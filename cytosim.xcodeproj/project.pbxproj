@@ -1806,7 +1806,7 @@
 		BBC422F9247342CF007EA070 /* hand_list.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hand_list.cc; sourceTree = "<group>"; };
 		BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fp_exceptions.cc; sourceTree = "<group>"; };
 		BBC4C3A024D5CDE100DB5187 /* test_string.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_string.cc; sourceTree = "<group>"; };
-		BBC6A56D25AF9BCB00C1EAE2 /* simd_math.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_math.h; sourceTree = "<group>"; };
+		BBC6A56D25AF9BCB00C1EAE2 /* simd_math.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simd_math.cc; sourceTree = "<group>"; };
 		BBC91299204EC2DC00219DC5 /* test_pipe.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_pipe.cc; sourceTree = "<group>"; };
 		BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sparmatsymblkdiag.cc; sourceTree = "<group>"; };
 		BBC96C5524A8A9CD00864F9B /* sparmatsymblkdiag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sparmatsymblkdiag.h; sourceTree = "<group>"; };
@@ -2604,7 +2604,7 @@
 				BB6CD587254ED31A00FB7547 /* real_print.h */,
 				BB9D224520C5D30200CBB0B1 /* simd.h */,
 				BB46A4C424A349F400E89FE2 /* simd_float.h */,
-				BBC6A56D25AF9BCB00C1EAE2 /* simd_math.h */,
+				BBC6A56D25AF9BCB00C1EAE2 /* simd_math.cc */,
 				BB18BB8523CDC20400B3605E /* simd_print.h */,
 				BBE447C4206468560058ADAC /* random */,
 				BB1B0F5323D3068B00C2608A /* grid */,

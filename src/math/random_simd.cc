@@ -2,26 +2,29 @@
 
 
 // pack array by removing all 'not-a-number's in arrray [s, e[
-static inline real * remove_nans(real * s, real * e)
+static inline real * remove_nan_pairs(real * s, real * e)
 {
     while ( s < e )
     {
-        --e;
+        e -= 2;
         // find the next `nan` going upward:
         while ( !std::isnan(*s) )
         {
-            if ( ++s > e )
+            s += 2;
+            if ( s > e )
                 return s;
         }
         // skip `nan` values going downward:
         while ( std::isnan(*e) )
         {
-            if ( --e <= s )
+            e -= 2;
+            if ( e <= s )
                 return s;
         }
         // copy number over:
-        *s++ = *e;
-        //*e = 0.0;
+        s[0] = e[0];
+        s[1] = e[1];
+        s += 2;
     }
     return s;
 }
@@ -86,19 +89,20 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
     const vec8f two = set8f(-2.0f);
-    const vec8f PI = set8f(M_PI);
+    const vec8f PI = set8f(M_PI*0x1p-31);
 
     real * d = dst;
     __m256i const* end = src + cnt;
     while ( src < end )
     {
-        // generate 16 random floats in [-1, 1]:
-        vec8f n = mul8f(eps, cvt8if(load8si(src++)));
-        vec8f t = mul8f(eps, cvt8if(load8si(src++)));
-        // calculate norm:
-        n = sqrt8f(mul8f(logapprox8f(abs8f(n)), two));
+        // generate norm in ]0, 1]:
+        vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(cvt8if(load8si(src++)))));
+        // generate angle in ]-PI, PI[:
+        vec8f t = mul8f(PI, cvt8if(load8si(src++)));
+        // transform norm:
+        n = sqrt8f(mul8f(logapprox8f(n), two));
         vec8f x, y;
-        cossinapprox8f(x, y, mul8f(PI, t));
+        cossinapprox8f(x, y, t);
         x = mul8f(n, x);
         y = mul8f(n, y);
 #if REAL_IS_DOUBLE
@@ -151,7 +155,7 @@ static real * gauss_fill_AVX1(real dst[], size_t cnt, const __m256i src[])
 #endif
         d += 16;
     }
-    return remove_nans(dst, d);
+    return remove_nan_pairs(dst, d);
     return d;
 }
 
@@ -182,7 +186,7 @@ static real * gauss_fill_AVX2(real dst[], size_t cnt, const __m256i src[])
     const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
     const vec8f half = set8f(-0.5f);
 
-    __m256i const* end = src + cnt;
+    __m256i const* end = src + cnt - 2;
 
     real * d = dst;  //cnt=78=39*2 // cnt*8 = 640
     real * e = dst+4*(cnt-2);
@@ -252,11 +256,15 @@ static real * gauss_fill_AVX2(real dst[], size_t cnt, const __m256i src[])
         y = blendv8f(y, u, k);
 #endif
 #if REAL_IS_DOUBLE
-        // convert 16 single-precision values
-        store4(d  , cvt4sd(getlo4f(x)));
-        store4(d+4, cvt4sd(gethi4f(x)));
-        store4(e  , cvt4sd(getlo4f(y)));
-        store4(e+4, cvt4sd(gethi4f(y)));
+        // convert to single-precision values
+        store4(d   , cvt4sd(getlo4f(x)));
+        store4(d+4 , cvt4sd(gethi4f(x)));
+        store4(d+8 , cvt4sd(getlo4f(y)));
+        store4(d+12, cvt4sd(gethi4f(y)));
+        store4(e   , cvt4sd(getlo4f(z)));
+        store4(e+4 , cvt4sd(gethi4f(z)));
+        store4(f   , cvt4sd(getlo4f(t)));
+        store4(f+4 , cvt4sd(gethi4f(t)));
 #else
         // store 16 single-precision values
         store8f(d, x);
@@ -268,7 +276,7 @@ static real * gauss_fill_AVX2(real dst[], size_t cnt, const __m256i src[])
         e += 8;
         f += 8;
     }
-    //return remove_nans(dst, d) - dst;
+    return remove_nan_pairs(dst, f);
     return dst+8*cnt;
 }
 

@@ -9,6 +9,7 @@
 #include "platonic.h"
 #include "simd.h"
 #include "simd_float.h"
+#include "simd_math.cc"
 
 
 namespace gle
@@ -90,40 +91,18 @@ namespace gle
         }
     }
 
-#ifdef __AVX__
-    // This works only if 'GLfloat == float'
-    void circle(size_t cnt, float CS[], double rad, double start)
-    {
-        const double theta = 2.0 * M_PI / (double)cnt;
-        const double c = std::cos(theta);
-        const double s = std::sin(theta);
-        const double c2 = c * c - s * s;
-        const double s2 = c * s + c * s;
-
-        vec4 cs{ c2, s2,  c2, s2};
-        vec4 sc{-s2, c2, -s2, c2};
-        
-        const double x0 = rad * std::cos(start);
-        const double y0 = rad * std::sin(start);
-        vec4 pp{x0, y0, c*x0-s*y0, s*x0+c*y0};
-        
-        GLfloat * ptr = CS;
-        GLfloat * const end = CS + 2 * cnt;
-        while ( ptr < end )
-        {
-            store4d(ptr, pp);
-            ptr += 4;
-            // apply the rotation matrix
-            // x = c * x - s * y;
-            // y = s * y + c * y;
-            pp = add4(mul4(cs, duplo4(pp)), mul4(sc, duphi4(pp)));
-        }
-        end[0] = x0;
-        end[1] = y0;
-    }
-#else
+    /**
+    Initialize CS[] to a circle:
+    delta = 2 * PI / cnt;
+        CS[2*i  ] = rad * cos(start+i*delta)
+        CS[2*i+1] = rad * sin(start+i*delta)
+    */
     void circle(size_t cnt, GLfloat CS[], double rad, double start)
     {
+#ifdef __AVX__
+        // This assumes that 'GLfloat == float'
+        return circleAVX(cnt, CS, rad, start);
+#endif
         const double theta = 2.0 * M_PI / (double)cnt;
         const double c = std::cos(theta);
         const double s = std::sin(theta);
@@ -145,7 +124,6 @@ namespace gle
         CS[2*cnt  ] = CS[0];
         CS[2*cnt+1] = CS[1];
     }
-#endif
     
     void initialize()
     {

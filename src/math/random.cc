@@ -287,7 +287,7 @@ void Random::refill_gaussians()
 
 #include "simd.h"
 #include "simd_float.h"
-#include "simd_math.h"
+#include "simd_math.cc"
 #include "random_simd.cc"
 
 
@@ -366,12 +366,12 @@ void Random::gauss_set(real vec[], size_t cnt)
  A note on the generation of random normal deviates
  Box & Muller, 1958
  */
-void Random::gauss_slow(real& x, real& y)
+void Random::gauss_boxmuller(real& x, real& y)
 {
-    real angle = real( URAND32() ) * ( TWO_POWER_MINUS_31 * M_PI );
-    real norm  = std::sqrt( -2 * std::log( preal_exc() ));
-    x = norm * std::cos(angle);
-    y = norm * std::sin(angle);
+    real ang = real(RAND32()) * ( TWO_POWER_MINUS_31 * M_PI );
+    real nrm  = std::sqrt( -2 * std::log( preal_exc() ));
+    x = nrm * std::cos(ang);
+    y = nrm * std::sin(ang);
 }
 
 //------------------------------------------------------------------------------

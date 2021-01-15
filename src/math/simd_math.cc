@@ -5,7 +5,7 @@
 #if defined(__AVX__)
 
 /// approximate reciprocal square root : 1 / sqrt(x) for 4 doubles
-inline static vec4 rsqrt4(vec4 x)
+inline vec4 rsqrt4(vec4 x)
 {
     vec4 t = set4(1.5);
     vec4 h = mul4(x, set4(0.5));
@@ -24,7 +24,7 @@ inline static vec4 rsqrt4(vec4 x)
 
 
 /// approximate reciprocal square root : 1 / sqrt(x) for 8 floats
-inline static vec8f rsqrt8fi(vec8f x)
+inline vec8f rsqrt8fi(vec8f x)
 {
     vec8f h = mul8f(x, set8f(0.5f));
     x = rsqrt8f(x);
@@ -39,9 +39,9 @@ inline static vec8f rsqrt8fi(vec8f x)
 #if defined(__INTEL_COMPILER)
 
 /// natural logarithm, part of Intel's SVML library
-inline static vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
+inline vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
 /// natural logarithm, part of Intel's SVML library
-inline static vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
+inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
 
 #endif
 
@@ -150,6 +150,43 @@ inline float cossinapprox8f(vec8f& C, vec8f& S, vec8f x)
     S = add8f(mul8f(xx, S), set8f(-0.1666243672f));
     S = add8f(mul8f(xx, S), set8f(0.9999793767f));
     S = mul8f(x, S);
+}
+
+
+/**
+ Initialize CS[] to a circle:
+ delta = 2 * PI / cnt;
+     CS[2*i  ] = rad * cos(start+i*delta)
+     CS[2*i+1] = rad * sin(start+i*delta)
+ */
+inline void circleAVX(size_t cnt, float CS[], double rad, double start)
+{
+    const double theta = 2.0 * M_PI / (double)cnt;
+    const double c = std::cos(theta);
+    const double s = std::sin(theta);
+    const double c2 = c * c - s * s;
+    const double s2 = c * s + c * s;
+
+    vec4 cs{ c2, s2,  c2, s2};
+    vec4 sc{-s2, c2, -s2, c2};
+    
+    const double x0 = rad * std::cos(start);
+    const double y0 = rad * std::sin(start);
+    vec4 pp{x0, y0, c*x0-s*y0, s*x0+c*y0};
+    
+    float * ptr = CS;
+    float * const end = CS + 2 * cnt;
+    while ( ptr < end )
+    {
+        store4d(ptr, pp);
+        ptr += 4;
+        // apply the rotation matrix
+        // x = c * x - s * y;
+        // y = s * y + c * y;
+        pp = add4(mul4(cs, duplo4(pp)), mul4(sc, duphi4(pp)));
+    }
+    end[0] = x0;
+    end[1] = y0;
 }
 
 #endif

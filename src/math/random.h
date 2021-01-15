@@ -12,8 +12,11 @@
 
 #include "SFMT.h"
 
+/// the maximum value of a signed 32-bit integer is 2e31-1
 #define TWO_POWER_MINUS_31 0x1p-31
+/// the maximum value of a unsigned 32-bit integer is 2e32-1
 #define TWO_POWER_MINUS_32 0x1p-32
+/// the maximum value of a unsigned 32-bit integer is 2e64-1
 #define TWO_POWER_MINUS_64 0x1p-64
 
 
@@ -287,7 +290,7 @@ public:
     void gauss_set(real vec[], size_t n, real v);
 
     /// signed real number, following a normal law N(0,1), slower algorithm
-    void gauss_slow(real &, real&);
+    void gauss_boxmuller(real &, real&);
     
     /// random in [0, inf[, with P(x) = exp(-x), mean = 1.0, variance = 1.0
     real exponential() { return -std::log( PREAL() * TWO_POWER_MINUS_32 + TWO_POWER_MINUS_32 );  }

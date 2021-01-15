@@ -444,7 +444,7 @@ real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
 
 #include "simd.h"
 #include "simd_float.h"
-#include "simd_math.h"
+#include "simd_math.cc"
 
 
 /* Absolute error bounded by 1e-5 for normalized inputs
@@ -678,10 +678,12 @@ void runGaussian(__m256i* buf, const char str[], int cnt)
     }
     printf("%-12s %5.2f :", str, toc(cnt));
     check_gaussian(end-vec, vec);
-    print_gaussian(SFMT_N32, vec); //std::min(SFMT_N256, 64), vec);
+    print_gaussian(end-vec, vec); //std::min(end-vec, 64), vec);
 }
 
-
+/**
+ Tests different implementation for speed
+ */
 void test_gaussian(int cnt)
 {
     printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
@@ -715,6 +717,22 @@ void test_gaussian(int cnt)
         print_gaussian(std::min(SFMT_N256, 32), vec);
     }
 #endif
+}
+
+/**
+ Prints many Gaussian distributecd random numbers
+ */
+void print_gaussian(int cnt)
+{
+    __m256i * buf = (__m256i*)RNG.data();
+    real *end, vec[SFMT_N32];
+
+    for ( int i = 0; i < cnt; ++i )
+    {
+        RNG.refill();
+        end = gauss_fill_AVX0(vec, SFMT_N256, buf);
+        for ( real * ptr = vec; ptr < end; ++ptr )
+            printf("%10.5f\n", *ptr);    }
 }
 
 
@@ -768,6 +786,10 @@ int main(int argc, char* argv[])
             
         case 7:
             test_gaussian(1<<18);
+            break;
+            
+        case 8:
+            print_gaussian(128);
             break;
     }
     
