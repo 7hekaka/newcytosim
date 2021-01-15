@@ -35,6 +35,8 @@
 */
 class alignas(64) Random
 {
+    uint32_t buffer_[SFMT_N32];
+    
     /// reserve of standard normally-distributed numbers ~ N(0,1)
     real gaussians_[SFMT_N32];
 

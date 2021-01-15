@@ -30,6 +30,9 @@
 static const w256_t avx2_param_mask = {{SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4,
     SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4}};
 
+static const w128_t avx_mask = {{SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4}};
+
+#ifdef __AVX2__
 /**
  * This function represents the recursion formula.
  * @param r an output
@@ -50,12 +53,47 @@ inline static void mm_recursion2(__m256i* r, __m256i a, __m256i b, __m256i c)
     x = _mm256_xor_si256(x, z);
 
     /* assume SFMT_SL1 >= 16 */
-    z = _mm256_permute2f128_si256(c, x, 0x21);     /* [c.upper, x.lower] */ 
+    z = _mm256_permute2f128_si256(c, x, 0x21);     /* [c.upper, x.lower] */
     z = _mm256_slli_epi32(z, SFMT_SL1);
     x = _mm256_xor_si256(x, z);
 
     _mm256_store_si256(r, x);
 }
+#else
+inline static void mm_recursion2(__m256i* r, __m256i a, __m256i b, __m256i c)
+{
+    __m128i la = _mm256_castsi256_si128(a), ua = _mm256_extractf128_si256(a, 1);
+    __m128i lb = _mm256_castsi256_si128(b), ub = _mm256_extractf128_si256(b, 1);
+    __m128i lc = _mm256_castsi256_si128(c), uc = _mm256_extractf128_si256(c, 1);
+    __m128i lx, ly, lz;
+    __m128i ux, uy, uz;
+
+    lx = _mm_slli_si128(la, SFMT_SL2);
+    ux = _mm_slli_si128(ua, SFMT_SL2);
+    lx = _mm_xor_si128(lx, la);
+    ux = _mm_xor_si128(ux, ua);
+    ly = _mm_srli_epi32(lb, SFMT_SR1);
+    uy = _mm_srli_epi32(ub, SFMT_SR1);
+    ly = _mm_and_si128(ly, avx_mask.xmm);
+    uy = _mm_and_si128(uy, avx_mask.xmm);
+    lx = _mm_xor_si128(lx, ly);
+    ux = _mm_xor_si128(ux, uy);
+    lz = _mm_srli_si128(lc, SFMT_SR2);
+    uz = _mm_srli_si128(uc, SFMT_SR2);
+    lx = _mm_xor_si128(lx, lz);
+    ux = _mm_xor_si128(ux, uz);
+
+    /* assume SFMT_SL1 >= 16 */
+    //z = _mm256_permute2f128_si256(c, x, 0x21);     /* [c.upper, x.lower] */
+    //lz = uc; uz = lx;
+    lz = _mm_slli_epi32(uc, SFMT_SL1);
+    uz = _mm_slli_epi32(lx, SFMT_SL1);
+    lx = _mm_xor_si128(lx, lz);
+    ux = _mm_xor_si128(ux, uz);
+
+    _mm256_store_si256(r, _mm256_set_m128i(ux, lx));
+}
+#endif
 
 /**
  * This function fills the internal state array with pseudorandom
@@ -68,7 +106,7 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
     int i;
     int pos = SFMT_POS1 / 2;
     __m256i r;
-    __m256i * pstate = sfmt->state_y;
+    __m256i * pstate = sfmt->state256;
     
     r = _mm256_load_si256(pstate+SFMT_N256-1);
     for (i = 0; i < SFMT_N256-pos; ++i) {
@@ -149,14 +187,13 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, unsigned size)
     }
 }
 #else
-static void gen_rand_array(sfmt_t * sfmt, w128_t * input, unsigned double_size)
+static void gen_rand_array(sfmt_t * sfmt, w128_t * input, unsigned size128)
 {
-    //printf("AVX2 gen_rand_array\n");
-    unsigned size = double_size / 2;
+    unsigned size = size128 / 2;
     unsigned pos = SFMT_POS1 / 2;
     unsigned i, j;
     __m256i r;
-    __m256i * pstate = sfmt->state_y;
+    __m256i * pstate = sfmt->state256;
     __m256i * array = (__m256i*)input;
 
     r = _mm256_loadu_si256(&pstate[SFMT_N256 - 1]);

@@ -278,9 +278,8 @@ real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
  */
 void Random::refill_gaussians()
 {
-    int32_t * mem = reinterpret_cast<int32_t*>(gaussians_+SFMT_N32) - SFMT_N32;
-    sfmt_fill_array32(&twister_, (uint32_t*)mem, SFMT_N32);
-    next_gaussian_ = gauss_fill(gaussians_, SFMT_N32, mem);
+    sfmt_fill_array32(&twister_, buffer_, SFMT_N32);
+    next_gaussian_ = gauss_fill(gaussians_, SFMT_N32, (int32_t*)buffer_);
     //printf("refill_gaussians %lu\n", next_gaussian_ - gaussians_);
 }
 
@@ -300,10 +299,8 @@ void Random::refill_gaussians()
  */
 void Random::refill_gaussians()
 {
-    __m256i * mem = reinterpret_cast<__m256i*>(gaussians_+SFMT_N32) - SFMT_N256;
-    //alignas(64) __m256i mem[SFMT_N32];
-    sfmt_fill_array32(&twister_, (uint32_t*)mem, SFMT_N32);
-    next_gaussian_ = gauss_fill_AVX0(gaussians_, SFMT_N256, mem);
+    sfmt_fill_array32(&twister_, buffer_, SFMT_N32);
+    next_gaussian_ = gauss_fill_AVX0(gaussians_, SFMT_N256, (__m256i*)buffer_);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
 }
 

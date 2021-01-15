@@ -39,8 +39,8 @@
 #ifdef __SSE2__
 #define HAVE_SSE2 1
 #endif
-#ifdef __AVX2__
-#define HAVE_AVX2 1
+#ifdef __AVX__
+#define HAVE_AVX 1
 #endif
 /* F. Nedelec */
 
@@ -105,7 +105,7 @@ union W128_T {
 union W128_T {
     uint32_t u[4];
     uint64_t u64[2];
-    __m128i si;
+     __m128i xmm;
 };
 #else
 /** 128-bit data structure */
@@ -115,14 +115,14 @@ union W128_T {
 };
 #endif
 
-#ifdef HAVE_AVX2
+#if HAVE_AVX
   #include <immintrin.h>
 /** 256-bit data structure */
 union W256_T {
     uint32_t u[8];
     uint64_t u64[4];
-    __m128i xmm[2];
-    __m256i ymm;
+     __m128i xmm[2];
+     __m256i ymm;
 };
 typedef union W256_T w256_t;
 #endif
@@ -135,10 +135,10 @@ typedef union W128_T w128_t;
  */
 struct SFMT_T {
     /** the 128-bit internal state array */
-#ifdef __AVX2__
+#if HAVE_AVX
     union {
-        __m256i state_y[SFMT_N256];
-        w128_t state[SFMT_N];
+    __m256i state256[SFMT_N256];
+     w128_t state[SFMT_N];
     };
 #else
     w128_t state[SFMT_N];

@@ -54,7 +54,7 @@ inline static void swap(w128_t *array, unsigned size);
 
 #if defined(HAVE_ALTIVEC)
   #include "SFMT-alti.h"
-#elif defined(HAVE_AVX2)
+#elif defined(HAVE_AVX)
   #include "SFMT-avx2.h"
 #elif defined(__SSE2__)
   #if defined(_MSC_VER)

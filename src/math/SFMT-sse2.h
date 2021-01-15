@@ -44,7 +44,7 @@ inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
     z = _mm_xor_si128(z, a);
     z = _mm_xor_si128(z, v);
     x = _mm_slli_si128(a, SFMT_SL2);
-    y = _mm_and_si128(y, sse2_param_mask.si);
+    y = _mm_and_si128(y, sse2_param_mask.xmm);
     z = _mm_xor_si128(z, x);
     z = _mm_xor_si128(z, y);
     *r = z;
@@ -60,20 +60,20 @@ void sfmt_gen_rand_all(sfmt_t * sfmt) {
     __m128i r1, r2;
     w128_t * pstate = sfmt->state;
 
-    r1 = pstate[SFMT_N - 2].si;
-    r2 = pstate[SFMT_N - 1].si;
+    r1 = pstate[SFMT_N - 2].xmm;
+    r2 = pstate[SFMT_N - 1].xmm;
     for (i = 0; i < SFMT_N - SFMT_POS1; i++) {
-    mm_recursion(&pstate[i].si, pstate[i].si,
-             pstate[i + SFMT_POS1].si, r1, r2);
+    mm_recursion(&pstate[i].xmm, pstate[i].xmm,
+             pstate[i + SFMT_POS1].xmm, r1, r2);
     r1 = r2;
-    r2 = pstate[i].si;
+    r2 = pstate[i].xmm;
     }
     for (; i < SFMT_N; i++) {
-    mm_recursion(&pstate[i].si, pstate[i].si,
-             pstate[i + SFMT_POS1 - SFMT_N].si,
+    mm_recursion(&pstate[i].xmm, pstate[i].xmm,
+             pstate[i + SFMT_POS1 - SFMT_N].xmm,
              r1, r2);
     r1 = r2;
-    r2 = pstate[i].si;
+    r2 = pstate[i].xmm;
     }
 }
 
@@ -90,34 +90,34 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * array, unsigned size)
     __m128i r1, r2;
     w128_t * pstate = sfmt->state;
 
-    r1 = pstate[SFMT_N - 2].si;
-    r2 = pstate[SFMT_N - 1].si;
+    r1 = pstate[SFMT_N - 2].xmm;
+    r2 = pstate[SFMT_N - 1].xmm;
     for (i = 0; i < SFMT_N - SFMT_POS1; i++) {
-    mm_recursion(&array[i].si, pstate[i].si,
-             pstate[i + SFMT_POS1].si, r1, r2);
+    mm_recursion(&array[i].xmm, pstate[i].xmm,
+             pstate[i + SFMT_POS1].xmm, r1, r2);
     r1 = r2;
-    r2 = array[i].si;
+    r2 = array[i].xmm;
     }
     for (; i < SFMT_N; i++) {
-    mm_recursion(&array[i].si, pstate[i].si,
-             array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
+    mm_recursion(&array[i].xmm, pstate[i].xmm,
+             array[i + SFMT_POS1 - SFMT_N].xmm, r1, r2);
     r1 = r2;
-    r2 = array[i].si;
+    r2 = array[i].xmm;
     }
     for (; i < size - SFMT_N; i++) {
-    mm_recursion(&array[i].si, array[i - SFMT_N].si,
-             array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
+    mm_recursion(&array[i].xmm, array[i - SFMT_N].xmm,
+             array[i + SFMT_POS1 - SFMT_N].xmm, r1, r2);
     r1 = r2;
-    r2 = array[i].si;
+    r2 = array[i].xmm;
     }
     for (j = 0; j < 2 * SFMT_N - size; j++) {
     pstate[j] = array[j + size - SFMT_N];
     }
     for (; i < size; i++, j++) {
-    mm_recursion(&array[i].si, array[i - SFMT_N].si,
-             array[i + SFMT_POS1 - SFMT_N].si, r1, r2);
+    mm_recursion(&array[i].xmm, array[i - SFMT_N].xmm,
+             array[i + SFMT_POS1 - SFMT_N].xmm, r1, r2);
     r1 = r2;
-    r2 = array[i].si;
+    r2 = array[i].xmm;
     pstate[j] = array[i];
     }
 }
