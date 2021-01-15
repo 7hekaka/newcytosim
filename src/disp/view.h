@@ -225,7 +225,7 @@ public:
 
     //---------------------------------------------------------------------------
     
-    /// draw text using gleDrawText
+    /// draw text
     void       drawText(std::string const& str, void* font, gle_color, int pos) const;
 
     /// display tiny vertical lines as elements of a scale bar

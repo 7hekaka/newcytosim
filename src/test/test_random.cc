@@ -726,13 +726,15 @@ void print_gaussian(int cnt)
 {
     __m256i * buf = (__m256i*)RNG.data();
     real *end, vec[SFMT_N32];
-
+#if defined(__AVX__)
     for ( int i = 0; i < cnt; ++i )
     {
         RNG.refill();
         end = gauss_fill_AVX0(vec, SFMT_N256, buf);
         for ( real * ptr = vec; ptr < end; ++ptr )
-            printf("%10.5f\n", *ptr);    }
+            printf("%10.5f\n", *ptr);
+    }
+#endif
 }
 
 
@@ -792,7 +794,5 @@ int main(int argc, char* argv[])
             print_gaussian(128);
             break;
     }
-    
-    printf("done\n");
 }
 

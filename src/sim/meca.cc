@@ -1865,7 +1865,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             // try with different seed and strongest preconditioner
             monitor.reset();
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
-            Cytosim::out(" reseeded: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+            Cytosim::out(" -> final: count %4i residual %.3e\n", monitor.count(), monitor.residual());
         }
 #endif
 

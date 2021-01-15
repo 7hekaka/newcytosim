@@ -1117,13 +1117,14 @@ void Parser::parse_dump(std::istream& is)
         char const* dir = str.c_str();
         std::string cwd = FilePath::get_cwd();
         FilePath::change_dir(dir, true);
+        fprintf(stderr, "Cytosim is dumping a system of size %lu in `%s'...", simul.sMeca.dimension(), dir);
 
         if ( mode & 1 ) simul.sMeca.saveSystem();
         if ( mode & 2 ) simul.sMeca.dumpSystem();
         if ( mode & 4 ) simul.sMeca.exportSystem();
 
         FilePath::change_dir(cwd);
-        fprintf(stderr, "Cytosim dump a %iD system of size %lu in `%s'\n", DIM, simul.sMeca.dimension(), dir);
+        fprintf(stderr, "done\n");
     }
 }
 

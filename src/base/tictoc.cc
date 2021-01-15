@@ -63,11 +63,13 @@ int  TicToc::days_since_2000()
 }
 
 
+/** Attention: this will fail after Jan. 2038 */
 time_t TicToc::seconds_since_1970()
 {
     return time(nullptr);
 }
 
+/** Attention: this will fail after Jan. 2038 */
 time_t  TicToc::seconds_since_2000()
 {
     return time(nullptr) - 946684800;
