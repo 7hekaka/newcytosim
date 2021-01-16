@@ -1,30 +1,51 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 
-// pack array by removing all 'not-a-number's in arrray [s, e[
+/// pack array by removing all 'not-a-number's in arrray [s, e[
+/** Attention: this may not work with option `-ffast-math` */
 static inline real * remove_nan_pairs(real * s, real * e)
 {
-    while ( s < e )
+    //real * start = s;
+    e -= 2;
+    if ( s < e )
     {
-        e -= 2;
         // find the next `nan` going upward:
-        while ( !std::isnan(*s) )
+        while ( s[0] == s[0] )
         {
             s += 2;
-            if ( s > e )
-                return s;
+            if ( s >= e )
+                break;
         }
         // skip `nan` values going downward:
-        while ( std::isnan(*e) )
+        while ( e[0] != e[0] )
         {
             e -= 2;
             if ( e <= s )
-                return s;
+                break;
         }
-        // copy number over:
+        //printf("- %4lu  %4lu\n", s-start, e-start);
+        // swap numbers over, putting NaNs toward the end of array
+        std::swap(s[0], e[0]);
+        std::swap(s[1], e[1]);
+        s += 2;
+        e -= 2;
+    }
+    while ( s < e )
+    {
+        // find the next `nan` going upward:
+        while ( s[0] == s[0] )
+            s += 2;
+        // skip `nan` values going downward:
+        while ( e[0] != e[0] )
+            e -= 2;
+        if ( s >= e )
+            break;
+        //printf("  %4lu  %4lu\n", s-start, e-start);
+        // copy numbers over:
         s[0] = e[0];
         s[1] = e[1];
         s += 2;
+        e -= 2;
     }
     return s;
 }

@@ -92,8 +92,8 @@ ifeq ($(COMPILER),gcc)
 # export CPATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
 
     CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
-    FAST     := -O3 -fno-trapping-math -ffast-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
-    FAST     := -O3 -fno-trapping-math -ffast-math -funroll-loops -ffp-contract=fast -march=native
+    FAST     := -O3 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
+    FAST     := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native # -mavx2 -mfma
 
     DEBUG    := -g3 -ggdb # -Wconversion
     COVERAGE := -fprofile-arcs -ftest-coverage
@@ -125,8 +125,8 @@ else ifeq ($(COMPILER),clang)
 # the old library: -stdlib=libstdc++ (deprecated)
 
     CXX      := c++ -Wfatal-errors
-    FAST     := -O3 -ffast-math -funroll-loops -mavx2 -mfma
-    FAST     := -O3 -ffast-math -funroll-loops
+    FAST     := -O3 -funroll-loops -mavx2 -mfma
+    FAST     := -O3 -funroll-loops
     DEBUG    := -g3 -ggdb
     COVERAGE := -fprofile-arcs -ftest-coverage
 
@@ -179,7 +179,7 @@ ifeq ($(MACHINE),cluster)
     MKLDIR := $(MKLROOT)/lib/intel64
 
     # Beware of AVX2 and other advanced features on heterogeneous clusters:
-    FAST   :=-O3 -fno-tree-vectorize -ffast-math -funroll-loops -mavx -ffp-contract=fast
+    FAST   :=-O3 -fno-tree-vectorize-funroll-loops -mavx -ffp-contract=fast
 
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := $(FAST) $(ALIGN) -O0 -fno-inline -pg
@@ -309,8 +309,8 @@ ifeq ($(MACHINE),windows)
     # copying "libblas.a" and "liblapack.a" in "/usr/lib"
 
     FlagsD := -g  $(WARN)
-    FlagsP := -pg -O3 -march=i686 -ffast-math $(ALIGN)
-    FlagsF := -O3 -finline-functions -march=i686 -ffast-math $(ALIGN)
+    FlagsP := -pg -O3 -march=i686 $(ALIGN)
+    FlagsF := -O3 -finline-functions -march=i686 $(ALIGN)
   
     LINK   := -llapack -lblas
     GRAFIX := -lglut32 -lglu32 -lopengl32

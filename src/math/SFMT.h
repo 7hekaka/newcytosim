@@ -115,7 +115,7 @@ union W128_T {
 };
 #endif
 
-#if HAVE_AVX2
+#ifdef HAVE_AVX2
   #include <immintrin.h>
 /** 256-bit data structure */
 union W256_T {

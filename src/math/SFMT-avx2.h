@@ -34,7 +34,7 @@ void sfmt_gen_rand_all_generic(sfmt_t * sfmt)
         r1 = r2;
         r2 = &sfmt->state[i];
     }
-    for (; i < SFMT_N; i++) {
+    for (i = SFMT_N - SFMT_POS1; i < SFMT_N; i++) {
         do_recursion(&sfmt->state[i], &sfmt->state[i],
                      &sfmt->state[i + SFMT_POS1 - SFMT_N], r1, r2);
         r1 = r2;
@@ -136,7 +136,7 @@ void sfmt_gen_rand_all(sfmt_t * sfmt)
  */
 static void gen_rand_array(sfmt_t * sfmt, w128_t * input, unsigned size128)
 {
-    unsigned size = size128 / 2;
+    int size = size128 / 2;
     unsigned i, j;
     __m256i r;
     __m256i * pstate = (__m256i*)sfmt->state;
@@ -147,18 +147,18 @@ static void gen_rand_array(sfmt_t * sfmt, w128_t * input, unsigned size128)
         r = mm256_recursion(pstate[i], pstate[i + SFMT_POS1/2], r);
         pstate[i] = r;
     }
-    for (; i < SFMT_N256; ++i) {
+    for (i = (SFMT_N-SFMT_POS1)/2; i < SFMT_N256; ++i) {
         r = mm256_recursion(pstate[i], array[i + (SFMT_POS1-SFMT_N)/2], r);
         pstate[i] = r;
     }
-    for (; i < size - SFMT_N256; ++i) {
+    for (i = SFMT_N256; i < size - SFMT_N256; ++i) {
         r = mm256_recursion(array[i - SFMT_N/2], array[i + (SFMT_POS1-SFMT_N)/2], r);
         pstate[i] = r;
     }
     for (j = 0; j < SFMT_N - size; ++j) {
         pstate[j] = array[j + size - SFMT_N/2];
     }
-    for (; i < size; ++i, ++j) {
+    for (i = size - SFMT_N256; i < size; ++i, ++j) {
         r = mm256_recursion(array[i - SFMT_N/2], array[i + (SFMT_POS1-SFMT_N)/2], r);
         pstate[i] = r;
     }
