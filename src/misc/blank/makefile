@@ -53,7 +53,7 @@ $(OBJ): %.o: %.cc
 	$(COMPILE) $(INCLUDE) -c $< -o build/$@
 
 SFMT.o: SFMT.c SFMT-std.c SFMT-sse2.c SFMT-alti.c
-	$(CXX) -x c -DNDEBUG -DSFMT_MEXP=19937 -Iimport -c $< -o build/$@
+	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -Iimport -x c -c $< -o build/$@
 
 #----------------------------makedep--------------------------------------------
 

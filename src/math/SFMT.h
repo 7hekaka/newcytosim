@@ -39,7 +39,7 @@
 #ifdef __SSE2__
 #define HAVE_SSE2 1
 #endif
-#ifdef __AVX__
+#ifdef __AVX2__
 #define HAVE_AVX2 1
 #endif
 /* F. Nedelec */

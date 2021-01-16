@@ -64,7 +64,7 @@ build/saveimage.o: saveimage.cc saveimage.h
 # Attention: Mersenne-Twister is coded in C-language,
 # and we must provide this with '-x c' to the compiler:
 SFMT.o: SFMT.c SFMT.h
-	$(CXX) -x c -DNDEBUG -DSFMT_MEXP=19937 -c $< -o build/$@
+	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o build/$@
 
 #----------------------------makedep--------------------------------------------
 
