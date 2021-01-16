@@ -22,9 +22,6 @@
  */
 static const w128_t sse2_param_mask = {{SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MSK4}};
 
-inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
-                                __m128i c, __m128i d);
-
 /**
  * This function represents the recursion formula.
  * @param r an output
@@ -33,8 +30,7 @@ inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
  * @param c a 128-bit part of the interal state array
  * @param d a 128-bit part of the interal state array
  */
-inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
-                __m128i c, __m128i d)
+inline static __m128i mm_recursion(__m128i a, __m128i b, __m128i c, __m128i d)
 {
     __m128i v, x, y, z;
 
@@ -46,8 +42,7 @@ inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
     x = _mm_slli_si128(a, SFMT_SL2);
     y = _mm_and_si128(y, sse2_param_mask.xmm);
     z = _mm_xor_si128(z, x);
-    z = _mm_xor_si128(z, y);
-    *r = z;
+    return _mm_xor_si128(z, y);
 }
 
 /**
@@ -55,25 +50,25 @@ inline static void mm_recursion(__m128i * r, __m128i a, __m128i b,
  * integers.
  * @param sfmt SFMT internal state
  */
-void sfmt_gen_rand_all(sfmt_t * sfmt) {
+void sfmt_gen_rand_all(sfmt_t * sfmt)
+{
     int i;
-    __m128i r1, r2;
-    w128_t * pstate = sfmt->state;
+    __m128i r1, r2, rr;
+    __m128i * pstate = (__m128i*)sfmt->state;
 
-    r1 = pstate[SFMT_N - 2].xmm;
-    r2 = pstate[SFMT_N - 1].xmm;
+    r1 = pstate[SFMT_N - 2];
+    r2 = pstate[SFMT_N - 1];
     for (i = 0; i < SFMT_N - SFMT_POS1; i++) {
-    mm_recursion(&pstate[i].xmm, pstate[i].xmm,
-             pstate[i + SFMT_POS1].xmm, r1, r2);
+    rr = mm_recursion(pstate[i], pstate[i + SFMT_POS1], r1, r2);
+    pstate[i] = rr;
     r1 = r2;
-    r2 = pstate[i].xmm;
+    r2 = rr;
     }
     for (; i < SFMT_N; i++) {
-    mm_recursion(&pstate[i].xmm, pstate[i].xmm,
-             pstate[i + SFMT_POS1 - SFMT_N].xmm,
-             r1, r2);
+    rr = mm_recursion(pstate[i], pstate[i + (SFMT_POS1-SFMT_N)], r1, r2);
+    pstate[i] = rr;
     r1 = r2;
-    r2 = pstate[i].xmm;
+    r2 = rr;
     }
 }
 
@@ -84,40 +79,41 @@ void sfmt_gen_rand_all(sfmt_t * sfmt) {
  * @param array an 128-bit array to be filled by pseudorandom numbers.
  * @param size number of 128-bit pseudorandom numbers to be generated.
  */
-static void gen_rand_array(sfmt_t * sfmt, w128_t * array, unsigned size)
+static void gen_rand_array(sfmt_t * sfmt, w128_t * input, unsigned size)
 {
     unsigned i, j;
-    __m128i r1, r2;
-    w128_t * pstate = sfmt->state;
+    __m128i r1, r2, rr;
+    __m128i * pstate = (__m128i*)sfmt->state;
+    __m128i * array = (__m128i*)input;
 
-    r1 = pstate[SFMT_N - 2].xmm;
-    r2 = pstate[SFMT_N - 1].xmm;
+    r1 = pstate[SFMT_N - 2];
+    r2 = pstate[SFMT_N - 1];
     for (i = 0; i < SFMT_N - SFMT_POS1; i++) {
-    mm_recursion(&array[i].xmm, pstate[i].xmm,
-             pstate[i + SFMT_POS1].xmm, r1, r2);
+    rr = mm_recursion(pstate[i], pstate[i + SFMT_POS1], r1, r2);
+    array[i] = rr;
     r1 = r2;
-    r2 = array[i].xmm;
+    r2 = rr;
     }
     for (; i < SFMT_N; i++) {
-    mm_recursion(&array[i].xmm, pstate[i].xmm,
-             array[i + SFMT_POS1 - SFMT_N].xmm, r1, r2);
+    rr = mm_recursion(pstate[i], array[i + (SFMT_POS1-SFMT_N)], r1, r2);
+    array[i] = rr;
     r1 = r2;
-    r2 = array[i].xmm;
+    r2 = rr;
     }
     for (; i < size - SFMT_N; i++) {
-    mm_recursion(&array[i].xmm, array[i - SFMT_N].xmm,
-             array[i + SFMT_POS1 - SFMT_N].xmm, r1, r2);
+    rr = mm_recursion(array[i - SFMT_N], array[i + (SFMT_POS1-SFMT_N)], r1, r2);
+    array[i] = rr;
     r1 = r2;
-    r2 = array[i].xmm;
+    r2 = rr;
     }
     for (j = 0; j < 2 * SFMT_N - size; j++) {
     pstate[j] = array[j + size - SFMT_N];
     }
     for (; i < size; i++, j++) {
-    mm_recursion(&array[i].xmm, array[i - SFMT_N].xmm,
-             array[i + SFMT_POS1 - SFMT_N].xmm, r1, r2);
+    rr = mm_recursion(array[i - SFMT_N], array[i + (SFMT_POS1-SFMT_N)], r1, r2);
+    array[i] = rr;
     r1 = r2;
-    r2 = array[i].xmm;
+    r2 = rr;
     pstate[j] = array[i];
     }
 }

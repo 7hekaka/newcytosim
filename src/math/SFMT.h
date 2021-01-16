@@ -40,7 +40,7 @@
 #define HAVE_SSE2 1
 #endif
 #ifdef __AVX__
-#define HAVE_AVX 1
+#define HAVE_AVX2 1
 #endif
 /* F. Nedelec */
 
@@ -115,7 +115,7 @@ union W128_T {
 };
 #endif
 
-#if HAVE_AVX
+#if HAVE_AVX2
   #include <immintrin.h>
 /** 256-bit data structure */
 union W256_T {
@@ -135,14 +135,7 @@ typedef union W128_T w128_t;
  */
 struct SFMT_T {
     /** the 128-bit internal state array */
-#if HAVE_AVX
-    union {
-    __m256i state256[SFMT_N256];
-     w128_t state[SFMT_N];
-    };
-#else
     w128_t state[SFMT_N];
-#endif
     /** index counter to the 32-bit internal state array */
     int idx;
 };
