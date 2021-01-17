@@ -44,7 +44,7 @@ extern "C" {
   STATIC FUNCTIONS
   ----------------*/
 inline static unsigned idxof(unsigned i);
-inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, unsigned size);
+inline static void gen_rand_array(sfmt_t * sfmt, w128_t *array, int size);
 inline static uint32_t func1(uint32_t x);
 inline static uint32_t func2(uint32_t x);
 static void period_certification(sfmt_t * sfmt);
