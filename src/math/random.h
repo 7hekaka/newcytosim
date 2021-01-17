@@ -35,24 +35,34 @@
 */
 class alignas(64) Random
 {
-    uint32_t buffer_[SFMT_N32];
-    
+    /// reserve of random integers
+    uint32_t integers_[SFMT_N32];
+
     /// reserve of standard normally-distributed numbers ~ N(0,1)
     real gaussians_[SFMT_N32];
 
-    /// Mersenne Twister state variables
+    /// Mersenne Twister Generator
     sfmt_t twister_;
 
-    /// pointer to Mersenne Twister state vector
+    /// pointer to integer reserve, at unused lower end
     uint32_t const* start_;
 
-    /// pointer to Mersenne Twister state vector
+    /// pointer to integer reserve, at unused upper end + 1
     uint32_t const* end_;
     
     /// pointer to access the next value in `gaussians_[]`
     real * next_gaussian_;
     
 protected:
+    
+    /// replenish state vector
+    void refill()
+    {
+        sfmt_gen_rand_all(&twister_);
+        memcpy(integers_, twister_.state, 4*SFMT_N32);
+        start_ = integers_;
+        end_ = start_ + SFMT_N32;
+    }
 
     /// extract next 32 random bits
     uint32_t URAND32()
@@ -123,17 +133,6 @@ public:
     
     /// seed by reading /dev/random and if this fails using the clock
     uint32_t seed();
-   
-    /// replenish state vector
-    void refill()
-    {
-        sfmt_gen_rand_all(&twister_);
-        start_ = twister_.state[0].u;
-        end_ = start_ + SFMT_N32;
-    }
-    
-    /// access to immutable state vector
-    uint32_t const* data() { return twister_.state[0].u; }
 
     /// signed integer in [-2^31+1, 2^31-1];
     int32_t  sint32() { return RAND32(); }

@@ -288,12 +288,10 @@ void sfmt_gen_rand_all(sfmt_t * sfmt) {
  * returns the pointer to the aligned memory block.
  */
 void sfmt_fill_array32(sfmt_t * sfmt, uint32_t *array, unsigned size) {
-    assert(sfmt->idx == SFMT_N32);
     assert(size % 4 == 0);
     assert(size >= SFMT_N32);
 
     gen_rand_array(sfmt, (w128_t *)array, size / 4);
-    sfmt->idx = SFMT_N32;
 }
 #endif
 
@@ -324,12 +322,10 @@ void sfmt_fill_array32(sfmt_t * sfmt, uint32_t *array, unsigned size) {
  * returns the pointer to the aligned memory block.
  */
 void sfmt_fill_array64(sfmt_t * sfmt, uint64_t *array, unsigned size) {
-    assert(sfmt->idx == SFMT_N32);
     assert(size % 2 == 0);
     assert(size >= SFMT_N64);
 
     gen_rand_array(sfmt, (w128_t *)array, size / 2);
-    sfmt->idx = SFMT_N32;
 
 #if defined(BIG_ENDIAN64) && !defined(ONLY64)
     swap((w128_t *)array, size /2);
@@ -353,7 +349,6 @@ void sfmt_init_gen_rand(sfmt_t * sfmt, uint32_t seed) {
         psfmt32[idxof(i)] = 1812433253UL * (psfmt32[idxof(i-1)]
                                             ^ (psfmt32[idxof(i-1)] >> 30)) + i;
     }
-    sfmt->idx = SFMT_N32;
     period_certification(sfmt);
 }
 
@@ -425,7 +420,6 @@ void sfmt_init_by_array(sfmt_t * sfmt, uint32_t *init_key, unsigned key_length) 
         i = (i + 1) % SFMT_N32;
     }
 
-    sfmt->idx = SFMT_N32;
     period_certification(sfmt);
 }
 #if defined(__cplusplus)

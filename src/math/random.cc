@@ -45,14 +45,14 @@ Random::Random()
     
     //fprintf(stderr, "Random with SFMT_N32 = %i\n", SFMT_N32);
     
-    uint32_t * buf = twister_.state[0].u;
     // clear state (not necessary):
-    memset(buf, 0, 4*SFMT_N32);
+    memset(integers_, 0, 4*SFMT_N32);
     memset(gaussians_, 0, sizeof(real)*SFMT_N32);
+    memset(twister_.state[0].u, 0, 4*SFMT_N32);
 
-    // initialize pointers:
-    start_ = buf;
-    end_ = buf;
+    // initialize pointers signalling an empty reserve:
+    start_ = integers_;
+    end_ = start_;
     next_gaussian_ = gaussians_;
 }
 
@@ -97,7 +97,7 @@ uint32_t hash(long t, int32_t c)
 uint32_t Random::seed()
 {
     uint32_t s = 0;
-    // read system source if available, from /dev/random which does not block!
+    // read system source if available, from /dev/urandom which does not block!
     FILE * f = fopen("/dev/urandom", "r");
     if ( f && ! ferror(f) )
     {
@@ -278,8 +278,8 @@ real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
  */
 void Random::refill_gaussians()
 {
-    sfmt_fill_array32(&twister_, buffer_, SFMT_N32);
-    next_gaussian_ = gauss_fill(gaussians_, SFMT_N32, (int32_t*)buffer_);
+    sfmt_gen_rand_all(&twister_);
+    next_gaussian_ = gauss_fill(gaussians_, SFMT_N32, (int32_t*)twister_.state);
     //printf("refill_gaussians %lu\n", next_gaussian_ - gaussians_);
 }
 
@@ -299,8 +299,8 @@ void Random::refill_gaussians()
  */
 void Random::refill_gaussians()
 {
-    sfmt_fill_array32(&twister_, buffer_, SFMT_N32);
-    next_gaussian_ = gauss_fill_AVX0(gaussians_, SFMT_N256, (__m256i*)buffer_);
+    sfmt_gen_rand_all(&twister_);
+    next_gaussian_ = gauss_fill_AVX0(gaussians_, SFMT_N256, (__m256i*)twister_.state);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
 }
 
