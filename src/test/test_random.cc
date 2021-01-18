@@ -423,7 +423,6 @@ int testGillespie(const int method)
 real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
 {
     int32_t const*const end = src + cnt;
-    real * d = dst;
     while ( src < end )
     {
         real x = src[0] * TWO_POWER_MINUS_31;
@@ -432,12 +431,12 @@ real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
         if (( w <= 1 ) & ( 0 < w ))
         {
             w = std::sqrt( std::log(w) / ( -0.5 * w ) );
-            *d++ = w * x;
-            *d++ = w * y;
+            *dst++ = w * x;
+            *dst++ = w * y;
         }
         src += 2;
     }
-    return d;
+    return dst;
 }
 
 #if defined(__AVX__)

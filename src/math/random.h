@@ -58,10 +58,10 @@ protected:
     /// replenish state vector
     void refill()
     {
-        sfmt_gen_rand_all(&twister_);
         memcpy(integers_, twister_.state, 4*SFMT_N32);
         start_ = integers_;
         end_ = start_ + SFMT_N32;
+        sfmt_gen_rand_all(&twister_);
     }
 
     /// extract next 32 random bits
@@ -184,28 +184,28 @@ public:
 #endif
  
     /// integer in [0,n] for n < 2^32, (slow) bitwise algorithm
-    uint32_t  pint32_slow(uint32_t n);
+    uint32_t pint32_slow(uint32_t n);
     
     /// a random unsigned integer with exactly `b` bit equal to `1`
-    uint32_t  distributed_bits(int b);
+    uint32_t distributed_bits(int b);
 
     /// integer in [0 N], with probabilities given in ratio[] of size N, with sum(ratio)>0
-    uint32_t  pint32_ratio(uint32_t n, const uint32_t ratio[]);
+    uint32_t pint32_ratio(uint32_t n, const uint32_t ratio[]);
 
     /// integer k of probability distribution p(k,E) = exp(-E) * pow(E,k) / factorial(k)
-    uint32_t  poisson(real E);
+    uint32_t poisson(real E);
     
     /// integer k of probability distribution p(k,E) = EL * pow(E,k) / factorial(k)
-    uint32_t  poissonE(real EL);
+    uint32_t poissonE(real EL);
     
     /// integer k of probability distribution p(k,E) = exp(-E) * pow(E,k) / factorial(k)
-    uint32_t  poisson_knuth(real E);
+    uint32_t poisson_knuth(real E);
 
     /// number of successive unsuccessful trials, when success has probability p (result >= 0)
-    uint32_t  geometric(real p);
+    uint32_t geometric(real p);
 
     /// number of sucesses among n trials of probability p
-    uint32_t  binomial(int n, real p);
+    uint32_t binomial(int n, real p);
     
     
     /// returns true with probability (p), and false with probability (1-p)

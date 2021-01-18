@@ -252,7 +252,6 @@ void Random::gauss_set(real & a, real & b, real v)
 real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
 {
     int32_t const*const end = src + cnt;
-    real * d = dst;
     while ( src < end )
     {
         real x = src[0] * TWO_POWER_MINUS_31;
@@ -261,13 +260,13 @@ real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
         if (( w <= 1 ) & ( 0 < w ))
         {
             w = std::sqrt( -2 * std::log(w) / w );
-            d[0] = w * x;
-            d[1] = w * y;
-            d += 2;
+            dst[0] = w * x;
+            dst[1] = w * y;
+            dst += 2;
         }
         src += 2;
     }
-    return d;
+    return dst;
 }
 
 /**
@@ -278,9 +277,9 @@ real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
  */
 void Random::refill_gaussians()
 {
-    sfmt_gen_rand_all(&twister_);
     next_gaussian_ = gauss_fill(gaussians_, SFMT_N32, (int32_t*)twister_.state);
     //printf("refill_gaussians %lu\n", next_gaussian_ - gaussians_);
+    sfmt_gen_rand_all(&twister_);
 }
 
 #else
@@ -299,9 +298,9 @@ void Random::refill_gaussians()
  */
 void Random::refill_gaussians()
 {
-    sfmt_gen_rand_all(&twister_);
     next_gaussian_ = gauss_fill_AVX0(gaussians_, SFMT_N256, (__m256i*)twister_.state);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
+    sfmt_gen_rand_all(&twister_);
 }
 
 #endif
