@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec.  Copyright 2021 Cambridge University.
 
 #ifndef BICGSTAB_H
 #define BICGSTAB_H
@@ -63,7 +63,11 @@ namespace LinearSolvers
 #endif
         goto start;
         
+#if SAFER_CONVERGENCE
+        while ( ! monitor.finished(dim, r, M_SQRT1_2) )
+#else
         while ( ! monitor.finished(dim, r) )
+#endif
         {
 #if SAFER_CONVERGENCE
             // save closest vector to solution so far
@@ -204,7 +208,11 @@ namespace LinearSolvers
 #endif
         goto start;
 
+#if SAFER_CONVERGENCE
+        while ( ! monitor.finished(dim, r, M_SQRT1_2) )
+#else
         while ( ! monitor.finished(dim, r) )
+#endif
         {
 #if SAFER_CONVERGENCE
             // save closest vector to solution so far
