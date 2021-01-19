@@ -4,7 +4,6 @@
 
 #include "sim.h"
 #include "vector.h"
-#include "object_pool.h"
 #include "fiber.h"
 
 class GrowingFiberProp;
@@ -39,8 +38,8 @@ class GrowingFiberProp;
  
     free_polymer = 1.0 - sum(all_fiber_length) / total_polymer
  
- The length of a fiber will not exceed `fiber:max_length`, and any Fiber shorter than `fiber:min_length`
- will be deleted.
+ The length of a fiber will not exceed `fiber:max_length`,
+ Fiber shorter than `fiber:min_length` are deleted if `fiber:persistent == 0`.
 
  See the @ref GrowingFiberPar.
  @ingroup FiberGroup

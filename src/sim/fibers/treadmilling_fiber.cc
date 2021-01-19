@@ -13,10 +13,9 @@
 
 TreadmillingFiber::TreadmillingFiber(TreadmillingFiberProp const* p) : Fiber(p), prop(p)
 {
-    mStateM  = STATE_WHITE;
+    mStateM = STATE_WHITE;
+    mStateP = STATE_WHITE;
     mGrowthM = 0;
-    
-    mStateP  = STATE_WHITE;
     mGrowthP = 0;
 }
 
@@ -35,7 +34,7 @@ void TreadmillingFiber::setEndStateM(state_t s)
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )
         mStateM = s;
     else
-        throw InvalidParameter("Invalid AssemblyState for TreadmillingFiber MINUS_END");
+        throw InvalidParameter("invalid AssemblyState for TreadmillingFiber MINUS_END");
 }
 
 
@@ -44,14 +43,13 @@ void TreadmillingFiber::setEndStateP(state_t s)
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )
         mStateP = s;
     else
-        throw InvalidParameter("Invalid AssemblyState for TreadmillingFiber PLUS_END");
+        throw InvalidParameter("invalid AssemblyState for TreadmillingFiber PLUS_END");
 }
-
 
 //------------------------------------------------------------------------------
 
 void TreadmillingFiber::step()
-{    
+{
     constexpr size_t P = 0, M = 1;
 
     if ( mStateP == STATE_GREEN )
@@ -62,9 +60,8 @@ void TreadmillingFiber::step()
         // growth is reduced if free monomers are scarce:
         mGrowthP = prop->growing_speed_dt[P] * prop->free_polymer;
         
-        assert_true(mGrowthP>=0);
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( forceP < 0 )
+        if (( forceP < 0 ) & ( mGrowthP > 0 ))
             mGrowthP *= std::exp(forceP*prop->growing_force_inv[P]);
     }
     else if ( mStateP == STATE_RED )
@@ -76,7 +73,7 @@ void TreadmillingFiber::step()
         mGrowthP = 0;
     }
     
-    
+    // MINUS_END dynamics
     if ( mStateM == STATE_GREEN )
     {
         // calculate the force acting on the point at the end:
@@ -84,10 +81,9 @@ void TreadmillingFiber::step()
         
         // growth is reduced if free monomers are scarce:
         mGrowthM = prop->growing_speed_dt[M] * prop->free_polymer;
-
-        assert_true(mGrowthM>=0);
+        
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( forceM < 0 )
+        if (( forceM < 0 ) & ( mGrowthM > 0 ))
             mGrowthM *= std::exp(forceM*prop->growing_force_inv[M]);
     }
     else if ( mStateM == STATE_RED )
@@ -99,14 +95,12 @@ void TreadmillingFiber::step()
         mGrowthM = 0;
     }
     
-    
     real len = length();
     real inc = mGrowthP + mGrowthM;
-    if ( inc < 0  &&  len + inc < prop->min_length )
+    if ( len + inc < prop->min_length )
     {
         if ( !prop->persistent )
         {
-            // the fiber is too short, we delete it:
             delete(this);
             return;
         }
@@ -120,14 +114,22 @@ void TreadmillingFiber::step()
     {
         // the remaining possible growth is distributed to the two ends:
         inc = ( prop->max_length - len ) / inc;
-        if ( mGrowthM != 0 ) growM(inc*mGrowthM);
-        if ( mGrowthP != 0 ) growP(inc*mGrowthP);
+        mGrowthM *= inc;
+        mGrowthP *= inc;
+        if ( mGrowthM != 0 ) growM(mGrowthM);
+        if ( mGrowthP != 0 ) growP(mGrowthP);
+    }
+    else // len > prop->max_length
+    {
+        mGrowthM = 0;
+        mGrowthP = 0;
     }
 
     Fiber::step();
+    //std::clog << reference() << " P " << mGrowthP << " M " << mGrowthM << " len " << length() << "\n";
 }
 
-                  
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -136,7 +138,7 @@ void TreadmillingFiber::write(Outputter& out) const
 {
     Fiber::write(out);
 
-    /// write variables describing the dynamic state of the ends:
+    // write variables describing the dynamic state of the ends:
     writeHeader(out, TAG_DYNAMIC);
     out.writeUInt16(mStateM);
     out.writeUInt16(0);

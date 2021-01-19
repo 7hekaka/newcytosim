@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "dim.h"
+#include "smath.h"
 #include "assert_macro.h"
 #include "dynamic_fiber.h"
 #include "dynamic_fiber_prop.h"
@@ -86,7 +87,7 @@ void DynamicFiber::setEndStateM(state_t s)
 int DynamicFiber::stepMinusEnd()
 {
     int res = 0;
-    real chewing_rate = 0;
+    real chewing = 0;
     
     // add chewing rate to stochastic off rate:
     
@@ -94,16 +95,16 @@ int DynamicFiber::stepMinusEnd()
     
     // convert chewing rate to stochastic off rate:
     if ( frChewM > prop->max_chewing_speed_dt )
-        chewing_rate = prop->max_chewing_speed_dt / prop->unit_length;
+        chewing = prop->max_chewing_speed_dt / prop->unit_length;
     else
-        chewing_rate = frChewM / prop->unit_length;
+        chewing = frChewM / prop->unit_length;
     
     //std::clog << " chewing rate M " << chewing_rate / prop->time_step << '\n';
     frChewM = 0;
     
 #endif
     
-    nextShrinkM -= prop->shrinking_rate_dt[1] + chewing_rate;
+    nextShrinkM -= prop->shrinking_rate_dt[1] + chewing;
     while ( nextShrinkM <= 0 )
     {
         --res;
@@ -161,24 +162,24 @@ int DynamicFiber::stepPlusEnd()
 {
     constexpr size_t P = 0;
     int res = 0;
-    real chewing_rate = 0;
+    real chewing = 0;
     
 #if NEW_FIBER_CHEW
     
     // convert chewing rate to stochastic off rate:
     ///@todo implement smooth saturation using logistic function
     if ( frChewP > prop->max_chewing_speed_dt )
-        chewing_rate = prop->max_chewing_speed_dt / prop->unit_length;
+        chewing = prop->max_chewing_speed_dt / prop->unit_length;
     else
-        chewing_rate = frChewP / prop->unit_length;
+        chewing = frChewP / prop->unit_length;
     
-    //std::clog << " chewing rate P " << chewing_rate / prop->time_step << '\n';
+    //std::clog << " chewing rate P " << chewing / prop->time_step << '\n';
     frChewP = 0;
 #endif
     
     if ( mStateP == STATE_RED )
     {
-        nextShrinkP -= prop->shrinking_rate_dt[P] + chewing_rate;
+        nextShrinkP -= prop->shrinking_rate_dt[P] + chewing;
         while ( nextShrinkP <= 0 )
         {
         	// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
@@ -194,45 +195,37 @@ int DynamicFiber::stepPlusEnd()
     else
     {
         // calculate the force acting on the point at the end:
-        real force = projectedForceEndP();
+        real forceP = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        real growth_rate = prop->growing_rate_dt[P] * prop->free_polymer;
+        real growth = prop->growing_rate_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( force < 0 )
-            growth_rate *= std::exp(force*prop->growing_force_inv[P]);
+        if (( forceP < 0 ) & ( growth > 0 ))
+            growth *= std::exp(forceP*prop->growing_force_inv[P]);
 
-        real hydrol_rate = prop->hydrolysis_rate_2dt[P];
+        real hydrol = prop->hydrolysis_rate_2dt[P];
         
 #if OLD_DYNAMIC_ZONE
         // change Hydrolysis rate if PLUS_END is far from origin:
         if ( posEndP().normSqr() > prop->zone_radius_sqr )
-            hydrol_rate = prop->zone_hydrolysis_rate_2dt[P];
+            hydrol = prop->zone_hydrolysis_rate_2dt[P];
         
         if ( prop->zone_space_ptr && !prop->zone_space_ptr->inside(posEndP()) )
-            hydrol_rate = prop->zone_hydrolysis_rate_2dt[P];
+            hydrol = prop->zone_hydrolysis_rate_2dt[P];
 #endif
         
         // @todo detach_rate should depend on the state of the subunit
-        real detach_rate = prop->growing_off_rate_dt[P] + chewing_rate;
+        real detach = prop->growing_off_rate_dt[P] + chewing;
         
-        nextGrowthP -= growth_rate;
-        nextShrinkP -= detach_rate;
-        nextHydrolP -= hydrol_rate;
+        nextGrowthP -= growth;
+        nextShrinkP -= detach;
+        nextHydrolP -= hydrol;
         
-        while ( nextGrowthP < 0 || nextShrinkP < 0 || nextHydrolP < 0 )
+        while (( nextGrowthP < 0 ) | ( nextShrinkP < 0 ) | ( nextHydrolP < 0 ))
         {
             // Select the earliest event:
-            real a = nextGrowthP/growth_rate;
-            real b = nextHydrolP/hydrol_rate;
-            int ii = ( b < a );
-            if ( detach_rate != 0 )
-            {
-                real c = nextShrinkP/detach_rate;
-                if ( c < std::min(a,b) )
-                    ii = 2;
-            }
+            int ii = sMath::arg_min(nextGrowthP/growth, nextHydrolP/hydrol, nextShrinkP/detach);
             
             switch ( ii )
             {
@@ -317,7 +310,7 @@ void DynamicFiber::write(Outputter& out) const
 {
     Fiber::write(out);
     
-    /// write variables describing the dynamic state of the ends:
+    // write variables describing the dynamic state of the ends:
     writeHeader(out, TAG_DYNAMIC);
     out.writeUInt8(unitM[0]);
     out.writeUInt8(unitM[1]);

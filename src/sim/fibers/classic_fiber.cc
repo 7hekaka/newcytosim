@@ -68,17 +68,16 @@ void ClassicFiber::step()
     if ( mStateM == STATE_GREEN )
     {
         // calculate the force acting on the point at the end:
-        real force = projectedForceEndM();
+        real forceM = projectedForceEndM();
         
         // growth is reduced if free monomers are scarce:
-        real spd = prop->growing_speed_dt[M] * prop->free_polymer;
+        mGrowthM = prop->growing_speed_dt[M] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( force < 0 )
-            mGrowthM = spd * std::exp(force*prop->growing_force_inv[M]) + prop->growing_off_speed_dt[M];
-        else
-            mGrowthM = spd + prop->growing_off_speed_dt[M];
-        
+        if (( forceM < 0 ) & ( mGrowthM > 0 ))
+            mGrowthM *= std::exp(forceM*prop->growing_force_inv[M]);
+
+        mGrowthM += prop->growing_off_speed_dt[M];
         
         // catastrophe may be constant, or it may depend on the growth rate
         real cata;
@@ -102,17 +101,16 @@ void ClassicFiber::step()
     if ( mStateP == STATE_GREEN )
     {
         // calculate the force acting on the point at the end:
-        real force = projectedForceEndP();
+        real forceP = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        real spd = prop->growing_speed_dt[P] * prop->free_polymer;
+        mGrowthP = prop->growing_speed_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( force < 0 )
-            mGrowthP = spd * std::exp(force*prop->growing_force_inv[P]) + prop->growing_off_speed_dt[P];
-        else
-            mGrowthP = spd + prop->growing_off_speed_dt[P];
-        
+        if (( forceP < 0 ) & ( mGrowthP > 0 ))
+            mGrowthP *= std::exp(forceP*prop->growing_force_inv[P]);
+
+        mGrowthP += prop->growing_off_speed_dt[P];
         
         // catastrophe may be constant, or it may depend on the growth rate
         real cata;
@@ -151,7 +149,7 @@ void ClassicFiber::step()
     {
         real force = -projectedForceEndP();
         
-        mGrowthP = prop->shrinking_speed_dt[P] * std::exp(force*prop->shrinking_force_inv[P]);
+        mGrowthP = prop->shrinking_speed_dt[P] * exp(force*prop->shrinking_force_inv[P]);
 
         //printf("ClassicFiber %5u: force %9.2f shrink %9.6f\n", identity(), force, mGrowthP);
         
@@ -185,8 +183,10 @@ void ClassicFiber::step()
     {
         // the remaining possible growth is distributed to the two ends:
         inc = ( prop->max_length - len ) / inc;
-        if ( mGrowthM != 0 ) growM(inc*mGrowthM);
-        if ( mGrowthP != 0 ) growP(inc*mGrowthP);
+        mGrowthM *= inc;
+        mGrowthP *= inc;
+        if ( mGrowthM != 0 ) growM(mGrowthM);
+        if ( mGrowthP != 0 ) growP(mGrowthP);
     }
     else
     {

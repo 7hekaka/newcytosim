@@ -67,7 +67,7 @@ void GrowingFiber::step()
         mGrowthP = prop->growing_speed_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( forceP < 0 )
+        if (( forceP < 0 ) & ( mGrowthP > 0 ))
             mGrowthP *= std::exp(forceP*prop->growing_force_inv[P]);
         
         mGrowthP += prop->growing_off_speed_dt[P];
@@ -91,7 +91,7 @@ void GrowingFiber::step()
         mGrowthM = prop->growing_speed_dt[M] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if ( forceM < 0 )
+        if (( forceM < 0 ) & ( mGrowthM > 0 ))
             mGrowthM *= std::exp(forceM*prop->growing_force_inv[M]);
 
         mGrowthM += prop->growing_off_speed_dt[M];
@@ -108,7 +108,6 @@ void GrowingFiber::step()
     {
         if ( !prop->persistent )
         {
-            // the fiber is too short, we delete it:
             delete(this);
             return;
         }
@@ -122,8 +121,10 @@ void GrowingFiber::step()
     {
         // the remaining possible growth is distributed to the two ends:
         inc = ( prop->max_length - len ) / inc;
-        if ( mGrowthM != 0 ) growM(inc*mGrowthM);
-        if ( mGrowthP != 0 ) growP(inc*mGrowthP);
+        mGrowthM *= inc;
+        mGrowthP *= inc;
+        if ( mGrowthM != 0 ) growM(mGrowthM);
+        if ( mGrowthP != 0 ) growP(mGrowthP);
     }
     else
     {
@@ -143,12 +144,10 @@ void GrowingFiber::write(Outputter& out) const
 {
     Fiber::write(out);
 
-    /// write variables describing the dynamic state of the ends:
+    // since states are constant, we write growth rates:
     writeHeader(out, TAG_DYNAMIC);
     out.writeFloat(mGrowthM);
-    out.writeFloat(0.0);
     out.writeFloat(mGrowthP);
-    out.writeFloat(0.0);
 }
 
 
@@ -161,13 +160,18 @@ void GrowingFiber::readEndState(Inputter& in)
         if ( in.formatID() > 45 )
             mGrowthP = in.readFloat();
     }
-    else
-#endif
+    else if ( in.formatID() < 56 )
     {
         mGrowthM = in.readFloat();
         in.readFloat();
         mGrowthP = in.readFloat();
         in.readFloat();
+    }
+    else
+#endif
+    {
+        mGrowthM = in.readFloat();
+        mGrowthP = in.readFloat();
     }
 }
 

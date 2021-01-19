@@ -16,6 +16,7 @@
  
  History of changes in file format:
 
+ - 56: 19/01/2021 All fiber dynamic stored on 16 bytes, really
  - 55: 02/10/2020 Interpolation4 stores coefficients only if mecable!=nullptr
  - 54: 25/05/2020 All fiber dynamic stored on 16 bytes
  - 53: 18/10/2019 Aster, Nucleus and Bundle store their primary Mecable directly

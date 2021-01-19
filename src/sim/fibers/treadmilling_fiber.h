@@ -4,7 +4,6 @@
 
 #include "sim.h"
 #include "vector.h"
-#include "object_pool.h"
 #include "fiber.h"
 
 class TreadmillingFiberProp;
@@ -12,11 +11,37 @@ class TreadmillingFiberProp;
 
 /// A Fiber with assembly at both ends 
 /**
- This is not documented yet!
-
+ The growing speed of each end are set independently.
+ The basic parameters are:
+ 
+ * `growing_speed`, the base assembly rate in um/s.
+ * `growing_force`, the characteristic force of polymerization in pN.
+ 
+ Positive values correspond to assembly, and negative values to disassembly.
+ Assembly is exponentially decreased by antagonistic force, and linearly dependent
+ on the availability of polymer.  Disassembly always occurs at the specified rate.
+ Only the component of the force parallel to the direction of the fiber at the end
+ is taken into account:
+ 
+     force = force_vector * fiber_direction;
+ 
+ The projected force is negative ( antagonistic ) if it is directed against fiber assembly.
+ 
+     if ( force < 0 )
+         speed = growing_speed * free_polymer * exp(force/growing_force);
+     else
+         speed = growing_speed * free_polymer;
+ 
+ In this equation, `free_polymer` is a number in [0,1], representing the fraction of free monomers.
+ It is defined as:
+ 
+    free_polymer = 1.0 - sum(all_fiber_length) / total_polymer
+ 
+ The length of a fiber will not exceed `fiber:max_length`,
+ Fiber shorter than `fiber:min_length` are deleted if `fiber:persistent == 0`.
+ 
  See the @ref TreadmillingFiberPar.
 
- @todo Document TreadmillingFiber
  @ingroup FiberGroup
  */
 class TreadmillingFiber : public Fiber

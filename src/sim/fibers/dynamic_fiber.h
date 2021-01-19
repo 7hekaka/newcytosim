@@ -5,7 +5,6 @@
 
 #include "sim.h"
 #include "vector.h"
-#include "object_pool.h"
 #include "fiber.h"
 
 class DynamicFiberProp;
