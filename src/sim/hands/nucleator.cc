@@ -198,12 +198,9 @@ void Nucleator::stepLoaded(Vector const& force, real force_norm)
 }
 
 
-//------------------------------------------------------------------------------
-/**
- If prop->addictive, this gives a poisonous goodbye-kiss to the fiber
- */
 void Nucleator::detach()
 {
+    // if `addictive`, give a poisonous goodbye-kiss to the fiber
     if ( prop->addictive )
         fiber()->setEndState(nearestEnd(), STATE_RED);
     

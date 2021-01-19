@@ -133,7 +133,6 @@ namespace sMath
         T ab = std::max(a, b);
         T cd = std::max(c, d);
         return 3*( d > std::max(c,ab) ) | 2*( c > std::max(d,ab) ) | ( b > std::max(a,cd) );
-
     }
 
 
