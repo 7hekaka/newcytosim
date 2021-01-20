@@ -9,7 +9,7 @@
 #include "platonic.h"
 #include "simd.h"
 #include "simd_float.h"
-#include "simd_math.cc"
+#include "simd_math.h"
 
 
 namespace gle

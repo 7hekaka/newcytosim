@@ -443,7 +443,7 @@ real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
 
 #include "simd.h"
 #include "simd_float.h"
-#include "simd_math.cc"
+#include "simd_math.h"
 
 
 /* Absolute error bounded by 1e-5 for normalized inputs

@@ -286,7 +286,7 @@ void Random::refill_gaussians()
 
 #include "simd.h"
 #include "simd_float.h"
-#include "simd_math.cc"
+#include "simd_math.h"
 #include "random_simd.cc"
 
 
