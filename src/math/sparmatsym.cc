@@ -73,7 +73,7 @@ void SparMatSym::deallocate()
 
 
 /// copy `cnt` elements from `src` to `dst`
-void copy(size_t cnt, SparMatSym::Element * src, SparMatSym::Element * dst)
+static void copy(size_t cnt, SparMatSym::Element * src, SparMatSym::Element * dst)
 {
     for ( size_t ii = 0; ii < cnt; ++ii )
         dst[ii] = src[ii];

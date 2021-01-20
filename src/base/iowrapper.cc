@@ -10,7 +10,7 @@
 
 
 /// check the size of some types that are baked in the code
-void sanityCheck()
+static void sanityCheck()
 {
     bool okay = true;
     okay &= ( 2 == sizeof(uint16_t) );

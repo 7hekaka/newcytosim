@@ -118,14 +118,14 @@ void SparMatSym1::deallocate()
 
 
 /// copy `cnt` elements from `src` to `dst`
-void copy(size_t cnt, SparMatSym1::Element * src, SparMatSym1::Element * dst)
+static void copy(size_t cnt, SparMatSym1::Element * src, SparMatSym1::Element * dst)
 {
     for ( size_t ii = 0; ii < cnt; ++ii )
         dst[ii] = src[ii];
 }
 
 /// move `cnt` elements to the next index, starting at vec[0]
-void shift(size_t cnt, SparMatSym1::Element * vec)
+static void shift(size_t cnt, SparMatSym1::Element * vec)
 {
     for ( size_t ii = cnt; ii > 0; --ii )
         vec[ii] = vec[ii-1];

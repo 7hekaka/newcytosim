@@ -96,7 +96,7 @@ char const* glErrorString(GLenum code)
 }
 
 
-void checkError(const char msg[])
+static void checkError(const char msg[])
 {
     GLenum glError = glGetError();
     while ( glError != GL_NO_ERROR )

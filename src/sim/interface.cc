@@ -676,7 +676,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void reportCPUtime(size_t frm, real simtime)
+static void reportCPUtime(size_t frm, real simtime)
 {
     static time_t nxt = 0;
     time_t now = TicToc::seconds_since_1970();

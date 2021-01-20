@@ -21,11 +21,11 @@ inline static vec4f load2f(float const* a)        { return (vec4f)_mm_loadl_epi6
 inline static vec4f load4f(float const* a)        { return _mm_load_ps(a); }
 inline static vec4f loadu4f(float const* a)       { return _mm_loadu_ps(a); }
 
-inline static void  store1f(float* a, vec4f b)    { _mm_store_ss(a,b); }
-inline static void  store2f(float* a, vec4f b)    { _mm_storeu_si64((void*)a,_mm_castps_si128(b)); } //_mm_storel_pi((__m64*)a, b); }
-inline static void  store3f(float* a, vec4f b)    { store2f(a,b); a[2]=b[2]; }
-inline static void  store4f(float* a, vec4f b)    { _mm_store_ps(a,b); }
-inline static void  storeu4f(float* a, vec4f b)   { _mm_storeu_ps(a,b); }
+inline static void store1f(float* a, vec4f b)     { _mm_store_ss(a,b); }
+inline static void store2f(float* a, vec4f b)     { _mm_storeu_si64((void*)a,_mm_castps_si128(b)); } //_mm_storel_pi((__m64*)a, b); }
+inline static void store3f(float* a, vec4f b)     { store2f(a,b); a[2]=b[2]; }
+inline static void store4f(float* a, vec4f b)     { _mm_store_ps(a,b); }
+inline static void storeu4f(float* a, vec4f b)    { _mm_storeu_ps(a,b); }
 
 inline static vec4f add4f(vec4f a, vec4f b)       { return _mm_add_ps(a,b); }
 inline static vec4f sub4f(vec4f a, vec4f b)       { return _mm_sub_ps(a,b); }

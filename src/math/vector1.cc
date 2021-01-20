@@ -5,7 +5,7 @@
 /**
  Optinally read two scalar values equal to zero
  */
-void eatTwoZeros(std::istream& is)
+static void eatTwoZeros(std::istream& is)
 {
     if ( is.good() )
     {

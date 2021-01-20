@@ -5,7 +5,7 @@
 /**
  Read a scalar value equal to zero
  */
-void eatOneZero(std::istream& is)
+static void eatOneZero(std::istream& is)
 {
     if ( is.good() )
     {

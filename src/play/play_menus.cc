@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-void processMenuFiber(int item)
+static void processMenuFiber(int item)
 {
     FiberDisp * FD = player.firstFiberDisp();
     
@@ -44,7 +44,7 @@ void processMenuFiber(int item)
 }
 
 
-int buildMenuFiber()
+static int buildMenuFiber()
 {
     static int menuID = 0;
     if ( menuID == 0 )
@@ -83,7 +83,7 @@ int buildMenuFiber()
 }
 
 //------------------------------------------------------------------------------
-void processMenuCouple(int item)
+static void processMenuCouple(int item)
 {
     switch (item)
     {
@@ -99,7 +99,7 @@ void processMenuCouple(int item)
     glApp::postRedisplay();
 }
 
-int buildMenuCouple()
+static int buildMenuCouple()
 {
     static int menuID = 0;
     if ( menuID == 0 )
@@ -115,7 +115,7 @@ int buildMenuCouple()
 }
 
 //------------------------------------------------------------------------------
-void processMenuDisplay(int item)
+static void processMenuDisplay(int item)
 {
     View & view = glApp::currentView();
     switch (item)
@@ -138,7 +138,7 @@ void processMenuDisplay(int item)
 }
 
 
-int buildMenuStyle()
+static int buildMenuStyle()
 {
     static int menuID = 0;
     if ( menuID == 0 )
@@ -152,7 +152,7 @@ int buildMenuStyle()
 }
 
 
-int buildMenuDisplay()
+static int buildMenuDisplay()
 {
     static int menuID = 0;
     int m0 = buildMenuStyle();
@@ -181,7 +181,7 @@ int buildMenuDisplay()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void processMenuFiberSelect(int item)
+static void processMenuFiberSelect(int item)
 {
     FiberDisp * FD = player.firstFiberDisp();
     if ( FD )
@@ -200,7 +200,7 @@ void processMenuFiberSelect(int item)
     }
 }
 
-int buildMenuFiberSelect()
+static int buildMenuFiberSelect()
 {
     static int menuID = 0;
     if ( menuID == 0 )
@@ -220,7 +220,7 @@ int buildMenuFiberSelect()
 
 
 //------------------------------------------------------------------------------
-void processMenuCoupleSelect(int item)
+static void processMenuCoupleSelect(int item)
 {
     switch (item)
     {
@@ -236,7 +236,7 @@ void processMenuCoupleSelect(int item)
     glApp::postRedisplay();
 }
 
-int buildMenuCoupleSelect()
+static int buildMenuCoupleSelect()
 {
     static int menuID = 0;
     if ( menuID == 0 )
@@ -252,7 +252,7 @@ int buildMenuCoupleSelect()
 }
 
 //------------------------------------------------------------------------------
-void processMenuSingleSelect(int item)
+static void processMenuSingleSelect(int item)
 {
     switch (item)
     {
@@ -268,7 +268,7 @@ void processMenuSingleSelect(int item)
     glApp::postRedisplay();
 }
 
-int buildMenuSingleSelect()
+static int buildMenuSingleSelect()
 {
     static int menuID = 0;
     if ( menuID == 0 )
@@ -282,7 +282,7 @@ int buildMenuSingleSelect()
     return menuID;
 }
 
-int buildSubMenu8()
+static int buildSubMenu8()
 {
     static int menuID = 0;
     if ( menuID == 0 ) {
@@ -295,7 +295,7 @@ int buildSubMenu8()
 
 //------------------------------------------------------------------------------
 
-int buildMenuSelect()
+static int buildMenuSelect()
 {
     static int menuID = 0;
     int m1 = buildMenuFiberSelect();
@@ -318,7 +318,7 @@ int buildMenuSelect()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void processMenuAnimation(int item)
+static void processMenuAnimation(int item)
 {
     switch (item)
     {
@@ -334,7 +334,7 @@ void processMenuAnimation(int item)
     glApp::postRedisplay();
 }
 
-int buildMenuAnimation()
+static int buildMenuAnimation()
 {
     static int menuID = 0;
     
@@ -352,7 +352,7 @@ int buildMenuAnimation()
 
 //------------------------------------------------------------------------------
 
-void processMenuReplay(int item)
+static void processMenuReplay(int item)
 {
     switch (item)
     {
@@ -372,7 +372,7 @@ void processMenuReplay(int item)
     glApp::postRedisplay();
 }
 
-int buildMenuReplay()
+static int buildMenuReplay()
 {
     static int menuID = 0;
     
@@ -396,7 +396,7 @@ int buildMenuReplay()
 
 
 //------------------------------------------------------------------------------
-void processMenuExport(int item)
+static void processMenuExport(int item)
 {
     switch (item)
     {
@@ -426,7 +426,7 @@ void processMenuExport(int item)
 }
 
 
-int buildMenuExport()
+static int buildMenuExport()
 {
     static int menuID = 0;
     if ( menuID == 0 )
