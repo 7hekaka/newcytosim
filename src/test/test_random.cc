@@ -420,19 +420,33 @@ int testGillespie(const int method)
  the size of `vec` should be a multiple of 2, and sufficient to hold `end-src` values
  @Return the number of values that were stored in `vec`
  */
-real * gauss_fill_0(real dst[], size_t cnt, const int32_t src[])
+template < typename REAL >
+REAL * gauss_fill_0(REAL dst[], size_t cnt, const int32_t src[])
 {
     int32_t const*const end = src + cnt;
     while ( src < end )
     {
-        real x = src[0] * TWO_POWER_MINUS_31;
-        real y = src[1] * TWO_POWER_MINUS_31;
-        real w = x * x + y * y;
+        REAL x = REAL(src[0]) * TWO_POWER_MINUS_31;
+        REAL y = REAL(src[1]) * TWO_POWER_MINUS_31;
+#if 1
+        if ( std::abs(x) + std::abs(y) >= M_SQRT2 )
+        {
+            constexpr REAL S = M_SQRT1_2 + 1;
+            // subtract corner and scale to recover a square of size sqrt(1/2)
+            REAL cx = S * x - std::copysign(S, x);
+            REAL cy = S * y - std::copysign(S, y);
+            // apply rotation, scaling by sqrt(2): x' = y + x;  y' = y - x
+            x = cy + cx;
+            y = cy - cx;
+        }
+#endif
+        REAL w = x * x + y * y;
         if (( w <= 1 ) & ( 0 < w ))
         {
             w = std::sqrt( std::log(w) / ( -0.5 * w ) );
-            *dst++ = w * x;
-            *dst++ = w * y;
+            dst[0] = w * x;
+            dst[1] = w * y;
+            dst += 2;
         }
         src += 2;
     }
@@ -688,6 +702,7 @@ void test_gaussian(int cnt)
 {
     printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
     real *end, vec[SFMT_N32] = { 0 };
+    float flt[SFMT_N32] = { 0 };
     sfmt_t sfmt;
     sfmt_init_gen_rand(&sfmt, time(nullptr));
 
@@ -701,8 +716,9 @@ void test_gaussian(int cnt)
     for ( int i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
-        end = gauss_fill_0(vec, SFMT_N32, (int32_t*)sfmt.state);
+        gauss_fill_0(flt, SFMT_N32, (int32_t*)sfmt.state);
     }
+    end = gauss_fill_0(vec, SFMT_N32, (int32_t*)sfmt.state);
     printf("%-12s %5.2f :", "Gauss0", toc(cnt));
     check_gaussian(end-vec, vec);
     //print_gaussian(end-vec, vec);
