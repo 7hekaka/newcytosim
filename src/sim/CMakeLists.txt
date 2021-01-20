@@ -7,6 +7,7 @@ set(SOURCES_SIM
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_segment.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/lattice.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/object.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/object_pool.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/object_set.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_site.cc"
     
@@ -36,7 +37,7 @@ set(SOURCES_SIM
     "${PROJECT_SOURCE_DIR}/src/sim/simul_prop.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/fiber_grid.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/point_grid.cc"
-    "${PROJECT_SOURCE_DIR}/src/sim/point_gridF.cc"
+    "${PROJECT_SOURCE_DIR}/src/sim/locus_grid.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/space_set.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/simul.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/interface.cc"

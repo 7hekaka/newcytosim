@@ -1,5 +1,6 @@
 set(SOURCES_DISP
     "${PROJECT_SOURCE_DIR}/src/disp/gle.cc"
+    "${PROJECT_SOURCE_DIR}/src/disp/gle_zoo.cc"
     "${PROJECT_SOURCE_DIR}/src/disp/gle_color.cc"
     "${PROJECT_SOURCE_DIR}/src/disp/gle_color_list.cc"
     "${PROJECT_SOURCE_DIR}/src/disp/view.cc"
