@@ -23,7 +23,7 @@ DisplayProp& disp = player.disp;
 
 void displayLive(View& view, int mag);
 
-/// enable to create a player for command-line-only offscreen rendering
+/// create a player suitable for command-line offscreen rendering only
 #define HEADLESS_PLAYER 0
 
 #if HEADLESS_PLAYER
@@ -373,8 +373,9 @@ int main(int argc, char* argv[])
     arg.print_warning(std::cerr, 1, "\n");
 
     //--------- initialize Window system and create Window
-#if ( HEADLESS_PLAYER == 0 )
-
+#if ( HEADLESS_PLAYER )
+    print_green(std::cout, "This player can only do offscreen rendering.\n");
+#else
 #ifdef __APPLE__
     glutInit(&argc, argv);
 #endif

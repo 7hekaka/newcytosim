@@ -10,7 +10,7 @@
 
 /// defines the amount added/subtracted to size/width when a key is pressed
 template< typename FLOAT >
-FLOAT grained(FLOAT x, int inc)
+static FLOAT grained(FLOAT x, int inc)
 {
     const FLOAT grain = (FLOAT)0.25;
     FLOAT dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
@@ -21,26 +21,26 @@ FLOAT grained(FLOAT x, int inc)
 //------------------------------------------------------------------------------
 
 template< typename T >
-void setVisible(T* p, int val)
+static void setVisible(T* p, int val)
 {
     p->visible = val;
     flashText("%s:visible = %i", p->name_str(), val);
 }
 
 template< typename T >
-void flipVisible(T* p, int val)
+static void flipVisible(T* p, int val)
 {
     p->visible = ( p->visible != val ) * val;
     flashText("%s:visible = %i", p->name_str(), p->visible);
 }
 
-void changeStyle(PointDisp * p, int)
+static void changeStyle(PointDisp * p, int)
 {
     p->style = ( p->style + 1 ) % 8;
     flashText("%s:style = %i", p->name_str(), p->style);
 }
 
-void setSize(PointDisp * p, GLfloat s)
+static void setSize(PointDisp * p, GLfloat s)
 {
     if ( s >= 0.5 )
     {
@@ -49,7 +49,7 @@ void setSize(PointDisp * p, GLfloat s)
     }
 }
 
-void setWidth(PointDisp * p, GLfloat s)
+static void setWidth(PointDisp * p, GLfloat s)
 {
     if ( s > 0.5 )
     {
@@ -58,7 +58,7 @@ void setWidth(PointDisp * p, GLfloat s)
     }
 }
 
-void changeSize(PointDisp * p, int inc)
+static void changeSize(PointDisp * p, int inc)
 {
     float s = grained(p->size, inc);
     if ( s > 32.f )
@@ -75,25 +75,24 @@ void changeSize(PointDisp * p, int inc)
 //------------------------------------------------------------------------------
 #pragma mark - PointDisp lists
 
-inline PointDisp* toPointDisp(Property * ptr)
+static inline PointDisp* toPointDisp(Property * ptr)
 {
     return static_cast<PointDisp*>(ptr);
 }
 
 
 /// apply function to all PointDisp is plist
-void setPointDisp(PropertyList const& plist, void(*func)(PointDisp*, int), int val)
+static void setPointDisp(PropertyList const& plist, void(*func)(PointDisp*, int), int val)
 {
     if ( plist.empty() )
         flashText("no relevant object");
 
     for ( Property * i : plist )
-        if ( toPointDisp(i)->visible )
-            func(toPointDisp(i), val);
+        func(toPointDisp(i), val);
 }
 
 
-void changePointDispSize(PropertyList const& plist, int inc,
+static void changePointDispSize(PropertyList const& plist, int inc,
                          bool dos, bool dow)
 {
     for ( Property * i : plist )
@@ -123,7 +122,7 @@ void changePointDispSize(PropertyList const& plist, int inc,
 }
 
 
-void setPointDispVisible(PropertyList const& plist, int val)
+static void setPointDispVisible(PropertyList const& plist, int val)
 {
     if ( plist.empty() )
         flashText("no relevant object");
@@ -133,7 +132,7 @@ void setPointDispVisible(PropertyList const& plist, int val)
 }
 
 
-PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
+static PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
 {
     PointDisp* one = nullptr;
     cnt = 0;
@@ -155,7 +154,7 @@ PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
 }
 
 
-void shufflePointDispVisible(const PropertyList& plist, int val)
+static void shufflePointDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.empty() )
         flashText("no relevant object");
@@ -199,7 +198,7 @@ void shufflePointDispVisible(const PropertyList& plist, int val)
 #pragma mark - Single Couple
 
 
-void changeSingleSelect()
+static void changeSingleSelect()
 {
     unsigned int & select = disp.single_select;
     switch( select )
@@ -212,7 +211,7 @@ void changeSingleSelect()
 }
 
 
-void changeCoupleSelect()
+static void changeCoupleSelect()
 {
     unsigned int & select = disp.couple_select;
     switch( select )
@@ -225,7 +224,7 @@ void changeCoupleSelect()
     }
 }
 
-void changeCoupleSelect2()
+static void changeCoupleSelect2()
 {
     unsigned int & select = disp.couple_select;
     if ( select & 8 )
@@ -249,7 +248,7 @@ void changeCoupleSelect2()
 #pragma mark - Fibers
 
 
-void changeExclude(FiberDisp* p, int val)
+static void changeExclude(FiberDisp* p, int val)
 {
     if ( val )
         p->hide >>= 2;
@@ -270,7 +269,7 @@ void changeExclude(FiberDisp* p, int val)
 }
 
 
-void flipExplode(FiberDisp* p)
+static void flipExplode(FiberDisp* p)
 {
     p->explode_style = ! p->explode_style;
     if ( p->explode_style && p->explode_range == 0 )
@@ -279,7 +278,7 @@ void flipExplode(FiberDisp* p)
 }
 
 
-void changeScale(real& scale, int d)
+static void changeScale(real& scale, int d)
 {
     real s = std::log2(std::fabs(scale)) + d * 0.125;
     if ( s < -14 ) s =  10;
@@ -288,7 +287,7 @@ void changeScale(real& scale, int d)
 }
 
 
-void changeScale(FiberDisp* p, int d)
+static void changeScale(FiberDisp* p, int d)
 {
     if ( p->lattice_style )
     {
@@ -315,7 +314,7 @@ void changeScale(FiberDisp* p, int d)
 }
 
 
-void invertScale(FiberDisp* p, int)
+static void invertScale(FiberDisp* p, int)
 {
     if ( p->lattice_style )
     {
@@ -333,7 +332,7 @@ void invertScale(FiberDisp* p, int)
 }
 
 
-void flashColoring(int val)
+static void flashColoring(int val)
 {
     switch ( val )
     {
@@ -351,49 +350,49 @@ void flashColoring(int val)
 }
 
 
-void setColoring(FiberDisp* p, int val)
+static void setColoring(FiberDisp* p, int val)
 {
     p->coloring = ( p->coloring ? 0 : val );
     flashColoring(p->coloring);
 }
 
 
-void changeColoring(FiberDisp* p, int inc)
+static void changeColoring(FiberDisp* p, int inc)
 {
     p->coloring = ( p->coloring + inc + 9 ) % 9;
     flashColoring(p->coloring);
 }
 
 
-void setMask(FiberDisp* p, int val)
+static void setMask(FiberDisp* p, int val)
 {
     p->mask = val;
     p->mask_bitfield = RNG.distributed_bits(p->mask);
     flashText("fiber:mask_bitfield=0x%X (%i bits)", p->mask_bitfield, p->mask);
 }
 
-void changeMask(FiberDisp* p, int val)
+static void changeMask(FiberDisp* p, int val)
 {
     p->mask = ( p->mask + val ) % 11;
     p->mask_bitfield = RNG.distributed_bits(p->mask);
     flashText("fiber:mask_bitfield=0x%X (%i bits)", p->mask_bitfield, p->mask);
 }
 
-void changePointStyle(FiberDisp* p, int inc)
+static void changePointStyle(FiberDisp* p, int inc)
 {
-    p->point_style = ( p->point_style + inc + 5 ) % 5;
+    p->point_style = ( p->point_style + inc + 5 ) % 4;
     switch ( p->point_style )
     {
         case 0: flashText("Fibers: no points");    break;
         case 1: flashText("Fibers: vertices");     break;
         case 2: flashText("Fibers: arrowheads");   break;
         case 3: flashText("Fibers: center point"); break;
-        case 4: flashText("Fibers: backbone");     break;
+        default: flashText("unknown fiber:point_style"); break;
     }
 }
 
 
-void flashLineStyle(int val)
+static void flashLineStyle(int val)
 {
     switch ( val )
     {
@@ -411,20 +410,26 @@ void flashLineStyle(int val)
     }
 }
 
-void toggleLineStyle(FiberDisp* p, int val)
+static void toggleLineStyle(FiberDisp* p, int val)
 {
     p->line_style = ( p->line_style != val ) * val;
     flashLineStyle(p->line_style);
 }
 
-void changeLineStyle(FiberDisp* p, int inc)
+static void changeLineStyle(FiberDisp* p, int inc)
 {
     p->line_style = ( p->line_style + inc + 9 ) % 9;
     flashLineStyle(p->line_style);
 }
 
+static void toggleStyle(FiberDisp* p, int val)
+{
+    p->style = ( p->style != val ) * val;
+    flashLineStyle(p->style);
+}
 
-void changeSpeckleStyle(FiberDisp* p, int)
+
+static void changeSpeckleStyle(FiberDisp* p, int)
 {
     p->speckle_style = ( p->speckle_style + 1 ) % 3;
     switch ( p->speckle_style )
@@ -436,7 +441,7 @@ void changeSpeckleStyle(FiberDisp* p, int)
 }
 
 
-void changeLatticeStyle(FiberDisp* p, int)
+static void changeLatticeStyle(FiberDisp* p, int)
 {
     p->lattice_style = ( 1 + p->lattice_style ) % 4;
 #if FIBER_HAS_LATTICE
@@ -447,7 +452,7 @@ void changeLatticeStyle(FiberDisp* p, int)
 }
 
 
-void changePointSize(FiberDisp* p, int inc)
+static void changePointSize(FiberDisp* p, int inc)
 {
     GLfloat s = grained(p->point_size, inc);
     
@@ -458,7 +463,7 @@ void changePointSize(FiberDisp* p, int inc)
     }
 }
 
-void changeLineWidth(FiberDisp* p, int inc)
+static void changeLineWidth(FiberDisp* p, int inc)
 {
     GLfloat s = grained(p->line_width, inc);
     
@@ -469,7 +474,7 @@ void changeLineWidth(FiberDisp* p, int inc)
     }
 }
 
-void changeSize(FiberDisp* p, int inc)
+static void changeSize(FiberDisp* p, int inc)
 {
     GLfloat s = grained(p->line_width, inc);
     
@@ -485,7 +490,7 @@ void changeSize(FiberDisp* p, int inc)
 }
 
 
-void changeEndStyle(FiberDisp* p, int val)
+static void changeEndStyle(FiberDisp* p, int val)
 {
     const int P = 1+val;
     const int M = 1+val*2;
@@ -522,7 +527,7 @@ void changeEndStyle(FiberDisp* p, int val)
 }
 
 
-void changeEndSize(FiberDisp* p, int inc)
+static void changeEndSize(FiberDisp* p, int inc)
 {
     real* size = p->end_size;
     real s0 = std::max(real(1), size[0] + inc);
@@ -547,19 +552,18 @@ void changeEndSize(FiberDisp* p, int inc)
 //---------------------------------------------------------------------
 #pragma mark - FiberDisp lists
 
-inline FiberDisp* toFiberDisp(Property * ptr)
+static inline FiberDisp* toFiberDisp(Property * ptr)
 {
     return static_cast<FiberDisp*>(ptr);
 }
 
-void setFiberDisp(PropertyList const& plist, void(*func)(FiberDisp*, int), int val)
+static void setFiberDisp(PropertyList const& plist, void(*func)(FiberDisp*, int), int val)
 {
     for ( Property * i : plist )
-        if ( toFiberDisp(i)->visible )
-            func(toFiberDisp(i), val);
+        func(toFiberDisp(i), val);
 }
 
-PointDisp * findVisibleFiberDisp(PropertyList const& plist, int& cnt)
+static PointDisp * findVisibleFiberDisp(PropertyList const& plist, int& cnt)
 {
     PointDisp * one = nullptr;
     cnt = 0;
@@ -577,14 +581,14 @@ PointDisp * findVisibleFiberDisp(PropertyList const& plist, int& cnt)
 }
 
 
-void setFiberDispVisible(PropertyList const& plist, int val)
+static void setFiberDispVisible(PropertyList const& plist, int val)
 {
     for ( Property * i : plist )
         toFiberDisp(i)->visible = val;
 }
 
 
-FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
+static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 {
     FiberDisp* one = nullptr;
     cnt = 0;
@@ -606,7 +610,7 @@ FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 }
 
 
-void shuffleFiberDispVisible(const PropertyList& plist, int val)
+static void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.empty() )
         flashText("no relevant object");
@@ -981,7 +985,7 @@ void processKey(unsigned char key)
             break;
             
         case 177:
-            setFiberDisp(player.allVisibleFiberDisp(), toggleLineStyle, 7);
+            setFiberDisp(player.allVisibleFiberDisp(), toggleStyle, 4);
             break;
 
         case '1':
@@ -1042,11 +1046,11 @@ void processKey(unsigned char key)
             if ( altKeyDown )
                 shufflePointDispVisible(player.allSphereDisp(), 1);
             else
-                setPointDisp(player.allSphereDisp(), changeStyle, 0);
+                setPointDisp(player.allVisibleSphereDisp(), changeStyle, 0);
             break;
         
         case '%':
-            setPointDisp(player.allSphereDisp(), changeSize, 2);
+            setPointDisp(player.allVisibleSphereDisp(), changeSize, 2);
             break;
             
         //------------------------ Single/Couple + Hands -----------------------

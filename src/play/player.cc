@@ -201,12 +201,12 @@ inline PointDisp* toPointDisp(Property * ptr)
 }
 
 
-PropertyList Player::allFiberDisp()
+PropertyList Player::allFiberDisp() const
 {
     return dispList.find_all("fiber:display");
 }
 
-PropertyList Player::allVisibleFiberDisp()
+PropertyList Player::allVisibleFiberDisp() const
 {
     PropertyList res, plist = dispList.find_all("fiber:display");
     
@@ -218,12 +218,12 @@ PropertyList Player::allVisibleFiberDisp()
     return res;
 }
 
-PropertyList Player::allHandDisp()
+PropertyList Player::allHandDisp() const
 {
     return dispList.find_all("hand:display");
 }
 
-PropertyList Player::allVisibleHandDisp()
+PropertyList Player::allVisibleHandDisp() const
 {
     PropertyList res, plist = dispList.find_all("hand:display");
     
@@ -235,17 +235,29 @@ PropertyList Player::allVisibleHandDisp()
     return res;
 }
 
-PropertyList Player::allSphereDisp()
+PropertyList Player::allSphereDisp() const
 {
     return dispList.find_all("bead:display", "solid:display", "sphere:display");
 }
 
-PropertyList Player::allSpaceDisp()
+PropertyList Player::allVisibleSphereDisp() const
+{
+    PropertyList res;
+    PropertyList all = dispList.find_all("bead:display", "solid:display", "sphere:display");
+    for ( Property * i : all )
+    {
+        if ( toPointDisp(i)->visible )
+            res.push_back(i);
+    }
+    return res;
+}
+
+PropertyList Player::allSpaceDisp() const
 {
     return dispList.find_all("space:display");
 }
 
-FiberDisp * Player::firstFiberDisp()
+FiberDisp * Player::firstFiberDisp() const
 {
     PropertyList plist = allVisibleFiberDisp();
     if ( plist.size() )

@@ -57,25 +57,28 @@ public:
     void clear();
 
     /// return all Fiber FiberDisp
-    PropertyList allFiberDisp();
+    PropertyList allFiberDisp() const;
    
     /// return all Fiber FiberDisp
-    PropertyList allVisibleFiberDisp();
+    PropertyList allVisibleFiberDisp() const;
  
     /// return all Hand PointDisp
-    PropertyList allHandDisp();
+    PropertyList allHandDisp() const;
     
     /// return all Hand PointDisp for which 'visible==true'
-    PropertyList allVisibleHandDisp();
+    PropertyList allVisibleHandDisp() const;
 
     /// return all Sphere/Solid/Bead PointDisp
-    PropertyList allSphereDisp();
-    
+    PropertyList allSphereDisp() const;
+ 
+    /// return all Sphere/Solid/Bead PointDisp for which 'visible==true'
+    PropertyList allVisibleSphereDisp() const;
+
     /// return all Space PointDisp
-    PropertyList allSpaceDisp();
+    PropertyList allSpaceDisp() const;
     
     /// return a FiberDisp
-    FiberDisp * firstFiberDisp();
+    FiberDisp * firstFiberDisp() const;
 
     //---------------------------------COMMANDS---------------------------------
     
