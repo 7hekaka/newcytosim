@@ -282,7 +282,7 @@ void SparMatSymBlkDiag::scale(const real alpha)
 
 
 void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd,
-                                         const size_t start, const size_t cnt) const
+                                        const size_t start, const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -300,7 +300,7 @@ void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd,
             size_t ii = col.inx_[n];
             // assuming lower triangle is stored:
             assert_true(ii>jj);
-            if ((start <= ii) & (ii < end))
+            if ( ii < end )
             {
                 //fprintf(stderr, "SMSBD %4lu %4lu\n", ii, jj); col[n].print(stderr);
                 col[n].addto(mat+(ii+ldd*jj)-off, ldd);
@@ -311,33 +311,30 @@ void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd,
 }
 
 
-void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
-                                         const size_t start, const size_t cnt) const
+void SparMatSymBlkDiag::addLowerBand(real alpha, real* mat, size_t ldd,
+                                     const size_t start, const size_t cnt, size_t rank) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
 
     size_t end = start + cnt;
+    size_t off = start + ldd * start;
     assert_true( end <= size_ );
-
+    
     for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
     {
         Column & col = pilar_[jj/BLOCK_SIZE];
-        size_t j = ( jj - start ) / BLOCK_SIZE;
-        mat[j+ldd*j] += alpha * col.dia_.trace();  // diagonal term
+        col.dia_.addto_lower(mat+(jj+ldd*jj)-off, ldd, alpha);
         for ( size_t n = 0; n < col.size_; ++n )
         {
             size_t ii = col.inx_[n];
             // assuming lower triangle is stored:
-            assert_false( ii % BLOCK_SIZE );
-            if ( ii < end )
+            assert_true(ii>jj);
+            if ((ii <= jj+rank) & (ii < end))
             {
-                size_t i = ( ii - start ) / BLOCK_SIZE;
-                assert_true( i > j );
-                real a = alpha * col[n].trace();
-                //fprintf(stderr, "SMSBD %4lu %4lu : %.4f\n", i, j, a);
-                mat[i+ldd*j] += a;
-                mat[j+ldd*i] += a;  // above diagonal
+                //fprintf(stderr, "SMSBD %4lu %4lu\n", ii, jj); col[n].print(stderr);
+                col[n].addto(mat+(ii+ldd*jj)-off, ldd, alpha);
+                //col[n].addto_trans(mat+(jj+ldd*ii)-off, ldd, alpha);
             }
         }
     }
@@ -347,9 +344,9 @@ void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 addresses `mat' using lower banded storage for a symmetric matrix
 mat(i, j) is stored in mat[i-j+ldd*j]
 */
-void SparMatSymBlkDiag::addDiagonalTraceBanded(real alpha, real* mat, size_t ldd,
-                                               const size_t start, const size_t cnt,
-                                               const size_t rank) const
+void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
+                                         const size_t start, const size_t cnt,
+                                         const size_t rank, bool sym) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -362,23 +359,21 @@ void SparMatSymBlkDiag::addDiagonalTraceBanded(real alpha, real* mat, size_t ldd
         Column & col = pilar_[jj/BLOCK_SIZE];
         size_t j = ( jj - start ) / BLOCK_SIZE;
         // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
-        mat[ldd*j] += alpha * col.dia_.trace();  // diagonal term
+        mat[j+ldd*j] += alpha * col.dia_.trace();  // diagonal term
         for ( size_t n = 0; n < col.size_; ++n )
         {
             size_t ii = col.inx_[n];
             // assuming lower triangle is stored:
             assert_false( ii % BLOCK_SIZE );
-            if ( ii < end )
+            if (( ii < end ) & ( ii <= jj+rank ))
             {
                 size_t i = ( ii - start ) / BLOCK_SIZE;
                 assert_true( i > j );
-                if ( i <= j + rank )
-                {
-                    real a = alpha * col[n].trace();
-                    //fprintf(stderr, "SMSBD %4lu %4lu : %.4f\n", i, j, a);
-                    // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
-                    mat[i-j+ldd*j] += a;
-                }
+                real a = alpha * col[n].trace();
+                //fprintf(stderr, "SMSBD %4lu %4lu : %.4f\n", i, j, a);
+                // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
+                mat[i+ldd*j] += a;
+                if ( sym ) mat[j+ldd*i] += a;
             }
         }
     }

@@ -33,8 +33,8 @@ using namespace TicToc;
 constexpr size_t NPTS = 113;
 constexpr size_t NVAL = DIM * NPTS;
 
-constexpr size_t BAND_NUD = 2*DIM;
-constexpr size_t BAND_LDD = 2*DIM+1;
+constexpr size_t BRANK = 2*DIM;
+constexpr size_t BLDD = 2*DIM+1;
 
 
 /// print only 16 scalars from given vector
@@ -262,67 +262,67 @@ void testPOTRS(size_t cnt)
 
 void uni0(int N, real const* AB, real* B)
 {
-    blas::xtbsv('L', 'N', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
-    blas::xtbsv('L', 'T', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
+    blas::xtbsv('L', 'N', 'N', N, BRANK, AB, BLDD, B, 1);
+    blas::xtbsv('L', 'T', 'N', N, BRANK, AB, BLDD, B, 1);
 }
 
 void uni1(int N, real const* AB, real* B)
 {
-    blas_xtbsvLN<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
-    blas_xtbsvLT<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
+    blas_xtbsvLN<'I'>(N, BRANK, AB, BLDD, B);
+    blas_xtbsvLT<'I'>(N, BRANK, AB, BLDD, B);
 }
 
 void uni2(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN(N, BAND_NUD, AB, BAND_LDD, B);
-    alsatian_xtbsvLTN(N, BAND_NUD, AB, BAND_LDD, B);
+    alsatian_xtbsvLNN(N, BRANK, AB, BLDD, B);
+    alsatian_xtbsvLTN(N, BRANK, AB, BLDD, B);
 }
 
 void uni3(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNNK<BAND_NUD>(N, AB, BAND_LDD, B);
-    alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLNNK<BRANK>(N, AB, BLDD, B);
+    alsatian_xtbsvLTNK<BRANK>(N, AB, BLDD, B);
 }
 
 void uni4(int N, real const* AB, real* B)
 {
-    alsatian_xpbtrsLK<BAND_NUD>(N, AB, BAND_LDD, B);
+    alsatian_xpbtrsLK<BRANK>(N, AB, BLDD, B);
 }
 
 // this gives wrong results
 void uniLNB(int N, real const* AB, real* B)
 {
-    blas::xtbsv('L', 'N', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
-    //blas::xtbsv('L', 'T', 'N', N, BAND_NUD, AB, BAND_LDD, B);
+    blas::xtbsv('L', 'N', 'N', N, BRANK, AB, BLDD, B, 1);
+    //blas::xtbsv('L', 'T', 'N', N, BRANK, AB, BLDD, B);
 }
 
 void uniLN0(int N, real const* AB, real* B)
 {
-    blas_xtbsvLN<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
-    //blas_xtbsvLT<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
+    blas_xtbsvLN<'I'>(N, BRANK, AB, BLDD, B);
+    //blas_xtbsvLT<'I'>(N, BRANK, AB, BLDD, B);
 }
 
 void uniLN1(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN(N, BAND_NUD, AB, BAND_LDD, B);
-    //alsatian_xtbsvLTN(N, BAND_NUD, AB, BAND_LDD, B);
+    alsatian_xtbsvLNN(N, BRANK, AB, BLDD, B);
+    //alsatian_xtbsvLTN(N, BRANK, AB, BLDD, B);
 }
 
 void uniLN2(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNNK<BAND_NUD>(N, AB, BAND_LDD, B);
-    //alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLNNK<BRANK>(N, AB, BLDD, B);
+    //alsatian_xtbsvLTNK<BRANK>(N, AB, BLDD, B);
 }
 
 void uniLN3(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN6(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLNN6(N, AB, BLDD, B);
 }
 
 void uniLN4(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE && defined(__SSE__)
-    U::alsatian_xtbsvLNN6SSE(N, AB, BAND_LDD, B);
+    U::alsatian_xtbsvLNN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);
 #endif
@@ -331,7 +331,7 @@ void uniLN4(int N, real const* AB, real* B)
 void uniLN5(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE && defined(__SSE__)
-    alsatian_xtbsvLNN6SSE(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLNN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);
 #endif
@@ -341,38 +341,38 @@ void uniLN5(int N, real const* AB, real* B)
 // this gives wrong results
 void uniLTB(int N, real const* AB, real* B)
 {
-    //blas::xtbsv('L', 'N', 'N', N, BAND_NUD, AB, BAND_LDD, B);
-    blas::xtbsv('L', 'T', 'N', N, BAND_NUD, AB, BAND_LDD, B, 1);
+    //blas::xtbsv('L', 'N', 'N', N, BRANK, AB, BLDD, B);
+    blas::xtbsv('L', 'T', 'N', N, BRANK, AB, BLDD, B, 1);
 }
 
 void uniLT0(int N, real const* AB, real* B)
 {
-    //blas_xtbsvLN<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
-    blas_xtbsvLT<'I'>(N, BAND_NUD, AB, BAND_LDD, B);
+    //blas_xtbsvLN<'I'>(N, BRANK, AB, BLDD, B);
+    blas_xtbsvLT<'I'>(N, BRANK, AB, BLDD, B);
 }
 
 void uniLT1(int N, real const* AB, real* B)
 {
-    //alsatian_xtbsvLNN(N, BAND_NUD, AB, BAND_LDD, B);
-    alsatian_xtbsvLTN(N, BAND_NUD, AB, BAND_LDD, B);
+    //alsatian_xtbsvLNN(N, BRANK, AB, BLDD, B);
+    alsatian_xtbsvLTN(N, BRANK, AB, BLDD, B);
 }
 
 void uniLT2(int N, real const* AB, real* B)
 {
-    //alsatian_xtbsvLNNK<BAND_NUD>(N, AB, BAND_LDD, B);
-    alsatian_xtbsvLTNK<BAND_NUD>(N, AB, BAND_LDD, B);
+    //alsatian_xtbsvLNNK<BRANK>(N, AB, BLDD, B);
+    alsatian_xtbsvLTNK<BRANK>(N, AB, BLDD, B);
 }
 
 void uniLT3(int N, real const* AB, real* B)
 {
-    //alsatian_xtbsvLNN6(N, AB, BAND_LDD, B);
-    alsatian_xtbsvLTN6(N, AB, BAND_LDD, B);
+    //alsatian_xtbsvLNN6(N, AB, BLDD, B);
+    alsatian_xtbsvLTN6(N, AB, BLDD, B);
 }
 
 void uniLT4(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE
-    U::alsatian_xtbsvLTN6SSE(N, AB, BAND_LDD, B);
+    U::alsatian_xtbsvLTN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);
 #endif
@@ -381,7 +381,7 @@ void uniLT4(int N, real const* AB, real* B)
 void uniLT5(int N, real const* AB, real* B)
 {
 #if REAL_IS_DOUBLE
-    alsatian_xtbsvLTN6SSE(N, AB, BAND_LDD, B);
+    alsatian_xtbsvLTN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);
 #endif
@@ -397,29 +397,29 @@ void test(size_t cnt)
     std::cout << "xTBSV " << NPTS << " points --- real " << sizeof(real);
     std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
 
-    real * AB = new_real(NVAL*std::max(NVAL, BAND_LDD)+4);
+    real * AB = new_real(NVAL*std::max(NVAL, BLDD)+4);
     real * S = new_real(NVAL);
     real * B = new_real(NVAL+4);
 
     for ( size_t i = 0; i < NVAL; ++i )
         S[i] = RNG.sreal();
-    zero_real(NVAL*BAND_LDD, AB);
-    nan_spill(AB+NPTS*BAND_LDD);
+    zero_real(NVAL*BLDD, AB);
+    nan_spill(AB+NPTS*BLDD);
     for ( size_t i = 0; i < NVAL; ++i )
     {
         real s = 0, r = 0.0625 * RNG.sreal();
-        for ( size_t j = 1; j < BAND_LDD; ++j )
+        for ( size_t j = 1; j < BLDD; ++j )
         {
             real x = -0.0625;
-            AB[j+BAND_LDD*i] = x;
+            AB[j+BLDD*i] = x;
             s += x;
         }
-        AB[  BAND_LDD*i] = 1.0 - 2*s; //diagonal term
-        AB[1+BAND_LDD*i] += r;
-        AB[2+BAND_LDD*i] -= r;
+        AB[  BLDD*i] = 1.0 - 2*s; //diagonal term
+        AB[1+BLDD*i] += r;
+        AB[2+BLDD*i] -= r;
     }
     int info;
-    alsatian_xpbtf2L<BAND_NUD>(NVAL, AB, BAND_LDD, &info);
+    alsatian_xpbtf2L<BRANK>(NVAL, AB, BLDD, &info);
     
 #if 1
     check<uni0>(NVAL, 1, S, AB, B, "blas::tbsv", cnt);

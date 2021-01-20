@@ -319,7 +319,7 @@ constexpr size_t ISOB_LDD = 3;
  the 'diagonal' terms from the blocks that are offset by 2 from the diagonal
  */
 constexpr size_t BAND_NUD = 2*DIM;
-constexpr size_t BAND_LDD = BAND_NUD+1;
+constexpr size_t BAND_LDD = BAND_NUD+DIM;
 
 /// apply preconditionner block in band storage
 inline void applyPrecondIsoB(Mecable const* mec, real* Y)
@@ -613,7 +613,7 @@ void printBlock(Mecable* mec, size_t sup)
  
  This block is square, symmetric, definite positive and predictable
  */
-void Meca::getIsoBBlock(const Mecable * mec, real* res) const
+void Meca::getIsoBBlock(const Mecable * mec, real* res, size_t ldd) const
 {
     const size_t nbp = mec->nbPoints();
 
@@ -621,25 +621,32 @@ void Meca::getIsoBBlock(const Mecable * mec, real* res) const
     
     if ( mec->hasRigidity() )
     {
-        if ( ISOB_LDD != 3 )
-            zero_real(ISOB_LDD*nbp, res);
-        setRigidityBanded(res, ISOB_LDD, nbp, beta*mec->fiberRigidity());
+        if ( ldd != 3 )
+            zero_real(ldd*nbp, res);
+        setBendingRigidity<1>(res, ldd-1, nbp, beta*mec->fiberRigidity());
     }
     else
-        zero_real(ISOB_LDD*nbp, res);
-
-    // add ones to the diagonal:
-    for ( size_t i = 0; i < nbp; ++i )
-        res[i*ISOB_LDD] += 1;
+        zero_real(ldd*nbp, res);
     
     //std::clog << "\nrigidity band " << nbp << "\n";
-    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, ISOB_LDD, 1);
+    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, ldd, 1);
+
+    /*
+     The matrix `res` is stored in 'packed symmetric banded storage':
+     usually, mat(i, j) is stored in mat[i+ldd*j]
+     but with banded storage, mat(i, j) is stored in mat[i-j+ldd*j] for i > j
+     So we use below ldd-1
+     */
 
 #if USE_ISO_MATRIX
-    mISO.addTriangularBlockBanded(beta, res, ISOB_LDD, mec->matIndex(), nbp, 2);
+    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 2);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTraceBanded(beta/DIM, res, ISOB_LDD, DIM*mec->matIndex(), DIM*nbp, 2);
+        mFUL.addDiagonalTrace(beta/DIM, res, ldd-1, DIM*mec->matIndex(), DIM*nbp, DIM*2, false);
+
+    // add Identity matrix to band storage:
+    for ( size_t i = 0; i < nbp; ++i )
+        res[ldd*i] += 1;
 }
 
 
@@ -660,14 +667,14 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
     if ( mec->hasRigidity() )
-        //addRigidityLower<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
-        addRigidity<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
+        //addBendingRigidityLower<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
+        addBendingRigidity<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
 #endif
 #if USE_ISO_MATRIX
     mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp);
+        mFUL.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp, DIM*nbp, true);
 #if ( 0 )
 #if ADD_PROJECTION_DIFF
     if ( mec->hasProjectionDiff() )
@@ -706,19 +713,63 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
         res[n] = beta * res[n];
     
     // add Identity matrix:
-    size_t bs1 = nbp + 1;
-    for ( size_t i = 0; i < nbp*nbp; i += bs1 )
+    for ( size_t i = 0; i < nbp*nbp; i += nbp+1 )
         res[i] += 1;
 }
 
 
 /**
- Get the total diagonal block corresponding to an Object, which is:
+ Get a diagonal block corresponding to an Object, which is:
  
-     I - time_step * P ( mISO + mFUL + P' )
+     I - time_step * mob * ( mISO + mFUL )
  
- The result is constructed by using functions from mISO and mFUL
- This block is square but not symmetric!
+ The result is constructed by using functions from mISO and mFUL, and then
+ multiplied by the vertex mobility, to approximate the dynamics.
+ This block is square and symmetric, and can be factorized by Cholesky's method!
+ */
+void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t rank) const
+{
+    const size_t nbp = mec->nbPoints();
+    const size_t bks = DIM * nbp;
+
+    zero_real(ldd*bks, res);
+
+    // multiply by mobility coefficient, skipping projection
+    const real beta = -tau_ * mec->pointMobility();
+    
+#if SEPARATE_RIGIDITY_TERMS
+    // set the Rigidity terms:
+    if ( mec->hasRigidity() )
+    {
+        setBendingRigidity<DIM>(res, ldd-1, nbp, beta*mec->fiberRigidity());
+        //std::clog<<"Rigidity block " << mec->reference() << "\n";
+        //VecPrint::print(std::clog, bks, bks, res, bks, 0);
+    }
+#endif
+#if USE_ISO_MATRIX
+    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, rank/DIM);
+#endif
+    //std::clog << "\niso:\n"; VecPrint::print(std::clog, ldd, std::min(bks, 24ul), res, ldd);
+    copy_lower_subspace<DIM>(bks, res, ldd-1, rank);
+    //std::clog << "\ncopy_subspace:\n"; VecPrint::print(std::clog, ldd, std::min(bks, 24ul), res, ldd);
+#if USE_ISO_MATRIX
+    if ( useFullMatrix )
+#endif
+        mFUL.addLowerBand(beta, res, ldd-1, DIM*mec->matIndex(), bks, rank);
+    
+    // add Identity matrix to band storage:
+    for ( size_t i = 0; i < bks; ++i )
+        res[ldd*i] += 1;
+}
+
+/**
+ Get a diagonal block corresponding to an Object, which is:
+ 
+     I - time_step * mob * ( mISO + mFUL )
+ 
+ The result is constructed by using functions from mISO and mFUL, and then
+ multiplied by the vertex mobility, to approximate the dynamics.
+ This block is square and symmetric, and can be factorized by Cholesky's method!
  */
 void Meca::getHalfBlock(const Mecable * mec, real* res) const
 {
@@ -731,7 +782,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
     // set the Rigidity terms:
     if ( mec->hasRigidity() )
     {
-        addRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
+        addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
         //std::clog<<"Rigidity block " << mec->reference() << "\n";
         //VecPrint::print(std::clog, bks, bks, res, bks, 0);
     }
@@ -739,13 +790,13 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
 #if USE_ISO_MATRIX
     mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
 #endif
-    expand_lower_matrix<DIM>(bks, res, bks);
+    copy_lower_subspace<DIM, true>(bks, res, bks);
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
         mFUL.addDiagonalBlock(res, bks, DIM*mec->matIndex(), bks);
     
-    // multiply by the drag coefficient, skipping projection
+    // multiply by mobility coefficient, skipping projection
     const real beta = -tau_ * mec->pointMobility();
     
     //blas::xscal(bs*bs, beta, res, 1);
@@ -753,8 +804,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
         res[n] = beta * res[n];
     
     // add Identity matrix:
-    size_t bs1 = bks + 1;
-    for ( size_t i = 0; i < bks*bks; i += bs1 )
+    for ( size_t i = 0; i < bks*bks; i += bks+1 )
         res[i] += 1;
 }
 
@@ -778,7 +828,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     // set the Rigidity terms:
     if ( mec->hasRigidity() )
     {
-        addRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
+        addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
         //std::clog<<"Rigidity block " << mec->reference() << "\n";
         //VecPrint::print(std::clog, bks, bks, res, bks, 0);
     }
@@ -786,7 +836,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
 #if USE_ISO_MATRIX
     mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
 #endif
-    expand_lower_matrix<DIM>(bks, res, bks);
+    copy_lower_subspace<DIM, true>(bks, res, bks);
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
@@ -830,8 +880,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
         res[n] = beta * res[n];
     
     // add Identity matrix:
-    size_t bs1 = bks + 1;
-    for ( size_t i = 0; i < bks*bks; i += bs1 )
+    for ( size_t i = 0; i < bks*bks; i += bks+1 )
         res[i] += 1;
 }
 
@@ -1079,7 +1128,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
     int bt, info = 0;
     if ( 1 ) //ISOB_LDD <= nbp )
     {
-        getIsoBBlock(mec, mec->block());
+        getIsoBBlock(mec, mec->block(), ISOB_LDD);
         // calculate Banded Cholesky factorization:
 #if CHOUCROUTE
         alsatian_xpbtf2L<2>(nbp, mec->block(), ISOB_LDD, &info);
@@ -1135,7 +1184,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
 
     mec->blockSize(DIM*nbp, nbp*nbp, 0);
     
-    //getIsoBBlock(mec, mec->block());
+    //getIsoBBlock(mec, mec->block(), ISOB_LDD);
     //std::clog << "banded preconditionner " << nbp << "\n";
     //VecPrint::print(std::clog, 3, S, mec->block(), ISOB_LDD, 1);
 
@@ -1205,23 +1254,25 @@ Compute preconditionner block corresponding to 'mec'
  */
 void Meca::computePrecondBand(Mecable* mec)
 {
+    assert_true(BAND_NUD < BAND_LDD);
     const size_t bks = DIM * mec->nbPoints();
-    mec->blockSize(bks, bks*bks, 0); //BAND_LDD, 0);
-    getHalfBlock(mec, mec->block());
-
-#if ( 0 )
-    std::clog << "band block " << bks <<":\n";
-    size_t S = std::min(bks, 16UL);
-    VecPrint::print(std::clog, S, S, mec->block(), bks);
-#endif
-    
+   
     int bt, info = 0;
 
     if ( BAND_LDD < bks )
     {
-        assert_true(BAND_NUD < BAND_LDD);
-        // convert to band storage:
-        lower_band_storage<BAND_NUD>(bks, mec->block(), mec->block(), BAND_LDD);
+        mec->blockSize(bks, BAND_LDD*bks, 0);
+        getBandedBlock(mec, mec->block(), BAND_LDD, BAND_NUD);
+        
+#if ( 0 )
+        size_t S = std::min(bks, 24UL);
+        std::clog << "band block " << bks <<":\n";
+        VecPrint::print(std::clog, BAND_LDD, S, mec->block(), BAND_LDD);
+        mec->blockSize(bks, bks*bks, 0);
+        getHalfBlock(mec, mec->block());
+        std::clog << "half block :\n";
+        VecPrint::print(std::clog, S, S, mec->block(), bks);
+#endif
         
         // calculate Cholesky factorization for band storage:
 #if CHOUCROUTE
@@ -1233,6 +1284,8 @@ void Meca::computePrecondBand(Mecable* mec)
     }
     else
     {
+        mec->blockSize(bks, bks*bks, 0);
+        getHalfBlock(mec, mec->block());
         // calculate Cholesky factorization:
 #if CHOUCROUTE
         alsatian_xpotf2L(bks, mec->block(), bks, &info);
@@ -1517,9 +1570,9 @@ void Meca::prepare(Simul const* sim)
         if ( mec->hasRigidity() )
         {
 #   if USE_ISO_MATRIX
-            addRigidityMatrix(mISO, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addBendingRigidityMatrix(mISO, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   else
-            addRigidityBlockMatrix<DIM>(mFUL, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addBendingRigidityBlockMatrix<DIM>(mFUL, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
 #   endif
         }
 #endif

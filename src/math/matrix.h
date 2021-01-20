@@ -67,7 +67,7 @@ public:
     /// copy the block ( x, y, x+sx, y+sy ) into `mat`
     void copyBlock(real* mat, unsigned ldd, size_t sx, size_t nx, size_t sy, size_t ny) const;
     
-    /// add diagonal block within index [x, x+sx] from this matrix to `mat`
+    /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
     virtual void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp=1) const;
     
     //----------------------------------------------------------------------

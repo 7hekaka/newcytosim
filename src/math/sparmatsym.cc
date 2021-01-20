@@ -236,18 +236,18 @@ void SparMatSym::addDiagonalBlock(real* mat, const size_t ldd,
     
     for ( size_t jj = start; jj < end; ++jj )
     {
-        size_t j = jj - start;
+        size_t j = amp * ( jj - start );
         for ( size_t n = 0; n < colsiz_[jj]; ++n )
         {
             size_t ii = column_[jj][n].inx;
             if ( start <= ii && ii < end )
             {
-                size_t i = ii - start;
+                size_t i = amp * ( ii - start );
                 assert_true(i > j);
                 // address lower triangle of 'mat'
-                mat[amp*(i+ldd*j)] += column_[jj][n].val;
+                mat[i+ldd*j] += column_[jj][n].val;
                 if ( i != j )
-                    mat[amp*(j+ldd*i)] += column_[jj][n].val;
+                    mat[j+ldd*i] += column_[jj][n].val;
             }
         }
     }

@@ -289,8 +289,8 @@ void blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
 
 
 /**
- This calls the standard lapack::pbtf2()
- and then *** inverts *** the diagonal terms
+ This is equivalent to calling the standard lapack::pbtf2()
+ and then *** inverting *** the diagonal terms
  
  SUBROUTINE DPBTF2( UPLO, N, KD, AB, LDAB, INFO )
 */
@@ -325,6 +325,7 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
         }
         AB += LDAB;
     }
+    *INFO = 0;
 }
 
 /**

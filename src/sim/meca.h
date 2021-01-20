@@ -307,6 +307,9 @@ private:
 
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
+    
+    /// extract the matrix on-diagonal block corresponding to a Mecable
+    void getBandedBlock(const Mecable*, real* mat, size_t ldd, size_t rank) const;
 
     /// extract the matrix on-diagonal block corresponding to a Mecable
     void getHalfBlock(const Mecable*, real* mat) const;
@@ -315,7 +318,7 @@ private:
     void getFullBlock(const Mecable*, real* mat) const;
 
     /// extract the 5-bands symmetric on-diagonal block corresponding to a Mecable
-    void getIsoBBlock(const Mecable*, real* mat) const;
+    void getIsoBBlock(const Mecable*, real* mat, size_t ldd) const;
 
     /// extract the istropic projection of the on-diagonal block corresponding to a Mecable
     void getIsoBlock(const Mecable*, real* mat) const;
@@ -391,7 +394,7 @@ public:
     /// calculate Y <- M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;
 
-    /// apply preconditionner: Y <- P*X (note that X maybe equal to Y)
+    /// apply preconditionner: Y <- P*X (this works even if X == Y)
     void precondition(const real* X, real* Y) const;
     
     /// calculates Y <- P*M*X, for left-sided preconditinning

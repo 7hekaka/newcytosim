@@ -331,13 +331,25 @@ public:
         M[0] += val_;
     }
     
-    /// add lower elements of this block to upper triangle of 'M'
+    /// add scaled elements of block 'S' to array 'M'
+    void addto(real * M, size_t ldd, real alpha) const
+    {
+        M[0] += alpha * val_;
+    }
+
+    /// add element of this block to 'M'
     void addto_lower(real * M, size_t ldd) const
     {
         M[0] += val_;
     }
     
-    /// add lower elements of this block to both upper and lower triangles of 'M'
+    /// add scaled element of this block to 'M'
+    void addto_lower(real * M, size_t ldd, real alpha) const
+    {
+        M[0] += alpha * val_;
+    }
+
+    /// add element of this block to 'M'
     void addto_symm(real * M, size_t ldd) const
     {
         M[0] += val_;

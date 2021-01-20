@@ -620,10 +620,10 @@ int main( int argc, char* argv[] )
     printf("Matrix test and timing code --- real %lu --- %s\n", sizeof(real), __VERSION__);
 
     RNG.seed();
-#if ( 0 )
+#if ( 1 )
     SparMat1 mat1;
     SparMat2 mat2;
-    SparMatA matA; //assymetric!
+    SparMatA matA; //asymetric!
     SparMatB mat3;
     SparMatD mat4;
     
@@ -632,7 +632,7 @@ int main( int argc, char* argv[] )
     compareMatrix(4*5, mat1, mat3, 1<<4);
     compareMatrix(4*7, mat2, mat3, 1<<5);
 #endif
-#if ( 0 )
+#if ( 1 )
     compareMatrix(4*11, mat1, mat3, 1<<6);
     compareMatrix(4*33, mat1, mat3, 1<<16);
     compareMatrix(4*3, mat1, mat4, 1<<16);

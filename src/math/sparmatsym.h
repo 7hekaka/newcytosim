@@ -83,7 +83,7 @@ public:
     /// scale the matrix by a scalar factor
     void scale(real);
     
-    /// add lower triangular half of 'this' block ( idx, idx, idx+siz, idx+siz ) to `mat`
+    /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
     void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp=1) const;
     
     /// prepare matrix for multiplications by a vector (must be called)

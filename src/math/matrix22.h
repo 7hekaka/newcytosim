@@ -746,7 +746,16 @@ public:
         M[1+ldd] += val[3];
     }
     
-    /// add lower elements of this block to upper triangle of 'M'
+    /// add scaled elements of block 'S' to array 'M'
+    void addto(real * M, size_t ldd, real alpha) const
+    {
+        M[0    ] += alpha * val[0];
+        M[1    ] += alpha * val[1];
+        M[  ldd] += alpha * val[2];
+        M[1+ldd] += alpha * val[3];
+    }
+
+    /// add lower elements of this block to lower triangle of 'M'
     void addto_lower(real * M, size_t ldd) const
     {
         M[0    ] += val[0];
@@ -755,6 +764,15 @@ public:
         assert_true( val[2] == 0 );
     }
     
+    /// add scaled lower elements of this block to lower triangle of 'M'
+    void addto_lower(real * M, size_t ldd, real alpha) const
+    {
+        M[0    ] += alpha * val[0];
+        M[1    ] += alpha * val[1];
+        M[1+ldd] += alpha * val[3];
+        assert_true( val[2] == 0 );
+    }
+
     /// add lower elements of this block to both upper and lower triangles of 'M'
     void addto_symm(real * M, size_t ldd) const
     {

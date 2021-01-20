@@ -836,7 +836,21 @@ public:
         M[2+ldd*2] += val[2+BLD*2];
     }
     
-    /// add lower elements of this block to upper triangle of 'M'
+    /// add scaled elements of block 'S' to array 'M'
+    void addto(real * M, size_t ldd, real alpha) const
+    {
+        M[0      ] += alpha * val[0];
+        M[1      ] += alpha * val[1      ];
+        M[2      ] += alpha * val[2      ];
+        M[  ldd  ] += alpha * val[0+BLD  ];
+        M[1+ldd  ] += alpha * val[1+BLD  ];
+        M[2+ldd  ] += alpha * val[2+BLD  ];
+        M[  ldd*2] += alpha * val[0+BLD*2];
+        M[1+ldd*2] += alpha * val[1+BLD*2];
+        M[2+ldd*2] += alpha * val[2+BLD*2];
+    }
+    
+    /// add lower elements of this block to lower triangle of 'M'
     void addto_lower(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
@@ -845,6 +859,17 @@ public:
         M[1+ldd  ] += val[1+BLD  ];
         M[2+ldd  ] += val[2+BLD  ];
         M[2+ldd*2] += val[2+BLD*2];
+    }
+    
+    /// add scaled lower elements of this block to lower triangle of 'M'
+    void addto_lower(real * M, size_t ldd, real alpha) const
+    {
+        M[0      ] += alpha * val[0];
+        M[1      ] += alpha * val[1      ];
+        M[2      ] += alpha * val[2      ];
+        M[1+ldd  ] += alpha * val[1+BLD  ];
+        M[2+ldd  ] += alpha * val[2+BLD  ];
+        M[2+ldd*2] += alpha * val[2+BLD*2];
     }
     
     /// add lower elements of this block to both upper and lower triangles of 'M'

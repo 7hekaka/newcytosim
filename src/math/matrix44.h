@@ -635,6 +635,14 @@ public:
             M[y+ldd*x] = val[y+4*x];
     }
     
+    /// add scaled elements of block 'S' to array 'M'
+    void addto(real * M, size_t ldd, real alpha) const
+    {
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = 0; y < 4; ++y )
+            M[y+ldd*x] = alpha * val[y+4*x];
+    }
+
     /// add lower elements of this block to lower triangle of 'M'
     void addto_lower(real * M, size_t ldd) const
     {
@@ -643,6 +651,14 @@ public:
             M[y+ldd*x] = val[y+4*x];
     }
     
+    /// add scaled lower elements of this block to lower triangle of 'M'
+    void addto_lower(real * M, size_t ldd, real alpha) const
+    {
+        for ( index x = 0; x < 4; ++x )
+        for ( index y = x; y < 4; ++y )
+            M[y+ldd*x] = alpha * val[y+4*x];
+    }
+
     /// add all elements of this block to 'M', with transposition
     void addto_trans(real * M, size_t ldd) const
     {

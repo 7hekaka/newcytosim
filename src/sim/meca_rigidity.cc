@@ -6,7 +6,7 @@
  for a filament with 'cnt' points.
  */
 template < typename MATRIX >
-void addRigidityMatrix0(MATRIX& mat, const size_t inx, const size_t cnt, const real R1)
+void addBendingRigidityMatrix0(MATRIX& mat, const size_t inx, const size_t cnt, const real R1)
 {
     assert_true( cnt > 2 );
     const real R2 = R1 * 2;
@@ -31,14 +31,13 @@ void addRigidityMatrix0(MATRIX& mat, const size_t inx, const size_t cnt, const r
  for a filament with 'cnt' points and bending modulus 'R'.
  */
 template < typename MATRIX >
-void addRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const real R)
+void addBendingRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
 
     const real R1 = -1 * R;
     const real R2 =  2 * R;
     const real R4 =  4 * R;
-    const real R5 = -5 * R;
     const real R6 = -6 * R;
 
     const size_t s = inx;
@@ -53,6 +52,7 @@ void addRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const re
 
     if ( 3 < cnt )
     {
+        const real R5 = -5 * R;
         mat(s+1, s+1) += R5;
         mat(s+2, s+1) += R4;
         mat(s+3, s+1) += R1;
@@ -73,14 +73,13 @@ void addRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const re
 
 
 template < int ORD, typename MATRIX>
-void addRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const real R)
+void addBendingRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
 
     const real R1 = -1 * R;
     const real R2 =  2 * R;
     const real R4 =  4 * R;
-    const real R5 = -5 * R;
     const real R6 = -6 * R;
     
     constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
@@ -96,6 +95,7 @@ void addRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, con
     
     if ( 3 < cnt )
     {
+        const real R5 = -5 * R;
         mat.block(s+U, s+U).add_diag(R5);
         mat.block(s+D, s+U).add_diag(R4);
         mat.block(s+T, s+U).add_diag(R1);
@@ -121,14 +121,13 @@ void addRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t cnt, con
  Only terms corresponding to the first subspace are set
  */
 template < size_t ORD >
-void addRigidity(real* mat, size_t ldd, size_t cnt, const real R)
+void addBendingRigidity(real* mat, size_t ldd, size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
 
     const real R1 = -1 * R;
     const real R2 =  2 * R;
     const real R4 =  4 * R;
-    const real R5 = -5 * R;
     const real R6 = -6 * R;
 
     constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
@@ -147,6 +146,7 @@ void addRigidity(real* mat, size_t ldd, size_t cnt, const real R)
 
     if ( 3 < cnt )
     {
+        const real R5 = -5 * R;
         mat[U+ldd*U] += R5;
         mat[U+ldd*D] += R4;
         mat[U+ldd*T] += R1;
@@ -176,32 +176,31 @@ void addRigidity(real* mat, size_t ldd, size_t cnt, const real R)
  Only terms above the diagonal and corresponding to the first subspace are set
  */
 template < size_t ORD >
-void addRigidityLower(real* mat, size_t ldd, size_t cnt, const real R)
+void addBendingRigidityLower(real* mat, size_t ldd, size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
 
-    const real R1 = -1 * R;
     const real R2 =  2 * R;
     const real R4 =  4 * R;
-    const real R5 = -5 * R;
     const real R6 = -6 * R;
 
     constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
     const size_t e = ORD * ( cnt - 2 );
     const size_t f = ORD * ( cnt - 1 );
     
-    mat[0] += R1;
+    mat[0] -= R;
     mat[U] += R2;
-    mat[D] += R1;
+    mat[D] -= R;
     
     mat[f+ldd*e] += R2;
-    mat[f+ldd*f] += R1;
+    mat[f+ldd*f] -= R;
     
     if ( 3 < cnt )
     {
+        const real R5 = -5 * R;
         mat[U+ldd*U] += R5;
         mat[D+ldd*U] += R4;
-        mat[T+ldd*U] += R1;
+        mat[T+ldd*U] -= R;
         mat[e+ldd*e] += R5;
     }
     else
@@ -211,101 +210,58 @@ void addRigidityLower(real* mat, size_t ldd, size_t cnt, const real R)
     
     for ( size_t n = D; n < e; n += U )
     {
-        mat[ n   +ldd*n] += R6;
-        mat[(n+U)+ldd*n] += R4;
-        mat[(n+D)+ldd*n] += R1;
-    }
-}
-
-
-/**
- Set rigidity terms with modulus 'R1' in diagonal and lower parts of `mat`,
- for a filament with 'cnt' points.
- */
-void addRigidityBanded(real* mat, size_t ldd, size_t cnt, const real R)
-{
-    assert_true( cnt > 2 );
-
-    const real R1 = -1 * R;
-    const real R2 =  2 * R;
-    const real R4 =  4 * R;
-    const real R5 = -5 * R;
-    const real R6 = -6 * R;
-
-    const size_t s = 0;
-    const size_t e = cnt - 2;
-
-    mat[  s*ldd] += R1;
-    mat[1+s*ldd] += R2;
-    mat[2+s*ldd] += R1;
-    
-    mat[  (e+1)*ldd] += R1;
-    mat[1+ e   *ldd] += R2;
-
-    if ( 3 < cnt )
-    {
-        mat[  (s+1)*ldd] += R5;
-        mat[1+(s+1)*ldd] += R4;
-        mat[2+(s+1)*ldd] += R1;
-        mat[   e   *ldd] += R5;
-    }
-    else
-    {
-        mat[(s+1)*ldd] -= R4;
-    }
-    
-    for ( size_t n = s+2; n < e; ++n )
-    {
-        mat[  n*ldd] += R6;
-        mat[1+n*ldd] += R4;
-        mat[2+n*ldd] += R1;
+        mat[  n+ldd*n] += R6;
+        mat[U+n+ldd*n] += R4;
+        mat[D+n+ldd*n] -= R;
     }
 }
 
 
 /*
- addresses `mat' using lower banded storage for a symmetric matrix
- mat(i, j) is stored in mat[i-j+ldd*j]
+ set lower triangle of `mat' to give bending rigidity with parameter R
  */
-void setRigidityBanded(real* mat, size_t ldd, size_t cnt, const real R)
+template < size_t ORD >
+void setBendingRigidity(real* mat, size_t ldd, size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
+    constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
 
     const real R1 = -1 * R;
     const real R2 =  2 * R;
     const real R4 =  4 * R;
-    const real R5 = -5 * R;
     const real R6 = -6 * R;
 
-    const size_t e = cnt - 2;
+    const size_t e = ORD * ( cnt - 2 );
+    const size_t f = ORD * ( cnt - 1 );
 
     mat[0] = R1;
-    mat[1] = R2;
-    mat[2] = R1;
+    mat[U] = R2;
+    mat[D] = R1;
     
-    mat[  (e+1)*ldd] = R1;
-    mat[1+(e+1)*ldd] = 0;
-    mat[2+(e+1)*ldd] = 0;
-    mat[1+  e*ldd]   = R2;
-    mat[2+  e*ldd]   = 0;
+    mat[  f+f*ldd] = R1;
+    mat[U+f+f*ldd] = 0;
+    mat[D+f+f*ldd] = 0;
+    mat[U+e+e*ldd] = R2;
+    mat[D+e+e*ldd] = 0;
 
     if ( 3 < cnt )
     {
-        mat[  ldd] = R5;
-        mat[1+ldd] = R4;
-        mat[2+ldd] = R1;
-        mat[e*ldd] = R5;
+        const real R5 = -5 * R;
+        mat[U+U*ldd] = R5;
+        mat[D+U*ldd] = R4;
+        mat[T+U*ldd] = R1;
+        mat[e+e*ldd] = R5;
     }
     else
     {
-        mat[ldd] = -R4;
+        mat[U+ORD*ldd] = -R4;
     }
     
-    for ( size_t n = 2; n < e; ++n )
+    for ( size_t n = D; n < e; n += ORD )
     {
-        mat[  n*ldd] = R6;
-        mat[1+n*ldd] = R4;
-        mat[2+n*ldd] = R1;
+        mat[  n+n*ldd] = R6;
+        mat[U+n+n*ldd] = R4;
+        mat[D+n+n*ldd] = R1;
     }
 }
 

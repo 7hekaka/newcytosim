@@ -380,9 +380,9 @@ void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd,
 addresses `mat' using lower banded storage for a symmetric matrix
 mat(i, j) is stored in mat[i-j+ldd*j]
 */
-void SparMatSym2::addTriangularBlockBanded(real alpha, real* mat, const size_t ldd,
-                                           const size_t start, const size_t cnt,
-                                           const size_t rank) const
+void SparMatSym2::addLowerBand(real alpha, real* mat, const size_t ldd,
+                               const size_t start, const size_t cnt,
+                               const size_t rank) const
 {
     size_t end = start + cnt;
     assert_true( end <= size_ );
@@ -400,29 +400,19 @@ void SparMatSym2::addTriangularBlockBanded(real alpha, real* mat, const size_t l
                 size_t i = ii - start;
                 //printf("SMS2 %4i %4i % .4f\n", ii, jj, a);
                 assert_true( i >= j );
-                // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
                 if ( i <= j + rank )
-                    mat[i-j+ldd*j] += alpha * column_[jj][n].val;
+                    mat[i+ldd*j] += alpha * column_[jj][n].val;
             }
         }
     }
 }
 
 
-
 void SparMatSym2::addDiagonalTrace(real alpha, real* mat, const size_t ldd,
-                                   const size_t start, const size_t cnt) const
+                                   const size_t start, const size_t cnt,
+                                   const size_t rank, bool sym) const
 {
     fprintf(stderr, "unfinished SparMatSym2::addDiagonalTrace()\n");
-    exit(1);
-}
-
-
-void SparMatSym2::addDiagonalTraceBanded(real alpha, real* mat, const size_t ldd,
-                                         const size_t start, const size_t cnt,
-                                         const size_t rank) const
-{
-    fprintf(stderr, "unfinished SparMatSym2::addDiagonalTraceBanded()\n");
     exit(1);
 }
 

@@ -3,86 +3,66 @@
 
 /**
  Fill-in matrix 'dst' as the duplicate of 'src', for each 'ORD' dimension.
- For 'ORD==1', this makes a simple copy
- For 'ORD==2', 'src' is copied twice, into odd indices, and into even indices.
- For 'ORD==3', three copies of 'src' are made into 'dst'.
+ For 'ORD==1', this does nothing
+ For 'ORD==2', the X-subspace of 'mat' is copied to the 'Y' subspace
+ For 'ORD==3', the X-subspace of 'mat' is copied to the 'Y' and 'Z' subspaces
  
- Both 'src' and 'dst' must be symmetrix square matrices.
- The size of 'dst' is ORD times the size of 'src'.
- Only the upper diagonal of 'src' is specified.
- Matrix Y is specified in full.
+ The size of 'mat' is `ORD*lin x DOR*col`
+ Only the X-suspace of 'src' is used.
  */
 
 template < size_t ORD >
-void duplicate_matrix(size_t siz, real const* src, size_t ldd, real * dst)
+void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
 {
-    size_t ddd = ORD * siz;
-    size_t lll = ORD * ldd;
+#if ( 0 )
+    std::clog << "\ncopy_subspace:\n";
+    VecPrint::print(std::clog, siz, siz, mat, ldd);
+#endif
     
-    zero_real(ddd*ddd, dst);
-    
-    for ( size_t i = 0; i < siz; ++i )
+    for ( size_t j = 0; j < siz; j += ORD )
+    for ( size_t i = j; i <= std::min(siz-1, j+rank); i += ORD )
     {
-        real dia = src[i+ldd*i];
-        size_t ii = ORD * i;
-        
-        for ( size_t d = 0; d < ORD; ++d )
-            dst[(1+lll)*(ii+d)] = dia;
-        
-        for ( size_t j = i+1; j < siz; ++j )
-        {
-            real val = src[i+ldd*j];
-            size_t jj = ORD * j;
-            for ( size_t d = 0; d < ORD; ++d )
-            {
-                dst[ii+d+lll*(jj+d)] = val;
-                dst[jj+d+lll*(ii+d)] = val;
-            }
-        }
+        real val = mat[i+ldd*j];
+        for ( size_t d = 1; d < ORD; ++d )
+            mat[i+d+ldd*(j+d)] = val;
     }
     
 #if ( 0 )
-    std::clog << "\nduplicate_matrix:\n";
-    VecPrint::print(std::clog, siz, siz, src, ldd);
-    std::clog << "Duplicated:\n";
-    VecPrint::print(std::clog, ddd, ddd, dst, lll);
+    std::clog << "copied:\n";
+    VecPrint::print(std::clog, siz, siz, mat, ldd);
 #endif
 }
 
 
 /**
- This will symmetrize matrix `mat`, by copying the upper triangle to the lower one
- It will also copy the terms that are within the first subspace `X` into the other
- dimensions.
+ This will copy the terms that are within the first subspace `X` into the other
+ dimensions. if 'SYMMETRIZE == true', this will also copy the upper triangle to
+ the lower one to make the matrix symmetric
  
- input: upper triangular matrix
- ouput: full symmetric matrix
+ at entry: `mat` is an upper triangular matrix
+ at exit: `mat` is a full symmetric matrix if `SYMMETRIZE==true`
  */
-template < size_t ORD >
-void expand_upper_matrix(size_t siz, real * mat, size_t ldd)
+template < size_t ORD, bool SYMMETRIZE >
+void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
 {
 #if ( 0 )
-    std::clog << "\nexpand_upper_matrix:\n";
+    std::clog << "\ncopy_upper_subspace:\n";
     VecPrint::print(std::clog, siz, siz, mat, ldd);
 #endif
     
     for ( size_t jj = 0; jj < siz; jj += ORD  )
+    for ( size_t ii = 0; ii <= jj; ii += ORD  )
     {
-        for ( size_t ii = 0; ii < jj; ii += ORD  )
+        real val = mat[ii+ldd*jj];
+        // expand term in other dimensions:
+        for ( size_t d = 1; d < ORD; ++d )
+            mat[ii+d+ldd*(jj+d)] = val;
+        
+        if ( SYMMETRIZE )
         {
-            real val = mat[ii+ldd*jj];
-            // expand term in other dimensions:
-            for ( size_t d = 1; d < ORD; ++d )
-                mat[ii+d+ldd*(jj+d)] = val;
-            
-            // symmetrize matrix:
             for ( size_t d = 0; d < ORD; ++d )
                 mat[jj+d+ldd*(ii+d)] = val;
         }
-        // expand diagonal term in other dimensions:
-        real val = mat[jj+ldd*jj];
-        for ( size_t d = 1; d < ORD; ++d )
-            mat[jj+d+ldd*(jj+d)] = val;
     }
 
 #if ( 0 )
@@ -92,39 +72,35 @@ void expand_upper_matrix(size_t siz, real * mat, size_t ldd)
 }
 
 /**
- This will symmetrize matrix `mat`, by copying the lower triangle to the upper one
- It will also copy the terms that are within the first subspace `X` into the other
- dimensions.
- 
- input: lower triangular matrix
- ouput: full symmetric matrix
+ This will copy the terms that are within the first subspace `X` into the other
+ dimensions. if 'SYMMETRIZE == true', this will also copy the lower triangle to
+ the upper one to make the matrix symmetric
+
+ at entry, `mat` is a lower triangular matrix
+ at exit, `mat` is a full symmetric matrix if `SYMMETRIZE==true`
  */
-template < size_t ORD >
-void expand_lower_matrix(size_t siz, real * mat, size_t ldd)
+template < size_t ORD, bool SYMMETRIZE >
+void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
-    std::clog << "\nexpand_lower_matrix:\n";
+    std::clog << "\ncopy_lower_subspace:\n";
     VecPrint::print(std::clog, S, S, mat, ldd);
 #endif
     
-    for ( size_t jj = 0; jj < siz; jj += ORD  )
+    for ( size_t jj =  0; jj < siz; jj += ORD )
+    for ( size_t ii = jj; ii < siz; ii += ORD )
     {
-        for ( size_t ii = jj; ii < siz; ii += ORD  )
+        real val = mat[ii+ldd*jj];
+        // expand term in other dimensions:
+        for ( size_t d = 1; d < ORD; ++d )
+            mat[ii+d+ldd*(jj+d)] = val;
+        
+        if ( SYMMETRIZE )
         {
-            real val = mat[ii+ldd*jj];
-            // expand term in other dimensions:
-            for ( size_t d = 1; d < ORD; ++d )
-                mat[ii+d+ldd*(jj+d)] = val;
-            
-            // symmetrize matrix:
             for ( size_t d = 0; d < ORD; ++d )
                 mat[jj+d+ldd*(ii+d)] = val;
         }
-        // expand diagonal term in other dimensions:
-        real val = mat[jj+ldd*jj];
-        for ( size_t d = 1; d < ORD; ++d )
-            mat[jj+d+ldd*(jj+d)] = val;
     }
     
 #if ( 0 )
@@ -208,7 +184,7 @@ void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 
     for ( size_t j = 0; j < siz; ++j )
     {
-        real * col = mat + ldd * j;
+        real* col = mat + ldd * j;
         //zero out terms above the diagonal:
         for ( size_t i = 0; i+ku < j; ++i )
             col[i] = 0;
@@ -226,7 +202,7 @@ void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 
 
 /// sum(element^2) / sum(diagonal^2)
-real off_diagonal_norm(size_t siz, real * mat)
+real off_diagonal_norm(size_t siz, real* mat)
 {
     real all = 0;
     for ( size_t k = 0; k < siz*siz; ++k )
@@ -241,7 +217,7 @@ real off_diagonal_norm(size_t siz, real * mat)
 
 
 /// set all values between '-val' and 'val' to zero
-void threshold_matrix(size_t siz, real * mat, real val)
+void threshold_matrix(size_t siz, real* mat, real val)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
     {
@@ -252,7 +228,7 @@ void threshold_matrix(size_t siz, real * mat, real val)
 
 
 /// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
-void init_matrix(size_t siz, real * mat, real dia, real off)
+void init_matrix(size_t siz, real* mat, real dia, real off)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
         mat[k] = off;
@@ -262,11 +238,11 @@ void init_matrix(size_t siz, real * mat, real dia, real off)
 
 
 /// erase all off-diagonal terms in `mat` of order `siz`
-void make_diagonal(size_t siz, real * mat, size_t ldd)
+void make_diagonal(size_t siz, real* mat, size_t ldd)
 {
     for ( size_t j = 0; j < siz; ++j )
     {
-        real * col = mat + j * ldd;
+        real* col = mat + j * ldd;
         for ( size_t i = 0; i < j; ++i )
             col[i] = 0.0;
         for ( size_t i = j+1; i < siz; ++i )
@@ -276,7 +252,7 @@ void make_diagonal(size_t siz, real * mat, size_t ldd)
 
 
 /// a test matrix with integer components
-void test_matrix(size_t siz, real * mat, size_t ldd)
+void test_matrix(size_t siz, real* mat, size_t ldd)
 {
     for ( size_t i = 0; i < siz; ++i )
     for ( size_t j = 0; j < siz; ++j )
@@ -310,7 +286,7 @@ void lower_band_storage(int N, real const* src, real* dst, int ldd)
     {
         int sup = std::min(N-1, j+KD);
         real const* S = src + N * j;
-        real * D = dst + ldd * j;
+        real* D = dst + ldd * j;
         for ( int i = j; i <= sup; ++i )
             D[i-j] = S[i];
     }
@@ -348,7 +324,7 @@ void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, si
     {
         size_t inf = j - std::min(j, ku);
         size_t sup = std::min(N-1, j+kl);
-        real * D = dst + ldd * j + kl + ku - j;
+        real* D = dst + ldd * j + kl + ku - j;
         real const* S = src + N * j;
         for ( size_t i = inf; i <= sup; ++i )
             D[i] = S[i];
@@ -362,7 +338,7 @@ void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, si
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* mat, real alpha, real * vec, real * tmp)
+real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* mat, real alpha, real* vec, real* tmp)
 {
     assert_true(siz > 0);
     const real TOLERANCE = 0.05;
@@ -403,7 +379,7 @@ real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* ma
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, real * vec, real * tmp)
+real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, real* vec, real* tmp)
 {
     const real TOLERANCE = 0.05;
     real oge, eig = blas::nrm2(siz, vec);

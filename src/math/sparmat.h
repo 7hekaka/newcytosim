@@ -62,7 +62,7 @@ public:
     /// scale the matrix by a scalar factor
     void scale( real a );
     
-    /// add this' data block ( idx, idx, idx+siz, idx+siz ) to upper triangular half of `mat`
+    /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
     void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp=1) const;
     
     /// multiplication of a vector: Y = Y + M * X, dim(X) = dim(M)
