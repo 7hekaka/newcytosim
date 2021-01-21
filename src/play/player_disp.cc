@@ -163,8 +163,9 @@ void Player::autoTrack(FiberSet const& fibers, View& view)
     if ( view.track_fibers & 2 )
     {
         // align with mean nematic direction
-        FiberSet::infoNematic(fibers.collect(), vec);
+        real S = FiberSet::infoNematic(fibers.collect(), vec);
         view.align_with(Vector3(vec));
+        flashText("Nematic order S = %5.3f", S);
         //view.rotation.setFromMatrix3(vec);
         //view.rotation.conjugate();
         //std::clog << "auto rotate: " << Vector3(vec) << '\n';
