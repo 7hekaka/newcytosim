@@ -85,6 +85,8 @@ inline vec4f logapprox4f(vec4f x)
 }
 
 
+#define USE_HORNER_RULE 1
+
 /// Approximate natural logarithm by Jacques-Henri Jourdan
 /**
  Absolute error bounded by 1e-5 for normalized inputs
@@ -99,56 +101,106 @@ inline vec8f logapprox8f(vec8f x)
     const vec8f mant = set8fi(0x007fffff);
     const vec8f expo = set8fi(0x3f800000);
     // polynomial coefficients
-    const vec8f a = set8f(+3.529304993f);
-    const vec8f b = set8f(-2.461222105f);
-    const vec8f c = set8f(+1.130626167f);
-    const vec8f d = set8f(-0.288739945f);
-    const vec8f e = set8f(+3.110401639e-2f);
-    const vec8f f = set8f(-89.970756366f);
-    const vec8f g = set8f(0.6931471805f);
+    const vec8f a1 = set8f(+3.529304993f);
+    const vec8f a2 = set8f(-2.461222105f);
+    const vec8f a3 = set8f(+1.130626167f);
+    const vec8f a4 = set8f(-0.288739945f);
+    const vec8f a5 = set8f(+3.110401639e-2f);
+    const vec8f F = set8f(-89.970756366f);
+    const vec8f G = set8f(0.6931471805f);
     // used to clear negative / NaN arguments:
     vec8f invalid = cmp8f(x, setzero8f(), _CMP_NGT_UQ);
     // extract exponent:
 #ifdef __AVX2__
-    vec8f cst = cvt8if(_mm256_srli_epi32(_mm256_castps_si256(x), 23));
+    vec8f a0 = cvt8if(_mm256_srli_epi32(_mm256_castps_si256(x), 23));
 #else
     __m128 hi = gethi4f(x);
     __m128 lo = getlo4f(x);
     hi = cvt4if(_mm_srli_epi32(_mm_castps_si128(hi), 23));
     lo = cvt4if(_mm_srli_epi32(_mm_castps_si128(lo), 23));
-    vec8f cst = cat4f(hi, lo);
+    vec8f a0 = cat4f(hi, lo);
 #endif
-    cst = add8f(mul8f(cst, g), f);
+    a0 = add8f(mul8f(a0, G), F);
     // clear exponents:
     x = or8f(expo, and8f(mant, x));
-    // evaluate polynom:
-    vec8f tmp = add8f(mul8f(x, e), d);
-    tmp = add8f(mul8f(x, tmp), c);
-    tmp = add8f(mul8f(x, tmp), b);
-    tmp = add8f(mul8f(x, tmp), a);
-    tmp = add8f(mul8f(x, tmp), cst);
+    /* Mathematically equivalent polynomial evaluations:
+     a0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4 + a5*x^5
+     a0 + x*(a1 + x*(a2 + x*(a3 + x*(a4 + x*a5))))
+     [a0 + a1*x] + xx*([a2 + a3*x] + xx*[a4 + a5*x]))
+     */
+#if USE_HORNER_RULE
+    vec8f tmp = add8f(mul8f(x, a5), a4);
+    tmp = add8f(mul8f(x, tmp), a3);
+    tmp = add8f(mul8f(x, tmp), a2);
+    tmp = add8f(mul8f(x, tmp), a1);
+    tmp = add8f(mul8f(x, tmp), a0);
+#else
+    // could reduce latency, at the cost of one additional multiplication
+    vec8f xx = mul8f(x, x);
+    vec8f t01 = add8f(mul8f(x, a1), a0);
+    vec8f t23 = add8f(mul8f(x, a3), a2);
+    vec8f tmp = add8f(mul8f(x, a5), a4);
+    tmp = add8f(mul8f(xx, tmp), t23);
+    tmp = add8f(mul8f(xx, tmp), t01);
+#endif
     // clear negative arguments:
     return or8f(tmp, invalid);
 }
-
 
 /// Approximate cos+sin by Jacques-Henri Jourdan
 /* Correct only in [-pi, pi]
    Absolute error bounded by 5e-5
    Continuous error */
-inline void cossinapprox8f(vec8f& C, vec8f& S, vec8f x)
+inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
 {
     vec8f xx = mul8f(x, x);
     
-    C = add8f(mul8f(xx, set8f(1.8929864824e-5f)), set8f(-1.3422947025e-3f));
-    C = add8f(mul8f(xx, C), set8f(4.1518035216e-2f));
-    C = add8f(mul8f(xx, C), set8f(-0.4998515820f));
-    C = add8f(mul8f(xx, C), set8f(1.f));
+    const vec8f c4 = set8f(1.8929864824e-5f);
+    const vec8f c3 = set8f(-1.3422947025e-3f);
+    const vec8f c2 = set8f(4.1518035216e-2f);
+    const vec8f c1 = set8f(-0.4998515820f);
+    const vec8f c0 = set8f(1.f);
+    
+    /* Mathematically equivalent polynomial evaluations:
+     a0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4
+     a0 + x*(a1 + x*(a2 + x*(a3 + x*a4)))
+     ([a0 + a1*x] + xx*([a2 + a3*x] + a4*xx)
 
-    S = add8f(mul8f(xx, set8f(2.1478401777e-6f)), set8f(-1.9264918228e-4f));
-    S = add8f(mul8f(xx, S), set8f(8.3089787513e-3f ));
-    S = add8f(mul8f(xx, S), set8f(-0.1666243672f));
-    S = add8f(mul8f(xx, S), set8f(0.9999793767f));
+     a0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4 + a5*x^5 + a6*x^6
+     a0 + x*(a1 + x*(a2 + x*(a3 + x*(a4 + x*(a5 + a6*x)))))
+     ([a0 + a1*x] + xx*[a2 + a3*x]) + [xx*xx]*([a4 + a5*x] + a6*x)
+     */
+#if USE_HORNER_RULE
+    // Horner's rule for 4th order polynom
+    C = add8f(mul8f(xx, c4), c3);
+    C = add8f(mul8f(xx, C), c2);
+    C = add8f(mul8f(xx, C), c1);
+    C = add8f(mul8f(xx, C), c0);
+#else
+    vec8f x4 = mul8f(xx, xx);
+    vec8f c01 = add8f(mul8f(xx, c1), c0);
+    vec8f c23 = add8f(mul8f(xx, c3), c2);
+    C = add8f(mul8f(x4, c4), c23);
+    C = add8f(mul8f(x4, C), c01);
+#endif
+    
+    const vec8f s4 = set8f(2.1478401777e-6f);
+    const vec8f s3 = set8f(-1.9264918228e-4f);
+    const vec8f s2 = set8f(8.3089787513e-3f);
+    const vec8f s1 = set8f(-0.1666243672f);
+    const vec8f s0 = set8f(0.9999793767f);
+
+#if USE_HORNER_RULE
+    S = add8f(mul8f(xx, s4), s3);
+    S = add8f(mul8f(xx, S), s2);
+    S = add8f(mul8f(xx, S), s1);
+    S = add8f(mul8f(xx, S), s0);
+#else
+    vec8f s01 = add8f(mul8f(xx, s1), s0);
+    vec8f s23 = add8f(mul8f(xx, s3), s2);
+    S = add8f(mul8f(x4, s4), s23);
+    S = add8f(mul8f(x4, S), s01);
+#endif
     S = mul8f(x, S);
 }
 

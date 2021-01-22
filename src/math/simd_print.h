@@ -14,19 +14,19 @@
 /// print SIMD vector of 2 doubles
 inline static void dump(__m128d v, char const* s)
 {
-    printf("%16s vec2( %5.2f %5.2f )\n", s, v[1], v[0]);
+    printf("%16s d( %5.2f %5.2f )\n", s, v[1], v[0]);
 }
 
 /// print two SIMD vector
 inline static void dump(__m128d v, vec2 w, char const* s)
 {
-    printf("%16s vec2( %5.2f %5.2f )( %5.2f %5.2f )\n", s, v[1], v[0], w[1], w[0]);
+    printf("%16s d( %5.2f %5.2f )( %5.2f %5.2f )\n", s, v[1], v[0], w[1], w[0]);
 }
 
 /// print SIMD vector of 4 floats
 inline static void dump(__m128 v, char const* s)
 {
-    printf("%16s floats( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
+    printf("%16s f( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
 
 #endif
@@ -66,20 +66,20 @@ inline static void dump32(__m128i v, char const* s)
 /// print SIMD vector of 4 doubles
 inline static void dump(__m256d v, char const* s)
 {
-    printf("%16s vec4( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
+    printf("%16s d( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
 
 /// print two SIMD vector of 4 doubles
-inline static void dump(__m256d v, vec4 w, char const* s)
+inline static void dump(__m256d v, __m256d w, char const* s)
 {
-    printf("%16s vec4( %5.2f %5.2f %5.2f %5.2f )( %5.2f %5.2f %5.2f %5.2f )\n",
+    printf("%16s d( %5.2f %5.2f %5.2f %5.2f )( %5.2f %5.2f %5.2f %5.2f )\n",
            s, v[3], v[2], v[1], v[0], w[3], w[2], w[1], w[0]);
 }
 
 /// print SIMD vector of 8 floats
 inline static void dump(__m256 v, char const* s)
 {
-    printf("%16s floats( %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f )\n", s,
+    printf("%16s f( %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f )\n", s,
            v[7], v[6], v[5], v[4], v[3], v[2], v[1], v[0]);
 }
 

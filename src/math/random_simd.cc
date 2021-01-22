@@ -116,14 +116,14 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
     __m256i const* end = src + cnt;
     while ( src < end )
     {
-        // generate norm in ]0, 1]:
+        // generate norm in ]0, 1]: 1 - eps * float(uint32)
         vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(cvt8if(load8si(src++)))));
         // generate angle in ]-PI, PI[:
         vec8f t = mul8f(PI, cvt8if(load8si(src++)));
         // transform norm:
         n = sqrt8f(mul8f(logapprox8f(n), two));
         vec8f x, y;
-        cossinapprox8f(x, y, t);
+        sincosapprox8f(x, y, t);
         x = mul8f(n, x);
         y = mul8f(n, y);
 #if REAL_IS_DOUBLE

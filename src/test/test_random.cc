@@ -600,18 +600,18 @@ __m256 logf_app(__m256 val)
 
 
 /// use this to check the log()
-void check_log(real dst[], size_t cnt, const __m256i src[])
+static real* check_log(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(0x1p-31f); //TWO_POWER_MINUS_31
     __m256i const* end = src + cnt;
     real * d = dst;
     while ( src < end )
     {
-        // generate random floats in [-1, 1]:
-        vec8f i = mul8f(eps, cvt8if(load8si(src++)));
-        vec8f j = mul8f(eps, cvt8if(load8si(src++)));
-        vec8f x = i;
-        vec8f y = logapprox8f(i);
+        // generate random floats in ]0, 1]:
+        vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(cvt8if(load8si(src++)))));
+        ++src; //vec8f j = mul8f(eps, cvt8if(load8si(src++)));
+        vec8f x = n;
+        vec8f y = logapprox8f(n);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
         store4(d   , cvt4sd(getlo4f(x)));
@@ -625,6 +625,7 @@ void check_log(real dst[], size_t cnt, const __m256i src[])
 #endif
         d += 16;
     }
+    return dst+8*cnt;
 }
 
 #include "random_simd.cc"
@@ -726,7 +727,8 @@ void test_gaussian(int cnt)
     runGaussian<gauss_fill_AVX0>(sfmt, "Gauss AVX0", cnt);
     runGaussian<gauss_fill_AVX1>(sfmt, "Gauss AVX1", cnt);
     runGaussian<gauss_fill_AVX2>(sfmt, "Gauss AVX2", cnt);
-    if ( 1 )
+    runGaussian<check_log>(sfmt, "logapprox", cnt);
+    if ( 0 )
     {
         printf("Approximate logarithm:\n");
         real vec[SFMT_N32] = { NAN };
