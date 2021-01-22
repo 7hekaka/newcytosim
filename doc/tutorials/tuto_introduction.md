@@ -66,7 +66,7 @@ defines the name of the simulation (*tutorial*), and sets the time step to 0.01 
         length = 20, 20
     }
 
-defines a rectangular space named *cell* with dimensions `W = 10` and `H = 10` micrometers. The entire box is actually `2W` wide, and `2H` high, and the origin is placed in the center.
+defines a rectangular space named *cell* with dimensions `W = 20` and `H = 20` micrometers. The origin is placed in the center.
 
 Finally:
 
