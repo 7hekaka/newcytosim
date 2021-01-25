@@ -717,9 +717,9 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
         aa = loaddup2(A);
         tt = unpacklo2(x0, x0);
         store1(X, mul1(aa, x0));
-        x0 = shuffle2(x0, x2, 0b01);
-        x2 = shuffle2(x2, x4, 0b01);
-        x4 = shuffle2(x4, load1(X+KD), 0b01);
+        x0 = gethilo2(x0, x2);
+        x2 = gethilo2(x2, x4);
+        x4 = gethilo2(x4, load1(X+KD));
         x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
         x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
         x4 = fnmadd2(tt, mul2(aa, loadu2(A+5)), x4);
@@ -729,9 +729,9 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
         From x0 to x0, two sequential multiplications are needed */
         vec2 t = mul1(load1(A), x0);
         store1(X, t);
-        x0 = shuffle2(x0, x2, 0b01);
-        x2 = shuffle2(x2, x4, 0b01);
-        x4 = shuffle2(x4, load1(X+KD), 0b01);
+        x0 = gethilo2(x0, x2);
+        x2 = gethilo2(x2, x4);
+        x4 = gethilo2(x4, load1(X+KD));
         tt = unpacklo2(t, t);
         x0 = fnmadd2(tt, loadu2(A+1), x0);
         x2 = fnmadd2(tt, loadu2(A+3), x2);
@@ -748,8 +748,8 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
     vec2 yy = mul1(aa, x0);
-    x0 = shuffle2(x0, x2, 0b01);
-    x2 = shuffle2(x2, x4, 0b01);
+    x0 = gethilo2(x0, x2);
+    x2 = gethilo2(x2, x4);
     x4 = unpackhi2(x4, setzero2());
     x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
     x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
@@ -759,8 +759,8 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
     storeu2(X, unpacklo2(yy, mul1(aa, x0)));
-    x0 = shuffle2(x0, x2, 0b01);
-    x2 = shuffle2(x2, x4, 0b01);
+    x0 = gethilo2(x0, x2);
+    x2 = gethilo2(x2, x4);
     x4 = setzero2();
     x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
     x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
@@ -769,8 +769,8 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
     yy = mul1(aa, x0);
-    x0 = shuffle2(x0, x2, 0b01);
-    x2 = shuffle2(x2, setzero2(), 0b01);
+    x0 = gethilo2(x0, x2);
+    x2 = gethilo2(x2, setzero2());
     x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
     x2 = fnmadd1(tt, mul1(aa, load1(A+3)), x2);
     A += lda;
@@ -778,7 +778,7 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
     storeu2(X+2, unpacklo2(yy, mul1(aa, x0)));
-    x0 = shuffle2(x0, x2, 0b01);
+    x0 = gethilo2(x0, x2);
     x2 = setzero2();
     x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
     A += lda;
@@ -832,7 +832,7 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
     // truncated round at j = N-3
     aa = loaddup2(A);
     tt = mul2(aa, load1Z(X-2));
-    x2 = shuffle2(x0, x2, 0b01);
+    x2 = gethilo2(x0, x2);
     tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
     tt = add1(tt, swap2(tt));
     x0 = unpacklo2(tt, x0);
@@ -841,7 +841,7 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
     aa = loaddup2(A);
     tt = mul2(aa, load1Z(X-3));
     tt = fnmadd2(x2, mul2(aa, load1Z(A+3)), tt);
-    x2 = shuffle2(x0, x2, 0b01);
+    x2 = gethilo2(x0, x2);
     tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
     tt = add1(tt, swap2(tt));
     x0 = unpacklo2(tt, x0);
@@ -851,8 +851,8 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
     aa = loaddup2(A);
     tt = mul2(aa, load1Z(X-4));
     tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
-    x4 = shuffle2(x2, x4, 0b01);
-    x2 = shuffle2(x0, x2, 0b01);
+    x4 = gethilo2(x2, x4);
+    x2 = gethilo2(x0, x2);
     tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
     tt = add1(tt, swap2(tt));
     x0 = unpacklo2(tt, x0);
@@ -861,8 +861,8 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
     aa = loaddup2(A);
     tt = mul2(aa, fnmadd2(x4, load1Z(A+5), load1Z(X-5)));
     tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
-    x4 = shuffle2(x2, x4, 0b01);
-    x2 = shuffle2(x0, x2, 0b01);
+    x4 = gethilo2(x2, x4);
+    x2 = gethilo2(x0, x2);
     tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
     tt = add1(tt, swap2(tt));
     x0 = unpacklo2(tt, x0);
@@ -879,11 +879,11 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
         aa = loadu2(A+5);
         bb = loadu2(B+5);
         tt = mul2(ab, fnmadd2(x4, unpackhi2(aa, bb), loadu2(X)));
-        tt = fnmadd2(shuffle2(x2, x4, 0b01), mul2(ab, unpacklo2(aa, bb)), tt);
+        tt = fnmadd2(gethilo2(x2, x4), mul2(ab, unpacklo2(aa, bb)), tt);
         aa = loadu2(A+3);
         bb = loadu2(B+3);
         tt = fnmadd2(x2, mul2(ab, unpackhi2(aa, bb)), tt);
-        tt = fnmadd2(shuffle2(x0, x2, 0b01), mul2(ab, unpacklo2(aa, bb)), tt);
+        tt = fnmadd2(gethilo2(x0, x2), mul2(ab, unpacklo2(aa, bb)), tt);
         aa = loadu2(A+1);
         bb = loadu2(B+1);
         tt = fnmadd2(x0, mul2(ab, unpackhi2(aa, bb)), tt);
@@ -891,7 +891,7 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
         // set correct value in high position:
         xx = fnmadd2(unpacklo2(x0, x0), AB, tt);
         // set correct values in both positions:
-        tt = fnmadd2(shuffle2(xx, x0, 0b01), AB, tt);
+        tt = fnmadd2(gethilo2(xx, x0), AB, tt);
         x4 = x2;
         x2 = x0;
         x0 = tt;
@@ -901,7 +901,7 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
     A += lda;
     ++X;
 #endif
-#if DEVELOP_XTBSV
+#if 1
     // this does not use SIMD parallelism, and it is as fast as anything else...
     vec2 x1 = unpackhi2(x0, x0);
     vec2 x3 = unpackhi2(x2, x2);
@@ -950,8 +950,8 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
         tt = mul2(aa, fnmadd2(x4, loadu2(A+5), load1Z(X)));
         //tt = fnmadd2(x4, mul2(aa, loadu2(A+5)), mul2(aa, load1Z(X)));
         tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
-        x4 = shuffle2(x2, x4, 0b01);
-        x2 = shuffle2(x0, x2, 0b01);
+        x4 = gethilo2(x2, x4);
+        x2 = gethilo2(x0, x2);
         tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
         tt = add1(tt, swap2(tt));
 #else
@@ -960,8 +960,8 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
         From x0 to x0, four sequential multiplications are needed */
         tt = fnmadd2(x4, loadu2(A+5), load1Z(X));
         tt = fnmadd2(x2, loadu2(A+3), tt);
-        x4 = shuffle2(x2, x4, 0b01);
-        x2 = shuffle2(x0, x2, 0b01);
+        x4 = gethilo2(x2, x4);
+        x2 = gethilo2(x0, x2);
         tt = fnmadd2(x0, loadu2(A+1), tt);
         tt = add1(tt, swap2(tt));
         tt = mul1(load1(A), tt);

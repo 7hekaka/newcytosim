@@ -395,9 +395,9 @@ void unpack_matrix()
     vec2 cd = load2(src+2);
     vec2 ef = load2(src+4);
     
-    vec2 m0h = blend2(cd, zz, 0b10),   m0l = ab;
-    vec2 m1h = blend2(ef, zz, 0b10),   m1l = unpackhi2(ab, cd);
-    vec2 m2h = shuffle2(ef, zz, 0b01), m2l = unpacklo2(cd, ef);
+    vec2 m0h = blend11(cd, zz),  m0l = ab;
+    vec2 m1h = blend11(ef, zz),  m1l = unpackhi2(ab, cd);
+    vec2 m2h = gethilo2(ef, zz), m2l = unpacklo2(cd, ef);
     
     dump(cat4(m0h, m0l), "m0 ");
     dump(cat4(m1h, m1l), "m1 ");

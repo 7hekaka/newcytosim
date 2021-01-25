@@ -66,6 +66,9 @@ inline static vec2 unpacklo2(vec2 a, vec2 b)        { return _mm_unpacklo_pd(a,b
 inline static vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
 inline static vec2 swap2(vec2 a)                    { return _mm_shuffle_pd(a, a, 0b01); }
 
+/// combine and swap to return { low = a[1], high = b[0] }
+inline static vec2 gethilo2(vec2 a, vec2 b)         { return _mm_shuffle_pd(a, b, 0b01); }
+
 #define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
 #define cmp2(a,b,k)       _mm_cmp_pd(a,b,k)
 
@@ -109,7 +112,10 @@ inline static vec2 normalize2(vec2 vec, double n)
 
 #if defined(__SSE4_1__)
 
-#define blend2(a,b,k)     _mm_blend_pd(a,b,k)
+#define blend2(a,b,k) _mm_blend_pd(a,b,k)
+
+/// blend to return { low = a[0], high = b[1] }
+inline static vec2 blend11(vec2 a, vec2 b) { return _mm_blend_pd(a, b, 0b10); }
 
 inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos)
 {

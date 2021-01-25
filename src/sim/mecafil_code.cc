@@ -621,8 +621,8 @@ void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, doub
         vec2 xy = getlo(s0);
         vec2 zx = gethi(s0);
 
-        vec2 mm = shuffle2(xy, s1, 0b01);
-        zx = add2(blend2(zx, s1, 0b10), blend2(zx, xy, 0b01));
+        vec2 mm = gethilo2(xy, s1);
+        zx = add2(blend11(zx, s1), blend11(xy, zx));
         store2(mul, add2(mm, zx));
 
         src += 6;
