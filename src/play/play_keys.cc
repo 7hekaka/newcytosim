@@ -378,9 +378,9 @@ static void changeMask(FiberDisp* p, int val)
     flashText("fiber:mask_bitfield=0x%X (%i bits)", p->mask_bitfield, p->mask);
 }
 
-static void changePointStyle(FiberDisp* p, int inc)
+static void changePointStyle(FiberDisp* p, int arg)
 {
-    p->point_style = ( p->point_style + inc + 5 ) % 4;
+    p->point_style = ( p->point_style + 1 ) % arg;
     switch ( p->point_style )
     {
         case 0: flashText("Fibers: no points");    break;
@@ -410,6 +410,19 @@ static void flashLineStyle(int val)
     }
 }
 
+static void flashFiberStyle(int val)
+{
+    switch ( val )
+    {
+        case 0: flashText("Fibers: default style"); break;
+        case 1: flashText("Fibers: style=filament");     break;
+        case 2: flashText("Fibers: style=actin");   break;
+        case 3: flashText("Fibers: style=microtubule"); break;
+        case 4: flashText("Fibers: style=backbone"); break;
+        default: flashText("unknown fiber:style"); break;
+    }
+}
+
 static void toggleLineStyle(FiberDisp* p, int val)
 {
     p->line_style = ( p->line_style != val ) * val;
@@ -418,14 +431,14 @@ static void toggleLineStyle(FiberDisp* p, int val)
 
 static void changeLineStyle(FiberDisp* p, int inc)
 {
-    p->line_style = ( p->line_style + inc + 9 ) % 9;
+    p->line_style = ( p->line_style + inc ) % 9;
     flashLineStyle(p->line_style);
 }
 
 static void toggleStyle(FiberDisp* p, int val)
 {
     p->style = ( p->style != val ) * val;
-    flashLineStyle(p->style);
+    flashFiberStyle(p->style);
 }
 
 
@@ -990,7 +1003,7 @@ void processKey(unsigned char key)
 
         case '1':
             if ( altKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 1);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 4);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeLineStyle, 1);
             break;
@@ -1026,16 +1039,17 @@ void processKey(unsigned char key)
             break;
             
         case '$':
-            if ( altKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 0);
-            else
-                setFiberDisp(player.allVisibleFiberDisp(), changeSpeckleStyle, 0);
+            setFiberDisp(player.allVisibleFiberDisp(), changeSpeckleStyle, 0);
             break;
             
         case '4':
             setFiberDisp(player.allVisibleFiberDisp(), changeLatticeStyle, 0);
             break;
             
+        case '/':
+            setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 2);
+            break;
+
         case '*':
             setFiberDisp(player.allVisibleFiberDisp(), changeLatticeStyle, 0);
             break;

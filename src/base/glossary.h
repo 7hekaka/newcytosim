@@ -97,19 +97,19 @@ private:
     static std::string format_count(size_t);
     
     /// report unused values and values used more than `threshold` times
-    static int   warning(pair_type const&, std::string& msg, size_t threshold);
+    static int warning(pair_type const&, std::string& msg, size_t threshold);
 
     /// read key and assignement operator
-    static int   read_key(pair_type&, std::istream&);
+    static int read_key(pair_type&, std::istream&);
     
     /// read one right-hand-side entry of an assignement
-    static int   read_value(pair_type&, std::istream&);
+    static int read_value(pair_type&, std::istream&);
     
     /// add right-hand-side entry to pair.second
-    static void  add_value(pair_type&, std::string&, bool);
+    static void add_value(pair_type&, std::string&, bool);
 
     /// register a new pair into the dictionnary
-    void         add_entry(pair_type const&, int no_overwrite);
+    void        add_entry(pair_type const&, int no_overwrite);
     
     //-------------------------------------------------------------------------------
     
@@ -240,61 +240,61 @@ public:
     //-------------------------------------------------------------------------------
 
     /// true if no key were set
-    bool         empty()   const { return mTerms.empty(); }
+    bool empty()   const { return mTerms.empty(); }
 
     /// total number of keys
-    size_t       nb_keys() const { return mTerms.size(); }
+    size_t nb_keys() const { return mTerms.size(); }
     
     /// return `true` if key is present, even if no value is associated with it
-    bool         has_key(key_type const&) const;
+    bool has_key(key_type const&) const;
     
     /// return `true` if key is present, and delete key
-    bool         use_key(key_type const&);
+    bool use_key(key_type const&);
     
     /// remove given key
-    void         clear(key_type const&);
+    void clear(key_type const&);
     
     /// clear all entries
-    void         clear() { mTerms.clear(); }
+    void clear() { mTerms.clear(); }
     
     /// remove all keys except the given one
-    void         clear_except(key_type const&);
+    void clear_except(key_type const&);
 
     /// clear usage counts for all entries
-    void         clear_counts();
+    void clear_counts();
     
     /// add usage counts from another Glossary
-    void         add_counts(Glossary const&);
+    void add_counts(Glossary const&);
 
     /// create a new Glossary with only the given key
-    Glossary     extract(key_type const&) const;
+    Glossary extract(key_type const&) const;
     
     /// create a new Glossary with terms that were not used
-    Glossary     extract_unused() const;
+    Glossary extract_unused() const;
 
     /// return number of values associated with a key
-    size_t       nb_values(key_type const&) const;
+    size_t nb_values(key_type const&) const;
     
     /// return true if key is present and a value was set for given index
-    bool         has_value(key_type const&, size_t inx) const;
+    bool has_value(key_type const&, size_t inx) const;
     
     /// gives a pointer to the values corresponding to a key, or null if the key is not present
-    rec_type *   values(key_type const&);
+    rec_type * values(key_type const&);
 
     /// gives a const pointer to the values corresponding to a key, or null if the key is not present
     rec_type const* values(key_type const&) const;
     
     /// return copy of value corresponding to `key[inx]`, or empty string if this value is not present
-    std::string  value(key_type const&, size_t inx = 0) const;
+    std::string value(key_type const&, size_t inx = 0) const;
     
     /// returns true if `key[inx]==val`, or false otherwise. Counter is incremented in case of match
-    bool         value_is(key_type const& key, size_t inx, std::string const& val) const;
+    bool value_is(key_type const& key, size_t inx, std::string const& val) const;
     
     /// print message about unused values and values used multiple times; return warning code
-    int          has_warning(std::ostream&, size_t threshold = 1) const;
+    int has_warning(std::ostream&, size_t threshold = 1) const;
     
     /// print message about unused values and values used multiple times
-    void         print_warning(std::ostream&, size_t threshold, std::string const&) const;
+    void print_warning(std::ostream&, size_t threshold, std::string const&) const;
 
     //-------------------------------------------------------------------------------
     #pragma mark -
@@ -315,34 +315,34 @@ public:
     }
     
     /// add value to key
-    void         add_value(key_type const&, std::string const& val);
+    void add_value(key_type const&, std::string const& val);
 
     /// update the glossary to include one assignment read from stream
-    void         read_entry(std::istream&, int no_overwrite = 2);
+    void read_entry(std::istream&, int no_overwrite = 2);
 
     /// update the glossary to include assignments stored in a stream
-    void         read(std::istream&, int no_overwrite = 2);
+    void read(std::istream&, int no_overwrite = 2);
 
     /// update the glossary to include assignments stored in a string
-    void         read(const std::string&, int no_overwrite = 2);
+    void read(const std::string&, int no_overwrite = 2);
     
     /// read file specified in path
-    void         read_file(const char path[], int no_overwrite = 2);
+    void read_file(const char path[], int no_overwrite = 2);
     
     /// read a file specified by name
-    void         read_file(std::string const& str, int no = 2) { read_file(str.c_str(), no); }
+    void read_file(std::string const& str, int no = 2) { read_file(str.c_str(), no); }
     
     /// read a C-style argument
-    void         read_string(const char arg[], int no_overwrite = 2);
+    void read_string(const char arg[], int no_overwrite = 2);
 
     /// read C-style command-line arguments, return 0 if success
-    int          read_strings(int argc, char* argv[], int no_overwrite = 2);
+    int read_strings(int argc, char* argv[], int no_overwrite = 2);
 
     /// write all [key, values]
-    void         write(std::ostream&, std::string const& prefix = "") const;
+    void write(std::ostream&, std::string const& prefix = "") const;
     
     /// write all [key, values]
-    void         write_counts(std::ostream&, std::string const& prefix = "") const;
+    void write_counts(std::ostream&, std::string const& prefix = "") const;
 
     //-------------------------------------------------------------------------------
     
