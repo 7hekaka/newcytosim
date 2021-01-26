@@ -6,6 +6,7 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "fiber_prop.h"
+#include "digit.h"
 #include "simul.h"
 #include "sim.h"
 
@@ -197,7 +198,7 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
 #endif
     
     // also check the Monitor's permissions:
-    return haMonitor->allowAttachment(sit);
+    return haMonitor->allowAttachment(sit, this);
 }
 
 
@@ -230,10 +231,9 @@ void Hand::attach(FiberSite const& s)
 }
 
 
-void Hand::detach()
+void Hand::detachHand()
 {
     assert_true( attached() );
-    haMonitor->beforeDetachment(this);
     fbFiber->removeHand(this);
     fbFiber = nullptr;
 #if FIBER_HAS_LATTICE
@@ -242,9 +242,10 @@ void Hand::detach()
 }
 
 
-void Hand::detachHand()
+void Hand::detach()
 {
     assert_true( attached() );
+    haMonitor->beforeDetachment(this);
     fbFiber->removeHand(this);
     fbFiber = nullptr;
 #if FIBER_HAS_LATTICE
@@ -369,10 +370,15 @@ bool Hand::read(Inputter& in, Simul& sim)
     {
         /* Promote a Digit class that is not bound to the lattice */
         FiberSite sit(*this);
-        Hand::detach();
-        // attaching Hand to Lattice if possible
+        // attach Hand to Lattice if possible, and detach otherwise
         if ( attachmentAllowed(sit) )
-            attach(sit);
+        {
+            fbLattice = sit.lattice();
+            fbSite = sit.site();
+            static_cast<Digit*>(this)->inc();
+        }
+        else
+            detachHand();
     }
 #endif
     

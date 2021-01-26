@@ -204,7 +204,7 @@ public:
             throw InvalidParameter("lattice:unit must be > 0");
         if ( laUnit != u )
         {
-            std::clog << "lattice:unit changed " << laUnit << " -> " << u << "\n";
+            std::clog << "lattice:unit " << laUnit << " -> " << u << "\n";
             //preserve the same abscissa range, with the new lattice unit
             real s = laUnit * laInf;
             real e = laUnit * laSup + laUnit;

@@ -1731,7 +1731,7 @@ void Chain::adjustSegmentation(real arg)
 {
     if ( (float)fnSegmentation != (float)arg )
     {
-        std::clog << reference() << " segmentation <- " << arg << "\n";
+        std::clog << reference() << " segmentation " << fnSegmentation << " -> " << arg << "\n";
         fnSegmentation = arg;
         adjustSegmentation();
         updateFiber();

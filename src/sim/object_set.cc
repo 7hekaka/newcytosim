@@ -496,7 +496,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool dis
         {
             Property const* P = obj->property();
 #if ( 1 )
-            std::clog << "Property mismatch: " << P->name() << "' is " << P->category() << P->number();
+            std::clog << "Property mismatch: `" << P->name() << "' is " << P->category() << P->number();
             std::clog << " but loaded object has property #" << ix << '\n';
 #endif
             erase(obj);
@@ -523,7 +523,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool dis
     assert_true( obj->property() );
     
     try {
-        //std::clog << "- loading " << Object::reference(tag, ix, id) << " at " << in.pos() << '\n';
+        //std::clog << "- loading " << Object::reference(tag, ix, id) << '\n';
         // read object data:
         obj->read(in, simul, tag);
     }

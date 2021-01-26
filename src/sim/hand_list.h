@@ -26,34 +26,37 @@ public:
     HandList() : haFront(nullptr), haBack(nullptr) {}
     
     /// first in list
-    Hand *   front() { return haFront; }
+    Hand * front() { return haFront; }
     
     /// last in list
-    Hand *   back() { return haBack; }
+    Hand * back() { return haBack; }
     
     /// register a new Hands that attached to this Fiber
-    void     add(Hand*);
+    void   add(Hand*);
     
     /// unregister bound Hands (which has detached)
-    void     remove(Hand*);
+    void   remove(Hand*);
     
     /// update all Hands bound to this
-    void     update() const;
+    void   update() const;
     
     /// detach all Hands
-    void     detachAll() const;
+    void   detachAll() const;
     
     /// sort Hands by order of increasing abscissa
-    void     sort();
+    void   sort();
     
     /// number of attached Hands
-    size_t   count() const;
+    size_t count() const;
     
+    /// number of times Hand is registered (should be zero or 1)
+    size_t count(Hand const*) const;
+
     /// a function to count Hands using a custom criteria
-    size_t   count(int (*func)(Hand const*)) const;
+    size_t count(int (*func)(Hand const*)) const;
     
     /// number of Hands attached within a range of abscissa
-    size_t   countInRange(real abs_min, real abs_max) const;
+    size_t countInRange(real abs_min, real abs_max) const;
     
 };
 

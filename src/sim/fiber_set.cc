@@ -278,8 +278,8 @@ void FiberSet::step()
         
         if ( fp->free_polymer < 0 )
         {
-            Cytosim::warn << "The free monomer concentration would be negative !!!\n";
-            //this should not happen
+            Cytosim::warn << "Inconsistent negative monomer pool: check parameter `total_polymer`\n";
+            // this should not happen
             fp->free_polymer = 0;
         }
     }

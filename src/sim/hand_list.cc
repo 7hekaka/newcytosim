@@ -13,6 +13,7 @@ The list is also used in reports, or to quickly count Hands bound to the fiber.
 */
 void HandList::add(Hand * n)
 {
+    //assert_true(count(n) == 0);
     //std::clog << this << " add " << n->prop->name() << '\n';
     n->prev(nullptr);
     n->next(haFront);
@@ -26,6 +27,7 @@ void HandList::add(Hand * n)
 
 void HandList::remove(Hand * n)
 {
+    //assert_true(count(n) == 1);
     //std::clog << this << " rem " << n->prop->name() << '\n';
     Hand * x = n->next();
     if ( n->prev() )
@@ -118,6 +120,17 @@ size_t HandList::count() const
     
     for ( Hand const* h = haFront; h; h = h->next() )
         ++res;
+    
+    return res;
+}
+
+
+size_t HandList::count(Hand const* arg) const
+{
+    size_t res = 0;
+    
+    for ( Hand const* h = haFront; h; h = h->next() )
+        res += ( h == arg );
     
     return res;
 }

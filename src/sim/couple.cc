@@ -256,11 +256,12 @@ void Couple::stepAA()
  
  */
 
-bool Couple::allowAttachment(FiberSite const& sit)
+bool Couple::allowAttachment(FiberSite const& sit, Hand const* h)
 {
-    Hand const* that = attachedHand();
-    
-    if ( !that )
+    assert_true( h == cHand1 || h == cHand2 );
+    Hand const* that = ( h == cHand1 ? cHand2 : cHand1 );
+
+    if ( !that->attached() )
         return true;
     
 #if FIBER_HAS_FAMILY
