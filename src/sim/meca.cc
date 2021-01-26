@@ -2271,7 +2271,7 @@ void Meca::exportSystem() const
     std::clog << "incorrect dump since SEPARATE_RIGIDITY_TERMS is defined\n";
 #endif
     FILE * f = fopen("ord.txt", "w");
-    fprintf(f, "%lu %i\n", dimension(), DIM);
+    fprintf(f, "%lu %i %lu\n", dimension(), DIM, sizeof(real));
     fclose(f);
     
     f = fopen("stp.txt", "w");
@@ -2557,7 +2557,7 @@ void Meca::dumpSystem(bool nat) const
     fclose(f);
  
     f = fopen("mob.bin", "wb");
-    dumpMobility(f);
+    dumpMobility(f, nat);
     fclose(f);
     
     f = fopen("obj.bin", "wb");
