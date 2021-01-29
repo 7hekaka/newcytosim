@@ -46,7 +46,7 @@ static gle_color nice_colors[] = {
     0xF6F675FF,
     0xFC9CAAFF};
 
-/// List of Francois's named colors
+/// Francois's list of named colors
 gle::named_color std_colors[] = {
     {"gray",          0x707070FF},
     {"aquamarine",    0x66DDAAFF},

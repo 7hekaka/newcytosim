@@ -79,7 +79,7 @@ void LocusGrid::createCells()
     max_diameter = pGrid.minimumWidth(1);
     
     //report the grid size used
-    pGrid.printSummary(Cytosim::log, "StericGridF");
+    pGrid.printSummary(Cytosim::log, "LocusGrid");
 }
 
 

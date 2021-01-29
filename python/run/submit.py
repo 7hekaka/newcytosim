@@ -3,7 +3,7 @@
 # A script to submit jobs to the SLURM queuing system
 #
 # F. Nedelec, 10.2007 --- 4.11.2020
-# Adapted from LSF to SLURM on 17.02.2017
+# Adapted to SLURM at Cambridge on 29.01.2021
 
 """
     Submit an array of jobs to the SLURM system, to be handled by 'go_sim.py'
@@ -48,9 +48,9 @@ F. Nedelec
 import sys, os, shutil, subprocess
 
 # default parameters for submission:
-subcmd  = 'sbatch'
+submit  = 'sbatch'
 queue   = 'skylake'
-runtime = '5-00:00:00' # 5 days
+runtime = '12:00:00' # 12 hours
 memory  = '4096'       # in MB
 ncpu    = 1            # nb of threads per job
 
@@ -99,10 +99,7 @@ def write_script(filename, cmd):
 
 def job(cwd, conf, jarg):
     """return bash script that will run one simulation"""
-    cmd  = ['module purge']
-    cmd += ['module load foss']
-    cmd += ['module load LAPACK OpenBLAS']
-    cmd += ['cd %s;' % cwd]
+    cmd  = ['cd %s;' % cwd]
     cmd += ['touch %s;' % conf]
     # the job will call go_sim.py once:
     cmd += ['python go_sim.py %s %s;' % (jarg, conf)]
@@ -115,7 +112,7 @@ def job(cwd, conf, jarg):
 def sub(exe):
     """return command that will submit one job"""
     # specify memory, shell, minimum number of cores and queue
-    cmd  = [subcmd, '--nodes=1', '--ntasks=1']
+    cmd  = [submit, '--nodes=1', '--ntasks=1']
     # specify number of threads if executable is threaded:
     if ncpu > 1:
         cmd += ['--cpus-per-task=%i' % ncpu]
@@ -127,7 +124,7 @@ def sub(exe):
     cmd += ['--signal=15@120']
     cmd += ['--signal=2@60']
     # request special hardware:
-    cmd += ['--constraint=avx2']
+    #cmd += ['--constraint=avx2']
     # redirect stderr and sdtout to files:
     cmd += ['--output='+jdir+'/logs/out']
     cmd += ['--error='+jdir+'/logs/err']
@@ -151,7 +148,7 @@ def array(jobcnt):
     cmd += ['#SBATCH --signal=INT@60']
     cmd += ['#SBATCH --signal=TERM@120']
     # request special hardware:
-    cmd += ['#SBATCH --constraint=avx2']
+    #cmd += ['#SBATCH --constraint=avx2']
     # redirect stderr and sdtout to files:
     cmd += ['#SBATCH --output='+jdir+'/logs/%a.out']
     cmd += ['#SBATCH --error='+jdir+'/logs/%a.err']
@@ -166,15 +163,15 @@ def array(jobcnt):
 
 def main(args):
     """submit jobs, depending on the arguments provided"""
-    global subcmd, memory, runtime, queue, jdir, ncpu
+    global submit, memory, runtime, queue, jdir, ncpu
     
-    #find subcmd command:
-    proc = subprocess.Popen(['which', subcmd], stdout=subprocess.PIPE)
+    #find submit command:
+    proc = subprocess.Popen(['which', submit], stdout=subprocess.PIPE)
     if proc.wait():
-        out.write("Error: submit command `"+subcmd+"' not found!\n")
+        out.write("Error: submit command `"+submit+"' not found!\n")
     else:
-        subcmd = proc.stdout.readline().strip()
-        #print('|'+subcmd+'|')
+        submit = proc.stdout.readline().strip()
+        #print('|'+submit+'|')
     
     # first argument is used for go_sim.py:
     jarg = args.pop(0)
@@ -252,7 +249,7 @@ def main(args):
         name = todo + '/job.bash';
         write_script(name, cmd)
         # make command to submit this script:
-        cmd = (subcmd, name)
+        cmd = (submit, name)
     else:
         cmd = sub(jname);
     execute(cmd)
