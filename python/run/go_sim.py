@@ -172,7 +172,7 @@ def main(args):
                 preconf = val
             elif key == 'name':
                 name = val
-            elif key == 'park'):
+            elif key == 'park':
                 park = val
             else:
                 out.write("Error: I do not understand argument `%s'\n" % arg)

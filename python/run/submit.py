@@ -246,7 +246,7 @@ def main(args):
         print("    submit.py created %i scripts in `%s'" % (jcnt, todo))
         cmd = array(jcnt)
         # create script file:
-        name = todo + '/job.bash';
+        name = jdir + '/job.bash';
         write_script(name, cmd)
         # make command to submit this script:
         cmd = (submit, name)

@@ -304,7 +304,7 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, REAL 
 template < int ORD, char diag, typename REAL >
 void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
     {
         REAL tmp[ORD];
@@ -353,7 +353,7 @@ void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
 template < int ORD, char diag, typename REAL >
 void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     for ( int I = M-1; I >= 0; --I )
     {
         REAL tmp[ORD];
@@ -396,7 +396,7 @@ void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
 template < int ORD, char diag, typename REAL >
 void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     for ( int K = M-1; K >= 0; --K )
     {
         if ( B[K] != 0 )
@@ -447,7 +447,7 @@ void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
 template < int ORD, char diag, typename REAL >
 void iso_xtrsmLUT(const int M, const REAL* A, const int lda, REAL* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     for ( int I = 0; I < M; ++I )
     {
         REAL tmp[ORD];
@@ -491,7 +491,7 @@ void iso_xtrsmLUT(const int M, const REAL* A, const int lda, REAL* B)
 template < char diag >
 void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
     {
         vec4 T = loadu4(B+3*K);
@@ -632,7 +632,7 @@ void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
 template < char diag >
 void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
@@ -761,7 +761,7 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
 template < char diag >
 void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
     {
@@ -852,7 +852,7 @@ void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
 template < char diag >
 void alsatian_xtrsmLLN2(const int M, const double* A, const int lda, double* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
     {
         vec2 tmp = load2(B+2*K);
@@ -875,7 +875,7 @@ void alsatian_xtrsmLLN2(const int M, const double* A, const int lda, double* B)
 template < char diag >
 void alsatian_xtrsmLLT2(const int M, const double* A, const int lda, double* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
@@ -897,7 +897,7 @@ void alsatian_xtrsmLLT2(const int M, const double* A, const int lda, double* B)
 template < char diag >
 void alsatian_xtrsmLUN2(const int M, const double* A, const int lda, double* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
     {
@@ -925,7 +925,7 @@ void alsatian_xtrsmLUN2(const int M, const double* A, const int lda, double* B)
 template < char diag, typename REAL >
 void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
     {
         REAL tmp = B[K];
@@ -948,7 +948,7 @@ void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
 template < char diag, typename REAL >
 void alsatian_xtrsmLLT1(const int M, const REAL* A, const int lda, REAL* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
@@ -970,7 +970,7 @@ void alsatian_xtrsmLLT1(const int M, const REAL* A, const int lda, REAL* B)
 template < char diag, typename REAL >
 void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
 {
-    assert_true( M < lda );
+    assert_true( M <= lda );
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
     {
