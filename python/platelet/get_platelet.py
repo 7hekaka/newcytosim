@@ -24,14 +24,18 @@ F. Nedelec, July 2017 -- 09.2018 -- 11.2018
 """
 
 import sys, os, subprocess, math, copy, random
-import matplotlib.pyplot as plt
+
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    plt = False
+
 from pyned import uncode, format_line, simple_linear_fit, linear_fit, power_fit, powerlaw_fit, exponential_fit, frange
 
 title = os.path.basename(os.getcwd())
 
 #------------------------------------------------------------------------
-def cntminmax(arg):
-    data = copy.deepcopy(arg)
+def cntminmax(data):
     cnt = 0
     ix = math.inf
     sx = -math.inf
@@ -259,8 +263,9 @@ def main(args):
                 res.append(data)
         os.chdir(cdir)
         if data:
-            plot_scaling(res)
-            #plot_repeat(res)
+            if plt:
+                plot_scaling(res)
+                #plot_repeat(res)
         else:
             sys.stderr.write("  Error: no data!\n")
             sys.exit()

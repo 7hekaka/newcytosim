@@ -34,7 +34,16 @@ submit.py sim cym/*
 
 cp config.cym.tpl jobXX/save/.
 
-%%%%%%%%%%%%%%%%%%  ANALYSIS
+%%%%%%%%%%%%%%%%%%  NEW ANALYSIS
+
+submit_one.py 'report time platelet verbose=0 > platelet.txt' scale13/run????
+scan.py 'report3 time platelet verbose=0 > platelet.txt' run????
+
+get_platelet.py run???? > scaling.txt
+
+fig_platelet.py scale??
+
+%%%%%%%%%%%%%%%%%%  OLD ANALYSIS
 
 scan.py '../../report platelet verbose=0 > ring.txt' run????
 
@@ -43,14 +52,6 @@ scan.py 'report3 time platelet verbose=0 > platelet.txt' run????
 get_tension.py run???? > scaling.txt
 
 scan.py 'get_tension.py run???? > scaling.txt' scale??
-
-%%%%%%%%%%%%%%%%%%  NEW ANALYSIS
-
-submit_one.py 'report time platelet verbose=0 > platelet.txt' scale13/run????
-
-get_platelet.py run???? > scaling.txt
-
-fig_platelet.py scale??
 
 %%%%%%%%%%%%%%%%%%  SORT
 

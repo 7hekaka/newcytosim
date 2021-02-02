@@ -38,24 +38,6 @@ logfile_name = 'log.txt'
 
 #==========================  DIR/FILES HANDLING ==============================
 
-def make_temp_directory():
-    #make a directory on the /scratch disc if possible:
-    str = os.getenv('USER', 'run') + '-'
-    import tempfile
-    try:
-        return tempfile.mkdtemp('', str, '/scratch/ned')
-    except:
-        pass
-    try:
-        return tempfile.mkdtemp('', str, '/scratch')
-    except:
-        pass
-    tmp = os.getenv('TMPDIR', '')
-    if tmp:
-        return tmp
-    return tempfile.mkdtemp('', str, '.')
-
-
 def make_directory(path, n=0):
     """
     Create a new directory name????,
@@ -73,6 +55,26 @@ def make_directory(path, n=0):
             res = path + '%04i' % n
         n += 1
     raise Error("failed to create new run directory on "+os.getenv('HOSTNAME', 'unknown'))
+
+
+def make_run_directory(name):
+    """create a directory to run the simulation"""
+    import tempfile
+    if 'SLURM_JOB_ID' in os.environ or 'LSB_JOBID' in os.environ:
+        try:
+            rds = '/rds/user/' + os.getenv('USER', 'nedelec') + '/hpc-work'
+            return tempfile.mkdtemp('', 'run-', rds)
+        except:
+            pass
+        try:
+            return tempfile.mkdtemp('', 'run-', '/local')
+        except:
+            pass
+        tmp = os.getenv('TMPDIR', '')
+        if tmp:
+            return tmp
+    return make_directory(name)
+    #return tempfile.mkdtemp('', 'run-', '.')
 
 
 def copy_recursive(src, dst):
@@ -200,11 +202,7 @@ def run(exe, conf, name, args=[]):
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf);    
-    # use a temporary directory on the cluster:
-    if 'SLURM_JOB_ID' in os.environ or 'LSB_JOBID' in os.environ:
-        wdir = make_temp_directory()
-    else:
-        wdir = make_directory(name)
+    wdir = make_run_directory()
     os.chmod(wdir, 504)
     os.chdir(wdir)
     shutil.copyfile(conf, config_name)

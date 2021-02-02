@@ -21,8 +21,7 @@ Description:
 F. Nedelec, 20 November 2018
 """
 
-import sys, os, subprocess, math, copy
-import statistics
+import sys, os, subprocess, math
 import matplotlib.pyplot as plt
 from pyned import uncode, format_line, power_fit, powerlaw_fit, frange
 
@@ -35,18 +34,18 @@ def next_power_of_2(x):
 
 
 def plot_data(ax, data, col):
-    clone = copy.deepcopy(data)
     # plot data:
     for x, y in data:
         ax.plot(x, y, 'o', markersize=4, markerfacecolor=col, markeredgewidth=0, markeredgecolor='None', alpha=0.5)
     bot, top = ax.get_ylim()
-    # add fitted power:
-    [ scale, power ] = powerlaw_fit(clone)
-    X = frange(4, 18, 100)
-    Y = [ scale*(x**power) for x in X ]
-    ax.plot(X, Y, '-', color=col, linewidth=0.5, alpha=0.5)
-    msg = "fit %.3f R^ %.3f" % (scale, power)
-    print(msg)
+    # add bestfit powerlaw with different offsets:
+    for base in [ 0 ]:
+        [ scale, power ] = powerlaw_fit([(x, y-base) for x,y in data])
+        X = frange(4, 18, 100)
+        Y = [ base + scale*(x**power) for x in X ]
+        ax.plot(X, Y, '-', color=col, linewidth=0.5, alpha=0.5)
+        msg = "fit %.2f + %.3f * ( R^ %.3f )" % (base, scale, power)
+        print(msg)
     #plt.text(4, top, msg, fontsize=6)
 
     

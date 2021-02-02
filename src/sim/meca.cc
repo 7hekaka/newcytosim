@@ -325,7 +325,6 @@ constexpr size_t BAND_LDD = BAND_NUD+DIM;
 inline void applyPrecondIsoB(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
-    assert_true( ISOB_LDD < nbp );
 
 #if CHOUCROUTE
     alsatian_xpbtrsL<DIM>(nbp, mec->block(), ISOB_LDD, Y);
@@ -382,7 +381,7 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
-    assert_true( BAND_NUD < bks );
+    assert_true( (int)BAND_NUD < bks );
 #if CHOUCROUTE
     alsatian_xpbtrsLK<BAND_NUD>(bks, mec->block(), BAND_LDD, Y);
 #elif 1

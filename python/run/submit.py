@@ -51,8 +51,8 @@ import sys, os, shutil, subprocess
 submit  = 'sbatch'
 queue   = 'skylake'
 runtime = '12:00:00' # 12 hours
-memory  = '4096'       # in MB
-ncpu    = 1            # nb of threads per job
+memory  = '3420'     # in MB
+ncpu    = 1          # nb of threads per job
 
 # parameters of the program:
 jdir    = 'job00'
