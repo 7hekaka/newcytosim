@@ -326,7 +326,7 @@ public:
 #endif
     
     /// record minium, maximum and sum of lattice values
-    void           infoLattice(real& len, size_t&, real& sm, real& mn, real& mx) const;
+    void           infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx) const;
 
     /// print Lattice data (for debugging purpose)
     void           printLattice(std::ostream&) const;

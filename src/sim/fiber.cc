@@ -1179,18 +1179,18 @@ void Fiber::printLattice(std::ostream& os) const
 }
 
 
-void Fiber::infoLattice(real& len, size_t& cnt, real& sm, real& mn, real& mx) const
+void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx) const
 {
 #if FIBER_HAS_LATTICE
     FiberLattice const& lat = frLattice;
     if ( lat.ready() )
     {
-        len += length();
         const auto sup = lat.indexP();
         for ( auto i = lat.indexM(); i <= sup; ++i )
         {
             ++cnt;
-            sm += lat.data(i);
+            vac += ( lat.data(i) == 0 );
+            sum += lat.data(i);
             real x = lat.data(i);
             mn = std::min(mn, x);
             mx = std::max(mx, x);

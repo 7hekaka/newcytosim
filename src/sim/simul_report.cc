@@ -330,11 +330,11 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "link" )
             return reportFiberLinks(out);
         if ( what == "lattice" )
-            return reportFiberLattice(out);
+            return reportFiberLattice(out, sel, true);
         if ( what == "mesh" )
-            return reportFiberMesh(out, false);
+            return reportFiberMesh(out, false, sel, true);
         if ( what == "mesh_density" )
-            return reportFiberMesh(out, true);
+            return reportFiberMesh(out, true, sel, true);
         if ( what == "connector" )
             return reportFiberConnectors(out, opt);
 
@@ -705,46 +705,59 @@ void Simul::reportFiberLinks(std::ostream& out) const
 /**
  Report quantity of substance in the fiber's Lattice
  */
-void Simul::reportFiberLattice(std::ostream& out) const
+void Simul::reportFiberLattice(std::ostream& out, Property const* sel, bool com) const
 {
-    out << COM << ljust("class", 2, 2);
-    out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
+    if ( com )
+    {
+        out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "vacant";
+        out << SEP << "avg" << SEP << "avg_if" << SEP << "min" << SEP << "max";
+    }
     
-    size_t cnt = 0;
-    real len = 0, sm = 0, mn = INFINITY, mx = -INFINITY;
+    size_t cnt = 0, vac = 0;
+    real sum = 0, mn = INFINITY, mx = -INFINITY;
     
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
-        fib->infoLattice(len, cnt, sm, mn, mx);
-
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+    {
+        if ( !sel || sel == fib->prop )
+            fib->infoLattice(cnt, vac, sum, mn, mx);
+    }
+    
     std::streamsize p = out.precision();
     out << LIN << ljust("fiber:lattice", 2);
-    out << SEP << sm;
-    out << SEP << std::setprecision(4) << sm / (real)cnt;
+    out << SEP << cnt;
+    out << SEP << vac;
+    out << SEP << std::setprecision(4) << sum / (real)cnt;
+    out << SEP << std::setprecision(4) << sum / (real)(cnt-vac);
     out << SEP << std::fixed << std::setprecision(6) << mn;
     out << SEP << std::fixed << std::setprecision(6) << mx;
-    out << SEP << std::setprecision(3) << len;
     out.precision(p);
 }
 
 
 /**
- Report quantity of substance in the fiber's Lattice
+ Report quantity of substance in the fiber's Mesh
  */
-void Simul::reportFiberMesh(std::ostream& out, bool density) const
+void Simul::reportFiberMesh(std::ostream& out, bool density, Property const* sel, bool com) const
 {
-    out << COM << ljust("class", 2, 2);
-    out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
+    if ( com )
+    {
+        out << COM << ljust("class", 2, 2) << SEP << "total";
+        out << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
+    }
     
     size_t cnt = 0;
-    real len = 0, sm = 0, mn = INFINITY, mx = -INFINITY;
+    real len = 0, sum = 0, mn = INFINITY, mx = -INFINITY;
     
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
-        fib->infoMesh(len, cnt, sm, mn, mx, density);
-
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+    {
+        if ( !sel || sel == fib->prop )
+            fib->infoMesh(len, cnt, sum, mn, mx, density);
+    }
+    
     std::streamsize p = out.precision();
     out << LIN << ljust("fiber:mesh", 2);
-    out << SEP << sm;
-    out << SEP << std::setprecision(4) << sm / (real)cnt;
+    out << SEP << sum;
+    out << SEP << std::setprecision(4) << sum / (real)cnt;
     out << SEP << std::fixed << std::setprecision(6) << mn;
     out << SEP << std::fixed << std::setprecision(6) << mx;
     out << SEP << std::setprecision(3) << len;
