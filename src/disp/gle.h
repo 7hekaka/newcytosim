@@ -147,6 +147,8 @@ namespace gle
     
     /// draw a Cube of side 2
     void cube();
+    /// draw a stellated octahedron
+    void star();
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
     void arrowTail();
 

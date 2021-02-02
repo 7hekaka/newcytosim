@@ -443,6 +443,44 @@ namespace gle
         glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
     }
     
+    /// The star is made of two Tetrahedrons: 8 triangles = 24 vertices
+    void initStar(GLuint buf1, GLuint buf2, GLfloat R=1.2f)
+    {
+        const GLfloat S = R / M_SQRT3;
+        const GLfloat Y = 2.0 * S;
+        const GLfloat B = -M_SQRT1_2 * S;
+        const GLfloat Z = -3.0 * B;
+
+        const GLfloat pts[] = {
+             R,-S, B,-R,-S, B, 0, Y, B,
+             R,-S, B, 0, Y, B, 0, 0, Z,
+             0, Y, B,-R,-S, B, 0, 0, Z,
+            -R,-S, B, R,-S, B, 0, 0, Z,
+            // reversed tetrahedron by central symmetry
+             R, S,-B,-R, S,-B, 0,-Y,-B,
+             0,-Y,-B,-R, S,-B, 0, 0,-Z,
+             R, S,-B, 0,-Y,-B, 0, 0,-Z,
+            -R, S,-B, R, S,-B, 0, 0,-Z,
+        };
+        
+        const GLfloat dir[] = {
+            +0.00000, 0.00000,-1.00000, 0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
+            +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
+            -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
+            +0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333,
+            // reversed tetrahedron by central symmetry
+            -0.00000,-0.00000, 1.00000, 0.00000, 0.00000, 1.00000, 0.00000, 0.00000, 1.00000,
+            -0.81650,-0.47140,-0.33333,-0.81650,-0.47140,-0.33333,-0.81650,-0.47140,-0.33333,
+            +0.81650,-0.47140,-0.33333, 0.81650,-0.47140,-0.33333, 0.81650,-0.47140,-0.33333,
+            -0.00000, 0.94281,-0.33333, 0.00000, 0.94281,-0.33333, 0.00000, 0.94281,-0.33333
+        };
+        
+        glBindBuffer(GL_ARRAY_BUFFER, buf1);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(pts), pts, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, buf2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(dir), dir, GL_STATIC_DRAW);
+    }
+
     
     /// Cube is make of 12 triangles = 36 vertices
     void initCube(GLuint buf1, GLuint buf2, GLfloat R=0.5773502692f)
@@ -746,6 +784,7 @@ namespace gle
             initIcosahedron(buf_[4], buf_[5]);
             initArrowTail(buf_[6], buf_[7]);
             initCube(buf_[8], buf_[9]);
+            initStar(buf_[10], buf_[11]);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
     }
@@ -753,9 +792,10 @@ namespace gle
     void tetrahedron() { drawBuffer(buf_[0], buf_[1], 12, GL_TRIANGLES); }
     void octahedron() { drawBuffer(buf_[2], buf_[3], 24, GL_TRIANGLES); }
     void icosahedron() { drawBuffer(buf_[4], buf_[5], 60, GL_TRIANGLES); }
-        
+
     void arrowTail() { drawBuffer(buf_[6], buf_[7], 45, GL_TRIANGLES); }
     void cube() { drawBuffer(buf_[8], buf_[9], 36, GL_TRIANGLES); }
+    void star() { drawBuffer(buf_[10], buf_[11], 24, GL_TRIANGLES); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Tubes

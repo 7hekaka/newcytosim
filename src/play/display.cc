@@ -1166,8 +1166,8 @@ void Display::drawFiberPoints(Fiber const& fib) const
         // display vertices:
         pointSize(disp->point_size);
         glBegin(GL_POINTS);
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
-            gle::gleVertex(fib.posP(ii));
+        for ( size_t i = 0; i < fib.nbPoints(); ++i )
+            gle::gleVertex(fib.posP(i));
         glEnd();
     }
     else if ( style == 2 )
@@ -1350,20 +1350,20 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
     {
         // draw fiber identity and vertex indices
         int C = snprintf(str, sizeof(str), " %u ", fib.identity());
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
+        for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
-            snprintf(str+C, sizeof(str)-C, "%lu", ii);
-            gle::drawText(fib.posP(ii), str, font);
+            snprintf(str+C, sizeof(str)-C, "%lu", i);
+            gle::drawText(fib.posP(i), str, font);
         }
     } 
     else if ( style & 2 )
     {
         // draw fiber identity and abscissa value at vertices
         int C = snprintf(str, sizeof(str), " %u ", fib.identity());
-        for ( size_t ii = 0; ii < fib.nbPoints(); ++ii )
+        for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
-            snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(ii));
-            gle::drawText(fib.posP(ii), str, font);
+            snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
+            gle::drawText(fib.posP(i), str, font);
         }
     }
     if ( style & 4 )
@@ -1841,14 +1841,14 @@ void Display::drawSolids(SolidSet const& set)
 #if ( DIM == 3 )
             if ( obj->prop->disp->color.transparent() )
             {
-                for ( size_t ii = 0; ii < obj->nbPoints(); ++ii )
-                    zObjects.push_back(zObject(obj, ii));
+                for ( size_t i = 0; i < obj->nbPoints(); ++i )
+                    zObjects.push_back(zObject(obj, i));
             }
             else
 #endif
             {
-                for ( size_t ii = 0; ii < obj->nbPoints(); ++ii )
-                    drawSolidT(*obj, ii);
+                for ( size_t i = 0; i < obj->nbPoints(); ++i )
+                    drawSolidT(*obj, i);
             }
         }
     }

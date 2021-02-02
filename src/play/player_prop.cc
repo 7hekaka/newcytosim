@@ -96,6 +96,7 @@ std::string standardReport(unsigned inx)
         case 6: return "couple:force";
         case 7: return "couple:configuration";
         case 8: return "platelet";
+        case 9: return "space";
     }
     return "";
 }
@@ -109,10 +110,11 @@ std::string alternativeReport(unsigned inx)
         case 2: return "system";
         case 3: return "fiber:energy";
         case 4: return "fiber:mesh,field";
-        case 5: return "fiber:segment";
-        case 6: return "fiber:cluster{couple=1}";
-        case 7: return "fiber:age";
-        case 8: return "fiber:distribution";
+        case 5: return "fiber:lattice";
+        case 6: return "fiber:segment";
+        case 7: return "fiber:cluster{couple=1}";
+        case 8: return "fiber:age";
+        case 9: return "fiber:distribution";
     }
     return "";
 }
@@ -120,7 +122,7 @@ std::string alternativeReport(unsigned inx)
 
 void PlayerProp::toggleReport(bool alt)
 {
-    report_index = ( report_index + 1 ) % 9;
+    report_index = ( report_index + 1 ) % 10;
     
     if ( alt )
         report = alternativeReport(report_index);

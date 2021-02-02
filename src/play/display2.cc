@@ -174,8 +174,8 @@ void Display2::drawSolid(Solid const& obj)
     if ( disp->style & 2  &&  disp->size > 0  && disp->perceptible )
     {
         bodyColor(obj);
-        for ( size_t p = 0; p < obj.nbPoints(); ++p )
-            drawObject(obj.posP(p), disp->size, gle::hedron(obj.radius(p)>0));
+        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+            drawObject(obj.posP(i), disp->size, gle::hedron(obj.radius(i)>0));
     }
     
     //display outline of spheres
@@ -185,10 +185,10 @@ void Display2::drawSolid(Solid const& obj)
         glDisable(GL_LIGHTING);
         lineWidth(disp->width);
         bodyColorF(obj).load();
-        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
+        for ( size_t i = 0; i < obj.nbPoints(); ++i )
         {
-            if ( obj.radius(ii) > 0 )
-                drawFlat(obj.posP(ii), obj.radius(ii), gle::circle);
+            if ( obj.radius(i) > 0 )
+                drawFlat(obj.posP(i), obj.radius(i), gle::circle);
         }
 #elif ( DIM == 3 )
         //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
@@ -221,8 +221,8 @@ void Display2::drawSolid(Solid const& obj)
         lineWidth(disp->width);
         bodyColorF(obj).load();
         glBegin(GL_LINE_LOOP);
-        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
-            gleVertex(obj.posPoint(ii));
+        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+            gleVertex(obj.posPoint(i));
         glEnd();
     }
 }
@@ -268,17 +268,17 @@ void Display2::drawSphere(Sphere const& obj)
     if ( disp->style & 2  &&  disp->perceptible )
     {
         bodyColor(obj);
-        drawPoint(obj.posP(0), disp);
-        for ( size_t ii = obj.nbRefPoints; ii < obj.nbPoints(); ii++ )
-            drawPoint(obj.posP(ii), disp);
+        drawObject(obj.posP(0), disp->size, gle::star);
+        for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
+            drawPoint(obj.posP(i), disp);
     }
     
     //display reference points
     if ( disp->style & 8  &&  disp->perceptible )
     {
         bodyColor(obj);
-        for ( size_t ii = 1; ii < obj.nbRefPoints; ii++ )
-            drawPoint(obj.posP(ii), disp);
+        for ( size_t i = 1; i < obj.nbRefPoints; ++i )
+            drawObject(obj.posP(i), disp->size, gle::tetrahedron);
     }
 }
 
@@ -357,8 +357,8 @@ void Display2::drawOrganizer(Organizer const& obj) const
             glDisable(GL_LIGHTING);
             bodyColorF(*sol).load();
             glBegin(GL_LINES);
-            for ( size_t ii = 0; ii < sol->nbPoints(); ++ii )
-                gleVertex(sol->posPoint(ii));
+            for ( size_t i = 0; i < sol->nbPoints(); ++i )
+                gleVertex(sol->posPoint(i));
             glEnd();
 #endif
         }

@@ -873,8 +873,8 @@ void Display3::drawSolid(Solid const& obj)
     if ( disp->style & 2  &&  disp->size > 0 )
     {
         bodyColor(obj);
-        for ( size_t p = 0; p < obj.nbPoints(); ++p )
-            drawObject(obj.posP(p), disp->size, gle::hedron(obj.radius(p)>0));
+        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+            drawObject(obj.posP(i), disp->size, gle::hedron(obj.radius(i)>0));
     }
     
 #if ( DIM == 3 )
@@ -908,8 +908,8 @@ void Display3::drawSolid(Solid const& obj)
         lineWidth(1.0);
         bodyColorF(obj).load();
         glBegin(GL_LINE_LOOP);
-        for ( size_t ii = 0; ii < obj.nbPoints(); ++ii )
-            gleVertex(obj.posPoint(ii));
+        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+            gleVertex(obj.posPoint(i));
         glEnd();
     }
 }
@@ -956,7 +956,7 @@ void Display3::drawSphere(Sphere const& obj)
     if ( disp->size > 0  &&  disp->style & 2 )
     {
         bodyColor(obj);
-        drawObject(obj.posP(0), disp->size, gle::octahedron);
+        drawObject(obj.posP(0), disp->size, gle::star);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), disp->size, gle::cube);
     }
@@ -965,8 +965,8 @@ void Display3::drawSphere(Sphere const& obj)
     if ( disp->size > 0  &&  disp->style & 8 )
     {
         bodyColor(obj);
-        for ( size_t i = 1; i < obj.nbRefPoints; i++ )
-            drawPoint(obj.posP(i), disp);
+        for ( size_t i = 1; i < obj.nbRefPoints; ++i )
+            drawObject(obj.posP(i), disp->size, gle::tetrahedron);
     }
 }
 
@@ -1031,8 +1031,8 @@ void Display3::drawOrganizer(Organizer const& obj) const
             gle::dualPass(gle::barrel);
             glPopMatrix();
 #else
-            for ( size_t ii = 0; ii < sol->nbPoints(); ii+=2 )
-                gleTube(sol->posPoint(ii), sol->posPoint(ii+1), w, gle::hexTube);
+            for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
+                gleTube(sol->posPoint(i), sol->posPoint(i+1), w, gle::hexTube);
 #endif
         }
     }
