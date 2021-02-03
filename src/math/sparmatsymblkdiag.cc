@@ -1815,7 +1815,7 @@ void SparMatSymBlkDiag::vecMulDiagonal3D(const double* src, double* dst) const
     }
 
     const size_t stop = size_ / BLOCK_SIZE;
-    #pragma ivdep unroll (2)
+    #pragma ivdep
     #pragma clang loop unroll_count(2)
     while ( j < stop )
     {

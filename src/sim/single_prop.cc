@@ -137,11 +137,11 @@ void SingleProp::complete(Simul const& sim)
     
     if ( confine_space_ptr )
         confine_space = confine_space_ptr->name();
-
-    if ( sim.primed() && confine != CONFINE_OFF )
+    else if ( confine != CONFINE_OFF )
     {
-        if ( !confine_space_ptr )
+        if ( sim.primed() )
             throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+        confine = CONFINE_OFF;
     }
 
     if ( hand.empty() )

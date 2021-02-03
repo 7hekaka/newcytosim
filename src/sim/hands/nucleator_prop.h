@@ -64,9 +64,9 @@ public:
      */
     Specificity  specificity;
     
-    /// defines if nucleator attaches to fibers that it creates [none, minus_end, plus_end]
+    /// specifies if the nucleator attaches to fibers that it creates [none, minus_end, plus_end]
     /**
-     This option controls if the nucleator will be attached or not to a fiber that it creates.
+     This option controls if the nucleator will be attached (or not) to a fiber that it created.
      Possible values for `hold_end`:
      - off
      - plus_end
@@ -74,7 +74,8 @@ public:
      .
      Note that a nucleator remains innactive as long as it is bound to a fiber.
      Thus, setting `hold_end = minus_end` in combination with a detachment rate of zero
-     will limit nucleation to one fiber at a time.
+     will limit nucleation to one fiber at a time, because in that case the nucleator
+     can only be released when the fiber is deleted, for example after a catastrophe.
      (default value is `minus_end`)
      */
     FiberEnd     hold_end;

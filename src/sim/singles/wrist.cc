@@ -12,9 +12,8 @@ extern Modulo const* modulo;
 Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const size_t pti)
 : Single(sp)
 {
-    assert_true(mec);
+    // 'mec' can be Null when reading from file
     rebase(mec, pti);
-    assert_false(base_.bad());
 #if ( 0 )
     if ( p->diffusion > 0 )
         throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");

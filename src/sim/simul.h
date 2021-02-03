@@ -250,21 +250,18 @@ private:
     //----------------------------- PARSING ------------------------------------
     
     /// return the ObjectSet corresponding to this Tag in the simulation (used for IO)
-    ObjectSet*      findSetT(const ObjectTag);
+    ObjectSet * findSetT(const ObjectTag);
 
 public:
     
-    /// Parse a text containing cytosim commands
-    void         evaluate(std::string const&);
-
     /// return the ObjectSet corresponding to a class
-    ObjectSet*   findSet(const std::string& cat);
+    ObjectSet *  findSet(const std::string& cat);
     
     /// convert Object to Mecable* if the conversion seems valid; returns 0 otherwise
     static Mecable* toMecable(Object *);
 
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
-    Mecable*     findMecable(const std::string&) const;
+    Mecable *    findMecable(const std::string&) const;
     
     /// find a Solid by name
     Solid *      findSolid(std::string s) { return Solid::toSolid(solids.findObject(s, "solid")); }
@@ -278,6 +275,9 @@ public:
     /// return first Space with given name
     Space const* findSpace(std::string const&) const;
     
+    /// Parse a text containing cytosim commands
+    void         evaluate(std::string const&);
+
     //---------------------------- PROPERTIES ----------------------------------
 
     /// change the name of the simulation

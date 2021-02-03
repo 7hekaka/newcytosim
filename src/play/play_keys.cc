@@ -686,27 +686,28 @@ void helpKeys(std::ostream& os)
     os << "   y Y         Save current image; Play and save all images\n";
 #endif
     os << "\nSimulation\n";
-    os << "   a s         Start live mode; Perform one simulation step and stop\n";
-    os << "   A a         Double period (num. steps per display); reset period\n";
-    os << "   g G         Delete all mouse-controlled handles; release handle\n";
+    os << "   a s         Start live mode; Allow one simulation step\n";
+    os << "   A a         Double period (num. steps/display); reset period\n";
+    os << "   g G         Delete mouse-controlled handles; release handle\n";
     os << "\nFibers\n";
     os << "   `           Address another type of fibers for modifications\n";
     os << "   1           Change display: line / color-coded tension / hide\n";
+    os << "   / §         Toggle vertices; toggle backbone display\n";
     os << "   2 3         Decrease; increase line width (ALT: point size)\n";
     os << "   !           Change display of tips: off / plus / both / minus\n";
     os << "   @ #         Decrease; increase fiber_end display size\n";
-    os << "   4 $         Change speckle display; change lattice display\n";
+    os << "   4 $         Change lattice display style; change speckle display\n";
     os << "   c d         Toggle fiber coloring; hide Right/left-pointing\n";
     os << "   m M         Mask a fraction of the fibers; change mask value\n";
     os << "   w e         decrease/increase tension/lattice/explode scale\n";
     os << "   t T         Toggle auto-tracking: 't':nematic; 'T':polar mode\n";
     os << "\nBeads - Solids - Spheres\n";
-    os << "   5           Toggle between different bead/sphere display style\n";
+    os << "   5           Rotate various bead/sphere display style\n";
     os << "   %           Change point size\n";
     os << "\nSingles - Couples\n";
-    os << "   6           Change the Single selection mode\n";
-    os << "   7 ALT-7     Change the Couple selection mode;\n";
-    os << "   0           Toggle the visibility flags of Hands\n";
+    os << "   6           Change Single visibility based on state\n";
+    os << "   7 ALT-7     Change Couple visibility based on state;\n";
+    os << "   0           Change visibility flags of Hands\n";
     os << "   8 9         Decrease; Increase point size of visible Hands\n";
     os << "   ALT-8 ALT-9 Decrease; Increase line width of visible Hands\n";
 }

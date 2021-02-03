@@ -47,29 +47,18 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(fiber_spec, "spec");
 #endif
     
-    glos.set(addictive,  "addictive");
-    
-    glos.set(hold_end,   "hold_end", {{"off",       NO_END},
-#ifdef BACKWARD_COMPATIBILITY
-                                      {"none",      NO_END},
-#endif
-                                      {"minus_end", MINUS_END},
-                                      {"plus_end",  PLUS_END}});
+    glos.set(addictive, "addictive");
 
-    glos.set(track_end,  "track_end", {{"off",       NO_END},
-#ifdef BACKWARD_COMPATIBILITY
-                                       {"none",      NO_END},
-#endif
-                                       {"minus_end", MINUS_END},
-                                       {"plus_end",  PLUS_END}});
+    if ( glos.set(track_end, "track_end", {{"off", NO_END},
+        {"minus_end", MINUS_END}, {"plus_end", PLUS_END}}) )
+        hold_end = track_end;
+
+    glos.set(hold_end, "hold_end", {{"off", NO_END},
+        {"minus_end", MINUS_END}, {"plus_end", PLUS_END}});
     
-    glos.set(specificity, "specificity", {{"off",          NUCLEATE_DIRECTED},
-#ifdef BACKWARD_COMPATIBILITY
-                                          {"none",         NUCLEATE_DIRECTED},
-#endif
-                                          {"parallel",     NUCLEATE_PARALLEL},
-                                          {"antiparallel", NUCLEATE_ANTIPARALLEL},
-                                          {"parallel_if",  NUCLEATE_PARALLEL_IF}});
+    glos.set(specificity, "specificity", {{"off", NUCLEATE_DIRECTED},
+        {"parallel", NUCLEATE_PARALLEL}, {"antiparallel", NUCLEATE_ANTIPARALLEL},
+        {"parallel_if", NUCLEATE_PARALLEL_IF}});
 }
 
 //------------------------------------------------------------------------------

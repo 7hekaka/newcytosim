@@ -109,9 +109,13 @@ void CoupleProp::complete(Simul const& sim)
 
     if ( confine_space_ptr )
         confine_space = confine_space_ptr->name();
-    else if ( sim.primed() && confine != CONFINE_OFF )
-        throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-    
+    else if ( confine != CONFINE_OFF )
+    {
+        if ( sim.primed() )
+            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+        confine = CONFINE_OFF;
+    }
+
     if ( length < 0 )
         throw InvalidParameter(name()+":length must be >= 0");
     

@@ -132,7 +132,10 @@ Object * SpaceSet::newObject(const ObjectTag tag, size_t num)
     if ( tag == Space::TAG )
     {
         SpaceProp * p = simul.findProperty<SpaceProp>("space", num);
-        return p->newSpace();
+        Space * s = p->newSpace();
+        if ( !s )
+            std::cerr << "Warning: unknown Space class `"+p->shape+"'\n";
+        return s;
     }
     std::cerr << "Warning: unknown Space tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
