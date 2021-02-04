@@ -55,11 +55,11 @@ void Display2::drawSimul(Simul const& sim)
     drawFibers(sim.fibers);
     
 #if ( DIM == 3 )
-    
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-
+#else
+    glDisable(GL_LIGHTING);
 #endif
     
     drawBeads(sim.beads);
@@ -67,10 +67,8 @@ void Display2::drawSimul(Simul const& sim)
     drawSpheres(sim.spheres);
     
 #if ( DIM == 3 )
-    
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
-
 #endif
 
     if ( prop->couple_select & 4 )
@@ -80,49 +78,14 @@ void Display2::drawSimul(Simul const& sim)
         drawSinglesA(sim.singles);
     
 #if ( DIM == 3 )
-    
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-
 #endif
 
     drawOrganizers(sim.organizers);
     drawMisc(sim);
 }
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-inline void Display2::drawBallT(Vector const& pos, real radius, gle_color const& col) const
-{
-    glPushMatrix();
-    gle::translate(pos);
-    gle::scale(radius);
-#if ( DIM == 3 )
-    glEnable(GL_LIGHTING);
-    col.load_both();
-    gle::dualPassSphere2();
-#else
-    glDisable(GL_LIGHTING);
-    col.load();
-    gle::discUp();
-#endif
-    glPopMatrix();
-}
-
-
-/// draw a little sphere
-inline void Display2::drawPoint(Vector const& pos, PointDisp const* disp) const
-{
-    glEnable(GL_LIGHTING);
-    glPushMatrix();
-    gle::translate(pos);
-    gle::scale(disp->size*sFactor);
-    gle::sphere1();
-    glPopMatrix();
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -135,7 +98,7 @@ void Display2::drawBead(Bead const& obj)
     if ( disp->style & 2  && disp->perceptible )
     {
         bodyColor(obj);
-        drawPoint(obj.position(), disp);
+        drawObject(obj.position(), disp->size, gle::sphere1);
     }
     
 #if ( DIM == 2 )
@@ -270,7 +233,7 @@ void Display2::drawSphere(Sphere const& obj)
         bodyColor(obj);
         drawObject(obj.posP(0), disp->size, gle::star);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawPoint(obj.posP(i), disp);
+            drawObject(obj.posP(i), disp->size, gle::sphere1);
     }
     
     //display reference points
@@ -289,18 +252,19 @@ void Display2::drawSphereT(Sphere const& obj)
 
     if ( disp->style & 5 )
     {
-        bodyColorF(obj).load_both();
         const Vector C = obj.posP(0);
 #if ( DIM < 3 )
+        bodyColorF(obj).load();
         if ( disp->style & 1 )
             drawFlat(C, obj.radius(), gle::circle);
         if ( disp->style & 2 )
-            drawFlat(obj.posP(0), obj.radius(), gle::discUp);
+            drawFlat(C, obj.radius(), gle::discUp);
 #else
         /* Note: The rotation matrix for the sphere calculated below from the
          reference points, includes scaling by the radius of the sphere.
          We then use a primitive for a sphere of radius 1.
          */
+        bodyColorF(obj).load_both();
         Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
 #endif
     }

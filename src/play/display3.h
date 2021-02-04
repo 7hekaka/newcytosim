@@ -20,7 +20,7 @@ class Display3 : public Display
 private:
     
     /// draw a fine spherical object
-    void drawBallT(Vector const&, float radius, gle_color const&) const;
+    void drawTBall(Vector const&, float radius, gle_color const&) const;
 
     /// draw a point with a small sphere
     void drawPoint(Vector const&, PointDisp const*) const;

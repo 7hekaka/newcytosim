@@ -13,12 +13,6 @@ class PointDisp;
  */
 class Display2 : public Display
 {
-    /// draw a fine spherical object
-    void drawBallT(Vector const&, real radius, gle_color const&) const;
-    
-    /// draw a point
-    void drawPoint(Vector const&, PointDisp const*) const;
-
 public:
     
     ///constructor

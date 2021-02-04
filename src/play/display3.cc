@@ -135,7 +135,7 @@ void Display3::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-inline void Display3::drawBallT(Vector const& pos, float radius, gle_color const& col) const
+inline void Display3::drawTBall(Vector const& pos, float radius, gle_color const& col) const
 {
     glEnable(GL_LIGHTING);
     col.load_both();
@@ -167,17 +167,6 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
         gle::translate(pos);
         gle::scale(disp->size*sFactor);
         gle::sphere1();
-#if ( 0 )
-        if ( disp->symbol )
-        {
-            glDisable(GL_LIGHTING);
-            disp->symbol_color.load();
-            glRasterPos2f(0,0);
-            glBitmap(0,0,0,0,-5,-4,0);
-            glutBitmapCharacter(GLUT_BITMAP_9_BY_15, disp->symbol);
-            glEnable(GL_LIGHTING);
-        }
-#endif
         glPopMatrix();
     }
 }
@@ -858,7 +847,7 @@ void Display3::drawBeadT(Bead const& obj)
     
     if ( disp->style & 1 )
     {
-        drawBallT(obj.position(), obj.radius(), bodyColorF(obj));
+        drawTBall(obj.position(), obj.radius(), bodyColorF(obj));
     }
 }
 
@@ -938,7 +927,7 @@ void Display3::drawSolidT(Solid const& obj, size_t inx)
             glEnable(glp);
             gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
-        drawBallT(X, obj.radius(inx), bodyColorF(obj));
+        drawTBall(X, obj.radius(inx), bodyColorF(obj));
         glDisable(GL_CLIP_PLANE3);
         glDisable(GL_CLIP_PLANE4);
         glDisable(GL_CLIP_PLANE5);
@@ -977,13 +966,14 @@ void Display3::drawSphereT(Sphere const& obj)
     if ( disp->style & 5 )
     {
         const Vector C = obj.posP(0);
-        bodyColorF(obj).load_front();
 #if ( DIM < 3 )
+        bodyColorF(obj).load();
         if ( disp->style & 1 )
             drawFlat(C, obj.radius(), gle::circle);
         if ( disp->style & 2 )
-            drawBallT(C, obj.radius(), bodyColorF(obj));
+            drawTBall(C, obj.radius(), bodyColorF(obj));
 #else
+        bodyColorF(obj).load_both();
         Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
 #endif
     }

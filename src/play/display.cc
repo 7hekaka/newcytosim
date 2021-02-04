@@ -82,6 +82,25 @@ void Display::drawFlat(Vector const& pos, float rad, void(*obj)()) const
     }
 }
 
+
+void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
+{
+    glPushMatrix();
+    gle::translate(pos);
+    gle::scale(rad);
+#if ( DIM == 3 )
+    glEnable(GL_LIGHTING);
+    col.load_both();
+    gle::dualPassSphere2();
+#else
+    glDisable(GL_LIGHTING);
+    col.load();
+    gle::discUp();
+#endif
+    glPopMatrix();
+}
+
+
 ///draw transparent sphere with decoration indicating the orientation of the sphere
 void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, Vector const& C, int style) const
 {

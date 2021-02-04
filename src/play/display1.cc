@@ -97,24 +97,6 @@ void Display1::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-inline void Display1::drawBallT(Vector const& pos, real radius, gle_color const& col) const
-{
-    glPushMatrix();
-    gle::translate(pos);
-    gle::scale(radius);
-#if ( DIM == 3 )
-    glEnable(GL_LIGHTING);
-    col.load_both();
-    gle::dualPassSphere2();
-#else
-    glDisable(GL_LIGHTING);
-    col.load();
-    gle::discUp();
-#endif
-    glPopMatrix();
-}
-
-
 /// this version usually draws a little sphere
 inline void Display1::drawPoint(Vector const& pos, PointDisp const* disp) const
 {
@@ -323,18 +305,19 @@ void Display1::drawSphereT(Sphere const& obj)
 
     if ( disp->style & 5 )
     {
-        bodyColorF(obj).load_both();
         const Vector C = obj.posP(0);
 #if ( DIM < 3 )
+        bodyColorF(obj).load();
         if ( disp->style & 1 )
             drawFlat(C, obj.radius(), gle::circle);
         if ( disp->style & 2 )
-            drawFlat(obj.posP(0), obj.radius(), gle::discUp);
+            drawFlat(C, obj.radius(), gle::discUp);
 #else
         /* Note: The rotation matrix for the sphere calculated below from the
          reference points, includes scaling by the radius of the sphere.
          We then use a primitive for a sphere of radius 1.
          */
+        bodyColorF(obj).load_both();
         Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
 #endif
     }
