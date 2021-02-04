@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 #include "frame_reader.h"
 #include "exceptions.h"
@@ -20,6 +20,12 @@ FrameReader::FrameReader() : inputter(DIM)
 
 
 void FrameReader::clear()
+{
+    inputter.clear();
+}
+
+
+void FrameReader::reset()
 {
     inputter.rewind();
     clearPositions();

@@ -17,7 +17,7 @@ namespace StreamFunc
     void skip_lines(std::ostream&, std::istream&, char skip);
 
     /// add `prefix` before every line, but skip lines starting with `skip`
-    void prefix_lines(std::ostream&, std::istream&, const char prefix[], char keep, char skip);
+    void prefix_lines(std::ostream&, std::istream&, const char prefix[], char verbatim, char skip);
 
     /// print the line of `istream` indicating the position `pos`, with a marker underline
     void mark_line(std::ostream&, std::istream&, std::streampos pos, const char prefix[]);

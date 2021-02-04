@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "iowrapper.h"
 #include <vector>
@@ -20,7 +20,7 @@ class Simul;
  - loadFrame() calls Simul::reloadObjects() to read the content of the frame.
  .
  
- Frames are recorded starting at index 0.
+ Frames are indexed starting at zero.
 */
 class FrameReader
 {
@@ -30,81 +30,84 @@ private:
     class file_pos 
     {
     public:
-        int    status_;   ///< indicates if `position` is valid
         fpos_t position_; ///< starting position in the file
+        int status_;      ///< indicates if `position` is valid
         file_pos() { status_ = 0; }
     };
     
     /// type for list of positions
-    typedef  std::vector<file_pos> PosList;
+    typedef std::vector<file_pos> PosList;
     
     /// the stream from which input is made
     Inputter inputter;
     
     /// starting position for each frame
-    PosList  framePos;
+    PosList framePos;
     
     /// index of frame stored currently
-    size_t   frameIndex;
+    size_t frameIndex;
     
     /// last frame loaded successfully
-    size_t   lastLoaded;
+    size_t lastLoaded;
     
-    /// remember position `pos` as the place where frame `frm` should start
-    void     savePos(size_t frm, const fpos_t& pos, int status);
-   
     /// go to a position where a frame close to `frm` is known to start
-    size_t   seekPos(size_t frm);
+    size_t seekPos(size_t frm);
+
+    /// remember position `pos` as the place where frame `frm` should start
+    void savePos(size_t frm, const fpos_t& pos, int status);
     
     /// check file validity
-    void     checkFile();
+    void checkFile();
     
     /// return 0 if file is good for input
-    int      badFile();
-    
+    int badFile();
+
 public:
     
     /// constructor, after which openFile() should be called
     FrameReader();
     
     /// open file for input
-    void     openFile(std::string const& file);
+    void openFile(std::string const& file);
     
-    /// clear the buffer
-    void     clearPositions();
-    
+    /// return index of current frame
+    size_t currentFrame() const { return frameIndex; }
+
     /// last frame seen in the file
-    size_t   lastKnownFrame() const;
-    
+    size_t lastKnownFrame() const;
+
     /// return state of file object
-    bool     hasFile() { return inputter.file(); }
+    bool hasFile() { return inputter.file(); }
     
     /// true when end of file is reached
-    bool     eof() const  { return inputter.eof();  }
+    bool eof() const  { return inputter.eof();  }
     
     /// rewind file
-    void     rewind() { inputter.rewind(); frameIndex=0; }
+    void rewind() { inputter.rewind(); frameIndex=0; }
 
     /// true if everything looks correct for input
-    bool     good() const { return inputter.good(); }
+    bool good() const { return inputter.good(); }
+    
+    /// clear error flag of file
+    void clear();
+    
+    /// clear the record of positions of frames in file
+    void clearPositions();
 
     /// rewind file and clear position buffer
-    void     clear();
-    
-    /// return index of current frame 
-    size_t   currentFrame() const { return frameIndex; }
+    void reset();
     
     /// find the starting point of frame `frm` by brute force !
-    int      seekFrame(size_t frm);
+    int seekFrame(size_t frm);
     
     /// load specified frame into given Simul (the index of first frame is 1)
-    int      loadFrame(Simul&, size_t frm, bool reload = false);
+    int loadFrame(Simul&, size_t frm, bool reload = false);
     
     /// read the next frame in the file, return 0 for SUCCESS, 1 for EOF
-    int      loadNextFrame(Simul&);
+    int loadNextFrame(Simul&);
     
     /// read the last frame in the file, return 0 for SUCCESS, 1 if no frame was found
-    int      loadLastFrame(Simul&, size_t cnt = 0);
+    int loadLastFrame(Simul&, size_t cnt = 0);
 
 };
 

@@ -1,7 +1,7 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 /*
  This is mostly a test for the class defined in frame_reader.h
- but it can be used to navigate from frame to frame in a object-file
+ but it can be used to navigate frames inside a trajectory file 'objects.cmo'
 */
 
 #include <cstring>
@@ -12,6 +12,7 @@
 #include "glossary.h"
 #include "messages.h"
 #include "iowrapper.h"
+#include "stream_func.h"
 #include "frame_reader.h"
 #include "simul.h"
 #include "parser.h"
@@ -20,15 +21,15 @@
 
 void help(std::ostream& os)
 {
-    printf("Cytosim-reader %iD, file version %i\n", DIM, Simul::currentFormatID);
-    os << "\n";
-    os << "Syntax:  reader [OPTIONS] [DIRECTORY] INPUT_FILE_NAME output=FILE_NAME\n";
+    os << "The `reader` reads Cytosim's trajectory file\n";
+    os << "Syntax: reader [OPTIONS] [DIRECTORY] INPUT_FILE_NAME output=FILE_NAME\n";
     os << "\n";
     os << "OPTIONS:\n";
     os << "     help       display this message\n";
     os << "     binary=0   write text coordinates in `file_out'\n";
     os << "     binary=1   write binary coordinates in `file_out'\n";
     os << "     verbose=?  set the verbose level\n";
+    os << "This reads "<<DIM<<" files up to format "<<Simul::currentFormatID<<"\n";
     os << "\n";
 }
 
@@ -93,30 +94,45 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
+    if ( arg.set(frm, "frame") )
+    {
+        if ( reader.loadFrame(simul, frm) )
+            printf("Frame %i could not be loaded\n", frm);
+    }
     
     printf("Reader: enter (h) for help\n");
     while ( true )
     {
-        printf("Frame %li, time %f", reader.currentFrame(), simul.time());
-        simul.reportInventory(std::cout);
+        printf("loaded frame %li, time %.3f:\n", reader.currentFrame(), simul.time());
+        if ( 1 )
+        {
+            std::stringstream ss;
+            simul.reportInventory(ss);
+            StreamFunc::prefix_lines(std::cout, ss, "    ", 0, 0);
+        }
         
-        printf("\n? ");
+        printf("? ");
         fgets(cmd, sizeof(cmd), stdin);
         
         if ( isdigit(cmd[0]))
         {
             char * end = nullptr;
-            frm = strtoul(cmd, &end, 10);
+            size_t f = strtoul(cmd, &end, 10);
             if ( errno )
-                printf("Reader: error reading: %s\n", cmd);
+                printf("Reader: syntax error in `%s'\n", cmd);
             else if ( end > cmd )
             {
                 try {
-                    if ( 0 != reader.loadFrame(simul, frm) )
-                        printf("Reader: frame not found: ");
+                    if ( 0 != reader.loadFrame(simul, f) )
+                    {
+                        printf("Reader: frame %lu not found.", f);
+                        reader.clear();
+                    }
+                    else
+                        frm = reader.currentFrame();
                 }
                 catch( Exception & e ) {
-                    printf("Reader: exception in `read` %lu: %s\n", frm, e.msg());
+                    printf("reader.loadFrame(%lu) exception: %s\n", f, e.msg());
                 }
             }
         }
@@ -128,10 +144,10 @@ int main(int argc, char* argv[])
                 case 'n':
                     try {
                         int err = reader.loadNextFrame(simul);
-                        if ( err ) printf("Reader error with `next`: %i\n", err);
+                        if ( err ) printf("reader.loadNextFrame error: %i\n", err);
                     }
                     catch( Exception & e ) {
-                        printf("Reader: exception in `next`: %s\n", e.msg());
+                        printf("reader.loadNextFrame exception: %s\n", e.msg());
                     }
                     break;
                     

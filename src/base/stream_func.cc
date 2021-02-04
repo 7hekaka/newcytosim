@@ -70,7 +70,7 @@ void StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
 
 
 void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char prefix[],
-                              char keep, char skip)
+                              char verbatim, char skip)
 {
     std::string line;
     
@@ -79,7 +79,7 @@ void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char pre
         std::getline(is, line);
         if ( line.size() < 1 )
             continue;
-        else if ( line[0] == keep )
+        else if ( line[0] == verbatim )
             os << line << '\n';
         else if ( line[0] == skip )
             ;
