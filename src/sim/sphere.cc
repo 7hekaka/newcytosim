@@ -52,7 +52,7 @@ Sphere::Sphere(SphereProp const* p, real rad)
         addPoint( Vector(0,0,rad) );
     }
     
-    setDragCoefficient();
+    setDragCoefficientStokes();
 }
 
 

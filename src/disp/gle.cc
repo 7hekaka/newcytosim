@@ -220,14 +220,12 @@ namespace gle
     {
         float X = float(B.XX-A.XX);
         float Y = float(B.YY-A.YY);
-        float N = invsqrt(X*X+Y*Y);
-        X *= N;
-        Y *= N;
+        float r = R * invsqrt(X*X+Y*Y);
         //warning! this matrix appears here transposed
         float mat[16] = {
-            Y*R,  -X*R,  0,  0,
-            0,       0, -R,  0,
-            X,       Y,  0,  0,
+            r*Y, -r*X,  0,  0,
+            0,      0, -R,  0,
+            X,      Y,  0,  0,
             float(A.XX), float(A.YY), 0, 1 };
         glMultMatrixf(mat);
     }

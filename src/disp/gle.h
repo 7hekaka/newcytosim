@@ -108,15 +108,15 @@ namespace gle
     //------------------------------------------------------------------------------
 #pragma mark -
         
-    /// translate by T, then rotate to align X with A, Y with B and Z with C
+    /// translate by T; rotate to align X with A, Y with B and Z with C
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
 
-    /// translate by A; rotate to align Z with AB, Z replaces X. The X-Y plane is scaled by R
+    /// translate by A; rotate to align Z with AB, Z replacing X. Scale XY plane by `rad'
     void stretchAlignZ(Vector2 const& A, Vector2 const& B, float rad);
-    /// translate by T, then rotate to align Z with dir
+    /// translate by A; rotate to align Z with AB, Z replacing X. Scale XY plane by `rad'
     void stretchAlignZ(Vector3 const& A, Vector3 const& B, float rad);
     
-    /// translate by T, then rotate to align Z with dir, scaling X and Y by radis
+    /// translate by pos; rotate to align Z with dir, scale XY plane by rad
     void transAlignZ(Vector1 const& pos, float rad, Vector1 const& dir);
     void transAlignZ(Vector2 const& pos, float rad, Vector2 const& dir);
     void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir);
