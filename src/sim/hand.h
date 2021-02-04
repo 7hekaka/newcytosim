@@ -119,6 +119,9 @@ public:
     {
         return prop->binding_key & fib->prop->binding_key;
     }
+    
+    /// only checks the Monitor's permission
+    bool         monitorAllowsAttachment(FiberSite& sit) const;
 
     /// tell if attachment at given site is permitted
     virtual bool attachmentAllowed(FiberSite&) const;

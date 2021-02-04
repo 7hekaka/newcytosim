@@ -59,22 +59,25 @@ public:
 
 #if BIND_CLOSEST_FIBER
 
-    /// HeavySegment is used to calculate distance of segments to a point
-    class HeavySegment
+    /// SegmentHit is used to calculate distance of segments to a point
+    class SegmentHit
     {
     public:
         FiberSegment seg_;   ///< The segment
         real         dis_;   ///< shortest distance from point to segment
         real         abs_;   ///< abscissa of projection of point
-        HeavySegment() { }
-        HeavySegment(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
+        
+        SegmentHit() {}
+        SegmentHit(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
+        
+        Fiber const* fiber() const { return seg_.fiber(); }
+        real abscissa() const { return seg_.abscissa1() + abs_; }
+        
+        std::string toString() const;
     };
     
-    /// list of HeavySegments
-    typedef Array<HeavySegment> HeavySegmentList;
-
-    /// used for tryToAttach()
-    mutable HeavySegmentList targets;
+    /// list of SegmentHits used in tryToAttach()
+    mutable Array<SegmentHit> targets;
     
 #endif
     

@@ -120,6 +120,13 @@ void Hand::moveToEnd(const FiberEnd end)
 //------------------------------------------------------------------------------
 #pragma mark -
 
+// only checks the Monitor's permission
+bool Hand::monitorAllowsAttachment(FiberSite& sit) const
+{
+    return haMonitor->allowAttachment(sit, this);
+}
+
+
 /**
 Checks that all the conditions required for attachment are met
  */
@@ -197,7 +204,7 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
     }
 #endif
     
-    // also check the Monitor's permissions:
+    // also check the Monitor's permission:
     return haMonitor->allowAttachment(sit, this);
 }
 

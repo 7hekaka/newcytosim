@@ -110,6 +110,9 @@ public:
 
     /// Human friendly ouput
     void         print(std::ostream&) const;
+
+    /// Human friendly ouput
+    std::string  toString() const;
 };
 
 /// print for debug purpose

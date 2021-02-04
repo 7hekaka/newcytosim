@@ -249,11 +249,19 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 
 #if BIND_CLOSEST_FIBER
 
+std::string FiberGrid::SegmentHit::toString() const
+{
+    std::ostringstream oss;
+    oss << "{ f" << seg_.fiber()->identity() << ":" << seg_.point();
+    oss << " @ " << dis_ << " }";
+    return oss.str();
+}
+    
 /// used to qsort segments according to distance
 static int compareSegments(const void * A, const void * B)
 {
-    real a = static_cast<FiberGrid::HeavySegment const*>(A)->dis_;
-    real b = static_cast<FiberGrid::HeavySegment const*>(B)->dis_;
+    real a = static_cast<FiberGrid::SegmentHit const*>(A)->dis_;
+    real b = static_cast<FiberGrid::SegmentHit const*>(B)->dis_;
     
     return ( a > b ) - ( b > a );
 }
@@ -286,7 +294,8 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             real dis = INFINITY;
             real abs = seg.projectPoint(place, dis);
             //std::clog << " target " << seg << " at " << dis << "\n";
-            if ( dis < sup )
+            FiberSite sit(const_cast<Fiber*>(seg.fiber()), abs);
+            if ( dis < sup && ha.monitorAllowsAttachment(sit) )
                 targets.emplace(seg, dis, abs);
         }
     }
@@ -302,17 +311,15 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      number to get the index of the next target that will bind, using a Poisson
      distribution */
     const uint64_t prob = 0x1p+32 * ha.prop->binding_prob;
-    for ( HeavySegment const& target : targets )
+    for ( SegmentHit const& hit : targets )
     {
-        //printf("    trying segment f%u:%lu dis %.6f\n", seg.fiber()->identity(), seg.point(), target.dis_);
+        //std::cout << "    trying " << hit.toString() << "\n";
         if ( RNG.pint32() < prob )
         {
-            FiberSegment const& seg = target.seg_;
-            Fiber * fib = const_cast<Fiber*>(seg.fiber());
-            FiberSite pos(fib, seg.abscissa1()+target.abs_);
-            if ( ha.attachmentAllowed(pos) )
+            FiberSite sit(const_cast<Fiber*>(hit.fiber()), hit.abscissa());
+            if ( ha.attachmentAllowed(sit) )
             {
-                ha.attach(pos);
+                ha.attach(sit);
                 return;
             }
         }
