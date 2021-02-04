@@ -54,7 +54,7 @@ size_t Matrix::nbElements(size_t start, size_t stop) const
 }
 
 //------------------------------------------------------------------------------
-void Matrix::copyBlock(real* mat, unsigned ldd, size_t sx, size_t nx, size_t sy, size_t ny) const
+void Matrix::copyBlock(real* mat, size_t ldd, size_t sx, size_t nx, size_t sy, size_t ny) const
 {
     assert_true( sx + nx < size() );
     assert_true( sy + ny < size() );
