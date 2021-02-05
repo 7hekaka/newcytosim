@@ -15,7 +15,7 @@ Random RNG;
 
 
 /// switch for using SIMD to generate Gaussians faster (requires AVX)
-#define NEW_SIMD_GAUSSIANS 0
+#define RANDOM_USES_AVX 0
 
 
 /// the most significant bit in a 32-bits integer
@@ -54,6 +54,7 @@ Random::Random()
     start_ = integers_;
     end_ = start_;
     next_gaussian_ = gaussians_;
+    next_exponential_ = exponentials_;
 }
 
 
@@ -135,7 +136,7 @@ bool Random::seeded()
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Floating points
 
 float Random::pfloat()
 {
@@ -181,8 +182,6 @@ float Random::pfloat23()
     return tmp.f - 1.0f;
 }
 
-//------------------------------------------------------------------------------
-#pragma mark -
 
 double Random::pdouble()
 {
@@ -218,7 +217,7 @@ double Random::sdouble()
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Gaussian derivates
 
 /**
  Set two signed real number, following a normal law N(0,v*v)
@@ -241,7 +240,7 @@ void Random::gauss_set(real & a, real & b, real v)
     b = w * y;
 }
 
-#if ( !NEW_SIMD_GAUSSIANS )
+#if ( !RANDOM_USES_AVX )
 
 /**
  Fill array `vec[]` with Gaussian values ~ N(0,1).
@@ -249,13 +248,31 @@ void Random::gauss_set(real & a, real & b, real v)
  For each 4 input values, this produces ~PI values.
  @Return address past the last value stored in `dst` = dst + nb_of_values_set
  */
-real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
+real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
 {
     int32_t const*const end = src + cnt;
     while ( src < end )
     {
         real x = src[0] * TWO_POWER_MINUS_31;
         real y = src[1] * TWO_POWER_MINUS_31;
+#if 1
+        /**
+        This folds the corners of [-1, 1] x [-1, 1] that are outside the unit circle,
+        to map these points back onto the original square. For randomly distributed points,
+        this increases the number of points within the unit circle by a factor 3-2*sqrt(2)
+        without changing the property of being equidistributed within the unit circle.
+        */
+        if ( std::abs(x) + std::abs(y) >= M_SQRT2 )
+        {
+            constexpr real S = M_SQRT1_2 + 1;
+            // subtract corner and scale to recover a square of size sqrt(1/2)
+            real cx = S * x - std::copysign(S, x);
+            real cy = S * y - std::copysign(S, y);
+            // apply rotation, scaling by sqrt(2): x' = y + x;  y' = y - x
+            x = cy + cx;
+            y = cy - cx;
+        }
+#endif
         real w = x * x + y * y;
         if (( w <= 1 ) & ( 0 < w ))
         {
@@ -277,7 +294,7 @@ real * gauss_fill(real dst[], size_t cnt, const int32_t src[])
  */
 void Random::refill_gaussians()
 {
-    next_gaussian_ = gauss_fill(gaussians_, SFMT_N32, (int32_t*)twister_.state);
+    next_gaussian_ = makeGaussians(gaussians_, SFMT_N32, (int32_t*)twister_.state);
     //printf("refill_gaussians %lu\n", next_gaussian_ - gaussians_);
     sfmt_gen_rand_all(&twister_);
 }
@@ -298,7 +315,7 @@ void Random::refill_gaussians()
  */
 void Random::refill_gaussians()
 {
-    next_gaussian_ = gauss_fill_AVX0(gaussians_, SFMT_N256, (__m256i*)twister_.state);
+    next_gaussian_ = makeGaussians_AVX0(gaussians_, SFMT_N256, (__m256i*)twister_.state);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
     sfmt_gen_rand_all(&twister_);
 }
@@ -371,8 +388,37 @@ void Random::gauss_boxmuller(real& x, real& y)
     y = nrm * std::sin(ang);
 }
 
+
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Exponential derivates
+
+/**
+Could use here the SIMD approximate Logarithm function
+ */
+void makeExponentials(real dst[], size_t cnt, const int32_t src[])
+{
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        real x = std::fabs(static_cast<real>(src[i]));
+        dst[i] = -std::log(1 - x * TWO_POWER_MINUS_31);
+    }
+}
+
+void Random::refill_exponentials()
+{
+#if ( RANDOM_USES_AVX )
+    makeExponentialsAVX(exponentials_, SFMT_N256, (__m256i*)twister_.state);
+#else
+    makeExponentials(exponentials_, SFMT_N32, (int32_t*)twister_.state);
+#endif
+    next_exponential_ = exponentials_ + SFMT_N32;
+    //printf("refill_exponentials\n");
+    sfmt_gen_rand_all(&twister_);
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Integers
 
 /**
  integer in [0,n] for n < 2^32
@@ -449,8 +495,7 @@ uint32_t Random::pint32_ratio(const uint32_t n, const uint32_t ratio[])
     return ii;
 }
 
-//------------------------------------------------------------------------------
-#pragma mark -
+
 /**
  Return Poisson distributed integer, with expectation=E  variance=E
  http://en.wikipedia.org/wiki/Poisson_distribution

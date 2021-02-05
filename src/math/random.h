@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef RANDOM_H
 #define RANDOM_H
 
@@ -40,6 +40,9 @@ class alignas(64) Random
 
     /// reserve of standard normally-distributed numbers ~ N(0,1)
     real gaussians_[SFMT_N32];
+    
+    /// reserve of exponentially-distributed numbers
+    real exponentials_[SFMT_N32];
 
     /// Mersenne Twister Generator
     sfmt_t twister_;
@@ -52,6 +55,9 @@ class alignas(64) Random
     
     /// pointer to access the next value in `gaussians_[]`
     real * next_gaussian_;
+    
+    /// pointer to access the next value in `exponentials_[]`
+    real * next_exponential_;
     
 protected:
     
@@ -270,7 +276,7 @@ public:
     
     
     
-    /// refill array `gaussians_[]` with normal law N(0,1), and reset next_gaussian_
+    /// refill array `gaussians_[]`, resetting `next_gaussian_`
     void refill_gaussians();
     
     /// set two independent random numbers, both following a normal law N(0,v*v)
@@ -294,9 +300,19 @@ public:
     /// signed real number, following a normal law N(0,1), slower algorithm
     void gauss_boxmuller(real &, real&);
     
-    /// random in [0, inf[, with P(x) = exp(-x), mean = 1.0, variance = 1.0
-    real exponential() { return -std::log(1 - ZERO2ONE());  }
-    
+    /// refill array `exponential_[]`, resetting `next_exponential_`
+    void refill_exponentials();
+
+    /// random in [0, inf[, distributed as P(x>m) = exp(-m); mean = 1.0, variance = 1.0
+    real exponential()
+    {
+        //return -std::log(1 - ZERO2ONE());
+        if ( next_exponential_ <= exponentials_ )
+            refill_exponentials();
+        --next_exponential_;
+        return *next_exponential_;
+    }
+
     /// exponentially distributed positive real, with P(x) = exp(-x/E) / E,  parameter E is 1/Rate
     real exponential(const real E) { return -E * std::log(1 - ZERO2ONE());  }
 

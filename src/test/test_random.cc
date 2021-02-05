@@ -421,7 +421,7 @@ int testGillespie(const int method)
  @Return the number of values that were stored in `vec`
  */
 template < typename REAL >
-REAL * gauss_fill_0(REAL dst[], size_t cnt, const int32_t src[])
+REAL * makeGaussians_(REAL dst[], size_t cnt, const int32_t src[])
 {
     int32_t const*const end = src + cnt;
     while ( src < end )
@@ -717,17 +717,17 @@ void test_gaussian(int cnt)
     for ( int i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
-        gauss_fill_0(flt, SFMT_N32, (int32_t*)sfmt.state);
+        makeGaussians_(flt, SFMT_N32, (int32_t*)sfmt.state);
     }
-    end = gauss_fill_0(vec, SFMT_N32, (int32_t*)sfmt.state);
-    printf("%-12s %5.2f :", "Gauss0", toc(cnt));
+    end = makeGaussians_(vec, SFMT_N32, (int32_t*)sfmt.state);
+    printf("%-12s %5.2f :", "Gauss_", toc(cnt));
     check_gaussian(end-vec, vec);
     //print_gaussian(end-vec, vec);
 #if defined(__AVX__)
-    runGaussian<gauss_fill_AVX0>(sfmt, "Gauss AVX0", cnt);
-    runGaussian<gauss_fill_AVX1>(sfmt, "Gauss AVX1", cnt);
-    runGaussian<gauss_fill_AVX2>(sfmt, "Gauss AVX2", cnt);
-    runGaussian<check_log>(sfmt, "logapprox", cnt);
+    runGaussian<makeGaussians_AVX0>(sfmt, "GaussAVX0", cnt);
+    runGaussian<makeGaussians_AVX1>(sfmt, "GaussAVX1", cnt);
+    runGaussian<makeGaussians_AVX2>(sfmt, "GaussAVX2", cnt);
+    runGaussian<makeExponentialsAVX>(sfmt, "Exponential", cnt);
     if ( 0 )
     {
         printf("Approximate logarithm:\n");

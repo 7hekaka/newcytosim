@@ -52,33 +52,6 @@ static inline real * remove_nan_pairs(real * s, real * e)
 
 
 #if defined(__AVX__)
-/*
- // generate random floats in [1, 2]:
- const vec8f mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x807fffff));
- const vec8f expo = _mm256_castsi256_ps(_mm256_set1_epi32(0x3f800000));
- const vec8f ninf = _mm256_castsi256_ps(_mm256_set1_epi32(0xff800000)); // -INFINITY
- const vec8f one = _mm256_set1_ps(1.0f);
- x = or8f(expo, and8f(mant, cast8f(load8si(src++))));
- y = or8f(expo, and8f(mant, cast8f(load8si(src++))));
-
-inline static vec8f magic8f(vec8f xxx)
-{
-    // bad approximation of sqrt(x*ln(x)) for x in [1, 2]
-    const vec8f one = set8f(1.0f);
-    const vec8f alpha = set8f(-2*M_LN2);
-    return sqrt8f(mul8f(alpha, mul8f(xxx, sub8f(xxx, one))));
-}
- */
-
-
-/// calculate  sqrt( -2 * log(n) / n )
-static inline vec8f sqrtlogdiv8f(const vec8f n)
-{
-    const vec8f half = set8f(-0.5f);
-    return sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
-    //return rsqrt8f(div8f(mul8f(half, n), log8f(n)));
-    //return rsqrt8f(mul8f(mul8f(half, n), rcp8f(log8f(n))));
-}
 
 
 /**
@@ -106,9 +79,10 @@ static inline void fold_corners(vec8f& x, vec8f& y)
 
 
 /** This follows Box-Muller's method with approximate Log and Sin/Cos functions */
-static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
+static real * makeGaussians_AVX0(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
+    const vec8f one = set8f(1.0f);
     const vec8f two = set8f(-2.0f);
     const vec8f PI = set8f(M_PI*0x1p-31);
 
@@ -117,7 +91,7 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
     while ( src < end )
     {
         // generate norm in ]0, 1]: 1 - eps * float(uint32)
-        vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(cvt8if(load8si(src++)))));
+        vec8f n = sub8f(one, mul8f(eps, abs8f(cvt8if(load8si(src++)))));
         // generate angle in ]-PI, PI[:
         vec8f t = mul8f(PI, cvt8if(load8si(src++)));
         // transform norm:
@@ -143,7 +117,7 @@ static real * gauss_fill_AVX0(real dst[], size_t cnt, const __m256i src[])
 }
 
 
-static real * gauss_fill_AVX1(real dst[], size_t cnt, const __m256i src[])
+static real * makeGaussians_AVX1(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f fac = set8f(TWO_POWER_MINUS_31);
     const vec8f half = set8f(-0.5f);
@@ -202,7 +176,7 @@ static inline void sort_nans(vec8f& x, vec8f& y)
 
  F. Nedelec 02.01.2017
  */
-static real * gauss_fill_AVX2(real dst[], size_t cnt, const __m256i src[])
+static real * makeGaussians_AVX2(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
     const vec8f half = set8f(-0.5f);
@@ -224,7 +198,6 @@ static real * gauss_fill_AVX2(real dst[], size_t cnt, const __m256i src[])
         n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
         //n = sqrt8f(div8f(log8f(n), mul8f(half, n)));
         //n = rsqrt8f(div8f(mul8f(half, n), logapprox8f(n)));
-        //n = sqrtlogdiv8f(n);
         x = mul8f(n, x);
         y = mul8f(n, y);
         // place corresponding X and Y values next to each other:
@@ -301,4 +274,33 @@ static real * gauss_fill_AVX2(real dst[], size_t cnt, const __m256i src[])
     return dst+8*cnt;
 }
 
+
+/// compute exponential derivates
+static real* makeExponentialsAVX(real dst[], size_t cnt, const __m256i src[])
+{
+    const vec8f eps = set8f(0x1p-31f); //TWO_POWER_MINUS_31
+    const vec8f one = set8f(1.0f);
+    
+    __m256i const* end = src + cnt;
+    while ( src < end )
+    {
+        // generate random floats in ]0, 1]:
+        vec8f x = sub8f(one, mul8f(eps, abs8f(cvt8if(load8si(src)))));
+        x = abs8f(logapprox8f(x));
+#if REAL_IS_DOUBLE
+        // convert 8 single-precision values
+        store4(dst  , cvt4sd(getlo4f(x)));
+        store4(dst+4, cvt4sd(gethi4f(x)));
+#else
+        // store 8 single-precision values
+        store8f(dst, x);
 #endif
+        dst += 8;
+        ++src;
+    }
+    return dst;
+}
+
+
+#endif
+
