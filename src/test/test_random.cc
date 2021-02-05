@@ -315,104 +315,6 @@ void test_poisson(size_t sup)
 
 
 //==========================================================================
-//test 3 methods to generate a random event time, when the rate varies in time
-// F. Nedelec, Oct 2005
-
-//this is our standard method: 64s CPU
-int method1(const int maxTime, const real rate[])
-{
-    for ( int ii=0; ii<maxTime; ++ii )
-    {
-        if (RNG.test(rate[ii])) return ii;
-    }
-    return maxTime;
-}
-
-//this is 'exact' and very slow: 370s CPU (an exponential at each step!)
-int method2(const int maxTime, const real rate[])
-{
-    for ( int ii=0; ii<maxTime; ++ii )
-    {
-        if ( RNG.preal() < -std::expm1(-rate[ii]) )
-            return ii;
-    }
-    return maxTime;
-}
-
-//this is exact, and the fastest method: 10s CPU!
-int method3(const int maxTime, const real rate[])
-{
-    real T = -std::log( RNG.preal() );
-    for ( int ii=0; ii<maxTime; ++ii )
-    {
-        T -= rate[ii];
-        if ( T < 0 ) return ii;
-    }
-    return maxTime;
-}
-
-
-int testGillespie(const int method)
-{
-    //test new idea for gillespie with changing rate (Oct 2005)
-    const int maxTime = 200;
-    real rate[maxTime];
-    for ( int ii=0; ii<maxTime; ++ii )
-        rate[ii] = ( ii % 10 ) / 30.0;
-    
-    int bins[3][maxTime+1];
-    for ( int ii=0; ii<=maxTime; ++ii )
-    {
-        bins[0][ii] = 0;
-        bins[1][ii] = 0;
-        bins[2][ii] = 0;
-    }
-    
-    const int nbSamples = 1000000;
-    const int subSamples = 10;
-    int result;
-    switch( method )
-    {
-        case 0:
-            for ( int ii=0; ii<nbSamples; ++ii )
-            {
-                bins[0][ method1(maxTime, rate) ]++;
-                bins[1][ method2(maxTime, rate) ]++;
-                bins[2][ method3(maxTime, rate) ]++;
-            }
-            break;
-            
-        case 1:
-            printf("method 1:");
-            for ( int ii=0; ii<nbSamples; ++ii )
-                for ( int jj=0; jj<subSamples; ++jj )
-                    result = method1(maxTime, rate);
-            return result;
-            
-        case 2:
-            printf("method 2:");
-            for ( int ii=0; ii<nbSamples; ++ii )
-                for ( int jj=0; jj<subSamples; ++jj )
-                    result = method2(maxTime, rate);
-            return result;
-            
-        case 3:
-            printf("method 3:");
-            for ( int ii=0; ii<nbSamples; ++ii )
-                for ( int jj=0; jj<subSamples; ++jj )
-                    result = method3(maxTime, rate);
-            return result;
-    }
-    
-    FILE* file = fopen("test.out", "w");
-    for ( int ii=0; ii<=maxTime; ++ii )
-        fprintf(file, "%4i   %6i %6i %6i\n", ii, bins[0][ii], bins[1][ii], bins[2][ii]);
-    fclose(file);
-    return 0;
-}
-
-
-//==========================================================================
 
 
 /**
@@ -452,6 +354,67 @@ REAL * makeGaussians_(REAL dst[], size_t cnt, const int32_t src[])
     }
     return dst;
 }
+
+template < typename REAL >
+REAL * makeExponentials_(REAL dst[], size_t cnt, const int32_t src[])
+{
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        REAL x = std::fabs(static_cast<REAL>(src[i]));
+        dst[i] = -std::log(1 - x * TWO_POWER_MINUS_31);
+    }
+    return dst + cnt;
+}
+
+
+template < typename T >
+void print_gaussian(size_t cnt, T const* vec)
+{
+    for ( size_t i = 0; i < cnt; )
+    {
+        for ( int k = 0; k < 4; ++k )
+        {
+            for ( int j = 0; j < 8 && i < cnt; ++j, ++i )
+                printf(" %8.4f", vec[i]);
+            printf(" :");
+        }
+        printf("\n");
+    }
+}
+
+template < typename REAL >
+void check_gaussian(size_t cnt, REAL* vec)
+{
+    size_t nan = 0;
+    REAL avg = 0, dev = 0;
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        if ( std::isnan(vec[i]) )
+            ++nan;
+        else
+        {
+            avg += vec[i];
+            dev += vec[i] * vec[i];
+        }
+    }
+    // covariance of odd and even numbers:
+    REAL cov = 0;
+    for ( size_t i = 1; i < cnt; i += 2 )
+    {
+        if ( !std::isnan(vec[i]) )
+            cov += vec[i-1] * vec[i];
+    }
+    cnt -= nan;
+    avg /= cnt;
+    dev = dev / cnt - avg;
+    cov = 0.5 * cov / cnt;
+    printf("%6lu numbers + %6lu NaNs: avg %7.4f dev %7.4f cov %7.4f\n", cnt, nan, avg, dev, cov);
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
 
 #if defined(__AVX__)
 
@@ -633,47 +596,20 @@ static real* check_log(real dst[], size_t cnt, const __m256i src[])
 #endif
 
 
-template < typename T >
-void print_gaussian(size_t cnt, T const* vec)
+template < float* (*FUNC)(float*, size_t, const int32_t*) >
+void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
 {
-    for ( size_t i = 0; i < cnt; )
+    float flt[SFMT_N32] = { 0 };
+    tic();
+    for ( int i = 0; i < cnt; ++i )
     {
-        for ( int k = 0; k < 4; ++k )
-        {
-            for ( int j = 0; j < 8 && i < cnt; ++j, ++i )
-                printf(" %8.4f", vec[i]);
-            printf(" :");
-        }
-        printf("\n");
+        sfmt_gen_rand_all(&sfmt);
+        FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
     }
-}
-
-void check_gaussian(size_t cnt, real* vec)
-{
-    size_t nan = 0;
-    real avg = 0, dev = 0;
-    for ( size_t i = 0; i < cnt; ++i )
-    {
-        if ( std::isnan(vec[i]) )
-            ++nan;
-        else
-        {
-            avg += vec[i];
-            dev += vec[i] * vec[i];
-        }
-    }
-    // covariance of odd and even numbers:
-    real cov = 0;
-    for ( size_t i = 1; i < cnt; i += 2 )
-    {
-        if ( !std::isnan(vec[i]) )
-            cov += vec[i-1] * vec[i];
-    }
-    cnt -= nan;
-    avg /= cnt;
-    dev = dev / cnt - avg;
-    cov = 0.5 * cov / cnt;
-    printf("%6lu numbers + %6lu NaNs: avg %7.4f dev %7.4f cov %7.4f\n", cnt, nan, avg, dev, cov);
+    float* end = FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
+    printf("%-12s %5.2f :", str, toc(cnt));
+    check_gaussian(end-flt, flt);
+    print_gaussian(std::min(end-flt, 64l), flt);
 }
 
 
@@ -702,10 +638,9 @@ void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
 void test_gaussian(int cnt)
 {
     printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
-    real *end, vec[SFMT_N32] = { 0 };
-    float flt[SFMT_N32] = { 0 };
     sfmt_t sfmt;
     sfmt_init_gen_rand(&sfmt, time(nullptr));
+    real *end, vec[SFMT_N32] = { 0 };
 
     tic();
     for ( int i = 0; i < cnt; ++i )
@@ -713,21 +648,12 @@ void test_gaussian(int cnt)
     printf("RNG.refill   %5.2f\n", toc(cnt));
     //print(vec, end);
     
-    tic();
-    for ( int i = 0; i < cnt; ++i )
-    {
-        sfmt_gen_rand_all(&sfmt);
-        makeGaussians_(flt, SFMT_N32, (int32_t*)sfmt.state);
-    }
-    end = makeGaussians_(vec, SFMT_N32, (int32_t*)sfmt.state);
-    printf("%-12s %5.2f :", "Gauss_", toc(cnt));
-    check_gaussian(end-vec, vec);
-    //print_gaussian(end-vec, vec);
+    runGaussian<makeGaussians_>(sfmt, "Gauss_", cnt);
 #if defined(__AVX__)
     runGaussian<makeGaussians_AVX0>(sfmt, "GaussAVX0", cnt);
     runGaussian<makeGaussians_AVX1>(sfmt, "GaussAVX1", cnt);
     runGaussian<makeGaussians_AVX2>(sfmt, "GaussAVX2", cnt);
-    runGaussian<makeExponentialsAVX>(sfmt, "Exponential", cnt);
+    runGaussian<makeExponentialsAVX>(sfmt, "Expon.AVX", cnt);
     if ( 0 )
     {
         printf("Approximate logarithm:\n");
@@ -736,6 +662,7 @@ void test_gaussian(int cnt)
         print_gaussian(std::min(SFMT_N256, 32), vec);
     }
 #endif
+    runGaussian<makeExponentials_>(sfmt, "Exponential", cnt);
 }
 
 /**
@@ -771,10 +698,6 @@ int main(int argc, char* argv[])
             test_exponential();
             test_uniform();
             test_gauss();
-            break;
-    
-        case 2:
-            testGillespie(rate);
             break;
 
         case 3:

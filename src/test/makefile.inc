@@ -107,6 +107,11 @@ test_random: test_random.cc random.o SFMT.o exceptions.o filewrapper.o messages.
 	$(DONE)
 vpath test_random bin
 
+test_variablerate: test_variablerate.cc random.o SFMT.o exceptions.o tictoc.o | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+vpath test_variablerate bin
+
 test_asm: test_asm.cc | bin
 	$(COMPILE) -restrict -S -c -m64 $^ -o build/test_asm.s
 	$(DONE)

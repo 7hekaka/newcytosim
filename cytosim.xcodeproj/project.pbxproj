@@ -1380,6 +1380,7 @@
 		BB171C320B3DEBE700CFFC3B /* fiber.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fiber.cc; path = src/sim/fiber.cc; sourceTree = SOURCE_ROOT; };
 		BB1749A407D798E600BC7BDC /* lattice.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = lattice.cc; path = src/sim/lattice.cc; sourceTree = SOURCE_ROOT; };
 		BB1749A507D798E600BC7BDC /* lattice.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = lattice.h; path = src/sim/lattice.h; sourceTree = SOURCE_ROOT; };
+		BB17CD1425CD49DF00202087 /* test_variablerate.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_variablerate.cc; sourceTree = "<group>"; };
 		BB18BB8523CDC20400B3605E /* simd_print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_print.h; sourceTree = "<group>"; };
 		BB18BBB71DFD78F600567023 /* test_simd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_simd; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB18BBC71DFD7E3400567023 /* test_code */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_code; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2768,6 +2769,7 @@
 				BB73591705B98DA3006956D5 /* test_sphere.cc */,
 				BBC4C3A024D5CDE100DB5187 /* test_string.cc */,
 				BBE13B800CD535DE008C212D /* test_thread.cc */,
+				BB17CD1425CD49DF00202087 /* test_variablerate.cc */,
 				BB3F600D14964B740092690C /* test_vbo.cc */,
 				BB7086342448BC3700C73273 /* test_xpttrs.cc */,
 				BB201E0D24ABD9A900A8CA82 /* test_xtbsv.cc */,
@@ -6809,7 +6811,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FP_TRAP = "-fp-trap-all=divzero,invalid";
@@ -6890,7 +6892,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = NO;
 				FP_TRAP = "-fp-trap-all=divzero,invalid";
@@ -6968,7 +6970,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = NO;
 				FP_TRAP = "-fp-trap-all=divzero,invalid";
