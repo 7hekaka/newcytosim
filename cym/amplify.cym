@@ -36,6 +36,7 @@ new 1 microtubule
     length = 4
     position = -3 0 0
     direction = 1 0 0
+    plus_end = grow
 }
 
 set hand activator
@@ -49,7 +50,7 @@ set hand nucleator
 {
     unbinding = 0, 3
     activity = nucleate
-    nucleate = 1, microtubule, ( length=0.1; )
+    nucleate = 1, microtubule, ( length=0.1; plus_end=grow; )
     specificity = parallel
     display = ( size=7; color=white; )
 }
@@ -58,6 +59,8 @@ set couple complex
 {
     hand1 = activator
     hand2 = nucleator
+    activity = fork
+    torque = 100, 0.3
     diffusion = 1
     stiffness = 100
     trans_activated = 1

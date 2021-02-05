@@ -62,7 +62,7 @@ void testMethod(const char str[])
     {
         FILE* file = fopen(str, "w");
         for ( size_t i = 0; i <= maxTime; ++i )
-            fprintf(file, "%4i %6u\n", i, bins[i]);
+            fprintf(file, "%4lu %6u\n", i, bins[i]);
         fclose(file);
     }
 }

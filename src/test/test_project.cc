@@ -679,14 +679,14 @@ void testProjectionU(SIZE_T cnt)
     testU<projectForcesU_>(cnt,    " U_   ");
     testU<projectForcesU_PTR>(cnt, " U_PTR");
     testU<projectForcesU_TWO>(cnt, " U_TWO");
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE__)
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
     testU<projectForcesU2D_SSE>(cnt, " U_SSE");
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testU<projectForcesU2D_AVX>(cnt, " U_AVX");
     testU<projectForcesU2D_AVY>(cnt, " U_AVY");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE__)
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
     testU<projectForcesU3D_SSE>(cnt, " U_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
@@ -1371,13 +1371,13 @@ void testProjectionD(SIZE_T cnt)
     testD<projectForcesD_RIV>(cnt, " D_RIV");
     testD<projectForcesD_FMA>(cnt, " D_FMA");
     testD<projectForcesD_PTR>(cnt, " D_PTR");
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE__)
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
     testD<projectForcesD2D_SSE>(cnt, " D_SSE");
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testD<projectForcesD2D_AVX>(cnt, " D_AVX");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE__)
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
     testD<projectForcesD3D_SSE>(cnt, " D_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)

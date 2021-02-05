@@ -676,7 +676,7 @@ void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* X)
 //------------------------------------------------------------------------------
 #pragma mark - Optimized SSE versions for KD==6
 
-#if defined(__SSE__)
+#if defined(__SSE3__)
 /**
  Optmized version for KD == 6
  Beware: this works assuming that N >= KD, and it will in particular write
@@ -1653,7 +1653,7 @@ void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
 #else
     if ( KD == 6 )
     {
-#if REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__SSE3__)
         alsatian_xtbsvLNN6SSE(N, AB, LDAB, B);
         alsatian_xtbsvLTN6SSE(N, AB, LDAB, B);
 #else

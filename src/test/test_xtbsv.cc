@@ -321,7 +321,7 @@ void uniLN3(int N, real const* AB, real* B)
 
 void uniLN4(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE && defined(__SSE__)
+#if REAL_IS_DOUBLE && defined(__SSE3__)
     U::alsatian_xtbsvLNN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);
@@ -330,7 +330,7 @@ void uniLN4(int N, real const* AB, real* B)
 
 void uniLN5(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE && defined(__SSE__)
+#if REAL_IS_DOUBLE && defined(__SSE3__)
     alsatian_xtbsvLNN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);

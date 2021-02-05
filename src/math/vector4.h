@@ -297,10 +297,14 @@ public:
     /// change signs of all coordinates
     void oppose()
     {
+#if VECTOR4_USES_AVX
+        vec = flipsign4(vec);
+#else
         XX = -XX;
         YY = -YY;
         ZZ = -ZZ;
         TT = -TT;
+#endif
     }
     
     //------------------------------------------------------------------
