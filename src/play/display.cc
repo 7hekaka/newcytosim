@@ -1341,6 +1341,13 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
 }
 
 
+void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
+{
+    drawFiberLattice2(fib, lat, width);
+    drawFiberLatticeEdges(fib, lat, width);
+}
+
+
 /**
  Indicate the edges between sites with small dots
  */
@@ -1709,6 +1716,10 @@ void Display::drawFiber(Fiber const& fib)
                 style = 0;
                 break;
             case 3:
+                drawFiberLattice3(fib, *lat, disp->line_width);
+                style = 0;
+                break;
+            case 4:
                 drawFiberLatticeEdges(fib, *lat, disp->line_width);
                 style = 0;
                 break;

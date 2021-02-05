@@ -228,6 +228,9 @@ public:
     virtual void drawFiberLattice2(Fiber const&, VisibleLattice const&, real width) const;
    
     /// display lattice cell edges
+    virtual void drawFiberLattice3(Fiber const&, VisibleLattice const&, real width) const;
+
+    /// display lattice cell edges
     virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real width) const;
 
     /// display Labels for a Fiber

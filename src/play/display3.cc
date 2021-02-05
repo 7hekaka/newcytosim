@@ -577,7 +577,8 @@ void color_alternate(Fiber const& fib, long ix, real)
 
 void color_by_lattice(Fiber const& fib, long ix, real scale)
 {
-    gle_color col = fib.disp->color.darken(scale*fib.visibleLattice()->data(ix));
+    real x = scale * fib.visibleLattice()->data(ix);
+    gle_color col = fib.disp->color.darken(x);
     if ( col.transparent() )
         col.load_both();
     else
@@ -587,7 +588,18 @@ void color_by_lattice(Fiber const& fib, long ix, real scale)
 
 void color_by_lattice_jet(Fiber const& fib, long ix, real scale)
 {
-    gle_color::jet_color(scale*fib.visibleLattice()->data(ix)).load_front();
+    real x = scale * fib.visibleLattice()->data(ix);
+    gle_color::jet_color(x).load_front();
+}
+
+
+void color_by_lattice_stripe(Fiber const& fib, long ix, real scale)
+{
+    real x = scale * fib.visibleLattice()->data(ix);
+    if ( ix & 1 )
+        gle_color::jet_color(x).lighten(1.0625).load_front();
+    else
+        gle_color::jet_color(x).darken(0.9375).load_front();
 }
 
 
@@ -643,6 +655,11 @@ void Display3::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, re
 void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
     drawFiberLattice(fib, lat, width, color_by_lattice_jet);
+}
+
+void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
+{
+    drawFiberLattice(fib, lat, width, color_by_lattice_stripe);
 }
 
 void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real width) const

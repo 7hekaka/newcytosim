@@ -229,10 +229,7 @@ public:
     
     gle_color lighten(GLfloat s) const
     {
-        GLfloat r = clamp( s * col_[0] );
-        GLfloat g = clamp( s * col_[1] );
-        GLfloat b = clamp( s * col_[2] );
-        return gle_color(r, g, b, col_[3]);
+        return gle_color(s*col_[0], s*col_[1], s*col_[2], col_[3]);
     }
     
     gle_color alpha_scaled(GLfloat s) const

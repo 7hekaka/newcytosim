@@ -76,6 +76,9 @@ public:
     
     /// display lattice subtance using color
     void drawFiberLattice2(Fiber const&, VisibleLattice const&, real width) const;
+    
+    /// display lattice subtance using color
+    void drawFiberLattice3(Fiber const&, VisibleLattice const&, real width) const;
 
     /// draw Edges of lattice
     void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real width) const;
