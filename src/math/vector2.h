@@ -273,7 +273,7 @@ public:
     void oppose()
     {
 #if VECTOR2_USES_SSE
-        vec = _mm_xor_pd(vec, set2(-0.0));
+        vec = flipsign2(vec);
 #else
         XX = -XX;
         YY = -YY;

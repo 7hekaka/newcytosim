@@ -311,7 +311,7 @@ public:
     void oppose()
     {
 #if VECTOR3_USES_AVX
-        vec = _mm256_xor_pd(vec, set4(-0.0));
+        vec = flipsign4(vec);
 #else
         XX = -XX;
         YY = -YY;
@@ -780,7 +780,7 @@ public:
     friend Vector3 operator -(Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
-        return Vector3(_mm256_xor_pd(b.vec, set4(-0.0)));
+        return Vector3(flipsign4(b.vec));
 #else
         return Vector3(-b.XX, -b.YY, -b.ZZ);
 #endif

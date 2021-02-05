@@ -78,7 +78,7 @@ inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos)
 // loading 4 and clearing one
 inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
 
-#else
+#elif defined(__SSE3__)
 
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,b,0xEE), 0xC4); }
 
@@ -147,6 +147,7 @@ inline static vec8f or8f(vec8f a, vec8f b)       { return _mm256_or_ps(a,b); }
 inline static vec8f and8f(vec8f a, vec8f b)      { return _mm256_and_ps(a,b); }
 inline static vec8f andnot8f(vec8f a, vec8f b)   { return _mm256_andnot_ps(a,b); }
 inline static vec8f abs8f(vec8f a)               { return _mm256_andnot_ps(_mm256_set1_ps(-0.0), a); }
+inline static vec8f flipsign8f(vec8f a)          { return _mm256_xor_ps(a, _mm256_set1_ps(-0.0)); }
 
 inline static vec8f unpacklo8f(vec8f a, vec8f b) { return _mm256_unpacklo_ps(a,b); }
 inline static vec8f unpackhi8f(vec8f a, vec8f b) { return _mm256_unpackhi_ps(a,b); }

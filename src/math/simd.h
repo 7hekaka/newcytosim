@@ -56,6 +56,7 @@ inline static vec2 min2(vec2 a, vec2 b)             { return _mm_min_pd(a,b); }
 inline static vec2 and2(vec2 a, vec2 b)             { return _mm_and_pd(a,b); }
 inline static vec2 andnot2(vec2 a, vec2 b)          { return _mm_andnot_pd(a,b); }
 inline static vec2 abs2(vec2 a)                     { return _mm_andnot_pd(sgn11, a); }
+inline static vec2 flipsign2(vec2 a)                { return _mm_xor_pd(a, sgn11); }
 
 inline static vec2 setr2(double a, double b)        { return _mm_setr_pd(a,b); }
 inline static vec2 set2(double a, double b)         { return _mm_set_pd(a, b); }
@@ -190,6 +191,7 @@ inline static vec4 min4(vec4 a, vec4 b)         { return _mm256_min_pd(a,b); }
 inline static vec4 and4(vec4 a, vec4 b)         { return _mm256_and_pd(a,b); }
 inline static vec4 andnot4(vec4 a, vec4 b)      { return _mm256_andnot_pd(a,b); }
 inline static vec4 abs4(vec4 a)                 { return _mm256_andnot_pd(sgn1111, a); }
+inline static vec4 flipsign4(vec4 a)            { return _mm256_xor_pd(a, sgn1111); }
 
 inline static vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
 inline static vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
