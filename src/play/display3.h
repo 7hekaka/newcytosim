@@ -39,14 +39,14 @@ private:
     
     /// draw Fiber model segments
     void drawFiberSegments(Fiber const&, real rad,
-                           void (*set_color)(Fiber const&, size_t, real), real) const;
+                           gle_color (*set_color)(Fiber const&, size_t)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
     void drawFiberSubSegments(Fiber const&, real rad, VisibleLattice::lati_t inx, VisibleLattice::lati_t last, real abs, real inc,
-                              void (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+                              gle_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
     
     /// display lattice subtance using specified color function
-    void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, void (*set_color)(Fiber const&, long, real)) const;
+    void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, gle_color (*set_color)(Fiber const&, long, real)) const;
 
 public:
         

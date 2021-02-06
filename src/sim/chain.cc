@@ -1375,7 +1375,7 @@ real curvature3(Vector const& A, Vector const& B, Vector const& C)
     real D = ( C - A ).normSqr();
     real P = dot(ab, bc);
     real S = std::max(0.0, 1.0 - ( P * P ) / ( ab.normSqr() * bc.normSqr() ));
-    return 2.0 * std::sqrt( S / D );
+    return 2 * std::sqrt( S / D );
 }
 
 /**
@@ -1394,17 +1394,19 @@ real curvature3(Vector const& A, Vector const& B, Vector const& C, real seg)
     Vector ab = B - A;
     Vector bc = C - B;
     real D = ( C - A ).normSqr();
-    real P = dot(ab, bc) / seg;
-    real S = std::max(0.0, ( 1.0 - P ) * ( 1.0 + P ));
-    return 2.0 * std::sqrt( S / D );
+    real P = dot(ab, bc) / ( seg * seg );
+    real S = std::max(real(0), ( 1 - P ) * ( 1 + P ));
+    return 2 * std::sqrt( S / D );
 }
 
-
+/**
+ This returns 
+ */
 real Chain::curvature(size_t p) const
 {
-    if ( p < 1 || lastPoint() <= p )
-        return 0;
-    return curvature3(posP(p-1), posP(p), posP(p+1), fnCut);
+    if (( 0 < p ) & ( p < lastPoint() ))
+        return curvature3(posP(p-1), posP(p), posP(p+1), fnCut);
+    return 0;
 }
 
 
@@ -1434,7 +1436,6 @@ real Chain::curvature(size_t p) const
 real Chain::bendingEnergy0() const
 {
     real e = 0;
-    
     const size_t lsp = nPoints - 2;
     if ( lsp > 0 )
     {
@@ -1454,7 +1455,6 @@ real Chain::bendingEnergy0() const
          */
         e *= ( lsp + 1 ) / ( fnCut * lsp );
     }
-    
     return e;
 }
 

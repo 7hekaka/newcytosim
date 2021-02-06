@@ -54,6 +54,7 @@ void FiberDisp::clear()
     
     length_scale     = 1;
     tension_scale    = 1;
+    tension_alpha    = 1;
     
     force_style      = 0;
     force_scale      = 1;
@@ -147,6 +148,7 @@ void FiberDisp::read(Glossary& glos)
     
     glos.set(length_scale,     "length_scale");
     glos.set(tension_scale,    "tension_scale");
+    tension_alpha = 1 / tension_scale;
 
     glos.set(force_style, "forces") || glos.set(force_style, "force");
     glos.set(force_scale, "forces", 1) || glos.set(force_scale, "force", 1);

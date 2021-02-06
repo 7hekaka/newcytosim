@@ -48,19 +48,19 @@ public:
      - 2 or 'microtubule' : microtubule-like rendering using beads for monomers.
      .
      */
-    int          style;
+    int style;
     
     /// visibility flag
-    int          visible;
+    int visible;
     
     /// color of fiber
-    gle_color    color;
+    gle_color color;
     
     /// color of inner surfaces of cylinder in 3D display (set as color[1])
-    gle_color    back_color;
+    gle_color back_color;
     
     /// color for unselected objects, default=invisible (set as color[2])
-    gle_color    hide_color;
+    gle_color hide_color;
 
     /// if true, vary the colors used to display the fibers
     /**
@@ -76,10 +76,10 @@ public:
      - 5 : color fibers according to age.
      .
      */
-    int          coloring;
+    int coloring;
 
     /// width of lines (also known as `line[0]` or `width`)
-    float        line_width;
+    float line_width;
 
     /// style for lines (also known as `line[1]`)
     /**
@@ -96,7 +96,7 @@ public:
      .
      The color value is calculated using (1): 'length_scale' or (2): 'tension_scale'.
      */
-    int          line_style;
+    int line_style;
     
     /// if true, close the end of the fiber (valid only for style==3)
     /**
@@ -106,7 +106,7 @@ public:
      - 2: use a hemisphere to make a round end.
      This is only valid for style==3
      */
-    int          line_caps;
+    int line_caps;
     
     /// diameter of points (also known as `point[0]` or `size`)
     /**
@@ -117,7 +117,7 @@ public:
      For example, if you set line_width=2.5 and point_value=0.01,
      the fibers will be displayed with a diameter of 0.025.
      */
-    float        point_size;
+    float point_size;
     
     /// style for display of points (also known as `point[1]`)
     /**
@@ -128,10 +128,10 @@ public:
      - 3 : show middle point of each fiber
      .
      */
-    int          point_style;
+    int point_style;
     
     /// distance between arrows for `point_style=2` (also known as `point[2]`)
-    real         point_interval;
+    real point_interval;
     
 
     /// style of fiber tips for { PLUS_END, MINUS_END }
@@ -148,7 +148,7 @@ public:
      - 5 : draw arrowhead in the inverted direction (for actin)
      .
      */
-    int          end_style[2];
+    int end_style[2];
     
     /// size of fiber tips for { PLUS_END, MINUS_END }
     /**
@@ -158,7 +158,7 @@ public:
          minus_end = SIZE, STYLE
          
      */
-    real         end_size[2];
+    real end_size[2];
     
     /// colors of the different FiberTip states
     /**
@@ -170,17 +170,17 @@ public:
      - 4, shrinking end, use end_color[4]
      .
      */
-    gle_color    end_color[6];
+    gle_color end_color[6];
     
     
     /// if true, specify the style for displaying lattice content (also known as `lattice[0]`)
-    int          lattice_style;
+    int lattice_style;
     
     /// defines the range of colors when displaying the lattice (also known as `lattice[1]`)
-    real         lattice_scale;
+    real lattice_scale;
     
     /// rescale concentration for the cells at the edge of reduced length
-    bool         lattice_rescale;
+    bool lattice_rescale;
     
     /// style of labels
     /**
@@ -190,11 +190,11 @@ public:
      - 4 : abscissa along fiber
      .
      */
-    int          label_style;
+    int label_style;
     
     
     /// size for speckle display (also know as `speckles`)
-    int          speckle_size;
+    int speckle_size;
 
     /// style for speckle display (also know as `speckles[1]`)
     /**
@@ -204,10 +204,10 @@ public:
      - 2 : regular speckes, separated by `interval`.
      .
      */
-    int          speckle_style;
+    int speckle_style;
 
     /// average distance between speckles (also known as `speckles[2]`)
-    real         speckle_interval;
+    real speckle_interval;
 
     /// a bit-field to hide certain categories of fibers
     /**
@@ -226,13 +226,13 @@ public:
      - 4th bit true: hide counter-clockwise fibers
      .
      */
-    int          hide;
+    int hide;
     
     /// the direction used for hiding left- or right-pointing fibers, etc. (known as `exclude[1]`)
-    Vector3      hide_axis;
+    Vector3 hide_axis;
     
     /// hide filament with specified state
-    unsigned     hide_state;
+    unsigned hide_state;
     
     /// number of bits equal to `1` in the mask_bitfield
     /**
@@ -254,7 +254,7 @@ public:
     
     
     /// conversion coefficient from length to color, for some line styles
-    real         length_scale;
+    real length_scale;
 
     /// conversion coefficient from tension to color, for `line_style==3` (tension)
     /**
@@ -266,20 +266,20 @@ public:
      while a value three times higher will be displayed red.
      Lower tension_scale values will yield brighter colors for the same force in the fiber.
      */
-    real         tension_scale;
+    real tension_scale;
 
     /// ( if != 0 ) display the net forces acting on vertices (known as `force`)
-    real         force_style;
+    real force_style;
 
     /**
      if `force_style != 0), a force `F` acting on a vertex is displayed as a
      segment of length `force_scale * F`.
      ( known as force[1], default = 1 )
      */
-    real         force_scale;
+    real force_scale;
     
     /// this color is specified as forces[2]
-    gle_color    force_color;
+    gle_color force_color;
 
     
     /// the 'explosion' effect shift the fibers in space
@@ -287,10 +287,10 @@ public:
      This can be useful to visualize dense regions,
      but is only implemented for style=2
      */
-    int          explode_style;
+    int explode_style;
     
     /// amount of lateral shift to separate fibers when display is exploded (known as `explode[1]`)
-    real         explode_range;
+    real explode_range;
     
     
     /// if true, display the average fiber
@@ -299,10 +299,13 @@ public:
      and the centroid of the polymer mass.
      It is useful to evaluate the amount of order in the network.
      */
-    int          draw_average;
+    int draw_average;
 
     /// @}
 
+    /// set to 1/tension_scale
+    real tension_alpha;
+    
 public:
     
     /// constructor

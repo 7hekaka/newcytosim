@@ -3,18 +3,18 @@
 #include "dim.h"
 #include "simul.h"
 #include "display3.h"
-#include "display_color.h"
 #include "modulo.h"
+
+#include "opengl.h"
+#include "gle.h"
+#include "gle_color_list.h"
+#include "glut.h"
 
 #include "fake.h"
 #include "fiber_disp.h"
 #include "line_disp.h"
 #include "point_disp.h"
-
-#include "opengl.h"
-#include "gle_color_list.h"
-#include "glut.h"
-#include "gle.h"
+#include "display_color.h"
 
 using namespace gle;
 extern Modulo const* modulo;
@@ -177,31 +177,32 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
 
 #if ( 1 )
 /**
-This draws the model-segments, using function `set_color` to set display colors
+This draws the model-segments, using function `select_color` to set display colors
 */
 void Display3::drawFiberSegments(Fiber const& fib, real rad,
-                                 void (*set_color)(Fiber const&, size_t, real), real beta) const
+                                 gle_color (*select_color)(Fiber const&, size_t)) const
 {
-    Vector pos = fib.posPoint(0), old;
-    Vector nxt = fib.posPoint(1);
-    Vector dir = normalize(nxt-pos);  // could use _mm_rsqrt_ss
+    Vector old = fib.posPoint(0);
+    Vector pos = fib.posPoint(1);
+    Vector nxt = fib.posPoint(2);
+    Vector dir = (pos-old) / fib.segmentation();
     
     glEnable(GL_CLIP_PLANE4);
     setClipPlane(GL_CLIP_PLANE4, -dir, nxt);
-    set_color(fib, 0, beta);
-    drawTube(pos, rad, nxt, gle::capedTube2);
-    setClipPlane(GL_CLIP_PLANE4, dir, nxt);
+    select_color(fib, 0).load_front();
+    drawTube(old, rad, pos, gle::capedTube2);
+    setClipPlane(GL_CLIP_PLANE4, dir, pos);
     glEnable(GL_CLIP_PLANE5);
 
     // draw inner segments
     const size_t last = fib.lastSegment();
-    for ( size_t inx = 1; inx <= last; ++inx )
+    for ( size_t i = 1; i < last; ++i )
     {
         old = pos;
         pos = nxt;
-        nxt = fib.posPoint(inx+1);
+        nxt = fib.posPoint(i+2);
         dir = normalize(nxt-old);
-        set_color(fib, inx, beta);
+        select_color(fib, i).load_front();
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         drawTube(old, rad, pos, gle::longTube2);
         setClipPlane(GL_CLIP_PLANE4,  dir, pos);
@@ -209,7 +210,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
 
     glDisable(GL_CLIP_PLANE5);
     // draw last segment:
-    set_color(fib, last, beta);
+    select_color(fib, last).load_front();
     drawTube(nxt, rad, pos, gle::endedTube2);
     glDisable(GL_CLIP_PLANE4);
 }
@@ -223,7 +224,7 @@ The function `set_color` is called to set the color of the segments.
 void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     VisibleLattice::lati_t inx, const VisibleLattice::lati_t last,
                                     real abs, const real inc,
-                                    void (*set_color)(Fiber const&, long, real),
+                                    gle_color (*select_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
 {
     Vector old = fib.displayPosM(abs);
@@ -231,7 +232,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     Vector nxt = fib.displayPosM(abs+inc*2);
     Vector dir = normalize(nxt-pos);
     
-    set_color(fib, inx++, facM);
+    select_color(fib, inx++, facM).load_front();
     glEnable(GL_CLIP_PLANE4);
     setClipPlane(GL_CLIP_PLANE4, -dir, pos);
     if ( abs <= 0 )
@@ -250,7 +251,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         pos = nxt;
         nxt = fib.displayPosM(abs);
         dir = normalize(nxt-old);
-        set_color(fib, inx++, fac);
+        select_color(fib, inx++, fac).load_front();
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
         // can draw a disc to close the tube:
         drawTube(old, rad, pos, gle::longTube2);  //gle::obturatedTube2
@@ -259,7 +260,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     glDisable(GL_CLIP_PLANE5);
 
     // draw last segment, which may be truncated:
-    set_color(fib, inx, facP);
+    select_color(fib, inx, facP).load_front();
     if ( abs >= fib.length() )
         drawTube(nxt, rad, pos, gle::endedTube2);
     else
@@ -273,20 +274,20 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 #pragma mark - Fiber Rendering using Spherocylinders
 
 /**
-This draws the model-segments, using function `set_color` to set display colors
+This draws the model-segments, using function `select_color` to set display colors
 */
 void Display3::drawFiberSegments(Fiber const& fib, real rad,
-                                 void (*set_color)(Fiber const&, size_t, real), real beta) const
+                                 gle_color (*select_color)(Fiber const&, size_t)) const
 {
     Vector nxt = fib.posPoint(0);
 
     // rendering tubes as spherocylinders that join properly at any angle!
     const size_t last = fib.lastSegment();
-    for ( size_t inx = 0; inx <= last; ++inx )
+    for ( size_t i = 0; i <= last; ++i )
     {
         Vector pos = nxt;
-        nxt = fib.posPoint(inx+1);
-        set_color(fib, inx, beta);
+        nxt = fib.posPoint(i+1);
+        select_color(fib, i).load_front();
         glPushMatrix();
         gle::transAlignZ(pos, 1.0, nxt-pos);
         gle::capsuleZ(norm(nxt-pos), rad);
@@ -303,7 +304,7 @@ The function `set_color` is called to set the color of the segments.
 void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     VisibleLattice::lati_t inx, const VisibleLattice::lati_t last,
                                     real abs, const real inc,
-                                    void (*set_color)(Fiber const&, long, real),
+                                    gle_color (*select_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
 {
     Vector nxt = fib.displayPosM(abs);
@@ -314,7 +315,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         abs += inc;
         Vector pos = nxt;
         nxt = fib.displayPosM(abs);
-        set_color(fib, inx, fac);
+        select_color(fib, inx, fac).load_front();
         glPushMatrix();
         gle::transAlignZ(pos, 1.0, nxt-pos);
         gle::capsuleZ(norm(nxt-pos), rad);
@@ -327,118 +328,34 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void color_not(Fiber const&, size_t, real)
-{
-}
-
-// defined in display.cc
-extern gle_color color_by_tension(Fiber const& fib, size_t seg);
-extern gle_color color_by_tension_jet(Fiber const& fib, size_t seg);
-
-void color_seg_tension(Fiber const& fib, size_t seg, real beta)
-{
-    real x = beta * fib.tension(seg);
-    fib.disp->color.load_front(x);
-}
-
-void color_seg_tension_jet(Fiber const& fib, size_t seg, real beta)
-{
-    real x = beta * fib.tension(seg);
-    // use jet coloring, where Lagrange multipliers are negative under compression
-    gle_color::jet_color_alpha(x).load_front();
-}
-
-void color_seg_curvature(Fiber const& fib, size_t seg, real beta)
-{
-    if ( fib.nbPoints() > 2 )
-    {
-        real c = fib.curvature(std::max(seg, 1LU));
-        real d = fib.curvature(std::min(seg+1, fib.lastSegment()));
-        gle_color::jet_color(beta*(c+d)).load_front();
-    }
-    else
-        gle_color::jet_color(0).load_front();
-}
-
-void color_seg_direction(Fiber const& fib, size_t seg, real)
-{
-    gle::radial_color(fib.dirSegment(seg)).load_front();
-}
-
-/// using distance from the minus end to the start of segment `seg`
-void color_seg_distanceM(Fiber const& fib, size_t seg, real beta)
-{
-    real x = std::min(seg*beta, (real)32.0);
-    fib.disp->color.load_front(std::exp(-x));
-}
-
-/// using distance from the plus end to the end of segment `seg`
-void color_seg_distanceP(Fiber const& fib, size_t seg, real beta)
-{
-    real x = std::min((fib.lastSegment()-seg)*beta, (real)32.0);
-    fib.disp->color.load_front(std::exp(-x));
-}
-
-/// color set according to distance to the confining Space
-void color_seg_height(Fiber const& fib, size_t seg, real beta)
-{
-    real Z = 0;
-    Space const* spc = fib.prop->confine_space_ptr;
-    if ( spc )
-        Z = -spc->signedDistanceToEdge(fib.posPoint(seg, 0.5));
-#if ( DIM > 2 )
-    else
-        Z = fib.posPoint(seg,0.5).ZZ;
-#endif
-    gle_color::jet_color(Z*beta).load_front();
-}
-
-
-/// color set according to steric grid
-void color_seg_grid(Fiber const& fib, size_t seg, real beta)
-{
-    Map<DIM> const& map = fib.simul().locusGrid.map();
-    Vector w = fib.posPoint(seg, 0.5);
-    size_t i = map.index(w);
-    gle::alt_color(i).load_front();
-}
-
-
 void Display3::drawFiberLines(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
 
     // set back color:
-    if ( fib.prop->disp->coloring )
+    if ( disp->coloring )
         fib.disp->color.load_back();
     else
-        fib.prop->disp->back_color.load_back();
+        disp->back_color.load_back();
     glEnable(GL_LIGHTING);
     
     switch ( disp->line_style )
     {
         case 1:
-            fib.disp->color.load_front();
-            drawFiberSegments(fib, rad, color_not, 1.0);
+            drawFiberSegments(fib, rad, color_fiber);
             break;
         case 2:
-        {
-            const real beta = 1 / disp->tension_scale;
-            drawFiberSegments(fib, rad, color_seg_tension, beta);
-        } break;
+            drawFiberSegments(fib, rad, color_by_tension);
+            break;
         case 3:
-        {
-            const real beta = 1 / disp->tension_scale;
-            drawFiberSegments(fib, rad, color_seg_tension_jet, beta);
-        } break;
+            drawFiberSegments(fib, rad, color_by_tension_jet);
+            break;
         case 4:
-        {
-            const real beta = 0.5 * fib.prop->disp->length_scale;
-            drawFiberSegments(fib, rad, color_seg_curvature, beta);
-        } break;
+            drawFiberSegments(fib, rad, color_seg_curvature);
+            break;
         case 5:
-            drawFiberSegments(fib, rad, color_seg_direction, 1.0);
+            drawFiberSegments(fib, rad, color_by_direction);
             break;
         case 6:
         {
@@ -446,8 +363,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
              but this code is only used in 2D normally, so it's okay */
             GLboolean cull = glIsEnabled(GL_CULL_FACE);
             glEnable(GL_CULL_FACE);
-            const real beta = fib.segmentation() / disp->length_scale;
-            drawFiberSegments(fib, rad, color_seg_distanceM, beta);
+            drawFiberSegments(fib, rad, color_by_abscissaM);
             if ( !cull ) glDisable(GL_CULL_FACE);
         } break;
         case 7:
@@ -457,17 +373,14 @@ void Display3::drawFiberLines(Fiber const& fib) const
             GLboolean cull = glIsEnabled(GL_CULL_FACE);
             glEnable(GL_CULL_FACE);
             glCullFace(GL_BACK);
-            const real beta = fib.segmentation() / disp->length_scale;
-            drawFiberSegments(fib, rad, color_seg_distanceP, beta);
+            drawFiberSegments(fib, rad, color_by_abscissaP);
             if ( !cull ) glDisable(GL_CULL_FACE);
         } break;
         case 8:
-        {
-            const real beta = 1 / disp->length_scale;
-            drawFiberSegments(fib, rad, color_seg_height, beta);
-        } break;
+            drawFiberSegments(fib, rad, color_by_height);
+            break;
         case 9:
-            drawFiberSegments(fib, rad, color_seg_grid, 1.0);
+            drawFiberSegments(fib, rad, color_by_grid);
             break;
     }
 }
@@ -490,9 +403,9 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     glEnable(GL_CULL_FACE);
     
     if ( disp->line_style == 6 )
-        color_seg_distanceM(fib, inx, fib.segmentation()/disp->length_scale);
+        color_by_abscissaM(fib, inx).load_front();
     else if ( disp->line_style == 7 )
-        color_seg_distanceP(fib, inx, fib.segmentation()/disp->length_scale);
+        color_by_abscissaP(fib, inx).load_front();
     else if ( disp->line_style == 2 )
         color_by_tension(fib, inx).load_front();
     else if ( disp->line_style == 3 )
@@ -511,7 +424,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
             if ( x < 1.0 )
             {
                 B = A + x * ( B - A );
-                color_seg_distanceM(fib, 0, 1);
+                color_by_abscissaM(fib, inx);
             }
         }
         setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, B);
@@ -534,7 +447,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
             if ( x < 1.0 )
             {
                 A = B + x * ( A - B );
-                color_seg_distanceP(fib, inx, 1.0);
+                color_by_abscissaP(fib, inx);
             }
         }
         setClipPlane(GL_CLIP_PLANE4, (B-A)*iseg, A);
@@ -563,48 +476,11 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
-
-
-void color_alternate(Fiber const& fib, long ix, real)
-{
-    if ( ix & 1 )
-        fib.disp->color.load_front();
-    else
-        fib.disp->color.darken(0.75).load_front();
-}
-
-
-void color_by_lattice(Fiber const& fib, long ix, real scale)
-{
-    real x = scale * fib.visibleLattice()->data(ix);
-    gle_color col = fib.disp->color.darken(x);
-    if ( col.transparent() )
-        col.load_both();
-    else
-        col.load_front();
-}
-
-
-void color_by_lattice_jet(Fiber const& fib, long ix, real scale)
-{
-    real x = scale * fib.visibleLattice()->data(ix);
-    gle_color::jet_color(x).load_front();
-}
-
-
-void color_by_lattice_stripe(Fiber const& fib, long ix, real scale)
-{
-    real x = scale * fib.visibleLattice()->data(ix);
-    if ( ix & 1 )
-        gle_color::jet_color(x).lighten(1.0625).load_front();
-    else
-        gle_color::jet_color(x).darken(0.9375).load_front();
-}
+#pragma mark - Display Lattice
 
 
 void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, real width,
-                                void (*set_color)(Fiber const&, long, real)) const
+                                gle_color (*select_color)(Fiber const&, long, real)) const
 {
     FiberDisp const*const disp = fib.prop->disp;
 
@@ -643,7 +519,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
         facP = ( lenP > 0.001*uni ? fac*uni/lenP : fac );
     }
 
-    drawFiberSubSegments(fib, rad, inf, sup, abs, uni, set_color, fac, facM, facP);
+    drawFiberSubSegments(fib, rad, inf, sup, abs, uni, select_color, fac, facM, facP);
 }
 
 
@@ -659,7 +535,7 @@ void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, re
 
 void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    drawFiberLattice(fib, lat, width, color_by_lattice_stripe);
+    drawFiberLattice(fib, lat, width, color_by_lattice_striped);
 }
 
 void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real width) const

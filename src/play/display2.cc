@@ -4,17 +4,18 @@
 #include "sim.h"
 #include "simul.h"
 #include "display2.h"
-#include "display_color.h"
 #include "modulo.h"
-
-#include "fake.h"
-#include "line_disp.h"
-#include "point_disp.h"
 
 #include "opengl.h"
 #include "gle.h"
 #include "gle_color_list.h"
 #include "glut.h"
+
+#include "fake.h"
+#include "line_disp.h"
+#include "point_disp.h"
+#include "fiber_disp.h"
+#include "display_color.h"
 
 using namespace gle;
 extern Modulo const* modulo;
