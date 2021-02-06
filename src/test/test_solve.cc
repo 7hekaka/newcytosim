@@ -64,7 +64,7 @@ void timerFunction(int value)
     
     f = ( pg - px );
     s = dot(pxn, f) / xn;
-    fx = 2.0 * s * pxn - f / xn;
+    fx = 2 * s * pxn - f / xn;
     
     //projector with its corrections due to the derivative of the constraints:
     C(0,0) = pxn[0] * fx[0] - s;

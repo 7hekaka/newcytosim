@@ -938,7 +938,7 @@ void Meca::addTorque(Mecapoint const& ptA,
     
 #if ( DIM == 2 )
     // small optimization in 2D, as the term (R+W)+(T+W) is diagonal
-    real dd = R.trace() - 2.0 * weight;
+    real dd = R.trace() - 2 * weight;
     add_block_diag(iiB, MatrixBlock(0, dd));
 #else
     add_block_diag(iiB, (R+W)+(T+W));
@@ -1081,7 +1081,7 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
 
 #if ( DIM == 2 )
     // in 2D, the term (R+W)+(T+W) is diagonal
-    real dd = R.trace() - 2.0 * weight;
+    real dd = R.trace() - 2 * weight;
     add_block_diag(iiB, wL+MatrixBlock(0,dd));
 #else
     add_block_diag(iiB, (R+W)+(T+W)+wL);

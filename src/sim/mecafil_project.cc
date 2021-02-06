@@ -159,9 +159,9 @@ void Mecafil::makeProjection()
         
         // this term should be 2.0, since iDir[] vectors are normalized:
 #if ( DIM == 2 )
-        iJJt[jj] = 2.0 * ( X[0]*X[0] + X[1]*X[1] );
+        iJJt[jj] = 2 * ( X[0]*X[0] + X[1]*X[1] );
 #else
-        iJJt[jj] = 2.0 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
+        iJJt[jj] = 2 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
 #endif
         // iJJt[jj]  = 2.0;
         
@@ -171,9 +171,9 @@ void Mecafil::makeProjection()
     const real* X = iDir + DIM*nbu;
     // this term should be 2, since iDir[] vectors are normalized
 #if ( DIM == 2 )
-    iJJt[nbu] = 2.0 * ( X[0]*X[0] + X[1]*X[1] );
+    iJJt[nbu] = 2 * ( X[0]*X[0] + X[1]*X[1] );
 #else
-    iJJt[nbu] = 2.0 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
+    iJJt[nbu] = 2 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
 #endif
     //iJJt[nbu] = 2.0;
 

@@ -110,9 +110,9 @@ real SpaceLid::volume() const
 #if ( DIM == 1 )
     return ( top_ - bot_ );
 #elif ( DIM == 2 )
-    return 2.0 * halflength_[0] * ( top_ - bot_ );
+    return 2 * halflength_[0] * ( top_ - bot_ );
 #else
-    return 4.0 * halflength_[0] * halflength_[1] * ( top_ - bot_ );
+    return 4 * halflength_[0] * halflength_[1] * ( top_ - bot_ );
 #endif
 }
 

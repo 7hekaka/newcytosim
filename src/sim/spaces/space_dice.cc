@@ -59,7 +59,7 @@ real SpaceDice::volume() const
 #if ( DIM == 1 )
     return 2 * length_[0];
 #elif ( DIM == 2 )
-    return 4.0 * length_[0]*length_[1] + (M_PI-4.0) * square(edge_);
+    return 4 * length_[0]*length_[1] + (M_PI-4.0) * square(edge_);
 #else
     return 8 * length_[0]*length_[1]*length_[2]
     + (2.0*M_PI-8.0) * ( length_[0] + length_[1] + length_[2] - 3 * edge_ ) * square(edge_)
@@ -73,9 +73,9 @@ real SpaceDice::surface() const
 #if ( DIM == 1 )
     return 2;
 #elif ( DIM == 2 )
-    return 4.0 * ( length_[0]+length_[1] ) + (2.0*M_PI-8.0) * edge_;
+    return 4 * ( length_[0]+length_[1] ) + (2.0*M_PI-8.0) * edge_;
 #else
-    return 8.0 * ( length_[0]*length_[1] + length_[0]*length_[2] + length_[1]*length_[2] )
+    return 8 * ( length_[0]*length_[1] + length_[0]*length_[2] + length_[1]*length_[2] )
     + (4.0*M_PI-16.0) * ( length_[0] + length_[1] + length_[2] - 3 * edge_ ) * edge_
     + (4.0*M_PI-24.0) * square(edge_);
 #endif

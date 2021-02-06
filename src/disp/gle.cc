@@ -46,7 +46,7 @@ namespace gle
     */
     void circle(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start)
     {
-        const double theta = 2.0 * M_PI / (double)cnt;
+        const double theta = 2 * M_PI / (double)cnt;
         const double c = std::cos(theta);
         const double s = std::sin(theta);
     
@@ -103,7 +103,7 @@ namespace gle
         // This assumes that 'GLfloat == float'
         return circleAVX(cnt, CS, rad, start);
 #endif
-        const double theta = 2.0 * M_PI / (double)cnt;
+        const double theta = 2 * M_PI / (double)cnt;
         const double c = std::cos(theta);
         const double s = std::sin(theta);
     
@@ -413,9 +413,9 @@ namespace gle
     void initTetrahedron(GLuint buf1, GLuint buf2, GLfloat R=1.2f)
     {
         const GLfloat S = R / M_SQRT3;
-        const GLfloat Y = 2.0 * S;
+        const GLfloat Y = 2 * S;
         const GLfloat B = -M_SQRT1_2 * S;
-        const GLfloat Z = -3.0 * B;
+        const GLfloat Z = -3 * B;
 
         // -R,-S, B
         // +R,-S, B
@@ -445,7 +445,7 @@ namespace gle
     void initStar(GLuint buf1, GLuint buf2, GLfloat R=1.2f)
     {
         const GLfloat S = R / M_SQRT3;
-        const GLfloat Y = 2.0 * S;
+        const GLfloat Y = 2 * S;
         const GLfloat B = -M_SQRT1_2 * S;
         const GLfloat Z = -3.0 * B;
 

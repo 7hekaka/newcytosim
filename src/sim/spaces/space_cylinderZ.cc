@@ -121,12 +121,12 @@ real SpaceCylinderZ::surface() const
     const real S0 = radius_ * LE;
     const real S1 = square(RE);
     const real S2 = M_PI * GC * edge_;
-    return ( 2.0 * M_PI ) * ( S0 + S1 + S2 );
+    return ( 2 * M_PI ) * ( S0 + S1 + S2 );
 #else
     // surface elements divided by 2 * M_PI:
     const real S0 = radius_ * ( top_ - bot_ );
     const real S1 = square(radius_);
-    return ( 2.0 * M_PI ) * ( S0 + S1 );
+    return ( 2 * M_PI ) * ( S0 + S1 );
 #endif
 }
 

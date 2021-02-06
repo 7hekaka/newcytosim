@@ -273,10 +273,10 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
 {
 #if ( DIM > 1 )
-    const real R2 = 2.0 * R1;
+    const real R2 = 2 * R1;
     for ( size_t d = 0; d < DIM; ++ d )
     {
-        real f = 2.0 * X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
+        real f = 2 * X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
         Y[A*DIM+d] += f * R1;
         Y[B*DIM+d] -= f * R2;
         Y[C*DIM+d] += f * R1;
