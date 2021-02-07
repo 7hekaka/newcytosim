@@ -63,9 +63,7 @@ namespace gle
     inline void gleVertex(Vector1 const& v)       { glVertex2d(v.XX, 0); }
     inline void gleVertex(Vector2 const& v)       { glVertex2d(v.XX, v.YY); }
     inline void gleVertex(Vector3 const& v)       { glVertex3d(v.XX, v.YY, v.ZZ); }
-    inline void gleVertex(real x, real y)         { glVertex2d(x, y); }
-    inline void gleVertex(real x, real y, real z) { glVertex3d(x, y, z); }
-    
+
     inline void gleNormal(Vector1 const& v)       { glNormal3d(v.XX, 0, 0); }
     inline void gleNormal(Vector2 const& v)       { glNormal3d(v.XX, v.YY, 0); }
     inline void gleNormal(Vector3 const& v)       { glNormal3d(v.XX, v.YY, v.ZZ); }
@@ -83,8 +81,6 @@ namespace gle
     inline void gleVertex(Vector1 const& v)       { glVertex2f(v.XX, 0); }
     inline void gleVertex(Vector2 const& v)       { glVertex2f(v.XX, v.YY); }
     inline void gleVertex(Vector3 const& v)       { glVertex3f(v.XX, v.YY, v.ZZ); }
-    inline void gleVertex(real x, real y)         { glVertex2f(x, y); }
-    inline void gleVertex(real x, real y, real z) { glVertex3f(x, y, z); }
 
     inline void gleNormal(Vector1 const& v)       { glNormal3f(v.XX, 0, 0); }
     inline void gleNormal(Vector2 const& v)       { glNormal3f(v.XX, v.YY, 0); }

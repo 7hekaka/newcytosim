@@ -117,42 +117,40 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 #include "opengl.h"
-#include "gle.h"
-using namespace gle;
 
 void SpacePeriodic::draw3D() const
 {
-    const real X = halflength_[0];
-    const real Y = ( DIM > 1 ) ? halflength_[1] : 1;
-    const real Z = ( DIM > 2 ) ? halflength_[2] : 0;
+    const GLfloat X = halflength_[0];
+    const GLfloat Y = ( DIM > 1 ) ? halflength_[1] : 1;
+    const GLfloat Z = ( DIM > 2 ) ? halflength_[2] : 0;
     
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
 
 #if ( DIM == 1 )
     glBegin(GL_LINES);
-    gleVertex(  X, -Y, 0 );
-    gleVertex(  X,  Y, 0 );
-    gleVertex( -X,  Y, 0 );
-    gleVertex( -X, -Y, 0 );
+    glVertex3f( X, -Y, 0 );
+    glVertex3f( X,  Y, 0 );
+    glVertex3f(-X,  Y, 0 );
+    glVertex3f(-X, -Y, 0 );
     glEnd();
 #endif
     
 #if ( DIM > 1 )
     glBegin(GL_LINE_LOOP);
-    gleVertex(  X,  Y, Z );
-    gleVertex(  X, -Y, Z );
-    gleVertex( -X, -Y, Z );
-    gleVertex( -X,  Y, Z );
+    glVertex3f( X,  Y, Z );
+    glVertex3f( X, -Y, Z );
+    glVertex3f(-X, -Y, Z );
+    glVertex3f(-X,  Y, Z );
     glEnd();
 #endif
 
 #if ( DIM > 2 )
     glBegin(GL_LINE_LOOP);
-    gleVertex(  X,  Y, -Z );
-    gleVertex(  X, -Y, -Z );
-    gleVertex( -X, -Y, -Z );
-    gleVertex( -X,  Y, -Z );
+    glVertex3f( X,  Y, -Z );
+    glVertex3f( X, -Y, -Z );
+    glVertex3f(-X, -Y, -Z );
+    glVertex3f(-X,  Y, -Z );
     glEnd();
 #endif
 

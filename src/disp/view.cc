@@ -788,22 +788,25 @@ void View::drawText(std::string const& str, void* font, gle_color col, int pos) 
 
 void View::drawCuboid(Vector3 const& A, Vector3 const& B)
 {
+    GLfloat AX = A.XX, AY = A.YY, AZ = A.ZZ;
+    GLfloat BX = B.XX, BY = B.YY, BZ = B.ZZ;
+
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_LIGHTING);
     glLineWidth(0.5);
-
+    
     glBegin(GL_LINE_LOOP);
-    gleVertex(A.XX, A.YY, A.ZZ);
-    gleVertex(B.XX, A.YY, A.ZZ);
-    gleVertex(B.XX, B.YY, A.ZZ);
-    gleVertex(A.XX, B.YY, A.ZZ);
+    glVertex3f(AX, AY, AZ);
+    glVertex3f(BX, AY, AZ);
+    glVertex3f(BX, BY, AZ);
+    glVertex3f(AX, BY, AZ);
     glEnd();
 
     glBegin(GL_LINE_LOOP);
-    gleVertex(A.XX, A.YY, B.ZZ);
-    gleVertex(B.XX, A.YY, B.ZZ);
-    gleVertex(B.XX, B.YY, B.ZZ);
-    gleVertex(A.XX, B.YY, B.ZZ);
+    glVertex3f(AX, AY, BZ);
+    glVertex3f(BX, AY, BZ);
+    glVertex3f(BX, BY, BZ);
+    glVertex3f(AX, BY, BZ);
     glEnd();
 
     glPopAttrib();

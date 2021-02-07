@@ -116,10 +116,10 @@ void drawValues(Grid<CELL, 3> const& grid,
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(w.XX-d, w.YY-e, zzz);
-            gle::gleVertex(w.XX+d, w.YY-e, zzz);
-            gle::gleVertex(w.XX-d, w.YY+e, zzz);
-            gle::gleVertex(w.XX+d, w.YY+e, zzz);
+            glVertex3f(w.XX-d, w.YY-e, zzz);
+            glVertex3f(w.XX+d, w.YY-e, zzz);
+            glVertex3f(w.XX-d, w.YY+e, zzz);
+            glVertex3f(w.XX+d, w.YY+e, zzz);
             glEnd();
         }
     }
@@ -152,10 +152,10 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(w.XX-d, yyy, w.ZZ-e);
-            gle::gleVertex(w.XX+d, yyy, w.ZZ-e);
-            gle::gleVertex(w.XX-d, yyy, w.ZZ+e);
-            gle::gleVertex(w.XX+d, yyy, w.ZZ+e);
+            glVertex3f(w.XX-d, yyy, w.ZZ-e);
+            glVertex3f(w.XX+d, yyy, w.ZZ-e);
+            glVertex3f(w.XX-d, yyy, w.ZZ+e);
+            glVertex3f(w.XX+d, yyy, w.ZZ+e);
             glEnd();
         }
     }
@@ -188,10 +188,10 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
         if ( set_color(arg, grid.icell3D(x,y,z), w) )
         {
             glBegin(GL_TRIANGLE_STRIP);
-            gle::gleVertex(xxx, w.YY-d, w.ZZ-e);
-            gle::gleVertex(xxx, w.YY+d, w.ZZ-e);
-            gle::gleVertex(xxx, w.YY-d, w.ZZ+e);
-            gle::gleVertex(xxx, w.YY+d, w.ZZ+e);
+            glVertex3f(xxx, w.YY-d, w.ZZ-e);
+            glVertex3f(xxx, w.YY+d, w.ZZ-e);
+            glVertex3f(xxx, w.YY-d, w.ZZ+e);
+            glVertex3f(xxx, w.YY+d, w.ZZ+e);
             glEnd();
         }
     }

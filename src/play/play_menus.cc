@@ -282,16 +282,6 @@ static int buildMenuSingleSelect()
     return menuID;
 }
 
-static int buildSubMenu8()
-{
-    static int menuID = 0;
-    if ( menuID == 0 ) {
-        menuID = glutCreateMenu(processMenuSingleSelect);
-        glutAddMenuEntry("-", 0);
-    }
-    return menuID;
-}
-
 
 //------------------------------------------------------------------------------
 

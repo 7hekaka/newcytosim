@@ -1463,10 +1463,10 @@ namespace gle
                   Vector1 const& B, real rB)
     {
         glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(A.XX,+rA);
-        gleVertex(A.XX,-rA);
-        gleVertex(B.XX,+rB);
-        gleVertex(B.XX,-rB);
+        glVertex2f(A.XX,+rA);
+        glVertex2f(A.XX,-rA);
+        glVertex2f(B.XX,+rB);
+        glVertex2f(B.XX,-rB);
         glEnd();
     }
     
@@ -1492,11 +1492,11 @@ namespace gle
     {
         glBegin(GL_TRIANGLE_STRIP);
         ca.load();
-        gleVertex(a.XX,-ra);
-        gleVertex(a.XX,+ra);
+        glVertex2f(a.XX,-ra);
+        glVertex2f(a.XX,+ra);
         cb.load();
-        gleVertex(b.XX,-rb);
-        gleVertex(b.XX,+rb);
+        glVertex2f(b.XX,-rb);
+        glVertex2f(b.XX,+rb);
         glEnd();
     }
     
@@ -1684,10 +1684,10 @@ namespace gle
     {
         GLfloat dx = rad*dir.XX, cx = pos.XX;
         glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(cx-dx   , dx);
-        gleVertex(cx-dx/2 , 0 );
-        gleVertex(cx+dx+dx, 0 );
-        gleVertex(cx-dx   ,-dx);
+        glVertex2f(cx-dx   , dx);
+        glVertex2f(cx-dx/2 , 0 );
+        glVertex2f(cx+dx+dx, 0 );
+        glVertex2f(cx-dx   ,-dx);
         glEnd();
     }
     
@@ -1696,10 +1696,10 @@ namespace gle
         GLfloat dx = rad*dir.XX,  cx = pos.XX;
         GLfloat dy = rad*dir.YY,  cy = pos.YY;
         glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(cx-dx-dy, cy-dy+dx);
-        gleVertex(cx-dx/2,  cy-dy/2 );
-        gleVertex(cx+dx+dx, cy+dy+dy);
-        gleVertex(cx-dx+dy, cy-dy-dx);
+        glVertex2f(cx-dx-dy, cy-dy+dx);
+        glVertex2f(cx-dx/2,  cy-dy/2 );
+        glVertex2f(cx+dx+dx, cy+dy+dy);
+        glVertex2f(cx-dx+dy, cy-dy-dx);
         glEnd();
     }
     
@@ -1718,10 +1718,10 @@ namespace gle
         real cx = pos.XX;
         glBegin(GL_TRIANGLE_STRIP);
         real dx = rad * dir.XX / 2;
-        gleVertex( cx-dx, -rad );
-        gleVertex( cx-dx,  rad );
-        gleVertex( cx+dx, -rad );
-        gleVertex( cx+dx,  rad );
+        glVertex2f( cx-dx, -rad );
+        glVertex2f( cx-dx,  rad );
+        glVertex2f( cx+dx, -rad );
+        glVertex2f( cx+dx,  rad );
         glEnd();
     }
     
@@ -1730,10 +1730,10 @@ namespace gle
         real dx = rad * dir.XX, cx = pos.XX - dx / 2;
         real dy = rad * dir.YY, cy = pos.YY - dy / 2;
         glBegin(GL_TRIANGLE_STRIP);
-        gleVertex( cx+dy, cy-dx );
-        gleVertex( cx-dy, cy+dx );
-        gleVertex( cx+dx+dy, cy+dy-dx );
-        gleVertex( cx+dx-dy, cy+dy+dx );
+        glVertex2f( cx+dy, cy-dx );
+        glVertex2f( cx-dy, cy+dx );
+        glVertex2f( cx+dx+dy, cy+dy-dx );
+        glVertex2f( cx+dx-dy, cy+dy+dx );
         glEnd();
     }
     

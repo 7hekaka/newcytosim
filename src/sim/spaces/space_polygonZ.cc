@@ -237,13 +237,13 @@ void SpacePolygonZ::drawZ(bool rings) const
         glLineWidth(0.5);
         for ( size_t n=0; n < npts; n++ )
         {
-            real R = pts[n].xx;
-            real Z = pts[n].yy;
+            GLfloat R = pts[n].xx;
+            GLfloat Z = pts[n].yy;
             if ( R > 0 )
             {
                 glBegin(GL_LINE_LOOP);
                 for ( size_t p = 0; p <= fin; ++p )
-                    gle::gleVertex( R*c[p], R*s[p], Z );
+                    glVertex3f(R*c[p], R*s[p], Z);
                 glEnd();
             }
         }

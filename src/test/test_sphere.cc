@@ -8,6 +8,8 @@
 #include "glut.h"
 #include "gle.h"
 
+using namespace gle;
+
 SphericalCode S, T;
 SphericalCode * front = &S;
 
@@ -130,9 +132,9 @@ void display(View&, int)
         Vector3 p(front->addr(ii));
         Vector3 n = p.orthogonal();
         glColor3f(1.f, 1.f, 1.f);
-        gle::gleVertex(p);
+        gleVertex(p);
         glColor3f(0.f, 0.f, 0.f);
-        gle::gleVertex(p+0.1*n);
+        gleVertex(p+0.1*n);
     }
     glEnd();
 #else
@@ -146,13 +148,13 @@ void display(View&, int)
         a.orthonormal(b,c);
         
         glColor3f(0.f, 1.f, 0.f);
-        gle::gleVertex(a);
+        gleVertex(a);
         glColor3f(0.f, 0.f, 0.f);
-        gle::gleVertex(a+e*b);
+        gleVertex(a+e*b);
         glColor3f(0.f, 0.f, 1.f);
-        gle::gleVertex(a);
+        gleVertex(a);
         glColor3f(0.f, 0.f, 0.f);
-        gle::gleVertex(a+e*c);
+        gleVertex(a+e*c);
     }
     glEnd();
 #endif

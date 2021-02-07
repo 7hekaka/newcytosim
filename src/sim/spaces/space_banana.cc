@@ -171,22 +171,22 @@ void SpaceBanana::draw2D() const
     // lower swing
     gle::arc(fin, c, s, bRadius+bWidth, A-M_PI, B, bCenter[0], bCenter[1]);
     for ( size_t i = 0; i < fin; ++i )
-        gleVertex(c[i], s[i], 0);
+        glVertex2f(c[i], s[i]);
     
     // right cap
     gle::arc(fin, c, s, bWidth, B, B+M_PI, bEnd[0], bEnd[1]);
     for ( size_t i = 0; i < fin; ++i )
-        gleVertex(c[i], s[i], 0);
+        glVertex2f(c[i], s[i]);
     
     // upper swing
     gle::arc(fin, c, s, bRadius-bWidth, B, A-M_PI, bCenter[0], bCenter[1]);
     for ( size_t i = 0; i < fin; ++i )
-        gleVertex(c[i], s[i], 0);
+        glVertex2f(c[i], s[i]);
         
     // left cap
     gle::arc(fin, c, s, bWidth, A, A+M_PI, -bEnd[0], bEnd[1]);
     for ( size_t i = 0; i < fin; ++i )
-        gleVertex(c[i], s[i], 0);
+        glVertex2f(c[i], s[i]);
 
     glEnd();
 }

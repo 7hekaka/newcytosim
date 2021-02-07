@@ -316,7 +316,7 @@ void SpacePolygon::drawPoints() const
     glPointSize(3);
     glBegin(GL_POINTS);
     for ( size_t n=0; n < npts; ++n )
-        gle::gleVertex(pts[n].xx, pts[n].yy);
+        glVertex2f(pts[n].xx, pts[n].yy);
     glEnd();
 #if ( 0 )
     // indicate index of each point:
@@ -347,13 +347,13 @@ void SpacePolygon::draw2D() const
     glPointSize(s);
     glBegin(GL_POINTS);
     for ( size_t n=0; n < npts; ++n )
-        gle::gleVertex(pts[n].xx, pts[n].yy);
+        glVertex2f(pts[n].xx, pts[n].yy);
     glEnd();
 
     //display polygon
     glBegin(GL_LINE_LOOP);
     for ( size_t n=0; n < npts; ++n )
-        gle::gleVertex(pts[n].xx, pts[n].yy);
+        glVertex2f(pts[n].xx, pts[n].yy);
     glEnd();
     
     glClear(GL_STENCIL_BUFFER_BIT);
@@ -369,13 +369,13 @@ void SpacePolygon::draw3D() const
     glLineWidth(2);
     glBegin(GL_LINE_LOOP);
     for ( size_t n=0; n < npts; ++n )
-        gle::gleVertex(pts[n].xx, pts[n].yy, -height_);
+        glVertex3f(pts[n].xx, pts[n].yy, -height_);
     glEnd();
     
     // display top
     glBegin(GL_LINE_LOOP);
     for ( size_t n=npts; n > 0; --n )
-        gle::gleVertex(pts[n].xx, pts[n].yy,  height_);
+        glVertex3f(pts[n].xx, pts[n].yy,  height_);
     glEnd();
     
     // display sides
@@ -383,13 +383,13 @@ void SpacePolygon::draw3D() const
     glBegin(GL_TRIANGLE_STRIP);
     for ( size_t n=0; n < npts; ++n )
     {
-        gle::gleVertex(pts[n].xx, pts[n].yy, Z);
-        gle::gleVertex(pts[n].xx, pts[n].yy,-Z);
+        glVertex3f(pts[n].xx, pts[n].yy, Z);
+        glVertex3f(pts[n].xx, pts[n].yy,-Z);
     }
     if ( 0 < npts )
     {
-        gle::gleVertex(pts[0].xx, pts[0].yy, Z);
-        gle::gleVertex(pts[0].xx, pts[0].yy,-Z);
+        glVertex3f(pts[0].xx, pts[0].yy, Z);
+        glVertex3f(pts[0].xx, pts[0].yy,-Z);
     }
     glEnd();
 }

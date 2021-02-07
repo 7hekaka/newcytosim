@@ -306,8 +306,6 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 #include "opengl.h"
-#include "gle.h"
-using namespace gle;
 
 void SpaceDice::draw2D() const
 {
@@ -316,54 +314,54 @@ void SpaceDice::draw2D() const
 
 void SpaceDice::draw3D() const
 {
-    const real X = length_[0] - edge_;
-    const real Y = length_[1] - edge_;
-    const real Z = length_[2] - edge_;
+    const GLfloat X = length_[0] - edge_;
+    const GLfloat Y = length_[1] - edge_;
+    const GLfloat Z = length_[2] - edge_;
  
-    const real XR = length_[0];
-    const real YR = length_[1];
-    const real ZR = length_[2];
+    const GLfloat XR = length_[0];
+    const GLfloat YR = length_[1];
+    const GLfloat ZR = length_[2];
 
     glBegin(GL_TRIANGLE_STRIP);
-    gleVertex(  XR,  Y, -Z );
-    gleVertex(  XR,  Y,  Z );
-    gleVertex(  XR, -Y, -Z );
-    gleVertex(  XR, -Y,  Z );
+    glVertex3f( XR,  Y, -Z );
+    glVertex3f( XR,  Y,  Z );
+    glVertex3f( XR, -Y, -Z );
+    glVertex3f( XR, -Y,  Z );
     glEnd();
     
     glBegin(GL_TRIANGLE_STRIP);
-    gleVertex( -XR, -Y, -Z );
-    gleVertex( -XR, -Y,  Z );
-    gleVertex( -XR,  Y, -Z );
-    gleVertex( -XR,  Y,  Z );
+    glVertex3f(-XR, -Y, -Z );
+    glVertex3f(-XR, -Y,  Z );
+    glVertex3f(-XR,  Y, -Z );
+    glVertex3f(-XR,  Y,  Z );
     glEnd();
     
     glBegin(GL_TRIANGLE_STRIP);
-    gleVertex(  X,  YR, -Z );
-    gleVertex( -X,  YR, -Z );
-    gleVertex(  X,  YR,  Z );
-    gleVertex( -X,  YR,  Z );
+    glVertex3f( X,  YR, -Z );
+    glVertex3f(-X,  YR, -Z );
+    glVertex3f( X,  YR,  Z );
+    glVertex3f(-X,  YR,  Z );
     glEnd();
     
     glBegin(GL_TRIANGLE_STRIP);
-    gleVertex(  X, -YR,  Z );
-    gleVertex( -X, -YR,  Z );
-    gleVertex(  X, -YR, -Z );
-    gleVertex( -X, -YR, -Z );
+    glVertex3f( X, -YR,  Z );
+    glVertex3f(-X, -YR,  Z );
+    glVertex3f( X, -YR, -Z );
+    glVertex3f(-X, -YR, -Z );
     glEnd();
     
     glBegin(GL_TRIANGLE_STRIP);
-    gleVertex(  X,  Y,  ZR );
-    gleVertex( -X,  Y,  ZR );
-    gleVertex(  X, -Y,  ZR );
-    gleVertex( -X, -Y,  ZR );
+    glVertex3f( X,  Y,  ZR );
+    glVertex3f(-X,  Y,  ZR );
+    glVertex3f( X, -Y,  ZR );
+    glVertex3f(-X, -Y,  ZR );
     glEnd();
     
     glBegin(GL_TRIANGLE_STRIP);
-    gleVertex(  X,  Y, -ZR );
-    gleVertex(  X, -Y, -ZR );
-    gleVertex( -X,  Y, -ZR );
-    gleVertex( -X, -Y, -ZR );
+    glVertex3f( X,  Y, -ZR );
+    glVertex3f( X, -Y, -ZR );
+    glVertex3f(-X,  Y, -ZR );
+    glVertex3f(-X, -Y, -ZR );
     glEnd();
     
     glDisable(GL_LIGHTING);

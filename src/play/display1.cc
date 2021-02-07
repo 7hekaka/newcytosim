@@ -404,11 +404,11 @@ inline void shiftedVertex(Vector const& pos, const Fiber * fib)
 {
     real shift = fib->disp->explode_shift;
 #if ( DIM == 3 )
-    gle::gleVertex(pos.XX, pos.YY+shift, pos.ZZ);
+    glVertex3f(pos.XX, pos.YY+shift, pos.ZZ);
 #elif ( DIM == 2 )
-    gle::gleVertex(pos.XX, pos.YY+shift);
+    glVertex2f(pos.XX, pos.YY+shift);
 #else
-    gle::gleVertex(pos.XX, shift);
+    glVertex2f(pos.XX, shift);
 #endif
 }
 
@@ -540,7 +540,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
         {
 #if ENABLE_EXPLODE_DISPLAY && ( DIM == 1 )
             obj->disp()->color2.load();
-            gleVertex(obj->posFoot().XX, obj->signature() * 0x1p-28 - 4);
+            glVertex2f(obj->posFoot().XX, obj->signature() * 0x1p-28 - 4);
 #else
             drawVertex(obj->posFoot(), obj->disp());
 #endif
@@ -598,7 +598,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
             if ( disp->perceptible )
             {
                 disp->color2.load();
-                gleVertex(obj->posFree().XX, obj->signature() * 0x1p-28 - 8);
+                glVertex2f(obj->posFree().XX, obj->signature() * 0x1p-28 - 8);
             }
 #else
             drawVertex(obj->posFree(), obj->disp1());

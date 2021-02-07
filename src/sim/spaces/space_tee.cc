@@ -427,34 +427,34 @@ void SpaceTee::draw2D() const
     
     glBegin(GL_LINE_LOOP);
     //the upper side from the tJunction to the left
-    gleVertex(  tJunction-tRadius, tRadius, 0 );
-    gleVertex( -tLength,          tRadius, 0 );
+    glVertex3f( tJunction-tRadius, tRadius, 0);
+    glVertex3f(-tLength,           tRadius, 0);
     
     //the left cap
     for ( size_t n = 0; n < fin; ++n )
-        gleVertex( -tLength-s[n], c[n], 0 );
+        glVertex3f( -tLength-s[n], c[n], 0 );
     
     //the lower side from left to right
-    gleVertex( -tLength, -tRadius, 0 );
-    gleVertex(  tLength, -tRadius, 0 );
+    glVertex3f(-tLength,-tRadius, 0);
+    glVertex3f( tLength,-tRadius, 0);
     
     //the right cap
     for ( size_t n = 0; n < fin; ++n )
-        gleVertex( tLength+s[n], -c[n], 0 );
+        glVertex3f( tLength+s[n], -c[n], 0);
     
     //the upper side from the right to the tJunction
-    gleVertex( tLength,          tRadius, 0 );
-    gleVertex( tJunction+tRadius, tRadius, 0 );
+    glVertex3f(tLength,          tRadius, 0);
+    glVertex3f(tJunction+tRadius, tRadius, 0);
     
     //the right side of the arm
-    gleVertex( tJunction+tRadius, tRadius+tArmLength, 0 );
+    glVertex3f(tJunction+tRadius, tRadius+tArmLength, 0);
     
     //the cap of the arm
     for ( size_t n = 0; n < fin; ++n )
-        gleVertex( tJunction+c[n], tArmLength+tRadius+s[n], 0 );
+        glVertex3f(tJunction+c[n], tArmLength+tRadius+s[n], 0);
     
     //the left side of the arm
-    gleVertex( tJunction-tRadius, tRadius+tArmLength, 0 );
+    glVertex3f(tJunction-tRadius, tRadius+tArmLength, 0);
 
     glEnd();
 }

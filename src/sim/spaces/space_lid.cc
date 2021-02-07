@@ -271,30 +271,28 @@ void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 #include "opengl.h"
-#include "gle.h"
-using namespace gle;
 
 void SpaceLid::draw2D() const
 {
-    const real X = halflength_[0];
-    const real T = top_;
-    const real B = bot_;
+    const GLfloat X = halflength_[0];
+    const GLfloat T = top_;
+    const GLfloat B = bot_;
     
     glBegin(GL_LINES);
-    gleVertex(-X, T, 0);
-    gleVertex( X, T, 0);
-    gleVertex( X, B, 0);
-    gleVertex(-X, B, 0);
+    glVertex3f(-X, T, 0);
+    glVertex3f( X, T, 0);
+    glVertex3f( X, B, 0);
+    glVertex3f(-X, B, 0);
     glEnd();
     
     // draw periodic boundaries:
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
-    gleVertex( X, T, 0);
-    gleVertex( X, B, 0);
-    gleVertex(-X, T, 0);
-    gleVertex(-X, B, 0);
+    glVertex3f( X, T, 0);
+    glVertex3f( X, B, 0);
+    glVertex3f(-X, T, 0);
+    glVertex3f(-X, B, 0);
     glEnd();
     glDisable(GL_LINE_STIPPLE);
 }
@@ -309,46 +307,46 @@ void SpaceLid::draw3D() const
     // draw faces:
     glBegin(GL_TRIANGLE_STRIP);
     glNormal3f(0, 0, 1);
-    gleVertex(-X,  Y, B);
-    gleVertex( X,  Y, B);
-    gleVertex(-X, -Y, B);
-    gleVertex( X, -Y, B);
+    glVertex3f(-X,  Y, B);
+    glVertex3f( X,  Y, B);
+    glVertex3f(-X, -Y, B);
+    glVertex3f( X, -Y, B);
     glEnd();
     glBegin(GL_TRIANGLE_STRIP);
     glNormal3f(0, 0, -1);
-    gleVertex(-X,  Y, T);
-    gleVertex(-X, -Y, T);
-    gleVertex( X,  Y, T);
-    gleVertex( X, -Y, T);
+    glVertex3f(-X,  Y, T);
+    glVertex3f(-X, -Y, T);
+    glVertex3f( X,  Y, T);
+    glVertex3f( X, -Y, T);
     glEnd();
     // draw outline:
     glBegin(GL_LINE_STRIP);
-    gleVertex(-X,  Y, B);
-    gleVertex( X,  Y, B);
-    gleVertex( X, -Y, B);
-    gleVertex(-X, -Y, B);
-    gleVertex(-X,  Y, B);
+    glVertex3f(-X,  Y, B);
+    glVertex3f( X,  Y, B);
+    glVertex3f( X, -Y, B);
+    glVertex3f(-X, -Y, B);
+    glVertex3f(-X,  Y, B);
     glEnd();
     glBegin(GL_LINE_STRIP);
-    gleVertex(-X,  Y, T);
-    gleVertex(-X, -Y, T);
-    gleVertex( X, -Y, T);
-    gleVertex( X,  Y, T);
-    gleVertex(-X,  Y, T);
+    glVertex3f(-X,  Y, T);
+    glVertex3f(-X, -Y, T);
+    glVertex3f( X, -Y, T);
+    glVertex3f( X,  Y, T);
+    glVertex3f(-X,  Y, T);
     glEnd();
     
     // draw periodic boundaries:
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
     glBegin(GL_LINES);
-    gleVertex( X,  Y, T);
-    gleVertex( X,  Y, B);
-    gleVertex( X, -Y, T);
-    gleVertex( X, -Y, B);
-    gleVertex(-X,  Y, T);
-    gleVertex(-X,  Y, B);
-    gleVertex(-X, -Y, T);
-    gleVertex(-X, -Y, B);
+    glVertex3f( X,  Y, T);
+    glVertex3f( X,  Y, B);
+    glVertex3f( X, -Y, T);
+    glVertex3f( X, -Y, B);
+    glVertex3f(-X,  Y, T);
+    glVertex3f(-X,  Y, B);
+    glVertex3f(-X, -Y, T);
+    glVertex3f(-X, -Y, B);
     glEnd();
     glDisable(GL_LINE_STIPPLE);
 }
