@@ -189,8 +189,8 @@ void glApp::maximizeDisplay()
     const int maxW = s * glutGet(GLUT_SCREEN_WIDTH);
     const int maxH = s * ( glutGet(GLUT_SCREEN_HEIGHT) - 49 );
     
-    const GLfloat zx = GLfloat(maxW) / W;
-    const GLfloat zy = GLfloat(maxH) / H;
+    const GLfloat zx(maxW / W);
+    const GLfloat zy(maxH / H);
     
     glutPositionWindow(0, 45);
     if ( zx < zy )

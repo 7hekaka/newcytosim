@@ -1000,8 +1000,8 @@ void View::drawScaleBar(int mode, const real scale) const
     glPushMatrix();
     glLoadIdentity();
     
-    GLfloat shift = 32 * pixelSize() * zoom;
-    GLfloat S = (GLfloat)scale;
+    GLfloat shift(32 * pixelSize() * zoom);
+    GLfloat S(scale);
     
     switch( mode )
     {

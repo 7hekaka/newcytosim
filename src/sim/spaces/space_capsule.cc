@@ -258,20 +258,20 @@ void SpaceCapsule::draw2D() const
     //number of sections in the quarter-circle
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     
-    GLfloat c[4*fin+1], s[4*fin+1];
-    gle::circle(4*fin, c, s, 1);
+    GLfloat cir[8*fin+2];
+    gle::compute_circle(fin*4, cir, 1);
     
-    const GLfloat L = (GLfloat)length_;
-    const GLfloat R = (GLfloat)radius_;
+    const GLfloat L(length_);
+    const GLfloat R(radius_);
     
     //display a loop in X/Y plane
     glBegin(GL_LINE_LOOP);
     
     for ( size_t n = 0;     n <= 2*fin; ++n )
-        glVertex2f(R*s[n]+L, R*c[n]);
+        glVertex2f(R*cir[1+2*n]+L, R*cir[2*n]);
     
     for ( size_t n = 2*fin; n <= 4*fin; ++n )
-        glVertex2f(R*s[n]-L, R*c[n]);
+        glVertex2f(R*cir[1+2*n]-L, R*cir[2*n]);
     
     glEnd();
 }
@@ -282,18 +282,18 @@ void SpaceCapsule::draw3D() const
     //number of sections in the quarter-circle
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     
-    GLfloat c[4*fin+1], s[4*fin+1];
-    gle::circle(4*fin, c, s, 1);
+    GLfloat cir[8*fin+2];
+    gle::compute_circle(fin*4, cir, 1);
     
-    const GLfloat L = (GLfloat)length_;
-    const GLfloat R = (GLfloat)radius_;
+    const GLfloat L(length_);
+    const GLfloat R(radius_);
     
     //display strips along the side of the volume:
     for ( size_t t = 0; t < 4*fin; ++t )
     {
         //compute the transverse angles:
-        GLfloat cb = c[t  ], sb = s[t  ];
-        GLfloat ca = c[t+1], sa = s[t+1];
+        GLfloat cb = cir[2*t  ], sb = cir[1+2*t];
+        GLfloat ca = cir[2*t+2], sa = cir[3+2*t];
         GLfloat cB = R * cb, sB = R * sb;
         GLfloat cA = R * ca, sA = R * sa;
         
@@ -301,7 +301,7 @@ void SpaceCapsule::draw3D() const
         glBegin(GL_TRIANGLE_STRIP);
         for ( size_t i=0; i <= fin; ++i )
         {
-            GLfloat x = c[i], y = s[i];
+            GLfloat x = cir[2*i], y = cir[1+2*i];
             glNormal3f(     x, ca*y, sa*y);
             glVertex3f(+L+R*x, cA*y, sA*y);
             glNormal3f(     x, cb*y, sb*y);
@@ -309,7 +309,7 @@ void SpaceCapsule::draw3D() const
         }
         for ( int i=fin; i >= 0; --i)
         {
-            GLfloat x = -c[i], y = s[i];
+            GLfloat x = -cir[2*i], y = cir[1+2*i];
             glNormal3f(     x, ca*y, sa*y);
             glVertex3f(-L+R*x, cA*y, sA*y);
             glNormal3f(     x, cb*y, sb*y);

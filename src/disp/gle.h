@@ -38,61 +38,55 @@ namespace gle
     /// initialize more buffer objects
     void initBuffers();
     
-    /// calculate sinus and cosinus for a circle
-    void circle(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start = 0);
-    
     /// calculate sinus and cosinus
-    void circle(size_t cnt, GLfloat CS[], double rad, double start = 0);
+    void compute_circle(size_t cnt, GLfloat CS[], double rad, double start = 0);
 
     /// calculate sinus and cosinus for a circular arc
-    void arc(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start, double end, GLfloat cenx, GLfloat ceny);
+    void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double end, GLfloat cx, GLfloat cy);
 
 #pragma mark -
     
-    inline void scale(float x)                          { glScalef(x,x,x); }
-    inline void scale(double x)                         { glScaled(x,x,x); }
-
-    inline void scale(float x, float y, float z)        { glScalef(x,y,z); }
-    inline void scale(double x, double y, double z)     { glScaled(x,y,z); }
+    inline void scale(float x)  { glScalef(x,x,x); }
+    inline void scale(double x) { glScaled(x,x,x); }
    
     inline void translate(float x, float y, float z)    { glTranslatef(x, y, z); }
     inline void translate(double x, double y, double z) { glTranslated(x, y, z); }
 
 #if REAL_IS_DOUBLE
     
-    inline void gleVertex(Vector1 const& v)       { glVertex2d(v.XX, 0); }
-    inline void gleVertex(Vector2 const& v)       { glVertex2d(v.XX, v.YY); }
-    inline void gleVertex(Vector3 const& v)       { glVertex3d(v.XX, v.YY, v.ZZ); }
+    inline void gleVertex(Vector1 const& v) { glVertex2d(v.XX, 0); }
+    inline void gleVertex(Vector2 const& v) { glVertex2d(v.XX, v.YY); }
+    inline void gleVertex(Vector3 const& v) { glVertex3d(v.XX, v.YY, v.ZZ); }
 
-    inline void gleNormal(Vector1 const& v)       { glNormal3d(v.XX, 0, 0); }
-    inline void gleNormal(Vector2 const& v)       { glNormal3d(v.XX, v.YY, 0); }
-    inline void gleNormal(Vector3 const& v)       { glNormal3d(v.XX, v.YY, v.ZZ); }
+    inline void gleNormal(Vector1 const& v) { glNormal3d(v.XX, 0, 0); }
+    inline void gleNormal(Vector2 const& v) { glNormal3d(v.XX, v.YY, 0); }
+    inline void gleNormal(Vector3 const& v) { glNormal3d(v.XX, v.YY, v.ZZ); }
     
-    inline void translate(Vector1 const& v)       { glTranslated(v.XX, 0, 0); }
-    inline void translate(Vector2 const& v)       { glTranslated(v.XX, v.YY, 0); }
-    inline void translate(Vector3 const& v)       { glTranslated(v.XX, v.YY, v.ZZ); }
+    inline void translate(Vector1 const& v) { glTranslated(v.XX, 0, 0); }
+    inline void translate(Vector2 const& v) { glTranslated(v.XX, v.YY, 0); }
+    inline void translate(Vector3 const& v) { glTranslated(v.XX, v.YY, v.ZZ); }
 
-    inline void rasterPos(Vector1 const& v)       { glRasterPos2d(v.XX, 0); }
-    inline void rasterPos(Vector2 const& v)       { glRasterPos2d(v.XX, v.YY); }
-    inline void rasterPos(Vector3 const& v)       { glRasterPos3d(v.XX, v.YY, v.ZZ); }
+    inline void rasterPos(Vector1 const& v) { glRasterPos2d(v.XX, 0); }
+    inline void rasterPos(Vector2 const& v) { glRasterPos2d(v.XX, v.YY); }
+    inline void rasterPos(Vector3 const& v) { glRasterPos3d(v.XX, v.YY, v.ZZ); }
 
 #else
 
-    inline void gleVertex(Vector1 const& v)       { glVertex2f(v.XX, 0); }
-    inline void gleVertex(Vector2 const& v)       { glVertex2f(v.XX, v.YY); }
-    inline void gleVertex(Vector3 const& v)       { glVertex3f(v.XX, v.YY, v.ZZ); }
+    inline void gleVertex(Vector1 const& v) { glVertex2f(v.XX, 0); }
+    inline void gleVertex(Vector2 const& v) { glVertex2f(v.XX, v.YY); }
+    inline void gleVertex(Vector3 const& v) { glVertex3f(v.XX, v.YY, v.ZZ); }
 
-    inline void gleNormal(Vector1 const& v)       { glNormal3f(v.XX, 0, 0); }
-    inline void gleNormal(Vector2 const& v)       { glNormal3f(v.XX, v.YY, 0); }
-    inline void gleNormal(Vector3 const& v)       { glNormal3f(v.XX, v.YY, v.ZZ); }
+    inline void gleNormal(Vector1 const& v) { glNormal3f(v.XX, 0, 0); }
+    inline void gleNormal(Vector2 const& v) { glNormal3f(v.XX, v.YY, 0); }
+    inline void gleNormal(Vector3 const& v) { glNormal3f(v.XX, v.YY, v.ZZ); }
     
-    inline void translate(Vector1 const& v)       { glTranslatef(v.XX, 0, 0); }
-    inline void translate(Vector2 const& v)       { glTranslatef(v.XX, v.YY, 0); }
-    inline void translate(Vector3 const& v)       { glTranslatef(v.XX, v.YY, v.ZZ); }
+    inline void translate(Vector1 const& v) { glTranslatef(v.XX, 0, 0); }
+    inline void translate(Vector2 const& v) { glTranslatef(v.XX, v.YY, 0); }
+    inline void translate(Vector3 const& v) { glTranslatef(v.XX, v.YY, v.ZZ); }
 
-    inline void rasterPos(Vector1 const& v)       { glRasterPos2f(v.XX, 0); }
-    inline void rasterPos(Vector2 const& v)       { glRasterPos2f(v.XX, v.YY); }
-    inline void rasterPos(Vector3 const& v)       { glRasterPos3f(v.XX, v.YY, v.ZZ); }
+    inline void rasterPos(Vector1 const& v) { glRasterPos2f(v.XX, 0); }
+    inline void rasterPos(Vector2 const& v) { glRasterPos2f(v.XX, v.YY); }
+    inline void rasterPos(Vector3 const& v) { glRasterPos3f(v.XX, v.YY, v.ZZ); }
  
 #endif
 
@@ -103,7 +97,7 @@ namespace gle
 
     //------------------------------------------------------------------------------
 #pragma mark -
-        
+    
     /// translate by T; rotate to align X with A, Y with B and Z with C
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
 
@@ -130,7 +124,7 @@ namespace gle
     void discUp();
     void discDown();
     /// draw nicer 2D disc of radius 1 in XY plane, with +Z as normal
-    void disc2();
+    void discUpNicer();
 
     /// draw a tetrahedron of side 2 in 3D
     void tetrahedron();
@@ -174,24 +168,26 @@ namespace gle
     void tube4();
     /// draw a nicer open tube along Z, of diameter 1 and length 1
     void tube8();
-    /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
+    /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube1();
-    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
+    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube2();
-    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-0.25, 1.25]
+    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube4();
-    /// draw a tube along Z, of diameter 1 with Z=[-16, 0]
+    /// draw a tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube1();
-    /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
+    /// draw a nicer tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube2();
-    /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
+    /// draw a nicer tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube4();
-    /// draw a nicer tube along Z, of diameter 1 with Z=[-16, 0]
+    /// draw a nicer tube along Z, of diameter 1 with Z=[0, 1]
     void hexTube();
 
     
-    /// draw a closed tube along Z, or diameter 1 and length 1
-    void cylinder();
+    /// display a cylindrical box, directed along Z, of radius 1 in Z=[0, 1]
+    void cylinder1();
+    /// display a cylindrical box, directed along Z, of radius 1 in Z=[-0.5, 0.5]
+    void cylinderZ();
     /// spherocylinder of length L, radius R, centered and aligned with axis Z
     void capsuleZ(GLfloat L, GLfloat R);
 
@@ -203,8 +199,6 @@ namespace gle
     inline void cone() { tubeZ(0, 1, 1, 0.25, 4); }
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
     inline void longCone() { coneZ(1, -1, 2, true); }
-    /// display a cylindrical box, directed along Z, of length 1, radius 1 in Z=[-0.5, +0.5]
-    void cylinderZ();
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1
     void dumbbell();
 

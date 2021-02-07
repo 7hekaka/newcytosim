@@ -417,13 +417,12 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
-using namespace gle;
 
 void SpaceTee::draw2D() const
 {
     constexpr size_t fin = 8 * gle::finesse;
-    GLfloat c[2*fin+1], s[2*fin+1];
-    gle::circle(2*fin, c, s, tRadius);
+    GLfloat cir[4*fin+2];
+    gle::compute_circle(fin*2, cir, tRadius);
     
     glBegin(GL_LINE_LOOP);
     //the upper side from the tJunction to the left
@@ -432,7 +431,7 @@ void SpaceTee::draw2D() const
     
     //the left cap
     for ( size_t n = 0; n < fin; ++n )
-        glVertex3f( -tLength-s[n], c[n], 0 );
+        glVertex3f(-tLength-cir[1+2*n], cir[2*n], 0);
     
     //the lower side from left to right
     glVertex3f(-tLength,-tRadius, 0);
@@ -440,10 +439,10 @@ void SpaceTee::draw2D() const
     
     //the right cap
     for ( size_t n = 0; n < fin; ++n )
-        glVertex3f( tLength+s[n], -c[n], 0);
+        glVertex3f(tLength+cir[1+2*n], -cir[2*n], 0);
     
     //the upper side from the right to the tJunction
-    glVertex3f(tLength,          tRadius, 0);
+    glVertex3f(tLength,           tRadius, 0);
     glVertex3f(tJunction+tRadius, tRadius, 0);
     
     //the right side of the arm
@@ -451,7 +450,7 @@ void SpaceTee::draw2D() const
     
     //the cap of the arm
     for ( size_t n = 0; n < fin; ++n )
-        glVertex3f(tJunction+c[n], tArmLength+tRadius+s[n], 0);
+        glVertex3f(tJunction+cir[2*n], tArmLength+tRadius+cir[1+2*n], 0);
     
     //the left side of the arm
     glVertex3f(tJunction-tRadius, tRadius+tArmLength, 0);

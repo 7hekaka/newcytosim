@@ -223,20 +223,19 @@ void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 void SpaceCylinder::draw3D() const
 {
     const size_t fin = 512;
+    GLfloat cir[2*fin+2];
+    gle::compute_circle(fin, cir, 1);
 
-    GLfloat L = (GLfloat)length_;
-    GLfloat R = (GLfloat)radius_;
-    
-    GLfloat c[fin+1], s[fin+1];
-    gle::circle(fin, c, s, 1);
+    GLfloat L(length_);
+    GLfloat R(radius_);
     
     glBegin(GL_TRIANGLE_STRIP);
-    for ( size_t sc = 0; sc <= fin; ++sc )
+    for ( size_t i = 0; i <= fin; ++i )
     {
-        GLfloat ca = c[sc], sa = s[sc];
-        glNormal3f( 0, ca, sa );
-        glVertex3f( +L, R*ca, R*sa );
-        glVertex3f( -L, R*ca, R*sa );
+        GLfloat c = cir[2*i], s = cir[1+2*i];
+        glNormal3f(0, c, s);
+        glVertex3f(+L, R*c, R*s);
+        glVertex3f(-L, R*c, R*s);
     }
     glEnd();
     
@@ -244,16 +243,16 @@ void SpaceCylinder::draw3D() const
     glBegin(GL_TRIANGLE_FAN);
     glNormal3f( +1, 0, 0 );
     glVertex3f( +L, 0, 0 );
-    for ( size_t sc = 0; sc <= fin; ++sc )
-        glVertex3f( +L, R*c[sc], R*s[sc] );
+    for ( size_t i = 0; i <= fin; ++i )
+        glVertex3f(+L, R*cir[2*i], R*cir[1+2*i]);
     glEnd();
     
     // draw the cap:
     glBegin(GL_TRIANGLE_FAN);
     glNormal3f( -1, 0, 0 );
     glVertex3f( -L, 0, 0 );
-    for ( size_t sc = 0; sc <= fin; ++sc )
-        glVertex3f( -L,-R*c[sc], R*s[sc] );
+    for ( size_t i = 0; i <= fin; ++i )
+        glVertex3f(-L, -R*cir[2*i], R*cir[1+2*i]);
     glEnd();
 }
 

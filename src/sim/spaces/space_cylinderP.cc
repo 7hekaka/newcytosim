@@ -210,18 +210,19 @@ void SpaceCylinderP::read(Inputter& in, Simul&, ObjectTag)
 void SpaceCylinderP::draw3D() const
 {
     const size_t fin = 512;
-    GLfloat c[fin+1], s[fin+1];
-    gle::circle(fin, c, s, 1);
+    GLfloat cir[2*fin+2];
+    gle::compute_circle(fin, cir, 1);
 
-    GLfloat L = (GLfloat)halflength_;
-    GLfloat R = (GLfloat)radius_;
-
+    GLfloat L(halflength_);
+    GLfloat R(radius_);
+    
     glBegin(GL_TRIANGLE_STRIP);
-    for ( size_t n = 0; n <= fin; ++n )
+    for ( size_t i = 0; i <= fin; ++i )
     {
-        glNormal3f( 0, c[n], s[n] );
-        glVertex3f( +L, R*c[n], R*s[n] );
-        glVertex3f( -L, R*c[n], R*s[n] );
+        GLfloat c = cir[2*i], s = cir[1+2*i];
+        glNormal3f(0, c, s);
+        glVertex3f(+L, R*c, R*s);
+        glVertex3f(-L, R*c, R*s);
     }
     glEnd();
     

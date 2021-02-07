@@ -64,7 +64,7 @@ void setModelView()
     
     //set the matrix with a simple zoom:
     glLoadIdentity();
-    glScaled(zoom, zoom, zoom);
+    glScalef(zoom, zoom, zoom);
     glTranslated(-focus[0], -focus[1], 0);
 }
 

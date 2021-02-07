@@ -46,7 +46,7 @@ public:
     /// set OpenGL color associated with value
     void setColor(const real scale) const
     {
-        GLfloat x = GLfloat(scale * val);
+        GLfloat x(scale * val);
         if ( x > 0 )
             gle_color::jet_color_dark(x, 1.0).load();
         else

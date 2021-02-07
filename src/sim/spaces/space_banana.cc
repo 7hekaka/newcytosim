@@ -157,49 +157,37 @@ void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
-using namespace gle;
 
 void SpaceBanana::draw2D() const
 {
     //number of sections in the quarter-circle
     constexpr size_t fin = 8 * gle::finesse;
-    GLfloat c[fin+1], s[fin+1];
+    GLfloat arc[8*fin+8];
     
     GLfloat A = -bAngle + M_PI_2;
     GLfloat B =  bAngle - M_PI_2;
     
-    glBegin(GL_LINE_LOOP);
     // lower swing
-    gle::arc(fin, c, s, bCurve+bRadius, A-M_PI, B, bCenter[0], bCenter[1]);
-    for ( size_t i = 0; i < fin; ++i )
-        glVertex2f(c[i], s[i]);
-    
+    gle::compute_arc(fin, arc      , bCurve+bRadius, A-M_PI, B, bCenter[0], bCenter[1]);
     // right cap
-    gle::arc(fin, c, s, bRadius, B, B+M_PI, bEnd[0], bEnd[1]);
-    for ( size_t i = 0; i < fin; ++i )
-        glVertex2f(c[i], s[i]);
-    
+    gle::compute_arc(fin, arc+2*fin, bRadius, B, B+M_PI, bEnd[0], bEnd[1]);
     // upper swing
-    gle::arc(fin, c, s, bCurve-bRadius, B, A-M_PI, bCenter[0], bCenter[1]);
-    for ( size_t i = 0; i < fin; ++i )
-        glVertex2f(c[i], s[i]);
-        
+    gle::compute_arc(fin, arc+4*fin, bCurve-bRadius, B, A-M_PI, bCenter[0], bCenter[1]);
     // left cap
-    gle::arc(fin, c, s, bRadius, A, A+M_PI, -bEnd[0], bEnd[1]);
-    for ( size_t i = 0; i < fin; ++i )
-        glVertex2f(c[i], s[i]);
-
-    glEnd();
+    gle::compute_arc(fin, arc+6*fin, bRadius, A, A+M_PI, -bEnd[0], bEnd[1]);
+    
+    glVertexPointer(2, GL_FLOAT, 0, arc);
+    glDrawArrays(GL_LINE_LOOP, 0, 4*fin);
 }
 
 void SpaceBanana::draw3D() const
 {
     glMatrixMode(GL_MODELVIEW);
 
-    GLdouble plane1[] = { -std::cos(bAngle), -std::sin(bAngle), 0, 0 };
-    GLdouble plane2[] = {  std::cos(bAngle), -std::sin(bAngle), 0, 0 };
-    GLdouble plane1i[] = {  std::cos(bAngle), std::sin(bAngle), 0, 0 };
-    GLdouble plane2i[] = { -std::cos(bAngle), std::sin(bAngle), 0, 0 };
+    GLdouble plane1[] = {-std::cos(bAngle),-std::sin(bAngle), 0, 0 };
+    GLdouble plane2[] = { std::cos(bAngle),-std::sin(bAngle), 0, 0 };
+    GLdouble plane3[] = { std::cos(bAngle), std::sin(bAngle), 0, 0 };
+    GLdouble plane4[] = {-std::cos(bAngle), std::sin(bAngle), 0, 0 };
     
     const GLenum glp1 = GL_CLIP_PLANE4;
     const GLenum glp2 = GL_CLIP_PLANE5;
@@ -220,7 +208,7 @@ void SpaceBanana::draw3D() const
     //right cap:
     glPushMatrix();
     glTranslated(bEnd[0], bEnd[1], 0);
-    glClipPlane(glp1, plane1i);
+    glClipPlane(glp1, plane3);
     gle::scale(bRadius);
     gle::sphere8();
     glPopMatrix();
@@ -228,7 +216,7 @@ void SpaceBanana::draw3D() const
     //left cap:
     glPushMatrix();
     glTranslated(-bEnd[0], bEnd[1], 0);
-    glClipPlane(glp1, plane2i);
+    glClipPlane(glp1, plane4);
     gle::scale(bRadius);
     gle::sphere8();
     glPopMatrix();

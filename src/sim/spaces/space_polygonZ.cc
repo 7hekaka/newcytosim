@@ -200,8 +200,8 @@ void SpacePolygonZ::drawZ(bool rings) const
 
     // that is a dummy way to initialize a circle:
     constexpr size_t fin = 8 * gle::finesse;
-    GLfloat c[fin+1], s[fin+1];
-    gle::circle(fin, c, s, 1);
+    GLfloat cir[2*fin+2];
+    gle::compute_circle(fin, cir, 1);
     
     //display surface
     for ( size_t n=1; n <= npts; n++ )
@@ -223,9 +223,9 @@ void SpacePolygonZ::drawZ(bool rings) const
             glBegin(GL_TRIANGLE_STRIP);
             for ( size_t p = 0; p <= fin; ++p )
             {
-                glNormal3f( nX*c[p], nX*s[p], nY );
-                glVertex3f( R2*c[p], R2*s[p], Z2 );
-                glVertex3f( R1*c[p], R1*s[p], Z1 );
+                glNormal3f( nX*cir[2*p], nX*cir[1+2*p], nY );
+                glVertex3f( R2*cir[2*p], R2*cir[1+2*p], Z2 );
+                glVertex3f( R1*cir[2*p], R1*cir[1+2*p], Z1 );
             }
             glEnd();
         }
@@ -243,7 +243,7 @@ void SpacePolygonZ::drawZ(bool rings) const
             {
                 glBegin(GL_LINE_LOOP);
                 for ( size_t p = 0; p <= fin; ++p )
-                    glVertex3f(R*c[p], R*s[p], Z);
+                    glVertex3f(R*cir[2*p], R*cir[1+2*p], Z);
                 glEnd();
             }
         }

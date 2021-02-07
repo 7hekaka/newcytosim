@@ -156,7 +156,7 @@ void setModelView()
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glScaled( zoom, zoom, zoom );
+    glScalef(zoom, zoom, zoom);
     glutPostRedisplay();
 }
 

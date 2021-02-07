@@ -155,8 +155,8 @@ void gle::plusL()
 /// draw pentagon that has the same surface as a disc of radius 1.
 void gle::pentagonS()
 {
-    const GLfloat A = GLfloat(M_PI * 0.1);
-    const GLfloat B = GLfloat(M_PI * 0.3);
+    const GLfloat A(M_PI * 0.1);
+    const GLfloat B(M_PI * 0.3);
     glBegin(GL_TRIANGLE_FAN);
     glNormal3f(0, 0, 1);
     glVertex2f(0, 0);
@@ -175,8 +175,8 @@ void gle::pentagonS()
 
 void gle::pentagonL()
 {
-    const GLfloat A = GLfloat(M_PI * 0.1);
-    const GLfloat B = GLfloat(M_PI * 0.3);
+    const GLfloat A(M_PI * 0.1);
+    const GLfloat B(M_PI * 0.3);
     glBegin(GL_LINE_LOOP);
     glNormal3f(0, 0, 1);
     const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
@@ -232,8 +232,8 @@ void gle::hexagonL()
 
 void gle::starS()
 {
-    const GLfloat A = GLfloat(M_PI * 0.1);
-    const GLfloat B = GLfloat(M_PI * 0.3);
+    const GLfloat A(M_PI * 0.1);
+    const GLfloat B(M_PI * 0.3);
     const GLfloat R  = 1.2f, H = -0.6f;
     const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
     const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
@@ -257,9 +257,9 @@ void gle::starS()
 
 void gle::starL()
 {
-    const GLfloat A = GLfloat(M_PI * 0.1);
-    const GLfloat B = GLfloat(M_PI * 0.3);
-            const GLfloat R  = 1.2f, H = -0.6f;
+    const GLfloat A(M_PI * 0.1);
+    const GLfloat B(M_PI * 0.3);
+    const GLfloat R  = 1.2f, H = -0.6f;
     const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
     const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
     glBegin(GL_LINE_LOOP);

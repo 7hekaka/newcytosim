@@ -13,13 +13,13 @@
 
 
 namespace gle
-{    
-    /// values of sinus over a full circle
-    GLfloat si_[ncircle+1] = { 0 };
-
-    /// values of cosinus over a full circle
-    GLfloat co_[ncircle+1] = { 0 };
+{
+    /// values of cosinus, sinus over a full circle
+    GLfloat cir_[2*ncircle+8] = { 0 };
     
+    inline GLfloat cos_(size_t n) { return cir_[4+2*n]; }
+    inline GLfloat sin_(size_t n) { return cir_[5+2*n]; }
+
     /// vertex buffer objects for tubes
     GLuint tub_[24] = { 0 };
     
@@ -39,37 +39,14 @@ namespace gle
     inline float invsqrt(float x) { return 1.0f / sqrtf(x); }
 #endif
 
-    // Fast method to calculate cosine and sinus over the entire circle
+    /// Calculates cosine and sinus over an arc of circle
     /**
-     C[] and S[] should be preallocated to hold 'cnt+1' values.
-     Fill in with a counter-clockwise circle starting at angle `start`
+     CS[] should be preallocated to hold `2x(cnt+1)' values.
+     Fill in with a counter-clockwise circle starting at angle `start`.
+     with radius `rad` and center {cenX, cenY}
     */
-    void circle(size_t cnt, GLfloat C[], GLfloat S[], double rad, double start)
-    {
-        const double theta = 2 * M_PI / (double)cnt;
-        const double c = std::cos(theta);
-        const double s = std::sin(theta);
-    
-        double t;
-        double x = rad * std::cos(start);
-        double y = rad * std::sin(start);
-        
-        for( size_t n = 0; n < cnt; ++n )
-        {
-            C[n] = GLfloat(x);
-            S[n] = GLfloat(y);
-            //apply the rotation matrix
-            t = x;
-            x = c * x - s * y;
-            y = s * t + c * y;
-            //std::clog << n << " " << x << " " << y << "\n";
-        }
-        C[cnt] = C[0];
-        S[cnt] = S[0];
-    }
-    
-    void arc(size_t cnt, GLfloat C[], GLfloat S[], double rad,
-             double start, double end, GLfloat cenX, GLfloat cenY)
+    void compute_arc(size_t cnt, GLfloat CS[], double rad,
+                     double start, double end, GLfloat cenX, GLfloat cenY)
     {
         const double theta = ( end - start ) / (double)cnt;
         const double c = std::cos(theta);
@@ -81,8 +58,8 @@ namespace gle
         
         for( size_t n = 0; n <= cnt; ++n )
         {
-            C[n] = GLfloat(x) + cenX;
-            S[n] = GLfloat(y) + cenY;
+            CS[  2*n] = GLfloat(x) + cenX;
+            CS[1+2*n] = GLfloat(y) + cenY;
             //apply the rotation matrix
             t = x;
             x = c * x - s * y;
@@ -91,13 +68,16 @@ namespace gle
         }
     }
 
+    /// Calculates cosine and sinus over the entire circle
     /**
-    Initialize CS[] to a circle:
-    delta = 2 * PI / cnt;
-        CS[2*i  ] = rad * cos(start+i*delta)
-        CS[2*i+1] = rad * sin(start+i*delta)
+    Set CS[] to coordinates around a circle:
+     delta = 2 * PI / cnt;
+     for i = 0 : cnt
+        CS[  2*i] = rad * cos(start+i*delta)
+        CS[1+2*i] = rad * sin(start+i*delta)
+     CS should be allocated to hold `2*cnt+2' values
     */
-    void circle(size_t cnt, GLfloat CS[], double rad, double start)
+    void compute_circle(size_t cnt, GLfloat CS[], double rad, double start)
     {
 #ifdef __AVX__
         // This assumes that 'GLfloat == float'
@@ -106,23 +86,24 @@ namespace gle
         const double theta = 2 * M_PI / (double)cnt;
         const double c = std::cos(theta);
         const double s = std::sin(theta);
-    
+
         double t;
         double x = rad * std::cos(start);
         double y = rad * std::sin(start);
+        GLfloat x0(x), y0(y);
         
         for( size_t n = 0; n < cnt; ++n )
         {
-            CS[2*n  ] = GLfloat(x);
-            CS[2*n+1] = GLfloat(y);
+            CS[  2*n] = GLfloat(x);
+            CS[1+2*n] = GLfloat(y);
             //apply the rotation matrix
             t = x;
             x = c * x - s * y;
             y = s * t + c * y;
             //std::clog << n << " " << x << " " << y << "\n";
         }
-        CS[2*cnt  ] = CS[0];
-        CS[2*cnt+1] = CS[1];
+        CS[  2*cnt] = x0;
+        CS[1+2*cnt] = y0;
     }
     
     void initialize()
@@ -138,7 +119,12 @@ namespace gle
             exit(1);
         }
 #endif
-        circle(ncircle, co_, si_, 1);
+        // store { 0, 0 } at the start of circle
+        for ( size_t i = 0; i < 4; ++i )
+            cir_[i] = 0;
+        // circle starts at index 4
+        compute_circle(ncircle, cir_+4, 1);
+        
         initSphereBuffers();
         CHECK_GL_ERROR("gle:initSphereBuffers()");
         initTubeBuffers();
@@ -354,40 +340,35 @@ namespace gle
     void circle()
     {
         glNormal3f(0, 0, 1);
-        glBegin(GL_LINE_LOOP);
-        for( size_t n = 0; n <= ncircle; ++n )
-            glVertex2f(co_[n], si_[n]);
-        glEnd();
+        glVertexPointer(2, GL_FLOAT, 0, 4+cir_);
+        glDrawArrays(GL_LINE_LOOP, 0, ncircle);
     }
     
     void discUp()
     {
         glNormal3f(0, 0, 1);
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f(0, 0);
-        for( size_t n = 0; n <= ncircle; n+=4 )
-            glVertex2f(co_[n], si_[n]);
-        glEnd();
+        glVertexPointer(2, GL_FLOAT, 16, cir_);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
     }
     
     void discDown()
     {
         glNormal3f(0, 0, -1);
+        //glVertexPointer(2, GL_FLOAT, 16, cir_);
+        //glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
         glBegin(GL_TRIANGLE_FAN);
         glVertex2f(0, 0);
-        for( size_t n = 0; n <= ncircle; n+=4 )
-            glVertex2f(si_[n], co_[n]);
+        // swap cos and sin to get front facing down (counter clockwise rule)
+        for( size_t n = 0; n <= ncircle; n += 2 )
+            glVertex2f(sin_(n), cos_(n));
         glEnd();
     }
     
-    void disc2()
+    void discUpNicer()
     {
         glNormal3f(0, 0, 1);
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f(0, 0);
-        for( size_t n = 0; n <= ncircle; ++n )
-            glVertex2f(co_[n], si_[n]);
-        glEnd();
+        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
     }
     
     //-----------------------------------------------------------------------
@@ -802,9 +783,9 @@ namespace gle
         glBegin(GL_TRIANGLE_STRIP);
         for( size_t n = 0; n <= ncircle; n += inc )
         {
-            glNormal3f(co_[n], si_[n], 0);
-            glVertex3f(co_[n], si_[n], T);
-            glVertex3f(co_[n], si_[n], B);
+            glNormal3f(cos_(n), sin_(n), 0);
+            glVertex3f(cos_(n), sin_(n), T);
+            glVertex3f(cos_(n), sin_(n), B);
         }
         glEnd();
     }
@@ -818,9 +799,9 @@ namespace gle
         glBegin(GL_TRIANGLE_STRIP);
         for( size_t n = 0; n <= ncircle; n += inc )
         {
-            glNormal3f(C*co_[n], C*si_[n], S);
-            glVertex3f(rT*co_[n], rT*si_[n], T);
-            glVertex3f(rB*co_[n], rB*si_[n], B);
+            glNormal3f(C*cos_(n), C*sin_(n), S);
+            glVertex3f(rT*cos_(n), rT*sin_(n), T);
+            glVertex3f(rB*cos_(n), rB*sin_(n), B);
         }
         glEnd();
     }
@@ -834,8 +815,8 @@ namespace gle
 
         for( size_t n = 0, p = 0; n < nbf; n += 6, p += inc )
         {
-            GLfloat C = co_[p];
-            GLfloat S = si_[p];
+            GLfloat C = cos_(p);
+            GLfloat S = sin_(p);
             
             dir[n  ] = C;
             dir[n+1] = S;
@@ -898,17 +879,17 @@ namespace gle
         if ( !glIsBuffer(tub_[0]) )
         {
             glGenBuffers(24, tub_);
-            const GLfloat L = 256.f;
+            const GLfloat B = -4.f, T = 256.f;
             initTube(tub_[ 0], tub_[ 1], 0, 1, 8);
             initTube(tub_[ 2], tub_[ 3], 0, 1, 4);
             initTube(tub_[ 4], tub_[ 5], 0, 1, 2);
             initTube(tub_[ 6], tub_[ 7], 0, 1, 1);
-            initTube(tub_[ 8], tub_[ 9],-4, L, 8);
-            initTube(tub_[10], tub_[11],-4, L, 4);
-            initTube(tub_[12], tub_[13],-4, L, 2);
-            initTube(tub_[14], tub_[15], 0, L, 8);
-            initTube(tub_[16], tub_[17], 0, L, 4);
-            initTube(tub_[18], tub_[19], 0, L, 2);
+            initTube(tub_[ 8], tub_[ 9], B, T, 8);
+            initTube(tub_[10], tub_[11], B, T, 4);
+            initTube(tub_[12], tub_[13], B, T, 2);
+            initTube(tub_[14], tub_[15], 0, T, 8);
+            initTube(tub_[16], tub_[17], 0, T, 4);
+            initTube(tub_[18], tub_[19], 0, T, 2);
             initHexTube(tub_[22], tub_[23], 0, 1);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
@@ -926,7 +907,7 @@ namespace gle
     void halfTube1() { drawBuffer(tub_[14], tub_[15], 2+ncircle/4, GL_TRIANGLE_STRIP); }
     void halfTube2() { drawBuffer(tub_[16], tub_[17], 2+ncircle/2, GL_TRIANGLE_STRIP); }
     void halfTube4() { drawBuffer(tub_[18], tub_[19], 2+ncircle  , GL_TRIANGLE_STRIP); }
-    void hexTube()  { drawBuffer(tub_[22], tub_[23], 14, GL_TRIANGLE_STRIP); }
+    void hexTube()   { drawBuffer(tub_[22], tub_[23], 14, GL_TRIANGLE_STRIP); }
 #else
     // unbuffered functions:
     void tube1()     { tubeZ(0, 1, 8); }
@@ -939,7 +920,7 @@ namespace gle
     void halfTube1() { tubeZ(-256.f, 0.0f, 8); }
     void halfTube2() { tubeZ(-256.f, 0.0f, 4); }
     void halfTube4() { tubeZ(-256.f, 0.0f, 2); }
-    void hexTube()  { hexTubeZ(0, 1); }
+    void hexTube()   { hexTubeZ(0, 1); }
 #endif
  
     void tubeZ(GLfloat za, GLfloat ra, gle_color ca, GLfloat zb, GLfloat rb, gle_color cb)
@@ -948,52 +929,61 @@ namespace gle
         for( size_t n = 0; n <= ncircle; ++n )
         {
             cb.load_load();
-            glNormal3f(   co_[n],    si_[n],  0);
-            glVertex3f(rb*co_[n], rb*si_[n], zb);
+            glNormal3f(   cos_(n),    sin_(n),  0);
+            glVertex3f(rb*cos_(n), rb*sin_(n), zb);
             ca.load_load();
-            glNormal3f(   co_[n],    si_[n],  0);
-            glVertex3f(ra*co_[n], ra*si_[n], za);
+            glNormal3f(   cos_(n),    sin_(n),  0);
+            glVertex3f(ra*cos_(n), ra*sin_(n), za);
         }
         glEnd();
     }
     
-    void cylinder()
+    void cylinder1()
     {
-        tubeZ(0, 1, 1);
+        tube1();
         glTranslatef(0,0,1);
         discUp();
         glTranslatef(0,0,-1);
         discDown();
     }
     
-    
+    void cylinderZ()
+    {
+        glTranslatef(0,0,0.5f);
+        discUp();
+        glTranslatef(0,0,-1);
+        tube1();
+        discDown();
+        glTranslatef(0,0,0.5f);
+    }
+
     /// spherocylinder of length L, radius R, centered and aligned with axis Z
     void capsuleZ(GLfloat L, GLfloat R)
     {
         const size_t fin = ncircle >> 2;
         const size_t C = 4;
         //display strips along the side of the volume:
-        for ( size_t t = 0; t < 4*fin; t+=C )
+        for ( size_t t = 0; t < 4*fin; t += C )
         {
             //compute the transverse angles:
-            GLfloat cb = co_[t  ], sb = si_[t  ];
-            GLfloat ca = co_[t+C], sa = si_[t+C];
+            GLfloat cb = cos_(t),   sb = sin_(t);
+            GLfloat ca = cos_(t+C), sa = sin_(t+C);
             GLfloat cB = R * cb, sB = R * sb;
             GLfloat cA = R * ca, sA = R * sa;
             
             //draw one srip of the oval:
             glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t i=0; i <= fin; i+=C )
+            for ( size_t i=0; i <= fin; i += C )
             {
-                GLfloat x = co_[i], y = si_[i];
+                GLfloat x = cos_(i), y = sin_(i);
                 glNormal3f(ca*y, sa*y,     x);
                 glVertex3f(cA*y, sA*y, L+R*x);
                 glNormal3f(cb*y, sb*y,     x);
                 glVertex3f(cB*y, sB*y, L+R*x);
             }
-            for ( int i=fin; i >= 0; i-=C )
+            for ( int i=fin; i >= 0; i -= C )
             {
-                GLfloat x = -co_[i], y = si_[i];
+                GLfloat x = -cos_(i), y = sin_(i);
                 glNormal3f(ca*y, sa*y,   x);
                 glVertex3f(cA*y, sA*y, R*x);
                 glNormal3f(cb*y, sb*y,   x);
@@ -1107,15 +1097,15 @@ namespace gle
     {
         for ( size_t n = 0; n < ncircle/2; n += inc )
         {
-            real U = co_[n], R = si_[n];
-            real L = co_[n+inc], S = si_[n+inc];
+            real U = cos_(n), R = sin_(n);
+            real L = cos_(n+inc), S = sin_(n+inc);
             glBegin(GL_TRIANGLE_STRIP);
             for ( size_t p = 0; p <= ncircle; p += inc )
             {
-                glNormal3f(R*co_[p], R*si_[p], U);
-                glVertex3f(R*co_[p], R*si_[p], U);
-                glNormal3f(S*co_[p], S*si_[p], L);
-                glVertex3f(S*co_[p], S*si_[p], L);
+                glNormal3f(R*cos_(p), R*sin_(p), U);
+                glVertex3f(R*cos_(p), R*sin_(p), U);
+                glNormal3f(S*cos_(p), S*sin_(p), L);
+                glVertex3f(S*cos_(p), S*sin_(p), L);
             }
             glEnd();
         }
@@ -1166,15 +1156,15 @@ namespace gle
     {
         for ( size_t n = 0; n < ncircle; n += S )
         {
-            GLfloat X0 = co_[n  ], Y0 = si_[n  ];
-            GLfloat X1 = co_[n+S], Y1 = si_[n+S];
+            GLfloat X0 = cos_(n  ), Y0 = sin_(n  );
+            GLfloat X1 = cos_(n+S), Y1 = sin_(n+S);
             glBegin(GL_TRIANGLE_STRIP);
             for ( size_t p = 0; p <= ncircle; p += 2*S )
             {
-                glNormal3f(X0*co_[p], Y0*co_[p], si_[p]);
-                glVertex3f(X0*(R+T*co_[p]), Y0*(R+T*co_[p]), T*si_[p]);
-                glNormal3f(X1*co_[p], Y1*co_[p], si_[p]);
-                glVertex3f(X1*(R+T*co_[p]), Y1*(R+T*co_[p]), T*si_[p]);
+                glNormal3f(X0*cos_(p), Y0*cos_(p), sin_(p));
+                glVertex3f(X0*(R+T*cos_(p)), Y0*(R+T*cos_(p)), T*sin_(p));
+                glNormal3f(X1*cos_(p), Y1*cos_(p), sin_(p));
+                glVertex3f(X1*(R+T*cos_(p)), Y1*(R+T*cos_(p)), T*sin_(p));
             }
             glEnd();
         }
@@ -1226,36 +1216,6 @@ namespace gle
     }
     
     
-    void cylinderZ()
-    {
-        const GLfloat T =  0.5;
-        const GLfloat B = -0.5;
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f( 0, 0, -1 );
-        glVertex3f( 0, 0,  B );
-        for ( size_t n = 0; n <= ncircle; ++n )
-            glVertex3f(co_[n], -si_[n], B);
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_STRIP);
-        for ( size_t n = 0; n <= ncircle; ++n )
-        {
-            glNormal3f(co_[n], si_[n], 0);
-            glVertex3f(co_[n], si_[n], T);
-            glVertex3f(co_[n], si_[n], B);
-        }
-        glEnd();
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f( 0, 0, 1 );
-        glVertex3f( 0, 0, T );
-        for ( size_t n = 0; n <= ncircle; ++n )
-            glVertex3f(co_[n], si_[n], T);
-        glEnd();
-    }
-    
-    
     void coneZ(GLfloat R, GLfloat B, GLfloat T, bool closed)
     {
         if ( closed )
@@ -1264,7 +1224,7 @@ namespace gle
             glNormal3f( 0, 0, B );
             glVertex3f( 0, 0, B );
             for ( size_t n = 0; n <= ncircle; ++n )
-                glVertex3f(R*co_[n], -R*si_[n], B);
+                glVertex3f(R*cos_(n), -R*sin_(n), B);
             glEnd();
         }
         glBegin(GL_TRIANGLE_FAN);
@@ -1274,8 +1234,8 @@ namespace gle
         const GLfloat C = (B-T)*S;
         for ( size_t n = 0; n <= ncircle; ++n )
         {
-            glNormal3f(C*co_[n], C*si_[n], S);
-            glVertex3f(R*co_[n], R*si_[n], B);
+            glNormal3f(C*cos_(n), C*sin_(n), S);
+            glVertex3f(R*cos_(n), R*sin_(n), B);
         }
         glEnd();
     }
@@ -1312,9 +1272,9 @@ namespace gle
             glBegin(GL_TRIANGLE_STRIP);
             for ( size_t n = 0; n <= ncircle; ++n )
             {
-                glNormal3f(dN*co_[n], dN*si_[n],-dR);
-                glVertex3f(R *co_[n], R *si_[n], Z);
-                glVertex3f(R0*co_[n], R0*si_[n], Z0);
+                glNormal3f(dN*cos_(n), dN*sin_(n),-dR);
+                glVertex3f(R *cos_(n), R *sin_(n), Z);
+                glVertex3f(R0*cos_(n), R0*sin_(n), Z0);
             }
             glEnd();
         }
@@ -1730,7 +1690,8 @@ namespace gle
     {
         glPushMatrix();
         transAlignZ(pos, rad, dir);
-        gle::cylinderZ();
+        glTranslatef(0, 0, -0.5f);
+        cylinder1();
         glPopMatrix();
     }
     
@@ -1785,7 +1746,7 @@ namespace gle
         stretchAlignZ(A, B, R);
         tube1();
         glTranslatef(0, 0, 1);
-        glScaled(3.0, 3.0, 3*R);
+        glScalef(3.0, 3.0, 3*R);
         gle::longCone();
         glPopMatrix();
     }
@@ -1796,7 +1757,7 @@ namespace gle
         stretchAlignZ(A, B, R);
         tube1();
         glTranslatef(0, 0, 1);
-        glScaled(3.0, 3.0, 3*R);
+        glScalef(3.0, 3.0, 3*R);
         gle::longCone();
         glPopMatrix();
     }
@@ -1807,7 +1768,7 @@ namespace gle
         stretchAlignZ(A, B, R);
         tube1();
         glTranslatef(0, 0, 1);
-        glScaled(3.0, 3.0, 3*R);
+        glScalef(3.0, 3.0, 3*R);
         gle::longCone();
         glPopMatrix();
     }
@@ -2263,8 +2224,8 @@ namespace gle
     //-----------------------------------------------------------------------
     void drawAxes(const real size, int dim)
     {
-        const GLfloat S = GLfloat(size);
-        const GLfloat R = S * 0.1f;
+        const GLfloat S(size);
+        const GLfloat R(S * 0.1f);
         
         glMatrixMode(GL_MODELVIEW);
         

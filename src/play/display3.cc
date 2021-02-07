@@ -566,7 +566,7 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real rad) const
             default: break;
             case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
             case 2: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::longCone); break;
-            case 3: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cylinder); break;
+            case 3: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cylinderZ); break;
             case 4: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::arrowTail); break;
             case 5: drawObject(fib.posEndM(),  fib.dirEndM(), rad, gle::arrowTail); break;
             case 6: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cube); break;
@@ -594,7 +594,7 @@ void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real rad) const
             default: break;
             case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
             case 2: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::longCone); break;
-            case 3: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::cylinder); break;
+            case 3: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::cylinderZ); break;
             case 4: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::arrowTail); break;
             case 5: drawObject(fib.posEndP(), -fib.dirEndP(), rad, gle::arrowTail); break;
             case 6: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::cube); break;
@@ -768,8 +768,8 @@ void Display3::drawSolid(Solid const& obj)
         //gle::gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
         glPushMatrix();
         Vector A = obj.posP(0), B = obj.posP(1);
-        gle::transAlignZ(0.5*(A+B), obj.radius(0), A-B);
-        gle::cylinderZ();
+        gle::transAlignZ(A, obj.radius(0), B-A);
+        gle::cylinder1();
         glPopMatrix();
     }
 #endif

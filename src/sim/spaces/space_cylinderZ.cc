@@ -511,25 +511,25 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCylinderZ::draw3D() const
 {
-    const GLfloat T = (GLfloat)top_;
-    const GLfloat B = (GLfloat)bot_;
-    const GLfloat R = (GLfloat)radius_;
-    const GLfloat E = (GLfloat)edge_;
-    const GLfloat RE = (GLfloat)(radius_ - edge_);
-    const GLfloat TE = (GLfloat)(top_ - edge_);
-    const GLfloat BE = (GLfloat)(bot_ + edge_);
+    const GLfloat T(top_);
+    const GLfloat B(bot_);
+    const GLfloat R(radius_);
+    const GLfloat E(edge_);
+    const GLfloat RE(radius_ - edge_);
+    const GLfloat TE(top_ - edge_);
+    const GLfloat BE(bot_ + edge_);
     
     const size_t fin = 256;
-    GLfloat c[fin+1], s[fin+1];
-    gle::circle(fin, c, s, 1);
+    GLfloat cir[2*fin+2];
+    gle::compute_circle(fin, cir, 1);
 
     const size_t pi_half = fin/4;
     const size_t pi_once = fin/2;
     
     for (size_t i = 0; i < fin; i++)
     {
-        GLfloat CU = c[i],   SU = s[i];
-        GLfloat CL = c[i+1], SL = s[i+1];
+        GLfloat CU = cir[2*i],   SU = cir[1+2*i];
+        GLfloat CL = cir[2*i+2], SL = cir[3+2*i];
 
         glBegin(GL_TRIANGLE_STRIP);
         glNormal3f(0, 0, +1);
@@ -539,13 +539,14 @@ void SpaceCylinderZ::draw3D() const
             //draw top arc
             for ( size_t j = 0; j <= pi_half; j++ )
             {
-                glNormal3f(CU*s[j],        SU*s[j],             c[j]);
-                glVertex3f(CU*(RE+E*s[j]), SU*(RE+E*s[j]), TE+E*c[j]);
-                glNormal3f(CL*s[j],        SL*s[j],             c[j]);
-                glVertex3f(CL*(RE+E*s[j]), SL*(RE+E*s[j]), TE+E*c[j]);
+                GLfloat C = cir[2*j], S = cir[1+2*j];
+                glNormal3f(CU*S,        SU*S,             C);
+                glVertex3f(CU*(RE+E*S), SU*(RE+E*S), TE+E*C);
+                glNormal3f(CL*S,        SL*S,             C);
+                glVertex3f(CL*(RE+E*S), SL*(RE+E*S), TE+E*C);
             }
             /*
-            // at pi_half, c[j] = 0 and s[j] = 1
+            // at pi_half, C = 0 and S = 1
             glNormal3f(CU,        SU,         0);
             glVertex3f(CU*(RE+E), SU*(RE+E), TE);
             glNormal3f(CL,        SL,         0);
@@ -559,10 +560,11 @@ void SpaceCylinderZ::draw3D() const
             //draw bottom arc
             for ( size_t j = pi_half; j<=pi_once; j++ )
             {
-                glNormal3f(CU*s[j],        SU*s[j],             c[j]);
-                glVertex3f(CU*(RE+E*s[j]), SU*(RE+E*s[j]), BE+E*c[j]);
-                glNormal3f(CL*s[j],        SL*s[j],             c[j]);
-                glVertex3f(CL*(RE+E*s[j]), SL*(RE+E*s[j]), BE+E*c[j]);
+                GLfloat C = cir[2*j], S = cir[1+2*j];
+                glNormal3f(CU*S,        SU*S,             C);
+                glVertex3f(CU*(RE+E*S), SU*(RE+E*S), BE+E*C);
+                glNormal3f(CL*S,        SL*S,             C);
+                glVertex3f(CL*(RE+E*S), SL*(RE+E*S), BE+E*C);
             }
         }
         else

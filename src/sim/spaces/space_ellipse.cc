@@ -223,48 +223,40 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceEllipse::draw2D() const
 {
-#if ( DIM == 1 )
-    
     GLfloat X = length_[0];
-    
-    glBegin(GL_LINES);
-    glVertex2f(-X, -1);
-    glVertex2f(-X,  1);
-    glVertex2f( X, -1);
-    glVertex2f( X,  1);
-    glEnd();
-
-#elif ( DIM == 2 )
+#if ( DIM == 1 )
+    GLfloat Y = 1;
+#else
+    GLfloat Y = length_[1];
+#endif
     
     constexpr size_t fin = 16 * gle::finesse;
     GLfloat cir[2*fin+2];
-    gle::circle(fin, cir, 1);
+    gle::compute_circle(fin, cir, 1);
 
     glPushMatrix();
-    glScaled(length_[0], length_[1], 1.0);
+    glScalef(X, Y, 1.0);
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_LOOP, 0, fin+1);
     glPopMatrix();
-
-#endif
 }
 
 
 void SpaceEllipse::draw3D() const
 {
     const size_t fin = gle::ncircle;
-    static GLfloat c[2*fin+1], s[2*fin+1];
+    static GLfloat cir[4*fin+2];
     static bool virgin = true;
     
     if ( virgin )
     {
         virgin = false;
-        gle::circle(2*fin, c, s, 1);
+        gle::compute_circle(fin*2, cir, 1);
     }
 
-    GLfloat X = (GLfloat)length_[0], iX = 1.0f / ( X * X );
-    GLfloat Y = (GLfloat)length_[1], iY = 1.0f / ( Y * Y );
-    GLfloat Z = (GLfloat)length_[2], iZ = 1.0f / ( Z * Z );
+    GLfloat X(length_[0]), iX = 1.0f / ( X * X );
+    GLfloat Y(length_[1]), iY = 1.0f / ( Y * Y );
+    GLfloat Z(length_[2]), iZ = 1.0f / ( Z * Z );
     
     /*
      A vector orthogonal to the ellipse at position (X, Y, Z) is
@@ -272,17 +264,17 @@ void SpaceEllipse::draw3D() const
       */
     for ( size_t n = 0; n < fin; ++n )
     {
-        GLfloat uX = s[n  ]*X, uY = s[n  ]*Y, uZ = c[n  ]*Z;
-        GLfloat lX = s[n+1]*X, lY = s[n+1]*Y, lZ = c[n+1]*Z;
+        GLfloat uX = cir[1+2*n]*X, uY = cir[1+2*n]*Y, uZ = cir[2*n  ]*Z;
+        GLfloat lX = cir[3+2*n]*X, lY = cir[3+2*n]*Y, lZ = cir[2+2*n]*Z;
         GLfloat uXi = uX * iX, uYi = uY * iY, uZi = uZ * iZ;
         GLfloat lXi = lX * iX, lYi = lY * iY, lZi = lZ * iZ;
         glBegin(GL_TRIANGLE_STRIP);
         for ( size_t p = 0; p <= 2*fin; ++p )
         {
-            glNormal3f(c[p]*uXi, s[p]*uYi, uZi);
-            glVertex3f(c[p]*uX , s[p]*uY , uZ );
-            glNormal3f(c[p]*lXi, s[p]*lYi, lZi);
-            glVertex3f(c[p]*lX , s[p]*lY , lZ );
+            glNormal3f(cir[2*p]*uXi, cir[1+2*p]*uYi, uZi);
+            glVertex3f(cir[2*p]*uX , cir[1+2*p]*uY , uZ );
+            glNormal3f(cir[2*p]*lXi, cir[1+2*p]*lYi, lZi);
+            glVertex3f(cir[2*p]*lX , cir[1+2*p]*lY , lZ );
         }
         glEnd();
 #if ( 0 )
@@ -291,8 +283,8 @@ void SpaceEllipse::draw3D() const
         glBegin(GL_LINES);
         for ( size_t p = 0; p <= 2*fin; p+=8 )
         {
-            glVertex3f(c[p]*uX, s[p]*uY, uZ);
-            glVertex3f(c[p]*(uX+m*uXi), s[p]*(uY+m*uYi), uZ+m*uZi);
+            glVertex3f(cir[2*p]*uX, cir[1+2*p]*uY, uZ);
+            glVertex3f(cir[2*p]*(uX+m*uXi), cir[1+2*p]*(uY+m*uYi), uZ+m*uZi);
         }
         glEnd();
 #endif
@@ -308,7 +300,8 @@ void SpaceEllipse::draw3D() const
         glBegin(GL_LINE_LOOP);
         for ( size_t n = 0; n <= 2*fin; ++n )
         {
-            GLfloat x = X * R * c[n], y = Y * R * s[n];
+            GLfloat x = X * R * cir[2*n];
+            GLfloat y = Y * R * cir[1+2*n];
             glNormal3f(x*iX, y*iY, H*iZ);
             glVertex3f(x, y, H);
         }

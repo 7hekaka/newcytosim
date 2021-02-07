@@ -159,7 +159,7 @@ void SpaceDisc::draw2D() const
 {
     constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
     GLfloat cir[2*fin+2];
-    gle::circle(fin, cir, (GLfloat)radius_);
+    gle::compute_circle(fin, cir, (GLfloat)radius_);
     
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);

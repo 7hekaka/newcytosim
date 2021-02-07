@@ -137,7 +137,7 @@ void SpaceSphere::draw2D() const
     GLfloat cir[2*fin+6];
     cir[2] = 0;
     cir[3] = 0;
-    gle::circle(fin, cir+4, (GLfloat)radius_);
+    gle::compute_circle(fin, cir+4, (GLfloat)radius_);
     
     glVertexPointer(2, GL_FLOAT, 0, cir+4);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
@@ -152,7 +152,7 @@ void SpaceSphere::draw2D() const
 
 void SpaceSphere::draw3D() const
 {
-    GLfloat R = (GLfloat)radius_;
+    GLfloat R(radius_);
     glPushMatrix();
     glScalef(R, R, R);
     gle::sphere8();
