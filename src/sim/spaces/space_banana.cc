@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 #include "dim.h"
 #include "space_banana.h"
 #include "exceptions.h"
@@ -12,42 +12,43 @@ SpaceBanana::SpaceBanana(SpaceProp const* p)
     if ( DIM == 1 )
         throw InvalidParameter("banana is not edible in 1D");
     bLength = 10;
-    bWidth  = 2;
-    bRadius = 20;
+    bRadius = 2;
+    bCurve = 20;
 }
 
 
 void SpaceBanana::resize(Glossary& opt)
 {
-    real len = bLength, wid = bWidth, rad = bRadius;
+    real len = bLength, rad = bRadius, cur = bCurve;
     
-    if ( opt.set(wid, "radius") )
-        wid *= 2;
-    else opt.set(wid, "diameter");
-    opt.set(rad, "curvature");
+    if ( opt.set(rad, "width") )
+        rad /= 2;
+    else opt.set(rad, "radius");
+    
+    opt.set(cur, "curvature");
     opt.set(len, "length");
 
-    len = len - 2 * wid;
+    len = len - 2 * rad;
 
     if ( len <= 0 )
         throw InvalidParameter("banana:length must be >= 2 * width");
-    if ( rad <= 0 )
-        throw InvalidParameter("banana:radius must be >= 0");
-    if ( wid < 0 )
-        throw InvalidParameter("banana:width must be > 0");
-    if ( wid > bRadius )
-        throw InvalidParameter("banana:width must be <= radius");
+    if ( cur <= 0 )
+        throw InvalidParameter("banana:curve must be >= 0");
+    if ( rad < 0 )
+        throw InvalidParameter("banana:radius must be > 0");
+    if ( rad > bCurve )
+        throw InvalidParameter("banana:radius must be <= curve");
     
     bLength = len;
-    bWidth = wid;
     bRadius = rad;
+    bCurve = cur;
     update();
 }
 
 
 void SpaceBanana::update()
 {
-    bAngle = 0.5 * bLength / bRadius;
+    bAngle = 0.5 * bLength / bCurve;
     
     if ( bAngle > M_PI )
     {
@@ -55,12 +56,12 @@ void SpaceBanana::update()
         std::cerr << "banana:length should not exceed 2*PI*radius\n";
     }
 
-    bWidthSqr = bWidth * bWidth;
-    bEnd[0] = bRadius * std::sin(bAngle);
-    bEnd[1] = 0.5*bRadius*(1-std::cos(bAngle));
+    bRadiusSqr = bRadius * bRadius;
+    bEnd[0] = bCurve * std::sin(bAngle);
+    bEnd[1] = 0.5*bCurve*(1-std::cos(bAngle));
     
     bCenter[0] = 0;
-    bCenter[1] = bRadius - bEnd[1];
+    bCenter[1] = bCurve - bEnd[1];
     bCenter[2] = 0;
 }
 
@@ -68,17 +69,17 @@ void SpaceBanana::update()
 real SpaceBanana::volume() const
 {
 #if ( DIM > 2 )
-    return (2*M_PI*bAngle*bRadius + 4*M_PI/3.*bWidth)*bWidthSqr;
+    return (2*M_PI*bAngle*bCurve + 4*M_PI/3.*bRadius)*bRadiusSqr;
 #else
-    return 4*bAngle*bRadius*bWidth + M_PI*bWidthSqr;
+    return 4*bAngle*bCurve*bRadius + M_PI*bRadiusSqr;
 #endif
 }
 
 
 void SpaceBanana::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-bEnd[0]-bWidth,-bWidth,-bWidth);
-    sup.set( bEnd[0]+bWidth, bEnd[1]+bWidth, bWidth);
+    inf.set(-bEnd[0]-bRadius,-bRadius,-bRadius);
+    sup.set( bEnd[0]+bRadius, bEnd[1]+bRadius, bRadius);
 }
 
 
@@ -87,7 +88,7 @@ Vector SpaceBanana::backbone(Vector const& pos) const
 {
     Vector cp = pos - bCenter;
     
-    real n = bRadius / cp.normXY();
+    real n = bCurve / cp.normXY();
     Vector prj;
 
     prj[0] = bCenter[0] + n * cp[0];
@@ -108,7 +109,7 @@ Vector SpaceBanana::backbone(Vector const& pos) const
 bool SpaceBanana::inside(Vector const& pos) const
 {
     Vector prj = backbone(pos);
-    return ( distanceSqr(pos, prj) <= bWidthSqr );
+    return ( distanceSqr(pos, prj) <= bRadiusSqr );
 }
 
 
@@ -117,7 +118,7 @@ Vector SpaceBanana::project(Vector const& pos) const
     Vector cen = backbone(pos);
     Vector dif = pos - cen;
     real n = dif.normSqr();
-    return cen + (bWidth / std::sqrt(n)) * dif;
+    return cen + (bRadius / std::sqrt(n)) * dif;
 }
 
 
@@ -128,8 +129,8 @@ void SpaceBanana::write(Outputter& out) const
     writeShape(out, "banana");
     out.writeUInt16(4);
     out.writeFloat(bLength);
-    out.writeFloat(bWidth);
     out.writeFloat(bRadius);
+    out.writeFloat(bCurve);
     out.writeFloat(0.f);
 }
 
@@ -137,8 +138,8 @@ void SpaceBanana::write(Outputter& out) const
 void SpaceBanana::setLengths(const real len[])
 {
     bLength = len[0];
-    bWidth  = len[1];
-    bRadius = len[2];
+    bRadius  = len[1];
+    bCurve = len[2];
     update();
 }
 
@@ -169,22 +170,22 @@ void SpaceBanana::draw2D() const
     
     glBegin(GL_LINE_LOOP);
     // lower swing
-    gle::arc(fin, c, s, bRadius+bWidth, A-M_PI, B, bCenter[0], bCenter[1]);
+    gle::arc(fin, c, s, bCurve+bRadius, A-M_PI, B, bCenter[0], bCenter[1]);
     for ( size_t i = 0; i < fin; ++i )
         glVertex2f(c[i], s[i]);
     
     // right cap
-    gle::arc(fin, c, s, bWidth, B, B+M_PI, bEnd[0], bEnd[1]);
+    gle::arc(fin, c, s, bRadius, B, B+M_PI, bEnd[0], bEnd[1]);
     for ( size_t i = 0; i < fin; ++i )
         glVertex2f(c[i], s[i]);
     
     // upper swing
-    gle::arc(fin, c, s, bRadius-bWidth, B, A-M_PI, bCenter[0], bCenter[1]);
+    gle::arc(fin, c, s, bCurve-bRadius, B, A-M_PI, bCenter[0], bCenter[1]);
     for ( size_t i = 0; i < fin; ++i )
         glVertex2f(c[i], s[i]);
         
     // left cap
-    gle::arc(fin, c, s, bWidth, A, A+M_PI, -bEnd[0], bEnd[1]);
+    gle::arc(fin, c, s, bRadius, A, A+M_PI, -bEnd[0], bEnd[1]);
     for ( size_t i = 0; i < fin; ++i )
         glVertex2f(c[i], s[i]);
 
@@ -211,7 +212,7 @@ void SpaceBanana::draw3D() const
     glTranslated(bCenter[0], bCenter[1], 0);
     glClipPlane(glp1, plane1);
     glClipPlane(glp2, plane2);
-    gle::torusZ(bRadius, bWidth);
+    gle::torusZ(bCurve, bRadius);
     glPopMatrix();
 
     glDisable(glp2);
@@ -220,7 +221,7 @@ void SpaceBanana::draw3D() const
     glPushMatrix();
     glTranslated(bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane1i);
-    gle::scale(bWidth);
+    gle::scale(bRadius);
     gle::sphere8();
     glPopMatrix();
 
@@ -228,7 +229,7 @@ void SpaceBanana::draw3D() const
     glPushMatrix();
     glTranslated(-bEnd[0], bEnd[1], 0);
     glClipPlane(glp1, plane2i);
-    gle::scale(bWidth);
+    gle::scale(bRadius);
     gle::sphere8();
     glPopMatrix();
     

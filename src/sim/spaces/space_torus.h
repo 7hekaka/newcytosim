@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef SPACE_TORUS_H
 #define SPACE_TORUS_H
@@ -10,8 +10,8 @@
  Space `torus` is defined by two parameters: 
  
  Parameters:
-     - `radius` = the main radius of the torus centerline
-     - `width`  = the diameter of the torus in its cross sections.
+     - `curvature` = the (large) radius of the torus centerline
+     - `width` = the diameter of the torus in its cross sections.
      .
 
  @ingroup SpaceGroup
@@ -20,56 +20,55 @@ class SpaceTorus : public Space
 {
 private:
     
-    /// main radius
-    real  bRadius;
+    /// main radius of curvature
+    real bCurve;
     
     /// thickness
-    real  bWidth, bWidthSqr;
+    real bRadius, bRadiusSqr;
     
-    /// set bWidthSqr
-    void update() { bWidthSqr = square(bWidth); }
+    /// set bRadiusSqr
+    void update() { bRadiusSqr = square(bRadius); }
     
     /// project on the backbone
     Vector backbone(Vector const& pos) const;
     
 public:
-        
+ 
     /// constructor
     SpaceTorus(SpaceProp const*);
-        
+ 
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        thickness() const { return bWidth; }
+    real thickness() const { return bRadius; }
 
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
+    /// OpenGL display function
+    void draw2D() const;
     
     /// OpenGL display function
-    void        draw2D() const;
-    
-    /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif

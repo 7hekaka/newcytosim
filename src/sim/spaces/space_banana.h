@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef SPACE_BANANA_H
 #define SPACE_BANANA_H
@@ -13,7 +13,7 @@
  Parameters:
      - `length` = the overall length
      - `width` = the diameter of the torus in its cross sections
-     - `curvature` = the main radius of the torus centerline
+     - `curvature` = the (large) radius of the torus centerline
      .
  
  This class was first conceived by Dietrich Foethke, to simulate S. pombe.
@@ -24,9 +24,9 @@ class SpaceBanana : public Space
 private:
     
     /// dimensions
-    real  bRadius;
-    real  bLength;
-    real  bWidth, bWidthSqr;
+    real bCurve;
+    real bLength;
+    real bRadius, bRadiusSqr;
 
     /// angle covered by torus section
     real bAngle;
@@ -49,38 +49,37 @@ public:
     SpaceBanana(SpaceProp const*);
     
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
  
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        thickness() const { return bWidth; }
+    real thickness() const { return bRadius; }
 
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
-        
+    void read(Inputter&, Simul&, ObjectTag);
 
     /// OpenGL display function
-    void        draw2D() const;
+    void draw2D() const;
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif
