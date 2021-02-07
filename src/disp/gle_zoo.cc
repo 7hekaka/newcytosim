@@ -10,12 +10,10 @@ void gle::triangleS()
     constexpr GLfloat pts[] = { 0, 1, 0, -H, -.5f, 0, H, -.5f, 0 };
     constexpr GLfloat dir[] = { 0, 0, 1, 0, 0, 1, 0, 0, 1 };
     
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, pts);
     glNormalPointer(GL_FLOAT, 0, dir);
     glDrawArrays(GL_TRIANGLES, 0, 1);
-    glDisableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 }
 

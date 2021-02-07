@@ -45,6 +45,7 @@ void View::initGL()
 {
     // let GL normalize the normals:
     glEnable(GL_NORMALIZE);
+    glEnableClientState(GL_VERTEX_ARRAY);
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_DITHER);
     
@@ -790,32 +791,21 @@ void View::drawCuboid(Vector3 const& A, Vector3 const& B)
 {
     GLfloat AX = A.XX, AY = A.YY, AZ = A.ZZ;
     GLfloat BX = B.XX, BY = B.YY, BZ = B.ZZ;
-
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
-    glLineWidth(0.5);
     
-    glBegin(GL_LINE_LOOP);
-    glVertex3f(AX, AY, AZ);
-    glVertex3f(BX, AY, AZ);
-    glVertex3f(BX, BY, AZ);
-    glVertex3f(AX, BY, AZ);
-    glEnd();
-
-    glBegin(GL_LINE_LOOP);
-    glVertex3f(AX, AY, BZ);
-    glVertex3f(BX, AY, BZ);
-    glVertex3f(BX, BY, BZ);
-    glVertex3f(AX, BY, BZ);
-    glEnd();
-
-    glPopAttrib();
+    GLfloat pts[24] = {AX, AY, AZ, BX, AY, AZ, BX, BY, AZ, AX, BY, AZ,
+                       AX, AY, BZ, BX, AY, BZ, BX, BY, BZ, AX, BY, BZ};
+    
+    glVertexPointer(3, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_LINE_LOOP, 0, 4);
+    glDrawArrays(GL_LINE_LOOP, 4, 4);
 }
 
 
 void View::drawROI() const
 {
+    glLineWidth(1);
     front_color.load();
+    glDisable(GL_LIGHTING);
     drawCuboid(mROI[0], mROI[1]);
 }
 

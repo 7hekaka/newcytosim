@@ -121,8 +121,6 @@ void SpaceTorus::draw2D() const
     constexpr size_t fin = 16 * gle::finesse;
     GLfloat cir[2*fin+2];
 
-    glEnableClientState(GL_VERTEX_ARRAY);
-
     gle::circle(fin, cir, GLfloat(bRadius-bWidth));
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
@@ -130,8 +128,6 @@ void SpaceTorus::draw2D() const
     gle::circle(fin, cir, GLfloat(bRadius+bWidth));
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
-
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void SpaceTorus::draw3D() const

@@ -760,7 +760,6 @@ namespace gle
 
     void drawBuffer(GLuint buf1, GLuint buf2, unsigned cnt, GLenum mode)
     {
-        glEnableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
         glVertexPointer(3, GL_FLOAT, 0, nullptr);
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -768,7 +767,6 @@ namespace gle
         glNormalPointer(GL_FLOAT, 0, nullptr);
         glDrawArrays(mode, 0, cnt);
         glDisableClientState(GL_NORMAL_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -1021,13 +1019,11 @@ namespace gle
 
     void drawPlatonic(Platonic::Solid & ico)
     {
-        glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, ico.vertex_data());
         glNormalPointer(GL_FLOAT, 0, ico.vertex_data());
         glDrawElements(GL_TRIANGLES, 3*ico.nb_faces(), GL_UNSIGNED_INT, ico.faces_data());
         glDisableClientState(GL_NORMAL_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
     }
     
     void sphere1U() { drawPlatonic(ico1); }
@@ -1079,7 +1075,6 @@ namespace gle
     {
         if ( glIsBuffer(buf1) )
         {
-            glEnableClientState(GL_VERTEX_ARRAY);
             glEnableClientState(GL_NORMAL_ARRAY);
             // the normal in each vertex is equal to the vertex!
             glBindBuffer(GL_ARRAY_BUFFER, buf1);
@@ -1090,9 +1085,7 @@ namespace gle
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
             glDrawElements(GL_TRIANGLES, 3*nfaces, GL_UNSIGNED_INT, nullptr);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            
             glDisableClientState(GL_NORMAL_ARRAY);
-            glDisableClientState(GL_VERTEX_ARRAY);
         }
     }
     
@@ -1534,9 +1527,7 @@ namespace gle
 #else
         glVertexPointer(2, GL_FLOAT, 0, pts);
 #endif
-        glEnableClientState(GL_VERTEX_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
-        glDisableClientState(GL_VERTEX_ARRAY);
     }
     
     /**
@@ -1555,7 +1546,6 @@ namespace gle
         ca.store(col+12);
         cb.store(col+16);
         cb.store(col+20);
-        glEnableClientState(GL_VERTEX_ARRAY);
 #if REAL_IS_DOUBLE
         glVertexPointer(2, GL_DOUBLE, 0, pts);
 #else
@@ -1565,7 +1555,6 @@ namespace gle
         glColorPointer(4, GL_FLOAT, 0, col);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_COLOR_ARRAY);
-        glDisableClientState(GL_VERTEX_ARRAY);
     }
     
     

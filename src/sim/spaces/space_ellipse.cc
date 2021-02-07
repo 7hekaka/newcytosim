@@ -242,10 +242,8 @@ void SpaceEllipse::draw2D() const
 
     glPushMatrix();
     glScaled(length_[0], length_[1], 1.0);
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_LOOP, 0, fin+1);
-    glDisableClientState(GL_VERTEX_ARRAY);
     glPopMatrix();
 
 #endif

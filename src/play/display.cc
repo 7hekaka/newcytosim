@@ -846,14 +846,12 @@ void Display::drawFiberBackbone(Fiber const& fib) const
 {
     glDisable(GL_LIGHTING);
 #if ( DIM > 1 )
-    glEnableClientState(GL_VERTEX_ARRAY);
 #  if REAL_IS_DOUBLE
     glVertexPointer(DIM, GL_DOUBLE, 0, fib.addrPoints());
 #  else
     glVertexPointer(DIM, GL_FLOAT, 0, fib.addrPoints());
 #  endif
     glDrawArrays(GL_LINE_STRIP, 0, fib.nbPoints());
-    glDisableClientState(GL_VERTEX_ARRAY);
 #else
     glBegin(GL_LINE_STRIP);
     for ( size_t i = 0; i < fib.nbPoints(); ++i )

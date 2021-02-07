@@ -161,10 +161,8 @@ void SpaceDisc::draw2D() const
     GLfloat cir[2*fin+2];
     gle::circle(fin, cir, (GLfloat)radius_);
     
-    glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 0, cir);
     glDrawArrays(GL_LINE_STRIP, 0, fin+1);
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void SpaceDisc::draw3D() const
