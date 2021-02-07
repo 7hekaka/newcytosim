@@ -176,3 +176,23 @@ void SpaceSet::write(Outputter& out) const
         writeObjects(out, pool);
     }
 }
+
+
+void SpaceSet::report(std::ostream& os) const
+{
+    if ( size() > 0 )
+    {
+        os << '\n' << title();
+        PropertyList plist = simul.properties.find_all(title());
+        for ( Property const* i : plist )
+        {
+            SpaceProp const* p = static_cast<SpaceProp const*>(i);
+            size_t cnt = count(match_property, p);
+            os << '\n' << std::setw(10) << cnt << ' ' << p->name();
+            os << " ( " << p->shape << " )";
+        }
+        if ( plist.size() > 1 )
+            os << '\n' << std::setw(10) << size() << " total";
+    }
+
+}
