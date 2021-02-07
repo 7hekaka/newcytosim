@@ -246,9 +246,9 @@ void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceStrip::draw2D() const
 {
-    const GLfloat X = halflength_[0];
-    const GLfloat T = top_;
-    const GLfloat B = bot_;
+    const GLfloat X(halflength_[0]);
+    const GLfloat T(top_);
+    const GLfloat B(bot_);
     
     glBegin(GL_LINES);
     glVertex3f(-X, T, 0);
@@ -271,11 +271,11 @@ void SpaceStrip::draw2D() const
 
 void SpaceStrip::draw3D() const
 {
-    const real X = halflength_[0];
-    const real T = top_;
-    const real B = bot_;
-    
-    const real Y = halflength_[1];
+    const GLfloat X(halflength_[0]);
+    const GLfloat T(top_);
+    const GLfloat B(bot_);
+
+    const GLfloat Y(halflength_[1]);
     // draw faces:
     glBegin(GL_TRIANGLE_STRIP);
     glNormal3f(0, 0, 1);

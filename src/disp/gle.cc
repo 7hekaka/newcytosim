@@ -46,7 +46,7 @@ namespace gle
      with radius `rad` and center {cenX, cenY}
     */
     void compute_arc(size_t cnt, GLfloat CS[], double rad,
-                     double start, double end, GLfloat cenX, GLfloat cenY)
+                     double start, double end, GLfloat cX, GLfloat cY)
     {
         const double theta = ( end - start ) / (double)cnt;
         const double c = std::cos(theta);
@@ -58,8 +58,8 @@ namespace gle
         
         for( size_t n = 0; n <= cnt; ++n )
         {
-            CS[  2*n] = GLfloat(x) + cenX;
-            CS[1+2*n] = GLfloat(y) + cenY;
+            CS[  2*n] = GLfloat(x) + cX;
+            CS[1+2*n] = GLfloat(y) + cY;
             //apply the rotation matrix
             t = x;
             x = c * x - s * y;
@@ -344,6 +344,13 @@ namespace gle
         glDrawArrays(GL_LINE_LOOP, 0, ncircle);
     }
     
+    void disc()
+    {
+        glNormal3f(0, 0, 1);
+        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
+    }
+
     void discUp()
     {
         glNormal3f(0, 0, 1);
@@ -354,21 +361,10 @@ namespace gle
     void discDown()
     {
         glNormal3f(0, 0, -1);
-        //glVertexPointer(2, GL_FLOAT, 16, cir_);
-        //glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f(0, 0);
-        // swap cos and sin to get front facing down (counter clockwise rule)
-        for( size_t n = 0; n <= ncircle; n += 2 )
-            glVertex2f(sin_(n), cos_(n));
-        glEnd();
-    }
-    
-    void discUpNicer()
-    {
-        glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
+        glFrontFace(GL_CW);
+        glVertexPointer(2, GL_FLOAT, 16, cir_);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
+        glFrontFace(GL_CCW);
     }
     
     //-----------------------------------------------------------------------
@@ -1402,73 +1398,72 @@ namespace gle
         if ( n > 0 )
         {
             rad /= n;
-            glBegin(GL_TRIANGLE_STRIP);
-            gleVertex(A+rad*d);
-            gleVertex(A-rad*d);
-            gleVertex(B+rad*d);
-            gleVertex(B-rad*d);
-            glEnd();
+            float2 pts[4] = { A+rad*d, A-rad*d, B+rad*d, B-rad*d };
+            glVertexPointer(2, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         }
     }
     
     
-    void drawBand(Vector1 const& A, real rA,
-                  Vector1 const& B, real rB)
+    void drawBand(Vector1 const& A, GLfloat rA,
+                  Vector1 const& B, GLfloat rB)
     {
-        glBegin(GL_TRIANGLE_STRIP);
-        glVertex2f(A.XX,+rA);
-        glVertex2f(A.XX,-rA);
-        glVertex2f(B.XX,+rB);
-        glVertex2f(B.XX,-rB);
-        glEnd();
+        GLfloat AX(A.XX);
+        GLfloat BX(B.XX);
+        GLfloat pts[8] = { AX, rA, AX, -rA, BX, rB, BX, -rB };
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
-    void drawBand(Vector2 const& A, real rA,
-                  Vector2 const& B, real rB)
+    void drawBand(Vector2 const& A, GLfloat rA,
+                  Vector2 const& B, GLfloat rB)
     {
         Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
         if ( n > 0 )
         {
-            d /= n;
-            glBegin(GL_TRIANGLE_STRIP);
-            gleVertex(A-rA*d);
-            gleVertex(A+rA*d);
-            gleVertex(B-rB*d);
-            gleVertex(B+rB*d);
-            glEnd();
+            GLfloat dX(d.XX/n), dY(d.YY/n);
+            GLfloat AX(A.XX), AY(A.YY);
+            GLfloat BX(B.XX), BY(B.YY);
+            GLfloat pts[8] = { AX+rA*dX, AY+rA*dY, AX-rA*dX, AY-rA*dY,
+                               BX+rB*dX, BY+rB*dY, BX-rB*dX, BY-rB*dY };
+            glVertexPointer(2, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
     
-    void drawBand(Vector1 const& a, real ra, gle_color ca,
-                  Vector1 const& b, real rb, gle_color cb)
+    void drawBand(Vector1 const& A, GLfloat rA, gle_color cA,
+                  Vector1 const& B, GLfloat rB, gle_color cB)
     {
-        glBegin(GL_TRIANGLE_STRIP);
-        ca.load();
-        glVertex2f(a.XX,-ra);
-        glVertex2f(a.XX,+ra);
-        cb.load();
-        glVertex2f(b.XX,-rb);
-        glVertex2f(b.XX,+rb);
-        glEnd();
+        GLfloat AX(A.XX);
+        GLfloat BX(B.XX);
+        GLfloat pts[8] = { AX,-rA, AX, rA, BX, -rB, BX, rB };
+        float4 col[4] = { cA, cA, cB, cB };
+        glEnableClientState(GL_COLOR_ARRAY);
+        glColorPointer(4, GL_FLOAT, 0, col);
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
     
-    void drawBand(Vector2 const& a, real ra, gle_color ca,
-                  Vector2 const& b, real rb, gle_color cb)
+    void drawBand(Vector2 const& A, GLfloat rA, gle_color cA,
+                  Vector2 const& B, GLfloat rB, gle_color cB)
     {
-        Vector2 d = ( b - a ).orthogonal();
+        Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
         if ( n > 0 )
         {
-            d /= n;
-            glBegin(GL_TRIANGLE_STRIP);
-            ca.load();
-            gleVertex(a+ra*d);
-            gleVertex(a-ra*d);
-            cb.load();
-            gleVertex(b+rb*d);
-            gleVertex(b-rb*d);
-            glEnd();
+            GLfloat dX(d.XX/n), dY(d.YY/n);
+            GLfloat AX(A.XX), AY(A.YY);
+            GLfloat BX(B.XX), BY(B.YY);
+            GLfloat pts[8] = { AX+rA*dX, AY+rA*dY, AX-rA*dX, AY-rA*dY,
+                               BX+rB*dX, BY+rB*dY, BX-rB*dX, BY-rB*dY };
+            float4 col[] = { cA, cA, cB, cB };
+            glEnableClientState(GL_COLOR_ARRAY);
+            glColorPointer(4, GL_FLOAT, 0, col);
+            glVertexPointer(2, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glDisableClientState(GL_COLOR_ARRAY);
         }
     }
     
@@ -1478,15 +1473,10 @@ namespace gle
      and a hourglass if the connection is antiparallel
      */
     void drawHourglass(Vector2 const& a, Vector2 const& da,
-                Vector2 const& b, Vector2 const& db)
+                       Vector2 const& b, Vector2 const& db)
     {
-        Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        static_assert(sizeof(pts)==12*sizeof(real), "unexpected size of Vector2");
-#if REAL_IS_DOUBLE
-        glVertexPointer(2, GL_DOUBLE, 0, pts);
-#else
+        float2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
         glVertexPointer(2, GL_FLOAT, 0, pts);
-#endif
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
     }
     
@@ -1495,23 +1485,12 @@ namespace gle
      and a hourglass if the connection is antiparallel
      */
     void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color ca,
-                Vector2 const& b, Vector2 const& db, gle_color cb)
+                       Vector2 const& b, Vector2 const& db, gle_color cb)
     {
-        Vector2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        static_assert(sizeof(pts)==12*sizeof(real), "unexpected size of Vector2");
-        GLfloat col[24];
-        cb.store(col);
-        cb.store(col+4);
-        ca.store(col+8);
-        ca.store(col+12);
-        cb.store(col+16);
-        cb.store(col+20);
-#if REAL_IS_DOUBLE
-        glVertexPointer(2, GL_DOUBLE, 0, pts);
-#else
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-#endif
+        float2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
+        float4 col[6] = { cb, cb, ca, ca, cb, cb };
         glEnableClientState(GL_COLOR_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 0, pts);
         glColorPointer(4, GL_FLOAT, 0, col);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_COLOR_ARRAY);
@@ -1522,54 +1501,32 @@ namespace gle
      This will displays a rectangle if the connection is antiparallel,
      and a hourglass if the connection is parallel
      */
-    void drawCross(Vector2 const& a, Vector2 const& da,
-                  Vector2 const& b, Vector2 const& db, real rad)
+    void drawCross(Vector2 const& A, Vector2 const& dA,
+                   Vector2 const& B, Vector2 const& dB, real rad)
     {
         glLineWidth(0.5);
-        glBegin(GL_TRIANGLE_FAN);
-        gleVertex(a);
-        gleVertex(a-rad*da);
-        gleVertex(b);
-        gleVertex(b-rad*db);
-        glEnd();
-        glBegin(GL_TRIANGLE_FAN);
-        gleVertex(a);
-        gleVertex(a+rad*da);
-        gleVertex(b);
-        gleVertex(b+rad*db);
-        glEnd();
+        float2 pts[8] = { A, A-rad*dA, B, B-rad*dB,
+                          A, A+rad*dA, B, B+rad*dB };
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+        glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
     }
     
-    void drawBar(Vector3 const& a, Vector3 const& da,
-                Vector3 const& b, Vector3 const& db, real rad)
+    void drawBar(Vector3 const& A, Vector3 const& dA,
+                 Vector3 const& B, Vector3 const& dB, real rad)
     {
-        Vector3 ab = normalize( a - b );
-        Vector3 ea = cross(ab, da);
-        Vector3 eb = cross(ab, db);
-        glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(a-rad*(da-ea));
-        gleVertex(a-rad*(da+ea));
-        gleVertex(b-rad*(db-eb));
-        gleVertex(b-rad*(db+eb));
-        glEnd();
-        glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(a+rad*(da-ea));
-        gleVertex(a+rad*(da+ea));
-        gleVertex(b+rad*(db-eb));
-        gleVertex(b+rad*(db+eb));
-        glEnd();
-        glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(a-rad*da);
-        gleVertex(a+rad*da);
-        gleVertex(b-rad*db);
-        gleVertex(b+rad*db);
-        glEnd();
-        glBegin(GL_TRIANGLE_STRIP);
-        gleVertex(a-rad*da);
-        gleVertex(a+rad*da);
-        gleVertex(b-rad*db);
-        gleVertex(b+rad*db);
-        glEnd();
+        Vector3 ab = normalize( A - B );
+        Vector3 ea = cross(ab, dA);
+        Vector3 eb = cross(ab, dB);
+        float3 pts[16] = { A-rad*(dA-ea), A-rad*(dA+ea), B-rad*(dB-eb), B-rad*(dB+eb),
+                           A+rad*(dA-ea), A+rad*(dA+ea), B+rad*(dB-eb), B+rad*(dB+eb),
+                           A-rad*dA, A+rad*dA, B-rad*dB, B+rad*dB,
+                           A-rad*dA, A+rad*dA, B-rad*dB, B+rad*dB };
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 8, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP,12, 4);
     }
     
     
@@ -1579,50 +1536,28 @@ namespace gle
      */
     void drawDumbbell(Vector2 const& A, Vector2 const& B, GLfloat diameter)
     {
-        const GLfloat S = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
-        const GLfloat R = diameter * S;
-        const GLfloat H = R * 0.8660254037844386f; //0.5f * sqrt(3);
-        const GLfloat X = R * 0.5f;
+        const GLfloat S(1.0996361107912678f); //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
+        const GLfloat R(diameter * S);
+        const GLfloat H(R * 0.8660254037844386f); //0.5f * sqrt(3);
+        const GLfloat X(R * 0.5f);
         
         Vector2 x = ( B - A ).normalized(H);
         Vector2 y = x.orthogonal(X);
+        float2 pts[20] = {
+            {0,0}, x+y, y+y, y-x, -x-y, -y-y, x-y, x+y,
+            x+y, x-y, B-A-y-x, B-A+y-x,
+            {0,0}, x+y, y+y, y-x, -x-y, -y-y, x-y, x+y };
+        glVertexPointer(2, GL_FLOAT, 0, pts);
         
         glPushMatrix();
         translate(A);
-        
-        // this is an hexagon centered around 'a':
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f(0,0);
-        gleVertex(x+y);
-        gleVertex(2*y);
-        gleVertex(-x+y);
-        gleVertex(-x-y);
-        gleVertex(-2*y);
-        gleVertex(x-y);
-        gleVertex(x+y);
-        glEnd();
-        
+        // draw hexagon around 'a':
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 8);
         // a band from 'a' to 'b'
-        glBegin(GL_TRIANGLE_FAN);
-        gleVertex(+y+x);
-        gleVertex(-y+x);
-        gleVertex(B-A-y-x);
-        gleVertex(B-A+y-x);
-        glEnd();
-        
-        // an hexagon centered around 'b'
+        glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
         translate(B-A);
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f(0,0);
-        gleVertex(x+y);
-        gleVertex(2*y);
-        gleVertex(-x+y);
-        gleVertex(-x-y);
-        gleVertex(-2*y);
-        gleVertex(x-y);
-        gleVertex(x+y);
-        glEnd();
-        
+        // an hexagon centered around 'b'
+        glDrawArrays(GL_TRIANGLE_FAN, 12, 8);
         glPopMatrix();
     }
     
@@ -1632,24 +1567,19 @@ namespace gle
     void drawCone(Vector1 const& pos, Vector1 const& dir, const GLfloat rad)
     {
         GLfloat dx = rad*dir.XX, cx = pos.XX;
-        glBegin(GL_TRIANGLE_STRIP);
-        glVertex2f(cx-dx   , dx);
-        glVertex2f(cx-dx/2 , 0 );
-        glVertex2f(cx+dx+dx, 0 );
-        glVertex2f(cx-dx   ,-dx);
-        glEnd();
+        GLfloat pts[8] = {cx-dx, dx, cx-dx/2, 0, cx+dx+dx, 0, cx-dx ,-dx };
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
     void drawCone(Vector2 const& pos, Vector2 const& dir, const GLfloat rad)
     {
-        GLfloat dx = rad*dir.XX,  cx = pos.XX;
-        GLfloat dy = rad*dir.YY,  cy = pos.YY;
-        glBegin(GL_TRIANGLE_STRIP);
-        glVertex2f(cx-dx-dy, cy-dy+dx);
-        glVertex2f(cx-dx/2,  cy-dy/2 );
-        glVertex2f(cx+dx+dx, cy+dy+dy);
-        glVertex2f(cx-dx+dy, cy-dy-dx);
-        glEnd();
+        GLfloat dx(rad*dir.XX),  cx(pos.XX);
+        GLfloat dy(rad*dir.YY),  cy(pos.YY);
+        GLfloat dxy = dx + dy, dyx = dy - dx;
+        GLfloat pts[8] = {cx-dxy, cy-dyx, cx-dx/2, cy-dy/2, cx+2*dx, cy+2*dy,cx+dyx, cy-dxy};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
     void drawCone(Vector3 const& pos, Vector3 const& dir, const GLfloat rad)
@@ -1664,26 +1594,20 @@ namespace gle
     
     void drawCylinder(Vector1 const& pos, Vector1 const& dir, float rad)
     {
-        real cx = pos.XX;
-        glBegin(GL_TRIANGLE_STRIP);
-        real dx = rad * dir.XX / 2;
-        glVertex2f( cx-dx, -rad );
-        glVertex2f( cx-dx,  rad );
-        glVertex2f( cx+dx, -rad );
-        glVertex2f( cx+dx,  rad );
-        glEnd();
+        GLfloat cx(pos.XX);
+        GLfloat dx(rad * dir.XX * 0.5);
+        GLfloat pts[8] = {cx-dx, -rad, cx-dx, rad, cx+dx, -rad, cx+dx, rad };
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
     void drawCylinder(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        real dx = rad * dir.XX, cx = pos.XX - dx / 2;
-        real dy = rad * dir.YY, cy = pos.YY - dy / 2;
-        glBegin(GL_TRIANGLE_STRIP);
-        glVertex2f( cx+dy, cy-dx );
-        glVertex2f( cx-dy, cy+dx );
-        glVertex2f( cx+dx+dy, cy+dy-dx );
-        glVertex2f( cx+dx-dy, cy+dy+dx );
-        glEnd();
+        GLfloat dx(rad * dir.XX), cx(pos.XX - dx * 0.5);
+        GLfloat dy(rad * dir.YY), cy(pos.YY - dy * 0.5);
+        GLfloat pts[8] = {cx+dy, cy-dx, cx-dy, cy+dx, cx+dx+dy, cy+dy-dx, cx+dx-dy, cy+dy+dx};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     
     void drawCylinder(Vector3 const& pos, Vector3 const& dir, float rad)
@@ -1700,35 +1624,26 @@ namespace gle
     
     void drawArrowTail(Vector1 const& pos, Vector1 const& dir, float rad)
     {
-        GLfloat dx = rad * dir.XX;
-        GLfloat cx = pos.XX - dx / 2;
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f( cx,       0  );
-        glVertex2f( cx-dx,   -dx );
-        glVertex2f( cx+dx,   -dx );
-        glVertex2f( cx+dx+dx, 0  );
-        glVertex2f( cx+dx,    dx );
-        glVertex2f( cx-dx,    dx );
-        glEnd();
+        GLfloat dx(rad * dir.XX);
+        GLfloat cx(pos.XX - dx * 0.5 );;
+        GLfloat pts[12] = {cx, 0, cx-dx, -dx, cx+dx, -dx,
+                           cx+2*dx, 0, cx+dx, dx, cx-dx, dx};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
     }
     
     void drawArrowTail(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        GLfloat dx = rad * dir.XX;
-        GLfloat dy = rad * dir.YY;
-        GLfloat cx = pos.XX - 1.5f * dx;
-        GLfloat cy = pos.YY - 1.5f * dy;
-        GLfloat ex = cx + 2 * dx;
-        GLfloat ey = cy + 2 * dy;
-        
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex2f( cx+dx, cy+dy );
-        glVertex2f( cx+dy, cy-dx );
-        glVertex2f( ex+dy, ey-dx );
-        glVertex2f( ex+dx, ey+dy );
-        glVertex2f( ex-dy, ey+dx );
-        glVertex2f( cx-dy, cy+dx );
-        glEnd();
+        GLfloat dx(rad * dir.XX);
+        GLfloat dy(rad * dir.YY);
+        GLfloat cx(pos.XX - 1.5f * dx);
+        GLfloat cy(pos.YY - 1.5f * dy);
+        GLfloat ex(cx + 2 * dx);
+        GLfloat ey(cy + 2 * dy);
+        GLfloat pts[12] = {cx+dx, cy+dy, cx+dy, cy-dx, ex+dy, ey-dx,
+                           ex+dx, ey+dy, ex-dy, ey+dx, cx-dy, cy+dx};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
     }
     
     void drawArrowTail(Vector3 const& pos, Vector3 const& dir, float rad)
@@ -1986,18 +1901,14 @@ namespace gle
             int rec[4] = { px-R, B, px+textWidth+R, T+R+R/2+R/4 };
             
             bcol.load();
-            glBegin(GL_TRIANGLE_FAN);
-            drawNiceRectangle(rec, 3);
-            glEnd();
+            drawNiceRectangle(rec, 3, GL_TRIANGLE_FAN);
             
             glPopAttrib();
             
             if ( position == 4 )
             {
                 glLineWidth(0.5);
-                glBegin(GL_LINE_STRIP);
-                drawNiceRectangle(rec, 3);
-                glEnd();
+                drawNiceRectangle(rec, 3, GL_LINE_STRIP);
             }
         }
         
@@ -2076,25 +1987,27 @@ namespace gle
      */
     void drawRectangle(const int rec[4])
     {
-        glVertex2i(rec[0], rec[1]);
-        glVertex2i(rec[2], rec[1]);
-        glVertex2i(rec[2], rec[3]);
-        glVertex2i(rec[0], rec[3]);
-        glVertex2i(rec[0], rec[1]);
+        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
+        GLfloat pts[10] = { L, B, R, B, R, T, L, T, L, B };
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_LINE_LOOP, 0, 5);
     }
     
-    
-    void drawNiceRectangle(const int rec[4], const int rad)
+    void drawRectangle(float L, float B, float R, float T, float Z)
     {
-        glVertex2i(rec[0], rec[1]+rad);
-        glVertex2i(rec[0]+rad, rec[1]);
-        glVertex2i(rec[2]-rad, rec[1]);
-        glVertex2i(rec[2], rec[1]+rad);
-        glVertex2i(rec[2], rec[3]-rad);
-        glVertex2i(rec[2]-rad, rec[3]);
-        glVertex2i(rec[0]+rad, rec[3]);
-        glVertex2i(rec[0], rec[3]-rad);
-        glVertex2i(rec[0], rec[1]+rad);
+        GLfloat pts[15] = { L, B, Z, R, B, Z, R, T, Z, L, T, Z, L, B, Z };
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_LINE_LOOP, 0, 5);
+    }
+
+    
+    void drawNiceRectangle(const int rec[4], const int rad, GLint prim)
+    {
+        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
+        GLfloat D(rad);
+        GLfloat pts[18] = {L,B+D,L+D,B,R-D,B,R,B+D,R,T-D,R-D,T,L+D,T,L,T-D,L,B+D};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(prim, 0, 9);
     }
     
     
@@ -2138,13 +2051,10 @@ namespace gle
         glOrtho(width, 0, 0, height, 0, 1 );
         
         //draw lines at 45 degrees
-        glBegin(GL_LINES);
-        glVertex2i(16, 1);    glVertex2i(1, 16);
-        glVertex2i(12, 1);    glVertex2i(1, 12);
-        glVertex2i(8,  1);    glVertex2i(1,  8);
-        glVertex2i(4,  1);    glVertex2i(1,  4);
-        glEnd();
-        
+        GLfloat pts[16] = {16, 1, 1, 16, 12, 1, 1, 12, 8, 1, 1, 8, 4, 1, 1, 4};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_LINES, 0, 8);
+
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
@@ -2152,16 +2062,6 @@ namespace gle
     
 
     //-----------------------------------------------------------------------
-    
-    void drawRectangle(float X1, float Y1, float X2, float Y2, float Z)
-    {
-        glBegin(GL_TRIANGLE_STRIP);
-        glVertex3f(X1, Y1, Z);
-        glVertex3f(X2, Y1, Z);
-        glVertex3f(X1, Y2, Z);
-        glVertex3f(X2, Y2, Z);
-        glEnd();
-    }
     
     int copyparity(int a, int b)
     {

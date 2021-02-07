@@ -48,12 +48,9 @@ void drawValues(Grid<CELL, 1> const& grid,
         float x = grid.position(0, c);
         if ( set_color(arg, grid[c], Vector1(x)) )
         {
-            glBegin(GL_TRIANGLE_STRIP);
-            glVertex2f(x  , -e);
-            glVertex2f(x+d, -e);
-            glVertex2f(x  ,  e);
-            glVertex2f(x+d,  e);
-            glEnd();
+            GLfloat pts[8] = {x, -e, x+d, -e, x, e, x+d, e};
+            glVertexPointer(2, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
 }
@@ -80,12 +77,10 @@ void drawValues(Grid<CELL, 2> const& grid,
         grid.setPositionFromIndex(w, c, 0.5);
         if ( set_color(arg, grid[c], w) )
         {
-            glBegin(GL_TRIANGLE_STRIP);
-            glVertex2f(w.XX-d, w.YY-e);
-            glVertex2f(w.XX+d, w.YY-e);
-            glVertex2f(w.XX-d, w.YY+e);
-            glVertex2f(w.XX+d, w.YY+e);
-            glEnd();
+            GLfloat X(w.XX), Y(w.YY);
+            GLfloat pts[8] = {X-d, Y-e, X+d, Y-e, X-d, Y+e, X+d, Y+e};
+            glVertexPointer(2, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
 }

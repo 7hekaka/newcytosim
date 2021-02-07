@@ -6,6 +6,14 @@
 #include "opengl.h"
 #include <iostream>
 
+/// array of 4 float RGBA components
+struct float4
+{
+    GLfloat col_[4];
+    float4(const GLfloat c[]) { col_[0]=c[0]; col_[1]=c[1]; col_[2]=c[2]; col_[3]=c[3]; }
+};
+
+
 /**
  gle_color implements colors with 4-components:
  - Red
@@ -23,7 +31,15 @@
 class gle_color
 {
 #pragma mark - Static methods
+public:
     
+    static size_t stride()
+    {
+        return sizeof(gle_color) - 4 * sizeof(GLfloat);
+    }
+
+private:
+
     /// concatenate 4 bytes into an int
     static uint32_t combine(uint32_t R, uint32_t G, uint32_t B, uint32_t A)
     {
@@ -39,15 +55,13 @@ class gle_color
     
     /// return value clamped to [0, 1]
     static GLfloat clamp(GLfloat s) { return std::max(0.0f, std::min(s, 1.0f)); }
-
-private:
-    
-    /// 32-bits integer containing 4 one-byte components: red, green, blue, alpha
-    uint32_t rgba_;
     
     /// array of 4 float components, matching the `rgba_` integer
     GLfloat col_[4];
-        
+    
+    /// 32-bits integer containing 4 one-byte components: red, green, blue, alpha
+    uint32_t rgba_;
+
 #pragma mark - Private methods
 
     /// update 'rgba_' to match values in 'col_'
@@ -68,7 +82,7 @@ private:
 #pragma mark - Public methods
 
 public:
-
+    
     /// set to white
     void set_white()
     {
@@ -179,8 +193,9 @@ public:
     bool operator ==(const gle_color col) const { return rgba_ == col.rgba_; }
     bool operator !=(const gle_color col) const { return rgba_ != col.rgba_; }
     
-    GLfloat const* data() const { return col_; }
-    
+    GLfloat const* colors() const { return col_; }
+    operator float4() const { return float4(col_); }
+
     /// access to float components
     GLfloat& operator [] (int i) { return col_[i]; }
 

@@ -22,6 +22,13 @@ class Vector2;
 #  define VECTOR3_USES_AVX 0
 #endif
 
+/// accessory class to facilitates using Vector2 in OpenGL
+struct float3
+{
+    float xyz[3];
+    float3(float x, float y, float z) : xyz{x, y, z} {}
+};
+
 
 /// Vector3 is a vector with 3 `real` components.
 /**
@@ -117,6 +124,9 @@ public:
     }
 #endif
     
+    /// conversion to float3
+    operator float3() const { return float3(XX, YY, ZZ); }
+
     /// return x-component
     real x() const { return XX; }
     /// return y-component

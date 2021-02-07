@@ -120,11 +120,12 @@ namespace gle
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void circle();
+    /// draw nicer 2D disc of radius 1 in XY plane, with +Z as normal
+    void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void discUp();
+    /// draw 2D disc of radius 1 in XY plane, with -Z as normal
     void discDown();
-    /// draw nicer 2D disc of radius 1 in XY plane, with +Z as normal
-    void discUpNicer();
 
     /// draw a tetrahedron of side 2 in 3D
     void tetrahedron();
@@ -211,7 +212,7 @@ namespace gle
     void drawRectangle(const int rect[4]);
     
     /// a rectangle with cut corners
-    void drawNiceRectangle(const int rect[4], int);
+    void drawNiceRectangle(const int rect[4], int, GLint);
 
     //------------------------------------------------------------------------------
     
@@ -284,12 +285,12 @@ namespace gle
     void drawBand(Vector3 const& A, Vector3 const& B, real);
 
     /// draw a band from A to B, with specified radius in A and B
-    void drawBand(Vector1 const& a, real, Vector1 const& b, real);
-    void drawBand(Vector2 const& a, real, Vector2 const& b, real);
+    void drawBand(Vector1 const& a, GLfloat, Vector1 const& b, GLfloat);
+    void drawBand(Vector2 const& a, GLfloat, Vector2 const& b, GLfloat);
     
     /// draw a band from A to B, with specified radius and colors in A and B
-    void drawBand(Vector1 const& a, real, gle_color, Vector1 const& b, real, gle_color);
-    void drawBand(Vector2 const& a, real, gle_color, Vector2 const& b, real, gle_color);
+    void drawBand(Vector1 const& a, GLfloat, gle_color, Vector1 const& b, GLfloat, gle_color);
+    void drawBand(Vector2 const& a, GLfloat, gle_color, Vector2 const& b, GLfloat, gle_color);
 
     /// draw symbol linking A to B
     void drawHourglass(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&);

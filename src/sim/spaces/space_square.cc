@@ -243,9 +243,9 @@ void SpaceSquare::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceSquare::draw3D() const
 {
-    const GLfloat X = length_[0];
-    const GLfloat Y = length_[1];
-    const GLfloat Z = ( DIM > 2 ) ? length_[2] : 0;
+    const GLfloat X(length_[0]);
+    const GLfloat Y(length_[1]);
+    const GLfloat Z(( DIM > 2 ) ? length_[2] : 0);
 
 #if ( DIM > 2 )
 

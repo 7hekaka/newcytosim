@@ -19,6 +19,12 @@
 #  define VECTOR2_USES_SSE 0
 #endif
 
+/// accessory class to facilitates using Vector2 in OpenGL
+struct float2
+{
+    float xy[2];
+    float2(float x, float y) : xy{x, y} {}
+};
 
 /// Vector2 is a vector with 2 `real` components.
 /**
@@ -96,6 +102,9 @@ public:
     }
 #endif
     
+    /// conversion to float2
+    operator float2() const { return float2(XX, YY); }
+
     /// return x-component
     real x() const { return XX; }
     /// return y-component

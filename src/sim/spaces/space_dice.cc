@@ -314,13 +314,13 @@ void SpaceDice::draw2D() const
 
 void SpaceDice::draw3D() const
 {
-    const GLfloat X = length_[0] - edge_;
-    const GLfloat Y = length_[1] - edge_;
-    const GLfloat Z = length_[2] - edge_;
+    const GLfloat X(length_[0] - edge_);
+    const GLfloat Y(length_[1] - edge_);
+    const GLfloat Z(length_[2] - edge_);
  
-    const GLfloat XR = length_[0];
-    const GLfloat YR = length_[1];
-    const GLfloat ZR = length_[2];
+    const GLfloat XR(length_[0]);
+    const GLfloat YR(length_[1]);
+    const GLfloat ZR(length_[2]);
 
     glBegin(GL_TRIANGLE_STRIP);
     glVertex3f( XR,  Y, -Z );

@@ -255,39 +255,35 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCapsule::draw2D() const
 {
-    //number of sections in the quarter-circle
-    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
-    
-    GLfloat cir[8*fin+2];
-    gle::compute_circle(fin*4, cir, 1);
-    
     const GLfloat L(length_);
     const GLfloat R(radius_);
-    
-    //display a loop in X/Y plane
-    glBegin(GL_LINE_LOOP);
-    
-    for ( size_t n = 0;     n <= 2*fin; ++n )
-        glVertex2f(R*cir[1+2*n]+L, R*cir[2*n]);
-    
-    for ( size_t n = 2*fin; n <= 4*fin; ++n )
-        glVertex2f(R*cir[1+2*n]-L, R*cir[2*n]);
-    
-    glEnd();
+
+    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
+    GLfloat cir[8*fin+4];
+    gle::compute_circle(fin*4, cir+4, R, M_PI_2);
+    cir[2] = 2*L;
+    cir[3] = R;
+
+    glTranslatef(-L, 0, 0);
+    glVertexPointer(2, GL_FLOAT, 0, cir+2);
+    glDrawArrays(GL_LINE_STRIP, 0, 2*fin+2);
+    glTranslatef(2*L, 0, 0);
+    cir[4*fin+2] = -2*L;
+    cir[4*fin+3] = -R;
+    glDrawArrays(GL_LINE_STRIP, 2*fin, 2*fin+2);
+    glTranslatef(-L, 0, 0);
 }
 
 
 void SpaceCapsule::draw3D() const
 {
-    //number of sections in the quarter-circle
-    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
-    
-    GLfloat cir[8*fin+2];
-    gle::compute_circle(fin*4, cir, 1);
-    
     const GLfloat L(length_);
     const GLfloat R(radius_);
     
+    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
+    GLfloat cir[8*fin+2];
+    gle::compute_circle(fin*4, cir, 1);
+        
     //display strips along the side of the volume:
     for ( size_t t = 0; t < 4*fin; ++t )
     {

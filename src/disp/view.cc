@@ -621,7 +621,7 @@ void View::setFog(GLint type, GLfloat param, gle_color color) const
         glFogf(GL_FOG_DENSITY, param/visRegion[2]);
     }
     
-    glFogfv(GL_FOG_COLOR, color.data());
+    glFogfv(GL_FOG_COLOR, color.colors());
 }
 
 void View::enableFog(const GLint type, const GLfloat param, gle_color color)
