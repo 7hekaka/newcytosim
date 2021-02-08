@@ -58,7 +58,7 @@ public:
     void        boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        thickness() const { return radius_; }
+    real        thickness() const { return 2*radius_; }
     
     /// direct normal direction calculation
     Vector      normalToEdge(Vector const& pos) const;

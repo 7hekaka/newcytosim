@@ -54,6 +54,9 @@ public:
     /// return bounding box in `inf` and `sup`
     void boundaries(Vector& inf, Vector& sup) const;
     
+    /// thickness in Z
+    real thickness() const { return ( top_ - bot_ ); }
+
     /// the volume inside
     real volume() const;
     

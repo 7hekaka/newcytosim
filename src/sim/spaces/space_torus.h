@@ -44,7 +44,7 @@ public:
     void boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real thickness() const { return bRadius; }
+    real thickness() const { return 2*bRadius; }
 
     /// the volume inside
     real volume() const;

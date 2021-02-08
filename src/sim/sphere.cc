@@ -251,9 +251,9 @@ void Sphere::setDragCoefficientStokes()
  a = radius of the sphere.
  
  The formula are taken from:
- <em>The Motion of a Closely-Fitting Sphere in a Fluid-Filled Tube</em>\n
- <b>P. Bungay and H. Brenner, Int. J. Multiphase Flow</b>\n
- Vol 1, pp. 25-56, 1973 (see 3.6, 4.68a and 5.11)
+     The Motion of a Closely-Fitting Sphere in a Fluid-Filled Tube
+     P. Bungay and H. Brenner, Int. J. Multiphase Flow
+     Vol 1, pp. 25-56, 1973 (see 3.6, 4.68a and 5.11)
  @latex
      \gamma = \frac{9 \pi^2 \sqrt{2} }{ 4\epsilon^{5/2}} \,\eta \, r
      \gamma^{rot} = 2 \pi^2 \sqrt{\frac{2}{\epsilon}} \,\eta\, r^3
@@ -265,14 +265,14 @@ void Sphere::setDragCoefficientPiston()
     assert_true( prop->confine_space_ptr );
     
     const real rad = radius();
-    real thickness = prop->confine_space_ptr->thickness();
-    real eps = ( thickness - rad ) / rad;
+    real thick = 0.5 * prop->confine_space_ptr->thickness();
+    real eps = ( thick - rad ) / rad;
     
     if ( eps <= 0 || eps > 1 )
-        throw InvalidParameter("Error: piston formula yields invalid value");
+        throw InvalidParameter("Sphere's mobility piston formula yields invalid value");
 
-    spDrag    = 9*M_PI*M_PI * prop->viscosity * rad * M_SQRT2 / ( 4 * std::pow(eps,2.5) );
-    spDragRot = 2*M_PI*M_PI * prop->viscosity * rad * rad * rad * std::sqrt(2.0/eps);
+    spDrag    = M_PI*M_PI*prop->viscosity*rad * 2.25 * M_SQRT2 * std::pow(eps,-2.5);
+    spDragRot = M_PI*M_PI*prop->viscosity*rad * rad * rad * std::sqrt(8/eps);
         
     //report the reduced mobility of the sphere:
     Cytosim::log("Sphere of radius %.3f has piston mobility %.2e\n", spRadius, spDrag);
