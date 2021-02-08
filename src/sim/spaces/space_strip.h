@@ -25,8 +25,8 @@ class SpaceStrip : public Space
 {
 private:
     
-    /// half to total width in X and Y dimensions
-    real halflength_[2];
+    /// half the lenth in each dimension
+    real half_[2];
     
     /// lower position of the bottom limit: Y in 2D and Z in 3D
     real bot_;

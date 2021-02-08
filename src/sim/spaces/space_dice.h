@@ -1,10 +1,10 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 #ifndef SPACE_DICE_H
 #define SPACE_DICE_H
 
 #include "space.h"
 
-#define ADVANCED_DICE 1
+#define ADVANCED_DICE_INTERACTIONS 1
 
 /// A rectangle ( or a cube ) with rounded edges. 
 /**
@@ -30,70 +30,76 @@ class SpaceDice : public Space
 {
 private:
     
-    /// half-width in each dimension
-    real      length_[3];
+    /// half the lenth in each dimension
+    real half_[3];
     
     /// the radius by which the corners are smoothed
-    real      edge_;
+    real edge_;
     
     /// the square of the radius
-    real      edgeSqr_;
+    real edgeSqr_;
     
     /// calculate edgeSqr_
-    void      update() { edgeSqr_ = square(edge_); }
+    void update() { edgeSqr_ = square(edge_); }
     
     /// apply a force directed towards the edge of the Space
-    void      setInteraction(Vector const& pos, Mecapoint const&, Meca&, real, const real[], real) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real, const real[], real) const;
 
 public:
-        
+    
     /// constructor
     SpaceDice(SpaceProp const*);
 
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
  
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// the area of the edge surface
-    real        surface() const;
+    real surface() const;
 
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// true if the bead is inside the Space
-    bool        allInside(Vector const&, real rad) const;
+    bool allInside(Vector const&, real rad) const;
 
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
-#if ADVANCED_DICE
+#if ADVANCED_DICE_INTERACTIONS
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 #endif
 
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     
     /// OpenGL display function
-    void        draw2D() const;
+    void drawFaces() const;
     
     /// OpenGL display function
-    void        draw3D() const;
+    void drawEdges() const;
+
+    /// OpenGL display function
+    void draw3D() const { drawFaces(); drawEdges(); }
+    
+    /// OpenGL display function
+    void draw2D() const { drawEdges(); }
 };
 
 #endif

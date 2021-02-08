@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "dim.h"
 #include "space_periodic.h"
 #include "exceptions.h"
@@ -10,7 +10,7 @@ SpacePeriodic::SpacePeriodic(SpaceProp const* p)
 : Space(p)
 {
     for ( int d = 0; d < 3; ++d )
-        halflength_[d] = 0;
+        half_[d] = 0;
 }
 
 
@@ -18,12 +18,12 @@ void SpacePeriodic::resize(Glossary& opt)
 {
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        real len = halflength_[d];
+        real len = half_[d];
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len <= 0 )
             throw InvalidParameter("periodic:length[",d,"] must be > 0");
-        halflength_[d] = len;
+        half_[d] = len;
     }
     update();
 }
@@ -33,14 +33,14 @@ void SpacePeriodic::update()
 {
     modulo_.reset();
     for ( unsigned d = 0; d < DIM; ++d )
-        modulo_.enable(d, 2*halflength_[d]);
+        modulo_.enable(d, 2*half_[d]);
 }
 
 
 void SpacePeriodic::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-halflength_[0],-halflength_[1],-halflength_[2]);
-    sup.set( halflength_[0], halflength_[1], halflength_[2]);
+    inf.set(-half_[0],-half_[1],-half_[2]);
+    sup.set( half_[0], half_[1], half_[2]);
 }
 
 
@@ -59,11 +59,11 @@ void SpacePeriodic::bounce(Vector& pos) const
 real SpacePeriodic::volume() const
 {
 #if ( DIM == 1 )
-    return 2 * halflength_[0];
+    return 2 * half_[0];
 #elif ( DIM == 2 )
-    return 4 * halflength_[0] * halflength_[1];
+    return 4 * half_[0] * half_[1];
 #else
-    return 8 * halflength_[0] * halflength_[1] * halflength_[2];
+    return 8 * half_[0] * half_[1] * half_[2];
 #endif
 }
 
@@ -87,18 +87,18 @@ void SpacePeriodic::write(Outputter& out) const
 {
     writeShape(out, "periodic");
     out.writeUInt16(4);
-    out.writeFloat(halflength_[0]);
-    out.writeFloat(halflength_[1]);
-    out.writeFloat(halflength_[2]);
+    out.writeFloat(half_[0]);
+    out.writeFloat(half_[1]);
+    out.writeFloat(half_[2]);
     out.writeFloat(0.f);
 }
 
 
 void SpacePeriodic::setLengths(const real len[])
 {
-    halflength_[0] = len[0];
-    halflength_[1] = len[1];
-    halflength_[2] = len[2];
+    half_[0] = len[0];
+    half_[1] = len[1];
+    half_[2] = len[2];
     update();
 }
 
@@ -120,40 +120,35 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 
 void SpacePeriodic::draw3D() const
 {
-    const GLfloat X = halflength_[0];
-    const GLfloat Y = ( DIM > 1 ) ? halflength_[1] : 1;
-    const GLfloat Z = ( DIM > 2 ) ? halflength_[2] : 0;
-    
+    const GLfloat X(half_[0]);
+    const GLfloat Y(( DIM > 1 ) ? half_[1] : 1);
+    const GLfloat T(( DIM > 2 ) ? half_[2] : 0);
+    const GLfloat B(-T);
+
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
 
 #if ( DIM == 1 )
-    glBegin(GL_LINES);
-    glVertex3f( X, -Y, 0 );
-    glVertex3f( X,  Y, 0 );
-    glVertex3f(-X,  Y, 0 );
-    glVertex3f(-X, -Y, 0 );
-    glEnd();
+    GLfloat lin[8] = { X,-Y, X, Y,-X, Y,-X,-Y };
+    glVertexPointer(2, GL_FLOAT, 0, lin);
+    glDrawArrays(GL_LINES, 0, 4);
+#elif ( DIM > 1 )
+    // draw edges of the box
+    GLfloat lin[48] = {
+        +X, Y, B, X,-Y, B,-X,-Y, B,-X, Y, B,
+        +X, Y, T, X,-Y, T,-X,-Y, T,-X, Y, T,
+        +X, Y, B, X, Y, T, X,-Y, B, X,-Y, T,
+        -X,-Y, B,-X,-Y, T,-X, Y, B,-X, Y, T
+    };
+    glVertexPointer(3, GL_FLOAT, 0, lin);
+    glDisable(GL_LIGHTING);
+    glDrawArrays(GL_LINE_LOOP, 0, 4);
+    if ( DIM > 2 )
+    {
+        glDrawArrays(GL_LINE_LOOP, 4, 4);
+        glDrawArrays(GL_LINES, 8, 8);
+    }
 #endif
-    
-#if ( DIM > 1 )
-    glBegin(GL_LINE_LOOP);
-    glVertex3f( X,  Y, Z );
-    glVertex3f( X, -Y, Z );
-    glVertex3f(-X, -Y, Z );
-    glVertex3f(-X,  Y, Z );
-    glEnd();
-#endif
-
-#if ( DIM > 2 )
-    glBegin(GL_LINE_LOOP);
-    glVertex3f( X,  Y, -Z );
-    glVertex3f( X, -Y, -Z );
-    glVertex3f(-X, -Y, -Z );
-    glVertex3f(-X,  Y, -Z );
-    glEnd();
-#endif
-
     glDisable(GL_LINE_STIPPLE);
 }
 

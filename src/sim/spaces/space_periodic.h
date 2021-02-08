@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef SPACE_PERIODIC_H
 #define SPACE_PERIODIC_H
 
@@ -20,8 +20,8 @@
 class SpacePeriodic : public Space
 {
     
-    /// half-length in each dimension
-    real   halflength_[3];
+    /// half the lenth in each dimension
+    real half_[3];
 
     /// Object to handle periodic boundary conditions
     Modulo modulo_;
@@ -32,44 +32,44 @@ public:
     SpacePeriodic(SpaceProp const*);
 
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
     
     /// return Modulo Object
     Modulo const* getModulo() const { return &modulo_; }
     
     /// match sizes of Modulo object
-    void        update();
+    void update();
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// equivalent to 'Modulo::fold'
-    void        bounce(Vector&) const;
+    void bounce(Vector&) const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
 
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
     
     /// OpenGL display function
-    void        draw2D() const { draw3D(); }
+    void draw2D() const { draw3D(); }
 };
 
 #endif

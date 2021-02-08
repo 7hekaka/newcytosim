@@ -15,8 +15,8 @@ SpaceLid::SpaceLid(SpaceDynamicProp const* p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("lid  is not usable in 1D");
-    halflength_[0] = 0;
-    halflength_[1] = 0;
+    half_[0] = 0;
+    half_[1] = 0;
     bot_ = 0;
     top_ = 0;
     force_ = 0;
@@ -27,12 +27,12 @@ void SpaceLid::resize(Glossary& opt)
 {
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        real len = halflength_[d];
+        real len = half_[d];
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len <= 0 )
             throw InvalidParameter("lid:length_[] must be > 0");
-        halflength_[d] = len;
+        half_[d] = len;
     }
     
     real bot = bot_, top = top_;
@@ -61,18 +61,18 @@ void SpaceLid::update()
 {
     modulo_.reset();
     for ( unsigned d = 0; d < DIM-1; ++d )
-        modulo_.enable(d, 2*halflength_[d]);
+        modulo_.enable(d, 2*half_[d]);
 }
 
 
 void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 {
 #if ( DIM >= 3 )
-    inf.set(-halflength_[0],-halflength_[1], bot_);
-    sup.set( halflength_[0], halflength_[1], top_);
+    inf.set(-half_[0],-half_[1], bot_);
+    sup.set( half_[0], half_[1], top_);
 #else
-    inf.set(-halflength_[0], bot_, 0);
-    sup.set( halflength_[0], top_, 0);
+    inf.set(-half_[0], bot_, 0);
+    sup.set( half_[0], top_, 0);
 #endif
 }
 
@@ -97,7 +97,7 @@ void SpaceLid::bounce(Vector& pos) const
  */
 Vector SpaceLid::randomPlaceOnEdge(real) const
 {
-    return Vector(RNG.sfloat()*halflength_[0], top_, 0);
+    return Vector(RNG.sfloat()*half_[0], top_, 0);
 }
 
 
@@ -110,9 +110,9 @@ real SpaceLid::volume() const
 #if ( DIM == 1 )
     return ( top_ - bot_ );
 #elif ( DIM == 2 )
-    return 2 * halflength_[0] * ( top_ - bot_ );
+    return 2 * half_[0] * ( top_ - bot_ );
 #else
-    return 4 * halflength_[0] * halflength_[1] * ( top_ - bot_ );
+    return 4 * half_[0] * half_[1] * ( top_ - bot_ );
 #endif
 }
 
@@ -238,8 +238,8 @@ void SpaceLid::write(Outputter& out) const
 {
     writeShape(out, "lid");
     out.writeUInt16(6);
-    out.writeFloat(halflength_[0]);
-    out.writeFloat(halflength_[1]);
+    out.writeFloat(half_[0]);
+    out.writeFloat(half_[1]);
     out.writeFloat(bot_);
     out.writeFloat(top_);
     out.writeFloat(0.f);
@@ -249,8 +249,8 @@ void SpaceLid::write(Outputter& out) const
 
 void SpaceLid::setLengths(const real len[])
 {
-    halflength_[0] = len[0];
-    halflength_[1] = len[1];
+    half_[0] = len[0];
+    half_[1] = len[1];
     bot_   = len[2];
     top_   = len[3];
     force_ = len[5];
@@ -274,80 +274,52 @@ void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceLid::draw2D() const
 {
-    const GLfloat X(halflength_[0]);
+    const GLfloat X(half_[0]);
     const GLfloat T(top_);
     const GLfloat B(bot_);
     
-    glBegin(GL_LINES);
-    glVertex3f(-X, T, 0);
-    glVertex3f( X, T, 0);
-    glVertex3f( X, B, 0);
-    glVertex3f(-X, B, 0);
-    glEnd();
-    
-    // draw periodic boundaries:
+    GLfloat pts[16] = {
+        -X, T, X, T, X, B,-X, B,
+        +X, T, X, B,-X, T,-X, B };
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_LINES, 0, 4);
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
-    glBegin(GL_LINES);
-    glVertex3f( X, T, 0);
-    glVertex3f( X, B, 0);
-    glVertex3f(-X, T, 0);
-    glVertex3f(-X, B, 0);
-    glEnd();
+    glDrawArrays(GL_LINES, 4, 4);
     glDisable(GL_LINE_STIPPLE);
 }
 
 void SpaceLid::draw3D() const
 {
-    const GLfloat X(halflength_[0]);
+    const GLfloat X(half_[0]);
+    const GLfloat Y(half_[1]);
     const GLfloat T(top_);
     const GLfloat B(bot_);
 
-    const real Y = halflength_[1];
     // draw faces:
-    glBegin(GL_TRIANGLE_STRIP);
-    glNormal3f(0, 0, 1);
-    glVertex3f(-X,  Y, B);
-    glVertex3f( X,  Y, B);
-    glVertex3f(-X, -Y, B);
-    glVertex3f( X, -Y, B);
-    glEnd();
-    glBegin(GL_TRIANGLE_STRIP);
-    glNormal3f(0, 0, -1);
-    glVertex3f(-X,  Y, T);
-    glVertex3f(-X, -Y, T);
-    glVertex3f( X,  Y, T);
-    glVertex3f( X, -Y, T);
-    glEnd();
-    // draw outline:
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(-X,  Y, B);
-    glVertex3f( X,  Y, B);
-    glVertex3f( X, -Y, B);
-    glVertex3f(-X, -Y, B);
-    glVertex3f(-X,  Y, B);
-    glEnd();
-    glBegin(GL_LINE_STRIP);
-    glVertex3f(-X,  Y, T);
-    glVertex3f(-X, -Y, T);
-    glVertex3f( X, -Y, T);
-    glVertex3f( X,  Y, T);
-    glVertex3f(-X,  Y, T);
-    glEnd();
+    GLfloat pts[24] = {
+        -X, Y, B, X, Y, B,-X,-Y, B, X,-Y, B,
+        -X, Y, T,-X,-Y, T, X, Y, T, X,-Y, T };
+    glVertexPointer(3, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
     
-    // draw periodic boundaries:
+    // draw outline:
+    GLfloat lin[30] = {
+        -X, Y, B, X, Y, B, X,-Y, B,-X,-Y, B,-X, Y, B,
+        -X, Y, T,-X,-Y, T, X,-Y, T, X, Y, T,-X, Y, T };
+    glVertexPointer(3, GL_FLOAT, 0, lin);
+    glDrawArrays(GL_LINE_STRIP, 0, 5);
+    glDrawArrays(GL_LINE_STRIP, 5, 5);
+    
+    // draw edges on periodic boundaries:
+    GLfloat edg[24] = {
+        +X, Y, T, X, Y, B, X,-Y, T, X,-Y, B,
+        -X, Y, T,-X, Y, B,-X,-Y, T,-X,-Y, B };
+    glVertexPointer(3, GL_FLOAT, 0, edg);
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
-    glBegin(GL_LINES);
-    glVertex3f( X,  Y, T);
-    glVertex3f( X,  Y, B);
-    glVertex3f( X, -Y, T);
-    glVertex3f( X, -Y, B);
-    glVertex3f(-X,  Y, T);
-    glVertex3f(-X,  Y, B);
-    glVertex3f(-X, -Y, T);
-    glVertex3f(-X, -Y, B);
-    glEnd();
+    glDrawArrays(GL_LINES, 0, 8);
     glDisable(GL_LINE_STIPPLE);
 }
 

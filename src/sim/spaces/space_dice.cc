@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "space_dice.h"
 #include "exceptions.h"
 #include "iowrapper.h"
@@ -13,7 +13,7 @@ SpaceDice::SpaceDice(SpaceProp const* p)
         throw InvalidParameter("dice is not usable in 1D");
 
     for ( int d = 0; d < 3; ++d )
-        length_[d] = 0;
+        half_[d] = 0;
     edge_ = 0;
 }
 
@@ -28,12 +28,12 @@ void SpaceDice::resize(Glossary& opt)
 
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        real len = length_[d];
+        real len = half_[d];
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len < edg )
             throw InvalidParameter("dice:length[] must be >= 2 * radius");
-        length_[d] = len;
+        half_[d] = len;
     }
     
     edge_ = edg;
@@ -46,8 +46,8 @@ void SpaceDice::resize(Glossary& opt)
  */
 void SpaceDice::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length_[0],-length_[1],-length_[2]);
-    sup.set( length_[0], length_[1], length_[2]);
+    inf.set(-half_[0],-half_[1],-half_[2]);
+    sup.set( half_[0], half_[1], half_[2]);
 }
 
 
@@ -57,12 +57,12 @@ void SpaceDice::boundaries(Vector& inf, Vector& sup) const
 real SpaceDice::volume() const
 {
 #if ( DIM == 1 )
-    return 2 * length_[0];
+    return 2 * half_[0];
 #elif ( DIM == 2 )
-    return 4 * length_[0]*length_[1] + (M_PI-4.0) * square(edge_);
+    return 4 * half_[0]*half_[1] + (M_PI-4.0) * square(edge_);
 #else
-    return 8 * length_[0]*length_[1]*length_[2]
-    + (2.0*M_PI-8.0) * ( length_[0] + length_[1] + length_[2] - 3 * edge_ ) * square(edge_)
+    return 8 * half_[0]*half_[1]*half_[2]
+    + (2.0*M_PI-8.0) * ( half_[0] + half_[1] + half_[2] - 3 * edge_ ) * square(edge_)
     + (4.0*M_PI/3.0-8.0) * cube(edge_);
 #endif
 }
@@ -73,10 +73,10 @@ real SpaceDice::surface() const
 #if ( DIM == 1 )
     return 2;
 #elif ( DIM == 2 )
-    return 4 * ( length_[0]+length_[1] ) + (2.0*M_PI-8.0) * edge_;
+    return 4 * ( half_[0]+half_[1] ) + (2.0*M_PI-8.0) * edge_;
 #else
-    return 8 * ( length_[0]*length_[1] + length_[0]*length_[2] + length_[1]*length_[2] )
-    + (4.0*M_PI-16.0) * ( length_[0] + length_[1] + length_[2] - 3 * edge_ ) * edge_
+    return 8 * ( half_[0]*half_[1] + half_[0]*half_[2] + half_[1]*half_[2] )
+    + (4.0*M_PI-16.0) * ( half_[0] + half_[1] + half_[2] - 3 * edge_ ) * edge_
     + (4.0*M_PI-24.0) * square(edge_);
 #endif
 }
@@ -87,7 +87,7 @@ bool SpaceDice::inside(Vector const& W) const
 {
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-        dis += square(max_real(0, abs_real(W[d]) - length_[d] + edge_));
+        dis += square(max_real(0, abs_real(W[d]) - half_[d] + edge_));
     return ( dis <= edgeSqr_ );
 }
 
@@ -97,7 +97,7 @@ bool SpaceDice::allInside(Vector const& W, real rad) const
     assert_true( rad >= 0 );
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-        dis += square(max_real(0, abs_real(W[d]) - length_[d] + edge_ + rad));
+        dis += square(max_real(0, abs_real(W[d]) - half_[d] + edge_ + rad));
     return ( dis <= edgeSqr_ );
 }
 
@@ -107,7 +107,7 @@ bool SpaceDice::allInside(Vector const& W, real rad) const
 
 Vector SpaceDice::project(Vector const& W) const
 {
-    return Vector(std::copysign(length_[0], W.XX), 0, 0);
+    return Vector(std::copysign(half_[0], W.XX), 0, 0);
 }
 
 #else
@@ -117,15 +117,15 @@ Vector SpaceDice::project(Vector const& W) const
     Vector P(W);
     bool in = true;
 
-    real X = length_[0] - abs_real(W.XX);
-    if ( X < edge_ ) { P.XX = std::copysign(length_[0]-edge_, W.XX); in=false; }
+    real X = half_[0] - abs_real(W.XX);
+    if ( X < edge_ ) { P.XX = std::copysign(half_[0]-edge_, W.XX); in=false; }
     
-    real Y = length_[1] - abs_real(W.YY);
-    if ( Y < edge_ ) { P.YY = std::copysign(length_[1]-edge_, W.YY); in=false; }
+    real Y = half_[1] - abs_real(W.YY);
+    if ( Y < edge_ ) { P.YY = std::copysign(half_[1]-edge_, W.YY); in=false; }
 
 #if ( DIM > 2 )
-    real Z = length_[2] - abs_real(W.ZZ);
-    if ( Z < edge_ ) { P.ZZ = std::copysign(length_[2]-edge_, W.ZZ); in=false; }
+    real Z = half_[2] - abs_real(W.ZZ);
+    if ( Z < edge_ ) { P.ZZ = std::copysign(half_[2]-edge_, W.ZZ); in=false; }
 #endif
     
     if ( in )
@@ -135,17 +135,17 @@ Vector SpaceDice::project(Vector const& W) const
         if ( Z < Y )
         {
             if ( Z < X )
-                P.ZZ = std::copysign(length_[2], W.ZZ);
+                P.ZZ = std::copysign(half_[2], W.ZZ);
             else
-                P.XX = std::copysign(length_[0], W.XX);
+                P.XX = std::copysign(half_[0], W.XX);
         }
         else
 #endif
         {
             if ( Y < X )
-                P.YY = std::copysign(length_[1], W.YY);
+                P.YY = std::copysign(half_[1], W.YY);
             else
-                P.XX = std::copysign(length_[0], W.XX);
+                P.XX = std::copysign(half_[0], W.XX);
         }
         return P;
     }
@@ -158,17 +158,17 @@ Vector SpaceDice::project(Vector const& W) const
 
 //------------------------------------------------------------------------------
 
-#if ADVANCED_DICE
+#if ADVANCED_DICE_INTERACTIONS
  
 void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real E) const
 {
 #if ( DIM == 1 )
-    meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
+    meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
 #else
-    real dX = length_[0] - abs_real(w.XX);
-    real dY = length_[1] - abs_real(w.YY);
+    real dX = half_[0] - abs_real(w.XX);
+    real dY = half_[1] - abs_real(w.YY);
 #if ( DIM > 2 )
-    real dZ = length_[2] - abs_real(w.ZZ);
+    real dZ = half_[2] - abs_real(w.ZZ);
 #endif
     
 #if ( DIM > 2 )
@@ -182,67 +182,67 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
         if ( dZ < dY )
         {
             if ( dZ < dX )
-                meca.addPlaneClampZ(pe, std::copysign(length_[2], w.ZZ), stiff);
+                meca.addPlaneClampZ(pe, std::copysign(half_[2], w.ZZ), stiff);
             else
-                meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
+                meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
         }
         else
 #endif
         {
             if ( dY < dX )
-                meca.addPlaneClampY(pe, std::copysign(length_[1], w.YY), stiff);
+                meca.addPlaneClampY(pe, std::copysign(half_[1], w.YY), stiff);
             else
-                meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
+                meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
         }
     }
 #if ( DIM > 2 )
     else if ( dY > edge_ && dZ > edge_ )
     {
-        meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
+        meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
     }
     else if ( dX > edge_ && dZ > edge_ )
     {
-        meca.addPlaneClampY(pe, std::copysign(length_[1], w.YY), stiff);
+        meca.addPlaneClampY(pe, std::copysign(half_[1], w.YY), stiff);
     }
     else if ( dX > edge_ && dY > edge_ )
     {
-        meca.addPlaneClampZ(pe, std::copysign(length_[2], w.ZZ), stiff);
+        meca.addPlaneClampZ(pe, std::copysign(half_[2], w.ZZ), stiff);
     }
 #endif
     else if ( dX > edge_ )
     {
 #if ( DIM > 2 )
-        real cY = std::copysign(length_[1]-edge_, w.YY);
-        real cZ = std::copysign(length_[2]-edge_, w.ZZ);
+        real cY = std::copysign(half_[1]-edge_, w.YY);
+        real cZ = std::copysign(half_[2]-edge_, w.ZZ);
         meca.addCylinderClamp(pe, Vector(1, 0, 0), Vector(0, cY, cZ), edge_, stiff);
 #else
-        meca.addPlaneClampY(pe, std::copysign(length_[1], w.YY), stiff);
+        meca.addPlaneClampY(pe, std::copysign(half_[1], w.YY), stiff);
 #endif
     }
     else if ( dY > edge_ )
     {
 #if ( DIM > 2 )
-        real cX = std::copysign(length_[0]-edge_, w.XX);
-        real cZ = std::copysign(length_[2]-edge_, w.ZZ);
+        real cX = std::copysign(half_[0]-edge_, w.XX);
+        real cZ = std::copysign(half_[2]-edge_, w.ZZ);
         meca.addCylinderClamp(pe, Vector(0, 1, 0), Vector(cX, 0, cZ), edge_, stiff);
 #else
-        meca.addPlaneClampX(pe, std::copysign(length_[0], w.XX), stiff);
+        meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
 #endif
     }
 #if ( DIM > 2 )
     else if ( dZ > edge_ )
     {
-        real cX = std::copysign(length_[0]-edge_, w.XX);
-        real cY = std::copysign(length_[1]-edge_, w.YY);
+        real cX = std::copysign(half_[0]-edge_, w.XX);
+        real cY = std::copysign(half_[1]-edge_, w.YY);
         meca.addCylinderClamp(pe, Vector(0, 0, 1), Vector(cX, cY, 0), edge_, stiff);
     }
 #endif
     else
     {
-        real cX = std::copysign(length_[0]-edge_, w.XX);
-        real cY = std::copysign(length_[1]-edge_, w.YY);
+        real cX = std::copysign(half_[0]-edge_, w.XX);
+        real cY = std::copysign(half_[1]-edge_, w.YY);
 #if ( DIM > 2 )
-        real cZ = std::copysign(length_[2]-edge_, w.ZZ);
+        real cZ = std::copysign(half_[2]-edge_, w.ZZ);
 #else
         real cZ = 0;
 #endif
@@ -254,7 +254,7 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
 
 void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, length_, edge_);
+    setInteraction(pos, pe, meca, stiff, half_, edge_);
 }
 
 
@@ -265,7 +265,7 @@ void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
 
     real dim[DIM];
     for ( unsigned d = 0; d < DIM; ++d )
-        dim[d] = max_real(0, length_[d]+R);
+        dim[d] = max_real(0, half_[d]+R);
 
     setInteraction(pos, pe, meca, stiff, dim, E);
 }
@@ -277,18 +277,18 @@ void SpaceDice::write(Outputter& out) const
 {
     writeShape(out, "dice");
     out.writeUInt16(4);
-    out.writeFloat(length_[0]);
-    out.writeFloat(length_[1]);
-    out.writeFloat(length_[2]);
+    out.writeFloat(half_[0]);
+    out.writeFloat(half_[1]);
+    out.writeFloat(half_[2]);
     out.writeFloat(edge_);
 }
 
 
 void SpaceDice::setLengths(const real len[])
 {
-    length_[0] = len[0];
-    length_[1] = len[1];
-    length_[2] = len[2];
+    half_[0] = len[0];
+    half_[1] = len[1];
+    half_[2] = len[2];
     edge_ = len[3];
     update();
 }
@@ -307,79 +307,57 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 #include "opengl.h"
 
-void SpaceDice::draw2D() const
+void SpaceDice::drawEdges() const
 {
-    drawSection( 2, 0, 0.01 );
-}
-
-void SpaceDice::draw3D() const
-{
-    const GLfloat X(length_[0] - edge_);
-    const GLfloat Y(length_[1] - edge_);
-    const GLfloat Z(length_[2] - edge_);
- 
-    const GLfloat XR(length_[0]);
-    const GLfloat YR(length_[1]);
-    const GLfloat ZR(length_[2]);
-
-    glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f( XR,  Y, -Z );
-    glVertex3f( XR,  Y,  Z );
-    glVertex3f( XR, -Y, -Z );
-    glVertex3f( XR, -Y,  Z );
-    glEnd();
-    
-    glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f(-XR, -Y, -Z );
-    glVertex3f(-XR, -Y,  Z );
-    glVertex3f(-XR,  Y, -Z );
-    glVertex3f(-XR,  Y,  Z );
-    glEnd();
-    
-    glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f( X,  YR, -Z );
-    glVertex3f(-X,  YR, -Z );
-    glVertex3f( X,  YR,  Z );
-    glVertex3f(-X,  YR,  Z );
-    glEnd();
-    
-    glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f( X, -YR,  Z );
-    glVertex3f(-X, -YR,  Z );
-    glVertex3f( X, -YR, -Z );
-    glVertex3f(-X, -YR, -Z );
-    glEnd();
-    
-    glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f( X,  Y,  ZR );
-    glVertex3f(-X,  Y,  ZR );
-    glVertex3f( X, -Y,  ZR );
-    glVertex3f(-X, -Y,  ZR );
-    glEnd();
-    
-    glBegin(GL_TRIANGLE_STRIP);
-    glVertex3f( X,  Y, -ZR );
-    glVertex3f( X, -Y, -ZR );
-    glVertex3f(-X,  Y, -ZR );
-    glVertex3f(-X, -Y, -ZR );
-    glEnd();
-    
+    drawSection(2, 0, 0.01);
+#if ( DIM > 2 )
+    const GLfloat X(half_[0] - edge_);
+    const GLfloat Y(half_[1] - edge_);
+    const GLfloat Z(half_[2] - edge_);
     glDisable(GL_LIGHTING);
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
-    drawSection( 0, -X, 0.01 );
-    drawSection( 0,  X, 0.01 );
-    drawSection( 1, -Y, 0.01 );
-    drawSection( 1,  Y, 0.01 );
-    drawSection( 2, -Z, 0.01 );
-    drawSection( 2,  Z, 0.01 );
+    drawSection(0, -X, 0.01);
+    drawSection(0,  X, 0.01);
+    drawSection(1, -Y, 0.01);
+    drawSection(1,  Y, 0.01);
+    drawSection(2, -Z, 0.01);
+    drawSection(2,  Z, 0.01);
     glDisable(GL_LINE_STIPPLE);
+#endif
+}
+
+void SpaceDice::drawFaces() const
+{
+    const GLfloat X(half_[0] - edge_);
+    const GLfloat Y(half_[1] - edge_);
+    const GLfloat Z(half_[2] - edge_);
+ 
+    const GLfloat XR(half_[0]);
+    const GLfloat YR(half_[1]);
+    const GLfloat ZR(half_[2]);
+    
+    GLfloat pts[72] = {
+        +XR, Y,-Z, XR, Y, Z, XR,-Y,-Z, XR,-Y, Z,
+        -XR,-Y,-Z,-XR,-Y, Z,-XR, Y,-Z,-XR, Y, Z,
+        +X, YR,-Z,-X, YR,-Z, X, YR, Z,-X, YR, Z,
+        +X,-YR, Z,-X,-YR, Z, X,-YR,-Z,-X,-YR,-Z,
+        +X, Y, ZR,-X, Y, ZR, X,-Y, ZR,-X,-Y, ZR,
+        +X, Y,-ZR, X,-Y,-ZR,-X, Y,-ZR,-X,-Y,-ZR,
+    };
+    glVertexPointer(3, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 8, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP,12, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP,16, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP,20, 4);
 }
 
 #else
 
-void SpaceDice::draw2D() const {}
-void SpaceDice::draw3D() const {}
+void SpaceDice::drawFaces() const {}
+void SpaceDice::drawEdges() const {}
 
 #endif
 
