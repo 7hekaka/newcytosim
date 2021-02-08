@@ -10,7 +10,7 @@
 #include "simd.h"
 #include "simd_float.h"
 #include "simd_math.h"
-
+#include "vector_float.h"
 
 namespace gle
 {
@@ -147,6 +147,15 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Rotation
 
+    /** extracts axis orthogonal to the display plane, and corresponding to depth
+     from the current modelview transformation: */
+    Vector3 directionDepth()
+    {
+        GLfloat mat[16];
+        glGetFloatv(GL_MODELVIEW_MATRIX, mat);
+        return normalize(Vector3(mat[2], mat[6], mat[10]));
+    }
+    
     template < typename FLOAT >
     inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3])
     {
@@ -687,7 +696,7 @@ namespace gle
         const GLfloat T = B + L;
         const GLfloat U = H + L;
         const GLfloat C = 0.5f;
-        const GLfloat S = M_SQRT3 * 0.5f;
+        const GLfloat S = M_SQRT3_2;
         const GLfloat cR = R * C;
         const GLfloat sR = R * S;
 

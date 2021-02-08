@@ -207,6 +207,7 @@
 		BB60C86C0B60353300596D88 /* fiber_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB60C6A00B6022FE00596D88 /* fiber_grid.cc */; };
 		BB61B7F019B7622800B1F4F6 /* print_color.h in Headers */ = {isa = PBXBuildFile; fileRef = BB61B7EF19B7622800B1F4F6 /* print_color.h */; };
 		BB61B7F219B7626A00B1F4F6 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
+		BB6294AA25D1865200439438 /* vector_float.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6294A825D1865200439438 /* vector_float.h */; };
 		BB6403F705FBC2F400DF7BFF /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB6403FA05FBC2F900DF7BFF /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB64041A05FBC59200DF7BFF /* frametool.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB77D6FB05F12F16001C0596 /* frametool.cc */; };
@@ -1501,6 +1502,7 @@
 		BB60C6A00B6022FE00596D88 /* fiber_grid.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fiber_grid.cc; path = src/sim/fiber_grid.cc; sourceTree = SOURCE_ROOT; };
 		BB61B7EF19B7622800B1F4F6 /* print_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = print_color.h; sourceTree = "<group>"; };
 		BB61B7F119B7626A00B1F4F6 /* print_color.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = print_color.cc; sourceTree = "<group>"; };
+		BB6294A825D1865200439438 /* vector_float.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vector_float.h; sourceTree = "<group>"; };
 		BB6403D805FBC28C00DF7BFF /* sieve */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sieve; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB64041505FBC58500DF7BFF /* frametool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = frametool; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB6485EB2057FD1B005F2CD1 /* allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allocator.h; path = src/math/allocator.h; sourceTree = SOURCE_ROOT; };
@@ -2459,6 +2461,7 @@
 				BBA27AEA211EC31600A7E184 /* vector4.h */,
 				BB0E4BD61002698100A96B34 /* random_vector.h */,
 				BB0E4BD71002698100A96B34 /* random_vector.cc */,
+				BB6294A825D1865200439438 /* vector_float.h */,
 			);
 			name = vector;
 			sourceTree = "<group>";
@@ -3699,6 +3702,7 @@
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
+				BB6294AA25D1865200439438 /* vector_float.h in Headers */,
 				BBDF9AA4228BFBD3005018BD /* xpttrf.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
 				BB7191800EF1CD9900CED9E2 /* sparmat.h in Headers */,

@@ -1,4 +1,4 @@
-// Cytosim 3.0 -  Copyright Francois Nedelec et al.  EMBL 2015
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "vector3.h"
 class MechouiParam;

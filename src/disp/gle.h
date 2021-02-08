@@ -98,6 +98,9 @@ namespace gle
     //------------------------------------------------------------------------------
 #pragma mark -
     
+    /// return direction orthogonal to display screen
+    Vector3 directionDepth();
+    
     /// translate by T; rotate to align X with A, Y with B and Z with C
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
 

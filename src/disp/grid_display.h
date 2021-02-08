@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 // Created 09/03/2015 by Francois Nedelec
 
 #ifndef GRID_DISPLAY_H
@@ -11,15 +11,13 @@
 #include "grid.h"
 #include "opengl.h"
 #include "gle.h"
-
+#include "vector_float.h"
 
 /// display the edges of a 1D grid using OpenGL
 void drawEdges(Map<1> const&);
 
-
 /// display the edges of a 2D grid using OpenGL
 void drawEdges(Map<2> const&);
-
 
 /// display the edges of a 3D grid using OpenGL
 void drawEdges(Map<3> const&);
@@ -36,7 +34,7 @@ void drawEdges(Map<3> const&);
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 1> const& grid,
-                bool set_color(TYPE, CELL const&, Vector1 const&),
+                gle_color color(TYPE, CELL const&, Vector1 const&),
                 TYPE arg)
 {
     float d = grid.cellWidth(0);
@@ -46,8 +44,10 @@ void drawValues(Grid<CELL, 1> const& grid,
     for ( size_t c = 0; c < grid.breadth(0); ++c )
     {
         float x = grid.position(0, c);
-        if ( set_color(arg, grid[c], Vector1(x)) )
+        gle_color col = color(arg, grid[c], Vector1(x));
+        if ( col.visible() )
         {
+            col.load();
             GLfloat pts[8] = {x, -e, x+d, -e, x, e, x+d, e};
             glVertexPointer(2, GL_FLOAT, 0, pts);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -64,7 +64,7 @@ void drawValues(Grid<CELL, 1> const& grid,
 */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 2> const& grid,
-                bool set_color(TYPE, CELL const&, Vector2 const&),
+                gle_color color(TYPE, CELL const&, Vector2 const&),
                 TYPE arg)
 {
     float d = 0.5 * grid.cellWidth(0);
@@ -75,8 +75,10 @@ void drawValues(Grid<CELL, 2> const& grid,
     {
         Vector2 w;
         grid.setPositionFromIndex(w, c, 0.5);
-        if ( set_color(arg, grid[c], w) )
+        gle_color col = color(arg, grid[c], w);
+        if ( col.visible() )
         {
+            col.load();
             GLfloat X(w.XX), Y(w.YY);
             GLfloat pts[8] = {X-d, Y-e, X+d, Y-e, X-d, Y+e, X+d, Y+e};
             glVertexPointer(2, GL_FLOAT, 0, pts);
@@ -93,29 +95,27 @@ void drawValues(Grid<CELL, 2> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
-                bool set_color(TYPE, CELL const&, Vector3 const&),
+                gle_color color(TYPE, CELL const&, Vector3 const&),
                 TYPE arg,
                 real zzz = 0)
 {
     assert_true(grid.hasCells());
-    
-    real d = 0.5 * grid.cellWidth(0);
-    real e = 0.5 * grid.cellWidth(1);
+    GLfloat d(0.5 * grid.cellWidth(0));
+    GLfloat e(0.5 * grid.cellWidth(1));
     
     size_t z = grid.index(2, zzz);
-    
     for ( size_t y = 0; y < grid.breadth(1); ++y )
     for ( size_t x = 0; x < grid.breadth(0); ++x )
     {
         Vector3 w(grid.position(0, x+0.5), grid.position(1, y+0.5), zzz);
-        if ( set_color(arg, grid.icell3D(x,y,z), w) )
+        gle_color col = color(arg, grid.icell3D(x,y,z), w);
+        if ( col.visible() )
         {
-            glBegin(GL_TRIANGLE_STRIP);
-            glVertex3f(w.XX-d, w.YY-e, zzz);
-            glVertex3f(w.XX+d, w.YY-e, zzz);
-            glVertex3f(w.XX-d, w.YY+e, zzz);
-            glVertex3f(w.XX+d, w.YY+e, zzz);
-            glEnd();
+            col.load();
+            GLfloat X(w.XX), Y(w.YY), Z(zzz);
+            GLfloat pts[12] = {X-d, Y-e, Z, X+d, Y-e, Z, X-d, Y+e, Z, X+d, Y+e, Z};
+            glVertexPointer(3, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
 }
@@ -129,29 +129,27 @@ void drawValues(Grid<CELL, 3> const& grid,
 */
 template <typename CELL, typename TYPE>
 void drawValuesXZ(Grid<CELL, 3> const& grid,
-                  bool set_color(TYPE, CELL const&, Vector3 const&),
+                  gle_color color(TYPE, CELL const&, Vector3 const&),
                   TYPE arg,
                   real yyy)
 {
     assert_true(grid.hasCells());
-    
-    real d = 0.5 * grid.cellWidth(0);
-    real e = 0.5 * grid.cellWidth(2);
+    GLfloat d(0.5 * grid.cellWidth(0));
+    GLfloat e(0.5 * grid.cellWidth(1));
     
     size_t y = grid.index(1, yyy);
-    
     for ( size_t z = 0; z < grid.breadth(2); ++z )
     for ( size_t x = 0; x < grid.breadth(0); ++x )
     {
         Vector3 w(grid.position(0, x+0.5), yyy, grid.position(2, y+0.5));
-        if ( set_color(arg, grid.icell3D(x,y,z), w) )
+        gle_color col = color(arg, grid.icell3D(x,y,z), w);
+        if ( col.visible() )
         {
-            glBegin(GL_TRIANGLE_STRIP);
-            glVertex3f(w.XX-d, yyy, w.ZZ-e);
-            glVertex3f(w.XX+d, yyy, w.ZZ-e);
-            glVertex3f(w.XX-d, yyy, w.ZZ+e);
-            glVertex3f(w.XX+d, yyy, w.ZZ+e);
-            glEnd();
+            col.load();
+            GLfloat X(w.XX), Y(yyy), Z(w.ZZ);
+            GLfloat pts[12] = {X-d, Y, Z-e, X+d, Y, Z-e, X-d, Y, Z+e, X+d, Y, Z+e};
+            glVertexPointer(3, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
 }
@@ -165,29 +163,27 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValuesYZ(Grid<CELL, 3> const& grid,
-                  bool set_color(TYPE, CELL const&, Vector3 const&),
+                  gle_color color(TYPE, CELL const&, Vector3 const&),
                   TYPE arg,
                   real xxx)
 {
     assert_true(grid.hasCells());
-    
-    real d = 0.5 * grid.cellWidth(0);
-    real e = 0.5 * grid.cellWidth(2);
+    GLfloat d(0.5 * grid.cellWidth(0));
+    GLfloat e(0.5 * grid.cellWidth(2));
     
     size_t x = grid.index(0, xxx);
-    
     for ( size_t z = 0; z < grid.breadth(2); ++z )
     for ( size_t y = 0; y < grid.breadth(1); ++y )
     {
         Vector3 w(xxx, grid.position(1, y+0.5), grid.position(2, z+0.5));
-        if ( set_color(arg, grid.icell3D(x,y,z), w) )
+        gle_color col = color(arg, grid.icell3D(x,y,z), w);
+        if ( col.visible() )
         {
-            glBegin(GL_TRIANGLE_STRIP);
-            glVertex3f(xxx, w.YY-d, w.ZZ-e);
-            glVertex3f(xxx, w.YY+d, w.ZZ-e);
-            glVertex3f(xxx, w.YY-d, w.ZZ+e);
-            glVertex3f(xxx, w.YY+d, w.ZZ+e);
-            glEnd();
+            col.load();
+            GLfloat X(xxx), Y(w.YY), Z(w.ZZ);
+            GLfloat pts[12] = {X, Y-d, Z-e, X, Y+d, Z-e, X, Y-d, Z+e, X, Y+d, Z+e};
+            glVertexPointer(3, GL_FLOAT, 0, pts);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
     }
 }
@@ -200,7 +196,7 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
-                bool set_color(TYPE, CELL const&, Vector3 const&),
+                gle_color color(TYPE, CELL const&, Vector3 const&),
                 TYPE arg,
                 Vector3 const& dir,
                 real pos)
@@ -208,42 +204,50 @@ void drawValues(Grid<CELL, 3> const& grid,
     assert_true(grid.hasCells());
     
     // this defines the finesse of the triangular mesh:
-    real n = 0.2 * grid.minimumWidth(1);
-    int m = (int)( grid.radius() / n );
-    
+    real cel = 0.2 * grid.minimumWidth(1);
+    int R = (int)ceil( grid.radius() / cel );
+
     Vector3 dx, dy;
-    dir.orthonormal(dx, dy, n);
-    Vector3 dh = dy * std::cos(M_PI/6);
+    dir.orthonormal(dx, dy, cel);
+    dy *= M_SQRT3_2;
     
-    for ( int y = -m; y <= m; y+=2 )
+    float3 * pts = new float3[4*R+2];
+    float4 * col = new float4[4*R+2];
+    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(4, GL_FLOAT, 0, col);
+    glVertexPointer(3, GL_FLOAT, 0, pts);
+
+    for ( int y = -R; y <= R; y+=2 )
     {
-        const Vector3 a = y * dh + pos * dir;
-        const Vector3 b = a + dh;
-        glBegin(GL_TRIANGLE_STRIP);
-        for ( int x = -m; x <= m; ++x )
+        Vector3 A = y * dy + pos * dir;
+        Vector3 B = A + dy + 0.5 * dx;
+        size_t i = 0;
+        for ( int n = -R; n <= R; ++n )
         {
-            const Vector3 v = a + x * dx;
-            set_color(arg, grid.interpolate3D(v), v);
-            gle::gleVertex(v);
-            
-            const Vector3 w = b + ( x + 0.5 ) * dx;
-            set_color(arg, grid.interpolate3D(w), w);
-            gle::gleVertex(w);
+            Vector3 V = A + n * dx;
+            Vector3 W = B + n * dx;
+            col[i] = color(arg, grid.interpolate3D(V), V);
+            pts[i++] = V;
+            col[i] = color(arg, grid.interpolate3D(W), W);
+            pts[i++] = W;
         }
-        glEnd();
-        glBegin(GL_TRIANGLE_STRIP);
-        for ( int x = -m; x <= m; ++x )
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+        i = 0;
+        A += 2 * dy;
+        for ( int n = -R; n <= R; ++n )
         {
-            const Vector3 v = b + x * dx + dh;
-            set_color(arg, grid.interpolate3D(v), v);
-            gle::gleVertex(v);
-            
-            const Vector3 w = b + ( x + 0.5 ) * dx;
-            set_color(arg, grid.interpolate3D(w), w);
-            gle::gleVertex(w);
+            Vector3 V = A + n * dx;
+            Vector3 W = B + n * dx;
+            col[i] = color(arg, grid.interpolate3D(V), V);
+            pts[i++] = V;
+            col[i] = color(arg, grid.interpolate3D(W), W);
+            pts[i++] = W;
         }
-        glEnd();
-   }
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+    }
+    glDisableClientState(GL_COLOR_ARRAY);
+    delete[] pts;
+    delete[] col;
 }
 
 

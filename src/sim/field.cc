@@ -502,15 +502,11 @@ void Field::step(FiberSet& fibers)
     };
     
     
-    static bool field_set_color(FieldDisplayParameters fdp, FieldGrid::value_type const& val, Vector const& pos)
+    static gle_color field_color(FieldDisplayParameters fdp, FieldGrid::value_type const& val, Vector const& pos)
     {
         if ( fdp.spc && ! fdp.spc->inside(pos) )
-        {
-            glColor3f(0, 0, 0); // background color
-            return false;
-        }
-        val.setColor(fdp.amp);
-        return true;
+            return gle_color(0, 0, 0);
+        return val.color(fdp.amp);
     }
     
     
@@ -525,7 +521,7 @@ void Field::step(FiberSet& fibers)
         glDisable(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
-        drawValues(mGrid, field_set_color, fdp);
+        drawValues(mGrid, field_color, fdp);
 #if ( 0 )
         // draw edges of cells
         glColor4f(1, 0, 1, 1);
@@ -552,9 +548,9 @@ void Field::step(FiberSet& fibers)
         //glLineWidth(1);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #if ( DIM >= 3 )
-        drawValues(mGrid, field_set_color, fdp, dir, pos);
+        drawValues(mGrid, field_color, fdp, dir, pos);
 #else
-        drawValues(mGrid, field_set_color, fdp);
+        drawValues(mGrid, field_color, fdp);
 #endif
         glPopAttrib();
     }

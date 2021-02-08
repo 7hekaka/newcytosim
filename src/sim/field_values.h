@@ -44,13 +44,12 @@ public:
     
 #ifdef DISPLAY
     /// set OpenGL color associated with value
-    void setColor(const real scale) const
+    gle_color color(const real scale) const
     {
         GLfloat x(scale * val);
         if ( x > 0 )
-            gle_color::jet_color_dark(x, 1.0).load();
-        else
-            glColor3f(-x, 0, -x);
+            return gle_color::jet_color_dark(x, 1.0);
+        return gle_color(-x, 0, -x);
     }
 #endif
 };
@@ -60,7 +59,7 @@ public:
 /**
  Example of type that can be used in Field
  */
-template < int N >
+template < size_t N >
 class FieldVector
 {
     /// vector of values
@@ -85,14 +84,14 @@ public:
 
 #ifdef DISPLAY
     /// set OpenGL color associated with value
-    void setColor(const real scale) const
+    gle_color color(const real scale) const
     {
         //this maps val[0] to the red channel, val[1] to green and val[2] to blue
         GLfloat rgb[3] = { 0, 0, 0 };
-        const int cmax = std::min(3, N);
-        for ( int c = 0; c < cmax; ++c )
+        const int sup = std::min(3UL, N);
+        for ( int c = 0; c < sup; ++c )
            rgb[c] = scale * val[c];
-        glColor3fv(rgb);
+        return gle_color(rgb[0], rgb[1], rgb[2]);
     }
 #endif
 };

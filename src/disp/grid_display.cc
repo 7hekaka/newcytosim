@@ -8,16 +8,17 @@ using namespace gle;
  */
 void drawEdges(Map<1> const& map)
 {
-    const float u =  0.5f;
-    const float d = -0.5f;
-    glBegin(GL_LINES);
-    for ( real ix = 0; ix <= map.breadth(0); ++ix )
+    size_t sup = 1 + map.breadth(0);
+    float4 * pts = new float4[sup];
+    
+    for ( size_t n = 0; n < sup; ++n )
     {
-        float x = map.position(0, ix);
-        glVertex2f(x, d);
-        glVertex2f(x, u);
+        float x = map.position(0, n);
+        pts[n] = float4{x, -0.5f, x, 0.5f};
     }
-    glEnd();
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_LINES, 0, 2*sup);
+    delete[] pts;
 }
 
 
@@ -26,27 +27,30 @@ void drawEdges(Map<1> const& map)
  */
 void drawEdges(Map<2> const& map)
 {
+    size_t sup0 = 1 + map.breadth(0);
+    size_t sup1 = 1 + map.breadth(1);
+    float4 * pts = new float4[std::max(sup0, sup1)];
+
     float i = map.inf(0);
     float s = map.sup(0);
-    glBegin(GL_LINES);
-    for ( float iy = 0; iy <= map.breadth(1); ++iy )
+    for ( size_t n = 0; n < sup1; ++n )
     {
-        float y = map.position(1, iy);
-        glVertex2f(i, y);
-        glVertex2f(s, y);
+        float y = map.position(1, n);
+        pts[n] = float4{i, y, s, y};
     }
-    glEnd();
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_LINES, 0, 2*sup1);
     
     i = map.inf(1);
     s = map.sup(1);
-    glBegin(GL_LINES);
-    for ( float ix = 0; ix <= map.breadth(0); ++ix )
+    for ( size_t n = 0; n < sup0; ++n )
     {
-        float x = map.position(0, ix);
-        glVertex2f(x, i);
-        glVertex2f(x, s);
+        float x = map.position(0, n);
+        pts[n] = float4{x, i, x, s};
     }
-    glEnd();
+    //glVertexPointer(2, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_LINES, 0, 2*sup0);
+    delete[] pts;
 }
 
 
@@ -55,43 +59,46 @@ void drawEdges(Map<2> const& map)
  */
 void drawEdges(Map<3> const& map)
 {
+    size_t sup0 = 1 + map.breadth(0);
+    size_t sup1 = 1 + map.breadth(1);
+    size_t sup2 = 1 + map.breadth(2);
+    float6 * pts = new float6[std::max(sup1, sup2)];
+    glVertexPointer(3, GL_FLOAT, 0, pts);
+
     GLfloat i = map.inf(0);
     GLfloat s = map.sup(0);
-    glBegin(GL_LINES);
-    for ( real iy = 0; iy <= map.breadth(1); ++iy )
-    for ( real iz = 0; iz <= map.breadth(2); ++iz )
+
+    for ( size_t iy = 0; iy < sup1; ++iy )
     {
         GLfloat y = map.position(1, iy);
-        GLfloat z = map.position(2, iz);
-        glVertex3f(i, y, z);
-        glVertex3f(s, y, z);
+        for ( size_t n = 0; n < sup2; ++n )
+        {
+            GLfloat z = map.position(2, n);
+            pts[n] = float6{i, y, z, s, y, z};
+        }
+        glDrawArrays(GL_LINES, 0, 2*sup2);
     }
-    glEnd();
     
     i = map.inf(1);
     s = map.sup(1);
-    glBegin(GL_LINES);
-    for ( real ix = 0; ix <= map.breadth(0); ++ix )
-    for ( real iz = 0; iz <= map.breadth(2); ++iz )
+    GLfloat b = map.inf(2);
+    GLfloat t = map.sup(2);
+    for ( size_t ix = 0; ix < sup0; ++ix )
     {
         GLfloat x = map.position(0, ix);
-        GLfloat z = map.position(2, iz);
-        glVertex3f(x, i, z);
-        glVertex3f(x, s, z);
+        for ( size_t n = 0; n < sup2; ++n )
+        {
+            GLfloat z = map.position(2, n);
+            pts[n] = float6{x, i, z, x, s, z};
+        }
+        glDrawArrays(GL_LINES, 0, 2*sup2);
+        for ( size_t n = 0; n < sup1; ++n )
+        {
+            GLfloat y = map.position(1, n);
+            pts[n] = float6{x, y, b, x, y, t};
+        }
+        glDrawArrays(GL_LINES, 0, 2*sup1);
     }
-    glEnd();
-    
-    i = map.inf(2);
-    s = map.sup(2);
-    glBegin(GL_LINES);
-    for ( real ix = 0; ix <= map.breadth(0); ++ix )
-    for ( real iy = 0; iy <= map.breadth(1); ++iy )
-    {
-        GLfloat x = map.position(0, ix);
-        GLfloat y = map.position(1, iy);
-        glVertex3f(x, y, i);
-        glVertex3f(x, y, s);
-    }
-    glEnd();
+    delete[] pts;
 }
 

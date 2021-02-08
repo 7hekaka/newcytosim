@@ -1,17 +1,10 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef GLE_COLOR_H
 #define GLE_COLOR_H
 
 #include "opengl.h"
 #include <iostream>
-
-/// array of 4 float RGBA components
-struct float4
-{
-    GLfloat col_[4];
-    float4(const GLfloat c[]) { col_[0]=c[0]; col_[1]=c[1]; col_[2]=c[2]; col_[3]=c[3]; }
-};
 
 
 /**
@@ -194,7 +187,6 @@ public:
     bool operator !=(const gle_color col) const { return rgba_ != col.rgba_; }
     
     GLfloat const* colors() const { return col_; }
-    operator float4() const { return float4(col_); }
 
     /// access to float components
     GLfloat& operator [] (int i) { return col_[i]; }

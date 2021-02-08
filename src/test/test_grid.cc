@@ -1,7 +1,7 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// Created by Francois Nedelec on January 2008
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
+// Started FJN on January 2008
 
-#define DIM 2
+#define DIM 3
 
 #include "vector.h"
 #include "random.h"
@@ -138,16 +138,14 @@ void processMouseDrag(int mx, int my, Vector3 & a, const Vector3 & b, int m)
 
 //------------------------------------------------------------------------------
 #if ( DIM == 3 )
-static bool field_color(int, const real& val, Vector3 const&)
+static gle_color field_color(int, const real& val, Vector3 const&)
 {
-    glColor3f(val/5.0, 0, 0);
-    return true;
+    return gle_color(val/5.0, 0, 0);
 }
 #else
-static bool field_color(int, const real& val, Vector2 const&)
+static gle_color field_color(int, const real& val, Vector2 const&)
 {
-    glColor3f(val/5.0, 0, 0);
-    return true;
+    return gle_color(val/5.0, 0, 0);
 }
 #endif
 
@@ -157,15 +155,16 @@ void display(View&, int)
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 #if ( DIM == 3 )
-    Vector3 dir(0,0,1);
-    drawValues(myGrid, field_color, 0, dir);
+    Vector3 dir = gle::directionDepth();
+    drawValues(myGrid, field_color, 0, dir, 0);
 #else
     drawValues(myGrid, field_color, 0);
 #endif
     
     //--------------draw a grid in gray:
+    
     glColor4f(1,1,1,.6f);
-    glLineWidth(1);
+    glLineWidth(2);
     drawEdges(myGrid);
 
     //--------------draw content of cells

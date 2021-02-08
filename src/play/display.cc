@@ -658,12 +658,7 @@ void Display::drawTransparentSpaces(SpaceSet const& set)
 void Display::drawFields(FieldSet const& set)
 {
 #if ( DIM == 3 )
-    // get current modelview transformation:
-    GLfloat mat[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-    
-    // extract axis corresponding to vertical direction:
-    Vector3 dir = normalize(Vector3(mat[2], mat[6], mat[10]));
+    Vector3 dir = gle::directionDepth();
 #else
     Vector3 dir(0,0,1);
 #endif
@@ -1901,12 +1896,7 @@ void Display::zObject::draw(Display * disp) const
 */
 void Display::drawTransparentObjects(Array<zObject>& list)
 {
-    // get current modelview transformation:
-    GLfloat mat[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-    
-    // extract axis corresponding to vertical direction:
-    Vector3 vertical(mat[2], mat[6], mat[10]);
+    Vector3 vertical = gle::directionDepth();
     
     for ( zObject & i : list )
         i.depth(dot(i.position(), vertical));

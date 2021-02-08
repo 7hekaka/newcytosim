@@ -1,12 +1,10 @@
-// Cytosim 3.0 -  Copyright Francois Nedelec et al.  EMBL 2015
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "mesh.h"
 #include <stdlib.h>
 #include "opengl.h"
 #include "mechoui_param.h"
 #include "gle_color_list.h"
-
-
 
 
 Mesh::Mesh()
@@ -130,8 +128,6 @@ int Mesh::read_binary(FILE * file)
 }
 
 
-
-
 int Mesh::read(char const* filename)
 {
     FILE * f = fopen(filename, "r");
@@ -164,7 +160,6 @@ int Mesh::read(char const* filename)
     std::clog << " Cannot read `" << filename << '\n';
     return 1;
 }
-
 
 
 /// structure to depth-sort triangles
@@ -211,12 +206,11 @@ void Mesh::display(MechouiParam const& pam) const
         glDrawArrays(GL_POINTS, 0, n_points);
     }
     
-    // get current modelview transformation:
+    /* extract axis corresponding to vertical direction,
+     from the current modelview transformation: */
     GLfloat mat[16];
     glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-    
-    // extract axis corresponding to vertical direction:
-    GLfloat ver[] = { mat[2], mat[6], mat[10] };
+    GLfloat dir[] = { mat[2], mat[6], mat[10] };
 
     glEnable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
@@ -251,7 +245,7 @@ void Mesh::display(MechouiParam const& pam) const
             tris[n_tris].a = faces[3*n  ];
             tris[n_tris].b = faces[3*n+1];
             tris[n_tris].c = faces[3*n+2];
-            tris[n_tris].z = g[0] * ver[0] + g[1] * ver[1] + g[2] * ver[2];
+            tris[n_tris].z = g[0] * dir[0] + g[1] * dir[1] + g[2] * dir[2];
             ++n_tris;
         }
         else
