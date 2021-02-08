@@ -10,6 +10,7 @@ struct float2
     float2() : xy{0, 0} {}
     float2(float x, float y) : xy{x, y} {}
     float2(Vector2 const& v) : xy{float(v.XX), float(v.YY)} {}
+    static float2 cast(double x, double y) { return float2(float(x), float(y)); }
 };
 
 
@@ -20,6 +21,7 @@ struct float3
     float3() : xyz{0, 0, 0} {}
     float3(float x, float y, float z) : xyz{x, y, z} {}
     float3(Vector3 const& v) : xyz{float(v.XX), float(v.YY), float(v.ZZ)} {}
+    static float3 cast(double x, double y, double z) { return float3(float(x), float(y), float(z)); }
 };
 
 
@@ -28,9 +30,11 @@ struct float4
 {
     float xyz[4];
     float4() : xyz{0, 0, 0, 0} {}
-    float4(float a, float b, float c, float d) : xyz{a, b, c, d} {}
+    float4(float x, float y, float z, float t) : xyz{x, y, z, t} {}
     float4(const float c[]) : xyz{c[0], c[1], c[2], c[3]} {}
     float4(gle_color const& c) : xyz{c.r(), c.g(), c.b(), c.a()} {}
+    static float4 cast(double x, double y, double z, double t)
+    { return float4(float(x), float(y), float(z), float(t)); }
 };
 
 
@@ -42,6 +46,8 @@ struct float6
     float6(float x, float y, float z, float a, float b, float c) : xyz{x, y, z, a, b, c} {}
     float6(Vector3 const& v, Vector3 const& w) :
     xyz{float(v.XX), float(v.YY), float(v.ZZ), float(w.XX), float(w.YY), float(w.ZZ)} {}
+    static float6 cast(double x, double y, double z, double a, double b, double c)
+    { return float6(float(x), float(y), float(z), float(a), float(b), float(c)); }
 };
 
 

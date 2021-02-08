@@ -2,6 +2,7 @@
 #include "assert_macro.h"
 #include "view.h"
 #include "gle.h"
+#include "vector_float.h"
 #include "offscreen.h"
 #include "glu_unproject.cc"
 #include "glut.h"
@@ -810,32 +811,30 @@ void View::drawROI() const
 }
 
 
-/// draw vertical ticks over ] -10*d, +10*d [
-void View::drawScaleTicksH(GLfloat d, GLfloat a, GLfloat b) const
+/// init vertical ticks over ] -cnt*d, +cnt*d [
+size_t setTicksH(float4* pts, int cnt, float d, float a, float b)
 {
-    glBegin(GL_LINES);
-    for ( int ii = 1; ii < 10; ++ii )
+    size_t n = 0;
+    for ( int i = 1; i < cnt; ++i )
     {
-        glVertex2f( ii*d, a);
-        glVertex2f( ii*d, b);
-        glVertex2f(-ii*d, a);
-        glVertex2f(-ii*d, b);
+        pts[n++] = float4{-i*d, a, -i*d, b};
+        pts[n++] = float4{ i*d, a,  i*d, b};
     }
-    glEnd();
+    pts[n++] = float4{0, a, 0, b};
+    return n*2;
 }
 
-/// draw horizontal ticks over ] -10*d, +10*d [
-void View::drawScaleTicksV(GLfloat d, GLfloat a, GLfloat b) const
+/// draw horizontal ticks over ] -cnt*d, +cnt*d [
+size_t setTicksV(float4* pts, int cnt, float d, float a, float b)
 {
-    glBegin(GL_LINES);
-    for ( int ii = 1; ii < 10; ++ii )
+    size_t n = 0;
+    for ( int i = 1; i < cnt; ++i )
     {
-        glVertex2f( a, ii*d);
-        glVertex2f( b, ii*d);
-        glVertex2f( a,-ii*d);
-        glVertex2f( b,-ii*d);
+        pts[n++] = float4{a, -i*d, b, -i*d};
+        pts[n++] = float4{a,  i*d, b,  i*d};
     }
-    glEnd();
+    pts[n++] = float4{a, 0, b, 0};
+    return n*2;
 }
 
 
@@ -849,42 +848,34 @@ void View::drawScaleTicksV(GLfloat d, GLfloat a, GLfloat b) const
  */
 void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
 {
-    // draw a box of length 'scale'
     glLineWidth(1);
-    glBegin(GL_LINE_LOOP);
-    glVertex2f(-s/2, a);
-    glVertex2f(-s/2, b);
-    glVertex2f( s/2, b);
-    glVertex2f( s/2, a);
-    glEnd();
+    gle::drawRectangle(-s/2, a, s/2, b, 0);
+    float4 pts[24];
+    glVertexPointer(2, GL_FLOAT, 0, pts);
 
     // draw bars
-    glLineWidth(2.0);
     s /= 10;
-    glBegin(GL_LINES);
-    for ( int ii = -5; ii <= 5; ++ii )
-    {
-        glVertex2f(ii*s, a);
-        glVertex2f(ii*s, b);
-    }
-    glEnd();
+    GLfloat w(2);
+    glLineWidth(w);
+    setTicksH(pts, 5, s, a, b);
+    glDrawArrays(GL_LINES, 0, 18);
     
     // draw tick marks
-    GLfloat w = 2.0;
     char str[16] = {0};
     do {
+        w -= 0.5;
         s /= 10;
         a /= 10;
         b /= 10;
         if ( s > 4 * pixelSize() )
         {
             glLineWidth(w);
-            drawScaleTicksH(s, a, b);
+            setTicksH(pts, 10, s, a, b);
+            glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(s-6*pixelSize(), b-12*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
             gle::bitmapText(str);
         }
-        w /= 2;
     } while ( w >= 0.5 );
 }
 
@@ -899,42 +890,34 @@ void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
  */
 void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
 {
-    // draw a box of length 'scale'
     glLineWidth(1);
-    glBegin(GL_LINE_LOOP);
-    glVertex2f(a, -s/2);
-    glVertex2f(b, -s/2);
-    glVertex2f(b,  s/2);
-    glVertex2f(a,  s/2);
-    glEnd();
-    
+    gle::drawRectangle(a, -s/2, b, s/2, 0);
+    float4 pts[24];
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+
     // draw bars
-    glLineWidth(2.0);
     s /= 10;
-    glBegin(GL_LINES);
-    for ( int ii = -5; ii <= 5; ++ii )
-    {
-        glVertex2f(a, ii*s);
-        glVertex2f(b, ii*s);
-    }
-    glEnd();
+    GLfloat w(2);
+    glLineWidth(w);
+    setTicksV(pts, 5, s, a, b);
+    glDrawArrays(GL_LINES, 0, 18);
     
     // draw tick marks
-    GLfloat w = 2.0;
     char str[16] = {0};
     do {
+        w -= 0.5;
         s /= 10;
         a /= 10;
         b /= 10;
         if ( s > 4 * pixelSize() )
         {
             glLineWidth(w);
-            drawScaleTicksV(s, a, b);
+            setTicksV(pts, 10, s, a, b);
+            glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(b+pixelSize(), s-4*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
             gle::bitmapText(str);
         }
-        w /= 2;
     } while ( w >= 0.5 );
 }
 
@@ -942,49 +925,40 @@ void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
 /**
  This will draw a centered cross with :
  - lines every scale/10, of width 1
- - lines every scale/100, of width 0.5
- - minuscule lines every scale/1000, of width 0.25
+ - small lines every scale/100, of width 0.5
+ - tiny lines every scale/1000, of width 0.25
  .
  */
 void View::drawScaleX(GLfloat scale) const
 {
-    GLfloat s =  scale;
-    GLfloat a =  scale/20;
-    GLfloat b = -scale/20;
-    
-    glLineWidth(4);
-    glBegin(GL_LINES);
-    glVertex2f(-scale, a);
-    glVertex2f(-scale, b);
-    glVertex2f( scale, a);
-    glVertex2f( scale, b);
-    glVertex2f(a, -scale);
-    glVertex2f(b, -scale);
-    glVertex2f(a,  scale);
-    glVertex2f(b,  scale);
-    glEnd();
-    
-    GLfloat w = 2.0;
+    GLfloat s(scale);
+    GLfloat a( scale/20);
+    GLfloat b(-scale/20);
+    GLfloat w(2);
+
+    float4 pts[24] = {
+        {-s, a,-s, b}, {s, a, s, b},
+        { a,-s, b,-s}, {a, s, b, s},
+        {-s, 0, s, 0}, {0,-s, 0, s}};
+
+    glLineWidth(w);
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_LINES, 0, 12);
+
     do {
+        w -= 0.5;
         s /= 10;
         if ( s > 2 * pixelSize() )
         {
             glLineWidth(w);
-            drawScaleTicksV(s, a, b);
-            drawScaleTicksH(s, a, b);
+            setTicksV(pts, 10, s, a, b);
+            glDrawArrays(GL_LINES, 0, 36);
+            setTicksH(pts, 10, s, a, b);
+            glDrawArrays(GL_LINES, 0, 36);
         }
         a /= 10;
         b /= 10;
-        w /= 2;
     } while ( w >= 0.5 );
-
-    glLineWidth(0.5);
-    glBegin(GL_LINES);
-    glVertex2f(-scale, 0);
-    glVertex2f( scale, 0);
-    glVertex2f(0, -scale);
-    glVertex2f(0,  scale);
-    glEnd();
 }
 
 

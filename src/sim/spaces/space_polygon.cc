@@ -305,98 +305,75 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 #include "opengl.h"
 #include "gle.h"
+#include "vector_float.h"
 
-void SpacePolygon::drawPoints() const
+
+void SpacePolygon::drawPolygon(bool points, bool lines) const
 {
-    const size_t npts = poly_.nbPoints();
+    const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
-
-    // display points:
-    glColor3f(1,1,1);
-    glPointSize(3);
-    glBegin(GL_POINTS);
-    for ( size_t n=0; n < npts; ++n )
-        glVertex2f(pts[n].xx, pts[n].yy);
-    glEnd();
-#if ( 0 )
-    // indicate index of each point:
-    char tmp[8];
-    for ( size_t n=0; n < npts; ++n )
-    {
-        snprintf(tmp, sizeof(tmp), "%i", n);
-        Vector p(pts[n].xx, pts[n].yy, height_);
-        gle::drawText(p, tmp, 0);
-    }
-#endif
-}
-
-void SpacePolygon::draw2D() const
-{
-    const size_t npts = poly_.nbPoints();
-    Polygon::Point2D const* pts = poly_.pts_;
+    float2 * flt = new float2[nbp];
+    for ( size_t n = 0; n < nbp; ++n )
+        flt[n] = float2::cast(pts[n].xx, pts[n].yy);
     
     glEnable(GL_STENCIL_TEST);
     glClearStencil(1);
     glClear(GL_STENCIL_BUFFER_BIT);
     glStencilFunc(GL_EQUAL, 1, ~0U);
     glStencilOp(GL_KEEP, GL_ZERO, GL_ZERO);
-    
-    //display points
-    GLfloat s = 1;
-    glGetFloatv(GL_LINE_WIDTH, &s);
-    glPointSize(s);
-    glBegin(GL_POINTS);
-    for ( size_t n=0; n < npts; ++n )
-        glVertex2f(pts[n].xx, pts[n].yy);
-    glEnd();
+    glVertexPointer(2, GL_FLOAT, 0, flt);
 
-    //display polygon
-    glBegin(GL_LINE_LOOP);
-    for ( size_t n=0; n < npts; ++n )
-        glVertex2f(pts[n].xx, pts[n].yy);
-    glEnd();
-    
+    if ( points )
+    {
+        glDrawArrays(GL_POINTS, 0, nbp);
+#if ( 0 )
+        // indicate index of each point:
+        char tmp[8];
+        for ( size_t n = 0; n < npts; ++n )
+        {
+            snprintf(tmp, sizeof(tmp), "%i", n);
+            Vector p(pts[n].xx, pts[n].yy, height_);
+            gle::drawText(p, tmp, 0);
+        }
+#endif
+    }
+    if ( lines )
+    {
+        glDrawArrays(GL_LINE_LOOP, 0, nbp);
+    }
     glClear(GL_STENCIL_BUFFER_BIT);
     glDisable(GL_STENCIL_TEST);
+    delete[] flt;
 }
+
 
 void SpacePolygon::draw3D() const
 {
-    const size_t npts = poly_.nbPoints();
+    float H(-height_);
+    const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
-    
-    // display bottom
+    float6 * flt = new float6[nbp+1];
+    for ( size_t n = 0; n <= nbp; ++n )
+    {
+        float X(pts[n].xx), Y(pts[n].yy);
+        flt[n] = float6{X, Y, -H, X, Y, H};
+    }
     glLineWidth(2);
-    glBegin(GL_LINE_LOOP);
-    for ( size_t n=0; n < npts; ++n )
-        glVertex3f(pts[n].xx, pts[n].yy, -height_);
-    glEnd();
-    
+    // display bottom
+    glVertexPointer(3, GL_FLOAT, 24, flt);
+    glDrawArrays(GL_LINE_LOOP, 0, nbp);
     // display top
-    glBegin(GL_LINE_LOOP);
-    for ( size_t n=npts; n > 0; --n )
-        glVertex3f(pts[n].xx, pts[n].yy,  height_);
-    glEnd();
-    
+    glVertexPointer(3, GL_FLOAT, 24, 3+(float*)flt);
+    glDrawArrays(GL_LINE_LOOP, 0, nbp);
     // display sides
-    real Z = height_;
-    glBegin(GL_TRIANGLE_STRIP);
-    for ( size_t n=0; n < npts; ++n )
-    {
-        glVertex3f(pts[n].xx, pts[n].yy, Z);
-        glVertex3f(pts[n].xx, pts[n].yy,-Z);
-    }
-    if ( 0 < npts )
-    {
-        glVertex3f(pts[0].xx, pts[0].yy, Z);
-        glVertex3f(pts[0].xx, pts[0].yy,-Z);
-    }
-    glEnd();
+    glVertexPointer(3, GL_FLOAT, 0, flt);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 2*nbp+2);
+    delete[] flt;
 }
 
 #else
 
-void SpacePolygon::draw2D() const {}
+void SpacePolygon::drawPolygon(bool, bool) const {}
 void SpacePolygon::draw3D() const {}
 
 #endif

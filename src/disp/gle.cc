@@ -2036,9 +2036,7 @@ namespace gle
         glDisable(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
         
-        glBegin(GL_LINE_LOOP);
         drawRectangle(rec);
-        glEnd();
         
         glPopAttrib();
         glPopMatrix();
