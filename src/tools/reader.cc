@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     if ( arg.set(frm, "frame") )
     {
         if ( reader.loadFrame(simul, frm) )
-            printf("Frame %i could not be loaded\n", frm);
+            printf("Frame %lu could not be loaded\n", frm);
     }
     
     printf("Reader: enter (h) for help\n");

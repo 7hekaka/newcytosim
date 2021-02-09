@@ -184,10 +184,7 @@ void Display2::drawSolid(Solid const& obj)
     {
         lineWidth(disp->width);
         bodyColorF(obj).load();
-        glBegin(GL_LINE_LOOP);
-        for ( size_t i = 0; i < obj.nbPoints(); ++i )
-            gleVertex(obj.posPoint(i));
-        glEnd();
+        drawStrip(obj.nbPoints(), obj.addrPoints(), GL_LINE_LOOP);
     }
 }
 
@@ -321,10 +318,7 @@ void Display2::drawOrganizer(Organizer const& obj) const
 #else
             glDisable(GL_LIGHTING);
             bodyColorF(*sol).load();
-            glBegin(GL_LINES);
-            for ( size_t i = 0; i < sol->nbPoints(); ++i )
-                gleVertex(sol->posPoint(i));
-            glEnd();
+            drawStrip(sol->nbPoints(), sol->addrPoints(), GL_LINES);
 #endif
         }
     }

@@ -92,8 +92,8 @@ void Display3::drawSimul(Simul const& sim)
          If the display is 'cut', we might see the inner sides,
          but rendering would be faster with Culling enabled
         */
-        //glEnable(GL_CULL_FACE);
-        //glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         drawFibers(sim.fibers);
     }
     
@@ -789,10 +789,7 @@ void Display3::drawSolid(Solid const& obj)
         glDisable(GL_LIGHTING);
         lineWidth(1.0);
         bodyColorF(obj).load();
-        glBegin(GL_LINE_LOOP);
-        for ( size_t i = 0; i < obj.nbPoints(); ++i )
-            gleVertex(obj.posPoint(i));
-        glEnd();
+        drawStrip(obj.nbPoints(), obj.addrPoints(), GL_LINE_LOOP);
     }
 }
 

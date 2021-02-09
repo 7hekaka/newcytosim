@@ -452,14 +452,12 @@ void SpaceDynamicEllipse::report(std::ostream& os) const
 void SpaceDynamicEllipse::draw3D() const
 {
 #if ( 0 )
+    float2 pts[8] = { 0 };
     // display principal axes:
-    glBegin(GL_LINES);
-    for ( unsigned n=0; n < DIM; ++n )
-    {
-        glVertex2f(0,0);
-        gle::gleVertex(length(n)*director(n));
-    }
-    glEnd();
+    for ( unsigned n = 0; n < DIM; ++n )
+        pts[2*n] = float2{length(n)*director(n));
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_LINES, 0, 2*DIM);
 #endif
 
     GLfloat MM[16] = { 0 };

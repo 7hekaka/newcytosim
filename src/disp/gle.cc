@@ -1932,63 +1932,7 @@ namespace gle
     
     
     //-----------------------------------------------------------------------
-#pragma mark - Misc
-    
-    /**
-     Draw an array of pixels using GL_TRIANGLE_STRIP
-     
-     The array rgba[] should ( nbc * width * height ) bytes,
-     containing nbc-components (eg. RGBA) per pixel and
-     stored by columns:
-     
-         load(i,j) = rgba[ nbc*(i+height*j) ]
-         0 <= i < height
-         0 <= j < width
-     
-     `pos` is the position of the top-left corner
-     `dx` is the direction of the width
-     `dy` is the direction of the height
-     The magnitudes of `dx` and `dy` indicates the dimensions of a pixel.
-     They may be of different magnitudes, and not necessarily orthogonal.
-     */
-    void drawPixels(int width, int height, int nbc, GLubyte rgba[], Vector2 pos, Vector2 dx, Vector2 dy)
-    {
-        glPushAttrib(GL_ENABLE_BIT|GL_POLYGON_BIT);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_LIGHTING);
-        
-        Vector2 left, right;
-        GLubyte * col = rgba;
-        
-        for ( int jj = 0; jj < width; ++jj )
-        {
-            left  = pos + dx * jj;
-            right = left + dx;
-            for ( int ii = 0; ii < height; ++ii )
-            {
-                if ( nbc == 3 )
-                    glColor3ubv(col);
-                else
-                    glColor4ubv(col);
-                glBegin(GL_TRIANGLE_STRIP);
-                col += nbc;
-                gleVertex(left);
-                gleVertex(right);
-                left  += dy;
-                right += dy;
-                gleVertex(left);
-                gleVertex(right);
-                glEnd();
-            }
-        }
-        
-        glPopAttrib();
-    }
-    
-    //-----------------------------------------------------------------------
-    
+    #pragma mark - Misc
     
     /**
      rectangle should be specified as [ left, bottom, right, top ]

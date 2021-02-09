@@ -360,9 +360,6 @@ namespace gle
     //------------------------------------------------------------------------------
 #pragma mark -
     
-    /// draw pixel array `rgba` containing 4 bytes per pixels
-    void drawPixels(int width, int height, int nbc, GLubyte rgba[], Vector2 pos, Vector2 dx, Vector2 dy);
-    
     /// display rectangle specified in pixel-coordinates
     void drawRectangle(const int rect[4], int window_width, int window_height);
     

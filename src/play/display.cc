@@ -837,24 +837,30 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
 
 
 // display fiber backbone using GL_LINES
-void Display::drawFiberBackbone(Fiber const& fib) const
+void Display::drawStrip(size_t cnt, real const* pts, GLint prim)
 {
     glDisable(GL_LIGHTING);
 #if ( DIM > 1 )
-#  if REAL_IS_DOUBLE
-    glVertexPointer(DIM, GL_DOUBLE, 0, fib.addrPoints());
-#  else
-    glVertexPointer(DIM, GL_FLOAT, 0, fib.addrPoints());
-#  endif
-    glDrawArrays(GL_LINE_STRIP, 0, fib.nbPoints());
+    constexpr GLenum TYP = REAL_IS_DOUBLE * ( GL_DOUBLE - GL_FLOAT ) + GL_FLOAT;
+    glVertexPointer(DIM, TYP, 0, pts);
+    glDrawArrays(prim, 0, cnt);
 #else
-    glBegin(GL_LINE_STRIP);
-    for ( size_t i = 0; i < fib.nbPoints(); ++i )
-        gle::gleVertex(fib.posP(i));
-    glEnd();
+    float * flt = new float[2*cnt];
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        flt[2*i] = (float)pts[i];
+        flt[1+2*i] = 0.f;
+    }
+    glVertexPointer(2, GL_FLOAT, 0, flt);
+    glDrawArrays(prim, 0, cnt);
+    delete[] flt;
 #endif
 }
 
+void Display::drawFiberBackbone(Fiber const& fib)
+{
+    drawStrip(fib.nbPoints(), fib.addrPoints(), GL_LINE_STRIP);
+}
 
 void Display::drawFiberLines(Fiber const& fib) const
 {

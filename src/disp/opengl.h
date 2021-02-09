@@ -11,9 +11,10 @@
 /// These values should be defined in OpenGL/glext.h
 
 #ifndef GL_MULTISAMPLE
-#define GL_MULTISAMPLE 0x809D
+#  define GL_MULTISAMPLE 0x809D
 #endif
 
 #ifndef GL_DEPTH_CLAMP
-#define GL_DEPTH_CLAMP 0x864F
+#  define GL_DEPTH_CLAMP 0x864F
 #endif
+

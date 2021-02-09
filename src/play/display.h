@@ -196,9 +196,11 @@ public:
     /// draw Fiber PLUS_END
     virtual void drawFiberPlusEnd(Fiber const&, int style, real size) const;
 
-    
+    /// display string of points
+    static void drawStrip(size_t cnt, real const* pts, GLint);
+
     /// draw broken lines joining the Fiber vertices
-    void         drawFiberBackbone(Fiber const&) const;
+    static void drawFiberBackbone(Fiber const&);
 
     /// draw Fiber linear features
     virtual void drawFiberLines(Fiber const&) const;
