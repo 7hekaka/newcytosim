@@ -27,11 +27,13 @@ extern Modulo const* modulo;
 
 
 Display::Display(DisplayProp const* dp)
-: pixelSize(1), uFactor(1), sFactor(1), minRadius(1), prop(dp)
+: fpts(nullptr), fcol(nullptr), pixelSize(1), uFactor(1), sFactor(1), minRadius(1), prop(dp)
 {
     assert_true(dp);
-    
     prep_time = -1;
+
+    fpts = new float[fpts_size*std::max(DIM,2)];
+    fcol = new float[fpts_size*4];
 }
 
 void Display::setPixelFactors(GLfloat ps, GLfloat u)
@@ -44,6 +46,12 @@ void Display::setPixelFactors(GLfloat ps, GLfloat u)
      */
     sFactor = 0.5f * u * ps;
     minRadius = 0.5 * pixelSize / sFactor;
+}
+
+Display::~Display()
+{
+    delete(fpts);
+    delete(fcol);
 }
 
 //------------------------------------------------------------------------------
@@ -837,9 +845,8 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
 
 
 // display fiber backbone using GL_LINES
-void Display::drawStrip(size_t cnt, real const* pts, GLint prim)
+void Display::drawStrip(size_t cnt, real const* pts, GLenum prim)
 {
-    glDisable(GL_LIGHTING);
 #if ( DIM > 1 )
     constexpr GLenum TYP = REAL_IS_DOUBLE * ( GL_DOUBLE - GL_FLOAT ) + GL_FLOAT;
     glVertexPointer(DIM, TYP, 0, pts);
@@ -859,6 +866,7 @@ void Display::drawStrip(size_t cnt, real const* pts, GLint prim)
 
 void Display::drawFiberBackbone(Fiber const& fib)
 {
+    glDisable(GL_LIGHTING);
     drawStrip(fib.nbPoints(), fib.addrPoints(), GL_LINE_STRIP);
 }
 
@@ -1125,10 +1133,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
     {
         // display vertices:
         pointSize(disp->point_size);
-        glBegin(GL_POINTS);
-        for ( size_t i = 0; i < fib.nbPoints(); ++i )
-            gle::gleVertex(fib.posP(i));
-        glEnd();
+        drawStrip(fib.nbPoints(), fib.addrPoints(), GL_POINTS);
     }
     else if ( style == 2 )
     {
@@ -1861,11 +1866,12 @@ void Display::drawOrganizers(OrganizerSet const& set)
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Display of transparent objects sorted by decreasing depth
 
+#if ( DIM >= 3 )
 
 /// display sub-part `inx` of object `obj`
-void Display::zObject::draw(Display * disp) const
+void zObject::draw(Display * disp) const
 {
     Mecable const * mec = point_.mecable();
     switch( mec->tag() )
@@ -1892,7 +1898,13 @@ void Display::zObject::draw(Display * disp) const
 }
 
 
-#if ( DIM >= 3 )
+/// function to sort zObjects according to their position 'depth'
+static int compareZObject(const void * A, const void * B)
+{
+    real a = static_cast<const zObject*>(A)->depth();
+    real b = static_cast<const zObject*>(B)->depth();
+    return ( a > b ) - ( a < b );
+}
 
 /**
  This display objects in `zObjects` from back to front

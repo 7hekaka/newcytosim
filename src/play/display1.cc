@@ -529,17 +529,30 @@ void Display1::drawSinglesF(const SingleSet & set) const
     if ( prop->point_size > 0 )
     {
         pointSize(prop->point_size);
-        glBegin(GL_POINTS);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glVertexPointer(std::max(DIM,2), GL_FLOAT, 0, fpts);
+        glColorPointer(4, GL_FLOAT, 0, fcol);
+        size_t i = 0;
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
-#if ENABLE_EXPLODE_DISPLAY && ( DIM == 1 )
-            obj->disp()->color2.load();
-            glVertex2f(obj->posFoot().XX, obj->signature() * 0x1p-28 - 4);
+            if ( obj->disp()->perceptible )
+            {
+#if ( DIM == 1 )
+                obj->posFoot().store(fpts+2*i);
+                fpts[1+2*i] = obj->signature() * 0x1p-28 - 4;
 #else
-            drawVertex(obj->posFoot(), obj->disp());
+                obj->posFoot().store(fpts+DIM*i);
 #endif
+                obj->disp()->color2.store(fcol+4*i);
+                if ( ++i >= fpts_size )
+                {
+                    glDrawArrays(GL_POINTS, 0, i);
+                    i = 0;
+                }
+            }
         }
-        glEnd();
+        glDrawArrays(GL_POINTS, 0, i);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
 }
 
@@ -582,30 +595,51 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
 {
     if ( prop->point_size > 0 )
     {
+        size_t i = 0;
         pointSize(prop->point_size);
-        
-        glBegin(GL_POINTS);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glVertexPointer(std::max(DIM,2), GL_FLOAT, 0, fpts);
+        glColorPointer(4, GL_FLOAT, 0, fcol);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
-#if ENABLE_EXPLODE_DISPLAY && ( DIM == 1 )
-            const PointDisp * disp = obj->disp1();
-            if ( disp->perceptible )
+            if ( obj->active() && obj->disp1()->perceptible )
             {
-                disp->color2.load();
-                glVertex2f(obj->posFree().XX, obj->signature() * 0x1p-28 - 8);
-            }
+#if ( DIM == 1 )
+                obj->posFree().store(fpts+2*i);
+                fpts[1+2*i] = obj->signature() * 0x1p-28 - 4;
 #else
-            drawVertex(obj->posFree(), obj->disp1());
+                obj->posFree().store(fpts+DIM*i);
 #endif
+                obj->disp1()->color2.store(fcol+4*i);
+                if ( ++i >= fpts_size )
+                {
+                    glDrawArrays(GL_POINTS, 0, i);
+                    i = 0;
+                }
+            }
         }
-        glEnd();
-        
+        glDrawArrays(GL_POINTS, 0, i);
+
 #if ( DIM > 1 )
-        // display inactive Couples with bitmap:
+        // display inactive Couples with smaller size:
+        pointSize(M_SQRT1_2*prop->point_size);
+        i = 0;
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
+        {
             if ( !obj->active() && obj->disp1()->perceptible )
-                obj->disp1()->drawI(obj->posFree());
+            {
+                obj->posFree().store(fpts+DIM*i);
+                obj->disp1()->color2.store(fcol+4*i);
+                if ( ++i >= fpts_size )
+                {
+                    glDrawArrays(GL_POINTS, 0, i);
+                    i = 0;
+                }
+            }
+        }
+        glDrawArrays(GL_POINTS, 0, i);
 #endif
+        glDisableClientState(GL_COLOR_ARRAY);
     }
 }
 

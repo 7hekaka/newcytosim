@@ -35,95 +35,89 @@ class PointDisp;
 /// defining the DISPLAY keyword enables display code in included files
 #define DISPLAY
 
+/**
+ @brief A display element with a depth coordinate
+ 
+ zObject is used to depth-sort and display transparent objects
+ */
+class zObject
+{
+    /// pointer to object
+    Mecapoint point_;
+    
+    /// distance to the imaging plane
+    real depth_;
+
+public:
+    
+    zObject() : depth_(0) { }
+    
+    zObject(Mecable const* m) : point_(m, 0), depth_(0) { }
+
+    zObject(Mecable const* m, size_t i) : point_(m, i), depth_(0) { }
+    
+    /// position
+    Vector position() const { return point_.pos(); }
+    
+    /// query depth
+    real depth() const { return depth_; }
+    
+    /// set depth
+    void depth(real z) { depth_ = z; }
+    
+    /// display object
+    void draw(Display*) const;
+};
+
 
 ///Base class to display Cytosim state using OpenGL
 class Display
 {
 protected:
     
-    /**
-     @brief A display element with a depth coordinate
-     
-     zObject is used to depth-sort and display transparent objects
-     */
-    class zObject
-    {
-        /// pointer to object
-        Mecapoint  point_;
-        
-        /// distance to the imaging plane
-        real       depth_;
+    /// array of float coordinates
+    GLfloat * fpts, * fcol;
 
-    public:
-        
-        zObject() : depth_(0) { }
-        
-        zObject(Mecable const* m) : point_(m, 0), depth_(0) { }
-
-        zObject(Mecable const* m, size_t i) : point_(m, i), depth_(0) { }
-        
-        /// position
-        Vector position() const { return point_.pos(); }
-        
-        /// query depth
-        real   depth()    const { return depth_; }
-        
-        /// set depth
-        void   depth(real z)    { depth_ = z; }
-        
-        /// display object
-        void   draw(Display*) const;
-
-    };
+    /// allocated size of `fpts`
+    const size_t fpts_size = 16384;
     
-    /// function to sort zObjects according to their position 'depth'
-    static int compareZObject(const void * A, const void * B)
-    {
-        real a = static_cast<const zObject*>(A)->depth();
-        real b = static_cast<const zObject*>(B)->depth();
-        return ( a > b ) - ( a < b );
-    }
-
     /// array of transparent objects to be displayed last
     Array<zObject> zObjects;
+    
+    /// the pixel size for this particular display
+    float pixelSize;
+    
+    /// scaling factors to convert 'size' parameter into pixels used in glPointSize() and glLineWidth()
+    float uFactor;
+    
+    /// scaling factors to convert 'size' parameter into real dimensions used in glScale()
+    float sFactor;
+    
+    ///  minimum radius under which object are now drawn
+    float minRadius;
+
+    /// flag used to calculate clusterAnalysis only once
+    size_t fiber_prep;
+    
+    /// used to calculate clusterAnalysis only once
+    double prep_time;
+    
+    /// min and max age used to adjust color range with COLORING_AGE
+    double age_scale, age_start;
+    
+    /// use OpenGL stencil test:
+    bool stencil_;
 
 private:
     
     /// set default value of FiberProp
     void prepareFiberDisp(FiberProp*, PropertyList&, gle_color);
-
+    
     /// set values of fiber's LineDisp
     void prepareLineDisp(Fiber const*);
-
+    
     template < typename T >
     void preparePointDisp(T * prop, PropertyList&, gle_color);
-
-protected:
-    
-    /// the pixel size for this particular display
-    float          pixelSize;
-    
-    /// scaling factors to convert 'size' parameter into pixels used in glPointSize() and glLineWidth()
-    float          uFactor;
-    
-    /// scaling factors to convert 'size' parameter into real dimensions used in glScale()
-    float          sFactor;
-    
-    ///  minimum radius under which object are now drawn
-    float          minRadius;
-
-    
-    /// flag used to calculate clusterAnalysis only once
-    size_t         fiber_prep;
-    
-    /// used to calculate clusterAnalysis only once
-    double         prep_time;
-    
-    /// min and max age used to adjust color range with COLORING_AGE
-    double         age_scale, age_start;
-    
-    /// use OpenGL stencil test:
-    bool           stencil_;
 
 public:
     
@@ -134,7 +128,7 @@ public:
     Display(DisplayProp const*);
     
     /// virtual destructor needed, as class is base to others
-    virtual ~Display() {}
+    virtual ~Display();
     
     /// display opaque internal objects using OpenGL commands
     virtual void drawSimul(Simul const&);
@@ -190,17 +184,17 @@ public:
     void drawTransparentSpaces(SpaceSet const&);
 
     
+    /// display string of points
+    static void drawStrip(size_t cnt, real const* pts, GLenum);
+
+    /// draw thin lines joining the Fiber vertices
+    static void drawFiberBackbone(Fiber const&);
+
     /// draw Fiber MINUS_END
     virtual void drawFiberMinusEnd(Fiber const&, int style, real size) const;
     
     /// draw Fiber PLUS_END
     virtual void drawFiberPlusEnd(Fiber const&, int style, real size) const;
-
-    /// display string of points
-    static void drawStrip(size_t cnt, real const* pts, GLint);
-
-    /// draw broken lines joining the Fiber vertices
-    static void drawFiberBackbone(Fiber const&);
 
     /// draw Fiber linear features
     virtual void drawFiberLines(Fiber const&) const;
