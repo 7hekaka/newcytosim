@@ -2,7 +2,7 @@
 #
 # A script to submit jobs to the SLURM queuing system
 #
-# F. Nedelec, 10.2007 --- 4.11.2020
+# F. Nedelec, 10.2007 --- 9.02.2021
 # Adapted to SLURM at Cambridge on 29.01.2021
 
 """
@@ -68,9 +68,7 @@ def execute(cmd):
             out.write("ERROR: command failed with value %i\n" % val)
             print(cmd)
     except OSError:
-        out.write("ERROR: command failed:\n")
-        print('> '+' '.join(cmd))
-
+        out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
 def makeNumberedDirectory(root):
     """Create an empty directories that start with 'root'"""

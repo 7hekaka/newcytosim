@@ -570,6 +570,14 @@ class Preconfig:
 
 #-------------------------------------------------------------------------------
 
+def parse(name, values, repeat=1, dest=''):
+    """
+    Process one file, and return the list of files generated
+    """
+    object=Preconfig()
+    return object.parse(name, values, repeat, dest)
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("You must specify a template file (for instructions, invoke with option '--help')")
@@ -578,6 +586,6 @@ if __name__ == "__main__":
     elif sys.argv[1]=='--version':
         print("This is PRECONFIG version %s (%s)" %(__VERSION__,__DATE__))
     else:
-        preconf=Preconfig()
-        preconf.main(sys.argv[1:])
+        object=Preconfig()
+        object.main(sys.argv[1:])
 

@@ -65,7 +65,7 @@ arrayname = 'cytosim'
 bsub  = '/usr/share/lsf/7.0/linux2.6-glibc2.3-x86_64/bin/bsub'
 
 
-def make_directory(name):
+def makeDirectory(name):
     """create a directory with specified name, if it does not exists"""
     if not os.path.isdir(name):
         try:
@@ -150,11 +150,11 @@ def main(args):
         return
 
     # make directories if necessary
-    make_directory(edir)
-    make_directory(odir)
-    make_directory(sdir)
-    make_directory(base+'/done')
-    make_directory(base+'/save')
+    makeDirectory(edir)
+    makeDirectory(odir)
+    makeDirectory(sdir)
+    makeDirectory(base+'/done')
+    makeDirectory(base+'/save')
     
     cnt  = 1
     id   = 1

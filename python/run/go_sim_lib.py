@@ -2,7 +2,7 @@
 #  It is not executable by directly, but it used by go_sim.py
 #  to create directory, copy files, move directories, etc.
 #
-# Copyright F. Nedelec 2007--2019, S. Dmitrieff 2019
+# Copyright F. Nedelec 2007--2021, S. Dmitrieff 2019
 
 
 try:
@@ -38,43 +38,41 @@ logfile_name = 'log.txt'
 
 #==========================  DIR/FILES HANDLING ==============================
 
-def make_directory(path, n=0):
+def make_directory(root, n=0):
     """
-    Create a new directory name????,
-    where ???? is a 4-digit number greater than n
+    Create a new directory `root####`, using a 4-digit number >= n
     """
-    res = path
-    if path[-1].isdigit():
-        path = path + '-'
+    if root[-1].isdigit():
+        root = root + '-'
     while n < 10000:
+        res = root + '%04i' % n
         try:
             os.mkdir(res)
-            #print("made " + res)
             return res
         except OSError:
-            res = path + '%04i' % n
+            pass #print("failed " + res)
         n += 1
     raise Error("failed to create new run directory on "+os.getenv('HOSTNAME', 'unknown'))
 
 
-def make_run_directory(name):
+def make_run_directory(root):
     """create a directory to run the simulation"""
     import tempfile
     if 'SLURM_JOB_ID' in os.environ or 'LSB_JOBID' in os.environ:
         try:
             rds = '/rds/user/' + os.getenv('USER', 'nedelec') + '/hpc-work'
-            return tempfile.mkdtemp('', 'run-', rds)
+            return tempfile.mkdtemp('', root, rds)
         except:
             pass
         try:
-            return tempfile.mkdtemp('', 'run-', '/local')
+            return tempfile.mkdtemp('', root, '/local')
         except:
             pass
         tmp = os.getenv('TMPDIR', '')
         if tmp:
             return tmp
-    return make_directory(name)
-    #return tempfile.mkdtemp('', 'run-', '.')
+    return make_directory(root)
+    #return tempfile.mkdtemp('', root, '.')
 
 
 def copy_recursive(src, dst):
@@ -93,52 +91,58 @@ def copy_recursive(src, dst):
             copy_recursive(s, d)
 
 
-def move_directory(path, park, name):
+def park_directory(path, park, name):
     """Copy directory 'path' to park, under a similar name"""
     src = os.path.abspath(path)
+    dst = os.path.join(park,name);
     if src == os.path.abspath(park):
         return src
     try:
-        dst = make_directory(os.path.join(park,name))
+        os.mkdir(dst)
     except:
-        sys.stderr.write("go_sim_lib.py found no parking space for '%s'\n" % path)
-        return src
-    #print("moving directory( %s -> %s )" % (src, dst))
+        dst = make_directory()
+        try:
+            os.mkdir(dst)
+        except:
+            sys.stderr.write("go_sim_lib.py found no parking space for '%s'\n" % path)
+            return src
+    print("moving directory( %s -> %s )" % (src, dst))
     copy_recursive(src, dst)
     from filecmp import dircmp
     dcmp = dircmp(src, dst)
     if dcmp.left_only or dcmp.diff_files:
-        sys.stderr.write("go_sim_lib.py could not copy '%s' identically\n" % path)
+        sys.stderr.write("go_sim_lib.py failed to copy '%s' verbatim\n" % path)
         return src
     else:
         shutil.rmtree(src)
     return dst
 
 
-def copy_config(conf, repeat):
+def copy_config(name, repeat):
     """
-        make 'repeat' copies of the config files.
+        make 'repeat' copies of the name.
     """
     res = []
     for x in range(repeat):
-        res.extend([conf]);
+        res.extend([name]);
     return res
 
 
-def make_config(conf, repeat, preconf, dest):
+def make_config(conf, repeat, script, dest):
     """
-    Generate config files by running a preconf script,
-    or simply repeat the name if ( repeat > 1 ) and preconf==''.
+    Generate config files by running a python script,
+    or simply repeat the name if ( repeat > 1 ) and script==''.
     """
-    if preconf:
+    if script:
+        code = script.rstrip('.py')
         module = {}
         try:
-            module = __import__(preconf.rstrip('.py'))
+            module = __import__(code)
         except:
             import imp
-            module = imp.load_source('pre_config', preconf)
+            module = imp.load_source(code, script)
         if not module:
-            raise Error("could not load python module `"+preconf+"'")
+            raise Error("could not load python module `"+code+"'")
         # use module to generate a new config file:
         return module.parse(conf, {}, repeat, dest)
     else:
@@ -202,7 +206,7 @@ def run(exe, conf, name, args=[]):
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf);    
-    wdir = make_run_directory()
+    wdir = make_run_directory('run')
     os.chmod(wdir, 504)
     os.chdir(wdir)
     shutil.copyfile(conf, config_name)

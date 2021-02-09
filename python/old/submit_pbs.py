@@ -56,7 +56,7 @@ mem   = '1gb'
 qsub  = '/opt/pbs/default/bin/qsub'
 
 
-def make_directory(name):
+def makeDirectory(name):
     """create a directory with specified name, if it does not exists"""
     if not os.path.isdir(name):
         try:
@@ -126,11 +126,11 @@ def main(args):
         return
 
     # make directories if necessary
-    make_directory(edir)
-    make_directory(odir)
-    make_directory(sdir)
-    make_directory(base+'/done')
-    make_directory(base+'/save')
+    makeDirectory(edir)
+    makeDirectory(odir)
+    makeDirectory(sdir)
+    makeDirectory(base+'/done')
+    makeDirectory(base+'/save')
     
     cnt  = 1
     id   = 0

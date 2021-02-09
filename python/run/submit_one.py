@@ -49,8 +49,7 @@ def execute(cmd):
             out.write("ERROR: command failed with value %i\n" % val)
             print(cmd)
     except OSError:
-        out.write("ERROR: command failed:\n")
-        print('> '+' '.join(cmd))
+        out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
 
 def write_script(fid, cmd):

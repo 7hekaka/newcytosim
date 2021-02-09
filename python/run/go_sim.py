@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # A script to run simulations sequentially.
-# Copyright F. Nedelec, 2010--2018
+# Copyright F. Nedelec, 2010--2018, Cambridge University 2019--2021
 # Using multiprocessing thanks to Adolfo Alsina and Serge Dmitrieff, March 2016
 
 """
@@ -12,7 +12,7 @@ Synopsis:
 
 Syntax:
 
-    go_sim.py [executable] [repeat] [script=PYTHON] [park=directory] config_file [config_file]
+    go_sim.py [executable] [repeat] [preconfig=PYTHON] [park=directory] config_file [config_file]
     
     Bracketted arguments are optional.
     If working_directory is not specified, the current directory is used.
@@ -31,7 +31,7 @@ F. Nedelec, 03.2010, 10.2011, 05.2012, 04.2013, 12.2017
 # The long time.sleep() prevents zoombie nodes from accepting further LSF jobs
 
 try:
-    import os, sys, time
+    import os, sys, shutil, time
 except ImportError:
     host = os.getenv('HOSTNAME', 'unknown')
     sys.stderr.write("go_sim.py could not load necessary python modules on %s\n" % host)
@@ -94,7 +94,7 @@ def run(conf, name):
     # move run directory to `park` if specified:
     if os.path.isdir(park):
         try:
-            res = go_sim_lib.move_directory(res, park, name)
+            res = go_sim_lib.park_directory(res, park, name)
             with open(res+"/log.txt", "a") as f:
                 f.write("parked    %s\n" % time.asctime())
             out.write("            ---> parked in %s\n" % res)
@@ -114,26 +114,25 @@ def run_queue(queue):
             break;
 
 
-def process(conf, preconf, name, queue):
+def process(conf, script, name, queue):
     """
         run configurations files generated from 'conf'
     """
     if not os.path.isfile(conf):
-        err.write("go_sim.py: file '%s' does not exist\n" % conf)
+        err.write("go_sim.py could not find file '%s'\n" % conf)
         sys.exit()
-    
     # generate config file(s):
-    if preconf:
+    if script:
         import tempfile
-        tmp = tempfile.mkdtemp('', name+'-', '.')
-        files = go_sim_lib.make_config(conf, repeat, preconf, tmp)
+        tmp = tempfile.mkdtemp('', '_'+name+'-', '.')
+        template = tmp + '/config.cym.tpl'
+        shutil.copy(conf, template);
+        files = go_sim_lib.make_config(template, repeat, script, tmp)
     else:
         files = go_sim_lib.copy_config(conf, repeat)
-
     if not files:
         err.write("go_sim.py could not generate config files\n")
         sys.exit()
- 
     # process all files created:
     for i, f in enumerate(files):
         if len(files) > 1:
@@ -151,10 +150,10 @@ def process(conf, preconf, name, queue):
 
 def main(args):
     global njobs, repeat, park, exe, queue
-    preconf = ''
-    name    = 'run0000'
-    files   = []
-    njobs   = 1
+    script = ''
+    name   = 'run0000'
+    files  = []
+    njobs  = 1
     
     # parse arguments list:
     for arg in args:
@@ -164,26 +163,28 @@ def main(args):
             exe = os.path.abspath(arg)
         elif os.path.isfile(arg):
             files.append(arg)
+        elif arg.startswith('preconfig'):
+            script = arg
         else:
             [key, equal, val] = arg.partition('=')
             if key == 'nproc' or key == 'njobs' or key == 'jobs':
                 njobs = val
-            elif key == 'script':
-                preconf = val
+            elif key == 'preconfig' or key == 'script':
+                script = val
             elif key == 'name':
                 name = val
             elif key == 'park':
                 park = val
             else:
-                out.write("Error: I do not understand argument `%s'\n" % arg)
+                out.write("go_sim.py does not understand argument `%s'\n" % arg)
                 sys.exit()
     
     if not files:
-        err.write("You should specify a config file on the command line\n")
+        err.write("go_sim.py expects a config file on the command line\n")
         sys.exit()
 
     if not executable(exe):
-        err.write("go_sim.py: executable '%s' not found\n" % exe)
+        err.write("go_sim.py could not find executable '%s'\n" % exe)
         sys.exit()
 
     # prepare for multiprocessing
@@ -199,7 +200,7 @@ def main(args):
     # process all given files:
     cnt = 0
     for conf in files:
-        process(conf, preconf, name, queue)
+        process(conf, script, name, queue)
         cnt += 1
         name = 'run%04i' % cnt
 
