@@ -100,7 +100,7 @@ def park_directory(path, park, name):
     try:
         os.mkdir(dst)
     except:
-        dst = make_directory()
+        dst = make_directory(dst)
         try:
             os.mkdir(dst)
         except:

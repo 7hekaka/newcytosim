@@ -97,7 +97,7 @@ inline static vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_loa
 // Convert between single and double types
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
 inline static __m256d cvt4sd(vec4f a)             { return _mm256_cvtps_pd(a); }
-inline static void store4d(float* a, __m256d b)   { _mm_store_ps(a, _mm256_cvtpd_ps(b)); }
+inline static void store4d(float* a, __m256d b)   { _mm_storeu_ps(a, _mm256_cvtpd_ps(b)); }
 #elif defined(__SSE3__)
 inline static vec4f broadcastlof(vec4f a)         { return _mm_shuffle_ps(a,a,0x00); }
 inline static vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }

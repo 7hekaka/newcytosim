@@ -697,7 +697,7 @@ void test_hsum()
     s0 = add4f(shuffle4f(s0, s2, 0x4E), shuffle4f(s0, s2, 0xE4));
     dump(s0, "sum ");
     
-    dump(blend4f(s0, s2), "blend  ");
+    dump(blend4f(s0, s2, 0b1011), "blend  ");
     dump(shuffle4f(s0, s2, 0xE4), "shuff  ");
 }
 
@@ -728,7 +728,7 @@ void test_mat()
     dump(m258, "m258");
     
     // transposed matrix:
-    vec4 m036 = blend31(u, shuffle4(m012, m345));
+    vec4 m036 = blend31(u, shuffle4(m012, m345, 0b1000));
     vec4 m147 = blend4(m145, permute4(u, 0b0101), 0b0100);
     
     dump(m036, "m036");
