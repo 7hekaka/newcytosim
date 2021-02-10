@@ -138,7 +138,7 @@ void SpaceBanana::write(Outputter& out) const
 void SpaceBanana::setLengths(const real len[])
 {
     bLength = len[0];
-    bRadius  = len[1];
+    bRadius = len[1];
     bCurve = len[2];
     update();
 }
@@ -160,21 +160,26 @@ void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceBanana::draw2D() const
 {
+    GLfloat R(bRadius);
+    GLfloat C(bCurve);
+    GLfloat cX(bCenter[0]);
+    GLfloat cY(bCenter[1]);
+    GLfloat eX(bEnd[0]);
+    GLfloat eY(bEnd[1]);
+    GLfloat A(-bAngle + M_PI_2);
+    GLfloat B( bAngle - M_PI_2);
+
     //number of sections in the quarter-circle
     constexpr size_t fin = 8 * gle::finesse;
     GLfloat arc[8*fin+8];
-    
-    GLfloat A = -bAngle + M_PI_2;
-    GLfloat B =  bAngle - M_PI_2;
-    
     // lower swing
-    gle::compute_arc(fin, arc      , bCurve+bRadius, A-M_PI, B, bCenter[0], bCenter[1]);
+    gle::compute_arc(fin, arc      , C+R, A-M_PI, M_PI+B-A, cX, cY);
     // right cap
-    gle::compute_arc(fin, arc+2*fin, bRadius, B, B+M_PI, bEnd[0], bEnd[1]);
+    gle::compute_arc(fin, arc+2*fin, R, B, M_PI, eX, eY);
     // upper swing
-    gle::compute_arc(fin, arc+4*fin, bCurve-bRadius, B, A-M_PI, bCenter[0], bCenter[1]);
+    gle::compute_arc(fin, arc+4*fin, C-R, B, A-B-M_PI, cX, cY);
     // left cap
-    gle::compute_arc(fin, arc+6*fin, bRadius, A, A+M_PI, -bEnd[0], bEnd[1]);
+    gle::compute_arc(fin, arc+6*fin, R, A, M_PI, -eX, eY);
     
     glVertexPointer(2, GL_FLOAT, 0, arc);
     glDrawArrays(GL_LINE_LOOP, 0, 4*fin);

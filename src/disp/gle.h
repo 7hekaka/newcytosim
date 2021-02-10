@@ -39,10 +39,13 @@ namespace gle
     void initBuffers();
     
     /// calculate sinus and cosinus
+    void compute_circle(size_t cnt, GLfloat CS[], double rad, double start, double theta, GLfloat cX, GLfloat cY);
+
+    /// calculate sinus and cosinus
     void compute_circle(size_t cnt, GLfloat CS[], double rad, double start = 0);
 
     /// calculate sinus and cosinus for a circular arc
-    void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double end, GLfloat cx, GLfloat cy);
+    void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
 
 #pragma mark -
     

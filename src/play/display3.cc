@@ -92,8 +92,8 @@ void Display3::drawSimul(Simul const& sim)
          If the display is 'cut', we might see the inner sides,
          but rendering would be faster with Culling enabled
         */
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+        //glEnable(GL_CULL_FACE);
+        //glCullFace(GL_BACK);
         drawFibers(sim.fibers);
     }
     

@@ -257,21 +257,12 @@ void SpaceCapsule::draw2D() const
 {
     const GLfloat L(length_);
     const GLfloat R(radius_);
-
-    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
-    GLfloat cir[8*fin+4];
-    gle::compute_circle(fin*4, cir+4, R, M_PI_2);
-    cir[2] = 2*L;
-    cir[3] = R;
-
-    glTranslatef(-L, 0, 0);
-    glVertexPointer(2, GL_FLOAT, 0, cir+2);
-    glDrawArrays(GL_LINE_STRIP, 0, 2*fin+2);
-    glTranslatef(2*L, 0, 0);
-    cir[4*fin+2] = -2*L;
-    cir[4*fin+3] = -R;
-    glDrawArrays(GL_LINE_STRIP, 2*fin, 2*fin+2);
-    glTranslatef(-L, 0, 0);
+    constexpr size_t fin = 16 * gle::finesse;
+    GLfloat arc[4*fin+4], *cra = arc + 2*fin + 2;
+    gle::compute_arc(fin, arc, R, -M_PI_2, M_PI,  L, 0);
+    gle::compute_arc(fin, cra, R,  M_PI_2, M_PI, -L, 0);
+    glVertexPointer(2, GL_FLOAT, 0, arc);
+    glDrawArrays(GL_LINE_LOOP, 0, 2*fin+2);
 }
 
 
@@ -280,53 +271,34 @@ void SpaceCapsule::draw3D() const
     const GLfloat L(length_);
     const GLfloat R(radius_);
     
-    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
-    GLfloat cir[8*fin+2];
-    gle::compute_circle(fin*4, cir, 1);
-        
-    //display strips along the side of the volume:
-    for ( size_t t = 0; t < 4*fin; ++t )
-    {
-        //compute the transverse angles:
-        GLfloat cb = cir[2*t  ], sb = cir[1+2*t];
-        GLfloat ca = cir[2*t+2], sa = cir[3+2*t];
-        GLfloat cB = R * cb, sB = R * sb;
-        GLfloat cA = R * ca, sA = R * sa;
-        
-        //draw one srip of the oval:
-        glBegin(GL_TRIANGLE_STRIP);
-        for ( size_t i=0; i <= fin; ++i )
-        {
-            GLfloat x = cir[2*i], y = cir[1+2*i];
-            glNormal3f(     x, ca*y, sa*y);
-            glVertex3f(+L+R*x, cA*y, sA*y);
-            glNormal3f(     x, cb*y, sb*y);
-            glVertex3f(+L+R*x, cB*y, sB*y);
-        }
-        for ( int i=fin; i >= 0; --i)
-        {
-            GLfloat x = -cir[2*i], y = cir[1+2*i];
-            glNormal3f(     x, ca*y, sa*y);
-            glVertex3f(-L+R*x, cA*y, sA*y);
-            glNormal3f(     x, cb*y, sb*y);
-            glVertex3f(-L+R*x, cB*y, sB*y);
-        }
-        glEnd();
-    }
+    const GLenum glp = GL_CLIP_PLANE5;
+    GLdouble plane[] = { 1, 0, 0, 0 };
+    glEnable(glp);
 
-    if ( 1 )
-    {
-        //draw 2 rings on the surface
-        glPushMatrix();
-        glTranslatef(L, 0, 0);
-        glScalef(R, R, R);
-        glRotated(90, 0, 1, 0);
-        gle::drawArrowedBand(24, 0.25);
-        glTranslatef(0, 0, -2*L/R);
-        glRotated(180, 0, 1, 0);
-        gle::drawArrowedBand(24, 0.25);
-        glPopMatrix();
-    }
+    //right side:
+    glPushMatrix();
+    glClipPlane(glp, plane);
+    glTranslatef(L, 0, 0);
+    glScalef(R, R, R);
+    glRotated(-90, 0, 1, 0);
+    gle::halfTube4();
+    gle::hemisphere4();
+    gle::drawArrowedBand(24, 0.25);
+    glPopMatrix();
+
+    //left side:
+    glPushMatrix();
+    plane[0] = -1;
+    glClipPlane(glp, plane);
+    glTranslatef(-L, 0, 0);
+    glScalef(R, R, R);
+    glRotated(90, 0, 1, 0);
+    gle::halfTube4();
+    gle::hemisphere4();
+    gle::drawArrowedBand(24, 0.25);
+    glPopMatrix();
+    
+    glDisable(glp);
 }
 
 #else

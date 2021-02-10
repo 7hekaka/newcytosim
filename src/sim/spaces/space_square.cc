@@ -265,12 +265,12 @@ void SpaceSquare::drawEdges() const
 
 void SpaceSquare::drawFaces() const
 {
+#if ( DIM > 2 )
     const GLfloat X(half_[0]);
     const GLfloat Y(half_[1]);
     const GLfloat T(( DIM > 2 ) ? half_[2] : 0);
     const GLfloat B(-T);
 
-#if ( DIM > 2 )
     GLfloat pts[72] = {
         +X, Y, B, X, Y, T, X,-Y, B, X,-Y, T,
         -X,-Y, B,-X,-Y, T,-X, Y, B,-X, Y, T,

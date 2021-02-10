@@ -420,100 +420,80 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceTee::draw2D() const
 {
+    GLfloat R(tRadius);
+    GLfloat L(tLength);
+    GLfloat J(tJunction);
+    GLfloat A(tArmLength);
+    
     constexpr size_t fin = 8 * gle::finesse;
-    GLfloat cir[4*fin+2];
-    gle::compute_circle(fin*2, cir, tRadius);
-    
-    glBegin(GL_LINE_LOOP);
-    //the upper side from the tJunction to the left
-    glVertex3f( tJunction-tRadius, tRadius, 0);
-    glVertex3f(-tLength,           tRadius, 0);
-    
-    //the left cap
-    for ( size_t n = 0; n < fin; ++n )
-        glVertex3f(-tLength-cir[1+2*n], cir[2*n], 0);
-    
-    //the lower side from left to right
-    glVertex3f(-tLength,-tRadius, 0);
-    glVertex3f( tLength,-tRadius, 0);
-    
-    //the right cap
-    for ( size_t n = 0; n < fin; ++n )
-        glVertex3f(tLength+cir[1+2*n], -cir[2*n], 0);
-    
-    //the upper side from the right to the tJunction
-    glVertex3f(tLength,           tRadius, 0);
-    glVertex3f(tJunction+tRadius, tRadius, 0);
-    
-    //the right side of the arm
-    glVertex3f(tJunction+tRadius, tRadius+tArmLength, 0);
-    
-    //the cap of the arm
-    for ( size_t n = 0; n < fin; ++n )
-        glVertex3f(tJunction+cir[2*n], tArmLength+tRadius+cir[1+2*n], 0);
-    
-    //the left side of the arm
-    glVertex3f(tJunction-tRadius, tRadius+tArmLength, 0);
+    GLfloat arc[6*fin+8], *top = arc+2*fin+2, *lft = top+2*fin+2;
+    gle::compute_arc(fin, arc, R, -M_PI_2, M_PI, L, 0);
+    gle::compute_arc(fin, top, R, 0, M_PI, J, A);
+    gle::compute_arc(fin, lft, R, M_PI_2, M_PI, -L, 0);
+    top[-2] = J+R;
+    top[-1] = R;
+    lft[-2] = J-R;
+    lft[-1] = R;
 
-    glEnd();
+    glVertexPointer(2, GL_FLOAT, 0, arc);
+    glDrawArrays(GL_LINE_LOOP, 0, 3*fin+2);
 }
 
+
+static void setClipPlane(GLuint p, GLdouble x, GLdouble y)
+{
+    GLdouble plane[] = { x, y, 0, 0 };
+    glClipPlane(p, plane);
+}
 
 void SpaceTee::draw3D() const
 {
     const GLenum glp1 = GL_CLIP_PLANE4;
     const GLenum glp2 = GL_CLIP_PLANE5;
-    const GLdouble planeZ[] = { 0, 0, 1, 0 };
-    const GLdouble plane1[] = { 0, -std::sqrt(0.5), std::sqrt(0.5), 0 };
-    const GLdouble plane2[] = { 0,  std::sqrt(0.5), std::sqrt(0.5), 0 };
 
-    GLdouble L = tLength/tRadius;
-    GLdouble J = tJunction/tRadius;
-    GLdouble A = tArmLength/tRadius;
+    GLfloat L(tLength/tRadius);
+    GLfloat J(tJunction/tRadius);
+    GLfloat A(tArmLength/tRadius);
 
     glEnable(glp1);
-    glPushMatrix();
-    gle::scale(tRadius);
+    glEnable(glp2);
 
     //right side:
     glPushMatrix();
-    glRotated(90, 0, 1, 0);
-    glTranslated(0, 0, J);
-    glClipPlane(glp1, plane1);
-    gle::tubeZ(0, L-J, 1);
-    glTranslated(0, 0, L-J);
-    glClipPlane(glp1, planeZ);
-    gle::sphere8();
+    gle::scale(tRadius);
+    glTranslatef(J, 0, 0);
+    setClipPlane(glp1, M_SQRT1_2, -M_SQRT1_2);
+    setClipPlane(glp2, 1, 0);
+    glTranslatef(L-J, 0, 0);
+    glRotated(-90, 0, 1, 0);
+    gle::halfTube4();
+    gle::hemisphere4();
     glPopMatrix();
 
     //left side:
     glPushMatrix();
-    glRotated(90, 0, -1, 0);
-    glTranslated(0, 0, -J);
-    glClipPlane(glp1, plane1);
-    gle::tubeZ(0, L+J, 1);
-    glTranslated(0, 0, L+J);
-    glClipPlane(glp1, planeZ);
-    gle::sphere8();
-    glTranslated(0, 0, -L-J);
+    gle::scale(tRadius);
+    glTranslatef(J, 0, 0);
+    setClipPlane(glp1, -M_SQRT1_2, -M_SQRT1_2);
+    setClipPlane(glp2, -1, 0);
+    glTranslatef(-L-J, 0, 0);
+    glRotated(90, 0, 1, 0);
+    gle::halfTube4();
+    gle::hemisphere4();
     glPopMatrix();
 
     //the arm:
     glPushMatrix();
+    gle::scale(tRadius);
     glTranslated(J, 0, 0);
-    glRotated(-90, 1, 0, 0);
-    glRotated( 90, 0, 0, 1);
-    glEnable(glp2);
-    glClipPlane(glp1, plane1);
-    glClipPlane(glp2, plane2);
-    gle::tubeZ(0, A+1, 1);
-    glTranslated(0, 0, A+1);
-    glDisable(glp2);
-    glClipPlane(glp1, planeZ);
-    gle::sphere8();
+    setClipPlane(glp1, -M_SQRT1_2, M_SQRT1_2);
+    setClipPlane(glp2, M_SQRT1_2, M_SQRT1_2);
+    glTranslatef(0, A, 0);
+    glRotated(90, 1, 0, 0);
+    gle::halfTube4();
+    gle::hemisphere4();
     glPopMatrix();
 
-    glPopMatrix();
     glDisable(glp1);
     glDisable(glp2);
 }

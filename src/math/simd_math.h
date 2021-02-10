@@ -206,39 +206,39 @@ inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
 
 
 /**
- Initialize CS[] to a circle:
+ Initialize ptr[] to a circle:
  delta = 2 * PI / cnt;
-     CS[2*i  ] = rad * cos(start+i*delta)
-     CS[2*i+1] = rad * sin(start+i*delta)
+     ptr[2*i  ] = rad * cos(start+i*theta) + cX
+     ptr[2*i+1] = rad * sin(start+i*theta) + cY
  */
-inline void circleAVX(size_t cnt, float CS[], double rad, double start)
+inline void set_arcAVX(size_t cnt, float ptr[], double rad, double start,
+                       double delta, double cX, double cY)
 {
-    const double theta = 2.0 * M_PI / (double)cnt;
-    const double c = std::cos(theta);
-    const double s = std::sin(theta);
+    const double c = std::cos(delta);
+    const double s = std::sin(delta);
     const double c2 = c * c - s * s;
-    const double s2 = c * s + c * s;
+    const double s2 = s * c + c * s;
 
-    vec4 cs{ c2, s2,  c2, s2};
-    vec4 sc{-s2, c2, -s2, c2};
-    
-    const double x0 = rad * std::cos(start);
-    const double y0 = rad * std::sin(start);
-    vec4 pp{x0, y0, c*x0-s*y0, s*x0+c*y0};
-    
-    float * ptr = CS;
-    float * const end = CS + 2 * cnt;
+    vec4 cs4{ c2, s2,  c2, s2};
+    vec4 sc4{-s2, c2, -s2, c2};
+
+    vec4 cc { cX, cY, cX, cY };
+    vec2 x0 { std::cos(start), std::sin(start) };
+    // rotate x0 by theta:
+    vec2 x1 = add2(mul2(vec2{c, s}, unpacklo2(x0, x0)), mul2(vec2{-s, c}, unpackhi2(x0, x0)));
+    vec4 xx = mul4(set4(rad), cat4(x1, x0));
+
+    float * const end = ptr + 2 * cnt - 2;
     while ( ptr < end )
     {
-        store4d(ptr, pp);
-        ptr += 4;
+        store4d(ptr, add4(xx, cc));
         // apply the rotation matrix
         // x = c * x - s * y;
-        // y = s * y + c * y;
-        pp = add4(mul4(cs, duplo4(pp)), mul4(sc, duphi4(pp)));
+        // y = s * x + c * y;
+        xx = add4(mul4(cs4, duplo4(xx)), mul4(sc4, duphi4(xx)));
+        ptr += 4;
     }
-    end[0] = x0;
-    end[1] = y0;
+    store4d(ptr, add4(xx, cc));
 }
 
 #endif
