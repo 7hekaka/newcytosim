@@ -15,9 +15,9 @@ int rank = 1;
 
 bool showVertices = false;
 bool showEdges = true;
+bool showFaces = true;
 
 Platonic::Solid * ico = nullptr;
-
 
 GLuint glbuffers[2] = { 0, 0 };
 
@@ -47,6 +47,7 @@ void processNormalKey(unsigned char c, int x, int y)
         case '[': rank = std::max(rank-1, 1);   break;
         case 's': style = ( style + 1 ) % 4;    break;
         case 'e': showEdges = !showEdges;       break;
+        case 't': showFaces = !showFaces;       break;
         case 'd': showVertices = !showVertices; break;
         case ' ': break; // update the Platonic
         default: glApp::processNormalKey(c,x,y); return;
@@ -136,19 +137,19 @@ void displayFaces()
 void display(View&, int)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     
-    glColor3f(0, 0, 0.75f);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    displayFaces();
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_LIGHTING);
-
+    if ( showFaces )
+    {
+        glColor3f(0, 0, 0.75f);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        displayFaces();
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_LIGHTING);
+    }
     if ( showEdges )
     {
         if ( ico->nb_edges() == 0 )
@@ -163,7 +164,6 @@ void display(View&, int)
         }
         glEnd();
     }
-
     if ( showVertices )
     {
         char tmp[128];
@@ -183,7 +183,6 @@ void display(View&, int)
             gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
         }        
     }
-    
     glutReportErrors();
 }
 

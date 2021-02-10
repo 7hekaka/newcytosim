@@ -3,33 +3,30 @@
 #ifndef PLATONIC_H
 #define PLATONIC_H
 
-#include "real.h"
 #include <iostream>
 
 namespace Platonic
 {
+    /// floating type used by Platonic
+    typedef float FLOAT;
+
     /// One of the corner of a Platonic solid
-    class Corner
+    struct Corner
     {
-    public:
-        
         /// Coordinates in space
-        real     pos_[3];
+        FLOAT    pos_[3];
         
         /// an index to identify this vertex
         unsigned inx_;
-
         
         Corner()
         { inx_=0; pos_[0]=0; pos_[1]=0; pos_[2]=0; }
         
         ~Corner() {}
         
-        void init(unsigned n, real x, real y, real z)
+        void init(unsigned n, FLOAT x, FLOAT y, FLOAT z)
         { inx_=n; pos_[0]=x; pos_[1]=y; pos_[2]=z; }
-        
     };
-    
     
     /// A vertex is interpolated from 3 Corners
     class Vertex
@@ -110,7 +107,7 @@ namespace Platonic
         static unsigned nb_edges(Polyhedra K, unsigned r);
         
         /// an estimation of the length of the edge
-        static real     length_edge(Polyhedra K, unsigned r);
+        static FLOAT    length_edge(Polyhedra K, unsigned r);
         
         /// build as polyhedra `K` refined by order `div`
         Solid(Polyhedra K, unsigned div, bool make_edges = false);
@@ -122,66 +119,66 @@ namespace Platonic
         ~Solid();
         
         /// set array of indices that define the edges
-        void           setEdges();
+        void     setEdges();
         
         /// number of derived vertices
-        unsigned int   nb_vertices()        const { return num_vertices_; }
+        unsigned nb_vertices() const { return num_vertices_; }
         
         /// reference to derived vertex `ii`
-        Vertex&        vertex(int ii)       const { return vertices_[ii]; }
+        Vertex&  vertex(int i) const { return vertices_[i]; }
         
         /// copy coordinates of points to given array
-        void           store_vertices(float* vec) const;
+        void     store_vertices(float* vec) const;
         
         /// copy coordinates of points to given array
-        void           store_vertices(double* vec) const;
+        void     store_vertices(double* vec) const;
 
         /// return pointer to array of coordinates of vertices
-        const float*   vertex_data()        const { return coordinates_; }
+        const float* vertex_data()      const { return coordinates_; }
         
         /// address of coordinates for vertex `v` ( `v < nb_vertices()` )
-        const float*   vertex_data(int v)   const { return coordinates_ + 3 * v; }
+        const float* vertex_data(int v) const { return coordinates_ + 3 * v; }
         
         
         /// number of points in the edges = 2 * nb-of-edges
-        unsigned int   nb_edges()           const { return num_edges_; }
+        unsigned int nb_edges()        const { return num_edges_; }
         
         /// array of indices to the vertices in each edge (2 per edge)
-        unsigned int*  edges_data()         const { return edges_; }
+        unsigned int* edges_data()     const { return edges_; }
         
         /// return address of first vertex of edge `e`
-        const float*   edge_data0(int e)    const { return coordinates_ + 3 * edges_[2*e]; }
+        const float* edge_data0(int e) const { return coordinates_ + 3 * edges_[2*e]; }
         
         /// return address of second vertex of edge `e`
-        const float*   edge_data1(int e)    const { return coordinates_ + 3 * edges_[2*e+1]; }
+        const float* edge_data1(int e) const { return coordinates_ + 3 * edges_[2*e+1]; }
         
         
         /// return address of first vertex of edge `e`
-        unsigned       edge_indx0(int e)    const { return edges_[2*e]; }
+        unsigned edge_indx0(int e)     const { return edges_[2*e]; }
         
         /// return address of second vertex of edge `e`
-        unsigned       edge_indx1(int e)    const { return edges_[2*e+1]; }
+        unsigned edge_indx1(int e)     const { return edges_[2*e+1]; }
         
         
         /// number of faces (each face is a triangle of 3 vertices)
-        unsigned int   nb_faces()           const { return num_faces_; }
+        unsigned int nb_faces()        const { return num_faces_; }
         
         /// array of indices to the vertices in each face (3 vertices per face)
-        unsigned int*  faces_data()         const { return faces_; }
+        unsigned int* faces_data()     const { return faces_; }
         
         /// return address of first vertex of face `f`
-        const float*   face_data0(int f)    const { return coordinates_ + 3 * faces_[3*f]; }
+        const float* face_data0(int f) const { return coordinates_ + 3 * faces_[3*f]; }
         /// return address of second vertex of face `f`
-        const float*   face_data1(int f)    const { return coordinates_ + 3 * faces_[3*f+1]; }
+        const float* face_data1(int f) const { return coordinates_ + 3 * faces_[3*f+1]; }
         /// return address of third vertex of face `f`
-        const float*   face_data2(int f)    const { return coordinates_ + 3 * faces_[3*f+2]; }
+        const float* face_data2(int f) const { return coordinates_ + 3 * faces_[3*f+2]; }
         
         /// return address of first vertex of face `f`
-        unsigned       face_indx0(int f)    const { return faces_[3*f]; }
+        unsigned face_indx0(int f)     const { return faces_[3*f]; }
         /// return address of second vertex of face `f`
-        unsigned       face_indx1(int f)    const { return faces_[3*f+1]; }
+        unsigned face_indx1(int f)     const { return faces_[3*f+1]; }
         /// return address of third vertex of face `f`
-        unsigned       face_indx2(int f)    const { return faces_[3*f+2]; }
+        unsigned face_indx2(int f)     const { return faces_[3*f+2]; }
         
     private:
         
@@ -216,8 +213,8 @@ namespace Platonic
         unsigned addVertex(Corner*, unsigned, Corner*, unsigned, Corner*, unsigned);
         unsigned makeVertex(Corner*, unsigned, Corner*, unsigned, Corner*, unsigned);
         
-        void init(unsigned, real* vdata[3], unsigned, unsigned* fdata[3], unsigned);
-        void refineTriangles(unsigned, real vex[][3], unsigned, unsigned fac[][3], unsigned div, int half);
+        void init(unsigned, FLOAT* vdata[3], unsigned, unsigned* fdata[3], unsigned);
+        void refineTriangles(unsigned, FLOAT vex[][3], unsigned, unsigned fac[][3], unsigned div, int half);
 
         void initTetrahedron(unsigned div);
         void initOctahedron(unsigned div);

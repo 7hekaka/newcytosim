@@ -13,6 +13,10 @@ SpaceTee::SpaceTee(SpaceProp const* p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("tee cannot be used in 1D");
+    tLength = 0;
+    tRadius = 0;
+    tArmLength = 0;
+    tJunction = 0;
 }
 
 
@@ -28,10 +32,10 @@ void SpaceTee::resize(Glossary& opt)
     opt.set(jun, "junction");
     opt.set(arm, "arm");
 
-    if ( len <= 0 || rad <= 0 || arm < 0 )
-        throw InvalidParameter("Space tee can't have negative length, arm length or radius.");
+    if ( len <= 0 || rad <= 0 || arm < rad )
+        throw InvalidParameter("tee can't have negative length, arm length or radius");
     if ( abs_real(jun)+rad > len )
-        throw InvalidParameter("Space tee: the position of the branch plus the radius must lie within the length of the T.");
+        throw InvalidParameter("tee: the position of the branch must be closer to center");
     
     tLength = len;
     tRadius = rad;

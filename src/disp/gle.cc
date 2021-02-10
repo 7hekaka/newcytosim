@@ -770,7 +770,7 @@ namespace gle
     }
 
     /// load data to GPU
-    void initBuffer(GLsizei cnt, GLfloat* ptr, GLuint buf)
+    void setBuffer(GLsizei cnt, GLfloat* ptr, GLuint buf)
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt, ptr, GL_STATIC_DRAW);
@@ -781,12 +781,12 @@ namespace gle
         if ( !glIsBuffer(buf_[0]) )
         {
             glGenBuffers(16, buf_);
-            drawTetrahedron(initBuffer, initBuffer, buf_[0], buf_[1]);
-            drawOctahedron(initBuffer, initBuffer, buf_[2], buf_[3]);
-            drawIcosahedron(initBuffer, initBuffer, buf_[4], buf_[5]);
-            drawArrowTail(initBuffer, initBuffer, buf_[6], buf_[7]);
-            drawCube(initBuffer, initBuffer, buf_[8], buf_[9]);
-            drawStar(initBuffer, initBuffer, buf_[10], buf_[11]);
+            drawTetrahedron(setBuffer, setBuffer, buf_[0], buf_[1]);
+            drawOctahedron(setBuffer, setBuffer, buf_[2], buf_[3]);
+            drawIcosahedron(setBuffer, setBuffer, buf_[4], buf_[5]);
+            drawArrowTail(setBuffer, setBuffer, buf_[6], buf_[7]);
+            drawCube(setBuffer, setBuffer, buf_[8], buf_[9]);
+            drawStar(setBuffer, setBuffer, buf_[10], buf_[11]);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
     }
@@ -834,12 +834,12 @@ namespace gle
 
     size_t drawTube(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat A, GLfloat B, size_t inc)
     {
-        size_t sec = ncircle / inc;
-        size_t nbf = 6 * sec + 6;     // number of coordinates
+        GLsizei sec = ncircle / inc;
+        GLsizei nbf = 6 * sec + 6;     // number of coordinates
         GLfloat pts[nbf], dir[nbf];
         assert_true( A <= B );
 
-        for( size_t n = 0, p = 0; n < nbf; n += 6, p += inc )
+        for( GLsizei n = 0, p = 0; n < nbf; n += 6, p += inc )
         {
             GLfloat C = cos_(p);
             GLfloat S = sin_(p);
@@ -860,8 +860,8 @@ namespace gle
             pts[n+4] = S;
             pts[n+5] = A;
         }
-        func1(sizeof(dir), dir, bufN);
-        func2(sizeof(pts), pts, bufP);
+        func1(4*nbf, dir, bufN);
+        func2(4*nbf, pts, bufP);
         return nbf;
     }
     
@@ -902,17 +902,17 @@ namespace gle
         {
             glGenBuffers(24, tub_);
             const GLfloat B = -4.f, T = 256.f;
-            drawTube(initBuffer, initBuffer, tub_[ 0], tub_[ 1], 0, 1, 8);
-            drawTube(initBuffer, initBuffer, tub_[ 2], tub_[ 3], 0, 1, 4);
-            drawTube(initBuffer, initBuffer, tub_[ 4], tub_[ 5], 0, 1, 2);
-            drawTube(initBuffer, initBuffer, tub_[ 6], tub_[ 7], 0, 1, 1);
-            drawTube(initBuffer, initBuffer, tub_[ 8], tub_[ 9], B, T, 8);
-            drawTube(initBuffer, initBuffer, tub_[10], tub_[11], B, T, 4);
-            drawTube(initBuffer, initBuffer, tub_[12], tub_[13], B, T, 2);
-            drawTube(initBuffer, initBuffer, tub_[14], tub_[15], 0, T, 8);
-            drawTube(initBuffer, initBuffer, tub_[16], tub_[17], 0, T, 4);
-            drawTube(initBuffer, initBuffer, tub_[18], tub_[19], 0, T, 2);
-            drawHexTube(initBuffer, initBuffer, tub_[22], tub_[23], 0, 1);
+            drawTube(setBuffer, setBuffer, tub_[ 0], tub_[ 1], 0, 1, 8);
+            drawTube(setBuffer, setBuffer, tub_[ 2], tub_[ 3], 0, 1, 4);
+            drawTube(setBuffer, setBuffer, tub_[ 4], tub_[ 5], 0, 1, 2);
+            drawTube(setBuffer, setBuffer, tub_[ 6], tub_[ 7], 0, 1, 1);
+            drawTube(setBuffer, setBuffer, tub_[ 8], tub_[ 9], B, T, 8);
+            drawTube(setBuffer, setBuffer, tub_[10], tub_[11], B, T, 4);
+            drawTube(setBuffer, setBuffer, tub_[12], tub_[13], B, T, 2);
+            drawTube(setBuffer, setBuffer, tub_[14], tub_[15], 0, T, 8);
+            drawTube(setBuffer, setBuffer, tub_[16], tub_[17], 0, T, 4);
+            drawTube(setBuffer, setBuffer, tub_[18], tub_[19], 0, T, 2);
+            drawHexTube(setBuffer, setBuffer, tub_[22], tub_[23], 0, 1);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
     }
@@ -1055,11 +1055,11 @@ namespace gle
         
         // upload vertex data:
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
-        glBufferData(GL_ARRAY_BUFFER, 3*ico.nb_vertices()*sizeof(float), ico.vertex_data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float)*ico.nb_vertices(), ico.vertex_data(), GL_STATIC_DRAW);
         
         // upload indices:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico.nb_faces()*sizeof(unsigned), ico.faces_data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(unsigned)*ico.nb_faces(), ico.faces_data(), GL_STATIC_DRAW);
         return ico.nb_faces();
     }
     
@@ -1145,33 +1145,33 @@ namespace gle
     {
         assert_true(glIsEnabled(GL_CULL_FACE));
         glCullFace(GL_FRONT);
-        gle::sphere1();
+        sphere1();
         glCullFace(GL_BACK);
-        gle::sphere1();
+        sphere1();
     }
     void dualPassSphere2()
     {
         assert_true(glIsEnabled(GL_CULL_FACE));
         glCullFace(GL_FRONT);
-        gle::sphere2();
+        sphere2();
         glCullFace(GL_BACK);
-        gle::sphere2();
+        sphere2();
     }
     void dualPassSphere4()
     {
         assert_true(glIsEnabled(GL_CULL_FACE));
         glCullFace(GL_FRONT);
-        gle::sphere4();
+        sphere4();
         glCullFace(GL_BACK);
-        gle::sphere4();
+        sphere4();
     }
     void dualPassSphere8()
     {
         assert_true(glIsEnabled(GL_CULL_FACE));
         glCullFace(GL_FRONT);
-        gle::sphere8();
+        sphere8();
         glCullFace(GL_BACK);
-        gle::sphere8();
+        sphere8();
     }
 
     /// draw a Torus of radius R and a thickness 2*T
@@ -1613,7 +1613,7 @@ namespace gle
     {
         glPushMatrix();
         transAlignZ(pos, rad, dir);
-        gle::longCone();
+        longCone();
         glPopMatrix();
     }
     
@@ -1689,7 +1689,7 @@ namespace gle
         tube1();
         glTranslatef(0, 0, 1);
         glScalef(3.0, 3.0, 3*R);
-        gle::longCone();
+        longCone();
         glPopMatrix();
     }
     
@@ -1700,7 +1700,7 @@ namespace gle
         tube1();
         glTranslatef(0, 0, 1);
         glScalef(3.0, 3.0, 3*R);
-        gle::longCone();
+        longCone();
         glPopMatrix();
     }
     
@@ -1711,7 +1711,7 @@ namespace gle
         tube1();
         glTranslatef(0, 0, 1);
         glScalef(3.0, 3.0, 3*R);
-        gle::longCone();
+        longCone();
         glPopMatrix();
     }
     
@@ -2121,14 +2121,14 @@ namespace gle
             tube1();
             glTranslatef(0, 0, 1);
             glScalef(3, 3, R/(S-R));
-            gle::longCone();
+            longCone();
             glPopMatrix();
         }
         // display a white ball at the origin
         gle_color(1.0, 1.0, 1.0, 1.0).load_load();
         glPushMatrix();
         scale(R);
-        gle::sphere4();
+        sphere4();
         glPopMatrix();
     }
     

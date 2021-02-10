@@ -99,7 +99,7 @@ void Platonic::Vertex::store_pos(double C[3]) const
     C[2] = Z * n;
 }
 
-void Platonic::Vertex::store_pos(float C[3]) const
+void Platonic::Vertex::store_pos(float ptr[3]) const
 {
     float X = 0, Y = 0, Z = 0;
     assert_true( sum_weights() > 0 );
@@ -119,12 +119,12 @@ void Platonic::Vertex::store_pos(float C[3]) const
     //normalize:
     float n = X*X + Y*Y + Z*Z;
     if ( n > 0 )
-        n = 1.0 / std::sqrt(n);
+        n = 1.f / std::sqrt(n);
     else
-        n = 1.0 / sum_weights();
-    C[0] = X * n;
-    C[1] = Y * n;
-    C[2] = Z * n;
+        n = 1.f / sum_weights();
+    ptr[0] = X * n;
+    ptr[1] = Y * n;
+    ptr[2] = Z * n;
 }
 
 void Platonic::Vertex::print(unsigned inx, std::ostream& out) const
@@ -187,7 +187,7 @@ unsigned Platonic::Solid::nb_faces(Polyhedra K, unsigned N)
  - the number of triangles on it is nb_faces()
  - the area of an equilateral triangle of side L is std::sqrt(3)*(L/2)^2
  */
-real Platonic::Solid::length_edge(Polyhedra K, unsigned N)
+Platonic::FLOAT Platonic::Solid::length_edge(Polyhedra K, unsigned N)
 {
     return 4 * std::sqrt( M_PI / ( std::sqrt(3) * nb_faces(K,N) ) );
 }
@@ -343,7 +343,8 @@ void Platonic::Solid::addFace(unsigned a, unsigned b, unsigned c, int half)
     assert_true( a!=b && b!=c && a!=c );
     if ( half )
     {
-        real pos[3], Z = 0;
+        FLOAT pos[3], Z = 0;
+        // estimate the Z coordinate of the center of the triangle:
         vertex(a).store_pos(pos); Z += pos[2];
         vertex(b).store_pos(pos); Z += pos[2];
         vertex(c).store_pos(pos); Z += pos[2];
@@ -390,7 +391,7 @@ void Platonic::Solid::refineFace(unsigned a, unsigned b, unsigned c, unsigned di
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Platonic::Solid::refineTriangles(unsigned n_vex, real vex[][3],
+void Platonic::Solid::refineTriangles(unsigned n_vex, FLOAT vex[][3],
                                       unsigned n_fac, unsigned fac[][3],
                                       unsigned div, int half = 0)
 {
@@ -424,12 +425,13 @@ void Platonic::Solid::refineTriangles(unsigned n_vex, real vex[][3],
 
 void Platonic::Solid::initTetrahedron(unsigned div)
 {
-    real a = 1.0/3.0;
-    real b = M_SQRT2/3.0;
-    real c = M_SQRT2/M_SQRT3;
+    constexpr FLOAT M_SQRT3 = 1.7320508075688772935274463415059;
+    FLOAT a = 1.0/3.0;
+    FLOAT b = M_SQRT2/3.0;
+    FLOAT c = M_SQRT2/M_SQRT3;
     
     // Four vertices on unit sphere
-    real vex[4][3] = {
+    FLOAT vex[4][3] = {
         { 0, 2*b, -a},
         {-c,  -b, -a},
         { c,  -b, -a},
@@ -451,7 +453,7 @@ void Platonic::Solid::initTetrahedron(unsigned div)
 void Platonic::Solid::initOctahedron(unsigned div)
 {
     // Eight vertices on unit sphere
-    real vex[6][3] = {
+    FLOAT vex[6][3] = {
         { 0,  0,  1},
         { 0,  0, -1},
         { 1,  0,  0},
@@ -478,12 +480,12 @@ void Platonic::Solid::initOctahedron(unsigned div)
 
 void Platonic::Solid::initIcosahedron(unsigned div)
 {
-    const real G = 0.5+0.5*std::sqrt(5.0);
-    const real Z = 1.0/std::sqrt(G*G+1.0);
-    const real T = G * Z;
+    const FLOAT G = 0.5+0.5*std::sqrt(5.0);
+    const FLOAT Z = 1 / std::sqrt(G*G+1.0);
+    const FLOAT T = G * Z;
     
     // Twelve vertices of icosahedron on unit sphere
-    real vex[12][3] = {
+    FLOAT vex[12][3] = {
         { T,  Z,  0},
         {-T, -Z,  0},
         {-T,  Z,  0},
@@ -527,14 +529,14 @@ void Platonic::Solid::initIcosahedron(unsigned div)
 
 void Platonic::Solid::initHemisphere(unsigned div)
 {
-    const real Z = std::sqrt(0.2);
-    const real C = std::cos(M_PI/2.5);
-    const real S = std::sin(M_PI/2.5);
-    const real D = C*C - S*S;
-    const real T = C*S*2;
+    const FLOAT Z = std::sqrt(0.2);
+    const FLOAT C = std::cos(5*M_PI_2);
+    const FLOAT S = std::sin(5*M_PI_2);
+    const FLOAT D = C*C - S*S;
+    const FLOAT T = C*S*2;
     
     // Twelve vertices of icosahedron on unit sphere
-    real vex[12][3] = {
+    FLOAT vex[12][3] = {
         { 0,  0,  1},
         { 1,  0,  Z},
         { C,  S,  Z},
@@ -573,6 +575,7 @@ void Platonic::Solid::initHemisphere(unsigned div)
         {11, 6, 10},
     };
     
+    // we can skip 5 triangles which are entirely in Z > 0
     refineTriangles(12, vex, 15, fac+5, div, -1);
 }
 
