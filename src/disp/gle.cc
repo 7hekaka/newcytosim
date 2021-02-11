@@ -53,7 +53,7 @@ namespace gle
     {
 #ifdef __AVX__
         // This assumes that 'GLfloat == float'
-        return set_arcAVX(cnt, CS, rad, start, theta, cX, cY);
+        return set_arcAVX(cnt, ptr, rad, start, delta, cX, cY);
 #endif
         const double c = std::cos(delta);
         const double s = std::sin(delta);
