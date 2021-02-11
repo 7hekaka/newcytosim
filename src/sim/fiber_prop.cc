@@ -250,6 +250,16 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 #endif
     
     fib->updateFiber();
+    
+#if FIBER_HAS_MESH
+    if ( fib->mesh().ready() )
+    {
+        // enable mesh initialization
+        real val = 0;
+        if ( opt.set(val, "mesh_value") )
+            fib->mesh().clear(val);
+    }
+#endif
 
     return fib;
 }

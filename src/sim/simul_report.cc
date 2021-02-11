@@ -332,9 +332,11 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "lattice" )
             return reportFiberLattice(out, sel, true);
         if ( what == "mesh" )
-            return reportFiberMesh(out, false, sel, true);
+            return reportFiberMeshAverage(out, false, sel, true);
         if ( what == "mesh_density" )
-            return reportFiberMesh(out, true, sel, true);
+            return reportFiberMeshAverage(out, true, sel, true);
+        if ( what == "mesh_all" )
+            return reportFiberMesh(out, false, sel, true);
         if ( what == "connector" )
             return reportFiberConnectors(out, opt);
 
@@ -737,7 +739,7 @@ void Simul::reportFiberLattice(std::ostream& out, Property const* sel, bool com)
 /**
  Report quantity of substance in the fiber's Mesh
  */
-void Simul::reportFiberMesh(std::ostream& out, bool density, Property const* sel, bool com) const
+void Simul::reportFiberMeshAverage(std::ostream& out, bool density, Property const* sel, bool com) const
 {
     if ( com )
     {
@@ -762,6 +764,36 @@ void Simul::reportFiberMesh(std::ostream& out, bool density, Property const* sel
     out << SEP << std::fixed << std::setprecision(6) << mx;
     out << SEP << std::setprecision(3) << len;
     out.precision(p);
+}
+
+/**
+ Report quantity of substance in the fiber's Mesh
+ */
+void Simul::reportFiberMesh(std::ostream& out, bool density, Property const* sel, bool com) const
+{
+    if ( com )
+    {
+        out << COM << ljust("fiber", 2, 2) << SEP << "total";
+        out << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
+    }
+    
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    {
+        size_t cnt = 0;
+        real len = 0, sum = 0, mn = INFINITY, mx = -INFINITY;
+        if ( !sel || sel == fib->prop )
+        {
+            fib->infoMesh(len, cnt, sum, mn, mx, density);
+            std::streamsize p = out.precision();
+            out << LIN << ljust(fib->reference(), 2);
+            out << SEP << sum;
+            out << SEP << std::setprecision(4) << sum / (real)cnt;
+            out << SEP << std::fixed << std::setprecision(6) << mn;
+            out << SEP << std::fixed << std::setprecision(6) << mx;
+            out << SEP << std::setprecision(3) << len;
+            out.precision(p);
+        }
+    }
 }
 
 

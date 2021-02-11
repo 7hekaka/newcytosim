@@ -67,7 +67,7 @@ state_t DynamicFiber::endStateM() const
 void DynamicFiber::setEndStateM(state_t s)
 {
     if ( s < 1 || 4 < s )
-        throw InvalidParameter("Invalid AssemblyState for DynamicFiber MINUS_END");
+        throw InvalidParameter("invalid AssemblyState for DynamicFiber MINUS_END");
     
     if ( s != mStateM )
     {
@@ -139,7 +139,7 @@ state_t DynamicFiber::endStateP() const
 void DynamicFiber::setEndStateP(state_t s)
 {
     if ( s < 1 || 4 < s )
-        throw InvalidParameter("Invalid AssemblyState for DynamicFiber PLUS_END");
+        throw InvalidParameter("invalid AssemblyState for DynamicFiber PLUS_END");
     
     if ( s != mStateP )
     {

@@ -334,8 +334,8 @@ public:
     
 #if FIBER_HAS_MESH
 
-    /// modifiable reference to Fiber's Lattice
-    Lattice<real> const&  mesh() const { return frMesh; }
+    /// modifiable reference to Fiber's mesh
+    Lattice<real>& mesh() { return frMesh; }
 
     /// value of the frMesh at given abscissa
     real           meshValue(real a) const { if ( frMesh.ready() ) return frMesh.cell(a); return 0; }

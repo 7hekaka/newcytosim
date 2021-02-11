@@ -72,6 +72,7 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         fib->setProjection(false);
         fib->setOrigin(offset_[i]);
         fib->setStraight(Vector(-0.5*len,0,0), Vector(1,0,0), len);
+        fib->updateFiber();
         if ( bone_ )
             fib->setPoints(bone_->addrPoints(), bone_->nbPoints());
         Buddy::connect(fib);

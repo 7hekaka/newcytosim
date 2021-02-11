@@ -102,7 +102,6 @@ void Chain::setStraight(Vector const& pos, Vector const& dir, real len)
     setSegmentation(len/(np-1));
     fnAbscissaP = fnAbscissaM + len;
     setStraight(pos, dir);
-    updateFiber();
 }
 
 

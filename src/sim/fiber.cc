@@ -156,7 +156,7 @@ Fiber::Fiber(FiberProp const* p)
 #if FIBER_HAS_MESH
             if ( prop->mesh_unit < REAL_EPSILON )
                 throw InvalidParameter("the Mesh unit (mesh[1]) must be > 0");
-            //Cytosim::log << reference() <<  " new value Lattice" << '\n';
+            //Cytosim::log << reference() <<  " new Mesh" << '\n';
             frMesh.setUnit(prop->mesh_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:mesh");
@@ -1754,14 +1754,6 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( tag == TAG )
     {
         Chain::read(in, sim, tag);
-#if FIBER_HAS_LATTICE
-        if ( frLattice.ready() )
-            frLattice.setRange(abscissaM(), abscissaP());
-#endif
-#if FIBER_HAS_MESH
-        if ( frMesh.ready() )
-            frMesh.setRange(abscissaM(), abscissaP());
-#endif
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
             birthTime(in.readFloat());
@@ -1779,6 +1771,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try {
 #if FIBER_HAS_LATTICE
+            frLattice.setRange(abscissaM(), abscissaP());
             frLattice.read(in);
 #else
             FiberLattice dummy;
@@ -1796,6 +1789,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try {
 #if FIBER_HAS_MESH
+            frMesh.setRange(abscissaM(), abscissaP());
             frMesh.read(in);
 #else
             Lattice<real> dummy;

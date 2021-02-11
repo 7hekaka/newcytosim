@@ -293,7 +293,7 @@ public:
 #pragma mark - data access
 
     /// pointer to data array
-    cell_t* data() const  { return laSite; }
+    cell_t*       data()        const  { return laSite; }
     
     /// value at index `s`, equivalent to []
     cell_t&       data(lati_t s)       { assert_true(valid(s)); return laSite[s]; }
@@ -302,13 +302,13 @@ public:
     cell_t const& data(lati_t s) const { assert_true(valid(s)); return laSite[s]; }
     
     /// reference to Site at index s
-    cell_t& operator[](lati_t s) { assert_true(valid(s)); return laSite[s]; }
+    cell_t& operator[](lati_t s)       { assert_true(valid(s)); return laSite[s]; }
     
     /// value at abscissa `a`, with convertion to site index, unlike operator []
-    cell_t&       cell(real a)          { lati_t s=index(a); assert_true(valid(s)); return laSite[s]; }
+    cell_t&       cell(real a)         { lati_t s=index(a); assert_true(valid(s)); return laSite[s]; }
     
     /// value at abscissa `a`, with convertion to site index, unlike operator []
-    cell_t const& cell(real a)    const { lati_t s=index(a); assert_true(valid(s)); return laSite[s]; }
+    cell_t const& cell(real a)   const { lati_t s=index(a); assert_true(valid(s)); return laSite[s]; }
 
     /// set all sites to `value`
     void clear(cell_t value = 0)
