@@ -182,33 +182,46 @@ This draws the model-segments, using function `select_color` to set display colo
 void Display3::drawFiberSegments(Fiber const& fib, real rad,
                                  gle_color (*select_color)(Fiber const&, size_t)) const
 {
+    const size_t last = fib.lastSegment();
     Vector old = fib.posPoint(0);
     Vector pos = fib.posPoint(1);
-    Vector nxt = fib.posPoint(2);
+    Vector nxt;
     Vector dir = (pos-old) / fib.segmentation();
-    
-    glEnable(GL_CLIP_PLANE4);
-    setClipPlane(GL_CLIP_PLANE4, -dir, nxt);
     select_color(fib, 0).load_front();
-    drawTube(old, rad, pos, gle::capedTube2);
-    setClipPlane(GL_CLIP_PLANE4, dir, pos);
-    glEnable(GL_CLIP_PLANE5);
 
-    // draw inner segments
-    const size_t last = fib.lastSegment();
-    for ( size_t i = 1; i < last; ++i )
+    if ( last > 0 )
     {
-        old = pos;
-        pos = nxt;
-        nxt = fib.posPoint(i+2);
-        dir = normalize(nxt-old);
-        select_color(fib, i).load_front();
-        setClipPlane(GL_CLIP_PLANE5, -dir, pos);
-        drawTube(old, rad, pos, gle::longTube2);
-        setClipPlane(GL_CLIP_PLANE4,  dir, pos);
+        nxt = fib.posPoint(2);
+        glEnable(GL_CLIP_PLANE4);
+        setClipPlane(GL_CLIP_PLANE4, -dir, nxt);
+        drawTube(old, rad, pos, gle::capedTube2);
+        setClipPlane(GL_CLIP_PLANE4, dir, pos);
+        
+        // draw inner segments
+        glEnable(GL_CLIP_PLANE5);
+        for ( size_t i = 1; i < last; ++i )
+        {
+            old = pos;
+            pos = nxt;
+            nxt = fib.posPoint(i+2);
+            dir = normalize(nxt-old);
+            select_color(fib, i).load_front();
+            setClipPlane(GL_CLIP_PLANE5, -dir, pos);
+            drawTube(old, rad, pos, gle::longTube2);
+            setClipPlane(GL_CLIP_PLANE4,  dir, pos);
+        }
+        glDisable(GL_CLIP_PLANE5);
     }
-
-    glDisable(GL_CLIP_PLANE5);
+    else
+    {
+        nxt = pos;
+        pos = old;
+        old = 0.5 * ( nxt + pos );
+        glEnable(GL_CLIP_PLANE4);
+        setClipPlane(GL_CLIP_PLANE4, -dir, old);
+        drawTube(pos, rad, nxt, gle::capedTube2);
+        setClipPlane(GL_CLIP_PLANE4, dir, old);
+    }
     // draw last segment:
     select_color(fib, last).load_front();
     drawTube(nxt, rad, pos, gle::endedTube2);
