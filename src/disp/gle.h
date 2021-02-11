@@ -149,14 +149,6 @@ namespace gle
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
     void arrowTail();
 
-    /// draw a sphere of radius 1 at origin
-    void sphere1U();
-    /// draw a nice sphere of radius 1 at origin
-    void sphere2U();
-    /// draw a very nice sphere of radius 1 at origin
-    void sphere4U();
-    /// draw a very nice sphere of radius 1 at origin
-    void sphere8U();
     /// draw Torus of radius `rad` and thickness `thick`
     void torusZ(GLfloat rad, GLfloat thick, size_t inc = 1);
     

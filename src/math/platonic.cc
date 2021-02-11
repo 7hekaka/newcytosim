@@ -106,7 +106,7 @@ bool Platonic::Vertex::equivalent(Corner* A, unsigned wA, Corner* B, unsigned wB
 }
 
 
-void Platonic::Vertex::store_pos(double C[3]) const
+void Platonic::Vertex::store_pos(double C[3], int half) const
 {
     double X = 0, Y = 0, Z = 0;
     assert_true( sum_weights() > 0 );
@@ -123,6 +123,9 @@ void Platonic::Vertex::store_pos(double C[3]) const
         }
     }
     
+    if ( half * Z > 0 )
+        Z = 0;
+
     // normalize:
     double n = X*X + Y*Y + Z*Z;
     if ( n > 0 )
@@ -207,22 +210,29 @@ void Platonic::Solid::build()
     edges_        = nullptr;
     
     coordinates_  = nullptr;
+    halfZ_        = 0;
 }
 
 
-Platonic::Solid::Solid(Polyhedra K, unsigned div, bool make_edges)
+Platonic::Solid::Solid(Polyhedra kind, unsigned div, int make)
 {
     build();
     
     if ( div > 0 )
     {
-        max_vertices_ = nb_vertices(K, div);
+        max_vertices_ = nb_vertices(kind, div);
         vertices_     = new Vertex[max_vertices_];
-        max_faces_    = nb_faces(K, div);
+        max_faces_    = nb_faces(kind, div);
         faces_        = new unsigned[3*max_faces_];
-        max_edges_    = nb_edges(K, div);
-        setVertices(K, div);
-        if ( make_edges )
+        max_edges_    = nb_edges(kind, div);
+        
+        setVertices(kind, div);
+        if ( make )
+        {
+            coordinates_ = new float[3*max_vertices_];
+            store_vertices(coordinates_);
+        }
+        if ( make & 2 )
             setEdges();
     }
 }
@@ -614,6 +624,7 @@ void Platonic::Solid::initHemisphere(unsigned div)
       //{4,  7, 10},
     };
     
+    halfZ_ = 1;
     // we can skip 5 triangles which are entirely in Z > 0
     refineTriangles(12, vex, 12, fac, div, 1);
 }
@@ -634,27 +645,20 @@ void Platonic::Solid::setVertices(Polyhedra kind, unsigned div)
     
     assert_true( num_vertices_ <= max_vertices_ );
     assert_true( num_faces_ <= max_faces_ );
-    
-    delete[] coordinates_;
-    coordinates_ = new float[3*max_vertices_];
-        
-    int half = ( kind == HEMISPHERE );
-    for ( unsigned n = 0; n < num_vertices_; ++n )
-        vertices_[n].store_pos(coordinates_+3*n, half);
 }
 
 
 void Platonic::Solid::store_vertices(float * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        vertices_[n].store_pos(vec+3*n, 0);
+        vertices_[n].store_pos(vec+3*n, halfZ_);
 }
 
 
 void Platonic::Solid::store_vertices(double * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        vertices_[n].store_pos(vec+3*n);
+        vertices_[n].store_pos(vec+3*n, halfZ_);
 }
 
 

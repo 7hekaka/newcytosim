@@ -29,7 +29,7 @@ void setPlatonic()
     if ( ico )
         delete ico;
     
-    ico = new Platonic::Solid((Platonic::Solid::Polyhedra)kind, rank);
+    ico = new Platonic::Solid((Platonic::Solid::Polyhedra)kind, rank, 1);
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points", rank, ico->nb_vertices());
@@ -101,12 +101,20 @@ void drawFaces2()
 
 void initVBO()
 {
-    //Create a new VBO for the vertex information
     glGenBuffers(2, glbuffers);
+    //Create a new VBO for the vertex information
+#if 0
     glBindBuffer(GL_ARRAY_BUFFER, glbuffers[0]);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->nb_vertices()*sizeof(float), ico->vertex_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+#else
+    glBindBuffer(GL_ARRAY_BUFFER, glbuffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, 3*ico->nb_vertices()*sizeof(float), nullptr, GL_STATIC_DRAW);
+    void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    ico->store_vertices((float*)glb);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+#endif
     //Create a new VBO for the indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glbuffers[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->nb_faces()*sizeof(unsigned), ico->faces_data(), GL_STATIC_DRAW);

@@ -52,7 +52,7 @@ namespace Platonic
         void store_pos(float vec[3], int half) const;
         
         /// export coordinates
-        void store_pos(double vec[3]) const;
+        void store_pos(double vec[3], int half) const;
         
         ///
         Vertex() { vertex_[0]=nullptr; vertex_[1]=nullptr; vertex_[2]=nullptr; }
@@ -103,10 +103,10 @@ namespace Platonic
         /// reset pointers
         void build();
         
-        /// build as polyhedra `K` refined by order `div`
-        Solid(Polyhedra K, unsigned div, bool make_edges = false);
+        /// build as polyhedra refined by order `div`
+        Solid(Polyhedra, unsigned div, int make = 0);
         
-        /// build as polyhedra `K` refined by order `div`
+        /// build as empty structure
         Solid() { build(); }
 
         /// destructor
@@ -201,6 +201,10 @@ namespace Platonic
         
         /// number of edges
         unsigned num_edges_, max_edges_;
+        
+        /// defining half space for hemisphere
+        int halfZ_;
+        
         
         unsigned findEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;
         unsigned getEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;

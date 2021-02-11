@@ -1185,10 +1185,10 @@ void glApp::displayMain()
             view.drawText(flashString, GLUT_BITMAP_9_BY_15, 0x0, 2);
         }
     }
+    CHECK_GL_ERROR("in glApp::displayMain()");
     glFinish();
     if ( view.buffered )
         glutSwapBuffers();
-    CHECK_GL_ERROR("in glApp::displayMain()");
 }
 
 /**

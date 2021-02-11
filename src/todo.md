@@ -37,10 +37,11 @@ F. Nedelec
 
 # v2018
 
-- use 'hh' for C++ header files
+- use 'hpp' for C++ header files
 - use 'cpp' extension for C++ code file
 - Update OpenGL code to use Shaders and eliminate immediate rendering
 
+- Rename gle gym
 - Replace GLUT by GLFW:  http://www.glfw.org/index.html
 - use Dear imGUI for rendering text and minimal GUI components (Omar Cornut)
      https://github.com/ocornut/imgui

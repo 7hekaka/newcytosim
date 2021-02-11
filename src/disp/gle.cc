@@ -1018,48 +1018,20 @@ namespace gle
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres
-
-#ifdef PLATONIC_H
-    
-    /// using icosahedrons to render the sphere:
-    Platonic::Solid ico1(Platonic::Solid::ICOSAHEDRON, gle::finesse/6);
-    Platonic::Solid ico2(Platonic::Solid::ICOSAHEDRON, gle::finesse/3);
-    Platonic::Solid ico4(Platonic::Solid::ICOSAHEDRON, gle::finesse);
-    Platonic::Solid ico8(Platonic::Solid::ICOSAHEDRON, gle::finesse*2);
-    Platonic::Solid icoH1(Platonic::Solid::HEMISPHERE, gle::finesse/6);
-    Platonic::Solid icoH2(Platonic::Solid::HEMISPHERE, gle::finesse/3);
-    Platonic::Solid icoH4(Platonic::Solid::HEMISPHERE, gle::finesse);
-
-    void drawPlatonic(Platonic::Solid & ico)
-    {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, ico.vertex_data());
-        glNormalPointer(GL_FLOAT, 0, ico.vertex_data());
-        glDrawElements(GL_TRIANGLES, 3*ico.nb_faces(), GL_UNSIGNED_INT, ico.faces_data());
-        glDisableClientState(GL_NORMAL_ARRAY);
-    }
-    
-    void sphere1U() { drawPlatonic(ico1); }
-    void sphere2U() { drawPlatonic(ico2); }
-    void sphere4U() { drawPlatonic(ico4); }
-    void sphere8U() { drawPlatonic(ico8); }
-    void hemisphere1U() { drawPlatonic(icoH1); }
-    void hemisphere2U() { drawPlatonic(icoH2); }
-    void hemisphere4U() { drawPlatonic(icoH4); }
-
-    //-----------------------------------------------------------------------
     
     GLuint initIcoBuffer(GLuint buf1, GLuint buf2, Platonic::Solid & ico)
     {
+        size_t douze = 3*sizeof(float);
         //std::clog << "initializeIco ico " << ico.nb_faces() << '\n';
-        
-        // upload vertex data:
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
-        glBufferData(GL_ARRAY_BUFFER, 3*sizeof(float)*ico.nb_vertices(), ico.vertex_data(), GL_STATIC_DRAW);
-        
+        glBufferData(GL_ARRAY_BUFFER, douze*ico.nb_vertices(), nullptr, GL_STATIC_DRAW);
+        void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        ico.store_vertices((float*)glb);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         // upload indices:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(unsigned)*ico.nb_faces(), ico.faces_data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, douze*ico.nb_faces(), ico.faces_data(), GL_STATIC_DRAW);
         return ico.nb_faces();
     }
     
@@ -1067,6 +1039,14 @@ namespace gle
     {
         if ( !glIsBuffer(ico_[0]) )
         {
+            /// using icosahedrons to render the sphere:
+            Platonic::Solid ico1(Platonic::Solid::ICOSAHEDRON, gle::finesse/6);
+            Platonic::Solid ico2(Platonic::Solid::ICOSAHEDRON, gle::finesse/3);
+            Platonic::Solid ico4(Platonic::Solid::ICOSAHEDRON, gle::finesse);
+            Platonic::Solid ico8(Platonic::Solid::ICOSAHEDRON, gle::finesse*2);
+            Platonic::Solid icoH1(Platonic::Solid::HEMISPHERE, gle::finesse/6);
+            Platonic::Solid icoH2(Platonic::Solid::HEMISPHERE, gle::finesse/3);
+            Platonic::Solid icoH4(Platonic::Solid::HEMISPHERE, gle::finesse);
             glGenBuffers(16, ico_);
             ico_nfaces[0] = initIcoBuffer(ico_[0], ico_[1], ico1);
             ico_nfaces[1] = initIcoBuffer(ico_[2], ico_[3], ico2);
@@ -1093,11 +1073,10 @@ namespace gle
             glBindBuffer(GL_ARRAY_BUFFER, buf1);
             glVertexPointer(3, GL_FLOAT, 0, nullptr);
             glNormalPointer(GL_FLOAT, 0, nullptr);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
             glDrawElements(GL_TRIANGLES, 3*nfaces, GL_UNSIGNED_INT, nullptr);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_NORMAL_ARRAY);
         }
     }
@@ -1109,38 +1088,7 @@ namespace gle
     void hemisphere1() { drawIcoBuffer(ico_nfaces[4], ico_[8], ico_[9]); }
     void hemisphere2() { drawIcoBuffer(ico_nfaces[5], ico_[10], ico_[11]); }
     void hemisphere4() { drawIcoBuffer(ico_nfaces[6], ico_[12], ico_[13]); }
-    
-#else
-    
-    // Without using PlatonicSolid
-    void initSphereBuffers() { }
-
-    /// using trigonometric functions to draw a ball of radius 1
-    void drawSphere(size_t inc)
-    {
-        for ( size_t n = 0; n < ncircle/2; n += inc )
-        {
-            real U = cos_(n), R = sin_(n);
-            real L = cos_(n+inc), S = sin_(n+inc);
-            glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t p = 0; p <= ncircle; p += inc )
-            {
-                glNormal3f(R*cos_(p), R*sin_(p), U);
-                glVertex3f(R*cos_(p), R*sin_(p), U);
-                glNormal3f(S*cos_(p), S*sin_(p), L);
-                glVertex3f(S*cos_(p), S*sin_(p), L);
-            }
-            glEnd();
-        }
-    }
-    
-    void sphere1() { drawSphere(8); }
-    void sphere2() { drawSphere(4); }
-    void sphere4() { drawSphere(2); }
-    void sphere8() { drawSphere(1); }
-
-#endif
-    
+        
     void dualPassSphere1()
     {
         assert_true(glIsEnabled(GL_CULL_FACE));
