@@ -49,7 +49,7 @@ namespace Platonic
         bool equivalent(Corner*, unsigned, Corner*, unsigned) const;
         
         /// export coordinates
-        void store_pos(float vec[3]) const;
+        void store_pos(float vec[3], int half) const;
         
         /// export coordinates
         void store_pos(double vec[3]) const;
@@ -88,15 +88,6 @@ namespace Platonic
         ///regular polyhedra made of triangles
         enum Polyhedra { TETRAHEDRON=0, OCTAHEDRON=1, ICOSAHEDRON=2, HEMISPHERE=3 };
         
-        /// Number of Vertices
-        static unsigned nb_vertices(Polyhedra K);
-        
-        /// Number of Faces
-        static unsigned nb_faces(Polyhedra K);
-        
-        /// Number of Edges
-        static unsigned nb_edges(Polyhedra K);
-        
         /// Number of Vertices after refinement of level 'r'
         static unsigned nb_vertices(Polyhedra K, unsigned r);
         
@@ -109,11 +100,14 @@ namespace Platonic
         /// an estimation of the length of the edge
         static FLOAT    length_edge(Polyhedra K, unsigned r);
         
+        /// reset pointers
+        void build();
+        
         /// build as polyhedra `K` refined by order `div`
         Solid(Polyhedra K, unsigned div, bool make_edges = false);
         
         /// build as polyhedra `K` refined by order `div`
-        Solid();
+        Solid() { build(); }
 
         /// destructor
         ~Solid();
@@ -144,20 +138,19 @@ namespace Platonic
         unsigned int nb_edges()        const { return num_edges_; }
         
         /// array of indices to the vertices in each edge (2 per edge)
-        unsigned int* edges_data()     const { return edges_; }
+        unsigned int* edge_indices()   const { return edges_; }
         
         /// return address of first vertex of edge `e`
-        const float* edge_data0(int e) const { return coordinates_ + 3 * edges_[2*e]; }
+        unsigned edge_index0(int e)    const { return edges_[2*e]; }
         
         /// return address of second vertex of edge `e`
-        const float* edge_data1(int e) const { return coordinates_ + 3 * edges_[2*e+1]; }
-        
-        
+        unsigned edge_index1(int e)    const { return edges_[2*e+1]; }
+
         /// return address of first vertex of edge `e`
-        unsigned edge_indx0(int e)     const { return edges_[2*e]; }
+        const float* edge_vertex0(int e) const { return coordinates_ + 3 * edges_[2*e]; }
         
         /// return address of second vertex of edge `e`
-        unsigned edge_indx1(int e)     const { return edges_[2*e+1]; }
+        const float* edge_vertex1(int e) const { return coordinates_ + 3 * edges_[2*e+1]; }
         
         
         /// number of faces (each face is a triangle of 3 vertices)
@@ -182,31 +175,32 @@ namespace Platonic
         
     private:
         
-        /// C-array of vertices of the Platonic solid
-        Corner* corners_;
-        /// C-array of derived vertices
+        /// Array of coordinates of all vertices
+        float  * coordinates_;
+
+        /// Array of vertices of the Platonic solid
+        Corner * corners_;
+        
+        /// Array of derived vertices
         Vertex * vertices_;
         
+        /// Array of indices of the points making the edges
+        unsigned *edges_;
+
+        /// Array of indices of the points making the faces
+        unsigned *faces_;
+
         unsigned num_corners_;
         
         unsigned num_vertices_, max_vertices_;
         
         unsigned num_edge_vertices_;
         
-        /// coordinates of all vertices
-        float  * coordinates_;
-        
-        
-        unsigned num_faces_,  max_faces_;
-        
-        /// array of indices of the points making the faces
-        unsigned *faces_;
+        /// number of faces
+        unsigned num_faces_, max_faces_;
         
         /// number of edges
-        unsigned num_edges_;
-        
-        /// array of indices of the points making the edges
-        unsigned *edges_;
+        unsigned num_edges_, max_edges_;
         
         unsigned findEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;
         unsigned getEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;
@@ -219,6 +213,7 @@ namespace Platonic
         void initTetrahedron(unsigned div);
         void initOctahedron(unsigned div);
         void initIcosahedron(unsigned div);
+        void initIcosahedronRotated(unsigned div);
         void initHemisphere(unsigned div);
 
         void setVertices(Polyhedra K, unsigned div);

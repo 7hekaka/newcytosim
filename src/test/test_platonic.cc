@@ -14,7 +14,7 @@ int kind = 2;
 int rank = 1;
 
 bool showVertices = false;
-bool showEdges = true;
+bool showEdges = false;
 bool showFaces = true;
 
 Platonic::Solid * ico = nullptr;
@@ -42,13 +42,15 @@ void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c) 
     {
-        case 'p': kind = ( kind + 1 ) % 3;      break;
+        case 'k': kind = ( kind + 1 ) % 4;      break;
         case ']': rank += 1;                    break;
         case '[': rank = std::max(rank-1, 1);   break;
+        case '}': rank += 16;                   break;
+        case '{': rank = std::max(rank-16, 1);  break;
         case 's': style = ( style + 1 ) % 4;    break;
         case 'e': showEdges = !showEdges;       break;
         case 't': showFaces = !showFaces;       break;
-        case 'd': showVertices = !showVertices; break;
+        case 'p': showVertices = !showVertices; break;
         case ' ': break; // update the Platonic
         default: glApp::processNormalKey(c,x,y); return;
     }
@@ -60,24 +62,32 @@ void processNormalKey(unsigned char c, int x, int y)
 }
 
 //------------------------------------------------------------------------------
+void drawPlane()
+{
+    glColor3f(0.25f, 0.25f, 0.25f);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    GLfloat pts[8] = {1, 1,-1, 1, 1,-1,-1,-1};
+    glVertexPointer(2, GL_FLOAT, 0, pts);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
 
-void displayFaces1()
+void drawFaces1()
 {
     glBegin(GL_TRIANGLES);
-    for ( unsigned ii = 0; ii < ico->nb_faces(); ++ii )
+    for ( unsigned i = 0; i < ico->nb_faces(); ++i )
     {
-        glNormal3fv(ico->face_data0(ii));
-        glVertex3fv(ico->face_data0(ii));
-        glNormal3fv(ico->face_data1(ii));
-        glVertex3fv(ico->face_data1(ii));
-        glNormal3fv(ico->face_data2(ii));
-        glVertex3fv(ico->face_data2(ii));
+        glNormal3fv(ico->face_data0(i));
+        glVertex3fv(ico->face_data0(i));
+        glNormal3fv(ico->face_data1(i));
+        glVertex3fv(ico->face_data1(i));
+        glNormal3fv(ico->face_data2(i));
+        glVertex3fv(ico->face_data2(i));
     }
     glEnd();
 }
 
 
-void displayFaces2()
+void drawFaces2()
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -104,7 +114,7 @@ void initVBO()
 }
 
 
-void displayFacesVBO()
+void drawFacesVBO()
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -123,30 +133,63 @@ void displayFacesVBO()
 }
 
 
-void displayFaces()
+void drawFaces()
 {
     if ( style == 1 )
-        displayFaces1();
+        drawFaces1();
     else if ( style == 2 )
-        displayFaces2();
+        drawFaces2();
     else if ( style == 3 )
-        displayFacesVBO();
+        drawFacesVBO();
 }
 
+void drawEdges()
+{
+    glColor3f(1,1,1);
+    glLineWidth(0.5);
+    glBegin(GL_LINES);
+    for ( unsigned i = 0; i < ico->nb_edges(); ++i )
+    {
+        glVertex3fv(ico->edge_vertex0(i));
+        glVertex3fv(ico->edge_vertex1(i));
+    }
+    glEnd();
+}
+
+void drawVertices()
+{
+    char tmp[128];
+    for ( unsigned i=0; i < ico->nb_vertices(); ++i )
+    {
+        Platonic::Vertex & dv = ico->vertex(i);
+        if ( dv.weight(2) == 0  &&  dv.weight(1) == 0 )
+            glColor3f(1.f, 1.f, 1.f);
+        else if ( dv.weight(2) == 0 )
+            glColor3f(0.f, 1.f, 0.f);
+        else
+            glColor3f(.5f, .5f, .5f);
+        
+        const float* v = ico->vertex_data(i);
+        Vector3 pos(v[0], v[1], v[2]);
+        snprintf(tmp, sizeof(tmp), "%u", i);
+        gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
+    }
+}
 
 void display(View&, int)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     
+    drawPlane();
     if ( showFaces )
     {
         glColor3f(0, 0, 0.75f);
+        glEnable(GL_LIGHTING);
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        displayFaces();
+        drawFaces();
         glDisable(GL_CULL_FACE);
         glDisable(GL_LIGHTING);
     }
@@ -154,34 +197,11 @@ void display(View&, int)
     {
         if ( ico->nb_edges() == 0 )
             ico->setEdges();
-        glColor3f(1,1,1);
-        glLineWidth(0.5);
-        glBegin(GL_LINES);
-        for ( unsigned ii=0; ii < ico->nb_edges(); ++ii )
-        {
-            glVertex3fv(ico->edge_data0(ii));
-            glVertex3fv(ico->edge_data1(ii));
-        }
-        glEnd();
+        drawEdges();
     }
     if ( showVertices )
     {
-        char tmp[128];
-        for ( unsigned ii=0; ii < ico->nb_vertices(); ++ii )
-        {
-            Platonic::Vertex & dv = ico->vertex(ii);
-            if ( dv.weight(2) == 0  &&  dv.weight(1) == 0 )
-                glColor3f(1.f, 1.f, 1.f);
-            else if ( dv.weight(2) == 0 )
-                glColor3f(0.f, 1.f, 0.f);
-            else
-                glColor3f(.5f, .5f, .5f);
-            
-            const float* v = ico->vertex_data(ii);
-            Vector3 pos(v[0], v[1], v[2]);
-            snprintf(tmp, sizeof(tmp), "%u", ii);
-            gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
-        }        
+        drawVertices();
     }
     glutReportErrors();
 }

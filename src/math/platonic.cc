@@ -5,6 +5,41 @@
 #include <cmath>
 
 //------------------------------------------------------------------------------
+#pragma mark - Solid static members
+
+unsigned Platonic::Solid::nb_vertices(Polyhedra k, unsigned N)
+{
+    static const unsigned V[] = { 4, 6, 12, 12 };
+    static const unsigned F[] = { 4, 8, 20, 12 };
+    static const unsigned E[] = { 6, 12, 30, 21 };
+    return V[k] + E[k] * (N-1) + F[k] * ((N-1)*(N-2)/2);
+}
+
+unsigned Platonic::Solid::nb_faces(Polyhedra k, unsigned N)
+{
+    static const unsigned F[] = { 4, 8, 20, 12 };
+    return F[k] * N * N;
+}
+
+unsigned Platonic::Solid::nb_edges(Polyhedra k, unsigned N)
+{
+    static const unsigned F[] = { 4, 8, 20, 12 };
+    static const unsigned E[] = { 6, 12, 30, 21 };
+    return E[k] * N + F[k] * 3 * ((N-1)*N/2);
+}
+
+/**
+ We estimate L from:
+ - the area of the sphere is 4*PI
+ - the number of triangles on it is nb_faces()
+ - the area of an equilateral triangle of side L is std::sqrt(3)*(L/2)^2
+ */
+Platonic::FLOAT Platonic::Solid::length_edge(Polyhedra k, unsigned N)
+{
+    return 4 * std::sqrt( M_PI / ( std::sqrt(3) * nb_faces(k,N) ) );
+}
+
+//------------------------------------------------------------------------------
 #pragma mark - Vertex
 
 // return 'a < b'
@@ -81,14 +116,14 @@ void Platonic::Vertex::store_pos(double C[3]) const
         Corner const* v = vertex_[i];
         if ( v )
         {
-            double W = (double)weight_[i];
+            FLOAT W = (FLOAT)weight_[i];
             X += W * v->pos_[0];
             Y += W * v->pos_[1];
             Z += W * v->pos_[2];
         }
     }
     
-    //normalize:
+    // normalize:
     double n = X*X + Y*Y + Z*Z;
     if ( n > 0 )
         n = 1.0 / std::sqrt(n);
@@ -99,7 +134,7 @@ void Platonic::Vertex::store_pos(double C[3]) const
     C[2] = Z * n;
 }
 
-void Platonic::Vertex::store_pos(float ptr[3]) const
+void Platonic::Vertex::store_pos(float ptr[3], int half) const
 {
     float X = 0, Y = 0, Z = 0;
     assert_true( sum_weights() > 0 );
@@ -115,6 +150,9 @@ void Platonic::Vertex::store_pos(float ptr[3]) const
             Z += W * v->pos_[2];
         }
     }
+    
+    if ( half * Z > 0 )
+        Z = 0;
     
     //normalize:
     float n = X*X + Y*Y + Z*Z;
@@ -149,65 +187,22 @@ void Platonic::Vertex::print(unsigned inx, std::ostream& out) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Solid static members
-
-unsigned Platonic::Solid::nb_vertices(Polyhedra K)
-{
-    static const unsigned V[] = { 4, 6, 12, 12 };
-    return V[K];
-}
-
-unsigned Platonic::Solid::nb_faces(Polyhedra K)
-{
-    static const unsigned F[] = { 4, 8, 20, 20 };
-    return F[K];
-}
-
-unsigned Platonic::Solid::nb_edges(Polyhedra K)
-{
-    static const unsigned E[] = { 6, 12, 30, 30 };
-    return E[K];
-}
-
-unsigned Platonic::Solid::nb_vertices(Polyhedra K, unsigned N)
-{
-    if ( N > 0 )
-        return nb_vertices(K) + nb_edges(K)*(N-1) + nb_faces(K)*((N-1)*(N-2))/2;
-    return 0;
-}
-
-unsigned Platonic::Solid::nb_faces(Polyhedra K, unsigned N)
-{
-    return nb_faces(K)*N*N;
-}
-
-/**
- We estimate L from:
- - the area of the sphere is 4*PI
- - the number of triangles on it is nb_faces()
- - the area of an equilateral triangle of side L is std::sqrt(3)*(L/2)^2
- */
-Platonic::FLOAT Platonic::Solid::length_edge(Polyhedra K, unsigned N)
-{
-    return 4 * std::sqrt( M_PI / ( std::sqrt(3) * nb_faces(K,N) ) );
-}
-
-//------------------------------------------------------------------------------
 #pragma mark - Solid
 
-Platonic::Solid::Solid()
+void Platonic::Solid::build()
 {
     num_corners_  = 0;
     corners_      = nullptr;
     
     max_vertices_ = 0;
-    vertices_     = nullptr;
     num_vertices_ = 0;
-    
+    vertices_     = nullptr;
+
     max_faces_    = 0;
     num_faces_    = 0;
     faces_        = nullptr;
     
+    max_edges_    = 0;
     num_edges_    = 0;
     edges_        = nullptr;
     
@@ -217,24 +212,15 @@ Platonic::Solid::Solid()
 
 Platonic::Solid::Solid(Polyhedra K, unsigned div, bool make_edges)
 {
-    num_corners_  = nb_vertices(K);
-    corners_      = new Corner[num_corners_];
-    
-    max_vertices_ = nb_vertices(K, div);
-    vertices_     = new Vertex[max_vertices_];
-    num_vertices_ = 0;
-    
-    max_faces_    = nb_faces(K, div);
-    num_faces_    = 0;
-    faces_        = new unsigned[3*max_faces_];
-    
-    num_edges_    = 0;
-    edges_        = nullptr;
-    
-    coordinates_  = nullptr;
+    build();
     
     if ( div > 0 )
     {
+        max_vertices_ = nb_vertices(K, div);
+        vertices_     = new Vertex[max_vertices_];
+        max_faces_    = nb_faces(K, div);
+        faces_        = new unsigned[3*max_faces_];
+        max_edges_    = nb_edges(K, div);
         setVertices(K, div);
         if ( make_edges )
             setEdges();
@@ -343,12 +329,13 @@ void Platonic::Solid::addFace(unsigned a, unsigned b, unsigned c, int half)
     assert_true( a!=b && b!=c && a!=c );
     if ( half )
     {
-        FLOAT pos[3], Z = 0;
-        // estimate the Z coordinate of the center of the triangle:
-        vertex(a).store_pos(pos); Z += pos[2];
-        vertex(b).store_pos(pos); Z += pos[2];
-        vertex(c).store_pos(pos); Z += pos[2];
-        if ( half * Z < 0 )
+        // reject face if 2 corners are outside
+        FLOAT pos[3];
+        int out = 0;
+        vertex(a).store_pos(pos, 0); out += ( pos[2] * half > 0 );
+        vertex(b).store_pos(pos, 0); out += ( pos[2] * half > 0 );
+        vertex(c).store_pos(pos, 0); out += ( pos[2] * half > 0 );
+        if ( out > 1 )
             return;
     }
     faces_[3*num_faces_  ] = a;
@@ -395,7 +382,9 @@ void Platonic::Solid::refineTriangles(unsigned n_vex, FLOAT vex[][3],
                                       unsigned n_fac, unsigned fac[][3],
                                       unsigned div, int half = 0)
 {
-    assert_true(n_vex <= num_corners_);
+    delete[] corners_;
+    num_corners_ = n_vex;
+    corners_ = new Corner[num_corners_];
     
     for ( unsigned c = 0; c < n_vex; ++c )
     {
@@ -527,7 +516,7 @@ void Platonic::Solid::initIcosahedron(unsigned div)
     refineTriangles(12, vex, 20, fac, div);
 }
 
-void Platonic::Solid::initHemisphere(unsigned div)
+void Platonic::Solid::initIcosahedronRotated(unsigned div)
 {
     const FLOAT Z = std::sqrt(0.2);
     const FLOAT C = std::cos(5*M_PI_2);
@@ -575,10 +564,59 @@ void Platonic::Solid::initHemisphere(unsigned div)
         {11, 6, 10},
     };
     
-    // we can skip 5 triangles which are entirely in Z > 0
-    refineTriangles(12, vex, 15, fac+5, div, -1);
+    refineTriangles(12, vex, 20, fac, div);
 }
 
+void Platonic::Solid::initHemisphere(unsigned div)
+{
+    const FLOAT G = 0.5+0.5*std::sqrt(5.0);
+    const FLOAT Z = 1 / std::sqrt(G*G+1.0);
+    const FLOAT T = G * Z;
+    
+    // Twelve vertices of icosahedron on unit sphere
+    FLOAT vex[12][3] = {
+        { T,  Z,  0},
+        {-T, -Z,  0},
+        {-T,  Z,  0},
+        { T, -Z,  0},
+        { Z,  0,  T}, // 4
+        {-Z,  0, -T},
+        { Z,  0, -T},
+        {-Z,  0,  T}, // 7
+        { 0,  T,  Z},
+        { 0, -T, -Z},
+        { 0, -T,  Z},
+        { 0,  T, -Z}
+    };
+    
+    /* Remove any face involving vertex 4 or 7 */
+    // Faces are ordered for OpenGL's default rule: Counter-Clockwise = facing out
+    unsigned fac[12][3] = {
+        {0,  3,  6},
+      //{1,  7,  2},
+      //{0,  4,  3},
+        {1,  2,  5},
+      //{0,  8,  4},
+        {1,  5,  9},
+        {0, 11,  8},
+        {1,  9, 10},
+        {0,  6, 11},
+      //{1, 10,  7},
+      //{4,  8,  7},
+        {5,  6,  9},
+      //{2,  7,  8},
+        {6,  3,  9},
+        {2,  8, 11},
+        {9,  3, 10},
+        {5,  2, 11},
+      //{3,  4, 10},
+        {6,  5, 11},
+      //{4,  7, 10},
+    };
+    
+    // we can skip 5 triangles which are entirely in Z > 0
+    refineTriangles(12, vex, 12, fac, div, 1);
+}
 //------------------------------------------------------------------------------
 #pragma mark - vertices
 
@@ -599,16 +637,17 @@ void Platonic::Solid::setVertices(Polyhedra kind, unsigned div)
     
     delete[] coordinates_;
     coordinates_ = new float[3*max_vertices_];
-    
+        
+    int half = ( kind == HEMISPHERE );
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        vertices_[n].store_pos(coordinates_+3*n);
+        vertices_[n].store_pos(coordinates_+3*n, half);
 }
 
 
 void Platonic::Solid::store_vertices(float * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        vertices_[n].store_pos(vec+3*n);
+        vertices_[n].store_pos(vec+3*n, 0);
 }
 
 
@@ -624,10 +663,8 @@ void Platonic::Solid::store_vertices(double * vec) const
 
 void Platonic::Solid::addEdge(unsigned a, unsigned b)
 {
-    unsigned i = std::min(a, b);
-    unsigned j = std::max(a, b);
-    edges_[2*num_edges_  ] = i;
-    edges_[2*num_edges_+1] = j;
+    edges_[2*num_edges_  ] = a;
+    edges_[2*num_edges_+1] = b;
     ++num_edges_;
 }
 
@@ -635,22 +672,21 @@ void Platonic::Solid::addEdge(unsigned a, unsigned b)
 void Platonic::Solid::setEdges()
 {
     delete[] edges_;
-    edges_ = new unsigned[6*max_faces_];
+    edges_ = new unsigned[2*max_edges_];
     num_edges_ = 0;
     
-    //build edges from the faces:
-    for ( unsigned f=0; f < max_faces_; ++f )
+    // build edges from the faces:
+    for ( unsigned i = 0; i < num_faces_; ++i )
     {
-        unsigned a = faces_[3*f  ];
-        unsigned b = faces_[3*f+1];
-        unsigned c = faces_[3*f+2];
-        
-        addEdge(a, b);
-        addEdge(b, c);
-        addEdge(c, a);
+        unsigned a = faces_[3*i  ];
+        unsigned b = faces_[3*i+1];
+        unsigned c = faces_[3*i+2];
+        if ( a < b ) addEdge(a, b);
+        if ( b < c ) addEdge(b, c);
+        if ( c < a ) addEdge(c, a);
     }
     
-    assert_true( num_edges_ <= 6*max_faces_ );
+    assert_true( num_edges_ <= max_edges_ );
 }
 
 

@@ -757,7 +757,7 @@ namespace gle
     void drawTriangles(GLsizei cnt, GLfloat* pts, GLuint)
     {
         glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLES, 0, cnt/12); // 3*sizeof(float)
+        glDrawArrays(GL_TRIANGLES, 0, cnt/(3*sizeof(float)));
         glDisableClientState(GL_NORMAL_ARRAY);
     }
     
@@ -765,7 +765,7 @@ namespace gle
     void drawTrianglesStrip(GLsizei cnt, GLfloat* pts, GLuint)
     {
         glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, cnt/12); // 3*sizeof(float)
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, cnt/(3*sizeof(float)));
         glDisableClientState(GL_NORMAL_ARRAY);
     }
 
@@ -860,8 +860,8 @@ namespace gle
             pts[n+4] = S;
             pts[n+5] = A;
         }
-        func1(4*nbf, dir, bufN);
-        func2(4*nbf, pts, bufP);
+        func1(sizeof(GLfloat)*nbf, dir, bufN);
+        func2(sizeof(GLfloat)*nbf, pts, bufP);
         return nbf;
     }
     
