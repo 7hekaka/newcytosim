@@ -120,16 +120,14 @@ using namespace gle;
 
 void SpaceTorus::draw2D() const
 {
-    constexpr size_t fin = 16 * gle::finesse;
-    GLfloat cir[2*fin+2];
-
-    gle::compute_circle(fin, cir, GLfloat(bCurve-bRadius));
-    glVertexPointer(2, GL_FLOAT, 0, cir);
-    glDrawArrays(GL_LINE_STRIP, 0, fin+1);
-
-    gle::compute_circle(fin, cir, GLfloat(bCurve+bRadius));
-    glVertexPointer(2, GL_FLOAT, 0, cir);
-    glDrawArrays(GL_LINE_STRIP, 0, fin+1);
+    GLfloat Ro(bCurve+bRadius);
+    GLfloat Rio((bCurve-bRadius)/(bCurve+bRadius));
+    glPushMatrix();
+    glScalef(Ro, Ro, Ro);
+    gle::circle();
+    glScalef(Rio, Rio, Rio);
+    gle::circle();
+    glPopMatrix();
 }
 
 void SpaceTorus::draw3D() const

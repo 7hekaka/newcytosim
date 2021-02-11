@@ -138,7 +138,7 @@ void PointDisp::paintShape() const
         case 's': gle::starS();      break;
         case '+': gle::plusS();      break;
         case 'c': break;
-        default: gle::discUp(); break;
+        default: gle::disc(); break;
     }
 }
 
@@ -182,7 +182,7 @@ void PointDisp::strokeI() const
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
     glColor4f(0, 0, 0, 0);
-    gle::discUp(); //strokeShape();
+    gle::disc(); //strokeShape();
     glPopMatrix();
     glPopAttrib();
 }

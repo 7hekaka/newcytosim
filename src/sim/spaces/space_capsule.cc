@@ -278,9 +278,7 @@ void SpaceCapsule::draw3D() const
     //right side:
     glPushMatrix();
     glClipPlane(glp, plane);
-    glTranslatef(L, 0, 0);
-    glScalef(R, R, R);
-    glRotated(-90, 0, 1, 0);
+    gle::transAlignZ(Vector(L,0,0), R, Vector(-1,0,0));
     gle::halfTube4();
     gle::hemisphere4();
     gle::drawArrowedBand(24, 0.25);
@@ -290,9 +288,7 @@ void SpaceCapsule::draw3D() const
     glPushMatrix();
     plane[0] = -1;
     glClipPlane(glp, plane);
-    glTranslatef(-L, 0, 0);
-    glScalef(R, R, R);
-    glRotated(90, 0, 1, 0);
+    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
     gle::halfTube4();
     gle::hemisphere4();
     gle::drawArrowedBand(24, 0.25);

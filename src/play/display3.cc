@@ -950,7 +950,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
                     /// draw a disc tangent to the Space:
                     Vector pos = obj->posFoot();
                     Vector dir = spc->normalToEdge(pos);
-                    drawObject(pos, dir, obj->disp()->size, gle::discUp);
+                    drawObject(pos, dir, obj->disp()->size, gle::disc);
                     continue;
                 }
             }
@@ -982,7 +982,7 @@ void Display3::drawSingleA(Single const* obj) const
             {
                 // draw a disc tangent to the Space:
                 disp->color2.load_both();
-                drawObject(pf, spc->normalToEdge(pf), disp->size, gle::discUp);
+                drawObject(pf, spc->normalToEdge(pf), disp->size, gle::disc);
                 disp->color.load_both();
             }
         }

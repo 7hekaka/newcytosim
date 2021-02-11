@@ -222,38 +222,24 @@ void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCylinder::draw3D() const
 {
-    const size_t fin = 512;
-    GLfloat cir[2*fin+2];
-    gle::compute_circle(fin, cir, 1);
+    const GLfloat L(length_);
+    const GLfloat R(radius_);
+    
+    const GLenum glp = GL_CLIP_PLANE5;
+    GLdouble plane[] = { -1, 0, 0, L };
+    glEnable(glp);
 
-    GLfloat L(length_);
-    GLfloat R(radius_);
-    
-    glBegin(GL_TRIANGLE_STRIP);
-    for ( size_t i = 0; i <= fin; ++i )
-    {
-        GLfloat c = cir[2*i], s = cir[1+2*i];
-        glNormal3f(0, c, s);
-        glVertex3f(+L, R*c, R*s);
-        glVertex3f(-L, R*c, R*s);
-    }
-    glEnd();
-    
-    // draw the cap:
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f( +1, 0, 0 );
-    glVertex3f( +L, 0, 0 );
-    for ( size_t i = 0; i <= fin; ++i )
-        glVertex3f(+L, R*cir[2*i], R*cir[1+2*i]);
-    glEnd();
-    
-    // draw the cap:
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f( -1, 0, 0 );
-    glVertex3f( -L, 0, 0 );
-    for ( size_t i = 0; i <= fin; ++i )
-        glVertex3f(-L, -R*cir[2*i], R*cir[1+2*i]);
-    glEnd();
+    glPushMatrix();
+    glClipPlane(glp, plane);
+    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
+    gle::halfTube4();
+    gle::discDown2();
+    glPopMatrix();
+    glDisable(glp);
+    glPushMatrix();
+    gle::transAlignZ(Vector(L,0,0), R, Vector(1,0,0));
+    gle::disc2();
+    glPopMatrix();
 }
 
 #else

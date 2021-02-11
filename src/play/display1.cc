@@ -308,7 +308,7 @@ void Display1::drawSphereT(Sphere const& obj)
         if ( disp->style & 1 )
             drawFlat(C, obj.radius(), gle::circle);
         if ( disp->style & 2 )
-            drawFlat(C, obj.radius(), gle::discUp);
+            drawFlat(C, obj.radius(), gle::disc);
 #else
         /* Note: The rotation matrix for the sphere calculated below from the
          reference points, includes scaling by the radius of the sphere.

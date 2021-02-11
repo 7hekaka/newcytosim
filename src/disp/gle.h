@@ -126,12 +126,14 @@ namespace gle
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void circle();
-    /// draw nicer 2D disc of radius 1 in XY plane, with +Z as normal
-    void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
-    void discUp();
+    void disc();
+    /// nicer 2D disc of radius 1 in XY plane, with +Z as normal
+    void disc2();
     /// draw 2D disc of radius 1 in XY plane, with -Z as normal
     void discDown();
+    /// nicer 2D disc of radius 1 in XY plane, with -Z as normal
+    void discDown2();
 
     /// draw a tetrahedron of side 2 in 3D
     void tetrahedron();

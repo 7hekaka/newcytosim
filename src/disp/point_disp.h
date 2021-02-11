@@ -172,7 +172,7 @@ public:
     void write_values(std::ostream&) const;
     
     /// recalculate bitmaps
-    void      prepare(GLfloat uf, GLfloat sf, bool make_maps);
+    void prepare(GLfloat uf, GLfloat sf, bool make_maps);
     
     /// draw inactive state
     template < typename VECTOR >
@@ -188,7 +188,7 @@ public:
             gle::translate(pos);
             gle::scale(realSize);
             color2.load();
-            gle::discUp();
+            gle::disc();
             glPopMatrix();
     #endif
         }

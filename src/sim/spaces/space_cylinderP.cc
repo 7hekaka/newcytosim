@@ -209,39 +209,28 @@ void SpaceCylinderP::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCylinderP::draw3D() const
 {
-    const size_t fin = 512;
-    GLfloat cir[2*fin+2];
-    gle::compute_circle(fin, cir, 1);
-
     GLfloat L(halflength_);
     GLfloat R(radius_);
     
-    glBegin(GL_TRIANGLE_STRIP);
-    for ( size_t i = 0; i <= fin; ++i )
-    {
-        GLfloat c = cir[2*i], s = cir[1+2*i];
-        glNormal3f(0, c, s);
-        glVertex3f(+L, R*c, R*s);
-        glVertex3f(-L, R*c, R*s);
-    }
-    glEnd();
-    
-    if ( 1 )
-    {
-        //draw dotted-rings to indicate periodicity
-        glLineStipple(1, 0x000F);
-        glEnable(GL_LINE_STIPPLE);
-        glPushMatrix();
-        glTranslatef(L, 0, 0);
-        glScalef(R, R, R);
-        glRotated(90, 0, 1, 0);
-        gle::circle();
-        glTranslatef(0, 0, -2*L/R);
-        glRotated(180, 0, 1, 0);
-        gle::circle();
-        glPopMatrix();
-        glDisable(GL_LINE_STIPPLE);
-    }
+    glLineStipple(1, 0x000F);
+    glEnable(GL_LINE_STIPPLE);
+
+    const GLenum glp = GL_CLIP_PLANE5;
+    GLdouble plane[] = { -1, 0, 0, L };
+    glEnable(glp);
+
+    glPushMatrix();
+    glClipPlane(glp, plane);
+    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
+    gle::halfTube4();
+    gle::circle();
+    glPopMatrix();
+    glDisable(glp);
+    glPushMatrix();
+    gle::transAlignZ(Vector(L,0,0), R, Vector(1,0,0));
+    gle::circle();
+    glPopMatrix();
+    glDisable(GL_LINE_STIPPLE);
 }
 
 #else

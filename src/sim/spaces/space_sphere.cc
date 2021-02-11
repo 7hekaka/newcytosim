@@ -131,23 +131,17 @@ void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceSphere::draw2D() const
 {
-    //number of sections in the quarter-circle
-    constexpr size_t fin = ((DIM==2) ? 32 : 8) * gle::finesse;
-    
-    GLfloat cir[2*fin+6];
-    cir[2] = 0;
-    cir[3] = 0;
-    gle::compute_circle(fin, cir+4, (GLfloat)radius_);
-    
-    glVertexPointer(2, GL_FLOAT, 0, cir+4);
-    glDrawArrays(GL_LINE_STRIP, 0, fin+1);
+    GLfloat R(radius_);
+    glPushMatrix();
+    glScalef(R, R, R);
+    gle::circle();
 
     if ( prop->disp->visible & 2 )
     {
         prop->disp->color2.load_load();
-        glVertexPointer(2, GL_FLOAT, 0, cir+2);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, fin+2);
+        gle::disc2();
     }
+    glPopMatrix();
 }
 
 void SpaceSphere::draw3D() const

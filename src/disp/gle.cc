@@ -339,15 +339,15 @@ namespace gle
     void disc()
     {
         glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
-    }
-
-    void discUp()
-    {
-        glNormal3f(0, 0, 1);
         glVertexPointer(2, GL_FLOAT, 16, cir_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
+    }
+
+    void disc2()
+    {
+        glNormal3f(0, 0, 1);
+        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
     }
     
     void discDown()
@@ -359,6 +359,15 @@ namespace gle
         glFrontFace(GL_CCW);
     }
     
+    void discDown2()
+    {
+        glNormal3f(0, 0, -1);
+        glFrontFace(GL_CW);
+        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
+        glFrontFace(GL_CCW);
+    }
+
     //-----------------------------------------------------------------------
     #pragma mark - Some Platonic solids
     
@@ -393,14 +402,14 @@ namespace gle
         // +R,-S, B
         //  0, Y, B
         //  0, 0, Z
-        GLfloat pts[] = {
+        GLfloat pts[9*4] = {
              R,-S, B,-R,-S, B, 0, Y, B,
              R,-S, B, 0, Y, B, 0, 0, Z,
              0, Y, B,-R,-S, B, 0, 0, Z,
             -R,-S, B, R,-S, B, 0, 0, Z,
         };
         //printNormals(4, pts);
-        GLfloat dir[] = {
+        GLfloat dir[9*4] = {
             +0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
             +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
             -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
@@ -419,7 +428,7 @@ namespace gle
         const GLfloat B = -M_SQRT1_2 * S;
         const GLfloat Z = -3.0 * B;
 
-        GLfloat pts[] = {
+        GLfloat pts[9*8] = {
              R,-S, B,-R,-S, B, 0, Y, B,
              R,-S, B, 0, Y, B, 0, 0, Z,
              0, Y, B,-R,-S, B, 0, 0, Z,
@@ -431,7 +440,7 @@ namespace gle
             -R, S,-B, R, S,-B, 0, 0,-Z,
         };
         
-        GLfloat dir[] = {
+        GLfloat dir[9*8] = {
             +0.00000, 0.00000,-1.00000, 0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
             +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
             -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
@@ -451,7 +460,7 @@ namespace gle
     /// Cube is make of 12 triangles = 36 vertices
     void drawCube(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat R=0.5773502692f)
     {
-        GLfloat pts[] = {
+        GLfloat pts[9*12] = {
             +R, R, R, R,-R,-R, R, R,-R,
             +R,-R,-R, R, R, R, R,-R, R,
             +R, R, R, R, R,-R,-R, R,-R,
@@ -466,7 +475,7 @@ namespace gle
             +R, R,-R, R,-R,-R,-R,-R,-R
         };
         
-        GLfloat dir[] = {
+        GLfloat dir[9*12] = {
             +1, 0, 0, 1, 0, 0, 1, 0, 0,
             +1, 0, 0, 1, 0, 0, 1, 0, 0,
             +0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -490,7 +499,7 @@ namespace gle
     {
         // Eight triangles, ordered counterclockwise
         // set size to match the volume of the unit sphere
-        GLfloat pts[] = {
+        GLfloat pts[9*8] = {
             +R, 0, 0, 0, 0, R, 0,-R, 0,
             +0, 0,-R,-R, 0, 0, 0, R, 0,
             +0, 0, R,-R, 0, 0, 0,-R, 0,
@@ -503,7 +512,7 @@ namespace gle
         
         // normals
         const GLfloat N = 1 / M_SQRT3;
-        GLfloat dir[] = {
+        GLfloat dir[9*8] = {
             +N,-N, N, N,-N, N, N,-N, N,
             -N, N,-N,-N, N,-N,-N, N,-N,
             -N,-N, N,-N,-N, N,-N,-N, N,
@@ -559,7 +568,7 @@ namespace gle
         const GLfloat T = G * O;   //0.8506508084f;
         
         // Twelve vertices of icosahedron on unit sphere
-        GLfloat pts[] = {
+        GLfloat pts[3*12] = {
             +T,  O,  0, // 0
             -T, -O,  0, // 1
             -T,  O,  0, // 2
@@ -611,8 +620,8 @@ namespace gle
     {
         const GLfloat T = R * 0.8506508084f;      // (1 + sqrt(5))/2
         const GLfloat O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
-        
-        GLfloat pts[] = {
+
+        GLfloat pts[9*20] = {
             -O,  0, -T,   O,  0, -T,   0, -T, -O,
             -O,  0, -T,   0,  T, -O,   O,  0, -T,
             +O,  0, -T,   T, -O,  0,   0, -T, -O,
@@ -635,7 +644,7 @@ namespace gle
             +O,  0,  T,  -O,  0,  T,   0, -T,  O,
         };
         
-        GLfloat dir[] = {
+        GLfloat dir[9*20] = {
             +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724,
             +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724,
             +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503,
@@ -673,7 +682,7 @@ namespace gle
         const GLfloat cR = R * C;
         const GLfloat sR = R * S;
 
-        GLfloat pts[] = {
+        GLfloat pts[9*15] = {
             cR,-sR, B,  1,  0, H,  1,  0, U,
             cR,-sR, B,  1,  0, U,  0,  0, T,
             cR, sR, B,  0,  0, T,  1,  0, U,
@@ -691,7 +700,7 @@ namespace gle
             cR,-sR, B, cR, sR, B,  1,  0, H
         };
         
-        GLfloat dir[] = {
+        GLfloat dir[9*15] = {
             0, -1, 0,  0, -1, 0,  0, -1, 0,
             0, -1, 0,  0, -1, 0,  0, -1, 0,
             0, +1, 0,  0, +1, 0,  0, +1, 0,
@@ -965,7 +974,7 @@ namespace gle
     {
         tube1();
         glTranslatef(0,0,1);
-        discUp();
+        disc();
         glTranslatef(0,0,-1);
         discDown();
     }
@@ -973,7 +982,7 @@ namespace gle
     void cylinderZ()
     {
         glTranslatef(0,0,0.5f);
-        discUp();
+        disc();
         glTranslatef(0,0,-1);
         tube1();
         discDown();

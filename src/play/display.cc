@@ -107,7 +107,7 @@ void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
 #else
     glDisable(GL_LIGHTING);
     col.load();
-    gle::discUp();
+    gle::disc();
 #endif
     glPopMatrix();
 }

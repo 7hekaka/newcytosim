@@ -223,21 +223,12 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceEllipse::draw2D() const
 {
-    GLfloat X = length_[0];
-#if ( DIM == 1 )
-    GLfloat Y = 1;
-#else
-    GLfloat Y = length_[1];
-#endif
-    
-    constexpr size_t fin = 16 * gle::finesse;
-    GLfloat cir[2*fin+2];
-    gle::compute_circle(fin, cir, 1);
+    GLfloat X(length_[0]);
+    GLfloat Y((DIM>1)?length_[1]:1);
 
     glPushMatrix();
     glScalef(X, Y, 1.0);
-    glVertexPointer(2, GL_FLOAT, 0, cir);
-    glDrawArrays(GL_LINE_LOOP, 0, fin+1);
+    gle::circle();
     glPopMatrix();
 }
 
