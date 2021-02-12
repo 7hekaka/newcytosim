@@ -183,20 +183,18 @@ void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceRing::draw3D() const
 {
-    const size_t fin = 512;
-    GLfloat cir[2*fin+2];
-    gle::compute_circle(fin, cir, GLfloat(radius_));
-
     GLfloat L(length_);
-    
-    glBegin(GL_TRIANGLE_STRIP);
-    for ( size_t n = 0; n <= fin; ++n )
-    {
-        glNormal3f( 0, cir[2*n], cir[1+2*n]);
-        glVertex3f(+L, cir[2*n], cir[1+2*n]);
-        glVertex3f(-L, cir[2*n], cir[1+2*n]);
-    }
-    glEnd();
+    GLfloat R(radius_);
+
+    const GLenum glp = GL_CLIP_PLANE5;
+    GLdouble plane[] = { -1, 0, 0, L };
+    glEnable(glp);
+    glClipPlane(glp, plane);
+    glPushMatrix();
+    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
+    gle::halfTube4();
+    glPopMatrix();
+    glDisable(glp);
 }
 
 #else

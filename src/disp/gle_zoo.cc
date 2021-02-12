@@ -6,8 +6,9 @@
 
 void gle::triangleS()
 {
-    constexpr GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
-    constexpr GLfloat pts[] = { 0, 1, 0, -H, -.5f, 0, H, -.5f, 0 };
+    constexpr GLfloat B(-0.5f); //std::sqrt(3)/2;
+    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
+    constexpr GLfloat pts[] = { 0, 1, 0,-T, B, 0, T, B, 0 };
     constexpr GLfloat dir[] = { 0, 0, 1, 0, 0, 1, 0, 0, 1 };
     
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -19,12 +20,12 @@ void gle::triangleS()
 
 void gle::triangleL()
 {
+    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
     glBegin(GL_LINE_LOOP);
     glNormal3f(0, 0, 1);
-    const GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
     glVertex2f( 0,  1.0);
-    glVertex2f(-H, -0.5);
-    glVertex2f( H, -0.5);
+    glVertex2f(-T, -0.5);
+    glVertex2f( T, -0.5);
     glEnd();
 }
 
@@ -32,23 +33,23 @@ void gle::triangleL()
 
 void gle::nablaS()
 {
+    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
     glBegin(GL_TRIANGLES);
     glNormal3f(0, 0, 1);
-    const GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
     glVertex2f( 0, -1.0);
-    glVertex2f( H,  0.5);
-    glVertex2f(-H,  0.5);
+    glVertex2f( T,  0.5);
+    glVertex2f(-T,  0.5);
     glEnd();
 }
 
 void gle::nablaL()
 {
+    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
     glBegin(GL_LINE_LOOP);
     glNormal3f(0, 0, 1);
-    const GLfloat H = 0.8660254037844386f; //std::sqrt(3)/2;
     glVertex2f( 0, -1.0);
-    glVertex2f( H,  0.5);
-    glVertex2f(-H,  0.5);
+    glVertex2f( T,  0.5);
+    glVertex2f(-T,  0.5);
     glEnd();
 }
 

@@ -150,7 +150,7 @@ void SpaceSphere::draw3D() const
     glPushMatrix();
     glScalef(R, R, R);
     gle::sphere8();
-    gle::drawThreeBands(128);
+    gle::threeBands(128);
     glPopMatrix();
 }
 

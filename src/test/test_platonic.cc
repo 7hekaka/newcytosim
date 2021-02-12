@@ -19,7 +19,8 @@ bool showFaces = true;
 
 Platonic::Solid * ico = nullptr;
 
-GLuint glbuffers[2] = { 0, 0 };
+GLuint glpts = 0;
+GLuint gldir = 0;
 
 //------------------------------------------------------------------------------
 void initVBO();
@@ -101,14 +102,15 @@ void drawFaces2()
 
 void initVBO()
 {
-    glGenBuffers(2, glbuffers);
+    glGenBuffers(1, &glpts);
+    glGenBuffers(1, &gldir);
     //Create a new VBO for the vertex information
 #if 0
-    glBindBuffer(GL_ARRAY_BUFFER, glbuffers[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, glpts);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->nb_vertices()*sizeof(float), ico->vertex_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #else
-    glBindBuffer(GL_ARRAY_BUFFER, glbuffers[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, glpts);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->nb_vertices()*sizeof(float), nullptr, GL_STATIC_DRAW);
     void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     ico->store_vertices((float*)glb);
@@ -116,7 +118,7 @@ void initVBO()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
     //Create a new VBO for the indices
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glbuffers[1]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gldir);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->nb_faces()*sizeof(unsigned), ico->faces_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
@@ -127,12 +129,12 @@ void drawFacesVBO()
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    glBindBuffer(GL_ARRAY_BUFFER, glbuffers[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, glpts);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glNormalPointer(GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glbuffers[1]);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gldir);
     glDrawElements(GL_TRIANGLES, 3*ico->nb_faces(), GL_UNSIGNED_INT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     

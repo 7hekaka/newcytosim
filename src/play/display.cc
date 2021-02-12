@@ -122,7 +122,7 @@ void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, V
     if ( style & 1 )
         gle::dualPassSphere4();
     if ( style & 4 )
-        gle::drawThreeBands(64);
+        gle::threeBands(64);
     glPopMatrix();
 }
 

@@ -281,7 +281,7 @@ void SpaceCapsule::draw3D() const
     gle::transAlignZ(Vector(L,0,0), R, Vector(-1,0,0));
     gle::halfTube4();
     gle::hemisphere4();
-    gle::drawArrowedBand(24, 0.25);
+    gle::arrowedBand(24, 0.25);
     glPopMatrix();
 
     //left side:
@@ -291,7 +291,7 @@ void SpaceCapsule::draw3D() const
     gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
     gle::halfTube4();
     gle::hemisphere4();
-    gle::drawArrowedBand(24, 0.25);
+    gle::arrowedBand(24, 0.25);
     glPopMatrix();
     
     glDisable(glp);

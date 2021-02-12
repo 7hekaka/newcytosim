@@ -235,70 +235,12 @@ void SpaceEllipse::draw2D() const
 
 void SpaceEllipse::draw3D() const
 {
-    const size_t fin = gle::ncircle;
-    static GLfloat cir[4*fin+2];
-    static bool virgin = true;
-    
-    if ( virgin )
-    {
-        virgin = false;
-        gle::compute_circle(fin*2, cir, 1);
-    }
-
-    GLfloat X(length_[0]), iX = 1.0f / ( X * X );
-    GLfloat Y(length_[1]), iY = 1.0f / ( Y * Y );
-    GLfloat Z(length_[2]), iZ = 1.0f / ( Z * Z );
-    
-    /*
-     A vector orthogonal to the ellipse at position (X, Y, Z) is
-     ( X / lenX^2, Y / lenY^2, Z / lenZ^2 )
-      */
-    for ( size_t n = 0; n < fin; ++n )
-    {
-        GLfloat uX = cir[1+2*n]*X, uY = cir[1+2*n]*Y, uZ = cir[2*n  ]*Z;
-        GLfloat lX = cir[3+2*n]*X, lY = cir[3+2*n]*Y, lZ = cir[2+2*n]*Z;
-        GLfloat uXi = uX * iX, uYi = uY * iY, uZi = uZ * iZ;
-        GLfloat lXi = lX * iX, lYi = lY * iY, lZi = lZ * iZ;
-        glBegin(GL_TRIANGLE_STRIP);
-        for ( size_t p = 0; p <= 2*fin; ++p )
-        {
-            glNormal3f(cir[2*p]*uXi, cir[1+2*p]*uYi, uZi);
-            glVertex3f(cir[2*p]*uX , cir[1+2*p]*uY , uZ );
-            glNormal3f(cir[2*p]*lXi, cir[1+2*p]*lYi, lZi);
-            glVertex3f(cir[2*p]*lX , cir[1+2*p]*lY , lZ );
-        }
-        glEnd();
-#if ( 0 )
-        // display normals (for checking)
-        GLfloat m = 0.1;
-        glBegin(GL_LINES);
-        for ( size_t p = 0; p <= 2*fin; p+=8 )
-        {
-            glVertex3f(cir[2*p]*uX, cir[1+2*p]*uY, uZ);
-            glVertex3f(cir[2*p]*(uX+m*uXi), cir[1+2*p]*(uY+m*uYi), uZ+m*uZi);
-        }
-        glEnd();
-#endif
-    }
-
-#if ( 1 )
-    // add decorations:
+    /* We cannot just rescale because the normals would not be correct */
+    gle::ellipse(length_[0], length_[1], length_[2]);
+    /* For the decoration, normals also need to be calculated */
     glLineWidth(0.5);
     for ( GLfloat u = -0.9f; u < 1.0f; u += 0.2f )
-    {
-        GLfloat H = u * Z;
-        GLfloat R = std::sqrt( 1 - u*u );
-        glBegin(GL_LINE_LOOP);
-        for ( size_t n = 0; n <= 2*fin; ++n )
-        {
-            GLfloat x = X * R * cir[2*n];
-            GLfloat y = Y * R * cir[1+2*n];
-            glNormal3f(x*iX, y*iY, H*iZ);
-            glVertex3f(x, y, H);
-        }
-        glEnd();
-    }
-#endif
+        gle::ellipse_circle(length_[0], length_[1], length_[2], u);
 }
 
 #else
