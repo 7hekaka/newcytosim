@@ -16,6 +16,7 @@
 #include "line_disp.h"
 #include "point_disp.h"
 #include "display_color.h"
+#include "vector_float.h"
 
 using namespace gle;
 extern Modulo const* modulo;
@@ -526,31 +527,27 @@ inline void drawLine(Vector const& a, const Fiber * fibA, const PointDisp* dispA
 
 void Display1::drawSinglesF(const SingleSet & set) const
 {
-    if ( prop->point_size > 0 )
+    if (( prop->point_size > 0 ) & ( set.sizeF() > 0 ))
     {
-        pointSize(prop->point_size);
-        glEnableClientState(GL_COLOR_ARRAY);
-        glVertexPointer(std::max(DIM,2), GL_FLOAT, 0, fpts);
-        glColorPointer(4, GL_FLOAT, 0, fcol);
-        size_t i = 0;
+        size_t i = 0, cnt = set.sizeF();
+        floatD* pts = mapVertexBuffer(cnt);
+        float4* col = mapColorBuffer(cnt);
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
             {
 #if ( DIM == 1 )
-                obj->posFoot().store(fpts+2*i);
-                fpts[1+2*i] = obj->signature() * 0x1p-28 - 4;
+                pts[i] = float2{obj->posFoot(), obj->signature()*0x1p-28-4};
 #else
-                obj->posFoot().store(fpts+DIM*i);
+                pts[i] = floatD{obj->posFoot()};
 #endif
-                obj->disp()->color2.store(fcol+4*i);
-                if ( ++i >= fpts_size )
-                {
-                    glDrawArrays(GL_POINTS, 0, i);
-                    i = 0;
-                }
+                col[i++] = float4{obj->disp()->color2};
             }
         }
+        unmapVertexBuffer();
+        unmapColorBuffer();
+        pointSize(prop->point_size);
+        glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_POINTS, 0, i);
         glDisableClientState(GL_COLOR_ARRAY);
     }
@@ -593,50 +590,45 @@ Always display Hand1 of Couple
  */
 void Display1::drawCouplesF1(CoupleSet const& set) const
 {
-    if ( prop->point_size > 0 )
+    if (( prop->point_size > 0 ) & ( set.sizeFF() > 0 ))
     {
-        size_t i = 0;
-        pointSize(prop->point_size);
-        glEnableClientState(GL_COLOR_ARRAY);
-        glVertexPointer(std::max(DIM,2), GL_FLOAT, 0, fpts);
-        glColorPointer(4, GL_FLOAT, 0, fcol);
+        size_t i = 0, cnt = set.sizeFF();
+        floatD* pts = mapVertexBuffer(cnt);
+        float4* col = mapColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( obj->active() && obj->disp1()->perceptible )
             {
 #if ( DIM == 1 )
-                obj->posFree().store(fpts+2*i);
-                fpts[1+2*i] = obj->signature() * 0x1p-28 - 4;
+                pts[i] = float2{obj->posFree(), obj->signature()*0x1p-28-4};
 #else
-                obj->posFree().store(fpts+DIM*i);
+                pts[i] = floatD{obj->posFree()};
 #endif
-                obj->disp1()->color2.store(fcol+4*i);
-                if ( ++i >= fpts_size )
-                {
-                    glDrawArrays(GL_POINTS, 0, i);
-                    i = 0;
-                }
+                col[i++] = float4{obj->disp1()->color2};
             }
         }
+        unmapVertexBuffer();
+        unmapColorBuffer();
+        pointSize(prop->point_size);
+        glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_POINTS, 0, i);
 
 #if ( DIM > 1 )
         // display inactive Couples with smaller size:
-        pointSize(M_SQRT1_2*prop->point_size);
         i = 0;
+        pts = mapVertexBuffer(cnt);
+        col = mapColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( !obj->active() && obj->disp1()->perceptible )
             {
-                obj->posFree().store(fpts+DIM*i);
-                obj->disp1()->color2.store(fcol+4*i);
-                if ( ++i >= fpts_size )
-                {
-                    glDrawArrays(GL_POINTS, 0, i);
-                    i = 0;
-                }
+                pts[i] = floatD{obj->posFree()};
+                col[i++] = float4{obj->disp1()->color2};
             }
         }
+        unmapVertexBuffer();
+        unmapColorBuffer();
+        pointSize(M_SQRT1_2*prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
 #endif
         glDisableClientState(GL_COLOR_ARRAY);
@@ -651,7 +643,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
  */
 void Display1::drawCouplesF2(CoupleSet const& set) const
 {
-    if ( prop->point_size > 0 )
+    if (( prop->point_size > 0 ) & ( set.sizeFF() > 0 ))
     {
         Couple * nxt;
         Couple * obj = set.firstFF();

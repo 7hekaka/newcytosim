@@ -27,13 +27,12 @@ extern Modulo const* modulo;
 
 
 Display::Display(DisplayProp const* dp)
-: fpts(nullptr), fcol(nullptr), pixelSize(1), uFactor(1), sFactor(1), minRadius(1), prop(dp)
+: pixelSize(1), uFactor(1), sFactor(1), minRadius(1), prop(dp)
 {
     assert_true(dp);
     prep_time = -1;
-
-    fpts = new float[fpts_size*std::max(DIM,2)];
-    fcol = new float[fpts_size*4];
+    for ( int u = 0; u < 4; ++u )
+        glbuf[u] = 0;
 }
 
 void Display::setPixelFactors(GLfloat ps, GLfloat u)
@@ -46,13 +45,50 @@ void Display::setPixelFactors(GLfloat ps, GLfloat u)
      */
     sFactor = 0.5f * u * ps;
     minRadius = 0.5 * pixelSize / sFactor;
+    
+    if ( !glIsBuffer(glbuf[0]) )
+        glGenBuffers(4, glbuf);
 }
 
 Display::~Display()
 {
-    delete(fpts);
-    delete(fcol);
 }
+
+//------------------------------------------------------------------------------
+#pragma mark - Buffers
+
+floatD* Display::mapVertexBuffer(size_t cnt) const
+{
+    constexpr size_t DOUZE = (DIM>1?DIM:2) * sizeof(float);
+    glBindBuffer(GL_ARRAY_BUFFER, glbuf[0]);
+    glBufferData(GL_ARRAY_BUFFER, DOUZE*cnt, nullptr, GL_STREAM_DRAW);
+    return (floatD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+}
+
+void Display::unmapVertexBuffer() const
+{
+    glBindBuffer(GL_ARRAY_BUFFER, glbuf[0]);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glVertexPointer((DIM>1?DIM:2), GL_FLOAT, 0, nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+float4* Display::mapColorBuffer(size_t cnt) const
+{
+    constexpr size_t SEIZE = 4 * sizeof(float);
+    glBindBuffer(GL_ARRAY_BUFFER, glbuf[3]);
+    glBufferData(GL_ARRAY_BUFFER, SEIZE*cnt, nullptr, GL_STREAM_DRAW);
+    return (float4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+}
+
+void Display::unmapColorBuffer() const
+{
+    glBindBuffer(GL_ARRAY_BUFFER, glbuf[3]);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glColorPointer(4, GL_FLOAT, 0, nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - drawObject

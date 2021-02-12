@@ -7,8 +7,15 @@
 #include "fiber.h"
 #include "mecable.h"
 #include "mecapoint.h"
-#include "display_prop.h"
 #include "gle_color.h"
+#include "display_prop.h"
+#include "vector_float.h"
+
+#if ( DIM == 3 )
+typedef float3 floatD;
+#else
+typedef float2 floatD;
+#endif
 
 class Simul;
 class Mecable;
@@ -74,12 +81,9 @@ public:
 class Display
 {
 protected:
-    
-    /// array of float coordinates
-    GLfloat * fpts, * fcol;
 
-    /// allocated size of `fpts`
-    const size_t fpts_size = 16384;
+    /// OpenGL buffers objects
+    GLuint glbuf[4];
     
     /// array of transparent objects to be displayed last
     Array<zObject> zObjects;
@@ -108,6 +112,11 @@ protected:
     /// use OpenGL stencil test:
     bool stencil_;
 
+    floatD* mapVertexBuffer(size_t) const;
+    void  unmapVertexBuffer() const;
+    float4* mapColorBuffer(size_t) const;
+    void  unmapColorBuffer() const;
+    
 private:
     
     /// set default value of FiberProp
