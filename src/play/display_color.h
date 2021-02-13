@@ -126,6 +126,12 @@ inline gle_color color_by_lattice_striped(Fiber const& fib, long ix, real beta)
     return gle_color::jet_color(x).lighten(0.9375 + ( ix & 1 ) * 0.125);
 }
 
+inline gle_color lattice_color(gle_color const& col, real val)
+{
+    return col.darken(val);
+    //return gle_color::jet_color(val);
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Color schemes for Sphere / Solid / Bead
 

@@ -1147,11 +1147,6 @@ void Display::drawFiberPoints(Fiber const& fib) const
 //------------------------------------------------------------------------------
 #pragma mark - Lattice
 
-static inline void set_lattice_color(gle_color const& col, real val)
-{
-    col.darken(val).load();
-}
-
 /**
  This style uses one vertex for each site, positionned at the center of the range
  OpenGL will interpolate the colors, and each site will be covered by a gradient.
@@ -1174,7 +1169,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
-        set_lattice_color(col, (fac*lat.data(inf))*(uni/len));
+        lattice_color(col, (fac*lat.data(inf))*(uni/len)).load();
         gle::gleVertex(fib.posEndM());
         gle::gleVertex(fib.posEndP());
     }
@@ -1192,19 +1187,19 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
         }
 
         // the terminal site may be truncated
-        set_lattice_color(col, facM*lat.data(inf));
+        lattice_color(col, facM*lat.data(inf)).load();
         gle::gleVertex(fib.posEndM());
         if ( uni*(inf+0.5) > fib.abscissaM() )
             gle::gleVertex(fib.pos(uni*(inf+0.5)));
         
         for ( auto h = inf+1; h < sup; ++h )
         {
-            set_lattice_color(col, fac*lat.data(h));
+            lattice_color(col, fac*lat.data(h)).load();
             gle::gleVertex(fib.pos(uni*(h+0.5)));
         }
         
         // the terminal site may be truncated
-        set_lattice_color(col, facP*lat.data(sup));
+        lattice_color(col, facP*lat.data(sup)).load();
         if ( uni*(sup+0.5) < fib.abscissaP() )
             gle::gleVertex(fib.pos(uni*(sup+0.5)));
         gle::gleVertex(fib.posEndP());
@@ -1235,7 +1230,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
-        set_lattice_color(col, (fac*lat.data(inf))*(uni/len));
+        lattice_color(col, (fac*lat.data(inf))*(uni/len)).load();
         gle::gleVertex(fib.posEndM());
         gle::gleVertex(fib.posEndP());
     }
@@ -1253,18 +1248,18 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
         }
 
         // the terminal site may be truncated
-        set_lattice_color(col, facM*lat.data(inf));
+        lattice_color(col, facM*lat.data(inf)).load();
         gle::gleVertex(fib.posEndM());
         
         for ( auto h = inf+1; h < sup; ++h )
         {
             gle::gleVertex(fib.pos(uni*h));
-            set_lattice_color(col, fac*lat.data(h));
+            lattice_color(col, fac*lat.data(h)).load();
             gle::gleVertex(fib.pos(uni*h));
         }
         
         // the terminal site may be truncated
-        set_lattice_color(col, facP*lat.data(sup));
+        lattice_color(col, facP*lat.data(sup)).load();
         gle::gleVertex(fib.pos(uni*sup));
         gle::gleVertex(fib.posEndP());
     }
