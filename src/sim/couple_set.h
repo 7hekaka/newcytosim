@@ -33,13 +33,13 @@ class CoupleSet: public ObjectSet
 private:
     
     /// list of Couple which are not attached (f=free)
-    ObjectPool    ffList;
+    ObjectPool ffList;
     
     /// list of Couple with only one side attached (a=attached, f=free)
-    ObjectPool    afList, faList;
+    ObjectPool afList, faList;
     
     /// list of Couple with both sides attached (a=attached)
-    ObjectPool    aaList;
+    ObjectPool aaList;
     
     /// return one of ffList, afList, faList, aaList, corresponding to given states
     ObjectPool&   sublist(bool attached1, bool attached2)
@@ -65,31 +65,31 @@ private:
     CoupleReserveList uniReserves;
     
     /// flag to enable `fast_diffusion` attachment algorithm
-    bool          uniEnabled;
+    bool uniEnabled;
     
     /// initialize `fast_diffusion` attachment algorithm
-    bool          uniPrepare(PropertyList const& properties);
+    bool uniPrepare(PropertyList const& properties);
     
     /// gather all Couple with `fast_diffusion` in reserve lists
-    Couple*       uniCollect(Couple*);
+    Couple* uniCollect(Couple*);
 
     /// ensures that `can` holds `cnt` Couple, creating them of specified CoupleProp
-    void          uniRefill(CoupleList& can, size_t cnt, CoupleProp const*);
+    void uniRefill(CoupleList& can, size_t cnt, CoupleProp const*);
 
     /// attach Hand1 of Couple from `can` on locations specified in `loc`
-    void          uniAttach1(Array<FiberSite>& loc, CoupleList& can);
+    void uniAttach1(Array<FiberSite>& loc, CoupleList& can);
     
     /// attach Hand2 of Couple from `can` on locations specified in `loc`
-    void          uniAttach2(Array<FiberSite>& loc, CoupleList& can);
+    void uniAttach2(Array<FiberSite>& loc, CoupleList& can);
     
     /// attach both Hands of `nb` Couple at crossing points specified by first argument
-    void          uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleList&, size_t nb);
+    void uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleList&, size_t nb);
 
     /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
-    void          uniAttach(FiberSet const&);
+    void uniAttach(FiberSet const&);
     
     /// release Couples from reserve lists
-    void          uniRelax();
+    void uniRelax();
     
 public:
         
@@ -105,164 +105,164 @@ public:
     static std::string title() { return "couple"; }
     
     /// create a new property of category `cat` for a class `name`
-    Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
+    Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    ObjectList  newObjects(const std::string& name, Glossary& opt);
+    ObjectList newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, size_t);
+    Object * newObject(ObjectTag, size_t);
     
     /// save free Couples
-    void        writeFF(Outputter&) const;
+    void writeFF(Outputter&) const;
     
     /// save attached Couples
-    void        writeAF(Outputter&) const;
+    void writeAF(Outputter&) const;
     
     /// save attached Couples
-    void        writeFA(Outputter&) const;
+    void writeFA(Outputter&) const;
 
     /// save bridging Couples
-    void        writeAA(Outputter&) const;
+    void writeAA(Outputter&) const;
 
     /// save objects
-    void        write(Outputter&, bool skip) const;
+    void write(Outputter&, bool skip) const;
     
     /// save objects
-    void        write(Outputter& out) const { write(out, false); }
+    void write(Outputter& out) const { write(out, false); }
 
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream&) const;
+    void report(std::ostream&) const;
 
     //--------------------------
 
     /// add object (should be a Couple)
-    void         link(Object *);
+    void link(Object *);
     
     /// remove object (should be a Couple)
-    void         unlink(Object *);
+    void unlink(Object *);
 
     /// reassign Couple to sublist following attachement of Hand 1
-    void         relinkA1(Couple *);
+    void relinkA1(Couple *);
     /// reassign Couple to sublist following detachment of Hand 1
-    void         relinkD1(Couple *);
+    void relinkD1(Couple *);
     /// reassign Couple to sublist following attachement of Hand 2
-    void         relinkA2(Couple *);
+    void relinkA2(Couple *);
     /// reassign Couple to sublist following detachment of Hand 2
-    void         relinkD2(Couple *);
+    void relinkD2(Couple *);
 
     /// reassign Couple to different sublist, given previous state
-    void         relink(Object *, bool attached1, bool attached2);
+    void relink(Object *, bool attached1, bool attached2);
 
     /// first unattached Couple
-    Couple *     firstFF()     const { return static_cast<Couple*>(ffList.front()); }
+    Couple * firstFF() const{ return static_cast<Couple*>(ffList.front()); }
     /// first Couple attached only by cHand1
-    Couple *     firstAF()     const { return static_cast<Couple*>(afList.front()); }
+    Couple * firstAF() const{ return static_cast<Couple*>(afList.front()); }
     /// first Couple attached only by cHand2
-    Couple *     firstFA()     const { return static_cast<Couple*>(faList.front()); }
+    Couple * firstFA() const{ return static_cast<Couple*>(faList.front()); }
     /// first Couple attached by both hands
-    Couple *     firstAA()     const { return static_cast<Couple*>(aaList.front()); }
+    Couple * firstAA() const{ return static_cast<Couple*>(aaList.front()); }
 
     /// last unattached Couple
-    Couple *     lastFF()      const { return static_cast<Couple*>(ffList.back()); }
+    Couple * lastFF()  const{ return static_cast<Couple*>(ffList.back()); }
     /// last Couple attached by cHand1
-    Couple *     lastAF()      const { return static_cast<Couple*>(afList.back()); }
+    Couple * lastAF()  const{ return static_cast<Couple*>(afList.back()); }
     /// last Couple attached by cHand2
-    Couple *     lastFA()      const { return static_cast<Couple*>(faList.back()); }
+    Couple * lastFA()  const{ return static_cast<Couple*>(faList.back()); }
     /// last Couple attached by both hands
-    Couple *     lastAA()      const { return static_cast<Couple*>(aaList.back()); }
+    Couple * lastAA()  const{ return static_cast<Couple*>(aaList.back()); }
 
     /// number of free Couples
-    size_t       sizeFF()      const { return ffList.size(); }
+    size_t sizeFF()  const{ return ffList.size(); }
     /// number of Couples attached by cHand1 only
-    size_t       sizeAF()      const { return afList.size(); }
+    size_t sizeAF()  const{ return afList.size(); }
     /// number of Couples attached by cHand2 only
-    size_t       sizeFA()      const { return faList.size(); }
+    size_t sizeFA()  const{ return faList.size(); }
     /// number of Couples attached by one hand
-    size_t       sizeA()       const { return faList.size()+afList.size(); }
+    size_t sizeA()   const{ return faList.size()+afList.size(); }
     /// number of Couples attached by both hands
-    size_t       sizeAA()      const { return aaList.size(); }
+    size_t sizeAA()  const{ return aaList.size(); }
     /// total number of elements
-    size_t       size()        const { return ffList.size() + faList.size() + afList.size() + aaList.size(); }
+    size_t size()    const{ return ffList.size() + faList.size() + afList.size() + aaList.size(); }
     
     /// return pointer to the Object of given ID, or zero if not found
-    Couple *     findID(ObjectID n)        const { return static_cast<Couple*>(inventory.get(n)); }
+    Couple * findID(ObjectID n)        const { return static_cast<Couple*>(inventory.get(n)); }
     
     /// first Couple in inventory
-    Couple *     firstID()                 const { return static_cast<Couple*>(inventory.first()); }
+    Couple * firstID()                 const { return static_cast<Couple*>(inventory.first()); }
     
     /// next Couple in inventory
-    Couple *     nextID(Couple const* obj) const { return static_cast<Couple*>(inventory.next(obj)); }
+    Couple * nextID(Couple const* obj) const { return static_cast<Couple*>(inventory.next(obj)); }
     
     /// collect all objects
-    ObjectList   collect() const;
+    ObjectList collect() const;
     
     /// collect objects for which func(this, val) == true
-    ObjectList   collect(bool (*func)(Object const*, void const*), void const*) const;
+    ObjectList collect(bool (*func)(Object const*, void const*), void const*) const;
     
     /// number of objects for which func(this, val) == true
-    size_t       count(bool (*func)(Object const*, void const*), void const*) const;
+    size_t count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// erase all Object and all Property
-    void         erase();
+    void erase();
     
     /// mix order of elements
-    void         shuffle();
+    void shuffle();
 
     /// distribute the Couple on the fibers to approximate an equilibrated state
-    void         equilibrateSym(FiberSet const&, CoupleList&, CoupleProp const*);
+    void equilibrateSym(FiberSet const&, CoupleList&, CoupleProp const*);
 
     /// distribute Couples of given class on the fibers to approximate an equilibrated state
-    void         equilibrate(FiberSet const&, CoupleList&, CoupleProp const*);
+    void equilibrate(FiberSet const&, CoupleList&, CoupleProp const*);
     
     /// distribute all Couple on the fibers to approximate an equilibrated state
-    void         equilibrate(FiberSet const&, PropertyList const&);
+    void equilibrate(FiberSet const&, PropertyList const&);
     
     /// distribute all free Couples on filament intersections
-    void         bindToIntersections(FiberSet const&, PropertyList const&);
+    void bindToIntersections(FiberSet const&, PropertyList const&);
     
     /// prepare for step()
-    void         prepare(PropertyList const& properties);
+    void prepare(PropertyList const& properties);
     
     /// Monte-Carlo step
-    void         step();
+    void step();
     
     /// cleanup at end of simulation period
-    void         relax() { uniRelax(); }
+    void relax() { uniRelax(); }
     
     /// modulo the position (periodic boundary conditions)
-    void         foldPosition(Modulo const*) const;
+    void foldPosition(Modulo const*) const;
 
     //--------------------------
     
     /// detach FF Couple
-    void         detachAA(Couple *);
+    void detachAA(Couple *);
     /// detach AF Couple
-    void         detachAF(Couple *);
+    void detachAF(Couple *);
     /// detach FA Couple
-    void         detachFA(Couple *);
+    void detachFA(Couple *);
 
     /// delete FF Couple
-    void         deleteAA(Couple *);
+    void deleteAA(Couple *);
     /// delete AF Couple
-    void         deleteAF(Couple *);
+    void deleteAF(Couple *);
     /// delete FA Couple
-    void         deleteFA(Couple *);
+    void deleteFA(Couple *);
 
     /// mark object before import
-    void         freeze(ObjectFlag f);
+    void freeze(ObjectFlag f);
     
     /// detach marked object after import
-    void         pruneDetach(ObjectFlag f);
+    void pruneDetach(ObjectFlag f);
 
     /// delete marked object after import
-    void         prune(ObjectFlag f);
+    void prune(ObjectFlag f);
     
     /// unmark objects after import
-    void         thaw();
+    void thaw();
     
     ///debug function
-    int          bad() const;
+    int bad() const;
 };
 
 
