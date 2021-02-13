@@ -27,15 +27,12 @@ private:
     
     /// draw a point with a small sphere
     void drawPoint(Vector const&, float) const;
-
     
     /// draw a point with a small sphere
-    inline void drawHand(Vector const& p, PointDisp const* d) const
-    { d->color.load_both(); drawPoint(p, d); }
+    inline void drawHand(Vector const& pos, PointDisp const* dis) const;
 
     /// draw a point with a small sphere
-    inline void drawHand2(Vector const& p, PointDisp const* d) const
-    { if ( d->visible ) { d->color2.load_both(); drawPoint(p, d); } }
+    inline void drawHand2(Vector const& pos, PointDisp const* dis) const;
     
     /// draw Fiber model segments
     void drawFiberSegments(Fiber const&, real rad,

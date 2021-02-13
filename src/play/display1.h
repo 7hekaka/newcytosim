@@ -16,9 +16,6 @@ class PointDisp;
  */
 class Display1 : public Display
 {
-    /// draw a point
-    void drawPoint(Vector const&, PointDisp const*) const;
-
 public:
     
     ///constructor

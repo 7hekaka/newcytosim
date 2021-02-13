@@ -46,6 +46,7 @@ void Display1::drawSimul(Simul const& sim)
     
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
+    glEnableClientState(GL_COLOR_ARRAY);
 
     if ( prop->couple_select & 1 )
         drawCouplesF(sim.couples);
@@ -53,11 +54,15 @@ void Display1::drawSimul(Simul const& sim)
     if ( prop->single_select & 1 )
         drawSinglesF(sim.singles);
     
+    glDisableClientState(GL_COLOR_ARRAY);
+
     drawFibers(sim.fibers);
 
+    glEnableClientState(GL_COLOR_ARRAY);
     if ( prop->couple_select & 2 )
         drawCouplesA(sim.couples);
-    
+    glDisableClientState(GL_COLOR_ARRAY);
+
 #if ( DIM == 3 )
     
     glEnable(GL_LIGHTING);
@@ -98,32 +103,6 @@ void Display1::drawSimul(Simul const& sim)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/// this version usually draws a little sphere
-inline void Display1::drawPoint(Vector const& pos, PointDisp const* disp) const
-{
-    if ( disp->perceptible )
-    {
-#if ( 0 )
-        // draw a OpenGL point
-        pointSize(disp->size);
-        glBegin(GL_POINTS);
-        gleVertex(pos);
-        glEnd();
-#else
-        /// draw a little sphere
-        glPushMatrix();
-        gle::translate(pos);
-        gle::scale(disp->size*sFactor);
-        gle::sphere1();
-        glPopMatrix();
-#endif
-    }
-}
-
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
 
 void Display1::drawFiber(Fiber const& fib)
 {
@@ -152,7 +131,7 @@ void Display1::drawBead(Bead const& obj)
     if ( disp->style & 2 )
     {
         bodyColor(obj);
-        drawPoint(obj.position(), disp);
+        drawObject(obj.position(), disp->size, gle::tetrahedron);
     }
     
 #if ( DIM == 2 )
@@ -284,7 +263,7 @@ void Display1::drawSphere(Sphere const& obj)
         bodyColor(obj);
         drawObject(obj.posP(0), disp->size, gle::star);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawPoint(obj.posP(i), disp);
+            drawObject(obj.posP(i), disp->size, gle::sphere1);
     }
     
     //display reference points
@@ -383,15 +362,34 @@ void Display1::drawOrganizer(Organizer const& obj) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-
-inline void drawVertex(Vector const& pos, const PointDisp* disp)
+template < typename OBJ >
+inline floatD setVertex(Vector const& pos, const OBJ& obj)
 {
-    if ( disp->perceptible )
-    {
-        disp->color2.load();
-        gleVertex(pos);
-    }
+#  if ( DIM == 1 )
+    return float2::cast(pos.XX, obj->signature()*0x1p-28-4);
+#  else
+    return floatD{pos};
+#  endif
 }
+
+#if ENABLE_EXPLODE_DISPLAY
+inline floatD setVertex(Vector const& pos, const Fiber * fib)
+{
+    GLfloat shift = fib->disp->explode_shift;
+#  if ( DIM == 1 )
+    return float2::cast(pos.XX, shift);
+#  elif ( DIM == 2 )
+    return float2::cast(pos.XX, pos.YY+shift);
+#  else
+    return float3::cast(pos.XX, pos.YY+shift, pos.ZZ);
+#  endif
+}
+#else
+inline floatD setVertex(Vector const& pos, const Fiber*)
+{
+    return floatD{pos};
+}
+#endif
 
 #if ENABLE_EXPLODE_DISPLAY
 
@@ -405,25 +403,6 @@ inline void shiftedVertex(Vector const& pos, const Fiber * fib)
 #else
     glVertex2f(pos.XX, shift);
 #endif
-}
-
-inline void drawVertex(Vector const& pos, const Fiber * fib, const PointDisp* disp)
-{
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color.load();
-        shiftedVertex(pos, fib);
-    }
-}
-
-
-inline void drawVertex2(Vector const& pos, Fiber const* fib, PointDisp const* disp)
-{
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color2.load();
-        shiftedVertex(pos, fib);
-    }
 }
 
 inline void drawLine(Vector const& a, Fiber const* fib, PointDisp const* disp, Vector const& b)
@@ -473,29 +452,6 @@ inline void drawLine(Vector const& a, const Fiber * fibA, const PointDisp* dispA
 
 #else
 
-// define macros without spatial shift:
-
-inline void drawVertex(Vector const& pos, const Fiber * fib, const PointDisp* disp)
-{
-    assert_true(fib->disp);
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color.load();
-        gleVertex(pos);
-    }
-}
-
-
-inline void drawVertex2(Vector const& pos, const Fiber * fib, const PointDisp* disp)
-{
-    if ( disp->perceptible && fib->disp->visible )
-    {
-        disp->color2.load();
-        gleVertex(pos);
-    }
-}
-
-
 inline void drawLine(Vector const& a, const Fiber * fib, const PointDisp* disp, Vector const& b)
 {
     if ( disp->perceptible && fib->disp->visible )
@@ -536,20 +492,14 @@ void Display1::drawSinglesF(const SingleSet & set) const
         {
             if ( obj->disp()->perceptible )
             {
-#if ( DIM == 1 )
-                pts[i] = float2{obj->posFoot(), obj->signature()*0x1p-28-4};
-#else
-                pts[i] = floatD{obj->posFoot()};
-#endif
+                pts[i] = setVertex(obj->posFoot(), obj);
                 col[i++] = float4{obj->disp()->color2};
             }
         }
         gle::unmapVertexBuffer();
         gle::unmapColorBuffer();
         pointSize(prop->point_size);
-        glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_POINTS, 0, i);
-        glDisableClientState(GL_COLOR_ARRAY);
     }
 }
 
@@ -557,13 +507,26 @@ void Display1::drawSinglesF(const SingleSet & set) const
 void Display1::drawSinglesA(const SingleSet & set) const
 {
     // display positions of Hands
-    if ( prop->point_size > 0 )
+    if (( prop->point_size > 0 ) & ( set.sizeF() > 0 ))
     {
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
+        glEnableClientState(GL_COLOR_ARRAY);
+        size_t i = 0, cnt = set.sizeF();
+        floatD* pts = gle::mapVertexBuffer(cnt);
+        float4* col = gle::mapColorBuffer(cnt);
         for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
-            drawVertex(obj->posHand(), obj->fiber(), obj->disp());
-        glEnd();
+        {
+            Fiber const* fib = obj->fiber();
+            if ( obj->disp()->perceptible & fib->disp->visible )
+            {
+                pts[i] = setVertex(obj->posHand(), fib);
+                col[i++] = float4{obj->disp()->color2};
+            }
+        }
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
+        pointSize(prop->point_size);
+        glDrawArrays(GL_POINTS, 0, i);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
     
     // display links to anchor points
@@ -572,6 +535,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
         lineWidth(prop->link_width);
         glBegin(GL_LINES);
         for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
+        {
             if ( obj->hasForce() )
             {
                 Vector ph = obj->posHand();
@@ -579,6 +543,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 if ( modulo ) modulo->fold(pf, ph);
                 drawLine(ph, obj->fiber(), obj->disp(), pf);
             }
+        }
         glEnd();
     }
 }
@@ -597,20 +562,15 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         float4* col = gle::mapColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
-            if ( obj->active() && obj->disp1()->perceptible )
+            if ( obj->active() & obj->disp1()->perceptible )
             {
-#if ( DIM == 1 )
-                pts[i] = float2{obj->posFree(), obj->signature()*0x1p-28-4};
-#else
-                pts[i] = floatD{obj->posFree()};
-#endif
+                pts[i] = setVertex(obj->posFree(), obj);
                 col[i++] = float4{obj->disp1()->color2};
             }
         }
         gle::unmapVertexBuffer();
         gle::unmapColorBuffer();
         pointSize(prop->point_size);
-        glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_POINTS, 0, i);
 
 #if ( DIM > 1 )
@@ -631,7 +591,6 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         pointSize(M_SQRT1_2*prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
 #endif
-        glDisableClientState(GL_COLOR_ARRAY);
     }
 }
 
@@ -645,69 +604,114 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
 {
     if (( prop->point_size > 0 ) & ( set.sizeFF() > 0 ))
     {
+        size_t i = 0, cnt = set.sizeFF();
+        floatD* pts = gle::mapVertexBuffer(cnt);
+        float4* col = gle::mapColorBuffer(cnt);
         Couple * nxt;
         Couple * obj = set.firstFF();
 
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
         if ( set.sizeFF() & 1 )
         {
             nxt = obj->next();
-            drawVertex(obj->posFree(), obj->disp12());
+            if ( obj->disp12()->perceptible )
+            {
+                pts[i] = setVertex(obj->posFree(), obj);
+                col[i++] = float4{obj->disp12()->color2};
+            }
             obj = nxt;
         }
         while ( obj )
         {
             nxt = obj->next();
-            drawVertex(obj->posFree(), obj->disp21());
+            if ( obj->disp21()->perceptible )
+            {
+                pts[i] = setVertex(obj->posFree(), obj);
+                col[i++] = float4{obj->disp21()->color2};
+            }
             obj = nxt->next();
-            drawVertex(nxt->posFree(), nxt->disp12());
+            if ( nxt->disp12()->perceptible )
+            {
+                pts[i] = setVertex(nxt->posFree(), nxt);
+                col[i++] = float4{nxt->disp12()->color2};
+            }
         }
-        glEnd();
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
+        pointSize(prop->point_size);
+        glDrawArrays(GL_POINTS, 0, i);
     }
 }
 
 
 void Display1::drawCouplesA(CoupleSet const& set) const
 {
-    if ( prop->point_size > 0 )
+    if (( prop->point_size > 0 ) & ( set.sizeAF()+set.sizeFA() > 0 ))
     {
-        // display bound couples
+        size_t i = 0, cnt = set.sizeAF()+set.sizeFA();
+        floatD* pts = gle::mapVertexBuffer(cnt);
+        float4* col = gle::mapColorBuffer(cnt);
+        for ( Couple * obj=set.firstAF(); obj ; obj=obj->next() )
+        {
+            Fiber const* fib = obj->fiber1();
+            if ( obj->disp1()->perceptible & fib->disp->visible )
+            {
+                pts[i] = setVertex(obj->posHand1(), fib);
+                col[i++] = float4{obj->disp1()->color2};
+            }
+        }
+        for ( Couple * obj=set.firstFA(); obj ; obj=obj->next() )
+        {
+            Fiber const* fib = obj->fiber2();
+            if ( obj->disp2()->perceptible & fib->disp->visible )
+            {
+                pts[i] = setVertex(obj->posHand2(), fib);
+                col[i++] = float4{obj->disp2()->color2};
+            }
+        }
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
         pointSize(prop->point_size);
-        glBegin(GL_POINTS);
-        
-        for ( Couple * cx=set.firstAF(); cx ; cx=cx->next() )
-            drawVertex2(cx->posHand1(), cx->fiber1(), cx->disp1());
-        
-        for ( Couple * cx=set.firstFA(); cx ; cx=cx->next() )
-            drawVertex2(cx->posHand2(), cx->fiber2(), cx->disp2());
-        
-        glEnd();
+        glDrawArrays(GL_POINTS, 0, i);
     }
 }
 
 
 void Display1::drawCouplesB(CoupleSet const& set) const
 {
-    // display bridging couples
-    if ( prop->point_size > 0 )
+    if (( prop->point_size > 0 ) & ( set.sizeAA() > 0 ) )
     {
-        pointSize(prop->point_size);
-        glBegin(GL_POINTS);
-        for ( Couple * cx=set.firstAA(); cx ; cx=cx->next() )
+        glEnableClientState(GL_COLOR_ARRAY);
+        size_t i = 0, cnt = 2 * set.sizeAA();
+        floatD* pts = gle::mapVertexBuffer(cnt);
+        float4* col = gle::mapColorBuffer(cnt);
+        for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
         {
 #if ( 0 )
             // only display if bridging two anti-parallel filaments
-            if ( prop->couple_select & 8  && cx->cosAngle() > 0 )
+            if ( prop->couple_select & 8  && obj->cosAngle() > 0 )
                 continue;
             // only display if bridging two parallel filaments
-            if ( prop->couple_select & 16 && cx->cosAngle() < 0 )
+            if ( prop->couple_select & 16 && obj->cosAngle() < 0 )
                 continue;
 #endif
-            drawVertex(cx->posHand1(), cx->fiber1(), cx->disp1());
-            drawVertex(cx->posHand2(), cx->fiber2(), cx->disp2());
+            Fiber const* fib1 = obj->fiber1();
+            Fiber const* fib2 = obj->fiber2();
+            if ( obj->disp1()->perceptible & fib1->disp->visible )
+            {
+                pts[i] = setVertex(obj->posHand1(), fib1);
+                col[i++] = float4{obj->disp1()->color};
+            }
+            if ( obj->disp2()->perceptible & fib2->disp->visible )
+            {
+                pts[i] = setVertex(obj->posHand2(), fib2);
+                col[i++] = float4{obj->disp2()->color};
+            }
         }
-        glEnd();
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
+        pointSize(prop->point_size);
+        glDrawArrays(GL_POINTS, 0, i);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
     
     // display the link for bridging couples

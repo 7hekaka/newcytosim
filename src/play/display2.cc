@@ -99,7 +99,7 @@ void Display2::drawBead(Bead const& obj)
     if ( disp->style & 2  && disp->perceptible )
     {
         bodyColor(obj);
-        drawObject(obj.position(), disp->size, gle::sphere1);
+        drawObject(obj.position(), disp->size, gle::tetrahedron);
     }
     
 #if ( DIM == 2 )
@@ -528,14 +528,19 @@ void Display2::drawCoupleB(Couple const* cx) const
             glBegin(GL_LINE_STRIP);
             Vector d1 = len * cx->dirFiber1();
             Vector d2 = len * cx->dirFiber2();
+            pd1->color.load();
             gleVertex(p1);
+            pd1->color.blend(pd2->color).load();
             gleVertex(0.5*((p1+d1)+(p2+d2)));
+            pd2->color.load();
             gleVertex(p2);
             glEnd();
 #else
             lineWidth(pd1->width);
             glBegin(GL_LINES);
+            pd1->color.load();
             gleVertex(p1);
+            pd2->color.load();
             gleVertex(p2);
             glEnd();
 #endif

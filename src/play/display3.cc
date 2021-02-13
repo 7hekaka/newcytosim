@@ -133,41 +133,49 @@ void Display3::drawSimul(Simul const& sim)
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Drawing primitives
 
-inline void Display3::drawTBall(Vector const& pos, float radius, gle_color const& col) const
+inline void Display3::drawTBall(Vector const& pos, float rad, gle_color const& col) const
 {
     glEnable(GL_LIGHTING);
     col.load_both();
-    glPushMatrix();
-    gle::translate(pos);
-    gle::scale(radius);
-    gle::dualPassSphere4();
-    glPopMatrix();
+    drawObject(pos, rad, gle::dualPassSphere4);
 }
 
 
-inline void Display3::drawPoint(Vector const& pos, float size) const
+inline void Display3::drawPoint(Vector const& pos, float rad) const
 {
     glEnable(GL_LIGHTING);
-    glPushMatrix();
-    gle::translate(pos);
-    gle::scale(size*sFactor);
-    gle::sphere2();
-    glPopMatrix();
+    drawObject(pos, rad, gle::sphere2);
 }
 
 
-inline void Display3::drawPoint(Vector const& pos, PointDisp const* disp) const
+inline void Display3::drawPoint(Vector const& pos, PointDisp const* dis) const
 {
-    if ( disp->perceptible )
+    if ( dis->perceptible )
     {
         glEnable(GL_LIGHTING);
-        glPushMatrix();
-        gle::translate(pos);
-        gle::scale(disp->size*sFactor);
-        gle::sphere1();
-        glPopMatrix();
+        drawObject(pos, dis->size, gle::sphere1);
+    }
+}
+
+/// draw a point with a small sphere
+inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
+{
+    if ( dis->perceptible )
+    {
+        dis->color.load_both();
+        drawObject(pos, dis->size, gle::sphere2);
+    }
+}
+
+/// draw a point with a small sphere
+inline void Display3::drawHand2(Vector const& pos, PointDisp const* dis) const
+{
+    if ( dis->perceptible )
+    {
+        dis->color2.load_both();
+        drawObject(pos, dis->size, gle::sphere2);
     }
 }
 
@@ -729,7 +737,7 @@ void Display3::drawBead(Bead const& obj)
     if ( disp->style & 2 )
     {
         bodyColor(obj);
-        drawPoint(obj.position(), disp);
+        drawObject(obj.position(), disp->size, gle::tetrahedron);
     }
     
 #if ( DIM == 2 )
