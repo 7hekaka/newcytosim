@@ -165,19 +165,19 @@ void Display::drawSimul(Simul const& sim)
     drawSolids(sim.solids);
     drawSpheres(sim.spheres);
     
-    if ( prop->single_select & 1 )
+    if (( prop->single_select & 1 ) & ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
     
-    if ( prop->couple_select & 1 )
+    if (( prop->couple_select & 1 ) & ( sim.couples.sizeFF() > 0 ))
         drawCouplesF(sim.couples);
 
-    if ( prop->couple_select & 2 )
+    if (( prop->couple_select & 2 ) & ( sim.couples.sizeA() > 0 ))
         drawCouplesA(sim.couples);
 
-    if ( prop->couple_select & 4 )
+    if (( prop->couple_select & 4 ) & ( sim.couples.sizeAA() > 0 ))
         drawCouplesB(sim.couples);
 
-    if ( prop->single_select & 2 )
+    if (( prop->single_select & 2 ) & ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
     
     if ( stencil_ )

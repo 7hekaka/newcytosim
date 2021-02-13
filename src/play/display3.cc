@@ -105,19 +105,19 @@ void Display3::drawSimul(Simul const& sim)
     drawSolids(sim.solids);
     drawSpheres(sim.spheres);
     
-    if ( prop->single_select & 1 )
+    if (( prop->single_select & 1 ) && ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
     
-    if ( prop->couple_select & 1 )
+    if (( prop->couple_select & 1 ) && ( sim.couples.sizeFF() > 0 ))
         drawCouplesF(sim.couples);
 
-    if ( prop->couple_select & 2 )
+    if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
         drawCouplesA(sim.couples);
 
-    if ( prop->couple_select & 4 )
+    if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
         drawCouplesB(sim.couples);
 
-    if ( prop->single_select & 2 )
+    if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
     
     if ( stencil_ )
@@ -895,13 +895,9 @@ void Display3::drawSphereT(Sphere const& obj)
 void Display3::drawOrganizer(Organizer const& obj) const
 {
     PointDisp const* disp = obj.disp();
-    
-    if ( !disp )
-        return;
+    const real wid = disp->width * sFactor;
 
-    const real w = disp->width*sFactor;
-
-    if ( disp->style & 2 )
+    if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
         bodyColor(disp, obj.signature());
@@ -910,14 +906,14 @@ void Display3::drawOrganizer(Organizer const& obj) const
         {
             drawPoint(P, disp);
             if ( modulo ) modulo->fold(Q, P);
-            gleTube(P, Q, w, gle::tube1);
+            gleTube(P, Q, wid, gle::tube1);
         }
     }
     /**
      This displays the Solid connecting two Aster as a spindle.
      Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
-    if ( disp->style & 1 && obj.tag() == Fake::TAG )
+    if ( disp && ( disp->style & 1 ) && obj.tag() == Fake::TAG )
     {
         Solid const* sol = Solid::toSolid(obj.core());
         if ( sol && sol->nbPoints() >= 4 )
@@ -933,7 +929,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             glPopMatrix();
 #else
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
-                gleTube(sol->posPoint(i), sol->posPoint(i+1), w, gle::hexTube);
+                gleTube(sol->posPoint(i), sol->posPoint(i+1), wid, gle::hexTube);
 #endif
         }
     }

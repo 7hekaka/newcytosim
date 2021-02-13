@@ -44,13 +44,13 @@ void Display2::drawSimul(Simul const& sim)
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
 
-    if ( prop->couple_select & 1 )
+    if (( prop->couple_select & 1 ) && ( sim.couples.sizeFF() > 0 ))
         drawCouplesF(sim.couples);
     
-    if ( prop->couple_select & 2 )
+    if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
         drawCouplesA(sim.couples);
     
-    if ( prop->single_select & 1 )
+    if (( prop->single_select & 1 ) && ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
     
     drawFibers(sim.fibers);
@@ -72,10 +72,10 @@ void Display2::drawSimul(Simul const& sim)
     glDisable(GL_CULL_FACE);
 #endif
 
-    if ( prop->couple_select & 4 )
+    if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
         drawCouplesB(sim.couples);
     
-    if ( prop->single_select & 2 )
+    if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
     
 #if ( DIM == 3 )
@@ -272,11 +272,8 @@ void Display2::drawSphereT(Sphere const& obj)
 void Display2::drawOrganizer(Organizer const& obj) const
 {
     PointDisp const* disp = obj.disp();
-    
-    if ( !disp )
-        return;
 
-    if ( disp->style & 2 )
+    if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
         glDisable(GL_LIGHTING);
@@ -300,7 +297,7 @@ void Display2::drawOrganizer(Organizer const& obj) const
      This display the Solid connecting two Aster as a spindle.
      Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
-    if ( disp->style & 1 && obj.tag() == Fake::TAG )
+    if ( disp && ( disp->style & 1 ) && obj.tag() == Fake::TAG )
     {
         Solid const* sol = Solid::toSolid(obj.core());
         if ( sol && sol->nbPoints() >= 4 )
