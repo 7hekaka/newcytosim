@@ -358,7 +358,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
         glBegin(GL_POINTS);
         glColor3f(1.f, 0.f, 0.f);
         for ( size_t n = 0; n < n_pts; ++n )
-            glVertex3d( pts[n].XX, pts[n].YY, pts[n].ZZ );
+            glVertex3d(pts[n].XX, pts[n].YY, pts[n].ZZ);
         glEnd();
         
         //draw the edges of the volume:

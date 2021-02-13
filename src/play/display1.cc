@@ -530,8 +530,8 @@ void Display1::drawSinglesF(const SingleSet & set) const
     if (( prop->point_size > 0 ) & ( set.sizeF() > 0 ))
     {
         size_t i = 0, cnt = set.sizeF();
-        floatD* pts = mapVertexBuffer(cnt);
-        float4* col = mapColorBuffer(cnt);
+        floatD* pts = gle::mapVertexBuffer(cnt);
+        float4* col = gle::mapColorBuffer(cnt);
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
@@ -544,8 +544,8 @@ void Display1::drawSinglesF(const SingleSet & set) const
                 col[i++] = float4{obj->disp()->color2};
             }
         }
-        unmapVertexBuffer();
-        unmapColorBuffer();
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
         pointSize(prop->point_size);
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_POINTS, 0, i);
@@ -593,8 +593,8 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
     if (( prop->point_size > 0 ) & ( set.sizeFF() > 0 ))
     {
         size_t i = 0, cnt = set.sizeFF();
-        floatD* pts = mapVertexBuffer(cnt);
-        float4* col = mapColorBuffer(cnt);
+        floatD* pts = gle::mapVertexBuffer(cnt);
+        float4* col = gle::mapColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( obj->active() && obj->disp1()->perceptible )
@@ -607,8 +607,8 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
                 col[i++] = float4{obj->disp1()->color2};
             }
         }
-        unmapVertexBuffer();
-        unmapColorBuffer();
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
         pointSize(prop->point_size);
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_POINTS, 0, i);
@@ -616,8 +616,8 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
 #if ( DIM > 1 )
         // display inactive Couples with smaller size:
         i = 0;
-        pts = mapVertexBuffer(cnt);
-        col = mapColorBuffer(cnt);
+        pts = gle::mapVertexBuffer(cnt);
+        col = gle::mapColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( !obj->active() && obj->disp1()->perceptible )
@@ -626,8 +626,8 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
                 col[i++] = float4{obj->disp1()->color2};
             }
         }
-        unmapVertexBuffer();
-        unmapColorBuffer();
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
         pointSize(M_SQRT1_2*prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
 #endif

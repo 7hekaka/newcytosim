@@ -286,7 +286,7 @@ set a RGB color as a function of a value h in [0, 4].
 The result vary from dark-blue, blue, cyan, yellow, orange to red:
 - 0 : dark-blue
 - 1 : blue
-- 2 : green
+- 2 : cyan
 - 3 : red
 - 4 : full red
 */

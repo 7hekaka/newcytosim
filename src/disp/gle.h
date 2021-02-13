@@ -7,7 +7,13 @@
 #include "opengl.h"
 #include "gle_color.h"
 #include "vector.h"
+#include "vector_float.h"
 
+#if ( DIM == 3 )
+typedef float3 floatD;
+#else
+typedef float2 floatD;
+#endif
 
 /// Simple geometrical objects drawn with OpenGL
 /**
@@ -46,6 +52,12 @@ namespace gle
 
     /// calculate sinus and cosinus for a circular arc
     void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
+
+    
+    floatD* mapVertexBuffer(size_t);
+    void  unmapVertexBuffer();
+    float4* mapColorBuffer(size_t);
+    void  unmapColorBuffer();
 
 #pragma mark -
     

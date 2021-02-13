@@ -31,8 +31,6 @@ Display::Display(DisplayProp const* dp)
 {
     assert_true(dp);
     prep_time = -1;
-    for ( int u = 0; u < 4; ++u )
-        glbuf[u] = 0;
 }
 
 void Display::setPixelFactors(GLfloat ps, GLfloat u)
@@ -45,50 +43,11 @@ void Display::setPixelFactors(GLfloat ps, GLfloat u)
      */
     sFactor = 0.5f * u * ps;
     minRadius = 0.5 * pixelSize / sFactor;
-    
-    if ( !glIsBuffer(glbuf[0]) )
-        glGenBuffers(4, glbuf);
 }
 
 Display::~Display()
 {
 }
-
-//------------------------------------------------------------------------------
-#pragma mark - Buffers
-
-floatD* Display::mapVertexBuffer(size_t cnt) const
-{
-    constexpr size_t DOUZE = (DIM>1?DIM:2) * sizeof(float);
-    glBindBuffer(GL_ARRAY_BUFFER, glbuf[0]);
-    glBufferData(GL_ARRAY_BUFFER, DOUZE*cnt, nullptr, GL_STREAM_DRAW);
-    return (floatD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-}
-
-void Display::unmapVertexBuffer() const
-{
-    glBindBuffer(GL_ARRAY_BUFFER, glbuf[0]);
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    glVertexPointer((DIM>1?DIM:2), GL_FLOAT, 0, nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-float4* Display::mapColorBuffer(size_t cnt) const
-{
-    constexpr size_t SEIZE = 4 * sizeof(float);
-    glBindBuffer(GL_ARRAY_BUFFER, glbuf[3]);
-    glBufferData(GL_ARRAY_BUFFER, SEIZE*cnt, nullptr, GL_STREAM_DRAW);
-    return (float4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-}
-
-void Display::unmapColorBuffer() const
-{
-    glBindBuffer(GL_ARRAY_BUFFER, glbuf[3]);
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    glColorPointer(4, GL_FLOAT, 0, nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark - drawObject
@@ -623,7 +582,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
 {
     const PointDisp * disp = obj->prop->disp;
     
-    bool back = ( disp->visible & 2 ) & ( disp->color2.opaque() == opaque );
+    bool back = ( disp->visible & 2 ) && ( disp->color2.opaque() == opaque );
     bool front = ( disp->visible & 1 ) & ( disp->color.opaque() == opaque );
     
     if ( back | front )
@@ -657,10 +616,7 @@ void Display::drawSpaces(SpaceSet const& set)
     for ( Space * obj = set.first(); obj; obj=obj->next() )
     {
         if ( obj->prop->disp->visible )
-        {
-            obj->prop->disp->color.load_load();
             drawSpace(obj, true);
-        }
     }
 
 #else
@@ -672,7 +628,7 @@ void Display::drawSpaces(SpaceSet const& set)
         {
             glDisable(GL_LIGHTING);
             lineWidth(disp->width);
-            disp->color.load_load();
+            disp->color.load();
             obj->draw2D();
         }
     }

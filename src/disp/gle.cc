@@ -14,8 +14,6 @@
 
 namespace gle
 {
-    constexpr size_t DOUZE = 3*sizeof(float);
-    
     /// function callback
     using drawCall = void (*)(GLsizei, GLfloat*, GLuint);
 
@@ -24,6 +22,9 @@ namespace gle
     
     inline GLfloat cos_(size_t n) { return cir_[4+2*n]; }
     inline GLfloat sin_(size_t n) { return cir_[5+2*n]; }
+    
+    /// OpenGL buffers objects for streaming
+    GLuint stream_[4] = { 0 };
 
     /// vertex buffer objects for tubes
     GLuint tub_[24] = { 0 };
@@ -43,6 +44,87 @@ namespace gle
 #else
     inline float invsqrt(float x) { return 1.0f / sqrtf(x); }
 #endif
+
+    void initialize()
+    {
+        CHECK_GL_ERROR("before gle:initialize()");
+#ifndef __APPLE__
+        //need to initialize GLEW on Linux
+        const GLenum err = glewInit();
+        if ( GLEW_OK != err )
+        {
+            /* Problem: glewInit failed, something is seriously wrong. */
+            fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+            exit(1);
+        }
+#endif
+        // store { 0, 0 } at the start of circle
+        for ( size_t i = 0; i < 4; ++i )
+            cir_[i] = 0;
+        // circle starts at index 4
+        compute_circle(ncircle, cir_+4, 1);
+        
+        initSphereBuffers();
+        CHECK_GL_ERROR("gle:initSphereBuffers()");
+        initTubeBuffers();
+        CHECK_GL_ERROR("gle:initTubeBuffers()");
+        initBuffers();
+        CHECK_GL_ERROR("gle:initBuffers()");
+        if ( !glIsBuffer(stream_[0]) )
+            glGenBuffers(4, stream_);
+        CHECK_GL_ERROR("glGenBuffers(4, stream_)");
+        std::atexit(release);
+    }
+    
+    void release()
+    {
+        glDeleteBuffers(16, ico_);
+        ico_[0] = 0;
+        glDeleteBuffers(24, tub_);
+        tub_[0] = 0;
+        glDeleteBuffers(16, buf_);
+        buf_[0] = 0;
+        glDeleteBuffers(4, stream_);
+        stream_[0] = 0;
+    }
+
+    //------------------------------------------------------------------------------
+    #pragma mark - Buffers
+
+    floatD* mapVertexBuffer(size_t cnt)
+    {
+        constexpr size_t DOUZE = (DIM>1?DIM:2) * sizeof(float);
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
+        glBufferData(GL_ARRAY_BUFFER, DOUZE*cnt, nullptr, GL_STREAM_DRAW);
+        return (floatD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    }
+
+    void unmapVertexBuffer()
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glVertexPointer((DIM>1?DIM:2), GL_FLOAT, 0, nullptr);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    float4* mapColorBuffer(size_t cnt)
+    {
+        constexpr size_t SEIZE = 4 * sizeof(float);
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[3]);
+        glBufferData(GL_ARRAY_BUFFER, SEIZE*cnt, nullptr, GL_STREAM_DRAW);
+        return (float4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    }
+
+    void unmapColorBuffer()
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[3]);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glColorPointer(4, GL_FLOAT, 0, nullptr);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
+    //-----------------------------------------------------------------------
+    #pragma mark - Arcs
 
     /// Calculates coordinates over an arc of circle
     /**
@@ -92,44 +174,6 @@ namespace gle
                      double angle, GLfloat cX, GLfloat cY)
     {
         set_arc(cnt, ptr, rad, start, angle/(cnt-1), cX, cY);
-    }
-    
-    void initialize()
-    {
-        CHECK_GL_ERROR("before gle:initialize()");
-#ifndef __APPLE__
-        //need to initialize GLEW on Linux
-        const GLenum err = glewInit();
-        if ( GLEW_OK != err )
-        {
-            /* Problem: glewInit failed, something is seriously wrong. */
-            fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-            exit(1);
-        }
-#endif
-        // store { 0, 0 } at the start of circle
-        for ( size_t i = 0; i < 4; ++i )
-            cir_[i] = 0;
-        // circle starts at index 4
-        compute_circle(ncircle, cir_+4, 1);
-        
-        initSphereBuffers();
-        CHECK_GL_ERROR("gle:initSphereBuffers()");
-        initTubeBuffers();
-        CHECK_GL_ERROR("gle:initTubeBuffers()");
-        initBuffers();
-        CHECK_GL_ERROR("gle:initBuffers()");
-        std::atexit(release);
-    }
-    
-    void release()
-    {
-        glDeleteBuffers(16, ico_);
-        ico_[0] = 0;
-        glDeleteBuffers(24, tub_);
-        tub_[0] = 0;
-        glDeleteBuffers(16, buf_);
-        buf_[0] = 0;
     }
     
     //-----------------------------------------------------------------------
@@ -1063,6 +1107,7 @@ namespace gle
     
     GLuint initIcoBuffer(GLuint buf1, GLuint buf2, Platonic::Solid & ico)
     {
+        constexpr size_t DOUZE = 3*sizeof(float);
         //std::clog << "initializeIco ico " << ico.nb_faces() << '\n';
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
         glBufferData(GL_ARRAY_BUFFER, DOUZE*ico.nb_vertices(), nullptr, GL_STATIC_DRAW);
