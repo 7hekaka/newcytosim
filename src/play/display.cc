@@ -858,8 +858,10 @@ void Display::drawStrip(size_t cnt, real const* pts, GLenum prim)
 
 void Display::drawFiberBackbone(Fiber const& fib)
 {
+    bool l = glIsEnabled(GL_LIGHTING);
     glDisable(GL_LIGHTING);
     drawStrip(fib.nbPoints(), fib.addrPoints(), GL_LINE_STRIP);
+    if ( l ) glEnable(GL_LIGHTING);
 }
 
 void Display::drawFiberLines(Fiber const& fib) const

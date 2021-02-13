@@ -32,7 +32,7 @@ private:
     inline void drawHand(Vector const& pos, PointDisp const* dis) const;
 
     /// draw a point with a small sphere
-    inline void drawHand2(Vector const& pos, PointDisp const* dis) const;
+    inline void drawHandF(Vector const& pos, PointDisp const* dis) const;
     
     /// draw Fiber model segments
     void drawFiberSegments(Fiber const&, real rad,

@@ -125,6 +125,7 @@ void Display3::drawSimul(Simul const& sim)
         glClearStencil(0);
         glDisable(GL_STENCIL_TEST);
     }
+    assert_true(glIsEnabled(GL_LIGHTING));
 
     drawOrganizers(sim.organizers);
     glDisable(GL_CULL_FACE);
@@ -137,7 +138,7 @@ void Display3::drawSimul(Simul const& sim)
 
 inline void Display3::drawTBall(Vector const& pos, float rad, gle_color const& col) const
 {
-    glEnable(GL_LIGHTING);
+    assert_true(glIsEnabled(GL_LIGHTING));
     col.load_both();
     drawObject(pos, rad, gle::dualPassSphere4);
 }
@@ -145,8 +146,8 @@ inline void Display3::drawTBall(Vector const& pos, float rad, gle_color const& c
 
 inline void Display3::drawPoint(Vector const& pos, float rad) const
 {
-    glEnable(GL_LIGHTING);
-    drawObject(pos, rad, gle::sphere2);
+    assert_true(glIsEnabled(GL_LIGHTING));
+    drawObject(pos, rad, gle::sphere1);
 }
 
 
@@ -154,7 +155,7 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
-        glEnable(GL_LIGHTING);
+        assert_true(glIsEnabled(GL_LIGHTING));
         drawObject(pos, dis->size, gle::sphere1);
     }
 }
@@ -164,18 +165,20 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
+        assert_true(glIsEnabled(GL_LIGHTING));
         dis->color.load_both();
-        drawObject(pos, dis->size, gle::sphere2);
+        drawObject(pos, dis->size, gle::sphere1);
     }
 }
 
 /// draw a point with a small sphere
-inline void Display3::drawHand2(Vector const& pos, PointDisp const* dis) const
+inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
+        assert_true(glIsEnabled(GL_LIGHTING));
         dis->color2.load_both();
-        drawObject(pos, dis->size, gle::sphere2);
+        drawObject(pos, dis->size, gle::sphere1);
     }
 }
 
@@ -748,6 +751,7 @@ void Display3::drawBead(Bead const& obj)
         bodyColorF(obj).load();
         lineWidth(disp->width);
         drawFlat(obj.position(), obj.radius(), gle::circle);
+        glEnable(GL_LIGHTING);
     }
 #endif
 }
@@ -811,6 +815,7 @@ void Display3::drawSolid(Solid const& obj)
         lineWidth(1.0);
         bodyColorF(obj).load();
         drawStrip(obj.nbPoints(), obj.addrPoints(), GL_LINE_LOOP);
+        glEnable(GL_LIGHTING);
     }
 }
 
@@ -895,13 +900,13 @@ void Display3::drawSphereT(Sphere const& obj)
 void Display3::drawOrganizer(Organizer const& obj) const
 {
     PointDisp const* disp = obj.disp();
-    const real wid = disp->width * sFactor;
 
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
         bodyColor(disp, obj.signature());
-        
+        const real wid = disp->width * sFactor;
+
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
             drawPoint(P, disp);
@@ -928,6 +933,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             gle::dualPass(gle::barrel);
             glPopMatrix();
 #else
+            const real wid = disp->width * sFactor;
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
                 gleTube(sol->posPoint(i), sol->posPoint(i+1), wid, gle::hexTube);
 #endif
@@ -962,7 +968,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
             if ( obj->base() )
                 drawObject(obj->posFoot(), obj->disp()->size, gle::octahedron);
             else
-                drawPoint(obj->posFoot(), obj->disp());
+                drawHandF(obj->posFoot(), obj->disp());
         }
     }
 }
@@ -1000,7 +1006,7 @@ void Display3::drawSingleA(Single const* obj) const
     if ( obj->base() )
         drawObject(ph, disp->size, gle::octahedron);
     else
-        drawPoint(ph, disp);
+        drawHand(ph, disp);
 }
 
 void Display3::drawSinglesA(SingleSet const& set) const
@@ -1020,7 +1026,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
 void Display3::drawCouplesF1(CoupleSet const& set) const
 {
     for ( Couple * cx = set.firstFF(); cx ; cx=cx->next() )
-        drawHand2(cx->posFree(), cx->disp1());
+        drawHandF(cx->posFree(), cx->disp1());
 }
 
 
@@ -1037,15 +1043,15 @@ void Display3::drawCouplesF2(CoupleSet const& set) const
     if ( set.sizeFF() & 1 )
     {
         nxt = obj->next();
-        drawHand2(obj->posFree(), obj->disp12());
+        drawHandF(obj->posFree(), obj->disp12());
         obj = nxt;
     }
     while ( obj )
     {
         nxt = obj->next();
-        drawHand2(obj->posFree(), obj->disp21());
+        drawHandF(obj->posFree(), obj->disp21());
         obj = nxt->next();
-        drawHand2(nxt->posFree(), nxt->disp12());
+        drawHandF(nxt->posFree(), nxt->disp12());
     }
 }
 

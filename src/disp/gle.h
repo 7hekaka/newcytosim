@@ -23,7 +23,8 @@ typedef float2 floatD;
 namespace gle
 {
     /// this defines the number of triangles used to draw shapes
-    /** higher finesse improves the rendering: 8 is good, 16 is nice and 32 is very nice */
+    /** Should be a multiple of 6; higher finesse improves the rendering:
+     6 is okay, 12 is nice and 24 is very nice */
     constexpr size_t finesse = 12;
     
     /// number of circle points stored in buffer

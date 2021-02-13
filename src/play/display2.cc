@@ -78,6 +78,7 @@ void Display2::drawSimul(Simul const& sim)
     if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
     
+
 #if ( DIM == 3 )
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
@@ -86,6 +87,8 @@ void Display2::drawSimul(Simul const& sim)
 
     drawOrganizers(sim.organizers);
     drawMisc(sim);
+
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 }
 
 //------------------------------------------------------------------------------

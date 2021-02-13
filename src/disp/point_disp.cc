@@ -11,7 +11,7 @@
 
 
 /// if this is defined, the pixelmap are stored in graphical memory
-#define POINTDISP_USES_PIXEL_BUFFERS 0
+#define POINTDISP_USES_PIXEL_BUFFERS 1
 
 
 void PointDisp::clearPixelmaps()
@@ -330,9 +330,9 @@ void PointDisp::drawPixelmap(size_t inx) const
     //translate to center the bitmap:
     glBitmap(0,0,0,0,mOffs,mOffs,nullptr);
 #if POINTDISP_USES_PIXEL_BUFFERS
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, pbo_[ii]);
-    glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_[inx]);
+    glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    //glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 #else
     glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp_[inx]);
 #endif
