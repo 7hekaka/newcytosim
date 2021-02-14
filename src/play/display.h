@@ -191,7 +191,7 @@ public:
     virtual void drawFiberPlusEnd(Fiber const&, int style, real size) const;
 
     /// draw Fiber linear features
-    virtual void drawFiberLines(Fiber const&) const;
+    virtual void drawFiberLines(Fiber const&, int style) const;
     
     /// draw one segment of a Fiber (used to display transparent fibers)
     virtual void drawFiberSegmentT(Fiber const&, size_t) const;

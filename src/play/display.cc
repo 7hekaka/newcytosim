@@ -864,186 +864,167 @@ void Display::drawFiberBackbone(Fiber const& fib)
     if ( l ) glEnable(GL_LIGHTING);
 }
 
-void Display::drawFiberLines(Fiber const& fib) const
-{
-    FiberDisp const*const disp = fib.prop->disp;
-    GLfloat alpha = disp->color.transparency();
 
-    switch ( disp->line_style )
+void Display::drawFiberLines(Fiber const& fib, int style) const
+{
+    size_t i = 0, cnt = 2 * fib.nbPoints();
+    fluteD* pts = gle::mapVertexBuffer(cnt);
+    flute4* col = gle::mapColorBuffer(cnt);
+    
+    switch ( style )
     {
-        case 1:
-        {
-            fib.disp->color.load();
-            // display plain lines:
-            lineWidth(disp->line_width);
-            drawFiberBackbone(fib);
+        case 1: { // display plain lines:
+            gle_color c = fib.prop->disp->color;
+            for ( i = 0; i < fib.nbPoints(); ++i )
+            {
+                pts[i] = fib.posP(i);
+                col[i] = c;
+            }
         } break;
-        case 2:
-        {
-            // display segments with color indicating internal tension
-            lineWidth(disp->line_width);
-            glBegin(GL_LINES);
+        case 2: // display segments with color indicating internal tension
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                color_by_tension(fib, n).load();
-                gle::gleVertex(fib.posP(n));
-                gle::gleVertex(fib.posP(n+1));
+                gle_color c = color_by_tension(fib, n);
+                pts[i] = fib.posP(n);
+                col[i++] = c;
+                pts[i] = fib.posP(n+1);
+                col[i++] = c;
             }
-            glEnd();
-        } break;
-        case 3:
-        {
-            // display segments with color indicating internal tension
-            lineWidth(disp->line_width);
-            glBegin(GL_LINES);
+            break;
+        case 3: // display segments with color indicating internal tension
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                color_by_tension_jet(fib, n).load(alpha);
-                gle::gleVertex(fib.posP(n));
-                gle::gleVertex(fib.posP(n+1));
+                gle_color c = color_by_tension_jet(fib, n);
+                pts[i] = fib.posP(n);
+                col[i++] = c;
+                pts[i] = fib.posP(n+1);
+                col[i++] = c;
             }
-            glEnd();
-        } break;
-        case 4:
-        {
-            // display segments with color indicating the curvature
-            lineWidth(disp->line_width);
-            glBegin(GL_LINE_STRIP);
-            color_by_curvature(fib, 0).load(alpha);
-            gle::gleVertex(fib.posEndM());
-            for ( size_t n = 1; n < fib.lastPoint(); ++n )
+            break;
+        case 4: // display segments with color indicating the curvature
+            for ( i = 0; i < fib.nbPoints(); ++i )
             {
-                color_by_curvature(fib, n).load(alpha);
-                gle::gleVertex(fib.posP(n));
+                pts[i] = fib.posP(i);
+                col[i] = color_by_curvature(fib, i);
             }
-            color_by_curvature(fib, fib.lastPoint()).load(alpha);
-            gle::gleVertex(fib.posEndP());
-            glEnd();
-        } break;
-        case 5:
-        {
-            // color according to the angle with respect to the XY-plane:
-            lineWidth(disp->line_width);
-            glBegin(GL_LINES);
+            break;
+        case 5: // color according to the angle with respect to the XY-plane:
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
-                color_by_direction(fib, n).load(alpha);
-                gle::gleVertex(fib.posP(n));
-                gle::gleVertex(fib.posP(n+1));
+                gle_color c = color_by_direction(fib, n);
+                pts[i] = fib.posP(n);
+                col[i++] = c;
+                pts[i] = fib.posP(n+1);
+                col[i++] = c;
             }
-            glEnd();
-        } break;
-        case 6:
-        {
-            // color according to the distance from the minus end
-            lineWidth(disp->line_width);
-            glBegin(GL_LINE_STRIP);
-            color_by_distanceM(fib, 0).load();
-            gle::gleVertex(fib.posEndM());
+            break;
+        case 6: // color according to the distance from the minus end
             for ( real dx = 0.125; dx < 0.6; dx *= 2 )
             {
-                color_by_distanceM(fib, dx).load();
-                gle::gleVertex(fib.posPoint(0, dx));
+                pts[i] = fib.posPoint(0, dx);
+                col[i++] = color_by_distanceM(fib, dx);
             }
             for ( size_t n = 1; n < fib.nbPoints(); ++n )
             {
-                color_by_distanceM(fib, n).load();
-                gle::gleVertex(fib.posP(n));
+                pts[i] = fib.posP(n);
+                col[i++] = color_by_distanceM(fib, n);
             }
-            glEnd();
-        } break;
-        case 7:
-        {
-            // color according to the distance from the plus end
-            lineWidth(disp->line_width);
-            glBegin(GL_LINE_STRIP);
+            break;
+        case 7: { // color according to the distance from the plus end
             const size_t last = fib.lastPoint();
             for ( size_t n = 0; n < last; ++n )
             {
-                color_by_distanceP(fib, n).load();
-                gle::gleVertex(fib.posP(n));
+                pts[i] = fib.posP(n);
+                col[i++] = color_by_distanceP(fib, n);
             }
             for ( real dx = 0.5; dx > 0.12; dx /= 2 )
             {
-                color_by_distanceP(fib, last-dx).load();
-                gle::gleVertex(fib.posPoint(last-1, 1-dx));
+                pts[i] = fib.posPoint(last-1, 1-dx);
+                col[i++] = color_by_distanceP(fib, last-dx);
             }
-            color_by_distanceP(fib, last).load();
-            gle::gleVertex(fib.posEndP());
-            glEnd();
         } break;
-        case 8:
-        {
-            // color according to distance to the confining Space
-            lineWidth(disp->line_width);
-            glBegin(GL_LINE_STRIP);
-            for ( size_t n = 0; n < fib.nbPoints(); ++n )
+        case 8: // color according to distance to the confining Space
+            for ( i = 0; i < fib.nbPoints(); ++i )
             {
-                color_by_height(fib, n).load(alpha);
-                gle::gleVertex(fib.posP(n));
+                pts[i] = fib.posP(i);
+                col[i] = color_by_height(fib, i);
             }
-            glEnd();
-        } break;
+            break;
     }
+    gle::unmapVertexBuffer();
+    gle::unmapColorBuffer();
+    glEnableClientState(GL_COLOR_ARRAY);
+    lineWidth(fib.prop->disp->line_width);
+    if ( i == cnt )
+        glDrawArrays(GL_LINES, 0, i);
+    else
+        glDrawArrays(GL_LINE_STRIP, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
 void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    lineWidth(disp->line_width);
-    
-    glDisable(GL_LIGHTING);
+    size_t i = 0, cnt = 8;
+    fluteD* pts = gle::mapVertexBuffer(cnt);
+    flute4* col = gle::mapColorBuffer(cnt);
+
     if ( disp->line_style == 6 )
     {
         // color by distance to Minus end
-        glBegin(GL_LINE_STRIP);
-        color_by_distanceM(fib, inx).load();
-        gle::gleVertex(fib.posP(inx));
+        pts[i] = fib.posP(inx);
+        col[i++] = color_by_distanceM(fib, inx);
         if ( inx == 0 )
         {
             for ( real dx = 0.125; dx < 0.6; dx *= 2 )
             {
-                color_by_distanceM(fib, dx).load();
-                gle::gleVertex(fib.posPoint(0, dx));
+                pts[i] = fib.posPoint(0, dx);
+                col[i++] = color_by_distanceM(fib, dx);
             }
         }
-        color_by_distanceM(fib, inx+1).load();
-        gle::gleVertex(fib.posP(inx+1));
-        glEnd();
+        pts[i] = fib.posP(inx+1);
+        col[i++] = color_by_distanceM(fib, inx+1);
     }
     else if ( disp->line_style == 7 )
     {
         // color by distance to Plus end
-        glBegin(GL_LINE_STRIP);
-        color_by_distanceP(fib, inx).load();
-        gle::gleVertex(fib.posP(inx));
+        pts[i] = fib.posP(inx);
+        col[i++] = color_by_distanceP(fib, inx);
         if ( inx == fib.lastSegment() )
         {
             for ( real dx = 0.5; dx > 0.12; dx /= 2 )
             {
-                color_by_distanceP(fib, inx+1-dx).load();
-                gle::gleVertex(fib.posPoint(inx, 1-dx));
+                pts[i] = fib.posPoint(inx, 1-dx);
+                col[i++] = color_by_distanceP(fib, inx+1-dx);
             }
         }
-        color_by_distanceP(fib, inx+1).load();
-        gle::gleVertex(fib.posP(inx+1));
-        glEnd();
+        pts[i] = fib.posP(inx+1);
+        col[i++] = color_by_distanceP(fib, inx+1);
     }
     else
     {
+        gle_color c;
         if ( disp->line_style == 2 )
-            color_by_tension(fib, inx).load();
+            c = color_by_tension(fib, inx);
         else if ( disp->line_style == 3 )
-            color_by_tension_jet(fib, inx).load();
+            c = color_by_tension_jet(fib, inx);
         else
-            fib.disp->color.load();
+            c = fib.disp->color;
         // the whole segment is painted with the same color:
-        glBegin(GL_LINES);
-        gle::gleVertex(fib.posP(inx));
-        gle::gleVertex(fib.posP(inx+1));
-        glEnd();
+        pts[0] = fib.posP(inx);
+        col[0] = c;
+        pts[1] = fib.posP(inx+1);
+        col[1] = c;
+        i = 2;
     }
+    glDisable(GL_LIGHTING);
+    gle::unmapVertexBuffer();
+    gle::unmapColorBuffer();
+    glEnableClientState(GL_COLOR_ARRAY);
+    lineWidth(fib.prop->disp->line_width);
+    glDrawArrays(GL_LINE_STRIP, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -1284,14 +1265,23 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
-
-    fib.disp->color.load();
-    pointSize(fib.prop->disp->point_size);
-    glDisable(GL_LIGHTING);
-    glBegin(GL_POINTS);
+    
+    size_t i = 0, cnt = sup - inf + 4;
+    fluteD* pts = gle::mapVertexBuffer(cnt);
+    flute4* col = gle::mapColorBuffer(cnt);
+    gle_color c = fib.disp->color;
     for ( auto h = inf+1; h <= sup; ++h )
-        gle::gleVertex(fib.posM(uni*h-fib.abscissaM()));
-    glEnd();
+    {
+        pts[i] = fib.posM(uni*h-fib.abscissaM());
+        col[i++] = c;
+    }
+    gle::unmapVertexBuffer();
+    gle::unmapColorBuffer();
+    glDisable(GL_LIGHTING);
+    pointSize(fib.prop->disp->point_size);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glDrawArrays(GL_POINTS, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -1355,16 +1345,22 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
 /// display forces acting on the fiber's vertices, using lines scaled by 'scale'
 void Display::drawFiberForces(Fiber const& fib, real scale) const
 {
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
+    size_t cnt = 2 * fib.nbPoints();
+    fluteD* pts = gle::mapVertexBuffer(cnt);
+    flute4* col = gle::mapColorBuffer(cnt);
+    gle_color c = fib.prop->disp->force_color;
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {
-        Vector p = fib.posP(i);
-        Vector q = p + scale * fib.netForce(i);
-        gle::gleVertex(p);
-        gle::gleVertex(q);
+        Vector P = fib.posP(i);
+        pts[  2*i] = P;
+        col[  2*i] = c;
+        pts[1+2*i] = P + scale * fib.netForce(i);
+        col[1+2*i] = c;
     }
-    glEnd();
+    gle::unmapVertexBuffer();
+    glDisable(GL_LIGHTING);
+    lineWidth(fib.prop->disp->line_width);
+    glDrawArrays(GL_LINES, 0, cnt);
 }
 
 //------------------------------------------------------------------------------
@@ -1684,7 +1680,7 @@ void Display::drawFiber(Fiber const& fib)
 #endif
 
     if ( style )
-        drawFiberLines(fib);
+        drawFiberLines(fib, style);
 
     if ( disp->point_style > 0 )
     {
@@ -1728,7 +1724,6 @@ void Display::drawFiber(Fiber const& fib)
         
         if ( disp->force_style )
         {
-            disp->force_color.load();
             lineWidth(disp->point_size);
             drawFiberForces(fib, disp->force_scale);
         }

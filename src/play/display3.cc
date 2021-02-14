@@ -352,7 +352,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Display3::drawFiberLines(Fiber const& fib) const
+void Display3::drawFiberLines(Fiber const& fib, int style) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real rad = disp->line_width * sFactor;
@@ -364,7 +364,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
         disp->back_color.load_back();
     glEnable(GL_LIGHTING);
     
-    switch ( disp->line_style )
+    switch ( style )
     {
         case 1:
             drawFiberSegments(fib, rad, color_fiber);
@@ -381,8 +381,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
         case 5:
             drawFiberSegments(fib, rad, color_by_direction);
             break;
-        case 6:
-        {
+        case 6: {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
             GLboolean cull = glIsEnabled(GL_CULL_FACE);
@@ -390,8 +389,7 @@ void Display3::drawFiberLines(Fiber const& fib) const
             drawFiberSegments(fib, rad, color_by_abscissaM);
             if ( !cull ) glDisable(GL_CULL_FACE);
         } break;
-        case 7:
-        {
+        case 7: {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
             GLboolean cull = glIsEnabled(GL_CULL_FACE);

@@ -63,7 +63,7 @@ public:
     void drawFiberPlusEnd(Fiber const&, int style, real size) const;
     
     /// draw Fiber linear features
-    void drawFiberLines(Fiber const&) const;
+    void drawFiberLines(Fiber const&, int style) const;
     
     /// draw one segment of a Fiber
     void drawFiberSegmentT(Fiber const&, size_t) const;
