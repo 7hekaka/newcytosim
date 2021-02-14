@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef MIGHTY_PROP_H
 #define MIGHTY_PROP_H
@@ -33,7 +33,7 @@ public:
      For myosin, see:
      http://dx.doi.org/10.1038/368113a0
      */
-    real    stall_force;
+    real stall_force;
     
     
     /// speed of the motor when its load is zero
@@ -41,7 +41,7 @@ public:
      A positive value specifies a plus-end directed motor.
      A negative value specifies a minus-end directed motor.
      */
-    real    unloaded_speed;
+    real unloaded_speed;
     
     
     /// if true, the speed is limited to the range [0, 2*unloaded_speed]
@@ -51,7 +51,7 @@ public:
      For a minus-end directed motor, the permitted range is [2*unloaded_speed, 0],
      thus also excluding backward steps and excessive speed.
      */
-    bool    limit_speed;
+    bool limit_speed;
     
     
     /// movement-induced probability of detaching
@@ -59,17 +59,17 @@ public:
      This is a positive number specifying the probability of detaching
      per unit-length of movement
      */
-    real    unbinding_density;
+    real unbinding_density;
 
     /// @}
     
 private:
     
     /// limits for a displacement in one time step apply if ( limit_speed = true )
-    real    min_dab, max_dab;
+    real min_dab, max_dab;
     
     /// variables derived from `unloaded_speed`
-    real    set_speed_dt, abs_speed_dt, var_speed_dt;
+    real set_speed_dt, var_speed_dt;
 
 public:
         

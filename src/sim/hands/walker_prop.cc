@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "dim.h"
 #include "sim.h"
 #include "messages.h"
@@ -89,7 +89,7 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     /*
      Compare mobility with stiffness: this can induce instability
      */
-    real ef = abs_speed_dt * stiff * mul / stall_force;
+    real ef = abs_real(set_speed_dt) * stiff * mul / stall_force;
     if ( unloaded_speed  &&  ef > 0.5 )
     {
         Cytosim::warn << "simulating `" << name() << "' may fail as:\n"\

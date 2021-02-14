@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef WALKER_PROP_H
 #define WALKER_PROP_H
 
@@ -26,14 +26,14 @@ public:
      */
 
     /// force at which stepping rate becomes zero
-    real    stall_force;
+    real stall_force;
     
     /// speed if `force=0` ( `unloaded_speed = rate * step_size` )
     /**
      A positive value specifies a plus-end directed motor.
      A negative value specifies a minus-end directed motor.
      */
-    real    unloaded_speed;
+    real unloaded_speed;
     
     /// probability to detach per step
     /**
@@ -44,28 +44,28 @@ public:
      
      In particular, `unbinding_chance` does not lead to the detachment of a stalled motor.
      */
-    real    unbinding_chance;
+    real unbinding_chance;
     
 #if NEW_VARIABLE_WALK
     /// portion of the speed that depends on position
-    real    variable_speed;
+    real variable_speed;
 #endif
 
     /// @}
     
 #if NEW_VARIABLE_WALK
     /// portion of the speed that depends on position
-    real    variable_walking_rate_dt;
+    real variable_walking_rate_dt;
 #endif
     
     
 private:
     
     /// derived variable
-    real    var_rate_dt;
+    real var_rate_dt;
     
     /// derived variable
-    real    walking_rate_dt;
+    real walking_rate_dt;
     
 public:
 
