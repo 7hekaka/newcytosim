@@ -312,9 +312,9 @@ void SpacePolygon::drawPolygon(bool points, bool lines) const
 {
     const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
-    float2 * flt = new float2[nbp];
+    flute2 * flt = new flute2[nbp];
     for ( size_t n = 0; n < nbp; ++n )
-        flt[n] = float2::cast(pts[n].xx, pts[n].yy);
+        flt[n] = flute2::cast(pts[n].xx, pts[n].yy);
     
     glEnable(GL_STENCIL_TEST);
     glClearStencil(1);
@@ -352,11 +352,11 @@ void SpacePolygon::draw3D() const
     float H(-height_);
     const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
-    float6 * flt = new float6[nbp+1];
+    flute6 * flt = new flute6[nbp+1];
     for ( size_t n = 0; n <= nbp; ++n )
     {
         float X(pts[n].xx), Y(pts[n].yy);
-        flt[n] = float6{X, Y, -H, X, Y, H};
+        flt[n] = flute6{X, Y, -H, X, Y, H};
     }
     glLineWidth(2);
     // display bottom

@@ -812,28 +812,28 @@ void View::drawROI() const
 
 
 /// init vertical ticks over ] -cnt*d, +cnt*d [
-size_t setTicksH(float4* pts, int cnt, float d, float a, float b)
+size_t setTicksH(flute4* pts, int cnt, float d, float a, float b)
 {
     size_t n = 0;
     for ( int i = 1; i < cnt; ++i )
     {
-        pts[n++] = float4{-i*d, a, -i*d, b};
-        pts[n++] = float4{ i*d, a,  i*d, b};
+        pts[n++] = flute4{-i*d, a, -i*d, b};
+        pts[n++] = flute4{ i*d, a,  i*d, b};
     }
-    pts[n++] = float4{0, a, 0, b};
+    pts[n++] = flute4{0, a, 0, b};
     return n*2;
 }
 
 /// draw horizontal ticks over ] -cnt*d, +cnt*d [
-size_t setTicksV(float4* pts, int cnt, float d, float a, float b)
+size_t setTicksV(flute4* pts, int cnt, float d, float a, float b)
 {
     size_t n = 0;
     for ( int i = 1; i < cnt; ++i )
     {
-        pts[n++] = float4{a, -i*d, b, -i*d};
-        pts[n++] = float4{a,  i*d, b,  i*d};
+        pts[n++] = flute4{a, -i*d, b, -i*d};
+        pts[n++] = flute4{a,  i*d, b,  i*d};
     }
-    pts[n++] = float4{a, 0, b, 0};
+    pts[n++] = flute4{a, 0, b, 0};
     return n*2;
 }
 
@@ -850,7 +850,7 @@ void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
 {
     glLineWidth(1);
     gle::drawRectangle(-s/2, a, s/2, b, 0);
-    float4 pts[24];
+    flute4 pts[24];
     glVertexPointer(2, GL_FLOAT, 0, pts);
 
     // draw bars
@@ -892,7 +892,7 @@ void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
 {
     glLineWidth(1);
     gle::drawRectangle(a, -s/2, b, s/2, 0);
-    float4 pts[24];
+    flute4 pts[24];
     glVertexPointer(2, GL_FLOAT, 0, pts);
 
     // draw bars
@@ -936,7 +936,7 @@ void View::drawScaleX(GLfloat scale) const
     GLfloat b(-scale/20);
     GLfloat w(2);
 
-    float4 pts[24] = {
+    flute4 pts[24] = {
         {-s, a,-s, b}, {s, a, s, b},
         { a,-s, b,-s}, {a, s, b, s},
         {-s, 0, s, 0}, {0,-s, 0, s}};

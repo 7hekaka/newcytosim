@@ -211,8 +211,8 @@ void drawValues(Grid<CELL, 3> const& grid,
     dir.orthonormal(dx, dy, cel);
     dy *= M_SQRT3_2;
     
-    float3 * pts = new float3[4*R+2];
-    float4 * col = new float4[4*R+2];
+    flute3 * pts = new flute3[4*R+2];
+    flute4 * col = new flute4[4*R+2];
     glEnableClientState(GL_COLOR_ARRAY);
     glColorPointer(4, GL_FLOAT, 0, col);
     glVertexPointer(3, GL_FLOAT, 0, pts);

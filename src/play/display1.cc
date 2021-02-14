@@ -311,7 +311,7 @@ void Display1::drawOrganizer(Organizer const& obj) const
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
-        floatD* pts = gle::mapVertexBuffer(2*cnt);
+        fluteD* pts = gle::mapVertexBuffer(2*cnt);
         while ( obj.getLink(i, P, Q) & ( i < cnt ) )
         {
             if ( modulo ) modulo->fold(Q, P);
@@ -362,31 +362,31 @@ void Display1::drawOrganizer(Organizer const& obj) const
 #pragma mark - Graphics primitives with shift
 
 template < typename OBJ >
-inline floatD setVertex(Vector const& pos, const OBJ& obj)
+inline fluteD setVertex(Vector const& pos, const OBJ& obj)
 {
 #  if ( DIM == 1 )
-    return float2::cast(pos.XX, obj->signature()*0x1p-28-4);
+    return flute2::cast(pos.XX, obj->signature()*0x1p-28-4);
 #  else
-    return floatD{pos};
+    return fluteD{pos};
 #  endif
 }
 
 #if ENABLE_EXPLODE_DISPLAY
-inline floatD setVertex(Vector const& pos, const Fiber * fib)
+inline fluteD setVertex(Vector const& pos, const Fiber * fib)
 {
     GLfloat shift = fib->disp->explode_shift;
 #  if ( DIM == 1 )
-    return float2::cast(pos.XX, shift);
+    return flute2::cast(pos.XX, shift);
 #  elif ( DIM == 2 )
-    return float2::cast(pos.XX, pos.YY+shift);
+    return flute2::cast(pos.XX, pos.YY+shift);
 #  else
-    return float3::cast(pos.XX, pos.YY+shift, pos.ZZ);
+    return flute3::cast(pos.XX, pos.YY+shift, pos.ZZ);
 #  endif
 }
 #else
-inline floatD setVertex(Vector const& pos, const Fiber*)
+inline fluteD setVertex(Vector const& pos, const Fiber*)
 {
-    return floatD{pos};
+    return fluteD{pos};
 }
 #endif
 
@@ -398,14 +398,14 @@ void Display1::drawSinglesF(const SingleSet & set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeF();
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
             {
                 pts[i] = setVertex(obj->posFoot(), obj);
-                col[i++] = float4{obj->disp()->color2};
+                col[i++] = flute4{obj->disp()->color2};
             }
         }
         gle::unmapVertexBuffer();
@@ -421,15 +421,15 @@ void Display1::drawSinglesA(const SingleSet & set) const
     size_t i = 0, cnt = 2*set.sizeF();
     if ( prop->point_size > 0 )
     {
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber();
             if ( obj->disp()->perceptible & fib->disp->visible )
             {
                 pts[i] = setVertex(obj->posHand(), fib);
-                col[i++] = float4{obj->disp()->color2};
+                col[i++] = flute4{obj->disp()->color2};
             }
         }
         gle::unmapVertexBuffer();
@@ -441,8 +441,8 @@ void Display1::drawSinglesA(const SingleSet & set) const
     // display links to anchor points
     if ( prop->link_width > 0 )
     {
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         i = 0;
         for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
         {
@@ -455,9 +455,9 @@ void Display1::drawSinglesA(const SingleSet & set) const
                     Vector Q = obj->posFoot();
                     if ( modulo ) modulo->fold(P, Q);
                     pts[i] = setVertex(P, fib);
-                    col[i++] = float4{obj->disp()->color};
+                    col[i++] = flute4{obj->disp()->color};
                     pts[i] = setVertex(Q, obj);
-                    col[i++] = float4{obj->disp()->color};
+                    col[i++] = flute4{obj->disp()->color};
                 }
             }
         }
@@ -478,14 +478,14 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeFF();
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( obj->active() & obj->disp1()->perceptible )
             {
                 pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = float4{obj->disp1()->color2};
+                col[i++] = flute4{obj->disp1()->color2};
             }
         }
         gle::unmapVertexBuffer();
@@ -502,8 +502,8 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         {
             if ( !obj->active() && obj->disp1()->perceptible )
             {
-                pts[i] = floatD{obj->posFree()};
-                col[i++] = float4{obj->disp1()->color2};
+                pts[i] = fluteD{obj->posFree()};
+                col[i++] = flute4{obj->disp1()->color2};
             }
         }
         gle::unmapVertexBuffer();
@@ -525,8 +525,8 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeFF();
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         Couple * nxt;
         Couple * obj = set.firstFF();
 
@@ -536,7 +536,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
             if ( obj->disp12()->perceptible )
             {
                 pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = float4{obj->disp12()->color2};
+                col[i++] = flute4{obj->disp12()->color2};
             }
             obj = nxt;
         }
@@ -546,13 +546,13 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
             if ( obj->disp21()->perceptible )
             {
                 pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = float4{obj->disp21()->color2};
+                col[i++] = flute4{obj->disp21()->color2};
             }
             obj = nxt->next();
             if ( nxt->disp12()->perceptible )
             {
                 pts[i] = setVertex(nxt->posFree(), nxt);
-                col[i++] = float4{nxt->disp12()->color2};
+                col[i++] = flute4{nxt->disp12()->color2};
             }
         }
         gle::unmapVertexBuffer();
@@ -568,15 +568,15 @@ void Display1::drawCouplesA(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeA();
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         for ( Couple * obj=set.firstAF(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber1();
             if ( obj->disp1()->perceptible & fib->disp->visible )
             {
                 pts[i] = setVertex(obj->posHand1(), fib);
-                col[i++] = float4{obj->disp1()->color2};
+                col[i++] = flute4{obj->disp1()->color2};
             }
         }
         for ( Couple * obj=set.firstFA(); obj ; obj=obj->next() )
@@ -585,7 +585,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
             if ( obj->disp2()->perceptible & fib->disp->visible )
             {
                 pts[i] = setVertex(obj->posHand2(), fib);
-                col[i++] = float4{obj->disp2()->color2};
+                col[i++] = flute4{obj->disp2()->color2};
             }
         }
         gle::unmapVertexBuffer();
@@ -602,8 +602,8 @@ void Display1::drawCouplesB(CoupleSet const& set) const
 
     if ( prop->point_size > 0 )
     {
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
         {
 #if ( 0 )
@@ -619,12 +619,12 @@ void Display1::drawCouplesB(CoupleSet const& set) const
             if ( obj->disp1()->perceptible & fib1->disp->visible )
             {
                 pts[i] = setVertex(obj->posHand1(), fib1);
-                col[i++] = float4{obj->disp1()->color};
+                col[i++] = flute4{obj->disp1()->color};
             }
             if ( obj->disp2()->perceptible & fib2->disp->visible )
             {
                 pts[i] = setVertex(obj->posHand2(), fib2);
-                col[i++] = float4{obj->disp2()->color};
+                col[i++] = flute4{obj->disp2()->color};
             }
         }
         gle::unmapVertexBuffer();
@@ -639,8 +639,8 @@ void Display1::drawCouplesB(CoupleSet const& set) const
 #if ENABLE_EXPLODE_DISPLAY
         cnt *= 2;
 #endif
-        floatD* pts = gle::mapVertexBuffer(cnt);
-        float4* col = gle::mapColorBuffer(cnt);
+        fluteD* pts = gle::mapVertexBuffer(cnt);
+        flute4* col = gle::mapColorBuffer(cnt);
         i = 0;
         for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
         {
@@ -666,22 +666,22 @@ void Display1::drawCouplesB(CoupleSet const& set) const
                 if ( vis1 )
                 {
                     pts[i] = setVertex(P, fib1);
-                    col[i++] = float4{obj->disp1()->color};
+                    col[i++] = flute4{obj->disp1()->color};
                     pts[i] = setVertex(Q, fib1);
-                    col[i++] = float4{obj->disp2()->color};
+                    col[i++] = flute4{obj->disp2()->color};
                 }
                 if ( vis2 )
                 {
                     pts[i] = setVertex(P, fib2);
-                    col[i++] = float4{obj->disp1()->color};
+                    col[i++] = flute4{obj->disp1()->color};
                     pts[i] = setVertex(Q, fib2);
-                    col[i++] = float4{obj->disp2()->color};
+                    col[i++] = flute4{obj->disp2()->color};
                 }
 #else
                 pts[i] = setVertex(P, fib1);
-                col[i++] = float4{obj->disp1()->color};
+                col[i++] = flute4{obj->disp1()->color};
                 pts[i] = setVertex(Q, fib2);
-                col[i++] = float4{obj->disp2()->color};
+                col[i++] = flute4{obj->disp2()->color};
 #endif
             }
         }

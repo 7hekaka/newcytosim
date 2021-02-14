@@ -280,7 +280,7 @@ void Display2::drawOrganizer(Organizer const& obj) const
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
-        floatD* pts = gle::mapVertexBuffer(2*cnt);
+        fluteD* pts = gle::mapVertexBuffer(2*cnt);
         while ( obj.getLink(i, P, Q) & ( i < cnt ) )
         {
             if ( modulo ) modulo->fold(Q, P);

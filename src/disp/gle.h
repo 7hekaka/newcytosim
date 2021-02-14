@@ -10,9 +10,9 @@
 #include "vector_float.h"
 
 #if ( DIM == 3 )
-typedef float3 floatD;
+typedef flute3 fluteD;
 #else
-typedef float2 floatD;
+typedef flute2 fluteD;
 #endif
 
 /// Simple geometrical objects drawn with OpenGL
@@ -55,9 +55,9 @@ namespace gle
     void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
 
     
-    floatD* mapVertexBuffer(size_t);
+    fluteD* mapVertexBuffer(size_t);
     void  unmapVertexBuffer();
-    float4* mapColorBuffer(size_t);
+    flute4* mapColorBuffer(size_t);
     void  unmapColorBuffer();
     void bindVertexBuffer(size_t);
 

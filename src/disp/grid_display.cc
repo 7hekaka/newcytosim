@@ -9,12 +9,12 @@ using namespace gle;
 void drawEdges(Map<1> const& map)
 {
     size_t sup = 1 + map.breadth(0);
-    float4 * pts = new float4[sup];
+    flute4 * pts = new flute4[sup];
     
     for ( size_t n = 0; n < sup; ++n )
     {
         float x = map.position(0, n);
-        pts[n] = float4{x, -0.5f, x, 0.5f};
+        pts[n] = flute4{x, -0.5f, x, 0.5f};
     }
     glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 2*sup);
@@ -29,14 +29,14 @@ void drawEdges(Map<2> const& map)
 {
     size_t sup0 = 1 + map.breadth(0);
     size_t sup1 = 1 + map.breadth(1);
-    float4 * pts = new float4[std::max(sup0, sup1)];
+    flute4 * pts = new flute4[std::max(sup0, sup1)];
 
     float i = map.inf(0);
     float s = map.sup(0);
     for ( size_t n = 0; n < sup1; ++n )
     {
         float y = map.position(1, n);
-        pts[n] = float4{i, y, s, y};
+        pts[n] = flute4{i, y, s, y};
     }
     glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 2*sup1);
@@ -46,7 +46,7 @@ void drawEdges(Map<2> const& map)
     for ( size_t n = 0; n < sup0; ++n )
     {
         float x = map.position(0, n);
-        pts[n] = float4{x, i, x, s};
+        pts[n] = flute4{x, i, x, s};
     }
     //glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 2*sup0);
@@ -62,7 +62,7 @@ void drawEdges(Map<3> const& map)
     size_t sup0 = 1 + map.breadth(0);
     size_t sup1 = 1 + map.breadth(1);
     size_t sup2 = 1 + map.breadth(2);
-    float6 * pts = new float6[std::max(sup1, sup2)];
+    flute6 * pts = new flute6[std::max(sup1, sup2)];
     glVertexPointer(3, GL_FLOAT, 0, pts);
 
     GLfloat i = map.inf(0);
@@ -74,7 +74,7 @@ void drawEdges(Map<3> const& map)
         for ( size_t n = 0; n < sup2; ++n )
         {
             GLfloat z = map.position(2, n);
-            pts[n] = float6{i, y, z, s, y, z};
+            pts[n] = flute6{i, y, z, s, y, z};
         }
         glDrawArrays(GL_LINES, 0, 2*sup2);
     }
@@ -89,13 +89,13 @@ void drawEdges(Map<3> const& map)
         for ( size_t n = 0; n < sup2; ++n )
         {
             GLfloat z = map.position(2, n);
-            pts[n] = float6{x, i, z, x, s, z};
+            pts[n] = flute6{x, i, z, x, s, z};
         }
         glDrawArrays(GL_LINES, 0, 2*sup2);
         for ( size_t n = 0; n < sup1; ++n )
         {
             GLfloat y = map.position(1, n);
-            pts[n] = float6{x, y, b, x, y, t};
+            pts[n] = flute6{x, y, b, x, y, t};
         }
         glDrawArrays(GL_LINES, 0, 2*sup1);
     }

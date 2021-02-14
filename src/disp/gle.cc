@@ -91,12 +91,12 @@ namespace gle
     //------------------------------------------------------------------------------
     #pragma mark - Buffers
 
-    floatD* mapVertexBuffer(size_t cnt)
+    fluteD* mapVertexBuffer(size_t cnt)
     {
         constexpr size_t DOUZE = (DIM>1?DIM:2) * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
         glBufferData(GL_ARRAY_BUFFER, DOUZE*cnt, nullptr, GL_STREAM_DRAW);
-        return (floatD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        return (fluteD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
 
     void unmapVertexBuffer()
@@ -114,12 +114,12 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    float4* mapColorBuffer(size_t cnt)
+    flute4* mapColorBuffer(size_t cnt)
     {
         constexpr size_t SEIZE = 4 * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, stream_[3]);
         glBufferData(GL_ARRAY_BUFFER, SEIZE*cnt, nullptr, GL_STREAM_DRAW);
-        return (float4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        return (flute4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
 
     void unmapColorBuffer()
@@ -1486,7 +1486,7 @@ namespace gle
         if ( n > 0 )
         {
             rad /= n;
-            float2 pts[4] = { A+rad*d, A-rad*d, B+rad*d, B-rad*d };
+            flute2 pts[4] = { A+rad*d, A-rad*d, B+rad*d, B-rad*d };
             glVertexPointer(2, GL_FLOAT, 0, pts);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         }
@@ -1526,7 +1526,7 @@ namespace gle
         GLfloat AX(A.XX);
         GLfloat BX(B.XX);
         GLfloat pts[8] = { AX,-rA, AX, rA, BX, -rB, BX, rB };
-        float4 col[4] = { cA, cA, cB, cB };
+        flute4 col[4] = { cA, cA, cB, cB };
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(4, GL_FLOAT, 0, col);
         glVertexPointer(2, GL_FLOAT, 0, pts);
@@ -1546,7 +1546,7 @@ namespace gle
             GLfloat BX(B.XX), BY(B.YY);
             GLfloat pts[8] = { AX+rA*dX, AY+rA*dY, AX-rA*dX, AY-rA*dY,
                                BX+rB*dX, BY+rB*dY, BX-rB*dX, BY-rB*dY };
-            float4 col[] = { cA, cA, cB, cB };
+            flute4 col[] = { cA, cA, cB, cB };
             glEnableClientState(GL_COLOR_ARRAY);
             glColorPointer(4, GL_FLOAT, 0, col);
             glVertexPointer(2, GL_FLOAT, 0, pts);
@@ -1563,7 +1563,7 @@ namespace gle
     void drawHourglass(Vector2 const& a, Vector2 const& da,
                        Vector2 const& b, Vector2 const& db)
     {
-        float2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
+        flute2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
         glVertexPointer(2, GL_FLOAT, 0, pts);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
     }
@@ -1575,8 +1575,8 @@ namespace gle
     void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color ca,
                        Vector2 const& b, Vector2 const& db, gle_color cb)
     {
-        float2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        float4 col[6] = { cb, cb, ca, ca, cb, cb };
+        flute2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
+        flute4 col[6] = { cb, cb, ca, ca, cb, cb };
         glEnableClientState(GL_COLOR_ARRAY);
         glVertexPointer(2, GL_FLOAT, 0, pts);
         glColorPointer(4, GL_FLOAT, 0, col);
@@ -1593,7 +1593,7 @@ namespace gle
                    Vector2 const& B, Vector2 const& dB, real rad)
     {
         glLineWidth(0.5);
-        float2 pts[8] = { A, A-rad*dA, B, B-rad*dB,
+        flute2 pts[8] = { A, A-rad*dA, B, B-rad*dB,
                           A, A+rad*dA, B, B+rad*dB };
         glVertexPointer(2, GL_FLOAT, 0, pts);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
@@ -1606,7 +1606,7 @@ namespace gle
         Vector3 ab = normalize( A - B );
         Vector3 ea = cross(ab, dA);
         Vector3 eb = cross(ab, dB);
-        float3 pts[16] = { A-rad*(dA-ea), A-rad*(dA+ea), B-rad*(dB-eb), B-rad*(dB+eb),
+        flute3 pts[16] = { A-rad*(dA-ea), A-rad*(dA+ea), B-rad*(dB-eb), B-rad*(dB+eb),
                            A+rad*(dA-ea), A+rad*(dA+ea), B+rad*(dB-eb), B+rad*(dB+eb),
                            A-rad*dA, A+rad*dA, B-rad*dB, B+rad*dB,
                            A-rad*dA, A+rad*dA, B-rad*dB, B+rad*dB };
@@ -1631,7 +1631,7 @@ namespace gle
         
         Vector2 x = ( B - A ).normalized(H);
         Vector2 y = x.orthogonal(X);
-        float2 pts[20] = {
+        flute2 pts[20] = {
             {0,0}, x+y, y+y, y-x, -x-y, -y-y, x-y, x+y,
             x+y, x-y, B-A-y-x, B-A+y-x,
             {0,0}, x+y, y+y, y-x, -x-y, -y-y, x-y, x+y };
