@@ -895,7 +895,7 @@ void Display::drawFiberLines(Fiber const& fib) const
         {
             // display segments with color indicating internal tension
             lineWidth(disp->line_width);
-            glBegin(GL_LINE_STRIP);
+            glBegin(GL_LINES);
             for ( size_t n = 0; n < fib.lastPoint(); ++n )
             {
                 color_by_tension_jet(fib, n).load(alpha);

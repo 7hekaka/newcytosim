@@ -476,6 +476,7 @@ void Display2::drawCouplesA(CoupleSet const& set) const
 
 void Display2::drawCoupleB(Couple const* cx) const
 {
+    gle_color air(0,0,0,0);
     const PointDisp * pd1 = cx->disp1();
     const PointDisp * pd2 = cx->disp2();
     
@@ -505,14 +506,16 @@ void Display2::drawCoupleB(Couple const* cx) const
         Vector d1 = cx->dirFiber1();
         Vector d2 = cx->dirFiber2();
         Vector pp = 0.5*(p1+p2) + (0.25*cx->prop->length)*(d1+d2);
+        gle_color col1 = pd1->visible ? pd1->color : air;
+        gle_color col2 = pd2->visible ? pd2->color : air;
         pts[0] = p1;
         pts[1] = pp;
         pts[2] = pp;
         pts[3] = p2;
-        col[0] = pd1->color;
-        col[1] = pd1->color;
-        col[2] = pd2->color;
-        col[3] = pd2->color;
+        col[0] = col1;
+        col[1] = col1;
+        col[2] = col2;
+        col[3] = col2;
 #endif
         gle::unmapVertexBuffer();
         gle::unmapColorBuffer();

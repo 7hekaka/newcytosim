@@ -22,7 +22,7 @@ using namespace gle;
 extern Modulo const* modulo;
 
 
-#define ENABLE_EXPLODE_DISPLAY ( DIM < 3 )
+#define ENABLE_EXPLODED_DISPLAY ( DIM < 3 )
 
 
 Display1::Display1(DisplayProp const* dp) : Display(dp)
@@ -108,7 +108,7 @@ void Display1::drawSimul(Simul const& sim)
 
 void Display1::drawFiber(Fiber const& fib)
 {
-#if ENABLE_EXPLODE_DISPLAY
+#if ENABLE_EXPLODED_DISPLAY
     //translate whole display to display the Fiber
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -117,7 +117,7 @@ void Display1::drawFiber(Fiber const& fib)
     
     Display::drawFiber(fib);
 
-#if ENABLE_EXPLODE_DISPLAY
+#if ENABLE_EXPLODED_DISPLAY
     glPopMatrix();
 #endif
 }
@@ -371,7 +371,7 @@ inline fluteD setVertex(Vector const& pos, const OBJ& obj)
 #  endif
 }
 
-#if ENABLE_EXPLODE_DISPLAY
+#if ENABLE_EXPLODED_DISPLAY
 inline fluteD setVertex(Vector const& pos, const Fiber * fib)
 {
     GLfloat shift = fib->disp->explode_shift;
@@ -405,7 +405,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
             if ( obj->disp()->perceptible )
             {
                 pts[i] = setVertex(obj->posFoot(), obj);
-                col[i++] = flute4{obj->disp()->color2};
+                col[i++] = obj->disp()->color2;
             }
         }
         gle::unmapVertexBuffer();
@@ -418,53 +418,39 @@ void Display1::drawSinglesF(const SingleSet & set) const
 
 void Display1::drawSinglesA(const SingleSet & set) const
 {
+    gle_color air(0,0,0,0);
     size_t i = 0, cnt = 2*set.sizeF();
-    if ( prop->point_size > 0 )
+    fluteD* pts = gle::mapVertexBuffer(cnt);
+    flute4* col = gle::mapColorBuffer(cnt);
+    for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
-        for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
+        Fiber const* fib = obj->fiber();
+        if ( obj->disp()->perceptible & fib->disp->visible )
         {
-            Fiber const* fib = obj->fiber();
-            if ( obj->disp()->perceptible & fib->disp->visible )
-            {
-                pts[i] = setVertex(obj->posHand(), fib);
-                col[i++] = flute4{obj->disp()->color2};
-            }
+            Vector P = obj->posHand();
+            Vector Q = obj->posFoot();
+            if ( modulo ) modulo->fold(P, Q);
+            gle_color c = ( obj->hasForce() ? obj->disp()->color : air );
+            pts[i] = setVertex(P, fib);
+            col[i++] = obj->disp()->color;
+            pts[i] = setVertex(Q, obj);
+            col[i++] = c;
         }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
-        pointSize(prop->point_size);
-        glDrawArrays(GL_POINTS, 0, i);
     }
+    gle::unmapVertexBuffer();
+    gle::unmapColorBuffer();
     
-    // display links to anchor points
     if ( prop->link_width > 0 )
     {
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
-        i = 0;
-        for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
-        {
-            if ( obj->hasForce() )
-            {
-                Fiber const* fib = obj->fiber();
-                if ( obj->disp()->perceptible & fib->disp->visible )
-                {
-                    Vector P = obj->posHand();
-                    Vector Q = obj->posFoot();
-                    if ( modulo ) modulo->fold(P, Q);
-                    pts[i] = setVertex(P, fib);
-                    col[i++] = flute4{obj->disp()->color};
-                    pts[i] = setVertex(Q, obj);
-                    col[i++] = flute4{obj->disp()->color};
-                }
-            }
-        }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
         lineWidth(prop->link_width);
         glDrawArrays(GL_LINES, 0, i);
+    }
+    
+    if ( prop->point_size > 0 )
+    {
+        gle::bindVertexBuffer((DIM>1?DIM:2));
+        pointSize(prop->point_size);
+        glDrawArrays(GL_POINTS, 0, i/2);
     }
 }
 
@@ -485,7 +471,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
             if ( obj->active() & obj->disp1()->perceptible )
             {
                 pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = flute4{obj->disp1()->color2};
+                col[i++] = obj->disp1()->color2;
             }
         }
         gle::unmapVertexBuffer();
@@ -503,7 +489,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
             if ( !obj->active() && obj->disp1()->perceptible )
             {
                 pts[i] = fluteD{obj->posFree()};
-                col[i++] = flute4{obj->disp1()->color2};
+                col[i++] = obj->disp1()->color2;
             }
         }
         gle::unmapVertexBuffer();
@@ -536,7 +522,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
             if ( obj->disp12()->perceptible )
             {
                 pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = flute4{obj->disp12()->color2};
+                col[i++] = obj->disp12()->color2;
             }
             obj = nxt;
         }
@@ -546,13 +532,13 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
             if ( obj->disp21()->perceptible )
             {
                 pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = flute4{obj->disp21()->color2};
+                col[i++] = obj->disp21()->color2;
             }
             obj = nxt->next();
             if ( nxt->disp12()->perceptible )
             {
                 pts[i] = setVertex(nxt->posFree(), nxt);
-                col[i++] = flute4{nxt->disp12()->color2};
+                col[i++] = nxt->disp12()->color2;
             }
         }
         gle::unmapVertexBuffer();
@@ -576,7 +562,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
             if ( obj->disp1()->perceptible & fib->disp->visible )
             {
                 pts[i] = setVertex(obj->posHand1(), fib);
-                col[i++] = flute4{obj->disp1()->color2};
+                col[i++] = obj->disp1()->color2;
             }
         }
         for ( Couple * obj=set.firstFA(); obj ; obj=obj->next() )
@@ -585,7 +571,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
             if ( obj->disp2()->perceptible & fib->disp->visible )
             {
                 pts[i] = setVertex(obj->posHand2(), fib);
-                col[i++] = flute4{obj->disp2()->color2};
+                col[i++] = obj->disp2()->color2;
             }
         }
         gle::unmapVertexBuffer();
@@ -598,97 +584,65 @@ void Display1::drawCouplesA(CoupleSet const& set) const
 
 void Display1::drawCouplesB(CoupleSet const& set) const
 {
-    size_t i = 0, cnt = 2 * set.sizeAA();
+    gle_color air(0,0,0,0);
+    size_t i = 0, cnt = 2 * set.sizeAA() * (1+ENABLE_EXPLODED_DISPLAY);
+    fluteD* pts = gle::mapVertexBuffer(cnt);
+    flute4* col = gle::mapColorBuffer(cnt);
+    for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
+    {
+#if ( 0 )
+        // only display if bridging two anti-parallel filaments
+        if ( prop->couple_select & 8  && obj->cosAngle() > 0 )
+            continue;
+        // only display if bridging two parallel filaments
+        if ( prop->couple_select & 16 && obj->cosAngle() < 0 )
+            continue;
+#endif
+        Fiber const* fib1 = obj->fiber1();
+        Fiber const* fib2 = obj->fiber2();
+        bool vis1 = obj->disp1()->perceptible & fib1->disp->visible;
+        bool vis2 = obj->disp2()->perceptible & fib2->disp->visible;
+        gle_color col1 = vis1 ? obj->disp1()->color : air;
+        gle_color col2 = vis2 ? obj->disp2()->color : air;
+        Vector P = obj->posHand1();
+        Vector Q = obj->posHand2();
+        if ( modulo ) modulo->fold(Q, P);
+        if ( vis1 | vis2 )
+        {
+            pts[i] = setVertex(P, fib1);
+            col[i++] = col1;
+            pts[i] = setVertex(Q, fib1);
+            col[i++] = col2;
+        }
+#if ENABLE_EXPLODED_DISPLAY
+        if ( vis2 )
+        {
+            pts[i] = setVertex(Q, fib2);
+            col[i++] = col2;
+            pts[i] = setVertex(P, fib2);
+            col[i++] = col1;
+        }
+#endif
+    }
+    gle::unmapVertexBuffer();
+    gle::unmapColorBuffer();
 
     if ( prop->point_size > 0 )
     {
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
-        for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
-        {
-#if ( 0 )
-            // only display if bridging two anti-parallel filaments
-            if ( prop->couple_select & 8  && obj->cosAngle() > 0 )
-                continue;
-            // only display if bridging two parallel filaments
-            if ( prop->couple_select & 16 && obj->cosAngle() < 0 )
-                continue;
-#endif
-            Fiber const* fib1 = obj->fiber1();
-            Fiber const* fib2 = obj->fiber2();
-            if ( obj->disp1()->perceptible & fib1->disp->visible )
-            {
-                pts[i] = setVertex(obj->posHand1(), fib1);
-                col[i++] = flute4{obj->disp1()->color};
-            }
-            if ( obj->disp2()->perceptible & fib2->disp->visible )
-            {
-                pts[i] = setVertex(obj->posHand2(), fib2);
-                col[i++] = flute4{obj->disp2()->color};
-            }
-        }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
         pointSize(prop->point_size);
+#if ENABLE_EXPLODED_DISPLAY
+        gle::bindVertexBuffer((DIM>1?DIM:2));
+        glDrawArrays(GL_POINTS, 0, i/2);
+#else
         glDrawArrays(GL_POINTS, 0, i);
+#endif
     }
     
-    // display the link for bridging couples
     if ( prop->link_width > 0 )
     {
-#if ENABLE_EXPLODE_DISPLAY
-        cnt *= 2;
-#endif
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
-        i = 0;
-        for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
-        {
-#if ( 0 )
-            // only display if bridging two anti-parallel filaments
-            if ( prop->couple_select & 8  && obj->cosAngle() > 0 )
-                continue;
-            // only display if bridging two parallel filaments
-            if ( prop->couple_select & 16 && obj->cosAngle() < 0 )
-                continue;
-#endif
-            Fiber const* fib1 = obj->fiber1();
-            Fiber const* fib2 = obj->fiber2();
-            bool vis1 = obj->disp1()->perceptible & fib1->disp->visible;
-            bool vis2 = obj->disp2()->perceptible & fib2->disp->visible;
-            if ( vis1 | vis2 )
-            {
-                Vector P = obj->posHand1();
-                Vector Q = obj->posHand2();
-                if ( modulo ) modulo->fold(Q, P);
-#if ENABLE_EXPLODE_DISPLAY
-                // display the link twice, attached to each (shifted) fiber
-                if ( vis1 )
-                {
-                    pts[i] = setVertex(P, fib1);
-                    col[i++] = flute4{obj->disp1()->color};
-                    pts[i] = setVertex(Q, fib1);
-                    col[i++] = flute4{obj->disp2()->color};
-                }
-                if ( vis2 )
-                {
-                    pts[i] = setVertex(P, fib2);
-                    col[i++] = flute4{obj->disp1()->color};
-                    pts[i] = setVertex(Q, fib2);
-                    col[i++] = flute4{obj->disp2()->color};
-                }
-#else
-                pts[i] = setVertex(P, fib1);
-                col[i++] = flute4{obj->disp1()->color};
-                pts[i] = setVertex(Q, fib2);
-                col[i++] = flute4{obj->disp2()->color};
-#endif
-            }
-        }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
         lineWidth(prop->link_width);
         glDrawArrays(GL_LINES, 0, i);
     }
 }
+
 
