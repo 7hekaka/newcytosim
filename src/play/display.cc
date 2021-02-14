@@ -1729,7 +1729,7 @@ void Display::drawFiber(Fiber const& fib)
         if ( disp->force_style )
         {
             disp->force_color.load();
-            lineWidth(std::max(1.0f, disp->point_size));
+            lineWidth(disp->point_size);
             drawFiberForces(fib, disp->force_scale);
         }
     }

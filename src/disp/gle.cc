@@ -1068,7 +1068,7 @@ namespace gle
         glTranslatef(0,0,0.5f);
         disc();
         glTranslatef(0,0,-1);
-        tube1();
+        tube4();
         discDown();
         glTranslatef(0,0,0.5f);
     }
