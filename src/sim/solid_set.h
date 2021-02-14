@@ -44,19 +44,19 @@ public:
     void    remove(Object *);
     
     /// first Solid
-    Solid * first() const { return static_cast<Solid*>(pool.front()); }
+    Solid * first() const { return static_cast<Solid*>(pool_.front()); }
     
     /// last Solid
-    Solid * last() const { return static_cast<Solid*>(pool.back()); }
+    Solid * last() const { return static_cast<Solid*>(pool_.back()); }
     
     /// first Solid in inventory
-    Solid * firstID() const { return static_cast<Solid*>(inventory.first()); }
+    Solid * firstID() const { return static_cast<Solid*>(inventory_.first()); }
 
     /// next Solid in inventory
-    Solid * nextID(Solid const* obj) const { return static_cast<Solid*>(inventory.next(obj)); }
+    Solid * nextID(Solid const* obj) const { return static_cast<Solid*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found
-    Solid * findID(ObjectID n) const { return static_cast<Solid*>(inventory.get(n)); }
+    Solid * findID(ObjectID n) const { return static_cast<Solid*>(inventory_.get(n)); }
     
     /// modulo the position (periodic boundary conditions)
     void    foldPosition(Modulo const*) const;

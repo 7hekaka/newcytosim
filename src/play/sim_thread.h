@@ -183,13 +183,13 @@ public:
     void       rewind()             { lock(); reader_.rewind(); unlock(); }
     
     /// attempt to load specified frame from file (0 = first frame; -1 = last frame)
-    int        loadFrame(size_t f)  { lock(); int r=reader_.loadFrame(simul, f); unlock(); return r; }
+    int        loadFrame(size_t f)  { lock(); int r=reader_.loadFrame(simul_, f); unlock(); return r; }
 
     /// load next frame in file
-    int        loadNextFrame()      { lock(); int r=reader_.loadNextFrame(simul); unlock(); return r; }
+    int        loadNextFrame()      { lock(); int r=reader_.loadNextFrame(simul_); unlock(); return r; }
     
     /// attempt to load last frame from file
-    int        loadLastFrame()      { lock(); int r=reader_.loadLastFrame(simul); unlock(); return r; }
+    int        loadLastFrame()      { lock(); int r=reader_.loadLastFrame(simul_); unlock(); return r; }
 
     /// index of current frame
     size_t     currentFrame() const { return reader_.currentFrame(); }

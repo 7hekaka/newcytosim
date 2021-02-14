@@ -113,15 +113,15 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
  */
 ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
 {
-    FiberProp * fp = simul.findProperty<FiberProp>("fiber", name);
+    FiberProp * fp = simul_.findProperty<FiberProp>("fiber", name);
     Fiber * fib = fp->newFiber(opt);
     assert_true( fib->tag()==Fiber::TAG );
-    fib->birthTime(simul.time());
+    fib->birthTime(simul_.time());
     
 #if FIBER_HAS_FAMILY
     std::string str;
     if ( opt.set(str, "family") )
-        fib->family_ = simul.findFiber(str);
+        fib->family_ = simul_.findFiber(str);
 #endif
 
     ObjectList res(8, 8);
@@ -143,8 +143,8 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         Tokenizer::split_integer(cnt, spe);
         
         // search for Single and Couple:
-        SingleProp * sip = static_cast<SingleProp*>(simul.properties.find("single", spe));
-        CoupleProp * cop = static_cast<CoupleProp*>(simul.properties.find("couple", spe));
+        SingleProp * sip = static_cast<SingleProp*>(simul_.properties.find("single", spe));
+        CoupleProp * cop = static_cast<CoupleProp*>(simul_.properties.find("couple", spe));
         
         if ( sip && cop )
             throw InvalidParameter("ambiguous fiber:attach single/couple `"+spe+"'");
@@ -210,9 +210,9 @@ Object * FiberSet::newObject(const ObjectTag tag, size_t num)
     if ( tag == Fiber::TAG )
 #endif
     {
-        FiberProp const* fp = simul.findProperty<FiberProp>("fiber", num);
+        FiberProp const* fp = simul_.findProperty<FiberProp>("fiber", num);
         Fiber * obj = fp->newFiber();
-        obj->birthTime(simul.time());
+        obj->birthTime(simul_.time());
         return obj;
     }
     std::cerr << "Warning: unknown Fiber tag `"+std::string(1,tag)+"' requested\n";
@@ -225,7 +225,7 @@ void FiberSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 
@@ -235,7 +235,7 @@ void FiberSet::report(std::ostream& os) const
     if ( size() > 0 )
     {
         os << '\n' << title();
-        PropertyList plist = simul.properties.find_all(title());
+        PropertyList plist = simul_.properties.find_all(title());
         for ( Property const* i : plist )
         {
             FiberProp const* p = static_cast<FiberProp const*>(i);
@@ -259,7 +259,7 @@ void FiberSet::report(std::ostream& os) const
 
 void FiberSet::step()
 {
-    PropertyList plist = simul.properties.find_all("fiber");
+    PropertyList plist = simul_.properties.find_all("fiber");
     
     // calculate the total length used for each kind of Fiber:
     for ( Property * i : plist )
@@ -400,13 +400,13 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
 void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
                                 const real max_distance) const
 {
-    FiberGrid & grid = simul.fiberGrid;
+    FiberGrid & grid = simul_.fiberGrid;
 
     if ( ! grid.hasGrid() )
     {
-        Space const* spc = simul.spaces.master();
+        Space const* spc = simul_.spaces.master();
         if ( spc )
-            simul.setFiberGrid(spc);
+            simul_.setFiberGrid(spc);
         else
             return allIntersections0(res1, res2, max_distance);
     }
@@ -586,7 +586,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
                 // without argument, a fiber name specifies uniform attachment:
                 if ( opt.nb_values(key) == 1 )
                 {
-                    Property * p = simul.findProperty(title(), str);
+                    Property * p = simul_.findProperty(title(), str);
                     if ( p )
                         return randomSite(static_cast<FiberProp*>(p));
                 }

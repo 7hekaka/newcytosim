@@ -9,18 +9,18 @@
 
 Event * EventSet::first() const
 {
-    return static_cast<Event*>(pool.front());
+    return static_cast<Event*>(pool_.front());
 }
 
 Event * EventSet::findID(ObjectID n) const
 {
-    return static_cast<Event*>(inventory.get(n));
+    return static_cast<Event*>(inventory_.get(n));
 }
 
 void EventSet::step()
 {
     for ( Event * e=first(); e; e=e->next() )
-        e->step(simul);
+        e->step(simul_);
 }
 
 
@@ -57,7 +57,7 @@ Object * EventSet::newObject(const ObjectTag tag, size_t num)
 ObjectList EventSet::newObjects(const std::string&, Glossary& opt)
 {
     ObjectList res;
-    Event * e = new Event(simul.time(), opt);
+    Event * e = new Event(simul_.time(), opt);
     res.push_back(e);
     return res;
 }
@@ -68,7 +68,7 @@ void EventSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 

@@ -11,13 +11,13 @@
 
 Tubule * TubuleSet::first() const
 {
-    return static_cast<Tubule*>(pool.front());
+    return static_cast<Tubule*>(pool_.front());
 }
 
 
 Tubule * TubuleSet::findID(ObjectID n) const
 {
-    return static_cast<Tubule*>(inventory.get(n));
+    return static_cast<Tubule*>(inventory_.get(n));
 }
 
 
@@ -40,7 +40,7 @@ Object * TubuleSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Tubule::TAG )
     {
-        TubuleProp * p = simul.findProperty<TubuleProp>("tubule", num);
+        TubuleProp * p = simul_.findProperty<TubuleProp>("tubule", num);
         return new Tubule(p);
     }
     std::cerr << "Warning: unknown Tubule tag `"+std::string(1,tag)+"' requested\n";
@@ -61,10 +61,10 @@ Object * TubuleSet::newObject(const ObjectTag tag, size_t num)
 ObjectList TubuleSet::newObjects(const std::string& name, Glossary& opt)
 {
     ObjectList res;
-    TubuleProp * p = simul.findProperty<TubuleProp>("tubule", name);
+    TubuleProp * p = simul_.findProperty<TubuleProp>("tubule", name);
     Tubule * o = new Tubule(p);
     res.push_back(o);
-    res.append(o->build(opt, simul));
+    res.append(o->build(opt, simul_));
     return res;
 }
 
@@ -74,6 +74,6 @@ void TubuleSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }

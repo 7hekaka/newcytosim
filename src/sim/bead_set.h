@@ -42,16 +42,16 @@ public:
     void   remove(Object *);
     
     /// first Object
-    Bead * first() const { return static_cast<Bead*>(pool.front()); }
+    Bead * first() const { return static_cast<Bead*>(pool_.front()); }
     
     /// first Bead in inventory
-    Bead * firstID() const { return static_cast<Bead*>(inventory.first()); }
+    Bead * firstID() const { return static_cast<Bead*>(inventory_.first()); }
     
     /// next Bead in inventory
-    Bead * nextID(Bead const* obj) const { return static_cast<Bead*>(inventory.next(obj)); }
+    Bead * nextID(Bead const* obj) const { return static_cast<Bead*>(inventory_.next(obj)); }
 
     /// find object from its Number
-    Bead * findID(ObjectID n) const { return static_cast<Bead*>(inventory.get(n)); }
+    Bead * findID(ObjectID n) const { return static_cast<Bead*>(inventory_.get(n)); }
     
     /// modulo the position (periodic boundary conditions)
     void   foldPosition(Modulo const*) const;

@@ -40,13 +40,13 @@ public:
     void     remove(Object *);
 
     /// first Object
-    Sphere * first() const { return static_cast<Sphere*>(pool.front()); }
+    Sphere * first() const { return static_cast<Sphere*>(pool_.front()); }
     
     /// first Sphere in inventory
-    Sphere * firstID() const { return static_cast<Sphere*>(inventory.first()); }
+    Sphere * firstID() const { return static_cast<Sphere*>(inventory_.first()); }
 
     /// return pointer to the Object of given ID, or zero if not found
-    Sphere * findID(ObjectID n) const { return static_cast<Sphere*>(inventory.get(n));}
+    Sphere * findID(ObjectID n) const { return static_cast<Sphere*>(inventory_.get(n));}
     
     /// modulo the position (periodic boundary conditions)
     void     foldPosition(Modulo const* s) const;

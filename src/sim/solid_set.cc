@@ -64,11 +64,11 @@ Object * SolidSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Solid::TAG )
     {
-        Property * p = simul.properties.find("solid", num);
+        Property * p = simul_.properties.find("solid", num);
 #ifdef BACKWARD_COMPATIBILITY
         // prior to 04.2016, "bead" and "solid" were used interchangeably
         if ( !p )
-             p = simul.properties.find("bead", num);
+             p = simul_.properties.find("bead", num);
 #endif
         if ( !p )
             throw InvalidIO("could not find `solid' class with ID "+std::to_string(num));
@@ -84,12 +84,12 @@ Object * SolidSet::newObject(const ObjectTag tag, size_t num)
  */
 ObjectList SolidSet::newObjects(const std::string& name, Glossary& opt)
 {
-    SolidProp * p = simul.findProperty<SolidProp>("solid", name);
+    SolidProp * p = simul_.findProperty<SolidProp>("solid", name);
     Solid * obj = new Solid(p);
     
     ObjectList res;
     res.push_back(obj);
-    res.append(obj->build(opt, simul));
+    res.append(obj->build(opt, simul_));
     obj->fixShape();
     return res;
 }
@@ -100,7 +100,7 @@ void SolidSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 
@@ -116,7 +116,7 @@ void SolidSet::add(Object * obj)
 void SolidSet::remove(Object * obj)
 {
     ObjectSet::remove(obj);
-    simul.singles.removeWrists(obj);
+    simul_.singles.removeWrists(obj);
 }
 
 

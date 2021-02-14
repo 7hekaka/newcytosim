@@ -15,13 +15,13 @@
 // first Organizer
 Organizer * OrganizerSet::first() const
 {
-    return static_cast<Organizer*>(pool.front());
+    return static_cast<Organizer*>(pool_.front());
 }
 
 // find object with given ID
 Organizer * OrganizerSet::findID(ObjectID n) const
 {
-    return static_cast<Organizer*>(inventory.get(n));
+    return static_cast<Organizer*>(inventory_.get(n));
 }
 
 //------------------------------------------------------------------------------
@@ -53,25 +53,25 @@ Object * OrganizerSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Aster::TAG )
     {
-        AsterProp * p = simul.findProperty<AsterProp>("aster", num);
+        AsterProp * p = simul_.findProperty<AsterProp>("aster", num);
         return new Aster(p);
     }
     
     if ( tag == Bundle::TAG )
     {
-        BundleProp * p = simul.findProperty<BundleProp>("bundle", num);
+        BundleProp * p = simul_.findProperty<BundleProp>("bundle", num);
         return new Bundle(p);
     }
     
     if ( tag == Nucleus::TAG )
     {
-        NucleusProp * p = simul.findProperty<NucleusProp>("nucleus", num);
+        NucleusProp * p = simul_.findProperty<NucleusProp>("nucleus", num);
         return new Nucleus(p);
     }
     
     if ( tag == Fake::TAG )
     {
-        FakeProp * p = simul.findProperty<FakeProp>("fake", num);
+        FakeProp * p = simul_.findProperty<FakeProp>("fake", num);
         return new Fake(p);
     }
     
@@ -83,7 +83,7 @@ Object * OrganizerSet::newObject(const ObjectTag tag, size_t num)
 ObjectList OrganizerSet::newObjects(const std::string& name, Glossary& opt)
 {
     Organizer * obj = nullptr;
-    Property * p = simul.properties.find_or_die(name);
+    Property * p = simul_.properties.find_or_die(name);
     
     if ( p->category() == "aster" )
         obj = new Aster(static_cast<AsterProp*>(p));
@@ -97,7 +97,7 @@ ObjectList OrganizerSet::newObjects(const std::string& name, Glossary& opt)
     ObjectList res;
     if ( obj )
     {
-        res = obj->build(opt, simul);
+        res = obj->build(opt, simul_);
         res.push_back(obj);
     }
     
@@ -110,7 +110,7 @@ void OrganizerSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 
@@ -120,7 +120,7 @@ void OrganizerSet::add(Object * obj)
 {
     ObjectSet::add(obj);
     // we also link all dependent objects:
-    static_cast<Organizer*>(obj)->addOrganized();
+    static_cast<Organizer*>(obj)->addOrganized(simul_);
 }
 
 
@@ -143,13 +143,13 @@ void OrganizerSet::report(std::ostream& os) const
     {
         unsigned total = 0;
         os << '\n' << title();
-        for ( Property const* i : simul.properties.find_all("aster", "bundle") )
+        for ( Property const* i : simul_.properties.find_all("aster", "bundle") )
         {
             size_t cnt = count(match_property, i);
             os << '\n' << std::setw(10) << cnt << " " << i->name();
             ++total;
         }
-        for ( Property const* i : simul.properties.find_all("nucleus", "fake") )
+        for ( Property const* i : simul_.properties.find_all("nucleus", "fake") )
         {
             size_t cnt = count(match_property, i);
             os << '\n' << std::setw(10) << cnt << " " << i->name();

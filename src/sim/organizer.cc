@@ -49,9 +49,8 @@ void Organizer::goodbye(Buddy const* b)
 }
 
 
-void Organizer::addOrganized()
+void Organizer::addOrganized(Simul & sim)
 {
-    Simul & sim = simul();
     for ( Mecable * i : mObjects )
     {
         if ( i && ! i->linked() )

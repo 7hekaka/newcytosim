@@ -53,29 +53,29 @@ void help(std::ostream& os)
 
 //------------------------------------------------------------------------------
 
-void report_raw(Simul const& simul, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
+void report_raw(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
     if ( verbose > 0 )
     {
         os << "\n% frame   " << frm << '\n';
-        simul.report_wrap(os, what, opt);
+        sim.report_wrap(os, what, opt);
     }
     else
     {
         std::stringstream ss;
-        simul.report(ss, what, opt);
+        sim.report(ss, what, opt);
         StreamFunc::skip_lines(os, ss, '%');
     }
 }
 
 
-void report_prefix(Simul const& simul, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
+void report_prefix(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
     char str[256] = { 0 };
     size_t str_len = 0;
     
     if ( prefix & 1 )
-        str_len += snprintf(str, sizeof(str), "%9.3f ", simul.time());
+        str_len += snprintf(str, sizeof(str), "%9.3f ", sim.time());
     
     if ( prefix & 2 )
         str_len += snprintf(str+str_len, sizeof(str)-str_len, "%9lu ", frm);
@@ -85,12 +85,12 @@ void report_prefix(Simul const& simul, std::ostream& os, std::string const& what
     if ( verbose )
     {
         os << "% frame   " << frm << '\n';
-        simul.report_wrap(ss, what, opt);
+        sim.report_wrap(ss, what, opt);
         StreamFunc::prefix_lines(os, ss, str, '%', 0);
     }
     else
     {
-        simul.report(ss, what, opt);
+        sim.report(ss, what, opt);
         StreamFunc::prefix_lines(os, ss, str, 0, '%');
     }
 }

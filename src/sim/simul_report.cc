@@ -838,7 +838,7 @@ static int compareFibers(Object const* A, Object const* B)
 void Simul::reportFibersSorted(std::ostream& out, Property const* sel, bool com) const
 {
     // sort fibers in the ObjectPool:
-    const_cast<Simul*>(this)->fibers.pool.blinksort(compareFibers);
+    const_cast<Simul*>(this)->fibers.pool_.blinksort(compareFibers);
 
     if ( com )
     {

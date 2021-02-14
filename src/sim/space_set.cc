@@ -131,7 +131,7 @@ Object * SpaceSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Space::TAG )
     {
-        SpaceProp * p = simul.findProperty<SpaceProp>("space", num);
+        SpaceProp * p = simul_.findProperty<SpaceProp>("space", num);
         Space * s = p->newSpace();
         if ( !s )
             std::cerr << "Warning: unknown Space class `"+p->shape+"'\n";
@@ -152,7 +152,7 @@ Object * SpaceSet::newObject(const ObjectTag tag, size_t num)
  */
 ObjectList SpaceSet::newObjects(const std::string& name, Glossary& opt)
 {
-    SpaceProp * p = simul.findProperty<SpaceProp>("space", name);
+    SpaceProp * p = simul_.findProperty<SpaceProp>("space", name);
     Space * obj = p->newSpace(opt);
 
     if ( !obj )
@@ -173,7 +173,7 @@ void SpaceSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 
@@ -183,7 +183,7 @@ void SpaceSet::report(std::ostream& os) const
     if ( size() > 0 )
     {
         os << '\n' << title();
-        PropertyList plist = simul.properties.find_all(title());
+        PropertyList plist = simul_.properties.find_all(title());
         for ( Property const* i : plist )
         {
             SpaceProp const* p = static_cast<SpaceProp const*>(i);

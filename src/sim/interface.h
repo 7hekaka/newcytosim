@@ -33,7 +33,7 @@ private:
 public:
     
     /// associated Simul
-    Simul& simul;
+    Simul& simul_;
     
     /// construct and associates with given Simul
     Interface(Simul&);

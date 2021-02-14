@@ -52,19 +52,19 @@ public:
     //--------------------------
 
     /// first Fiber
-    Fiber * first()            const { return static_cast<Fiber*>(pool.front()); }
+    Fiber * first()            const { return static_cast<Fiber*>(pool_.front()); }
     
     /// last Fiber
-    Fiber * last()             const { return static_cast<Fiber*>(pool.back()); }
+    Fiber * last()             const { return static_cast<Fiber*>(pool_.back()); }
     
     /// first Fiber in inventory
-    Fiber * firstID()          const { return static_cast<Fiber*>(inventory.first()); }
+    Fiber * firstID()          const { return static_cast<Fiber*>(inventory_.first()); }
 
     /// next Fiber in inventory
-    Fiber * nextID(Fiber const* obj) const { return static_cast<Fiber*>(inventory.next(obj)); }
+    Fiber * nextID(Fiber const* obj) const { return static_cast<Fiber*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found
-    Fiber * findID(ObjectID n) const { return static_cast<Fiber*>(inventory.get(n)); }
+    Fiber * findID(ObjectID n) const { return static_cast<Fiber*>(inventory_.get(n)); }
 
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
     void planarCut(Vector const& n, real a, state_t stateP, state_t stateM);

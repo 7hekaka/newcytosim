@@ -116,19 +116,19 @@ void Parser::parse_set(std::istream& is)
             else
 #endif
             opt.read(blok);
-            execute_change(simul.prop, opt);
+            execute_change(simul_.prop, opt);
             if ( name != "*" )
-                simul.rename(name);
+                simul_.rename(name);
         }
 #ifdef BACKWARD_COMPATIBILITY
         else if ( para == "display" )
         {
             opt.define(para, blok);
-            execute_change(simul.prop, opt);
+            execute_change(simul_.prop, opt);
         }
 #endif
     }
-    else if ( simul.isCategory(cat) && !spec )
+    else if ( simul_.isCategory(cat) && !spec )
     {
         /* in this form:
          set CLASS NAME { PARAMETER = VALUE }
@@ -247,7 +247,7 @@ void Parser::parse_change(std::istream& is)
     {
         change_all = true;
         name = Tokenizer::get_symbol(is);
-        if ( !simul.isCategory(name) )
+        if ( !simul_.isCategory(name) )
             throw InvalidSyntax("`"+name+"' is not a known class of object");
     }
 
@@ -278,7 +278,7 @@ void Parser::parse_change(std::istream& is)
             is.get();
             change_all = true;
         }
-        else if ( simul.findProperty(name, para) )
+        else if ( simul_.findProperty(name, para) )
         {
             //change CLASS NAME { VALUE }
             name = para;
@@ -367,7 +367,7 @@ void Parser::parse_new(std::istream& is)
     
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
-    if ( simul.isCategory(name) )
+    if ( simul_.isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -395,7 +395,7 @@ void Parser::parse_new(std::istream& is)
         }
         else
         {
-            size_t nb_objects = simul.nbObjects();
+            size_t nb_objects = simul_.nbObjects();
             
             // syntax sugar, to specify the position of the Fiber ends
             if ( opt.has_key("position_ends") )
@@ -441,7 +441,7 @@ void Parser::parse_new(std::istream& is)
             size_t required = 0;
             if ( opt.set(required, "required") )
             {
-                size_t created = simul.nbObjects() - nb_objects;
+                size_t created = simul_.nbObjects() - nb_objects;
                 if ( created < required )
                 {
                     std::cerr << "created  = " << created << '\n';
@@ -526,7 +526,7 @@ void Parser::parse_delete(std::istream& is)
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
-    if ( simul.isCategory(name) )
+    if ( simul_.isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -578,7 +578,7 @@ void Parser::parse_mark(std::istream& is)
     std::string name = Tokenizer::get_symbol(is);
 #ifdef BACKWARD_COMPATIBILITY
     // Read formats anterior to 3.11.2017
-    if ( simul.isCategory(name) )
+    if ( simul_.isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -661,7 +661,7 @@ void Parser::parse_run(std::istream& is)
         if ( is.peek() == '*' )
         {
             is.get();
-            name = simul.prop->name();
+            name = simul_.prop->name();
         }
     }
 #endif
@@ -670,13 +670,13 @@ void Parser::parse_run(std::istream& is)
     
     if ( name == "all" )
     {
-        if ( Tokenizer::get_symbol(is) != "simul" )
-            throw InvalidSyntax("expected `run all simul { }')");
+        if ( Tokenizer::get_symbol(is) != "simul_" )
+            throw InvalidSyntax("expected `run all simul_ { }')");
         // There can only be one Simul object:
-        name = simul.prop->name();
+        name = simul_.prop->name();
     }
     
-    if ( name != "*"  &&  name != simul.prop->name() )
+    if ( name != "*"  &&  name != simul_.prop->name() )
         throw InvalidSyntax("unknown simul name `"+name+"'");
 
     std::string blok = Tokenizer::get_block(is, '{');
@@ -698,7 +698,7 @@ void Parser::parse_run(std::istream& is)
                 {
                     if ( span <= 0 )
                         throw InvalidParameter("duration must be >= 0'");
-                    cnt = (size_t)std::ceil(span/simul.time_step());
+                    cnt = (size_t)std::ceil(span/simul_.time_step());
                 }
             }
         }
@@ -1013,7 +1013,7 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( size_t c = 0; c < cnt; ++c )
     {
-        if ( simul.prop->verbose )
+        if ( simul_.prop->verbose )
             Cytosim::log("repeat code %lu/%lu\n", c+1, cnt);
         evaluate(code);
     }
@@ -1111,17 +1111,17 @@ void Parser::parse_dump(std::istream& is)
         int mode = 1;
         opt.set(mode, "mode");
 
-        simul.sMeca.doNotify = 1;
-        simul.solve_half();
+        simul_.sMeca.doNotify = 1;
+        simul_.solve_half();
         
         char const* dir = str.c_str();
         std::string cwd = FilePath::get_cwd();
         FilePath::change_dir(dir, true);
-        fprintf(stderr, "Cytosim is dumping a system of size %lu in `%s'...", simul.sMeca.dimension(), dir);
+        fprintf(stderr, "Cytosim is dumping a system of size %lu in `%s'...", simul_.sMeca.dimension(), dir);
 
-        if ( mode & 1 ) simul.sMeca.saveSystem();
-        if ( mode & 2 ) simul.sMeca.dumpSystem();
-        if ( mode & 4 ) simul.sMeca.exportSystem();
+        if ( mode & 1 ) simul_.sMeca.saveSystem();
+        if ( mode & 2 ) simul_.sMeca.dumpSystem();
+        if ( mode & 4 ) simul_.sMeca.exportSystem();
 
         FilePath::change_dir(cwd);
         fprintf(stderr, "done\n");
@@ -1219,7 +1219,7 @@ int Parser::evaluate_one(std::istream& is)
     else if ( tok == "restart" )
     {
         // reset simulation and rewind config file, repeating forever
-        simul.erase();
+        simul_.erase();
         is.clear();
         is.seekg(0);
         return 0;
@@ -1276,6 +1276,6 @@ void Parser::readConfig(std::string const& filename)
 
 void Parser::readConfig()
 {
-    readConfig(simul.prop->config_file);
+    readConfig(simul_.prop->config_file);
 }
 

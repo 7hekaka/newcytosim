@@ -49,7 +49,7 @@ void SingleSet::step()
     if ( uniEnabled )
     {
         obj = uniCollect(fHead);
-        uniAttach(simul.fibers);
+        uniAttach(simul_.fibers);
     }
     else
         obj = fHead;
@@ -84,12 +84,12 @@ Object * SingleSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Single::TAG )
     {
-        SingleProp * p = simul.findProperty<SingleProp>("single", num);
+        SingleProp * p = simul_.findProperty<SingleProp>("single", num);
         return p->newSingle();
     }
     else if ( tag == Wrist::TAG )
     {
-        SingleProp * p = simul.findProperty<SingleProp>("single", num);
+        SingleProp * p = simul_.findProperty<SingleProp>("single", num);
         return p->newWrist(nullptr, 0);
     }
     std::cerr << "Warning: unknown Single tag `"+std::string(1,tag)+"' requested\n";
@@ -141,13 +141,13 @@ Object * SingleSet::newObject(const ObjectTag tag, size_t num)
  */
 ObjectList SingleSet::newObjects(const std::string& name, Glossary& opt)
 {
-    SingleProp * p = simul.findProperty<SingleProp>("single", name);
+    SingleProp * p = simul_.findProperty<SingleProp>("single", name);
     
     Single * obj = nullptr;
     std::string str;
     if ( opt.set(str, "base") )
     {
-        Mecable * mec = simul.findMecable(str);
+        Mecable * mec = simul_.findMecable(str);
         if ( !mec )
             throw InvalidParameter("could not find Mecable specified in single:base `"+str+"'");
         // get index of point in second argument
@@ -162,11 +162,11 @@ ObjectList SingleSet::newObjects(const std::string& name, Glossary& opt)
 
     // Allow user to attach Hand to an existing fiber
     if ( opt.has_key("attach") )
-        obj->attach(simul.fibers.someSite("attach", opt));
+        obj->attach(simul_.fibers.someSite("attach", opt));
     
     // Allow user to attach Hand to an existing fiber
     if ( opt.has_key("site") )
-        obj->attach(simul.fibers.someSite("site", opt));
+        obj->attach(simul_.fibers.someSite("site", opt));
 
     ObjectList res;
     res.push_back(obj);
@@ -246,7 +246,7 @@ void SingleSet::erase()
     relax();
     ObjectSet::erase(fList);
     ObjectSet::erase(aList);
-    inventory.clear();
+    inventory_.clear();
 }
 
 
@@ -285,7 +285,7 @@ void SingleSet::pruneDetach(ObjectFlag f)
 void SingleSet::deleteA(Single * s)
 {
     s->hand()->detachHand();
-    inventory.unassign(s);
+    inventory_.unassign(s);
     s->objset(nullptr);
     aList.pop(s);
     delete(s);
@@ -368,7 +368,7 @@ void SingleSet::report(std::ostream& os) const
     if ( size() > 0 )
     {
         os << '\n' << title();
-        PropertyList plist = simul.properties.find_all(title());
+        PropertyList plist = simul_.properties.find_all(title());
         for ( Property const* i : plist )
         {
             SingleProp const* p = static_cast<SingleProp const*>(i);
@@ -443,7 +443,7 @@ ObjectList SingleSet::makeWrists(Mecable const* obj, size_t fip, size_t nbp, std
     std::string str, mod;
     iss >> str >> mod;
     
-    SingleProp * sip = simul.findProperty<SingleProp>("single", str);
+    SingleProp * sip = simul_.findProperty<SingleProp>("single", str);
 
     if ( mod == "each" )
     {
@@ -514,7 +514,7 @@ void SingleSet::uniRefill(SingleList& can, size_t cnt, SingleProp const* p)
     for ( size_t i = can.size(); i < cnt; ++i )
     {
         Single* s = p->newSingle();
-        inventory.assign(s);
+        inventory_.assign(s);
         can.push_back(s);
     }
 }

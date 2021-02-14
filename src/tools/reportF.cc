@@ -51,27 +51,27 @@ void help(std::ostream& os)
 
 //------------------------------------------------------------------------------
 
-void report(Simul const& simul, std::ostream& os, std::string const& what, Glossary& opt)
+void report(Simul const& sim, std::ostream& os, std::string const& what, Glossary& opt)
 {
     if ( verbose > 0 )
     {
-        simul.report_wrap(os, what, opt);
+        sim.report_wrap(os, what, opt);
     }
     else
     {
         std::stringstream ss;
-        simul.report(ss, what, opt);
+        sim.report(ss, what, opt);
         StreamFunc::skip_lines(os, ss, '%');
     }
 }
 
 
-void report(Simul const& simul, std::string const& what, Glossary& opt, size_t frm)
+void report(Simul const& sim, std::string const& what, Glossary& opt, size_t frm)
 {
     char filename[256];
     snprintf(filename, sizeof(filename), "%s%04lu.txt", root, frm);
     std::ofstream os(filename);
-    report(simul, os, what, opt);
+    report(sim, os, what, opt);
 }
 
 //------------------------------------------------------------------------------

@@ -22,14 +22,14 @@ void ObjectSet::link(Object * obj)
 {
     assert_true( !obj->objset() );
     obj->objset(this);
-    pool.push_front(obj);
+    pool_.push_front(obj);
 }
 
 
 void ObjectSet::unlink(Object * obj)
 {
     assert_true( obj->objset() == this );
-    pool.pop(obj);
+    pool_.pop(obj);
     obj->objset(nullptr);
 }
 
@@ -143,7 +143,7 @@ void ObjectSet::add(Object * obj)
 {
     if ( !obj->linked() )
     {
-        inventory.assign(obj);
+        inventory_.assign(obj);
         link(obj);
         //std::clog << "ObjectSet::add(" << obj->reference() << ")\n";
     }
@@ -164,7 +164,7 @@ void ObjectSet::add(ObjectList const& list)
 void ObjectSet::remove(Object * obj)
 {
     //std::clog << "ObjectSet::remove " <<  obj->reference() << '\n';
-    inventory.unassign(obj);
+    inventory_.unassign(obj);
     if ( obj->linked() )
         unlink(obj);
 }
@@ -201,8 +201,8 @@ void ObjectSet::erase(Object * obj)
 
 void ObjectSet::erase()
 {
-    erase(pool);
-    inventory.clear();
+    erase(pool_);
+    inventory_.clear();
 }
 
 
@@ -215,14 +215,14 @@ Object* ObjectSet::findObject(std::string spec, long num, const std::string& tit
         Inventoried * inv = nullptr;
         if ( num > 0 )
         {
-            inv = inventory.get(num);
+            inv = inventory_.get(num);
         }
         else
         {
             // start from the end of the list:
-            inv = inventory.last();
+            inv = inventory_.last();
             while ( inv  &&  ++num <= 0 )
-                inv = inventory.previous(inv);
+                inv = inventory_.previous(inv);
         }
         return static_cast<Object*>(inv);
     }
@@ -230,23 +230,23 @@ Object* ObjectSet::findObject(std::string spec, long num, const std::string& tit
     // check if string starts with 'first'
     if ( spec == "first" )
     {
-        Inventoried* inv = inventory.first();
+        Inventoried* inv = inventory_.first();
         while ( inv  &&  --num >= 0 )
-            inv = inventory.next(inv);
+            inv = inventory_.next(inv);
         return static_cast<Object*>(inv);
     }
     
     // check if string starts with 'last'
     if ( spec == "last" )
     {
-        Inventoried* inv = inventory.last();
+        Inventoried* inv = inventory_.last();
         while ( inv  &&  ++num <= 0 )
-            inv = inventory.previous(inv);
+            inv = inventory_.previous(inv);
         return static_cast<Object*>(inv);
     }
     
     // finally search for a property name:
-    Property * pp = simul.findProperty(title, spec);
+    Property * pp = simul_.findProperty(title, spec);
 
     if ( pp )
     {
@@ -255,26 +255,26 @@ Object* ObjectSet::findObject(std::string spec, long num, const std::string& tit
         {
             // 'microtubule1' would return the first created microtubule
             // std::clog << "findObject -> highest pick `" << spec << num << "'\n";
-            inv = inventory.first();
+            inv = inventory_.first();
             while ( inv )
             {
                 num -= ( static_cast<Object*>(inv)->property() == pp );
                 if ( num <= 0 )
                     break;
-                inv = inventory.next(inv);
+                inv = inventory_.next(inv);
             }
         }
         else
         {
             // 'microtubule0' would return the last created microtubule
             //std::clog << "findObject -> highest pick `" << spec << num << "'\n";
-            inv = inventory.last();
+            inv = inventory_.last();
             while ( inv )
             {
                 num += ( static_cast<Object*>(inv)->property() == pp );
                 if ( num > 0 )
                     break;
-                inv = inventory.previous(inv);
+                inv = inventory_.previous(inv);
             }
         }
         return static_cast<Object*>(inv);
@@ -321,10 +321,10 @@ Object* ObjectSet::findObject(std::string spec, const std::string& title) const
     //std::clog << "ObjectSet::findObject " << spec << '\n';
     
     if ( spec == "first" )
-        return static_cast<Object*>(inventory.first());
+        return static_cast<Object*>(inventory_.first());
     
     if ( spec == "last" )
-        return static_cast<Object*>(inventory.last());
+        return static_cast<Object*>(inventory_.last());
  
     // try to split into a word and a number:
     long num = 0;
@@ -341,7 +341,7 @@ Object* ObjectSet::findObject(std::string spec, const std::string& title) const
     }
     
     // check property name:
-    Property * p = simul.findProperty(title, spec);
+    Property * p = simul_.findProperty(title, spec);
     if ( p )
     {
         ObjectList sel = collect(match_property, p);
@@ -408,13 +408,13 @@ ObjectList ObjectSet::collect(const ObjectPool & list,
 
 ObjectList ObjectSet::collect() const
 {
-    return collect(pool);
+    return collect(pool_);
 }
 
 
 ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    return collect(pool, func, arg);
+    return collect(pool_, func, arg);
 }
 
 
@@ -426,7 +426,7 @@ ObjectList ObjectSet::collect(Property const* p) const
 
 size_t ObjectSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    return count(pool, func, arg);
+    return count(pool_, func, arg);
 }
 
 //------------------------------------------------------------------------------
@@ -525,7 +525,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool dis
     try {
         //std::clog << "- loading " << Object::reference(tag, ix, id) << '\n';
         // read object data:
-        obj->read(in, simul, tag);
+        obj->read(in, simul_, tag);
     }
     catch( Exception & e )
     {
@@ -554,7 +554,7 @@ void ObjectSet::writeReport(std::ostream& os, const std::string& title) const
     if ( size() > 0 )
     {
         os << '\n' << title;
-        PropertyList plist = simul.properties.find_all(title);
+        PropertyList plist = simul_.properties.find_all(title);
         if ( plist.size() > 0 )
         {
             for ( Property * p : plist )

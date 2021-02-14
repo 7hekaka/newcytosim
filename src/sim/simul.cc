@@ -298,10 +298,10 @@ void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 Space const* Simul::findSpace(std::string const& str) const
 {
     if ( str == "first" )
-        return static_cast<Space*>(spaces.inventory.first());
+        return static_cast<Space*>(spaces.inventory_.first());
 
     if ( str == "last" )
-        return static_cast<Space*>(spaces.inventory.last());
+        return static_cast<Space*>(spaces.inventory_.last());
     
     Property * sp = properties.find("space", str);
     

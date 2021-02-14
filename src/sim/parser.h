@@ -104,7 +104,7 @@ public:
     /// Open and parse the config file with the given name
     void readConfig(std::string const& name);
 
-    /// Parse the default config file i.e. calls readConfig(simul.prop->config)
+    /// Parse the default config file (SimulProp::config)
     void readConfig();
 
 };

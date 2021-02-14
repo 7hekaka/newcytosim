@@ -44,24 +44,24 @@ private:
 public:
 
     /// holds pointers to the Objects organized by ObjectID
-    Inventory         inventory;
+    Inventory inventory_;
     
     /// holds pointers to the Objects in a doubly linked list
-    ObjectPool        pool;
+    ObjectPool pool_;
     
     /// the Simul containing this set
-    Simul&            simul;
+    Simul& simul_;
     
 protected:
     
     /// mark all objects from given list with value `f`
-    static void       flag(ObjectPool const&, ObjectFlag f);
+    static void flag(ObjectPool const&, ObjectFlag f);
     
     /// delete objects which are marked as `f` from given list, and mark objects with `s`
-    static void       prune(ObjectPool const&, ObjectFlag f, ObjectFlag g);
+    static void prune(ObjectPool const&, ObjectFlag f, ObjectFlag g);
     
     /// collect objects from ObjectPool for which func(obj, val) == true
-    static size_t     count(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
+    static size_t count(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
 
     /// collect all objects
     static ObjectList collect(ObjectPool const&);
@@ -70,47 +70,47 @@ protected:
     static ObjectList collect(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
 
     /// write Object in ObjectPool to file
-    static void       writeObjects(Outputter&, ObjectPool const&);
+    static void writeObjects(Outputter&, ObjectPool const&);
     
     /// print a list of the content (nb of objects, class)
-    void              writeReport(std::ostream&, const std::string& title) const;
+    void writeReport(std::ostream&, const std::string& title) const;
 
 public:
     
     /// mark objects before import
-    virtual void      freeze(ObjectFlag f) { flag(pool, f); }
+    virtual void freeze(ObjectFlag f) { flag(pool_, f); }
     
     /// delete marked objects
-    virtual void      prune(ObjectFlag f)  { prune(pool, f, 0); }
+    virtual void prune(ObjectFlag f)  { prune(pool_, f, 0); }
     
     /// unmark objects after import
-    virtual void      thaw()               { flag(pool, 0); }
+    virtual void thaw()               { flag(pool_, 0); }
     
     /// apply translation to all Objects in ObjectList
-    static void       translateObjects(ObjectList const&, Vector const&);
+    static void translateObjects(ObjectList const&, Vector const&);
     
     /// apply rotation to all Objects in ObjectList
-    static void       rotateObjects(ObjectList const&, Rotation const&);
+    static void rotateObjects(ObjectList const&, Rotation const&);
     
     /// apply Isometry to all Objects in ObjectList
-    static void       moveObjects(ObjectList const&, Isometry const&);
+    static void moveObjects(ObjectList const&, Isometry const&);
 
     /// flag all Objects in ObjectList
-    static void       flagObjects(ObjectList const&, ObjectFlag f);
+    static void flagObjects(ObjectList const&, ObjectFlag f);
 
     /// apply translation to unflagged Objects in list
-    static void       translateObjects(ObjectList const&, Vector const&, ObjectFlag f);
+    static void translateObjects(ObjectList const&, Vector const&, ObjectFlag f);
     
     /// apply rotation to unflagged Objects in list
-    static void       rotateObjects(ObjectList const&, Rotation const&, ObjectFlag f);
+    static void rotateObjects(ObjectList const&, Rotation const&, ObjectFlag f);
 
     /// apply Isometry to unflagged Objects in list
-    static void       moveObjects(ObjectList const&, Isometry const&, ObjectFlag f);
+    static void moveObjects(ObjectList const&, Isometry const&, ObjectFlag f);
 
 public:
     
     /// creator
-    ObjectSet(Simul& s) : simul(s) { }
+    ObjectSet(Simul& s) : simul_(s) { }
     
     /// destructor
     virtual ~ObjectSet() { erase(); }    
@@ -124,65 +124,65 @@ public:
     virtual ObjectList newObjects(const std::string& name, Glossary& opt) = 0;
    
     /// create new Object with given Tag and Property `num` (used for reading trajectory file)
-    virtual Object *   newObject(ObjectTag, size_t num) = 0;
+    virtual Object * newObject(ObjectTag, size_t num) = 0;
 
     //--------------------------
     
     /// register Object, and add it at the end of the list
-    virtual void       add(Object *);
+    virtual void add(Object *);
     
     /// add multiple Objects
-    void               add(ObjectList const&);
+    void add(ObjectList const&);
     
     /// remove Object
-    virtual void       remove(Object *);
+    virtual void remove(Object *);
 
     /// remove all Objects in list
-    void               remove(ObjectList const&);
+    void remove(ObjectList const&);
     
     /// link the object last in the list
-    virtual void       link(Object *);
+    virtual void link(Object *);
     
     /// link the object last in the list
-    virtual void       unlink(Object *);
+    virtual void unlink(Object *);
 
     /// remove Object, and delete it
-    void               erase(Object *);
+    void erase(Object *);
     
     /// delete  Objects specified in given list
-    void               erase(ObjectPool&);
+    void erase(ObjectPool&);
 
     /// delete all Objects in list and forget all serial numbers
-    virtual void       erase();
+    virtual void erase();
     
     /// number of elements
-    virtual size_t     size()             const { return pool.size(); }
+    virtual size_t size()       const { return pool_.size(); }
 
     /// mix the order of elements in the doubly linked list pool
-    virtual void       shuffle()                { pool.shuffle(); }
+    virtual void shuffle()            { pool_.shuffle(); }
     
     /// first Object in the list
-    Object *           first()            const { return static_cast<Object*>(pool.front()); }
+    Object * first()            const { return static_cast<Object*>(pool_.front()); }
     
     /// last Object
-    Object *           last()             const { return static_cast<Object*>(pool.back()); }
+    Object * last()             const { return static_cast<Object*>(pool_.back()); }
     
     /// find Object of given serial-number (see Inventory)
-    Object *           findID(ObjectID n) const { return static_cast<Object*>(inventory.get(n)); }
+    Object * findID(ObjectID n) const { return static_cast<Object*>(inventory_.get(n)); }
     
     /// return an Object which has this property
-    Object *           findObject(Property const*) const;
+    Object * findObject(Property const*) const;
 
     /// return Object corresponding to specifications
-    Object *           findObject(std::string spec, long identity, const std::string&) const;
+    Object * findObject(std::string spec, long identity, const std::string&) const;
     
     /// return Object corresponding to a certain criteria (eg. 'first' or 'last')
-    Object *           findObject(std::string spec, const std::string&) const;
+    Object * findObject(std::string spec, const std::string&) const;
     
     //--------------------------
     
     /// number of objects for which ( func(obj, val) == true )
-    virtual size_t     count(bool (*func)(Object const*, void const*), void const*) const;
+    virtual size_t count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// collect all objects
     virtual ObjectList collect() const;
@@ -191,21 +191,21 @@ public:
     virtual ObjectList collect(bool (*func)(Object const*, void const*), void const*) const;
 
     /// collect objects that have given Property
-    ObjectList         collect(Property const*) const;
+    ObjectList collect(Property const*) const;
     
     /// load one Object from file, or skip it if `skip==true`
-    void               loadObject(Inputter&, ObjectTag tag, bool fat, bool skip, bool update);
+    void loadObject(Inputter&, ObjectTag tag, bool fat, bool skip, bool update);
     
     /// write all Objects to file
-    virtual void       write(Outputter&) const = 0;
+    virtual void write(Outputter&) const = 0;
     
     /// print a summary of the content (nb of objects, class)
-    virtual void       report(std::ostream&) const = 0;
+    virtual void report(std::ostream&) const = 0;
 
 };
 
 
 // This is declared here rather than in object.h for inlining
-inline Simul & Object::simul() const { return set_->simul; }
+inline Simul & Object::simul() const { return set_->simul_; }
 
 #endif

@@ -29,7 +29,7 @@ protected:
     typedef std::vector<Mecable*> MecableList;
     
     /// list of Objects that are `organized`
-    MecableList   mObjects;
+    MecableList mObjects;
     
 public:
 
@@ -45,61 +45,63 @@ public:
     //--------------------------------------------------------------------------
 
     /// number of objects currently organized
-    size_t             nbOrganized() const  { return mObjects.size(); }
+    size_t nbOrganized() const  { return mObjects.size(); }
     
     /// set number of objects
-    void               nbOrganized(size_t n) { mObjects.resize(n, nullptr); }
+    void nbOrganized(size_t n) { mObjects.resize(n, nullptr); }
     
     /// return Mecable at index `n`
-    Mecable *          organized(size_t n) const { assert_true(n<mObjects.size()); return mObjects[n]; }
+    Mecable * organized(size_t n) const { assert_true(n<mObjects.size()); return mObjects[n]; }
     
     /// add Mecable at end of list
-    void               grasp(Mecable *);
+    void grasp(Mecable *);
 
     /// add Mecable at given index
-    void               grasp(Mecable *, size_t);
+    void grasp(Mecable *, size_t);
     
     /// returns true if Mecables is one of the organized object
-    bool               check(Mecable const*) const;
+    bool check(Mecable const*) const;
 
     /// handles the disapearance of one of the organized object
-    void               goodbye(Buddy const*);
+    void goodbye(Buddy const*);
     
     /// add objects to Simul if they are not already linked
-    virtual void       addOrganized();
+    virtual void addOrganized(Simul&);
 
     //--------------------------------------------------------------------------
 
     /// Organizer cannot be moved
-    int                mobile() const { return 0; }
+    int mobile() const { return 0; }
     
     /// return the center of gravity
-    virtual Vector     position() const;
+    virtual Vector position() const;
 
     /// return the average of all vertices
-    virtual Vector     positionP(size_t) const;
+    virtual Vector positionP(size_t) const;
 /*
     /// move all associated objects
-    void               translate(Vector const& T);
+    void translate(Vector const& T);
     
     /// rotate all associated objects
-    void               rotate(Rotation const& T);
+    void rotate(Rotation const& T);
 */
     /// Stochastic simulation
-    virtual void       step() {}
+    virtual void step() {}
     
     /// add interactions to a Meca
-    virtual void       setInteractions(Meca&) const {}
+    virtual void setInteractions(Meca&) const {}
     
     /// sum the drag coefficient of all objects
-    real               sumDragCoefficient() const;
-    
+    real sumDragCoefficient() const;
     
     /// retrieve end positions of link number `inx`, or returns zero if this link does not exist
-    virtual bool       getLink(size_t inx, Vector&, Vector&) const { return false; }
+    virtual size_t nbLinks() const { return 0; }
+
+    /// retrieve end positions of link number `inx`, or returns zero if this link does not exist
+    virtual bool getLink(size_t inx, Vector&, Vector&) const { return false; }
     
     /// object from that gives its display parameters
-    virtual Mecable*   core() const { return nullptr; }
+    virtual Mecable * core() const { return nullptr; }
     
     /// display parameters
     virtual PointDisp const* disp() const { return nullptr; }
@@ -115,13 +117,13 @@ public:
     //--------------------------------------------------------------------------
     
     /// read list of Mecables
-    void          readOrganized(Inputter&, Simul&, size_t);
+    void readOrganized(Inputter&, Simul&, size_t);
 
     /// read
-    void          read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write
-    void          write(Outputter&) const;
+    void write(Outputter&) const;
 };
 
 

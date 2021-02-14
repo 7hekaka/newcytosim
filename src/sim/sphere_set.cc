@@ -10,7 +10,7 @@
 void SphereSet::remove(Object * obj)
 {
     ObjectSet::remove(obj);
-    simul.singles.removeWrists(obj);
+    simul_.singles.removeWrists(obj);
 }
 
 
@@ -26,7 +26,7 @@ Object * SphereSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Sphere::TAG )
     {
-        SphereProp * p = simul.findProperty<SphereProp>("sphere", num);
+        SphereProp * p = simul_.findProperty<SphereProp>("sphere", num);
         return new Sphere(p);
     }
     std::cerr << "Warning: unknown Sphere tag `"+std::string(1,tag)+"' requested\n";
@@ -38,7 +38,7 @@ Object * SphereSet::newObject(const ObjectTag tag, size_t num)
  */
 ObjectList SphereSet::newObjects(const std::string& name, Glossary& opt)
 {
-    SphereProp * p = simul.findProperty<SphereProp>("sphere", name);
+    SphereProp * p = simul_.findProperty<SphereProp>("sphere", name);
         
     // set radius if provided as argument
     real rad = -1;
@@ -60,7 +60,7 @@ ObjectList SphereSet::newObjects(const std::string& name, Glossary& opt)
 
     ObjectList res;
     res.push_back(obj);
-    res.append(obj->build(opt, simul));
+    res.append(obj->build(opt, simul_));
     return res;
 }
 
@@ -70,7 +70,7 @@ void SphereSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 

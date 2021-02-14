@@ -102,7 +102,7 @@ void CoupleSet::step()
     if ( uniEnabled )
     {
         obj = uniCollect(ffHead);
-        uniAttach(simul.fibers);
+        uniAttach(simul_.fibers);
         while ( obj )
         {
             nxt = obj->next();
@@ -208,7 +208,7 @@ Object * CoupleSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Couple::TAG )
     {
-        CoupleProp * p = simul.findProperty<CoupleProp>("couple", num);
+        CoupleProp * p = simul_.findProperty<CoupleProp>("couple", num);
         return p->newCouple();
     }
     std::cerr << "Warning: unknown Couple tag `"+std::string(1,tag)+"' requested\n";
@@ -243,7 +243,7 @@ Object * CoupleSet::newObject(const ObjectTag tag, size_t num)
  */
 ObjectList CoupleSet::newObjects(const std::string& name, Glossary& opt)
 {
-    CoupleProp * p = simul.findProperty<CoupleProp>("couple", name);
+    CoupleProp * p = simul_.findProperty<CoupleProp>("couple", name);
     Couple * obj = p->newCouple(&opt);
     
     ObjectList res;
@@ -251,22 +251,22 @@ ObjectList CoupleSet::newObjects(const std::string& name, Glossary& opt)
         
     // Allow user to attach hand1:
     if ( opt.has_key("attach1") )
-        obj->attach1(simul.fibers.someSite("attach1", opt));
+        obj->attach1(simul_.fibers.someSite("attach1", opt));
 
     // Allow user to attach hand2:
     if ( opt.has_key("attach2") )
-        obj->attach2(simul.fibers.someSite("attach2", opt));
+        obj->attach2(simul_.fibers.someSite("attach2", opt));
 
     /* It would be possible to create Couple with custom hand type, and the
     syntax below to attach the Hands could be better used for this */
     
     // Allow user to attach hand1:
     if ( opt.has_key("site1") )
-        obj->attach1(simul.fibers.someSite("site1", opt));
+        obj->attach1(simul_.fibers.someSite("site1", opt));
     
     // Allow user to attach hand2:
     if ( opt.has_key("site2") )
-        obj->attach2(simul.fibers.someSite("site2", opt));
+        obj->attach2(simul_.fibers.someSite("site2", opt));
 
     return res;
 }
@@ -411,7 +411,7 @@ void CoupleSet::erase()
     ObjectSet::erase(faList);
     ObjectSet::erase(afList);
     ObjectSet::erase(ffList);
-    inventory.clear();
+    inventory_.clear();
 }
 
 
@@ -482,7 +482,7 @@ void CoupleSet::deleteAA(Couple * c)
 {
     c->hand1()->detachHand();
     c->hand2()->detachHand();
-    inventory.unassign(c);
+    inventory_.unassign(c);
     c->objset(nullptr);
     aaList.pop(c);
     delete(c);
@@ -492,7 +492,7 @@ void CoupleSet::deleteAA(Couple * c)
 void CoupleSet::deleteFA(Couple * c)
 {
     c->hand2()->detachHand();
-    inventory.unassign(c);
+    inventory_.unassign(c);
     c->objset(nullptr);
     faList.pop(c);
     delete(c);
@@ -502,7 +502,7 @@ void CoupleSet::deleteFA(Couple * c)
 void CoupleSet::deleteAF(Couple * c)
 {
     c->hand1()->detachHand();
-    inventory.unassign(c);
+    inventory_.unassign(c);
     c->objset(nullptr);
     afList.pop(c);
     delete(c);
@@ -608,7 +608,7 @@ void CoupleSet::report(std::ostream& os) const
     if ( size() > 0 )
     {
         os << '\n' << title();
-        PropertyList plist = simul.properties.find_all(title());
+        PropertyList plist = simul_.properties.find_all(title());
         for ( Property const* i : plist )
         {
             CoupleProp const* p = static_cast<CoupleProp const*>(i);
@@ -696,7 +696,7 @@ void CoupleSet::uniRefill(CoupleList& can, size_t cnt, CoupleProp const* p)
     for ( size_t i = can.size(); i < cnt; ++i )
     {
         Couple* c = p->newCouple();
-        inventory.assign(c);
+        inventory_.assign(c);
         can.push_back(c);
     }
 }
@@ -1130,7 +1130,7 @@ void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properti
     for ( Property * i : properties.find_all("couple") )
     {
         CoupleProp * cop = static_cast<CoupleProp *>(i);
-        cop->complete(simul);
+        cop->complete(simul_);
         
         if ( !cop->trans_activated )
         {

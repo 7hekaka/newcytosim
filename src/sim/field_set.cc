@@ -11,7 +11,7 @@
 // first object
 Field * FieldSet::first() const
 {
-    return static_cast<Field*>(pool.front());
+    return static_cast<Field*>(pool_.front());
 }
 
 // find object
@@ -23,7 +23,7 @@ Field * FieldSet::findObject(Property const* p) const
 // return pointer to the Object of given ID, or zero if not found
 Field * FieldSet::findID(ObjectID n) const
 {
-    return static_cast<Field*>(inventory.get(n));
+    return static_cast<Field*>(inventory_.get(n));
 }
 
 //------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ void FieldSet::step()
         if ( f->hasField() )
         {
             LOG_ONCE("!!!! Field is active\n");
-            f->step(simul.fibers);
+            f->step(simul_.fibers);
         }
     }
 }
@@ -65,7 +65,7 @@ Object * FieldSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Field::TAG )
     {
-        FieldProp * p = simul.findProperty<FieldProp>("field", num);
+        FieldProp * p = simul_.findProperty<FieldProp>("field", num);
         return new Field(p);
     }
     std::cerr << "Warning: unknown Field tag `"+std::string(1,tag)+"' requested\n";
@@ -87,7 +87,7 @@ Object * FieldSet::newObject(const ObjectTag tag, size_t num)
  */
 ObjectList FieldSet::newObjects(const std::string& name, Glossary& opt)
 {
-    Property * p = simul.properties.find_or_die("field", name);
+    Property * p = simul_.properties.find_or_die("field", name);
     FieldProp * fp = static_cast<FieldProp*>(p);
         
     Field * obj = new Field(fp);
@@ -102,7 +102,7 @@ ObjectList FieldSet::newObjects(const std::string& name, Glossary& opt)
         std::string str;
         if ( opt.set(str, "value", 1) )
         {
-            Space const* spc = simul.findSpace(str);
+            Space const* spc = simul_.findSpace(str);
             if ( !spc )
                 spc = obj->prop->field_space_ptr;
             obj->setConcentration(spc, val, 0);
@@ -124,7 +124,7 @@ void FieldSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 

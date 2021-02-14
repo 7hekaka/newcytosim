@@ -29,19 +29,19 @@ public:
     static std::string title() { return "space"; }
     
     /// create a new property of category `cat` for a class `name`
-    Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
+    Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    ObjectList  newObjects(const std::string& name, Glossary& opt);
+    ObjectList newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, size_t);
+    Object * newObject(ObjectTag, size_t);
     
     /// write all Objects to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream& os) const;
+    void report(std::ostream& os) const;
 
     //--------------------------
     
@@ -58,17 +58,17 @@ public:
     void step();
     
     /// first Space
-    Space * first() const { return static_cast<Space*>(pool.front()); }
+    Space * first() const { return static_cast<Space*>(pool_.front()); }
 
     /// first Space with this Property
     Space * findObject(const Property * p) const { return static_cast<Space*>(ObjectSet::findObject(p)); }
     
     /// last Space
     Space * last() const
-    { return static_cast<Space*>(pool.back());}
+    { return static_cast<Space*>(pool_.back());}
 
     /// return pointer to the Object of given ID, or zero if not found
-    Space * findID(ObjectID n) const { return static_cast<Space*>(inventory.get(n)); }
+    Space * findID(ObjectID n) const { return static_cast<Space*>(inventory_.get(n)); }
 
 };
 

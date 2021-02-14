@@ -20,7 +20,7 @@ Object * BeadSet::newObject(const ObjectTag tag, size_t num)
 {
     if ( tag == Bead::TAG )
     {
-        BeadProp * p = simul.findProperty<BeadProp>("bead", num);
+        BeadProp * p = simul_.findProperty<BeadProp>("bead", num);
         return new Bead(p, Vector(0,0,0), 0);
     }
     std::cerr << "Warning: unknown Bead tag `"+std::string(1,tag)+"' requested\n";
@@ -94,7 +94,7 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
     if ( rad <= 0 )
         throw InvalidParameter("bead:radius must be specified and > 0");
 
-    BeadProp * p = simul.findProperty<BeadProp>("bead", name);
+    BeadProp * p = simul_.findProperty<BeadProp>("bead", name);
     Bead * obj = new Bead(p, Vector(0,0,0), rad);
     
     res.push_back(obj);
@@ -102,7 +102,7 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
     std::string str;
     // attach different kinds of SINGLE
     while ( opt.set(str, var, inx++) )
-        res.append(simul.singles.makeWrists(obj, 0, 1, str));
+        res.append(simul_.singles.makeWrists(obj, 0, 1, str));
 
     return res;
 }
@@ -113,7 +113,7 @@ void BeadSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.put_line("\n#section "+title(), out.binary());
-        writeObjects(out, pool);
+        writeObjects(out, pool_);
     }
 }
 
@@ -121,7 +121,7 @@ void BeadSet::write(Outputter& out) const
 void BeadSet::remove(Object * obj)
 {
     ObjectSet::remove(obj);
-    simul.singles.removeWrists(obj);
+    simul_.singles.removeWrists(obj);
 }
 
 
