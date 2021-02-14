@@ -54,6 +54,9 @@ public:
     Solid *    solid() const { return fkSolid; }
 
     
+    /// number of links to be displayed using getLink()
+    size_t     nbLinks() const { return asterPoints.size(); }
+
     /// retrieve link between Solid and Aster's core
     bool       getLink(size_t, Vector&, Vector&) const;
     

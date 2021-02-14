@@ -275,25 +275,28 @@ void Display2::drawSphereT(Sphere const& obj)
 void Display2::drawOrganizer(Organizer const& obj) const
 {
     PointDisp const* disp = obj.disp();
+    size_t i = 0, cnt = obj.nbLinks();
 
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
-        glDisable(GL_LIGHTING);
-        
-        for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
-            disp->drawI(P);
-
-        lineWidth(disp->width);
-        bodyColorF(disp, obj.signature()).load();
-        glBegin(GL_LINES);
-        for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
+        floatD* pts = gle::mapVertexBuffer(2*cnt);
+        while ( obj.getLink(i, P, Q) & ( i < cnt ) )
         {
             if ( modulo ) modulo->fold(Q, P);
-            gleVertex(P);
-            gleVertex(Q);
+            pts[  2*i] = P;
+            pts[1+2*i] = Q;
+            ++i;
         }
-        glEnd();
+        gle::unmapVertexBuffer();
+        glDisable(GL_LIGHTING);
+        bodyColorF(disp, obj.signature()).load();
+        lineWidth(disp->width);
+        glDrawArrays(GL_LINES, 0, 2*i);
+
+        gle::bindVertexBuffer((DIM>1?DIM:2));
+        pointSize(disp->size);
+        glDrawArrays(GL_POINTS, 0, i);
     }
 
     /**

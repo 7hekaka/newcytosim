@@ -9,6 +9,7 @@ struct float2
     float xy[2];
     float2() : xy{0, 0} {}
     float2(float x, float y) : xy{x, y} {}
+    float2(Vector1 const& v) : xy{float(v.XX), 0} {}
     float2(Vector1 const& v, float y) : xy{float(v.XX), y} {}
     float2(Vector1 const& v, double y) : xy{float(v.XX), float(y)} {}
     float2(Vector2 const& v) : xy{float(v.XX), float(v.YY)} {}

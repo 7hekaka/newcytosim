@@ -93,7 +93,7 @@ namespace gle
 
     floatD* mapVertexBuffer(size_t cnt)
     {
-        constexpr size_t DOUZE = (DIM>1?DIM:2) * sizeof(float);
+        constexpr size_t DOUZE = (DIM>1?DIM:2) * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
         glBufferData(GL_ARRAY_BUFFER, DOUZE*cnt, nullptr, GL_STREAM_DRAW);
         return (floatD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -106,10 +106,17 @@ namespace gle
         glVertexPointer((DIM>1?DIM:2), GL_FLOAT, 0, nullptr);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+    
+    void bindVertexBuffer(size_t skip)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
+        glVertexPointer((DIM>1?DIM:2), GL_FLOAT, skip*sizeof(GLfloat), nullptr);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 
     float4* mapColorBuffer(size_t cnt)
     {
-        constexpr size_t SEIZE = 4 * sizeof(float);
+        constexpr size_t SEIZE = 4 * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, stream_[3]);
         glBufferData(GL_ARRAY_BUFFER, SEIZE*cnt, nullptr, GL_STREAM_DRAW);
         return (float4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -1066,8 +1073,8 @@ namespace gle
         glTranslatef(0,0,0.5f);
     }
     
-    /// spherocylinder of length L, radius R, centered and aligned with axis Z
-    void capsuleZ(GLfloat L, GLfloat R)
+    /// draw spherocylinder of radius R, of axis Z with Z in [B, T]
+    void capsuleZ(GLfloat B, GLfloat T, GLfloat R)
     {
         const size_t fin = ncircle >> 2;
         const size_t inc = 4;
@@ -1085,18 +1092,18 @@ namespace gle
             for ( size_t i=0; i <= fin; i += inc )
             {
                 GLfloat x = cos_(i), y = sin_(i);
-                glNormal3f(ca*y, sa*y,     x);
-                glVertex3f(cA*y, sA*y, L+R*x);
-                glNormal3f(cb*y, sb*y,     x);
-                glVertex3f(cB*y, sB*y, L+R*x);
+                glNormal3f(ca*y, sa*y, x);
+                glVertex3f(cA*y, sA*y, T+R*x);
+                glNormal3f(cb*y, sb*y, x);
+                glVertex3f(cB*y, sB*y, T+R*x);
             }
             for ( int i=fin; i >= 0; i -= inc )
             {
                 GLfloat x = -cos_(i), y = sin_(i);
-                glNormal3f(ca*y, sa*y,   x);
-                glVertex3f(cA*y, sA*y, R*x);
-                glNormal3f(cb*y, sb*y,   x);
-                glVertex3f(cB*y, sB*y, R*x);
+                glNormal3f(ca*y, sa*y, x);
+                glVertex3f(cA*y, sA*y, B+R*x);
+                glNormal3f(cb*y, sb*y, x);
+                glVertex3f(cB*y, sB*y, B+R*x);
             }
             glEnd();
         }

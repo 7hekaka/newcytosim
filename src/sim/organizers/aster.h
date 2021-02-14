@@ -249,6 +249,9 @@ public:
     /// position of attachment point on Fiber corresponding to second link
     Vector        posFiber2(size_t n) const;
     
+    /// number of links to be displayed using getLink()
+    size_t        nbLinks() const { return 2 * nbFibers(); }
+
     /// retrieve link between Solid and end of Fiber number `i`, returning stiffness
     real          getLink1(size_t i, Vector&, Vector&) const;
     

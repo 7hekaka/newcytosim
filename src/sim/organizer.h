@@ -94,7 +94,7 @@ public:
     /// sum the drag coefficient of all objects
     real sumDragCoefficient() const;
     
-    /// retrieve end positions of link number `inx`, or returns zero if this link does not exist
+    /// number of links to be displayed using getLink()
     virtual size_t nbLinks() const { return 0; }
 
     /// retrieve end positions of link number `inx`, or returns zero if this link does not exist

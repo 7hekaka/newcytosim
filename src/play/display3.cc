@@ -314,7 +314,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
         select_color(fib, i).load_front();
         glPushMatrix();
         gle::transAlignZ(pos, 1.0, nxt-pos);
-        gle::capsuleZ(norm(nxt-pos), rad);
+        gle::capsuleZ(0, norm(nxt-pos), rad);
         glPopMatrix();
     }
 }
@@ -342,7 +342,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         select_color(fib, inx, fac).load_front();
         glPushMatrix();
         gle::transAlignZ(pos, 1.0, nxt-pos);
-        gle::capsuleZ(norm(nxt-pos), rad);
+        gle::capsuleZ(0, norm(nxt-pos), rad);
         glPopMatrix();
     }
 }
@@ -492,7 +492,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 #else
     glPushMatrix();
     gle::transAlignZ(0.5*(A+B), 1.0, B-A);
-    gle::capsuleZ(fib.segmentation(), rad);
+    gle::capsuleZ(0, fib.segmentation(), rad);
     glPopMatrix();
 #endif
     if ( !cull ) glDisable(GL_CULL_FACE);

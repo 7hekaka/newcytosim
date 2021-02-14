@@ -59,6 +59,7 @@ namespace gle
     void  unmapVertexBuffer();
     float4* mapColorBuffer(size_t);
     void  unmapColorBuffer();
+    void bindVertexBuffer(size_t);
 
 #pragma mark -
     
@@ -206,7 +207,7 @@ namespace gle
     /// display a cylindrical box, directed along Z, of radius 1 in Z=[-0.5, 0.5]
     void cylinderZ();
     /// spherocylinder of length L, radius R, centered and aligned with axis Z
-    void capsuleZ(GLfloat L, GLfloat R);
+    void capsuleZ(GLfloat B, GLfloat T, GLfloat R);
 
     /// draw a 3-portion cylinder with a larger central section
     void barrel();

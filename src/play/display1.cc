@@ -306,28 +306,28 @@ void Display1::drawSphereT(Sphere const& obj)
 void Display1::drawOrganizer(Organizer const& obj) const
 {
     PointDisp const* disp = obj.disp();
+    size_t i = 0, cnt = obj.nbLinks();
 
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
-        glDisable(GL_LIGHTING);
-
-        bodyColorF(disp, obj.signature()).load();
-        pointSize(0.75f*disp->size);
-        glBegin(GL_POINTS);
-        for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
-            gleVertex(P);
-        glEnd();
-
-        lineWidth(disp->width);
-        glBegin(GL_LINES);
-        for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
+        floatD* pts = gle::mapVertexBuffer(2*cnt);
+        while ( obj.getLink(i, P, Q) & ( i < cnt ) )
         {
             if ( modulo ) modulo->fold(Q, P);
-            gleVertex(P);
-            gleVertex(Q);
+            pts[  2*i] = P;
+            pts[1+2*i] = Q;
+            ++i;
         }
-        glEnd();
+        gle::unmapVertexBuffer();
+        glDisable(GL_LIGHTING);
+        bodyColorF(disp, obj.signature()).load();
+        lineWidth(disp->width);
+        glDrawArrays(GL_LINES, 0, 2*i);
+
+        gle::bindVertexBuffer((DIM>1?DIM:2));
+        pointSize(disp->size);
+        glDrawArrays(GL_POINTS, 0, i);
     }
 
     /**
@@ -340,8 +340,8 @@ void Display1::drawOrganizer(Organizer const& obj) const
         if ( sol && sol->nbPoints() >= 4 )
         {
 #if ( DIM == 3 )
-            bodyColor(*sol);
             glEnable(GL_LIGHTING);
+            bodyColor(*sol);
             glPushMatrix();
             Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
