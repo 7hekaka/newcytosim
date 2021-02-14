@@ -485,69 +485,40 @@ void Display2::drawCoupleB(Couple const* cx) const
     if ( modulo )
         modulo->fold(p2, p1);
     
-    if ( pd1 == pd2 )
+    if ( pd1->perceptible || pd2->perceptible )
     {
-        if ( pd1->perceptible )
-        {
-            pd1->color.load();
-#if ( 1 )
-            /*
-             Can shift positions towards the minus-end by couple's length
-             to create an effect to highlight the configuration:
-             ///// on antiparallel fibers
-             >>>>> on parallel fibers
-             */
-            real len = 0.5 * cx->prop->length;
-            lineWidth(pd1->width);
-            glBegin(GL_LINE_STRIP);
-            Vector d1 = len * cx->dirFiber1();
-            Vector d2 = len * cx->dirFiber2();
-            gleVertex(p1);
-            gleVertex(0.5*((p1+d1)+(p2+d2)));
-            gleVertex(p2);
-            glEnd();
+        glEnableClientState(GL_COLOR_ARRAY);
+        fluteD* pts = gle::mapVertexBuffer(4);
+        flute4* col = gle::mapColorBuffer(4);
+#if 0
+        pts[0] = p1;
+        pts[1] = p2;
+        col[0] = pd1->color;
+        col[1] = pd2->color;
 #else
-            lineWidth(pd1->width);
-            glBegin(GL_LINES);
-            gleVertex(p1);
-            gleVertex(p2);
-            glEnd();
+        /*
+         Can shift positions towards the minus-end by couple's length
+         to create an effect to highlight the configuration:
+         ///// on antiparallel fibers
+         >>>>> on parallel fibers
+         */
+        Vector d1 = cx->dirFiber1();
+        Vector d2 = cx->dirFiber2();
+        Vector pp = 0.5*(p1+p2) + (0.25*cx->prop->length)*(d1+d2);
+        pts[0] = p1;
+        pts[1] = pp;
+        pts[2] = pp;
+        pts[3] = p2;
+        col[0] = pd1->color;
+        col[1] = pd1->color;
+        col[2] = pd2->color;
+        col[3] = pd2->color;
 #endif
-        }
-    }
-    else
-    {
-        if ( pd1->perceptible || pd2->perceptible )
-        {
-#if ( 1 )
-            /*
-             Can shift positions towards the minus-end by couple's length
-             to create an effect to highlight the configuration:
-             ///// on antiparallel fibers
-             >>>>> on parallel fibers
-             */
-            real len = 0.5 * cx->prop->length;
-            lineWidth(pd1->width);
-            glBegin(GL_LINE_STRIP);
-            Vector d1 = len * cx->dirFiber1();
-            Vector d2 = len * cx->dirFiber2();
-            pd1->color.load();
-            gleVertex(p1);
-            pd1->color.blend(pd2->color).load();
-            gleVertex(0.5*((p1+d1)+(p2+d2)));
-            pd2->color.load();
-            gleVertex(p2);
-            glEnd();
-#else
-            lineWidth(pd1->width);
-            glBegin(GL_LINES);
-            pd1->color.load();
-            gleVertex(p1);
-            pd2->color.load();
-            gleVertex(p2);
-            glEnd();
-#endif
-        }
+        gle::unmapVertexBuffer();
+        gle::unmapColorBuffer();
+        lineWidth(pd1->width);
+        glDrawArrays(GL_LINES, 0, 4);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
     
     if ( cx->active() )
