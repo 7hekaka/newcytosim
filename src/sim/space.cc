@@ -520,49 +520,51 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 
 
-void Space::drawSection(const int dim, const real pos, const real step) const
+void Space::drawSection(int dim, real pos, size_t cnt) const
 {
     Vector inf, sup;
     boundaries(inf, sup);
-    Vector p( pos, pos, pos );
-    int xx = ( dim + 1 ) % DIM;
-    int yy = ( xx + 1 ) % DIM;
-    
-    real xs = sup[xx];
-    real ys = sup[yy];
-    real inc = step * std::max(xs, ys);
+    Vector ppp(pos, pos, pos);
+    int xxx = ( dim + 1 ) % DIM;
+    int yyy = ( xxx + 1 ) % DIM;
+    real ix = inf[xxx], sx = sup[xxx];
+    real iy = inf[yyy], sy = sup[yyy];
+    real dx = ( sx - ix ) / cnt;
+    real dy = ( sy - iy ) / cnt;
 
-    glBegin(GL_LINE_LOOP);
-    p[yy] = ys;
-    for ( real a = -xs; a < xs; a += inc )
+    size_t i = 0;
+    fluteD* pts = gle::mapVertexBuffer(4*cnt+4);
+    ppp[xxx] = sx;
+    for ( real y = iy; y <= sy; y += dy )
     {
-        p[xx] = a;
-        gle::gleVertex(project(p));
+        ppp[yyy] = y;
+        pts[i++] = project(ppp);
     };
-    p[xx] = xs;
-    for ( real a = -ys; a < ys; a += inc )
+    ppp[yyy] = sy;
+    for ( real x = sx; x >= ix; x -= dx )
     {
-        p[yy] = -a;
-        gle::gleVertex(project(p));
-    };
-    p[yy] = -ys;
-    for ( real a = -xs; a < xs; a += inc )
+        ppp[xxx] = x;
+        pts[i++] = project(ppp);
+    }
+    ppp[xxx] = ix;
+    for ( real y = sy; y >= iy; y -= dy )
     {
-        p[xx] = -a;
-        gle::gleVertex(project(p));
+        ppp[yyy] = y;
+        pts[i++] = project(ppp);
     };
-    p[xx] = -xs;
-    for ( real a = -ys; a < ys; a += inc )
+    ppp[yyy] = iy;
+    for ( real x = ix; x <= sx; x += dx )
     {
-        p[yy] = a;
-        gle::gleVertex(project(p));
-    };
-    glEnd();
+        ppp[xxx] = x;
+        pts[i++] = project(ppp);
+    }
+    gle::unmapVertexBuffer();
+    glDrawArrays(GL_LINE_STRIP, 0, i);
 }
 
 #else
 
-void Space::drawSection(const int dim, const real pos, const real step) const
+void Space::drawSection(int, real, size_t) const
 {
     //you will get this output if objects for play was not compiled properly:
     //DISPLAY should be defined on the compiler command, with: -DDISPLAY

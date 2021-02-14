@@ -24,7 +24,7 @@ void SpaceDice::resize(Glossary& opt)
     
     opt.set(edg, "edge");
     if ( edg < 0 )
-        throw InvalidParameter("dice:radius must be >= 0");
+        throw InvalidParameter("dice:edge must be >= 0");
 
     for ( unsigned d = 0; d < DIM; ++d )
     {
@@ -309,7 +309,7 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceDice::drawEdges() const
 {
-    drawSection(2, 0, 0.01);
+    const size_t CNT = 128;
 #if ( DIM > 2 )
     const GLfloat X(half_[0] - edge_);
     const GLfloat Y(half_[1] - edge_);
@@ -317,13 +317,15 @@ void SpaceDice::drawEdges() const
     glDisable(GL_LIGHTING);
     glLineStipple(1, 0x000F);
     glEnable(GL_LINE_STIPPLE);
-    drawSection(0, -X, 0.01);
-    drawSection(0,  X, 0.01);
-    drawSection(1, -Y, 0.01);
-    drawSection(1,  Y, 0.01);
-    drawSection(2, -Z, 0.01);
-    drawSection(2,  Z, 0.01);
+    drawSection(0, -X, CNT);
+    drawSection(0,  X, CNT);
+    drawSection(1, -Y, CNT);
+    drawSection(1,  Y, CNT);
+    drawSection(2, -Z, CNT);
+    drawSection(2,  Z, CNT);
     glDisable(GL_LINE_STIPPLE);
+#else
+    drawSection(2, 0, CNT);
 #endif
 }
 
