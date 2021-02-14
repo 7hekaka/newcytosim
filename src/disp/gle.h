@@ -164,16 +164,19 @@ namespace gle
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
     void arrowTail();
 
-    /// draw Torus of radius `rad` and thickness `thick`
-    void torusZ(GLfloat rad, GLfloat thick, size_t inc = 1);
-    
+    /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
+    void coneZ(GLfloat R, GLfloat B, GLfloat T);
+    /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
+    void discZ(GLfloat R, GLfloat Z, GLfloat N);
     /// draw an open tube from B to T along Z, of diameter 1
     void tubeZ(GLfloat B, GLfloat T, int inc);
     /// draw an open tube from B to T along Z, of diameter 1
     void tubeZ(GLfloat B, GLfloat rB, GLfloat T, GLfloat rT, int inc);
     /// draw an open tube along Z, of diameter 1 and length 1, Z=[0, 1]
     void hexTubeZ(GLfloat Zmin, GLfloat Zmax);
-    
+    /// draw Torus of radius `rad` and thickness `thick`
+    void torusZ(GLfloat rad, GLfloat thick, size_t inc = 1);
+
     /// draw an open tube along Z, of diameter 1 and length 1
     void tube1();
     /// draw an open tube along Z, of diameter 1 and length 1
@@ -207,12 +210,8 @@ namespace gle
 
     /// draw a 3-portion cylinder with a larger central section
     void barrel();
-    /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
-    void coneZ(GLfloat R, GLfloat B, GLfloat T);
-    /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
-    void discZ(GLfloat R, GLfloat Z, GLfloat N);
     /// display an open cone directed along Z, of radius 1 at Z=0
-    inline void cone() { tubeZ(0, 1, 1, 0.25, 4); }
+    inline void truncatedCone() { tubeZ(0, 1, 1, 0.25, 4); }
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
     inline void longCone() { coneZ(1, -1, 2); discZ(1, -1, -1); }
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1

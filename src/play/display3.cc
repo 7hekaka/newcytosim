@@ -998,7 +998,7 @@ void Display3::drawSingleA(Single const* obj) const
         }
 #endif
 #if ( DIM > 2 )
-        gleTube(pf, ph, disp->width*sFactor, gle::cone);
+        gleTube(pf, ph, disp->width*sFactor, gle::truncatedCone);
 #else
         gle::drawBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
 #endif
