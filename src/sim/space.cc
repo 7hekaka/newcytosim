@@ -533,7 +533,7 @@ void Space::drawSection(int dim, real pos, size_t cnt) const
     real dy = ( sy - iy ) / cnt;
 
     size_t i = 0;
-    fluteD* pts = gle::mapVertexBuffer(4*cnt+4);
+    fluteV* pts = gle::mapVertexBuffer(4*cnt+4);
     ppp[xxx] = sx;
     for ( real y = iy; y <= sy; y += dy )
     {

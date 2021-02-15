@@ -91,45 +91,74 @@ namespace gle
     //------------------------------------------------------------------------------
     #pragma mark - Buffers
 
-    fluteD* mapVertexBuffer(size_t cnt)
+    fluteV* mapVertexBuffer(size_t cnt)
     {
-        constexpr size_t DOUZE = (DIM>1?DIM:2) * sizeof(GLfloat);
         glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
-        glBufferData(GL_ARRAY_BUFFER, DOUZE*cnt, nullptr, GL_STREAM_DRAW);
-        return (fluteD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteV), nullptr, GL_STREAM_DRAW);
+        return (fluteV*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
 
     void unmapVertexBuffer()
     {
         glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
         glUnmapBuffer(GL_ARRAY_BUFFER);
-        glVertexPointer((DIM>1?DIM:2), GL_FLOAT, 0, nullptr);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, 0, nullptr);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
     void bindVertexBuffer(size_t skip)
     {
         glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
-        glVertexPointer((DIM>1?DIM:2), GL_FLOAT, skip*sizeof(GLfloat), nullptr);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(fluteV), nullptr);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    flute4* mapColorBuffer(size_t cnt)
+    fluteVN* mapVertexNormalBuffer(size_t cnt)
     {
-        constexpr size_t SEIZE = 4 * sizeof(GLfloat);
-        glBindBuffer(GL_ARRAY_BUFFER, stream_[3]);
-        glBufferData(GL_ARRAY_BUFFER, SEIZE*cnt, nullptr, GL_STREAM_DRAW);
-        return (flute4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteVN), nullptr, GL_STREAM_DRAW);
+        return (fluteVN*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
 
-    void unmapColorBuffer()
+    void unmapVertexNormalBuffer()
     {
-        glBindBuffer(GL_ARRAY_BUFFER, stream_[3]);
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
         glUnmapBuffer(GL_ARRAY_BUFFER);
-        glColorPointer(4, GL_FLOAT, 0, nullptr);
+        glNormalPointer(GL_FLOAT, 0, nullptr);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
+    void bindVertexNormalBuffer(size_t skip)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
+        glNormalPointer(GL_FLOAT, skip*sizeof(fluteVN), nullptr);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    fluteVC* mapVertexColorBuffer(size_t cnt)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[2]);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteVC), nullptr, GL_STREAM_DRAW);
+        return (fluteVC*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    }
+
+    void unmapVertexColorBuffer()
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[2]);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, sizeof(fluteVC), nullptr);
+        glColorPointer(4, GL_FLOAT, sizeof(fluteVC), (void*)(DIM==3?0x10:0x8));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
+    void bindVertexColorBuffer(size_t skip)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[2]);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(fluteVC), nullptr);
+        glColorPointer(4, GL_FLOAT, skip*sizeof(fluteVC), (void*)(DIM==3?0x10:0x8));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
     //-----------------------------------------------------------------------
     #pragma mark - Arcs
 
@@ -1162,9 +1191,9 @@ namespace gle
         if ( glIsBuffer(buf1) )
         {
             glEnableClientState(GL_NORMAL_ARRAY);
-            // the normal in each vertex is equal to the vertex!
             glBindBuffer(GL_ARRAY_BUFFER, buf1);
             glVertexPointer(3, GL_FLOAT, 0, nullptr);
+            // the normal in each vertex is equal to the vertex!
             glNormalPointer(GL_FLOAT, 0, nullptr);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
             glDrawElements(GL_TRIANGLES, 3*nfaces, GL_UNSIGNED_INT, nullptr);
@@ -2193,7 +2222,9 @@ namespace gle
         glPopMatrix();
     }
     
-    //-----------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    #pragma mark - Debugging
+    
     char const* errorString(GLenum code)
     {
         switch ( code )
@@ -2255,6 +2286,27 @@ namespace gle
         glGetIntegerv(GL_VIEWPORT, vp);
         std::clog << "viewport = " << vp[0] << " " << vp[1] << " " << vp[2] << " " << vp[3] << '\n';
 #endif
+    }
+    
+    /// print current color properties of OpenGL context
+    void print_color_materials(std::ostream& os)
+    {
+        GLfloat mat[4] = { 0 };
+        glGetMaterialfv(GL_FRONT, GL_AMBIENT, mat);
+        os << "front  amb" << gle_color::components(mat) << '\n';
+        glGetMaterialfv(GL_FRONT, GL_DIFFUSE, mat);
+        os << "front  dif" << gle_color::components(mat) << '\n';
+        glGetMaterialfv(GL_FRONT, GL_EMISSION, mat);
+        os << "front  emi" << gle_color::components(mat) << '\n';
+        os << '\n';
+
+        glGetMaterialfv(GL_BACK, GL_AMBIENT, mat);
+        os << "back  amb" << gle_color::components(mat) << '\n';
+        glGetMaterialfv(GL_BACK, GL_DIFFUSE, mat);
+        os << "back  dif" << gle_color::components(mat) << '\n';
+        glGetMaterialfv(GL_BACK, GL_EMISSION, mat);
+        os << "back  emi" << gle_color::components(mat) << '\n';
+        os << '\n';
     }
 
 }

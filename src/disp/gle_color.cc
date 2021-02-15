@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "gle_color.h"
 #include "gle_color_list.h"
@@ -9,52 +9,43 @@
 #include <cmath>
 
 
+//-----------------------------------------------------------------------
 #pragma mark Color Input/Output
 
 const char hex_rep[] = "0123456789ABCDEF";
 
 /**
- Write '0xRRGGBBAA' if size > 10 and '0xRRGGBB' if size == 9 or 10 and nothing otherwise
- Write at most size-1 characters (the N'th character then gets the terminating `\0');
- return the number of characters printed (not including the trailing `\0' used to end output to strings)
+ Write '0xRRGGBBAA' to 'str[]'
  */
-int gle_color::print(char * str, size_t size) const
+void gle_color::hexadecimal(char * str) const
 {
-    if ( size < 9 )
-        return 0;
-    
     uint32_t n = rgba_;
-
     str[0] = '0';
     str[1] = 'x';
     int c = 2;
-    while ( c < 8 )
+    while ( c < 10 )
     {
         uint32_t d = ( n >> 28 );
         n <<= 4;
         str[c] = hex_rep[d];
         ++c;
     }
-    // write alpha component is space permits:
-    if ( size > 10 )
-    {
-        while ( c < 10 )
-        {
-            uint32_t d = ( n >> 28 );
-            n <<= 4;
-            str[c] = hex_rep[d];
-            ++c;
-        }
-    }
     str[c] = '\0';
-    return c-1;
 }
 
 
 std::string gle_color::to_string() const
 {
     char str[12] = { 0 };
-    print(str, 12);
+    hexadecimal(str);
+    return std::string(str);
+}
+
+
+std::string gle_color::components(GLfloat ptr[4])
+{
+    char str[64];
+    snprintf(str, sizeof(str), "( %4.2f %4.2f %4.2f %4.2f )", ptr[0], ptr[1], ptr[2], ptr[3]);
     return std::string(str);
 }
 
@@ -155,7 +146,9 @@ std::istream& operator >> (std::istream& is, gle_color& col)
 
 std::ostream& operator << (std::ostream& os, gle_color const& arg)
 {
-    os << arg.to_string();
+    char str[12] = { 0 };
+    arg.hexadecimal(str);
+    os << str;
     return os;
 }
 

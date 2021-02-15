@@ -4,6 +4,7 @@
 #define GLE_COLOR_H
 
 #include "opengl.h"
+#include <string>
 #include <iostream>
 
 
@@ -373,13 +374,6 @@ public:
     }
     
 #pragma mark -
-
-    /// print color in human-friendly format
-    int print(char* str, size_t size) const;
-
-    /// conversion of color to human-friendly format
-    std::string to_string() const;
-    
     
     /// conversion function from RGB to HSV color space
     static void RGB2HSV(GLfloat r, GLfloat g, GLfloat b, GLfloat* h, GLfloat* s, GLfloat* v);
@@ -409,34 +403,14 @@ public:
     /// return new jet color extended
     static gle_color jet_color_alpha(float h);
 
+    /// print color in hexadecimal format (str must be of size 12)
+    void hexadecimal(char* str) const;
+
+    /// conversion of color to hexadecimal format
+    std::string to_string() const;
     
-    static void print_components(std::ostream& os, std::string const& str, GLfloat mat[4])
-    {
-        char tmp[128];
-        snprintf(tmp, sizeof(tmp), " %4.2f %4.2f %4.2f %4.2f", mat[0], mat[1], mat[2], mat[3]);
-        os << str << tmp;
-    }
-
-    /// print current color properties of OpenGL context
-    static void print_materials(std::ostream& os)
-    {
-        GLfloat mat[4] = { 0 };
-        glGetMaterialfv(GL_FRONT, GL_AMBIENT, mat);
-        print_components(os, "front  amb", mat);
-        glGetMaterialfv(GL_FRONT, GL_DIFFUSE, mat);
-        print_components(os, "  dif", mat);
-        glGetMaterialfv(GL_FRONT, GL_EMISSION, mat);
-        print_components(os, "  emi", mat);
-        os << '\n';
-
-        glGetMaterialfv(GL_BACK, GL_AMBIENT, mat);
-        print_components(os, " back  amb", mat);
-        glGetMaterialfv(GL_BACK, GL_DIFFUSE, mat);
-        print_components(os, "  dif", mat);
-        glGetMaterialfv(GL_BACK, GL_EMISSION, mat);
-        print_components(os, "  emi", mat);
-        os << '\n';
-    }
+    /// print RGBA components in vector format
+    static std::string components(GLfloat ptr[4]);
 };
 
 

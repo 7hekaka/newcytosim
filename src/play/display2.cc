@@ -280,7 +280,7 @@ void Display2::drawOrganizer(Organizer const& obj) const
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
-        fluteD* pts = gle::mapVertexBuffer(2*cnt);
+        fluteV* pts = gle::mapVertexBuffer(2*cnt);
         while ( obj.getLink(i, P, Q) & ( i < cnt ) )
         {
             if ( modulo ) modulo->fold(Q, P);
@@ -294,7 +294,7 @@ void Display2::drawOrganizer(Organizer const& obj) const
         lineWidth(disp->width);
         glDrawArrays(GL_LINES, 0, 2*i);
 
-        gle::bindVertexBuffer((DIM>1?DIM:2));
+        gle::bindVertexBuffer(2);
         pointSize(disp->size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -368,7 +368,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 //drawCone(pf, ph-pf, disp->width*sFactor);
 #else
                 gle::drawBand(ph, disp->width*sFactor, ps, disp->width*sFactor);
-                gle::drawBand(ps, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5));
+                gle::drawBand(ps, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5f));
 #endif
             }
         }
@@ -489,13 +489,10 @@ void Display2::drawCoupleB(Couple const* cx) const
     if ( pd1->perceptible || pd2->perceptible )
     {
         glEnableClientState(GL_COLOR_ARRAY);
-        fluteD* pts = gle::mapVertexBuffer(4);
-        flute4* col = gle::mapColorBuffer(4);
+        fluteVC* flu = gle::mapVertexColorBuffer(4);
 #if 0
-        pts[0] = p1;
-        pts[1] = p2;
-        col[0] = pd1->color;
-        col[1] = pd2->color;
+        flu[0] = fluteVC{ p1, pd1->color };
+        flu[1] = fluteVC{ p2, pd2->color };
 #else
         /*
          Can shift positions towards the minus-end by couple's length
@@ -508,17 +505,12 @@ void Display2::drawCoupleB(Couple const* cx) const
         Vector pp = 0.5*(p1+p2) + (0.25*cx->prop->length)*(d1+d2);
         gle_color col1 = pd1->visible ? pd1->color : air;
         gle_color col2 = pd2->visible ? pd2->color : air;
-        pts[0] = p1;
-        pts[1] = pp;
-        pts[2] = pp;
-        pts[3] = p2;
-        col[0] = col1;
-        col[1] = col1;
-        col[2] = col2;
-        col[3] = col2;
+        flu[0] = fluteVC{ p1, col1 };
+        flu[1] = fluteVC{ pp, col1 };
+        flu[2] = fluteVC{ pp, col2 };
+        flu[3] = fluteVC{ p2, col2 };
 #endif
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
+        gle::unmapVertexColorBuffer();
         lineWidth(pd1->width);
         glDrawArrays(GL_LINES, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);

@@ -22,7 +22,7 @@ using namespace gle;
 extern Modulo const* modulo;
 
 
-#define ENABLE_EXPLODED_DISPLAY ( DIM < 3 )
+#define ENABLE_EXPLODED_DISPLAY ( DIM < 2 )
 
 
 Display1::Display1(DisplayProp const* dp) : Display(dp)
@@ -311,7 +311,7 @@ void Display1::drawOrganizer(Organizer const& obj) const
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
-        fluteD* pts = gle::mapVertexBuffer(2*cnt);
+        fluteV* pts = gle::mapVertexBuffer(2*cnt);
         while ( obj.getLink(i, P, Q) & ( i < cnt ) )
         {
             if ( modulo ) modulo->fold(Q, P);
@@ -325,7 +325,7 @@ void Display1::drawOrganizer(Organizer const& obj) const
         lineWidth(disp->width);
         glDrawArrays(GL_LINES, 0, 2*i);
 
-        gle::bindVertexBuffer((DIM>1?DIM:2));
+        gle::bindVertexBuffer(2);
         pointSize(disp->size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -362,17 +362,17 @@ void Display1::drawOrganizer(Organizer const& obj) const
 #pragma mark - Graphics primitives with shift
 
 template < typename OBJ >
-inline fluteD setVertex(Vector const& pos, const OBJ& obj)
+inline fluteV setVertex(Vector const& pos, const OBJ& obj)
 {
 #  if ( DIM == 1 )
     return flute2::cast(pos.XX, obj->signature()*0x1p-28-4);
 #  else
-    return fluteD{pos};
+    return fluteV{pos};
 #  endif
 }
 
 #if ENABLE_EXPLODED_DISPLAY
-inline fluteD setVertex(Vector const& pos, const Fiber * fib)
+inline fluteV setVertex(Vector const& pos, const Fiber * fib)
 {
     GLfloat shift = fib->disp->explode_shift;
 #  if ( DIM == 1 )
@@ -384,9 +384,9 @@ inline fluteD setVertex(Vector const& pos, const Fiber * fib)
 #  endif
 }
 #else
-inline fluteD setVertex(Vector const& pos, const Fiber*)
+inline fluteV setVertex(Vector const& pos, const Fiber*)
 {
-    return fluteD{pos};
+    return fluteV{pos};
 }
 #endif
 
@@ -398,18 +398,13 @@ void Display1::drawSinglesF(const SingleSet & set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeF();
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
+        fluteVC* flu = gle::mapVertexColorBuffer(cnt);
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
-            {
-                pts[i] = setVertex(obj->posFoot(), obj);
-                col[i++] = obj->disp()->color2;
-            }
+                flu[i++] = fluteVC{setVertex(obj->posFoot(), obj), obj->disp()->color2};
         }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
+        gle::unmapVertexColorBuffer();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -420,25 +415,27 @@ void Display1::drawSinglesA(const SingleSet & set) const
 {
     gle_color air(0,0,0,0);
     size_t i = 0, cnt = 2*set.sizeF();
-    fluteD* pts = gle::mapVertexBuffer(cnt);
-    flute4* col = gle::mapColorBuffer(cnt);
+    fluteVC* flu = gle::mapVertexColorBuffer(cnt);
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
         Fiber const* fib = obj->fiber();
         if ( obj->disp()->perceptible & fib->disp->visible )
         {
-            Vector P = obj->posHand();
-            Vector Q = obj->posFoot();
-            if ( modulo ) modulo->fold(P, Q);
-            gle_color c = ( obj->hasForce() ? obj->disp()->color : air );
-            pts[i] = setVertex(P, fib);
-            col[i++] = obj->disp()->color;
-            pts[i] = setVertex(Q, obj);
-            col[i++] = c;
+            gle_color d, c = obj->disp()->color;
+            Vector Q, P = obj->posHand();
+            if ( obj->hasForce() ) {
+                d = c;
+                Q = obj->posFoot();
+                if ( modulo ) modulo->fold(Q, P);
+            } else {
+                Q = P;
+                d = air;
+            }
+            flu[i++] = fluteVC{setVertex(P, fib), c};
+            flu[i++] = fluteVC{setVertex(Q, obj), d};
         }
     }
-    gle::unmapVertexBuffer();
-    gle::unmapColorBuffer();
+    gle::unmapVertexColorBuffer();
     
     if ( prop->link_width > 0 )
     {
@@ -448,7 +445,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
     
     if ( prop->point_size > 0 )
     {
-        gle::bindVertexBuffer((DIM>1?DIM:2));
+        gle::bindVertexColorBuffer(2);
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i/2);
     }
@@ -464,36 +461,26 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeFF();
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
+        fluteVC* flu = gle::mapVertexColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( obj->active() & obj->disp1()->perceptible )
-            {
-                pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = obj->disp1()->color2;
-            }
+                flu[i++] = fluteVC{setVertex(obj->posFree(), obj), obj->disp1()->color2};
         }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
+        gle::unmapVertexColorBuffer();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
 
 #if ( DIM > 1 )
         // display inactive Couples with smaller size:
         i = 0;
-        pts = gle::mapVertexBuffer(cnt);
-        col = gle::mapColorBuffer(cnt);
+        flu = gle::mapVertexColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( !obj->active() && obj->disp1()->perceptible )
-            {
-                pts[i] = fluteD{obj->posFree()};
-                col[i++] = obj->disp1()->color2;
-            }
+                flu[i++] = fluteVC{fluteV{obj->posFree()}, obj->disp1()->color2};
         }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
+        gle::unmapVertexColorBuffer();
         pointSize(M_SQRT1_2*prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
 #endif
@@ -511,8 +498,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeFF();
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
+        fluteVC* flu = gle::mapVertexColorBuffer(cnt);
         Couple * nxt;
         Couple * obj = set.firstFF();
 
@@ -520,29 +506,19 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
         {
             nxt = obj->next();
             if ( obj->disp12()->perceptible )
-            {
-                pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = obj->disp12()->color2;
-            }
+                flu[i++] = fluteVC{setVertex(obj->posFree(), obj), obj->disp12()->color2};
             obj = nxt;
         }
         while ( obj )
         {
             nxt = obj->next();
             if ( obj->disp21()->perceptible )
-            {
-                pts[i] = setVertex(obj->posFree(), obj);
-                col[i++] = obj->disp21()->color2;
-            }
+                flu[i++] = fluteVC{setVertex(obj->posFree(), obj), obj->disp21()->color2};
             obj = nxt->next();
             if ( nxt->disp12()->perceptible )
-            {
-                pts[i] = setVertex(nxt->posFree(), nxt);
-                col[i++] = nxt->disp12()->color2;
-            }
+                flu[i++] = fluteVC{setVertex(nxt->posFree(), nxt), nxt->disp12()->color2};
         }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
+        gle::unmapVertexColorBuffer();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -554,28 +530,20 @@ void Display1::drawCouplesA(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeA();
-        fluteD* pts = gle::mapVertexBuffer(cnt);
-        flute4* col = gle::mapColorBuffer(cnt);
+        fluteVC* flu = gle::mapVertexColorBuffer(cnt);
         for ( Couple * obj=set.firstAF(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber1();
             if ( obj->disp1()->perceptible & fib->disp->visible )
-            {
-                pts[i] = setVertex(obj->posHand1(), fib);
-                col[i++] = obj->disp1()->color2;
-            }
+                flu[i++] = fluteVC{setVertex(obj->posHand1(), fib), obj->disp1()->color2};
         }
         for ( Couple * obj=set.firstFA(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber2();
             if ( obj->disp2()->perceptible & fib->disp->visible )
-            {
-                pts[i] = setVertex(obj->posHand2(), fib);
-                col[i++] = obj->disp2()->color2;
-            }
+                flu[i++] = fluteVC{setVertex(obj->posHand2(), fib), obj->disp2()->color2};
         }
-        gle::unmapVertexBuffer();
-        gle::unmapColorBuffer();
+        gle::unmapVertexColorBuffer();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -586,8 +554,7 @@ void Display1::drawCouplesB(CoupleSet const& set) const
 {
     gle_color air(0,0,0,0);
     size_t i = 0, cnt = 2 * set.sizeAA() * (1+ENABLE_EXPLODED_DISPLAY);
-    fluteD* pts = gle::mapVertexBuffer(cnt);
-    flute4* col = gle::mapColorBuffer(cnt);
+    fluteVC* flu = gle::mapVertexColorBuffer(cnt);
     for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
     {
 #if ( 0 )
@@ -609,39 +576,34 @@ void Display1::drawCouplesB(CoupleSet const& set) const
         if ( modulo ) modulo->fold(Q, P);
         if ( vis1 | vis2 )
         {
-            pts[i] = setVertex(P, fib1);
-            col[i++] = col1;
-            pts[i] = setVertex(Q, fib1);
-            col[i++] = col2;
+            flu[i++] = fluteVC{setVertex(P, fib1), col1};
+            flu[i++] = fluteVC{setVertex(Q, fib1), col2};
         }
 #if ENABLE_EXPLODED_DISPLAY
         if ( vis2 )
         {
-            pts[i] = setVertex(Q, fib2);
-            col[i++] = col2;
-            pts[i] = setVertex(P, fib2);
-            col[i++] = col1;
+            flu[i++] = fluteVC{setVertex(Q, fib2), col2};
+            flu[i++] = fluteVC{setVertex(P, fib2), col1};
         }
 #endif
     }
-    gle::unmapVertexBuffer();
-    gle::unmapColorBuffer();
-
-    if ( prop->point_size > 0 )
-    {
-        pointSize(prop->point_size);
-#if ENABLE_EXPLODED_DISPLAY
-        gle::bindVertexBuffer((DIM>1?DIM:2));
-        glDrawArrays(GL_POINTS, 0, i/2);
-#else
-        glDrawArrays(GL_POINTS, 0, i);
-#endif
-    }
+    gle::unmapVertexColorBuffer();
     
     if ( prop->link_width > 0 )
     {
         lineWidth(prop->link_width);
         glDrawArrays(GL_LINES, 0, i);
+    }
+
+    if ( prop->point_size > 0 )
+    {
+        pointSize(prop->point_size);
+#if ENABLE_EXPLODED_DISPLAY
+        gle::bindVertexColorBuffer(2);
+        glDrawArrays(GL_POINTS, 0, i/2);
+#else
+        glDrawArrays(GL_POINTS, 0, i);
+#endif
     }
 }
 

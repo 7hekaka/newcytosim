@@ -215,8 +215,6 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 //                         OPENGL  DISPLAY
 //------------------------------------------------------------------------------
 
-// Modified from sphere by Aastha Mathur, 18th Jan 2013
-
 #ifdef DISPLAY
 
 #include "gle.h"
@@ -225,9 +223,10 @@ void SpaceEllipse::draw2D() const
 {
     GLfloat X(length_[0]);
     GLfloat Y((DIM>1)?length_[1]:1);
+    GLfloat Z((DIM>2)?length_[2]:1);
 
     glPushMatrix();
-    glScalef(X, Y, 1.0);
+    glScalef(X, Y, Z);
     gle::circle();
     glPopMatrix();
 }
@@ -235,12 +234,21 @@ void SpaceEllipse::draw2D() const
 
 void SpaceEllipse::draw3D() const
 {
-    /* We cannot just rescale because the normals would not be correct */
-    gle::ellipse(length_[0], length_[1], length_[2]);
-    /* For the decoration, normals also need to be calculated */
+    GLfloat X(length_[0]);
+    GLfloat Y((DIM>1)?length_[1]:1);
+    GLfloat Z((DIM>2)?length_[2]:1);
+#if 1
+    glPushMatrix();
+    glScalef(X, Y, Z);
+    gle::sphere8();
+    glPopMatrix();
+#else
+    gle::ellipse(X, Y, Z);
+    /* Add decoration */
     glLineWidth(0.5);
     for ( GLfloat u = -0.9f; u < 1.0f; u += 0.2f )
-        gle::ellipse_circle(length_[0], length_[1], length_[2], u);
+        gle::ellipse_circle(X, Y, Z, u);
+#endif
 }
 
 #else

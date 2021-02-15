@@ -10,9 +10,13 @@
 #include "vector_float.h"
 
 #if ( DIM == 3 )
-typedef flute3 fluteD;
+typedef flute3 fluteV;
+typedef flute6 fluteVN;
+typedef flute8 fluteVC;
 #else
-typedef flute2 fluteD;
+typedef flute2 fluteV;
+typedef flute4 fluteVN;
+typedef flute6 fluteVC;
 #endif
 
 /// Simple geometrical objects drawn with OpenGL
@@ -55,11 +59,17 @@ namespace gle
     void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
 
     
-    fluteD* mapVertexBuffer(size_t);
+    fluteV* mapVertexBuffer(size_t);
     void  unmapVertexBuffer();
-    flute4* mapColorBuffer(size_t);
-    void  unmapColorBuffer();
-    void bindVertexBuffer(size_t);
+    void   bindVertexBuffer(size_t);
+
+    fluteVN* mapVertexNormalBuffer(size_t);
+    void  unmapVertexNormalBuffer();
+    void   bindVertexNormalBuffer(size_t);
+
+    fluteVC* mapVertexColorBuffer(size_t);
+    void  unmapVertexColorBuffer();
+    void   bindVertexColorBuffer(size_t);
 
 #pragma mark -
     
@@ -386,7 +396,9 @@ namespace gle
 
     /// draw a set of 2 or 3 axes, depending on `dim`
     void drawAxes(real size, int dim);
-    
+
+#pragma mark -
+
     /// convert OpenGL error code to string
     const char* errorString(GLenum code);
 
@@ -395,6 +407,9 @@ namespace gle
  
     /// print some info for debugging purpose
     void dump();
+    
+    /// print current color properties of OpenGL context
+    void print_color_materials(std::ostream& os);
 }
 
 //#define CHECK_GL_ERROR(ARG) ((void) 0)
