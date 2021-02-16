@@ -76,7 +76,7 @@ struct flute8
     flute8(Vector3 const& v, gle_color const& c) :
     xyz{float(v.XX), float(v.YY), float(v.ZZ), 1, c.r(), c.g(), c.b(), c.a()} {}
     flute8(flute3 const& v, gle_color const& c) :
-    xyz{v.xyz[0], v.xyz[1], v.xyz[3], 1, c.r(), c.g(), c.b(), c.a()} {}
+    xyz{v.xyz[0], v.xyz[1], v.xyz[2], 1, c.r(), c.g(), c.b(), c.a()} {}
     flute8(gle_color const& c, gle_color const& d) :
     xyz{c.r(), c.g(), c.b(), c.a(), d.r(), d.g(), d.b(), d.a()} {}
 };

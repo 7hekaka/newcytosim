@@ -76,7 +76,7 @@ namespace gle
         //glBindBuffer(GL_ARRAY_BUFFER, stream_[2]);
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glVertexPointer((DIM>2?3:2), GL_FLOAT, sizeof(fluteVC), nullptr);
-        glColorPointer(4, GL_FLOAT, sizeof(fluteVC), (void*)(DIM==3?0x10:0x8));
+        glColorPointer(4, GL_FLOAT, sizeof(fluteVC), (void*)(DIM>2?0x10:0x8));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
@@ -84,7 +84,7 @@ namespace gle
     {
         glBindBuffer(GL_ARRAY_BUFFER, stream_[2]);
         glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(fluteVC), nullptr);
-        glColorPointer(4, GL_FLOAT, skip*sizeof(fluteVC), (void*)(DIM==3?0x10:0x8));
+        glColorPointer(4, GL_FLOAT, skip*sizeof(fluteVC), (void*)(DIM>2?0x10:0x8));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     

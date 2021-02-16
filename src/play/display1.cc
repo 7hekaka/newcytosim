@@ -374,7 +374,7 @@ inline fluteV setVertex(Vector const& pos, const OBJ& obj)
 #if ENABLE_EXPLODED_DISPLAY
 inline fluteV setVertex(Vector const& pos, const Fiber * fib)
 {
-    GLfloat shift = fib->disp->explode_shift;
+    real shift = fib->disp->explode_shift;
 #  if ( DIM == 1 )
     return flute2::cast(pos.XX, shift);
 #  elif ( DIM == 2 )
