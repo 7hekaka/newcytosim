@@ -1159,7 +1159,7 @@ namespace gle
         // upload indices:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, DOUZE*ico.nb_faces(), ico.faces_data(), GL_STATIC_DRAW);
-        fprintf(stderr, "icosahedron buffer %i has %u faces\n", buf1, ico.nb_faces());
+        //fprintf(stderr, "icosahedron buffer %i has %u faces\n", buf1, ico.nb_faces());
         return ico.nb_faces();
     }
     

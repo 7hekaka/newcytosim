@@ -593,7 +593,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
         glEnable(GL_CULL_FACE);
         if ( back )
         {
-            disp->color2.load_back();
+            disp->color2.load_front();
             glCullFace(GL_FRONT);
             obj->draw3D();
         }
@@ -1147,6 +1147,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     lineWidth(width);
     glDisable(GL_LIGHTING);
     glDrawArrays(GL_LINE_STRIP, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -1210,6 +1211,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     lineWidth(width);
     glDisable(GL_LIGHTING);
     glDrawArrays(GL_LINE_STRIP, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
