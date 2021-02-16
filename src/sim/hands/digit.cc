@@ -200,8 +200,13 @@ void Fiber::resetLattice()
         for ( Hand * ha = frHands.front(); ha; ha = ha->next() )
         {
             if ( ha->lattice() == &frLattice )
-                static_cast<Digit*>(ha)->inc();
+            {
+                Digit* dig = static_cast<Digit*>(ha);
+                dig->inc();
+                dig->moveTo(frLattice.unit() * dig->site()+ dig->prop->site_shift);
+            }
         }
     }
 }
 #endif
+

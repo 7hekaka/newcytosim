@@ -156,7 +156,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
             fbSite = in.readInt32();
             fbLattice = &fbFiber->lattice();
             // put in the middle of the site:
-            ///@todo: we should use digit:site_shift here:
+            // the abscissa will be adjusted in Fiber::resetLattice()
             fbAbs = ( fbSite + 0.5 ) * fbLattice->unit();
 #else
             lati_t t = in.readInt32();
