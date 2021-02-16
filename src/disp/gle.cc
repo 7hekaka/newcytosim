@@ -844,13 +844,26 @@ namespace gle
         return i;
     }
     
-    /// hexagon has the same surface as a disc of radius 1.
-    size_t setHexTube(flute6* flu, GLfloat A, GLfloat B)
+    size_t setTube(flute6* flu, GLfloat R, GLfloat B, GLfloat T, size_t inc)
     {
-        constexpr GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        assert_true( B <= T );
+        GLsizei i = 0;
+        for( size_t p = 0; p <= ncircle; p += inc )
+        {
+            GLfloat C = cos_(p), S = sin_(p);
+            flu[i++] = flute6{ R*C, R*S, T, C, S, 0 };
+            flu[i++] = flute6{ R*C, R*S, B, C, S, 0 };
+        }
+        return i;
+    }
+
+    /// hexagon has the same surface as a disc of radius 1.
+    size_t setHexTube(flute6* flu, GLfloat rad, GLfloat A, GLfloat B)
+    {
         constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
         constexpr GLfloat S = 0.5f;
-        constexpr GLfloat H = R * C, X = R * S;
+        const GLfloat R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const GLfloat H = R * C, X = R * S;
         
         flu[0] = flute6{ R, 0, B, 1, 0, 0};
         flu[1] = flute6{ R, 0, A, 1, 0, 0};
@@ -881,13 +894,13 @@ namespace gle
         return n;
     }
     
-    size_t initHexTubeBuffer(GLuint buf, GLfloat A, GLfloat B)
+    size_t initHexTubeBuffer(GLuint buf, GLfloat R, GLfloat A, GLfloat B)
     {
         size_t cnt = 14;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        size_t n = setHexTube(flu, A, B);
+        size_t n = setHexTube(flu, R, A, B);
         glUnmapBuffer(GL_ARRAY_BUFFER);
         assert_true( n <= cnt );
         return n;
@@ -908,7 +921,8 @@ namespace gle
     void initTubeBuffers()
     {
         glGenBuffers(12, tub_);
-        const GLfloat B = -4.f, T = 256.f;
+        /* The value of T limits the aspect ratio of tubes that can be drawn */
+        const GLfloat B = -4.f, T = 128.f;
         initTubeBuffer(tub_[0], 0, 1, 8);
         initTubeBuffer(tub_[1], 0, 1, 4);
         initTubeBuffer(tub_[2], 0, 1, 2);
@@ -919,7 +933,8 @@ namespace gle
         initTubeBuffer(tub_[7], 0, T, 8);
         initTubeBuffer(tub_[8], 0, T, 4);
         initTubeBuffer(tub_[9], 0, T, 2);
-        initHexTubeBuffer(tub_[10], 0, 1);
+        initHexTubeBuffer(tub_[10], 1, 0, 1);
+        initHexTubeBuffer(tub_[11], 0.5f, 0, T);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -935,7 +950,8 @@ namespace gle
     void halfTube2() { drawTubeBuffer(tub_[8], 2+ncircle/2); }
     void halfTube4() { drawTubeBuffer(tub_[9], 2+ncircle  ); }
     void hexTube()   { drawTubeBuffer(tub_[10], 14); }
-    
+    void thinTube()  { drawTubeBuffer(tub_[11], 14); }
+
     void cylinder1()
     {
         tube1();

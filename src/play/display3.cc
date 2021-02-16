@@ -1182,22 +1182,28 @@ void Display3::drawCoupleB(Couple const* cx) const
     else if ( dns > 1e-6 )
     {
         Vector mid = 0.5 * ( p1 + p2 );
+        Vector dir = normalize( p2 - p1 );
         
         glEnable(GL_CLIP_PLANE5);
         if ( pd1->visible )
         {
-            setClipPlane(GL_CLIP_PLANE5, -dif, mid);
-            pd1->color.load_front();
-            gleTube(p1, p2, pd1->width*sFactor, gle::tube1);
-            drawHand(p1, pd1);
+            setClipPlane(GL_CLIP_PLANE5, -dir, mid);
+            pd1->color.load_both();
+            glPushMatrix();
+            transAlignZ(p1, pd1->size*sFactor, dir);
+            gle::sphere1();
+            gle::thinTube();
+            glPopMatrix();
         }
-        
         if ( pd2->visible )
         {
-            setClipPlane(GL_CLIP_PLANE5,  dif, mid);
-            pd2->color.load_front();
-            gleTube(p2, p1, pd2->width*sFactor, gle::tube1);
-            drawHand(p2, pd2);
+            setClipPlane(GL_CLIP_PLANE5,  dir, mid);
+            pd2->color.load_both();
+            glPushMatrix();
+            transAlignZ(p2, pd2->size*sFactor, -dir);
+            gle::sphere1();
+            gle::thinTube();
+            glPopMatrix();
         }
         glDisable(GL_CLIP_PLANE5);
     }

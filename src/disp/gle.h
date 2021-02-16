@@ -184,9 +184,10 @@ namespace gle
     void halfTube2();
     /// draw a nicer tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube4();
-    /// draw a nicer tube along Z, of diameter 1 with Z=[0, 1]
+    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void hexTube();
-
+    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 256]
+    void thinTube();
     
     /// display a cylindrical box, directed along Z, of radius 1 in Z=[0, 1]
     void cylinder1();
