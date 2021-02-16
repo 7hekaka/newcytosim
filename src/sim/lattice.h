@@ -108,7 +108,7 @@ private:
         assert_true( inf <= sup );
         
         // return if existing boundaries are sufficient
-        if ( laSite  &&  laInf <= inf  &&  sup <= laSup )
+        if (( laSite != nullptr ) & ( laInf <= inf ) & ( sup <= laSup ))
             return;
         
         inf -= margin;
@@ -219,8 +219,8 @@ public:
     /// set cell values outside the valid range
     void markEdges(const cell_t val)
     {
-        for ( lati_t i = laInf;   i < laIndexM; ++i ) laSite[i] = val;
-        for ( lati_t i = laIndexP+1; i < laSup; ++i ) laSite[i] = val;
+        for ( lati_t i = laInf; i < laIndexM; ++i ) laSite[i] = val;
+        for ( lati_t i = laIndexP; i < laSup; ++i ) laSite[i] = val;
     }
     
     /// set the range of valid abscissa
@@ -232,11 +232,11 @@ public:
         if ( !std::is_same<real, cell_t>::value && laSite )
             markEdges(0);
 #endif
-        laIndexM = index(a);
-        laIndexP = index_sup(b) - 1;
+        laIndexM = index_sup(a) - 1;
+        laIndexP = index(b);
 
         /* allocate with a safety margin of 8 cells */
-        allocate(laIndexM, laIndexP+1, 8);
+        allocate(laIndexM, laIndexP, 8);
 #if 0
         if ( !std::is_same<real, cell_t>::value )
             markEdges(~0);
@@ -265,21 +265,21 @@ public:
     
     /// index of the site after the one containing abscissa `a`
     lati_t  index_sup(real a)   const { return (lati_t)std::ceil(a/laUnit); }
-    
+
     /// index of the site after the one containing abscissa `a`
     lati_t  index_round(real a) const { return (lati_t)round(a/laUnit); }
 
     /// true if index 'i' is covered by the lattice allocated range
-    bool    valid(lati_t i)     const { return ( laInf <= i  &&  i < laSup ); }
+    bool    valid(lati_t i)     const { return (( laInf <= i ) & ( i < laSup )); }
     
     /// true if index 'i' is not covered by the lattice allocated range
-    bool    invalid(lati_t i)   const { return ( i < laInf  ||  laSup <= i ); }
+    bool    invalid(lati_t i)   const { return (( i < laInf ) | ( laSup <= i )); }
     
     /// true if index 'i' corresponds to a site that is completely between Minus and Plus ends
-    bool    betweenMP(lati_t i) const { return ( laIndexM < i  &&  i < laIndexP ); }
+    bool    betweenMP(lati_t i) const { return (( laIndexM < i ) & ( i < laIndexP )); }
     
     /// true if index 'i' corresponds to a site that is partly or entirely outside the range
-    bool    outsideMP(lati_t i) const { return ( i <= laIndexM || laIndexP <= i ); }
+    bool    outsideMP(lati_t i) const { return (( i <= laIndexM ) | ( laIndexP <= i )); }
 
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`
