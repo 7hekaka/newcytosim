@@ -7,17 +7,6 @@
 #include "opengl.h"
 #include "gle_color.h"
 #include "vector.h"
-#include "vector_float.h"
-
-#if ( DIM == 3 )
-typedef flute3 fluteV;
-typedef flute6 fluteVN;
-typedef flute8 fluteVC;
-#else
-typedef flute2 fluteV;
-typedef flute4 fluteVN;
-typedef flute6 fluteVC;
-#endif
 
 /// Simple geometrical objects drawn with OpenGL
 /**
@@ -57,19 +46,6 @@ namespace gle
 
     /// calculate sinus and cosinus for a circular arc
     void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
-
-    
-    fluteV* mapVertexBuffer(size_t);
-    void  unmapVertexBuffer();
-    void   bindVertexBuffer(size_t);
-
-    fluteVN* mapVertexNormalBuffer(size_t);
-    void  unmapVertexNormalBuffer();
-    void   bindVertexNormalBuffer(size_t);
-
-    fluteVC* mapVertexColorBuffer(size_t);
-    void  unmapVertexColorBuffer();
-    void   bindVertexColorBuffer(size_t);
 
 #pragma mark -
     

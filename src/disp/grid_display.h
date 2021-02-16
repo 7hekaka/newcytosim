@@ -11,7 +11,7 @@
 #include "grid.h"
 #include "opengl.h"
 #include "gle.h"
-#include "vector_float.h"
+#include "flute.h"
 
 /// display the edges of a 1D grid using OpenGL
 void drawEdges(Map<1> const&);

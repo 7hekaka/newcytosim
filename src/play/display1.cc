@@ -16,7 +16,7 @@
 #include "line_disp.h"
 #include "point_disp.h"
 #include "display_color.h"
-#include "vector_float.h"
+#include "gle_flute.h"
 
 using namespace gle;
 extern Modulo const* modulo;

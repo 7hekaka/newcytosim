@@ -28,7 +28,7 @@ vpath %.o  build
 
 OBJ=random.o exceptions.o vector3.o platonic.o\
     glossary.o filepath.o parameter.o iomessages.o filewrapper.o\
-	glapp.o gle.o gle_color.o object.o blank.o
+	glapp.o gle.o gle_flute.o gle_color.o object.o blank.o
 
 #----------------------------targets--------------------------------------------
 

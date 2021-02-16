@@ -518,7 +518,7 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 #include "gle.h"
-
+#include "gle_flute.h"
 
 void Space::drawSection(int dim, real pos, size_t cnt) const
 {

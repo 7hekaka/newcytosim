@@ -1,7 +1,7 @@
-// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
-#ifndef VECTOR_FLOAT_H
-#define VECTOR_FLOAT_H
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
+#ifndef FLUTE_H
+#define FLUTE_H
 
 /// accessory class to pack vertex data
 struct flute2
@@ -81,4 +81,4 @@ struct flute8
     xyz{c.r(), c.g(), c.b(), c.a(), d.r(), d.g(), d.b(), d.a()} {}
 };
 
-#endif /* VECTOR_FLOAT_H */
+#endif /* FLUTE_H */

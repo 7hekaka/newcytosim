@@ -305,7 +305,7 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 #include "opengl.h"
 #include "gle.h"
-#include "vector_float.h"
+#include "flute.h"
 
 
 void SpacePolygon::drawPolygon(bool points, bool lines) const

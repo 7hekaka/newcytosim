@@ -128,6 +128,9 @@
 		BB39EC26153806070047768E /* duo_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB39EC24153806070047768E /* duo_long.cc */; };
 		BB39EC27153806070047768E /* duo_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB39EC25153806070047768E /* duo_long.h */; };
 		BB3A4AE919351389005CD868 /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
+		BB3CFAA025DBCC350016A7A3 /* gle_flute.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3CFA9E25DBCC340016A7A3 /* gle_flute.h */; };
+		BB3CFAA125DBCC350016A7A3 /* gle_flute.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3CFA9F25DBCC350016A7A3 /* gle_flute.cc */; };
+		BB3CFAA325DBD0E90016A7A3 /* flute.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3CFAA225DBD0E80016A7A3 /* flute.h */; };
 		BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3DA1DC254C8F0200226B81 /* object_pool.cc */; };
 		BB3DA1DF254C8F0300226B81 /* object_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3DA1DD254C8F0300226B81 /* object_pool.h */; };
 		BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
@@ -207,7 +210,6 @@
 		BB60C86C0B60353300596D88 /* fiber_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB60C6A00B6022FE00596D88 /* fiber_grid.cc */; };
 		BB61B7F019B7622800B1F4F6 /* print_color.h in Headers */ = {isa = PBXBuildFile; fileRef = BB61B7EF19B7622800B1F4F6 /* print_color.h */; };
 		BB61B7F219B7626A00B1F4F6 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
-		BB6294AA25D1865200439438 /* vector_float.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6294A825D1865200439438 /* vector_float.h */; };
 		BB6403F705FBC2F400DF7BFF /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB6403FA05FBC2F900DF7BFF /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB64041A05FBC59200DF7BFF /* frametool.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB77D6FB05F12F16001C0596 /* frametool.cc */; };
@@ -1430,6 +1432,9 @@
 		BB3A4AE519351389005CD868 /* space_tee.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_tee.cc; path = src/sim/spaces/space_tee.cc; sourceTree = SOURCE_ROOT; };
 		BB3A4AE619351389005CD868 /* space_tee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_tee.h; path = src/sim/spaces/space_tee.h; sourceTree = SOURCE_ROOT; };
 		BB3AAF5806076A8B00508E18 /* fiber_grid2.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = fiber_grid2.cc; path = src/sim/fiber_grid2.cc; sourceTree = SOURCE_ROOT; };
+		BB3CFA9E25DBCC340016A7A3 /* gle_flute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gle_flute.h; sourceTree = "<group>"; };
+		BB3CFA9F25DBCC350016A7A3 /* gle_flute.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gle_flute.cc; sourceTree = "<group>"; };
+		BB3CFAA225DBD0E80016A7A3 /* flute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flute.h; sourceTree = "<group>"; };
 		BB3D2ADA05C8396B0022ACE5 /* spherical_code.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = spherical_code.cc; path = src/math/spherical_code.cc; sourceTree = SOURCE_ROOT; };
 		BB3D8E1615F490D0001851E1 /* simul_report.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simul_report.cc; sourceTree = "<group>"; };
 		BB3DA1DC254C8F0200226B81 /* object_pool.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_pool.cc; sourceTree = "<group>"; };
@@ -1502,7 +1507,6 @@
 		BB60C6A00B6022FE00596D88 /* fiber_grid.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fiber_grid.cc; path = src/sim/fiber_grid.cc; sourceTree = SOURCE_ROOT; };
 		BB61B7EF19B7622800B1F4F6 /* print_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = print_color.h; sourceTree = "<group>"; };
 		BB61B7F119B7626A00B1F4F6 /* print_color.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = print_color.cc; sourceTree = "<group>"; };
-		BB6294A825D1865200439438 /* vector_float.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vector_float.h; sourceTree = "<group>"; };
 		BB6403D805FBC28C00DF7BFF /* sieve */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sieve; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB64041505FBC58500DF7BFF /* frametool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = frametool; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB6485EB2057FD1B005F2CD1 /* allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allocator.h; path = src/math/allocator.h; sourceTree = SOURCE_ROOT; };
@@ -2461,7 +2465,6 @@
 				BBA27AEA211EC31600A7E184 /* vector4.h */,
 				BB0E4BD61002698100A96B34 /* random_vector.h */,
 				BB0E4BD71002698100A96B34 /* random_vector.cc */,
-				BB6294A825D1865200439438 /* vector_float.h */,
 			);
 			name = vector;
 			sourceTree = "<group>";
@@ -2972,14 +2975,17 @@
 		BB9711641DECDA2C00352630 /* GLE */ = {
 			isa = PBXGroup;
 			children = (
-				BB9711501DECDA1300352630 /* gle.cc */,
 				BB9711511DECDA1300352630 /* gle.h */,
+				BB9711501DECDA1300352630 /* gle.cc */,
+				BB9711531DECDA1300352630 /* gle_color.h */,
+				BB9711521DECDA1300352630 /* gle_color.cc */,
+				BB9711551DECDA1300352630 /* gle_color_list.h */,
+				BB9711541DECDA1300352630 /* gle_color_list.cc */,
+				BB3CFAA225DBD0E80016A7A3 /* flute.h */,
+				BB3CFA9E25DBCC340016A7A3 /* gle_flute.h */,
+				BB3CFA9F25DBCC350016A7A3 /* gle_flute.cc */,
 				BB2F144B257D8E260033F86D /* gle_zoo.h */,
 				BB2F144A257D8E260033F86D /* gle_zoo.cc */,
-				BB9711521DECDA1300352630 /* gle_color.cc */,
-				BB9711531DECDA1300352630 /* gle_color.h */,
-				BB9711541DECDA1300352630 /* gle_color_list.cc */,
-				BB9711551DECDA1300352630 /* gle_color_list.h */,
 			);
 			name = GLE;
 			sourceTree = "<group>";
@@ -3373,6 +3379,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3CFAA025DBCC350016A7A3 /* gle_flute.h in Headers */,
+				BB3CFAA325DBD0E90016A7A3 /* flute.h in Headers */,
 				BB7B5A9C241A81BB0063F252 /* platonic.h in Headers */,
 				BB56AB71246F0451002EB689 /* display_color.h in Headers */,
 			);
@@ -3702,7 +3710,6 @@
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
-				BB6294AA25D1865200439438 /* vector_float.h in Headers */,
 				BBDF9AA4228BFBD3005018BD /* xpttrf.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
 				BB7191800EF1CD9900CED9E2 /* sparmat.h in Headers */,
@@ -4473,6 +4480,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB109D3723D0788200805F16 /* point_disp.cc in Sources */,
+				BB3CFAA125DBCC350016A7A3 /* gle_flute.cc in Sources */,
 				BB7B5A9D241A81BF0063F252 /* platonic.cc in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
 				BB97116B1DECDB9500352630 /* offscreen.cc in Sources */,

@@ -2,7 +2,7 @@
 #include "assert_macro.h"
 #include "view.h"
 #include "gle.h"
-#include "vector_float.h"
+#include "flute.h"
 #include "offscreen.h"
 #include "glu_unproject.cc"
 #include "glut.h"
