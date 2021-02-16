@@ -737,7 +737,8 @@ void processKey(unsigned char key)
         } break;
         
         case 'N':
-            glApp::createWindow(displayLive);
+            /**Need to share OpenGL context with the main window */
+            //glApp::newWindow(displayLive);
             break;
 
 #if ENABLE_WRITE

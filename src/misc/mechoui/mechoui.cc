@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
     pam.read(arg);
     glApp::currentView().read(arg);
     arg.print_warning(std::cerr, 1, "\n");
-    glApp::createWindow(display);
+    glApp::newWindow(display);
     gle::initialize();
     
     file_list = FilePath::list_dir(pam.directory.c_str(), "rec");

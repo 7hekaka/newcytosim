@@ -384,7 +384,7 @@ int main(int argc, char* argv[])
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
     glApp::normalKeyFunc(processNormalKey);
-    glApp::createWindow(displayLive);
+    glApp::newWindow(displayLive);
 
     if ( mode == ONSCREEN_MOVIE )
     {

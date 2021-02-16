@@ -584,7 +584,7 @@ int main(int argc, char* argv[])
     glApp::setDimensionality(DIM);
     glApp::normalKeyFunc(processNormalKey);
     glApp::specialKeyFunc(processSpecialKey);
-    glApp::createWindow(display);
+    glApp::newWindow(display);
     glApp::setScale(20);
     gle::initialize();
 

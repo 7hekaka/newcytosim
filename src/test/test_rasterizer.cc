@@ -342,7 +342,7 @@ int main(int argc, char* argv[])
         glApp::attachMenu(GLUT_RIGHT_BUTTON);
         glApp::normalKeyFunc(processNormalKey);
         glApp::setScale(2*(size+radius+1));
-        glApp::createWindow(display);
+        glApp::newWindow(display);
 
         glutMainLoop();
     }

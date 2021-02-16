@@ -1230,16 +1230,14 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     const auto sup = lat.indexP();
     
     size_t i = 0, cnt = sup - inf + 4;
-    fluteVC* flu = gle::mapVertexColorBuffer(cnt);
-    gle_color c = fib.disp->color;
+    fluteV* flu = gle::mapVertexBuffer(cnt);
     for ( auto h = inf+1; h <= sup; ++h )
-        flu[i++] = fluteVC { fib.posM(uni*h-fib.abscissaM()), c };
-    gle::unmapVertexColorBuffer();
+        flu[i++] = fib.posM(uni*h-fib.abscissaM());
+    gle::unmapVertexBuffer();
     glDisable(GL_LIGHTING);
+    fib.disp->color.load();
     pointSize(fib.prop->disp->point_size);
-    glEnableClientState(GL_COLOR_ARRAY);
     glDrawArrays(GL_POINTS, 0, i);
-    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -1304,20 +1302,18 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
 void Display::drawFiberForces(Fiber const& fib, real scale) const
 {
     size_t cnt = 2 * fib.nbPoints();
-    fluteVC* flu = gle::mapVertexColorBuffer(cnt);
-    gle_color c = fib.prop->disp->force_color;
+    fluteV* flu = gle::mapVertexBuffer(cnt);
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {
         Vector P = fib.posP(i);
         Vector F = scale * fib.netForce(i);
-        flu[  2*i] = fluteVC{ P, c };
-        flu[1+2*i] = fluteVC{ P+F, c };
+        flu[  2*i] = P;
+        flu[1+2*i] = P+F;
     }
-    glEnableClientState(GL_COLOR_ARRAY);
-    gle::unmapVertexColorBuffer();
+    gle::unmapVertexBuffer();
     glDisable(GL_LIGHTING);
+    fib.prop->disp->force_color.load();
     glDrawArrays(GL_LINES, 0, cnt);
-    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 //------------------------------------------------------------------------------

@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
     glApp::attachMenu(GLUT_RIGHT_BUTTON);
-    glApp::createWindow(display);
+    glApp::newWindow(display);
     glApp::setScale(4);
     gle::initialize();
 

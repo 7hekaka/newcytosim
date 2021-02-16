@@ -202,7 +202,11 @@ void glApp::maximizeDisplay()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-int glApp::createWindow(void (*func)(View&, int))
+/**
+ @todo: share OpenGL context between new window and main one,
+ which is possible with GLFW
+ */
+int glApp::newWindow(void (*func)(View&, int))
 {
     View & view = views[0];
     
@@ -226,8 +230,7 @@ int glApp::createWindow(void (*func)(View&, int))
     
     // create window with title containing current working directory:
     int win = 0;
-    char str[256] = { 0 };
-    strncpy(str, "Cytosim    ", sizeof(str));
+    char str[256] = "Cytosim     ";
     if ( getcwd(str+10, 246) )
         win = glutCreateWindow(str);
     else
@@ -270,7 +273,7 @@ int glApp::createWindow(void (*func)(View&, int))
 /**
  This will not destroy the main window
  */
-void glApp::destroyWindow(int win)
+void glApp::deleteWindow(int win)
 {
     if ( win == 0 )
         win = glutGetWindow();
@@ -452,7 +455,7 @@ void glApp::processNormalKey(unsigned char c, int, int)
             if ( mFullScreen )
                 exitFullScreen();
             else
-                destroyWindow(glutGetWindow());
+                deleteWindow(glutGetWindow());
             break;
         
             

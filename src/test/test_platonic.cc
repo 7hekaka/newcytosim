@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
     glApp::setDimensionality(3);
     glApp::attachMenu(GLUT_RIGHT_BUTTON);
     glApp::normalKeyFunc(processNormalKey);
-    glApp::createWindow(display);
+    glApp::newWindow(display);
     glApp::setScale(3);
   
     setPlatonic();

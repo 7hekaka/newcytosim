@@ -324,7 +324,7 @@ int main(int argc, char* argv[])
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
     glApp::normalKeyFunc(processNormalKey);
-    glApp::createWindow(display);
+    glApp::newWindow(display);
     glApp::setScale(2*range+1);
 
     glutMainLoop();

@@ -24,10 +24,10 @@ namespace glApp
     void       setDimensionality(int d);
 
     /// set display function `func`
-    int        createWindow(void (*func)(View&, int));
+    int        newWindow(void (*func)(View&, int));
     
     /// destroy window
-    void       destroyWindow(int win);
+    void       deleteWindow(int win);
     
     /// enter full-screen mode
     void       enterFullScreen(bool saveWindowPos);
