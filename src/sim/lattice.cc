@@ -12,7 +12,7 @@ void Lattice<uint8_t>::write_data(Outputter& out, lati_t inf, lati_t sup) const
     out.writeUInt8(1);
 
     for ( lati_t s = inf; s < sup; ++s )
-        out.writeUInt8(laSite[s]);
+        out.writeUInt8(laCell[s]);
 }
 
 /// write data within [inf, sup[ to file
@@ -24,7 +24,7 @@ void Lattice<uint16_t>::write_data(Outputter& out, lati_t inf, lati_t sup) const
     out.writeUInt8(2);
 
     for ( lati_t s = inf; s < sup; ++s )
-        out.writeUInt16(laSite[s]);
+        out.writeUInt16(laCell[s]);
 }
 
 /// write data within [inf, sup[ to file
@@ -36,7 +36,7 @@ void Lattice<uint32_t>::write_data(Outputter& out, lati_t inf, lati_t sup) const
     out.writeUInt8(4);
 
     for ( lati_t s = inf; s < sup; ++s )
-        out.writeUInt32(laSite[s]);
+        out.writeUInt32(laCell[s]);
 }
 
 /// write data within [inf, sup[ to file
@@ -48,7 +48,7 @@ void Lattice<uint64_t>::write_data(Outputter& out, lati_t inf, lati_t sup) const
     out.writeUInt8(8);
     
     for ( lati_t s = inf; s < sup; ++s )
-        out.writeUInt64(laSite[s]);
+        out.writeUInt64(laCell[s]);
 }
 
 /// write data within [inf, sup[ to file
@@ -60,5 +60,5 @@ void Lattice<real>::write_data(Outputter& out, lati_t inf, lati_t sup) const
     out.writeUInt8(12);
     
     for ( lati_t s = inf; s < sup; ++s )
-        out.writeFloat(laSite[s]);
+        out.writeFloat(laCell[s]);
 }

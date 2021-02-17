@@ -127,7 +127,7 @@ public:
     std::string buildReport(std::string) const;
     
     /// build message that appears on bottom
-    std::string buildLabel() const;
+    std::string buildLabel(std::string const&) const;
     
     /// build central message
     std::string buildMemo(int) const;

@@ -47,26 +47,27 @@ public:
 private:
     
     /// lowest valid index (can be negative or positive)
-    lati_t     laInf;
+    lati_t   laInf;
     
     /// highest valid index plus one (laSup > laInf)
-    lati_t     laSup;
-    
-    /// distance between adjacent sites
-    real       laUnit;
-
-    /// Original allocated memory ( laSite = laSite0 - laInf )
-    cell_t *   laSite0;
-    
-    /// Array of sites, of valid range [laInf, laSup[
-    cell_t *   laSite;
+    lati_t   laSup;
     
     /// index of cell containing the MINUS_END
-    lati_t     laIndexM;
+    lati_t   laIndexM;
     
     /// index of cell containing the PLUS_END
-    lati_t     laIndexP;
+    lati_t   laIndexP;
     
+    /// Array of sites, of valid range [laInf, laSup[
+    /** This is a pointer with offset : laCell = laPtr - laInf */
+    cell_t * laCell;
+    
+    /// Pointer to allocated memory for cell (not used for access)
+    cell_t * laPtr;
+
+    /// distance between adjacent sites
+    real     laUnit;
+
 #pragma mark - Allocation
     
     /// allocate for indices within [inf, sup[, and copy values from `src`
@@ -93,12 +94,12 @@ private:
             }
         }
         
-        delete[] laSite0;
+        delete[] laPtr;
 
         laInf = inf;
         laSup = sup;
-        laSite0 = ptr;
-        laSite  = mem;
+        laPtr = ptr;
+        laCell = mem;
     }
     
     
@@ -108,13 +109,13 @@ private:
         assert_true( inf <= sup );
         
         // return if existing boundaries are sufficient
-        if (( laSite != nullptr ) & ( laInf <= inf ) & ( sup <= laSup ))
+        if (( laCell != nullptr ) & ( laInf <= inf ) & ( sup <= laSup ))
             return;
         
         inf -= margin;
         sup += margin;
         
-        if ( laSite )
+        if ( laCell )
         {
             // only extend the current coverage:
             inf = std::min(inf, laInf);
@@ -122,7 +123,7 @@ private:
             //std::clog<<"Lattice "<<this<<" covers ["<<laInf<<","<<laSup<<"[\n";
         }
         
-        allocate_copy(inf, sup, laSite, laInf, laSup);
+        allocate_copy(inf, sup, laCell, laInf, laSup);
     }
     
     
@@ -130,11 +131,11 @@ private:
     void deallocate()
     {
         //std::clog<<"Lattice realeased\n";
-        delete[] laSite0;
-        laSite0 = nullptr;
-        laSite  = nullptr;
-        laInf   = 0;
-        laSup   = 0;
+        delete[] laPtr;
+        laPtr = nullptr;
+        laCell = nullptr;
+        laInf = 0;
+        laSup = 0;
     }
     
     /// forbid access to data via automatic type conversion:
@@ -149,11 +150,11 @@ public:
     /// Constructor
     Lattice()
     {
-        laInf   = 0;
-        laSup   = 0;
-        laUnit  = 0;
-        laSite0 = nullptr;
-        laSite  = nullptr;
+        laInf = 0;
+        laSup = 0;
+        laUnit = 0;
+        laPtr = nullptr;
+        laCell = nullptr;
         laIndexM = 0;
         laIndexP = 0;
     }
@@ -167,7 +168,7 @@ public:
         laUnit = lat.laUnit;
 
         // allocate and copy lat's data:
-        allocate_copy(lat.laInf, lat.laSup, lat.laSite, lat.laInf, lat.laSup);
+        allocate_copy(lat.laInf, lat.laSup, lat.laCell, lat.laInf, lat.laSup);
     }
     
     /// assignment operator
@@ -176,7 +177,7 @@ public:
         laUnit = lat.laUnit;
 
         // allocate and copy lat's data:
-        allocate_copy(lat.laInf, lat.laSup, lat.laSite, lat.laInf, lat.laSup);
+        allocate_copy(lat.laInf, lat.laSup, lat.laCell, lat.laInf, lat.laSup);
         return *this;
     }
 
@@ -209,7 +210,7 @@ public:
             real s = laUnit * laInf;
             real e = laUnit * laSup + laUnit;
             laUnit = u;
-            if ( laSite )
+            if ( laCell )
                 setRange(s, e);
         }
     }
@@ -219,8 +220,8 @@ public:
     /// set cell values outside the valid range
     void markEdges(const cell_t val)
     {
-        for ( lati_t i = laInf; i < laIndexM; ++i ) laSite[i] = val;
-        for ( lati_t i = laIndexP; i < laSup; ++i ) laSite[i] = val;
+        for ( lati_t i = laInf; i < laIndexM; ++i ) laCell[i] = val;
+        for ( lati_t i = laIndexP; i < laSup; ++i ) laCell[i] = val;
     }
     
     /// set the range of valid abscissa
@@ -229,14 +230,14 @@ public:
         assert_true( laUnit > REAL_EPSILON );
         //std::clog << this << " Lattice::setRange(" << a << ", " << b << ") " << laUnit << "\n";
 #if 0
-        if ( !std::is_same<real, cell_t>::value && laSite )
+        if ( !std::is_same<real, cell_t>::value && laCell )
             markEdges(0);
 #endif
         laIndexM = index_sup(a) - 1;
         laIndexP = index(b);
 
         /* allocate with a safety margin of 8 cells */
-        allocate(laIndexM, laIndexP, 8);
+        allocate(laIndexM, laIndexP+1, 0);
 #if 0
         if ( !std::is_same<real, cell_t>::value )
             markEdges(~0);
@@ -293,28 +294,28 @@ public:
 #pragma mark - data access
 
     /// pointer to data array
-    cell_t*       data()        const  { return laSite; }
+    cell_t*       data()        const  { return laCell; }
     
     /// value at index `s`, equivalent to []
-    cell_t&       data(lati_t s)       { assert_true(valid(s)); return laSite[s]; }
+    cell_t&       data(lati_t s)       { assert_true(valid(s)); return laCell[s]; }
 
     /// value at index `s`, equivalent to []
-    cell_t const& data(lati_t s) const { assert_true(valid(s)); return laSite[s]; }
+    cell_t const& data(lati_t s) const { assert_true(valid(s)); return laCell[s]; }
     
     /// reference to Site at index s
-    cell_t& operator[](lati_t s)       { assert_true(valid(s)); return laSite[s]; }
+    cell_t& operator[](lati_t s)       { assert_true(valid(s)); return laCell[s]; }
     
     /// value at abscissa `a`, with convertion to site index, unlike operator []
-    cell_t&       cell(real a)         { lati_t s=index(a); assert_true(valid(s)); return laSite[s]; }
+    cell_t&       cell(real a)         { lati_t s=index(a); assert_true(valid(s)); return laCell[s]; }
     
     /// value at abscissa `a`, with convertion to site index, unlike operator []
-    cell_t const& cell(real a)   const { lati_t s=index(a); assert_true(valid(s)); return laSite[s]; }
+    cell_t const& cell(real a)   const { lati_t s=index(a); assert_true(valid(s)); return laCell[s]; }
 
     /// set all sites to `value`
     void clear(cell_t value = 0)
     {
         for ( lati_t s = laInf; s < laSup; ++s )
-            laSite[s] = value;
+            laCell[s] = value;
     }
 
 #pragma mark - Transfer
@@ -327,9 +328,9 @@ public:
         is = std::max(is, std::max(laInf, lat.laInf));
         ie = std::min(ie, std::min(laSup, lat.laSup));
         
-        CELL * s = laSite + is;
-        CELL *const e = laSite + ie;
-        CELL * o = lat.laSite + is;
+        CELL * s = laCell + is;
+        CELL *const e = laCell + ie;
+        CELL * o = lat.laCell + is;
 
         // transfer values
         while ( s < e )
@@ -362,8 +363,8 @@ public:
     {
         res = 0;
         // limit boundaries
-        CELL * s = laSite + std::max(is, laInf);
-        CELL * e = laSite + std::min(ie, laSup);
+        CELL * s = laCell + std::max(is, laInf);
+        CELL * e = laCell + std::min(ie, laSup);
         
         // collect
         while ( s < e )
@@ -404,8 +405,8 @@ public:
     void sum(SUM& res, lati_t is, lati_t ie) const
     {
         // check boundaries
-        CELL * s = laSite + std::max(is, laInf);
-        CELL * e = laSite + std::min(ie, laSup);
+        CELL * s = laCell + std::max(is, laInf);
+        CELL * e = laCell + std::min(ie, laSup);
         
         // collect
         res = 0;
@@ -463,7 +464,7 @@ public:
         out.writeInt32(sup);
         out.writeFloat(laUnit);
         
-        if ( laSite )
+        if ( laCell )
             write_data(out, inf, sup);
         else
         {
@@ -506,27 +507,27 @@ public:
         if ( nbytes == 1 )
         {
             for ( lati_t s = inf; s < sup; ++s )
-                laSite[s] = in.readUInt8();
+                laCell[s] = in.readUInt8();
         }
         else if ( nbytes == 2 )
         {
             for ( lati_t s = inf; s < sup; ++s )
-                laSite[s] = in.readUInt16();
+                laCell[s] = in.readUInt16();
         }
         else if ( nbytes == 4 )
         {
             for ( lati_t s = inf; s < sup; ++s )
-                laSite[s] = in.readUInt32();
+                laCell[s] = in.readUInt32();
         }
         else if ( nbytes == 8 )
         {
             for ( lati_t s = inf; s < sup; ++s )
-                laSite[s] = in.readUInt64();
+                laCell[s] = in.readUInt64();
         }
         else
         {
             for ( lati_t s = inf; s < sup; ++s )
-                laSite[s] = in.readFloat();
+                laCell[s] = in.readFloat();
         }
     }
 
@@ -541,7 +542,7 @@ public:
     int bad()
     {
         if ( laUnit <= 0 )   return 1;
-        if ( !laSite )       return 2;
+        if ( !laCell )       return 2;
         if ( laInf > laSup ) return 4;
         return 0;
     }

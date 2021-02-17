@@ -123,7 +123,7 @@ public:
     void setLights(bool local = false) const;
     
     /// set text displayed in center of window
-    void setLabel(std::string const& msg) { full_label = label + " " + msg; }
+    void setLabel(std::string const& msg) { full_label = msg; }
     
     /// set text displayed near top of window
     void setMessage(std::string const& msg) { top_message = msg; }
