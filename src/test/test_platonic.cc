@@ -192,6 +192,21 @@ void display(View&, int)
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     
+    if ( 1 )
+    {
+        glLineWidth(2);
+        //glPolygonMode(GL_FRONT, GL_LINE);
+        glColor4f(0, 1, 1, 0.5f);
+        glEnable(GL_LIGHTING);
+        //glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        //gle::sphere1();
+        gle::blobS();
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_LIGHTING);
+        return;
+    }
+
     drawPlane();
     if ( showFaces )
     {
@@ -229,6 +244,8 @@ int main(int argc, char* argv[])
     glApp::setScale(3);
   
     setPlatonic();
+    gle::initBuffers();
+    gle::initSphereBuffers();
     glutMainLoop();
 }
 

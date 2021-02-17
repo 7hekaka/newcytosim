@@ -224,7 +224,7 @@ test_rasterizer: test_rasterizer.cc rasterizerG.o $(OBJ_GLAP) | bin
 	$(DONE)
 vpath test_rasterizer bin
 
-test_space: test_space.cc cytosimG.a $(OBJ_GLAP) | bin
+test_space: test_space.cc cytosimG.a gle_flute.o $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 vpath test_space bin

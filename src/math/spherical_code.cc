@@ -207,7 +207,7 @@ void SphericalCode::setForces( real forces[], real threshold )
             {
                 // points do not overlap:
                 //force = vector / r^3, but here dist = r^2
-                dist = 1.0 / ( dist * std::sqrt(dist) );
+                dist = std::sqrt(dist) / ( dist * dist );
                 //update forces for jj and ii:
                 for ( size_t d = 0 ; d < 3; ++d )
                 {

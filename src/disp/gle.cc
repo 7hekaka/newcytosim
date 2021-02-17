@@ -846,11 +846,121 @@ namespace gle
         func1(sizeof(dir), dir, bufN);
         func2(sizeof(pts), pts, bufP);
     }
+    
+    //-----------------------------------------------------------------------
+
+    void cube1()
+    {
+        constexpr GLfloat R = 1.f, U = -1.f;
+        const GLfloat pts[] = {
+             R, U, U, U, U, U,
+             R, R, U, U, R, U,
+             U, R, R, U, U, U,
+             U, U, R, R, U, U,
+             R, U, R, R, R, U,
+             R, R, R, U, R, R,
+             R, U, R, U, U, R };
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+    }
+    
+    void tetrahedron1()
+    {
+        constexpr GLfloat R = 1.f, U = -1.f;
+        GLfloat pts[3*8] = {
+            0, 0, R, R, 0, 0, 0, R, 0,
+            0, 0, U, U, 0, 0, 0, U, 0,
+            0, 0, R, R, 0, 0 };
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
+    }
+
+    size_t setBlob(flute3* flu)
+    {
+        constexpr GLfloat R = 1.f, U = -1.f;
+        const GLfloat pts[] = {
+             R, U, U, U, U, U,
+             R, R, U, U, R, U,
+             U, R, R, U, U, U,
+             U, U, R, R, U, U,
+             R, U, R, R, R, U,
+             R, R, R, U, R, R,
+             R, U, R, U, U, R };
+        size_t i = 0, n = 0;
+        flute3 a, b, c;
+        for ( n = 0; n < 11; n += 2 )
+        {
+            a = flute3{pts[3*n  ], pts[3*n+1], pts[3*n+2]};
+            b = flute3{pts[3*n+3], pts[3*n+4], pts[3*n+5]};
+            c = flute3{pts[3*n+6], pts[3*n+7], pts[3*n+8]};
+            flu[i++] = normalize(a+a);
+            flu[i++] = normalize(a+b);
+            flu[i++] = normalize(a+c);
+            flu[i++] = normalize(b+c);
+        }
+        a = flute3{pts[3*n+3], pts[3*n+4], pts[3*n+5]};
+        flu[i++] = normalize(c+c);
+        flu[i++] = normalize(a+c);
+        for ( n = 13; n > 2; n -= 2 )
+        {
+            a = flute3{pts[3*n  ], pts[3*n+1], pts[3*n+2]};
+            b = flute3{pts[3*n-3], pts[3*n-2], pts[3*n-1]};
+            c = flute3{pts[3*n-6], pts[3*n-5], pts[3*n-4]};
+            flu[i++] = normalize(a+a);
+            flu[i++] = normalize(a+b);
+            flu[i++] = normalize(a+c);
+            flu[i++] = normalize(b+c);
+        }
+        a = flute3{pts[0], pts[1], pts[2]};
+        flu[i++] = normalize(c+c);
+        flu[i++] = normalize(a+c);
+        return i;
+    }
+    
+    void initBlobBuffer(GLuint buf)
+    {
+        const size_t cnt = 54;
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute3), nullptr, GL_STATIC_DRAW);
+        flute3 * flu = (flute3*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        size_t n = setBlob(flu);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        assert_true( n <= cnt );
+    }
+    
+    void drawVertexBuffer(GLenum mode, GLuint buf, GLsizei cnt)
+    {
+        assert_true(glIsBuffer(buf));
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glVertexPointer(3, GL_FLOAT, 0, nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, nullptr);
+        glDrawArrays(mode, 0, cnt);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    void blobS()
+    {
+        flute3 flu[54];
+        size_t i = setBlob(flu);
+        glVertexPointer(3, GL_FLOAT, 0, flu);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, flu);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 26);
+        glColor4f(1,1,1,0.5);
+        glDrawArrays(GL_TRIANGLE_STRIP, 26, 26);
+        //glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+    
+    void blob() { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 52); }
 
     //-----------------------------------------------------------------------
-    
-    void drawVertexNormalBuffer(GLenum mode, GLuint buf, size_t cnt,
-                                size_t data_size, size_t normal_offset)
+
+    void drawVertexNormalBuffer(GLenum mode, GLuint buf, GLsizei cnt,
+                                GLsizei data_size, size_t normal_offset)
     {
         assert_true(glIsBuffer(buf));
         glBindBuffer(GL_ARRAY_BUFFER, buf);
@@ -896,7 +1006,7 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt, ptr, GL_STATIC_DRAW);
     }
-
+    
     void initBuffers()
     {
         glGenBuffers(16, buf_);
@@ -906,6 +1016,7 @@ namespace gle
         drawArrowTail(setBuffer, setBuffer, buf_[6], buf_[7]);
         drawCube(setBuffer, setBuffer, buf_[8], buf_[9]);
         drawStar(setBuffer, setBuffer, buf_[10], buf_[11]);
+        initBlobBuffer(buf_[12]);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     

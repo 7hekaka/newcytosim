@@ -167,7 +167,7 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color.load_both();
-        drawObject(pos, dis->size, gle::sphere1);
+        drawObject(pos, dis->size, gle::blob);
     }
 }
 
@@ -178,7 +178,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color2.load_both();
-        drawObject(pos, dis->size, gle::sphere1);
+        drawObject(pos, dis->size, gle::blob);
     }
 }
 
@@ -1191,7 +1191,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             pd1->color.load_both();
             glPushMatrix();
             transAlignZ(p1, pd1->size*sFactor, dir);
-            gle::sphere1();
+            gle::blob(); //sphere1();
             gle::thinTube();
             glPopMatrix();
         }
@@ -1201,7 +1201,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             pd2->color.load_both();
             glPushMatrix();
             transAlignZ(p2, pd2->size*sFactor, -dir);
-            gle::sphere1();
+            gle::blob(); //sphere1();
             gle::thinTube();
             glPopMatrix();
         }

@@ -149,6 +149,11 @@ namespace gle
     /// returns tetrahedron or octahedron
     inline void (*hedron(bool x))() { return x ? octahedron : tetrahedron; }
     
+    void cube1();
+    void tetrahedron1();
+    void blobS();
+    /// draw a roughly spherical shape made of few triangles
+    void blob();
     /// draw a Cube of side 2
     void cube();
     /// draw a stellated octahedron
