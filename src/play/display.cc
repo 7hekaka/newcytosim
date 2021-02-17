@@ -377,7 +377,7 @@ void Display::prepareLineDisp(const Fiber * fib)
     LineDisp * self = fib->disp;
     self->color = col;
     
-#if ( 0 )
+#if ( 1 )
     // colors of ends set to match body color:
     self->end_color[0] = col;
     self->end_color[1] = col;

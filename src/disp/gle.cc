@@ -379,6 +379,21 @@ namespace gle
     //-----------------------------------------------------------------------
     # pragma mark - Circle, Cone and Disc
     
+    size_t setCone(flute6* flu, GLfloat B, GLfloat T, size_t inc)
+    {
+        const GLfloat L = T - B;
+        const GLfloat Y = 1.f/sqrtf(L*L+1.f);
+        const GLfloat X = Y * L;
+        GLsizei i = 1;
+        flu[0] = flute6{ 0, 0, T, 0, 0, 1 };
+        for( size_t p = 0; p <= ncircle; p += inc )
+        {
+            GLfloat C = cos_(p), S = sin_(p);
+            flu[i++] = flute6{ C, S, B, C*X, S*X, Y };
+        }
+        return i;
+    }
+
     void circle()
     {
         glNormal3f(0, 0, 1);
@@ -400,13 +415,14 @@ namespace gle
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
     }
     
+    // this does not preserve the modelview transformation
     void discTop()
     {
         glNormal3f(0, 0, 1);
         glTranslatef(0, 0, 1);
         glVertexPointer(2, GL_FLOAT, 16, cir_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
-        glTranslatef(0, 0, -1);
+        //glTranslatef(0, 0, -1);
     }
 
     void discDown()
@@ -443,8 +459,8 @@ namespace gle
         glNormal3f( 0, 0, 1 );
         glVertex3f( 0, 0, T );
         const GLfloat L(T-B);
-        const GLfloat Y = -1.f/sqrtf(L*L+1);
-        const GLfloat X = -Y * L;
+        const GLfloat Y = 1.f/sqrtf(L*L+1);
+        const GLfloat X = Y * L;
         for ( size_t n = 0; n <= ncircle; ++n )
         {
             GLfloat S = sin_(n), C = cos_(n);
@@ -457,19 +473,21 @@ namespace gle
     void cone()
     {
         coneZ(1, 0, 1);
-        discZ(1, 0, -1);
+        discDown2();
     }
 
     void longCone()
     {
-        coneZ(1, -1, 2);
-        discZ(1, -1, -1);
+        glTranslatef(0, 0, -1);
+        glScalef(1, 1, 3);
+        cone();
     }
 
     void shortCone()
     {
-        coneZ(1.5, 0.7, 1.4);
-        discZ(1.5, 0.7, -1);
+        glTranslatef(0, 0, -0.333f);
+        glScalef(1, 1, 0.5);
+        cone();
     }
 
     void truncatedCone()
@@ -831,6 +849,19 @@ namespace gle
 
     //-----------------------------------------------------------------------
     
+    void drawVertexNormalBuffer(GLenum mode, GLuint buf, size_t cnt,
+                                size_t data_size, size_t normal_offset)
+    {
+        assert_true(glIsBuffer(buf));
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glVertexPointer(3, GL_FLOAT, data_size, nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, data_size, (void*)normal_offset);
+        glDrawArrays(mode, 0, cnt);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
     void drawTriangleBuffer(GLuint nor, GLuint pts, GLsizei cnt)
     {
         assert_true(glIsBuffer(nor));
@@ -916,7 +947,7 @@ namespace gle
         return i;
     }
 
-    /// hexagon has the same surface as a disc of radius 1.
+    /// hexagon has the same surface as a disc of radius rad.
     size_t setHexTube(flute6* flu, GLfloat rad, GLfloat A, GLfloat B)
     {
         constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
@@ -941,9 +972,16 @@ namespace gle
         return 14;
     }
     
+    inline size_t nbTubeTriangles(size_t inc)
+    {
+        return 2 + ( 2 * ncircle ) / inc;
+    }
+    
+    constexpr size_t nbHexTubeTriangles = 14;
+    
     size_t initTubeBuffer(GLuint buf, GLfloat A, GLfloat B, size_t inc)
     {
-        size_t cnt = 2 * ( 1 + ncircle / inc );
+        size_t cnt = nbTubeTriangles(inc);
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -955,7 +993,7 @@ namespace gle
     
     size_t initHexTubeBuffer(GLuint buf, GLfloat R, GLfloat A, GLfloat B)
     {
-        size_t cnt = 14;
+        size_t cnt = nbHexTubeTriangles;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -965,16 +1003,9 @@ namespace gle
         return n;
     }
 
-    void drawTubeBuffer(GLuint buf, size_t cnt)
+    inline void drawTubeBuffer(GLuint buf, size_t cnt)
     {
-        assert_true(glIsBuffer(buf));
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, sizeof(flute6), (void*)(3*sizeof(GLfloat)));
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        drawVertexNormalBuffer(GL_TRIANGLE_STRIP, buf, cnt, sizeof(flute6), 3*sizeof(GLfloat));
     }
 
     void initTubeBuffers()
@@ -998,33 +1029,35 @@ namespace gle
     }
 
     // using Vertex Buffer Objects
-    void tube1()     { drawTubeBuffer(tub_[0], 2+ncircle/4); }
-    void tube2()     { drawTubeBuffer(tub_[1], 2+ncircle/2); }
-    void tube4()     { drawTubeBuffer(tub_[2], 2+ncircle  ); }
-    void tube8()     { drawTubeBuffer(tub_[3], 2+ncircle*2); }
-    void longTube1() { drawTubeBuffer(tub_[4], 2+ncircle/4); }
-    void longTube2() { drawTubeBuffer(tub_[5], 2+ncircle/2); }
-    void longTube4() { drawTubeBuffer(tub_[6], 2+ncircle  ); }
-    void halfTube1() { drawTubeBuffer(tub_[7], 2+ncircle/4); }
-    void halfTube2() { drawTubeBuffer(tub_[8], 2+ncircle/2); }
-    void halfTube4() { drawTubeBuffer(tub_[9], 2+ncircle  ); }
-    void hexTube()   { drawTubeBuffer(tub_[10], 14); }
-    void thinTube()  { drawTubeBuffer(tub_[11], 14); }
+    void tube1()     { drawTubeBuffer(tub_[0], nbTubeTriangles(8)); }
+    void tube2()     { drawTubeBuffer(tub_[1], nbTubeTriangles(4)); }
+    void tube4()     { drawTubeBuffer(tub_[2], nbTubeTriangles(2)); }
+    void tube8()     { drawTubeBuffer(tub_[3], nbTubeTriangles(1)); }
+    void longTube1() { drawTubeBuffer(tub_[4], nbTubeTriangles(8)); }
+    void longTube2() { drawTubeBuffer(tub_[5], nbTubeTriangles(4)); }
+    void longTube4() { drawTubeBuffer(tub_[6], nbTubeTriangles(2)); }
+    void halfTube1() { drawTubeBuffer(tub_[7], nbTubeTriangles(8)); }
+    void halfTube2() { drawTubeBuffer(tub_[8], nbTubeTriangles(4)); }
+    void halfTube4() { drawTubeBuffer(tub_[9], nbTubeTriangles(2)); }
+    void hexTube()   { drawTubeBuffer(tub_[10], nbHexTubeTriangles); }
+    void thinTube()  { drawTubeBuffer(tub_[11], nbHexTubeTriangles); }
 
+    // this does not preserve the modelview transformation
     void cylinder1()
     {
         tube1();
-        discTop();
         discDown();
+        discTop();
     }
     
+    // this does not preserve the modelview transformation
     void cylinder2()
     {
         glTranslatef(0,0,-0.5f);
-        discTop();
-        tube4();
         discDown();
-        glTranslatef(0,0,0.5f);
+        tube4();
+        discTop();
+        //glTranslatef(0,0,0.5f);
     }
 
     //-----------------------------------------------------------------------
