@@ -20,9 +20,6 @@ namespace gle
     /// values of cosinus, sinus over a full circle
     GLfloat cir_[2*ncircle+8] = { 0 };
     
-    inline GLfloat cos_(size_t n) { return cir_[4+2*n]; }
-    inline GLfloat sin_(size_t n) { return cir_[5+2*n]; }
-    
     /// OpenGL buffers objects for streaming
     GLuint stream_[4] = { 0 };
     
@@ -98,7 +95,13 @@ namespace gle
     }
 
     //-----------------------------------------------------------------------
-    #pragma mark - Arcs
+    #pragma mark - Compute Arc and Circle
+    
+    /// access to precomputed cosinus
+    inline GLfloat cos_(size_t n) { return cir_[4+2*n]; }
+    
+    /// access to precomputed sinus
+    inline GLfloat sin_(size_t n) { return cir_[5+2*n]; }
 
     /// Calculates coordinates over an arc of circle
     /**
@@ -152,15 +155,6 @@ namespace gle
     
     //-----------------------------------------------------------------------
     #pragma mark - Rotation
-
-    /** extracts axis orthogonal to the display plane, and corresponding to depth
-     from the current modelview transformation: */
-    Vector3 directionDepth()
-    {
-        GLfloat mat[16];
-        glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-        return normalize(Vector3(mat[2], mat[6], mat[10]));
-    }
     
     template < typename FLOAT >
     inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3])
@@ -249,24 +243,14 @@ namespace gle
     }
 
     
-    void gleRotate(Vector3 const& A, Vector3 const& B,
-                   Vector3 const& C, bool inverse)
+    void rotate(Vector3 const& A, Vector3 const& B, Vector3 const& C)
     {
         float mat[16];
         for ( int i = 0; i < 3; ++i )
         {
-            if ( inverse )
-            {
-                mat[4*i  ] = A[i];
-                mat[4*i+1] = B[i];
-                mat[4*i+2] = C[i];
-            }
-            else
-            {
-                mat[i  ] = A[i];
-                mat[i+4] = B[i];
-                mat[i+8] = C[i];
-            }
+            mat[i  ] = A[i];
+            mat[i+4] = B[i];
+            mat[i+8] = C[i];
             mat[i+12]  = 0;
             mat[i*4+3] = 0;
         }
@@ -274,6 +258,21 @@ namespace gle
         glMultMatrixf(mat);
     }
     
+    void rotateInverse(Vector3 const& A, Vector3 const& B, Vector3 const& C)
+    {
+        float mat[16];
+        for ( int i = 0; i < 3; ++i )
+        {
+            mat[4*i  ] = A[i];
+            mat[4*i+1] = B[i];
+            mat[4*i+2] = C[i];
+            mat[4*i+3] = 0;
+            mat[i+12]  = 0;
+        }
+        mat[15] = 1;
+        glMultMatrixf(mat);
+    }
+
     
     void transRotate(Vector3 const& O, Vector3 const& A,
                      Vector3 const& B, Vector3 const& C)
@@ -350,7 +349,35 @@ namespace gle
         glClipPlane(glp, eq);
     }
     
+    
+    /**
+     draw back first, and then front of object,
+     GL_CULL_FACE is temporarily enabled for this
+     */
+    void dualPass(void primitive())
+    {
+        GLboolean cull = glIsEnabled(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        primitive();
+        glCullFace(GL_BACK);
+        primitive();
+        if ( !cull ) glDisable(GL_CULL_FACE);
+    }
+    
+    /**
+     return axis orthogonal to the display plane, and corresponding to depth
+     obtained from the current modelview transformation
+     */
+    Vector3 directionDepth()
+    {
+        GLfloat mat[16];
+        glGetFloatv(GL_MODELVIEW_MATRIX, mat);
+        return normalize(Vector3(mat[2], mat[6], mat[10]));
+    }
+
     //-----------------------------------------------------------------------
+    # pragma mark - Circle, Cone and Disc
     
     void circle()
     {
@@ -373,6 +400,15 @@ namespace gle
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
     }
     
+    void discTop()
+    {
+        glNormal3f(0, 0, 1);
+        glTranslatef(0, 0, 1);
+        glVertexPointer(2, GL_FLOAT, 16, cir_);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
+        glTranslatef(0, 0, -1);
+    }
+
     void discDown()
     {
         glNormal3f(0, 0, -1);
@@ -416,6 +452,29 @@ namespace gle
             glVertex3f(R*C, R*S, B);
         }
         glEnd();
+    }
+
+    void cone()
+    {
+        coneZ(1, 0, 1);
+        discZ(1, 0, -1);
+    }
+
+    void longCone()
+    {
+        coneZ(1, -1, 2);
+        discZ(1, -1, -1);
+    }
+
+    void shortCone()
+    {
+        coneZ(1.5, 0.7, 1.4);
+        discZ(1.5, 0.7, -1);
+    }
+
+    void truncatedCone()
+    {
+        tubeZ(0, 1, 1, 0.25, 4);
     }
 
     //-----------------------------------------------------------------------
@@ -922,7 +981,7 @@ namespace gle
     {
         glGenBuffers(12, tub_);
         /* The value of T limits the aspect ratio of tubes that can be drawn */
-        const GLfloat B = -4.f, T = 128.f;
+        const GLfloat B = -32.f, T = 256.f;
         initTubeBuffer(tub_[0], 0, 1, 8);
         initTubeBuffer(tub_[1], 0, 1, 4);
         initTubeBuffer(tub_[2], 0, 1, 2);
@@ -955,24 +1014,21 @@ namespace gle
     void cylinder1()
     {
         tube1();
-        glTranslatef(0,0,1);
-        disc();
-        glTranslatef(0,0,-1);
+        discTop();
         discDown();
     }
     
-    void cylinderZ()
+    void cylinder2()
     {
-        glTranslatef(0,0,0.5f);
-        disc();
-        glTranslatef(0,0,-1);
+        glTranslatef(0,0,-0.5f);
+        discTop();
         tube4();
         discDown();
         glTranslatef(0,0,0.5f);
     }
 
     //-----------------------------------------------------------------------
-    #pragma mark - Slow legacy tubes
+    #pragma mark - Legacy 3D objects
 
     void tubeZ(GLfloat B, GLfloat T, int inc)
     {
@@ -1077,6 +1133,49 @@ namespace gle
             glEnd();
         }
     }
+    
+    void ellipseZ(GLfloat rX, GLfloat rY, GLfloat rZ)
+    {
+        GLfloat iX(1.f/rX), iY(1.f/rY), iZ(1.f/rZ);
+        /*
+         A vector orthogonal to the ellipse surface at position (X, Y, Z) is
+         ( X / rX^2, Y / rY^2, Z / rZ^2 )
+          */
+        for ( size_t n = 0; n < ncircle/2; ++n )
+        {
+            GLfloat uC = cos_(n  ), uS = sin_(n  );
+            GLfloat lC = cos_(n+1), lS = sin_(n+1);
+            GLfloat uX = uS * rX, uY = uS * rY, uZ = uC * rZ;
+            GLfloat lX = lS * rX, lY = lS * rY, lZ = lC * rZ;
+            GLfloat xu = uS * iX, yu = uS * iY, zu = uC * iZ;
+            GLfloat xl = lS * iX, yl = lS * iY, zl = lC * iZ;
+            glBegin(GL_TRIANGLE_STRIP);
+            for ( size_t p = 0; p <= ncircle; ++p )
+            {
+                GLfloat S = sin_(p), C = cos_(p);
+                glNormal3f(C*xu, S*yu, zu);
+                glVertex3f(C*uX, S*uY, uZ);
+                glNormal3f(C*xl, S*yl, zl);
+                glVertex3f(C*lX, S*lY, lZ);
+            }
+            glEnd();
+        }
+    }
+
+    void ellipse_circleZ(GLfloat rX, GLfloat rY, GLfloat rZ, GLfloat u)
+    {
+        GLfloat R(std::sqrt((1-u)*(1+u)));
+        GLfloat iX(1.f/rX), iY(1.f/rY), iZ(u/rZ);
+        GLfloat vX(R*rX), vY(R*rY), vZ(u*rZ);
+        glBegin(GL_LINE_LOOP);
+        for ( size_t n = 0; n <= ncircle; ++n )
+        {
+            GLfloat S = sin_(n), C = cos_(n);
+            glNormal3f(C*iX, S*iY, iZ);
+            glVertex3f(C*vX, S*vY, vZ);
+        }
+        glEnd();
+    }
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres
@@ -1174,49 +1273,6 @@ namespace gle
         sphere8();
         glCullFace(GL_BACK);
         sphere8();
-    }
-
-    void ellipse(GLfloat rX, GLfloat rY, GLfloat rZ)
-    {
-        GLfloat iX(1.f/rX), iY(1.f/rY), iZ(1.f/rZ);
-        /*
-         A vector orthogonal to the ellipse surface at position (X, Y, Z) is
-         ( X / rX^2, Y / rY^2, Z / rZ^2 )
-          */
-        for ( size_t n = 0; n < ncircle/2; ++n )
-        {
-            GLfloat uC = cos_(n  ), uS = sin_(n  );
-            GLfloat lC = cos_(n+1), lS = sin_(n+1);
-            GLfloat uX = uS * rX, uY = uS * rY, uZ = uC * rZ;
-            GLfloat lX = lS * rX, lY = lS * rY, lZ = lC * rZ;
-            GLfloat xu = uS * iX, yu = uS * iY, zu = uC * iZ;
-            GLfloat xl = lS * iX, yl = lS * iY, zl = lC * iZ;
-            glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t p = 0; p <= ncircle; ++p )
-            {
-                GLfloat S = sin_(p), C = cos_(p);
-                glNormal3f(C*xu, S*yu, zu);
-                glVertex3f(C*uX, S*uY, uZ);
-                glNormal3f(C*xl, S*yl, zl);
-                glVertex3f(C*lX, S*lY, lZ);
-            }
-            glEnd();
-        }
-    }
-
-    void ellipse_circle(GLfloat rX, GLfloat rY, GLfloat rZ, GLfloat u)
-    {
-        GLfloat R(std::sqrt((1-u)*(1+u)));
-        GLfloat iX(1.f/rX), iY(1.f/rY), iZ(u/rZ);
-        GLfloat vX(R*rX), vY(R*rY), vZ(u*rZ);
-        glBegin(GL_LINE_LOOP);
-        for ( size_t n = 0; n <= ncircle; ++n )
-        {
-            GLfloat S = sin_(n), C = cos_(n);
-            glNormal3f(C*iX, S*iY, iZ);
-            glVertex3f(C*vX, S*vY, vZ);
-        }
-        glEnd();
     }
     
     //-----------------------------------------------------------------------
@@ -1317,50 +1373,6 @@ namespace gle
     void barrel()
     {
         drawRevolution(barrelRadius, 0, 1, 0.0625);
-    }
-    
-    //-----------------------------------------------------------------------
-#pragma mark - Object Placement
-    
-    
-    /**
-     draw back first, and then front of object,
-     GL_CULL_FACE should be enabled
-     */
-    void dualPass(void primitive())
-    {
-        GLboolean cull = glIsEnabled(GL_CULL_FACE);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-        primitive();
-        glCullFace(GL_BACK);
-        primitive();
-        if ( !cull ) glDisable(GL_CULL_FACE);
-    }    
-    
-    //-----------------------------------------------------------------------
-    void gleObject(Vector1 const& X, Vector1 const& D, const float R, void (*obj)())
-    {
-        glPushMatrix();
-        transAlignZ(X, R, D);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector2 const& X, Vector2 const& D, const float R, void (*obj)())
-    {
-        glPushMatrix();
-        transAlignZ(X, R, D);
-        obj();
-        glPopMatrix();
-    }
-    
-    void gleObject(Vector3 const& X, Vector3 const& D, const float R, void (*obj)())
-    {
-        glPushMatrix();
-        transAlignZ(X, R, D);
-        obj();
-        glPopMatrix();
     }
 
     //-----------------------------------------------------------------------
@@ -1642,8 +1654,7 @@ namespace gle
     {
         glPushMatrix();
         transAlignZ(pos, rad, dir);
-        glTranslatef(0, 0, -0.5f);
-        cylinder1();
+        cylinder2();
         glPopMatrix();
     }
     

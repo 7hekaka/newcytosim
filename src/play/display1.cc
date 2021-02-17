@@ -194,7 +194,7 @@ void Display1::drawSolid(Solid const& obj)
         {
             glEnable(GL_LIGHTING);
             bodyColor(obj);
-            //gle::gleObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
+            //drawObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
             glPushMatrix();
             Vector A = obj.posP(0), B = obj.posP(1);
             gle::transAlignZ(A, obj.radius(0), B-A);

@@ -1,6 +1,7 @@
 set(SOURCES_PLAY
     "${PROJECT_SOURCE_DIR}/src/play/frame_reader.cc"
     "${PROJECT_SOURCE_DIR}/src/play/display_prop.cc"
+    "${PROJECT_SOURCE_DIR}/src/disp/gle_flute.cc"
     "${PROJECT_SOURCE_DIR}/src/play/display.cc"
     "${PROJECT_SOURCE_DIR}/src/play/display1.cc"
     "${PROJECT_SOURCE_DIR}/src/play/display2.cc"

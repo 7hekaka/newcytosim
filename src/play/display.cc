@@ -600,7 +600,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
         }
         if ( front )
         {
-            disp->color.load_front();
+            disp->color.load_load();
             glCullFace(GL_BACK);
             obj->draw3D();
         }

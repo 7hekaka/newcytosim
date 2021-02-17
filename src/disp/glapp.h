@@ -41,7 +41,7 @@ namespace glApp
     /// return current mode
     bool       isFullScreen();
     
-    /// return current mode
+    /// set current mode
     void       setFullScreen(bool);
 
     /// maximize window size within the current screen

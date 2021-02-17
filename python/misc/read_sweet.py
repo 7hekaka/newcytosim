@@ -43,8 +43,6 @@ def read(path):
         while bytes:
             data = struct.unpack(format, bytes)
             # do something here with the data:
-            # sphere( type, id, color, x, y, z )
-            # radius should be .003575 micrometers
             print(data)
             bytes = f.read(nbytes)
         f.close()

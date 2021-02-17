@@ -243,11 +243,11 @@ void SpaceEllipse::draw3D() const
     gle::sphere8();
     glPopMatrix();
 #else
-    gle::ellipse(X, Y, Z);
+    gle::ellipseZ(X, Y, Z);
     /* Add decoration */
     glLineWidth(0.5);
     for ( GLfloat u = -0.9f; u < 1.0f; u += 0.2f )
-        gle::ellipse_circle(X, Y, Z, u);
+        gle::ellipse_circleZ(X, Y, Z, u);
 #endif
 }
 

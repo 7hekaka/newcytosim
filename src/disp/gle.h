@@ -120,6 +120,9 @@ namespace gle
     void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
     void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);
     void setClipPlane(GLenum, Vector3 const& dir, Vector3 const& pos);
+    
+    /// display back faces first, and then front faces
+    void dualPass(void primitive());
 
     //------------------------------------------------------------------------------
 #pragma mark -
@@ -128,6 +131,8 @@ namespace gle
     void circle();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
+    /// draw 2D disc of radius 1 at Z=1, with +Z as normal
+    void discTop();
     /// nicer 2D disc of radius 1 in XY plane, with +Z as normal
     void disc2();
     /// draw 2D disc of radius 1 in XY plane, with -Z as normal
@@ -163,6 +168,12 @@ namespace gle
     void hexTubeZ(GLfloat Zmin, GLfloat Zmax);
     /// draw Torus of radius `rad` and thickness `thick`
     void torusZ(GLfloat rad, GLfloat thick, size_t inc = 1);
+    /// spherocylinder of length L, radius R, centered and aligned with axis Z
+    void capsuleZ(GLfloat B, GLfloat T, GLfloat R);
+    /// draw ellipse
+    void ellipseZ(GLfloat rX, GLfloat rY, GLfloat rZ);
+    /// draw circle on the ellipse
+    void ellipse_circleZ(GLfloat rX, GLfloat rY, GLfloat rZ, GLfloat u);
 
     /// draw an open tube along Z, of diameter 1 and length 1
     void tube1();
@@ -189,19 +200,21 @@ namespace gle
     /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 256]
     void thinTube();
     
-    /// display a cylindrical box, directed along Z, of radius 1 in Z=[0, 1]
+    /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
     void cylinder1();
-    /// display a cylindrical box, directed along Z, of radius 1 in Z=[-0.5, 0.5]
-    void cylinderZ();
-    /// spherocylinder of length L, radius R, centered and aligned with axis Z
-    void capsuleZ(GLfloat B, GLfloat T, GLfloat R);
+    /// display a cylinder of axis Z, radius 1 in Z=[-0.5, 0.5]
+    void cylinder2();
 
+    /// display a cone of axis Z, radius 1 at Z=0, summit at Z=1
+    void cone();
+    /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
+    void longCone();
+    /// display a closed cone directed along Z, of radius 1.5 in Z=[0.7, +1.4]
+    void shortCone();
+    /// display an open cone directed along Z, of radius 1 at Z=0
+    void truncatedCone();
     /// draw a 3-portion cylinder with a larger central section
     void barrel();
-    /// display an open cone directed along Z, of radius 1 at Z=0
-    inline void truncatedCone() { tubeZ(0, 1, 1, 0.25, 4); }
-    /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
-    inline void longCone() { coneZ(1, -1, 2); discZ(1, -1, -1); }
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1
     void dumbbell();
 
@@ -242,9 +255,6 @@ namespace gle
     void hemisphere2();
     /// draw a very nice half-sphere in Z < 0
     void hemisphere4();
-    
-    void ellipse(GLfloat rX, GLfloat rY, GLfloat rZ);
-    void ellipse_circle(GLfloat rX, GLfloat rY, GLfloat rZ, GLfloat u);
 
 #if 1
     /// primitives to draw the ends of spherocylinders:
@@ -261,21 +271,9 @@ namespace gle
     inline void endedTube1() { halfTube1(); discDown(); }
     inline void endedTube2() { halfTube2(); discDown(); }
     inline void endedTube4() { halfTube4(); discDown(); }
-    
-    inline void arrowHead() { tube1(); glTranslatef(0, 0, 1); glScalef(3.f, 3.f, 3.f); gle::longCone(); }
 
     //------------------------------------------------------------------------------
-#pragma mark -
-    
-    /// display back first, and then front
-    void dualPass(void primitive());
- 
-    /// draw 'obj' scaled by radius at position 'x', oriented along 'd'
-    void gleObject(Vector1 const& pos, Vector1 const& dir, float rad, void (*obj)());
-    void gleObject(Vector2 const& pos, Vector2 const& dir, float rad, void (*obj)());
-    void gleObject(Vector3 const& pos, Vector3 const& dir, float rad, void (*obj)());
-    
-    //------------------------------------------------------------------------------
+    #pragma mark -
 
     /// draw 'obj' with its ends at [a,b], of specified radius
     void gleTube(Vector1 const& A, Vector1 const& B, float rad, void (*obj)());
