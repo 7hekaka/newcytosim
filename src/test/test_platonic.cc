@@ -194,14 +194,15 @@ void display(View&, int)
     
     if ( 1 )
     {
-        glLineWidth(2);
+        glLineWidth(1);
+        glPointSize(10);
         //glPolygonMode(GL_FRONT, GL_LINE);
         glColor4f(0, 1, 1, 0.5f);
         glEnable(GL_LIGHTING);
         //glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         //gle::sphere1();
-        gle::blobS();
+        gle::pin();
         glDisable(GL_CULL_FACE);
         glDisable(GL_LIGHTING);
         return;
@@ -244,8 +245,7 @@ int main(int argc, char* argv[])
     glApp::setScale(3);
   
     setPlatonic();
-    gle::initBuffers();
-    gle::initSphereBuffers();
+    gle::initialize();
     glutMainLoop();
 }
 

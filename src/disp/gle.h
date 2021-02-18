@@ -151,9 +151,14 @@ namespace gle
     
     void cube1();
     void tetrahedron1();
-    void blobS();
+    void loadBlobBuffer();
+    void loadPinBuffer();
+
+    void unloadBuffer();
     /// draw a roughly spherical shape made of few triangles
     void blob();
+    /// draw a centerred blob of radius 1 with a cone extending up in Z
+    void pin();
     /// draw a Cube of side 2
     void cube();
     /// draw a stellated octahedron

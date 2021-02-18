@@ -861,10 +861,10 @@ namespace gle
              R, R, R, U, R, R,
              R, U, R, U, U, R };
         glVertexPointer(3, GL_FLOAT, 0, pts);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
     }
     
+    /// this does not really work
     void tetrahedron1()
     {
         constexpr GLfloat R = 1.f, U = -1.f;
@@ -878,15 +878,19 @@ namespace gle
 
     size_t setBlob(flute3* flu)
     {
-        constexpr GLfloat R = 1.f, U = -1.f;
+        constexpr GLfloat R = 1.f, U = -1.f, H(M_SQRT2);
+        /* start from a centerred cube, rotated appropriately
+         with vertices ordered to draw all surfaces of the cube
+         with a single triangle strip. */
         const GLfloat pts[] = {
-             R, U, U, U, U, U,
-             R, R, U, U, R, U,
-             U, R, R, U, U, U,
-             U, U, R, R, U, U,
-             R, U, R, R, R, U,
-             R, R, R, U, R, R,
-             R, U, R, U, U, R };
+             H, R, 0, 0, R, H,
+             H, U, 0, 0, U, H,
+            -H, U, 0, 0, R, H,
+            -H, R, 0, H, R, 0,
+             0, R,-H, H, U, 0,
+             0, U,-H,-H, U, 0,
+             0, R,-H,-H, R, 0 };
+        // refine the triangle strip:
         size_t i = 0, n = 0;
         flute3 a, b, c;
         for ( n = 0; n < 11; n += 2 )
@@ -918,44 +922,80 @@ namespace gle
         return i;
     }
     
+    /* This moves some vertices to add an hexagonal needle to the blob */
+    void modifyBlob(flute3 * flu)
+    {
+        const GLfloat R = 0.6f;
+        const GLfloat Y = R * 0.8660254037844386f; // sqrtf(3)/2;
+        const GLfloat X = R * 0.5f;
+        const GLfloat Z = 0.6f;
+        //{ 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 }
+        // pull some vertices far away in Z
+        for ( int u : { 42, 44, 46, 48, 50 } ) flu[u] = flute3{ 0, 0, 6 };
+        // set the 6 vertex of an hexagon:
+        for ( int u : { 3, 49 } ) flu[u] = flute3{ R, 0, Z};
+        for ( int u : { 5, 47 } ) flu[u] = flute3{ X,-Y, Z};
+        for ( int u : { 7, 45 } ) flu[u] = flute3{-X,-Y, Z};
+        for ( int u : { 9, 43 } ) flu[u] = flute3{-R, 0, Z};
+        for ( int u : {11, 41 } ) flu[u] = flute3{-X, Y, Z};
+        for ( int u : {1,40,51} ) flu[u] = flute3{ X, Y, Z};
+    }
+    
     void initBlobBuffer(GLuint buf)
     {
-        const size_t cnt = 54;
+        const size_t cnt = 2*64;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute3), nullptr, GL_STATIC_DRAW);
         flute3 * flu = (flute3*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        size_t n = setBlob(flu);
+        setBlob(flu);
+        setBlob(flu+64);
+        modifyBlob(flu+64);
         glUnmapBuffer(GL_ARRAY_BUFFER);
-        assert_true( n <= cnt );
     }
     
-    void drawVertexBuffer(GLenum mode, GLuint buf, GLsizei cnt)
+    void drawVertexBuffer(GLenum mode, GLuint buf, GLsizei start, GLsizei cnt)
     {
         assert_true(glIsBuffer(buf));
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glVertexPointer(3, GL_FLOAT, 0, nullptr);
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 0, nullptr);
-        glDrawArrays(mode, 0, cnt);
+        glDrawArrays(mode, start, cnt);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
+    void loadBuffer(GLuint buf)
+    {
+        assert_true(glIsBuffer(buf));
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glVertexPointer(3, GL_FLOAT, 0, nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, nullptr);
+    }
+    void unloadBuffer()
+    {
         glDisableClientState(GL_NORMAL_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void blobS()
+    void pinS()
     {
-        flute3 flu[54];
+        flute3 flu[52];
         size_t i = setBlob(flu);
+        modifyBlob(flu);
         glVertexPointer(3, GL_FLOAT, 0, flu);
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 0, flu);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 26);
         glColor4f(1,1,1,0.5);
         glDrawArrays(GL_TRIANGLE_STRIP, 26, 26);
-        //glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
         glDisableClientState(GL_NORMAL_ARRAY);
+        glColor3f(1,1,1);
+        for ( unsigned u : { 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 } )
+            glDrawArrays(GL_POINTS, u, 1);
+        glDrawArrays(GL_LINE_STRIP, 0, 52);
     }
-    
-    void blob() { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 52); }
 
     //-----------------------------------------------------------------------
 
@@ -1028,6 +1068,12 @@ namespace gle
     void arrowTail() { drawTriangleBuffer(buf_[6], buf_[7], 45); }
     void cube()      { drawTriangleBuffer(buf_[8], buf_[9], 36); }
     void star()      { drawTriangleBuffer(buf_[10], buf_[11], 24); }
+    
+    void blob()      { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 0, 52); }
+    void pin()       { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 64, 52); }
+    
+    void loadBlobBuffer() { loadBuffer(buf_[12]); }
+    void loadPinBuffer() { loadBuffer(buf_[13]); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
@@ -1064,20 +1110,20 @@ namespace gle
         constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
         constexpr GLfloat S = 0.5f;
         const GLfloat R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        const GLfloat H = R * C, X = R * S;
+        const GLfloat Y = R * C, X = R * S;
         
         flu[0] = flute6{ R, 0, B, 1, 0, 0};
         flu[1] = flute6{ R, 0, A, 1, 0, 0};
-        flu[2] = flute6{ X, H, B, S, C, 0};
-        flu[3] = flute6{ X, H, A, S, C, 0};
-        flu[4] = flute6{-X, H, B,-S, C, 0};
-        flu[5] = flute6{-X, H, A,-S, C, 0};
+        flu[2] = flute6{ X, Y, B, S, C, 0};
+        flu[3] = flute6{ X, Y, A, S, C, 0};
+        flu[4] = flute6{-X, Y, B,-S, C, 0};
+        flu[5] = flute6{-X, Y, A,-S, C, 0};
         flu[6] = flute6{-R, 0, B,-1, 0, 0};
         flu[7] = flute6{-R, 0, A,-1, 0, 0};
-        flu[8] = flute6{-X,-H, B,-S, -C, 0};
-        flu[9] = flute6{-X,-H, A,-S, -C, 0};
-        flu[10] = flute6{ X,-H, B, S,-C, 0};
-        flu[11] = flute6{ X,-H, A, S,-C, 0};
+        flu[8] = flute6{-X,-Y, B,-S, -C, 0};
+        flu[9] = flute6{-X,-Y, A,-S, -C, 0};
+        flu[10] = flute6{ X,-Y, B, S,-C, 0};
+        flu[11] = flute6{ X,-Y, A, S,-C, 0};
         flu[12] = flute6{ R, 0, B, 1, 0, 0};
         flu[13] = flute6{ R, 0, A, 1, 0, 0};
         return 14;

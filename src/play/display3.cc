@@ -119,7 +119,7 @@ void Display3::drawSimul(Simul const& sim)
 
     if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
-    
+
     if ( stencil_ )
     {
         glClearStencil(0);
@@ -949,7 +949,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
         if ( obj->disp()->perceptible )
         {
             obj->disp()->color2.load_both();
-#if ( 1 )
+#if ( 0 )
             if ( obj->disp()->style == 2 )
             {
                 Space const* spc = obj->confineSpace();
@@ -977,34 +977,54 @@ void Display3::drawSingleA(Single const* obj) const
     const PointDisp * disp = obj->disp();
     Vector ph = obj->posHand();
     disp->color.load_both();
-    
-    if ( obj->hasFoot() && disp->width > 0 )
-    {
-        Vector pf = obj->posFoot();
-        if ( modulo ) modulo->fold(pf, ph);
-#if ( 0 )
-        if ( obj->disp()->style == 2 )
-        {
-            Space const* spc = obj->confineSpace();
-            if ( spc )
-            {
-                // draw a disc tangent to the Space:
-                disp->color2.load_both();
-                drawObject(pf, spc->normalToEdge(pf), disp->size, gle::disc);
-                disp->color.load_both();
-            }
-        }
-#endif
-#if ( DIM > 2 )
-        gleTube(pf, ph, disp->width*sFactor, gle::truncatedCone);
-#else
-        gle::drawBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5f));
-#endif
-    }
+
     if ( obj->base() )
         drawObject(ph, disp->size, gle::octahedron);
     else
         drawHand(ph, disp);
+}
+
+
+void Display3::drawSingleB(Single const* obj) const
+{
+    const PointDisp * disp = obj->disp();
+    Vector ph = obj->posHand();
+    Vector pf = obj->posFoot();
+    if ( modulo ) modulo->fold(pf, ph);
+
+    disp->color2.load_both();
+#if ( 0 )
+    if ( obj->disp()->style == 2 && obj->confineSpace() )
+    {
+        // draw a disc tangent to the Space:
+        drawObject(pf, obj->confineSpace()->normalToEdge(pf), disp->size, gle::disc);
+    }
+    else
+#endif
+    {
+        glPushMatrix();
+        gle::translate(pf);
+        gle::scale(sFactor*0.5*disp->size);
+        gle::blob();
+        glPopMatrix();
+    }
+    disp->color.load_both();
+#if ( DIM > 2 )
+    Vector dir = normalize( pf - ph );
+    glEnable(GL_CLIP_PLANE5);
+    setClipPlane(GL_CLIP_PLANE5, -dir, pf);
+    glPushMatrix();
+    transAlignZ(ph, disp->size*sFactor, dir);
+    gle::pin();
+    glPopMatrix();
+    glDisable(GL_CLIP_PLANE5);
+#else
+    if ( obj->base() )
+        drawObject(ph, disp->size, gle::octahedron);
+    else
+        drawHand(ph, disp);
+    gle::drawBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5f));
+#endif
 }
 
 void Display3::drawSinglesA(SingleSet const& set) const
@@ -1012,7 +1032,12 @@ void Display3::drawSinglesA(SingleSet const& set) const
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
         if ( obj->disp()->perceptible && obj->fiber()->disp->visible )
-            drawSingleA(obj);
+        {
+            if ( obj->hasFoot() && obj->disp()->width > 0 )
+                drawSingleB(obj);
+            else
+                drawSingleA(obj);
+        }
     }
 }
 
@@ -1191,8 +1216,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             pd1->color.load_both();
             glPushMatrix();
             transAlignZ(p1, pd1->size*sFactor, dir);
-            gle::blob(); //sphere1();
-            gle::thinTube();
+            gle::pin(); //sphere1(); gle::thinTube();
             glPopMatrix();
         }
         if ( pd2->visible )
@@ -1201,8 +1225,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             pd2->color.load_both();
             glPushMatrix();
             transAlignZ(p2, pd2->size*sFactor, -dir);
-            gle::blob(); //sphere1();
-            gle::thinTube();
+            gle::pin(); //sphere1(); gle::thinTube();
             glPopMatrix();
         }
         glDisable(GL_CLIP_PLANE5);
