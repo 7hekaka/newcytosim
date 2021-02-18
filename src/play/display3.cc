@@ -295,7 +295,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 #else
 
 //------------------------------------------------------------------------------
-#pragma mark - Fiber Rendering using Spherocylinders
+#pragma mark - Fiber Rendering using Spheres to fill the gaps at the tube junctions
 
 /**
 This draws the model-segments, using function `select_color` to set display colors
@@ -303,20 +303,33 @@ This draws the model-segments, using function `select_color` to set display colo
 void Display3::drawFiberSegments(Fiber const& fib, real rad,
                                  gle_color (*select_color)(Fiber const&, size_t)) const
 {
-    Vector nxt = fib.posPoint(0);
+    GLfloat Lr(fib.segmentation()/rad);
+    Vector pos = fib.posPoint(0);
+    Vector nxt = fib.posPoint(1);
+    
+    select_color(fib, 0).load_front();
+    glPushMatrix();
+    gle::transAlignZ(pos, rad, nxt-pos);
+    gle::hemisphere4();
+    glScalef(1, 1, Lr);
+    gle::tube2();
 
-    // rendering tubes as spherocylinders that join properly at any angle!
     const size_t last = fib.lastSegment();
     for ( size_t i = 0; i <= last; ++i )
     {
-        Vector pos = nxt;
+        pos = nxt;
         nxt = fib.posPoint(i+1);
         select_color(fib, i).load_front();
-        glPushMatrix();
-        gle::transAlignZ(pos, 1.0, nxt-pos);
-        gle::capsuleZ(0, norm(nxt-pos), rad);
         glPopMatrix();
+        glPushMatrix();
+        gle::transAlignZ(pos, rad, nxt-pos);
+        gle::blob();
+        glScalef(1, 1, Lr);
+        gle::tube2();
     }
+    gle_color(1,0,1).load_front();
+    gle::discTop();
+    glPopMatrix();
 }
 
 
@@ -331,20 +344,42 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     gle_color (*select_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
 {
-    Vector nxt = fib.displayPosM(abs);
+    GLfloat Lr(inc/rad);
+    Vector pos = fib.displayPosM(abs);
+    Vector nxt = fib.displayPosM(abs+inc);
     
-    // rendering tubes as spherocylinders that join properly at any angle!
-    for ( ; inx <= last; ++inx )
+    select_color(fib, inx, facM).load_front();
+    glPushMatrix();
+    gle::transAlignZ(pos, rad, nxt-pos);
+    if ( abs <= 0 )
+        gle::hemisphere4();
+    glScalef(1, 1, Lr);
+    gle::tube2();
+    glPopMatrix();
+    abs += inc;
+    
+    for ( ++inx ; inx < last; ++inx )
     {
         abs += inc;
-        Vector pos = nxt;
+        pos = nxt;
         nxt = fib.displayPosM(abs);
         select_color(fib, inx, fac).load_front();
         glPushMatrix();
-        gle::transAlignZ(pos, 1.0, nxt-pos);
-        gle::capsuleZ(0, norm(nxt-pos), rad);
+        gle::stretchAlignZ(pos, nxt, rad);
+        gle::tube2();
         glPopMatrix();
     }
+    abs += inc;
+    pos = nxt;
+    nxt = fib.displayPosM(abs);
+    // draw last segment, which may be truncated:
+    select_color(fib, inx, facP).load_front();
+    glPushMatrix();
+    gle::stretchAlignZ(pos, nxt, rad);
+    gle::tube2();
+    if ( abs >= fib.length() )
+        gle::discTop();
+    glPopMatrix();
 }
 
 #endif

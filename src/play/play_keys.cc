@@ -428,6 +428,8 @@ static void flashFiberStyle(int val)
 static void toggleLineStyle(FiberDisp* p, int val)
 {
     p->line_style = ( p->line_style != val ) * val;
+    if ( p->style == 4 ) // override the 'backbone' style
+        p->style = 0;
     flashLineStyle(p->line_style);
 }
 
