@@ -58,6 +58,7 @@ private:
     /// index of cell containing the PLUS_END
     lati_t   laIndexP;
     
+    
     /// Array of sites, of valid range [laInf, laSup[
     /** This is a pointer with offset : laCell = laPtr - laInf */
     cell_t * laCell;
@@ -67,6 +68,12 @@ private:
 
     /// distance between adjacent sites
     real     laUnit;
+    
+    /// index of first cell entirely within MINUS_END and PLUS_END
+    lati_t   laFirst;
+    
+    /// 1 + index of last cell entirely within MINUS_END and PLUS_END
+    lati_t   laFence;
 
 #pragma mark - Allocation
     
@@ -233,11 +240,14 @@ public:
         if ( !std::is_same<real, cell_t>::value && laCell )
             markEdges(0);
 #endif
-        laIndexM = index_sup(a) - 1;
-        laIndexP = index(b);
+        laIndexM = index(a);
+        laIndexP = index_sup(b) - 1;
 
+        laFirst = index_sup(a);
+        laFence = index(b);
+        
         /* allocate with a safety margin of 8 cells */
-        allocate(laIndexM, laIndexP+1, 0);
+        allocate(laIndexM, laIndexP+1, 8);
 #if 0
         if ( !std::is_same<real, cell_t>::value )
             markEdges(~0);
@@ -249,11 +259,17 @@ public:
     
     /// index of site containing the PLUS_END
     lati_t  indexP() const { return laIndexP; }
+    
+    /// index of first cell that is entirely within both ends
+    lati_t  first()  const { return laFirst; }
+    
+    /// one + index of last cell that is entirely within both ends
+    lati_t  fence()  const { return laFence; }
 
     /// first valid index
     lati_t  inf()    const { return laInf; }
     
-    /// last valid index plus one
+    /// one + last valid index
     lati_t  sup()    const { return laSup; }
 
     /// distance between adjacent sites
@@ -277,10 +293,10 @@ public:
     bool    invalid(lati_t i)   const { return (( i < laInf ) | ( laSup <= i )); }
     
     /// true if index 'i' corresponds to a site that is completely between Minus and Plus ends
-    bool    betweenMP(lati_t i) const { return (( laIndexM < i ) & ( i < laIndexP )); }
+    bool    betweenMP(lati_t i) const { return (( laFirst <= i ) & ( i < laFence )); }
     
     /// true if index 'i' corresponds to a site that is partly or entirely outside the range
-    bool    outsideMP(lati_t i) const { return (( i <= laIndexM ) | ( laIndexP <= i )); }
+    bool    outsideMP(lati_t i) const { return (( i < laFirst ) | ( laFence <= i )); }
 
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`

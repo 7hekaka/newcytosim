@@ -132,7 +132,7 @@ void Digit::handleDisassemblyM()
     if ( RNG.test(prop->hold_shrinking_end) )
     {
         jumpToEndM();
-        if ( site() < lattice()->indexM() )
+        if ( site() < lattice()->first() )
             detach();
     }
     else
@@ -150,7 +150,7 @@ void Digit::handleDisassemblyP()
     if ( prop->hold_shrinking_end > 0 )
     {
         jumpToEndP();
-        if ( site() > lattice()->indexP() )
+        if ( site() >= lattice()->fence() )
             detach();
     }
     else

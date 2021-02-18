@@ -38,7 +38,7 @@ void DigitProp::read(Glossary& glos)
     if ( glos.set(footprint, "footprint") )
     {
         if ( std::is_same<real, FiberLattice::cell_t>::value )
-            Cytosim::warn << "`footprint` is only valid with Integer-based Lattice";
+            Cytosim::warn << "`footprint` is only valid with Integer-based Lattice\n";
     }
 
 #ifdef BACKWARD_COMPATIBILITY

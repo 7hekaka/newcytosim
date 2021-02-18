@@ -327,7 +327,6 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
         glScalef(1, 1, Lr);
         gle::tube2();
     }
-    gle_color(1,0,1).load_front();
     gle::discTop();
     glPopMatrix();
 }
@@ -344,7 +343,6 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
                                     gle_color (*select_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
 {
-    GLfloat Lr(inc/rad);
     Vector pos = fib.displayPosM(abs);
     Vector nxt = fib.displayPosM(abs+inc);
     
@@ -353,7 +351,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     gle::transAlignZ(pos, rad, nxt-pos);
     if ( abs <= 0 )
         gle::hemisphere4();
-    glScalef(1, 1, Lr);
+    glScalef(1, 1, inc/rad);
     gle::tube2();
     glPopMatrix();
     abs += inc;

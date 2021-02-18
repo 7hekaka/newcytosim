@@ -105,10 +105,10 @@ public:
     void   jumpTo(lati_t p) { if ( vacant(p) ) hop(p); }
     
     /// relocate without checking intermediate sites
-    void   jumpToEndM() { jumpTo(lattice()->indexM()); }
+    void   jumpToEndM() { jumpTo(lattice()->first()); }
 
     /// relocate without checking intermediate sites
-    void   jumpToEndP() { jumpTo(lattice()->indexP()); }
+    void   jumpToEndP() { jumpTo(lattice()->fence()-1); }
 
     
     /// attempt one step towards the PLUS_END
