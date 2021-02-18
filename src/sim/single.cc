@@ -134,7 +134,7 @@ void Single::stepF()
 void Single::stepA()
 {
     assert_true( sHand->attached() );
-    assert_true( !hasForce() );
+    assert_true( !hasFoot() );
 
 #if NEW_MOBILE_SINGLE
     // translation:

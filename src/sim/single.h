@@ -32,9 +32,10 @@ class PointDisp;
  -# a Wrist is attached to one vertex of a Mecable.
  .
  
- Attached Wrist and Picket exert a force on the Fiber to which the Hand is attached.
+ Wrist and Picket may exert force on the Fiber to which their Hand attaches.
  For WristLong and PicketLong, this force can have a non-zero resting length.
- For these class in which the Hand can be under tension, `hasForce()` returns true.
+ For these class, `hasFoot()` returns true. The force may still be zero if the
+ link stiffness is not set or set to zero.
 
  Wrist and Picket can be distinguished with Single::base():
  - for Single and Picket, this returns zero,
@@ -150,7 +151,7 @@ public:
     virtual void    unbase() {}
 
     /// true if Single creates an interaction
-    virtual bool    hasForce()    const { return false; }
+    virtual bool    hasFoot()     const { return false; }
     
     /// stretch = ( position_anchor - position_hand ), or zero for a diffusible Single
     virtual Vector  stretch()     const { return Vector(0,0,0); }

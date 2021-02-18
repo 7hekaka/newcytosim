@@ -978,7 +978,7 @@ void Display3::drawSingleA(Single const* obj) const
     Vector ph = obj->posHand();
     disp->color.load_both();
     
-    if ( obj->hasForce() && disp->width > 0 )
+    if ( obj->hasFoot() && disp->width > 0 )
     {
         Vector pf = obj->posFoot();
         if ( modulo ) modulo->fold(pf, ph);

@@ -43,7 +43,7 @@ public:
     void    setPosition(Vector const& x) { sPos = x; }
 
     /// true if Single creates an interaction
-    bool    hasForce() const { return true; }
+    bool    hasFoot() const { return true; }
     
     /// stretch of the link = ( posFoot() - posHand() )
     Vector  stretch() const;

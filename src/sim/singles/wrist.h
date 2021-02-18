@@ -69,7 +69,7 @@ public:
     Vector  posFoot() const { return base_.position(); }
 
     /// true if Single creates a link
-    bool    hasForce() const { return true; }
+    bool    hasFoot() const { return true; }
     
     /// stretch of the link = ( posFoot() - posHand() )
     Vector  stretch() const;

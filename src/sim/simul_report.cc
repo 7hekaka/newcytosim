@@ -2057,7 +2057,7 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel, bool com) 
     // accumulate counts:
     for ( Single const* i=singles.firstA(); i; i=i->next() )
     {
-        if ( i->hasForce() && ( !sel || sel == i->prop ))
+        if ( i->hasFoot() && ( !sel || sel == i->prop ))
         {
             size_t x = std::min(MAX, i->prop->number());
             real f = i->force().norm();
