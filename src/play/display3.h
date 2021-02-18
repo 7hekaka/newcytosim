@@ -129,7 +129,7 @@ public:
     void drawCoupleB(Couple const*) const;
  
     /// draw one bridging Couple
-    void drawCoupleBfast(Couple const*) const;
+    void drawCoupleBplain(Couple const*) const;
 
     /// draw an Organizer
     void drawOrganizer(Organizer const&) const;

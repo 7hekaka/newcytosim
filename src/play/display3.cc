@@ -346,7 +346,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     Vector pos = fib.displayPosM(abs);
     Vector nxt = fib.displayPosM(abs+inc);
     
-    select_color(fib, inx, facM).load_front();
+    select_color(fib, inx++, facM).load_front();
     glPushMatrix();
     gle::transAlignZ(pos, rad, nxt-pos);
     if ( abs <= 0 )
@@ -354,29 +354,35 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     glScalef(1, 1, inc/rad);
     gle::tube2();
     glPopMatrix();
-    abs += inc;
+    abs += 2*inc;
     
-    for ( ++inx ; inx < last; ++inx )
+    while ( inx < last )
     {
-        abs += inc;
         pos = nxt;
         nxt = fib.displayPosM(abs);
-        select_color(fib, inx, fac).load_front();
+        select_color(fib, inx++, fac).load_front();
+        abs += inc;
         glPushMatrix();
         gle::stretchAlignZ(pos, nxt, rad);
         gle::tube2();
         glPopMatrix();
     }
-    abs += inc;
-    pos = nxt;
-    nxt = fib.displayPosM(abs);
     // draw last segment, which may be truncated:
-    select_color(fib, inx, facP).load_front();
+    select_color(fib, last, facP).load_front();
     glPushMatrix();
-    gle::stretchAlignZ(pos, nxt, rad);
-    gle::tube2();
     if ( abs >= fib.length() )
-        gle::discTop();
+    {
+        gle::transAlignZ(nxt, rad, fib.dirEndP());
+        glScalef(1, 1, fib.length()-abs);
+    }
+    else
+    {
+        pos = nxt;
+        nxt = fib.displayPosM(abs);
+        gle::stretchAlignZ(pos, nxt, rad);
+    }
+    gle::tube2();
+    gle::discTop();
     glPopMatrix();
 }
 
@@ -550,8 +556,6 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, blk);
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, blk);
     glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 32);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
 
     const real fac = 1 / disp->lattice_scale;
     const real uni = lat.unit();
@@ -1143,7 +1147,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
     }
 }
 
-void Display3::drawCoupleBfast(Couple const* cx) const
+void Display3::drawCoupleBplain(Couple const* cx) const
 {
     const PointDisp * pd1 = cx->disp1();
     const PointDisp * pd2 = cx->disp2();
