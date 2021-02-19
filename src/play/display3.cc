@@ -304,7 +304,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 #else
 
 //------------------------------------------------------------------------------
-#pragma mark - Fiber Rendering using Spheres to fill the gaps at the tube junctions
+#pragma mark - draw Fibers using longer tubes to fill the gaps at the junctions
 
 /**
 This draws the model-segments, using function `select_color` to set display colors
@@ -321,22 +321,31 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     gle::transAlignZ(pos, rad, nxt-pos);
     gle::hemisphere4();
     glScalef(1, 1, Lr);
-    gle::tube2();
+    gle::tube3();
+    glPopMatrix();
 
     const size_t last = fib.lastSegment();
-    for ( size_t i = 0; i <= last; ++i )
+    for ( size_t i = 0; i < last; ++i )
     {
         pos = nxt;
         nxt = fib.posPoint(i+1);
         select_color(fib, i).load_front();
-        glPopMatrix();
         glPushMatrix();
         gle::transAlignZ(pos, rad, nxt-pos);
         //gle::sphere2();
         glScalef(1, 1, Lr);
         gle::tube2();
+        glPopMatrix();
     }
-    gle::discTop();
+    glPushMatrix();
+    pos = nxt;
+    nxt = fib.posPoint(last+1);
+    select_color(fib, last).load_front();
+    gle::transAlignZ(nxt, rad, pos-nxt);
+    //gle::sphere2();
+    glScalef(1, 1, Lr);
+    gle::tube3();
+    gle::discBottom();
     glPopMatrix();
 }
 
@@ -361,7 +370,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     if ( abs <= 0 )
         gle::hemisphere4();
     glScalef(1, 1, inc/rad);
-    gle::tube2();
+    gle::tube3();
     glPopMatrix();
     
     // keep abs to match to the end of the section already drawn
@@ -382,15 +391,17 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     select_color(fib, last, facP).load_front();
     glPushMatrix();
     if ( abs+inc >= fib.length() )
-        gle::transAlignZ(nxt, rad, fib.dirEndP(), fib.length()-abs);
+    {
+        gle::transAlignZ(fib.posEndP(), rad, -fib.dirEndP(), fib.length()-abs);
+        gle::discBottom();
+    }
     else
     {
         pos = nxt;
         nxt = fib.displayPosM(abs);
-        gle::stretchAlignZ(pos, nxt, rad);
+        gle::stretchAlignZ(nxt, pos, rad);
     }
-    gle::tube2();
-    gle::discTop();
+    gle::tube3();
     glPopMatrix();
 }
 
@@ -1236,8 +1247,8 @@ void Display3::drawCoupleB(Couple const* cx) const
             // accurate rendering of Couple's composite link
             Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
             drawPoint(mid, pd1->width);
-            gleTube(p2, mid, pd2->width*sFactor, gle::tube2); //gle::hexTube);
-            gleTube(p1, mid, pd1->width*sFactor, gle::tube2); //gle::hexTube);
+            gleTube(p2, mid, pd2->width*sFactor, gle::hexTube);
+            gleTube(p1, mid, pd1->width*sFactor, gle::hexTube);
 #elif ( 0 )
             drawPoint(cx->sidePos1(), pd1->width);
             drawPoint(cx->sidePos2(), pd1->width);
@@ -1258,6 +1269,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             glPushMatrix();
             gle::transAlignZ(p1, rad, p2-p1);
             float Lr = norm( p2 - p1 ) / rad;
+            float iLr = gle::invsqrt(Lr);
             if ( pd2->visible )
             {
                 glTranslatef(0, 0, Lr);
@@ -1270,7 +1282,7 @@ void Display3::drawCoupleB(Couple const* cx) const
                 pd1->color.load_both();
                 gle::blob();
             }
-            glScalef(1, 1, Lr);
+            glScalef(iLr, iLr, Lr);
             gle::thinTube();
             glPopMatrix();
 #else

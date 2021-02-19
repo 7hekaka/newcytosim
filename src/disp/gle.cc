@@ -34,13 +34,6 @@ namespace gle
     
     /// number of faces in icosahedrons
     GLsizei ico_ntri[8] = { 0 };
-    
-    /// inverse square root
-#if defined(__SSE3__)
-    inline float invsqrt(float x) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x))); }
-#else
-    inline float invsqrt(float x) { return 1.0f / sqrtf(x); }
-#endif
 
     void initialize()
     {
@@ -476,7 +469,7 @@ namespace gle
         //glTranslatef(0, 0, -1);
     }
 
-    void discDown()
+    void discBottom()
     {
         glNormal3f(0, 0, -1);
         glFrontFace(GL_CW);
@@ -485,7 +478,7 @@ namespace gle
         glFrontFace(GL_CCW);
     }
     
-    void discDown2()
+    void discBottom2()
     {
         glNormal3f(0, 0, -1);
         glFrontFace(GL_CW);
@@ -524,7 +517,7 @@ namespace gle
     void cone()
     {
         coneZ(1, 0, 1);
-        discDown2();
+        discBottom2();
     }
 
     void longCone()
@@ -1223,41 +1216,43 @@ namespace gle
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const GLfloat B = -32.f, T = 256.f;
         initTubeBuffer(tub_[0], 0, 1, 8);
-        initTubeBuffer(tub_[1], 0, 1, 4);
-        initTubeBuffer(tub_[2], 0, 1, 2);
-        initTubeBuffer(tub_[3], 0, 1, 1);
-        initTubeBuffer(tub_[4], B, T, 8);
-        initTubeBuffer(tub_[5], B, T, 4);
-        initTubeBuffer(tub_[6], B, T, 2);
-        initTubeBuffer(tub_[7], 0, T, 8);
-        initTubeBuffer(tub_[8], 0, T, 4);
-        initTubeBuffer(tub_[9], 0, T, 2);
-        initHexTubeBuffer(tub_[10], 1, 0, 1);
-        initHexTubeBuffer(tub_[11], 0.5f, 0, 1);
-        initHexTubeBuffer(tub_[12], 0.5f, 0, T);
+        initTubeBuffer(tub_[1],-0.0625, 1.0625, 4);
+        initTubeBuffer(tub_[2], 0, 1.0625, 4);
+        initTubeBuffer(tub_[3], 0, 1, 2);
+        initTubeBuffer(tub_[4], 0, 1, 1);
+        initTubeBuffer(tub_[5], B, T, 8);
+        initTubeBuffer(tub_[6], B, T, 4);
+        initTubeBuffer(tub_[7], B, T, 2);
+        initTubeBuffer(tub_[8], 0, T, 8);
+        initTubeBuffer(tub_[10], 0, T, 4);
+        initTubeBuffer(tub_[10], 0, T, 2);
+        initHexTubeBuffer(tub_[11], 1, 0, 1);
+        initHexTubeBuffer(tub_[12], 0.5f, 0, 1);
+        initHexTubeBuffer(tub_[13], 0.5f, 0, T);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     // using Vertex Buffer Objects
     void tube1()     { drawTubeBuffer(tub_[0], nbTubeTriangles(8)); }
     void tube2()     { drawTubeBuffer(tub_[1], nbTubeTriangles(4)); }
-    void tube4()     { drawTubeBuffer(tub_[2], nbTubeTriangles(2)); }
-    void tube8()     { drawTubeBuffer(tub_[3], nbTubeTriangles(1)); }
-    void longTube1() { drawTubeBuffer(tub_[4], nbTubeTriangles(8)); }
-    void longTube2() { drawTubeBuffer(tub_[5], nbTubeTriangles(4)); }
-    void longTube4() { drawTubeBuffer(tub_[6], nbTubeTriangles(2)); }
-    void halfTube1() { drawTubeBuffer(tub_[7], nbTubeTriangles(8)); }
-    void halfTube2() { drawTubeBuffer(tub_[8], nbTubeTriangles(4)); }
-    void halfTube4() { drawTubeBuffer(tub_[9], nbTubeTriangles(2)); }
-    void hexTube()   { drawTubeBuffer(tub_[10], nbHexTubeTriangles); }
-    void thinTube()  { drawTubeBuffer(tub_[11], nbHexTubeTriangles); }
-    void thinLongTube() { drawTubeBuffer(tub_[12], nbHexTubeTriangles); }
+    void tube3()     { drawTubeBuffer(tub_[2], nbTubeTriangles(4)); }
+    void tube4()     { drawTubeBuffer(tub_[3], nbTubeTriangles(2)); }
+    void tube8()     { drawTubeBuffer(tub_[4], nbTubeTriangles(1)); }
+    void longTube1() { drawTubeBuffer(tub_[5], nbTubeTriangles(8)); }
+    void longTube2() { drawTubeBuffer(tub_[6], nbTubeTriangles(4)); }
+    void longTube4() { drawTubeBuffer(tub_[7], nbTubeTriangles(2)); }
+    void halfTube1() { drawTubeBuffer(tub_[8], nbTubeTriangles(8)); }
+    void halfTube2() { drawTubeBuffer(tub_[9], nbTubeTriangles(4)); }
+    void halfTube4() { drawTubeBuffer(tub_[10], nbTubeTriangles(2)); }
+    void hexTube()   { drawTubeBuffer(tub_[11], nbHexTubeTriangles); }
+    void thinTube()  { drawTubeBuffer(tub_[12], nbHexTubeTriangles); }
+    void thinLongTube() { drawTubeBuffer(tub_[13], nbHexTubeTriangles); }
 
     // this does not preserve the modelview transformation
     void cylinder1()
     {
         tube1();
-        discDown();
+        discBottom();
         discTop();
     }
     
@@ -1265,7 +1260,7 @@ namespace gle
     void cylinder2()
     {
         glTranslatef(0,0,-0.5f);
-        discDown();
+        discBottom();
         tube4();
         discTop();
         //glTranslatef(0,0,0.5f);

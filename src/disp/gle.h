@@ -46,6 +46,13 @@ namespace gle
 
     /// calculate sinus and cosinus for a circular arc
     void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
+    
+    /// inverse square root
+#if defined(__SSE3__)
+    inline float invsqrt(float x) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x))); }
+#else
+    inline float invsqrt(float x) { return x / sqrtf(x); }
+#endif
 
 #pragma mark -
     
@@ -140,9 +147,9 @@ namespace gle
     /// nicer 2D disc of radius 1 in XY plane, with +Z as normal
     void disc2();
     /// draw 2D disc of radius 1 in XY plane, with -Z as normal
-    void discDown();
+    void discBottom();
     /// nicer 2D disc of radius 1 in XY plane, with -Z as normal
-    void discDown2();
+    void discBottom2();
 
     /// draw a tetrahedron of side 2 in 3D
     void tetrahedron();
@@ -195,6 +202,8 @@ namespace gle
     void tube1();
     /// draw an open tube along Z, of diameter 1 and length 1
     void tube2();
+    /// draw an open tube along Z, of diameter 1 and length 1
+    void tube3();
     /// draw a nice open tube along Z, of diameter 1 and length 1
     void tube4();
     /// draw a nicer open tube along Z, of diameter 1 and length 1
@@ -281,14 +290,14 @@ namespace gle
     inline void capedTube4() { halfTube4(); hemisphere4(); }
 #else
     /// primitives to draw the ends of spherocylinders:
-    inline void capedTube1() { halfTube1(); discDown(); }
-    inline void capedTube2() { halfTube2(); discDown(); }
-    inline void capedTube4() { halfTube4(); discDown(); }
+    inline void capedTube1() { halfTube1(); discBottom(); }
+    inline void capedTube2() { halfTube2(); discBottom(); }
+    inline void capedTube4() { halfTube4(); discBottom(); }
 #endif
     /// primitives to draw the ends of spherocylinders:
-    inline void endedTube1() { halfTube1(); discDown(); }
-    inline void endedTube2() { halfTube2(); discDown(); }
-    inline void endedTube4() { halfTube4(); discDown(); }
+    inline void endedTube1() { halfTube1(); discBottom(); }
+    inline void endedTube2() { halfTube2(); discBottom(); }
+    inline void endedTube4() { halfTube4(); discBottom(); }
 
     //------------------------------------------------------------------------------
     #pragma mark -
