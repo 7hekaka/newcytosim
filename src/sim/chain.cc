@@ -1357,45 +1357,34 @@ void Chain::segmentationVariance(real& avg, real& var) const
 
 
 /**
- Calculate the inverse of the radius of the circle containing the points A, B, C
+ Calculate Menger curvature:
+ the inverse of the radius of the circle that passes through A, B and C
  
-     std::cos(angle) = scalar_product( AB, BC ) / ( |AB| * |BC| )
-     std::sin(angle) = std::sqrt( 1 - std::cos(angle)^2 )
-     2 * radius * std::sin(angle) = |AC|
-     curvature = 2 * std::sin(angle) / |AC|
-     curvature = 2 * std::sqrt( [ 1 - std::cos(angle)^2 ] / AC^2 )
-
+ 1/R = 4 * Area(triangle) / ( |AB|*|BC|*|AC| )
+ 
  curvature is ZERO if A, B and C are aligned
  */
 real curvature3(Vector const& A, Vector const& B, Vector const& C)
 {
-    Vector ab = B - A;
-    Vector bc = C - B;
-    real D = ( C - A ).normSqr();
-    real P = dot(ab, bc);
-    real S = std::max(0.0, 1.0 - ( P * P ) / ( ab.normSqr() * bc.normSqr() ));
-    return 2 * std::sqrt( S / D );
+    // cross-product = 2 * surface; hence S = 16 * surface^2
+    real S = 4 * normSqr(cross( C - A, C - B ));
+    return sqrt( S / ( normSqr(B-A) * normSqr(C-B) * normSqr(C-A) ));
 }
 
 /**
- Calculate the inverse of the radius of the circle containing the points A, B, C
+ Calculate Menger curvature:
+ the inverse of the radius of the circle that passes through A, B and C
  
-     std::cos(angle) = scalar_product( AB, BC ) / ( |AB| * |BC| )
-     std::sin(angle) = std::sqrt( 1 - std::cos(angle)^2 )
-     2 * radius * std::sin(angle) = |AC|
-     curvature = 2 * std::sin(angle) / |AC|
-     curvature = 2 * std::sqrt( [ 1 - std::cos(angle)^2 ] / AC^2 )
-
+ 1/R = 4 * Area(triangle) / ( |AB|*|BC|*|AC| )
+ 
  curvature is ZERO if A, B and C are aligned
+ 
+ Thank you, Serge to point this out!
  */
 real curvature3(Vector const& A, Vector const& B, Vector const& C, real seg)
 {
-    Vector ab = B - A;
-    Vector bc = C - B;
-    real D = ( C - A ).normSqr();
-    real P = dot(ab, bc) / ( seg * seg );
-    real S = std::max(real(0), ( 1 - P ) * ( 1 + P ));
-    return 2 * std::sqrt( S / D );
+    real H = norm( A + C - 2 * B );  // 2 * height_of_triangle
+    return H / ( seg * seg );
 }
 
 /**

@@ -189,13 +189,19 @@ public:
         return XX*XX;
     }
     
+    /// the square of the norm
+    friend real normSqr(Vector1 const& V)
+    {
+        return V.normSqr();
+    }
+
     
     /// the standard norm = std::sqrt(x^2)
     real norm() const
     {
         return abs_real(XX);
     }
-    
+
     /// the standard norm = std::sqrt(x^2)
     friend real norm(Vector1 const& V)
     {

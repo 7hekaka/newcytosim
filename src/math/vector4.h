@@ -315,6 +315,12 @@ public:
         return XX*XX + YY*YY + ZZ*ZZ + TT*TT;
     }
     
+    /// the square of the norm
+    friend real normSqr(Vector4 const& V)
+    {
+        return V.normSqr();
+    }
+
     /// the standard norm = std::sqrt(x^2+y^2+z^2+t^2)
     real norm() const
     {
