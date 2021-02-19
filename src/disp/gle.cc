@@ -24,7 +24,7 @@ namespace gle
     GLuint stream_[4] = { 0 };
     
     /// vertex buffer objects for tubes
-    GLuint tub_[12] = { 0 };
+    GLuint tub_[16] = { 0 };
     
     /// vertex buffer objects for hex tubes
     GLuint buf_[16] = { 0 };
@@ -303,9 +303,9 @@ namespace gle
     {
         float X = float(D.XX);
         float Y = float(D.YY);
-        float N = R * invsqrt(X*X+Y*Y);
-        X *= N;
-        Y *= N;
+        float n = R * invsqrt(X*X+Y*Y);
+        X *= n;
+        Y *= n;
         float mat[16] = {
             Y, -X,  0,  0,
             0,  0, -R,  0,
@@ -320,14 +320,65 @@ namespace gle
         float X = float(D.XX);
         float Y = float(D.YY);
         float Z = float(D.ZZ);
-        float N = invsqrt(X*X+Y*Y+Z*Z);
-        float vec[3] = { N*X, N*Y, N*Z };
+        float n = invsqrt(X*X+Y*Y+Z*Z);
+        float vec[3] = { n*X, n*Y, n*Z };
         float mat[16] = {
             0, 0, 0, 0,
             0, 0, 0, 0,
             0, 0, 0, 0,
             float(P.XX), float(P.YY), float(P.ZZ), 1};
         orthonormal(vec, R, mat, mat+4, mat+8);
+        glMultMatrixf(mat);
+    }
+
+    
+    // rotate to align Z with 'D' and translate to center 'P'
+    void transAlignZ(Vector1 const& P, float R, Vector1 const& D, float S)
+    {
+        float X = std::copysign(R, float(D.XX));
+        float Z = std::copysign(S, float(D.XX));
+        float mat[16] = {
+            0, -X,  0,  0,
+            0,  0, -R,  0,
+            Z,  0,  0,  0,
+            float(P.XX), 0, 0, 1};
+        glMultMatrixf(mat);
+    }
+    
+    // rotate to align Z with 'D' and translate to center 'P'
+    void transAlignZ(Vector2 const& P, float R, Vector2 const& D, float S)
+    {
+        float X = float(D.XX);
+        float Y = float(D.YY);
+        float n = invsqrt(X*X+Y*Y);
+        X *= n;
+        Y *= n;
+        float mat[16] = {
+            R*Y, -R*X,  0,  0,
+            0,      0, -R,  0,
+            S*X,  S*Y,  0,  0,
+            float(P.XX), float(P.YY), 0, 1};
+        glMultMatrixf(mat);
+    }
+    
+    // rotate to align Z with 'D' and translate to center 'P'
+    void transAlignZ(Vector3 const& P, float R, Vector3 const& D, float S)
+    {
+        float X = float(D.XX);
+        float Y = float(D.YY);
+        float Z = float(D.ZZ);
+        float n = invsqrt(X*X+Y*Y+Z*Z);
+        float vec[3] = { n*X, n*Y, n*Z };
+        float mat[16] = {
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            float(P.XX), float(P.YY), float(P.ZZ), 1};
+        orthonormal(vec, R, mat, mat+4, mat+8);
+        n = S / R;
+        mat[8] *= n;
+        mat[9] *= n;
+        mat[10] *= n;
         glMultMatrixf(mat);
     }
 
@@ -1070,10 +1121,11 @@ namespace gle
     void star()      { drawTriangleBuffer(buf_[10], buf_[11], 24); }
     
     void blob()      { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 0, 52); }
-    void pin()       { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 64, 52); }
-    
+    void needle()    { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 64, 52); }
+
     void loadBlobBuffer() { loadBuffer(buf_[12]); }
-    void loadPinBuffer() { loadBuffer(buf_[13]); }
+    void blobf()     { glDrawArrays(GL_TRIANGLE_STRIP, 0, 52); }
+    void needlef()   { glDrawArrays(GL_TRIANGLE_STRIP,64, 52); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
@@ -1167,7 +1219,7 @@ namespace gle
 
     void initTubeBuffers()
     {
-        glGenBuffers(12, tub_);
+        glGenBuffers(14, tub_);
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const GLfloat B = -32.f, T = 256.f;
         initTubeBuffer(tub_[0], 0, 1, 8);
@@ -1181,7 +1233,8 @@ namespace gle
         initTubeBuffer(tub_[8], 0, T, 4);
         initTubeBuffer(tub_[9], 0, T, 2);
         initHexTubeBuffer(tub_[10], 1, 0, 1);
-        initHexTubeBuffer(tub_[11], 0.5f, 0, T);
+        initHexTubeBuffer(tub_[11], 0.5f, 0, 1);
+        initHexTubeBuffer(tub_[12], 0.5f, 0, T);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -1198,6 +1251,7 @@ namespace gle
     void halfTube4() { drawTubeBuffer(tub_[9], nbTubeTriangles(2)); }
     void hexTube()   { drawTubeBuffer(tub_[10], nbHexTubeTriangles); }
     void thinTube()  { drawTubeBuffer(tub_[11], nbHexTubeTriangles); }
+    void thinLongTube() { drawTubeBuffer(tub_[12], nbHexTubeTriangles); }
 
     // this does not preserve the modelview transformation
     void cylinder1()

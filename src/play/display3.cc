@@ -264,31 +264,40 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     else
         drawTube(old, rad, pos, gle::halfTube2);
     setClipPlane(GL_CLIP_PLANE4, dir, pos);
+    
+    // keep abs to match to the end of the section already drawn
+    abs += inc;
 
     glEnable(GL_CLIP_PLANE5);
-    abs += inc*2;
     // draw segments
     while ( inx < last )
     {
         abs += inc;
         old = pos;
         pos = nxt;
-        nxt = fib.displayPosM(abs);
+        nxt = fib.displayPosM(abs+inc);
         dir = normalize(nxt-old);
         select_color(fib, inx++, fac).load_front();
         setClipPlane(GL_CLIP_PLANE5, -dir, pos);
-        // can draw a disc to close the tube:
-        drawTube(old, rad, pos, gle::longTube2);  //gle::obturatedTube2
+        // could add a disc to close the tube: gle::endedTube2
+        drawTube(old, rad, pos, gle::longTube2);
         setClipPlane(GL_CLIP_PLANE4, dir, pos);
     }
     glDisable(GL_CLIP_PLANE5);
 
     // draw last segment, which may be truncated:
-    select_color(fib, inx, facP).load_front();
-    if ( abs >= fib.length() )
-        drawTube(nxt, rad, pos, gle::endedTube2);
+    select_color(fib, last, facP).load_front();
+    if ( abs+inc >= fib.length() )
+    {
+        glPushMatrix();
+        gle::transAlignZ(nxt, rad, -fib.dirEndP(), fib.length()-abs);
+        gle::endedTube2();
+        glPopMatrix();
+    }
     else
+    {
         drawTube(nxt, rad, pos, gle::halfTube2);
+    }
     glDisable(GL_CLIP_PLANE4);
 }
 
@@ -323,7 +332,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
         glPopMatrix();
         glPushMatrix();
         gle::transAlignZ(pos, rad, nxt-pos);
-        gle::blob();
+        //gle::sphere2();
         glScalef(1, 1, Lr);
         gle::tube2();
     }
@@ -354,14 +363,16 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     glScalef(1, 1, inc/rad);
     gle::tube2();
     glPopMatrix();
-    abs += 2*inc;
+    
+    // keep abs to match to the end of the section already drawn
+    abs += inc;
     
     while ( inx < last )
     {
+        abs += inc;
         pos = nxt;
         nxt = fib.displayPosM(abs);
         select_color(fib, inx++, fac).load_front();
-        abs += inc;
         glPushMatrix();
         gle::stretchAlignZ(pos, nxt, rad);
         gle::tube2();
@@ -370,11 +381,8 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     // draw last segment, which may be truncated:
     select_color(fib, last, facP).load_front();
     glPushMatrix();
-    if ( abs >= fib.length() )
-    {
-        gle::transAlignZ(nxt, rad, fib.dirEndP());
-        glScalef(1, 1, fib.length()-abs);
-    }
+    if ( abs+inc >= fib.length() )
+        gle::transAlignZ(nxt, rad, fib.dirEndP(), fib.length()-abs);
     else
     {
         pos = nxt;
@@ -1052,7 +1060,7 @@ void Display3::drawSingleB(Single const* obj) const
     setClipPlane(GL_CLIP_PLANE5, -dir, pf);
     glPushMatrix();
     transAlignZ(ph, disp->size*sFactor, dir);
-    gle::pin();
+    gle::needle();
     glPopMatrix();
     glDisable(GL_CLIP_PLANE5);
 #else
@@ -1243,29 +1251,53 @@ void Display3::drawCoupleB(Couple const* cx) const
     }
     else if ( dns > 1e-6 )
     {
-        Vector mid = 0.5 * ( p1 + p2 );
-        Vector dir = normalize( p2 - p1 );
-        
-        glEnable(GL_CLIP_PLANE5);
-        if ( pd1->visible )
+        if ( pd2->visible | pd1->visible )
         {
-            setClipPlane(GL_CLIP_PLANE5, -dir, mid);
-            pd1->color.load_both();
+#if 1
+            float rad = pd1->size*sFactor;
             glPushMatrix();
-            transAlignZ(p1, pd1->size*sFactor, dir);
-            gle::pin(); //sphere1(); gle::thinTube();
+            gle::transAlignZ(p1, rad, p2-p1);
+            float Lr = norm( p2 - p1 ) / rad;
+            if ( pd2->visible )
+            {
+                glTranslatef(0, 0, Lr);
+                pd2->color.load_both();
+                gle::blob();
+                glTranslatef(0, 0, -Lr);
+            }
+            if ( pd1->visible )
+            {
+                pd1->color.load_both();
+                gle::blob();
+            }
+            glScalef(1, 1, Lr);
+            gle::thinTube();
             glPopMatrix();
+#else
+            Vector mid = 0.5 * ( p1 + p2 );
+            Vector dir = normalize( p2 - p1 );
+            glEnable(GL_CLIP_PLANE5);
+            if ( pd1->visible )
+            {
+                setClipPlane(GL_CLIP_PLANE5, -dir, mid);
+                pd1->color.load_both();
+                glPushMatrix();
+                transAlignZ(p1, pd1->size*sFactor, dir);
+                gle::needle(); //sphere1(); gle::thinLongTube();
+                glPopMatrix();
+            }
+            if ( pd2->visible )
+            {
+                setClipPlane(GL_CLIP_PLANE5,  dir, mid);
+                pd2->color.load_both();
+                glPushMatrix();
+                transAlignZ(p2, pd2->size*sFactor, -dir);
+                gle::needle(); //sphere1(); gle::thinLongTube();
+                glPopMatrix();
+            }
+            glDisable(GL_CLIP_PLANE5);
+#endif
         }
-        if ( pd2->visible )
-        {
-            setClipPlane(GL_CLIP_PLANE5,  dir, mid);
-            pd2->color.load_both();
-            glPushMatrix();
-            transAlignZ(p2, pd2->size*sFactor, -dir);
-            gle::pin(); //sphere1(); gle::thinTube();
-            glPopMatrix();
-        }
-        glDisable(GL_CLIP_PLANE5);
     }
     else
     {

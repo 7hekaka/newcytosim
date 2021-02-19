@@ -117,6 +117,10 @@ namespace gle
     void transAlignZ(Vector2 const& pos, float rad, Vector2 const& dir);
     void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir);
 
+    void transAlignZ(Vector1 const& pos, float rad, Vector1 const& dir, float scale);
+    void transAlignZ(Vector2 const& pos, float rad, Vector2 const& dir, float scale);
+    void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir, float scale);
+
     void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
     void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);
     void setClipPlane(GLenum, Vector3 const& dir, Vector3 const& pos);
@@ -157,8 +161,10 @@ namespace gle
     void unloadBuffer();
     /// draw a roughly spherical shape made of few triangles
     void blob();
+    void blobf();
     /// draw a centerred blob of radius 1 with a cone extending up in Z
-    void pin();
+    void needle();
+    void needlef();
     /// draw a Cube of side 2
     void cube();
     /// draw a stellated octahedron
@@ -207,9 +213,11 @@ namespace gle
     void halfTube4();
     /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void hexTube();
-    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 256]
+    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void thinTube();
-    
+    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 256]
+    void thinLongTube();
+
     /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
     void cylinder1();
     /// display a cylinder of axis Z, radius 1 in Z=[-0.5, 0.5]

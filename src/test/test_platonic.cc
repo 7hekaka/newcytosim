@@ -202,7 +202,7 @@ void display(View&, int)
         //glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         //gle::sphere1();
-        gle::pin();
+        gle::needle();
         glDisable(GL_CULL_FACE);
         glDisable(GL_LIGHTING);
         return;
