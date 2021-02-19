@@ -1047,6 +1047,7 @@ void Display3::drawSingleB(Single const* obj) const
     Vector ph = obj->posHand();
     Vector pf = obj->posFoot();
     if ( modulo ) modulo->fold(pf, ph);
+    GLfloat rad = disp->size*sFactor;
 
     disp->color2.load_both();
 #if ( 0 )
@@ -1060,17 +1061,28 @@ void Display3::drawSingleB(Single const* obj) const
     {
         glPushMatrix();
         gle::translate(pf);
-        gle::scale(sFactor*0.5*disp->size);
+        gle::scale(rad*0.5);
         gle::blob();
         glPopMatrix();
     }
     disp->color.load_both();
 #if ( DIM > 2 )
+    Vector diff = pf - ph;
+    real L = norm(diff);
+    GLfloat wid = disp->width/disp->size;
+    glPushMatrix();
+    transAlignZ(ph, rad, diff/L);
+    gle::blob();
+    glScalef(wid, wid, L/rad);
+    gle::thinTube();
+    glPopMatrix();
+#elif ( 0 )
+    GLfloat rad = disp->size*sFactor;
     Vector dir = normalize( pf - ph );
     glEnable(GL_CLIP_PLANE5);
     setClipPlane(GL_CLIP_PLANE5, -dir, pf);
     glPushMatrix();
-    transAlignZ(ph, disp->size*sFactor, dir);
+    transAlignZ(ph, rad, dir);
     gle::needle();
     glPopMatrix();
     glDisable(GL_CLIP_PLANE5);

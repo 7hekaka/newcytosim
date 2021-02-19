@@ -1224,7 +1224,7 @@ namespace gle
         initTubeBuffer(tub_[6], B, T, 4);
         initTubeBuffer(tub_[7], B, T, 2);
         initTubeBuffer(tub_[8], 0, T, 8);
-        initTubeBuffer(tub_[10], 0, T, 4);
+        initTubeBuffer(tub_[9], 0, T, 4);
         initTubeBuffer(tub_[10], 0, T, 2);
         initHexTubeBuffer(tub_[11], 1, 0, 1);
         initHexTubeBuffer(tub_[12], 0.5f, 0, 1);
