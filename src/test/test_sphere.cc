@@ -102,6 +102,31 @@ void processNormalKey(unsigned char c, int x, int y)
 }
 
 //------------------------------------------------------------------------------
+void drawVertices()
+{
+    glBegin(GL_POINTS);
+    for ( size_t i=0; i < front->nbPoints(); ++i )
+    {
+        GLfloat x, y, z;
+        front->putPoint(&x, &y, &z, i);
+        glVertex3f(x, y, z);
+    }
+    glEnd();
+}
+
+void nameVertices()
+{
+    char tmp[128];
+    for ( size_t i=0; i < front->nbPoints(); ++i )
+    {
+        GLfloat x, y, z;
+        front->putPoint(&x, &y, &z, i);
+        snprintf(tmp, sizeof(tmp), "%u", i);
+        gle::drawText(Vector3(x, y, z), tmp, GLUT_BITMAP_8_BY_13, 0.5);
+    }
+}
+
+
 void display(View&, int)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -109,22 +134,14 @@ void display(View&, int)
     glPointSize(7);
     
     if ( front == &T )
-        glColor3f(0.f, 0.f, 0.7);
+        glColor3f(0.f, 0.f, 1.0);
     else
         glColor3f(0.f, 0.7, 0.f);
 
-    glBegin(GL_POINTS);
-    for ( size_t ii=0; ii < front->nbPoints(); ++ii )
-    {
-#if REAL_IS_DOUBLE
-        glVertex3dv( front->addr(ii) );
-#else
-        glVertex3fv( front->addr(ii) );
-#endif
-    }
-    glEnd();
+    drawVertices();
+    nameVertices();
     
-#if ( 1 )
+#if ( 0 )
     glLineWidth(3);
     glBegin(GL_LINES);
     for ( size_t ii=0; ii < front->nbPoints(); ++ii )
@@ -137,7 +154,8 @@ void display(View&, int)
         gleVertex(p+0.1*n);
     }
     glEnd();
-#else
+#endif
+#if ( 0 )
     const real e = 0.05;
     glLineWidth(4);
     glBegin(GL_LINES);

@@ -40,7 +40,17 @@ void SphericalCode::putPoint(real ptr[3], const size_t i)
 }
 
 
-void SphericalCode::putPoint(real* x, real* y, real* z, const size_t i)
+void SphericalCode::putPoint(double* x, double* y, double* z, const size_t i)
+{
+    if ( i < num_points_ )
+    {
+        *x = coord_[3*i+0];
+        *y = coord_[3*i+1];
+        *z = coord_[3*i+2];
+    }
+}
+
+void SphericalCode::putPoint(float* x, float* y, float* z, const size_t i)
 {
     if ( i < num_points_ )
     {
@@ -51,7 +61,7 @@ void SphericalCode::putPoint(real* x, real* y, real* z, const size_t i)
 }
 
 
-void SphericalCode::putPoints( real ptr[], const size_t ptr_n )
+void SphericalCode::putPoints(real ptr[], const size_t ptr_n)
 {
     size_t sup = std::min(3*num_points_, ptr_n);
     for ( size_t i = 0; i < sup; ++i )
@@ -283,10 +293,24 @@ size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_nb_
     real mag = 0.1 * len * len * len * len / (real)num_points_;
     precision *= mag;
 
-    //------------ distribute the points randomly on the sphere:
-    for ( size_t ii = 0; ii < num_points_; ++ii )
-        randomize(coord_+ii*3);
-    
+#if 0
+    // distribute the points randomly on the sphere:
+    for ( size_t i = 0; i < num_points_; ++i )
+        randomize(coord_+i*3);
+#else
+    // use Fibonacci's spiral on the sphere:
+    real gold = 4 * M_PI / ( 1.0 + sqrt(5) );
+    real beta = 2.0 / num_points_;
+    for ( size_t i = 0; i < num_points_; ++i )
+    {
+        real a = i * gold;
+        real p = acos(1-(i+0.5)*beta);
+        coord_[  i*3] = cos(a)*sin(p);
+        coord_[1+i*3] = sin(a)*sin(p);
+        coord_[2+i*3] = cos(p);
+    }
+#endif
+
     //--------- for one point only, we return:
     if ( num_points_ < 2 )
     {
@@ -350,14 +374,11 @@ size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_nb_
                 
                 //exit when the desired precision is reached
                 if ( mag < precision )
-                {
-                    free_real(coord);
-                    free_real(force);
-                    return step;
-                }
+                    goto done;
             }
         }
     }
+done:
     free_real(coord);
     free_real(force);
     return step;
