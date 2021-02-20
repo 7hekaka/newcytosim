@@ -769,7 +769,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     {
         glEnable(GL_LIGHTING);
         // display arrowheads along the fiber:
-        const float rad = disp->point_size*sFactor;
+        const GLfloat rad = disp->point_size*sFactor;
         const real sep = disp->point_interval;
         real ab = std::ceil(fib.abscissaM()/sep) * sep;
         for ( ; ab <= fib.abscissaP(); ab += sep )
@@ -959,7 +959,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
     {
         Vector P, Q;
         bodyColor(disp, obj.signature());
-        const real wid = disp->width * sFactor;
+        const float wid = disp->width * sFactor;
 
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
@@ -987,7 +987,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             gle::dualPass(gle::barrel);
             glPopMatrix();
 #else
-            const real wid = disp->width * sFactor;
+            const float wid = disp->width * sFactor;
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
                 gleTube(sol->posPoint(i), sol->posPoint(i+1), wid, gle::hexTube);
 #endif
@@ -1047,7 +1047,8 @@ void Display3::drawSingleB(Single const* obj) const
     Vector ph = obj->posHand();
     Vector pf = obj->posFoot();
     if ( modulo ) modulo->fold(pf, ph);
-    GLfloat rad = disp->size*sFactor;
+    GLfloat rad = disp->size * sFactor;
+    GLfloat wid = disp->width * sFactor;
 
     disp->color2.load_both();
 #if ( 0 )
@@ -1069,11 +1070,10 @@ void Display3::drawSingleB(Single const* obj) const
 #if ( DIM > 2 )
     Vector diff = pf - ph;
     real L = norm(diff);
-    GLfloat wid = disp->width/disp->size;
     glPushMatrix();
     transAlignZ(ph, rad, diff/L);
     gle::blob();
-    glScalef(wid, wid, L/rad);
+    glScalef(wid/rad, wid/rad, L/rad);
     gle::thinTube();
     glPopMatrix();
 #elif ( 0 )
@@ -1091,7 +1091,7 @@ void Display3::drawSingleB(Single const* obj) const
         drawObject(ph, disp->size, gle::octahedron);
     else
         drawHand(ph, disp);
-    gle::drawBand(ph, disp->width*sFactor, disp->color, pf, disp->width*sFactor, disp->color.alpha_scaled(0.5f));
+    gle::drawBand(ph, wid, disp->color, pf, wid, disp->color.alpha_scaled(0.5f));
 #endif
 }
 
@@ -1277,11 +1277,11 @@ void Display3::drawCoupleB(Couple const* cx) const
         if ( pd2->visible | pd1->visible )
         {
 #if 1
-            float rad = pd1->size*sFactor;
+            GLfloat rad = pd1->size * sFactor;
+            GLfloat Lr = norm( p2 - p1 ) / rad;
+            GLfloat iLr = (pd1->width / pd1->size); // * gle::invsqrt(Lr);
             glPushMatrix();
             gle::transAlignZ(p1, rad, p2-p1);
-            float Lr = norm( p2 - p1 ) / rad;
-            float iLr = gle::invsqrt(Lr);
             if ( pd2->visible )
             {
                 glTranslatef(0, 0, Lr);

@@ -157,13 +157,13 @@ namespace gle
         const FLOAT a = v[1] / ( v[2] + s );
         const FLOAT b = v[1] * a;
         const FLOAT c = v[0] * a;
-        FLOAT ss = s * mul;
+        FLOAT sul = s * mul;
         x[0] = mul * ( -v[2] - b );
         x[1] = mul * c;
         x[2] = mul * v[0];
-        y[0] = ss * c;
-        y[1] = ss * b - mul;
-        y[2] = ss * v[1];
+        y[0] = sul * c;
+        y[1] = sul * b - mul;
+        y[2] = sul * v[1];
     }
 
     template < typename FLOAT >
@@ -174,13 +174,13 @@ namespace gle
         const FLOAT a = v[1] / ( v[2] + s );
         const FLOAT b = v[1] * a;
         const FLOAT c = v[0] * a;
-        FLOAT ss = s * mul;
+        FLOAT sul = s * mul;
         x[0] = mul * ( -v[2] - b );
         x[1] = mul * c;
         x[2] = mul * v[0];
-        y[0] = ss * c;
-        y[1] = ss * b - mul;
-        y[2] = ss * v[1];
+        y[0] = sul * c;
+        y[1] = sul * b - mul;
+        y[2] = sul * v[1];
         z[0] = mul * v[0];
         z[1] = mul * v[1];
         z[2] = mul * v[2];
