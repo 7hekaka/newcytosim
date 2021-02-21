@@ -2134,17 +2134,19 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 /**
  Link `B` to an interpolated point `S` on the side of `A`:
  
-     S = pos(A) + cross( arm, A.dir() )
+     S = A.pos() + cross( arm, A.dir() )
  
  Where A.dir() is the direction of the Fiber supporting `A`, in `A`.
  The vector `arm` should ideally be perpendicular to A.dir(), and in this case,
- `A` and `B` are separated by norm(arm). The force is linear:
+ `A` and `S` are separated by norm(arm). For best results, `arm` should also be
+ perpendicular to the link axis `B-A` to separate B from A by |arm|.
+ The forces are linear and sum up to zero:
 
-     force_B = weight * ( S - B )
-     force_S = -force_B
- 
+     force(B) = weight * ( S - B )
+     force(S) = -force(B)
+
  The `force_S` is redistributed on the vertices on each side of `A`,
- according to the interpolation coefficients, as usual.
+ according to the interpolation coefficients, as a function of `arm`.
  
  This code is valid in any dimension and works in 2 and 3D
  */
@@ -2327,22 +2329,24 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 
 
 /**
-Link `B` to an interpolated point `S` on the side of `A`:
-
-    S = pos(A) + cross( arm, A.dir() )
-
-Where A.dir() is the direction of the Fiber supporting `A`, in `A`.
-The vector `arm` should ideally be perpendicular to A.dir(), and in this case,
-`A` and `B` are separated by norm(arm). The force is linear:
-
-    force_B = weight * ( S - B )
-    force_S = -force_B
-
-The `force_S` is redistributed on the vertices on each side of `A`,
-according to the interpolation coefficients, as usual.
-
-This code is valid in any dimension and works in 2 and 3D
-*/
+ Link `B` to an interpolated point `S` on the side of `A`:
+ 
+     S = A.pos() + cross( arm, A.dir() )
+ 
+ Where A.dir() is the direction of the Fiber supporting `A`, in `A`.
+ The vector `arm` should ideally be perpendicular to A.dir(), and in this case,
+ `A` and `S` are separated by norm(arm). For best results, `arm` should also be
+ perpendicular to the link axis `B-A` to separate B from A by |arm|.
+ The forces are linear and sum up to zero:
+ 
+     force(B) = weight * ( S - B )
+     force(S) = -force(B)
+ 
+ The `force_S` is redistributed on the vertices on each side of `A`,
+ according to the interpolation coefficients, as a function of `arm`.
+ 
+ This code is valid in any dimension and works in 2 and 3D
+ */
 void Meca::addSideLink3D(Interpolation const& ptA,
                          Interpolation const& ptB,
                          Torque const& arm,

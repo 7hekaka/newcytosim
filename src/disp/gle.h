@@ -169,9 +169,10 @@ namespace gle
     /// draw a roughly spherical shape made of few triangles
     void blob();
     void blobf();
-    /// draw a centerred blob of radius 1 with a cone extending up in Z
+    /// draw a centered blob of radius 1 with a cone extending up in Z
     void needle();
     void needlef();
+    void smallCube();
     /// draw a Cube of side 2
     void cube();
     /// draw a stellated octahedron

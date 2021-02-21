@@ -130,6 +130,12 @@ public:
  
     /// draw one bridging Couple
     void drawCoupleBplain(Couple const*) const;
+    
+    /// draw one bridging Couple
+    void drawCoupleBside(Couple const*) const;
+    
+    /// draw one bridging Couple
+    void drawCoupleBneedle(Couple const*) const;
 
     /// draw an Organizer
     void drawOrganizer(Organizer const&) const;

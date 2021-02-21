@@ -1074,7 +1074,7 @@ void Display3::drawSingleB(Single const* obj) const
     transAlignZ(ph, rad, diff/L);
     gle::blob();
     glScalef(wid/rad, wid/rad, L/rad);
-    gle::thinTube();
+    gle::hexTube();
     glPopMatrix();
 #elif ( 0 )
     GLfloat rad = disp->size*sFactor;
@@ -1185,21 +1185,129 @@ void Display3::drawCoupleBplain(Couple const* cx) const
     
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
+
+    pd1->color.load_both();
+    gleTube(p1, p2, pd1->width*sFactor, gle::hexTube);
+    if ( pd1->visible ) drawHand(p1, pd1);
+    if ( pd2->visible ) drawHand(p2, pd2);
+}
+
+
+void Display3::drawCoupleBside(Couple const* cx) const
+{
+    const PointDisp * pd1 = cx->disp1();
+    const PointDisp * pd2 = cx->disp2();
     
+    Vector p1 = cx->posHand1();
+    Vector pS = cx->sidePos1();
+    Vector p2 = cx->posHand2();
+    if ( modulo ) modulo->fold(p2, p1);
+    
+#if FIBER_HAS_FAMILY
     if ( pd1 == pd2 )
     {
+        // semi-accurate rendering of Couple's side-side link
+        pd1->color.load_both();
+        Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
+        drawPoint(mid, pd1->width);
+        gleTube(p2, mid, pd2->width*sFactor, gle::hexTube);
+        gleTube(p1, mid, pd1->width*sFactor, gle::hexTube);
+        drawPoint(p1, pd1);
+        drawPoint(p2, pd2);
+        return;
+    }
+#endif
+    
+    GLfloat rad = pd1->size * sFactor;
+    GLfloat Lr = cx->prop->length / rad;
+    GLfloat iLr = ( pd1->width / pd1->size );
+    
+    //if ( cx->cosAngle() > 0 ) gle_color(1, 0.5, 0.25).load_both(); else gle_color(0, 1, 0).load_both();
+    if ( pd1->visible )
+    {
+        GLfloat Z = cx->fiber1()->prop->disp->line_width / pd1->size + 0.4;
+        pd1->color.load_both();
+        glPushMatrix();
+        gle::transAlignZ(p1, rad, pS-p1);
+        glTranslatef(0, 0, Z);
+        gle::blob();
+        glTranslatef(0, 0,Lr-Z);
+        gle::smallCube();
+        glTranslatef(0, 0,-Lr);
+        glScalef(iLr, iLr, Lr);
+        gle::hexTube();
+        glPopMatrix();
+    }
+
+    // draw a link between pS and p2
+    glPushMatrix();
+    gle::transAlignZ(p2, rad, pS-p2);
+    if ( pd2->visible )
+    {
+        pd2->color.load_both();
+        gle::blob();
+    }
+    glScalef(iLr, iLr, norm(pS-p2) / rad);
+    gle::hexTube();
+    glPopMatrix();
+}
+
+
+
+void Display3::drawCoupleBneedle(Couple const* cx) const
+{
+    const PointDisp * pd1 = cx->disp1();
+    const PointDisp * pd2 = cx->disp2();
+    
+    Vector p1 = cx->posHand1();
+    Vector p2 = cx->posHand2();
+    if ( modulo ) modulo->fold(p2, p1);
+    
+    Vector dif = p2 - p1;
+    real dns = dif.normSqr();
+    
+    if ( dns > 1e-6 )
+    {
+#if !FIBER_HAS_FAMILY
+        // moving the 'hands' to the surface of the fiber:
+        dns = sFactor * gle::invsqrt(dns);
+        // position the heads at the surface of the filaments:
+        const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
+        const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
+        // move points along the link
+        //p1 += dif * min_real(0.45, rad1*dns);
+        //p2 -= dif * min_real(0.45, rad2*dns);
+        // move points orthogonal to the fiber's axis
+        Vector dir1 = cx->dirFiber1();
+        Vector dir2 = cx->dirFiber2();
+        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
+        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
+#endif
+        Vector mid = 0.5 * ( p1 + p2 );
+        Vector dir = normalize( p2 - p1 );
+        glEnable(GL_CLIP_PLANE5);
         if ( pd1->visible )
         {
+            setClipPlane(GL_CLIP_PLANE5, -dir, mid);
             pd1->color.load_both();
-            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
-            drawHand(p1, pd1);
-            drawHand(p2, pd2);
+            glPushMatrix();
+            transAlignZ(p1, pd1->size*sFactor, dir);
+            gle::needle(); //sphere1(); gle::thinLongTube();
+            glPopMatrix();
         }
+        if ( pd2->visible )
+        {
+            setClipPlane(GL_CLIP_PLANE5,  dir, mid);
+            pd2->color.load_both();
+            glPushMatrix();
+            transAlignZ(p2, pd2->size*sFactor, -dir);
+            gle::needle(); //sphere1(); gle::thinLongTube();
+            glPopMatrix();
+        }
+        glDisable(GL_CLIP_PLANE5);
     }
-    else if ( pd1->visible || pd2->visible )
+    else
     {
-        pd1->color.load_both();
-        gleTube(p1, p2, pd1->width*sFactor, gle::tube1);
         if ( pd1->visible ) drawHand(p1, pd1);
         if ( pd2->visible ) drawHand(p2, pd2);
     }
@@ -1222,7 +1330,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:
-        dns = sFactor / std::sqrt(dns);
+        dns = sFactor * gle::invsqrt(dns);
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
         const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
@@ -1236,98 +1344,38 @@ void Display3::drawCoupleB(Couple const* cx) const
         p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
     }
 #endif
-    
-    if ( pd1 == pd2 )
-    {
-#if ( 0 )
-        // ENDOCYTOSIS 2015
-        if ( cx->fiber1()->disp->color.transparent() )
-        {
-            pd1->color.load_both(cx->fiber1()->disp->color.transparency());
-            glDepthMask(GL_FALSE);
-            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
-            glDepthMask(GL_TRUE);
-            continue;
-        }
-#endif
-        if ( pd1->visible )
-        {
-            pd1->color.load_both();
-            drawPoint(p1, pd1);
-            drawPoint(p2, pd2);
-#if FIBER_HAS_FAMILY
-            // accurate rendering of Couple's composite link
-            Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
-            drawPoint(mid, pd1->width);
-            gleTube(p2, mid, pd2->width*sFactor, gle::hexTube);
-            gleTube(p1, mid, pd1->width*sFactor, gle::hexTube);
-#elif ( 0 )
-            drawPoint(cx->sidePos1(), pd1->width);
-            drawPoint(cx->sidePos2(), pd1->width);
-            gleTube(p2, cx->sidePos2(), pd2->width*sFactor, gle::hexTube);
-            gleTube(p1, cx->sidePos1(), pd1->width*sFactor, gle::hexTube);
-            gleTube(cx->sidePos1(), cx->sidePos2(), pd2->width*sFactor, gle::hexTube);
-#else
-            gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
-#endif
-        }
-    }
-    else if ( dns > 1e-6 )
-    {
-        if ( pd2->visible | pd1->visible )
-        {
-#if 1
-            GLfloat rad = pd1->size * sFactor;
-            GLfloat Lr = norm( p2 - p1 ) / rad;
-            GLfloat iLr = (pd1->width / pd1->size); // * gle::invsqrt(Lr);
-            glPushMatrix();
-            gle::transAlignZ(p1, rad, p2-p1);
-            if ( pd2->visible )
-            {
-                glTranslatef(0, 0, Lr);
-                pd2->color.load_both();
-                gle::blob();
-                glTranslatef(0, 0, -Lr);
-            }
-            if ( pd1->visible )
-            {
-                pd1->color.load_both();
-                gle::blob();
-            }
-            glScalef(iLr, iLr, Lr);
-            gle::thinTube();
-            glPopMatrix();
-#else
-            Vector mid = 0.5 * ( p1 + p2 );
-            Vector dir = normalize( p2 - p1 );
-            glEnable(GL_CLIP_PLANE5);
-            if ( pd1->visible )
-            {
-                setClipPlane(GL_CLIP_PLANE5, -dir, mid);
-                pd1->color.load_both();
-                glPushMatrix();
-                transAlignZ(p1, pd1->size*sFactor, dir);
-                gle::needle(); //sphere1(); gle::thinLongTube();
-                glPopMatrix();
-            }
-            if ( pd2->visible )
-            {
-                setClipPlane(GL_CLIP_PLANE5,  dir, mid);
-                pd2->color.load_both();
-                glPushMatrix();
-                transAlignZ(p2, pd2->size*sFactor, -dir);
-                gle::needle(); //sphere1(); gle::thinLongTube();
-                glPopMatrix();
-            }
-            glDisable(GL_CLIP_PLANE5);
-#endif
-        }
-    }
-    else
-    {
-        if ( pd1->visible ) drawHand(p1, pd1);
-        if ( pd2->visible ) drawHand(p2, pd2);
-    }
-}
 
+#if ( 0 ) // ENDOCYTOSIS 2015
+    if ( cx->fiber1()->disp->color.transparent() )
+    {
+        pd1->color.load_both(cx->fiber1()->disp->color.transparency());
+        glDepthMask(GL_FALSE);
+        gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
+        glDepthMask(GL_TRUE);
+        return;
+    }
+#endif
+        
+    GLfloat rad = pd1->size * sFactor;
+    GLfloat Lr = norm( p2 - p1 ) / rad;
+    GLfloat iLr = (pd1->width / pd1->size); // * gle::invsqrt(Lr);
+    
+    glPushMatrix();
+    gle::transAlignZ(p1, rad, p2-p1);
+    if ( pd2->visible )
+    {
+        glTranslatef(0, 0, Lr);
+        pd2->color.load_both();
+        gle::blob();
+        glTranslatef(0, 0,-Lr);
+    }
+    if ( pd1->visible )
+    {
+        pd1->color.load_both();
+        gle::blob();
+    }
+    glScalef(iLr, iLr, Lr);
+    gle::hexTube();
+    glPopMatrix();
+}
 

@@ -908,6 +908,26 @@ namespace gle
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
     }
     
+    size_t setCube(flute3* flu, GLfloat R)
+    {
+        const GLfloat U = -R;
+        flu[0] = flute3{R, U, U};
+        flu[1] = flute3{U, U, U};
+        flu[2] = flute3{R, R, U};
+        flu[3] = flute3{U, R, U};
+        flu[4] = flute3{U, R, R};
+        flu[5] = flute3{U, U, U};
+        flu[6] = flute3{U, U, R};
+        flu[7] = flute3{R, U, U};
+        flu[8] = flute3{R, U, R};
+        flu[9] = flute3{R, R, U};
+        flu[10] = flute3{R, R, R};
+        flu[11] = flute3{U, R, R};
+        flu[12] = flute3{R, U, R};
+        flu[13] = flute3{U, U, R};
+        return 14;
+    }
+
     /// this does not really work
     void tetrahedron1()
     {
@@ -987,13 +1007,14 @@ namespace gle
     
     void initBlobBuffer(GLuint buf)
     {
-        const size_t cnt = 2*64;
+        const size_t cnt = 3*64;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute3), nullptr, GL_STATIC_DRAW);
         flute3 * flu = (flute3*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         setBlob(flu);
         setBlob(flu+64);
         modifyBlob(flu+64);
+        setCube(flu+128, 0.5f);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
     
@@ -1115,6 +1136,7 @@ namespace gle
     
     void blob()      { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 0, 52); }
     void needle()    { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 64, 52); }
+    void smallCube() { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 128, 14); }
 
     void loadBlobBuffer() { loadBuffer(buf_[12]); }
     void blobf()     { glDrawArrays(GL_TRIANGLE_STRIP, 0, 52); }
@@ -1216,8 +1238,8 @@ namespace gle
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const GLfloat B = -32.f, T = 256.f;
         initTubeBuffer(tub_[0], 0, 1, 8);
-        initTubeBuffer(tub_[1],-0.0625, 1.0625, 4);
-        initTubeBuffer(tub_[2], 0, 1.0625, 4);
+        initTubeBuffer(tub_[1],-0.03125, 1.03125, 4);
+        initTubeBuffer(tub_[2], 0, 1.03125, 4);
         initTubeBuffer(tub_[3], 0, 1, 2);
         initTubeBuffer(tub_[4], 0, 1, 1);
         initTubeBuffer(tub_[5], B, T, 8);

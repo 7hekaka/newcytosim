@@ -1719,19 +1719,22 @@ void Display::drawCouplesB(CoupleSet const& set) const
 {
     for ( Couple * cx=set.firstAA(); cx ; cx=cx->next() )
     {
-        // do not display Couple if the associated Fibers are both hidden
-        if ( !cx->fiber1()->disp->visible && !cx->fiber2()->disp->visible )
-            continue;
-        
         // only display if bridging two anti-parallel filaments
-        if ( prop->couple_select & 8  && cx->cosAngle() > 0 )
+        if (( prop->couple_select & 8 ) && cx->cosAngle() > 0 )
             continue;
         
         // only display if bridging two parallel filaments
-        if ( prop->couple_select & 16 && cx->cosAngle() < 0 )
+        if (( prop->couple_select & 16 ) && cx->cosAngle() < 0 )
             continue;
         
-        drawCoupleB(cx);
+        // do not display Couple if the associated Fibers are both hidden
+        bool vis1 = cx->fiber1()->disp->visible | cx->fiber2()->disp->visible;
+        
+        // do not display Couple if both hands are hidden
+        bool vis2 = cx->disp1()->visible | cx->disp2()->visible;
+        
+        if ( vis1 & vis2 )
+            drawCoupleB(cx);
     }
 }
 
