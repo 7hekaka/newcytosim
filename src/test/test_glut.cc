@@ -201,6 +201,22 @@ enum { MOUSE_PASSIVE, MOUSE_ZOOM, MOUSE_MOVE, MOUSE_CLICK };
 //this is called when the mouse button is pressed or released:
 void processMouse(int button, int state, int x, int y)
 {
+#if 0
+    static int mx, my;
+    if ( state == GLUT_DOWN )
+    {
+        mx = x;
+        my = y;
+        printf("  mouse %i %i (%4i %4i) ", button, state, x, y);
+    }
+    else
+    {
+        if ( mx == x && my == y )
+            printf("  ---- %i %i\n", button, state);
+        else
+            printf("  ---- %i %i (%4i %4i)\n", button, state, x, y);
+    }
+#endif
     // for a button release event, do nothing:
     if ( state != GLUT_DOWN ) return;
     

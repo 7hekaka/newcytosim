@@ -1322,11 +1322,10 @@ void Display3::drawCoupleB(Couple const* cx) const
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
     if ( modulo ) modulo->fold(p2, p1);
-    
     Vector dif = p2 - p1;
-    real dns = dif.normSqr();
     
 #if !FIBER_HAS_FAMILY
+    real dns = dif.normSqr();
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:

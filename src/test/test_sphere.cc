@@ -121,7 +121,7 @@ void nameVertices()
     {
         GLfloat x, y, z;
         front->putPoint(&x, &y, &z, i);
-        snprintf(tmp, sizeof(tmp), "%u", i);
+        snprintf(tmp, sizeof(tmp), "%lu", i);
         gle::drawText(Vector3(x, y, z), tmp, GLUT_BITMAP_8_BY_13, 0.5);
     }
 }
