@@ -736,11 +736,11 @@ real FiberSet::totalLength(FiberProp const* sel) const
 
 
 void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
-                          real& avg, real& dev, real& mn, real& mx)
+                          real& avg, real& var, real& mn, real& mx)
 {
     cnt = 0;
     avg = 0;
-    dev = 0;
+    var = 0;
     mn = INFINITY;
     mx = 0;
 
@@ -752,7 +752,7 @@ void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
             ++cnt;
             real x = fib->length();
             avg += x;
-            dev += x * x;
+            var += x * x;
             mn = std::min(mn, x);
             mx = std::max(mx, x);
         }
@@ -761,19 +761,17 @@ void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
     if ( cnt )
     {
         avg /= cnt;
-        real v = ( dev - square(avg)*cnt ) / (cnt-1);
-        // the variance can be numerically negative, which is mathematically impossible
-        dev = std::sqrt(max_real(0, v));
+        var = ( var - square(avg)*cnt ) / (cnt-1);
     }
 }
 
 
 void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
-                             real& avg, real& dev, real& mn, real& mx)
+                             real& avg, real& var, real& mn, real& mx)
 {
     cnt = 0;
     avg = 0;
-    dev = 0;
+    var = 0;
     mn = INFINITY;
     mx = 0;
     
@@ -785,7 +783,7 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
             ++cnt;
             real x = fib->birthTime();
             avg += x;
-            dev += x * x;
+            var += x * x;
             mn = std::min(mn, x);
             mx = std::max(mx, x);
         }
@@ -794,9 +792,7 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
     if ( cnt )
     {
         avg /= cnt;
-        real v = ( dev - square(avg)*cnt ) / (cnt-1);
-        // the variance can be numerically negative, which is mathematically impossible
-        dev = std::sqrt(max_real(0, v));
+        var = ( var - square(avg)*cnt ) / (cnt-1);
     }
 }
 
@@ -1211,11 +1207,11 @@ void FiberSet::infoSpindle(real& ixa, real& ixp, Vector const& n, real a, real m
  Sum elastic bending energy of all the fibers `fib` for which func(fib, arg) == true
  */
 void FiberSet::infoBendingEnergy(ObjectList const& objs, size_t& cnt,
-                                 real& avg, real& dev)
+                                 real& avg, real& var)
 {
     cnt = 0;
     avg = 0;
-    dev = 0;
+    var = 0;
     
     for ( Object * i : objs )
     {
@@ -1225,16 +1221,14 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs, size_t& cnt,
             ++cnt;
             real x = fib->bendingEnergy();
             avg += x;
-            dev += x * x;
+            var += x * x;
         }
     }
     
     if ( cnt )
     {
         avg /= cnt;
-        real v = ( dev - square(avg)*cnt ) / (cnt-1);
-        // the variance can be numerically negative, which is mathematically impossible
-        dev = std::sqrt(max_real(0, v));
+        var = ( var - square(avg)*cnt ) / (cnt-1);
     }
 }
 

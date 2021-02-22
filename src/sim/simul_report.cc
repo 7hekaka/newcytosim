@@ -223,7 +223,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
  ------------------------|------------------------------------------------------
  `fiber:position`        | Position and orientation of fibers
  `fiber:age`             | Average age of fibers
- `fiber:length`          | Average length and standard deviation of fibers
+ `fiber:length`          | Average length and variance of lengths of fibers
  `fiber:distribution`    | length distribution of fiber lengths (option: `max` and `interval`)
  `fiber:dynamic`         | Number of fiber classified by PLUS_END Dynamic state
  `fiber:point`           | coordinates of vertices of all fibers
@@ -473,26 +473,26 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
 #pragma mark - Fiber Aggregated Properties
 
 /**
- Export average length and standard-deviation for each class of fiber
+ Export average length and variance of lengths for each class of fiber
  */
 void Simul::reportFiberAge(std::ostream& out) const
 {
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
-    out << SEP << "dev_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
+    out << SEP << "var_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
     
     size_t cnt;
-    real avg, dev, mn, mx;
+    real avg, var, mn, mx;
     const real now = prop->time;
 
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
         ObjectList objs = fibers.collect(fp);
-        fibers.infoBirthtime(objs, cnt, avg, dev, mn, mx);
+        fibers.infoBirthtime(objs, cnt, avg, var, mn, mx);
         out << LIN << ljust(fp->name(), 2);
         out << SEP << cnt;
         out << SEP << avg;
-        out << SEP << dev;
+        out << SEP << var;
         out << SEP << now-mx;
         out << SEP << now-avg;
         out << SEP << now-mn;
@@ -501,20 +501,20 @@ void Simul::reportFiberAge(std::ostream& out) const
 
 
 /**
-Export average length and standard-deviation for a class of fiber
+Export average length and variance of length for a class of fiber
 */
 void Simul::reportFiberLengths(std::ostream& out, FiberProp const* fp) const
 {
     size_t cnt;
-    real avg, dev, mn, mx;
+    real avg, var, mn, mx;
     ObjectList objs = fibers.collect(fp);
-    fibers.infoLength(objs, cnt, avg, dev, mn, mx);
+    fibers.infoLength(objs, cnt, avg, var, mn, mx);
     
     out << LIN << ljust(fp->name(), 2);
     out << SEP << cnt;
     out.precision(3);
     out << SEP << std::fixed << avg;
-    out << SEP << std::fixed << dev;
+    out << SEP << std::fixed << var;
     out << SEP << std::fixed << mn;
     out << SEP << std::fixed << mx;
     out.precision(1);
@@ -522,13 +522,13 @@ void Simul::reportFiberLengths(std::ostream& out, FiberProp const* fp) const
 }
 
 /**
- Export average length and standard-deviation for each class of fiber
+ Export average length and variance for each class of fiber
  */
 void Simul::reportFiberLengths(std::ostream& out, Property const* sel, bool com) const
 {
     if ( com )
     {
-        out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "std_dev";
+        out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
         out << SEP << "min_len" << SEP << "max_len" << SEP << "total";
     }
     
@@ -545,7 +545,7 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel, bool com)
 
 
 /**
- Export average length and standard-deviation for each class of fiber
+ Export length histograms for each class of fiber
  */
 void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
 {
@@ -1203,23 +1203,23 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
 void Simul::reportFiberBendingEnergy(std::ostream& out) const
 {
     out << COM << ljust("bending_energy",2,2) << SEP << "count";
-    out << SEP << "sum" << SEP << "avg" << SEP << "dev" << SEP << "rigidity";
+    out << SEP << "sum" << SEP << "avg" << SEP << "var" << SEP << "rigidity";
     
     size_t cnt;
-    real avg, dev;
+    real avg, var;
     
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
         ObjectList objs = fibers.collect(fp);
-        fibers.infoBendingEnergy(objs, cnt, avg, dev);
+        fibers.infoBendingEnergy(objs, cnt, avg, var);
         if ( cnt > 0 )
         {
             out << LIN << ljust(fp->name(), 2);
             out << SEP << cnt;
             out << SEP << avg*cnt;
             out << SEP << avg;
-            out << SEP << dev;
+            out << SEP << var;
             out << SEP << fp->rigidity;
         }
     }
@@ -2905,8 +2905,8 @@ void Simul::reportRing(std::ostream& out) const
 void Simul::reportPlatelet(std::ostream& out) const
 {
     size_t nfib;
-    real pol, dev, mn, mx;
-    fibers.infoLength(fibers.collect(), nfib, pol, dev, mn, mx);
+    real pol, var, mn, mx;
+    fibers.infoLength(fibers.collect(), nfib, pol, var, mn, mx);
     pol *= nfib;
     
     computeForces();

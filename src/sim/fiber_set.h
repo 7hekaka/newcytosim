@@ -116,11 +116,11 @@ public:
     /// total length of Fiber for Fibers with given FiberProp
     real         totalLength(FiberProp const *) const;
     
-    /// calculate: number of fibers, mean, standard-deviation, min and max of fiber length
-    static void  infoLength(ObjectList const&, size_t& cnt, real& avg, real& dev, real& mn, real& mx);
+    /// calculate: number of fibers, mean, variance, min and max of fiber length
+    static void  infoLength(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);
     
-    /// calculate: number of fibers, mean, standard-deviation, min and max of fiber length
-    static void  infoBirthtime(ObjectList const&, size_t& cnt, real& avg, real& dev, real& mn, real& mx);
+    /// calculate: number of fibers, mean, variance, min and max of fiber length
+    static void  infoBirthtime(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);
 
     /// calculate: number of fibers, number of joints and number of kinks
     static void  infoSegments(ObjectList const&, size_t& cnt, size_t& points, real&, real&, real&);
@@ -141,7 +141,7 @@ public:
     void         infoPlane(int& np, int& na, Vector const& n, real a) const;
     
     /// Calculate characteristics of bendingEnergy()
-    static void  infoBendingEnergy(ObjectList const&, size_t& cnt, real& avg, real& dev);
+    static void  infoBendingEnergy(ObjectList const&, size_t& cnt, real& avg, real& var);
     
     /// sum Lagrange multipliers for segments that intersect the plane <em> n.pos + a = 0 </em>
     void  infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const;
