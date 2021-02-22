@@ -1340,19 +1340,20 @@ void Chain::segmentationMinMax(real& mn, real& mx) const
 /**
  Returns the average and variances of segment length
  */
-void Chain::segmentationVariance(real& avg, real& var) const
+void Chain::segmentationVariance(real& mean, real& variance) const
 {
-    avg = 0;
-    var = 0;
+    const double off = segmentation(); // assumed mean
+    double avg = 0, var = 0;
     size_t cnt = nbSegments();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        real r = diffPoints(n).norm();
+        real r = diffPoints(n).norm() - off;
         avg += r;
         var += r*r;
     }
     avg /= (real)cnt;
-    var = var / (real)cnt - avg * avg;
+    variance = ( var - square(avg) * cnt ) / (cnt-1);
+    mean = avg + off;
 }
 
 

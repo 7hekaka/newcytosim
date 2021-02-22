@@ -760,10 +760,10 @@ void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
     
     if ( cnt )
     {
-        avg /= (real)cnt;
-        real v = dev/(real)cnt - avg*avg;
+        avg /= cnt;
+        real v = ( dev - square(avg)*cnt ) / (cnt-1);
         // the variance can be numerically negative, which is mathematically impossible
-        dev = std::sqrt(std::max((real)0, v));
+        dev = std::sqrt(max_real(0, v));
     }
 }
 
@@ -774,8 +774,8 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
     cnt = 0;
     avg = 0;
     dev = 0;
-    mn  = INFINITY;
-    mx  = 0;
+    mn = INFINITY;
+    mx = 0;
     
     for ( Object * i : objs )
     {
@@ -793,10 +793,10 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
     
     if ( cnt )
     {
-        avg /= (real)cnt;
-        real v = dev/(real)cnt - avg*avg;
+        avg /= cnt;
+        real v = ( dev - square(avg)*cnt ) / (cnt-1);
         // the variance can be numerically negative, which is mathematically impossible
-        dev = std::sqrt(std::max((real)0, v));
+        dev = std::sqrt(max_real(0, v));
     }
 }
 
@@ -1231,10 +1231,10 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs, size_t& cnt,
     
     if ( cnt )
     {
-        avg /= (real)cnt;
-        real v = dev/(real)cnt - avg*avg;
+        avg /= cnt;
+        real v = ( dev - square(avg)*cnt ) / (cnt-1);
         // the variance can be numerically negative, which is mathematically impossible
-        dev = std::sqrt(std::max((real)0, v));
+        dev = std::sqrt(max_real(0, v));
     }
 }
 

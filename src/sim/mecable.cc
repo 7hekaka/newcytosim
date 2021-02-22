@@ -332,7 +332,7 @@ void Mecable::calculateMomentum(Vector& avg, Vector& dev)
     if ( nPoints > 1 )
     {
         avg /= nPoints;
-        dev /= nPoints;
+        dev /= nPoints-1;
     }
     
     dev -= avg.e_squared();

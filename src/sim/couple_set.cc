@@ -812,7 +812,6 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
     Array<FiberSite> loc(1024, 1024);
     
 #if ( 0 )
-    
     // this performs a basic verification of fibers.uniFiberSites()
     size_t rep = 1<<10;
     double avg = 0, var = 0;
@@ -823,10 +822,9 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
         avg += s;
         var += s*s;
     }
-    avg /= (real)rep;
-    var = var/(real)rep - avg * avg;
+    avg /= rep;
+    var = var/(rep-1) - avg * avg;
     printf("UNI-FIBER-SITES(1)  avg = %9.2f   var = %9.2f\n", avg, var);
-    
 #endif
     
     // uniform attachment for reserved couples:

@@ -43,7 +43,7 @@ void Tubule::reset()
 ObjectList Tubule::build(Glossary& opt, Simul& sim)
 {
     FiberProp const* fp = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
-    real len = 1.0, var = 0;
+    real len = 1.0, dev = 0;
     ObjectList res;
 
     // get the 'bone'
@@ -59,8 +59,8 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
     else
     {
         opt.set(len, "length");
-        if ( opt.set(var, "length", 1) )
-            len += var * RNG.sreal();
+        if ( opt.set(dev, "length", 1) )
+            len += dev * RNG.sreal();
         len = std::max(len, fp->min_length);
         len = std::min(len, fp->max_length);
     }

@@ -211,28 +211,26 @@ void setGeometry()
 }
 
 
-void checkVolume()
+void checkVolume(size_t CNT)
 {
-    const size_t CNT = 2;
+    real vol = spc->volume();
     double avg = 0, dev = 0;
     
     for ( size_t i = 0; i < CNT; ++i )
     {
-        real e = spc->estimateVolume(1<<21);
-        //printf("Monte-Carlo estimated volume %.6f\n", e);
+        real e = spc->estimateVolume(1<<21) - vol;
+        //printf("Monte-Carlo estimated volume %.6f\n", e+vol);
         avg += e;
         dev += e * e;
     }
     avg /= CNT;
-    dev = dev/(real)CNT - avg * avg;
-    dev = std::sqrt(abs_real(dev));
+    dev = ( dev - avg * avg * CNT ) / (CNT-1)
+    dev = std::sqrt(max_real(0, dev));
     
-    real vol = spc->volume();
-
     printf("Monte-Carlo estimated volume of `%s` is", spc->prop->shape.c_str());
-    printf("  %.3f +/- %.3f;  given volume is %.3f\n", avg, dev, vol);
+    printf("  %.3f +/- %.3f;  given volume is %.3f\n", avg+vol, dev, vol);
     
-    if ( fabs(vol-avg) > 3*dev )
+    if ( abs_real(avg) > 3*dev )
          printf("WARNING: POSSIBLE VOLUME MISMATCH!!!!\n");
 }
 
@@ -605,7 +603,7 @@ int main(int argc, char* argv[])
         exit(EXIT_SUCCESS);
     }
 
-    checkVolume();
+    checkVolume(8);
     glutMainLoop();
 }
 

@@ -225,36 +225,33 @@ void test_real()
 
 //==========================================================================
 
-void test_uniform()
+void test_uniform(size_t cnt)
 {
-    size_t cnt = 1<<28;
-    real avg = 0;
-    real var = 0;
+    const double off = 0.5;
+    double avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
-        real x = RNG.sreal();
-        real y = RNG.sreal();
-        real z = RNG.sreal();
-        real t = RNG.sreal();
+        real x = RNG.sreal() - off;
+        real y = RNG.sreal() - off;
+        real z = RNG.sreal() - off;
+        real t = RNG.sreal() - off;
         avg += x + y + z + t;
         var += x*x + y*y + z*z + t*t;
     }
     cnt *= 4;
-    avg /= (real)cnt;
-    var = var/(real)cnt - avg * avg;
-    printf("UNIFORM      avg = %.12e   var = %.12e\n", avg, var);
+    avg /= cnt;
+    var = ( var - square(avg) * cnt ) / (cnt-1);
+    printf("UNIFORM      avg = %.12e   var = %.12e\n", avg+off, var);
 }
 
 
-void test_gauss()
+void test_gauss(size_t CNT)
 {
-    printf("Gauss\n");
     size_t cnt = 0;
-    real avg = 0;
-    real var = 0;
+    double avg = 0, var = 0;
     const size_t n_max = 1<<6;
     real vec[n_max] = { 0 };
-    for ( size_t i = 0; i < 10000000; ++i )
+    for ( size_t i = 0; i < CNT; ++i )
     {
         size_t n = RNG.pint32(n_max);
         RNG.gauss_set(vec, n);
@@ -265,9 +262,9 @@ void test_gauss()
             var += vec[u] * vec[u];
         }
     }
-    avg /= (real)cnt;
-    var = var/(real)cnt - avg * avg;
-    printf("GAUSS      avg = %.12e   var = %.12e\n", avg, var);
+    avg /= cnt;
+    var = ( var - square(avg) * cnt ) / (cnt-1);
+    printf("GAUSSIAN     avg = %.12e   var = %.12e\n", avg, var);
 
 }
 
@@ -283,24 +280,23 @@ void test_prob()
 }
 
 
-void test_exponential()
+void test_exponential(size_t cnt)
 {
-    size_t cnt = 1 << 29;
-    real avg = 0;
-    real var = 0;
+    const double off = 1;
+    double avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
-        real x = RNG.exponential();
-        real y = RNG.exponential();
-        real z = RNG.exponential();
-        real t = RNG.exponential();
+        real x = RNG.exponential() - off;
+        real y = RNG.exponential() - off;
+        real z = RNG.exponential() - off;
+        real t = RNG.exponential() - off;
         avg += x + y + z + t;
         var += x*x + y*y + z*z + t*t;
     }
     cnt *= 4;
-    avg /= (real)cnt;
-    var = var/(real)cnt - avg * avg;
-    printf("EXPONENTIAL  avg = %.12e   var = %.12e\n", avg, var);
+    avg /= cnt;
+    var = ( var - square(avg) * cnt ) / (cnt-1);
+    printf("EXPONENTIAL  avg = %.12e   var = %.12e\n", avg+off, var);
 }
 
 
@@ -386,7 +382,8 @@ template < typename REAL >
 void check_gaussian(size_t cnt, REAL* vec)
 {
     size_t nan = 0;
-    REAL avg = 0, dev = 0;
+    double off = 1; // assumed mean
+    double avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
         if ( std::isnan(vec[i]) )
@@ -394,21 +391,21 @@ void check_gaussian(size_t cnt, REAL* vec)
         else
         {
             avg += vec[i];
-            dev += vec[i] * vec[i];
+            var += ( vec[i] - off ) * ( vec[i] - off );
         }
     }
+    avg /= cnt;
+    var = ( var - square( avg - off ) * cnt ) / ( cnt - 1 );
     // covariance of odd and even numbers:
-    REAL cov = 0;
+    double cov = 0;
     for ( size_t i = 1; i < cnt; i += 2 )
     {
         if ( !std::isnan(vec[i]) )
-            cov += vec[i-1] * vec[i];
+            cov += ( vec[i-1] - avg ) * ( vec[i] - avg );
     }
     cnt -= nan;
-    avg /= cnt;
-    dev = dev / cnt - avg;
-    cov = 0.5 * cov / cnt;
-    printf("%6lu numbers + %6lu NaNs: avg %7.4f dev %7.4f cov %7.4f\n", cnt, nan, avg, dev, cov);
+    cov /= ( cnt / 2 );
+    printf("%6lu numbers + %6lu NaNs: avg %7.4f var %7.4f cov %7.4f\n", cnt, nan, avg, var, cov);
 }
 
 
@@ -695,9 +692,9 @@ int main(int argc, char* argv[])
             break;
             
         case 1:
-            test_exponential();
-            test_uniform();
-            test_gauss();
+            test_exponential(0x1p26);
+            test_uniform(0x1p20);
+            test_gauss(0x1p20);
             break;
 
         case 3:
