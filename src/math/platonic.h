@@ -14,7 +14,7 @@ namespace Platonic
     struct Corner
     {
         /// Coordinates in space
-        FLOAT    pos_[3];
+        FLOAT pos_[3];
         
         /// an index to identify this vertex
         unsigned inx_;
@@ -40,28 +40,22 @@ namespace Platonic
     public:
         
         /// pointers to the corners being interpolated
-        Corner*   vertex_[3];
+        unsigned index_[3];
         
         /// Weights of the interpolation
-        unsigned  weight_[3];
+        unsigned weight_[3];
         
         /// check if weights are equal
-        bool equivalent(Corner*, unsigned, Corner*, unsigned) const;
-        
-        /// export coordinates
-        void store_pos(float vec[3], int half) const;
-        
-        /// export coordinates
-        void store_pos(double vec[3], int half) const;
+        bool equivalent(unsigned, unsigned, unsigned, unsigned) const;
         
         ///
-        Vertex() { vertex_[0]=nullptr; vertex_[1]=nullptr; vertex_[2]=nullptr; }
+        Vertex() { index_[0]=-1; index_[1]=-1; index_[2]=-1; }
         
         //Vertex(Corner *, unsigned, Corner *, unsigned, Corner *, unsigned) { set(); }
         
         ~Vertex() {}
         
-        void set(Corner*, unsigned, Corner*, unsigned, Corner*, unsigned);
+        void set(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
 
         unsigned weight(int x) const { return weight_[x]; }
         
@@ -84,25 +78,76 @@ namespace Platonic
     class Solid
     {
     public:
+        /// regular polyhedra made of triangles
+        enum Polyhedra { TETRAHEDRON=0, OCTAHEDRON=1, ICOSAHEDRON=2, HEMISPHERE=3, QUADRANT=4, CUBOID=5 };
+
+    private:
+        /// Array of coordinates of all vertices
+        float  * coordinates_;
         
-        ///regular polyhedra made of triangles
-        enum Polyhedra { TETRAHEDRON=0, OCTAHEDRON=1, ICOSAHEDRON=2, HEMISPHERE=3 };
+        /// Array of primary vertices of the geometry
+        Corner * corners_;
         
-        /// Number of Vertices after refinement of level 'r'
-        static unsigned nb_vertices(Polyhedra K, unsigned r);
+        /// Array of derived vertices
+        Vertex * vertices_;
         
-        /// Number of Faces after refinement of level 'r'
-        static unsigned nb_faces(Polyhedra K, unsigned r);
+        /// Array of indices of the points making the edges
+        unsigned *edges_;
         
-        /// Number of Edges after refinement of level 'r'
-        static unsigned nb_edges(Polyhedra K, unsigned r);
+        /// Array of indices of the points making the faces
+        unsigned *faces_;
         
-        /// an estimation of the length of the edge
-        static FLOAT    length_edge(Polyhedra K, unsigned r);
+        unsigned num_corners_;
+        
+        unsigned num_vertices_, max_vertices_;
+        
+        unsigned num_edge_vertices_;
+        
+        /// number of faces
+        unsigned num_faces_, max_faces_;
+        
+        /// number of edges
+        unsigned num_edges_, max_edges_;
+        
+        /// defining which Z half space for hemisphere
+        int halfZ_;
+        
+        
+        unsigned findEdgeVertex(unsigned, unsigned, unsigned, unsigned) const;
+        unsigned getEdgeVertex(unsigned, unsigned, unsigned, unsigned) const;
+        unsigned addVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
+        unsigned makeVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
+        
+        void init(unsigned, FLOAT* vdata[3], unsigned, unsigned* fdata[3], unsigned);
+        void setCorners(unsigned, FLOAT vex[][3], unsigned div);
+        void refineTriangles(unsigned, unsigned fac[][3], unsigned div);
+        
+        void initTetrahedron(unsigned div);
+        void initOctahedron(unsigned div);
+        void initIcosahedron(unsigned div);
+        void initIcosahedronRotated(unsigned div);
+        void initHemisphere(unsigned div);
+        void initQuadrant(unsigned div);
+        void initCuboid(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div);
+        
+        void setVertices(Polyhedra K, unsigned div);
+        void addFace(unsigned, unsigned, unsigned);
+        void addEdge(unsigned, unsigned);
+        void refineEdge(unsigned a, unsigned b, unsigned div);
+        void refineFace(unsigned*, unsigned a, unsigned b, unsigned c, unsigned div);
+        void refineQuad(unsigned*, unsigned quad[4], unsigned div);
+        void refineStrip(unsigned cnt, unsigned inx[], unsigned div);
+        void store_pos(Vertex const&, float vec[3], int half) const;
+        void store_pos(Vertex const&, double vec[3], int half) const;
+
+    public:
         
         /// reset pointers
         void build();
         
+        /// allocates memory
+        void allocate(unsigned n_vertices, unsigned n_edges, unsigned n_faces, unsigned div);
+
         /// build as polyhedra refined by order `div`
         Solid(Polyhedra, unsigned div, int make = 0);
         
@@ -166,65 +211,12 @@ namespace Platonic
         /// return address of third vertex of face `f`
         const float* face_data2(int f) const { return coordinates_ + 3 * faces_[3*f+2]; }
         
-        /// return address of first vertex of face `f`
+        /// return index of first vertex in face `f`
         unsigned face_indx0(int f)     const { return faces_[3*f]; }
-        /// return address of second vertex of face `f`
+        /// return index of second vertex in face `f`
         unsigned face_indx1(int f)     const { return faces_[3*f+1]; }
-        /// return address of third vertex of face `f`
+        /// return index of third vertex in face `f`
         unsigned face_indx2(int f)     const { return faces_[3*f+2]; }
-        
-    private:
-        
-        /// Array of coordinates of all vertices
-        float  * coordinates_;
-
-        /// Array of vertices of the Platonic solid
-        Corner * corners_;
-        
-        /// Array of derived vertices
-        Vertex * vertices_;
-        
-        /// Array of indices of the points making the edges
-        unsigned *edges_;
-
-        /// Array of indices of the points making the faces
-        unsigned *faces_;
-
-        unsigned num_corners_;
-        
-        unsigned num_vertices_, max_vertices_;
-        
-        unsigned num_edge_vertices_;
-        
-        /// number of faces
-        unsigned num_faces_, max_faces_;
-        
-        /// number of edges
-        unsigned num_edges_, max_edges_;
-        
-        /// defining half space for hemisphere
-        int halfZ_;
-        
-        
-        unsigned findEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;
-        unsigned getEdgeVertex(Corner*, unsigned, Corner*, unsigned) const;
-        unsigned addVertex(Corner*, unsigned, Corner*, unsigned, Corner*, unsigned);
-        unsigned makeVertex(Corner*, unsigned, Corner*, unsigned, Corner*, unsigned);
-        
-        void init(unsigned, FLOAT* vdata[3], unsigned, unsigned* fdata[3], unsigned);
-        void refineTriangles(unsigned, FLOAT vex[][3], unsigned, unsigned fac[][3], unsigned div, int half);
-
-        void initTetrahedron(unsigned div);
-        void initOctahedron(unsigned div);
-        void initIcosahedron(unsigned div);
-        void initIcosahedronRotated(unsigned div);
-        void initHemisphere(unsigned div);
-
-        void setVertices(Polyhedra K, unsigned div);
-        void addFace(unsigned, unsigned, unsigned, int half);
-        void addEdge(unsigned, unsigned);
-        void refineEdge(unsigned a, unsigned b, unsigned div);
-        void refineFace(unsigned a, unsigned b, unsigned c, unsigned div, int half);
     };
 }
 

@@ -4,78 +4,47 @@
 #include "platonic.h"
 #include <cmath>
 
-//------------------------------------------------------------------------------
-#pragma mark - Solid static members
 
-unsigned Platonic::Solid::nb_vertices(Polyhedra k, unsigned N)
+namespace Platonic
 {
-    static const unsigned V[] = { 4, 6, 12, 12 };
-    static const unsigned F[] = { 4, 8, 20, 12 };
-    static const unsigned E[] = { 6, 12, 30, 21 };
-    return V[k] + E[k] * (N-1) + F[k] * ((N-1)*(N-2)/2);
-}
-
-unsigned Platonic::Solid::nb_faces(Polyhedra k, unsigned N)
-{
-    static const unsigned F[] = { 4, 8, 20, 12 };
-    return F[k] * N * N;
-}
-
-unsigned Platonic::Solid::nb_edges(Polyhedra k, unsigned N)
-{
-    static const unsigned F[] = { 4, 8, 20, 12 };
-    static const unsigned E[] = { 6, 12, 30, 21 };
-    return E[k] * N + F[k] * 3 * ((N-1)*N/2);
-}
-
-/**
- We estimate L from:
- - the area of the sphere is 4*PI
- - the number of triangles on it is nb_faces()
- - the area of an equilateral triangle of side L is std::sqrt(3)*(L/2)^2
- */
-Platonic::FLOAT Platonic::Solid::length_edge(Polyhedra k, unsigned N)
-{
-    return 4 * std::sqrt( M_PI / ( std::sqrt(3) * nb_faces(k,N) ) );
-}
 
 //------------------------------------------------------------------------------
 #pragma mark - Vertex
-
+        
 // return 'a < b'
-bool Platonic::Vertex::smaller(unsigned a, unsigned b)
+bool Vertex::smaller(unsigned a, unsigned b)
 {
     if ( weight_[a] < weight_[b] )
         return true;
     return ( weight_[a] > 0 && weight_[a] == weight_[b]
-            && vertex_[a]->inx_ > vertex_[b]->inx_ );
+            && index_[a] > index_[b] );
 }
 
-void Platonic::Vertex::swap(unsigned a, unsigned b)
+void Vertex::swap(unsigned a, unsigned b)
 {
-    Corner  * p = vertex_[b];
+    unsigned p = index_[b];
     unsigned w = weight_[b];
-    vertex_[b] = vertex_[a];
+    index_[b] = index_[a];
     weight_[b] = weight_[a];
-    vertex_[a] = p;
+    index_[a] = p;
     weight_[a] = w;
 }
 
-void Platonic::Vertex::set(Corner* A, unsigned wA,
-                           Corner* B, unsigned wB,
-                           Corner* C, unsigned wC )
+void Vertex::set(unsigned A, unsigned wA,
+                 unsigned B, unsigned wB,
+                 unsigned C, unsigned wC )
 {
-    vertex_[0] = A;
+    index_[0] = A;
     weight_[0] = wA;
-    assert_true( wA == 0 || A );
+    assert_true( wA >= 0 );
     
-    vertex_[1] = B;
+    index_[1] = B;
     weight_[1] = wB;
-    assert_true( wB == 0 || B );
+    assert_true( wB >= 0 );
     
-    vertex_[2] = C;
+    index_[2] = C;
     weight_[2] = wC;
-    assert_true( wC == 0 || C );
+    assert_true( wC >= 0 );
     
     if ( smaller(0,1) ) swap(0,1);
     if ( smaller(1,2) ) swap(1,2);
@@ -85,14 +54,14 @@ void Platonic::Vertex::set(Corner* A, unsigned wA,
 /**
  The indices should be sorted for this to work
  */
-bool Platonic::Vertex::equivalent(Corner* A, unsigned wA, Corner* B, unsigned wB) const
+bool Vertex::equivalent(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 {
     assert_true( weight_[0] >= weight_[1] );
     assert_true( weight_[1] >= weight_[2] );
     // order by larger weigth and smaller point index
-    if ( wB > wA || ( wA == wB && A->inx_ > B->inx_ ))
+    if ( wB > wA || ( wA == wB && A > B ))
     {
-        Corner* T = A;
+        unsigned T = A;
         A = B;
         B = T;
         unsigned wT = wA;
@@ -101,25 +70,25 @@ bool Platonic::Vertex::equivalent(Corner* A, unsigned wA, Corner* B, unsigned wB
     }
     unsigned S = sum_weights();
     unsigned T = wA + wB;
-    return (   T*weight_[0]==S*wA && ( weight_[0]==0 || vertex_[0]==A )
-            && T*weight_[1]==S*wB && ( weight_[1]==0 || vertex_[1]==B ));
+    return (   T*weight_[0]==S*wA && ( weight_[0]==0 || index_[0]==A )
+            && T*weight_[1]==S*wB && ( weight_[1]==0 || index_[1]==B ));
 }
 
 
-void Platonic::Vertex::store_pos(double C[3], int half) const
+void Solid::store_pos(Vertex const& vex, double ptr[3], int half) const
 {
-    double X = 0, Y = 0, Z = 0;
-    assert_true( sum_weights() > 0 );
+    assert_true( vex.sum_weights() > 0 );
     
+    double X = 0, Y = 0, Z = 0;
     for ( int i = 0; i < 3; ++i )
     {
-        Corner const* v = vertex_[i];
-        if ( v )
+        FLOAT W = (FLOAT)vex.weight_[i];
+        if ( W )
         {
-            FLOAT W = (FLOAT)weight_[i];
-            X += W * v->pos_[0];
-            Y += W * v->pos_[1];
-            Z += W * v->pos_[2];
+            Corner const& v = corners_[vex.index_[i]];
+            X += W * v.pos_[0];
+            Y += W * v.pos_[1];
+            Z += W * v.pos_[2];
         }
     }
     
@@ -131,26 +100,26 @@ void Platonic::Vertex::store_pos(double C[3], int half) const
     if ( n > 0 )
         n = 1.0 / std::sqrt(n);
     else
-        n = 1.0 / sum_weights();
-    C[0] = X * n;
-    C[1] = Y * n;
-    C[2] = Z * n;
+        n = 1.0 / vex.sum_weights();
+    ptr[0] = X * n;
+    ptr[1] = Y * n;
+    ptr[2] = Z * n;
 }
 
-void Platonic::Vertex::store_pos(float ptr[3], int half) const
+void Solid::store_pos(Vertex const& vex, float ptr[3], int half) const
 {
-    float X = 0, Y = 0, Z = 0;
-    assert_true( sum_weights() > 0 );
+    assert_true( vex.sum_weights() > 0 );
     
+    float X = 0, Y = 0, Z = 0;
     for ( int i = 0; i < 3; ++i )
     {
-        Corner const* v = vertex_[i];
-        if ( v )
+        float W = (float)vex.weight_[i];
+        if ( W )
         {
-            float W = (float)weight_[i];
-            X += W * v->pos_[0];
-            Y += W * v->pos_[1];
-            Z += W * v->pos_[2];
+            Corner const& v = corners_[vex.index_[i]];
+            X += W * v.pos_[0];
+            Y += W * v.pos_[1];
+            Z += W * v.pos_[2];
         }
     }
     
@@ -162,29 +131,29 @@ void Platonic::Vertex::store_pos(float ptr[3], int half) const
     if ( n > 0 )
         n = 1.f / std::sqrt(n);
     else
-        n = 1.f / sum_weights();
+        n = 1.f / vex.sum_weights();
     ptr[0] = X * n;
     ptr[1] = Y * n;
     ptr[2] = Z * n;
 }
 
-void Platonic::Vertex::print(unsigned inx, std::ostream& out) const
+void Vertex::print(unsigned inx, std::ostream& out) const
 {
     out << "P" << inx << " = ( ";
     if ( weight_[2] == 0 && weight_[1] == 0 )
     {
-        out << vertex_[0]->inx_ << " " << weight_[0] ;
+        out << index_[0] << " " << weight_[0] ;
     }
     else if ( weight_[2] == 0 )
     {
-        out << vertex_[0]->inx_ << " " << weight_[0] << ", ";
-        out << vertex_[1]->inx_ << " " << weight_[1];
+        out << index_[0] << " " << weight_[0] << ", ";
+        out << index_[1] << " " << weight_[1];
     }
     else
     {
-        out << vertex_[0]->inx_ << " " << weight_[0] << ", ";
-        out << vertex_[1]->inx_ << " " << weight_[1] << ", ";
-        out << vertex_[2]->inx_ << " " << weight_[2];
+        out << index_[0] << " " << weight_[0] << ", ";
+        out << index_[1] << " " << weight_[1] << ", ";
+        out << index_[2] << " " << weight_[2];
     }
     out << " )" << std::endl;
 }
@@ -192,7 +161,7 @@ void Platonic::Vertex::print(unsigned inx, std::ostream& out) const
 //------------------------------------------------------------------------------
 #pragma mark - Solid
 
-void Platonic::Solid::build()
+void Solid::build()
 {
     num_corners_  = 0;
     corners_      = nullptr;
@@ -214,18 +183,25 @@ void Platonic::Solid::build()
 }
 
 
-Platonic::Solid::Solid(Polyhedra kind, unsigned div, int make)
+void Solid::allocate(unsigned V, unsigned E, unsigned F, unsigned N)
+{
+    unsigned nv = V + E * (N-1) + F * ((N-1)*(N-2)/2);
+    unsigned ne = E * N + F * 3 * ((N-1)*N/2);
+    unsigned nf = F * N * N;
+    max_vertices_ = nv;
+    vertices_     = new Vertex[nv];
+    max_edges_    = ne;
+    max_faces_    = nf;
+    faces_        = new unsigned[3*nf];
+}
+
+
+Solid::Solid(Polyhedra kind, unsigned div, int make)
 {
     build();
     
     if ( div > 0 )
     {
-        max_vertices_ = nb_vertices(kind, div);
-        vertices_     = new Vertex[max_vertices_];
-        max_faces_    = nb_faces(kind, div);
-        faces_        = new unsigned[3*max_faces_];
-        max_edges_    = nb_edges(kind, div);
-        
         setVertices(kind, div);
         if ( make )
         {
@@ -238,7 +214,7 @@ Platonic::Solid::Solid(Polyhedra kind, unsigned div, int make)
 }
 
 
-Platonic::Solid::~Solid()
+Solid::~Solid()
 {
     delete[] corners_;
     delete[] vertices_;
@@ -253,7 +229,7 @@ Platonic::Solid::~Solid()
 /**
  register a new derived-vertex:
  */
-unsigned Platonic::Solid::addVertex(Corner* A, unsigned wA, Corner* B, unsigned wB, Corner* C, unsigned wC)
+unsigned Solid::addVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsigned C, unsigned wC)
 {
     unsigned i = num_vertices_++;
     assert_true(i < max_vertices_);
@@ -267,7 +243,7 @@ unsigned Platonic::Solid::addVertex(Corner* A, unsigned wA, Corner* B, unsigned 
  return index of the Vertex corresponding to given interpolation
  of max_vertices_ if not found
  */
-unsigned Platonic::Solid::findEdgeVertex(Corner* A, unsigned wA, Corner* B, unsigned wB) const
+unsigned Solid::findEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 {
     /**
      We limit the search to the vertices that are on the edges of
@@ -285,7 +261,7 @@ unsigned Platonic::Solid::findEdgeVertex(Corner* A, unsigned wA, Corner* B, unsi
 /**
  return index of the Vertex corresponding to given interpolation
  */
-unsigned Platonic::Solid::getEdgeVertex(Corner* A, unsigned wA, Corner* B, unsigned wB) const
+unsigned Solid::getEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 {
     unsigned i = findEdgeVertex(A, wA, B, wB);
     if ( i >= max_vertices_ )
@@ -303,8 +279,9 @@ unsigned Platonic::Solid::getEdgeVertex(Corner* A, unsigned wA, Corner* B, unsig
  We only check existence if X is on an edge, since only then may it
  has been created previously while processing another face.
  */
-unsigned Platonic::Solid::makeVertex(Corner* A, unsigned wA, Corner* B, unsigned wB, Corner* C, unsigned wC)
+unsigned Solid::makeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsigned C, unsigned wC)
 {
+    assert_true( wA > 0 && wB > 0 && wC >= 0 );
     if ( wC == 0 )
         return getEdgeVertex(A, wA, B, wB);
     return addVertex(A, wA, B, wB, C, wC);
@@ -315,36 +292,33 @@ unsigned Platonic::Solid::makeVertex(Corner* A, unsigned wA, Corner* B, unsigned
 #pragma mark -
 
 /// add intermediate vertices between `a` and `b`
-void Platonic::Solid::refineEdge(unsigned a, unsigned b, unsigned div)
+void Solid::refineEdge(unsigned a, unsigned b, unsigned div)
 {
-    Corner *A = &corners_[a];
-    Corner *B = &corners_[b];
-    
     // check if this edge has been processes already:
-    unsigned i = findEdgeVertex(A, div-1, B, 1);
+    unsigned i = findEdgeVertex(a, div-1, b, 1);
     if ( i >= max_vertices_ )
     {
         for ( unsigned u = 1; u < div; ++u )
         {
-            addVertex(A, div-u, B, u, nullptr, 0);
+            addVertex(a, div-u, b, u, 0, 0);
             num_edge_vertices_ = num_vertices_;
         }
     }
 }
 
 
-void Platonic::Solid::addFace(unsigned a, unsigned b, unsigned c, int half)
+void Solid::addFace(unsigned a, unsigned b, unsigned c)
 {
     //printf("face %i %i %i\n", a, b, c);
     assert_true( a!=b && b!=c && a!=c );
-    if ( half )
+    if ( halfZ_ )
     {
         // reject face if 2 corners are outside
         FLOAT pos[3];
         int out = 0;
-        vertex(a).store_pos(pos, 0); out += ( pos[2] * half > 0 );
-        vertex(b).store_pos(pos, 0); out += ( pos[2] * half > 0 );
-        vertex(c).store_pos(pos, 0); out += ( pos[2] * half > 0 );
+        store_pos(vertex(a), pos, 0); out += ( pos[2] * halfZ_ > 0 );
+        store_pos(vertex(b), pos, 0); out += ( pos[2] * halfZ_ > 0 );
+        store_pos(vertex(c), pos, 0); out += ( pos[2] * halfZ_ > 0 );
         if ( out > 1 )
             return;
     }
@@ -355,31 +329,80 @@ void Platonic::Solid::addFace(unsigned a, unsigned b, unsigned c, int half)
 }
 
 
-void Platonic::Solid::refineFace(unsigned a, unsigned b, unsigned c, unsigned div, int half)
+void Solid::refineFace(unsigned* line, unsigned a, unsigned b, unsigned c, unsigned div)
 {
-    Corner *A = &corners_[a];
-    Corner *B = &corners_[b];
-    Corner *C = &corners_[c];
+    for ( unsigned u = 0; u <= div; ++u )
+        line[u] = getEdgeVertex(a, div-u, b, u);
     
-    unsigned* line = new unsigned[div+1];
-    
-    for ( unsigned u = 0; u <= div;  ++u )
+    for ( unsigned ii = 1; ii <= div; ++ii )
+    {
+        unsigned x = getEdgeVertex(a, div-ii, c, ii);
+        addFace(line[0], line[1], x);
+        line[0] = x;
+        
+        for ( unsigned jj = 1; ii+jj <= div; ++jj )
+        {
+            x = makeVertex(b, jj, c, ii, a, div-ii-jj);
+            addFace(line[jj-1], line[jj], x);
+            addFace(line[jj], line[jj+1], x);
+            line[jj] = x;
+        }
+    }
+}
+
+void Solid::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
+{
+    unsigned A = quad[0];
+    unsigned B = quad[1];
+    unsigned C = quad[2];
+    unsigned D = quad[3];
+
+    for ( unsigned u = 0; u <= div; ++u )
         line[u] = getEdgeVertex(A, div-u, B, u);
     
     for ( unsigned ii = 1; ii <= div; ++ii )
     {
-        unsigned X = getEdgeVertex(A, div-ii, C, ii);
-        
-        addFace(line[0], line[1], X, half);
-        line[0] = X;
-        
-        for ( unsigned jj = 1; ii+jj <= div; ++jj )
+        unsigned x = getEdgeVertex(A, div-ii, C, ii);
+        addFace(line[0], line[1], x);
+        line[0] = x;
+        unsigned stop = div-ii;
+        for ( unsigned jj = 1; jj <= stop; ++jj )
         {
-            X = makeVertex(B, jj, C, ii, A, div-ii-jj);
-            addFace(line[jj-1], line[jj], X, half);
-            addFace(line[jj], line[jj+1], X, half);
-            line[jj] = X;
+            x = makeVertex(B, jj, C, ii, A, div-ii-jj);
+            addFace(line[jj-1], line[jj], x);
+            addFace(line[jj], line[jj+1], x);
+            line[jj] = x;
         }
+        for ( unsigned jj = stop+1; jj < div; ++jj )
+        {
+            x = makeVertex(D, jj-stop, C, stop+ii-jj, B, div-ii);
+            addFace(line[jj-1], line[jj], x);
+            addFace(line[jj], line[jj+1], x);
+            line[jj] = x;
+        }
+        x = getEdgeVertex(D, ii, B, div-ii);
+        addFace(line[div-1], line[div], x);
+        line[div] = x;
+    }
+}
+
+    
+void Solid::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
+{
+    unsigned* line = new unsigned[cnt*(div+1)];
+
+    for ( unsigned c = 0; c < cnt; ++c )
+    {
+        unsigned A = inx[0];
+        unsigned B = inx[1];
+        unsigned C = inx[2];
+
+        for ( unsigned u = 0; u <= div; ++u )
+            line[div*c+u] = getEdgeVertex(A, div-u, C, u);
+    }
+    
+    for ( unsigned ii = 1; ii <= div; ++ii )
+    {
     }
     delete[] line;
 }
@@ -388,9 +411,7 @@ void Platonic::Solid::refineFace(unsigned a, unsigned b, unsigned c, unsigned di
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Platonic::Solid::refineTriangles(unsigned n_vex, FLOAT vex[][3],
-                                      unsigned n_fac, unsigned fac[][3],
-                                      unsigned div, int half = 0)
+void Solid::setCorners(unsigned n_vex, FLOAT vex[][3], unsigned div)
 {
     delete[] corners_;
     num_corners_ = n_vex;
@@ -399,30 +420,34 @@ void Platonic::Solid::refineTriangles(unsigned n_vex, FLOAT vex[][3],
     for ( unsigned c = 0; c < n_vex; ++c )
     {
         corners_[c].init(c, vex[c][0], vex[c][1], vex[c][2]);
-        // also create the vertex 'derived' from this point
-        addVertex(corners_+c, div, nullptr, 0, nullptr, 0);
+        // also create the corresponding 'derived' vertex:
+        addVertex(c, div, 0, 0, 0, 0);
     }
     num_edge_vertices_ = n_vex;
+}
 
+
+void Solid::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div)
+{
     for ( unsigned f = 0; f < n_fac; ++f )
     {
         unsigned a = fac[f][0];
         unsigned b = fac[f][1];
         unsigned c = fac[f][2];
-        
         refineEdge(a, b, div);
         refineEdge(b, c, div);
         refineEdge(c, a, div);
     }
-    
     assert_true(num_vertices_ <= max_vertices_);
     
+    unsigned* line = new unsigned[div+1];
     for ( unsigned f = 0; f < n_fac; ++f )
-        refineFace(fac[f][0], fac[f][1], fac[f][2], div, half);
+        refineFace(line, fac[f][0], fac[f][1], fac[f][2], div);
+    delete[] line;
 }
 
 
-void Platonic::Solid::initTetrahedron(unsigned div)
+void Solid::initTetrahedron(unsigned div)
 {
     constexpr FLOAT M_SQRT3 = 1.7320508075688772935274463415059;
     FLOAT a = 1.0/3.0;
@@ -445,11 +470,13 @@ void Platonic::Solid::initTetrahedron(unsigned div)
         {1, 2, 3}
     };
     
-    refineTriangles(4, vex, 4, fac, div);
+    allocate(4, 6, 4, div);
+    setCorners(4, vex, div);
+    refineTriangles(4, fac, div);
 }
 
 
-void Platonic::Solid::initOctahedron(unsigned div)
+void Solid::initOctahedron(unsigned div)
 {
     // Eight vertices on unit sphere
     FLOAT vex[6][3] = {
@@ -473,11 +500,13 @@ void Platonic::Solid::initOctahedron(unsigned div)
         {1, 4, 3}
     };
     
-    refineTriangles(6, vex, 8, fac, div);
+    allocate(6, 12, 8, div);
+    setCorners(6, vex, div);
+    refineTriangles(8, fac, div);
 }
 
 
-void Platonic::Solid::initIcosahedron(unsigned div)
+void Solid::initIcosahedron(unsigned div)
 {
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
     const FLOAT Z = 1 / std::sqrt(G*G+1.0);
@@ -523,10 +552,12 @@ void Platonic::Solid::initIcosahedron(unsigned div)
         {4,  7, 10},
     };
     
-    refineTriangles(12, vex, 20, fac, div);
+    allocate(12, 30, 20, div);
+    setCorners(12, vex, div);
+    refineTriangles(20, fac, div);
 }
 
-void Platonic::Solid::initIcosahedronRotated(unsigned div)
+void Solid::initIcosahedronRotated(unsigned div)
 {
     const FLOAT Z = std::sqrt(0.2);
     const FLOAT C = std::cos(5*M_PI_2);
@@ -571,13 +602,15 @@ void Platonic::Solid::initIcosahedronRotated(unsigned div)
         {11, 8,  7},
         {11, 9,  8},
         {11, 10, 9},
-        {11, 6, 10},
+        {11, 6, 10}
     };
     
-    refineTriangles(12, vex, 20, fac, div);
+    allocate(12, 30, 20, div);
+    setCorners(12, vex, div);
+    refineTriangles(20, fac, div);
 }
 
-void Platonic::Solid::initHemisphere(unsigned div)
+void Solid::initHemisphere(unsigned div)
 {
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
     const FLOAT Z = 1 / std::sqrt(G*G+1.0);
@@ -621,17 +654,113 @@ void Platonic::Solid::initHemisphere(unsigned div)
         {5,  2, 11},
       //{3,  4, 10},
         {6,  5, 11},
-      //{4,  7, 10},
+      //{4,  7, 10}
     };
     
     halfZ_ = 1;
     // we can skip 5 triangles which are entirely in Z > 0
-    refineTriangles(12, vex, 12, fac, div, 1);
+    allocate(12, 21, 12, div);
+    setCorners(12, vex, div);
+    refineTriangles(12, fac, div);
 }
+
+
+void Solid::initQuadrant(unsigned div)
+{
+    FLOAT vex[12][3] = {
+        { 1, 0, 0 },
+        { 0, 1, 0 },
+        { 0, 0, 1 }
+    };
+    
+    unsigned fac[1][3] = {
+        {0, 1, 2}
+    };
+    
+    allocate(3, 3, 1, div);
+    setCorners(3, vex, div);
+    refineTriangles(1, fac, div);
+}
+
+
+void Solid::initCuboid(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
+{
+    const FLOAT Xr = X + R;
+    const FLOAT Yr = Y + R;
+    const FLOAT Zr = Z + R;
+
+    FLOAT vex[24][3] = {
+        {+Xr, Y,-Z}, { Xr, Y, Z}, { Xr,-Y,-Z}, { Xr,-Y, Z},
+        {-Xr,-Y,-Z}, {-Xr,-Y, Z}, {-Xr, Y,-Z}, {-Xr, Y, Z},
+        {+X, Yr,-Z}, {-X, Yr,-Z}, { X, Yr, Z}, {-X, Yr, Z},
+        {+X,-Yr, Z}, {-X,-Yr, Z}, { X,-Yr,-Z}, {-X,-Yr,-Z},
+        {+X, Y, Zr}, {-X, Y, Zr}, { X,-Y, Zr}, {-X,-Y, Zr},
+        {+X, Y,-Zr}, { X,-Y,-Zr}, {-X, Y,-Zr}, {-X,-Y,-Zr}
+    };
+    
+    unsigned quad[18][4] = {
+        // faces
+        { 0, 1, 2, 3 }, { 4, 5, 6, 7 },
+        { 8, 9, 10, 11 }, { 12, 13, 14, 15 },
+        { 16, 17, 18, 19 }, { 20, 21, 22, 23 },
+        // parallel to the Z axis
+        { 8, 10, 0, 1 }, { 2, 3, 14, 12 },
+        { 15, 13, 4, 5 }, { 6, 7, 9, 11 },
+        // parallel to the Y axis
+        { 0, 2, 20, 21 }, { 22, 23, 6, 4 },
+        { 7, 5, 17, 19 }, { 16, 18, 1, 3 },
+        // parallel to the X axis
+        { 10, 11, 16, 17 }, { 18, 19, 12, 13 },
+        { 14, 15, 21, 23 }, { 20, 22, 8, 9 }
+    };
+    
+    unsigned fac[12][3] = {
+        { 0, 20, 8 }, { 1, 10, 16 },
+        { 2, 14, 21 },{ 3, 18, 12 },
+        { 4, 23, 15 }, { 5, 13, 19 },
+        { 7, 17, 11 }, { 6, 9, 22 }
+    };
+
+    allocate(24, 90, 44, div);
+    setCorners(24, vex, div);
+    for ( unsigned q = 0; q < 18; ++q )
+    {
+        unsigned a = quad[q][0];
+        unsigned b = quad[q][1];
+        unsigned c = quad[q][2];
+        unsigned d = quad[q][3];
+        refineEdge(a, b, div);
+        refineEdge(b, c, div);
+        refineEdge(c, a, div);
+        refineEdge(b, d, div);
+        refineEdge(c, d, div);
+    }
+    refineTriangles(8, fac, div);
+    
+    unsigned* line = new unsigned[div+1];
+    // faces
+    for ( int n = 0; n < 6; ++n )
+        refineQuad(line, quad[n], 1);
+    
+    // parallel to the Z axis
+    for ( int n = 6; n < 10; ++n )
+        refineQuad(line, quad[n], div);
+    
+    // parallel to the Y axis
+    for ( int n = 10; n < 14; ++n )
+        refineQuad(line, quad[n], div);
+
+    // parallel to the X axis
+    for ( int n = 14; n < 18; ++n )
+        refineQuad(line, quad[n], div);
+    delete[] line;
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark - vertices
 
-void Platonic::Solid::setVertices(Polyhedra kind, unsigned div)
+void Solid::setVertices(Polyhedra kind, unsigned div)
 {
     assert_true(div > 0);
     
@@ -641,6 +770,8 @@ void Platonic::Solid::setVertices(Polyhedra kind, unsigned div)
         case OCTAHEDRON: initOctahedron(div); break;
         case ICOSAHEDRON: initIcosahedron(div); break;
         case HEMISPHERE: initHemisphere(div); break;
+        case QUADRANT: initQuadrant(div); break;
+        case CUBOID: initCuboid(1, 1, 1, 0.3, div); break;
     }
     
     assert_true( num_vertices_ <= max_vertices_ );
@@ -648,24 +779,24 @@ void Platonic::Solid::setVertices(Polyhedra kind, unsigned div)
 }
 
 
-void Platonic::Solid::store_vertices(float * vec) const
+void Solid::store_vertices(float * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        vertices_[n].store_pos(vec+3*n, halfZ_);
+        store_pos(vertices_[n], vec+3*n, halfZ_);
 }
 
 
-void Platonic::Solid::store_vertices(double * vec) const
+void Solid::store_vertices(double * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        vertices_[n].store_pos(vec+3*n, halfZ_);
+        store_pos(vertices_[n], vec+3*n, halfZ_);
 }
 
 
 //------------------------------------------------------------------------------
 #pragma mark - edges
 
-void Platonic::Solid::addEdge(unsigned a, unsigned b)
+void Solid::addEdge(unsigned a, unsigned b)
 {
     edges_[2*num_edges_  ] = a;
     edges_[2*num_edges_+1] = b;
@@ -673,7 +804,7 @@ void Platonic::Solid::addEdge(unsigned a, unsigned b)
 }
 
 
-void Platonic::Solid::setEdges()
+void Solid::setEdges()
 {
     delete[] edges_;
     edges_ = new unsigned[2*max_edges_];
@@ -693,4 +824,4 @@ void Platonic::Solid::setEdges()
     assert_true( num_edges_ <= max_edges_ );
 }
 
-
+} // namespace

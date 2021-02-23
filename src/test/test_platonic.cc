@@ -43,7 +43,7 @@ void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c) 
     {
-        case 'k': kind = ( kind + 1 ) % 4;      break;
+        case 'k': kind = ( kind + 1 ) % 6;      break;
         case ']': rank += 1;                    break;
         case '[': rank = std::max(rank-1, 1);   break;
         case '}': rank += 16;                   break;
@@ -51,6 +51,7 @@ void processNormalKey(unsigned char c, int x, int y)
         case 's': style = ( style + 1 ) % 4;    break;
         case 'e': showEdges = !showEdges;       break;
         case 't': showFaces = !showFaces;       break;
+        case 'i': showVertices = !showVertices; break;
         case 'p': showVertices = !showVertices; break;
         case ' ': break; // update the Platonic
         default: glApp::processNormalKey(c,x,y); return;
@@ -192,7 +193,7 @@ void display(View&, int)
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
     
-    if ( 1 )
+    if ( 0 )
     {
         glLineWidth(1);
         glPointSize(10);
@@ -221,9 +222,17 @@ void display(View&, int)
     }
     if ( showEdges )
     {
+#if 1
+        glLineWidth(0.25);
+        glColor3f(1, 1, 1);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        drawFaces();
+        glPolygonMode(GL_FRONT, GL_FILL);
+#else
         if ( ico->nb_edges() == 0 )
             ico->setEdges();
         drawEdges();
+#endif
     }
     if ( showVertices )
     {
