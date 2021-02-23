@@ -1779,7 +1779,8 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try {
 #if FIBER_HAS_LATTICE
-            frLattice.setRange(abscissaM(), abscissaP());
+            if ( frLattice.ready() )
+                frLattice.setRange(abscissaM(), abscissaP());
             frLattice.read(in);
 #else
             FiberLattice dummy;
@@ -1797,7 +1798,8 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try {
 #if FIBER_HAS_MESH
-            frMesh.setRange(abscissaM(), abscissaP());
+            if ( frMesh.ready() )
+                frMesh.setRange(abscissaM(), abscissaP());
             frMesh.read(in);
 #else
             Lattice<real> dummy;

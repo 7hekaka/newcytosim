@@ -874,7 +874,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
     switch ( style )
     {
         case 1: { // display plain lines:
-            gle_color c = fib.prop->disp->color;
+            gle_color c = fib.disp->color;
             for ( i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = fluteVC{fib.posP(i), c};
         } break;
