@@ -306,35 +306,61 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 #include "opengl.h"
+#include "gle.h"
+#include "gle_flute.h"
+#include "platonic.h"
 
-void SpaceDice::drawEdges() const
+void SpaceDice::draw2D() const
 {
     const size_t CNT = 128;
-#if ( DIM > 2 )
-    const GLfloat X(half_[0] - edge_);
-    const GLfloat Y(half_[1] - edge_);
-    const GLfloat Z(half_[2] - edge_);
-    glDisable(GL_LIGHTING);
-    glLineStipple(1, 0x000F);
-    glEnable(GL_LINE_STIPPLE);
-    drawSection(0, -X, CNT);
-    drawSection(0,  X, CNT);
-    drawSection(1, -Y, CNT);
-    drawSection(1,  Y, CNT);
-    drawSection(2, -Z, CNT);
-    drawSection(2,  Z, CNT);
-    glDisable(GL_LINE_STIPPLE);
-#else
     drawSection(2, 0, CNT);
-#endif
 }
 
-void SpaceDice::drawFaces() const
+void SpaceDice::draw3D() const
 {
-    const GLfloat X(half_[0] - edge_);
-    const GLfloat Y(half_[1] - edge_);
-    const GLfloat Z(half_[2] - edge_);
- 
+    const float X(half_[0] - edge_);
+    const float Y(half_[1] - edge_);
+    const float Z(half_[2] - edge_);
+    
+    Platonic::Solid mesh;
+    mesh.initDice(X, Y, Z, edge_, gle::finesse);
+    
+    size_t cnt = mesh.nb_vertices();
+#if 0
+    fluteV * flu = gle::mapVertexBuffer(cnt);
+    mesh.store_vertices((float*)flu);
+    gle::unmapVertexBuffer();
+#else
+    glBindBuffer(GL_ARRAY_BUFFER, gle::stream_[0]);
+    glBufferData(GL_ARRAY_BUFFER, 3*cnt*sizeof(float), nullptr, GL_STREAM_DRAW);
+    float * flu = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    mesh.store_vertices(flu);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glVertexPointer(3, GL_FLOAT, 0, nullptr);
+    glNormalPointer(GL_FLOAT, 0, nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+#endif
+
+#if 0
+    glDisable(GL_LIGHTING);
+    glPointSize(4);
+    glDrawArrays(GL_POINTS, 0, cnt);
+    glEnable(GL_LIGHTING);
+#endif
+
+    size_t tri = 3 * ( mesh.nb_faces() - 12 );
+    unsigned* inx = gle::mapIndexBuffer(tri);
+    memcpy(inx, mesh.face_data(), tri*sizeof(unsigned));
+    gle::unmapIndexBuffer();
+    
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_INT, nullptr);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+#if 1
+    // that is just to get the normals right
     const GLfloat XR(half_[0]);
     const GLfloat YR(half_[1]);
     const GLfloat ZR(half_[2]);
@@ -348,18 +374,19 @@ void SpaceDice::drawFaces() const
         +X, Y,-ZR, X,-Y,-ZR,-X, Y,-ZR,-X,-Y,-ZR,
     };
     glVertexPointer(3, GL_FLOAT, 0, pts);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 8, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP,12, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP,16, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP,20, 4);
+    glNormal3f(+1,0,0); glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glNormal3f(-1,0,0); glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
+    glNormal3f(0,+1,0); glDrawArrays(GL_TRIANGLE_STRIP, 8, 4);
+    glNormal3f(0,-1,0); glDrawArrays(GL_TRIANGLE_STRIP,12, 4);
+    glNormal3f(0,0,+1); glDrawArrays(GL_TRIANGLE_STRIP,16, 4);
+    glNormal3f(0,0,-1); glDrawArrays(GL_TRIANGLE_STRIP,20, 4);
+#endif
 }
 
 #else
 
-void SpaceDice::drawFaces() const {}
-void SpaceDice::drawEdges() const {}
+void SpaceDice::draw2D() const {}
+void SpaceDice::draw3D() const {}
 
 #endif
 

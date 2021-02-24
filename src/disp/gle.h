@@ -53,6 +53,9 @@ namespace gle
 #else
     inline float invsqrt(float x) { return x / sqrtf(x); }
 #endif
+    
+    /// OpenGL buffers objects for streaming
+    extern GLuint stream_[4];
 
 #pragma mark -
     

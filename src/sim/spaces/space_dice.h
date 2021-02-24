@@ -88,18 +88,11 @@ public:
     /// read from file
     void read(Inputter&, Simul&, ObjectTag);
     
-    
     /// OpenGL display function
-    void drawFaces() const;
-    
-    /// OpenGL display function
-    void drawEdges() const;
+    void draw2D() const;
 
     /// OpenGL display function
-    void draw3D() const { drawFaces(); drawEdges(); }
-    
-    /// OpenGL display function
-    void draw2D() const { drawEdges(); }
+    void draw3D() const;
 };
 
 #endif

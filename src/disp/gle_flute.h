@@ -34,6 +34,10 @@ namespace gle
     fluteVC* mapVertexColorBuffer(size_t);
     void  unmapVertexColorBuffer();
     void   bindVertexColorBuffer(size_t);
+    
+    unsigned* mapIndexBuffer(size_t);
+    void  unmapIndexBuffer();
+    void   bindIndexBuffer(size_t);
 };
 
 #endif

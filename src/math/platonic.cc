@@ -8,9 +8,7 @@
 namespace Platonic
 {
 
-//------------------------------------------------------------------------------
-#pragma mark - Vertex
-        
+
 // return 'a < b'
 bool Vertex::smaller(unsigned a, unsigned b)
 {
@@ -75,68 +73,6 @@ bool Vertex::equivalent(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 }
 
 
-void Solid::store_pos(Vertex const& vex, double ptr[3], int half) const
-{
-    assert_true( vex.sum_weights() > 0 );
-    
-    double X = 0, Y = 0, Z = 0;
-    for ( int i = 0; i < 3; ++i )
-    {
-        FLOAT W = (FLOAT)vex.weight_[i];
-        if ( W )
-        {
-            Corner const& v = corners_[vex.index_[i]];
-            X += W * v.pos_[0];
-            Y += W * v.pos_[1];
-            Z += W * v.pos_[2];
-        }
-    }
-    
-    if ( half * Z > 0 )
-        Z = 0;
-
-    // normalize:
-    double n = X*X + Y*Y + Z*Z;
-    if ( n > 0 )
-        n = 1.0 / std::sqrt(n);
-    else
-        n = 1.0 / vex.sum_weights();
-    ptr[0] = X * n;
-    ptr[1] = Y * n;
-    ptr[2] = Z * n;
-}
-
-void Solid::store_pos(Vertex const& vex, float ptr[3], int half) const
-{
-    assert_true( vex.sum_weights() > 0 );
-    
-    float X = 0, Y = 0, Z = 0;
-    for ( int i = 0; i < 3; ++i )
-    {
-        float W = (float)vex.weight_[i];
-        if ( W )
-        {
-            Corner const& v = corners_[vex.index_[i]];
-            X += W * v.pos_[0];
-            Y += W * v.pos_[1];
-            Z += W * v.pos_[2];
-        }
-    }
-    
-    if ( half * Z > 0 )
-        Z = 0;
-    
-    //normalize:
-    float n = X*X + Y*Y + Z*Z;
-    if ( n > 0 )
-        n = 1.f / std::sqrt(n);
-    else
-        n = 1.f / vex.sum_weights();
-    ptr[0] = X * n;
-    ptr[1] = Y * n;
-    ptr[2] = Z * n;
-}
-
 void Vertex::print(unsigned inx, std::ostream& out) const
 {
     out << "P" << inx << " = ( ";
@@ -157,6 +93,7 @@ void Vertex::print(unsigned inx, std::ostream& out) const
     }
     out << " )" << std::endl;
 }
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Solid
@@ -179,7 +116,13 @@ void Solid::build()
     edges_        = nullptr;
     
     coordinates_  = nullptr;
-    halfZ_        = 0;
+    
+    kind_ = 0;
+    halfZ_ = 0;
+    
+    for ( int i = 0; i < 3; ++i )
+        length_[i] = 0;
+    length_[3] = 1;
 }
 
 
@@ -196,13 +139,31 @@ void Solid::allocate(unsigned V, unsigned E, unsigned F, unsigned N)
 }
 
 
+void Solid::build(Polyhedra kind, unsigned div)
+{
+    assert_true(div > 0);
+    switch( kind )
+    {
+        case UNSET: break;
+        case TETRAHEDRON: initTetrahedron(div); break;
+        case OCTAHEDRON: initOctahedron(div); break;
+        case ICOSAHEDRON: initIcosahedron(div); break;
+        case HEMISPHERE: initHemisphere(div); break;
+        case DICE: initDice(0.7, 0.7, 0.7, 0.3, div); break;
+    }
+    
+    assert_true( num_vertices_ <= max_vertices_ );
+    assert_true( num_faces_ <= max_faces_ );
+}
+
+    
 Solid::Solid(Polyhedra kind, unsigned div, int make)
 {
     build();
     
     if ( div > 0 )
     {
-        setVertices(kind, div);
+        build(kind, div);
         if ( make )
         {
             coordinates_ = new float[3*max_vertices_];
@@ -316,9 +277,9 @@ void Solid::addFace(unsigned a, unsigned b, unsigned c)
         // reject face if 2 corners are outside
         FLOAT pos[3];
         int out = 0;
-        store_pos(vertex(a), pos, 0); out += ( pos[2] * halfZ_ > 0 );
-        store_pos(vertex(b), pos, 0); out += ( pos[2] * halfZ_ > 0 );
-        store_pos(vertex(c), pos, 0); out += ( pos[2] * halfZ_ > 0 );
+        interpolate(vertex(a), pos, 0); out += ( pos[2] * halfZ_ > 0 );
+        interpolate(vertex(b), pos, 0); out += ( pos[2] * halfZ_ > 0 );
+        interpolate(vertex(c), pos, 0); out += ( pos[2] * halfZ_ > 0 );
         if ( out > 1 )
             return;
     }
@@ -386,7 +347,7 @@ void Solid::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
     }
 }
 
-    
+    /// unfinished
 void Solid::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
 {
     unsigned* line = new unsigned[cnt*(div+1)];
@@ -449,6 +410,7 @@ void Solid::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div)
 
 void Solid::initTetrahedron(unsigned div)
 {
+    kind_ = TETRAHEDRON;
     constexpr FLOAT M_SQRT3 = 1.7320508075688772935274463415059;
     FLOAT a = 1.0/3.0;
     FLOAT b = M_SQRT2/3.0;
@@ -478,6 +440,7 @@ void Solid::initTetrahedron(unsigned div)
 
 void Solid::initOctahedron(unsigned div)
 {
+    kind_ = OCTAHEDRON;
     // Eight vertices on unit sphere
     FLOAT vex[6][3] = {
         { 0,  0,  1},
@@ -508,6 +471,7 @@ void Solid::initOctahedron(unsigned div)
 
 void Solid::initIcosahedron(unsigned div)
 {
+    kind_ = ICOSAHEDRON;
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
     const FLOAT Z = 1 / std::sqrt(G*G+1.0);
     const FLOAT T = G * Z;
@@ -559,6 +523,7 @@ void Solid::initIcosahedron(unsigned div)
 
 void Solid::initIcosahedronRotated(unsigned div)
 {
+    kind_ = ICOSAHEDRON;
     const FLOAT Z = std::sqrt(0.2);
     const FLOAT C = std::cos(5*M_PI_2);
     const FLOAT S = std::sin(5*M_PI_2);
@@ -612,6 +577,7 @@ void Solid::initIcosahedronRotated(unsigned div)
 
 void Solid::initHemisphere(unsigned div)
 {
+    kind_ = HEMISPHERE;
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
     const FLOAT Z = 1 / std::sqrt(G*G+1.0);
     const FLOAT T = G * Z;
@@ -665,26 +631,14 @@ void Solid::initHemisphere(unsigned div)
 }
 
 
-void Solid::initQuadrant(unsigned div)
+void Solid::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
 {
-    FLOAT vex[12][3] = {
-        { 1, 0, 0 },
-        { 0, 1, 0 },
-        { 0, 0, 1 }
-    };
+    kind_ = DICE;
+    length_[0] = X;
+    length_[1] = Y;
+    length_[2] = Z;
+    length_[3] = R;
     
-    unsigned fac[1][3] = {
-        {0, 1, 2}
-    };
-    
-    allocate(3, 3, 1, div);
-    setCorners(3, vex, div);
-    refineTriangles(1, fac, div);
-}
-
-
-void Solid::initCuboid(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
-{
     const FLOAT Xr = X + R;
     const FLOAT Yr = Y + R;
     const FLOAT Zr = Z + R;
@@ -738,58 +692,154 @@ void Solid::initCuboid(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
     refineTriangles(8, fac, div);
     
     unsigned* line = new unsigned[div+1];
+    // edges parallel to the Z axis
+    for ( int n = 6; n < 10; ++n )
+        refineQuad(line, quad[n], div);
+    
+    // edges parallel to the Y axis
+    for ( int n = 10; n < 14; ++n )
+        refineQuad(line, quad[n], div);
+
+    // edges parallel to the X axis
+    for ( int n = 14; n < 18; ++n )
+        refineQuad(line, quad[n], div);
+
     // faces
     for ( int n = 0; n < 6; ++n )
         refineQuad(line, quad[n], 1);
     
-    // parallel to the Z axis
-    for ( int n = 6; n < 10; ++n )
-        refineQuad(line, quad[n], div);
-    
-    // parallel to the Y axis
-    for ( int n = 10; n < 14; ++n )
-        refineQuad(line, quad[n], div);
-
-    // parallel to the X axis
-    for ( int n = 14; n < 18; ++n )
-        refineQuad(line, quad[n], div);
     delete[] line;
 }
 
 
 //------------------------------------------------------------------------------
-#pragma mark - vertices
+#pragma mark - Solid vertices
 
-void Solid::setVertices(Polyhedra kind, unsigned div)
+template < typename REAL >
+void scale(REAL& X, REAL& Y, REAL& Z, REAL n)
 {
-    assert_true(div > 0);
-    
-    switch( kind )
+    X *= n;
+    Y *= n;
+    Z *= n;
+}
+
+
+template < typename REAL >
+void project(REAL* X)
+{
+    REAL n = 1.0 / std::sqrt(X[0]*X[0] + X[1]*X[1] + X[2]*X[2]);
+    X[0] *= n;
+    X[1] *= n;
+    X[2] *= n;
+}
+
+
+template < typename REAL >
+void projectDice(REAL* X, const REAL len[4])
+{
+    REAL px = std::min(len[0], std::max(-len[0], X[0]));
+    REAL py = std::min(len[1], std::max(-len[1], X[1]));
+    REAL pz = std::min(len[2], std::max(-len[2], X[2]));
+
+    REAL n = 0;
+    n += ( X[0] - px ) * ( X[0] - px );
+    n += ( X[1] - py ) * ( X[1] - py );
+    n += ( X[2] - pz ) * ( X[2] - pz );
+    n = len[3] / sqrt(n);
+    X[0] = px + n * ( X[0] - px );
+    X[1] = py + n * ( X[1] - py );
+    X[2] = pz + n * ( X[2] - pz );
+}
+
+
+void Solid::interpolate(Vertex const& vex, double ptr[3], int half) const
+{
+    double X = 0, Y = 0, Z = 0, S = 0;
+    for ( int i = 0; i < 3; ++i )
     {
-        case TETRAHEDRON: initTetrahedron(div); break;
-        case OCTAHEDRON: initOctahedron(div); break;
-        case ICOSAHEDRON: initIcosahedron(div); break;
-        case HEMISPHERE: initHemisphere(div); break;
-        case QUADRANT: initQuadrant(div); break;
-        case CUBOID: initCuboid(1, 1, 1, 0.3, div); break;
+        FLOAT W = (FLOAT)vex.weight_[i];
+        if ( W )
+        {
+            Corner const& v = corners_[vex.index_[i]];
+            X += W * v.pos_[0];
+            Y += W * v.pos_[1];
+            Z += W * v.pos_[2];
+            S += W;
+        }
     }
+    assert_true( S > 0 );
+
+    if ( half * Z > 0 )
+        Z = 0;
+
+    scale(X, Y, Z, 1.0/S);
+    ptr[0] = X;
+    ptr[1] = Y;
+    ptr[2] = Z;
+}
+
+
+void Solid::interpolate(Vertex const& vex, float ptr[3], int half) const
+{
+    float X = 0, Y = 0, Z = 0, S = 0;
+    for ( int i = 0; i < 3; ++i )
+    {
+        float W = (float)vex.weight_[i];
+        if ( W )
+        {
+            Corner const& v = corners_[vex.index_[i]];
+            X += W * v.pos_[0];
+            Y += W * v.pos_[1];
+            Z += W * v.pos_[2];
+            S += W;
+        }
+    }
+    assert_true( S > 0 );
+
+    if ( half * Z > 0 )
+        Z = 0;
     
-    assert_true( num_vertices_ <= max_vertices_ );
-    assert_true( num_faces_ <= max_faces_ );
+    scale(X, Y, Z, 1.f/S);
+    ptr[0] = X;
+    ptr[1] = Y;
+    ptr[2] = Z;
 }
 
 
 void Solid::store_vertices(float * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        store_pos(vertices_[n], vec+3*n, halfZ_);
+        interpolate(vertices_[n], vec+3*n, halfZ_);
+    
+    if ( kind_ == DICE )
+    {
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            projectDice(vec+3*n, length_);
+    }
+    else
+    {
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            project(vec+3*n);
+    }
 }
 
 
 void Solid::store_vertices(double * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        store_pos(vertices_[n], vec+3*n, halfZ_);
+        interpolate(vertices_[n], vec+3*n, halfZ_);
+    
+    if ( kind_ == DICE )
+    {
+        double len[4] = { length_[0], length_[1], length_[2], length_[3] };
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            projectDice(vec+3*n, len);
+    }
+    else
+    {
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            project(vec+3*n);
+    }
 }
 
 

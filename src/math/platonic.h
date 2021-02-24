@@ -79,9 +79,12 @@ namespace Platonic
     {
     public:
         /// regular polyhedra made of triangles
-        enum Polyhedra { TETRAHEDRON=0, OCTAHEDRON=1, ICOSAHEDRON=2, HEMISPHERE=3, QUADRANT=4, CUBOID=5 };
+        enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3, HEMISPHERE=4, DICE=5 };
 
     private:
+        /// dimensions
+        FLOAT    length_[4];
+        
         /// Array of coordinates of all vertices
         float  * coordinates_;
         
@@ -97,10 +100,12 @@ namespace Platonic
         /// Array of indices of the points making the faces
         unsigned *faces_;
         
+        /// number of primary vertices
         unsigned num_corners_;
         
         unsigned num_vertices_, max_vertices_;
         
+        /// number of vertices on the edges between primary corners
         unsigned num_edge_vertices_;
         
         /// number of faces
@@ -110,43 +115,41 @@ namespace Platonic
         unsigned num_edges_, max_edges_;
         
         /// defining which Z half space for hemisphere
-        int halfZ_;
+        FLOAT halfZ_;
         
+        /// 
+        int kind_;
         
         unsigned findEdgeVertex(unsigned, unsigned, unsigned, unsigned) const;
         unsigned getEdgeVertex(unsigned, unsigned, unsigned, unsigned) const;
         unsigned addVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
         unsigned makeVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
         
-        void init(unsigned, FLOAT* vdata[3], unsigned, unsigned* fdata[3], unsigned);
         void setCorners(unsigned, FLOAT vex[][3], unsigned div);
         void refineTriangles(unsigned, unsigned fac[][3], unsigned div);
         
-        void initTetrahedron(unsigned div);
-        void initOctahedron(unsigned div);
-        void initIcosahedron(unsigned div);
-        void initIcosahedronRotated(unsigned div);
-        void initHemisphere(unsigned div);
-        void initQuadrant(unsigned div);
-        void initCuboid(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div);
-        
-        void setVertices(Polyhedra K, unsigned div);
         void addFace(unsigned, unsigned, unsigned);
         void addEdge(unsigned, unsigned);
         void refineEdge(unsigned a, unsigned b, unsigned div);
         void refineFace(unsigned*, unsigned a, unsigned b, unsigned c, unsigned div);
         void refineQuad(unsigned*, unsigned quad[4], unsigned div);
         void refineStrip(unsigned cnt, unsigned inx[], unsigned div);
-        void store_pos(Vertex const&, float vec[3], int half) const;
-        void store_pos(Vertex const&, double vec[3], int half) const;
+        
+        void build();
+        void build(Polyhedra K, unsigned div);
+        void allocate(unsigned nv, unsigned ne, unsigned nf, unsigned div);
+
+        void interpolate(Vertex const&, float vec[3], int half) const;
+        void interpolate(Vertex const&, double vec[3], int half) const;
 
     public:
         
-        /// reset pointers
-        void build();
-        
-        /// allocates memory
-        void allocate(unsigned n_vertices, unsigned n_edges, unsigned n_faces, unsigned div);
+        void initTetrahedron(unsigned div);
+        void initOctahedron(unsigned div);
+        void initIcosahedron(unsigned div);
+        void initIcosahedronRotated(unsigned div);
+        void initHemisphere(unsigned div);
+        void initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div);
 
         /// build as polyhedra refined by order `div`
         Solid(Polyhedra, unsigned div, int make = 0);
@@ -202,7 +205,7 @@ namespace Platonic
         unsigned int nb_faces()        const { return num_faces_; }
         
         /// array of indices to the vertices in each face (3 vertices per face)
-        unsigned int* faces_data()     const { return faces_; }
+        unsigned int* face_data()     const { return faces_; }
         
         /// return address of first vertex of face `f`
         const float* face_data0(int f) const { return coordinates_ + 3 * faces_[3*f]; }

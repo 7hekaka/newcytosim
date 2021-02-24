@@ -7,9 +7,6 @@
 
 namespace gle
 {
-    /// defined in gle.cc
-    extern GLuint stream_[4];
-    
     static GLuint boundBuffer()
     {
         GLint i = 0;
@@ -40,6 +37,7 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
+    
     fluteVN* mapVertexNormalBuffer(size_t cnt)
     {
         glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
@@ -52,16 +50,19 @@ namespace gle
         assert_true(stream_[1] == boundBuffer());
         //glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
         glUnmapBuffer(GL_ARRAY_BUFFER);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, 0, nullptr);
+        glNormalPointer(GL_FLOAT, sizeof(fluteVN), (void*)(DIM>2?0x10:0x8));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
     void bindVertexNormalBuffer(size_t skip)
     {
         glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
-        glNormalPointer(GL_FLOAT, skip*sizeof(fluteVN), nullptr);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(fluteVN), nullptr);
+        glNormalPointer(GL_FLOAT, skip*sizeof(fluteVN), (void*)(DIM>2?0x10:0x8));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+    
     
     fluteVC* mapVertexColorBuffer(size_t cnt)
     {
@@ -88,4 +89,19 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
+    
+    unsigned* mapIndexBuffer(size_t cnt)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, stream_[3]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cnt*sizeof(unsigned), nullptr, GL_STREAM_DRAW);
+        return (unsigned*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+    }
+    
+    void unmapIndexBuffer()
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, stream_[3]);
+        glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
 };
