@@ -250,7 +250,13 @@ void SphericalCode::setForces( real forces[], real threshold )
 
 
 /**
- Move the points in the direction of the forces, with scaling factor S 
+ Move the points in the direction of the forces, with scaling factor S
+ 
+ @todo: use Newton's method to optimize the energy, rather than a fixed step
+ 
+     x = x - F'(x) / F''(x)
+ 
+ where F(x) = energy of configuration
  */
 void SphericalCode::refinePoints( real Pnew[], const real Pold[], real forces[], real S )
 {

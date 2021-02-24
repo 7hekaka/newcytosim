@@ -323,7 +323,7 @@ void SpaceDice::draw3D() const
     const float Z(half_[2] - edge_);
     
     Tesselator mesh;
-    mesh.initDice(X, Y, Z, edge_, gle::finesse);
+    mesh.initDice(X, Y, Z, edge_, gle::finesse, 1);
     
     size_t cnt = mesh.nb_vertices();
 #if 0
@@ -348,6 +348,7 @@ void SpaceDice::draw3D() const
     glEnable(GL_LIGHTING);
 #endif
 
+    // remove the last 12 triangles, corresponding to the faces
     size_t tri = 3 * ( mesh.nb_faces() - 12 );
     unsigned* inx = gle::mapIndexBuffer(tri);
     memcpy(inx, mesh.face_data(), tri*sizeof(unsigned));

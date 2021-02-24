@@ -146,7 +146,7 @@ public:
     void initIcosahedron(unsigned div);
     void initIcosahedronRotated(unsigned div);
     void initHemisphere(unsigned div);
-    void initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div);
+    void initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid);
     
     /// build as polyhedra refined by order `div`
     Tesselator(Polyhedra, unsigned div, int make = 0);

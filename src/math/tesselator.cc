@@ -146,7 +146,7 @@ void Tesselator::build(Polyhedra kind, unsigned div)
         case OCTAHEDRON: initOctahedron(div); break;
         case ICOSAHEDRON: initIcosahedron(div); break;
         case HEMISPHERE: initHemisphere(div); break;
-        case DICE: initDice(12, 7, 7, 3, div); break;
+        case DICE: initDice(0.7, 0.5, 0.5, 0.3, div, div); break;
     }
     
     assert_true( num_vertices_ <= max_vertices_ );
@@ -633,7 +633,10 @@ void Tesselator::initHemisphere(unsigned div)
 }
 
 
-void Tesselator::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
+/**
+ This divides the edges by 'div' and the 6 square faces bi 'vid'
+ */
+void Tesselator::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid)
 {
     kind_ = DICE;
     length_[0] = X;
@@ -655,10 +658,9 @@ void Tesselator::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
     };
     
     unsigned quad[18][4] = {
-        // faces
-        { 0, 1, 2, 3 }, { 4, 5, 6, 7 },
-        { 8, 9, 10, 11 }, { 12, 13, 14, 15 },
-        { 16, 17, 18, 19 }, { 20, 21, 22, 23 },
+        { 0, 1, 2, 3 }, { 4, 5, 6, 7 },         // faces at +X and -X
+        { 8, 9, 10, 11 }, { 12, 13, 14, 15 },   // faces at +Y and -Y
+        { 16, 17, 18, 19 }, { 20, 21, 22, 23 }, // faces at +Z and -Z
         // parallel to the Z axis
         { 8, 10, 0, 1 }, { 2, 3, 14, 12 },
         { 15, 13, 4, 5 }, { 6, 7, 9, 11 },
@@ -694,21 +696,21 @@ void Tesselator::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
     refineTriangles(8, fac, div);
     
     unsigned* line = new unsigned[div+1];
-    // edges parallel to the Z axis
+    // 4 edges parallel to the Z axis
     for ( int n = 6; n < 10; ++n )
         refineQuad(line, quad[n], div);
     
-    // edges parallel to the Y axis
+    // 4 edges parallel to the Y axis
     for ( int n = 10; n < 14; ++n )
         refineQuad(line, quad[n], div);
 
-    // edges parallel to the X axis
+    // 4 edges parallel to the X axis
     for ( int n = 14; n < 18; ++n )
         refineQuad(line, quad[n], div);
 
     // faces
     for ( int n = 0; n < 6; ++n )
-        refineQuad(line, quad[n], div);
+        refineQuad(line, quad[n], vid);
     
     delete[] line;
 }
@@ -890,13 +892,16 @@ void Tesselator::exportPLY(FILE* f) const
     fprintf(f, "property float z\n");
     fprintf(f, "element face %u\n", num_faces_);
     fprintf(f, "property list uchar int vertex_index\n");
+//    fprintf(f, "property uint vertex0\n");
+//    fprintf(f, "property uint vertex1\n");
+//    fprintf(f, "property uint vertex2\n");
     fprintf(f, "end_header\n");
     
     for ( unsigned u = 0; u < num_vertices_; ++u )
         fprintf(f, "%5.3f %5.3f %5.3f\n", vex_[3*u], vex_[3*u+1], vex_[3*u+2]);
     
     for ( unsigned u = 0; u < num_faces_; ++u )
-        fprintf(f, "%u %u %u\n", faces_[3*u], faces_[3*u+1], faces_[3*u+2]);
+        fprintf(f, "3 %u %u %u\n", faces_[3*u], faces_[3*u+1], faces_[3*u+2]);
 }
 
 

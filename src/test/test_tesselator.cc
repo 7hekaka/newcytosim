@@ -38,68 +38,65 @@ void setTesselator()
     initVBO();
 }
 
-void exportPLY()
+FILE * openFile(const char name[])
 {
-    FILE * f = fopen("mesh.ply", "w");
+    FILE * f = fopen(name, "w");
 
     if ( !f || ferror(f) )
     {
-        fprintf(stderr, "input file could not be opened");
-        return;
+        glApp::flashText("input file could not be opened");
+        return nullptr;
     }
     if ( ferror(f) )
     {
         fclose(f);
-        fprintf(stderr, "input file opened with error");
-        return;
+        glApp::flashText("input file opened with error");
+        return nullptr;
     }
+    return f;
+}
 
-    ico->exportPLY(f);
-    fclose(f);
+
+void exportPLY()
+{
+    FILE * f = openFile("mesh.ply");
+    if ( f ) {
+        ico->exportPLY(f);
+        fclose(f);
+        glApp::flashText("exported `mesh.ply'");
+    }
 }
 
 void exportSTL()
 {
-    FILE * f = fopen("mesh.stl", "wb");
-
-    if ( !f || ferror(f) )
-    {
-        fprintf(stderr, "input file could not be opened");
-        return;
-    }
-    if ( ferror(f) )
-    {
+    FILE * f = openFile("mesh.stl");
+    if ( f ) {
+        ico->exportSTL(f);
         fclose(f);
-        fprintf(stderr, "input file opened with error");
-        return;
+        glApp::flashText("exported `mesh.stl'");
     }
-
-    ico->exportSTL(f);
-    fclose(f);
 }
 
 void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c) 
     {
-        case 'y': exportPLY();                  break;
-        case 'Y': exportSTL();                  break;
-        case 'k': kind = ( kind + 1 ) % 6;      break;
-        case ']': rank += 1;                    break;
-        case '[': rank = std::max(rank-1, 1);   break;
-        case '}': rank += 16;                   break;
-        case '{': rank = std::max(rank-16, 1);  break;
-        case 's': style = ( style + 1 ) % 4;    break;
-        case 'e': showEdges = !showEdges;       break;
-        case 't': showFaces = !showFaces;       break;
-        case 'p': showVertices = !showVertices; break;
         case ' ': break; // update the Platonic
+        case 'k': kind = ( kind + 1 ) % 6; break;
+        case ']': rank += 1; break;
+        case '}': rank += 16; break;
+        case '[': rank = std::max(rank-1, 1); break;
+        case '{': rank = std::max(rank-16, 1); break;
+        case 'y': exportPLY(); return;
+        case 'Y': exportSTL(); return;
+        case 'e': showEdges = !showEdges; return;
+        case 't': showFaces = !showFaces; return;
+        case 'p': showVertices = !showVertices; return;
+        case 's': style = ( style + 1 ) % 4; glApp::flashText("style = %i", style); return;
         default: glApp::processNormalKey(c,x,y); return;
     }
     
     setTesselator();
-    
-    glApp::flashText("style = %i", style);
     glutPostRedisplay();
 }
 
