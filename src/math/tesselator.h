@@ -1,16 +1,29 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#ifndef PLATONIC_H
-#define PLATONIC_H
+#ifndef TESSELATOR_H
+#define TESSELATOR_H
 
 #include <iostream>
 
-namespace Platonic
+/// Provides a triangulation of a surface made by refining a Platonic solid
+/**
+ Platonic solids made of triangles are refined by subdividing the faces
+ into smaller triangles. The faces are re-assembled to cover the surface
+ without duplicating vertices.
+ 
+ The level of refinement is set by an integer N > 0, corresponding to the
+ number of section in which each edge of the original Platonic solid is divided.
+ */
+class Tesselator
 {
-    /// floating type used by Platonic
+public:
+    /// floating type used for calculations
     typedef float FLOAT;
 
-    /// One of the corner of a Platonic solid
+    /// starting shapes
+    enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3, HEMISPHERE=4, DICE=5 };
+
+    /// One of the vertex of the template model
     struct Corner
     {
         /// Coordinates in space
@@ -61,26 +74,10 @@ namespace Platonic
         
         unsigned sum_weights() const { return weight_[0]+weight_[1]+weight_[2]; }
         
-        void     print(unsigned, std::ostream&) const;
+        void print(unsigned, std::ostream&) const;
     };
     
     
-    /// A refined polyhedra to serve as a tesselation
-    /**
-     Platonic solids made of triangles can be refined by subdividing the faces
-     into smaller triangles. The faces are re-assembled together into the Solid
-     without duplicating points.
-     
-     The level of refinement is set by an integer N > 0, corresponding to the 
-     number of section in which each edge of the original Platonic solid is divided.
-     
-     */
-    class Solid
-    {
-    public:
-        /// regular polyhedra made of triangles
-        enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3, HEMISPHERE=4, DICE=5 };
-
     private:
         /// dimensions
         FLOAT    length_[4];
@@ -152,13 +149,13 @@ namespace Platonic
         void initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div);
 
         /// build as polyhedra refined by order `div`
-        Solid(Polyhedra, unsigned div, int make = 0);
+        Tesselator(Polyhedra, unsigned div, int make = 0);
         
         /// build as empty structure
-        Solid() { build(); }
+        Tesselator() { build(); }
 
         /// destructor
-        ~Solid();
+        ~Tesselator();
         
         /// set array of indices that define the edges
         void     setEdges();
@@ -220,7 +217,6 @@ namespace Platonic
         unsigned face_indx1(int f)     const { return faces_[3*f+1]; }
         /// return index of third vertex in face `f`
         unsigned face_indx2(int f)     const { return faces_[3*f+2]; }
-    };
-}
+};
 
 #endif

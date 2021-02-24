@@ -26,7 +26,7 @@ vpath %.cc $(INCDIR)
 vpath %.c  $(INCDIR)
 vpath %.o  build
 
-OBJ=random.o exceptions.o vector3.o platonic.o\
+OBJ=random.o exceptions.o vector3.o tesselator.o\
     glossary.o filepath.o parameter.o iomessages.o filewrapper.o\
 	glapp.o gle.o gle_flute.o gle_color.o object.o blank.o
 

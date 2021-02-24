@@ -33,7 +33,7 @@ vpath %.o  build
 
 OBJ=exceptions.o vector3.o glossary.o property.o backtrace.o offscreen.o\
     tokenizer.o stream_func.o print_color.o view.o view_prop.o glapp.o\
-    gle.o gle_flute.o platonic.o gle_color.o gle_color_list.o tictoc.o filepath.o\
+    gle.o gle_flute.o tesselator.o gle_color.o gle_color_list.o tictoc.o filepath.o\
     mesh.o mechoui_param.o mechoui.o
 
 #----------------------------targets--------------------------------------------

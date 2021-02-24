@@ -3,7 +3,7 @@
 #
 # File src/disp/makefile.inc
 
-OBJ_DISP := fiber_disp.o line_disp.o point_disp.o grid_display.o platonic.o\
+OBJ_DISP := fiber_disp.o line_disp.o point_disp.o grid_display.o tesselator.o\
             gle.o gle_color.o gle_color_list.o gle_zoo.o view.o view_prop.o glapp.o
 
 

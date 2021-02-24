@@ -5,7 +5,7 @@ TESTS:=test_bits test_gillespie test_solve test_random test_math test_glos\
        test_xpttrs test_xtbsv test_quaternion test_rigidity test_project\
        test_ortho test_matrix test_thread test_blas test_pipe test_simd test_solver
 
-TESTS_GL:=test_opengl test_vbo test_glut test_glapp test_platonic\
+TESTS_GL:=test_opengl test_vbo test_glut test_glapp test_tesselator\
           test_rasterizer test_space test_grid test_sphere
 
 
@@ -208,10 +208,10 @@ test_sphere: test_sphere.cc $(OBJ_GLAP) | bin
 	$(DONE)
 vpath test_sphere bin
 
-test_platonic: test_platonic.cc platonic.o $(OBJ_GLAP) | bin
+test_tesselator: test_tesselator.cc tesselator.o $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
 	$(DONE)
-vpath test_platonic bin
+vpath test_tesselator bin
 
 
 # build the rasterizer with graphical debugging enabled:

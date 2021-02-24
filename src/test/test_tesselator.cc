@@ -1,10 +1,9 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// Test class Platonic::Solid
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "gle.h"
 #include "glut.h"
 #include "glapp.h"
-#include "platonic.h"
+#include "tesselator.h"
 #include <cstdio>
 
 using namespace gle;
@@ -17,7 +16,7 @@ bool showVertices = false;
 bool showEdges = false;
 bool showFaces = true;
 
-Platonic::Solid * ico = nullptr;
+Tesselator * ico = nullptr;
 
 GLuint glpts = 0;
 GLuint gldir = 0;
@@ -25,12 +24,12 @@ GLuint gldir = 0;
 //------------------------------------------------------------------------------
 void initVBO();
 
-void setPlatonic()
+void setTesselator()
 {
     if ( ico )
         delete ico;
     
-    ico = new Platonic::Solid((Platonic::Solid::Polyhedra)kind, rank, 1);
+    ico = new Tesselator((Tesselator::Polyhedra)kind, rank, 1);
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points", rank, ico->nb_vertices());
@@ -57,7 +56,7 @@ void processNormalKey(unsigned char c, int x, int y)
         default: glApp::processNormalKey(c,x,y); return;
     }
     
-    setPlatonic();
+    setTesselator();
     
     glApp::flashText("style = %i", style);
     glutPostRedisplay();
@@ -172,7 +171,7 @@ void drawVertices()
     char tmp[128];
     for ( unsigned i=0; i < ico->nb_vertices(); ++i )
     {
-        Platonic::Vertex & dv = ico->vertex(i);
+        Tesselator::Vertex & dv = ico->vertex(i);
         if ( dv.weight(2) == 0  &&  dv.weight(1) == 0 )
             glColor3f(1.f, 1.f, 1.f);
         else if ( dv.weight(2) == 0 )
@@ -253,29 +252,7 @@ int main(int argc, char* argv[])
     glApp::newWindow(display);
     glApp::setScale(3);
   
-    setPlatonic();
+    setTesselator();
     gle::initialize();
     glutMainLoop();
 }
-
-/*
-int main(int argc, char* argv[])
- {
-     Platonic::Solid::Polyhedra kind = Platonic::Solid::ICOSAHEDRON;
-     printf("-------------- order 2:\n");
-     Platonic::Solid T0(kind, 2);
-     printf("-------------- order 3:\n");
-     Platonic::Solid T1(kind, 2);
-     printf("-------------- order 4:\n");
-     Platonic::Solid T2(kind, 4);
-     printf("-------------- order 8:\n");
-     Platonic::Solid T3(kind, 8);
-     printf("-------------- order 16:\n");
-     Platonic::Solid T4(kind, 16);
-     printf("-------------- order 32:\n");
-     Platonic::Solid T5(kind, 32);
-     printf("-------------- order 64:\n");
-     Platonic::Solid T6(kind, 64);
-}
-*/
-

@@ -1,16 +1,12 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "assert_macro.h"
-#include "platonic.h"
+#include "tesselator.h"
 #include <cmath>
 
 
-namespace Platonic
-{
-
-
 // return 'a < b'
-bool Vertex::smaller(unsigned a, unsigned b)
+bool Tesselator::Vertex::smaller(unsigned a, unsigned b)
 {
     if ( weight_[a] < weight_[b] )
         return true;
@@ -18,7 +14,7 @@ bool Vertex::smaller(unsigned a, unsigned b)
             && index_[a] > index_[b] );
 }
 
-void Vertex::swap(unsigned a, unsigned b)
+void Tesselator::Vertex::swap(unsigned a, unsigned b)
 {
     unsigned p = index_[b];
     unsigned w = weight_[b];
@@ -28,9 +24,9 @@ void Vertex::swap(unsigned a, unsigned b)
     weight_[a] = w;
 }
 
-void Vertex::set(unsigned A, unsigned wA,
-                 unsigned B, unsigned wB,
-                 unsigned C, unsigned wC )
+void Tesselator::Vertex::set(unsigned A, unsigned wA,
+                             unsigned B, unsigned wB,
+                             unsigned C, unsigned wC )
 {
     index_[0] = A;
     weight_[0] = wA;
@@ -52,7 +48,7 @@ void Vertex::set(unsigned A, unsigned wA,
 /**
  The indices should be sorted for this to work
  */
-bool Vertex::equivalent(unsigned A, unsigned wA, unsigned B, unsigned wB) const
+bool Tesselator::Vertex::equivalent(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 {
     assert_true( weight_[0] >= weight_[1] );
     assert_true( weight_[1] >= weight_[2] );
@@ -73,7 +69,7 @@ bool Vertex::equivalent(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 }
 
 
-void Vertex::print(unsigned inx, std::ostream& out) const
+void Tesselator::Vertex::print(unsigned inx, std::ostream& out) const
 {
     out << "P" << inx << " = ( ";
     if ( weight_[2] == 0 && weight_[1] == 0 )
@@ -98,7 +94,7 @@ void Vertex::print(unsigned inx, std::ostream& out) const
 //------------------------------------------------------------------------------
 #pragma mark - Solid
 
-void Solid::build()
+void Tesselator::build()
 {
     num_corners_  = 0;
     corners_      = nullptr;
@@ -126,7 +122,7 @@ void Solid::build()
 }
 
 
-void Solid::allocate(unsigned V, unsigned E, unsigned F, unsigned N)
+void Tesselator::allocate(unsigned V, unsigned E, unsigned F, unsigned N)
 {
     unsigned nv = V + E * (N-1) + F * ((N-1)*(N-2)/2);
     unsigned ne = E * N + F * 3 * ((N-1)*N/2);
@@ -139,7 +135,7 @@ void Solid::allocate(unsigned V, unsigned E, unsigned F, unsigned N)
 }
 
 
-void Solid::build(Polyhedra kind, unsigned div)
+void Tesselator::build(Polyhedra kind, unsigned div)
 {
     assert_true(div > 0);
     switch( kind )
@@ -157,7 +153,7 @@ void Solid::build(Polyhedra kind, unsigned div)
 }
 
     
-Solid::Solid(Polyhedra kind, unsigned div, int make)
+Tesselator::Tesselator(Polyhedra kind, unsigned div, int make)
 {
     build();
     
@@ -175,7 +171,7 @@ Solid::Solid(Polyhedra kind, unsigned div, int make)
 }
 
 
-Solid::~Solid()
+Tesselator::~Tesselator()
 {
     delete[] corners_;
     delete[] vertices_;
@@ -190,7 +186,7 @@ Solid::~Solid()
 /**
  register a new derived-vertex:
  */
-unsigned Solid::addVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsigned C, unsigned wC)
+unsigned Tesselator::addVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsigned C, unsigned wC)
 {
     unsigned i = num_vertices_++;
     assert_true(i < max_vertices_);
@@ -204,11 +200,11 @@ unsigned Solid::addVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsi
  return index of the Vertex corresponding to given interpolation
  of max_vertices_ if not found
  */
-unsigned Solid::findEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB) const
+unsigned Tesselator::findEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 {
     /**
      We limit the search to the vertices that are on the edges of
-     the original PlatonicSolid, since they are the only one to be duplicated
+     the original Platonic solid, since they are the only one to be duplicated
      Yet, we have a linear search that may be limiting for very fine divisions
      */
     for ( unsigned i = 0; i < num_edge_vertices_; ++i )
@@ -222,12 +218,12 @@ unsigned Solid::findEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB)
 /**
  return index of the Vertex corresponding to given interpolation
  */
-unsigned Solid::getEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB) const
+unsigned Tesselator::getEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB) const
 {
     unsigned i = findEdgeVertex(A, wA, B, wB);
     if ( i >= max_vertices_ )
     {
-        fprintf(stderr, "Platonic::Solid internal error: non-existent edge vertex\n");
+        fprintf(stderr, "Tesselator internal error: non-existent edge vertex\n");
         return 0;
     }
     return i;
@@ -240,7 +236,7 @@ unsigned Solid::getEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB) 
  We only check existence if X is on an edge, since only then may it
  has been created previously while processing another face.
  */
-unsigned Solid::makeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsigned C, unsigned wC)
+unsigned Tesselator::makeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsigned C, unsigned wC)
 {
     assert_true( wA > 0 && wB > 0 && wC >= 0 );
     if ( wC == 0 )
@@ -253,7 +249,7 @@ unsigned Solid::makeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, uns
 #pragma mark -
 
 /// add intermediate vertices between `a` and `b`
-void Solid::refineEdge(unsigned a, unsigned b, unsigned div)
+void Tesselator::refineEdge(unsigned a, unsigned b, unsigned div)
 {
     // check if this edge has been processes already:
     unsigned i = findEdgeVertex(a, div-1, b, 1);
@@ -268,7 +264,7 @@ void Solid::refineEdge(unsigned a, unsigned b, unsigned div)
 }
 
 
-void Solid::addFace(unsigned a, unsigned b, unsigned c)
+void Tesselator::addFace(unsigned a, unsigned b, unsigned c)
 {
     //printf("face %i %i %i\n", a, b, c);
     assert_true( a!=b && b!=c && a!=c );
@@ -290,7 +286,7 @@ void Solid::addFace(unsigned a, unsigned b, unsigned c)
 }
 
 
-void Solid::refineFace(unsigned* line, unsigned a, unsigned b, unsigned c, unsigned div)
+void Tesselator::refineFace(unsigned* line, unsigned a, unsigned b, unsigned c, unsigned div)
 {
     for ( unsigned u = 0; u <= div; ++u )
         line[u] = getEdgeVertex(a, div-u, b, u);
@@ -311,7 +307,7 @@ void Solid::refineFace(unsigned* line, unsigned a, unsigned b, unsigned c, unsig
     }
 }
 
-void Solid::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
+void Tesselator::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
 {
     unsigned A = quad[0];
     unsigned B = quad[1];
@@ -348,7 +344,7 @@ void Solid::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
 }
 
     /// unfinished
-void Solid::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
+void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
 {
     unsigned* line = new unsigned[cnt*(div+1)];
 
@@ -372,7 +368,7 @@ void Solid::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Solid::setCorners(unsigned n_vex, FLOAT vex[][3], unsigned div)
+void Tesselator::setCorners(unsigned n_vex, FLOAT vex[][3], unsigned div)
 {
     delete[] corners_;
     num_corners_ = n_vex;
@@ -388,7 +384,7 @@ void Solid::setCorners(unsigned n_vex, FLOAT vex[][3], unsigned div)
 }
 
 
-void Solid::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div)
+void Tesselator::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div)
 {
     for ( unsigned f = 0; f < n_fac; ++f )
     {
@@ -408,7 +404,7 @@ void Solid::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div)
 }
 
 
-void Solid::initTetrahedron(unsigned div)
+void Tesselator::initTetrahedron(unsigned div)
 {
     kind_ = TETRAHEDRON;
     constexpr FLOAT M_SQRT3 = 1.7320508075688772935274463415059;
@@ -438,7 +434,7 @@ void Solid::initTetrahedron(unsigned div)
 }
 
 
-void Solid::initOctahedron(unsigned div)
+void Tesselator::initOctahedron(unsigned div)
 {
     kind_ = OCTAHEDRON;
     // Eight vertices on unit sphere
@@ -469,7 +465,7 @@ void Solid::initOctahedron(unsigned div)
 }
 
 
-void Solid::initIcosahedron(unsigned div)
+void Tesselator::initIcosahedron(unsigned div)
 {
     kind_ = ICOSAHEDRON;
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
@@ -521,7 +517,7 @@ void Solid::initIcosahedron(unsigned div)
     refineTriangles(20, fac, div);
 }
 
-void Solid::initIcosahedronRotated(unsigned div)
+void Tesselator::initIcosahedronRotated(unsigned div)
 {
     kind_ = ICOSAHEDRON;
     const FLOAT Z = std::sqrt(0.2);
@@ -575,7 +571,7 @@ void Solid::initIcosahedronRotated(unsigned div)
     refineTriangles(20, fac, div);
 }
 
-void Solid::initHemisphere(unsigned div)
+void Tesselator::initHemisphere(unsigned div)
 {
     kind_ = HEMISPHERE;
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
@@ -631,7 +627,7 @@ void Solid::initHemisphere(unsigned div)
 }
 
 
-void Solid::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
+void Tesselator::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
 {
     kind_ = DICE;
     length_[0] = X;
@@ -752,7 +748,7 @@ void projectDice(REAL* X, const REAL len[4])
 }
 
 
-void Solid::interpolate(Vertex const& vex, double ptr[3], int half) const
+void Tesselator::interpolate(Vertex const& vex, double ptr[3], int half) const
 {
     double X = 0, Y = 0, Z = 0, S = 0;
     for ( int i = 0; i < 3; ++i )
@@ -779,7 +775,7 @@ void Solid::interpolate(Vertex const& vex, double ptr[3], int half) const
 }
 
 
-void Solid::interpolate(Vertex const& vex, float ptr[3], int half) const
+void Tesselator::interpolate(Vertex const& vex, float ptr[3], int half) const
 {
     float X = 0, Y = 0, Z = 0, S = 0;
     for ( int i = 0; i < 3; ++i )
@@ -806,7 +802,7 @@ void Solid::interpolate(Vertex const& vex, float ptr[3], int half) const
 }
 
 
-void Solid::store_vertices(float * vec) const
+void Tesselator::store_vertices(float * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
         interpolate(vertices_[n], vec+3*n, halfZ_);
@@ -824,7 +820,7 @@ void Solid::store_vertices(float * vec) const
 }
 
 
-void Solid::store_vertices(double * vec) const
+void Tesselator::store_vertices(double * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
         interpolate(vertices_[n], vec+3*n, halfZ_);
@@ -846,7 +842,7 @@ void Solid::store_vertices(double * vec) const
 //------------------------------------------------------------------------------
 #pragma mark - edges
 
-void Solid::addEdge(unsigned a, unsigned b)
+void Tesselator::addEdge(unsigned a, unsigned b)
 {
     edges_[2*num_edges_  ] = a;
     edges_[2*num_edges_+1] = b;
@@ -854,7 +850,7 @@ void Solid::addEdge(unsigned a, unsigned b)
 }
 
 
-void Solid::setEdges()
+void Tesselator::setEdges()
 {
     delete[] edges_;
     edges_ = new unsigned[2*max_edges_];
@@ -874,4 +870,3 @@ void Solid::setEdges()
     assert_true( num_edges_ <= max_edges_ );
 }
 
-} // namespace

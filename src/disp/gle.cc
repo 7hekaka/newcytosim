@@ -6,7 +6,7 @@
 #include "assert_macro.h"
 #include "gle.h"
 #include "glut.h"
-#include "platonic.h"
+#include "tesselator.h"
 #include "simd.h"
 #include "simd_float.h"
 #include "simd_math.h"
@@ -1048,6 +1048,7 @@ namespace gle
     {
         flute3 flu[52];
         size_t i = setBlob(flu);
+        assert_true(i == 52);
         modifyBlob(flu);
         glVertexPointer(3, GL_FLOAT, 0, flu);
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -1059,7 +1060,7 @@ namespace gle
         glColor3f(1,1,1);
         for ( unsigned u : { 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 } )
             glDrawArrays(GL_POINTS, u, 1);
-        glDrawArrays(GL_LINE_STRIP, 0, 52);
+        glDrawArrays(GL_LINE_STRIP, 0, i);
     }
 
     //-----------------------------------------------------------------------
@@ -1441,7 +1442,7 @@ namespace gle
     //-----------------------------------------------------------------------
 #pragma mark - Spheres
     
-    GLuint initIcoBuffer(GLuint buf1, GLuint buf2, Platonic::Solid & ico)
+    GLuint initIcoBuffer(GLuint buf1, GLuint buf2, Tesselator & ico)
     {
         constexpr size_t DOUZE = 3*sizeof(float);
         //std::clog << "initializeIco ico " << ico.nb_faces() << '\n';
@@ -1461,13 +1462,13 @@ namespace gle
     void initSphereBuffers()
     {
         /// using icosahedrons to render the sphere:
-        Platonic::Solid ico1(Platonic::Solid::ICOSAHEDRON, gle::finesse/6);
-        Platonic::Solid ico2(Platonic::Solid::ICOSAHEDRON, gle::finesse/3);
-        Platonic::Solid ico4(Platonic::Solid::ICOSAHEDRON, gle::finesse);
-        Platonic::Solid ico8(Platonic::Solid::ICOSAHEDRON, gle::finesse*2);
-        Platonic::Solid icoH1(Platonic::Solid::HEMISPHERE, gle::finesse/6);
-        Platonic::Solid icoH2(Platonic::Solid::HEMISPHERE, gle::finesse/3);
-        Platonic::Solid icoH4(Platonic::Solid::HEMISPHERE, gle::finesse);
+        Tesselator ico1(Tesselator::ICOSAHEDRON, gle::finesse/6);
+        Tesselator ico2(Tesselator::ICOSAHEDRON, gle::finesse/3);
+        Tesselator ico4(Tesselator::ICOSAHEDRON, gle::finesse);
+        Tesselator ico8(Tesselator::ICOSAHEDRON, gle::finesse*2);
+        Tesselator icoH1(Tesselator::HEMISPHERE, gle::finesse/6);
+        Tesselator icoH2(Tesselator::HEMISPHERE, gle::finesse/3);
+        Tesselator icoH4(Tesselator::HEMISPHERE, gle::finesse);
         glGenBuffers(16, ico_);
         ico_ntri[0] = initIcoBuffer(ico_[0], ico_[1], ico1);
         ico_ntri[1] = initIcoBuffer(ico_[2], ico_[3], ico2);

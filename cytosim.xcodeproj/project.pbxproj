@@ -543,8 +543,8 @@
 		BB786AF20AF62C8B005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
 		BB786AF30AF62C90005AF9A2 /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB786B1C0AF62D28005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
-		BB7B5A9C241A81BB0063F252 /* platonic.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF390A25FB22003333C9 /* platonic.h */; };
-		BB7B5A9D241A81BF0063F252 /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
+		BB7B5A9C241A81BB0063F252 /* tesselator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF390A25FB22003333C9 /* tesselator.h */; };
+		BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* tesselator.cc */; };
 		BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591105B98DA3006956D5 /* test_rasterizer.cc */; };
 		BB7D839610274A4500C1DC38 /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7D839510274A4500C1DC38 /* common.h */; };
 		BB7F684012D0F1B100F8FC84 /* display_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7F683E12D0F1B100F8FC84 /* display_prop.cc */; };
@@ -613,7 +613,7 @@
 		BB8BBD05215284C70033BC7A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB8BBD0621537DD50033BC7A /* player.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7358C805B98DA3006956D5 /* player.cc */; };
 		BB8CB8571523147900505E89 /* bicgstab.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8CB8551523147900505E89 /* bicgstab.h */; };
-		BB8EE1E42542DE5E00E15C40 /* test_platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9A56010A74E9E40069E362 /* test_platonic.cc */; };
+		BB8EE1E42542DE5E00E15C40 /* test_tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9A56010A74E9E40069E362 /* test_tesselator.cc */; };
 		BB8EE1E62542DE6D00E15C40 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8EE1E52542DE6D00E15C40 /* GLUT.framework */; };
 		BB8EE1E82542DE7400E15C40 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8EE1E72542DE7400E15C40 /* OpenGL.framework */; };
 		BB8EE1E92542DEA100E15C40 /* gle.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711501DECDA1300352630 /* gle.cc */; };
@@ -627,7 +627,7 @@
 		BB8EE1F12542DF4800E15C40 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
 		BB8EE1F22542DF4F00E15C40 /* tokenizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50D6120FFAE51900278580 /* tokenizer.cc */; };
 		BB8EE1F32542DF5800E15C40 /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
-		BB8EE1F42542DF6100E15C40 /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
+		BB8EE1F42542DF6100E15C40 /* tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* tesselator.cc */; };
 		BB8EE1F52542DF6C00E15C40 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
 		BB8EE1F62542DF7800E15C40 /* filepath.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB65DBE911AD53AC005DD116 /* filepath.cc */; };
 		BB8EE1F72542DF8B00E15C40 /* gle_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711521DECDA1300352630 /* gle_color.cc */; };
@@ -771,7 +771,7 @@
 		BBB1C6D30CB2CAA300679ADC /* iowrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587B05B98DA3006956D5 /* iowrapper.cc */; };
 		BBB1C6D40CB2CAA300679ADC /* filewrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB20484A0AF203A0004EDA21 /* filewrapper.cc */; };
 		BBB1C6D50CB2CAA300679ADC /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
-		BBB1C6D70CB2CAA300679ADC /* platonic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* platonic.cc */; };
+		BBB1C6D70CB2CAA300679ADC /* tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* tesselator.cc */; };
 		BBB1C6D90CB2CAA300679ADC /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
 		BBB1C6DE0CB2CAA300679ADC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BBB1E47D126DC70B00B19D26 /* actor_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E479126DC70B00B19D26 /* actor_prop.cc */; };
@@ -1488,8 +1488,8 @@
 		BB53F5760DCB467000ED38EB /* point_grid.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = point_grid.cc; path = src/sim/point_grid.cc; sourceTree = SOURCE_ROOT; };
 		BB53F5770DCB467000ED38EB /* point_grid.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = point_grid.h; path = src/sim/point_grid.h; sourceTree = SOURCE_ROOT; };
 		BB55BF300A25FB13003333C9 /* dim.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = dim.h; path = src/math/dim.h; sourceTree = SOURCE_ROOT; };
-		BB55BF380A25FB22003333C9 /* platonic.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = platonic.cc; path = src/math/platonic.cc; sourceTree = SOURCE_ROOT; };
-		BB55BF390A25FB22003333C9 /* platonic.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = platonic.h; path = src/math/platonic.h; sourceTree = SOURCE_ROOT; };
+		BB55BF380A25FB22003333C9 /* tesselator.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = tesselator.cc; path = src/math/tesselator.cc; sourceTree = SOURCE_ROOT; };
+		BB55BF390A25FB22003333C9 /* tesselator.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = tesselator.h; path = src/math/tesselator.h; sourceTree = SOURCE_ROOT; };
 		BB560C2F1813DC8800CB1BF5 /* vecprint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vecprint.h; path = src/math/vecprint.h; sourceTree = SOURCE_ROOT; };
 		BB568CCA0BFCEAA300CB5335 /* cym */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; path = cym; sourceTree = SOURCE_ROOT; };
 		BB56AB70246F0451002EB689 /* display_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = display_color.h; sourceTree = "<group>"; };
@@ -1709,7 +1709,7 @@
 		BB9771601F52D98200EB8C92 /* cymart.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cymart.cc; sourceTree = "<group>"; };
 		BB98FE900B35F66300796DAE /* meca.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = meca.h; path = src/sim/meca.h; sourceTree = SOURCE_ROOT; };
 		BB98FE910B35F66300796DAE /* meca.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = meca.cc; path = src/sim/meca.cc; sourceTree = SOURCE_ROOT; };
-		BB9A56010A74E9E40069E362 /* test_platonic.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_platonic.cc; path = src/test/test_platonic.cc; sourceTree = SOURCE_ROOT; };
+		BB9A56010A74E9E40069E362 /* test_tesselator.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_tesselator.cc; path = src/test/test_tesselator.cc; sourceTree = SOURCE_ROOT; };
 		BB9B5CA91541C01800C0B9B6 /* space_beads.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_beads.cc; path = src/sim/spaces/space_beads.cc; sourceTree = SOURCE_ROOT; };
 		BB9B5CAA1541C01800C0B9B6 /* space_beads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_beads.h; path = src/sim/spaces/space_beads.h; sourceTree = SOURCE_ROOT; };
 		BB9B5DE215429BF400C0B9B6 /* field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = field.h; sourceTree = "<group>"; };
@@ -2216,8 +2216,8 @@
 				BB8CE30705DFF9140031D3B4 /* isometry.h */,
 				BB73589A05B98DA3006956D5 /* spherical_code.h */,
 				BB3D2ADA05C8396B0022ACE5 /* spherical_code.cc */,
-				BB55BF390A25FB22003333C9 /* platonic.h */,
-				BB55BF380A25FB22003333C9 /* platonic.cc */,
+				BB55BF390A25FB22003333C9 /* tesselator.h */,
+				BB55BF380A25FB22003333C9 /* tesselator.cc */,
 				BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */,
 				BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */,
 				BB749D651793645D00B43298 /* polygon.h */,
@@ -2759,7 +2759,7 @@
 				BB73590A05B98DA3006956D5 /* test_opengl.cc */,
 				BBD3030225798FC600C6D61A /* test_ortho.cc */,
 				BBC91299204EC2DC00219DC5 /* test_pipe.cc */,
-				BB9A56010A74E9E40069E362 /* test_platonic.cc */,
+				BB9A56010A74E9E40069E362 /* test_tesselator.cc */,
 				BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */,
 				BB749D621793620500B43298 /* test_quartic.cc */,
 				BB73590F05B98DA3006956D5 /* test_quaternion.cc */,
@@ -3381,7 +3381,7 @@
 			files = (
 				BB3CFAA025DBCC350016A7A3 /* gle_flute.h in Headers */,
 				BB3CFAA325DBD0E90016A7A3 /* flute.h in Headers */,
-				BB7B5A9C241A81BB0063F252 /* platonic.h in Headers */,
+				BB7B5A9C241A81BB0063F252 /* tesselator.h in Headers */,
 				BB56AB71246F0451002EB689 /* display_color.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4481,7 +4481,7 @@
 			files = (
 				BB109D3723D0788200805F16 /* point_disp.cc in Sources */,
 				BB3CFAA125DBCC350016A7A3 /* gle_flute.cc in Sources */,
-				BB7B5A9D241A81BF0063F252 /* platonic.cc in Sources */,
+				BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
 				BB97116B1DECDB9500352630 /* offscreen.cc in Sources */,
 				BB97116A1DECDB8F00352630 /* saveimage.cc in Sources */,
@@ -4900,7 +4900,7 @@
 				BB8EE1F82542DF8B00E15C40 /* gle_color_list.cc in Sources */,
 				BB8EE1F62542DF7800E15C40 /* filepath.cc in Sources */,
 				BB8EE1F52542DF6C00E15C40 /* tictoc.cc in Sources */,
-				BB8EE1F42542DF6100E15C40 /* platonic.cc in Sources */,
+				BB8EE1F42542DF6100E15C40 /* tesselator.cc in Sources */,
 				BB8EE1F32542DF5800E15C40 /* stream_func.cc in Sources */,
 				BB8EE1F22542DF4F00E15C40 /* tokenizer.cc in Sources */,
 				BB8EE1F12542DF4800E15C40 /* print_color.cc in Sources */,
@@ -4912,7 +4912,7 @@
 				BB8EE1EC2542DF1000E15C40 /* view_prop.cc in Sources */,
 				BB8EE1EA2542DEB200E15C40 /* glapp.cc in Sources */,
 				BB8EE1E92542DEA100E15C40 /* gle.cc in Sources */,
-				BB8EE1E42542DE5E00E15C40 /* test_platonic.cc in Sources */,
+				BB8EE1E42542DE5E00E15C40 /* test_tesselator.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4990,7 +4990,7 @@
 				BBB1C6D30CB2CAA300679ADC /* iowrapper.cc in Sources */,
 				BBB1C6D40CB2CAA300679ADC /* filewrapper.cc in Sources */,
 				BBB1C6D50CB2CAA300679ADC /* random.cc in Sources */,
-				BBB1C6D70CB2CAA300679ADC /* platonic.cc in Sources */,
+				BBB1C6D70CB2CAA300679ADC /* tesselator.cc in Sources */,
 				BBB1C6D90CB2CAA300679ADC /* vector3.cc in Sources */,
 				BB92D7D4110E0D0500727008 /* property_list.cc in Sources */,
 				BB92D7D5110E0D0600727008 /* property.cc in Sources */,

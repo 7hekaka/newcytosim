@@ -308,7 +308,7 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 #include "opengl.h"
 #include "gle.h"
 #include "gle_flute.h"
-#include "platonic.h"
+#include "tesselator.h"
 
 void SpaceDice::draw2D() const
 {
@@ -322,7 +322,7 @@ void SpaceDice::draw3D() const
     const float Y(half_[1] - edge_);
     const float Z(half_[2] - edge_);
     
-    Platonic::Solid mesh;
+    Tesselator mesh;
     mesh.initDice(X, Y, Z, edge_, gle::finesse);
     
     size_t cnt = mesh.nb_vertices();
