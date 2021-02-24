@@ -2,6 +2,7 @@
 
 #include "assert_macro.h"
 #include "tesselator.h"
+#include <algorithm>
 #include <cmath>
 
 
@@ -69,25 +70,25 @@ bool Tesselator::Vertex::equivalent(unsigned A, unsigned wA, unsigned B, unsigne
 }
 
 
-void Tesselator::Vertex::print(unsigned inx, std::ostream& out) const
+void Tesselator::Vertex::print(unsigned inx, FILE* f) const
 {
-    out << "P" << inx << " = ( ";
+    fprintf(f, "P%i = ( ", inx);
     if ( weight_[2] == 0 && weight_[1] == 0 )
     {
-        out << index_[0] << " " << weight_[0] ;
+        fprintf(f, "%i %u", index_[0], weight_[0]);
     }
     else if ( weight_[2] == 0 )
     {
-        out << index_[0] << " " << weight_[0] << ", ";
-        out << index_[1] << " " << weight_[1];
+        fprintf(f, "%i %u", index_[0], weight_[0]);
+        fprintf(f, "  %i %u", index_[1], weight_[1]);
     }
     else
     {
-        out << index_[0] << " " << weight_[0] << ", ";
-        out << index_[1] << " " << weight_[1] << ", ";
-        out << index_[2] << " " << weight_[2];
+        fprintf(f, "%i %u", index_[0], weight_[0]);
+        fprintf(f, "  %i %u", index_[1], weight_[1]);
+        fprintf(f, "  %i %u", index_[2], weight_[2]);
     }
-    out << " )" << std::endl;
+    fprintf(f, " )");
 }
 
 
@@ -111,7 +112,7 @@ void Tesselator::build()
     num_edges_    = 0;
     edges_        = nullptr;
     
-    coordinates_  = nullptr;
+    vex_ = nullptr;
     
     kind_ = 0;
     halfZ_ = 0;
@@ -145,14 +146,22 @@ void Tesselator::build(Polyhedra kind, unsigned div)
         case OCTAHEDRON: initOctahedron(div); break;
         case ICOSAHEDRON: initIcosahedron(div); break;
         case HEMISPHERE: initHemisphere(div); break;
-        case DICE: initDice(0.7, 0.7, 0.7, 0.3, div); break;
+        case DICE: initDice(12, 7, 7, 3, div); break;
     }
     
     assert_true( num_vertices_ <= max_vertices_ );
     assert_true( num_faces_ <= max_faces_ );
 }
 
-    
+
+void Tesselator::setVertices()
+{
+    delete[] vex_;
+    vex_ = new float[3*max_vertices_];
+    store_vertices(vex_);
+}
+
+
 Tesselator::Tesselator(Polyhedra kind, unsigned div, int make)
 {
     build();
@@ -161,10 +170,7 @@ Tesselator::Tesselator(Polyhedra kind, unsigned div, int make)
     {
         build(kind, div);
         if ( make )
-        {
-            coordinates_ = new float[3*max_vertices_];
-            store_vertices(coordinates_);
-        }
+            setVertices();
         if ( make & 2 )
             setEdges();
     }
@@ -702,7 +708,7 @@ void Tesselator::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div)
 
     // faces
     for ( int n = 0; n < 6; ++n )
-        refineQuad(line, quad[n], 1);
+        refineQuad(line, quad[n], div);
     
     delete[] line;
 }
@@ -870,3 +876,54 @@ void Tesselator::setEdges()
     assert_true( num_edges_ <= max_edges_ );
 }
 
+/**
+ http://paulbourke.net/dataformats/ply
+ */
+void Tesselator::exportPLY(FILE* f) const
+{
+    fprintf(f, "ply\n");
+    fprintf(f, "format ascii 1.0\n");
+    fprintf(f, "comment made by Cytosim\n");
+    fprintf(f, "element vertex %u\n", num_vertices_);
+    fprintf(f, "property float x\n");
+    fprintf(f, "property float y\n");
+    fprintf(f, "property float z\n");
+    fprintf(f, "element face %u\n", num_faces_);
+    fprintf(f, "property list uchar int vertex_index\n");
+    fprintf(f, "end_header\n");
+    
+    for ( unsigned u = 0; u < num_vertices_; ++u )
+        fprintf(f, "%5.3f %5.3f %5.3f\n", vex_[3*u], vex_[3*u+1], vex_[3*u+2]);
+    
+    for ( unsigned u = 0; u < num_faces_; ++u )
+        fprintf(f, "%u %u %u\n", faces_[3*u], faces_[3*u+1], faces_[3*u+2]);
+}
+
+
+/**
+ https://en.wikipedia.org/wiki/STL_(file_format)
+ */
+void Tesselator::exportSTL(FILE* f) const
+{
+    float n[3] = { 0 };
+    char buf[128] = { 0 };
+    fwrite(buf, 80, 1, f); // 80 bytes header
+    fwrite(&num_faces_, 1, 4, f); // 4 bytes
+   
+    for ( unsigned u = 0; u < num_faces_; ++u )
+    {
+        float const* a = face_vertex0(u);
+        float const* b = face_vertex1(u);
+        float const* c = face_vertex2(u);
+        // calculate normal of triangle:
+        n[0] = ( b[1] - a[1] ) * ( b[2] - a[2] ) - ( c[2] - a[2] ) * ( b[1] - a[1] );
+        n[1] = ( b[2] - a[2] ) * ( b[0] - a[0] ) - ( c[0] - a[0] ) * ( b[2] - a[2] );
+        n[2] = ( b[0] - a[0] ) * ( b[1] - a[1] ) - ( c[1] - a[1] ) * ( b[0] - a[0] );
+
+        fwrite(n, 3, 4, f); // normal
+        fwrite(a, 3, 4, f);
+        fwrite(b, 3, 4, f);
+        fwrite(c, 3, 4, f);
+        fwrite(buf, 1, 2, f);
+    }
+}

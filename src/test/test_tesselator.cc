@@ -38,10 +38,52 @@ void setTesselator()
     initVBO();
 }
 
+void exportPLY()
+{
+    FILE * f = fopen("mesh.ply", "w");
+
+    if ( !f || ferror(f) )
+    {
+        fprintf(stderr, "input file could not be opened");
+        return;
+    }
+    if ( ferror(f) )
+    {
+        fclose(f);
+        fprintf(stderr, "input file opened with error");
+        return;
+    }
+
+    ico->exportPLY(f);
+    fclose(f);
+}
+
+void exportSTL()
+{
+    FILE * f = fopen("mesh.stl", "wb");
+
+    if ( !f || ferror(f) )
+    {
+        fprintf(stderr, "input file could not be opened");
+        return;
+    }
+    if ( ferror(f) )
+    {
+        fclose(f);
+        fprintf(stderr, "input file opened with error");
+        return;
+    }
+
+    ico->exportSTL(f);
+    fclose(f);
+}
+
 void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c) 
     {
+        case 'y': exportPLY();                  break;
+        case 'Y': exportSTL();                  break;
         case 'k': kind = ( kind + 1 ) % 6;      break;
         case ']': rank += 1;                    break;
         case '[': rank = std::max(rank-1, 1);   break;
@@ -50,7 +92,6 @@ void processNormalKey(unsigned char c, int x, int y)
         case 's': style = ( style + 1 ) % 4;    break;
         case 'e': showEdges = !showEdges;       break;
         case 't': showFaces = !showFaces;       break;
-        case 'i': showVertices = !showVertices; break;
         case 'p': showVertices = !showVertices; break;
         case ' ': break; // update the Platonic
         default: glApp::processNormalKey(c,x,y); return;
@@ -77,12 +118,12 @@ void drawFaces1()
     glBegin(GL_TRIANGLES);
     for ( unsigned i = 0; i < ico->nb_faces(); ++i )
     {
-        glNormal3fv(ico->face_data0(i));
-        glVertex3fv(ico->face_data0(i));
-        glNormal3fv(ico->face_data1(i));
-        glVertex3fv(ico->face_data1(i));
-        glNormal3fv(ico->face_data2(i));
-        glVertex3fv(ico->face_data2(i));
+        glNormal3fv(ico->face_vertex0(i));
+        glVertex3fv(ico->face_vertex0(i));
+        glNormal3fv(ico->face_vertex1(i));
+        glVertex3fv(ico->face_vertex1(i));
+        glNormal3fv(ico->face_vertex2(i));
+        glVertex3fv(ico->face_vertex2(i));
     }
     glEnd();
 }
