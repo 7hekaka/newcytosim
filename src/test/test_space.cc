@@ -224,7 +224,7 @@ void checkVolume(size_t CNT)
         dev += e * e;
     }
     avg /= CNT;
-    dev = ( dev - avg * avg * CNT ) / (CNT-1)
+    dev = ( dev - avg * avg * CNT ) / (CNT-1);
     dev = std::sqrt(max_real(0, dev));
     
     printf("Monte-Carlo estimated volume of `%s` is", spc->prop->shape.c_str());
