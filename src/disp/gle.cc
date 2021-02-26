@@ -1819,11 +1819,11 @@ namespace gle
                    Vector2 const& B, Vector2 const& dB, real rad)
     {
         glLineWidth(0.5);
-        flute2 pts[8] = { A, A-rad*dA, B, B-rad*dB,
-                          A, A+rad*dA, B, B+rad*dB };
+        flute2 pts[8] = { A-rad*dA, A, B, B-rad*dB,
+                          A+rad*dA, A, B, B+rad*dB };
         glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-        glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
     }
     
     void drawBar(Vector3 const& A, Vector3 const& dA,
@@ -1850,29 +1850,15 @@ namespace gle
      */
     void drawDumbbell(Vector2 const& A, Vector2 const& B, GLfloat diameter)
     {
-        const GLfloat S(1.0996361107912678f); //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
-        const GLfloat R(diameter * S);
-        const GLfloat H(R * 0.8660254037844386f); //0.5f * sqrt(3);
-        const GLfloat X(R * 0.5f);
-        
-        Vector2 x = ( B - A ).normalized(H);
-        Vector2 y = x.orthogonal(X);
+        const float S(1.0996361107912678f); //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
+        const float R(diameter * S);
+        Vector2 x = ( B - A ).normalized(R*0.8660254037844386f);
+        Vector2 y = x.orthogonal(R*0.5f);
         flute2 pts[20] = {
-            {0,0}, x+y, y+y, y-x, -x-y, -y-y, x-y, x+y,
-            x+y, x-y, B-A-y-x, B-A+y-x,
-            {0,0}, x+y, y+y, y-x, -x-y, -y-y, x-y, x+y };
+            A-x-y, A-x+y, A-y-y, A+y+y, A+x-y, A+x+y,
+            B-x-y, B-x+y, B-y-y, B+y+y, B+x-y, B+x+y };
         glVertexPointer(2, GL_FLOAT, 0, pts);
-        
-        glPushMatrix();
-        translate(A);
-        // draw hexagon around 'a':
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 8);
-        // a band from 'a' to 'b'
-        glDrawArrays(GL_TRIANGLE_FAN, 8, 4);
-        translate(B-A);
-        // an hexagon centered around 'b'
-        glDrawArrays(GL_TRIANGLE_FAN, 12, 8);
-        glPopMatrix();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
     }
     
     //-----------------------------------------------------------------------
@@ -1938,11 +1924,11 @@ namespace gle
     void drawArrowTail(Vector1 const& pos, Vector1 const& dir, float rad)
     {
         GLfloat dx(rad * dir.XX);
-        GLfloat cx(pos.XX - dx * 0.5 );;
-        GLfloat pts[12] = {cx, 0, cx-dx, -dx, cx+dx, -dx,
-                           cx+2*dx, 0, cx+dx, dx, cx-dx, dx};
+        GLfloat cx(pos.XX - dx * 0.5 );
+        GLfloat pts[12] = {cx-dx, -dx, cx+dx, -dx, cx, 0,
+                           cx+2*dx, 0, cx-dx, dx, cx+dx, dx};
         glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
     }
     
     void drawArrowTail(Vector2 const& pos, Vector2 const& dir, float rad)
@@ -1953,10 +1939,10 @@ namespace gle
         GLfloat cy(pos.YY - 1.5f * dy);
         GLfloat ex(cx + 2 * dx);
         GLfloat ey(cy + 2 * dy);
-        GLfloat pts[12] = {cx+dx, cy+dy, cx+dy, cy-dx, ex+dy, ey-dx,
-                           ex+dx, ey+dy, ex-dy, ey+dx, cx-dy, cy+dx};
+        GLfloat pts[12] = {cx+dy, cy-dx, ex+dy, ey-dx, cx+dx, cy+dy,
+                           ex+dx, ey+dy, cx-dy, cy+dx, ex-dy, ey+dx};
         glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
     }
     
     void drawArrowTail(Vector3 const& pos, Vector3 const& dir, float rad)

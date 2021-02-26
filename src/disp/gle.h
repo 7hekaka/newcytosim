@@ -334,8 +334,6 @@ namespace gle
     
     /// draw two discs in A and B, connected with a line
     void drawDumbbell(Vector2 const& A, Vector2 const& B, float diameter);
-    /// draw two spheres in A and B, connected with a cylinder
-    void drawDumbbell(Vector3 const& A, Vector3 const& B, float diameter);
 
     /// display cone, dir should be normalized
     void drawCone(Vector1 const& center, Vector1 const& dir, float rad);
