@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef HAND_H
 #define HAND_H
@@ -49,18 +49,18 @@ private:
     Hand();
     
     /// Pointer used to build the list of Hands bound to a Fiber
-    Hand *         haNext;
+    Hand * hNext;
     
     /// Pointer used to build the list of Hands bound to a Fiber
-    Hand *         haPrev;
+    Hand * hPrev;
 
 protected:
 
     /// the monitor associated with this Hand
-    HandMonitor *  haMonitor;
+    HandMonitor * hMonitor;
     
     /// Gillespie normalized time for detachment (must be set at attachment)
-    real           nextDetach;
+    real nextDetach;
     
 public:
     
@@ -87,41 +87,41 @@ public:
 
 
     /// return next Hand in Fiber's list
-    Hand *  next()  const  { return haNext; }
+    Hand * next()  const  { return hNext; }
     
     /// return previous Hand in Fiber's list
-    Hand *  prev()  const  { return haPrev; }
+    Hand * prev()  const  { return hPrev; }
 
     /// set next Hand in Fiber's list
-    void    next(Hand * h) { haNext = h; }
+    void next(Hand * h) { hNext = h; }
     
     /// set previous Hand in Fiber's list
-    void    prev(Hand * h) { haPrev = h; }
+    void prev(Hand * h) { hPrev = h; }
 
     
     /// identify as Digital class
     virtual bool isDigit() const { return false; }
 
     /// move to a different fiber, at the same abscissa
-    void         relocate(Fiber* f);
+    void relocate(Fiber* f);
     
     /// move to a different fiber, at the given abscissa
-    void         relocate(Fiber* f, real a);
+    void relocate(Fiber* f, real a);
 
     /// relocate to the specified tip of the current fiber
-    void         moveToEnd(FiberEnd);
+    void moveToEnd(FiberEnd);
 
     /// bind at position `a` on Fiber `f`
-    void         locate(Fiber* f, real a);
+    void locate(Fiber* f, real a);
 
     // Check that binding can occur on Fiber, from BITWISE AND of the binding keys
-    bool         keyMatch(Fiber const* fib) const
+    bool keyMatch(Fiber const* fib) const
     {
         return prop->binding_key & fib->prop->binding_key;
     }
     
     /// only checks the Monitor's permission
-    bool         monitorAllowsAttachment(FiberSite& sit) const;
+    bool monitorAllowsAttachment(FiberSite& sit) const;
 
     /// tell if attachment at given site is permitted
     virtual bool attachmentAllowed(FiberSite&) const;
@@ -130,13 +130,13 @@ public:
     virtual void attach(FiberSite const&);
     
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void         attach(Fiber * f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
+    void attach(Fiber * f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
     
     /// attach at the given end of Fiber (this calls attach(FiberSite))
-    void         attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
+    void attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
 
     /// detach, without updating Monitor
-    void         detachHand();
+    void detachHand();
     
     /// detach
     virtual void detach();
@@ -151,7 +151,7 @@ public:
     virtual void stepLoaded(Vector const& force, real force_norm);
     
     /// check abscissa against fiber edge, and calls handle functions if necessary.
-    void         checkFiberRange();
+    void checkFiberRange();
 
     /// this is called when disassembly occured PLUS_END
     virtual void handleDisassemblyM();
@@ -160,29 +160,29 @@ public:
     virtual void handleDisassemblyP();
 
     /// attach at abscissa of given Fiber (this calls attach(FiberSite))
-    void         attachTo(Fiber * f, real a) { attach(FiberSite(f, a)); }
+    void attachTo(Fiber * f, real a) { attach(FiberSite(f, a)); }
     
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void         attachTo(Fiber * f, real a, FiberEnd ref) { attach(FiberSite(f, f->abscissaFrom(a, ref))); }
+    void attachTo(Fiber * f, real a, FiberEnd ref) { attach(FiberSite(f, f->abscissaFrom(a, ref))); }
     
     /// attach at the given end of Fiber (this calls attach(FiberSite))
-    void         attachToEnd(Fiber * f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
+    void attachToEnd(Fiber * f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
     
     
     /// return other Hand if part of a Couple, and zero otherwise
-    Hand *       otherHand() const;
+    Hand * otherHand() const;
 
     /// return position of other Hand, if part of a Couple, or of Single
-    Vector       linkBase() const;
+    Vector linkBase() const;
     
     /// return stiffness of associated link
-    real         linkStiffness() const;
+    real linkStiffness() const;
     
     /// read from file
-    bool         read(Inputter&, Simul&);
+    bool read(Inputter&, Simul&);
     
     /// write to file
-    void         write(Outputter&) const;
+    void write(Outputter&) const;
     
     
 protected:

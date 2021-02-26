@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef FIBER_SITE_H
 #define FIBER_SITE_H
@@ -11,12 +11,12 @@
 
 /// FiberSite indicates a location on a Fiber by its curvilinear abscissa
 /**
- The key variable is a pointer to a Fiber, `fbFiber`, which is NULL
+ The key variable is a pointer to a Fiber, `hFiber`, which is NULL
  in the `unattached` state.
  
  In the `attached` state, the location on the Fiber is recorded using the
- curvilinear abscissa `fbAbs`, measured along the fiber, from a reference
- that is fixed on the Fiber, called the Fiber's origin. `fbAbs' is a signed
+ curvilinear abscissa `hAbs`, measured along the fiber, from a reference
+ that is fixed on the Fiber, called the Fiber's origin. `hAbs' is a signed
  continuous quantity that increases from Minus to Plus ends. The origin is
  virtual and may reside outside the Fiber ends.
  
@@ -25,8 +25,8 @@
  at the tips of the Fiber.
  
  If the Fiber has a Lattice, The `FiberSite` also supports binding at discrete
- positions, and in this case uses a pointer `fbLattice' and a signed integer
- `fbSite` to keep track of the position.
+ positions, and in this case uses a pointer `hLattice' and a signed integer
+ `hSite` to keep track of the position.
 */
 class FiberSite
 {
@@ -34,39 +34,39 @@ private:
     
     /// the interpolation on the Fiber's vertices
     /**
-     If all is well, ( inter.mecable() == fbFiber ) and ( abscissaInter() == fbAbs )
+     If all is well, ( inter.mecable() == hFiber ) and ( abscissaInterp() == hAbs )
      */
-    Interpolation inter;
+    Interpolation hTerp;
     
     /// the abscissa of the interpolated point, which should be equal to `abscissa()`
-    real abscissaInter() const { return fbFiber->abscissaPoint(real(inter.point1())+inter.coef1()); }
+    real abscissaInterp() const { return hFiber->abscissaPoint(real(hTerp.point1())+hTerp.coef1()); }
 
 protected:
     
     /// the Fiber of interest, or NULL
-    Fiber *       fbFiber;
+    Fiber *       hFiber;
     
     /// the abscissa from the origin of the Fiber
-    real          fbAbs;
+    real          hAbs;
     
     /// propagate Lattice cell index type
     typedef FiberLattice::lati_t lati_t;
 
 #if FIBER_HAS_LATTICE
     /// pointer to the Lattice of the Fiber, or NULL if not in use
-    FiberLattice* fbLattice;
+    FiberLattice* hLattice;
     
     /// index in the Fiber's Lattice (a signed integer)
-    lati_t        fbSite;
+    lati_t        hSite;
 #endif
 
 public:
 
 #if FIBER_HAS_LATTICE
     /// default constructor
-    FiberSite() : fbFiber(nullptr), fbAbs(0), fbLattice(nullptr), fbSite(0) {}
+    FiberSite() : hFiber(nullptr), hAbs(0), hLattice(nullptr), hSite(0) {}
 #else
-    FiberSite() : fbFiber(nullptr), fbAbs(0) {}
+    FiberSite() : hFiber(nullptr), hAbs(0) {}
 #endif
 
     /// construct at the given distance from the origin
@@ -78,19 +78,19 @@ public:
 #if FIBER_HAS_LATTICE
     
     /// return Lattice if engaged
-    FiberLattice* lattice() const { return fbLattice; }
+    FiberLattice* lattice() const { return hLattice; }
     
     /// index of Lattice's site
-    lati_t        site()    const { return fbSite; }
+    lati_t        site()    const { return hSite; }
     
     /// set FiberSite at index `s` with an abscissa `off` within the site
     void engageLattice(FiberLattice* l, lati_t s, real off)
     {
-        fbLattice = l;
-        fbSite    = s;
-        fbAbs     = l->unit() * s + off;
-        //assert_true(fbFiber->abscissaM() < fbAbs + REAL_EPSILON);
-        //assert_true(fbAbs < fbFiber->abscissaP() + REAL_EPSILON);
+        hLattice = l;
+        hSite    = s;
+        hAbs     = l->unit() * s + off;
+        //assert_true(hFiber->abscissaM() < hAbs + REAL_EPSILON);
+        //assert_true(hAbs < hFiber->abscissaP() + REAL_EPSILON);
     }
 
 #else
@@ -101,13 +101,13 @@ public:
     //--------------------------------------------------------------------------
 
     /// return the interpolation
-    const Interpolation& interpolation() const { assert_false(bad()); return inter; }
+    const Interpolation& interpolation() const { assert_false(bad()); return hTerp; }
     
     /// recalculate the Interpolation
-    void         update()       { inter = fbFiber->interpolate(fbAbs); }
+    void         update()       { hTerp = hFiber->interpolate(hAbs); }
     
     /// move to a different abscissa on the current fiber
-    void         moveTo(real a) { fbAbs = a; update(); }
+    void         moveTo(real a) { hAbs = a; update(); }
 
     /// relocate to MINUS_END of current fiber
     void         relocateM();
@@ -118,42 +118,42 @@ public:
     //--------------------------------------------------------------------------
     
     /// true if not attached
-    bool         unattached()    const { return !fbFiber; }
+    bool         unattached()    const { return !hFiber; }
 
     /// true if attached
-    bool         attached()      const { return fbFiber; }
+    bool         attached()      const { return hFiber; }
     
     /// Fiber to which this is attached, or zero if not attached
-    Fiber*       fiber()         const { return fbFiber; }
+    Fiber*       fiber()         const { return hFiber; }
     
     /// position in space (using current interpolation)
-    Vector       pos()           const { return inter.pos(); }
+    Vector       pos()           const { return hTerp.pos(); }
     
 #if FIBER_HAS_FAMILY
     /// the position around which attachment is seeked
     Vector       outerPos()      const;
 #else
     /// the position around which attachment is seeked
-    Vector       outerPos()      const { return inter.pos(); }
+    Vector       outerPos()      const { return hTerp.pos(); }
 #endif
     
     /// position (recalculated on the fly)
-    Vector       posHand()       const { return fbFiber->pos(fbAbs); }
+    Vector       posHand()       const { return hFiber->pos(hAbs); }
     
     /// direction of Fiber obtained by normalization
-    Vector       dir()           const { return inter.dir(); }
+    Vector       dir()           const { return hTerp.dir(); }
     
     /// the direction of the Fiber at the point of attachment
-    Vector       dirFiber()      const { return fbFiber->dirSegment(inter.point1()); }
+    Vector       dirFiber()      const { return hFiber->dirSegment(hTerp.point1()); }
     
     /// the abscissa, from the origin of the Fiber
-    real         abscissa()      const { return fbAbs; }
+    real         abscissa()      const { return hAbs; }
 
     /// abscissa, counted from the MINUS_END
-    real         abscissaFromM() const { return fbAbs - fbFiber->abscissaM(); }
+    real         abscissaFromM() const { return hAbs - hFiber->abscissaM(); }
 
     /// inverted abscissa counted from the PLUS_END, positive if ( abscissa < abscissa(PLUS_END) )
-    real         abscissaFromP() const { return fbFiber->abscissaP() - fbAbs; }
+    real         abscissaFromP() const { return hFiber->abscissaP() - hAbs; }
 
     /// abscissa, counted from the specified FiberEnd (in reversed direction for the PLUS_END)
     real         abscissaFrom(FiberEnd ref) const;
@@ -165,13 +165,13 @@ public:
     real         distanceToEnd(FiberEnd) const;
 
     /// true if abscissa is below abscissaP
-    bool         belowP()        const { return fbFiber->belowP(fbAbs); }
+    bool         belowP()        const { return hFiber->belowP(hAbs); }
     
     /// true if abscissa is above abscissaM
-    bool         aboveM()        const { return fbFiber->aboveM(fbAbs); }
+    bool         aboveM()        const { return hFiber->aboveM(hAbs); }
     
     /// true if abscissa is not within the fiber's boundaries
-    bool         outsideMP()     const { return fbFiber->outsideMP(fbAbs); }
+    bool         outsideMP()     const { return hFiber->outsideMP(hAbs); }
     
     //--------------------------------------------------------------------------
     
@@ -186,7 +186,7 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// check that fbAbs is within Fiber::abscissaM() and Fiber::abscissaP()
+    /// check that hAbs is within Fiber::abscissaM() and Fiber::abscissaP()
     int          checkAbscissa() const;
     
     /// check validity of the interpolation (debuging purposes)

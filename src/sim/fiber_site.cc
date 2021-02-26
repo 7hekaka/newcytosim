@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "fiber_site.h"
 #include "iowrapper.h"
@@ -7,35 +7,35 @@
 
 
 FiberSite::FiberSite(Fiber* f, real a)
-: fbFiber(f), fbAbs(a)
+: hFiber(f), hAbs(a)
 {
     assert_true(f);
 #if FIBER_HAS_LATTICE
-    fbLattice = nullptr;
-    fbSite = 0;
+    hLattice = nullptr;
+    hSite = 0;
 #endif
-    inter = f->interpolate(a);
+    hTerp = f->interpolate(a);
 }
 
 
 void FiberSite::relocateM()
 {
-    assert_true(fbFiber);
-    fbAbs = fbFiber->abscissaM();
-    inter = fbFiber->interpolateEndM();
+    assert_true(hFiber);
+    hAbs = hFiber->abscissaM();
+    hTerp = hFiber->interpolateEndM();
 #if FIBER_HAS_LATTICE
-    assert_true(!fbLattice);
+    assert_true(!hLattice);
 #endif
 }
 
 
 void FiberSite::relocateP()
 {
-    assert_true(fbFiber);
-    fbAbs = fbFiber->abscissaP();
-    inter = fbFiber->interpolateEndP();
+    assert_true(hFiber);
+    hAbs = hFiber->abscissaP();
+    hTerp = hFiber->interpolateEndP();
 #if FIBER_HAS_LATTICE
-    assert_true(!fbLattice);
+    assert_true(!hLattice);
 #endif
 }
 
@@ -47,23 +47,23 @@ void FiberSite::relocateP()
 #if FIBER_HAS_FAMILY
 Vector FiberSite::outerPos() const
 {
-    if ( fbFiber->family_ )
+    if ( hFiber->family_ )
     {
-        real ab = fbAbs - fbFiber->abscissaM();
-        Vector pos = fbFiber->posM(ab);
-        Vector cen = fbFiber->family_->posM(ab);
+        real ab = hAbs - hFiber->abscissaM();
+        Vector pos = hFiber->posM(ab);
+        Vector cen = hFiber->family_->posM(ab);
         return pos + 0.5 * ( pos - cen );
-        //return 2 * pos - fbFiber->family_->posM(ab);
+        //return 2 * pos - hFiber->family_->posM(ab);
     }
-    return inter.pos();
+    return hTerp.pos();
 }
 #endif
 
 
 FiberEnd FiberSite::nearestEnd() const
 {
-    assert_true(fbFiber);
-    if ( fbAbs > fbFiber->abscissaC() )
+    assert_true(hFiber);
+    if ( hAbs > hFiber->abscissaC() )
         return PLUS_END;
     else
         return MINUS_END;
@@ -72,26 +72,26 @@ FiberEnd FiberSite::nearestEnd() const
 
 real FiberSite::distanceToEnd(FiberEnd end) const
 {
-    assert_true(fbFiber);
+    assert_true(hFiber);
     if ( end == PLUS_END )
-        return fbFiber->abscissaP() - fbAbs;
+        return hFiber->abscissaP() - hAbs;
     else
     {
         assert_true(end == MINUS_END);
-        return fbAbs - fbFiber->abscissaM();
+        return hAbs - hFiber->abscissaM();
     }
 }
 
 
 real  FiberSite::abscissaFrom(const FiberEnd ref) const
 {
-    assert_true(fbFiber);
+    assert_true(hFiber);
     switch( ref )
     {
-        case MINUS_END:  return fbAbs - fbFiber->abscissaM();
-        case PLUS_END:   return fbFiber->abscissaP() - fbAbs;
-        case ORIGIN:     return fbAbs;
-        case CENTER:     return fbAbs - fbFiber->abscissaC();
+        case MINUS_END:  return hAbs - hFiber->abscissaM();
+        case PLUS_END:   return hFiber->abscissaP() - hAbs;
+        case ORIGIN:     return hAbs;
+        case CENTER:     return hAbs - hFiber->abscissaC();
         default:         ABORT_NOW("invalid argument value");
     }
     return 0;
@@ -104,21 +104,21 @@ real  FiberSite::abscissaFrom(const FiberEnd ref) const
 void FiberSite::write(Outputter& out) const
 {
     out.writeSoftSpace();
-    if ( fbFiber )
+    if ( hFiber )
     {
         checkAbscissa();
 #if FIBER_HAS_LATTICE
-        if ( fbLattice )
+        if ( hLattice )
         {
-            Object::writeReference(out, Fiber::TAG_LATTICE, fbFiber->identity());
-            // in older format, `fbAbs` was written here
-            out.writeInt32(fbSite);
+            Object::writeReference(out, Fiber::TAG_LATTICE, hFiber->identity());
+            // in older format, `hAbs` was written here
+            out.writeInt32(hSite);
         }
         else
 #endif
         {
-            Object::writeReference(out, fbFiber);
-            out.writeFloat(fbAbs);
+            Object::writeReference(out, hFiber);
+            out.writeFloat(hAbs);
         }
     }
     else
@@ -132,43 +132,43 @@ void FiberSite::read(Inputter& in, Simul& sim)
 {
     ObjectTag tag = 0;
     Object * w = sim.readReference(in, tag);
-    fbFiber = static_cast<Fiber*>(w);
+    hFiber = static_cast<Fiber*>(w);
 
     if ( w )
     {
         //std::clog << "FiberSite::read() " << (char)tag << '\n';
         if ( tag == Fiber::TAG )
         {
-            fbAbs = in.readFloat();
+            hAbs = in.readFloat();
 #if FIBER_HAS_LATTICE
             // set mSite to closest integral position
-            if ( fbLattice )
-                fbSite = fbLattice->index(fbAbs);
+            if ( hLattice )
+                hSite = hLattice->index(hAbs);
 #endif
         }
         else if ( tag == Fiber::TAG_LATTICE )
         {
 #ifdef BACKWARD_COMPATIBILITY
             if ( in.formatID() < 49 )
-                fbAbs = in.readFloat();
+                hAbs = in.readFloat();
 #endif
 #if FIBER_HAS_LATTICE
-            fbSite = in.readInt32();
-            fbLattice = &fbFiber->lattice();
+            hSite = in.readInt32();
+            hLattice = &hFiber->lattice();
             // put in the middle of the site:
             // the abscissa will be adjusted in Fiber::resetLattice()
-            fbAbs = ( fbSite + 0.5 ) * fbLattice->unit();
+            hAbs = ( hSite + 0.5 ) * hLattice->unit();
 #else
             lati_t t = in.readInt32();
             // relying on the lattice_unit being correct at this stage:
-            fbAbs = ( t + 0.5 ) * fbFiber->prop->lattice_unit;
+            hAbs = ( t + 0.5 ) * hFiber->prop->lattice_unit;
             //throw InvalidIO("Cannot import Digit without fiber's lattice");
 #endif
         }
 #ifdef BACKWARD_COMPATIBILITY
         else if ( tag == 'm' )
         {
-            fbAbs = in.readFloat();
+            hAbs = in.readFloat();
         } 
 #endif
         else
@@ -190,8 +190,8 @@ void FiberSite::print(std::ostream& os) const
         os.precision(3);
         os << "(f" << fiber()->identity();
 #if FIBER_HAS_LATTICE
-        if ( fbLattice )
-            os << " s " << fbSite;
+        if ( hLattice )
+            os << " s " << hSite;
         else
 #endif
             os << " @ " << std::fixed << abscissa() << ")";
@@ -213,16 +213,16 @@ std::ostream& operator << (std::ostream& os, FiberSite const& arg)
 
 int FiberSite::checkAbscissa() const
 {
-    assert_true(fbFiber);
+    assert_true(hFiber);
     
-    real a = fbFiber->abscissaM() - fbAbs;
+    real a = hFiber->abscissaM() - hAbs;
     if ( a > 1e-3 )
     {
         std::cerr << "FiberSite:abscissa < fiber:abscissa(MINUS_END) by " << a << '\n';
         return 2;
     }
     
-    real b = fbAbs - fbFiber->abscissaP();
+    real b = hAbs - hFiber->abscissaP();
     if ( b > 1e-3 )
     {
         std::cerr << "FiberSite:abscissa > fiber:abscissa(PLUS_END) by " << b << '\n';
@@ -234,25 +234,25 @@ int FiberSite::checkAbscissa() const
 
 int FiberSite::bad() const
 {
-    if ( fbFiber != inter.mecable() )
+    if ( hFiber != hTerp.mecable() )
     {
-        std::cerr << "Interpolation mismatch " << fbFiber << " " << inter.mecable() << '\n';
+        std::cerr << "Interpolation mismatch " << hFiber << " " << hTerp.mecable() << '\n';
         return 7;
     }
     
-    if ( fbFiber->betweenMP(fbAbs) )
+    if ( hFiber->betweenMP(hAbs) )
     {
-        const real e = fbAbs - abscissaInter();
+        const real e = hAbs - abscissaInterp();
         
         //std::clog << "Interpolation " << std::scientific << e << '\n';
         if ( abs_real(e) > 1e-3 )
         {
             std::cerr << "FiberSite::Interpolation error " << std::scientific << e << "\n";
             std::cerr << " abscissa:\n";
-            std::cerr << "    binder       " << fbAbs << "\n";
-            std::cerr << "    interpolated " << abscissaInter() << "\n";
-            Interpolation pi = fbFiber->interpolate(fbAbs);
-            std::cerr << "    updated      " << fbFiber->abscissaPoint(pi.point1()+pi.coef1()) << "\n";
+            std::cerr << "    binder       " << hAbs << "\n";
+            std::cerr << "    interpolated " << abscissaInterp() << "\n";
+            Interpolation pi = hFiber->interpolate(hAbs);
+            std::cerr << "    updated      " << hFiber->abscissaPoint(pi.point1()+pi.coef1()) << "\n";
             return 8;
         }
     }

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "slider.h"
 #include "slider_prop.h"
 #include "glossary.h"
@@ -29,26 +29,26 @@ void Slider::stepLoaded(Vector const& force, real force_norm)
 {
     assert_true( attached() );
     
-    real a = fbAbs + dot(force, dirFiber()) * prop->mobility_dt;
+    real a = hAbs + dot(force, dirFiber()) * prop->mobility_dt;
     
-    if ( a < fbFiber->abscissaM() )
+    if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;
         }
-        a = fbFiber->abscissaM();
+        a = hFiber->abscissaM();
     }
     
-    if ( a > fbFiber->abscissaP() )
+    if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;
         }
-        a = fbFiber->abscissaP();
+        a = hFiber->abscissaP();
     }
 
     assert_true( nextDetach >= 0 );

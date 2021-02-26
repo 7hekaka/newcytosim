@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "hand.h"
 #include "hand_prop.h"
@@ -17,10 +17,10 @@ HandMonitor Hand::dummyMonitor;
 //------------------------------------------------------------------------------
 
 Hand::Hand(HandProp const* p, HandMonitor* m)
- : haNext(nullptr), haPrev(nullptr), haMonitor(m), prop(p)
+ : hNext(nullptr), hPrev(nullptr), hMonitor(m), prop(p)
 {
     if ( !m )
-        haMonitor = &dummyMonitor;
+        hMonitor = &dummyMonitor;
     // initialize in unattached state:
     nextDetach = 0;
 }
@@ -29,26 +29,26 @@ Hand::Hand(HandProp const* p, HandMonitor* m)
 Hand::~Hand()
 {
     // the Hands should be detached in ~Couple and ~Single
-    assert_true(!fbFiber);
+    assert_true(!hFiber);
     prop = nullptr;
 }
 
 
 Hand * Hand::otherHand() const
 {
-    return haMonitor->otherHand(this);
+    return hMonitor->otherHand(this);
 }
 
 
 Vector Hand::linkBase() const
 {
-    return haMonitor->linkBase(this);
+    return hMonitor->linkBase(this);
 }
 
 
 real Hand::linkStiffness() const
 {
-    return haMonitor->linkStiffness();
+    return hMonitor->linkStiffness();
 }
 
 
@@ -71,13 +71,13 @@ void Hand::resetTimers()
 void Hand::relocate(Fiber* f)
 {
     assert_true(f);
-    if ( fbFiber )
+    if ( hFiber )
     {
-        fbFiber->removeHand(this);
-        fbFiber = f;
+        hFiber->removeHand(this);
+        hFiber = f;
 #if FIBER_HAS_LATTICE
-        if ( fbLattice )
-            fbLattice = &f->lattice();
+        if ( hLattice )
+            hLattice = &f->lattice();
 #endif
     }
     f->addHand(this);
@@ -88,27 +88,27 @@ void Hand::relocate(Fiber* f)
 void Hand::relocate(Fiber* f, const real a)
 {
     assert_true(f);
-    if ( f != fbFiber )
+    if ( f != hFiber )
     {
-        if ( fbFiber )
+        if ( hFiber )
         {
-            fbFiber->removeHand(this);
-            fbFiber = f;
+            hFiber->removeHand(this);
+            hFiber = f;
 #if FIBER_HAS_LATTICE
-            if ( fbLattice )
-                fbLattice = &f->lattice();
+            if ( hLattice )
+                hLattice = &f->lattice();
 #endif
         }
         f->addHand(this);
     }
-    fbAbs = a;
+    hAbs = a;
     update();
 }
 
 
 void Hand::moveToEnd(const FiberEnd end)
 {
-    assert_true(fbFiber);
+    assert_true(hFiber);
     assert_true(end==PLUS_END || end==MINUS_END);
     
     if ( end == PLUS_END )
@@ -123,7 +123,7 @@ void Hand::moveToEnd(const FiberEnd end)
 // only checks the Monitor's permission
 bool Hand::monitorAllowsAttachment(FiberSite& sit) const
 {
-    return haMonitor->allowAttachment(sit, this);
+    return hMonitor->allowAttachment(sit, this);
 }
 
 
@@ -205,22 +205,22 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
 #endif
     
     // also check the Monitor's permission:
-    return haMonitor->allowAttachment(sit, this);
+    return hMonitor->allowAttachment(sit, this);
 }
 
 
 void Hand::locate(Fiber* f, real a)
 {
     assert_true(f);
-    assert_true(!fbFiber);
+    assert_true(!hFiber);
     //assert_true(f->abscissaM() <= a + REAL_EPSILON);
     //assert_true(a <= f->abscissaP() + REAL_EPSILON);
 
-    fbAbs = a;
-    fbFiber = f;
+    hAbs = a;
+    hFiber = f;
     f->addHand(this);
     update();
-    haMonitor->afterAttachment(this);
+    hMonitor->afterAttachment(this);
     nextDetach = RNG.exponential();
 }
 
@@ -228,12 +228,12 @@ void Hand::locate(Fiber* f, real a)
 void Hand::attach(FiberSite const& s)
 {
     assert_true(s.attached());
-    assert_true(!fbFiber);
+    assert_true(!hFiber);
 
     locate(s.fiber(), s.abscissa());
 #if FIBER_HAS_LATTICE
-    fbLattice = s.lattice();
-    fbSite = s.site();
+    hLattice = s.lattice();
+    hSite = s.site();
 #endif
 }
 
@@ -241,10 +241,10 @@ void Hand::attach(FiberSite const& s)
 void Hand::detachHand()
 {
     assert_true( attached() );
-    fbFiber->removeHand(this);
-    fbFiber = nullptr;
+    hFiber->removeHand(this);
+    hFiber = nullptr;
 #if FIBER_HAS_LATTICE
-    fbLattice = nullptr;
+    hLattice = nullptr;
 #endif
 }
 
@@ -252,11 +252,11 @@ void Hand::detachHand()
 void Hand::detach()
 {
     assert_true( attached() );
-    haMonitor->beforeDetachment(this);
-    fbFiber->removeHand(this);
-    fbFiber = nullptr;
+    hMonitor->beforeDetachment(this);
+    hFiber->removeHand(this);
+    hFiber = nullptr;
 #if FIBER_HAS_LATTICE
-    fbLattice = nullptr;
+    hLattice = nullptr;
 #endif
 }
 
@@ -268,9 +268,9 @@ void Hand::checkFiberRange()
 {
     assert_true( attached() );
     
-    if ( fbAbs < fbFiber->abscissaM() )
+    if ( hAbs < hFiber->abscissaM() )
         handleDisassemblyM();
-    else if ( fbAbs > fbFiber->abscissaP() )
+    else if ( hAbs > hFiber->abscissaP() )
         handleDisassemblyP();
 }
 
@@ -358,30 +358,30 @@ bool Hand::read(Inputter& in, Simul& sim)
         prop = sim.findProperty<HandProp>("hand",in.readUInt16());
 #endif
     
-    Fiber * fib = fbFiber;
+    Fiber * fib = hFiber;
     FiberSite::read(in, sim);
     resetTimers();
     
     // update fiber's lists:
-    if ( fib != fbFiber )
+    if ( fib != hFiber )
     {
         if ( fib )
             fib->removeHand(this);
-        if ( fbFiber )
-            fbFiber->addHand(this);
+        if ( hFiber )
+            hFiber->addHand(this);
     }
     
-    fib = fbFiber;
+    fib = hFiber;
 #if FIBER_HAS_LATTICE
-    if ( fbFiber && !fbLattice && isDigit() )
+    if ( hFiber && !hLattice && isDigit() )
     {
         /* Promote a Digit class that is not bound to the lattice */
         FiberSite sit(*this);
         // attach Hand to Lattice if possible, and detach otherwise
         if ( attachmentAllowed(sit) )
         {
-            fbLattice = sit.lattice();
-            fbSite = sit.site();
+            hLattice = sit.lattice();
+            hSite = sit.site();
             static_cast<Digit*>(this)->inc();
         }
         else

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "fiber.h"
 #include "field.h"
@@ -21,34 +21,34 @@ void Fiber::step()
     assert_small( length1() - length() );
 #if FIBER_HAS_GLUE
     if ( prop->glue )
-        setGlue(frGlue, PLUS_END, prop->glue);
+        setGlue(fGlue, PLUS_END, prop->glue);
 #endif
 #if NEW_FIBER_CHEW
-    if ( frChewP > 0 )
+    if ( fChewP > 0 )
     {
-        if ( frChewP > prop->max_chewing_speed_dt )
-            frChewP = prop->max_chewing_speed_dt;
+        if ( fChewP > prop->max_chewing_speed_dt )
+            fChewP = prop->max_chewing_speed_dt;
         
-        if ( length() - frChewM - frChewP < prop->min_length )
+        if ( length() - fChewM - fChewP < prop->min_length )
         {
             delete(this);
             return;
         }
-        growP(-frChewP);
-        frChewP = 0;
+        growP(-fChewP);
+        fChewP = 0;
     }
-    if ( frChewM > 0 )
+    if ( fChewM > 0 )
     {
-        if ( frChewM > prop->max_chewing_speed_dt )
-            frChewM = prop->max_chewing_speed_dt;
+        if ( fChewM > prop->max_chewing_speed_dt )
+            fChewM = prop->max_chewing_speed_dt;
 
-        if ( length() - frChewM < prop->min_length )
+        if ( length() - fChewM < prop->min_length )
         {
             delete(this);
             return;
         }
-        growM(-frChewM);
-        frChewM = 0;
+        growM(-fChewM);
+        fChewM = 0;
     }
 #endif
     
@@ -94,21 +94,21 @@ void Fiber::step()
     
 #if FIBER_HAS_MESH
     
-    //std::clog << reference() << " mesh " << std::fixed << frMesh->data(0) << '\n';
-    //std::clog << reference() << " mesh sum = " << frMesh->sum() << "     ";
+    //std::clog << reference() << " mesh " << std::fixed << fMesh->data(0) << '\n';
+    //std::clog << reference() << " mesh sum = " << fMesh->sum() << "     ";
     
     if ( prop->mesh_binding_rate > 0 || prop->mesh_unbinding_rate > 0 )
     {
         real on  = prop->mesh_binding_rate * simul().time_step();
         real off = -std::expm1( -prop->mesh_unbinding_rate * simul().time_step() );
-        equilibrateMesh(frMesh, prop->field_ptr, on, off);
+        equilibrateMesh(fMesh, prop->field_ptr, on, off);
     }
     
     if ( prop->mesh_flux_speed != 0 )
-        fluxMesh(frMesh, prop->field_ptr, prop->mesh_flux_speed);
+        fluxMesh(fMesh, prop->field_ptr, prop->mesh_flux_speed);
     
     if ( prop->mesh_cut_fiber )
-        cutFiberMesh(frMesh);
+        cutFiberMesh(fMesh);
     
     if ( prop->mesh_aging_rate > 0 )
     {
@@ -118,10 +118,10 @@ void Fiber::step()
          with a time-scale given by 'mesh_aging_rate'.
          */
         real cst = prop->mesh_aging_rate * simul().time_step();
-        evolveMeshValues(frMesh, cst, 1 - cst);
-        //std::clog << reference() << " lattice avg = " << frMesh->sum()*frMesh->unit()/length() << '\n';
+        evolveMeshValues(fMesh, cst, 1 - cst);
+        //std::clog << reference() << " lattice avg = " << fMesh->sum()*fMesh->unit()/length() << '\n';
     }
-    //std::clog << frMesh->sum() << '\n';
+    //std::clog << fMesh->sum() << '\n';
 #endif
 }
 
@@ -145,7 +145,7 @@ Fiber::Fiber(FiberProp const* p)
             if ( prop->lattice_unit < REAL_EPSILON )
                 throw InvalidParameter("the Lattice unit (lattice[1]) must be > 0");
             //Cytosim::log << reference() <<  " new Lattice" << '\n';
-            frLattice.setUnit(prop->lattice_unit);
+            fLattice.setUnit(prop->lattice_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:lattice");
 #endif
@@ -157,14 +157,14 @@ Fiber::Fiber(FiberProp const* p)
             if ( prop->mesh_unit < REAL_EPSILON )
                 throw InvalidParameter("the Mesh unit (mesh[1]) must be > 0");
             //Cytosim::log << reference() <<  " new Mesh" << '\n';
-            frMesh.setUnit(prop->mesh_unit);
+            fMesh.setUnit(prop->mesh_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:mesh");
 #endif
         }
     }
 #if FIBER_HAS_GLUE
-    frGlue = nullptr;
+    fGlue = nullptr;
 #endif
 #if FIBER_HAS_FAMILY
     family_ = this;
@@ -172,8 +172,8 @@ Fiber::Fiber(FiberProp const* p)
     brother_ = nullptr;
 #endif
 #if NEW_FIBER_CHEW
-    frChewM = 0;
-    frChewP = 0;
+    fChewM = 0;
+    fChewP = 0;
 #endif
 }
 
@@ -198,12 +198,12 @@ Fiber::~Fiber()
     
 #if FIBER_HAS_MESH
     if ( prop->field_ptr )
-        releaseMeshValues(frMesh, prop->field_ptr);
+        releaseMeshValues(fMesh, prop->field_ptr);
 #endif
 
 #if FIBER_HAS_GLUE
-    delete(frGlue);
-    frGlue = nullptr;
+    delete(fGlue);
+    fGlue = nullptr;
 #endif
     if ( disp )
     {
@@ -261,7 +261,7 @@ void Fiber::flipHandsPolarity()
      new_abs = plus + minus - old_abs
      */
     real mid = abscissaM() + abscissaP();
-    Hand * ha = frHands.front();
+    Hand * ha = fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -281,7 +281,7 @@ void Fiber::cutM(real len)
     
     Chain::cutM(len);
     
-    Hand * ha = frHands.front();
+    Hand * ha = fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -304,7 +304,7 @@ void Fiber::cutP(real len)
     
     Chain::cutP(len);
     
-    Hand * ha = frHands.front();
+    Hand * ha = fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -352,11 +352,11 @@ Fiber* Fiber::severPoint(size_t pti)
     fib->updateFiber();
 
 #if FIBER_HAS_MESH
-    if ( frMesh.ready() )
+    if ( fMesh.ready() )
     {
-        assert_true( frMesh.unit() == fib->frMesh.unit() );
+        assert_true( fMesh.unit() == fib->fMesh.unit() );
         // transfer Lattice values located above the cut
-        fib->frMesh.takeP(frMesh, frMesh.index_round(abs));
+        fib->fMesh.takeP(fMesh, fMesh.index_round(abs));
     }
 #endif
 
@@ -364,7 +364,7 @@ Fiber* Fiber::severPoint(size_t pti)
     truncateP(pti);
     
     // transfer Hands above point P, at same abscissa
-    Hand * ha = frHands.front();
+    Hand * ha = fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -420,11 +420,11 @@ Fiber* Fiber::severP(real abs)
     fib->updateFiber();
 
 #if FIBER_HAS_MESH
-    if ( frMesh.ready() )
+    if ( fMesh.ready() )
     {
-        assert_true( frMesh.unit() == fib->frMesh.unit() );
+        assert_true( fMesh.unit() == fib->fMesh.unit() );
         // transfer Lattice values located above the cut:
-        fib->frMesh.takeP(frMesh, frMesh.index_round(abscissaM()+abs));
+        fib->fMesh.takeP(fMesh, fMesh.index_round(abscissaM()+abs));
     }
 #endif
     
@@ -436,7 +436,7 @@ Fiber* Fiber::severP(real abs)
     // transfer all Hands above cut to new piece
     // their abscissa should not change in this transfer
     abs += abscissaM();
-    Hand * ha = frHands.front();
+    Hand * ha = fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -465,7 +465,7 @@ void Fiber::severNow()
      which is essential here to avoid data loss:
      cut from high to low abscissa
      */
-    for ( SeverPos const& cut : pendingCuts )
+    for ( CutFacts const& cut : pendingCuts )
     {
         //std::clog << "cut " << cut.abs << " [ " << abscissaM() << " " << abscissaP() << " ]\n";
         if ( cut.abs - abscissaM() <= prop->min_length )
@@ -609,16 +609,16 @@ void Fiber::join(Fiber * fib)
     setEndStateP(fib->endStateP());
 
 #if FIBER_HAS_MESH
-    if ( frMesh.ready() )
+    if ( fMesh.ready() )
     {
-        assert_true( frMesh.unit() == fib->frMesh.unit() );
+        assert_true( fMesh.unit() == fib->fMesh.unit() );
         // transfer Lattice values from other fiber
-        frMesh.takeP(fib->frMesh, frMesh.indexM());
+        fMesh.takeP(fib->fMesh, fMesh.indexM());
     }
 #endif
 
     // transfer all Hands
-    Hand * ha = fib->frHands.front();
+    Hand * ha = fib->fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -1046,7 +1046,7 @@ size_t Fiber::nbHandsInRange(real i, real s, const FiberEnd ref) const
     s = abscissaFrom(s, ref);
     if ( s < i )
         std::swap(i, s);
-    return frHands.countInRange(i, s);
+    return fHands.countInRange(i, s);
 }
 
 
@@ -1061,7 +1061,7 @@ size_t Fiber::nbHandsNearEnd(const real len, const FiberEnd ref) const
     else
         throw("invalid argument value to nbHandsNearEnd()");
         
-    return frHands.countInRange(i, s);
+    return fHands.countInRange(i, s);
 }
 
 //------------------------------------------------------------------------------
@@ -1119,7 +1119,7 @@ void Fiber::updateFiber()
      We must iterate one step ahead, because `checkFiberRange()` may lead to detachment.
      The loop could be unrolled, or parallelized
      */
-    Hand * ha = frHands.front();
+    Hand * ha = fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
@@ -1130,27 +1130,27 @@ void Fiber::updateFiber()
     }
 #if FIBER_HAS_LATTICE
     // this will allocate the Lattice's site to cover the range of Abscissa:
-    if ( frLattice.ready() )
+    if ( fLattice.ready() )
     {
-        frLattice.setRange(abscissaM(), abscissaP());
+        fLattice.setRange(abscissaM(), abscissaP());
     }
 #endif
 #if FIBER_HAS_MESH
     // this will allocate the Lattice's site to cover the range of Abscissa:
-    if ( frMesh.ready() )
+    if ( fMesh.ready() )
     {
-        frMesh.setRange(abscissaM(), abscissaP());
+        fMesh.setRange(abscissaM(), abscissaP());
         
         if ( prop->field_ptr )
         {
             real sumM;
             // release Lattice substance located outside the valid abscissa range
-            frMesh.collectM(sumM);
+            fMesh.collectM(sumM);
             prop->field_ptr->cell(posEndM()) += sumM;
             //Cytosim::log << " Fiber::MINUS_END releases " << sumM << '\n';
             
             real sumP;
-            frMesh.collectP(sumP);
+            fMesh.collectP(sumP);
             prop->field_ptr->cell(posEndP()) += sumP;
             //Cytosim::log << " Fiber::PLUS_END releases " << sumP << '\n';
         }
@@ -1165,7 +1165,7 @@ void Fiber::updateFiber()
 void Fiber::printLattice(std::ostream& os) const
 {
 #if FIBER_HAS_LATTICE
-    FiberLattice const& lat = frLattice;
+    FiberLattice const& lat = fLattice;
     using std::setw;
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1182,7 +1182,7 @@ void Fiber::printLattice(std::ostream& os) const
 void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx) const
 {
 #if FIBER_HAS_LATTICE
-    FiberLattice const& lat = frLattice;
+    FiberLattice const& lat = fLattice;
     if ( lat.ready() )
     {
         const auto sup = lat.indexP();
@@ -1203,9 +1203,9 @@ void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx)
 VisibleLattice const* Fiber::visibleLattice() const
 {
 #if FIBER_HAS_MESH
-    return &frMesh;
+    return &fMesh;
 #elif FIBER_HAS_LATTICE
-    return &frLattice;
+    return &fLattice;
 #else
     return nullptr;
 #endif
@@ -1466,7 +1466,7 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
 void Fiber::infoMesh(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
 {
 #if FIBER_HAS_MESH
-    Lattice<real> const& lat = frMesh;
+    Lattice<real> const& lat = fMesh;
     if ( lat.ready() )
     {
         len += length();
@@ -1705,21 +1705,21 @@ void Fiber::write(Outputter& out) const
      We can save the occupancy Lattice here, but this is not necessary
      as it can be recalculated on the fly, so we save space by skipping
      */
-    if ( frLattice.ready() )
+    if ( fLattice.ready() )
     {
         writeHeader(out, TAG_LATTICE);
-        // frLattice.write(out);
+        // fLattice.write(out);
         // only write information corresponding to actual Fiber abscissa range:
-        frLattice.write(out, frLattice.indexM(), frLattice.indexP()+1);
+        fLattice.write(out, fLattice.indexM(), fLattice.indexP()+1);
     }
 #endif
 #if FIBER_HAS_MESH
-    if ( frMesh.ready() )
+    if ( fMesh.ready() )
     {
         writeHeader(out, TAG_FIBMESH);
-        // frMesh.write(out);
+        // fMesh.write(out);
         // only write information corresponding to actual Fiber abscissa range:
-        frMesh.write(out, frMesh.indexM(), frMesh.indexP()+1);
+        fMesh.write(out, fMesh.indexM(), fMesh.indexP()+1);
     }
 #endif
 }
@@ -1755,12 +1755,12 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         Chain::read(in, sim, tag);
 #if FIBER_HAS_LATTICE
-        if ( frLattice.ready() )
-            frLattice.setRange(abscissaM(), abscissaP());
+        if ( fLattice.ready() )
+            fLattice.setRange(abscissaM(), abscissaP());
 #endif
 #if FIBER_HAS_MESH
-        if ( frMesh.ready() )
-            frMesh.setRange(abscissaM(), abscissaP());
+        if ( fMesh.ready() )
+            fMesh.setRange(abscissaM(), abscissaP());
 #endif
 #ifdef BACKWARD_COMPATIBILITY
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
@@ -1772,16 +1772,16 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
             Cytosim::warn << "fiber:length < min_length ( " << length() << " < " << prop->min_length << " )\n";
         }
 #if FIBER_HAS_GLUE
-        frGlue = nullptr;
+        fGlue = nullptr;
 #endif
     }
     else if ( tag == TAG_LATTICE )
     {
         try {
 #if FIBER_HAS_LATTICE
-            if ( frLattice.ready() )
-                frLattice.setRange(abscissaM(), abscissaP());
-            frLattice.read(in);
+            if ( fLattice.ready() )
+                fLattice.setRange(abscissaM(), abscissaP());
+            fLattice.read(in);
 #else
             FiberLattice dummy;
             dummy.read(in);
@@ -1798,9 +1798,9 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try {
 #if FIBER_HAS_MESH
-            if ( frMesh.ready() )
-                frMesh.setRange(abscissaM(), abscissaP());
-            frMesh.read(in);
+            if ( fMesh.ready() )
+                fMesh.setRange(abscissaM(), abscissaP());
+            fMesh.read(in);
 #else
             Lattice<real> dummy;
             dummy.read(in);

@@ -10,7 +10,7 @@
 class Hand;
 
 
-/// a list of Hands
+/// a list of Hands, used to keep track of Hands attached to a Fiber
 class HandList
 {
     
@@ -32,19 +32,19 @@ public:
     Hand * back() { return haBack; }
     
     /// register a new Hands that attached to this Fiber
-    void   add(Hand*);
+    void add(Hand*);
     
     /// unregister bound Hands (which has detached)
-    void   remove(Hand*);
+    void remove(Hand*);
     
     /// update all Hands bound to this
-    void   update() const;
+    void update() const;
     
     /// detach all Hands
-    void   detachAll() const;
+    void detachAll() const;
     
     /// sort Hands by order of increasing abscissa
-    void   sort();
+    void sort();
     
     /// number of attached Hands
     size_t count() const;

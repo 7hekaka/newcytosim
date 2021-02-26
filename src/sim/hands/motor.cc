@@ -22,35 +22,35 @@ void Motor::stepUnloaded()
 #if NEW_VARIABLE_SPEED
     LOG_ONCE("Motor speed is affected by Fiber's Lattice\n");
     real C = fiber()->meshValue(abscissa());
-    real a = fbAbs + prop->set_speed_dt + prop->variable_speed_dt * C;
+    real a = hAbs + prop->set_speed_dt + prop->variable_speed_dt * C;
 #else
-    real a = fbAbs + prop->set_speed_dt;
+    real a = hAbs + prop->set_speed_dt;
 #endif
 
-    if ( a < fbFiber->abscissaM() )
+    if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;
         }
-        a = fbFiber->abscissaM();
+        a = hFiber->abscissaM();
     }
     
-    if ( a > fbFiber->abscissaP() )
+    if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;
         }
-        a = fbFiber->abscissaP();
+        a = hFiber->abscissaP();
     }
     
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * abs_real(a-fbAbs);
+    nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
 #endif
 
     if ( !testDetachment() )
@@ -82,38 +82,38 @@ void Motor::stepLoaded(Vector const& force, real force_norm)
         dab = std::min(dab, prop->max_dab);
     }
     
-    real a = fbAbs + dab;
+    real a = hAbs + dab;
     
-    if ( a < fbFiber->abscissaM() )
+    if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;
         }
-        a = fbFiber->abscissaM();
+        a = hFiber->abscissaM();
     }
     
-    if ( a > fbFiber->abscissaP() )
+    if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
         {
             detach();
             return;
         }
-        a = fbFiber->abscissaP();
+        a = hFiber->abscissaP();
     }
 
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * abs_real(a-fbAbs);
+    nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
 #endif
     
     if ( testKramersDetachment(force_norm) )
         return;
 
-    //std::cerr << this << " > " << fbAbs << "  " << dab << "\n";
+    //std::cerr << this << " > " << hAbs << "  " << dab << "\n";
     moveTo(a);
 }
 

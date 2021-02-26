@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "nucleator.h"
 #include "nucleator_prop.h"
@@ -37,7 +37,7 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
     if ( opt.set(mk, "mark") )
         Simul::mark(objs, mk);
     else
-        Simul::mark(objs, haMonitor->nucleatorID());
+        Simul::mark(objs, hMonitor->nucleatorID());
 
     // the Fiber will be oriented depending on specificity:
     Rotation rot;
@@ -45,7 +45,7 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
     real ang = 0;
     if ( opt.set(ang, "nucleation_angle") )
     {
-        Vector dir = haMonitor->otherDirection(this);
+        Vector dir = hMonitor->otherDirection(this);
         rot = Rotation::rotationToVector(dir);
 #if ( DIM == 2 )
         rot = rot * Rotation::randomRotation(ang);
@@ -57,21 +57,21 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
     {            
         case NucleatorProp::NUCLEATE_PARALLEL:
         {
-            Vector dir = haMonitor->otherDirection(this);
+            Vector dir = hMonitor->otherDirection(this);
             rot = Rotation::randomRotationToVector(dir);
         }
         break;
         
         case NucleatorProp::NUCLEATE_ANTIPARALLEL:
         {
-            Vector dir = -haMonitor->otherDirection(this);
+            Vector dir = -hMonitor->otherDirection(this);
             rot = Rotation::randomRotationToVector(dir);
         }
         break;
         
         case NucleatorProp::NUCLEATE_PARALLEL_IF:
         {
-            Hand * ha = haMonitor->otherHand(this);
+            Hand * ha = hMonitor->otherHand(this);
             if ( ha && ha->attached() )
             {
                 rot = Rotation::randomRotationToVector(ha->dirFiber());
@@ -105,10 +105,10 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
     ObjectSet::rotateObjects(objs, rot);
     
     // shift position by the length of the interaction:
-    if ( haMonitor->linkRestingLength() > 0 )
+    if ( hMonitor->linkRestingLength() > 0 )
     {
-        Vector dir = haMonitor->otherDirection(this);
-        pos += dir.randOrthoU(haMonitor->linkRestingLength());
+        Vector dir = hMonitor->otherDirection(this);
+        pos += dir.randOrthoU(hMonitor->linkRestingLength());
     }
 
     /*

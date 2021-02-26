@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef DIGIT_H
 #define DIGIT_H
@@ -46,40 +46,40 @@ public:
 #if FIBER_HAS_LATTICE > 0
 
     /// true if given Lattice's site is outside Lattice's range
-    bool   outsideMP(lati_t s) const { return fbLattice->outsideMP(s); }
+    bool   outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
 
     /// true if given Lattice's site has this footprint's bits set
     bool   occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) & prop->footprint; }
 
     /// true if given Lattice's site is unoccupied (check all footprint bits equal to 1)
-    bool   vacant(lati_t s) const { return 0 == (fbLattice->data(s) & prop->footprint); }
+    bool   vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop->footprint); }
 
     /// flip footprint bits on current site
-    void   inc() const { assert_true(vacant(fbSite)); fbLattice->data(fbSite) ^= prop->footprint; }
+    void   inc() const { assert_true(vacant(hSite)); hLattice->data(hSite) ^= prop->footprint; }
 
     /// flip footprint bits on current site
-    void   dec() const { fbLattice->data(fbSite) ^= prop->footprint; assert_true(vacant(fbSite));  }
+    void   dec() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacant(hSite));  }
     
 #elif FIBER_HAS_LATTICE < 0
 
     /// true if given Lattice's site is outside Lattice's range
-    bool   outsideMP(lati_t s) const { return fbLattice->outsideMP(s); }
+    bool   outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
 
     /// true if given Lattice's site is occupied
     bool   occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) != 0.0; }
 
     /// true if given Lattice's site is unoccupied
-    bool   vacant(lati_t s) const { return fbLattice->data(s) == 0.0; }
+    bool   vacant(lati_t s) const { return hLattice->data(s) == 0.0; }
 
     /// add 1.0 to Lattice's site
-    void   inc() const { fbLattice->data(fbSite) += 1.0; }
+    void   inc() const { hLattice->data(hSite) += 1.0; }
 
     /// subtract 1.0 to Lattice's site
-    void   dec() const { fbLattice->data(fbSite) -= 1.0; }
+    void   dec() const { hLattice->data(hSite) -= 1.0; }
     
 #else
 
-    lati_t site() const { return (lati_t)std::round(fbAbs/prop->step_size); }
+    lati_t site() const { return (lati_t)std::round(hAbs/prop->step_size); }
     bool   outsideMP(lati_t) const { return false; }
     bool   occupied(FiberLattice& lat, lati_t s) const { return false; }
     bool   vacant(lati_t) const { return true; }

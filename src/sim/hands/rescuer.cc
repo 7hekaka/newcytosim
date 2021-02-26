@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "rescuer.h"
 #include "rescuer_prop.h"
 #include "glossary.h"
@@ -33,11 +33,11 @@ void Rescuer::handleDisassemblyM()
     if ( RNG.test(prop->rescue_prob) )
     {
         Fiber * fib = fiber();
-        assert_true( fbAbs < fbFiber->abscissaM() );
+        assert_true( hAbs < hFiber->abscissaM() );
         // induce rescue:
         fib->setEndStateM(STATE_GREEN);
         // increase MT length to cover position of Hand
-        fib->growM(fiber()->abscissaM()-fbAbs);
+        fib->growM(fiber()->abscissaM()-hAbs);
         // update all Hands:
         fib->updateHands();
     }
@@ -65,11 +65,11 @@ void Rescuer::handleDisassemblyP()
     if ( RNG.test(prop->rescue_prob) )
     {
         Fiber * fib = fiber();
-        assert_true( fbAbs > fbFiber->abscissaP() );
+        assert_true( hAbs > hFiber->abscissaP() );
         // induce rescue:
         fib->setEndStateP(STATE_GREEN);
         // increase MT length to cover position of Hand
-        fib->growP(fbAbs-fiber()->abscissaP());
+        fib->growP(hAbs-fiber()->abscissaP());
         // update all Hands:
         fib->updateHands();
     }

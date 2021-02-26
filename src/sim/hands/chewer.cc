@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "chewer.h"
 #include "chewer_prop.h"
@@ -33,7 +33,7 @@ void Chewer::stepUnloaded()
     if ( engaged != NO_END )
     {
 #if NEW_FIBER_CHEW
-        fbFiber->chew(prop->chewing_speed_dt, engaged);
+        hFiber->chew(prop->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
         throw InvalidParameter("fiber:chew is not enabled");
@@ -41,17 +41,17 @@ void Chewer::stepUnloaded()
         return;
     }
 
-    real a = fbAbs + prop->diffusion_dt * RNG.sreal();
+    real a = hAbs + prop->diffusion_dt * RNG.sreal();
     
-    if ( a <= fbFiber->abscissaM() )
+    if ( a <= hFiber->abscissaM() )
     {
-        a = fbFiber->abscissaM();
+        a = hFiber->abscissaM();
         engaged = MINUS_END;
     }
     
-    if ( a >= fbFiber->abscissaP() )
+    if ( a >= hFiber->abscissaP() )
     {
-        a = fbFiber->abscissaP();
+        a = hFiber->abscissaP();
         engaged = PLUS_END;
     }
     
@@ -73,7 +73,7 @@ void Chewer::stepLoaded(Vector const& force, real force_norm)
     if ( engaged != NO_END )
     {
 #if NEW_FIBER_CHEW
-        fbFiber->chew(prop->chewing_speed_dt, engaged);
+        hFiber->chew(prop->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
         throw InvalidParameter("fiber:chew is not enabled");
@@ -83,10 +83,10 @@ void Chewer::stepLoaded(Vector const& force, real force_norm)
     
     // the load is the projection of the force on the local direction of Fiber
     real load = dot(force, dirFiber());
-    real a = fbAbs + prop->diffusion_dt * RNG.sreal() + prop->mobility_dt * load;
+    real a = hAbs + prop->diffusion_dt * RNG.sreal() + prop->mobility_dt * load;
     
-    const real m = fbFiber->abscissaM();
-    const real p = fbFiber->abscissaP();
+    const real m = hFiber->abscissaM();
+    const real p = hFiber->abscissaP();
     
     if ( a <= m )
     {

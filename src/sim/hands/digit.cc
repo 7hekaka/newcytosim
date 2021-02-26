@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "digit.h"
 #include "digit_prop.h"
@@ -66,11 +66,11 @@ void Digit::hop(lati_t s)
 #if FIBER_HAS_LATTICE
     assert_true( lattice() );
     dec();
-    fbSite = s;
+    hSite = s;
     inc();
-    fbAbs = s * lattice()->unit() + prop->site_shift;
+    hAbs = s * lattice()->unit() + prop->site_shift;
 #else
-    fbAbs = s * prop->step_size + prop->site_shift;
+    hAbs = s * prop->step_size + prop->site_shift;
 #endif
     update();
 }
@@ -193,17 +193,17 @@ std::ostream& operator << (std::ostream& os, Digit const& arg)
 #if FIBER_HAS_LATTICE
 void Fiber::resetLattice()
 {
-    if ( frLattice.data() )
+    if ( fLattice.data() )
     {
-        frLattice.clear();
+        fLattice.clear();
         
-        for ( Hand * ha = frHands.front(); ha; ha = ha->next() )
+        for ( Hand * ha = fHands.front(); ha; ha = ha->next() )
         {
-            if ( ha->lattice() == &frLattice )
+            if ( ha->isDigit() && ha->lattice() == &fLattice )
             {
                 Digit* dig = static_cast<Digit*>(ha);
                 dig->inc();
-                dig->moveTo(frLattice.unit() * dig->site()+ dig->prop->site_shift);
+                dig->moveTo(fLattice.unit() * dig->site()+ dig->prop->site_shift);
             }
         }
     }

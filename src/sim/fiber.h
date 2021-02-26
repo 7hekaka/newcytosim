@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef FIBER_H
 #define FIBER_H
@@ -64,7 +64,7 @@ typedef FiberLattice VisibleLattice;
  
  - `FiberProp * prop` points to the physical properties (ie. parameters) of the Fiber.
  - `FiberDisp * disp` points to display parameters (not used in sim).
- - `frHands` keeps track of all attached Hands.
+ - `fHands` keeps track of all attached Hands.
  .
  
  The Fiber may have a Lattice of integers, used by Digit and derived Hands.
@@ -84,7 +84,7 @@ private:
     Fiber& operator =(const Fiber&);
 
     /// Stores the information needed to sever a Fiber
-    class SeverPos
+    class CutFacts
     {
     public:
         real    abs;      ///< abscissa of the cut, from the reference
@@ -92,53 +92,53 @@ private:
         state_t stateP;   ///< state of the new PLUS_END
         
         /// constructor (abscissa, new_plus_end_state, new_minus_end_state)
-        SeverPos(real a, state_t p, state_t m) { abs=a; stateP=p; stateM=m; }
+        CutFacts(real a, state_t p, state_t m) { abs=a; stateP=p; stateM=m; }
         
         /// sort from PLUS_END to MINUS_END, i.e. with decreasing abscissa
-        bool operator < (SeverPos const&b) const { return abs > b.abs; }
+        bool operator < (CutFacts const&b) const { return abs > b.abs; }
     };
 
     /// list of bound Hands
-    mutable HandList    frHands;
+    mutable HandList fHands;
     
 #if FIBER_HAS_LATTICE
     /// Associated Lattice used for occupancy of Digit
-    FiberLattice        frLattice;
+    FiberLattice fLattice;
 #endif
 #if FIBER_HAS_MESH
     /// Associated Lattice of reals
-    Lattice<real>       frMesh;
+    Lattice<real> fMesh;
 #endif
 #if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
-    Single *            frGlue;
+    Single * fGlue;
 #endif
 
 protected:
 #if NEW_FIBER_CHEW
     /// stored chewing at the end
-    real                frChewM, frChewP;
+    real fChewM, fChewP;
 #endif
     
     /// ordered list of future severing positions
-    std::set<SeverPos>  pendingCuts;
+    std::set<CutFacts> pendingCuts;
 
     
     /// cut Fiber at point `pti`, return section `[ pti - PLUS_END ]`
     virtual Fiber* severPoint(size_t pti);
     
     /// return index of point where there is a kink with ( std::cos(angle) < max_cos )
-    size_t         hasKink(real max_cos) const;
+    size_t hasKink(real max_cos) const;
 
     
     /// viscous drag coefficient for an ellipsoid moving in an infinite volume of fluid
-    static real    dragCoefficientEllipsoid(real len, FiberProp const*);
+    static real dragCoefficientEllipsoid(real len, FiberProp const*);
     
     /// viscous drag coefficient for a cylinder moving in an infinite volume of fluid
-    static real    dragCoefficientCylinder(real len, FiberProp const*);
+    static real dragCoefficientCylinder(real len, FiberProp const*);
     
     /// viscous drag coefficient for a cylinder moving close to a surface
-    static real    dragCoefficientSurface(real len, FiberProp const*);
+    static real dragCoefficientSurface(real len, FiberProp const*);
     
 public:
     
@@ -148,31 +148,31 @@ public:
      A Hand may not bind to a fiber, if the other Hand of the Couple is already
      attached to a fiber with the same value of `family`, if ( family > 0 ).
      */
-    Fiber const*  family_;
-    Fiber const*  sister_;
-    Fiber const*  brother_;
+    Fiber const* family_;
+    Fiber const* sister_;
+    Fiber const* brother_;
 
     /// radial direction at the specified distance from the MINUS_END
-    Vector  radialDirM(real a) const { assert_true(this!=family_); return posM(a) - family_->posM(a); }
+    Vector radialDirM(real a) const { assert_true(this!=family_); return posM(a) - family_->posM(a); }
 
     /// radial direction at the specified abscissa
-    Vector  radialDir(real a) const { return radialDirM(a-abscissaM()); }
+    Vector radialDir(real a) const { return radialDirM(a-abscissaM()); }
     
     /// position of a point specified by distance from the MINUS_END
-    Vector  displayPosM(real a) const;
+    Vector displayPosM(real a) const;
 
 #else
     
     /// position of a point specified by distance from the MINUS_END
-    Vector  displayPosM(real a) const { return posM(a); }
+    Vector displayPosM(real a) const { return posM(a); }
 
 #endif
 
     /// the Property of this object
-    FiberProp const*    prop;
+    FiberProp const * prop;
     
     /// the display parameters
-    LineDisp mutable*   disp;
+    LineDisp mutable* disp;
 
     //--------------------------------------------------------------------------
 
@@ -213,14 +213,14 @@ public:
     Fiber *        severNow(real abs) { return severP(abs-abscissaM()); }
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
-    void           sever(real a, state_t p, state_t m) { pendingCuts.insert(SeverPos(a, p, m)); }
+    void           sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }
     
     /// perform all the cuts registered by sever()
     void           severNow();
 
 #if NEW_FIBER_CHEW
     /// register a chewing quantity
-    void           chew(const real x, FiberEnd end) { if ( end == PLUS_END ) frChewP += x; else frChewM += x; }
+    void           chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
 #endif
 
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
@@ -281,28 +281,28 @@ public:
     //--------------------------------------------------------------------------
     
     /// register a new Hands that attached to this Fiber
-    void           addHand(Hand* h) const { frHands.add(h); }
+    void           addHand(Hand* h) const { fHands.add(h); }
     
     /// unregister bound Hands (which has detached)
-    void           removeHand(Hand* h) const  { frHands.remove(h); }
+    void           removeHand(Hand* h) const  { fHands.remove(h); }
     
     /// update all Hands bound to this
-    void           updateHands() const { frHands.update(); }
+    void           updateHands() const { fHands.update(); }
 
     /// detach all Hands
-    void           detachHands() const { frHands.detachAll(); }
+    void           detachHands() const { fHands.detachAll(); }
     
     /// sort Hands by order of increasing abscissa
-    void           sortHands() const { frHands.sort(); }
+    void           sortHands() const { fHands.sort(); }
     
     /// return Hand bound to this fiber (use ->next() to access all other Hands)
-    Hand *         firstHand() const { return frHands.front(); }
+    Hand *         firstHand() const { return fHands.front(); }
    
     /// number of attached Hands
-    size_t         nbHands() const { return frHands.count(); }
+    size_t         nbHands() const { return fHands.count(); }
     
     /// a function to count Hands using a custom criteria
-    size_t         nbHands(int (*func)(Hand const*)) const { return frHands.count(func); }
+    size_t         nbHands(int (*func)(Hand const*)) const { return fHands.count(func); }
 
     /// number of Hands attached within a range of abscissa
     size_t         nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;
@@ -313,10 +313,10 @@ public:
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE
     /// modifiable reference to Fiber's Lattice
-    FiberLattice&  lattice() { return frLattice; }
+    FiberLattice&  lattice() { return fLattice; }
     
     /// const reference to Fiber's Lattice
-    FiberLattice const& lattice() const { return frLattice; }
+    FiberLattice const& lattice() const { return fLattice; }
         
     /// recalculate occupancy lattice from bound Digits
     void           resetLattice();
@@ -335,10 +335,10 @@ public:
 #if FIBER_HAS_MESH
 
     /// modifiable reference to Fiber's mesh
-    Lattice<real>& mesh() { return frMesh; }
+    Lattice<real>& mesh() { return fMesh; }
 
-    /// value of the frMesh at given abscissa
-    real           meshValue(real a) const { if ( frMesh.ready() ) return frMesh.cell(a); return 0; }
+    /// value of the fMesh at given abscissa
+    real           meshValue(real a) const { if ( fMesh.ready() ) return fMesh.cell(a); return 0; }
 
 #endif
     
