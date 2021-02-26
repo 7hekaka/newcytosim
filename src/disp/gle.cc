@@ -423,21 +423,43 @@ namespace gle
     //-----------------------------------------------------------------------
     # pragma mark - Circle, Cone and Disc
     
-    size_t setCone(flute6* flu, GLfloat B, GLfloat T, size_t inc)
+    size_t setCone(flute6* flu, float B, float T, size_t inc)
     {
-        const GLfloat L = T - B;
-        const GLfloat Y = 1.f/sqrtf(L*L+1.f);
-        const GLfloat X = Y * L;
-        GLsizei i = 1;
+        const float L = T - B;
+        const float Y = 1.f/sqrtf(L*L+1.f);
+        const float X = Y * L;
+        size_t i = 1;
         flu[0] = flute6{ 0, 0, T, 0, 0, 1 };
         for( size_t p = 0; p <= ncircle; p += inc )
         {
-            GLfloat C = cos_(p), S = sin_(p);
+            float C = cos_(p), S = sin_(p);
+            // 3 vertex and 3 normal coordinates
             flu[i++] = flute6{ C, S, B, C*X, S*X, Y };
         }
         return i;
     }
+    
+    void setDisc(flute3* flu, float R, float Z, size_t inc)
+    {
+        size_t i = 1;
+        flu[0] = flute3{ 0, 0, Z };
+        for ( size_t n = 0; n <= ncircle; n += inc )
+            flu[i++] = flute3{R*cos_(n), R*sin_(n), Z};
+    }
 
+    //-----------------------------------------------------------------------
+    # pragma mark - Circle, Cone and Disc
+
+    /*
+     @todo: need to use indexed-triangles, TRIANGLE_FAN are deprecated
+         add left most vertex
+         for each phi in (-PI/2, Pi/2) //ommit the first and last one
+             x = r * sin(phi)
+             y = r * cos(phi)
+             add (x, y)
+             add (x, -y)
+         add right most vertex
+     */
     void circle()
     {
         glNormal3f(0, 0, 1);
@@ -485,33 +507,6 @@ namespace gle
         glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
         glFrontFace(GL_CCW);
-    }
-    
-    void discZ(GLfloat R, GLfloat Z, GLfloat N)
-    {
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f( 0, 0, N );
-        glVertex3f( 0, 0, Z );
-        for ( size_t n = 0; n <= ncircle; ++n )
-            glVertex3f(R*cos_(n), R*sin_(n), Z);
-        glEnd();
-    }
-    
-    void coneZ(GLfloat R, GLfloat B, GLfloat T)
-    {
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f( 0, 0, 1 );
-        glVertex3f( 0, 0, T );
-        const GLfloat L(T-B);
-        const GLfloat Y = 1.f/sqrtf(L*L+1);
-        const GLfloat X = Y * L;
-        for ( size_t n = 0; n <= ncircle; ++n )
-        {
-            GLfloat S = sin_(n), C = cos_(n);
-            glNormal3f(X*C, X*S, Y);
-            glVertex3f(R*C, R*S, B);
-        }
-        glEnd();
     }
 
     void cone()
@@ -908,9 +903,9 @@ namespace gle
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
     }
     
-    size_t setCube(flute3* flu, GLfloat R)
+    size_t setCube(flute3* flu, float R)
     {
-        const GLfloat U = -R;
+        const float U = -R;
         flu[0] = flute3{R, U, U};
         flu[1] = flute3{U, U, U};
         flu[2] = flute3{R, R, U};
@@ -946,7 +941,7 @@ namespace gle
         /* start from a centerred cube, rotated appropriately
          with vertices ordered to draw all surfaces of the cube
          with a single triangle strip. */
-        const GLfloat pts[] = {
+        const float pts[] = {
              H, R, 0, 0, R, H,
              H, U, 0, 0, U, H,
             -H, U, 0, 0, R, H,
@@ -989,10 +984,10 @@ namespace gle
     /* This moves some vertices to add an hexagonal needle to the blob */
     void modifyBlob(flute3 * flu)
     {
-        const GLfloat R = 0.6f;
-        const GLfloat Y = R * 0.8660254037844386f; // sqrtf(3)/2;
-        const GLfloat X = R * 0.5f;
-        const GLfloat Z = 0.6f;
+        const float R = 0.6f;
+        const float Y = R * 0.8660254037844386f; // sqrtf(3)/2;
+        const float X = R * 0.5f;
+        const float Z = 0.6f;
         //{ 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 }
         // pull some vertices far away in Z
         for ( int u : { 42, 44, 46, 48, 50 } ) flu[u] = flute3{ 0, 0, 6 };
@@ -1146,26 +1141,26 @@ namespace gle
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
 
-    size_t setTube(flute6* flu, GLfloat B, GLfloat T, size_t inc)
+    size_t setTube(flute6* flu, float B, float T, size_t inc)
     {
         assert_true( B <= T );
-        GLsizei i = 0;
+        size_t i = 0;
         for( size_t p = 0; p <= ncircle; p += inc )
         {
-            GLfloat C = cos_(p), S = sin_(p);
+            float C = cos_(p), S = sin_(p);
             flu[i++] = flute6{ C, S, T, C, S, 0 };
             flu[i++] = flute6{ C, S, B, C, S, 0 };
         }
         return i;
     }
     
-    size_t setTube(flute6* flu, GLfloat R, GLfloat B, GLfloat T, size_t inc)
+    size_t setTube(flute6* flu, float R, float B, float T, size_t inc)
     {
         assert_true( B <= T );
-        GLsizei i = 0;
+        size_t i = 0;
         for( size_t p = 0; p <= ncircle; p += inc )
         {
-            GLfloat C = cos_(p), S = sin_(p);
+            float C = cos_(p), S = sin_(p);
             flu[i++] = flute6{ R*C, R*S, T, C, S, 0 };
             flu[i++] = flute6{ R*C, R*S, B, C, S, 0 };
         }
@@ -1173,12 +1168,12 @@ namespace gle
     }
 
     /// hexagon has the same surface as a disc of radius rad.
-    size_t setHexTube(flute6* flu, GLfloat rad, GLfloat A, GLfloat B)
+    size_t setHexTube(flute6* flu, float rad, float A, float B)
     {
-        constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
-        constexpr GLfloat S = 0.5f;
-        const GLfloat R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        const GLfloat Y = R * C, X = R * S;
+        constexpr float C = 0.8660254037844386f; //std::sqrt(3)/2;
+        constexpr float S = 0.5f;
+        const float R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const float Y = R * C, X = R * S;
         
         flu[0] = flute6{ R, 0, B, 1, 0, 0};
         flu[1] = flute6{ R, 0, A, 1, 0, 0};
@@ -1204,7 +1199,7 @@ namespace gle
     
     constexpr size_t nbHexTubeTriangles = 14;
     
-    size_t initTubeBuffer(GLuint buf, GLfloat A, GLfloat B, size_t inc)
+    size_t initTubeBuffer(GLuint buf, float A, float B, size_t inc)
     {
         size_t cnt = nbTubeTriangles(inc);
         glBindBuffer(GL_ARRAY_BUFFER, buf);
@@ -1216,7 +1211,7 @@ namespace gle
         return n;
     }
     
-    size_t initHexTubeBuffer(GLuint buf, GLfloat R, GLfloat A, GLfloat B)
+    size_t initHexTubeBuffer(GLuint buf, float R, float A, float B)
     {
         size_t cnt = nbHexTubeTriangles;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
@@ -1291,6 +1286,23 @@ namespace gle
 
     //-----------------------------------------------------------------------
     #pragma mark - Legacy 3D objects
+    
+    void coneZ(GLfloat R, GLfloat B, GLfloat T)
+    {
+        glBegin(GL_TRIANGLE_FAN);
+        glNormal3f( 0, 0, 1 );
+        glVertex3f( 0, 0, T );
+        const GLfloat L(T-B);
+        const GLfloat Y = 1.f/sqrtf(L*L+1);
+        const GLfloat X = Y * L;
+        for ( size_t n = 0; n <= ncircle; ++n )
+        {
+            GLfloat S = sin_(n), C = cos_(n);
+            glNormal3f(X*C, X*S, Y);
+            glVertex3f(R*C, R*S, B);
+        }
+        glEnd();
+    }
 
     void tubeZ(GLfloat B, GLfloat T, int inc)
     {
@@ -1306,20 +1318,20 @@ namespace gle
         glEnd();
     }
 
-    void tubeZ(GLfloat bZ, GLfloat rB, GLfloat tZ, GLfloat rT, int inc)
+    void tubeZ(GLfloat B, GLfloat rB, GLfloat T, GLfloat rT, int inc)
     {
-        assert_true( bZ <= tZ );
-        const GLfloat H(tZ-bZ);
+        assert_true( B <= T );
+        const GLfloat H(T-B);
         const GLfloat N = 1.f/sqrtf(H*H+(rT-rB)*(rT-rB));
-        const GLfloat tC = N * (tZ-bZ);
+        const GLfloat tC = N * (T-B);
         const GLfloat tS = N * (rB-rT);
         glBegin(GL_TRIANGLE_STRIP);
         for( size_t n = 0; n <= ncircle; n += inc )
         {
             GLfloat S = sin_(n), C = cos_(n);
             glNormal3f(tC*C, tC*S, tS);
-            glVertex3f(rT*C, rT*S, tZ);
-            glVertex3f(rB*C, rB*S, bZ);
+            glVertex3f(rT*C, rT*S, T);
+            glVertex3f(rB*C, rB*S, B);
         }
         glEnd();
     }
@@ -1444,17 +1456,17 @@ namespace gle
     
     GLuint initIcoBuffer(GLuint buf1, GLuint buf2, Tesselator & ico)
     {
-        constexpr size_t DOUZE = 3*sizeof(float);
+        constexpr size_t DOUZEf = 3*sizeof(float);
+        constexpr size_t DOUZEi = 3*sizeof(unsigned);
         //std::clog << "initializeIco ico " << ico.nb_faces() << '\n';
         glBindBuffer(GL_ARRAY_BUFFER, buf1);
-        glBufferData(GL_ARRAY_BUFFER, DOUZE*ico.nb_vertices(), nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, ico.nb_vertices()*DOUZEf, nullptr, GL_STATIC_DRAW);
         void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         ico.store_vertices((float*)glb);
         glUnmapBuffer(GL_ARRAY_BUFFER);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
         // upload indices:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf2);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*sizeof(unsigned)*ico.nb_faces(), ico.face_data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ico.nb_faces()*DOUZEi, ico.face_data(), GL_STATIC_DRAW);
         //fprintf(stderr, "icosahedron buffer %i has %u faces\n", buf1, ico.nb_faces());
         return ico.nb_faces();
     }
@@ -2106,6 +2118,24 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
+    void paintOctogon(const int rec[4], const int rad)
+    {
+        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
+        GLfloat D(rad);
+        GLfloat pts[16] = {R,B+D, R,T-D, R-D,B, R-D,T, L+D,B, L+D,T, L,B+D, L,T-D};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
+    }
+    
+    void drawOctogon(const int rec[4], const int rad)
+    {
+        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
+        GLfloat D(rad);
+        GLfloat pts[18] = {L,B+D, L+D,B, R-D,B, R,B+D, R,T-D, R-D,T, L+D,T, L,T-D, L,B+D};
+        glVertexPointer(2, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_LINE_STRIP, 0, 9);
+    }
+
     /**
      The text is displayed in the current color.
      A background rectangle is displayed only if `bcol` is visible.
@@ -2198,18 +2228,14 @@ namespace gle
             int R = abs(lineHeight);
             int B = std::min(py, py + n_lines * lineHeight);
             int T = std::max(py, py + n_lines * lineHeight);
-            
             int rec[4] = { px-R, B, px+textWidth+R, T+R+R/2+R/4 };
-            
             bcol.load();
-            drawNiceRectangle(rec, 3, GL_TRIANGLE_FAN);
-            
+            paintOctogon(rec, 3);
             glPopAttrib();
-            
             if ( position == 4 )
             {
                 glLineWidth(0.5);
-                drawNiceRectangle(rec, 3, GL_LINE_STRIP);
+                drawOctogon(rec, 3);
             }
         }
         
@@ -2245,16 +2271,6 @@ namespace gle
         glDrawArrays(GL_LINE_LOOP, 0, 5);
     }
 
-    
-    void drawNiceRectangle(const int rec[4], const int rad, GLint prim)
-    {
-        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
-        GLfloat D(rad);
-        GLfloat pts[18] = {L,B+D,L+D,B,R-D,B,R,B+D,R,T-D,R-D,T,L+D,T,L,T-D,L,B+D};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(prim, 0, 9);
-    }
-    
     
     void drawRectangle(const int rec[4], int width, int height)
     {

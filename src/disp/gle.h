@@ -258,9 +258,6 @@ namespace gle
     void drawRectangle(const int rect[4]);
     void drawRectangle(float L, float B, float R, float T, float Z=0);
 
-    /// a rectangle with cut corners
-    void drawNiceRectangle(const int rect[4], int, GLint);
-
     //------------------------------------------------------------------------------
     
     /// do not draw
