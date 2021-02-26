@@ -24,7 +24,7 @@ set field blue
     diffusion = 1
     bind_fibers = 0.5
     positive = 1
-    display_scale = 0.1
+    display_scale = 1
 }
 
 new blue
@@ -62,8 +62,8 @@ set fiber filament
     steric = 1, 0.025
     squeeze = 1, 0.05, 1
     
-    lattice = 2, 0.05
-    lattice_cut_fiber = 1
+    mesh = 2, 0.05
+    mesh_cut_fiber = 1
 
     activity = dynamic
     growing_speed = 0.18

@@ -22,7 +22,7 @@ set field blue
 {
     step = 0.1
     diffusion = 0.5
-    display_scale = 0.25
+    display_scale = 1
 }
 
 new blue
@@ -32,11 +32,11 @@ new blue
 
 set fiber filament
 {
-    lattice = 1
-    lattice_unit = 0.1
-    lattice_flux_speed = -1
-    lattice_binding_rate = 2
-    lattice_unbinding_rate = 0.25
+    mesh = 1
+    mesh_unit = 0.1
+    mesh_flux_speed = -1
+    mesh_binding_rate = 2
+    mesh_unbinding_rate = 0.25
     rigidity = 20
     segmentation = 0.5
     field = blue

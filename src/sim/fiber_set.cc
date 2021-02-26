@@ -921,22 +921,28 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
 #endif
             }
             // set lower triangle of 3x3 second rank traceless tensor:
-            M[0] += w * ( DIM * XX - N );
-            M[1] += w * ( DIM * XY );
-            M[2] += w * ( DIM * XZ );
-            M[4] += w * ( DIM * YY - N );
-            M[5] += w * ( DIM * YZ );
-            M[8] += w * ( DIM * ZZ - N );
+            M[0] += w * XX;
+            M[1] += w * XY;
+            M[2] += w * XZ;
+            M[4] += w * YY;
+            M[5] += w * YZ;
+            M[8] += w * ZZ;
             sum += w * N;
         }
     }
     
     if ( sum == 0 )
         return 0;
-    // rescale matrix:
+    // rescale matrix: 2D: ( DIM * M - 1 ),  3D: 1/2 * ( DIM * M - 1 )
+    real beta = ( DIM == 3 ) ? 0.5 : 1.0;
+    sum = beta * DIM / sum;
     for ( size_t d = 0; d < 9; ++d )
-        M[d] = M[d] / sum;
-    
+        M[d] = sum * M[d];
+    // subtract trace:
+    M[0] -= beta;
+    if ( DIM > 1 ) M[4] -= beta;
+    if ( DIM > 2 ) M[8] -= beta;
+
     int nbv = 1;
     real vec[9] = { 0 };
     real val[3] = { 0 };

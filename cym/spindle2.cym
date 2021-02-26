@@ -58,8 +58,8 @@ set fiber microtubule
     segmentation = 0.5
     steric = 1, 0.025
     
-    lattice = 2, 0.05
-    lattice_cut_fiber = 1
+    mesh = 2, 0.05
+    mesh_cut_fiber = 1
 
     activity = tubule
     dynamic_model = 1

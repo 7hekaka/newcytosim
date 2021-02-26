@@ -333,6 +333,14 @@ public:
         for ( lati_t s = laInf; s < laSup; ++s )
             laCell[s] = value;
     }
+    
+    /// set gradient of values from zero to `alpha`
+    void gradient(cell_t alpha)
+    {
+        cell_t val = alpha * laUnit;
+        for ( lati_t s = laInf; s < laSup; ++s )
+            laCell[s] = s * val;
+    }
 
 #pragma mark - Transfer
     

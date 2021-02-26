@@ -22,7 +22,7 @@ set field blue
     diffusion = 0.5
     transport = 1, 5
     cut_fibers = 1
-    display_scale = 0.5
+    display_scale = 1
 }
 
 new blue
