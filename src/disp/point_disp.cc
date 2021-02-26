@@ -313,12 +313,16 @@ void PointDisp::savePixelmap(GLubyte* bitmap, unsigned dim, unsigned id) const
     {
        char str[32];
         snprintf(str, sizeof(str), "bitmap_%s_%02u.png", name_str(), id);
-        FILE * file = fopen(str, "w");
-        if ( file && !ferror(file ) )
+        FILE * f = fopen(str, "w");
+        if ( f )
         {
-            SaveImage::saveAlphaPNG(file, bitmap, dim, dim);
-            fclose(file);
-            std::clog << "PointDisp saved " << str << '\n';
+            if ( !ferror(f) )
+            {
+                SaveImage::saveAlphaPNG(f, bitmap, dim, dim);
+                fclose(f);
+                std::clog << "PointDisp saved " << str << '\n';
+            }
+            fclose(f);
         }
     }
 }

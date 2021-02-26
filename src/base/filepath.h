@@ -5,6 +5,9 @@
 /// Functions to handle UNIX-like file/directory paths
 namespace FilePath
 {
+    /// open C-file
+    FILE * open_file(const char path[], const char mode[2]);
+    
     /// return path to current working directory
     std::string get_cwd();
 

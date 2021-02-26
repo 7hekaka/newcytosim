@@ -2246,18 +2246,13 @@ void Meca::saveRHS(FILE * file) const
  */
 void Meca::saveSystem() const
 {
-    FILE * f = fopen("matrix.mtx", "w");
-    if ( f && ~ferror(f) )
-    {
-        saveMatrix(f, 0);
-        fclose(f);
-    }
-    f = fopen("vector.mtx", "w");
-    if ( f && ~ferror(f) )
-    {
-        saveRHS(f);
-        fclose(f);
-    }
+    FILE * f = FilePath::open_file("matrix.mtx", "w");
+    saveMatrix(f, 0);
+    fclose(f);
+    
+    f = FilePath::open_file("vector.mtx", "w");
+    saveRHS(f);
+    fclose(f);
 }
 
 
@@ -2269,19 +2264,19 @@ void Meca::exportSystem() const
 #if SEPARATE_RIGIDITY_TERMS
     std::clog << "incorrect dump since SEPARATE_RIGIDITY_TERMS is defined\n";
 #endif
-    FILE * f = fopen("ord.txt", "w");
+    FILE * f = FilePath::open_file("ord.txt", "w");
     fprintf(f, "%lu %i %lu\n", dimension(), DIM, sizeof(real));
     fclose(f);
     
-    f = fopen("stp.txt", "w");
+    f = FilePath::open_file("stp.txt", "w");
     fprintf(f, "%f %f\n", tau_, tolerance_);
     fclose(f);
-
-    f = fopen("mob.txt", "w");
+    
+    f = FilePath::open_file("mob.txt", "w");
     saveMobility(f);
     fclose(f);
     
-    f = fopen("obj.txt", "w");
+    f = FilePath::open_file("obj.txt", "w");
     saveObjectID(f);
     fclose(f);
     
@@ -2547,47 +2542,47 @@ void Meca::dumpMobility(FILE * file, bool nat) const
  */
 void Meca::dumpSystem(bool nat) const
 {
-    FILE * f = fopen("ord.txt", "w");
+    FILE * f = FilePath::open_file("ord.txt", "w");
     fprintf(f, "%lu %i %lu\n", dimension(), DIM, sizeof(real));
     fclose(f);
     
-    f = fopen("stp.txt", "w");
+    f = FilePath::open_file("stp.txt", "w");
     fprintf(f, "%.12f %.12f\n", tau_, tolerance_);
     fclose(f);
- 
-    f = fopen("mob.bin", "wb");
+    
+    f = FilePath::open_file("mob.bin", "wb");
     dumpMobility(f, nat);
     fclose(f);
     
-    f = fopen("obj.bin", "wb");
+    f = FilePath::open_file("obj.bin", "wb");
     dumpObjectID(f);
     fclose(f);
     
-    f = fopen("rhs.bin", "wb");
+    f = FilePath::open_file("rhs.bin", "wb");
     dumpVector(f, dimension(), vRHS, nat);
     fclose(f);
     
-    f = fopen("sol.bin", "wb");
+    f = FilePath::open_file("sol.bin", "wb");
     dumpVector(f, dimension(), vSOL, nat);
     fclose(f);
     
-    f = fopen("pts.bin", "wb");
+    f = FilePath::open_file("pts.bin", "wb");
     dumpVector(f, dimension(), vPTS, nat);
     fclose(f);
     
-    f = fopen("sys.bin", "wb");
+    f = FilePath::open_file("sys.bin", "wb");
     dumpMatrix(f, nat);
     fclose(f);
     
-    f = fopen("ela.bin", "wb");
+    f = FilePath::open_file("ela.bin", "wb");
     dumpElasticity(f, nat);
     fclose(f);
     
-    f = fopen("prj.bin", "wb");
+    f = FilePath::open_file("prj.bin", "wb");
     dumpProjection(f, nat);
     fclose(f);
     
-    f = fopen("con.bin", "wb");
+    f = FilePath::open_file("con.bin", "wb");
     dumpPreconditionner(f, nat);
     fclose(f);
     

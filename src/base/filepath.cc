@@ -10,6 +10,25 @@
 #include "exceptions.h"
 
 
+FILE * FilePath::open_file(const char name[], const char mode[2])
+{
+    if ( name[0] == 0 )
+        throw InvalidIO("an empty file name was specified");
+
+    FILE* f = fopen(name, "w");
+
+    if ( !f )
+        throw InvalidIO("file `"+std::string(name)+"' could not be opened");
+    if ( ferror(f) )
+    {
+        fclose(f);
+        f = nullptr;
+        throw InvalidIO("file `"+std::string(name)+"'  opened with error");
+    }
+    return f;
+}
+
+
 std::string FilePath::get_cwd()
 {
     char cwd[1024] = { 0 };
