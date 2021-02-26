@@ -308,31 +308,17 @@ void Mecable::calculateMomentum(Vector& avg, Vector& dev)
     avg.reset();
     dev.reset();
     
-    // calculate first and second moments:
     for ( size_t i = 0; i < nPoints; ++i )
     {
         Vector x = posPoint(i);
         avg += x;
         dev += x.e_squared();
-        /*
-         real const* pp = pPos + DIM*i;
-         avg.XX += pp[0];
-         dev.XX += pp[0] * pp[0];
-         #if ( DIM > 1 )
-         avg.YY += pp[1];
-         dev.YY += pp[1] * pp[1];
-         #endif
-         #if ( DIM > 2 )
-         avg.ZZ += pp[2];
-         dev.ZZ += pp[2] * pp[2];
-         #endif
-         */
     }
     
     if ( nPoints > 1 )
     {
         avg /= nPoints;
-        dev /= nPoints-1;
+        dev /= nPoints;
     }
     
     dev -= avg.e_squared();

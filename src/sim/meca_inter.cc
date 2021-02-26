@@ -2621,10 +2621,10 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
     Matrix22 C(cc2, -ee2,  ee2, cc2);
     Matrix22 D(cc3,  ee2, -ee2, cc3);
 
-    Matrix22 wA = A * (-weight); //(ww0,  we1, -we1, ww0);
-    Matrix22 wB = B * (-weight); //(ww1, -we1,  we1, ww1);
-    Matrix22 wC = C * (-weight); //(ww2,  we2, -we2, ww2);
-    Matrix22 wD = D * (-weight); //(ww3, -we2,  we2, ww3);
+    Matrix22 wAt = A.transposed(-weight); //(ww0,  we1, -we1, ww0);
+    Matrix22 wBt = B.transposed(-weight); //(ww1, -we1,  we1, ww1);
+    Matrix22 wCt = C.transposed(-weight); //(ww2,  we2, -we2, ww2);
+    Matrix22 wDt = D.transposed(-weight); //(ww3, -we2,  we2, ww3);
         
     /*
      We use block operations to set the matrix lower blocks:
@@ -2636,27 +2636,27 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
     ii3   | D'A  D'B  D'C  D'D |
      */
 
-    add_block_diag(ii0, wA.trans_mul(A));
-    add_block_diag(ii1, wB.trans_mul(B));
-    add_block_diag(ii2, wC.trans_mul(C));
-    add_block_diag(ii3, wD.trans_mul(D));
+    add_block_diag(ii0, wAt.mul(A));
+    add_block_diag(ii1, wBt.mul(B));
+    add_block_diag(ii2, wCt.mul(C));
+    add_block_diag(ii3, wDt.mul(D));
  
-    add_block(ii1, ii0, wB.trans_mul(A));
-    add_block(ii3, ii2, wD.trans_mul(C));
+    add_block(ii1, ii0, wBt.mul(A));
+    add_block(ii3, ii2, wDt.mul(C));
 
     if ( ii2 > ii0 )
     {
-        add_block(ii2, ii0, wC.trans_mul(A));
-        add_block(ii3, ii0, wD.trans_mul(A));
-        add_block(ii2, ii1, wC.trans_mul(B));
-        add_block(ii3, ii1, wD.trans_mul(B));
+        add_block(ii2, ii0, wCt.mul(A));
+        add_block(ii3, ii0, wDt.mul(A));
+        add_block(ii2, ii1, wCt.mul(B));
+        add_block(ii3, ii1, wDt.mul(B));
     }
     else
     {
-        add_block(ii0, ii2, wA.trans_mul(C));
-        add_block(ii1, ii2, wB.trans_mul(C));
-        add_block(ii0, ii3, wA.trans_mul(D));
-        add_block(ii1, ii3, wB.trans_mul(D));
+        add_block(ii0, ii2, wAt.mul(C));
+        add_block(ii1, ii2, wBt.mul(C));
+        add_block(ii0, ii3, wAt.mul(D));
+        add_block(ii1, ii3, wBt.mul(D));
     }
  
     if ( modulo )
@@ -2665,10 +2665,10 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( off.is_not_zero() )
         {
-            add_base(ii0, wA.trans_vecmul(off));
-            add_base(ii1, wB.trans_vecmul(off));
-            add_base(ii2, wC.trans_vecmul(off));
-            add_base(ii3, wD.trans_vecmul(off));
+            add_base(ii0, wAt*off);
+            add_base(ii1, wBt*off);
+            add_base(ii2, wCt*off);
+            add_base(ii3, wDt*off);
         }
     }
     
@@ -2709,10 +2709,10 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
     MatrixBlock C = MatrixBlock::vectorProduct(cc2,  legB);
     MatrixBlock D = MatrixBlock::vectorProduct(cc3, -legB);
 
-    MatrixBlock wA = A * (-weight);
-    MatrixBlock wB = B * (-weight);
-    MatrixBlock wC = C * (-weight);
-    MatrixBlock wD = D * (-weight);
+    MatrixBlock wAt = A.transposed(-weight);
+    MatrixBlock wBt = B.transposed(-weight);
+    MatrixBlock wCt = C.transposed(-weight);
+    MatrixBlock wDt = D.transposed(-weight);
         
     /*
      We use block operations to set the matrix lower blocks:
@@ -2724,27 +2724,27 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
     ii3   | D'A  D'B  D'C  D'D |
      */
 
-    add_block_diag(ii0, wA.trans_mul(A));
-    add_block_diag(ii1, wB.trans_mul(B));
-    add_block_diag(ii2, wC.trans_mul(C));
-    add_block_diag(ii3, wD.trans_mul(D));
+    add_block_diag(ii0, wAt.mul(A));
+    add_block_diag(ii1, wBt.mul(B));
+    add_block_diag(ii2, wCt.mul(C));
+    add_block_diag(ii3, wDt.mul(D));
  
-    add_block(ii1, ii0, wB.trans_mul(A));
-    add_block(ii3, ii2, wD.trans_mul(C));
+    add_block(ii1, ii0, wBt.mul(A));
+    add_block(ii3, ii2, wDt.mul(C));
 
     if ( ii2 > ii0 )
     {
-        add_block(ii2, ii0, wC.trans_mul(A));
-        add_block(ii3, ii0, wD.trans_mul(A));
-        add_block(ii2, ii1, wC.trans_mul(B));
-        add_block(ii3, ii1, wD.trans_mul(B));
+        add_block(ii2, ii0, wCt.mul(A));
+        add_block(ii3, ii0, wDt.mul(A));
+        add_block(ii2, ii1, wCt.mul(B));
+        add_block(ii3, ii1, wDt.mul(B));
     }
     else
     {
-        add_block(ii0, ii2, wA.trans_mul(C));
-        add_block(ii1, ii2, wB.trans_mul(C));
-        add_block(ii0, ii3, wA.trans_mul(D));
-        add_block(ii1, ii3, wB.trans_mul(D));
+        add_block(ii0, ii2, wAt.mul(C));
+        add_block(ii1, ii2, wBt.mul(C));
+        add_block(ii0, ii3, wAt.mul(D));
+        add_block(ii1, ii3, wBt.mul(D));
     }
  
     if ( modulo )
@@ -2753,10 +2753,10 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
         Vector off = modulo->offset( ptB.pos() - ptA.pos() );
         if ( off.is_not_zero() )
         {
-            add_base(ii0, wA.trans_vecmul(off));
-            add_base(ii1, wB.trans_vecmul(off));
-            add_base(ii2, wC.trans_vecmul(off));
-            add_base(ii3, wD.trans_vecmul(off));
+            add_base(ii0, wAt*off);
+            add_base(ii1, wBt*off);
+            add_base(ii2, wCt*off);
+            add_base(ii3, wDt*off);
         }
     }
     
