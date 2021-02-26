@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef POLYGON_H
 #define POLYGON_H
 
@@ -18,27 +18,19 @@ public:
     /// holds the coordinates of a point in 2D + info about the segment
     struct Point2D 
     {
-        real xx, yy;   ///< coordinates of point
-        real dx, dy;   ///< normalized direction to next point
-        real len;      ///< distance to next point
-        long spot;     ///< indicates the type of edge
+        real xx, yy; ///< coordinates of point
+        real dx, dy; ///< normalized direction to next point
+        real len;    ///< distance to next point
+        long spot;   ///< indicates the type of edge
         
         /// constructor
-        Point2D() { spot = 0; }
+        Point2D() : dx(0), dy(0), len(0), spot(0) { }
         
         /// set coordinates of point
-        Point2D(real sx, real sy)
-        {
-            xx = sx;
-            yy = sy;
-            spot = 0;
-        }
+        Point2D(real x, real y) : xx(x), yy(y), dx(0), dy(0), len(0), spot(0) {}
         
-        /// test if given point overlap with *this
-        bool operator == (const Point2D& p)
-        {
-            return ( xx == p.xx  &&  yy == p.yy );
-        }
+        /// true if given point overlaps with *this
+        bool operator == (const Point2D& p) { return ((xx==p.xx) & (yy==p.yy)); }
         
         /// print
         void write(std::ostream& os) const
@@ -55,7 +47,7 @@ public:
     Point2D* pts_;
     
     /// number of points
-    size_t   npts_;
+    size_t npts_;
     
 public:
     
@@ -66,64 +58,64 @@ public:
     ~Polygon();
     
     /// number of points
-    size_t   nbPoints() const { return npts_; }
+    size_t nbPoints() const { return npts_; }
     
     /// set number of points and allocate memory
-    void     allocate(size_t s);
+    void allocate(size_t s);
     
     /// set as regular polygon with `ord` sides (4 : square)
-    void     set(size_t ord, real radius, real angle = 0);
+    void set(size_t ord, real radius, real angle = 0);
 
     /// return copy of point at index `inx`
-    Point2D  point(size_t inx) { assert_true( inx < npts_ ); return pts_[inx]; }
+    Point2D point(size_t inx) { assert_true(inx<npts_); return pts_[inx]; }
 
     /// set coordinates of point at index `inx`:
-    void     setPoint(size_t inx, real x, real y, long c = 0);
+    void setPoint(size_t inx, real x, real y, long c = 0);
     
     /// subfunction
     static size_t read(std::istream&, Point2D *pts, size_t pts_size);
     
     /// read polygon from stream
-    void     read(std::istream&);
+    void read(std::istream&);
     
     /// read polygon from file
-    void     read(std::string const&);
+    void read(std::string const&);
     
     /// write a polygon to stream
-    void     write(std::ostream&) const;
+    void write(std::ostream&) const;
 
     /// flip the order of the points
-    void     flip();
+    void flip();
     
     /// move all points by given amount
-    void     translate(real dx, real dy);
+    void translate(real dx, real dy);
     
     /// scale all points by given factors in X and Y
-    void     scale(real sx, real sy);
+    void scale(real sx, real sy);
     
     /// move all segments sideways, to uniformly increase the surface of polygon
-    void     inflate(real eps);
+    void inflate(real eps);
     
     /// calculate the offsets necessary for the other functions. Return 0 if OK
-    int      complete(real epsilon);
+    int complete(real epsilon);
     
     /// tell if a point is inside a polygon
-    int      inside(real x, real y, int edge, real threshold = REAL_EPSILON) const;
+    int inside(real x, real y, int edge, real threshold = REAL_EPSILON) const;
     
     /// calculate the projection (pX, pY) of the point (x,y) on a polygon
-    int      project(real x, real y, real& pX, real& pY, size_t& hit) const;
+    int project(real x, real y, real& pX, real& pY, size_t& hit) const;
     
     /// calculate the bounding box [xmin, xmax, ymin, ymax] of a polygon
-    void     find_extremes(real box[4]) const;
+    void find_extremes(real box[4]) const;
     
     /// calculate the surface of a polygon
-    real     surface() const;
+    real surface() const;
     
     /// printout
-    void     dump(std::ostream&) const;
+    void dump(std::ostream&) const;
     
     /// printout
-    void     print(FILE*) const;
+    void print(FILE*) const;
 };
 
 #endif

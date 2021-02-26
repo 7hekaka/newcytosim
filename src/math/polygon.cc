@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "polygon.h"
 #include <iostream>
 #include <sstream>
@@ -258,9 +258,7 @@ void Polygon::inflate(real eps)
 
 
 /**
- box[] = { xmin, xmax, ymin, ymax }
- 
- result is undefined if ( npts == 0 ).
+ box[] = { xmin, xmax, ymin, ymax } over all points
  */
 void Polygon::find_extremes(real box[4]) const
 {
@@ -271,13 +269,20 @@ void Polygon::find_extremes(real box[4]) const
         box[2] = pts_[0].yy;
         box[3] = pts_[0].yy;
     }
+    else
+    {
+        box[0] = 0;
+        box[1] = 0;
+        box[2] = 0;
+        box[3] = 0;
+    }
     
     for ( size_t i = 1; i < npts_; ++i )
     {
-        if ( pts_[i].xx < box[0] )  box[0] = pts_[i].xx;
-        if ( pts_[i].xx > box[1] )  box[1] = pts_[i].xx;
-        if ( pts_[i].yy < box[2] )  box[2] = pts_[i].yy;
-        if ( pts_[i].yy > box[3] )  box[3] = pts_[i].yy;
+        box[0] = std::min(box[0], pts_[i].xx);
+        box[1] = std::max(box[1], pts_[i].xx);
+        box[2] = std::min(box[2], pts_[i].yy);
+        box[3] = std::max(box[3], pts_[i].yy);
     }
 }
 
@@ -350,8 +355,8 @@ real Polygon::surface() const
         return 0;
     
     real S = pts_[npts_-1].xx * ( pts_[0].yy - pts_[npts_-2].yy );
-    for ( size_t ii = 2; ii < npts_; ++ii )
-        S += pts_[ii-1].xx * ( pts_[ii].yy - pts_[ii-2].yy );
+    for ( size_t i = 2; i < npts_; ++i )
+        S += pts_[i-1].xx * ( pts_[i].yy - pts_[i-2].yy );
     
     return S * 0.5;
 }
@@ -360,10 +365,10 @@ real Polygon::surface() const
 /**
  Count the number of time a ray from (xx, yy) to (infinity, yy) crosses the polygon
  The point is inside if the result is odd. 
- This works for both clockwise and anticlockwise polygons.
+ This method works for clockwise and anticlockwise polygons.
  
  @return
- 0    : point is ouside
+ 0    : point is outside
  1    : point is inside
  edge : point is near the boundary, within distance `threshold`
  .
@@ -375,10 +380,10 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
     Point2D p1, p2 = pts_[0];
     
     //check all edges of polygon
-    for ( size_t ii = 1; ii <= npts_; ++ii )
+    for ( size_t i = 1; i <= npts_; ++i )
     {
         p1 = p2;
-        p2 = pts_[ii];
+        p2 = pts_[i];
 
         // check if edge cannot interesect with ray
         if (((yy <= p1.yy) & (yy < p2.yy)) | ((yy >= p1.yy) & (yy > p2.yy)))
@@ -404,7 +409,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
                 return edge;
             
             // next vertex
-            const Point2D& p3 = pts_[ii+1];
+            const Point2D& p3 = pts_[i+1];
          
             // check that p2 is not a corner
             if (((p1.yy < yy) & (yy < p3.yy)) | ((p3.yy < yy) & (yy < p1.yy)))
@@ -455,47 +460,43 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, size_t& hit) const
     pX = pts_[0].xx;
     pY = pts_[0].yy;
     
-    real dis = ( xx - pX ) * ( xx - pX ) + ( yy - pY ) * ( yy - pY );
+    real dd = square(xx-pX) + square(yy-pY);
     
-    for ( size_t ii = 0; ii < npts_; ++ii )
+    for ( size_t i = 0; i < npts_; ++i )
     {
-        real x = xx - pts_[ii].xx;
-        real y = yy - pts_[ii].yy;
-        // distance to polygon point:
+        real x = xx - pts_[i].xx;
+        real y = yy - pts_[i].yy;
+        // distance to this polygon point:
         real d = x * x + y * y;
-        // abscissa of projection on segment [ii, ii+1] of the polygon:
-        real a = pts_[ii].dx * x + pts_[ii].dy * y;
+        // abscissa of projection on segment [i, i+1] of the polygon:
+        real a = pts_[i].dx * x + pts_[i].dy * y;
         
         if ( a > 0 )
         {
-            if ( a < pts_[ii].len )
+            if ( a < pts_[i].len )
             {
                 // distance from segment to point:
                 real da = d - a * a;
                 
-                if ( da < dis )
+                if ( da < dd )
                 {
-                    dis = da;
-                    pX  = pts_[ii].xx + a * pts_[ii].dx;
-                    pY  = pts_[ii].yy + a * pts_[ii].dy;
-                    hit = ii;
+                    dd = da;
+                    pX = pts_[i].xx + a * pts_[i].dx;
+                    pY = pts_[i].yy + a * pts_[i].dy;
+                    hit = i;
                     res = 1;
                 }
             }
         }
-        else
+        else if ( d < dd )
         {
-            if ( d < dis )
-            {
-                dis = d;
-                pX  = pts_[ii].xx;
-                pY  = pts_[ii].yy;
-                hit = ii;
-                res = 0;
-            }
+            dd = d;
+            pX = pts_[i].xx;
+            pY = pts_[i].yy;
+            hit = i;
+            res = 0;
         }
     }
-    
     return res;
 }
 
