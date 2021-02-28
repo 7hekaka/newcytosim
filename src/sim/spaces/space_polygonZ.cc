@@ -192,69 +192,69 @@ void SpacePolygonZ::setInteractions(Meca& meca) const
 #ifdef DISPLAY
 #include "opengl.h"
 #include "gle.h"
-
-void SpacePolygonZ::drawZ(bool rings) const
-{
-    const size_t npts = poly_.nbPoints();
-    Polygon::Point2D const* pts = poly_.pts_;
-
-    // that is a dummy way to initialize a circle:
-    constexpr size_t fin = 8 * gle::finesse;
-    GLfloat cir[2*fin+2];
-    gle::compute_circle(fin, cir, 1);
-    
-    //display surface
-    for ( size_t n=1; n <= npts; n++ )
-    {
-        // do not display special edges
-        if ( pts[n-1].spot )
-            continue;
-        
-        GLfloat R1 = GLfloat(pts[n-1].xx);
-        GLfloat Z1 = GLfloat(pts[n-1].yy);
-        GLfloat R2 = GLfloat(pts[n].xx);
-        GLfloat Z2 = GLfloat(pts[n].yy);
-        
-        GLfloat nX = GLfloat( pts[n-1].dy);
-        GLfloat nY = GLfloat(-pts[n-1].dx);
-        
-        if ( R1 >= 0 && R2 >= 0 )
-        {
-            glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t p = 0; p <= fin; ++p )
-            {
-                glNormal3f( nX*cir[2*p], nX*cir[1+2*p], nY );
-                glVertex3f( R2*cir[2*p], R2*cir[1+2*p], Z2 );
-                glVertex3f( R1*cir[2*p], R1*cir[1+2*p], Z1 );
-            }
-            glEnd();
-        }
-    }
-    
-    //display rings around:
-    if ( rings )
-    {
-        glLineWidth(0.5);
-        for ( size_t n=0; n < npts; n++ )
-        {
-            GLfloat R = pts[n].xx;
-            GLfloat Z = pts[n].yy;
-            if ( R > 0 )
-            {
-                glBegin(GL_LINE_LOOP);
-                for ( size_t p = 0; p <= fin; ++p )
-                    glVertex3f(R*cir[2*p], R*cir[1+2*p], Z);
-                glEnd();
-            }
-        }
-    }
-}
-
+#include "gle_flute.h"
 
 void SpacePolygonZ::draw3D() const
 {
-    drawZ(0);
+    const size_t npts = poly_.nbPoints();
+    Polygon::Point2D const* pts = poly_.pts_;
+    
+    for ( size_t n = 0; n < npts; n++ )
+    {
+        // do not display special edges
+        if ( pts[n].spot )
+            continue;
+        
+        GLfloat R1(pts[n].xx), R2(pts[n+1].xx);
+        GLfloat Z1(pts[n].yy), Z2(pts[n+1].yy);
+        GLfloat nX(pts[n].dy), nY(-pts[n].dx);
+        
+        if (( R1 >= 0 ) & ( R2 >= 0 ))
+        {
+            fluteVN * flu = gle::mapVertexNormalBuffer(2+2*gle::pi_twice);
+            size_t i = 0;
+            for ( size_t j = 0; j <= gle::pi_twice; ++j )
+            {
+                float C = gle::cos_(j), S = gle::sin_(j);
+                flu[i++] = fluteVN{R2*C, R2*S, Z2, nX*C, nX*S, nY};
+                flu[i++] = fluteVN{R1*C, R1*S, Z1, nX*C, nX*S, nY};
+            }
+            gle::unmapVertexNormalBuffer();
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+        }
+    }
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+
+//display rings around:
+void SpacePolygonZ::drawRings() const
+{
+    const size_t npts = poly_.nbPoints();
+    Polygon::Point2D const* pts = poly_.pts_;
+    
+    glLineWidth(0.5);
+    for ( size_t n = 0; n < npts; n++ )
+    {
+        GLfloat R = pts[n].xx;
+        GLfloat Z = pts[n].yy;
+        GLfloat nX(pts[n].dy), nY(-pts[n].dx);
+        if ( R > 0 )
+        {
+            fluteVN * flu = gle::mapVertexNormalBuffer(2+gle::pi_twice);
+            size_t i = 0;
+            for ( size_t j = 0; j <= gle::pi_twice; ++j )
+            {
+                float C = gle::cos_(j), S = gle::sin_(j);
+                flu[i++] = fluteVN{R*C, R*S, Z, nX*C, nX*S, nY};
+            }
+            gle::unmapVertexNormalBuffer();
+            glDrawArrays(GL_LINE_LOOP, 0, i);
+        }
+    }
+}
+
 
 #else
 

@@ -72,7 +72,7 @@ public:
     real        estimateVolumeZ(size_t cnt) const;
 
     /// OpenGL display function
-    void        drawZ(bool show_rings) const;
+    void        drawRings() const;
 
     /// OpenGL display function
     void        draw3D() const;

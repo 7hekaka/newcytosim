@@ -50,9 +50,10 @@ namespace gle
         assert_true(stream_[1] == boundBuffer());
         //glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
         glUnmapBuffer(GL_ARRAY_BUFFER);
-        glVertexPointer((DIM>2?3:2), GL_FLOAT, 0, nullptr);
-        glNormalPointer(GL_FLOAT, sizeof(fluteVN), (void*)(DIM>2?0x10:0x8));
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, sizeof(fluteVN), nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, sizeof(fluteVN), (void*)(DIM>2?0xC:0x8));
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
     void bindVertexNormalBuffer(size_t skip)

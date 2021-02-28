@@ -12,6 +12,7 @@ int style = 2;
 int kind = 2;
 int rank = 1;
 
+bool showIndices = false;
 bool showVertices = false;
 bool showEdges = false;
 bool showFaces = true;
@@ -24,17 +25,15 @@ GLuint gldir = 0;
 //------------------------------------------------------------------------------
 void initVBO();
 
-void setTesselator()
+void reset()
 {
     if ( ico )
         delete ico;
-    
     ico = new Tesselator((Tesselator::Polyhedra)kind, rank, 1);
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points", rank, ico->nb_vertices());
     glApp::setMessage(tmp);
-    
     initVBO();
 }
 
@@ -82,21 +81,21 @@ void processNormalKey(unsigned char c, int x, int y)
     switch (c) 
     {
         case ' ': break; // update the Platonic
-        case 'k': kind = ( kind + 1 ) % 6; break;
-        case ']': rank += 1; break;
-        case '}': rank += 16; break;
-        case '[': rank = std::max(rank-1, 1); break;
-        case '{': rank = std::max(rank-16, 1); break;
+        case 'k': kind = ( kind + 1 ) % 6; reset(); break;
+        case ']': rank += 1; reset(); break;
+        case '}': rank += 16; reset(); break;
+        case '[': rank = std::max(rank-1, 1); reset(); break;
+        case '{': rank = std::max(rank-16, 1); reset(); break;
         case 'y': exportPLY(); return;
         case 'Y': exportSTL(); return;
-        case 'e': showEdges = !showEdges; return;
-        case 't': showFaces = !showFaces; return;
-        case 'p': showVertices = !showVertices; return;
-        case 's': style = ( style + 1 ) % 4; glApp::flashText("style = %i", style); return;
+        case 'e': showEdges = !showEdges; break;
+        case 't': showFaces = !showFaces; break;
+        case 'i': showIndices = !showIndices; break;
+        case 'p': showVertices = !showVertices; break;
+        case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
         default: glApp::processNormalKey(c,x,y); return;
     }
     
-    setTesselator();
     glutPostRedisplay();
 }
 
@@ -110,23 +109,8 @@ void drawPlane()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void drawFaces1()
-{
-    glBegin(GL_TRIANGLES);
-    for ( unsigned i = 0; i < ico->nb_faces(); ++i )
-    {
-        glNormal3fv(ico->face_vertex0(i));
-        glVertex3fv(ico->face_vertex0(i));
-        glNormal3fv(ico->face_vertex1(i));
-        glVertex3fv(ico->face_vertex1(i));
-        glNormal3fv(ico->face_vertex2(i));
-        glVertex3fv(ico->face_vertex2(i));
-    }
-    glEnd();
-}
 
-
-void drawFaces2()
+void drawFacesArray()
 {
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
@@ -184,10 +168,8 @@ void drawFacesVBO()
 void drawFaces()
 {
     if ( style == 1 )
-        drawFaces1();
+        drawFacesArray();
     else if ( style == 2 )
-        drawFaces2();
-    else if ( style == 3 )
         drawFacesVBO();
 }
 
@@ -204,7 +186,7 @@ void drawEdges()
     glEnd();
 }
 
-void drawVertices()
+void nameVertices()
 {
     char tmp[128];
     for ( unsigned i=0; i < ico->nb_vertices(); ++i )
@@ -222,6 +204,18 @@ void drawVertices()
         snprintf(tmp, sizeof(tmp), "%u", i);
         gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
     }
+}
+
+void drawVertices()
+{
+    glPointSize(10);
+    glColor3f(1, 1, 1);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, glpts);
+    glVertexPointer(3, GL_FLOAT, 0, nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_POINTS, 0, ico->nb_vertices());
+    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void display(View&, int)
@@ -275,6 +269,10 @@ void display(View&, int)
     {
         drawVertices();
     }
+    if ( showIndices )
+    {
+        nameVertices();
+    }
     glutReportErrors();
 }
 
@@ -290,7 +288,7 @@ int main(int argc, char* argv[])
     glApp::newWindow(display);
     glApp::setScale(3);
   
-    setTesselator();
+    reset();
     gle::initialize();
     glutMainLoop();
 }

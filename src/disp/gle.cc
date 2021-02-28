@@ -18,7 +18,7 @@ namespace gle
     using drawCall = void (*)(GLsizei, GLfloat*, GLuint);
 
     /// values of cosinus, sinus over a full circle
-    GLfloat cir_[2*ncircle+8] = { 0 };
+    float cir_[2*pi_twice+8] = { 0 };
     
     /// OpenGL buffers objects for streaming
     GLuint stream_[4] = { 0 };
@@ -52,7 +52,7 @@ namespace gle
         for ( size_t i = 0; i < 4; ++i )
             cir_[i] = 0;
         // circle starts at index 4
-        compute_circle(ncircle, cir_+4, 1);
+        compute_circle(pi_twice, cir_+4, 1, 0);
         
         if ( !glIsBuffer(ico_[0]) )
         {
@@ -91,10 +91,10 @@ namespace gle
     #pragma mark - Compute Arc and Circle
     
     /// access to precomputed cosinus
-    inline GLfloat cos_(size_t n) { return cir_[4+2*n]; }
+    inline float cos_(size_t n) { return cir_[4+2*n]; }
     
     /// access to precomputed sinus
-    inline GLfloat sin_(size_t n) { return cir_[5+2*n]; }
+    inline float sin_(size_t n) { return cir_[5+2*n]; }
 
     /// Calculates coordinates over an arc of circle
     /**
@@ -430,7 +430,7 @@ namespace gle
         const float X = Y * L;
         size_t i = 1;
         flu[0] = flute6{ 0, 0, T, 0, 0, 1 };
-        for( size_t p = 0; p <= ncircle; p += inc )
+        for( size_t p = 0; p <= pi_twice; p += inc )
         {
             float C = cos_(p), S = sin_(p);
             // 3 vertex and 3 normal coordinates
@@ -443,7 +443,7 @@ namespace gle
     {
         size_t i = 1;
         flu[0] = flute3{ 0, 0, Z };
-        for ( size_t n = 0; n <= ncircle; n += inc )
+        for ( size_t n = 0; n <= pi_twice; n += inc )
             flu[i++] = flute3{R*cos_(n), R*sin_(n), Z};
     }
 
@@ -464,21 +464,21 @@ namespace gle
     {
         glNormal3f(0, 0, 1);
         glVertexPointer(2, GL_FLOAT, 0, 4+cir_);
-        glDrawArrays(GL_LINE_LOOP, 0, ncircle);
+        glDrawArrays(GL_LINE_LOOP, 0, pi_twice);
     }
     
     void disc()
     {
         glNormal3f(0, 0, 1);
         glVertexPointer(2, GL_FLOAT, 16, cir_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
     }
 
     void disc2()
     {
         glNormal3f(0, 0, 1);
         glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_twice);
     }
     
     // this does not preserve the modelview transformation
@@ -487,7 +487,7 @@ namespace gle
         glNormal3f(0, 0, 1);
         glTranslatef(0, 0, 1);
         glVertexPointer(2, GL_FLOAT, 16, cir_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
         //glTranslatef(0, 0, -1);
     }
 
@@ -496,7 +496,7 @@ namespace gle
         glNormal3f(0, 0, -1);
         glFrontFace(GL_CW);
         glVertexPointer(2, GL_FLOAT, 16, cir_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle/2);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
         glFrontFace(GL_CCW);
     }
     
@@ -505,7 +505,7 @@ namespace gle
         glNormal3f(0, 0, -1);
         glFrontFace(GL_CW);
         glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+ncircle);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_twice);
         glFrontFace(GL_CCW);
     }
 
@@ -1145,7 +1145,7 @@ namespace gle
     {
         assert_true( B <= T );
         size_t i = 0;
-        for( size_t p = 0; p <= ncircle; p += inc )
+        for( size_t p = 0; p <= pi_twice; p += inc )
         {
             float C = cos_(p), S = sin_(p);
             flu[i++] = flute6{ C, S, T, C, S, 0 };
@@ -1158,7 +1158,7 @@ namespace gle
     {
         assert_true( B <= T );
         size_t i = 0;
-        for( size_t p = 0; p <= ncircle; p += inc )
+        for( size_t p = 0; p <= pi_twice; p += inc )
         {
             float C = cos_(p), S = sin_(p);
             flu[i++] = flute6{ R*C, R*S, T, C, S, 0 };
@@ -1194,7 +1194,7 @@ namespace gle
     
     inline size_t nbTubeTriangles(size_t inc)
     {
-        return 2 + ( 2 * ncircle ) / inc;
+        return 2 + ( 2 * pi_twice ) / inc;
     }
     
     constexpr size_t nbHexTubeTriangles = 14;
@@ -1295,7 +1295,7 @@ namespace gle
         const GLfloat L(T-B);
         const GLfloat Y = 1.f/sqrtf(L*L+1);
         const GLfloat X = Y * L;
-        for ( size_t n = 0; n <= ncircle; ++n )
+        for ( size_t n = 0; n <= pi_twice; ++n )
         {
             GLfloat S = sin_(n), C = cos_(n);
             glNormal3f(X*C, X*S, Y);
@@ -1308,7 +1308,7 @@ namespace gle
     {
         assert_true( B <= T );
         glBegin(GL_TRIANGLE_STRIP);
-        for( size_t n = 0; n <= ncircle; n += inc )
+        for( size_t n = 0; n <= pi_twice; n += inc )
         {
             GLfloat S = sin_(n), C = cos_(n);
             glNormal3f(C, S, 0);
@@ -1326,7 +1326,7 @@ namespace gle
         const GLfloat tC = N * (T-B);
         const GLfloat tS = N * (rB-rT);
         glBegin(GL_TRIANGLE_STRIP);
-        for( size_t n = 0; n <= ncircle; n += inc )
+        for( size_t n = 0; n <= pi_twice; n += inc )
         {
             GLfloat S = sin_(n), C = cos_(n);
             glNormal3f(tC*C, tC*S, tS);
@@ -1339,7 +1339,7 @@ namespace gle
     void tubeZ(GLfloat B, GLfloat R, gle_color col, GLfloat T, GLfloat D, gle_color loc)
     {
         glBegin(GL_TRIANGLE_STRIP);
-        for( size_t n = 0; n <= ncircle; ++n )
+        for( size_t n = 0; n <= pi_twice; ++n )
         {
             GLfloat S = sin_(n), C = cos_(n);
             col.load_load();
@@ -1355,7 +1355,7 @@ namespace gle
     /// draw spherocylinder of radius R, of axis Z with Z in [B, T]
     void capsuleZ(GLfloat B, GLfloat T, GLfloat R)
     {
-        const size_t fin = ncircle >> 2;
+        const size_t fin = pi_twice >> 2;
         const size_t inc = 4;
         //display strips along the side of the volume:
         for ( size_t t = 0; t < 4*fin; t += inc )
@@ -1391,12 +1391,12 @@ namespace gle
     /// draw a Torus of radius R and a thickness 2*T
     void torusZ(GLfloat R, GLfloat T, size_t inc)
     {
-        for ( size_t n = 0; n < ncircle; n += inc )
+        for ( size_t n = 0; n < pi_twice; n += inc )
         {
             GLfloat X0 = cos_(n    ), Y0 = sin_(n    );
             GLfloat X1 = cos_(n+inc), Y1 = sin_(n+inc);
             glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t p = 0; p <= ncircle; p += 2*inc )
+            for ( size_t p = 0; p <= pi_twice; p += 2*inc )
             {
                 GLfloat S = sin_(p), C = cos_(p);
                 glNormal3f(X0*C, Y0*C, S);
@@ -1415,7 +1415,7 @@ namespace gle
          A vector orthogonal to the ellipse surface at position (X, Y, Z) is
          ( X / rX^2, Y / rY^2, Z / rZ^2 )
           */
-        for ( size_t n = 0; n < ncircle/2; ++n )
+        for ( size_t n = 0; n < pi_once; ++n )
         {
             GLfloat uC = cos_(n  ), uS = sin_(n  );
             GLfloat lC = cos_(n+1), lS = sin_(n+1);
@@ -1424,7 +1424,7 @@ namespace gle
             GLfloat xu = uS * iX, yu = uS * iY, zu = uC * iZ;
             GLfloat xl = lS * iX, yl = lS * iY, zl = lC * iZ;
             glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t p = 0; p <= ncircle; ++p )
+            for ( size_t p = 0; p <= pi_twice; ++p )
             {
                 GLfloat S = sin_(p), C = cos_(p);
                 glNormal3f(C*xu, S*yu, zu);
@@ -1442,7 +1442,7 @@ namespace gle
         GLfloat iX(1.f/rX), iY(1.f/rY), iZ(u/rZ);
         GLfloat vX(R*rX), vY(R*rY), vZ(u*rZ);
         glBegin(GL_LINE_LOOP);
-        for ( size_t n = 0; n <= ncircle; ++n )
+        for ( size_t n = 0; n <= pi_twice; ++n )
         {
             GLfloat S = sin_(n), C = cos_(n);
             glNormal3f(C*iX, S*iY, iZ);
@@ -1623,7 +1623,7 @@ namespace gle
             dR = dR*dN;
             
             glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t n = 0; n <= ncircle; ++n )
+            for ( size_t n = 0; n <= pi_twice; ++n )
             {
                 GLfloat S = sin_(n), C = cos_(n);
                 glNormal3f(dN*C, dN*S,-dR);

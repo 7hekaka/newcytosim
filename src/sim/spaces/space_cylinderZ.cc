@@ -508,80 +508,64 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 #include "opengl.h"
 #include "gle.h"
+#include "gle_flute.h"
 
 void SpaceCylinderZ::draw3D() const
 {
-    const GLfloat T(top_);
-    const GLfloat B(bot_);
-    const GLfloat R(radius_);
+    const GLfloat T(top_), TE(top_-edge_);
+    const GLfloat B(bot_), BE(bot_+edge_);
+    const GLfloat R(radius_), RE(radius_-edge_);
     const GLfloat E(edge_);
-    const GLfloat RE(radius_ - edge_);
-    const GLfloat TE(top_ - edge_);
-    const GLfloat BE(bot_ + edge_);
     
-    const size_t fin = 256;
-    GLfloat cir[2*fin+2];
-    gle::compute_circle(fin, cir, 1);
-
-    const size_t pi_half = fin/4;
-    const size_t pi_once = fin/2;
+    size_t cnt = 2 * ( gle::pi_once + 3 );
     
-    for (size_t i = 0; i < fin; i++)
+    for ( size_t u = 0; u < gle::pi_twice; ++u )
     {
-        GLfloat CU = cir[2*i],   SU = cir[1+2*i];
-        GLfloat CL = cir[2*i+2], SL = cir[3+2*i];
+        fluteVN * flu = gle::mapVertexNormalBuffer(cnt);
+        float CU = gle::cos_(u), CL = gle::cos_(u+1);
+        float SU = gle::sin_(u), SL = gle::sin_(u+1);
 
-        glBegin(GL_TRIANGLE_STRIP);
-        glNormal3f(0, 0, +1);
-        glVertex3f(0, 0,  T);
+        size_t i = 0;
+        flu[i++] = fluteVN{0, 0, T, 0, 0, 1};
         if ( edge_ > 0 )
         {
             //draw top arc
-            for ( size_t j = 0; j <= pi_half; j++ )
+            for ( size_t j = 0; j <= gle::pi_half; ++j )
             {
-                GLfloat C = cir[2*j], S = cir[1+2*j];
-                glNormal3f(CU*S,        SU*S,             C);
-                glVertex3f(CU*(RE+E*S), SU*(RE+E*S), TE+E*C);
-                glNormal3f(CL*S,        SL*S,             C);
-                glVertex3f(CL*(RE+E*S), SL*(RE+E*S), TE+E*C);
+                float C = gle::cos_(j), S = gle::sin_(j);
+                float RS = RE + E*S;
+                flu[i++] = fluteVN{CU*RS, SU*RS, TE+E*C, CU*S, SU*S, C};
+                flu[i++] = fluteVN{CL*RS, SL*RS, TE+E*C, CL*S, SL*S, C};
             }
             /*
             // at pi_half, C = 0 and S = 1
-            glNormal3f(CU,        SU,         0);
-            glVertex3f(CU*(RE+E), SU*(RE+E), TE);
-            glNormal3f(CL,        SL,         0);
-            glVertex3f(CL*(RE+E), SL*(RE+E), TE);
-
-            glNormal3f(CU,        SU,         0);
-            glVertex3f(CU*(RE+E), SU*(RE+E), BE);
-            glNormal3f(CL,        SL,         0);
-            glVertex3f(CL*(RE+E), SL*(RE+E), BE);
+             flu[i++] = fluteVN{CU*R, SU*R, TE, CU, SU, 0};
+             flu[i++] = fluteVN{CL*R, SL*R, TE, CL, SL, 0};
+             flu[i++] = fluteVN{CU*R, SU*R, BE, CU, SU, 0};
+             flu[i++] = fluteVN{CL*R, SL*R, BE, CL, SL, 0};
              */
             //draw bottom arc
-            for ( size_t j = pi_half; j<=pi_once; j++ )
+            for ( size_t j = gle::pi_half; j <= gle::pi_once; ++j )
             {
-                GLfloat C = cir[2*j], S = cir[1+2*j];
-                glNormal3f(CU*S,        SU*S,             C);
-                glVertex3f(CU*(RE+E*S), SU*(RE+E*S), BE+E*C);
-                glNormal3f(CL*S,        SL*S,             C);
-                glVertex3f(CL*(RE+E*S), SL*(RE+E*S), BE+E*C);
+                float C = gle::cos_(j), S = gle::sin_(j);
+                float RS = RE + E*S;
+                flu[i++] = fluteVN{CU*RS, SU*RS, BE+E*C, CU*S, SU*S, C};
+                flu[i++] = fluteVN{CL*RS, SL*RS, BE+E*C, CL*S, SL*S, C};
             }
         }
         else
         {
-            glNormal3f(CU,   SU,   0);
-            glVertex3f(CU*R, SU*R, T);
-            glNormal3f(CL,   SL,   0);
-            glVertex3f(CL*R, SL*R, T);
-            glNormal3f(CU,   SU,   0);
-            glVertex3f(CU*R, SU*R, B);
-            glNormal3f(CL,   SL,   0);
-            glVertex3f(CL*R, SL*R, B);
+            flu[i++] = fluteVN{CU*R, SU*R, T, CU, SU, 0};
+            flu[i++] = fluteVN{CL*R, SL*R, T, CL, SL, 0};
+            flu[i++] = fluteVN{CU*R, SU*R, B, CU, SU, 0};
+            flu[i++] = fluteVN{CL*R, SL*R, B, CL, SL, 0};
         }
-        glNormal3f(0, 0, -1);
-        glVertex3f(0, 0,  B);
-        glEnd();
+        flu[i++] = fluteVN{0, 0, B, 0, 0, -1};
+        gle::unmapVertexNormalBuffer();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 #else

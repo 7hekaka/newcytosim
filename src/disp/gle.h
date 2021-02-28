@@ -21,7 +21,15 @@ namespace gle
     constexpr size_t finesse = 12;
     
     /// number of circle points stored in buffer
-    constexpr size_t ncircle = finesse * 8;
+    constexpr size_t pi_twice = finesse * 8;
+    constexpr size_t pi_once = finesse * 4;
+    constexpr size_t pi_half = finesse * 2;
+
+    /// access to precomputed cosinus
+    float cos_(size_t n);
+    
+    /// access to precomputed sinus
+    float sin_(size_t n);
 
     /// initialize the arrays
     void initialize();
@@ -70,10 +78,6 @@ namespace gle
     inline void gleVertex(Vector1 const& v) { glVertex2d(v.XX, 0); }
     inline void gleVertex(Vector2 const& v) { glVertex2d(v.XX, v.YY); }
     inline void gleVertex(Vector3 const& v) { glVertex3d(v.XX, v.YY, v.ZZ); }
-
-    inline void gleNormal(Vector1 const& v) { glNormal3d(v.XX, 0, 0); }
-    inline void gleNormal(Vector2 const& v) { glNormal3d(v.XX, v.YY, 0); }
-    inline void gleNormal(Vector3 const& v) { glNormal3d(v.XX, v.YY, v.ZZ); }
     
     inline void translate(Vector1 const& v) { glTranslated(v.XX, 0, 0); }
     inline void translate(Vector2 const& v) { glTranslated(v.XX, v.YY, 0); }
@@ -88,10 +92,6 @@ namespace gle
     inline void gleVertex(Vector1 const& v) { glVertex2f(v.XX, 0); }
     inline void gleVertex(Vector2 const& v) { glVertex2f(v.XX, v.YY); }
     inline void gleVertex(Vector3 const& v) { glVertex3f(v.XX, v.YY, v.ZZ); }
-
-    inline void gleNormal(Vector1 const& v) { glNormal3f(v.XX, 0, 0); }
-    inline void gleNormal(Vector2 const& v) { glNormal3f(v.XX, v.YY, 0); }
-    inline void gleNormal(Vector3 const& v) { glNormal3f(v.XX, v.YY, v.ZZ); }
     
     inline void translate(Vector1 const& v) { glTranslatef(v.XX, 0, 0); }
     inline void translate(Vector2 const& v) { glTranslatef(v.XX, v.YY, 0); }
