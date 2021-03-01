@@ -213,6 +213,5 @@ int main(int argc, char* argv[])
     glApp::newWindow(display);
     glApp::setScale(3);
     gle::initialize();
-
     glutMainLoop();
 }

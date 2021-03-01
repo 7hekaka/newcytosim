@@ -366,13 +366,13 @@ public:
     /// index in dimension `d` corresponding to position `w`
     int          index(size_t d, real w) const { return (int)map(d, w); }
 
-    /// the length of the diagonal of a cell = std::sqrt( sum(cWidth[d]^2) )
-    real diagonalLength() const
+    /// half the diagonal length of the unit cell
+    real cellRadius() const
     {
         real res = cWidth[0] * cWidth[0];
         for ( int d = 1; d < ORD; ++d )
             res += cWidth[d] * cWidth[d];
-        return std::sqrt(res);
+        return 0.5 * std::sqrt(res);
     }
     
     /// the smallest cell width, along dimensions that have more than `min_size` cells

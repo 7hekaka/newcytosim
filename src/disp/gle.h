@@ -83,10 +83,6 @@ namespace gle
     inline void translate(Vector2 const& v) { glTranslated(v.XX, v.YY, 0); }
     inline void translate(Vector3 const& v) { glTranslated(v.XX, v.YY, v.ZZ); }
 
-    inline void rasterPos(Vector1 const& v) { glRasterPos2d(v.XX, 0); }
-    inline void rasterPos(Vector2 const& v) { glRasterPos2d(v.XX, v.YY); }
-    inline void rasterPos(Vector3 const& v) { glRasterPos3d(v.XX, v.YY, v.ZZ); }
-
 #else
 
     inline void gleVertex(Vector1 const& v) { glVertex2f(v.XX, 0); }
@@ -96,10 +92,6 @@ namespace gle
     inline void translate(Vector1 const& v) { glTranslatef(v.XX, 0, 0); }
     inline void translate(Vector2 const& v) { glTranslatef(v.XX, v.YY, 0); }
     inline void translate(Vector3 const& v) { glTranslatef(v.XX, v.YY, v.ZZ); }
-
-    inline void rasterPos(Vector1 const& v) { glRasterPos2f(v.XX, 0); }
-    inline void rasterPos(Vector2 const& v) { glRasterPos2f(v.XX, v.YY); }
-    inline void rasterPos(Vector3 const& v) { glRasterPos3f(v.XX, v.YY, v.ZZ); }
  
 #endif
 
@@ -112,7 +104,7 @@ namespace gle
 #pragma mark -
     
     /// return direction orthogonal to display screen
-    Vector3 directionDepth();
+    Vector3 depthAxis();
     
     /// translate by T; rotate to align X with A, Y with B and Z with C
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);

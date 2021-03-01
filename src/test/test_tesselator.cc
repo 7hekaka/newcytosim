@@ -287,8 +287,7 @@ int main(int argc, char* argv[])
     glApp::normalKeyFunc(processNormalKey);
     glApp::newWindow(display);
     glApp::setScale(3);
-  
-    reset();
     gle::initialize();
+    reset();
     glutMainLoop();
 }

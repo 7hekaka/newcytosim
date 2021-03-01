@@ -10,13 +10,13 @@
 #include "real.h"
 #include "tictoc.h"
 #include "gle.h"
-
-using namespace TicToc;
-using namespace gle;
+#include "gle_flute.h"
 
 #include "grid.h"
 #include "grid_display.h"
 
+using namespace TicToc;
+using namespace gle;
 
 //area of the grid
 const int range = 5;
@@ -35,7 +35,7 @@ Vector3 nod(0,0,0);
 
 
 #define TEST_REGIONS
-real  regionRadius = 1.5;
+real regionRadius = 1.5;
 
 //------------------------------------------------------------------------------
 void throwMarbles(int cnt)
@@ -149,13 +149,13 @@ static gle_color field_color(int, const real& val, Vector2 const&)
 }
 #endif
 
+
 void display(View&, int)
 {
-    char str[16];
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
 #if ( DIM == 3 )
-    Vector3 dir = gle::directionDepth();
+    Vector3 dir = gle::depthAxis();
     drawValues(myGrid, field_color, 0, dir, 0);
 #else
     drawValues(myGrid, field_color, 0);
@@ -168,49 +168,57 @@ void display(View&, int)
     drawEdges(myGrid);
 
     //--------------draw content of cells
-    glColor3f(.5f,.5f,1);
+    const real gold = 2.0 / ( 1.0 + sqrt(5) );
+    fluteVC * flu = gle::mapVertexColorBuffer(16*myGrid.nbCells()+2);
+    size_t i = 0;
+
     for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
     {
-        int val = myGrid.icell(c);
-        if ( val > 0 )
+        int cnt = myGrid.icell(c);
+        // use Fibonacci's spiral on the sphere:
+        if ( cnt > 0 )
         {
-            Vector x;
-            myGrid.setPositionFromIndex(x, c, 0.5);
-            glPointSize(std::sqrt(16*val));
-            glBegin(GL_POINTS);
-            gleVertex(x);
-            glEnd();
+            Vector x, y;
+            myGrid.setPositionFromIndex(x, c, 0.3);
+            myGrid.setPositionFromIndex(y, c, 0.7);
+            for ( int u = 0; u < std::min(16, cnt); ++u )
+            {
+                Vector off(fmod(u*gold,1.0), float(u)/cnt, 0);
+                flu[i++] = fluteVC{x+(y-x).e_mul(off), gle_color(0, 1, 1)};
+            }
         }
     }
 
     //-------------draw selected-cell
+    flu[i++] = fluteVC{pos, gle_color(1,1,0)};
+    flu[i++] = fluteVC{nod, gle_color(1,1,0)};
+    unmapVertexColorBuffer();
     glPointSize(12);
-    glBegin(GL_POINTS);
-    glColor4f(1,1,1,1);
-    gleVertex(pos);
-    glColor4f(1,1,0,1);
-    gleVertex(nod);
-    glEnd();
+    glEnableClientState(GL_COLOR_ARRAY);
+    glDrawArrays(GL_POINTS, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 
     //-------------draw region
     if ( myGrid.hasRegions() )
     {
+        char str[16];
         int * offset = nullptr;
         size_t nb = myGrid.getRegion(offset, cell_indx);
 
         glColor4f(1,1,1,0.7);
-        for ( size_t i = 0; i < nb; ++i )
+        for ( size_t j = 0; j < nb; ++j )
         {
             Vector x;
-            myGrid.setPositionFromIndex(x, cell_indx+offset[i], 0.4);
-            snprintf(str, sizeof(str), "%lu", i);
+            myGrid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
+            snprintf(str, sizeof(str), "%lu", j);
             gle::drawText(x, str, GLUT_BITMAP_HELVETICA_10);
         }
     }
     else
     {
-        real vi = myGrid.interpolate(pos);
-        snprintf(str, sizeof(str), "cell %lu %f", cell_indx, vi);
+        char str[16];
+        real val = myGrid.interpolate(pos);
+        snprintf(str, sizeof(str), "cell %lu %f", cell_indx, val);
         glApp::setMessage(str);
     }
 }
@@ -326,6 +334,6 @@ int main(int argc, char* argv[])
     glApp::normalKeyFunc(processNormalKey);
     glApp::newWindow(display);
     glApp::setScale(2*range+1);
-
+    gle::initialize();
     glutMainLoop();
 }

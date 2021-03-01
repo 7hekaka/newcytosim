@@ -16,6 +16,7 @@ namespace gle
     
     fluteV* mapVertexBuffer(size_t cnt)
     {
+        assert_true(glIsBuffer(stream_[0]));
         glBindBuffer(GL_ARRAY_BUFFER, stream_[0]);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteV), nullptr, GL_STREAM_DRAW);
         return (fluteV*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -40,6 +41,7 @@ namespace gle
     
     fluteVN* mapVertexNormalBuffer(size_t cnt)
     {
+        assert_true(glIsBuffer(stream_[1]));
         glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteVN), nullptr, GL_STREAM_DRAW);
         return (fluteVN*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -67,6 +69,7 @@ namespace gle
     
     fluteVC* mapVertexColorBuffer(size_t cnt)
     {
+        //assert_true(glIsBuffer(stream_[2]));
         glBindBuffer(GL_ARRAY_BUFFER, stream_[2]);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteVC), nullptr, GL_STREAM_DRAW);
         return (fluteVC*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -93,6 +96,7 @@ namespace gle
     
     unsigned* mapIndexBuffer(size_t cnt)
     {
+        assert_true(glIsBuffer(stream_[3]));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, stream_[3]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, cnt*sizeof(unsigned), nullptr, GL_STREAM_DRAW);
         return (unsigned*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);

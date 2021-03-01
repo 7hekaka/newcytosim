@@ -19,13 +19,20 @@
 using namespace gle;
 extern Modulo const* modulo;
 
+//------------------------------------------------------------------------------
+/*
+ Should use instanced rendering to draw multiple Sphere and Tube, etc.
+ Possibly also for the tubes if we transfer 'tube length' to the GPU
+
+ https://learnopengl.com/Advanced-OpenGL/Instancing
+ https://www.khronos.org/opengl/wiki/Vertex_Rendering#Instancing
+ https://metalbyexample.com/instanced-rendering/
+ */
 
 Display3::Display3(DisplayProp const* dp) : Display(dp)
 {
 }
 
-//------------------------------------------------------------------------------
-#pragma mark -
 
 void Display3::drawSimul(Simul const& sim)
 {

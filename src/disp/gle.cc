@@ -413,7 +413,7 @@ namespace gle
      return axis orthogonal to the display plane, and corresponding to depth
      obtained from the current modelview transformation
      */
-    Vector3 directionDepth()
+    Vector3 depthAxis()
     {
         GLfloat mat[16];
         glGetFloatv(GL_MODELVIEW_MATRIX, mat);
@@ -2085,7 +2085,7 @@ namespace gle
         int L = 1;
         int H = fontHeight(font);
         int W = maxTextWidth(text, font, L);
-        rasterPos(vec);
+        glRasterPos3f(vec.x(), vec.y(), vec.z());
         //translate to center the bitmap:
         glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
         bitmapText(text, font, H);

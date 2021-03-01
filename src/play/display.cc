@@ -659,7 +659,7 @@ void Display::drawTransparentSpaces(SpaceSet const& set)
 void Display::drawFields(FieldSet const& set)
 {
 #if ( DIM == 3 )
-    Vector3 dir = gle::directionDepth();
+    Vector3 dir = gle::depthAxis();
 #else
     Vector3 dir(0,0,1);
 #endif
@@ -1857,7 +1857,7 @@ static int compareZObject(const void * A, const void * B)
 */
 void Display::drawTransparentObjects(Array<zObject>& list)
 {
-    Vector3 vertical = gle::directionDepth();
+    Vector3 vertical = gle::depthAxis();
     
     for ( zObject & i : list )
         i.depth(dot(i.position(), vertical));

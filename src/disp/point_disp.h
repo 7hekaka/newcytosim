@@ -181,7 +181,7 @@ public:
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            gle::rasterPos(pos);
+            glRasterPos3f(pos.x(), pos.y(), pos.z());
             drawPixelmap(0);
     #else
             glPushMatrix();
@@ -201,7 +201,7 @@ public:
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            gle::rasterPos(pos);
+            glRasterPos3f(pos.x(), pos.y(), pos.z());
             drawPixelmap(1);
     #else
             glPushMatrix();
@@ -221,7 +221,7 @@ public:
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            gle::rasterPos(pos);
+            glRasterPos3f(pos.x(), pos.y(), pos.z());
             drawPixelmap(2);
     #else
             glPushMatrix();

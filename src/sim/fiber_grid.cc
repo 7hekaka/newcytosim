@@ -183,13 +183,13 @@ paintGrid(first_fiber, last_fiber) links all segments found in 'fiber' and its
  where GP (grid-point) is the closest point on the grid to X.
  
  Since GP in tryToAttach() is the closest point on fGrid to X, we have:
- (B) distance( GP, X ) < 0.5 * fGrid.diagonalLength()
+ (B) distance( GP, X ) < fGrid.cellRadius()
  
  Thus to find all rods for which:
  (B) distance( X, segment ) < grid::range
  we simply use:
  
-     H = grid::range + 0.5 * fGrid.diagonalLength();
+     H = grid::range + fGrid.cellRadius();
  
  Note: H is calculated by paintGrid() and grid::range by setFiberGrid().
  
@@ -207,7 +207,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
     fGrid.clear();
     const Vector offset(fGrid.inf());
     const Vector deltas(fGrid.delta());
-    const real width = range + 0.5 * fGrid.diagonalLength();
+    const real width = range + fGrid.cellRadius();
     
     //define the painting function used:
     void (*paint)(int, int, int, int, void*) = modulo ? paintCellPeriodic : paintCell;
