@@ -24,12 +24,15 @@ namespace gle
     constexpr size_t pi_twice = finesse * 8;
     constexpr size_t pi_once = finesse * 4;
     constexpr size_t pi_half = finesse * 2;
+    
+    /// values of cosinus, sinus over a full circle
+    extern const float* circle_;
 
     /// access to precomputed cosinus
-    float cos_(size_t n);
+    inline float cos_(size_t n) { return circle_[4+2*n]; }
     
     /// access to precomputed sinus
-    float sin_(size_t n);
+    inline float sin_(size_t n) { return circle_[5+2*n]; }
 
     /// initialize the arrays
     void initialize();

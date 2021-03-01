@@ -20,6 +20,9 @@ namespace gle
     /// values of cosinus, sinus over a full circle
     float cir_[2*pi_twice+8] = { 0 };
     
+    /// non modifiable values of cosinus, sinus
+    const float* circle_ = const_cast<float*>(cir_);
+    
     /// OpenGL buffers objects for streaming
     GLuint stream_[4] = { 0 };
     
@@ -48,9 +51,6 @@ namespace gle
             exit(1);
         }
 #endif
-        // store { 0, 0 } at the start of circle
-        for ( size_t i = 0; i < 4; ++i )
-            cir_[i] = 0;
         // circle starts at index 4
         compute_circle(pi_twice, cir_+4, 1, 0);
         
@@ -90,12 +90,6 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle
     
-    /// access to precomputed cosinus
-    inline float cos_(size_t n) { return cir_[4+2*n]; }
-    
-    /// access to precomputed sinus
-    inline float sin_(size_t n) { return cir_[5+2*n]; }
-
     /// Calculates coordinates over an arc of circle
     /**
     Set ptr[] to coordinates around a circle:
@@ -463,21 +457,21 @@ namespace gle
     void circle()
     {
         glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 0, 4+cir_);
+        glVertexPointer(2, GL_FLOAT, 0, 4+circle_);
         glDrawArrays(GL_LINE_LOOP, 0, pi_twice);
     }
     
     void disc()
     {
         glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 16, cir_);
+        glVertexPointer(2, GL_FLOAT, 16, circle_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
     }
 
     void disc2()
     {
         glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
+        glVertexPointer(2, GL_FLOAT, 0, 2+circle_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_twice);
     }
     
@@ -486,7 +480,7 @@ namespace gle
     {
         glNormal3f(0, 0, 1);
         glTranslatef(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 16, cir_);
+        glVertexPointer(2, GL_FLOAT, 16, circle_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
         //glTranslatef(0, 0, -1);
     }
@@ -495,7 +489,7 @@ namespace gle
     {
         glNormal3f(0, 0, -1);
         glFrontFace(GL_CW);
-        glVertexPointer(2, GL_FLOAT, 16, cir_);
+        glVertexPointer(2, GL_FLOAT, 16, circle_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
         glFrontFace(GL_CCW);
     }
@@ -504,7 +498,7 @@ namespace gle
     {
         glNormal3f(0, 0, -1);
         glFrontFace(GL_CW);
-        glVertexPointer(2, GL_FLOAT, 0, 2+cir_);
+        glVertexPointer(2, GL_FLOAT, 0, 2+circle_);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_twice);
         glFrontFace(GL_CCW);
     }
