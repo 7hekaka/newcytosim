@@ -196,7 +196,7 @@ vpath test_solve bin
 
 #----------------------------Targets using GLAPP--------------------------------
 
-OBJ_GLAP := $(OBJ_DISP) offscreen.o cytobase.a cytomath.a SFMT.o
+OBJ_GLAP := $(OBJ_DISP) gle_flute.o offscreen.o cytobase.a cytomath.a SFMT.o
 
 test_glapp: test_glapp.cc $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)

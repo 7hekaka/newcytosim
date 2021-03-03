@@ -27,7 +27,7 @@ namespace gle
     GLuint stream_[4] = { 0 };
     
     /// vertex buffer objects for tubes
-    GLuint tub_[16] = { 0 };
+    GLuint tub_[24] = { 0 };
     
     /// vertex buffer objects for hex tubes
     GLuint buf_[16] = { 0 };
@@ -56,18 +56,18 @@ namespace gle
         
         if ( !glIsBuffer(ico_[0]) )
         {
-            initSphereBuffers();
-            CHECK_GL_ERROR("gle:initSphereBuffers()");
+            setSphereBuffers();
+            CHECK_GL_ERROR("gle:setSphereBuffers()");
         }
         if ( !glIsBuffer(tub_[0]) )
         {
-            initTubeBuffers();
-            CHECK_GL_ERROR("gle:initTubeBuffers()");
+            setTubeBuffers();
+            CHECK_GL_ERROR("gle:setTubeBuffers()");
         }
         if ( !glIsBuffer(buf_[0]) )
         {
-            initBuffers();
-            CHECK_GL_ERROR("gle:initBuffers()");
+            setBuffers();
+            CHECK_GL_ERROR("gle:setBuffers()");
         }
         if ( !glIsBuffer(stream_[0]) )
             glGenBuffers(4, stream_);
@@ -77,16 +77,53 @@ namespace gle
     
     void release()
     {
-        glDeleteBuffers(16, ico_);
+        glDeleteBuffers(14, ico_);
         ico_[0] = 0;
-        glDeleteBuffers(12, tub_);
+        glDeleteBuffers(24, tub_);
         tub_[0] = 0;
-        glDeleteBuffers(16, buf_);
+        glDeleteBuffers(14, buf_);
         buf_[0] = 0;
         glDeleteBuffers(4, stream_);
         stream_[0] = 0;
     }
 
+    //-----------------------------------------------------------------------
+    #pragma mark - maps
+    
+    GLuint boundBuffer()
+    {
+        GLint i = 0;
+        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &i);
+        return (GLuint)i;
+    }
+
+    flute6* mapVertexNormalBuffer(size_t cnt)
+    {
+        //assert_true(glIsBuffer(stream_[1]));
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STREAM_DRAW);
+        return (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    }
+    
+    void unmapVertexNormalBuffer()
+    {
+        assert_true(stream_[1] == boundBuffer());
+        //glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, sizeof(flute6), nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, sizeof(flute6), (void*)0xC);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
+    void bindVertexNormalBuffer(size_t skip)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
+        glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(flute6), nullptr);
+        glNormalPointer(GL_FLOAT, skip*sizeof(flute6), (void*)0xC);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle
     
@@ -415,121 +452,7 @@ namespace gle
     }
 
     //-----------------------------------------------------------------------
-    # pragma mark - Circle, Cone and Disc
-    
-    size_t setCone(flute6* flu, float B, float T, size_t inc)
-    {
-        const float L = T - B;
-        const float Y = 1.f/sqrtf(L*L+1.f);
-        const float X = Y * L;
-        size_t i = 1;
-        flu[0] = flute6{ 0, 0, T, 0, 0, 1 };
-        for( size_t p = 0; p <= pi_twice; p += inc )
-        {
-            float C = cos_(p), S = sin_(p);
-            // 3 vertex and 3 normal coordinates
-            flu[i++] = flute6{ C, S, B, C*X, S*X, Y };
-        }
-        return i;
-    }
-    
-    void setDisc(flute3* flu, float R, float Z, size_t inc)
-    {
-        size_t i = 1;
-        flu[0] = flute3{ 0, 0, Z };
-        for ( size_t n = 0; n <= pi_twice; n += inc )
-            flu[i++] = flute3{R*cos_(n), R*sin_(n), Z};
-    }
-
-    //-----------------------------------------------------------------------
-    # pragma mark - Circle, Cone and Disc
-
-    /*
-     @todo: need to use indexed-triangles, TRIANGLE_FAN are deprecated
-         add left most vertex
-         for each phi in (-PI/2, Pi/2) //ommit the first and last one
-             x = r * sin(phi)
-             y = r * cos(phi)
-             add (x, y)
-             add (x, -y)
-         add right most vertex
-     */
-    void circle()
-    {
-        glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 0, 4+circle_);
-        glDrawArrays(GL_LINE_LOOP, 0, pi_twice);
-    }
-    
-    void disc()
-    {
-        glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 16, circle_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
-    }
-
-    void disc2()
-    {
-        glNormal3f(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 0, 2+circle_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_twice);
-    }
-    
-    // this does not preserve the modelview transformation
-    void discTop()
-    {
-        glNormal3f(0, 0, 1);
-        glTranslatef(0, 0, 1);
-        glVertexPointer(2, GL_FLOAT, 16, circle_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
-        //glTranslatef(0, 0, -1);
-    }
-
-    void discBottom()
-    {
-        glNormal3f(0, 0, -1);
-        glFrontFace(GL_CW);
-        glVertexPointer(2, GL_FLOAT, 16, circle_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_once);
-        glFrontFace(GL_CCW);
-    }
-    
-    void discBottom2()
-    {
-        glNormal3f(0, 0, -1);
-        glFrontFace(GL_CW);
-        glVertexPointer(2, GL_FLOAT, 0, 2+circle_);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 2+pi_twice);
-        glFrontFace(GL_CCW);
-    }
-
-    void cone()
-    {
-        coneZ(1, 0, 1);
-        discBottom2();
-    }
-
-    void longCone()
-    {
-        glTranslatef(0, 0, -1);
-        glScalef(1, 1, 3);
-        cone();
-    }
-
-    void shortCone()
-    {
-        glTranslatef(0, 0, -0.333f);
-        glScalef(1, 1, 0.5);
-        cone();
-    }
-
-    void truncatedCone()
-    {
-        tubeZ(0, 1, 1, 0.25, 4);
-    }
-
-    //-----------------------------------------------------------------------
-    #pragma mark - Some Platonic solids
+    #pragma mark - Some 3D objects
     
     /// code to calculate and print normals
     void printNormals(size_t cnt, GLfloat const* pts)
@@ -1102,9 +1025,9 @@ namespace gle
         glBufferData(GL_ARRAY_BUFFER, cnt, ptr, GL_STATIC_DRAW);
     }
     
-    void initBuffers()
+    void setBuffers()
     {
-        glGenBuffers(16, buf_);
+        glGenBuffers(14, buf_);
         drawTetrahedron(setBuffer, setBuffer, buf_[0], buf_[1]);
         drawOctahedron(setBuffer, setBuffer, buf_[2], buf_[3]);
         drawIcosahedron(setBuffer, setBuffer, buf_[4], buf_[5]);
@@ -1133,9 +1056,44 @@ namespace gle
     void needlef()   { glDrawArrays(GL_TRIANGLE_STRIP,64, 52); }
 
     //-----------------------------------------------------------------------
-#pragma mark - Tubes
+    #pragma mark - 2D circle
 
-    size_t setTube(flute6* flu, float B, float T, size_t inc)
+    size_t setCircle(flute2* flu, size_t inc, float Z, float R, float N)
+    {
+        size_t i = 0;
+        for ( size_t n = 0; n <= pi_twice; n += inc )
+        {
+            float C = cos_(n), S = sin_(n);
+            flu[i++] = flute2{R*C, R*S};
+        }
+        return i;
+    }
+    
+    size_t setCircleBuffer(GLuint buf, size_t inc, float Z, float R, float N)
+    {
+        size_t cnt = ( 1 + pi_twice ) / inc;
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute2), nullptr, GL_STATIC_DRAW);
+        flute2 * flu = (flute2*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        size_t n = setCircle(flu, inc, Z, R, N);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        assert_true( n <= cnt );
+        return n;
+    }
+    
+    inline void drawLineStrip(GLuint buf, size_t cnt)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glVertexPointer(2, GL_FLOAT, sizeof(flute2), nullptr);
+        glDrawArrays(GL_LINE_STRIP, 0, cnt);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    //-----------------------------------------------------------------------
+    #pragma mark - Tubes and Cones
+
+    /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
+    size_t setTube(flute6* flu, size_t inc, float B, float T)
     {
         assert_true( B <= T );
         size_t i = 0;
@@ -1148,7 +1106,8 @@ namespace gle
         return i;
     }
     
-    size_t setTube(flute6* flu, float R, float B, float T, size_t inc)
+    /// set triangle strip for a tube of constant radius R with Z in [B, T]
+    size_t setTube(flute6* flu, size_t inc, float B, float T, float R)
     {
         assert_true( B <= T );
         size_t i = 0;
@@ -1160,58 +1119,119 @@ namespace gle
         }
         return i;
     }
-
-    /// hexagon has the same surface as a disc of radius rad.
-    size_t setHexTube(flute6* flu, float rad, float A, float B)
+    
+    /// set triangle strip for a cone of radius rB at Z=B, and rT at Z=T
+    size_t setCone(flute6* flu, size_t inc, float B, float T, float rB, float rT)
     {
+        assert_true( B <= T );
+        const float H(T-B), R(rT-rB);
+        const float k(std::copysign(1.f,H)/sqrtf(H*H+R*R));
+        const float tC(k*H);
+        const float tS(k*R);
+        size_t i = 0;
+        for( size_t n = 0; n <= pi_twice; n += inc )
+        {
+            float S = sin_(n), C = cos_(n);
+            flu[i++] = flute6{ rT*C, rT*S, T, tC*C, tC*S, tS };
+            flu[i++] = flute6{ rB*C, rB*S, B, tC*C, tC*S, tS };
+        }
+        return i;
+    }
+
+    /// set triangle strip for a disc at Z, with given normal in Z
+    size_t setDisc(flute6* flu, size_t inc, float Z, float N)
+    {
+        size_t i = 0;
+        for( size_t n = inc; n < pi_once; n += inc )
+        {
+            float S = sin_(n), C = cos_(n);
+            flu[i++] = flute6{ C, -S, Z, 0, 0, N };
+            flu[i++] = flute6{ C,  S, Z, 0, 0, N };
+        }
+        return i;
+    }
+
+    /// set triangle strip for tube with hexagonal crosssection
+    size_t setHexTube(flute6* flu, float B, float T, float rad)
+    {
+        // the hexagon has the same surface as a disc of radius rad.
         constexpr float C = 0.8660254037844386f; //std::sqrt(3)/2;
         constexpr float S = 0.5f;
         const float R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         const float Y = R * C, X = R * S;
         
-        flu[0] = flute6{ R, 0, B, 1, 0, 0};
-        flu[1] = flute6{ R, 0, A, 1, 0, 0};
-        flu[2] = flute6{ X, Y, B, S, C, 0};
-        flu[3] = flute6{ X, Y, A, S, C, 0};
-        flu[4] = flute6{-X, Y, B,-S, C, 0};
-        flu[5] = flute6{-X, Y, A,-S, C, 0};
-        flu[6] = flute6{-R, 0, B,-1, 0, 0};
-        flu[7] = flute6{-R, 0, A,-1, 0, 0};
-        flu[8] = flute6{-X,-Y, B,-S, -C, 0};
-        flu[9] = flute6{-X,-Y, A,-S, -C, 0};
-        flu[10] = flute6{ X,-Y, B, S,-C, 0};
-        flu[11] = flute6{ X,-Y, A, S,-C, 0};
-        flu[12] = flute6{ R, 0, B, 1, 0, 0};
-        flu[13] = flute6{ R, 0, A, 1, 0, 0};
+        flu[0] = flute6{ R, 0, T, 1, 0, 0};
+        flu[1] = flute6{ R, 0, B, 1, 0, 0};
+        flu[2] = flute6{ X, Y, T, S, C, 0};
+        flu[3] = flute6{ X, Y, B, S, C, 0};
+        flu[4] = flute6{-X, Y, T,-S, C, 0};
+        flu[5] = flute6{-X, Y, B,-S, C, 0};
+        flu[6] = flute6{-R, 0, T,-1, 0, 0};
+        flu[7] = flute6{-R, 0, B,-1, 0, 0};
+        flu[8] = flute6{-X,-Y, T,-S, -C, 0};
+        flu[9] = flute6{-X,-Y, B,-S, -C, 0};
+        flu[10] = flute6{ X,-Y, T, S,-C, 0};
+        flu[11] = flute6{ X,-Y, B, S,-C, 0};
+        flu[12] = flute6{ R, 0, T, 1, 0, 0};
+        flu[13] = flute6{ R, 0, B, 1, 0, 0};
         return 14;
     }
     
-    inline size_t nbTubeTriangles(size_t inc)
+    inline size_t nbTrianglesTube(size_t inc)
     {
         return 2 + ( 2 * pi_twice ) / inc;
     }
-    
-    constexpr size_t nbHexTubeTriangles = 14;
-    
-    size_t initTubeBuffer(GLuint buf, float A, float B, size_t inc)
+  
+    inline size_t nbTrianglesDisc(size_t inc)
     {
-        size_t cnt = nbTubeTriangles(inc);
+        return ( 2 * pi_once ) / inc - 2;
+    }
+
+    constexpr size_t nbTrianglesHex = 14;
+    
+    size_t setTubeBuffer(GLuint buf, size_t inc, float B, float T)
+    {
+        size_t cnt = nbTrianglesTube(inc);
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        size_t n = setTube(flu, A, B, inc);
+        size_t n = setTube(flu, inc, B, T);
         glUnmapBuffer(GL_ARRAY_BUFFER);
         assert_true( n <= cnt );
         return n;
     }
     
-    size_t initHexTubeBuffer(GLuint buf, float R, float A, float B)
+    size_t setConeBuffer(GLuint buf, size_t inc, float B, float rB, float T, float rT)
     {
-        size_t cnt = nbHexTubeTriangles;
+        size_t cnt = nbTrianglesTube(inc);
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        size_t n = setHexTube(flu, R, A, B);
+        size_t n = setCone(flu, inc, B, T, rB, rT);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        assert_true( n <= cnt );
+        return n;
+    }
+    
+    size_t setDiscBuffer(GLuint buf, size_t inc, float Z, float N)
+    {
+        size_t cnt = nbTrianglesDisc(inc);
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
+        flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        size_t n = setDisc(flu, inc, Z, N);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        assert_true( n <= cnt );
+        return n;
+    }
+
+    size_t setHexTubeBuffer(GLuint buf, float R, float B, float T)
+    {
+        size_t cnt = nbTrianglesHex;
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
+        flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        size_t n = setHexTube(flu, B, T, R);
         glUnmapBuffer(GL_ARRAY_BUFFER);
         assert_true( n <= cnt );
         return n;
@@ -1222,228 +1242,71 @@ namespace gle
         drawVertexNormalBuffer(GL_TRIANGLE_STRIP, buf, cnt, sizeof(flute6), 3*sizeof(GLfloat));
     }
 
-    void initTubeBuffers()
+    void setTubeBuffers()
     {
-        glGenBuffers(14, tub_);
+        glGenBuffers(24, tub_);
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const GLfloat B = -32.f, T = 256.f;
-        initTubeBuffer(tub_[0], 0, 1, 8);
-        initTubeBuffer(tub_[1],-0.03125, 1.03125, 4);
-        initTubeBuffer(tub_[2], 0, 1.03125, 4);
-        initTubeBuffer(tub_[3], 0, 1, 2);
-        initTubeBuffer(tub_[4], 0, 1, 1);
-        initTubeBuffer(tub_[5], B, T, 8);
-        initTubeBuffer(tub_[6], B, T, 4);
-        initTubeBuffer(tub_[7], B, T, 2);
-        initTubeBuffer(tub_[8], 0, T, 8);
-        initTubeBuffer(tub_[9], 0, T, 4);
-        initTubeBuffer(tub_[10], 0, T, 2);
-        initHexTubeBuffer(tub_[11], 1, 0, 1);
-        initHexTubeBuffer(tub_[12], 0.5f, 0, 1);
-        initHexTubeBuffer(tub_[13], 0.5f, 0, T);
+        setTubeBuffer(tub_[0], 8, 0, 1);
+        setTubeBuffer(tub_[1], 4,-0.03125, 1.03125);
+        setTubeBuffer(tub_[2], 4, 0, 1.03125);
+        setTubeBuffer(tub_[3], 2, 0, 1);
+        setTubeBuffer(tub_[4], 1, 0, 1);
+        setTubeBuffer(tub_[5], 8, B, T);
+        setTubeBuffer(tub_[6], 4, B, T);
+        setTubeBuffer(tub_[7], 2, B, T);
+        setTubeBuffer(tub_[8], 8, 0, T);
+        setTubeBuffer(tub_[9], 4, 0, T);
+        setTubeBuffer(tub_[10], 2, 0, T);
+        setHexTubeBuffer(tub_[11], 0, 1, 1);
+        setHexTubeBuffer(tub_[12], 0, 1, 0.5f);
+        setHexTubeBuffer(tub_[13], 0, T, 0.5f);
+        setConeBuffer(tub_[14], 2, 0, 1, 1, 0);
+        setConeBuffer(tub_[15], 1, 0, 1, 1, 0);
+        setConeBuffer(tub_[16], 2, 0, 1, 1, 0.25);
+        setDiscBuffer(tub_[17], 2, 0, 1);
+        setDiscBuffer(tub_[18], 1, 0, 1);
+        setDiscBuffer(tub_[19], 2, 1, 1);
+        setDiscBuffer(tub_[20], 1, 1, 1);
+        setDiscBuffer(tub_[21], 2, 0, -1);
+        setDiscBuffer(tub_[22], 1, 0, -1);
+        setCircleBuffer(tub_[23], 1, 0, 1, 1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     // using Vertex Buffer Objects
-    void tube1()     { drawTubeBuffer(tub_[0], nbTubeTriangles(8)); }
-    void tube2()     { drawTubeBuffer(tub_[1], nbTubeTriangles(4)); }
-    void tube3()     { drawTubeBuffer(tub_[2], nbTubeTriangles(4)); }
-    void tube4()     { drawTubeBuffer(tub_[3], nbTubeTriangles(2)); }
-    void tube8()     { drawTubeBuffer(tub_[4], nbTubeTriangles(1)); }
-    void longTube1() { drawTubeBuffer(tub_[5], nbTubeTriangles(8)); }
-    void longTube2() { drawTubeBuffer(tub_[6], nbTubeTriangles(4)); }
-    void longTube4() { drawTubeBuffer(tub_[7], nbTubeTriangles(2)); }
-    void halfTube1() { drawTubeBuffer(tub_[8], nbTubeTriangles(8)); }
-    void halfTube2() { drawTubeBuffer(tub_[9], nbTubeTriangles(4)); }
-    void halfTube4() { drawTubeBuffer(tub_[10], nbTubeTriangles(2)); }
-    void hexTube()   { drawTubeBuffer(tub_[11], nbHexTubeTriangles); }
-    void thinTube()  { drawTubeBuffer(tub_[12], nbHexTubeTriangles); }
-    void thinLongTube() { drawTubeBuffer(tub_[13], nbHexTubeTriangles); }
+    void tube1()     { drawTubeBuffer(tub_[0], nbTrianglesTube(8)); }
+    void tube2()     { drawTubeBuffer(tub_[1], nbTrianglesTube(4)); }
+    void tube3()     { drawTubeBuffer(tub_[2], nbTrianglesTube(4)); }
+    void tube4()     { drawTubeBuffer(tub_[3], nbTrianglesTube(2)); }
+    void tube8()     { drawTubeBuffer(tub_[4], nbTrianglesTube(1)); }
+    void longTube1() { drawTubeBuffer(tub_[5], nbTrianglesTube(8)); }
+    void longTube2() { drawTubeBuffer(tub_[6], nbTrianglesTube(4)); }
+    void longTube4() { drawTubeBuffer(tub_[7], nbTrianglesTube(2)); }
+    void halfTube1() { drawTubeBuffer(tub_[8], nbTrianglesTube(8)); }
+    void halfTube2() { drawTubeBuffer(tub_[9], nbTrianglesTube(4)); }
+    void halfTube4() { drawTubeBuffer(tub_[10], nbTrianglesTube(2)); }
+    void hexTube()   { drawTubeBuffer(tub_[11], nbTrianglesHex); }
+    void thinTube()  { drawTubeBuffer(tub_[12], nbTrianglesHex); }
+    void thinLongTube()  { drawTubeBuffer(tub_[13], nbTrianglesHex); }
+    void cone1()         { drawTubeBuffer(tub_[14], nbTrianglesTube(2)); }
+    void cone2()         { drawTubeBuffer(tub_[15], nbTrianglesTube(1)); }
+    void truncatedCone() { drawTubeBuffer(tub_[16], nbTrianglesTube(1)); }
+    void disc1()         { drawTubeBuffer(tub_[17], nbTrianglesDisc(2)); }
+    void disc2()         { drawTubeBuffer(tub_[18], nbTrianglesDisc(1)); }
+    void discTop1()      { drawTubeBuffer(tub_[19], nbTrianglesDisc(2)); }
+    void discTop2()      { drawTubeBuffer(tub_[20], nbTrianglesDisc(1)); }
+    void discBottom1()   { drawTubeBuffer(tub_[21], nbTrianglesDisc(2)); }
+    void discBottom2()   { drawTubeBuffer(tub_[22], nbTrianglesDisc(1)); }
+    void circle()        { drawLineStrip(tub_[23], 1+pi_twice); }
 
-    // this does not preserve the modelview transformation
-    void cylinder1()
-    {
-        tube1();
-        discBottom();
-        discTop();
-    }
-    
-    // this does not preserve the modelview transformation
-    void cylinder2()
-    {
-        glTranslatef(0,0,-0.5f);
-        discBottom();
-        tube4();
-        discTop();
-        //glTranslatef(0,0,0.5f);
-    }
-
-    //-----------------------------------------------------------------------
-    #pragma mark - Legacy 3D objects
-    
-    void coneZ(GLfloat R, GLfloat B, GLfloat T)
-    {
-        glBegin(GL_TRIANGLE_FAN);
-        glNormal3f( 0, 0, 1 );
-        glVertex3f( 0, 0, T );
-        const GLfloat L(T-B);
-        const GLfloat Y = 1.f/sqrtf(L*L+1);
-        const GLfloat X = Y * L;
-        for ( size_t n = 0; n <= pi_twice; ++n )
-        {
-            GLfloat S = sin_(n), C = cos_(n);
-            glNormal3f(X*C, X*S, Y);
-            glVertex3f(R*C, R*S, B);
-        }
-        glEnd();
-    }
-
-    void tubeZ(GLfloat B, GLfloat T, int inc)
-    {
-        assert_true( B <= T );
-        glBegin(GL_TRIANGLE_STRIP);
-        for( size_t n = 0; n <= pi_twice; n += inc )
-        {
-            GLfloat S = sin_(n), C = cos_(n);
-            glNormal3f(C, S, 0);
-            glVertex3f(C, S, T);
-            glVertex3f(C, S, B);
-        }
-        glEnd();
-    }
-
-    void tubeZ(GLfloat B, GLfloat rB, GLfloat T, GLfloat rT, int inc)
-    {
-        assert_true( B <= T );
-        const GLfloat H(T-B);
-        const GLfloat N = 1.f/sqrtf(H*H+(rT-rB)*(rT-rB));
-        const GLfloat tC = N * (T-B);
-        const GLfloat tS = N * (rB-rT);
-        glBegin(GL_TRIANGLE_STRIP);
-        for( size_t n = 0; n <= pi_twice; n += inc )
-        {
-            GLfloat S = sin_(n), C = cos_(n);
-            glNormal3f(tC*C, tC*S, tS);
-            glVertex3f(rT*C, rT*S, T);
-            glVertex3f(rB*C, rB*S, B);
-        }
-        glEnd();
-    }
-
-    void tubeZ(GLfloat B, GLfloat R, gle_color col, GLfloat T, GLfloat D, gle_color loc)
-    {
-        glBegin(GL_TRIANGLE_STRIP);
-        for( size_t n = 0; n <= pi_twice; ++n )
-        {
-            GLfloat S = sin_(n), C = cos_(n);
-            col.load_load();
-            glNormal3f(  C,   S, 0);
-            glVertex3f(D*C, D*S, B);
-            loc.load_load();
-            glNormal3f(  C,   S, 0);
-            glVertex3f(R*C, R*S, T);
-        }
-        glEnd();
-    }
-    
-    /// draw spherocylinder of radius R, of axis Z with Z in [B, T]
-    void capsuleZ(GLfloat B, GLfloat T, GLfloat R)
-    {
-        const size_t fin = pi_twice >> 2;
-        const size_t inc = 4;
-        //display strips along the side of the volume:
-        for ( size_t t = 0; t < 4*fin; t += inc )
-        {
-            //compute the transverse angles:
-            GLfloat cb = cos_(t),     sb = sin_(t);
-            GLfloat ca = cos_(t+inc), sa = sin_(t+inc);
-            GLfloat cB = R * cb, sB = R * sb;
-            GLfloat cA = R * ca, sA = R * sa;
-            
-            //draw one srip of the oval:
-            glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t i=0; i <= fin; i += inc )
-            {
-                GLfloat x = cos_(i), y = sin_(i);
-                glNormal3f(ca*y, sa*y, x);
-                glVertex3f(cA*y, sA*y, T+R*x);
-                glNormal3f(cb*y, sb*y, x);
-                glVertex3f(cB*y, sB*y, T+R*x);
-            }
-            for ( int i=fin; i >= 0; i -= inc )
-            {
-                GLfloat x = -cos_(i), y = sin_(i);
-                glNormal3f(ca*y, sa*y, x);
-                glVertex3f(cA*y, sA*y, B+R*x);
-                glNormal3f(cb*y, sb*y, x);
-                glVertex3f(cB*y, sB*y, B+R*x);
-            }
-            glEnd();
-        }
-    }
-    
-    /// draw a Torus of radius R and a thickness 2*T
-    void torusZ(GLfloat R, GLfloat T, size_t inc)
-    {
-        for ( size_t n = 0; n < pi_twice; n += inc )
-        {
-            GLfloat X0 = cos_(n    ), Y0 = sin_(n    );
-            GLfloat X1 = cos_(n+inc), Y1 = sin_(n+inc);
-            glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t p = 0; p <= pi_twice; p += 2*inc )
-            {
-                GLfloat S = sin_(p), C = cos_(p);
-                glNormal3f(X0*C, Y0*C, S);
-                glVertex3f(X0*(R+T*C), Y0*(R+T*C), T*S);
-                glNormal3f(X1*C, Y1*C, S);
-                glVertex3f(X1*(R+T*C), Y1*(R+T*C), T*S);
-            }
-            glEnd();
-        }
-    }
-    
-    void ellipseZ(GLfloat rX, GLfloat rY, GLfloat rZ)
-    {
-        GLfloat iX(1.f/rX), iY(1.f/rY), iZ(1.f/rZ);
-        /*
-         A vector orthogonal to the ellipse surface at position (X, Y, Z) is
-         ( X / rX^2, Y / rY^2, Z / rZ^2 )
-          */
-        for ( size_t n = 0; n < pi_once; ++n )
-        {
-            GLfloat uC = cos_(n  ), uS = sin_(n  );
-            GLfloat lC = cos_(n+1), lS = sin_(n+1);
-            GLfloat uX = uS * rX, uY = uS * rY, uZ = uC * rZ;
-            GLfloat lX = lS * rX, lY = lS * rY, lZ = lC * rZ;
-            GLfloat xu = uS * iX, yu = uS * iY, zu = uC * iZ;
-            GLfloat xl = lS * iX, yl = lS * iY, zl = lC * iZ;
-            glBegin(GL_TRIANGLE_STRIP);
-            for ( size_t p = 0; p <= pi_twice; ++p )
-            {
-                GLfloat S = sin_(p), C = cos_(p);
-                glNormal3f(C*xu, S*yu, zu);
-                glVertex3f(C*uX, S*uY, uZ);
-                glNormal3f(C*xl, S*yl, zl);
-                glVertex3f(C*lX, S*lY, lZ);
-            }
-            glEnd();
-        }
-    }
-
-    void ellipse_circleZ(GLfloat rX, GLfloat rY, GLfloat rZ, GLfloat u)
-    {
-        GLfloat R(std::sqrt((1-u)*(1+u)));
-        GLfloat iX(1.f/rX), iY(1.f/rY), iZ(u/rZ);
-        GLfloat vX(R*rX), vY(R*rY), vZ(u*rZ);
-        glBegin(GL_LINE_LOOP);
-        for ( size_t n = 0; n <= pi_twice; ++n )
-        {
-            GLfloat S = sin_(n), C = cos_(n);
-            glNormal3f(C*iX, S*iY, iZ);
-            glVertex3f(C*vX, S*vY, vZ);
-        }
-        glEnd();
-    }
+    void disc() { disc1(); }
+    void cone() { cone2(); discBottom2(); }
+    void cylinder1() { tube1(); discBottom1(); discTop1(); }
+    // these primitices do not preserve the modelview transformation
+    void cylinder2() { glTranslatef(0,0,-0.5f); discBottom1(); tube4(); discTop1(); }
+    void longCone() { glTranslatef(0, 0, -1); glScalef(1, 1, 3); cone2(); discBottom2(); }
+    void shortCone() { glTranslatef(0, 0, -0.333f); glScalef(1, 1, 0.5); cone2(); discBottom2(); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres
@@ -1465,7 +1328,7 @@ namespace gle
         return ico.nb_faces();
     }
     
-    void initSphereBuffers()
+    void setSphereBuffers()
     {
         /// using icosahedrons to render the sphere:
         Tesselator ico1(Tesselator::ICOSAHEDRON, gle::finesse/6);
@@ -1475,7 +1338,7 @@ namespace gle
         Tesselator icoH1(Tesselator::HEMISPHERE, gle::finesse/6);
         Tesselator icoH2(Tesselator::HEMISPHERE, gle::finesse/3);
         Tesselator icoH4(Tesselator::HEMISPHERE, gle::finesse);
-        glGenBuffers(16, ico_);
+        glGenBuffers(14, ico_);
         ico_ntri[0] = initIcoBuffer(ico_[0], ico_[1], ico1);
         ico_ntri[1] = initIcoBuffer(ico_[2], ico_[3], ico2);
         ico_ntri[2] = initIcoBuffer(ico_[4], ico_[5], ico4);
@@ -1544,8 +1407,30 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-#pragma mark - 3D primitives
+    #pragma mark - 3D primitives
     
+    /// set Triangle strip for a Torus of radius R and a thickness 2*T
+    void torusZ(float R, float T, size_t inc)
+    {
+        for ( size_t n = 0; n < pi_twice; n += inc )
+        {
+            flute6 * flu = mapVertexNormalBuffer(2+pi_twice);
+            float X0 = cos_(n), X1 = cos_(n+inc);
+            float Y0 = sin_(n), Y1 = sin_(n+inc);
+            size_t i = 0;
+            for ( size_t p = 0; p <= pi_twice; p += 2*inc )
+            {
+                float S = sin_(p), C = cos_(p);
+                flu[i++] = {X0*(R+T*C), Y0*(R+T*C), T*S, X0*C, Y0*C, S};
+                flu[i++] = {X1*(R+T*C), Y1*(R+T*C), T*S, X1*C, Y1*C, S};
+            }
+            unmapVertexNormalBuffer();
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+        }
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
     /**
      Draw a cylindrical band on the equator of a sphere of radius 1.
      The band is in the XY plane. The axis of the cylinder is Z.

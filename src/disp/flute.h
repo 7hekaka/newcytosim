@@ -79,4 +79,5 @@ struct flute8
     flute8(gle_color const& c, gle_color const& d) : xyz{c.r(), c.g(), c.b(), c.a(), d.r(), d.g(), d.b(), d.a()} {}
 };
 
+
 #endif /* FLUTE_H */

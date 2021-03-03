@@ -352,7 +352,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     //gle::sphere2();
     glScalef(1, 1, Lr);
     gle::tube3();
-    gle::discBottom();
+    gle::discBottom2();
     glPopMatrix();
 }
 
@@ -400,7 +400,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     if ( abs+inc >= fib.length() )
     {
         gle::transAlignZ(fib.posEndP(), rad, -fib.dirEndP(), fib.length()-abs);
-        gle::discBottom();
+        gle::discBottom2();
     }
     else
     {

@@ -237,18 +237,11 @@ void SpaceEllipse::draw3D() const
     GLfloat X(length_[0]);
     GLfloat Y((DIM>1)?length_[1]:1);
     GLfloat Z((DIM>2)?length_[2]:1);
-#if 1
+
     glPushMatrix();
     glScalef(X, Y, Z);
     gle::sphere8();
     glPopMatrix();
-#else
-    gle::ellipseZ(X, Y, Z);
-    /* Add decoration */
-    glLineWidth(0.5);
-    for ( GLfloat u = -0.9f; u < 1.0f; u += 0.2f )
-        gle::ellipse_circleZ(X, Y, Z, u);
-#endif
 }
 
 #else

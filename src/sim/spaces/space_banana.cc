@@ -189,10 +189,11 @@ void SpaceBanana::draw3D() const
 {
     glMatrixMode(GL_MODELVIEW);
 
-    GLdouble plane1[] = {-std::cos(bAngle),-std::sin(bAngle), 0, 0 };
-    GLdouble plane2[] = { std::cos(bAngle),-std::sin(bAngle), 0, 0 };
-    GLdouble plane3[] = { std::cos(bAngle), std::sin(bAngle), 0, 0 };
-    GLdouble plane4[] = {-std::cos(bAngle), std::sin(bAngle), 0, 0 };
+    GLdouble C = std::cos(bAngle), S = std::sin(bAngle);
+    GLdouble plane1[] = {-C,-S, 0, 0 };
+    GLdouble plane2[] = { C,-S, 0, 0 };
+    GLdouble plane3[] = { C, S, 0, 0 };
+    GLdouble plane4[] = {-C, S, 0, 0 };
     
     const GLenum glp1 = GL_CLIP_PLANE4;
     const GLenum glp2 = GL_CLIP_PLANE5;

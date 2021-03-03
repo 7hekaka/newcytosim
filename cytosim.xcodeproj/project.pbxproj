@@ -1478,7 +1478,7 @@
 		BB50FE841268FB00005E925C /* motor_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = motor_prop.h; path = hands/motor_prop.h; sourceTree = "<group>"; };
 		BB50FE851268FB00005E925C /* motor.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = motor.cc; path = hands/motor.cc; sourceTree = "<group>"; };
 		BB50FE861268FB00005E925C /* motor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = motor.h; path = hands/motor.h; sourceTree = "<group>"; };
-		BB51BC2305FA534000D4869F /* test_glap */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_glap; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB51BC2305FA534000D4869F /* test_glapp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_glapp; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB51BC5C05FA559800D4869F /* libcytobase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytobase.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB51BD1405FA5FAA00D4869F /* libcytosim.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytosim.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB537E3311131B110059D9AA /* field_prop.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = field_prop.cc; path = src/sim/field_prop.cc; sourceTree = SOURCE_ROOT; };
@@ -2179,7 +2179,7 @@
 				BB6403D805FBC28C00DF7BFF /* sieve */,
 				BB7C2B7F05F93FB9002C69A9 /* test_rasterizer */,
 				BB7C2BC105FA4EF8002C69A9 /* test_grid */,
-				BB51BC2305FA534000D4869F /* test_glap */,
+				BB51BC2305FA534000D4869F /* test_glapp */,
 				BB66EA66068D95AD001934AF /* test_space */,
 				BBCA9EF006AFCB4600638608 /* report */,
 				BBB1C6E40CB2CAA300679ADC /* blank */,
@@ -3970,7 +3970,7 @@
 			);
 			name = test_glapp;
 			productName = test_glapp;
-			productReference = BB51BC2305FA534000D4869F /* test_glap */;
+			productReference = BB51BC2305FA534000D4869F /* test_glapp */;
 			productType = "com.apple.product-type.tool";
 		};
 		BB51BC5B05FA559800D4869F /* cytobase */ = {
@@ -6652,7 +6652,7 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
-				PRODUCT_NAME = test_glap;
+				PRODUCT_NAME = test_glapp;
 			};
 			name = Development;
 		};
@@ -6670,7 +6670,7 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
-				PRODUCT_NAME = test_glap;
+				PRODUCT_NAME = test_glapp;
 			};
 			name = Deployment;
 		};
@@ -6688,7 +6688,7 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
-				PRODUCT_NAME = test_glap;
+				PRODUCT_NAME = test_glapp;
 			};
 			name = Default;
 		};

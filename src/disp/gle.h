@@ -7,6 +7,7 @@
 #include "opengl.h"
 #include "gle_color.h"
 #include "vector.h"
+#include "flute.h"
 
 /// Simple geometrical objects drawn with OpenGL
 /**
@@ -41,13 +42,13 @@ namespace gle
     void release();
     
     /// initialize the Vertex Buffer Objects
-    void initTubeBuffers();
+    void setTubeBuffers();
 
     /// initialize the Vertex Buffer Objects
-    void initSphereBuffers();
+    void setSphereBuffers();
    
     /// initialize more buffer objects
-    void initBuffers();
+    void setBuffers();
     
     /// calculate sinus and cosinus
     void compute_circle(size_t cnt, GLfloat CS[], double rad, double start, double theta, GLfloat cX, GLfloat cY);
@@ -67,6 +68,18 @@ namespace gle
     
     /// OpenGL buffers objects for streaming
     extern GLuint stream_[4];
+
+    /// used in debug mode
+    GLuint boundBuffer();
+    
+    /// map GPU buffer
+    flute6* mapVertexNormalBuffer(size_t);
+    
+    /// unmap GPU buffer
+    void unmapVertexNormalBuffer();
+    
+    /// rename GPU buffer
+    void bindVertexNormalBuffer(size_t);
 
 #pragma mark -
     
@@ -140,12 +153,16 @@ namespace gle
     void circle();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
-    /// draw 2D disc of radius 1 at Z=1, with +Z as normal
-    void discTop();
+    /// draw 2D disc of radius 1 in XY plane, with +Z as normal
+    void disc1();
     /// nicer 2D disc of radius 1 in XY plane, with +Z as normal
     void disc2();
+    /// draw 2D disc of radius 1 at Z=1, with +Z as normal
+    void discTop1();
+    /// draw 2D disc of radius 1 at Z=1, with +Z as normal
+    void discTop2();
     /// draw 2D disc of radius 1 in XY plane, with -Z as normal
-    void discBottom();
+    void discBottom1();
     /// nicer 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom2();
 
@@ -178,25 +195,6 @@ namespace gle
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
     void arrowTail();
 
-    /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
-    void coneZ(GLfloat R, GLfloat B, GLfloat T);
-    /// display a cone directed along Z, of radius R at Z=B, and 0 at Z=T
-    void discZ(GLfloat R, GLfloat Z, GLfloat N);
-    /// draw an open tube from B to T along Z, of diameter 1
-    void tubeZ(GLfloat B, GLfloat T, int inc);
-    /// draw an open tube from B to T along Z, of diameter 1
-    void tubeZ(GLfloat B, GLfloat rB, GLfloat T, GLfloat rT, int inc);
-    /// draw an open tube along Z, of diameter 1 and length 1, Z=[0, 1]
-    void hexTubeZ(GLfloat Zmin, GLfloat Zmax);
-    /// draw Torus of radius `rad` and thickness `thick`
-    void torusZ(GLfloat rad, GLfloat thick, size_t inc = 1);
-    /// spherocylinder of length L, radius R, centered and aligned with axis Z
-    void capsuleZ(GLfloat B, GLfloat T, GLfloat R);
-    /// draw ellipse
-    void ellipseZ(GLfloat rX, GLfloat rY, GLfloat rZ);
-    /// draw circle on the ellipse
-    void ellipse_circleZ(GLfloat rX, GLfloat rY, GLfloat rZ, GLfloat u);
-
     /// draw an open tube along Z, of diameter 1 and length 1
     void tube1();
     /// draw an open tube along Z, of diameter 1 and length 1
@@ -225,6 +223,10 @@ namespace gle
     void thinTube();
     /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 256]
     void thinLongTube();
+    /// display a cone of axis Z, radius 1 at Z=0, summit at Z=1
+    void cone1();
+    /// display a nicer cone of axis Z, radius 1 at Z=0, summit at Z=1
+    void cone2();
 
     /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
     void cylinder1();
@@ -243,6 +245,8 @@ namespace gle
     void barrel();
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1
     void dumbbell();
+    /// draw Torus of radius `rad` and thickness `thick`
+    void torusZ(float rad, float thick, size_t inc = 1);
 
     /// draw a circular band composed of little triangles
     void arrowedBand(size_t nb_triangles, float width);
@@ -286,14 +290,14 @@ namespace gle
     inline void capedTube4() { halfTube4(); hemisphere4(); }
 #else
     /// primitives to draw the ends of spherocylinders:
-    inline void capedTube1() { halfTube1(); discBottom(); }
-    inline void capedTube2() { halfTube2(); discBottom(); }
-    inline void capedTube4() { halfTube4(); discBottom(); }
+    inline void capedTube1() { halfTube1(); discBottom1(); }
+    inline void capedTube2() { halfTube2(); discBottom2(); }
+    inline void capedTube4() { halfTube4(); discBottom2(); }
 #endif
     /// primitives to draw the ends of spherocylinders:
-    inline void endedTube1() { halfTube1(); discBottom(); }
-    inline void endedTube2() { halfTube2(); discBottom(); }
-    inline void endedTube4() { halfTube4(); discBottom(); }
+    inline void endedTube1() { halfTube1(); discBottom1(); }
+    inline void endedTube2() { halfTube2(); discBottom2(); }
+    inline void endedTube4() { halfTube4(); discBottom2(); }
 
     //------------------------------------------------------------------------------
     #pragma mark -
