@@ -48,7 +48,7 @@ set fiber microtubule
 
 set solid core
 {
-    display = ( style=2; coloring=1; size=12; )
+    display = ( style=3; coloring=1; size=12; )
 }
 
 set aster star

@@ -1478,61 +1478,45 @@ namespace gle
         arrowStrip(w, inc);
     }
     
-    
-    GLfloat dumbbellRadius(GLfloat z)
-    {
-        const GLfloat PIF = GLfloat(M_PI);
-        return sinf(PIF*z) * ( 1.3f + cosf(2*PIF*z) );
-    }
-    
-    
     /**
      Draw a surface of revolution around the Z-axis.
      The surface goes from Z to Z_max, and its radius is
      given by the function `radius`(z) provided as argument.
      */
-    void drawRevolution(GLfloat (*radius)(GLfloat), GLfloat Z, GLfloat Zmax, GLfloat dZ)
+    void drawRevolution(float (*radius)(float), float Z, float T, GLfloat dZ)
     {
         GLfloat R = radius(Z);
-        GLfloat R0, Z0, dR, dN;
-        
-        while ( Z < Zmax )
+        while ( Z < T )
         {
-            Z0 = Z;
-            R0 = R;
+            flute6 * flu = mapVertexNormalBuffer(2+2*pi_twice);
+            float Y = Z;
+            float Q = R;
             Z += dZ;
             R = radius(Z);
             
-            dR = ( R - R0 ) / dZ;
-            dN = 1.0f / sqrtf( 1 + dR * dR );
-            dR = dR*dN;
+            float dR = ( R - Q ) / dZ;
+            float dN = 1.0f / sqrtf( 1 + dR * dR );
+            dR = dR * dN;
             
-            glBegin(GL_TRIANGLE_STRIP);
+            size_t i = 0;
             for ( size_t n = 0; n <= pi_twice; ++n )
             {
                 GLfloat S = sin_(n), C = cos_(n);
-                glNormal3f(dN*C, dN*S,-dR);
-                glVertex3f(R *C, R *S, Z);
-                glVertex3f(R0*C, R0*S, Z0);
+                flu[i++] = {R*C, R*S, Z, dN*C, dN*S,-dR};
+                flu[i++] = {Q*C, Q*S, Y, dN*C, dN*S,-dR};
             }
-            glEnd();
+            unmapVertexNormalBuffer();
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
         }
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void dumbbell()
-    {
-        drawRevolution(dumbbellRadius, 0, 1, 0.0625);
-    }
-    
-    GLfloat barrelRadius(GLfloat z)
-    {
-        return sinf(3.14159265359f*z);
-    }
-    
-    void barrel()
-    {
-        drawRevolution(barrelRadius, 0, 1, 0.0625);
-    }
+    /// some volume of revolution with axis along Z
+    float dumbbellRadius(float z) { return sinf(3.14159265f*z) * (1.3f+cosf(6.28318530f*z)); }
+    float barrelRadius(float z) { return sinf(3.14159265f*z); }
+    void dumbbell() { drawRevolution(dumbbellRadius, 0, 1, 0.0625); }
+    void barrel() { drawRevolution(barrelRadius, 0, 1, 0.0625); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
