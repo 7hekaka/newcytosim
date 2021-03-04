@@ -492,8 +492,8 @@ void Display2::drawCoupleB(Couple const* cx) const
         glEnableClientState(GL_COLOR_ARRAY);
         fluteVC* flu = gle::mapVertexColorBuffer(4);
 #if 0
-        flu[0] = fluteVC{ p1, pd1->color };
-        flu[1] = fluteVC{ p2, pd2->color };
+        flu[0] = { p1, pd1->color };
+        flu[1] = { p2, pd2->color };
 #else
         /*
          Can shift positions towards the minus-end by couple's length
@@ -506,10 +506,10 @@ void Display2::drawCoupleB(Couple const* cx) const
         Vector pp = 0.5*(p1+p2) + (0.25*cx->prop->length)*(d1+d2);
         gle_color col1 = pd1->visible ? pd1->color : air;
         gle_color col2 = pd2->visible ? pd2->color : air;
-        flu[0] = fluteVC{ p1, col1 };
-        flu[1] = fluteVC{ pp, col1 };
-        flu[2] = fluteVC{ pp, col2 };
-        flu[3] = fluteVC{ p2, col2 };
+        flu[0] = { p1, col1 };
+        flu[1] = { pp, col1 };
+        flu[2] = { pp, col2 };
+        flu[3] = { p2, col2 };
 #endif
         gle::unmapVertexColorBuffer();
         lineWidth(pd1->width);

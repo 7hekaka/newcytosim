@@ -525,7 +525,7 @@ void SpaceCylinderZ::draw3D() const
         float SU = gle::sin_(u), SL = gle::sin_(u+1);
 
         size_t i = 0;
-        flu[i++] = flute6{0, 0, T, 0, 0, 1};
+        flu[i++] = {0, 0, T, 0, 0, 1};
         if ( edge_ > 0 )
         {
             //draw top arc
@@ -533,33 +533,33 @@ void SpaceCylinderZ::draw3D() const
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
-                flu[i++] = flute6{CU*RS, SU*RS, TE+E*C, CU*S, SU*S, C};
-                flu[i++] = flute6{CL*RS, SL*RS, TE+E*C, CL*S, SL*S, C};
+                flu[i++] = {CU*RS, SU*RS, TE+E*C, CU*S, SU*S, C};
+                flu[i++] = {CL*RS, SL*RS, TE+E*C, CL*S, SL*S, C};
             }
             /*
             // at pi_half, C = 0 and S = 1
-             flu[i++] = flute6{CU*R, SU*R, TE, CU, SU, 0};
-             flu[i++] = flute6{CL*R, SL*R, TE, CL, SL, 0};
-             flu[i++] = flute6{CU*R, SU*R, BE, CU, SU, 0};
-             flu[i++] = flute6{CL*R, SL*R, BE, CL, SL, 0};
+             flu[i++] = {CU*R, SU*R, TE, CU, SU, 0};
+             flu[i++] = {CL*R, SL*R, TE, CL, SL, 0};
+             flu[i++] = {CU*R, SU*R, BE, CU, SU, 0};
+             flu[i++] = {CL*R, SL*R, BE, CL, SL, 0};
              */
             //draw bottom arc
             for ( size_t j = gle::pi_half; j <= gle::pi_once; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
-                flu[i++] = flute6{CU*RS, SU*RS, BE+E*C, CU*S, SU*S, C};
-                flu[i++] = flute6{CL*RS, SL*RS, BE+E*C, CL*S, SL*S, C};
+                flu[i++] = {CU*RS, SU*RS, BE+E*C, CU*S, SU*S, C};
+                flu[i++] = {CL*RS, SL*RS, BE+E*C, CL*S, SL*S, C};
             }
         }
         else
         {
-            flu[i++] = flute6{CU*R, SU*R, T, CU, SU, 0};
-            flu[i++] = flute6{CL*R, SL*R, T, CL, SL, 0};
-            flu[i++] = flute6{CU*R, SU*R, B, CU, SU, 0};
-            flu[i++] = flute6{CL*R, SL*R, B, CL, SL, 0};
+            flu[i++] = {CU*R, SU*R, T, CU, SU, 0};
+            flu[i++] = {CL*R, SL*R, T, CL, SL, 0};
+            flu[i++] = {CU*R, SU*R, B, CU, SU, 0};
+            flu[i++] = {CL*R, SL*R, B, CL, SL, 0};
         }
-        flu[i++] = flute6{0, 0, B, 0, 0, -1};
+        flu[i++] = {0, 0, B, 0, 0, -1};
         gle::unmapVertexNormalBuffer();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }

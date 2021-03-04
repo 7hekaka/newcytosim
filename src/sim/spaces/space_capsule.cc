@@ -252,16 +252,18 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 #include "opengl.h"
 #include "gle.h"
+#include "gle_flute.h"
 
 void SpaceCapsule::draw2D() const
 {
     const GLfloat L(length_);
     const GLfloat R(radius_);
     constexpr size_t fin = 16 * gle::finesse;
-    GLfloat arc[4*fin+4], *cra = arc + 2*fin + 2;
+    float* arc = gle::mapFloatBuffer(4*fin+4);
+    float* cra = arc + 2*fin + 2;
     gle::compute_arc(fin, arc, R, -M_PI_2, M_PI,  L, 0);
     gle::compute_arc(fin, cra, R,  M_PI_2, M_PI, -L, 0);
-    glVertexPointer(2, GL_FLOAT, 0, arc);
+    gle::unmapFloatBuffer(2);
     glDrawArrays(GL_LINE_LOOP, 0, 2*fin+2);
 }
 
@@ -279,9 +281,9 @@ void SpaceCapsule::draw3D() const
     glPushMatrix();
     glClipPlane(glp, plane);
     gle::transAlignZ(Vector(L,0,0), R, Vector(-1,0,0));
-    gle::halfTube4();
+    gle::halfTube1();
     gle::hemisphere4();
-    gle::arrowedBand(24, 0.25);
+    gle::arrowStrip(0.5, 2);
     glPopMatrix();
 
     //left side:
@@ -289,9 +291,9 @@ void SpaceCapsule::draw3D() const
     plane[0] = -1;
     glClipPlane(glp, plane);
     gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
-    gle::halfTube4();
+    gle::halfTube1();
     gle::hemisphere4();
-    gle::arrowedBand(24, 0.25);
+    gle::arrowStrip(0.5, 2);
     glPopMatrix();
     
     glDisable(glp);

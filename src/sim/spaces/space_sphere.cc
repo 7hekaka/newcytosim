@@ -139,7 +139,7 @@ void SpaceSphere::draw2D() const
     if ( prop->disp->visible & 2 )
     {
         prop->disp->color2.load_load();
-        gle::disc2();
+        gle::disc1();
     }
     glPopMatrix();
 }
@@ -150,7 +150,7 @@ void SpaceSphere::draw3D() const
     glPushMatrix();
     glScalef(R, R, R);
     gle::sphere8();
-    gle::threeBands(128);
+    gle::threeArrowStrip(0.5, 1);
     glPopMatrix();
 }
 

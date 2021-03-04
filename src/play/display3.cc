@@ -328,7 +328,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     gle::transAlignZ(pos, rad, nxt-pos);
     gle::hemisphere4();
     glScalef(1, 1, Lr);
-    gle::tube3();
+    gle::tubeF();
     glPopMatrix();
 
     const size_t last = fib.lastSegment();
@@ -341,7 +341,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
         gle::transAlignZ(pos, rad, nxt-pos);
         //gle::sphere2();
         glScalef(1, 1, Lr);
-        gle::tube2();
+        gle::tubeE();
         glPopMatrix();
     }
     glPushMatrix();
@@ -351,7 +351,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     gle::transAlignZ(nxt, rad, pos-nxt);
     //gle::sphere2();
     glScalef(1, 1, Lr);
-    gle::tube3();
+    gle::tubeF();
     gle::discBottom2();
     glPopMatrix();
 }
@@ -377,7 +377,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     if ( abs <= 0 )
         gle::hemisphere4();
     glScalef(1, 1, inc/rad);
-    gle::tube3();
+    gle::tubeF();
     glPopMatrix();
     
     // keep abs to match to the end of the section already drawn
@@ -391,7 +391,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         select_color(fib, inx++, fac).load_front();
         glPushMatrix();
         gle::stretchAlignZ(pos, nxt, rad);
-        gle::tube2();
+        gle::tubeE();
         glPopMatrix();
     }
     // draw last segment, which may be truncated:
@@ -408,7 +408,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         nxt = fib.displayPosM(abs);
         gle::stretchAlignZ(nxt, pos, rad);
     }
-    gle::tube3();
+    gle::tubeF();
     glPopMatrix();
 }
 

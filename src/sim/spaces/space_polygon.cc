@@ -356,7 +356,7 @@ void SpacePolygon::draw3D() const
     for ( size_t n = 0; n <= nbp; ++n )
     {
         float X(pts[n].xx), Y(pts[n].yy);
-        flt[n] = flute6{X, Y, -H, X, Y, H};
+        flt[n] = {X, Y, -H, X, Y, H};
     }
     glLineWidth(2);
     // display bottom

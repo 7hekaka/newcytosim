@@ -157,6 +157,7 @@ void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gle_flute.h"
 
 void SpaceBanana::draw2D() const
 {
@@ -171,7 +172,7 @@ void SpaceBanana::draw2D() const
 
     //number of sections in the quarter-circle
     constexpr size_t fin = 8 * gle::finesse;
-    GLfloat arc[8*fin+8];
+    float* arc = gle::mapFloatBuffer(8*fin+8);
     // lower swing
     gle::compute_arc(fin, arc      , C+R, A-M_PI, M_PI+B-A, cX, cY);
     // right cap
@@ -181,7 +182,7 @@ void SpaceBanana::draw2D() const
     // left cap
     gle::compute_arc(fin, arc+6*fin, R, A, M_PI, -eX, eY);
     
-    glVertexPointer(2, GL_FLOAT, 0, arc);
+    gle::unmapFloatBuffer(2);
     glDrawArrays(GL_LINE_LOOP, 0, 4*fin);
 }
 

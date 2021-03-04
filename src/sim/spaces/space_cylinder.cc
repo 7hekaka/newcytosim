@@ -232,7 +232,7 @@ void SpaceCylinder::draw3D() const
     glPushMatrix();
     glClipPlane(glp, plane);
     gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
-    gle::halfTube4();
+    gle::halfTube1();
     gle::discBottom2();
     glPopMatrix();
     glDisable(glp);

@@ -817,10 +817,10 @@ size_t setTicksH(flute4* pts, int cnt, float d, float a, float b)
     size_t n = 0;
     for ( int i = 1; i < cnt; ++i )
     {
-        pts[n++] = flute4{-i*d, a, -i*d, b};
-        pts[n++] = flute4{ i*d, a,  i*d, b};
+        pts[n++] = {-i*d, a, -i*d, b};
+        pts[n++] = { i*d, a,  i*d, b};
     }
-    pts[n++] = flute4{0, a, 0, b};
+    pts[n++] = {0, a, 0, b};
     return n*2;
 }
 
@@ -830,10 +830,10 @@ size_t setTicksV(flute4* pts, int cnt, float d, float a, float b)
     size_t n = 0;
     for ( int i = 1; i < cnt; ++i )
     {
-        pts[n++] = flute4{a, -i*d, b, -i*d};
-        pts[n++] = flute4{a,  i*d, b,  i*d};
+        pts[n++] = {a, -i*d, b, -i*d};
+        pts[n++] = {a,  i*d, b,  i*d};
     }
-    pts[n++] = flute4{a, 0, b, 0};
+    pts[n++] = {a, 0, b, 0};
     return n*2;
 }
 

@@ -118,7 +118,7 @@ void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, V
     if ( style & 1 )
         gle::dualPassSphere4();
     if ( style & 4 )
-        gle::threeBands(64);
+        gle::threeArrowStrip(0.5, 1);
     glPopMatrix();
 }
 
@@ -876,52 +876,52 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
         case 1: { // display plain lines:
             gle_color c = fib.disp->color;
             for ( i = 0; i < fib.nbPoints(); ++i )
-                flu[i] = fluteVC{fib.posP(i), c};
+                flu[i] = {fib.posP(i), c};
         } break;
         case 2: // display segments with color indicating internal tension
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_tension(fib, n);
-                flu[i++] = fluteVC{fib.posP(n), c};
-                flu[i++] = fluteVC{fib.posP(n+1), c};
+                flu[i++] = {fib.posP(n), c};
+                flu[i++] = {fib.posP(n+1), c};
             }
             break;
         case 3: // display segments with color indicating internal tension
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_tension_jet(fib, n);
-                flu[i++] = fluteVC{fib.posP(n), c};
-                flu[i++] = fluteVC{fib.posP(n+1), c};
+                flu[i++] = {fib.posP(n), c};
+                flu[i++] = {fib.posP(n+1), c};
             }
             break;
         case 4: // display segments with color indicating the curvature
             for ( i = 0; i < fib.nbPoints(); ++i )
-                flu[i] = fluteVC{fib.posP(i), color_by_curvature(fib, i)};
+                flu[i] = {fib.posP(i), color_by_curvature(fib, i)};
             break;
         case 5: // color according to the angle with respect to the XY-plane:
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_direction(fib, n);
-                flu[i++] = fluteVC{fib.posP(n), c};
-                flu[i++] = fluteVC{fib.posP(n+1), c};
+                flu[i++] = {fib.posP(n), c};
+                flu[i++] = {fib.posP(n+1), c};
             }
             break;
         case 6: // color according to the distance from the minus end
             for ( real a = 0.125; a < 0.6; a *= 2 )
-                flu[i++] = fluteVC{fib.posPoint(0, a), color_by_distanceM(fib, a)};
+                flu[i++] = {fib.posPoint(0, a), color_by_distanceM(fib, a)};
             for ( size_t n = 1; n < fib.nbPoints(); ++n )
-                flu[i++] = fluteVC{fib.posP(n), color_by_distanceM(fib, n)};
+                flu[i++] = {fib.posP(n), color_by_distanceM(fib, n)};
             break;
         case 7: { // color according to the distance from the plus end
             const size_t last = fib.lastPoint();
             for ( size_t n = 0; n < last; ++n )
-                flu[i++] = fluteVC{fib.posP(n), color_by_distanceP(fib, n)};
+                flu[i++] = {fib.posP(n), color_by_distanceP(fib, n)};
             for ( real a = 0.5; a > 0.12; a /= 2 )
-                flu[i++] = fluteVC{fib.posPoint(last-1, 1-a), color_by_distanceP(fib, last-a)};
+                flu[i++] = {fib.posPoint(last-1, 1-a), color_by_distanceP(fib, last-a)};
         } break;
         case 8: // color according to distance to the confining Space
             for ( i = 0; i < fib.nbPoints(); ++i )
-                flu[i] = fluteVC{fib.posP(i), color_by_height(fib, i)};
+                flu[i] = {fib.posP(i), color_by_height(fib, i)};
             break;
     }
     gle::unmapVertexColorBuffer();
@@ -944,24 +944,24 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     if ( disp->line_style == 6 )
     {
         // color by distance to Minus end
-        flu[i++] = fluteVC{fib.posP(inx), color_by_distanceM(fib, inx)};
+        flu[i++] = {fib.posP(inx), color_by_distanceM(fib, inx)};
         if ( inx == 0 )
         {
             for ( real dx = 0.125; dx < 0.6; dx *= 2 )
-                flu[i++] = fluteVC{fib.posPoint(0, dx), color_by_distanceM(fib, dx)};
+                flu[i++] = {fib.posPoint(0, dx), color_by_distanceM(fib, dx)};
         }
-        flu[i++] = fluteVC{fib.posP(inx+1), color_by_distanceM(fib, inx+1)};
+        flu[i++] = {fib.posP(inx+1), color_by_distanceM(fib, inx+1)};
     }
     else if ( disp->line_style == 7 )
     {
         // color by distance to Plus end
-        flu[i++] = fluteVC{fib.posP(inx), color_by_distanceP(fib, inx)};
+        flu[i++] = {fib.posP(inx), color_by_distanceP(fib, inx)};
         if ( inx == fib.lastSegment() )
         {
             for ( real dx = 0.5; dx > 0.12; dx /= 2 )
-                flu[i++] = fluteVC{fib.posPoint(inx, 1-dx), color_by_distanceP(fib, inx+1-dx)};
+                flu[i++] = {fib.posPoint(inx, 1-dx), color_by_distanceP(fib, inx+1-dx)};
         }
-        flu[i++] = fluteVC{fib.posP(inx+1), color_by_distanceP(fib, inx+1)};
+        flu[i++] = {fib.posP(inx+1), color_by_distanceP(fib, inx+1)};
     }
     else
     {
@@ -973,8 +973,8 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         else
             c = fib.disp->color;
         // the whole segment is painted with the same color:
-        flu[i++] = fluteVC{fib.posP(inx), c};
-        flu[i++] = fluteVC{fib.posP(inx+1), c};
+        flu[i++] = {fib.posP(inx), c};
+        flu[i++] = {fib.posP(inx+1), c};
     }
     glDisable(GL_LIGHTING);
     gle::unmapVertexColorBuffer();
@@ -1109,8 +1109,8 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
         c = lattice_color(col, (fac*lat.data(inf))*(uni/len));
-        flu[i++] = fluteVC{fib.posEndM(), c};
-        flu[i++] = fluteVC{fib.posEndP(), c};
+        flu[i++] = {fib.posEndM(), c};
+        flu[i++] = {fib.posEndP(), c};
     }
     else
     {
@@ -1127,21 +1127,21 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
 
         // the terminal site may be truncated
         c = lattice_color(col, facM*lat.data(inf));
-        flu[i++] = fluteVC{fib.posEndM(), c};
+        flu[i++] = {fib.posEndM(), c};
         if ( uni*(inf+0.5) > fib.abscissaM() )
-            flu[i++] = fluteVC{fib.pos(uni*(inf+0.5)), c};
+            flu[i++] = {fib.pos(uni*(inf+0.5)), c};
         
         for ( auto h = inf+1; h < sup; ++h )
         {
             c = lattice_color(col, fac*lat.data(h));
-            flu[i++] = fluteVC{fib.pos(uni*(h+0.5)), c};
+            flu[i++] = {fib.pos(uni*(h+0.5)), c};
         }
         
         // the terminal site may be truncated
         c = lattice_color(col, facP*lat.data(sup));
         if ( uni*(sup+0.5) < fib.abscissaP() )
-            flu[i++] = fluteVC{fib.pos(uni*(sup+0.5)), c};
-        flu[i++] = fluteVC{fib.posEndP(), c};
+            flu[i++] = {fib.pos(uni*(sup+0.5)), c};
+        flu[i++] = {fib.posEndP(), c};
     }
     gle::unmapVertexColorBuffer();
     glEnableClientState(GL_COLOR_ARRAY);
@@ -1174,8 +1174,8 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
         c = lattice_color(col, (fac*lat.data(inf))*(uni/len));
-        flu[i++] = fluteVC{fib.posEndM(), c};
-        flu[i++] = fluteVC{fib.posEndP(), c};
+        flu[i++] = {fib.posEndM(), c};
+        flu[i++] = {fib.posEndP(), c};
     }
     else
     {
@@ -1192,20 +1192,20 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
 
         // the terminal site may be truncated
         c = lattice_color(col, facM*lat.data(inf));
-        flu[i++] = fluteVC{fib.posEndM(), c};
+        flu[i++] = {fib.posEndM(), c};
 
         for ( auto h = inf+1; h < sup; ++h )
         {
             Vector P = fib.pos(uni*h);
             c = lattice_color(col, fac*lat.data(h));
-            flu[i++] = fluteVC{P, c};
-            flu[i++] = fluteVC{P, c};
+            flu[i++] = {P, c};
+            flu[i++] = {P, c};
         }
         
         // the terminal site may be truncated
         c = lattice_color(col, facP*lat.data(sup));
-        flu[i++] = fluteVC{fib.pos(uni*sup), c};
-        flu[i++] = fluteVC{fib.posEndP(), c};
+        flu[i++] = {fib.pos(uni*sup), c};
+        flu[i++] = {fib.posEndP(), c};
     }
     gle::unmapVertexColorBuffer();
     glEnableClientState(GL_COLOR_ARRAY);

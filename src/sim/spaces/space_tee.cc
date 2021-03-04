@@ -421,6 +421,8 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gle_flute.h"
+
 
 void SpaceTee::draw2D() const
 {
@@ -430,7 +432,8 @@ void SpaceTee::draw2D() const
     GLfloat A(tArmLength);
     
     constexpr size_t fin = 8 * gle::finesse;
-    GLfloat arc[6*fin+8], *top = arc+2*fin+2, *lft = top+2*fin+2;
+    float* arc = gle::mapFloatBuffer(6*fin+8);
+    float* top = arc+2*fin+2, *lft = top+2*fin+2;
     gle::compute_arc(fin, arc, R, -M_PI_2, M_PI, L, 0);
     gle::compute_arc(fin, top, R, 0, M_PI, J, A);
     gle::compute_arc(fin, lft, R, M_PI_2, M_PI, -L, 0);
@@ -439,6 +442,7 @@ void SpaceTee::draw2D() const
     lft[-2] = J-R;
     lft[-1] = R;
 
+    gle::unmapFloatBuffer(2);
     glVertexPointer(2, GL_FLOAT, 0, arc);
     glDrawArrays(GL_LINE_LOOP, 0, 3*fin+2);
 }
@@ -471,7 +475,7 @@ void SpaceTee::draw3D() const
     setClipPlane(glp2, 1, 0);
     glTranslatef(L-J, 0, 0);
     glRotatef(-90, 0, 1, 0);
-    gle::halfTube4();
+    gle::halfTube1();
     gle::hemisphere4();
     glPopMatrix();
 
@@ -483,7 +487,7 @@ void SpaceTee::draw3D() const
     setClipPlane(glp2, -1, 0);
     glTranslatef(-L-J, 0, 0);
     glRotated(90, 0, 1, 0);
-    gle::halfTube4();
+    gle::halfTube1();
     gle::hemisphere4();
     glPopMatrix();
 
@@ -495,7 +499,7 @@ void SpaceTee::draw3D() const
     setClipPlane(glp2, M_SQRT1_2, M_SQRT1_2);
     glTranslatef(0, A, 0);
     glRotatef(90, 1, 0, 0);
-    gle::halfTube4();
+    gle::halfTube1();
     gle::hemisphere4();
     glPopMatrix();
 

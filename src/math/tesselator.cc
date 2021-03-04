@@ -586,18 +586,18 @@ void Tesselator::initHemisphere(unsigned div)
     
     // Twelve vertices of icosahedron on unit sphere
     FLOAT vex[12][3] = {
-        { T,  Z,  0},
-        {-T, -Z,  0},
-        {-T,  Z,  0},
-        { T, -Z,  0},
-        { Z,  0,  T}, // 4
-        {-Z,  0, -T},
-        { Z,  0, -T},
-        {-Z,  0,  T}, // 7
-        { 0,  T,  Z},
-        { 0, -T, -Z},
-        { 0, -T,  Z},
-        { 0,  T, -Z}
+        {-Z,  T,  0},
+        { Z, -T,  0},
+        {-Z, -T,  0},
+        { Z,  T,  0},
+        { 0,  Z,  T}, // 4
+        { 0, -Z, -T},
+        { 0,  Z, -T},
+        { 0, -Z,  T}, // 7
+        {-T,  0,  Z},
+        { T,  0, -Z},
+        { T,  0,  Z},
+        {-T,  0, -Z}
     };
     
     /* Remove any face involving vertex 4 or 7 */

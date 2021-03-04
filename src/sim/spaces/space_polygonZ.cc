@@ -215,8 +215,8 @@ void SpacePolygonZ::draw3D() const
             for ( size_t j = 0; j <= gle::pi_twice; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
-                flu[i++] = flute6{R2*C, R2*S, Z2, nX*C, nX*S, nY};
-                flu[i++] = flute6{R1*C, R1*S, Z1, nX*C, nX*S, nY};
+                flu[i++] = {R2*C, R2*S, Z2, nX*C, nX*S, nY};
+                flu[i++] = {R1*C, R1*S, Z1, nX*C, nX*S, nY};
             }
             gle::unmapVertexNormalBuffer();
             glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
@@ -246,7 +246,7 @@ void SpacePolygonZ::drawRings() const
             for ( size_t j = 0; j <= gle::pi_twice; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
-                flu[i++] = flute6{R*C, R*S, Z, nX*C, nX*S, nY};
+                flu[i++] = {R*C, R*S, Z, nX*C, nX*S, nY};
             }
             gle::unmapVertexNormalBuffer();
             glDrawArrays(GL_LINE_LOOP, 0, i);

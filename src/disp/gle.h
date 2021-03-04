@@ -17,14 +17,14 @@
 namespace gle
 {
     /// this defines the number of triangles used to draw shapes
-    /** Should be a multiple of 6; higher finesse improves the rendering:
-     6 is okay, 12 is nice and 24 is very nice */
-    constexpr size_t finesse = 12;
+    /** Higher finesse improves the rendering:
+     4 is okay, 8 is nice and 16 is very nice */
+    constexpr size_t finesse = 8;
     
     /// number of circle points stored in buffer
-    constexpr size_t pi_twice = finesse * 8;
-    constexpr size_t pi_once = finesse * 4;
-    constexpr size_t pi_half = finesse * 2;
+    constexpr size_t pi_twice = finesse * 12;
+    constexpr size_t pi_once = finesse * 6;
+    constexpr size_t pi_half = finesse * 3;
     
     /// values of cosinus, sinus over a full circle
     extern const float* circle_;
@@ -74,12 +74,15 @@ namespace gle
     
     /// map GPU buffer
     flute6* mapVertexNormalBuffer(size_t);
-    
     /// unmap GPU buffer
     void unmapVertexNormalBuffer();
-    
-    /// rename GPU buffer
+    /// remap GPU buffer
     void bindVertexNormalBuffer(size_t);
+
+    /// map GPU buffer
+    float* mapFloatBuffer(size_t);
+    /// unmap GPU buffer
+    void unmapFloatBuffer(size_t);
 
 #pragma mark -
     
@@ -151,6 +154,8 @@ namespace gle
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void circle();
+    /// draw 2D circle of radius 1 in XY plane, with +Z as normal
+    void circle2();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
@@ -197,13 +202,13 @@ namespace gle
 
     /// draw an open tube along Z, of diameter 1 and length 1
     void tube1();
-    /// draw an open tube along Z, of diameter 1 and length 1
-    void tube2();
-    /// draw an open tube along Z, of diameter 1 and length 1
-    void tube3();
-    /// draw a nice open tube along Z, of diameter 1 and length 1
+    /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1+epsilon]
+    void tubeE();
+    /// draw an open tube along Z, of radius 1 covering Z [0, 1+epsilon]
+    void tubeF();
+    /// draw a nice open tube along Z, of radius 1 and length 1
     void tube4();
-    /// draw a nicer open tube along Z, of diameter 1 and length 1
+    /// draw a nicer open tube along Z, of radius 1 and length 1
     void tube8();
     /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube1();
@@ -249,9 +254,9 @@ namespace gle
     void torusZ(float rad, float thick, size_t inc = 1);
 
     /// draw a circular band composed of little triangles
-    void arrowedBand(size_t nb_triangles, float width);
+    void arrowStrip(float width, size_t inc);
     /// draw 3 Arrowed Bands defining 8 quadrants on the sphere of radius 1
-    void threeBands(size_t nb_triangles);
+    void threeArrowStrip(float width, size_t inc);
     
     /// a rectangle ( rect = [ left, bottom, right, top ] )
     void drawRectangle(const int rect[4]);
@@ -284,17 +289,17 @@ namespace gle
     void hemisphere4();
 
 #if 1
-    /// primitives to draw the ends of spherocylinders:
+    /// primitives to draw the minus ends of fibers:
     inline void capedTube1() { halfTube1(); hemisphere1(); }
     inline void capedTube2() { halfTube2(); hemisphere2(); }
     inline void capedTube4() { halfTube4(); hemisphere4(); }
 #else
-    /// primitives to draw the ends of spherocylinders:
+    /// primitives to draw the minus ends of fibers:
     inline void capedTube1() { halfTube1(); discBottom1(); }
     inline void capedTube2() { halfTube2(); discBottom2(); }
     inline void capedTube4() { halfTube4(); discBottom2(); }
 #endif
-    /// primitives to draw the ends of spherocylinders:
+    /// primitives to draw the plus ends of fibers:
     inline void endedTube1() { halfTube1(); discBottom1(); }
     inline void endedTube2() { halfTube2(); discBottom2(); }
     inline void endedTube4() { halfTube4(); discBottom2(); }

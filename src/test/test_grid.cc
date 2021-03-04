@@ -184,14 +184,14 @@ void display(View&, int)
             for ( int u = 0; u < std::min(16, cnt); ++u )
             {
                 Vector off(fmod(u*gold,1.0), float(u)/cnt, 0);
-                flu[i++] = fluteVC{x+(y-x).e_mul(off), gle_color(0, 1, 1)};
+                flu[i++] = {x+(y-x).e_mul(off), gle_color(0, 1, 1)};
             }
         }
     }
 
     //-------------draw selected-cell
-    flu[i++] = fluteVC{pos, gle_color(1,1,0)};
-    flu[i++] = fluteVC{nod, gle_color(1,1,0)};
+    flu[i++] = {pos, gle_color(1,1,0)};
+    flu[i++] = {nod, gle_color(1,1,0)};
     unmapVertexColorBuffer();
     glPointSize(12);
     glEnableClientState(GL_COLOR_ARRAY);

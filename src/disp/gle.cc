@@ -96,6 +96,23 @@ namespace gle
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &i);
         return (GLuint)i;
     }
+    
+    float* mapFloatBuffer(size_t cnt)
+    {
+        //assert_true(glIsBuffer(stream_[1]));
+        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(float), nullptr, GL_STREAM_DRAW);
+        return (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    }
+    
+    void unmapFloatBuffer(size_t N)
+    {
+        assert_true(stream_[1] == boundBuffer());
+        //glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+        glVertexPointer(N, GL_FLOAT, N*sizeof(float), nullptr);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 
     flute6* mapVertexNormalBuffer(size_t cnt)
     {
@@ -823,20 +840,20 @@ namespace gle
     size_t setCube(flute3* flu, float R)
     {
         const float U = -R;
-        flu[0] = flute3{R, U, U};
-        flu[1] = flute3{U, U, U};
-        flu[2] = flute3{R, R, U};
-        flu[3] = flute3{U, R, U};
-        flu[4] = flute3{U, R, R};
-        flu[5] = flute3{U, U, U};
-        flu[6] = flute3{U, U, R};
-        flu[7] = flute3{R, U, U};
-        flu[8] = flute3{R, U, R};
-        flu[9] = flute3{R, R, U};
-        flu[10] = flute3{R, R, R};
-        flu[11] = flute3{U, R, R};
-        flu[12] = flute3{R, U, R};
-        flu[13] = flute3{U, U, R};
+        flu[0] = {R, U, U};
+        flu[1] = {U, U, U};
+        flu[2] = {R, R, U};
+        flu[3] = {U, R, U};
+        flu[4] = {U, R, R};
+        flu[5] = {U, U, U};
+        flu[6] = {U, U, R};
+        flu[7] = {R, U, U};
+        flu[8] = {R, U, R};
+        flu[9] = {R, R, U};
+        flu[10] = {R, R, R};
+        flu[11] = {U, R, R};
+        flu[12] = {R, U, R};
+        flu[13] = {U, U, R};
         return 14;
     }
 
@@ -871,28 +888,28 @@ namespace gle
         flute3 a, b, c;
         for ( n = 0; n < 11; n += 2 )
         {
-            a = flute3{pts[3*n  ], pts[3*n+1], pts[3*n+2]};
-            b = flute3{pts[3*n+3], pts[3*n+4], pts[3*n+5]};
-            c = flute3{pts[3*n+6], pts[3*n+7], pts[3*n+8]};
+            a = {pts[3*n  ], pts[3*n+1], pts[3*n+2]};
+            b = {pts[3*n+3], pts[3*n+4], pts[3*n+5]};
+            c = {pts[3*n+6], pts[3*n+7], pts[3*n+8]};
             flu[i++] = normalize(a+a);
             flu[i++] = normalize(a+b);
             flu[i++] = normalize(a+c);
             flu[i++] = normalize(b+c);
         }
-        a = flute3{pts[3*n+3], pts[3*n+4], pts[3*n+5]};
+        a = {pts[3*n+3], pts[3*n+4], pts[3*n+5]};
         flu[i++] = normalize(c+c);
         flu[i++] = normalize(a+c);
         for ( n = 13; n > 2; n -= 2 )
         {
-            a = flute3{pts[3*n  ], pts[3*n+1], pts[3*n+2]};
-            b = flute3{pts[3*n-3], pts[3*n-2], pts[3*n-1]};
-            c = flute3{pts[3*n-6], pts[3*n-5], pts[3*n-4]};
+            a = {pts[3*n  ], pts[3*n+1], pts[3*n+2]};
+            b = {pts[3*n-3], pts[3*n-2], pts[3*n-1]};
+            c = {pts[3*n-6], pts[3*n-5], pts[3*n-4]};
             flu[i++] = normalize(a+a);
             flu[i++] = normalize(a+b);
             flu[i++] = normalize(a+c);
             flu[i++] = normalize(b+c);
         }
-        a = flute3{pts[0], pts[1], pts[2]};
+        a = {pts[0], pts[1], pts[2]};
         flu[i++] = normalize(c+c);
         flu[i++] = normalize(a+c);
         return i;
@@ -907,14 +924,14 @@ namespace gle
         const float Z = 0.6f;
         //{ 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 }
         // pull some vertices far away in Z
-        for ( int u : { 42, 44, 46, 48, 50 } ) flu[u] = flute3{ 0, 0, 6 };
+        for ( int u : { 42, 44, 46, 48, 50 } ) flu[u] = { 0, 0, 6 };
         // set the 6 vertex of an hexagon:
-        for ( int u : { 3, 49 } ) flu[u] = flute3{ R, 0, Z};
-        for ( int u : { 5, 47 } ) flu[u] = flute3{ X,-Y, Z};
-        for ( int u : { 7, 45 } ) flu[u] = flute3{-X,-Y, Z};
-        for ( int u : { 9, 43 } ) flu[u] = flute3{-R, 0, Z};
-        for ( int u : {11, 41 } ) flu[u] = flute3{-X, Y, Z};
-        for ( int u : {1,40,51} ) flu[u] = flute3{ X, Y, Z};
+        for ( int u : { 3, 49 } ) flu[u] = { R, 0, Z};
+        for ( int u : { 5, 47 } ) flu[u] = { X,-Y, Z};
+        for ( int u : { 7, 45 } ) flu[u] = {-X,-Y, Z};
+        for ( int u : { 9, 43 } ) flu[u] = {-R, 0, Z};
+        for ( int u : {11, 41 } ) flu[u] = {-X, Y, Z};
+        for ( int u : {1,40,51} ) flu[u] = { X, Y, Z};
     }
     
     void initBlobBuffer(GLuint buf)
@@ -976,19 +993,6 @@ namespace gle
     }
 
     //-----------------------------------------------------------------------
-
-    void drawVertexNormalBuffer(GLenum mode, GLuint buf, GLsizei cnt,
-                                GLsizei data_size, size_t normal_offset)
-    {
-        assert_true(glIsBuffer(buf));
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glVertexPointer(3, GL_FLOAT, data_size, nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, data_size, (void*)normal_offset);
-        glDrawArrays(mode, 0, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
 
     void drawTriangleBuffer(GLuint nor, GLuint pts, GLsizei cnt)
     {
@@ -1064,7 +1068,7 @@ namespace gle
         for ( size_t n = 0; n <= pi_twice; n += inc )
         {
             float C = cos_(n), S = sin_(n);
-            flu[i++] = flute2{R*C, R*S};
+            flu[i++] = {R*C, R*S};
         }
         return i;
     }
@@ -1081,11 +1085,11 @@ namespace gle
         return n;
     }
     
-    inline void drawLineStrip(GLuint buf, size_t cnt)
+    inline void drawLineStrip(GLuint buf, size_t cnt, size_t skip)
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glVertexPointer(2, GL_FLOAT, sizeof(flute2), nullptr);
-        glDrawArrays(GL_LINE_STRIP, 0, cnt);
+        glVertexPointer(2, GL_FLOAT, skip*sizeof(flute2), nullptr);
+        glDrawArrays(GL_LINE_STRIP, 0, cnt/skip);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -1100,8 +1104,8 @@ namespace gle
         for( size_t p = 0; p <= pi_twice; p += inc )
         {
             float C = cos_(p), S = sin_(p);
-            flu[i++] = flute6{ C, S, T, C, S, 0 };
-            flu[i++] = flute6{ C, S, B, C, S, 0 };
+            flu[i++] = { C, S, T, C, S, 0 };
+            flu[i++] = { C, S, B, C, S, 0 };
         }
         return i;
     }
@@ -1114,8 +1118,8 @@ namespace gle
         for( size_t p = 0; p <= pi_twice; p += inc )
         {
             float C = cos_(p), S = sin_(p);
-            flu[i++] = flute6{ R*C, R*S, T, C, S, 0 };
-            flu[i++] = flute6{ R*C, R*S, B, C, S, 0 };
+            flu[i++] = { R*C, R*S, T, C, S, 0 };
+            flu[i++] = { R*C, R*S, B, C, S, 0 };
         }
         return i;
     }
@@ -1132,8 +1136,8 @@ namespace gle
         for( size_t n = 0; n <= pi_twice; n += inc )
         {
             float S = sin_(n), C = cos_(n);
-            flu[i++] = flute6{ rT*C, rT*S, T, tC*C, tC*S, tS };
-            flu[i++] = flute6{ rB*C, rB*S, B, tC*C, tC*S, tS };
+            flu[i++] = { rT*C, rT*S, T, tC*C, tC*S, tS };
+            flu[i++] = { rB*C, rB*S, B, tC*C, tC*S, tS };
         }
         return i;
     }
@@ -1142,12 +1146,14 @@ namespace gle
     size_t setDisc(flute6* flu, size_t inc, float Z, float N)
     {
         size_t i = 0;
+        flu[i++] = { 1, 0, Z, 0, 0, N };
         for( size_t n = inc; n < pi_once; n += inc )
         {
             float S = sin_(n), C = cos_(n);
-            flu[i++] = flute6{ C, -S, Z, 0, 0, N };
-            flu[i++] = flute6{ C,  S, Z, 0, 0, N };
+            flu[i++] = { C,  S, Z, 0, 0, N };
+            flu[i++] = { C, -S, Z, 0, 0, N };
         }
+        flu[i++] = {-1, 0, Z, 0, 0, N };
         return i;
     }
 
@@ -1160,34 +1166,27 @@ namespace gle
         const float R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         const float Y = R * C, X = R * S;
         
-        flu[0] = flute6{ R, 0, T, 1, 0, 0};
-        flu[1] = flute6{ R, 0, B, 1, 0, 0};
-        flu[2] = flute6{ X, Y, T, S, C, 0};
-        flu[3] = flute6{ X, Y, B, S, C, 0};
-        flu[4] = flute6{-X, Y, T,-S, C, 0};
-        flu[5] = flute6{-X, Y, B,-S, C, 0};
-        flu[6] = flute6{-R, 0, T,-1, 0, 0};
-        flu[7] = flute6{-R, 0, B,-1, 0, 0};
-        flu[8] = flute6{-X,-Y, T,-S, -C, 0};
-        flu[9] = flute6{-X,-Y, B,-S, -C, 0};
-        flu[10] = flute6{ X,-Y, T, S,-C, 0};
-        flu[11] = flute6{ X,-Y, B, S,-C, 0};
-        flu[12] = flute6{ R, 0, T, 1, 0, 0};
-        flu[13] = flute6{ R, 0, B, 1, 0, 0};
+        flu[0] = { R, 0, T, 1, 0, 0};
+        flu[1] = { R, 0, B, 1, 0, 0};
+        flu[2] = { X, Y, T, S, C, 0};
+        flu[3] = { X, Y, B, S, C, 0};
+        flu[4] = {-X, Y, T,-S, C, 0};
+        flu[5] = {-X, Y, B,-S, C, 0};
+        flu[6] = {-R, 0, T,-1, 0, 0};
+        flu[7] = {-R, 0, B,-1, 0, 0};
+        flu[8] = {-X,-Y, T,-S, -C, 0};
+        flu[9] = {-X,-Y, B,-S, -C, 0};
+        flu[10] = { X,-Y, T, S,-C, 0};
+        flu[11] = { X,-Y, B, S,-C, 0};
+        flu[12] = { R, 0, T, 1, 0, 0};
+        flu[13] = { R, 0, B, 1, 0, 0};
         return 14;
     }
     
     inline size_t nbTrianglesTube(size_t inc)
     {
-        return 2 + ( 2 * pi_twice ) / inc;
+        return 2 * ( 1 + pi_twice / inc );
     }
-  
-    inline size_t nbTrianglesDisc(size_t inc)
-    {
-        return ( 2 * pi_once ) / inc - 2;
-    }
-
-    constexpr size_t nbTrianglesHex = 14;
     
     size_t setTubeBuffer(GLuint buf, size_t inc, float B, float T)
     {
@@ -1215,7 +1214,7 @@ namespace gle
     
     size_t setDiscBuffer(GLuint buf, size_t inc, float Z, float N)
     {
-        size_t cnt = nbTrianglesDisc(inc);
+        size_t cnt = pi_twice / inc;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -1227,7 +1226,7 @@ namespace gle
 
     size_t setHexTubeBuffer(GLuint buf, float R, float B, float T)
     {
-        size_t cnt = nbTrianglesHex;
+        size_t cnt = 14;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -1237,74 +1236,82 @@ namespace gle
         return n;
     }
 
-    inline void drawTubeBuffer(GLuint buf, size_t cnt)
-    {
-        drawVertexNormalBuffer(GL_TRIANGLE_STRIP, buf, cnt, sizeof(flute6), 3*sizeof(GLfloat));
-    }
-
     void setTubeBuffers()
     {
         glGenBuffers(24, tub_);
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const GLfloat B = -32.f, T = 256.f;
-        setTubeBuffer(tub_[0], 8, 0, 1);
-        setTubeBuffer(tub_[1], 4,-0.03125, 1.03125);
-        setTubeBuffer(tub_[2], 4, 0, 1.03125);
-        setTubeBuffer(tub_[3], 2, 0, 1);
-        setTubeBuffer(tub_[4], 1, 0, 1);
-        setTubeBuffer(tub_[5], 8, B, T);
-        setTubeBuffer(tub_[6], 4, B, T);
-        setTubeBuffer(tub_[7], 2, B, T);
-        setTubeBuffer(tub_[8], 8, 0, T);
-        setTubeBuffer(tub_[9], 4, 0, T);
-        setTubeBuffer(tub_[10], 2, 0, T);
-        setHexTubeBuffer(tub_[11], 0, 1, 1);
+        setTubeBuffer(tub_[0], 1, 0, 1);
+        setTubeBuffer(tub_[1], 2, 0, 1);
+        setTubeBuffer(tub_[2], 4, 0, 1);
+        setTubeBuffer(tub_[3], 4,-0.03125, 1.03125);
+        setTubeBuffer(tub_[4], 4, 0, 1.03125);
+        setTubeBuffer(tub_[5], 1, B, T);
+        setTubeBuffer(tub_[6], 2, B, T);
+        setTubeBuffer(tub_[7], 4, B, T);
+        setTubeBuffer(tub_[8], 1, 0, T);
+        setTubeBuffer(tub_[9], 2, 0, T);
+        setTubeBuffer(tub_[10], 4, 0, T);
+        setHexTubeBuffer(tub_[11], 0, 1, 1.0f);
         setHexTubeBuffer(tub_[12], 0, 1, 0.5f);
         setHexTubeBuffer(tub_[13], 0, T, 0.5f);
-        setConeBuffer(tub_[14], 2, 0, 1, 1, 0);
-        setConeBuffer(tub_[15], 1, 0, 1, 1, 0);
+        setConeBuffer(tub_[14], 1, 0, 1, 1, 0);
+        setConeBuffer(tub_[15], 2, 0, 1, 1, 0);
         setConeBuffer(tub_[16], 2, 0, 1, 1, 0.25);
-        setDiscBuffer(tub_[17], 2, 0, 1);
-        setDiscBuffer(tub_[18], 1, 0, 1);
-        setDiscBuffer(tub_[19], 2, 1, 1);
-        setDiscBuffer(tub_[20], 1, 1, 1);
-        setDiscBuffer(tub_[21], 2, 0, -1);
-        setDiscBuffer(tub_[22], 1, 0, -1);
+        setDiscBuffer(tub_[17], 1, 0, 1);
+        setDiscBuffer(tub_[18], 2, 0, 1);
+        setDiscBuffer(tub_[19], 1, 1, 1);
+        setDiscBuffer(tub_[20], 2, 1, 1);
+        setDiscBuffer(tub_[21], 1, 0, -1);
+        setDiscBuffer(tub_[22], 2, 0, -1);
         setCircleBuffer(tub_[23], 1, 0, 1, 1);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
+    inline void drawTriangleStrip(GLuint buf, size_t cnt)
+    {
+        assert_true(glIsBuffer(buf));
+        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, sizeof(flute6), (void*)(3*sizeof(float)));
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, cnt);
+        glDisableClientState(GL_NORMAL_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     // using Vertex Buffer Objects
-    void tube1()     { drawTubeBuffer(tub_[0], nbTrianglesTube(8)); }
-    void tube2()     { drawTubeBuffer(tub_[1], nbTrianglesTube(4)); }
-    void tube3()     { drawTubeBuffer(tub_[2], nbTrianglesTube(4)); }
-    void tube4()     { drawTubeBuffer(tub_[3], nbTrianglesTube(2)); }
-    void tube8()     { drawTubeBuffer(tub_[4], nbTrianglesTube(1)); }
-    void longTube1() { drawTubeBuffer(tub_[5], nbTrianglesTube(8)); }
-    void longTube2() { drawTubeBuffer(tub_[6], nbTrianglesTube(4)); }
-    void longTube4() { drawTubeBuffer(tub_[7], nbTrianglesTube(2)); }
-    void halfTube1() { drawTubeBuffer(tub_[8], nbTrianglesTube(8)); }
-    void halfTube2() { drawTubeBuffer(tub_[9], nbTrianglesTube(4)); }
-    void halfTube4() { drawTubeBuffer(tub_[10], nbTrianglesTube(2)); }
-    void hexTube()   { drawTubeBuffer(tub_[11], nbTrianglesHex); }
-    void thinTube()  { drawTubeBuffer(tub_[12], nbTrianglesHex); }
-    void thinLongTube()  { drawTubeBuffer(tub_[13], nbTrianglesHex); }
-    void cone1()         { drawTubeBuffer(tub_[14], nbTrianglesTube(2)); }
-    void cone2()         { drawTubeBuffer(tub_[15], nbTrianglesTube(1)); }
-    void truncatedCone() { drawTubeBuffer(tub_[16], nbTrianglesTube(1)); }
-    void disc1()         { drawTubeBuffer(tub_[17], nbTrianglesDisc(2)); }
-    void disc2()         { drawTubeBuffer(tub_[18], nbTrianglesDisc(1)); }
-    void discTop1()      { drawTubeBuffer(tub_[19], nbTrianglesDisc(2)); }
-    void discTop2()      { drawTubeBuffer(tub_[20], nbTrianglesDisc(1)); }
-    void discBottom1()   { drawTubeBuffer(tub_[21], nbTrianglesDisc(2)); }
-    void discBottom2()   { drawTubeBuffer(tub_[22], nbTrianglesDisc(1)); }
-    void circle()        { drawLineStrip(tub_[23], 1+pi_twice); }
+    void tube1()         { drawTriangleStrip(tub_[0], nbTrianglesTube(1)); }
+    void tube2()         { drawTriangleStrip(tub_[1], nbTrianglesTube(2)); }
+    void tube4()         { drawTriangleStrip(tub_[2], nbTrianglesTube(4)); }
+    void tubeE()         { drawTriangleStrip(tub_[3], nbTrianglesTube(4)); }
+    void tubeF()         { drawTriangleStrip(tub_[4], nbTrianglesTube(4)); }
+    void longTube1()     { drawTriangleStrip(tub_[5], nbTrianglesTube(1)); }
+    void longTube2()     { drawTriangleStrip(tub_[6], nbTrianglesTube(2)); }
+    void longTube4()     { drawTriangleStrip(tub_[7], nbTrianglesTube(4)); }
+    void halfTube1()     { drawTriangleStrip(tub_[8], nbTrianglesTube(1)); }
+    void halfTube2()     { drawTriangleStrip(tub_[9], nbTrianglesTube(2)); }
+    void halfTube4()     { drawTriangleStrip(tub_[10], nbTrianglesTube(4)); }
+    void hexTube()       { drawTriangleStrip(tub_[11], 14); }
+    void thinTube()      { drawTriangleStrip(tub_[12], 14); }
+    void thinLongTube()  { drawTriangleStrip(tub_[13], 14); }
+    void cone1()         { drawTriangleStrip(tub_[14], nbTrianglesTube(1)); }
+    void cone2()         { drawTriangleStrip(tub_[15], nbTrianglesTube(2)); }
+    void truncatedCone() { drawTriangleStrip(tub_[16], nbTrianglesTube(2)); }
+    void disc1()         { drawTriangleStrip(tub_[17], pi_twice); }
+    void disc2()         { drawTriangleStrip(tub_[18], pi_twice/2); }
+    void discTop1()      { drawTriangleStrip(tub_[19], pi_twice); }
+    void discTop2()      { drawTriangleStrip(tub_[20], pi_twice/2); }
+    void discBottom1()   { drawTriangleStrip(tub_[21], pi_twice); }
+    void discBottom2()   { drawTriangleStrip(tub_[22], pi_twice/2); }
+    void circle()        { drawLineStrip(tub_[23], 1+pi_twice, 1); }
+    void circle2()       { drawLineStrip(tub_[23], 1+pi_twice, 2); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }
-    void cylinder1() { tube1(); discBottom1(); discTop1(); }
+    void cylinder1() { tube2(); discBottom2(); discTop2(); }
     // these primitices do not preserve the modelview transformation
-    void cylinder2() { glTranslatef(0,0,-0.5f); discBottom1(); tube4(); discTop1(); }
+    void cylinder2() { glTranslatef(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }
     void longCone() { glTranslatef(0, 0, -1); glScalef(1, 1, 3); cone2(); discBottom2(); }
     void shortCone() { glTranslatef(0, 0, -0.333f); glScalef(1, 1, 0.5); cone2(); discBottom2(); }
 
@@ -1331,13 +1338,13 @@ namespace gle
     void setSphereBuffers()
     {
         /// using icosahedrons to render the sphere:
-        Tesselator ico1(Tesselator::ICOSAHEDRON, gle::finesse/6);
-        Tesselator ico2(Tesselator::ICOSAHEDRON, gle::finesse/3);
-        Tesselator ico4(Tesselator::ICOSAHEDRON, gle::finesse);
-        Tesselator ico8(Tesselator::ICOSAHEDRON, gle::finesse*2);
-        Tesselator icoH1(Tesselator::HEMISPHERE, gle::finesse/6);
-        Tesselator icoH2(Tesselator::HEMISPHERE, gle::finesse/3);
-        Tesselator icoH4(Tesselator::HEMISPHERE, gle::finesse);
+        Tesselator ico1(Tesselator::ICOSAHEDRON, std::max(1UL, gle::finesse/2));
+        Tesselator ico2(Tesselator::ICOSAHEDRON, gle::finesse);
+        Tesselator ico4(Tesselator::ICOSAHEDRON, gle::finesse*2);
+        Tesselator ico8(Tesselator::ICOSAHEDRON, gle::finesse*4);
+        Tesselator icoH1(Tesselator::HEMISPHERE, std::max(1UL, gle::finesse/2));
+        Tesselator icoH2(Tesselator::HEMISPHERE, gle::finesse);
+        Tesselator icoH4(Tesselator::HEMISPHERE, gle::finesse*2);
         glGenBuffers(14, ico_);
         ico_ntri[0] = initIcoBuffer(ico_[0], ico_[1], ico1);
         ico_ntri[1] = initIcoBuffer(ico_[2], ico_[3], ico2);
@@ -1436,40 +1443,39 @@ namespace gle
      The band is in the XY plane. The axis of the cylinder is Z.
      The band is made of triangles indicating the clockwise direction.
      */
-    void arrowedBand(const size_t nb_triangles, float width)
+    void arrowStrip(float width, const size_t inc)
     {
-        GLfloat A(2 * M_PI / nb_triangles);
-        GLfloat W(width * A / M_SQRT3);
-        GLfloat R(1.0f / cosf(A*0.5f));
+        float A(M_PI * inc / pi_half);
+        float W(width * A / M_SQRT3);
+        float R(1.0f / cosf(A*0.5f));
         
-        glBegin(GL_TRIANGLES);
-        glNormal3f(1, 0, 0);
-        glVertex3f(1, 0, W);
-        glVertex3f(1, 0,-W);
-        for ( size_t ii = 1; ii < nb_triangles; ++ii )
+        flute6 * flu = mapVertexNormalBuffer(3*(1+pi_twice/(2*inc)));
+        size_t i = 0;
+        flu[i++] = {R, 0, W, 1, 0, 0};
+        flu[i++] = {R, 0,-W, 1, 0, 0};
+        for ( size_t n = 0; n < pi_twice; n += 2*inc )
         {
-            GLfloat ang = ii * A;
-            GLfloat c = R * cosf(ang);
-            GLfloat s = R * sinf(ang);
-            
-            glNormal3f(c, s, 0);
-            glVertex3f(c, s, 0);
-            glVertex3f(c, s, W);
-            glVertex3f(c, s,-W);
+            GLfloat c = R * cos_(n);
+            GLfloat s = R * sin_(n);
+            flu[i++] = {c, s, 0, c, s, 0};
+            flu[i++] = {c, s, W, c, s, 0};
+            flu[i++] = {c, s,-W, c, s, 0};
         }
-        glNormal3f(1, 0, 0);
-        glVertex3f(1, 0, 0);
-        glEnd();
+        flu[i++] = {R, 0, 0, 1, 0, 0};
+        unmapVertexNormalBuffer();
+        glDrawArrays(GL_TRIANGLES, 0, i);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
     
-    void threeBands(const size_t nb_triangles)
+    void threeArrowStrip(float w, const size_t inc)
     {
-        arrowedBand(nb_triangles, 0.25);
+        arrowStrip(w, inc);
         glRotated(-90,1,0,0);
-        arrowedBand(nb_triangles, 0.25);
+        arrowStrip(w, inc);
         glRotated(90,0,1,0);
-        arrowedBand(nb_triangles, 0.25);
+        arrowStrip(w, inc);
     }
     
     
