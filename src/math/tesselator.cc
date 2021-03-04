@@ -674,7 +674,7 @@ void Tesselator::initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsi
     
     unsigned fac[12][3] = {
         { 0, 20, 8 }, { 1, 10, 16 },
-        { 2, 14, 21 },{ 3, 18, 12 },
+        { 2, 14, 21 }, { 3, 18, 12 },
         { 4, 23, 15 }, { 5, 13, 19 },
         { 7, 17, 11 }, { 6, 9, 22 }
     };

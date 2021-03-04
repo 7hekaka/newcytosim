@@ -8,10 +8,11 @@
 
 using namespace gle;
 
-int style = 2;
+int style = 0;
 int kind = 2;
 int rank = 1;
 
+bool showPlane = true;
 bool showIndices = false;
 bool showVertices = false;
 bool showEdges = false;
@@ -32,7 +33,8 @@ void reset()
     ico = new Tesselator((Tesselator::Polyhedra)kind, rank, 1);
 
     char tmp[128];
-    snprintf(tmp, sizeof(tmp), "%i div, %i points", rank, ico->nb_vertices());
+    snprintf(tmp, sizeof(tmp), "%i div, %i points, %i faces",
+             rank, ico->nb_vertices(), ico->nb_faces());
     glApp::setMessage(tmp);
     initVBO();
 }
@@ -118,7 +120,7 @@ void drawFacesArray()
     glNormalPointer(GL_FLOAT, 0, ico->vertex_data());
     glDrawElements(GL_TRIANGLES, 3*ico->nb_faces(), GL_UNSIGNED_INT, ico->face_data());
     glDisableClientState(GL_NORMAL_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    //glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -161,7 +163,7 @@ void drawFacesVBO()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glDisableClientState(GL_NORMAL_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    //glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -169,7 +171,7 @@ void drawFaces()
 {
     if ( style == 1 )
         drawFacesArray();
-    else if ( style == 2 )
+    else
         drawFacesVBO();
 }
 
@@ -220,9 +222,9 @@ void drawVertices()
 
 void display(View&, int)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     if ( 0 )
     {
@@ -240,7 +242,8 @@ void display(View&, int)
         return;
     }
 
-    drawPlane();
+    if ( showPlane )
+        drawPlane();
     if ( showFaces )
     {
         glColor3f(0, 0, 0.75f);
@@ -249,16 +252,16 @@ void display(View&, int)
         glCullFace(GL_BACK);
         drawFaces();
         glDisable(GL_CULL_FACE);
-        glDisable(GL_LIGHTING);
     }
     if ( showEdges )
     {
 #if 1
+        glDisable(GL_LIGHTING);
         glLineWidth(0.25);
         glColor3f(1, 1, 1);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         drawFaces();
-        glPolygonMode(GL_FRONT, GL_FILL);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #else
         if ( ico->nb_edges() == 0 )
             ico->setEdges();
@@ -267,10 +270,12 @@ void display(View&, int)
     }
     if ( showVertices )
     {
+        glDisable(GL_LIGHTING);
         drawVertices();
     }
     if ( showIndices )
     {
+        glDisable(GL_LIGHTING);
         nameVertices();
     }
     glutReportErrors();

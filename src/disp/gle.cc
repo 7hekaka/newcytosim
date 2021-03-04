@@ -1149,7 +1149,7 @@ namespace gle
         flu[i++] = { 1, 0, Z, 0, 0, N };
         for( size_t n = inc; n < pi_once; n += inc )
         {
-            float S = sin_(n), C = cos_(n);
+            float S = std::copysign(sin_(n), N), C = cos_(n);
             flu[i++] = { C,  S, Z, 0, 0, N };
             flu[i++] = { C, -S, Z, 0, 0, N };
         }
@@ -1224,7 +1224,7 @@ namespace gle
         return n;
     }
 
-    size_t setHexTubeBuffer(GLuint buf, float R, float B, float T)
+    size_t setHexTubeBuffer(GLuint buf, float B, float T, float R)
     {
         size_t cnt = 14;
         glBindBuffer(GL_ARRAY_BUFFER, buf);
@@ -1312,8 +1312,8 @@ namespace gle
     void cylinder1() { tube2(); discBottom2(); discTop2(); }
     // these primitices do not preserve the modelview transformation
     void cylinder2() { glTranslatef(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }
-    void longCone() { glTranslatef(0, 0, -1); glScalef(1, 1, 3); cone2(); discBottom2(); }
-    void shortCone() { glTranslatef(0, 0, -0.333f); glScalef(1, 1, 0.5); cone2(); discBottom2(); }
+    void longCone() { glTranslatef(0,0,-1); glScalef(1,1,3); cone2(); discBottom2(); }
+    void shortCone() { glTranslatef(0,0,-0.333f); glScalef(1,1,0.5); cone2(); discBottom2(); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres
