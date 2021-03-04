@@ -29,21 +29,21 @@ public:
     */
     
     /// primitive (e.g. `rectangle`)
-    std::string  shape;
+    std::string shape;
     
     /// display string (see @ref PointDispPar)
-    std::string  display;
+    std::string display;
     
     /// name of the file where dimensions are stored
-    std::string  dimensions;
+    std::string dimensions;
 
     /// @}
     
     /// derived variable: flag to indicate that `display` has a new value
-    bool         display_fresh;
+    bool display_fresh;
 
     /// derived variable: parameters extracted from `display`
-    PointDisp *  disp;
+    PointDisp * disp;
 
 public:
 

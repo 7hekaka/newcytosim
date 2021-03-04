@@ -2069,7 +2069,7 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel, bool com) 
     }
     
     if ( com )
-        out << COM << ljust("class", 2, 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
+        out << COM << ljust("single", 2, 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
     for ( size_t i = 0; i < MAX; ++i )
     {
         if ( cnt[i] > 0 )
@@ -2275,7 +2275,7 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel, bool com) 
     }
         
     if ( com )
-        out << COM << ljust("class", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
+        out << COM << ljust("couple", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
     for ( size_t i = 0; i < MAX; ++i )
     {
         if ( cnt[i] > 0 )
