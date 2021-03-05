@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef SPACE_RING_H
 #define SPACE_RING_H
 
@@ -26,10 +26,10 @@ class SpaceRing : public Space
 private:
     
     /// half the length of the cylinder
-    real  length_;
+    real half_;
     
     /// the radius of the ring
-    real  radius_;
+    real radius_;
 
 public:
         
@@ -37,48 +37,48 @@ public:
     SpaceRing(SpaceProp const*);
     
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// true if the bead is inside the Space
-    bool        allInside(Vector const&, real rad) const;
+    bool allInside(Vector const&, real rad) const;
     
     /// a random position inside the volume
-    Vector      randomPlace() const;
+    Vector randomPlace() const;
 
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
     
     /// OpenGL display function
-    void        draw2D() const { draw3D(); }
+    void draw2D() const { draw3D(); }
 };
 
 #endif

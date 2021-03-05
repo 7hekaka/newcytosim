@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef SPACE_CAPSULE_H
 #define SPACE_CAPSULE_H
 
@@ -23,10 +23,10 @@ class SpaceCapsule : public Space
 private:
     
     /// half the distance between the centers of the two hemispherical caps
-    real  length_;
+    real half_;
     
     /// the radius of the hemispheres caps
-    real  radius_;
+    real radius_;
 
 public:
         
@@ -34,58 +34,58 @@ public:
     SpaceCapsule(SpaceProp const*);
     
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        thickness() const { return 2*radius_; }
+    real thickness() const { return 2*radius_; }
 
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// the area of the edge surface
-    real        surface() const;
+    real surface() const;
 
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// true if the bead is inside the Space
-    bool        allInside(Vector const&, real rad) const;
+    bool allInside(Vector const&, real rad) const;
     
     /// a random position inside the volume
-    Vector      randomPlace() const;
+    Vector randomPlace() const;
     
     /// direct normal direction calculation
-    Vector      normalToEdge(Vector const&) const;
+    Vector normalToEdge(Vector const&) const;
     
     /// direct surface placement
-    Vector      randomPlaceOnEdge(real) const;
+    Vector randomPlaceOnEdge(real) const;
 
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// OpenGL display function
-    void        draw2D() const;
+    void draw2D() const;
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif

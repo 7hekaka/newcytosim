@@ -31,7 +31,7 @@ void SpaceLid::resize(Glossary& opt)
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len <= 0 )
-            throw InvalidParameter("lid:length_[] must be > 0");
+            throw InvalidParameter("lid:length must be > 0");
         half_[d] = len;
     }
     

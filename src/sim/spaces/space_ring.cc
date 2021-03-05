@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "space_ring.h"
 #include "exceptions.h"
 #include "mecapoint.h"
@@ -12,14 +12,14 @@ SpaceRing::SpaceRing(SpaceProp const* p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("ring is only valid in 3D: use rectangle instead");
-    length_ = 0;
+    half_ = 0;
     radius_ = 0;
 }
 
 
 void SpaceRing::resize(Glossary& opt)
 {
-    real len = length_, rad = radius_;
+    real len = half_, rad = radius_;
     
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
@@ -32,21 +32,21 @@ void SpaceRing::resize(Glossary& opt)
     if ( rad < 0 )
         throw InvalidParameter("ring:radius must be >= 0");
 
-    length_ = len;
+    half_ = len;
     radius_ = rad;
 }
 
 
 void SpaceRing::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length_,-radius_,-radius_);
-    sup.set( length_, radius_, radius_);
+    inf.set(-half_,-radius_,-radius_);
+    sup.set( half_, radius_, radius_);
 }
 
 
 real  SpaceRing::volume() const
 {
-    return 2 * M_PI * length_ * radius_ * radius_;
+    return 2 * M_PI * half_ * radius_ * radius_;
 }
 
 
@@ -54,11 +54,11 @@ Vector SpaceRing::randomPlace() const
 {
 #if ( DIM >= 3 )
     const Vector2 V = Vector2::randB(radius_);
-    return Vector(length_*RNG.sreal(), V.XX, V.YY);
+    return Vector(half_*RNG.sreal(), V.XX, V.YY);
 #elif ( DIM > 1 )
-    return Vector(length_*RNG.sreal(), radius_*RNG.sreal());
+    return Vector(half_*RNG.sreal(), radius_*RNG.sreal());
 #else
-    return Vector(length_*RNG.sreal());
+    return Vector(half_*RNG.sreal());
 #endif
 }
 
@@ -68,7 +68,7 @@ bool SpaceRing::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
     const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
-    return ( abs_real(W.XX) <= length_  &&  RT <= square(radius_) );
+    return ( abs_real(W.XX) <= half_  &&  RT <= square(radius_) );
 #else
     return false;
 #endif
@@ -80,7 +80,7 @@ bool SpaceRing::allInside(Vector const& W, const real rad ) const
 
 #if ( DIM > 2 )
     const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
-    return ( abs_real(W.XX) + rad <= length_  &&  RT <= square(radius_-rad) );
+    return ( abs_real(W.XX) + rad <= half_  &&  RT <= square(radius_-rad) );
 #else
     return false;
 #endif
@@ -92,13 +92,8 @@ bool SpaceRing::allInside(Vector const& W, const real rad ) const
  */
 Vector SpaceRing::project(Vector const& W) const
 {
-    Vector P(W);
-    if ( W.XX >  length_ )
-        P.XX =  length_;
-    else if ( W.XX < -length_ )
-        P.XX = -length_;
-    else
-        P.XX = W.XX;
+    Vector P;
+    P.XX = min_real(max_real(W.XX, -half_), half_);
     
 #if ( DIM > 2 )
     real n = W.normYZ();
@@ -137,7 +132,7 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& mec
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, length_, radius_);
+    setInteraction(pos, pe, meca, stiff, half_, radius_);
 }
 
 /**
@@ -145,7 +140,7 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& mec
  */
 void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, length_, radius_);
+    setInteraction(pos, pe, meca, stiff, half_, radius_);
 }
 
 //------------------------------------------------------------------------------
@@ -154,14 +149,14 @@ void SpaceRing::write(Outputter& out) const
 {
     writeShape(out, "ring");
     out.writeUInt16(2);
-    out.writeFloat(length_);
+    out.writeFloat(half_);
     out.writeFloat(radius_);
 }
 
 
 void SpaceRing::setLengths(const real len[])
 {
-    length_ = len[0];
+    half_ = len[0];
     radius_ = len[1];
 }
 
@@ -183,7 +178,7 @@ void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceRing::draw3D() const
 {
-    GLfloat L(length_);
+    GLfloat L(half_);
     GLfloat R(radius_);
 
     const GLenum glp = GL_CLIP_PLANE5;
