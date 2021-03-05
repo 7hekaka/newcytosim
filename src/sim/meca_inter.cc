@@ -1221,7 +1221,6 @@ void Meca::addLink(Mecapoint const& ptA,
         }
 #endif
     }
-    
     DRAW_LINK(ptA, ptA.pos(), ptB.pos());
 }
 
@@ -1274,7 +1273,6 @@ void Meca::addLink(Interpolation const& ptA,
             add_base(DIM*ii2, off, ww[2]);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), ptB.pos());
 }
 
@@ -1329,7 +1327,6 @@ void Meca::addLink(Mecapoint const& ptA,
             add_base(DIM*ii2, off, ww[2]);
         }
     }
-    
     DRAW_LINK(ptB, ptB.pos(), ptA.pos());
 }
 
@@ -1391,7 +1388,6 @@ void Meca::addLink(Interpolation const& ptA,
             add_base(DIM*ii3, off, ww[3]);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), ptB.pos());
 }
 
@@ -2124,7 +2120,6 @@ void Meca::addSideLink2D(Interpolation const& ptA,
             add_base(ii2, off, weight);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -2210,7 +2205,6 @@ void Meca::addSideLink3D(Interpolation const& ptA,
             add_base(ii2, off, weight);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -2321,7 +2315,6 @@ void Meca::addSideLink2D(Interpolation const& ptA,
             add_base(ii3, off, ww3);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -2411,7 +2404,6 @@ void Meca::addSideLink3D(Interpolation const& ptA,
             add_base(ii3, off, wcc3);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -2671,7 +2663,6 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
             add_base(ii3, wDt*off);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
 }
 
@@ -2759,7 +2750,6 @@ void Meca::addSideSideLink3D(Interpolation const& ptA,
             add_base(ii3, wDt*off);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
 }
 
@@ -3040,7 +3030,6 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -3096,7 +3085,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), axi, ptB.pos());
 }
 
@@ -3163,7 +3151,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), arm, ptB.pos());
 }
 
@@ -3225,7 +3212,6 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
             sub_base(ii2, wP*off);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -3386,7 +3372,6 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
             add_base(ii3, wP*off, cc3);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -3461,7 +3446,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             add_base(ii3, off, cc3);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), axi, ptB.pos());
 }
 
@@ -3535,7 +3519,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             add_base(ii3, off, cc3);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -3622,7 +3605,6 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
             add_base(ii3, wP*off, cc3);
         }
     }
-    
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
@@ -4126,14 +4108,14 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
 
     if ( modulo )
         pos += modulo->offset( ptA.pos() - pos );
-    
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), pos);
 
     //it seems to works also fine without the term in eew* below:
     Vector off = wE * Vector(-pos.YY, pos.XX);
 
     add_base(ii0, wA*pos+off);
     add_base(ii1, wB*pos-off);
+    
+    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), pos);
 }
 
 #endif
@@ -4178,11 +4160,11 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
 
     if ( modulo )
         pos += modulo->offset( ptA.pos() - pos );
-    
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), pos);
  
     sub_base(ii0, wAt*pos);
     sub_base(ii1, wBt*pos);
+    
+    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), pos);
 }
 
 

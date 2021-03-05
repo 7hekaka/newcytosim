@@ -972,7 +972,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
         {
             drawPoint(P, disp);
             if ( modulo ) modulo->fold(Q, P);
-            gleTube(P, Q, wid, gle::tube1);
+            stretchTube(P, Q, wid, gle::tube1);
         }
     }
     /**
@@ -996,7 +996,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
 #else
             const float wid = disp->width * sFactor;
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
-                gleTube(sol->posPoint(i), sol->posPoint(i+1), wid, gle::hexTube);
+                stretchTube(sol->posPoint(i), sol->posPoint(i+1), wid, gle::hexTube);
 #endif
         }
     }
@@ -1194,7 +1194,7 @@ void Display3::drawCoupleBplain(Couple const* cx) const
     Vector p2 = cx->posHand2();
 
     pd1->color.load_both();
-    gleTube(p1, p2, pd1->width*sFactor, gle::hexTube);
+    stretchTube(p1, p2, pd1->width*sFactor, gle::hexTube);
     if ( pd1->visible ) drawHand(p1, pd1);
     if ( pd2->visible ) drawHand(p2, pd2);
 }
@@ -1217,8 +1217,8 @@ void Display3::drawCoupleBside(Couple const* cx) const
         pd1->color.load_both();
         Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
         drawPoint(mid, pd1->width);
-        gleTube(p2, mid, pd2->width*sFactor, gle::hexTube);
-        gleTube(p1, mid, pd1->width*sFactor, gle::hexTube);
+        stretchTube(p2, mid, pd2->width*sFactor, gle::hexTube);
+        stretchTube(p1, mid, pd1->width*sFactor, gle::hexTube);
         drawPoint(p1, pd1);
         drawPoint(p2, pd2);
         return;
@@ -1356,7 +1356,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     {
         pd1->color.load_both(cx->fiber1()->disp->color.transparency());
         glDepthMask(GL_FALSE);
-        gleTube(p1, p2, pd2->width*sFactor, gle::hexTube);
+        stretchTube(p1, p2, pd2->width*sFactor, gle::hexTube);
         glDepthMask(GL_TRUE);
         return;
     }

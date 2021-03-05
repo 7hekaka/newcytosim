@@ -1522,7 +1522,7 @@ namespace gle
 #pragma mark - Tubes
     
     
-    void gleTube(Vector1 const& A, Vector1 const& B, float R, void (*obj)())
+    void stretchTube(Vector1 const& A, Vector1 const& B, float R, void (*obj)())
     {
         glPushMatrix();
         stretchAlignZ(A, B, R);
@@ -1530,7 +1530,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleTube(Vector2 const& A, Vector2 const& B, float R, void (*obj)())
+    void stretchTube(Vector2 const& A, Vector2 const& B, float R, void (*obj)())
     {
         glPushMatrix();
         stretchAlignZ(A, B, R);
@@ -1538,7 +1538,7 @@ namespace gle
         glPopMatrix();
     }
     
-    void gleTube(Vector3 const& A, Vector3 const& B, float R, void (*obj)())
+    void stretchTube(Vector3 const& A, Vector3 const& B, float R, void (*obj)())
     {
         glPushMatrix();
         stretchAlignZ(A, B, R);

@@ -308,9 +308,9 @@ namespace gle
     #pragma mark -
 
     /// draw 'obj' with its ends at [a,b], of specified radius
-    void gleTube(Vector1 const& A, Vector1 const& B, float rad, void (*obj)());
-    void gleTube(Vector2 const& A, Vector2 const& B, float rad, void (*obj)());
-    void gleTube(Vector3 const& A, Vector3 const& B, float rad, void (*obj)());
+    void stretchTube(Vector1 const& A, Vector1 const& B, float rad, void (*obj)());
+    void stretchTube(Vector2 const& A, Vector2 const& B, float rad, void (*obj)());
+    void stretchTube(Vector3 const& A, Vector3 const& B, float rad, void (*obj)());
 
     void drawTube(Vector1 const& A, float rad, Vector1 const& B, void (*obj)());
     void drawTube(Vector2 const& A, float rad, Vector2 const& B, void (*obj)());

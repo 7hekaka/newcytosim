@@ -365,7 +365,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 
                 disp->color.load();
 #if ( DIM >= 3 )
-                gleTube(pf, ph, disp->width*sFactor, gle::truncatedCone);
+                stretchTube(pf, ph, disp->width*sFactor, gle::truncatedCone);
                 //drawCone(pf, ph-pf, disp->width*sFactor);
 #else
                 gle::drawBand(ph, disp->width*sFactor, ps, disp->width*sFactor);

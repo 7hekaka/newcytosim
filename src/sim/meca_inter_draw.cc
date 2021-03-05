@@ -1,19 +1,17 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 
-#  include "../disp/gle.h"
-#  include "../disp/gle_color_list.h"
+#include "../disp/gle.h"
+#include "../disp/gle_color_list.h"
 
-#  define DRAW_LINK(PTA, ...) {\
-    if ( drawLinks ) {\
-        gle::bright_color(PTA.mecable()->signature()).load();\
-        drawLink(__VA_ARGS__); }\
-}
+#define DRAW_LINK(PTA, ...)\
+{ if ( drawLinks ) drawLink(gle::bright_color(PTA.mecable()->signature()), __VA_ARGS__); }
 
 
 /// Display link between 2 positions
-void drawLink(Vector const& a, Vector const& b)
+void drawLink(gle_color const& col, Vector const& a, Vector const& b)
 {
+    col.load();
     glLineStipple(1, 0xFFFF);
     glBegin(GL_LINES);
     gle::gleVertex(a);
@@ -22,8 +20,9 @@ void drawLink(Vector const& a, Vector const& b)
 }
 
 /// Display link between 2 positions, with resting length `len`
-void drawLink(Vector const& a, Vector const& ab, real len)
+void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
 {
+    col.load();
     Vector b = a + ab;
     Vector dx = ab * (( 1 - len / ab.norm() ) / 2);
     glLineStipple(1, 0x3333);
@@ -45,8 +44,9 @@ void drawLink(Vector const& a, Vector const& ab, real len)
 }
 
 /// Display link between 3 positions
-void drawLink(Vector const& a, Vector const& ab, Vector c)
+void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
 {
+    col.load();
     if ( modulo )
         modulo->fold(c, a);
     Vector b = a + ab;
@@ -66,8 +66,9 @@ void drawLink(Vector const& a, Vector const& ab, Vector c)
 }
 
 /// Display link between 4 positions
-void drawLink(Vector const& a, Vector const& ab, Vector const& dc, Vector const& d)
+void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector const& dc, Vector const& d)
 {
+    col.load();
     Vector b = a + ab;
     Vector c = d + dc;
     glLineStipple(1, 0x7171);
