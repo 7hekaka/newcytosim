@@ -1,4 +1,4 @@
-// Cytosim 3.0 - F. Nedelec and Laboratory, Copyright EMBL 2007
+// Cytosim 3.0 - F. Nedelec and Laboratory, Copyright 2020 Cambridge University.
 
 #include "dim.h"
 #include "space_dynamic_ellipse.h"
@@ -46,9 +46,9 @@ void SpaceDynamicEllipse::dump(std::ostream& out) const
 {
     char str[1024];
     
-    real S = surfaceEllipse(length_);
+    real S = surfaceEllipse(radius_);
     snprintf(str, sizeof(str), " dEllipse %7.3f %7.3f %7.3f  S %7.3f  V %7.3f  P %7.3f",
-             length_[0], length_[1], length_[2], S, volumeEllipse(length_), pressure);
+             radius_[0], radius_[1], radius_[2], S, volumeEllipse(radius_), pressure);
     out << str;
     
 #if ( DIM > 1 )
@@ -130,14 +130,14 @@ void SpaceDynamicEllipse::decompose_force(Vector const& forces, Vector const& po
 void SpaceDynamicEllipse::add_radial_force(Vector const& forces, Vector const& pos) const
 {
     Vector U = director(0);
-    Rforces.XX += dot(U, forces) * dot(U, pos) / length_[0];
+    Rforces.XX += dot(U, forces) * dot(U, pos) / radius_[0];
 #if ( DIM >= 2 )
     Vector V = director(1);
-    Rforces.YY += dot(V, forces) * dot(V, pos) / length_[1];
+    Rforces.YY += dot(V, forces) * dot(V, pos) / radius_[1];
 #endif
 #if ( DIM > 2 )
     Vector W = director(2);
-    Rforces.ZZ += dot(W, forces) * dot(W, pos) / length_[2];
+    Rforces.ZZ += dot(W, forces) * dot(W, pos) / radius_[2];
 #endif
 }
 
@@ -157,9 +157,9 @@ Vector SpaceDynamicEllipse::pressure_forces(const real P) const
 #if ( DIM == 1 )
     return Vector(0, 0, 0);
 #elif ( DIM == 2 )
-    return Vector(S*length_[1], S*length_[0]);
+    return Vector(S*radius_[1], S*radius_[0]);
 #elif ( DIM > 2 )
-    return Vector(S*length_[1]*length_[2], S*length_[2]*length_[0], S*length_[0]*length_[1]);
+    return Vector(S*radius_[1]*radius_[2], S*radius_[2]*radius_[0], S*radius_[0]*radius_[1]);
 #endif
 }
 
@@ -240,23 +240,23 @@ Vector SpaceDynamicEllipse::tension_forces() const
 #if ( DIM == 2 )
 
     real S = -prop->tension * M_PI;
-    real N = std::sqrt( (3.0*length_[0]+length_[1])*(length_[0]+3.0*length_[1]) );
+    real N = std::sqrt( (3.0*radius_[0]+radius_[1])*(radius_[0]+3.0*radius_[1]) );
 
-    res.XX = S * (3.0 - ( 3.0*length_[0] + 5.0*length_[1] ) / N );
-    res.YY = S * (3.0 - ( 3.0*length_[1] + 5.0*length_[0] ) / N );
+    res.XX = S * (3.0 - ( 3.0*radius_[0] + 5.0*radius_[1] ) / N );
+    res.YY = S * (3.0 - ( 3.0*radius_[1] + 5.0*radius_[0] ) / N );
     
 #elif ( DIM > 2 )
     
-    real S = -prop->tension * surfaceEllipse(length_);
+    real S = -prop->tension * surfaceEllipse(radius_);
     
-    real pXY = surf_block(length_[0], length_[1]);
-    real pXZ = surf_block(length_[0], length_[2]);
-    real pYZ = surf_block(length_[1], length_[2]);
-    real XYZ = surf_block(length_[0], length_[1], length_[2]);
+    real pXY = surf_block(radius_[0], radius_[1]);
+    real pXZ = surf_block(radius_[0], radius_[2]);
+    real pYZ = surf_block(radius_[1], radius_[2]);
+    real XYZ = surf_block(radius_[0], radius_[1], radius_[2]);
 
-    res.XX = S * ( pXY + pXZ ) / ( length_[0] * XYZ );
-    res.YY = S * ( pXY + pYZ ) / ( length_[1] * XYZ );
-    res.ZZ = S * ( pXZ + pYZ ) / ( length_[2] * XYZ );
+    res.XX = S * ( pXY + pXZ ) / ( radius_[0] * XYZ );
+    res.YY = S * ( pXY + pYZ ) / ( radius_[1] * XYZ );
+    res.ZZ = S * ( pXZ + pYZ ) / ( radius_[2] * XYZ );
 
 #endif
     return res;
@@ -275,7 +275,7 @@ void SpaceDynamicEllipse::step()
         
         // calculate forces:
         Rforces += tension_forces();
-        pressure = compute_pressure(length_, Rforces);
+        pressure = compute_pressure(radius_, Rforces);
         Rforces += pressure_forces(pressure);
 
         // implement changes in shape:
@@ -285,7 +285,7 @@ void SpaceDynamicEllipse::step()
             for ( int i=0; i<DIM; ++i )
             {
                 assert_true(delta[i] == delta[i]);
-                length_[i] += delta[i];
+                radius_[i] += delta[i];
             }
             //dump(std::clog);
             //std::clog << "%  balance " << Rforces << "\n";
@@ -434,10 +434,10 @@ void SpaceDynamicEllipse::write(Outputter& out) const
  */
 void SpaceDynamicEllipse::report(std::ostream& os) const
 {
-    os << "  radius_0" << length_[0];
-    os << "  radius_1" << length_[1];
+    os << "  radius_0" << radius_[0];
+    os << "  radius_1" << radius_[1];
 #if ( DIM == 3 )
-    os << "  radius_2" << length_[2];
+    os << "  radius_2" << radius_[2];
 #endif
 }
 

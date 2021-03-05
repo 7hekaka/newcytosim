@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 #include "space_ellipse.h"
 #include "exceptions.h"
 #include "iowrapper.h"
@@ -9,20 +9,20 @@
 SpaceEllipse::SpaceEllipse(SpaceProp const* p)
 : Space(p)
 {
-#ifdef ELLIPSE_HAS_SPHEROID
+#if ELLIPSE_HAS_SPHEROID
     mSpheroid = -1;
 #endif
     for ( int d = 0; d < 3; ++d )
-        length_[d] = 0;
+        radius_[d] = 0;
 }
 
 
 void SpaceEllipse::update()
 {
     for ( unsigned d = 0; d < DIM; ++d )
-        lengthSqr_[d] = square(length_[d]);
+        radiusSqr_[d] = square(radius_[d]);
     
-#if ( DIM > 2 ) && defined ELLIPSE_HAS_SPHEROID
+#if ( DIM > 2 ) && ELLIPSE_HAS_SPHEROID
     mSpheroid = -1;
     
     // if any two dimensions are similar, then the ellipsoid is a spheroid
@@ -30,7 +30,7 @@ void SpaceEllipse::update()
     {
         int xx = ( zz + 1 ) % DIM;
         int yy = ( zz + 2 ) % DIM;
-        if ( abs_real( (length(xx)-length(yy)) / (length(xx)+length(yy)) ) < REAL_EPSILON )
+        if ( abs_real(radius_[xx]-radius_[yy]) < REAL_EPSILON*(radius_[xx]+radius_[yy]) )
             mSpheroid = zz;
     }
 #endif
@@ -41,13 +41,13 @@ void SpaceEllipse::resize(Glossary& opt)
 {
     for ( unsigned d = 0; d < DIM; ++d )
     {
-        real len = length_[d];
+        real len = radius_[d];
         if ( opt.set(len, "diameter", d) || opt.set(len, "length", d) )
             len *= 0.5;
         else opt.set(len, "radius", d);
         if ( len < REAL_EPSILON )
             throw InvalidParameter("ellipse:radius[] must be > 0");
-        length_[d] = len;
+        radius_[d] = len;
     }
     update();
 }
@@ -55,8 +55,8 @@ void SpaceEllipse::resize(Glossary& opt)
 
 void SpaceEllipse::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-length_[0],-length_[1],-length_[2]);
-    sup.set( length_[0], length_[1], length_[2]);
+    inf.set(-radius_[0],-radius_[1],-radius_[2]);
+    sup.set( radius_[0], radius_[1], radius_[2]);
 }
 
 /**
@@ -72,9 +72,9 @@ Vector SpaceEllipse::normalToEdge(Vector const& pos) const
 #if ( DIM == 1 )
     return Vector(std::copysign(real(1.0), pos.XX));
 #elif ( DIM == 2 )
-    return normalize(Vector(pos.XX/lengthSqr_[0], pos.YY/lengthSqr_[1]));
+    return normalize(Vector(pos.XX/radiusSqr_[0], pos.YY/radiusSqr_[1]));
 #else
-    return normalize(Vector(pos.XX/lengthSqr_[0], pos.YY/lengthSqr_[1], pos.ZZ/lengthSqr_[2]));
+    return normalize(Vector(pos.XX/radiusSqr_[0], pos.YY/radiusSqr_[1], pos.ZZ/radiusSqr_[2]));
 #endif
 }
 
@@ -82,12 +82,12 @@ Vector SpaceEllipse::normalToEdge(Vector const& pos) const
 real SpaceEllipse::volume() const
 {
 #if ( DIM == 1 )
-    return 2 * length_[0];
+    return 2 * radius_[0];
 #elif ( DIM == 2 )
-    return M_PI * length_[0] * length_[1];
+    return M_PI * radius_[0] * radius_[1];
 #else
     constexpr real C = 4 * M_PI / 3.0;
-    return (C * length_[0]) * (length_[1] * length_[2]);
+    return (C * radius_[0]) * (radius_[1] * radius_[2]);
 #endif
 }
 
@@ -98,15 +98,15 @@ real SpaceEllipse::surface() const
     return 2;
 #elif ( DIM == 2 )
     // approximate formula
-    real h = square(length_[0]-length_[1]) / square(length_[0]+length_[1]);
-    real S = M_PI * ( length_[0] + length_[1] );
+    real h = square(radius_[0]-radius_[1]) / square(radius_[0]+radius_[1]);
+    real S = M_PI * ( radius_[0] + radius_[1] );
     return S * ( 1.0 + 0.25 * h * ( 1.0 + 0.0625 * h * ( 1.0 + 0.25 * h )));
 #else
     // approximate formula
     constexpr real POW = 1.6075;
-    real AB = length_[0]*length_[1];
-    real AC = length_[0]*length_[2];
-    real BC = length_[1]*length_[2];
+    real AB = radius_[0]*radius_[1];
+    real AC = radius_[0]*radius_[2];
+    real BC = radius_[1]*radius_[2];
     real S = std::pow(AB,POW) + std::pow(AC,POW) + std::pow(BC,POW);
     return (4.0*M_PI) * std::pow(S/3.0, 1.0/POW);
 #endif
@@ -116,11 +116,11 @@ real SpaceEllipse::surface() const
 bool SpaceEllipse::inside(Vector const& W) const
 {
 #if ( DIM == 1 )
-    return abs_real(W.XX) < length_[0];
+    return abs_real(W.XX) < radius_[0];
 #elif ( DIM == 2 )
-    return square(W.XX/length_[0]) + square(W.YY/length_[1]) <= 1;
+    return square(W.XX/radius_[0]) + square(W.YY/radius_[1]) <= 1;
 #else
-    return square(W.XX/length_[0]) + square(W.YY/length_[1]) + square(W.ZZ/length_[2]) <= 1;
+    return square(W.XX/radius_[0]) + square(W.YY/radius_[1]) + square(W.ZZ/radius_[2]) <= 1;
 #endif
 }
 
@@ -128,16 +128,16 @@ bool SpaceEllipse::inside(Vector const& W) const
 Vector1 SpaceEllipse::project1D(Vector1 const& W) const
 {
     if ( W.XX >= 0 )
-        return Vector1(length_[0], 0, 0);
+        return Vector1(radius_[0], 0, 0);
     else
-        return Vector1(-length_[0], 0, 0);
+        return Vector1(-radius_[0], 0, 0);
 }
 
 
 Vector2 SpaceEllipse::project2D(Vector2 const& W) const
 {
     Vector2 P(W);
-    projectEllipse(P.XX, P.YY, W.XX, W.YY, length_[0], length_[1]);
+    projectEllipse(P.XX, P.YY, W.XX, W.YY, radius_[0], radius_[1]);
     // check that results are valid numbers:
     assert_true(P.valid());
     return P;
@@ -147,7 +147,7 @@ Vector2 SpaceEllipse::project2D(Vector2 const& W) const
 Vector3 SpaceEllipse::project3D(Vector3 const& W) const
 {
     Vector3 P(W);
-#if ( DIM > 2 ) && defined ELLIPSE_HAS_SPHEROID
+#if ( DIM > 2 ) && ELLIPSE_HAS_SPHEROID
     /*
      If the ellipsoid has two equal axes, we can reduce the problem to 2D,
      because it is symmetric by rotation around the remaining axis, which
@@ -159,12 +159,12 @@ Vector3 SpaceEllipse::project3D(Vector3 const& W) const
         const int xx = ( zz + 1 ) % DIM;
         const int yy = ( zz + 2 ) % DIM;
         
-        if ( length(xx) != length(yy) )
+        if ( radius_[xx] != radius_[yy] )
             throw InvalidParameter("Inconsistent mSpheroid dimensions");
         
         //rotate point around the xx axis to bring it into the yy-zz plane:
         real pR, rr = std::sqrt( W[xx]*W[xx] + W[yy]*W[yy] );
-        projectEllipse(pR, P[zz], rr, W[zz], length(xx), length(zz), 8*REAL_EPSILON);
+        projectEllipse(pR, P[zz], rr, W[zz], radius_[xx], radius_[zz]);
         // back-rotate to get the projection in 3D:
         if ( rr > 0 ) {
             real s = pR / rr;
@@ -175,11 +175,11 @@ Vector3 SpaceEllipse::project3D(Vector3 const& W) const
             P[xx] = 0;
             P[yy] = 0;
         }
-        return;
+        return P;
     }
 #endif
     
-    projectEllipsoid(P.data(), W.data(), length_);
+    projectEllipsoid(P.data(), W.data(), radius_);
     return P;
 }
 
@@ -190,17 +190,17 @@ void SpaceEllipse::write(Outputter& out) const
 {
     writeShape(out, "ellipse");
     out.writeUInt16(4);
-    out.writeFloat(length_[0]);
-    out.writeFloat(length_[1]);
-    out.writeFloat(length_[2]);
+    out.writeFloat(radius_[0]);
+    out.writeFloat(radius_[1]);
+    out.writeFloat(radius_[2]);
     out.writeFloat(0.f);
 }
 
 void SpaceEllipse::setLengths(const real len[])
 {
-    length_[0] = len[0];
-    length_[1] = len[1];
-    length_[2] = len[2];
+    radius_[0] = len[0];
+    radius_[1] = len[1];
+    radius_[2] = len[2];
     update();
 }
 
@@ -221,9 +221,9 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceEllipse::draw2D() const
 {
-    GLfloat X(length_[0]);
-    GLfloat Y((DIM>1)?length_[1]:1);
-    GLfloat Z((DIM>2)?length_[2]:1);
+    GLfloat X(radius_[0]);
+    GLfloat Y((DIM>1)?radius_[1]:1);
+    GLfloat Z((DIM>2)?radius_[2]:1);
 
     glPushMatrix();
     glScalef(X, Y, Z);
@@ -234,9 +234,9 @@ void SpaceEllipse::draw2D() const
 
 void SpaceEllipse::draw3D() const
 {
-    GLfloat X(length_[0]);
-    GLfloat Y((DIM>1)?length_[1]:1);
-    GLfloat Z((DIM>2)?length_[2]:1);
+    GLfloat X(radius_[0]);
+    GLfloat Y((DIM>1)?radius_[1]:1);
+    GLfloat Z((DIM>2)?radius_[2]:1);
 
     glPushMatrix();
     glScalef(X, Y, Z);

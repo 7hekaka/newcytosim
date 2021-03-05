@@ -1,4 +1,4 @@
-// Cytosim 3.0 - F. Nedelec and Laboratory, Copyright EMBL 2007
+// Cytosim 3.0 - F. Nedelec and Laboratory, Copyright 2020 Cambridge University.
 
 #ifndef SPACE_DYNAMIC_ELLIPSE_H
 #define SPACE_DYNAMIC_ELLIPSE_H
@@ -26,41 +26,41 @@ class SpaceDynamicEllipse : public SpaceEllipse
 private:
     
     /// Orientation matrix
-    MatrixD  mat;
+    MatrixD mat;
     
     /// Inverse of mat
-    MatrixD  inv;
+    MatrixD inv;
     
     /// pressure : lagrange parameter for volume conservation
-    real     pressure;
+    real pressure;
     
     /// external radial forces
-    Vector   rad_forces;
+    Vector rad_forces;
     
     /// Radial and circular forces
     mutable Vector Rforces;
     mutable Torque Torques;
     
     /// Reset forces
-    void        reset_forces() const;
+    void reset_forces() const;
     
     /// Decompose forces between radial and circular components
-    void        decompose_force(Vector const&, Vector const&, Vector const&) const;
+    void decompose_force(Vector const&, Vector const&, Vector const&) const;
     
     /// Add radial component
-    void        add_radial_force(Vector const&, Vector const&) const;
+    void add_radial_force(Vector const&, Vector const&) const;
     
     /// Find the optimal value of the pressure
-    real        compute_pressure(Vector const&, Vector const&) const;
+    real compute_pressure(Vector const&, Vector const&) const;
     
     /// Return forces corresponding to given pressure
-    Vector      pressure_forces(real pressure) const;
+    Vector pressure_forces(real pressure) const;
     
     /// return normalized forces caused by surface tension
-    Vector      tension_forces() const;
+    Vector tension_forces() const;
     
     /// Gives the i-th eigenvector of the ellipsoid
-    Vector      director(size_t i) const;
+    Vector director(size_t i) const;
     
     /// Surface area of an ellipse of given axis length
     static real surfaceEllipse(Vector const&);
@@ -77,49 +77,49 @@ public:
     const SpaceDynamicProp* prop;
     
     /// change dimensions
-    void    resize(Glossary& opt);
+    void resize(Glossary& opt);
 
     /// add interactions to a Meca
-    void    setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
 
     /// setInteraction and changes the forces the ellipse undergoes
-    void    setInteraction(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const;
+    void setInteraction(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const;
 
     ///    ContractEllipse has a step function to adjust shape
-    void    step();
+    void step();
     
     /// project point on the closest edge of the Space
-    Vector  project(Vector const& pos) const
+    Vector project(Vector const& pos) const
     {
         Vector p = inv * pos;
         return mat * SpaceEllipse::project(p);
     }
     
     /// true if the point is inside the Space 
-    bool    inside(Vector const& pos) const
+    bool inside(Vector const& pos) const
     {
         Vector p = inv * pos;
         return SpaceEllipse::inside(p);
     }
     
     /// debug printout
-    void    dump(std::ostream&) const;
+    void dump(std::ostream&) const;
     
     /// descriptive printout
-    void    report(std::ostream&) const;
+    void report(std::ostream&) const;
     
     /// write to file
-    void    write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// read from file
-    void    read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
     
     /// OpenGL display function
-    void    draw3D() const;
+    void draw3D() const;
     
     /// OpenGL display function
-    void    draw2D() const { draw3D(); }
+    void draw2D() const { draw3D(); }
 
 };
 

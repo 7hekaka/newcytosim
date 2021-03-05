@@ -1,12 +1,12 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 #ifndef SPACE_ELLIPSE_H
 #define SPACE_ELLIPSE_H
 
 #include "dim.h"
 #include "space.h"
 
-
-//#define ELLIPSE_HAS_SPHEROID
+/// enables code to shortcut the projection in case two of the ellipse axes are equal
+#define ELLIPSE_HAS_SPHEROID 0
 
 /// ellipse in 2D, ellipsoid or spheroid in 3D 
 /**
@@ -29,12 +29,12 @@ class SpaceEllipse : public Space
 protected:
 
     /// dimensions
-    real length_[3];
+    real radius_[3];
   
     /// dimensions squared
-    real lengthSqr_[3];
+    real radiusSqr_[3];
 
-#ifdef ELLIPSE_HAS_SPHEROID
+#if ELLIPSE_HAS_SPHEROID
     /// indicates that two axes are equal
     int mSpheroid;
 #endif
@@ -48,34 +48,34 @@ public:
     SpaceEllipse(SpaceProp const*);
         
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
  
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// direct normal direction calculation
-    Vector      normalToEdge(Vector const& pos) const;
+    Vector normalToEdge(Vector const& pos) const;
     
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// the area of the edge surface
-    real        surface() const;
+    real surface() const;
 
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector1     project1D(Vector1 const&) const;
+    Vector1 project1D(Vector1 const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector2     project2D(Vector2 const&) const;
+    Vector2 project2D(Vector2 const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector3     project3D(Vector3 const&) const;
+    Vector3 project3D(Vector3 const&) const;
     
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const
+    Vector project(Vector const& pos) const
     {
 #if ( DIM == 1 )
         return project1D(pos);
@@ -88,20 +88,20 @@ public:
     
 
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
     
     /// OpenGL display function
-    void        draw2D() const;
+    void draw2D() const;
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif
