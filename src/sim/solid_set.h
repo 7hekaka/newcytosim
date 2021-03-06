@@ -58,8 +58,8 @@ public:
     /// return pointer to the Object of given ID, or zero if not found
     Solid * findID(ObjectID n) const { return static_cast<Solid*>(inventory_.get(n)); }
     
-    /// modulo the position (periodic boundary conditions)
-    void    foldPosition(Modulo const*) const;
+    /// bring all objects to centered image using periodic boundary conditions
+    void    foldPositions(Modulo const*) const;
     
     /// returns Solid, if one of its Sphere covers the given position (`inx` is set by this function)
     Solid*  insideSphere(Vector const&, real range, size_t& inx, SolidProp const*) const;

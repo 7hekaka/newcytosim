@@ -325,9 +325,9 @@ void Mecable::calculateMomentum(Vector& avg, Vector& dev)
 }
 
 
-void Mecable::foldPosition(Modulo const* s)
+void Mecable::foldPosition(Modulo const* m)
 {
-    Vector off = s->offset(position());
+    Vector off = m->offset(position());
     if ( off.is_not_zero() )
         translate(-off);
 }

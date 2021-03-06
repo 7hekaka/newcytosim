@@ -75,9 +75,9 @@ void SphereSet::write(Outputter& out) const
 }
 
 
-void SphereSet::foldPosition(Modulo const* s) const
+void SphereSet::foldPositions(Modulo const* m) const
 {
     for ( Sphere * o=SphereSet::first(); o; o=o->next() )
-        o->foldPosition(s);
+        o->foldPosition(m);
 }
 

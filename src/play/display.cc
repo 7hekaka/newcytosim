@@ -506,7 +506,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
 void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
 {
     if ( prop->fold )
-        sim.foldPosition();
+        sim.foldPositions();
     
     // counter to give different colors to the objects
     size_t idx = 0;

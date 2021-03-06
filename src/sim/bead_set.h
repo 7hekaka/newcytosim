@@ -53,8 +53,8 @@ public:
     /// find object from its Number
     Bead * findID(ObjectID n) const { return static_cast<Bead*>(inventory_.get(n)); }
     
-    /// modulo the position (periodic boundary conditions)
-    void   foldPosition(Modulo const*) const;
+    /// bring all objects to centered image using periodic boundary conditions
+    void   foldPositions(Modulo const*) const;
     
     /// Monte-Carlo simulation step for every Object
     void   step() {}

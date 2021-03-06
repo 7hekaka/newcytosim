@@ -385,13 +385,13 @@ void CoupleSet::relink(Object * obj, const bool s1, const bool s2)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void CoupleSet::foldPosition(Modulo const* s) const
+void CoupleSet::foldPositions(Modulo const* m) const
 {
     Couple * cx;
-    for ( cx=firstAA(); cx; cx=cx->next() )  cx->foldPosition(s);
-    for ( cx=firstFA(); cx; cx=cx->next() )  cx->foldPosition(s);
-    for ( cx=firstAF(); cx; cx=cx->next() )  cx->foldPosition(s);
-    for ( cx=firstFF(); cx; cx=cx->next() )  cx->foldPosition(s);
+    for ( cx=firstAA(); cx; cx=cx->next() )  cx->foldPosition(m);
+    for ( cx=firstFA(); cx; cx=cx->next() )  cx->foldPosition(m);
+    for ( cx=firstAF(); cx; cx=cx->next() )  cx->foldPosition(m);
+    for ( cx=firstFF(); cx; cx=cx->next() )  cx->foldPosition(m);
 }
 
 
