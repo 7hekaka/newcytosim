@@ -414,7 +414,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
 void Display1::drawSinglesA(const SingleSet & set) const
 {
     gle_color air(0,0,0,0);
-    size_t i = 0, cnt = 2*set.sizeF();
+    size_t i = 0, cnt = 2*set.sizeA();
     fluteVC* flu = gle::mapVertexColorBuffer(cnt);
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
