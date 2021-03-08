@@ -14,7 +14,7 @@ set simul system
 
 set space cell
 {
-    shape = semiperiodic
+    shape = semi_periodic
 }
 
 new cell
@@ -26,7 +26,7 @@ new cell
 
 set space base
 {
-    shape = semiperiodic
+    shape = semi_periodic
 }
 
 new base

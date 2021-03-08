@@ -96,7 +96,7 @@ new link
     attach = filament1, 8
 }
 
-run 4 system
+run 40 system
 {
     nb_frames = 2
 }
