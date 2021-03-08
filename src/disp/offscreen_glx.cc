@@ -128,6 +128,7 @@ void OffScreen::releaseBuffer()
 
 void OffScreen::closeContext()
 {
+    releaseBuffer();
     glXDestroyContext(dpy, glxContext);
     XCloseDisplay(dpy);
 }

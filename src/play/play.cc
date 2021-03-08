@@ -360,11 +360,7 @@ int main(int argc, char* argv[])
                 }
             } while ( 0 == thread.loadNextFrame() );
         }
-        
         printf("\n");
-        if ( multi )
-            OffScreen::releaseBuffer();
-        OffScreen::releaseBuffer();
         OffScreen::closeContext();
         arg.print_warning(std::cerr, 1, "\n");
         return EXIT_SUCCESS;

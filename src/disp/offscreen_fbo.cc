@@ -220,6 +220,12 @@ void OffScreen::closeContext()
 {
     if ( offContext == CGLGetCurrentContext() )
     {
+        while ( !opengl_buffers.empty() )
+        {
+            opengl_buffers.top().release();
+            opengl_buffers.pop();
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CGLSetCurrentContext(preContext);
         CGLDestroyContext(offContext);
         //printf("offscreen- restored context %p\n", preContext);
