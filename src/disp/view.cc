@@ -110,6 +110,21 @@ void View::initGL()
 }
 
 
+void View::toggleDepthClamp()
+{
+    if ( glIsEnabled(GL_DEPTH_CLAMP) )
+    {
+        depth_clamp = false;
+        glDisable(GL_DEPTH_CLAMP);
+    }
+    else
+    {
+        depth_clamp = true;
+        glEnable(GL_DEPTH_CLAMP);
+    }
+}
+
+
 void View::openDisplay()
 {
     load();

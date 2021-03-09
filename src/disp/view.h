@@ -119,14 +119,17 @@ public:
     /// init OpenGL parameters
     void initGL();
 
+    /// toggle depth clamp GL capability
+    void toggleDepthClamp();
+    
     /// set OpenGL Lights for lighting effects
     void setLights(bool local = false) const;
     
     /// set text displayed in center of window
-    void setLabel(std::string const& msg) { full_label = msg; }
+    void setLabel(std::string const& arg) { full_label = label + " " + arg; }
     
     /// set text displayed near top of window
-    void setMessage(std::string const& msg) { top_message = msg; }
+    void setMessage(std::string const& arg) { top_message = arg; }
 
     /// set OpenGL Fog, with mode (GL_EXP or GL_LINEAR), intensity and color
     void enableFog(GLint mode, GLfloat param, gle_color);

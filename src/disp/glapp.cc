@@ -481,6 +481,11 @@ void glApp::processNormalKey(unsigned char c, int, int)
             }
             break;
         
+        case 'V':
+            view.toggleDepthClamp();
+            flashText("view:depth_clamp = %i", view.depth_clamp);
+            break;
+            
         case 'b':
             view.scalebar = ( view.scalebar + 1 ) % 4;
             flashText("view:scalebar = %i", view.scalebar);
@@ -750,7 +755,7 @@ void glApp::processMenuEvent(int item)
         case 7:   setDimensionality(mDIM==2?3:2);    break;
         
         case 20:  exit(EXIT_SUCCESS);                break;
-            
+        
         case 100: view.enableFog(0, 0);              break;
         case 101: view.enableFog(1, 0);              break;
         case 102: view.enableFog(2, 0.0625);         break;

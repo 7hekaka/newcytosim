@@ -38,7 +38,9 @@ void CutterProp::read(Glossary& glos)
                                        {"orange",    STATE_ORANGE},
                                        {"red",       STATE_RED},
                                        {"static",    STATE_WHITE},
+                                       {"grow",      STATE_GREEN},
                                        {"growing",   STATE_GREEN},
+                                       {"shrink",    STATE_RED},
                                        {"shrinking", STATE_RED},
                                        {"delete",    STATE_BLACK}});
     
