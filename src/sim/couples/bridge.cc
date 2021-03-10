@@ -37,7 +37,9 @@ Vector Bridge::force() const
     
     real dn = d.norm();
     
-    return ( prop->stiffness * ( 1 - prop->length / dn ) ) * d;
+    if ( dn > REAL_EPSILON )
+        return ( prop->stiffness * ( 1 - prop->length / dn ) ) * d;
+    return Vector(0,0,0);
 }
 
 
