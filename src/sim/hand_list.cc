@@ -14,7 +14,7 @@ The list is also used in reports, or to quickly count Hands bound to the fiber.
 void HandList::add(Hand * n)
 {
     //assert_true(count(n) == 0);
-    //std::clog << this << " add " << n->prop->name() << '\n';
+    //std::clog << this << " add " << n->prop->name() << " " << n << '\n';
     n->prev(nullptr);
     n->next(haFront);
     if ( haFront )
@@ -22,13 +22,14 @@ void HandList::add(Hand * n)
     else
         haBack = n;
     haFront = n;
+    //assert_false(bad());
 }
 
 
 void HandList::remove(Hand * n)
 {
     //assert_true(count(n) == 1);
-    //std::clog << this << " rem " << n->prop->name() << '\n';
+    //std::clog << this << " rem " << n->prop->name() << " " << n << '\n';
     Hand * x = n->next();
     if ( n->prev() )
         n->prev()->next(x);
@@ -43,6 +44,10 @@ void HandList::remove(Hand * n)
         assert_true( haBack == n );
         haBack = n->prev();
     }
+    //assert_false(bad());
+    // this cleanup is not necessary:
+    //n->prev(nullptr);
+    //n->next(nullptr);
 }
 
 
@@ -53,8 +58,9 @@ void HandList::update() const
 }
 
 
-void HandList::detachAll() const
+void HandList::detachAll()
 {
+    assert_false(bad());
     // we must iterate one step ahead, because detach() will unlink
     Hand * h = haFront;
     while ( h )
@@ -63,6 +69,8 @@ void HandList::detachAll() const
         h->detach();
         h = n;
     }
+    assert_true(haFront==nullptr);
+    assert_true(haBack==nullptr);
 }
 
 /**
@@ -158,3 +166,24 @@ size_t HandList::countInRange(real i, real s) const
     //printf("nbHandsInRange(%8.2f, %8.2f) = %u\n", a, b, res);
     return res;
 }
+
+
+/**
+ This traverses the entire list, checking every link
+ */
+int HandList::bad() const
+{
+    int res = 0;
+    Hand * h = haFront;
+    Hand * p = nullptr;
+    while ( h )
+    {
+        res |= ( h->prev() != p );
+        p = h;
+        h = h->next();
+    }
+    res |= 2 * ( p != haBack );
+    return res;
+}
+
+

@@ -41,7 +41,7 @@ public:
     void update() const;
     
     /// detach all Hands
-    void detachAll() const;
+    void detachAll();
     
     /// sort Hands by order of increasing abscissa
     void sort();
@@ -58,6 +58,8 @@ public:
     /// number of Hands attached within a range of abscissa
     size_t countInRange(real abs_min, real abs_max) const;
     
+    /// check data integrity
+    int bad() const;
 };
 
 
