@@ -102,7 +102,7 @@ Build:
     glfw:  http://www.glfw.org/index.html
     Qt  :  http://qt.digia.com
 - new font renderer, eg. FreeType (http://www.freetype.org/index.html)
-problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
+- gle -> gym; glapp -> gymapp
 
 # Performance:
 

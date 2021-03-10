@@ -194,7 +194,7 @@ Vector Fiber::displayPosM(real ab) const
 
 Fiber::~Fiber()
 {
-    detachHands();
+    fHands.detachAll();
     
 #if FIBER_HAS_MESH
     if ( prop->field_ptr )

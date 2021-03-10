@@ -140,6 +140,9 @@ public:
     /// position (recalculated on the fly)
     Vector       posHand()       const { return hFiber->pos(hAbs); }
     
+    /// position shifted by 'x'
+    Vector       posHand(real x) const { return hFiber->pos(hAbs+x); }
+
     /// direction of Fiber obtained by normalization
     Vector       dir()           const { return hTerp.dir(); }
     
