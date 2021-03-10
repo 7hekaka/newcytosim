@@ -81,9 +81,6 @@ void Myosin::stepLoaded(Vector const& force, real force_norm)
     }
     
     assert_true( nextDetach >= 0 );
-    if ( prop->unbinding_force_inv > 0 )
-        testKramersDetachment(force_norm);
-    else
-        testDetachment();
+    testKramersDetachment(force_norm);
 }
 

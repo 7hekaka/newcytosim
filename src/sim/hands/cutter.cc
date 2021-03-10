@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "cutter.h"
 #include "cutter_prop.h"
@@ -12,7 +12,7 @@
 Cutter::Cutter(CutterProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {
-    gspTime = RNG.exponential();
+    nextCut = RNG.exponential();
 }
 
 
@@ -42,11 +42,11 @@ void Cutter::stepUnloaded()
     if ( testDetachment() )
         return;
 
-    gspTime -= prop->cutting_rate_dt;
+    nextCut -= prop->cutting_rate_dt;
     
-    if ( gspTime < 0 )
+    if ( nextCut < 0 )
     {
-        gspTime = RNG.exponential();
+        nextCut = RNG.exponential();
         cut();
     }
 }
@@ -60,11 +60,11 @@ void Cutter::stepLoaded(Vector const& force, real force_norm)
     if ( testKramersDetachment(force_norm) )
         return;
     
-    gspTime -= prop->cutting_rate_dt;
+    nextCut -= prop->cutting_rate_dt;
     
-    if ( gspTime < 0 )
+    if ( nextCut < 0 )
     {
-        gspTime = RNG.exponential();
+        nextCut = RNG.exponential();
         cut();
     }
 }

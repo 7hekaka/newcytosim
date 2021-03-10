@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef CUTTER_H
 #define CUTTER_H
@@ -27,7 +27,7 @@ private:
     Cutter();
     
     /// Gillespie countdown timer
-    real     gspTime;
+    real nextCut;
 
 public:
     
@@ -41,13 +41,13 @@ public:
     ~Cutter() {}
     
     /// cut current fiber at attachement position
-    void   cut();
+    void cut();
     
     /// simulate when `this` is attached but not under load
-    void   stepUnloaded();
+    void stepUnloaded();
     
     /// simulate when `this` is attached and under load
-    void   stepLoaded(Vector const& force, real force_norm);
+    void stepLoaded(Vector const& force, real force_norm);
     
 };
 

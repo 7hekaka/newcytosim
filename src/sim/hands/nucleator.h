@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef NUCLEATOR_H
 #define NUCLEATOR_H
@@ -34,7 +34,7 @@ private:
     Nucleator();
     
     /// Gillespie countdown timer
-    real gspTime;
+    real nextNuc;
     
 public:
     
