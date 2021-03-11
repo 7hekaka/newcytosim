@@ -81,16 +81,11 @@ void Rescuer::handleDisassemblyP()
 void Rescuer::stepUnloaded()
 {
     assert_true( attached() );
-    
-    testDetachment();
 }
 
 
-void Rescuer::stepLoaded(Vector const& force, real force_norm)
+void Rescuer::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    assert_true( nextDetach >= 0 );
-    
-    testKramersDetachment(force_norm);
 }
 

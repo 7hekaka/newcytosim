@@ -42,7 +42,15 @@ void Shackle::stepAA()
     {
         Vector f = force();
         real fn = f.norm();
-        cHand1->stepLoaded( f, fn);
-        cHand2->stepLoaded(-f, fn);
+        
+        if ( cHand1->testKramersDetachment(fn) )
+            cHand1->stepLoaded( f);
+        else
+            cHand1->detach();
+        
+        if ( cHand2->testKramersDetachment(fn) )
+            cHand2->stepLoaded(-f);
+        else
+            cHand2->detach();
     }
 }

@@ -21,19 +21,12 @@ Actor::Actor(ActorProp const* p, HandMonitor* h)
 void Actor::stepUnloaded()
 {
     assert_true( attached() );
-
-    // test for detachment
-    testDetachment();
 }
 
 
-void Actor::stepLoaded(Vector const& force, real force_norm)
+void Actor::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    assert_true( nextDetach >= 0 );
-    
-    if ( testKramersDetachment(force_norm) )
-        return;
 
     // do something:
 }

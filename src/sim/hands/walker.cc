@@ -73,8 +73,6 @@ void Walker::stepUnloaded()
     
         nextStep += RNG.exponential();
     }
-    
-    testDetachment();
 }
 
 
@@ -83,7 +81,7 @@ void Walker::stepUnloaded()
  However, force is also known to increase the rate of backward steps.
  \todo simulate occurence of backward steps in Walker
  */
-void Walker::stepLoaded(Vector const& force, real force_norm)
+void Walker::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
@@ -121,8 +119,5 @@ void Walker::stepLoaded(Vector const& force, real force_norm)
         
         nextStep += RNG.exponential();
     }
-    
-    assert_true( nextDetach >= 0 );
-    testKramersDetachment(force_norm);
 }
 

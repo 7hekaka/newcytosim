@@ -63,12 +63,10 @@ void Kinesin::stepUnloaded()
         else
             nextBack += RNG.exponential();
     }
-    
-    testDetachment();
 }
 
 
-void Kinesin::stepLoaded(Vector const& force, real force_norm)
+void Kinesin::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
@@ -107,8 +105,5 @@ void Kinesin::stepLoaded(Vector const& force, real force_norm)
         else
             nextBack += RNG.exponential();
     }
-    
-    assert_true( nextDetach >= 0 );
-    testKramersDetachment(force_norm);
 }
 

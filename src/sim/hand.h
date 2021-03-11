@@ -148,7 +148,7 @@ public:
     virtual void stepUnloaded();
 
     /// simulate when the Hand is attached and under load
-    virtual void stepLoaded(Vector const& force, real force_norm);
+    virtual void stepLoaded(Vector const& force);
     
     /// check abscissa against fiber edge, and calls handle functions if necessary.
     void checkFiberRange();
@@ -184,39 +184,28 @@ public:
     /// write to file
     void write(Outputter&) const;
     
-    
-protected:
-    
-    
     /// reset Gillespie's counters
     void resetTimers();
     
     /**
-     Test for spontaneous detachment using Gillespie approach.
-     @return true if the test has passed, and detach() was called.
-     see @ref Stochastic
+     Test for spontaneous detachment using Gillespie counter (@ref Stochastic)
+     @return true if the hand should remain attached
      */
     bool testDetachment()
     {
+        assert_true( nextDetach >= 0 );
         nextDetach -= prop->unbinding_rate_dt;
         
-        if ( nextDetach <= 0 )
-        {
-            detach();
-            return true;
-        }
-        
-        return false;
+        return ( nextDetach > 0 );
     }
     
-    
     /**
-     Test for spontaneous detachment using Gillespie approach.
-     @return true if the test has passed, and detach() was called.
-     see @ref Stochastic
+     Test for force-dependent detachment using Gillespie counter (@ref Stochastic)
+     @return true if the hand should remain attached
      */
     bool testKramersDetachment(const real force)
     {
+        assert_true( nextDetach >= 0 );
         /*
          Attention: the exponential term can easily become numerically "infinite",
          which is problematic if 'unbinding_rate==0' and 'unbinding_force' is finite.
@@ -224,12 +213,8 @@ protected:
          */
         //std::cerr << prop->name() << " " << std::exp(force*prop->unbinding_force_inv) << "\n";
         nextDetach -= prop->unbinding_rate_dt * std::exp(force*prop->unbinding_force_inv);
-        if ( nextDetach <= 0 )
-        {
-            detach();
-            return true;
-        }
-        return false;
+        
+        return ( nextDetach > 0 );
     }
 };
 

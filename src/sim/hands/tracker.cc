@@ -33,11 +33,6 @@ void Tracker::stepUnloaded()
 {
     assert_true( attached() );
     
-    // detachment
-    if ( testDetachment() )
-        return;
-
-    
     switch ( prop->track_end )
     {
         case NO_END:
@@ -61,13 +56,9 @@ void Tracker::stepUnloaded()
 }
 
 
-void Tracker::stepLoaded(Vector const& force, real force_norm)
+void Tracker::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    
-    assert_true( nextDetach >= 0 );
-    if ( testKramersDetachment(force_norm) )
-        return;
 
     switch ( prop->track_end )
     {

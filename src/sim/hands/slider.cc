@@ -17,15 +17,11 @@ void Slider::stepUnloaded()
 {
     assert_true( attached() );
     
-    // spontaneous detachment:
-    if ( testDetachment() )
-        return;
-    
     /// diffusion?
 }
 
 
-void Slider::stepLoaded(Vector const& force, real force_norm)
+void Slider::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
@@ -50,10 +46,6 @@ void Slider::stepLoaded(Vector const& force, real force_norm)
         }
         a = hFiber->abscissaP();
     }
-
-    assert_true( nextDetach >= 0 );
-    if ( testKramersDetachment(force_norm) )
-        return;
 
     // movement can lead to detachment, so we do it last:
     moveTo(a);

@@ -164,9 +164,6 @@ void Nucleator::stepUnloaded()
 {
     assert_true( attached() );
     
-    if ( testDetachment() )
-        return;
-    
     /// OPTION 1: delete entire fiber
     if ( prop->addictive == 2 )
     {
@@ -182,13 +179,9 @@ void Nucleator::stepUnloaded()
 }
 
 
-void Nucleator::stepLoaded(Vector const& force, real force_norm)
+void Nucleator::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    assert_true( nextDetach >= 0 );
-    
-    if ( testKramersDetachment(force_norm) )
-        return;
     
     // may track the end of the Fiber:
     if ( prop->track_end == MINUS_END )

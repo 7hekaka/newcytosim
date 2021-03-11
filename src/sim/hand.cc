@@ -315,8 +315,6 @@ void Hand::stepUnattached(Simul& sim, Vector const& pos)
 void Hand::stepUnloaded()
 {
     assert_true( attached() );
-    
-    testDetachment();
 }
 
 
@@ -325,12 +323,9 @@ void Hand::stepUnloaded()
  vith basal rate HandProp::unbinding_rate, 
  and characteristic force HandProp::unbinding_force
  */
-void Hand::stepLoaded(Vector const& force, real force_norm)
+void Hand::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    assert_true( nextDetach >= 0 );
-    
-    testKramersDetachment(force_norm);
 }
 
 

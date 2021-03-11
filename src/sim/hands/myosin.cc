@@ -29,9 +29,6 @@ void Myosin::stepUnloaded()
 {
     assert_true( attached() );
     
-    if ( testDetachment() )
-        return;
-    
     nextStep -= prop->walking_rate_dt;
     
     while ( nextStep <= 0 )
@@ -56,7 +53,7 @@ void Myosin::stepUnloaded()
  However, force is also known to increase the rate of backward steps.
  \todo simulate occurence of backward steps
  */
-void Myosin::stepLoaded(Vector const& force, real force_norm)
+void Myosin::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
@@ -79,8 +76,5 @@ void Myosin::stepLoaded(Vector const& force, real force_norm)
             hop(s);
         nextStep += RNG.exponential();
     }
-    
-    assert_true( nextDetach >= 0 );
-    testKramersDetachment(force_norm);
 }
 

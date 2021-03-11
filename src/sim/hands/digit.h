@@ -136,7 +136,7 @@ public:
     void   stepUnloaded();
     
     /// simulate when `this` is attached and under load
-    void   stepLoaded(Vector const& force, real force_norm);
+    void   stepLoaded(Vector const& force);
  
     
     /// this is called when the attachment point is beyond the PLUS_END

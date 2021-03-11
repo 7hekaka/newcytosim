@@ -45,8 +45,6 @@ void Dynein::stepUnloaded()
             hop(s);
         nextStep += RNG.exponential();
     }
-    
-    testDetachment();
 }
 
 
@@ -55,7 +53,7 @@ void Dynein::stepUnloaded()
  However, force is also known to increase the rate of backward steps.
  \todo simulate occurence of backward steps
  */
-void Dynein::stepLoaded(Vector const& force, real force_norm)
+void Dynein::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
@@ -78,8 +76,5 @@ void Dynein::stepLoaded(Vector const& force, real force_norm)
             hop(s);
         nextStep += RNG.exponential();
     }
-
-    assert_true( nextDetach >= 0 );
-    testKramersDetachment(force_norm);
 }
 

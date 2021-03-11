@@ -37,10 +37,6 @@ void Cutter::cut()
 void Cutter::stepUnloaded()
 {
     assert_true( attached() );
-    
-    // test for detachment
-    if ( testDetachment() )
-        return;
 
     nextCut -= prop->cutting_rate_dt;
     
@@ -52,13 +48,9 @@ void Cutter::stepUnloaded()
 }
 
 
-void Cutter::stepLoaded(Vector const& force, real force_norm)
+void Cutter::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    assert_true( nextDetach >= 0 );
-    
-    if ( testKramersDetachment(force_norm) )
-        return;
     
     nextCut -= prop->cutting_rate_dt;
     

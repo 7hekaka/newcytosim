@@ -164,19 +164,15 @@ tests detachment
 void Digit::stepUnloaded()
 {
     assert_true( attached() );
-    testDetachment();
 }
 
 
 /**
 (see @ref Stochastic)
  */
-void Digit::stepLoaded(Vector const& force, real force_norm)
+void Digit::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    assert_true( nextDetach >= 0 );
-
-    testKramersDetachment(force_norm);
 }
 
 //------------------------------------------------------------------------------

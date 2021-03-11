@@ -51,14 +51,14 @@ void Mighty::stepUnloaded()
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
     nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
-    
-    // detach or move
-    if ( !testDetachment() )
+    if ( nextDetach <= 0 )
+        detach();
+    else
         moveTo(a);
 }
 
 
-void Mighty::stepLoaded(Vector const& force, real force_norm)
+void Mighty::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
@@ -101,10 +101,9 @@ void Mighty::stepLoaded(Vector const& force, real force_norm)
     assert_true( nextDetach >= 0 );
     nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
     
-    if ( testKramersDetachment(force_norm) )
-        return;
-    
-    // movement can lead to detachment, so we do it last:
-    moveTo(a);
+    if ( nextDetach <= 0 )
+        detach();
+    else
+        moveTo(a);
 }
 

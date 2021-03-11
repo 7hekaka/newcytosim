@@ -26,16 +26,11 @@ void Regulator::attach(FiberSite const& s)
 void Regulator::stepUnloaded()
 {
     assert_true( attached() );
-    
-    testDetachment();
 }
 
 
-void Regulator::stepLoaded(Vector const& force, real force_norm)
+void Regulator::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    assert_true( nextDetach >= 0 );
-    
-    testKramersDetachment(force_norm);
 }
 

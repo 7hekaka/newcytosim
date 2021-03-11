@@ -58,7 +58,7 @@ public:
     void stepUnloaded();
 
     /// simulate when `this` is attached and under load
-    void stepLoaded(Vector const& force, real force_norm);
+    void stepLoaded(Vector const& force);
     
     /// detach from Fiber
     void detach();
