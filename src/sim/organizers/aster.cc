@@ -321,7 +321,7 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
     std::string spec;
     if ( opt.set(spec, "solid") )
     {
-        SolidProp * p = static_cast<SolidProp*>(sim.findProperty("solid", spec));
+        SolidProp const* p = static_cast<SolidProp*>(sim.findProperty("solid", spec));
         
         if ( p )
         {

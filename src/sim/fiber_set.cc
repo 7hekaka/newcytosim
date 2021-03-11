@@ -586,9 +586,9 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
                 // without argument, a fiber name specifies uniform attachment:
                 if ( opt.nb_values(key) == 1 )
                 {
-                    Property * p = simul_.findProperty(title(), str);
+                    Property const* p = simul_.findProperty(title(), str);
                     if ( p )
-                        return randomSite(static_cast<FiberProp*>(p));
+                        return randomSite(static_cast<FiberProp const*>(p));
                 }
                 throw InvalidParameter("could not find fiber specified for attachment `"+str+"'");
             }

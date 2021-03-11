@@ -341,7 +341,7 @@ Object* ObjectSet::findObject(std::string spec, const std::string& title) const
     }
     
     // check property name:
-    Property * p = simul_.findProperty(title, spec);
+    Property const* p = simul_.findProperty(title, spec);
     if ( p )
     {
         ObjectList sel = collect(match_property, p);
@@ -496,8 +496,8 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool dis
         {
             Property const* P = obj->property();
 #if ( 1 )
-            std::clog << "Property mismatch: `" << P->name() << "' is " << P->category() << P->number();
-            std::clog << " but loaded object has property #" << ix << '\n';
+            std::clog << "Warning: erasing " << P->category() << P->number() << " `" << P->name();
+            std::clog << "' to load object with property #" << ix << '\n';
 #endif
             erase(obj);
             obj = nullptr;
