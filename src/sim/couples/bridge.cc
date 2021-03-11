@@ -36,10 +36,13 @@ Vector Bridge::force() const
         modulo->fold(d);
     
     real dn = d.norm();
+    // the norm of the force vector is always known, even if 'd' is nearly zero:
+    real f = prop->stiffness * ( dn - prop->length );
     
     if ( dn > REAL_EPSILON )
-        return ( prop->stiffness * ( 1 - prop->length / dn ) ) * d;
-    return Vector(0,0,0);
+        return d * ( f / dn );
+    
+    return Vector(f,0,0);
 }
 
 
