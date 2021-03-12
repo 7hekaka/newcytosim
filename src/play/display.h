@@ -124,8 +124,8 @@ public:
     /// virtual destructor needed, as class is base to others
     virtual ~Display();
     
-    /// display opaque internal objects using OpenGL commands
-    virtual void drawSimul(Simul const&);
+    /// display opaque objects
+    virtual void drawObjects(Simul const&);
     
     /// enable/disable stencil usage
     void setStencil(bool s) { stencil_ = s; }
@@ -137,10 +137,10 @@ public:
     void prepareForDisplay(Simul const&, PropertyList&);
 
     /// display the whole simulation
-    void display(Simul const&);
+    void drawSimul(Simul const&);
     
     /// display for periodic systems
-    void displayTiled(Simul const&, int nine);
+    void drawTiled(Simul const&, int nine);
 
     /// set OpenGL line width
     void lineWidth(float w) const { glLineWidth(std::max(w*uFactor, 0.25f)); }
@@ -246,30 +246,30 @@ public:
 
     
     /// draw a Bead
-    virtual void drawBead(Bead const&) = 0;
+    virtual void drawBead(Bead const&);
 
     /// draw translucent elements of a Bead
-    virtual void drawBeadT(Bead const&) = 0;
+    virtual void drawBeadT(Bead const&);
     
     /// draw the Beads
     void drawBeads(BeadSet const&);
 
     
     /// draw opaque elements of a Solid
-    virtual void drawSolid(Solid const&) = 0;
+    virtual void drawSolid(Solid const&);
     
     /// draw translucent elements of a Solid
-    virtual void drawSolidT(Solid const&, size_t) = 0;
+    void drawSolidT(Solid const&, size_t);
     
     /// draw the Solids
     void drawSolids(SolidSet const&);
     
     
     /// draw the Sphere
-    virtual void drawSphere(Sphere const&) = 0;
+    virtual void drawSphere(Sphere const&);
 
     /// draw translucent elements of a Sphere
-    virtual void drawSphereT(Sphere const&) = 0;
+    virtual void drawSphereT(Sphere const&);
     
     /// draw the Spheres
     void drawSpheres(SphereSet const&);

@@ -135,8 +135,8 @@ inline void drawMonomer(Vector3 const& pos, real rad)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-
-void Display::drawSimul(Simul const& sim)
+/** This is only one version of the display function, see display1.cc, etc. */
+void Display::drawObjects(Simul const& sim)
 {
     glDepthMask(GL_FALSE);
     glDisable(GL_LIGHTING);
@@ -166,19 +166,19 @@ void Display::drawSimul(Simul const& sim)
     drawSolids(sim.solids);
     drawSpheres(sim.spheres);
     
-    if (( prop->single_select & 1 ) & ( sim.singles.sizeF() > 0 ))
+    if (( prop->single_select & 1 ) && ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
     
-    if (( prop->couple_select & 1 ) & ( sim.couples.sizeFF() > 0 ))
+    if (( prop->couple_select & 1 ) && ( sim.couples.sizeFF() > 0 ))
         drawCouplesF(sim.couples);
 
-    if (( prop->couple_select & 2 ) & ( sim.couples.sizeA() > 0 ))
+    if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
         drawCouplesA(sim.couples);
 
-    if (( prop->couple_select & 4 ) & ( sim.couples.sizeAA() > 0 ))
+    if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
         drawCouplesB(sim.couples);
 
-    if (( prop->single_select & 2 ) & ( sim.singles.sizeA() > 0 ))
+    if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
     
     if ( stencil_ )
@@ -193,7 +193,7 @@ void Display::drawSimul(Simul const& sim)
 }
 
 
-void Display::display(Simul const& sim)
+void Display::drawSimul(Simul const& sim)
 {
     // clear list of transparent objects
     zObjects.clear();
@@ -211,7 +211,7 @@ void Display::display(Simul const& sim)
     glDisable(GL_LIGHTING);
 #endif
     
-    drawSimul(sim);
+    drawObjects(sim);
     
     /*
      Draw translucent objects:
@@ -241,10 +241,10 @@ void Display::display(Simul const& sim)
 
 /**
  To get correct display, it would be necessary to display all opaque objects first,
- and then all transparent objects for all tiles. Here, we calls Display::display()
- a number of times, and objects are sorted within each tile. The result is not perfect.
+ and then all transparent objects for all tiles. Here, we calls Display::drawSimul()
+ a number of times, and objects are only sorted within each tile. The result is imperfect.
  */
-void Display::displayTiled(Simul const& sim, int arg)
+void Display::drawTiled(Simul const& sim, int arg)
 {
     assert_true(modulo);
     
@@ -272,7 +272,7 @@ void Display::displayTiled(Simul const& sim, int arg)
     {
         Vector T = dx * px + dy * py + dz * pz;
         gle::translate( T);
-        display(sim);
+        drawSimul(sim);
         gle::translate(-T);
     }
 }
@@ -1739,7 +1739,98 @@ void Display::drawCouplesB(CoupleSet const& set) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Solid
+
+void Display::drawSolid(Solid const& obj)
+{
+    const PointDisp * disp = obj.prop->disp;
+    
+    //display points:
+    if (( disp->style & 2 ) && ( disp->size > 0 ))
+    {
+        bodyColor(obj);
+        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+            drawObject(obj.posP(i), disp->size, gle::hedron(obj.radius(i)>0));
+    }
+    
+    //display outline of spheres
+    if ( disp->style & 4 )
+    {
+#if ( DIM == 2 )
+        glDisable(GL_LIGHTING);
+        lineWidth(disp->width);
+        bodyColorF(obj).load();
+        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+        {
+            if ( obj.radius(i) > 0 )
+                drawFlat(obj.posP(i), obj.radius(i), gle::circle);
+        }
+#elif ( DIM == 3 )
+        //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
+        if ( obj.mark()  &&  obj.nbPoints() > 1 )
+        {
+            glEnable(GL_LIGHTING);
+            bodyColor(obj);
+            //drawObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
+            glPushMatrix();
+            Vector A = obj.posP(0), B = obj.posP(1);
+            gle::transAlignZ(A, obj.radius(0), B-A);
+            gle::cylinder1();
+            glPopMatrix();
+        }
+#endif
+    }
+    
+    //print the number for each Solid
+    if ( disp->style & 8 )
+    {
+        char tmp[8];
+        bodyColorF(obj).load();
+        snprintf(tmp, sizeof(tmp), "%u", obj.identity());
+        gle::drawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
+    }
+    
+    //draw polygon around vertices of Solid
+    if ( disp->style & 16 )
+    {
+        glDisable(GL_LIGHTING);
+        lineWidth(disp->width);
+        bodyColorF(obj).load();
+        drawStrip(obj.nbPoints(), obj.addrPoints(), GL_LINE_LOOP);
+        glEnable(GL_LIGHTING);
+    }
+}
+
+/**
+ Display a semi-transparent disc / sphere
+ */
+void Display::drawSolidT(Solid const& obj, size_t inx)
+{
+    const PointDisp * disp = obj.prop->disp;
+
+    if (( disp->style & 1 ) && ( obj.radius(inx) > 0 ))
+    {
+        Vector X = obj.posP(inx);
+        size_t near[3];
+        size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
+        //printf("nearest balls to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
+        // set clipping planes with nearest balls
+        for ( size_t i = 0; i < num; ++i )
+        {
+            size_t J = near[i];
+            Vector P = obj.posPoint(J);
+            real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
+            GLenum glp = GL_CLIP_PLANE5 - i;
+            glEnable(glp);
+            gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
+        }
+        drawBallT(X, obj.radius(inx), bodyColorF(obj));
+        glDisable(GL_CLIP_PLANE3);
+        glDisable(GL_CLIP_PLANE4);
+        glDisable(GL_CLIP_PLANE5);
+    }
+}
+
 
 void Display::drawSolids(SolidSet const& set)
 {
@@ -1764,6 +1855,47 @@ void Display::drawSolids(SolidSet const& set)
     }
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Beads
+
+void Display::drawBead(Bead const& obj)
+{
+    const PointDisp * disp = obj.prop->disp;
+
+    // display center:
+    if ( disp->style & 2 )
+    {
+        bodyColor(obj);
+        drawObject(obj.position(), disp->size, gle::tetrahedron);
+    }
+    
+#if ( DIM == 2 )
+    // display outline:
+    if ( disp->style & 4 )
+    {
+        glDisable(GL_LIGHTING);
+        bodyColorF(obj).load();
+        lineWidth(disp->width);
+        drawFlat(obj.position(), obj.radius(), gle::circle);
+        glEnable(GL_LIGHTING);
+    }
+#endif
+}
+
+
+/**
+ Display a semi-transparent disc / sphere
+ */
+void Display::drawBeadT(Bead const& obj)
+{
+    const PointDisp * disp = obj.prop->disp;
+    
+    if ( disp->style & 1 )
+    {
+        drawBallT(obj.position(), obj.radius(), bodyColorF(obj));
+    }
+}
+
 
 void Display::drawBeads(BeadSet const& set)
 {
@@ -1779,6 +1911,59 @@ void Display::drawBeads(BeadSet const& set)
 #endif
                 drawBeadT(*obj);
         }
+    }
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Sphere
+
+void Display::drawSphere(Sphere const& obj)
+{
+    const PointDisp * disp = obj.prop->disp;
+    
+    //display center and surface points
+    if (( disp->style & 2 ) && disp->perceptible )
+    {
+        bodyColor(obj);
+        drawObject(obj.posP(0), disp->size, gle::star);
+        for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
+            drawObject(obj.posP(i), disp->size, gle::sphere1);
+    }
+    
+    //display reference points
+    if (( disp->style & 8 ) && disp->perceptible )
+    {
+        bodyColor(obj);
+        for ( size_t i = 1; i < obj.nbRefPoints; ++i )
+            drawObject(obj.posP(i), disp->size, gle::tetrahedron);
+    }
+}
+
+
+void Display::drawSphereT(Sphere const& obj)
+{
+    const PointDisp * disp = obj.prop->disp;
+
+    if ( disp->style & 7 )
+    {
+        const Vector C = obj.posP(0);
+#if ( DIM < 3 )
+        bodyColorF(obj).load();
+        if ( disp->style & 1 )
+            drawFlat(C, obj.radius(), gle::circle);
+        if ( disp->style & 2 )
+            drawFlat(C, obj.radius(), gle::disc);
+        if ( disp->style & 4 )
+            drawBallT(C, obj.radius(), bodyColorF(obj));
+#else
+        /* Note: The rotation matrix for the sphere calculated below from the
+         reference points, includes scaling by the radius of the sphere.
+         We then use a primitive for a sphere of radius 1.
+         */
+        bodyColorF(obj).load_both();
+        Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
+#endif
     }
 }
 
@@ -1799,6 +1984,10 @@ void Display::drawSpheres(SphereSet const& set)
         }
     }
 }
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Organizers
 
 
 void Display::drawOrganizers(OrganizerSet const& set)

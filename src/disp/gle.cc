@@ -2125,6 +2125,13 @@ namespace gle
         glVertexPointer(3, GL_FLOAT, 0, pts);
         glDrawArrays(GL_LINE_LOOP, 0, 5);
     }
+    
+    void fillRectangle(float L, float B, float R, float T, float Z)
+    {
+        GLfloat pts[15] = { L, B, Z, R, B, Z, L, T, Z, R, T, Z };
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
 
     
     void drawRectangle(const int rec[4], int width, int height)
@@ -2179,7 +2186,7 @@ namespace gle
     
     int copyparity(int a, int b)
     {
-        return a + (( std::abs(a) + b ) & 1);
+        return a + (( std::abs(a) + b ) & 1 );
     }
 
     void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2)
@@ -2191,7 +2198,7 @@ namespace gle
         {
             float U = R * T;
             col1.load_load();
-            drawRectangle(-U, -U, U, U, Z);
+            fillRectangle(-U, -U, U, U, Z);
         }
         
         col2.load_load();
@@ -2214,22 +2221,22 @@ namespace gle
             {
                 float X = i * T;
                 float Y = y * T;
-                drawRectangle( X-H, Y-H, X+H, Y+H, Z);
-                drawRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
+                fillRectangle( X-H, Y-H, X+H, Y+H, Z);
+                fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
             }
             for ( int i = copyparity(Q,y); i <= x; i+=2 )
             {
                 float X = y * T;
                 float Y = i * T;
-                drawRectangle( X-H, Y-H, X+H, Y+H, Z);
-                drawRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
+                fillRectangle( X-H, Y-H, X+H, Y+H, Z);
+                fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
             }
             for ( int i = copyparity(Q,y); i <= x; i+=2 )
             {
                 float X = y * T;
                 float Y = i * T;
-                drawRectangle(-X-H, Y-H,-X+H, Y+H, Z);
-                drawRectangle( X+H,-Y+H, X-H,-Y-H, Z);
+                fillRectangle(-X-H, Y-H,-X+H, Y+H, Z);
+                fillRectangle( X+H,-Y+H, X-H,-Y-H, Z);
             }
         }
     }

@@ -23,26 +23,8 @@ public:
     
     
     /// draw the given simulation state using OpenGL commands
-    void drawSimul(Simul const&);
-    
-    /// draw the Solids
-    void drawSolid(Solid const&);
- 
-    /// draw the transparent part for the Solids
-    void drawSolidT(Solid const&, size_t);
-    
-    /// draw a Bead
-    void drawBead(Bead const&);
-    
-    /// draw transparent membrane of Bead
-    void drawBeadT(Bead const&);
-    
-    /// draw a Sphere
-    void drawSphere(Sphere const&);
-    
-    /// draw transparent membrane of Sphere
-    void drawSphereT(Sphere const&);
-    
+    void drawObjects(Simul const&);
+
     /// draw free Singles
     void drawSinglesF(SingleSet const&) const;
     

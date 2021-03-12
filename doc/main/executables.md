@@ -39,11 +39,15 @@ and some of its functionalities (eg. PNG support) depend on external libraries.
  
 The [display parameters](../sim/graphics.md) controlling the graphical output can
 be embedded within the config file, or be specified from a second configuration file.
-Most objects have a `display` parameter that control their appearance in `play`.
+Most objects have a `display` parameter controlling their appearance in `play` (color, etc.).
 These parameters are ignored by `sim`, but they are copied verbatim to `properties.cmo`,
-from which they are read by `play`.
-The display parameters can also be included in a separate file with extension ".cyp",
+from which they are read when you replay a simulation. 
+
+The display parameters can also be specified in a separate file with extension ".cyp",
 as in `play display.cyp`.
+Note that the display parameters will be printed on the terminal after you press 'k' in `play`,
+and you can copy-paste this output to create your initial `display.cyp`.
+
  
 `play` can be used to:
 

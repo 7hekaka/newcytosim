@@ -18,9 +18,6 @@
 class Display3 : public Display
 {
 private:
-    
-    /// draw a fine spherical object
-    void drawTBall(Vector const&, float radius, gle_color const&) const;
 
     /// draw a point with a small sphere
     void drawPoint(Vector const&, PointDisp const*) const;
@@ -54,7 +51,7 @@ public:
     ~Display3() {}
     
     /// draw the given simulation state using OpenGL commands
-    void drawSimul(Simul const&);
+    void drawObjects(Simul const&);
     
     /// draw Fiber MINUS_END
     void drawFiberMinusEnd(Fiber const&, int style, real size) const;
@@ -85,24 +82,6 @@ public:
     
     /// draw Fiber speckles
     void drawFiberSpeckles(Fiber const&) const;
-    
-    /// draw the Solids
-    void drawSolid(Solid const&);
- 
-    /// draw the transparent parts of Solid
-    void drawSolidT(Solid const&, size_t);
-
-    /// draw a Bead
-    void drawBead(Bead const&);
-    
-    /// draw transparent membrane of Bead
-    void drawBeadT(Bead const&);
-    
-    /// draw a Sphere
-    void drawSphere(Sphere const&);
-    
-    /// draw transparent membrane of Sphere
-    void drawSphereT(Sphere const&);
     
     /// draw the free Single
     void drawSinglesF(SingleSet const&) const;

@@ -228,12 +228,10 @@ void Player::prepareDisplay(View& view, int mag)
      */
 
     GLfloat pix = view.pixelSize();
+    GLfloat fac = ((disp.point_value > 0) ? disp.point_value/pix : 1 );
     //std::clog << " pixel size = " << pix << '\n';
 
-    if ( disp.point_value > 0 )
-        mDisplay->setPixelFactors(pix/mag, mag*disp.point_value/pix);
-    else
-        mDisplay->setPixelFactors(pix/mag, mag);
+    mDisplay->setPixelFactors(pix/mag, mag*fac);
 
     CHECK_GL_ERROR("in prepareDisplay");
 
@@ -250,29 +248,15 @@ void Player::prepareDisplay(View& view, int mag)
 }
 
 //------------------------------------------------------------------------------
-void Player::displayCytosim()
+void Player::drawCytosim()
 {
     //std::clog << "displayCytosim @ " << std::fixed << simul.time() << "s\n";
-    // clear pixels:
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
-    if ( disp.draw_floor )
-    {
-        glDisable(GL_DEPTH_TEST);
-        glDepthMask(GL_FALSE);
-        gle_color col1(0.0,0.0,0.0);
-        gle_color col2(0.2,0.2,0.2);
-        gle::drawTiledFloor(disp.draw_floor, disp.floor_tile, disp.floor_height, col1, col2);
-        glDepthMask(GL_TRUE);
-        glEnable(GL_DEPTH_TEST);
-    }
-
     try {
         // draw:
         if ( modulo && disp.tile )
-            mDisplay->displayTiled(simul, disp.tile);
+            mDisplay->drawTiled(simul, disp.tile);
         else
-            mDisplay->display(simul);
+            mDisplay->drawSimul(simul);
 
 #if DRAW_MECA_LINKS
         if ( disp.draw_links )
@@ -317,9 +301,18 @@ void Player::readDisplayString(View& view, std::string const& str)
 
 
 /**
- Display the full Scene
+ Display the full Scene for export, skipping some features
  */
-void Player::displayScene(View& view, int mag)
+void Player::drawScene(View& view)
+{
+    view.openDisplay();
+    drawCytosim();
+    view.closeDisplay();
+    glFinish();
+}
+
+
+void Player::drawScene(View& view, int mag)
 {
     if ( simul.prop->display_fresh )
     {
@@ -328,10 +321,7 @@ void Player::displayScene(View& view, int mag)
     }
     //thread.debug("display");
     prepareDisplay(view, mag);
-    view.openDisplay();
-    displayCytosim();
-    view.closeDisplay();
-    glFinish();
+    drawScene(view);
 }
 
 //------------------------------------------------------------------------------
@@ -390,7 +380,8 @@ int Player::saveView(const char* root, size_t indx, int downsample, int verbose)
 
 void displayMagnified(int mag, void * arg)
 {
-    static_cast<Player*>(arg)->displayCytosim();
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    static_cast<Player*>(arg)->drawCytosim();
     CHECK_GL_ERROR("in displayMagnified");
 }
 

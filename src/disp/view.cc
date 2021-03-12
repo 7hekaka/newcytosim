@@ -129,15 +129,25 @@ void View::openDisplay()
 {
     load();
     back_color.load_clear();
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     setFog(fog_type, fog_param, fog_color);
     setLights();
     setClipping();
+    
+    if ( floor_radius > 1 )
+    {
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_LIGHTING);
+        glDepthMask(GL_FALSE);
+        gle_color col1(0.0,0.0,0.0);
+        gle_color col2(0.2,0.2,0.2);
+        gle::drawTiledFloor(floor_radius, floor_tile, floor_height, col1, col2);
+        glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+    }
 }
 
 
-/**
- Displays Axes and Scalebar
- */
 void View::closeDisplay() const
 {
     endClipping();

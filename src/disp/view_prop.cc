@@ -53,6 +53,10 @@ void ViewProp::clear()
     fog_type     = 0;
     fog_param    = 1;
     fog_color    = 0x000000FF;
+    
+    floor_radius   = 0;
+    floor_tile     = 1;
+    floor_height   = 0;
 }
 
 
@@ -65,12 +69,7 @@ void ViewProp::read(Glossary& glos)
     glos.set(auto_scale,  "autoscale");
     glos.set(focus,       "focus");
     glos.set(rotation,    "rotation");
-    
-    // normalize quaternion:
-    if ( rotation.normSqr() > 0.00001 )
-        rotation.normalize();
-    else
-        rotation.set(1,0,0,0);
+    rotation.normalize();
 
     glos.set(perspective, "perspective");
     glos.set(slice, "slice", {{"off", 0},{"front", 1},{"back", 2},{"slice", 3}});
@@ -145,6 +144,10 @@ void ViewProp::read(Glossary& glos)
     glos.set(fog_type,  "fog", keys);
     glos.set(fog_param, "fog", 1);
     glos.set(fog_color, "fog", 2);
+    
+    glos.set(floor_radius, "floor");
+    glos.set(floor_tile, "floor", 1);
+    glos.set(floor_height, "floor", 2);
 }
 
 //------------------------------------------------------------------------------
@@ -172,6 +175,7 @@ void ViewProp::write_values(std::ostream& os) const
     write_value(os, "scalebar",      scalebar, scalebar_length, scalebar_color);
     write_value(os, "axes",          axes, axes_size);
     write_value(os, "fog",           fog_type, fog_param, fog_color);
+    write_value(os, "floor",         floor_radius, floor_tile, floor_height);
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         std::string var = "clip_plane" + std::to_string(k);

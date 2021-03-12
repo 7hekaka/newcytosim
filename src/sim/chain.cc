@@ -118,8 +118,7 @@ void Chain::placeEnd(const FiberEnd ref)
             break;
             
         case PLUS_END:
-            translate(posMiddle()-posEndM());
-            flipChainPolarity();
+            translate(posMiddle()-posEndP());
             break;
             
         case CENTER:

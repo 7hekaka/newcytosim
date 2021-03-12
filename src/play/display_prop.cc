@@ -19,11 +19,6 @@ void DisplayProp::clear()
     point_size     = 5;
     link_width     = 4;
     line_width     = 2;
-    
-    draw_floor     = 0;
-    floor_radius   = 0;
-    floor_tile     = 1;
-    floor_height   = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -49,11 +44,6 @@ void DisplayProp::read(Glossary& glos)
     if ( glos.set(line_width, "line_width") )
         link_width = line_width;
     glos.set(link_width, "link_width") || glos.set(link_width, "link_size");
-    
-    glos.set(floor_radius, "floor");
-    glos.set(floor_tile, "floor", 1);
-    glos.set(floor_height, "floor", 2);
-    draw_floor = (int)(floor_radius/floor_tile);
 }
 
 
@@ -71,7 +61,6 @@ void DisplayProp::write_values(std::ostream& os) const
     write_value(os, "point_size",    point_size);
     write_value(os, "link_width",    link_width);
     write_value(os, "line_width",    line_width);
-    write_value(os, "floor",         floor_radius, floor_tile, floor_height);
 }
 
 

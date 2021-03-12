@@ -34,7 +34,7 @@ Display3::Display3(DisplayProp const* dp) : Display(dp)
 }
 
 
-void Display3::drawSimul(Simul const& sim)
+void Display3::drawObjects(Simul const& sim)
 {
     glDepthMask(GL_FALSE);
     glDisable(GL_LIGHTING);
@@ -142,13 +142,6 @@ void Display3::drawSimul(Simul const& sim)
 
 //------------------------------------------------------------------------------
 #pragma mark - Drawing primitives
-
-inline void Display3::drawTBall(Vector const& pos, float rad, gle_color const& col) const
-{
-    assert_true(glIsEnabled(GL_LIGHTING));
-    col.load_both();
-    drawObject(pos, rad, gle::dualPassSphere4);
-}
 
 
 inline void Display3::drawPoint(Vector const& pos, float rad) const
@@ -786,173 +779,6 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     {
         // display middle of fiber:
         drawPoint(fib.posMiddle(), 2*rad);
-    }
-}
-
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-void Display3::drawBead(Bead const& obj)
-{
-    const PointDisp * disp = obj.prop->disp;
-
-    // display center:
-    if ( disp->style & 2 )
-    {
-        bodyColor(obj);
-        drawObject(obj.position(), disp->size, gle::tetrahedron);
-    }
-    
-#if ( DIM == 2 )
-    // display outline:
-    if ( disp->style & 4 )
-    {
-        glDisable(GL_LIGHTING);
-        bodyColorF(obj).load();
-        lineWidth(disp->width);
-        drawFlat(obj.position(), obj.radius(), gle::circle);
-        glEnable(GL_LIGHTING);
-    }
-#endif
-}
-
-/**
- Display a bead as a sphere
- */
-void Display3::drawBeadT(Bead const& obj)
-{
-    const PointDisp * disp = obj.prop->disp;
-    
-    if ( disp->style & 1 )
-    {
-        drawTBall(obj.position(), obj.radius(), bodyColorF(obj));
-    }
-}
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-void Display3::drawSolid(Solid const& obj)
-{
-    const PointDisp * disp = obj.prop->disp;
-    
-    //display points:
-    if ( disp->style & 2  &&  disp->size > 0 )
-    {
-        bodyColor(obj);
-        for ( size_t i = 0; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), disp->size, gle::hedron(obj.radius(i)>0));
-    }
-    
-#if ( DIM == 3 )
-    //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
-    if ( obj.mark()  &&  disp->style & 4  &&  obj.nbPoints() > 1 )
-    {
-        glEnable(GL_LIGHTING);
-        bodyColor(obj);
-        //drawObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
-        glPushMatrix();
-        Vector A = obj.posP(0), B = obj.posP(1);
-        gle::transAlignZ(A, obj.radius(0), B-A);
-        gle::cylinder1();
-        glPopMatrix();
-    }
-#endif
-
-    //display a signature for each Solid
-    if ( disp->style & 8 )
-    {
-        char tmp[8];
-        bodyColor(obj);
-        snprintf(tmp, sizeof(tmp), "%u", obj.identity());
-        gle::drawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
-    }
-    
-    //draw polygon around vertices of Solid
-    if ( disp->style & 16 )
-    {
-        glDisable(GL_LIGHTING);
-        lineWidth(1.0);
-        bodyColorF(obj).load();
-        drawStrip(obj.nbPoints(), obj.addrPoints(), GL_LINE_LOOP);
-        glEnable(GL_LIGHTING);
-    }
-}
-
-
-/**
- Display a semi-transparent disc / sphere
- */
-void Display3::drawSolidT(Solid const& obj, size_t inx)
-{
-    const PointDisp * disp = obj.prop->disp;
-
-    if (( disp->style & 1 ) & ( obj.radius(inx) > 0 ))
-    {
-        Vector X = obj.posP(inx);
-        size_t near[3];
-        size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
-        //printf("nearest balls to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
-        // set clipping planes with nearest balls
-        for ( size_t i = 0; i < num; ++i )
-        {
-            size_t J = near[i];
-            Vector P = obj.posPoint(J);
-            real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
-            GLenum glp = GL_CLIP_PLANE5 - i;
-            glEnable(glp);
-            gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
-        }
-        drawTBall(X, obj.radius(inx), bodyColorF(obj));
-        glDisable(GL_CLIP_PLANE3);
-        glDisable(GL_CLIP_PLANE4);
-        glDisable(GL_CLIP_PLANE5);
-    }
-}
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-void Display3::drawSphere(Sphere const& obj)
-{
-    const PointDisp * disp = obj.prop->disp;
-    
-    //display center and surface points
-    if ( disp->size > 0  &&  disp->style & 2 )
-    {
-        bodyColor(obj);
-        drawObject(obj.posP(0), disp->size, gle::star);
-        for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), disp->size, gle::cube);
-    }
-
-    //display reference points
-    if ( disp->size > 0  &&  disp->style & 8 )
-    {
-        bodyColor(obj);
-        for ( size_t i = 1; i < obj.nbRefPoints; ++i )
-            drawObject(obj.posP(i), disp->size, gle::tetrahedron);
-    }
-}
-
-void Display3::drawSphereT(Sphere const& obj)
-{
-    const PointDisp * disp = obj.prop->disp;
-
-    if ( disp->style & 5 )
-    {
-        const Vector C = obj.posP(0);
-#if ( DIM < 3 )
-        bodyColorF(obj).load();
-        if ( disp->style & 1 )
-            drawFlat(C, obj.radius(), gle::circle);
-        if ( disp->style & 2 )
-            drawTBall(C, obj.radius(), bodyColorF(obj));
-#else
-        bodyColorF(obj).load_both();
-        Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
-#endif
     }
 }
 

@@ -21,10 +21,10 @@ Simul&      simul = player.simul;
 PlayerProp&  prop = player.prop;
 DisplayProp& disp = player.disp;
 
-void displayLive(View& view, int mag);
+void drawLive(View& view, int mag);
 
 /// create a player suitable for command-line offscreen rendering only
-#define HEADLESS_PLAYER 0
+#define HEADLESS_PLAYER 1
 
 #if HEADLESS_PLAYER
 void helpKeys(std::ostream& os) { os << "This is a headless display\n"; }
@@ -53,9 +53,9 @@ void goodbye()
 /**
  display is done only if data can be accessed by current thread
  */
-void displayLive(View& view, int mag)
+void drawLive(View& view, int mag)
 {
-    CHECK_GL_ERROR("before displayLive");
+    CHECK_GL_ERROR("before drawLive");
     if ( 0 == thread.trylock() )
     {
         // read and execute commands from incoming pipe:
@@ -68,7 +68,9 @@ void displayLive(View& view, int mag)
         }
         //thread.debug("display");
         player.prepareDisplay(view, mag);
-        player.displayCytosim();
+        view.openDisplay();
+        player.drawCytosim();
+        view.closeDisplay();
         thread.unlock();
     }
     else
@@ -82,10 +84,10 @@ void displayLive(View& view, int mag)
 /**
  This is a bare-bone version used for off-screen rendering.
  */
-void displayOffscreen(View & view, int mag)
+void drawOffscreen(View & view, int mag)
 {
-    //std::clog << "displayOffscreen " << glApp::views.size() << '\n';
-    player.displayScene(view, mag);
+    //std::clog << "drawOffscreen " << glApp::views.size() << '\n';
+    player.drawScene(view, mag);
 }
 
 
@@ -212,28 +214,58 @@ int main(int argc, char* argv[])
     
 #if HEADLESS_PLAYER
     View view("*");
-    view.setDisplayFunc(displayOffscreen);
+    view.setDisplayFunc(drawOffscreen);
 #else
     glApp::setDimensionality(DIM);
     if ( arg.use_key("fullscreen") )
         glApp::setFullScreen(1);
     View& view = glApp::views[0];
-    view.setDisplayFunc(displayLive);
+    view.setDisplayFunc(drawLive);
 #endif
-
-    // default configuration file for play:
-    std::string file;
-    if ( ! player.goLive || has_frame )
-        file = simul.prop->property_file;
-    else
-        file = simul.prop->config_file;
-    std::string setup = file;
     
+    //---------Open trajectory file and load simulation world
+
     try
     {
-        // read config file, to get the name of 'simul' and simul:display
-        Parser(simul, 0, 1, 0, 0, 0).readConfig(file);
+        std::string file = simul.prop->config_file;
+        
+        // config file is `properties.cmo` in replay mode:
+        if ( ! player.goLive || has_frame )
+            file = simul.prop->property_file;
 
+        if ( ! player.goLive || has_frame )
+        {
+            // read config to create all properties
+            Parser(simul, 1, 1, 0, 0, 0).readConfig(file);
+                        
+            // open trajectory file and load requested frame:
+            thread.openFile(simul.prop->trajectory_file);
+            
+            if ( thread.loadFrame(frm) )
+            {
+                // load last frame in file:
+                if ( thread.loadLastFrame() )
+                    std::cerr << "Warning: could only load frame " << thread.currentFrame() << ' ';
+            }
+            frm = thread.currentFrame();
+        }
+        else
+        {
+            // get the name of 'simul' and simul:display from config file
+            Parser(simul, 0, 1, 0, 0, 0).readConfig(file);
+        }
+    }
+    catch( Exception & e )
+    {
+        print_error(e);
+        return EXIT_FAILURE;
+    }
+
+    //---------Open setup file and read display parameters from command line
+
+    try
+    {
+        std::string setup;
         // check for play's configuration file specified on the command line:
         if ( arg.set(setup, ".cyp") )
         {
@@ -257,40 +289,9 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
+        arg.print_warning(std::cerr, 1, "\n");
         print_error(e);
         return EXIT_FAILURE;
-    }
-    
-    //---------Open trajectory file and read state
-
-    if ( ! player.goLive || has_frame )
-    {
-        try
-        {
-            // real file again to create all properties
-            Parser(simul, 1, 0, 0, 0, 0).readConfig(file);
-            
-            // read 'setup' file again to overwrite 'display' values
-            if ( file != setup )
-                Parser(simul, 0, 0, 0, 0, 0).readConfig(setup);
-            
-            thread.openFile(simul.prop->trajectory_file);
-            
-            // load requested frame from trajectory file:
-            if ( thread.loadFrame(frm) )
-            {
-                // load last frame in file:
-                if ( thread.loadLastFrame() )
-                    std::cerr << "Warning: could only load frame " << thread.currentFrame() << ' ';
-            }
-            frm = thread.currentFrame();
-        }
-        catch( Exception & e )
-        {
-            arg.print_warning(std::cerr, 1, "\n");
-            print_error(e);
-            return EXIT_FAILURE;
-        }
     }
     
 #ifndef __APPLE__
@@ -335,13 +336,10 @@ int main(int argc, char* argv[])
                 // only save requested frames:
                 if ( thread.currentFrame() == frm )
                 {
-                    displayOffscreen(view, magnify);
+                    drawOffscreen(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
-                    if ( magnify > 1 )
-                        player.saveView("poster", frm, prop.downsample, 2);
-                    else
-                        player.saveView("image", frm, prop.downsample, 2);
+                    player.saveView("image", frm, prop.downsample, 2);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }
@@ -352,7 +350,7 @@ int main(int argc, char* argv[])
             do {
                 if ( ++s >= prop.period )
                 {
-                    displayOffscreen(view, magnify);
+                    drawOffscreen(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
                     player.saveView("movie", frm++, prop.downsample, 2);
@@ -380,7 +378,7 @@ int main(int argc, char* argv[])
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
     glApp::normalKeyFunc(processNormalKey);
-    glApp::newWindow(displayLive);
+    glApp::newWindow(drawLive);
 
     if ( mode == ONSCREEN_MOVIE )
     {

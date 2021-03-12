@@ -8,32 +8,32 @@ static void processMenuFiber(int item)
     {
         switch (item)
         {
-            case 0:   break;
-            case 1:   FD->line_style   = FD->line_style?0:1;      break;
-            case 2:   FD->line_style   = FD->line_style==2?0:2;   break;
+            case 0: break;
+            case 1: FD->line_style = FD->line_style?0:1; break;
+            case 2: FD->line_style = FD->line_style==2?0:2; break;
                 
-            case 3:   FD->point_style  = !FD->point_style;        break;
-            case 5:   FD->point_style  = FD->point_style==2?0:2;  break;
+            case 3: FD->point_style = !FD->point_style; break;
+            case 5: FD->point_style = FD->point_style==2?0:2; break;
                 
-            case 7:   FD->end_style[1] = 3*!FD->end_style[1];     break;
-            case 8:   FD->end_style[0] = 2*!FD->end_style[0];     break;
+            case 7: FD->end_style[1] = 3*!FD->end_style[1]; break;
+            case 8: FD->end_style[0] = 2*!FD->end_style[0]; break;
                 
-            case 9:   FD->force_style = FD->force_style; break;
-            case 10:  FD->visible     = !FD->visible;    break;
+            case 9: FD->force_style = FD->force_style; break;
+            case 10: FD->visible = !FD->visible; break;
                 
-            case 20:  FD->coloring = FiberDisp::COLORING_OFF;       break;
-            case 21:  FD->coloring = FiberDisp::COLORING_RANDOM;    break;
-            case 22:  FD->coloring = FiberDisp::COLORING_MARK;      break;
-            case 23:  FD->coloring = FiberDisp::COLORING_FLAG;      break;
-            case 24:  FD->coloring = FiberDisp::COLORING_FAMILY;    break;
-            case 25:  FD->coloring = FiberDisp::COLORING_CLUSTER;   break;
-            case 26:  FD->coloring = FiberDisp::COLORING_DIRECTION; break;
-            case 27:  FD->coloring = FiberDisp::COLORING_AGE;       break;
-            case 28:  FD->coloring = FiberDisp::COLORING_PSTATE;    break;
+            case 20: FD->coloring = FiberDisp::COLORING_OFF; break;
+            case 21: FD->coloring = FiberDisp::COLORING_RANDOM; break;
+            case 22: FD->coloring = FiberDisp::COLORING_MARK; break;
+            case 23: FD->coloring = FiberDisp::COLORING_FLAG; break;
+            case 24: FD->coloring = FiberDisp::COLORING_FAMILY; break;
+            case 25: FD->coloring = FiberDisp::COLORING_CLUSTER; break;
+            case 26: FD->coloring = FiberDisp::COLORING_DIRECTION; break;
+            case 27: FD->coloring = FiberDisp::COLORING_AGE; break;
+            case 28: FD->coloring = FiberDisp::COLORING_PSTATE; break;
 
-            case 30:  FD->draw_average = 0;  break;
-            case 31:  FD->draw_average = 1;  break;
-            case 32:  FD->draw_average = 2;  break;
+            case 30: FD->draw_average = 0; break;
+            case 31: FD->draw_average = 1; break;
+            case 32: FD->draw_average = 2; break;
                 
             default:
                 std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
@@ -87,11 +87,11 @@ static void processMenuCouple(int item)
 {
     switch (item)
     {
-        case 0:  return;
-        case 1:  disp.couple_select = 0;  break;
-        case 2:  disp.couple_select = 1;  break;
-        case 3:  disp.couple_select = 2;  break;
-        case 4:  disp.couple_select = 4;  break;
+        case 0: return;
+        case 1: disp.couple_select = 0; break;
+        case 2: disp.couple_select = 1; break;
+        case 3: disp.couple_select = 2; break;
+        case 4: disp.couple_select = 4; break;
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
@@ -120,15 +120,15 @@ static void processMenuDisplay(int item)
     View & view = glApp::currentView();
     switch (item)
     {
-        case 0:   return;
-        case 1:   view.reset();                            break;
-        case 3:   disp.tile = ( disp.tile ? 0 : 7 );       break;
-        case 4:   glApp::toggleFullScreen();               break;
-        case 6:   view.track_fibers = !view.track_fibers;  break;
+        case 0: return;
+        case 1: view.reset(); break;
+        case 3: disp.tile = ( disp.tile ? 0 : 7 ); break;
+        case 4: glApp::toggleFullScreen(); break;
+        case 6: view.track_fibers = !view.track_fibers; break;
         
-        case 101: player.setStyle(1);  break;
-        case 102: player.setStyle(2);  break;
-        case 103: player.setStyle(3);  break;
+        case 101: player.setStyle(1); break;
+        case 102: player.setStyle(2); break;
+        case 103: player.setStyle(3); break;
             
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
@@ -188,10 +188,10 @@ static void processMenuFiberSelect(int item)
     {
         switch (item)
         {
-            case 0:  return;
-            case 1:  FD->hide  = 0;   break;
-            case 2:  FD->hide ^= 1;   break;
-            case 3:  FD->hide ^= 2;   break;
+            case 0: return;
+            case 1: FD->hide  = 0; break;
+            case 2: FD->hide ^= 1; break;
+            case 3: FD->hide ^= 2; break;
             default:
                 std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
                 return;
@@ -224,11 +224,11 @@ static void processMenuCoupleSelect(int item)
 {
     switch (item)
     {
-        case 0:  return;
-        case 1:  disp.couple_select  = 0;   break;
-        case 2:  disp.couple_select ^= 1;   break;
-        case 3:  disp.couple_select ^= 2;   break;
-        case 4:  disp.couple_select ^= 4;   break;
+        case 0: return;
+        case 1: disp.couple_select  = 0; break;
+        case 2: disp.couple_select ^= 1; break;
+        case 3: disp.couple_select ^= 2; break;
+        case 4: disp.couple_select ^= 4; break;
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
@@ -256,10 +256,10 @@ static void processMenuSingleSelect(int item)
 {
     switch (item)
     {
-        case 0:  return;
-        case 1:  disp.single_select  = 0;   break;
-        case 2:  disp.single_select ^= 1;   break;
-        case 3:  disp.single_select ^= 2;   break;
+        case 0: return;
+        case 1: disp.single_select  = 0; break;
+        case 2: disp.single_select ^= 1; break;
+        case 3: disp.single_select ^= 2; break;
         
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
@@ -312,11 +312,11 @@ static void processMenuAnimation(int item)
 {
     switch (item)
     {
-        case 0:  return;
-        case 1:  processKey('z');   break;
-        case 2:  processKey('a');   break;
-        case 4:  processKey('s');   break;
-        case 5:  processKey('r');   break;
+        case 0: return;
+        case 1: processKey('z'); break;
+        case 2: processKey('a'); break;
+        case 4: processKey('s'); break;
+        case 5: processKey('r'); break;
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
@@ -346,15 +346,15 @@ static void processMenuReplay(int item)
 {
     switch (item)
     {
-        case 0:  return;
-        case 1:  processKey('p');  break;
-        case 2:  processKey('o');  break;
-        case 3:  processKey('s');  break;
-        case 4:  processKey('z');  break;
-        case 5:  player.previousFrame();  break;
-        case 6:  player.nextFrame();      break;
-        case 7:  prop.loop = 0;      break;
-        case 8:  prop.loop = 1;      break;
+        case 0: return;
+        case 1: processKey('p'); break;
+        case 2: processKey('o'); break;
+        case 3: processKey('s'); break;
+        case 4: processKey('z'); break;
+        case 5: player.previousFrame(); break;
+        case 6: player.nextFrame(); break;
+        case 7: prop.loop = 0; break;
+        case 8: prop.loop = 1; break;
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
@@ -369,13 +369,13 @@ static int buildMenuReplay()
     if ( menuID == 0 )
     {
         menuID = glutCreateMenu(processMenuReplay);
-        glutAddMenuEntry("(p) Play/Faster",       1);
-        glutAddMenuEntry("(o) Slower",            2);
-        glutAddMenuEntry("(s) Stop",              3);
-        glutAddMenuEntry("-",                     0);
-        glutAddMenuEntry("(z) First Frame",       4);
-        glutAddMenuEntry("(<) Previous Frame",    5);
-        glutAddMenuEntry("(>) Next Frame",        6);
+        glutAddMenuEntry("(p) Play/Faster",    1);
+        glutAddMenuEntry("(o) Slower",         2);
+        glutAddMenuEntry("(s) Stop",           3);
+        glutAddMenuEntry("-",                  0);
+        glutAddMenuEntry("(z) First Frame",    4);
+        glutAddMenuEntry("(<) Previous Frame", 5);
+        glutAddMenuEntry("(>) Next Frame",     6);
         if ( prop.loop )
             glutAddMenuEntry("Do not loop", 7);
         else
@@ -390,23 +390,23 @@ static void processMenuExport(int item)
 {
     switch (item)
     {
-        case 0:   return;
-        case 1:   player.saveView("image", prop.image_index++, 1); return;
-        case 2:   player.saveView("image", prop.image_index++, 2); return;
-        case 3:   player.saveScene(3, "image", prop.image_index++, 3); return;
-        case 4:   player.saveScene(6, "image", prop.image_index++, 3); return;
-        case 5:   player.saveScene(9, "image", prop.image_index++, 3); return;
-        case 6:   player.saveScene(4, "poster", prop.poster_index++);  return;
-        case 7:   player.saveScene(8, "poster", prop.poster_index++);  return;
+        case 0: return;
+        case 1: player.saveView("image", prop.image_index++, 1); return;
+        case 2: player.saveView("image", prop.image_index++, 2); return;
+        case 3: player.saveScene(3, "image", prop.image_index++, 3); return;
+        case 4: player.saveScene(6, "image", prop.image_index++, 3); return;
+        case 5: player.saveScene(9, "image", prop.image_index++, 3); return;
+        case 6: player.saveScene(4, "poster", prop.poster_index++); return;
+        case 7: player.saveScene(8, "poster", prop.poster_index++); return;
 
-        case 9:   prop.save_images = 1; player.startPlayback();     return;
-        case 10:  prop.image_index = 0;                             return;
+        case 9: prop.save_images = 1; player.startPlayback(); return;
+        case 10: prop.image_index = 0; return;
         
-        case 20:  player.writePlayParameters(std::cout, true);    return;
-        case 21:  player.writeDisplayParameters(std::cout, true); return;
-        case 22:  thread.writeProperties(std::cout, true);        return;
-        case 23:  thread.exportObjects(false);                    return;
-        case 24:  thread.exportObjects(true);                     return;
+        case 20: player.writePlayParameters(std::cout, true); return;
+        case 21: player.writeDisplayParameters(std::cout, true); return;
+        case 22: thread.writeProperties(std::cout, true); return;
+        case 23: thread.exportObjects(false); return;
+        case 24: thread.exportObjects(true); return;
             
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';

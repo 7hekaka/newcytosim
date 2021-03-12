@@ -26,9 +26,10 @@ GLubyte* new_pixels(size_t s)
     return (GLubyte*)malloc(s*sizeof(GLubyte));
 }
 
-void free_pixels(GLubyte * ptr)
+void free_pixels(GLubyte *& ptr)
 {
     free(ptr);
+    ptr = nullptr;
 }
 
 
@@ -83,7 +84,7 @@ int SaveImage::saveImage(const char * filename,
  After setting a higher resolution, this will translate the ModelView to produce several
  images that will be stiched together in memory, into an image with higher resolution.
  This works even if the image is larger than the maximum OpenGL viewPort,
- but there can be artifacts due to stitching imperfections.
+ but there can be artifacts caused by objects in the stitched zones.
  */
 int SaveImage::saveCompositeImage(const int mag,
                                   const char * filename,
@@ -136,7 +137,7 @@ int SaveImage::saveCompositeImage(const int mag,
         
         free_pixels(pixels);
     }
-    if ( sub ) free_pixels(sub);
+    free_pixels(sub);
     return res;
 }
 
@@ -185,8 +186,8 @@ int SaveImage::saveMagnifiedImage(const int mag,
             if ( 0 == readPixels(0, 0, width, height, sub) )
             {
                 GLubyte * dst = &pixels[width*PIX*(ix+mH*iy)];
-                for ( int ii=0; ii<height; ++ii )
-                    memcpy(&dst[ii*mW*PIX], &sub[ii*width*PIX], width*PIX);
+                for ( int h = 0; h < height; ++h )
+                    memcpy(&dst[h*mW*PIX], &sub[h*width*PIX], width*PIX);
             }
         }
         res = savePixels(filename, format, pixels, mW, mH, downsample);
@@ -194,7 +195,7 @@ int SaveImage::saveMagnifiedImage(const int mag,
         //restore original viewport:
         glViewport(svp[0], svp[1], svp[2], svp[3]);
     }
-    if ( sub ) free_pixels(sub);
+    free_pixels(sub);
     return res;
 }
 

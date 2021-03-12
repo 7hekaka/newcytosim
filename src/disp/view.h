@@ -102,10 +102,10 @@ public:
     /// set display callback
     void setDisplayFunc(void (*f)(View&, int)) { displayCallback = f; }
 
-    /// set clipping planes and fog parameters
+    /// clear pixels and set clipping planes and fog parameters
     void openDisplay();
     
-    /// set clipping planes and fog parameters
+    /// unset clipping planes and fog parameters, display axes and scale bar
     void closeDisplay() const;
     
     /// display scale bar, info text, etc.

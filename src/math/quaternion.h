@@ -243,13 +243,23 @@ public:
     }
 
     /// scale in place to obtain norm = `n`
-    void normalize(REAL n = 1.0)
+    void normalize(REAL n)
     {
         REAL s = n / norm();
         q[0] *= s;
         q[1] *= s;
         q[2] *= s;
         q[3] *= s;
+    }
+    
+    /// scale to reach a norm of 1
+    void normalize()
+    {
+        REAL s = normSqr();
+        if ( s > REAL_EPSILON )
+            *this *= 1.0 / std::sqrt(s);
+        else
+            set(1, 0, 0, 0);
     }
     
     /// conjugated quaternion +, -, -, -

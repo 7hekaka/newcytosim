@@ -302,24 +302,10 @@ void glApp::setScale(GLfloat s)
 {
     if ( 0 == views.size() )
         initialize();
-
-    views[0].view_size = s;
     
-    if ( views.size() > 1 )
-    {
-        int win = glutGetWindow();
-        // update all window-associated views:
-        for ( size_t n = 1; n < views.size(); ++n )
-        {
-            View & view = views[n];
-            if ( view.window() > 0 )
-            {
-                glutSetWindow(view.window());
-                view.view_size = s;
-            }
-        }
-        glutSetWindow(win);
-    }
+    // update all window-associated views:
+    for ( size_t n = 0; n < views.size(); ++n )
+        views[n].view_size = s;
 }
 
 /*
@@ -1155,9 +1141,7 @@ void glApp::displayPlain()
     CHECK_GL_ERROR("before glApp::displayPlain()");
     View & view = glApp::currentView();
 
-    view.openDisplay();
     view.display();
-    view.closeDisplay();
 
     if ( view.buffered )
         glutSwapBuffers();
@@ -1174,9 +1158,7 @@ void glApp::displayMain()
     CHECK_GL_ERROR("before glApp::displayMain()");
     View & view = views[1];
     
-    view.openDisplay();
     view.display();
-    view.closeDisplay();
     view.drawInteractiveFeatures();
 
     if ( mouseAction == MOUSE_MAGNIFIER )

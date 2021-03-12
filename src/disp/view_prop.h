@@ -23,23 +23,23 @@ public:
      */
     
     /// zoom factor = ratio between visible area and `view_size`
-    GLfloat          zoom;
+    GLfloat zoom;
     
     /// size of area visible in the window, in sim-units (default=10)
-    GLfloat          view_size;
+    GLfloat view_size;
     
     /// enables the display area to be set from the size of the simulation space
     /**
      If ( `auto_scale` > 0 ), `view_size` is set automatically to match the simulation space.
      This is on by default.
      */
-    unsigned int     auto_scale;
+    unsigned auto_scale;
     
     /// the point that is in the center of the window in real-world coordinates
-    Vector3          focus;
+    Vector3 focus;
     
     /// additional translation used by autoTrack
-    Vector3          focus_shift;
+    Vector3 focus_shift;
     
     /// orientation of display
     Quaternion<real> rotation;
@@ -50,7 +50,7 @@ public:
      but it will use a 3D perspective if 'perspective==true'.
      This is only meaningful in 3D mode.
      */
-    int              perspective;
+    int perspective;
     
     /// modifies the display to show only the front, the back or a slice of the world
     /**
@@ -61,40 +61,40 @@ public:
      - `slice`  (3)
      .
      */
-    unsigned int     slice;
+    unsigned int slice;
 
     /// color of background
-    gle_color        back_color;
+    gle_color back_color;
     
     /// color used to highlight objects
-    gle_color        front_color;
+    gle_color front_color;
 
     /// flag to use a double buffer for smoother rendering (default=1)
     /**
      http://en.wikipedia.org/wiki/Multiple_buffering#Double_buffering_in_computer_graphics
      */
-    bool             buffered;
+    bool buffered;
 
     /// flag to enable OpenGL depth buffer (default=1)
     /**
      This is useful for 3D rendering.
      http://en.wikipedia.org/wiki/Z-buffering
      */
-    int              depth_test;
+    int depth_test;
     
     /// flag to perform depth-clamp (default=false)
     /** http://www.opengl.org/registry/specs/NV/depth_clamp.txt */
-    int              depth_clamp;
+    int depth_clamp;
 
     /// flag to enable native device resolution on mac osx
     /**
      This works only if you use Renaud Blanch's modified GLUT
      http://iihm.imag.fr/blanch/software/glut-macosx
      */
-    int              retina;
+    int retina;
     
     /// flag to enable OpenGL stencil buffer (default=0)
-    int              stencil;
+    int stencil;
     
     /// if > 0, enables OpenGL full scene anti-aliasing (default=0)
     /**
@@ -103,11 +103,11 @@ public:
      http://en.wikipedia.org/wiki/Multisample_anti-aliasing
      Many graphic cards only support 8 samples max, so try 4 or 8.
      */
-    int              multisample;
+    int multisample;
     
     
     /// string at start of `message` (if `none` is specified, no message is shown)
-    std::string      label;
+    std::string label;
     
     /// automatically adjust view to keep fibers in window
     /**
@@ -121,28 +121,28 @@ public:
      .
      The translation defined by focus is applied after this adjustment.
      */
-    unsigned int     track_fibers;
+    unsigned track_fibers;
     
     /// position of window on screen (top-left corner, in pixels)
-    int              window_position[2];
+    int window_position[2];
     
     /// desired size of window in pixels (also known as `size`)
-    int              window_size[2];
+    int window_size[2];
     
     /// display flag for a scalebar (default=0)
-    unsigned int     scalebar;
+    unsigned scalebar;
 
     /// length of scale-bar in sim-world units (set as `scalebar[1]`)
-    real             scalebar_length;
+    real scalebar_length;
     
     /// color of scale-bar (set as `scalebar[2]`)
-    gle_color        scalebar_color;
+    gle_color scalebar_color;
 
     /// display flag for displaying X-Y-Z axes
-    unsigned int     axes;
+    unsigned axes;
     
     /// length of axes (set a `axes[1]`, default=1)
-    real             axes_size;
+    real axes_size;
 
     /// on/off flags for clipping (defined as `clip_plane?`)
     /**
@@ -166,31 +166,37 @@ public:
          }
      
      */
-    int              clip_plane_mode[NB_CLIP_PLANES];
+    int clip_plane_mode[NB_CLIP_PLANES];
 
     /// direction perpendicular to clipping plane (defined as `clip_plane?[1]`)
-    Vector3          clip_plane_vector[NB_CLIP_PLANES];
+    Vector3 clip_plane_vector[NB_CLIP_PLANES];
     
     /// scalar offset defining the equation of the clipping plane (defined as `clip_plane?[2]`)
-    real             clip_plane_scalar[NB_CLIP_PLANES];
+    real clip_plane_scalar[NB_CLIP_PLANES];
 
     
     /// characteristics of OpenGL fog (also known as `fog[0]`)
-    int              fog_type;
+    int fog_type;
     
     /// density of fog (also known as `fog[1]`)
-    GLfloat          fog_param;
+    GLfloat fog_param;
     
     /// color of fog (also known as `fog[2]`)
-    gle_color        fog_color;
- 
+    gle_color fog_color;
+    
+    /// draw 'tiled' floor
+    int floor_radius;
+    
+    /// parameters for 'tiled' floor
+    float floor_tile, floor_height;
+
     /// @}
     
     /// text displayed in center of window
-    std::string      memo;
+    std::string memo;
     
     /// flag to display information on screen
-    int              draw_memo;
+    int draw_memo;
 
 public:
    

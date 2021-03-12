@@ -145,11 +145,14 @@ public:
     /// read parameters contained in string
     void readDisplayString(View&, std::string const&);
     
-    /// display cytosim state and message
-    void displayCytosim();
+    /// draw cytosim's system
+    void drawCytosim();
     
-    /// display function calling displayCytosim
-    void displayScene(View&, int mag);
+    /// draw system calling drawCytosim
+    void drawScene(View&);
+
+    /// draw system calling drawCytosim
+    void drawScene(View&, int mag);
     
     /// export current viewport to a graphic file
     int  saveView(const char* filename, const char* format, int downsample) const;
