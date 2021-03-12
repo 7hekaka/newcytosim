@@ -506,15 +506,14 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
 #include "gle.h"
 
 void SpaceCylinderZ::draw3D() const
 {
-    const GLfloat T(top_), TE(top_-edge_);
-    const GLfloat B(bot_), BE(bot_+edge_);
-    const GLfloat R(radius_), RE(radius_-edge_);
-    const GLfloat E(edge_);
+    const float T(top_), TE(top_-edge_);
+    const float B(bot_), BE(bot_+edge_);
+    const float R(radius_), RE(radius_-edge_);
+    const float E(edge_);
     
     size_t cnt = 2 * ( gle::pi_once + 3 );
     

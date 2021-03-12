@@ -161,14 +161,14 @@ void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceBanana::draw2D() const
 {
-    GLfloat R(bRadius);
-    GLfloat C(bCurve);
-    GLfloat cX(bCenter[0]);
-    GLfloat cY(bCenter[1]);
-    GLfloat eX(bEnd[0]);
-    GLfloat eY(bEnd[1]);
-    GLfloat A(-bAngle + M_PI_2);
-    GLfloat B( bAngle - M_PI_2);
+    float R(bRadius);
+    float C(bCurve);
+    float cX(bCenter[0]);
+    float cY(bCenter[1]);
+    float eX(bEnd[0]);
+    float eY(bEnd[1]);
+    float A(-bAngle + M_PI_2);
+    float B( bAngle - M_PI_2);
 
     //number of sections in the quarter-circle
     constexpr size_t fin = 8 * gle::finesse;

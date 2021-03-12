@@ -204,9 +204,9 @@ void SpacePolygonZ::draw3D() const
         if ( pts[n].spot )
             continue;
         
-        GLfloat R1(pts[n].xx), R2(pts[n+1].xx);
-        GLfloat Z1(pts[n].yy), Z2(pts[n+1].yy);
-        GLfloat nX(pts[n].dy), nY(-pts[n].dx);
+        float R1(pts[n].xx), R2(pts[n+1].xx);
+        float Z1(pts[n].yy), Z2(pts[n+1].yy);
+        float nX(pts[n].dy), nY(-pts[n].dx);
         
         if (( R1 >= 0 ) & ( R2 >= 0 ))
         {
@@ -236,11 +236,11 @@ void SpacePolygonZ::drawRings() const
     glLineWidth(0.5);
     for ( size_t n = 0; n < npts; n++ )
     {
-        GLfloat R = pts[n].xx;
-        GLfloat Z = pts[n].yy;
-        GLfloat nX(pts[n].dy), nY(-pts[n].dx);
+        float R(pts[n].xx);
+        float Z(pts[n].yy);
         if ( R > 0 )
         {
+            float nX(pts[n].dy), nY(-pts[n].dx);
             flute6 * flu = gle::mapVertexNormalBuffer(2+gle::pi_twice);
             size_t i = 0;
             for ( size_t j = 0; j <= gle::pi_twice; ++j )

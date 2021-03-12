@@ -222,8 +222,8 @@ void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCylinder::draw3D() const
 {
-    const GLfloat L(half_);
-    const GLfloat R(radius_);
+    const real L(half_);
+    const real R(radius_);
     
     const GLenum glp = GL_CLIP_PLANE5;
     GLdouble plane[] = { -1, 0, 0, L };

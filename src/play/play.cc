@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "simul_prop.h"
 #include "glossary.h"
@@ -24,7 +24,7 @@ DisplayProp& disp = player.disp;
 void drawLive(View& view, int mag);
 
 /// create a player suitable for command-line offscreen rendering only
-#define HEADLESS_PLAYER 1
+#define HEADLESS_PLAYER 0
 
 #if HEADLESS_PLAYER
 void helpKeys(std::ostream& os) { os << "This is a headless display\n"; }

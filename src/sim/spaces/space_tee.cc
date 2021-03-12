@@ -426,10 +426,10 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceTee::draw2D() const
 {
-    GLfloat R(tRadius);
-    GLfloat L(tLength);
-    GLfloat J(tJunction);
-    GLfloat A(tArmLength);
+    float R(tRadius);
+    float L(tLength);
+    float J(tJunction);
+    float A(tArmLength);
     
     constexpr size_t fin = 8 * gle::finesse;
     float* arc = gle::mapFloatBuffer(6*fin+8);

@@ -256,8 +256,8 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCapsule::draw2D() const
 {
-    const GLfloat L(half_);
-    const GLfloat R(radius_);
+    const float L(half_);
+    const real R(radius_);
     constexpr size_t fin = 16 * gle::finesse;
     float* arc = gle::mapFloatBuffer(4*fin+4);
     float* cra = arc + 2*fin + 2;
@@ -270,8 +270,8 @@ void SpaceCapsule::draw2D() const
 
 void SpaceCapsule::draw3D() const
 {
-    const GLfloat L(half_);
-    const GLfloat R(radius_);
+    const real L(half_);
+    const float R(radius_);
     
     const GLenum glp = GL_CLIP_PLANE5;
     GLdouble plane[] = { 1, 0, 0, 0 };
