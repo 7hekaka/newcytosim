@@ -336,7 +336,7 @@ void PointDisp::drawPixelmap(size_t inx) const
 #if POINTDISP_USES_PIXEL_BUFFERS
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_[inx]);
     glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    //glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+    //glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 #else
     glDrawPixels(nPix, nPix, GL_RGBA, GL_UNSIGNED_BYTE, bmp_[inx]);
 #endif

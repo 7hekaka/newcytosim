@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2021
 
 #ifndef DISPLAY3_H
 #define DISPLAY3_H

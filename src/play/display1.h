@@ -48,9 +48,7 @@ public:
     
     /// draw bridging Couples
     void drawCouplesB(CoupleSet const&) const;
-    
-    /// draw Organizer
-    void drawOrganizer(Organizer const&) const;
+
 };
 
 #endif

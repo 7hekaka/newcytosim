@@ -11,7 +11,6 @@
 #include "gle_color_list.h"
 #include "glut.h"
 
-#include "fake.h"
 #include "line_disp.h"
 #include "point_disp.h"
 #include "fiber_disp.h"
@@ -88,64 +87,7 @@ void Display2::drawObjects(Simul const& sim)
 
     drawOrganizers(sim.organizers);
     drawMisc(sim);
-
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
-}
-
-//------------------------------------------------------------------------------
-void Display2::drawOrganizer(Organizer const& obj) const
-{
-    PointDisp const* disp = obj.disp();
-    size_t i = 0, cnt = obj.nbLinks();
-
-    if ( disp && ( disp->style & 2 ))
-    {
-        Vector P, Q;
-        fluteV* pts = gle::mapVertexBuffer(2*cnt);
-        while ( obj.getLink(i, P, Q) & ( i < cnt ) )
-        {
-            if ( modulo ) modulo->fold(Q, P);
-            pts[  2*i] = P;
-            pts[1+2*i] = Q;
-            ++i;
-        }
-        gle::unmapVertexBuffer();
-        glDisable(GL_LIGHTING);
-        bodyColorF(disp, obj.signature()).load();
-        lineWidth(disp->width);
-        glDrawArrays(GL_LINES, 0, 2*i);
-
-        gle::bindVertexBuffer(2);
-        pointSize(disp->size);
-        glDrawArrays(GL_POINTS, 0, i);
-    }
-
-    /**
-     This display the Solid connecting two Aster as a spindle.
-     Used for Cleo Kozlowski simulation of C. elegans (2007)
-     */
-    if ( disp && ( disp->style & 1 ) && obj.tag() == Fake::TAG )
-    {
-        Solid const* sol = Solid::toSolid(obj.core());
-        if ( sol && sol->nbPoints() >= 4 )
-        {
-#if ( DIM == 3 )
-            bodyColor(*sol);
-            glEnable(GL_LIGHTING);
-            glPushMatrix();
-            Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
-            Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
-            stretchAlignZ(a, b, 1);
-            gle::dualPass(gle::barrel);
-            glPopMatrix();
-            glDisable(GL_LIGHTING);
-#else
-            glDisable(GL_LIGHTING);
-            bodyColorF(*sol).load();
-            drawStrip(sol->nbPoints(), sol->addrPoints(), GL_LINES);
-#endif
-        }
-    }
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 //------------------------------------------------------------------------------

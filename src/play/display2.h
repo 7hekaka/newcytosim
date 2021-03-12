@@ -43,8 +43,6 @@ public:
     /// draw bridging Couples
     void drawCoupleB(Couple const*) const;
     
-    /// draw an Organizer
-    void drawOrganizer(Organizer const&) const;
 };
 
 #endif

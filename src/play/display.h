@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
@@ -246,17 +246,17 @@ public:
 
     
     /// draw a Bead
-    virtual void drawBead(Bead const&);
+    void drawBead(Bead const&);
 
     /// draw translucent elements of a Bead
-    virtual void drawBeadT(Bead const&);
+    void drawBeadT(Bead const&);
     
     /// draw the Beads
     void drawBeads(BeadSet const&);
 
     
     /// draw opaque elements of a Solid
-    virtual void drawSolid(Solid const&);
+    void drawSolid(Solid const&);
     
     /// draw translucent elements of a Solid
     void drawSolidT(Solid const&, size_t);
@@ -266,10 +266,10 @@ public:
     
     
     /// draw the Sphere
-    virtual void drawSphere(Sphere const&);
+    void drawSphere(Sphere const&);
 
     /// draw translucent elements of a Sphere
-    virtual void drawSphereT(Sphere const&);
+    void drawSphereT(Sphere const&);
     
     /// draw the Spheres
     void drawSpheres(SphereSet const&);
@@ -300,7 +300,7 @@ public:
     virtual void drawCouplesB(CoupleSet const&) const;
 
     /// draw Organizer
-    virtual void drawOrganizer(Organizer const&) const = 0;
+    virtual void drawOrganizer(Organizer const&) const;
     
     /// draw the Organizers
     void drawOrganizers(OrganizerSet const&);
