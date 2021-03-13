@@ -758,8 +758,8 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& can)
 
 /**
  Distribute up to `nb` Couples from `can` by attaching them to locations specified
- by `loc1` and `loc2`. These positions correspond to points where 2 fibers cross,
- as returned by FiberSet::allIntersections().
+ by `loc1` and `loc2`. These positions correspond fibers crossings, calculated by
+ FiberSet::allIntersections().
  */
 void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
                             CoupleList& can, size_t nb)
@@ -1161,10 +1161,16 @@ void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properti
 }
 
 
+void CoupleSet::equilibrate()
+{
+    equilibrate(simul_.fibers, simul_.properties);
+}
+
+
 /**
  This takes all the Free Couple and attach them at the intersection points of the network of filaments
  */
-void CoupleSet::bindToIntersections(FiberSet const& fibers, PropertyList const& properties)
+void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleList& can, PropertyList const& properties)
 {
     // calculate maximum range of Hands
     real range = 0;
@@ -1186,18 +1192,42 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, PropertyList const& 
     
     Cytosim::log << "Connect on " << nbc << " intersections within range " << range << "\n";
     
-    if ( nbc > 0 )
-    {
-        Couple * c = firstFF(), * nxt;
-        while ( c )
-        {
-            nxt = c->next();
-            size_t p = RNG.pint32(nbc);
-            c->attach1(loc1[p]);
-            c->attach2(loc2[p]);
-            c = nxt;
-        }
-    }
+    uniAttach12(loc1, loc2, can, can.size());
 }
 
 
+/** applies to all couples of given class */
+void CoupleSet::bindToIntersections(CoupleProp const* cop)
+{
+    CoupleList can;
+    Couple * c = firstFF(), * nxt;
+    while ( c )
+    {
+        nxt = c->next();
+        if ( cop == c->property() )
+        {
+            unlink(c);
+            can.push_back(c);
+        }
+        c = nxt;
+    }
+
+    bindToIntersections(simul_.fibers, can, simul_.properties);
+}
+
+
+/** applies to all free couples */
+void CoupleSet::bindToIntersections()
+{
+    CoupleList can;
+    Couple * c = firstFF(), * nxt;
+    while ( c )
+    {
+        nxt = c->next();
+        unlink(c);
+        can.push_back(c);
+        c = nxt;
+    }
+
+    bindToIntersections(simul_.fibers, can, simul_.properties);
+}

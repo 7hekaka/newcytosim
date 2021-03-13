@@ -51,6 +51,9 @@ private:
 
     /// parse command `cut`
     void parse_cut(std::istream&);
+    
+    /// parse command `cut`
+    void parse_connect(std::istream&);
 
     /// parse command `run`
     void parse_run(std::istream&);

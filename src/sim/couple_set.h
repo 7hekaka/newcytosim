@@ -42,7 +42,7 @@ private:
     ObjectPool aaList;
     
     /// return one of ffList, afList, faList, aaList, corresponding to given states
-    ObjectPool&   sublist(bool attached1, bool attached2)
+    ObjectPool& sublist(bool attached1, bool attached2)
     {
         if ( attached1 )
         {
@@ -218,9 +218,18 @@ public:
     /// distribute all Couple on the fibers to approximate an equilibrated state
     void equilibrate(FiberSet const&, PropertyList const&);
     
-    /// distribute all free Couples on filament intersections
-    void bindToIntersections(FiberSet const&, PropertyList const&);
+    /// distribute all Couple on the fibers to approximate an equilibrated state
+    void equilibrate();
+
+    /// distribute Couples on filament intersections
+    void bindToIntersections(FiberSet const&, CoupleList&, PropertyList const&);
     
+    /// distribute Couples on filament intersections
+    void bindToIntersections(CoupleProp const*);
+    
+    /// distribute all free Couples on filament intersections
+    void bindToIntersections();
+
     /// prepare for step()
     void prepare(PropertyList const& properties);
     

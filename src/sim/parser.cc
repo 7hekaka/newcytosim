@@ -642,6 +642,30 @@ void Parser::parse_cut(std::istream& is)
 
 
 //------------------------------------------------------------------------------
+/**
+ Attach Couple or Single to position on fibers
+ 
+     connect COUPLE_NAME
+     {
+        
+     }
+ */
+void Parser::parse_connect(std::istream& is)
+{
+    std::streampos ipos = is.tellg();
+    std::string str = Tokenizer::get_token(is);
+    std::string blok = Tokenizer::get_block(is, '{');
+    
+    if ( do_run )
+    {
+        Glossary opt(blok);
+        execute_connect(str, opt);
+        check_warnings(opt, is, ipos);
+    }
+}
+
+
+//------------------------------------------------------------------------------
 
 /**
  @copydetails Interface::execute_run
@@ -1198,8 +1222,6 @@ int Parser::evaluate_one(std::istream& is)
     else if ( tok == "include" )
         parse_read(is);
 #endif
-    else if ( tok == "cut" )
-        parse_cut(is);
     else if ( tok == "report" )
         parse_report(is);
     else if ( tok == "write" )
@@ -1212,10 +1234,12 @@ int Parser::evaluate_one(std::istream& is)
         parse_call(is);
     else if ( tok == "repeat" )
         parse_repeat(is);
-    else if ( tok == "skip" )
-        Tokenizer::get_block(is, '{');
     else if ( tok == "for" )
         parse_for(is);
+    else if ( tok == "cut" )
+        parse_cut(is);
+    else if ( tok == "connect" )
+        parse_connect(is);
     else if ( tok == "restart" )
     {
         // reset simulation and rewind config file, repeating forever
@@ -1224,8 +1248,8 @@ int Parser::evaluate_one(std::istream& is)
         is.seekg(0);
         return 0;
     }
-    else if ( tok == "end" )
-        return 2; //parse_end(is);
+    else if ( tok == "stop" )
+        return 2;
     else if ( tok == ";" )
         return 0;
     else if ( tok == "dump" )

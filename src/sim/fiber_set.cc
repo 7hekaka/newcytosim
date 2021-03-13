@@ -440,19 +440,19 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
             FiberSegment seg(fib, s);
             list = grid.cellTargets(seg.middle());
             //std::clog << seg << ":";
-            for ( FiberSegment const& can : list )
+            for ( FiberSegment const& sog : list )
             {
-                Fiber * bif = const_cast<Fiber*>(can.fiber());
+                Fiber * bif = const_cast<Fiber*>(sog.fiber());
                 if ( fib < bif )
                 {
                     //std::clog << "   " << can;
                     real abs1, abs2;
-                    if ( seg.shortestDistance(can, abs1, abs2) <= sup )
+                    if ( seg.shortestDistance(sog, abs1, abs2) <= sup )
                     {
-                        if ( seg.within(abs1) & can.within(abs2) )
+                        if ( seg.within(abs1) & sog.within(abs2) )
                         {
                             res1.emplace(fib, abs1+fib->abscissaPoint(s));
-                            res2.emplace(bif, abs2+bif->abscissaPoint(can.point()));
+                            res2.emplace(bif, abs2+bif->abscissaPoint(sog.point()));
                         }
                     }
                 }

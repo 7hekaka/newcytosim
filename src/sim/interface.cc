@@ -388,7 +388,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
             i->mark(mk);
     }
     
-    // syntax sugar, translation after placement
+    // translation after placement
     Vector vec;
     if ( opt.set(vec, "translation") )
         ObjectSet::translateObjects(res, vec);
@@ -411,9 +411,11 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
 //------------------------------------------------------------------------------
 /**
  Creates `cnt` objects of class `name`.
- The objects are placed at random position in a random orientation within the current Space.
+ The objects are distributed uniformly within the current Space, also with
+ random orientations.
  
- This is meant to be faster than calling execute_new(name, opt) `cnt` times.
+ This is meant to replace calling execute_new(name, opt) `cnt` times, when
+ no option was given to the command.
  */
 void Interface::execute_new(std::string const& name, size_t cnt)
 {
@@ -459,7 +461,6 @@ void Interface::execute_new(std::string const& name, size_t cnt)
     }
     
     VLOG("-NEW " << cnt << "`" << name << "' objects\n");
-
     //hold();
 }
 
@@ -669,6 +670,26 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
     
     VLOG("-CUT PLANE (" << n << ").x = " << -a << "\n");
     simul_.fibers.planarCut(objs, n, a, stateP, stateM);
+}
+
+
+void Interface::execute_connect(std::string const& name, Glossary& opt)
+{
+    ObjectList objs;
+
+    if ( name == "couple" )
+    {
+        simul_.couples.bindToIntersections();
+    }
+    else
+    {
+        Property * pp = simul_.properties.find_or_die(name);
+        if ( pp->category() != "couple" )
+            throw InvalidSyntax("only `bind couple' or `bind couple_class' is supported");
+        simul_.couples.bindToIntersections(static_cast<CoupleProp*>(pp));
+    }
+    
+    VLOG("-CONNECT (" << name << "\n");
 }
 
 //------------------------------------------------------------------------------
@@ -1045,9 +1066,9 @@ void Interface::execute_write(std::string const& name, std::string const& what, 
 void Interface::execute_call(std::string& str, Glossary& opt)
 {
     if ( str == "equilibrate" )
-        simul_.couples.equilibrate(simul_.fibers, simul_.properties);
+        simul_.couples.equilibrate();
     else if ( str == "connect" )
-        simul_.couples.bindToIntersections(simul_.fibers, simul_.properties);
+        simul_.couples.bindToIntersections();
     else if ( str == "custom0" )
         simul_.custom0(opt);
     else if ( str == "custom1" )
