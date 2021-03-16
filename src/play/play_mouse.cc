@@ -66,42 +66,35 @@ void processMouseDrag(int, int, Vector3& ori3, const Vector3& pos3, int mode)
 void timerCallback(const int value)
 {
     unsigned millisec = prop.delay;
-    
-    //thread.debug("timerCallback");
+
+    //std::clog << "timerCallback @ " << std::fixed << simul.time() << "s\n";
     if ( player.goLive && thread.alive() )
     {
-        if ( prop.save_images && 0 == thread.trylock() )
-        {
-            player.drawScene(glApp::views[1]);
-            player.saveView("image", prop.image_index++, prop.downsample);
-            thread.unlock();
-        }
-        
+        //thread.debug("timerCallback");
         thread.signal();
     }
-    else if ( prop.play )
+    else
     {
-        if ( prop.save_images )
-        {
-            player.drawScene(glApp::views[1]);
-            player.saveView("movie", thread.currentFrame(), prop.downsample);
-        }
-
+        // in replay mode, no need to lock the simulation state
+        if ( thread.executePipedCommands(32) )
+            glApp::postRedisplay();
+        
         if ( prop.play == 1 )
         {
             // skip prop.period frames, and at least one
             for ( unsigned s = 1; s < prop.period; ++s )
                 player.nextFrame();
             player.nextFrame();
+            glApp::postRedisplay();
         }
         else if ( prop.play == -1 )
+        {
             player.previousFrame();
-        
-        if ( !prop.save_images )
-            glApp::displayMain(); //glApp::postRedisplay();
+            glApp::postRedisplay();
+        }
+        else
+            millisec = 200;
     }
-    else
-        millisec = 200;
     
     glutTimerFunc(millisec, timerCallback, 2);
 }

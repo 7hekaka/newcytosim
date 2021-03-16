@@ -155,7 +155,7 @@ public:
     void       clear();
     
     /// execute commands from standard input, return number of lines processed
-    size_t     readInput(size_t max_nb_lines);
+    size_t     executePipedCommands(size_t max_nb_lines);
     
     /// halt the live simulation, read the config file and change the object parameters
     void       reloadParameters(std::string const& file);
@@ -191,7 +191,7 @@ public:
     /// attempt to load last frame from file
     int        loadLastFrame()      { lock(); int r=reader_.loadLastFrame(simul_); unlock(); return r; }
 
-    /// index of current frame
+    /// index of current framee (0 is lowest valid value)
     size_t     currentFrame() const { return reader_.currentFrame(); }
 
     

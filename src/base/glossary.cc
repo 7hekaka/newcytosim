@@ -103,9 +103,8 @@ bool Glossary::has_key(key_type const& k) const
 
 
 /**
- This will return 'false' if the key is not defined,
- and `true` if the key is defined without a value,
- and the value if the key was defined with a value.
+ @return 'false' if the key is not defined and `true` if the key is defined without a value,
+ and finally the value if the key was defined with a value that can be read as a boolean.
  */
 bool Glossary::use_key(key_type const& k)
 {
@@ -125,7 +124,10 @@ bool Glossary::use_key(key_type const& k)
                 std::istringstream iss(val.value_);
                 iss >> var;
                 if ( iss.fail() )
+                {
+                    print_magenta(std::cerr, "warning: unexpected value `"+val.value_+"' specified for `"+w->first+"'\n");
                     var = false;
+                }
             }
         }
         mTerms.erase(w);
@@ -266,7 +268,7 @@ std::string Glossary::value(key_type const& key, size_t inx) const
 
 /**
  This is equivalement to value(key, inx) == val, except
- that the counter is incremented only if there is a match
+ that the counter is incremented only if there is an exact match
  */
 bool Glossary::value_is(key_type const& key, size_t inx, std::string const& val) const
 {

@@ -7,30 +7,30 @@
 
 void PlayerProp::clear()
 {
-    play         = 0;
-    loop         = 0;
-    exit_at_eof  = false;
-    period       = 1;
-    delay        = 32;
-
-    report_index = 0;
+    play      = 0;
+    loop      = 0;
+    auto_exit = 0;
+    period    = 1;
+    delay     = 32;
 
     for ( int k = 0; k < NB_MAGIC_KEYS; ++k )
     {
-        magic_key[k]  = 0;
+        magic_key[k] = 0;
         magic_code[k] = "";
     }
     
-    save_images = false;
+    save_images = 0;
+    downsample = 1;
     if ( SaveImage::supported("png") )
         image_format = "png";
     else
         image_format = "ppm";
 
     image_dir    = "";
-    downsample   = 1;
+    report_index = 0;
     image_index  = 0;
     poster_index = 0;
+    saved_image  = -1;
 }
 
 
@@ -48,6 +48,7 @@ void PlayerProp::read(Glossary& glos)
     glos.set(downsample,   "downsample");
     glos.set(downsample,   "downsampling");
     glos.set(report,       "report");
+    glos.set(auto_exit,    "auto_exit");
 
     if ( ! SaveImage::supported(image_format.c_str()) )
         throw InvalidParameter("unsupported image format");

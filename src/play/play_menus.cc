@@ -399,7 +399,7 @@ static void processMenuExport(int item)
         case 6: player.saveScene(4, "poster", prop.poster_index++); return;
         case 7: player.saveScene(8, "poster", prop.poster_index++); return;
 
-        case 9: prop.save_images = 1; player.startPlayback(); return;
+        case 9: prop.save_images = 9999; player.startPlayback(); return;
         case 10: prop.image_index = 0; return;
         
         case 20: player.writePlayParameters(std::cout, true); return;

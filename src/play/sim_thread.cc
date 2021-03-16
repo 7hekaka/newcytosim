@@ -421,7 +421,7 @@ inline int has_input(int fd)
  Read standard input and executes incoming commands.
  This should be executed by a process who already owns the lock on the data
  */
-size_t SimThread::readInput(size_t max_nb_lines)
+size_t SimThread::executePipedCommands(size_t max_nb_lines)
 {
     const size_t LINESIZE = 2048;
     clearerr(stdin);

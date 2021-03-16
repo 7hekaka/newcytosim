@@ -59,7 +59,8 @@ void Player::nextFrame()
     {
         if ( thread.loadNextFrame() )
         {
-            if ( prop.exit_at_eof )
+            // this means end of file is reached:
+            if ( prop.auto_exit )
                 exit(EXIT_SUCCESS);
             if ( prop.loop )
                 thread.loadFrame(0);
@@ -69,6 +70,7 @@ void Player::nextFrame()
                 stop();
             }
         }
+        //std::clog << simul.nbObjects() << " objects @ " << std::fixed << simul.time() << "s\n";
     }
     catch( Exception & e )
     {

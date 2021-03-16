@@ -250,7 +250,7 @@ void Player::prepareDisplay(View& view, int mag)
 //------------------------------------------------------------------------------
 void Player::drawCytosim()
 {
-    //std::clog << "displayCytosim @ " << std::fixed << simul.time() << "s\n";
+    //std::clog << " drawCytosim @ " << std::fixed << simul.time() << "s\n";
     try {
         // draw:
         if ( modulo && disp.tile )
@@ -309,6 +309,22 @@ void Player::drawScene(View& view)
     drawCytosim();
     view.closeDisplay();
     glFinish();
+    
+    if ( prop.save_images > 0 )
+    {
+        size_t t = simul.time();
+        if ( prop.saved_image != t )
+        {
+            prop.saved_image = t;
+            if ( goLive )
+                saveView("image", prop.image_index++, prop.downsample);
+            else
+                saveView("movie", thread.currentFrame(), prop.downsample);
+            // exit if last image was saved:
+            if ( --prop.save_images == 0 && ( prop.auto_exit & 2 ))
+                exit(EXIT_SUCCESS);
+        }
+    }
 }
 
 
@@ -319,7 +335,7 @@ void Player::drawScene(View& view, int mag)
         readDisplayString(view, simul.prop->display);
         simul.prop->display_fresh = false;
     }
-    //thread.debug("display");
+    //thread.debug("drawScene");
     prepareDisplay(view, mag);
     drawScene(view);
 }

@@ -51,26 +51,15 @@ void goodbye()
 #pragma mark - Display
 
 /**
- display is done only if data can be accessed by current thread
+ call drawScene() if data can be accessed by current thread
  */
 void drawLive(View& view, int mag)
 {
     CHECK_GL_ERROR("before drawLive");
     if ( 0 == thread.trylock() )
     {
-        // read and execute commands from incoming pipe:
-        thread.readInput(32);
-        //thread.debug("display locked");
-        if ( simul.prop->display_fresh )
-        {
-            player.readDisplayString(view, simul.prop->display);
-            simul.prop->display_fresh = false;
-        }
-        //thread.debug("display");
-        player.prepareDisplay(view, mag);
-        view.openDisplay();
-        player.drawCytosim();
-        view.closeDisplay();
+        thread.executePipedCommands(32);
+        player.drawScene(view, mag);
         thread.unlock();
     }
     else
@@ -81,9 +70,7 @@ void drawLive(View& view, int mag)
 }
 
 
-/**
- This is a bare-bone version used for off-screen rendering.
- */
+// This must be a plain C-function
 void drawOffscreen(View & view, int mag)
 {
     //std::clog << "drawOffscreen " << glApp::views.size() << '\n';
@@ -119,14 +106,15 @@ void help(std::ostream& os)
           "     image frame=INT,INT,...  render several frames offscreen\n"
           "     image magnify=INT        render frames at higher resolution\n"
           "     movie                    render all frames off screen\n"
-          "     movie=on                 render all frames on screen\n"
+          "     'movie on', 'image on'   render on screen\n"
           "     movie period=INT         render one frame every INT frames\n"
           " (there should be no whitespace around the equal sign)\n";
 }
 
 
 /// different modes:
-enum { ONSCREEN, OFFSCREEN_IMAGE, OFFSCREEN_MOVIE, ONSCREEN_MOVIE };
+enum Style { ONSCREEN, OFFSCREEN };
+enum Mode { NORMAL, SAVE_IMAGE, SAVE_MOVIE };
 
 
 void print_error(Exception const& e)
@@ -138,7 +126,8 @@ void print_error(Exception const& e)
 
 int main(int argc, char* argv[])
 {
-    int mode = ONSCREEN;
+    Style style = ONSCREEN;
+    Mode mode = NORMAL;
     int magnify = 1;
     Glossary arg;
     
@@ -172,21 +161,29 @@ int main(int argc, char* argv[])
     
     if ( arg.use_key("live") || arg.has_key(".cym") )
         player.goLive = true;
-    
+
     if ( arg.use_key("image") )
-        mode = OFFSCREEN_IMAGE;
+    {
+        mode = SAVE_IMAGE;
+        style = OFFSCREEN;
+    }
 
     if ( arg.use_key("poster") )
     {
-        mode = OFFSCREEN_IMAGE;
+        mode = SAVE_IMAGE;
+        style = OFFSCREEN;
         magnify = 3;
     }
     
-    if ( arg.value_is("movie", 0, "on") )
-        mode = ONSCREEN_MOVIE;
-    else if ( arg.use_key("movie") )
-        mode = OFFSCREEN_MOVIE;
+    if ( arg.use_key("movie") )
+    {
+        mode = SAVE_MOVIE;
+        style = OFFSCREEN;
+    }
     
+    if ( arg.use_key("on") )
+        style = ONSCREEN;
+
     // get image over-sampling:
     arg.set(magnify, "magnify") || arg.set(magnify, "magnification");
 
@@ -301,7 +298,7 @@ int main(int argc, char* argv[])
     
     //-------- off-screen (non interactive) rendering -------
     
-    if ( mode == OFFSCREEN_IMAGE || mode == OFFSCREEN_MOVIE )
+    if ( style == OFFSCREEN )
     {
         const int W = view.width() * magnify;
         const int H = view.height() * magnify;
@@ -327,7 +324,7 @@ int main(int argc, char* argv[])
         player.setStyle(disp.style);
         view.initGL();
 
-        if ( mode == OFFSCREEN_IMAGE )
+        if ( mode == SAVE_IMAGE )
         {
             size_t inx = 0;
             // it is possible to specify multiple frame indices:
@@ -336,21 +333,21 @@ int main(int argc, char* argv[])
                 // only save requested frames:
                 if ( thread.currentFrame() == frm )
                 {
-                    drawOffscreen(view, magnify);
+                    player.drawScene(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
                     player.saveView("image", frm, prop.downsample, 2);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }
-        else if ( mode == OFFSCREEN_MOVIE )
+        else if ( mode == SAVE_MOVIE )
         {
             // save every prop.period
             unsigned s = prop.period;
             do {
                 if ( ++s >= prop.period )
                 {
-                    drawOffscreen(view, magnify);
+                    player.drawScene(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
                     player.saveView("movie", frm++, prop.downsample, 2);
@@ -380,13 +377,20 @@ int main(int argc, char* argv[])
     glApp::normalKeyFunc(processNormalKey);
     glApp::newWindow(drawLive);
 
-    if ( mode == ONSCREEN_MOVIE )
+    if ( mode == SAVE_IMAGE )
     {
-        prop.exit_at_eof = true;
-        prop.save_images = true;
+        prop.auto_exit = 2;
+        prop.save_images = 1;
         prop.play = 1;
     }
     
+    if ( mode == SAVE_MOVIE )
+    {
+        prop.auto_exit = 1;
+        prop.save_images = 9999;
+        prop.play = 1;
+    }
+
     //-------- initialize graphical user interface and graphics
 
     try

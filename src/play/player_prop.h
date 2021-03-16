@@ -24,47 +24,22 @@ public:
      */
     
     /// direction of replay: 1: forward and -1: reverse
-    int            play;
+    int play;
     
     /// if true, jump to first frame after last frame
-    unsigned int   loop;
+    unsigned loop;
     
     /// number of simulation steps done between two drawings
     /**
      if period==2, only half of the frames will be displayed
      */
-    unsigned int   period;
+    unsigned period;
     
     /// number of milli-seconds between refresh
-    unsigned int   delay;
+    unsigned delay;
     
-    /// specifies information displayed near the bottom left corner of window
-    std::string    report;
-
-    /// associate a piece of custom code to a key
-    /**
-     Example:
-     
-         % define a magic key to delete fibers:
-         set system display
-         {
-            magic_key1 = m, ( delete 10 microtubule )
-            magic_key2 = C, ( cut microtubule { plane = 1 0 0, 0 } )
-            label = (Press 'm' to delete fibers!)
-         }
-     
-     up to 4 keys (magic_key, magic_key1 ... 3) can be defined.
-     */
-    char           magic_key[NB_MAGIC_KEYS];
-    
-    /// flag to export image files
-    bool           save_images;
-    
-    /// format of exported images [png, ppm]
-    std::string    image_format;
-    
-    /// directory where images are exported
-    std::string    image_dir;
+    /// number of images to export
+    unsigned save_images;
     
     /// if > 1, downsample images before writing them out
     /**
@@ -72,28 +47,56 @@ public:
      Specify a larger image size than desired, and the equivalent downsampling,
      For example, to produce a 512x256 image:
      
-         window_size = 1024, 512
-         downsample = 2
-         
+     window_size = 1024, 512
+     downsample = 2
+     
      */
-    unsigned int   downsample;
+    unsigned downsample;
+
+    /// specifies information displayed near the bottom left corner of window
+    std::string report;
+
+    /// format of exported images [png, ppm]
+    std::string image_format;
     
+    /// directory where images are exported
+    std::string image_dir;
+
+    /// associate a piece of custom code to a key
+    /**
+     Example:
+     
+     % define a magic key to delete fibers:
+     set system display
+     {
+     magic_key1 = m, ( delete 10 microtubule )
+     magic_key2 = C, ( cut microtubule { plane = 1 0 0, 0 } )
+     label = (Press 'm' to delete fibers!)
+     }
+     
+     up to 4 keys (magic_key, magic_key1 ... 3) can be defined.
+     */
+    char magic_key[NB_MAGIC_KEYS];
+
     /** @} */
 
     /// if true, program will quit when end-of-file is reached
-    bool           exit_at_eof;
+    unsigned auto_exit;
     
     /// index of report which is displayed
-    unsigned int   report_index;
+    unsigned report_index;
 
     /// index used to build the name of the exported image
-    unsigned int   image_index;
+    unsigned image_index;
     
     /// index used to build the name of the exported poster
-    unsigned int   poster_index;
-   
+    unsigned poster_index;
+    
+    /// time of last image exported
+    double saved_image;
+    
     /// the piece of cytosim code executed when `magic_key` is pressed (set as `magic_key[1]`)
-    std::string    magic_code[NB_MAGIC_KEYS];
+    std::string magic_code[NB_MAGIC_KEYS];
     
 public:
 

@@ -754,7 +754,7 @@ void processKey(unsigned char key)
             if ( prop.save_images == 0 )
             {
                 if ( player.startPlayback() || thread.alive() )
-                    prop.save_images = 1;
+                    prop.save_images = 9999;
             }
             else
             {

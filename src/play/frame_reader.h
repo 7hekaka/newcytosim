@@ -70,7 +70,7 @@ public:
     /// open file for input
     void openFile(std::string const& file);
     
-    /// return index of current frame
+    /// return index of current frame (0 is lowest valid value)
     size_t currentFrame() const { return frameIndex; }
 
     /// last frame seen in the file
