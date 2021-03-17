@@ -36,9 +36,6 @@ public:
     /// SimThread to control the live simulation
     SimThread    thread;
     
-    /// a flag for live simulation
-    bool         goLive;
-    
     /// the current Display object
     Display  *   mDisplay;
     

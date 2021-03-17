@@ -98,7 +98,7 @@ void Player::rewind()
 
 bool Player::startPlayback()
 {
-    if ( thread.goodFile()  &&  prop.play != 1  && !goLive )
+    if ( thread.goodFile()  &&  prop.play != 1  && !prop.goLive )
     {
         //rewind file if its end was reached:
         if ( thread.eof() )
@@ -133,7 +133,7 @@ void Player::accelerate()
     if ( prop.delay < min_delay )
     {
         prop.delay = min_delay;
-        if ( goLive )
+        if ( prop.goLive )
             flashText("Delay is %i ms! use 'A' to jump frames", prop.delay);
         else
             flashText("Delay is %i ms!", prop.delay);
@@ -146,7 +146,7 @@ void Player::accelerate()
 
 void Player::stop()
 {
-    goLive = 0;
+    prop.goLive = 0;
     prop.play = 0;
     prop.save_images = 0;
 }
@@ -155,7 +155,7 @@ void Player::stop()
 void Player::startstop()
 {
     if ( thread.alive() )
-        goLive = !goLive;
+        prop.goLive = !prop.goLive;
     else if ( thread.goodFile() )
     {
         if ( !prop.play )
@@ -170,7 +170,7 @@ void Player::extendLive()
 {
     if ( 0 == thread.extend() )
         flashText("Extend simulation...");
-    goLive = 1;
+    prop.goLive = 1;
 }
 
 

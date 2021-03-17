@@ -68,7 +68,7 @@ void timerCallback(const int value)
     unsigned millisec = prop.delay;
 
     //std::clog << "timerCallback @ " << std::fixed << simul.time() << "s\n";
-    if ( player.goLive && thread.alive() )
+    if ( prop.goLive && thread.alive() )
     {
         //thread.debug("timerCallback");
         thread.signal();

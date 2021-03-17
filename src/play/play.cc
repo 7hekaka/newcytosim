@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
     }
     
     if ( arg.use_key("live") || arg.has_key(".cym") )
-        player.goLive = true;
+        prop.goLive = true;
 
     if ( arg.use_key("image") )
     {
@@ -226,15 +226,14 @@ int main(int argc, char* argv[])
     {
         std::string file = simul.prop->config_file;
         
-        // config file is `properties.cmo` in replay mode:
-        if ( ! player.goLive || has_frame )
-            file = simul.prop->property_file;
-
-        if ( ! player.goLive || has_frame )
+        if ( ! prop.goLive || has_frame )
         {
+            // config file is `properties.cmo` in replay mode:
+            file = simul.prop->property_file;
+            
             // read config to create all properties
             Parser(simul, 1, 1, 0, 0, 0).readConfig(file);
-                        
+            
             // open trajectory file and load requested frame:
             thread.openFile(simul.prop->trajectory_file);
             
@@ -410,7 +409,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    if ( player.goLive )
+    if ( prop.goLive )
     {
         thread.period(prop.period);
         try

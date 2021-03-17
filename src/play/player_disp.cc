@@ -75,7 +75,7 @@ std::string Player::buildLabel() const
     if ( sh && sh->attached() )
         oss << "\nHandle: " << sh->force().norm() << "pN";
 
-    if ( thread.alive() && goLive )
+    if ( thread.alive() && prop.goLive )
     {
         oss << "\nLive";
         //display ratio number-of-time-step / frame
@@ -316,7 +316,7 @@ void Player::drawScene(View& view)
         if ( prop.saved_image != t )
         {
             prop.saved_image = t;
-            if ( goLive )
+            if ( prop.goLive )
                 saveView("image", prop.image_index++, prop.downsample);
             else
                 saveView("movie", thread.currentFrame(), prop.downsample);

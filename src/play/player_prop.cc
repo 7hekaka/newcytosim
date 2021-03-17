@@ -31,6 +31,7 @@ void PlayerProp::clear()
     image_index  = 0;
     poster_index = 0;
     saved_image  = -1;
+    goLive = 0;
 }
 
 
