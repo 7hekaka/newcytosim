@@ -172,7 +172,7 @@ void timerFunction(int)
     if ( timerOn )
     {
         distributePoints();
-        glutPostRedisplay();
+        glApp::postRedisplay();
         glutTimerFunc(timerDelay, timerFunction, 0);
     }
 }
@@ -207,7 +207,7 @@ void setGeometry()
         printf("Error: `%s'\n", e.msg());
     }
 
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 
@@ -287,7 +287,7 @@ void processMenu(int item)
             toggleSlicing(3);
             break;
     }
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 
@@ -332,8 +332,7 @@ void processSpecialKey(int key, int x=0, int y=0)
         default:
             break;
     }
-    
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 void processNormalKey(unsigned char c, int x=0, int y=0)
@@ -436,8 +435,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
         default:
             glApp::processNormalKey(c,x,y);
     }
-    
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 //------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// F. Nedelec started glApp in Dec 2005
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
+// started glApp in Dec 2005
 
 #include "glut.h"
 #include "glapp.h"
@@ -294,7 +294,7 @@ void glApp::resizeWindow(int w, int h)
     views[win].reshape(w, h);
     flashText("window size %i %i", w, h);
     glClear(GL_COLOR_BUFFER_BIT);
-    glutPostRedisplay();
+    postRedisplay();
 }
 
 
@@ -559,9 +559,9 @@ void glApp::processSpecialKey(int key, int, int)
     //std::clog << "special key " << key << ": " << glutGetModifiers() << "  ";
     switch ( key )
     {
-        case GLUT_KEY_HOME:      view.reset();            glutPostRedisplay(); return;
-        case GLUT_KEY_PAGE_UP:   view.zoom_in(1.4142f);   glutPostRedisplay(); return;
-        case GLUT_KEY_PAGE_DOWN: view.zoom_out(1.4142f);  glutPostRedisplay(); return;
+        case GLUT_KEY_HOME:      view.reset();            postRedisplay(); return;
+        case GLUT_KEY_PAGE_UP:   view.zoom_in(1.4142f);   postRedisplay(); return;
+        case GLUT_KEY_PAGE_DOWN: view.zoom_out(1.4142f);  postRedisplay(); return;
         case GLUT_KEY_LEFT:      dxy.set(-F,0,0);         break;
         case GLUT_KEY_RIGHT:     dxy.set(+F,0,0);         break;
         case GLUT_KEY_DOWN:      dxy.set(0,-F,0);         break;
@@ -587,7 +587,7 @@ void glApp::processSpecialKey(int key, int, int)
         //std::clog << "vec " << dxy << " >>> " << vec << "\n";
         view.move_by((128*view.pixelSize())*vec);
     }
-    glutPostRedisplay();
+    postRedisplay();
 }
 
 
@@ -833,7 +833,7 @@ void glApp::processMenuEvent(int item)
 
         default: ABORT_NOW("unknown menu item");
     }
-    glutPostRedisplay();
+    postRedisplay();
     buildMenu();
 }
 
@@ -905,7 +905,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
 
         glutSetCursor(GLUT_CURSOR_INHERIT);
         mouseAction = MOUSE_PASSIVE;
-        glutPostRedisplay();
+        postRedisplay();
         return;
     }
 
@@ -1000,7 +1000,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
         case MOUSE_PASSIVE:
             return;
     }
-    glutPostRedisplay();
+    postRedisplay();
 }
 
 
@@ -1096,7 +1096,7 @@ void glApp::processMouseDrag(int mX, int mY)
         case MOUSE_PASSIVE: 
             break;
     }
-    glutPostRedisplay();
+    postRedisplay();
 }
 
 //------------------------------------------------------------------------------
@@ -1112,6 +1112,7 @@ void glApp::processPassiveMouseMotion(int mx, int my)
 
 void glApp::flashText0(const char* str)
 {
+    //std::clog << " flashText " << str << "\n";
     flashString = str;
     flashEndTime = TicToc::seconds_since_1970() + 3.0;
     
@@ -1181,11 +1182,17 @@ void glApp::displayMain()
         glutSwapBuffers();
 }
 
-/**
- call glutPostRedisplay() if only the current window needs to be updated
- */
+
 void glApp::postRedisplay()
 {
+    //std::clog << " post\n";
+    glutPostRedisplay();
+}
+
+
+void glApp::postRedisplayAll()
+{
+    //std::clog << " postAll\n";
     for ( unsigned n = 1; n < views.size(); ++n )
         if ( views[n].window() > 0 )
             glutPostWindowRedisplay(n);

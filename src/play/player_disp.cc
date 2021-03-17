@@ -320,9 +320,12 @@ void Player::drawScene(View& view)
                 saveView("image", prop.image_index++, prop.downsample);
             else
                 saveView("movie", thread.currentFrame(), prop.downsample);
-            // exit if last image was saved:
+            // exit if this was the last image requested:
             if ( --prop.save_images == 0 && ( prop.auto_exit & 2 ))
+            {
+                printf("\n");
                 exit(EXIT_SUCCESS);
+            }
         }
     }
 }
@@ -380,11 +383,11 @@ int Player::saveView(const char* root, size_t indx, int downsample, int verbose)
     {
         int W = vp[2] / downsample;
         int H = vp[3] / downsample;
-        if ( verbose > 1 )
+        if ( verbose )
+        {
             printf("\r saved %ix%i snapshot %s    ", W, H, name);
-        else
-            printf(" saved %ix%i snapshot %s\n", W, H, name);
-        fflush(stdout);
+            fflush(stdout);
+        }
     }
     if ( cwd[0] )
         chdir(cwd);

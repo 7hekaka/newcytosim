@@ -133,7 +133,7 @@ void processNormalKey(unsigned char c, int x, int y)
             return;
     }
 
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 /// mouse callback for shift-click, with unprojected mouse position

@@ -60,7 +60,7 @@ void processMouseDrag(int, int, Vector3& ori3, const Vector3& pos3, int mode)
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Input / Timer callback
+#pragma mark - Timer callback
 
 
 void timerCallback(const int value)
@@ -79,18 +79,18 @@ void timerCallback(const int value)
         if ( thread.executePipedCommands(32) )
             glApp::postRedisplay();
         
-        if ( prop.play == 1 )
+        if ( prop.play > 0 )
         {
             // skip prop.period frames, and at least one
             for ( unsigned s = 1; s < prop.period; ++s )
                 player.nextFrame();
             player.nextFrame();
-            glApp::postRedisplay();
+            glApp::postRedisplayAll();
         }
-        else if ( prop.play == -1 )
+        else if ( prop.play < 0 )
         {
             player.previousFrame();
-            glApp::postRedisplay();
+            glApp::postRedisplayAll();
         }
         else
             millisec = 200;

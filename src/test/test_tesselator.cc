@@ -97,8 +97,7 @@ void processNormalKey(unsigned char c, int x, int y)
         case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
         default: glApp::processNormalKey(c,x,y); return;
     }
-    
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 //------------------------------------------------------------------------------

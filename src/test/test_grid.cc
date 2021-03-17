@@ -99,7 +99,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             glApp::processNormalKey(c,x,y);
             return;
     }
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 
@@ -127,7 +127,7 @@ void processMouseClick(int, int, const Vector3 & a, int)
     }
     
     glApp::setMessage(str);
-    glutPostRedisplay();
+    glApp::postRedisplay();
 }
 
 ///set callback for shift-drag, with unprojected mouse and click positions

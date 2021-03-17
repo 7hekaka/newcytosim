@@ -65,7 +65,7 @@ void drawLive(View& view, int mag)
     else
     {
         //thread.debug("display: trylock failed");
-        //glutPostRedisplay();
+        //postRedisplay();
     }
 }
 
@@ -105,8 +105,8 @@ void help(std::ostream& os)
           "     image frame=INT          render specified frame offscreen\n"
           "     image frame=INT,INT,...  render several frames offscreen\n"
           "     image magnify=INT        render frames at higher resolution\n"
-          "     movie                    render all frames off screen\n"
-          "     'movie on', 'image on'   render on screen\n"
+          "     movie                    render all frames offscreen\n"
+          "     'movie on', 'image on'   use on-screen rendering\n"
           "     movie period=INT         render one frame every INT frames\n"
           " (there should be no whitespace around the equal sign)\n";
 }
@@ -336,7 +336,7 @@ int main(int argc, char* argv[])
                     player.drawScene(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
-                    player.saveView("image", frm, prop.downsample, 2);
+                    player.saveView("image", frm, prop.downsample);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }
@@ -350,7 +350,7 @@ int main(int argc, char* argv[])
                     player.drawScene(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
-                    player.saveView("movie", frm++, prop.downsample, 2);
+                    player.saveView("movie", frm++, prop.downsample);
                     s = 0;
                 }
             } while ( 0 == thread.loadNextFrame() );
