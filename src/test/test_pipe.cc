@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 /*
  This is a test for controlling cytosim's play by sending commands via the standard input
  This program initiates a child process to run 'play' and send commands via a Pipe
@@ -86,8 +86,9 @@ int command_zoom(char cmd[], size_t len, int num)
 int command(char cmd[], size_t len, int num)
 {
     float angle = num * M_PI / 180.0;
-    if ( num % 2 )
+    if ( 1 == num & 1 )
     {
+        // change zoom, to test smoothness of response
         float z = 1.0f + 0.25f * cosf(angle*0.25f);
         return snprintf(cmd, len, "change all simul display { zoom=%.3f; }\n", z);
     }
@@ -120,6 +121,7 @@ int command(char cmd[], size_t len, int num)
         }
         case 5:
         {
+            //return snprintf(cmd, len, "change all simul display {save_images=1}\n");
             float s = 0.5*round(16+15*cosf(angle+M_PI));
             return snprintf(cmd, len, "change all fiber display { points=%.1f, 1; };\n", s);
         }

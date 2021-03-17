@@ -291,6 +291,7 @@ void Player::readDisplayString(View& view, std::string const& str)
     {
         Glossary glos(str);
         disp.read(glos);
+        prop.read(glos);
         const int W = view.width(), H = view.height();
         view.read(glos);
         // window size cannot be changed:
