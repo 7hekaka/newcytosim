@@ -93,7 +93,7 @@ void timerCallback(const int value)
             glApp::postRedisplayAll();
         }
         else
-            millisec = 200;
+            millisec = 100;
     }
     
     glutTimerFunc(millisec, timerCallback, 2);

@@ -438,20 +438,19 @@ size_t SimThread::executePipedCommands(size_t max_nb_lines)
             //write(STDOUT_FILENO, ">>>> ", 5); write(STDOUT_FILENO, str, strlen(str));
             try {
                 Parser::evaluate(str);
-                glApp::flashText0(str);
             }
             catch ( Exception & e ) {
-                std::cerr << e.brief() << str;
+                print_green(std::cerr, e.brief());
+                std::cerr << " in: " << str;
             }
             if ( ++cnt >= max_nb_lines )
                 break;
             // check if more input is available:
             if ( has_input(STDIN_FILENO) < 1 )
-            {
-                //printf("processed %i lines from standard input\n", cnt);
                 break;
-            }
         }
+        glApp::flashText0(str);
+        //printf("executed %lu lines from standard input\n", cnt);
         return cnt;
     }
     return 0;

@@ -78,19 +78,21 @@ void stop()
 // this one might give you a headache:
 int command_zoom(char cmd[], size_t len, int num)
 {
-    float z = 2.0f + cosf(num * M_PI / 180.0);
+    float z = 1.0f + 0.25f * cosf(num * M_PI / 180.0);
     return snprintf(cmd, len, "change all simul display { zoom=%.3f; }\n", z);
 }
 
 // build command suitable to cytosim
 int command(char cmd[], size_t len, int num)
 {
-    if ( num == 360 )
-    {
-        return snprintf(cmd, len, "set garbage { crap=2; };\n");
-    }
     float angle = num * M_PI / 180.0;
-    switch ( num % 6 )
+    if ( num % 2 )
+    {
+        float z = 1.0f + 0.25f * cosf(angle*0.25f);
+        return snprintf(cmd, len, "change all simul display { zoom=%.3f; }\n", z);
+    }
+    else
+    switch (( num >> 1 ) % 6 )
     {
         case 0:
         {
@@ -118,8 +120,8 @@ int command(char cmd[], size_t len, int num)
         }
         case 5:
         {
-            float z = 2.0f + cosf(angle/8.0);
-            return snprintf(cmd, len, "change all simul display { zoom=%.3f; }\n", z);
+            float s = 0.5*round(16+15*cosf(angle+M_PI));
+            return snprintf(cmd, len, "change all fiber display { points=%.1f, 1; };\n", s);
         }
     }
     return 0;
@@ -174,7 +176,7 @@ int main(int argc, char* argv[])
                 break;
             }
         }
-        usleep(10000);
+        usleep(20000);
     }
     
     //stop();

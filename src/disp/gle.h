@@ -419,9 +419,11 @@ namespace gle
     void print_color_materials(std::ostream& os);
 }
 
-//#define CHECK_GL_ERROR(ARG) ((void) 0)
-#define CHECK_GL_ERROR(ARG) gle::reportErrors(stderr, ARG)
-
+#ifdef NDEBUG
+#  define CHECK_GL_ERROR(ARG) ((void) 0)
+#else
+#  define CHECK_GL_ERROR(ARG) gle::reportErrors(stderr, ARG)
+#endif
 
 
 #endif

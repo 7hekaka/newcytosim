@@ -1115,9 +1115,6 @@ void glApp::flashText0(const char* str)
     //std::clog << " flashText " << str << "\n";
     flashString = str;
     flashEndTime = TicToc::seconds_since_1970() + 3.0;
-    
-    if ( views.size() > 1  &&  views[1].window()==1 )
-        glutPostWindowRedisplay(1);
 }
 
 void glApp::flashText(const char* fmt, ...)
@@ -1128,6 +1125,9 @@ void glApp::flashText(const char* fmt, ...)
     vsnprintf(tmp, 1024, fmt, args);
     va_end(args);
     flashText0(tmp);
+    
+    if ( views.size() > 1  &&  views[1].window()==1 )
+        glutPostWindowRedisplay(1);
 }
 
 //------------------------------------------------------------------------------

@@ -250,7 +250,12 @@ void Player::prepareDisplay(View& view, int mag)
 //------------------------------------------------------------------------------
 void Player::drawCytosim()
 {
-    //std::clog << " drawCytosim @ " << std::fixed << simul.time() << "s\n";
+#if 0
+    static double sec = TicToc::milliseconds();
+    double now = TicToc::milliseconds();
+    std::clog << " drawCytosim(" << std::setprecision(3) << simul.time() << "s) " << now-sec << "\n";
+    sec = now;
+#endif
     try {
         // draw:
         if ( modulo && disp.tile )
