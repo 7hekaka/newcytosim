@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2021
 
 #include "dim.h"
 #include "smath.h"
@@ -16,27 +16,8 @@
  */
 DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p), prop(p)
 {
-    // set PLUS_END as growing
-    unitP[0] = 1;
-    unitP[1] = 1;
-    unitP[2] = 1;
-    mStateP  = calculateStateP();
-    mGrowthP = 0;
-    
-    nextGrowthP = RNG.exponential();
-    nextHydrolP = RNG.exponential();
-    nextShrinkP = RNG.exponential();
-
-    // set MINUS_END as growing
-    unitM[0] = 1;
-    unitM[1] = 1;
-    unitM[2] = 1;
-    mStateM  = calculateStateM();
-    mGrowthM = 0;
-
-    nextGrowthM = RNG.exponential();
-    nextHydrolM = RNG.exponential();
-    nextShrinkM = RNG.exponential();
+    initM();
+    initP();
 }
 
 
@@ -45,9 +26,21 @@ DynamicFiber::~DynamicFiber()
     prop = nullptr;
 }
 
-
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - MINUS END
+
+/** set MINUS_END as growing */
+void DynamicFiber::initM()
+{
+    unitM[0] = 1;
+    unitM[1] = 1;
+    mStateM  = calculateStateM();
+    mGrowthM = 0;
+
+    nextGrowthM = RNG.exponential();
+    nextHydrolM = RNG.exponential();
+    nextShrinkM = RNG.exponential();
+}
 
 
 state_t DynamicFiber::calculateStateM() const
@@ -72,8 +65,8 @@ void DynamicFiber::setEndStateM(state_t s)
     if ( s != mStateM )
     {
         mStateM = s;
+        unitM[0] = ( 4 - s ) & 1;
         unitM[1] = ( 4 - s ) / 2;
-        unitM[0] = ( 4 - s - 2*unitM[1] );
         assert_true( 0==unitP[0] || unitP[0]==1 );
         assert_true( 0==unitP[1] || unitP[1]==1 );
         assert_true( mStateM == calculateStateM() );
@@ -115,12 +108,26 @@ int DynamicFiber::stepMinusEnd()
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - PLUS END
+
+/** set PLUS_END as growing */
+void DynamicFiber::initP()
+{
+    unitP[0] = 1;
+    unitP[1] = 1;
+    mStateP  = calculateStateP();
+    mGrowthP = 0;
+    
+    nextGrowthP = RNG.exponential();
+    nextHydrolP = RNG.exponential();
+    nextShrinkP = RNG.exponential();
+}
+
 
 /**
  The microscopic state correspond to:
- - STATE_GREEN for growth,
- - STATE_RED for shrinkage
+ - 1 = STATE_GREEN for growth,
+ - 4 = STATE_RED for shrinkage
  .
  */
 state_t DynamicFiber::calculateStateP() const
@@ -144,8 +151,8 @@ void DynamicFiber::setEndStateP(state_t s)
     if ( s != mStateP )
     {
         mStateP = s;
+        unitP[0] = ( 4 - s ) & 1;
         unitP[1] = ( 4 - s ) / 2;
-        unitP[0] = ( 4 - s - 2*unitP[1] );
         assert_true( 0==unitP[0] || unitP[0]==1 );
         assert_true( 0==unitP[1] || unitP[1]==1 );
         assert_true( mStateP == calculateStateP() );
@@ -184,8 +191,7 @@ int DynamicFiber::stepPlusEnd()
         {
         	// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
 			unitP[0] = unitP[1];
-            unitP[1] = unitP[2];
-			unitP[2] = RNG.test(prop->unhydrolyzed_prob[P]);
+            unitP[1] = RNG.test(prop->unhydrolyzed_prob[P]);
 			--res;
             nextShrinkP += RNG.exponential();
             mStateP = calculateStateP();
@@ -231,7 +237,6 @@ int DynamicFiber::stepPlusEnd()
             {
                 case 0:
                     // add fresh unit, shifting old terminal to penultimate position
-                    unitP[2] = unitP[1] * RNG.test(prop->unhydrolyzed_prob[P]);
                     unitP[1] = unitP[0];
                     unitP[0] = 1;
                     ++res;
@@ -247,8 +252,7 @@ int DynamicFiber::stepPlusEnd()
                 case 2:
                     // remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
                     unitP[0] = unitP[1];
-                    unitP[1] = unitP[2];
-                    unitP[2] = RNG.test(prop->unhydrolyzed_prob[P]);
+                    unitP[1] = RNG.test(prop->unhydrolyzed_prob[P]);
                     --res;
                     nextShrinkP += RNG.exponential();
                     break;

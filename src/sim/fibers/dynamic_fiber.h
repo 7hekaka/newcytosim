@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2021
 
 #ifndef DYNAMIC_FIBER_H
 #define DYNAMIC_FIBER_H
@@ -76,36 +76,36 @@ class DynamicFiber : public Fiber
 private:
     
     /// assembly during last time-step
-    real       mGrowthP;
-    real       mGrowthM;
+    real mGrowthP;
+    real mGrowthM;
     
     /// Gillespie countdown timers for PLUS_END:
-    real       nextGrowthP;
-    real       nextHydrolP;
-    real       nextShrinkP;
+    real nextGrowthP;
+    real nextHydrolP;
+    real nextShrinkP;
     
     /// Gillespie countdown timers for MINUS_END:
-    real       nextGrowthM;
-    real       nextHydrolM;
-    real       nextShrinkM;
+    real nextGrowthM;
+    real nextHydrolM;
+    real nextShrinkM;
     
     /// state of units near the PLUS_END: [0] is terminal, [1] is penultimate unit
-    unsigned   unitP[3];
-    
-    /// dynamic state of PLUS_END
-    state_t    mStateP;
+    unsigned unitP[2];
     
     /// state of units near the MINUS_END
-    unsigned   unitM[3];
+    unsigned unitM[2];
     
+    /// dynamic state of PLUS_END
+    state_t mStateP;
+
     /// dynamic state of MINUS_END
-    state_t    mStateM;
+    state_t mStateM;
 
     /// calculate dynamic state from unit states near PLUS_END
-    state_t    calculateStateP() const;
+    state_t calculateStateP() const;
     
     /// calculate dynamic state from unit states near MINUS_END
-    state_t    calculateStateM() const;
+    state_t calculateStateM() const;
    
 public:
     
@@ -120,6 +120,12 @@ public:
         
     //--------------------------------------------------------------------------
     
+    /// initialize minus end
+    void        initM();
+    
+    /// initialize plus end
+    void        initP();
+
     /// return assembly/disassembly state of MINUS_END
     state_t     endStateM() const;
     
