@@ -14,9 +14,6 @@
 
 namespace gle
 {
-    /// function callback
-    using drawCall = void (*)(GLsizei, GLfloat*, GLuint);
-
     /// values of cosinus, sinus over a full circle
     float cir_[2*pi_twice+8] = { 0 };
     
@@ -26,21 +23,20 @@ namespace gle
     /// OpenGL buffers objects for streaming
     GLuint stream_[4] = { 0 };
     
-    /// vertex buffer objects for tubes
-    GLuint tub_ = 0;
+    /// vertex buffer objects for static draw
+    GLuint buf_[4] = { 0 };
 
     /// offset for tube objects
-    GLint start_[32] = { 0 };
+    GLsizei start_[32] = { 0 };
     
+    /// offset for other objects
+    GLsizei buf_pos_[12] = { 0 };
+
     /// vertex buffer objects for icosahedrons
-    GLuint ico_[2] = { 0 };
     GLsizei ico_pts_[8] = { 0 };
     GLsizei ico_idx_[8] = { 0 };
     /// number of faces in icosahedrons
     GLsizei ico_cnt_[8] = { 0 };
-
-    /// vertex buffer objects for varous 3D shapes
-    GLuint buf_[16] = { 0 };
 
     void initialize()
     {
@@ -58,20 +54,19 @@ namespace gle
         // circle starts at index 4
         compute_circle(pi_twice, cir_+4, 1, 0);
         
-        if ( !glIsBuffer(ico_[0]) )
-        {
-            setSphereBuffers();
-            CHECK_GL_ERROR("gle:setSphereBuffers()");
-        }
-        if ( !glIsBuffer(tub_) )
-        {
-            setTubeBuffers();
-            CHECK_GL_ERROR("gle:setTubeBuffers()");
-        }
         if ( !glIsBuffer(buf_[0]) )
         {
+            glGenBuffers(4, buf_);
+            glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+            setSphereBuffers();
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ARRAY_BUFFER, buf_[2]);
+            setTubeBuffers();
+            glBindBuffer(GL_ARRAY_BUFFER, buf_[3]);
             setBuffers();
             CHECK_GL_ERROR("gle:setBuffers()");
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         if ( !glIsBuffer(stream_[0]) )
             glGenBuffers(4, stream_);
@@ -81,11 +76,7 @@ namespace gle
     
     void release()
     {
-        glDeleteBuffers(2, ico_);
-        ico_[0] = 0;
-        glDeleteBuffers(1, &tub_);
-        tub_ = 0;
-        glDeleteBuffers(14, buf_);
+        glDeleteBuffers(4, buf_);
         buf_[0] = 0;
         glDeleteBuffers(4, stream_);
         stream_[0] = 0;
@@ -474,13 +465,16 @@ namespace gle
 
     //-----------------------------------------------------------------------
     #pragma mark - Some 3D objects
-    
+
+    /// function callback
+    using drawCall = void (*)(flute6*&, size_t, float const*, float const*);
+
     /// code to calculate and print normals
-    void printNormals(size_t cnt, GLfloat const* pts)
+    void printNormals(size_t cnt, float const* pts)
     {
         for ( size_t i = 0; i < cnt; ++i )
         {
-            GLfloat const* x = pts + 9 * i;
+            float const* x = pts + 9 * i;
             Vector3 a(x[0], x[1], x[2]);
             Vector3 b(x[3], x[4], x[5]);
             Vector3 c(x[6], x[7], x[8]);
@@ -491,46 +485,71 @@ namespace gle
             printf("\n");
         }
     }
+    
+    /// set triangle strip for tube with hexagonal crosssection
+    void setHexTube(flute6*& flu, float B, float T, float rad)
+    {
+        // the hexagon has the same surface as a disc of radius rad.
+        constexpr float C = 0.8660254037844386f; //std::sqrt(3)/2;
+        constexpr float S = 0.5f;
+        const float R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const float Y = R * C, X = R * S;
+        
+        flu[0] = { R, 0, T, 1, 0, 0};
+        flu[1] = { R, 0, B, 1, 0, 0};
+        flu[2] = { X, Y, T, S, C, 0};
+        flu[3] = { X, Y, B, S, C, 0};
+        flu[4] = {-X, Y, T,-S, C, 0};
+        flu[5] = {-X, Y, B,-S, C, 0};
+        flu[6] = {-R, 0, T,-1, 0, 0};
+        flu[7] = {-R, 0, B,-1, 0, 0};
+        flu[8] = {-X,-Y, T,-S, -C, 0};
+        flu[9] = {-X,-Y, B,-S, -C, 0};
+        flu[10] = { X,-Y, T, S,-C, 0};
+        flu[11] = { X,-Y, B, S,-C, 0};
+        flu[12] = { R, 0, T, 1, 0, 0};
+        flu[13] = { R, 0, B, 1, 0, 0};
+        flu += 14;
+    }
 
     /// Tetrahedron is make of 4 triangles = 12 vertices
-    void drawTetrahedron(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat R=1.2f)
+    void setTetrahedron(drawCall func, flute6*& flt, float R=1.2f)
     {
-        const GLfloat S = R / M_SQRT3;
-        const GLfloat Y = 2 * S;
-        const GLfloat B = -M_SQRT1_2 * S;
-        const GLfloat Z = -3 * B;
+        const float S = R / M_SQRT3;
+        const float Y = 2 * S;
+        const float B = -M_SQRT1_2 * S;
+        const float Z = -3 * B;
 
         // -R,-S, B
         // +R,-S, B
         //  0, Y, B
         //  0, 0, Z
-        GLfloat pts[9*4] = {
+        float pts[9*4] = {
              R,-S, B,-R,-S, B, 0, Y, B,
              R,-S, B, 0, Y, B, 0, 0, Z,
              0, Y, B,-R,-S, B, 0, 0, Z,
             -R,-S, B, R,-S, B, 0, 0, Z,
         };
         //printNormals(4, pts);
-        GLfloat dir[9*4] = {
+        float dir[9*4] = {
             +0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
             +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
             -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
             +0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333
         };
         assert_true( sizeof(pts) == sizeof(dir) );
-        func1(sizeof(dir), dir, bufN);
-        func2(sizeof(pts), pts, bufP);
+        func(flt, 12, pts, dir);
     }
     
     /// The star is made of two Tetrahedrons: 8 triangles = 24 vertices
-    void drawStar(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat R=1.2f)
+    void setStar(drawCall func, flute6*& flt, float R=1.2f)
     {
-        const GLfloat S = R / M_SQRT3;
-        const GLfloat Y = 2 * S;
-        const GLfloat B = -M_SQRT1_2 * S;
-        const GLfloat Z = -3.0 * B;
+        const float S = R / M_SQRT3;
+        const float Y = 2 * S;
+        const float B = -M_SQRT1_2 * S;
+        const float Z = -3.0 * B;
 
-        GLfloat pts[9*8] = {
+        float pts[9*8] = {
              R,-S, B,-R,-S, B, 0, Y, B,
              R,-S, B, 0, Y, B, 0, 0, Z,
              0, Y, B,-R,-S, B, 0, 0, Z,
@@ -542,7 +561,7 @@ namespace gle
             -R, S,-B, R, S,-B, 0, 0,-Z,
         };
         
-        GLfloat dir[9*8] = {
+        float dir[9*8] = {
             +0.00000, 0.00000,-1.00000, 0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
             +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
             -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
@@ -554,15 +573,14 @@ namespace gle
             -0.00000, 0.94281,-0.33333, 0.00000, 0.94281,-0.33333, 0.00000, 0.94281,-0.33333
         };
         assert_true( sizeof(pts) == sizeof(dir) );
-        func1(sizeof(dir), dir, bufN);
-        func2(sizeof(pts), pts, bufP);
+        func(flt, 24, pts, dir);
     }
 
     
     /// Cube is make of 12 triangles = 36 vertices
-    void drawCube(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat R=0.5773502692f)
+    void setCube(drawCall func, flute6*& flt, float R=0.5773502692f)
     {
-        GLfloat pts[9*12] = {
+        float pts[9*12] = {
             +R, R, R, R,-R,-R, R, R,-R,
             +R,-R,-R, R, R, R, R,-R, R,
             +R, R, R, R, R,-R,-R, R,-R,
@@ -577,7 +595,7 @@ namespace gle
             +R, R,-R, R,-R,-R,-R,-R,-R
         };
         
-        GLfloat dir[9*12] = {
+        float dir[9*12] = {
             +1, 0, 0, 1, 0, 0, 1, 0, 0,
             +1, 0, 0, 1, 0, 0, 1, 0, 0,
             +0, 1, 0, 0, 1, 0, 0, 1, 0,
@@ -592,16 +610,15 @@ namespace gle
             +0, 0,-1, 0, 0,-1, 0, 0,-1
         };
         assert_true( sizeof(pts) == sizeof(dir) );
-        func1(sizeof(dir), dir, bufN);
-        func2(sizeof(pts), pts, bufP);
+        func(flt, 36, pts, dir);
     }
     
     /// Octahedron is make of 8 triangles = 24 vertices
-    void drawOctahedron(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat R=1.46459188756f)
+    void setOctahedron(drawCall func, flute6*& flt, float R=1.46459188756f)
     {
         // Eight triangles, ordered counterclockwise
         // set size to match the volume of the unit sphere
-        GLfloat pts[9*8] = {
+        float pts[9*8] = {
             +R, 0, 0, 0, 0, R, 0,-R, 0,
             +0, 0,-R,-R, 0, 0, 0, R, 0,
             +0, 0, R,-R, 0, 0, 0,-R, 0,
@@ -613,8 +630,8 @@ namespace gle
         };
         
         // normals
-        const GLfloat N = 1 / M_SQRT3;
-        GLfloat dir[9*8] = {
+        const float N = 1 / M_SQRT3;
+        float dir[9*8] = {
             +N,-N, N, N,-N, N, N,-N, N,
             -N, N,-N,-N, N,-N,-N, N,-N,
             -N,-N, N,-N,-N, N,-N,-N, N,
@@ -625,24 +642,23 @@ namespace gle
             -N,-N,-N,-N,-N,-N,-N,-N,-N
         };
         assert_true( sizeof(pts) == sizeof(dir) );
-        func1(sizeof(dir), dir, bufN);
-        func2(sizeof(pts), pts, bufP);
+        func(flt, 24, pts, dir);
     }
 
     
 #if ( 0 )
     // this is used to calculate the vertices of the icosahedron
-    void icoFace(GLfloat* a, GLfloat* b, GLfloat* c)
+    void icoFace(float* a, float* b, float* c)
     {
-        GLfloat pts[9] = {a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]};
-        GLfloat nx = (a[0]+b[0]+c[0]) / 3.0f;
-        GLfloat ny = (a[1]+b[1]+c[1]) / 3.0f;
-        GLfloat nz = (a[2]+b[2]+c[2]) / 3.0f;
-        GLfloat n = std::sqrt( nx * nx + ny * ny + nz * nz );
+        float pts[9] = {a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]};
+        float nx = (a[0]+b[0]+c[0]) / 3.0f;
+        float ny = (a[1]+b[1]+c[1]) / 3.0f;
+        float nz = (a[2]+b[2]+c[2]) / 3.0f;
+        float n = std::sqrt( nx * nx + ny * ny + nz * nz );
         nx /= n;
         ny /= n;
         nz /= n;
-        GLfloat nor[9] = {nx, ny, nz, nx, ny, nz, nx, ny, nz};
+        float nor[9] = {nx, ny, nz, nx, ny, nz, nx, ny, nz};
         glVertexPointer(3, GL_FLOAT, 0, pts);
         glNormalPointer(GL_FLOAT, 0, nor);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -658,19 +674,19 @@ namespace gle
         }
     }
     
-    void icoFace(GLfloat* pts, size_t a, size_t b, size_t c)
+    void icoFace(float* pts, size_t a, size_t b, size_t c)
     {
         icoFace(pts+3*a, pts+3*b, pts+3*c);
     }
     
     void icosahedron()
     {
-        const GLfloat G = 0.5+0.5*std::sqrt(5.0);
-        const GLfloat O = 1/std::sqrt(G*G+1); //0.5257311121f;
-        const GLfloat T = G * O;   //0.8506508084f;
+        const float G = 0.5+0.5*std::sqrt(5.0);
+        const float O = 1/std::sqrt(G*G+1); //0.5257311121f;
+        const float T = G * O;   //0.8506508084f;
         
         // Twelve vertices of icosahedron on unit sphere
-        GLfloat pts[3*12] = {
+        float pts[3*12] = {
             +T,  O,  0, // 0
             -T, -O,  0, // 1
             -T,  O,  0, // 2
@@ -718,12 +734,12 @@ namespace gle
 #endif
     
     /// Icosahedrong with 20 triangles = 60 vertices
-    void drawIcosahedron(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat R=1.0f)
+    void setIcosahedron(drawCall func, flute6*& flt, float R=1.0f)
     {
-        const GLfloat T = R * 0.8506508084f;      // (1 + sqrt(5))/2
-        const GLfloat O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
+        const float T = R * 0.8506508084f;      // (1 + sqrt(5))/2
+        const float O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
 
-        GLfloat pts[9*20] = {
+        float pts[9*20] = {
             -O,  0, -T,   O,  0, -T,   0, -T, -O,
             -O,  0, -T,   0,  T, -O,   O,  0, -T,
             +O,  0, -T,   T, -O,  0,   0, -T, -O,
@@ -746,7 +762,7 @@ namespace gle
             +O,  0,  T,  -O,  0,  T,   0, -T,  O,
         };
         
-        GLfloat dir[9*20] = {
+        float dir[9*20] = {
             +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724,
             +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724,
             +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503,
@@ -769,22 +785,21 @@ namespace gle
             +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724,
         };
         assert_true( sizeof(pts) == sizeof(dir) );
-        func1(sizeof(dir), dir, bufN);
-        func2(sizeof(pts), pts, bufP);
+        func(flt, 60, pts, dir);
     }
     
     /// Three fins similar to the tail of a V2 rocket
-    void drawArrowTail(drawCall func1, drawCall func2, GLuint bufN, GLuint bufP, GLfloat R=0.1f,
-                       GLfloat B=-0.5f, GLfloat H=-1.5f, GLfloat L=2.0f)
+    void setArrowTail(drawCall func, flute6*& flt, float R=0.1f,
+                       float B=-0.5f, float H=-1.5f, float L=2.0f)
     {
-        const GLfloat T = B + L;
-        const GLfloat U = H + L;
-        const GLfloat C = 0.5f;
-        const GLfloat S = M_SQRT3_2;
-        const GLfloat cR = R * C;
-        const GLfloat sR = R * S;
+        const float T = B + L;
+        const float U = H + L;
+        const float C = 0.5f;
+        const float S = M_SQRT3_2;
+        const float cR = R * C;
+        const float sR = R * S;
 
-        GLfloat pts[9*15] = {
+        float pts[9*15] = {
             cR,-sR, B,  1,  0, H,  1,  0, U,
             cR,-sR, B,  1,  0, U,  0,  0, T,
             cR, sR, B,  0,  0, T,  1,  0, U,
@@ -802,7 +817,7 @@ namespace gle
             cR,-sR, B, cR, sR, B,  1,  0, H
         };
         
-        GLfloat dir[9*15] = {
+        float dir[9*15] = {
             0, -1, 0,  0, -1, 0,  0, -1, 0,
             0, -1, 0,  0, -1, 0,  0, -1, 0,
             0, +1, 0,  0, +1, 0,  0, +1, 0,
@@ -820,8 +835,7 @@ namespace gle
             -1, 0,-1, -1,  0,-1, -1,  0,-1
         };
         assert_true( sizeof(pts) == sizeof(dir) );
-        func1(sizeof(dir), dir, bufN);
-        func2(sizeof(pts), pts, bufP);
+        func(flt, 45, pts, dir);
     }
     
     //-----------------------------------------------------------------------
@@ -841,7 +855,7 @@ namespace gle
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
     }
     
-    size_t setCube(flute3* flu, float R)
+    size_t setCube(flute3*& flu, float R)
     {
         const float U = -R;
         flu[0] = {R, U, U};
@@ -858,6 +872,7 @@ namespace gle
         flu[11] = {U, R, R};
         flu[12] = {R, U, R};
         flu[13] = {U, U, R};
+        flu += 14;
         return 14;
     }
 
@@ -937,30 +952,14 @@ namespace gle
         for ( int u : {11, 41 } ) flu[u] = {-X, Y, Z};
         for ( int u : {1,40,51} ) flu[u] = { X, Y, Z};
     }
-    
-    void initBlobBuffer(GLuint buf)
+
+    void setBlob(flute3*& flu, bool modified)
     {
-        const size_t cnt = 3*64;
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute3), nullptr, GL_STATIC_DRAW);
-        flute3 * flu = (flute3*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        setBlob(flu);
-        setBlob(flu+64);
-        modifyBlob(flu+64);
-        setCube(flu+128, 0.5f);
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-    }
-    
-    void drawVertexBuffer(GLenum mode, GLuint buf, GLsizei start, GLsizei cnt)
-    {
-        assert_true(glIsBuffer(buf));
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glVertexPointer(3, GL_FLOAT, 0, nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
-        glDrawArrays(mode, start, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        size_t n = setBlob(flu);
+        assert_true(n==52);
+        if ( modified )
+            modifyBlob(flu);
+        flu += n;
     }
     
     void loadBuffer(GLuint buf)
@@ -997,69 +996,100 @@ namespace gle
     }
 
     //-----------------------------------------------------------------------
-
-    void drawTriangleBuffer(GLuint nor, GLuint pts, GLsizei cnt)
-    {
-        assert_true(glIsBuffer(nor));
-        glBindBuffer(GL_ARRAY_BUFFER, pts);
-        glVertexPointer(3, GL_FLOAT, 0, nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, nor);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
-        glDrawArrays(GL_TRIANGLES, 0, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    
-    /// prepare to draw normals
-    void setNormals(GLsizei, GLfloat* nor, GLuint)
-    {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, nor);
-    }
     
     /// draw
-    void drawTriangles(GLsizei cnt, GLfloat* pts, GLuint)
+    void drawVNBuffer(flute6*&, size_t cnt, float const* pts, float const* dir)
     {
+        glEnableClientState(GL_NORMAL_ARRAY);
         glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLES, 0, cnt/(3*sizeof(float)));
+        glNormalPointer(GL_FLOAT, 0, dir);
+        glDrawArrays(GL_TRIANGLES, 0, cnt);
         glDisableClientState(GL_NORMAL_ARRAY);
     }
 
     /// load data to GPU
-    void setBuffer(GLsizei cnt, GLfloat* ptr, GLuint buf)
+    void setBuffer(flute6*& dst, size_t cnt, float const* pts, float const* dir)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glBufferData(GL_ARRAY_BUFFER, cnt, ptr, GL_STATIC_DRAW);
+        // intertwine the data:
+        for ( size_t i = 0; i < cnt; ++i )
+            dst[i] = { pts[3*i], pts[1+3*i], pts[2+3*i], dir[3*i], dir[1+3*i], dir[2+3*i] };
+        dst += cnt;
     }
     
     void setBuffers()
     {
-        glGenBuffers(14, buf_);
-        drawTetrahedron(setBuffer, setBuffer, buf_[0], buf_[1]);
-        drawOctahedron(setBuffer, setBuffer, buf_[2], buf_[3]);
-        drawIcosahedron(setBuffer, setBuffer, buf_[4], buf_[5]);
-        drawArrowTail(setBuffer, setBuffer, buf_[6], buf_[7]);
-        drawCube(setBuffer, setBuffer, buf_[8], buf_[9]);
-        drawStar(setBuffer, setBuffer, buf_[10], buf_[11]);
-        initBlobBuffer(buf_[12]);
+        size_t cnt = 24 * pi_twice;  // this is empirical!
+        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
+        flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        flute6 * ptr = flu;
+        buf_pos_[0] = ptr-flu; setTetrahedron(setBuffer, ptr);
+        buf_pos_[1] = ptr-flu; setOctahedron(setBuffer, ptr);
+        buf_pos_[2] = ptr-flu; setIcosahedron(setBuffer, ptr);
+        buf_pos_[3] = ptr-flu; setArrowTail(setBuffer, ptr);
+        buf_pos_[4] = ptr-flu; setCube(setBuffer, ptr);
+        buf_pos_[5] = ptr-flu; setStar(setBuffer, ptr);
+        buf_pos_[6] = ptr-flu; setHexTube(ptr, 0, 1, 1.0f);
+        buf_pos_[7] = ptr-flu; setHexTube(ptr, 0, 1, 0.5f);
+        buf_pos_[8] = ptr-flu; setHexTube(ptr, 0, 256.f, 0.5f);
+        flute3 * fl3 = (flute3*)ptr;
+        buf_pos_[9] = fl3-(flute3*)flu; setBlob(fl3, false);
+        buf_pos_[10] = fl3-(flute3*)flu; setBlob(fl3, true);
+        buf_pos_[11] = fl3-(flute3*)flu; setCube(fl3, true);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+    
+    inline void drawVNBuffer(GLenum mode, GLint start, size_t cnt)
+    {
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
+        glNormalPointer(GL_FLOAT, sizeof(flute6), (void*)(3*sizeof(float)));
+        glDrawArrays(mode, start, cnt);
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+
+    void drawVNTriangles(GLsizei start, GLsizei cnt)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[3]);
+        drawVNBuffer(GL_TRIANGLES, start, cnt);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
-    void tetrahedron() { drawTriangleBuffer(buf_[0], buf_[1], 12); }
-    void octahedron()  { drawTriangleBuffer(buf_[2], buf_[3], 24); }
-    void icosahedron() { drawTriangleBuffer(buf_[4], buf_[5], 60); }
-    //void icosahedron() { drawIcosahedron(setNormals, drawTriangles, 0, 0); }
-    
-    void arrowTail() { drawTriangleBuffer(buf_[6], buf_[7], 45); }
-    void cube()      { drawTriangleBuffer(buf_[8], buf_[9], 36); }
-    void star()      { drawTriangleBuffer(buf_[10], buf_[11], 24); }
-    
-    void blob()      { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 0, 52); }
-    void needle()    { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 64, 52); }
-    void smallCube() { drawVertexBuffer(GL_TRIANGLE_STRIP, buf_[12], 128, 14); }
+    void drawVNStrip(GLsizei start, GLsizei cnt)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[3]);
+        drawVNBuffer(GL_TRIANGLE_STRIP, start, cnt);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
 
-    void loadBlobBuffer() { loadBuffer(buf_[12]); }
+    void drawTriangleStrip(GLsizei start, GLsizei cnt)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[3]);
+        glVertexPointer(3, GL_FLOAT, 0, nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, nullptr);
+        glDrawArrays(GL_TRIANGLE_STRIP, start, cnt);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
+    void tetrahedron() { drawVNTriangles(buf_pos_[0], 12); }
+    void octahedron()  { drawVNTriangles(buf_pos_[1], 24); }
+    void icosahedron() { drawVNTriangles(buf_pos_[2], 60); }
+    void icosahedron1() { flute6* ptr; setIcosahedron(drawVNBuffer, ptr); }
+    
+    void arrowTail() { drawVNTriangles(buf_pos_[3], 45); }
+    void cube()      { drawVNTriangles(buf_pos_[4], 36); }
+    void star()      { drawVNTriangles(buf_pos_[5], 24); }
+    
+    void hexTube()      { drawVNStrip(buf_pos_[6], 14); }
+    void thinTube()     { drawVNStrip(buf_pos_[7], 14); }
+    void thinLongTube() { drawVNStrip(buf_pos_[8], 14); }
+
+    void blob()      { drawTriangleStrip(buf_pos_[9], 52); }
+    void needle()    { drawTriangleStrip(buf_pos_[10], 52); }
+    void smallCube() { drawTriangleStrip(buf_pos_[11], 14); }
+
+    void loadBlobBuffer() { loadBuffer(buf_[3]); }
     void blobf()     { glDrawArrays(GL_TRIANGLE_STRIP, 0, 52); }
     void needlef()   { glDrawArrays(GL_TRIANGLE_STRIP,64, 52); }
 
@@ -1093,7 +1123,7 @@ namespace gle
     #pragma mark - Tubes and Cones
 
     /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
-    size_t setTube(flute6* flu, size_t inc, float B, float T)
+    void setTube(flute6*& flu, size_t inc, float B, float T)
     {
         assert_true( B <= T );
         size_t i = 0;
@@ -1103,11 +1133,11 @@ namespace gle
             flu[i++] = { C, S, T, C, S, 0 };
             flu[i++] = { C, S, B, C, S, 0 };
         }
-        return i;
+        flu += i;
     }
     
     /// set triangle strip for a tube of constant radius R with Z in [B, T]
-    size_t setTube(flute6* flu, size_t inc, float B, float T, float R)
+    void setTube(flute6*& flu, size_t inc, float B, float T, float R)
     {
         assert_true( B <= T );
         size_t i = 0;
@@ -1117,19 +1147,18 @@ namespace gle
             flu[i++] = { R*C, R*S, T, C, S, 0 };
             flu[i++] = { R*C, R*S, B, C, S, 0 };
         }
-        return i;
+        flu += i;
     }
     
     /// set triangle strip for a double-walled tube of inner radius R with Z in [B, T]
-    size_t setDoubleTube(flute6* flu, size_t inc, float B, float T, float R)
+    void setDoubleTube(flute6*& flu, size_t inc, float B, float T, float R)
     {
-        size_t n = setTube(flu, inc, B, T);
-        n += setTube(flu+n, inc, B, T, R);
-        return n;
+        setTube(flu, inc, B, T);
+        setTube(flu, inc, B, T, R);
     }
 
     /// set triangle strip for a cone of radius rB at Z=B, and rT at Z=T
-    size_t setCone(flute6* flu, size_t inc, float B, float T, float rB, float rT)
+    void setCone(flute6*& flu, size_t inc, float B, float T, float rB, float rT)
     {
         assert_true( B <= T );
         const float H(T-B), R(rT-rB);
@@ -1143,11 +1172,11 @@ namespace gle
             flu[i++] = { rT*C, rT*S, T, tC*C, tC*S, tS };
             flu[i++] = { rB*C, rB*S, B, tC*C, tC*S, tS };
         }
-        return i;
+        flu += i;
     }
 
     /// set triangle strip for a disc at Z, with given normal in Z
-    size_t setDisc(flute6* flu, size_t inc, float Z, float N)
+    void setDisc(flute6*& flu, size_t inc, float Z, float N)
     {
         size_t i = 0;
         flu[i++] = { 1, 0, Z, 0, 0, N };
@@ -1158,33 +1187,7 @@ namespace gle
             flu[i++] = { C, -S, Z, 0, 0, N };
         }
         flu[i++] = {-1, 0, Z, 0, 0, N };
-        return i;
-    }
-
-    /// set triangle strip for tube with hexagonal crosssection
-    size_t setHexTube(flute6* flu, float B, float T, float rad)
-    {
-        // the hexagon has the same surface as a disc of radius rad.
-        constexpr float C = 0.8660254037844386f; //std::sqrt(3)/2;
-        constexpr float S = 0.5f;
-        const float R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        const float Y = R * C, X = R * S;
-        
-        flu[0] = { R, 0, T, 1, 0, 0};
-        flu[1] = { R, 0, B, 1, 0, 0};
-        flu[2] = { X, Y, T, S, C, 0};
-        flu[3] = { X, Y, B, S, C, 0};
-        flu[4] = {-X, Y, T,-S, C, 0};
-        flu[5] = {-X, Y, B,-S, C, 0};
-        flu[6] = {-R, 0, T,-1, 0, 0};
-        flu[7] = {-R, 0, B,-1, 0, 0};
-        flu[8] = {-X,-Y, T,-S, -C, 0};
-        flu[9] = {-X,-Y, B,-S, -C, 0};
-        flu[10] = { X,-Y, T, S,-C, 0};
-        flu[11] = { X,-Y, B, S,-C, 0};
-        flu[12] = { R, 0, T, 1, 0, 0};
-        flu[13] = { R, 0, B, 1, 0, 0};
-        return 14;
+        flu += i;
     }
     
     inline size_t nbTrianglesTube(size_t inc)
@@ -1197,40 +1200,36 @@ namespace gle
         flute6* ptr = flu;
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const float B = -32.f, T = 256.f, E = 0.03125;
-        start_[0] = ptr-flu; ptr += setTube(ptr, 1, 0, 1);
-        start_[1] = ptr-flu; ptr += setTube(ptr, 2, 0, 1);
-        start_[2] = ptr-flu; ptr += setTube(ptr, 4, 0, 1);
-        start_[3] = ptr-flu; ptr += setTube(ptr, 4,-E, 1+E);
-        start_[4] = ptr-flu; ptr += setTube(ptr, 4, 0, 1+E);
-        //start_[5] = ptr-flu; ptr += setDoubleTube(ptr, 4,-E, 1+E, 18/25.0);
-        //start_[6] = ptr-flu; ptr += setDoubleTube(ptr, 4, 0, 1+E, 18/25.0);
-        start_[7] = ptr-flu; ptr += setTube(ptr, 1, B, T);
-        start_[8] = ptr-flu; ptr += setTube(ptr, 2, B, T);
-        start_[9] = ptr-flu; ptr += setTube(ptr, 4, B, T);
-        start_[10] = ptr-flu; ptr += setTube(ptr, 1, 0, T);
-        start_[11] = ptr-flu; ptr += setTube(ptr, 2, 0, T);
-        start_[12] = ptr-flu; ptr += setTube(ptr, 4, 0, T);
-        start_[14] = ptr-flu; ptr += setHexTube(ptr, 0, 1, 1.0f);
-        start_[15] = ptr-flu; ptr += setHexTube(ptr, 0, 1, 0.5f);
-        start_[16] = ptr-flu; ptr += setHexTube(ptr, 0, T, 0.5f);
-        start_[17] = ptr-flu; ptr += setCone(ptr, 1, 0, 1, 1, 0);
-        start_[18] = ptr-flu; ptr += setCone(ptr, 2, 0, 1, 1, 0);
-        start_[19] = ptr-flu; ptr += setCone(ptr, 2, 0, 1, 1, 0.25);
-        start_[20] = ptr-flu; ptr += setDisc(ptr, 1, 0, 1);
-        start_[21] = ptr-flu; ptr += setDisc(ptr, 2, 0, 1);
-        start_[22] = ptr-flu; ptr += setDisc(ptr, 1, 1, 1);
-        start_[23] = ptr-flu; ptr += setDisc(ptr, 2, 1, 1);
-        start_[24] = ptr-flu; ptr += setDisc(ptr, 1, 0, -1);
-        start_[25] = ptr-flu; ptr += setDisc(ptr, 2, 0, -1);
-        start_[26] = ptr-flu; ptr += setCircle((flute2*)ptr, 1, 0, 1, 1);
+        start_[0] = ptr-flu; setTube(ptr, 1, 0, 1);
+        start_[1] = ptr-flu; setTube(ptr, 2, 0, 1);
+        start_[2] = ptr-flu; setTube(ptr, 4, 0, 1);
+        start_[3] = ptr-flu; setTube(ptr, 4,-E, 1+E);
+        start_[4] = ptr-flu; setTube(ptr, 4, 0, 1+E);
+        //start_[5] = ptr-flu; setDoubleTube(ptr, 4,-E, 1+E, 18/25.0);
+        //start_[6] = ptr-flu; setDoubleTube(ptr, 4, 0, 1+E, 18/25.0);
+        start_[7] = ptr-flu; setTube(ptr, 1, B, T);
+        start_[8] = ptr-flu; setTube(ptr, 2, B, T);
+        start_[9] = ptr-flu; setTube(ptr, 4, B, T);
+        start_[10] = ptr-flu; setTube(ptr, 1, 0, T);
+        start_[11] = ptr-flu; setTube(ptr, 2, 0, T);
+        start_[12] = ptr-flu; setTube(ptr, 4, 0, T);
+        start_[13] = ptr-flu; setCone(ptr, 1, 0, 1, 1, 0);
+        start_[14] = ptr-flu; setCone(ptr, 2, 0, 1, 1, 0);
+        start_[15] = ptr-flu; setCone(ptr, 2, 0, 1, 1, 0.25);
+        start_[16] = ptr-flu; setDisc(ptr, 1, 0, 1);
+        start_[17] = ptr-flu; setDisc(ptr, 2, 0, 1);
+        start_[18] = ptr-flu; setDisc(ptr, 1, 1, 1);
+        start_[19] = ptr-flu; setDisc(ptr, 2, 1, 1);
+        start_[20] = ptr-flu; setDisc(ptr, 1, 0, -1);
+        start_[21] = ptr-flu; setDisc(ptr, 2, 0, -1);
+        start_[22] = ptr-flu; setCircle((flute2*)ptr, 1, 0, 1, 1);
+        start_[23] = ptr-flu; setCircle((flute2*)ptr, 1, 0, 1, 2);
         return ptr-flu;
     }
 
     void setTubeBuffers()
     {
-        glGenBuffers(1, &tub_);
         size_t cnt = 24 * pi_twice;  // this is empirical!
-        glBindBuffer(GL_ARRAY_BUFFER, tub_);
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STATIC_DRAW);
         flute6 * flu = (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         size_t n = setTubeBuffers(flu);
@@ -1238,55 +1237,47 @@ namespace gle
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-    
-    inline void drawTriangleStrip(GLuint buf, GLint start, size_t cnt)
+
+    inline void drawTubeStrip(GLint start, size_t cnt)
     {
-        assert_true(glIsBuffer(buf));
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, sizeof(flute6), (void*)(3*sizeof(float)));
-        glDrawArrays(GL_TRIANGLE_STRIP, start, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[2]);
+        drawVNBuffer(GL_TRIANGLE_STRIP, start, cnt);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
-    inline void drawLineStrip(GLuint buf, GLint start, size_t cnt, size_t skip)
+    inline void drawLineStrip(GLint start, size_t cnt, size_t skip)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[2]);
         glVertexPointer(2, GL_FLOAT, skip*sizeof(flute2), nullptr);
         glDrawArrays(GL_LINE_STRIP, 0, cnt/skip);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
     // using Vertex Buffer Objects
-    void tube1()         { drawTriangleStrip(tub_, start_[0], nbTrianglesTube(1)); }
-    void tube2()         { drawTriangleStrip(tub_, start_[1], nbTrianglesTube(2)); }
-    void tube4()         { drawTriangleStrip(tub_, start_[2], nbTrianglesTube(4)); }
-    void tubeE()         { drawTriangleStrip(tub_, start_[3], nbTrianglesTube(4)); }
-    void tubeF()         { drawTriangleStrip(tub_, start_[4], nbTrianglesTube(4)); }
-    void doubleTubeE()   { drawTriangleStrip(tub_, start_[5], 2*nbTrianglesTube(4)); }
-    void doubleTubeF()   { drawTriangleStrip(tub_, start_[6], 2*nbTrianglesTube(4)); }
-    void longTube1()     { drawTriangleStrip(tub_, start_[7], nbTrianglesTube(1)); }
-    void longTube2()     { drawTriangleStrip(tub_, start_[8], nbTrianglesTube(2)); }
-    void longTube4()     { drawTriangleStrip(tub_, start_[9], nbTrianglesTube(4)); }
-    void halfTube1()     { drawTriangleStrip(tub_, start_[10], nbTrianglesTube(1)); }
-    void halfTube2()     { drawTriangleStrip(tub_, start_[11], nbTrianglesTube(2)); }
-    void halfTube4()     { drawTriangleStrip(tub_, start_[12], nbTrianglesTube(4)); }
-    void hexTube()       { drawTriangleStrip(tub_, start_[14], 14); }
-    void thinTube()      { drawTriangleStrip(tub_, start_[15], 14); }
-    void thinLongTube()  { drawTriangleStrip(tub_, start_[16], 14); }
-    void cone1()         { drawTriangleStrip(tub_, start_[17], nbTrianglesTube(1)); }
-    void cone2()         { drawTriangleStrip(tub_, start_[18], nbTrianglesTube(2)); }
-    void truncatedCone() { drawTriangleStrip(tub_, start_[19], nbTrianglesTube(2)); }
-    void disc1()         { drawTriangleStrip(tub_, start_[20], pi_twice); }
-    void disc2()         { drawTriangleStrip(tub_, start_[21], pi_twice/2); }
-    void discTop1()      { drawTriangleStrip(tub_, start_[22], pi_twice); }
-    void discTop2()      { drawTriangleStrip(tub_, start_[23], pi_twice/2); }
-    void discBottom1()   { drawTriangleStrip(tub_, start_[24], pi_twice); }
-    void discBottom2()   { drawTriangleStrip(tub_, start_[25], pi_twice/2); }
-    void circle()        { drawLineStrip(tub_, start_[26], 1+pi_twice, 1); }
-    void circle2()       { drawLineStrip(tub_, start_[27], 1+pi_twice, 2); }
+    void tube1()         { drawTubeStrip(start_[0], nbTrianglesTube(1)); }
+    void tube2()         { drawTubeStrip(start_[1], nbTrianglesTube(2)); }
+    void tube4()         { drawTubeStrip(start_[2], nbTrianglesTube(4)); }
+    void tubeE()         { drawTubeStrip(start_[3], nbTrianglesTube(4)); }
+    void tubeF()         { drawTubeStrip(start_[4], nbTrianglesTube(4)); }
+    void doubleTubeE()   { drawTubeStrip(start_[5], 2*nbTrianglesTube(4)); }
+    void doubleTubeF()   { drawTubeStrip(start_[6], 2*nbTrianglesTube(4)); }
+    void longTube1()     { drawTubeStrip(start_[7], nbTrianglesTube(1)); }
+    void longTube2()     { drawTubeStrip(start_[8], nbTrianglesTube(2)); }
+    void longTube4()     { drawTubeStrip(start_[9], nbTrianglesTube(4)); }
+    void halfTube1()     { drawTubeStrip(start_[10], nbTrianglesTube(1)); }
+    void halfTube2()     { drawTubeStrip(start_[11], nbTrianglesTube(2)); }
+    void halfTube4()     { drawTubeStrip(start_[12], nbTrianglesTube(4)); }
+    void cone1()         { drawTubeStrip(start_[13], nbTrianglesTube(1)); }
+    void cone2()         { drawTubeStrip(start_[14], nbTrianglesTube(2)); }
+    void truncatedCone() { drawTubeStrip(start_[15], nbTrianglesTube(2)); }
+    void disc1()         { drawTubeStrip(start_[16], pi_twice); }
+    void disc2()         { drawTubeStrip(start_[17], pi_twice/2); }
+    void discTop1()      { drawTubeStrip(start_[18], pi_twice); }
+    void discTop2()      { drawTubeStrip(start_[19], pi_twice/2); }
+    void discBottom1()   { drawTubeStrip(start_[20], pi_twice); }
+    void discBottom2()   { drawTubeStrip(start_[21], pi_twice/2); }
+    void circle()        { drawLineStrip(start_[22], 1+pi_twice, 1); }
+    void circle2()       { drawLineStrip(start_[23], 1+pi_twice, 2); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }
@@ -1334,12 +1325,9 @@ namespace gle
             n_idx += ico[i].nb_faces();
         }
         
-        glGenBuffers(2, ico_);
-        glBindBuffer(GL_ARRAY_BUFFER, ico_[0]);
         glBufferData(GL_ARRAY_BUFFER, n_pts*3*sizeof(float), nullptr, GL_STATIC_DRAW);
         float *const PTR = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ico_[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, n_idx*3*sizeof(unsigned), nullptr, GL_STATIC_DRAW);
         unsigned *const IDX = (unsigned*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
         
@@ -1362,11 +1350,11 @@ namespace gle
     void drawIcoBuffer(GLsizei start, GLsizei start_inx, GLsizei cnt)
     {
         glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, ico_[0]);
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
         glVertexPointer(3, GL_FLOAT, 0, (void*)(start*sizeof(GLfloat)));
         // the normal in each vertex is equal to the vertex!
         glNormalPointer(GL_FLOAT, 0, (void*)(start*sizeof(GLfloat)));
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ico_[1]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(start_inx*sizeof(GLuint)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
