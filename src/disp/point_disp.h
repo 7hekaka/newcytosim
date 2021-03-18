@@ -24,7 +24,7 @@ private:
 #if POINTDISP_USES_PIXELMAPS
     
     /// pointer to 3 square bitmaps with 4*nPix*nPix pixels each
-    GLubyte   *bmp_[3];
+    uint8_t   *bmp_[3];
 
     /// index of the Pixel Buffer Objects on GPU
     GLuint     pbo_[3];
@@ -42,7 +42,7 @@ private:
     void releasePixelmap();
     
     /// scale down pixelmap by factor 'bin'
-    void downsampleRGBA(GLubyte*, unsigned, unsigned, GLubyte const*, unsigned bin);
+    void downsampleRGBA(uint8_t*, unsigned, unsigned, uint8_t const*, unsigned bin);
     
     /// create the pixelmaps
     void makePixelmaps(GLfloat, unsigned supersampling);
@@ -54,10 +54,10 @@ private:
     void drawPixelmap(size_t) const;
     
     /// save pixelmap to file
-    void savePixelmap(GLubyte*, unsigned dim, GLuint) const;
+    void savePixelmap(uint8_t*, unsigned dim, GLuint) const;
     
     /// save pixelmap on server side
-    void storePixelmap(GLubyte*, unsigned dim, GLuint) const;
+    void storePixelmap(uint8_t*, unsigned dim, GLuint) const;
 
 #endif
 

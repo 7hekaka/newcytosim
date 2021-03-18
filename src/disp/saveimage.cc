@@ -16,17 +16,19 @@ bool SaveImage::supported(const char format[])
 #endif
     if ( 0 == strcasecmp(format, "ppm") )
         return true;
-    
+    if ( 0 == strcasecmp(format, "tga") )
+        return true;
+
     return false;
 }
 
 
-GLubyte* new_pixels(size_t s)
+uint8_t* new_pixels(size_t s)
 {
-    return (GLubyte*)malloc(s*sizeof(GLubyte));
+    return (uint8_t*)calloc(s, sizeof(uint8_t));
 }
 
-void free_pixels(GLubyte *& ptr)
+void free_pixels(uint8_t *& ptr)
 {
     free(ptr);
     ptr = nullptr;
@@ -65,7 +67,7 @@ int SaveImage::saveImage(const char * filename,
     int res = 1;
 
     //allocate memory to hold image:
-    GLubyte* pixels = new_pixels(3*vp[2]*vp[3]);
+    uint8_t* pixels = new_pixels(3*vp[2]*vp[3]);
 
     if ( pixels)
     {
@@ -102,8 +104,8 @@ int SaveImage::saveCompositeImage(const int mag,
     int mH = mag * height;
     
     const int PIX = 3;  //number of bytes for each pixel
-    GLubyte* pixels = new_pixels(mW*mH*PIX);
-    GLubyte* sub    = new_pixels(width*height*PIX);
+    uint8_t* pixels = new_pixels(mW*mH*PIX);
+    uint8_t* sub    = new_pixels(width*height*PIX);
     
     if ( pixels )
     {
@@ -125,7 +127,7 @@ int SaveImage::saveCompositeImage(const int mag,
                 glPopMatrix();
                 if ( 0 == readPixels(0, 0, width, height, sub) )
                 {
-                    GLubyte * dst = &pixels[width*PIX*(ix+mH*iy)];
+                    uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
                     for ( int ii=0; ii<height; ++ii )
                         memcpy(&dst[ii*mW*PIX], &sub[ii*width*PIX], width*PIX);
                 }
@@ -172,8 +174,8 @@ int SaveImage::saveMagnifiedImage(const int mag,
     
     const int PIX = 3;  //number of bytes for each pixel
     //allocate memory to hold the full image:
-    GLubyte* pixels = new_pixels(mW*mH*PIX);
-    GLubyte* sub = new_pixels(width*height*PIX);
+    uint8_t* pixels = new_pixels(mW*mH*PIX);
+    uint8_t* sub = new_pixels(width*height*PIX);
     if ( pixels )
     {
         GLint svp[4];
@@ -185,7 +187,7 @@ int SaveImage::saveMagnifiedImage(const int mag,
             display(mag, arg);
             if ( 0 == readPixels(0, 0, width, height, sub) )
             {
-                GLubyte * dst = &pixels[width*PIX*(ix+mH*iy)];
+                uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
                 for ( int h = 0; h < height; ++h )
                     memcpy(&dst[h*mW*PIX], &sub[h*width*PIX], width*PIX);
             }
@@ -237,7 +239,7 @@ int SaveImage::readPixels(GLint X, GLint Y, GLsizei W, GLsizei H, GLvoid *pixels
  from the lowest to the highest row, left to right in each row (as in OpenGL).
  The pixels components of `src` are averaged to produce `dst`.
  */
-void SaveImage::downsampleRGB(GLubyte dst[], const GLubyte src[],
+void SaveImage::downsampleRGB(uint8_t dst[], const uint8_t src[],
                               unsigned W, unsigned H, unsigned bin)
 {
     const size_t s = bin * bin;
@@ -261,27 +263,30 @@ void SaveImage::downsampleRGB(GLubyte dst[], const GLubyte src[],
         for ( size_t dx = 0; dx < bin; ++dx )
         for ( size_t dy = 0; dy < bin; ++dy )
         {
-            GLubyte const* p = src + 3 * ( dx + bin*x + W*(dy+bin*y) );
+            uint8_t const* p = src + 3 * ( dx + bin*x + W*(dy+bin*y) );
             r += p[0];
             g += p[1];
             b += p[2];
         }
         
-        dst[3*(x+sx*y)  ] = (GLubyte)( r / s );
-        dst[3*(x+sx*y)+1] = (GLubyte)( g / s );
-        dst[3*(x+sx*y)+2] = (GLubyte)( b / s );
+        dst[3*(x+sx*y)  ] = (uint8_t)( r / s );
+        dst[3*(x+sx*y)+1] = (uint8_t)( g / s );
+        dst[3*(x+sx*y)+2] = (uint8_t)( b / s );
     }
 }
 
 
 int SaveImage::savePixels(FILE * file,
                           const char format[],
-                          const GLubyte pixels[],
+                          const uint8_t pixels[],
                           int width, int height)
 {
     if ( 0 == strcasecmp(format, "ppm") )
         return saveColorPPM(file, pixels, width, height);
     
+    if ( 0 == strcasecmp(format, "tga") )
+        return saveColorTGA(file, pixels, width, height);
+
     if ( 0 == strcasecmp(format, "png") )
         return saveColorPNG(file, pixels, width, height);
     
@@ -291,7 +296,7 @@ int SaveImage::savePixels(FILE * file,
 
 int SaveImage::savePixels(FILE * file,
                           const char format[],
-                          const GLubyte pixels[],
+                          const uint8_t pixels[],
                           int width, int height,
                           int downsample)
 {
@@ -300,7 +305,7 @@ int SaveImage::savePixels(FILE * file,
         //printf("downsampling %i to : %i %i\n", downsample, mw, mh);
         int W = width / downsample;
         int H = height / downsample;
-        GLubyte* img = new_pixels(3*W*H);
+        uint8_t* img = new_pixels(3*W*H);
         if ( img )
         {
             downsampleRGB(img, pixels, width, height, downsample);
@@ -332,7 +337,7 @@ FILE * SaveImage::openFile(const char * filename)
 
 int SaveImage::savePixels(const char * filename,
                           const char format[],
-                          const GLubyte pixels[],
+                          const uint8_t pixels[],
                           int width, int height,
                           int downsample)
 {
@@ -358,40 +363,64 @@ int SaveImage::savePixels(const char * filename,
 }
 
 //------------------------------------------------------------------------------
-//------------------------------- PPM FORMAT -----------------------------------
-//------------------------------------------------------------------------------
-#pragma mark - PPM
+#pragma mark - PPM format
 
 /**
  Write the image in the Portable Pixmap format, also Netpbm format (man -k ppm).
  We use here the 'raw' binary format starting with P6 
  */
 int SaveImage::saveColorPPM(FILE* file,
-                            const GLubyte pixels[],
+                            const uint8_t pixels[],
                             const int width, const int height)
 {
-    if ( !file || ferror(file) )
-        return 1;
-    
     fprintf(file, "P6\n");
     fprintf(file, "%i %i\n", width, height);
     fprintf(file, "255\n");
     
     //write the pixels binary, line by line:
-    for ( int ii = height-1; ii >= 0; --ii )
-        fwrite(&pixels[3*ii*width], 1, 3*width, file);
+    for ( int i = height-1; i >= 0; --i )
+        fwrite(&pixels[3*i*width], 1, 3*width, file);
     return 0;
 }
 
 
 //------------------------------------------------------------------------------
-//-------------------------------- PNG FORMAT ----------------------------------
+#pragma mark - TGA format
+
+/**
+ save RGB Truevision TGA format
+ https://en.wikipedia.org/wiki/Truevision_TGA
+ */
+int SaveImage::saveColorTGA(FILE* file,
+                            const uint8_t pixels[],
+                            const int width, const int height)
+{
+    uint8_t header[18] = { 0 };
+    // Data code type -- 2 - uncompressed RGB image.
+    header[2] = 2;
+    // Image width - low byte
+    header[12] = width & 0xFF;
+    // Image width - high byte
+    header[13] = (width >> 8) & 0xFF;
+    // Image height - low byte
+    header[14] = height & 0xFF;
+    // Image height - high byte
+    header[15] = (height >> 8) & 0xFF;
+    // Color bit depth
+    header[16] = 24;
+
+    fwrite(header, sizeof(uint8_t), 18, file);
+    fwrite(pixels, sizeof(uint8_t), width * height * 3, file);
+    return 0;
+}
+
+
 //------------------------------------------------------------------------------
-#pragma mark - PNG
+#pragma mark - PNG format
 
 #ifndef HAS_PNG
 
-int SaveImage::savePNG(FILE*, const GLubyte pixels[],
+int SaveImage::savePNG(FILE*, const uint8_t pixels[],
                        const int, const int,
                        const int, const int)
 {
@@ -530,7 +559,7 @@ int savePNG(FILE* file,
 }
 
 
-int SaveImage::savePNG(FILE* file, const GLubyte pixels[],
+int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
                        const int bit_depth, const int nb_colors,
                        const int width, const int height)
 {
@@ -559,8 +588,8 @@ int SaveImage::savePNG(FILE* file, const GLubyte pixels[],
 /**
  Save RGBA image, 4 x 8-bits per pixel
  */
-int SaveImage::saveAlphaPNG(FILE* file, const GLubyte pixels[],
-                           const int width, const int height)
+int SaveImage::saveAlphaPNG(FILE* file, const uint8_t pixels[],
+                            const int width, const int height)
 {
     return savePNG(file, pixels, 8, 4, width, height);
 }
@@ -568,7 +597,7 @@ int SaveImage::saveAlphaPNG(FILE* file, const GLubyte pixels[],
 /**
  Save RGB image, 3 x 8-bits per pixel
  */
-int SaveImage::saveColorPNG(FILE* file, const GLubyte pixels[],
+int SaveImage::saveColorPNG(FILE* file, const uint8_t pixels[],
                             const int width, const int height)
 {
     return savePNG(file, pixels, 8, 3, width, height);
@@ -577,9 +606,9 @@ int SaveImage::saveColorPNG(FILE* file, const GLubyte pixels[],
 /**
  Save 16-bits gray-level image
  */
-int SaveImage::saveGrayPNG(FILE* file, const GLubyte pixels[],
+int SaveImage::saveGrayPNG(FILE* file, const uint16_t pixels[],
                            const int width, const int height)
 {    
-    return savePNG(file, pixels, 16, 1, width, height);
+    return savePNG(file, (uint8_t*)pixels, 16, 1, width, height);
 }
 

@@ -121,7 +121,7 @@ size_t image(std::istream& is, FILE * file)
         }
     }
     
-    SaveImage::saveGrayPNG(file, (GLubyte*)array, dim[0], dim[1]);
+    SaveImage::saveGrayPNG(file, array, dim[0], dim[1]);
     delete[] array;
     return cnt;
 }

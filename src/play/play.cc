@@ -126,7 +126,7 @@ void print_error(Exception const& e)
 
 int main(int argc, char* argv[])
 {
-    Style style = ONSCREEN;
+    Style style = OFFSCREEN;
     Mode mode = NORMAL;
     int magnify = 1;
     Glossary arg;
@@ -163,29 +163,28 @@ int main(int argc, char* argv[])
         prop.goLive = true;
 
     if ( arg.use_key("image") )
-    {
         mode = SAVE_IMAGE;
-        style = OFFSCREEN;
-    }
 
     if ( arg.use_key("poster") )
     {
         mode = SAVE_IMAGE;
-        style = OFFSCREEN;
         magnify = 3;
     }
     
     if ( arg.use_key("movie") )
-    {
         mode = SAVE_MOVIE;
-        style = OFFSCREEN;
-    }
     
     if ( arg.use_key("on") )
         style = ONSCREEN;
+    
+    if ( arg.use_key("tga") )
+        prop.image_format = "tga";
+    
+    if ( arg.use_key("png") )
+        prop.image_format = "png";
 
     // get image over-sampling:
-    arg.set(magnify, "magnify") || arg.set(magnify, "magnification");
+    arg.set(magnify, "magnify") || arg.set(magnify, "mag");
 
     // change working directory if specified:
     if ( arg.has_key("directory") )
@@ -297,7 +296,7 @@ int main(int argc, char* argv[])
     
     //-------- off-screen (non interactive) rendering -------
     
-    if ( style == OFFSCREEN )
+    if ( mode != NORMAL && style == OFFSCREEN )
     {
         const int W = view.width() * magnify;
         const int H = view.height() * magnify;

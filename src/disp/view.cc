@@ -783,7 +783,7 @@ void View::displayMagnifier(GLint Z, Vector3 foc, GLint mX, GLint mY) const
         glPopMatrix();
         glViewport(0, 0, W, H);
 /*
-        GLubyte * tmp = (GLubyte*)malloc(3*M*M*sizeof(GLubyte));
+        uint8_t * tmp = (uint8_t*)malloc(3*M*M*sizeof(uint8_t));
         glReadPixels(0, 0, M, M, GL_RGB, GL_UNSIGNED_BYTE, tmp);
         SaveImage::savePixels("pixels.png", "png", tmp, W, H, 0);
         free(tmp);

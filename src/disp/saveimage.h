@@ -3,14 +3,7 @@
 #define SAVEIMAGE_H
 
 #include <cstdio>
-
-
-#ifndef GL_VERSION_1_1
-
-typedef unsigned char GLubyte;
-
-#endif
-
+#include <stdint.h>
 
 /// Can save pixel array to files in PNG or PPM format
 /**
@@ -33,31 +26,34 @@ namespace SaveImage
     FILE * openFile(const char * name);
 
     /// Netpbm pixel image format, 3 one-byte componentss per pixels (R, G, B)
-    int saveColorPPM(FILE*, const GLubyte[], int width, int height);
+    int saveColorPPM(FILE*, const uint8_t[], int width, int height);
     
+    /// uncompressed RGB TGA format (https://en.wikipedia.org/wiki/Truevision_TGA)
+    int saveColorTGA(FILE*, const uint8_t[], int width, int height);
+
     /// write PNG image
-    int savePNG(FILE*, const GLubyte[], int bit_depth, int nb_colors, int width, int height);
+    int savePNG(FILE*, const uint8_t[], int bit_depth, int nb_colors, int width, int height);
 
     /// Portable Network Graphic format, 4 one-byte components per pixels (R, G, B, A)
-    int saveAlphaPNG(FILE*, const GLubyte[], int width, int height);
+    int saveAlphaPNG(FILE*, const uint8_t[], int width, int height);
 
     /// Portable Network Graphic format, 3 one-byte components per pixels (R, G, B)
-    int saveColorPNG(FILE*, const GLubyte[], int width, int height);
+    int saveColorPNG(FILE*, const uint8_t[], int width, int height);
 
-    /// gray-level PNG format with one 2-byte component per pixels
-    int saveGrayPNG(FILE*, const GLubyte[], int width, int height);
+    /// save 16-bit grayscale PNG file
+    int saveGrayPNG(FILE*, const uint16_t[], int width, int height);
     
     /// save pixels[] and return error-code
-    int savePixels(FILE*, const char format[], const GLubyte[], int width, int height);
+    int savePixels(FILE*, const char format[], const uint8_t[], int width, int height);
     
     /// save pixels[] and return error-code
-    int savePixels(FILE*, const char format[], const GLubyte[], int width, int height, int downsample);
+    int savePixels(FILE*, const char format[], const uint8_t[], int width, int height, int downsample);
 
     /// save pixels[] and return error-code
-    int savePixels(const char* name, const char format[], const GLubyte[], int width, int height, int downsample);
+    int savePixels(const char* name, const char format[], const uint8_t[], int width, int height, int downsample);
     
     /// downsample `src` to set `dst`
-    void downsampleRGB(GLubyte* dst, GLubyte const* src, unsigned W, unsigned H, unsigned bin);
+    void downsampleRGB(uint8_t* dst, uint8_t const* src, unsigned W, unsigned H, unsigned bin);
 
     //-------------------- use the functions below: ---------------------
     

@@ -45,8 +45,8 @@ from which they are read when you replay a simulation.
 
 The display parameters can also be specified in a separate file with extension ".cyp",
 as in `play display.cyp`.
-Note that the display parameters will be printed on the terminal after you press 'k' in `play`,
-and you can copy-paste this output to create your initial `display.cyp`.
+Note that the display parameters will be printed on the terminal after you press `k` in `play`,
+and you can copy-paste this output to create an initial `display.cyp`.
 
  
 `play` can be used to:
@@ -55,9 +55,10 @@ Purpose                                         |  Command      |
 ------------------------------------------------|----------------
 Display the simulation in the current folder    |  `play`     
 Display the simulation in folder `PATH`         |  `play PATH`
-Perform a live simulation                       |  `play live`
-Generate images offscreen                       |  `play image`     
+Perform a live simulation                       |  `play live` 
+Generate images from a trajectory               |  `play movie`     
 
+The live mode is automatically started if a config file extending with '.cym' is specified on the command line.
 
 ## Play's replay mode
 
@@ -79,14 +80,14 @@ This should open a window. This simulation is calculated on the fly, and nothing
 With `play` the [commands](../sim/commands.md) in the config file that normally export data to file are disabled.
  
 
-## PLay's offscreen mode
+## Offscreen rendering
  
 Play can generate images without opening a window, as for example:
  
 Command                                |   Result                                       |
 ---------------------------------------|-------------------------------------------------
 `play image frame=10`                  | An image representing frame 10
-`play image frame=10,20,30`            | Three images representing the specified frames
+`play image frame=10,20,30`            | An image for each specified frames
 `play image frame=10 image_format=png` | a PNG image representing frame 10 
 `play image magnification=3 frame=10`  | an image for frame 10 at 3x magnified resolution
 `play movie`                           | an image for each frame in the trajectory file

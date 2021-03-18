@@ -50,20 +50,20 @@ std::string gle_color::components(GLfloat ptr[4])
 }
 
 
-GLubyte hex2byte(int c)
+uint8_t hex2byte(int c)
 {
     if ( '0' <= c && c <= '9' )
-        return (GLubyte)(c - '0');
+        return (uint8_t)(c - '0');
     else if ( 'A' <= c && c <= 'F' )
-        return (GLubyte)(c - ( 'A' - 10 ));
+        return (uint8_t)(c - ( 'A' - 10 ));
     else if ( 'a' <= c && c <= 'f' )
-        return (GLubyte)(c - ( 'a' - 10 ));
+        return (uint8_t)(c - ( 'a' - 10 ));
     throw InvalidSyntax("invalid hexadecimal digit");
 }
 
-GLubyte hex2byte(int a, int b)
+uint8_t hex2byte(int a, int b)
 {
-    return (GLubyte)( hex2byte(a) << 4 ) | hex2byte(b);
+    return (uint8_t)( hex2byte(a) << 4 ) | hex2byte(b);
 }
 
 /**
@@ -110,7 +110,7 @@ std::istream& operator >> (std::istream& is, gle_color& col)
         else if ( '0'==c  &&  'x'==d )
         {
             is.get();
-            GLubyte u[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
+            uint8_t u[4] = { 0xFF, 0xFF, 0xFF, 0xFF };
             int i = 0;
             while ( i < 4 )
             {

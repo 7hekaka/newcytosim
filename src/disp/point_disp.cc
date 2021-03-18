@@ -209,7 +209,7 @@ void PointDisp::allocatePixelmap()
             delete(bmp_[0]);
     
         size_t dd = pixSize * pixSize;
-        GLubyte * mem = new GLubyte[12*dd];
+        uint8_t * mem = new uint8_t[12*dd];
         bmp_[0] = mem;
         bmp_[1] = mem + 4*dd;
         bmp_[2] = mem + 8*dd;
@@ -234,7 +234,7 @@ void PointDisp::releasePixelmap()
 
 
 /// print pixel map in ASCII
-void printPixels(GLubyte const* pix, unsigned sx, unsigned sy)
+void printPixels(uint8_t const* pix, unsigned sx, unsigned sy)
 {
     for ( size_t y = 0; y < sy; ++y )
     {
@@ -251,8 +251,8 @@ void printPixels(GLubyte const* pix, unsigned sx, unsigned sy)
  from the lowest to the highest row, left to right in each row (as in OpenGL).
  The pixels components of `src` are averaged to produce `dst`.
  */
-void PointDisp::downsampleRGBA(GLubyte dst[], unsigned sx, unsigned sy,
-                               GLubyte const src[], unsigned bin)
+void PointDisp::downsampleRGBA(uint8_t dst[], unsigned sx, unsigned sy,
+                               uint8_t const src[], unsigned bin)
 {
     const size_t s = bin * bin;
 
@@ -274,22 +274,22 @@ void PointDisp::downsampleRGBA(GLubyte dst[], unsigned sx, unsigned sy,
         for ( unsigned dx = 0; dx < bin; ++dx )
         for ( unsigned dy = 0; dy < bin; ++dy )
         {
-            GLubyte const* p = src + 4 * ( dx+bin*(x+sx*(dy+bin*y)) );
+            uint8_t const* p = src + 4 * ( dx+bin*(x+sx*(dy+bin*y)) );
             r += p[0];
             g += p[1];
             b += p[2];
             a += p[3];
         }
             
-        dst[4*(x+sx*y)  ] = (GLubyte)( r / s );
-        dst[4*(x+sx*y)+1] = (GLubyte)( g / s );
-        dst[4*(x+sx*y)+2] = (GLubyte)( b / s );
-        dst[4*(x+sx*y)+3] = (GLubyte)( a / s );
+        dst[4*(x+sx*y)  ] = (uint8_t)( r / s );
+        dst[4*(x+sx*y)+1] = (uint8_t)( g / s );
+        dst[4*(x+sx*y)+2] = (uint8_t)( b / s );
+        dst[4*(x+sx*y)+3] = (uint8_t)( a / s );
     }
 }
 
 
-void PointDisp::storePixelmap(GLubyte* bitmap, unsigned dim, GLuint pbi) const
+void PointDisp::storePixelmap(uint8_t* bitmap, unsigned dim, GLuint pbi) const
 {
 #if POINTDISP_USES_PIXEL_BUFFERS
     assert_true(pbi);
@@ -307,7 +307,7 @@ void PointDisp::storePixelmap(GLubyte* bitmap, unsigned dim, GLuint pbi) const
 #include "saveimage.h"
 
 // Export bitmap to file in PNG format
-void PointDisp::savePixelmap(GLubyte* bitmap, unsigned dim, unsigned id) const
+void PointDisp::savePixelmap(uint8_t* bitmap, unsigned dim, unsigned id) const
 {
     if ( SaveImage::supported("png") )return given name of property
     {
@@ -407,7 +407,7 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
         }
         if ( sampling > 1 )
         {
-            GLubyte * tmp = new GLubyte[4*dim*dim];
+            uint8_t * tmp = new uint8_t[4*dim*dim];
             glReadPixels(0, 0, dim, dim, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
             downsampleRGBA(bmp_[i], nPix, nPix, tmp, sampling);
             delete[] tmp;

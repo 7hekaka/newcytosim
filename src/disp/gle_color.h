@@ -126,19 +126,19 @@ public:
     }
 
     /// specify components with bytes
-    void set_bytes(GLubyte r, GLubyte g, GLubyte b, GLubyte a)
+    void set_bytes(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     {
         rgba_ = combine(uint32_t(r), uint32_t(g), uint32_t(b), uint32_t(a));
         update_float();
     }
 
     /// export components as bytes
-    void put_bytes(GLubyte& r, GLubyte& g, GLubyte& b, GLubyte& a) const
+    void put_bytes(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
     {
-        r = 0xFF & (GLubyte)( rgba_ >> 24 );
-        g = 0xFF & (GLubyte)( rgba_ >> 16 );
-        b = 0xFF & (GLubyte)( rgba_ >> 8 );
-        a = 0xFF & (GLubyte)( rgba_ );
+        r = 0xFF & (uint8_t)( rgba_ >> 24 );
+        g = 0xFF & (uint8_t)( rgba_ >> 16 );
+        b = 0xFF & (uint8_t)( rgba_ >> 8 );
+        a = 0xFF & (uint8_t)( rgba_ );
     }
     
     /// set from 4-bytes integer
