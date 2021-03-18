@@ -331,9 +331,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
         nxt = fib.posPoint(i+1);
         select_color(fib, i).load_front();
         glPushMatrix();
-        gle::transAlignZ(pos, rad, nxt-pos);
-        //gle::sphere2();
-        glScalef(1, 1, Lr);
+        gle::stretchAlignZ(pos, nxt, rad);
         gle::tubeE();
         glPopMatrix();
     }

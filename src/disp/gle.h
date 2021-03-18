@@ -208,6 +208,10 @@ namespace gle
     void tubeE();
     /// draw an open tube along Z, of radius 1 covering Z [0, 1+epsilon]
     void tubeF();
+    /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1+epsilon]
+    void doubleTubeE();
+    /// draw an open tube along Z, of radius 1 covering Z [0, 1+epsilon]
+    void doubleTubeF();
     /// draw a nice open tube along Z, of radius 1 and length 1
     void tube4();
     /// draw a nicer open tube along Z, of radius 1 and length 1

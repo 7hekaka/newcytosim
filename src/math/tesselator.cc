@@ -136,39 +136,22 @@ void Tesselator::allocate(unsigned V, unsigned E, unsigned F, unsigned N)
 }
 
 
-void Tesselator::build(Polyhedra kind, unsigned div)
+void Tesselator::build(Polyhedra kind, unsigned div, int make)
 {
-    assert_true(div > 0);
-    switch( kind )
-    {
-        case UNSET: break;
-        case TETRAHEDRON: initTetrahedron(div); break;
-        case OCTAHEDRON: initOctahedron(div); break;
-        case ICOSAHEDRON: initIcosahedron(div); break;
-        case HEMISPHERE: initHemisphere(div); break;
-        case DICE: initDice(0.7, 0.5, 0.5, 0.3, div, div); break;
-    }
-    
-    assert_true( num_vertices_ <= max_vertices_ );
-    assert_true( num_faces_ <= max_faces_ );
-}
-
-
-void Tesselator::setVertices()
-{
-    delete[] vex_;
-    vex_ = new float[3*max_vertices_];
-    store_vertices(vex_);
-}
-
-
-Tesselator::Tesselator(Polyhedra kind, unsigned div, int make)
-{
-    build();
-    
     if ( div > 0 )
     {
-        build(kind, div);
+        switch( kind )
+        {
+            case UNSET: break;
+            case TETRAHEDRON: initTetrahedron(div); break;
+            case OCTAHEDRON: initOctahedron(div); break;
+            case ICOSAHEDRON: initIcosahedron(div); break;
+            case HEMISPHERE: initHemisphere(div); break;
+            case DICE: initDice(0.7, 0.5, 0.5, 0.3, div, div); break;
+        }
+        
+        assert_true( num_vertices_ <= max_vertices_ );
+        assert_true( num_faces_ <= max_faces_ );
         if ( make )
             setVertices();
         if ( make & 2 )
@@ -176,6 +159,12 @@ Tesselator::Tesselator(Polyhedra kind, unsigned div, int make)
     }
 }
 
+void Tesselator::setVertices()
+{
+    delete[] vex_;
+    vex_ = new float[3*max_vertices_];
+    store_vertices(vex_);
+}
 
 Tesselator::~Tesselator()
 {

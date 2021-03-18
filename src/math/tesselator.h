@@ -133,7 +133,6 @@ private:
     void refineStrip(unsigned cnt, unsigned inx[], unsigned div);
     
     void build();
-    void build(Polyhedra K, unsigned div);
     void allocate(unsigned nv, unsigned ne, unsigned nf, unsigned div);
     
     void interpolate(Vertex const&, float vec[3], int half) const;
@@ -149,8 +148,11 @@ public:
     void initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid);
     
     /// build as polyhedra refined by order `div`
-    Tesselator(Polyhedra, unsigned div, int make = 0);
+    Tesselator(Polyhedra K, unsigned div, int make = 0) { build(K, div, make); }
     
+    /// build as polyhedra refined by order `div`
+    void build(Polyhedra, unsigned div, int make = 0);
+
     /// build as empty structure
     Tesselator() { build(); }
     
@@ -184,13 +186,13 @@ public:
     unsigned int nb_edges()        const { return num_edges_; }
     
     /// array of indices to the vertices in each edge (2 per edge)
-    unsigned int* edge_data()   const { return edges_; }
+    unsigned int* edge_data()      const { return edges_; }
     
     /// number of faces (each face is a triangle of 3 vertices)
     unsigned int nb_faces()        const { return num_faces_; }
     
     /// array of indices to the vertices in each face (3 vertices per face)
-    unsigned int* face_data()     const { return faces_; }
+    unsigned int* face_data()      const { return faces_; }
     
     /// export ascii PLY format
     void exportPLY(FILE *) const;
