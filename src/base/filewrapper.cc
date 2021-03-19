@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 
 #include "filewrapper.h"
 #include "exceptions.h"

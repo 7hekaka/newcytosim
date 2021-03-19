@@ -132,7 +132,6 @@ void Display3::drawObjects(Simul const& sim)
         glClearStencil(0);
         glDisable(GL_STENCIL_TEST);
     }
-    assert_true(glIsEnabled(GL_LIGHTING));
 
     drawOrganizers(sim.organizers);
     glDisable(GL_CULL_FACE);
