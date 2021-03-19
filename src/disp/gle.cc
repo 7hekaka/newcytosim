@@ -1107,21 +1107,12 @@ namespace gle
         return i;
     }
     
-    size_t setCircleBuffer(GLuint buf, size_t inc, float Z, float R, float N)
+    void setCircle(flute6*& flu, size_t inc, float Z, float R, float N)
     {
-        size_t cnt = ( 1 + pi_twice ) / inc;
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute2), nullptr, GL_STATIC_DRAW);
-        flute2 * flu = (flute2*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        size_t n = setCircle(flu, inc, Z, R, N);
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        assert_true( n <= cnt );
-        return n;
+        size_t i = setCircle((flute2*)flu, inc, Z, R, N);
+        flu += 1 + i / 3;
     }
-
-    //-----------------------------------------------------------------------
-    #pragma mark - Tubes and Cones
-
+    
     /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
     void setTube(flute6*& flu, size_t inc, float B, float T)
     {
@@ -1190,11 +1181,6 @@ namespace gle
         flu += i;
     }
     
-    inline size_t nbTrianglesTube(size_t inc)
-    {
-        return 2 * ( 1 + pi_twice / inc );
-    }
-    
     size_t setTubeBuffers(flute6* flu)
     {
         flute6* ptr = flu;
@@ -1222,9 +1208,14 @@ namespace gle
         start_[19] = ptr-flu; setDisc(ptr, 2, 1, 1);
         start_[20] = ptr-flu; setDisc(ptr, 1, 0, -1);
         start_[21] = ptr-flu; setDisc(ptr, 2, 0, -1);
-        start_[22] = ptr-flu; setCircle((flute2*)ptr, 1, 0, 1, 1);
-        start_[23] = ptr-flu; setCircle((flute2*)ptr, 1, 0, 1, 2);
+        start_[22] = ptr-flu; setCircle(ptr, 1, 0, 1, 1);
+        start_[23] = ptr-flu; setCircle(ptr, 1, 0, 1, 2);
         return ptr-flu;
+    }
+    
+    inline size_t nbTrianglesTube(size_t inc)
+    {
+        return 2 * ( 1 + pi_twice / inc );
     }
 
     void setTubeBuffers()
@@ -1249,7 +1240,7 @@ namespace gle
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf_[2]);
         glVertexPointer(2, GL_FLOAT, skip*sizeof(flute2), nullptr);
-        glDrawArrays(GL_LINE_STRIP, 0, cnt/skip);
+        glDrawArrays(GL_LINE_STRIP, 3*start, cnt/skip);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
@@ -1444,8 +1435,8 @@ namespace gle
         flu[i++] = {R, 0,-W, 1, 0, 0};
         for ( size_t n = 0; n < pi_twice; n += 2*inc )
         {
-            GLfloat c = R * cos_(n);
-            GLfloat s = R * sin_(n);
+            float c = R * cos_(n);
+            float s = R * sin_(n);
             flu[i++] = {c, s, 0, c, s, 0};
             flu[i++] = {c, s, W, c, s, 0};
             flu[i++] = {c, s,-W, c, s, 0};
@@ -1472,9 +1463,9 @@ namespace gle
      The surface goes from Z to Z_max, and its radius is
      given by the function `radius`(z) provided as argument.
      */
-    void drawRevolution(float (*radius)(float), float Z, float T, GLfloat dZ)
+    void drawRevolution(float (*radius)(float), float Z, float T, float dZ)
     {
-        GLfloat R = radius(Z);
+        float R = radius(Z);
         while ( Z < T )
         {
             flute6 * flu = mapVertexNormalBuffer(2+2*pi_twice);
@@ -1490,7 +1481,7 @@ namespace gle
             size_t i = 0;
             for ( size_t n = 0; n <= pi_twice; ++n )
             {
-                GLfloat S = sin_(n), C = cos_(n);
+                float S = sin_(n), C = cos_(n);
                 flu[i++] = {R*C, R*S, Z, dN*C, dN*S,-dR};
                 flu[i++] = {Q*C, Q*S, Y, dN*C, dN*S,-dR};
             }

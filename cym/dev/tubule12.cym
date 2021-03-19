@@ -48,7 +48,7 @@ new 0 fil
     range = 0.2 -0.1, 0.2 0.1
 }
 
-skip {
+%{
 new 3 fil
 {
     length = 1

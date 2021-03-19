@@ -58,7 +58,7 @@ new fil { family=1; length=1; direction=1; position=0  0.0012 -0.0099; origin=0.
 new fil { family=1; length=1; direction=1; position=0  0.0056 -0.0082; origin=0.000923; }
 
 %------------------- 13-Microtubule at origin, orientated -X
-skip{
+%{
 new fil { family=2; length=1; direction=-1; position=0 -0.0100  0;      origin=0.003077; }
 new fil { family=2; length=1; direction=-1; position=0 -0.0088  0.0046; origin=0.002154; }
 new fil { family=2; length=1; direction=-1; position=0 -0.0056  0.0082; origin=0.001231; }
