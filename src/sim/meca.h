@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
 #ifndef MECA_H
 #define MECA_H
@@ -51,13 +51,21 @@ typedef Matrix33 MatrixBlock;
 #endif
 
 
-/// set TRUE to use matrix mISO and mFUL (the traditional way)
-/** This option should be 0 if PARALLELIZE_MATRIX == 1 */
-#define USE_ISO_MATRIX 0
+/// set 1 to use matrix mISO and mFUL (the traditional way)
+/**
+ USE_ISO_MATRIX should not affect the results in any way, but the speed of execution.
+ This makes the simulation a lot faster on isotropic systems (eg. self.cym), that
+ are using isotropic force elements such as the Hookean link (Meca::addLink().
+ It is useless for a purely non-isotropic system and causes a bit of overhead.
+ 
+ Finally, the parallelization code does not consider the ISO matrix, hence
+ this option should be disabled if PARALLELIZE_MATRIX == 1
+ */
+#define USE_ISO_MATRIX 1
 
 /**
  Option to allow 'play' to display Meca links graphically.
- This option affects display speed since it requires two calls to setInteractions()
+ This option affects sim and play speed with some code added to all Meca::addLink()
  This option is normally OFF.
  */
 #define DRAW_MECA_LINKS 0

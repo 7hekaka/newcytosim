@@ -10,6 +10,7 @@ set simul system
     kT = 0.0042
     steric_max_range = 0.5
     viscosity = 100
+    % for this to work, compile with DRAW_MECA_LINKS 1
     display = ( draw_links=1; )
 }
 

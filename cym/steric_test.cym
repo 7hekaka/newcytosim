@@ -10,6 +10,8 @@ set simul system
     viscosity = 10
     time_step = 0.001
     kT = 0.00042
+    % for this to work, compile with DRAW_MECA_LINKS 1
+    display = ( draw_links=1; )
 }
 
 set space cell

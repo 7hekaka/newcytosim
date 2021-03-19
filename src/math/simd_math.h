@@ -52,7 +52,8 @@ inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
  Returns a finite number for +inf input
  Returns -inf for nan and <= 0 inputs.
  Continuous error.
- SIMD by Francois Nedelec 12.01.2021
+ SIMD by FJN 12.01.2021 derived from:
+ http://gallium.inria.fr/blog/fast-vectorizable-math-approx/
  */
 inline vec4f logapprox4f(vec4f x)
 {
@@ -93,7 +94,7 @@ inline vec4f logapprox4f(vec4f x)
  Returns a finite number for +inf input
  Returns -inf for nan and <= 0 inputs.
  Continuous error.
- SIMD by Francois Nedelec 12.01.2021
+ SIMD by FJN 12.01.2021 derived from:
  */
 inline vec8f logapprox8f(vec8f x)
 {
@@ -148,9 +149,12 @@ inline vec8f logapprox8f(vec8f x)
 }
 
 /// Approximate cos+sin by Jacques-Henri Jourdan
-/* Correct only in [-pi, pi]
-   Absolute error bounded by 5e-5
-   Continuous error */
+/**
+   This is correct only for x in [-pi, pi]
+   Absolute error bounded is by 5e-5
+   Continuous error
+ SIMD by FJN 12.01.2021 derived from:
+ */
 inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
 {
     vec8f xx = mul8f(x, x);
