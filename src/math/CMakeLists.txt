@@ -16,7 +16,7 @@ set(MATH_SOURCES
     "${PROJECT_SOURCE_DIR}/src/math/polygon.cc"
     "${PROJECT_SOURCE_DIR}/src/math/spherical_code.cc"
     "${PROJECT_SOURCE_DIR}/src/math/random.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/platonic.cc"
+    "${PROJECT_SOURCE_DIR}/src/math/tesselator.cc"
     "${PROJECT_SOURCE_DIR}/src/math/random_vector.cc"
     "${PROJECT_SOURCE_DIR}/src/math/project_ellipse.cc"
     "${PROJECT_SOURCE_DIR}/src/math/SFMT.c"
