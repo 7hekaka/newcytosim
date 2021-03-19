@@ -7,18 +7,25 @@
 
 # Cytosim used in other groups
 
-*Please, let us know if we are missing citations here*
+*Please, let us know of any citations we could add*
+
+2021
+
+- [Dynein self-organizes while translocating the centrosome in T cells](https://www.molbiolcell.org/doi/abs/10.1091/mbc.E20-10-0668)
+- [Kinesin-4 KIF21B limits microtubule growth to allow rapid centrosome polarization in T cells](https://www.biorxiv.org/content/10.1101/2020.08.28.271643v2)
+- [Crowder and Surface Effects on Self-organization of Microtubules](https://arxiv.org/abs/2009.04669)
 
 2020
 
+- [Reverse-engineering forces responsible for dynamic clustering and spreading of multiple nuclei in developing muscle cells](https://doi.org/10.1091/mbc.E19-12-0711)
 - [Wrinkling instability in 3D active nematics](https://pubs.acs.org/doi/abs/10.1021/acs.nanolett.0c01546)
 - [Deep learning the assembly parameters of growing cytoskeletal networks]() Kros, Maury F, Eindhoven University.
 - [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/abs/1804.11044)
 - [Chromosomes function as a barrier to mitotic spindle bipolarity in polyploid cells](https://doi.org/10.1083/jcb.201908006)   
 
-
 2019
 
+- [PP2A-B55/SUR-6 collaborates with the nuclear lamina for centrosome separation during mitotic entry](https://doi.org/10.1091/mbc.E18-10-0631)
 - [Spherical spindle shape promotes perpendicular cortical orientation by preventing isometric cortical pulling on both spindle poles during C. elegans female meiosis](http://dx.doi.org/10.1242/dev.178863)  
 - [Collective effects of yeast cytoplasmic dynein based microtubule transport](http://dx.doi.org/10.1039/c8sm01434e)  
 - [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/pdf/1804.11044.pdf)  
@@ -55,4 +62,4 @@
 2012
 
 - [Spatial and Temporal Sensing Limits of Microtubule Polarization in Neuronal Growth Cones by Intracellular Gradients and Forces](http://dx.doi.org/10.1016/j.bpj.2012.10.021)
-Spherical spindleSpherical spindle
+
