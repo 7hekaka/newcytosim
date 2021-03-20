@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef  MESSAGES_H
 #define  MESSAGES_H
@@ -18,7 +18,7 @@ namespace Cytosim
         std::string  pref_;
 
         /// pointer to the current destination of output
-        std::ostream* out_;
+        std::ostream out_;
         
         /// file stream, if open
         std::ofstream ofs_;
@@ -33,8 +33,9 @@ namespace Cytosim
         
         /// create stream directed to given stream with `max_output` allowed
         Output(std::ostream& os, size_t sup = 0x1p31, std::string const& p = "")
-        : pref_(p), out_(&os), cnt_(sup)
+        : pref_(p), out_(std::cout.rdbuf()), cnt_(sup)
         {
+            out_.rdbuf(os.rdbuf());
             nul_.open("/dev/null");
         }
         
@@ -42,7 +43,7 @@ namespace Cytosim
         void open(std::string const& filename)
         {
             ofs_.open(filename.c_str());
-            out_ = &ofs_;
+            out_.rdbuf(ofs_.rdbuf());
         }
         
         /// close file
@@ -50,51 +51,37 @@ namespace Cytosim
         {
             if ( ofs_.is_open() )
                 ofs_.close();
-            out_ = &std::cout;
-        }
-        
-        /// return current output stream
-        std::ostream* stream() const
-        {
-            return out_;
+            out_.rdbuf(std::cout.rdbuf());
         }
         
         /// return current output
         operator std::ostream&()
         {
-            return *out_;
+            return out_;
         }
         
-        /// flush
-        void flush()
-        {
-            if ( out_ != &nul_ )
-                out_->flush();
-        }
-
         /// direct output to /dev/null
         void silent()
         {
-            out_ = &nul_;
+            out_.rdbuf(nul_.rdbuf());
         }
         
         /// direct output to given stream
         void redirect(Output const& x)
         {
-            out_ = x.stream();
+            out_.rdbuf(x.out_.rdbuf());
         }
         
         /// std::ostream style output operator
         template < typename T >
         std::ostream& operator << (T const& x)
         {
-            if ( out_!=&nul_ && out_->good() && cnt_ )
+            if ( out_.good() && cnt_ )
             {
                 --cnt_;
-                (*out_) << pref_ << x;
-                return *out_;
+                out_ << pref_ << x;
             }
-            return nul_;
+            return out_;
         }
         
         /// front-end to a `printf()` syntax with flush
@@ -104,7 +91,7 @@ namespace Cytosim
             char str[2048] = { 0 };
             snprintf(str, sizeof(str), fmt, args...);
             operator<<(str);
-            flush();
+            out_.flush();
         }
 
     };

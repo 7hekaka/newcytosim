@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
 #ifndef FIELD_H
 #define FIELD_H
@@ -241,7 +241,7 @@ public:
     static const ObjectTag TAG = 'i';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
     
     /// return index of 'prop' in corresponding PropertyList
     Property const* property() const { return prop; }
@@ -256,7 +256,7 @@ public:
 #pragma mark -
     
     /// print total, minimum and maximum value
-    void   writeInfo(std::ostream& out) const
+    void document(std::ostream& out) const
     {
         real vol = mGrid.cellVolume();
         FieldGrid::value_type sum, mn, mx;
@@ -266,7 +266,7 @@ public:
     
     /// write Field to file using VAL::write()
     /** Some of this should be moved to Grid */
-    void   write(Outputter& out) const
+    void write(Outputter& out) const
     {
         if ( mGrid.hasCells() && prop->save )
         {
@@ -294,7 +294,7 @@ public:
     
     
     /// read Field from file using VAL::read()
-    void   readData(Inputter& in, Simul&)
+    void readData(Inputter& in, Simul&)
     {
         size_t size[DIM] = { 0 };
         real   minB[DIM] = { 0 }, maxB[DIM] = { 0 };
@@ -326,7 +326,7 @@ public:
     }
     
     /// read Field and checks that the Grid::step has not changed
-    void   read(Inputter& in, Simul& sim, ObjectTag)
+    void read(Inputter& in, Simul& sim, ObjectTag)
     {
         readData(in, sim);
         

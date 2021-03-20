@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "interface.h"
 #include "stream_func.h"
@@ -1038,27 +1038,27 @@ void Interface::execute_write(std::string const& name, std::string const& what, 
     std::string str;
     VLOG("-WRITE " << what << " to " << file << '\n');
     
-    std::ostream* osp = &std::cout;
-    std::ofstream ofs;
+    std::ostream out(std::cout.rdbuf());
 
     // a STAR designates the standard output:
     if ( name != "*" )
     {
         bool append = true;
         opt.set(append, "append");
+        std::ofstream ofs;
         ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
-        osp = &ofs;
+        out.rdbuf(ofs.rdbuf());
     }
     
     if ( ver > 1 )
-        simul_.report_wrap(*osp, what, opt);
+        simul_.report_wrap(out, what, opt);
     else if ( ver > 0 )
-        simul_.report(*osp, what, opt);
+        simul_.report(out, what, opt);
     else
     {
         std::stringstream ss;
         simul_.report(ss, what, opt);
-        StreamFunc::skip_lines(*osp, ss, '%');
+        StreamFunc::skip_lines(out, ss, '%');
     }
 }
 

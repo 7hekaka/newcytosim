@@ -21,6 +21,7 @@ This is only done in 3D, but not in 2D as it would be ill-defined, since filamen
 
 # Parameters
 
+Attention: the parameters in the config file are 'radius' and not diameters, and thus `d_i = 2 r_i`.  
 To enable steric, you need to set multiple parameters in the different objects:
 
 You need to enable steric and set K\_push and K\_pull:
@@ -31,22 +32,22 @@ You need to enable steric and set K\_push and K\_pull:
        ...
 	}
 
-For the filament, you must enable steric and set `d_0` and `d_1`:
+For the filament, you must enable steric and set `r_0` and `r_1`:
 
 	set fiber microtubule
 	{
-	    steric = 1, 0.025, 0.025  % enable_flag, d_0, d_1
+	    steric = 1, 0.025, 0.025  % enable_flag, r_0, r_1
 	    ...
 	}
 
-For Sphere, beads and Solid, you can enable steric. The parameter `d_0` is always the radius of these objects, but `d_1` can be set:
+For Sphere, beads and Solid, you can enable steric. The parameter `r_0` is always the radius of these objects, but the range can be set:
 	
 	set bead ball
 	{
-	    steric = 1, 0.01         % enable_flag, d_1
+	    steric = 1, 0.01         % enable_flag, r_1
 	    ...
 	}	
 
 # Implementation
 
-A regular grid is used to efficiently find the pairs that are within sufficient range to interact. 
+A regular grid *stericGrid* is used to efficiently find the pairs that are within sufficient range to interact. 
