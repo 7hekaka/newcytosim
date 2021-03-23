@@ -14,13 +14,7 @@
 #include "flute.h"
 
 /// display the edges of a 1D grid using OpenGL
-void drawEdges(Map<1> const&);
-
-/// display the edges of a 2D grid using OpenGL
-void drawEdges(Map<2> const&);
-
-/// display the edges of a 3D grid using OpenGL
-void drawEdges(Map<3> const&);
+template<int ORD> void drawEdges(Map<ORD> const&);
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -209,7 +203,7 @@ void drawValues(Grid<CELL, 3> const& grid,
 
     Vector3 dx, dy;
     dir.orthonormal(dx, dy, cel);
-    dy *= M_SQRT3_2;
+    dy *= 0.5 * M_SQRT3;
     
     flute3 * pts = new flute3[4*R+2];
     flute4 * col = new flute4[4*R+2];

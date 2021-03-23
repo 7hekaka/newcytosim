@@ -795,7 +795,7 @@ namespace gle
         const float T = B + L;
         const float U = H + L;
         const float C = 0.5f;
-        const float S = M_SQRT3_2;
+        const float S = 0.5f * M_SQRT3;
         const float cR = R * C;
         const float sR = R * S;
 

@@ -402,10 +402,10 @@ void Tesselator::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div
 void Tesselator::initTetrahedron(unsigned div)
 {
     kind_ = TETRAHEDRON;
-    constexpr FLOAT M_SQRT3 = 1.7320508075688772935274463415059;
+    constexpr FLOAT F_SQRT3 = 1.7320508075688772935274463415059f;
     FLOAT a = 1.0/3.0;
     FLOAT b = M_SQRT2/3.0;
-    FLOAT c = M_SQRT2/M_SQRT3;
+    FLOAT c = M_SQRT2/F_SQRT3;
     
     // Four vertices on unit sphere
     FLOAT vex[4][3] = {

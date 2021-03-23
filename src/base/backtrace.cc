@@ -5,7 +5,7 @@
 #include "backtrace.h"
 
 // enable/disable backtrace with the '#if' below:
-#if 1
+#if 0
 
 #include <execinfo.h>
 #include <stdlib.h>
