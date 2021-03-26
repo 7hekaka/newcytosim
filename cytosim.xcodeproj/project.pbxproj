@@ -359,11 +359,11 @@
 		BB6921B2233D359F00F528D2 /* mecafil.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9D992508D6281100DBD2BF /* mecafil.cc */; };
 		BB6921B3233D359F00F528D2 /* meca.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB98FE910B35F66300796DAE /* meca.cc */; };
 		BB6921B4233D359F00F528D2 /* fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB171C320B3DEBE700CFFC3B /* fiber.cc */; };
-		BB6921B5233D359F00F528D2 /* fiber_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB60C6A00B6022FE00596D88 /* fiber_grid.cc */; };
+		BB6921B5233D359F00F528D2 /* fiber_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB60C6A00B6022FE00596D88 /* fiber_grid.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB6921B6233D359F00F528D2 /* hand_monitor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDFE3BE0C6A37FF00CD333A /* hand_monitor.cc */; };
 		BB6921B7233D359F00F528D2 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB6921B8233D359F00F528D2 /* lattice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1749A407D798E600BC7BDC /* lattice.cc */; };
-		BB6921B9233D359F00F528D2 /* point_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB53F5760DCB467000ED38EB /* point_grid.cc */; };
+		BB6921B9233D359F00F528D2 /* point_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB53F5760DCB467000ED38EB /* point_grid.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB6921BA233D359F00F528D2 /* movable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* movable.cc */; };
 		BB6921BB233D359F00F528D2 /* object_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA8BD730E1FBDE8009C7F93 /* object_set.cc */; };
 		BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402E60E236764007410D7 /* solid_set.cc */; };
@@ -646,7 +646,7 @@
 		BB955CF6116FCB39000E70A6 /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
 		BB957FF92466A86500A61493 /* locus_grid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB957FF82466A86500A61493 /* locus_grid.h */; };
 		BB957FFA2466A8B300A61493 /* locus_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* locus_grid.cc */; };
-		BB957FFB2466A8B300A61493 /* locus_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* locus_grid.cc */; };
+		BB957FFB2466A8B300A61493 /* locus_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9CA2931A55C2C000302A6D /* locus_grid.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB9711671DECDB7E00352630 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
 		BB9711681DECDB8200352630 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
 		BB9711691DECDB8500352630 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
@@ -779,6 +779,8 @@
 		BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
 		BBB1E480126DC70B00B19D26 /* actor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47C126DC70B00B19D26 /* actor.h */; };
 		BBBD34E01AABA5BE00819326 /* map.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBD34DF1AABA5BE00819326 /* map.h */; };
+		BBBF3BEA260DEA2100079BE3 /* grid_display.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3092292164BAC300C6DEE4 /* grid_display.cc */; };
+		BBBF3BEB260DEA4F00079BE3 /* grid_display.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3092282164BAC300C6DEE4 /* grid_display.h */; };
 		BBC422F52472D0C2007EA070 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBC422FA247342CF007EA070 /* hand_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC422F8247342CF007EA070 /* hand_list.h */; };
 		BBC422FB247342CF007EA070 /* hand_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F9247342CF007EA070 /* hand_list.cc */; };
@@ -3762,6 +3764,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBBF3BEB260DEA4F00079BE3 /* grid_display.h in Headers */,
 				BB51BC1705FA4FD100D4869F /* messages.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4887,6 +4890,7 @@
 				BB51BC1605FA4FD100D4869F /* messages.cc in Sources */,
 				BB3417660C3294B40016CF18 /* filewrapper.cc in Sources */,
 				BB31698724A0F3F4008DFDB3 /* operator_new.cc in Sources */,
+				BBBF3BEA260DEA2100079BE3 /* grid_display.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

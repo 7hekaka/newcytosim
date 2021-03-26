@@ -546,13 +546,14 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
 
 #ifdef DISPLAY
 
-#  include "grid_display.h"
+#include "opengl.h"
+void drawEdges(Map<DIM> const&);
 
 void FiberGrid::draw() const
 {
     glDisable(GL_LIGHTING);
-    glColor4f(0, 1, 1, 1);
-    glLineWidth(0.5);
+    glColor3f(0, 0, 1);
+    glLineWidth(0.25);
     drawEdges(fGrid);
 }
 #endif

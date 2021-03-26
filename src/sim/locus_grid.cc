@@ -745,13 +745,14 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
 
 #ifdef DISPLAY
 
-#  include "grid_display.h"
+#include "opengl.h"
+void drawEdges(Map<DIM> const&);
 
 void LocusGrid::draw() const
 {
     glDisable(GL_LIGHTING);
-    glColor3f(1, 0, 1);
-    glLineWidth(0.5);
+    glColor3f(1, 0, 0);
+    glLineWidth(0.25);
     drawEdges(pGrid);
 }
 #endif

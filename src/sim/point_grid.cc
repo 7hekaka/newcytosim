@@ -734,13 +734,14 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 
 #ifdef DISPLAY
 
-#  include "grid_display.h"
+#include "opengl.h"
+void drawEdges(Map<DIM> const&);
 
 void PointGrid::draw() const
 {
     glDisable(GL_LIGHTING);
-    glColor3f(1, 0, 1);
-    glLineWidth(0.5);
+    glColor3f(0, 1, 0);
+    glLineWidth(0.25);
     drawEdges(pGrid);
 }
 #endif

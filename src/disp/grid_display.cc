@@ -1,7 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "grid_display.h"
-using namespace gle;
 
 /**
  This uses the current OpenGL color and line width.

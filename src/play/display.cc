@@ -761,10 +761,10 @@ void Display::drawAverageFiber2(FiberSet const& fibers, void const* arg)
 void Display::drawMisc(Simul const& sim)
 {
 #if ( 0 )
-    // display Steric Grid for visual debugging:
-    glLineWidth(0.5);
-    glColor3f(0, 0, 1);
+    // display Grids for visual inspection:
     sim.pointGrid.draw();
+    sim.fiberGrid.draw();
+    sim.locusGrid.draw();
 #endif
     
     for ( Property const* i : sim.properties.find_all("fiber") )
