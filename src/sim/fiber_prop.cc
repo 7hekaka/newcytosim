@@ -614,12 +614,12 @@ void FiberProp::complete(Simul const& sim)
 #endif
     
 #if ( 0 )
-    //print some information on the 'stiffness' of the matrix
+    //print some information on the 'stiffness' of the system
     Fiber fib(this);
     fib.setStraight(Vector(-5,0,0), Vector(1,0,0), 10);
     
     fib.setDragCoefficient();
-    real mob_dt = sim.time_step() * fib.nbPoints() / fib.dragCoefficient();
+    real mob_dt = sim.time_step() * fib.pointMobility();
     
     real stiffness = 100;
     real coef1 = mob_dt * stiffness;

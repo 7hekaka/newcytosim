@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef CHAIN_H
 #define CHAIN_H
@@ -165,6 +165,9 @@ public:
     size_t lastSegment() const { return nPoints - 2; }
 
     //---------------------
+    
+    /// set Lagrange multipliers (this is normally not needed)
+    virtual void setTensions(const real*) {}
 
     /// set position of MINUS_END and direction (length and Nb of points are not modified)
     /** dir does not need to be normalized */
@@ -411,10 +414,13 @@ public:
     //--------------------- Info
     
     /// calculate the minimum and maximum segment length
-    void         segmentationMinMax(real&, real&) const;
+    void         segmentationMinMax(real const* ptr, real&, real&) const;
+    
+    /// calculate the minimum and maximum segment length
+    void         segmentationMinMax(real& n, real& x) const { segmentationMinMax(pPos, n, x); }
 
     /// calculate average and variance of the segment length
-    void         segmentationVariance(real&, real&) const;
+    void         segmentationVariance(real const* ptr, real&, real&) const;
 
     /// curvature calculated at joint `p`, where `0 < p < nbPoints()-1`
     real         curvature(size_t p) const;
@@ -469,13 +475,19 @@ public:
     //---------------------
     
     /// print info such as length and segmentation
-    void         writeInfo(std::ostream&, real, real, real, real) const;
+    void         briefdoc(std::ostream&, real, real, real, real) const;
+
+    /// print info such as length and segmentation
+    void         document(std::ostream&, real, real, real, real) const;
     
     /// print info such as length and segmentation
-    void         writeInfo(std::ostream&) const;
+    void         document(real const* ptr, std::ostream&) const;
+    
+    /// return string with info such as length and segmentation
+    std::string  document(real const* ptr) const;
 
     /// check length and segmentation and write if suspicious
-    int          checkLength(std::ostream&, real len) const;
+    int          checkLength(real const* ptr, std::ostream&, real len) const;
 
     /// write to Outputter
     void         write(Outputter&) const;

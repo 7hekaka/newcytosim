@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include <memory>
 #include "dim.h"
@@ -314,7 +314,7 @@ void Chain::reshape_two(const real* src, real* dst, real cut)
  
      ( Y[i+1] - Y[i] )^2 = cut^2
  
- i.e. 'A[]' should fulfill a set of equalities F[i] = 0, with:
+ i.e. 'A[]' should fulfill a set of equations F[i] = 0, with:
  
      F[i] = ( Y[i+1] - Y[i] )^2 - cut^2
  
@@ -322,19 +322,19 @@ void Chain::reshape_two(const real* src, real* dst, real cut)
  
      Y[i+1] - Y[i] = A[i+1] * dif[i+1] + (1-2*A[i]) * dif[i] + A[i-1] * dif[i-1]
  
- Method: use all zeros as first guess for 'sca', and apply a multidimensional
- Newton's method to iteratively refine the guess.
+ Method: use all zeros as first guess for 'sca', and follow
+ Newton's method to iteratively refine the multidimensional guess.
  
- In practice, we calculate `A_next` from `A` using the relationship:
+ In practice, we calculate `A_new` from `A` using the relationship:
  
-     J(A) * ( A_next - A ) = -F(A)
+     J(A) * ( A_new - A ) = -F(A)
  
  Where J is the Jacobian matrix: J[i,j] = dF[i] / dA[j]
  
  For this problem, J is square and tri-diagonal but not symmetric,
  and must be recalculated at each iteration. A factor 2 can be factorized:
 
-     A_next = A - 1/2 inv(K).F(A)
+     A_new = A - 1/2 inv(K).F(A)
  
  Where J = 2 * K
 
@@ -342,106 +342,108 @@ void Chain::reshape_two(const real* src, real* dst, real cut)
  FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
  */
 
-int Chain::reshape_calculate(const size_t ns, real cutcut,
+int Chain::reshape_calculate(const size_t ns, real target,
                              real const* mag, real const* pri, real const* sec,
                              real* mem, size_t chk)
 {
-    real * sca = mem;
-    real * val = mem+chk;
+    real * mul = mem;
+    real * rhs = mem+chk;
     real * dia = mem+chk*2;
     real * low = mem+chk*3;
     real * upe = mem+chk*4;
     
-    real err0 = 0;
+    real err, err0 = 0;
     /*
      Perform here the first iteration of Newton's method
-     the formula is the same as below, with all `sca` equal to zero,
+     the formula is the same as below, with all `mul` equal to zero,
      and thus 'vec == dif'
      The system is symmetric, and we can use a faster factorization
      */
     for ( size_t i = 0; i < ns; ++i )
     {
-        sca[i] = mag[i] - cutcut;
-        err0 += abs_real(sca[i]);  // calculating the 1-norm
+        mul[i] = mag[i] - target;
         dia[i] = mag[i] * 4;
         low[i] = pri[i] * (-2);  //accessing pri[ns-1], but not used
+        err0 += abs_real(mul[i]);  // calculating the 1-norm
     }
     
     int info = 0;
     lapack::xpttrf(ns, dia, low, &info);
     if ( info ) {
-        std::cerr << " reshape_local failed " << info << '\n';
+        std::cerr << " reshape_local (pttrf) failed " << info << '\n';
         return 1;
     }
-    lapack::xptts2(ns, 1, dia, low, sca, ns);
-    
+    lapack::xptts2(ns, 1, dia, low, mul, ns);
 #if ( 0 )
-    printf("\n ====err %20.16f", err0);
-    printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+    printf("\n    err0 %20.16f", err0);
+    printf(" mul "); VecPrint::print(std::cout, std::min(16UL, ns), mul, 3);
 #endif
+    if ( err0 < ns * REAL_EPSILON )
+        return 0;
     size_t cnt = 0;
     while ( ++cnt < 8 )
     {
+        constexpr real d = -2;
         assert_true( ns > 1 );
         // set the matrix elements and RHS of system,
         {
-            real b = 1-2*sca[0], c = sca[1];
+            real b = 1 - 2 * mul[0], c = mul[1];
             //vec = b*dif[i] + c*dif[i+1];
             real D = b * mag[0] + c * pri[0];
             real U = b * pri[0] + c * mag[1];
-            val[0] = b * D + c * U - cutcut;
-            dia[0] = D * ( -2 );
+            rhs[0] = b * D + c * U - target;
+            dia[0] = d * D;
             upe[0] = U;
         }
-        real err = abs_real(val[0]);
+        err = abs_real(rhs[0]);
         for( size_t i = 1; i+1 < ns; ++i )
         {
-            real a = sca[i-1];
-            real b = 1 - 2 * sca[i];
-            real c = sca[i+1];
+            real a = mul[i-1];
+            real b = 1 - 2 * mul[i];
+            real c = mul[i+1];
             /*
              vec = a*dif[i-1] + b*dif[i] + c*dif[i+1];
-             val = vec.normSqr() - curSqr;
-             low = derivate(val, sca[i-1])
-             dia = derivate(val, sca[i]);
-             upe = derivate(val, sca[i+1);
+             rhs = vec.normSqr() - target;
+             low = derivate(rhs, mul[i-1])
+             dia = derivate(rhs, mul[i]);
+             upe = derivate(rhs, mul[i+1);
              */
             real L = a * mag[i-1] + b * pri[i-1] + c * sec[i-1];
             real D = a * pri[i-1] + b * mag[i  ] + c * pri[i  ];
             real U = a * sec[i-1] + b * pri[i  ] + c * mag[i+1];
 
-            val[i] = ( a * L + b * D ) + ( c * U - cutcut );
+            rhs[i] = a * L + b * D + c * U - target;
             low[i] = L;
-            dia[i] = D * ( -2 );
+            dia[i] = d * D;
             upe[i] = U;
-            err += abs_real(val[i]);
+            err += abs_real(rhs[i]);
         }
         {
-            real a = sca[ns-2];
-            real b = 1 - 2 * sca[ns-1];
+            real a = mul[ns-2];
+            real b = 1 - 2 * mul[ns-1];
             //vec = a*dif[ns-2] + b*dif[ns-1];
             real L = a * mag[ns-2] + b * pri[ns-2];
             real D = a * pri[ns-2] + b * mag[ns-1];
-            val[ns-1] = a * L + b * D - cutcut;
+            rhs[ns-1] = a * L + b * D - target;
             low[ns-1] = L;
-            dia[ns-1] = D * ( -2 );
+            dia[ns-1] = d * D;
+            err += abs_real(rhs[ns-1]);
         }
-        err += abs_real(val[ns-1]);
-#if ( 0 )
-        printf("\n %3lu err %20.16f norm(val) %8.5e", cnt, err, blas::nrm2(ns, val));
-        //printf("\n     val "); VecPrint::print(std::cout, ns, val, 6);
-        //printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 6);
-#endif
-        if ( err < REAL_EPSILON )
+        //printf("\n %3lu err %20.16f norm(rhs) %8.5e", cnt, err, blas::nrm2(ns, rhs));
+        
+        if ( err < ns * REAL_EPSILON )
             return 0;
         if ( err > err0 )
+        {
+            //printf("  rhs"); VecPrint::print(std::cout, std::min(16UL, ns), rhs, 3);
             return 3;
-        err0 = err;
+        }
 #if ( 0 )
         printf("\n diff(L,U) = %f", blas::max_diff(ns-1, upe, low+1));
         printf("\n L"); VecPrint::print(std::cout, std::min(16UL, ns-1), low+1, 3);
         printf("\n D"); VecPrint::print(std::cout, std::min(16UL, ns  ), dia, 3);
         printf("\n U"); VecPrint::print(std::cout, std::min(16UL, ns-1), upe, 3);
+        //printf("\n rhs "); VecPrint::print(std::cout, std::min(16UL, ns), rhs, 6);
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
@@ -452,27 +454,27 @@ int Chain::reshape_calculate(const size_t ns, real cutcut,
         }
         printf("\n %3i diff(low-upe) %12.6f", cnt, 2*asy/sup);
 #endif
-        lapack::xgtsv(ns, 1, low+1, dia, upe, val, ns, &info);
+        lapack::xgtsv(ns, 1, low+1, dia, upe, rhs, ns, &info);
         if ( info )
         {
-            std::cerr << " LAPACK dgtsv failed " << info << '\n';
+            std::cerr << " reshape_local (dgtsv) failed " << info << '\n';
             return 2;
         }
         
         // update result following Newton's iteration
         for ( size_t u = 0; u < ns; ++u )
-            sca[u] -= 0.5 * val[u];
+            mul[u] -= 0.5 * rhs[u];
         
-        //printf("\n   ->sca "); VecPrint::print(std::cout, ns, sca, 3);
+        //printf(" >mul"); VecPrint::print(std::cout, std::min(16UL, ns), mul, 3);
     }
-    //printf("\n   >>err %20.16f", err);
-    //printf("\n   >>sca "); VecPrint::print(std::cout, ns, sca, 3);
-    return 4;
+    //printf("\n   >> err %20.16f", err);
+    //printf("\n   >>mul "); VecPrint::print(std::cout, ns, mul, 3);
+    return ( err < err0 );
 }
 
 
 /// old version (2018)
-int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
+int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
                                  real* mem, size_t chk)
 {
     real * sca = mem;
@@ -493,7 +495,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
     {
         Vector difA(dif+DIM*i), difB(dif+DIM*(i+1));
         real n = difA.normSqr();
-        sca[i] = n - cutcut;
+        sca[i] = n - target;
         err0 += abs_real(sca[i]);
         dia[i] = n * 4;
         low[i] = dot(difA, difB) * (-2);  //using undefined value
@@ -502,7 +504,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
     int info = 0;
     lapack::xpttrf(ns, dia, low, &info);
     if ( info ) {
-        std::cerr << " reshape_local failed " << info << '\n';
+        std::cerr << " reshape_local (pttrf) failed " << info << '\n';
         return 1;
     }
     lapack::xptts2(ns, 1, dia, low, sca, ns);
@@ -517,7 +519,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
             Vector dif0(dif), dif1(dif+DIM);
             // set the matrix elements and RHS of system,
             Vector vec = (1-2*sca[0]) * dif0 + sca[1] * dif1;
-            val[0] = vec.normSqr() - cutcut;
+            val[0] = vec.normSqr() - target;
             dia[0] = dot(vec, dif0) * ( -2 );
             upe[0] = dot(vec, dif1);
         }
@@ -526,7 +528,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
         {
             Vector difA(dif+DIM*(i-1)), difB(dif+DIM*i), difC(dif+DIM*(i+1));
             Vector vec = sca[i-1]*difA + (1-2*sca[i])*difB + sca[i+1]*difC;
-            val[i] = vec.normSqr() - cutcut;
+            val[i] = vec.normSqr() - target;
             low[i] = dot(vec, difA);
             dia[i] = dot(vec, difB) * ( -2 );
             upe[i] = dot(vec, difC);
@@ -535,7 +537,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
         {
             Vector difA(dif+DIM*(ns-2)), difB(dif+DIM*(ns-1));
             Vector vec = sca[ns-2]*difA + (1-2*sca[ns-1])*difB;
-            val[ns-1] = vec.normSqr() - cutcut;
+            val[ns-1] = vec.normSqr() - target;
             low[ns-1] = dot(vec, difA);
             dia[ns-1] = dot(vec, difB) * ( -2 );
         }
@@ -574,7 +576,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
 
         // update result following Newton's iteration
         for ( size_t u = 0; u < ns; ++u )
-            sca[u] -= 0.5 * val[u];
+            sca[u] = std::min(0.5, sca[u] - 0.5 * val[u]);
 
         //printf("\n   ->sca "); VecPrint::print(std::cout, ns, sca, 3);
     }
@@ -587,7 +589,7 @@ int Chain::reshape_calculate_old(const size_t ns, real cutcut, const real* dif,
  old version 22.02.2015
  externally provided memory `mem[]` should be allocated to hold `5*chk` reals
  */
-int Chain::reshape_calculate_alt(const size_t ns, real cutcut,
+int Chain::reshape_calculate_alt(const size_t ns, real target,
                                  const real* dif, real* mem, size_t chk)
 {
     real * sca = mem;
@@ -607,7 +609,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real cutcut,
         {
             Vector dif0(dif), dif1(dif+DIM);
             Vector vec = (1-2*sca[0]) * dif0 + sca[1]*dif1;
-            val[0] = vec.normSqr() - cutcut;
+            val[0] = vec.normSqr() - target;
             dia[0] = dot(vec, dif0) * ( -2 );
             upe[0] = dot(vec, dif1);
         }
@@ -616,7 +618,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real cutcut,
         {
             Vector difA(dif+DIM*(i-1)), difB(dif+DIM*i), difC(dif+DIM*(i+1));
             Vector vec = sca[i-1]*difA + (1-2*sca[i])*difB + sca[i+1]*difC;
-            val[i] = vec.normSqr() - cutcut;
+            val[i] = vec.normSqr() - target;
             low[i] = dot(vec, difA);
             dia[i] = dot(vec, difB) * ( -2 );
             upe[i] = dot(vec, difC);
@@ -625,7 +627,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real cutcut,
         {
             Vector difA(dif+DIM*(ns-2)), difB(dif+DIM*(ns-1));
             Vector vec = sca[ns-2]*difA + (1-2*sca[ns-1])*difB;
-            val[ns-1] = vec.normSqr() - cutcut;
+            val[ns-1] = vec.normSqr() - target;
             low[ns-1] = dot(vec, difA);
             dia[ns-1] = dot(vec, difB) * ( -2 );
         }
@@ -733,35 +735,36 @@ void Chain::reshape_apply_alt(const size_t nbs, const real* dif, const real* src
  Try to re-establish the length of the segments, by moving points along
  the directions of the flanking segments
  
- here ns = nbSegments() and tmp_size >= ns
- `tmp` should be of size (5+3+3)*tmp_size
+ here ns = nbSegments() and mem_size >= ns
+ `mem` should be allocated to hold 8 * mem_size
  */
 int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
-                         real cut, real* tmp, size_t tmp_size)
+                         real cut, real* mem, size_t mem_size)
 {
     int res;
     assert_true( nbs > 1 );
     //auto rdt = __rdtsc();
 
     // alias some of the memory provided for the work:
-    real * mag = tmp;
-    real * pri = tmp + tmp_size;
-    real * sec = tmp + tmp_size * 2;
-    real * mem = tmp + tmp_size * 3;
+    real * mag = mem + mem_size * 5;
+    real * pri = mem + mem_size * 6;
+    real * sec = mem + mem_size * 7;
     
+    // rescale factor to make matrix elements close to 1:
+    real alpha = 1.0 / ( cut * cut );
     // calculate terms using 'dif[]':
     Vector A, B, C;
     A.load_diff(src);
     B.load_diff(src+DIM);
-    mag[0] = A.normSqr();
-    mag[1] = B.normSqr();
-    pri[0] = dot(A, B);
+    mag[0] = alpha * A.normSqr();
+    mag[1] = alpha * B.normSqr();
+    pri[0] = alpha * dot(A, B);
     for ( size_t i = 2; i < nbs; ++i )
     {
         C.load_diff(src+DIM*i);
-        mag[i] = C.normSqr();
-        pri[i-1] = dot(B, C);
-        sec[i-2] = dot(A, C);
+        mag[i] = alpha * C.normSqr();
+        pri[i-1] = alpha * dot(B, C);
+        sec[i-2] = alpha * dot(A, C);
         A = B;
         B = C;
     }
@@ -769,15 +772,16 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     pri[nbs-1] = 0;
     sec[nbs-2] = 0;
     sec[nbs-1] = 0;
-    /*
-    printf("\n mag "); VecPrint::print(std::cout, nbs, mag, 3);
-    printf("\n pri "); VecPrint::print(std::cout, nbs, pri, 3);
-    printf("\n sec "); VecPrint::print(std::cout, nbs, sec, 3);
-    */
-    res = reshape_calculate(nbs, cut*cut, mag, pri, sec, mem, tmp_size);
+#if ( 0 )
+    size_t S = std::min(nbs, 24UL);
+    printf("\n mag "); VecPrint::print(std::cout, S, mag, 3);
+    printf("\n pri "); VecPrint::print(std::cout, S, pri, 3);
+    printf("\n sec "); VecPrint::print(std::cout, S, sec, 3);
+#endif
+    res = reshape_calculate(nbs, 1.0, mag, pri, sec, mem, mem_size);
     
 #if ( 0 )
-    real * dif = new_real(tmp_size*DIM);
+    real * dif = new_real(mem_size*DIM);
     // calculate differences
     for ( size_t p = 0; p < DIM*nbs; ++p )
         dif[p] = src[p+DIM] - src[p];
@@ -786,7 +790,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 
     // checking against older code
     copy_real(nbs, mem, mag);
-    res = reshape_calculate_alt(nbs, cut*cut, dif, mem, tmp_size);
+    res = reshape_calculate_alt(nbs, 1.0, dif, mem, mem_size);
     real errS = blas::max_diff(nbs, mem, mag);
     if ( abs_real(errS) > 1e-8 )
     {
@@ -799,6 +803,17 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 
     if ( res == 0 )
     {
+#if ( 0 )
+        if ( nbs <= S )
+        {
+            printf("\n>>> mul "); VecPrint::print(std::cout, S, mem, 3);
+        }
+        else
+        {
+            printf("\n>>> mul "); VecPrint::print(std::cout, S/2, mem, 3);
+            printf("..."); VecPrint::print(std::cout, S/2, mem+nbs-S/2, 3);
+        }
+#endif
         reshape_apply(nbs, src, mem, dst);
 #if ( 0 )
         // checking against older code
@@ -923,6 +938,7 @@ void Chain::getPoints(real const* ptr)
     if ( skipProjection )
         return copy_real(DIM*nPoints, ptr, pPos);
 #endif
+    constexpr size_t NVEC = 8;
 #if 0
     // use here static memory
     // Attention: this only works if using a single thread
@@ -933,7 +949,7 @@ void Chain::getPoints(real const* ptr)
     {
         alc = allocated();
         free_real(mem);
-        mem = new_real(alc*8);
+        mem = new_real(alc*NVEC);
     }
 #else
     // use here thread-local static memory
@@ -952,7 +968,7 @@ void Chain::getPoints(real const* ptr)
     {
         alc = allocated();
         free_real(uptr.release());
-        uptr.reset(new_real(alc*8));
+        uptr.reset(new_real(alc*NVEC));
         //printf("> new real[%lu] %p %p\n", alc, uptr.get(), pthread_self());
     }
     real * mem = uptr.get();
@@ -960,15 +976,17 @@ void Chain::getPoints(real const* ptr)
     
     //printf("\n %u  /pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
     //printf("\n %u  |ptr ", identity()); VecPrint::print(std::cerr, nPoints, ptr, 3);
-
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
     else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, mem, allocated()) )
 #endif
     {
+        std::string doc = document(ptr);
         reshape_global(nbSegments(), ptr, pPos, fnCut);
-        Cytosim::warn << "a crude method was used to reshape " << reference() << '\n';
+        Cytosim::warn << "crude motion was applied to " << doc << '\n';
+        //copy_real(DIM*nbPoints(), ptr, pPos);
+        //Cytosim::warn << document(pPos) << '\n';
     }
     
     //printf("\n %u  >pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
@@ -1322,13 +1340,16 @@ void Chain::join(Chain const* fib)
 /**
  Returns the minimum and maximum distance between consecutive points
  */
-void Chain::segmentationMinMax(real& mn, real& mx) const
+void Chain::segmentationMinMax(real const* ptr, real& mn, real& mx) const
 {
-    mn = diffPoints(0).normSqr();
+    Vector vec;
+    vec.load_diff(ptr);
+    mn = vec.normSqr();
     mx = mn;
     for ( size_t n = 1; n < lastPoint(); ++n )
     {
-        real r = diffPoints(n).normSqr();
+        vec.load_diff(ptr+DIM*n);
+        real r = vec.normSqr();
         mn = std::min(mn, r);
         mx = std::max(mx, r);
     }
@@ -1339,14 +1360,16 @@ void Chain::segmentationMinMax(real& mn, real& mx) const
 /**
  Returns the average and variances of segment length
  */
-void Chain::segmentationVariance(real& mean, real& variance) const
+void Chain::segmentationVariance(real const* ptr, real& mean, real& variance) const
 {
+    Vector vec;
     const double off = segmentation(); // assumed mean
     double avg = 0, var = 0;
     size_t cnt = nbSegments();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        real r = diffPoints(n).norm() - off;
+        vec.load_diff(ptr+DIM*n);
+        real r = vec.norm() - off;
         avg += r;
         var += r*r;
     }
@@ -2023,12 +2046,20 @@ real Chain::projectedForceEnd(const FiberEnd end) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - document
+
+void Chain::briefdoc(std::ostream& os, real len, real con, real mn, real mx) const
+{
+    os << "chain " << reference();
+    os << "( seg " << segmentation() << ": " << mn << " +" << mx-mn;
+    os << " len " << len << " " << std::showpos << con-len << std::noshowpos << " )";
+}
+
 
 /**
  Prints info on the length of Segments, which can be useful for debugging
  */
-void Chain::writeInfo(std::ostream& os, real len, real con, real mn, real mx) const
+void Chain::document(std::ostream& os, real len, real con, real mn, real mx) const
 {
     os << "chain " << std::setw(7) << reference() << '\n';
     os << "{\n";
@@ -2041,16 +2072,16 @@ void Chain::writeInfo(std::ostream& os, real len, real con, real mn, real mx) co
 }
 
 
-int Chain::checkLength(std::ostream& os, real len) const
+int Chain::checkLength(real const* ptr, std::ostream& os, real len) const
 {
     real mn, mx;
-    segmentationMinMax(mn, mx);
+    segmentationMinMax(ptr, mn, mx);
     real dev = ( mx - mn ) / segmentation();
-    real con = contourLength(pPos, nPoints);
+    real con = contourLength(ptr, nPoints);
     real err = abs_real( con - len ) / ( con + len );
     int res = ( dev > 0.05 ) + ( err > 0.05 );
     if ( res )
-        writeInfo(os, len, con, mn, mx);
+        document(os, len, con, mn, mx);
     return res;
 }
 
@@ -2058,15 +2089,26 @@ int Chain::checkLength(std::ostream& os, real len) const
 /**
  Prints info on the length of Segments, which can be useful for debugging
  */
-void Chain::writeInfo(std::ostream& os) const
+void Chain::document(real const* ptr, std::ostream& os) const
 {
     real mn, mx;
     real len = length();
-    segmentationMinMax(mn, mx);
-    real con = contourLength(pPos, nPoints);
-    writeInfo(os, len, con, mn, mx);
+    segmentationMinMax(ptr, mn, mx);
+    real con = contourLength(ptr, nPoints);
+    briefdoc(os, len, con, mn, mx);
 }
 
+
+std::string Chain::document(real const* ptr) const
+{
+    std::ostringstream ss;
+    document(ptr, ss);
+    return ss.str();
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - I/O
 
 void Chain::write(Outputter& out) const
 {
@@ -2130,6 +2172,6 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     
     // verify the length and segmentation:
     if ( in.vectorSize() == DIM )
-        checkLength(std::clog, len);
+        checkLength(pPos, std::clog, len);
 }
 

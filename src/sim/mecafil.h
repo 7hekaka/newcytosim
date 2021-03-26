@@ -137,6 +137,9 @@ public:
     /// compute Lagrange multipliers associated with length constraints, given the force
     void        computeTensions(const real* force);
     
+    /// set Lagrange multipliers
+    void        setTensions(const real* ptr) { copy_real(nbSegments(), ptr, iLag); }
+    
     /// debug output
     void        printTensions(FILE *, char = ' ') const;
     

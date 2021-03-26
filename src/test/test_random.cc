@@ -637,7 +637,6 @@ void test_gaussian(int cnt)
     printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
     sfmt_t sfmt;
     sfmt_init_gen_rand(&sfmt, time(nullptr));
-    real *end, vec[SFMT_N32] = { 0 };
 
     tic();
     for ( int i = 0; i < cnt; ++i )
@@ -647,6 +646,7 @@ void test_gaussian(int cnt)
     
     runGaussian<makeGaussians_>(sfmt, "Gauss_", cnt);
 #if defined(__AVX__)
+    real *end, vec[SFMT_N32] = { 0 };
     runGaussian<makeGaussians_AVX0>(sfmt, "GaussAVX0", cnt);
     runGaussian<makeGaussians_AVX1>(sfmt, "GaussAVX1", cnt);
     runGaussian<makeGaussians_AVX2>(sfmt, "GaussAVX2", cnt);

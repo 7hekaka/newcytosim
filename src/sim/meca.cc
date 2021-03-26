@@ -1653,50 +1653,63 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real* fff, real 
 
 
 /**
- This solves the equation:
+ Meca::solve() solves the equation of motion with all Mecables:
  
-     ( Xnew - Xold ) / time_step = P * Force + Noise
+     drag * ( Xnew - Xold ) / time_step = P * Force + Noise
  
- Explicit integration would lead to:
+ Where X is large a vector containing all the coordinates.
+ P is the projection associated with constrains in the dynamics.
+ The projection P and scaling by `mobility = 1/drag` are implemented together via
  
-     Xnew = Xold + time_step * P * Force + Noise
+     Mecable::projectForces()
+     Mecable::leftoverMobility()
  
- For implicit integration, we use a linearization of the force:
+ We note here `mobP` the combination: mobP * X = ( 1/drag ) * P * X.
+ To calculate Xnew, explicit integration would be:
+ 
+     Xnew = Xold + time_step * mobP * Force + Noise
+ 
+ For a semi-implicit integration, we use a linearization of the force:
  
      Force(X) = M * X + B
  
- where M is a matrix and B is a vector, leading to:
+ where M is a matrix and B a vector. The linearlization is performed by the
+ functions such as Meca::addLink() in `meca_inter.cc`, usually around the
+ positions of equilibrium. The linearization is used around Xold:
  
-     ( I - time_step * P * M ) ( Xnew - Xold ) = time_step * P * Force + Noise
+     Force(X) = M * ( X - Xold ) + F
  
- where:
+ where F = M * Xold + B = Force(Xold), leading to:
  
-     Force = M * Xold + B
+     ( I - time_step * mobP * M ) ( Xnew - Xold ) = time_step * mobP * F + Noise
+ 
+ with:
  
      Noise = std::sqrt(2*kT*time_step*mobility) * Gaussian(0,1)
  
- Implicit integration ensures numerical stability. In the code,
- the sparse matrix M is decomposed as:
+ Implicit integration ensures numerical stability: a large time_step can be used.
+ Moreover, the matrix M is sparse, and it is decomposed as:
  
-     M = mISO + mFUL + Rigidity_of_Mecables
+     M = mISO + mFUL + Rigidity
  
- Where mISO is isotropic: it applies similarly in the X, Y and Z subspaces, and
- has no crossterms between X and Y or X and Z or Y ans Z subspaces.
- All crossterms go into mFUL.
- The terms should already be set:
+ Where mISO is isotropic: it applies similarly in the X, Y and Z subspaces, while
+ mFUL can accept crossterms between different subspaces. Using mISO is optional.
+ Normally, Meca::solve is called after:
 
      'mISO', 'mFUL' and 'B=vBAS' are set in Meca::setAllInteractions()
      'vPTS = Xold' is set from Mecables' points in Meca::prepare()
-     
+ 
  The outline of the calculation is:
  
      'vRND' <- calibrated Gaussian random terms ~N(0,1)
-     'vFOR' <- force 'M * Xold + B'
-     'vRHS' <- time_step * P * F + vRND (right-hand-side of the system)
-     'vSOL' <- solution to the linear system of equations is calculated
-     'vSOL' <- 'Xnew = Xold + vSOL'
-     'vFOR' <- force 'M * Xnew + B'
+     'vFOR' <- F = M * Xold + B
+     'vRHS' <- set right-hand-side: time_step * mobP * F + vRND
+     Solve the linear system ( I - time_step * mob * P * M ) * vSOL = vRHS
+     'vSOL' <- solution to the linear system of equations
+     'vPTS' <- calculate new positions: 'Xnew = vPTS + vSOL'
+     'vFOR' <- calculate force with new positions: 'M * Xnew + B'
  
+ The function Meca::apply() sends 'VPTS' and 'vFOR' back to the Mecable.
  */
 size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 {
@@ -2021,8 +2034,8 @@ void Meca::apply()
         for ( Mecable * mec : mecables )
         {
             size_t off = DIM * mec->matIndex();
-            mec->getPoints(vPTS+off);
             mec->getForces(vFOR+off);
+            mec->getPoints(vPTS+off);
         }
     }
     else
