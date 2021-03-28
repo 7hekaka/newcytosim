@@ -389,7 +389,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     glPushMatrix();
     if ( abs+inc >= fib.length() )
     {
-        gle::transAlignZ(fib.posEndP(), rad, -fib.dirEndP(), fib.length()-abs);
+        gle::transAlignZ(fib.displayPosM(abs+inc), rad, -fib.dirEndP(), fib.length()-abs);
         gle::discBottom2();
     }
     else

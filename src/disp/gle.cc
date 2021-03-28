@@ -208,9 +208,9 @@ namespace gle
         y[1] = sul * b - mul;
         y[2] = sul * v[1];
     }
-
+    
     template < typename FLOAT >
-    inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3], FLOAT z[3])
+    inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3], FLOAT fac, FLOAT z[3])
     {
         const FLOAT s = std::copysign((FLOAT)1, v[2]);
         /// optimized version by Marc B. Reynolds
@@ -224,11 +224,11 @@ namespace gle
         y[0] = sul * c;
         y[1] = sul * b - mul;
         y[2] = sul * v[1];
-        z[0] = mul * v[0];
-        z[1] = mul * v[1];
-        z[2] = mul * v[2];
-    }    
-    
+        z[0] = fac * v[0];
+        z[1] = fac * v[1];
+        z[2] = fac * v[2];
+    }
+
     /**
      `R` is the transverse scaling done in the XY plane after rotation
      */
@@ -363,7 +363,7 @@ namespace gle
             0, 0, 0, 0,
             0, 0, 0, 0,
             float(P.XX), float(P.YY), float(P.ZZ), 1};
-        orthonormal(vec, R, mat, mat+4, mat+8);
+        orthonormal(vec, R, mat, mat+4, R, mat+8);
         glMultMatrixf(mat);
     }
 
@@ -397,7 +397,7 @@ namespace gle
         glMultMatrixf(mat);
     }
     
-    // rotate to align Z with 'D' and translate to center 'P'
+    // rotate to align Z with 'D' and translate to center 'P', scale Z axis by S
     void transAlignZ(Vector3 const& P, float R, Vector3 const& D, float S)
     {
         float X = float(D.XX);
@@ -410,11 +410,7 @@ namespace gle
             0, 0, 0, 0,
             0, 0, 0, 0,
             float(P.XX), float(P.YY), float(P.ZZ), 1};
-        orthonormal(vec, R, mat, mat+4, mat+8);
-        n = S / R;
-        mat[8] *= n;
-        mat[9] *= n;
-        mat[10] *= n;
+        orthonormal(vec, R, mat, mat+4, S, mat+8);
         glMultMatrixf(mat);
     }
 
