@@ -427,7 +427,7 @@ void Parser::parse_new(std::istream& is)
                 }
                 else
                 {
-                    opt.define("position", 0, 0.5*(A+B));
+                    opt.define("position", 0, A);
                     execute_new(name, opt);
                 }
             }

@@ -252,8 +252,9 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 std::string FiberGrid::SegmentHit::toString() const
 {
     std::ostringstream oss;
-    oss << "{ f" << seg_.fiber()->identity() << ":" << seg_.point();
-    oss << " @ " << dis_ << " }";
+    oss << "f" << seg_.fiber()->identity() << ":" << seg_.point();
+    // convert distance squared to nm
+    oss << " " << std::setprecision(1) << std::fixed << 1000 * sqrt(dis_);
     return oss.str();
 }
     
@@ -311,19 +312,22 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      number to get the index of the next target that will bind, using a Poisson
      distribution */
     const uint64_t prob = 0x1p+32 * ha.prop->binding_prob;
+    //std::clog << &ha << " trying ";
     for ( SegmentHit const& hit : targets )
     {
-        //std::cout << "    trying " << hit.toString() << "\n";
         if ( RNG.pint32() < prob )
         {
             FiberSite sit(const_cast<Fiber*>(hit.fiber()), hit.abscissa());
             if ( ha.attachmentAllowed(sit) )
             {
+                //std::clog << hit.toString() << "\n";
                 ha.attach(sit);
                 return;
             }
         }
+        //std::clog << hit.toString() << " | ";
     }
+    //std::clog << "\n";
 }
 
 

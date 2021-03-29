@@ -64,8 +64,8 @@ public:
     {
     public:
         FiberSegment seg_;   ///< The segment
-        real         dis_;   ///< shortest distance from point to segment
-        real         abs_;   ///< abscissa of projection of point
+        real         dis_;   ///< shortest distance squared from point to segment
+        real         abs_;   ///< abscissa of projection of target point
         
         SegmentHit() {}
         SegmentHit(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }

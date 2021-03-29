@@ -184,8 +184,8 @@ void glApp::maximizeDisplay()
     int H = glutGet(GLUT_WINDOW_HEIGHT);
 
     /// using addition by Renaud Blanch to handle Retina display:
-    int s = std::max(1, glutGet(GLUT_WINDOW_SCALE));
- 
+    int s = 1; //std::max(1, glutGet(GLUT_WINDOW_SCALE));
+    
     const int maxW = s * glutGet(GLUT_SCREEN_WIDTH);
     const int maxH = s * ( glutGet(GLUT_SCREEN_HEIGHT) - 49 );
     
