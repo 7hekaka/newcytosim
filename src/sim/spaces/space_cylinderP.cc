@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "space_cylinderP.h"
 #include "exceptions.h"
 #include "iowrapper.h"
@@ -12,13 +12,13 @@ SpaceCylinderP::SpaceCylinderP(SpaceProp const* p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("cylinderP is only valid in 3D: use strip instead");
-    halflength_ = 0;
+    half_ = 0;
     radius_ = 0;
 }
 
 void SpaceCylinderP::resize(Glossary& opt)
 {
-    real len = halflength_, rad = radius_;
+    real len = half_, rad = radius_;
     
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
@@ -33,7 +33,7 @@ void SpaceCylinderP::resize(Glossary& opt)
     if ( len <= 0 )
         throw InvalidParameter("cylinderP:length must be > 0");
     
-    halflength_ = len;
+    half_ = len;
     radius_ = rad;
 
     update();
@@ -43,20 +43,20 @@ void SpaceCylinderP::resize(Glossary& opt)
 void SpaceCylinderP::update()
 {
     modulo_.reset();
-    modulo_.enable(0, 2*halflength_);
+    modulo_.enable(0, 2*half_);
 }
 
 
 void SpaceCylinderP::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-halflength_,-radius_,-radius_);
-    sup.set( halflength_, radius_, radius_);
+    inf.set(-half_,-radius_,-radius_);
+    sup.set( half_, radius_, radius_);
 }
 
 
 real SpaceCylinderP::volume() const
 {
-    return 2 * M_PI * halflength_ * square(radius_);
+    return 2 * M_PI * half_ * square(radius_);
 }
 
 
@@ -91,11 +91,11 @@ Vector SpaceCylinderP::randomPlace() const
 {
 #if ( DIM >= 3 )
     const Vector2 V = Vector2::randB(radius_);
-    return Vector(halflength_*RNG.sreal(), V.XX, V.YY);
+    return Vector(half_*RNG.sreal(), V.XX, V.YY);
 #elif ( DIM > 1 )
-    return Vector(halflength_*RNG.sreal(), radius_*RNG.sreal());
+    return Vector(half_*RNG.sreal(), radius_*RNG.sreal());
 #else
-    return Vector(halflength_*RNG.sreal());
+    return Vector(half_*RNG.sreal());
 #endif
 }
 
@@ -116,9 +116,9 @@ Vector SpaceCylinderP::randomPlaceOnEdge(real) const
 {
 #if ( DIM >= 3 )
     const Vector2 YZ = Vector2::randU(radius_);
-    return Vector(halflength_*RNG.sreal(), YZ.XX, YZ.YY);
+    return Vector(half_*RNG.sreal(), YZ.XX, YZ.YY);
 #endif
-    return Vector(halflength_*RNG.sreal(), radius_*RNG.sflip(), 0);
+    return Vector(half_*RNG.sreal(), radius_*RNG.sflip(), 0);
 }
 
 
@@ -179,14 +179,14 @@ void SpaceCylinderP::write(Outputter& out) const
 {
     writeShape(out, "cylinderP");
     out.writeUInt16(2);
-    out.writeFloat(halflength_);
+    out.writeFloat(half_);
     out.writeFloat(radius_);
 }
 
 
 void SpaceCylinderP::setLengths(const real len[])
 {
-    halflength_ = len[0];
+    half_ = len[0];
     radius_ = len[1];
     update();
 }
@@ -209,7 +209,7 @@ void SpaceCylinderP::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCylinderP::draw3D() const
 {
-    GLfloat L(halflength_);
+    GLfloat L(half_);
     GLfloat R(radius_);
     
     glLineStipple(1, 0x000F);

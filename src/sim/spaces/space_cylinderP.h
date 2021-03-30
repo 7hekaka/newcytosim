@@ -1,11 +1,11 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef SPACE_CYLINDERP_H
 #define SPACE_CYLINDERP_H
 
 #include "space.h"
 #include "modulo.h"
 
-/// a periodic cylinder aligned with X
+/// A cylinder of axis X with periodic boundary conditions in X
 /**
  Space `cylinderP` is a cylinder with periodic boundary conditions
  along the X-axis. It has no ends and loops on itself like a torus,
@@ -24,10 +24,10 @@ class SpaceCylinderP : public Space
 private:
     
     /// half the length of the central cylinder
-    real  halflength_;
+    real half_;
     
     /// the radius of the cylinder
-    real  radius_;
+    real radius_;
 
     /// Object to handle periodic boundary conditions
     Modulo modulo_;
@@ -38,64 +38,64 @@ public:
     SpaceCylinderP(SpaceProp const*);
 
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
  
     /// return Modulo Object
     Modulo const* getModulo() const { return &modulo_; }
     
     /// match sizes of Modulo object
-    void        update();
+    void update();
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        thickness() const { return 2*radius_; }
+    real thickness() const { return 2*radius_; }
 
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
 
     /// true if the bead is inside the Space
-    bool        allInside(Vector const&, real rad) const;
+    bool allInside(Vector const&, real rad) const;
     
     /// a random position inside the volume
-    Vector      randomPlace() const;
+    Vector randomPlace() const;
     
     /// direct normal direction calculation
-    Vector      normalToEdge(Vector const&) const;
+    Vector normalToEdge(Vector const&) const;
     
     /// direct surface placement
-    Vector      randomPlaceOnEdge(real) const;
+    Vector randomPlaceOnEdge(real) const;
 
     /// set `proj` as the point on the edge that is closest to `point`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// equivalent to 'Modulo::fold'
-    void        bounce(Vector&) const;
+    void bounce(Vector&) const;
 
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif
