@@ -2495,11 +2495,11 @@ void Meca::addSideLink(Interpolation const& ptA,
 
 #if ( DIM == 2 )
 
-// this is old style code, addressing mFUL() directly, but it works!
-void Meca::addSideSideLink2Dalt(Interpolation const& ptA,
-                                Interpolation const& ptB,
-                                const real armA, const real armB,
-                                const real weight)
+/// this is old style code, addressing mFUL() directly, but it works!
+void Meca::addSideSideLink2D(Interpolation const& ptA,
+                             Interpolation const& ptB,
+                             const real armA, const real armB,
+                             const real weight)
 {
     assert_true( weight >= 0 );
     
@@ -2582,98 +2582,13 @@ void Meca::addSideSideLink2Dalt(Interpolation const& ptA,
         throw Exception("addSideSideLink2D is not usable with periodic boundary conditions");
 }
 
-
-// new style code, validated on 19.01.2020
-void Meca::addSideSideLink2D(Interpolation const& ptA,
-                             Interpolation const& ptB,
-                             const real armA, const real armB,
-                             const real weight)
-{
-    assert_true( weight >= 0 );
-
-    // full indices:
-    const size_t ii0 = DIM * ptA.matIndex1();
-    const size_t ii1 = DIM * ptA.matIndex2();
-    const size_t ii2 = DIM * ptB.matIndex1();
-    const size_t ii3 = DIM * ptB.matIndex2();
- 
-    if ( any_equal(ii0, ii1, ii2, ii3) )
-        return;
-
-    //coefficients to form A-B:
-    const real cc0 =  ptA.coef0();
-    const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef0();
-    const real cc3 = -ptB.coef1();
-    const real ee1 =  armA / ptA.len();
-    const real ee2 = -armB / ptB.len();
-
-    Matrix22 A(cc0, -ee1,  ee1, cc0);
-    Matrix22 B(cc1,  ee1, -ee1, cc1);
-    Matrix22 C(cc2, -ee2,  ee2, cc2);
-    Matrix22 D(cc3,  ee2, -ee2, cc3);
-
-    Matrix22 wAt = A.transposed(-weight); //(ww0,  we1, -we1, ww0);
-    Matrix22 wBt = B.transposed(-weight); //(ww1, -we1,  we1, ww1);
-    Matrix22 wCt = C.transposed(-weight); //(ww2,  we2, -we2, ww2);
-    Matrix22 wDt = D.transposed(-weight); //(ww3, -we2,  we2, ww3);
-        
-    /*
-     We use block operations to set the matrix lower blocks:
-            ii0  ii1  ii2  ii3
-           ---------------------
-    ii0   | A'A                |
-    ii1   | B'A  B'B           |
-    ii2   | C'A  C'B  C'C      |
-    ii3   | D'A  D'B  D'C  D'D |
-     */
-
-    add_block_diag(ii0, wAt.mul(A));
-    add_block_diag(ii1, wBt.mul(B));
-    add_block_diag(ii2, wCt.mul(C));
-    add_block_diag(ii3, wDt.mul(D));
- 
-    add_block(ii1, ii0, wBt.mul(A));
-    add_block(ii3, ii2, wDt.mul(C));
-
-    if ( ii2 > ii0 )
-    {
-        add_block(ii2, ii0, wCt.mul(A));
-        add_block(ii3, ii0, wDt.mul(A));
-        add_block(ii2, ii1, wCt.mul(B));
-        add_block(ii3, ii1, wDt.mul(B));
-    }
-    else
-    {
-        add_block(ii0, ii2, wAt.mul(C));
-        add_block(ii1, ii2, wBt.mul(C));
-        add_block(ii0, ii3, wAt.mul(D));
-        add_block(ii1, ii3, wBt.mul(D));
-    }
- 
-    if ( modulo )
-    {
-        //this was not tested!
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
-        if ( off.is_not_zero() )
-        {
-            add_base(ii0, wAt*off);
-            add_base(ii1, wBt*off);
-            add_base(ii2, wCt*off);
-            add_base(ii3, wDt*off);
-        }
-    }
-    DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
-}
-
-
 #endif
 
 // new style code, validated on 19.01.2020
-void Meca::addSideSideLink3D(Interpolation const& ptA,
-                             Interpolation const& ptB,
-                             Torque const& armA, Torque const& armB,
-                             const real weight)
+void Meca::addSideSideLink(Interpolation const& ptA,
+                           Interpolation const& ptB,
+                           Torque const& armA, Torque const& armB,
+                           const real weight)
 {
     assert_true( weight >= 0 );
 
@@ -2784,14 +2699,14 @@ void Meca::addSideSideLink(Interpolation const& ptA,
     Vector dir = ptB.pos() - ptA.pos();
     real armA = std::copysign(0.5*len, cross(ptA.diff(), dir));
     real armB = std::copysign(0.5*len, cross(dir, ptB.diff()));
-    addSideSideLink2D(ptA, ptB, armA, armB, weight);
+    addSideSideLink(ptA, ptB, armA, armB, weight);
 
 #else
     
     Vector dir = ptB.pos() - ptA.pos();
     Vector armA = cross(ptA.diff(), dir).normalized(0.5*len);
     Vector armB = cross(dir, ptB.diff()).normalized(0.5*len);
-    addSideSideLink3D(ptA, ptB, armA, armB, weight);
+    addSideSideLink(ptA, ptB, armA, armB, weight);
 
 #endif
 }

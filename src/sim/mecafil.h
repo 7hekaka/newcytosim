@@ -148,13 +148,13 @@ public:
 
     /// longitudinal force dipole between vertices `p` and `p+1`
     /**
-     Tensions are calculated as the Lagrange multipliers associated with the
-     distance between neigboring vertices, i.e. the fiber segment's lengths.
+     Tensions are calculated as the Lagrange multipliers associated with the constrains
+     of distance between adjacent vertices, i.e. the segment length.
      This tension is:
      - positive when the segment is being pulled
      - negative when the segment is under compression
      .
-     It is given in units of force (picoNewton, if all quantitites use Cytosim's units).
+     It is given in units of force (picoNewton, in Cytosim's standard units).
      */
     real        tension(size_t p) const { assert_true(p+1<nPoints); return iLag[p]; }
     

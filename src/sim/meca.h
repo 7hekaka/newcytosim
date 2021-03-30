@@ -600,13 +600,11 @@ public:
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
     void testSideLink(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
 
-#if ( DIM == 2 )
     /// Link of stiffness `weight` and resting length `arm1+arm2`, on the sides of both fibers
     void addSideSideLink2D(Interpolation const&, Interpolation const&, real arm1, real arm2, real weight);
-    void addSideSideLink2Dalt(Interpolation const&, Interpolation const&, real arm1, real arm2, real weight);
-#endif
+    
     /// Link of stiffness `weight` and resting length `arm1+arm2`, on the sides of both fibers
-    void addSideSideLink3D(Interpolation const&, Interpolation const&, Torque const& arm1, Torque const& arm2, real weight);
+    void addSideSideLink(Interpolation const&, Interpolation const&, Torque const& arm1, Torque const& arm2, real weight);
 
     /// Link of stiffness `weight` and resting length `arm`, on the sides of both fibers
     void addSideSideLink(Interpolation const&, Interpolation const&, real arm, real weight);
