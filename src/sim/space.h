@@ -36,9 +36,15 @@ class Space : public Object
 {
 protected:
     
-    /// read numbers from file into array `len` of size `n_len`
+    /// read shape string from file
+    static void readShape(Inputter&, std::string const& expected);
+    
+    /// read lengths from file into array `len` of size `n_len`
+    static void readLengths(Inputter&, size_t n_len, real* len);
+    
+    /// read shape string and lengths
     static void readShape(Inputter&, size_t n_len, real* len, std::string const&);
-
+    
 public:
     
     /// parameters

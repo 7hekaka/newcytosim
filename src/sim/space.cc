@@ -438,6 +438,49 @@ void Space::writeShape(Outputter& out, std::string const& arg)
 }
 
 
+void Space::readShape(Inputter& in, std::string const& expected)
+{
+    std::string str;
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 52 )
+        str = in.get_word(); // stored as a space-terminated string
+    else
+#endif
+        str = in.get_characters(16); // stored as 16 characters
+    
+    // compare with expected shape:
+    if ( str != expected )
+    {
+#if 0
+        InvalidIO e("shape mismatch");
+        e << "found `" << str << "' in file when `" << expected << "' was expected";
+        throw e;
+#else
+        std::cerr << "Warning: shape mismatch: ";
+        std::cerr << "found `" << str << "' in file when `" << expected << "' was expected\n";
+#endif
+    }
+}
+
+
+void Space::readLengths(Inputter& in, size_t n_len, real len[])
+{
+    size_t n = 0;
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 43 )
+        n = in.readUInt8();
+    else
+#endif
+        n = in.readUInt16();
+    
+    size_t d = 0;
+    for ( ; d < std::min(n_len,n); ++d )
+        len[d] = in.readFloat();
+    for ( ; d < n; ++d )
+        in.readFloat();
+}
+
+
 void Space::readShape(Inputter& in, size_t n_len, real len[], std::string const& expected)
 {
 #ifdef BACKWARD_COMPATIBILITY
@@ -460,43 +503,9 @@ void Space::readShape(Inputter& in, size_t n_len, real len[], std::string const&
     }
 #endif
     
-    std::string str;
-#ifdef BACKWARD_COMPATIBILITY
-    if ( in.formatID() < 52 )
-        str = in.get_word(); // stored as a space-terminated string
-    else
-#endif
-        str = in.get_characters(16); // stored as 16 characters
-    
-    // compare with expected shape:
-    if ( str != expected )
-    {
-#if 0
-        InvalidIO e("shape mismatch");
-        e << "found `" << str << "' in file when `" << expected << "' was expected";
-        throw e;
-#else
-        std::cerr << "Warning: shape mismatch: ";
-        std::cerr << "found `" << str << "' in file when `" << expected << "' was expected\n";
-#endif
-    }
-    
-    // read the dimensions:
-    size_t n = 0;
-#ifdef BACKWARD_COMPATIBILITY
-    if ( in.formatID() < 43 )
-        n = in.readUInt8();
-    else
-#endif
-        n = in.readUInt16();
-    
-    size_t d = 0;
-    for ( ; d < std::min(n_len,n); ++d )
-        len[d] = in.readFloat();
-    for ( ; d < n; ++d )
-        in.readFloat();
+    readShape(in, expected);
+    readLengths(in, n_len, len);
 }
-
 
 void Space::write(Outputter& out) const
 {
