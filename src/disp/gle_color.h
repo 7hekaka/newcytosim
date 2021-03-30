@@ -7,7 +7,6 @@
 #include <string>
 #include <iostream>
 
-
 /**
  gle_color implements colors with 4-components:
  - Red
@@ -17,19 +16,23 @@
  .
  
  This class implements the `RGBA` format using an 'unsigned integer'
- and an array of 4 GLfloat.
+ and an array of 4 floats.
  
- F. Nedelec -- Merged two older color classes on 23 August 2015
+ F. Nedelec -- Merged two older color classes on 23.08.2015
  */
 /// Color with 4 components: red, green, blue, alpha (RGBA)
 class gle_color
 {
 #pragma mark - Static methods
 public:
+
+    /// type used to quantify color components
+    typedef GLfloat COLOF;
+
     
     static size_t stride()
     {
-        return sizeof(gle_color) - 4 * sizeof(GLfloat);
+        return sizeof(gle_color) - 4 * sizeof(COLOF);
     }
 
 private:
@@ -42,16 +45,16 @@ private:
     }
     
     /// concatenate 4 bytes into an int
-    static uint32_t combine(GLfloat R, GLfloat G, GLfloat B, GLfloat A)
+    static uint32_t combine(COLOF R, COLOF G, COLOF B, COLOF A)
     {
         return combine(uint32_t(255*R), uint32_t(255*G), uint32_t(255*B), uint32_t(255*A));
     }
     
     /// return value clamped to [0, 1]
-    static GLfloat clamp(GLfloat s) { return std::max(0.0f, std::min(s, 1.0f)); }
+    static COLOF clamp(COLOF s) { return std::max(COLOF(0), std::min(s, COLOF(1))); }
     
-    /// array of 4 float components, matching the `rgba_` integer
-    GLfloat col_[4];
+    /// array of 4 COLOF components, matching the `rgba_` integer
+    COLOF col_[4];
     
     /// 32-bits integer containing 4 one-byte components: red, green, blue, alpha
     uint32_t rgba_;
@@ -65,12 +68,12 @@ private:
     }
     
     /// update 'col_' to match values in 'rgba_'
-    void update_float()
+    void update_float(uint32_t arg)
     {
-        col_[0] = (float)( 0xFF & ( rgba_ >> 24 ) ) / 255.f;
-        col_[1] = (float)( 0xFF & ( rgba_ >> 16 ) ) / 255.f;
-        col_[2] = (float)( 0xFF & ( rgba_ >>  8 ) ) / 255.f;
-        col_[3] = (float)( 0xFF & rgba_ ) / 255.f;
+        col_[0] = COLOF( 0xFF & ( arg >> 24 ) ) / 255;
+        col_[1] = COLOF( 0xFF & ( arg >> 16 ) ) / 255;
+        col_[2] = COLOF( 0xFF & ( arg >>  8 ) ) / 255;
+        col_[3] = COLOF( 0xFF & arg ) / 255;
     }
     
 #pragma mark - Public methods
@@ -98,7 +101,7 @@ public:
     }
 
     /// specify floating point components
-    void set_float(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+    void set_float(COLOF r, COLOF g, COLOF b, COLOF a)
     {
         col_[0] = clamp(r);
         col_[1] = clamp(g);
@@ -108,7 +111,7 @@ public:
     }
     
     /// export floating point components
-    void store(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat& a) const
+    void store(COLOF& r, COLOF& g, COLOF& b, COLOF& a) const
     {
         r = col_[0];
         g = col_[1];
@@ -117,7 +120,7 @@ public:
     }
     
     /// export floating point components to array
-    void store(GLfloat c[4]) const
+    void store(COLOF c[4]) const
     {
         c[0] = col_[0];
         c[1] = col_[1];
@@ -129,7 +132,7 @@ public:
     void set_bytes(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     {
         rgba_ = combine(uint32_t(r), uint32_t(g), uint32_t(b), uint32_t(a));
-        update_float();
+        update_float(rgba_);
     }
 
     /// export components as bytes
@@ -139,13 +142,6 @@ public:
         g = 0xFF & (uint8_t)( rgba_ >> 16 );
         b = 0xFF & (uint8_t)( rgba_ >> 8 );
         a = 0xFF & (uint8_t)( rgba_ );
-    }
-    
-    /// set from 4-bytes integer
-    void set_rgba(uint32_t u)
-    {
-        rgba_ = u;
-        update_float();
     }
     
 #pragma mark - Constructors
@@ -162,55 +158,57 @@ public:
     /// constructor
     gle_color(const uint32_t& u)
     {
-        set_rgba(u);
+        rgba_ = u;
+        update_float(u);
     }
     
     /// constructor from RGB values, with Alpha component = 1.0
-    gle_color(const GLfloat& r, const GLfloat& g, const GLfloat& b)
+    gle_color(const COLOF& r, const COLOF& g, const COLOF& b)
     {
         set_float(r,g,b,1.0f);
     }
 
     /// constructor from RGBA components
-    gle_color(const GLfloat& r, const GLfloat& g, const GLfloat& b, const GLfloat& a)
+    gle_color(const COLOF& r, const COLOF& g, const COLOF& b, const COLOF& a)
     {
         set_float(r,g,b,a);
     }
     
 #pragma mark - Public methods
 
-    void operator = (const uint32_t& col)
+    void operator = (const uint32_t& arg)
     {
-        set_rgba(col);
+        rgba_ = arg;
+        update_float(arg);
     }
     
     bool operator ==(const gle_color col) const { return rgba_ == col.rgba_; }
     bool operator !=(const gle_color col) const { return rgba_ != col.rgba_; }
     
-    GLfloat const* colors() const { return col_; }
+    COLOF const* colors() const { return col_; }
 
     /// access to float components
-    GLfloat& operator [] (int i) { return col_[i]; }
+    COLOF& operator [] (int i) { return col_[i]; }
 
-    GLfloat   r() const { return col_[0]; }
-    GLfloat   g() const { return col_[1]; }
-    GLfloat   b() const { return col_[2]; }
-    GLfloat   a() const { return col_[3]; }
+    COLOF r() const { return col_[0]; }
+    COLOF g() const { return col_[1]; }
+    COLOF b() const { return col_[2]; }
+    COLOF a() const { return col_[3]; }
     
-    GLfloat   red()   const { return col_[0]; }
-    GLfloat   green() const { return col_[1]; }
-    GLfloat   blue()  const { return col_[2]; }
-    GLfloat   alpha() const { return col_[3]; }
+    COLOF red()   const { return col_[0]; }
+    COLOF green() const { return col_[1]; }
+    COLOF blue()  const { return col_[2]; }
+    COLOF alpha() const { return col_[3]; }
 
-    void      set_red  (GLfloat s) { col_[0] = clamp(s); update_rgba(); }
-    void      set_green(GLfloat s) { col_[1] = clamp(s); update_rgba(); }
-    void      set_blue (GLfloat s) { col_[2] = clamp(s); update_rgba(); }
-    void      set_alpha(GLfloat s) { col_[3] = clamp(s); update_rgba(); }
+    void set_red  (COLOF s) { col_[0] = clamp(s); update_rgba(); }
+    void set_green(COLOF s) { col_[1] = clamp(s); update_rgba(); }
+    void set_blue (COLOF s) { col_[2] = clamp(s); update_rgba(); }
+    void set_alpha(COLOF s) { col_[3] = clamp(s); update_rgba(); }
 
-    gle_color red  (GLfloat s) const { return gle_color(clamp(s), col_[1], col_[2], col_[3]); }
-    gle_color green(GLfloat s) const { return gle_color(col_[0], clamp(s), col_[2], col_[3]); }
-    gle_color blue (GLfloat s) const { return gle_color(col_[0], col_[1], clamp(s), col_[3]); }
-    gle_color alpha(GLfloat s) const { return gle_color(col_[0], col_[1], col_[2], clamp(s)); }
+    gle_color red  (COLOF s) const { return gle_color(clamp(s), col_[1], col_[2], col_[3]); }
+    gle_color green(COLOF s) const { return gle_color(col_[0], clamp(s), col_[2], col_[3]); }
+    gle_color blue (COLOF s) const { return gle_color(col_[0], col_[1], clamp(s), col_[3]); }
+    gle_color alpha(COLOF s) const { return gle_color(col_[0], col_[1], col_[2], clamp(s)); }
 
     gle_color match_r(gle_color c) const { return gle_color(c.col_[0], col_[1], col_[2], col_[3]); }
     gle_color match_g(gle_color c) const { return gle_color(col_[0], c.col_[1], col_[2], col_[3]); }
@@ -219,48 +217,55 @@ public:
     
 #pragma mark -
 
-    bool      visible()            const { return ( rgba_ & 0xFF ); }
-    bool      invisible()          const { return ( rgba_ & 0xFF ) == 0; }
-    GLfloat   brightness()         const { return ( col_[0] + col_[1] + col_[2] ) * col_[3]; }
+    bool  visible()            const { return ( rgba_ & 0xFF ); }
+    bool  invisible()          const { return ( rgba_ & 0xFF ) == 0; }
+    COLOF brightness()         const { return ( col_[0] + col_[1] + col_[2] ) * col_[3]; }
     
-    bool      opaque()             const { return ( (rgba_ & 0xFF) == 0xFF ); }
-    bool      transparent()        const { return ( (rgba_ & 0xFF) != 0xFF ); }
-    GLfloat   transparency()       const { return col_[3]; }
+    bool  opaque()             const { return ( (rgba_ & 0xFF) == 0xFF ); }
+    bool  transparent()        const { return ( (rgba_ & 0xFF) != 0xFF ); }
+    COLOF transparency()       const { return col_[3]; }
     
 #pragma mark -
 
-    gle_color darken(GLfloat s) const
+    gle_color darken(COLOF s) const
     {
-        GLfloat x = clamp(s);
+        COLOF x = clamp(s);
         return gle_color(x*col_[0], x*col_[1], x*col_[2], col_[3]);
     }
     
-    gle_color lighten(GLfloat s) const
+    gle_color lighten(COLOF s) const
     {
         return gle_color(s*col_[0], s*col_[1], s*col_[2], col_[3]);
     }
     
-    gle_color alpha_scaled(GLfloat s) const
+    gle_color alpha_scaled(COLOF s) const
     {
         return gle_color(col_[0], col_[1], col_[2], clamp(s*col_[3]));
     }
     
     gle_color blend(gle_color c) const
     {
-        GLfloat s = a() + c.a();
-        GLfloat h = a()   / s;
-        GLfloat g = c.a() / s;
+        COLOF s = a() + c.a();
+        COLOF h = a()   / s;
+        COLOF g = c.a() / s;
         return gle_color(h*col_[0]+g*c.col_[0], h*col_[1]+g*c.col_[1], h*col_[2]+g*c.col_[2], h+g);
     }
     
-    friend gle_color blend(GLfloat g, gle_color a, GLfloat h, gle_color b)
+    friend gle_color blend(COLOF g, gle_color A, COLOF h, gle_color B)
     {
-        return gle_color(g*a[0]+h*b[0], g*a[1]+h*b[1], g*a[2]+h*b[2], g*a[3]+h*b[3]);
+        return gle_color(g*A[0]+h*B[0], g*A[1]+h*B[1], g*A[2]+h*B[2], g*A[3]+h*B[3]);
     }
 
     gle_color inverted() const
     {
         return gle_color(1.f-col_[0], 1.f-col_[1], 1.f-col_[2], col_[3]);
+    }
+    
+    gle_color tweak(uint32_t arg) const
+    {
+        gle_color C(arg);
+        constexpr COLOF A = 0.5, B = 0.5;
+        return gle_color(col_[0]*A+C[0]*B, col_[1]*A+C[1]*B, col_[2]*A+C[2]*B, col_[3]);
     }
     
 #pragma mark -
@@ -274,7 +279,7 @@ public:
     }
     
     /// set current OpenGL color, but with `a` as alpha component
-    void load(GLfloat a) const
+    void load(COLOF a) const
     {
         glColor4f(col_[0], col_[1], col_[2], clamp(a));
     }
@@ -286,7 +291,7 @@ public:
     
     static void no_emission(GLenum face)
     {
-        GLfloat blk[4] = { 0, 0, 0, 1 };
+        COLOF blk[4] = { 0, 0, 0, 1 };
         glMaterialfv(face, GL_EMISSION, blk);
     }
 
@@ -306,18 +311,18 @@ public:
     }
     
     /// set FRONT material property for lighting, and current color with given alpha-component
-    void load_load(GLfloat a) const
+    void load_load(COLOF a) const
     {
-        GLfloat mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
+        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
         glColor4fv(mat);
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
         no_emission(GL_FRONT);
     }
 
     /// set front OpenGL color, with `a` as alpha component
-    void load_front(GLfloat a) const
+    void load_front(COLOF a) const
     {
-        GLfloat mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
+        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
         no_emission(GL_FRONT);
     }
@@ -326,16 +331,16 @@ public:
     void load_back() const
     {
         //glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col_);
-        GLfloat blk[4] = { 0, 0, 0, 1 };
+        COLOF blk[4] = { 0, 0, 0, 1 };
         glMaterialfv(GL_BACK, GL_AMBIENT, col_);
         glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
         glMaterialfv(GL_BACK, GL_EMISSION, blk);
     }
     
     /// set BACK material property for lighting, but with `a` as alpha component
-    void load_back(GLfloat a) const
+    void load_back(COLOF a) const
     {
-        GLfloat mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
+        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
         glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, mat);
         no_emission(GL_BACK);
     }
@@ -344,7 +349,7 @@ public:
     void load_both() const
     {
 #if 0
-        GLfloat blk[4] = { 0, 0, 0, 0 };
+        COLOF blk[4] = { 0, 0, 0, 0 };
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col_);
         glMaterialfv(GL_BACK, GL_AMBIENT, col_);
         glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
@@ -355,10 +360,10 @@ public:
     }
     
     /// set FRONT and BACK material property for lighting
-    void load_both(GLfloat a) const
+    void load_both(COLOF a) const
     {
-        GLfloat blk[4] = { 0, 0, 0, 1 };
-        GLfloat mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
+        COLOF blk[4] = { 0, 0, 0, 1 };
+        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
         glMaterialfv(GL_BACK, GL_AMBIENT, mat);
         glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
@@ -368,7 +373,7 @@ public:
     /// set FRONT and BACK material property for lighting
     void load_emission() const
     {
-        GLfloat blk[4] = { 0, 0, 0, 1 };
+        COLOF blk[4] = { 0, 0, 0, 1 };
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, blk);
         glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, col_);
     }
@@ -376,32 +381,32 @@ public:
 #pragma mark -
     
     /// conversion function from RGB to HSV color space
-    static void RGB2HSV(GLfloat r, GLfloat g, GLfloat b, GLfloat* h, GLfloat* s, GLfloat* v);
+    static void RGB2HSV(COLOF r, COLOF g, COLOF b, COLOF* h, COLOF* s, COLOF* v);
     
     /// conversion functions from HSV to RGB color space
-    static void HSV2RGB(GLfloat h, GLfloat s, GLfloat v, GLfloat* r, GLfloat* g, GLfloat* b);
+    static void HSV2RGB(COLOF h, COLOF s, COLOF v, COLOF* r, COLOF* g, COLOF* b);
     
     
     /// set a RGB color from a factor in [-PI, PI], continuously varying through all colors
-    static void set_hue_components(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat h);
+    static void set_hue_components(COLOF& r, COLOF& g, COLOF& b, COLOF h);
 
     /// return new saturated color with given Hue value `h` in [-PI, PI]
-    static gle_color hue_color(float h, float alpha = 1.0f);
+    static gle_color hue_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new saturated color with Hue value `atan2(y, x)`
-    static gle_color radial_color(float x, float y, float alpha);
+    static gle_color radial_color(COLOF x, COLOF y, COLOF alpha);
 
     /// return color build from a normalized 3D vector {x, y, z}
-    static gle_color radial_color(float x, float y, float z, float alpha);
+    static gle_color radial_color(COLOF x, COLOF y, COLOF z, COLOF alpha);
 
     /// return new jet color for h in [0, 5] with specified alpha component
-    static gle_color jet_color(float h, float alpha = 1.0f);
+    static gle_color jet_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new jet color extended
-    static gle_color jet_color_dark(float h, float alpha = 1.0f);
+    static gle_color jet_color_dark(COLOF h, COLOF alpha = 1.0f);
     
     /// return new jet color extended
-    static gle_color jet_color_alpha(float h);
+    static gle_color jet_color_alpha(COLOF h);
 
     /// print color in hexadecimal format (str must be of size 12)
     void hexadecimal(char* str) const;
@@ -410,7 +415,7 @@ public:
     std::string to_string() const;
     
     /// print RGBA components in vector format
-    static std::string components(GLfloat ptr[4]);
+    static std::string components(COLOF ptr[4]);
 };
 
 

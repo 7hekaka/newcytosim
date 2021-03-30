@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------
 #pragma mark Color Input/Output
 
-const char hex_rep[] = "0123456789ABCDEF";
+static const char hexadecimal_digit[] = "0123456789ABCDEF";
 
 /**
  Write '0xRRGGBBAA' to 'str[]'
@@ -27,7 +27,7 @@ void gle_color::hexadecimal(char * str) const
     {
         uint32_t d = ( n >> 28 );
         n <<= 4;
-        str[c] = hex_rep[d];
+        str[c] = hexadecimal_digit[d];
         ++c;
     }
     str[c] = '\0';
@@ -42,7 +42,7 @@ std::string gle_color::to_string() const
 }
 
 
-std::string gle_color::components(GLfloat ptr[4])
+std::string gle_color::components(COLOF ptr[4])
 {
     char str[64];
     snprintf(str, sizeof(str), "( %4.2f %4.2f %4.2f %4.2f )", ptr[0], ptr[1], ptr[2], ptr[3]);
@@ -130,7 +130,7 @@ std::istream& operator >> (std::istream& is, gle_color& col)
         else if ( isdigit(c) )
         {
             is.unget();
-            GLfloat r, g, b, a=1;
+            gle_color::COLOF r, g, b, a=1;
             is >> r >> g >> b;
             if ( ! is.fail() )
             {
@@ -163,9 +163,9 @@ std::ostream& operator << (std::ostream& os, gle_color const& arg)
  if s == 0, then h = -1 (undefined)
 */
 
-void gle_color::RGB2HSV(const GLfloat r, const GLfloat g, const GLfloat b, GLfloat* h, GLfloat* s, GLfloat* v)
+void gle_color::RGB2HSV(const COLOF r, const COLOF g, const COLOF b, COLOF* h, COLOF* s, COLOF* v)
 {
-    GLfloat mn, mx, delta;
+    COLOF mn, mx, delta;
     mn = std::min(r, std::min(g, b));
     mx = std::max(r, std::max(g, b));
     *v = mx;
@@ -189,18 +189,18 @@ void gle_color::RGB2HSV(const GLfloat r, const GLfloat g, const GLfloat b, GLflo
 }
 
 
-void gle_color::HSV2RGB(const GLfloat h, const GLfloat s, const GLfloat v, GLfloat* r, GLfloat* g, GLfloat* b)
+void gle_color::HSV2RGB(const COLOF h, const COLOF s, const COLOF v, COLOF* r, COLOF* g, COLOF* b)
 {
     int i;
-    GLfloat f, p, q, t;
+    COLOF f, p, q, t;
     if ( s == 0 ) {
         // achromatic (gray)
         *r = *g = *b = v;
         return;
     }
-    GLfloat hc = h/60;               // sector 0 to 5
+    COLOF hc = h/60;               // sector 0 to 5
     i = (int)std::floor(hc);
-    f = hc - (GLfloat)i;             // fractional part of h
+    f = hc - (COLOF)i;             // fractional part of h
     p = v * ( 1 - s );
     q = v * ( 1 - s * f );
     t = v * ( 1 - s * ( 1 - f ) );
@@ -221,11 +221,11 @@ void gle_color::HSV2RGB(const GLfloat h, const GLfloat s, const GLfloat v, GLflo
  set a RGB color as a function of a Hue value `a` in [-PI, PI].
  The colors follow in this order: red, green, blue, red ...
 */
-void gle_color::set_hue_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLfloat h)
+void gle_color::set_hue_components(COLOF& r, COLOF& g, COLOF& b, const COLOF h)
 {
-    GLfloat x = 3 * GLfloat( h * M_1_PI + 1 );
+    COLOF x = 3 * COLOF( h * M_1_PI + 1 );
     int i = (int)std::floor(x);
-    GLfloat f = x-(GLfloat)i;
+    COLOF f = x-(COLOF)i;
     switch( i % 6 )
     {
         case 0: r = 1;   g = f;   b = 0;   break;
@@ -244,20 +244,20 @@ void gle_color::set_hue_components(GLfloat& r, GLfloat& g, GLfloat& b, const GLf
  with alpha-component equal to `a`.
  Two opposite vectors gives approximately complementary colors.
  */
-gle_color gle_color::radial_color(const float x, const float y, const float z, const float a)
+gle_color gle_color::radial_color(const COLOF x, const COLOF y, const COLOF z, const COLOF a)
 {
-    GLfloat pX = std::max(0.0f, x), nX = -0.5f * std::min(0.0f, x);
-    GLfloat pY = std::max(0.0f, y), nY = -0.5f * std::min(0.0f, y);
-    GLfloat pZ = std::max(0.0f, z), nZ = -0.5f * std::min(0.0f, z);
+    COLOF pX = std::max(0.0f, x), nX = -0.5f * std::min(0.0f, x);
+    COLOF pY = std::max(0.0f, y), nY = -0.5f * std::min(0.0f, y);
+    COLOF pZ = std::max(0.0f, z), nZ = -0.5f * std::min(0.0f, z);
     return gle_color(pX+nY+nZ, nX+pY+nZ, nX+nY+pZ, a);
 }
 
 /**
  set a RGB color as a function of a 2D vector, using the angle in the XY plane
 */
-gle_color gle_color::radial_color(const float x, const float y, const float a)
+gle_color gle_color::radial_color(const COLOF x, const COLOF y, const COLOF a)
 {
-    GLfloat r, g, b;
+    COLOF r, g, b;
     set_hue_components(r, g, b, atan2f(y, x));
     return gle_color(r, g, b, a);
 }
@@ -267,9 +267,9 @@ gle_color gle_color::radial_color(const float x, const float y, const float a)
  with alpha-component equal to `a`.
  The colors follow in this order: red, green, blue, red ...
  */
-gle_color gle_color::hue_color(const float h, const float a)
+gle_color gle_color::hue_color(const COLOF h, const COLOF a)
 {
-    GLfloat r, g, b;
+    COLOF r, g, b;
     set_hue_components(r, g, b, h);
     return gle_color(r, g, b, a);
 }
@@ -283,9 +283,9 @@ The result vary from dark-blue, blue, cyan, yellow, orange to red:
 - 3 : red
 - 4 : full red
 */
-gle_color gle_color::jet_color(const float h, const float a)
+gle_color gle_color::jet_color(const COLOF h, const COLOF a)
 {
-    GLfloat r, g, b;
+    COLOF r, g, b;
     if ( h <= 0.4 )
     {
         r = 0;
@@ -295,7 +295,7 @@ gle_color gle_color::jet_color(const float h, const float a)
     else if ( h < 4.0 )
     {
         int i = (int)std::floor(h);
-        GLfloat f = h-(GLfloat)i;
+        COLOF f = h-(COLOF)i;
         switch( i )
         {
             case 0:  r = 0;   g = 0;   b = f;   break;
@@ -324,9 +324,9 @@ The result vary from black, blue, cyan, yellow, orange to red:
 - 4 : yellow
 - 5 : white
 */
-gle_color gle_color::jet_color_dark(const float h, const float a)
+gle_color gle_color::jet_color_dark(const COLOF h, const COLOF a)
 {
-    GLfloat r, g, b;
+    COLOF r, g, b;
     if ( h <= 0.1 )
     {
         r = 0;
@@ -336,7 +336,7 @@ gle_color gle_color::jet_color_dark(const float h, const float a)
     else if ( h < 5.0 )
     {
         int i = (int)std::floor(h);
-        GLfloat f = h-(GLfloat)i;
+        COLOF f = h-(COLOF)i;
         switch( i )
         {
             case 0:  r = 0;   g = 0;   b = f;   break;
@@ -367,9 +367,9 @@ The result vary from black, blue, cyan, yellow, orange to red:
 - 4 : yellow
 - 5 : white
 */
-gle_color gle_color::jet_color_alpha(const float h)
+gle_color gle_color::jet_color_alpha(const COLOF h)
 {
-    GLfloat r, g, b, a;
+    COLOF r, g, b, a;
     if ( h <= 0 )
     {
         r = 0;
@@ -380,7 +380,7 @@ gle_color gle_color::jet_color_alpha(const float h)
     else if ( h < 5.0 )
     {
         int i = (int)std::floor(h);
-        GLfloat f = h-(GLfloat)i;
+        COLOF f = h-(COLOF)i;
         switch( i )
         {
             case 0:  r = 0;   g = 0;   b = 1;   a = f; break;
