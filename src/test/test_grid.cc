@@ -1,7 +1,9 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 // Started FJN on January 2008
 
-#define DIM 3
+#ifndef DIM
+#  define DIM 3
+#endif
 
 #include "vector.h"
 #include "random.h"

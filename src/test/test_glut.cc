@@ -138,7 +138,7 @@ void windowReshaped(int w, int h)
 
 void processNormalKey(unsigned char c, int x, int y)
 {
-    printf("key %i (%4i %4i)\n", c, x, y);
+    printf("key %i mouse (%i %i)\n", c, x, y);
     switch (c)
     {
         case 27:
@@ -150,7 +150,7 @@ void processNormalKey(unsigned char c, int x, int y)
             break;   //we use break to call the setModelView() below
             
         default:
-            printf("hit key `%c' (ascii %i) with modifier %i\n", c, c, glutGetModifiers());
+            printf("key %i with modifier %i\n", c, glutGetModifiers());
     }
     setModelView();
     glutPostRedisplay();
@@ -160,7 +160,7 @@ void processNormalKey(unsigned char c, int x, int y)
 // handle special keys: arrows, ctrl, etc.
 void processInputKey(int c, int, int)
 {
-    printf("unknown special key %c\n", c);
+    printf("special key %c\n", c);
 }
 
 
