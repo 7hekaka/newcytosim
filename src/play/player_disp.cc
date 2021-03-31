@@ -323,9 +323,9 @@ void Player::drawScene(View& view)
         {
             prop.saved_image = t;
             if ( prop.goLive )
-                saveView("image", prop.image_index++, prop.downsample);
+                saveView(prop.image_index++, prop.downsample);
             else
-                saveView("movie", thread.currentFrame(), prop.downsample);
+                saveView(thread.currentFrame(), prop.downsample);
             // exit if this was the last image requested:
             if ( --prop.save_images == 0 && ( prop.auto_exit & 2 ))
             {
@@ -357,11 +357,17 @@ void Player::drawScene(View& view, int mag)
  in the format specified by 'PlayerProp::image_format',
  in the current working directory
  */
-int Player::saveView(const char* filename, const char* format, int downsample) const
+int Player::saveView(const char* filename, const char* format, int downsample, int verbose) const
 {
     GLint vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
-    return SaveImage::saveImage(filename, format, vp, downsample);
+    int err = SaveImage::saveImage(filename, format, vp, downsample);
+    if ( err == 0 && verbose > 0 )
+    {
+        printf("\r saved %ix%i snapshot %s    ", vp[2]/downsample, vp[3]/downsample, filename);
+        fflush(stdout);
+    }
+    return err;
 }
 
 
@@ -371,30 +377,29 @@ int Player::saveView(const char* filename, const char* format, int downsample) c
  in the folder specified in `PlayerProp::image_dir`.
  The name of the file is formed by concatenating 'root' and 'indx'.
  */
-int Player::saveView(const char* root, size_t indx, int downsample, int verbose) const
+int Player::saveView(size_t indx, int downsample, int verbose) const
 {
-    char cwd[1024] = { 0 };
-    char name[1024];
+    char str[1024], cwd[1024] = { 0 };
     char const* format = prop.image_format.c_str();
-    snprintf(name, sizeof(name), "%s%04lu.%s", root, indx, format);
-    if ( prop.image_dir.length() )
+    std::string& name = prop.image_name;
+    std::string::size_type d = name.find('.');
+    if ( d != std::string::npos )
+    {
+        // if there is a '.', copy name verbatim:
+        strncpy(str, name.c_str(), sizeof(str));
+        name = name.substr(0, d);
+    }
+    else
+    {
+        // with no '.', build name using integer:
+        snprintf(str, sizeof(str), "%s%04lu.%s", name.c_str(), indx, format);
+    }
+    if ( prop.image_dir.length() > 0 )
     {
         if ( getcwd(cwd, sizeof(cwd)) )
             chdir(prop.image_dir.c_str());
     }
-    GLint vp[4];
-    glGetIntegerv(GL_VIEWPORT, vp);
-    int err = SaveImage::saveImage(name, format, vp, downsample);
-    if ( err == 0 && verbose > 0 )
-    {
-        int W = vp[2] / downsample;
-        int H = vp[3] / downsample;
-        if ( verbose )
-        {
-            printf("\r saved %ix%i snapshot %s    ", W, H, name);
-            fflush(stdout);
-        }
-    }
+    int err = saveView(str, format, downsample, verbose);
     if ( cwd[0] )
         chdir(cwd);
     return err;
@@ -455,15 +460,15 @@ int Player::saveScene(const int mag, const char* name, const char* format, const
 int Player::saveScene(const int mag, const char* root, unsigned indx, const int downsample)
 {
     char cwd[1024] = { 0 };
-    char name[1024];
+    char str[1024];
     char const* format = prop.image_format.c_str();
-    snprintf(name, sizeof(name), "%s%04i.%s", root, indx, format);
+    snprintf(str, sizeof(str), "%s%04i.%s", root, indx, format);
     if ( prop.image_dir.length() )
     {
         if ( getcwd(cwd, sizeof(cwd)) )
             chdir(prop.image_dir.c_str());
     }
-    int err = saveScene(mag, name, format, downsample);
+    int err = saveScene(mag, str, format, downsample);
     if ( cwd[0] )
         chdir(cwd);
     glApp::postRedisplay();

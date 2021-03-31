@@ -41,8 +41,8 @@ F. Nedelec
 - use 'cpp' extension for C++ code file
 - Update OpenGL code to use Shaders and eliminate immediate rendering
 
-- Rename gle gym
 - Replace GLUT by GLFW:  http://www.glfw.org/index.html
+- Rename gle: gym and glApp: gymapp
 - use Dear imGUI for rendering text and minimal GUI components (Omar Cornut)
      https://github.com/ocornut/imgui
 
@@ -102,7 +102,6 @@ Build:
     glfw:  http://www.glfw.org/index.html
     Qt  :  http://qt.digia.com
 - new font renderer, eg. FreeType (http://www.freetype.org/index.html)
-- gle -> gym; glapp -> gymapp
 
 # Performance:
 

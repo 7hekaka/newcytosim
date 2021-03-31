@@ -744,7 +744,7 @@ void processKey(unsigned char key)
         case 'y':
             // save current image, without decorations
             player.drawScene(glApp::currentView());
-            player.saveView("image", prop.image_index++, 1);
+            player.saveView(prop.image_index++, 1);
             // with over sampling and downsampling to get super-resolution:
             //player.saveScene(3, "image", prop.image_index++, 3);
             return;

@@ -59,6 +59,9 @@ public:
     /// format of exported images [png, ppm]
     std::string image_format;
     
+    /// name of image to be saved
+    mutable std::string image_name;
+
     /// directory where images are exported
     std::string image_dir;
 

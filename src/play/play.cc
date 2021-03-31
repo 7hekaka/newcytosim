@@ -163,16 +163,23 @@ int main(int argc, char* argv[])
         prop.goLive = true;
 
     if ( arg.use_key("image") )
+    {
+        prop.image_name = "image";
         mode = SAVE_IMAGE;
-
+    }
+    
     if ( arg.use_key("poster") )
     {
+        prop.image_name = "poster";
         mode = SAVE_IMAGE;
         magnify = 3;
     }
     
     if ( arg.use_key("movie") )
+    {
+        prop.image_name = "movie";
         mode = SAVE_MOVIE;
+    }
     
     if ( arg.use_key("on") )
         style = ONSCREEN;
@@ -182,6 +189,18 @@ int main(int argc, char* argv[])
     
     if ( arg.use_key("png") )
         prop.image_format = "png";
+
+    if ( arg.set(prop.image_name, ".png") )
+    {
+        prop.image_format = "png";
+        mode = SAVE_IMAGE;
+    }
+    
+    if ( arg.set(prop.image_name, ".tga") )
+    {
+        prop.image_format = "tga";
+        mode = SAVE_IMAGE;
+    }
 
     // get image over-sampling:
     arg.set(magnify, "magnify") || arg.set(magnify, "mag");
@@ -334,7 +353,7 @@ int main(int argc, char* argv[])
                     player.drawScene(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
-                    player.saveView("image", frm, prop.downsample);
+                    player.saveView(frm, prop.downsample);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }
@@ -348,7 +367,7 @@ int main(int argc, char* argv[])
                     player.drawScene(view, magnify);
                     if ( multi )
                         blitBuffers(fbo, multi, W, H);
-                    player.saveView("movie", frm++, prop.downsample);
+                    player.saveView(frm++, prop.downsample);
                     s = 0;
                 }
             } while ( 0 == thread.loadNextFrame() );

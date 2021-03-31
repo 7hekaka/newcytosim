@@ -27,6 +27,7 @@ void PlayerProp::clear()
         image_format = "ppm";
 
     image_dir    = "";
+    image_name   = "image";
     report_index = 0;
     image_index  = 0;
     poster_index = 0;
@@ -45,6 +46,7 @@ void PlayerProp::read(Glossary& glos)
         delay = std::max(2u, delay);
     glos.set(save_images,  "save_images") || glos.set(save_images,  "save_image");
     glos.set(image_format, "image_format");
+    glos.set(image_name,   "image_name");
     glos.set(image_dir,    "image_dir");
     glos.set(downsample,   "downsample");
     glos.set(report,       "report");
