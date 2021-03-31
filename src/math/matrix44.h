@@ -1,5 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// F. Nedelec, Strasbourg 12.06.2018
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
+// FJN, Strasbourg 12.06.2018
 
 #ifndef MATRIX44
 #define MATRIX44
@@ -69,7 +69,7 @@ public:
         val[0xF] = p;
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `z`
+    /// construct Matrix with diagonal terms set to `d` and other terms set to `z`
     Matrix44(real z, real d)
     {
         val[0x0] = d;

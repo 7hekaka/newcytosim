@@ -1,5 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// F. Nedelec, Strasbourg 08.06.2018
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
+// FJN, Strasbourg 08.06.2018
 
 #ifndef MATRIX11
 #define MATRIX11
@@ -40,7 +40,7 @@ public:
         val_ = v;
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `z`
+    /// construct Matrix with term set to `d`
     Matrix11(real, real d)
     {
         val_ = d;
@@ -403,6 +403,12 @@ public:
     static Matrix11 vectorProduct(const real dia, const real)
     {
         return Matrix11(dia);
+    }
+    
+    /// meaningless function
+    static Matrix11 planarRotation(const real axis, const real c, const real s)
+    {
+        return Matrix11(sign_real(axis));
     }
 
     /// return rotation matrix of angle defined by cosinus and sinus

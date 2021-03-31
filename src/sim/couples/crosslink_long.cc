@@ -81,7 +81,7 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     Vector dir = pt2.pos() - pt1.pos();
     mArm1 = std::copysign(len, cross(pt1.diff(), dir));
     mArm2 = std::copysign(len, cross(dir, pt2.diff()));
-    meca.addSideSideLink(pt1, pt2, mArm1, mArm2, prop->stiffness);
+    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop->stiffness);
 
 #elif ( DIM >= 3 )
 
@@ -114,8 +114,7 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     //mArm1 = cross(pt1.diff(), dir).normalized(len);
     //mArm2 = cross(dir, pt2.diff()).normalized(len);
 # endif
-    meca.addSideSideLink(pt1, pt2, mArm1, mArm2, prop->stiffness);
-    
+    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop->stiffness);
 #endif
 }
 

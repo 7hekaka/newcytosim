@@ -222,7 +222,7 @@ void Tubule::setInteractionsB(Meca& meca) const
         for ( size_t n = 0; n < NFIL; ++n )
         {
             Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(i) ).normalized(len));
-            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiff);
+            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiff);
         }
     }
 
@@ -235,7 +235,7 @@ void Tubule::setInteractionsB(Meca& meca) const
     for ( size_t n = 0; n < NFIL; ++n )
     {
         Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(end) ).normalized(len));
-        meca.addSideLink3D(Interpolation(fil_[n],end-1,end,1), Mecapoint(fil_[n+1],end), arm, stiff);
+        meca.addSideLinkMT(Interpolation(fil_[n],end-1,end,1), Mecapoint(fil_[n+1],end), arm, stiff);
     }
 #endif
 }
@@ -284,9 +284,9 @@ void Tubule::setInteractions(Meca& meca) const
         {
             Vector arm = ( cen - fil_[n]->posPoint(i) ).normalized(len);
             // orthoradial beams:
-            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiffL);
+            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiffL);
             // radial spoke:
-            meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(bone_,i), alpha*cross(dir,arm), stiffR);
+            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(bone_,i), alpha*cross(dir,arm), stiffR);
         }
     }
 
@@ -295,8 +295,8 @@ void Tubule::setInteractions(Meca& meca) const
     for ( size_t n = 0; n < NFIL; ++n )
     {
         Vector arm = ( cen - fil_[n]->posPoint(e) ).normalized(len);
-        meca.addSideLink3D(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), mat.vecmul(arm), stiffL);
-        meca.addSideLink3D(Interpolation(fil_[n],e-1,e,1), Mecapoint(bone_,e), alpha*cross(dir,arm), stiffR);
+        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), mat.vecmul(arm), stiffL);
+        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(bone_,e), alpha*cross(dir,arm), stiffR);
     }
 #endif
 }
@@ -341,7 +341,7 @@ void Tubule::setInteractionsC(Meca& meca) const
             for ( size_t n = 0; n < NFIL; ++n )
             {
                 Vector arm = (2*cen - fil_[n]->posPoint(i)- fil_[n+1]->posPoint(i)).normalized(len);
-                meca.addSideLink3D(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiffL);
+                meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiffL);
             }
         }
         else
@@ -349,7 +349,7 @@ void Tubule::setInteractionsC(Meca& meca) const
             for ( size_t n = 0; n < NFIL; ++n )
             {
                 Vector arm = (2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(len);
-                meca.addSideLink3D(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), arm, stiffL);
+                meca.addSideLinkMT(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), arm, stiffL);
             }
         }
         

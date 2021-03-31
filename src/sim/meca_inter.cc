@@ -2185,8 +2185,8 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 
     if ( ii2 > ii0 )
     {
-        sub_block(ii2, ii0, wAt.transposed());
-        sub_block(ii2, ii1, wBt.transposed());
+        add_block(ii2, ii0, weight, aR);
+        add_block(ii2, ii1, weight, bR);
     }
     else
     {
@@ -2208,6 +2208,51 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
 }
 
+/**
+ This is a specialized version of addSideLink3D(), without Modulo
+ */
+void Meca::addSideLinkMT(Interpolation const& ptA,
+                         Mecapoint const& ptB,
+                         Torque const& arm,
+                         const real weight)
+{
+    assert_true( weight >= 0 );
+    
+    // full indices:
+    const size_t ii0 = DIM * ptA.matIndex1();
+    const size_t ii1 = DIM * ptA.matIndex2();
+    const size_t ii2 = DIM * ptB.matIndex();
+    
+    if ( any_equal(ii0, ii1, ii2) )
+        throw Exception("Meca::addSideLink0 has overlapping indices");
+
+    // interpolation coefficients:
+    const real cc0 = ptA.coef0();
+    const real cc1 = ptA.coef1();
+    const Torque leg = arm / ptA.len();
+
+    MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
+    MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
+    
+    MatrixBlock aT = MatrixBlock::vectorProduct(cc0,  leg);
+    MatrixBlock bT = MatrixBlock::vectorProduct(cc1, -leg);
+    
+    add_block_diag(ii0, -weight, aT.mul(aR)); //this term is symmetric but not diagonal
+    add_block(ii1, ii0, -weight, bT.mul(aR));
+    add_block_diag(ii1, -weight, bT.mul(bR)); //this term is symmetric but not diagonal
+
+    if ( ii2 > ii0 )
+    {
+        add_block(ii2, ii0, weight, aR);
+        add_block(ii2, ii1, weight, bR);
+    }
+    else
+    {
+        add_block(ii0, ii2, weight, aT);
+        add_block(ii1, ii2, weight, bT);
+    }
+    add_block_diag(ii2, MatrixBlock(0, -weight));
+}
 
 
 void Meca::addSideLink(Interpolation const& ptA,
@@ -2490,15 +2535,14 @@ void Meca::addSideLink(Interpolation const& ptA,
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Symmetric off-axis links
+#pragma mark - Symmetric off-axis links and tilted links
 //------------------------------------------------------------------------------
 
 #if ( DIM == 2 )
 
 /// this is old style code, addressing mFUL() directly, but it works!
-void Meca::addSideSideLink2D(Interpolation const& ptA,
-                             Interpolation const& ptB,
-                             const real armA, const real armB,
+void Meca::addSideSideLink2D(Interpolation const& ptA, const real armA,
+                             Interpolation const& ptB, const real armB,
                              const real weight)
 {
     assert_true( weight >= 0 );
@@ -2585,9 +2629,8 @@ void Meca::addSideSideLink2D(Interpolation const& ptA,
 #endif
 
 // new style code, validated on 19.01.2020
-void Meca::addSideSideLink(Interpolation const& ptA,
-                           Interpolation const& ptB,
-                           Torque const& armA, Torque const& armB,
+void Meca::addSideSideLink(Interpolation const& ptA, Torque const& armA,
+                           Interpolation const& ptB, Torque const& armB,
                            const real weight)
 {
     assert_true( weight >= 0 );
@@ -2699,16 +2742,116 @@ void Meca::addSideSideLink(Interpolation const& ptA,
     Vector dir = ptB.pos() - ptA.pos();
     real armA = std::copysign(0.5*len, cross(ptA.diff(), dir));
     real armB = std::copysign(0.5*len, cross(dir, ptB.diff()));
-    addSideSideLink(ptA, ptB, armA, armB, weight);
+    addSideSideLink(ptA, armA, ptB, armB, weight);
 
 #else
     
     Vector dir = ptB.pos() - ptA.pos();
     Vector armA = cross(ptA.diff(), dir).normalized(0.5*len);
     Vector armB = cross(dir, ptB.diff()).normalized(0.5*len);
-    addSideSideLink(ptA, ptB, armA, armB, weight);
+    addSideSideLink(ptA, armA, ptB, armB, weight);
 
 #endif
+}
+
+
+/**
+ A tilted double link to represent MAP65/PRC1/Ase1 connectors, which are orientated
+ with an angle of 70 relative to the microtubule surface.
+ 
+ The angle of rotation is defined by cosinus and sinus values (c, s), and is
+ measured from the axis of each fiber (from minus to plus ends):
+ - (1, 0) is no rotation, where the link extends parallel to the fiber
+ - (0, 1) is a 90 degree rotation, and the link extends orthogonal to the fiber
+ - ( 0.5, 0.5*M_SQRT3) would lean 60 degrees towards the plus end.
+ - (-0.5, 0.5*M_SQRT3) would lean 60 degrees towards the minus end.
+ Strasbourg, 31.03.2021
+ */
+void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
+                                 Interpolation const& ptB, Torque const& armB,
+                                 const real len, const real c, const real s,
+                                 const real weight)
+{
+    assert_true( weight >= 0 );
+
+    // full indices:
+    const size_t ii0 = DIM * ptA.matIndex1();
+    const size_t ii1 = DIM * ptA.matIndex2();
+    const size_t ii2 = DIM * ptB.matIndex1();
+    const size_t ii3 = DIM * ptB.matIndex2();
+ 
+    if ( any_equal(ii0, ii1, ii2, ii3) )
+        return;
+
+    //coefficients to form A-B:
+    const real cc0 =  ptA.coef0();
+    const real cc1 =  ptA.coef1();
+    const real cc2 = -ptB.coef0();
+    const real cc3 = -ptB.coef1();
+    
+    const real ia = len / ptA.len();
+    const real ib = len / ptB.len();
+
+    // R and T rotate and scale to get a vector of size 'len' from 'ptA.diff'
+    MatrixBlock R = MatrixBlock::planarRotation(armA/len, ia*c, ia*s);
+    MatrixBlock T = MatrixBlock::planarRotation(armB/len, ib*c, ib*s);
+
+    MatrixBlock A = MatrixBlock(0, cc0) - R;
+    MatrixBlock B = MatrixBlock(0, cc1) + R;
+    MatrixBlock C = MatrixBlock(0, cc2) + T;
+    MatrixBlock D = MatrixBlock(0, cc3) - T;
+
+    MatrixBlock wAt = A.transposed(-weight);
+    MatrixBlock wBt = B.transposed(-weight);
+    MatrixBlock wCt = C.transposed(-weight);
+    MatrixBlock wDt = D.transposed(-weight);
+        
+    /*
+     We use block operations to set the matrix lower blocks:
+            ii0  ii1  ii2  ii3
+           ---------------------
+    ii0   | A'A                |
+    ii1   | B'A  B'B           |
+    ii2   | C'A  C'B  C'C      |
+    ii3   | D'A  D'B  D'C  D'D |
+     */
+
+    add_block_diag(ii0, wAt.mul(A));
+    add_block_diag(ii1, wBt.mul(B));
+    add_block_diag(ii2, wCt.mul(C));
+    add_block_diag(ii3, wDt.mul(D));
+ 
+    add_block(ii1, ii0, wBt.mul(A));
+    add_block(ii3, ii2, wDt.mul(C));
+
+    if ( ii2 > ii0 )
+    {
+        add_block(ii2, ii0, wCt.mul(A));
+        add_block(ii3, ii0, wDt.mul(A));
+        add_block(ii2, ii1, wCt.mul(B));
+        add_block(ii3, ii1, wDt.mul(B));
+    }
+    else
+    {
+        add_block(ii0, ii2, wAt.mul(C));
+        add_block(ii1, ii2, wBt.mul(C));
+        add_block(ii0, ii3, wAt.mul(D));
+        add_block(ii1, ii3, wBt.mul(D));
+    }
+ 
+    if ( modulo )
+    {
+        //this was not tested!
+        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        if ( off.is_not_zero() )
+        {
+            add_base(ii0, wAt*off);
+            add_base(ii1, wBt*off);
+            add_base(ii2, wCt*off);
+            add_base(ii3, wDt*off);
+        }
+    }
+    DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
 }
 
 //------------------------------------------------------------------------------

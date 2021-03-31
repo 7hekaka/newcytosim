@@ -582,6 +582,9 @@ public:
 #endif
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
     void addSideLink3D(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
+    
+    /// Link of stiffness `weight`, at distance `arm` on the side of first segment
+    void addSideLinkMT(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
 
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
     void addSideLink(Interpolation const&, Mecapoint const&, real arm, real weight);
@@ -601,13 +604,16 @@ public:
     void testSideLink(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
 
     /// Link of stiffness `weight` and resting length `arm1+arm2`, on the sides of both fibers
-    void addSideSideLink2D(Interpolation const&, Interpolation const&, real arm1, real arm2, real weight);
+    void addSideSideLink2D(Interpolation const&, real arm1, Interpolation const&, real arm2, real weight);
     
     /// Link of stiffness `weight` and resting length `arm1+arm2`, on the sides of both fibers
-    void addSideSideLink(Interpolation const&, Interpolation const&, Torque const& arm1, Torque const& arm2, real weight);
+    void addSideSideLink(Interpolation const&, Torque const& arm1, Interpolation const&, Torque const& arm2, real weight);
 
     /// Link of stiffness `weight` and resting length `arm`, on the sides of both fibers
     void addSideSideLink(Interpolation const&, Interpolation const&, real arm, real weight);
+    
+    /// Link of stiffness `weight` on the sides of both fibers and tilted by (cosinus, sinus)
+    void addTiltedSideSideLink(Interpolation const&, Torque const& arm1, Interpolation const&, Torque const& arm2, real len, real cosinus, real sinus, real weight);
 
     /// Link of stiffness `weight` and perpendicular to first segment
     void addSlidingLink(Interpolation const&, Mecapoint const&, real weight);

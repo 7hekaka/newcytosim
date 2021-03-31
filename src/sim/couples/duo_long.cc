@@ -95,6 +95,6 @@ void DuoLong::setInteractions(Meca& meca) const
     
 #endif
     
-    //meca.addSideSideLink( cHand1->interpolation(), cHand2->interpolation(), prop->length, prop->stiffness );
+    //meca.addSideSideLink(cHand1->interpolation(), cHand2->interpolation(), prop->length, prop->stiffness);
 }
 

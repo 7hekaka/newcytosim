@@ -1,5 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// F. Nedelec, Strasbourg 08.06.2018
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
+// FJN, Strasbourg 08.06.2018
 
 #ifndef MATRIX22
 #define MATRIX22
@@ -78,7 +78,7 @@ public:
         val[3] = d;
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `z`
+    /// construct Matrix with diagonal terms set to `d` and other terms set to `z`
     Matrix22(real z, real d)
     {
         val[0] = d;
@@ -855,7 +855,14 @@ public:
     {
         return Matrix22(dia, off, -off, dia);
     }
-
+    
+    /// Rotation with angle set by cosinus and sinus values
+    static Matrix22 planarRotation(const real axis, const real c, const real s)
+    {
+        real sa = s * sign_real(axis);
+        return Matrix22(c, sa, -sa, c);
+    }
+    
     /// return rotation matrix of angle defined by cosinus and sinus
     static Matrix22 rotation(const real c, const real s)
     {

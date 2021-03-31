@@ -1,5 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// F. Nedelec, Strasbourg 08.06.2018
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
+// FJN, Strasbourg 08.06.2018
 
 #ifndef MATRIX34
 #define MATRIX34
@@ -75,7 +75,7 @@ public:
         clear_shadow();
     }
 
-    /// construct Matrix with `d` on the diagonal and other values equal to `z`
+    /// construct Matrix with diagonal terms set to `d` and other terms set to `z`
     Matrix34(real z, real d)
     {
         val[0] = d;
@@ -1039,6 +1039,23 @@ public:
         return Matrix34(    dia,  vec.ZZ, -vec.YY,
                         -vec.ZZ,     dia,  vec.XX,
                          vec.YY, -vec.XX,     dia);
+    }
+    
+    /// 2D Rotation with angle set by cosinus and sinus values
+    /**
+     This is equivalent to rotationAroundAxis(axis, c, s) - outerProduct(axis)
+     Attention: This is meant to be called with `norm(axis)==1` and `c*c + s*s == 1`
+     but the values of 'c' and 's' can be tweaked to scale the resulting matrix.
+     */
+    static Matrix34 planarRotation(const Vector3& axis, const real c, const real s)
+    {
+        const real  X = axis.XX,  Y = axis.YY,  Z = axis.ZZ;
+        const real cX = -c * X,  cY = -c * Y,  cZ = -c * Z;
+        const real sX =  s * X,  sY =  s * Y,  sZ =  s * Z;
+
+        return Matrix34(cX * X + c , cY * X + sZ, cZ * X - sY,
+                        cX * Y - sZ, cY * Y + c , cZ * Y + sX,
+                        cX * Z + sY, cY * Z - sX, cZ * Z + c );
     }
 
 #pragma mark - Rotations
