@@ -422,32 +422,20 @@ void displayMagnified(int mag, void * arg)
  */
 int Player::saveScene(const int mag, const char* name, const char* format, const int downsample)
 {
-    if ( !SaveImage::supported(format) )
-    {
-        std::cerr << "Error unsupported image format `" << format << "'\n";
-        return -1;
-    }
-    
     View & view = glApp::currentView();
     const int W = view.width(), H = view.height();
-    
     thread.lock();
     
     //std::clog << "saveMagnifiedImage " << W << "x" << H << " mag=" << mag << '\n';
-
     prepareDisplay(view, mag);
-    
     view.openDisplay();
     int err = SaveImage::saveMagnifiedImage(mag, name, format, W, H, displayMagnified, this, downsample);
     if ( err )
-    {
-        err = SaveImage::saveCompositeImage(mag, name, format, W, H, view.pixelSize(), displayMagnified, this);
-        if ( !err )
-            printf("saved %ix%i snapshot %s\n", W, H, name);
-    }
-    else
+        err = SaveImage::saveCompositeImage(mag, name, format, W, H, view.pixelSize(), displayMagnified, this, downsample);
+    if ( !err )
         printf("saved %ix%i snapshot %s\n", mag*W/downsample, mag*H/downsample, name);
     view.closeDisplay();
+    
     thread.unlock();
     return err;
 }
