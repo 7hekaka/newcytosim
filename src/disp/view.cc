@@ -425,23 +425,25 @@ void View::setModelView() const
 void View::sliceView(int mode) const
 {
     real off = view_size * 0.5;
-    
-    if ( mode == 1 )
+    switch ( mode )
     {
-        setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,+1), off);
-        if ( !depth_clamp )
-            setFog(1, 0, fog_color);
-    }
-    else if ( mode == 2 )
-    {
-        setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,-1), -off);
-        setFog(1, 1, fog_color);
-    }
-    else if ( mode == 3 )
-    {
-        real thk = view_size * 0.05;
-        setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,-1), thk-off);
-        setClipPlaneEye(GL_CLIP_PLANE2, Vector3(0,0,+1), thk+off);
+        case 1: {
+            setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,+1), off);
+            if ( !depth_clamp )
+                setFog(1, 0, fog_color);
+        } break;
+        case 2: {
+            setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,-1), -off);
+            setFog(1, 1, fog_color);
+        } break;
+        case 3: {
+            real thk = view_size * 0.05;
+            setClipPlaneEye(GL_CLIP_PLANE1, Vector3(0,0,-1), thk-off);
+            setClipPlaneEye(GL_CLIP_PLANE2, Vector3(0,0,+1), thk+off);
+        } break;
+        case 4: {
+            setClipPlane(GL_CLIP_PLANE1, -gle::depthAxis(), 0);
+        } break;
     }
 }
 
