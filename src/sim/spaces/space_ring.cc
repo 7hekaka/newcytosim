@@ -181,15 +181,10 @@ void SpaceRing::draw3D() const
     GLfloat L(half_);
     GLfloat R(radius_);
 
-    const GLenum glp = GL_CLIP_PLANE5;
-    GLdouble plane[] = { -1, 0, 0, L };
-    glEnable(glp);
-    glClipPlane(glp, plane);
     glPushMatrix();
-    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
-    gle::halfTube1();
+    gle::stretchAlignZ(Vector(-L,0,0), Vector(L,0,0), R);
+    gle::tube1();
     glPopMatrix();
-    glDisable(glp);
 }
 
 #else

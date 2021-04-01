@@ -211,26 +211,25 @@ void SpaceCylinderP::draw3D() const
 {
     GLfloat L(half_);
     GLfloat R(radius_);
-    
-    glLineStipple(1, 0x000F);
-    glEnable(GL_LINE_STIPPLE);
-
-    const GLenum glp = GL_CLIP_PLANE5;
-    GLdouble plane[] = { -1, 0, 0, L };
-    glEnable(glp);
 
     glPushMatrix();
-    glClipPlane(glp, plane);
-    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
-    gle::halfTube1();
-    gle::circle();
+    gle::stretchAlignZ(Vector(-L,0,0), Vector(L,0,0), R);
+    gle::tube1();
     glPopMatrix();
-    glDisable(glp);
-    glPushMatrix();
-    gle::transAlignZ(Vector(L,0,0), R, Vector(1,0,0));
-    gle::circle();
-    glPopMatrix();
-    glDisable(GL_LINE_STIPPLE);
+
+    if ( 1 )
+    {
+        // mark the edge of the periodicity with dotted lines
+        glLineStipple(1, 0x000F);
+        glEnable(GL_LINE_STIPPLE);
+        glPushMatrix();
+        gle::transAlignZ(Vector(-L,0,0), R, Vector(-1,0,0));
+        gle::circle();
+        gle::transAlignZ(Vector(L,0,0), R, Vector(1,0,0));
+        gle::circle();
+        glPopMatrix();
+        glDisable(GL_LINE_STIPPLE);
+    }
 }
 
 #else

@@ -128,7 +128,7 @@ namespace gle
     /// translate by T; rotate to align X with A, Y with B and Z with C
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
 
-    /// translate by A; rotate to align Z with AB, Z replacing X. Scale XY plane by `rad'
+    /// translate by A; rotate to align Z with AB, Z replacing X. Scale in Z to put B at (0,0,1) Scale XY plane by `rad'
     void stretchAlignZ(Vector2 const& A, Vector2 const& B, float rad);
     /// translate by A; rotate to align Z with AB, Z replacing X. Scale XY plane by `rad'
     void stretchAlignZ(Vector3 const& A, Vector3 const& B, float rad);

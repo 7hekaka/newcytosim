@@ -245,6 +245,8 @@ namespace gle
     }
 
     /**
+      Translate and rotate to place A in (0,0,0) and B at (0,0,1).
+      Scale XY plane by `rad' and Z axis by 1/|AB|
      `R` is the transverse scaling done in the XY plane after rotation
      */
     void stretchAlignZ(Vector2 const& A, Vector2 const& B, float R)
@@ -261,7 +263,10 @@ namespace gle
         glMultMatrixf(mat);
     }
     
-    // set rotation to align Z with 'AB' and translate to 'A'
+    /**
+     Translate and rotate to place A in (0,0,0) and B at (0,0,1).
+     Scale XY plane by `rad' and Z axis by 1/|AB|
+     */
     void stretchAlignZ(Vector3 const& A, Vector3 const& B, float R)
     {
         float X = float(B.XX-A.XX);

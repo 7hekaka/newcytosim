@@ -272,31 +272,25 @@ void SpaceCapsule::draw3D() const
 {
     const real L(half_);
     const float R(radius_);
-    
-    const GLenum glp = GL_CLIP_PLANE5;
-    GLdouble plane[] = { 1, 0, 0, 0 };
-    glEnable(glp);
 
     //right side:
     glPushMatrix();
-    glClipPlane(glp, plane);
     gle::transAlignZ(Vector(L,0,0), R, Vector(-1,0,0));
-    gle::halfTube1();
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
+    glPopMatrix();
+
+    glPushMatrix();
+    gle::stretchAlignZ(Vector(-L,0,0), Vector(L,0,0), R);
+    gle::tube1();
     glPopMatrix();
 
     //left side:
     glPushMatrix();
-    plane[0] = -1;
-    glClipPlane(glp, plane);
     gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
-    gle::halfTube1();
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
     glPopMatrix();
-    
-    glDisable(glp);
 }
 
 #else

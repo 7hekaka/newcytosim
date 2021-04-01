@@ -224,21 +224,12 @@ void SpaceCylinder::draw3D() const
 {
     const real L(half_);
     const real R(radius_);
-    
-    const GLenum glp = GL_CLIP_PLANE5;
-    GLdouble plane[] = { -1, 0, 0, L };
-    glEnable(glp);
 
     glPushMatrix();
-    glClipPlane(glp, plane);
-    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
-    gle::halfTube1();
-    gle::discBottom2();
-    glPopMatrix();
-    glDisable(glp);
-    glPushMatrix();
-    gle::transAlignZ(Vector(L,0,0), R, Vector(1,0,0));
-    gle::disc2();
+    gle::stretchAlignZ(Vector(-L,0,0), Vector(L,0,0), R);
+    gle::tube1();
+    gle::discBottom1();
+    gle::discTop1();
     glPopMatrix();
 }
 
