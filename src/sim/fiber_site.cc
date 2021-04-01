@@ -186,16 +186,17 @@ void FiberSite::print(std::ostream& os) const
 {
     if ( fiber() )
     {
-        std::streamsize p = os.precision();
-        os.precision(3);
-        os << "(f" << fiber()->identity();
 #if FIBER_HAS_LATTICE
         if ( hLattice )
-            os << " s " << hSite;
+            os << "[" << fiber()->reference() << " " << hSite << "]";
         else
 #endif
-            os << " @ " << std::fixed << abscissa() << ")";
-        os.precision(p);
+        {
+            std::streamsize p = os.precision();
+            os.precision(3);
+            os << "(" << fiber()->reference() << " " << std::fixed << abscissa() << ")";
+            os.precision(p);
+        }
     } else
         os << "(null)";
 }

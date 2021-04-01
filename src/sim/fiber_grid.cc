@@ -286,6 +286,8 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     // using here the member variable 'targets' as a temporary list:
     targets.clear();
     
+    //if ( ha.otherHand() ) std::clog << " try " << *(FiberSite*)ha.otherHand() << "\n";
+    
     // calculate distance to all targets
     const real sup = square(ha.prop->binding_range);
     for ( FiberSegment const& seg : segments )
@@ -294,10 +296,17 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
         {
             real dis = INFINITY;
             real abs = seg.projectPoint(place, dis);
-            //std::clog << " target " << seg << " at " << dis << "\n";
-            FiberSite sit(const_cast<Fiber*>(seg.fiber()), abs);
-            if ( dis < sup && ha.monitorAllowsAttachment(sit) )
-                targets.emplace(seg, dis, abs);
+            if ( dis < sup )
+            {
+                FiberSite sit(const_cast<Fiber*>(seg.fiber()), abs);
+                if ( ha.monitorAllowsAttachment(sit) )
+                {
+                    targets.emplace(seg, dis, abs);
+                    //std::clog << "   target " << sit << " at " << dis << " nm\n";
+                }
+                //else std::clog << "   verbot " << sit << " at " << dis << " nm\n";
+            }
+            //else std::clog << "   beyond " << seg << " at " << dis << " nm\n";
         }
     }
     

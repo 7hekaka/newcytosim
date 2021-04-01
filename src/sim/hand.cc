@@ -387,6 +387,6 @@ bool Hand::read(Inputter& in, Simul& sim)
 
 std::ostream& operator << (std::ostream& os, Hand const& arg)
 {
-    os << "hand(" << arg.fiber()->reference() << ", " << arg.abscissa() << ")";
+    os << "hand(" << arg.fiber()->reference() << " " << arg.abscissa() << ")";
     return os;
 }

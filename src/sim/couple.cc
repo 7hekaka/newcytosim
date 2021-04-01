@@ -275,21 +275,22 @@ void Couple::stepAA()
 bool Couple::allowAttachment(FiberSite const& sit, Hand const* h)
 {
     assert_true( h == cHand1 || h == cHand2 );
-    Hand const* that = ( h == cHand1 ? cHand2 : cHand1 );
+    FiberSite const* that = ( h == cHand1 ? cHand2 : cHand1 );
 
     if ( !that->attached() )
         return true;
     
+    Fiber const* fib = that->fiber();
+    Fiber const* fob = sit.fiber();
+    
 #if FIBER_HAS_FAMILY
-    // prevent binding if that would induce link inside the same family
-    if ( that->fiber()->family_
-        &&  that->fiber()->family_ == sit.fiber()->family_ )
+    // prevent binding if that would make a link inside the same family
+    if ( fib->family_  &&  fib->family_==fob->family_ )
         return false;
 #endif
 
     // prevent binding to the same fiber at adjacent locations:
-    if ( that->fiber() == sit.fiber()
-        &&  abs_real(sit.abscissa()-that->abscissa()) <= prop->min_loop )
+    if ( fib==fob  &&  abs_real(sit.abscissa()-that->abscissa()) <= prop->min_loop )
         return false;
     
 #if ( 0 )
@@ -298,8 +299,8 @@ bool Couple::allowAttachment(FiberSite const& sit, Hand const* h)
      i.e. a link between two Fibers from the same aster, very close to the center
      of this aster. Such links would be improductive, and would trap the Couples.
      */
-    const Buddy * bud = that->fiber()->buddy(0);
-    if ( bud  &&  bud == sit.fiber()->buddy(0) )
+    const Buddy * bud = fib->buddy(0);
+    if ( bud  &&  bud == fob->buddy(0) )
     {
         real a = that->abscissa();
         real b = sit.abscissa();
