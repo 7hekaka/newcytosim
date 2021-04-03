@@ -612,6 +612,9 @@ public:
     /// Link of stiffness `weight` and resting length `arm`, on the sides of both fibers
     void addSideSideLink(Interpolation const&, Interpolation const&, real arm, real weight);
     
+    /// Link of stiffness `weight` on the sides of both fibers and tilted by (cosinus, sinus)
+    void addTiltedSideSideLink(Interpolation const&, MatrixBlock const&, Interpolation const&, MatrixBlock const&, real weight);
+
     /// Link of stiffness `weight` on the sides of both fibers and tilted by ang = (cosinus, sinus)
     void addTiltedSideSideLink(Interpolation const&, Torque const& arm1, Interpolation const&, Torque const& arm2, real len, Vector2 const& ang, real weight);
 

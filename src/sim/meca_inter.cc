@@ -2725,17 +2725,11 @@ void Meca::addSideSideLink(Interpolation const& ptA,
  A tilted double link to represent MAP65/PRC1/Ase1 connectors, which are orientated
  with an angle of 70 relative to the microtubule surface.
  
- The angle of rotation is defined by ang = (cosinus, sinus), and is
- measured from the axis of each fiber (from minus to plus ends):
- - (1, 0) is no rotation, where the link extends parallel to the fiber
- - (0, 1) is a 90 degree rotation, and the link extends orthogonal to the fiber
- - ( 0.5, 0.5*M_SQRT3) would lean 60 degrees towards the plus end.
- - (-0.5, 0.5*M_SQRT3) would lean 60 degrees towards the minus end.
- Strasbourg, 31.03.2021
+ The rotations are defined directly by Matrices R and T
+ Strasbourg, 3.04.2021
  */
-void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
-                                 Interpolation const& ptB, Torque const& armB,
-                                 const real len, Vector2 const& ang,
+void Meca::addTiltedSideSideLink(Interpolation const& ptA, MatrixBlock const& R,
+                                 Interpolation const& ptB, MatrixBlock const& T,
                                  const real weight)
 {
     assert_true( weight >= 0 );
@@ -2754,13 +2748,6 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
     const real cc1 =  ptA.coef1();
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
-    
-    const real ia = len / ptA.len();
-    const real ib = len / ptB.len();
-
-    // R and T rotate and scale to get a vector of size 'len' from 'ptA.diff'
-    MatrixBlock R = MatrixBlock::planarRotation(armA/len, ia*ang.XX, ia*ang.YY);
-    MatrixBlock T = MatrixBlock::planarRotation(armB/len, ib*ang.XX, ib*ang.YY);
 
     MatrixBlock A = MatrixBlock(0, cc0) - R;
     MatrixBlock B = MatrixBlock(0, cc1) + R;
@@ -2818,6 +2805,34 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
         }
     }
     DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
+}
+
+
+/**
+ A tilted double link to represent MAP65/PRC1/Ase1 connectors, which are orientated
+ with an angle of 70 relative to the microtubule surface.
+ 
+ The angle of rotation is defined by cosinus and sinus values (c, s), and is
+ measured from the axis of each fiber (from minus to plus ends):
+ - (1, 0) is no rotation, where the link extends parallel to the fiber
+ - (0, 1) is a 90 degree rotation, and the link extends orthogonal to the fiber
+ - ( 0.5, 0.5*M_SQRT3) would lean 60 degrees towards the plus end.
+ - (-0.5, 0.5*M_SQRT3) would lean 60 degrees towards the minus end.
+ Strasbourg, 31.03.2021
+ */
+void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
+                                 Interpolation const& ptB, Torque const& armB,
+                                 const real len, Vector2 const& ang,
+                                 const real weight)
+{
+    const real ia = len / ptA.len();
+    const real ib = len / ptB.len();
+
+    // R and T rotate and scale to get a vector of size 'len' from 'ptA.diff'
+    MatrixBlock R = MatrixBlock::planarRotation(armA/len, ia*ang.XX, ia*ang.YY);
+    MatrixBlock T = MatrixBlock::planarRotation(armB/len, ib*ang.XX, ib*ang.YY);
+    
+    addTiltedSideSideLink(ptA, R, ptB, T, weight);
 }
 
 //------------------------------------------------------------------------------
