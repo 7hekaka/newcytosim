@@ -34,11 +34,8 @@ public:
     
     /// @}
     
-    /// derived variable: cosine(angle)
-    real cosinus;
-    
-    /// derived variable: sinus(angle)
-    real sinus;
+    /// derived variable: [cos(angle), sin(angle)]
+    Vector2 angle_dir;
 
 public:
     

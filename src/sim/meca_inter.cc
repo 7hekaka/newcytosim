@@ -441,16 +441,15 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
  
  The direction of `ptB` is rotated around `axis` defined as cross( dirA, dirB ).
  The calculation is explicit and all contributions go in the force vector vBAS[]
- It is assumed that `cosinus^2 + sinus^2 = 1`
+ It is assumed that `ang.norm() = 1`
  Note that if ( sinus == 0 ), you can use addTorque(ptA, ptB, weight)
  */
 void Meca::addTorqueExplicit(Interpolation const& ptA,
                              Interpolation const& ptB,
-                             const real cosinus, const real sinus,
-                             const real weight)
+                             Vector2 const& ang, const real weight)
 {
     assert_true( weight >= 0 );
-    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+    assert_small( ang.normSqr() - 1.0 );
 
     // full indices:
     const size_t ii0 = DIM * ptA.matIndex1();
@@ -473,10 +472,10 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
      in 3D the axis of torque is perpendicular to both `da` and `db`,
      and the angle is only defined between 0 and PI,
      */
-    Vector axis = cross(db, da).normalized(sign_real(sinus));
+    Vector axis = cross(db, da).normalized(sign_real(ang.YY));
     
     // rotate vector `db` around `arm` by angle specified as (cosinus, sinus):
-    Vector rot = cosinus * db + sinus * cross(axis, db);
+    Vector rot = ang.XX * db + ang.YY * cross(axis, db);
     
 #elif ( DIM == 2 )
 
@@ -484,7 +483,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     real dir = sign_real(cross(da, db));
 
     // rotate vector `db` by angle defined by (cosinus, sinus) around Z
-    Vector rot( db.XX*cosinus + db.YY*sinus*dir, db.YY*cosinus - db.XX*sinus*dir );
+    Vector rot( db.XX*ang.XX + db.YY*ang.YY*dir, db.YY*ang.XX - db.XX*ang.YY*dir );
     
 #else
     
@@ -552,11 +551,11 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
  */
 void Meca::addTorquePoliti(Interpolation const& pt1,
                            Interpolation const& pt2,
-                           const real cosinus, const real sinus,
+                           Vector const& ang,
                            const real weight)
 {
     assert_true( weight >= 0 );
-    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+    assert_small( ang.normSqr() - 1.0 );
 
     if ( pt1.overlapping(pt2) )
         return;
@@ -578,8 +577,8 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
     //Helping vector this vector is at torque_angle from cd.
     //Therefore in resting state angle difference between ab and ce is zero. This vector is used to compute the strength of torque
     Vector ce;
-    ce.XX =  cd.XX*cosinus + cd.YY*sinus;
-    ce.YY = -cd.XX*sinus   + cd.YY*cosinus;
+    ce.XX =  cd.XX*ang.XX + cd.YY*ang.YY;
+    ce.YY = -cd.XX*ang.YY + cd.YY*ang.XX;
     //normalize
     const real abn = ab.norm();
     const real abnS= ab.normSqr();
@@ -659,7 +658,7 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
      force_D = - force_C
  
  These force vectors are orthogonal to the segments on which they are applied.
- The parameter `equilibrium_angle` is the resting angle specified as ( cosinus, sinus )
+ The equilibrium_angle is the angle specified by the rotation matrix R
  The interpolation coefficients of `pt1` and `pt2` are ignored.
 
  3D implicit torque implementation
@@ -846,11 +845,10 @@ void Meca::addTorque(Interpolation const& pt1,
 
 void Meca::addTorque(Interpolation const& pt1,
                      Interpolation const& pt2,
-                     const real cosinus, const real sinus,
-                     const real weight)
+                     Vector2 const& ang, const real weight)
 {
     assert_true( weight >= 0 );
-    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+    assert_small( ang.normSqr() - 1.0 );
     
 #if ( DIM == 3 )
     const Vector AB = pt1.diff();
@@ -861,9 +859,9 @@ void Meca::addTorque(Interpolation const& pt1,
         axis /= n;
     else
         axis = Vector::randU();
-    addTorque(pt1, pt2, MatrixBlock::rotationAroundAxis(axis, cosinus, sinus), weight);
+    addTorque(pt1, pt2, MatrixBlock::rotationAroundAxis(axis, ang.XX, ang.YY), weight);
 #elif ( DIM == 2 )
-    addTorque(pt1, pt2, MatrixBlock(cosinus, sinus, -sinus, cosinus), weight);
+    addTorque(pt1, pt2, MatrixBlock(ang.XX, ang.YY, -ang.YY, ang.XX), weight);
 #endif
 }
 
@@ -871,12 +869,12 @@ void Meca::addTorque(Interpolation const& pt1,
 
 
 
-MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, real cosinus, real sinus)
+MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, Vector2 const& ang)
 {
 #if ( DIM == 3 )
-    return (-weight) * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
+    return (-weight) * MatrixBlock::rotationAroundAxis(axi, ang.XX, ang.YY);
 #elif ( DIM == 2 )
-    return (-weight) * MatrixBlock(cosinus, axi*sinus, -axi*sinus, cosinus);
+    return (-weight) * MatrixBlock(ang.XX, axi*ang.YY, -axi*ang.YY, ang.XX);
 #else
     return MatrixBlock(-weight);  //should not be used!
 #endif
@@ -897,21 +895,6 @@ void Meca::addTorque(Mecapoint const& ptA,
 {
     assert_true( weight >= 0 );
     const MatrixBlock W(0, -weight);
-
-/*
-#if ( DIM == 3 )
-    const Vector3 AB = ptB.pos() - ptA.pos();
-    const Vector3 BC = ptC.pos() - ptB.pos();
-    Vector3 axi = normalize(cross(AB, BC));
-    if ( axi != axi )
-        return;
-    const MatrixBlock R = -weight * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
-#elif ( DIM == 2 )
-    const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
-#else
-    const Matrix11 R(-weight);  //should not be used!
-#endif
-*/
     const MatrixBlock T = R.transposed();
 
     // full indices:
@@ -960,12 +943,10 @@ void Meca::addTorque(Mecapoint const& ptA,
 void Meca::addTorquePlane(Mecapoint const& ptA,
                           Mecapoint const& ptB,
                           Mecapoint const& ptC,
-                          const Torque & axi,
-                          const real cosinus, const real sinus,
-                          const real weight)
+                          const Torque & axi, Vector2 const& ang, const real weight)
 {
     assert_true( weight >= 0 );
-    assert_small( cosinus*cosinus + sinus*sinus - 1.0 );
+    assert_small( ang.normSqr() - 1.0 );
 
 #if ( DIM == 3 )
     /*
@@ -976,10 +957,10 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
         return;
      */
     const MatrixBlock X = MatrixBlock::outerProduct(axi);
-    const MatrixBlock R = MatrixBlock::rotationAroundAxis(axi, cosinus, sinus) - X;
+    const MatrixBlock R = MatrixBlock::rotationAroundAxis(axi, ang.XX, ang.YY) - X;
     const MatrixBlock P = MatrixBlock(0,1) - X;
 #elif ( DIM == 2 )
-    const MatrixBlock R = MatrixBlock(cosinus, sinus,-sinus, cosinus);
+    const MatrixBlock R = MatrixBlock(ang.XX, ang.YY,-ang.YY, ang.XX);
     const MatrixBlock P(0,1);
 #else
     const MatrixBlock R(1.0);  //should not be used!
@@ -1030,21 +1011,6 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
     assert_true( weightL >= 0 );
     const MatrixBlock W(0, -weight);
     const Vector AB = ptB.pos() - ptA.pos();
-    
-/*
-#if ( DIM == 3 )
-    const Vector3 BC = ptC.pos() - ptB.pos();
-    Vector3 axi = normalize(cross(AB, BC));
-    if ( axi != axi )
-        return;
-    const MatrixBlock R = -weight * MatrixBlock::rotationAroundAxis(axi, cosinus, sinus);
-#elif ( DIM == 2 )
-    const Matrix22 R = -weight * Matrix22(cosinus, sinus,-sinus, cosinus);
-#else
-    const Matrix11 R(-weight);  //should not be used!
-#endif
-*/
-
     const MatrixBlock T = R.transposed();
     
     // full indices:
@@ -2759,7 +2725,7 @@ void Meca::addSideSideLink(Interpolation const& ptA,
  A tilted double link to represent MAP65/PRC1/Ase1 connectors, which are orientated
  with an angle of 70 relative to the microtubule surface.
  
- The angle of rotation is defined by cosinus and sinus values (c, s), and is
+ The angle of rotation is defined by ang = (cosinus, sinus), and is
  measured from the axis of each fiber (from minus to plus ends):
  - (1, 0) is no rotation, where the link extends parallel to the fiber
  - (0, 1) is a 90 degree rotation, and the link extends orthogonal to the fiber
@@ -2769,7 +2735,7 @@ void Meca::addSideSideLink(Interpolation const& ptA,
  */
 void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
                                  Interpolation const& ptB, Torque const& armB,
-                                 const real len, const real c, const real s,
+                                 const real len, Vector2 const& ang,
                                  const real weight)
 {
     assert_true( weight >= 0 );
@@ -2793,8 +2759,8 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
     const real ib = len / ptB.len();
 
     // R and T rotate and scale to get a vector of size 'len' from 'ptA.diff'
-    MatrixBlock R = MatrixBlock::planarRotation(armA/len, ia*c, ia*s);
-    MatrixBlock T = MatrixBlock::planarRotation(armB/len, ib*c, ib*s);
+    MatrixBlock R = MatrixBlock::planarRotation(armA/len, ia*ang.XX, ia*ang.YY);
+    MatrixBlock T = MatrixBlock::planarRotation(armB/len, ib*ang.XX, ib*ang.YY);
 
     MatrixBlock A = MatrixBlock(0, cc0) - R;
     MatrixBlock B = MatrixBlock(0, cc1) + R;

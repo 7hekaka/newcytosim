@@ -8,7 +8,9 @@
 Fork::Fork(ForkProp const* p, Vector const& w)
 : Couple(p, w), prop(p)
 {
-    sinus = 0;
+#if ( DIM == 2 )
+    sinus = prop->angle_dir.YY;
+#endif
 }
 
 
@@ -26,16 +28,21 @@ void Fork::setInteractions(Meca& meca) const
     meca.addLink(pt1, pt2, prop->stiffness);
     
 #if ( DIM == 2 )
-    // flip the angle to match the current configuration of the bond
     if ( prop->flip )
-        sinus = std::copysign(prop->sinus, cross(pt1.diff(), pt2.diff()));
+    {
+        Vector2 dir = prop->angle_dir;
+        // flip the angle to match the current configuration of the bond
+        sinus = std::copysign(dir.YY, cross(pt1.diff(), pt2.diff()));
+        dir.YY = sinus;
+        meca.addTorque(pt1, pt2, dir, prop->angular_stiffness);
+    }
     else
-        sinus = prop->sinus;
-    
-    meca.addTorque(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
-    //meca.addTorquePoliti(pt1, pt2, prop->cosinus, sinus, prop->angular_stiffness);
+    {
+        meca.addTorque(pt1, pt2, prop->angle_dir, prop->angular_stiffness);
+    }
+    //meca.addTorquePoliti(pt1, pt2, dir, prop->angular_stiffness);
 #elif ( DIM == 3 )
-    meca.addTorque(pt1, pt2, prop->cosinus, prop->sinus, prop->angular_stiffness);
+    meca.addTorque(pt1, pt2, prop->angle_dir, prop->angular_stiffness);
 #endif
 }
 

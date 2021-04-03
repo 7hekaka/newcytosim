@@ -309,11 +309,11 @@ Cambridge, 12.2019
 void Tubule::setInteractionsC(Meca& meca) const
 {
 #if ( DIM >= 3 )
-    const real ang = M_PI / NFIL;
-    const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
+    const real angle = 2 * M_PI / NFIL;
+    const real len = 2 * prop->radius * std::sin(angle);  // distance between protofilaments
     const real stiffL = prop->stiffness[0];
     const real stiffA = prop->stiffness[1];
-    real co = std::cos(2*ang), si = std::sin(2*ang);
+    Vector2 ang(std::cos(angle), std::sin(angle));
     
     assert_true(fil_[0]);
     const size_t end = fil_[0]->nbSegments();
@@ -336,7 +336,7 @@ void Tubule::setInteractionsC(Meca& meca) const
             dir.normalize();
             
             // create rotation matrix for torque:
-            mat = Meca::torqueMatrix(stiffA, dir, co, si);
+            mat = Meca::torqueMatrix(stiffA, dir, ang);
             
             for ( size_t n = 0; n < NFIL; ++n )
             {
