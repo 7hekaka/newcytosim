@@ -153,10 +153,10 @@ public:
     Fiber const* brother_;
 
     /// radial direction at the specified distance from the MINUS_END
-    Vector radialDirM(real a) const { assert_true(this!=family_); return posM(a) - family_->posM(a); }
+    Vector radialDiffM(real a) const { assert_true(this!=family_); return posM(a) - family_->posM(a); }
 
     /// radial direction at the specified abscissa
-    Vector radialDir(real a) const { return radialDirM(a-abscissaM()); }
+    Vector radialDiff(real a) const { return radialDiffM(a-abscissaM()); }
     
     /// position of a point specified by distance from the MINUS_END
     Vector displayPosM(real a) const;
