@@ -2825,12 +2825,12 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
                                  const real len, Vector2 const& ang,
                                  const real weight)
 {
-    const real ia = len / ptA.len();
-    const real ib = len / ptB.len();
+    const real a = len / ptA.len();
+    const real b = len / ptB.len();
 
     // R and T rotate and scale to get a vector of size 'len' from 'ptA.diff'
-    MatrixBlock R = MatrixBlock::planarRotation(armA/len, ia*ang.XX, ia*ang.YY);
-    MatrixBlock T = MatrixBlock::planarRotation(armB/len, ib*ang.XX, ib*ang.YY);
+    MatrixBlock R = MatrixBlock::planarRotation(armA/len, a*ang.XX, a*ang.YY);
+    MatrixBlock T = MatrixBlock::planarRotation(armB/len, b*ang.XX, b*ang.YY);
     
     addTiltedSideSideLink(ptA, R, ptB, T, weight);
 }

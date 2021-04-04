@@ -144,6 +144,41 @@
         }
     }
     
+    void hexTubeZ(GLfloat A, GLfloat B)
+    {
+        /// draw hexagon that has the same surface as a disc of radius 1.
+        constexpr GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        constexpr GLfloat C = 0.8660254037844386f; //std::sqrt(3)/2;
+        constexpr GLfloat S = 0.5f;
+        constexpr GLfloat H = R * C, X = R * S;
+        
+        const GLfloat pts[] = {
+             R,  0, B,  R,  0, A,
+             X,  H, B,  X,  H, A,
+            -X,  H, B, -X,  H, A,
+            -R,  0, B, -R,  0, A,
+            -X, -H, B, -X, -H, A,
+             X, -H, B,  X, -H, A,
+             R,  0, B,  R,  0, A };
+        
+        constexpr GLfloat dir[] = {
+             1,  0, 0,  1,  0, 0,
+             S,  C, 0,  S,  C, 0,
+            -S,  C, 0, -S,  C, 0,
+            -1,  0, 0, -1,  0, 0,
+            -S, -C, 0, -S, -C, 0,
+             S, -C, 0,  S, -C, 0,
+             1,  0, 0,  1,  0, 0 };
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, pts);
+        glNormalPointer(GL_FLOAT, 0, dir);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+    }
+
     void ellipseZ(GLfloat rX, GLfloat rY, GLfloat rZ)
     {
         GLfloat iX(1.f/rX), iY(1.f/rY), iZ(1.f/rZ);

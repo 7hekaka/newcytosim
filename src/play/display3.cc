@@ -289,7 +289,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     if ( abs+inc >= fib.length() )
     {
         glPushMatrix();
-        gle::transAlignZ(nxt, rad, -fib.dirEndP(), fib.length()-abs);
+        gle::transAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
         gle::endedTube2();
         glPopMatrix();
     }
@@ -389,7 +389,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     glPushMatrix();
     if ( abs+inc >= fib.length() )
     {
-        gle::transAlignZ(fib.displayPosM(abs+inc), rad, -fib.dirEndP(), fib.length()-abs);
+        gle::transAlignZ1(fib.displayPosM(abs+inc), rad, -fib.dirEndP(), fib.length()-abs);
         gle::discBottom2();
     }
     else

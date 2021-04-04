@@ -129,6 +129,8 @@ namespace gle
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
 
     /// translate by A; rotate to align Z with AB, Z replacing X. Scale in Z to put B at (0,0,1) Scale XY plane by `rad'
+    void stretchAlignZ(Vector1 const& A, Vector1 const& B, float rad);
+    /// translate by A; rotate to align Z with AB, Z replacing X. Scale in Z to put B at (0,0,1) Scale XY plane by `rad'
     void stretchAlignZ(Vector2 const& A, Vector2 const& B, float rad);
     /// translate by A; rotate to align Z with AB, Z replacing X. Scale XY plane by `rad'
     void stretchAlignZ(Vector3 const& A, Vector3 const& B, float rad);
@@ -138,9 +140,10 @@ namespace gle
     void transAlignZ(Vector2 const& pos, float rad, Vector2 const& dir);
     void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir);
 
-    void transAlignZ(Vector1 const& pos, float rad, Vector1 const& dir, float scale);
-    void transAlignZ(Vector2 const& pos, float rad, Vector2 const& dir, float scale);
-    void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir, float scale);
+    /// translate by pos; rotate to align Z with dir, given norm(dir)=1, scale XY by rad and Z by fac
+    void transAlignZ1(Vector1 const& pos, float rad, Vector1 const& dir, float fac);
+    void transAlignZ1(Vector2 const& pos, float rad, Vector2 const& dir, float fac);
+    void transAlignZ1(Vector3 const& pos, float rad, Vector3 const& dir, float fac);
 
     void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
     void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);

@@ -45,12 +45,30 @@ public:
     
     real XX, YY, ZZ;
     
+    Vector3() { XX=0; YY=0; ZZ=0; }
     Vector3(real a, real b, real c) { XX=a; YY=b; ZZ=c; }
     void set(real a, real b, real c) { XX=a; YY=b; ZZ=c; }
-    Vector3() { XX=srand(); YY=srand(); ZZ=srand(); }
+    void set_rand() { XX=srand(); YY=srand(); ZZ=srand(); }
+    
+    real norm() { return sqrt(XX*XX + YY*YY + ZZ*ZZ); }
 
 public:
     
+    void set_unit(real N)
+    {
+        real nn;
+        do {
+            XX = srand();
+            YY = srand();
+            ZZ = srand();
+            nn = XX*XX + YY*YY + ZZ*ZZ;
+        } while ( nn > 1 );
+        nn = N / sqrt(nn);
+        XX *= nn;
+        YY *= nn;
+        ZZ *= nn;
+    }
+
     Vector3 orthogonal() const
     {
         real ax = abs_real(XX);
@@ -86,11 +104,58 @@ public:
 };
 
 
+/**
+ This works only if norm(z[]) == n!
+ Derived from `Building an Orthonormal Basis, Revisited`,
+ Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
+ optimized by Marc B. Reynolds
+*/
+void orthonormal(const real z[3], real n, real x[3], real y[3])
+{
+    const real s = std::copysign(real(1), z[2]);
+    const real a = z[1] / ( z[2] + s * n );
+    const real b = z[1] * a;
+    const real c = z[0] * a;
+    x[0] = -z[2] - b;
+    x[1] = c;
+    x[2] = z[0];
+    y[0] = s * c;
+    y[1] = s * b - n;
+    y[2] = s * z[1];
+}
+
+real dot(real A[3], real B[3]) { return A[0]*B[0] + A[1]*B[1] + A[2]*B[2]; }
+
+void test_orthonormal()
+{
+    const real N = 2;
+    const size_t MAX = 1 << 14;
+    Vector3 vec[MAX];
+    
+    for ( size_t i = 0; i < MAX; ++i )
+    {
+        vec[i].set_unit(N);
+        real Z[3] = { vec[i].XX, vec[i].YY, vec[i].ZZ };
+        real Y[3] = { 0 };
+        real X[3] = { 0 };
+
+        orthonormal(Z, N, X, Y);
+        printf("  %9.3f %9.3f %9.3f :", X[0], X[1], X[2]);
+        printf("  %9.3f %9.3f %9.3f ", dot(X, X), dot(X,Y), dot(X,Z));
+        printf("  %9.3f %9.3f %9.3f ", dot(Y, X), dot(Y,Y), dot(Y,Z));
+        printf("  %9.3f %9.3f %9.3f\n", dot(Z, X), dot(Z,Y), dot(Z,Z));
+    }
+}
+
 void test(size_t cnt)
 {
     const size_t MAX = 1 << 14;
     Vector3 vec[MAX];
     Vector3 vic[MAX];
+    
+    for ( size_t i = 0; i < MAX; ++i )
+        vec[i].set_rand();
+    
     /*
     for ( size_t i = 0; i < MAX; ++i )
         printf("%9.3f %9.3f %9.3f\n", vec[i].XX, vec[i].YY, vec[i].ZZ);
@@ -122,5 +187,6 @@ void test(size_t cnt)
 int main()
 {
     printf("test_ortho --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
-    test(1<<15);
+    //test(1<<15);
+    test_orthonormal();
 }

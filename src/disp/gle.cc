@@ -192,43 +192,26 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Rotation
     
-    template < typename FLOAT >
-    inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3])
+    /**
+     This works if norm(z[]) == n!
+     Derived from `Building an Orthonormal Basis, Revisited`,
+     Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
+     optimized by Marc B. Reynolds
+    */
+    void orthonormal(const float z[3], float n, float x[3], float y[3])
     {
-        const FLOAT s = std::copysign((FLOAT)1, v[2]);
-        /// optimized version by Marc B. Reynolds
-        const FLOAT a = v[1] / ( v[2] + s );
-        const FLOAT b = v[1] * a;
-        const FLOAT c = v[0] * a;
-        FLOAT sul = s * mul;
-        x[0] = mul * ( -v[2] - b );
-        x[1] = mul * c;
-        x[2] = mul * v[0];
-        y[0] = sul * c;
-        y[1] = sul * b - mul;
-        y[2] = sul * v[1];
+        const float s = std::copysign(1.f, z[2]);
+        const float a = z[1] / ( z[2] + s * n );
+        const float b = z[1] * a;
+        const float c = z[0] * a;
+        x[0] = -z[2] - b;
+        x[1] = c;
+        x[2] = z[0];
+        y[0] = s * c;
+        y[1] = s * b - n;
+        y[2] = s * z[1];
     }
     
-    template < typename FLOAT >
-    inline void orthonormal(const FLOAT v[3], FLOAT mul, FLOAT x[3], FLOAT y[3], FLOAT fac, FLOAT z[3])
-    {
-        const FLOAT s = std::copysign((FLOAT)1, v[2]);
-        /// optimized version by Marc B. Reynolds
-        const FLOAT a = v[1] / ( v[2] + s );
-        const FLOAT b = v[1] * a;
-        const FLOAT c = v[0] * a;
-        FLOAT sul = s * mul;
-        x[0] = mul * ( -v[2] - b );
-        x[1] = mul * c;
-        x[2] = mul * v[0];
-        y[0] = sul * c;
-        y[1] = sul * b - mul;
-        y[2] = sul * v[1];
-        z[0] = fac * v[0];
-        z[1] = fac * v[1];
-        z[2] = fac * v[2];
-    }
-
     /**
      `R` is the transverse scaling done in the XY plane after rotation
      */
@@ -272,7 +255,7 @@ namespace gle
         float X = float(B.XX-A.XX);
         float Y = float(B.YY-A.YY);
         float Z = float(B.ZZ-A.ZZ);
-        float N = invsqrt(X*X+Y*Y+Z*Z);
+        float N = R / std::sqrt(X*X+Y*Y+Z*Z);
         float vec[3] = { N*X, N*Y, N*Z };
         float mat[16] = {
             0, 0, 0, 0,
@@ -361,20 +344,20 @@ namespace gle
         float X = float(D.XX);
         float Y = float(D.YY);
         float Z = float(D.ZZ);
-        float n = invsqrt(X*X+Y*Y+Z*Z);
-        float vec[3] = { n*X, n*Y, n*Z };
+        float N = R / std::sqrt(X*X+Y*Y+Z*Z);
+        float vec[3] = { N*X, N*Y, N*Z };
         float mat[16] = {
             0, 0, 0, 0,
             0, 0, 0, 0,
-            0, 0, 0, 0,
+            vec[0], vec[1], vec[2], 0,
             float(P.XX), float(P.YY), float(P.ZZ), 1};
-        orthonormal(vec, R, mat, mat+4, R, mat+8);
+        orthonormal(vec, R, mat, mat+4);
         glMultMatrixf(mat);
     }
 
     
-    // rotate to align Z with 'D' and translate to center 'P'
-    void transAlignZ(Vector1 const& P, float R, Vector1 const& D, float S)
+    // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
+    void transAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
     {
         float X = std::copysign(R, float(D.XX));
         float Z = std::copysign(S, float(D.XX));
@@ -386,14 +369,11 @@ namespace gle
         glMultMatrixf(mat);
     }
     
-    // rotate to align Z with 'D' and translate to center 'P'
-    void transAlignZ(Vector2 const& P, float R, Vector2 const& D, float S)
+    // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
+    void transAlignZ1(Vector2 const& P, float R, Vector2 const& D, float S)
     {
         float X = float(D.XX);
         float Y = float(D.YY);
-        float n = invsqrt(X*X+Y*Y);
-        X *= n;
-        Y *= n;
         float mat[16] = {
             R*Y, -R*X,  0,  0,
             0,      0, -R,  0,
@@ -402,20 +382,19 @@ namespace gle
         glMultMatrixf(mat);
     }
     
-    // rotate to align Z with 'D' and translate to center 'P', scale Z axis by S
-    void transAlignZ(Vector3 const& P, float R, Vector3 const& D, float S)
+    // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P', scale Z axis by S
+    void transAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
     {
         float X = float(D.XX);
         float Y = float(D.YY);
         float Z = float(D.ZZ);
-        float n = invsqrt(X*X+Y*Y+Z*Z);
-        float vec[3] = { n*X, n*Y, n*Z };
+        float vec[3] = { R*X, R*Y, R*Z };
         float mat[16] = {
             0, 0, 0, 0,
             0, 0, 0, 0,
-            0, 0, 0, 0,
+            S*X, S*Y, S*Z, 0,
             float(P.XX), float(P.YY), float(P.ZZ), 1};
-        orthonormal(vec, R, mat, mat+4, S, mat+8);
+        orthonormal(vec, R, mat, mat+4);
         glMultMatrixf(mat);
     }
 
