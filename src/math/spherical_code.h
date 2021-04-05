@@ -76,7 +76,7 @@ public:
     /// multiply all coordinates by `factor`
     void   scale(real factor);
     
-    /// address where the coordinates for point `inx` are
+    /// address where the coordinates for point `inx` are stored
     const real* addr(const size_t inx) const { return &coord_[3 * inx]; }
     
     /// copy the coordinates from point `inx` onto the given 3-dim array ptr

@@ -14,10 +14,10 @@
 Vector3 origin(0,0,0), position(0,0,0);
 
 
-void display(View&, int)
+void display(View& view, int)
 {
+    view.openDisplay();
     glEnable(GL_LIGHTING);
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // rendering of icosahedron:
     gle_color(1.0, 0.0, 1.0, 1.0).load_front();
@@ -47,6 +47,7 @@ void display(View&, int)
     glColor3f(1.0, 0.0, 1.0);
     glVertex3f(0, 0, 0);
     glEnd();
+    view.closeDisplay();
 }
 
 

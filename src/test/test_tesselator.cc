@@ -219,11 +219,11 @@ void drawVertices()
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void display(View&, int)
+void display(View& view, int)
 {
+    view.openDisplay();
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     if ( 0 )
     {
@@ -277,7 +277,7 @@ void display(View&, int)
         glDisable(GL_LIGHTING);
         nameVertices();
     }
-    glutReportErrors();
+    view.closeDisplay();
 }
 
 

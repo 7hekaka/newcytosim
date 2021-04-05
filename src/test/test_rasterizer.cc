@@ -213,10 +213,10 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
 //===================================================================
 
 
-void display(View&, int)
+void display(View& view, int)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
+    view.openDisplay();
+
     //--------------draw points on the grid:
 #if ( DIM == 2 )
     glPointSize(1);
@@ -299,6 +299,7 @@ void display(View&, int)
     Vector Q = pts[1];
     testFatLine(P,Q);
     rasterize(P,Q,paintDraw);
+    view.closeDisplay();
 }
 
 /* 

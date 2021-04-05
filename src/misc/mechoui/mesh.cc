@@ -252,8 +252,8 @@ void Mesh::display(MechouiParam const& pam) const
         {
             // set identical back and front material properties
             gle_color col = gle::bright_color(cell);
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col.data());
-            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, col.data());
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col.colors());
+            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, col.colors());
 
             // calculate the normal to the triangle:
             GLfloat ab[] = { b[0]-a[0], b[1]-a[1], b[2]-a[2] };
@@ -265,13 +265,14 @@ void Mesh::display(MechouiParam const& pam) const
         }
     }
     
+    gle_color col = pam.face_color;
     // prepare for transparency
-    if ( pam.face_color.transparent() )
+    if ( col.transparent() )
         glDepthMask(GL_FALSE);
 
     // set identical back and front material properties
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, pam.face_color.data());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, pam.face_color.data());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col.colors());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, col.colors());
     glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 64);
     
     // depth-sort triangles:

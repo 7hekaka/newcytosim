@@ -124,11 +124,12 @@ void timer(int value)
 }
 
 
-void display(View&, int)
+void display(View& view, int)
 {
-    pam.back_color.load_clear();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    view.openDisplay();
+    pam.face_color = view.front_color;
     mesh.display(pam);
+    view.closeDisplay();
 }
 
 //------------------------------------------------------------------------------

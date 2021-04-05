@@ -14,9 +14,6 @@ class MechouiParam
 {
 public:
     
-    /// color of background
-    gle_color    back_color;
-    
     /// color of faces
     gle_color    face_color;
     

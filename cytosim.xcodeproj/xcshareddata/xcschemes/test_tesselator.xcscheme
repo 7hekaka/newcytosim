@@ -5,22 +5,6 @@
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
-      <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BB7C2BC005FA4EF8002C69A9"
-               BuildableName = "test_grid"
-               BlueprintName = "test_grid"
-               ReferencedContainer = "container:cytosim.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-      </BuildActionEntries>
    </BuildAction>
    <TestAction
       buildConfiguration = "Development"
@@ -55,20 +39,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BB8EE1DB2542DE2100E15C40"
-            BuildableName = "test_platonic"
-            BlueprintName = "test_platonic"
+            BuildableName = "test_tesselator"
+            BlueprintName = "test_tesselator"
             ReferencedContainer = "container:cytosim.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BB7C2BC005FA4EF8002C69A9"
-            BuildableName = "test_grid"
-            BlueprintName = "test_grid"
-            ReferencedContainer = "container:cytosim.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Deployment"
@@ -76,16 +51,6 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable
-         runnableDebuggingMode = "0">
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BB7C2BC005FA4EF8002C69A9"
-            BuildableName = "test_grid"
-            BlueprintName = "test_grid"
-            ReferencedContainer = "container:cytosim.xcodeproj">
-         </BuildableReference>
-      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Development">

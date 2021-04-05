@@ -127,10 +127,9 @@ void nameVertices()
 }
 
 
-void display(View&, int)
+void display(View& view, int)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-    
+    view.openDisplay();
     glPointSize(7);
     
     if ( front == &T )
@@ -144,9 +143,9 @@ void display(View&, int)
 #if ( 0 )
     glLineWidth(3);
     glBegin(GL_LINES);
-    for ( size_t ii=0; ii < front->nbPoints(); ++ii )
+    for ( size_t i=0; i < front->nbPoints(); ++i )
     {
-        Vector3 p(front->addr(ii));
+        Vector3 p(front->addr(i));
         Vector3 n = p.orthogonal();
         glColor3f(1.f, 1.f, 1.f);
         gleVertex(p);
@@ -155,21 +154,20 @@ void display(View&, int)
     }
     glEnd();
 #endif
-#if ( 0 )
-    const real e = 0.05;
-    glLineWidth(4);
+#if ( 1 )
+    const real e = 0.1;
+    glLineWidth(2);
     glBegin(GL_LINES);
-    for ( size_t ii=0; ii < front->nbPoints(); ++ii )
+    for ( size_t i=0; i < front->nbPoints(); ++i )
     {
-        Vector3 a(front->addr(ii));
-        Vector3 b, c;
-        a.orthonormal(b,c);
+        Vector3 b, c, a(front->addr(i));
+        a.orthonormal(b, c);
         
         glColor3f(0.f, 1.f, 0.f);
         gleVertex(a);
         glColor3f(0.f, 0.f, 0.f);
         gleVertex(a+e*b);
-        glColor3f(0.f, 0.f, 1.f);
+        glColor3f(1.f, 0.f, 1.f);
         gleVertex(a);
         glColor3f(0.f, 0.f, 0.f);
         gleVertex(a+e*c);
@@ -184,6 +182,7 @@ void display(View&, int)
         glutSolidSphere(0.98,30,30);
         glDepthMask(GL_TRUE);
     }
+    view.closeDisplay();
 }
 
 //------------------------------------------------------------------------------

@@ -8,7 +8,6 @@
 
 void MechouiParam::clear()
 {
-    back_color  = 0xDDDDDDFF;
     point_color = 0x000000FF;
     face_color  = 0xFFFFFF55;
     point_size  = 1;
@@ -24,7 +23,6 @@ void MechouiParam::clear()
 void MechouiParam::read(Glossary& glos)
 {
     glos.set(point_size,    "point_size");
-    glos.set(back_color,    "back_color");
     glos.set(face_color,    "face_color");
     glos.set(point_color,   "point_color");
     glos.set(point_style,   "point_style");
@@ -46,7 +44,6 @@ static  void write_param(std::ostream& os, std::string const& name, T const& c)
 
 void MechouiParam::write(std::ostream& os) const
 {
-    write_param(os, "back_color",  back_color);
     write_param(os, "face_color",  face_color);
     write_param(os, "point_size",  point_size);
     write_param(os, "point_color", point_color);

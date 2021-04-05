@@ -611,35 +611,35 @@ public:
 #else
         assert_small(normSqr() - 1.0);
 #endif
-        real sz = std::copysign(real(1.0), ZZ);
+        real s = std::copysign(real(1.0), ZZ);
 #if ( 1 )
         // optimized version by Marc B. Reynolds
-        const real a = YY / ( ZZ + sz );
+        const real a = YY / ( ZZ + s );
         const real b = YY * a;
         const real c = XX * a;
-        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-sz*sz)
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
         E.set(-ZZ - b, c, XX);
-        F.set(sz * c, sz * b - 1, sz * YY);
-        // for an inverted basis, use F.set(c, b-sz, YY);
+        F.set(s * c, s * b - 1, s * YY);
+        // for an inverted basis, use F.set(c, b-s, YY);
 #else
         // original code from Tom Duff et al.
-        const real a = -1 / ( ZZ + sz );
+        const real a = -1 / ( ZZ + s );
         const real b = (XX * YY) * a;
-        // below normSqr(E) = 1 + x*x*a*a*(normSqr(this)-sz*sz)
-        E.set(1 + sz * (XX * XX) * a, sz * b, -sz * XX);
-        F.set(b, sz + (YY * YY) * a, -YY);
+        // below normSqr(E) = 1 + x*x*a*a*(normSqr(this)-s*s)
+        E.set(1 + s * (XX * XX) * a, s * b, -s * XX);
+        F.set(b, s + (YY * YY) * a, -YY);
 #endif
         //printf("orthonormal %+9.6f %+9.6f %+9.6f\n", dot(*this, E), dot(*this, F), dot(E, F));
     }
     
     /**
-     Set 'E' and 'F' to build a basis (this, E, F), with norm(E) = norm(F) = nrm
+     Set 'E' and 'F' to build a basis (this, E, F), with norm(E) = norm(F) = N
      assuming that 'norm(*this) == 1'
      
      From `Building an Orthonormal Basis, Revisited`,
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
      */
-    void orthonormal(Vector3& E, Vector3& F, real nrm) const
+    void orthonormal(Vector3& E, Vector3& F, real N) const
     {
 #if 0
         if ( abs_real(normSqr() - 1.0) > 0.01 )
@@ -653,18 +653,39 @@ public:
 #else
         assert_small(normSqr() - 1.0);
 #endif
-        real sz = std::copysign(real(1.0), ZZ);
+        real s = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
-        real nY = nrm * YY;
-        real a = nY / ( ZZ + sz );
+        real nY = N * YY;
+        real a = nY / ( ZZ + s );
         real b = YY * a;
         real c = XX * a;
-        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-sz*sz)
-        E.set(-nrm * ZZ - b, c, nrm * XX);
-        F.set(sz * c, sz * b - nrm, sz * nY);
-        // for an inverted basis, use F.set(c, b - sz * nrm, nY);
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
+        E.set(-N * ZZ - b, c, N * XX);
+        F.set(s * c, s * b - N, s * nY);
+        // for an inverted basis, use F.set(c, b - s * N, nY);
         //printf("orthonormal %+9.6f %+9.6f %+9.6f :", dot(*this, E), dot(*this, F), dot(E, F));
         //printf(" %+9.6f %+9.6f %+9.6f\n", normSqr(), dot(E, E), dot(F, F));
+    }
+
+    /**
+     Set 'E' and 'F' to build a basis (this, E, F), with norm(E) = norm(F) = N
+     assuming that 'norm(*this) == N'
+     
+     Derived from `Building an Orthonormal Basis, Revisited`,
+     Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
+     */
+    void orthonormal(real N, Vector3& E, Vector3& F) const
+    {
+        assert_small(normSqr() - N);
+        real s = std::copysign(real(1.0), ZZ);
+        // optimized version by Marc B. Reynolds
+        real a = YY / ( ZZ + s * N );
+        real b = YY * a;
+        real c = XX * a;
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
+        E.set(-ZZ-b, c, XX);
+        F.set(s*c, s*b-N, s*YY);
+        // for an inverted basis, use F.set(c, b - s*N, YY);
     }
 
     /// rotate `vec` around `*this`, by angle defined by cosinus and sinus

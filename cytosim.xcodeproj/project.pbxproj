@@ -1670,7 +1670,7 @@
 		BB89A3F31A6410CF00D724F4 /* event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event.h; sourceTree = "<group>"; };
 		BB8CB8551523147900505E89 /* bicgstab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bicgstab.h; path = src/math/bicgstab.h; sourceTree = SOURCE_ROOT; };
 		BB8CE30705DFF9140031D3B4 /* isometry.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = isometry.h; path = src/math/isometry.h; sourceTree = SOURCE_ROOT; };
-		BB8EE1DC2542DE2100E15C40 /* test_platonic */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_platonic; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB8EE1DC2542DE2100E15C40 /* test_tesselator */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_tesselator; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB8EE1E52542DE6D00E15C40 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		BB8EE1E72542DE7400E15C40 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		BB901AD925B02E3B005FB57F /* random_simd.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = random_simd.cc; sourceTree = "<group>"; };
@@ -2193,7 +2193,7 @@
 				BB7086562449CBF300C73273 /* test_rigidity */,
 				BBAA7E892455D94600C924DB /* test_block */,
 				BB201E1E24ABDCD900A8CA82 /* test_xtbsv */,
-				BB8EE1DC2542DE2100E15C40 /* test_platonic */,
+				BB8EE1DC2542DE2100E15C40 /* test_tesselator */,
 				BBE2FB8E25680D5800EB88EA /* sweet */,
 			);
 			name = build;
@@ -4172,9 +4172,9 @@
 			productReference = BB7C2BC105FA4EF8002C69A9 /* test_grid */;
 			productType = "com.apple.product-type.tool";
 		};
-		BB8EE1DB2542DE2100E15C40 /* test_platonic */ = {
+		BB8EE1DB2542DE2100E15C40 /* test_tesselator */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BB8EE1E32542DE2100E15C40 /* Build configuration list for PBXNativeTarget "test_platonic" */;
+			buildConfigurationList = BB8EE1E32542DE2100E15C40 /* Build configuration list for PBXNativeTarget "test_tesselator" */;
 			buildPhases = (
 				BB8EE1D82542DE2100E15C40 /* Sources */,
 				BB8EE1D92542DE2100E15C40 /* Frameworks */,
@@ -4184,9 +4184,9 @@
 			);
 			dependencies = (
 			);
-			name = test_platonic;
-			productName = test_platonic;
-			productReference = BB8EE1DC2542DE2100E15C40 /* test_platonic */;
+			name = test_tesselator;
+			productName = test_tesselator;
+			productReference = BB8EE1DC2542DE2100E15C40 /* test_tesselator */;
 			productType = "com.apple.product-type.tool";
 		};
 		BB9D879F1E76BAE500DD0F00 /* test_matrix */ = {
@@ -4413,21 +4413,21 @@
 				BBCA9EEA06AFCB4600638608 /* report */,
 				BB64041405FBC58500DF7BFF /* frametool */,
 				BB6403B505FBC0E200DF7BFF /* tests */,
-				BB18BBB61DFD78F600567023 /* test_simd */,
-				BB18BBC61DFD7E3400567023 /* test_code */,
-				BB7086392449CBE900C73273 /* test_xpttrs */,
-				BB7086482449CBF300C73273 /* test_rigidity */,
+				BBB1C6C70CB2CAA300679ADC /* blank */,
+				BBE2FB8D25680D5800EB88EA /* sweet */,
 				BBAA7E7F2455D94600C924DB /* test_block */,
-				BB9D879F1E76BAE500DD0F00 /* test_matrix */,
-				BB2D09F2243DBC3400C1C0AB /* test_solver */,
+				BB18BBC61DFD7E3400567023 /* test_code */,
 				BB51BC2205FA534000D4869F /* test_glapp */,
 				BB7C2BC005FA4EF8002C69A9 /* test_grid */,
-				BB6405F005FBD9CD00DF7BFF /* test_space */,
-				BB8EE1DB2542DE2100E15C40 /* test_platonic */,
+				BB9D879F1E76BAE500DD0F00 /* test_matrix */,
+				BB7086482449CBF300C73273 /* test_rigidity */,
 				BB7C2B7E05F93FB9002C69A9 /* test_rasterizer */,
-				BBB1C6C70CB2CAA300679ADC /* blank */,
+				BB18BBB61DFD78F600567023 /* test_simd */,
+				BB6405F005FBD9CD00DF7BFF /* test_space */,
+				BB2D09F2243DBC3400C1C0AB /* test_solver */,
+				BB8EE1DB2542DE2100E15C40 /* test_tesselator */,
+				BB7086392449CBE900C73273 /* test_xpttrs */,
 				BB201E0F24ABDCD900A8CA82 /* test_xtbsv */,
-				BBE2FB8D25680D5800EB88EA /* sweet */,
 			);
 		};
 /* End PBXProject section */
@@ -7925,7 +7925,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		BB8EE1E32542DE2100E15C40 /* Build configuration list for PBXNativeTarget "test_platonic" */ = {
+		BB8EE1E32542DE2100E15C40 /* Build configuration list for PBXNativeTarget "test_tesselator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BB8EE1E02542DE2100E15C40 /* Development */,

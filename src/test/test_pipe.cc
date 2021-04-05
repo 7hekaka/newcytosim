@@ -86,7 +86,7 @@ int command_zoom(char cmd[], size_t len, int num)
 int command(char cmd[], size_t len, int num)
 {
     float angle = num * M_PI / 180.0;
-    if ( 1 == num & 1 )
+    if ( num & 1 )
     {
         // change zoom, to test smoothness of response
         float z = 1.0f + 0.25f * cosf(angle*0.25f);

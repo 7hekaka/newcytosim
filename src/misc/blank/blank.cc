@@ -163,8 +163,7 @@ void timerFunction(int value)
 //------------------------------------------------------------------------------
 void display(View& view, int)
 {
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
+    view.openDisplay();
     view.setLabel(std::to_string(sTime));
 
     glPointSize(6);
@@ -172,8 +171,10 @@ void display(View& view, int)
     pthread_mutex_lock(&mutex);
     for(size_t i = 0; i < PAM.max; ++i)
         things[i].draw();
-    pthread_mutex_unlock(&mutex);
     glEnd();
+
+    view.closeDisplay();
+    pthread_mutex_unlock(&mutex);
 }
 
 //------------------------------------------------------------------------------

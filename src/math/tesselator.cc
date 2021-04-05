@@ -138,6 +138,7 @@ void Tesselator::allocate(unsigned V, unsigned E, unsigned F, unsigned N)
 
 void Tesselator::build(Polyhedra kind, unsigned div, int make)
 {
+    build();
     if ( div > 0 )
     {
         switch( kind )

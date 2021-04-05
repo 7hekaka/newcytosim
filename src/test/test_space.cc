@@ -462,9 +462,9 @@ bool visible(size_t i)
 }
 
 
-void display(View&, int)
+void display(View& view, int)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    view.openDisplay();
 
     if ( spc && draw_space )
     {
@@ -571,6 +571,7 @@ void display(View&, int)
             gleVertex(project[ii]);
         glEnd();
     }
+    view.closeDisplay();
 }
 
 //------------------------------------------------------------------------------
