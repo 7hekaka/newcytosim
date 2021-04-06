@@ -53,8 +53,10 @@ void Display2::drawObjects(Simul const& sim)
     if (( prop->single_select & 1 ) && ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
     
-    drawFibers(sim.fibers);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     
+    drawFibers(sim.fibers);
+
 #if ( DIM == 3 )
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
@@ -77,7 +79,7 @@ void Display2::drawObjects(Simul const& sim)
     
     if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
-    
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 #if ( DIM == 3 )
     glEnable(GL_LIGHTING);
@@ -87,7 +89,6 @@ void Display2::drawObjects(Simul const& sim)
 
     drawOrganizers(sim.organizers);
     drawMisc(sim);
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -100,6 +101,7 @@ void Display2::drawSinglesF(const SingleSet & set) const
 {
     for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         obj->disp()->drawF(obj->posFoot());
+    CHECK_GL_ERROR("in Display::drawSinglesF()");
 }
 
 

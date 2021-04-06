@@ -517,10 +517,12 @@ void Field::step(FiberSet& fibers)
         fdp.amp = 1.0 / ( prop->display_scale * mGrid.cellVolume() );
         fdp.spc = nullptr;
         
-        glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_LIGHTING);
+        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
+        GLboolean cullf = glIsEnabled(GL_CULL_FACE);
+        GLboolean light = glIsEnabled(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
+        glDisable(GL_LIGHTING);
         drawValues(mGrid, field_color, fdp);
 #if ( 0 )
         // draw edges of cells
@@ -528,7 +530,9 @@ void Field::step(FiberSet& fibers)
         glLineWidth(0.5);
         drawEdges(mGrid);
 #endif
-        glPopAttrib();
+        if ( depth ) glEnable(GL_DEPTH_TEST);
+        if ( cullf ) glEnable(GL_CULL_FACE);
+        if ( light ) glEnable(GL_LIGHTING);
     }
     
     
@@ -539,11 +543,12 @@ void Field::step(FiberSet& fibers)
         fdp.amp = 1.0 / ( prop->display_scale * mGrid.cellVolume() );
         fdp.spc = spc;
         
-        //glPushAttrib(GL_ENABLE_BIT|GL_POLYGON_BIT);
-        glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_LIGHTING);
+        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
+        GLboolean cullf = glIsEnabled(GL_CULL_FACE);
+        GLboolean light = glIsEnabled(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
+        glDisable(GL_LIGHTING);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         //glLineWidth(1);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -552,7 +557,9 @@ void Field::step(FiberSet& fibers)
 #else
         drawValues(mGrid, field_color, fdp);
 #endif
-        glPopAttrib();
+        if ( depth ) glEnable(GL_DEPTH_TEST);
+        if ( cullf ) glEnable(GL_CULL_FACE);
+        if ( light ) glEnable(GL_LIGHTING);
     }
 
 #else

@@ -1870,7 +1870,7 @@ namespace gle
      draw the string character per character using:
      glutBitmapCharacter()
      */
-    void bitmapText(const char text[], void* font, GLfloat vshift)
+    void bitmapString(const char text[], void* font, GLfloat vshift)
     {
         if ( !font )
         {
@@ -1903,22 +1903,33 @@ namespace gle
     
     
     /**
-     set the current raster position to `w`
+     draw text at position `vec`, if this corresponds to a valid raster position
      */
     void drawText(Vector3 const& vec, const char text[], void* font, float dx)
     {
-        glPushAttrib(GL_CURRENT_BIT|GL_ENABLE_BIT);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_LIGHTING);
-        glDisable(GL_ALPHA_TEST);
-        int L = 1;
-        int H = fontHeight(font);
-        int W = maxTextWidth(text, font, L);
+        GLboolean valid = false;
         glRasterPos3f(vec.x(), vec.y(), vec.z());
-        //translate to center the bitmap:
-        glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
-        bitmapText(text, font, H);
-        glPopAttrib();
+        glGetBooleanv(GL_CURRENT_RASTER_POSITION_VALID, &valid);
+
+        if ( valid == GL_TRUE )
+        {
+            GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
+            GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
+            GLboolean light = glIsEnabled(GL_LIGHTING);
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_ALPHA_TEST);
+            glDisable(GL_LIGHTING);
+            int L = 1;
+            int H = fontHeight(font);
+            int W = maxTextWidth(text, font, L);
+            // center text:
+            glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
+            bitmapString(text, font, H);
+            if ( depth ) glEnable(GL_DEPTH_TEST);
+            if ( alpha ) glEnable(GL_ALPHA_TEST);
+            if ( light ) glEnable(GL_LIGHTING);
+            CHECK_GL_ERROR("in drawText()");
+        }
     }
     
     void drawText(Vector2 const& w, const char text[], void* font, float dx)
@@ -1968,7 +1979,7 @@ namespace gle
      
      Note: width and height are the current size of the viewport (window)
      */
-    void drawText(const char text[], void* font, const gle_color bcol,
+    void drawText(const char text[], void* font, const gle_color back,
                      const int position, int width, int height)
     {
         assert_true( width > 0 );
@@ -2019,11 +2030,13 @@ namespace gle
         }
         
         //set pixel coordinate system:
-        glPushAttrib(GL_CURRENT_BIT|GL_ENABLE_BIT);
+        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
+        GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
+        GLboolean light = glIsEnabled(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
-        glDisable(GL_LIGHTING);
         glDisable(GL_ALPHA_TEST);
-        
+        glDisable(GL_LIGHTING);
+
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
@@ -2036,31 +2049,33 @@ namespace gle
         glRasterPos2i(0, 0);
         glBitmap(0, 0, 0, 0, px, py, nullptr);
         
-        if ( bcol.visible() )
+        if ( back.visible() )
         {
-            glPushAttrib(GL_LIGHTING_BIT|GL_CURRENT_BIT);
-            glDisable(GL_LIGHTING);
+            float col[4];
+            glGetFloatv(GL_CURRENT_COLOR, col);
             int R = abs(lineHeight);
             int B = std::min(py, py + n_lines * lineHeight);
             int T = std::max(py, py + n_lines * lineHeight);
             int rec[4] = { px-R, B, px+textWidth+R, T+R+R/2+R/4 };
-            bcol.load();
+            back.load();
             paintOctogon(rec, 3);
-            glPopAttrib();
             if ( position == 4 )
             {
                 glLineWidth(0.5);
                 drawOctogon(rec, 3);
             }
+            glColor4fv(col);
         }
         
-        bitmapText(text, font, lineHeight);
+        bitmapString(text, font, lineHeight);
         
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
-        glPopAttrib();
+        if ( depth ) glEnable(GL_DEPTH_TEST);
+        if ( alpha ) glEnable(GL_ALPHA_TEST);
+        if ( light ) glEnable(GL_LIGHTING);
     }
     
     
@@ -2106,13 +2121,15 @@ namespace gle
         glOrtho(0, width, 0, height, 0, 1);
         
         //disable advanced features
-        glPushAttrib(GL_ENABLE_BIT);
-        glDisable(GL_LIGHTING);
+        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
+        GLboolean light = glIsEnabled(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
+        glDisable(GL_LIGHTING);
         
         drawRectangle(rec);
         
-        glPopAttrib();
+        if ( depth ) glEnable(GL_DEPTH_TEST);
+        if ( light ) glEnable(GL_LIGHTING);
         glPopMatrix();
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();
@@ -2269,11 +2286,11 @@ namespace gle
      */
     void reportErrors(FILE * out, const char* msg)
     {
-        GLenum glError = glGetError();
-        while ( glError != GL_NO_ERROR )
+        GLenum e = glGetError();
+        while ( e != GL_NO_ERROR )
         {
-            fprintf(out, "OpenGL error `%s' %s\n", errorString(glError), msg);
-            glError = glGetError();
+            fprintf(out, "OpenGL error `%s' %s\n", errorString(e), msg);
+            e = glGetError();
         }
     }
     

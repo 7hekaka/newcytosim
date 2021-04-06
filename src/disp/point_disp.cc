@@ -176,15 +176,17 @@ void PointDisp::strokeI() const
     const GLfloat DOT_SIZE = 0.55f;
 
     // draw a transparent hole in the center:
-    glPushAttrib(GL_COLOR_BUFFER_BIT|GL_ENABLE_BIT);
+    GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
+    GLboolean blend = glIsEnabled(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_BLEND);
     glPushMatrix();
     glScalef(DOT_SIZE, DOT_SIZE, DOT_SIZE);
-    glDisable(GL_BLEND);
-    glDisable(GL_ALPHA_TEST);
     glColor4f(0, 0, 0, 0);
     gle::disc(); //strokeShape();
     glPopMatrix();
-    glPopAttrib();
+    if ( alpha ) glEnable(GL_ALPHA_TEST);
+    if ( blend ) glEnable(GL_BLEND);
 }
 
 
@@ -352,41 +354,43 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
     assert_true(pixSize==nPix);
     CHECK_GL_ERROR("1 PointDisp::makePixelmaps");
     
-    glPushAttrib(GL_PIXEL_MODE_BIT|GL_VIEWPORT_BIT|GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT);
-
     unsigned dim = sampling * nPix;
-#ifdef __APPLE__
-    GLuint offscreen = OffScreen::createBuffer(dim, dim, 0);
-#else
-    GLuint offscreen = 0;
-#endif
     GLfloat s = 0.5f * sampling * size * uFactor;
     GLfloat t = 0.5f * dim;
     GLfloat w = width * sampling * uFactor;
-    GLint vp[4];
-
+    
+    GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
+    GLboolean light = glIsEnabled(GL_LIGHTING);
+    GLboolean blend = glIsEnabled(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
     glDisable(GL_LIGHTING);
     glDisable(GL_BLEND);
-    glDisable(GL_ALPHA_TEST);
-    
+
+    GLint svp[4];
+    glGetIntegerv(GL_VIEWPORT, svp);
+
+    //match projection to viewport:
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
-    
-    //match projection to viewport:
-    glGetIntegerv(GL_VIEWPORT, vp);
-    glOrtho(0, vp[2], 0, vp[3], 0, 1);
+
+#ifdef __APPLE__
+    OffScreen::createBuffer(dim, dim, 0);
+    glOrtho(0, dim, 0, dim, 0, 1);
+#else
+    glPushAttrib(GL_PIXEL_MODE_BIT|GL_VIEWPORT_BIT|GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT);
+    glOrtho(0, svp[2], 0, svp[3], 0, 1);
+#endif
     
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    
     glTranslatef(t, t, 0);
     glScalef(s,s,s);
     if ( w > 0 ) glLineWidth(w);
     // we use a transparent background, because points will overlap
     glClearColor(0,0,0,0);
-    
+
     for ( int i = 0; i < 3; ++i )
     {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -431,11 +435,16 @@ void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
     
-    // release offscreen if used
-    if ( offscreen )
-        OffScreen::releaseBuffer();
+    if ( alpha ) glEnable(GL_ALPHA_TEST);
+    if ( light ) glEnable(GL_LIGHTING);
+    if ( blend ) glEnable(GL_BLEND);
 
+#ifdef __APPLE__
+    OffScreen::releaseBuffer();
+    glViewport(svp[0], svp[1], svp[2], svp[3]);
+#else
     glPopAttrib();
+#endif
 }
 
 #endif

@@ -387,7 +387,7 @@ namespace gle
     void drawText(const char text[], void* font, gle_color bcol, int position, int width, int height);
     
     /// draw text at the current OpenGL raster position and raster color
-    void bitmapText(const char text[], void* font = nullptr, GLfloat vshift = 0);
+    void bitmapString(const char text[], void* font = nullptr, GLfloat vshift = 0);
     
     /// draw `text` at position `pos`
     void drawText(Vector1 const& pos, const char text[], void* font, float dx=0);

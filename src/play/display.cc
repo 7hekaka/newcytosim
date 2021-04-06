@@ -235,7 +235,7 @@ void Display::drawSimul(Simul const& sim)
 #endif
     
     glDepthMask(GL_TRUE);
-    CHECK_GL_ERROR("in Display::display()");
+    CHECK_GL_ERROR("in Display::drawSimul()");
 }
 
 
@@ -635,6 +635,7 @@ void Display::drawSpaces(SpaceSet const& set)
     }
     
 #endif
+    CHECK_GL_ERROR("in Display::drawSpaces()");
 }
 
 
@@ -1290,14 +1291,15 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
     {
         // indicate tension values in the segments
         Vector a = fib.posEndM();
-        for ( size_t ii = 1; ii < fib.nbPoints(); ++ii )
+        for ( size_t i = 1; i < fib.nbPoints(); ++i )
         {
-            Vector b = fib.posPoint(ii);
-            snprintf(str, sizeof(str), "%+4.1f", fib.tension(ii-1));
+            Vector b = fib.posPoint(i);
+            snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
             gle::drawText(0.5*(a+b), str, font, 0.5);
             a = b;
         }
     }
+    CHECK_GL_ERROR("in Display::drawFiberLabels()");
 }
 
 
@@ -1700,6 +1702,7 @@ void Display::drawFibers(FiberSet const& set)
         if ( fib->disp->visible )
             drawFiber(*fib);
     }
+    CHECK_GL_ERROR("in Display::drawFibers()");
 }
 
 

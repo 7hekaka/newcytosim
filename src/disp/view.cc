@@ -901,7 +901,7 @@ void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
             glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(s-6*pixelSize(), b-12*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gle::bitmapText(str);
+            gle::bitmapString(str);
         }
     } while ( w >= 0.5 );
 }
@@ -943,7 +943,7 @@ void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
             glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(b+pixelSize(), s-4*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gle::bitmapText(str);
+            gle::bitmapString(str);
         }
     } while ( w >= 0.5 );
 }
@@ -993,10 +993,13 @@ void View::drawScaleX(GLfloat scale) const
  */
 void View::drawScaleBar(int mode, const real scale) const
 {
-    glPushAttrib(GL_ENABLE_BIT);
-    glDisable(GL_LIGHTING);
+    GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
+    GLboolean light = glIsEnabled(GL_LIGHTING);
+    GLboolean blend = glIsEnabled(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
     glDisable(GL_BLEND);
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -1025,5 +1028,7 @@ void View::drawScaleBar(int mode, const real scale) const
     }
     
     glPopMatrix();
-    glPopAttrib();
+    if ( depth ) glEnable(GL_DEPTH_TEST);
+    if ( light ) glEnable(GL_LIGHTING);
+    if ( blend ) glEnable(GL_BLEND);
 }

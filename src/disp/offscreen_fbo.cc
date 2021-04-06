@@ -38,7 +38,6 @@ public:
     /// allocate graphical memory
     void create(GLuint W, GLuint H)
     {
-        //glPushAttrib(GL_ALL_ATTRIB_BITS);
         width = W;
         height = H;
         glGenFramebuffers(1, &frameBuffer);
@@ -98,11 +97,11 @@ char const* glErrorString(GLenum code)
 
 static void checkError(const char msg[])
 {
-    GLenum glError = glGetError();
-    while ( glError != GL_NO_ERROR )
+    GLenum e = glGetError();
+    while ( e != GL_NO_ERROR )
     {
-        fprintf(stderr, "OpenGL error `%s' %s\n", glErrorString(glError), msg);
-        glError = glGetError();
+        fprintf(stderr, "OpenGL error `%s' %s\n", glErrorString(e), msg);
+        e = glGetError();
     }
 }
 
@@ -277,7 +276,8 @@ GLuint OffScreen::createBuffer(const int width, const int height, int multisampl
     GLenum err = glGetError();
     if ( err != GL_NO_ERROR )
     {
-        fprintf(stderr, "Error: the OpenGL max. buffer size is %i\n", GL_MAX_RENDERBUFFER_SIZE);
+        fprintf(stderr, "OpenGL error `%s'\n", glErrorString(err));
+        fprintf(stderr, " (max. buffer size is %i)\n", GL_MAX_RENDERBUFFER_SIZE);
         return 0;
     }
     
