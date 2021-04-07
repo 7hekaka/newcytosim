@@ -363,10 +363,17 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     
     select_color(fib, inx++, facM).load_front();
     glPushMatrix();
-    gle::transAlignZ(pos, rad, nxt-pos);
     if ( abs <= 0 )
+    {
+        real len = (nxt-pos).norm();
+        gle::transAlignZ1(pos, rad, (nxt-pos)/len, rad);
         gle::hemisphere4();
-    glScalef(1, 1, inc/rad);
+        glScalef(1, 1, len/rad);
+    }
+    else
+    {
+        gle::stretchAlignZ(pos, nxt, rad);
+    }
     gle::tubeF();
     glPopMatrix();
     
@@ -1152,9 +1159,9 @@ void Display3::drawCoupleB(Couple const* cx) const
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
     if ( modulo ) modulo->fold(p2, p1);
-    Vector dif = p2 - p1;
     
 #if !FIBER_HAS_FAMILY
+    Vector dif = p2 - p1;
     real dns = dif.normSqr();
     if ( dns > 1e-6 )
     {
