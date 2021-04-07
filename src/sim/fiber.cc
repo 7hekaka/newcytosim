@@ -993,7 +993,7 @@ void Fiber::setInteractions(Meca& meca) const
             } break;
 #endif
             default:
-                throw InvalidParameter("Invalid fiber::confine");
+                throw InvalidParameter("Invalid fiber:confine");
         }
     }
     
@@ -1029,7 +1029,7 @@ void Fiber::setInteractions(Meca& meca) const
                 break;
                 
             default:
-                throw InvalidParameter("Invalid fiber::confine2");
+                throw InvalidParameter("Invalid fiber:confine2");
         }
     }
 #endif

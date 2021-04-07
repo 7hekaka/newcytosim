@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef GLOSSARY_H
 #define GLOSSARY_H
@@ -187,7 +187,8 @@ private:
     
     /// set enum of type T using a dictionary of correspondances
     template <typename T>
-    static void set_value(T & var, key_type const& key, std::string const& val, dict_type<T> const& dict)
+    static void set_value(T & var, key_type const& key, std::string const& val,
+                          dict_type<T> const& dict, bool accept_all)
     {
         for ( auto const& kv : dict )
         {
@@ -200,8 +201,7 @@ private:
             }
         }
         
-#if ( 0 )
-        if ( std::is_enum<T>::value )
+        if ( accept_all && std::is_enum<T>::value )
         {
             // accept a numeric value
             size_t idx;
@@ -209,15 +209,14 @@ private:
             T t = static_cast<T>(i);
             if ( idx == val.size() && (int)t == i )
             {
-                std::cerr << "Warning: accepting unknown value `" << t << "' for `" << key << "'\n";
+                std::clog << "Warning: accepting unknown value " << t << " for `" << key << "'\n";
                 var = t;
                 return;
             }
         }
-#endif
         
         InvalidParameter e("could not set `"+key+"' from `"+val+"'");
-        e << "Known values are:\n";
+        e << "\nKnown values are:\n";
         for ( auto const& kv : dict )
             e << PREF << kv.first << " = " << kv.second << '\n';
         throw e;
@@ -346,28 +345,6 @@ public:
 
     //-------------------------------------------------------------------------------
     
-    /// try to set `var` from `key[inx]`. @return 1 if `var` was set, 0 otherwise
-    /** An internal counter is incremented to record that the value was read */
-    template <typename T>
-    int set(T & var, key_type const& key, size_t inx = 0) const
-    {
-        rec_type const* rec = values(key);
-        
-        if ( rec && inx < rec->size() )
-        {
-            val_type const& val = rec->at(inx);
-
-            if ( val.defined_ )
-            {
-                set_value(var, key, val.value_);
-                ++val.count_;
-                return 1;
-            }
-        }
-        
-        return 0;
-    }
-
     /// try to set `var` from `key[inx]`, without recording that the parameter was read.
     template <typename T>
     int peek(T & var, key_type const& key, size_t inx = 0) const
@@ -384,18 +361,49 @@ public:
                 return 1;
             }
         }
+        return 0;
+    }
 
+    /// try to set `var` from `key[inx]`. @return 1 if `var` was set, 0 otherwise
+    /** An internal counter is incremented to record that the value was read */
+    template <typename T>
+    int set(T & var, key_type const& key, size_t inx = 0) const
+    {
+        rec_type const* rec = values(key);
+        
+        if ( rec && inx < rec->size() )
+        {
+            val_type const& val = rec->at(inx);
+            
+            if ( val.defined_ )
+            {
+                set_value(var, key, val.value_);
+                ++val.count_;
+                return 1;
+            }
+        }
         return 0;
     }
     
-    /// try to set `var` from `key[inx]` or `alt[alt_inx]. @return 1 if `var` was set, 0 otherwise
+    /// try to set `var` from `key[inx]` or `alt[jax]`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */
     template <typename T>
-    int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t alt_inx) const
+    int set(T & var, key_type const& key, key_type const& alt) const
+    {
+        int res = set(var, key, 0);
+        if ( !res )
+            res = set(var, alt, 0);
+        return res;
+    }
+
+    /// try to set `var` from `key[inx]` or `alt[jax]`. @return 1 if `var` was set, 0 otherwise
+    /** An internal counter is incremented to record that the value was read */
+    template <typename T>
+    int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t jax) const
     {
         int res = set(var, key, inx);
         if ( !res )
-            res = set(var, alt, alt_inx);
+            res = set(var, alt, jax);
         return res;
     }
     
@@ -421,15 +429,14 @@ public:
                 ++set;
             }
         }
- 
         return set;
     }
    
 
-    /// try to set `var` from `key[inx]`, using the dictionary `dict`. @return 1 if `var` was set, 0 otherwise
+    /// try to set `var` from `key[inx]`, using `dict`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */
     template <typename T>
-    int set(T & var, key_type const& key, size_t inx, dict_type<T> const& dict) const
+    int set(T & var, key_type const& key, size_t inx, dict_type<T> const& dict, bool accept_all = false) const
     {
         rec_type const* rec = values(key);
         
@@ -439,32 +446,32 @@ public:
             
             if ( val.defined_ )
             {
-                set_value(var, key, val.value_, dict);
+                set_value(var, key, val.value_, dict, accept_all);
                 ++val.count_;
                 return 1;
             }
         }
-        
         return 0;
     }
     
-    /// try to set `var` from `key[inx]` or `alt[alt_inx], using the dictionary `dict`
+    /// try to set `var` from `key[inx]` or `alt[jax]`, using the dictionary `dict`
     /** An internal counter is incremented to record that the value was read */
     template <typename T>
-    int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t alt_inx, dict_type<T> const& dict) const
+    int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t jax,
+            dict_type<T> const& dict, bool accept_all = false) const
     {
-        int res = set(var, key, inx, dict);
+        int res = set(var, key, inx, dict, accept_all);
         if ( !res )
-            res = set(var, alt, alt_inx, dict);
+            res = set(var, alt, jax, dict, accept_all);
         return res;
     }
 
     /// try to set `var` from `key[0]`, using the dictionary `dict`
     /** An internal counter is incremented to record that the value was read */
     template <typename T>
-    int set(T & var, key_type const& key, dict_type<T> const& dict) const
+    int set(T & var, key_type const& key, dict_type<T> const& dict, bool accept_all = false) const
     {
-        return set(var, key, 0, dict);
+        return set(var, key, 0, dict, accept_all);
     }
     
     /// true if value of `key[inx]` is composed of alpha characters and '_'

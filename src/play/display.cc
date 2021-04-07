@@ -989,9 +989,9 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 void Display::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    const real sep = disp->speckle_interval;
+    const real gap = disp->speckle_gap;
 
-    size_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/sep);
+    size_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/gap);
     fluteV* pts = gle::mapVertexBuffer(cnt);
 
     // display random speckles:
@@ -1008,45 +1008,45 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
         if ( fib.abscissaM() < 0 )
         {
             uint32_t z = fib.signature();
-            real a = sep * std::log(z*TINY);
+            real a = gap * std::log(z*TINY);
             while ( a > fib.abscissaP() )
             {
                 z = lcrng2(z);
-                a += sep * std::log(z*TINY);
+                a += gap * std::log(z*TINY);
             }
             while ( a >= fib.abscissaM() )
             {
                 if ( i < cnt ) pts[i++] = fib.pos(a);
                 z = lcrng2(z);
-                a += sep * std::log(z*TINY);
+                a += gap * std::log(z*TINY);
             }
         }
         // draw speckles above the origin of abscissa
         if ( fib.abscissaP() > 0 )
         {
             uint32_t z = ~fib.signature();
-            real a = -sep * std::log(z*TINY);
+            real a = -gap * std::log(z*TINY);
             while ( a < fib.abscissaM() )
             {
                 z = lcrng1(z);
-                a -= sep * std::log(z*TINY);
+                a -= gap * std::log(z*TINY);
             }
             while ( a <= fib.abscissaP() )
             {
                 if ( i < cnt ) pts[i++] = fib.pos(a);
                 z = lcrng1(z);
-                a -= sep * std::log(z*TINY);
+                a -= gap * std::log(z*TINY);
             }
         }
     }
     else if ( disp->speckle_style == 2 )
     {
         // display regular speckles
-        real a = sep * std::ceil( fib.abscissaM() / sep );
+        real a = gap * std::ceil( fib.abscissaM() / gap );
         while ( a <= fib.abscissaP() )
         {
             if ( i < cnt ) pts[i++] = fib.pos(a);
-            a += sep;
+            a += gap;
         }
     }
     
@@ -1072,9 +1072,9 @@ void Display::drawFiberPoints(Fiber const& fib) const
     {
         // display arrowheads along the fiber:
         const float rad = disp->point_size*sFactor;
-        const real sep = disp->point_interval;
-        real ab = std::ceil(fib.abscissaM()/sep) * sep;
-        for ( ; ab <= fib.abscissaP(); ab += sep )
+        const real gap = disp->point_gap;
+        real ab = std::ceil(fib.abscissaM()/gap) * gap;
+        for ( ; ab <= fib.abscissaP(); ab += gap )
             gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
     else if ( style == 3 )

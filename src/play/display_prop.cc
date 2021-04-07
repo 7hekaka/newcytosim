@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "display_prop.h"
 #include "glossary.h"
@@ -29,8 +29,8 @@ void DisplayProp::read(Glossary& glos)
     glos.set(fold, "fold");
     glos.set(fold, "tile", 1);
 
-    glos.set(tile, "tiled") || glos.set(tile, "periodic");
-    glos.set(fold, "tiled", 1) || glos.set(fold, "periodic", 1);
+    glos.set(tile, "tiled", "periodic");
+    glos.set(fold, "tiled", 1, "periodic", 1);
 
     glos.set(draw_links, "draw_links");
 
@@ -43,7 +43,7 @@ void DisplayProp::read(Glossary& glos)
     // unless specified, `link_width` will be equal to `line_width`:
     if ( glos.set(line_width, "line_width") )
         link_width = line_width;
-    glos.set(link_width, "link_width") || glos.set(link_width, "link_size");
+    glos.set(link_width, "link_width", "link_size");
 }
 
 

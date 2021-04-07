@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "fiber_prop.h"
 #include "sim.h"
@@ -385,20 +385,27 @@ void FiberProp::read(Glossary& glos)
     glos.set(binding_key,  "binding_key");
     
     glos.set(lattice,      "lattice");
-    glos.set(lattice_unit, "lattice", 1) || glos.set(lattice_unit, "lattice_unit");
+    glos.set(lattice_unit, "lattice", 1, "lattice_unit", 0);
     
 #if FIBER_HAS_MESH
     // the analog lattice containing 'real' values was named 'mesh' on 28.11.2019
     glos.set(mesh,         "mesh");
-    glos.set(mesh_unit,    "mesh", 1) || glos.set(mesh_unit, "mesh_unit");
+    glos.set(mesh_unit,    "mesh", 1, "mesh_unit", 0);
 
+#  ifdef BACKWARD_COMPATIBILITY
     // parameters `lattice_*' were renamed `mesh_*' on 28.11.2019
-    glos.set(mesh_cut_fiber,      "mesh_cut_fiber")      || glos.set(mesh_cut_fiber, "lattice_cut_fiber");
-    glos.set(mesh_flux_speed,     "mesh_flux_speed")     || glos.set(mesh_flux_speed, "lattice_flux_speed");
-    glos.set(mesh_binding_rate,   "mesh_binding_rate")   || glos.set(mesh_binding_rate, "lattice_binding_rate");
-    glos.set(mesh_unbinding_rate, "mesh_unbinding_rate") || glos.set(mesh_unbinding_rate, "lattice_unbinding_rate");
-    
-    glos.set(mesh_aging_rate, "mesh_aging_rate") || glos.set(mesh_aging_rate, "lattice_aging_rate");
+    glos.set(mesh_cut_fiber, "mesh_cut_fiber", "lattice_cut_fiber");
+    glos.set(mesh_flux_speed, "mesh_flux_speed", "lattice_flux_speed");
+    glos.set(mesh_binding_rate, "mesh_binding_rate", "lattice_binding_rate");
+    glos.set(mesh_unbinding_rate, "mesh_unbinding_rate", "lattice_unbinding_rate");
+    glos.set(mesh_aging_rate, "mesh_aging_rate", "lattice_aging_rate");
+#  else
+    glos.set(mesh_cut_fiber, "mesh_cut_fiber");
+    glos.set(mesh_flux_speed, "mesh_flux_speed");
+    glos.set(mesh_binding_rate, "mesh_binding_rate");
+    glos.set(mesh_unbinding_rate, "mesh_unbinding_rate");
+    glos.set(mesh_aging_rate, "mesh_aging_rate");
+#  endif
 #endif
 
     glos.set(confine,           "confine", {{"off",       CONFINE_OFF},
@@ -421,10 +428,10 @@ void FiberProp::read(Glossary& glos)
     glos.set(confine_space,     "confine_space");
 
 #if NEW_FIBER_CONFINE2
-    glos.set(confine2,           "confine2", {{"off",       CONFINE_OFF},
-                                              {"on",        CONFINE_ON},
-                                              {"inside",    CONFINE_INSIDE},
-                                              {"outside",   CONFINE_OUTSIDE}});
+    glos.set(confine2,           "confine2", {{"off",     CONFINE_OFF},
+                                              {"on",      CONFINE_ON},
+                                              {"inside",  CONFINE_INSIDE},
+                                              {"outside", CONFINE_OUTSIDE}}, 1);
     
     glos.set(confine2_stiffness, "confine2", 1);
     glos.set(confine2_space,     "confine2", 2);

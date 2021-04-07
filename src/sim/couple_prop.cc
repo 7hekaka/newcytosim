@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "couple_prop.h"
 #include "couple.h"
@@ -66,7 +66,7 @@ void CoupleProp::read(Glossary& glos)
     
     glos.set(trans_activated, "trans_activated");
     // changed 'stiff' to 'min_loop' on 26.04.2020
-    glos.set(min_loop, "min_loop") || glos.set(min_loop, "stiff");
+    glos.set(min_loop, "min_loop", "stiff");
 
     glos.set(specificity, "specificity", {{"off",          BIND_ALWAYS},
 #ifdef BACKWARD_COMPATIBILITY

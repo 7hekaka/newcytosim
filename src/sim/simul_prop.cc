@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #include "simul_prop.h"
 #include "assert_macro.h"
 #include "space_prop.h"
@@ -57,7 +57,7 @@ void SimulProp::read(Glossary& glos)
 {
     // a dimensionality can be specified to stop the program from running
     unsigned d = DIM;
-    if ( glos.set(d, "dimension") || glos.set(d, "dim") )
+    if ( glos.set(d, "dimension", "dim") )
     {
         if ( d != DIM )
         {
@@ -81,7 +81,7 @@ void SimulProp::read(Glossary& glos)
     real T = 0;
     if ( glos.set(T, "temperature" ) )
         kT = 1.38064852e-5 * T;
-    glos.set(kT, "kT") || glos.set(kT, "thermal_energy");
+    glos.set(kT, "kT", "thermal_energy");
 
     glos.set(tolerance,         "tolerance");
     glos.set(acceptable_prob,   "acceptable_prob");

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "glossary.h"
 #include "tokenizer.h"
@@ -55,10 +55,10 @@ std::string format_value(std::string const& str)
 std::string format_count(size_t c)
 {
     if ( c == 0 )
-        return " (unused)";
+        return " (unread)";
     if ( c == 1 )
-        return " (used)";
-    return " (used " + std::to_string(c) + "x)";
+        return " (read)";
+    return " (read " + std::to_string(c) + "x)";
 }
     
 

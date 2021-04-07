@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "dynein.h"
 #include "dynein_prop.h"
@@ -28,8 +28,8 @@ void DyneinProp::read(Glossary& glos)
 {
     DigitProp::read(glos);
     
-    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "force");
-    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "speed");
+    glos.set(stall_force,    "stall_force", "force");
+    glos.set(unloaded_speed, "unloaded_speed", "speed");
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(unloaded_speed, "max_speed");
 #endif

@@ -695,7 +695,7 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
          with respect to the lattice of each fiber.
          */
         
-        const real spread = disp->speckle_interval;
+        const real spread = disp->speckle_gap;
         constexpr real TINY = 0x1p-32;
         // draw speckles below the origin of abscissa:
         if ( fib.abscissaM() < 0 )
@@ -735,12 +735,12 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
     else if ( disp->speckle_style == 2 )
     {
         //we distribute points regularly along the center line
-        const real sep = disp->speckle_interval;
-        real a = sep * std::ceil( fib.abscissaM() / sep );
+        const real gap = disp->speckle_gap;
+        real a = gap * std::ceil( fib.abscissaM() / gap );
         while ( a <= fib.abscissaP() )
         {
             drawPoint(fib.pos(a), rad);
-            a += sep;
+            a += gap;
         }
     }
 }
@@ -767,9 +767,9 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         glEnable(GL_LIGHTING);
         // display arrowheads along the fiber:
         const GLfloat rad = disp->point_size*sFactor;
-        const real sep = disp->point_interval;
-        real ab = std::ceil(fib.abscissaM()/sep) * sep;
-        for ( ; ab <= fib.abscissaP(); ab += sep )
+        const real gap = disp->point_gap;
+        real ab = std::ceil(fib.abscissaM()/gap) * gap;
+        for ( ; ab <= fib.abscissaP(); ab += gap )
             gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
     else if ( style == 3 )

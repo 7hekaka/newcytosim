@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "dim.h"
 #include "hand_prop.h"
@@ -175,16 +175,16 @@ void HandProp::clear()
 
 void HandProp::read(Glossary& glos)
 {
-    glos.set(binding_rate,  "binding_rate")  || glos.set(binding_rate,  "binding", 0);
-    glos.set(binding_range, "binding_range") || glos.set(binding_range, "binding", 1);
-    glos.set(binding_key,   "binding_key")   || glos.set(binding_key,   "binding", 2);
+    glos.set(binding_rate,  "binding_rate", 0,"binding", 0);
+    glos.set(binding_range, "binding_range", 0, "binding", 1);
+    glos.set(binding_key,   "binding_key", 0, "binding", 2);
     
 #if NEW_BINDING_LIMITS
     glos.set(binding_limits, 2,  "binding_limits");
 #endif
     
-    glos.set(unbinding_rate,  "unbinding_rate")  || glos.set(unbinding_rate,  "unbinding", 0);
-    glos.set(unbinding_force, "unbinding_force") || glos.set(unbinding_force, "unbinding", 1);
+    glos.set(unbinding_rate,  "unbinding_rate", 0, "unbinding", 0);
+    glos.set(unbinding_force, "unbinding_force", 0, "unbinding", 1);
     
     
     glos.set(bind_also_end, "bind_also_end", {{"off",       NO_END},
@@ -197,7 +197,7 @@ void HandProp::read(Glossary& glos)
                                               {"minus_end", MINUS_END},
                                               {"both_ends", BOTH_ENDS}});
     
-    glos.set(bind_end_range, "bind_end_range") || glos.set(bind_end_range, "bind_only_end", 1);
+    glos.set(bind_end_range, "bind_end_range", 0, "bind_only_end", 1);
 
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(bind_also_end, "bind_also_ends", {{"off",       NO_END},

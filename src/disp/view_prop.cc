@@ -81,7 +81,7 @@ void ViewProp::read(Glossary& glos)
         front_color = back_color.inverted();
     }
     glos.set(front_color, "front_color");
-    glos.set(buffered,    "buffered") || glos.set(buffered, "buffer");
+    glos.set(buffered,    "buffered", "buffer");
     glos.set(depth_test,  "depth_test");
     glos.set(depth_clamp, "depth_clamp");
     glos.set(retina,      "retina");

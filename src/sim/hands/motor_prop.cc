@@ -39,8 +39,8 @@ void MotorProp::read(Glossary& glos)
 {
     HandProp::read(glos);
     
-    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "force");
-    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "speed");
+    glos.set(stall_force,    "stall_force", "force");
+    glos.set(unloaded_speed, "unloaded_speed", "speed");
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(unloaded_speed, "max_speed");
 #endif

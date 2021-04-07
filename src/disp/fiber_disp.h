@@ -124,14 +124,14 @@ public:
      Possible values for `point_style`:
      - 0 : show nothing,
      - 1 : show vertices,
-     - 2 : show arrowheads separated by `point_interval`,
+     - 2 : show arrowheads separated by `point_gap`,
      - 3 : show middle point of each fiber
      .
      */
     int point_style;
     
     /// distance between arrows for `point_style=2` (also known as `point[2]`)
-    real point_interval;
+    real point_gap;
     
 
     /// style of fiber tips for { PLUS_END, MINUS_END }
@@ -207,7 +207,7 @@ public:
     int speckle_style;
 
     /// average distance between speckles (also known as `speckles[2]`)
-    real speckle_interval;
+    real speckle_gap;
 
     /// a bit-field to hide certain categories of fibers
     /**

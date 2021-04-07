@@ -35,12 +35,12 @@ void WalkerProp::read(Glossary& glos)
 {
     DigitProp::read(glos);
     
-    glos.set(stall_force,    "stall_force")    || glos.set(stall_force,    "force");
-    glos.set(unloaded_speed, "unloaded_speed") || glos.set(unloaded_speed, "speed");
+    glos.set(stall_force,    "stall_force", "force");
+    glos.set(unloaded_speed, "unloaded_speed", "speed");
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(unloaded_speed,   "max_speed");
 #endif
-    glos.set(unbinding_chance, "unbinding_chance") || glos.set(unbinding_chance, "unbinding", 2);
+    glos.set(unbinding_chance, "unbinding_chance", 0, "unbinding", 2);
     
 #if NEW_VARIABLE_WALK
     glos.set(variable_speed, "variable_speed");

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "dim.h"
 #include "exceptions.h"
@@ -31,8 +31,8 @@ void ForkProp::read(Glossary& glos)
     CoupleProp::read(glos);
     
     // compact syntax
-    glos.set(angular_stiffness, "torque") || glos.set(angle, "angle");
-    glos.set(angle, "torque", 1) || glos.set(angular_stiffness, "angular_stiffness");
+    glos.set(angular_stiffness, "torque", "angular_stiffness");
+    glos.set(angle, "torque", 1, "angle", 0);
     
     glos.set(flip, "flip");
 }
