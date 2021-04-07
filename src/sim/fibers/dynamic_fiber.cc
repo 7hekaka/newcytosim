@@ -59,9 +59,6 @@ state_t DynamicFiber::endStateM() const
 
 void DynamicFiber::setEndStateM(state_t s)
 {
-    if ( s < 1 || 4 < s )
-        throw InvalidParameter("invalid AssemblyState for DynamicFiber MINUS_END");
-    
     if ( s != mStateM )
     {
         mStateM = s;
@@ -75,7 +72,7 @@ void DynamicFiber::setEndStateM(state_t s)
 
 
 /**
- Minus end can shrink
+ Minus end can only shrink, and so far the state vector unitM[] is ignored
  */
 int DynamicFiber::stepMinusEnd()
 {
@@ -274,7 +271,7 @@ void DynamicFiber::step()
     constexpr size_t P = 0;
     // perform stochastic simulation:
     int incP = stepPlusEnd();
-    int incM = stepMinusEnd();
+    int incM = mStateM ? stepMinusEnd() : 0;
 
     mGrowthP = incP * prop->unit_length;
     mGrowthM = incM * prop->unit_length;
