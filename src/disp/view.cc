@@ -139,9 +139,7 @@ void View::openDisplay()
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
         glDepthMask(GL_FALSE);
-        gle_color col1(0.0,0.0,0.0);
-        gle_color col2(0.2,0.2,0.2);
-        gle::drawTiledFloor(floor_radius, floor_tile, floor_height, col1, col2);
+        gle::drawTiledFloor(floor_radius, floor_tile, floor_height, floor_color, back_color);
         glDepthMask(GL_TRUE);
         glEnable(GL_DEPTH_TEST);
     }

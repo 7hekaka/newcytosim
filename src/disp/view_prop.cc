@@ -54,9 +54,19 @@ void ViewProp::clear()
     fog_param    = 1;
     fog_color    = 0x000000FF;
     
-    floor_radius   = 0;
-    floor_tile     = 1;
-    floor_height   = 0;
+    floor_radius = 0;
+    floor_tile   = 1;
+    floor_height = 0;
+    floor_color  = 0x242424FF;
+}
+
+
+void ViewProp::invertColors()
+{
+    back_color = back_color.inverted();
+    front_color = front_color.inverted();
+    fog_color = fog_color.inverted();
+    floor_color = floor_color.inverted();
 }
 
 
@@ -148,6 +158,7 @@ void ViewProp::read(Glossary& glos)
     glos.set(floor_radius, "floor");
     glos.set(floor_tile, "floor", 1);
     glos.set(floor_height, "floor", 2);
+    glos.set(floor_color, "floor", 3);
 }
 
 //------------------------------------------------------------------------------
@@ -175,7 +186,7 @@ void ViewProp::write_values(std::ostream& os) const
     write_value(os, "scalebar",      scalebar, scalebar_length, scalebar_color);
     write_value(os, "axes",          axes, axes_size);
     write_value(os, "fog",           fog_type, fog_param, fog_color);
-    write_value(os, "floor",         floor_radius, floor_tile, floor_height);
+    write_value(os, "floor",         floor_radius, floor_tile, floor_height, floor_color);
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         std::string var = "clip_plane" + std::to_string(k);

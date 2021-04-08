@@ -243,22 +243,22 @@ public:
         return gle_color(col_[0], col_[1], col_[2], clamp(s*col_[3]));
     }
     
-    gle_color blend(gle_color c) const
+    gle_color blend(gle_color C) const
     {
-        COLOF s = a() + c.a();
+        COLOF s = a() + C.a();
         COLOF h = a()   / s;
-        COLOF g = c.a() / s;
-        return gle_color(h*col_[0]+g*c.col_[0], h*col_[1]+g*c.col_[1], h*col_[2]+g*c.col_[2], h+g);
+        COLOF g = C.a() / s;
+        return gle_color(h*col_[0]+g*C[0], h*col_[1]+g*C[1], h*col_[2]+g*C[2], 0.5*(h+g));
     }
     
-    friend gle_color blend(COLOF g, gle_color A, COLOF h, gle_color B)
+    gle_color blend(COLOF g, gle_color B, COLOF h)
     {
-        return gle_color(g*A[0]+h*B[0], g*A[1]+h*B[1], g*A[2]+h*B[2], g*A[3]+h*B[3]);
+        return gle_color(g*col_[0]+h*B[0], g*col_[1]+h*B[1], g*col_[2]+h*B[2], g*col_[3]+h*B[3]);
     }
 
     gle_color inverted() const
     {
-        return gle_color(1.f-col_[0], 1.f-col_[1], 1.f-col_[2], col_[3]);
+        return gle_color(1-col_[0], 1-col_[1], 1-col_[2], col_[3]);
     }
     
     gle_color tweak(uint32_t arg) const

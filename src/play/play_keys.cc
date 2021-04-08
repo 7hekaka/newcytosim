@@ -864,11 +864,9 @@ void processKey(unsigned char key)
             thread.releaseHandle();
             break;
             
-        case 'i': {
-            ViewProp& vp = glApp::currentView();
-            vp.back_color = vp.back_color.inverted();
-            vp.front_color = vp.front_color.inverted();
-        } break;
+        case 'i':
+            glApp::currentView().invertColors();
+            break;
 
         case 'r':
             prop.toggleReport(0);

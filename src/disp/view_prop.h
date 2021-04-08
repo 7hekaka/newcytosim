@@ -183,12 +183,15 @@ public:
     
     /// color of fog (also known as `fog[2]`)
     gle_color fog_color;
-    
+
     /// draw 'tiled' floor
     int floor_radius;
     
     /// parameters for 'tiled' floor
     float floor_tile, floor_height;
+    
+    /// color of floor
+    gle_color floor_color;
 
     /// @}
     
@@ -221,6 +224,9 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
 
+    /// invert some colors
+    void invertColors();
+    
 };
 
 #endif

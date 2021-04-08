@@ -2166,19 +2166,19 @@ namespace gle
         return a + (( std::abs(a) + b ) & 1 );
     }
 
-    void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2)
+    void drawTiledFloor(int R, float T, float Z, gle_color col, gle_color back)
     {
         float H = T * 0.5;
         int Q = std::floor( double(R) * M_SQRT1_2 );
         
-        if ( col1.visible() )
+        if ( back.visible() )
         {
             float U = R * T;
-            col1.load_load();
+            back.load_load();
             fillRectangle(-U, -U, U, U, Z);
         }
         
-        col2.load_load();
+        col.load_load();
         int x = R;
         int RX = 2 * x - 3;
         int RY = 0;
