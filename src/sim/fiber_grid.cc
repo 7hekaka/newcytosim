@@ -7,13 +7,10 @@
 #include "fiber_site.h"
 #include "messages.h"
 #include "space.h"
-#include "modulo.h"
 #include "hand.h"
 #include "hand_prop.h"
 #include "simul.h"
 #include "sim.h"
-
-extern Modulo const* modulo;
 
 
 #if ( 0 )
@@ -33,6 +30,7 @@ extern Modulo const* modulo;
  */
 size_t FiberGrid::setGrid(Space const* space, real max_step)
 {
+    modulo_ = space->getModulo();
     assert_true(max_step > 0);
     Vector inf, sup;
     space->boundaries(inf, sup);
@@ -46,7 +44,7 @@ size_t FiberGrid::setGrid(Space const* space, real max_step)
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
 
-        if ( modulo  &&  modulo->isPeriodic(d) )
+        if ( modulo_ && modulo_->isPeriodic(d) )
         {
             //adjust the grid to match the edges exactly
             cnt[d] = std::max((size_t)1, (size_t)std::ceil(n));
@@ -210,7 +208,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
     const real width = range + fGrid.cellRadius();
     
     //define the painting function used:
-    void (*paint)(int, int, int, int, void*) = modulo ? paintCellPeriodic : paintCell;
+    void (*paint)(int, int, int, int, void*) = modulo_ ? paintCellPeriodic : paintCell;
     
     for ( const Fiber * fib = first; fib != last ; fib=fib->next() )
     {

@@ -365,7 +365,7 @@ public:
     /// true if Grid has some periodic direction
     bool isPeriodic() const { return pGrid.isPeriodic(); }
     
-    /// true if the grid was initialized by calling setGrid()
+    /// sum of allocated size of lists for all cells
     size_t capacity() const;
 
     /// clear the grid

@@ -20,6 +20,7 @@ PointGrid::PointGrid()
 
 size_t PointGrid::setGrid(Space const* spc, real min_step)
 {
+    assert_true( modulo == spc->getModulo() );
     assert_true( min_step > 0 );
     Vector inf, sup;
     spc->boundaries(inf, sup);
@@ -32,8 +33,9 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
         
-        if ( modulo  &&  modulo->isPeriodic(d) )
+        if ( modulo && modulo->isPeriodic(d) )
         {
+            assert_small( modulo->period_[d] - sup[d] + inf[d] );
             //adjust the grid to match the edges
             cnt[d] = std::max((size_t)1, (size_t)std::floor(n));
             pGrid.setPeriodic(d, true);

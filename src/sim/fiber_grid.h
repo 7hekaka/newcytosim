@@ -5,6 +5,7 @@
 
 #include "dim.h"
 #include "vector.h"
+#include "modulo.h"
 #include "array.h"
 #include "grid.h"
 #include "fiber.h"
@@ -86,10 +87,13 @@ private:
     /// grid for divide-and-conquer strategies:
     grid_type fGrid;
     
+    /// Object for periodic boundary conditions
+    Modulo const* modulo_;
+    
 public:
     
     /// constructor
-    FiberGrid()  { }
+    FiberGrid() : modulo_(nullptr) { }
 
     /// set a grid to cover the specified Space with cells of width `max_step` at most
     size_t       setGrid(Space const*, real max_step);
