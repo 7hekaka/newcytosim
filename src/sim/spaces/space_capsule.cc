@@ -275,19 +275,19 @@ void SpaceCapsule::draw3D() const
 
     //right side:
     glPushMatrix();
-    gle::transAlignZ(Vector(L,0,0), R, Vector(-1,0,0));
+    gle::transAlignZX(L, R, -1);
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
     glPopMatrix();
 
     glPushMatrix();
-    gle::stretchAlignZ(Vector(-L,0,0), Vector(L,0,0), R);
+    gle::stretchAlignZX(-L, L, R);
     gle::tube1();
     glPopMatrix();
 
     //left side:
     glPushMatrix();
-    gle::transAlignZ(Vector(-L,0,0), R, Vector(1,0,0));
+    gle::transAlignZX(-L, R, 1);
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
     glPopMatrix();

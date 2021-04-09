@@ -145,6 +145,11 @@ namespace gle
     void transAlignZ1(Vector2 const& pos, float rad, Vector2 const& dir, float fac);
     void transAlignZ1(Vector3 const& pos, float rad, Vector3 const& dir, float fac);
 
+    /// translate by pos; rotate to align X to Z, scale by rad
+    void transAlignZX(float pos, float rad, float dir);
+    /// translate by A; rotate to align X to Z, scale XY by rad and Z by B-A
+    void stretchAlignZX(float A, float B, float rad);
+
     void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
     void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);
     void setClipPlane(GLenum, Vector3 const& dir, Vector3 const& pos);

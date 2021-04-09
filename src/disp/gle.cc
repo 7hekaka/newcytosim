@@ -190,7 +190,7 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    #pragma mark - Rotation
+    #pragma mark - Rotations
     
     /**
      This works if norm(z[]) == n!
@@ -217,12 +217,13 @@ namespace gle
      */
     void stretchAlignZ(Vector1 const& A, Vector1 const& B, float R)
     {
-        float X = std::copysign(R, B.XX-A.XX);
+        float X = B.XX-A.XX;
+        float Y = std::copysign(R, X);
         //warning! this matrix appears here transposed
         float mat[16] = {
-            0, -X,  0,  0,
-            0,  0, -R,  0,
-            X,  0,  0,  0,
+            0, Y, 0, 0,
+            0, 0, R, 0,
+            X, 0, 0, 0,
             float(A.XX), 0, 0, 1 };
         glMultMatrixf(mat);
     }
@@ -239,9 +240,9 @@ namespace gle
         float r = R * invsqrt(X*X+Y*Y);
         //warning! this matrix appears here transposed
         float mat[16] = {
-            r*Y, -r*X,  0,  0,
-            0,      0, -R,  0,
-            X,      Y,  0,  0,
+            -r*Y, r*X, 0, 0,
+            0, 0, R, 0,
+            X, Y, 0, 0,
             float(A.XX), float(A.YY), 0, 1 };
         glMultMatrixf(mat);
     }
@@ -355,7 +356,6 @@ namespace gle
         glMultMatrixf(mat);
     }
 
-    
     // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
     void transAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
     {
@@ -398,6 +398,33 @@ namespace gle
         glMultMatrixf(mat);
     }
 
+    // rotate to align Z with X and translate to center 'P'
+    void transAlignZX(float P, float R, float X)
+    {
+        float Y = std::copysign(R, X);
+        float mat[16] = {
+            0, Y, 0, 0,
+            0, 0, R, 0,
+            Y, 0, 0, 0,
+            P, 0, 0, 1};
+        glMultMatrixf(mat);
+    }
+    
+    // rotate to align Z with X and translate to center 'A'
+    void stretchAlignZX(float A, float B, float R)
+    {
+        float X = B - A;
+        float Y = std::copysign(R, X);
+        //warning! this matrix appears here transposed
+        float mat[16] = {
+            0, Y, 0, 0,
+            0, 0, R, 0,
+            X, 0, 0, 0,
+            A, 0, 0, 1 };
+        glMultMatrixf(mat);
+    }
+    
+    
     void setClipPlane(GLenum glp, Vector1 const& dir, Vector1 const& pos)
     {
         GLdouble eq[4] = { dir.XX, 0, 0, -dot(dir, pos) };

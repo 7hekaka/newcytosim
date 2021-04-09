@@ -182,7 +182,7 @@ void SpaceRing::draw3D() const
     GLfloat R(radius_);
 
     glPushMatrix();
-    gle::stretchAlignZ(Vector(-L,0,0), Vector(L,0,0), R);
+    gle::stretchAlignZX(-L, L, R);
     gle::tube1();
     glPopMatrix();
 }

@@ -213,7 +213,7 @@ void SpaceCylinderP::draw3D() const
     GLfloat R(radius_);
 
     glPushMatrix();
-    gle::stretchAlignZ(Vector(-L,0,0), Vector(L,0,0), R);
+    gle::stretchAlignZX(-L, L, R);
     gle::tube1();
     glPopMatrix();
 
@@ -223,9 +223,11 @@ void SpaceCylinderP::draw3D() const
         glLineStipple(1, 0x000F);
         glEnable(GL_LINE_STIPPLE);
         glPushMatrix();
-        gle::transAlignZ(Vector(-L,0,0), R, Vector(-1,0,0));
+        gle::transAlignZX(-L, R, -1);
         gle::circle();
-        gle::transAlignZ(Vector(L,0,0), R, Vector(1,0,0));
+        glPopMatrix();
+        glPushMatrix();
+        gle::transAlignZX(L, R, -1);
         gle::circle();
         glPopMatrix();
         glDisable(GL_LINE_STIPPLE);
