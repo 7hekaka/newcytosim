@@ -395,60 +395,8 @@ void Parser::parse_new(std::istream& is)
         }
         else
         {
-            size_t nb_objects = simul_.nbObjects();
-            
-            // syntax sugar, to specify the position of the Fiber ends
-            if ( opt.has_key("position_ends") )
-            {
-                Vector A, B;
-                if ( !opt.set(A, "position_ends") || !opt.set(B, "position_ends", 1) )
-                    throw InvalidParameter("two vectors need to be defined by `position_ends'");
-                opt.define("length",    0, (A-B).norm());
-                opt.define("position",  0, (A+B)*0.5);
-                opt.define("direction", 0, (B-A).normalized());
-            }
-
-            // distribute objects regularly between two points:
-            if ( opt.has_key("range") )
-            {
-                Vector A, B;
-                if ( !opt.set(A, "range") || !opt.set(B, "range", 1) )
-                    throw InvalidParameter("two vectors need to be defined by `range'");
-                if ( opt.has_key("position") )
-                    throw InvalidParameter("cannot specify `position' if `range' is defined");
-                if ( cnt > 1 )
-                {
-                    Vector dAB = ( B - A ) / real(cnt-1);
-                    for ( size_t n = 0; n < cnt; ++n )
-                    {
-                        opt.define("position", 0, A + n * dAB);
-                        execute_new(name, opt);
-                    }
-                }
-                else
-                {
-                    opt.define("position", 0, A);
-                    execute_new(name, opt);
-                }
-            }
-            else
-            {
-                // place each object independently from the others:
-                for ( size_t n = 0; n < cnt; ++n )
-                    execute_new(name, opt);
-            }
-            
-            size_t required = 0;
-            if ( opt.set(required, "required") )
-            {
-                size_t created = simul_.nbObjects() - nb_objects;
-                if ( created < required )
-                {
-                    std::cerr << "created  = " << created << '\n';
-                    std::cerr << "required = " << required << '\n';
-                    throw InvalidParameter("could not create enough `"+name+"'");
-                }
-            }
+            // place each object independently from the others:
+            execute_new(name, opt, cnt);
             
             if ( opt.has_key("display") )
                 throw InvalidParameter("display parameters should be specified within `set'");
@@ -723,6 +671,8 @@ void Parser::parse_run(std::istream& is)
                     if ( span <= 0 )
                         throw InvalidParameter("duration must be >= 0'");
                     cnt = (size_t)std::ceil(span/simul_.time_step());
+                    opt.clear("duration");
+                    opt.clear("time");
                 }
             }
         }

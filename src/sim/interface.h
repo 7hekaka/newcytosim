@@ -68,8 +68,11 @@ public:
     Isometry   find_placement(Glossary&, int placement, size_t nb_trials);
     
     /// create 1 object of type `name`, following options in Glossary
-    ObjectList execute_new(std::string const& name, Glossary&);
+    void       execute_new(std::string const& name, ObjectSet*, Glossary&);
     
+    /// create `cnt` objects of type `name`, following options in Glossary
+    void       execute_new(std::string const& name, Glossary&, size_t cnt);
+
     /// create `cnt` objects of type `name`, randomly placed in space (no option)
     void       execute_new(std::string const& name, size_t cnt);
     

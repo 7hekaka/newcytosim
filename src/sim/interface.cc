@@ -17,7 +17,7 @@
 
 // Use the second definition to get some verbose reports:
 #define VLOG(ARG) ((void) 0)
-//#define VLOG(ARG) std::clog << ARG;
+//#define VLOG(ARG) std::clog << ARG << '\n';
 
 //------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ Interface::Interface(Simul& s)
  */
 Property* Interface::execute_set(std::string const& cat, std::string const& name, Glossary& def)
 {
-    VLOG("+SET " << cat << " `" << name << "'\n");
+    VLOG("+SET " << cat << " `" << name << "'");
     
     /* We do not allow for using the class name to name a property,
     as this should create confusion in the config file */
@@ -91,7 +91,7 @@ Property * Interface::execute_change(std::string const& name, Glossary& def, boo
     
     if ( pp )
     {
-        VLOG("-CHANGE " << pp->category() << " `" << name << "'\n");
+        VLOG("-CHANGE " << pp->category() << " `" << name << "'");
         execute_change(pp, def);
     }
     else
@@ -104,7 +104,7 @@ Property * Interface::execute_change(std::string const& name, Glossary& def, boo
         }
         else
         {
-            VLOG("unknown change |" << name << "|\n");
+            VLOG("unknown change |" << name << "|");
         }
     }
     return pp;
@@ -117,7 +117,7 @@ void Interface::execute_change_all(std::string const& cat, Glossary& def)
     
     for ( Property * i : plist )
     {
-        VLOG("+CHANGE " << i->category() << " `" << i->name() << "'\n");
+        VLOG("+CHANGE " << i->category() << " `" << i->name() << "'");
         execute_change(i, def);
     }
     /*
@@ -297,44 +297,30 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
 
 
 /**
- This would usually create ONE object of type 'name'.
+ This would usually create ONE object of type 'name', placed according to `opt`
  */
-ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
+void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& opt)
 {
-    ObjectList res;
-    ObjectSet * set = nullptr;
-    Property * pp = simul_.properties.find(name);
-    // Allows to make an object without an associated Property
-    if ( pp )
-        set = simul_.findSet(pp->category());
-    else
-        set = simul_.findSet(name);
-    if ( !set )
-    {
-        if ( pp )
-            throw InvalidSyntax("could not determine the class of `"+name+"'");
-        throw InvalidSyntax("undefined class `"+name+"'");
-    }
-    
     size_t ouf = 0, nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
 
+    ObjectList objs;
     do {
         
         // create the objects:
-        res = set->newObjects(name, opt);
+        objs = set->newObjects(name, opt);
         
 #if ( 0 )
         // check for `nullptr` in list, which should not happen:
-        if ( res.count(nullptr) )
+        if ( objs.count(nullptr) )
         {
             std::clog << "cytosim found empty slots in newObjects(" << name << ")\n";
-            res.remove_pack(nullptr);
+            objs.remove_pack(nullptr);
         }
 #endif
         
         // early bailout for immobile objects:
-        if ( res.size()==1 && !res[0]->mobile() )
+        if ( objs.size()==1 && !objs[0]->mobile() )
             break;
         
         PlacementType placement = PLACE_INSIDE;
@@ -354,7 +340,7 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
             // find a position:
             Isometry iso = find_placement(opt, placement, nb_trials);
             // place object at this position:
-            ObjectSet::moveObjects(res, iso);
+            ObjectSet::moveObjects(objs, iso);
             // special case for which we check all vertices:
             if ( placement == PLACE_ALL_INSIDE )
             {
@@ -362,12 +348,12 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
                 Space const* spc = simul_.spaces.master();
                 if ( opt.set(str, "placement", 1) )
                     spc = simul_.findSpace(str);
-                for ( Object * i : res )
+                for ( Object * i : objs )
                 {
                     Mecable * mec = Simul::toMecable(i);
                     if ( mec && ! mec->allInside(spc) )
                     {
-                        res.destroy();
+                        objs.destroy();
                         break;
                     }
                 }
@@ -378,33 +364,110 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
             Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
             break;
         }
-    } while ( res.empty() );
+    } while ( objs.empty() );
     
     // optionally mark the objects:
     ObjectMark mk = 0;
     if ( opt.set(mk, "mark") )
     {
-        for ( Object * i : res )
+        for ( Object * i : objs )
             i->mark(mk);
     }
     
     // translation after placement
     Vector vec;
     if ( opt.set(vec, "translation") )
-        ObjectSet::translateObjects(res, vec);
+        ObjectSet::translateObjects(objs, vec);
 
     /* 
      Because the objects in ObjectList are not necessarily all of the same class,
      we call simul_.add() rather than directly set->add()
      */
-    simul_.add(res);
+    simul_.add(objs);
+}
+
+
+/**
+ Create `cnt` objects of type 'name', according to specifications.
+ */
+void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
+{
+    ObjectSet * set = nullptr;
+    Property * pp = simul_.properties.find(name);
+    // Allows to make an object without an associated Property
+    if ( pp )
+        set = simul_.findSet(pp->category());
+    else
+        set = simul_.findSet(name);
+    if ( !set )
+    {
+        if ( pp )
+            throw InvalidSyntax("could not determine the class of `"+name+"'");
+        throw InvalidSyntax("undefined class `"+name+"'");
+    }
+    size_t amount = set->size();
     
+    /// allow to set a desired number of objects:
+    size_t target = 0;
+    if ( opt.set(target, "nb_objects") )
+    {
+        if ( target < amount )
+        {
+            ObjectList objs = set->collect();
+            simul_.erase(objs, amount-target);
+            return;
+        }
+        // create enough objects to reach target:
+        cnt = target - amount;
+    }
+
+    // syntax sugar, to distribute objects regularly between two points:
+    if ( opt.has_key("range") )
+    {
+        Vector A, B;
+        if ( !opt.set(A, "range") || !opt.set(B, "range", 1) )
+            throw InvalidParameter("two vectors need to be defined by `range'");
+        if ( opt.has_key("position") )
+            throw InvalidParameter("cannot specify `position' if `range' is defined");
+        Vector dAB = ( B - A ) / std::max(1UL, cnt-1);
+        
+        for ( size_t n = 0; n < cnt; ++n )
+        {
+            opt.define("position", 0, A + n * dAB);
+            execute_new(name, set, opt);
+        }
+    }
+    else
+    {
+        // syntax sugar, to specify the position of the Fiber ends
+        if ( opt.has_key("position_ends") )
+        {
+            Vector A, B;
+            if ( !opt.set(A, "position_ends") || !opt.set(B, "position_ends", 1) )
+                throw InvalidParameter("two vectors need to be defined by `position_ends'");
+            opt.define("length",    0, (A-B).norm());
+            opt.define("position",  0, (A+B)*0.5);
+            opt.define("direction", 0, (B-A).normalized());
+        }
+
+        for ( size_t n = 0; n < cnt; ++n )
+            execute_new(name, set, opt);
+    }
     //hold();
+    
+    size_t required = 0;
+    if ( opt.set(required, "required") )
+    {
+        size_t created = set->size() - amount;
+        if ( created < required )
+        {
+            std::cerr << "created  = " << created << '\n';
+            std::cerr << "required = " << required << '\n';
+            throw InvalidParameter("could not create enough `"+name+"'");
+        }
+    }
 
-    VLOG("+NEW `" << name << "' made " << res.size() << " objects");
-    VLOG(" (simul now has " << simul_.nbObjects() << " objects)\n");
-
-    return res;
+    VLOG("+NEW `" << name << "' made " << set->size()-amount << " objects (total " << simul_.nbObjects() << ")");
 }
 
 
@@ -414,8 +477,8 @@ ObjectList Interface::execute_new(std::string const& name, Glossary& opt)
  The objects are distributed uniformly within the current Space, also with
  random orientations.
  
- This is meant to replace calling execute_new(name, opt) `cnt` times, when
- no option was given to the command.
+ This is meant to replace execute_new(name, opt, cnt), when no option was given
+ to the command.
  */
 void Interface::execute_new(std::string const& name, size_t cnt)
 {
@@ -460,7 +523,7 @@ void Interface::execute_new(std::string const& name, size_t cnt)
         simul_.add(objs);
     }
     
-    VLOG("-NEW " << cnt << "`" << name << "' objects\n");
+    VLOG("-NEW " << cnt << "`" << name << "' objects");
     //hold();
 }
 
@@ -581,28 +644,10 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     filter.set(simul_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter);
     
-    if ( objs.size() == 0 )
-    {
-        Cytosim::warn << "found no `" << name << "' to delete\n";
-        return;
-    }
-    
-    if ( cnt == 1 )
-    {
-        simul_.erase(objs.pick_one());
-    }
+    if ( objs.size() > 0 )
+        simul_.erase(objs, cnt);
     else
-    {
-        if ( cnt < objs.size() )
-        {
-            // limit the list to a random subset
-            objs.shuffle();
-            objs.truncate(cnt);
-        }
-        
-        //std::clog << "simul:deleting " << objs.size() << " " << set->title() << '\n';
-        simul_.erase(objs);
-    }
+        Cytosim::warn << "found no `" << name << "' to delete\n";
 }
 
 /**
@@ -668,7 +713,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
         objs = simul_.fibers.collect(pass_filter, &filter);
     }
     
-    VLOG("-CUT PLANE (" << n << ").x = " << -a << "\n");
+    VLOG("-CUT PLANE (" << n << ").x = " << -a);
     simul_.fibers.planarCut(objs, n, a, stateP, stateM);
 }
 
@@ -689,7 +734,7 @@ void Interface::execute_connect(std::string const& name, Glossary& opt)
         simul_.couples.bindToIntersections(static_cast<CoupleProp*>(pp));
     }
     
-    VLOG("-CONNECT (" << name << "\n");
+    VLOG("-CONNECT (" << name << ")");
 }
 
 //------------------------------------------------------------------------------
@@ -829,7 +874,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     real   delta = (real)nb_steps;
     size_t check = nb_steps;
     
-    VLOG("+RUN START " << nb_steps << '\n');
+    VLOG("+RUN START " << nb_steps);
 
     if ( do_write )
     {
@@ -877,7 +922,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         simul_.events.erase(event);
 #endif
     simul_.relax();
-    VLOG("+RUN END\n");
+    VLOG("+RUN END");
 }
 
 
@@ -887,7 +932,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 */
 void Interface::execute_run(size_t nb_steps)
 {
-    VLOG("-RUN START " << nb_steps << '\n');
+    VLOG("-RUN START " << nb_steps);
     simul_.prepare();
     
     for ( size_t sss = 0; sss < nb_steps; ++sss )
@@ -899,7 +944,7 @@ void Interface::execute_run(size_t nb_steps)
     }
     
     simul_.relax();
-    VLOG("-RUN END\n");
+    VLOG("-RUN END");
 }
 
 
@@ -946,7 +991,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     opt.set(frm, "frame");
     opt.set(append, "append");
 
-    VLOG("-IMPORT frame " << frm << " from " << file << '\n');
+    VLOG("-IMPORT frame " << frm << " from " << file);
 
     while ( in.good() )
     {
@@ -991,7 +1036,7 @@ void Interface::execute_export(std::string const& name, std::string const& what,
     bool binary = true;
     bool prune = true;
 
-    VLOG("-EXPORT " << what << " to " << name << '\n');
+    VLOG("-EXPORT " << what << " to " << name);
 
     // here '*' designates the standard output:
     if ( what == "all" || what == "objects" )
@@ -1036,7 +1081,7 @@ void Interface::execute_write(std::string const& name, std::string const& what, 
     int ver = 1;
     opt.set(ver, "verbose");
     std::string str;
-    VLOG("-WRITE " << what << " to " << file << '\n');
+    VLOG("-WRITE " << what << " to " << name);
     
     std::ostream out(std::cout.rdbuf());
 

@@ -147,6 +147,9 @@ public:
     
     /// remove and delete all objects from given list
     void erase(ObjectList const&);
+    
+    /// remove and delete 'cnt' objects from given list
+    void erase(ObjectList&, size_t);
 
     /// mark objects from given list
     static void mark(ObjectList const&, ObjectMark);
