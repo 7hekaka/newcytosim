@@ -145,7 +145,7 @@ void Parser::parse_set(std::istream& is)
             size_t ix;
 #ifdef BACKWARD_COMPATIBILITY
             // name changed to `property_number` on 10.12.2017
-            if ( opt.set(ix, "property_number") || opt.set(ix, "property_index") )
+            if ( opt.set(ix, "property_number", "property_index") )
 #else
             if ( opt.set(ix, "property_number") )
 #endif
@@ -666,7 +666,7 @@ void Parser::parse_run(std::istream& is)
             {
                 // instead of `nb_steps', user can specify a duration in seconds:
                 real span = 0;
-                if ( opt.set(span, "duration") || opt.set(span, "time") )
+                if ( opt.set(span, "duration", "time") )
                 {
                     if ( span <= 0 )
                         throw InvalidParameter("duration must be >= 0'");
@@ -877,7 +877,7 @@ void Parser::parse_report(std::istream& is)
     if ( do_run && ( do_write || file == "*" ))
     {
         Glossary opt(blok);
-        execute_write(file, what, opt);
+        execute_report(file, what, opt);
         check_warnings(opt, is, ipos);
     }
 }
@@ -926,7 +926,7 @@ void Parser::parse_write(std::istream& is)
     if ( do_run && ( do_write || file == "*" ))
     {
         Glossary opt(blok);
-        execute_write(file, what, opt);
+        execute_report(file, what, opt);
         check_warnings(opt, is, ipos);
     }
 }

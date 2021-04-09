@@ -42,7 +42,7 @@ void SpaceBeads::setBeads()
  */
 void SpaceBeads::resize(Glossary& opt)
 {
-    opt.set(mBeadName, "bead") || opt.set(mBeadName, "beads");
+    opt.set(mBeadName, "bead", "beads");
 }
 
 /**

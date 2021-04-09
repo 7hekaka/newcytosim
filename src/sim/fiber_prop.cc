@@ -31,7 +31,7 @@ real FiberProp::newFiberLength(Glossary& opt) const
 #ifdef BACKWARD_COMPATIBILITY
     opt.set(len, "initial_length") ||
 #endif
-    opt.set(len, "length") || opt.set(len, "fiber_length");
+    opt.set(len, "length", "fiber_length");
     
     // exponential distribution, truncated (Julio M.Belmonte's student):
     if ( opt.value_is("length", 1, "exponential") )
@@ -46,7 +46,7 @@ real FiberProp::newFiberLength(Glossary& opt) const
     {
         // add variability without changing mean:
         real var = 0;
-        if ( opt.set(var, "length", 1) || opt.set(var, "fiber_length", 1) )
+        if ( opt.set(var, "length", 1, "fiber_length", 1) )
         {
             len += var * RNG.sreal();
         }

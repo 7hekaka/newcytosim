@@ -97,7 +97,7 @@ ObjectList FieldSet::newObjects(const std::string& name, Glossary& opt)
         
     // an initial concentration can be specified:
     Field::value_type val = 0;
-    if ( opt.set(val, "value") || opt.set(val, "initial_value") )
+    if ( opt.set(val, "value", "initial_value") )
     {
         std::string str;
         if ( opt.set(str, "value", 1) )

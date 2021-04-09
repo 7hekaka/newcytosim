@@ -578,8 +578,8 @@ public:
         }
         
         opt.set(mrk, "mark");
-        opt.set(st1, "state1") || opt.set(st1, "stateP") || opt.set(st1, "state");
-        opt.set(st2, "state2") || opt.set(st2, "stateM") || opt.set(st1, "state", 1);
+        opt.set(st1, "state1", "stateP") || opt.set(st1, "state");
+        opt.set(st2, "state2", "stateM") || opt.set(st1, "state", 1);
     }
     
     /// return `true` if given object fulfills all the conditions specified
@@ -1076,13 +1076,14 @@ void Interface::execute_export(std::string const& name, std::string const& what,
 /**
  see Parser::parse_report
  */
-void Interface::execute_write(std::string const& name, std::string const& what, Glossary& opt)
+void Interface::execute_report(std::string const& name, std::string const& what, Glossary& opt)
 {
     int ver = 1;
     opt.set(ver, "verbose");
     std::string str;
-    VLOG("-WRITE " << what << " to " << name);
+    VLOG("-REPORT " << what << " to " << name);
     
+    std::ofstream ofs;
     std::ostream out(std::cout.rdbuf());
 
     // a STAR designates the standard output:
@@ -1090,7 +1091,6 @@ void Interface::execute_write(std::string const& name, std::string const& what, 
     {
         bool append = true;
         opt.set(append, "append");
-        std::ofstream ofs;
         ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
         out.rdbuf(ofs.rdbuf());
     }

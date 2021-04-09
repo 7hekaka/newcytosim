@@ -44,7 +44,7 @@ Event::Event(double now, Glossary& opt)
 {
     double t = now;
     clear();
-    opt.set(activity, "activity") || opt.set(activity, "code");
+    opt.set(activity, "activity", "code");
     
     if ( opt.set(t, "time") )
     {

@@ -80,8 +80,9 @@ namespace Cytosim
             {
                 --cnt_;
                 out_ << pref_ << x;
+                return out_;
             }
-            return out_;
+            return nul_;
         }
         
         /// front-end to a `printf()` syntax with flush

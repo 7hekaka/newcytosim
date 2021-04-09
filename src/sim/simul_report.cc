@@ -426,7 +426,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     {
         return reportField(out);
     }
-    if ( who == "system" )
+    if ( who == "simul" || who.empty() )
     {
         if ( what.empty() )
             return reportSystem(out);
@@ -436,7 +436,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportInventory(out);
         if ( what == "property" || what == "parameter" )
             return writeProperties(out, false);
-        throw InvalidSyntax("I can only report system: time, inventory, property");
+        throw InvalidSyntax("I can only report simul: time, inventory, property");
     }
     if ( who == "property" )
     {
@@ -2718,8 +2718,8 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
     bool C = false, S = false, M = false;
 
     opt.set(details, "details");
-    opt.set(C, "couples") || opt.set(C, "couple");
-    opt.set(S, "solids") || opt.set(S, "solid");
+    opt.set(C, "couples", "couple");
+    opt.set(S, "solids", "solid");
     opt.set(M, "meca");
     
     flagClusters(C, S, M);
