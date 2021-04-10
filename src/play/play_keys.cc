@@ -310,6 +310,11 @@ static void changeScale(FiberDisp* p, int d)
         changeScale(p->force_scale, d);
         flashText("fiber:force_scale = %.5f", p->force_scale);
     }
+    else if ( p->speckle_style )
+    {
+        changeScale(p->speckle_gap, d);
+        flashText("fiber:speckle_gap = %.5f", p->speckle_gap);
+    }
     else if ( disp.style == 2 )
         flipExplode(p);
 }
@@ -467,12 +472,18 @@ static void changeLatticeStyle(FiberDisp* p, int)
 
 static void changePointSize(FiberDisp* p, int inc)
 {
-    GLfloat s = grained(p->point_size, inc);
+    bool alt = p->speckle_style && !p->point_style;
+    float& size = alt ? p->speckle_size : p->point_size;
+    
+    GLfloat s = grained(size, inc);
     
     if ( s > 0 )
     {
-        p->point_size = s;
-        flashText("%s:point_size=%0.2f", p->name_str(), s);
+        size = s;
+        if ( alt )
+            flashText("%s:speckle_size=%0.2f", p->name_str(), s);
+        else
+            flashText("%s:point_size=%0.2f", p->name_str(), s);
     }
 }
 

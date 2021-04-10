@@ -688,7 +688,7 @@ void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real rad) const
 void Display3::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    real rad = disp->speckle_size;
+    float rad = disp->speckle_size;
 
     if ( rad * uFactor < 2 )
         return;

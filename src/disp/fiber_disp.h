@@ -194,7 +194,7 @@ public:
     
     
     /// size for speckle display (also know as `speckles`)
-    int speckle_size;
+    float speckle_size;
 
     /// style for speckle display (also know as `speckles[1]`)
     /**
