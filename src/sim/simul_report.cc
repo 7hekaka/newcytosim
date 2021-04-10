@@ -210,13 +210,13 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
  `field`         | Total quantity of substance in field and Lattices
  
  
- WHAT                | Output
- --------------------|----------------------------------------------------------
- `system:time`       | Time
- `system:inventory`  | summary list of objects
- `system:property`   | All properties
- `system:parameter`  | global parameters
- `system:NAME`       | parameters for Property 'NAME'
+ WHAT               | Output
+ -------------------|----------------------------------------------------------
+ `simul:time`       | Time
+ `simul:inventory`  | summary list of objects
+ `simul:property`   | All properties
+ `simul:parameter`  | global parameters
+ `simul:NAME`       | parameters for Property 'NAME'
 
 
  WHAT                    | Output
@@ -429,7 +429,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "simul" || who.empty() )
     {
         if ( what.empty() )
-            return reportSystem(out);
+            return reportSimul(out);
         if ( what == "time" )
             return reportTime(out);
         if ( what == "inventory" )
@@ -1619,7 +1619,7 @@ void Simul::reportInventory(std::ostream& out) const
 }
 
 template < typename SET >
-void reportSystemSet(std::ostream& out, SET& set, PropertyList const& properties)
+void reportSimulSet(std::ostream& out, SET& set, PropertyList const& properties)
 {
     for ( Property const* i : properties.find_all(set.title()) )
     {
@@ -1643,13 +1643,13 @@ void reportSystemSet(std::ostream& out, SET& set, PropertyList const& properties
     }
 }
 
-void Simul::reportSystem(std::ostream& out) const
+void Simul::reportSimul(std::ostream& out) const
 {
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "vertices" << SEP << "largest";
-    reportSystemSet(out,  fibers, properties);
-    reportSystemSet(out,  solids, properties);
-    reportSystemSet(out, spheres, properties);
-    reportSystemSet(out,   beads, properties);
+    reportSimulSet(out,  fibers, properties);
+    reportSimulSet(out,  solids, properties);
+    reportSimulSet(out, spheres, properties);
+    reportSimulSet(out,   beads, properties);
 }
 
 /**

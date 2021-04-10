@@ -109,8 +109,8 @@ std::string alternativeReport(unsigned inx)
     switch( inx )
     {
         case 0: return "";
-        case 1: return "system:inventory";
-        case 2: return "system";
+        case 1: return "simul:inventory";
+        case 2: return "simul";
         case 3: return "fiber:energy";
         case 4: return "fiber:mesh,field";
         case 5: return "fiber:lattice";

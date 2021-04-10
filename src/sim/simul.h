@@ -380,8 +380,8 @@ public:
     /// give a short inventory of the simulation state, obtained from ObjectSet::report()
     void reportInventory(std::ostream&) const;
     
-    /// give a summary of the System
-    void reportSystem(std::ostream&) const;
+    /// give a summary of the Simul
+    void reportSimul(std::ostream&) const;
     
     /// print the length and the points of each fiber
     void reportFiber(std::ostream&, Fiber const*) const;
