@@ -7,7 +7,6 @@
 #include "iowrapper.h"
 #include "fiber_prop.h"
 #include "fiber_set.h"
-#include "hand_monitor.h"
 #include "simul.h"
 
 

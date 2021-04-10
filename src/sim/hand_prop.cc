@@ -1,16 +1,15 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "dim.h"
+#include "sim.h"
 #include "hand_prop.h"
 #include "messages.h"
 #include "exceptions.h"
 #include "glossary.h"
 #include "common.h"
-#include "sim.h"
 #include "simul_prop.h"
 #include "simul.h"
 #include "hand.h"
-#include "hand_monitor.h"
 
 #include "motor_prop.h"
 #include "walker_prop.h"
