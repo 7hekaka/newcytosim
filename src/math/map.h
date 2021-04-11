@@ -267,15 +267,8 @@ public:
             if ( cells[d] <= 0 )
                 throw InvalidParameter("Cannot build grid as nbcells[] is <= 0");
             
-            if ( infs[d] > sups[d] )
-            {
-                if ( infs[d] > sups[d] + REAL_EPSILON )
-                    throw InvalidParameter("Cannot build grid as sup[] < inf[]");
-                sups[d] = infs[d];
-            }
-            
-            if ( infs[d] == sups[d] )
-                throw InvalidParameter("Cannot build grid as sup[] == inf[]");
+            if ( infs[d] >= sups[d] )
+                throw InvalidParameter("Cannot build grid as sup[] <= inf[]");
             
             mStride[d] = cnt;
             cnt      *= cells[d];
@@ -863,7 +856,7 @@ public:
         char*const end = str+sizeof(str);
         ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells:", arg, ORD, mNbCells);
         for ( int d = 0; d < ORD; ++d )
-            ptr += snprintf(ptr, end-ptr, "\n   [ %9.3f  %+9.3f ] / %6lu = %9.3f", mInf[d], mSup[d], mDim[d], cWidth[d]);
+            ptr += snprintf(ptr, end-ptr, " [ %9.3f %+9.3f ] / %lu = %4.3f", mInf[d], mSup[d], mDim[d], cWidth[d]);
         os << str << std::endl;
     }
 };
