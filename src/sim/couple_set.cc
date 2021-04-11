@@ -671,6 +671,7 @@ void CoupleSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector
         Vector h2 = c->posHand2();
         if ( modulo )
         {
+            // calculate image that is closest to plane:
             Vector cen = n * ( -a / n.normSqr() );
             modulo->fold(h1, cen);
             modulo->fold(h2, h1);
