@@ -1,0 +1,99 @@
+% A contractile linear bundle in a periodic Space
+% Simplified from Daniel Cortes's model. Strasbourg 11.04.2021
+
+set simul system
+{
+    time_step = 0.001
+    viscosity = 1
+    steric    = 1, 1000
+    display = ( size=1536,512; tile=1 )
+}
+
+set space cell
+{
+    shape = cylinderP
+    display = ( color = 0x0000ff22; visible=3; )
+}
+
+
+new cell
+{
+    length = 5
+    radius = 0.1
+}
+
+set fiber actin
+{
+    rigidity     = 0.06
+    segmentation = 0.05
+    confine      = inside, 500, cell
+    steric       = 1, 0.010
+    display = ( color=white; interval=1.0; line_width=1; )
+}
+
+set hand myosin
+{
+    binding_rate   = 1
+    binding_range  = 0.05
+    unbinding_rate = 0.51
+    activity       = motor
+    
+    unloaded_speed = 0.5
+    stall_force    = 4
+
+    display = ( color=white; size=3; width=1; )
+}
+
+set hand binder
+{
+    binding_rate    = 1
+    binding_range   = 0.05
+    unbinding_rate  = 0
+    unbinding_force = inf
+
+    display = ( color=red; size=3; width=1; )
+}
+
+
+set couple motor
+{
+    hand1     = myosin
+    hand2     = myosin
+    stiffness = 100
+    diffusion = fast
+    length    = 0.05
+}
+
+set couple crosslinker
+{
+    hand1     = binder
+    hand2     = binder
+    stiffness = 80
+    diffusion = fast
+    length    = 0.05
+    activity  = crosslink
+}
+
+
+new 150 fiber actin
+{
+    length    = 1.0, 0.3
+    direction = X
+    position  = cylinder 5 0.1
+}
+
+new event
+{
+    delay = 0.1
+    code = (report fiber:tensionX tension.txt { verbose=0 })
+}
+
+run 500 system
+
+new 1000 crosslinker { attach1 = actin }
+new 1000 motor { attach1 = actin }
+
+run 5000 system
+{
+    nb_frames = 500
+}
