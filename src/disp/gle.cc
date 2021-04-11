@@ -14,10 +14,10 @@
 
 namespace gle
 {
-    /// values of cosinus, sinus over a full circle
+    /// values of cosine, sine over a full circle
     float cir_[2*pi_twice+8] = { 0 };
     
-    /// non modifiable values of cosinus, sinus
+    /// non modifiable values of cosine, sine
     const float* circle_ = const_cast<float*>(cir_);
     
     /// OpenGL buffers objects for streaming

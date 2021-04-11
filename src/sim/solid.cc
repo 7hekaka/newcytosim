@@ -853,7 +853,7 @@ void Solid::reshape()
     
     real n = std::sqrt( a*a + b*b );
     
-    // cosine and sinus of the rotation:
+    // cosine and sine of the rotation:
     real c = 1, s = 0;
     if ( n > REAL_EPSILON ) {
         c = a / n;

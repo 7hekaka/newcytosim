@@ -19,8 +19,8 @@ class ForkProp;
 class Fork : public Couple
 {
 #if ( DIM == 2 )
-    /// sinus of angle, with [up, down] sign in space for 2D
-    mutable real sinus;
+    /// sine of angle, with [up, down] sign in space for 2D
+    mutable real sine;
 #endif
 public:
     

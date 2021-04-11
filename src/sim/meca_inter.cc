@@ -433,7 +433,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 
 /**
  Add an explicit torque to induce two segments to make an angle
- defined by (cosinus, sinus) relative to each other:
+ defined by (cosine, sine) relative to each other:
  
      torque = weigth * cross( dirA , dirB.rotated(angle) )
      forceA =  cross(torque, dirA)
@@ -442,7 +442,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
  The direction of `ptB` is rotated around `axis` defined as cross( dirA, dirB ).
  The calculation is explicit and all contributions go in the force vector vBAS[]
  It is assumed that `ang.norm() = 1`
- Note that if ( sinus == 0 ), you can use addTorque(ptA, ptB, weight)
+ Note that if ( sine == 0 ), you can use addTorque(ptA, ptB, weight)
  */
 void Meca::addTorqueExplicit(Interpolation const& ptA,
                              Interpolation const& ptB,
@@ -474,7 +474,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
      */
     Vector axis = cross(db, da).normalized(sign_real(ang.YY));
     
-    // rotate vector `db` around `arm` by angle specified as (cosinus, sinus):
+    // rotate vector `db` around `arm` by angle specified as (cosine, sine):
     Vector rot = ang.XX * db + ang.YY * cross(axis, db);
     
 #elif ( DIM == 2 )
@@ -482,7 +482,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     // this correspond to the Z-direction, up or down:
     real dir = sign_real(cross(da, db));
 
-    // rotate vector `db` by angle defined by (cosinus, sinus) around Z
+    // rotate vector `db` by angle defined by (cosine, sine) around Z
     Vector rot( db.XX*ang.XX + db.YY*ang.YY*dir, db.YY*ang.XX - db.XX*ang.YY*dir );
     
 #else
@@ -708,7 +708,7 @@ void Meca::addTorque(Interpolation const& pt1,
 #endif
 
     //std::clog << std::fixed;
-    //std::clog << std::setw(9) << Tvu << " " << std::setw(9) << Ruv << std::setw(9) << sinus << "\n";
+    //std::clog << std::setw(9) << Tvu << " " << std::setw(9) << Ruv << std::setw(9) << sine << "\n";
     //std::clog << "u " << std::setw(12) << u << " Tv " << std::setw(12) << Tv << "\n";
     //std::clog << "v " << std::setw(12) << v << " Ru " << std::setw(12) << Ru << "\n";
 
@@ -835,7 +835,7 @@ void Meca::addTorque(Interpolation const& pt1,
 
 #if ( 0 )
     const MatrixBlock dvFu = duFv.transposed();
-    //std::clog << iiA << " " << iiB << " " << iiC << " " << iiD << " " << sinus << "\n";
+    //std::clog << iiA << " " << iiB << " " << iiC << " " << iiD << " " << sine << "\n";
     std::clog << "duFu " << std::setw(12) << duFu << " duFv " << std::setw(12) << duFv << "\n";
     std::clog << "dvFu " << std::setw(12) << dvFu << " dvFv " << std::setw(12) << dvFv << "\n";
     std::clog << "Fu0 " << std::fixed << std::setw(12) << Fu0 << "    Fv0 " << std::setw(12) << Fv0 << "\n";
@@ -2812,7 +2812,7 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, MatrixBlock const& R,
  A tilted double link to represent MAP65/PRC1/Ase1 connectors, which are orientated
  with an angle of 70 relative to the microtubule surface.
  
- The angle of rotation is defined by cosinus and sinus values (c, s), and is
+ The angle of rotation is defined by cosine and sine values (c, s), and is
  measured from the axis of each fiber (from minus to plus ends):
  - (1, 0) is no rotation, where the link extends parallel to the fiber
  - (0, 1) is a 90 degree rotation, and the link extends orthogonal to the fiber

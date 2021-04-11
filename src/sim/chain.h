@@ -429,7 +429,7 @@ public:
     real         bendingEnergy0() const;
 
     /// the cosine of the maximum segment angle: indicate the errors due to curvature
-    real         minCosinus() const;
+    real         minCosine() const;
     
     /// number of joints at which ( cosine(angle) < threshold )
     size_t       nbKinks(real threshold = 0) const;

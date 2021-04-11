@@ -26,13 +26,13 @@ namespace gle
     constexpr size_t pi_once = finesse * 6;
     constexpr size_t pi_half = finesse * 3;
     
-    /// values of cosinus, sinus over a full circle
+    /// values of cosine, sine over a full circle
     extern const float* circle_;
 
-    /// access to precomputed cosinus
+    /// access to precomputed cosine
     inline float cos_(size_t n) { return circle_[4+2*n]; }
     
-    /// access to precomputed sinus
+    /// access to precomputed sine
     inline float sin_(size_t n) { return circle_[5+2*n]; }
 
     /// initialize the arrays
@@ -50,13 +50,13 @@ namespace gle
     /// initialize more buffer objects
     void setBuffers();
     
-    /// calculate sinus and cosinus
+    /// calculate sine and cosine
     void compute_circle(size_t cnt, GLfloat CS[], double rad, double start, double theta, GLfloat cX, GLfloat cY);
 
-    /// calculate sinus and cosinus
+    /// calculate sine and cosine
     void compute_circle(size_t cnt, GLfloat CS[], double rad, double start = 0);
 
-    /// calculate sinus and cosinus for a circular arc
+    /// calculate sine and cosine for a circular arc
     void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
     
     /// inverse square root

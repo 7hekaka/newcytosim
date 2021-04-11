@@ -1470,7 +1470,7 @@ real Chain::bendingEnergy0() const
 }
 
 
-real Chain::minCosinus() const
+real Chain::minCosine() const
 {
     real res;
     Vector dir1, dir2;
@@ -1674,7 +1674,7 @@ void Chain::adjustSegmentation()
     // accumulate the error in variable autoCut, 
     // The error is in angle-square: 1-cos(angle) ~ (angle)^2
     if ( ++autoCutCnt > 0 )
-        autoCutVal += 1.0 - minCosinus();
+        autoCutVal += 1.0 - minCosine();
     
     // after accumulation of time steps, we check the result
     if ( autoCutCnt >= RECUT_PERIOD )

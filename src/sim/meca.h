@@ -431,30 +431,30 @@ public:
     /// Add an explicit torque to constrain two segments to be parallel
     void addTorqueExplicit(Interpolation const&, Interpolation const&, real weight);
 
-    /// Add an explicit torque to constrain two segments to an angle defined by ang = (cosinus, sinus)
+    /// Add an explicit torque to constrain two segments to an angle defined by ang = (cosine, sine)
     void addTorqueExplicit(Interpolation const&, Interpolation const&, Vector2 const& ang, real weight);
     
     //------------------------- IMPLICIT ELEMENTS ------------------------------
 
-    /// Add a torque to constrain two segments to an angle defined by ang = (cosinus, sinus)
+    /// Add a torque to constrain two segments to an angle defined by ang = (cosine, sine)
     static MatrixBlock torqueMatrix(real weight, Torque const& axis, Vector2 const& ang);
 
     /// old code that has been replaced by interTorque()
     void addTorquePoliti(Interpolation const&, Interpolation const&, Vector2 const& ang, real weight);
     
-    /// Add a torque to constrain two segments to an angle defined by ang = (cosinus, sinus)
+    /// Add a torque to constrain two segments to an angle defined by ang = (cosine, sine)
     void addTorque(Interpolation const&, Interpolation const&, MatrixBlock const&, real weight);
 
-    /// Add a torque to constrain two segments to an angle defined by ang = (cosinus, sinus)
+    /// Add a torque to constrain two segments to an angle defined by ang = (cosine, sine)
     void addTorque(Interpolation const&, Interpolation const&, Vector2 const& ang, real weight);
 
-    /// Add a torque on 3 points with equilibrium angle defined by ang = (cosinus, sinus)
+    /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine)
     void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight);
 
-    /// Add a torque on 3 points with equilibrium angle defined by ang = (cosinus, sinus)
+    /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine)
     void addTorquePlane(Mecapoint const&, Mecapoint const&, Mecapoint const&, Torque const&, Vector2 const& ang, real weight);
 
-    /// Add a torque on 3 points with equilibrium angle defined by ang = (cosinus, sinus), add LongLink on two points
+    /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine), add LongLink on two points
     void addTorqueLong(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
 
     /// Link of stiffness `weight` from fixed position
@@ -612,10 +612,10 @@ public:
     /// Link of stiffness `weight` and resting length `arm`, on the sides of both fibers
     void addSideSideLink(Interpolation const&, Interpolation const&, real arm, real weight);
     
-    /// Link of stiffness `weight` on the sides of both fibers and tilted by (cosinus, sinus)
+    /// Link of stiffness `weight` on the sides of both fibers and tilted by (cosine, sine)
     void addTiltedSideSideLink(Interpolation const&, MatrixBlock const&, Interpolation const&, MatrixBlock const&, real weight);
 
-    /// Link of stiffness `weight` on the sides of both fibers and tilted by ang = (cosinus, sinus)
+    /// Link of stiffness `weight` on the sides of both fibers and tilted by ang = (cosine, sine)
     void addTiltedSideSideLink(Interpolation const&, Torque const& arm1, Interpolation const&, Torque const& arm2, real len, Vector2 const& ang, real weight);
 
     /// Link of stiffness `weight` and perpendicular to first segment

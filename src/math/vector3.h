@@ -688,7 +688,7 @@ public:
         // for an inverted basis, use F.set(c, b - s*N, YY);
     }
 
-    /// rotate `vec` around `*this`, by angle defined by cosinus and sinus
+    /// rotate `vec` around `*this`, by angle defined by cosine and sine
     /**
      It is assumed that norm(*this)==1
      The result is a unit Vector orthogonal to *this, of norm `c*c + s*s`

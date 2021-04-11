@@ -294,7 +294,7 @@ void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, re
      F2 = -F1 -F3
  
  These forces are normal to the segments: dot(F1, t1) = dot(F3, t2) = 0
- The cosinus are obtained here from the normalized difference vector 'dir'.
+ The cosine are obtained here from the normalized difference vector 'dir'.
 
  Ivan Hornak & Heiko Rieger in:
      Stochastic Model of T Cell Repolarization during Target Elimination

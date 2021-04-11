@@ -195,12 +195,12 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         modulo->fold(off);
 #endif
     
-    real C = dot(d11, d22);  // cosinus of angle
+    real C = dot(d11, d22);  // cosine of angle
     
     if ( 1-abs_real(C) > 128 * REAL_EPSILON )
     {
         // if C~1, the value of 1.0-C*C may be imprecise
-        real iS = 1 / (( 1 - C ) * ( 1 + C ));    // 1.0 / sinus^2
+        real iS = 1 / (( 1 - C ) * ( 1 + C ));    // 1.0 / sine^2
         // This deals with the general case of non-parallel lines
 #if ( DIM > 2 )
         // direction N of the shortest path is orthogonal to both lines:

@@ -1056,7 +1056,7 @@ public:
                          vec.YY, -vec.XX,     dia);
     }
     
-    /// 2D Rotation around `axis` (of norm 1) with angle set by cosinus and sinus values
+    /// 2D Rotation around `axis` (of norm 1) with angle set by cosine and sine values
     /**
      This is equivalent to rotationAroundAxis(axis, c, s) - outerProduct(axis)
      Attention: This is meant to be called with `norm(axis)==1` and `c*c + s*s == 1`
@@ -1075,7 +1075,7 @@ public:
 
 #pragma mark - Rotations
     
-    /// rotation around `axis` (of norm 1) with angle set by cosinus and sinus values
+    /// rotation around `axis` (of norm 1) with angle set by cosine and sine values
     /**
      Attention: the result is a rotation only if `norm(axis)==1` and `c*c + s*s == 1`
      but the values of 'c' and 's' can be scaled to obtain a matrix where the
@@ -1085,7 +1085,7 @@ public:
     {
         /*
          This is using Rodrigues's formula:
-             Id + sinus * K + ( 1 - cosinus ) * K^2
+             Id + sine * K + ( 1 - cosine ) * K^2
              K = -Id (X) axis       (-K is the cross product matrix)
              K^2 = axis (x) axis - Id
          

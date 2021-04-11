@@ -856,14 +856,14 @@ public:
         return Matrix22(dia, off, -off, dia);
     }
     
-    /// Rotation with angle set by cosinus and sinus values
+    /// Rotation with angle set by cosine and sine values
     static Matrix22 planarRotation(const real axis, const real c, const real s)
     {
         real sa = s * sign_real(axis);
         return Matrix22(c, sa, -sa, c);
     }
     
-    /// return rotation matrix of angle defined by cosinus and sinus
+    /// return rotation matrix of angle defined by cosine and sine
     static Matrix22 rotation(const real c, const real s)
     {
         return Matrix22(c, s, -s, c);
