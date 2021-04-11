@@ -2804,7 +2804,7 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, MatrixBlock const& R,
             add_base(ii3, wDt*off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
+    DRAW_LINK(ptA, ptA.pos(), R * ptA.diff(), T * ptB.diff(), ptB.pos());
 }
 
 

@@ -197,7 +197,7 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
     
     real C = dot(d11, d22);  // cosinus of angle
     
-    if ( abs_real(1-C) > REAL_EPSILON )
+    if ( 1-abs_real(C) > 128 * REAL_EPSILON )
     {
         // if C~1, the value of 1.0-C*C may be imprecise
         real iS = 1 / (( 1 - C ) * ( 1 + C ));    // 1.0 / sinus^2
@@ -259,7 +259,9 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         abs2 = 0.5 * ( std::min(len2, std::max(m2, p2)) + std::max((real)0, std::min(m2, p2)));
         
         // return distance between lines
-        return off.normSqr() - d1off * d1off;
+        real res = off.normSqr() - d1off * d1off;
+        //real dis = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
+        return res;
     }
 }
 
