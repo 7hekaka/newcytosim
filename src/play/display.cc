@@ -520,10 +520,11 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
 
     if ( prep_time != sim.time() )
     {
-        // the cluster analysis only needs to be done once per state:
-        //prep_time = sim.time();
+        // the analysis only needs to be done once per state:
+        prep_time = sim.time();
+        // compute clusters:
         if ( fiber_prep & 1 )
-            sim.flagClusters(0, 0, 1);
+            sim.flagClusters(1, 0, 0);
         
         // if fiber tensions are used for display, recompute them now:
         if ( fiber_prep & 2 )
