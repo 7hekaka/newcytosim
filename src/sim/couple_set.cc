@@ -13,6 +13,7 @@
 #include "glossary.h"
 #include "simul.h"
 
+extern Modulo const* modulo;
 
 //------------------------------------------------------------------------------
 
@@ -649,6 +650,42 @@ size_t CoupleSet::count(bool (*func)(Object const*, void const*), void const* ar
     size_t fa = ObjectSet::count(faList, func, arg);
     size_t aa = ObjectSet::count(aaList, func, arg);
     return ff + af + fa + aa;
+}
+
+/**
+ Sum tensions of all Couples stretching accross the plane defined by `n.pos + a = 0`
+
+ The tension is normally positive for stretching
+ */
+void CoupleSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const
+{
+    cnt = 0;
+    sum = 0;
+    inf = INFINITY;
+    sup = -INFINITY;
+
+    Vector dir = normalize(n);
+    for ( Couple * c = firstAA(); c; c = c->next() )
+    {
+        Vector h1 = c->posHand1();
+        Vector h2 = c->posHand2();
+        if ( modulo )
+        {
+            Vector cen = n * ( -a / n.normSqr() );
+            modulo->fold(h1, cen);
+            modulo->fold(h2, h1);
+        }
+        real x = dot(n, h1) + a;
+        real y = dot(n, h2) + a;
+        if ( x * y < 0 )
+        {
+            real h = dot(dir, c->force()) * sign_real(y-x);
+            inf = std::min(inf, h);
+            sup = std::max(sup, h);
+            sum += h;
+            ++cnt;
+        }
+    }
 }
 
 

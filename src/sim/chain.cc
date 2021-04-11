@@ -2050,9 +2050,12 @@ real Chain::projectedForceEnd(const FiberEnd end) const
 
 void Chain::briefdoc(std::ostream& os, real len, real con, real mn, real mx) const
 {
+    std::streamsize p = os.precision();
+    os.precision(3);
     os << "chain " << reference();
     os << "( seg " << segmentation() << ": " << mn << " +" << mx-mn;
     os << " len " << len << " " << std::showpos << con-len << std::noshowpos << " )";
+    os.precision(p);
 }
 
 

@@ -1257,8 +1257,8 @@ void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector 
 {
     cnt = 0;
     sum = 0;
-    inf = 0;
-    sup = 0;
+    inf = INFINITY;
+    sup = -INFINITY;
 
     Vector dir = normalize(n);
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
@@ -1291,9 +1291,9 @@ void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup) const
 {
     cnt = 0;
     sum = 0;
-    inf = 0;
-    sup = 0;
-    
+    inf = INFINITY;
+    sup = -INFINITY;
+
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
         for ( size_t s = 0; s < fib->nbSegments(); ++s )

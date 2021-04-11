@@ -54,7 +54,6 @@ private:
         }
     }
 
-
     /// holds the property and the list of singles
     typedef std::pair<CoupleProp const*, CoupleList> CoupleReserve;
 
@@ -91,6 +90,20 @@ private:
     /// release Couples from reserve lists
     void uniRelax();
     
+    /// detach AA Couple
+    void detachAA(Couple*);
+    /// detach AF Couple
+    void detachAF(Couple*);
+    /// detach FA Couple
+    void detachFA(Couple*);
+
+    /// delete AA Couple
+    void deleteAA(Couple*);
+    /// delete AF Couple
+    void deleteAF(Couple*);
+    /// delete FA Couple
+    void deleteFA(Couple*);
+
 public:
         
     /// flags to skip unattached Couple in trajectory file
@@ -130,9 +143,6 @@ public:
     
     /// save objects
     void write(Outputter& out) const { write(out, false); }
-
-    /// print a summary of the content (nb of objects, class)
-    void report(std::ostream&) const;
 
     //--------------------------
 
@@ -184,6 +194,22 @@ public:
     size_t sizeAA()  const{ return aaList.size(); }
     /// total number of elements
     size_t size()    const{ return ffList.size() + faList.size() + afList.size() + aaList.size(); }
+
+    /// erase all Object and all Property
+    void erase();
+    
+    /// mix order of elements
+    void shuffle();
+    
+    /// prepare for step()
+    void prepare(PropertyList const& properties);
+    
+    /// Monte-Carlo step
+    void step();
+    
+    /// cleanup at end of simulation period
+    void relax() { uniRelax(); }
+    
     
     /// return pointer to the Object of given ID, or zero if not found
     Couple * findID(ObjectID n)        const { return static_cast<Couple*>(inventory_.get(n)); }
@@ -202,12 +228,14 @@ public:
     
     /// number of objects for which func(this, val) == true
     size_t count(bool (*func)(Object const*, void const*), void const*) const;
-
-    /// erase all Object and all Property
-    void erase();
     
-    /// mix order of elements
-    void shuffle();
+    /// print a summary of the content (nb of objects, class)
+    void report(std::ostream&) const;
+    
+    /// sum tension accross plane defined by `n.pos + a = 0`
+    void infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const;
+
+    //--------------------------
 
     /// distribute the Couple on the fibers to approximate an equilibrated state
     void equilibrateSym(FiberSet const&, CoupleList&, CoupleProp const*);
@@ -230,33 +258,10 @@ public:
     /// distribute all free Couples on filament intersections
     void bindToIntersections();
 
-    /// prepare for step()
-    void prepare(PropertyList const& properties);
-    
-    /// Monte-Carlo step
-    void step();
-    
-    /// cleanup at end of simulation period
-    void relax() { uniRelax(); }
-    
     /// bring all objects to centered image using periodic boundary conditions
     void foldPositions(Modulo const*) const;
 
     //--------------------------
-    
-    /// detach FF Couple
-    void detachAA(Couple *);
-    /// detach AF Couple
-    void detachAF(Couple *);
-    /// detach FA Couple
-    void detachFA(Couple *);
-
-    /// delete FF Couple
-    void deleteAA(Couple *);
-    /// delete AF Couple
-    void deleteAF(Couple *);
-    /// delete FA Couple
-    void deleteFA(Couple *);
 
     /// mark object before import
     void freeze(ObjectFlag f);
