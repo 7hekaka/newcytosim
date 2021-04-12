@@ -536,7 +536,7 @@ void Simul::computeForces() const
     }
     catch ( Exception & e )
     {
-        std::cerr << "Error, cytosim could not compute forces:\n";
+        std::cerr << "Error, Cytosim could not compute forces:\n";
         std::cerr << "   " << e.message() << '\n';
     }
 }

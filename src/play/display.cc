@@ -1066,8 +1066,10 @@ void Display::drawFiberPoints(Fiber const& fib) const
     if ( style == 1 )
     {
         // display vertices:
+        glDisable(GL_POINT_SMOOTH);
         pointSize(disp->point_size);
         drawStrip(fib.nbPoints(), fib.addrPoints(), GL_POINTS);
+        glEnable(GL_POINT_SMOOTH);
     }
     else if ( style == 2 )
     {

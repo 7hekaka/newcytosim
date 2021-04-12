@@ -227,7 +227,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         fluteVC* flu = gle::mapVertexColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
-            if ( obj->active() & obj->disp1()->perceptible )
+            if ( obj->active() && obj->disp1()->perceptible )
                 flu[i++] = {setVertex(obj->posFree(), obj), obj->disp1()->color2};
         }
         gle::unmapVertexColorBuffer();
@@ -235,7 +235,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         glDrawArrays(GL_POINTS, 0, i);
 
 #if ( DIM > 1 )
-        // display inactive Couples with smaller size:
+        // display inactive Couples with square dots:
         i = 0;
         flu = gle::mapVertexColorBuffer(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
@@ -244,8 +244,10 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
                 flu[i++] = {fluteV{obj->posFree()}, obj->disp1()->color2};
         }
         gle::unmapVertexColorBuffer();
+        glDisable(GL_POINT_SMOOTH);
         pointSize(M_SQRT1_2*prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
+        glEnable(GL_POINT_SMOOTH);
 #endif
     }
 }

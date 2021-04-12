@@ -192,8 +192,8 @@ void display(View& view, int)
     }
 
     //-------------draw selected-cell
-    flu[i++] = {pos, gle_color(1,1,0)};
-    flu[i++] = {nod, gle_color(1,1,0)};
+    flu[i++] = {Vector2(pos), gle_color(1,1,0)};
+    flu[i++] = {Vector2(nod), gle_color(1,1,0)};
     unmapVertexColorBuffer();
     glPointSize(12);
     glEnableClientState(GL_COLOR_ARRAY);
