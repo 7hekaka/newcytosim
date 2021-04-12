@@ -22,7 +22,6 @@
 #include "space_cylinderZ.h"
 #include "space_cylinderP.h"
 #include "space_ring.h"
-#include "space_beads.h"
 #include "space_tee.h"
 
 #if NEW_SPACES
@@ -118,7 +117,6 @@ Space * SpaceProp::newSpace() const
 #if NEW_SPACES
     if ( s=="mesh" )                           return new SpaceMesh(this);
     if ( s=="force" )                          return new SpaceForce(this);
-    if ( s=="beads" )                          return new SpaceBeads(this);
 #endif
     
     //std::cerr << "Warning: unknown Space shape `"+s+"'\n";

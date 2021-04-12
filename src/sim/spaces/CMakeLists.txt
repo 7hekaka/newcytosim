@@ -21,7 +21,6 @@ set(SPACES_SOURCES
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_dynamic_sphere.cc"
     
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_force.cc"
-    "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_beads.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_polygonZ.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_tee.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_disc.cc"

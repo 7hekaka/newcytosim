@@ -658,8 +658,6 @@
 		BB97B7D720DE3B7E004D659C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB98FE920B35F66300796DAE /* meca.h in Headers */ = {isa = PBXBuildFile; fileRef = BB98FE900B35F66300796DAE /* meca.h */; };
 		BB98FE930B35F66300796DAE /* meca.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB98FE910B35F66300796DAE /* meca.cc */; };
-		BB9B5CAB1541C01800C0B9B6 /* space_beads.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5CA91541C01800C0B9B6 /* space_beads.cc */; };
-		BB9B5CAC1541C01800C0B9B6 /* space_beads.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5CAA1541C01800C0B9B6 /* space_beads.h */; };
 		BB9B5DE315429BF400C0B9B6 /* field.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5DE215429BF400C0B9B6 /* field.h */; };
 		BB9B5E0D15429ED100C0B9B6 /* field.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5E0C15429ED100C0B9B6 /* field.cc */; };
 		BB9D87A81E76BB0000DD0F00 /* test_matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E4E00E8EB4A60009F6D0 /* test_matrix.cc */; };
@@ -881,7 +879,6 @@
 		BBE82A3B233D15EB00BE44DF /* space_capsule.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88394C10B4912A00A4028F /* space_capsule.h */; };
 		BBE82A3C233D15EB00BE44DF /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
 		BBE82A3D233D15EB00BE44DF /* space_periodic.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4B5EA13E04D2400CBE163 /* space_periodic.h */; };
-		BBE82A3F233D15EB00BE44DF /* space_beads.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5CAA1541C01800C0B9B6 /* space_beads.h */; };
 		BBE82A41233D15EB00BE44DF /* space_ring.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE9D38C158500BA00FF944A /* space_ring.h */; };
 		BBE82A42233D15EB00BE44DF /* space_cylinderP.h in Headers */ = {isa = PBXBuildFile; fileRef = E2F6428815D01466009B7C31 /* space_cylinderP.h */; };
 		BBE82A43233D15EB00BE44DF /* space_force.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */; };
@@ -903,7 +900,6 @@
 		BBE82A59233D15EB00BE44DF /* space_capsule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88394B10B4912A00A4028F /* space_capsule.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A5A233D15EB00BE44DF /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A5B233D15EB00BE44DF /* space_periodic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4B5E913E04D2400CBE163 /* space_periodic.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
-		BBE82A5C233D15EB00BE44DF /* space_beads.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5CA91541C01800C0B9B6 /* space_beads.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A5D233D15EB00BE44DF /* space_ring.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE9D38B158500BA00FF944A /* space_ring.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A5E233D15EB00BE44DF /* space_cylinderP.cc in Sources */ = {isa = PBXBuildFile; fileRef = E2F6428715D01466009B7C31 /* space_cylinderP.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A5F233D15EB00BE44DF /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
@@ -1712,8 +1708,6 @@
 		BB98FE900B35F66300796DAE /* meca.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = meca.h; path = src/sim/meca.h; sourceTree = SOURCE_ROOT; };
 		BB98FE910B35F66300796DAE /* meca.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = meca.cc; path = src/sim/meca.cc; sourceTree = SOURCE_ROOT; };
 		BB9A56010A74E9E40069E362 /* test_tesselator.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_tesselator.cc; path = src/test/test_tesselator.cc; sourceTree = SOURCE_ROOT; };
-		BB9B5CA91541C01800C0B9B6 /* space_beads.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_beads.cc; path = src/sim/spaces/space_beads.cc; sourceTree = SOURCE_ROOT; };
-		BB9B5CAA1541C01800C0B9B6 /* space_beads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_beads.h; path = src/sim/spaces/space_beads.h; sourceTree = SOURCE_ROOT; };
 		BB9B5DE215429BF400C0B9B6 /* field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = field.h; sourceTree = "<group>"; };
 		BB9B5E0C15429ED100C0B9B6 /* field.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = field.cc; sourceTree = "<group>"; };
 		BB9B6DC806AC5160004A4D10 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -2882,8 +2876,6 @@
 				BBA176EC22103C5C0046E858 /* space_mesh.cc */,
 				BB48AB011B42BABD008540D1 /* space_banana.h */,
 				BB48AB001B42BABD008540D1 /* space_banana.cc */,
-				BB9B5CAA1541C01800C0B9B6 /* space_beads.h */,
-				BB9B5CA91541C01800C0B9B6 /* space_beads.cc */,
 				BB88394C10B4912A00A4028F /* space_capsule.h */,
 				BB88394B10B4912A00A4028F /* space_capsule.cc */,
 				BB8838C210B48EF900A4028F /* space_cylinder.h */,
@@ -3825,7 +3817,6 @@
 				BB955CF6116FCB39000E70A6 /* space_set.h in Headers */,
 				BBE4B5EE13E04D2400CBE163 /* space_periodic.h in Headers */,
 				BB805D62241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */,
-				BB9B5CAC1541C01800C0B9B6 /* space_beads.h in Headers */,
 				BBE9D38E158500BA00FF944A /* space_ring.h in Headers */,
 				E2F6428B15D01466009B7C31 /* space_cylinderP.h in Headers */,
 				BB5CF1FB16DD2D5A00EF0FE3 /* space_force.h in Headers */,
@@ -3860,7 +3851,6 @@
 				BBE82A3C233D15EB00BE44DF /* space_set.h in Headers */,
 				BBE82A3D233D15EB00BE44DF /* space_periodic.h in Headers */,
 				BB805D63241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */,
-				BBE82A3F233D15EB00BE44DF /* space_beads.h in Headers */,
 				BBE82A41233D15EB00BE44DF /* space_ring.h in Headers */,
 				BBE82A42233D15EB00BE44DF /* space_cylinderP.h in Headers */,
 				BBE82A43233D15EB00BE44DF /* space_force.h in Headers */,
@@ -5043,7 +5033,6 @@
 				BB805D64241A3F1500B62699 /* space_dynamic_ellipse.cc in Sources */,
 				BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */,
 				BBE4B5ED13E04D2400CBE163 /* space_periodic.cc in Sources */,
-				BB9B5CAB1541C01800C0B9B6 /* space_beads.cc in Sources */,
 				BBE9D38D158500BA00FF944A /* space_ring.cc in Sources */,
 				E2F6428915D01466009B7C31 /* space_cylinderP.cc in Sources */,
 				BB5CF1F916DD2D5A00EF0FE3 /* space_force.cc in Sources */,
@@ -5087,7 +5076,6 @@
 				BB805D65241A3F1500B62699 /* space_dynamic_ellipse.cc in Sources */,
 				BBE82A5A233D15EB00BE44DF /* space_banana.cc in Sources */,
 				BBE82A5B233D15EB00BE44DF /* space_periodic.cc in Sources */,
-				BBE82A5C233D15EB00BE44DF /* space_beads.cc in Sources */,
 				BBE82A5D233D15EB00BE44DF /* space_ring.cc in Sources */,
 				BBE82A5E233D15EB00BE44DF /* space_cylinderP.cc in Sources */,
 				BBE82A5F233D15EB00BE44DF /* space_force.cc in Sources */,
