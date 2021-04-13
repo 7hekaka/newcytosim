@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include <csignal>
 
@@ -14,11 +14,12 @@
 #include "tictoc.h"
 #include "unistd.h"
 
+
 void help(std::ostream& os)
 {
     os << "sim [OPTIONS] [FILE]\n";
-    os << "  FILE    if FILE ends with `.cym', run specified config file\n";
-    os << "  +       redirect outputs to terminal instead of `messages.cmo'\n";
+    os << "  FILE    run specified config file, if ending with `.cym'\n";
+    os << "  +       redirect output to terminal instead of `messages.cmo'\n";
     os << "  -       suppress output\n";
     os << "  info    print build options\n";
     os << "  help    print this message\n";
@@ -58,26 +59,25 @@ void handle_interrupt(int sig)
 //=================================  MAIN  =====================================
 //------------------------------------------------------------------------------
 
-void print_error(Exception const& e)
-{
-    print_magenta(std::cerr, e.brief());
-    std::cerr << e.info() << '\n';
-}
+/// for normal output:
+using std::cout;
+/// where errors are printed:
+using std::cerr;
 
 int main(int argc, char* argv[])
 {
     // register callback to catch interrupting signals:
     if ( signal(SIGINT, handle_interrupt) )
-        std::cerr << "Could not register SIGINT handler\n";
+        cerr << "Could not register SIGINT handler\n";
     if ( signal(SIGTERM, handle_interrupt) )
-        std::cerr << "Could not register SIGTERM handler\n";
+        cerr << "Could not register SIGTERM handler\n";
 #if 0
     if ( signal(SIGSEGV, handle_signal) )
-        std::cerr << "Could not register SIGSEGV handler\n";
+        cerr << "Could not register SIGSEGV handler\n";
     if ( signal(SIGILL,  handle_signal) )
-        std::cerr << "Could not register SIGILL handler\n";
+        cerr << "Could not register SIGILL handler\n";
     if ( signal(SIGABRT, handle_abort) )
-        std::cerr << "Could not register SIGABRT handler\n";
+        cerr << "Could not register SIGABRT handler\n";
 #endif
     // catch division by zero and Nan
     //feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
@@ -90,15 +90,15 @@ int main(int argc, char* argv[])
 
     if ( arg.use_key("help") || arg.use_key("--help") )
     {
-        splash(std::cout);
-        help(std::cout);
+        splash(cout);
+        help(cout);
         return EXIT_SUCCESS;
     }
 
     if ( arg.use_key("info") || arg.use_key("--version")  )
     {
-        splash(std::cout);
-        print_version(std::cout);
+        splash(cout);
+        print_version(cout);
         return EXIT_SUCCESS;
     }
     
@@ -143,31 +143,33 @@ int main(int argc, char* argv[])
         simul.initialize(arg);
     }
     catch( Exception & e ) {
-        print_error(e);
+        print_magenta(cerr, e.brief());
+        cerr << e.info() << '\n';
         return EXIT_FAILURE;
     }
     catch(...) {
-        print_red(std::cerr, "Error: an unknown exception occurred during initialization\n");
+        print_magenta(cerr, "Error: an unknown exception occurred during initialization\n");
         return EXIT_FAILURE;
     }
     
-    arg.print_warning(std::cerr, 1, " on command line\n");
+    arg.print_warning(cerr, 1, " on command line\n");
     time_t sec = TicToc::seconds_since_1970();
     
     try {
         Parser(simul, 1, 1, 1, 1, 1).readConfig();
     }
     catch( Exception & e ) {
-        print_error(e);
+        print_magenta(cerr, e.brief());
+        cerr << e.info() << '\n';
         return EXIT_FAILURE;
     }
     catch(...) {
-        std::cerr << "Error: an unknown exception occurred\n";
+        print_magenta(cerr, "Error: an unknown exception occurred\n");
         return EXIT_FAILURE;
     }
     
     Cytosim::out << "% " << TicToc::date() << "\n";
     sec = TicToc::seconds_since_1970() - sec;
-    Cytosim::out << "end  " << sec << " s ( " << (real)( sec / 60 ) / 60.0 << " h )\n";
+    Cytosim::out << "end  " << sec << " s ( " << (real)(sec/60)/60.0 << " h )\n";
     Cytosim::out.close();
 }

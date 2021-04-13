@@ -1203,12 +1203,13 @@ void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx)
 VisibleLattice const* Fiber::visibleLattice() const
 {
 #if FIBER_HAS_MESH
-    return &fMesh;
-#elif FIBER_HAS_LATTICE
-    return &fLattice;
-#else
-    return nullptr;
+    if ( fMesh.ready() )
+        return &fMesh;
 #endif
+#if FIBER_HAS_LATTICE
+    return &fLattice;
+#endif
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -1488,9 +1489,9 @@ void Fiber::infoMesh(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool 
 #pragma mark - Glue
 
 /**
- fiber:glue=1 creates a Single if the tip of the Fiber goes outside the Space.
- The Single's hand is managed to always be attached at the tip of the Fiber.
- The Single detaches if the Fiber tip is pulled inside.
+ setGlue1 keeps the Single attached as long as the Fiber tip is outside the Space.
+ The Single's hand is managed to always remain at the tip of the Fiber.
+ The Single detaches immediately if the Fiber tip is back inside.
  This generates mostly a pushing force from the cortex
  */
 void Fiber::setGlue1(Single* glue, const FiberEnd end, Space const* spc)
@@ -1520,8 +1521,7 @@ void Fiber::setGlue1(Single* glue, const FiberEnd end, Space const* spc)
 
 
 /**
- fiber:glue=2
- The Single's hand is managed to always be attached at the tip of the Fiber.
+ setGlue2 keeps the Single always at the tip of the Fiber.
  The Single's hand detaches only spontaneously.
  This creates both pulling and pushing force from the cortex
  */
@@ -1548,8 +1548,8 @@ void Fiber::setGlue2(Single* glue, const FiberEnd end, Space const* spc)
 
 
 /**
- fiber:glue=3 creates a Single at the position where the Fiber crosses the Space's edge.
- This makes an anchor point exactly at the cortex.
+ setGlue3 keeps the Single where the Fiber first crosses the Space's edge.
+ This makes an anchor point exactly at the edge, and only controls attachment.
  The Single's Hand behaves and detaches normally.
  */
 void Fiber::setGlue3(Single* glue, Space const* spc)
@@ -1590,7 +1590,7 @@ void Fiber::setGlue3(Single* glue, Space const* spc)
 
 
 /**
- This associates a Single to the end of the Fiber if this end is growing.
+ setGlueG keeps the Single attached to the fiber tip if this tip is Growing.
  */
 void Fiber::setGlueG(Single* glue, FiberEnd end)
 {
@@ -1610,7 +1610,8 @@ void Fiber::setGlueG(Single* glue, FiberEnd end)
 
 
 /**
- This associates a Single to the end of the Fiber at any time
+ setGlueE keeps the Single at the end of the Fiber until it detaches spontaneously,
+ and rebind the Single when the Fiber tip resumes growth.
  */
 void Fiber::setGlueE(Single* glue, FiberEnd end)
 {
