@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef DUO_H
 #define DUO_H
@@ -22,21 +22,21 @@ class Duo : public Couple
     friend class DuoProp;
     
     /// Gillespie countdown timer for deactivation event
-    real    gspTime;
+    real countdown_;
     
-    /// switch on activity flag
-    void    activate();
+    /// switch activity 'on'
+    void activate();
     
-    /// switch off activity flag
-    void    deactivate();
+    /// switch activity 'off'
+    void deactivate();
     
     /// check for deactivation
-    void    deactivation();
+    void tryDeactivate();
     
 protected:
     
     /// active flag
-    int     mActive;
+    int active_;
     
 public:
     
@@ -50,25 +50,25 @@ public:
     virtual ~Duo();
     
     /// activity flag
-    bool    active() const { return mActive; }
+    int  active() const { return active_; }
     
     /// simulation step for a free Duo
-    void    stepFF();
+    void stepFF();
     
     /// simulation step for a Duo attached by Hand1
-    void    stepAF();
+    void stepAF();
     
     /// simulation step for a Duo attached by Hand2
-    void    stepFA();
+    void stepFA();
     
     /// simulation step for a linking Duo
-    void    stepAA();
+    void stepAA();
 
     /// write to file
-    void    write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// read from file
-    void    read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
 };
 

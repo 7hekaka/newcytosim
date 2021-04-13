@@ -21,7 +21,7 @@ class LineDisp;
 
 
 /// Flag to add a Lattice of integers to each Fiber {0, 1}
-#define FIBER_HAS_LATTICE 1
+#define FIBER_HAS_LATTICE 0
 
 /// Flag to add a Lattice of reals to each Fiber {0, 1}
 #define FIBER_HAS_MESH 1

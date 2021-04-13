@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "duo.h"
 #include "duo_prop.h"
@@ -13,7 +13,7 @@ extern Modulo const* modulo;
 //------------------------------------------------------------------------------
 
 Duo::Duo(DuoProp const* p, Vector const& w)
-: Couple(p, w), mActive(0), prop(p)
+: Couple(p, w), active_(0), prop(p)
 {
 }
 
@@ -26,13 +26,13 @@ Duo::~Duo()
 
 void Duo::activate()
 {
-    mActive = 1;
-    gspTime = RNG.exponential();
+    active_ = 1;
+    countdown_ = RNG.exponential();
 }
 
 void Duo::deactivate()
 {
-    mActive = 0;
+    active_ = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -58,15 +58,15 @@ void Duo::stepFF()
 
     
     // activity
-    if ( mActive )
+    if ( active_ )
     {
         // spontaneous de-activation:
-        gspTime -= prop->deactivation_rate_dt;
-        if ( gspTime <= 0 )
+        countdown_ -= prop->deactivation_rate_dt;
+        if ( countdown_ <= 0 )
         {
             deactivate();
             // test fraction of time when it is inactive:
-            if ( RNG.test(-gspTime/prop->deactivation_rate_dt) )
+            if ( RNG.test(-countdown_/prop->deactivation_rate_dt) )
                 return;
         }
     
@@ -81,10 +81,10 @@ void Duo::stepFF()
 /**
  test for spontaneous de-activation
  */
-void Duo::deactivation()
+void Duo::tryDeactivate()
 {
-    gspTime -= prop->deactivation_rate_dt;
-    if ( gspTime <= 0 )
+    countdown_ -= prop->deactivation_rate_dt;
+    if ( countdown_ <= 0 )
         deactivate();
 }
 
@@ -97,8 +97,8 @@ void Duo::deactivation()
  */
 void Duo::stepAF()
 {
-    if ( mActive && prop->vulnerable )
-        deactivation();
+    if ( active_ && prop->vulnerable )
+        tryDeactivate();
     
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
     cHand2->stepUnattached(simul(), cHand1->outerPos());
@@ -118,8 +118,8 @@ void Duo::stepAF()
  */
 void Duo::stepFA()
 {
-    if ( mActive && prop->vulnerable )
-        deactivation();
+    if ( active_ && prop->vulnerable )
+        tryDeactivate();
     
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
     cHand1->stepUnattached(simul(), cHand2->outerPos());
@@ -139,8 +139,8 @@ void Duo::stepFA()
  */
 void Duo::stepAA()
 {
-    if ( mActive && prop->vulnerable )
-        deactivation();
+    if ( active_ && prop->vulnerable )
+        tryDeactivate();
 
     Vector f = force();
     real fn = f.norm();
@@ -161,7 +161,7 @@ void Duo::stepAA()
 
 void Duo::write(Outputter& out) const
 {
-    out.writeUInt8(mActive);
+    out.writeUInt8(active_);
     Couple::write(out);
 }
 
@@ -171,7 +171,7 @@ void Duo::read(Inputter& in, Simul& sim, ObjectTag tag)
 #ifdef BACKWARD_COMPATIBILITY
     if ( in.formatID() > 36 )
 #endif
-    mActive = in.readUInt8();
+    active_ = in.readUInt8();
     Couple::read(in, sim, tag);
 }
 

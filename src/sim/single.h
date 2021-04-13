@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 #ifndef SINGLE_H
 #define SINGLE_H
 
@@ -50,25 +50,25 @@ class Single : public Object, public HandMonitor
 private:
     
     /// specialization of HandMonitor
-    void      afterAttachment(Hand const*);
+    void afterAttachment(Hand const*);
     /// specialization of HandMonitor
-    void      beforeDetachment(Hand const*);
+    void beforeDetachment(Hand const*);
     /// specialization of HandMonitor
-    Vector    linkBase(Hand const*) const { return posFoot(); }
-    /// = identity() of the Object on which a Wrist is attached, or Single::identity()
-    ObjectID  nucleatorID()         const { return base()?base()->identity():Object::identity(); }
+    Vector linkBase(Hand const*) const { return posFoot(); }
     /// specialization of HandMonitor
-    real      linkRestingLength()   const { return prop->length; }
+    real linkRestingLength() const { return prop->length; }
     /// stiffness of the interaction
-    real      linkStiffness()       const { return 0; }
+    real linkStiffness() const { return 0; }
+    /// return Base::identity() or Single::identity()
+    ObjectID nucleatorID() const { return base()?base()->identity():Object::identity(); }
 
 protected:
     
     /// the position of the foot
-    Vector        sPos;
+    Vector sPos;
     
     /// the motor domain
-    Hand *        sHand;
+    Hand * sHand;
 
 public:
     
@@ -84,57 +84,57 @@ public:
     //--------------------------------------------------------------------------
     
     /// associated Hand
-    Hand*   hand()                      const  { return sHand; }
+    Hand * hand() const { return sHand; }
     
     /// sHand->attached()
-    bool    attached()                  const  { return sHand->attached(); }
+    bool attached() const { return sHand->attached(); }
     
     /// sHand->attached()
-    int     state()                     const  { return sHand->attached(); }
+    int state() const { return sHand->attached(); }
 
     /// Fiber to which this is attached
-    Fiber*  fiber()                     const  { return sHand->fiber(); }
+    Fiber * fiber() const { return sHand->fiber(); }
     
     /// attachment position of Hand along fiber (call is invalid if Hand is not attached)
-    real    abscissa()                  const  { return sHand->abscissa(); }
+    real abscissa() const { return sHand->abscissa(); }
     
     /// position of the Hand (call is invalid if Hand is not attached)
-    Vector  posHand()                   const  { return sHand->pos(); }
+    Vector posHand() const { return sHand->pos(); }
     
     /// direction of Fiber at attachment point (call is invalid if Hand is not attached)
-    Vector  dirFiber()                  const  { return sHand->dirFiber(); }
+    Vector dirFiber() const { return sHand->dirFiber(); }
     
     /// attach Hand at the given site
-    void    attach(FiberSite s)                { if ( sHand->attachmentAllowed(s) ) sHand->attach(s); }
+    void attach(FiberSite s) { if ( sHand->attachmentAllowed(s) ) sHand->attach(s); }
     
     /// attach Hand at given Fiber end
-    void    attachEnd(Fiber * f, FiberEnd end) { sHand->attachEnd(f, end); }
+    void attachEnd(Fiber * f, FiberEnd end) { sHand->attachEnd(f, end); }
 
     /// move Hand at given end
-    void    moveToEnd(FiberEnd end)            { sHand->moveToEnd(end); }
+    void moveToEnd(FiberEnd end) { sHand->moveToEnd(end); }
     
     /// detach
-    void    detach()                           { sHand->detach(); }
+    void detach() { sHand->detach(); }
 
     //--------------------------------------------------------------------------
     
     ///return the position in space of the object
-    virtual Vector  position() const;
+    Vector position() const;
     
     /// Single can be translated only if it is not attached
-    virtual int     mobile()   const { return !sHand->attached(); }
+    int mobile() const { return !sHand->attached(); }
     
     /// translate object's position by the given vector
-    virtual void    translate(Vector const& x)   { sPos += x; }
+    void translate(Vector const& x)   { sPos += x; }
     
     /// move object to specified position
-    virtual void    setPosition(Vector const& x) { sPos = x; }
+    void setPosition(Vector const& x) { sPos = x; }
 
     /// bring object to centered image using periodic boundary conditions
-    virtual void    foldPosition(Modulo const*);
+    void foldPosition(Modulo const*);
     
     /// set the position randomly inside prop->confine_space
-    void            randomizePosition();
+    void randomizePosition();
 
     //--------------------------------------------------------------------------
     
@@ -171,10 +171,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// a static_cast<> of Object::next()
-    Single*         next() const { return static_cast<Single*>(nextO); }
+    Single * next() const { return static_cast<Single*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    Single*         prev() const { return static_cast<Single*>(prevO); }
+    Single * prev() const { return static_cast<Single*>(prevO); }
 
     //--------------------------------------------------------------------------
 
@@ -182,22 +182,22 @@ public:
     static const ObjectTag TAG = 's';
     
     /// return unique character identifying the class
-    ObjectTag        tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
     
     /// return associated Property
-    Property const*  property() const { return prop; }
+    Property const* property() const { return prop; }
     
     /// return PointDisp of associated Hand
     PointDisp const* disp() const { return sHand->prop->disp; }
 
     /// return Property::confine_space_ptr
-    Space const*     confineSpace() const { return prop->confine_space_ptr; }
+    Space const* confineSpace() const { return prop->confine_space_ptr; }
     
     /// read from file
-    virtual void    read(Inputter&, Simul&, ObjectTag);
+    virtual void read(Inputter&, Simul&, ObjectTag);
     
     /// write to file
-    virtual void    write(Outputter&) const;
+    virtual void write(Outputter&) const;
     
 };
 

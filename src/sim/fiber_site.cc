@@ -159,7 +159,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
             // the abscissa will be adjusted in Fiber::resetLattice()
             hAbs = ( hSite + 0.5 ) * hLattice->unit();
 #else
-            lati_t t = in.readInt32();
+            int32_t t = in.readInt32();
             // relying on the lattice_unit being correct at this stage:
             hAbs = ( t + 0.5 ) * hFiber->prop->lattice_unit;
             //throw InvalidIO("Cannot import Digit without fiber's lattice");

@@ -46,104 +46,104 @@ public:
 #if FIBER_HAS_LATTICE > 0
 
     /// true if given Lattice's site is outside Lattice's range
-    bool   outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
+    bool outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
 
     /// true if given Lattice's site has this footprint's bits set
-    bool   occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) & prop->footprint; }
+    bool occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) & prop->footprint; }
 
     /// true if given Lattice's site is unoccupied (check all footprint bits equal to 1)
-    bool   vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop->footprint); }
+    bool vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop->footprint); }
 
     /// flip footprint bits on current site
-    void   inc() const { assert_true(vacant(hSite)); hLattice->data(hSite) ^= prop->footprint; }
+    void inc() const { assert_true(vacant(hSite)); hLattice->data(hSite) ^= prop->footprint; }
 
     /// flip footprint bits on current site
-    void   dec() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacant(hSite));  }
+    void dec() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacant(hSite));  }
     
 #elif FIBER_HAS_LATTICE < 0
 
     /// true if given Lattice's site is outside Lattice's range
-    bool   outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
+    bool outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
 
     /// true if given Lattice's site is occupied
-    bool   occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) != 0.0; }
+    bool occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) != 0.0; }
 
     /// true if given Lattice's site is unoccupied
-    bool   vacant(lati_t s) const { return hLattice->data(s) == 0.0; }
+    bool vacant(lati_t s) const { return hLattice->data(s) == 0.0; }
 
     /// add 1.0 to Lattice's site
-    void   inc() const { hLattice->data(hSite) += 1.0; }
+    void inc() const { hLattice->data(hSite) += 1.0; }
 
     /// subtract 1.0 to Lattice's site
-    void   dec() const { hLattice->data(hSite) -= 1.0; }
+    void dec() const { hLattice->data(hSite) -= 1.0; }
     
 #else
 
     lati_t site() const { return (lati_t)std::round(hAbs/prop->step_size); }
-    bool   outsideMP(lati_t) const { return false; }
-    bool   occupied(FiberLattice& lat, lati_t s) const { return false; }
-    bool   vacant(lati_t) const { return true; }
-    void   inc() const {}
-    void   dec() const {}
+    bool outsideMP(lati_t) const { return false; }
+    bool occupied(FiberLattice& lat, lati_t s) const { return false; }
+    bool vacant(lati_t) const { return true; }
+    void inc() const {}
+    void dec() const {}
     
 #endif
     
     /// check if attachement is possible according to properties
-    bool   attachmentAllowed(FiberSite&) const;
+    bool attachmentAllowed(FiberSite&) const;
 
     /// attach and update variables
-    void   attach(FiberSite const&);
+    void attach(FiberSite const&);
     
     /// detach
-    void   detach();
+    void detach();
 
     
     /// transfer to given site
-    void   hop(lati_t);
+    void hop(lati_t);
 
     /// transfer to given site if it is vacant
-    void   jumpTo(lati_t p) { if ( vacant(p) ) hop(p); }
+    void jumpTo(lati_t p) { if ( vacant(p) ) hop(p); }
     
     /// relocate without checking intermediate sites
-    void   jumpToEndM() { jumpTo(lattice()->first()); }
+    void jumpToEndM() { jumpTo(lattice()->first()); }
 
     /// relocate without checking intermediate sites
-    void   jumpToEndP() { jumpTo(lattice()->fence()-1); }
+    void jumpToEndP() { jumpTo(lattice()->fence()-1); }
 
     
     /// attempt one step towards the PLUS_END
-    void   stepP()      { jumpTo(site()+1); }
+    void stepP()      { jumpTo(site()+1); }
     
     /// attempt one step towards the MINUS_END
-    void   stepM()      { jumpTo(site()-1); }
+    void stepM()      { jumpTo(site()-1); }
 
     
     /// attempt one step of size `s` towards the PLUS_END
-    void   jumpP(int s) { jumpTo(site()+s); }
+    void jumpP(int s) { jumpTo(site()+s); }
     
     /// attempt one step of size `s` towards the MINUS_END
-    void   jumpM(int s) { jumpTo(site()-s); }
+    void jumpM(int s) { jumpTo(site()-s); }
 
     
     /// attempt `n` steps towards the PLUS_END, checking all intermediate sites
-    void   crawlP(int n);
+    void crawlP(int n);
     
     /// attempt `n` steps towards the MINUS_END, checking all intermediate sites
-    void   crawlM(int n);
+    void crawlM(int n);
 
     
     /// simulate when `this` is attached but not under load
-    void   stepUnloaded();
+    void stepUnloaded();
     
     /// simulate when `this` is attached and under load
-    void   stepLoaded(Vector const& force);
+    void stepLoaded(Vector const& force);
  
     
     /// this is called when the attachment point is beyond the PLUS_END
-    void   handleDisassemblyM();
+    void handleDisassemblyM();
     
     /// this is called when the attachment point is below the MINUS_END
-    void   handleDisassemblyP();
+    void handleDisassemblyP();
     
 };
 

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef COUPLE_H
 #define COUPLE_H
@@ -57,26 +57,30 @@ protected:
     Hand * cHand2;
     
     /// specialization of HandMonitor
-    bool      allowAttachment(FiberSite const&, Hand const*);
+    bool allowAttachment(FiberSite const&, Hand const*);
     /// specialization of HandMonitor
-    void      afterAttachment(Hand const*);
+    void afterAttachment(Hand const*);
     /// specialization of HandMonitor
-    void      beforeDetachment(Hand const*);
+    void beforeDetachment(Hand const*);
+    
     /// specialization of HandMonitor
-    ObjectID  nucleatorID() const { return Object::identity(); }
+    Hand * otherHand(Hand const*) const;
     /// specialization of HandMonitor
-    Hand *    otherHand(Hand const*) const;
+    Vector otherDirection(Hand const*) const;
+    
+    /// true if both Hands are attached
+    bool linking() const { return cHand1->attached() && cHand2->attached(); }
     /// specialization of HandMonitor
-    Vector    linkBase(Hand const*) const;
+    Vector linkBase(Hand const*) const;
     /// specialization of HandMonitor
-    Vector    otherDirection(Hand const*) const;
-    /// specialization of HandMonitor
-    real      linkRestingLength() const { return prop->length; }
+    real linkRestingLength() const { return prop->length; }
     /// stiffness of the interaction, if the Couple is bridging
-    real      linkStiffness() const { return ( cHand1->attached() && cHand2->attached() ) * prop->stiffness; }
+    real linkStiffness() const { return linking() * prop->stiffness; }
+    /// specialization of HandMonitor
+    ObjectID nucleatorID() const { return Object::identity(); }
 
     /// update position to account for diffusion in one time step
-    void      diffuse() { cPos.addRand(prop->diffusion_dt); }
+    void diffuse() { cPos.addRand(prop->diffusion_dt); }
     
 public:
     
@@ -87,154 +91,151 @@ public:
     virtual ~Couple();
 
     /// copy operator
-    Couple&  operator=(Couple const&);
+    Couple & operator=(Couple const&);
     
     //--------------------------------------------------------------------------
     
-    /// change the property and update the two Hands
-    void           changeProperty(CoupleProp *);
+    /// change the property and update the two Hands (experimental)
+    void changeProperty(CoupleProp *);
     
     /// add interactions to a Meca
-    virtual void   setInteractions(Meca&) const;
+    virtual void setInteractions(Meca&) const;
     
     /// add interactions to a Meca (experimental)
-    virtual void   setInteractionsAF(Meca&) const;
+    virtual void setInteractionsAF(Meca&) const;
     
     /// add interactions to a Meca (experimental)
-    virtual void   setInteractionsFA(Meca&) const;
+    virtual void setInteractionsFA(Meca&) const;
     
     //--------------------------------------------------------------------------
     
     /// the position of the complex, calculated from cPos, cHand1 and cHand2
-    virtual Vector position() const;
+    Vector position() const;
    
     /// Couple can be displaced only if it is not attached
-    virtual int    mobile()               const { return !cHand1->attached() && !cHand2->attached(); }
+    int mobile() const { return !cHand1->attached() && !cHand2->attached(); }
     
     /// translate object's position by the given vector
-    virtual void   translate(Vector const& x)   { cPos += x; }
+    void translate(Vector const& x) { cPos += x; }
     
     /// move object to specified position
-    void           setPosition(Vector const& x) { cPos = x; }
+    void setPosition(Vector const& x) { cPos = x; }
 
     /// bring object to centered image using periodic boundary conditions
-    virtual void   foldPosition(Modulo const*);
+    void foldPosition(Modulo const*);
     
     /// set the position randomly inside prop->confine_space
-    void           randomizePosition();
+    void randomizePosition();
     
     //--------------------------------------------------------------------------
     
     /// activity flag
-    virtual bool   active()               const { return true; }
-    
-    /// true if both Hands are attached
-    bool           linking()              const { return cHand1->attached() && cHand2->attached(); }
+    virtual int active() const { return 1; }
 
     /// the state of the Couple in { 0 ... 3 } representing { FF, FA, FA, AA }
-    int            state()                const { return cHand1->attached() + 2 * cHand2->attached(); }
+    int state() const { return cHand1->attached() + 2 * cHand2->attached(); }
     
     /// category of link: Parallel; Anti-parallel; X; T+; V+; T-; V-
-    int            configuration(real len, real max_cos=0.5) const;
+    int configuration(real len, real max_cos=0.5) const;
 
     /// return one of the Hand that is attached, or zero if both are detached
-    Hand *         attachedHand()         const;
-    
-    /// offset between hands, essentially: ( cHand2->posHand() - cHand1->posHand() )
-    Vector         stretch()              const;
-
-    /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
-    virtual Vector force()                const;
+    Hand * attachedHand() const;
      
     /// cosine of the angle between the two Fibers attached by the hands
-    real           cosAngle()             const { return dot(cHand1->dirFiber(), cHand2->dirFiber()); }
+    real cosAngle() const { return dot(cHand1->dirFiber(), cHand2->dirFiber()); }
     
     /// the position of the complex if it is unattached
-    Vector         posFree()              const { return cPos; }
-   
+    Vector posFree() const { return cPos; }
+    
+    /// offset between hands, essentially: ( cHand2->posHand() - cHand1->posHand() )
+    Vector stretch() const;
+
     /// position on the side of fiber1 used in setInteractions()
-    virtual Vector sidePos1()             const { return cHand1->pos(); }
+    virtual Vector sidePos1() const { return cHand1->pos(); }
     
     /// position on the side of fiber2 used in sideInteractions()
-    virtual Vector sidePos2()             const { return cHand2->pos(); }
+    virtual Vector sidePos2() const { return cHand2->pos(); }
+    
+    /// force between hands, essentially: stiffness * ( sidePos2 - sidePos1 )
+    virtual Vector force() const;
 
     //--------------------------------------------------------------------------
 
     /// simulation step for a free Couple: diffusion
-    virtual void   stepFF();
+    virtual void stepFF();
     
     /// simulation step for a Couple attached by Hand1
-    virtual void   stepAF();
+    virtual void stepAF();
     
     /// simulation step for a Couple attached by Hand2
-    virtual void   stepFA();
+    virtual void stepFA();
     
     /// simulation step for a doubly-attached Couple
-    virtual void   stepAA();
+    virtual void stepAA();
 
     //--------------------------------------------------------------------------
 
     /// pointer to Hand1
-    Hand*    hand1()                            { return cHand1; }
+    Hand * hand1() { return cHand1; }
    
     /// pointer to constant Hand1
-    Hand const* hand1()                   const { return cHand1; }
+    Hand const* hand1() const { return cHand1; }
     
     /// true if Hand1 is attached
-    bool     attached1()                  const { return cHand1->attached(); }
+    bool attached1() const { return cHand1->attached(); }
     
     /// Fiber to which Hand1 is attached, or zero if not attached
-    Fiber*   fiber1()                     const { return cHand1->fiber(); }
+    Fiber * fiber1() const { return cHand1->fiber(); }
     
     /// attachment position of Hand1 along fiber (only valid if Hand1 is attached)
-    real     abscissa1()                  const { return cHand1->abscissa(); }
+    real abscissa1() const { return cHand1->abscissa(); }
     
     /// position of Hand1 when attached (only valid if Hand1 is attached)
-    Vector   posHand1()                   const { return cHand1->pos(); }
+    Vector posHand1() const { return cHand1->pos(); }
     
     /// direction of Fiber at attachment point of Hand1 (only valid if Hand1 is attached)
-    Vector   dirFiber1()                  const { return cHand1->dirFiber(); }
+    Vector dirFiber1() const { return cHand1->dirFiber(); }
  
     /// attach Hand1 at the given FiberSite
-    void     attach1(FiberSite s)               { if ( cHand1->attachmentAllowed(s) ) cHand1->attach(s); }
+    void attach1(FiberSite s) { if ( cHand1->attachmentAllowed(s) ) cHand1->attach(s); }
     
     /// attach Hand1 at the given end
-    void     attachEnd1(Fiber* f, FiberEnd end) { cHand1->attachEnd(f, end); }
+    void attachEnd1(Fiber* f, FiberEnd end) { cHand1->attachEnd(f, end); }
     
     /// move Hand1 to given end
-    void     moveToEnd1(FiberEnd end)           { cHand1->moveToEnd(end); }
+    void moveToEnd1(FiberEnd end) { cHand1->moveToEnd(end); }
 
     //--------------------------------------------------------------------------
 
     /// pointer to Hand2
-    Hand*    hand2()                            { return cHand2; }
+    Hand * hand2() { return cHand2; }
     
     /// pointer to constant Hand2
-    Hand const* hand2()                   const { return cHand2; }
+    Hand const* hand2() const { return cHand2; }
 
     /// true if Hand2 is attached
-    bool     attached2()                  const { return cHand2->attached(); }
+    bool attached2() const { return cHand2->attached(); }
     
     /// Fiber to which Hand2 is attached, or zero if not attached
-    Fiber*   fiber2()                     const { return cHand2->fiber(); }
+    Fiber * fiber2() const { return cHand2->fiber(); }
     
     /// attachment position of Hand2 along fiber (only valid if Hand2 is attached)
-    real     abscissa2()                  const { return cHand2->abscissa(); }
+    real abscissa2() const { return cHand2->abscissa(); }
     
     /// position of Hand2 when attached (only valid if Hand2 is attached)
-    Vector   posHand2()                   const { return cHand2->pos(); }
+    Vector posHand2() const { return cHand2->pos(); }
     
     /// direction of Fiber at attachment point of Hand2 (only valid if Hand2 is attached)
-    Vector   dirFiber2()                  const { return cHand2->dirFiber(); }
+    Vector dirFiber2() const { return cHand2->dirFiber(); }
     
     /// attach Hand2 at the given FiberSite
-    void     attach2(FiberSite s)               { if ( cHand2->attachmentAllowed(s) ) cHand2->attach(s); }
+    void attach2(FiberSite s) { if ( cHand2->attachmentAllowed(s) ) cHand2->attach(s); }
     
     /// attach Hand2 at the given end
-    void     attachEnd2(Fiber *f, FiberEnd end) { cHand2->attachEnd(f, end); }
+    void attachEnd2(Fiber *f, FiberEnd end) { cHand2->attachEnd(f, end); }
     
     /// move Hand2 to given end
-    void     moveToEnd2(FiberEnd end)           { cHand2->moveToEnd(end); }
+    void moveToEnd2(FiberEnd end) { cHand2->moveToEnd(end); }
 
     //--------------------------------------------------------------------------
 
@@ -250,16 +251,16 @@ public:
     static const ObjectTag TAG = 'c';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }
     
     /// write to file
-    void            write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// read from file
-    void            read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// return PointDisp of Hand1
     PointDisp const* disp1() const { return cHand1->prop->disp; }

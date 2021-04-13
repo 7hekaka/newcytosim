@@ -26,10 +26,16 @@
  
  If the Fiber has a Lattice, The `FiberSite` also supports binding at discrete
  positions, and in this case uses a pointer `hLattice' and a signed integer
- `hSite` to keep track of the position.
+ `hSite` to keep track of the position. The lattice uses the same origin as
+ the abscissa scale, such that abscissa always corresponds to `unit * site'.
 */
 class FiberSite
 {
+public:
+    
+    /// propagate Lattice cell index type
+    typedef FiberLattice::lati_t lati_t;
+
 private:
     
     /// the interpolation on the Fiber's vertices
@@ -44,27 +50,24 @@ private:
 protected:
     
     /// the Fiber of interest, or NULL
-    Fiber *       hFiber;
-    
-    /// the abscissa from the origin of the Fiber
-    real          hAbs;
-    
-    /// propagate Lattice cell index type
-    typedef FiberLattice::lati_t lati_t;
+    Fiber * hFiber;
 
 #if FIBER_HAS_LATTICE
     /// pointer to the Lattice of the Fiber, or NULL if not in use
-    FiberLattice* hLattice;
+    FiberLattice * hLattice;
     
     /// index in the Fiber's Lattice (a signed integer)
-    lati_t        hSite;
+    lati_t hSite;
 #endif
+    
+    /// the abscissa from the origin of the Fiber
+    real hAbs;
 
 public:
 
 #if FIBER_HAS_LATTICE
     /// default constructor
-    FiberSite() : hFiber(nullptr), hAbs(0), hLattice(nullptr), hSite(0) {}
+    FiberSite() : hFiber(nullptr), hLattice(nullptr), hSite(0), hAbs(0) {}
 #else
     FiberSite() : hFiber(nullptr), hAbs(0) {}
 #endif
@@ -81,7 +84,7 @@ public:
     FiberLattice* lattice() const { return hLattice; }
     
     /// index of Lattice's site
-    lati_t        site()    const { return hSite; }
+    lati_t site() const { return hSite; }
     
     /// set FiberSite at index `s` with an abscissa `off` within the site
     void engageLattice(FiberLattice* l, lati_t s, real off)
@@ -104,96 +107,96 @@ public:
     const Interpolation& interpolation() const { assert_false(bad()); return hTerp; }
     
     /// recalculate the Interpolation
-    void         update()       { hTerp = hFiber->interpolate(hAbs); }
+    void update() { hTerp = hFiber->interpolate(hAbs); }
     
     /// move to a different abscissa on the current fiber
-    void         moveTo(real a) { hAbs = a; update(); }
+    void moveTo(real a) { hAbs = a; update(); }
 
     /// relocate to MINUS_END of current fiber
-    void         relocateM();
+    void relocateM();
     
     /// relocate to PLUS_END of current fiber
-    void         relocateP();
+    void relocateP();
 
     //--------------------------------------------------------------------------
     
     /// true if not attached
-    bool         unattached()    const { return !hFiber; }
+    bool unattached() const { return !hFiber; }
 
     /// true if attached
-    bool         attached()      const { return hFiber; }
+    bool attached() const { return hFiber; }
     
     /// Fiber to which this is attached, or zero if not attached
-    Fiber*       fiber()         const { return hFiber; }
+    Fiber* fiber() const { return hFiber; }
     
     /// position in space (using current interpolation)
-    Vector       pos()           const { return hTerp.pos(); }
+    Vector pos() const { return hTerp.pos(); }
     
 #if FIBER_HAS_FAMILY
     /// the position around which attachment is seeked
-    Vector       outerPos()      const;
+    Vector outerPos() const;
 #else
     /// the position around which attachment is seeked
-    Vector       outerPos()      const { return hTerp.pos(); }
+    Vector outerPos() const { return hTerp.pos(); }
 #endif
     
     /// position (recalculated on the fly)
-    Vector       posHand()       const { return hFiber->pos(hAbs); }
+    Vector posHand() const { return hFiber->pos(hAbs); }
     
-    /// position shifted by 'x'
-    Vector       posHand(real x) const { return hFiber->pos(hAbs+x); }
+    /// position at abscissa shifted by 'x'
+    Vector posHand(real x) const { return hFiber->pos(hAbs+x); }
 
     /// direction of Fiber obtained by normalization
-    Vector       dir()           const { return hTerp.dir(); }
+    Vector dir() const { return hTerp.dir(); }
     
     /// the direction of the Fiber at the point of attachment
-    Vector       dirFiber()      const { return hFiber->dirSegment(hTerp.point1()); }
+    Vector dirFiber() const { return hFiber->dirSegment(hTerp.point1()); }
     
     /// the abscissa, from the origin of the Fiber
-    real         abscissa()      const { return hAbs; }
+    real abscissa() const { return hAbs; }
 
     /// abscissa, counted from the MINUS_END
-    real         abscissaFromM() const { return hAbs - hFiber->abscissaM(); }
+    real abscissaFromM() const { return hAbs - hFiber->abscissaM(); }
 
     /// inverted abscissa counted from the PLUS_END, positive if ( abscissa < abscissa(PLUS_END) )
-    real         abscissaFromP() const { return hFiber->abscissaP() - hAbs; }
+    real abscissaFromP() const { return hFiber->abscissaP() - hAbs; }
 
     /// abscissa, counted from the specified FiberEnd (in reversed direction for the PLUS_END)
-    real         abscissaFrom(FiberEnd ref) const;
+    real abscissaFrom(FiberEnd ref) const;
             
     /// nearest end to the current attachment point
-    FiberEnd     nearestEnd() const;
+    FiberEnd nearestEnd() const;
     
     /// distance to the closest fiber tip
-    real         distanceToEnd(FiberEnd) const;
+    real distanceToEnd(FiberEnd) const;
 
     /// true if abscissa is below abscissaP
-    bool         belowP()        const { return hFiber->belowP(hAbs); }
+    bool belowP() const { return hFiber->belowP(hAbs); }
     
     /// true if abscissa is above abscissaM
-    bool         aboveM()        const { return hFiber->aboveM(hAbs); }
+    bool aboveM() const { return hFiber->aboveM(hAbs); }
     
     /// true if abscissa is not within the fiber's boundaries
-    bool         outsideMP()     const { return hFiber->outsideMP(hAbs); }
+    bool outsideMP() const { return hFiber->outsideMP(hAbs); }
     
     //--------------------------------------------------------------------------
     
     /// read from file
-    void         read(Inputter&, Simul&);
+    void read(Inputter&, Simul&);
     
     /// write to file
-    void         write(Outputter&) const;
+    void write(Outputter&) const;
  
     /// Human friendly ouput
-    void         print(std::ostream&) const;
+    void print(std::ostream&) const;
     
-    //--------------------------------------------------------------------------
+    //---------------------------------------------------------------------
     
     /// check that hAbs is within Fiber::abscissaM() and Fiber::abscissaP()
-    int          checkAbscissa() const;
+    int checkAbscissa() const;
     
     /// check validity of the interpolation (debuging purposes)
-    int          bad() const;
+    int bad() const;
 };
 
 /// output operator for debugging purpose
