@@ -870,7 +870,7 @@ void Display::drawFiberBackbone(Fiber const& fib)
 
 void Display::drawFiberLines(Fiber const& fib, int style) const
 {
-    size_t i = 0, cnt = 2 * fib.nbSegments();
+    size_t i = 0, cnt = 2 * fib.nbSegments() + 8;
     fluteVC* flu = gle::mapVertexColorBuffer(cnt+4);
     
     switch ( style )
@@ -909,7 +909,8 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             }
             break;
         case 6: // color according to the distance from the minus end
-            for ( real a = 0.125; a < 0.6; a *= 2 )
+            flu[i++] = {fib.posPoint(0), color_by_distanceM(fib, 0)};
+            for ( real a = 0.0625; a < 0.6; a *= 2 )
                 flu[i++] = {fib.posPoint(0, a), color_by_distanceM(fib, a)};
             for ( size_t n = 1; n < fib.nbPoints(); ++n )
                 flu[i++] = {fib.posP(n), color_by_distanceM(fib, n)};
@@ -918,8 +919,9 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             const size_t last = fib.lastPoint();
             for ( size_t n = 0; n < last; ++n )
                 flu[i++] = {fib.posP(n), color_by_distanceP(fib, n)};
-            for ( real a = 0.5; a > 0.12; a /= 2 )
+            for ( real a = 0.5; a > 0.06; a /= 2 )
                 flu[i++] = {fib.posPoint(last-1, 1-a), color_by_distanceP(fib, last-a)};
+            flu[i++] = {fib.posPoint(last), color_by_distanceP(fib, last)};
         } break;
         case 8: // color according to distance to the confining Space
             for ( i = 0; i < fib.nbPoints(); ++i )

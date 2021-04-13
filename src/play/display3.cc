@@ -16,6 +16,9 @@
 #include "point_disp.h"
 #include "display_color.h"
 
+/// Cliping planes permit nice junctions to be made between tubes, but are slow
+#define USE_CLIP_PLANES 0
+
 using namespace gle;
 extern Modulo const* modulo;
 
@@ -185,7 +188,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 //------------------------------------------------------------------------------
 #pragma mark - Nicely Joined Fiber Rendering using clipping planes
 
-#if ( 1 )
+#if USE_CLIP_PLANES
 /**
 This draws the model-segments, using function `select_color` to set display colors
 */
@@ -289,7 +292,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     if ( abs+inc >= fib.length() )
     {
         glPushMatrix();
-        gle::transAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
+        gle::stretchAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
         gle::endedTube2();
         glPopMatrix();
     }
@@ -311,7 +314,7 @@ This draws the model-segments, using function `select_color` to set display colo
 void Display3::drawFiberSegments(Fiber const& fib, real rad,
                                  gle_color (*select_color)(Fiber const&, size_t)) const
 {
-    GLfloat Lr(fib.segmentation()/rad);
+    const size_t last = fib.lastSegment();
     Vector pos = fib.posPoint(0);
     Vector nxt = fib.posPoint(1);
     
@@ -319,11 +322,17 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     glPushMatrix();
     gle::transAlignZ(pos, rad, nxt-pos);
     gle::hemisphere4();
-    glScalef(1, 1, Lr);
-    gle::tubeF();
+    glScalef(1, 1, fib.segmentation()/rad);
+    if ( last == 0 )
+    {
+        gle::tube4();
+        gle::discTop2();
+        glPopMatrix();
+        return;
+    }
+    gle::tubeS();
     glPopMatrix();
 
-    const size_t last = fib.lastSegment();
     for ( size_t i = 0; i < last; ++i )
     {
         pos = nxt;
@@ -331,18 +340,16 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
         select_color(fib, i).load_front();
         glPushMatrix();
         gle::stretchAlignZ(pos, nxt, rad);
-        gle::tubeE();
+        gle::tubeM();
         glPopMatrix();
     }
     glPushMatrix();
     pos = nxt;
     nxt = fib.posPoint(last+1);
     select_color(fib, last).load_front();
-    gle::transAlignZ(nxt, rad, pos-nxt);
-    //gle::sphere2();
-    glScalef(1, 1, Lr);
-    gle::tubeF();
-    gle::discBottom2();
+    gle::stretchAlignZ(pos, nxt, rad);
+    gle::tubeE();
+    gle::discTop2();
     glPopMatrix();
 }
 
@@ -366,7 +373,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     if ( abs <= 0 )
     {
         real len = (nxt-pos).norm();
-        gle::transAlignZ1(pos, rad, (nxt-pos)/len, rad);
+        gle::stretchAlignZ1(pos, rad, (nxt-pos)/len, rad);
         gle::hemisphere4();
         glScalef(1, 1, len/rad);
     }
@@ -374,7 +381,14 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     {
         gle::stretchAlignZ(pos, nxt, rad);
     }
-    gle::tubeF();
+    if ( last == inx )
+    {
+        gle::tube4();
+        gle::discTop2();
+        glPopMatrix();
+        return;
+    }
+    gle::tubeS();
     glPopMatrix();
     
     // keep abs to match to the end of the section already drawn
@@ -388,7 +402,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         select_color(fib, inx++, fac).load_front();
         glPushMatrix();
         gle::stretchAlignZ(pos, nxt, rad);
-        gle::tubeE();
+        gle::tubeM();
         glPopMatrix();
     }
     // draw last segment, which may be truncated:
@@ -396,16 +410,14 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
     glPushMatrix();
     if ( abs+inc >= fib.length() )
     {
-        gle::transAlignZ1(fib.displayPosM(abs+inc), rad, -fib.dirEndP(), fib.length()-abs);
-        gle::discBottom2();
+        gle::stretchAlignZ1(nxt, rad, fib.dirEndP(), fib.length()-abs);
+        gle::discTop2();
     }
     else
     {
-        pos = nxt;
-        nxt = fib.displayPosM(abs);
-        gle::stretchAlignZ(nxt, pos, rad);
+        gle::stretchAlignZ(nxt, fib.displayPosM(abs+inc), rad);
     }
-    gle::tubeF();
+    gle::tubeE();
     glPopMatrix();
 }
 
@@ -479,7 +491,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 
     Vector A = fib.posP(inx);
     Vector B = fib.posP(inx+1);
-    
+
     glEnable(GL_LIGHTING);
     /* Either CULL_FACE should be enable to hide the back side,
      or every primitive should be renderred with a double pass*/
@@ -496,23 +508,45 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         color_by_tension_jet(fib, inx).load_front();
     else
         fib.disp->color.load_front();
+    
+    // truncate terminal segment according to length_scale
+    if ( inx == 0 && disp->line_style == 6 )
+    {
+        real x = 3 * disp->length_scale * iseg;
+        if ( x < 1.0 )
+        {
+            B = A + x * ( B - A );
+            color_by_abscissaM(fib, inx);
+        }
+    }
+    
+    // truncate terminal segment according to length_scale
+    if ( inx == fib.lastSegment() && disp->line_style == 7 )
+    {
+        real x = 3 * disp->length_scale * iseg;
+        if ( x < 1.0 )
+        {
+            A = B + x * ( A - B );
+            color_by_abscissaP(fib, inx);
+        }
+    }
 
-#if 1
+#if USE_CLIP_PLANES
     if ( inx == 0 )
     {
         glEnable(GL_CLIP_PLANE5);
-        if ( disp->line_style == 6 )
+        if ( inx == fib.lastSegment() )
         {
-            // cut the terminal segment according to length_scale
-            real x = 2 * disp->length_scale * iseg;
-            if ( x < 1.0 )
-            {
-                B = A + x * ( B - A );
-                color_by_abscissaM(fib, inx);
-            }
+            setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, (A+B)*0.5);
+            drawTube(A, rad, B, gle::capedTube2);
+            setClipPlane(GL_CLIP_PLANE5, (B-A)*iseg, (A+B)*0.5);
+            drawTube(B, rad, A, gle::endedTube2);
         }
-        setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, B);
-        drawTube(A, rad, B, gle::capedTube2);
+        else
+        {
+            setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, B);
+            drawTube(A, rad, B, gle::capedTube2);
+        }
         glDisable(GL_CLIP_PLANE5);
         return;
     }
@@ -524,16 +558,6 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     if ( inx == fib.lastSegment() )
     {
         glEnable(GL_CLIP_PLANE4);
-        if ( disp->line_style == 7 )
-        {
-            // cut the terminal segment according to length_scale
-            real x = 2 * disp->length_scale * iseg;
-            if ( x < 1.0 )
-            {
-                A = B + x * ( A - B );
-                color_by_abscissaP(fib, inx);
-            }
-        }
         setClipPlane(GL_CLIP_PLANE4, (B-A)*iseg, A);
         drawTube(B, rad, A, gle::endedTube2);
         glDisable(GL_CLIP_PLANE4);
@@ -551,8 +575,8 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     glDisable(GL_CLIP_PLANE5);
 #else
     glPushMatrix();
-    gle::transAlignZ(0.5*(A+B), 1.0, B-A);
-    gle::capsuleZ(0, fib.segmentation(), rad);
+    gle::stretchAlignZ(A, B, rad);
+    gle::tube4();
     glPopMatrix();
 #endif
     if ( !cull ) glDisable(GL_CULL_FACE);
@@ -641,18 +665,15 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
  */
 void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real rad) const
 {
-    if ( rad > 0 )
+    if ( rad > 0 ) switch(style)
     {
-        switch(style)
-        {
-            default: break;
-            case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
-            case 2: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::longCone); break;
-            case 3: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cylinder2); break;
-            case 4: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::arrowTail); break;
-            case 5: drawObject(fib.posEndM(),  fib.dirEndM(), rad, gle::arrowTail); break;
-            case 6: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cube); break;
-        }
+        default: break;
+        case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
+        case 2: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::longCone); break;
+        case 3: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cylinder2); break;
+        case 4: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::arrowTail); break;
+        case 5: drawObject(fib.posEndM(), fib.dirEndM(), rad, gle::arrowTail); break;
+        case 6: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cube); break;
     }
 }
 
@@ -669,18 +690,15 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real rad) const
  */
 void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real rad) const
 {
-    if ( rad > 0 )
+    if ( rad > 0 ) switch(style)
     {
-        switch(style)
-        {
-            default: break;
-            case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
-            case 2: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::longCone); break;
-            case 3: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::cylinder2); break;
-            case 4: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::arrowTail); break;
-            case 5: drawObject(fib.posEndP(), -fib.dirEndP(), rad, gle::arrowTail); break;
-            case 6: drawObject(fib.posEndP(),  fib.dirEndP(), rad, gle::cube); break;
-        }
+        default: break;
+        case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
+        case 2: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::longCone); break;
+        case 3: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cylinder2); break;
+        case 4: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::arrowTail); break;
+        case 5: drawObject(fib.posEndP(),-fib.dirEndP(), rad, gle::arrowTail); break;
+        case 6: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cube); break;
     }
 }
 

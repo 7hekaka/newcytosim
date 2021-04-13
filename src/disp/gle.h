@@ -141,9 +141,9 @@ namespace gle
     void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir);
 
     /// translate by pos; rotate to align Z with dir, given norm(dir)=1, scale XY by rad and Z by fac
-    void transAlignZ1(Vector1 const& pos, float rad, Vector1 const& dir, float fac);
-    void transAlignZ1(Vector2 const& pos, float rad, Vector2 const& dir, float fac);
-    void transAlignZ1(Vector3 const& pos, float rad, Vector3 const& dir, float fac);
+    void stretchAlignZ1(Vector1 const& pos, float rad, Vector1 const& dir, float fac);
+    void stretchAlignZ1(Vector2 const& pos, float rad, Vector2 const& dir, float fac);
+    void stretchAlignZ1(Vector3 const& pos, float rad, Vector3 const& dir, float fac);
 
     /// translate by pos; rotate to align X to Z, scale by rad
     void transAlignZX(float pos, float rad, float dir);
@@ -212,10 +212,12 @@ namespace gle
     void tube1();
     /// draw an open tube along Z, of diameter 1 and length 1
     void tube2();
-    /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1+epsilon]
-    void tubeE();
     /// draw an open tube along Z, of radius 1 covering Z [0, 1+epsilon]
-    void tubeF();
+    void tubeS();
+    /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1+epsilon]
+    void tubeM();
+    /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1]
+    void tubeE();
     /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1+epsilon]
     void doubleTubeE();
     /// draw an open tube along Z, of radius 1 covering Z [0, 1+epsilon]

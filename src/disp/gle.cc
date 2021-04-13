@@ -357,7 +357,7 @@ namespace gle
     }
 
     // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
-    void transAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
+    void stretchAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
     {
         float X = std::copysign(R, float(D.XX));
         float Z = std::copysign(S, float(D.XX));
@@ -370,7 +370,7 @@ namespace gle
     }
     
     // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
-    void transAlignZ1(Vector2 const& P, float R, Vector2 const& D, float S)
+    void stretchAlignZ1(Vector2 const& P, float R, Vector2 const& D, float S)
     {
         float X = float(D.XX);
         float Y = float(D.YY);
@@ -383,7 +383,7 @@ namespace gle
     }
     
     // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P', scale Z axis by S
-    void transAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
+    void stretchAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
     {
         float X = float(D.XX);
         float Y = float(D.YY);
@@ -1196,11 +1196,10 @@ namespace gle
         start_[0] = ptr-flu; setTube(ptr, 1, 0, 1);
         start_[1] = ptr-flu; setTube(ptr, 2, 0, 1);
         start_[2] = ptr-flu; setTube(ptr, 4, 0, 1);
-        start_[3] = ptr-flu; setTube(ptr, 4,-E, 1+E);
-        start_[4] = ptr-flu; setTube(ptr, 4, 0, 1+E);
-        //start_[5] = ptr-flu; setDoubleTube(ptr, 4,-E, 1+E, 18/25.0);
-        //start_[6] = ptr-flu; setDoubleTube(ptr, 4, 0, 1+E, 18/25.0);
-        start_[7] = ptr-flu; setTube(ptr, 1, B, T);
+        start_[3] = ptr-flu; setTube(ptr, 4, 0, 1+E);
+        start_[4] = ptr-flu; setTube(ptr, 4,-E, 1+E);
+        start_[5] = ptr-flu; setTube(ptr, 4,-E, 1);
+        start_[6] = ptr-flu; setTube(ptr, 1, B, T);
         start_[8] = ptr-flu; setTube(ptr, 2, B, T);
         start_[9] = ptr-flu; setTube(ptr, 4, B, T);
         start_[10] = ptr-flu; setTube(ptr, 1, 0, T);
@@ -1255,10 +1254,9 @@ namespace gle
     void tube1()         { drawTubeStrip(start_[0], nbTrianglesTube(1)); }
     void tube2()         { drawTubeStrip(start_[1], nbTrianglesTube(2)); }
     void tube4()         { drawTubeStrip(start_[2], nbTrianglesTube(4)); }
-    void tubeE()         { drawTubeStrip(start_[3], nbTrianglesTube(4)); }
-    void tubeF()         { drawTubeStrip(start_[4], nbTrianglesTube(4)); }
-    void doubleTubeE()   { drawTubeStrip(start_[5], 2*nbTrianglesTube(4)); }
-    void doubleTubeF()   { drawTubeStrip(start_[6], 2*nbTrianglesTube(4)); }
+    void tubeS()         { drawTubeStrip(start_[3], nbTrianglesTube(4)); }
+    void tubeM()         { drawTubeStrip(start_[4], nbTrianglesTube(4)); }
+    void tubeE()         { drawTubeStrip(start_[5], nbTrianglesTube(4)); }
     void longTube1()     { drawTubeStrip(start_[7], nbTrianglesTube(1)); }
     void longTube2()     { drawTubeStrip(start_[8], nbTrianglesTube(2)); }
     void longTube4()     { drawTubeStrip(start_[9], nbTrianglesTube(4)); }
