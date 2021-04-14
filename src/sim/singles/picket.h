@@ -19,8 +19,12 @@ public:
     
     /// sPos should never change
     void    beforeDetachment(Hand const*);
+    
     /// stiffness of the interaction
     real    linkStiffness() const { return prop->stiffness; }
+    
+    /// true if Single creates an interaction
+    bool    hasLink() const { return true; }
 
 public:
 
@@ -41,9 +45,6 @@ public:
     
     /// move object to specified position
     void    setPosition(Vector const& x) { sPos = x; }
-
-    /// true if Single creates an interaction
-    bool    hasFoot() const { return true; }
     
     /// stretch of the link = ( posFoot() - posHand() )
     Vector  stretch() const;

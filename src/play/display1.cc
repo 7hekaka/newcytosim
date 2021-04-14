@@ -186,7 +186,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
         {
             gle_color d, c = obj->disp()->color;
             Vector Q, P = obj->posHand();
-            if ( obj->hasFoot() ) {
+            if ( obj->hasLink() ) {
                 d = c;
                 Q = obj->posFoot();
                 if ( modulo ) modulo->fold(Q, P);

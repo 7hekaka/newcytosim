@@ -69,13 +69,13 @@ protected:
     Vector otherDirection(Hand const*) const;
     
     /// true if both Hands are attached
-    bool linking() const { return cHand1->attached() && cHand2->attached(); }
+    bool hasLink() const { return cHand1->attached() && cHand2->attached(); }
+    /// stiffness of the interaction, if the Couple is bridging
+    real linkStiffness() const { return hasLink() * prop->stiffness; }
     /// specialization of HandMonitor
     Vector linkBase(Hand const*) const;
     /// specialization of HandMonitor
     real linkRestingLength() const { return prop->length; }
-    /// stiffness of the interaction, if the Couple is bridging
-    real linkStiffness() const { return linking() * prop->stiffness; }
     /// specialization of HandMonitor
     ObjectID nucleatorID() const { return Object::identity(); }
 

@@ -117,7 +117,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
             
             disp->drawA(ph);
             
-            if ( obj->hasFoot() && disp->width > 0 )
+            if ( obj->hasLink() && disp->width > 0 )
             {
                 Vector ps = obj->sidePos();
                 Vector pf = obj->posFoot();

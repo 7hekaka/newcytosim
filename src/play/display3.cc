@@ -956,7 +956,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
     {
         if ( obj->disp()->perceptible && obj->fiber()->disp->visible )
         {
-            if ( obj->hasFoot() && obj->disp()->width > 0 )
+            if ( obj->hasLink() && obj->disp()->width > 0 )
                 drawSingleB(obj);
             else
                 drawSingleA(obj);

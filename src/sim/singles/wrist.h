@@ -62,14 +62,14 @@ public:
     void    rebase(Mecable const* mec, size_t ref, Vector pos) { base_.set(mec, ref, pos); }
     
     
+    /// true if Single creates a link
+    bool    hasLink() const { return true; }
+
     /// stiffness of the interaction
     real    linkStiffness() const { return prop->stiffness; }
 
     /// the position of the anchoring point
     Vector  posFoot() const { return base_.position(); }
-
-    /// true if Single creates a link
-    bool    hasFoot() const { return true; }
     
     /// stretch of the link = ( posFoot() - posHand() )
     Vector  stretch() const;
