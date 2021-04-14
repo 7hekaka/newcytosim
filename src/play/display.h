@@ -66,7 +66,7 @@ public:
     void depth(real z) { depth_ = z; }
     
     /// display object
-    void draw(Display*) const;
+    void draw(Display const*) const;
 };
 
 
@@ -112,6 +112,9 @@ private:
     
     template < typename T >
     void preparePointDisp(T * prop, PropertyList&, gle_color);
+    
+    /// draw translucent objects after depth-sorting
+    void drawTransparentObjects(Array<zObject>&);
 
 public:
     
@@ -127,6 +130,9 @@ public:
     /// display opaque objects
     virtual void drawObjects(Simul const&);
     
+    /// draw translucent objects after depth-sorting
+    void drawTransparentObjects(Simul const&);
+
     /// enable/disable stencil usage
     void setStencil(bool s) { stencil_ = s; }
 
@@ -249,7 +255,7 @@ public:
     void drawBead(Bead const&);
 
     /// draw translucent elements of a Bead
-    void drawBeadT(Bead const&);
+    void drawBeadT(Bead const&) const;
     
     /// draw the Beads
     void drawBeads(BeadSet const&);
@@ -259,7 +265,7 @@ public:
     void drawSolid(Solid const&);
     
     /// draw translucent elements of a Solid
-    void drawSolidT(Solid const&, size_t);
+    void drawSolidT(Solid const&, size_t) const;
     
     /// draw the Solids
     void drawSolids(SolidSet const&);
@@ -269,7 +275,7 @@ public:
     void drawSphere(Sphere const&);
 
     /// draw translucent elements of a Sphere
-    void drawSphereT(Sphere const&);
+    void drawSphereT(Sphere const&) const;
     
     /// draw the Spheres
     void drawSpheres(SphereSet const&);
@@ -304,10 +310,6 @@ public:
     
     /// draw the Organizers
     void drawOrganizers(OrganizerSet const&);
-
-
-    /// draw translucent objects after depth-sorting
-    void drawTransparentObjects(Array<zObject>&);
 
     
     /// draw additional items

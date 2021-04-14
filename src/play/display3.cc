@@ -248,7 +248,7 @@ used to model the Fiber. All abscissa is relative to the MINUS_END.
 The function `set_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
-                                    VisibleLattice::lati_t inx, const VisibleLattice::lati_t last,
+                                    long inx, const long last,
                                     real abs, const real inc,
                                     gle_color (*select_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const
@@ -360,7 +360,7 @@ used to model the Fiber. All abscissa is relative to the MINUS_END.
 The function `set_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
-                                    VisibleLattice::lati_t inx, const VisibleLattice::lati_t last,
+                                    long inx, const long last,
                                     real abs, const real inc,
                                     gle_color (*select_color)(Fiber const&, long, real),
                                     real fac, real facM, real facP) const

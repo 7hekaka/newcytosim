@@ -207,34 +207,15 @@ void Display::drawSimul(Simul const& sim)
 
 #if ( DIM >= 3 )
     glEnable(GL_LIGHTING);
+    drawObjects(sim);
+    glDepthMask(GL_FALSE);
+    drawTransparentObjects(sim);
     glDepthMask(GL_TRUE);
 #else
     glDisable(GL_LIGHTING);
-#endif
-    
     drawObjects(sim);
-    
-    /*
-     Draw translucent objects:
-     - make depth buffer readable only
-     - objects are depth-sorted, from far to near
-     - Dual pass is used to display back before front
-     */
-
-#if ( DIM >= 3 )
-    
-    glDisable(GL_CULL_FACE);
-    glDepthMask(GL_FALSE);
-    
-    if ( zObjects.size() )
-        drawTransparentObjects(zObjects);
-    
-    glEnable(GL_CULL_FACE);
-    drawTransparentSpaces(sim.spaces);
-
 #endif
     
-    glDepthMask(GL_TRUE);
     CHECK_GL_ERROR("in Display::drawSimul()");
 }
 
@@ -1812,7 +1793,7 @@ void Display::drawSolid(Solid const& obj)
 /**
  Display a semi-transparent disc / sphere
  */
-void Display::drawSolidT(Solid const& obj, size_t inx)
+void Display::drawSolidT(Solid const& obj, size_t inx) const
 {
     const PointDisp * disp = obj.prop->disp;
 
@@ -1894,7 +1875,7 @@ void Display::drawBead(Bead const& obj)
 /**
  Display a semi-transparent disc / sphere
  */
-void Display::drawBeadT(Bead const& obj)
+void Display::drawBeadT(Bead const& obj) const
 {
     const PointDisp * disp = obj.prop->disp;
     
@@ -1949,7 +1930,7 @@ void Display::drawSphere(Sphere const& obj)
 }
 
 
-void Display::drawSphereT(Sphere const& obj)
+void Display::drawSphereT(Sphere const& obj) const
 {
     const PointDisp * disp = obj.prop->disp;
 
@@ -2066,7 +2047,7 @@ void Display::drawOrganizers(OrganizerSet const& set)
 #if ( DIM >= 3 )
 
 /// display sub-part `inx` of object `obj`
-void zObject::draw(Display * disp) const
+void zObject::draw(Display const* disp) const
 {
     Mecable const * mec = point_.mecable();
     switch( mec->tag() )
@@ -2117,18 +2098,35 @@ void Display::drawTransparentObjects(Array<zObject>& list)
     // depth-sort objects:
     list.sort(compareZObject);
 
-    /*
-     Enable polygon offset to avoid artifacts with objects of same size,
-     particularly the ends of filaments with their tubular shaft.
-     */
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.0, 1.0);
-    glEnable(GL_CULL_FACE);
-
     for ( zObject const& i : list )
         i.draw(this);
+}
+
+
+/**
+ Draw translucent objects:
+ - make depth buffer readable only
+ - objects are depth-sorted, from far to near
+ - Dual pass is used to display back before front
+ */
+void Display::drawTransparentObjects(Simul const& sim)
+{
+    glEnable(GL_CULL_FACE);
+
+    if ( zObjects.size() )
+    {
+        /*
+         Enable polygon offset to avoid artifacts with objects of same size,
+         particularly the ends of filaments with their tubular shaft.
+         */
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0, 1.0);
+        drawTransparentObjects(zObjects);
+        glDisable(GL_POLYGON_OFFSET_FILL);
+    }
     
-    glDisable(GL_POLYGON_OFFSET_FILL);
+    glEnable(GL_CULL_FACE);
+    drawTransparentSpaces(sim.spaces);
     glDisable(GL_CULL_FACE);
 }
 
