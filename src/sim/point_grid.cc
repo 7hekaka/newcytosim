@@ -143,15 +143,15 @@ void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rd, real rg) 
 void PointGrid::checkPP(Meca& meca, StericParam const& pam,
                         FatPoint const& aa, FatPoint const& bb)
 {
-    //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
-    const real len = aa.radius + bb.radius;
-    Vector vab = bb.pos - aa.pos;
+    //std::clog << "   PP- " << bb.pnt_ << " " << aa.pnt_ << '\n';
+    const real len = aa.rad_ + bb.rad_;
+    Vector vab = bb.pos_ - aa.pos_;
     
     if ( modulo )
         modulo->fold(vab);
     
     if ( vab.normSqr() < len*len )
-        meca.addLongLink(aa.pnt, bb.pnt, len, pam.stiff_push);
+        meca.addLongLink(aa.pnt_, bb.pnt_, len, pam.stiff_push);
 }
 
 
@@ -164,19 +164,19 @@ void PointGrid::checkPP(Meca& meca, StericParam const& pam,
 void PointGrid::checkPL(Meca& meca, StericParam const& pam,
                         FatPoint const& aa, FatLocus const& bb)
 {
-    //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
-    const real len = aa.radius + bb.radius;
+    //std::clog << "   PL- " << bb.seg_ << " " << aa.pnt_ << '\n';
+    const real len = aa.rad_ + bb.rad_;
     
     // get position of point with respect to segment:
     real dis2 = INFINITY;
-    real abs = bb.seg.projectPoint0(aa.pos, dis2);
+    real abs = bb.seg_.projectPoint0(aa.pos_, dis2);
     
     if ( 0 <= abs )
     {
-        if ( abs <= bb.seg.len() )
+        if ( abs <= bb.seg_.len() )
         {
             if ( dis2 < len*len )
-                meca.addSideSlidingLink(Interpolation(bb.seg, abs), aa.pnt, len, pam.stiff_push);
+                meca.addSideSlidingLink(Interpolation(bb.seg_, abs), aa.pnt_, len, pam.stiff_push);
         }
         else
         {
@@ -192,15 +192,15 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
         {
             /* we check the projection to the previous segment,
              and if it falls on the right of it, then we interact with the node */
-            Vector vab = aa.pos - bb.seg.pos1();
+            Vector vab = aa.pos_ - bb.seg_.pos1();
             
             if ( modulo )
                 modulo->fold(vab);
             
-            if ( dot(vab, bb.seg.fiber()->diffPoints(bb.seg.point()-1)) >= 0 )
+            if ( dot(vab, bb.seg_.fiber()->diffPoints(bb.seg_.point()-1)) >= 0 )
             {
                 if ( vab.normSqr() < len*len )
-                    meca.addLongLink(aa.pnt, bb.seg.exact1(), len, pam.stiff_push);
+                    meca.addLongLink(aa.pnt_, bb.seg_.exact1(), len, pam.stiff_push);
             }
         }
     }
@@ -216,21 +216,21 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
 void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
-    //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
-    const real ran = aa.range + bb.radius;
+    //std::clog << "   LL1 " << aa.seg_ << " " << bb.point1() << '\n';
+    const real ran = aa.rge_ + bb.rad_;
     
     // get position of bb.point1() with respect to segment 'aa'
     real dis2 = INFINITY;
-    real abs = aa.seg.projectPoint0(bb.seg.pos1(), dis2);
+    real abs = aa.seg_.projectPoint0(bb.seg_.pos1(), dis2);
     
-    if ((0 <= abs) & (abs <= aa.seg.len()) & (dis2 < ran*ran))
+    if ((0 <= abs) & (abs <= aa.seg_.len()) & (dis2 < ran*ran))
     {
         /*
          bb.point1() projects inside segment 'aa'
          */
-        const real len = aa.radius + bb.radius;
+        const real len = aa.rad_ + bb.rad_;
         real stiff = sign_select(dis2-len*len, pam.stiff_push, pam.stiff_pull);
-        meca.addSideSlidingLink(Interpolation(aa.seg, abs), bb.seg.exact1(), len, stiff);
+        meca.addSideSlidingLink(Interpolation(aa.seg_, abs), bb.seg_.exact1(), len, stiff);
     }
     else if ( abs < 0 )
     {
@@ -242,14 +242,14 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
              */
             if ( &bb < &aa  &&  bb.isFirst() )
             {
-                Vector vab = bb.seg.pos1() - aa.seg.pos1();
+                Vector vab = bb.seg_.pos1() - aa.seg_.pos1();
                 
                 if ( modulo )
                     modulo->fold(vab);
                 
-                const real len = aa.radius + bb.radius;
-                if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg.diff()) >= 0 )
-                    meca.addLongLink(aa.seg.exact1(), bb.seg.exact1(), len, pam.stiff_push);
+                const real len = aa.rad_ + bb.rad_;
+                if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg_.diff()) >= 0 )
+                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), len, pam.stiff_push);
             }
         }
         else
@@ -258,19 +258,19 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
              Check the projection to the segment located before 'aa',
              and interact if 'bb.point1()' falls on the right side of it
              */
-            Vector vab = bb.seg.pos1() - aa.seg.pos1();
+            Vector vab = bb.seg_.pos1() - aa.seg_.pos1();
             
             if ( modulo )
                 modulo->fold(vab);
             
-            if ( dot(vab, aa.seg.fiber()->diffPoints(aa.seg.point()-1)) >= 0 )
+            if ( dot(vab, aa.seg_.fiber()->diffPoints(aa.seg_.point()-1)) >= 0 )
             {
                 const real d = vab.normSqr();
                 if ( d < ran*ran )
                 {
-                    const real len = aa.radius + bb.radius;
+                    const real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
-                    meca.addLongLink(aa.seg.exact1(), bb.seg.exact1(), len, stiff);
+                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), len, stiff);
                 }
             }
         }
@@ -286,21 +286,21 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
 void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
-    //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
-    const real ran = aa.range + bb.radius;
+    //std::clog << "   LL2 " << aa.seg_ << " " << bb.point2() << '\n';
+    const real ran = aa.rge_ + bb.rad_;
     
     // get position of bb.point2() with respect to segment 'aa'
     real dis2 = INFINITY;
-    real abs = aa.seg.projectPoint0(bb.seg.pos2(), dis2);
+    real abs = aa.seg_.projectPoint0(bb.seg_.pos2(), dis2);
     
-    if ((0 <= abs) & (dis2 < ran*ran) & (abs <= aa.seg.len()))
+    if ((0 <= abs) & (dis2 < ran*ran) & (abs <= aa.seg_.len()))
     {
         /*
          bb.point2() projects inside segment 'aa'
          */
-        const real len = aa.radius + bb.radius;
+        const real len = aa.rad_ + bb.rad_;
         real stiff = sign_select(dis2-len*len, pam.stiff_push, pam.stiff_pull);
-        meca.addSideSlidingLink(Interpolation(aa.seg, abs), bb.seg.exact2(), len, stiff);
+        meca.addSideSlidingLink(Interpolation(aa.seg_, abs), bb.seg_.exact2(), len, stiff);
     }
     else if ( abs < 0 )
     {
@@ -308,7 +308,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
          Check the projection to the segment located before 'aa',
          and interact if 'bb.point1()' falls on the right side of it
          */
-        Vector vab = bb.seg.pos2() - aa.seg.pos1();
+        Vector vab = bb.seg_.pos2() - aa.seg_.pos1();
         
         if ( modulo )
             modulo->fold(vab);
@@ -316,25 +316,25 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
         if ( aa.isFirst() )
         {
             assert_true(bb.isLast());
-            const real len = aa.radius + bb.radius;
-            if ( vab.normSqr() < len*len  && dot(vab, bb.seg.diff()) <= 0 )
-                meca.addLongLink(aa.seg.exact1(), bb.seg.exact2(), len, pam.stiff_push);
+            const real len = aa.rad_ + bb.rad_;
+            if ( vab.normSqr() < len*len  && dot(vab, bb.seg_.diff()) <= 0 )
+                meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), len, pam.stiff_push);
         }
         else
         {
-            if ( dot(vab, aa.seg.fiber()->diffPoints(aa.seg.point()-1)) >= 0 )
+            if ( dot(vab, aa.seg_.fiber()->diffPoints(aa.seg_.point()-1)) >= 0 )
             {
                 const real d = vab.normSqr();
                 if ( d < ran*ran )
                 {
-                    const real len = aa.radius + bb.radius;
+                    const real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
-                    meca.addLongLink(aa.seg.exact1(), bb.seg.exact2(), len, stiff);
+                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), len, stiff);
                 }
             }
         }
     }
-    else if ( &bb < &aa  &&  aa.isLast()  &&  abs > aa.seg.len() )
+    else if ( &bb < &aa  &&  aa.isLast()  &&  abs > aa.seg_.len() )
     {
         /*
          Check the projection of aa.point2(),
@@ -342,14 +342,14 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
          */
         assert_true(bb.isLast());
         
-        Vector vab = bb.seg.pos2() - aa.seg.pos2();
+        Vector vab = bb.seg_.pos2() - aa.seg_.pos2();
         
         if ( modulo )
             modulo->fold(vab);
         
-        const real len = aa.radius + bb.radius;
-        if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg.diff()) <= 0 )
-            meca.addLongLink(aa.seg.exact2(), bb.seg.exact2(), len, pam.stiff_push);
+        const real len = aa.rad_ + bb.rad_;
+        if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg_.diff()) <= 0 )
+            meca.addLongLink(aa.seg_.exact2(), bb.seg_.exact2(), len, pam.stiff_push);
     }
 }
 
@@ -364,24 +364,24 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
 {
 #if ( DIM == 3 )
     
-    const real ran = std::max(aa.range+bb.radius, aa.radius+bb.range);
+    const real ran = std::max(aa.rge_+bb.rad_, aa.rad_+bb.rge_);
 
     /* in 3D, we use shortestDistance() to calculate the closest distance
      between two segments, and use the result to build an interaction */
     real a, b;
-    real d = aa.seg.shortestDistance(bb.seg, a, b);
+    real d = aa.seg_.shortestDistance(bb.seg_, a, b);
     if ( d >= ran*ran )
         return;
     
-    if ( aa.seg.within(a) & bb.seg.within(b) )
+    if ( aa.seg_.within(a) & bb.seg_.within(b) )
     {
-        const real len = aa.radius + bb.radius;
+        const real len = aa.rad_ + bb.rad_;
         real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
-        meca.addSideSlidingLink(Interpolation(aa.seg, a), Interpolation(bb.seg, b), ran, stiff);
+        meca.addSideSlidingLink(Interpolation(aa.seg_, a), Interpolation(bb.seg_, b), ran, stiff);
     }
 #endif
     
-    //std::clog << "LL " << aa.seg << " " << bb.seg << '\n';
+    //std::clog << "LL " << aa.seg_ << " " << bb.seg_ << '\n';
     checkLL1(meca, pam, aa, bb);
     
     if ( aa.isLast() )
@@ -401,16 +401,16 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
 /// excluding two spheres when they are from the same Solid
 inline bool adjacent(FatPoint const* a, FatPoint const* b)
 {
-    return ( a->pnt.mecable() == b->pnt.mecable() );
+    return ( a->pnt_.mecable() == b->pnt_.mecable() );
 }
 
 
 /// excluding Fiber and Solid from the same Aster
 inline bool adjacent(FatPoint const* a, FatLocus const* b)
 {
-    //a->pnt.mecable()->Buddy::print(std::clog);
-    //b->seg.fiber()->Buddy::print(std::clog);
-    return b->seg.fiber()->buddy() == a->pnt.mecable()->buddy();
+    //a->pnt_.mecable()->Buddy::print(std::clog);
+    //b->seg_.fiber()->Buddy::print(std::clog);
+    return b->seg_.fiber()->buddy() == a->pnt_.mecable()->buddy();
 }
 
 
@@ -418,11 +418,11 @@ inline bool adjacent(FatPoint const* a, FatLocus const* b)
 inline bool adjacent(FatLocus const* a, FatLocus const* b)
 {
 #if FIBER_HAS_FAMILY
-    return (( a->seg.fiber()->family_ == b->seg.fiber()->family_ )
+    return (( a->seg_.fiber()->family_ == b->seg_.fiber()->family_ )
 #else
-    return (( a->seg.fiber() == b->seg.fiber() )
+    return (( a->seg_.fiber() == b->seg_.fiber() )
 #endif
-            & ( a->seg.point() < 2 + b->seg.point() ) & ( b->seg.point() < 2 + a->seg.point() ));
+            & ( a->seg_.point() < 2 + b->seg_.point() ) & ( b->seg_.point() < 2 + a->seg_.point() ));
 }
 
 //------------------------------------------------------------------------------
@@ -501,21 +501,21 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
 {
     for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
-        Vector pos = ii->pos;
+        Vector pos = ii->pos_;
         for ( FatPoint* jj = ii+1; jj < pots.end(); ++jj )
-            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
+            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos_) <= sup )
                 checkPP(meca, pam, *ii, *jj);
         
         for ( FatLocus* kk = locs.begin(); kk < locs.end(); ++kk )
-            if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos) <= sup )
+            if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos_) <= sup )
                 checkPL(meca, pam, *ii, *kk);
     }
 
     for ( FatLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
-        Vector pos = ii->pos;
+        Vector pos = ii->pos_;
         for ( FatLocus* jj = ii+1; jj < locs.end(); ++jj )
-            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
+            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos_) <= sup )
                 checkLL(meca, pam, *ii, *jj);
     }
 }
@@ -537,28 +537,28 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
 
     for ( FatPoint* ii = pots1.begin(); ii < pots1.end(); ++ii )
     {
-        const Vector pos = ii->pos;
+        const Vector pos = ii->pos_;
 
         for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
-            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos) <= sup )
+            if ( !adjacent(ii, jj) && distanceSqr(pos, jj->pos_) <= sup )
                 checkPP(meca, pam, *ii, *jj);
         
         for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
-            if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos) <= sup )
+            if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos_) <= sup )
                 checkPL(meca, pam, *ii, *kk);
     }
     
     for ( FatLocus* ii = locs1.begin(); ii < locs1.end(); ++ii )
     {
-        const Vector pos = ii->pos;
+        const Vector pos = ii->pos_;
 
         for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
-            if ( !adjacent(jj, ii) && distanceSqr(pos, jj->pos) <= sup )
+            if ( !adjacent(jj, ii) && distanceSqr(pos, jj->pos_) <= sup )
                 checkPL(meca, pam, *jj, *ii);
         
         for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
-            if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos) <= sup )
+            if ( !adjacent(ii, kk) && distanceSqr(pos, kk->pos_) <= sup )
                 checkLL(meca, pam, *ii, *kk);
         }
     }

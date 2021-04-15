@@ -23,27 +23,27 @@ class FatPoint
 public:
     
     /// position of center
-    Vector    pos;
+    Vector    pos_;
     
     /// indicates one vertex in a Mecable
-    Mecapoint pnt;
+    Mecapoint pnt_;
 
     /// equilibrium radius of the interaction (distance where force is zero)
-    real      radius;
+    real      rad_;
     
     /// interaction range (maximum distance at which the force can operate)
-    real      range;
+    real      rge_;
     
 public:
     
     FatPoint() {}
     
-    FatPoint(Mecapoint const& p, real rd, real rg, Vector const& w)
+    FatPoint(Mecapoint const& p, real d, real e, Vector const& w)
     {
-        pos    = w;
-        radius = rd;
-        range  = rg;
-        pnt    = p;
+        pos_ = w;
+        rad_ = d;
+        rge_ = e;
+        pnt_ = p;
     }
 };
 
@@ -56,49 +56,49 @@ class FatLocus
 public:
     
     /// position of center
-    Vector       pos;
+    Vector pos_;
     
     /// indicates one segment of a Fiber
-    FiberSegment seg;
+    FiberSegment seg_;
 
     /// equilibrium radius of the interaction (distance where force is zero)
-    real         radius;
+    real rad_;
     
     /// interaction range (maximum distance at which the force can operate)
-    real         range;
+    real rge_;
     
 public:
     
     FatLocus() {}
     
-    FatLocus(FiberSegment const& p, real rd, real rg, Vector const& w)
+    FatLocus(FiberSegment const& p, real r, real e, Vector const& w)
     {
-        pos    = w;
-        radius = rd;
-        range  = rg;
-        seg    = p;
+        pos_ = w;
+        rad_ = r;
+        rge_ = e;
+        seg_ = p;
     }
     
     /// true if the segment is the first of the Fiber
     bool isFirst() const
     {
-        return seg.isFirst();
+        return seg_.isFirst();
     }
     
     /// true if the segment is the last of the Fiber
     bool isLast() const
     {
-        return seg.isLast();
+        return seg_.isLast();
     }
     
     FatPoint fatPoint1() const
     {
-        return FatPoint(seg.exact1(), radius, range, seg.pos1());
+        return FatPoint(seg_.exact1(), rad_, rge_, seg_.pos1());
     }
     
     FatPoint fatPoint2() const
     {
-        return FatPoint(seg.exact2(), radius, range, seg.pos2());
+        return FatPoint(seg_.exact2(), rad_, rge_, seg_.pos2());
     }
 };
 
