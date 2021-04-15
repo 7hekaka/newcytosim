@@ -320,8 +320,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
         /*
          bb.point2() projects inside segment 'aa'
          */
-        const real len = aa.rad_ + bb.rad_;
-        meca.addSideSlidingLink(Interpolation(seg, abs), bb.point2(), len, stiff);
+        meca.addSideSlidingLink(Interpolation(seg, abs), bb.point2(), ran, stiff);
     }
     else if ( abs < 0 )
     {

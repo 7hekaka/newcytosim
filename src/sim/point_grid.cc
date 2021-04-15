@@ -377,7 +377,7 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     {
         const real len = aa.rad_ + bb.rad_;
         real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
-        meca.addSideSlidingLink(Interpolation(aa.seg_, a), Interpolation(bb.seg_, b), ran, stiff);
+        meca.addSideSlidingLink(Interpolation(aa.seg_, a), Interpolation(bb.seg_, b), len, stiff);
     }
 #endif
     
