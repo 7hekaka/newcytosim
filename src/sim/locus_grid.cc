@@ -201,7 +201,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
         if ( abs <= bb.len() )
         {
             if ( dis2 < ran*ran )
-                meca.addSideSlidingLink(Interpolation(bb.segment(), abs), aa.point(), ran, stiff);
+                meca.addSideSlidingLink(bb.segment(), abs, aa.point(), ran, stiff);
         }
         else
         {
@@ -255,7 +255,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
         /*
          bb.point1() projects inside segment 'aa'
          */
-        meca.addSideSlidingLink(Interpolation(seg, abs), bb.point1(), ran, stiff);
+        meca.addSideSlidingLink(seg, abs, bb.point1(), ran, stiff);
     }
     else if ( abs < 0 )
     {
@@ -320,7 +320,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
         /*
          bb.point2() projects inside segment 'aa'
          */
-        meca.addSideSlidingLink(Interpolation(seg, abs), bb.point2(), ran, stiff);
+        meca.addSideSlidingLink(seg, abs, bb.point2(), ran, stiff);
     }
     else if ( abs < 0 )
     {
@@ -390,7 +390,7 @@ void LocusGrid::checkLL(Meca& meca, real stiff,
         return;
     
     if ( aaseg.within(a) & bbseg.within(b) )
-        meca.addSideSlidingLink(Interpolation(aaseg, a), Interpolation(bbseg, b), ran, stiff);
+        meca.addSideSlidingLink(aaseg, a, Interpolation(bbseg, b), ran, stiff);
     
 #endif
 

@@ -2990,9 +2990,13 @@ void Meca::addSlidingLink(Interpolation const& ptA,
 
 #if ( DIM == 2 )
 
+/**
+ It is assumed that: norm(arm) = len / ptA.segmentation()
+*/
 void Meca::addSideSlidingLink2D(Interpolation const& ptA,
+                                const real leg,
                                 Mecapoint const& ptB,
-                                const real arm,
+                                Vector const& dir,
                                 const real weight)
 {
     assert_true( weight >= 0 );
@@ -3005,14 +3009,6 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     if ( any_equal(ii0, ii1, ii2) )
         return;
     
-    /*
-     The length of fiber's segment is known, so we could spare the calculation
-     of `seg` below, which involves a square root
-     */
-    const real seg = ptA.len();
-    const real ee = arm / seg;
-    Vector dir = ptA.diff() / seg;
-    
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
     
@@ -3020,8 +3016,8 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
     // anti-symmetric matrix blocks:
-    const Matrix22 A(cc0, -ee,  ee, cc0);
-    const Matrix22 B(cc1,  ee, -ee, cc1);
+    const Matrix22 A(cc0, -leg,  leg, cc0);
+    const Matrix22 B(cc1,  leg, -leg, cc1);
 
     /*
      We use block operations to set the matrix block by block:
@@ -3069,7 +3065,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.diff()), ptB.pos());
 }
 
 
@@ -3196,10 +3192,13 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
 #endif
 
 
-
+/**
+ It is assumed that: norm(arm) = len / ptA.segmentation()
+ */
 void Meca::addSideSlidingLink3D(Interpolation const& ptA,
+                                Torque const& leg,
                                 Mecapoint const& ptB,
-                                Torque const& arm,
+                                Vector const& dir,
                                 const real weight)
 {
     assert_true( weight >= 0 );
@@ -3215,13 +3214,12 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     // interpolation coefficients:
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
-    const real eps = -1.0 / ptA.len();
     
-    MatrixBlock aR = MatrixBlock::vectorProduct(cc0,  eps*arm);
-    MatrixBlock bR = MatrixBlock::vectorProduct(cc1, -eps*arm);
+    MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
+    MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
 
     // the projection matrix: P = -weight * [ I - dir (x) dir ]
-    MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
+    MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
     MatrixBlock aTwP = aR.trans_mul(wP);
     MatrixBlock bTwP = bR.trans_mul(wP);
@@ -3251,7 +3249,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
             sub_base(ii2, wP*off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.diff()), ptB.pos());
 }
 
 
@@ -3286,7 +3284,7 @@ Vector calculateArm(Vector off, Vector const& diff, real len)
      force_B = weight * ( 1 - T T' ) ( B - S )
 
  */
-void Meca::addSideSlidingLink(Interpolation const& ptA,
+void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
                               Mecapoint const& ptB,
                               const real len,
                               const real weight)
@@ -3297,27 +3295,25 @@ void Meca::addSideSlidingLink(Interpolation const& ptA,
     
 #elif ( DIM == 2 )
     
-    Vector ab = ptB.pos()-ptA.pos();
+    Vector ab = ptB.pos()-segA.pos1();
     if ( modulo )
         modulo->fold(ab);
-    real arm = std::copysign(len, cross(ptA.diff(), ab));
-    addSideSlidingLink2D(ptA, ptB, arm, weight);
+    real leg = std::copysign(len*segA.lenInv(), cross(segA.diff(), ab));
+    addSideSlidingLink2D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
     
 #else
-    /*
-    // old version used before 2020 for steric interactions
-    Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
-    addSideSlidingLinkS(ptA, ptB, arm, weight);
-    */
-    //Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
-    Vector arm = ptB.pos()-ptA.pos1();
+    
+    Vector leg = ptB.pos() - segA.pos1();
     if ( modulo )
-        modulo->fold(arm);
-    arm = cross(ptA.diff(), arm);
-    real n = arm.norm();
+        modulo->fold(leg);
+    leg = cross(segA.diff(), leg);
+    real n = leg.norm();
     if ( n > REAL_EPSILON )
-        addSideSlidingLink3D(ptA, ptB, arm*(len/n), weight);
-
+    {
+        leg *= ( len * segA.lenInv() ) / n;
+        addSideSlidingLink3D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
+    }
+    
 #endif
 }
 
@@ -3342,10 +3338,13 @@ void Meca::addSideSlidingLink(Interpolation const& ptA,
  
      force_S = weight * ( 1 - T T' ) ( S - B )
      force_B = weight * ( 1 - T T' ) ( B - S )
-*/
+
+ It is assumed that: norm(arm) = len / ptA.segmentation()
+ */
 void Meca::addSideSlidingLink2D(Interpolation const& ptA,
+                                const real leg,
                                 Interpolation const& ptB,
-                                const real arm,
+                                Vector const& dir,
                                 const real weight)
 {
     assert_true( weight >= 0 );
@@ -3364,15 +3363,12 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     const real cc1 =  ptA.coef1();
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
-    const real eps = -1.0 / ptA.len();
-    
-    real ee = arm * eps;
-    
-    Matrix22 aR(cc0, ee,-ee, cc0);  // aR = alpha - len * R
-    Matrix22 bR(cc1,-ee, ee, cc1);  // bR = beta + len * R
+        
+    Matrix22 aR(cc0,-leg, leg, cc0);  // aR = alpha - len * R
+    Matrix22 bR(cc1, leg,-leg, cc1);  // bR = beta + len * R
     
     // the projection matrix: P = -weight * [ I - dir (x) dir ]
-    Matrix22 wP = Matrix22::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
+    Matrix22 wP = Matrix22::offsetOuterProduct(-weight, dir, weight);
     
     Matrix22 aTwP = aR.trans_mul(wP);
     Matrix22 bTwP = bR.trans_mul(wP);
@@ -3411,7 +3407,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
             add_base(ii3, wP*off, cc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.dir()), ptB.pos());
 }
 
 
@@ -3578,11 +3574,14 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
  
      force_S = weight * ( 1 - T T' ) ( S - B )
      force_B = weight * ( 1 - T T' ) ( B - S )
-*/
 
+ It is assumed that: norm(arm) = len / ptA.segmentation()
+
+*/
 void Meca::addSideSlidingLink3D(Interpolation const& ptA,
+                                Torque const& leg,
                                 Interpolation const& ptB,
-                                Torque const& arm,
+                                Vector const& dir,
                                 const real weight)
 {
     assert_true( weight >= 0 );
@@ -3601,13 +3600,12 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     const real cc1 =  ptA.coef1();
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
-    const real eps = -1.0 / ptA.len();
     
-    MatrixBlock aR = MatrixBlock::vectorProduct(cc0,  eps*arm);
-    MatrixBlock bR = MatrixBlock::vectorProduct(cc1, -eps*arm);
+    MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
+    MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
 
     // the projection matrix: P = -weight * [ I - dir (x) dir ]
-    MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, ptA.diff()*eps, weight);
+    MatrixBlock wP = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
     MatrixBlock aTwP = aR.trans_mul(wP);
     MatrixBlock bTwP = bR.trans_mul(wP);
@@ -3644,7 +3642,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
             add_base(ii3, wP*off, cc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.diff()), ptB.pos());
 }
 
 
@@ -3664,7 +3662,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
  
  */
 
-void Meca::addSideSlidingLink(Interpolation const& ptA,
+void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
                               Interpolation const& ptB,
                               const real len,
                               const real weight)
@@ -3675,23 +3673,22 @@ void Meca::addSideSlidingLink(Interpolation const& ptA,
     
 #elif ( DIM == 2 )
     
-    real arm = std::copysign(len, cross(ptA.diff(), ptB.pos()-ptA.pos1()));
-    addSideSlidingLink2D(ptA, ptB, arm, weight);
+    real leg = std::copysign(len*segA.lenInv(), cross(segA.diff(), ptB.pos()-segA.pos1()));
+    addSideSlidingLink2D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
     
 #else
-    
-    // old version for steric interactions
-    //Vector arm = calculateArm(ptB.pos()-ptA.pos1(), ptA.diff(), len);
-    //addSideSlidingLinkS(ptA, ptB, arm, weight);
-    //Vector arm = cross(ptA.diff(), ptB.pos()-ptA.pos1());
-    Vector arm = ptB.pos()-ptA.pos1();
-    if ( modulo )
-        modulo->fold(arm);
-    arm = cross(ptA.diff(), arm);
-    real n = arm.norm();
-    if ( n > REAL_EPSILON )
-        addSideSlidingLink3D(ptA, ptB, arm*(len/n), weight);
 
+    Vector leg = ptB.pos() - segA.pos1();
+    if ( modulo )
+        modulo->fold(leg);
+    leg = cross(segA.diff(), leg);
+    real n = leg.norm();
+    if ( n > REAL_EPSILON )
+    {
+        leg *= ( len * segA.lenInv() ) / n;
+        addSideSlidingLink3D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
+    }
+    
 #endif
 }
 

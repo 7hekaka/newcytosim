@@ -68,16 +68,17 @@ void ShackleLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
+    real iseg = cHand1->fiber()->segmentationInv();
 
 #if ( DIM == 2 )
     
     mArm = calcArm(pt1, pt2.pos(), prop->length);
-    meca.addSideSlidingLink2D(pt1, pt2, mArm, prop->stiffness);
+    meca.addSideSlidingLink2D(pt1, mArm*iseg, pt2, cHand1->dirFiber(), prop->stiffness);
     
 #elif ( DIM >= 3 )
     
     mArm = calcArm(pt1, pt2.pos(), prop->length);
-    meca.addSideSlidingLink3D(pt1, pt2, mArm, prop->stiffness);
+    meca.addSideSlidingLink3D(pt1, mArm*iseg, pt2, cHand1->dirFiber(), prop->stiffness);
     
 #endif
 }
