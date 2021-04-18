@@ -9,7 +9,7 @@ void DisplayProp::clear()
     style          = 1;
     tile           = 0;
     fold           = 1;
-    draw_links     = false;
+    draw_links     = true;
 
     couple_flip    = 0;
     couple_select  = 7;

@@ -2186,7 +2186,7 @@ namespace gle
 
     //-----------------------------------------------------------------------
     
-    int copyparity(int a, int b)
+    int copy_parity(const int a, const int b)
     {
         return a + (( std::abs(a) + b ) & 1 );
     }
@@ -2219,21 +2219,21 @@ namespace gle
                 --x;
             }
             RY += 4 * y + 8;
-            for ( int i = copyparity(-x,y); i <= x; i+=2 )
+            for ( int i = copy_parity(-x,y); i <= x; i+=2 )
             {
                 float X = i * T;
                 float Y = y * T;
                 fillRectangle( X-H, Y-H, X+H, Y+H, Z);
                 fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
             }
-            for ( int i = copyparity(Q,y); i <= x; i+=2 )
+            for ( int i = copy_parity(Q,y); i <= x; i+=2 )
             {
                 float X = y * T;
                 float Y = i * T;
                 fillRectangle( X-H, Y-H, X+H, Y+H, Z);
                 fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
             }
-            for ( int i = copyparity(Q,y); i <= x; i+=2 )
+            for ( int i = copy_parity(Q,y); i <= x; i+=2 )
             {
                 float X = y * T;
                 float Y = i * T;

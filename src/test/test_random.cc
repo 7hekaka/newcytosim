@@ -265,7 +265,6 @@ void test_gauss(size_t CNT)
     avg /= cnt;
     var = ( var - square(avg) * cnt ) / (cnt-1);
     printf("GAUSSIAN     avg = %.12e   var = %.12e\n", avg, var);
-
 }
 
 

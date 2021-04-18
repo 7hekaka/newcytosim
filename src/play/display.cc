@@ -1543,7 +1543,7 @@ void Display::drawFiber(Fiber const& fib)
     
     if ( disp->style & 4 )
     {
-        glLineWidth(0.5);
+        glLineWidth(1);
         fib.disp->color.load();
         drawFiberBackbone(fib);
     }

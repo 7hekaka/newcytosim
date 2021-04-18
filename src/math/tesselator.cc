@@ -339,7 +339,8 @@ void Tesselator::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
     }
 }
 
-    /// unfinished
+
+/// unfinished
 void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
 {
     unsigned* line = new unsigned[cnt*(div+1)];
