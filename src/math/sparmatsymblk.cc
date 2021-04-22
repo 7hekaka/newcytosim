@@ -313,7 +313,7 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd,
         if ( col.size_ > 0 )
         {
             assert_true(col.inx_[0] == jj);
-            col[0].addto_symm(mat+(jj+ldd*jj)-off, ldd);
+            col[0].addto_symm(mat+(1+ldd)*jj-off, ldd);
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];
@@ -346,7 +346,7 @@ void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd,
         if ( col.size_ > 0 )
         {
             assert_true(col.inx_[0] == jj);
-            col[0].addto_lower(mat+(jj+ldd*jj)-off, ldd, alpha);
+            col[0].addto_lower(mat+(1+ldd)*jj-off, ldd, alpha);
             for ( size_t n = 1; n < col.size_; ++n )
             {
                 size_t ii = col.inx_[n];

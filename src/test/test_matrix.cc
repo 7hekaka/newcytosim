@@ -163,29 +163,30 @@ void compareMatrix(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
 {
     real * tmp1 = new_real(size*size);
     real * tmp2 = new_real(size*size);
-    
-    mat1.reset();
-    mat2.reset();
 
     mat1.resize(size);
     mat2.resize(size);
     
+    mat1.reset();
+    mat2.reset();
+
     for ( size_t n = 0; n < fill; ++n )
     {
-        real a = RNG.sreal();
-        size_t ii = RNG.pint32(size), jj = RNG.pint32(size);
+        real a = 0.1; //RNG.preal();
+        size_t ii = RNG.pint32(size);
+        size_t jj = RNG.pint32(size);
         if ( ii != jj )
         {
             size_t i = std::max(ii, jj);
             size_t j = std::min(ii, jj);
             
             mat1(i, i) += a;
-            mat1(j, j) += a;
             mat1(i, j) -= a;
-            
+            mat1(j, j) += a;
+
             mat2(i, i) += a;
-            mat2(j, j) += a;
             mat2(i, j) -= a;
+            mat2(j, j) += a;
         }
     }
     
@@ -194,31 +195,36 @@ void compareMatrix(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
         size_t inx = DIM * ( RNG.pint32(size-cnt) / DIM );
         
         zero_real(size*size, tmp1);
-        mat1.addDiagonalBlock(tmp1, size, inx, cnt);
         zero_real(size*size, tmp2);
+
+        mat1.addDiagonalBlock(tmp1, size, inx, cnt);
         mat2.addDiagonalBlock(tmp2, size, inx, cnt);
         
-        real nrm = 0;
-        for ( size_t n = 0; n < size*size; ++n )
+        bool error = false;
+        for ( size_t i = 0; i < size; ++i )
+        for ( size_t j = 0; j < size; ++j )
         {
-            tmp1[n] -= tmp2[n];
-            nrm += tmp1[n] * tmp1[n];
+            real e = abs_real(tmp1[i+size*j]-tmp2[i+size*j]);
+            if ( e > 0.1 )
+            {
+                std::clog << "Error " << i << " " << j << "\n";
+                error = true;
+            }
         }
         
         std::clog << "Size " << size << " : " << mat1.what() << "  " << mat2.what();
         std::clog << " inx " << inx << " + " << cnt << " ";
-        if ( nrm > 0 )
+        if ( error )
         {
             std::clog << ": error\n";
             std::clog << mat2.what() << ":\n";
             VecPrint::print(std::clog, cnt, cnt, tmp2, size);
+            
             zero_real(size*size, tmp2);
             mat1.addDiagonalBlock(tmp2, size, inx, cnt);
             std::clog << mat1.what() << ":\n";
             VecPrint::print(std::clog, cnt, cnt, tmp2, size);
-            std::clog<<"\ndiff:\n";
-            VecPrint::print(std::clog, cnt, cnt, tmp1, size);
-            
+            exit(0);
         }
         else
         {

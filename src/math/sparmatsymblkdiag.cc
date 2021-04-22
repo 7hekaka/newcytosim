@@ -243,11 +243,11 @@ real* SparMatSymBlkDiag::addr(size_t iii, size_t jjj) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Stuff
 
 void SparMatSymBlkDiag::reset()
 {
-    for ( size_t n = 0; n < size_/BLOCK_SIZE; ++n )
+    for ( size_t n = 0; n < alloc_/BLOCK_SIZE; ++n )
         pilar_[n].reset();
 }
 
@@ -282,7 +282,7 @@ void SparMatSymBlkDiag::scale(const real alpha)
 
 
 void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd,
-                                        const size_t start, const size_t cnt) const
+                                         const size_t start, const size_t cnt) const
 {
     assert_false( start % BLOCK_SIZE );
     assert_false( cnt % BLOCK_SIZE );
@@ -294,7 +294,7 @@ void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd,
     for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
     {
         Column & col = pilar_[jj/BLOCK_SIZE];
-        col.dia_.addto_symm(mat+(jj+ldd*jj)-off, ldd);
+        col.dia_.addto_symm(mat+(1+ldd)*jj-off, ldd);
         for ( size_t n = 0; n < col.size_; ++n )
         {
             size_t ii = col.inx_[n];
@@ -324,7 +324,7 @@ void SparMatSymBlkDiag::addLowerBand(real alpha, real* mat, size_t ldd,
     for ( size_t jj = start; jj < end; jj += BLOCK_SIZE )
     {
         Column & col = pilar_[jj/BLOCK_SIZE];
-        col.dia_.addto_lower(mat+(jj+ldd*jj)-off, ldd, alpha);
+        col.dia_.addto_lower(mat+(1+ldd)*jj-off, ldd, alpha);
         for ( size_t n = 0; n < col.size_; ++n )
         {
             size_t ii = col.inx_[n];

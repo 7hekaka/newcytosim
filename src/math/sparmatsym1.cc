@@ -357,6 +357,7 @@ void SparMatSym1::addDiagonalBlock(real* mat, const size_t ldd,
         {
             size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
+            assert_true( ii >= jj );
             if ( ii < end )
             {
                 size_t i = amp * ( ii - start );
@@ -442,7 +443,6 @@ size_t SparMatSym1::nbDiagonalElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
-    //all allocated elements are counted, even if zero
     size_t cnt = 0;
     for ( size_t jj = start; jj < stop; ++jj )
         cnt += ( colsiz_[jj] > 0 ) && ( column_[jj][0].val != 0.0 );
