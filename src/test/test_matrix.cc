@@ -190,6 +190,7 @@ void compareMatrix(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
         }
     }
     
+    bool error = false;
     for ( size_t cnt = DIM; cnt < size; cnt += DIM )
     {
         size_t inx = DIM * ( RNG.pint32(size-cnt) / DIM );
@@ -200,7 +201,6 @@ void compareMatrix(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
         mat1.addDiagonalBlock(tmp1, size, inx, cnt);
         mat2.addDiagonalBlock(tmp2, size, inx, cnt);
         
-        bool error = false;
         for ( size_t i = 0; i < size; ++i )
         for ( size_t j = 0; j < size; ++j )
         {
@@ -212,10 +212,10 @@ void compareMatrix(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
             }
         }
         
-        std::clog << "Size " << size << " : " << mat1.what() << "  " << mat2.what();
-        std::clog << " inx " << inx << " + " << cnt << " ";
         if ( error )
         {
+            std::clog << "Size " << size << " : " << mat1.what() << "  " << mat2.what();
+            std::clog << " inx " << inx << " + " << cnt << " ";
             std::clog << ": error\n";
             std::clog << mat2.what() << ":\n";
             VecPrint::print(std::clog, cnt, cnt, tmp2, size);
@@ -224,15 +224,16 @@ void compareMatrix(size_t size,  MATRIX & mat1, MATROX& mat2, size_t fill)
             mat1.addDiagonalBlock(tmp2, size, inx, cnt);
             std::clog << mat1.what() << ":\n";
             VecPrint::print(std::clog, cnt, cnt, tmp2, size);
-            exit(0);
-        }
-        else
-        {
-            std::clog << ": identical\n";
-            //VecPrint::print(std::clog, cnt, cnt, tmp2, size);
+            break;
         }
     }
-    
+    if ( !error )
+    {
+        std::clog << mat1.what() << " and " << mat2.what();
+        std::clog << " are identical\n";
+        //VecPrint::print(std::clog, cnt, cnt, tmp2, size);
+    }
+
     free_real(tmp1);
     free_real(tmp2);
 }
@@ -626,7 +627,7 @@ int main( int argc, char* argv[] )
     printf("Matrix test and timing code --- real %lu --- %s\n", sizeof(real), __VERSION__);
 
     RNG.seed();
-#if ( 1 )
+#if ( 0 )
     SparMat1 mat1;
     SparMat2 mat2;
     SparMatA matA; //asymetric!
@@ -638,7 +639,7 @@ int main( int argc, char* argv[] )
     compareMatrix(4*5, mat1, mat3, 1<<4);
     compareMatrix(4*7, mat2, mat3, 1<<5);
 #endif
-#if ( 1 )
+#if ( 0 )
     compareMatrix(4*11, mat1, mat3, 1<<6);
     compareMatrix(4*33, mat1, mat3, 1<<16);
     compareMatrix(4*3, mat1, mat4, 1<<16);
