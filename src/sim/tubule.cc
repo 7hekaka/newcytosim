@@ -200,11 +200,11 @@ void Tubule::setInteractionsB(Meca& meca) const
     const real c = std::cos(ang), s = std::sin(ang);
     
     assert_true(fil_[0]);
-    const size_t end = fil_[0]->nbSegments();
+    const size_t e = fil_[0]->nbSegments();
     
     Rotation mat(0,1);
 
-    for ( size_t i = 0; i < end; ++i )
+    for ( size_t i = 0; i < e; ++i )
     {
         // get centerline
         Vector cen(0,0,0);
@@ -229,13 +229,13 @@ void Tubule::setInteractionsB(Meca& meca) const
     // get centerline
     Vector cen(0,0,0);
     for ( size_t n = 0; n < NFIL; ++n )
-        cen += fil_[n]->posPoint(end);
+        cen += fil_[n]->posPoint(e);
     cen /= NFIL;
     
     for ( size_t n = 0; n < NFIL; ++n )
     {
-        Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(end) ).normalized(len));
-        meca.addSideLinkMT(Interpolation(fil_[n],end-1,end,1), Mecapoint(fil_[n+1],end), arm, stiff);
+        Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(e) ).normalized(len));
+        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), arm, stiff);
     }
 #endif
 }
@@ -316,10 +316,10 @@ void Tubule::setInteractionsC(Meca& meca) const
     Vector2 ang(std::cos(angle), std::sin(angle));
     
     assert_true(fil_[0]);
-    const size_t end = fil_[0]->nbSegments();
+    const size_t e = fil_[0]->nbSegments();
     
     MatrixBlock mat;
-    for ( size_t i = 0; i <= end; ++i )
+    for ( size_t i = 0; i < e; ++i )
     {
         // get centerline
         Vector cen(0,0,0);
@@ -327,37 +327,36 @@ void Tubule::setInteractionsC(Meca& meca) const
             cen += fil_[n]->posPoint(i);
         cen /= NFIL;
         
-        if ( i < end )
-        {
-            // get average direction of the Tubule at this location:
-            Vector dir(0,0,0);
-            for ( size_t n = 0; n < NFIL; ++n )
-                dir += fil_[n]->diffPoints(i);
-            dir.normalize();
-            
-            // create rotation matrix for torque:
-            mat = Meca::torqueMatrix(stiffA, dir, ang);
-            
-            for ( size_t n = 0; n < NFIL; ++n )
-            {
-                Vector arm = (2*cen - fil_[n]->posPoint(i)- fil_[n+1]->posPoint(i)).normalized(len);
-                meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiffL);
-            }
-        }
-        else
-        {
-            for ( size_t n = 0; n < NFIL; ++n )
-            {
-                Vector arm = (2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(len);
-                meca.addSideLinkMT(Interpolation(fil_[n],i-1,i,1), Mecapoint(fil_[n+1],i), arm, stiffL);
-            }
-        }
+        // get average direction of the Tubule at this location:
+        Vector dir(0,0,0);
+        for ( size_t n = 0; n < NFIL; ++n )
+            dir += fil_[n]->diffPoints(i);
+        dir.normalize();
+        
+        // create rotation matrix for torque:
+        mat = Meca::torqueMatrix(stiffA, dir, ang);
         
         for ( size_t n = 0; n < NFIL; ++n )
         {
+            Vector arm = (2*cen - fil_[n]->posPoint(i)- fil_[n+1]->posPoint(i)).normalized(len);
+            
+            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiffL);
+
             meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i),
                            Mecapoint(fil_[n+2],i), mat, stiffA);
         }
+    }
+    
+    // last segment:
+    Vector cen(0,0,0);
+    for ( size_t n = 0; n < NFIL; ++n )
+        cen += fil_[n]->posPoint(e);
+    cen /= NFIL;
+
+    for ( size_t n = 0; n < NFIL; ++n )
+    {
+        Vector arm = (2*cen - fil_[n]->posPoint(e) - fil_[n+1]->posPoint(e)).normalized(len);
+        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), arm, stiffL);
     }
 #endif
 }

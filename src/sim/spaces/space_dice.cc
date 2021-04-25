@@ -32,7 +32,7 @@ void SpaceDice::resize(Glossary& opt)
         if ( opt.set(len, "length", d) )
             len *= 0.5;
         if ( len < edg )
-            throw InvalidParameter("dice:length[] must be >= 2 * radius");
+            throw InvalidParameter("dice:length[] must be >= 2 * edge");
         half_[d] = len;
     }
     

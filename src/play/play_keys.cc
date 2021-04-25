@@ -300,11 +300,6 @@ static void changeScale(FiberDisp* p, int d)
         p->tension_alpha = 1 / p->tension_scale;
         flashText("fiber:tension_scale = %.5f", p->tension_scale);
     }
-    else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 || p->line_style == 8 )
-    {
-        changeScale(p->length_scale, d);
-        flashText("fiber:length_scale = %.5f", p->length_scale);
-    }
     else if ( p->force_style )
     {
         changeScale(p->force_scale, d);
@@ -314,6 +309,11 @@ static void changeScale(FiberDisp* p, int d)
     {
         changeScale(p->speckle_gap, d);
         flashText("fiber:speckle_gap = %.5f", p->speckle_gap);
+    }
+    else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 || p->line_style == 8 )
+    {
+        changeScale(p->length_scale, d);
+        flashText("fiber:length_scale = %.5f", p->length_scale);
     }
     else if ( disp.style == 2 )
         flipExplode(p);
