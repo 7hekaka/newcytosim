@@ -497,9 +497,9 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 
 
 /**
- This will consider once all pairs of objects from the given lists
- Compared to `setInteractions()`, this performs an additional test
- for the distance between the object's `pos` is below `max_diameter`
+ This will consider once all pairs of objects from the given lists.
+ Compared to `setInteractions()`, this performs an additional test to exclude
+ objects for which the distance between `pos` is above `max_diameter`.
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
                                 FatPointList & pots, FatLocusList & locs)
@@ -530,8 +530,8 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated.
 
- Compared to `setInteractions()`, this performs an additional test
- for the distance between the object's `pos` is below `max_diameter`
+ Compared to `setInteractions()`, this performs an additional test to exclude
+ objects for which the distance between `pos` is above `max_diameter`.
  */
 void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
                                 FatPointList & pots1, FatLocusList & locs1,

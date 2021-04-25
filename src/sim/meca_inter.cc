@@ -1790,9 +1790,58 @@ void Meca::addLink4(Interpolation const& pti,
      force_A = weight * ( B - A ) * ( length / |AB| - 1 )
      force_B = weight * ( A - B ) * ( length / |AB| - 1 )
  
- This streamlined version is used for Steric interaction.
+ This streamlined version of addLongLink() is used for Steric interaction, with:
+ - axi = ptB.pos() - ptA.pos()
+ - ab2 = normSqr(axi)
+ - periodic boundary conditions have been applied to `axi` if necessary
+ - 'ab2 < len * len', thus leading to a repulsive force only.
+ 
  */
 
+void Meca::addLongLink1(Mecapoint const& ptA,
+                        Mecapoint const& ptB,
+                        Vector& axi,
+                        const real ab2,
+                        const real len,
+                        const real weight)
+{
+    assert_true( weight >= 0 );
+    assert_true( len >= 0 );
+
+    const size_t ia = DIM * ptA.matIndex();  // coef is +weight
+    const size_t ib = DIM * ptB.matIndex();  // coef is -weight
+
+    assert_true( ia != ib );
+    DRAW_LINK(ptA, ptA.pos(), axi, len);
+
+    if ( ab2 > REAL_EPSILON )
+    {
+        const real wab = weight / ab2;
+        MatrixBlock wT = MatrixBlock::outerProduct(axi, wab);
+        
+        axi *= ( wab * len ) * std::sqrt(ab2);
+        sub_base(ia, axi);
+        add_base(ib, axi);
+
+        sub_block_diag(ia, wT);
+        sub_block_diag(ib, wT);
+        add_block(std::max(ia, ib), std::min(ia, ib), wT);
+    }
+}
+
+
+/**
+Link `ptA` (A) and `ptB` (B),
+The force is affine with non-zero resting length:
+
+    force_A = weight * ( B - A ) * ( length / |AB| - 1 )
+    force_B = weight * ( A - B ) * ( length / |AB| - 1 )
+
+This streamlined version of addLongLink() is used for Steric interaction, with:
+ - axi = ptB.pos() - ptA.pos()
+ - ab2 = normSqr(axi)
+ - periodic boundary conditions have been applied to `axi` if necessary
+*/
 void Meca::addLongLink(Mecapoint const& ptA,
                        Mecapoint const& ptB,
                        const Vector& axi,
@@ -1812,7 +1861,8 @@ void Meca::addLongLink(Mecapoint const& ptA,
     if ( ab2 > REAL_EPSILON )
     {
         const real abn = std::sqrt(ab2);
-        const real wla = weight * len / abn;
+        const real iab = 1.0 / ab2;
+        const real wla = weight * len * abn * iab; // weight * len / abn
         
         add_base(ia, axi,-wla);
         add_base(ib, axi, wla);
@@ -1822,13 +1872,13 @@ void Meca::addLongLink(Mecapoint const& ptA,
          This is done by using len = 1 in the formula for links that are shorter
          than the desired target. */
         if ( len > abn )
-            wT = MatrixBlock::outerProduct(axi, -weight/ab2);
+            wT = MatrixBlock::outerProduct(axi, weight*iab);
         else
-            wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
+            wT = MatrixBlock::offsetOuterProduct(weight-wla, axi, wla*iab);
         
-        add_block_diag(ia, wT);
-        add_block_diag(ib, wT);
-        sub_block(std::max(ia, ib), std::min(ia, ib), wT);
+        sub_block_diag(ia, wT);
+        sub_block_diag(ib, wT);
+        add_block(std::max(ia, ib), std::min(ia, ib), wT);
     }
 }
 

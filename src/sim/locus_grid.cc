@@ -177,7 +177,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
     real ab2 = vab.normSqr();
     
     if ( ab2 < ran*ran )
-        meca.addLongLink(aa.point(), bb.point(), vab, ab2, ran, stiff);
+        meca.addLongLink1(aa.point(), bb.point(), vab, ab2, ran, stiff);
 }
 
 
@@ -229,7 +229,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink(aa.point(), bb.point1(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.point(), bb.point1(), vab, ab2, ran, stiff);
             }
         }
     }
@@ -278,7 +278,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 #endif
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) >= 0 )
-                    meca.addLongLink(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
             }
         }
         else
@@ -297,7 +297,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
             }
         }
     }
@@ -345,7 +345,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
             real ab2 = vab.normSqr();
 
             if ( ab2 < ran*ran  && dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
+                meca.addLongLink1(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
         }
         else
         {
@@ -353,7 +353,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
             }
         }
     }
@@ -373,7 +373,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
         real ab2 = vab.normSqr();
         
         if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) <= 0 )
-            meca.addLongLink(aa.point2(), bb.point2(), vab, ab2, ran, stiff);
+            meca.addLongLink1(aa.point2(), bb.point2(), vab, ab2, ran, stiff);
     }
 }
 
@@ -514,9 +514,9 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
 
 
 /**
- This will consider once all pairs of objects from the given lists
- Compared to `setInteractions()`, this performs an additional test
- for the distance between the object's `pos` is below `max_diameter`
+ This will consider once all pairs of objects from the given lists.
+ Compared to `setInteractions()`, this performs an additional test to exclude
+ objects for which the distance between `pos` is above `max_diameter`.
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
                                 BigPointList & pots, BigLocusList & locs)
@@ -547,8 +547,8 @@ void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated.
 
- Compared to `setInteractions()`, this performs an additional test
- for the distance between the object's `pos` is below `max_diameter`
+ Compared to `setInteractions()`, this performs an additional test to exclude
+ objects for which the distance between `pos` is above `max_diameter`.
  */
 void LocusGrid::setInteractions(Meca& meca, real stiff, real sup,
                                 BigPointList & pots1, BigLocusList & locs1,

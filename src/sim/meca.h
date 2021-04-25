@@ -567,7 +567,10 @@ public:
     void addLink4(Interpolation const&, const size_t[], const real[], real weight);
 
     //----------------------- ELEMENTS LINKING POINTS --------------------------
-    
+
+    /// Link of stiffness `weight` and resting length `len`
+    void addLongLink1(Mecapoint const&, Mecapoint const&, Vector&, real ab2, real len, real weight);
+
     /// Link of stiffness `weight` and resting length `len`
     void addLongLink(Mecapoint const&, Mecapoint const&, Vector const&, real ab2, real len, real weight);
 
