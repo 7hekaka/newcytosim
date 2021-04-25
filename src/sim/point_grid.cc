@@ -149,9 +149,10 @@ void PointGrid::checkPP(Meca& meca, StericParam const& pam,
     
     if ( modulo )
         modulo->fold(vab);
-    
-    if ( vab.normSqr() < len*len )
-        meca.addLongLink(aa.pnt_, bb.pnt_, len, pam.stiff_push);
+
+    real ab2 = vab.normSqr();
+    if ( ab2 < len*len )
+        meca.addLongLink(aa.pnt_, bb.pnt_, vab, ab2, len, pam.stiff_push);
 }
 
 
@@ -192,15 +193,16 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
         {
             /* we check the projection to the previous segment,
              and if it falls on the right of it, then we interact with the node */
-            Vector vab = aa.pos_ - bb.seg_.pos1();
+            Vector vab = bb.seg_.pos1() - aa.pos_;
             
             if ( modulo )
                 modulo->fold(vab);
             
-            if ( dot(vab, bb.seg_.fiber()->diffPoints(bb.seg_.point()-1)) >= 0 )
+            if ( dot(vab, bb.prevDiff()) <= 0 )
             {
-                if ( vab.normSqr() < len*len )
-                    meca.addLongLink(aa.pnt_, bb.seg_.exact1(), len, pam.stiff_push);
+                real ab2 = vab.normSqr();
+                if ( ab2 < len*len )
+                    meca.addLongLink(aa.pnt_, bb.seg_.exact1(), vab, ab2, len, pam.stiff_push);
             }
         }
     }
@@ -247,9 +249,10 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
                 if ( modulo )
                     modulo->fold(vab);
                 
-                const real len = aa.rad_ + bb.rad_;
-                if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg_.diff()) >= 0 )
-                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), len, pam.stiff_push);
+                real ab2 = vab.normSqr();
+                real len = aa.rad_ + bb.rad_;
+                if ( ab2 < len*len  &&  dot(vab, bb.seg_.diff()) >= 0 )
+                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), vab, ab2, len, pam.stiff_push);
             }
         }
         else
@@ -263,14 +266,14 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
             if ( modulo )
                 modulo->fold(vab);
             
-            if ( dot(vab, aa.seg_.fiber()->diffPoints(aa.seg_.point()-1)) >= 0 )
+            if ( dot(vab, aa.prevDiff()) >= 0 )
             {
-                const real d = vab.normSqr();
-                if ( d < ran*ran )
+                real ab2 = vab.normSqr();
+                if ( ab2 < ran*ran )
                 {
-                    const real len = aa.rad_ + bb.rad_;
-                    real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
-                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), len, stiff);
+                    real len = aa.rad_ + bb.rad_;
+                    real stiff = sign_select(ab2-len*len, pam.stiff_push, pam.stiff_pull);
+                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), vab, ab2, len, stiff);
                 }
             }
         }
@@ -316,20 +319,21 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
         if ( aa.isFirst() )
         {
             assert_true(bb.isLast());
-            const real len = aa.rad_ + bb.rad_;
-            if ( vab.normSqr() < len*len  && dot(vab, bb.seg_.diff()) <= 0 )
-                meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), len, pam.stiff_push);
+            real ab2 = vab.normSqr();
+            real len = aa.rad_ + bb.rad_;
+            if ( ab2 < len*len  && dot(vab, bb.seg_.diff()) <= 0 )
+                meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), vab, ab2, len, pam.stiff_push);
         }
         else
         {
-            if ( dot(vab, aa.seg_.fiber()->diffPoints(aa.seg_.point()-1)) >= 0 )
+            if ( dot(vab, aa.prevDiff()) >= 0 )
             {
-                const real d = vab.normSqr();
-                if ( d < ran*ran )
+                real ab2 = vab.normSqr();
+                if ( ab2 < ran*ran )
                 {
-                    const real len = aa.rad_ + bb.rad_;
-                    real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
-                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), len, stiff);
+                    real len = aa.rad_ + bb.rad_;
+                    real stiff = sign_select(ab2-len*len, pam.stiff_push, pam.stiff_pull);
+                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), vab, ab2, len, stiff);
                 }
             }
         }
@@ -347,9 +351,10 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
         if ( modulo )
             modulo->fold(vab);
         
-        const real len = aa.rad_ + bb.rad_;
-        if ( vab.normSqr() < len*len  &&  dot(vab, bb.seg_.diff()) <= 0 )
-            meca.addLongLink(aa.seg_.exact2(), bb.seg_.exact2(), len, pam.stiff_push);
+        real ab2 = vab.normSqr();
+        real len = aa.rad_ + bb.rad_;
+        if ( ab2 < len*len  &&  dot(vab, bb.seg_.diff()) <= 0 )
+            meca.addLongLink(aa.seg_.exact2(), bb.seg_.exact2(), vab, ab2, len, pam.stiff_push);
     }
 }
 

@@ -375,7 +375,7 @@ void Simul::setAllInteractions(Meca& meca) const
     // add steric interactions
     if ( prop->steric_mode )
     {
-        // in the abscence of pulling, we can use the simplified steric engine:
+        // in the presence of pulling, use the most complete steric engine:
         if ( prop->steric_stiff_pull[0] > 0 )
             setStericInteractions(meca);
         else

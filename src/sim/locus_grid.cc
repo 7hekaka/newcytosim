@@ -174,8 +174,10 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
     if ( modulo )
         modulo->fold(vab);
 #endif
-    if ( vab.normSqr() < ran*ran )
-        meca.addLongLink(aa.point(), bb.point(), ran, stiff);
+    real ab2 = vab.normSqr();
+    
+    if ( ab2 < ran*ran )
+        meca.addLongLink(aa.point(), bb.point(), vab, ab2, ran, stiff);
 }
 
 
@@ -217,16 +219,17 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
         {
             /* we check the projection to the previous segment,
              and if it falls on the right of it, then we interact with the node */
-            Vector vab = aa.pos_ - bb.pos1();
+            Vector vab = bb.pos1() - aa.pos_;
             
 #if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
 #endif
-            if ( dot(vab, bb.prevDiff()) >= 0 )
+            if ( dot(vab, bb.prevDiff()) <= 0 )
             {
-                if ( vab.normSqr() < ran*ran )
-                    meca.addLongLink(aa.point(), bb.point1(), ran, stiff);
+                real ab2 = vab.normSqr();
+                if ( ab2 < ran*ran )
+                    meca.addLongLink(aa.point(), bb.point1(), vab, ab2, ran, stiff);
             }
         }
     }
@@ -273,8 +276,9 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
                 if ( modulo )
                     modulo->fold(vab);
 #endif
-                if ( vab.normSqr() < ran*ran  &&  dot(vab, bb.diff()) >= 0 )
-                    meca.addLongLink(aa.point1(), bb.point1(), ran, stiff);
+                real ab2 = vab.normSqr();
+                if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) >= 0 )
+                    meca.addLongLink(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
             }
         }
         else
@@ -291,8 +295,9 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 #endif
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
-                if ( vab.normSqr() < ran*ran )
-                    meca.addLongLink(aa.point1(), bb.point1(), ran, stiff);
+                real ab2 = vab.normSqr();
+                if ( ab2 < ran*ran )
+                    meca.addLongLink(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
             }
         }
     }
@@ -337,15 +342,18 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
         if ( aa.isFirst() )
         {
             assert_true(bb.isLast());
-            if ( vab.normSqr() < ran*ran  && dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink(aa.point1(), bb.point2(), ran, stiff);
+            real ab2 = vab.normSqr();
+
+            if ( ab2 < ran*ran  && dot(vab, bb.diff()) <= 0 )
+                meca.addLongLink(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
         }
         else
         {
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
-                if ( vab.normSqr() < ran*ran )
-                    meca.addLongLink(aa.point1(), bb.point2(), ran, stiff);
+                real ab2 = vab.normSqr();
+                if ( ab2 < ran*ran )
+                    meca.addLongLink(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
             }
         }
     }
@@ -358,13 +366,14 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
         assert_true(bb.isLast());
         
         Vector vab = bb.pos2() - aa.pos2();
-        
 #if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
 #endif
-        if ( vab.normSqr() < ran*ran  &&  dot(vab, bb.diff()) <= 0 )
-            meca.addLongLink(aa.point2(), bb.point2(), ran, stiff);
+        real ab2 = vab.normSqr();
+        
+        if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) <= 0 )
+            meca.addLongLink(aa.point2(), bb.point2(), vab, ab2, ran, stiff);
     }
 }
 

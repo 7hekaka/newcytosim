@@ -1785,6 +1785,56 @@ void Meca::addLink4(Interpolation const& pti,
 
 /**
  Link `ptA` (A) and `ptB` (B),
+ The force is affine with non-zero resting length:
+ 
+     force_A = weight * ( B - A ) * ( length / |AB| - 1 )
+     force_B = weight * ( A - B ) * ( length / |AB| - 1 )
+ 
+ This streamlined version is used for Steric interaction.
+ */
+
+void Meca::addLongLink(Mecapoint const& ptA,
+                       Mecapoint const& ptB,
+                       const Vector& axi,
+                       const real ab2,
+                       const real len,
+                       const real weight)
+{
+    assert_true( weight >= 0 );
+    assert_true( len >= 0 );
+
+    const size_t ia = DIM * ptA.matIndex();  // coef is +weight
+    const size_t ib = DIM * ptB.matIndex();  // coef is -weight
+
+    assert_true( ia != ib );
+    DRAW_LINK(ptA, ptA.pos(), axi, len);
+
+    if ( ab2 > REAL_EPSILON )
+    {
+        const real abn = std::sqrt(ab2);
+        const real wla = weight * len / abn;
+        
+        add_base(ia, axi,-wla);
+        add_base(ib, axi, wla);
+        
+        MatrixBlock wT;
+        /* To stabilize the matrix with compression, we remove negative eigenvalues
+         This is done by using len = 1 in the formula for links that are shorter
+         than the desired target. */
+        if ( len > abn )
+            wT = MatrixBlock::outerProduct(axi, -weight/ab2);
+        else
+            wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
+        
+        add_block_diag(ia, wT);
+        add_block_diag(ib, wT);
+        sub_block(std::max(ia, ib), std::min(ia, ib), wT);
+    }
+}
+
+
+/**
+ Link `ptA` (A) and `ptB` (B),
  The force is affine with non-zero resting length: 
  
      force_A = weight * ( B - A ) * ( length / |AB| - 1 )
@@ -1823,11 +1873,9 @@ void Meca::addLongLink(Mecapoint const& ptA,
     add_base(ib, axi, wla);
     
     MatrixBlock wT;
-
     /* To stabilize the matrix with compression, we remove negative eigenvalues
      This is done by using len = 1 in the formula for links that are shorter
      than the desired target. */
-
     if ( len > abn )
         wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else
@@ -1896,11 +1944,9 @@ void Meca::addLongLink(Mecapoint const& ptA,
     add_base(ii2, axi, wla);
 
     MatrixBlock wT;
-
     /* To stabilize the matrix with compression, we remove negative eigenvalues
      This is done by using len = 1 in the formula for links that are shorter
      than the desired target. */
-
     if ( len > abn )
         wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else
@@ -1973,12 +2019,10 @@ void Meca::addLongLink(Interpolation const& ptA,
     add_base(ii2, axi, cc2 * wla);
     add_base(ii3, axi, cc3 * wla);
     
+    MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
      This is done by using len = 1 in the formula for links that are shorter
      than the desired target. */
-    
-    MatrixBlock wT;
-    
     if ( len > abn )
         wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else

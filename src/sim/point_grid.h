@@ -100,6 +100,9 @@ public:
     {
         return FatPoint(seg_.exact2(), rad_, rge_, seg_.pos2());
     }
+    
+    /// offset = point1 - point0
+    Vector prevDiff() const { return seg_.fiber()->diffPoints(seg_.point()-1); }
 };
 
 

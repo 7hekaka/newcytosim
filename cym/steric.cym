@@ -15,12 +15,13 @@ set simul system
 
 set space cell
 {
-    shape = circle
+    shape = dice
 }
 
 new cell
 {
-    radius = 3
+    length = 3, 3, 0.5
+    edge = 0.25
 }
 
 set fiber filament

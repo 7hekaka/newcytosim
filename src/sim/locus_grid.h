@@ -1,4 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
+
 #ifndef LOCUS_GRID_H
 #define LOCUS_GRID_H
 
@@ -104,7 +105,7 @@ public:
     /// offset = point2 - point1
     Vector diff() const { return fib_->diffPoints(pti_); }
     
-    /// offset = point2 - point1
+    /// offset = point1 - point0
     Vector prevDiff() const { return fib_->diffPoints(pti_-1); }
     
     /// position of point 2
