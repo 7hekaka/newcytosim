@@ -1810,12 +1810,12 @@ void Meca::addLongLink1(Mecapoint const& ptA,
 
     const size_t ia = DIM * ptA.matIndex();  // coef is +weight
     const size_t ib = DIM * ptB.matIndex();  // coef is -weight
-
     assert_true( ia != ib );
-    DRAW_LINK(ptA, ptA.pos(), axi, len);
 
     if ( ab2 > REAL_EPSILON )
     {
+        DRAW_LINK(ptA, ptA.pos(), axi, len);
+
         const real abn = std::sqrt(ab2);
         const real wab = weight / ab2;
         MatrixBlock wT = MatrixBlock::outerProduct(axi, wab);
@@ -1845,7 +1845,7 @@ This streamlined version of addLongLink() is used for Steric interaction, with:
 */
 void Meca::addLongLink(Mecapoint const& ptA,
                        Mecapoint const& ptB,
-                       const Vector& axi,
+                       Vector& axi,
                        const real ab2,
                        const real len,
                        const real weight)
@@ -1855,18 +1855,15 @@ void Meca::addLongLink(Mecapoint const& ptA,
 
     const size_t ia = DIM * ptA.matIndex();  // coef is +weight
     const size_t ib = DIM * ptB.matIndex();  // coef is -weight
-
     assert_true( ia != ib );
-    DRAW_LINK(ptA, ptA.pos(), axi, len);
 
     if ( ab2 > REAL_EPSILON )
     {
+        DRAW_LINK(ptA, ptA.pos(), axi, len);
+
         const real abn = std::sqrt(ab2);
         const real iab = 1.0 / ab2;
         const real wla = weight * len * abn * iab; // weight * len / abn
-        
-        add_base(ia, axi,-wla);
-        add_base(ib, axi, wla);
         
         MatrixBlock wT;
         /* To stabilize the matrix with compression, we remove negative eigenvalues
@@ -1876,6 +1873,10 @@ void Meca::addLongLink(Mecapoint const& ptA,
             wT = MatrixBlock::outerProduct(axi, weight*iab);
         else
             wT = MatrixBlock::offsetOuterProduct(weight-wla, axi, wla*iab);
+
+        axi *= wla;
+        sub_base(ia, axi);
+        add_base(ib, axi);
         
         sub_block_diag(ia, wT);
         sub_block_diag(ib, wT);
@@ -1911,17 +1912,13 @@ void Meca::addLongLink(Mecapoint const& ptA,
 
     if ( modulo )
         modulo->foldOffset(axi, off);
-    
-    DRAW_LINK(ptA, ptA.pos(), axi, len);
 
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
-
     const real wla = weight * len / abn;
-
-    add_base(ia, axi,-wla);
-    add_base(ib, axi, wla);
+    
+    DRAW_LINK(ptA, ptA.pos(), axi, len);
     
     MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
@@ -1932,6 +1929,10 @@ void Meca::addLongLink(Mecapoint const& ptA,
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
+    axi *= wla;
+    sub_base(ia, axi);
+    add_base(ib, axi);
+
     add_block_diag(ia, wT);
     add_block_diag(ib, wT);
     if ( ia > ib )
@@ -1977,13 +1978,10 @@ void Meca::addLongLink(Mecapoint const& ptA,
 
     if ( modulo )
         modulo->foldOffset(axi, off);
-    
-    DRAW_LINK(ptB, ptB.pos(), axi, len);
-    
+        
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
-
     const real wla = weight * len / abn;
 
     // interpolation coefficients:
@@ -2017,6 +2015,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
         add_base(ii1, off, cc1);
         add_base(ii2, off);
     }
+    DRAW_LINK(ptB, ptB.pos(), axi, len);
 }
 
 
@@ -2057,12 +2056,9 @@ void Meca::addLongLink(Interpolation const& ptA,
     if ( modulo )
         modulo->foldOffset(axi, off);
     
-    DRAW_LINK(ptA, ptA.pos(), axi, len);
-
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
-
     const real wla = weight * len / abn;
 
     add_base(ii0, axi, cc0 * wla);
@@ -2107,7 +2103,8 @@ void Meca::addLongLink(Interpolation const& ptA,
         add_base(ii1, off, cc1);
         add_base(ii2, off, cc2);
         add_base(ii3, off, cc3);
-   }
+    }
+    DRAW_LINK(ptA, ptA.pos(), axi, len);
 }
 
 
