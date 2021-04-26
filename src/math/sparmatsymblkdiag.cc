@@ -167,8 +167,11 @@ void SparMatSymBlkDiag::Column::operator =(SparMatSymBlkDiag::Column & col)
  */
 SparMatSymBlkDiag::Block& SparMatSymBlkDiag::Column::block(size_t ii, size_t jj)
 {
+#if 0
+    // this is unnecessary
     if ( ii == jj )
         return dia_;
+#endif
     
     assert_true( ii > jj );
     if ( size_ > 0 )
@@ -177,15 +180,6 @@ SparMatSymBlkDiag::Block& SparMatSymBlkDiag::Column::block(size_t ii, size_t jj)
         for ( size_t n = 0; n < size_; ++n )
             if ( inx_[n] == ii )
                 return blk_[n];
-    }
-    else
-    {
-        allocate(1);
-        //add the requested term:
-        inx_[0] = ii;
-        blk_[0].reset();
-        size_ = 1;
-        return blk_[0];
     }
     
     // add the requested term:
@@ -221,8 +215,10 @@ real& SparMatSymBlkDiag::operator()(size_t iii, size_t jjj)
     return pilar_[jj].block(ii, jj).value();
 #else
     size_t i = ii % BLOCK_SIZE;
-    size_t j = jj / BLOCK_SIZE;
-    return pilar_[j].block(ii-i, j*BLOCK_SIZE)(i, jj-j*BLOCK_SIZE);
+    size_t j = jj % BLOCK_SIZE;
+    if ( ii-i == jj-j )
+        return pilar_[jj-j].dia_(i, j);
+    return pilar_[jj-j].block(ii-i, jj-j)(i, j);
 #endif
 }
 
@@ -236,8 +232,10 @@ real* SparMatSymBlkDiag::addr(size_t iii, size_t jjj) const
     return &pilar_[jj].block(ii, jj).value();
 #else
     size_t i = ii % BLOCK_SIZE;
-    size_t j = jj / BLOCK_SIZE;
-    return pilar_[j].block(ii-i, j*BLOCK_SIZE).addr(i, j*BLOCK_SIZE);
+    size_t j = jj % BLOCK_SIZE;
+    if ( ii-i == jj-j )
+        return pilar_[jj-j].dia_.addr(i, j);
+    return pilar_[jj-j].block(ii-i, jj-j).addr(i, j);
 #endif
 }
 

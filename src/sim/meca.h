@@ -509,18 +509,19 @@ public:
     
     /// Link of stiffness `weight` with a line defined by `pos` and its tangent `dir`
     void addLineClamp(Interpolation const&, Vector const& pos, Vector const& dir, real weight);
+
     
-    /// Link of stiffness `weight` to coordinate corresponding to `inx`
-    void addPlaneClamp(size_t inx, real off, real weight);
+    /// Link of stiffness `weight` orthogonal to one of the principal plane and offset by `off`
+    void addPlaneClampXYZ(Mecapoint const& P, size_t xyz, real off, real weight);
+
+    /// Link of stiffness `weight` with a plane parallel to YZ and offset by `off`
+    void addPlaneClampX(Mecapoint const& P, real off, real weight) { addPlaneClampXYZ(P, 0, off, weight); }
     
-    /// Link of stiffness `weight` with a plane parallel to YZ offset by `off`
-    void addPlaneClampX(Mecapoint const&, real off, real weight);
+    /// Link of stiffness `weight` with a plane parallel to XZ and offset by `off`
+    void addPlaneClampY(Mecapoint const& P, real off, real weight) { addPlaneClampXYZ(P, 1, off, weight); }
     
-    /// Link of stiffness `weight` with a plane parallel to XZ offset by `off`
-    void addPlaneClampY(Mecapoint const&, real off, real weight);
-    
-    /// Link of stiffness `weight` with a plane parallel to XY offset by `off`
-    void addPlaneClampZ(Mecapoint const&, real off, real weight);
+    /// Link of stiffness `weight` with a plane parallel to XY and offset by `off`
+    void addPlaneClampZ(Mecapoint const& P, real off, real weight) { addPlaneClampXYZ(P, 2, off, weight); }
 
     
     /// Link of stiffness `weight` with a plane defined by `pos` and its normal `dir`

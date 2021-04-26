@@ -1861,8 +1861,8 @@ void Meca::addLongLink(Mecapoint const& ptA,
     {
         DRAW_LINK(ptA, ptA.pos(), axi, len);
 
-        const real abn = std::sqrt(ab2);
         const real iab = 1.0 / ab2;
+        const real abn = std::sqrt(ab2);
         const real wla = weight * len * abn * iab; // weight * len / abn
         
         MatrixBlock wT;
@@ -3869,8 +3869,9 @@ void Meca::addPointClampXY(Mecapoint const& ptA,
 #if ( DIM == 2 )
     sub_iso(ptA.matIndex(), ptA.matIndex(), weight);
 #elif ( DIM > 2 )
-    mFUL(inx,   inx  ) -= weight;
-    mFUL(inx+1, inx+1) -= weight;
+    MatrixBlock & B = mFUL.diag_block(inx);
+    B(0, 0) -= weight;
+    B(1, 1) -= weight;
     assert_true( pos.ZZ == 0 );
 #endif
     add_base(inx, pos, weight);
@@ -4023,8 +4024,8 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
     
 #if ( DIM == 2 )
     
-    mFUL(inx+1, inx+1) -= weight;
-    vBAS[inx+1]      += weight * std::copysign(rad, pte.pos().YY);
+    mFUL.diag_block(inx)(1, 1) -= weight;
+    vBAS[inx+1] += weight * std::copysign(rad, pte.pos().YY);
     
 #elif ( DIM >= 3 )
 
@@ -4039,17 +4040,18 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
     if ( rad < len )
     {
         real wla = weight * rad / len;
-        mFUL(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
-        mFUL(inx+2, inx+1) -= wla * dir.YY * dir.ZZ;
-        mFUL(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
+        MatrixBlock & B = mFUL.diag_block(inx);
+        B(1, 1) -= wla * dir.YY * dir.YY + weight - wla;
+        B(2, 1) -= wla * dir.YY * dir.ZZ;
+        B(2, 2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
     }
     else
     {
         fac = weight * rad;
-
-        mFUL(inx+1, inx+1) -= weight * dir.YY * dir.YY;
-        mFUL(inx+2, inx+1) -= weight * dir.YY * dir.ZZ;
-        mFUL(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
+        MatrixBlock & B = mFUL.diag_block(inx);
+        B(1, 1) -= weight * dir.YY * dir.YY;
+        B(2, 1) -= weight * dir.YY * dir.ZZ;
+        B(2, 2) -= weight * dir.ZZ * dir.ZZ;
     }
     
     // there should be no XX component here!
@@ -4077,8 +4079,8 @@ void Meca::addCylinderClampY(Mecapoint const& pte,
     
 #if ( DIM == 2 )
     
-    mFUL(inx, inx) -= weight;
-    vBAS[inx]    += weight * std::copysign(rad, pte.pos().XX);
+    mFUL.diag_block(inx)(0, 0) -= weight;
+    vBAS[inx] += weight * std::copysign(rad, pte.pos().XX);
     
 #elif ( DIM >= 3 )
 
@@ -4093,15 +4095,17 @@ void Meca::addCylinderClampY(Mecapoint const& pte,
     if ( rad < len )
     {
         real wla = weight * rad / len;
-        mFUL(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
-        mFUL(inx+2, inx  ) -= wla * dir.XX * dir.ZZ;
-        mFUL(inx+2, inx+2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
+        MatrixBlock & B = mFUL.diag_block(inx);
+        B(0, 0) -= wla * dir.XX * dir.XX + weight - wla;
+        B(2, 0) -= wla * dir.XX * dir.ZZ;
+        B(2, 2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
     }
     else
     {
-        mFUL(inx  , inx  ) -= weight * dir.XX * dir.XX;
-        mFUL(inx+2, inx  ) -= weight * dir.XX * dir.ZZ;
-        mFUL(inx+2, inx+2) -= weight * dir.ZZ * dir.ZZ;
+        MatrixBlock & B = mFUL.diag_block(inx);
+        B(0, 0) -= weight * dir.XX * dir.XX;
+        B(2, 0) -= weight * dir.XX * dir.ZZ;
+        B(2, 2) -= weight * dir.ZZ * dir.ZZ;
     }
     
     vBAS[inx  ] += fac * dir.XX;
@@ -4140,15 +4144,17 @@ void Meca::addCylinderClampZ(Mecapoint const& pte,
     if ( rad < len )
     {
         real wla = weight * rad / len;
-        mFUL(inx  , inx  ) -= wla * dir.XX * dir.XX + weight - wla;
-        mFUL(inx+1, inx  ) -= wla * dir.XX * dir.YY;
-        mFUL(inx+1, inx+1) -= wla * dir.YY * dir.YY + weight - wla;
+        MatrixBlock & B = mFUL.diag_block(inx);
+        B(0, 0) -= wla * dir.XX * dir.XX + weight - wla;
+        B(1, 0) -= wla * dir.XX * dir.YY;
+        B(1, 1) -= wla * dir.YY * dir.YY + weight - wla;
     }
     else
     {
-        mFUL(inx  , inx  ) -= weight * dir.XX * dir.XX;
-        mFUL(inx+1, inx  ) -= weight * dir.XX * dir.YY;
-        mFUL(inx+1, inx+1) -= weight * dir.YY * dir.YY;
+        MatrixBlock & B = mFUL.diag_block(inx);
+        B(0, 0) -= weight * dir.XX * dir.XX;
+        B(1, 0) -= weight * dir.XX * dir.YY;
+        B(1, 1) -= weight * dir.YY * dir.YY;
     }
     
     vBAS[inx  ] += fac * dir.XX;
@@ -4342,39 +4348,6 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 //------------------------------------------------------------------------------
 
 /**
- This constrains a single degree of freedom indicated by 'inx', representing a
- planar constraint in 3D. Hence 'pos' is the X, Y or Z component of the plane.
-*/
-void Meca::addPlaneClamp(size_t inx,
-                         real off,
-                         const real weight)
-{
-    mFUL(inx, inx) -= weight;
-    vBAS[inx] += weight * off;
-}
-
-void Meca::addPlaneClampX(Mecapoint const& P, real off, real weight)
-{
-    size_t inx = DIM * P.matIndex();
-    mFUL(inx, inx) -= weight;
-    vBAS[inx] += weight * off;
-}
-
-void Meca::addPlaneClampY(Mecapoint const& P, real off, real weight)
-{
-    size_t inx = DIM * P.matIndex() + 1;
-    mFUL(inx, inx) -= weight;
-    vBAS[inx] += weight * off;
-}
-
-void Meca::addPlaneClampZ(Mecapoint const& P, real off, real weight)
-{
-    size_t inx = DIM * P.matIndex() + 2;
-    mFUL(inx, inx) -= weight;
-    vBAS[inx] += weight * off;
-}
-
-/**
  Link `ptA` (X) to the line defined by `G` and tangent vector `dir`.
  The force is linear with position with a stiffness `weight`, and its
  components parallel to `dir` are removed corresponding to a frictionless line:
@@ -4438,6 +4411,26 @@ void Meca::addLineClamp(Interpolation const& pti,
     //add the constant term:
     add_base(ii0, wT*pos, -cc0);
     add_base(ii1, wT*pos, -cc1);
+}
+
+
+/**
+ This constrains a single degree of freedom indicated by 'inx', representing a
+ planar constraint in 3D. Hence 'off' is the X, Y or Z component of the plane.
+*/
+void Meca::addPlaneClampXYZ(Mecapoint const& P, size_t xyz, real off, real weight)
+{
+    assert_true( weight >= 0 );
+    assert_true( xyz < DIM );
+#if USE_MATRIX_BLOCK
+    size_t inx = DIM * P.matIndex();
+    mFUL.diag_block(inx)(xyz, xyz) -= weight;
+    vBAS[inx+xyz] += weight * off;
+#else
+    size_t inx = DIM * P.matIndex() + xyz;
+    mFUL(inx, inx) -= weight;
+    vBAS[inx] += weight * off;
+#endif
 }
 
 

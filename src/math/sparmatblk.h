@@ -16,7 +16,7 @@
  and is otherwise set here, to match the dimensionality of the simulation
  */
 
-#define BLOCK_SIZE DIM
+#define BLOCK_SIZE ( DIM < 3 ? DIM : 3 )
 
 #if ( BLOCK_SIZE == 1 )
 #  include "matrix11.h"
