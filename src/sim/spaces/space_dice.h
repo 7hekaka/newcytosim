@@ -31,7 +31,7 @@ class SpaceDice : public Space
 private:
     
     /// half the lenth in each dimension
-    real half_[3];
+    real half_[4];
     
     /// the radius by which the corners are smoothed
     real edge_;

@@ -850,7 +850,7 @@ void Meca::addTorque(Interpolation const& pt1,
     assert_true( weight >= 0 );
     assert_small( ang.normSqr() - 1.0 );
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     const Vector AB = pt1.diff();
     const Vector CD = pt2.diff();
     Vector axis = cross(AB, CD);
@@ -871,12 +871,12 @@ void Meca::addTorque(Interpolation const& pt1,
 
 MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, Vector2 const& ang)
 {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     return (-weight) * MatrixBlock::rotationAroundAxis(axi, ang.XX, ang.YY);
 #elif ( DIM == 2 )
     return (-weight) * MatrixBlock(ang.XX, axi*ang.YY, -axi*ang.YY, ang.XX);
 #else
-    return MatrixBlock(-weight);  //should not be used!
+    return MatrixBlock(0, -weight);  //should not be used!
 #endif
 }
 
@@ -948,7 +948,7 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
     assert_true( weight >= 0 );
     assert_small( ang.normSqr() - 1.0 );
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     /*
     const Vector3 AB = ptB.pos() - ptA.pos();
     const Vector3 BC = ptC.pos() - ptB.pos();
@@ -963,7 +963,7 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
     const MatrixBlock R = MatrixBlock(ang.XX, ang.YY,-ang.YY, ang.XX);
     const MatrixBlock P(0,1);
 #else
-    const MatrixBlock R(1.0);  //should not be used!
+    const MatrixBlock R(0,1);  //should not be used!
     const MatrixBlock P(0,1);
 #endif
     

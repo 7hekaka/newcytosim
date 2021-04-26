@@ -934,7 +934,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
     if ( sum == 0 )
         return 0;
     // rescale matrix: 2D: ( DIM * M - 1 ),  3D: 1/2 * ( DIM * M - 1 )
-    real beta = ( DIM == 3 ) ? 0.5 : 1.0;
+    real beta = ( DIM >= 3 ) ? 0.5 : 1.0;
     sum = beta * DIM / sum;
     for ( size_t d = 0; d < 9; ++d )
         M[d] = sum * M[d];

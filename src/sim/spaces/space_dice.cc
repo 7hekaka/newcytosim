@@ -12,7 +12,7 @@ SpaceDice::SpaceDice(SpaceProp const* p)
     if ( DIM == 1 )
         throw InvalidParameter("dice is not usable in 1D");
 
-    for ( int d = 0; d < 3; ++d )
+    for ( int d = 0; d < 4; ++d )
         half_[d] = 0;
     edge_ = 0;
 }

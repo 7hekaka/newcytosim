@@ -21,7 +21,7 @@ class SpacePeriodic : public Space
 {
     
     /// half the lenth in each dimension
-    real half_[3];
+    real half_[4];
 
     /// Object to handle periodic boundary conditions
     Modulo modulo_;

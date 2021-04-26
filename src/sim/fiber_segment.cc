@@ -123,7 +123,7 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
     real abs = ( dX * aX ) * lenInv();
 #elif ( DIM == 2 )
     real abs = ( dX * aX + dY * aY ) * lenInv();
-#elif ( DIM == 3 )
+#else
     real abs = ( dX * aX + dY * aY + dZ * aZ ) * lenInv();
 #endif
     
@@ -143,9 +143,9 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
 #if   ( DIM == 1 )
         dis = 0;
 #elif ( DIM == 2 )
-        dis = aX * aX + aY * aY - abs * abs;
-#elif ( DIM == 3 )
-        dis = aX * aX + aY * aY + aZ * aZ - abs * abs;
+        dis = aX * aX + ( aY * aY - abs * abs );
+#else
+        dis = ( aX * aX + aY * aY ) + ( aZ * aZ - abs * abs );
 #endif
         
 #if ( 0 )

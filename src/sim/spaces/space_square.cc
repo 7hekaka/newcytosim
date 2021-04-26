@@ -10,7 +10,7 @@
 SpaceSquare::SpaceSquare(SpaceProp const* p)
 : Space(p)
 {
-    for ( size_t d = 0; d < 3; ++d )
+    for ( size_t d = 0; d < 4; ++d )
         half_[d] = 0;
 }
 

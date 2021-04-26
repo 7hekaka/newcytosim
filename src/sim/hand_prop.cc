@@ -346,10 +346,10 @@ void HandProp::write_values(std::ostream& os) const
  */
 real HandProp::bindingSectionRate() const
 {
-#if ( DIM == 2 )
-    return 2 * binding_range * binding_rate;
-#elif ( DIM == 3 )
+#if ( DIM >= 3 )
     return M_PI * binding_range * binding_range * binding_rate;
+#elif ( DIM == 2 )
+    return 2 * binding_range * binding_rate;
 #else
     return binding_rate;
 #endif
@@ -361,10 +361,10 @@ real HandProp::bindingSectionRate() const
  */
 real HandProp::bindingSectionProb() const
 {
-#if ( DIM == 2 )
-    return 2 * binding_range * binding_prob;
-#elif ( DIM == 3 )
+#if ( DIM >= 3 )
     return M_PI * binding_range * binding_range * binding_prob;
+#elif ( DIM == 2 )
+    return 2 * binding_range * binding_prob;
 #else
     return binding_prob;
 #endif

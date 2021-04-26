@@ -9,7 +9,7 @@
 SpacePeriodic::SpacePeriodic(SpaceProp const* p)
 : Space(p)
 {
-    for ( int d = 0; d < 3; ++d )
+    for ( int d = 0; d < 4; ++d )
         half_[d] = 0;
 }
 

@@ -364,9 +364,9 @@ void Display::prepareLineDisp(const Fiber * fib)
 
     bool hide = false;
     // hide right or left-pointing fibers:
-    if (( disp->hide & 1 )  &&  dot(fib->diffPoints(0), disp->hide_axis) < 0 )
+    if (( disp->hide & 1 )  &&  dot(fib->diffPoints(0), Vector(disp->hide_axis)) < 0 )
         hide = true;
-    if (( disp->hide & 2 )  &&  dot(fib->diffPoints(0), disp->hide_axis) > 0 )
+    if (( disp->hide & 2 )  &&  dot(fib->diffPoints(0), Vector(disp->hide_axis)) > 0 )
         hide = true;
     
 #if ( DIM == 2 )
@@ -672,13 +672,13 @@ void Display::drawAverageFiber(ObjectList const& objs)
 bool selectR(Object const* obj, void const* arg)
 {
     Fiber const* fib = static_cast<Fiber const*>(obj);
-    return fib->prop == arg  &&  dot(fib->diffPoints(0), fib->prop->disp->hide_axis) > 0;
+    return fib->prop==arg  &&  dot(fib->diffPoints(0), Vector(fib->prop->disp->hide_axis)) > 0;
 }
 
 bool selectL(Object const* obj, void const* arg)
 {
     Fiber const* fib = static_cast<Fiber const*>(obj);
-    return fib->prop == arg  &&  dot(fib->diffPoints(0), fib->prop->disp->hide_axis) < 0;
+    return fib->prop==arg  &&  dot(fib->diffPoints(0), Vector(fib->prop->disp->hide_axis)) < 0;
 }
 
 void Display::drawAverageFiber1(FiberSet const& fibers, void const* arg)
