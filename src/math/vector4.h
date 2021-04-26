@@ -23,7 +23,6 @@ class Vector3;
 #  define VECTOR4_USES_AVX 0
 #endif
 
-
 /// Vector4 is a vector with 4 `real` components.
 /**
  Note: We assume that the coordinates XX, YY, ZZ and TT are adjacent in memory,
@@ -74,13 +73,13 @@ public:
 #endif
     
     /// copy 1 coordinate from Vector1
-    Vector4(const Vector1&);
+    explicit Vector4(const Vector1&);
 
     /// copy 2 coordinates from Vector2
-    Vector4(const Vector2&);
+    explicit Vector4(const Vector2&);
     
     /// copy 3 coordinates from Vector3
-    Vector4(const Vector3&);
+    explicit Vector4(const Vector3&);
 
     /// address of coordinate array
     real * data()                { return &XX; }
@@ -108,7 +107,7 @@ public:
         return (&XX)[i];
     }
 #endif
-    
+
     /// return x-component
     real x() const { return XX; }
     /// return y-component
@@ -762,13 +761,12 @@ public:
     
     /// return a random vector of norm <= n; sampling is uniform
     static Vector4 randB(real n);
-  
+    
     
     /// return a random vector with Normally distributed coordinates ~ N(0,n)
     static Vector4 randG(real n);
     
 };
-
 
 //-------------------------- associated global functions -----------------------
 

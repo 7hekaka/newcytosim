@@ -238,21 +238,21 @@ inline void Meca::sub_iso_diag(size_t i, real val)
 
 
 /// add `vec` to the base
-inline void Meca::add_base(size_t i, Vector const& vec)
+inline void Meca::add_base(size_t const& i, Vector const& vec) const
 {
     assert_true( i % DIM == 0 );
     vec.add_to(vBAS+i);
 }
 
 /// add `alpha * vec` to the base
-inline void Meca::add_base(size_t i, Vector const& vec, real alpha)
+inline void Meca::add_base(size_t const& i, Vector const& vec, real alpha) const
 {
     assert_true( i % DIM == 0 );
     vec.add_to(alpha, vBAS+i);
 }
 
 /// add `-vec` to the base
-inline void Meca::sub_base(size_t i, Vector const& vec)
+inline void Meca::sub_base(size_t const& i, Vector const& vec) const
 {
     assert_true( i % DIM == 0 );
     vec.sub_to(vBAS+i);
@@ -1816,10 +1816,11 @@ void Meca::addLongLink1(Mecapoint const& ptA,
 
     if ( ab2 > REAL_EPSILON )
     {
+        const real abn = std::sqrt(ab2);
         const real wab = weight / ab2;
         MatrixBlock wT = MatrixBlock::outerProduct(axi, wab);
         
-        axi *= ( wab * len ) * std::sqrt(ab2);
+        axi *= ( wab * len ) * abn;
         sub_base(ia, axi);
         add_base(ib, axi);
 

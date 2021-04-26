@@ -283,13 +283,13 @@ private:
     void sub_iso_diag(size_t i, real val);
 
     /// add vector to vBAS at index `i`
-    void add_base(size_t i, Vector const&);
+    void add_base(size_t const&, Vector const&) const;
 
     /// add scaled vector to vBAS at index `i`
-    void add_base(size_t i, Vector const&, real);
+    void add_base(size_t const&, Vector const&, real) const;
 
     /// sub vector to vBAS at index `i`
-    void sub_base(size_t i, Vector const&);
+    void sub_base(size_t const&, Vector const&) const;
 
 private:
     

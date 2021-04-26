@@ -83,10 +83,10 @@ public:
 #endif
     
     /// copy 1 coordinate from Vector1
-    Vector3(const Vector1&);
+    explicit Vector3(const Vector1&);
 
     /// copy 2 coordinates from Vector2
-    Vector3(const Vector2&);
+    explicit Vector3(const Vector2&);
     
     
     /// address of coordinate array
@@ -134,7 +134,7 @@ public:
 #endif
     }
     
-    /// load from array: X = b[0]; Y = b[1]; Z = b[2]
+    /// load from memory: X = b[0]; Y = b[1]; Z = b[2]
     void load(const float b[])
     {
         XX = b[0];
@@ -145,7 +145,7 @@ public:
 #endif
     }
     
-    /// load from array: X = b[0]; Y = b[1]; Z = b[2]
+    /// load from memory: X = b[0]; Y = b[1]; Z = b[2]
     void load(const double b[])
     {
 #if VECTOR3_USES_AVX
@@ -227,7 +227,8 @@ public:
     void add_to(real b[]) const
     {
 #if VECTOR3_USES_AVX
-        store3(b, add4(vec, load3(b)));
+        assert_true(vec[3] == 0);
+        storeu4(b, add4(vec, loadu4(b)));
 #else
         b[0] += XX;
         b[1] += YY;
@@ -239,7 +240,8 @@ public:
     void add_to(real alpha, real b[]) const
     {
 #if VECTOR3_USES_AVX
-        store3(b, add4(mul4(set4(alpha), vec), load3(b)));
+        assert_true(vec[3] == 0);
+        storeu4(b, add4(mul4(set4(alpha), vec), loadu4(b)));
 #else
         b[0] += alpha * XX;
         b[1] += alpha * YY;
@@ -262,7 +264,8 @@ public:
     void sub_to(real b[]) const
     {
 #if VECTOR3_USES_AVX
-        store3(b, sub4(load3(b), vec));
+        assert_true(vec[3] == 0);
+        storeu4(b, sub4(loadu4(b), vec));
 #else
         b[0] -= XX;
         b[1] -= YY;
@@ -274,7 +277,8 @@ public:
     void sub_to(real alpha, real b[]) const
     {
 #if VECTOR3_USES_AVX
-        store3(b, sub4(load3(b), mul4(set4(alpha), vec)));
+        assert_true(vec[3] == 0);
+        storeu4(b, sub4(loadu4(b), mul4(set4(alpha), vec)));
 #else
         b[0] -= alpha * XX;
         b[1] -= alpha * YY;
@@ -1104,6 +1108,4 @@ inline std::ostream& operator << (std::ostream& os, Vector3 const& arg)
     return os;
 }
 
-
 #endif
-

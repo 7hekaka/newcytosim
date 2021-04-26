@@ -213,15 +213,13 @@ public:
         assert_true( jj < size_ );
         assert_true( ii % BLOCK_SIZE == 0 );
         assert_true( jj % BLOCK_SIZE == 0 );
-        if ( ii == jj )
-            return column(ii).diag_block();
 #if ( 1 )
         // safe swap, with branchless code:
         size_t i = std::max(ii, jj);
         size_t j = std::min(ii, jj);
         return column(j).block(i, j);
 #else
-        assert_true( ii > jj );
+        assert_true( ii >= jj );
         return column(jj).block(ii, jj);
 #endif
     }
