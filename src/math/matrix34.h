@@ -506,10 +506,10 @@ public:
     }
 
 #pragma mark -
-#if MATRIX34_USES_AVX
     
-    /// multiplication by a vector: this * V
-    const vec4 vecmul4(const vec4 vec) const
+#if MATRIX34_USES_AVX
+    /// multiplication by a vector: this * V = { x, y, z, garbage }
+    const vec4 vecmul3_avx(const vec4 vec) const
     {
         vec4 s0 = mul4(load4(val  ), vec);
         vec4 s1 = mul4(load4(val+4), vec);
@@ -522,14 +522,8 @@ public:
         return add4(twine2f128(s0, s2), blend22(s0, s2));
     }
     
-    /// multiplication by a vector: this * V
-    const vec4 vecmul3(double const* V) const
-    {
-        return vecmul4(loadu4(V)); // { x, y, z, garbage }
-    }
-
     /// multiplication by a vector: transpose(M) * V
-    const vec4 trans_vecmul3(double const* V) const
+    const vec4 trans_vecmul3_avx(double const* V) const
     {
         vec4 xyxy = broadcast2(V);
         vec4 xxxx = duplo4(xyxy); //broadcast1(V);
@@ -542,7 +536,7 @@ public:
 #endif
     
     /// multiplication by a vector: this * V
-    Vector3 vecmul0(Vector3 const& V) const
+    Vector3 vecmul_(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[1] * V.YY + val[2] * V.ZZ,
                        val[4] * V.XX + val[5] * V.YY + val[6] * V.ZZ,
@@ -550,41 +544,15 @@ public:
     }
     
     /// multiplication by a vector: this * V
-    Vector3 vecmul0(real const* ptr) const
+    Vector3 vecmul_(real const* R) const
     {
-        return Vector3(val[0] * ptr[0] + val[1] * ptr[1] + val[2] * ptr[2],
-                       val[4] * ptr[0] + val[5] * ptr[1] + val[6] * ptr[2],
-                       val[8] * ptr[0] + val[9] * ptr[1] + val[10] * ptr[2]);
-    }
-
-    /// multiplication by a vector: this * V
-    inline Vector3 vecmul(Vector3 const& vec) const
-    {
-#if MATRIX34_USES_AVX
-        return vecmul3(vec);
-#else
-        return vecmul0(vec);
-#endif
-    }
-    
-    /// multiplication by a vector: this * { ptr[0], ptr[1] }
-    Vector3 vecmul(real const* ptr) const
-    {
-#if MATRIX34_USES_AVX
-        return vecmul3(ptr);
-#else
-        return vecmul0(ptr);
-#endif
-    }
-
-    /// multiplication with a vector: M * V
-    friend Vector3 operator * (Matrix34 const& mat, Vector3 const& vec)
-    {
-        return mat.vecmul(vec);
+        return Vector3(val[0] * R[0] + val[1] * R[1] + val[2] * R[2],
+                       val[4] * R[0] + val[5] * R[1] + val[6] * R[2],
+                       val[8] * R[0] + val[9] * R[1] + val[10] * R[2]);
     }
 
     /// multiplication by a vector: transpose(M) * V
-    Vector3 trans_vecmul0(Vector3 const& V) const
+    Vector3 trans_vecmul_(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[4] * V.YY + val[ 8] * V.ZZ,
                        val[1] * V.XX + val[5] * V.YY + val[ 9] * V.ZZ,
@@ -592,21 +560,50 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    Vector3 trans_vecmul0(real const* V) const
+    Vector3 trans_vecmul_(real const* V) const
     {
         return Vector3(val[0] * V[0] + val[4] * V[1] + val[ 8] * V[2],
                        val[1] * V[0] + val[5] * V[1] + val[ 9] * V[2],
                        val[2] * V[0] + val[6] * V[1] + val[10] * V[2]);
     }
 
+    /// multiplication by a vector: this * V
+    inline Vector3 vecmul(Vector3 const& vec) const
+    {
+#if MATRIX34_USES_AVX && VECTOR3_USES_AVX
+        return vecmul3_avx(vec.vec);
+#elif MATRIX34_USES_AVX
+        return vecmul3_avx(vec.data());
+#else
+        return vecmul_(vec);
+#endif
+    }
+    
+    /// multiplication by a vector: this * { ptr[0], ptr[1] }
+    Vector3 vecmul(real const* ptr) const
+    {
+#if MATRIX34_USES_AVX
+        return vecmul3_avx(loadu4(ptr));
+#else
+        return vecmul_(ptr);
+#endif
+    }
+
     /// multiplication by a vector: transpose(M) * V
     inline Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX34_USES_AVX
-        return trans_vecmul3(V);
+        return trans_vecmul3_avx(V);
 #else
-        return trans_vecmul0(V);
+        return trans_vecmul_(V);
 #endif
+    }
+
+    
+    /// multiplication with a 3-component vector: M * V
+    friend Vector3 operator * (Matrix34 const& mat, Vector3 const& vec)
+    {
+        return mat.vecmul(vec);
     }
 
     /// multiplication by another matrix: @returns this * M

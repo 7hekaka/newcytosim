@@ -413,7 +413,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    static const vec2 vecmul2(vec4 const& mat, vec2 const& vec)
+    static const vec2 vecmul2_avx(vec4 const& mat, vec2 const& vec)
     {
 #if 0
         vec2 res;
@@ -431,7 +431,7 @@ public:
     }
     
     /// multiplication by a vector: this * V
-    static const vec2 vecmul2(vec4 const& mat, real const* V)
+    static const vec2 vecmul2_avx(vec4 const& mat, real const* V)
     {
 #if 0
         vec2 res;
@@ -449,7 +449,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    static const vec2 trans_vecmul2(vec4 const& mat, real const* V)
+    static const vec2 trans_vecmul2_avx(vec4 const& mat, real const* V)
     {
 #if 0
         vec2 res;
@@ -469,7 +469,7 @@ public:
     }
     
     /// multiplication by another matrix: @returns val * mat
-    static const vec4 mul(vec4 const& val, vec4 const& mat)
+    static const vec4 mul_avx(vec4 const& val, vec4 const& mat)
     {
 #ifdef __FMA__
         vec4 s = mul4(permute2f128(val,val,0x20), duplo4(mat));
@@ -482,14 +482,14 @@ public:
     }
     
     /// multiplication by another matrix: @returns val * mat
-    static const vec4 mul(real const* val, vec4 const& mat)
+    static const vec4 mul_avx(real const* val, vec4 const& mat)
     {
         vec4 s = mul4(broadcast2(val), duplo4(mat));
         return fmadd4(broadcast2(val+2), duphi4(mat), s);
     }
 
     /// multiplication by another matrix: @returns transpose(this) * mat
-    static const vec4 trans_mul(vec4 const& val, vec4 const& mat)
+    static const vec4 trans_mul_avx(vec4 const& val, vec4 const& mat)
     {
 #ifdef __FMA__
         vec4 s = mul4(permute4x64(val, 0x88), duplo4(mat));
@@ -508,26 +508,26 @@ public:
 #endif
 
     /// multiplication by a vector: this * V
-    Vector2 vecmul0(Vector2 const& V) const
+    Vector2 vecmul_(Vector2 const& V) const
     {
         return Vector2(val[0] * V.XX + val[2] * V.YY,
                        val[1] * V.XX + val[3] * V.YY);
     }
 
     /// multiplication by a vector: this * V
-    Vector2 vecmul0(real const* ptr) const
+    Vector2 vecmul_(real const* P) const
     {
-        return Vector2(val[0] * ptr[0] + val[2] * ptr[1],
-                       val[1] * ptr[0] + val[3] * ptr[1]);
+        return Vector2(val[0] * P[0] + val[2] * P[1],
+                       val[1] * P[0] + val[3] * P[1]);
     }
 
     /// multiplication by a vector: this * V
     Vector2 vecmul(Vector2 const& V) const
     {
 #if MATRIX22_USES_AVX
-        return Vector2(vecmul2(mat, V.vec));
+        return Vector2(vecmul2_avx(mat, V.vec));
 #else
-        return vecmul0(V);
+        return vecmul_(V);
 #endif
     }
 
@@ -535,9 +535,9 @@ public:
     Vector2 vecmul(real const* ptr) const
     {
 #if MATRIX22_USES_AVX
-        return Vector2(vecmul2(mat, ptr));
+        return Vector2(vecmul2_avx(mat, ptr));
 #else
-        return vecmul0(ptr);
+        return vecmul_(ptr);
 #endif
     }
     
@@ -547,26 +547,26 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    Vector2 trans_vecmul0(Vector2 const& V) const
+    Vector2 trans_vecmul_(Vector2 const& V) const
     {
         return Vector2(val[0] * V.XX + val[1] * V.YY,
                        val[2] * V.XX + val[3] * V.YY);
     }
 
     /// multiplication by a vector: transpose(M) * V
-    Vector2 trans_vecmul0(real const* ptr) const
+    Vector2 trans_vecmul_(real const* R) const
     {
-        return Vector2(val[0] * ptr[0] + val[1] * ptr[1],
-                       val[2] * ptr[0] + val[3] * ptr[1]);
+        return Vector2(val[0] * R[0] + val[1] * R[1],
+                       val[2] * R[0] + val[3] * R[1]);
     }
 
     /// multiplication by a vector: transpose(M) * V
     Vector2 trans_vecmul(real const* ptr) const
     {
 #if MATRIX22_USES_AVX
-        return Vector2(trans_vecmul2(mat, ptr));
+        return Vector2(trans_vecmul2_avx(mat, ptr));
 #else
-        return trans_vecmul0(ptr);
+        return trans_vecmul_(ptr);
 #endif
     }
 
@@ -574,7 +574,7 @@ public:
     const Matrix22 mul(Matrix22 const& M) const
     {
 #if MATRIX22_USES_AVX
-        return mul(val, M.mat);
+        return mul_avx(val, M.mat);
 #else
         Matrix22 res;
         res.val[0] = val[0] * M[0] + val[2] * M[1];
@@ -595,7 +595,7 @@ public:
     const Matrix22 trans_mul(Matrix22 const& M) const
     {
 #if MATRIX22_USES_AVX
-        return trans_mul(mat, M.mat);
+        return trans_mul_avx(mat, M.mat);
 #else
         Matrix22 res;
         res.val[0] = val[0] * M[0] + val[1] * M[1];

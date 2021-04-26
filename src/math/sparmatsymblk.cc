@@ -705,18 +705,18 @@ void SparMatSymBlk::Column::vecMulAdd3D(const real* X, real* Y, size_t jj) const
 void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 {
     assert_true(size_ > 0);
-    const vec4 xxxx = load4(X+jj);
+    const Vector4 xxxx(X+jj);
     assert_true(inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
-    vec4 yyyy = blk_[0].vecmul4(xxxx);
+    Vector4 yyyy = blk_[0].vecmul(xxxx);
     for ( size_t n = 1; n < size_; ++n )
     {
         const size_t ii = inx_[n];
         Block const& M = blk_[n];
-        store4(Y+ii, add4(load4(Y+ii), M.vecmul4(xxxx)));
-        yyyy += M.trans_vecmul(X+ii);
+        M.vecmul(xxxx).add_to(Y+ii);
+        yyyy += M.trans_vecmul4_(X+ii);
     }
-    store4(Y+jj, add4(yyyy, load4(Y+jj)));
+    yyyy.add_to(Y+jj);
 }
 #endif
 

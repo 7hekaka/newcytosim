@@ -499,26 +499,9 @@ public:
 #pragma mark -
 
 #if MATRIX33_USES_AVX
-    /// multiplication by a vector: this * V
-    const vec4 vecmul3(double const* V) const
-    {
-        vec4 xyxy = broadcast2(V);
-        vec4 xxxx = duplo4(xyxy); //broadcast1(V);
-        vec4 yyyy = duphi4(xyxy); //broadcast1(V+1);
-        vec4 zzzz = broadcast1(V+2);
-#if ( BLD == 4 )
-        xxxx = mul4(load4(val), xxxx);
-        yyyy = mul4(load4(val+BLD), yyyy);
-        return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx,yyyy));
-#else
-        xxxx = mul4(load3(val), xxxx);
-        yyyy = mul4(load3(val+BLD), yyyy);
-        return fmadd4(load3(val+BLD*2), zzzz, add4(xxxx,yyyy));
-#endif
-    }
     
-    /// multiplication by a vector: this * V
-    const vec4 vecmul4(const vec4 xyzt) const
+    /// multiplication by a 3-components vector: this * V
+    const vec4 vecmul3_avx(const vec4 xyzt) const
     {
         vec4 xyxy = duplo2f128(xyzt);
         vec4 ztzt = duphi2f128(xyzt);
@@ -528,16 +511,34 @@ public:
 #if ( BLD == 4 )
         xxxx = mul4(load4(val), xxxx);
         yyyy = mul4(load4(val+BLD), yyyy);
-        return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx,yyyy));
+        return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx, yyyy));
 #else
         xxxx = mul4(load3(val), xxxx);
         yyyy = mul4(load3(val+BLD), yyyy);
-        return fmadd4(load3(val+BLD*2), zzzz, add4(xxxx,yyyy));
+        return fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
+#endif
+    }
+
+    /// multiplication by a vector: this * V
+    const vec4 vecmul3_avx(double const* V) const
+    {
+        vec4 xyxy = broadcast2(V);
+        vec4 xxxx = duplo4(xyxy); //broadcast1(V);
+        vec4 yyyy = duphi4(xyxy); //broadcast1(V+1);
+        vec4 zzzz = broadcast1(V+2);
+#if ( BLD == 4 )
+        xxxx = mul4(load4(val), xxxx);
+        yyyy = mul4(load4(val+BLD), yyyy);
+        return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx, yyyy));
+#else
+        xxxx = mul4(load3(val), xxxx);
+        yyyy = mul4(load3(val+BLD), yyyy);
+        return fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
 #endif
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const vec4 trans_vecmul3(double const* V) const
+    const vec4 trans_vecmul3_avx(double const* V) const
     {
 #if ( BLD == 4 )
         vec4 vec = loadu4(V); // { x, y, z, garbage }
@@ -555,7 +556,7 @@ public:
 #endif
     
     /// multiplication by a vector: this * V
-    Vector3 vecmul0(Vector3 const& V) const
+    Vector3 vecmul_(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[  BLD] * V.YY + val[  BLD*2] * V.ZZ,
                        val[1] * V.XX + val[1+BLD] * V.YY + val[1+BLD*2] * V.ZZ,
@@ -563,20 +564,38 @@ public:
     }
     
     /// multiplication by a vector: this * V
-    Vector3 vecmul0(real const* ptr) const
+    Vector3 vecmul_(real const* R) const
     {
-        return Vector3(val[0] * ptr[0] + val[  BLD] * ptr[1] + val[  BLD*2] * ptr[2],
-                       val[1] * ptr[0] + val[1+BLD] * ptr[1] + val[1+BLD*2] * ptr[2],
-                       val[2] * ptr[0] + val[2+BLD] * ptr[1] + val[2+BLD*2] * ptr[2]);
+        return Vector3(val[0] * R[0] + val[  BLD] * R[1] + val[  BLD*2] * R[2],
+                       val[1] * R[0] + val[1+BLD] * R[1] + val[1+BLD*2] * R[2],
+                       val[2] * R[0] + val[2+BLD] * R[1] + val[2+BLD*2] * R[2]);
+    }
+    
+    /// multiplication by a vector: transpose(M) * V
+    Vector3 trans_vecmul_(Vector3 const& V) const
+    {
+        return Vector3(val[0    ] * V.XX + val[1      ] * V.YY + val[2      ] * V.ZZ,
+                       val[BLD  ] * V.XX + val[1+BLD  ] * V.YY + val[2+BLD  ] * V.ZZ,
+                       val[BLD*2] * V.XX + val[1+BLD*2] * V.YY + val[2+BLD*2] * V.ZZ);
+    }
+
+    /// multiplication by a vector: transpose(M) * V
+    Vector3 trans_vecmul_(real const* R) const
+    {
+        return Vector3(val[0    ] * R[0] + val[1      ] * R[1] + val[2      ] * R[2],
+                       val[BLD  ] * R[0] + val[1+BLD  ] * R[1] + val[2+BLD  ] * R[2],
+                       val[BLD*2] * R[0] + val[1+BLD*2] * R[1] + val[2+BLD*2] * R[2]);
     }
 
     /// multiplication by a vector: this * V
     inline Vector3 vecmul(Vector3 const& vec) const
     {
-#if MATRIX33_USES_AVX
-        return vecmul3(vec);
+#if MATRIX33_USES_AVX && VECTOR3_USES_AVX
+        return vecmul3_avx(vec.vec);
+#elif MATRIX33_USES_AVX
+        return vecmul3_avx(vec.data());
 #else
-        return vecmul0(vec);
+        return vecmul_(vec);
 #endif
     }
     
@@ -584,9 +603,9 @@ public:
     Vector3 vecmul(real const* ptr) const
     {
 #if MATRIX33_USES_AVX
-        return vecmul3(ptr);
+        return vecmul3_avx(ptr);
 #else
-        return vecmul0(ptr);
+        return vecmul_(ptr);
 #endif
     }
 
@@ -597,28 +616,12 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    Vector3 trans_vecmul0(Vector3 const& V) const
-    {
-        return Vector3(val[0    ] * V.XX + val[1      ] * V.YY + val[2      ] * V.ZZ,
-                       val[BLD  ] * V.XX + val[1+BLD  ] * V.YY + val[2+BLD  ] * V.ZZ,
-                       val[BLD*2] * V.XX + val[1+BLD*2] * V.YY + val[2+BLD*2] * V.ZZ);
-    }
-
-    /// multiplication by a vector: transpose(M) * V
-    Vector3 trans_vecmul0(real const* V) const
-    {
-        return Vector3(val[0    ] * V[0] + val[1      ] * V[1] + val[2      ] * V[2],
-                       val[BLD  ] * V[0] + val[1+BLD  ] * V[1] + val[2+BLD  ] * V[2],
-                       val[BLD*2] * V[0] + val[1+BLD*2] * V[1] + val[2+BLD*2] * V[2]);
-    }
-
-    /// multiplication by a vector: transpose(M) * V
     inline Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX33_USES_AVX
-        return trans_vecmul3(V);
+        return trans_vecmul3_avx(V);
 #else
-        return trans_vecmul0(V);
+        return trans_vecmul_(V);
 #endif
     }
 

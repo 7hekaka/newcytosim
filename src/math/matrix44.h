@@ -5,6 +5,7 @@
 #define MATRIX44
 
 #include "real.h"
+#include "vector3.h"
 #include "vector4.h"
 #include <cstdio>
 #include <iostream>
@@ -398,8 +399,35 @@ public:
 #pragma mark -
 
 #if MATRIX44_USES_AVX
-    /// multiplication by a vector: this * V
-    const vec4 vecmul4(vec4 const& vec) const
+    
+    /// multiplication by a 3-components vector: this * V = { x, y, z, garbage }
+    const vec4 vecmul3_avx(const vec4 xyzt) const
+    {
+        vec4 xyxy = duplo2f128(xyzt);
+        vec4 ztzt = duphi2f128(xyzt);
+        vec4 xxxx = duplo4(xyxy);
+        vec4 yyyy = duphi4(xyxy);
+        vec4 zzzz = duplo4(ztzt);
+        xxxx = mul4(load4(val), xxxx);
+        yyyy = mul4(load4(val+4), yyyy);
+        return fmadd4(load4(val+8), zzzz, add4(xxxx, yyyy));
+    }
+
+    /// multiplication by a 3-components vector: transpose(M) * V
+    const vec4 trans_vecmul3_avx(double const* V) const
+    {
+        vec4 vec = loadu4(V); // { x, y, z, garbage }
+        vec4 s0 = mul4(load4(val  ), vec);
+        vec4 s1 = mul4(load4(val+4), vec);
+        vec4 s2 = mul4(load4(val+8), vec);
+        vec4 s3 = setzero4();
+        s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
+        s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+        return add4(twine2f128(s0, s2), blend22(s0, s2));
+    }
+
+    /// multiplication by a 4-components vector: this * V
+    const vec4 vecmul4_avx(vec4 const& vec) const
     {
         vec4 p = swap2f128(vec);
         vec4 l = blend22(vec, p);
@@ -411,8 +439,8 @@ public:
         return add4(x, y);
     }
     
-    /// multiplication by a vector: transpose(this) * V
-    const vec4 trans_vecmul4(vec4 const& vec) const
+    /// multiplication by a 4-components vector: transpose(this) * V
+    const vec4 trans_vecmul4_avx(vec4 const& vec) const
     {
         vec4 s0 = mul4(load4(val   ), vec);
         vec4 s1 = mul4(load4(val+4 ), vec);
@@ -424,61 +452,125 @@ public:
         return add4(twine2f128(s0, s2), blend22(s0, s2));
     }
 
-    /// multiplication by a vector: this * V
-    const vec4 vecmul(real const* ptr) const
+/*
+    /// multiplication by a vector3: this * V
+    const vec4 vecmul3_avx(real const* R) const
     {
-#if 1
-        return vecmul4(load4(ptr));
-#else
-        return vec4{val[0x0] * ptr[0] + val[0x4] * ptr[1] + val[0x8] * ptr[2] + val[0xC] * ptr[3],
-                    val[0x1] * ptr[0] + val[0x5] * ptr[1] + val[0x9] * ptr[2] + val[0xD] * ptr[3],
-                    val[0x2] * ptr[0] + val[0x6] * ptr[1] + val[0xA] * ptr[2] + val[0xE] * ptr[3],
-                    val[0x3] * ptr[0] + val[0x7] * ptr[1] + val[0xB] * ptr[2] + val[0xF] * ptr[3]};
-#endif
+        return vec4{val[0x0] * R[0] + val[0x4] * R[1] + val[0x8] * R[2],
+                    val[0x1] * R[0] + val[0x5] * R[1] + val[0x9] * R[2],
+                    val[0x2] * R[0] + val[0x6] * R[1] + val[0xA] * R[2], 0};
     }
 
     /// multiplication by a vector: transpose(M) * V
-    const vec4 trans_vecmul(real const* V) const
+    const vec4 trans_vecmul3_avx(real const* R) const
     {
-#if 1
-        return trans_vecmul4(load4(V));
+        return vec4{val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2],
+                    val[0x4] * R[0] + val[0x5] * R[1] + val[0x6] * R[2],
+                    val[0x8] * R[0] + val[0x9] * R[1] + val[0xA] * R[2], 0};
+    }
+
+    /// multiplication by a vector: this * V
+    const vec4 vecmul4_avx(real const* R) const
+    {
+        return vec4{val[0x0] * R[0] + val[0x4] * R[1] + val[0x8] * R[2] + val[0xC] * R[3],
+                    val[0x1] * R[0] + val[0x5] * R[1] + val[0x9] * R[2] + val[0xD] * R[3],
+                    val[0x2] * R[0] + val[0x6] * R[1] + val[0xA] * R[2] + val[0xE] * R[3],
+                    val[0x3] * R[0] + val[0x7] * R[1] + val[0xB] * R[2] + val[0xF] * R[3]};
+    }
+
+    /// multiplication by a vector: transpose(M) * V
+    const vec4 trans_vecmul4_avx(real const* R) const
+    {
+        return vec4{val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2] + val[0x3] * R[3],
+                    val[0x4] * R[0] + val[0x5] * R[1] + val[0x6] * R[2] + val[0x7] * R[3],
+                    val[0x8] * R[0] + val[0x9] * R[1] + val[0xA] * R[2] + val[0xB] * R[3],
+                    val[0xC] * R[0] + val[0xD] * R[1] + val[0xE] * R[2] + val[0xF] * R[3]};
+    }
+ */
+#endif
+
+    /// multiplication by a vector: this * V
+    Vector3 vecmul3_(Vector3 const& V) const
+    {
+        return Vector3(val[0x0] * V.XX + val[0x4] * V.YY + val[0x8] * V.ZZ,
+                       val[0x1] * V.XX + val[0x5] * V.YY + val[0x9] * V.ZZ,
+                       val[0x2] * V.XX + val[0x6] * V.YY + val[0xA] * V.ZZ);
+    }
+    
+    /// multiplication by a vector3: this * V
+    Vector3 vecmul3_(real const* R) const
+    {
+        return Vector3(val[0x0] * R[0] + val[0x4] * R[1] + val[0x8] * R[2],
+                       val[0x1] * R[0] + val[0x5] * R[1] + val[0x9] * R[2],
+                       val[0x2] * R[0] + val[0x6] * R[1] + val[0xA] * R[2]);
+    }
+
+    /// multiplication by a vector: transpose(M) * V
+    Vector3 trans_vecmul3_(Vector3 const& V) const
+    {
+        return Vector3(val[0x0] * V.XX + val[0x1] * V.YY + val[0x2] * V.ZZ,
+                       val[0x4] * V.XX + val[0x5] * V.YY + val[0x6] * V.ZZ,
+                       val[0x8] * V.XX + val[0x9] * V.YY + val[0xA] * V.ZZ);
+    }
+    
+    /// multiplication by a vector: transpose(M) * V
+    Vector3 trans_vecmul3_(real const* R) const
+    {
+        return Vector3(val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2],
+                       val[0x4] * R[0] + val[0x5] * R[1] + val[0x6] * R[2],
+                       val[0x8] * R[0] + val[0x9] * R[1] + val[0xA] * R[2]);
+    }
+
+    /// multiplication by a vector: this * V
+    inline Vector3 vecmul(Vector3 const& vec) const
+    {
+#if MATRIX44_USES_AVX && VECTOR3_USES_AVX
+        return vecmul3_avx(vec.vec);
+#elif MATRIX44_USES_AVX
+        return vecmul3_avx(vec.data());
 #else
-        return vec4{val[0x0] * V[0] + val[0x1] * V[1] + val[0x2] * V[2] + val[0x3] * V[3],
-                    val[0x4] * V[0] + val[0x5] * V[1] + val[0x6] * V[2] + val[0x7] * V[3],
-                    val[0x8] * V[0] + val[0x9] * V[1] + val[0xA] * V[2] + val[0xB] * V[3],
-                    val[0xC] * V[0] + val[0xD] * V[1] + val[0xE] * V[2] + val[0xF] * V[3]};
+        return vecmul3_(vec);
+#endif
+    }
+
+    /// multiplication by a vector: this * V
+    inline Vector3 trans_vecmul(Vector3 const& vec) const
+    {
+#if MATRIX44_USES_AVX
+        return trans_vecmul3_avx(vec.data());
+#else
+        return trans_vecmul3_(vec);
 #endif
     }
     
-#else
+    /// vector multiplication
+    friend Vector3 operator * (Matrix44 const& mat, Vector3 const& vec)
+    {
+        return mat.vecmul(vec);
+    }
+
+    
     
     /// multiplication by a vector: this * V
-    Vector4 vecmul(Vector4 const& V) const
+    Vector4 vecmul4_(Vector4 const& V) const
     {
         return Vector4(val[0x0] * V.XX + val[0x4] * V.YY + val[0x8] * V.ZZ + val[0xC] * V.TT,
                        val[0x1] * V.XX + val[0x5] * V.YY + val[0x9] * V.ZZ + val[0xD] * V.TT,
                        val[0x2] * V.XX + val[0x6] * V.YY + val[0xA] * V.ZZ + val[0xE] * V.TT,
                        val[0x3] * V.XX + val[0x7] * V.YY + val[0xB] * V.ZZ + val[0xF] * V.TT);
     }
-
-    /// multiplication by a vector: transpose(this) * V
-    Vector4 vecmul0(real const* ptr) const
-    {
-        return Vector4(val[0x0] * ptr[0] + val[0x4] * ptr[1] + val[0x8] * ptr[2] + val[0xC] * ptr[3],
-                       val[0x1] * ptr[0] + val[0x5] * ptr[1] + val[0x9] * ptr[2] + val[0xD] * ptr[3],
-                       val[0x2] * ptr[0] + val[0x6] * ptr[1] + val[0xA] * ptr[2] + val[0xE] * ptr[3],
-                       val[0x3] * ptr[0] + val[0x7] * ptr[1] + val[0xB] * ptr[2] + val[0xF] * ptr[3]);
-    }
-#endif
     
-    /// vector multiplication
-    friend Vector4 operator * (Matrix44 const& mat, Vector4 const& ptr)
+    /// multiplication by a vector: transpose(this) * V
+    Vector4 vecmul4_(real const* R) const
     {
-        return mat.vecmul(ptr);
+        return Vector4(val[0x0] * R[0] + val[0x4] * R[1] + val[0x8] * R[2] + val[0xC] * R[3],
+                       val[0x1] * R[0] + val[0x5] * R[1] + val[0x9] * R[2] + val[0xD] * R[3],
+                       val[0x2] * R[0] + val[0x6] * R[1] + val[0xA] * R[2] + val[0xE] * R[3],
+                       val[0x3] * R[0] + val[0x7] * R[1] + val[0xB] * R[2] + val[0xF] * R[3]);
     }
-
+    
     /// multiplication by a vector: transpose(M) * V
-    Vector4 trans_vecmul(Vector4 const& V) const
+    Vector4 trans_vecmul4_(Vector4 const& V) const
     {
         return Vector4(val[0x0] * V.XX + val[0x1] * V.YY + val[0x2] * V.ZZ + val[0x3] * V.TT,
                        val[0x4] * V.XX + val[0x5] * V.YY + val[0x6] * V.ZZ + val[0x7] * V.TT,
@@ -487,12 +579,42 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    Vector4 trans_vecmul0(real const* ptr) const
+    Vector4 trans_vecmul4_(real const* R) const
     {
-        return Vector4(val[0x0] * ptr[0] + val[0x1] * ptr[1] + val[0x2] * ptr[2] + val[0x3] * ptr[3],
-                       val[0x4] * ptr[0] + val[0x5] * ptr[1] + val[0x6] * ptr[2] + val[0x7] * ptr[3],
-                       val[0x8] * ptr[0] + val[0x9] * ptr[1] + val[0xA] * ptr[2] + val[0xB] * ptr[3],
-                       val[0xC] * ptr[0] + val[0xD] * ptr[1] + val[0xE] * ptr[2] + val[0xF] * ptr[3]);
+        return Vector4(val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2] + val[0x3] * R[3],
+                       val[0x4] * R[0] + val[0x5] * R[1] + val[0x6] * R[2] + val[0x7] * R[3],
+                       val[0x8] * R[0] + val[0x9] * R[1] + val[0xA] * R[2] + val[0xB] * R[3],
+                       val[0xC] * R[0] + val[0xD] * R[1] + val[0xE] * R[2] + val[0xF] * R[3]);
+    }
+
+    /// multiplication by a vector: this * V
+    inline Vector4 vecmul(Vector4 const& vec) const
+    {
+#if MATRIX44_USES_AVX && VECTOR3_USES_AVX
+        return vecmul4_avx(vec.vec);
+#elif MATRIX44_USES_AVX
+        return vecmul4_avx(vec.data());
+#else
+        return vecmul4_(vec);
+#endif
+    }
+
+    /// multiplication by a vector: this * V
+    inline Vector4 trans_vecmul(Vector4 const& vec) const
+    {
+#if MATRIX44_USES_AVX && VECTOR3_USES_AVX
+        return trans_vecmul4_avx(vec.vec);
+#elif MATRIX44_USES_AVX
+        return trans_vecmul4_avx(vec.data());
+#else
+        return trans_vecmul4_(vec);
+#endif
+    }
+
+    /// vector multiplication
+    friend Vector4 operator * (Matrix44 const& mat, Vector4 const& vec)
+    {
+        return mat.vecmul(vec);
     }
     
 
