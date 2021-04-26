@@ -367,7 +367,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
 void PointGrid::checkLL(Meca& meca, StericParam const& pam,
                         FatLocus const& aa, FatLocus const& bb)
 {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     
     const real ran = std::max(aa.rge_+bb.rad_, aa.rad_+bb.rge_);
 
@@ -742,14 +742,16 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 #ifdef DISPLAY
 
 #include "opengl.h"
-void drawEdges(Map<DIM> const&);
+void drawBoundaries(Map<DIM> const&);
 
 void PointGrid::draw() const
 {
+#if ( DIM <= 3 )
     glDisable(GL_LIGHTING);
     glColor3f(0, 1, 0);
     glLineWidth(0.25);
-    drawEdges(pGrid);
+    drawBoundaries(pGrid);
+#endif
 }
 #endif
 

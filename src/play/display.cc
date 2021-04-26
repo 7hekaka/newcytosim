@@ -97,7 +97,7 @@ void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
     glPushMatrix();
     gle::translate(pos);
     gle::scale(rad);
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     glEnable(GL_LIGHTING);
     col.load_both();
     gle::dualPassSphere2();
@@ -109,19 +109,6 @@ void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
     glPopMatrix();
 }
 
-
-///draw transparent sphere with decoration indicating the orientation of the sphere
-void Display::drawSphereT(Vector const& pos, Vector const& A, Vector const& B, Vector const& C, int style) const
-{
-    glEnable(GL_LIGHTING);
-    glPushMatrix();
-    gle::transRotate(pos, A, B, C);
-    if ( style & 1 )
-        gle::dualPassSphere4();
-    if ( style & 4 )
-        gle::threeArrowStrip(0.5, 1);
-    glPopMatrix();
-}
 
 /// used for drawFilament
 inline void drawMonomer(Vector3 const& pos, real rad)
@@ -388,7 +375,7 @@ void Display::prepareLineDisp(const Fiber * fib)
         hide = true;
     if (( disp->hide & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)) > 0 )
         hide = true;
-#elif ( DIM == 3 )
+#elif ( DIM >= 3 )
     // hide clockwise or counter-clockwise orientated fibers in the XY plane
     if (( disp->hide & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ < 0 )
         hide = true;
@@ -593,7 +580,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
 
 void Display::drawSpaces(SpaceSet const& set)
 {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     
     // draw non-transparent Spaces first:
     for ( Space * obj = set.first(); obj; obj=obj->next() )
@@ -641,7 +628,7 @@ void Display::drawTransparentSpaces(SpaceSet const& set)
  */
 void Display::drawFields(FieldSet const& set)
 {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     Vector3 dir = gle::depthAxis();
 #else
     Vector3 dir(0,0,1);
@@ -1594,7 +1581,7 @@ void Display::drawFiber(Fiber const& fib)
         }
     }
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     /*
      Handle styles in 3D that are using transparency to draw fiber's segments
      */
@@ -1754,7 +1741,7 @@ void Display::drawSolid(Solid const& obj)
             if ( obj.radius(i) > 0 )
                 drawFlat(obj.posP(i), obj.radius(i), gle::circle);
         }
-#elif ( DIM == 3 )
+#elif ( DIM >= 3 )
         //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
         {
@@ -1828,7 +1815,7 @@ void Display::drawSolids(SolidSet const& set)
         if ( obj->prop->disp->visible )
         {
             drawSolid(*obj);
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
             if ( obj->prop->disp->color.transparent() )
             {
                 for ( size_t i = 0; i < obj->nbPoints(); ++i )
@@ -1893,7 +1880,7 @@ void Display::drawBeads(BeadSet const& set)
         if ( obj->prop->disp->visible )
         {
             drawBead(*obj);
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
             if ( obj->prop->disp->color.transparent() )
                 zObjects.push_back(zObject(obj));
             else
@@ -1951,7 +1938,14 @@ void Display::drawSphereT(Sphere const& obj) const
          We then use a primitive for a sphere of radius 1.
          */
         bodyColorF(obj).load_both();
-        Display::drawSphereT(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C, disp->style);
+        glEnable(GL_LIGHTING);
+        glPushMatrix();
+        gle::transRotate(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C);
+        if ( disp->style & 1 )
+            gle::dualPassSphere4();
+        if ( disp->style & 4 )
+            gle::threeArrowStrip(0.5, 1);
+        glPopMatrix();
 #endif
     }
 }
@@ -1964,7 +1958,7 @@ void Display::drawSpheres(SphereSet const& set)
         if ( obj->prop->disp->visible )
         {
             drawSphere(*obj);
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
             if ( obj->prop->disp->color.transparent() )
                 zObjects.push_back(zObject(obj));
             else
@@ -2014,7 +2008,7 @@ void Display::drawOrganizer(Organizer const& obj) const
         Solid const* sol = Solid::toSolid(obj.core());
         if ( sol && sol->nbPoints() >= 4 )
         {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
             glEnable(GL_LIGHTING);
             bodyColor(*sol);
             glPushMatrix();

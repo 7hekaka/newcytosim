@@ -163,7 +163,7 @@ void paintCellPeriodic(const int x_inf, const int x_sup, const int y, const int 
         grid->icell1D( x ).push_back(seg);
 #elif ( DIM == 2 )
         grid->icell2D( x, y ).push_back(seg);
-#elif ( DIM == 3 )
+#else
         grid->icell3D( x, y, z ).push_back(seg);
 #endif
     }
@@ -558,13 +558,15 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
 #ifdef DISPLAY
 
 #include "opengl.h"
-void drawEdges(Map<DIM> const&);
+void drawBoundaries(Map<DIM> const&);
 
 void FiberGrid::draw() const
 {
+#if ( DIM <= 3 )
     glDisable(GL_LIGHTING);
     glColor3f(0, 0, 1);
     glLineWidth(0.25);
-    drawEdges(fGrid);
+    drawBoundaries(fGrid);
+#endif
 }
 #endif

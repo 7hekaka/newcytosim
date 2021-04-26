@@ -14,11 +14,11 @@
 #include "flute.h"
 
 /// display the edges of a 1D grid using OpenGL
-template<int ORD> void drawEdges(Map<ORD> const&) {};
+template<int ORD> void drawBoundaries(Map<ORD> const&) {};
 
-void drawEdges(Map<1> const&);
-void drawEdges(Map<2> const&);
-void drawEdges(Map<3> const&);
+void drawBoundaries(Map<1> const&);
+void drawBoundaries(Map<2> const&);
+void drawBoundaries(Map<3> const&);
 
 //------------------------------------------------------------------------------
 #pragma mark -

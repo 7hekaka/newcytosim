@@ -139,7 +139,7 @@ void processMouseDrag(int mx, int my, Vector3 & a, const Vector3 & b, int m)
 }
 
 //------------------------------------------------------------------------------
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
 static gle_color field_color(int, const real& val, Vector3 const&)
 {
     return gle_color(val/5.0, 0, 0);
@@ -156,7 +156,7 @@ void display(View& view, int)
 {
     view.openDisplay();
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     Vector3 dir = gle::depthAxis();
     drawValues(myGrid, field_color, 0, dir, 0);
 #else
@@ -167,7 +167,7 @@ void display(View& view, int)
     
     glColor4f(1,1,1,.6f);
     glLineWidth(2);
-    drawEdges(myGrid);
+    drawBoundaries(myGrid);
 
     //--------------draw content of cells
     const real gold = 2.0 / ( 1.0 + sqrt(5) );

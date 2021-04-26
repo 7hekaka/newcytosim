@@ -23,7 +23,7 @@ Vector shift(0, 0, 0);
 Vector delta(1, 1, 1);
 Vector pts[MAX];
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
 int hit[2*size+1][2*size+1][2*size+1];
 #else
 int hit[2*size+1][2*size+1];
@@ -42,7 +42,7 @@ void clearHits()
 {
     for ( int i = 0; i <= 2*size; ++i )
     for ( int j = 0; j <= 2*size; ++j )
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     for ( int k = 0; k <= 2*size; ++k )
         hit[i][j][k] = 0;
 #else
@@ -63,7 +63,7 @@ void paintHit(int x_inf, int x_sup, int y, int z, void*)
     {
         if ( -size <= x && x <= size )
         {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
             ++hit[x+size][y+size][z+size];
 #else
             ++hit[x+size][y+size];
@@ -96,7 +96,7 @@ void rasterize(Vector P, Vector Q, void (paint)(int, int, int, int, void*))
     Rasterizer::paintRectangle(paint, nullptr, P, Q, iPQ, radius, shift, delta);
     //Rasterizer::paintRectangle(paint, nullptr, P, Q, iPQ, radius);
     //Rasterizer::paintBox2D(paint, nullptr, P, Q, radius, shift, delta);
-#elif ( DIM == 3 )
+#elif ( DIM >= 3 )
     //Rasterizer::paintHexagonalPrism(paint, nullptr, P, Q, iPQ, radius, shift, delta);
     Rasterizer::paintCuboid(paint, nullptr, P, Q, iPQ, radius, shift, delta);
     //Rasterizer::paintBox3D(paint, nullptr, P, Q, radius, shift, delta);
@@ -124,7 +124,7 @@ bool checkPoint(Vector const& p, Vector const& q, int i, int j, int k)
 {
     int in = inCylinder(p,q,Vector(i,j,k));
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     int ht = hit[i+size][j+size][k+size];
 #else
     int ht = hit[i+size][j+size];
@@ -138,7 +138,7 @@ bool checkPoint(Vector const& p, Vector const& q, int i, int j, int k)
             glColor4f(0, 0, 1, 0.5);
         else
             glColor3f(1, 0, 0);
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
         glVertex3i(i, j, k);
 #else
         glVertex2i(i, j);
@@ -157,7 +157,7 @@ bool testFatLine(Vector P, Vector Q)
     rasterize(P, Q, paintHit);
     for ( int i = -size; i <= size; ++i )
     for ( int j = -size; j <= size; ++j )
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     for ( int k = -size; k <= size; ++k )
         res |= checkPoint(P, Q, i, j, k);
 #else
@@ -249,7 +249,7 @@ void display(View& view, int)
     glColor3f(1, 0, 1);
     for ( size_t i = 0; i < n_pts ; ++i )
     {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
         glVertex3d(pts[i].XX, pts[i].YY, pts[i].ZZ);
 #elif ( DIM == 2 )
         glVertex2d(pts[i].XX, pts[i].YY);
@@ -317,7 +317,7 @@ void speedTest(size_t cnt)
         {
 #if ( DIM == 2 )
             Rasterizer::paintRectangle(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
-#elif ( DIM == 3 )
+#elif ( DIM >= 3 )
             Rasterizer::paintCuboid(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
 #endif
         }

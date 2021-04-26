@@ -385,7 +385,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
 void LocusGrid::checkLL(Meca& meca, real stiff,
                         BigLocus const& aa, BigLocus const& bb)
 {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     
     const real ran = aa.rad_ + bb.rad_;
     
@@ -756,14 +756,16 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
 #ifdef DISPLAY
 
 #include "opengl.h"
-void drawEdges(Map<DIM> const&);
+void drawBoundaries(Map<DIM> const&);
 
 void LocusGrid::draw() const
 {
+#if ( DIM <= 3 )
     glDisable(GL_LIGHTING);
     glColor3f(1, 0, 0);
     glLineWidth(0.25);
-    drawEdges(pGrid);
+    drawBoundaries(pGrid);
+#endif
 }
 #endif
 

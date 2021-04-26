@@ -62,7 +62,7 @@ void Display1::drawObjects(Simul const& sim)
         drawCouplesA(sim.couples);
     glDisableClientState(GL_COLOR_ARRAY);
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
@@ -74,7 +74,7 @@ void Display1::drawObjects(Simul const& sim)
     drawSolids(sim.solids);
     drawSpheres(sim.spheres);
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
@@ -89,7 +89,7 @@ void Display1::drawObjects(Simul const& sim)
         drawSinglesA(sim.singles);
     glDisableClientState(GL_COLOR_ARRAY);
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);

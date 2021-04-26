@@ -232,7 +232,7 @@ void Player::prepareDisplay(View& view, int mag)
     //std::clog << " pixel size = " << pix << '\n';
 
     mDisplay->setPixelFactors(pix/mag, mag*fac);
-    mDisplay->setStencil(view.stencil && ( DIM == 3 ));
+    mDisplay->setStencil(view.stencil && ( DIM >= 3 ));
 
     CHECK_GL_ERROR("in prepareDisplay");
 

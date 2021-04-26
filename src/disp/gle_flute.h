@@ -11,7 +11,7 @@
  separately for each different value of DIM.
  */
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
 typedef flute3 fluteV;
 typedef flute8 fluteVC;
 #else

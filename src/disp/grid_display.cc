@@ -5,7 +5,7 @@
 /**
  This uses the current OpenGL color and line width.
  */
-void drawEdges(Map<1> const& map)
+void drawBoundaries(Map<1> const& map)
 {
     size_t sup = 1 + map.breadth(0);
     flute4 * pts = new flute4[sup];
@@ -24,7 +24,7 @@ void drawEdges(Map<1> const& map)
 /**
  This uses the current OpenGL color and line width.
  */
-void drawEdges(Map<2> const& map)
+void drawBoundaries(Map<2> const& map)
 {
     size_t sup0 = 1 + map.breadth(0);
     size_t sup1 = 1 + map.breadth(1);
@@ -56,7 +56,7 @@ void drawEdges(Map<2> const& map)
 /**
  This uses the current OpenGL color and line width.
  */
-void drawEdges(Map<3> const& map)
+void drawBoundaries(Map<3> const& map)
 {
     size_t sup0 = 1 + map.breadth(0);
     size_t sup1 = 1 + map.breadth(1);

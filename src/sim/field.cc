@@ -234,7 +234,7 @@ void Field::laplacian(const real* field, real * mat) const
     }
 #endif
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     // derivative in the Y-direction:
     const size_t ss = mGrid.stride(2);
     for ( size_t yy = 1; yy < mGrid.breadth(1); ++yy )
@@ -263,7 +263,7 @@ void Field::laplacian(const real* field, real * mat) const
     }
 #endif
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     // derivative in the Z-direction:
     const size_t nxy = nbc / mGrid.breadth(2);
     assert_true( nxy == ss );
@@ -318,7 +318,7 @@ void Field::setEdgesY(real * field, real val)
     }
 #endif
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     // set Y-edges:
     const size_t nz = mGrid.breadth(2);
     const size_t nxy = nbc / nz;
@@ -338,7 +338,7 @@ void Field::setEdgesY(real * field, real val)
 
 void Field::setEdgesZ(real * field, real val)
 {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     const size_t nbc = mGrid.nbCells();
     
     const size_t nz = mGrid.breadth(2);
@@ -410,7 +410,7 @@ void Field::step(FiberSet& fibers)
         setEdgesY(field, prop->boundary_value * cellVolume());
 #endif
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     if ( prop->boundary_condition & 4 )
         setEdgesZ(field, prop->boundary_value * cellVolume());
 #endif
@@ -523,12 +523,14 @@ void Field::step(FiberSet& fibers)
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
         glDisable(GL_LIGHTING);
+#if ( DIM <= 3 )
         drawValues(mGrid, field_color, fdp);
+#endif
 #if ( 0 )
         // draw edges of cells
         glColor4f(1, 0, 1, 1);
         glLineWidth(0.5);
-        drawEdges(mGrid);
+        drawBoundaries(mGrid);
 #endif
         if ( depth ) glEnable(GL_DEPTH_TEST);
         if ( cullf ) glEnable(GL_CULL_FACE);
@@ -552,9 +554,9 @@ void Field::step(FiberSet& fibers)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         //glLineWidth(1);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-#if ( DIM >= 3 )
+#if ( DIM == 3 )
         drawValues(mGrid, field_color, fdp, dir, pos);
-#else
+#elif ( DIM <= 2 )
         drawValues(mGrid, field_color, fdp);
 #endif
         if ( depth ) glEnable(GL_DEPTH_TEST);

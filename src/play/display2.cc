@@ -57,7 +57,7 @@ void Display2::drawObjects(Simul const& sim)
     
     drawFibers(sim.fibers);
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -69,7 +69,7 @@ void Display2::drawObjects(Simul const& sim)
     drawSolids(sim.solids);
     drawSpheres(sim.spheres);
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     glDisable(GL_LIGHTING);
     glDisable(GL_CULL_FACE);
 #endif
@@ -81,7 +81,7 @@ void Display2::drawObjects(Simul const& sim)
         drawSinglesA(sim.singles);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);

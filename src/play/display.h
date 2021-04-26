@@ -164,9 +164,6 @@ public:
     void drawFlat(Vector const& pos, float rad, void (*obj)()) const;
     
     /// draw a fine spherical object
-    void drawSphereT(Vector const&, Vector const&, Vector const&, Vector const&, int) const;
-    
-    /// draw a fine spherical object
     void drawBallT(Vector const&, real radius, gle_color const&) const;
     
 

@@ -833,7 +833,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
         if ( sol && sol->nbPoints() >= 4 )
         {
             bodyColor(*sol);
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
             glPushMatrix();
             Vector3 a = 0.5 * (sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5 * (sol->posP(1) + sol->posP(3));
