@@ -5,7 +5,8 @@
  is within a certain range because their length may vary, and taking into
  account the radius of Bead, Sphere and Solid.
  
- This function can be used to set SimulProp::steric_max_range.
+ This function is used to estimate SimulProp::steric_max_range, when it is
+ not specified by the user.
  
  It assumes that Fiber::adjustSegmentation() is used, such that at any time:
      actual_segmentation <  4/3 * FiberProp::segmentation
@@ -42,7 +43,7 @@ real Simul::estimateStericRange() const
      + 2 * ( len / 2 ) since len/2 is the distance between the center of the segment
      and its most distal point.
      */
-    ran = len + 2*ran;
+    ran = len + 2 * ran;
     
     
     for ( Sphere const* O=spheres.first(); O; O=O->next() )

@@ -113,13 +113,13 @@ void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rd, real rg) 
 #if ( CHECK_STERIC_RANGE )
     //we check that the grid would correctly detect collision of two segments
     //along the diagonal, corresponding to the worst-case scenario
-    real diag = square(fib->segmentation()) + square(2*rg);
-    if ( square(max_diameter) * 1.001 < diag )
+    real dis = fib->segmentation() + 2 * rad;
+    if ( max_diameter < 0.999 * dis )
     {
         InvalidParameter e("simul:steric_max_range is too short");
-        e << PREF << "steric_max_range should be greater than std::sqrt( sqr(segment_length) + 4*sqr(range) )\n";
+        e << PREF << "steric_max_range should be greater than `segment_length + 2*range`\n";
         e << PREF << "with segment_length ~ 4/3 segmentation\n";
-        e << PREF << "= " << diag << " for some fibers\n";
+        e << PREF << "= " << dis << " for some fibers\n";
         throw e;
     }
 #endif
@@ -371,11 +371,10 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     
     const real ran = std::max(aa.rge_+bb.rad_, aa.rad_+bb.rge_);
 
-    /* in 3D, we use shortestDistance() to calculate the closest distance
-     between two segments, and use the result to build an interaction */
-    real a, b;
-    real d = aa.seg_.shortestDistance(bb.seg_, a, b);
-    if ( d >= ran*ran )
+    /* in 3D, check the shortest distance between two segments, and if close
+     enough, use the result to build an interaction */
+    real a, b, d;
+    if ( aa.seg_.belowDistance(bb.seg_, ran, a, b, d) )
         return;
     
     if ( aa.seg_.within(a) & bb.seg_.within(b) )
@@ -436,8 +435,8 @@ inline bool adjacent(FatLocus const* a, FatLocus const* b)
 /**
  This will consider once all pairs of objects from the given lists
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& stiff,
-                                FatPointList & pots, FatLocusList & locs)
+void PointGrid::setSterics(Meca& meca, StericParam const& stiff,
+                           FatPointList & pots, FatLocusList & locs)
 {
     for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
@@ -463,9 +462,9 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& stiff,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                FatPointList & pots1, FatLocusList & locs1,
-                                FatPointList & pots2, FatLocusList & locs2)
+void PointGrid::setSterics(Meca& meca, StericParam const& pam,
+                           FatPointList & pots1, FatLocusList & locs1,
+                           FatPointList & pots2, FatLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -498,11 +497,11 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
 
 /**
  This will consider once all pairs of objects from the given lists.
- Compared to `setInteractions()`, this performs an additional test to exclude
- objects for which the distance between `pos` is above `max_diameter`.
+ Compared to `setSterics()`, this performs an additional test to exclude
+ objects for which the distance between `pos` is above `sup`.
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
-                                FatPointList & pots, FatLocusList & locs)
+void PointGrid::setSterics(Meca& meca, StericParam const& pam, real sup,
+                           FatPointList & pots, FatLocusList & locs)
 {
     for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
@@ -530,12 +529,12 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated.
 
- Compared to `setInteractions()`, this performs an additional test to exclude
- objects for which the distance between `pos` is above `max_diameter`.
+ Compared to `setSterics()`, this performs an additional test to exclude
+ objects for which the distance between `pos` is above `sup`.
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& pam, real sup,
-                                FatPointList & pots1, FatLocusList & locs1,
-                                FatPointList & pots2, FatLocusList & locs2)
+void PointGrid::setSterics(Meca& meca, StericParam const& pam, real sup,
+                           FatPointList & pots1, FatLocusList & locs1,
+                           FatPointList & pots2, FatLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -596,25 +595,25 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
         
         if ( isPeriodic() )
         {
-            setInteractions(meca, pam, baseP, baseL);
+            setSterics(meca, pam, baseP, baseL);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
                 FatPointList & sideP = point_list(inx+region[reg]);
                 FatLocusList & sideL = locus_list(inx+region[reg]);
-                setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+                setSterics(meca, pam, baseP, baseL, sideP, sideL);
             }
         }
         else
         {
             const real sup = square(max_diameter);
-            setInteractions(meca, pam, sup, baseP, baseL);
+            setSterics(meca, pam, sup, baseP, baseL);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
                 FatPointList & sideP = point_list(inx+region[reg]);
                 FatLocusList & sideL = locus_list(inx+region[reg]);
-                setInteractions(meca, pam, sup, baseP, baseL, sideP, sideL);
+                setSterics(meca, pam, sup, baseP, baseL, sideP, sideL);
             }
         }
     }
@@ -643,25 +642,25 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         
         if ( isPeriodic() )
         {
-            setInteractions(meca, pam, baseP, baseL);
+            setSterics(meca, pam, baseP, baseL);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
                 FatPointList & sideP = point_list(inx+region[reg], pan);
                 FatLocusList & sideL = locus_list(inx+region[reg], pan);
-                setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+                setSterics(meca, pam, baseP, baseL, sideP, sideL);
             }
         }
         else
         {
             const real sup = square(max_diameter);
-            setInteractions(meca, pam, sup, baseP, baseL);
+            setSterics(meca, pam, sup, baseP, baseL);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
                 FatPointList & sideP = point_list(inx+region[reg], pan);
                 FatLocusList & sideL = locus_list(inx+region[reg], pan);
-                setInteractions(meca, pam, sup, baseP, baseL, sideP, sideL);
+                setSterics(meca, pam, sup, baseP, baseL, sideP, sideL);
             }
         }
     }
@@ -695,7 +694,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             {
                 FatPointList & sideP = point_list(inx+region[reg], pan2);
                 FatLocusList & sideL = locus_list(inx+region[reg], pan2);
-                setInteractions(meca, pam, baseP, baseL, sideP, sideL);
+                setSterics(meca, pam, baseP, baseL, sideP, sideL);
             }
             
             FatPointList & baseP2 = point_list(inx, pan2);
@@ -705,7 +704,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             {
                 FatPointList & sideP = point_list(inx+region[reg], pan1);
                 FatLocusList & sideL = locus_list(inx+region[reg], pan1);
-                setInteractions(meca, pam, baseP2, baseL2, sideP, sideL);
+                setSterics(meca, pam, baseP2, baseL2, sideP, sideL);
             }
         }
         else
@@ -715,7 +714,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             {
                 BigPointList & sideP = point_list(inx+region[reg], pan2);
                 BigLocusList & sideL = locus_list(inx+region[reg], pan2);
-                setInteractions(meca, pam, sup, baseP, baseL, sideP, sideL);
+                setSterics(meca, pam, sup, baseP, baseL, sideP, sideL);
             }
 
             BigPointList & baseP2 = point_list(inx, pan2);
@@ -725,7 +724,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             {
                 BigPointList & sideP = point_list(inx+region[reg], pan1);
                 BigLocusList & sideL = locus_list(inx+region[reg], pan1);
-                setInteractions(meca, pam, sup, baseP2, baseL2, sideP, sideL);
+                setSterics(meca, pam, sup, baseP2, baseL2, sideP, sideL);
             }
         }
 

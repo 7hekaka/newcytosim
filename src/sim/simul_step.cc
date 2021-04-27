@@ -131,7 +131,11 @@ void Simul::step()
     fibers.step();
     
     //printf("     ::steps    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
-
+    
+    // if no Hands are present, we can skip attachment altogether:
+    if ( singles.size() + couples.size() == 0 )
+        return;
+    
 #if POOL_HAND_ATTACHMENT
     dontAttach = ( dontAttach + 1 ) % POOL_HAND_ATTACHMENT;
     

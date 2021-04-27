@@ -229,7 +229,7 @@ private:
     /// grid for divide-and-conquer strategies:
     Grid<PointGridCell, DIM> pGrid;
     
-    /// max radius that can be included
+    /// max diameter of objects, given the cell size
     real max_diameter;
     
 private:
@@ -250,22 +250,22 @@ private:
     static void checkLL(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
     
     /// check all pairs between the two lists
-    static void setInteractions(Meca&, StericParam const&,
-                                FatPointList &, FatLocusList &);
+    static void setSterics(Meca&, StericParam const&,
+                           FatPointList &, FatLocusList &);
     
     /// check all pairs between the two lists
-    static void setInteractions(Meca&, StericParam const&,
-                                FatPointList &, FatLocusList &,
-                                FatPointList &, FatLocusList &);
+    static void setSterics(Meca&, StericParam const&,
+                           FatPointList &, FatLocusList &,
+                           FatPointList &, FatLocusList &);
     
     /// check all pairs between two lists, checking center-to-center distance
-    static void setInteractions(Meca&, StericParam const&, real sup,
-                                FatPointList &, FatLocusList &);
+    static void setSterics(Meca&, StericParam const&, real sup,
+                           FatPointList &, FatLocusList &);
     
     /// check all pairs between two lists, checking center-to-center distance
-    static void setInteractions(Meca&, StericParam const&, real sup,
-                                FatPointList &, FatLocusList &,
-                                FatPointList &, FatLocusList &);
+    static void setSterics(Meca&, StericParam const&, real sup,
+                           FatPointList &, FatLocusList &,
+                           FatPointList &, FatLocusList &);
 
 #if ( N_STERIC_PANES == 1 )
     

@@ -812,7 +812,7 @@ void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
     out << SEP << fib->dirEnd(CENTER);
     out << SEP << (fib->posEndM()-fib->posEndP()).norm();
     real C = dot(fib->dirEndM(), fib->dirEndP());
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     real S = cross(fib->dirEndM(), fib->dirEndP()).norm();
 #else
     real S = cross(fib->dirEndM(), fib->dirEndP());
@@ -1323,24 +1323,24 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
         {
             for ( size_t ii = 0; ii < fib->nbSegments(); ++ii )
             {
-                FiberSegment seg1(fib, ii);
+                FiberSegment seg(fib, ii);
                 for ( size_t jj = 0; jj < fob->nbSegments(); ++jj )
                 {
-                    real abs1, abs2;
-                    FiberSegment seg2(fob, jj);
-                    if ( seg1.shortestDistance(seg2, abs1, abs2) <= sup )
+                    real abs1, abs2, dis2;
+                    FiberSegment soc(fob, jj);
+                    if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
                     {
-                        if ( seg1.within(abs1) & seg2.within(abs2) )
+                        if ( seg.within(abs1) & soc.within(abs2) )
                         {
                             ++cnt;
-                            Vector pos1 = seg1.pos(abs1/seg1.len());
+                            Vector pos1 = seg.pos(abs1/seg.len());
                             //Vector pos2 = loc2.pos(abs2/loc2.len());
                             if ( details == 2 )
                             {
                                 out << LIN << fib->identity();
-                                out << SEP << abs1 + seg1.abscissa1();
+                                out << SEP << abs1 + seg.abscissa1();
                                 out << SEP << fob->identity();
-                                out << SEP << abs2 + seg2.abscissa1();
+                                out << SEP << abs2 + soc.abscissa1();
                                 out << SEP << pos1;
                             }
                             accum.add(pos1);

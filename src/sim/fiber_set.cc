@@ -355,15 +355,15 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
     {
         for ( size_t s1 = 0; s1 < fib1->nbSegments(); ++s1 )
         {
-            FiberSegment seg1(fib1, s1);
+            FiberSegment seg(fib1, s1);
             // check against other segments of this fiber
             for ( size_t s2 = s1+2; s2 < fib1->nbSegments(); ++s2 )
             {
-                FiberSegment seg2(fib1, s2);
-                real abs1, abs2;
-                if ( seg1.shortestDistance(seg2, abs1, abs2) <= sup )
+                FiberSegment soc(fib1, s2);
+                real abs1, abs2, dis2;
+                if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
                 {
-                    if ( seg1.within(abs1) & seg2.within(abs2) )
+                    if ( seg.within(abs1) & soc.within(abs2) )
                     {
                         res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
                         res2.emplace(fib1, abs2+fib1->abscissaPoint(s2));
@@ -375,11 +375,11 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
             {
                 for ( size_t s2 = 0; s2 < fib2->nbSegments(); ++s2 )
                 {
-                    FiberSegment seg2(fib2, s2);
-                    real abs1, abs2;
-                    if ( seg1.shortestDistance(seg2, abs1, abs2) <= sup )
+                    FiberSegment soc(fib2, s2);
+                    real abs1, abs2, dis2;
+                    if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
                     {
-                        if ( seg1.within(abs1) & seg2.within(abs2) )
+                        if ( seg.within(abs1) & soc.within(abs2) )
                         {
                             res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
                             res2.emplace(fib2, abs2+fib2->abscissaPoint(s2));
@@ -440,19 +440,19 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
             FiberSegment seg(fib, s);
             list = grid.cellTargets(seg.middle());
             //std::clog << seg << ":";
-            for ( FiberSegment const& sog : list )
+            for ( FiberSegment const& soc : list )
             {
-                Fiber * bif = const_cast<Fiber*>(sog.fiber());
+                Fiber * bif = const_cast<Fiber*>(soc.fiber());
                 if ( fib < bif )
                 {
                     //std::clog << "   " << can;
-                    real abs1, abs2;
-                    if ( seg.shortestDistance(sog, abs1, abs2) <= sup )
+                    real abs1, abs2, dis2;
+                    if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
                     {
-                        if ( seg.within(abs1) & sog.within(abs2) )
+                        if ( seg.within(abs1) & soc.within(abs2) )
                         {
                             res1.emplace(fib, abs1+fib->abscissaPoint(s));
-                            res2.emplace(bif, abs2+bif->abscissaPoint(sog.point()));
+                            res2.emplace(bif, abs2+bif->abscissaPoint(soc.point()));
                         }
                     }
                 }

@@ -371,13 +371,12 @@ public:
     /// the smallest cell width, along dimensions that have more than `min_size` cells
     real minimumWidth(size_t min_size) const
     {
-        real res = 0;
+        real res = INFINITY;
         for ( int d = 0; d < ORD; ++d )
+        {
             if ( mDim[d] > min_size )
-                res = cWidth[d];
-        for ( int d = 0; d < ORD; ++d )
-            if ( mDim[d] > min_size  &&  cWidth[d] < res )
-                res = cWidth[d];
+                res = std::min(res, cWidth[d]);
+        }
         return res;
     }
     

@@ -253,9 +253,15 @@ private:
     /// grid for divide-and-conquer strategies:
     Grid<LocusGridCell, DIM> pGrid;
     
-    /// max radius that can be included
-    real max_diameter;
+    /// max radius of spherical objects
+    real point_radius;
     
+    /// max segmentation of fiber segments added to grid
+    real locus_length;
+    
+    /// max radius of fiber segments added to grid
+    real locus_radius;
+
 private:
     
     /// check two Spheres
@@ -274,22 +280,22 @@ private:
     static void checkLL(Meca&, real stiff, BigLocus const&, BigLocus const&);
     
     /// check all pairs between the two lists
-    static void setInteractions(Meca&, real stiff,
-                                BigPointList &, BigLocusList &);
+    static void setSterics(Meca&, real stiff,
+                           BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists
-    static void setInteractions(Meca&, real stiff,
-                                BigPointList &, BigLocusList &,
-                                BigPointList &, BigLocusList &);
+    static void setSterics(Meca&, real stiff,
+                           BigPointList &, BigLocusList &,
+                           BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setInteractions(Meca&, real stiff, real sup,
-                                BigPointList &, BigLocusList &);
+    static void setSterics(Meca&, real stiff, real sup, real seg_sup,
+                           BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setInteractions(Meca&, real stiff, real sup,
-                                BigPointList &, BigLocusList &,
-                                BigPointList &, BigLocusList &);
+    static void setSterics(Meca&, real stiff, real sup, real seg_sup,
+                           BigPointList &, BigLocusList &,
+                           BigPointList &, BigLocusList &);
 
 #if ( MAX_STERIC_PANES == 1 )
     
@@ -370,23 +376,26 @@ public:
     size_t capacity() const;
 
     /// clear the grid
-    void clear()            { pGrid.clear(); }
+    void clear() { pGrid.clear(); point_radius=0; locus_length=0; locus_radius=0; }
     
 #if ( MAX_STERIC_PANES == 1 )
     
     /// place Mecable vertex on the grid
-    void add(Mecable const* m, size_t i, real rad) const
+    void add(Mecable const* m, size_t i, real rad)
     {
         Vector w = m->posPoint(i);
         point_list(w).emplace(m, i, rad, w);
+        point_radius = std::max(point_radius, rad);
     }
     
     /// place Fiber segment on the grid
-    void add(Fiber const* f, size_t i, real rad) const
+    void add(Fiber const* f, size_t i, real rad)
     {
         // link in cell containing the middle of the segment
         Vector w = f->posPoint(i, 0.5);
         locus_list(w).emplace(f, i, rad, w);
+        locus_length = std::max(locus_length, f->segmentation());
+        locus_radius = std::max(locus_radius, rad);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -395,10 +404,10 @@ public:
 #else
     
     /// place Mecable vertex on the grid
-    void add(size_t pane, Mecable const*, size_t, real rad) const;
+    void add(size_t pane, Mecable const*, size_t, real rad);
     
     /// place Fiber segment on the grid
-    void add(size_t pane, Fiber const*, size_t, real rad) const;
+    void add(size_t pane, Fiber const*, size_t, real rad);
     
     /// enter interactions into Meca in one panes with given parameters
     void setInteractions(Meca&, real stiff, size_t pan) const;

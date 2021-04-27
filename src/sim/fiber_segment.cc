@@ -171,20 +171,21 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
  to each other. P1 belongs to `*this`, and P2 to `seg`. These points are defined
  by their abscissa (abs1, abs2) for which the values [0, segment_length] match
  the edges of the segments.
+
  
- @return `distance(P1, P2)^2', the SQUARE of the distance between the lines.
  @sets arguments `abs1` and `abs2` to be the abscissa of the corresponding points
- 
- The calling function must check if 'abs1' and 'abs2' are within [0, segment_length]
- to do anything meaningful.
+ @sets `dis2 = distance(P1, P2)^2`, the SQUARE of the distance between the lines.
+ In 2D, `dis2 = 0` unless the lines are parallel.
 
  If the segments are parallel, P1 and P2 are set to the middle of the overlapping
  section between the two segments.
- 
- In 2D, the returned distance is always zero.
+
+ The calling function must check if 'abs1' and 'abs2' are within [0, segment_length]
+ to do anything meaningful.
  */
 
-real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& abs2) const
+bool FiberSegment::belowDistance(FiberSegment const& seg, real sup,
+                                 real& abs1, real& abs2, real& dis2) const
 {
     Vector off = seg.pos1() - pos1();
     Vector d11 = dir();
@@ -195,49 +196,52 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
         modulo->fold(off);
 #endif
     
-    real C = dot(d11, d22);  // cosine of angle
+#if ( DIM > 2 )
+    Torque N = cross(d11, d22);
+    real S = N.normSqr();  // sine^2
+#else
+    real S = square(cross(d11, d22));  // sine^2
+#endif
     
-    if ( 1-abs_real(C) > 128 * REAL_EPSILON )
+    if ( abs_real(S) > 128 * REAL_EPSILON )
     {
-        // if C~1, the value of 1.0-C*C may be imprecise
-        real iS = 1 / (( 1 - C ) * ( 1 + C ));    // 1.0 / sine^2
         // This deals with the general case of non-parallel lines
 #if ( DIM > 2 )
         // direction N of the shortest path is orthogonal to both lines:
         // distance between lines = dot(off, N) / N.norm()
-        real D = dot(off, cross(d11, d22));
+        real D = square( dot(off, N) );
+        if ( D > ( sup * sup ) * S )
+            return false;
 #endif
+        real iS = 1 / S;    // 1.0 / sine^2
+        real C = dot(d11, d22);  // cosine of angle
         real d1off = dot(d11, off);
         real d2off = dot(d22, off);
-        
+
         abs1 = ( d1off - C * d2off ) * iS;
         abs2 = ( C * d1off - d2off ) * iS;
+#if ( DIM > 2 )
+        dis2 = D * iS;
+#else
+        dis2 = 0;
+#endif
 #if 0
         // check that identified line path is orthogonal to both segments:
         Vector p1 = pos1() + abs1 * d11;
         Vector p2 = seg.pos1() + abs2 * d22;
         real n1 = dot(d11, p2-p1);
         real n2 = dot(d22, p2-p1);
-        printf("shortestDistance %+9.6f %+9.6f :", n1, n2);
+        printf("belowDistance %+9.6f %+9.6f :", n1, n2);
         // check different formula for distance betwen lines:
-        real res0 = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
-        real res1 = ( off - d11 * abs1 ).normSqr() - abs2 * abs2;
-        real res2 = ( off + d22 * abs2 ).normSqr() - abs1 * abs1;
-        real res3 = ( D * D ) * iS;  // 1.0 / N.normSqr() == iS
-        printf("%6.4f  %6.4f  %6.4f  %6.4f\n", sqrt(res0), sqrt(res1), sqrt(res2), sqrt(res3));
+        real res0 = ( off + abs2 * d22 - abs1 * d11 ).norm();
+        real res1 = sqrt( D * iS );  // 1.0 / N.normSqr() == iS
+        real res2 = ( p2 - p1 ).norm();
+        printf("%6.4f  %6.4f  %6.4f\n", res0, res1, res2);
 #endif
-#if ( DIM > 2 )
-        //printf("dis %03u:%02lu", seg.fiber()->identity(), seg.point());
-        //printf(" %03u:%02lu  %6.4f\n", fiber()->identity(), point(), fabs(D)*sqrt(iS));
-        return ( D * D ) * iS;
-#else
-        return 0;
-#endif
+        return true;
     }
     else
     {
-        const real len1 = len();
-        const real len2 = seg.len();
         /*
          This deals with the case where the two segments are almost parallel:
          S ~= 0; C ~= +/- 1
@@ -245,23 +249,26 @@ real FiberSegment::shortestDistance(FiberSegment const& seg, real& abs1, real& a
          p1 = projection of seg.pos2()
          */
         const real d1off = dot(d11, off);
-        
-        real m1 = d1off;
-        real p1 = d1off + C * len2;
-        
-        // clamp inside segment and use mid-point
-        abs1 = 0.5 * ( std::min(len1, std::max(m1, p1)) + std::max((real)0, std::min(m1, p1)));
-        
-        real m2 = -dot(d22, off);
-        real p2 = m2 + C * len1;
-        
-        // clamp inside segment and use mid-point
-        abs2 = 0.5 * ( std::min(len2, std::max(m2, p2)) + std::max((real)0, std::min(m2, p2)));
+        const real len1 = len(), len2 = seg.len();
         
         // return distance between lines
-        real res = off.normSqr() - d1off * d1off;
-        //real dis = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
-        return res;
+        dis2 = off.normSqr() - d1off * d1off;
+        //real E = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
+        if ( dis2 > sup * sup )
+            return false;
+
+        real C = dot(d11, d22);  // cosine of angle
+        real m1 = d1off;
+        real p1 = d1off + C * len2;
+        real m2 = -dot(d22, off);
+        real p2 = m2 + C * len1;
+
+        // clamp inside segment and use mid-point
+        abs1 = 0.5 * ( min_real(len1, max_real(m1, p1)) + max_real(0, min_real(m1, p1)));
+        
+        // clamp inside segment and use mid-point
+        abs2 = 0.5 * ( min_real(len2, max_real(m2, p2)) + max_real(0, min_real(m2, p2)));
+        return true;
     }
 }
 

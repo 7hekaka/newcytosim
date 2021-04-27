@@ -104,9 +104,9 @@ public:
 
     /// old hand-crafted projectionPoint(), but incompatible with periodic boundary conditions
     real         projectPointF(const real[], real& dist) const;
-
+    
     /// calculates the closest distance between two infinite lines and set corresponding abscissa
-    real         shortestDistance(FiberSegment const&, real& a, real& b) const;
+    bool         belowDistance(FiberSegment const&, real sup, real& a, real& b, real& dis2) const;
 
     /// Human friendly ouput
     void         print(std::ostream&) const;
