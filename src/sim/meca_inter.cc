@@ -4016,8 +4016,7 @@ void Meca::addSphereClamp(Interpolation const& pti,
  
  The force resides in the YZ plane.
  */
-void Meca::addCylinderClampX(Mecapoint const& pte,
-                             real rad, const real weight)
+void Meca::addCylinderClampX(Mecapoint const& pte, const real rad, const real weight)
 {
     assert_true( weight >= 0 );
     const size_t inx = DIM * pte.matIndex();
@@ -4083,8 +4082,7 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
  
  The force resides in the XZ plane.
  */
-void Meca::addCylinderClampY(Mecapoint const& pte,
-                             real rad, const real weight)
+void Meca::addCylinderClampY(Mecapoint const& pte, const real rad, const real weight)
 {
     assert_true( weight >= 0 );
     const size_t inx = DIM * pte.matIndex();
@@ -4150,8 +4148,7 @@ void Meca::addCylinderClampY(Mecapoint const& pte,
  
  The force resides in the XY plane.
  */
-void Meca::addCylinderClampZ(Mecapoint const& pte,
-                             const real rad, const real weight)
+void Meca::addCylinderClampZ(Mecapoint const& pte, const real rad, const real weight)
 {
     assert_true( weight >= 0 );
     

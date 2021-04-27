@@ -95,10 +95,13 @@ bool SpaceDice::inside(Vector const& W) const
 bool SpaceDice::allInside(Vector const& W, real rad) const
 {
     assert_true( rad >= 0 );
+    real E = max_real(0, edge_-rad);  // remaining edge
+    real R = E + rad;  // size reduction
+
     real dis = 0;
     for ( unsigned d = 0; d < DIM; ++d )
-        dis += square(max_real(0, abs_real(W[d]) - half_[d] + edge_ + rad));
-    return ( dis <= edgeSqr_ );
+        dis += square(max_real(0, abs_real(W[d]) - max_real(0, half_[d]-R)));
+    return ( dis <= E * E );
 }
 
 //------------------------------------------------------------------------------
@@ -158,23 +161,24 @@ Vector SpaceDice::project(Vector const& W) const
 
 //------------------------------------------------------------------------------
 
-#if ADVANCED_DICE_INTERACTIONS
- 
-void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real E) const
+/**
+ Here 'dim' is the reduced dimension: half_[d] - edge_
+ */
+void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real edg)
 {
 #if ( DIM == 1 )
-    meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
+    meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
 #else
-    real dX = half_[0] - abs_real(w.XX);
-    real dY = half_[1] - abs_real(w.YY);
+    real dX = dim[0] - abs_real(w.XX);
+    real dY = dim[1] - abs_real(w.YY);
+    bool inX = ( dX > edg );
+    bool inY = ( dY > edg );
 #if ( DIM > 2 )
-    real dZ = half_[2] - abs_real(w.ZZ);
-#endif
-    
-#if ( DIM > 2 )
-    if ( dX > edge_ && dY > edge_ && dZ > edge_ )
+    real dZ = dim[2] - abs_real(w.ZZ);
+    bool inZ = ( dZ > edg );
+    if ( inX && inY && inZ )
 #else
-    if ( dX > edge_ && dY > edge_ )
+    if ( inX && inY )
 #endif
     {
         // find the dimensionality corresponding to the closest face
@@ -182,71 +186,71 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
         if ( dZ < dY )
         {
             if ( dZ < dX )
-                meca.addPlaneClampZ(pe, std::copysign(half_[2], w.ZZ), stiff);
+                meca.addPlaneClampZ(pe, std::copysign(dim[2], w.ZZ), stiff);
             else
-                meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
+                meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
         }
         else
 #endif
         {
             if ( dY < dX )
-                meca.addPlaneClampY(pe, std::copysign(half_[1], w.YY), stiff);
+                meca.addPlaneClampY(pe, std::copysign(dim[1], w.YY), stiff);
             else
-                meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
+                meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
         }
     }
 #if ( DIM > 2 )
-    else if ( dY > edge_ && dZ > edge_ )
+    else if ( inY && inZ )
     {
-        meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
+        meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
     }
-    else if ( dX > edge_ && dZ > edge_ )
+    else if ( inX && inZ )
     {
-        meca.addPlaneClampY(pe, std::copysign(half_[1], w.YY), stiff);
+        meca.addPlaneClampY(pe, std::copysign(dim[1], w.YY), stiff);
     }
-    else if ( dX > edge_ && dY > edge_ )
+    else if ( inX && inY )
     {
-        meca.addPlaneClampZ(pe, std::copysign(half_[2], w.ZZ), stiff);
+        meca.addPlaneClampZ(pe, std::copysign(dim[2], w.ZZ), stiff);
     }
 #endif
-    else if ( dX > edge_ )
+    else if ( inX )
     {
 #if ( DIM > 2 )
-        real cY = std::copysign(half_[1]-edge_, w.YY);
-        real cZ = std::copysign(half_[2]-edge_, w.ZZ);
-        meca.addCylinderClamp(pe, Vector(1, 0, 0), Vector(0, cY, cZ), edge_, stiff);
+        real cY = std::copysign(dim[1]-edg, w.YY);
+        real cZ = std::copysign(dim[2]-edg, w.ZZ);
+        meca.addCylinderClamp(pe, Vector(1, 0, 0), Vector(0, cY, cZ), edg, stiff);
 #else
-        meca.addPlaneClampY(pe, std::copysign(half_[1], w.YY), stiff);
+        meca.addPlaneClampY(pe, std::copysign(dim[1], w.YY), stiff);
 #endif
     }
-    else if ( dY > edge_ )
+    else if ( inY )
     {
 #if ( DIM > 2 )
-        real cX = std::copysign(half_[0]-edge_, w.XX);
-        real cZ = std::copysign(half_[2]-edge_, w.ZZ);
-        meca.addCylinderClamp(pe, Vector(0, 1, 0), Vector(cX, 0, cZ), edge_, stiff);
+        real cX = std::copysign(dim[0]-edg, w.XX);
+        real cZ = std::copysign(dim[2]-edg, w.ZZ);
+        meca.addCylinderClamp(pe, Vector(0, 1, 0), Vector(cX, 0, cZ), edg, stiff);
 #else
-        meca.addPlaneClampX(pe, std::copysign(half_[0], w.XX), stiff);
+        meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
 #endif
     }
 #if ( DIM > 2 )
-    else if ( dZ > edge_ )
+    else if ( inZ )
     {
-        real cX = std::copysign(half_[0]-edge_, w.XX);
-        real cY = std::copysign(half_[1]-edge_, w.YY);
-        meca.addCylinderClamp(pe, Vector(0, 0, 1), Vector(cX, cY, 0), edge_, stiff);
+        real cX = std::copysign(dim[0]-edg, w.XX);
+        real cY = std::copysign(dim[1]-edg, w.YY);
+        meca.addCylinderClamp(pe, Vector(0, 0, 1), Vector(cX, cY, 0), edg, stiff);
     }
 #endif
     else
     {
-        real cX = std::copysign(half_[0]-edge_, w.XX);
-        real cY = std::copysign(half_[1]-edge_, w.YY);
+        real cX = std::copysign(dim[0]-edg, w.XX);
+        real cY = std::copysign(dim[1]-edg, w.YY);
 #if ( DIM > 2 )
-        real cZ = std::copysign(half_[2]-edge_, w.ZZ);
+        real cZ = std::copysign(dim[2]-edg, w.ZZ);
 #else
         real cZ = 0;
 #endif
-        meca.addSphereClamp(pe, Vector(cX, cY, cZ), edge_, stiff);
+        meca.addSphereClamp(pe, Vector(cX, cY, cZ), edg, stiff);
     }
 #endif
 }
@@ -261,15 +265,13 @@ void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& mec
 void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real E = max_real(0, edge_-rad);  // remaining edge
-    real R = min_real(0, edge_-rad);  // size reduction
 
     real dim[DIM];
     for ( unsigned d = 0; d < DIM; ++d )
-        dim[d] = max_real(0, half_[d]+R);
+        dim[d] = max_real(0, half_[d] - rad);
 
     setInteraction(pos, pe, meca, stiff, dim, E);
 }
-#endif
 
 //------------------------------------------------------------------------------
 

@@ -4,8 +4,6 @@
 
 #include "space.h"
 
-#define ADVANCED_DICE_INTERACTIONS 1
-
 /// A rectangle ( or a cube ) with rounded edges. 
 /**
  Space `dice` is a cube with smooth edges.
@@ -43,7 +41,7 @@ private:
     void update() { edgeSqr_ = square(edge_); }
     
     /// apply a force directed towards the edge of the Space
-    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real, const real[], real) const;
+    static void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real, const real[], real);
 
 public:
     
@@ -71,13 +69,11 @@ public:
     /// set `proj` as the point on the edge that is closest to `point`
     Vector project(Vector const& pos) const;
     
-#if ADVANCED_DICE_INTERACTIONS
     /// apply a force directed towards the edge of the Space
-    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setInteraction(Vector const&, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
-#endif
+    void setInteraction(Vector const&, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     /// write to file
     void write(Outputter&) const;
