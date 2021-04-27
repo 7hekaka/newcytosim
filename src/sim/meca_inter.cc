@@ -4024,39 +4024,51 @@ void Meca::addCylinderClampX(Mecapoint const& pte,
     
 #if ( DIM == 2 )
     
+    //mFUL(inx+1, inx+1) -= weight;
     mFUL.diag_block(inx)(1, 1) -= weight;
     vBAS[inx+1] += weight * std::copysign(rad, pte.pos().YY);
     
 #elif ( DIM >= 3 )
 
     Vector pos = pte.pos();
-    real fac = weight * rad;
     real len = pos.normYZ();
     if ( len < REAL_EPSILON )
         return;
     
-    Vector dir(0, pos.YY/len, pos.ZZ/len);
+    real dY = pos.YY / len;
+    real dZ = pos.ZZ / len;
     
+    real YY, ZY, ZZ;
     if ( rad < len )
     {
+        // attractive
         real wla = weight * rad / len;
-        MatrixBlock & B = mFUL.diag_block(inx);
-        B(1, 1) -= wla * dir.YY * dir.YY + weight - wla;
-        B(2, 1) -= wla * dir.YY * dir.ZZ;
-        B(2, 2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
+        YY = wla * ( dY * dY - 1.0 ) + weight;
+        ZY = wla * dZ * dY;
+        ZZ = wla * ( dZ * dZ - 1.0 ) + weight;
     }
     else
     {
-        fac = weight * rad;
-        MatrixBlock & B = mFUL.diag_block(inx);
-        B(1, 1) -= weight * dir.YY * dir.YY;
-        B(2, 1) -= weight * dir.YY * dir.ZZ;
-        B(2, 2) -= weight * dir.ZZ * dir.ZZ;
+        // repulsive
+        YY = weight * dY * dY;
+        ZY = weight * dZ * dY;
+        ZZ = weight * dZ * dZ;
     }
-    
-    // there should be no XX component here!
-    vBAS[inx+1] += fac * dir.YY;
-    vBAS[inx+2] += fac * dir.ZZ;
+#if USE_MATRIX_BLOCK
+    MatrixBlock & B = mFUL.diag_block(inx);
+    B(1, 1) -= YY;
+    B(2, 1) -= ZY;
+    B(2, 2) -= ZZ;
+#else
+    mFUL(inx+1, inx+1) -= YY;
+    mFUL(inx+2, inx+1) -= ZY;
+    mFUL(inx+2, inx+2) -= ZZ;
+#endif
+
+    real fac = weight * rad;
+    // there should be no X component here!
+    vBAS[inx+1] += fac * dY;
+    vBAS[inx+2] += fac * dZ;
     
 #endif
 }
@@ -4079,38 +4091,51 @@ void Meca::addCylinderClampY(Mecapoint const& pte,
     
 #if ( DIM == 2 )
     
+    //mFUL(inx, inx) -= weight;
     mFUL.diag_block(inx)(0, 0) -= weight;
     vBAS[inx] += weight * std::copysign(rad, pte.pos().XX);
     
 #elif ( DIM >= 3 )
 
     Vector pos = pte.pos();
-    real fac = weight * rad;
     real len = pos.normXZ();
     if ( len < REAL_EPSILON )
         return;
     
-    Vector dir(pos.XX/len, 0, pos.ZZ/len);
+    real dX = pos.XX / len;
+    real dZ = pos.ZZ / len;
     
+    real XX, ZX, ZZ;
     if ( rad < len )
     {
+        // attractive
         real wla = weight * rad / len;
-        MatrixBlock & B = mFUL.diag_block(inx);
-        B(0, 0) -= wla * dir.XX * dir.XX + weight - wla;
-        B(2, 0) -= wla * dir.XX * dir.ZZ;
-        B(2, 2) -= wla * dir.ZZ * dir.ZZ + weight - wla;
+        XX = wla * ( dX * dX - 1.0 ) + weight;
+        ZX = wla * dZ * dX;
+        ZZ = wla * ( dZ * dZ - 1.0 ) + weight;
     }
     else
     {
-        MatrixBlock & B = mFUL.diag_block(inx);
-        B(0, 0) -= weight * dir.XX * dir.XX;
-        B(2, 0) -= weight * dir.XX * dir.ZZ;
-        B(2, 2) -= weight * dir.ZZ * dir.ZZ;
+        // repulsive
+        XX = weight * dX * dX;
+        ZX = weight * dZ * dX;
+        ZZ = weight * dZ * dZ;
     }
-    
-    vBAS[inx  ] += fac * dir.XX;
-    // there should be no YY component here!
-    vBAS[inx+2] += fac * dir.ZZ;
+#if USE_MATRIX_BLOCK
+    MatrixBlock & B = mFUL.diag_block(inx);
+    B(0, 0) -= XX;
+    B(2, 0) -= ZX;
+    B(2, 2) -= ZZ;
+#else
+    mFUL(inx  , inx  ) -= XX;
+    mFUL(inx+2, inx  ) -= ZX;
+    mFUL(inx+2, inx+2) -= ZZ;
+#endif
+
+    real fac = weight * rad;
+    vBAS[inx  ] += fac * dX;
+    // there should be no Y component here!
+    vBAS[inx+2] += fac * dZ;
     
 #endif
 }
@@ -4130,48 +4155,60 @@ void Meca::addCylinderClampZ(Mecapoint const& pte,
 {
     assert_true( weight >= 0 );
     
-#if ( DIM > 1 )
+#if ( DIM >= 3 )
 
     const size_t inx = DIM * pte.matIndex();
     Vector pos = pte.pos();
-    real fac = weight * rad;
     real len = pos.normXY();
     if ( len < REAL_EPSILON )
         return;
     
-    Vector dir(pos.XX/len, pos.YY/len, 0);
-    
+    real dX = pos.XX / len;
+    real dY = pos.YY / len;
+
+    real XX, YX, YY;
     if ( rad < len )
     {
+        // attractive
         real wla = weight * rad / len;
-        MatrixBlock & B = mFUL.diag_block(inx);
-        B(0, 0) -= wla * dir.XX * dir.XX + weight - wla;
-        B(1, 0) -= wla * dir.XX * dir.YY;
-        B(1, 1) -= wla * dir.YY * dir.YY + weight - wla;
+        XX = wla * ( dX * dX - 1.0 ) + weight;
+        YX = wla * dY * dX;
+        YY = wla * ( dY * dY - 1.0 ) + weight;
     }
     else
     {
-        MatrixBlock & B = mFUL.diag_block(inx);
-        B(0, 0) -= weight * dir.XX * dir.XX;
-        B(1, 0) -= weight * dir.XX * dir.YY;
-        B(1, 1) -= weight * dir.YY * dir.YY;
+        // repulsive
+        XX = weight * dX * dX;
+        YX = weight * dY * dX;
+        YY = weight * dY * dY;
     }
+#if USE_MATRIX_BLOCK
+    MatrixBlock & B = mFUL.diag_block(inx);
+    B(0, 0) -= XX;
+    B(1, 0) -= YX;
+    B(1, 1) -= YY;
+#else
+    mFUL(inx  , inx  ) -= XX;
+    mFUL(inx+1, inx  ) -= YX;
+    mFUL(inx+1, inx+1) -= YY;
+#endif
     
-    vBAS[inx  ] += fac * dir.XX;
-    vBAS[inx+1] += fac * dir.YY;
-    // there should be no ZZ component here!
+    real fac = weight * rad;
+    vBAS[inx  ] += fac * dX;
+    vBAS[inx+1] += fac * dY;
+    // there should be no Z component here!
 
 #endif
 }
 
 /**
- Link `pte` (P) to a cylinder of axis Z and radius `rad`
+ Link `pte` (P) to a cylinder of given `axis` and radius `rad`
  The force is affine with non-zero resting length:
  
      G = Vector(0, 0, P.ZZ)
      force = weight * ( G - P ) * ( rad / |PG| - 1 )
  
- The force resides in the XY plane.
+ The force resides in the plane orthogonal to `axis` anchored at `center`.
  */
 void Meca::addCylinderClamp(Mecapoint const& pte,
                             Vector const& axis, Vector const& center,
@@ -4182,20 +4219,22 @@ void Meca::addCylinderClamp(Mecapoint const& pte,
     assert_true( weight >= 0 );
     const size_t inx = DIM * pte.matIndex();
 
-    //Projection matrix along the cylinder axis:  P = [ I - axis (x) axis ]
+    //Projection removing components parallel to the cylinder axis:  P = [ I - axis (x) axis ]
     MatrixBlock P = MatrixBlock::offsetOuterProduct(1.0, axis, -1.0/axis.normSqr());
     
-    Vector dir = P * ( pte.pos() - center );
+    Vector dir = P.vecmul( pte.pos() - center );
     real len = dir.norm();
     
     if ( len > REAL_EPSILON )
     {
         real wla = weight * rad / len;
         
+        MatrixBlock W;
         if ( rad < len )
-            P = P.mul(MatrixBlock::offsetOuterProduct(wla-weight, dir/len, -wla));
+            W = MatrixBlock::offsetOuterProduct(wla-weight, dir/len, -wla);
         else
-            P = P.mul(MatrixBlock::outerProduct(dir/len, -weight));
+            W = MatrixBlock::outerProduct(dir/len, -weight);
+        P = P.mul(W);
         
         add_block_diag(inx, P);
         add_base(inx, wla*dir - P*center);

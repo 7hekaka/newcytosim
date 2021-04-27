@@ -366,22 +366,28 @@ public:
         return std::sqrt(XX*XX + YY*YY);
     }
     
+    /// the 2D norm = x^2+z^2
+    real normXZSqr() const
+    {
+        return XX*XX + ZZ*ZZ;
+    }
+
     /// the 2D norm = std::sqrt(x^2+z^2)
     real normXZ() const
     {
         return std::sqrt(XX*XX + ZZ*ZZ);
-    }
-    
-    /// the 2D norm = std::sqrt(y^2+z^2)
-    real normYZ() const
-    {
-        return std::sqrt(YY*YY + ZZ*ZZ);
     }
 
     /// the 2D norm = y^2+z^2
     real normYZSqr() const
     {
         return YY*YY + ZZ*ZZ;
+    }
+
+    /// the 2D norm = std::sqrt(y^2+z^2)
+    real normYZ() const
+    {
+        return std::sqrt(YY*YY + ZZ*ZZ);
     }
 
     /// square of the distance between two points, equivalent to (a-b).normSqr()
