@@ -98,12 +98,14 @@ size_t Sphere::addSurfacePoint(Vector const& cp)
 
      new sphere NAME
      {
-        radius = REAL
+        radius = VALUE, DEVIATION, MINIMUM
         point1 = INTEGER, POSITION [, SINGLE_SPEC]
      }
  
- The `INTEGER` specifies the number of points created, and `POSITION` can be a
- `VECTOR`, or the string 'surface'.  Multiple `SINGLE_SPEC` can be specified.
+ Variability around the mean radius is added if 'DEVIATION' and 'MINIMUM' are specified.
+ All values must be positive. When specifying the points on the surface of the Sphere,
+ an `INTEGER` set the number of points created, and `POSITION` can be a `VECTOR`,
+ or the string 'surface'.  Multiple points commands can be given: point1, point2, etc.
  
  <h3> Add Singles to a Sphere </h3>
  
@@ -392,7 +394,7 @@ real Sphere::addBrownianForces(real const* rnd, real alpha, real* res) const
 #if   ( DIM == 2 )
         rhs[1] += fp.YY;
         T += cross(Vector(pos[0]-cx, pos[1]-cy), fp);
-#elif ( DIM == 3 )
+#elif ( DIM >= 3 )
         rhs[1] += fp.YY;
         rhs[2] += fp.ZZ;
         T += cross(Vector(pos[0]-cx, pos[1]-cy, pos[2]-cz), fp);
@@ -417,7 +419,7 @@ real Sphere::addBrownianForces(real const* rnd, real alpha, real* res) const
         rhs[0] += R.XX - T * pos[1] + fp.XX;
         rhs[1] += R.YY + T * pos[0] + fp.YY;
         F += fp + cross(T, Vector(pos[0]-cx, pos[1]-cy));
-#elif ( DIM == 3 )
+#elif ( DIM >= 3 )
         rhs[0] += R.XX + T.YY * pos[2] - T.ZZ * pos[1] + fp.XX;
         rhs[1] += R.YY + T.ZZ * pos[0] - T.XX * pos[2] + fp.YY;
         rhs[2] += R.ZZ + T.XX * pos[1] - T.YY * pos[0] + fp.ZZ;
@@ -429,7 +431,7 @@ real Sphere::addBrownianForces(real const* rnd, real alpha, real* res) const
 #if   ( DIM == 2 )
     res[0] -= F.XX + bT * rnd[0];
     res[1] -= F.YY + bT * rnd[1];
-#elif ( DIM == 3 )
+#elif ( DIM >= 3 )
     res[0] -= F.XX + bT * rnd[0];
     res[1] -= F.YY + bT * rnd[1];
     res[2] -= F.ZZ + bT * rnd[2];
@@ -445,7 +447,7 @@ real Sphere::addBrownianForces(real const* rnd, real alpha, real* res) const
  */
 void Sphere::orthogonalize(size_t i)
 {
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     const size_t ix = 1 + i;
     const size_t iy = 1 + (i+1)%3;
     const size_t iz = 1 + (i+2)%3;
@@ -490,7 +492,7 @@ void Sphere::reshape()
         setPoint(j, cen + axis);
     }
     
-#if ( DIM == 3 )
+#if ( DIM >= 3 )
     orthogonalize(RNG.pint32(3));
 #endif
 }

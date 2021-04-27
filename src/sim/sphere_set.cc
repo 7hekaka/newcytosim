@@ -46,13 +46,13 @@ ObjectList SphereSet::newObjects(const std::string& name, Glossary& opt)
         throw InvalidParameter("parameter `radius` should be specified and > 0");
     
     // possibly add some variability
-    real dev = 0;
-    if ( opt.set(dev, "radius", 1) )
+    real dev = 0, inf = 0;
+    if ( opt.set(dev, "radius", 1) && opt.set(inf, "radius", 2) )
     {
         real r;
         do
             r = rad + dev * RNG.gauss();
-        while ( r < REAL_EPSILON );
+        while ( r < inf );
         rad = r;
     }
     

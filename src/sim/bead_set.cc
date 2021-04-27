@@ -30,12 +30,15 @@ Object * BeadSet::newObject(const ObjectTag tag, size_t num)
 /**
  @ingroup NewObject
 
- By definition, a Bead has one point, and one can only set the radius of the Bead:
+ A Bead is defined by its center and only the radius can be specified:
 
      new bead NAME
      {
-       radius = REAL
+       radius = VALUE, DEVIATION, MINIMUM
      }
+ 
+ Variability around the mean radius is added if 'DEVIATION' and 'MINIMUM' are specified.
+ All values must be positive.
 
  <h3> How to add Single </h3>
 
@@ -80,13 +83,13 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
         opt.set(rad, "radius");
         
         // possibly add some variability in the radius:
-        real dev = 0;
-        if ( opt.set(dev, "radius", 1) )
+        real dev = 0, inf = 0;
+        if ( opt.set(dev, "radius", 1) && opt.set(inf, "radius", 2) )
         {
             real r;
             do
                 r = rad + dev * RNG.gauss();
-            while ( r < REAL_EPSILON );
+            while ( r < inf );
             rad = r;
         }
     }

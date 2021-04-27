@@ -59,7 +59,7 @@ set bead ball
 
 new 40 ball
 {
-    radius = 0.25
+    radius = 0.25, 0.1, 0.05
 }
 
 run 100000 system
