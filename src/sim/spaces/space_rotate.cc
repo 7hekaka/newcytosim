@@ -56,14 +56,14 @@ Vector SpaceRotate::project(Vector const& pos) const
 
 
 /* It would be necessary to use a temporary Meca, to swap the indices between X and Z */
-void SpaceRotate::setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const
+void SpaceRotate::setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const
 {
     ABORT_NOW("unfinished SpaceRotate");
 }
 
 
 /* It would be necessary to use a temporary Meca, to swap the indices between X and Z */
-void SpaceRotate::setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const
+void SpaceRotate::setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const
 {
     ABORT_NOW("unfinished SpaceRotate");
 }

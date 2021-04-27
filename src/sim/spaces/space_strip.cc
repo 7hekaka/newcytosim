@@ -173,10 +173,10 @@ Vector SpaceStrip::project(Vector const& pos) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - setInteraction
+#pragma mark - setConfinement
 
 
-void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
     real Y = sign_select(2 * pos.YY - bot_ - top_, bot_, top_);
@@ -188,7 +188,7 @@ void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& me
 }
 
 
-void SpaceStrip::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
     real Y = sign_select(2 * pos.YY - bot_ - top_, bot_+rad, top_-rad);

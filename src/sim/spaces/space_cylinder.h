@@ -21,7 +21,7 @@
 class SpaceCylinder : public Space
 {    
     /// apply a force directed towards the edge of the Space
-    static void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff, real len, real rad);
+    static void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff, real len, real rad);
 
 private:
     
@@ -61,10 +61,10 @@ public:
     Vector project(Vector const& pos) const;
 
     /// apply a force directed towards the edge of the Space
-    void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     
     /// write to file

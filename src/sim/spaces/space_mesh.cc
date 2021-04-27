@@ -76,15 +76,15 @@ Vector SpaceMesh::project(Vector const& W) const
  
  @todo Also project re-entrant polygon corners on the segments of the Fiber.
  */
-void SpaceMesh::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceMesh::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {    
-      std::cerr << "unfinished SpaceMesh::setInteraction\n";
+      std::cerr << "unfinished SpaceMesh::setConfinement\n";
 }
 
 
-void SpaceMesh::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceMesh::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    std::cerr << "unfinished SpaceMesh::setInteraction(with radius)\n";
+    std::cerr << "unfinished SpaceMesh::setConfinement(with radius)\n";
 }
 
 

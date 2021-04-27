@@ -164,7 +164,7 @@ Vector SpaceDice::project(Vector const& W) const
 /**
  Here 'dim' is the reduced dimension: half_[d] - edge_
  */
-void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real edg)
+void SpaceDice::setConfinement(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real edg)
 {
 #if ( DIM == 1 )
     meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
@@ -256,13 +256,13 @@ void SpaceDice::setInteraction(Vector const& w, Mecapoint const& pe, Meca& meca,
 }
 
 
-void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, half_, edge_);
+    setConfinement(pos, pe, meca, stiff, half_, edge_);
 }
 
 
-void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real E = max_real(0, edge_-rad);  // remaining edge
 
@@ -270,7 +270,7 @@ void SpaceDice::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
     for ( unsigned d = 0; d < DIM; ++d )
         dim[d] = max_real(0, half_[d] - rad);
 
-    setInteraction(pos, pe, meca, stiff, dim, E);
+    setConfinement(pos, pe, meca, stiff, dim, E);
 }
 
 //------------------------------------------------------------------------------

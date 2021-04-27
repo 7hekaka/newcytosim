@@ -17,10 +17,6 @@
      - length = total extent along X, Y and Z
      - radius = rounding radius of edges
      .
-
- Note: Dice::setInteraction() relies on project(), and numerical instabilities
- may arise in particular if `radius << size`, because determining the tangent
- plane to a point becomes imprecise.
  
  @ingroup SpaceGroup
  */
@@ -41,7 +37,7 @@ private:
     void update() { edgeSqr_ = square(edge_); }
     
     /// apply a force directed towards the edge of the Space
-    static void setInteraction(Vector const& pos, Mecapoint const&, Meca&, real, const real[], real);
+    static void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real, const real[], real);
 
 public:
     
@@ -70,10 +66,10 @@ public:
     Vector project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void setInteraction(Vector const&, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const&, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void setInteraction(Vector const&, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const&, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     /// write to file
     void write(Outputter&) const;

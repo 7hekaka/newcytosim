@@ -117,8 +117,8 @@ void Couple::setInteractions(Meca& meca) const
     if ( prop->confine )
     {
         Space const* spc = prop->confine_space_ptr;
-        spc->setInteraction(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
-        spc->setInteraction(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
+        spc->setConfinement(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
+        spc->setConfinement(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
 }
@@ -132,7 +132,7 @@ void Couple::setInteractionsAF(Meca& meca) const
     if ( prop->confine )
     {
         Space const* spc = prop->confine_space_ptr;
-        spc->setInteraction(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
+        spc->setConfinement(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
 }
@@ -146,7 +146,7 @@ void Couple::setInteractionsFA(Meca& meca) const
     if ( prop->confine )
     {
         Space const* spc = prop->confine_space_ptr;
-        spc->setInteraction(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
+        spc->setConfinement(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
 }

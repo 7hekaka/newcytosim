@@ -132,7 +132,7 @@ Vector SpaceCylinder::project(Vector const& W) const
 /**
  This applies the correct forces in the cylindrical part and the caps.
  */
-void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca,
+void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca,
                                    real stiff, const real len, const real rad)
 {
     bool cap = ( abs_real(pos.XX) > len );
@@ -171,21 +171,21 @@ void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca&
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, half_, radius_);
+    setConfinement(pos, pe, meca, stiff, half_, radius_);
 }
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinder::setInteraction(Vector const& pos, Mecapoint const& pe,
+void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& pe,
                                    real rad, Meca& meca, real stiff) const
 {
     real R = max_real(0, radius_ - rad);
     real L = max_real(0, half_ - rad);
     
-    setInteraction(pos, pe, meca, stiff, L, R);
+    setConfinement(pos, pe, meca, stiff, L, R);
 }
 
 //------------------------------------------------------------------------------

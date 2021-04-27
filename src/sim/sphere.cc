@@ -339,18 +339,18 @@ void Sphere::setInteractions(Meca& meca) const
             {
                 Vector cen(pPos);
                 if ( ! spc->inside(cen) )
-                    spc->setInteraction(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                    spc->setConfinement(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
             
             case CONFINE_ALL_INSIDE:
             {
                 Vector cen(pPos);
                 if ( ! spc->allInside(cen, spRadius) )
-                    spc->setInteraction(cen, Mecapoint(this, 0), spRadius, meca, prop->confine_stiffness);
+                    spc->setConfinement(cen, Mecapoint(this, 0), spRadius, meca, prop->confine_stiffness);
             } break;
             
             case CONFINE_ON:
-                spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
             
             default:
                 throw InvalidParameter("Invalid sphere::confine");

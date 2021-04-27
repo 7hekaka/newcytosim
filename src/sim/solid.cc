@@ -65,7 +65,7 @@ void Solid::setInteractions(Meca& meca) const
                     {
                         Vector pos = posP(i);
                         if ( ! spc->inside(pos) )
-                            spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
+                            spc->setConfinement(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                     }
                 }
                 break;
@@ -79,7 +79,7 @@ void Solid::setInteractions(Meca& meca) const
                     {
                         Vector pos = posP(i);
                         if ( spc->inside(pos) )
-                            spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
+                            spc->setConfinement(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                     }
                 }
                 break;
@@ -93,7 +93,7 @@ void Solid::setInteractions(Meca& meca) const
                     {
                         Vector pos = posP(i);
                         if ( ! spc->allInside(pos, rad) )
-                            spc->setInteraction(pos, Mecapoint(this, i), rad, meca, prop->confine_stiffness);
+                            spc->setConfinement(pos, Mecapoint(this, i), rad, meca, prop->confine_stiffness);
                     }
                 }
                 break;
@@ -103,19 +103,19 @@ void Solid::setInteractions(Meca& meca) const
                 {
                     // only confine massive points:
                     if ( soRadius[i] > 0 )
-                        spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
+                        spc->setConfinement(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
                 }
                 break;
                 
             case CONFINE_POINT:
-                spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
                 break;
                 
             case CONFINE_POINT_INSIDE:
             {
                 Vector pos = posP(0);
                 if ( !spc->inside(pos) )
-                    spc->setInteraction(pos, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                    spc->setConfinement(pos, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
 
             default:

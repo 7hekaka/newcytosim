@@ -21,7 +21,7 @@ CrosslinkLong::~CrosslinkLong()
 }
 
 /*
- Note that, since `mArm` is calculated by setInteraction(),
+ Note that, since `mArm` is calculated by setInteractions(),
  the result will be incorrect if 'solve=0'
 */
 Vector CrosslinkLong::sidePos1() const
@@ -35,7 +35,7 @@ Vector CrosslinkLong::sidePos1() const
 
 
 /*
- Note that, since `mArm` is calculated by setInteraction(),
+ Note that, since `mArm` is calculated by setInteractions(),
  the result will be incorrect if 'solve=0'
 */
 Vector CrosslinkLong::sidePos2() const

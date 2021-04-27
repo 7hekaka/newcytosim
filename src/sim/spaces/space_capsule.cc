@@ -189,7 +189,7 @@ Vector SpaceCapsule::randomPlaceOnEdge(real) const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
+void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
     if ( abs_real(pos.XX) > len )
     {
@@ -204,20 +204,20 @@ void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, half_, radius_);
+    setConfinement(pos, pe, meca, stiff, half_, radius_);
 }
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     if ( rad < radius_ )
-        setInteraction(pos, pe, meca, stiff, half_, radius_-rad);
+        setConfinement(pos, pe, meca, stiff, half_, radius_-rad);
     else
-        setInteraction(pos, pe, meca, stiff, half_, 0);
+        setConfinement(pos, pe, meca, stiff, half_, 0);
 }
 
 //------------------------------------------------------------------------------

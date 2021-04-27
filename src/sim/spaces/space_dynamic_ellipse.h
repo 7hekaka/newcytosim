@@ -18,7 +18,7 @@ class SpaceDynamicProp;
      - length = total length in X, Y and Z directions
      .
 
- This Space has no corners: setInteraction() relies on project()
+ This Space has no corners: setConfinement() relies on project()
  */
 
 class SpaceDynamicEllipse : public SpaceEllipse
@@ -82,8 +82,8 @@ public:
     /// add interactions to a Meca
     void setInteractions(Meca&) const;
 
-    /// setInteraction and changes the forces the ellipse undergoes
-    void setInteraction(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const;
+    /// this also register the forces the ellipse undergoes
+    void setConfinement(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const;
 
     ///    ContractEllipse has a step function to adjust shape
     void step();

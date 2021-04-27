@@ -78,13 +78,13 @@ Vector SpaceSphere::project(Vector const& pos) const
 
 //------------------------------------------------------------------------------
 
-void SpaceSphere::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceSphere::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
 }
 
 
-void SpaceSphere::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceSphere::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     if ( radius_ > rad )
         meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);

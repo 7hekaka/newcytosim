@@ -171,10 +171,10 @@ Vector SpaceLid::project(Vector const& pos) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - setInteraction
+#pragma mark - setConfinement
 
 
-void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
+void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
@@ -194,7 +194,7 @@ void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe,
 }
 
 
-void SpaceLid::setInteraction(Vector const& pos, Mecapoint const& pe, real rad,
+void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe, real rad,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )

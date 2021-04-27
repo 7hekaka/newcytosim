@@ -17,9 +17,9 @@
  
  This is an OLD Space: 
  The re-entrant corners at the base of the arm are not
- properly considered in setInteraction().
+ properly considered in setConfinement().
  
- @todo Update SpaceTee::setInteraction() if you want to use this SpaceTee.
+ @todo Update SpaceTee::setConfinement() if you want to use this SpaceTee.
 */
 class SpaceTee : public Space
 {

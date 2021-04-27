@@ -18,7 +18,7 @@
  
  The projection of one point on the surface of the ellipse is done numerically. 
  In 3D this is the only solution if the 3 axes have different length.
- setInteraction() relies on project() and thus uses the tangent plane at the
+ setConfinement() relies on project() and thus uses the tangent plane at the
  projection point to approximate the confinement force.
 
  @ingroup SpaceGroup

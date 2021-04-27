@@ -17,7 +17,7 @@ void SpaceDynamicSphere::setInteractions(Meca&) const
 }
 
 
-void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
+void SpaceDynamicSphere::setConfinement(Vector const& pos, Mecapoint const& pe,
                                         Meca& meca, real stiff) const
 {
     meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
@@ -25,7 +25,7 @@ void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
 }
 
 
-void SpaceDynamicSphere::setInteraction(Vector const& pos, Mecapoint const& pe,
+void SpaceDynamicSphere::setConfinement(Vector const& pos, Mecapoint const& pe,
                                         real rad, Meca& meca, real stiff) const
 {
     if ( radius_ > rad )

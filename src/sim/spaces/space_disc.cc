@@ -96,14 +96,14 @@ void SpaceDisc::setInteractions(Meca&) const
 }
 
 
-void SpaceDisc::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
     force_ += stiff * ( pos.norm() - radius_ );
 }
 
 
-void SpaceDisc::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     if ( radius_ > rad )
     {

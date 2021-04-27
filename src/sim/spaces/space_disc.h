@@ -65,10 +65,10 @@ public:
     void        setInteractions(Meca&) const;
 
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
 
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     ///    the step function can change the radius
     void        step();

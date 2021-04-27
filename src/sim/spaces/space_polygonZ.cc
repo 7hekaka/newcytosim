@@ -129,9 +129,9 @@ Vector SpacePolygonZ::project(Vector const& W) const
  
  @todo Also project re-entrant polygon corners on the segments of the Fiber.
  */
-void SpacePolygonZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpacePolygonZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    //Space::setInteraction(pos, pe, meca, stiff); return;
+    //Space::setConfinement(pos, pe, meca, stiff); return;
 #if ( DIM > 2 )
     real P, R = pos.normXY();
     size_t hit;
@@ -159,9 +159,9 @@ void SpacePolygonZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca&
 }
                        
 
-void SpacePolygonZ::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpacePolygonZ::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    //setInteraction(pos, pe, meca, stiff);
+    //setConfinement(pos, pe, meca, stiff);
     std::cerr << "unfinished SpacePolygonZ::setInteractions(with radius)\n";
 }
 

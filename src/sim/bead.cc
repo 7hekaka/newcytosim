@@ -61,7 +61,7 @@ void Bead::setInteractions(Meca& meca) const
                 // Confine only the center
                 Vector cen(pPos);
                 if ( ! spc->inside(cen) )
-                    spc->setInteraction(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                    spc->setConfinement(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_OUTSIDE:
@@ -69,7 +69,7 @@ void Bead::setInteractions(Meca& meca) const
                 // confine the center outside
                 Vector cen(pPos);
                 if ( spc->inside(cen) )
-                    spc->setInteraction(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                    spc->setConfinement(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_ALL_INSIDE:
@@ -77,11 +77,11 @@ void Bead::setInteractions(Meca& meca) const
                 // Confine the entire bead
                 Vector cen(pPos);
                 if ( ! spc->allInside(cen, paRadius) )
-                    spc->setInteraction(cen, Mecapoint(this, 0), paRadius, meca, prop->confine_stiffness);
+                    spc->setConfinement(cen, Mecapoint(this, 0), paRadius, meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_ON:
-                spc->setInteraction(position(), Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(position(), Mecapoint(this, 0), meca, prop->confine_stiffness);
                 break;
                 
             default:

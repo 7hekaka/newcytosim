@@ -177,7 +177,7 @@ Vector SpacePolygon::project(Vector const& W) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - setInteraction
+#pragma mark - setConfinement
 
 /**
  The current procedure tests the vertices of fibers against the segments of the polygon.
@@ -185,7 +185,7 @@ Vector SpacePolygon::project(Vector const& W) const
  
  @todo Also project re-entrant polygon corners on the segments of the Fiber.
  */
-void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {    
 #if ( DIM > 1 )
     
@@ -226,10 +226,10 @@ void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& 
 }
 
 
-void SpacePolygon::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    //setInteraction(pos, pe, meca, stiff);
-    std::cerr << "unfinished SpacePolygon::setInteraction(with radius)\n";
+    //setConfinement(pos, pe, meca, stiff);
+    std::cerr << "unfinished SpacePolygon::setConfinement(with radius)\n";
 }
 
 #include "fiber_segment.h"

@@ -118,7 +118,7 @@ Vector SpaceRing::project(Vector const& W) const
 /**
  This applies a force directed to the surface of the cylinder
  */
-void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
+void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
 {
     if ( abs_real(pos.XX) > len )
         meca.addPlaneClampX(pe, std::copysign(len, pos.XX), stiff);
@@ -130,17 +130,17 @@ void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& mec
 /**
  This applies a force directed to the surface of the cylinder
  */
-void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, half_, radius_);
+    setConfinement(pos, pe, meca, stiff, half_, radius_);
 }
 
 /**
  This applies a force directed to the surface of the cylinder
  */
-void SpaceRing::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, half_, radius_);
+    setConfinement(pos, pe, meca, stiff, half_, radius_);
 }
 
 //------------------------------------------------------------------------------

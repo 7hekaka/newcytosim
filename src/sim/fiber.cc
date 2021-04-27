@@ -940,7 +940,7 @@ void Fiber::setInteractions(Meca& meca) const
                 {
                     Vector pos = posP(i);
                     if ( spc->outside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
+                        spc->setConfinement(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                 }
                 break;
                 
@@ -949,30 +949,30 @@ void Fiber::setInteractions(Meca& meca) const
                 {
                     Vector pos = posP(i);
                     if ( spc->inside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
+                        spc->setConfinement(pos, Mecapoint(this, i), meca, prop->confine_stiffness);
                 }
                 break;
                 
             case CONFINE_ON:
                 for ( size_t i = 0; i < nPoints; ++i )
-                    spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
+                    spc->setConfinement(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
                 break;
                 
             case CONFINE_MINUS_END:
-                spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
                 break;
 
             case CONFINE_PLUS_END:
             {
                 const size_t L = lastPoint();
-                spc->setInteraction(posP(L), Mecapoint(this, L), meca, prop->confine_stiffness);
+                spc->setConfinement(posP(L), Mecapoint(this, L), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_BOTH_ENDS:
             {
                 const size_t L = lastPoint();
-                spc->setInteraction(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
-                spc->setInteraction(posP(L), Mecapoint(this, L), meca, prop->confine_stiffness);
+                spc->setConfinement(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(posP(L), Mecapoint(this, L), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_PLUS_OUT:
@@ -980,7 +980,7 @@ void Fiber::setInteractions(Meca& meca) const
                 const size_t L = lastPoint();
                 Vector pos = posP(L);
                 if ( spc->inside(pos) )
-                    spc->setInteraction(pos, Mecapoint(this, L), meca, prop->confine_stiffness);
+                    spc->setConfinement(pos, Mecapoint(this, L), meca, prop->confine_stiffness);
             } break;
 #if NEW_FIBER_CONFINE_RANGE
             case CONFINE_RANGE:
@@ -989,7 +989,7 @@ void Fiber::setInteractions(Meca& meca) const
                 size_t S = clampedIndexM(prop->confine_range[0]);
                 size_t E = clampedIndexM(prop->confine_range[1]);
                 for ( size_t i = S; i < E; ++i )
-                    spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
+                    spc->setConfinement(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
             } break;
 #endif
             default:
@@ -1010,7 +1010,7 @@ void Fiber::setInteractions(Meca& meca) const
                 {
                     Vector pos = posP(i);
                     if ( spc->outside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine2_stiffness);
+                        spc->setConfinement(pos, Mecapoint(this, i), meca, prop->confine2_stiffness);
                 }
                 break;
                 
@@ -1019,13 +1019,13 @@ void Fiber::setInteractions(Meca& meca) const
                 {
                     Vector pos = posP(i);
                     if ( spc->inside(pos) )
-                        spc->setInteraction(pos, Mecapoint(this, i), meca, prop->confine2_stiffness);
+                        spc->setConfinement(pos, Mecapoint(this, i), meca, prop->confine2_stiffness);
                 }
                 break;
                 
             case CONFINE_ON:
                 for ( size_t i = 0; i < nPoints; ++i )
-                    spc->setInteraction(posP(i), Mecapoint(this, i), meca, prop->confine2_stiffness);
+                    spc->setConfinement(posP(i), Mecapoint(this, i), meca, prop->confine2_stiffness);
                 break;
                 
             default:

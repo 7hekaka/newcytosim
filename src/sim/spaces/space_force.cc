@@ -42,13 +42,13 @@ Vector SpaceForce::project(Vector const&) const
 }
 
 
-void SpaceForce::setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const
+void SpaceForce::setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const
 {
     throw InvalidParameter("Invalid use of space `force'");
 }
 
 
-void SpaceForce::setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const
+void SpaceForce::setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const
 {
     throw InvalidParameter("Invalid use of space `force'");
 }

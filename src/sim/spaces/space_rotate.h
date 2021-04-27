@@ -10,7 +10,7 @@
  This simply rotates any vector argument before calling the Space functions,
  and eventually inversely transforms the result.
  
- @todo SpaceRotate is unfinished: setInteraction() not implemented
+ @todo SpaceRotate is unfinished: setConfinement() not implemented
  */
 class SpaceRotate : public Space
 {
@@ -49,10 +49,10 @@ public:
     Vector      project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setInteraction(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// write to file
     void        write(Outputter&) const;

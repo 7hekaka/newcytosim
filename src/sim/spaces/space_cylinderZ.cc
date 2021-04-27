@@ -333,7 +333,7 @@ Vector SpaceCylinderZ::project(Vector const& W) const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, 
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, 
                                     real stiff, real R, real B, real T)
 {
 #if ( DIM >= 3 )
@@ -379,7 +379,7 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
 }
 
 
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca,
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca,
                                     real stiff, real R, real B, real T, real E)
 {
 #if ( DIM >= 3 )
@@ -439,19 +439,19 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
 #if HAS_SMOOTH_EDGES
-    setInteraction(pos, pe, meca, stiff, radius_, bot_, top_, edge_);
+    setConfinement(pos, pe, meca, stiff, radius_, bot_, top_, edge_);
 #else
-    setInteraction(pos, pe, meca, stiff, radius_, bot_, top_);
+    setConfinement(pos, pe, meca, stiff, radius_, bot_, top_);
 #endif
 }
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real R = max_real(0, radius_ - rad);
     real T = top_ - rad;
@@ -464,9 +464,9 @@ void SpaceCylinderZ::setInteraction(Vector const& pos, Mecapoint const& pe, real
     }
     
 #if HAS_SMOOTH_EDGES
-    setInteraction(pos, pe, meca, stiff, R, B, T, edge_);
+    setConfinement(pos, pe, meca, stiff, R, B, T, edge_);
 #else
-    setInteraction(pos, pe, meca, stiff, R, B, T);
+    setConfinement(pos, pe, meca, stiff, R, B, T);
 #endif
 }
 

@@ -158,7 +158,7 @@ void Single::setInteractions(Meca& meca) const
     if ( prop->confine )
     {
         Space const* spc = prop->confine_space_ptr;
-        spc->setInteraction(sHand->interpolation(), meca, prop->stiffness, prop->confine);
+        spc->setConfinement(sHand->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
 }

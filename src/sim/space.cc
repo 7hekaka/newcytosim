@@ -358,7 +358,7 @@ real  Space::signedDistanceToEdge(Vector const& pos) const
  This generates a friction-less potential centered on the edge.
  */
 
-void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void Space::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     Vector prj = project(pos);
     assert_true(prj.valid());
@@ -377,7 +377,7 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, r
  This generates a friction-less potential centered on the edge.
  */
 
-void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void Space::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     Vector prj = projectDeflated(pos, rad);
     Vector dir = pos - prj;
@@ -389,13 +389,13 @@ void Space::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Mec
 #if ( 0 )
 
 /**
- This calls Space::setInteraction(pos, Mecapoint, meca, stiff) twice,
+ This calls Space::setConfinement(pos, Mecapoint, meca, stiff) twice,
  to generate a force on `pi` (which is at position `pos`) toward the surface.
  */
-void Space::setInteraction(Vector const& pos, Interpolation const& pi, Meca& meca, real stiff) const
+void Space::setConfinement(Vector const& pos, Interpolation const& pi, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pi.exact1(), meca, pi.coef0()*stiff);
-    setInteraction(pos, pi.exact2(), meca, pi.coef1()*stiff);
+    setConfinement(pos, pi.exact1(), meca, pi.coef0()*stiff);
+    setConfinement(pos, pi.exact2(), meca, pi.coef1()*stiff);
 }
 
 
@@ -406,23 +406,23 @@ void Space::setInteraction(Vector const& pos, Interpolation const& pi, Meca& mec
  - ( conf == surface )
  .
  */
-void Space::setInteraction(Interpolation const& pi, Meca& meca, real stiff, Confinement conf) const
+void Space::setConfinement(Interpolation const& pi, Meca& meca, real stiff, Confinement conf) const
 {
     if ( conf == CONFINE_ON )
     {
-        setInteraction(pi.pos(), pi, meca, stiff);
+        setConfinement(pi.pos(), pi, meca, stiff);
     }
     else if ( conf == CONFINE_INSIDE )
     {
         Vector pos = pi.pos();
         if ( ! inside(pos) )
-            setInteraction(pos, pi, meca, stiff);
+            setConfinement(pos, pi, meca, stiff);
     }
     else if ( conf == CONFINE_OUTSIDE )
     {
         Vector pos = pi.pos();
         if ( inside(pos) )
-            setInteraction(pos, pi, meca, stiff);
+            setConfinement(pos, pi, meca, stiff);
     }
 }
 

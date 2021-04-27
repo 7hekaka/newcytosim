@@ -82,7 +82,7 @@ void SpaceDynamicEllipse::setInteractions(Meca&) const
 
  Also update \a Rforces and \a Torques that will be use to evolve the Space
 */
-void SpaceDynamicEllipse::setInteraction(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceDynamicEllipse::setConfinement(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
     Vector prj;
     prj = project(pos);

@@ -160,7 +160,7 @@ Vector SpaceSquare::project(Vector const& W) const
 
  */
 
-void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& meca, real stiff, const real dim[])
+void SpaceSquare::setConfinement(const real pos[], Mecapoint const& pe, Meca& meca, real stiff, const real dim[])
 {
     bool in = true;
     
@@ -192,19 +192,19 @@ void SpaceSquare::setInteraction(const real pos[], Mecapoint const& pe, Meca& me
 }
 
 
-void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceSquare::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
-    setInteraction(pos, pe, meca, stiff, half_);
+    setConfinement(pos, pe, meca, stiff, half_);
 }
 
 
-void SpaceSquare::setInteraction(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceSquare::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
     real dim[DIM];
     for ( size_t d = 0; d < DIM; ++d )
         dim[d] = max_real(0, half_[d] - rad);
 
-    setInteraction(pos, pe, meca, stiff, dim);
+    setConfinement(pos, pe, meca, stiff, dim);
 }
 
 //------------------------------------------------------------------------------
