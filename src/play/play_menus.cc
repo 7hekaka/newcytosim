@@ -398,6 +398,7 @@ static void processMenuExport(int item)
         case 5: player.saveScene(9, "image", prop.image_index++, 3); return;
         case 6: player.saveScene(4, "poster", prop.poster_index++); return;
         case 7: player.saveScene(8, "poster", prop.poster_index++); return;
+        case 8: player.saveScene(16, "poster", prop.poster_index++); return;
 
         case 9: prop.save_images = 9999; player.startPlayback(); return;
         case 10: prop.image_index = 0; return;
@@ -431,6 +432,7 @@ static int buildMenuExport()
     glutAddMenuEntry("Save 3x Fine Image",        5);
     glutAddMenuEntry("Save 4x Poster",            6);
     glutAddMenuEntry("Save 8x Poster",            7);
+    glutAddMenuEntry("Save 16x Poster",           8);
     glutAddMenuEntry("Play & Save Images (Y)",    9);
     glutAddMenuEntry("Reset Image-file Index",   10);
     glutAddMenuEntry("-",                         0);
