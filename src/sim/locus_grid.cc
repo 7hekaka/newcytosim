@@ -130,7 +130,7 @@ void LocusGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge
  The force is applied if the objects are closer to the maximum
  of their specified range + radius.
  */
-inline static void checkPP(Meca& meca, real stiff,
+void LocusGrid::checkPP(Meca& meca, real stiff,
                         BigPoint const& aa, BigPoint const& bb)
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
@@ -155,7 +155,7 @@ inline static void checkPP(Meca& meca, real stiff,
  The force is applied if the objects are closer than the maximum of the two range + radius,
  and if the center of the sphere projects inside the segment.
  */
-inline static void checkPL(Meca& meca, real stiff,
+void LocusGrid::checkPL(Meca& meca, real stiff,
                         BigPoint const& aa, BigLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
@@ -209,8 +209,8 @@ inline static void checkPL(Meca& meca, real stiff,
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-inline static void checkLL1(Meca& meca, real stiff,
-                            BigLocus const& aa, BigLocus const& bb)
+void LocusGrid::checkLL1(Meca& meca, real stiff,
+                         BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
     const real ran = aa.rad_ + bb.rad_;
@@ -276,8 +276,8 @@ inline static void checkLL1(Meca& meca, real stiff,
 
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-inline static void checkLL2(Meca& meca, real stiff,
-                            BigLocus const& aa, BigLocus const& bb)
+void LocusGrid::checkLL2(Meca& meca, real stiff,
+                         BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
     const real ran = aa.rad_ + bb.rad_;
@@ -349,8 +349,8 @@ inline static void checkLL2(Meca& meca, real stiff,
  This is used to check two FiberSegment, that each represent a segment of a Fiber.
  The segments are tested for intersection in 3D.
  */
-inline static void checkLL(Meca& meca, real stiff,
-                           BigLocus const& aa, BigLocus const& bb)
+void LocusGrid::checkLL(Meca& meca, real stiff,
+                        BigLocus const& aa, BigLocus const& bb)
 {
 #if ( DIM >= 3 )
     
@@ -385,6 +385,10 @@ inline static void checkLL(Meca& meca, real stiff,
 //------------------------------------------------------------------------------
 #pragma mark - Selections of pairs excluded from Sterics
 
+/*
+ In general, these test will only exclude relatively rare pairs from interacting,
+ and thus are less stringent than BigVector::near(): they should be tested after.
+ */
 
 /// excluding two spheres when they are from the same Solid
 inline static bool not_adjacent(BigPoint const* a, BigPoint const* b)
@@ -421,8 +425,8 @@ inline static bool not_adjacent(BigLocus const* a, BigLocus const* b)
 /**
  This will consider once all pairs of objects from the given lists
  */
-static void setSterics0(Meca& meca, real stiff,
-                        BigPointList & pots, BigLocusList & locs)
+void LocusGrid::setSterics0(Meca& meca, real stiff,
+                            BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
@@ -448,9 +452,9 @@ static void setSterics0(Meca& meca, real stiff,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated
  */
-static void setSterics0(Meca& meca, real stiff,
-                        BigPointList & pots1, BigLocusList & locs1,
-                        BigPointList & pots2, BigLocusList & locs2)
+void LocusGrid::setSterics0(Meca& meca, real stiff,
+                            BigPointList & pots1, BigLocusList & locs1,
+                            BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -488,19 +492,19 @@ static void setSterics0(Meca& meca, real stiff,
  
  `rad` is the maximum radius of Points, and the `seg` the maximum range of Locuses
  */
-static void setStericsT(Meca& meca, real stiff,
-                        BigPointList & pots, BigLocusList & locs)
+void LocusGrid::setStericsT(Meca& meca, real stiff,
+                            BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
         BigVector pos = ii->pos_;
         
         for ( BigPoint* jj = ii+1; jj < pots.end(); ++jj )
-            if ( not_adjacent(ii, jj) & pos.near(jj->pos_) )
+            if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
                 checkPP(meca, stiff, *ii, *jj);
         
         for ( BigLocus* kk = locs.begin(); kk < locs.end(); ++kk )
-            if ( not_adjacent(ii, kk) & pos.near(kk->pos_) )
+            if ( pos.near(kk->pos_) && not_adjacent(ii, kk) )
                 checkPL(meca, stiff, *ii, *kk);
     }
 
@@ -509,7 +513,7 @@ static void setStericsT(Meca& meca, real stiff,
         BigVector pos = ii->pos_;
         
         for ( BigLocus* jj = ii+1; jj < locs.end(); ++jj )
-            if ( not_adjacent(ii, jj) & pos.near(jj->pos_) )
+            if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
                 checkLL(meca, stiff, *ii, *jj);
     }
 }
@@ -524,9 +528,9 @@ static void setStericsT(Meca& meca, real stiff,
 
  `rad` is the maximum radius of Points, and the `seg` the maximum range of Locuses
 */
-static void setStericsT(Meca& meca, real stiff,
-                        BigPointList & pots1, BigLocusList & locs1,
-                        BigPointList & pots2, BigLocusList & locs2)
+void LocusGrid::setStericsT(Meca& meca, real stiff,
+                            BigPointList & pots1, BigLocusList & locs1,
+                            BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -536,11 +540,11 @@ static void setStericsT(Meca& meca, real stiff,
         const BigVector pos = ii->pos_;
 
         for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
-            if ( not_adjacent(ii, jj) & pos.near(jj->pos_) )
+            if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
                 checkPP(meca, stiff, *ii, *jj);
         
         for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
-            if ( not_adjacent(ii, kk) & pos.near(kk->pos_) )
+            if ( pos.near(kk->pos_) && not_adjacent(ii, kk) )
                 checkPL(meca, stiff, *ii, *kk);
     }
     
@@ -549,12 +553,12 @@ static void setStericsT(Meca& meca, real stiff,
         const BigVector pos = ii->pos_;
 
         for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
-            if ( not_adjacent(jj, ii) & pos.near(jj->pos_) )
+            if ( pos.near(jj->pos_) && not_adjacent(jj, ii) )
                 checkPL(meca, stiff, *jj, *ii);
         
         for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
-            if ( not_adjacent(ii, kk) & pos.near(kk->pos_) )
+            if ( pos.near(kk->pos_) && not_adjacent(ii, kk) )
                 checkLL(meca, stiff, *ii, *kk);
         }
     }
@@ -584,7 +588,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff) const
         BigPointList & baseP = point_list(inx);
         BigLocusList & baseL = locus_list(inx);
         
-        if ( isPeriodic() )
+        if ( pGrid.isPeriodic() )
         {
             setSterics0(meca, stiff, baseP, baseL);
             
@@ -630,7 +634,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
         BigPointList & baseP = point_list(inx, pan);
         BigLocusList & baseL = locus_list(inx, pan);
         
-        if ( isPeriodic() )
+        if ( pGrid.isPeriodic() )
         {
             setSterics0(meca, stiff, baseP, baseL);
             
@@ -677,7 +681,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
         BigPointList & baseP = point_list(inx, pan1);
         BigLocusList & baseL = locus_list(inx, pan1);
         
-        if ( isPeriodic() )
+        if ( pGrid.isPeriodic() )
         {
             for ( int reg = 0; reg < nr; ++reg )
             {

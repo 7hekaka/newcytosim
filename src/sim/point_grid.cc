@@ -593,7 +593,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
         FatPointList & baseP = point_list(inx);
         FatLocusList & baseL = locus_list(inx);
         
-        if ( isPeriodic() )
+        if ( pGrid.isPeriodic() )
         {
             setSterics(meca, pam, baseP, baseL);
             
@@ -640,7 +640,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         FatPointList & baseP = point_list(inx, pan);
         FatLocusList & baseL = locus_list(inx, pan);
         
-        if ( isPeriodic() )
+        if ( pGrid.isPeriodic() )
         {
             setSterics(meca, pam, baseP, baseL);
             
@@ -688,7 +688,7 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         FatPointList & baseP = point_list(inx, pan1);
         FatLocusList & baseL = locus_list(inx, pan1);
         
-        if ( isPeriodic() )
+        if ( pGrid.isPeriodic() )
         {
             for ( int reg = 0; reg < nr; ++reg )
             {
