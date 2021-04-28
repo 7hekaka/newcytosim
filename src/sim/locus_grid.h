@@ -297,39 +297,6 @@ private:
 
 private:
     
-    /// check two Spheres
-    static void checkPP(Meca&, real stiff, BigPoint const&, BigPoint const&);
-    
-    /// check Sphere against Line segment
-    static void checkPL(Meca&, real stiff, BigPoint const&, BigLocus const&);
-    
-    /// check Line segment against Sphere
-    static void checkLL1(Meca&, real stiff, BigLocus const&, BigLocus const&);
-    
-    /// check Line segment against the terminal Sphere of a Fiber
-    static void checkLL2(Meca&, real stiff, BigLocus const&, BigLocus const&);
-    
-    /// check two Line segments
-    static void checkLL(Meca&, real stiff, BigLocus const&, BigLocus const&);
-    
-    /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff,
-                            BigPointList &, BigLocusList &);
-    
-    /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff,
-                            BigPointList &, BigLocusList &,
-                            BigPointList &, BigLocusList &);
-    
-    /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff,
-                           BigPointList &, BigLocusList &);
-    
-    /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff,
-                            BigPointList &, BigLocusList &,
-                            BigPointList &, BigLocusList &);
-    
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`

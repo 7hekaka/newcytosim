@@ -231,41 +231,6 @@ private:
     
     /// max diameter of objects, given the cell size
     real max_diameter;
-    
-private:
-    
-    /// check two Spheres
-    static void checkPP(Meca&, StericParam const&, FatPoint const&, FatPoint const&);
-    
-    /// check Sphere against Line segment
-    static void checkPL(Meca&, StericParam const&, FatPoint const&, FatLocus const&);
-    
-    /// check Line segment against Sphere
-    static void checkLL1(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
-    
-    /// check Line segment against the terminal Sphere of a Fiber
-    static void checkLL2(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
-    
-    /// check two Line segments
-    static void checkLL(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
-    
-    /// check all pairs between the two lists
-    static void setSterics(Meca&, StericParam const&,
-                           FatPointList &, FatLocusList &);
-    
-    /// check all pairs between the two lists
-    static void setSterics(Meca&, StericParam const&,
-                           FatPointList &, FatLocusList &,
-                           FatPointList &, FatLocusList &);
-    
-    /// check all pairs between two lists, checking center-to-center distance
-    static void setSterics(Meca&, StericParam const&, real sup,
-                           FatPointList &, FatLocusList &);
-    
-    /// check all pairs between two lists, checking center-to-center distance
-    static void setSterics(Meca&, StericParam const&, real sup,
-                           FatPointList &, FatLocusList &,
-                           FatPointList &, FatLocusList &);
 
 #if ( NUM_STERIC_PANES == 1 )
     

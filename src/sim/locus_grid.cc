@@ -130,7 +130,7 @@ void LocusGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge
  The force is applied if the objects are closer to the maximum
  of their specified range + radius.
  */
-void LocusGrid::checkPP(Meca& meca, real stiff,
+inline static void checkPP(Meca& meca, real stiff,
                         BigPoint const& aa, BigPoint const& bb)
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
@@ -155,7 +155,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
  The force is applied if the objects are closer than the maximum of the two range + radius,
  and if the center of the sphere projects inside the segment.
  */
-void LocusGrid::checkPL(Meca& meca, real stiff,
+inline static void checkPL(Meca& meca, real stiff,
                         BigPoint const& aa, BigLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
@@ -209,8 +209,8 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void LocusGrid::checkLL1(Meca& meca, real stiff,
-                         BigLocus const& aa, BigLocus const& bb)
+inline static void checkLL1(Meca& meca, real stiff,
+                            BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
     const real ran = aa.rad_ + bb.rad_;
@@ -276,8 +276,8 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void LocusGrid::checkLL2(Meca& meca, real stiff,
-                         BigLocus const& aa, BigLocus const& bb)
+inline static void checkLL2(Meca& meca, real stiff,
+                            BigLocus const& aa, BigLocus const& bb)
 {
     //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
     const real ran = aa.rad_ + bb.rad_;
@@ -349,8 +349,8 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
  This is used to check two FiberSegment, that each represent a segment of a Fiber.
  The segments are tested for intersection in 3D.
  */
-void LocusGrid::checkLL(Meca& meca, real stiff,
-                        BigLocus const& aa, BigLocus const& bb)
+inline static void checkLL(Meca& meca, real stiff,
+                           BigLocus const& aa, BigLocus const& bb)
 {
 #if ( DIM >= 3 )
     
@@ -387,14 +387,14 @@ void LocusGrid::checkLL(Meca& meca, real stiff,
 
 
 /// excluding two spheres when they are from the same Solid
-inline bool not_adjacent(BigPoint const* a, BigPoint const* b)
+inline static bool not_adjacent(BigPoint const* a, BigPoint const* b)
 {
     return a->mec_ != b->mec_;
 }
 
 
 /// excluding Fiber and Solid from the same Aster
-inline bool not_adjacent(BigPoint const* a, BigLocus const* b)
+inline static bool not_adjacent(BigPoint const* a, BigLocus const* b)
 {
     //a->mec_->Buddy::print(std::clog);
     //b->fib_->Buddy::print(std::clog);
@@ -403,15 +403,16 @@ inline bool not_adjacent(BigPoint const* a, BigLocus const* b)
 
 
 /// excluding segments that are adjacent on the same fiber, or protofilaments from Tubule
-inline bool not_adjacent(BigLocus const* a, BigLocus const* b)
+inline static bool not_adjacent(BigLocus const* a, BigLocus const* b)
 {
 #if FIBER_HAS_FAMILY
     return (( a->fib_->family_ != b->fib_->family_ )
+            || (( a->pti_ > 1 + b->pti_ ) | ( b->pti_ > 1 + a->pti_ )));
 #else
     return (( a->fib_ != b->fib_ )
+            || (( a->pti_ > 1 + b->pti_ ) | ( b->pti_ > 1 + a->pti_ )));
 #endif
-            || (( a->pti_ >= 2 + b->pti_ ) | ( b->pti_ >= 2 + a->pti_ )));
-            // we cannot use abs() above because `pti_` is unsigned
+    // we cannot use abs() above because `pti_` is unsigned
 }
 
 //------------------------------------------------------------------------------
@@ -420,8 +421,8 @@ inline bool not_adjacent(BigLocus const* a, BigLocus const* b)
 /**
  This will consider once all pairs of objects from the given lists
  */
-void LocusGrid::setSterics0(Meca& meca, real stiff,
-                            BigPointList & pots, BigLocusList & locs)
+static void setSterics0(Meca& meca, real stiff,
+                        BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
@@ -447,9 +448,9 @@ void LocusGrid::setSterics0(Meca& meca, real stiff,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated
  */
-void LocusGrid::setSterics0(Meca& meca, real stiff,
-                            BigPointList & pots1, BigLocusList & locs1,
-                            BigPointList & pots2, BigLocusList & locs2)
+static void setSterics0(Meca& meca, real stiff,
+                        BigPointList & pots1, BigLocusList & locs1,
+                        BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -487,19 +488,19 @@ void LocusGrid::setSterics0(Meca& meca, real stiff,
  
  `rad` is the maximum radius of Points, and the `seg` the maximum range of Locuses
  */
-void LocusGrid::setStericsT(Meca& meca, real stiff,
-                            BigPointList & pots, BigLocusList & locs)
+static void setStericsT(Meca& meca, real stiff,
+                        BigPointList & pots, BigLocusList & locs)
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
         BigVector pos = ii->pos_;
         
         for ( BigPoint* jj = ii+1; jj < pots.end(); ++jj )
-            if ( not_adjacent(ii, jj) && pos.near(jj->pos_) )
+            if ( not_adjacent(ii, jj) & pos.near(jj->pos_) )
                 checkPP(meca, stiff, *ii, *jj);
         
         for ( BigLocus* kk = locs.begin(); kk < locs.end(); ++kk )
-            if ( not_adjacent(ii, kk) && pos.near(kk->pos_) )
+            if ( not_adjacent(ii, kk) & pos.near(kk->pos_) )
                 checkPL(meca, stiff, *ii, *kk);
     }
 
@@ -508,7 +509,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
         BigVector pos = ii->pos_;
         
         for ( BigLocus* jj = ii+1; jj < locs.end(); ++jj )
-            if ( not_adjacent(ii, jj) && pos.near(jj->pos_) )
+            if ( not_adjacent(ii, jj) & pos.near(jj->pos_) )
                 checkLL(meca, stiff, *ii, *jj);
     }
 }
@@ -523,9 +524,9 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
 
  `rad` is the maximum radius of Points, and the `seg` the maximum range of Locuses
 */
-void LocusGrid::setStericsT(Meca& meca, real stiff,
-                            BigPointList & pots1, BigLocusList & locs1,
-                            BigPointList & pots2, BigLocusList & locs2)
+static void setStericsT(Meca& meca, real stiff,
+                        BigPointList & pots1, BigLocusList & locs1,
+                        BigPointList & pots2, BigLocusList & locs2)
 {
     assert_true( &pots1 != &pots2 );
     assert_true( &locs1 != &locs2 );
@@ -535,11 +536,11 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
         const BigVector pos = ii->pos_;
 
         for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
-            if ( not_adjacent(ii, jj) && pos.near(jj->pos_) )
+            if ( not_adjacent(ii, jj) & pos.near(jj->pos_) )
                 checkPP(meca, stiff, *ii, *jj);
         
         for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
-            if ( not_adjacent(ii, kk) && pos.near(kk->pos_) )
+            if ( not_adjacent(ii, kk) & pos.near(kk->pos_) )
                 checkPL(meca, stiff, *ii, *kk);
     }
     
@@ -548,12 +549,12 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
         const BigVector pos = ii->pos_;
 
         for ( BigPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
-            if ( not_adjacent(jj, ii) && pos.near(jj->pos_) )
+            if ( not_adjacent(jj, ii) & pos.near(jj->pos_) )
                 checkPL(meca, stiff, *jj, *ii);
         
         for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
-            if ( not_adjacent(ii, kk) && pos.near(kk->pos_) )
+            if ( not_adjacent(ii, kk) & pos.near(kk->pos_) )
                 checkLL(meca, stiff, *ii, *kk);
         }
     }
