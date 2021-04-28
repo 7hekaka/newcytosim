@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
         PRINT(FatLocus);
         
         PRINT(LocusGrid);
+        PRINT(BigVector);
         PRINT(BigPoint);
         PRINT(BigLocus);
         

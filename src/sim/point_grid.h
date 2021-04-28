@@ -115,7 +115,7 @@ typedef Array<FatLocus> FatLocusList;
 
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
-#define N_STERIC_PANES 1
+#define NUM_STERIC_PANES 1
 
 
 /// a set of lists associated with the same location
@@ -123,7 +123,7 @@ class PointGridCell
 {
     friend class PointGrid;
     
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
     
     /// unique steric pane
     FatPointList point_pane;
@@ -134,10 +134,10 @@ class PointGridCell
 #else
     
     /// different steric panes
-    FatPointList point_panes_0[N_STERIC_PANES];
+    FatPointList point_panes_0[NUM_STERIC_PANES];
     
     /// different steric panes
-    FatLocusList locus_panes_0[N_STERIC_PANES];
+    FatLocusList locus_panes_0[NUM_STERIC_PANES];
     
     /// alias to the array of panes, with index 1 refering to point_panes_0[0]
     FatPointList * point_panes;
@@ -149,7 +149,7 @@ class PointGridCell
     
 public:
     
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
     
     PointGridCell()
     {
@@ -173,7 +173,7 @@ public:
     /// clear all panes
     void clear()
     {
-        for ( size_t p = 1; p <= N_STERIC_PANES; ++p )
+        for ( size_t p = 1; p <= NUM_STERIC_PANES; ++p )
         {
             point_panes[p].clear();
             locus_panes[p].clear();
@@ -182,14 +182,14 @@ public:
     
     FatPointList& point_list(size_t p)
     {
-        assert_true( 0 < p && p <= N_STERIC_PANES );
+        assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return point_panes[p];
     }
     
     
     FatLocusList& locus_list(size_t p)
     {
-        assert_true( 0 < p && p <= N_STERIC_PANES );
+        assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return locus_panes[p];
     }
     
@@ -267,7 +267,7 @@ private:
                            FatPointList &, FatLocusList &,
                            FatPointList &, FatLocusList &);
 
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
     FatPointList& point_list(Vector const& w) const
@@ -298,28 +298,28 @@ private:
     /// cell corresponding to position `w`, and pane `p`
     FatPointList& point_list(Vector const& w, const size_t p) const
     {
-        assert_true( 0 < p && p <= N_STERIC_PANES );
+        assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.cell(w).point_panes[p];
     }
     
     /// cell corresponding to position `w`, and pane `p`
     FatLocusList& locus_list(Vector const& w, const size_t p) const
     {
-        assert_true( 0 < p && p <= N_STERIC_PANES );
+        assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.cell(w).locus_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
     FatPointList& point_list(const size_t c, const size_t p) const
     {
-        assert_true( 0 < p && p <= N_STERIC_PANES );
+        assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.icell(c).point_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
     FatLocusList& locus_list(const size_t c, const size_t p) const
     {
-        assert_true( 0 < p && p <= N_STERIC_PANES );
+        assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.icell(c).locus_panes[p];
     }
     
@@ -345,7 +345,7 @@ public:
     /// clear the grid
     void clear()            { pGrid.clear(); }
     
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
     
     /// place Mecapoint on the grid
     void add(Mecable const* m, size_t i, real rad, real extra_range) const

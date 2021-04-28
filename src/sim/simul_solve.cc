@@ -141,7 +141,7 @@ void Simul::setStericInteractions(Meca& meca) const
         
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
                 pointGrid.add(F, i, rad, ran);
 #else
                 pointGrid.add(F->prop->steric, F, i, rad, ran);
@@ -153,7 +153,7 @@ void Simul::setStericInteractions(Meca& meca) const
     for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
         if ( O->prop->steric )
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
             pointGrid.add(O, 0, O->radius(), O->radius()+O->prop->steric_range);
 #else
             pointGrid.add(O->prop->steric, O, 0, O->radius(), O->radius()+O->prop->steric_range);
@@ -164,7 +164,7 @@ void Simul::setStericInteractions(Meca& meca) const
     for ( Bead const* B=beads.first(); B; B=B->next() )
     {
         if ( B->prop->steric )
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
             pointGrid.add(B, 0, B->radius(), B->radius()+B->prop->steric_range);
 #else
             pointGrid.add(B->prop->steric, B, 0, B->radius(), B->radius()+B->prop->steric_range);
@@ -179,7 +179,7 @@ void Simul::setStericInteractions(Meca& meca) const
             for ( size_t i = 0; i < S->nbPoints(); ++i )
             {
                 if ( S->radius(i) > REAL_EPSILON )
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
                     pointGrid.add(S, i, S->radius(i), S->radius(i)+S->prop->steric_range);
 #else
                     pointGrid.add(S->prop->steric, S, i, S->radius(i), S->radius(i)+S->prop->steric_range);
@@ -191,11 +191,11 @@ void Simul::setStericInteractions(Meca& meca) const
     /// create parameters
     StericParam pam(prop->steric_stiff_push[0], prop->steric_stiff_pull[0]);
     
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
     
     pointGrid.setInteractions(meca, pam);
 
-#elif ( N_STERIC_PANES == 2 )
+#elif ( NUM_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
     pointGrid.setInteractions(meca, pam, 1);
@@ -206,7 +206,7 @@ void Simul::setStericInteractions(Meca& meca) const
 #else
     
     // add steric interactions within each pane:
-    for ( size_t p = 1; p <= N_STERIC_PANES; ++p )
+    for ( size_t p = 1; p <= NUM_STERIC_PANES; ++p )
         pointGrid.setInteractions(meca, pam, p);
 
 #endif
@@ -251,12 +251,13 @@ void Simul::setStericInteractionsAlt(Meca& meca) const
         if ( F->prop->steric )
         {
             const real rad = F->prop->steric_radius;
+            const real rge = rad + 0.5 * F->segmentation();
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
 #if ( MAX_STERIC_PANES == 1 )
-                locusGrid.add(F, i, rad);
+                locusGrid.add(F, i, rad, rge);
 #else
-                locusGrid.add(F->prop->steric, F, i, rad);
+                locusGrid.add(F->prop->steric, F, i, rad, rge);
 #endif
         }
     }

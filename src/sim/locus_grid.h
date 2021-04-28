@@ -16,6 +16,45 @@ class Mecable;
 class Mecapoint;
 class FiberSegment;
 
+
+
+/// Used for early exclusing of potential pairs, representing { position, interaction radius }
+/** This uses single precision arithmetics, hopefully sufficient for exclusion tests */
+class BigVector
+{
+public:
+
+    float XX, YY, ZZ;
+    float RR;
+    
+    BigVector() { XX = 0; YY = 0; ZZ = 0; RR = 0; }
+
+    BigVector(Vector1 v, real r) { XX = v.XX; YY = 0; ZZ = 0; RR = r; }
+    BigVector(Vector2 v, real r) { XX = v.XX; YY = v.YY; ZZ = 0; RR = r; }
+    BigVector(Vector3 v, real r) { XX = v.XX; YY = v.YY; ZZ = v.ZZ; RR = r; }
+
+    /// @return result of test `distance(this, arg) < sum_of_ranges`
+    bool near(BigVector const& arg) const
+    {
+        float x = XX - arg.XX;
+#if ( DIM == 1 )
+        float r = RR + arg.RR;
+        return ( std::abs(x) <= r );
+#elif ( DIM == 2 )
+        float y = YY - arg.YY;
+        float r = RR + arg.RR;
+        return ( x*x + y*y <= r*r );
+#else
+        float y = YY - arg.YY;
+        float z = ZZ - arg.ZZ;
+        float r = RR + arg.RR;
+        return ( z*z + x*x <= r*r - y*y );
+#endif
+    }
+};
+
+
+
 /// represents the point of a Mecable for steric interactions
 class BigPoint
 {
@@ -24,10 +63,7 @@ class BigPoint
 public:
     
     /// position of center
-    Vector   pos_;
-    
-    /// equilibrium radius of the interaction (distance where force is zero)
-    real     rad_;
+    BigVector pos_;
     
     /// Mecable containing the point-of-interest
     Mecable const* mec_;
@@ -43,10 +79,9 @@ public:
     BigPoint() {}
     
     BigPoint(Mecable const* m, size_t i, real r, Vector const& w)
+    : pos_(w, r)
     {
         mec_ = m;
-        pos_ = w;
-        rad_ = r;
         pti_ = static_cast<unsigned>(i);
         key_ = 0;
         assert_true( i == pti_ );
@@ -54,6 +89,13 @@ public:
     
     /// construct Mecapoint
     inline Mecapoint point() const;
+    
+    /// position of center
+    Vector cen() const { return mec_->posPoint(pti_); }
+    //Vector cen() const { return Vector(&pos_.XX); }
+    
+    /// radius
+    real rad() const { return pos_.RR; }
 };
 
 
@@ -64,15 +106,15 @@ class BigLocus
     
 public:
     
-    /// position of center
-    Vector   pos_;
-    
-    /// equilibrium radius of the interaction (distance where force is zero)
-    real     rad_;
+    /// position of center, and radius of interaction
+    BigVector pos_;
 
     /// Fiber to which the segment belongs to
     Fiber const* fib_;
     
+    /// equilibrium radius of the interaction (distance where force is zero)
+    real     rad_;
+
     /// index of segment's first point
     unsigned pti_;
     
@@ -83,10 +125,10 @@ public:
     
     BigLocus() {}
     
-    BigLocus(Fiber const*& f, size_t i, real r, Vector const& w)
+    BigLocus(Fiber const*& f, size_t i, real r, real e, Vector const& w)
+    : pos_(w, e)
     {
         fib_ = f;
-        pos_ = w;
         rad_ = r;
         pti_ = static_cast<unsigned>(i);
         key_ = 0;
@@ -228,7 +270,7 @@ public:
     {
         size_t res = 0;
         for ( int i = 0; i < MAX_STERIC_PANES; ++i )
-            res += point_pane[i].capacity() + locus_pane[i].capacity();
+            res += point_panes[i].capacity() + locus_panes[i].capacity();
         return res;
     }
 
@@ -252,15 +294,6 @@ private:
     
     /// grid for divide-and-conquer strategies:
     Grid<LocusGridCell, DIM> pGrid;
-    
-    /// max radius of spherical objects
-    real point_radius;
-    
-    /// max segmentation of fiber segments added to grid
-    real locus_length;
-    
-    /// max radius of fiber segments added to grid
-    real locus_radius;
 
 private:
     
@@ -280,23 +313,23 @@ private:
     static void checkLL(Meca&, real stiff, BigLocus const&, BigLocus const&);
     
     /// check all pairs between the two lists
-    static void setSterics(Meca&, real stiff,
-                           BigPointList &, BigLocusList &);
+    static void setSterics0(Meca&, real stiff,
+                            BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists
-    static void setSterics(Meca&, real stiff,
-                           BigPointList &, BigLocusList &,
+    static void setSterics0(Meca&, real stiff,
+                            BigPointList &, BigLocusList &,
+                            BigPointList &, BigLocusList &);
+    
+    /// check all pairs between the two lists, checking center-to-center distance
+    static void setStericsT(Meca&, real stiff,
                            BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setSterics(Meca&, real stiff, real sup, real seg_sup,
-                           BigPointList &, BigLocusList &);
+    static void setStericsT(Meca&, real stiff,
+                            BigPointList &, BigLocusList &,
+                            BigPointList &, BigLocusList &);
     
-    /// check all pairs between the two lists, checking center-to-center distance
-    static void setSterics(Meca&, real stiff, real sup, real seg_sup,
-                           BigPointList &, BigLocusList &,
-                           BigPointList &, BigLocusList &);
-
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
@@ -376,7 +409,7 @@ public:
     size_t capacity() const;
 
     /// clear the grid
-    void clear() { pGrid.clear(); point_radius=0; locus_length=0; locus_radius=0; }
+    void clear() { pGrid.clear(); }
     
 #if ( MAX_STERIC_PANES == 1 )
     
@@ -385,17 +418,14 @@ public:
     {
         Vector w = m->posPoint(i);
         point_list(w).emplace(m, i, rad, w);
-        point_radius = std::max(point_radius, rad);
     }
     
     /// place Fiber segment on the grid
-    void add(Fiber const* f, size_t i, real rad)
+    void add(Fiber const* f, size_t i, real rad, real rge)
     {
         // link in cell containing the middle of the segment
         Vector w = f->posPoint(i, 0.5);
-        locus_list(w).emplace(f, i, rad, w);
-        locus_length = std::max(locus_length, f->segmentation());
-        locus_radius = std::max(locus_radius, rad);
+        locus_list(w).emplace(f, i, rad, rge, w);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -407,7 +437,7 @@ public:
     void add(size_t pane, Mecable const*, size_t, real rad);
     
     /// place Fiber segment on the grid
-    void add(size_t pane, Fiber const*, size_t, real rad);
+    void add(size_t pane, Fiber const*, size_t, real rad, real rge);
     
     /// enter interactions into Meca in one panes with given parameters
     void setInteractions(Meca&, real stiff, size_t pan) const;

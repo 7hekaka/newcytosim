@@ -78,11 +78,11 @@ void PointGrid::createCells()
 #define CHECK_STERIC_RANGE 0
 
 
-#if ( N_STERIC_PANES != 1 )
+#if ( NUM_STERIC_PANES != 1 )
 
 void PointGrid::add(size_t pan, Mecable const* mec, size_t inx, real rad, real rg) const
 {
-    if ( pan == 0 || pan > N_STERIC_PANES )
+    if ( pan == 0 || pan > NUM_STERIC_PANES )
         throw InvalidParameter("point:steric is out-of-range");
     
     Vector w = mec->posPoint(inx);
@@ -103,7 +103,7 @@ void PointGrid::add(size_t pan, Mecable const* mec, size_t inx, real rad, real r
 
 void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rd, real rg) const
 {
-    if ( pan == 0 || pan > N_STERIC_PANES )
+    if ( pan == 0 || pan > NUM_STERIC_PANES )
         throw InvalidParameter("line:steric is out-of-range");
     
     // link in the cell containing the middle of the segment:
@@ -435,25 +435,25 @@ inline bool adjacent(FatLocus const* a, FatLocus const* b)
 /**
  This will consider once all pairs of objects from the given lists
  */
-void PointGrid::setSterics(Meca& meca, StericParam const& stiff,
+void PointGrid::setSterics(Meca& meca, StericParam const& pam,
                            FatPointList & pots, FatLocusList & locs)
 {
     for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
         for ( FatPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( !adjacent(ii, jj) )
-                checkPP(meca, stiff, *ii, *jj);
+                checkPP(meca, pam, *ii, *jj);
         
         for ( FatLocus* kk = locs.begin(); kk < locs.end(); ++kk )
             if ( !adjacent(ii, kk) )
-                checkPL(meca, stiff, *ii, *kk);
+                checkPL(meca, pam, *ii, *kk);
     }
 
     for ( FatLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
         for ( FatLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( !adjacent(ii, jj) )
-                checkLL(meca, stiff, *ii, *jj);
+                checkLL(meca, pam, *ii, *jj);
     }
 }
 
@@ -572,7 +572,7 @@ void PointGrid::setSterics(Meca& meca, StericParam const& pam, real sup,
 #pragma mark - Check all pairs of Cells
 
 
-#if ( N_STERIC_PANES == 1 )
+#if ( NUM_STERIC_PANES == 1 )
 
 /**
  Check interactions between objects contained in the grid.
@@ -712,18 +712,18 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
             const real sup = square(max_diameter);
             for ( int reg = 0; reg < nr; ++reg )
             {
-                BigPointList & sideP = point_list(inx+region[reg], pan2);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan2);
+                FatPointList & sideP = point_list(inx+region[reg], pan2);
+                FatLocusList & sideL = locus_list(inx+region[reg], pan2);
                 setSterics(meca, pam, sup, baseP, baseL, sideP, sideL);
             }
 
-            BigPointList & baseP2 = point_list(inx, pan2);
-            BigLocusList & baseL2 = locus_list(inx, pan2);
+            FatPointList & baseP2 = point_list(inx, pan2);
+            FatLocusList & baseL2 = locus_list(inx, pan2);
             
             for ( int reg = 1; reg < nr; ++reg )
             {
-                BigPointList & sideP = point_list(inx+region[reg], pan1);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan1);
+                FatPointList & sideP = point_list(inx+region[reg], pan1);
+                FatLocusList & sideL = locus_list(inx+region[reg], pan1);
                 setSterics(meca, pam, sup, baseP2, baseL2, sideP, sideL);
             }
         }
