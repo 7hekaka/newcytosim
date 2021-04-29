@@ -3,6 +3,7 @@
 #include "player.h"
 #include "opengl.h"
 #include "gle.h"
+#include "gle_color_list.h"
 #include "glapp.h"
 
 using namespace gle;

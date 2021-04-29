@@ -233,7 +233,9 @@ void Player::prepareDisplay(View& view, int mag)
 
     mDisplay->setPixelFactors(pix/mag, mag*fac);
     mDisplay->setStencil(view.stencil && ( DIM >= 3 ));
-
+    /// adjust reference color used by gle::bright_color
+    gle::background_color = view.back_color;
+    
     CHECK_GL_ERROR("in prepareDisplay");
 
     try {

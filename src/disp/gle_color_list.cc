@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 // Created by Francois Nedelec on 08/08/2010.
 
 #include "gle_color_list.h"
@@ -1535,17 +1535,15 @@ void gle::print_std_colors(std::ostream& os)
 
 gle_color gle::alt_color(size_t indx)
 {
-    const size_t max = sizeof(crayola_colors) / sizeof(named_color);
-    return crayola_colors[ indx % max ].hex;
+    const size_t max = sizeof(xkcd_colors) / sizeof(named_color);
+    return xkcd_colors[ indx % max ].hex;
 }
 
 
 /**
- extract all colors from the crayola list, that have a brightness between `minb` and `maxb`
+ Extract colors from the crayola list that are significantly different from `back`
  */
-
-size_t gle::select_colors(gle_color* list, size_t list_size,
-                       const GLfloat minb, const GLfloat maxb)
+size_t gle::filter_colors(gle_color* list, size_t list_size, const gle_color back)
 {
     const size_t max = sizeof(crayola_colors) / sizeof(named_color);
 
@@ -1553,10 +1551,12 @@ size_t gle::select_colors(gle_color* list, size_t list_size,
     for ( size_t c = 0; c < max; ++c )
     {
         gle_color col = crayola_colors[c].hex;
-        if ( minb <= col.brightness()  &&  col.brightness() <= maxb )
-            list[res++] = col;
-        if ( res == list_size )
-            return res;
+        if ( col.difference(back) >= 0.25 )
+        {
+            list[res] = col;
+            if ( ++res >= list_size )
+                return res;
+        }
     }
     
     // always returns at least one color:
@@ -1570,25 +1570,29 @@ size_t gle::select_colors(gle_color* list, size_t list_size,
 }
 
 
+
+// color used by bright_color
+gle_color gle::background_color(0,0,0,1);
+
 /**
  return `indx`-th color from the crayola list, that has a brightness between `minb` and `maxb`
  */
-gle_color gle::bright_color(size_t indx, const GLfloat minb, const GLfloat maxb)
+gle_color gle::bright_color(size_t indx, const gle_color back)
 {
     const size_t max = sizeof(crayola_colors) / sizeof(named_color);
 
     static gle_color scolor[max];
-    static GLfloat sminb = 0.6f, smaxb = 3;
-    static size_t scmax = select_colors(scolor, max, sminb, smaxb);
+    static gle_color ref(0,0,0,1);
+    static size_t num = filter_colors(scolor, max, ref);
 
-    if ( sminb != minb || smaxb != maxb )
+    if ( back != ref )
     {
-        sminb = minb;
-        smaxb = maxb;
-        scmax = select_colors(scolor, max, minb, maxb);
+        ref = back;
+        num = filter_colors(scolor, max, back);
+        //std::clog << num << " bright colors\n";
     }
     
-    return scolor[indx%scmax];
+    return scolor[indx%num];
 }
 
 

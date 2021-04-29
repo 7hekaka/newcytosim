@@ -582,7 +582,7 @@ void glApp::processSpecialKey(int key, int, int)
     {
         // Translate view
         if ( (glutGetModifiers() & GLUT_ACTIVE_CTRL) ^ (userMode == MOUSE_TRANSLATEZ) )
-            dxy.set(dxy.XX, 0, dxy.YY);
+            dxy.set(0.5*dxy.XX, 0, 0.5*dxy.YY);
         rot.rotateVector(vec, dxy);
         //std::clog << "vec " << dxy << " >>> " << vec << "\n";
         view.move_by((128*view.pixelSize())*vec);
@@ -671,8 +671,11 @@ int buildClipMenu()
         
         glutAddMenuEntry(" 0 < Z",     321);
         glutAddMenuEntry(" Z < 0",     322);
-        glutAddMenuEntry("-1 < Z < 1", 323);
-        glutAddMenuEntry("-0.5 < Z < 0.5", 324);
+        glutAddMenuEntry(" 0.25 < Z",  323);
+        glutAddMenuEntry(" Z < 0.25",  324);
+        glutAddMenuEntry("-1 < Z < 1", 325);
+        glutAddMenuEntry("-0.5 < Z < 0.5", 326);
+        glutAddMenuEntry("-0.25 < Z < 0.25", 327);
     }
     return menu;
 }
@@ -820,15 +823,30 @@ void glApp::processMenuEvent(int item)
             view.enableClipPlane(0, Vector3(0,0,-1), 0);
             view.disableClipPlane(1);
             break;
-            
+ 
         case 323:
+            view.enableClipPlane(0, Vector3(0,0,+1), 0.25);
+            view.disableClipPlane(1);
+            break;
+            
+        case 324:
+            view.enableClipPlane(0, Vector3(0,0,-1), 0.25);
+            view.disableClipPlane(1);
+            break;
+            
+        case 325:
             view.enableClipPlane(0, Vector3(0,0,+1), 1);
             view.enableClipPlane(1, Vector3(0,0,-1), 1);
             break;
 
-        case 324:
+        case 326:
             view.enableClipPlane(0, Vector3(0,0,+1), 0.5);
             view.enableClipPlane(1, Vector3(0,0,-1), 0.5);
+            break;
+
+        case 327:
+            view.enableClipPlane(0, Vector3(0,0,+1), 0.25);
+            view.enableClipPlane(1, Vector3(0,0,-1), 0.25);
             break;
 
         default: ABORT_NOW("unknown menu item");

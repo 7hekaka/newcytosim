@@ -217,14 +217,23 @@ public:
     
 #pragma mark -
 
-    bool  visible()            const { return ( rgba_ & 0xFF ); }
-    bool  invisible()          const { return ( rgba_ & 0xFF ) == 0; }
-    COLOF brightness()         const { return ( col_[0] + col_[1] + col_[2] ) * col_[3]; }
+    bool  visible()      const { return ( rgba_ & 0xFF ); }
+    bool  invisible()    const { return ( rgba_ & 0xFF ) == 0; }
+    COLOF normSqr()      const { return col_[0]*col_[0] + col_[1]*col_[1] + col_[2]*col_[2]; }
+    COLOF brightness()   const { return normSqr() * col_[3]; }
     
-    bool  opaque()             const { return ( (rgba_ & 0xFF) == 0xFF ); }
-    bool  transparent()        const { return ( (rgba_ & 0xFF) != 0xFF ); }
-    COLOF transparency()       const { return col_[3]; }
+    bool  opaque()       const { return ( (rgba_ & 0xFF) == 0xFF ); }
+    bool  transparent()  const { return ( (rgba_ & 0xFF) != 0xFF ); }
+    COLOF transparency() const { return col_[3]; }
     
+    COLOF difference(gle_color back) const
+    {
+        COLOF x = col_[0] - back.col_[0];
+        COLOF y = col_[1] - back.col_[1];
+        COLOF z = col_[2] - back.col_[2];
+        return x*x + y*y + z*z;
+    }
+
 #pragma mark -
 
     gle_color darken(COLOF s) const
