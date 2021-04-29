@@ -15,6 +15,10 @@ class Simul;
 class Fiber;
 
 
+/// number of panes in the steric engine
+/** This should normally be set equal to 1, for optimal performance */
+#define NUM_STERIC_PANES 3
+
 
 /// Used for early exclusing of potential pairs, representing { position, interaction radius }
 /** This uses single precision arithmetics, hopefully sufficient for exclusion tests */
@@ -154,11 +158,6 @@ typedef Array<FatPoint> FatPointList;
 typedef Array<FatLocus> FatLocusList;
 
 
-/// number of panes in the steric engine
-/** This should normally be set equal to 1, for optimal performance */
-#define NUM_STERIC_PANES 3
-
-
 /// a set of lists associated with the same location
 class PointGridCell
 {
@@ -226,7 +225,6 @@ public:
         assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return point_panes[p];
     }
-    
     
     FatLocusList& locus_list(size_t p)
     {

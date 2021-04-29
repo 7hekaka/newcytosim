@@ -568,92 +568,112 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
 #if ( MAX_STERIC_PANES == 1 )
 
 /**
- Check interactions between objects contained in the grid.
+ Check interactions between objects contained in the grid:
+ Scan all cells to examine each pair each pair of objects (ii, jj) only once.
  */
-//template < StericFuncPtr1 FUNC1, StericFuncPtr1 FUNC2 >
-void LocusGrid::setInteractions(Meca& meca, real stiff) const
+void LocusGrid::setSterics0(Meca& meca, real stiff) const
 {
-    //std::clog << "----" << '\n';
-    
-    // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int * region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
-        // We consider each pair of objects (ii, jj) only once:
-        
         BigPointList & baseP = point_list(inx);
         BigLocusList & baseL = locus_list(inx);
+
+        setSterics0(meca, stiff, baseP, baseL);
         
-        if ( pGrid.isPeriodic() )
+        for ( int reg = 1; reg < nr; ++reg )
         {
-            setSterics0(meca, stiff, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg]);
-                BigLocusList & sideL = locus_list(inx+region[reg]);
-                setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
-            }
-        }
-        else
-        {
-            setStericsT(meca, stiff, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg]);
-                BigLocusList & sideL = locus_list(inx+region[reg]);
-                setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
-            }
+            BigPointList & sideP = point_list(inx+region[reg]);
+            BigLocusList & sideL = locus_list(inx+region[reg]);
+            setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
         }
     }
 }
 
 
-#else
-
-/**
- Check interactions between the FatPoints contained in Pane `pan`.
- */
-void LocusGrid::setInteractions(Meca& meca, real stiff,
-                                const size_t pan) const
+/** This calls setStericsT() */
+void LocusGrid::setStericsT(Meca& meca, real stiff) const
 {
-    // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int * region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
-        // We consider each pair of objects (ii, jj) only once:
+        BigPointList & baseP = point_list(inx);
+        BigLocusList & baseL = locus_list(inx);
+
+        setStericsT(meca, stiff, baseP, baseL);
+        
+        for ( int reg = 1; reg < nr; ++reg )
+        {
+            BigPointList & sideP = point_list(inx+region[reg]);
+            BigLocusList & sideL = locus_list(inx+region[reg]);
+            setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
+        }
+    }
+}
+
+
+void LocusGrid::setInteractions(Meca& meca, real stiff) const
+{
+    //std::clog << "----" << '\n';
+    if ( pGrid.isPeriodic() )
+        setSterics0(meca, stiff);
+    else
+        setStericsT(meca, stiff);
+}
+
+#else
+
+/**
+ Check interactions between objects contained in the pane `pan`:
+ Scan all cells to examine each pair each pair of objects (ii, jj) only once.
+ */
+void LocusGrid::setSterics0(Meca& meca, real stiff, const size_t pan) const
+{
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    {
+        int * region;
+        int nr = pGrid.getRegion(region, inx);
+        assert_true(region[0] == 0);
         
         BigPointList & baseP = point_list(inx, pan);
         BigLocusList & baseL = locus_list(inx, pan);
         
-        if ( pGrid.isPeriodic() )
+        setSterics0(meca, stiff, baseP, baseL);
+        
+        for ( int reg = 1; reg < nr; ++reg )
         {
-            setSterics0(meca, stiff, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg], pan);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan);
-                setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
-            }
+            BigPointList & sideP = point_list(inx+region[reg], pan);
+            BigLocusList & sideL = locus_list(inx+region[reg], pan);
+            setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
         }
-        else
+    }
+}
+
+
+void LocusGrid::setStericsT(Meca& meca, real stiff, const size_t pan) const
+{
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    {
+        int * region;
+        int nr = pGrid.getRegion(region, inx);
+        assert_true(region[0] == 0);
+        
+        BigPointList & baseP = point_list(inx, pan);
+        BigLocusList & baseL = locus_list(inx, pan);
+        
+        setStericsT(meca, stiff, baseP, baseL);
+        
+        for ( int reg = 1; reg < nr; ++reg )
         {
-            setStericsT(meca, stiff, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg], pan);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan);
-                setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
-            }
+            BigPointList & sideP = point_list(inx+region[reg], pan);
+            BigLocusList & sideL = locus_list(inx+region[reg], pan);
+            setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
         }
     }
 }
@@ -663,64 +683,90 @@ void LocusGrid::setInteractions(Meca& meca, real stiff,
  Check interactions between the FatPoints contained in Panes `pan1` and `pan2`,
  where ( pan1 != pan2 )
  */
-void LocusGrid::setInteractions(Meca& meca, real stiff,
-                                const size_t pan1, const size_t pan2) const
+void LocusGrid::setSterics0(Meca& meca, real stiff,
+                                 const size_t pan1, const size_t pan2) const
 {
     assert_true(pan1 != pan2);
     
-    // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int * region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
-        // We consider each pair of objects (ii, jj) only once:
-        
         BigPointList & baseP = point_list(inx, pan1);
         BigLocusList & baseL = locus_list(inx, pan1);
         
-        if ( pGrid.isPeriodic() )
+        for ( int reg = 0; reg < nr; ++reg )
         {
-            for ( int reg = 0; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg], pan2);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan2);
-                setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
-            }
-
-            BigPointList & baseP2 = point_list(inx, pan2);
-            BigLocusList & baseL2 = locus_list(inx, pan2);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg], pan1);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan1);
-                setSterics0(meca, stiff, baseP2, baseL2, sideP, sideL);
-            }
+            BigPointList & sideP = point_list(inx+region[reg], pan2);
+            BigLocusList & sideL = locus_list(inx+region[reg], pan2);
+            setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
         }
-        else
+        
+        BigPointList & baseP2 = point_list(inx, pan2);
+        BigLocusList & baseL2 = locus_list(inx, pan2);
+        
+        for ( int reg = 1; reg < nr; ++reg )
         {
-            for ( int reg = 0; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg], pan2);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan2);
-                setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
-            }
-
-            BigPointList & baseP2 = point_list(inx, pan2);
-            BigLocusList & baseL2 = locus_list(inx, pan2);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                BigPointList & sideP = point_list(inx+region[reg], pan1);
-                BigLocusList & sideL = locus_list(inx+region[reg], pan1);
-                setStericsT(meca, stiff, baseP2, baseL2, sideP, sideL);
-            }
+            BigPointList & sideP = point_list(inx+region[reg], pan1);
+            BigLocusList & sideL = locus_list(inx+region[reg], pan1);
+            setSterics0(meca, stiff, baseP2, baseL2, sideP, sideL);
         }
     }
 }
 
+
+void LocusGrid::setStericsT(Meca& meca, real stiff,
+                                 const size_t pan1, const size_t pan2) const
+{
+    assert_true(pan1 != pan2);
+    
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    {
+        int * region;
+        int nr = pGrid.getRegion(region, inx);
+        assert_true(region[0] == 0);
+        
+        BigPointList & baseP = point_list(inx, pan1);
+        BigLocusList & baseL = locus_list(inx, pan1);
+        
+        for ( int reg = 0; reg < nr; ++reg )
+        {
+            BigPointList & sideP = point_list(inx+region[reg], pan2);
+            BigLocusList & sideL = locus_list(inx+region[reg], pan2);
+            setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
+        }
+        
+        BigPointList & baseP2 = point_list(inx, pan2);
+        BigLocusList & baseL2 = locus_list(inx, pan2);
+        
+        for ( int reg = 1; reg < nr; ++reg )
+        {
+            BigPointList & sideP = point_list(inx+region[reg], pan1);
+            BigLocusList & sideL = locus_list(inx+region[reg], pan1);
+            setStericsT(meca, stiff, baseP2, baseL2, sideP, sideL);
+        }
+    }
+}
+
+
+void LocusGrid::setInteractions(Meca& meca, real stiff, size_t pan) const
+{
+    if ( pGrid.isPeriodic() )
+        setSterics0(meca, stiff, pan);
+    else
+        setStericsT(meca, stiff, pan);
+}
+
+
+void LocusGrid::setInteractions(Meca& meca, real stiff, size_t pan1, size_t pan2) const
+{
+    if ( pGrid.isPeriodic() )
+        setSterics0(meca, stiff, pan1, pan2);
+    else
+        setStericsT(meca, stiff, pan1, pan2);
+}
 
 #endif
 

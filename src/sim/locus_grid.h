@@ -17,6 +17,10 @@ class Mecapoint;
 class FiberSegment;
 
 
+/// number of panes in the steric engine
+/** This should normally be set equal to 1, for optimal performance */
+#define MAX_STERIC_PANES 1
+
 
 /// Used for early exclusing of potential pairs, representing { position, interaction radius }
 /** This uses single precision arithmetics, hopefully sufficient for exclusion tests */
@@ -172,11 +176,6 @@ typedef Array<BigPoint> BigPointList;
 typedef Array<BigLocus> BigLocusList;
 
 
-/// number of panes in the steric engine
-/** This should normally be set equal to 1, for optimal performance */
-#define MAX_STERIC_PANES 1
-
-
 /// a set of lists associated with the same location
 class LocusGridCell
 {
@@ -250,13 +249,11 @@ public:
         return point_panes[p];
     }
     
-    
     BigLocusList& locus_list(size_t p)
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return locus_panes[p];
     }
-    
     
     size_t capacity() const
     {
@@ -354,6 +351,12 @@ private:
         return pGrid.icell(w).locus_pane;
     }
     
+    /// enter interactions into Meca with given stiffness
+    void setSterics0(Meca&, real stiff) const;
+    
+    /// enter interactions into Meca with given stiffness
+    void setStericsT(Meca&, real stiff) const;
+
 #else
     
     /// cell corresponding to position `w`, and pane `p`
@@ -384,6 +387,18 @@ private:
         return pGrid.icell(c).locus_panes[p];
     }
     
+    /// enter interactions into Meca in one panes with given parameters
+    void setSterics0(Meca&, real stiff, size_t pan) const;
+    
+    /// enter interactions into Meca in one panes with given parameters
+    void setStericsT(Meca&, real stiff, size_t pan) const;
+    
+    /// enter interactions into Meca between two panes with given parameters
+    void setSterics0(Meca&, real stiff, size_t pan1, size_t pan2) const;
+    
+    /// enter interactions into Meca between two panes with given parameters
+    void setStericsT(Meca&, real stiff, size_t pan1, size_t pan2) const;
+
 #endif
     
 public:
