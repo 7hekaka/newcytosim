@@ -17,7 +17,22 @@ class Fiber;
 
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
-#define NUM_STERIC_PANES 3
+#define NUM_STERIC_PANES 1
+
+
+/// Stores the stiffness parameters for the steric engine
+class Stiffness
+{
+public:
+    real push;
+    real pull;
+    
+    Stiffness(real h, real l)
+    {
+        push = h;
+        pull = l;
+    }
+};
 
 
 /// Used for early exclusing of potential pairs, representing { position, interaction radius }
@@ -202,6 +217,11 @@ public:
         locus_pane.clear();
     }
     
+    size_t capacity() const
+    {
+        return point_pane.capacity() + locus_pane.capacity();
+    }
+
 #else
     
     PointGridCell() : point_panes(point_panes_0), locus_panes(locus_panes_0)
@@ -232,22 +252,15 @@ public:
         return locus_panes[p];
     }
     
-#endif
-};
-
-
-/// Contains the stiffness parameters for the steric engine
-class StericParam
-{
-public:
-    real stiff_push;
-    real stiff_pull;
-    
-    StericParam(real push, real pull)
+    size_t capacity() const
     {
-        stiff_push = push;
-        stiff_pull = pull;
+        size_t res = 0;
+        for ( int i = 0; i < NUM_STERIC_PANES; ++i )
+            res += point_panes[i].capacity() + locus_panes[i].capacity();
+        return res;
     }
+
+#endif
 };
 
 
@@ -271,35 +284,35 @@ private:
 private:
     
     /// check two Spheres
-    static void checkPP(Meca&, StericParam const&, FatPoint const&, FatPoint const&);
+    static void checkPP(Meca&, Stiffness const&, FatPoint const&, FatPoint const&);
     
     /// check Sphere against Line segment
-    static void checkPL(Meca&, StericParam const&, FatPoint const&, FatLocus const&);
+    static void checkPL(Meca&, Stiffness const&, FatPoint const&, FatLocus const&);
     
     /// check Line segment against Sphere
-    static void checkLL1(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
+    static void checkLL1(Meca&, Stiffness const&, FatLocus const&, FatLocus const&);
     
     /// check Line segment against the terminal Sphere of a Fiber
-    static void checkLL2(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
+    static void checkLL2(Meca&, Stiffness const&, FatLocus const&, FatLocus const&);
     
     /// check two Line segments
-    static void checkLL(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
+    static void checkLL(Meca&, Stiffness const&, FatLocus const&, FatLocus const&);
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, StericParam const&,
+    static void setSterics0(Meca&, Stiffness const&,
                             FatPointList &, FatLocusList &);
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, StericParam const&,
+    static void setSterics0(Meca&, Stiffness const&,
                             FatPointList &, FatLocusList &,
                             FatPointList &, FatLocusList &);
     
     /// check all pairs between two lists, checking center-to-center distance
-    static void setStericsT(Meca&, StericParam const&,
+    static void setStericsT(Meca&, Stiffness const&,
                             FatPointList &, FatLocusList &);
     
     /// check all pairs between two lists, checking center-to-center distance
-    static void setStericsT(Meca&, StericParam const&,
+    static void setStericsT(Meca&, Stiffness const&,
                             FatPointList &, FatLocusList &,
                             FatPointList &, FatLocusList &);
 
@@ -329,6 +342,12 @@ private:
         return pGrid.icell(w).locus_pane;
     }
     
+    /// enter interactions into Meca with given stiffness
+    void setSterics0(Meca&, Stiffness const&) const;
+    
+    /// enter interactions into Meca with given stiffness
+    void setStericsT(Meca&, Stiffness const&) const;
+
 #else
     
     /// cell corresponding to position `w`, and pane `p`
@@ -359,6 +378,18 @@ private:
         return pGrid.icell(c).locus_panes[p];
     }
     
+    /// enter interactions into Meca in one panes with given parameters
+    void setSterics0(Meca&, Stiffness const&, size_t pan) const;
+    
+    /// enter interactions into Meca in one panes with given parameters
+    void setStericsT(Meca&, Stiffness const&, size_t pan) const;
+    
+    /// enter interactions into Meca between two panes with given parameters
+    void setSterics0(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
+    
+    /// enter interactions into Meca between two panes with given parameters
+    void setStericsT(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
+
 #endif
     
 public:
@@ -373,10 +404,13 @@ public:
     void createCells();
     
     /// true if the grid was initialized by calling setGrid()
-    size_t hasGrid() const  { return pGrid.hasCells(); }
+    size_t hasGrid() const { return pGrid.hasCells(); }
+    
+    /// sum of allocated size of lists for all cells
+    size_t capacity() const;
 
     /// clear the grid
-    void clear()            { pGrid.clear(); }
+    void clear() { pGrid.clear(); }
     
 #if ( NUM_STERIC_PANES == 1 )
     
@@ -396,7 +430,7 @@ public:
     }
     
     /// enter interactions into Meca with given stiffness
-    void setInteractions(Meca&, StericParam const&) const;
+    void setInteractions(Meca&, Stiffness const&) const;
     
 #else
     
@@ -407,10 +441,10 @@ public:
     void add(size_t pane, Fiber const*, size_t, real rad, real rge, real sup) const;
     
     /// enter interactions into Meca in one panes with given parameters
-    void setInteractions(Meca&, StericParam const&, size_t pan) const;
+    void setInteractions(Meca&, Stiffness const&, size_t pan) const;
     
     /// enter interactions into Meca between two panes with given parameters
-    void setInteractions(Meca&, StericParam const&, size_t pan1, size_t pan2) const;
+    void setInteractions(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
     
 #endif
     

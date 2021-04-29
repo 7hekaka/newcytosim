@@ -71,7 +71,10 @@ public:
     
     /// Mecable containing the point-of-interest
     Mecable const* mec_;
-
+    
+    /// equilibrium radius of the interaction (distance where force is zero)
+    real     rad_;
+    
     /// Index of the point-of-interest in the Mecable
     unsigned pti_;
     
@@ -83,6 +86,7 @@ public:
     : pos_(w, r)
     {
         mec_ = m;
+        rad_ = r;
         pti_ = static_cast<unsigned>(i);
         assert_true( i == pti_ );
     }
@@ -93,9 +97,6 @@ public:
     /// position of center
     Vector cen() const { return mec_->posPoint(pti_); }
     //Vector cen() const { return Vector(&pos_.XX); }
-    
-    /// radius
-    real rad() const { return pos_.RR; }
 };
 
 
@@ -413,7 +414,7 @@ public:
     void createCells();
     
     /// true if the grid was initialized by calling setGrid()
-    size_t hasGrid() const  { return pGrid.hasCells(); }
+    size_t hasGrid() const { return pGrid.hasCells(); }
     
     /// sum of allocated size of lists for all cells
     size_t capacity() const;

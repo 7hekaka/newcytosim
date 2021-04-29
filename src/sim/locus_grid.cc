@@ -31,7 +31,6 @@ LocusGrid::LocusGrid()
 
 size_t LocusGrid::setGrid(Space const* spc, real min_step)
 {
-    assert_true( modulo == spc->getModulo() );
     assert_true( min_step > 0 );
     Vector inf, sup;
     spc->boundaries(inf, sup);
@@ -45,6 +44,7 @@ size_t LocusGrid::setGrid(Space const* spc, real min_step)
             throw InvalidParameter("invalid space:boundaries");
         
 #if GRID_HAS_PERIODIC
+        assert_true( modulo == spc->getModulo() );
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             assert_small( modulo->period_[d] - sup[d] + inf[d] );
@@ -135,7 +135,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
     Vector vab = bb.cen() - aa.cen();
-    const real ran = aa.rad() + bb.rad();
+    const real ran = aa.rad_ + bb.rad_;
 
 #if GRID_HAS_PERIODIC
     if ( modulo )
@@ -159,7 +159,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
                         BigPoint const& aa, BigLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
-    const real ran = aa.rad() + bb.rad_;
+    const real ran = aa.rad_ + bb.rad_;
     
     // get position of point with respect to segment:
     real dis2 = INFINITY;
@@ -489,8 +489,6 @@ void LocusGrid::setSterics0(Meca& meca, real stiff,
  This will consider once all pairs of objects from the given lists.
  Compared to `setSterics0()`, this performs additional tests to exclude
  objects that are too far appart to interact, based on BigVector::near()
- 
- `rad` is the maximum radius of Points, and the `seg` the maximum range of Locuses
  */
 void LocusGrid::setStericsT(Meca& meca, real stiff,
                             BigPointList & pots, BigLocusList & locs)
@@ -525,8 +523,6 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
 
  Compared to `setSterics0()`, this performs additional tests to exclude
  objects that are too far appart to interact, based on BigVector::near()
-
- `rad` is the maximum radius of Points, and the `seg` the maximum range of Locuses
 */
 void LocusGrid::setStericsT(Meca& meca, real stiff,
                             BigPointList & pots1, BigLocusList & locs1,

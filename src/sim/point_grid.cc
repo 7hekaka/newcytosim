@@ -19,7 +19,6 @@ PointGrid::PointGrid()
 
 size_t PointGrid::setGrid(Space const* spc, real min_step)
 {
-    assert_true( modulo == spc->getModulo() );
     assert_true( min_step > 0 );
     Vector inf, sup;
     spc->boundaries(inf, sup);
@@ -31,7 +30,8 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
         
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
-        
+#if GRID_HAS_PERIODIC
+        assert_true( modulo == spc->getModulo() );
         if ( modulo && modulo->isPeriodic(d) )
         {
             assert_small( modulo->period_[d] - sup[d] + inf[d] );
@@ -40,6 +40,7 @@ size_t PointGrid::setGrid(Space const* spc, real min_step)
             pGrid.setPeriodic(d, true);
         }
         else
+#endif
         {
             //add a border in any dimension which is not periodic
             cnt[d] = (size_t)std::ceil(n) + 2;
@@ -64,6 +65,15 @@ void PointGrid::createCells()
     
     //report the grid size used
     pGrid.printSummary(Cytosim::log, "StericGrid");
+}
+
+
+size_t PointGrid::capacity() const
+{
+    size_t res = 0;
+    for ( size_t i = 0; i < pGrid.nbCells(); ++i )
+        res += pGrid[i].capacity();
+    return res;
 }
 
 
@@ -108,19 +118,19 @@ void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge
  The force is applied if the objects are closer than the
  sum of their radiuses.
  */
-void PointGrid::checkPP(Meca& meca, StericParam const& pam,
+void PointGrid::checkPP(Meca& meca, Stiffness const& pam,
                         FatPoint const& aa, FatPoint const& bb)
 {
     //std::clog << "   PP- " << bb.pnt_ << " " << aa.pnt_ << '\n';
     Vector vab = bb.cen() - aa.cen();
     const real len = aa.rad_ + bb.rad_;
-    
+#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(vab);
-
+#endif
     real ab2 = vab.normSqr();
     if ( ab2 < len*len )
-        meca.addLongLink(aa.pnt_, bb.pnt_, vab, ab2, len, pam.stiff_push);
+        meca.addLongLink(aa.pnt_, bb.pnt_, vab, ab2, len, pam.push);
 }
 
 
@@ -130,7 +140,7 @@ void PointGrid::checkPP(Meca& meca, StericParam const& pam,
  
  The force is applied if the objects are closer than the sum of their radiuses.
  */
-void PointGrid::checkPL(Meca& meca, StericParam const& pam,
+void PointGrid::checkPL(Meca& meca, Stiffness const& pam,
                         FatPoint const& aa, FatLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg_ << " " << aa.pnt_ << '\n';
@@ -145,7 +155,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
         if ( abs <= bb.seg_.len() )
         {
             if ( dis2 < len*len )
-                meca.addSideSlidingLink(bb.seg_, abs, aa.pnt_, len, pam.stiff_push);
+                meca.addSideSlidingLink(bb.seg_, abs, aa.pnt_, len, pam.push);
         }
         else
         {
@@ -162,15 +172,15 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
             /* we check the projection to the previous segment,
              and if it falls on the right of it, then we interact with the node */
             Vector vab = bb.seg_.pos1() - aa.cen();
-            
+#if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
-            
+#endif
             if ( dot(vab, bb.prevDiff()) <= 0 )
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < len*len )
-                    meca.addLongLink(aa.pnt_, bb.seg_.exact1(), vab, ab2, len, pam.stiff_push);
+                    meca.addLongLink(aa.pnt_, bb.seg_.exact1(), vab, ab2, len, pam.push);
             }
         }
     }
@@ -183,7 +193,7 @@ void PointGrid::checkPL(Meca& meca, StericParam const& pam,
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
+void PointGrid::checkLL1(Meca& meca, Stiffness const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
     //std::clog << "   LL1 " << aa.seg_ << " " << bb.point1() << '\n';
@@ -199,7 +209,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
          bb.point1() projects inside segment 'aa'
          */
         const real len = aa.rad_ + bb.rad_;
-        real stiff = sign_select(dis2-len*len, pam.stiff_push, pam.stiff_pull);
+        real stiff = sign_select(dis2-len*len, pam.push, pam.pull);
         meca.addSideSlidingLink(aa.seg_, abs, bb.seg_.exact1(), len, stiff);
     }
     else if ( abs < 0 )
@@ -213,14 +223,14 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
             if ( &bb < &aa  &&  bb.isFirst() )
             {
                 Vector vab = bb.seg_.pos1() - aa.seg_.pos1();
-                
+#if GRID_HAS_PERIODIC
                 if ( modulo )
                     modulo->fold(vab);
-                
+#endif
                 real ab2 = vab.normSqr();
                 real len = aa.rad_ + bb.rad_;
                 if ( ab2 < len*len  &&  dot(vab, bb.seg_.diff()) >= 0 )
-                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), vab, ab2, len, pam.stiff_push);
+                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), vab, ab2, len, pam.push);
             }
         }
         else
@@ -230,17 +240,17 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
              and interact if 'bb.point1()' falls on the right side of it
              */
             Vector vab = bb.seg_.pos1() - aa.seg_.pos1();
-            
+#if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
-            
+#endif
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
                 {
                     real len = aa.rad_ + bb.rad_;
-                    real stiff = sign_select(ab2-len*len, pam.stiff_push, pam.stiff_pull);
+                    real stiff = sign_select(ab2-len*len, pam.push, pam.pull);
                     meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), vab, ab2, len, stiff);
                 }
             }
@@ -254,7 +264,7 @@ void PointGrid::checkLL1(Meca& meca, StericParam const& pam,
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
+void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
     //std::clog << "   LL2 " << aa.seg_ << " " << bb.point2() << '\n';
@@ -270,7 +280,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
          bb.point2() projects inside segment 'aa'
          */
         const real len = aa.rad_ + bb.rad_;
-        real stiff = sign_select(dis2-len*len, pam.stiff_push, pam.stiff_pull);
+        real stiff = sign_select(dis2-len*len, pam.push, pam.pull);
         meca.addSideSlidingLink(aa.seg_, abs, bb.seg_.exact2(), len, stiff);
     }
     else if ( abs < 0 )
@@ -280,17 +290,17 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
          and interact if 'bb.point1()' falls on the right side of it
          */
         Vector vab = bb.seg_.pos2() - aa.seg_.pos1();
-        
+#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-        
+#endif
         if ( aa.isFirst() )
         {
             assert_true(bb.isLast());
             real ab2 = vab.normSqr();
             real len = aa.rad_ + bb.rad_;
             if ( ab2 < len*len  && dot(vab, bb.seg_.diff()) <= 0 )
-                meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), vab, ab2, len, pam.stiff_push);
+                meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), vab, ab2, len, pam.push);
         }
         else
         {
@@ -300,7 +310,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
                 if ( ab2 < ran*ran )
                 {
                     real len = aa.rad_ + bb.rad_;
-                    real stiff = sign_select(ab2-len*len, pam.stiff_push, pam.stiff_pull);
+                    real stiff = sign_select(ab2-len*len, pam.push, pam.pull);
                     meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), vab, ab2, len, stiff);
                 }
             }
@@ -315,14 +325,14 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
         assert_true(bb.isLast());
         
         Vector vab = bb.seg_.pos2() - aa.seg_.pos2();
-        
+#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-        
+#endif
         real ab2 = vab.normSqr();
         real len = aa.rad_ + bb.rad_;
         if ( ab2 < len*len  &&  dot(vab, bb.seg_.diff()) <= 0 )
-            meca.addLongLink(aa.seg_.exact2(), bb.seg_.exact2(), vab, ab2, len, pam.stiff_push);
+            meca.addLongLink(aa.seg_.exact2(), bb.seg_.exact2(), vab, ab2, len, pam.push);
     }
 }
 
@@ -332,7 +342,7 @@ void PointGrid::checkLL2(Meca& meca, StericParam const& pam,
  in 3D, the segments are tested for getting within the requested distance.
  in 2D, only the vertices are checked.
  */
-void PointGrid::checkLL(Meca& meca, StericParam const& pam,
+void PointGrid::checkLL(Meca& meca, Stiffness const& pam,
                         FatLocus const& aa, FatLocus const& bb)
 {
 #if ( DIM >= 3 )
@@ -348,7 +358,7 @@ void PointGrid::checkLL(Meca& meca, StericParam const& pam,
     if ( aa.seg_.within(a) & bb.seg_.within(b) )
     {
         const real len = aa.rad_ + bb.rad_;
-        real stiff = sign_select(d-len*len, pam.stiff_push, pam.stiff_pull);
+        real stiff = sign_select(d-len*len, pam.push, pam.pull);
         meca.addSideSlidingLink(aa.seg_, a, Interpolation(bb.seg_, b), len, stiff);
     }
 #endif
@@ -409,25 +419,25 @@ inline static bool not_adjacent(FatLocus const* a, FatLocus const* b)
 /**
  This will consider once all pairs of objects from the given lists
  */
-void PointGrid::setSterics0(Meca& meca, StericParam const& pam,
+void PointGrid::setSterics0(Meca& meca, Stiffness const& stiff,
                             FatPointList & pots, FatLocusList & locs)
 {
     for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
         for ( FatPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( not_adjacent(ii, jj) )
-                checkPP(meca, pam, *ii, *jj);
+                checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocus* kk = locs.begin(); kk < locs.end(); ++kk )
             if ( not_adjacent(ii, kk) )
-                checkPL(meca, pam, *ii, *kk);
+                checkPL(meca, stiff, *ii, *kk);
     }
 
     for ( FatLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
         for ( FatLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( not_adjacent(ii, jj) )
-                checkLL(meca, pam, *ii, *jj);
+                checkLL(meca, stiff, *ii, *jj);
     }
 }
 
@@ -436,7 +446,7 @@ void PointGrid::setSterics0(Meca& meca, StericParam const& pam,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated
  */
-void PointGrid::setSterics0(Meca& meca, StericParam const& pam,
+void PointGrid::setSterics0(Meca& meca, Stiffness const& stiff,
                             FatPointList & pots1, FatLocusList & locs1,
                             FatPointList & pots2, FatLocusList & locs2)
 {
@@ -447,23 +457,23 @@ void PointGrid::setSterics0(Meca& meca, StericParam const& pam,
     {
         for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( not_adjacent(ii, jj) )
-                checkPP(meca, pam, *ii, *jj);
+                checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
             if ( not_adjacent(ii, kk) )
-                checkPL(meca, pam, *ii, *kk);
+                checkPL(meca, stiff, *ii, *kk);
     }
     
     for ( FatLocus* ii = locs1.begin(); ii < locs1.end(); ++ii )
     {
         for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( not_adjacent(jj, ii) )
-                checkPL(meca, pam, *jj, *ii);
+                checkPL(meca, stiff, *jj, *ii);
         
         for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
         {
             if ( not_adjacent(ii, kk)  )
-                checkLL(meca, pam, *ii, *kk);
+                checkLL(meca, stiff, *ii, *kk);
         }
     }
 }
@@ -471,10 +481,10 @@ void PointGrid::setSterics0(Meca& meca, StericParam const& pam,
 
 /**
  This will consider once all pairs of objects from the given lists.
- Compared to `setSterics0()`, this performs an additional test to exclude
- objects for which the distance between `pos` is above `sup`.
+ Compared to `setSterics0()`, this performs additional tests to exclude
+ objects that are too far appart to interact, based on BigVector::near()
  */
-void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
+void PointGrid::setStericsT(Meca& meca, Stiffness const& stiff,
                             FatPointList & pots, FatLocusList & locs)
 {
     for ( FatPoint* ii = pots.begin(); ii < pots.end(); ++ii )
@@ -483,11 +493,11 @@ void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
         
         for ( FatPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
-                checkPP(meca, pam, *ii, *jj);
+                checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocus* kk = locs.begin(); kk < locs.end(); ++kk )
             if ( pos.near(kk->pos_) && not_adjacent(ii, kk) )
-                checkPL(meca, pam, *ii, *kk);
+                checkPL(meca, stiff, *ii, *kk);
     }
 
     for ( FatLocus* ii = locs.begin(); ii < locs.end(); ++ii )
@@ -496,7 +506,7 @@ void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
         
         for ( FatLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
-                checkLL(meca, pam, *ii, *jj);
+                checkLL(meca, stiff, *ii, *jj);
     }
 }
 
@@ -505,10 +515,10 @@ void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated.
 
- Compared to `setSterics0()`, this performs an additional test to exclude
- objects for which the distance between `pos` is above `sup`.
+ Compared to `setSterics0()`, this performs additional tests to exclude
+ objects that are too far appart to interact, based on BigVector::near()
  */
-void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
+void PointGrid::setStericsT(Meca& meca, Stiffness const& stiff,
                             FatPointList & pots1, FatLocusList & locs1,
                             FatPointList & pots2, FatLocusList & locs2)
 {
@@ -521,11 +531,11 @@ void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
 
         for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
-                checkPP(meca, pam, *ii, *jj);
+                checkPP(meca, stiff, *ii, *jj);
         
         for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
             if ( pos.near(kk->pos_) && not_adjacent(ii, kk) )
-                checkPL(meca, pam, *ii, *kk);
+                checkPL(meca, stiff, *ii, *kk);
     }
     
     for ( FatLocus* ii = locs1.begin(); ii < locs1.end(); ++ii )
@@ -534,11 +544,11 @@ void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
 
         for ( FatPoint* jj = pots2.begin(); jj < pots2.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacent(jj, ii) )
-                checkPL(meca, pam, *jj, *ii);
+                checkPL(meca, stiff, *jj, *ii);
         
         for ( FatLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
             if ( pos.near(kk->pos_) && not_adjacent(ii, kk) )
-                checkLL(meca, pam, *ii, *kk);
+                checkLL(meca, stiff, *ii, *kk);
     }
 }
 
@@ -551,7 +561,7 @@ void PointGrid::setStericsT(Meca& meca, StericParam const& pam,
 /**
  Check interactions between objects contained in the grid.
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
+void PointGrid::setSterics0(Meca& meca, Stiffness const& stiff) const
 {
     //std::clog << "----" << '\n';
     
@@ -562,44 +572,62 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam) const
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
-        // We consider each pair of objects (ii, jj) only once:
-        
         FatPointList & baseP = point_list(inx);
         FatLocusList & baseL = locus_list(inx);
+        setSterics0(meca, stiff, baseP, baseL);
         
-        if ( pGrid.isPeriodic() )
+        for ( int reg = 1; reg < nr; ++reg )
         {
-            setSterics0(meca, pam, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg]);
-                FatLocusList & sideL = locus_list(inx+region[reg]);
-                setSterics0(meca, pam, baseP, baseL, sideP, sideL);
-            }
-        }
-        else
-        {
-            setStericsT(meca, pam, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg]);
-                FatLocusList & sideL = locus_list(inx+region[reg]);
-                setStericsT(meca, pam, baseP, baseL, sideP, sideL);
-            }
+            FatPointList & sideP = point_list(inx+region[reg]);
+            FatLocusList & sideL = locus_list(inx+region[reg]);
+            setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
         }
     }
 }
 
+
+void PointGrid::setStericsT(Meca& meca, Stiffness const& stiff) const
+{
+    //std::clog << "----" << '\n';
+    
+    // scan all cells to examine each pair of particles:
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    {
+        int * region;
+        int nr = pGrid.getRegion(region, inx);
+        assert_true(region[0] == 0);
+        
+        FatPointList & baseP = point_list(inx);
+        FatLocusList & baseL = locus_list(inx);
+        
+        setStericsT(meca, stiff, baseP, baseL);
+        
+        for ( int reg = 1; reg < nr; ++reg )
+        {
+            FatPointList & sideP = point_list(inx+region[reg]);
+            FatLocusList & sideL = locus_list(inx+region[reg]);
+            setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
+        }
+    }
+}
+
+
+void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff) const
+{
+    //std::clog << "----" << '\n';
+    if ( pGrid.isPeriodic() )
+        setSterics0(meca, stiff);
+    else
+        setStericsT(meca, stiff);
+}
 
 #else
 
 /**
  Check interactions between the FatPoints contained in Pane `pan`.
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                const size_t pan) const
+void PointGrid::setSterics0(Meca& meca, Stiffness const& stiff,
+                            const size_t pan) const
 {
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
@@ -608,32 +636,41 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
-        // We consider each pair of objects (ii, jj) only once:
+        FatPointList & baseP = point_list(inx, pan);
+        FatLocusList & baseL = locus_list(inx, pan);
+        
+        setSterics0(meca, stiff, baseP, baseL);
+        
+        for ( int reg = 1; reg < nr; ++reg )
+        {
+            FatPointList & sideP = point_list(inx+region[reg], pan);
+            FatLocusList & sideL = locus_list(inx+region[reg], pan);
+            setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
+        }
+    }
+}
+
+
+void PointGrid::setStericsT(Meca& meca, Stiffness const& stiff,
+                            const size_t pan) const
+{
+    // scan all cells to examine each pair of particles:
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    {
+        int * region;
+        int nr = pGrid.getRegion(region, inx);
+        assert_true(region[0] == 0);
         
         FatPointList & baseP = point_list(inx, pan);
         FatLocusList & baseL = locus_list(inx, pan);
         
-        if ( pGrid.isPeriodic() )
+        setStericsT(meca, stiff, baseP, baseL);
+        
+        for ( int reg = 1; reg < nr; ++reg )
         {
-            setSterics0(meca, pam, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg], pan);
-                FatLocusList & sideL = locus_list(inx+region[reg], pan);
-                setSterics0(meca, pam, baseP, baseL, sideP, sideL);
-            }
-        }
-        else
-        {
-            setStericsT(meca, pam, baseP, baseL);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg], pan);
-                FatLocusList & sideL = locus_list(inx+region[reg], pan);
-                setStericsT(meca, pam, baseP, baseL, sideP, sideL);
-            }
+            FatPointList & sideP = point_list(inx+region[reg], pan);
+            FatLocusList & sideL = locus_list(inx+region[reg], pan);
+            setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
         }
     }
 }
@@ -643,8 +680,8 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
  Check interactions between the FatPoints contained in Panes `pan1` and `pan2`,
  where ( pan1 != pan2 )
  */
-void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
-                                const size_t pan1, const size_t pan2) const
+void PointGrid::setSterics0(Meca& meca, Stiffness const& stiff,
+                            const size_t pan1, const size_t pan2) const
 {
     assert_true(pan1 != pan2);
     
@@ -655,53 +692,80 @@ void PointGrid::setInteractions(Meca& meca, StericParam const& pam,
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
-        // We consider each pair of objects (ii, jj) only once:
+        FatPointList & baseP = point_list(inx, pan1);
+        FatLocusList & baseL = locus_list(inx, pan1);
+        
+        for ( int reg = 0; reg < nr; ++reg )
+        {
+            FatPointList & sideP = point_list(inx+region[reg], pan2);
+            FatLocusList & sideL = locus_list(inx+region[reg], pan2);
+            setSterics0(meca, stiff, baseP, baseL, sideP, sideL);
+        }
+        
+        FatPointList & baseP2 = point_list(inx, pan2);
+        FatLocusList & baseL2 = locus_list(inx, pan2);
+        
+        for ( int reg = 1; reg < nr; ++reg )
+        {
+            FatPointList & sideP = point_list(inx+region[reg], pan1);
+            FatLocusList & sideL = locus_list(inx+region[reg], pan1);
+            setSterics0(meca, stiff, baseP2, baseL2, sideP, sideL);
+        }
+    }
+}
+
+void PointGrid::setStericsT(Meca& meca, Stiffness const& stiff,
+                            const size_t pan1, const size_t pan2) const
+{
+    assert_true(pan1 != pan2);
+    
+    // scan all cells to examine each pair of particles:
+    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    {
+        int * region;
+        int nr = pGrid.getRegion(region, inx);
+        assert_true(region[0] == 0);
         
         FatPointList & baseP = point_list(inx, pan1);
         FatLocusList & baseL = locus_list(inx, pan1);
         
-        if ( pGrid.isPeriodic() )
+        for ( int reg = 0; reg < nr; ++reg )
         {
-            for ( int reg = 0; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg], pan2);
-                FatLocusList & sideL = locus_list(inx+region[reg], pan2);
-                setSterics0(meca, pam, baseP, baseL, sideP, sideL);
-            }
-            
-            FatPointList & baseP2 = point_list(inx, pan2);
-            FatLocusList & baseL2 = locus_list(inx, pan2);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg], pan1);
-                FatLocusList & sideL = locus_list(inx+region[reg], pan1);
-                setSterics0(meca, pam, baseP2, baseL2, sideP, sideL);
-            }
+            FatPointList & sideP = point_list(inx+region[reg], pan2);
+            FatLocusList & sideL = locus_list(inx+region[reg], pan2);
+            setStericsT(meca, stiff, baseP, baseL, sideP, sideL);
         }
-        else
+        
+        FatPointList & baseP2 = point_list(inx, pan2);
+        FatLocusList & baseL2 = locus_list(inx, pan2);
+        
+        for ( int reg = 1; reg < nr; ++reg )
         {
-            for ( int reg = 0; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg], pan2);
-                FatLocusList & sideL = locus_list(inx+region[reg], pan2);
-                setStericsT(meca, pam, baseP, baseL, sideP, sideL);
-            }
-
-            FatPointList & baseP2 = point_list(inx, pan2);
-            FatLocusList & baseL2 = locus_list(inx, pan2);
-            
-            for ( int reg = 1; reg < nr; ++reg )
-            {
-                FatPointList & sideP = point_list(inx+region[reg], pan1);
-                FatLocusList & sideL = locus_list(inx+region[reg], pan1);
-                setStericsT(meca, pam, baseP2, baseL2, sideP, sideL);
-            }
+            FatPointList & sideP = point_list(inx+region[reg], pan1);
+            FatLocusList & sideL = locus_list(inx+region[reg], pan1);
+            setStericsT(meca, stiff, baseP2, baseL2, sideP, sideL);
         }
-
     }
 }
 
+
+
+void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff, size_t pan) const
+{
+    if ( pGrid.isPeriodic() )
+        setSterics0(meca, stiff, pan);
+    else
+        setStericsT(meca, stiff, pan);
+}
+
+
+void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff, size_t pan1, size_t pan2) const
+{
+    if ( pGrid.isPeriodic() )
+        setSterics0(meca, stiff, pan1, pan2);
+    else
+        setStericsT(meca, stiff, pan1, pan2);
+}
 
 #endif
 

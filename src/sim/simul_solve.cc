@@ -190,7 +190,7 @@ void Simul::setStericInteractions(Meca& meca) const
     }
     
     /// create parameters
-    StericParam pam(prop->steric_stiff_push[0], prop->steric_stiff_pull[0]);
+    Stiffness pam(prop->steric_stiff_push[0], prop->steric_stiff_pull[0]);
     
 #if ( NUM_STERIC_PANES == 1 )
     
