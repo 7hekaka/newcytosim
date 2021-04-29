@@ -137,14 +137,15 @@ void Simul::setStericInteractions(Meca& meca) const
         if ( F->prop->steric )
         {
             const real rad = F->prop->steric_radius;        // equilibrium radius
-            const real ran = rad + F->prop->steric_range;   // extended range of interaction
-        
+            const real rge = rad + F->prop->steric_range;   // extended range of interaction
+            const real sup = rge + 0.5 * F->segmentation();
+
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
 #if ( NUM_STERIC_PANES == 1 )
-                pointGrid.add(F, i, rad, ran);
+                pointGrid.add(F, i, rad, rge, sup);
 #else
-                pointGrid.add(F->prop->steric, F, i, rad, ran);
+                pointGrid.add(F->prop->steric, F, i, rad, rge, sup);
 #endif
         }
     }

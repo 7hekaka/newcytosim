@@ -308,7 +308,7 @@ public:
             mPeriodic[d] = p;
 #else
         if ( p )
-            throw InvalidParameter("grid.h was compiled without PERIODIC_SUPPORT");
+            throw InvalidParameter("grid.h was compiled with GRID_HAS_PERIODIC = 0");
 #endif
     }
     

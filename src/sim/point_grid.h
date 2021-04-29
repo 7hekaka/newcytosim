@@ -15,6 +15,44 @@ class Simul;
 class Fiber;
 
 
+
+/// Used for early exclusing of potential pairs, representing { position, interaction radius }
+/** This uses single precision arithmetics, hopefully sufficient for exclusion tests */
+class FatVector
+{
+public:
+
+    float XX, YY, ZZ;
+    float RR;
+    
+    FatVector() { XX = 0; YY = 0; ZZ = 0; RR = 0; }
+
+    FatVector(Vector1 v, real r) { XX = v.XX; YY = 0; ZZ = 0; RR = r; }
+    FatVector(Vector2 v, real r) { XX = v.XX; YY = v.YY; ZZ = 0; RR = r; }
+    FatVector(Vector3 v, real r) { XX = v.XX; YY = v.YY; ZZ = v.ZZ; RR = r; }
+
+    /// @return result of test `distance(this, arg) < sum_of_ranges`
+    bool near(FatVector const& arg) const
+    {
+        float x = XX - arg.XX;
+#if ( DIM == 1 )
+        float r = RR + arg.RR;
+        return ( std::abs(x) <= r );
+#elif ( DIM == 2 )
+        float y = YY - arg.YY;
+        float r = RR + arg.RR;
+        return ( x*x + y*y <= r*r );
+#else
+        float y = YY - arg.YY;
+        float z = ZZ - arg.ZZ;
+        float r = RR + arg.RR;
+        return ( z*z + x*x <= r*r - y*y );
+#endif
+    }
+};
+
+
+
 /// represents a Mecapoint for steric interactions
 class FatPoint
 {
@@ -23,7 +61,7 @@ class FatPoint
 public:
     
     /// position of center
-    Vector    pos_;
+    FatVector pos_;
     
     /// indicates one vertex in a Mecable
     Mecapoint pnt_;
@@ -38,13 +76,16 @@ public:
     
     FatPoint() {}
     
-    FatPoint(Mecapoint const& p, real d, real e, Vector const& w)
+    FatPoint(Mecapoint const& p, real r, real e, Vector const& w)
+    : pos_(w, e)
     {
-        pos_ = w;
-        rad_ = d;
+        rad_ = r;
         rge_ = e;
         pnt_ = p;
     }
+    
+    /// position of center
+    Vector cen() const { return pnt_.pos(); }
 };
 
 
@@ -56,7 +97,7 @@ class FatLocus
 public:
     
     /// position of center
-    Vector pos_;
+    FatVector pos_;
     
     /// indicates one segment of a Fiber
     FiberSegment seg_;
@@ -71,9 +112,9 @@ public:
     
     FatLocus() {}
     
-    FatLocus(FiberSegment const& p, real r, real e, Vector const& w)
+    FatLocus(FiberSegment const& p, real r, real e, real u, Vector const& w)
+    : pos_(w, u)
     {
-        pos_ = w;
         rad_ = r;
         rge_ = e;
         seg_ = p;
@@ -115,7 +156,7 @@ typedef Array<FatLocus> FatLocusList;
 
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
-#define NUM_STERIC_PANES 1
+#define NUM_STERIC_PANES 3
 
 
 /// a set of lists associated with the same location
@@ -229,8 +270,40 @@ private:
     /// grid for divide-and-conquer strategies:
     Grid<PointGridCell, DIM> pGrid;
     
-    /// max diameter of objects, given the cell size
-    real max_diameter;
+private:
+    
+    /// check two Spheres
+    static void checkPP(Meca&, StericParam const&, FatPoint const&, FatPoint const&);
+    
+    /// check Sphere against Line segment
+    static void checkPL(Meca&, StericParam const&, FatPoint const&, FatLocus const&);
+    
+    /// check Line segment against Sphere
+    static void checkLL1(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
+    
+    /// check Line segment against the terminal Sphere of a Fiber
+    static void checkLL2(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
+    
+    /// check two Line segments
+    static void checkLL(Meca&, StericParam const&, FatLocus const&, FatLocus const&);
+    
+    /// check all pairs between the two lists
+    static void setSterics0(Meca&, StericParam const&,
+                            FatPointList &, FatLocusList &);
+    
+    /// check all pairs between the two lists
+    static void setSterics0(Meca&, StericParam const&,
+                            FatPointList &, FatLocusList &,
+                            FatPointList &, FatLocusList &);
+    
+    /// check all pairs between two lists, checking center-to-center distance
+    static void setStericsT(Meca&, StericParam const&,
+                            FatPointList &, FatLocusList &);
+    
+    /// check all pairs between two lists, checking center-to-center distance
+    static void setStericsT(Meca&, StericParam const&,
+                            FatPointList &, FatLocusList &,
+                            FatPointList &, FatLocusList &);
 
 #if ( NUM_STERIC_PANES == 1 )
     
@@ -310,18 +383,18 @@ public:
 #if ( NUM_STERIC_PANES == 1 )
     
     /// place Mecapoint on the grid
-    void add(Mecable const* m, size_t i, real rad, real extra_range) const
+    void add(Mecable const* m, size_t i, real rad, real rge) const
     {
         Vector w = m->posPoint(i);
-        point_list(w).emplace(Mecapoint(m, i), rad, extra_range, w);
+        point_list(w).emplace(Mecapoint(m, i), rad, rge, w);
     }
     
     /// place FiberSegment on the grid
-    void add(Fiber const* f, size_t i, real rad, real extra_range) const
+    void add(Fiber const* f, size_t i, real rad, real rge, real sup) const
     {
         // link in cell containing the middle of the segment
         Vector w = f->posPoint(i, 0.5);
-        locus_list(w).emplace(FiberSegment(f, i), rad, extra_range, w);
+        locus_list(w).emplace(FiberSegment(f, i), rad, rge, sup, w);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -330,10 +403,10 @@ public:
 #else
     
     /// place Mecapoint on the grid
-    void add(size_t pane, Mecable const*, size_t, real rad, real extra_range) const;
+    void add(size_t pane, Mecable const*, size_t, real rad, real rge) const;
     
     /// place FiberSegment on the grid
-    void add(size_t pane, Fiber const*, size_t, real rad, real extra_range) const;
+    void add(size_t pane, Fiber const*, size_t, real rad, real rge, real sup) const;
     
     /// enter interactions into Meca in one panes with given parameters
     void setInteractions(Meca&, StericParam const&, size_t pan) const;

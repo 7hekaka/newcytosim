@@ -71,9 +71,6 @@ public:
     /// Index of the point-of-interest in the Mecable
     unsigned pti_;
     
-    /// key to exclude certain pairs from interacting
-    unsigned key_;
-    
 public:
     
     BigPoint() {}
@@ -83,7 +80,6 @@ public:
     {
         mec_ = m;
         pti_ = static_cast<unsigned>(i);
-        key_ = 0;
         assert_true( i == pti_ );
     }
     
@@ -118,9 +114,6 @@ public:
     /// index of segment's first point
     unsigned pti_;
     
-    /// key to exclude certain pairs from interacting
-    unsigned key_;
-    
 public:
     
     BigLocus() {}
@@ -131,7 +124,6 @@ public:
         fib_ = f;
         rad_ = r;
         pti_ = static_cast<unsigned>(i);
-        key_ = 0;
         assert_true( i == pti_ );
     }
     
@@ -294,6 +286,12 @@ private:
     
     /// grid for divide-and-conquer strategies:
     Grid<LocusGridCell, DIM> pGrid;
+    
+    /// member function pointer
+    using StericFuncPtr1 = void (LocusGrid::*)(Meca&, real, BigPointList&, BigLocusList&);
+    
+    /// member function pointer
+    using StericFuncPtr2 = void (LocusGrid::*)(Meca&, real, BigPointList&, BigLocusList&, BigPointList&, BigLocusList&);
 
 private:
     

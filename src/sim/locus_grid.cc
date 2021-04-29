@@ -105,14 +105,14 @@ void LocusGrid::add(size_t pan, Mecable const* mec, size_t inx, real rad)
 }
 
 
-void LocusGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge)
+void LocusGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real sup)
 {
     if ( pan == 0 || pan > MAX_STERIC_PANES )
         throw InvalidParameter("line:steric is out-of-range");
     
     // link in the cell containing the middle of the segment:
     Vector w = fib->posPoint(inx, 0.5);
-    locus_list(w, pan).emplace(fib, inx, rad, rge, w);
+    locus_list(w, pan).emplace(fib, inx, rad, sup, w);
 }
 
 
@@ -497,7 +497,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
 {
     for ( BigPoint* ii = pots.begin(); ii < pots.end(); ++ii )
     {
-        BigVector pos = ii->pos_;
+        const BigVector pos = ii->pos_;
         
         for ( BigPoint* jj = ii+1; jj < pots.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
@@ -510,7 +510,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
 
     for ( BigLocus* ii = locs.begin(); ii < locs.end(); ++ii )
     {
-        BigVector pos = ii->pos_;
+        const BigVector pos = ii->pos_;
         
         for ( BigLocus* jj = ii+1; jj < locs.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacent(ii, jj) )
@@ -557,10 +557,8 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
                 checkPL(meca, stiff, *jj, *ii);
         
         for ( BigLocus* kk = locs2.begin(); kk < locs2.end(); ++kk )
-        {
             if ( pos.near(kk->pos_) && not_adjacent(ii, kk) )
                 checkLL(meca, stiff, *ii, *kk);
-        }
     }
 }
 
@@ -572,6 +570,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff,
 /**
  Check interactions between objects contained in the grid.
  */
+//template < StericFuncPtr1 FUNC1, StericFuncPtr1 FUNC2 >
 void LocusGrid::setInteractions(Meca& meca, real stiff) const
 {
     //std::clog << "----" << '\n';
