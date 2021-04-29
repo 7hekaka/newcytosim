@@ -184,23 +184,21 @@ int main(int argc, char* argv[])
     if ( arg.use_key("on") )
         style = ONSCREEN;
     
-    if ( arg.use_key("tga") )
-        prop.image_format = "tga";
-    
-    if ( arg.use_key("png") )
-        prop.image_format = "png";
-
     if ( arg.set(prop.image_name, ".png") )
     {
         prop.image_format = "png";
         mode = SAVE_IMAGE;
     }
-    
+    else if ( arg.use_key("png") )
+        prop.image_format = "png";
+
     if ( arg.set(prop.image_name, ".tga") )
     {
         prop.image_format = "tga";
         mode = SAVE_IMAGE;
     }
+    else if ( arg.use_key("tga") )
+        prop.image_format = "tga";
 
     // get image over-sampling:
     arg.set(magnify, "magnify") || arg.set(magnify, "mag");

@@ -13,7 +13,7 @@
 *  [Running simulations on your computer](main/runs.md)
 *  [Running cytosim on a cluster](main/run_slurm.md)
 *  [Graphical rendering](sim/graphics.md)
-*  [Making movies](main/movies.md)
+*  [Exporting images and making movies](main/movies.md)
 *  [Getting numbers out of Cytosim with `report`](sim/report.md)
 *  [Frequently asked questions](main/faq.md)
 *  [Prior work](examples/index.md)

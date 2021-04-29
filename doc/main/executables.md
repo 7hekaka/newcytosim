@@ -51,16 +51,17 @@ and you can copy-paste this output to create an initial `display.cyp`.
  
 `play` can be used to:
 
-Purpose                                         |  Command      |
-------------------------------------------------|----------------
+Purpose                                         |  Command                            
+------------------------------------------------|-------------------------------------
 Display the simulation in the current folder    |  `play`     
 Display the simulation in folder `PATH`         |  `play PATH`
-Perform a live simulation                       |  `play live` 
+Start a live simulation                         |  `play live` or `play FILENAME.cym`
 Generate images from a trajectory               |  `play movie`     
+
 
 The live mode is automatically started if a config file extending with '.cym' is specified on the command line.
 
-## Play's replay mode
+## Play - Replay mode
 
 Use `play` to display a simulation calculated by `sim`.
 By default, play reads `properties.cmo` and `objects.cmo`, in the current directory.
@@ -69,16 +70,15 @@ A different trajectory file can be specified:
 
 	play final.cmo
  
-## Play's live mode
+## Play - Live mode
  
 Use `play live` to start a simulation and display it online:
 
 	play live
-	play live spindle.cym
+	play spindle.cym
  
 This should open a window. This simulation is calculated on the fly, and nothing is saved.
-With `play` the [commands](../sim/commands.md) in the config file that normally export data to file are disabled.
- 
+Note that with `play` some [commands](../sim/commands.md) that write files to disc are disabled.
 
 ## Offscreen rendering
  
