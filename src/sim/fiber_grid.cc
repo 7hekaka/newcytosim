@@ -560,7 +560,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
 #include "opengl.h"
 void drawBoundaries(Map<DIM> const&);
 
-void FiberGrid::draw() const
+void FiberGrid::drawGrid() const
 {
 #if ( DIM <= 3 )
     glDisable(GL_LIGHTING);

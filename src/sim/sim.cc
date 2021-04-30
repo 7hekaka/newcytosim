@@ -170,6 +170,6 @@ int main(int argc, char* argv[])
     
     Cytosim::out << "% " << TicToc::date() << "\n";
     sec = TicToc::seconds_since_1970() - sec;
-    Cytosim::out << "end  " << sec << " s ( " << (real)(sec/60)/60.0 << " h )\n";
+    Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";
     Cytosim::out.close();
 }

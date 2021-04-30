@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef MODULO_H
 #define MODULO_H
@@ -6,10 +6,17 @@
 #include "real.h"
 #include "vector.h"
 
-/// Modulo implements periodic boundary conditions
+/// Modulo is a helper class used to implement periodic boundary conditions
 /**
- This class is used to apply periodic boundaries conditions in one or 
+ This class is used to apply periodic boundaries conditions to Vectors in one or
  in multiple dimensions in space: X, Y or Z.
+ 
+ We follow the method B (Do not restrict the particle coordinates) described in
+ [wikipedia](https://en.wikipedia.org/wiki/Periodic_boundary_conditions)
+
+ In this way, we can tell the movements of the filaments, and track all paths
+ without any loss of information. Attention: our origin is in the box center,
+ unlike on Wikipedia’s description.
  */
 class Modulo
 {

@@ -70,7 +70,7 @@ public:
     }
 };
 
-
+//------------------------------------------------------------------------------
 
 /// represents a Mecapoint for steric interactions
 class FatPoint
@@ -110,6 +110,7 @@ public:
     Mecapoint exact() const { return pnt_; }
 };
 
+//------------------------------------------------------------------------------
 
 /// represents the Segment of a Fiber for steric interactions
 class FatLocus
@@ -171,6 +172,7 @@ public:
 
 };
 
+//------------------------------------------------------------------------------
 
 /// type for a list of FatPoint
 typedef Array<FatPoint> FatPointList;
@@ -269,16 +271,22 @@ public:
 #endif
 };
 
+//------------------------------------------------------------------------------
 
-/// Divide-and-Conquer to implement steric interactions
+/// PointGrid implements a Cell Lists approach to steric interactions
 /**
- A divide-and-conquer algorithm is used to find FatPoints that overlap:
- - It uses a grid 'pGrid' covering the space, initialized by setGrid()
- To each point on pGrid is associated a list of FatPoint* of class PointGridCell.
- - The functions 'add()' position the given FatPoints on the grid
- - Function setStericInteraction() uses pGrid to find pairs of FatPoints that may overlap.
- It then calculates their actual distance, and set a interaction from Meca if necessary
+ This implements a divide-and-conquer method to find particles that are within a
+ certain cutoff distance from each other. In brief:
+ - It covers the space with a Grid `pGrid`, initialized by `setGrid()`
+ - A list of class `PointGridCell` is associated with each cell of `pGrid`.
+ - `PointGrid::add()` links `BigPoint` or `BigLocus` to the appropriate cell of the grid.
+ - `PointGrid::setInteractions()` checks all pairs of particles that may overlap,
+    calculating their actual distance, and calling Meca::addLink() as necessary
  .
+ The related class `LocusGrid`, is a simpler, streamline version of this class.
+ For periodic boundary conditions, this follows the [Periodic wrapping] method.
+ 
+ Check the [general introduction on Cell Lists](https://en.wikipedia.org/wiki/Cell_lists)
  */
 class PointGrid
 {
@@ -403,8 +411,8 @@ public:
     /// creator
     PointGrid();
     
-    /// define grid covering specified Space, with cell of size min_step at least
-    size_t setGrid(Space const*, real min_step);
+    /// define grid covering specified Space, given a minimal cell size requirement
+    size_t setGrid(Space const*, real min_width);
     
     /// allocate memory for grid
     void createCells();
@@ -458,7 +466,7 @@ public:
     Map<DIM> const& map() const { return pGrid; }
     
     /// OpenGL display function
-    void draw() const;
+    void drawGrid() const;
 };
 
 

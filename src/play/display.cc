@@ -731,9 +731,9 @@ void Display::drawMisc(Simul const& sim)
 {
 #if ( 0 )
     // display Grids for visual inspection:
-    sim.pointGrid.draw();
-    sim.fiberGrid.draw();
-    sim.locusGrid.draw();
+    sim.pointGrid.drawGrid();
+    sim.fiberGrid.drawGrid();
+    sim.locusGrid.drawGrid();
 #endif
     
     for ( Property const* i : sim.properties.find_all("fiber") )

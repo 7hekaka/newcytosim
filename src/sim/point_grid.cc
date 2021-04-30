@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "assert_macro.h"
 #include "point_grid.h"
@@ -17,37 +17,39 @@ PointGrid::PointGrid()
 }
 
 
-size_t PointGrid::setGrid(Space const* spc, real min_step)
+size_t PointGrid::setGrid(Space const* spc, real min_width)
 {
-    assert_true( min_step > 0 );
+    assert_true( min_width > 0 );
     Vector inf, sup;
     spc->boundaries(inf, sup);
     
     size_t cnt[3] = { 1, 1, 1 };
     for ( size_t d = 0; d < DIM; ++d )
     {
-        real n = ( sup[d] - inf[d] ) / min_step;
+        // minimum number of cells in dimension 'd'
+        int n = std::floor(( sup[d] - inf[d] ) / min_width);
         
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
+        
 #if GRID_HAS_PERIODIC
         assert_true( modulo == spc->getModulo() );
-        if ( modulo && modulo->isPeriodic(d) )
+        if ( modulo  &&  modulo->isPeriodic(d) )
         {
             assert_small( modulo->period_[d] - sup[d] + inf[d] );
-            //adjust the grid to match the edges
-            cnt[d] = std::max((size_t)1, (size_t)std::floor(n));
+            // adjust the grid to match the edges
+            cnt[d] = std::max(1, n);
             pGrid.setPeriodic(d, true);
         }
         else
 #endif
         {
-            //add a border in any dimension which is not periodic
-            cnt[d] = (size_t)std::ceil(n) + 2;
-            n = cnt[d] * 0.5 * min_step;
-            real mid = inf[d] + sup[d];
-            inf[d] = mid - n;
-            sup[d] = mid + n;
+            //extend in any dimension that is not periodic, adjusting the cell size to min_width
+            cnt[d] = n + 1;
+            real w = cnt[d] * 0.5 * min_width;
+            real m = inf[d] + sup[d];
+            inf[d] = m - w;
+            sup[d] = m + w;
         }
     }
     
@@ -785,7 +787,7 @@ void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff, size_t pan1,
 #include "opengl.h"
 void drawBoundaries(Map<DIM> const&);
 
-void PointGrid::draw() const
+void PointGrid::drawGrid() const
 {
 #if ( DIM <= 3 )
     glDisable(GL_LIGHTING);

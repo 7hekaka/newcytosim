@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "assert_macro.h"
 #include "locus_grid.h"
@@ -19,16 +19,17 @@ LocusGrid::LocusGrid()
 }
 
 
-size_t LocusGrid::setGrid(Space const* spc, real min_step)
+size_t LocusGrid::setGrid(Space const* spc, real min_width)
 {
-    assert_true( min_step > 0 );
+    assert_true( min_width > 0 );
     Vector inf, sup;
     spc->boundaries(inf, sup);
     
     size_t cnt[3] = { 1, 1, 1 };
     for ( size_t d = 0; d < DIM; ++d )
     {
-        real n = ( sup[d] - inf[d] ) / min_step;
+        // minimum number of cells in dimension 'd'
+        int n = std::floor(( sup[d] - inf[d] ) / min_width);
         
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
@@ -38,19 +39,19 @@ size_t LocusGrid::setGrid(Space const* spc, real min_step)
         if ( modulo  &&  modulo->isPeriodic(d) )
         {
             assert_small( modulo->period_[d] - sup[d] + inf[d] );
-            //adjust the grid to match the edges
-            cnt[d] = std::max((size_t)1, (size_t)std::floor(n));
+            // adjust the grid to match the edges
+            cnt[d] = std::max(1, n);
             pGrid.setPeriodic(d, true);
         }
         else
 #endif
         {
-            //add a border in any dimension which is not periodic
-            cnt[d] = (size_t)std::ceil(n) + 2;
-            n = cnt[d] * 0.5 * min_step;
-            real mid = inf[d] + sup[d];
-            inf[d] = mid - n;
-            sup[d] = mid + n;
+            //extend in any dimension that is not periodic, adjusting cell size to min_width
+            cnt[d] = n + 1;
+            real w = cnt[d] * 0.5 * min_width;
+            real m = inf[d] + sup[d];
+            inf[d] = m - w;
+            sup[d] = m + w;
         }
     }
     
@@ -123,7 +124,7 @@ void LocusGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real sup
 void LocusGrid::checkPP(Meca& meca, real stiff,
                         BigPoint const& aa, BigPoint const& bb)
 {
-    //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
+    //std::clog << "   PP- " << bb.mec_ << " " << aa.mec_ << '\n';
     Vector vab = bb.cen() - aa.cen();
     const real ran = aa.rad() + bb.rad();
 
@@ -148,7 +149,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
 void LocusGrid::checkPL(Meca& meca, real stiff,
                         BigPoint const& aa, BigLocus const& bb)
 {
-    //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
+    //std::clog << "   PL- " << aa.mec_ << " " << bb.fib_ << '\n';
     const real ran = aa.rad() + bb.rad_;
     
     // determine projection of `aa` on segment `bb`:
@@ -208,7 +209,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
 void LocusGrid::checkLL1(Meca& meca, real stiff,
                          BigLocus const& aa, BigLocus const& bb)
 {
-    //std::clog << "   LL1 " << aa.seg << " " << bb.vertex1() << '\n';
+    //std::clog << "   LL1 " << aa.fib_ << " " << bb.vertex1() << '\n';
     const real ran = aa.rad_ + bb.rad_;
     
     // get position of bb.vertex1() with respect to segment 'aa'
@@ -275,7 +276,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 void LocusGrid::checkLL2(Meca& meca, real stiff,
                          BigLocus const& aa, BigLocus const& bb)
 {
-    //std::clog << "   LL2 " << aa.seg << " " << bb.vertex2() << '\n';
+    //std::clog << "   LL2 " << aa.fib_ << " " << bb.vertex2() << '\n';
     const real ran = aa.rad_ + bb.rad_;
     
     // get position of bb.vertex2() with respect to segment 'aa'
@@ -366,7 +367,7 @@ void LocusGrid::checkLL(Meca& meca, real stiff,
     
 #endif
 
-    //std::clog << "LL " << aa.seg << " " << bb.seg << '\n';
+    //std::clog << "   LL " << aa.fib_ << " " << bb.fib_ << '\n';
     checkLL1(meca, stiff, aa, bb);
     
     if ( aa.isLast() )
@@ -407,12 +408,12 @@ inline static bool not_adjacent(BigLocus const* a, BigLocus const* b)
 {
 #if FIBER_HAS_FAMILY
     return (( a->fib_->family_ != b->fib_->family_ )
-            || (( a->pti_ > 1 + b->pti_ ) | ( b->pti_ > 1 + a->pti_ )));
+            || (( a->vix_ > 1 + b->vix_ ) | ( b->vix_ > 1 + a->vix_ )));
 #else
     return (( a->fib_ != b->fib_ )
-            || (( a->pti_ > 1 + b->pti_ ) | ( b->pti_ > 1 + a->pti_ )));
+            || (( a->vix_ > 1 + b->vix_ ) | ( b->vix_ > 1 + a->vix_ )));
 #endif
-    // we cannot use abs() above because `pti_` is unsigned
+    // we cannot use abs() above because `vix_` is unsigned
 }
 
 //------------------------------------------------------------------------------
@@ -770,7 +771,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff, size_t pan1, size_t pan2
 #include "opengl.h"
 void drawBoundaries(Map<DIM> const&);
 
-void LocusGrid::draw() const
+void LocusGrid::drawGrid() const
 {
 #if ( DIM <= 3 )
     glDisable(GL_LIGHTING);

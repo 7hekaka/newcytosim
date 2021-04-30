@@ -76,8 +76,8 @@ public:
     /// equilibrium radius of the interaction (distance where force is zero)
     real     rad_;
     
-    /// Index of the point-of-interest in the Mecable
-    unsigned pti_;
+    /// Index of Mecable's vertex
+    unsigned vix_;
     
 public:
     
@@ -88,15 +88,15 @@ public:
     {
         mec_ = m;
         rad_ = r;
-        pti_ = static_cast<unsigned>(i);
-        assert_true( i == pti_ );
+        vix_ = static_cast<unsigned>(i);
+        assert_true( i == vix_ );
     }
     
     /// construct Mecapoint
-    inline Mecapoint exact() const { return Mecapoint(mec_, pti_); }
+    inline Mecapoint exact() const { return Mecapoint(mec_, vix_); }
     
     /// position of center
-    Vector cen() const { return mec_->posPoint(pti_); }
+    Vector cen() const { return mec_->posPoint(vix_); }
     //Vector cen() const { return Vector(&pos_.XX); }
     
     real rad() const { return rad_; }
@@ -120,7 +120,7 @@ public:
     real     rad_;
 
     /// index of segment's first point
-    unsigned pti_;
+    unsigned vix_;
     
 public:
     
@@ -131,42 +131,43 @@ public:
     {
         fib_ = f;
         rad_ = r;
-        pti_ = static_cast<unsigned>(i);
-        assert_true( i == pti_ );
+        vix_ = static_cast<unsigned>(i);
+        assert_true( i == vix_ );
     }
 
     /// position of point 1
-    Vector pos1() const { return fib_->posPoint(pti_); }
+    Vector pos1() const { return fib_->posPoint(vix_); }
     
     /// position of point 2
-    Vector pos2() const { return fib_->posPoint(pti_+1); }
+    Vector pos2() const { return fib_->posPoint(vix_+1); }
     
     /// offset = point2 - point1
-    Vector diff() const { return fib_->diffPoints(pti_); }
+    Vector diff() const { return fib_->diffPoints(vix_); }
     
     /// offset = point1 - point0
-    Vector prevDiff() const { return fib_->diffPoints(pti_-1); }
+    Vector prevDiff() const { return fib_->diffPoints(vix_-1); }
     
     /// length of segment
     real len() const { return fib_->segmentation(); }
 
     /// true if the segment is the first of the Fiber
-    bool isFirst() const { return ( pti_ == 0 ); }
+    bool isFirst() const { return ( vix_ == 0 ); }
     
     /// true if the segment is the last of the Fiber
-    bool isLast() const { return ( pti_+2 == fib_->nbPoints() ); }
+    bool isLast() const { return ( vix_+2 == fib_->nbPoints() ); }
 
     /// Mecapoint to point 1
-    Mecapoint vertex1() const { return Mecapoint(fib_, pti_); }
+    Mecapoint vertex1() const { return Mecapoint(fib_, vix_); }
     
     /// Mecapoint to point 2
-    Mecapoint vertex2() const { return Mecapoint(fib_, pti_+1); }
+    Mecapoint vertex2() const { return Mecapoint(fib_, vix_+1); }
     
     /// FiberSegment
-    FiberSegment segment() const { return FiberSegment(fib_, pti_); }
+    FiberSegment segment() const { return FiberSegment(fib_, vix_); }
 
 };
 
+//------------------------------------------------------------------------------
 
 /// type for a list of FatPoint
 typedef Array<BigPoint> BigPointList;
@@ -175,7 +176,7 @@ typedef Array<BigPoint> BigPointList;
 typedef Array<BigLocus> BigLocusList;
 
 
-/// a set of lists associated with the same location
+/// a set of lists associated with one cell of the grid
 class LocusGridCell
 {
     friend class LocusGrid;
@@ -265,16 +266,22 @@ public:
 #endif
 };
 
+//------------------------------------------------------------------------------
 
-/// Divide-and-Conquer to implement steric interactions
+/// LocusGrid implements a *Cell Lists* approach to steric interactions
 /**
- A divide-and-conquer algorithm is used to find FatPoints that overlap:
- - It uses a grid 'pGrid' covering the space, initialized by setGrid()
- To each point on pGrid is associated a list of FatPoint* of class PointGridCell.
- - The functions 'add()' position the given FatPoints on the grid
- - Function setStericInteraction() uses pGrid to find pairs of FatPoints that may overlap.
- It then calculates their actual distance, and set a interaction from Meca if necessary
+ This implements a divide-and-conquer method to find particles that are within a
+ certain cutoff distance from each other. In brief:
+ - It covers the space with a Grid `pGrid`, initialized by `setGrid()`
+ - A list of class `LocusGridCell` is associated with each cell of `pGrid`.
+ - `LocusGrid::add()` links `BigPoint` or `BigLocus` to the appropriate cell of the grid.
+ - `LocusGrid::setInteractions()` checks all pairs of particles that may overlap,
+    calculating their actual distance, and calling Meca::addLink() as necessary
  .
+ Compared to PointGrid, LocusGrid only supports repulsive interactions.
+ For periodic boundary conditions, this follows the [Periodic wrapping] method.
+ 
+ Check the [general introduction on Cell Lists](https://en.wikipedia.org/wiki/Cell_lists)
  */
 class LocusGrid
 {
@@ -405,8 +412,8 @@ public:
     /// creator
     LocusGrid();
     
-    /// define grid covering specified Space, with cell of size min_step at least
-    size_t setGrid(Space const*, real min_step);
+    /// define grid covering specified Space, given a minimal cell size requirement
+    size_t setGrid(Space const*, real min_width);
     
     /// allocate memory for grid
     void createCells();
@@ -460,7 +467,7 @@ public:
     Map<DIM> const& map() const { return pGrid; }
     
     /// OpenGL display function
-    void draw() const;
+    void drawGrid() const;
 };
 
 

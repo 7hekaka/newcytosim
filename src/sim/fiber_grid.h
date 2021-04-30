@@ -138,7 +138,7 @@ public:
     Map<DIM> const& map() const { return fGrid; }
 
     /// OpenGL display function
-    void         draw() const;
+    void drawGrid() const;
 };
 
 

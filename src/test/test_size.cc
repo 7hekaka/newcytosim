@@ -33,14 +33,17 @@ int main(int argc, char* argv[])
         PRINT(SparMatSymBlk::Column);
         PRINT(SparMatSymBlkDiag::Column);
         
-        PRINT(PointGrid);
+        PRINT(PointGrid)
+        PRINT(FatVector);
         PRINT(FatPoint);
         PRINT(FatLocus);
+        PRINT(PointGridCell);
         
         PRINT(LocusGrid);
         PRINT(BigVector);
         PRINT(BigPoint);
         PRINT(BigLocus);
+        PRINT(LocusGridCell);
         
         PRINT(Rasterizer::Vertex2);
         PRINT(Rasterizer::Vertex2d);
