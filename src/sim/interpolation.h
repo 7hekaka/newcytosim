@@ -77,10 +77,10 @@ public:
     Mecable const*  mecable()  const { return mec_; }
 
     /// Mecapoint corresponding to first point
-    Mecapoint       exact1()   const { return Mecapoint(mec_, pt1_); }
+    Mecapoint       vertex1()  const { return Mecapoint(mec_, pt1_); }
     
     /// Mecapoint corresponding to second point
-    Mecapoint       exact2()   const { return Mecapoint(mec_, pt2_); }
+    Mecapoint       vertex2()  const { return Mecapoint(mec_, pt2_); }
     
     /// Index of point 1 in object
     size_t          point1()   const { return pt1_; }

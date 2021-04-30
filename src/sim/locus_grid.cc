@@ -14,16 +14,6 @@ extern Modulo const* modulo;
 
 //------------------------------------------------------------------------------
 
-inline Mecapoint BigPoint::point() const { return Mecapoint(mec_, pti_); }
-
-inline FiberSegment BigLocus::segment() const { return FiberSegment(fib_, pti_); }
-
-inline Mecapoint BigLocus::point1() const { return Mecapoint(fib_, pti_); }
-
-inline Mecapoint BigLocus::point2() const { return Mecapoint(fib_, pti_+1); }
-
-//------------------------------------------------------------------------------
-
 LocusGrid::LocusGrid()
 {
 }
@@ -135,7 +125,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
 {
     //std::clog << "   PP- " << bb.pnt << " " << aa.pnt << '\n';
     Vector vab = bb.cen() - aa.cen();
-    const real ran = aa.rad_ + bb.rad_;
+    const real ran = aa.rad() + bb.rad();
 
 #if GRID_HAS_PERIODIC
     if ( modulo )
@@ -144,7 +134,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
     real ab2 = vab.normSqr();
     
     if ( ab2 < ran*ran )
-        meca.addLongLink1(aa.point(), bb.point(), vab, ab2, ran, stiff);
+        meca.addLongLink1(aa.exact(), bb.exact(), vab, ab2, ran, stiff);
 }
 
 
@@ -159,46 +149,52 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
                         BigPoint const& aa, BigLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg << " " << aa.pnt << '\n';
-    const real ran = aa.rad_ + bb.rad_;
+    const real ran = aa.rad() + bb.rad_;
     
-    // get position of point with respect to segment:
-    real dis2 = INFINITY;
-    real abs = bb.segment().projectPoint0(aa.cen(), dis2);
+    // determine projection of `aa` on segment `bb`:
+    real ab2 = INFINITY;
+    real abs = bb.segment().projectPoint0(aa.cen(), ab2);
     
     if ( 0 <= abs )
     {
         if ( abs <= bb.len() )
         {
-            if ( dis2 < ran*ran )
-                meca.addSideSlidingLink(bb.segment(), abs, aa.point(), ran, stiff);
+            // the point projects inside the segment
+            if ( ab2 < ran*ran )
+                meca.addSideSlidingLink(bb.segment(), abs, aa.exact(), ran, stiff);
         }
         else
         {
+            // the point projects right past the segment, and we check the fiber tip
             if ( bb.isLast() )
-                checkPP(meca, stiff, aa, bb.bigPoint2());
+            {
+                Vector vab = bb.pos2() - aa.cen();
+#if GRID_HAS_PERIODIC
+                if ( modulo )
+                    modulo->fold(vab);
+#endif
+                ab2 = vab.normSqr();
+                if ( ab2 < ran*ran )
+                    meca.addLongLink1(aa.exact(), bb.vertex2(), vab, ab2, ran, stiff);
+            }
         }
     }
     else
     {
-        if ( bb.isFirst() )
-            checkPP(meca, stiff, aa, bb.bigPoint1());
-        else
-        {
-            /* we check the projection to the previous segment,
-             and if it falls on the right of it, then we interact with the node */
-            Vector vab = bb.pos1() - aa.cen();
-            
+        // here abs < 0, and thus `bb` projects left past the segment
+        Vector vab = bb.pos1() - aa.cen();
 #if GRID_HAS_PERIODIC
-            if ( modulo )
-                modulo->fold(vab);
+        if ( modulo )
+            modulo->fold(vab);
 #endif
-            if ( dot(vab, bb.prevDiff()) <= 0 )
-            {
-                real ab2 = vab.normSqr();
-                if ( ab2 < ran*ran )
-                    meca.addLongLink1(aa.point(), bb.point1(), vab, ab2, ran, stiff);
-            }
-        }
+        ab2 = vab.normSqr();
+        /*
+         This code handles the interactions will all the joints of a fiber:
+         interact with the node only if this projects on the previous segment
+         or if this is the terminal point of a fiber.
+         */
+        if ( ab2 < ran*ran && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
+            meca.addLongLink1(aa.exact(), bb.vertex1(), vab, ab2, ran, stiff);
     }
 }
 
@@ -212,10 +208,10 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
 void LocusGrid::checkLL1(Meca& meca, real stiff,
                          BigLocus const& aa, BigLocus const& bb)
 {
-    //std::clog << "   LL1 " << aa.seg << " " << bb.point1() << '\n';
+    //std::clog << "   LL1 " << aa.seg << " " << bb.vertex1() << '\n';
     const real ran = aa.rad_ + bb.rad_;
     
-    // get position of bb.point1() with respect to segment 'aa'
+    // get position of bb.vertex1() with respect to segment 'aa'
     real dis2 = INFINITY;
     FiberSegment seg = aa.segment();
     real abs = seg.projectPoint0(bb.pos1(), dis2);
@@ -223,16 +219,16 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
     if ((0 <= abs) & (abs <= aa.len()) & (dis2 < ran*ran))
     {
         /*
-         bb.point1() projects inside segment 'aa'
+         bb.vertex1() projects inside segment 'aa'
          */
-        meca.addSideSlidingLink(seg, abs, bb.point1(), ran, stiff);
+        meca.addSideSlidingLink(seg, abs, bb.vertex1(), ran, stiff);
     }
     else if ( abs < 0 )
     {
         if ( aa.isFirst() )
         {
             /*
-             Check the projection of aa.point1(),
+             Check the projection of aa.vertex1(),
              on the segment represented by 'bb'
              */
             if ( &bb < &aa  &&  bb.isFirst() )
@@ -245,14 +241,14 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 #endif
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) >= 0 )
-                    meca.addLongLink1(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, stiff);
             }
         }
         else
         {
             /*
              Check the projection to the segment located before 'aa',
-             and interact if 'bb.point1()' falls on the right side of it
+             and interact if 'bb.vertex1()' falls on the right side of it
              */
             Vector vab = bb.pos1() - aa.pos1();
             
@@ -264,7 +260,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink1(aa.point1(), bb.point1(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, stiff);
             }
         }
     }
@@ -279,10 +275,10 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 void LocusGrid::checkLL2(Meca& meca, real stiff,
                          BigLocus const& aa, BigLocus const& bb)
 {
-    //std::clog << "   LL2 " << aa.seg << " " << bb.point2() << '\n';
+    //std::clog << "   LL2 " << aa.seg << " " << bb.vertex2() << '\n';
     const real ran = aa.rad_ + bb.rad_;
     
-    // get position of bb.point2() with respect to segment 'aa'
+    // get position of bb.vertex2() with respect to segment 'aa'
     real dis2 = INFINITY;
     FiberSegment seg = aa.segment();
     real abs = seg.projectPoint0(bb.pos2(), dis2);
@@ -290,15 +286,15 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
     if ((0 <= abs) & (dis2 < ran*ran) & (abs <= aa.len()))
     {
         /*
-         bb.point2() projects inside segment 'aa'
+         bb.vertex2() projects inside segment 'aa'
          */
-        meca.addSideSlidingLink(seg, abs, bb.point2(), ran, stiff);
+        meca.addSideSlidingLink(seg, abs, bb.vertex2(), ran, stiff);
     }
     else if ( abs < 0 )
     {
         /*
          Check the projection to the segment located before 'aa',
-         and interact if 'bb.point1()' falls on the right side of it
+         and interact if 'bb.vertex1()' falls on the right side of it
          */
         Vector vab = bb.pos2() - aa.pos1();
         
@@ -312,7 +308,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
             real ab2 = vab.normSqr();
 
             if ( ab2 < ran*ran  && dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink1(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
+                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, stiff);
         }
         else
         {
@@ -320,14 +316,14 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink1(aa.point1(), bb.point2(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, stiff);
             }
         }
     }
     else if ( &bb < &aa  &&  aa.isLast()  &&  abs > aa.len() )
     {
         /*
-         Check the projection of aa.point2(),
+         Check the projection of aa.vertex2(),
          on the segment represented by 'bb'
          */
         assert_true(bb.isLast());
@@ -340,7 +336,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
         real ab2 = vab.normSqr();
         
         if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) <= 0 )
-            meca.addLongLink1(aa.point2(), bb.point2(), vab, ab2, ran, stiff);
+            meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, ran, stiff);
     }
 }
 

@@ -4,62 +4,70 @@
 
 set simul system
 {
-    steric_max_range = 0.5
-    steric = 1, 100, 10
+    steric = 1, 100
 
     viscosity = 10
-    time_step = 0.001
+    time_step = 0.0001
     kT = 0.00042
-    % for this to work, compile with DRAW_MECA_LINKS 1
-    display = ( draw_links=1; )
+    % to display links, compile with DRAW_MECA_LINKS 1
+    display = ( draw_links = 1; window_size=1280,1024; )
 }
 
 set space cell
 {
-    shape = circle
+    shape = square
 }
 
 new cell
 {
-    radius = 1
+    length = 3, 2
 }
 
 set fiber filament
 {
     rigidity = 10
-    segmentation = 0.2
+    segmentation = 0.25
 
-    steric = 1, 0.05, 0.05
-    display = ( lines=3; labels=1; points=8, 1; coloring=1; )
+    steric = 1, 0.06, 0.05
+    display = ( lines=1; points=4, 1; coloring=1; plus_end=8, sphere; )
 }
 
 
-new filament { length = 0.6; position = -0.5  0.05 0; direction = X; }
-new filament { length = 0.6; position = -0.5 -0.05 0; direction = X; }
+new filament { length = 1; position = -0.51 0.8 0; direction = -1 0; }
+new filament { length = 1; position =  0.51 0.8 0; direction =  1 0; }
+
+new filament { length = 1; position = -0.52 0.7 0; direction = -1 0; }
+new filament { length = 1; position =  0.52 0.7 0; direction = -1 0; }
+
+new filament { length = 1; position = -0.53 0.6 0; direction =  1 0; }
+new filament { length = 1; position =  0.53 0.6 0; direction =  1 0; }
+
+new filament { length = 1; position = -0.54 0.5 0; direction =  1 0; }
+new filament { length = 1; position =  0.54 0.5 0; direction = -1 0; }
+
+new filament { length = 1; position = -0.56 0.4 0; direction =  1 0; }
+new filament { length = 1; position =  0.56 0.4 0; direction =  1 0; }
 
 
-new filament { length = 0.6; position =  0.5  0.1 0; direction = X; }
-new filament { length = 0.6; position =  0.5 -0.1 0; direction = X; }
+new filament { length = 1; position = -0.7  0.05 0; direction = X; }
+new filament { length = 1; position = -0.7 -0.05 0; direction = X; }
+
+new filament { length = 1; position =  0.7  0.06 0; direction = X; }
+new filament { length = 1; position =  0.8 -0.06 0; direction = X; }
 
 
-new filament { length = 0.5; position =  0.31 0.5 0; direction =  1 0; }
-new filament { length = 0.5; position = -0.31 0.5 0; direction =  1 0; }
+new filament { length = 1; position = -0.8 -0.32 0; direction =  1 0; }
+new filament { length = 1; position = -0.7 -0.40 0; direction =  1 0; }
 
-new filament { length = 0.5; position =  0.30 0.6 0; direction = -1 0; }
-new filament { length = 0.5; position = -0.30 0.6 0; direction =  1 0; }
-
-new filament { length = 0.5; position =  0.29 0.7 0; direction = -1 0; }
-new filament { length = 0.5; position = -0.29 0.7 0; direction = -1 0; }
+new filament { length = 1; position =  0.8 -0.32 0; direction = -1 0; }
+new filament { length = 1; position =  0.7 -0.40 0; direction =  1 0; }
 
 
-new filament { length = 0.5; position =  0.32 -0.5 0; direction =  1 0; }
-new filament { length = 0.5; position = -0.32 -0.5 0; direction =  1 0; }
+new filament { length = 1; position = -0.6 -0.70 0; direction = -1 0; }
+new filament { length = 1; position = -0.8 -0.78 0; direction =  1 0; }
 
-new filament { length = 0.5; position =  0.30 -0.6 0; direction = -1 0; }
-new filament { length = 0.5; position = -0.30 -0.6 0; direction =  1 0; }
-
-new filament { length = 0.5; position =  0.28 -0.7 0; direction = -1 0; }
-new filament { length = 0.5; position = -0.28 -0.7 0; direction = -1 0; }
+new filament { length = 1; position =  0.8 -0.70 0; direction = -1 0; }
+new filament { length = 1; position =  0.6 -0.77 0; direction = -1 0; }
 
 
 set bead ball

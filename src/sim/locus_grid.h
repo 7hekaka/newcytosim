@@ -6,14 +6,15 @@
 #include "grid.h"
 #include "dim.h"
 #include "vector.h"
-#include "array.h"
+#include "mecapoint.h"
 #include "fiber.h"
+#include "fiber_segment.h"
+#include "array.h"
 
 class Space;
 class Modulo;
 class Simul;
 class Mecable;
-class Mecapoint;
 class FiberSegment;
 
 
@@ -92,11 +93,13 @@ public:
     }
     
     /// construct Mecapoint
-    inline Mecapoint point() const;
+    inline Mecapoint exact() const { return Mecapoint(mec_, pti_); }
     
     /// position of center
     Vector cen() const { return mec_->posPoint(pti_); }
     //Vector cen() const { return Vector(&pos_.XX); }
+    
+    real rad() const { return rad_; }
 };
 
 
@@ -131,9 +134,6 @@ public:
         pti_ = static_cast<unsigned>(i);
         assert_true( i == pti_ );
     }
-    
-    /// construct FiberSegment
-    FiberSegment segment() const;
 
     /// position of point 1
     Vector pos1() const { return fib_->posPoint(pti_); }
@@ -147,7 +147,7 @@ public:
     /// offset = point1 - point0
     Vector prevDiff() const { return fib_->diffPoints(pti_-1); }
     
-    /// position of point 2
+    /// length of segment
     real len() const { return fib_->segmentation(); }
 
     /// true if the segment is the first of the Fiber
@@ -157,16 +157,14 @@ public:
     bool isLast() const { return ( pti_+2 == fib_->nbPoints() ); }
 
     /// Mecapoint to point 1
-    Mecapoint point1() const;
+    Mecapoint vertex1() const { return Mecapoint(fib_, pti_); }
     
     /// Mecapoint to point 2
-    Mecapoint point2() const;
+    Mecapoint vertex2() const { return Mecapoint(fib_, pti_+1); }
     
-    /// to point 1
-    BigPoint bigPoint1() const { return BigPoint(fib_, pti_, rad_, pos1()); }
-    
-    /// to point 2
-    BigPoint bigPoint2() const { return BigPoint(fib_, pti_+1, rad_, pos2()); }
+    /// FiberSegment
+    FiberSegment segment() const { return FiberSegment(fib_, pti_); }
+
 };
 
 

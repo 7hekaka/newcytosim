@@ -394,8 +394,8 @@ void Space::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Mec
  */
 void Space::setConfinement(Vector const& pos, Interpolation const& pi, Meca& meca, real stiff) const
 {
-    setConfinement(pos, pi.exact1(), meca, pi.coef0()*stiff);
-    setConfinement(pos, pi.exact2(), meca, pi.coef1()*stiff);
+    setConfinement(pos, pi.vertex1(), meca, pi.coef0()*stiff);
+    setConfinement(pos, pi.vertex2(), meca, pi.coef1()*stiff);
 }
 
 

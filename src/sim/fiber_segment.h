@@ -78,10 +78,10 @@ public:
     Vector       dir()         const { return fib_->dirSegment(pti_); }
     
     /// Mecapoint corresponding to first point
-    Mecapoint    exact1()      const { return Mecapoint(fib_, pti_); }
+    Mecapoint    vertex1()     const { return Mecapoint(fib_, pti_); }
     
     /// Mecapoint corresponding to second point
-    Mecapoint    exact2()      const { return Mecapoint(fib_, pti_+1); }
+    Mecapoint    vertex2()     const { return Mecapoint(fib_, pti_+1); }
     
     /// true if the segment is the first of the Fiber
     bool         isFirst()     const { return ( pti_ == 0 ); }

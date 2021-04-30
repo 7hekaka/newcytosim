@@ -144,45 +144,52 @@ void PointGrid::checkPL(Meca& meca, Stiffness const& pam,
                         FatPoint const& aa, FatLocus const& bb)
 {
     //std::clog << "   PL- " << bb.seg_ << " " << aa.pnt_ << '\n';
-    const real len = aa.rad_ + bb.rad_;
+    const real ran = aa.rad_ + bb.rad_;
     
     // get position of point with respect to segment:
-    real dis2 = INFINITY;
-    real abs = bb.seg_.projectPoint0(aa.cen(), dis2);
+    real ab2 = INFINITY;
+    real abs = bb.seg_.projectPoint0(aa.cen(), ab2);
     
     if ( 0 <= abs )
     {
-        if ( abs <= bb.seg_.len() )
+        if ( abs <= bb.len() )
         {
-            if ( dis2 < len*len )
-                meca.addSideSlidingLink(bb.seg_, abs, aa.pnt_, len, pam.push);
+            // the point projects inside the segment
+            if ( ab2 < ran*ran )
+                meca.addSideSlidingLink(bb.seg_, abs, aa.pnt_, ran, pam.push);
         }
         else
         {
+            // the point projects right past the segment, and we check the fiber tip
             if ( bb.isLast() )
-                checkPP(meca, pam, aa, bb.fatPoint2());
+            {
+                Vector vab = bb.pos2() - aa.cen();
+#if GRID_HAS_PERIODIC
+                if ( modulo )
+                    modulo->fold(vab);
+#endif
+                ab2 = vab.normSqr();
+                if ( ab2 < ran*ran )
+                    meca.addLongLink1(aa.pnt_, bb.vertex2(), vab, ab2, ran, pam.push);
+            }
         }
     }
     else
     {
-        if ( bb.isFirst() )
-            checkPP(meca, pam, aa, bb.fatPoint1());
-        else
-        {
-            /* we check the projection to the previous segment,
-             and if it falls on the right of it, then we interact with the node */
-            Vector vab = bb.seg_.pos1() - aa.cen();
+        
+        Vector vab = bb.pos1() - aa.cen();
 #if GRID_HAS_PERIODIC
-            if ( modulo )
-                modulo->fold(vab);
+        if ( modulo )
+            modulo->fold(vab);
 #endif
-            if ( dot(vab, bb.prevDiff()) <= 0 )
-            {
-                real ab2 = vab.normSqr();
-                if ( ab2 < len*len )
-                    meca.addLongLink(aa.pnt_, bb.seg_.exact1(), vab, ab2, len, pam.push);
-            }
-        }
+        ab2 = vab.normSqr();
+        /*
+         This code handles the interactions will all the joints of a fiber:
+         interact with the node only if this projects on the previous segment
+         or if this is the terminal point of a fiber.
+         */
+        if ( ab2 < ran*ran && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
+            meca.addLongLink(aa.pnt_, bb.vertex1(), vab, ab2, ran, pam.push);
     }
 }
 
@@ -196,50 +203,50 @@ void PointGrid::checkPL(Meca& meca, Stiffness const& pam,
 void PointGrid::checkLL1(Meca& meca, Stiffness const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
-    //std::clog << "   LL1 " << aa.seg_ << " " << bb.point1() << '\n';
+    //std::clog << "   LL1 " << aa.seg_ << " " << bb.vertex1() << '\n';
     const real ran = aa.rge_ + bb.rad_;
     
-    // get position of bb.point1() with respect to segment 'aa'
+    // get position of bb.vertex1() with respect to segment 'aa'
     real dis2 = INFINITY;
-    real abs = aa.seg_.projectPoint0(bb.seg_.pos1(), dis2);
+    real abs = aa.seg_.projectPoint0(bb.pos1(), dis2);
     
-    if ((0 <= abs) & (abs <= aa.seg_.len()) & (dis2 < ran*ran))
+    if ((0 <= abs) & (abs <= aa.len()) & (dis2 < ran*ran))
     {
         /*
-         bb.point1() projects inside segment 'aa'
+         bb.vertex1() projects inside segment 'aa'
          */
         const real len = aa.rad_ + bb.rad_;
         real stiff = sign_select(dis2-len*len, pam.push, pam.pull);
-        meca.addSideSlidingLink(aa.seg_, abs, bb.seg_.exact1(), len, stiff);
+        meca.addSideSlidingLink(aa.seg_, abs, bb.vertex1(), len, stiff);
     }
     else if ( abs < 0 )
     {
         if ( aa.isFirst() )
         {
             /*
-             Check the projection of aa.point1(),
+             Check the projection of aa.vertex1(),
              on the segment represented by 'bb'
              */
             if ( &bb < &aa  &&  bb.isFirst() )
             {
-                Vector vab = bb.seg_.pos1() - aa.seg_.pos1();
+                Vector vab = bb.pos1() - aa.pos1();
 #if GRID_HAS_PERIODIC
                 if ( modulo )
                     modulo->fold(vab);
 #endif
                 real ab2 = vab.normSqr();
                 real len = aa.rad_ + bb.rad_;
-                if ( ab2 < len*len  &&  dot(vab, bb.seg_.diff()) >= 0 )
-                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), vab, ab2, len, pam.push);
+                if ( ab2 < len*len  &&  dot(vab, bb.diff()) >= 0 )
+                    meca.addLongLink(aa.vertex1(), bb.vertex1(), vab, ab2, len, pam.push);
             }
         }
         else
         {
             /*
              Check the projection to the segment located before 'aa',
-             and interact if 'bb.point1()' falls on the right side of it
+             and interact if 'bb.vertex1()' falls on the right side of it
              */
-            Vector vab = bb.seg_.pos1() - aa.seg_.pos1();
+            Vector vab = bb.pos1() - aa.pos1();
 #if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
@@ -251,7 +258,7 @@ void PointGrid::checkLL1(Meca& meca, Stiffness const& pam,
                 {
                     real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(ab2-len*len, pam.push, pam.pull);
-                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact1(), vab, ab2, len, stiff);
+                    meca.addLongLink(aa.vertex1(), bb.vertex1(), vab, ab2, len, stiff);
                 }
             }
         }
@@ -267,29 +274,29 @@ void PointGrid::checkLL1(Meca& meca, Stiffness const& pam,
 void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
                          FatLocus const& aa, FatLocus const& bb)
 {
-    //std::clog << "   LL2 " << aa.seg_ << " " << bb.point2() << '\n';
+    //std::clog << "   LL2 " << aa.seg_ << " " << bb.vertex2() << '\n';
     const real ran = aa.rge_ + bb.rad_;
     
-    // get position of bb.point2() with respect to segment 'aa'
+    // get position of bb.vertex2() with respect to segment 'aa'
     real dis2 = INFINITY;
-    real abs = aa.seg_.projectPoint0(bb.seg_.pos2(), dis2);
+    real abs = aa.seg_.projectPoint0(bb.pos2(), dis2);
     
-    if ((0 <= abs) & (dis2 < ran*ran) & (abs <= aa.seg_.len()))
+    if ((0 <= abs) & (dis2 < ran*ran) & (abs <= aa.len()))
     {
         /*
-         bb.point2() projects inside segment 'aa'
+         bb.vertex2() projects inside segment 'aa'
          */
         const real len = aa.rad_ + bb.rad_;
         real stiff = sign_select(dis2-len*len, pam.push, pam.pull);
-        meca.addSideSlidingLink(aa.seg_, abs, bb.seg_.exact2(), len, stiff);
+        meca.addSideSlidingLink(aa.seg_, abs, bb.vertex2(), len, stiff);
     }
     else if ( abs < 0 )
     {
         /*
          Check the projection to the segment located before 'aa',
-         and interact if 'bb.point1()' falls on the right side of it
+         and interact if 'bb.vertex1()' falls on the right side of it
          */
-        Vector vab = bb.seg_.pos2() - aa.seg_.pos1();
+        Vector vab = bb.pos2() - aa.pos1();
 #if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
@@ -299,8 +306,8 @@ void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
             assert_true(bb.isLast());
             real ab2 = vab.normSqr();
             real len = aa.rad_ + bb.rad_;
-            if ( ab2 < len*len  && dot(vab, bb.seg_.diff()) <= 0 )
-                meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), vab, ab2, len, pam.push);
+            if ( ab2 < len*len  && dot(vab, bb.diff()) <= 0 )
+                meca.addLongLink(aa.vertex1(), bb.vertex2(), vab, ab2, len, pam.push);
         }
         else
         {
@@ -311,28 +318,28 @@ void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
                 {
                     real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(ab2-len*len, pam.push, pam.pull);
-                    meca.addLongLink(aa.seg_.exact1(), bb.seg_.exact2(), vab, ab2, len, stiff);
+                    meca.addLongLink(aa.vertex1(), bb.vertex2(), vab, ab2, len, stiff);
                 }
             }
         }
     }
-    else if ( &bb < &aa  &&  aa.isLast()  &&  abs > aa.seg_.len() )
+    else if ( &bb < &aa  &&  aa.isLast()  &&  abs > aa.len() )
     {
         /*
-         Check the projection of aa.point2(),
+         Check the projection of aa.vertex2(),
          on the segment represented by 'bb'
          */
         assert_true(bb.isLast());
         
-        Vector vab = bb.seg_.pos2() - aa.seg_.pos2();
+        Vector vab = bb.pos2() - aa.pos2();
 #if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
 #endif
         real ab2 = vab.normSqr();
         real len = aa.rad_ + bb.rad_;
-        if ( ab2 < len*len  &&  dot(vab, bb.seg_.diff()) <= 0 )
-            meca.addLongLink(aa.seg_.exact2(), bb.seg_.exact2(), vab, ab2, len, pam.push);
+        if ( ab2 < len*len  &&  dot(vab, bb.diff()) <= 0 )
+            meca.addLongLink(aa.vertex2(), bb.vertex2(), vab, ab2, len, pam.push);
     }
 }
 

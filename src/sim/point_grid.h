@@ -105,6 +105,9 @@ public:
     
     /// position of center
     Vector cen() const { return pnt_.pos(); }
+    
+    /// construct Mecapoint
+    Mecapoint exact() const { return pnt_; }
 };
 
 
@@ -140,29 +143,32 @@ public:
     }
     
     /// true if the segment is the first of the Fiber
-    bool isFirst() const
-    {
-        return seg_.isFirst();
-    }
+    bool isFirst() const { return seg_.isFirst(); }
     
     /// true if the segment is the last of the Fiber
-    bool isLast() const
-    {
-        return seg_.isLast();
-    }
+    bool isLast() const { return seg_.isLast(); }
     
-    FatPoint fatPoint1() const
-    {
-        return FatPoint(seg_.exact1(), rad_, rge_, seg_.pos1());
-    }
+    /// position of point 1
+    Vector pos1() const { return seg_.pos1(); }
     
-    FatPoint fatPoint2() const
-    {
-        return FatPoint(seg_.exact2(), rad_, rge_, seg_.pos2());
-    }
+    /// position of point 2
+    Vector pos2() const { return seg_.pos2(); }
     
+    /// offset = point2 - point1
+    Vector diff() const { return seg_.diff(); }
+
     /// offset = point1 - point0
     Vector prevDiff() const { return seg_.fiber()->diffPoints(seg_.point()-1); }
+    
+    /// length of segment
+    real len() const { return seg_.len(); }
+
+    /// Mecapoint to point 1
+    Mecapoint vertex1() const { return seg_.vertex1(); }
+    
+    /// Mecapoint to point 2
+    Mecapoint vertex2() const { return seg_.vertex2(); }
+
 };
 
 
