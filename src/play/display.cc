@@ -29,7 +29,7 @@ extern Modulo const* modulo;
 
 
 Display::Display(DisplayProp const* dp)
-: pixelSize(1), uFactor(1), sFactor(1), minRadius(1), prop(dp)
+: pixelSize(1), uFactor(1), sFactor(1), prop(dp)
 {
     assert_true(dp);
     prep_time = -1;
@@ -44,7 +44,6 @@ void Display::setPixelFactors(GLfloat ps, GLfloat u)
      while most gle::primitives have a radius of 1
      */
     sFactor = 0.5f * u * ps;
-    minRadius = 0.5 * pixelSize / sFactor;
 }
 
 Display::~Display()
@@ -56,11 +55,11 @@ Display::~Display()
 
 void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
 {
-    if ( rad > minRadius )
+    if ( rad > pixelSize )
     {
         glPushMatrix();
         gle::translate(pos);
-        gle::scale(rad*sFactor);
+        gle::scale(rad);
         obj();
         glPopMatrix();
     }
@@ -69,10 +68,10 @@ void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
 
 void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*obj)()) const
 {
-    if ( rad > minRadius )
+    if ( rad > pixelSize )
     {
         glPushMatrix();
-        gle::transAlignZ(pos, rad*sFactor, dir);
+        gle::transAlignZ(pos, rad, dir);
         obj();
         glPopMatrix();
     }
@@ -664,7 +663,7 @@ void Display::drawAverageFiber(ObjectList const& objs)
         const float rad = 10 * sFactor;
         gle::drawCylinder(M, MP, rad);
         gle::drawCone(P, MP, rad);
-        drawObject(G, 10, gle::sphere2);
+        drawObject(G, rad, gle::sphere2);
     }
 }
 
@@ -760,21 +759,18 @@ void Display::drawMisc(Simul const& sim)
  - 5: arrow-head in reverse direction
  .
  */
-void Display::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
+void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 {
-    real rad = size * sFactor;
-    if ( rad > 0 )
+    float rad = size * sFactor;
+    if ( rad > 0 ) switch(style)
     {
-        switch(style)
-        {
-            default: break;
-            case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
-            case 2: gle::drawCone(fib.posEndM(), -fib.dirEndM(), rad); break;
-            case 3: gle::drawCylinder(fib.posEndM(), fib.dirEndM(), rad); break;
-            case 4: gle::drawArrowTail(fib.posEndM(), -fib.dirEndM(), rad); break;
-            case 5: gle::drawArrowTail(fib.posEndM(), fib.dirEndM(), rad); break;
-            case 6: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cube); break;
-        }
+        default: break;
+        case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
+        case 2: gle::drawCone(fib.posEndM(), -fib.dirEndM(), rad); break;
+        case 3: gle::drawCylinder(fib.posEndM(), fib.dirEndM(), rad); break;
+        case 4: gle::drawArrowTail(fib.posEndM(), -fib.dirEndM(), rad); break;
+        case 5: gle::drawArrowTail(fib.posEndM(), fib.dirEndM(), rad); break;
+        case 6: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cube); break;
     }
 }
 
@@ -788,21 +784,18 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, real size) const
  - 5: arrow-head in reverse direction
  .
  */
-void Display::drawFiberPlusEnd(Fiber const& fib, int style, real size) const
+void Display::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
-    real rad = size * sFactor;
-    if ( rad > 0 )
+    float rad = size * sFactor;
+    if ( rad > 0 ) switch(style)
     {
-        switch(style)
-        {
-            default: break;
-            case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
-            case 2: gle::drawCone(fib.posEndP(), fib.dirEndP(), rad); break;
-            case 3: gle::drawCylinder(fib.posEndP(), -fib.dirEndP(), rad); break;
-            case 4: gle::drawArrowTail(fib.posEndP(), fib.dirEndP(), rad); break;
-            case 5: gle::drawArrowTail(fib.posEndP(), -fib.dirEndP(), rad); break;
-            case 6: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cube); break;
-        }
+        default: break;
+        case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
+        case 2: gle::drawCone(fib.posEndP(), fib.dirEndP(), rad); break;
+        case 3: gle::drawCylinder(fib.posEndP(), -fib.dirEndP(), rad); break;
+        case 4: gle::drawArrowTail(fib.posEndP(), fib.dirEndP(), rad); break;
+        case 5: gle::drawArrowTail(fib.posEndP(), -fib.dirEndP(), rad); break;
+        case 6: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cube); break;
     }
 }
 
@@ -1053,7 +1046,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( style == 3 )
     {
         // display only middle of fiber:
-        drawObject(fib.posMiddle(), 2*disp->point_size, gle::sphere2);
+        drawObject(fib.posMiddle(), 2*disp->point_size*sFactor, gle::sphere2);
     }
 }
 
@@ -1726,7 +1719,7 @@ void Display::drawSolid(Solid const& obj)
     {
         bodyColor(obj);
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), disp->size, gle::hedron(obj.radius(i)>0));
+            drawObject(obj.posP(i), disp->size*sFactor, gle::hedron(obj.radius(i)>0));
     }
     
     //display outline of spheres
@@ -1842,7 +1835,7 @@ void Display::drawBead(Bead const& obj)
     if ( disp->style & 2 )
     {
         bodyColor(obj);
-        drawObject(obj.position(), disp->size, gle::tetrahedron);
+        drawObject(obj.position(), disp->size*sFactor, gle::tetrahedron);
     }
     
 #if ( DIM == 2 )
@@ -1902,9 +1895,9 @@ void Display::drawSphere(Sphere const& obj)
     if (( disp->style & 2 ) && disp->perceptible )
     {
         bodyColor(obj);
-        drawObject(obj.posP(0), disp->size, gle::star);
+        drawObject(obj.posP(0), disp->size*sFactor, gle::star);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), disp->size, gle::sphere1);
+            drawObject(obj.posP(i), disp->size*sFactor, gle::sphere1);
     }
     
     //display reference points
@@ -1912,7 +1905,7 @@ void Display::drawSphere(Sphere const& obj)
     {
         bodyColor(obj);
         for ( size_t i = 1; i < obj.nbRefPoints; ++i )
-            drawObject(obj.posP(i), disp->size, gle::tetrahedron);
+            drawObject(obj.posP(i), disp->size*sFactor, gle::tetrahedron);
     }
 }
 

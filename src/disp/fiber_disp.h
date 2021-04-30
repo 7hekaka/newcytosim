@@ -158,7 +158,7 @@ public:
          minus_end = SIZE, STYLE
          
      */
-    real end_size[2];
+    float end_size[2];
     
     /// colors of the different FiberTip states
     /**

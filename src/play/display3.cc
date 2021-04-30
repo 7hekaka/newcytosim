@@ -158,7 +158,7 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* dis) const
     if ( dis->perceptible )
     {
         assert_true(glIsEnabled(GL_LIGHTING));
-        drawObject(pos, dis->size, gle::sphere1);
+        drawObject(pos, dis->size*sFactor, gle::sphere1);
     }
 }
 
@@ -169,7 +169,7 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color.load_both();
-        drawObject(pos, dis->size, gle::blob);
+        drawObject(pos, dis->size*sFactor, gle::blob);
     }
 }
 
@@ -180,7 +180,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color2.load_both();
-        drawObject(pos, dis->size, gle::blob);
+        drawObject(pos, dis->size*sFactor, gle::blob);
     }
 }
 
@@ -663,8 +663,9 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
  .
  with 3D objects
  */
-void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real rad) const
+void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 {
+    float rad = size * sFactor;
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -688,8 +689,9 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, real rad) const
  .
  with 3D objects
  */
-void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real rad) const
+void Display3::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
+    float rad = size * sFactor;
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -706,10 +708,7 @@ void Display3::drawFiberPlusEnd(Fiber const& fib, int style, real rad) const
 void Display3::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    float rad = disp->speckle_size;
-
-    if ( rad * uFactor < 2 )
-        return;
+    float rad = disp->speckle_size * sFactor;
 
     // display random speckles:
     if ( disp->speckle_style == 1 )
@@ -775,11 +774,8 @@ void Display3::drawFiberPoints(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     // diameter of lines and points in space units:
-    real rad = disp->point_size;
+    const GLfloat rad = disp->point_size * sFactor;
     int style = disp->point_style & 3;
-
-    if ( rad * uFactor < 2 )
-        return;
 
     if ( style == 1 )
     {
@@ -791,7 +787,6 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     {
         glEnable(GL_LIGHTING);
         // display arrowheads along the fiber:
-        const GLfloat rad = disp->point_size*sFactor;
         const real gap = disp->point_gap;
         real ab = std::ceil(fib.abscissaM()/gap) * gap;
         for ( ; ab <= fib.abscissaP(); ab += gap )
@@ -860,6 +855,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
         if ( obj->disp()->perceptible )
         {
             obj->disp()->color2.load_both();
+            const GLfloat rad = obj->disp()->size * sFactor;
 #if ( 0 )
             if ( obj->disp()->style == 2 )
             {
@@ -869,13 +865,13 @@ void Display3::drawSinglesF(SingleSet const& set) const
                     /// draw a disc tangent to the Space:
                     Vector pos = obj->posFoot();
                     Vector dir = spc->normalToEdge(pos);
-                    drawObject(pos, dir, obj->disp()->size, gle::disc);
+                    drawObject(pos, dir, rad, gle::disc);
                     continue;
                 }
             }
 #endif
             if ( obj->base() )
-                drawObject(obj->posFoot(), obj->disp()->size, gle::octahedron);
+                drawObject(obj->posFoot(), rad, gle::octahedron);
             else
                 drawHandF(obj->posFoot(), obj->disp());
         }
@@ -890,7 +886,7 @@ void Display3::drawSingleA(Single const* obj) const
     disp->color.load_both();
 
     if ( obj->base() )
-        drawObject(ph, disp->size, gle::octahedron);
+        drawObject(ph, disp->size * sFactor, gle::octahedron);
     else
         drawHand(ph, disp);
 }
@@ -910,7 +906,7 @@ void Display3::drawSingleB(Single const* obj) const
     if ( obj->disp()->style == 2 && obj->confineSpace() )
     {
         // draw a disc tangent to the Space:
-        drawObject(pf, obj->confineSpace()->normalToEdge(pf), disp->size, gle::disc);
+        drawObject(pf, obj->confineSpace()->normalToEdge(pf), rad, gle::disc);
     }
     else
 #endif
@@ -943,7 +939,7 @@ void Display3::drawSingleB(Single const* obj) const
     glDisable(GL_CLIP_PLANE5);
 #else
     if ( obj->base() )
-        drawObject(ph, disp->size, gle::octahedron);
+        drawObject(ph, rad, gle::octahedron);
     else
         drawHand(ph, disp);
     gle::drawBand(ph, wid, disp->color, pf, wid, disp->color.alpha_scaled(0.5f));
@@ -1064,7 +1060,7 @@ void Display3::drawCoupleBside(Couple const* cx) const
         // semi-accurate rendering of Couple's side-side link
         pd1->color.load_both();
         Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
-        drawPoint(mid, pd1->width);
+        drawPoint(mid, pd1->width*sFactor);
         stretchTube(p2, mid, pd2->width*sFactor, gle::hexTube);
         stretchTube(p1, mid, pd1->width*sFactor, gle::hexTube);
         drawPoint(p1, pd1);

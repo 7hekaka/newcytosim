@@ -54,10 +54,10 @@ public:
     void drawObjects(Simul const&);
     
     /// draw Fiber MINUS_END
-    void drawFiberMinusEnd(Fiber const&, int style, real size) const;
+    void drawFiberMinusEnd(Fiber const&, int style, float size) const;
     
     /// draw Fiber PLUS_END
-    void drawFiberPlusEnd(Fiber const&, int style, real size) const;
+    void drawFiberPlusEnd(Fiber const&, int style, float size) const;
     
     /// draw Fiber linear features
     void drawFiberLines(Fiber const&, int style) const;

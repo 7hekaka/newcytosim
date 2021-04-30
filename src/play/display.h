@@ -84,11 +84,8 @@ protected:
     /// scaling factors to convert 'size' parameter into pixels used in glPointSize() and glLineWidth()
     float uFactor;
     
-    /// scaling factors to convert 'size' parameter into real dimensions used in glScale()
+    /// scaling factors to convert 'size' parameter into physical dimensions used in glScale()
     float sFactor;
-    
-    ///  minimum radius under which object are now drawn
-    float minRadius;
 
     /// flag used to calculate clusterAnalysis only once
     size_t fiber_prep;
@@ -188,10 +185,10 @@ public:
     static void drawFiberBackbone(Fiber const&);
 
     /// draw Fiber MINUS_END
-    virtual void drawFiberMinusEnd(Fiber const&, int style, real size) const;
+    virtual void drawFiberMinusEnd(Fiber const&, int style, float size) const;
     
     /// draw Fiber PLUS_END
-    virtual void drawFiberPlusEnd(Fiber const&, int style, real size) const;
+    virtual void drawFiberPlusEnd(Fiber const&, int style, float size) const;
 
     /// draw Fiber linear features
     virtual void drawFiberLines(Fiber const&, int style) const;
