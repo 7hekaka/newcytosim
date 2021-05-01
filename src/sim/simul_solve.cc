@@ -263,6 +263,9 @@ void Simul::setStericInteractionsAlt(Meca& meca) const
         }
     }
     
+    // mark edge between Fiber segments and other type of elements
+    locusGrid.mark();
+    
     // include Spheres
     for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
@@ -302,7 +305,7 @@ void Simul::setStericInteractionsAlt(Meca& meca) const
         }
     }
     
-    /// create parameters
+    /// stiffness
     real stiff = prop->steric_stiff_push[0];
 
 #if ( MAX_STERIC_PANES == 1 )

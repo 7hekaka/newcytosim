@@ -59,50 +59,6 @@ public:
 };
 
 
-
-/// represents the point of a Mecable for steric interactions
-class BigPoint
-{
-    friend class LocusGrid;
-    
-public:
-    
-    /// position of center
-    BigVector pos_;
-    
-    /// Mecable containing the point-of-interest
-    Mecable const* mec_;
-    
-    /// equilibrium radius of the interaction (distance where force is zero)
-    real     rad_;
-    
-    /// Index of Mecable's vertex
-    unsigned vix_;
-    
-public:
-    
-    BigPoint() {}
-    
-    BigPoint(Mecable const* m, size_t i, real r, Vector const& w)
-    : pos_(w, r)
-    {
-        mec_ = m;
-        rad_ = r;
-        vix_ = static_cast<unsigned>(i);
-        assert_true( i == vix_ );
-    }
-    
-    /// construct Mecapoint
-    inline Mecapoint exact() const { return Mecapoint(mec_, vix_); }
-    
-    /// position of center
-    Vector cen() const { return mec_->posPoint(vix_); }
-    //Vector cen() const { return Vector(&pos_.XX); }
-    
-    real rad() const { return rad_; }
-};
-
-
 /// represents the Segment of a Fiber for steric interactions
 class BigLocus
 {
@@ -114,7 +70,7 @@ public:
     BigVector pos_;
 
     /// Fiber to which the segment belongs to
-    Fiber const* fib_;
+    Mecable const* obj_;
     
     /// equilibrium radius of the interaction (distance where force is zero)
     real     rad_;
@@ -126,145 +82,153 @@ public:
     
     BigLocus() {}
     
-    BigLocus(Fiber const*& f, size_t i, real r, real e, Vector const& w)
+    BigLocus(Mecable const* f, size_t i, real r, real e, Vector const& w)
     : pos_(w, e)
     {
-        fib_ = f;
+        obj_ = f;
         rad_ = r;
         vix_ = static_cast<unsigned>(i);
         assert_true( i == vix_ );
     }
+    
+    /// position of center
+    Vector cen() const { return obj_->posPoint(vix_); }
+    //Vector cen() const { return Vector(&pos_.XX); }
 
     /// position of point 1
-    Vector pos1() const { return fib_->posPoint(vix_); }
+    Vector pos1() const { return obj_->posPoint(vix_); }
     
     /// position of point 2
-    Vector pos2() const { return fib_->posPoint(vix_+1); }
+    Vector pos2() const { return obj_->posPoint(vix_+1); }
     
     /// offset = point2 - point1
-    Vector diff() const { return fib_->diffPoints(vix_); }
+    Vector diff() const { return obj_->diffPoints(vix_); }
     
     /// offset = point1 - point0
-    Vector prevDiff() const { return fib_->diffPoints(vix_-1); }
+    Vector prevDiff() const { return obj_->diffPoints(vix_-1); }
     
     /// length of segment
-    real len() const { return fib_->segmentation(); }
+    real len() const { return static_cast<Fiber const*>(obj_)->segmentation(); }
 
     /// true if the segment is the first of the Fiber
     bool isFirst() const { return ( vix_ == 0 ); }
     
     /// true if the segment is the last of the Fiber
-    bool isLast() const { return ( vix_+2 == fib_->nbPoints() ); }
+    bool isLast() const { return ( vix_+2 == obj_->nbPoints() ); }
 
     /// Mecapoint to point 1
-    Mecapoint vertex1() const { return Mecapoint(fib_, vix_); }
+    Mecapoint vertex1() const { return Mecapoint(obj_, vix_); }
     
     /// Mecapoint to point 2
-    Mecapoint vertex2() const { return Mecapoint(fib_, vix_+1); }
+    Mecapoint vertex2() const { return Mecapoint(obj_, vix_+1); }
     
     /// FiberSegment
-    FiberSegment segment() const { return FiberSegment(fib_, vix_); }
+    FiberSegment segment() const { return FiberSegment(static_cast<Fiber const*>(obj_), vix_); }
 
 };
 
+/// we used this alias for clarity and backward compatibility
+typedef BigLocus BigPoint;
+
 //------------------------------------------------------------------------------
 
-/// type for a list of FatPoint
-typedef Array<BigPoint> BigPointList;
+/// a list containing BigLocus and BigPoint
+/**
+ The Fiber segments are contained in the first part of the list, index in [0, border[
+ The other elements are in the second part, index in [border, end[
+ */
+class BigLocusList
+{
+    friend class LocusGrid;
 
-/// type for a list of FatLocus
-typedef Array<BigLocus> BigLocusList;
+    /// the list containing objects
+    Array<BigLocus> pane;
+    
+    /// index of first non Fiber element in list
+    size_t border;
+    
+public:
+    
+    /// constructor
+    BigLocusList()
+    {
+        border = 0;
+    }
+    
+    /// clear all panes
+    void clear()
+    {
+        pane.clear();
+        border = 0;
+    }
+    
+    /// mark the edge where non-Fiber elements start
+    void mark() { border = pane.size(); }
 
+    /// first element in list
+    BigLocus * begin() { return pane.begin() ; }
+    
+    /// first BigPoint in list
+    BigLocus * middle() { return pane.data() + border; }
+    
+    /// one past last element in list
+    BigLocus * end() { return pane.end(); }
+
+    /// allocated size
+    size_t capacity() const { return pane.capacity(); }
+
+};
+
+
+#if ( MAX_STERIC_PANES > 1 )
 
 /// a set of lists associated with one cell of the grid
 class LocusGridCell
 {
     friend class LocusGrid;
     
-#if ( MAX_STERIC_PANES == 1 )
-    
-    /// unique steric pane
-    BigPointList point_pane;
-    
-    /// unique steric pane
-    BigLocusList locus_pane;
-    
-#else
-    
     /// different steric panes
-    BigPointList point_panes_0[MAX_STERIC_PANES];
+    BigLocusList panes_0[MAX_STERIC_PANES];
     
-    /// different steric panes
-    BigLocusList locus_panes_0[MAX_STERIC_PANES];
-    
-    /// alias to the array of panes, with index 1 refering to point_panes_0[0]
-    BigPointList * point_panes;
-    
-    /// alias to the array of panes, with index 1 refering to locus_panes_0[0]
-    BigLocusList * locus_panes;
-    
-#endif
+    /// alias to the array of panes, to use indices starting from 1
+    BigLocusList * panes;
     
 public:
     
-#if ( MAX_STERIC_PANES == 1 )
-    
-    LocusGridCell()
+    LocusGridCell() : panes(panes_0)
     {
-    }
-    
-    /// clear all panes
-    void clear()
-    {
-        point_pane.clear();
-        locus_pane.clear();
-    }
-    
-    size_t capacity() const
-    {
-        return point_pane.capacity() + locus_pane.capacity();
-    }
-    
-#else
-    
-    LocusGridCell() : point_panes(point_panes_0), locus_panes(locus_panes_0)
-    {
-        --point_panes;
-        --locus_panes;
+        --panes;
     }
     
     /// clear all panes
     void clear()
     {
         for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-        {
-            point_panes[p].clear();
-            locus_panes[p].clear();
-        }
+            panes[p].clear();
     }
     
-    BigPointList& point_list(size_t p)
+    BigLocusList& cell_list(size_t p)
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return point_panes[p];
+        return panes[p];
     }
     
-    BigLocusList& locus_list(size_t p)
+    void mark() const
     {
-        assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return locus_panes[p];
+        for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
+            panes[p].mark();
     }
-    
+
     size_t capacity() const
     {
         size_t res = 0;
         for ( int i = 0; i < MAX_STERIC_PANES; ++i )
-            res += point_panes[i].capacity() + locus_panes[i].capacity();
+            res += panes[i].capacity();
         return res;
     }
+};
 
 #endif
-};
 
 //------------------------------------------------------------------------------
 
@@ -274,7 +238,7 @@ public:
  certain cutoff distance from each other. In brief:
  - It covers the space with a Grid `pGrid`, initialized by `setGrid()`
  - A list of class `LocusGridCell` is associated with each cell of `pGrid`.
- - `LocusGrid::add()` links `BigPoint` or `BigLocus` to the appropriate cell of the grid.
+ - `LocusGrid::add()` links `BigLocus` or `BigLocus` to the appropriate cell of the grid.
  - `LocusGrid::setInteractions()` checks all pairs of particles that may overlap,
     calculating their actual distance, and calling Meca::addLink() as necessary
  .
@@ -287,14 +251,13 @@ class LocusGrid
 {
 private:
     
+#if ( MAX_STERIC_PANES == 1 )
+    /// grid for divide-and-conquer strategies:
+    Grid<BigLocusList, DIM> pGrid;
+#else
     /// grid for divide-and-conquer strategies:
     Grid<LocusGridCell, DIM> pGrid;
-    
-    /// member function pointer
-    using StericFuncPtr1 = void (LocusGrid::*)(Meca&, real, BigPointList&, BigLocusList&);
-    
-    /// member function pointer
-    using StericFuncPtr2 = void (LocusGrid::*)(Meca&, real, BigPointList&, BigLocusList&, BigPointList&, BigLocusList&);
+#endif
 
 private:
     
@@ -313,48 +276,31 @@ private:
     /// check two Line segments
     static void checkLL(Meca&, real stiff, BigLocus const&, BigLocus const&);
     
-    /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff,
-                            BigPointList &, BigLocusList &);
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff,
-                            BigPointList &, BigLocusList &,
-                            BigPointList &, BigLocusList &);
+    static void setSterics0(Meca&, real stiff, BigLocusList&);
+    
+    /// check all pairs between the two lists
+    static void setSterics0(Meca&, real stiff, BigLocusList&, BigLocusList&);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff,
-                            BigPointList &, BigLocusList &);
+    static void setStericsT(Meca&, real stiff, BigLocusList&);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff,
-                            BigPointList &, BigLocusList &,
-                            BigPointList &, BigLocusList &);
-    
+    static void setStericsT(Meca&, real stiff, BigLocusList&, BigLocusList&);
+
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
-    BigPointList& point_list(Vector const& w) const
+    BigLocusList& cell_list(Vector const& w) const
     {
-        return pGrid.cell(w).point_pane;
-    }
-    
-    /// cell corresponding to position `w`, and pane `p`
-    BigLocusList& locus_list(Vector const& w) const
-    {
-        return pGrid.cell(w).locus_pane;
+        return pGrid.cell(w);
     }
     
     /// cell corresponding to index `w`, and pane `p`
-    BigPointList& point_list(const size_t w) const
+    BigLocusList& cell_list(const size_t w) const
     {
-        return pGrid.icell(w).point_pane;
-    }
-    
-    /// cell corresponding to index `w`, and pane `p`
-    BigLocusList& locus_list(const size_t w) const
-    {
-        return pGrid.icell(w).locus_pane;
+        return pGrid.icell(w);
     }
     
     /// enter interactions into Meca with given stiffness
@@ -366,31 +312,17 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    BigPointList& point_list(Vector const& w, const size_t p) const
+    BigLocusList& cell_list(Vector const& w, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return pGrid.cell(w).point_panes[p];
-    }
-    
-    /// cell corresponding to position `w`, and pane `p`
-    BigLocusList& locus_list(Vector const& w, const size_t p) const
-    {
-        assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return pGrid.cell(w).locus_panes[p];
+        return pGrid.cell(w).panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    BigPointList& point_list(const size_t c, const size_t p) const
+    BigLocusList& cell_list(const size_t c, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return pGrid.icell(c).point_panes[p];
-    }
-    
-    /// cell corresponding to index `c`, and pane `p`
-    BigLocusList& locus_list(const size_t c, const size_t p) const
-    {
-        assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return pGrid.icell(c).locus_panes[p];
+        return pGrid.icell(c).panes[p];
     }
     
     /// enter interactions into Meca in one panes with given parameters
@@ -421,6 +353,8 @@ public:
     /// true if the grid was initialized by calling setGrid()
     size_t hasGrid() const { return pGrid.hasCells(); }
     
+    void mark() const;
+
     /// sum of allocated size of lists for all cells
     size_t capacity() const;
 
@@ -433,27 +367,38 @@ public:
     void add(Mecable const* m, size_t i, real rad)
     {
         Vector w = m->posPoint(i);
-        point_list(w).emplace(m, i, rad, w);
+        cell_list(w).pane.emplace(m, i, rad, rad, w);
     }
     
-    /// place Fiber segment on the grid
+    // link in the cell containing the middle of the segment:
     void add(Fiber const* f, size_t i, real rad, real rge)
     {
-        // link in cell containing the middle of the segment
         Vector w = f->posPoint(i, 0.5);
-        locus_list(w).emplace(f, i, rad, rge, w);
+        cell_list(w).pane.emplace(f, i, rad, rge, w);
     }
     
     /// enter interactions into Meca with given stiffness
     void setInteractions(Meca&, real stiff) const;
     
 #else
-    
+
     /// place Mecable vertex on the grid
-    void add(size_t pane, Mecable const*, size_t, real rad);
+    void add(size_t pan, Mecable const* mec, size_t inx, real rad)
+    {
+        if ( pan == 0 || pan > MAX_STERIC_PANES )
+            throw InvalidParameter("point:steric is out-of-range");
+        Vector w = mec->posPoint(inx);
+        cell_list(w, pan).pane.emplace(mec, inx, rad, rad, w);
+    }
     
-    /// place Fiber segment on the grid
-    void add(size_t pane, Fiber const*, size_t, real rad, real rge);
+    // link in the cell containing the middle of the segment:
+    void add(size_t pan, Fiber const* fib, size_t inx, real rad, real sup)
+    {
+        if ( pan == 0 || pan > MAX_STERIC_PANES )
+            throw InvalidParameter("line:steric is out-of-range");
+        Vector w = fib->posPoint(inx, 0.5);
+        cell_list(w, pan).pane.emplace(fib, inx, rad, sup, w);
+    }
     
     /// enter interactions into Meca in one panes with given parameters
     void setInteractions(Meca&, real stiff, size_t pan) const;
@@ -462,7 +407,7 @@ public:
     void setInteractions(Meca&, real stiff, size_t pan1, size_t pan2) const;
     
 #endif
-    
+
     /// underlying spatial grid
     Map<DIM> const& map() const { return pGrid; }
     

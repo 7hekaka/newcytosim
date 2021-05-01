@@ -39,12 +39,11 @@ int main(int argc, char* argv[])
         PRINT(FatLocus);
         PRINT(PointGridCell);
         
-        PRINT(LocusGrid);
         PRINT(BigVector);
-        PRINT(BigPoint);
         PRINT(BigLocus);
-        PRINT(LocusGridCell);
-        
+        PRINT(BigLocusList);
+        PRINT(LocusGrid);
+
         PRINT(Rasterizer::Vertex2);
         PRINT(Rasterizer::Vertex2d);
         PRINT(Rasterizer::Vertex3);

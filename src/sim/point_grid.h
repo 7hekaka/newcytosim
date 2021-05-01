@@ -105,9 +105,6 @@ public:
     
     /// position of center
     Vector cen() const { return pnt_.pos(); }
-    
-    /// construct Mecapoint
-    Mecapoint exact() const { return pnt_; }
 };
 
 //------------------------------------------------------------------------------
@@ -279,7 +276,7 @@ public:
  certain cutoff distance from each other. In brief:
  - It covers the space with a Grid `pGrid`, initialized by `setGrid()`
  - A list of class `PointGridCell` is associated with each cell of `pGrid`.
- - `PointGrid::add()` links `BigPoint` or `BigLocus` to the appropriate cell of the grid.
+ - `PointGrid::add()` links `BigLocus` or `BigLocus` to the appropriate cell of the grid.
  - `PointGrid::setInteractions()` checks all pairs of particles that may overlap,
     calculating their actual distance, and calling Meca::addLink() as necessary
  .
