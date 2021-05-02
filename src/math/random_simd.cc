@@ -64,17 +64,18 @@ static inline void fold_corners(vec8f& x, vec8f& y)
 {
     // fold the corners of the square, which is ~17% of the surface...
     // test if point is close to corner, separated by line |x|+|y| > sqrt(2)
-    vec8f mut = cmp8f(add8f(abs8f(x), abs8f(y)), set8f(M_SQRT2), _CMP_NLT_UQ);
-    // coordinates of nearest corner: copysign(S, x)
-    constexpr float S = M_SQRT1_2 + 1.0f;
-    vec8f cx = blendv8f(set8f(S), set8f(-S), x);
-    vec8f cy = blendv8f(set8f(S), set8f(-S), y);
-    // subtract corner and scale to recover a square of size sqrt(1/2)
-    cx = sub8f(mul8f(set8f(S), x), cx);
-    cy = sub8f(mul8f(set8f(S), y), cy);
-    // apply rotation, scaling by sqrt(2): x' = y + x;  y' = y - x
-    x = blendv8f(x, add8f(cy, cx), mut);
-    y = blendv8f(y, sub8f(cy, cx), mut);
+    vec8f mut = cmp8f(add8f(abs8f(x), abs8f(y)), set8f(M_SQRT2), _CMP_GE_OQ);
+    // coordinates of nearest corner, scaled: copysign(S, x)
+    constexpr float S = M_SQRT2 + 1.0f;
+    const vec8f ss = set8f(S), mm = set8f(-S);
+    vec8f cx = blendv8f(ss, mm, x);
+    vec8f cy = blendv8f(ss, mm, y);
+    // subtract corner to recover a square of side 1, covering the circle
+    cx = sub8f(mul8f(ss, x), cx);
+    cy = sub8f(mul8f(ss, y), cy);
+    // apply mutation, if selected:
+    x = blendv8f(x, cx, mut);
+    y = blendv8f(y, cy, mut);
 }
 
 

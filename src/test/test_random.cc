@@ -369,9 +369,9 @@ void print_gaussian(size_t cnt, T const* vec)
     {
         for ( int k = 0; k < 4; ++k )
         {
-            for ( int j = 0; j < 8 && i < cnt; ++j, ++i )
-                printf(" %8.4f", vec[i]);
             printf(" :");
+            for ( int j = 0; j < 8 && i < cnt; ++j )
+                printf(" %8.4f", vec[i++]);
         }
         printf("\n");
     }
@@ -404,7 +404,7 @@ void check_gaussian(size_t cnt, REAL* vec)
     }
     cnt -= nan;
     cov /= ( cnt / 2 );
-    printf("%6lu numbers + %6lu NaNs: avg %7.4f var %7.4f cov %7.4f\n", cnt, nan, avg, var, cov);
+    printf("%6lu + %6lu NaNs: avg %7.4f var %7.4f cov %7.4f ", cnt, nan, avg, var, cov);
 }
 
 
@@ -605,7 +605,7 @@ void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
     float* end = FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
     printf("%-12s %5.2f :", str, toc(cnt));
     check_gaussian(end-flt, flt);
-    print_gaussian(std::min(end-flt, 64l), flt);
+    print_gaussian(std::min(end-flt, 16l), flt);
 }
 
 
@@ -624,7 +624,7 @@ void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
     }
     printf("%-12s %5.2f :", str, toc(cnt));
     check_gaussian(end-vec, vec);
-    print_gaussian(std::min(end-vec, 64l), vec);
+    print_gaussian(std::min(end-vec, 16l), vec);
 }
 #endif
 

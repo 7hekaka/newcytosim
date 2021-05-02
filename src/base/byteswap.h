@@ -11,6 +11,7 @@ void byteswap(T) = delete;
 /// reverse byte order
 inline static uint16_t byteswap(uint16_t i)
 {
+    //return __builtin_bswap16(i);
     return ( i & 0xff ) << 8 | ( i & 0xff00 ) >> 8;
 }
 
@@ -23,9 +24,10 @@ inline static int16_t byteswap(int16_t i)
 /// reverse byte order
 inline static uint32_t byteswap(uint32_t i)
 {
+    //return __builtin_bswap32(i);
     return (i & 0xff) << 24 |
-    (i & 0xff00) << 8 |
-    (i & 0xff0000) >> 8 |
+    (i & 0x0000ff00) << 8 |
+    (i & 0x00ff0000) >> 8 |
     (i & 0xff000000) >> 24;
 }
 
@@ -38,13 +40,14 @@ inline static int32_t byteswap(int32_t i)
 /// reverse byte order
 inline static uint64_t byteswap(uint64_t i)
 {
-    return (i & 0xff) << 56
-    | (i & 0xff00) << 40 |
-    (i & 0xff0000) << 24 |
-    (i & 0xff000000) << 8 |
-    (i & 0xff00000000) >> 8 |
-    (i & 0xff0000000000) >> 24 |
-    (i & 0xff000000000000) >> 40 |
+    //return __builtin_bswap64(i);
+    return (i & 0xff) << 56 |
+    (i & 0x000000000000ff00) << 40 |
+    (i & 0x0000000000ff0000) << 24 |
+    (i & 0x00000000ff000000) <<  8 |
+    (i & 0x000000ff00000000) >>  8 |
+    (i & 0x0000ff0000000000) >> 24 |
+    (i & 0x00ff000000000000) >> 40 |
     (i & 0xff00000000000000) >> 56;
 }
 
