@@ -18,19 +18,32 @@
 
 typedef double real;
 
-const size_t SIZE = 1<<14;
-real vX[SIZE], vY[SIZE];
+const size_t SIZ = 1<<14;
+real vX[SIZ], vY[SIZ];
 
 void init()
 {
-    for ( size_t ii=0; ii<SIZE; ++ii )
+    for ( size_t ii=0; ii<SIZ; ++ii )
     {
-        vX[ii] = 1/real(SIZE-ii);
-        vY[ii] = real(SIZE-ii);
+        vX[ii] = 1/real(SIZ-ii);
+        vY[ii] = real(SIZ-ii);
     }
 }
 
-void dump(size_t len, const real* vec)
+void dump(size_t len, const float* vec)
+{
+    printf(": ");
+    for ( size_t n = 0; n < len; ++n )
+    {
+        if ( n % 4 == 3 )
+            printf("%+5.2f  ", vec[n]);
+        else
+            printf("%+5.2f ", vec[n]);
+    }
+    printf("\n");
+}
+
+void dump(size_t len, const double* vec)
 {
     printf(": ");
     for ( size_t n = 0; n < len; ++n )
@@ -46,7 +59,7 @@ void dump(size_t len, const real* vec)
 real scalar()
 {
     real d = 0;
-    for ( size_t ii=0; ii<SIZE; ++ii )
+    for ( size_t ii=0; ii<SIZ; ++ii )
         d += vX[ii] * vY[ii];
     return d;
 }
@@ -54,7 +67,7 @@ real scalar()
 real vector2()
 {
     vec2 s = setzero2();
-    for ( size_t ii=0; ii<SIZE; ii+=2 )
+    for ( size_t ii=0; ii<SIZ; ii+=2 )
         s = add2(s, mul2( load2(vX+ii), load2(vY+ii) ));
     _mm_empty();
     
@@ -66,7 +79,7 @@ real vector2()
 real vector4()
 {
     vec4 s = setzero4();
-    for ( size_t ii=0; ii<SIZE; ii+=4 )
+    for ( size_t ii=0; ii<SIZ; ii+=4 )
         s = add4(s, mul4( load4(vX+ii), load4(vY+ii) ));
     _mm_empty();
     
@@ -81,7 +94,7 @@ real vectorU()
     vec4 v2 = setzero4();
     vec4 v3 = setzero4();
     
-    for ( size_t ii=0; ii<SIZE; ii+=16 )
+    for ( size_t ii=0; ii<SIZ; ii+=16 )
     {
         v0 = add4(v0, mul4( load4(vX+ii   ), load4(vY+ii   ) ));
         v1 = add4(v1, mul4( load4(vX+ii+4 ), load4(vY+ii+4 ) ));
@@ -97,14 +110,14 @@ real vectorU()
 
 #endif
 
-void run(real (*func)(), const char name[])
+void run(real (*func)(), const char name[], const size_t REP)
 {
-    const int rep = 1<<14;
     real a = 0, b = 0, c = 0, d = 0;
     real e = 0, f = 0, g = 0, h = 0;
-    fprintf(stderr, "%s:  ", name);
+    fprintf(stderr, "%10s:  ", name);
     TicToc::tic();
-    for ( int ii=0; ii<rep; ++ii )
+    
+    for ( size_t i=0; i<REP; ++i )
     {
         a = (*func)();
         b = (*func)();
@@ -117,7 +130,7 @@ void run(real (*func)(), const char name[])
     }
     
     real s = ((a + b) + (c + d)) + ((e + f) + (g + h));
-    fprintf(stderr, " %f :  %.0f ms\n", s, TicToc::toc());
+    fprintf(stderr, " %16f :  %8.0f ms\n", s, TicToc::toc());
 }
 
 
@@ -172,7 +185,7 @@ void test_shuffle()
  make dst = { XYZ XYZ XYZ XYZ }
  from src = { XYZ? }
  */
-inline void twinedup12(real const* src, real* dst)
+inline void twinedup12(double const* src, double* dst)
 {
     vec4 s = load3(src);
     vec4 p = permute2f128(s, s, 0x01);
@@ -192,7 +205,7 @@ inline void twinedup12(real const* src, real* dst)
  from
      src = { XYZT }
  */
-inline void repeat12(real const* src, real* dst)
+inline void repeat12(double const* src, double* dst)
 {
     vec4 s = load4(src);
     dump(s, "s");
@@ -215,7 +228,7 @@ inline void repeat12(real const* src, real* dst)
      dY = { YYYY }
      dZ = { ZZZZ }
  */
-inline void twine12(real const* X, real const* Y, real const* Z, real* dst)
+inline void twine12(double const* X, double const* Y, double const* Z, double* dst)
 {
     vec4 sx = load4(X);
     vec4 sy = load4(Y);
@@ -241,7 +254,7 @@ inline void twine12(real const* X, real const* Y, real const* Z, real* dst)
      dZ = { ZZZZ }
  from src = { XYZ XYZ XYZ XYZ }
  */
-inline void untwine12(real const* src, real* X, real* Y, real* Z)
+inline void untwine12(double const* src, double* X, double* Y, double* Z)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -267,7 +280,7 @@ inline void untwine12(real const* src, real* X, real* Y, real* Z)
  from
      src = { XYZ XYZ XYZ XYZ }
  */
-inline void sumXXX(real const* src, real* dst)
+inline void sumXXX(double const* src, double* dst)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -289,7 +302,7 @@ inline void sumXXX(real const* src, real* dst)
  from
      src = { XYZ XYZ XYZ XYZ }
  */
-inline void sumXYZ(real const* src, real* dst)
+inline void sumXYZ(double const* src, double* dst)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -312,9 +325,9 @@ inline void sumXYZ(real const* src, real* dst)
 void test_twine()
 {
     printf("------ test_twine\n");
-    real dst[12] = { 0 };
-    const real src[12] = { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3 };
-    real X[4] = { 1 }, Y[4] = { 2 }, Z[4] = { 3 };
+    double dst[12] = { 0 };
+    const double src[12] = { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3 };
+    double X[4] = { 1 }, Y[4] = { 2 }, Z[4] = { 3 };
     untwine12(src, X, Y, Z);
     dump(4, X);
     dump(4, Y);
@@ -337,7 +350,7 @@ void test_twine()
  make dst = { XYZ? XYZ? XYZ? XYZ? }
  from src = { XYZ XYZ XYZ XYZ }
  */
-inline void destride3x4(real const* src, real* dst)
+inline void destride3x4(double const* src, double* dst)
 {
     vec4 s0 = load4(src);
     vec4 s1 = load4(src+4);
@@ -362,8 +375,8 @@ void test_stride()
 {
     printf("------ test_stride\n");
     const size_t CNT = 1024;
-    real a[CNT*12];
-    real b[CNT*16];
+    double a[CNT*12];
+    double b[CNT*16];
     
     for ( size_t n = 0; n < 12*CNT; ++n )
         a[n] = 1 + n % 12;
@@ -388,7 +401,7 @@ void test_stride()
  */
 void unpack_matrix()
 {
-    real src[] = { 1, 2, 3, 4, 5, 6 };
+    double src[] = { 1, 2, 3, 4, 5, 6 };
     
     vec2 zz = setzero2();
     vec2 ab = load2(src);
@@ -839,8 +852,77 @@ void test_transpose4()
     dump(t1, "t1");
     dump(t2, "t2");
     dump(t3, "t3");
-
 }
+
+
+/* return transposed matrix
+make dst = { XXXX YYYY ZZZZ TTTT }
+from src = { XYZT XYZT XYZT XYZT }
+*/
+void transpose16(double const* src, double* dst)
+{
+    vec4 u0 = load4(src);
+    vec4 u1 = load4(src+4);
+    vec4 v2 = load4(src+8);
+    vec4 v3 = load4(src+12);
+    vec4 v0 = unpacklo4(u0, u1);
+    vec4 v1 = unpackhi4(u0, u1);
+    u0 = unpacklo4(v2, v3);
+    u1 = unpackhi4(v2, v3);
+    v2 = twine2f128(v0, u0);
+    v3 = twine2f128(v1, u1);
+    store4(dst   , blend22(v0, v2));
+    store4(dst+4 , blend22(v1, v3));
+    store4(dst+8 , blend22(v2, u0));
+    store4(dst+12, blend22(v3, u1));
+}
+
+/* return transposed matrix
+make dst = { XXXX YYYY ZZZZ TTTT }
+from src = { XYZT XYZT XYZT XYZT }
+*/
+void transpose16(float const* src, float* dst)
+{
+    vec4f u0 = loadu4f(src);
+    vec4f u1 = loadu4f(src+4);
+    vec4f v2 = loadu4f(src+8);
+    vec4f v3 = loadu4f(src+12);
+    vec4f v0 = unpacklo4f(u0, u1);
+    vec4f v1 = unpackhi4f(u0, u1);
+    u0 = unpacklo4f(v2, v3);
+    u1 = unpackhi4f(v2, v3);
+    v2 = twine2f64(v0, u0);
+    v3 = twine2f64(v1, u1);
+    store4f(dst   , blend22f(v0, v2));
+    store4f(dst+4 , blend22f(v2, u0));
+    store4f(dst+8 , blend22f(v1, v3));
+    store4f(dst+12, blend22f(v3, u1));
+}
+
+void test_transpose16()
+{
+    vec4f x { 0, 1, 2, 3 };
+    vec4f y { 4, 5, 6, 7 };
+    dump(twine2f64(x,y) , "twine");
+    printf("------ test_transpose16\n");
+    {
+        float dst[12] = { 0 };
+        //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
+        const float src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
+        transpose16(src, dst);
+        printf("source    "); dump(16, src);
+        printf("transpose "); dump(16, dst);
+    }
+    {
+        double dst[12] = { 0 };
+        //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
+        const double src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
+        transpose16(src, dst);
+        printf("source    "); dump(16, src);
+        printf("transpose "); dump(16, dst);
+    }
+}
+
 
 void test_swap7()
 {
@@ -878,46 +960,49 @@ void test_swap7()
 
 int main(int argc, char * argv[])
 {
+    int i = 0;
+    if ( argc > 1 )
+        i = std::max(0, atoi(argv[1]));
+
     //test_swapSSE();
     test_shuffle();
+    switch ( i )
+    {
+        case 0:
+            init();
+            run(scalar,  "scalar ", 1<<16);
+            run(vector2, "vector2", 1<<16);
 #ifdef __AVX__
-    if ( 1 )
-    {
-        unpack_matrix();
-        test_twine();
-        test_stride();
-    }
-    if ( 0 )
-    {
-        test_cat();
-        test_load();
-        test_broadcast();
-        test_store();
-    }
-    if ( 0 )
-    {
-        //test_swap1();
-        //test_swap2();
-        test_swap4();
-        test_hadd();
-        test_hsum();
-    }
-    if ( 0 )
-    {
-        test_transpose2();
-        test_transpose3();
-        test_transpose4();
-        test_swap7();
-    }
+            run(vector4, "vector4", 1<<16);
+            run(vectorU, "vectorU", 1<<16);
 #endif
-    if ( 0 )
-    {
-        init();
-        run(scalar,  "scalar ");
-        run(vector2, "vector2");
+            break;
 #ifdef __AVX__
-        run(vector4, "vector4");
-        run(vectorU, "vectorU");
+        case 1:
+            unpack_matrix();
+            test_twine();
+            test_stride();
+            break;
+        case 2:
+            test_cat();
+            test_load();
+            test_broadcast();
+            test_store();
+            break;
+        case 3:
+            //test_swap1();
+            //test_swap2();
+            test_swap4();
+            test_hadd();
+            test_hsum();
+            break;
+        case 4:
+            test_transpose2();
+            test_transpose3();
+            test_transpose4();
+            test_transpose16();
+            test_swap7();
+            break;
 #endif
     }
 }

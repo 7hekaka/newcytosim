@@ -64,10 +64,10 @@ namespace TicToc
     /// call to start timer
     void    tic();
     
-    /// return number of seconds elapsed since last call to `tic()`
+    /// return number of milliseconds elapsed since last call to `tic()`
     double  toc();
     
-    /// return number of seconds elapsed since last call to `tic()`
+    /// return number of milliseconds elapsed since last call to `tic()`, divided by `arg`
     double  toc(double);
 
 }

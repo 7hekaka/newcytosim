@@ -320,14 +320,14 @@ public:
         vec4 v3 = load4(val+12);
         vec4 u0 = unpacklo4(v0, v1);
         vec4 u1 = unpackhi4(v0, v1);
-        vec4 u2 = unpacklo4(v2, v3);
-        vec4 u3 = unpackhi4(v2, v3);
-        v0 = twine2f128(u0, u2);
-        v1 = twine2f128(u1, u3);
-        store4(res.val   , blend22(u0, v0));
-        store4(res.val+4 , blend22(u1, v1));
-        store4(res.val+8 , blend22(v0, u2));
-        store4(res.val+12, blend22(v1, u3));
+        v0 = unpacklo4(v2, v3);
+        v1 = unpackhi4(v2, v3);
+        v2 = twine2f128(u0, v0);
+        v3 = twine2f128(u1, v1);
+        store4(res.val   , blend22(u0, v2));
+        store4(res.val+4 , blend22(u1, v3));
+        store4(res.val+8 , blend22(v2, v0));
+        store4(res.val+12, blend22(v3, v1));
 #else
         for ( index x = 0; x < 4; ++x )
         for ( index y = 0; y < 4; ++y )
@@ -348,14 +348,14 @@ public:
         vec4 v3 = mul4(a, load4(val+12));
         vec4 u0 = unpacklo4(v0, v1);
         vec4 u1 = unpackhi4(v0, v1);
-        vec4 u2 = unpacklo4(v2, v3);
-        vec4 u3 = unpackhi4(v2, v3);
-        v0 = twine2f128(u0, u2);
-        v1 = twine2f128(u1, u3);
-        store4(res.val   , blend22(u0, v0));
-        store4(res.val+4 , blend22(u1, v1));
-        store4(res.val+8 , blend22(v0, u2));
-        store4(res.val+12, blend22(v1, u3));
+        v0 = unpacklo4(v2, v3);
+        v1 = unpackhi4(v2, v3);
+        v2 = twine2f128(u0, v0);
+        v3 = twine2f128(u1, v1);
+        store4(res.val   , blend22(u0, v2));
+        store4(res.val+4 , blend22(u1, v3));
+        store4(res.val+8 , blend22(v2, v0));
+        store4(res.val+12, blend22(v3, v1));
 #else
         for ( index x = 0; x < 4; ++x )
         for ( index y = 0; y < 4; ++y )

@@ -45,6 +45,15 @@ inline static vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b);
 inline static vec4f duplo4f(vec4f a)              { return _mm_unpacklo_ps(a,a); }
 inline static vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a); }
 
+// return { A1, B0 } from a = { A0, A1 } and b = { B0, B1 }
+inline static vec4f twine2f64(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
+
+inline static vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
+inline static vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }
+inline static vec4f cmple4f(vec4f a, vec4f b) { return _mm_cmple_ps(a, b); }
+inline static vec4f cmpge4f(vec4f a, vec4f b) { return _mm_cmpge_ps(a, b); }
+
+
 /// convert integer to float:
 inline static vec4f cvt4if(__m128i a) { return _mm_cvtepi32_ps(a); }
 inline static vec4f cast4f(__m128i a) { return _mm_castsi128_ps(a); }
@@ -53,7 +62,6 @@ inline static vec4f cast4f(__m128i a) { return _mm_castsi128_ps(a); }
 inline static vec4f rsqrt4f(vec4f a)  { return _mm_rsqrt_ps(a); }
 
 #define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
-#define cmp4f(a,b,c)     _mm_cmp_ps(a,b,c)
 
 #endif  // __SSE3__
 
@@ -89,6 +97,8 @@ inline static vec4f load3f(float const* a) { vec4f b; b[0]=a[0]; b[1]=a[2]; b[1]
 
 
 #if defined(__AVX__)
+// comparison
+#define cmp4f(a,b,c)     _mm_cmp_ps(a,b,c)
 // copy a[0] into all elements of destination
 inline static vec4f broadcastlof(vec4f a)         { return _mm_permute_ps(a,0x00); }
 inline static vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
