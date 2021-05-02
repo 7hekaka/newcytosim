@@ -53,6 +53,7 @@ inline static vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }
 inline static vec4f cmple4f(vec4f a, vec4f b) { return _mm_cmple_ps(a, b); }
 inline static vec4f cmpge4f(vec4f a, vec4f b) { return _mm_cmpge_ps(a, b); }
 
+inline static int any_true4f(vec4f a) { return !_mm_test_all_zeros((__m128i)a, (__m128i{-1l, -1l})); }
 
 /// convert integer to float:
 inline static vec4f cvt4if(__m128i a) { return _mm_cvtepi32_ps(a); }

@@ -3083,7 +3083,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
 #if ( DIM == 2 )
 
 /**
- It is assumed that: norm(arm) = len / ptA.segmentation()
+ It is assumed that: norm(leg) = len / ptA.segmentation()
 */
 void Meca::addSideSlidingLink2D(Interpolation const& ptA,
                                 const real leg,
@@ -3285,7 +3285,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
 
 
 /**
- It is assumed that: norm(arm) = len / ptA.segmentation()
+ It is assumed that: norm(leg) = len / ptA.segmentation()
  */
 void Meca::addSideSlidingLink3D(Interpolation const& ptA,
                                 Torque const& leg,
@@ -3431,7 +3431,7 @@ void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
      force_S = weight * ( 1 - T T' ) ( S - B )
      force_B = weight * ( 1 - T T' ) ( B - S )
 
- It is assumed that: norm(arm) = len / ptA.segmentation()
+ It is assumed that: norm(leg) = len / ptA.segmentation()
  */
 void Meca::addSideSlidingLink2D(Interpolation const& ptA,
                                 const real leg,
@@ -3667,8 +3667,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
      force_S = weight * ( 1 - T T' ) ( S - B )
      force_B = weight * ( 1 - T T' ) ( B - S )
 
- It is assumed that: norm(arm) = len / ptA.segmentation()
-
+ It is assumed that: norm(leg) = len / ptA.segmentation()
 */
 void Meca::addSideSlidingLink3D(Interpolation const& ptA,
                                 Torque const& leg,

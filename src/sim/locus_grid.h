@@ -38,6 +38,8 @@ public:
     BigVector(Vector2 v, real r) { XX = v.XX; YY = v.YY; ZZ = 0; RR = r; }
     BigVector(Vector3 v, real r) { XX = v.XX; YY = v.YY; ZZ = v.ZZ; RR = r; }
 
+    float const* data() const { return &XX; }
+    
     /// @return result of test `distance(this, arg) < sum_of_ranges`
     bool near(BigVector const& arg) const
     {
@@ -164,15 +166,21 @@ public:
     
     /// mark the edge where non-Fiber elements start
     void mark() { border = pane.size(); }
+    
+    /// number of elements in list
+    size_t size() const { return pane.size(); }
 
     /// first element in list
-    BigLocus * begin() { return pane.begin() ; }
+    BigLocus const* begin() const { return pane.begin(); }
     
     /// first BigPoint in list
-    BigLocus * middle() { return pane.data() + border; }
+    BigLocus const* middle() const { return pane.data() + border; }
     
     /// one past last element in list
-    BigLocus * end() { return pane.end(); }
+    BigLocus const* end() const { return pane.end(); }
+    
+    /// reference to Object at index ii (val_[ii])
+    BigLocus const& operator[](const size_t i) const { return pane.at(i); }
 
     /// allocated size
     size_t capacity() const { return pane.capacity(); }
@@ -288,7 +296,10 @@ private:
     
     /// check all pairs between the two lists, checking center-to-center distance
     static void setStericsT(Meca&, real stiff, BigLocusList&, BigLocusList&);
-
+    
+    /// check all pairs between the two lists, checking center-to-center distance
+    static void setStericsU(Meca&, real stiff, BigLocusList&, BigLocusList&);
+    
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
