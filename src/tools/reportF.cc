@@ -141,7 +141,12 @@ int main(int argc, char* argv[])
             std::cerr << "Error: missing frame " << frame << '\n';
             return EXIT_FAILURE;
         }
- 
+        if ( DIM != reader.vectorSize() )
+        {
+            std::cerr << "Error: dimensionality missmatch between `report` and file\n";
+            return EXIT_FAILURE;
+        }
+
         // process first record, at index 'frame':
         report(simul, what, arg, frame);
         

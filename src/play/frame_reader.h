@@ -88,6 +88,9 @@ public:
     /// true if everything looks correct for input
     bool good() const { return inputter.good(); }
     
+    /// dimensionality of vectors
+    unsigned vectorSize() const { return inputter.vectorSize(); }
+    
     /// clear error flag of file
     void clear();
     
