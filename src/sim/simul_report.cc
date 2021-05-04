@@ -1645,7 +1645,7 @@ void reportSimulSet(std::ostream& out, SET& set, PropertyList const& properties)
 
 void Simul::reportSimul(std::ostream& out) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "vertices" << SEP << "largest";
+    out << COM << ljust("class", 2, 2) << SEP << "objects" << SEP << "vertices" << SEP << "largest";
     reportSimulSet(out,  fibers, properties);
     reportSimulSet(out,  solids, properties);
     reportSimulSet(out, spheres, properties);

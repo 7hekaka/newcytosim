@@ -174,7 +174,13 @@ public:
     BigLocus const* begin() const { return pane.begin(); }
     
     /// first BigPoint in list
+    BigLocus const* pre_middle() const { return pane.begin() + (border & (~3UL)); }
+
+    /// first BigPoint in list
     BigLocus const* middle() const { return pane.data() + border; }
+    
+    /// one past last element in list
+    BigLocus const* pre_end() const { return pane.begin() - (pane.size() & (~3UL)); }
     
     /// one past last element in list
     BigLocus const* end() const { return pane.end(); }
@@ -286,19 +292,19 @@ private:
     
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff, BigLocusList&);
+    static void setSterics0(Meca&, real stiff, BigLocusList const&);
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff, BigLocusList&, BigLocusList&);
+    static void setSterics0(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff, BigLocusList&);
+    static void setStericsT(Meca&, real stiff, BigLocusList const&);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff, BigLocusList&, BigLocusList&);
+    static void setStericsT(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsU(Meca&, real stiff, BigLocusList&, BigLocusList&);
+    static void setStericsU(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
     
 #if ( MAX_STERIC_PANES == 1 )
     

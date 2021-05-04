@@ -269,7 +269,7 @@ void PointGrid::checkLL1(Meca& meca, Stiffness const& pam,
 
 
 /**
- This is used to check a segment of a fiber against the terminal vertex of fiber
+ This is used to check a segment of a fiber against the terminal vertex of a fiber
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
@@ -283,14 +283,17 @@ void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
     real dis2 = INFINITY;
     real abs = aa.seg_.projectPoint0(bb.pos2(), dis2);
     
-    if ((0 <= abs) & (dis2 < ran*ran) & (abs <= aa.len()))
+    if ((0 <= abs) & (abs <= aa.len()))
     {
         /*
          bb.vertex2() projects inside segment 'aa'
          */
-        const real len = aa.rad_ + bb.rad_;
-        real stiff = sign_select(dis2-len*len, pam.push, pam.pull);
-        meca.addSideSlidingLink(aa.seg_, abs, bb.vertex2(), len, stiff);
+        if ( dis2 < ran*ran )
+        {
+            const real len = aa.rad_ + bb.rad_;
+            real stiff = sign_select(dis2-len*len, pam.push, pam.pull);
+            meca.addSideSlidingLink(aa.seg_, abs, bb.vertex2(), len, stiff);
+        }
     }
     else if ( abs < 0 )
     {
@@ -325,12 +328,13 @@ void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
             }
         }
     }
-    else if ( &bb < &aa  &&  aa.isLast()  &&  abs > aa.len() )
+    else if (( &bb < &aa ) & aa.isLast() )
     {
         /*
          Check the projection of aa.vertex2(),
          on the segment represented by 'bb'
          */
+        assert_true(abs > aa.len());
         assert_true(bb.isLast());
         
         Vector vab = bb.pos2() - aa.pos2();
