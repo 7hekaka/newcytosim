@@ -558,7 +558,10 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list1,
 
 #if ( DIM == 3 ) && defined(__SSE3__)
 
-/// evaluates 4 pos.near(jj->pos_) using SIMD instructions
+/**
+ Evaluate 4 pos.near(jj->pos_) using SIMD instructions
+ return a 4-bit integer where each bit represents the result of one test
+ */
 inline int four_near(vec4f const& xyzr, BigLocus const* src)
 {
     vec4f tt = sub4f(loadu4f(src->pos_.data()), xyzr);
@@ -583,41 +586,6 @@ inline int four_near(vec4f const& xyzr, BigLocus const* src)
 }
 
 
-size_t list_near(unsigned dst[], size_t alc, BigVector const& pos, BigLocusList& list)
-{
-    vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
-    
-    BigLocus const* head = list.begin();
-    BigLocus const* src = list.begin();
-    BigLocus const* end = list.end();
-    
-    size_t cnt = 0;
-    size_t sup = list.size();
-
-    while ( src < end )
-    {
-        int t = four_near(xyzr, src);
-        if ( t )
-        {
-            /* there must be a better way to do this */
-            unsigned x = src - head;
-            if ((t & 1)) dst[cnt++] = x;
-            if ((t & 2) && x+1 < sup ) dst[cnt++] = x+1;
-            if ((t & 4) && x+2 < sup ) dst[cnt++] = x+2;
-            if ((t & 8) && x+3 < sup ) dst[cnt++] = x+3;
-#if 0
-            bool n0 = pos.near(src->pos_);
-            bool n1 = pos.near((src+1)->pos_);
-            bool n2 = pos.near((src+2)->pos_);
-            bool n3 = pos.near((src+3)->pos_);
-            printf("%i:%u%u%u%u \n", t, n3, n2, n1, n0);
-#endif
-        }
-        src += 4;
-    }
-    return cnt;
-}
-
 /**
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated.
@@ -628,6 +596,7 @@ size_t list_near(unsigned dst[], size_t alc, BigVector const& pos, BigLocusList&
 void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
                             BigLocusList const& list2)
 {
+    assert_true( &list1 != &list2 );
 #if 0
     {
         size_t l1 = list1.num_locus(), p1 = list1.num_points();
@@ -635,7 +604,6 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
         printf(" stericsU: %2lu+%2lu  :  %2lu+%2lu\n", l1, p1, l2, p2);
     }
 #endif
-    assert_true( &list1 != &list2 );
     BigLocus const* mid1 = list1.middle();
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
@@ -733,7 +701,8 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
                 //printf(" XL%i");
                 //int u = 0, k = 1;
                 int u = __builtin_ctz(t), k = 1 << u;
-                int m = std::min(4, int(list2.middle()-jj));
+                int m = int(list2.middle()-jj);
+                assert_true( m < 4 );
                 int e = std::min(4, int(list2.end()-jj));
                 for ( ; u < m; ++u, k<<=1 )
                     if ( (t&k) && not_adjacentPL(*ii, *(jj+u)) ) checkPL(meca, stiff, *ii, *(jj+u));
@@ -770,6 +739,140 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
     }
 }
 
+typedef unsigned long bitfield;
+
+bitfield near_bits(vec4f const& xyzr, BigLocusList const& list, size_t start)
+{
+    unsigned shift = 0;
+    bitfield res = 0;
+    size_t sup = std::min(list.size()-start, 64UL);
+    BigLocus const* art = list.begin() + start;
+    BigLocus const* end = art + ( sup & ~15UL );
+    BigLocus const* ptr = art;
+
+    while ( ptr < end )
+    {
+        bitfield t = four_near(xyzr, ptr);
+        bitfield u = four_near(xyzr, ptr+4) << 4;
+        bitfield v = four_near(xyzr, ptr+8) << 8;
+        bitfield w = four_near(xyzr, ptr+12) << 12;
+        res |= (( t | u )|( v | w )) << shift;
+        shift += 16;
+        ptr += 16;
+    }
+    
+    end = art + ( sup & ~7UL );
+    while ( ptr < end )
+    {
+        bitfield t = four_near(xyzr, ptr);
+        bitfield u = four_near(xyzr, ptr+4) << 4;
+        res |= ( t | u ) << shift;
+        shift += 8;
+        ptr += 8;
+    }
+    
+    end = art + sup;
+    while ( ptr < end )
+    {
+        unsigned i = end - ptr;
+        bitfield k = ~( ~0LU << i );
+        bitfield t = four_near(xyzr, ptr);
+        res |= ( t & k ) << shift;
+        shift += 4;
+        ptr += 4;
+    }
+    
+    //printf(" many_near %2lu : %lu\n", list.size(), res);
+    return res;
+}
+
+
+/**
+ This will consider once all pairs of objects from the given lists,
+ assuming that the list are different and no object is repeated.
+
+ Compared to `setSterics0()`, this performs additional tests to exclude
+ objects that are too far appart to interact, based on BigVector::near()
+*/
+void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
+                            BigLocusList const& list2)
+{
+    assert_true( &list1 != &list2 );
+#if 0
+    {
+        size_t l1 = list1.num_locus(), p1 = list1.num_points();
+        size_t l2 = list2.num_locus(), p2 = list2.num_points();
+        printf(" stericsU: %2lu+%2lu  :  %2lu+%2lu\n", l1, p1, l2, p2);
+    }
+#endif
+    BigLocus const* mid1 = list1.middle();
+    unsigned e, b, u;
+    for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
+    {
+        BigVector pos = ii->pos_;
+        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        for ( size_t offset = 0; offset < list2.size(); offset += 64 )
+        {
+            bitfield bits = near_bits(xyzr, list2, offset);
+            BigLocus const* jj = list2.begin();
+            e = list2.num_locus();
+            while ( bits != 0 )
+            {
+                //printf(" LL%lX\n", bits);
+                b = __builtin_ctzl(bits);
+                u = b + offset;
+                if ( u >= e ) break;
+                if ( not_adjacentLL(*ii, *(jj+u)) )
+                    checkLL(meca, stiff, *ii, *(jj+u));
+                bits ^= 1UL << b;
+            }
+            e = list2.size();
+            while ( bits )
+            {
+                //printf(" PL%lX\n", bits);
+                b = __builtin_ctzl(bits);
+                u = b + offset;
+                if ( u >= e ) break;
+                if ( not_adjacentPL(*(jj+u), *ii) )
+                    checkPL(meca, stiff, *(jj+u), *ii);
+                bits ^= 1UL << b;
+            }
+        }
+    }
+    
+    for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
+    {
+        BigVector pos = ii->pos_;
+        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        for ( size_t offset = 0; offset < list2.size(); offset += 64 )
+        {
+            bitfield bits = near_bits(xyzr, list2, offset);
+            BigLocus const* jj = list2.begin();
+            e = list2.num_locus();
+            while ( bits )
+            {
+                //printf(" LP%lX\n", bits);
+                b = __builtin_ctzl(bits);
+                u = b + offset;
+                if ( u >= e ) break;
+                if ( not_adjacentPL(*ii, *(jj+u)) )
+                    checkPL(meca, stiff, *ii, *(jj+u));
+                bits ^= 1UL << b;
+            }
+            e = list2.size();
+            while ( bits )
+            {
+                //printf(" PP%lX\n", bits);
+                b = __builtin_ctzl(bits);
+                u = b + offset;
+                if ( u >= e ) break;
+                if ( not_adjacentPP(*ii, *(jj+u)) )
+                    checkPP(meca, stiff, *ii, *(jj+u));
+                bits ^= 1UL << b;
+            }
+        }
+    }
+}
 #endif
 
 //------------------------------------------------------------------------------
@@ -815,9 +918,9 @@ void LocusGrid::setStericsT(Meca& meca, real stiff) const
 #if ( DIM == 3 ) && defined(__SSE3__)
             BigLocusList& side = cell_list(inx+region[reg]);
             if ( base.size() < side.size() )
-                setStericsU(meca, stiff, base, side);
+                setStericsT(meca, stiff, base, side);
             else
-                setStericsU(meca, stiff, side, base);
+                setStericsT(meca, stiff, side, base);
 #else
             setStericsT(meca, stiff, base, cell_list(inx+region[reg]));
 #endif

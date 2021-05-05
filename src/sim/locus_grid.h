@@ -312,6 +312,9 @@ private:
     /// check all pairs between the two lists, checking center-to-center distance
     static void setStericsU(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
     
+    /// check all pairs between the two lists, checking center-to-center distance
+    static void setStericsX(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
+
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`, and pane `p`
