@@ -402,7 +402,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         if ( opt.set(sep, "separation") )
         {
             // attach Single on the surface of this sphere:
-            size_t nbs = opt.nb_values(var) - 2;
+            size_t nbs = opt.num_values(var) - 2;
             // 'pts' is a set of unit vectors:
             std::vector<Vector> pts(nbs, Vector(0,0,0));
 

@@ -58,14 +58,14 @@ Vector Space::randomPlace() const
  - inside(point) = true
  - inside(point, radius) = false
  */
-Vector Space::randomPlaceNearEdge(real rad, size_t nb_trials) const
+Vector Space::randomPlaceNearEdge(real rad, size_t num_trials) const
 {
     size_t ouf = 0;
     Vector res;
     do {
         res = randomPlace();
         assert_true( inside(res) );
-        if ( ++ouf > nb_trials )
+        if ( ++ouf > num_trials )
             throw InvalidParameter("edge placement failed for space `"+prop->name()+"'");
     } while ( allInside(res, rad) );
     return res;

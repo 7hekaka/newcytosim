@@ -57,8 +57,8 @@ public:
     /// the deallocation
     void deallocate();
     
-    /// allocate the matrix to be able to hold nb_block (arg 1) blocks
-    void allocate(size_t nb_block);
+    /// allocate the matrix to be able to hold `nb` blocks
+    void allocate(size_t nb);
     
     /// default destructor
     ~MatrixFull() { deallocate(); }

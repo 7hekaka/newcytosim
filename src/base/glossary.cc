@@ -218,7 +218,7 @@ Glossary Glossary::extract_unused() const
 //------------------------------------------------------------------------------
 #pragma mark - Values access
 
-size_t Glossary::nb_values(key_type const& k) const
+size_t Glossary::num_values(key_type const& k) const
 {
     map_type::const_iterator w = mTerms.find(k);
     if ( w != mTerms.end() )

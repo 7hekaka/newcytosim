@@ -71,7 +71,7 @@ void ClassicFiberProp::read(Glossary& glos)
         Cytosim::warn << "fiber:dynamic_force was renamed growing_force\n";
 
     // change made 13 October 2014
-    if ( glos.nb_values("growing_force") == 1 )
+    if ( glos.num_values("growing_force") == 1 )
     {
         real x = 0;
         if ( glos.peek(x, "catastrophe_rate", 1) && x > 0 )

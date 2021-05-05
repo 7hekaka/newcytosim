@@ -144,10 +144,10 @@ public:
     real signedDistanceToEdge(Vector const&) const;
     
     /// calculate a random position located inside and at most at distance `rad` from the edge
-    Vector randomPlaceNearEdge(real rad, size_t nb_trials) const;
+    Vector randomPlaceNearEdge(real rad, size_t num_trials) const;
     
     /// calculate a random position located on the edge
-    Vector randomPlaceOnEdge(real rad, size_t nb_trials) const;
+    Vector randomPlaceOnEdge(real rad, size_t num_trials) const;
 
     //------------- DERIVED FUNCTIONS THAT CAN BE OVERWRITTEN ------------------
 

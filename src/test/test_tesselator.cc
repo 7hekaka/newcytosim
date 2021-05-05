@@ -34,7 +34,7 @@ void reset()
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points, %i faces",
-             rank, ico->nb_vertices(), ico->nb_faces());
+             rank, ico->num_vertices(), ico->num_faces());
     glApp::setMessage(tmp);
     initVBO();
 }
@@ -117,7 +117,7 @@ void drawFacesArray()
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
     glNormalPointer(GL_FLOAT, 0, ico->vertex_data());
-    glDrawElements(GL_TRIANGLES, 3*ico->nb_faces(), GL_UNSIGNED_INT, ico->face_data());
+    glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_INT, ico->face_data());
     glDisableClientState(GL_NORMAL_ARRAY);
     //glDisableClientState(GL_VERTEX_ARRAY);
 }
@@ -130,11 +130,11 @@ void initVBO()
     //Create a new VBO for the vertex information
 #if 0
     glBindBuffer(GL_ARRAY_BUFFER, glpts);
-    glBufferData(GL_ARRAY_BUFFER, 3*ico->nb_vertices()*sizeof(float), ico->vertex_data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), ico->vertex_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #else
     glBindBuffer(GL_ARRAY_BUFFER, glpts);
-    glBufferData(GL_ARRAY_BUFFER, 3*ico->nb_vertices()*sizeof(float), nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), nullptr, GL_STATIC_DRAW);
     void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     ico->store_vertices((float*)glb);
     glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -142,7 +142,7 @@ void initVBO()
 #endif
     //Create a new VBO for the indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gldir);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->nb_faces()*sizeof(unsigned), ico->face_data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->num_faces()*sizeof(unsigned), ico->face_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -158,7 +158,7 @@ void drawFacesVBO()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gldir);
-    glDrawElements(GL_TRIANGLES, 3*ico->nb_faces(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_INT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glDisableClientState(GL_NORMAL_ARRAY);
@@ -179,7 +179,7 @@ void drawEdges()
     glColor3f(1,1,1);
     glLineWidth(0.5);
     glBegin(GL_LINES);
-    for ( unsigned i = 0; i < ico->nb_edges(); ++i )
+    for ( unsigned i = 0; i < ico->num_edges(); ++i )
     {
         glVertex3fv(ico->edge_vertex0(i));
         glVertex3fv(ico->edge_vertex1(i));
@@ -190,7 +190,7 @@ void drawEdges()
 void nameVertices()
 {
     char tmp[128];
-    for ( unsigned i=0; i < ico->nb_vertices(); ++i )
+    for ( unsigned i=0; i < ico->num_vertices(); ++i )
     {
         Tesselator::Vertex & dv = ico->vertex(i);
         if ( dv.weight(2) == 0  &&  dv.weight(1) == 0 )
@@ -215,7 +215,7 @@ void drawVertices()
     glBindBuffer(GL_ARRAY_BUFFER, glpts);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDrawArrays(GL_POINTS, 0, ico->nb_vertices());
+    glDrawArrays(GL_POINTS, 0, ico->num_vertices());
     glDisableClientState(GL_VERTEX_ARRAY);
 }
 
@@ -262,7 +262,7 @@ void display(View& view, int)
         drawFaces();
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #else
-        if ( ico->nb_edges() == 0 )
+        if ( ico->num_edges() == 0 )
             ico->setEdges();
         drawEdges();
 #endif

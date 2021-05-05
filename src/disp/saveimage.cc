@@ -491,7 +491,7 @@ int SaveImage::readPNG(FILE* fp, png_bytep *& row_pointers, int& bit_depth, int&
 
 int savePNG(FILE* file,
             png_bytep row_pointers[],
-            const int bit_depth, const int nb_colors,
+            const int bit_depth, const int num_colors,
             const int width, const int height)
 {
     if ( !file )
@@ -502,13 +502,13 @@ int savePNG(FILE* file,
     
     int color_type = -1;
     
-    if ( nb_colors == 1 )
+    if ( num_colors == 1 )
         color_type = PNG_COLOR_TYPE_GRAY;
     
-    if ( nb_colors == 3 )
+    if ( num_colors == 3 )
         color_type = PNG_COLOR_TYPE_RGB;
     
-    if ( nb_colors == 4 )
+    if ( num_colors == 4 )
         color_type = PNG_COLOR_TYPE_RGBA;
     
     if ( color_type < 0 )
@@ -543,7 +543,7 @@ int savePNG(FILE* file,
     if (setjmp(png_jmpbuf(png_ptr)))
         return 3;
     
-    if ( nb_colors == 1 && bit_depth == 16 )
+    if ( num_colors == 1 && bit_depth == 16 )
         png_set_swap(png_ptr);
     
     png_write_image(png_ptr, row_pointers);
@@ -560,21 +560,21 @@ int savePNG(FILE* file,
 
 
 int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
-                       const int bit_depth, const int nb_colors,
+                       const int bit_depth, const int num_colors,
                        const int width, const int height)
 {
     int res = 1;
     png_bytep * rows = (png_bytep*)malloc(height*sizeof(png_bytep));
     if ( rows )
     {
-        int bytes_per_row = ( bit_depth / 8 ) * nb_colors * width;
+        int bytes_per_row = ( bit_depth / 8 ) * num_colors * width;
         
         png_byte * start = (png_byte*)pixels;
         
         for ( int y = 0; y < height; ++y )
             rows[y] = start + bytes_per_row * ( height-y-1 );
         
-        res = savePNG(file, rows, bit_depth, nb_colors, width, height);
+        res = savePNG(file, rows, bit_depth, num_colors, width, height);
         
         free(rows);
     }

@@ -9,88 +9,10 @@
 
 /// A Map with an instantiation of class CELL in each voxel
 /** 
-Grid<int ORD, typename CELL> creates a regular lattice over a rectangular
-region of space of dimensionality ORD.
-The grid is initialized by setDimensions() and createCells() allocates a one-dimensional
-array of CELL, with one value for each lattice point of the grid.
-
-Functions are provided to convert from the real space coordinates (of type real)
-into an index usable to access the one-dimensional array of CELL.
-The cells are ordered successively, the first dimension (X) varying the fastest
-i.e. cell[ii+1] will in most cases be located on the right of cell[ii], although
-if cell[ii] is on the right edge, then cell[ii+1] is on the symmetric edge. 
-
-\par Access:
-
-Cells can be accessed in three ways:
- - Position:      a set of real       operator()( real[] ), or operator(real, real, real)
- - Index:         one integer         operator[](int index)
- - Coordinates:   a set of integer    function cell(int[]), or cell(int,int,int)
-.
-Valid indices are [0...nbCells()-1], where nbCells() is calculated by setDimensions().
-If a position lies outside the rectangular region where the grid is defined,
-index(real[]) returns the index of the closest voxel.
-
-Functions to convert between the three types are provided:
- - index()
- - pack()
- - setCoordinatesFromIndex(),
- - setCoordinatesFromPosition()
- - setPositionFromCoordinates()
- - setPositionFromIndex()
-.
-
-\par Indices:
-
-The grid is initialized by setDimensions(inf, sup, nbCells), which calculates:
-  - cWidth[d] = ( sup[d] - inf[d] ) / nbCells[d], for d in [0, ORD[
-
-The coordinates of a cell at position pos[] are:
-  - c[d] = int(  ( pos[d] - inf[d] ) / cWidth[d] )
-
-and its index is
-  - with ORD==1: index = c[0]
-  - with ORD==2: index = c[0] + nbcells[0] * c[1]
-  - with ORD==3: index = c[0] + nbcells[0] * ( c[1] + nbcells[1] * c[2] )
-  - etc.
-.
-    
-For a 4x4 2D grid, the index are like this:
-
-    12  13  14  15
-    8    9  10  11
-    4    5   6   7
-    0    1   2   3
-
-\par Neighborhood:
-
-The class also provides information on which cells surround each cell:
- - createSquareRegions(range) calculates square regions of size range
-   ( range==1 gives nearest neighbors ).
- - createRoundRegions(range) calculates round regions of size range
- - createSideRegions(range)
-.
-After calling one of the above function, getRegion(offsets, index) will set 'offsets'
-to point to an array of 'index offsets' for the cell referred by 'index'.
-A zero offset value (0) is always first in the list and refers to self.
-In the example above:
-    - for index = 0 it would return { 0 1 4 5 }
-    - for index = 5 it would return { 0 -1 1 -5 -4 -3 3 4 5 }
-.
-You obtain the cell-indices of the neighboring cells by adding offsets[n] to 'index':
-Example:
-
-    CELL * cell = & myGrid.cell(inx);
-    nb_neighbors = myGrid.getRegion(region, inx);
-    for ( int n = 1; n < nb_neighbors; ++n ) 
-    {
-        Cell & neighbor = cell[region[n]];
-        ...
-    }
-
+ Most of the functionality is provided by the parent class Map.
+ This in addition provides functions to interpolate numerical values,
+ and to clear the values of the cells.
 */
-
-///\todo Derive GridNumeric specialized for numerical values
 ///\todo add Grid<> copy constructor and copy assignment
 
 template <typename CELL, int ORD>

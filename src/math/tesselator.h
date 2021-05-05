@@ -174,22 +174,22 @@ public:
     
     
     /// number of derived vertices
-    unsigned nb_vertices() const { return num_vertices_; }
+    unsigned num_vertices() const { return num_vertices_; }
     
     /// return pointer to array of coordinates of vertices
     const float* vertex_data()      const { return vex_; }
     
-    /// address of coordinates for vertex `v` ( `v < nb_vertices()` )
+    /// address of coordinates for vertex `v` ( `v < num_vertices()` )
     const float* vertex_data(int v) const { return vex_ + 3 * v; }
     
     /// number of points in the edges = 2 * nb-of-edges
-    unsigned int nb_edges()        const { return num_edges_; }
+    unsigned int num_edges()        const { return num_edges_; }
     
     /// array of indices to the vertices in each edge (2 per edge)
     unsigned int* edge_data()      const { return edges_; }
     
     /// number of faces (each face is a triangle of 3 vertices)
-    unsigned int nb_faces()        const { return num_faces_; }
+    unsigned int num_faces()        const { return num_faces_; }
     
     /// array of indices to the vertices in each face (3 vertices per face)
     unsigned int* face_data()      const { return faces_; }

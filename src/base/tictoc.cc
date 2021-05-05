@@ -159,7 +159,7 @@ double TicToc::toc(double arg)
 {
     timeval tv;
     gettimeofday(&tv, nullptr);
-    return double(1e3*(tv.tv_sec-tic_t.tv_sec) + 1e-3*(tv.tv_usec-tic_t.tv_usec))/arg;
+    return double(1e6*(tv.tv_sec-tic_t.tv_sec) + (tv.tv_usec-tic_t.tv_usec))/arg;
 }
 
 #else

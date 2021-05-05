@@ -1029,11 +1029,11 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CouplePr
     
     // get all crosspoints:
     fibers.allIntersections(loc1, loc2, bind_range);
-    const size_t nb_crossings = loc1.size();
-    //const real nb_crossings = square(total_length) / ( M_PI * space_volume );
+    const size_t num_crossings = loc1.size();
+    //const real num_crossings = square(total_length) / ( M_PI * space_volume );
 
     const real ratio_fibs = 2 * total_length * bind_range / space_volume;
-    const real ratio_cros = 4 * M_PI * nb_crossings * square(bind_range) / space_volume;
+    const real ratio_cros = 4 * M_PI * num_crossings * square(bind_range) / space_volume;
     
     /*
      The different states are defined in Belmonte et al. 2017, supplementary:
@@ -1052,11 +1052,11 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleList& can, CouplePr
 #if ( 0 )
     printf("Couple::equilibrate %s (sym):\n", cop->name_str());
     printf("     total %lu\n", reserve.size());
-    const real nb_fiber = fibers.size();
-    const real fiber_length = total_length / nb_fiber;
-    const real nbc = nb_fiber * ( nb_fiber - 1 ) * square(fiber_length) / ( M_PI * space_volume );
+    const real num_fibers = fibers.size();
+    const real fiber_length = total_length / num_fibers;
+    const real nbc = num_fibers * ( num_fibers - 1 ) * square(fiber_length) / ( M_PI * space_volume );
     //const real nbc = square(total_length) / ( M_PI * space_volume );
-    printf("     nb_crossings predicted  %9.2f   true %9i\n", nbc, nb_crossings);
+    printf("     num_crossings predicted  %9.2f   true %9i\n", nbc, num_crossings);
     printf("     F %9.2f A %9.2f G %9.2f B %9.2f\n", popF, popA, popG, popB);
 #endif
     
@@ -1104,12 +1104,12 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp 
 
     // get all crosspoints:
     fibers.allIntersections(loc1, loc2, std::max(bind_range1, bind_range2));
-    const size_t nb_crossings = loc1.size();
+    const size_t num_crossings = loc1.size();
     
     const real ratio_fibs1 = 2 * total_length * bind_range1 / space_volume;
     const real ratio_fibs2 = 2 * total_length * bind_range2 / space_volume;
-    const real ratio_cros1 = 4 * M_PI * nb_crossings * square(bind_range1) / space_volume;
-    const real ratio_cros2 = 4 * M_PI * nb_crossings * square(bind_range2) / space_volume;
+    const real ratio_cros1 = 4 * M_PI * num_crossings * square(bind_range1) / space_volume;
+    const real ratio_cros2 = 4 * M_PI * num_crossings * square(bind_range2) / space_volume;
     
     /*
      The different states are defined in Belmonte et al. 2017, supplementary:
@@ -1135,11 +1135,11 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleList& can, CoupleProp 
 #if ( 0 ) && ( DIM == 2 )
     printf("Couple::equilibrate %s:\n", cop->name_str());
     printf("     total %lu\n", reserve.size());
-    const real nb_fiber = fibers.size();
-    const real fiber_length = total_length / nb_fiber;
-    const real nbc = nb_fiber * ( nb_fiber - 1 ) * square(fiber_length) / ( M_PI * space_volume );
+    const real num_fibers = fibers.size();
+    const real fiber_length = total_length / num_fibers;
+    const real nbc = num_fibers * ( num_fibers - 1 ) * square(fiber_length) / ( M_PI * space_volume );
     //const real nbc = square(total_length) / ( M_PI * space_volume );
-    printf("     nb_crossings predicted  %9.2f   true %9i\n", nbc, nb_crossings);
+    printf("     num_crossings predicted  %9.2f   true %9i\n", nbc, num_crossings);
     printf("     F %9.2f A %9.2f G %9.2f B %9.2f\n", popF, popA1+popA2, popG1+popG2, popB);
 #endif
     

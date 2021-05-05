@@ -169,6 +169,12 @@ public:
     
     /// number of elements in list
     size_t size() const { return pane.size(); }
+    
+    /// number of BigLocus in list
+    size_t num_locus() const { return border; }
+    
+    /// number of BigPoints in list
+    size_t num_points() const { return pane.size() - border; }
 
     /// first element in list
     BigLocus const* begin() const { return pane.begin(); }

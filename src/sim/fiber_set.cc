@@ -584,7 +584,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
             if ( !fib )
             {
                 // without argument, a fiber name specifies uniform attachment:
-                if ( opt.nb_values(key) == 1 )
+                if ( opt.num_values(key) == 1 )
                 {
                     Property const* p = simul_.findProperty(title(), str);
                     if ( p )

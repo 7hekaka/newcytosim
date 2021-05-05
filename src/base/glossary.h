@@ -242,7 +242,7 @@ public:
     bool empty()   const { return mTerms.empty(); }
 
     /// total number of keys
-    size_t nb_keys() const { return mTerms.size(); }
+    size_t num_keys() const { return mTerms.size(); }
     
     /// return `true` if key is present, even if no value is associated with it
     bool has_key(key_type const&) const;
@@ -272,7 +272,7 @@ public:
     Glossary extract_unused() const;
 
     /// return number of values associated with a key
-    size_t nb_values(key_type const&) const;
+    size_t num_values(key_type const&) const;
     
     /// return true if key is present and a value was set for given index
     bool has_value(key_type const&, size_t inx) const;

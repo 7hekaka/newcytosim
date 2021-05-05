@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
             arg.read_file(str);
         
         // print content of Glossary:
-        printf("%lu keys:\n", arg.nb_keys());
+        printf("%lu keys:\n", arg.num_keys());
         arg.write(std::cout, "    > ");
         
         // extract values from Glossary:

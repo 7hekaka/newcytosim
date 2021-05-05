@@ -389,7 +389,7 @@ void Parser::parse_new(std::istream& is)
     
     if ( do_new & ( cnt > 0 ))
     {
-        if ( opt.nb_keys() == 0 )
+        if ( opt.num_keys() == 0 )
         {
             execute_new(name, cnt);
         }

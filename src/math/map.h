@@ -91,8 +91,8 @@ You obtain the cell-indices of the neighboring cells by adding offsets[n] to 'in
 Example:
 
     CELL * cell = & map.icell(indx);
-    nb_neighbors = map.getRegion(region, indx);
-    for ( int n = 1; n < nb_neighbors; ++n ) 
+    int n_neighbors = map.getRegion(region, indx);
+    for ( int n = 1; n < n_neighbors; ++n )
     {
         Cell & neighbor = cell[region[n]];
         ...

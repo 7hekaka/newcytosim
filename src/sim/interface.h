@@ -65,7 +65,7 @@ public:
     Isometry   read_placement(Glossary&);
     
     /// return position and orientation of an object, with verification of 'placement'
-    Isometry   find_placement(Glossary&, int placement, size_t nb_trials);
+    Isometry   find_placement(Glossary&, int placement, size_t num_trials);
     
     /// create 1 object of type `name`, following options in Glossary
     void       execute_new(std::string const& name, ObjectSet*, Glossary&);

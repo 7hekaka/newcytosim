@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
     report(simul, *osp, what, frame, arg);
     size_t cnt = 1;
 
-    if ( arg.nb_values("frame") > 1 )
+    if ( arg.num_values("frame") > 1 )
     {
         // multiple record indices were specified:
         size_t s = 1;

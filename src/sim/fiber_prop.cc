@@ -154,7 +154,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     // specify the vertices directly:
     if ( opt.has_key("points") )
     {
-        size_t nbp = opt.nb_values("points");
+        size_t nbp = opt.num_values("points");
         fib->setNbPoints(nbp);
         for ( size_t p = 0; p < nbp; ++p )
         {
@@ -170,7 +170,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 #endif
     if ( opt.has_key("shape") )
     {
-        size_t nbp = opt.nb_values("shape");
+        size_t nbp = opt.num_values("shape");
         
         if ( nbp < 2 )
             throw InvalidParameter("fiber:shape must be a list of comma-separated points");

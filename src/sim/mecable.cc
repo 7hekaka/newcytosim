@@ -299,8 +299,8 @@ Vector Mecable::position() const
 
 /**
  Calculate first and second moment of vertex coordinates:
- - avg = sum( P ) / nb_points
- - dev = sum( P .* P ) / nb_points - square( avg );
+ - avg = sum( P ) / num_points
+ - dev = sum( P .* P ) / num_points - square( avg );
  .
  */
 void Mecable::calculateMomentum(Vector& avg, Vector& dev)

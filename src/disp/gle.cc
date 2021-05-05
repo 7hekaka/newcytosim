@@ -1290,15 +1290,15 @@ namespace gle
     {
         ico_pts_[i] = ptr - PTR;
         ico_idx_[i] = idx - IDX;
-        ico_cnt_[i] = ico.nb_faces() * 3;
+        ico_cnt_[i] = ico.num_faces() * 3;
 
         ico.store_vertices(ptr);
-        ptr += ico.nb_vertices() * 3;
+        ptr += ico.num_vertices() * 3;
         
-        size_t cnt = ico.nb_faces() * 3;
+        size_t cnt = ico.num_faces() * 3;
         memcpy(idx, ico.face_data(), cnt * sizeof(unsigned));
         idx += cnt;
-        //fprintf(stderr, "icosahedron %lu has %u faces\n", i, ico.nb_faces());
+        //fprintf(stderr, "icosahedron %lu has %u faces\n", i, ico.num_faces());
     }
 
     /// using icosahedrons to render the sphere:
@@ -1313,12 +1313,12 @@ namespace gle
         ico[5].build(Tesselator::HEMISPHERE, gle::finesse);
         ico[6].build(Tesselator::HEMISPHERE, gle::finesse*2);
         
-        //std::clog << "initializeIco ico " << ico.nb_faces() << '\n';
+        //std::clog << "initializeIco ico " << ico.num_faces() << '\n';
         size_t n_pts = 0, n_idx = 0;
         for ( int i = 0; i < 7; ++i )
         {
-            n_pts += ico[i].nb_vertices();
-            n_idx += ico[i].nb_faces();
+            n_pts += ico[i].num_vertices();
+            n_idx += ico[i].num_faces();
         }
         
         glBufferData(GL_ARRAY_BUFFER, n_pts*3*sizeof(float), nullptr, GL_STATIC_DRAW);

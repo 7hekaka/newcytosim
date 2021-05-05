@@ -319,7 +319,7 @@ public:
             printf("file: %lu field:%lu\n", nbc, mGrid.nbCells());
             throw InvalidIO("mismatch in Field::size");
         }
-        //std::clog << "readData() nb_cells=" << nbc << '\n';
+        //std::clog << "readData() num_cells=" << nbc << '\n';
         
         for ( size_t c = 0; c < nbc; ++c )
             mGrid.icell(c).read(in);

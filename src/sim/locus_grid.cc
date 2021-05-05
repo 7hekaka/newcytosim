@@ -630,9 +630,13 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
 {
     assert_true( &list1 != &list2 );
     BigLocus const* mid1 = list1.middle();
-    
-    //std::clog << " list1: " << std::setw(2) << mid1-list1.begin() << "+" << std::setw(2) << list1.end()-mid1;
-    //std::clog << " : list2: " << std::setw(2) << mid2-list2.begin() << "+" << std::setw(2) << list2.end()-mid2 << "\n";
+#if 0
+    {
+        size_t l1 = list1.num_locus(), p1 = list1.num_points();
+        size_t l2 = list2.num_locus(), p2 = list2.num_points();
+        printf(" list1: %2lu+%2lu  :  list2 %2lu+%2lu\n", l1, p1, l2, p2);
+    }
+#endif
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
         BigVector pos = ii->pos_;
@@ -644,7 +648,6 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
         {
             t = four_near(xyzr, jj);
             if ( !t ) continue;
-            //printf(" LL%i:%i", t, __builtin_ctz(t));
             if ( (t&1) && not_adjacentLL(*ii, *(jj  )) ) checkLL(meca, stiff, *ii, *(jj));
             if ( (t&2) && not_adjacentLL(*ii, *(jj+1)) ) checkLL(meca, stiff, *ii, *(jj+1));
             if ( (t&4) && not_adjacentLL(*ii, *(jj+2)) ) checkLL(meca, stiff, *ii, *(jj+2));
@@ -656,7 +659,8 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
             if ( t )
             {
                 //printf(" XL%i");
-                int u = 0, k = 1;
+                //int u = 0, k = 1;
+                int u = __builtin_ctz(t), k = 1 << u;
                 int m = std::min(4, int(list2.middle()-jj));
                 int e = std::min(4, int(list2.end()-jj));
                 for ( ; u < m; ++u, k<<=1 )
@@ -703,7 +707,8 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
             if ( t )
             {
                 //printf(" XL%i");
-                int u = 0, k = 1;
+                //int u = 0, k = 1;
+                int u = __builtin_ctz(t), k = 1 << u;
                 int m = std::min(4, int(list2.middle()-jj));
                 int e = std::min(4, int(list2.end()-jj));
                 for ( ; u < m; ++u, k<<=1 )

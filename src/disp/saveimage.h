@@ -32,7 +32,7 @@ namespace SaveImage
     int saveColorTGA(FILE*, const uint8_t[], int width, int height);
 
     /// write PNG image
-    int savePNG(FILE*, const uint8_t[], int bit_depth, int nb_colors, int width, int height);
+    int savePNG(FILE*, const uint8_t[], int bit_depth, int num_colors, int width, int height);
 
     /// Portable Network Graphic format, 4 one-byte components per pixels (R, G, B, A)
     int saveAlphaPNG(FILE*, const uint8_t[], int width, int height);

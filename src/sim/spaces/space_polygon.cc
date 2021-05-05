@@ -45,7 +45,7 @@ void SpacePolygon::resize(Glossary& opt)
     else if ( opt.has_key("points") )
     {
         // specify vertices directly:
-        size_t nbp = opt.nb_values("points");
+        size_t nbp = opt.num_values("points");
         poly_.allocate(nbp);
         for ( size_t p = 0; p < nbp; ++p )
         {

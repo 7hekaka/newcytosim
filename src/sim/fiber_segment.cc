@@ -60,7 +60,7 @@ real FiberSegment::projectPoint0(Vector W, real& dis) const
 real FiberSegment::projectPoint(Vector W, real& dis) const
 {
     Vector A = pos1();
-    Vector B = pos2();
+    Vector D = diff();
     W -= A;
     
 #if GRID_HAS_PERIODIC
@@ -69,7 +69,7 @@ real FiberSegment::projectPoint(Vector W, real& dis) const
 #endif
     
     // project with the scalar product:
-    real abs = dot(W, B-A) * lenInv();
+    real abs = dot(W, D) * lenInv();
     
     // test boundaries of filament:
     if ( abs < 0 )
@@ -80,14 +80,17 @@ real FiberSegment::projectPoint(Vector W, real& dis) const
     else if ( abs > len() )
     {
         if ( isLast() )
-            dis = (W+A-B).normSqr();
+            dis = (W-D).normSqr();
     }
     else
     {
 #if ( DIM == 1 )
         dis = 0;
-#else
+#elif ( DIM == 2 )
         dis = W.normSqr() - abs * abs;
+#else
+        // must optimize explicitely, since the compiler cannot reorder additions
+        dis = ( W.XX * W.XX + W.YY * W.YY ) + ( W.ZZ * W.ZZ - abs * abs );
 #endif
     }
     return abs;

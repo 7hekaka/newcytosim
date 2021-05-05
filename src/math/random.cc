@@ -246,7 +246,7 @@ void Random::gauss_set(real & a, real & b, real v)
  Fill array `vec[]` with Gaussian values ~ N(0,1).
  the size of `vec` should be a multiple of 2, and sufficient to hold `end-src` values
  For each 4 input values, this produces ~PI values.
- @Return address past the last value stored in `dst` = dst + nb_of_values_set
+ @Return address past the last value stored in `dst`
  */
 real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
 {

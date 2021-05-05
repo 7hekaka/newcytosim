@@ -122,7 +122,7 @@ void FiberDisp::read(Glossary& glos)
 
     key = glos.has_key("speckle") ? "speckle" : "speckles";
 #ifdef BACKWARD_COMPATIBILITY
-    if ( glos.nb_values(key) == 2 )
+    if ( glos.num_values(key) == 2 )
     {
         speckle_size = line_width * 2;
         glos.set(speckle_style, key);

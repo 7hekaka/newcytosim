@@ -207,7 +207,7 @@ enum PlacementType { PLACE_NOT, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
      {
        position = POSITION
        placement = PLACEMENT, SPACE_NAME, CONDITION
-       nb_trials = INTEGER
+       num_trials = INTEGER
      }
  
  PLACEMENT can be:
@@ -220,19 +220,19 @@ enum PlacementType { PLACE_NOT, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
  By default, the specifications are relative to the first Space to be defined,
  but a different space can be specified as second argument of PLACEMENT.
  
- You can set the density of objects with `nb_trials=1`:
+ You can set the density of objects with `num_trials=1`:
  
      new 100 grafted
      {
        position = ( rectangle 10 10 )
-       nb_trials = 1
+       num_trials = 1
      }
  
  In this way an object will be created only if its randomly chosen position falls
  inside the Space, and the density will thus be exactly what is specified from the
  `position` range (here 100/10*10 = 1 object per squared micrometer).
  */
-Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trials)
+Isometry Interface::find_placement(Glossary& opt, int placement, size_t num_trials)
 {
     size_t ouf = 0;
     std::string str;
@@ -246,7 +246,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
     
     Isometry iso;
 
-    while ( ++ouf < nb_trials )
+    while ( ++ouf < num_trials )
     {
         // generate a new position:
         iso = read_placement(opt);
@@ -301,8 +301,8 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
  */
 void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& opt)
 {
-    size_t ouf = 0, nb_trials = 1<<14;
-    opt.set(nb_trials, "nb_trials");
+    size_t ouf = 0, num_trials = 1<<14;
+    opt.set(num_trials, "num_trials");
 
     ObjectList objs;
     do {
@@ -338,7 +338,7 @@ void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& o
         if ( placement != PLACE_NOT )
         {
             // find a position:
-            Isometry iso = find_placement(opt, placement, nb_trials);
+            Isometry iso = find_placement(opt, placement, num_trials);
             // place object at this position:
             ObjectSet::moveObjects(objs, iso);
             // special case for which we check all vertices:
@@ -359,9 +359,9 @@ void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& o
                 }
             }
         }
-        if ( ++ouf > nb_trials )
+        if ( ++ouf > num_trials )
         {
-            Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
+            Cytosim::log << "could not place `" << name << "' after " << num_trials << " trials\n";
             break;
         }
     } while ( objs.empty() );

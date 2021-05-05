@@ -28,7 +28,7 @@ private:
     size_t ** mxRow;
     
     // allocate column to hold nb values
-    void allocateColumn(size_t column_index, size_t nb_values);
+    void allocateColumn(size_t column_index, size_t num_values);
     
 public:
     

@@ -37,14 +37,14 @@ namespace SolverC
     /// Bi-Conjugate Gradient Stabilized
     int BCGS(int size, const real* rhs, real* solution,
              void (*matVect)( const real*, real* ),
-             int& nb_iterations, real& max_residual);
+             int& num_iterations, real& max_residual);
     
     
     /// Bi-Conjugate Gradient Stabilized with Preconditionning
     int BCGSP(int size, const real* rhs, real* solution,
               void (*matVect)( const real*, real* ),
               void (*precond)( const real*, real* ),
-              int& nb_iterations, real& max_residual);
+              int& num_iterations, real& max_residual);
     
     
     /// Memory allocation function
