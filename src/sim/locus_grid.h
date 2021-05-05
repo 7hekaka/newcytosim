@@ -186,7 +186,7 @@ public:
     BigLocus const* middle() const { return pane.data() + border; }
     
     /// one past last element in list
-    BigLocus const* pre_end() const { return pane.begin() - (pane.size() & (~3UL)); }
+    BigLocus const* pre_end() const { return pane.begin() + (pane.size() & (~3UL)); }
     
     /// one past last element in list
     BigLocus const* end() const { return pane.end(); }

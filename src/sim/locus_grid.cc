@@ -628,15 +628,15 @@ size_t list_near(unsigned dst[], size_t alc, BigVector const& pos, BigLocusList&
 void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
                             BigLocusList const& list2)
 {
-    assert_true( &list1 != &list2 );
-    BigLocus const* mid1 = list1.middle();
 #if 0
     {
         size_t l1 = list1.num_locus(), p1 = list1.num_points();
         size_t l2 = list2.num_locus(), p2 = list2.num_points();
-        printf(" list1: %2lu+%2lu  :  list2 %2lu+%2lu\n", l1, p1, l2, p2);
+        printf(" stericsU: %2lu+%2lu  :  %2lu+%2lu\n", l1, p1, l2, p2);
     }
 #endif
+    assert_true( &list1 != &list2 );
+    BigLocus const* mid1 = list1.middle();
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
         BigVector pos = ii->pos_;
@@ -653,8 +653,9 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
             if ( (t&4) && not_adjacentLL(*ii, *(jj+2)) ) checkLL(meca, stiff, *ii, *(jj+2));
             if ( (t&8) && not_adjacentLL(*ii, *(jj+3)) ) checkLL(meca, stiff, *ii, *(jj+3));
         }
-        // transition zone with BigLocus and BigPoint
+        if ( jj < list2.pre_end() )
         {
+            // handle transition zone with BigLocus and BigPoint
             t = four_near(xyzr, jj);
             if ( t )
             {
@@ -669,19 +670,29 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
                     if ( (t&k) && not_adjacentPL(*(jj+u), *ii) ) checkPL(meca, stiff,*(jj+u), *ii);
             }
             jj += 4;
+            assert_true( jj > list2.middle() );
+            for ( ; jj < list2.pre_end(); jj += 4 )
+            {
+                t = four_near(xyzr, jj);
+                if ( !t ) continue;
+                //printf(" LP%i", t);
+                if ( (t&1) && not_adjacentPL(*(jj  ), *ii) ) checkPL(meca, stiff, *(jj), *ii);
+                if ( (t&2) && not_adjacentPL(*(jj+1), *ii) ) checkPL(meca, stiff, *(jj+1), *ii);
+                if ( (t&4) && not_adjacentPL(*(jj+2), *ii) ) checkPL(meca, stiff, *(jj+2), *ii);
+                if ( (t&8) && not_adjacentPL(*(jj+3), *ii) ) checkPL(meca, stiff, *(jj+3), *ii);
+            }
         }
-        for ( ; jj < list2.pre_end(); jj += 4 )
+        else
         {
-            t = four_near(xyzr, jj);
-            if ( !t ) continue;
-            //printf(" LP%i", t);
-            if ( (t&1) && not_adjacentPL(*(jj  ), *ii) ) checkPL(meca, stiff, *(jj), *ii);
-            if ( (t&2) && not_adjacentPL(*(jj+1), *ii) ) checkPL(meca, stiff, *(jj+1), *ii);
-            if ( (t&4) && not_adjacentPL(*(jj+2), *ii) ) checkPL(meca, stiff, *(jj+2), *ii);
-            if ( (t&8) && not_adjacentPL(*(jj+3), *ii) ) checkPL(meca, stiff, *(jj+3), *ii);
+            // less than 3 BigLocus remaining
+            assert_true( list2.middle() - jj < 4 );
+            for ( ; jj < list2.middle(); ++jj )
+                if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj) ) checkLL(meca, stiff, *ii, *jj);
         }
+        // less than 3 BigPoint remaining
+        assert_true( list2.end() - jj < 4 );
         for ( ; jj < list2.end(); ++jj )
-            if ( pos.near(jj->pos_) && not_adjacentPL(*jj, *ii) ) checkPL(meca, stiff,*jj, *ii);
+            if ( pos.near(jj->pos_) && not_adjacentPL(*jj, *ii) ) checkPL(meca, stiff, *jj, *ii);
     }
     
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
@@ -701,8 +712,9 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
             if ( (t&4) && not_adjacentPL(*ii, *(jj+2)) ) checkPL(meca, stiff, *ii, *(jj+2));
             if ( (t&8) && not_adjacentPL(*ii, *(jj+3)) ) checkPL(meca, stiff, *ii, *(jj+3));
         }
-        // transition zone with BigLocus and BigPoint
+        if ( jj < list2.pre_end() )
         {
+            // handle transition zone with BigLocus and BigPoint
             t = four_near(xyzr, jj);
             if ( t )
             {
@@ -717,19 +729,29 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
                     if ( (t&k) && not_adjacentPP(*ii, *(jj+u)) ) checkPP(meca, stiff, *ii, *(jj+u));
             }
             jj += 4;
+            assert_true( jj > list2.middle() );
+            for ( ; jj < list2.pre_end(); jj += 4 )
+            {
+                t = four_near(xyzr, jj);
+                if ( !t ) continue;
+                //printf(" PP%i", t);
+                if ( (t&1) && not_adjacentPP(*ii, *(jj  )) ) checkPP(meca, stiff, *ii, *(jj));
+                if ( (t&2) && not_adjacentPP(*ii, *(jj+1)) ) checkPP(meca, stiff, *ii, *(jj+1));
+                if ( (t&4) && not_adjacentPP(*ii, *(jj+2)) ) checkPP(meca, stiff, *ii, *(jj+2));
+                if ( (t&8) && not_adjacentPP(*ii, *(jj+3)) ) checkPP(meca, stiff, *ii, *(jj+3));
+            }
         }
-        for ( ; jj < list2.pre_end(); jj += 4 )
+        else
         {
-            t = four_near(xyzr, jj);
-            if ( !t ) continue;
-            //printf(" PP%i", t);
-            if ( (t&1) && not_adjacentPP(*ii, *(jj  )) ) checkPP(meca, stiff, *ii, *(jj));
-            if ( (t&2) && not_adjacentPP(*ii, *(jj+1)) ) checkPP(meca, stiff, *ii, *(jj+1));
-            if ( (t&4) && not_adjacentPP(*ii, *(jj+2)) ) checkPP(meca, stiff, *ii, *(jj+2));
-            if ( (t&8) && not_adjacentPP(*ii, *(jj+3)) ) checkPP(meca, stiff, *ii, *(jj+3));
+            // less than 3 BigLocus remaining
+            assert_true( list2.middle() - jj < 4 );
+            for ( ; jj < list2.middle(); ++jj )
+                if ( pos.near(jj->pos_) && not_adjacentPL(*ii, *jj) ) checkPL(meca, stiff, *ii, *jj);
         }
+        // less than 3 BigPoint remaining
+        assert_true( list2.end() - jj < 4 );
         for ( ; jj < list2.end(); ++jj )
-            if ( pos.near(jj->pos_) && not_adjacentPP(*jj, *ii) ) checkPP(meca, stiff,*jj, *ii);
+            if ( pos.near(jj->pos_) && not_adjacentPP(*jj, *ii) ) checkPP(meca, stiff, *jj, *ii);
     }
 }
 
