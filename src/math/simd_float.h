@@ -47,6 +47,10 @@ inline static vec4f duphi4f(vec4f a)              { return _mm_unpackhi_ps(a,a);
 
 // return { A1, B0 } from a = { A0, A1 } and b = { B0, B1 }
 inline static vec4f twine2f64(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
+// return { B1, A1 } from a = { A0, A1 } and b = { B0, B1 }
+inline static vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }
+// return { A0, B0 } from a = { A0, A1 } and b = { B0, B1 }
+inline static vec4f movelh4f(vec4f a, vec4f b) { return _mm_movelh_ps(a, b); }
 
 inline static vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
 inline static vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }

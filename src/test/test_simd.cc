@@ -861,20 +861,20 @@ from src = { XYZT XYZT XYZT XYZT }
 */
 void transpose16(double const* src, double* dst)
 {
-    vec4 u0 = load4(src);
-    vec4 u1 = load4(src+4);
-    vec4 v2 = load4(src+8);
-    vec4 v3 = load4(src+12);
+    vec4 u0 = loadu4(src);
+    vec4 u1 = loadu4(src+4);
+    vec4 v2 = loadu4(src+8);
+    vec4 v3 = loadu4(src+12);
     vec4 v0 = unpacklo4(u0, u1);
     vec4 v1 = unpackhi4(u0, u1);
     u0 = unpacklo4(v2, v3);
     u1 = unpackhi4(v2, v3);
     v2 = twine2f128(v0, u0);
     v3 = twine2f128(v1, u1);
-    store4(dst   , blend22(v0, v2));
-    store4(dst+4 , blend22(v1, v3));
-    store4(dst+8 , blend22(v2, u0));
-    store4(dst+12, blend22(v3, u1));
+    storeu4(dst   , blend22(v0, v2));
+    storeu4(dst+4 , blend22(v1, v3));
+    storeu4(dst+8 , blend22(v2, u0));
+    storeu4(dst+12, blend22(v3, u1));
 }
 
 /* return transposed matrix
@@ -883,42 +883,39 @@ from src = { XYZT XYZT XYZT XYZT }
 */
 void transpose16(float const* src, float* dst)
 {
-    vec4f u0 = loadu4f(src);
-    vec4f u1 = loadu4f(src+4);
-    vec4f v2 = loadu4f(src+8);
-    vec4f v3 = loadu4f(src+12);
-    vec4f v0 = unpacklo4f(u0, u1);
-    vec4f v1 = unpackhi4f(u0, u1);
-    u0 = unpacklo4f(v2, v3);
-    u1 = unpackhi4f(v2, v3);
-    v2 = twine2f64(v0, u0);
-    v3 = twine2f64(v1, u1);
-    store4f(dst   , blend22f(v0, v2));
-    store4f(dst+4 , blend22f(v2, u0));
-    store4f(dst+8 , blend22f(v1, v3));
-    store4f(dst+12, blend22f(v3, u1));
+    vec4f v0 = loadu4f(src);
+    vec4f v1 = loadu4f(src+4);
+    vec4f u2 = loadu4f(src+8);
+    vec4f u3 = loadu4f(src+12);
+    vec4f u0 = unpacklo4f(v0, v1);
+    vec4f u1 = unpackhi4f(v0, v1);
+    v0 = unpacklo4f(u2, u3);
+    v1 = unpackhi4f(u2, u3);
+    storeu4f(dst   , movelh4f(u0, v0));
+    storeu4f(dst+4 , movehl4f(v0, u0));
+    storeu4f(dst+8 , movelh4f(u1, v1));
+    storeu4f(dst+12, movehl4f(v1, u1));
 }
 
 void test_transpose16()
 {
     vec4f x { 0, 1, 2, 3 };
     vec4f y { 4, 5, 6, 7 };
-    dump(twine2f64(x,y) , "twine");
     printf("------ test_transpose16\n");
     {
-        float dst[12] = { 0 };
+        float dst[16] = { 0 };
         //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
         const float src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
         transpose16(src, dst);
-        printf("source    "); dump(16, src);
+        printf("float     "); dump(16, src);
         printf("transpose "); dump(16, dst);
     }
     {
-        double dst[12] = { 0 };
+        double dst[16] = { 0 };
         //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
         const double src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
         transpose16(src, dst);
-        printf("source    "); dump(16, src);
+        printf("double    "); dump(16, src);
         printf("transpose "); dump(16, dst);
     }
 }
@@ -997,11 +994,11 @@ int main(int argc, char * argv[])
             test_hsum();
             break;
         case 4:
-            test_transpose2();
-            test_transpose3();
-            test_transpose4();
+            //test_transpose2();
+            //test_transpose3();
+            //test_transpose4();
             test_transpose16();
-            test_swap7();
+            //test_swap7();
             break;
 #endif
     }

@@ -561,25 +561,25 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list1,
 /// evaluates 4 pos.near(jj->pos_) using SIMD instructions
 inline int four_near(vec4f const& xyzr, BigLocus const* src)
 {
-    vec4f u0 = sub4f(loadu4f(src->pos_.data()), xyzr);
-    vec4f u1 = sub4f(loadu4f((src+1)->pos_.data()), xyzr);
-    vec4f v2 = sub4f(loadu4f((src+2)->pos_.data()), xyzr);
-    vec4f v3 = sub4f(loadu4f((src+3)->pos_.data()), xyzr);
+    vec4f tt = sub4f(loadu4f(src->pos_.data()), xyzr);
+    vec4f yy = sub4f(loadu4f((src+1)->pos_.data()), xyzr);
+    vec4f uu = sub4f(loadu4f((src+2)->pos_.data()), xyzr);
+    vec4f rr = sub4f(loadu4f((src+3)->pos_.data()), xyzr);
     // transpose 4x4 data matrix:
-    vec4f v0 = unpacklo4f(u0, u1);
-    vec4f v1 = unpackhi4f(u0, u1);
-    u0 = unpacklo4f(v2, v3);
-    u1 = unpackhi4f(v2, v3);
-    v2 = twine2f64(v0, u0);
-    v3 = twine2f64(v1, u1);
-    v0 = blend22f(v0, v2);
-    u0 = blend22f(v2, u0);
-    v1 = blend22f(v1, v3);
-    u1 = blend22f(v3, u1);
+    vec4f xx = unpacklo4f(tt, yy);
+    tt = unpackhi4f(tt, yy);
+    vec4f zz = unpacklo4f(uu, rr);
+    rr = unpackhi4f(uu, rr);
+    yy = movelh4f(xx, zz);
+    xx = movehl4f(zz, xx);
+    uu = mul4f(yy, yy);
+    zz = movelh4f(tt, rr);  // yy, rr
+    rr = movehl4f(rr, tt);
+    tt = mul4f(zz, zz);
     // calculate test:
-    u0 = add4f(mul4f(v0, v0), mul4f(u0, u0));  // x*x + y*y
-    u1 = sub4f(mul4f(u1, u1), mul4f(v1, v1));  // r*r - z*z
-    return movemask4f(_mm_cmplt_ps(u0, u1));  // TRUE if test passes
+    uu = add4f(mul4f(xx, xx), uu); // x*x + y*y
+    tt = sub4f(mul4f(rr, rr), tt); // r*r - z*z
+    return movemask4f(_mm_cmplt_ps(uu, tt));  // x*x + y*y < r*r - z*z
 }
 
 
@@ -644,10 +644,18 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
         int t;
         
         BigLocus const* jj = list2.begin();
+        #pragma nounroll
         for ( ; jj < list2.pre_middle(); jj += 4 )
         {
             t = four_near(xyzr, jj);
             if ( !t ) continue;
+#if 0
+            bool n0 = pos.near(jj->pos_);
+            bool n1 = pos.near((jj+1)->pos_);
+            bool n2 = pos.near((jj+2)->pos_);
+            bool n3 = pos.near((jj+3)->pos_);
+            printf("%i:%u%u%u%u \n", t, n3, n2, n1, n0);
+#endif
             if ( (t&1) && not_adjacentLL(*ii, *(jj  )) ) checkLL(meca, stiff, *ii, *(jj));
             if ( (t&2) && not_adjacentLL(*ii, *(jj+1)) ) checkLL(meca, stiff, *ii, *(jj+1));
             if ( (t&4) && not_adjacentLL(*ii, *(jj+2)) ) checkLL(meca, stiff, *ii, *(jj+2));
@@ -671,6 +679,7 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
             }
             jj += 4;
             assert_true( jj > list2.middle() );
+            #pragma nounroll
             for ( ; jj < list2.pre_end(); jj += 4 )
             {
                 t = four_near(xyzr, jj);
@@ -686,11 +695,13 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
         {
             // less than 3 BigLocus remaining
             assert_true( list2.middle() - jj < 4 );
+            #pragma nounroll
             for ( ; jj < list2.middle(); ++jj )
                 if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj) ) checkLL(meca, stiff, *ii, *jj);
         }
         // less than 3 BigPoint remaining
         assert_true( list2.end() - jj < 4 );
+        #pragma nounroll
         for ( ; jj < list2.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPL(*jj, *ii) ) checkPL(meca, stiff, *jj, *ii);
     }
@@ -702,6 +713,7 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
         int t;
         
         BigLocus const* jj = list2.begin();
+        #pragma nounroll
         for ( ; jj < list2.pre_middle(); jj += 4 )
         {
             t = four_near(xyzr, jj);
@@ -730,6 +742,7 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
             }
             jj += 4;
             assert_true( jj > list2.middle() );
+            #pragma nounroll
             for ( ; jj < list2.pre_end(); jj += 4 )
             {
                 t = four_near(xyzr, jj);
@@ -745,11 +758,13 @@ void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
         {
             // less than 3 BigLocus remaining
             assert_true( list2.middle() - jj < 4 );
+            #pragma nounroll
             for ( ; jj < list2.middle(); ++jj )
                 if ( pos.near(jj->pos_) && not_adjacentPL(*ii, *jj) ) checkPL(meca, stiff, *ii, *jj);
         }
         // less than 3 BigPoint remaining
         assert_true( list2.end() - jj < 4 );
+        #pragma nounroll
         for ( ; jj < list2.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPP(*jj, *ii) ) checkPP(meca, stiff, *jj, *ii);
     }
