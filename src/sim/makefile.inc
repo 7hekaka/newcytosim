@@ -59,17 +59,17 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            simul_prop.o simul.o interface.o parser.o
 
 
-OBJ_CYTOSIM:=$(OBJ_SPACE) $(OBJ_SIM) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
+OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_SIM) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
              $(OBJ_SINGLES) $(OBJ_COUPLES) $(OBJ_ORGANIZERS)
 
-OBJ_CYTOSIMD1:=$(OBJ_CYTOSIM:%.o=%D1.o)
-OBJ_CYTOSIMD2:=$(OBJ_CYTOSIM:%.o=%D2.o)
-OBJ_CYTOSIMD3:=$(OBJ_CYTOSIM:%.o=%D3.o)
+OBJ_CYTOLIB1:=$(OBJ_CYTOLIB:%.o=%D1.o)
+OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=%D2.o)
+OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=%D3.o)
 
 
 # objects containing graphical code under the DISPLAY keyword:
 OBJ_GRAFIX:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
-OBJ_CYTOSIMG:=$(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOSIM)) $(OBJ_GRAFIX:%.o=%G.o)
+OBJ_CYTOLIBG:=$(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOLIB)) $(OBJ_GRAFIX:%.o=%G.o)
 
 #----------------------------targets--------------------------------------------
 
@@ -79,14 +79,14 @@ INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/c
 
 #--- normal build:
 
-sim: sim.cc cytosim.a cytomath.a cytobase.a SFMT.o | bin
+sim: sim.cc cytolib.a cytomath.a cytobase.a SFMT.o | bin
 	$(COMPILE) $(INC_BM) $(INFO) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath sim  bin
 
 #--- build for debuging:
 
-simd: sim.cc cytosim.a cytomath.a cytobase.a SFMT.o | bin
+simd: sim.cc cytolib.a cytomath.a cytobase.a SFMT.o | bin
 	$(CXX) $(FlagsD) $(INC_BM) $(INFO) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath simd  bin
@@ -108,52 +108,52 @@ bin3/sim: sim.cc cytosimD3.a cytomathD3.a cytobase.a SFMT.o | bin3
 
 #--- libraries:
 
-cytosim.a: $(OBJ_CYTOSIM) | lib
+cytolib.a: $(OBJ_CYTOLIB) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytosimD1.a: $(OBJ_CYTOSIMD1) | lib
+cytolibD1.a: $(OBJ_CYTOLIB1) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytosimD2.a: $(OBJ_CYTOSIMD2) | lib
+cytolibD2.a: $(OBJ_CYTOLIB2) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytosimD3.a: $(OBJ_CYTOSIMD3) | lib
+cytolibD3.a: $(OBJ_CYTOLIB3) | lib
 	$(MAKELIB)
 	$(DONE)
 
 #--- libraries with graphical code enabled
 
-cytosimG.a: $(OBJ_CYTOSIMG) | lib
+cytosimG.a: $(OBJ_CYTOLIBG) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytosimGD1.a: $(OBJ_CYTOSIMG:%.o=%D1.o) | lib
+cytosimGD1.a: $(OBJ_CYTOLIBG:%.o=%D1.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytosimGD2.a: $(OBJ_CYTOSIMG:%.o=%D2.o) | lib
+cytosimGD2.a: $(OBJ_CYTOLIBG:%.o=%D2.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
-cytosimGD3.a: $(OBJ_CYTOSIMG:%.o=%D3.o) | lib
+cytosimGD3.a: $(OBJ_CYTOLIBG:%.o=%D3.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
 #----------------------------target rules---------------------------------------
 
-$(OBJ_CYTOSIM): %.o: %.cc %.h | build
+$(OBJ_CYTOLIB): %.o: %.cc %.h | build
 	$(COMPILE) $(INC_SIM) -c $< -o build/$@
 
-$(OBJ_CYTOSIMD1): %D1.o: %.cc %.h | build
+$(OBJ_CYTOLIB1): %D1.o: %.cc %.h | build
 	$(COMPILE) -DDIM=1 $(INC_SIM) -c $< -o build/$@
 
-$(OBJ_CYTOSIMD2): %D2.o: %.cc %.h | build
+$(OBJ_CYTOLIB2): %D2.o: %.cc %.h | build
 	$(COMPILE) -DDIM=2 $(INC_SIM) -c $< -o build/$@
 
-$(OBJ_CYTOSIMD3): %D3.o: %.cc %.h | build
+$(OBJ_CYTOLIB3): %D3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o build/$@
 
 

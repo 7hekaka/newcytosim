@@ -27,6 +27,7 @@ set(SPACES_SOURCES
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_lid.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_ring.cc"
     "${PROJECT_SOURCE_DIR}/src/sim/spaces/space_mesh.cc"
+    "${PROJECT_SOURCE_DIR}/src/math/quartic_solver.cc"
 )
 
 add_library(${SPACES_LIB_TARGET} STATIC ${SPACES_SOURCES})

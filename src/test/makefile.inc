@@ -72,7 +72,7 @@ test_rigidity: test_rigidity.cc random.o random_vector.o SFMT.o tictoc.o | bin
 	$(DONE)
 vpath test_rigidity bin
 
-test_size: test_size.cc cytosim.a cytomath.a cytobase.a | bin
+test_size: test_size.cc cytolib.a cytomath.a cytobase.a | bin
 	$(COMPILE) -Isrc/math -Isrc/base -Isrc/sim $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_sizeof bin

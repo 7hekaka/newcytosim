@@ -10,7 +10,7 @@ vpath %.cc src/tools
 
 #--------------------macros----------------------------------------------------
 
-TOOL_OBJ := cytosim.a cytomath.a sparmatsymblk.o cytobase.a SFMT.o
+TOOL_OBJ := cytolib.a cytomath.a sparmatsymblk.o cytobase.a SFMT.o
 
 TOOL_INC  = $(addprefix -Isrc/, math base sim sim/spaces sim/fibers sim/singles sim/organizers disp play)
 

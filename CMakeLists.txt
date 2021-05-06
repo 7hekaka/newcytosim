@@ -11,11 +11,20 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tar)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
-if(NOT DEFINED DIMENSION)
-    set(DIMENSION 2)
+set(SIM_LIB_TARGET "cytolib")
+set(BASE_LIB_TARGET "cytobase")
+set(MATH_LIB_TARGET "cytomath")
+set(SPACES_LIB_TARGET "cytospace")
+set(SPACES_G_LIB_TARGET "cytospaceG")
+set(DISP_LIB_TARGET "cytodisp")
+
+if(DEFINED DIMENSION)
+    add_definitions(-DDIM=${DIMENSION})
+    set(SIM_LIB_TARGET "cytolibD${DIMENSION}")
+    set(SPACES_LIB_TARGET "cytospaceD${DIMENSION}")
+    set(SPACES_G_LIB_TARGET "cytospaceD${DIMENSION}G")
 endif()
 
-add_definitions(-DDIM=${DIMENSION})
 
 option(BUILD_SIM_EXECUTABLE "build the cytosim simulation executable" ON)
 option(BUILD_PLAY_EXECUTABLE "build the cytosim OpenGL viewer" ON)
@@ -46,13 +55,6 @@ set(TOOLS_SRC_DIR "${PROJECT_SOURCE_DIR}/src/tools")
 
 set(CYTOSIM_EXE_TARGET "sim")
 set(PLAY_EXE_TARGET "play")
-
-set(SIM_LIB_TARGET "cytosimD${DIMENSION}")
-set(BASE_LIB_TARGET "cytobase")
-set(MATH_LIB_TARGET "cytomath")
-set(SPACES_LIB_TARGET "cytospaceD${DIMENSION}")
-set(SPACES_G_LIB_TARGET "cytospaceD${DIMENSION}G")
-set(DISP_LIB_TARGET "cytodisp")
 
 # Use this to link against the Cytosim Libraries
 set(CYTOSIM_LIBRARIES
