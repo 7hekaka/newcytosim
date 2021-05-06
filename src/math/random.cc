@@ -2,13 +2,13 @@
 
 #include "random.h"
 
-#include <cstdio>
+#include <iostream>
 #include <cstdlib>
 #include <climits>
 #include <sys/time.h>
 #include <cstring>
 #include <ctime>
-
+#include <random>
 
 /// static object
 Random RNG;
@@ -98,23 +98,14 @@ uint32_t hash(long t, int32_t c)
 uint32_t Random::seed()
 {
     uint32_t s = 0;
-    // read system source if available, from /dev/urandom which does not block!
-    FILE * f = fopen("/dev/urandom", "r");
-    if ( f && ! ferror(f) )
-    {
-        int cnt = 0;
-        while ( s == 0 && ++cnt < 32 )
-        {
-            if ( fread(&s, sizeof(s), 1, f) < sizeof(s) )
-            {
-                s = 0;
-                break;
-            }
-        }
+    // read system source if available:
+    try {
+        std::random_device rd;
+        s = rd();
     }
-    // use clock otherwise
-    if ( s == 0 )
-    {
+    catch (const std::exception &e) {
+        std::cerr << e.what() << '\n';
+        // use clock otherwise
         struct timeval now;
         gettimeofday(&now, nullptr);
         s = hash(now.tv_sec, now.tv_usec);
