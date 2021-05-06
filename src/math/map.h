@@ -1,8 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 // Francois Nedelec; Created 07/03/2015. nedelec@embl.de
 
-#ifndef GRID_BASE_H
-#define GRID_BASE_H
+#ifndef MAP_H
+#define MAP_H
 
 #include "assert_macro.h"
 #include "exceptions.h"
