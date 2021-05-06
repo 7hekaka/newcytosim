@@ -55,7 +55,7 @@ public:
         float y = YY - arg.YY;
         float z = ZZ - arg.ZZ;
         float r = RR + arg.RR;
-        return ( z*z + x*x <= r*r - y*y );
+        return ( x*x + y*y < r*r - z*z );
 #endif
     }
 };
