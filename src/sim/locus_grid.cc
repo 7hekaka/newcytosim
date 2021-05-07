@@ -786,7 +786,7 @@ bitfield near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
     {
         bitfield t = four_near(xyzr, ptr);
         unsigned i = end - ptr;
-        assert_true( i < 4 );
+        assert_true( i < 8 );
         // a mask to clear the bits past the end:
         bitfield k = ~( ~0LU << i );
         res |= ( t & k ) << shift;
