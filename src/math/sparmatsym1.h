@@ -7,8 +7,8 @@
 #include <cstdio>
 #include <string>
 
-#define MATRIX1_OPTIMIZED_MULTIPLY 1
-#define MATRIX1_USES_COLNEXT 1
+#define SPARMAT1_OPTIMIZED_MULTIPLY 1
+#define SPARMAT1_USES_COLNEXT 1
 
 ///real symmetric sparse Matrix, with optimized multiplication
 /**
@@ -52,7 +52,7 @@ private:
     /// colmax_[c] is the number of Elements allocated in column 'c'
     unsigned * colmax_;
 
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
     /// colidx_[i] is the index of the first non-empty column of index >= i
     size_t * colidx_;
 #endif
@@ -66,7 +66,7 @@ private:
     /// update colidx_[], a pointer to the next non-empty column
     void setColumnIndex();
     
-#if MATRIX1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_OPTIMIZED_MULTIPLY
 
     ///array of index for the optmized multiplication
     ///@todo migrate to DSS Symmetric Matrix Storage format

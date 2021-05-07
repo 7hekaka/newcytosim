@@ -91,6 +91,7 @@ inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a)
 
 #elif defined(__SSE3__)
 
+// emulating the blend function using two shuffles
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,b,0xEE), 0xC4); }
 
 // loading 3 elements

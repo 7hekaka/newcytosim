@@ -161,19 +161,30 @@ void test_swapSSE()
 
 void test_shuffle()
 {
+    printf("------ test_shuffle\n");
     // two shuffles to perform a blend
     vec4f a { 1, 2, 3, 4 };
     vec4f b {-1,-2,-3,-4 };
     dump(a, "a  ");
     dump(b, "b  ");
 
-    vec4f x = _mm_shuffle_ps(a, b, 0xEE);
-    vec4f y = _mm_shuffle_ps(a, x, 0xC4);
-    dump(y, "y  ");
+    dump(_mm_movehl_ps(a, b), "_mm_movehl_ps(a, b)");
+    dump(_mm_movelh_ps(a, b), "_mm_movelh_ps(a, b)");
+    dump(_mm_movehl_ps(b, a), "_mm_movehl_ps(b, a)");
+    dump(_mm_movelh_ps(b, a), "_mm_movelh_ps(b, a)");
+
+    dump(_mm_shuffle_ps(a, b, 0x4E), "_mm_shuffle_ps(a, b, 0x4E)");
+    dump(_mm_shuffle_ps(a, b, 0xEE), "_mm_shuffle_ps(a, b, 0xEE)");
+    dump(_mm_shuffle_ps(a, b, 0xE4), "_mm_shuffle_ps(a, b, 0xE4)");
+    dump(_mm_shuffle_ps(a, b, 0xC4), "_mm_shuffle_ps(a, b, 0xC4)");
+
+    dump(_mm_shuffle_ps(b, a, 0x24), "_mm_shuffle_ps(b, a, 0x24)");
+    dump(_mm_shuffle_ps(a, b, 0x23), "_mm_shuffle_ps(a, b, 0x23)");
     
-    b = _mm_shuffle_ps(a, b, 0x23);
-    a = _mm_shuffle_ps(b, a, 0x24);
-    dump(y, "a  ");
+    vec4f x = _mm_movehl_ps(b, a);
+    dump(x, "shuffle-blend");
+    vec4f y = _mm_shuffle_ps(a, x, 0xC4);
+    dump(y, "shuffle-blend");
 }
 
 //------------------------------------------------------------------------------
@@ -961,8 +972,6 @@ int main(int argc, char * argv[])
     if ( argc > 1 )
         i = std::max(0, atoi(argv[1]));
 
-    //test_swapSSE();
-    test_shuffle();
     switch ( i )
     {
         case 0:
@@ -994,11 +1003,15 @@ int main(int argc, char * argv[])
             test_hsum();
             break;
         case 4:
-            //test_transpose2();
-            //test_transpose3();
-            //test_transpose4();
+            test_transpose2();
+            test_transpose3();
+            test_transpose4();
             test_transpose16();
-            //test_swap7();
+            break;
+        case 5:
+            test_swapSSE();
+            test_shuffle();
+            test_swap7();
             break;
 #endif
     }

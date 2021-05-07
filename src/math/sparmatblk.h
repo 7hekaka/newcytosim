@@ -31,9 +31,9 @@
 
 // Flag to enable AVX implementation
 #ifdef __AVX__
-#  define MATRIXSB_USES_AVX REAL_IS_DOUBLE
+#  define SPARMATBLK_USES_AVX REAL_IS_DOUBLE
 #else
-#  define MATRIXSB_USES_AVX 0
+#  define SPARMATBLK_USES_AVX 0
 #endif
 
 /// Sparse Matrix with block elements
@@ -119,7 +119,7 @@ public:
         /// multiplication of a vector: L * X
         real vecMul1D(const real* X) const;
 
-#if MATRIXSB_USES_AVX
+#if SPARMATBLK_USES_AVX
         /// multiplication of a vector: L * X
         vec2 vecMul2D(const real* X) const;
         

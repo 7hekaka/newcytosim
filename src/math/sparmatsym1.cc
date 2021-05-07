@@ -10,16 +10,16 @@
 
 
 #ifdef __AVX__
-#  define MATRIX1_USES_AVX REAL_IS_DOUBLE
-#  define MATRIX1_USES_SSE REAL_IS_DOUBLE
+#  define SPARMAT1_USES_AVX REAL_IS_DOUBLE
+#  define SPARMAT1_USES_SSE REAL_IS_DOUBLE
 #  include "simd.h"
 #elif defined(__SSE3__)
-#  define MATRIX1_USES_AVX 0
-#  define MATRIX1_USES_SSE REAL_IS_DOUBLE
+#  define SPARMAT1_USES_AVX 0
+#  define SPARMAT1_USES_SSE REAL_IS_DOUBLE
 #  include "simd.h"
 #else
-#  define MATRIX1_USES_AVX 0
-#  define MATRIX1_USES_SSE 0
+#  define SPARMAT1_USES_AVX 0
+#  define SPARMAT1_USES_SSE 0
 #endif
 
 
@@ -30,12 +30,12 @@ SparMatSym1::SparMatSym1()
     column_ = nullptr;
     colsiz_ = nullptr;
     colmax_ = nullptr;
-#if MATRIX1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_OPTIMIZED_MULTIPLY
     nmax_ = 0;
     ija_  = nullptr;
     sa_   = nullptr;
 #endif
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
     colidx_ = new size_t[2];
     colidx_[0] = 0;
 #endif
@@ -84,7 +84,7 @@ void SparMatSym1::allocate(size_t alc)
             colmax_[ii] = 0;
         }
         
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
         delete[] colidx_;
         colidx_ = new size_t[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
@@ -103,10 +103,10 @@ void SparMatSym1::deallocate()
         delete[] column_; column_ = nullptr;
         delete[] colsiz_; colsiz_ = nullptr;
         delete[] colmax_; colmax_ = nullptr;
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
         delete[] colidx_; colidx_ = nullptr;
 #endif
-#if MATRIX1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_OPTIMIZED_MULTIPLY
         delete[] ija_;
         free_real(sa_);
         ija_ = nullptr;
@@ -453,9 +453,9 @@ size_t SparMatSym1::nbDiagonalElements(size_t start, size_t stop) const
 std::string SparMatSym1::what() const
 {
     std::ostringstream msg;
-#if MATRIX1_USES_AVX
+#if SPARMAT1_USES_AVX
     msg << "SMS1x " << nbElements();
-#elif MATRIX1_USES_SSE
+#elif SPARMAT1_USES_SSE
     msg << "SMS1e " << nbElements();
 #else
     msg << "SMS1 " << nbElements();
@@ -496,7 +496,7 @@ void SparMatSym1::printColumns(std::ostream& os, size_t start, size_t stop)
     for ( size_t jj = start; jj < stop; ++jj )
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
         os << " index " << colidx_[jj];
 #endif
     }
@@ -519,7 +519,7 @@ void SparMatSym1::printColumn(std::ostream& os, const size_t jj)
 
 void SparMatSym1::printSparseArray(std::ostream& os) const
 {
-#if MATRIX1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_OPTIMIZED_MULTIPLY
     std::ios::fmtflags fgs = os.flags();
     size_t end = ija_[size_];
     
@@ -624,7 +624,7 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element c
 //------------------------------------------------------------------------------
 #pragma mark - Prepare Multiplication
 
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
 void SparMatSym1::setColumnIndex()
 {
     if ( size_ > 0 )
@@ -647,7 +647,7 @@ void SparMatSym1::setColumnIndex()
 #endif
 
 
-#if !MATRIX1_OPTIMIZED_MULTIPLY
+#if !SPARMAT1_OPTIMIZED_MULTIPLY
 
 bool SparMatSym1::prepareForMultiply(int)
 {
@@ -804,7 +804,7 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj,
 //------------------------------------------------------------------------------
 #pragma mark - 2D SIMD
 
-#if MATRIX1_USES_SSE
+#if SPARMAT1_USES_SSE
 
 inline static void multiply2(const real* X, real* Y, size_t ii,
                       const real* val, vec2 const& xx, vec2& ss)
@@ -956,7 +956,7 @@ void SparMatSym1::vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj,
 
 #endif
 
-#if MATRIX1_USES_AVX && MATRIX1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_USES_AVX && SPARMAT1_OPTIMIZED_MULTIPLY
 
 /*
 Accumulation is done here in the higher part of 'ss'
@@ -1061,11 +1061,11 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj,
 //------------------------------------------------------------------------------
 #pragma mark - 3D SIMD
 
-#if MATRIX1_USES_SSE
+#if SPARMAT1_USES_SSE
 #endif
 
 
-#if MATRIX1_USES_AVX && MATRIX1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_USES_AVX && SPARMAT1_OPTIMIZED_MULTIPLY
 void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
                                         real const* dia, size_t start, size_t stop) const
 {
@@ -1116,13 +1116,13 @@ void SparMatSym1::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) c
     assert_true( start <= stop );
     stop = std::min(stop, size_);
 
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
     for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else
     for ( size_t jj = start; jj < stop; ++jj )
 #endif
     {
-#if MATRIX1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_OPTIMIZED_MULTIPLY
         vecMulAddCol(X, Y, jj, sa_+jj, ija_[jj], ija_[jj+1]);
 #else
         if ( colsiz_[jj] > 0 )
@@ -1140,16 +1140,16 @@ void SparMatSym1::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t st
     assert_true( start <= stop );
     stop = std::min(stop, size_);
 
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
     for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else
     for ( size_t jj = start; jj < stop; ++jj )
 #endif
     {
-#if MATRIX1_OPTIMIZED_MULTIPLY
-#  if MATRIX1_USES_AVX
+#if SPARMAT1_OPTIMIZED_MULTIPLY
+#  if SPARMAT1_USES_AVX
         vecMulAddColIso2D_AVXU(X, Y, 2*jj, sa_+jj, ija_[jj], ija_[jj+1]);
-#  elif MATRIX1_USES_SSE
+#  elif SPARMAT1_USES_SSE
         vecMulAddColIso2D_SSEU(X, Y, 2*jj, sa_+jj, ija_[jj], ija_[jj+1]);
 #  else
         vecMulAddColIso2D(X, Y, 2*jj, sa_+jj, ija_[jj], ija_[jj+1]);
@@ -1171,14 +1171,14 @@ void SparMatSym1::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t st
     assert_true( start <= stop );
     stop = std::min(stop, size_);
 
-#if MATRIX1_USES_COLNEXT
+#if SPARMAT1_USES_COLNEXT
     for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else
     for ( size_t jj = start; jj < stop; ++jj )
 #endif
     {
-#if MATRIX1_OPTIMIZED_MULTIPLY
-#  if MATRIX1_USES_AVX
+#if SPARMAT1_OPTIMIZED_MULTIPLY
+#  if SPARMAT1_USES_AVX
         vecMulAddColIso3D_AVX(X, Y, 3*jj, sa_+jj, ija_[jj], ija_[jj+1]);
 #  else
         vecMulAddColIso3D(X, Y, 3*jj, sa_+jj, ija_[jj], ija_[jj+1]);

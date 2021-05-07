@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <sstream>
 
-#define MATRIX_OPTIMIZED_MULTIPLY 1
+#define SPARMAT_OPTIMIZED_MULTIPLY 1
 
 const size_t AVAILABLE_CELL = ~0U >> 1;
 const size_t LAST_IN_COLUMN = ~0U;
@@ -269,7 +269,7 @@ size_t SparMat::nbElements(size_t start, size_t stop) const
 std::string SparMat::what() const
 {
     std::ostringstream msg;
-#if MATRIX_OPTIMIZED_MULTIPLY
+#if SPARMAT_OPTIMIZED_MULTIPLY
     msg << "mS+ " << nbElements();
 #else
     msg << "mS " << nbElements();
@@ -293,7 +293,7 @@ void SparMat::vecMulAdd( const real* X, real* Y ) const
 }
 
 //------------------------------------------------------------------------------
-#if ( MATRIX_OPTIMIZED_MULTIPLY == 0 )
+#if ( SPARMAT_OPTIMIZED_MULTIPLY == 0 )
 
 
 void SparMat::vecMulAddIso2D( const real* X, real* Y ) const
@@ -329,7 +329,7 @@ void SparMat::vecMulAddIso3D( const real* X, real* Y ) const
 }
 
 
-#else  // MATRIX_OPTIMIZED_MULTIPLY
+#else  // SPARMAT_OPTIMIZED_MULTIPLY
 
 
 void SparMat::vecMulAddIso2D( const real* X, real* Y ) const

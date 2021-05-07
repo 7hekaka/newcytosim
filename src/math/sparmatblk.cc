@@ -339,7 +339,7 @@ size_t SparMatBlk::nbElements() const
 std::string SparMatBlk::what() const
 {
     std::ostringstream msg;
-#if MATRIXSB_USES_AVX
+#if SPARMATBLK_USES_AVX
     msg << "SMBx " << Block::what() << "*" << nbElements();
 #else
     msg << "SMB " << Block::what() << "*" << nbElements();
@@ -647,7 +647,7 @@ real SparMatBlk::Line::vecMul1D(const real* X) const
 //------------------------------------------------------------------------------
 #pragma mark - SIMD Optimized Vector Multiplication
 
-#if MATRIXSB_USES_AVX
+#if SPARMATBLK_USES_AVX
 
 #include "simd.h"
 
@@ -945,9 +945,9 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
-#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
         store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
-#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DUU(X)));
 #else
@@ -966,9 +966,9 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
-#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
         store2(Y+i, add2(load2(Y+i), row_[i].vecMul2D(X)));
-#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3D(X)));
 #else
@@ -991,9 +991,9 @@ void SparMatBlk::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t sto
         cnt += row_[i].size_;
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
-#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
         store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
-#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DUU(X)));
 #else
@@ -1023,9 +1023,9 @@ void SparMatBlk::vecMul(const real* X, real* Y, size_t start, size_t stop) const
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] = row_[i].vecMul1D(X);
-#elif ( BLOCK_SIZE == 2 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
         store2(Y+i, row_[i].vecMul2DU(X));
-#elif ( BLOCK_SIZE == 3 ) && MATRIXSB_USES_AVX
+#elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+i, row_[i].vecMul3DUU(X));
 #else
