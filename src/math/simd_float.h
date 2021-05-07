@@ -83,11 +83,7 @@ inline static vec4f blend13f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1110)
 
 inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos)
 {
-#if defined(__AVX512VL__)
-    return _mm_mask_mov_ps(pos, val, neg);
-#else
     return _mm_blendv_ps(pos, neg, val);
-#endif
 }
 
 // loading 4 and clearing one

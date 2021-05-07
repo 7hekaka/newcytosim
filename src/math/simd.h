@@ -234,11 +234,7 @@ inline static vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); 
 
 inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos)
 {
-#if defined(__AVX512VL__)
-    return _mm256_mask_mov_pd(pos, val, neg);
-#else
     return _mm256_blendv_pd(pos, neg, val);
-#endif
 }
 
 #if 0
