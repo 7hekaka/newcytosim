@@ -277,7 +277,7 @@ public:
  - It covers the space with a Grid `pGrid`, initialized by `setGrid()`
  - A list of class `PointGridCell` is associated with each cell of `pGrid`.
  - `PointGrid::add()` links `BigLocus` or `BigLocus` to the appropriate cell of the grid.
- - `PointGrid::setInteractions()` checks all pairs of particles that may overlap,
+ - `PointGrid::setSterics()` checks all pairs of particles that may overlap,
     calculating their actual distance, and calling Meca::addLink() as necessary
  .
  The related class `LocusGrid`, is a simpler, streamline version of this class.
@@ -441,7 +441,7 @@ public:
     }
     
     /// enter interactions into Meca with given stiffness
-    void setInteractions(Meca&, Stiffness const&) const;
+    void setSterics(Meca&, Stiffness const&) const;
     
 #else
     
@@ -452,10 +452,10 @@ public:
     void add(size_t pane, Fiber const*, size_t, real rad, real rge, real sup) const;
     
     /// enter interactions into Meca in one panes with given parameters
-    void setInteractions(Meca&, Stiffness const&, size_t pan) const;
+    void setSterics(Meca&, Stiffness const&, size_t pan) const;
     
     /// enter interactions into Meca between two panes with given parameters
-    void setInteractions(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
+    void setSterics(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
     
 #endif
     

@@ -2834,7 +2834,7 @@ void Simul::analyzeRing(ObjectFlag flg, real& length, real& radius) const
     unsigned rad_cnt = 0;
     
     // rotate plane around the Z-axis and find intersecting fibers
-    for ( unsigned a = 0; a <= 360; ++a )
+    for ( unsigned a = 0; a < 360; ++a )
     {
         real ang = a * M_PI / 180.0;
         Vector nor( std::cos(ang), std::sin(ang), 0);

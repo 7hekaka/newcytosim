@@ -194,21 +194,21 @@ void Simul::setStericInteractions(Meca& meca) const
     
 #if ( NUM_STERIC_PANES == 1 )
     
-    pointGrid.setInteractions(meca, pam);
+    pointGrid.setSterics(meca, pam);
 
 #elif ( NUM_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
-    pointGrid.setInteractions(meca, pam, 1);
+    pointGrid.setSterics(meca, pam, 1);
     // add steric interactions between panes 1 and 2:
-    pointGrid.setInteractions(meca, pam, 1, 2);
-    //pointGrid.setInteractions(meca, pam, 2, 1);
+    pointGrid.setSterics(meca, pam, 1, 2);
+    //pointGrid.setSterics(meca, pam, 2, 1);
 
 #else
     
     // add steric interactions within each pane:
     for ( size_t p = 1; p <= NUM_STERIC_PANES; ++p )
-        pointGrid.setInteractions(meca, pam, p);
+        pointGrid.setSterics(meca, pam, p);
 
 #endif
 }
@@ -310,21 +310,21 @@ void Simul::setStericInteractionsAlt(Meca& meca) const
 
 #if ( MAX_STERIC_PANES == 1 )
         
-    locusGrid.setInteractions(meca, stiff);
+    locusGrid.setSterics(meca, stiff);
 
 #elif ( MAX_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
-    locusGrid.setInteractions(meca, stiff, 1);
+    locusGrid.setSterics(meca, stiff, 1);
     // add steric interactions between panes 1 and 2:
-    locusGrid.setInteractions(meca, stiff, 1, 2);
-    //pointGrid.setInteractions(meca, pam, 2, 1);
+    locusGrid.setSterics(meca, stiff, 1, 2);
+    //pointGrid.setSterics(meca, pam, 2, 1);
 
 #else
     
     // add steric interactions within each pane:
     for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-        locusGrid.setInteractions(meca, stiff, p);
+        locusGrid.setSterics(meca, stiff, p);
 
 #endif
     //std::clog << "LocusGrid has capacity " << locusGrid.capacity() << "\n";

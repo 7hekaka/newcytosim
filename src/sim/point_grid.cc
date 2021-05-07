@@ -625,7 +625,7 @@ void PointGrid::setStericsT(Meca& meca, Stiffness const& stiff) const
 }
 
 
-void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff) const
+void PointGrid::setSterics(Meca& meca, Stiffness const& stiff) const
 {
     //std::clog << "----" << '\n';
     if ( pGrid.isPeriodic() )
@@ -763,7 +763,7 @@ void PointGrid::setStericsT(Meca& meca, Stiffness const& stiff,
 
 
 
-void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff, size_t pan) const
+void PointGrid::setSterics(Meca& meca, Stiffness const& stiff, size_t pan) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(meca, stiff, pan);
@@ -772,7 +772,7 @@ void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff, size_t pan) 
 }
 
 
-void PointGrid::setInteractions(Meca& meca, Stiffness const& stiff, size_t pan1, size_t pan2) const
+void PointGrid::setSterics(Meca& meca, Stiffness const& stiff, size_t pan1, size_t pan2) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(meca, stiff, pan1, pan2);

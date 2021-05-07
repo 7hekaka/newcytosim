@@ -259,7 +259,7 @@ public:
  - It covers the space with a Grid `pGrid`, initialized by `setGrid()`
  - A list of class `LocusGridCell` is associated with each cell of `pGrid`.
  - `LocusGrid::add()` links `BigLocus` or `BigLocus` to the appropriate cell of the grid.
- - `LocusGrid::setInteractions()` checks all pairs of particles that may overlap,
+ - `LocusGrid::setSterics()` checks all pairs of particles that may overlap,
     calculating their actual distance, and calling Meca::addLink() as necessary
  .
  Compared to PointGrid, LocusGrid only supports repulsive interactions.
@@ -404,7 +404,7 @@ public:
     }
     
     /// enter interactions into Meca with given stiffness
-    void setInteractions(Meca&, real stiff) const;
+    void setSterics(Meca&, real stiff) const;
     
 #else
 
@@ -427,10 +427,10 @@ public:
     }
     
     /// enter interactions into Meca in one panes with given parameters
-    void setInteractions(Meca&, real stiff, size_t pan) const;
+    void setSterics(Meca&, real stiff, size_t pan) const;
     
     /// enter interactions into Meca between two panes with given parameters
-    void setInteractions(Meca&, real stiff, size_t pan1, size_t pan2) const;
+    void setSterics(Meca&, real stiff, size_t pan1, size_t pan2) const;
     
 #endif
 

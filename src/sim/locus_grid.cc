@@ -984,7 +984,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff) const
 }
 
 
-void LocusGrid::setInteractions(Meca& meca, real stiff) const
+void LocusGrid::setSterics(Meca& meca, real stiff) const
 {
     //std::clog << "----" << '\n';
     if ( pGrid.isPeriodic() )
@@ -1083,7 +1083,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, size_t pan, size_t bim) cons
 }
 
 
-void LocusGrid::setInteractions(Meca& meca, real stiff, size_t pan) const
+void LocusGrid::setSterics(Meca& meca, real stiff, size_t pan) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(meca, stiff, pan);
@@ -1092,7 +1092,7 @@ void LocusGrid::setInteractions(Meca& meca, real stiff, size_t pan) const
 }
 
 
-void LocusGrid::setInteractions(Meca& meca, real stiff, size_t pan1, size_t pan2) const
+void LocusGrid::setSterics(Meca& meca, real stiff, size_t pan1, size_t pan2) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(meca, stiff, pan1, pan2);
