@@ -592,6 +592,8 @@ inline int four_near(vec4f const& xyzr, BigLocus const* src)
 
  Compared to `setSterics0()`, this performs additional tests to exclude
  objects that are too far appart to interact, based on BigVector::near()
+ 
+ This code was superseeded by setStericsX()
 */
 void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
                             BigLocusList const& list2)
@@ -825,6 +827,13 @@ void near_bits(bitfield& bitL, bitfield& bitP, vec4f const& xyzr, BigLocusList c
 
  Compared to `setSterics0()`, this performs additional tests to exclude
  objects that are too far appart to interact, based on BigVector::near()
+ 
+ The same approach can be used for periodic boundary conditions, if:
+ - BigVector should be folded to their cannonical representation
+ - distance should should be calculated adding an offset, when the
+   two cells are accross a periodic boundary, and this offset is defined per
+   cell pairs, and not per object pair: just need to update `xyzr` below.
+ .
 */
 void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
                             BigLocusList const& list2)

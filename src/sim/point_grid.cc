@@ -360,18 +360,18 @@ void PointGrid::checkLL(Meca& meca, Stiffness const& pam,
 {
 #if ( DIM >= 3 )
     
-    const real ran = std::max(aa.rge_+bb.rad_, aa.rad_+bb.rge_);
+    const real ran = std::max(bb.rad_+aa.rge_, aa.rad_+bb.rge_);
 
     /* in 3D, check the shortest distance between two segments, and if close
      enough, use the result to build an interaction */
-    real a, b, d;
-    if ( aa.seg_.belowDistance(bb.seg_, ran, a, b, d) )
+    real a, b, dis2 = INFINITY;
+    if ( ! aa.seg_.belowDistance(bb.seg_, ran, a, b, dis2) )
         return;
     
     if ( aa.seg_.within(a) & bb.seg_.within(b) )
     {
         const real len = aa.rad_ + bb.rad_;
-        real stiff = sign_select(d-len*len, pam.push, pam.pull);
+        real stiff = sign_select(dis2-len*len, pam.push, pam.pull);
         meca.addSideSlidingLink(aa.seg_, a, Interpolation(bb.seg_, b), len, stiff);
     }
 #endif
@@ -400,7 +400,7 @@ void PointGrid::checkLL(Meca& meca, Stiffness const& pam,
 /// excluding two spheres when they are from the same Solid
 inline static bool not_adjacent(FatPoint const* a, FatPoint const* b)
 {
-    return a->pnt_.mecable() == b->pnt_.mecable();
+    return a->pnt_.mecable() != b->pnt_.mecable();
 }
 
 
@@ -409,7 +409,7 @@ inline static bool not_adjacent(FatPoint const* a, FatLocus const* b)
 {
     //a->pnt_.mecable()->Buddy::print(std::clog);
     //b->seg_.fiber()->Buddy::print(std::clog);
-    return b->seg_.fiber()->buddy() == a->pnt_.mecable()->buddy();
+    return b->seg_.fiber()->buddy() != a->pnt_.mecable()->buddy();
 }
 
 
@@ -417,10 +417,10 @@ inline static bool not_adjacent(FatPoint const* a, FatLocus const* b)
 inline static bool not_adjacent(FatLocus const* a, FatLocus const* b)
 {
 #if FIBER_HAS_FAMILY
-    return (( a->seg_.fiber()->family_ == b->seg_.fiber()->family_ )
+    return (( a->seg_.fiber()->family_ != b->seg_.fiber()->family_ )
             || (( a->seg_.point() > 1 + b->seg_.point() ) | ( b->seg_.point() > 1 + a->seg_.point() )));
 #else
-    return (( a->seg_.fiber() == b->seg_.fiber() )
+    return (( a->seg_.fiber() != b->seg_.fiber() )
             || (( a->seg_.point() > 1 + b->seg_.point() ) | ( b->seg_.point() > 1 + a->seg_.point() )));
 #endif
     // we cannot use abs() above because `pti_` is unsigned

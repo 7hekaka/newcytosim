@@ -241,7 +241,6 @@ bool FiberSegment::belowDistance(FiberSegment const& seg, real sup,
         real res2 = ( p2 - p1 ).norm();
         printf("%6.4f  %6.4f  %6.4f\n", res0, res1, res2);
 #endif
-        return true;
     }
     else
     {
@@ -271,8 +270,8 @@ bool FiberSegment::belowDistance(FiberSegment const& seg, real sup,
         
         // clamp inside segment and use mid-point
         abs2 = 0.5 * ( min_real(len2, max_real(m2, p2)) + max_real(0, min_real(m2, p2)));
-        return true;
     }
+    return true;
 }
 
 
