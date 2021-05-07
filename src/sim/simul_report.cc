@@ -8,7 +8,7 @@
 #include "stream_func.h"
 
 /// width of columns in formatted output, in number of characters
-int column_width = 10;
+static int column_width = 10;
 
 /// use this macro at the beginning of a line of comment
 #define COM "\n% " << std::setw(column_width-2)
@@ -22,7 +22,7 @@ int column_width = 10;
 #include "accumulator.h"
 
 /// pad string by adding white-space on the right up to size 'n * column_width - p'
-std::string ljust(std::string const& str, size_t n, size_t p = 0)
+static std::string ljust(std::string const& str, size_t n, size_t p = 0)
 {
     size_t s = n * (size_t)column_width - p;
     if ( str.size() < s )
@@ -32,7 +32,7 @@ std::string ljust(std::string const& str, size_t n, size_t p = 0)
 }
 
 /// pad string by adding white-space on the left up to size 'n * column_width - p'
-std::string rjust(std::string const& str, size_t n, size_t p = 1)
+static std::string rjust(std::string const& str, size_t n, size_t p = 1)
 {
     size_t s = n * (size_t)column_width - p;
     if ( str.size() < s )
@@ -42,7 +42,7 @@ std::string rjust(std::string const& str, size_t n, size_t p = 1)
 }
 
 /// repeat string DIM times with X, Y, Z endings as appropriate
-std::string repeatXYZ(std::string const& str)
+static std::string repeatXYZ(std::string const& str)
 {
     std::string res(rjust(str+"X", 1, 1));
 #if ( DIM > 1 )
@@ -55,7 +55,7 @@ std::string repeatXYZ(std::string const& str)
 }
 
 /// remove any 's' at the end of the argument
-void remove_plural(std::string & str)
+static void remove_plural(std::string & str)
 {
     if ( str.size() > 2  &&  str.at(str.size()-1) == 's' )
         str.resize(str.size()-1);
@@ -93,7 +93,7 @@ void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
 {
     std::streamsize op = out.precision(), p = 4;
     opt.set(p, "precision");
-    opt.set(column_width, "column") || opt.peek(column_width, "width");
+    opt.set(column_width, "column", "width");
     
     // use fixed notation:
     out.setf(std::ios_base::fixed, std::ios_base::floatfield);
