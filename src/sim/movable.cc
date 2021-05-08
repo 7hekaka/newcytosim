@@ -846,6 +846,17 @@ restart:
 }
 
 
+/// extract a rotation angle specified in Radian
+static real get_angle(std::istream& is)
+{
+    real a = 0;
+    is >> a;
+    // if no angle is specified, set it randomly:
+    if ( is.fail() )
+        a = RNG.sreal() * M_PI;
+    return a;
+}
+
 /**
  A rotation can be specified in 3D as follows:
  
@@ -928,34 +939,16 @@ Rotation Movable::readRotation(std::istream& is)
         return rot;
     }
     else if ( tok == "X" )
-    {
-        real ang = 0.5 * M_PI;
-        is >> ang;
-        return Rotation::rotationAroundX(ang);
-    }
+        return Rotation::rotationAroundX(get_angle(is));
     else if ( tok == "Y" )
-    {
-        real ang = 0.5 * M_PI;
-        is >> ang;
-        return Rotation::rotationAroundY(ang);
-    }
+        return Rotation::rotationAroundY(get_angle(is));
     else if ( tok == "Z" )
-    {
-        real ang = 0.5 * M_PI;
-        is >> ang;
-        return Rotation::rotationAroundZ(ang);
-    }
+        return Rotation::rotationAroundZ(get_angle(is));
 #else
     else if ( tok == "X" )
-    {
         return Rotation::identity();
-    }
     else if ( tok == "Z" )
-    {
-        real ang = 0.5 * M_PI;
-        is >> ang;
-        return Rotation::rotation(ang);
-    }
+        return Rotation::rotation(get_angle(is));
 #endif
     
     // rewind before token:
