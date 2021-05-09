@@ -31,7 +31,7 @@ void PlayerProp::clear()
     report_index = 0;
     image_index  = 0;
     poster_index = 0;
-    saved_image  = -1;
+    saved_image_time = -1;
     goLive = 0;
 }
 

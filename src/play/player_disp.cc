@@ -320,10 +320,10 @@ void Player::drawScene(View& view)
     
     if ( prop.save_images > 0 )
     {
-        size_t t = simul.time();
-        if ( prop.saved_image != t )
+        double t = simul.time();
+        if ( prop.saved_image_time != t )
         {
-            prop.saved_image = t;
+            prop.saved_image_time = t;
             if ( prop.goLive )
                 saveView(prop.image_index++, prop.downsample);
             else

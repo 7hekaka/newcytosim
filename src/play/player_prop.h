@@ -99,7 +99,7 @@ public:
     unsigned poster_index;
     
     /// time of last image exported
-    double saved_image;
+    double saved_image_time;
     
     /// the piece of cytosim code executed when `magic_key` is pressed (set as `magic_key[1]`)
     std::string magic_code[NB_MAGIC_KEYS];
