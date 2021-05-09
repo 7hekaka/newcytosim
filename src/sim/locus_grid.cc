@@ -403,7 +403,9 @@ inline static bool not_adjacentPL(BigPoint const& a, BigLocus const& b)
 inline static bool not_adjacentLL(BigLocus const& a, BigLocus const& b)
 {
 #if FIBER_HAS_FAMILY
-    return (( a.obj_->family_ != b.obj_->family_ )
+    Fiber const* fibA = static_cast<Fiber const*>(a.obj_);
+    Fiber const* fibB = static_cast<Fiber const*>(b.obj_);
+    return (( fibA->family_ != fibB->family_ )
             || (( a.vix_ > 1 + b.vix_ ) | ( b.vix_ > 1 + a.vix_ )));
 #else
     return (( a.obj_ != b.obj_ )
