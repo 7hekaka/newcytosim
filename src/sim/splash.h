@@ -25,6 +25,7 @@ inline void print_version(std::ostream& os)
     os << "  Periodic: " << GRID_HAS_PERIODIC;
     os << "  AttachPool: " << POOL_HAND_ATTACHMENT;
     os << "  Precision: " << sizeof(real) << " bytes\n";
+    
     os << "   Fiber has lattice " << FIBER_HAS_LATTICE;
     os << " mesh " << FIBER_HAS_MESH;
     os << " family " << FIBER_HAS_FAMILY;

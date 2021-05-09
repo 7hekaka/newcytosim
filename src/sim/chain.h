@@ -109,9 +109,9 @@ private:
     
 protected:
 
-#if NEW_SKIP_PROJECTION
+#if UNCONSTRAINED_LENGTH
     /// true if projection operator is identity
-    bool skipProjection;
+    bool unconstrainLength;
 #endif
 
     /// flag to update
@@ -188,10 +188,10 @@ public:
     /// change the current segmentation to force `length()==len` (normally not needed)
     void imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
    
-#if NEW_SKIP_PROJECTION
-    void setProjection(bool s) { skipProjection = s; }
+#if UNCONSTRAINED_LENGTH
+    void constrainLength(bool s) { unconstrainLength = !s; }
 #else
-    void setProjection(bool) {}
+    void constrainLength(bool) { std::clog << "Warning: unconstrained length not supported\n"; }
 #endif
 
     //---------------------

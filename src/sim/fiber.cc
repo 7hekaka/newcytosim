@@ -850,8 +850,8 @@ void Fiber::prepareMecable()
     
     assert_true( iPointMobility >= 0 );
     
-#if NEW_SKIP_PROJECTION
-    setProjection(prop->skip_projection);
+#if UNCONSTRAINED_LENGTH
+    constrainLength(prop->contrain_length);
 #endif
     // the scaling of the bending elasticity depends on the length of the segments
     iRigidity = prop->rigidity / segmentationCube();

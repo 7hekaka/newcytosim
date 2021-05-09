@@ -103,9 +103,7 @@ void  processMouseClick(int mx, int my, const Vector3 & a, int)
     gluPickMatrix(mx, my, 2, 2, viewport);
     view.setProjection();
     pam.selected = mesh.pick();
-    view.setProjection();
     glMatrixMode(GL_MODELVIEW);
-
 }
 
 /// callback for shift-drag, with unprojected mouse positions

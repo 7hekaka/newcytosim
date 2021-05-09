@@ -1,0 +1,95 @@
+% Bending of one microtubule using clamp and vertical forces at both ends.
+% Romain PIC, L'Hay-Les-Roses 31.03.2020, FJN 9.5.2021
+
+set simul system
+{
+    dim = 3
+    viscosity = 1
+    time_step = 0.001
+    precondition = 0
+}
+
+set system display
+{
+    window_size = 1280, 512;
+    point_value = 0.001;
+    back_color = black;
+}
+
+set space cell 
+{
+    shape = sphere
+    display = ( visible = 0 )
+}
+
+new cell
+{
+    radius = 3
+}
+
+
+set fiber backbone
+{
+    rigidity = 1
+    segmentation = 0.1
+    binding_key  = 0
+    display = ( color=green; )
+}
+
+set fiber filament
+{
+    rigidity = 0.5
+    segmentation = 0.1
+    end_force = 0 -0.25 0, both_ends
+}
+
+set hand binder
+{
+    binding = 10, 0.05
+    unbinding = 0, inf
+    display = ( width=5; size=12; color=red; )
+}
+
+set single clamp
+{
+    hand = binder
+    activity = fixed
+    stiffness = 10000
+}
+
+set filament display
+{
+    color      = blue;
+    coloring   = 5;
+    points     = 6, 1;
+    lines      = 4, 1;
+}
+
+set tubule microtubule
+{
+    stiffness = 10000, 5000
+    fiber = filament
+    bone = backbone
+}
+
+new 1 microtubule
+{
+    length = 4
+    position = 0 0 0
+    direction = 1 0 0
+}
+
+new clamp
+{
+    position = 0 0 0
+    attach = filament1, 2, minus_end
+}
+
+repeat 100
+{
+	run 1000 system
+	{
+	    nb_frames = 1
+	}
+	report fiber:force fiber_positions.txt
+}

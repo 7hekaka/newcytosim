@@ -55,8 +55,8 @@ Chain::Chain()
 {
     fnCut          = 0;
     fnSegmentation = 0;
-#if NEW_SKIP_PROJECTION
-    skipProjection = false;
+#if UNCONSTRAINED_LENGTH
+    unconstrainLength = false;
 #endif
 #if CURVATURE_DEPENDENT_SEGMENTATION
     clearAutoCounters(1);
@@ -934,8 +934,8 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
  */
 void Chain::getPoints(real const* ptr)
 {
-#if NEW_SKIP_PROJECTION
-    if ( skipProjection )
+#if UNCONSTRAINED_LENGTH
+    if ( unconstrainLength )
         return copy_real(DIM*nPoints, ptr, pPos);
 #endif
     constexpr size_t NVEC = 8;

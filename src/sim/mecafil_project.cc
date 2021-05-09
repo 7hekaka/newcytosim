@@ -272,8 +272,8 @@ void projectForcesD_(size_t nbs, const real* dir, const real* src, const real* m
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
-#if NEW_SKIP_PROJECTION
-    if ( skipProjection )
+#if UNCONSTRAINED_LENGTH
+    if ( unconstrainLength )
         return copy_real(DIM*nPoints, X, Y);
 #endif
     
@@ -355,8 +355,8 @@ void Mecafil::printProjection(std::ostream& os) const
 void Mecafil::makeProjectionDiff(const real* force)
 {
     useProjectionDiff = false;
-#if NEW_SKIP_PROJECTION
-    if ( skipProjection )
+#if UNCONSTRAINED_LENGTH
+    if ( unconstrainLength )
         return;
 #endif
     const size_t nbs = nbSegments();

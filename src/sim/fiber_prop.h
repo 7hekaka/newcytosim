@@ -332,9 +332,9 @@ public:
     bool         loop;
 #endif
     
-#if NEW_SKIP_PROJECTION
+#if UNCONSTRAINED_LENGTH
     /// if `true` do not enforce segment length constraints
-    bool         skip_projection;
+    bool         contrain_length;
 #endif
     
     /// @}

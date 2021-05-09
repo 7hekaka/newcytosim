@@ -21,7 +21,8 @@ void DynamicFiberProp::clear()
 {
     FiberProp::clear();
     
-    unit_length    = 0.008;
+    // we use the tubulin heterodimer length by default:
+    unit_length = 0.008;
     
     for ( int i = 0; i < 2; ++i )
     {
