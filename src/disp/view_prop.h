@@ -142,7 +142,7 @@ public:
     unsigned axes;
     
     /// length of axes (set a `axes[1]`, default=1)
-    real axes_size;
+    float axes_size;
 
     /// on/off flags for clipping (defined as `clip_plane?`)
     /**

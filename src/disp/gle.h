@@ -416,7 +416,7 @@ namespace gle
     void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2);
 
     /// draw a set of 2 or 3 axes, depending on `dim`
-    void drawAxes(real size, int dim);
+    void drawAxes(float size, int dim);
 
 #pragma mark -
 

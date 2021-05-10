@@ -81,11 +81,11 @@ protected:
     /// the pixel size for this particular display
     float pixelSize;
     
-    /// scaling factors to convert 'size' parameter into pixels used in glPointSize() and glLineWidth()
-    float uFactor;
+    /// the value of the size & width unit in pixels
+    float unitValue;
     
-    /// scaling factors to convert 'size' parameter into physical dimensions used in glScale()
-    float sFactor;
+    /// the value of the size & width unit in natural units (ie. micrometers)
+    float sizeScale;
 
     /// flag used to calculate clusterAnalysis only once
     size_t fiber_prep;
@@ -134,7 +134,7 @@ public:
     void setStencil(bool s) { stencil_ = s; }
 
     /// set current pixel-size and the value of the point in pixels
-    void setPixelFactors(GLfloat pixel_size, GLfloat uFactor);
+    void setPixelFactors(float pixel_size, float unit_value);
     
     /// get ready to display
     void prepareForDisplay(Simul const&, PropertyList&);
@@ -146,10 +146,10 @@ public:
     void drawTiled(Simul const&, int nine);
 
     /// set OpenGL line width
-    void lineWidth(float w) const { glLineWidth(std::max(w*uFactor, 0.25f)); }
+    void lineWidth(float w) const { glLineWidth(std::max(w*unitValue, 0.25f)); }
 
     /// set OpenGL point size
-    void pointSize(float w) const { glPointSize(std::max(w*uFactor, 0.25f)); }
+    void pointSize(float w) const { glPointSize(std::max(w*unitValue, 0.25f)); }
     
     /// draw primitive `obj` at given position
     void drawObject(Vector const& pos, float rad, void (*obj)()) const;

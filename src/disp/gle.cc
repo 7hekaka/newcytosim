@@ -2245,7 +2245,7 @@ namespace gle
 
     
     //-----------------------------------------------------------------------
-    void drawAxes(const real size, int dim)
+    void drawAxes(const float size, int dim)
     {
         const GLfloat S(size);
         const GLfloat R(S * 0.1f);

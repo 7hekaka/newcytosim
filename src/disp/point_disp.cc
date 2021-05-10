@@ -349,15 +349,15 @@ void PointDisp::drawPixelmap(size_t inx) const
 /**
  `sampling` defines the level of oversampling used to improve the quality of bitmaps
  */
-void PointDisp::makePixelmaps(GLfloat uFactor, unsigned sampling)
+void PointDisp::makePixelmaps(GLfloat unit_value, unsigned sampling)
 {
     assert_true(pixSize==nPix);
     CHECK_GL_ERROR("1 PointDisp::makePixelmaps");
     
     unsigned dim = sampling * nPix;
-    GLfloat s = 0.5f * sampling * size * uFactor;
+    GLfloat s = 0.5f * sampling * size * unit_value;
     GLfloat t = 0.5f * dim;
-    GLfloat w = width * sampling * uFactor;
+    GLfloat w = width * sampling * unit_value;
     
     GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
     GLboolean light = glIsEnabled(GL_LIGHTING);

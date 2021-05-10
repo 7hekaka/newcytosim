@@ -222,16 +222,16 @@ void Player::prepareDisplay(View& view, int mag)
     view.setMessage(buildReport(prop.report));
     
     //----------------- set pixel size and unit-size:
-    /*
-     if disp.point_value is set, line-width and point-size were specified in 'real' units,
-     and otherwise, they were specified in pixels.
-     */
 
     GLfloat pix = view.pixelSize();
-    GLfloat fac = ((disp.point_value > 0) ? disp.point_value/pix : 1 );
+    /*
+     if `disp.point_value` is set, line width and point size are to be understood
+     in 'real' units, and otherwise, they are understood as number of pixels.
+     */
+    GLfloat val = (disp.point_value > 0 ? disp.point_value/pix : 1 );
     //std::clog << " pixel size = " << pix << '\n';
 
-    mDisplay->setPixelFactors(pix/mag, mag*fac);
+    mDisplay->setPixelFactors(pix/mag, mag*val);
     mDisplay->setStencil(view.stencil && ( DIM >= 3 ));
     /// adjust reference color used by gle::bright_color
     gle::background_color = view.back_color;
