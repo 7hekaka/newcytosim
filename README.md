@@ -50,16 +50,28 @@ The documentation source files use [Markdown](https://en.wikipedia.org/wiki/Mark
 
 # Installation
 
-Cytosim is distributed as source code and [must be compiled](doc/compile/index.md) before use. On Mac OS X and Linux this should be uncomplicated even if you are not familiar with compilation in general. On Windows, this is more challenging, and we suggest to [compile within Cygwin](doc/compile/cygwin.md).
+Cytosim is distributed as source code and [must be compiled](doc/compile/index.md) before use. On Mac OS X and Linux this should be uncomplicated even if you are not familiar with program development. Compiling natively on Windows would require changes to the code, but Cytosim should [compile within Cygwin](doc/compile/cygwin.md).
 
-To compile, enter these commands in a terminal window:
+To download the source code, enter these commands in a terminal window:
 
-	git clone https://gitlab.com/f.nedelec/cytosim-dev
+	git clone https://gitlab.com/f.nedelec/cytosim
 	cd cytosim
+	
+To compile using [make](https://www.gnu.org/software/make), try:
+	
 	make
 
-For more information, please check [the compile instructions](doc/compile/index.md).
-Once *cytosim* is running on your machine, check the tutorials, the page on [running simulations](doc/main/runs.md), and the examples contained in the folder `cym`. Inspect in particular the short configuration files (e.g. fiber.cym, self.cym). 
+If this fails, parameters of `makefile.inc` need to be updated.
+Altermatively, it is possible to use [cmake](https://cmake.org) to configure `make` automatically:
+
+	mkdir build
+	cd build
+	cmake ..
+	make
+
+For troubleshooting, please check [the compile instructions](doc/compile/index.md).
+Once *cytosim* is running on your machine, proceed with the [tutorials](doc/tutorials/index.md), the page on [running simulations](doc/main/runs.md), and the examples contained in the folder `cym`. 
+Inspect in particular the short configuration files (e.g. fiber.cym, self.cym). 
 
 # Contributors
 
