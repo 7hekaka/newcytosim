@@ -200,11 +200,7 @@ inline static vec8f cast8f(__m256i a) { return _mm256_castsi256_ps(a); }
 
 inline static vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos)
 {
-#if defined(__AVX512VL__)
-    return _mm256_mask_mov_ps(pos, val, neg);
-#else
     return _mm256_blendv_ps(pos, neg, val);
-#endif
 }
 
 #endif // AVX
