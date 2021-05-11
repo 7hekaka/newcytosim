@@ -543,14 +543,17 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
             // info line "#format 48 dim 2"
             else if ( tok == "format" )
             {
-                unsigned d = 0, f = 0;
+                unsigned f = 0, d = 0;
                 iss >> f >> tok >> d;
                 in.formatID(f);
                 //if ( f != currentFormatID )
                 //    Cytosim::warn << "Cytosim is reading previous format " << f << '\n';
-                if ( d != in.vectorSize() )
-                    Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
-                in.vectorSize(d);
+                if ( tok == "dim" )
+                {
+                    if ( in.vectorSize() != d )
+                        Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
+                    in.vectorSize(d);
+                }
             }
             // time data "#time 1.2345"
             else if ( tok == "time" )

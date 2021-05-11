@@ -31,13 +31,13 @@ public:
     void     reset();
     
     /// Constructor
-    Inputter(unsigned d) : FileWrapper(nullptr), vecsize_(d) { reset(); }
+    Inputter(unsigned d) : FileWrapper(nullptr) { reset(); vecsize_=d; }
     
     /// Constructor
-    Inputter(unsigned d, FILE* f, const char* path=nullptr) : FileWrapper(f, path), vecsize_(d) { reset(); }
+    Inputter(unsigned d, FILE* f, const char* path=nullptr) : FileWrapper(f, path) { reset(); vecsize_=d; }
     
     /// constructor which opens a file
-    Inputter(unsigned d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r"), vecsize_(d) { reset(); }
+    Inputter(unsigned d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r") { reset(); vecsize_=d; }
 
     /// return dimensionnally of vectors
     unsigned vectorSize()     const { return vecsize_; }
