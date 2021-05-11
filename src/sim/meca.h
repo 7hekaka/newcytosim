@@ -457,6 +457,9 @@ public:
 
     /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine), add LongLink on two points
     void addTorqueLong(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
+    
+    /// Add a torque on 4 points to align AB with CD
+    void addTorque(Mecapoint const&, Mecapoint const&, real weight);
 
     /// Link of stiffness `weight` from fixed position
     void addPointClamp(Mecapoint const&, Vector, real weight);

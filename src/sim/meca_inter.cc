@@ -399,6 +399,8 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
 
     Torque Tq = cross(da, db);
     
+#if ( 0 )
+    
 #if ( DIM >= 3 )
     const real Tn = Tq.norm();
 #else
@@ -408,18 +410,20 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     // calculate current angle between segments in [0, pi]:
     const real angle = std::atan2(Tn, dot(da, db));
     
-    /**
+    /*
      Scale torque to make it proportional to angle:
      we multiply the vector Tq by angle / sin(angle),
      knowing that Tn = Tq.norm() = sin(angle) * sqrt( na * nb )
-     
-     To have a Torque proportional to sin(angle), use:
-     real nn = sqrt( na * nb ); or nn = Tn / angle
-     na = weight / ( na * nn );
-     nb = weight / ( nb * nn );
      */
     na = weight * angle / ( na * Tn );
     nb = weight * angle / ( nb * Tn );
+#else
+    // To have a Torque proportional to sin(angle)
+    real nn = std::sqrt( na * nb ); //or nn = Tn / angle
+    na = weight / ( na * nn );
+    nb = weight / ( nb * nn );
+    
+#endif
     
     Vector fa = cross(Tq * na, da);
     Vector fb = cross(db, Tq * nb);
@@ -1060,6 +1064,81 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
     add_block_diag(iiC, W);
 }
 
+
+/**
+ Add Torque between 4 points to align AB with CD:
+ 
+ F_A = k * ( -A + B + C - D )
+ F_B = -F_A
+ F_C = -F_A
+ F_D =  F_A
+ 
+ FJN, 11.05.2021
+ */
+void Meca::addTorque(Mecapoint const& ptA,
+                     Mecapoint const& ptC,
+                     const real weight)
+{
+    assert_true( weight >= 0 );
+
+#if USE_ISO_MATRIX
+    const size_t iiA = ptA.matIndex();
+    const size_t iiB = 1 + iiA;
+    const size_t iiC = ptC.matIndex();
+    const size_t iiD = 1 + iiC;
+
+    sub_iso_diag(iiA, weight);
+    add_iso(iiB, iiA, weight);
+    sub_iso_diag(iiB, weight);
+    sub_iso_diag(iiC, weight);
+    add_iso(iiD, iiC, weight);
+    sub_iso_diag(iiD, weight);
+
+    if ( iiC > iiA )
+    {
+        add_iso(iiC, iiA, weight);
+        sub_iso(iiD, iiA, weight);
+        sub_iso(iiC, iiB, weight);
+        add_iso(iiD, iiB, weight);
+    }
+    else
+    {
+        add_iso(iiA, iiC, weight);
+        sub_iso(iiA, iiD, weight);
+        sub_iso(iiB, iiC, weight);
+        add_iso(iiB, iiD, weight);
+    }
+#else
+    const size_t iiA = DIM * ptA.matIndex();
+    const size_t iiB = DIM + iiA;
+    const size_t iiC = DIM * ptC.matIndex();
+    const size_t iiD = DIM + iiC;
+
+    const MatrixBlock W(0, weight);
+
+    sub_block_diag(iiA, W);
+    add_block(iiB, iiA, W);
+    sub_block_diag(iiB, W);
+    sub_block_diag(iiC, W);
+    add_block(iiD, iiC, W);
+    sub_block_diag(iiD, W);
+
+    if ( iiC > iiA )
+    {
+        add_block(iiC, iiA, W);
+        sub_block(iiD, iiA, W);
+        sub_block(iiC, iiB, W);
+        add_block(iiD, iiB, W);
+    }
+    else
+    {
+        add_block(iiA, iiC, W);
+        sub_block(iiA, iiD, W);
+        sub_block(iiB, iiC, W);
+        add_block(iiB, iiD, W);
+    }
+#endif
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Interpolation of positions

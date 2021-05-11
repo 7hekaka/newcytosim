@@ -287,6 +287,8 @@ void Tubule::setInteractions(Meca& meca) const
             meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiffL);
             // radial spoke:
             meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(bone_,i), alpha*cross(dir,arm), stiffR);
+            // twist stiffness
+            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffR);
         }
     }
 
