@@ -339,7 +339,7 @@ namespace gle
         glMultMatrixf(mat);
     }
     
-    // rotate to align Z with 'D' and translate to center 'P'
+    // rotate to align Z with 'D' and translate to center 'P', scale uniformly by `R`
     void transAlignZ(Vector3 const& P, float R, Vector3 const& D)
     {
         float X = float(D.XX);
@@ -585,7 +585,7 @@ namespace gle
 
     
     /// Cube is make of 12 triangles = 36 vertices
-    void setCube(drawCall func, flute6*& flt, float R=0.5773502692f)
+    void setCube(drawCall func, flute6*& flt, float R)
     {
         float pts[9*12] = {
             +R, R, R, R,-R,-R, R, R,-R,
@@ -847,7 +847,8 @@ namespace gle
     
     //-----------------------------------------------------------------------
 
-    void cube1()
+    /// this does not set normals
+    void cubeF()
     {
         constexpr GLfloat R = 1.f, U = -1.f;
         const GLfloat pts[] = {
@@ -862,6 +863,7 @@ namespace gle
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
     }
     
+    /// this only sets vertices, skipping normals
     size_t setCube(flute3*& flu, float R)
     {
         const float U = -R;
@@ -883,8 +885,8 @@ namespace gle
         return 14;
     }
 
-    /// this does not really work
-    void tetrahedron1()
+    /// this does not really work, since normals are not set correctly
+    void tetrahedronF()
     {
         constexpr GLfloat R = 1.f, U = -1.f;
         GLfloat pts[3*8] = {
@@ -1033,7 +1035,7 @@ namespace gle
         buf_pos_[1] = ptr-flu; setOctahedron(setBuffer, ptr);
         buf_pos_[2] = ptr-flu; setIcosahedron(setBuffer, ptr);
         buf_pos_[3] = ptr-flu; setArrowTail(setBuffer, ptr);
-        buf_pos_[4] = ptr-flu; setCube(setBuffer, ptr);
+        buf_pos_[4] = ptr-flu; setCube(setBuffer, ptr, 0.5773502692f);
         buf_pos_[5] = ptr-flu; setStar(setBuffer, ptr);
         buf_pos_[6] = ptr-flu; setHexTube(ptr, 0, 1, 1.0f);
         buf_pos_[7] = ptr-flu; setHexTube(ptr, 0, 1, 0.5f);
@@ -1041,7 +1043,7 @@ namespace gle
         flute3 * fl3 = (flute3*)ptr;
         buf_pos_[9] = fl3-(flute3*)flu; setBlob(fl3, false);
         buf_pos_[10] = fl3-(flute3*)flu; setBlob(fl3, true);
-        buf_pos_[11] = fl3-(flute3*)flu; setCube(fl3, true);
+        buf_pos_[11] = fl3-(flute3*)flu; setCube(fl3, 1.0);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
     
@@ -1095,10 +1097,6 @@ namespace gle
     void blob()      { drawTriangleStrip(buf_pos_[9], 52); }
     void needle()    { drawTriangleStrip(buf_pos_[10], 52); }
     void smallCube() { drawTriangleStrip(buf_pos_[11], 14); }
-
-    void loadBlobBuffer() { loadBuffer(buf_[3]); }
-    void blobf()     { glDrawArrays(GL_TRIANGLE_STRIP, 0, 52); }
-    void needlef()   { glDrawArrays(GL_TRIANGLE_STRIP,64, 52); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D circle

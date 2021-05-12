@@ -188,21 +188,19 @@ namespace gle
     /// returns tetrahedron or octahedron
     inline void (*hedron(bool x))() { return x ? octahedron : tetrahedron; }
     
-    void cube1();
-    void tetrahedron1();
-    void loadBlobBuffer();
-    void loadPinBuffer();
+    /// draw a cube of side length 2, but without normals
+    void cubeF();
+    /// draw a tetrahedron, without normals
+    void tetrahedronF();
 
-    void unloadBuffer();
     /// draw a roughly spherical shape made of few triangles
     void blob();
-    void blobf();
     /// draw a centered blob of radius 1 with a cone extending up in Z
     void needle();
-    void needlef();
-    void smallCube();
     /// draw a Cube of side 2
     void cube();
+    /// draw a Cube of side 1
+    void smallCube();
     /// draw a stellated octahedron
     void star();
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
