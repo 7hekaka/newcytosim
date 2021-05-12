@@ -49,10 +49,16 @@ Vector FiberSite::outerPos() const
 {
     if ( hFiber->family_ )
     {
-        real ab = hAbs - hFiber->abscissaM();
-        Vector pos = hFiber->posM(ab);
-        Vector cen = hFiber->family_->posM(ab);
-        return pos + 0.5 * ( pos - cen );
+        real a = hAbs - hFiber->abscissaM();
+#if 1
+        Vector b = hFiber->brother_->posM(a);
+        Vector s = hFiber->sister_->posM(a);
+        return hFiber->posM(a) + cross(b-s, hFiber->dirM(a));
+#else
+        Vector p = hFiber->posM(ab);
+        Vector c = hFiber->family_->posM(ab); //centerline
+        return p + 0.5 * ( p - c );
+#endif
         //return 2 * pos - hFiber->family_->posM(ab);
     }
     return hTerp.pos();

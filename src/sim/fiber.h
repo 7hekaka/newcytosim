@@ -158,6 +158,9 @@ public:
     /// radial direction at the specified abscissa
     Vector radialDiff(real a) const { return radialDiffM(a-abscissaM()); }
     
+    /// direction tangent to the Tubule surface and orthogonal to the MT symmetry axis, at the specified abscissa
+    Vector orthoRadial(real a) const { a-=abscissaM(); return brother_->posM(a) - sister_->posM(a); }
+
     /// position of a point specified by distance from the MINUS_END
     Vector displayPosM(real a) const;
 

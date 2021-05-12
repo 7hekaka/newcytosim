@@ -176,7 +176,7 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color.load_both();
-        drawObject3(pos, dis->size, gle::blob);
+        drawObject(pos, dis->size*sizeScale, gle::blob);
     }
 }
 
@@ -187,7 +187,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color2.load_both();
-        drawObject3(pos, dis->size, gle::blob);
+        drawObject(pos, dis->size*sizeScale, gle::blob);
     }
 }
 
@@ -1018,6 +1018,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
             else
 #endif
             drawHand(cx->posHand1(), cx->disp1());
+            //drawObject3(cx->hand1()->outerPos(), 0.5f*cx->disp1()->size, gle::tetrahedron);
         }
     }
     
@@ -1032,6 +1033,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
             else
 #endif
             drawHand(cx->posHand2(), cx->disp2());
+            //drawObject3(cx->hand2()->outerPos(), 0.5f*cx->disp2()->size, gle::tetrahedron);
         }
     }
 }

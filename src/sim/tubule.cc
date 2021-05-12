@@ -40,7 +40,7 @@ void Tubule::reset()
 }
 
 
-ObjectList Tubule::build(Glossary& opt, Simul& sim)
+ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
 {
     FiberProp const* fp = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
     real len = 1.0, dev = 0;
@@ -92,11 +92,14 @@ ObjectList Tubule::build(Glossary& opt, Simul& sim)
         dir.normalize();
     }
     
-    // set orthonormal coordinate system
-    Vector E(0,prop->radius,0), F(0,0,prop->radius);
-    dir.orthonormal(E, F, prop->radius);
+    // set orthonormal coordinate system (dir, E, F)
+    Vector E(0,rad,0), F(0,0,rad);
+    dir.orthonormal(E, F, rad);
     
-    // translate protofilaments to form a tube:
+    /*
+     translate protofilaments to form a tube, arranging them
+     in a counter-clockwise order, to form a right-handed helix
+     */
     real a = 0; //M_PI * RNG.sreal();
     real da = 2 * M_PI / NFIL;
     for ( size_t i = 0; i < NFIL; ++i )
