@@ -17,7 +17,7 @@ class Meca;
 /*
  13 fibers arranged in a tubular configurations into a Microtubule
  
- FJN, Cambridge, Sept--Oct 2019
+ FJN, started in Cambridge, Sept--Oct 2019
  */
 class Tubule : public Object, private Buddy
 {
@@ -60,7 +60,7 @@ public:
     ObjectList build(real radius, Glossary&, Simul&);
 
     /// position of centerline at distance 'dis' from the MINUS_END
-    Vector     posCenterlineM(real dis);
+    Vector posCenterlineM(real dis);
 
     
     /// initialize sister[] and brother[]
@@ -96,13 +96,13 @@ public:
     Property const* property() const { return prop; }
 
     /// read
-    void      read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write
-    void      write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// debug printout
-    void      report(std::ostream&);
+    void report(std::ostream&);
 };
 
 #endif

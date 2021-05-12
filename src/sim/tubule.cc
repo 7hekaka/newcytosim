@@ -136,9 +136,12 @@ void Tubule::setFamily(Fiber const* fam)
 #if FIBER_HAS_FAMILY
     for ( size_t i = 0; i < NFIL; ++i )
     {
-        fil_[i]->family_ = fam;
-        fil_[i]->sister_ = fil_[(i+NFIL-1)%NFIL];
-        fil_[i]->brother_ = fil_[(i+1)%NFIL];
+        if ( fil_[i] )
+        {
+            fil_[i]->family_ = fam;
+            fil_[i]->sister_ = fil_[(i+NFIL-1)%NFIL];
+            fil_[i]->brother_ = fil_[(i+1)%NFIL];
+        }
     }
     if ( bone_ )
         bone_->family_ = fam;
@@ -385,16 +388,19 @@ void Tubule::write(Outputter& out) const
 
 void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    size_t n = in.readUInt16();
+    
     ObjectTag g;
+    size_t n = in.readUInt16()-1;
     Object * w = sim.readReference(in, g);
     bone_ = Fiber::toFiber(w);
-    for ( size_t i = 0; i < n-1; ++i )
+    size_t i = 0;
+    for (; i < n && i < NFIL; ++i )
     {
         w = sim.readReference(in, g);
-        if ( i < NFIL )
-            fil_[i] = Fiber::toFiber(w);
+        fil_[i] = Fiber::toFiber(w);
     }
+    for (; i < NFIL; ++i )
+        fil_[i] = nullptr;
     setFamily(bone_?bone_:fil_[0]);
 }
 
@@ -403,6 +409,10 @@ void Tubule::report(std::ostream& os)
 {
     os << reference() << " " << bone_->segmentation() << " " << bone_->nbPoints() << " " << bone_->length() << "\n";
     for ( size_t i = 0; i < NFIL; ++i )
-        os << std::setw(7) << i << " " << fil_[i]->segmentation() << " " << fil_[i]->nbPoints() << " "<< fil_[i]->length() << "\n";
+    {
+        Fiber const* F = fil_[i];
+        if ( F )
+            os << std::setw(7) << i << " " << F->segmentation() << " " << F->nbPoints() << " "<< F->length() << "\n";
+    }
 }
 
