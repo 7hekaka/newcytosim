@@ -1018,7 +1018,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber1()->disp->color.transparent() )
             {
-                cx->disp1()->color.load_both(cx->fiber1()->disp->color.transparency());
+                disp->color.load_both(cx->fiber1()->disp->color.transparency());
                 drawPoint(h->pos(), disp);
                 continue;
             }
@@ -1038,7 +1038,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber2()->disp->color.transparent() )
             {
-                cx->disp1()->color.load_both(cx->fiber2()->disp->color.transparency());
+                disp->color.load_both(cx->fiber2()->disp->color.transparency());
                 drawPoint(h->pos(), disp);
                 continue;
             }
