@@ -1007,33 +1007,44 @@ void Display3::drawCouplesF2(CoupleSet const& set) const
 
 void Display3::drawCouplesA(CoupleSet const& set) const
 {
+    //const float R = 0.5f * sizeScale;
     for ( Couple * cx=set.firstAF(); cx ; cx=cx->next() )
     {
-        if ( cx->fiber1()->disp->visible && cx->disp1()->visible )
+        Hand const* h = cx->hand1();
+        PointDisp const* disp = h->prop->disp;
+
+        if ( h->fiber()->disp->visible && disp->visible )
         {
-#if ( 0 )
-            // ENDOCYTOSIS 2015
+#if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber1()->disp->color.transparent() )
+            {
                 cx->disp1()->color.load_both(cx->fiber1()->disp->color.transparency());
-            else
+                drawPoint(h->pos(), disp);
+                continue;
+            }
 #endif
-            drawHand(cx->posHand1(), cx->disp1());
-            //drawObject3(cx->hand1()->outerPos(), 0.5f*cx->disp1()->size, gle::tetrahedron);
+            drawHand(h->pos(), disp);
+            //drawObject(h->outerPos(), h->pos()-h->outerPos(), R*disp->size, gle::tetrahedron);
         }
     }
     
     for ( Couple * cx=set.firstFA(); cx ; cx=cx->next() )
     {
+        Hand const* h = cx->hand2();
+        PointDisp const* disp = h->prop->disp;
+
         if ( cx->fiber2()->disp->visible && cx->disp2()->visible )
         {
-#if ( 0 )
-            // ENDOCYTOSIS 2015
+#if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber2()->disp->color.transparent() )
+            {
                 cx->disp1()->color.load_both(cx->fiber2()->disp->color.transparency());
-            else
+                drawPoint(h->pos(), disp);
+                continue;
+            }
 #endif
-            drawHand(cx->posHand2(), cx->disp2());
-            //drawObject3(cx->hand2()->outerPos(), 0.5f*cx->disp2()->size, gle::tetrahedron);
+            drawHand(h->pos(), disp);
+            //drawObject(h->outerPos(), h->pos()-h->outerPos(), R*disp->size, gle::tetrahedron);
         }
     }
 }
