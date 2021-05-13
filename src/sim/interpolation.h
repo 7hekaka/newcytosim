@@ -64,10 +64,10 @@ public:
         pt1_ = p;  pt2_ = q;  coef_ = c;
     }
     
-    /// Index of point 1 in the matrix of dynamics (Meca)
+    /// Index of point 1 in the matrix of dynamics (Meca::mISO)
     size_t          matIndex1() const { return mec_->matIndex() + pt1_; }
     
-    /// Index of point 2 in the matrix of dynamics (Meca)
+    /// Index of point 2 in the matrix of dynamics (Meca::mISO)
     size_t          matIndex2() const { return mec_->matIndex() + pt2_; }
     
     /// true if the pointer seems to be valid.

@@ -44,6 +44,9 @@ public:
     /// index of segment
     size_t       point()       const { return pti_; }
     
+    /// Index of the point-of-interest in the isotropic matrix (Meca::mISO)
+    size_t       matIndex()    const { return fib_->matIndex() + pti_; }
+
     /// abscissa at start of segment (i.e. corresponding to point())
     real         abscissa1()   const { return fib_->abscissaPoint(pti_); }
     

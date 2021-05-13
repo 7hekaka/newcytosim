@@ -885,6 +885,48 @@ MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, Vector2 const& an
 }
 
 
+/**
+ Add Torque between 4 points to align AB with CD:
+ 
+ F = k * ( -A + 2*B - C )
+ 
+ F_A = F
+ F_B = -2 * F
+ F_C = F
+ 
+ FJN, 11.05.2021
+ */
+void Meca::addTorque(Mecapoint const& ptA,
+                     Mecapoint const& ptB,
+                     Mecapoint const& ptC,
+                     const real scale, const real weight)
+{
+    assert_true( weight >= 0 );
+    const MatrixBlock W(0, weight);
+
+    const size_t iiA = DIM * ptA.matIndex();
+    const size_t iiB = DIM * ptB.matIndex();
+    const size_t iiC = DIM * ptC.matIndex();
+    
+    sub_block_diag(iiA, W);
+    if ( iiB > iiA )
+        add_block(iiB, iiA, W*2);
+    else
+        add_block(iiA, iiB, W*2);
+    if ( iiC > iiA )
+        sub_block(iiC, iiA, W);
+    else
+        sub_block(iiA, iiC, W);
+    
+    sub_block_diag(iiB, W*4);
+    
+    if ( iiC > iiB )
+        add_block(iiC, iiB, W*2);
+    else
+        add_block(iiB, iiC, W*2);
+    sub_block_diag(iiC, W);
+}
+
 
 /**
  Add Torque between 3 points.
@@ -2316,9 +2358,10 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);
     
-    add_block_diag(ii0, wAt.mul(aR)); //this term is symmetric but not diagonal
+    //the following 3 terms are symmetric but not diagonal
+    add_block_diag(ii0, wAt.mul(aR));
     add_block(ii1, ii0, wBt.mul(aR));
-    add_block_diag(ii1, wBt.mul(bR)); //this term is symmetric but not diagonal
+    add_block_diag(ii1, wBt.mul(bR));
 
     if ( ii2 > ii0 )
     {
@@ -2347,44 +2390,47 @@ void Meca::addSideLink3D(Interpolation const& ptA,
 
 /**
  This is a specialized version of addSideLink3D(), without Modulo
+ `leg` is already normalized to include the Fiber's segmentation
  */
-void Meca::addSideLinkMT(Interpolation const& ptA,
-                         Mecapoint const& ptB,
-                         Torque const& arm,
-                         const real weight)
+void Meca::addSideLink(FiberSegment const& segA, real alpha,
+                       Mecapoint const& ptB,
+                       Torque const& leg,
+                       const real weight)
 {
     assert_true( weight >= 0 );
     
     // full indices:
-    const size_t ii0 = DIM * ptA.matIndex1();
-    const size_t ii1 = DIM * ptA.matIndex2();
+    const size_t ii0 = DIM * segA.matIndex();
+    const size_t ii1 = DIM + ii0;
     const size_t ii2 = DIM * ptB.matIndex();
-    
-    if ( any_equal(ii0, ii1, ii2) )
-        throw Exception("Meca::addSideLink0 has overlapping indices");
+    assert_true( ii0 != ii2 );
 
     // interpolation coefficients:
-    const real cc0 = ptA.coef0();
-    const real cc1 = ptA.coef1();
-    const Torque leg = arm / ptA.len();
-
-    MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
-    MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
-    
-    MatrixBlock aT = MatrixBlock::vectorProduct(cc0,  leg);
-    MatrixBlock bT = MatrixBlock::vectorProduct(cc1, -leg);
-    
-    add_block_diag(ii0, -weight, aT.mul(aR)); //this term is symmetric but not diagonal
-    add_block(ii1, ii0, -weight, bT.mul(aR));
-    add_block_diag(ii1, -weight, bT.mul(bR)); //this term is symmetric but not diagonal
+    const real cc0 = 1 - alpha;
+    const real cc1 = alpha;
+    //const Torque leg = arm / ptA.len();
 
     if ( ii2 > ii0 )
     {
+        MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
+        MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
+        //the following 3 terms are symmetric but not diagonal
+        add_block_diag(ii0, -weight, aR.trans_mul(aR));
+        add_block(ii1, ii0, -weight, bR.trans_mul(aR));
+        add_block_diag(ii1, -weight, bR.trans_mul(bR));
+        
         add_block(ii2, ii0, weight, aR);
         add_block(ii2, ii1, weight, bR);
     }
     else
     {
+        MatrixBlock aT = MatrixBlock::vectorProduct(cc0,  leg); // = aR.transposed()
+        MatrixBlock bT = MatrixBlock::vectorProduct(cc1, -leg); // = bR.transposed()
+        //the following 3 terms are symmetric but not diagonal
+        add_block_diag(ii0, -weight, aT.trans_mul(aT));
+        add_block(ii1, ii0, -weight, aT.trans_mul(bT));
+        add_block_diag(ii1, -weight, bT.trans_mul(bT));
+        
         add_block(ii0, ii2, weight, aT);
         add_block(ii1, ii2, weight, bT);
     }
@@ -2554,9 +2600,10 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);
     
-    add_block_diag(ii0, wAt.mul(aR));  //this term is symmetric but not diagonal
+    //the following 3 terms are symmetric but not diagonal
+    add_block_diag(ii0, wAt.mul(aR));
     add_block(ii1, ii0, wBt.mul(aR));
-    add_block_diag(ii1, wBt.mul(bR));  //this term is symmetric but not diagonal
+    add_block_diag(ii1, wBt.mul(bR));
     if ( ii2 > ii0 )
     {
         add_block(ii2, ii0, wcc2, aR);
@@ -4402,9 +4449,10 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);
     
-    add_block_diag(ii0, wAt.mul(aR)); //this term is symmetric but not diagonal
+    //the following 3 terms are symmetric but not diagonal
+    add_block_diag(ii0, wAt.mul(aR));
     add_block(ii1, ii0, wBt.mul(aR));
-    add_block_diag(ii1, wBt.mul(bR)); //this term is symmetric but not diagonal
+    add_block_diag(ii1, wBt.mul(bR));
 
     if ( modulo )
         pos += modulo->offset( ptA.pos() - pos );

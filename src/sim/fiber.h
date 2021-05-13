@@ -151,12 +151,6 @@ public:
     Fiber const* family_;
     Fiber const* sister_;
     Fiber const* brother_;
-
-    /// radial direction at the specified distance from the MINUS_END
-    Vector radialDiffM(real a) const { assert_true(this!=family_); return posM(a) - family_->posM(a); }
-
-    /// radial direction at the specified abscissa
-    Vector radialDiff(real a) const { return radialDiffM(a-abscissaM()); }
     
     /// direction tangent to the Tubule surface and orthogonal to the MT symmetry axis, at the specified abscissa
     Vector orthoRadial(real a) const { a-=abscissaM(); return brother_->posM(a) - sister_->posM(a); }

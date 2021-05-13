@@ -264,9 +264,13 @@ public:
     /// Store the index where coordinates are located in Meca
     void        setIndex(size_t inx)       { pIndex = static_cast<unsigned>(inx); }
     
-    /// Index of the first point in Meca, possibly to be multiplied by DIM
-    /** X1 is stored at DIM*matIndex(), Y1 at DIM*matIndex()+1, Z1 at DIM*matIndex()+2
-     then X2, Y2, Z2...
+    /// Index of the first vertex in the isotropic matrix (Meca::mISO)
+    /**
+     The coordinates are stored consecutively in Meca's vectors:
+     [X1, Y1, Z1] are stored startig at DIM*matIndex()
+     [X2, Y2, Z2] is store at DIM*(1+matIndex()) ...
+     The index can be used directly to address the isotropic matrix (Meca::mISO)
+     and should be multiplied by DIM to address the general matrix (Meca::mFUL)
      */
     size_t      matIndex()   const { return pIndex; }
 

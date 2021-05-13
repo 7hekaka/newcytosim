@@ -49,7 +49,7 @@ Vector CrosslinkLong::sidePos2() const
 
 
 /**
- Calculates the force for the addSideLink()
+ Calculates the force from stiffness * ( sidePos2() - sidePos1() )
  */
 Vector CrosslinkLong::force() const
 {
@@ -87,10 +87,6 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     
     /* calculate the Arms to offset the position along the radial direction
     of the microtubules */
-    /*
-    mArm1 = cross(pt1.diff(), fiber1()->radialDiff(abscissa1())).normalized(len);
-    mArm2 = cross(pt2.diff(), fiber2()->radialDiff(abscissa2())).normalized(len);
-    */
     mArm1 = fiber1()->orthoRadial(abscissa1()).normalized(len);
     mArm2 = fiber2()->orthoRadial(abscissa2()).normalized(len);
     // this can be improved, since this still allows the MTs to rotate around

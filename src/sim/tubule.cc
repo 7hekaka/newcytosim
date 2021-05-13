@@ -197,13 +197,13 @@ void Tubule::goodbye(Buddy const* b)
 This uses only addSideLink() with appropriate directions
 Cambridge, 12.2019
 */
-void Tubule::setInteractionsB(Meca& meca) const
+void Tubule::setInteractionsA(Meca& meca) const
 {
 #if ( DIM >= 3 )
     const real stiff = prop->stiffness[0];
-    const real ang = M_PI / NFIL;
-    const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
-    const real c = std::cos(ang), s = std::sin(ang);
+    const real ang = M_PI / NFIL; // this is half the angle of each sector!!
+    const real len = prop->radius * 2 * std::sin(ang);  // distance between protofilaments
+    const real C = std::cos(ang), S = std::sin(ang);
     
     assert_true(fil_[0]);
     const size_t e = fil_[0]->nbSegments();
@@ -212,7 +212,7 @@ void Tubule::setInteractionsB(Meca& meca) const
 
     for ( size_t i = 0; i < e; ++i )
     {
-        // get centerline
+        // compute centerline
         Vector cen(0,0,0);
         for ( size_t n = 0; n < NFIL; ++n )
             cen += fil_[n]->posPoint(i);
@@ -223,12 +223,13 @@ void Tubule::setInteractionsB(Meca& meca) const
         for ( size_t n = 0; n < NFIL; ++n )
             dir += fil_[n]->diffPoints(i);
         dir.normalize();
-        mat = Rotation::rotationAroundAxis(dir, c, s);
+        mat = Rotation::rotationAroundAxis(dir, C, S);
         
         for ( size_t n = 0; n < NFIL; ++n )
         {
-            Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(i) ).normalized(len));
-            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiff);
+            real alpha = len * fil_[n]->segmentationInv();
+            Vector leg = mat.vecmul(( cen - fil_[n]->posPoint(i) ).normalized(alpha));
+            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(fil_[n+1],i), leg, stiff);
         }
     }
 
@@ -240,8 +241,9 @@ void Tubule::setInteractionsB(Meca& meca) const
     
     for ( size_t n = 0; n < NFIL; ++n )
     {
-        Vector arm = mat.vecmul(( cen - fil_[n]->posPoint(e) ).normalized(len));
-        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), arm, stiff);
+        real alpha = len * fil_[n]->segmentationInv();
+        Vector leg = mat.vecmul(( cen - fil_[n]->posPoint(e) ).normalized(alpha));
+        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(fil_[n+1],e), leg, stiff);
     }
 #endif
 }
@@ -261,7 +263,7 @@ void Tubule::setInteractions(Meca& meca) const
     const real stiffR = prop->stiffness[1];
     const real ang = M_PI / NFIL;
     const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
-    const real c = std::cos(ang), s = std::sin(ang);
+    const real C = std::cos(ang), S = std::sin(ang);
     
     const size_t e = bone_->nbSegments();
     
@@ -276,7 +278,7 @@ void Tubule::setInteractions(Meca& meca) const
     }
     
     Rotation mat(0,1);
-    real alpha = prop->radius / len;
+    real beta = prop->radius / len;
     Vector cen, dir;
     
     for ( size_t i = 0; i < e; ++i )
@@ -284,15 +286,16 @@ void Tubule::setInteractions(Meca& meca) const
         // get centerline
         cen = bone_->posPoint(i);
         dir = bone_->dirSegment(i);
-        mat = Rotation::rotationAroundAxis(dir, c, s);
+        mat = Rotation::rotationAroundAxis(dir, C, S);
         
         for ( size_t n = 0; n < NFIL; ++n )
         {
-            Vector arm = ( cen - fil_[n]->posPoint(i) ).normalized(len);
+            real alpha = len * fil_[n]->segmentationInv();
+            Vector leg = ( cen - fil_[n]->posPoint(i) ).normalized(alpha);
             // orthoradial beams:
-            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), mat.vecmul(arm), stiffL);
+            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(fil_[n+1],i), mat.vecmul(leg), stiffL);
             // radial spoke:
-            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(bone_,i), alpha*cross(dir,arm), stiffR);
+            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(bone_,i), beta*cross(dir,leg), stiffR);
             // twist stiffness
             meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffR);
         }
@@ -302,9 +305,10 @@ void Tubule::setInteractions(Meca& meca) const
     cen = bone_->posPoint(e);
     for ( size_t n = 0; n < NFIL; ++n )
     {
-        Vector arm = ( cen - fil_[n]->posPoint(e) ).normalized(len);
-        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), mat.vecmul(arm), stiffL);
-        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(bone_,e), alpha*cross(dir,arm), stiffR);
+        real alpha = len * fil_[n]->segmentationInv();
+        Vector leg = ( cen - fil_[n]->posPoint(e) ).normalized(alpha);
+        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(fil_[n+1],e), mat.vecmul(leg), stiffL);
+        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(bone_,e), beta*cross(dir,leg), stiffR);
     }
 #endif
 }
@@ -317,11 +321,12 @@ Cambridge, 12.2019
 void Tubule::setInteractionsC(Meca& meca) const
 {
 #if ( DIM >= 3 )
-    const real angle = 2 * M_PI / NFIL;
-    const real len = 2 * prop->radius * std::sin(angle);  // distance between protofilaments
+    const real theta = 2 * M_PI / NFIL;
+    const real len = 2 * prop->radius * std::sin(0.5*theta);  // distance between protofilaments
     const real stiffL = prop->stiffness[0];
     const real stiffA = prop->stiffness[1];
-    Vector2 ang(std::cos(angle), std::sin(angle));
+    const real stiffT = prop->stiffness[1];
+    Vector2 ang(std::cos(theta), std::sin(theta));
     
     assert_true(fil_[0]);
     const size_t e = fil_[0]->nbSegments();
@@ -346,12 +351,11 @@ void Tubule::setInteractionsC(Meca& meca) const
         
         for ( size_t n = 0; n < NFIL; ++n )
         {
-            Vector arm = (2*cen - fil_[n]->posPoint(i)- fil_[n+1]->posPoint(i)).normalized(len);
-            
-            meca.addSideLinkMT(Interpolation(fil_[n],i,i+1,0), Mecapoint(fil_[n+1],i), arm, stiffL);
-
-            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i),
-                           Mecapoint(fil_[n+2],i), mat, stiffA);
+            real alpha = len * fil_[n]->segmentationInv();
+            Vector leg = ( 2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(alpha);
+            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(fil_[n+1],i), leg, stiffL);
+            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), Mecapoint(fil_[n+2],i), mat, stiffA);
+            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffT);
         }
     }
     
@@ -363,8 +367,55 @@ void Tubule::setInteractionsC(Meca& meca) const
 
     for ( size_t n = 0; n < NFIL; ++n )
     {
-        Vector arm = (2*cen - fil_[n]->posPoint(e) - fil_[n+1]->posPoint(e)).normalized(len);
-        meca.addSideLinkMT(Interpolation(fil_[n],e-1,e,1), Mecapoint(fil_[n+1],e), arm, stiffL);
+        real alpha = len * fil_[n]->segmentationInv();
+        Vector leg = (2*cen - fil_[n]->posPoint(e) - fil_[n+1]->posPoint(e)).normalized(alpha);
+        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(fil_[n+1],e), leg, stiffL);
+    }
+#endif
+}
+
+/**
+ Using addSideLink() but this causes a serious problem, since Torque are disbalanced...
+ Strasbourg, 13.05.2021
+ */
+void Tubule::setInteractionsD(Meca& meca) const
+{
+#if ( DIM >= 3 )
+    const real ang = M_PI / NFIL;  // half of the sector angle!
+    const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
+    const real stiffL = prop->stiffness[0];
+    const real stiffR = prop->stiffness[1];
+    const real C = std::sin(ang), S = std::cos(ang); // rotation of angle PI/2 - ang
+    Rotation mat;
+
+    for ( size_t n = 0; n < NFIL; ++n )
+    {
+        Fiber * fib = fil_[n+1];
+        const size_t e = fil_[n]->nbSegments();
+        const real alpha = len * fib->segmentationInv();
+
+        if ( fib->nbSegments() != e )
+        {
+            Cytosim::warn << "unequal Tubule filaments\n";
+            return;
+        }
+        
+        for ( size_t i = 0; i < e; ++i )
+        {
+            mat = Rotation::rotationAroundAxis(fib->dirSegment(i), C, S);
+            // rotate direction of previous protofilament pair:
+            Vector leg = mat.vecmul(fib->posPoint(i) - fil_[n]->posPoint(i)).normalized(alpha);
+            meca.addSideLink(FiberSegment(fib,i), 0, Mecapoint(fil_[n+2],i), leg, stiffL);
+            // orthoradial links with bending stiffness
+            //meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), Mecapoint(fil_[n+2],i), 1.0, stiffL);
+            // twist stiffness
+            meca.addTorque(Mecapoint(fib,i), Mecapoint(fil_[n+2],i), stiffR);
+        }
+
+        // use the same rotation matrix for the last point:
+        //mat = Rotation::rotationAroundAxis(fib->dirSegment(e-1), C, S);
+        Vector leg = mat.vecmul(fib->posPoint(e) - fil_[n]->posPoint(e)).normalized(alpha);
+        meca.addSideLink(FiberSegment(fib,e-1), 1, Mecapoint(fil_[n+2],e), leg, stiffL);
     }
 #endif
 }

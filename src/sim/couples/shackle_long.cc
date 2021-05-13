@@ -47,7 +47,7 @@ Vector ShackleLong::sidePos1() const
 }
 
 /**
- Calculates the force for the addSideLink()
+ Calculates the force as stiffness * ( cHand2->pos() - sidePos1() )
  */
 Vector ShackleLong::force() const
 {

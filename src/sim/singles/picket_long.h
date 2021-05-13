@@ -29,7 +29,7 @@ public:
     /// destructor
     ~PicketLong();
         
-    /// position on the side of fiber used for sideInteractions
+    /// position on the side of fiber used in setInteractions()
     Vector  sidePos() const;
     
     /// force = stiffness * ( posFoot() - posHand() )

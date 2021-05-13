@@ -46,7 +46,7 @@ public:
     /// Position of the point-of-interest in space
     Vector         pos()           const { return mec_->posPoint(pti_); }
     
-    /// Index of the point-of-interest in the big matrix
+    /// Index of the point-of-interest in the isotropic matrix (Meca::mISO)
     size_t         matIndex()      const { return mec_->matIndex() + pti_; }
     
     /// Write to file

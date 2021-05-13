@@ -66,7 +66,7 @@ Vector WristLong::sidePos() const
 }
 
 /**
- Using a Meca::addSideLink()
+ Using Meca::addSideLink2D() or Meca::addSideLink3D()
  */
 void WristLong::setInteractions(Meca& meca) const
 {

@@ -58,7 +58,7 @@ Vector PicketLong::sidePos() const
 
 
 /**
- This calculates the force corresponding to the addSideLink()
+ This calculates the force as stiffness * ( posFoot() - sidePos() )
  */
 Vector PicketLong::force() const
 {

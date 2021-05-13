@@ -8,7 +8,7 @@
 /// A Couple with a non-zero resting length
 /**
  The CoupleLong adds a non-zero resting length to Couple,
- it uses Meca::addSideLink()
+ it uses Meca::addSideLink2D() or Meca::addSideLink3D()
 
  CoupleLong is automatically selected if ( prop:length > 0 )
  @ingroup CoupleGroup
@@ -29,10 +29,10 @@ public:
     /// destructor
     virtual ~CoupleLong();
     
-    /// position on the side of fiber1 used for Meca::addSideLink()
+    /// position on the side of fiber1 to which the link is made
     Vector  sidePos1() const;
 
-    /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
+    /// force between hands, essentially: stiffness * ( cHand2->pos() - sidePos1() )
     Vector  force() const;
     
     /// add interactions to a Meca

@@ -448,6 +448,9 @@ public:
 
     /// Add a torque to constrain two segments to an angle defined by ang = (cosine, sine)
     void addTorque(Interpolation const&, Interpolation const&, Vector2 const& ang, real weight);
+    
+    /// Add a 'bending elasticity' torque on 3 points 
+    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, real scale, real weight);
 
     /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine)
     void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight);
@@ -593,12 +596,12 @@ public:
 #endif
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
     void addSideLink3D(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
-    
-    /// Link of stiffness `weight`, at distance `arm` on the side of first segment
-    void addSideLinkMT(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
 
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
     void addSideLink(Interpolation const&, Mecapoint const&, real arm, real weight);
+    
+    /// Specialized version, where `leg` is already multiplied by the segment length
+    void addSideLink(FiberSegment const&, real alpha, Mecapoint const&, Torque const& arm, real weight);
 
     
 #if ( DIM == 2 )

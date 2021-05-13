@@ -72,13 +72,18 @@ public:
     /// handles the disapearance of one of the filament
     void goodbye(Buddy const*);
     
-    ///
-    void setInteractions(Meca&) const;
-    ///
+    /// unused test
+    void setInteractionsA(Meca&) const;
+    /// unused test
     void setInteractionsB(Meca&) const;
-    ///
+    /// unused test
     void setInteractionsC(Meca&) const;
+    /// unused test
+    void setInteractionsD(Meca&) const;
     
+    /// the one that is used
+    void setInteractions(Meca&) const;
+
     
     /// a static_cast<> of Object::next()
     Tubule *  next() const { return static_cast<Tubule*>(nextO); }

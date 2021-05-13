@@ -1051,7 +1051,9 @@ public:
 
     
     /// build the matrix `dia * Id + vec (x) Id`
-    /** thus applying M to V results in `dia * V + vec (x) V */
+    /**
+     Thus applying M to V results in `dia * V + vec (x) V`
+     */
     static Matrix33 vectorProduct(const real dia, const Vector3& vec)
     {
         return Matrix33(    dia,  vec.ZZ, -vec.YY,

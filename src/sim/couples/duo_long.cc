@@ -69,7 +69,7 @@ Vector DuoLong::force() const
 
 
 /**
- This uses addSideLink().
+ This uses addSideLink2D() or addSideLink3D().
  
  Another possibility would be SideSideLink, which is fully symmetric.
  */

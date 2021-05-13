@@ -55,7 +55,7 @@ Vector CoupleLong::sidePos1() const
 
 
 /**
- Calculates the force for the addSideLink()
+ Calculates the force as stiffness * ( cHand2->pos() - sidePos1() )
  */
 Vector CoupleLong::force() const
 {
@@ -70,9 +70,9 @@ Vector CoupleLong::force() const
 
 
 /**
- This uses addSideLink().
+ This uses addSideLink2D() or addSideLink3D().
  
- Another possibility would be SideSideLink, which is fully symmetric.
+ Another possibility would be addSideSideLink, which is fully symmetric.
  */
 void CoupleLong::setInteractions(Meca& meca) const
 {
