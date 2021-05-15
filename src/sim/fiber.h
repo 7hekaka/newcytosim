@@ -140,6 +140,9 @@ protected:
     /// viscous drag coefficient for a cylinder moving close to a surface
     static real dragCoefficientSurface(real len, FiberProp const*);
     
+    /// add confinement interactions to a Meca
+    void setConfinement(Meca&, Confinement, Space const*, real stiff) const;
+
 public:
     
 #if FIBER_HAS_FAMILY
@@ -187,11 +190,11 @@ public:
     /// calculate viscous drag coefficient
     void           setDragCoefficient();
     
-    /// add interactions to a Meca
+    /// add force elements relevant for this Fiber to a Meca
     void           setInteractions(Meca&) const;
     
 
-    /// invert polarity and adjust abscissa of Hands to keep them at the same place
+    /// adjust abscissa of Hands by applying mirror image around fiber midpoint
     void           flipHandsPolarity();
     
     /// remove the portion of size `len` that includes the MINUS_END
