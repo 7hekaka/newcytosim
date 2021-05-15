@@ -47,16 +47,16 @@ enum Confinement
     CONFINE_OFF           = 0,   ///< not confined
     CONFINE_INSIDE        = 1,   ///< confine vertices inside the Space
     CONFINE_OUTSIDE       = 2,   ///< confine vertices outside the Space
-    CONFINE_ON            = 3,   ///< confine on the surface of the Space
+    CONFINE_ON            = 3,   ///< confine all vertices to the surface of the Space (always apply force)
     CONFINE_ALL_INSIDE    = 4,   ///< confine the entire sphere inside the Space
     CONFINE_ALL_OUTSIDE   = 5,   ///< confine the entire sphere outside the Space
-    CONFINE_PLUS_END      = 10,  ///< confine the PLUS_END of fibers to the surface of the Space
-    CONFINE_MINUS_END     = 11,  ///< confine the MINUS_END of fibers to the surface of the Space
+    CONFINE_PLUS_END      = 10,  ///< confine PLUS_END of fibers to the surface of the Space
+    CONFINE_MINUS_END     = 11,  ///< confine MINUS_END of fibers to the surface of the Space
     CONFINE_BOTH_ENDS     = 12,  ///< confine both ends of fibers to the surface of the Space
-    CONFINE_PLUS_OUT      = 13,  ///< confine the PLUS_END outside
-    CONFINE_POINT         = 14,  ///< confine first vertex of a Solid
-    CONFINE_POINT_INSIDE  = 15,  ///< confine first vertex of a Solid, insde the Space
-    CONFINE_RANGE         = 17   ///< confine a range of point on Fibers
+    CONFINE_PLUS_OUT      = 13,  ///< confine the PLUS_END outside the Space
+    CONFINE_POINT         = 14,  ///< confine first vertex of a Solid to the surface of the Space
+    CONFINE_POINT_INSIDE  = 15,  ///< confine first vertex of a Solid, inside the Space
+    CONFINE_RANGE         = 17   ///< confine vertices within a range of abscissa to the surface
 };
 
 

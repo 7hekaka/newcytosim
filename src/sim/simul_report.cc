@@ -1225,6 +1225,42 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
     }
 }
 
+/** Attention: This does not handle all cases */
+static bool confinementApplies(Confinement mode, Space const* spc, Vector const& pos)
+{
+    switch ( mode )
+    {
+        case CONFINE_OFF: return false;
+        case CONFINE_INSIDE: return spc->outside(pos);
+        case CONFINE_OUTSIDE: return spc->inside(pos);
+        case CONFINE_ON: return true;
+        case CONFINE_PLUS_END: return true;
+        case CONFINE_MINUS_END: return true;
+        case CONFINE_BOTH_ENDS: return true;
+        case CONFINE_PLUS_OUT: return spc->inside(pos);
+        default: return true;
+    }
+    return true;
+}
+
+/** Attention: This does not handle all cases */
+static bool vertexIsConfined(Confinement mode, Fiber const* fib, size_t inx)
+{
+    switch ( mode )
+    {
+        case CONFINE_OFF: return false;
+        case CONFINE_INSIDE: return true;
+        case CONFINE_OUTSIDE: return true;
+        case CONFINE_ON: return true;
+        case CONFINE_PLUS_END: return ( inx == fib->lastPoint() );
+        case CONFINE_MINUS_END: return ( inx == 0 );
+        case CONFINE_BOTH_ENDS: return ( inx == 0 || inx == fib->lastPoint() );
+        case CONFINE_PLUS_OUT: return ( inx == fib->lastPoint() );
+        default: return true;
+    }
+    return true;
+}
+
 
 /**
  Export total magnitude of force exerted by Fiber on the confinement
@@ -1232,7 +1268,7 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
 void Simul::reportFiberConfineForce(std::ostream& out) const
 {
     out << COM << "confinement forces";
-    out << COM << "identity" << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
+    out << COM << "identity" << SEP << "vertex" << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
      
      // list fibers in the order of the inventory:
      for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
@@ -1240,28 +1276,36 @@ void Simul::reportFiberConfineForce(std::ostream& out) const
          out << COM << "fiber " << fib->reference();
          Space const* spc = findSpace(fib->prop->confine_space);
          const real stiff = fib->prop->confine_stiffness;
+         const Confinement mode = fib->prop->confine;
 
          for ( size_t p = 0; p < fib->nbPoints(); ++p )
          {
-             out << LIN << fib->identity();
              Vector w, pos = fib->posPoint(p);
-             out << SEP << pos;
-             if ( spc->outside(pos) )
+             if ( vertexIsConfined(mode, fib, p) && confinementApplies(mode, spc, pos) )
              {
                  w = spc->project(pos);
+                 out << LIN << fib->identity();
+                 out << SEP << p << SEP << pos;
                  out << SEP << stiff * ( w - pos );
-             }
-             else
-             {
-                 out << SEP << Vector(0,0,0);
              }
          }
      }
 }
 
+static bool isSymmetricAroundZ(std::string const& shape)
+{
+    if ( shape == "sphere" ) return true;
+    if ( shape == "cylinderZ" ) return true;
+    if ( shape == "ellipse" ) return true;
+    if ( shape == "torus" ) return true;
+    if ( shape == "ring" ) return true;
+    return false;
+}
 
 /**
- Export total magnitude of force exerted by Fiber on the confinement
+ Export total magnitude of force exerted by Fiber on the confinement.
+ The radial components of the forces are summed up, which is only meaningful
+ in very particular systems, when the geometry is circular around the Z-axis!
  */
 real Simul::reportFiberConfinement(std::ostream& out) const
 {
@@ -1275,14 +1319,19 @@ real Simul::reportFiberConfinement(std::ostream& out) const
     {
         Space const* spc = findSpace(fib->prop->confine_space);
         const real stiff = fib->prop->confine_stiffness;
+        const Confinement mode = fib->prop->confine;
+
+        if ( !isSymmetricAroundZ(spc->prop->shape) )
+            throw InvalidParameter("unexpected Space:shape in reportFiberConfinement()");
         
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
             Vector w, pos = fib->posPoint(p);
-            if ( spc->outside(pos) )
+            if ( vertexIsConfined(mode, fib, p) && confinementApplies(mode, spc, pos) )
             {
                 ++cnt;
                 w = spc->project(pos);
+                // assuming the goemetry is rotational-symmetric around the Z axis:
                 Vector dir = normalize(Vector(pos.XX, pos.YY, 0));
                 Vector vec = stiff * ( pos - w );
                 sum += vec;
