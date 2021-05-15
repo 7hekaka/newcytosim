@@ -31,17 +31,17 @@ sieve: sieve.cc frame_reader.o $(TOOL_OBJ) | bin
 	$(DONE)
 vpath sieve bin
 
-bin1/sieve: sieve.cc frame_reader.o cytosimD1.a cytomathD1.a cytobase.a SFMT.o | bin1
+bin1/sieve: sieve.cc frame_reader.o cytolibD1.a cytomathD1.a cytobase.a SFMT.o | bin1
 	$(COMPILE) -DDIM=1 $(TOOL_INC) $(OBJECTS) $(LINK) -o bin1/sieve
 	$(DONE)
 vpath bin1/sieve bin1
 
-bin2/sieve: sieve.cc frame_reader.o cytosimD2.a cytomathD2.a cytobase.a SFMT.o | bin2
+bin2/sieve: sieve.cc frame_reader.o cytolibD2.a cytomathD2.a cytobase.a SFMT.o | bin2
 	$(COMPILE) -DDIM=2 $(TOOL_INC) $(OBJECTS) $(LINK) -o bin2/sieve
 	$(DONE)
 vpath bin2/sieve bin2
 
-bin3/sieve: sieve.cc frame_reader.o cytosimD3.a cytomathD3.a cytobase.a SFMT.o | bin3
+bin3/sieve: sieve.cc frame_reader.o cytolibD3.a cytomathD3.a cytobase.a SFMT.o | bin3
 	$(COMPILE) -DDIM=3 $(TOOL_INC) $(OBJECTS) $(LINK) -o bin3/sieve
 	$(DONE)
 vpath bin3/sieve bin3
@@ -58,17 +58,17 @@ report: report.cc frame_reader.o $(TOOL_OBJ) | bin
 	$(DONE)
 vpath report bin
 
-bin1/report: report.cc frame_reader.o cytosimD1.a cytomathD1.a cytobase.a SFMT.o | bin1
+bin1/report: report.cc frame_reader.o cytolibD1.a cytomathD1.a cytobase.a SFMT.o | bin1
 	$(COMPILE) -DDIM=1 $(TOOL_INC) $(OBJECTS) $(LINK) -o bin1/report
 	$(DONE)
 vpath bin1/report bin1
 
-bin2/report: report.cc frame_reader.o cytosimD2.a cytomathD2.a cytobase.a SFMT.o | bin2
+bin2/report: report.cc frame_reader.o cytolibD2.a cytomathD2.a cytobase.a SFMT.o | bin2
 	$(COMPILE) -DDIM=2 $(TOOL_INC) $(OBJECTS) $(LINK) -o bin2/report
 	$(DONE)
 vpath bin2/report bin2
 
-bin3/report: report.cc frame_reader.o cytosimD3.a cytomathD3.a cytobase.a SFMT.o | bin3
+bin3/report: report.cc frame_reader.o cytolibD3.a cytomathD3.a cytobase.a SFMT.o | bin3
 	$(COMPILE) -DDIM=3 $(TOOL_INC) $(OBJECTS) $(LINK) -o bin3/report
 	$(DONE)
 vpath bin3/report bin3

@@ -2158,8 +2158,8 @@
 		BB1B0F5323D3068B00C2608A /* grid */ = {
 			isa = PBXGroup;
 			children = (
-				BB73588105B98DA3006956D5 /* grid.h */,
 				BBBD34DF1AABA5BE00819326 /* map.h */,
+				BB73588105B98DA3006956D5 /* grid.h */,
 				BB73589F05B98DA3006956D5 /* rasterizer.h */,
 				BB73589E05B98DA3006956D5 /* rasterizer.cc */,
 			);
