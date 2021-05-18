@@ -129,7 +129,6 @@ void Mecafil::storeDirections()
      we assume here that successive points are correctly separated by 'segmentation',
      such that we can normalize the vector simply by dividing by 'segmentation'
      */
-    //checkSegmentation(0.01);
     const real val = 1.0 / segmentation();
     const size_t end = DIM * lastPoint();
     #pragma ivdep

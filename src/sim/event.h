@@ -42,15 +42,15 @@ public:
 
     /// code to be executed
     std::string activity;
+    
+    /// true if event will fire multiple times
+    bool        recurrent;
 
     /// rate of occurence of firing events
     double      rate;
     
     /// delay in unit time between firing events (used if `rate` is not set)
     double      delay;
-
-    /// true if event will fire multiple times
-    bool        recurrent;
     
     ///@}
     

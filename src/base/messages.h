@@ -89,7 +89,7 @@ namespace Cytosim
         template < typename... Args >
         void operator()(const char* fmt, Args&&... args)
         {
-            char str[2048] = { 0 };
+            char str[1024] = { 0 };
             snprintf(str, sizeof(str), fmt, args...);
             operator<<(str);
             out_.flush();

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "dim.h"
+#include "smath.h"
 #include "assert_macro.h"
 #include "chain.h"
 #include "iowrapper.h"
@@ -1340,21 +1341,19 @@ void Chain::join(Chain const* fib)
 /**
  Returns the minimum and maximum distance between consecutive points
  */
-void Chain::segmentationMinMax(real const* ptr, real& mn, real& mx) const
+void Chain::segmentationMinMax(real const* ptr, real& in, real& ax) const
 {
-    Vector vec;
-    vec.load_diff(ptr);
-    mn = vec.normSqr();
-    mx = mn;
-    for ( size_t n = 1; n < lastPoint(); ++n )
+    real x = sMath::distanceSqr<DIM>(ptr, ptr+DIM);
+    in = x;
+    ax = x;
+    for ( unsigned i = 1; i < lastPoint(); ++i )
     {
-        vec.load_diff(ptr+DIM*n);
-        real r = vec.normSqr();
-        mn = std::min(mn, r);
-        mx = std::max(mx, r);
+        x = sMath::distanceSqr<DIM>(ptr+DIM*i, ptr+DIM*(i+1));
+        in = std::min(in, x);
+        ax = std::max(ax, x);
     }
-    mn = std::sqrt(mn);
-    mx = std::sqrt(mx);
+    in = std::sqrt(in);
+    ax = std::sqrt(ax);
 }
 
 /**
