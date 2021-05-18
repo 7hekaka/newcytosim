@@ -154,15 +154,9 @@ void Couple::setInteractionsFA(Meca& meca) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/**
- Simulates:
- - diffusive motion
- - attachment
- .
- */
-void Couple::stepFF()
+void Couple::diffuse()
 {
-    diffuse();
+    Vector pos = cPos + Vector::randS(prop->diffusion_dt);
     
     // confinement:
     if ( prop->confine == CONFINE_INSIDE )
@@ -172,12 +166,24 @@ void Couple::stepFF()
          Set concentration of molecules at edges of Space by letting molecules
          out, and put some back at a constant rate
          */
+        cPos = pos;
         prop->confine_space_ptr->bounce(cPos);
     }
     else if ( prop->confine == CONFINE_ON )
     {
-        cPos = prop->confine_space_ptr->project(cPos);
+        cPos = prop->confine_space_ptr->project(pos);
     }
+}
+
+/**
+ Simulates:
+ - diffusive motion
+ - attachment
+ .
+ */
+void Couple::stepFF()
+{
+    diffuse();
 
     /*
      For attachment, we select randomly one of the Hand, with equal chances,

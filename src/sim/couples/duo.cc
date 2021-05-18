@@ -41,16 +41,6 @@ void Duo::stepFF()
 {
     diffuse();
     
-    // confinement:
-    if ( prop->confine == CONFINE_INSIDE )
-    {
-        prop->confine_space_ptr->bounce(cPos);
-    }
-    else if ( prop->confine == CONFINE_ON )
-    {
-        cPos = prop->confine_space_ptr->project(cPos);
-    }    
-    
     // check activity
     ///@todo better Duo::activation criteria
     if ( prop->activation_space_ptr->inside(cPos) )

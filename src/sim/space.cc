@@ -214,6 +214,9 @@ real Space::estimateVolume(size_t cnt) const
  In most geometries, this works well, but if the distance from the point
  to the edge is very large compared to the width of the space, the number
  of iterations may be large.
+ 
+ In general, this does not satisfies detailed balance, and may lead to artificial
+ accumulations in certain part of space, such as the center of a sphere.
 */
 void Space::bounceOnEdges(Vector& pos) const
 {

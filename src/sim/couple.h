@@ -80,7 +80,7 @@ protected:
     ObjectID nucleatorID() const { return Object::identity(); }
 
     /// update position to account for diffusion in one time step
-    void diffuse() { cPos.addRand(prop->diffusion_dt); }
+    void diffuse();
     
 public:
     

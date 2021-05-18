@@ -37,9 +37,6 @@ void Crosslink::stepFF()
 {
     diffuse();
     
-    // confinement:
-    prop->confine_space_ptr->bounce(cPos);
-    
     // activity:
     cHand1->stepUnattached(simul(), cPos);
     cHand2->stepUnattached(simul(), cPos);
