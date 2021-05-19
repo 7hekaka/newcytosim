@@ -469,8 +469,8 @@ void LocusGrid::setSterics0(Meca& meca, real stiff, BigLocusList const& list1,
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
     {
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
-            if ( not_adjacentPL(*jj, *ii) )
-                checkPL(meca, stiff, *jj, *ii);
+            if ( not_adjacentPL(*ii, *jj) )
+                checkPL(meca, stiff, *ii, *jj);
 
         for ( BigPoint const* jj = mid2; jj < list2.end(); ++jj )
             if ( not_adjacentPP(*ii, *jj) )
