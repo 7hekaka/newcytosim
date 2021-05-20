@@ -11,7 +11,7 @@
 #include "grid.h"
 #include "opengl.h"
 #include "gle.h"
-#include "flute.h"
+#include "gle_flute.h"
 
 /// display the edges of a 1D grid using OpenGL
 template<int ORD> void drawBoundaries(Map<ORD> const&) {};
@@ -35,22 +35,24 @@ void drawValues(Grid<CELL, 1> const& grid,
                 gle_color color(TYPE, CELL const&, Vector1 const&),
                 TYPE arg)
 {
-    float d = grid.cellWidth(0);
-    float e = 2;
-    
-    // paint all cells one by one
-    for ( size_t c = 0; c < grid.breadth(0); ++c )
+    float dx = grid.cellWidth(0), cx = 0.5f * dx;
+    float dy = 1;
+
+    flute6 * flu = gle::mapVertexColorBuffer(4*grid.breadth(0)+4);
+    size_t i = 0;
+    for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
     {
-        float x = grid.position(0, c);
-        gle_color col = color(arg, grid[c], Vector1(x));
-        if ( col.visible() )
-        {
-            col.load();
-            GLfloat pts[8] = {x, -e, x+d, -e, x, e, x+d, e};
-            glVertexPointer(2, GL_FLOAT, 0, pts);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        }
+        float x = grid.position(0, ix);
+        gle_color col = color(arg, grid.icell1D(ix), Vector1(x+cx));
+        // use a full quad to achieve uniform color within
+        flu[i++] = { x+dx, dy, col };
+        flu[i++] = { x, 0, col };
+        flu[i++] = { x, dy, col };
+        flu[i++] = { x+dx, 0, col };
     }
+    gle::unmapVertexColorBuffer();
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -65,24 +67,29 @@ void drawValues(Grid<CELL, 2> const& grid,
                 gle_color color(TYPE, CELL const&, Vector2 const&),
                 TYPE arg)
 {
-    float d = 0.5 * grid.cellWidth(0);
-    float e = 0.5 * grid.cellWidth(1);
-
-    // paint all cells one by one
-    for ( size_t c = 0; c < grid.nbCells(); ++c )
+    float dx = grid.cellWidth(0), cx = 0.5f * dx;
+    float dy = grid.cellWidth(1), cy = 0.5f * dy;
+ 
+    glEnableClientState(GL_COLOR_ARRAY);
+    for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
     {
-        Vector2 w;
-        grid.setPositionFromIndex(w, c, 0.5);
-        gle_color col = color(arg, grid[c], w);
-        if ( col.visible() )
+        flute6 * flu = gle::mapVertexColorBuffer(4*grid.breadth(0)+4);
+        size_t i = 0;
+        for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
         {
-            col.load();
-            GLfloat X(w.XX), Y(w.YY);
-            GLfloat pts[8] = {X-d, Y-e, X+d, Y-e, X-d, Y+e, X+d, Y+e};
-            glVertexPointer(2, GL_FLOAT, 0, pts);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            float x = grid.position(0, ix);
+            float y = grid.position(1, iy);
+            gle_color col = color(arg, grid.icell2D(ix, iy), Vector2(x+cx, y+cy));
+            // use a full quad to achieve uniform color within
+            flu[i++] = { x, y+dy, col };
+            flu[i++] = { x, y, col };
+            flu[i++] = { x+dx, y+dy, col };
+            flu[i++] = { x+dx, y, col };
         }
+        gle::unmapVertexColorBuffer();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -98,24 +105,30 @@ void drawValues(Grid<CELL, 3> const& grid,
                 real zzz = 0)
 {
     assert_true(grid.hasCells());
-    GLfloat d(0.5 * grid.cellWidth(0));
-    GLfloat e(0.5 * grid.cellWidth(1));
+    float dx = grid.cellWidth(0), cx = 0.5f * dx;
+    float dy = grid.cellWidth(1), cy = 0.5f * dy;
+    float z = (float)zzz;
     
-    size_t z = grid.index(2, zzz);
-    for ( size_t y = 0; y < grid.breadth(1); ++y )
-    for ( size_t x = 0; x < grid.breadth(0); ++x )
+    size_t iz = grid.index(2, zzz);
+    for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
     {
-        Vector3 w(grid.position(0, x+0.5), grid.position(1, y+0.5), zzz);
-        gle_color col = color(arg, grid.icell3D(x,y,z), w);
-        if ( col.visible() )
+        flute8 * flu = gle::mapVertexColorBuffer(4*grid.breadth(0)+4);
+        size_t i = 0;
+        for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
         {
-            col.load();
-            GLfloat X(w.XX), Y(w.YY), Z(zzz);
-            GLfloat pts[12] = {X-d, Y-e, Z, X+d, Y-e, Z, X-d, Y+e, Z, X+d, Y+e, Z};
-            glVertexPointer(3, GL_FLOAT, 0, pts);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            float x = grid.position(0, ix);
+            float y = grid.position(1, iy);
+            gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, y+cy, zzz));
+            // use a full quad to achieve uniform color within
+            flu[i++] = { x, y+dy, z, col };
+            flu[i++] = { x, y, z, col };
+            flu[i++] = { x+dx, y+dy, z, col };
+            flu[i++] = { x+dx, y, z, col };
         }
+        gle::unmapVertexColorBuffer();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -132,24 +145,29 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
                   real yyy)
 {
     assert_true(grid.hasCells());
-    GLfloat d(0.5 * grid.cellWidth(0));
-    GLfloat e(0.5 * grid.cellWidth(1));
-    
-    size_t y = grid.index(1, yyy);
-    for ( size_t z = 0; z < grid.breadth(2); ++z )
-    for ( size_t x = 0; x < grid.breadth(0); ++x )
+    float dx = grid.cellWidth(0), cx = 0.5f * dx;
+    float dz = grid.cellWidth(1), cz = 0.5f * dz;
+    float y = (float)yyy;
+
+    size_t iy = grid.index(1, yyy);
+    for ( size_t iz = 0; iz < grid.breadth(2); ++iz )
     {
-        Vector3 w(grid.position(0, x+0.5), yyy, grid.position(2, y+0.5));
-        gle_color col = color(arg, grid.icell3D(x,y,z), w);
-        if ( col.visible() )
+        flute8 * flu = gle::mapVertexColorBuffer(4*grid.breadth(0)+4);
+        size_t i = 0;
+        for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
         {
-            col.load();
-            GLfloat X(w.XX), Y(yyy), Z(w.ZZ);
-            GLfloat pts[12] = {X-d, Y, Z-e, X+d, Y, Z-e, X-d, Y, Z+e, X+d, Y, Z+e};
-            glVertexPointer(3, GL_FLOAT, 0, pts);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            float x = grid.position(0, ix);
+            float z = grid.position(2, iz);
+            gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, yyy, z+cz));
+            flu[i++] = { x, y, z+dz, col };
+            flu[i++] = { x, y, z, col };
+            flu[i++] = { x+dx, y, z+dz, col };
+            flu[i++] = { x+dx, y, z, col };
         }
+        gle::unmapVertexColorBuffer();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -166,28 +184,33 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
                   real xxx)
 {
     assert_true(grid.hasCells());
-    GLfloat d(0.5 * grid.cellWidth(0));
-    GLfloat e(0.5 * grid.cellWidth(2));
-    
-    size_t x = grid.index(0, xxx);
-    for ( size_t z = 0; z < grid.breadth(2); ++z )
-    for ( size_t y = 0; y < grid.breadth(1); ++y )
+    float dy = grid.cellWidth(0), cy = 0.5f * dy;
+    float dz = grid.cellWidth(1), cz = 0.5f * dz;
+    float x = (float)xxx;
+
+    size_t ix = grid.index(0, xxx);
+    for ( size_t iz = 0; iz < grid.breadth(2); ++iz )
     {
-        Vector3 w(xxx, grid.position(1, y+0.5), grid.position(2, z+0.5));
-        gle_color col = color(arg, grid.icell3D(x,y,z), w);
-        if ( col.visible() )
+        flute8 * flu = gle::mapVertexColorBuffer(4*grid.breadth(1)+4);
+        size_t i = 0;
+        for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
         {
-            col.load();
-            GLfloat X(xxx), Y(w.YY), Z(w.ZZ);
-            GLfloat pts[12] = {X, Y-d, Z-e, X, Y+d, Z-e, X, Y-d, Z+e, X, Y+d, Z+e};
-            glVertexPointer(3, GL_FLOAT, 0, pts);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            float y = grid.position(1, iy);
+            float z = grid.position(2, iz);
+            gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(xxx, y+cy, z+cz));
+            flu[i++] = { x, y, z+dz, col };
+            flu[i++] = { x, y, z, col };
+            flu[i++] = { x, y+dy, z+dz, col };
+            flu[i++] = { x, y+dy, z, col };
         }
+        gle::unmapVertexColorBuffer();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
-/// display a slice of the field in a plane perpendicular to 'dir'
+/// display a slice of the 3D field in a plane perpendicular to 'dir'
 /**
  a Cell color is specified by `bool set_color(TYPE, CELL const&, Vector2 const&)`
  The return value of this function is ignored.
@@ -209,14 +232,11 @@ void drawValues(Grid<CELL, 3> const& grid,
     dir.orthonormal(dx, dy, cel);
     dy *= 0.5 * M_SQRT3;
     
-    flute3 * pts = new flute3[4*R+2];
-    flute4 * col = new flute4[4*R+2];
     glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, GL_FLOAT, 0, col);
-    glVertexPointer(3, GL_FLOAT, 0, pts);
 
     for ( int y = -R; y <= R; y+=2 )
     {
+        flute8 * flu = gle::mapVertexColorBuffer(4*R+2);
         Vector3 A = y * dy + pos * dir;
         Vector3 B = A + dy + 0.5 * dx;
         size_t i = 0;
@@ -224,31 +244,28 @@ void drawValues(Grid<CELL, 3> const& grid,
         {
             Vector3 V = A + n * dx;
             Vector3 W = B + n * dx;
-            col[i] = color(arg, grid.interpolate3D(V), V);
-            pts[i++] = V;
-            col[i] = color(arg, grid.interpolate3D(W), W);
-            pts[i++] = W;
+            flu[i++] = { V, color(arg, grid.interpolate3D(V), V) };
+            flu[i++] = { W, color(arg, grid.interpolate3D(W), W) };
         }
+        gle::unmapVertexColorBuffer();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+        flu = gle::mapVertexColorBuffer(4*R+2);
         i = 0;
         A += 2 * dy;
         for ( int n = -R; n <= R; ++n )
         {
             Vector3 V = A + n * dx;
             Vector3 W = B + n * dx;
-            col[i] = color(arg, grid.interpolate3D(V), V);
-            pts[i++] = V;
-            col[i] = color(arg, grid.interpolate3D(W), W);
-            pts[i++] = W;
+            flu[i++] = { V, color(arg, grid.interpolate3D(V), V) };
+            flu[i++] = { W, color(arg, grid.interpolate3D(W), W) };
         }
+        gle::unmapVertexColorBuffer();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
     glDisableClientState(GL_COLOR_ARRAY);
-    delete[] pts;
-    delete[] col;
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 
 #endif
-
 

@@ -136,7 +136,7 @@ void displayVBO()
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[0]);
     // Establish its 3 coordinates per vertex with zero stride in this array; necessary here
-    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Draw the vertices

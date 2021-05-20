@@ -182,7 +182,7 @@ void SpaceBanana::draw2D() const
     // left cap
     gle::compute_arc(fin, arc+6*fin, R, A, M_PI, -eX, eY);
     
-    gle::unmapFloatBuffer(2);
+    gle::unmapFloatBuffer(2, 0);
     glDrawArrays(GL_LINE_LOOP, 0, 4*fin);
 }
 

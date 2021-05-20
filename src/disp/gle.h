@@ -82,7 +82,7 @@ namespace gle
     /// map GPU buffer
     float* mapFloatBuffer(size_t);
     /// unmap GPU buffer
-    void unmapFloatBuffer(size_t);
+    void unmapFloatBuffer(size_t, size_t);
 
 #pragma mark -
     

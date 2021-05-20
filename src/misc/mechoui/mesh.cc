@@ -197,7 +197,7 @@ void Mesh::display(MechouiParam const& pam) const
     //Upload vertex data to the video device
     glBufferData(GL_ARRAY_BUFFER, 3*n_points*sizeof(float), points, GL_STREAM_DRAW);
 
-    glVertexPointer(3, GL_FLOAT, 0, 0);
+    glVertexPointer(3, GL_FLOAT, 0, nullptr);
 
     if ( pam.point_style )
     {

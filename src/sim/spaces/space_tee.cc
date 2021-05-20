@@ -442,7 +442,7 @@ void SpaceTee::draw2D() const
     lft[-2] = J-R;
     lft[-1] = R;
 
-    gle::unmapFloatBuffer(2);
+    gle::unmapFloatBuffer(2, 0);
     glVertexPointer(2, GL_FLOAT, 0, arc);
     glDrawArrays(GL_LINE_LOOP, 0, 3*fin+2);
 }

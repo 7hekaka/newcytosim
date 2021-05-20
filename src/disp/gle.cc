@@ -100,13 +100,16 @@ namespace gle
         return (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
     
-    void unmapFloatBuffer(size_t N)
+    void unmapFloatBuffer(size_t dim, size_t color)
     {
         assert_true(stream_[1] == boundBuffer());
         //glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
         glUnmapBuffer(GL_ARRAY_BUFFER);
-        glVertexPointer(N, GL_FLOAT, N*sizeof(float), nullptr);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        size_t size = (dim+color) * sizeof(float);
+        glVertexPointer(dim, GL_FLOAT, size, nullptr);
+        if ( color > 0 )
+            glColorPointer(4, GL_FLOAT, size, (void*)(dim*sizeof(float)));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     flute6* mapVertexNormalBuffer(size_t cnt)
@@ -1603,11 +1606,13 @@ namespace gle
     {
         GLfloat AX(A.XX);
         GLfloat BX(B.XX);
-        GLfloat pts[8] = { AX,-rA, AX, rA, BX, -rB, BX, rB };
-        flute4 col[4] = { cA, cA, cB, cB };
+        flute6 * flu = (flute6*)mapFloatBuffer(4*6);
+        flu[0] = { AX, -rA, cA };
+        flu[1] = { AX,  rA, cA };
+        flu[2] = { BX, -rB, cB };
+        flu[3] = { BX,  rB, cB };
+        unmapFloatBuffer(2, 1);
         glEnableClientState(GL_COLOR_ARRAY);
-        glColorPointer(4, GL_FLOAT, 0, col);
-        glVertexPointer(2, GL_FLOAT, 0, pts);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);
     }
@@ -1622,12 +1627,13 @@ namespace gle
             GLfloat dX(d.XX/n), dY(d.YY/n);
             GLfloat AX(A.XX), AY(A.YY);
             GLfloat BX(B.XX), BY(B.YY);
-            GLfloat pts[8] = { AX+rA*dX, AY+rA*dY, AX-rA*dX, AY-rA*dY,
-                               BX+rB*dX, BY+rB*dY, BX-rB*dX, BY-rB*dY };
-            flute4 col[] = { cA, cA, cB, cB };
+            flute6 * flu = (flute6*)mapFloatBuffer(4*6);
+            flu[0] = { AX+rA*dX, AY+rA*dY, cA };
+            flu[1] = { AX-rA*dX, AY-rA*dY, cA };
+            flu[2] = { BX+rB*dX, BY+rB*dY, cB };
+            flu[3] = { BX-rB*dX, BY-rB*dY, cB };
+            unmapFloatBuffer(2, 1);
             glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, GL_FLOAT, 0, col);
-            glVertexPointer(2, GL_FLOAT, 0, pts);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glDisableClientState(GL_COLOR_ARRAY);
         }
@@ -1650,14 +1656,18 @@ namespace gle
      This will displays a rectangle if the connection is parallel,
      and a hourglass if the connection is antiparallel
      */
-    void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color ca,
-                       Vector2 const& b, Vector2 const& db, gle_color cb)
+    void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color cA,
+                       Vector2 const& b, Vector2 const& db, gle_color cB)
     {
-        flute2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        flute4 col[6] = { cb, cb, ca, ca, cb, cb };
+        flute6 * flu = (flute6*)mapFloatBuffer(6*6);
+        flu[0] = { b-db, cB };
+        flu[1] = { b, cB };
+        flu[2] = { a-da, cA };
+        flu[3] = { a+da, cA };
+        flu[4] = { b, cB };
+        flu[5] = { b+db, cB };
+        unmapFloatBuffer(2, 1);
         glEnableClientState(GL_COLOR_ARRAY);
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glColorPointer(4, GL_FLOAT, 0, col);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_COLOR_ARRAY);
     }

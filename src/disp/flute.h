@@ -57,6 +57,7 @@ struct flute6
     float xyz[6];
     flute6() : xyz{0, 0, 0, 0, 0, 0} {}
     flute6(float x, float y, float z, float a, float b, float c) : xyz{x, y, z, a, b, c} {}
+    flute6(float x, float y, gle_color const& c) : xyz{x, y, c.r(), c.g(), c.b(), c.a()} {}
     flute6(flute3 const& a, flute3 const& b) : xyz{a.xyz[0], a.xyz[1], a.xyz[2], b.xyz[0], b.xyz[1], b.xyz[2]} {}
     flute6(Vector1 const& v, gle_color const& c) : xyz{float(v.XX), 0, c.r(), c.g(), c.b(), c.a()} {}
     flute6(Vector2 const& v, gle_color const& c) : xyz{float(v.XX), float(v.YY), c.r(), c.g(), c.b(), c.a()} {}
@@ -73,6 +74,7 @@ struct flute8
     float xyz[8];
     flute8() : xyz{0, 0, 0, 0, 0, 0, 0, 0} {}
     flute8(float x, float y, float z, float t, float r, float g, float b, float a) : xyz{x, y, z, t, r, g, b, a} {}
+    flute8(float x, float y, float z, gle_color const& c) : xyz{x, y, z, 1, c.r(), c.g(), c.b(), c.a()} {}
     flute8(Vector1 const& v, gle_color const& c) : xyz{float(v.XX), 0, 0, 1, c.r(), c.g(), c.b(), c.a()} {}
     flute8(Vector2 const& v, gle_color const& c) : xyz{float(v.XX), float(v.YY), 0, 1, c.r(), c.g(), c.b(), c.a()} {}
     flute8(Vector3 const& v, gle_color const& c) : xyz{float(v.XX), float(v.YY), float(v.ZZ), 1, c.r(), c.g(), c.b(), c.a()} {}
