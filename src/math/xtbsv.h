@@ -1151,7 +1151,7 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
             pA -= lda;
             pX -= ORD;
         }
-        vec4 a2 = a1;
+        a2 = a1;
         if ( N > 1 ) // j = N-2
         {
             a0 = loadu4(pX);
@@ -1177,7 +1177,7 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
     storeu4(pX, blend31(a1, a0));
     pA -= lda;
     pX -= ORD;
-    vec4 tt = broadcast1(a1);
+    vec4 tt = broadcastd(a1);
     vec4 af = loadu4(pX);
     while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
     {
@@ -1196,7 +1196,7 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
 #endif
         // restore 4th position that was saved in 'tt'
         storeu4(pX, blend31(a1, tt));
-        tt = broadcast1(a1); // save 4th position for next round
+        tt = broadcastd(a1); // save 4th position for next round
         pA -= lda;
         pX -= ORD;
     }

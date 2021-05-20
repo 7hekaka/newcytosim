@@ -456,15 +456,11 @@ public:
         res[0] = mat[0] * V[0] + mat[1] * V[1];
         res[1] = mat[2] * V[0] + mat[3] * V[1];
         return res;
-#elif defined __AVX2__
-        vec4 m = mul4(mat, broadcast2(V));
-        vec4 l = permute4x64(m, 0x88);
-        vec4 h = permute4x64(m, 0xDD);
-        return add2(getlo(l), getlo(h));
-#else
-        vec4 m = mul4(mat, broadcast2(V));
-        vec2 h = gethi(m);
-        return add2(unpacklo2(getlo(m), h), unpackhi2(getlo(m), h));
+#elif defined __AVX__
+        vec2 h = gethi(mat);
+        vec2 l = mul2(unpacklo2(getlo(mat), h), loaddup2(V));
+        h = mul2(unpackhi2(getlo(mat), h), loaddup2(V+1));
+        return add2(l, h);
 #endif
     }
     

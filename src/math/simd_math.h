@@ -208,41 +208,41 @@ inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
     S = mul8f(x, S);
 }
 
+#endif
 
+
+#if defined(__SSE3__)
+#include "simd_print.h"
 /**
  Initialize ptr[] to a circle:
  delta = 2 * PI / cnt;
      ptr[2*i  ] = rad * cos(start+i*theta) + cX
      ptr[2*i+1] = rad * sin(start+i*theta) + cY
  */
-inline void set_arcAVX(size_t cnt, float ptr[], double rad, double start,
-                       double delta, double cX, double cY)
+void set_arc_SEE(size_t cnt, float ptr[], float rad, float start,
+                 float delta, float cX, float cY)
 {
-    const double c = std::cos(delta);
-    const double s = std::sin(delta);
-    const double c2 = c * c - s * s;
-    const double s2 = s * c + c * s;
+    const float C = cosf(delta+delta);
+    const float S = sinf(delta+delta);
 
-    vec4 cs4{ c2, s2,  c2, s2};
-    vec4 sc4{-s2, c2, -s2, c2};
+    vec4f CS { C, S,  C, S};
+    vec4f SC {-S, C, -S, C};
 
-    vec4 cc { cX, cY, cX, cY };
-    vec2 x0 { std::cos(start), std::sin(start) };
-    // rotate x0 by theta:
-    vec2 x1 = add2(mul2(vec2{c, s}, unpacklo2(x0, x0)), mul2(vec2{-s, c}, unpackhi2(x0, x0)));
-    vec4 xx = mul4(set4(rad), cat4(x1, x0));
+    vec4f cc { cX, cY, cX, cY };
+    vec4f xx { cosf(start), sinf(start), cosf(start+delta), sinf(start+delta) };
+    xx = mul4f(set4f(rad), xx);
 
     float * const end = ptr + 2 * cnt - 2;
     while ( ptr < end )
     {
-        store4d(ptr, add4(xx, cc));
+        store4f(ptr, add4f(xx, cc));
         // apply the rotation matrix
         // x = c * x - s * y;
         // y = s * x + c * y;
-        xx = add4(mul4(cs4, duplo4(xx)), mul4(sc4, duphi4(xx)));
+        xx = add4f(mul4f(CS, dupeven4f(xx)), mul4f(SC, dupodd4f(xx)));
         ptr += 4;
     }
-    store4d(ptr, add4(xx, cc));
+    store4f(ptr, add4f(xx, cc));
 }
 
 #endif

@@ -154,9 +154,9 @@ namespace gle
     void set_arc(size_t cnt, GLfloat ptr[], double rad,
                  double start, double delta, GLfloat cX, GLfloat cY)
     {
-#ifdef __AVX__
+#ifdef __SSE3__
         // This assumes that 'GLfloat == float'
-        return set_arcAVX(cnt, ptr, rad, start, delta, cX, cY);
+        return set_arc_SEE(cnt, ptr, rad, start, delta, cX, cY);
 #endif
         const double c = std::cos(delta);
         const double s = std::sin(delta);

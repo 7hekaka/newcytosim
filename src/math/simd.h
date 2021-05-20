@@ -199,6 +199,9 @@ inline static vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b)
 inline static vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); } //_mm256_unpacklo_pd(a,a)
 inline static vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_mm256_unpackhi_pd(a,a)
 
+// copy a[0] into all elements of dst.
+inline static vec4 broadcastd(vec4 a)         { return _mm256_movedup_pd(_mm256_permute2f128_pd(a, a, 0x00)); }
+
 /* Unused functions:
  inline static vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m128d(a,b); }
  inline static void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
@@ -304,9 +307,7 @@ inline static vec4 interleave4(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 
 inline static vec4 interleave4(vec4 a) { return _mm256_permute4x64_pd(a, 0x50); }
 
 // copy a[0] into all elements of dst.
-inline static vec4 broadcast1(vec2 a)  { return _mm256_broadcastsd_pd(a); }
-// copy a[0] into all elements of dst.
-inline static vec4 broadcast1(vec4 a)  { return _mm256_broadcastsd_pd(cast2(a)); }
+inline static vec4 broadcastd(vec2 a)  { return _mm256_broadcastsd_pd(a); }
 
 
 /// cross product of two 3D vectors ( X Y Z T )
@@ -338,7 +339,6 @@ inline static vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
 inline static vec4 interleave4(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
 inline static vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
-inline static vec4 broadcast1(vec4 a)  { return _mm256_movedup_pd(_mm256_set_m128d(cast2(a), cast2(a))); }
 
 #endif
 
