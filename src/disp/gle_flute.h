@@ -26,6 +26,8 @@ namespace gle
     void   bindVertexBuffer(size_t);
 
     fluteVC* mapVertexColorBuffer(size_t);
+    flute6* mapVertex2ColorBuffer(size_t);
+    flute8* mapVertex4ColorBuffer(size_t);
     void  unmapVertexColorBuffer();
     void   bindVertexColorBuffer(size_t);
     

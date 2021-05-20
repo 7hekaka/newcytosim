@@ -390,9 +390,9 @@ static void changePointStyle(FiberDisp* p, int arg)
     p->point_style = ( p->point_style + 1 ) % arg;
     switch ( p->point_style )
     {
-        case 0: flashText("Fibers: no points");    break;
-        case 1: flashText("Fibers: vertices");     break;
-        case 2: flashText("Fibers: arrowheads");   break;
+        case 0: flashText("Fibers: no points"); break;
+        case 1: flashText("Fibers: vertices"); break;
+        case 2: flashText("Fibers: arrowheads"); break;
         case 3: flashText("Fibers: center point"); break;
         default: flashText("unknown fiber:point_style"); break;
     }
@@ -403,17 +403,17 @@ static void flashLineStyle(int val)
 {
     switch ( val )
     {
-        case 0: flashText("Fibers: no lines");                     break;
-        case 1: flashText("Fibers: lines");                        break;
-        case 2: flashText("Fiber color by axial tensions");        break;
-        case 3: flashText("Fiber jet color by axial tensions");    break;
-        case 4: flashText("Fiber color by curvature");             break;
-        case 5: flashText("Fiber color by orientation");           break;
+        case 0: flashText("Fibers: no lines"); break;
+        case 1: flashText("Fibers: lines"); break;
+        case 2: flashText("Fiber color by axial tensions"); break;
+        case 3: flashText("Fiber jet color by axial tensions"); break;
+        case 4: flashText("Fiber color by curvature"); break;
+        case 5: flashText("Fiber color by orientation"); break;
         case 6: flashText("Fiber color by distance to minus-end"); break;
-        case 7: flashText("Fiber color by distance to plus-end");  break;
-        case 8: flashText("Fiber color by height");                break;
-        case 9: flashText("Fiber color by grid (if style=3)");     break;
-        default: flashText("unknown fiber:line style");            break;
+        case 7: flashText("Fiber color by distance to plus-end"); break;
+        case 8: flashText("Fiber color by height"); break;
+        case 9: flashText("Fiber color by grid (if style=3)"); break;
+        default: flashText("unknown fiber:line style"); break;
     }
 }
 
@@ -422,8 +422,8 @@ static void flashFiberStyle(int val)
     switch ( val )
     {
         case 0: flashText("Fibers: default style"); break;
-        case 1: flashText("Fibers: style=filament");     break;
-        case 2: flashText("Fibers: style=actin");   break;
+        case 1: flashText("Fibers: style=filament"); break;
+        case 2: flashText("Fibers: style=actin"); break;
         case 3: flashText("Fibers: style=microtubule"); break;
         case 4: flashText("Fibers: style=backbone"); break;
         default: flashText("unknown fiber:style"); break;

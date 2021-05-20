@@ -241,7 +241,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( !obj->active() && obj->disp1()->perceptible )
-                flu[i++] = {fluteV{obj->posFree()}, obj->disp1()->color2};
+                flu[i++] = {obj->posFree(), obj->disp1()->color2};
         }
         gle::unmapVertexColorBuffer();
         glDisable(GL_POINT_SMOOTH);
