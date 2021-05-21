@@ -234,96 +234,52 @@ double Inputter::readDouble()
 
 
 /**
- This will read vecsize_ floats, and store the first D ones in a[].
+ This will read `vecsize_` floats, and set `cnt` values in ptr[], filling in with zeros.
  The default vector size can be changed by calling `vectorSize(INT)`
  */
-void Inputter::readFloats(float a[], const unsigned D)
+void Inputter::readFloats(float ptr[], const size_t cnt)
 {
-    size_t d;
-    if ( vecsize_ <= D )
-    {
-        for ( d = 0; d < vecsize_; ++d )
-            a[d] = readFloat();
-        for (; d < D; ++d )
-            a[d] = 0.0f;
-    }
-    else
-    {
-        for ( d = 0; d < D; ++d )
-            a[d] = readFloat();
-        for (; d < vecsize_; ++d )
-            readFloat();
-    }
+    size_t stop = std::min(vecsize_, cnt);
+    size_t d = 0;
+    while ( d < stop )
+        ptr[d++] = readFloat();
+    while ( d < cnt )
+        ptr[d++] = 0.0f;
+    for ( d = stop; d < vecsize_; ++d )
+        readFloat();
 }
 
 
 /**
- This will read vecsize_ floats, and store the first D ones in a[].
+ This will read `vecsize_` floats, and set `cnt` values in ptr[], filling in with zeros.
  */
-void Inputter::readFloats(double a[], const unsigned D)
+void Inputter::readFloats(double ptr[], const size_t cnt)
 {
-    size_t d;
-    if ( vecsize_ <= D )
-    {
-        for ( d = 0; d < vecsize_; ++d )
-            a[d] = readFloat();
-        for (; d < D; ++d )
-            a[d] = 0.0;
-    }
-    else
-    {
-        for ( d = 0; d < D; ++d )
-            a[d] = readFloat();
-        for (; d < vecsize_; ++d )
-            readFloat();
-    }
+    size_t stop = std::min(vecsize_, cnt);
+    size_t d = 0;
+    while ( d < stop )
+        ptr[d++] = readFloat();
+    while ( d < cnt )
+        ptr[d++] = 0.0;
+    for ( d = stop; d < vecsize_; ++d )
+        readFloat();
 }
 
 
 /**
- This will read `n * vecsize_` floats, and store `n * D` values in a[].
+ This will read `vecsize_` doubles, and set `cnt` values in ptr[], filling in with zeros.
  */
-void Inputter::readFloats(double a[], const size_t n, const unsigned D)
+void Inputter::readDoubles(double ptr[], const size_t cnt)
 {
-    const size_t nd = n * vecsize_;
-    float * v = new float[nd];
-    
-    if ( binary_ )
-    {
-        if ( nd != fread(v, 4, nd, mFile) )
-        {
-            delete[] v;
-            throw InvalidIO("readFloats(D) failed");
-        }
-        if ( binary_ == 2 )
-        {
-            for ( size_t i = 0; i < nd; ++i )
-                v[i] = byteswap(v[i]);
-        }
-    }
-    else
-    {
-        for ( size_t u = 0; u < nd; ++u )
-            if ( 1 != fscanf(mFile, " %f", v+u) )
-            {
-                delete[] v;
-                throw InvalidIO("readFloats-D failed");
-            }
-    }
-
-    const size_t m = ( vecsize_ < D ? vecsize_ : D );
-    
-    for ( size_t u = 0; u < n; ++u )
-    {
-        size_t i = 0;
-        for ( ; i < m; ++i )
-            a[D*u+i] = v[vecsize_*u+i];
-        for ( ; i < D; ++i )
-            a[D*u+i] = 0;
-    }
-    delete[] v;
+    size_t stop = std::min(vecsize_, cnt);
+    size_t d = 0;
+    while ( d < stop )
+        ptr[d++] = readDouble();
+    while ( d < cnt )
+        ptr[d++] = 0.0;
+    for ( d = stop; d < vecsize_; ++d )
+        readDouble();
 }
-
 
 //==============================================================================
 #pragma mark - OUTPUT

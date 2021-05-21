@@ -57,15 +57,12 @@ void SimulProp::read(Glossary& glos)
 {
     // a dimensionality can be specified to stop the program from running
     unsigned d = DIM;
-    if ( glos.set(d, "dimension", "dim") )
+    if ( glos.set(d, "dimension", "dim") && d != DIM )
     {
-        if ( d != DIM )
-        {
-            std::cerr << "Aborting since the config file specifies a different dimensionality:\n";
-            std::cerr << "Cytosim was compiled with DIM="<<DIM<<" but the config specifies `dim="<<d<<"'\n";
-            exit(0);
-            //throw InvalidParameter("dimensionality missmatch");
-        }
+        std::cerr << "Aborting since the config file specifies a different dimensionality:\n";
+        std::cerr << "Cytosim was compiled with DIM="<<DIM<<" but the config specifies `dim="<<d<<"'\n";
+        exit(0);
+        //throw InvalidParameter("dimensionality missmatch");
     }
     
     glos.set(viscosity,         "viscosity");

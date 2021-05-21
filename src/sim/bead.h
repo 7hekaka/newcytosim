@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec.  Copyright 2021 Cambridge University.
 
 #ifndef BEAD_H
 #define BEAD_H
@@ -31,10 +31,10 @@ class Bead : public Mecable
 private:
     
     /// radius
-    real        paRadius;
+    real paRadius;
 
     /// the total drag coefficient for translation
-    real        paDrag;
+    real paDrag;
     
 public:
     
@@ -50,61 +50,61 @@ public:
     //--------------------------------------------------------------------------
     
     /// return the position in space of the object
-    Vector      pos()                  const { return Vector(pPos); }
+    Vector pos()                const { return Vector(pPos); }
 
     /// return the position in space of the object
-    Vector      position()             const { return Vector(pPos); }
+    Vector position()           const { return Vector(pPos); }
     
     /// move the object position ( position += given vector )
-    void        translate(Vector const& x)   { x.add_to(pPos); }
+    void translate(Vector const& x)   { x.add_to(pPos); }
     
     /// set the object position ( position = given vector )
-    void        setPosition(Vector const& x) { x.store(pPos); }
+    void setPosition(Vector const& x) { x.store(pPos); }
 
     //--------------------------------------------------------------------------
         
     /// the radius of the Bead
-    real        radius()    const { return paRadius; }
+    real radius()    const { return paRadius; }
     
     /// the volume of the bead
-    real        radiusSqr() const { return paRadius * paRadius; }
+    real radiusSqr() const { return paRadius * paRadius; }
     
     /// set the radius of the Bead
-    void        resize(real R)    { assert_true(R>0); paRadius = R; }
+    void resize(real R)    { assert_true(R>0); paRadius = R; }
     
     /// the volume of the bead
-    real        volume() const;
+    real volume() const;
     
     //--------------------------------------------------------------------------
     
     /// sets the mobility
-    void        setDragCoefficient();
+    void setDragCoefficient();
     
     /// the total drag-coefficient of object (force = drag * speed)
-    real        dragCoefficient() const { return paDrag; }
+    real dragCoefficient() const { return paDrag; }
     
     /// The mobility of a model vertex ( speed = mobility * point_force )
-    real        pointMobility() const { return 1 / paDrag; }
+    real pointMobility() const { return 1 / paDrag; }
 
     /// sets the mobility
-    void        prepareMecable() { setDragCoefficient(); }
+    void prepareMecable() { setDragCoefficient(); }
     
     /// calculates the speed of points in Y, for the forces given in X
-    void        projectForces(const real* X, real* Y) const;
+    void projectForces(const real* X, real* Y) const;
     
     /// add contribution of Brownian forces
-    real        addBrownianForces(real const* rnd, real, real* rhs) const;
+    real addBrownianForces(real const* rnd, real, real* rhs) const;
 
     /// add the interactions due to confinement
-    void        setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Bead *      next() const { return static_cast<Bead*>(nextO); }
+    Bead * next() const { return static_cast<Bead*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    Bead *      prev() const { return static_cast<Bead*>(prevO); }
+    Bead * prev() const { return static_cast<Bead*>(prevO); }
     
     //--------------------------------------------------------------------------
 
@@ -112,7 +112,7 @@ public:
     static const ObjectTag TAG = 'b';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }
@@ -136,10 +136,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
 };
 

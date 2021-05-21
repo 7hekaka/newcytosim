@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "assert_macro.h"
 #include "bead.h"
@@ -115,7 +115,7 @@ void Bead::setDragCoefficient()
     paDrag = 6 * M_PI * prop->viscosity * paRadius;
     if ( prop->drag > 0 )
     {
-        //std::clog << "setting for `" << prop->name() << "' bypass Stokes' drag " << paDrag << '\n';
+        //std::clog << "drag set for `" << prop->name() << "' bypassing Stokes' law\n";
         paDrag = prop->drag;
     }
     
@@ -131,7 +131,7 @@ void Bead::setDragCoefficient()
 
 
 /**
- The projection is trivial
+ The projection here just scales by the mobility
  */
 void Bead::projectForces(const real* X, real* Y) const
 {
@@ -155,9 +155,9 @@ void Bead::write(Outputter& out) const
 void Bead::read(Inputter& in, Simul&, ObjectTag)
 {
     Vector pos;
-    in.readFloats(pos, DIM);
+    in.readDoubles(pos, DIM);
     setPoint(0, pos);
-    real r = in.readFloat();
+    real r = in.readDouble();
     resize(r);
 }
 

@@ -13,17 +13,17 @@ class Inputter : public FileWrapper
 private:
         
     /// The format ID of the input: this allow backward compatibility with older formats
-    unsigned format_;
+    size_t format_;
     
     /// The dimensionality of vectors stored in the file
-    unsigned vecsize_;
+    size_t vecsize_;
     
     /** if the state is stored in a binary format, binary_
         is set to 1 or 2. with 2, byte order is swapped automatically
         this occurs for example when reading a simulation calculated 
         on PC from mac, or vice et versa.
         */
-    int      binary_;
+    int binary_;
 
 public:
     
@@ -31,25 +31,25 @@ public:
     void     reset();
     
     /// Constructor
-    Inputter(unsigned d) : FileWrapper(nullptr) { reset(); vecsize_=d; }
+    Inputter(size_t d) : FileWrapper(nullptr) { reset(); vecsize_=d; }
     
     /// Constructor
-    Inputter(unsigned d, FILE* f, const char* path=nullptr) : FileWrapper(f, path) { reset(); vecsize_=d; }
+    Inputter(size_t d, FILE* f, const char* path=nullptr) : FileWrapper(f, path) { reset(); vecsize_=d; }
     
     /// constructor which opens a file
-    Inputter(unsigned d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r") { reset(); vecsize_=d; }
+    Inputter(size_t d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r") { reset(); vecsize_=d; }
 
     /// return dimensionnally of vectors
-    unsigned vectorSize()     const { return vecsize_; }
+    size_t   vectorSize()     const { return vecsize_; }
     
     /// Set dimentionnality of vectors
-    void     vectorSize(unsigned d) { vecsize_ = d; }
+    void     vectorSize(size_t d) { vecsize_ = d; }
     
     /// returns the type of input
-    unsigned formatID()       const { return format_; }
+    size_t   formatID()       const { return format_; }
 
     /// returns the type of input
-    void     formatID(unsigned f)   { format_ = f; }
+    void     formatID(size_t f)   { format_ = f; }
 
     /// Returns 1 for native binary format, 2 for non-native binary format, and 0 if not binary
     int      binary()         const { return binary_; }
@@ -76,15 +76,12 @@ public:
     /// Reads one double on 8 bytes
     double   readDouble();
     
-    /// Reads one vector, returning D coordinates in the array of size D
-    void     readFloats(float[], unsigned D);
-    /// Reads one vector, returning D coordinates in the array of size D
-    void     readFloats(double[], unsigned D);
-    
-    /// Reads `n` vector, returning D coordinates for each, in the array of size n*D
-    void     readFloats(float[], size_t n, unsigned D);
-    /// Reads `n` vector, returning D coordinates for each, in the array of size n*D
-    void     readFloats(double[], size_t n, unsigned D);
+    /// Reads one vector, setting `cnt` coordinates in the array
+    void     readFloats(float[], size_t D);
+    /// Reads one vector, setting `cnt` coordinates in the array
+    void     readFloats(double[], size_t D);
+    /// Reads one vector, setting `cnt` coordinates in the array
+    void     readDoubles(double[], size_t D);
 
 };
 
