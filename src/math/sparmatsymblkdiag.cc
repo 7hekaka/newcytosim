@@ -212,13 +212,14 @@ real& SparMatSymBlkDiag::operator()(size_t iii, size_t jjj)
     size_t ii = std::max(iii, jjj);
     size_t jj = std::min(iii, jjj);
 #if ( BLOCK_SIZE == 1 )
-    return pilar_[jj].block(ii, jj).value();
+    return pilar_[jj/BLOCK_SIZE].block(ii, jj).value();
 #else
     size_t i = ii % BLOCK_SIZE;
-    size_t j = jj % BLOCK_SIZE;
-    if ( ii-i == jj-j )
-        return pilar_[jj-j].dia_(i, j);
-    return pilar_[jj-j].block(ii-i, jj-j)(i, j);
+    size_t j = jj / BLOCK_SIZE;
+    size_t jb = j * BLOCK_SIZE;
+    if ( ii-i == j*BLOCK_SIZE )
+        return pilar_[j].dia_(i, jj-jb);
+    return pilar_[j].block(ii-i, jb)(i, jj-jb);
 #endif
 }
 
@@ -229,13 +230,14 @@ real* SparMatSymBlkDiag::addr(size_t iii, size_t jjj) const
     size_t ii = std::max(iii, jjj);
     size_t jj = std::min(iii, jjj);
 #if ( BLOCK_SIZE == 1 )
-    return &pilar_[jj].block(ii, jj).value();
+    return &pilar_[jj/BLOCK_SIZE].block(ii, jj).value();
 #else
     size_t i = ii % BLOCK_SIZE;
     size_t j = jj % BLOCK_SIZE;
-    if ( ii-i == jj-j )
-        return pilar_[jj-j].dia_.addr(i, j);
-    return pilar_[jj-j].block(ii-i, jj-j).addr(i, j);
+    size_t jb = j * BLOCK_SIZE;
+    if ( ii-i == j*BLOCK_SIZE )
+        return pilar_[j].dia_.addr(i, jj-jb);
+    return pilar_[j].block(ii-i, jb).addr(i, jj-jb);
 #endif
 }
 
@@ -382,13 +384,13 @@ void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 int SparMatSymBlkDiag::bad() const
 {
     size_t stop = size_ / BLOCK_SIZE;
-    for ( size_t jj = 0; jj < stop; ++jj )
+    for ( size_t j = 0; j < stop; ++j )
     {
-        Column & col = pilar_[jj];
+        Column & col = pilar_[j];
         for ( size_t n = 0 ; n < col.size_ ; ++n )
         {
             if ( col.inx_[n] >= size_ ) return 2;
-            if ( col.inx_[n] <= jj )    return 3;
+            if ( col.inx_[n] <= j ) return 3;
         }
     }
     return 0;

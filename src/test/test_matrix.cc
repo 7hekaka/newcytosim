@@ -116,7 +116,7 @@ template <typename MATRIX>
 void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
 {
     assert_true( i+DIM-1 < mat.size() );
-    assert_true( j < i );
+    assert_true( j < i );  // below diagonal
     
 #if ( DIM == 3 )
     Matrix33 M(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
@@ -126,18 +126,19 @@ void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
     Matrix11 M(alpha);
 #endif
     
-    for ( int x = 0; x < DIM; ++x )
-    for ( int y = x; y < DIM; ++y )
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = x; y < DIM; ++y )
     {
-        mat(i+y, i+x) += M(y,x);
-        mat(j+y, j+x) += M(y,x);
+        real v = M(y,x);
+        mat(i+y, i+x) += v;
+        mat(j+y, j+x) += v;
     }
     if ( 1 )
     {
         size_t I = std::max(i, j);
         size_t J = std::min(i, j);
-        for ( int x = 0; x < DIM; ++x )
-        for ( int y = 0; y < DIM; ++y )
+        for ( size_t x = 0; x < DIM; ++x )
+        for ( size_t y = 0; y < DIM; ++y )
             mat(I+y, J+x) += M(y,x);
     }
 }
