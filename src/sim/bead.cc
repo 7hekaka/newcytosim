@@ -155,9 +155,9 @@ void Bead::write(Outputter& out) const
 void Bead::read(Inputter& in, Simul&, ObjectTag)
 {
     Vector pos;
-    in.readDoubles(pos, DIM);
+    in.readFloats(pos, DIM);
     setPoint(0, pos);
-    real r = in.readDouble();
+    real r = in.readFloat();
     resize(r);
 }
 
