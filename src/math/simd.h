@@ -150,13 +150,13 @@ inline static vec4 load4(double const* a)       { return _mm256_load_pd(a); }
 inline static vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
 /// unaligned load 2 values, and zeros out the upper two
-inline static vec4 load2Z(double const* a)      { return _mm256_blend_pd(cast4(loadu2(a)), setzero4(), 0b1100); }
+inline static vec4 load2Z(double const* a)      { return _mm256_blend_pd(_mm256_castpd128_pd256(_mm_load_pd(a)), _mm256_setzero_pd(), 0b1100); }
 
 /// unaligned load 4 values, and zeros out the upper one
-inline static vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), setzero4(), 0b1000); }
+inline static vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
 
 /// unaligned load 2 values, allowing for undefined value in upper positions
-inline static vec4 load2crap(double const* a)   { return cast4(loadu2(a)); }
+inline static vec4 load2crap(double const* a)   { return _mm256_castpd128_pd256(_mm_load_pd(a)); }
 
 inline static void store1(double* a, vec4 b)    { _mm_store_sd(a, cast2(b)); }
 inline static void store2(double* a, vec4 b)    { _mm_store_pd(a, cast2(b)); }
