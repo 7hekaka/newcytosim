@@ -456,6 +456,7 @@ void test_load()
     vec4 y = load4(mem);
     dump(y, "load");
     
+    // Attention: the upper 128-bits are in undefined state after a cast
     dump(cast4(load1(mem)), "cast4(load1)");
     dump(cast4(load2(mem)), "cast4(load2)");
     dump(load2Z(mem), "load2Z");

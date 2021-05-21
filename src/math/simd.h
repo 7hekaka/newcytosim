@@ -155,6 +155,9 @@ inline static vec4 load2Z(double const* a)      { return _mm256_blend_pd(cast4(l
 /// unaligned load 4 values, and zeros out the upper one
 inline static vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), setzero4(), 0b1000); }
 
+/// unaligned load 2 values, allowing for undefined value in upper positions
+inline static vec4 load2crap(double const* a)   { return cast4(loadu2(a)); }
+
 inline static void store1(double* a, vec4 b)    { _mm_store_sd(a, cast2(b)); }
 inline static void store2(double* a, vec4 b)    { _mm_store_pd(a, cast2(b)); }
 inline static void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, cast2(b)); }
@@ -241,7 +244,7 @@ inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos)
 }
 
 #if 0
-  inline static vec4  load3(double const* a)    { return blend4(cast4(loadu2(a)), broadcast1(a+2), 0b0100); }
+  inline static vec4  load3(double const* a)    { return blend4(load2Z(a)), broadcast1(a+2), 0b0100); }
   inline static void store3(double* a, vec4 b)  { storeu2(a, getlo(b)); store1(a+2, gethi(b)); }
 #else
   //inline static vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }

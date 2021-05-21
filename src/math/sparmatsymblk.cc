@@ -1008,7 +1008,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
     {
         const size_t& ii = inx_[n];
         vec4 mat = streamload4(blk_[n]);      // load 2x2 matrix
-        vec4 yy = cast4(load2(Y+ii));   // yy = { Y0 Y1 0 0 }
+        vec4 yy = load2Z(Y+ii);         // yy = { Y0 Y1 0 0 }
         vec4 xx = broadcast2(X+ii);     // xx = { X0 X1 X0 X1 }
 
         // multiply with the full block:
@@ -1036,7 +1036,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
 inline static void multiply2D(double const* X, double* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
 {
     vec4 xx = broadcast2(X+ii);
-    vec4 u = fmadd4(mat, xxxx, cast4(load2(Y+ii)));
+    vec4 u = fmadd4(mat, xxxx, load2Z(Y+ii));
     store2(Y+ii, add2(getlo(u), gethi(u)));
     ss = fmadd4(mat, xx, ss);
 }
@@ -1077,8 +1077,8 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
         assert_true( i0 < i1 );
         vec4 mat0 = streamload4(blk_[n  ]);
         vec4 mat1 = streamload4(blk_[n+1]);
-        vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
-        vec4 u1 = fmadd4(mat1, xxyy, cast4(load2(Y+i1)));
+        vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
+        vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
         ss = fmadd4(mat0, broadcast2(X+i0), ss);
         s1 = fmadd4(mat1, broadcast2(X+i1), s1);
         store2(Y+i0, add2(getlo(u0), gethi(u0)));
@@ -1143,10 +1143,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
         vec4 mat1 = streamload4(blk_[n+1]);
         vec4 mat2 = streamload4(blk_[n+2]);
         vec4 mat3 = streamload4(blk_[n+3]);
-        vec4 u0 = fmadd4(mat0, xxyy, cast4(load2(Y+i0)));
-        vec4 u1 = fmadd4(mat1, xxyy, cast4(load2(Y+i1)));
-        vec4 u2 = fmadd4(mat2, xxyy, cast4(load2(Y+i2)));
-        vec4 u3 = fmadd4(mat3, xxyy, cast4(load2(Y+i3)));
+        vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
+        vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
+        vec4 u2 = fmadd4(mat2, xxyy, load2Z(Y+i2));
+        vec4 u3 = fmadd4(mat3, xxyy, load2Z(Y+i3));
         ss = fmadd4(mat0, broadcast2(X+i0), ss);
         s1 = fmadd4(mat1, broadcast2(X+i1), s1);
         s2 = fmadd4(mat2, broadcast2(X+i2), s2);

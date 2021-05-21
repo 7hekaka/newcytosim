@@ -969,7 +969,7 @@ inline static void multiply4(const double* X, double* Y, size_t ii,
                       const double* val, vec4 const& xx, vec4& ss)
 {
     vec4 x = blend22(xx, broadcast2(X+ii));  // hi <- X , lo <- xx
-    ss = blend22(cast4(load2(Y+ii)), ss);    // hi <- ss, lo <- Y
+    ss = blend22(load2crap(Y+ii), ss);    // hi <- ss, lo <- Y
     ss = fmadd4(broadcast1(val), x, ss);
     store2(Y+ii, getlo(ss));
 }
@@ -1031,10 +1031,10 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
         const size_t i1 = inx[1];
         const size_t i2 = inx[2];
         const size_t i3 = inx[3];
-        s0 = blend22(cast4(load2(Y+i0)),s0);    // lo = Y
-        s1 = blend22(cast4(load2(Y+i1)),s1);    // lo = Y
-        s2 = blend22(cast4(load2(Y+i2)),s2);    // lo = Y
-        s3 = blend22(cast4(load2(Y+i3)),s3);    // lo = Y
+        s0 = blend22(load2crap(Y+i0),s0);    // lo = Y
+        s1 = blend22(load2crap(Y+i1),s1);    // lo = Y
+        s2 = blend22(load2crap(Y+i2),s2);    // lo = Y
+        s3 = blend22(load2crap(Y+i3),s3);    // lo = Y
         vec4 x0 = blend22(xx,broadcast2(X+i0));   // hi = X , lo <- xx
         vec4 x1 = blend22(xx,broadcast2(X+i1));   // hi = X , lo <- xx
         vec4 x2 = blend22(xx,broadcast2(X+i2));   // hi = X , lo <- xx
