@@ -160,7 +160,7 @@ To display all these pictures, we will use a browswer, and generate the HTML pag
 
     make_page.py tile=5 run????
     
-This should generate a file `page.html`, which can be openned in your favorite browser.
+This should generate a file `page.html`, which can be opened in your favorite browser.
 
 
 # Step 4 - Alternative sampling strategies

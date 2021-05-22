@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "simul.h"
+#include "event.h"
 
 #include "matrix11.h"
 #include "matrix22.h"
@@ -85,6 +86,7 @@ int main(int argc, char* argv[])
         PRINT(Solid);
         PRINT(Bead);
         PRINT(Sphere);
+        PRINT(Event);
         PRINT(Simul);
     }
 }

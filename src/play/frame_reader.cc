@@ -3,6 +3,7 @@
 #include "frame_reader.h"
 #include "exceptions.h"
 #include "iowrapper.h"
+#include "filepath.h"
 #include "simul.h"
 
 
@@ -34,23 +35,16 @@ void FrameReader::reset()
 
 void FrameReader::openFile(std::string const& file)
 {
-    int error = inputter.open(file.c_str(), "rb");
-    
-    if ( error )
+    if ( !FilePath::is_file(file) && FilePath::is_file(file+".gz") )
     {
-        //file was not found, we try 'gunzip'
-        std::string tmp = file + ".gz";
-        FILE* fp = fopen(tmp.c_str(), "r");
-        if ( fp )
-        {
-            fclose(fp);
-            tmp = "gunzip " + tmp;
-            std::clog << tmp << '\n';
-            
-            if ( 0 == system(tmp.c_str()) )
-                inputter.open(file.c_str(), "rb");
-        }
+        std::string cmd = "gunzip " + file + ".gz";
+        std::clog << cmd << '\n';
+        if ( system(cmd.c_str()) )
+            throw InvalidIO("failed to unzip `"+file+".gz'");
     }
+
+    if ( inputter.open(file.c_str(), "rb") )
+        return;
     
     if ( !inputter.file() )
         throw InvalidIO("file `"+file+"' not found");
@@ -59,7 +53,7 @@ void FrameReader::openFile(std::string const& file)
         throw InvalidIO("file `"+file+"' is invalid");
  
     clearPositions();
-    //std::clog << "FrameReader: has openned " << obj_file << '\n';
+    //std::clog << "FrameReader: has opened " << obj_file << '\n';
 }
 
 

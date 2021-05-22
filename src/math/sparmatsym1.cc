@@ -964,7 +964,7 @@ The high position of 'xx' is not used
 The low position of 'ss' is used locally
 */
 inline static void multiply4(const real* X, real* Y, size_t ii,
-                      const real* val, vec4 const& xx, vec4& ss)
+                             const real* val, vec4 const& xx, vec4& ss)
 {
     vec4 x = blend22(xx, broadcast2(X+ii));  // hi <- X , lo <- xx
     ss = blend22(load2crap(Y+ii), ss);    // hi <- ss, lo <- Y

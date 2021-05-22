@@ -1,5 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// Monday 5 June 2018 was a very nice day in Strasbourg
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
+// Started on Monday 5 June 2018, which was a very nice day in Strasbourg
 
 #ifndef SIMD_H
 #define SIMD_H

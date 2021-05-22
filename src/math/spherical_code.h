@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 #ifndef SPHERICAL_CODE_H
 #define SPHERICAL_CODE_H
 
@@ -7,17 +7,16 @@
 
 ///\todo we could replace here the Coulomb repulsive interaction by a linear force
 /* 
-A linear forces will allow us to solve an associated linear system on 
-the coordinates of the point, using an interative solver.
-that might be quite fast. The repulsive interaction only need to take
-the neighbour into account, so we could have local force only, which
-would scale better than having all points interact (Coulomb)
+ Idea: A linear forces would allow us to solve an associated linear system on the
+ coordinates of the points, using an iterative solver, that might be quite fast.
+ The repulsive interaction only needs to take the first neighbours into account,
+ so we could have local forces only, which would scale better than having all points
+ interact, as is the case with the Coulomb energy.
 */
 
 /// Distribute points on the unit sphere, minimizing the 'electrostatic' energy
 /**  The number of points is arbitrary, see
 http://mathworld.wolfram.com/SphericalCode.html
-\n
 
 Algorithm:
  -# The points are distributed randomly on the sphere
@@ -34,13 +33,13 @@ Algorithm:
 The procedure (steps 2-4) is continues until convergence.\n
 
 The main method is the class constructor, or equivalently distributePoints(),
-which take the number of points as argument and makes the calculation.
-Points coordinates can then be retrieved using either:
+which take the number of points as argument and performs the calculation.
+The coordinates of points can then be retrieved using either:
+
     - copyPositionsForAllPoints()
     - copyCoordinatesOfPoint()
 
-\author
-F. Nedelec, created August 2002, last modified May, 2014
+\author FJN, created August 2002, last modified Avril 2021
 */
 class SphericalCode
 {
