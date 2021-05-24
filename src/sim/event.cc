@@ -56,7 +56,7 @@ Event::Event(double now, Glossary& opt)
             throw InvalidParameter("event:rate must be > 0");
         reload(now);
     }
-    else if ( opt.set(delay, "delay") )
+    else if ( opt.set(delay, "interval") || opt.set(delay, "delay") )
     {
         if ( delay <= 0 )
             throw InvalidParameter("event:delay must be > 0");

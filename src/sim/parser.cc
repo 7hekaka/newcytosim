@@ -866,7 +866,7 @@ void Parser::parse_report(std::istream& is)
     std::streampos ipos = is.tellg();
     std::string what = Tokenizer::get_polysymbol(is);
     while ( is.peek() == ',' )
-        what += "," + Tokenizer::get_polysymbol(is);
+        what += char(is.get()) + Tokenizer::get_polysymbol(is);
     std::string file = Tokenizer::get_path(is);
     
     if ( file.empty() )

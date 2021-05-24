@@ -171,6 +171,7 @@ void Glossary::clear_counts()
 }
 
 
+/** transfer read counts from 'opt' to 'this' */
 void Glossary::add_counts(Glossary const& opt)
 {
     for ( auto& i : mTerms )

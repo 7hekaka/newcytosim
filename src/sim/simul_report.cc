@@ -123,20 +123,20 @@ void Simul::report(std::ostream& out, std::string what, Glossary& opt) const
         {
             out << '\n' << e.brief();
         }
-        // check for another report instruction:
-        char c = Tokenizer::get_character(is, true, false);
-        if ( c == EOF )
+        // another report instruction should be separated by a comma:
+        if ( is.peek() != ',' )
             break;
-        if ( c != ',' )
-        {
-            out << '\n';
-            char rest[256] = { c };
-            is.getline(rest+1, sizeof(rest)-1);
-            throw InvalidParameter("unexpected `" + std::string(rest) + "' in report string");
-        }
+        is.get();
+    }
+    out << '\n';
+    {
+        // check for unused characters in instruction stream
+        std::string str;
+        std::getline(is, str);
+        if ( str.size() > 0 )
+            throw InvalidParameter("unexpected `" + str + "' in report string");
     }
     //opt.write_counts(std::cerr);
-    out << '\n';
     out.precision(op);
 }
 
@@ -169,7 +169,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
     {
         if ( split )
         {
-            // process every class in the category separatly:
+            // process classes in this category separately:
             PropertyList plist = properties.find_all(who);
             for ( Property const* sel : plist )
             {
