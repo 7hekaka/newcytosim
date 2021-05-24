@@ -1611,7 +1611,7 @@ namespace gle
         flu[1] = { AX,  rA, cA };
         flu[2] = { BX, -rB, cB };
         flu[3] = { BX,  rB, cB };
-        unmapFloatBuffer(2, 1);
+        unmapFloatBuffer(2, 4);
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);
@@ -1632,7 +1632,7 @@ namespace gle
             flu[1] = { AX-rA*dX, AY-rA*dY, cA };
             flu[2] = { BX+rB*dX, BY+rB*dY, cB };
             flu[3] = { BX-rB*dX, BY-rB*dY, cB };
-            unmapFloatBuffer(2, 1);
+            unmapFloatBuffer(2, 4);
             glEnableClientState(GL_COLOR_ARRAY);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glDisableClientState(GL_COLOR_ARRAY);
@@ -1666,7 +1666,7 @@ namespace gle
         flu[3] = { a+da, cA };
         flu[4] = { b, cB };
         flu[5] = { b+db, cB };
-        unmapFloatBuffer(2, 1);
+        unmapFloatBuffer(2, 4);
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_COLOR_ARRAY);
