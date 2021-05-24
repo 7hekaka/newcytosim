@@ -5,7 +5,7 @@
 #include "exceptions.h"
 
 constexpr int PERIODIC_XYZ = ( 1 << DIM ) - 1;
-constexpr int PERIODIC_YZ  = ( 1 << (DIM-1) ) - 1;
+constexpr int PERIODIC_XY  = PERIODIC_XYZ & 3;
 constexpr int PERIODIC_X   = 1;
 
 
@@ -43,12 +43,10 @@ void Modulo::fold(Vector& vec) const
         vec.ZZ = fold_real(vec.ZZ, period_[2]);
 #endif
     }
-    else if ( mMode == PERIODIC_YZ )
+    else if ( mMode == PERIODIC_XY )
     {
-#if ( DIM > 1 )
         vec.XX = fold_real(vec.XX, period_[0]);
-#endif
-#if ( DIM > 2 )
+#if ( DIM > 1 )
         vec.YY = fold_real(vec.YY, period_[1]);
 #endif
     }

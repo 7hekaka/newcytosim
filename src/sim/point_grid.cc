@@ -132,7 +132,7 @@ void PointGrid::checkPP(Meca& meca, Stiffness const& pam,
 #endif
     real ab2 = vab.normSqr();
     if ( ab2 < len*len )
-        meca.addLongLink(aa.pnt_, bb.pnt_, vab, ab2, len, pam.push);
+        meca.addLongLink1(aa.pnt_, bb.pnt_, vab, ab2, len, pam.push);
 }
 
 
@@ -191,7 +191,7 @@ void PointGrid::checkPL(Meca& meca, Stiffness const& pam,
          or if this is the terminal point of a fiber.
          */
         if ( ab2 < ran*ran && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
-            meca.addLongLink(aa.pnt_, bb.vertex1(), vab, ab2, ran, pam.push);
+            meca.addLongLink1(aa.pnt_, bb.vertex1(), vab, ab2, ran, pam.push);
     }
 }
 
@@ -239,7 +239,7 @@ void PointGrid::checkLL1(Meca& meca, Stiffness const& pam,
                 real ab2 = vab.normSqr();
                 real len = aa.rad_ + bb.rad_;
                 if ( ab2 < len*len  &&  dot(vab, bb.diff()) >= 0 )
-                    meca.addLongLink(aa.vertex1(), bb.vertex1(), vab, ab2, len, pam.push);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, len, pam.push);
             }
         }
         else
@@ -260,7 +260,7 @@ void PointGrid::checkLL1(Meca& meca, Stiffness const& pam,
                 {
                     real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(ab2-len*len, pam.push, pam.pull);
-                    meca.addLongLink(aa.vertex1(), bb.vertex1(), vab, ab2, len, stiff);
+                    meca.addLongLink2(aa.vertex1(), bb.vertex1(), vab, ab2, len, stiff);
                 }
             }
         }
@@ -312,7 +312,7 @@ void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
             real ab2 = vab.normSqr();
             real len = aa.rad_ + bb.rad_;
             if ( ab2 < len*len  && dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink(aa.vertex1(), bb.vertex2(), vab, ab2, len, pam.push);
+                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, len, pam.push);
         }
         else
         {
@@ -323,7 +323,7 @@ void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
                 {
                     real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(ab2-len*len, pam.push, pam.pull);
-                    meca.addLongLink(aa.vertex1(), bb.vertex2(), vab, ab2, len, stiff);
+                    meca.addLongLink2(aa.vertex1(), bb.vertex2(), vab, ab2, len, stiff);
                 }
             }
         }
@@ -345,7 +345,7 @@ void PointGrid::checkLL2(Meca& meca, Stiffness const& pam,
         real ab2 = vab.normSqr();
         real len = aa.rad_ + bb.rad_;
         if ( ab2 < len*len  &&  dot(vab, bb.diff()) <= 0 )
-            meca.addLongLink(aa.vertex2(), bb.vertex2(), vab, ab2, len, pam.push);
+            meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, len, pam.push);
     }
 }
 

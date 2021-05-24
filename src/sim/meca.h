@@ -575,11 +575,11 @@ public:
 
     //----------------------- ELEMENTS LINKING POINTS --------------------------
 
-    /// Link of stiffness `weight` and resting length `len`
+    /// Link of stiffness `weight` and resting length `len`, tweaked version
     void addLongLink1(Mecapoint const&, Mecapoint const&, Vector&, real ab2, real len, real weight);
 
-    /// Link of stiffness `weight` and resting length `len`
-    void addLongLink(Mecapoint const&, Mecapoint const&, Vector&, real ab2, real len, real weight);
+    /// Link of stiffness `weight` and resting length `len`, tweaked version
+    void addLongLink2(Mecapoint const&, Mecapoint const&, Vector&, real ab2, real len, real weight);
 
     /// Link of stiffness `weight` and resting length `len`
     void addLongLink(Mecapoint const&, Mecapoint const&, real len, real weight);

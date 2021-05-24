@@ -1948,6 +1948,17 @@ void Meca::addLongLink1(Mecapoint const& ptA,
         sub_block_diag(ia, wT);
         sub_block_diag(ib, wT);
         add_block(std::max(ia, ib), std::min(ia, ib), wT);
+        
+        if ( modulo )
+        {
+            Vector off = modulo->offset(ptB.pos() - ptA.pos());
+            if ( off.is_not_zero() )
+            {
+                off = wT * off;
+                sub_base(ia, off);
+                add_base(ib, off);
+            }
+        }
     }
 }
 
@@ -1964,12 +1975,12 @@ This streamlined version of addLongLink() is used for Steric interaction, with:
  - ab2 = normSqr(axi)
  - periodic boundary conditions have been applied to `axi` if necessary
 */
-void Meca::addLongLink(Mecapoint const& ptA,
-                       Mecapoint const& ptB,
-                       Vector& axi,
-                       const real ab2,
-                       const real len,
-                       const real weight)
+void Meca::addLongLink2(Mecapoint const& ptA,
+                        Mecapoint const& ptB,
+                        Vector& axi,
+                        const real ab2,
+                        const real len,
+                        const real weight)
 {
     assert_true( weight >= 0 );
     assert_true( len >= 0 );
@@ -2002,6 +2013,17 @@ void Meca::addLongLink(Mecapoint const& ptA,
         sub_block_diag(ia, wT);
         sub_block_diag(ib, wT);
         add_block(std::max(ia, ib), std::min(ia, ib), wT);
+        
+        if ( modulo )
+        {
+            Vector off = modulo->offset(ptB.pos()-ptA.pos());
+            if ( off.is_not_zero() )
+            {
+                off = wT * off;
+                sub_base(ia, off);
+                add_base(ib, off);
+            }
+        }
     }
 }
 
