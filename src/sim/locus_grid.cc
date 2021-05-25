@@ -939,7 +939,8 @@ void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
 
 /**
  Check interactions between objects contained in the grid:
- Scan all cells to examine each pair each pair of objects (ii, jj) only once.
+ Scan all cells to examine all object pairs (ii, jj) only once.
+ This version can handle periodic boundary conditions
  */
 void LocusGrid::setSterics0(Meca& meca, real stiff) const
 {
@@ -999,7 +1000,8 @@ void LocusGrid::setSterics(Meca& meca, real stiff) const
 
 /**
  Check interactions between objects contained in the pane `pan`:
- Scan all cells to examine each pair each pair of objects (ii, jj) only once.
+ Scan all cells to examine all object pairs (ii, jj) only once.
+ This version can handle periodic boundary conditions
  */
 void LocusGrid::setSterics0(Meca& meca, real stiff, size_t pan) const
 {

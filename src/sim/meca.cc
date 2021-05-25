@@ -1157,7 +1157,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
     else
     {
         mec->blockType(0);
-        //std::clog << "failed to compute Band Preconditionner block\n";
+        //std::clog << "failed to compute Band Preconditionner block of size " << nbp << "\n";
         ++bump_;
     }
 }
@@ -1208,7 +1208,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
     else
     {
         mec->blockType(0);
-        //std::clog << "failed to compute IsoS Preconditionner block\n";
+        //std::clog << "failed to compute IsoS Preconditionner block of size " << nbp << "\n";
         ++bump_;
     }
 }
@@ -1243,7 +1243,7 @@ void Meca::computePrecondIsoP(Mecable* mec)
     else
     {
         mec->blockType(0);
-        //std::clog << "failed to compute IsoP Preconditionner block\n";
+        //std::clog << "failed to compute IsoP Preconditionner block of size " << nbp << "\n";
         ++bump_;
     }
 }
@@ -1302,7 +1302,7 @@ void Meca::computePrecondBand(Mecable* mec)
     else
     {
         mec->blockType(0);
-        //std::clog << "failed to compute half Preconditionner block\n";
+        //std::clog << "failed to compute half Preconditionner block of size " << bks << "\n";
         ++bump_;
     }
 }
@@ -1338,7 +1338,7 @@ void Meca::computePrecondHalf(Mecable* mec)
     else
     {
         mec->blockType(0);
-        //std::clog << "failed to compute half Preconditionner block\n";
+        //std::clog << "failed to compute half Preconditionner bloc of size " << bks << "\n";
         ++bump_;
     }
 }
@@ -1365,7 +1365,7 @@ void Meca::computePrecondFull(Mecable* mec)
     else
     {
         mec->blockType(0);
-        //std::clog << "failed to compute full Preconditionner block\n";
+        //std::clog << "failed to compute full Preconditionner block of size " << bks << "\n";
         ++bump_;
     }
 }

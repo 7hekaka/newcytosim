@@ -47,10 +47,11 @@ void FiberSite::relocateP()
 #if FIBER_HAS_FAMILY
 Vector FiberSite::outerPos() const
 {
-    if ( hFiber->family_ )
+    if ( hFiber->family_ != hFiber )
     {
         real a = hAbs - hFiber->abscissaM();
 #if 1
+        assert_true( hFiber->brother_ != hFiber->sister_ );
         Vector b = hFiber->brother_->posM(a);
         Vector s = hFiber->sister_->posM(a);
         return hFiber->posM(a) + cross(b-s, hFiber->dirM(a));
