@@ -35,8 +35,12 @@ void DigitProp::read(Glossary& glos)
         site_shift = 0.5 * step_size;
     glos.set(site_shift, "site_shift");
     
-    if ( glos.set(footprint, "footprint") )
+    unsigned i = 0;
+    if ( glos.set(i, "footprint") )
     {
+        footprint = i;
+        if ( (unsigned)footprint != i )
+            throw InvalidParameter("the `footprint` value overflows");
         if ( std::is_same<real, FiberLattice::cell_t>::value )
             Cytosim::warn << "`footprint` is only valid with Integer-based Lattice\n";
     }
