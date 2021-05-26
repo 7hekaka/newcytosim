@@ -119,41 +119,15 @@ void FileWrapper::put_line(const std::string& str, bool end)
 }
 
 
-std::string FileWrapper::get_line(const char end)
+std::string FileWrapper::get_line()
 {
     std::string res;
-
-    if ( ferror(mFile) )
-        return res;
-
-    const size_t CHK = 32;
-    char buf[CHK];
-    
-    fpos_t pos;
-    char * m;
-    
-    while ( !feof(mFile) )
-    {
-        fgetpos(mFile, &pos);
-        size_t s = fread(buf, 1, CHK, mFile);
-        
-        // search for separator:
-        m = (char*)memchr(buf, end, s);
-        
-        if ( m )
-        {
-            s = (size_t)( m - buf );
-            res.append(buf, s);
-            //reposition at end of line:
-            fsetpos(mFile, &pos);
-            if ( s+1 != fread(buf, 1, s+1, mFile) )
-                throw InvalidIO("unexpected error");
-            //fprintf(stderr,"-|%s|-\n", line.c_str());
-            break;
-        }
-        res.append(buf, s);
-    }
-    
+    char * line = nullptr;
+    size_t line_len = 0;
+    ssize_t read = getline(&line, &line_len, mFile);
+    if ( read > 0 )
+        res.assign(line);
+    free(line);
     return res;
 }
 

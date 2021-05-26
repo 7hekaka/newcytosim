@@ -99,7 +99,7 @@ public:
     void put_line(const std::string&, bool end = 0);
 
     /// read until character `end` is found and set `line`, including terminating character
-    std::string get_line(char end='\n');
+    std::string get_line();
 
     /// put `cnt` characters from str
     void put_characters(std::string const&, size_t cnt);
