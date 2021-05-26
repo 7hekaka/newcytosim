@@ -418,9 +418,6 @@ public:
     
     /// print length distribution for each class of fiber
     void reportFiberLengthHistogram(std::ostream&, Glossary&) const;
-
-    /// print number of kinks in each class of Fiber
-    void reportFiberSegments(std::ostream&) const;
     
     /// print coordinates of speckles that follow a frozen random sampling
     void reportFiberSpeckles(std::ostream&, Glossary&) const;
@@ -434,20 +431,22 @@ public:
     /// print Fiber tensions along certain planes defined in `opt`
     void reportFiberTension(std::ostream&, Glossary&) const;
     
+    
+    /// print number of kinks in each class of Fiber
+    void reportFiberSegments(std::ostream&) const;
+
     /// print sum of all bending energy
     void reportFiberBendingEnergy(std::ostream&) const;
+    
+    /// print number of kinks in each class of Fiber
+    void reportFiberExtension(std::ostream&) const;
+
     
     /// print component of forces experienced by Fibers due to confinement
     void reportFiberConfineForce(std::ostream& out) const;
 
     /// print radial component of forces experienced by Fibers due to confinement
     real reportFiberConfinement(std::ostream& out) const;
-
-    /// print position of hands bound to fibers
-    void reportFiberHands(std::ostream&) const;
-    
-    /// print position of bound hands that are associated with stiffness
-    void reportFiberLinks(std::ostream&) const;
 
     /// print summary of Fiber's lattice quantities
     void reportFiberLattice(std::ostream&, Property const*, bool com) const;
@@ -457,6 +456,13 @@ public:
     
     /// print summary of Fiber's lattice quantities
     void reportFiberMesh(std::ostream&, bool density, Property const*, bool com) const;
+    
+    
+    /// print position of hands bound to fibers
+    void reportFiberHands(std::ostream&) const;
+    
+    /// print position of bound hands that are associated with stiffness
+    void reportFiberLinks(std::ostream&) const;
 
     /// print interection abscissa between fibers
     void reportFiberConnectors(std::ostream&, Glossary&) const;

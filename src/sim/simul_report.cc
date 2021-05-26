@@ -293,17 +293,19 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportFiberSpeckles(out, opt);
         if ( what == "sample" )
             return reportFiberSamples(out, opt);
-        if ( what == "segment" )
-            return reportFiberSegments(out);
         if ( what == "length" )
             return reportFiberLengths(out, sel, com);
         if ( what == "distribution" || what == "histogram" )
             return reportFiberLengthHistogram(out, opt);
         if ( what == "tension" )
             return reportFiberTension(out, opt);
+        if ( what == "segment" )
+            return reportFiberSegments(out);
         if ( what == "energy" )
             return reportFiberBendingEnergy(out);
-        if ( what == "dynamic" )
+        if ( what == "extension" )
+            return reportFiberExtension(out);
+        if ( what == "end_state" || what == "dynamic" )
         {
             reportFiberEndState(out, PLUS_END, sel, true);
             reportFiberEndState(out, MINUS_END, sel, false);
@@ -341,7 +343,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportFiberConnectors(out, opt);
 
         throw InvalidSyntax("I can only report fiber: position, end, minus_end, plus_end, "\
-                            "point, moment, speckle, sample, segment, dynamic, length, "\
+                            "point, moment, speckle, sample, segment, dynamic, length, extension,"\
                             "distribution, tension, force, cluster, age, energy, hand, link");
     }
     if ( who == "bead" )
@@ -480,14 +482,14 @@ void Simul::reportFiberAge(std::ostream& out) const
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
     out << SEP << "var_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
     
-    size_t cnt;
-    real avg, var, mn, mx;
     const real now = prop->time;
 
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
         ObjectList objs = fibers.collect(fp);
+        size_t cnt = 0;
+        real avg = 0, var = 0, mn = INFINITY, mx = -INFINITY;
         fibers.infoBirthtime(objs, cnt, avg, var, mn, mx);
         out << LIN << ljust(fp->name(), 2);
         out << SEP << cnt;
@@ -503,14 +505,14 @@ void Simul::reportFiberAge(std::ostream& out) const
 /**
 Export average length and variance of length for a class of fiber
 */
-void Simul::reportFiberLengths(std::ostream& out, FiberProp const* fp) const
+void Simul::reportFiberLengths(std::ostream& out, FiberProp const* sel) const
 {
-    size_t cnt;
-    real avg, var, mn, mx;
-    ObjectList objs = fibers.collect(fp);
+    size_t cnt = 0;
+    real avg = 0, var = 0, mn = INFINITY, mx = -INFINITY;
+    ObjectList objs = fibers.collect(sel);
     fibers.infoLength(objs, cnt, avg, var, mn, mx);
     
-    out << LIN << ljust(fp->name(), 2);
+    out << LIN << ljust(sel->name(), 2);
     out << SEP << cnt;
     out.precision(3);
     out << SEP << std::fixed << avg;
@@ -632,6 +634,10 @@ void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const*
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - Fiber conformation
+
+
 void Simul::reportFiberSegments(std::ostream& out) const
 {
     out << COM << ljust("class", 2, 2) << SEP << "fibers" << SEP << "joints";
@@ -657,51 +663,74 @@ void Simul::reportFiberSegments(std::ostream& out) const
 }
 
 
-void Simul::reportFiberHands(std::ostream& out) const
+/**
+ Export fiber elastic bending energy
+ */
+void Simul::reportFiberBendingEnergy(std::ostream& out) const
 {
-    out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs";
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    out << COM << ljust("bending_energy",2,2) << SEP << "count";
+    out << SEP << "sum" << SEP << "avg" << SEP << "var" << SEP << "rigidity";
+    
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        if ( fib->nbHands() > 0 )
+        FiberProp const* fp = static_cast<FiberProp const*>(i);
+        ObjectList objs = fibers.collect(fp);
+        size_t cnt = 0;
+        real avg = 0, var = 0;
+        fibers.infoBendingEnergy(objs, cnt, avg, var);
+        if ( cnt > 0 )
         {
-            out << COM << "on fiber " << fib->reference();
-            fib->sortHands();
-            for ( Hand * ha = fib->firstHand(); ha; ha = ha->next() )
-            {
-                out << LIN << fib->prop->number();
-                out << SEP << fib->identity();
-                out << SEP << ha->prop->number();
-                out << SEP << ha->abscissa();
-            }
+            out << LIN << ljust(fp->name(), 2);
+            out << SEP << cnt;
+            out << SEP << avg*cnt;
+            out << SEP << avg;
+            out << SEP << var;
+            out << SEP << fp->rigidity;
         }
     }
 }
 
 
-void Simul::reportFiberLinks(std::ostream& out) const
+/**
+ Export fiber elastic bending energy
+ */
+void Simul::reportFiberExtension(std::ostream& out) const
 {
-    out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs" << SEP << "position";
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    out << COM << ljust("end_to_end_dist",2,2) << SEP << "count";
+    out << SEP << "avg" << SEP << "var" << SEP << "min" << SEP << "max";
+    
+    for ( Property const* i : properties.find_all("fiber") )
     {
-        if ( fib->nbHands() > 0 )
+        size_t cnt = 0;
+        real avg = 0, var = 0, in = INFINITY, ax = -INFINITY;
+        FiberProp const* p = static_cast<FiberProp const*>(i);
+        for ( Object const* f : fibers.collect(p) )
         {
-            out << COM << "on fiber " << fib->reference();
-            fib->sortHands();
-            for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
-            {
-                if ( ha->linkStiffness() > 0 )
-                {
-                    out << LIN << fib->prop->number();
-                    out << SEP << fib->identity();
-                    out << SEP << ha->prop->number();
-                    out << SEP << ha->abscissa();
-                    out << SEP << ha->linkBase();
-                    out << SEP << ha->linkStiffness();
-                }
-            }
+            Fiber const* fib = Fiber::toFiber(f);
+            real x = ( fib->posEndP() - fib->posEndM() ).norm();
+            in = std::min(in, x);
+            ax = std::max(ax, x);
+            avg += x;
+            var += x * x;
+            ++cnt;
+        }
+        if ( cnt > 0 )
+        {
+            avg /= real(cnt);
+            var = ( var - square(avg) * cnt ) / real(cnt-1);
+            out << LIN << ljust(p->name(), 2);
+            out << SEP << cnt;
+            out << SEP << avg;
+            out << SEP << var;
+            out << SEP << in;
+            out << SEP << ax;
         }
     }
 }
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Fiber Lattice & Mesh
 
 
 /**
@@ -1197,34 +1226,6 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
 }
 
 
-/**
- Export fiber elastic bending energy
- */
-void Simul::reportFiberBendingEnergy(std::ostream& out) const
-{
-    out << COM << ljust("bending_energy",2,2) << SEP << "count";
-    out << SEP << "sum" << SEP << "avg" << SEP << "var" << SEP << "rigidity";
-    
-    size_t cnt;
-    real avg, var;
-    
-    for ( Property const* i : properties.find_all("fiber") )
-    {
-        FiberProp const* fp = static_cast<FiberProp const*>(i);
-        ObjectList objs = fibers.collect(fp);
-        fibers.infoBendingEnergy(objs, cnt, avg, var);
-        if ( cnt > 0 )
-        {
-            out << LIN << ljust(fp->name(), 2);
-            out << SEP << cnt;
-            out << SEP << avg*cnt;
-            out << SEP << avg;
-            out << SEP << var;
-            out << SEP << fp->rigidity;
-        }
-    }
-}
-
 /** Attention: This does not handle all cases */
 static bool confinementApplies(Confinement mode, Space const* spc, Vector const& pos)
 {
@@ -1344,6 +1345,56 @@ real Simul::reportFiberConfinement(std::ostream& out) const
     return rad;
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark - bound Hands per Fiber
+
+
+void Simul::reportFiberHands(std::ostream& out) const
+{
+    out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs";
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    {
+        if ( fib->nbHands() > 0 )
+        {
+            out << COM << "on fiber " << fib->reference();
+            fib->sortHands();
+            for ( Hand * ha = fib->firstHand(); ha; ha = ha->next() )
+            {
+                out << LIN << fib->prop->number();
+                out << SEP << fib->identity();
+                out << SEP << ha->prop->number();
+                out << SEP << ha->abscissa();
+            }
+        }
+    }
+}
+
+
+void Simul::reportFiberLinks(std::ostream& out) const
+{
+    out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs" << SEP << "position";
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    {
+        if ( fib->nbHands() > 0 )
+        {
+            out << COM << "on fiber " << fib->reference();
+            fib->sortHands();
+            for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
+            {
+                if ( ha->linkStiffness() > 0 )
+                {
+                    out << LIN << fib->prop->number();
+                    out << SEP << fib->identity();
+                    out << SEP << ha->prop->number();
+                    out << SEP << ha->abscissa();
+                    out << SEP << ha->linkBase();
+                    out << SEP << ha->linkStiffness();
+                }
+            }
+        }
+    }
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Networks

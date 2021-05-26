@@ -240,7 +240,7 @@ void test_uniform(size_t cnt)
     }
     cnt *= 4;
     avg /= cnt;
-    var = ( var - square(avg) * cnt ) / (cnt-1);
+    var = ( var - square(avg) * cnt ) / real(cnt-1);
     printf("UNIFORM      avg = %.12e   var = %.12e\n", avg+off, var);
 }
 
@@ -263,7 +263,7 @@ void test_gauss(size_t CNT)
         }
     }
     avg /= cnt;
-    var = ( var - square(avg) * cnt ) / (cnt-1);
+    var = ( var - square(avg) * cnt ) / real(cnt-1);
     printf("GAUSSIAN     avg = %.12e   var = %.12e\n", avg, var);
 }
 
@@ -294,7 +294,7 @@ void test_exponential(size_t cnt)
     }
     cnt *= 4;
     avg /= cnt;
-    var = ( var - square(avg) * cnt ) / (cnt-1);
+    var = ( var - square(avg) * cnt ) / real(cnt-1);
     printf("EXPONENTIAL  avg = %.12e   var = %.12e\n", avg+off, var);
 }
 
