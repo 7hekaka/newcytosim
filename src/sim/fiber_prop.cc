@@ -614,7 +614,7 @@ void FiberProp::complete(Simul const& sim)
     if ( drag_length <= 0 )
         throw InvalidParameter("fiber:drag_length must be > 0");
 
-#if OLD_SQUEEZE_FORCE
+#if NEW_FIBER_CHEW
     if ( max_chewing_speed < 0 )
         throw InvalidParameter("fiber:max_chewing_speed must be >= 0");
     max_chewing_speed_dt = max_chewing_speed * sim.time_step();
