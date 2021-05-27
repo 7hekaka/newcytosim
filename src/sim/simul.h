@@ -428,18 +428,21 @@ public:
     /// print the coordinates and forces on the vertices of each fiber
     void reportFiberForces(std::ostream&) const;
 
-    /// print Fiber tensions along certain planes defined in `opt`
+    /// print Fiber tensions along certain planes defined in Glossary
     void reportFiberTension(std::ostream&, Glossary&) const;
     
     
     /// print number of kinks in each class of Fiber
     void reportFiberSegments(std::ostream&) const;
 
-    /// print sum of all bending energy
+    /// document bending energy
     void reportFiberBendingEnergy(std::ostream&) const;
     
-    /// print number of kinks in each class of Fiber
+    /// document end-to-end distance in each class of Fiber
     void reportFiberExtension(std::ostream&) const;
+    
+    /// document nematic order (alignement) of Fiber
+    void reportFiberNematic(std::ostream&) const;
 
     
     /// print component of forces experienced by Fibers due to confinement

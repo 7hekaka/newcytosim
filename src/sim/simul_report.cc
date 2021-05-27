@@ -305,6 +305,8 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportFiberBendingEnergy(out);
         if ( what == "extension" )
             return reportFiberExtension(out);
+        if ( what == "nematic" )
+            return reportFiberNematic(out);
         if ( what == "end_state" || what == "dynamic" )
         {
             reportFiberEndState(out, PLUS_END, sel, true);
@@ -691,9 +693,6 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
 }
 
 
-/**
- Export fiber elastic bending energy
- */
 void Simul::reportFiberExtension(std::ostream& out) const
 {
     out << COM << ljust("end_to_end_dist",2,2) << SEP << "count";
@@ -724,6 +723,28 @@ void Simul::reportFiberExtension(std::ostream& out) const
             out << SEP << var;
             out << SEP << in;
             out << SEP << ax;
+        }
+    }
+}
+
+
+void Simul::reportFiberNematic(std::ostream& out) const
+{
+    out << COM << ljust("class",2,2) << SEP << "count" << SEP << "order";
+    out << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
+    
+    for ( Property const* i : properties.find_all("fiber") )
+    {
+        FiberProp const* p = static_cast<FiberProp const*>(i);
+        ObjectList objs = fibers.collect(p);
+        if ( objs.size() > 0 )
+        {
+            real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+            real S = FiberSet::infoNematic(objs, vec);
+            out << LIN << ljust(p->name(), 2);
+            out << SEP << objs.size();
+            out << SEP << S;
+            out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];
         }
     }
 }
