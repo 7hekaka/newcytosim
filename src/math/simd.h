@@ -234,10 +234,6 @@ inline static vec4 blend31(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1000);
 inline static vec4 blend22(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1100); }
 inline static vec4 blend13(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1110); }
 
-/// concatenate two vec2 into a vec4
-inline static vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
-inline static vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); }
-
 inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos)
 {
     return _mm256_blendv_pd(pos, neg, val);
