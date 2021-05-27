@@ -4,7 +4,6 @@
 #include "glut.h"
 #include "glapp.h"
 #include <unistd.h>
-#include <cstdarg>
 #include "exceptions.h"
 #include "saveimage.h"
 #include "glossary.h"
@@ -63,7 +62,7 @@ namespace glApp
     real         farZ   = 1;       ///< normalized device Z-coordinate of back-plane
 
     unsigned int imageIndex = 0;   ///< index for image name
-    double       flashEndTime;
+    double       flashFinish;
     std::string  flashString;
 
     Vector3      ROIdup[2];
@@ -1128,28 +1127,18 @@ void glApp::processPassiveMouseMotion(int mx, int my)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void glApp::flashText0(const char* str)
+void glApp::flashText0(std::string const& str)
 {
-    //std::clog << " flashText " << str << "\n";
-    flashString = str;
-    flashEndTime = TicToc::seconds_since_1970() + 3.0;
+    if ( str != flashString )
+    {
+        //std::clog << " flashText " << str << "\n";
+        flashString = str;
+        flashFinish = TicToc::seconds_since_1970() + 3.0;
+        if ( views.size() > 1  &&  views[1].window()==1 )
+            glutPostWindowRedisplay(1);
+    }
 }
 
-void glApp::flashText(const char* fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-    char tmp[1024];
-    vsnprintf(tmp, 1024, fmt, args);
-    va_end(args);
-    flashText0(tmp);
-    
-    if ( views.size() > 1  &&  views[1].window()==1 )
-        glutPostWindowRedisplay(1);
-}
-
-//------------------------------------------------------------------------------
-#pragma mark -
 
 /**
  This is used for any secondary window.
@@ -1186,7 +1175,7 @@ void glApp::displayMain()
     if ( flashString.size() )
     {
         /// check time
-        if ( TicToc::seconds_since_1970() > flashEndTime )
+        if ( TicToc::seconds_since_1970() > flashFinish )
             flashString = "";
         else
         {

@@ -497,10 +497,10 @@ void View::align_with(const Vector3 & dir)
     // axis is obtained by vector product: axis = cross((1, 0, 0), a)
     Vector3 axis( 0, dir.ZZ, -dir.YY );
     // cosine is scalar product, sine is norm of vector-product:
-    real cs = dir.XX, si = axis.norm();
-    if ( si > REAL_EPSILON )
+    real C = dir.XX, S = axis.norm();
+    if ( S > REAL_EPSILON )
     {
-        rotation.setFromAxis(axis, std::atan2(si, cs));
+        rotation.setFromAxis(axis, std::atan2(S, C));
         setModelView();
     }
 }

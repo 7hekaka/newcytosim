@@ -114,15 +114,20 @@ namespace glApp
     
     //---------------------------------MESSAGES---------------------------------
     
-    /// display given text on screen for 3 sec
-    void flashText0(const char* str);
-    
-    ///@todo: replace flashText(...) by a std::ostream&
-    /// draw text for 3 sec (to report that something has been done)
-    void flashText(const char* fmt, ...);
-    
     /// set message displayed on current window
     void setMessage(std::string const&);
+
+    /// display given text on screen for 3 sec
+    void flashText0(std::string const&);
+    
+    /// display text for 3 sec on screen, used to signify something to user
+    template < typename... Args >
+    void flashText(const char* fmt, Args&&... args)
+    {
+        char str[1024] = { 0 };
+        snprintf(str, sizeof(str), fmt, args...);
+        flashText0(str);
+    }
 
     //-------------------------------DISPLAY------------------------------------
     
