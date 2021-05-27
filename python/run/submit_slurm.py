@@ -40,7 +40,7 @@ Examples:
        Submit a different job for each config file provided, with 10 repeats of each
     
     
-Last updated 26.09.2018
+Last updated 09.02.2021
 F. Nedelec
 """
 
