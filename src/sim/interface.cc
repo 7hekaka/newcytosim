@@ -874,7 +874,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     real   delta = (real)nb_steps;
     size_t check = nb_steps;
     
-    VLOG("+RUN START " << nb_steps);
+    simul_.prepare();
 
     if ( do_write )
     {
@@ -889,7 +889,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         check = size_t(delta);
     }
     
-    simul_.prepare();
+    VLOG("+RUN START " << nb_steps);
     
     size_t frame = 0;
     size_t sss = 0;
@@ -922,6 +922,9 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         simul_.events.erase(event);
 #endif
     simul_.relax();
+    if ( do_write )
+        simul_.writeProperties(nullptr, prune);
+    
     VLOG("+RUN END");
 }
 
@@ -1056,17 +1059,16 @@ void Interface::execute_export(std::string const& name, std::string const& what,
     else if ( what == "properties" )
     {
         opt.set(prune, "prune");
-        std::ostream * osp = &std::cout;
         std::ofstream ofs;
+        std::ostream out(std::cout.rdbuf());
+        // a STAR designates the standard output:
         if ( name != "*" )
         {
             opt.set(append, "append");
-            std::ios_base::openmode mode = std::ios_base::out;
-            if ( append ) mode |= std::ofstream::app;
-            ofs.open(name.c_str(), mode);
-            osp = &ofs;
+            ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
+            out.rdbuf(ofs.rdbuf());
         }
-        simul_.writeProperties(*osp, prune);
+        simul_.writeProperties(out, prune);
     }
     else
         throw InvalidIO("only `objects' or `properties' can be exported");

@@ -135,8 +135,8 @@ int main(int argc, char* argv[])
 
     std::string input = TRAJECTORY;
     std::string str, what;
-    std::ostream * osp = &std::cout;
     std::ofstream ofs;
+    std::ostream out(std::cout.rdbuf());
 
     // check for prefix:
     int ax = 1;
@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
                 std::clog << "Cannot open output file\n";
                 return EXIT_FAILURE;
             }
-            osp = &ofs;
+            out.rdbuf(ofs.rdbuf());
         }
     }
     catch( Exception & e )
@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    report(simul, *osp, what, frame, arg);
+    report(simul, out, what, frame, arg);
     size_t cnt = 1;
 
     if ( arg.num_values("frame") > 1 )
@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
             // try to load the specified frame:
             if ( 0 == reader.loadFrame(simul, frame) )
             {
-                report(simul, *osp, what, frame, arg);
+                report(simul, out, what, frame, arg);
                 ++cnt;
             }
             else
@@ -246,7 +246,7 @@ int main(int argc, char* argv[])
             ++f;
             if ( f % period == frame % period )
             {
-                report(simul, *osp, what, f, arg);
+                report(simul, out, what, f, arg);
                 ++cnt;
             }
         }
