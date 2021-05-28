@@ -953,10 +953,11 @@ void Fiber::setInteractions(Meca& meca) const
                 // forces is capped to a maximum magnitude 'f':
 #if ( DIM == 3 )
                 Vector n = Vector(0, -P.YY, -P.ZZ).normalized(f);
-#else
-                Vector n(0, std::copysign(f, -P.YY), 0);
-#endif
                 meca.addForce(Mecapoint(this, i), n);
+#elif ( DIM == 2 )
+                Vector n(0, std::copysign(f, -P.YY), 0);
+                meca.addForce(Mecapoint(this, i), n);
+#endif
             }
         }
     }
