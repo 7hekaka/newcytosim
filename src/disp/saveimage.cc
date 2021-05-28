@@ -22,12 +22,12 @@ bool SaveImage::supported(const char format[])
 }
 
 
-uint8_t* new_pixels(size_t s)
+static uint8_t* new_pixels(size_t s)
 {
     return (uint8_t*)calloc(s, sizeof(uint8_t));
 }
 
-void free_pixels(uint8_t *& ptr)
+static void free_pixels(uint8_t *& ptr)
 {
     free(ptr);
     ptr = nullptr;
@@ -488,16 +488,16 @@ int SaveImage::readPNG(FILE* fp, png_bytep *& row_pointers, int& bit_depth, int&
 */
 
 
-int savePNG(FILE* file,
-            png_bytep row_pointers[],
-            const int bit_depth, const int num_colors,
-            const int width, const int height)
+static int savePNG(FILE* file,
+                   png_bytep row_pointers[],
+                   const int bit_depth, const int num_colors,
+                   const int width, const int height)
 {
     if ( !file )
-        return FILE_ERROR;
+        return SaveImage::FILE_ERROR;
     
     if ( bit_depth != 8 && bit_depth != 16 )
-        return PNG_ERROR+9;
+        return 19;
     
     int color_type = -1;
     
@@ -511,26 +511,26 @@ int savePNG(FILE* file,
         color_type = PNG_COLOR_TYPE_RGBA;
     
     if ( color_type < 0 )
-        return PNG_ERROR+8;
+        return 18;
     
     /* initialize stuff */
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     
     if (!png_ptr)
-        return PNG_ERROR+7;
+        return 17;
     
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
-        return PNG_ERROR+6;
+        return 16;
     
     if (setjmp(png_jmpbuf(png_ptr)))
-        return PNG_ERROR+5;
+        return 15;
     
     png_init_io(png_ptr, file);
     
     /* write header */
     if (setjmp(png_jmpbuf(png_ptr)))
-        return PNG_ERROR+4;
+        return 14;
     
     png_set_IHDR(png_ptr, info_ptr, width, height,
                  bit_depth, color_type,
@@ -540,7 +540,7 @@ int savePNG(FILE* file,
     
     /* write bytes */
     if (setjmp(png_jmpbuf(png_ptr)))
-        return PNG_ERROR+3;
+        return 13;
     
     if ( num_colors == 1 && bit_depth == 16 )
         png_set_swap(png_ptr);
@@ -550,11 +550,11 @@ int savePNG(FILE* file,
     
     /* end write */
     if (setjmp(png_jmpbuf(png_ptr)))
-        return PNG_ERROR+2;
+        return 12;
     
     png_write_end(png_ptr, NULL);
  
-    return NO_ERROR;
+    return 0;
 }
 
 
