@@ -18,7 +18,7 @@ namespace FilePath
     bool is_dir(const char path[]);
     
     /// change current working directory
-    /** returns file descriptor of current working directory */
+    /** returns error code: 0 = success */
     int change_dir(const char path[]);
 
     /// change current working directory, creating it, if absent and 'make==true'

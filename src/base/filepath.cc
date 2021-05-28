@@ -65,17 +65,15 @@ int FilePath::make_dir(const char name[])
 
 int FilePath::change_dir(const char path[])
 {
-    int cwd = -1;
     if ( path && *path )
     {
-        cwd = dirfd(opendir("."));
         if ( chdir(path) )
         {
             perror("Could not change directory");
             return -1;
         }
     }
-    return cwd;
+    return 0;
 }
 
 
