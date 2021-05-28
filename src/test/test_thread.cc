@@ -19,7 +19,7 @@ void* loop(void *arg)
     pthread_t self = pthread_self();
     for ( int cnt = 1; cnt <= 10; ++cnt )
     {
-        printf("- thread %p: step %i", self, cnt);
+        printf("- thread %lx: step %i", self, cnt);
         pthread_cond_wait(&condition, &mutex);
     }
     pthread_mutex_unlock(&mutex);
