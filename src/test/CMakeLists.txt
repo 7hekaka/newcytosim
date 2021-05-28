@@ -45,8 +45,8 @@ endforeach()
 set(TEST_GL_LIBS
     rasterizerGL
     "${DISP_LIB_TARGET}"
-    "${SPACES_LIB_TARGET}"
     "${SIM_LIB_TARGET}"
+    "${SPACES_LIB_TARGET}"
     "${MATH_LIB_TARGET}"
     "${BASE_LIB_TARGET}"
     "${LAPACK_LIB}"
