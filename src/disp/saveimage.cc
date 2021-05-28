@@ -7,7 +7,6 @@
 #  include "opengl.h"
 #endif
 
-
 bool SaveImage::supported(const char format[])
 {
 #ifdef HAS_PNG
@@ -64,12 +63,12 @@ int SaveImage::saveImage(const char * filename,
                          const int vp[4],
                          int downsample)
 {
-    int res = 1;
+    int res = FAILED_ALLOCATION;
 
     //allocate memory to hold image:
     uint8_t* pixels = new_pixels(3*vp[2]*vp[3]);
 
-    if ( pixels)
+    if ( pixels )
     {
         if ( 0 == readPixels(vp[0], vp[1], vp[2], vp[3], pixels) )
             res = savePixels(filename, format, pixels, vp[2], vp[3], downsample);
@@ -97,7 +96,7 @@ int SaveImage::saveCompositeImage(const int mag,
                                   int downsample)
 {
     if ( ! supported(format) )
-        return -1;
+        return UNKNOWN_FORMAT;
     
     int res = 1;
     int mW = mag * width;
@@ -158,7 +157,7 @@ int SaveImage::saveMagnifiedImage(const int mag,
                                   int downsample)
 {
     if ( ! supported(format) )
-        return -1;
+        return UNKNOWN_FORMAT;
     
     int res = 1;
     int mW = mag * width;
@@ -169,7 +168,7 @@ int SaveImage::saveMagnifiedImage(const int mag,
     if ( mW > dim[0] || mH > dim[1] )
     {
         fprintf(err, "SaveImage:: exceeding maximum supported size (%ix%i)\n", (int)dim[0], (int)dim[1]);
-        return 1;
+        return FAILED_ALLOCATION;
     }
     
     const int PIX = 3;  //number of bytes for each pixel
@@ -225,7 +224,7 @@ int SaveImage::readPixels(GLint X, GLint Y, GLsizei W, GLsizei H, GLvoid *pixels
     if ( glError != GL_NO_ERROR )
     {
         fprintf(err, "Error: could not read pixels (OpenGL error %u)\n", glError);
-        return 1;
+        return OPENGL_ERROR;
     }
     return 0;
 }
@@ -290,7 +289,7 @@ int SaveImage::savePixels(FILE * file,
     if ( 0 == strcasecmp(format, "png") )
         return saveColorPNG(file, pixels, width, height);
     
-    return -1;
+    return UNKNOWN_FORMAT;
 }
 
 
@@ -359,7 +358,7 @@ int SaveImage::savePixels(const char * filename,
         return res;
     }
     
-    return 3;
+    return FILE_ERROR;
 }
 
 //------------------------------------------------------------------------------
@@ -380,7 +379,7 @@ int SaveImage::saveColorPPM(FILE* file,
     //write the pixels binary, line by line:
     for ( int i = height-1; i >= 0; --i )
         fwrite(&pixels[3*i*width], 1, 3*width, file);
-    return 0;
+    return NO_ERROR;
 }
 
 
@@ -411,7 +410,7 @@ int SaveImage::saveColorTGA(FILE* file,
 
     fwrite(header, sizeof(uint8_t), 18, file);
     fwrite(pixels, sizeof(uint8_t), width * height * 3, file);
-    return 0;
+    return NO_ERROR;
 }
 
 
@@ -425,7 +424,7 @@ int SaveImage::savePNG(FILE*, const uint8_t pixels[],
                        const int, const int)
 {
     fprintf(err, "PNG format not supported (recompilation needed)\n");
-    return -1;
+    return UNKNOWN_FORMAT;
 }
 
 #else
@@ -495,10 +494,10 @@ int savePNG(FILE* file,
             const int width, const int height)
 {
     if ( !file )
-        return 9;
+        return FILE_ERROR;
     
     if ( bit_depth != 8 && bit_depth != 16 )
-        return 9;
+        return PNG_ERROR+9;
     
     int color_type = -1;
     
@@ -512,26 +511,26 @@ int savePNG(FILE* file,
         color_type = PNG_COLOR_TYPE_RGBA;
     
     if ( color_type < 0 )
-        return 8;
+        return PNG_ERROR+8;
     
     /* initialize stuff */
     png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
     
     if (!png_ptr)
-        return 7;
+        return PNG_ERROR+7;
     
     png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)
-        return 6;
+        return PNG_ERROR+6;
     
     if (setjmp(png_jmpbuf(png_ptr)))
-        return 5;
+        return PNG_ERROR+5;
     
     png_init_io(png_ptr, file);
     
     /* write header */
     if (setjmp(png_jmpbuf(png_ptr)))
-        return 4;
+        return PNG_ERROR+4;
     
     png_set_IHDR(png_ptr, info_ptr, width, height,
                  bit_depth, color_type,
@@ -541,7 +540,7 @@ int savePNG(FILE* file,
     
     /* write bytes */
     if (setjmp(png_jmpbuf(png_ptr)))
-        return 3;
+        return PNG_ERROR+3;
     
     if ( num_colors == 1 && bit_depth == 16 )
         png_set_swap(png_ptr);
@@ -551,11 +550,11 @@ int savePNG(FILE* file,
     
     /* end write */
     if (setjmp(png_jmpbuf(png_ptr)))
-        return 2;
+        return PNG_ERROR+2;
     
     png_write_end(png_ptr, NULL);
  
-    return 0;
+    return NO_ERROR;
 }
 
 
@@ -563,7 +562,7 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
                        const int bit_depth, const int num_colors,
                        const int width, const int height)
 {
-    int res = 1;
+    int res = FAILED_ALLOCATION;
     png_bytep * rows = (png_bytep*)malloc(height*sizeof(png_bytep));
     if ( rows )
     {

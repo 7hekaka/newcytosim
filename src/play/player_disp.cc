@@ -13,6 +13,7 @@
 #include "tictoc.h"
 #include <unistd.h>
 #include <cstdlib>
+#include "filepath.h"
 #include "glut.h"
 
 extern void helpKeys(std::ostream&);
@@ -381,7 +382,7 @@ int Player::saveView(const char* filename, const char* format, int downsample, i
  */
 int Player::saveView(size_t indx, int downsample, int verbose) const
 {
-    char str[1024], cwd[1024] = { 0 };
+    char str[1024] = { 0 };
     char const* format = prop.image_format.c_str();
     std::string& name = prop.image_name;
     std::string::size_type d = name.find('.');
@@ -396,14 +397,9 @@ int Player::saveView(size_t indx, int downsample, int verbose) const
         // with no '.', build name using integer:
         snprintf(str, sizeof(str), "%s%04lu.%s", name.c_str(), indx, format);
     }
-    if ( prop.image_dir.length() > 0 )
-    {
-        if ( getcwd(cwd, sizeof(cwd)) )
-            chdir(prop.image_dir.c_str());
-    }
+    int cwd = FilePath::change_dir(prop.image_dir, true);
     int err = saveView(str, format, downsample, verbose);
-    if ( cwd[0] )
-        chdir(cwd);
+    FilePath::change_dir(cwd);
     return err;
 }
 
@@ -449,18 +445,12 @@ int Player::saveScene(const int mag, const char* name, const char* format, const
  */
 int Player::saveScene(const int mag, const char* root, unsigned indx, const int downsample)
 {
-    char cwd[1024] = { 0 };
-    char str[1024];
+    char str[1024] = { 0 };
     char const* format = prop.image_format.c_str();
     snprintf(str, sizeof(str), "%s%04i.%s", root, indx, format);
-    if ( prop.image_dir.length() )
-    {
-        if ( getcwd(cwd, sizeof(cwd)) )
-            chdir(prop.image_dir.c_str());
-    }
+    int cwd = FilePath::change_dir(prop.image_dir, true);
     int err = saveScene(mag, str, format, downsample);
-    if ( cwd[0] )
-        chdir(cwd);
+    FilePath::change_dir(cwd);
     glApp::postRedisplay();
     return err;
 }

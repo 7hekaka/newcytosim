@@ -19,6 +19,9 @@
  */
 namespace SaveImage
 {
+    /// error codes
+    enum { NO_ERROR=0, FAILED_ALLOCATION=1, UNKNOWN_FORMAT=2, OPENGL_ERROR=3, FILE_ERROR=4, PNG_ERROR=10 };
+
     /// destination of error messages (set to zero to suppress output)
     static FILE * err = stderr;
     

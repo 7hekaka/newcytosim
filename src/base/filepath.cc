@@ -59,17 +59,48 @@ bool FilePath::is_dir(const char path[])
 
 int FilePath::make_dir(const char name[])
 {
-    return mkdir(name, S_IRWXU|S_IRWXG|S_IRWXG|S_IXOTH);
+    return mkdir(name, S_IRWXU|S_IRWXG|S_IXOTH);
+}
+
+
+int FilePath::change_dir(const char path[])
+{
+    int cwd = -1;
+    if ( path && *path )
+    {
+        cwd = dirfd(opendir("."));
+        if ( chdir(path) )
+        {
+            perror("Could not change directory");
+            return -1;
+        }
+    }
+    return cwd;
 }
 
 
 int FilePath::change_dir(const char path[], bool make)
 {
-    if ( !path || *path == 0 )
-        return 0;
-    if ( make )
-        mkdir(path, S_IRWXU|S_IRWXG|S_IRWXG|S_IXOTH);
-    return chdir(path);
+    int cwd = -1;
+    if ( *path )
+    {
+        cwd = dirfd(opendir("."));
+        if ( make )
+            (void)mkdir(path, 0777);
+        if ( chdir(path) )
+            perror("Could not change directory");
+    }
+    return cwd;
+}
+
+
+void FilePath::change_dir(int file)
+{
+    if ( file >= 0 )
+    {
+        (void)fchdir(file);
+        (void)close(file);
+    }
 }
 
 
