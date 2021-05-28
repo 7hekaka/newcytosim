@@ -118,15 +118,15 @@ namespace glApp
     void setMessage(std::string const&);
 
     /// display given text on screen for 3 sec
-    void flashText0(std::string const&);
+    void flashText(std::string const&);
     
     /// display text for 3 sec on screen, used to signify something to user
-    template < typename... Args >
-    void flashText(const char* fmt, Args&&... args)
+    template < typename Arg1, typename... Args >
+    void flashText(const char* fmt, Arg1&& arg1, Args&&... args)
     {
         char str[1024] = { 0 };
-        snprintf(str, sizeof(str), fmt, args...);
-        flashText0(str);
+        snprintf(str, sizeof(str), fmt, arg1, args...);
+        flashText(str);
     }
 
     //-------------------------------DISPLAY------------------------------------

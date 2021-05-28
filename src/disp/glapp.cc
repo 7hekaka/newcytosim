@@ -1127,7 +1127,7 @@ void glApp::processPassiveMouseMotion(int mx, int my)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void glApp::flashText0(std::string const& str)
+void glApp::flashText(std::string const& str)
 {
     if ( str != flashString )
     {

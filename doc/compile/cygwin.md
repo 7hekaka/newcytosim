@@ -67,7 +67,7 @@ Cytosim will only work within Cygwin, and not directly under Windows. This means
 Cytosim should be started from the Cygwin terminal window:
 
     cd cytosim
-    export DISPLAY=:0
+    export DISPLAY=localhost:0.0
     bin/play live   
 
 Author: Daniel Cortes, Julio Belmonte and Francois Nedelec, last updated 4.04.2020

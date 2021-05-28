@@ -449,7 +449,7 @@ size_t SimThread::executePipedCommands(size_t max_nb_lines)
             if ( has_input(STDIN_FILENO) < 1 )
                 break;
         }
-        glApp::flashText0(str);
+        glApp::flashText(str);
         //printf("executed %lu lines from standard input\n", cnt);
         return cnt;
     }

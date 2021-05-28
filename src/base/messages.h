@@ -85,12 +85,19 @@ namespace Cytosim
             return nul_;
         }
         
-        /// front-end to a `printf()` syntax with flush
-        template < typename... Args >
-        void operator()(const char* fmt, Args&&... args)
+        /// output string with flush
+        void operator()(const char* str)
+        {
+            operator<<(str);
+            out_.flush();
+        }
+
+        /// front-end to a `printf()` syntax followed by flush
+        template < typename Arg1, typename... Args >
+        void operator()(const char* fmt, Arg1 arg1, Args&&... args)
         {
             char str[1024] = { 0 };
-            snprintf(str, sizeof(str), fmt, args...);
+            snprintf(str, sizeof(str), fmt, arg1, args...);
             operator<<(str);
             out_.flush();
         }
