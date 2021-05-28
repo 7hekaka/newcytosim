@@ -68,7 +68,7 @@ void report(Simul const& sim, std::ostream& os, std::string const& what, Glossar
 
 void report(Simul const& sim, std::string const& what, Glossary& opt, size_t frm)
 {
-    char filename[256];
+    char filename[512];
     snprintf(filename, sizeof(filename), "%s%04lu.txt", root, frm);
     std::ofstream os(filename);
     report(sim, os, what, opt);

@@ -45,6 +45,13 @@ void instructions(std::ostream& os = std::cout)
     os << " INTEGER   read specified frame if possible\n";
 }
 
+void inventory(Simul& simul, size_t frame)
+{
+    printf("loaded frame %li @ time %.3f:\n", frame, simul.time());
+    std::stringstream ss;
+    simul.reportInventory(ss);
+    StreamFunc::prefix_lines(std::cout, ss, "    ", 0, 0);
+}
 
 //------------------------------------------------------------------------------
 
@@ -98,22 +105,14 @@ int main(int argc, char* argv[])
     {
         if ( reader.loadFrame(simul, frm) )
             printf("Frame %lu could not be loaded\n", frm);
+        else
+            printf("loaded frame %li, time %.3f:\n", reader.currentFrame(), simul.time());
     }
     
-    printf("Reader: enter (h) for help\n");
-    while ( true )
+    instructions();
+    printf("? ");
+    while ( fgets(cmd, sizeof(cmd), stdin) )
     {
-        printf("loaded frame %li, time %.3f:\n", reader.currentFrame(), simul.time());
-        if ( 1 )
-        {
-            std::stringstream ss;
-            simul.reportInventory(ss);
-            StreamFunc::prefix_lines(std::cout, ss, "    ", 0, 0);
-        }
-        
-        printf("? ");
-        fgets(cmd, sizeof(cmd), stdin);
-        
         if ( isdigit(cmd[0]))
         {
             char * end = nullptr;
@@ -136,49 +135,41 @@ int main(int argc, char* argv[])
                 }
             }
         }
-        else
+        else switch( cmd[0] )
         {
-            switch( cmd[0] )
-            {
-                case '\n':
-                case 'n':
-                    try {
-                        int err = reader.loadNextFrame(simul);
-                        if ( err ) printf("reader.loadNextFrame error: %i\n", err);
-                    }
-                    catch( Exception & e ) {
-                        printf("reader.loadNextFrame exception: %s\n", e.msg());
-                    }
-                    break;
-                    
-                case 'w':
-                    simul.writeObjects(output, true, binary);
-                    break;
-                    
-                case 'e':
-                    simul.erase();
-                    break;
-                    
-                case 'b':
-                    binary = !binary;
-                    printf("Reader: binary = %i\n", binary);
-                    break;
-                    
-                case 'c':
-                    reader.clearPositions();
-                    break;
-
-                case 'r':
-                    reader.rewind();
-                    break;
-                    
-                case 'q': case 'Q': case 27:
-                    return 0;
-                    
-                default:
-                    instructions();
-                    break;
-            }
+            case '\n':
+            case 'n':
+                try {
+                    int err = reader.loadNextFrame(simul);
+                    if ( err ) printf("reader.loadNextFrame error: %i\n", err);
+                }
+                catch( Exception & e ) {
+                    printf("reader.loadNextFrame exception: %s\n", e.msg());
+                }
+                break;
+            case 'w':
+                simul.writeObjects(output, true, binary);
+                break;
+            case 'e':
+                simul.erase();
+                break;
+            case 'b':
+                binary = !binary;
+                printf("Reader: binary = %i\n", binary);
+                break;
+            case 'c':
+                reader.clearPositions();
+                break;
+            case 'r':
+                reader.rewind();
+                break;
+            case 'q': case 'Q': case 27:
+                return 0;
+            default:
+                printf("I do not understand `%c`\n", cmd[0]);
+                break;
         }
+        inventory(simul, reader.currentFrame());
+        printf("? ");
     }
 }
