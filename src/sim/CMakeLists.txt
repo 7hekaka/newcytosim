@@ -216,9 +216,9 @@ target_include_directories(${SIMG_LIB_TARGET} PUBLIC
 
 
 if(BUILD_SIM_EXECUTABLE)
-    add_executable(${CYTOSIM_EXE_TARGET} "${SRC_SIM_DIR}/sim.cc")
+    add_executable(${SIM_TARGET} "${SRC_SIM_DIR}/sim.cc")
 
-    target_link_libraries(${CYTOSIM_EXE_TARGET} PRIVATE
+    target_link_libraries(${SIM_TARGET} PRIVATE
         "${SIM_LIB_TARGET}"
         "${MATH_LIB_TARGET}"
         "${BASE_LIB_TARGET}"
@@ -227,7 +227,7 @@ if(BUILD_SIM_EXECUTABLE)
         Threads::Threads
     )
 
-    target_include_directories(${CYTOSIM_EXE_TARGET} PUBLIC
+    target_include_directories(${SIM_TARGET} PUBLIC
         "${SRC_MATH_DIR}"
         "${SRC_BASE_DIR}"
         "${SRC_SIM_ALL_DIR}"

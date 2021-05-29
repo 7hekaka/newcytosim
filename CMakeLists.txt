@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.2.0)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
-set(TARGET "cytosim")
-project(${TARGET} C CXX)
+project("cytosim" C CXX)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tar)
@@ -27,12 +26,9 @@ endif()
 
 option(BUILD_SIM_EXECUTABLE "build the cytosim simulation executable" ON)
 option(BUILD_PLAY_EXECUTABLE "build the cytosim OpenGL viewer" ON)
-option(BUILD_CYTOSIM_TESTS "build the cytosim test executables" ON)
-option(BUILD_CYTOSIM_TOOLS "build the cytosim tools executables" ON)
+option(BUILD_CYTOSIM_TOOLS "build all cytosim/tools executables" ON)
+option(BUILD_CYTOSIM_TESTS "build all cytosim/test executables" ON)
 
-if(BUILD_CYTOSIM_TOOLS)
-    set(BUILD_PLAY_EXECUTABLE ON)
-endif()
 
 set(SRC_BASE_DIR "${PROJECT_SOURCE_DIR}/src/base")
 set(SRC_MATH_DIR "${PROJECT_SOURCE_DIR}/src/math")
@@ -44,17 +40,17 @@ set(SRC_TOOLS_DIR "${PROJECT_SOURCE_DIR}/src/tools")
 set(DOC_DIR "${PROJECT_SOURCE_DIR}/src/doc")
 
 set(SRC_SIM_ALL_DIR
-"${SRC_SIM_DIR}"
-"${SRC_SIM_DIR}/fibers"
-"${SRC_SIM_DIR}/hands"
-"${SRC_SIM_DIR}/singles"
-"${SRC_SIM_DIR}/couples"
-"${SRC_SIM_DIR}/organizers"
-"${SRC_SIM_DIR}/spaces"
+    "${SRC_SIM_DIR}"
+    "${SRC_SIM_DIR}/fibers"
+    "${SRC_SIM_DIR}/hands"
+    "${SRC_SIM_DIR}/singles"
+    "${SRC_SIM_DIR}/couples"
+    "${SRC_SIM_DIR}/organizers"
+    "${SRC_SIM_DIR}/spaces"
 )
 
-set(CYTOSIM_EXE_TARGET "sim")
-set(PLAY_EXE_TARGET "play")
+set(SIM_TARGET "sim")
+set(PLAY_TARGET "play")
 
 #-------------------------------- Libraries ------------------------------------
 

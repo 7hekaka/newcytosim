@@ -13,9 +13,9 @@ set(SOURCES_PLAY
 )
 
 if(BUILD_PLAY_EXECUTABLE)
-    add_executable(${PLAY_EXE_TARGET} ${SOURCES_PLAY})
+    add_executable(${PLAY_TARGET} ${SOURCES_PLAY})
 
-    target_link_libraries(${PLAY_EXE_TARGET} PUBLIC
+    target_link_libraries(${PLAY_TARGET} PUBLIC
         "${SIMG_LIB_TARGET}"
         "${DISP_LIB_TARGET}"
         "${MATH_LIB_TARGET}"
@@ -26,7 +26,7 @@ if(BUILD_PLAY_EXECUTABLE)
         Threads::Threads
     )
 
-    target_include_directories(${PLAY_EXE_TARGET} PUBLIC
+    target_include_directories(${PLAY_TARGET} PUBLIC
         "${SRC_MATH_DIR}"
         "${SRC_BASE_DIR}"
         "${SRC_SIM_ALL_DIR}"
