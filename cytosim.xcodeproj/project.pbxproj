@@ -1551,6 +1551,15 @@
 		BB7086562449CBF300C73273 /* test_rigidity */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_rigidity; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB7191C50EF1CD9900CED9E2 /* libcytomath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytomath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB7192360EF1CEEA00CED9E2 /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; name = makefile.inc; path = src/math/makefile.inc; sourceTree = SOURCE_ROOT; };
+		BB72EA632662262A00FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA642662263600FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA652662264400FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA662662265300FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA672662266000FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA682662266D00FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA692662267800FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA6A2662268200FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BB72EA6B26622B0100FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = src/CMakeLists.txt; sourceTree = "<group>"; };
 		BB73586D05B98DA3006956D5 /* array.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = array.h; path = src/base/array.h; sourceTree = SOURCE_ROOT; };
 		BB73586E05B98DA3006956D5 /* assert_macro.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = assert_macro.h; path = src/base/assert_macro.h; sourceTree = SOURCE_ROOT; };
 		BB73587105B98DA3006956D5 /* conjgradient.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = conjgradient.cc; path = src/math/conjgradient.cc; sourceTree = SOURCE_ROOT; };
@@ -2603,6 +2612,7 @@
 			children = (
 				BB55BF300A25FB13003333C9 /* dim.h */,
 				BB7192360EF1CEEA00CED9E2 /* makefile.inc */,
+				BB72EA652662264400FF7352 /* CMakeLists.txt */,
 				BBFC66B209C0C3D30031048A /* real.h */,
 				BB6CD587254ED31A00FB7547 /* real_print.h */,
 				BB9D224520C5D30200CBB0B1 /* simd.h */,
@@ -2645,6 +2655,8 @@
 				BB4EDF01162CB0DA001C3FE8 /* config.cym */,
 				BB2BF8CD0E085BF30024546A /* makefile.inc */,
 				BB64CD940869C129004DD8FE /* makefile */,
+				BB72EA632662262A00FF7352 /* CMakeLists.txt */,
+				BB72EA6B26622B0100FF7352 /* CMakeLists.txt */,
 				BB73586C05B98DA3006956D5 /* base */,
 				BB7190A20EF1C92E00CED9E2 /* math */,
 				BB7358D205B98DA3006956D5 /* sim */,
@@ -2668,6 +2680,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8DA0E085C880024546A /* makefile.inc */,
+				BB72EA642662263600FF7352 /* CMakeLists.txt */,
 				BB73586E05B98DA3006956D5 /* assert_macro.h */,
 				BB6E174B223E5B2F00AF850D /* operator_new.cc */,
 				BB614DA005BE8FF30048FA70 /* lists */,
@@ -2683,6 +2696,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8D60E085C3C0024546A /* makefile.inc */,
+				BB72EA682662266D00FF7352 /* CMakeLists.txt */,
 				BB7662C410E923A200C93DF6 /* frame_reader.h */,
 				BB7662C310E923A200C93DF6 /* frame_reader.cc */,
 				BB0E885516FBC81400451517 /* sim_thread.h */,
@@ -2705,6 +2719,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8D80E085C620024546A /* makefile.inc */,
+				BB72EA662662265300FF7352 /* CMakeLists.txt */,
 				BBF0385F18BCF7A3002E8568 /* splash.h */,
 				BBF0385D18BCF207002E8568 /* splash.cc */,
 				BB7D839510274A4500C1DC38 /* common.h */,
@@ -2737,6 +2752,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8D50E085C270024546A /* makefile.inc */,
+				BB72EA692662267800FF7352 /* CMakeLists.txt */,
 				BB95C53B249627EC003CA21A /* test_array.cc */,
 				BB9EC3912091D6B000EF00E7 /* test_asm.cc */,
 				BB882B400EE82D6A00E29E5C /* test_bits.cc */,
@@ -2784,6 +2800,7 @@
 			isa = PBXGroup;
 			children = (
 				BB2BF8D40E085C110024546A /* makefile.inc */,
+				BB72EA6A2662268200FF7352 /* CMakeLists.txt */,
 				BB9BEB9C1C774BB30085E19F /* analyse.cc */,
 				BB9771601F52D98200EB8C92 /* cymart.cc */,
 				BB77D6FB05F12F16001C0596 /* frametool.cc */,
@@ -2945,6 +2962,7 @@
 			isa = PBXGroup;
 			children = (
 				BB9711581DECDA1300352630 /* makefile.inc */,
+				BB72EA672662266000FF7352 /* CMakeLists.txt */,
 				BBC0E57210CABBBB008139D1 /* point_disp.h */,
 				BBC0E57110CABBBB008139D1 /* point_disp.cc */,
 				BBD4BB3A1007F2D300D00914 /* fiber_disp.h */,

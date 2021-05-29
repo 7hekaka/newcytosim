@@ -1,23 +1,22 @@
 set(SOURCES_PLAY
-    "${PROJECT_SOURCE_DIR}/src/play/frame_reader.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/display_prop.cc"
-    "${PROJECT_SOURCE_DIR}/src/disp/gle_flute.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/display.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/display1.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/display2.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/display3.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/sim_thread.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/player_prop.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/player.cc"
-    "${PROJECT_SOURCE_DIR}/src/play/play.cc"
+    "${SRC_PLAY_DIR}/frame_reader.cc"
+    "${SRC_PLAY_DIR}/display_prop.cc"
+    "${SRC_DISP_DIR}/gle_flute.cc"
+    "${SRC_PLAY_DIR}/display.cc"
+    "${SRC_PLAY_DIR}/display1.cc"
+    "${SRC_PLAY_DIR}/display2.cc"
+    "${SRC_PLAY_DIR}/display3.cc"
+    "${SRC_PLAY_DIR}/sim_thread.cc"
+    "${SRC_PLAY_DIR}/player_prop.cc"
+    "${SRC_PLAY_DIR}/player.cc"
+    "${SRC_PLAY_DIR}/play.cc"
 )
 
 if(BUILD_PLAY_EXECUTABLE)
     add_executable(${PLAY_EXE_TARGET} ${SOURCES_PLAY})
 
     target_link_libraries(${PLAY_EXE_TARGET} PUBLIC
-        "${SIM_LIB_TARGET}"
-        "${SPACES_G_LIB_TARGET}"
+        "${SIMG_LIB_TARGET}"
         "${DISP_LIB_TARGET}"
         "${MATH_LIB_TARGET}"
         "${BASE_LIB_TARGET}"
@@ -28,9 +27,9 @@ if(BUILD_PLAY_EXECUTABLE)
     )
 
     target_include_directories(${PLAY_EXE_TARGET} PUBLIC
-        "${MATH_SRC_DIR}"
-        "${BASE_SRC_DIR}"
-        "${SIM_SRC_DIR}"
-        "${DISP_SRC_DIR}"
+        "${SRC_MATH_DIR}"
+        "${SRC_BASE_DIR}"
+        "${SRC_SIM_ALL_DIR}"
+        "${SRC_DISP_DIR}"
     )
 endif(BUILD_PLAY_EXECUTABLE)

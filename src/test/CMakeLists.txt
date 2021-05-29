@@ -1,9 +1,9 @@
 set(TEST_INCLUDES
-    "${BASE_SRC_DIR}"
-    "${MATH_SRC_DIR}"
-    "${SIM_SRC_DIR}"
-    "${DISP_SRC_DIR}"
-    "${PLAY_SRC_DIR}"
+    "${SRC_BASE_DIR}"
+    "${SRC_MATH_DIR}"
+    "${SRC_SIM_ALL_DIR}"
+    "${SRC_DISP_DIR}"
+    "${SRC_PLAY_DIR}"
 )
 
 set(TEST_LIBS
@@ -14,8 +14,6 @@ set(TEST_LIBS
     "${BASE_LIB_TARGET}"
     "${OPENGL_LIBS}"
 )
-
-set(TEST_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src/test/")
 
 set(TEST_LIST
     #"test" # Test is a reserved word in CMake 3.10.x
@@ -32,7 +30,7 @@ set(TEST_LIST
 )
 
 foreach(TEST_NAME ${TEST_LIST})
-    add_executable("${TEST_NAME}" "${PROJECT_SOURCE_DIR}/src/test/${TEST_NAME}.cc")
+    add_executable("${TEST_NAME}" "${SRC_TEST_DIR}/${TEST_NAME}.cc")
     set_source_files_properties(
         PROPERTIES
         EXTERNAL_OBJECT true
@@ -45,8 +43,7 @@ endforeach()
 set(TEST_GL_LIBS
     rasterizerGL
     "${DISP_LIB_TARGET}"
-    "${SIM_LIB_TARGET}"
-    "${SPACES_LIB_TARGET}"
+    "${SIMG_LIB_TARGET}"
     "${MATH_LIB_TARGET}"
     "${BASE_LIB_TARGET}"
     "${LAPACK_LIB}"
@@ -67,7 +64,7 @@ set(GL_TEST_LIST
 )
 
 foreach(TEST_NAME ${GL_TEST_LIST})
-    add_executable(${TEST_NAME} "${PROJECT_SOURCE_DIR}/src/test/${TEST_NAME}.cc")
+    add_executable(${TEST_NAME} "${SRC_TEST_DIR}/${TEST_NAME}.cc")
     target_include_directories(${TEST_NAME} PUBLIC "${TEST_INCLUDES}")
     target_link_libraries(${TEST_NAME} PUBLIC "${TEST_GL_LIBS}")
 endforeach()

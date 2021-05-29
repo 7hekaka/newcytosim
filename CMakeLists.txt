@@ -1,28 +1,27 @@
 cmake_minimum_required(VERSION 3.2.0)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_BUILD_TYPE Debug)
 
 set(TARGET "cytosim")
 project(${TARGET} C CXX)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tar)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
-set(SIM_LIB_TARGET "cytolib")
-set(BASE_LIB_TARGET "cytobase")
-set(MATH_LIB_TARGET "cytomath")
-set(SPACES_LIB_TARGET "cytospace")
-set(SPACES_G_LIB_TARGET "cytospaceG")
-set(DISP_LIB_TARGET "cytodisp")
+set(SIM_LIB_TARGET "libcytosim")
+set(SIMG_LIB_TARGET "libcytosimG")
+set(BASE_LIB_TARGET "libcytobase")
+set(MATH_LIB_TARGET "libcytomath")
+set(DISP_LIB_TARGET "libcytodisp")
 
 if(DEFINED DIMENSION)
     add_definitions(-DDIM=${DIMENSION})
     set(SIM_LIB_TARGET "cytolibD${DIMENSION}")
-    set(SPACES_LIB_TARGET "cytospaceD${DIMENSION}")
-    set(SPACES_G_LIB_TARGET "cytospaceD${DIMENSION}G")
+    set(SIMG_LIB_TARGET "cytospaceD${DIMENSION}G")
 endif()
 
 
@@ -35,38 +34,29 @@ if(BUILD_CYTOSIM_TOOLS)
     set(BUILD_PLAY_EXECUTABLE ON)
 endif()
 
-set(BASE_SRC_DIR "${PROJECT_SOURCE_DIR}/src/base")
-set(DOC_SRC_DIR "${PROJECT_SOURCE_DIR}/src/doc")
-set(DISP_SRC_DIR "${PROJECT_SOURCE_DIR}/src/disp")
-set(MATH_SRC_DIR "${PROJECT_SOURCE_DIR}/src/math")
-set(PLAY_SRC_DIR "${PROJECT_SOURCE_DIR}/src/play")
+set(SRC_BASE_DIR "${PROJECT_SOURCE_DIR}/src/base")
+set(SRC_MATH_DIR "${PROJECT_SOURCE_DIR}/src/math")
+set(SRC_SIM_DIR "${PROJECT_SOURCE_DIR}/src/sim")
+set(SRC_DISP_DIR "${PROJECT_SOURCE_DIR}/src/disp")
+set(SRC_PLAY_DIR "${PROJECT_SOURCE_DIR}/src/play")
+set(SRC_TEST_DIR "${PROJECT_SOURCE_DIR}/src/test/")
+set(SRC_TOOLS_DIR "${PROJECT_SOURCE_DIR}/src/tools")
+set(DOC_DIR "${PROJECT_SOURCE_DIR}/src/doc")
 
-set(SIM_SRC_DIR
-"${PROJECT_SOURCE_DIR}/src/sim"
-"${PROJECT_SOURCE_DIR}/src/sim/fibers"
-"${PROJECT_SOURCE_DIR}/src/sim/hands"
-"${PROJECT_SOURCE_DIR}/src/sim/singles"
-"${PROJECT_SOURCE_DIR}/src/sim/couples"
-"${PROJECT_SOURCE_DIR}/src/sim/organizers"
-"${PROJECT_SOURCE_DIR}/src/sim/spaces"
+set(SRC_SIM_ALL_DIR
+"${SRC_SIM_DIR}"
+"${SRC_SIM_DIR}/fibers"
+"${SRC_SIM_DIR}/hands"
+"${SRC_SIM_DIR}/singles"
+"${SRC_SIM_DIR}/couples"
+"${SRC_SIM_DIR}/organizers"
+"${SRC_SIM_DIR}/spaces"
 )
-set(TEST_SRC_DIR "${PROJECT_SOURCE_DIR}/src/test")
-set(TOOLS_SRC_DIR "${PROJECT_SOURCE_DIR}/src/tools")
 
 set(CYTOSIM_EXE_TARGET "sim")
 set(PLAY_EXE_TARGET "play")
 
-# Use this to link against the Cytosim Libraries
-set(CYTOSIM_LIBRARIES
-    "${SIM_LIB_TARGET}"
-    "${SPACES_LIB_TARGET}"
-    "${MATH_LIB_TARGET}"
-    "${BASE_LIB_TARGET}"
-    "${LAPACK_LIB}"
-    "${BLAS_LIB}"
-    Threads::Threads
-    PARENT_SCOPE
-)
+#-------------------------------- Libraries ------------------------------------
 
 find_library(LAPACK_LIB lapack REQUIRED)
 if(LAPACK_LIB)
@@ -102,7 +92,6 @@ if(BUILD_PLAY_EXECUTABLE OR BUILD_CYTOSIM_TESTS OR BUILD_CYTOSIM_TOOLS)
         find_package(Xt)
         find_package(X11)
         find_package(GLEW)
-
         set(OPENGL_LIBS
             glut
             OpenGL::GL
@@ -112,8 +101,7 @@ if(BUILD_PLAY_EXECUTABLE OR BUILD_CYTOSIM_TESTS OR BUILD_CYTOSIM_TOOLS)
             GLEW
         )
     elseif(UNIX AND APPLE)
-        message("Building for Mac")
-
+        message("Building for MacOS")
         set(OPENGL_LIBS
             "-framework Accelerate"
             "-framework GLUT"

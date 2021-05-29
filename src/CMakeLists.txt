@@ -1,7 +1,6 @@
 add_subdirectory("base")
 add_subdirectory("math")
 add_subdirectory("sim")
-add_subdirectory("sim/spaces")
 add_subdirectory("disp")
 add_subdirectory("play")
 

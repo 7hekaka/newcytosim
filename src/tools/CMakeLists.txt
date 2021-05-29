@@ -1,18 +1,17 @@
 set(SOURCES_TOOL
-    "${PROJECT_SOURCE_DIR}/src/play/frame_reader.cc"
+    "${SRC_PLAY_DIR}/frame_reader.cc"
 )
 
 set(TOOL_INCLUDES
-    "${MATH_SRC_DIR}"
-    "${BASE_SRC_DIR}"
-    "${SIM_SRC_DIR}"
-    "${DISP_SRC_DIR}"
-    "${PLAY_SRC_DIR}"
+    "${SRC_MATH_DIR}"
+    "${SRC_BASE_DIR}"
+    "${SRC_SIM_ALL_DIR}"
+    "${SRC_DISP_DIR}"
+    "${SRC_PLAY_DIR}"
 )
 
 set(TOOL_LIBS
     "${SIM_LIB_TARGET}"
-    "${SPACES_LIB_TARGET}"
     "${MATH_LIB_TARGET}"
     "${BASE_LIB_TARGET}"
     "${LAPACK_LIB}"
@@ -31,7 +30,7 @@ set(TOOL_LIST
 
 # Build the Tools
 foreach(TOOL_NAME ${TOOL_LIST})
-    add_executable("${TOOL_NAME}" ${SOURCES_TOOL} "${PROJECT_SOURCE_DIR}/src/tools/${TOOL_NAME}.cc")
+    add_executable("${TOOL_NAME}" ${SOURCES_TOOL} "${SRC_TOOLS_DIR}/${TOOL_NAME}.cc")
     set_source_files_properties(
         PROPERTIES
         EXTERNAL_OBJECT true

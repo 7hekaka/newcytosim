@@ -1,39 +1,40 @@
 set(MATH_SOURCES
-    "${PROJECT_SOURCE_DIR}/src/math/vector1.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/vector2.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/vector3.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/matrix11.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/matrix22.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/matrix33.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/matrix34.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/rasterizer.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/sparmatsym1.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/sparmatsym2.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/sparmatsymblk.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/sparmatsymblkdiag.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/sparmatblk.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/matfull.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/polygon.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/spherical_code.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/random.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/tesselator.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/random_vector.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/project_ellipse.cc"
-    "${PROJECT_SOURCE_DIR}/src/math/SFMT.c"
+    "${SRC_MATH_DIR}/vector1.cc"
+    "${SRC_MATH_DIR}/vector2.cc"
+    "${SRC_MATH_DIR}/vector3.cc"
+    "${SRC_MATH_DIR}/matrix11.cc"
+    "${SRC_MATH_DIR}/matrix22.cc"
+    "${SRC_MATH_DIR}/matrix33.cc"
+    "${SRC_MATH_DIR}/matrix34.cc"
+    "${SRC_MATH_DIR}/rasterizer.cc"
+    "${SRC_MATH_DIR}/sparmatsym1.cc"
+    "${SRC_MATH_DIR}/sparmatsym2.cc"
+    "${SRC_MATH_DIR}/sparmatsymblk.cc"
+    "${SRC_MATH_DIR}/sparmatsymblkdiag.cc"
+    "${SRC_MATH_DIR}/sparmatblk.cc"
+    "${SRC_MATH_DIR}/matfull.cc"
+    "${SRC_MATH_DIR}/polygon.cc"
+    "${SRC_MATH_DIR}/spherical_code.cc"
+    "${SRC_MATH_DIR}/random.cc"
+    "${SRC_MATH_DIR}/tesselator.cc"
+    "${SRC_MATH_DIR}/random_vector.cc"
+    "${SRC_MATH_DIR}/project_ellipse.cc"
+    "${SRC_MATH_DIR}/quartic_solver.cc"
+    "${SRC_MATH_DIR}/SFMT.c"
 )
 
 add_library(${MATH_LIB_TARGET} STATIC ${MATH_SOURCES})
 target_include_directories(${MATH_LIB_TARGET} PUBLIC
-    "${MATH_SRC_DIR}"
-    "${BASE_SRC_DIR}"
+    "${SRC_MATH_DIR}"
+    "${SRC_BASE_DIR}"
 )
 
 if(BUILD_CYTOSIM_TESTS)
-    add_library(rasterizerGL "${PROJECT_SOURCE_DIR}/src/math/rasterizer.cc")
+    add_library(rasterizerGL "${SRC_MATH_DIR}/rasterizer.cc")
     target_compile_definitions(rasterizerGL PRIVATE -DDISPLAY)
     target_include_directories(rasterizerGL PUBLIC
-        "${MATH_SRC_DIR}"
-        "${BASE_SRC_DIR}"
-        "${DISP_SRC_DIR}"
+        "${SRC_MATH_DIR}"
+        "${SRC_BASE_DIR}"
+        "${SRC_DISP_DIR}"
     )
 endif()

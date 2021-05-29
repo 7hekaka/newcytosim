@@ -69,19 +69,15 @@ test write / read systematically on all cym files
 
 # Dissemination
 
-- create a Vanilla version of Cytosim: cytosim.core,
+- Create a Vanilla version of Cytosim: cytosim.core,
     where Hands, Single, Couple and Fiber are final (not derived) classes,
     and Fiber implements ClassicFiber, and Single implements Picket
 - Video tutorial to install and run cytosim (pombe simulation)
 - Video tutorial to do something simple (self-organization / contraction?)
 - Processing-style single-window GUI to start Cytosim
 - IKEA/LEGO style step-by-step manual with minimal text
-- Bare-bone version of Cytosim for contract (no field, no bead)
-- create an config file editor with a 'run' button on top, alike Processing
-- create syntax-color highligting file for cytosim, in some editor
+- maintain Manu's syntax-color highligting file for cytosim
 - create 2D tutorial on how to place objects
-- complete public version without sensitive code
-- organize 3rd CYTOSIM practical course in Porquerolles (yeah!)
 - export to X3D format, and install viewer within a browser
 
 # Future work:
@@ -90,17 +86,15 @@ test write / read systematically on all cym files
 - Represents an actin filament with two strands... a microtubule with 13.
      the strands can be in register, such that vertices describe circles in 3D, 
      while the abscissaM() can be shifted appropriately
-- New space CylinderX equivalent to CylinderZ, but in the X direction
 
 Build:
 
-- build with modern 'make' like
+- build with modern 'make', eg:
     scons: http://www.scons.org instead of make
     cmake: http://www.cmake.org
     meson: https://mesonbuild.com
 - Replace GLUT:
     glfw:  http://www.glfw.org/index.html
-    Qt  :  http://qt.digia.com
 - new font renderer, eg. FreeType (http://www.freetype.org/index.html)
 
 # Performance:
