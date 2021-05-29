@@ -31,7 +31,7 @@ typedef Grid<real, DIM> grid_type;
 grid_type myGrid;
 
 size_t cell_indx;
-int coord[DIM];
+int coord[4] = { 0 };
 Vector3 pos(0,0,0);
 Vector3 nod(0,0,0);
 
@@ -159,7 +159,7 @@ void display(View& view, int)
 #if ( DIM >= 3 )
     Vector3 dir = gle::depthAxis();
     drawValues(myGrid, field_color, 0, dir, 0);
-#else
+#elif ( DIM > 1 )
     drawValues(myGrid, field_color, 0);
 #endif
     
