@@ -1,175 +1,98 @@
 set(SOURCES_SPACES
-    "${SRC_SIM_DIR}/space.cc"
-    "${SRC_SIM_DIR}/space_prop.cc"
-    "${SRC_SIM_DIR}/spaces/space_square.cc"
-    "${SRC_SIM_DIR}/spaces/space_sphere.cc"
-    "${SRC_SIM_DIR}/spaces/space_dice.cc"
-    "${SRC_SIM_DIR}/spaces/space_torus.cc"
-    "${SRC_SIM_DIR}/spaces/space_polygon.cc"
-    "${SRC_SIM_DIR}/spaces/space_banana.cc"
-    "${SRC_SIM_DIR}/spaces/space_ellipse.cc"
-    "${SRC_SIM_DIR}/spaces/space_cylinder.cc"
-    "${SRC_SIM_DIR}/spaces/space_cylinderZ.cc"
-    "${SRC_SIM_DIR}/spaces/space_capsule.cc"
-    "${SRC_SIM_DIR}/spaces/space_strip.cc"
-    "${SRC_SIM_DIR}/spaces/space_periodic.cc"
-    "${SRC_SIM_DIR}/spaces/space_cylinderP.cc"
-    
-    "${SRC_SIM_DIR}/spaces/space_dynamic_prop.cc"
-    "${SRC_SIM_DIR}/spaces/space_dynamic_ellipse.cc"
-    "${SRC_SIM_DIR}/spaces/space_dynamic_sphere.cc"
-    
-    "${SRC_SIM_DIR}/spaces/space_force.cc"
-    "${SRC_SIM_DIR}/spaces/space_polygonZ.cc"
-    "${SRC_SIM_DIR}/spaces/space_tee.cc"
-    "${SRC_SIM_DIR}/spaces/space_disc.cc"
-    "${SRC_SIM_DIR}/spaces/space_lid.cc"
-    "${SRC_SIM_DIR}/spaces/space_ring.cc"
-    "${SRC_SIM_DIR}/spaces/space_mesh.cc"
+    spaces/space_square.cc
+    spaces/space_sphere.cc
+    spaces/space_dice.cc
+    spaces/space_torus.cc
+    spaces/space_polygon.cc
+    spaces/space_banana.cc
+    spaces/space_ellipse.cc
+    spaces/space_cylinder.cc
+    spaces/space_cylinderZ.cc
+    spaces/space_capsule.cc
+    spaces/space_strip.cc
+    spaces/space_periodic.cc
+    spaces/space_cylinderP.cc
+    spaces/space_dynamic_prop.cc
+    spaces/space_dynamic_ellipse.cc
+    spaces/space_dynamic_sphere.cc
+    spaces/space_force.cc
+    spaces/space_polygonZ.cc
+    spaces/space_tee.cc
+    spaces/space_disc.cc
+    spaces/space_lid.cc
+    spaces/space_ring.cc
+    spaces/space_mesh.cc
 )
 
 set(SOURCES_SIM
-    "${SRC_SIM_DIR}/modulo.cc"
-    "${SRC_SIM_DIR}/movable.cc"
-    "${SRC_SIM_DIR}/mecable.cc"
-    "${SRC_SIM_DIR}/mecapoint.cc"
-    "${SRC_SIM_DIR}/interpolation.cc"
-    "${SRC_SIM_DIR}/interpolation4.cc"
-    "${SRC_SIM_DIR}/fiber_segment.cc"
-    "${SRC_SIM_DIR}/lattice.cc"
-    "${SRC_SIM_DIR}/object.cc"
-    "${SRC_SIM_DIR}/object_pool.cc"
-    "${SRC_SIM_DIR}/object_set.cc"
-    "${SRC_SIM_DIR}/fiber_site.cc"
-    
-    "${SRC_SIM_DIR}/sphere_prop.cc"
-    "${SRC_SIM_DIR}/sphere.cc"
-    "${SRC_SIM_DIR}/sphere_set.cc"
-    
-    "${SRC_SIM_DIR}/bead.cc"
-    "${SRC_SIM_DIR}/bead_set.cc"
-    
-    "${SRC_SIM_DIR}/solid_prop.cc"
-    "${SRC_SIM_DIR}/solid.cc"
-    "${SRC_SIM_DIR}/solid_set.cc"
-    
-    "${SRC_SIM_DIR}/field.cc"
-    "${SRC_SIM_DIR}/field_prop.cc"
-    "${SRC_SIM_DIR}/field_set.cc"
-    
-    "${SRC_SIM_DIR}/event.cc"
-    "${SRC_SIM_DIR}/event_set.cc"
-    
-    "${SRC_SIM_DIR}/tubule_prop.cc"
-    "${SRC_SIM_DIR}/tubule.cc"
-    "${SRC_SIM_DIR}/tubule_set.cc"
-    
-    "${SRC_SIM_DIR}/meca.cc"
-    "${SRC_SIM_DIR}/simul_prop.cc"
-    "${SRC_SIM_DIR}/fiber_grid.cc"
-    "${SRC_SIM_DIR}/point_grid.cc"
-    "${SRC_SIM_DIR}/locus_grid.cc"
-    "${SRC_SIM_DIR}/space_set.cc"
-    "${SRC_SIM_DIR}/simul.cc"
-    "${SRC_SIM_DIR}/interface.cc"
-    "${SRC_SIM_DIR}/parser.cc"
+    modulo.cc movable.cc
+    mecable.cc meca.cc mecapoint.cc
+    interpolation.cc interpolation4.cc
+    fiber_segment.cc fiber_site.cc
+    lattice.cc
+    object.cc object_pool.cc object_set.cc
+    sphere_prop.cc sphere.cc sphere_set.cc
+    bead.cc bead_set.cc
+    solid_prop.cc solid.cc solid_set.cc
+    field.cc field_prop.cc field_set.cc
+    event.cc event_set.cc
+    chain.cc mecafil.cc
+    fiber.cc fiber_prop.cc fiber_set.cc
+    hand.cc hand_list.cc hand_prop.cc
+    single.cc single_prop.cc single_set.cc
+    couple.cc couple_prop.cc couple_set.cc
+    organizer.cc organizer_set.cc
+    tubule_prop.cc tubule.cc tubule_set.cc
+    fiber_grid.cc point_grid.cc locus_grid.cc
+    space.cc space_prop.cc space_set.cc
+    simul.cc simul_prop.cc
+    interface.cc parser.cc
 )
 
 set(SOURCES_HANDS
-    "${SRC_SIM_DIR}/hand.cc"
-    "${SRC_SIM_DIR}/hand_list.cc"
-    "${SRC_SIM_DIR}/hand_prop.cc"
-    "${SRC_SIM_DIR}/hands/motor.cc"
-    "${SRC_SIM_DIR}/hands/motor_prop.cc"
-    "${SRC_SIM_DIR}/hands/slider.cc"
-    "${SRC_SIM_DIR}/hands/slider_prop.cc"
-    "${SRC_SIM_DIR}/hands/actor.cc"
-    "${SRC_SIM_DIR}/hands/actor_prop.cc"
-    "${SRC_SIM_DIR}/hands/nucleator.cc"
-    "${SRC_SIM_DIR}/hands/nucleator_prop.cc"
-    "${SRC_SIM_DIR}/hands/tracker.cc"
-    "${SRC_SIM_DIR}/hands/tracker_prop.cc"
-    "${SRC_SIM_DIR}/hands/cutter.cc"
-    "${SRC_SIM_DIR}/hands/cutter_prop.cc"
-    "${SRC_SIM_DIR}/hands/rescuer.cc"
-    "${SRC_SIM_DIR}/hands/rescuer_prop.cc"
-    "${SRC_SIM_DIR}/hands/mighty.cc"
-    "${SRC_SIM_DIR}/hands/mighty_prop.cc"
-    
-    "${SRC_SIM_DIR}/hands/chewer_prop.cc"
-    "${SRC_SIM_DIR}/hands/chewer.cc"
-    "${SRC_SIM_DIR}/hands/walker_prop.cc"
-    "${SRC_SIM_DIR}/hands/walker.cc"
-    "${SRC_SIM_DIR}/hands/regulator_prop.cc"
-    "${SRC_SIM_DIR}/hands/regulator.cc"
-    
-    "${SRC_SIM_DIR}/hands/digit_prop.cc"
-    "${SRC_SIM_DIR}/hands/digit.cc"
-    "${SRC_SIM_DIR}/hands/myosin_prop.cc"
-    "${SRC_SIM_DIR}/hands/myosin.cc"
-    "${SRC_SIM_DIR}/hands/dynein_prop.cc"
-    "${SRC_SIM_DIR}/hands/dynein.cc"
-    "${SRC_SIM_DIR}/hands/kinesin_prop.cc"
-    "${SRC_SIM_DIR}/hands/kinesin.cc"
+    hands/motor.cc hands/motor_prop.cc
+    hands/slider.cc hands/slider_prop.cc
+    hands/actor.cc hands/actor_prop.cc
+    hands/nucleator.cc hands/nucleator_prop.cc
+    hands/tracker.cc hands/tracker_prop.cc
+    hands/cutter.cc hands/cutter_prop.cc
+    hands/rescuer.cc hands/rescuer_prop.cc
+    hands/mighty.cc hands/mighty_prop.cc
+    hands/chewer_prop.cc hands/chewer.cc
+    hands/walker_prop.cc hands/walker.cc
+    hands/regulator_prop.cc hands/regulator.cc
+    hands/digit_prop.cc hands/digit.cc
+    hands/myosin_prop.cc hands/myosin.cc
+    hands/dynein_prop.cc hands/dynein.cc
+    hands/kinesin_prop.cc hands/kinesin.cc
 )
 
 set(SOURCES_FIBERS
-    "${SRC_SIM_DIR}/chain.cc"
-    "${SRC_SIM_DIR}/fiber.cc"
-    "${SRC_SIM_DIR}/mecafil.cc"
-    "${SRC_SIM_DIR}/fiber_prop.cc"
-    "${SRC_SIM_DIR}/fiber_set.cc"
-    "${SRC_SIM_DIR}/fibers/dynamic_fiber.cc"
-    "${SRC_SIM_DIR}/fibers/dynamic_fiber_prop.cc"
-    "${SRC_SIM_DIR}/fibers/classic_fiber.cc"
-    "${SRC_SIM_DIR}/fibers/classic_fiber_prop.cc"
-    "${SRC_SIM_DIR}/fibers/treadmilling_fiber.cc"
-    "${SRC_SIM_DIR}/fibers/treadmilling_fiber_prop.cc"
-    "${SRC_SIM_DIR}/fibers/growing_fiber.cc"
-    "${SRC_SIM_DIR}/fibers/growing_fiber_prop.cc"
+    fibers/dynamic_fiber.cc fibers/dynamic_fiber_prop.cc
+    fibers/classic_fiber.cc fibers/classic_fiber_prop.cc
+    fibers/treadmilling_fiber.cc fibers/treadmilling_fiber_prop.cc
+    fibers/growing_fiber.cc fibers/growing_fiber_prop.cc
 )
 
 set(SOURCES_SINGLES
-    "${SRC_SIM_DIR}/single.cc"
-    "${SRC_SIM_DIR}/single_prop.cc"
-    "${SRC_SIM_DIR}/single_set.cc"
-    "${SRC_SIM_DIR}/singles/picket.cc"
-    "${SRC_SIM_DIR}/singles/picket_long.cc"
-    "${SRC_SIM_DIR}/singles/wrist.cc"
-    "${SRC_SIM_DIR}/singles/wrist_long.cc"
+    singles/picket.cc singles/picket_long.cc
+    singles/wrist.cc singles/wrist_long.cc
 )
 
 set(SOURCES_COUPLES
-    "${SRC_SIM_DIR}/couple.cc"
-    "${SRC_SIM_DIR}/couple_prop.cc"
-    "${SRC_SIM_DIR}/couple_set.cc"
-    "${SRC_SIM_DIR}/couples/couple_long.cc"
-    "${SRC_SIM_DIR}/couples/crosslink.cc"
-    "${SRC_SIM_DIR}/couples/crosslink_long.cc"
-    "${SRC_SIM_DIR}/couples/crosslink_prop.cc"
-    "${SRC_SIM_DIR}/couples/bridge.cc"
-    "${SRC_SIM_DIR}/couples/bridge_prop.cc"
-    "${SRC_SIM_DIR}/couples/shackle.cc"
-    "${SRC_SIM_DIR}/couples/shackle_long.cc"
-    "${SRC_SIM_DIR}/couples/shackle_prop.cc"
-    "${SRC_SIM_DIR}/couples/fork.cc"
-    "${SRC_SIM_DIR}/couples/fork_prop.cc"
-    "${SRC_SIM_DIR}/couples/duo.cc"
-    "${SRC_SIM_DIR}/couples/duo_prop.cc"
-    "${SRC_SIM_DIR}/couples/duo_long.cc"
+    couples/couple_long.cc
+    couples/crosslink.cc couples/crosslink_long.cc couples/crosslink_prop.cc
+    couples/bridge.cc couples/bridge_prop.cc
+    couples/shackle.cc couples/shackle_long.cc couples/shackle_prop.cc
+    couples/fork.cc couples/fork_prop.cc
+    couples/duo.cc couples/duo_prop.cc couples/duo_long.cc
 )
 
 set(SOURCES_ORGANIZERS
-    "${SRC_SIM_DIR}/organizer.cc"
-    "${SRC_SIM_DIR}/organizer_set.cc"
-    "${SRC_SIM_DIR}/organizers/aster.cc"
-    "${SRC_SIM_DIR}/organizers/aster_prop.cc"
-    "${SRC_SIM_DIR}/organizers/nucleus.cc"
-    "${SRC_SIM_DIR}/organizers/nucleus_prop.cc"
-    "${SRC_SIM_DIR}/organizers/fake.cc"
-    "${SRC_SIM_DIR}/organizers/fake_prop.cc"
-    "${SRC_SIM_DIR}/organizers/bundle.cc"
-    "${SRC_SIM_DIR}/organizers/bundle_prop.cc"
+    organizers/aster.cc organizers/aster_prop.cc
+    organizers/nucleus.cc organizers/nucleus_prop.cc
+    organizers/fake.cc organizers/fake_prop.cc
+    organizers/bundle.cc organizers/bundle_prop.cc
 )
 
 set(SOURCES_CYTOSIM
@@ -182,20 +105,23 @@ set(SOURCES_CYTOSIM
     "${SOURCES_ORGANIZERS}"
 )
 
+# objects containing graphical code under the DISPLAY keyword:
+set(SOURCES_CYTOSIM_DISPLAY
+    ${SOURCES_SPACES}
+    field.cc
+    fiber_grid.cc
+    point_grid.cc
+)
+
+list(TRANSFORM SOURCES_CYTOSIM PREPEND "${SRC_SIM_DIR}/")
+list(TRANSFORM SOURCES_CYTOSIM_DISPLAY PREPEND "${SRC_SIM_DIR}/")
+
 add_library(${SIM_LIB_TARGET} STATIC ${SOURCES_CYTOSIM})
 
 target_include_directories(${SIM_LIB_TARGET} PUBLIC
     "${SRC_MATH_DIR}"
     "${SRC_BASE_DIR}"
     "${SRC_SIM_ALL_DIR}"
-)
-
-# objects containing graphical code under the DISPLAY keyword:
-set(SOURCES_CYTOSIM_DISPLAY
-    "${SOURCES_SPACES}"
-    "${SRC_SIM_DIR}/field.cc"
-    "${SRC_SIM_DIR}/fiber_grid.cc"
-    "${SRC_SIM_DIR}/point_grid.cc"
 )
 
 #set(SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_CYTOSIM})
