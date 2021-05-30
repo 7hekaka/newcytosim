@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
                         frm = reader.currentFrame();
                 }
                 catch( Exception & e ) {
-                    printf("reader.loadFrame(%lu) exception: %s\n", f, e.msg());
+                    printf("reader.loadFrame(%lu) exception: %s\n", f, e.what());
                 }
             }
         }
@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
                     if ( err ) printf("reader.loadNextFrame error: %i\n", err);
                 }
                 catch( Exception & e ) {
-                    printf("reader.loadNextFrame exception: %s\n", e.msg());
+                    printf("reader.loadNextFrame exception: %s\n", e.what());
                 }
                 break;
             case 'w':

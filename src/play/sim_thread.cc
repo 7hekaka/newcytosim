@@ -155,7 +155,7 @@ void SimThread::extend_run()
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
         simul_.relax();
-        //flashText("Error: %s", e.msg());
+        //flashText("Error: %s", e.what());
     }
     hold_callback();
 }

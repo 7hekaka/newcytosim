@@ -60,8 +60,8 @@ public:
         return "";
     }
 
-    /// return copy of the message as C-string
-    char const* msg() const
+    /// return C-string pointer to message
+    char const* what() const
     {
         return msg_.c_str();
     }

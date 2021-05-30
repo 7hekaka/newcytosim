@@ -2336,7 +2336,7 @@ void Meca::exportSystem() const
 //------------------------------------------------------------------------------
 #pragma mark - Functions to export in binary format
 
-void dumpVector(FILE * file, size_t dim, real* vec, bool nat)
+static void dumpVector(FILE * file, size_t dim, real* vec, bool nat)
 {
     static float * low = nullptr;
     static size_t alc = 0;

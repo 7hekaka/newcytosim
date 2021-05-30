@@ -195,7 +195,7 @@ void setGeometry()
     }
     catch( Exception & e )
     {
-        printf("Error: `%s'\n", e.msg());
+        printf("Error: `%s'\n", e.what());
     }
     
     try {
@@ -204,7 +204,7 @@ void setGeometry()
     }
     catch( Exception & e )
     {
-        printf("Error: `%s'\n", e.msg());
+        printf("Error: `%s'\n", e.what());
     }
 
     glApp::postRedisplay();
