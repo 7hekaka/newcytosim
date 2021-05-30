@@ -175,14 +175,16 @@ int main(int argc, char* argv[])
         magnify = 3;
     }
     
-    if ( arg.use_key("movie") )
-    {
-        prop.image_name = "movie";
-        mode = SAVE_MOVIE;
-    }
-    
     if ( arg.use_key("on") )
         style = ONSCREEN;
+    
+    if ( arg.set(prop.image_name, ".ppm") )
+    {
+        prop.image_format = "ppm";
+        mode = SAVE_IMAGE;
+    }
+    else if ( arg.use_key("ppm") )
+        prop.image_format = "ppm";
     
     if ( arg.set(prop.image_name, ".png") )
     {
@@ -191,7 +193,7 @@ int main(int argc, char* argv[])
     }
     else if ( arg.use_key("png") )
         prop.image_format = "png";
-
+    
     if ( arg.set(prop.image_name, ".tga") )
     {
         prop.image_format = "tga";
@@ -199,6 +201,13 @@ int main(int argc, char* argv[])
     }
     else if ( arg.use_key("tga") )
         prop.image_format = "tga";
+    
+    if ( arg.use_key("movie") )
+    {
+        if ( mode == NORMAL )
+            prop.image_name = "movie";
+        mode = SAVE_MOVIE;
+    }
 
     // get image over-sampling:
     arg.set(magnify, "magnify") || arg.set(magnify, "mag");
