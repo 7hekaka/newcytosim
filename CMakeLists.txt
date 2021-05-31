@@ -24,10 +24,11 @@ if(DEFINED DIMENSION)
 endif()
 
 
-option(BUILD_SIM_EXECUTABLE "build the cytosim simulation executable" ON)
-option(BUILD_PLAY_EXECUTABLE "build the cytosim OpenGL viewer" ON)
-option(BUILD_CYTOSIM_TOOLS "build all cytosim/tools executables" ON)
-option(BUILD_CYTOSIM_TESTS "build all cytosim/test executables" ON)
+option(BUILD_SIM "build the simulation executable" ON)
+option(BUILD_PLAY "build the Graphical viewer" ON)
+option(BUILD_REPORT "build the report executable" OFF)
+option(BUILD_TOOLS "build all cytosim/tools executables" ON)
+option(BUILD_TESTS "build all cytosim/test executables" ON)
 
 
 set(SRC_BASE_DIR "${PROJECT_SOURCE_DIR}/src/base")
@@ -79,7 +80,7 @@ if(NOT UNIX)
     message(FATAL_ERROR "CMake File currently only setup to build on Linux and Mac")
 endif()
 
-if(BUILD_PLAY_EXECUTABLE OR BUILD_CYTOSIM_TESTS OR BUILD_CYTOSIM_TOOLS)
+if(BUILD_PLAY OR BUILD_TESTS OR BUILD_TOOLS)
     if(UNIX AND NOT APPLE)
         message("Building for Linux")
         find_package(GLUT)

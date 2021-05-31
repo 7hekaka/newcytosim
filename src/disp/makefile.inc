@@ -37,4 +37,4 @@ offscreen.o: offscreen.cc offscreen.h offscreen_fbo.cc offscreen_glx.cc
 
 
 $(OBJ_DISP): %.o: %.cc %.h | build
-	$(COMPILE) -Isrc/math -Isrc/base -Isrc/sim -c $< -o build/$@
+	$(COMPILE) -Isrc/math -Isrc/base -c $< -o build/$@

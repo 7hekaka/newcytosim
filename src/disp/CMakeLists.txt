@@ -22,5 +22,4 @@ add_library(${DISP_LIB_TARGET} STATIC ${SOURCES_DISP})
 target_include_directories(${DISP_LIB_TARGET} PUBLIC
     "${SRC_MATH_DIR}"
     "${SRC_BASE_DIR}"
-    "${SRC_SIM_ALL_DIR}"
 )

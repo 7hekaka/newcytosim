@@ -29,14 +29,14 @@ set(TOOL_LIST
 )
 
 # Build the Tools
-foreach(TOOL_NAME ${TOOL_LIST})
-    add_executable("${TOOL_NAME}" ${SOURCES_TOOL} "${SRC_TOOLS_DIR}/${TOOL_NAME}.cc")
+foreach(TOOL ${TOOL_LIST})
+    add_executable("${TOOL}" ${SOURCES_TOOL} "${SRC_TOOLS_DIR}/${TOOL}.cc")
     set_source_files_properties(
         PROPERTIES
         EXTERNAL_OBJECT true
         GENERATED true
     )
-    target_link_libraries(${TOOL_NAME} PUBLIC "${TOOL_LIBS}")
-    target_include_directories(${TOOL_NAME} PUBLIC ${TOOL_INCLUDES})
+    target_link_libraries(${TOOL} PUBLIC "${TOOL_LIBS}")
+    target_include_directories(${TOOL} PUBLIC ${TOOL_INCLUDES})
 endforeach()
 

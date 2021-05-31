@@ -13,7 +13,7 @@ set(SOURCES_PLAY
 
 list(TRANSFORM SOURCES_PLAY PREPEND "${SRC_PLAY_DIR}/")
 
-if(BUILD_PLAY_EXECUTABLE)
+if(BUILD_PLAY)
     add_executable(${PLAY_TARGET} ${SOURCES_PLAY})
 
     target_link_libraries(${PLAY_TARGET} PUBLIC
@@ -30,7 +30,7 @@ if(BUILD_PLAY_EXECUTABLE)
     target_include_directories(${PLAY_TARGET} PUBLIC
         "${SRC_MATH_DIR}"
         "${SRC_BASE_DIR}"
-        "${SRC_SIM_ALL_DIR}"
+        "${SRC_SIM_DIR}"
         "${SRC_DISP_DIR}"
     )
-endif(BUILD_PLAY_EXECUTABLE)
+endif(BUILD_PLAY)

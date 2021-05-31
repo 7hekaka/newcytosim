@@ -3,7 +3,8 @@
 #include "fiber_disp.h"
 #include "glossary.h"
 #include "random.h"
-#include "sim.h" // only to define BACKWARD_COMPATIBILITY
+
+#define BACKWARD_COMPATIBILITY
 
 
 void FiberDisp::clear()

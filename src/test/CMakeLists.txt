@@ -29,15 +29,15 @@ set(TEST_LIST
     "test_string"
 )
 
-foreach(TEST_NAME ${TEST_LIST})
-    add_executable("${TEST_NAME}" "${SRC_TEST_DIR}/${TEST_NAME}.cc")
+foreach(TEST ${TEST_LIST})
+    add_executable("${TEST}" "${SRC_TEST_DIR}/${TEST}.cc")
     set_source_files_properties(
         PROPERTIES
         EXTERNAL_OBJECT true
         GENERATED true
     )
-    target_include_directories(${TEST_NAME} PUBLIC "${TEST_INCLUDES}")
-    target_link_libraries(${TEST_NAME} PUBLIC "${TEST_LIBS}")
+    target_include_directories(${TEST} PUBLIC "${TEST_INCLUDES}")
+    target_link_libraries(${TEST} PUBLIC "${TEST_LIBS}")
 endforeach()
 
 set(TEST_GL_LIBS
@@ -63,8 +63,8 @@ set(GL_TEST_LIST
     "test_solve"
 )
 
-foreach(TEST_NAME ${GL_TEST_LIST})
-    add_executable(${TEST_NAME} "${SRC_TEST_DIR}/${TEST_NAME}.cc")
-    target_include_directories(${TEST_NAME} PUBLIC "${TEST_INCLUDES}")
-    target_link_libraries(${TEST_NAME} PUBLIC "${TEST_GL_LIBS}")
+foreach(TEST ${GL_TEST_LIST})
+    add_executable(${TEST} "${SRC_TEST_DIR}/${TEST}.cc")
+    target_include_directories(${TEST} PUBLIC "${TEST_INCLUDES}")
+    target_link_libraries(${TEST} PUBLIC "${TEST_GL_LIBS}")
 endforeach()
