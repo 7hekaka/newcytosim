@@ -1,19 +1,21 @@
 set(SOURCES_DISP
-    "${SRC_DISP_DIR}/gle.cc"
-    "${SRC_DISP_DIR}/gle_flute.cc"
-    "${SRC_DISP_DIR}/gle_zoo.cc"
-    "${SRC_DISP_DIR}/gle_color.cc"
-    "${SRC_DISP_DIR}/gle_color_list.cc"
-    "${SRC_DISP_DIR}/view.cc"
-    "${SRC_DISP_DIR}/view_prop.cc"
-    "${SRC_DISP_DIR}/grid_display.cc"
-    "${SRC_DISP_DIR}/glapp.cc"
-    "${SRC_DISP_DIR}/saveimage.cc"
-    "${SRC_DISP_DIR}/offscreen.cc"
-    "${SRC_DISP_DIR}/fiber_disp.cc"
-    "${SRC_DISP_DIR}/line_disp.cc"
-    "${SRC_DISP_DIR}/point_disp.cc"
+    gle.cc
+    gle_flute.cc
+    gle_zoo.cc
+    gle_color.cc
+    gle_color_list.cc
+    view.cc
+    view_prop.cc
+    grid_display.cc
+    glapp.cc
+    saveimage.cc
+    offscreen.cc
+    fiber_disp.cc
+    line_disp.cc
+    point_disp.cc
 )
+
+list(TRANSFORM SOURCES_DISP PREPEND "${SRC_DISP_DIR}/")
 
 add_library(${DISP_LIB_TARGET} STATIC ${SOURCES_DISP})
 

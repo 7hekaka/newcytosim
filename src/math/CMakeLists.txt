@@ -1,29 +1,31 @@
-set(MATH_SOURCES
-    "${SRC_MATH_DIR}/vector1.cc"
-    "${SRC_MATH_DIR}/vector2.cc"
-    "${SRC_MATH_DIR}/vector3.cc"
-    "${SRC_MATH_DIR}/matrix11.cc"
-    "${SRC_MATH_DIR}/matrix22.cc"
-    "${SRC_MATH_DIR}/matrix33.cc"
-    "${SRC_MATH_DIR}/matrix34.cc"
-    "${SRC_MATH_DIR}/rasterizer.cc"
-    "${SRC_MATH_DIR}/sparmatsym1.cc"
-    "${SRC_MATH_DIR}/sparmatsym2.cc"
-    "${SRC_MATH_DIR}/sparmatsymblk.cc"
-    "${SRC_MATH_DIR}/sparmatsymblkdiag.cc"
-    "${SRC_MATH_DIR}/sparmatblk.cc"
-    "${SRC_MATH_DIR}/matfull.cc"
-    "${SRC_MATH_DIR}/polygon.cc"
-    "${SRC_MATH_DIR}/spherical_code.cc"
-    "${SRC_MATH_DIR}/random.cc"
-    "${SRC_MATH_DIR}/tesselator.cc"
-    "${SRC_MATH_DIR}/random_vector.cc"
-    "${SRC_MATH_DIR}/project_ellipse.cc"
-    "${SRC_MATH_DIR}/quartic_solver.cc"
-    "${SRC_MATH_DIR}/SFMT.c"
+set(SOURCES_MATH
+    vector1.cc
+    vector2.cc
+    vector3.cc
+    matrix11.cc
+    matrix22.cc
+    matrix33.cc
+    matrix34.cc
+    rasterizer.cc
+    sparmatsym1.cc
+    sparmatsym2.cc
+    sparmatsymblk.cc
+    sparmatsymblkdiag.cc
+    sparmatblk.cc
+    matfull.cc
+    polygon.cc
+    spherical_code.cc
+    random.cc
+    tesselator.cc
+    random_vector.cc
+    project_ellipse.cc
+    quartic_solver.cc
+    SFMT.c
 )
 
-add_library(${MATH_LIB_TARGET} STATIC ${MATH_SOURCES})
+list(TRANSFORM SOURCES_MATH PREPEND "${SRC_MATH_DIR}/")
+
+add_library(${MATH_LIB_TARGET} STATIC ${SOURCES_MATH})
 target_include_directories(${MATH_LIB_TARGET} PUBLIC
     "${SRC_MATH_DIR}"
     "${SRC_BASE_DIR}"

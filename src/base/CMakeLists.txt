@@ -1,23 +1,25 @@
-set(BASE_SOURCES
-    "${SRC_BASE_DIR}/operator_new.cc"
-    "${SRC_BASE_DIR}/messages.cc"
-    "${SRC_BASE_DIR}/filewrapper.cc"
-    "${SRC_BASE_DIR}/filepath.cc"
-    "${SRC_BASE_DIR}/iowrapper.cc"
-    "${SRC_BASE_DIR}/exceptions.cc"
-    "${SRC_BASE_DIR}/tictoc.cc"
-    "${SRC_BASE_DIR}/node.cc"
-    "${SRC_BASE_DIR}/inventory.cc"
-    "${SRC_BASE_DIR}/stream_func.cc"
-    "${SRC_BASE_DIR}/tokenizer.cc"
-    "${SRC_BASE_DIR}/glossary.cc"
-    "${SRC_BASE_DIR}/property.cc"
-    "${SRC_BASE_DIR}/property_list.cc"
-    "${SRC_BASE_DIR}/backtrace.cc"
-    "${SRC_BASE_DIR}/print_color.cc"
+set(SOURCES_BASE
+    operator_new.cc
+    messages.cc
+    filewrapper.cc
+    filepath.cc
+    iowrapper.cc
+    exceptions.cc
+    tictoc.cc
+    node.cc
+    inventory.cc
+    stream_func.cc
+    tokenizer.cc
+    glossary.cc
+    property.cc
+    property_list.cc
+    backtrace.cc
+    print_color.cc
 )
 
-add_library(${BASE_LIB_TARGET} STATIC ${BASE_SOURCES})
+list(TRANSFORM SOURCES_BASE PREPEND "${SRC_BASE_DIR}/")
+
+add_library(${BASE_LIB_TARGET} STATIC ${SOURCES_BASE})
 
 set_source_files_properties(
     PROPERTIES

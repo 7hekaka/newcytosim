@@ -1,16 +1,17 @@
 set(SOURCES_PLAY
-    "${SRC_PLAY_DIR}/frame_reader.cc"
-    "${SRC_PLAY_DIR}/display_prop.cc"
-    "${SRC_DISP_DIR}/gle_flute.cc"
-    "${SRC_PLAY_DIR}/display.cc"
-    "${SRC_PLAY_DIR}/display1.cc"
-    "${SRC_PLAY_DIR}/display2.cc"
-    "${SRC_PLAY_DIR}/display3.cc"
-    "${SRC_PLAY_DIR}/sim_thread.cc"
-    "${SRC_PLAY_DIR}/player_prop.cc"
-    "${SRC_PLAY_DIR}/player.cc"
-    "${SRC_PLAY_DIR}/play.cc"
+    frame_reader.cc
+    display_prop.cc
+    display.cc
+    display1.cc
+    display2.cc
+    display3.cc
+    sim_thread.cc
+    player_prop.cc
+    player.cc
+    play.cc
 )
+
+list(TRANSFORM SOURCES_PLAY PREPEND "${SRC_PLAY_DIR}/")
 
 if(BUILD_PLAY_EXECUTABLE)
     add_executable(${PLAY_TARGET} ${SOURCES_PLAY})

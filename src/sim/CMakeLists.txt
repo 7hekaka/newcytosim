@@ -124,21 +124,32 @@ target_include_directories(${SIM_LIB_TARGET} PUBLIC
     "${SRC_SIM_ALL_DIR}"
 )
 
+
 #set(SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_CYTOSIM})
 #list(REMOVE_ITEM SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_CYTOSIM_DISPLAY})
 
 add_library(${SIMG_LIB_TARGET} STATIC ${SOURCES_CYTOSIM})
-target_compile_definitions(${SIMG_LIB_TARGET} PRIVATE DISPLAY)
-foreach(FILE ${SOURCES_CYTOSIM_DISPLAY})
-    #set_source_files_properties(${FILE} TARGET_DIRECTORY ${SIMG_LIB_TARGET} PROPERTIES COMPILE_DEFINITIONS "DISPLAY")
-    #message(${FILE} "will be compiled with -DDISPLAY")
-endforeach()
+
 target_include_directories(${SIMG_LIB_TARGET} PUBLIC
     "${SRC_MATH_DIR}"
     "${SRC_BASE_DIR}"
     "${SRC_SIM_ALL_DIR}"
     "${SRC_DISP_DIR}"
 )
+
+
+# It is only necessary to compile files in ${SOURCES_CYTOSIM_DISPLAY} with this flag
+# but I do not know how to specify this with CMake
+# Hence by setting a target_compile_definitions, all source will be compiled with -DDISPLAY
+
+target_compile_definitions(${SIMG_LIB_TARGET} PRIVATE DISPLAY)
+
+# This below does not work, as it sets the compile options for all targets including the files
+
+foreach(FILE ${SOURCES_CYTOSIM_DISPLAY})
+    #set_source_files_properties(${FILE} TARGET_DIRECTORY ${SIMG_LIB_TARGET} PROPERTIES COMPILE_DEFINITIONS "DISPLAY")
+    #message(${FILE} "will be compiled with -DDISPLAY")
+endforeach()
 
 
 if(BUILD_SIM_EXECUTABLE)
