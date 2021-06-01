@@ -71,7 +71,7 @@ def execute(cmd):
         out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
 def makeNumberedDirectory(root):
-    """Create an empty directories that start with 'root'"""
+    """Create an empty directory named as 'rootXX' with a 2-digits number XX"""
     cnt = 0
     while cnt < 10000:
         name = root + '%02i' % cnt
@@ -80,7 +80,7 @@ def makeNumberedDirectory(root):
             return name
         except OSError:
             cnt += 1
-    out.write("Error: directory '%s' could not be created \n" % root)
+    out.write("Error: directory '%s' could not be created\n" % root)
     return ''
 
 

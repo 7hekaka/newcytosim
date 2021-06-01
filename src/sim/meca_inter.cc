@@ -3508,14 +3508,15 @@ Vector calculateArm(Vector off, Vector const& diff, real len)
 }
 
 /**
- Link `ptA` (A) and `ptB` (B),
+ Link `segA` (A) and `ptB` (B),
  This is a combination of a SideLink with a Sliding Link:
  The force is linear of zero resting length, but it is taken between B,
  and another point S located on the side of A:
  
      S = A + len * N,
  
- where N is a normalized vector orthogonal to the fiber in A, in the direction of B.
+ where N is a normalized vector orthogonal to the fiber in A, in the direction of B,
+ which is obtained by cross product with the segment direction.
  In addition, the tangential part of the force is removed.
  
  If T is the normalized direction of the fiber in A:
@@ -3886,7 +3887,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
 
 
 /**
- Link `ptA` (A) and `ptB` (B),
+ Link `segA` (A) and `ptB` (B),
  This is a combination of Side- and Sliding Links:
  The force is linear of zero resting length, but it is taken between B
  and another point S which is located on the side of A:

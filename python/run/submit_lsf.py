@@ -66,7 +66,7 @@ def makeDirectory(name):
             os.mkdir(name)
             return 2
         except OSError:
-            out.write("Error: directory '%s' could not be created \n" % path)
+            out.write("Error: directory '%s' could not be created\n" % path)
             sys.exit()
     return 0
 
@@ -101,7 +101,7 @@ def makeNumberedDirectory(root):
             return name
         except OSError:
             cnt += 1
-    out.write("Error: directory '%s' could not be created \n" % root)
+    out.write("Error: directory '%s' could not be created\n" % root)
     return ''
 
 #------------------------------------------------------------------------

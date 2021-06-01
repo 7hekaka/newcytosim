@@ -81,7 +81,7 @@ def makeNumberedDirectory(root):
             return name
         except OSError:
             cnt += 1
-    out.write("Error: directory '%s' could not be created \n" % root)
+    out.write("Error: directory '%s' could not be created\n" % root)
     return ''
 
 
