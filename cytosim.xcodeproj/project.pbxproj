@@ -584,6 +584,7 @@
 		BB846BE5116FDEB900A0CD0E /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
 		BB8481B2158348E80076C8C2 /* couple_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8481B0158348E80076C8C2 /* couple_long.cc */; };
 		BB8481B3158348E80076C8C2 /* couple_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8481B1158348E80076C8C2 /* couple_long.h */; };
+		BB855B762667D2C700621C09 /* cympack.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB855B752667D2C700621C09 /* cympack.cc */; };
 		BB882AF80EE82C8B00E29E5C /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB882B1B0EE82C9700E29E5C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB88388F10B48EC400A4028F /* space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388910B48EC400A4028F /* space_prop.cc */; };
@@ -1638,6 +1639,7 @@
 		BB81B86A219EE55F009CA402 /* play_keys.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = play_keys.cc; sourceTree = "<group>"; };
 		BB8481B0158348E80076C8C2 /* couple_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = couple_long.cc; path = couples/couple_long.cc; sourceTree = "<group>"; };
 		BB8481B1158348E80076C8C2 /* couple_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = couple_long.h; path = couples/couple_long.h; sourceTree = "<group>"; };
+		BB855B752667D2C700621C09 /* cympack.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cympack.cc; sourceTree = "<group>"; };
 		BB882B400EE82D6A00E29E5C /* test_bits.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_bits.cc; path = src/test/test_bits.cc; sourceTree = SOURCE_ROOT; };
 		BB88388710B48EC400A4028F /* modulo.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = modulo.cc; path = src/sim/modulo.cc; sourceTree = SOURCE_ROOT; };
 		BB88388810B48EC400A4028F /* modulo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = modulo.h; path = src/sim/modulo.h; sourceTree = SOURCE_ROOT; };
@@ -2808,6 +2810,7 @@
 				BBAB0D36138FAEC6006DEAF9 /* reader.cc */,
 				BBA721BB1462C3B900ACF26D /* report.cc */,
 				BB30391F16FB42C700CDF586 /* reportF.cc */,
+				BB855B752667D2C700621C09 /* cympack.cc */,
 				BBCD6993126F818F00D19DDF /* sieve.cc */,
 				BBE2FB8825680C3500EB88EA /* sweet.cc */,
 			);
@@ -4873,6 +4876,7 @@
 				BB7191B90EF1CD9900CED9E2 /* vector1.cc in Sources */,
 				BB7191BA0EF1CD9900CED9E2 /* vector2.cc in Sources */,
 				BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */,
+				BB855B762667D2C700621C09 /* cympack.cc in Sources */,
 				BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */,
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,

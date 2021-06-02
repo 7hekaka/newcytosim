@@ -52,6 +52,11 @@ reader: reader.cc frame_reader.o $(TOOL_OBJ) | bin
 	$(DONE)
 vpath reader bin
 
+cympack: cympack.cc frame_reader.o $(TOOL_OBJ) | bin
+	$(TOOL_MAKE)
+	$(DONE)
+vpath cympack bin
+
 
 report: report.cc frame_reader.o $(TOOL_OBJ) | bin
 	$(COMPILE) $(TOOL_INC) $(OBJECTS) $(LINK) -o bin/$@

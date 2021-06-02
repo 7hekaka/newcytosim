@@ -26,6 +26,7 @@ set(TOOL_LIST
     "reportF"
     "analyse"
 	"reader"
+    "cympack"
 )
 
 # Build the Tools
