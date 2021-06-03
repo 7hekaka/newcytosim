@@ -7,7 +7,7 @@
  1. a file containing coordinates of the objects: 'points.float32'
     This is a binary file stored either in floating point or fixed point:
     'points.float32' : [ 4 bytes, a floating point in micrometers ]
-    'points.fixed32' : [ 4 bytes, an int32 in picometers ],
+    'points.fixed16' : [ 2 bytes, an int16 = 4096 * micrometer ],
 
  2. a file describing the objects: 'paths.uint32'
     This is a binary file containing uniform records consisting of:
@@ -38,7 +38,7 @@ void help(std::ostream& os)
     os << "1. a file containing coordinates of the objects: 'points.float32'\n";
     os << "   This is a binary file stored either in floating point or fixed point:\n";
     os << "   'points.float32' : [ 4 bytes, a floating point in micrometers ]\n";
-    os << "   'points.fixed32' : [ 4 bytes, an int32 in picometers ],\n";
+    os << "   'points.fixed16' : [ 4 bytes, an int32 = 4096 * micrometer ],\n";
 
     os << "2. a file describing the objects: 'paths.uint32'\n";
     os << "   This is a binary file containing uniform records consisting of:\n";
@@ -51,14 +51,18 @@ void help(std::ostream& os)
     os << "Compiled with DIM=" << DIM << "\n";
 }
 
-
 //------------------------------------------------------------------------------
-#pragma mark - data write
+#pragma mark - Globals
 
 FILE* fileP = nullptr;
 FILE* fileS = nullptr;
 
+int use_fixed16 = 0;
 size_t pointer = 0;
+size_t overflow = 0;
+
+//------------------------------------------------------------------------------
+#pragma mark - Files
 
 FILE * openFile(const char name[], bool binary)
 {
@@ -83,8 +87,16 @@ bool openFiles(const char root[], unsigned frm)
 {
     char str[256] = { 0 };
     pointer = 0;
-    snprintf(str, sizeof(str), "%s%04u.float32", root, frm);
-    fileP = openFile(str, true);
+    if ( use_fixed16 )
+    {
+        snprintf(str, sizeof(str), "%s%04u.fixed16", root, frm);
+        fileP = openFile(str, true);
+    }
+    else
+    {
+        snprintf(str, sizeof(str), "%s%04u.float32", root, frm);
+        fileP = openFile(str, true);
+    }
     snprintf(str, sizeof(str), "%s%04u.uint32", root, frm);
     fileS = openFile(str, true);
     return ( fileP && fileS );
@@ -96,15 +108,37 @@ void closeFiles()
     fclose(fileS); fileS = nullptr;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - data write
 
-void writeVector(Vector3 const& pos)
+int16_t fix(real x)
+{
+    constexpr real SCALE = 2048;
+    long l = std::lround(SCALE*x);
+    int16_t i = (int16_t)l;
+    overflow += ( l != (long)i );
+    //if ( l != (long)i ) fprintf(stderr, "fixed16 overflow %f %li\n", x, l);
+    return i;
+}
+
+void writeVector16(Vector3 const& pos)
+{
+#if ( DIM == 3 )
+    int16_t vec[3] = { fix(pos.XX), fix(pos.YY), fix(pos.ZZ) };
+#else
+    int16_t vec[3] = { fix(pos.XX), fix(pos.YY), 0 };
+#endif
+    fwrite(vec, DIM, sizeof(int16_t), fileP);
+    pointer += DIM;
+}
+
+void writeVector32(Vector3 const& pos)
 {
     float vec[3] = { 0 };
     pos.store(vec);
     fwrite(vec, DIM, sizeof(float), fileP);
     pointer += DIM;
 }
-
 
 void writeObject(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
 {
@@ -114,21 +148,38 @@ void writeObject(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
     fwrite(&d, 1, 4, fileS);
 }
 
-
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void writeFibers(FiberSet const& fibers)
+void writeFibers32(FiberSet const& fibers)
 {
     // process fibers in the natural order:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         size_t start = pointer;
         for ( size_t i = 0; i < fib->nbPoints(); ++i )
-            writeVector(fib->posPoint(i));
+            writeVector32(fib->posPoint(i));
         
         writeObject(fib->prop->number(), fib->identity(), start, pointer);
     }
+}
+
+void writeFibers16(FiberSet const& fibers)
+{
+    overflow = 0;
+    
+    // process fibers in the natural order:
+    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    {
+        size_t start = pointer;
+        for ( size_t i = 0; i < fib->nbPoints(); ++i )
+            writeVector16(fib->posPoint(i));
+        
+        writeObject(fib->prop->number(), fib->identity(), start, pointer);
+    }
+    
+    if ( overflow )
+        fprintf(stderr, "Warning: fixed16 data format overflowed %lu times\n", overflow);
 }
 
 //------------------------------------------------------------------------------
@@ -156,8 +207,7 @@ int main(int argc, char* argv[])
     if ( arg.has_key("directory") )
         FilePath::change_dir(arg.value("directory"));
 
-    bool binary = 1;
-    arg.set(binary, "binary");
+    arg.set(use_fixed16, "fixed");
     std::string input = TRAJECTORY;
     arg.set(input, ".cmo") || arg.set(input, "input");
 
@@ -180,7 +230,10 @@ int main(int argc, char* argv[])
         {
             if ( openFiles(what.c_str(), frm) )
             {
-                writeFibers(simul.fibers);
+                if ( use_fixed16 )
+                    writeFibers16(simul.fibers);
+                else
+                    writeFibers32(simul.fibers);
                 closeFiles();
             }
             ++frm;
