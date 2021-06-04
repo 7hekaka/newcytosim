@@ -120,11 +120,11 @@ public:
         
         for ( int d = 1; d < 4; ++d )
             coef1_[d] = in.readFloat();
-        coef1_[0] = 1.0 - coef1_[1] - coef1_[2] - coef1_[3];
+        coef1_[0] = 1.0 - coef1_[1] - coef1_[2] - coef1_[3] * (DIM==3);
         
         for ( int d = 1; d < 4; ++d )
             coef2_[d] = in.readFloat();
-        coef2_[0] = 1.0 - coef2_[1] - coef2_[2] - coef2_[3];
+        coef2_[0] = 1.0 - coef2_[1] - coef2_[2] - coef2_[3] * (DIM==3);
         
         len_ = rad * ( Vector3(coef1_+1) - Vector3(coef2_+1) ).norm();
         rank_ = calcRank();

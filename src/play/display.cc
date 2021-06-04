@@ -1200,12 +1200,12 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     const auto sup = lat.indexP();
     
     size_t i = 0, cnt = sup - inf + 4;
-    fluteV* flu = gle::mapVertexBuffer(cnt);
+    gle_color col = fib.disp->color;
+    fluteVC* flu = gle::mapVertexColorBuffer(cnt);
     for ( auto h = inf+1; h <= sup; ++h )
-        flu[i++] = fib.posM(uni*h-fib.abscissaM());
-    gle::unmapVertexBuffer();
+        flu[i++] = { fib.posM(uni*h-fib.abscissaM()), col };
+    gle::unmapVertexColorBuffer();
     glDisable(GL_LIGHTING);
-    fib.disp->color.load();
     pointSize(fib.prop->disp->point_size);
     glDrawArrays(GL_POINTS, 0, i);
 }
@@ -1272,18 +1272,19 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
 /// display forces acting on the fiber's vertices, using lines scaled by 'scale'
 void Display::drawFiberForces(Fiber const& fib, real scale) const
 {
+    gle_color col = fib.prop->disp->force_color;
+    gle_color lor = col.alpha_scaled(0.5f);
     size_t cnt = 2 * fib.nbPoints();
-    fluteV* flu = gle::mapVertexBuffer(cnt);
+    fluteVC* flu = gle::mapVertexColorBuffer(cnt);
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {
         Vector P = fib.posP(i);
         Vector F = scale * fib.netForce(i);
-        flu[  2*i] = P;
-        flu[1+2*i] = P+F;
+        flu[  2*i] = { P, col };
+        flu[1+2*i] = { P+F, lor };
     }
-    gle::unmapVertexBuffer();
+    gle::unmapVertexColorBuffer();
     glDisable(GL_LIGHTING);
-    fib.prop->disp->force_color.load();
     glDrawArrays(GL_LINES, 0, cnt);
 }
 
@@ -1973,21 +1974,21 @@ void Display::drawOrganizer(Organizer const& obj) const
     if ( disp && ( disp->style & 2 ))
     {
         Vector P, Q;
-        fluteV* pts = gle::mapVertexBuffer(2*cnt);
-        while ( obj.getLink(i, P, Q) & ( i < cnt ) )
+        gle_color c = bodyColorF(disp, obj.signature());
+        fluteVC* flu = gle::mapVertexColorBuffer(2*cnt);
+        while ( obj.getLink(i, P, Q) )
         {
             if ( modulo ) modulo->fold(Q, P);
-            pts[  2*i] = P;
-            pts[1+2*i] = Q;
-            ++i;
+            flu[  2*i] = { P, c };
+            flu[1+2*i] = { Q, c };
+            if ( ++i >= cnt ) break;
         }
-        gle::unmapVertexBuffer();
+        gle::unmapVertexColorBuffer();
         glDisable(GL_LIGHTING);
-        bodyColorF(disp, obj.signature()).load();
         lineWidth(disp->width);
         glDrawArrays(GL_LINES, 0, 2*i);
 
-        gle::bindVertexBuffer(2);
+        gle::bindVertexColorBuffer(2);
         pointSize(disp->size);
         glDrawArrays(GL_POINTS, 0, i);
     }
