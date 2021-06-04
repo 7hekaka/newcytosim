@@ -17,7 +17,7 @@
      [4 bytes, uint32: last index in the vector file]
 
  Two files are generated for each timepoint of the trajectory file.
- The 'NAME' would typically be a 'system0000' or alike.
+ The 'NAME' would typically be 'cell0000' or alike.
  
  FJN, 2--4 June 2021
 */
@@ -49,8 +49,8 @@ void help(std::ostream& os)
     os << "    [4 bytes, uint32: last index in the vector file]\n";
 
     os << "Two files are generated for each timepoint of the trajectory file.\n";
-    os << "The 'NAME' would typically be a 'cell0000' or alike.\n";
-    os << "Compiled with DIM=" << DIM << "\n";
+    os << "The 'NAME' would typically be 'cell0000' or alike.\n";
+    os << "Made with format version " << Simul::currentFormatID << " and DIM=" << DIM << "\n";
 }
 
 //------------------------------------------------------------------------------
@@ -90,15 +90,11 @@ bool openFiles(const char root[], unsigned frm)
     char str[512] = { 0 };
     pointer = 0;
     if ( use_fixed16 )
-    {
         snprintf(str, sizeof(str), "%s%04u.fixed16", root, frm);
-        fileP = openFile(str, true);
-    }
     else
-    {
         snprintf(str, sizeof(str), "%s%04u.float32", root, frm);
-        fileP = openFile(str, true);
-    }
+    fileP = openFile(str, true);
+    
     snprintf(str, sizeof(str), "%s%04u.paths32", root, frm);
     fileS = openFile(str, true);
     return ( fileP && fileS );
@@ -137,23 +133,32 @@ void writeScalar32(real alpha)
     ++pointer;
 }
 
+void writeVector16(Vector2 const& pos)
+{
+    int16_t vec[2] = { fix(pos.XX), fix(pos.YY) };
+    fwrite(vec, 2, sizeof(int16_t), fileP);
+    pointer += 2;
+}
+
+void writeVector32(Vector2 const& pos)
+{
+    float vec[2] = { (float)pos.XX, (float)pos.YY };
+    fwrite(vec, 2, sizeof(float), fileP);
+    pointer += 2;
+}
+
 void writeVector16(Vector3 const& pos)
 {
-#if ( DIM == 3 )
     int16_t vec[3] = { fix(pos.XX), fix(pos.YY), fix(pos.ZZ) };
-#else
-    int16_t vec[3] = { fix(pos.XX), fix(pos.YY), 0 };
-#endif
-    fwrite(vec, DIM, sizeof(int16_t), fileP);
-    pointer += DIM;
+    fwrite(vec, 3, sizeof(int16_t), fileP);
+    pointer += 3;
 }
 
 void writeVector32(Vector3 const& pos)
 {
-    float vec[3] = { 0 };
-    pos.store(vec);
-    fwrite(vec, DIM, sizeof(float), fileP);
-    pointer += DIM;
+    float vec[3] = { (float)pos.XX, (float)pos.YY, (float)pos.ZZ };
+    fwrite(vec, 3, sizeof(float), fileP);
+    pointer += 3;
 }
 
 void writeObject(uint32_t a, uint32_t b, size_t s, size_t p)
@@ -171,7 +176,7 @@ void writeObject(uint32_t a, uint32_t b, size_t s, size_t p)
 //------------------------------------------------------------------------------
 #pragma mark - Export
 
-template < void writeVector(Vector3 const&) >
+template < void writeVector(Vector const&) >
 void writeFibers(FiberSet const& set)
 {
     // process fibers in the natural order:
@@ -185,7 +190,7 @@ void writeFibers(FiberSet const& set)
     }
 }
 
-template < void writeVector(Vector3 const&), void writeScalar(real) >
+template < void writeVector(Vector const&), void writeScalar(real) >
 void writeSolids(SolidSet const& set)
 {
     for ( Solid const* obj = set.firstID(); obj; obj = set.nextID(obj) )
@@ -200,7 +205,7 @@ void writeSolids(SolidSet const& set)
     }
 }
 
-template < void writeVector(Vector3 const&), void writeScalar(real)  >
+template < void writeVector(Vector const&), void writeScalar(real) >
 void writeBeads(BeadSet const& set)
 {
     for ( Bead const* obj = set.firstID(); obj; obj = set.nextID(obj) )
@@ -212,7 +217,7 @@ void writeBeads(BeadSet const& set)
     }
 }
 
-template < void writeVector(Vector3 const&), void writeScalar(real)  >
+template < void writeVector(Vector const&), void writeScalar(real) >
 void writeSpheres(SphereSet const& set)
 {
     for ( Sphere const* obj = set.firstID(); obj; obj = set.nextID(obj) )
