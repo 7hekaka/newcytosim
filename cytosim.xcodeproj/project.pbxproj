@@ -90,7 +90,6 @@
 		BB20484C0AF203A0004EDA21 /* filewrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB20484A0AF203A0004EDA21 /* filewrapper.cc */; };
 		BB20484D0AF203A0004EDA21 /* filewrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = BB20484B0AF203A0004EDA21 /* filewrapper.h */; };
 		BB217A881AAA67AA006DD82E /* play.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7358C305B98DA3006956D5 /* play.cc */; };
-		BB227D48256814BC00A42E98 /* sweet.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE2FB8825680C3500EB88EA /* sweet.cc */; };
 		BB227D49256814C900A42E98 /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB227D4A2568150600A42E98 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
 		BB227D4B2568150A00A42E98 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
@@ -584,7 +583,7 @@
 		BB846BE5116FDEB900A0CD0E /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
 		BB8481B2158348E80076C8C2 /* couple_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8481B0158348E80076C8C2 /* couple_long.cc */; };
 		BB8481B3158348E80076C8C2 /* couple_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8481B1158348E80076C8C2 /* couple_long.h */; };
-		BB855B762667D2C700621C09 /* cympack.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB855B752667D2C700621C09 /* cympack.cc */; };
+		BB855B77266A0CC400621C09 /* cympack.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB855B752667D2C700621C09 /* cympack.cc */; };
 		BB882AF80EE82C8B00E29E5C /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB882B1B0EE82C9700E29E5C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB88388F10B48EC400A4028F /* space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388910B48EC400A4028F /* space_prop.cc */; };
@@ -1899,7 +1898,7 @@
 		BBE13B800CD535DE008C212D /* test_thread.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_thread.cc; path = src/test/test_thread.cc; sourceTree = SOURCE_ROOT; };
 		BBE151DF05E574F300F782A8 /* test_space.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_space.cc; path = src/test/test_space.cc; sourceTree = SOURCE_ROOT; };
 		BBE2FB8825680C3500EB88EA /* sweet.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sweet.cc; sourceTree = "<group>"; };
-		BBE2FB8E25680D5800EB88EA /* sweet */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sweet; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBE2FB8E25680D5800EB88EA /* cympack */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cympack; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE4269614437BA4003795C4 /* treadmilling_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = treadmilling_fiber_prop.cc; path = fibers/treadmilling_fiber_prop.cc; sourceTree = "<group>"; };
 		BBE4269714437BA4003795C4 /* treadmilling_fiber_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = treadmilling_fiber_prop.h; path = fibers/treadmilling_fiber_prop.h; sourceTree = "<group>"; };
 		BBE4269814437BA4003795C4 /* treadmilling_fiber.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = treadmilling_fiber.cc; path = fibers/treadmilling_fiber.cc; sourceTree = "<group>"; };
@@ -2199,7 +2198,7 @@
 				BBAA7E892455D94600C924DB /* test_block */,
 				BB201E1E24ABDCD900A8CA82 /* test_xtbsv */,
 				BB8EE1DC2542DE2100E15C40 /* test_tesselator */,
-				BBE2FB8E25680D5800EB88EA /* sweet */,
+				BBE2FB8E25680D5800EB88EA /* cympack */,
 			);
 			name = build;
 			sourceTree = SOURCE_ROOT;
@@ -4335,9 +4334,9 @@
 			productReference = BBE0993E0869D87F005FF210 /* libcytospace.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		BBE2FB8D25680D5800EB88EA /* sweet */ = {
+		BBE2FB8D25680D5800EB88EA /* cympack */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BBE2FB9225680D5800EB88EA /* Build configuration list for PBXNativeTarget "sweet" */;
+			buildConfigurationList = BBE2FB9225680D5800EB88EA /* Build configuration list for PBXNativeTarget "cympack" */;
 			buildPhases = (
 				BBE2FB8A25680D5800EB88EA /* Sources */,
 				BBE2FB8B25680D5800EB88EA /* Frameworks */,
@@ -4347,9 +4346,9 @@
 			);
 			dependencies = (
 			);
-			name = sweet;
+			name = cympack;
 			productName = sweet;
-			productReference = BBE2FB8E25680D5800EB88EA /* sweet */;
+			productReference = BBE2FB8E25680D5800EB88EA /* cympack */;
 			productType = "com.apple.product-type.tool";
 		};
 		BBE82A27233D15EB00BE44DF /* cytospaceG */ = {
@@ -4425,7 +4424,7 @@
 				BB64041405FBC58500DF7BFF /* frametool */,
 				BB6403B505FBC0E200DF7BFF /* tests */,
 				BBB1C6C70CB2CAA300679ADC /* blank */,
-				BBE2FB8D25680D5800EB88EA /* sweet */,
+				BBE2FB8D25680D5800EB88EA /* cympack */,
 				BBAA7E7F2455D94600C924DB /* test_block */,
 				BB18BBC61DFD7E3400567023 /* test_code */,
 				BB51BC2205FA534000D4869F /* test_glapp */,
@@ -4876,7 +4875,6 @@
 				BB7191B90EF1CD9900CED9E2 /* vector1.cc in Sources */,
 				BB7191BA0EF1CD9900CED9E2 /* vector2.cc in Sources */,
 				BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */,
-				BB855B762667D2C700621C09 /* cympack.cc in Sources */,
 				BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */,
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,
@@ -5067,8 +5065,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB855B77266A0CC400621C09 /* cympack.cc in Sources */,
 				BB227D4D2568154500A42E98 /* frame_reader.cc in Sources */,
-				BB227D48256814BC00A42E98 /* sweet.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7975,7 +7973,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		BBE2FB9225680D5800EB88EA /* Build configuration list for PBXNativeTarget "sweet" */ = {
+		BBE2FB9225680D5800EB88EA /* Build configuration list for PBXNativeTarget "cympack" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BBE2FB9325680D5800EB88EA /* Development */,
