@@ -42,7 +42,7 @@ private:
     std::string  name_;
     
     /// numerical identifier used in output file
-    size_t       number_;
+    unsigned     number_;
 
     /// pad string by adding white-space on the right up to size 20
     static std::string format_(std::string const& str)
@@ -83,11 +83,11 @@ public:
     //-------------------------------------------------------------------------------
     
     /// index, unique among all Property of similar category()
-    size_t       number()     const { return number_; }
+    unsigned     number()     const { return number_; }
     
     /// set index in the array of Properties
-    void         renumber(size_t x) { number_ = x; }
-    //void       renumber(size_t x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
+    void         renumber(unsigned x) { number_ = x; }
+    //void       renumber(unsigned x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
 
     //-------------------------------------------------------------------------------
     

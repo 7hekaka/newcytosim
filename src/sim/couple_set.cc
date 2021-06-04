@@ -930,7 +930,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
 bool CoupleSet::uniPrepare(PropertyList const& properties)
 {
     bool res = false;
-    size_t last = 0;
+    unsigned last = 0;
     
     PropertyList allprop = properties.find_all("couple");
 

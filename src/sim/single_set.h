@@ -136,7 +136,7 @@ public:
     /// first Single in inventory
     Single * firstID()           const { return static_cast<Single*>(inventory_.first()); }
     
-    /// next Single in inventory
+    /// returns Single immediately following 'obj' in inventory
     Single * nextID(Single const* obj) const { return static_cast<Single*>(inventory_.next(obj)); }
 
     /// collect all objects

@@ -98,7 +98,7 @@ public:
     Property *   find(std::string const& cat, std::string const& name) const;
     
     /// return property which has the provided index, or zero if it cannot be found
-    Property *   find(std::string const& cat, const size_t index) const;
+    Property *   find(std::string const& cat, const unsigned index) const;
     
     
     /// return property with provided name, throwing an exception if it cannot be found
@@ -108,7 +108,7 @@ public:
     Property *   find_or_die(std::string const& cat, std::string const& name) const;
 
     /// return property with provided name, throwing an exception if it cannot be found
-    Property *   find_or_die(std::string const& cat, const size_t index) const;
+    Property *   find_or_die(std::string const& cat, const unsigned index) const;
     
     
     /// return list of properties of the given category

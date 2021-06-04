@@ -217,7 +217,7 @@ public:
     /// first Couple in inventory
     Couple * firstID()                 const { return static_cast<Couple*>(inventory_.first()); }
     
-    /// next Couple in inventory
+    /// returns Couple immediately following 'obj' in inventory
     Couple * nextID(Couple const* obj) const { return static_cast<Couple*>(inventory_.next(obj)); }
     
     /// collect all objects

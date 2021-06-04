@@ -60,7 +60,7 @@ public:
     /// first Fiber in inventory
     Fiber * firstID()          const { return static_cast<Fiber*>(inventory_.first()); }
 
-    /// next Fiber in inventory
+    /// returns Fiber immediately following 'obj' in inventory
     Fiber * nextID(Fiber const* obj) const { return static_cast<Fiber*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found

@@ -20,7 +20,7 @@ void PropertyList::deposit(Property * p)
 {
     if ( p )
     {
-        size_t cnt = 0;
+        unsigned cnt = 0;
         for ( Property* i : vec_ )
         {
             if ( i->category() == p->category() )
@@ -145,7 +145,7 @@ Property * PropertyList::find(std::string const& cat, std::string const& nom) co
 }
 
 
-Property * PropertyList::find(std::string const& cat, const size_t num) const
+Property * PropertyList::find(std::string const& cat, const unsigned num) const
 {
     //std::clog << this << "->find(" << cat << ", " << idx << ")" << '\n';
     if ( num <= 0 )
@@ -174,7 +174,7 @@ Property * PropertyList::find_or_die(std::string const& cat, std::string const& 
 }
 
 
-Property * PropertyList::find_or_die(std::string const& cat, const size_t num) const
+Property * PropertyList::find_or_die(std::string const& cat, const unsigned num) const
 {
     Property * res = find(cat, num);
     

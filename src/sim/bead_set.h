@@ -47,7 +47,7 @@ public:
     /// first Bead in inventory
     Bead * firstID() const { return static_cast<Bead*>(inventory_.first()); }
     
-    /// next Bead in inventory
+    /// returns Bead immediately following 'obj' in inventory
     Bead * nextID(Bead const* obj) const { return static_cast<Bead*>(inventory_.next(obj)); }
 
     /// find object from its Number

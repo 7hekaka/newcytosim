@@ -2118,7 +2118,7 @@ void Simul::reportSingleLink(std::ostream& out, Property const* sel, bool com) c
  */
 void Simul::reportSingle(std::ostream& out, Property const* sel, bool com) const
 {
-    constexpr size_t SUP = 128;
+    constexpr unsigned SUP = 128;
     
     size_t free[SUP+1] = { 0 }, bound[SUP+1] = { 0 }, based[SUP+1] = { 0 };
     
@@ -2169,7 +2169,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel, bool com) const
  */
 void Simul::reportSingleForce(std::ostream& out, Property const* sel, bool com) const
 {
-    constexpr size_t MAX = 8;
+    constexpr unsigned MAX = 8;
     real cnt[MAX+1] = { 0 };
     real avg[MAX+1] = { 0 };
     real sup[MAX+1] = { 0 };
@@ -2375,7 +2375,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
  */
 void Simul::reportCoupleForce(std::ostream& out, Property const* sel, bool com) const
 {
-    constexpr size_t MAX = 8;
+    constexpr unsigned MAX = 8;
     real cnt[MAX+1] = { 0 };
     real avg[MAX+1] = { 0 };
     real sup[MAX+1] = { 0 };

@@ -52,7 +52,7 @@ public:
     /// first Solid in inventory
     Solid * firstID() const { return static_cast<Solid*>(inventory_.first()); }
 
-    /// next Solid in inventory
+    /// returns Solid immediately following 'obj' in inventory
     Solid * nextID(Solid const* obj) const { return static_cast<Solid*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found

@@ -44,6 +44,9 @@ public:
     
     /// first Sphere in inventory
     Sphere * firstID() const { return static_cast<Sphere*>(inventory_.first()); }
+    
+    /// returns Sphere immediately following 'obj' in inventory
+    Sphere * nextID(Sphere const* obj) const { return static_cast<Sphere*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found
     Sphere * findID(ObjectID n) const { return static_cast<Sphere*>(inventory_.get(n));}
