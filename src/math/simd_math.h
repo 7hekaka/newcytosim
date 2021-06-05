@@ -235,14 +235,14 @@ void set_arc_SEE(size_t cnt, float ptr[], float rad, float start,
     float * const end = ptr + 2 * cnt - 2;
     while ( ptr < end )
     {
-        store4f(ptr, add4f(xx, cc));
+        storeu4f(ptr, add4f(xx, cc));
         // apply the rotation matrix
         // x = c * x - s * y;
         // y = s * x + c * y;
         xx = add4f(mul4f(CS, dupeven4f(xx)), mul4f(SC, dupodd4f(xx)));
         ptr += 4;
     }
-    store4f(ptr, add4f(xx, cc));
+    storeu4f(ptr, add4f(xx, cc));
 }
 
 #endif
