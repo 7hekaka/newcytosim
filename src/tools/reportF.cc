@@ -21,7 +21,7 @@ char root[256] = "report";
 
 void help(std::ostream& os)
 {
-    os << "Cytosim-reportF "<<DIM<<"D, file version " << Simul::currentFormatID << '\n';
+    os << "Cytosim-reportF\n";
     os << "       generates reports/statistics from a trajectory file\n";
     os << "       this tool is simular to 'report', but generates one file per frame\n";
     os << " Syntax:\n";
@@ -47,6 +47,7 @@ void help(std::ostream& os)
     os << "of the trajectory to a different file. These files are named:\n";
     os << "    ROOT####.txt\n";
     os << "where #### is the frame number and ROOT can be specified.\n";
+    os << "Made with format version " << Simul::currentFormatID << " and DIM=" << DIM << "\n";
 }
 
 //------------------------------------------------------------------------------

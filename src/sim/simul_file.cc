@@ -547,7 +547,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                 iss >> f >> tok >> d;
                 in.formatID(f);
                 //if ( f != currentFormatID )
-                //    Cytosim::warn << "Cytosim is reading previous format " << f << '\n';
+                //    Cytosim::warn << "Cytosim is reading format ID " << f << '\n';
                 if ( tok == "dim" )
                 {
                     if ( in.vectorSize() != d )
@@ -578,7 +578,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                         {
                             in.formatID(i);
                             //if ( i != currentFormatID )
-                            //    std::clog << "Cytosim is reading data format " << i << "\n";
+                            //    std::clog << "Cytosim is reading format ID " << i << "\n";
                         }
                     }
                 }

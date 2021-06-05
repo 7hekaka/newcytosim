@@ -8,29 +8,28 @@
 #include "simul_prop.h"
 
 
-void help()
+void help(std::ostream& os)
 {
-    printf("Cytosim-sieve:\n\n");
-    printf("   Sieve reads a cytosim trajectory file, loading frames into memory,\n");
-    printf("   and writes them to a new file using the latest cytosim format.\n");
-    printf("   The output can be generated in either binary or text format.\n");
-    printf("   A category of objects can be removed by specifying `skip=WHAT`.\n");
-    printf("   If the specified output file already exists, data is appended to it.\n");
-    printf("   This writes %iD files with format %i (real = %lu bytes)\n", DIM, Simul::currentFormatID, sizeof(real));
-    printf("   (built on %s)\n\n", __DATE__);
-    printf("Usage:\n");
-    printf("    sieve input_file output_file [options]\n\n");
-    printf("Options:\n");
-    printf("    dim=INT            process files with specified dimensionality\n");
-    printf("    binary=1           use binary format (default)\n");
-    printf("    binary=0           use text format (default if output ends with .txt\n");
-    printf("    skip=WHAT          remove all objects of class WHAT\n");
-    printf("    skip_free_single=1 remove unbound singles\n");
-    printf("    skip_free_couple=1 remove unbound couples\n");
-    printf("    frame=INDEX        process only specified frame\n\n");
-    printf("Examples:\n");
-    printf("    sieve objects.cmo objects.txt\n");
-    printf("    sieve objects.cmo objects.txt skip=couple\n");
+    os << "Cytosim-sieve:\n";
+    os << "   Sieve reads a cytosim trajectory file, loading frames into memory,\n";
+    os << "   and writes them to a new file using the latest cytosim format.\n";
+    os << "   The output can be generated in either binary or text format.\n";
+    os << "   A category of objects can be removed by specifying `skip=WHAT`.\n";
+    os << "   If the specified output file already exists, data is appended to it.\n";
+    os << "Usage:\n";
+    os << "    sieve input_file output_file [options]\n\n";
+    os << "Options:\n";
+    os << "    dim=INT            process files with specified dimensionality\n";
+    os << "    binary=1           use binary format (default)\n";
+    os << "    binary=0           use text format (default if output ends with .txt\n";
+    os << "    skip=WHAT          remove all objects of class WHAT\n";
+    os << "    skip_free_single=1 remove unbound singles\n";
+    os << "    skip_free_couple=1 remove unbound couples\n";
+    os << "    frame=INDEX        process only specified frame\n\n";
+    os << "Examples:\n";
+    os << "    sieve objects.cmo objects.txt\n";
+    os << "    sieve objects.cmo objects.txt skip=couple\n";
+    os << "Made with format version " << Simul::currentFormatID << " and DIM=" << DIM << "\n";
 }
 
 
@@ -45,7 +44,7 @@ int main(int argc, char* argv[])
 
     if ( argc < 3 )
     {
-        help();
+        help(std::cout);
         return EXIT_SUCCESS;
     }
     

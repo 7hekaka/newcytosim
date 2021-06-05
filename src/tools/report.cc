@@ -22,7 +22,7 @@ int prefix = 0;
 
 void help(std::ostream& os)
 {
-    os << "Cytosim-report "<<DIM<<"D, file version " << Simul::currentFormatID << '\n';
+    os << "Cytosim-report\n";
     os << "       generates reports/statistics from a trajectory file\n";
     os << " Syntax:\n";
     os << "       report [time] WHAT [OPTIONS]\n";
@@ -49,6 +49,7 @@ void help(std::ostream& os)
     os << "       report fiber:points frame=10 > fibers.txt\n";
     os << "       report fiber:points frame=10,20 > fibers.txt\n";
     os << "       report fiber:points period=8 > fibers.txt\n";
+    os << "Made with format version " << Simul::currentFormatID << " and DIM=" << DIM << "\n";
 }
 
 //------------------------------------------------------------------------------

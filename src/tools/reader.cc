@@ -29,8 +29,7 @@ void help(std::ostream& os)
     os << "     binary=0   write text coordinates in `file_out'\n";
     os << "     binary=1   write binary coordinates in `file_out'\n";
     os << "     verbose=?  set the verbose level\n";
-    os << "This reads "<<DIM<<" files up to format "<<Simul::currentFormatID<<"\n";
-    os << "\n";
+    os << "Made with format version " << Simul::currentFormatID << " and DIM=" << DIM << "\n";
 }
 
 void instructions(std::ostream& os = std::cout)

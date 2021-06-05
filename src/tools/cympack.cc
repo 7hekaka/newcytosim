@@ -240,7 +240,7 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
     Glossary arg;
-    if ( arg.read_strings(argc-2, argv+2) )
+    if ( arg.read_strings(argc-1, argv+1) )
         return EXIT_FAILURE;
     
     if ( arg.has_key("directory") )
