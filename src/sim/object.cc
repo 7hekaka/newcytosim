@@ -61,11 +61,12 @@ bool match_property(Object const* obj, void const* prop)
  For example 'f0:021' is the fiber number 21 of class 0 (ie. property index = 0),
  For example 'f1:010' is the fiber number 10 of class 1 (ie. property index = 1)
 */
-std::string Object::reference(ObjectTag tag, size_t pix, ObjectID id)
+std::string Object::reference(ObjectTag tag, size_t pip, ObjectID id)
 {
-    assert_true( pix >= 0 );
+    assert_true( pip > 0 );
+    assert_true( id > 0 );
     char tmp[32];
-    snprintf(tmp, sizeof(tmp), "%c%lu:%04u", tag, pix, id);
+    snprintf(tmp, sizeof(tmp), "%c%lu:%04u", tag, pip, id);
     return std::string(tmp);
 }
 
@@ -173,56 +174,6 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
         out.writeUInt8(property()->number(), 0);
         out.writeUInt16(identity(), ':');
     }
-}
-
-
-void Object::readHeader(Inputter& in, bool fat, unsigned& ix, ObjectID& id, ObjectMark& mk)
-{
-    if ( in.binary() )
-    {
-        // read header in binary format
-        if ( fat )
-        {
-            ix = in.readUInt16();
-            id = in.readUInt32();
-#ifdef BACKWARD_COMPATIBILITY
-            if ( in.formatID() < 34 )
-                ;
-            else if ( in.formatID() < 39 )
-                mk = in.readUInt16();
-            else
-#endif
-            mk = in.readUInt32();
-        }
-        else
-        {
-            ix = in.readUInt8();
-            id = in.readUInt16();
-        }
-    }
-    else
-    {
-        // read header in text format
-        FILE * file = in.file();
-        if ( 1 != fscanf(file, "%u", &ix) )
-            throw InvalidIO("invalid Object header");
-        if ( in.get_char() != ':' )
-            throw InvalidIO("invalid Object header");
-        if ( 1 != fscanf(file, "%u", &id) )
-            throw InvalidIO("invalid Object header");
-        int c = in.get_char();
-        if ( c == ':' )
-        {
-            if ( 1 != fscanf(file, "%u", &mk) )
-            throw InvalidIO("invalid Object header");
-        }
-        else
-            in.unget(c);
-    }
-#ifdef BACKWARD_COMPATIBILITY
-    if ( in.formatID() < 45 )
-        ++ix;
-#endif
 }
 
 

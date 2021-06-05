@@ -303,11 +303,11 @@ public:
     
     /// return Property in the requested type, or throw an exception
     template < typename T >
-    T* findProperty(std::string const& cat, size_t ix) const
+    T* findProperty(std::string const& cat, PropertyID id) const
     {
-        Property * p = properties.find(cat, ix);
+        Property * p = properties.find(cat, id);
         if ( !p )
-            throw InvalidIO("could not find `"+cat+"' class with ID "+std::to_string(ix));
+            ;//throw InvalidIO("could not find `"+cat+"' class with ID "+std::to_string(id));
         return static_cast<T*>(p);
     }
     

@@ -654,7 +654,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 bool SingleSet::uniPrepare(PropertyList const& properties)
 {
     bool res = false;
-    unsigned last = 0;
+    PropertyID last = 0;
 
     PropertyList allprop = properties.find_all("single");
     

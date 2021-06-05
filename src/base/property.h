@@ -10,6 +10,9 @@
 class Glossary;
 class Simul;
 
+/// Type used to identify Properties in files
+typedef unsigned PropertyID;
+
 
 /// A Property holds the parameters for a particular category of objects
 /**
@@ -39,10 +42,10 @@ private:
     Property();
     
     /// the name of the property
-    std::string  name_;
+    std::string name_;
     
-    /// numerical identifier used in output file
-    unsigned     number_;
+    /// numerical identifier used in file; a valid value should be non-zero
+    PropertyID number_;
 
     /// pad string by adding white-space on the right up to size 20
     static std::string format_(std::string const& str)
@@ -83,11 +86,11 @@ public:
     //-------------------------------------------------------------------------------
     
     /// index, unique among all Property of similar category()
-    unsigned     number()     const { return number_; }
+    PropertyID   number() const { return number_; }
     
     /// set index in the array of Properties
-    void         renumber(unsigned x) { number_ = x; }
-    //void       renumber(unsigned x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
+    void         renumber(PropertyID x) { number_ = x; }
+    //void       renumber(PropertyID x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
 
     //-------------------------------------------------------------------------------
     

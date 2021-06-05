@@ -142,7 +142,7 @@ void Parser::parse_set(std::istream& is)
             opt.read(blok);
             pp = execute_set(cat, name, opt);
             
-            size_t ix;
+            PropertyID ix;
 #ifdef BACKWARD_COMPATIBILITY
             // name changed to `property_number` on 10.12.2017
             if ( opt.set(ix, "property_number", "property_index") )

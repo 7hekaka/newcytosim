@@ -86,9 +86,6 @@ public:
     
     /// write header to object data, using provided tag
     void        writeHeader(Outputter&, ObjectTag tag) const;
-    
-    /// read header
-    static void readHeader(Inputter& in, bool fat, unsigned& ix, ObjectID& id, ObjectMark& mk);
 
 public:
     

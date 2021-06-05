@@ -470,20 +470,71 @@ void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list)
 }
 
 
+/** This should match Object::writeHeader() */
+static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+{
+    if ( in.binary() )
+    {
+        // read header in binary format
+        if ( fat )
+        {
+            ix = in.readUInt16();
+            id = in.readUInt32();
+#ifdef BACKWARD_COMPATIBILITY
+            if ( in.formatID() < 34 )
+                ;
+            else if ( in.formatID() < 39 )
+                mk = in.readUInt16();
+            else
+#endif
+            mk = in.readUInt32();
+        }
+        else
+        {
+            ix = in.readUInt8();
+            id = in.readUInt16();
+        }
+    }
+    else
+    {
+        // read header in text format
+        FILE * file = in.file();
+        if ( 1 != fscanf(file, "%u", &ix) )
+            throw InvalidIO("invalid Object header");
+        if ( in.get_char() != ':' )
+            throw InvalidIO("invalid Object header");
+        if ( 1 != fscanf(file, "%u", &id) )
+            throw InvalidIO("invalid Object header");
+        int c = in.get_char();
+        if ( c == ':' )
+        {
+            if ( 1 != fscanf(file, "%u", &mk) )
+            throw InvalidIO("invalid Object header");
+        }
+        else
+            in.unget(c);
+    }
+#ifdef BACKWARD_COMPATIBILITY
+    if ( in.formatID() < 45 )
+        ++ix;
+#endif
+}
+
+
 /**
- Load an object from file
+ Load one object from file
  
  If 'update==true', the corresponding object is changed, or a new object is created.
  If 'discard==true', the object is deleted / not loaded
  */
 void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool discard, bool update)
 {
-    unsigned ix = 0;
+    PropertyID ix = 0;
     ObjectID id = 0;
     ObjectMark mk = 0;
     Object * obj = nullptr;
     
-    Object::readHeader(in, fat, ix, id, mk);
+    readObjectHeader(in, fat, ix, id, mk);
     
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");

@@ -2118,22 +2118,30 @@ void Simul::reportSingleLink(std::ostream& out, Property const* sel, bool com) c
  */
 void Simul::reportSingle(std::ostream& out, Property const* sel, bool com) const
 {
-    constexpr unsigned SUP = 128;
+    constexpr size_t SUP = 128;
     
     size_t free[SUP+1] = { 0 }, bound[SUP+1] = { 0 }, based[SUP+1] = { 0 };
     
     for ( Single const* i = singles.firstF(); i ; i = i->next() )
     {
         assert_true(!i->attached());
-        ++free[std::min(i->prop->number(), SUP)];
-        based[std::min(i->prop->number(), SUP)] += ( i->base() != nullptr );
+        size_t x = i->prop->number();
+        if ( x < SUP )
+        {
+            ++free[x];
+            based[x] += ( i->base() != nullptr );
+        }
     }
     
     for ( Single const* i=singles.firstA(); i ; i=i->next() )
     {
         assert_true(i->attached());
-        ++bound[std::min(i->prop->number(), SUP)];
-        based[std::min(i->prop->number(), SUP)] += ( i->base() != nullptr );
+        size_t x = i->prop->number();
+        if ( x < SUP )
+        {
+            ++bound[x];
+            based[x] += ( i->base() != nullptr );
+        }
     }
     
     if ( 1 )
@@ -2169,7 +2177,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel, bool com) const
  */
 void Simul::reportSingleForce(std::ostream& out, Property const* sel, bool com) const
 {
-    constexpr unsigned MAX = 8;
+    constexpr size_t MAX = 8;
     real cnt[MAX+1] = { 0 };
     real avg[MAX+1] = { 0 };
     real sup[MAX+1] = { 0 };
@@ -2180,12 +2188,15 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel, bool com) 
     {
         if ( i->hasLink() && ( !sel || sel == i->prop ))
         {
-            size_t x = std::min(MAX, i->prop->number());
-            real f = i->force().norm();
-            avg[x] += f;
-            cnt[x] += 1;
-            sup[x] = std::max(sup[x], f);
-            len[x] = std::max(len[x], i->stretch().norm());
+            size_t x = i->prop->number();
+            if ( x < MAX )
+            {
+                real f = i->force().norm();
+                avg[x] += f;
+                cnt[x] += 1;
+                sup[x] = std::max(sup[x], f);
+                len[x] = std::max(len[x], i->stretch().norm());
+            }
         }
     }
     
@@ -2375,7 +2386,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
  */
 void Simul::reportCoupleForce(std::ostream& out, Property const* sel, bool com) const
 {
-    constexpr unsigned MAX = 8;
+    constexpr size_t MAX = 8;
     real cnt[MAX+1] = { 0 };
     real avg[MAX+1] = { 0 };
     real sup[MAX+1] = { 0 };
@@ -2386,12 +2397,15 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel, bool com) 
     {
         if ( !sel || sel == i->prop )
         {
-            size_t x = std::min(MAX, i->prop->number());
-            real f = i->force().norm();
-            avg[x] += f;
-            cnt[x] += 1;
-            sup[x] = std::max(sup[x], f);
-            len[x] = std::max(len[x], i->stretch().norm());
+            size_t x = i->prop->number();
+            if ( x < MAX )
+            {
+                real f = i->force().norm();
+                avg[x] += f;
+                cnt[x] += 1;
+                sup[x] = std::max(sup[x], f);
+                len[x] = std::max(len[x], i->stretch().norm());
+            }
         }
     }
         

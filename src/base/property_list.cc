@@ -20,7 +20,7 @@ void PropertyList::deposit(Property * p)
 {
     if ( p )
     {
-        unsigned cnt = 0;
+        PropertyID cnt = 0;
         for ( Property* i : vec_ )
         {
             if ( i->category() == p->category() )
@@ -145,14 +145,14 @@ Property * PropertyList::find(std::string const& cat, std::string const& nom) co
 }
 
 
-Property * PropertyList::find(std::string const& cat, const unsigned num) const
+Property * PropertyList::find(std::string const& cat, const PropertyID id) const
 {
     //std::clog << this << "->find(" << cat << ", " << idx << ")" << '\n';
-    if ( num <= 0 )
+    if ( id <= 0 )
         return nullptr;
     
     for ( Property* i : vec_ )
-        if ( i->category()==cat  &&  i->number()==num )
+        if ( i->category()==cat  &&  i->number()==id )
             return i;
     
     return nullptr;
@@ -174,13 +174,13 @@ Property * PropertyList::find_or_die(std::string const& cat, std::string const& 
 }
 
 
-Property * PropertyList::find_or_die(std::string const& cat, const unsigned num) const
+Property * PropertyList::find_or_die(std::string const& cat, const PropertyID id) const
 {
-    Property * res = find(cat, num);
+    Property * res = find(cat, id);
     
     if ( !res )
     {
-        InvalidSyntax e("unknown class `"+cat+std::to_string(num)+"'");
+        InvalidSyntax e("unknown class `"+cat+std::to_string(id)+"'");
         e << all_names(PREF);
         throw e;
     }
