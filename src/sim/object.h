@@ -85,7 +85,7 @@ public:
     static void writeReference(Outputter&, Object const*);
     
     /// write header to object data, using provided tag
-    void        writeHeader(Outputter&, ObjectTag tag) const;
+    void        writeHeader(Outputter&, ObjectTag) const;
 
 public:
     

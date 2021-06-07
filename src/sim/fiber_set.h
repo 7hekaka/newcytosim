@@ -105,8 +105,14 @@ public:
     /// reverse the polarity of all fibers
     void flipFiberPolarity();
     
-    /// delete marked object after import
+    /// update object after import
+    void update();
+
+    /// delete objects that were not updated during import
     void prune();
+    
+    /// relink all objects after import
+    void thaw();
 
     //--------------------------------------------------------------------------
     

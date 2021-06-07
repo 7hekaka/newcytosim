@@ -820,12 +820,12 @@ void Display::drawStrip(size_t cnt, real const* pts, GLenum prim)
 #endif
 }
 
+
 void Display::drawFiberBackbone(Fiber const& fib)
 {
-    bool l = glIsEnabled(GL_LIGHTING);
-    glDisable(GL_LIGHTING);
+    fib.disp->color.load();
+    assert_true(!glIsEnabled(GL_LIGHTING));
     drawStrip(fib.nbPoints(), fib.addrPoints(), GL_LINE_STRIP);
-    if ( l ) glEnable(GL_LIGHTING);
 }
 
 
@@ -1524,9 +1524,12 @@ void Display::drawFiber(Fiber const& fib)
     
     if ( disp->style & 4 )
     {
-        glLineWidth(1);
+        lineWidth(disp->line_width);
         fib.disp->color.load();
-        drawFiberBackbone(fib);
+        assert_true(!glIsEnabled(GL_LIGHTING));
+        glDisable(GL_LIGHTING);
+        drawStrip(fib.nbPoints(), fib.addrPoints(), GL_LINE_STRIP);
+        return;
     }
 
     if ( disp->style )

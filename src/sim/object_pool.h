@@ -71,8 +71,8 @@ public:
     /// put Object last in the list
     void   push_back(Object *);
     
-    /// import all objects from given list, and empty it
-    void   merge(ObjectPool& list);
+    /// import all objects from given list, emptying it
+    void   append(ObjectPool& list);
     
     /// link `n` after already linked `p`
     void   push_after(Object * p, Object * n);
@@ -83,11 +83,11 @@ public:
     /// Remove Object `n` from list
     void   pop(Object * n);
     
-    /// Remove top Object from list
-    void   pop_front();
+    /// Remove top Object from list, returning it
+    Object* pop_front();
     
     /// Remove last Object from list
-    void   pop_back();
+    Object* pop_back();
     
     /// clear the list
     void   clear();

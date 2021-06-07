@@ -49,6 +49,9 @@ public:
     /// holds pointers to the Objects in a doubly linked list
     ObjectPool pool_;
     
+    /// holds pointers to the Objects in a doubly linked list
+    ObjectPool ice_;
+
     /// the Simul containing this set
     Simul& simul_;
     
@@ -75,7 +78,7 @@ protected:
 public:
     
     /// unlink all objects before import
-    virtual void freeze() { pool_.clear(); }
+    virtual void freeze();
     
     /// delete objects that were not updated during import
     virtual void prune();

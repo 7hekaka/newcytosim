@@ -42,7 +42,7 @@ void ObjectPool::push_back(Object * n)
 /**
  Transfer objects in `list` to the end of `this`, until `list` is empty.
  */
-void ObjectPool::merge(ObjectPool& list)
+void ObjectPool::append(ObjectPool& list)
 {
     Object * n = list.frontO;
     
@@ -90,35 +90,43 @@ void ObjectPool::push_before(Object * p, Object * n)
 }
 
 
-void ObjectPool::pop_front()
+Object* ObjectPool::pop_front()
 {
-    assert_true( frontO );
- 
-    Object * n = frontO->nextO;
-    frontO = n;
-    n->nextO = nullptr;  // unnecessary?
-
-    if ( frontO )
-        frontO->prevO = nullptr;
-    else
-        backO = nullptr;
-    --nSize;
+    Object * n = frontO;
+    if ( n )
+    {
+        --nSize;
+        frontO = n->nextO;
+        
+        if ( frontO )
+            frontO->prevO = nullptr;
+        else
+            backO = nullptr;
+        
+        n->set_ = nullptr;
+        n->nextO = nullptr;  // unnecessary?
+    }
+    return n;
 }
 
 
-void ObjectPool::pop_back()
+Object* ObjectPool::pop_back()
 {
-    assert_true( backO );
+    Object * n = backO;
+    if ( n )
+    {
+        --nSize;
+        backO = n->prevO;
     
-    Object * n = backO->prevO;
-    backO = n;
-    n->prevO = nullptr;  // unnecessary?
-    
-    if ( backO )
-        backO->nextO = nullptr;
-    else
-        frontO = nullptr;
-    --nSize;
+        if ( backO )
+            backO->nextO = nullptr;
+        else
+            frontO = nullptr;
+        
+        n->set_ = nullptr;
+        n->prevO = nullptr;  // unnecessary?
+    }
+    return n;
 }
 
 
@@ -141,6 +149,7 @@ void ObjectPool::pop(Object * n)
         backO = n->prevO;
     }
     
+    n->set_ = nullptr;
     n->prevO = nullptr; // unnecessary?
     n->nextO = nullptr; // unnecessary?
     --nSize;

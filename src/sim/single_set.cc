@@ -255,16 +255,9 @@ void SingleSet::erase()
 void SingleSet::freeze()
 {
     relax();
-    aList.clear();
-    fList.clear();
-}
-
-
-void SingleSet::detachA(Single * s)
-{
-    s->hand()->detachHand();
-    aList.pop(s);
-    fList.push_back(s);
+    assert_true(ice_.empty());
+    ice_.append(aList);
+    ice_.append(fList);
 }
 
 
@@ -272,34 +265,31 @@ void SingleSet::pruneDetach()
 {
     /* After reading from file, the Hands should not update
      any Fiber, Single or Couple as they will be deleted */
-    Inventoried * i = inventory_.first();
+    Object * i = ice_.pop_front();
     while ( i )
     {
         Single* o = static_cast<Single*>(i);
-        i = inventory_.next(i);
-        if ( ! o->linked() )
-            detachA(o);
+        i = ice_.pop_front();
+        if ( o->attached() )
+            o->hand()->detachHand();
+        link(o);
     }
 }
 
-
+/** After reading from file, the Hands should not update
+ any Fiber, Single or Couple as they will be deleted */
 void SingleSet::prune()
 {
-    /* After reading from file, the Hands should not update
-     any Fiber, Single or Couple as they will be deleted */
-    Inventoried * i = inventory_.first();
+    Object * i = ice_.pop_front();
     while ( i )
     {
         Single* o = static_cast<Single*>(i);
-        i = inventory_.next(i);
-        if ( ! o->linked() )
-        {
-            if ( o->attached() )
-                o->hand()->detachHand();
-            inventory_.unassign(o);
-            o->objset(nullptr);
-            delete(o);
-        }
+        i = ice_.pop_front();
+        if ( o->attached() )
+            o->hand()->detachHand();
+        inventory_.unassign(o);
+        o->objset(nullptr);
+        delete(o);
     }
 }
 

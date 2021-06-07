@@ -688,29 +688,47 @@ void FiberSet::flipFiberPolarity()
 }
 
 
+void FiberSet::update()
+{
+    Object * i = pool_.front();
+    while ( i )
+    {
+        Fiber * o = static_cast<Fiber*>(i);
+        i = i->next();
+        o->updateFiber();
+        o->resetLattice();
+    }
+}
+
 /**
  After reading from file, the fiber structure need to be updated,
  as well as the Hands bound to them.
  */
 void FiberSet::prune()
 {
-    Inventoried * i = inventory_.first();
+    Object * i = ice_.pop_front();
     while ( i )
     {
         Fiber* o = static_cast<Fiber*>(i);
-        i = inventory_.next(i);
-        if ( !o->linked() )
-        {
-            inventory_.unassign(o);
-            o->objset(nullptr);
-            delete(o);
-        }
-        else
-        {
-            o->updateFiber();
-            o->resetLattice();
-        }
+        i = ice_.pop_front();
+        inventory_.unassign(o);
+        o->objset(nullptr);
+        delete(o);
     }
+    update();
+}
+
+
+void FiberSet::thaw()
+{
+    Object * i = ice_.pop_front();
+    while ( i )
+    {
+        Fiber* o = static_cast<Fiber*>(i);
+        i = ice_.pop_front();
+        link(o);
+    }
+    update();
 }
 
 

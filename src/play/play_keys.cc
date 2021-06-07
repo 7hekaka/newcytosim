@@ -1007,6 +1007,7 @@ void processKey(unsigned char key)
             setFiberDisp(player.allVisibleFiberDisp(), toggleLineStyle, 1);
             break;
             
+        case '?':
         case 177:
             setFiberDisp(player.allVisibleFiberDisp(), toggleStyle, 4);
             break;

@@ -108,9 +108,6 @@ public:
     /// reassign Single to different sublist following detachment of Hand
     void relinkD(Single *);
 
-    /// detach an attached Single
-    void detachA(Single *);
-
     /// create Wrists anchored on given Mecable
     ObjectList makeWrists(Mecable const*, size_t, size_t, std::string&);
 

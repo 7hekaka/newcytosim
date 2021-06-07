@@ -181,14 +181,12 @@ void ObjectSet::remove(ObjectList const& list)
 
 void ObjectSet::erase(ObjectPool & list)
 {
-    Object * n = list.front();
-    while ( n )
+    Object * i = list.pop_front();
+    while ( i )
     {
-        Object * p = n->next();
-        list.pop(n);
-        static_cast<Object*>(n)->objset(nullptr);
-        delete(n);
-        n = p;
+        static_cast<Object*>(i)->objset(nullptr);
+        delete(i);
+        i = list.pop_front();
     }
 }
 
@@ -442,32 +440,34 @@ void ObjectSet::flag(ObjectPool const& list, ObjectFlag f)
 }
 
 
+void ObjectSet::freeze()
+{
+    assert_true(ice_.empty());
+    ice_.append(pool_);
+}
+
+
 void ObjectSet::prune()
 {
-    Inventoried * i = inventory_.first();
+    Object * i = ice_.pop_front();
     while ( i )
     {
-        Object* o = static_cast<Object*>(i);
-        i = inventory_.next(i);
-        if ( !o->linked() )
-        {
-            inventory_.unassign(o);
-            o->objset(nullptr);
-            delete(o);
-        }
+        Object * o = i;
+        i = ice_.pop_front();
+        inventory_.unassign(o);
+        o->objset(nullptr);
+        delete(o);
     }
 }
 
 
 void ObjectSet::thaw()
 {
-    Inventoried * i = inventory_.first();
+    Object * i = ice_.pop_front();
     while ( i )
     {
-        Object* o = static_cast<Couple*>(i);
-        i = inventory_.next(i);
-        if ( ! o->linked() )
-            link(o);
+        link(i);
+        i = ice_.pop_front();
     }
 }
 
@@ -558,16 +558,20 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     if ( update )
     {
         obj = findID(id);
-        // check that property index has not changed:
-        if ( obj && obj->property()->number() != ix )
+        if ( obj && tag == obj->tag() )
         {
-            Property const* P = obj->property();
+            ice_.pop(obj);
+            // check that property index has not changed:
+            if ( obj->property()->number() != ix )
+            {
+                Property const* P = obj->property();
 #if ( 1 )
-            std::clog << "Warning: erasing " << P->category() << P->number() << " `" << P->name();
-            std::clog << "' to load object with property #" << ix << '\n';
+                std::clog << "Warning: erasing " << P->category() << P->number() << " `" << P->name();
+                std::clog << "' to load object with property #" << ix << '\n';
 #endif
-            erase(obj);
-            obj = nullptr;
+                erase(obj);
+                obj = nullptr;
+            }
         }
     }
     
@@ -601,7 +605,8 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         throw;
     }
     
-    if ( !obj->linked() )
+    // link only primary object:
+    if ( tag == obj->tag() )
     {
         link(obj);
         if ( mk ) obj->mark(mk);
