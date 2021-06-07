@@ -149,14 +149,27 @@ void ObjectPool::pop(Object * n)
 
 void ObjectPool::clear()
 {
+#if ( 0 )
+    // thorough unnecessary cleanup?
     Object * p, * n = frontO;
     while ( n )
     {
-        n->prevO = nullptr; // unnecessary?
+        n->set_ = nullptr;
+        n->prevO = nullptr;
         p = n->nextO;
-        n->nextO = nullptr; // unnecessary?
+        n->nextO = nullptr;
         n = p;
     }
+#endif
+#if ( 1 )
+    // necessary cleanup
+    Object * n = frontO;
+    while ( n )
+    {
+        n->set_ = nullptr;
+        n = n->nextO;
+    }
+#endif
     frontO = nullptr;
     backO  = nullptr;
     nSize  = 0;
@@ -558,10 +571,11 @@ bool ObjectPool::count(Object const* n) const
 int ObjectPool::bad() const
 {
     size_t cnt = 0;
-    Object * p = frontO, * q;
     
-    if ( p  &&  p->prevO != nullptr )
+    if ( frontO && frontO->prevO != nullptr )
         return 1;
+    
+    Object * p = frontO, * q;
     while ( p )
     {
         q = p->nextO;

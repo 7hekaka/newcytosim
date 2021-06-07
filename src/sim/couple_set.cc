@@ -282,12 +282,12 @@ void CoupleSet::relinkA1(Couple * obj)
     if ( obj->attached2() )
     {
         faList.pop(obj);
-        aaList.push_front(obj);
+        aaList.push_back(obj);
     }
     else
     {
         ffList.pop(obj);
-        afList.push_front(obj);
+        afList.push_back(obj);
     }
 }
 
@@ -299,12 +299,12 @@ void CoupleSet::relinkD1(Couple * obj)
     if ( obj->attached2() )
     {
         aaList.pop(obj);
-        faList.push_front(obj);
+        faList.push_back(obj);
     }
     else
     {
         afList.pop(obj);
-        ffList.push_front(obj);
+        ffList.push_back(obj);
     }
 }
 
@@ -316,12 +316,12 @@ void CoupleSet::relinkA2(Couple * obj)
     if ( obj->attached1() )
     {
         afList.pop(obj);
-        aaList.push_front(obj);
+        aaList.push_back(obj);
     }
     else
     {
         ffList.pop(obj);
-        faList.push_front(obj);
+        faList.push_back(obj);
     }
 }
 
@@ -333,12 +333,12 @@ void CoupleSet::relinkD2(Couple * obj)
     if ( obj->attached1() )
     {
         aaList.pop(obj);
-        afList.push_front(obj);
+        afList.push_back(obj);
     }
     else
     {
         faList.pop(obj);
-        ffList.push_front(obj);
+        ffList.push_back(obj);
     }
 }
 
@@ -350,7 +350,9 @@ void CoupleSet::link(Object * obj)
     
     obj->objset(this);
     Couple * c = static_cast<Couple*>(obj);
-    sublist(c->attached1(), c->attached2()).push_front(obj);
+    sublist(c->attached1(), c->attached2()).push_back(obj);
+    
+    //std::clog << "CoupleSet has " << ffList.size() << "  " << afList.size() << "  " << faList.size() << "  " << aaList.size() << '\n';
 }
 
 
@@ -371,15 +373,6 @@ void CoupleSet::unlink(Object * obj)
     
     obj->objset(nullptr);
     sublist(c->attached1(), c->attached2()).pop(obj);
-}
-
-
-void CoupleSet::relink(Object * obj, const bool s1, const bool s2)
-{
-    assert_true( obj->objset() == this );
-    sublist(s1, s2).pop(obj);
-    Couple * c = static_cast<Couple*>(obj);
-    sublist(c->attached1(), c->attached2()).push_front(obj);
 }
 
 
@@ -416,142 +409,53 @@ void CoupleSet::erase()
 }
 
 
-void CoupleSet::freeze(ObjectFlag f)
+void CoupleSet::freeze()
 {
     relax();
-    ObjectSet::flag(aaList, f);
-    ObjectSet::flag(faList, f);
-    ObjectSet::flag(afList, f);
-    ObjectSet::flag(ffList, f);
+    aaList.clear();
+    faList.clear();
+    afList.clear();
+    ffList.clear();
 }
 
 
-void CoupleSet::detachAA(Couple * c)
-{
-    c->hand1()->detachHand();
-    c->hand2()->detachHand();
-    aaList.pop(c);
-    ffList.push_back(c);
-}
-
-
-void CoupleSet::detachFA(Couple * c)
-{
-    c->hand2()->detachHand();
-    faList.pop(c);
-    ffList.push_back(c);
-}
-
-
-void CoupleSet::detachAF(Couple * c)
-{
-    c->hand1()->detachHand();
-    afList.pop(c);
-    ffList.push_back(c);
-}
-
-
-void CoupleSet::pruneDetach(ObjectFlag f)
-{
-    /* Update system given that only attached hand were read again */
-    for ( Couple* c=firstAF(), *n; c; c=n )
-    {
-        n = c->next();
-        if ( c->flag() == f )
-            detachAF(c);
-        c->flag(0);
-    }
-    for ( Couple* c=firstFA(), *n; c; c=n )
-    {
-        n = c->next();
-        if ( c->flag() == f )
-            detachFA(c);
-        c->flag(0);
-    }
-    for ( Couple* c=firstAA(), *n; c; c=n )
-    {
-        n = c->next();
-        if ( c->flag() == f )
-            detachAA(c);
-        c->flag(0);
-    }
-    ObjectSet::flag(ffList, 0);
-}
-
-
-void CoupleSet::deleteAA(Couple * c)
-{
-    c->hand1()->detachHand();
-    c->hand2()->detachHand();
-    inventory_.unassign(c);
-    c->objset(nullptr);
-    aaList.pop(c);
-    delete(c);
-}
-
-
-void CoupleSet::deleteFA(Couple * c)
-{
-    c->hand2()->detachHand();
-    inventory_.unassign(c);
-    c->objset(nullptr);
-    faList.pop(c);
-    delete(c);
-}
-
-
-void CoupleSet::deleteAF(Couple * c)
-{
-    c->hand1()->detachHand();
-    inventory_.unassign(c);
-    c->objset(nullptr);
-    afList.pop(c);
-    delete(c);
-}
-
-
-void CoupleSet::prune(ObjectFlag f)
+void CoupleSet::pruneDetach()
 {
     /* After reading from file, the Hands should not
      update any Fiber, Single or Couple as they will be deleted */
-    for ( Couple* c=firstAF(), *n; c; c=n )
+    Inventoried * i = inventory_.first();
+    while ( i )
     {
-        n = c->next();
-        if ( c->flag() == f )
-            deleteAF(c);
-        else
-            c->flag(0);
+        Couple* o = static_cast<Couple*>(i);
+        i = inventory_.next(i);
+        if ( ! o->linked() )
+        {
+            if ( o->attached1() ) o->hand1()->detachHand();
+            if ( o->attached2() ) o->hand2()->detachHand();
+            link(o);
+        }
     }
-    for ( Couple* c=firstFA(), *n; c; c=n )
-    {
-        n = c->next();
-        if ( c->flag() == f )
-            deleteFA(c);
-        else
-            c->flag(0);
-    }
-    for ( Couple* c=firstAA(), *n; c; c=n )
-    {
-        n = c->next();
-        if ( c->flag() == f )
-            deleteAA(c);
-        else
-            c->flag(0);
-    }
-    
-    //ObjectSet::prune(aaList, f, 0);
-    //ObjectSet::prune(faList, f, 0);
-    //ObjectSet::prune(afList, f, 0);
-    ObjectSet::prune(ffList, f, 0);
 }
 
 
-void CoupleSet::thaw()
+void CoupleSet::prune()
 {
-    ObjectSet::flag(aaList, 0);
-    ObjectSet::flag(faList, 0);
-    ObjectSet::flag(afList, 0);
-    ObjectSet::flag(ffList, 0);
+    /* After reading from file, the Hands should not
+     update any Fiber, Single or Couple as they will be deleted */
+    Inventoried * i = inventory_.first();
+    while ( i )
+    {
+        Couple* o = static_cast<Couple*>(i);
+        i = inventory_.next(i);
+        if ( ! o->linked() )
+        {
+            if ( o->attached1() ) o->hand1()->detachHand();
+            if ( o->attached2() ) o->hand2()->detachHand();
+            inventory_.unassign(o);
+            o->objset(nullptr);
+            delete(o);
+        }
+    }
 }
 
 

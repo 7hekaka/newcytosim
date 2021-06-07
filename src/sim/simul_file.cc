@@ -247,15 +247,16 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
 
     if ( id == 0 )
         return nullptr;
-    
-    if ( !isalpha(tag) )
-        throw InvalidIO("`"+std::string(1,tag)+"' is not a valid class TAG");
 
     const ObjectSet * set = findSetT(tag);
     
     if ( !set )
+    {
+        if ( !isalpha(tag) )
+            throw InvalidIO("`"+std::string(1,tag)+"' is not a valid class TAG");
         throw InvalidIO("`"+std::string(1,tag)+"' is not a known class TAG");
-
+    }
+    
     Object * res = set->findID(id);
     
     if ( !res )
@@ -276,9 +277,6 @@ private:
     /// state
     bool  frozen;
     
-    /// value of flag
-    static constexpr ObjectFlag FLAG = 777;
-    
 public:
     
     /// flag all objects with FLAG
@@ -286,40 +284,40 @@ public:
     : sim(s)
     {
         //Cytosim::log("Simul::InputLock created with %i objects\n", sim->nbObjects());
-        sim->couples.freeze(FLAG);
-        sim->singles.freeze(FLAG);
-        sim->fibers.freeze(FLAG);
-        sim->beads.freeze(FLAG);
-        sim->solids.freeze(FLAG);
-        sim->spheres.freeze(FLAG);
-        sim->tubules.freeze(FLAG);
-        sim->organizers.freeze(FLAG);
-        sim->fields.freeze(FLAG);
-        sim->spaces.freeze(FLAG);
-        //sim->events.freeze(FLAG);
+        sim->couples.freeze();
+        sim->singles.freeze();
+        sim->fibers.freeze();
+        sim->beads.freeze();
+        sim->solids.freeze();
+        sim->spheres.freeze();
+        sim->tubules.freeze();
+        sim->organizers.freeze();
+        sim->fields.freeze();
+        sim->spaces.freeze();
+        //sim->events.freeze();
         frozen = true;
     }
     
     /// erase objects flagged with FLAG
     void prune(bool alt_single, bool alt_couple)
     {
-        //sim->events.prune(FLAG);
-        sim->organizers.prune(FLAG);
-        sim->tubules.prune(FLAG);
+        //sim->events.prune();
+        sim->organizers.prune();
+        sim->tubules.prune();
         if ( alt_couple )
-            sim->couples.pruneDetach(FLAG);
+            sim->couples.pruneDetach();
         else
-            sim->couples.prune(FLAG);
+            sim->couples.prune();
         if ( alt_single )
-            sim->singles.pruneDetach(FLAG);
+            sim->singles.pruneDetach();
         else
-            sim->singles.prune(FLAG);
-        sim->beads.prune(FLAG);
-        sim->solids.prune(FLAG);
-        sim->spheres.prune(FLAG);
-        sim->fibers.prune(FLAG);
-        sim->spaces.prune(FLAG);
-        sim->fields.prune(FLAG);
+            sim->singles.prune();
+        sim->beads.prune();
+        sim->solids.prune();
+        sim->spheres.prune();
+        sim->fibers.prune();
+        sim->spaces.prune();
+        sim->fields.prune();
         frozen = false;
     }
 
@@ -331,15 +329,15 @@ public:
          destroying a Fiber will detach any motor attached to it,
          and thus automatically move them to the 'unattached' list,
          as if they had been updated from reading the file.
-         Destroying couples and singles before the fibers avoid this problem.
+         Destroying couples and singles before the fibers avoids this problem.
          */
         if ( frozen )
         {
             //sim->events.thaw();
-            sim->organizers.thaw();
-            sim->tubules.thaw();
             sim->couples.thaw();
             sim->singles.thaw();
+            sim->organizers.thaw();
+            sim->tubules.thaw();
             sim->beads.thaw();
             sim->solids.thaw();
             sim->spheres.thaw();
@@ -527,6 +525,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                 objset = findSet(section);
                 if ( !objset )
                     std::clog << " warning: unknown section |" << section << "|\n";
+                if ( subset && objset != subset )
+                    in.skip_until("#section ");
             }
             // frame start
             else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )
@@ -632,26 +632,20 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                     continue;
                 }
             }
+            // this is an 'older' code pathway, before 2017?
+            if ( !objset )
+            {
+                ObjectSet * set = findSetT(tag);
+                if ( set )
+                    set->loadObject(in, tag, fat, true);
+                continue;
+            }
 #endif
             try
             {
-                if ( objset )
-                {
-                    // check that we are using the correct ObjectSet:
-                    assert_true( objset == findSetT(tag) );
-                    const bool discard = ( subset && subset!=objset );
-                    objset->loadObject(in, tag, fat, discard, true);
-                }
-                else
-                {
-                    // this is an 'older' code pathway
-                    ObjectSet * set = findSetT(tag);
-                    if ( set )
-                    {
-                        const bool discard = ( subset && subset!=set );
-                        set->loadObject(in, tag, fat, discard, true);
-                    }
-                }
+                // check that we are using the correct ObjectSet:
+                assert_true( objset == findSetT(tag) );
+                objset->loadObject(in, tag, fat, true);
             }
             catch( Exception & e )
             {

@@ -203,7 +203,6 @@ Inventoried* Inventory::last() const
 
 Inventoried* Inventory::next(Inventoried const* i) const
 {
-    assert_true(byNames[i->identity()]==i);
     ObjectID n = i->identity() + 1;
     assert_true(n <= allocated_);
     if ( byNames[n] )

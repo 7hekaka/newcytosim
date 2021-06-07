@@ -692,18 +692,23 @@ void FiberSet::flipFiberPolarity()
  After reading from file, the fiber structure need to be updated,
  as well as the Hands bound to them.
  */
-void FiberSet::prune(ObjectFlag f)
+void FiberSet::prune()
 {
-    for (Fiber* fib=first(), *n; fib; fib=n)
+    Inventoried * i = inventory_.first();
+    while ( i )
     {
-        n = fib->next();
-        if ( fib->flag() == f )
-            delete(fib);
+        Fiber* o = static_cast<Fiber*>(i);
+        i = inventory_.next(i);
+        if ( !o->linked() )
+        {
+            inventory_.unassign(o);
+            o->objset(nullptr);
+            delete(o);
+        }
         else
         {
-            fib->updateFiber();
-            fib->resetLattice();
-            fib->flag(0);
+            o->updateFiber();
+            o->resetLattice();
         }
     }
 }

@@ -181,14 +181,14 @@ ObjectList SingleSet::newObjects(const std::string& name, Glossary& opt)
 void SingleSet::relinkA(Single * obj)
 {
     fList.pop(obj);
-    aList.push_front(obj);
+    aList.push_back(obj);
 }
 
 
 void SingleSet::relinkD(Single * obj)
 {
     aList.pop(obj);
-    fList.push_front(obj);
+    fList.push_back(obj);
 }
 
 
@@ -200,9 +200,11 @@ void SingleSet::link(Object * obj)
     obj->objset(this);
 
     if ( static_cast<Single*>(obj)->attached() )
-        aList.push_front(obj);
+        aList.push_back(obj);
     else
-        fList.push_front(obj);
+        fList.push_back(obj);
+    
+    //std::clog << "SingleSet has " << fList.size() << "  " << aList.size() << '\n';
 }
 
 /**
@@ -250,11 +252,11 @@ void SingleSet::erase()
 }
 
 
-void SingleSet::freeze(ObjectFlag f)
+void SingleSet::freeze()
 {
     relax();
-    ObjectSet::flag(aList, f);
-    ObjectSet::flag(fList, f);
+    aList.clear();
+    fList.clear();
 }
 
 
@@ -266,54 +268,39 @@ void SingleSet::detachA(Single * s)
 }
 
 
-void SingleSet::pruneDetach(ObjectFlag f)
-{
-    /* Update system given that only attached hand were read again */
-    for ( Single* s=firstA(), *n; s; s=n )
-    {
-        n = s->next();
-        if ( s->flag() == f )
-            detachA(s);
-        s->flag(0);
-    }
-    
-    //ObjectSet::prune(aList, f, 0);
-    ObjectSet::flag(fList, 0);
-}
-
-
-void SingleSet::deleteA(Single * s)
-{
-    s->hand()->detachHand();
-    inventory_.unassign(s);
-    s->objset(nullptr);
-    aList.pop(s);
-    delete(s);
-}
-
-
-void SingleSet::prune(ObjectFlag f)
+void SingleSet::pruneDetach()
 {
     /* After reading from file, the Hands should not update
      any Fiber, Single or Couple as they will be deleted */
-    for ( Single* s=firstA(), *n; s; s=n )
+    Inventoried * i = inventory_.first();
+    while ( i )
     {
-        n = s->next();
-        if ( s->flag() == f )
-            deleteA(s);
-        else
-            s->flag(0);
+        Single* o = static_cast<Single*>(i);
+        i = inventory_.next(i);
+        if ( ! o->linked() )
+            detachA(o);
     }
-    
-    //ObjectSet::prune(aList, f, 0);
-    ObjectSet::prune(fList, f, 0);
 }
 
 
-void SingleSet::thaw()
+void SingleSet::prune()
 {
-    ObjectSet::flag(aList, 0);
-    ObjectSet::flag(fList, 0);
+    /* After reading from file, the Hands should not update
+     any Fiber, Single or Couple as they will be deleted */
+    Inventoried * i = inventory_.first();
+    while ( i )
+    {
+        Single* o = static_cast<Single*>(i);
+        i = inventory_.next(i);
+        if ( ! o->linked() )
+        {
+            if ( o->attached() )
+                o->hand()->detachHand();
+            inventory_.unassign(o);
+            o->objset(nullptr);
+            delete(o);
+        }
+    }
 }
 
 

@@ -107,10 +107,7 @@ public:
     
     /// reassign Single to different sublist following detachment of Hand
     void relinkD(Single *);
-    
-    /// delete an attached Single
-    void deleteA(Single *);
-    
+
     /// detach an attached Single
     void detachA(Single *);
 
@@ -177,18 +174,15 @@ public:
 
     //--------------------------
     
-    /// mark object before import
-    void freeze(ObjectFlag f);
+    /// unlink all objects before import
+    void freeze();
     
-    /// detach marked object after import
-    void pruneDetach(ObjectFlag f);
+    /// detach objects that were not updated during import
+    void pruneDetach();
 
-    /// delete marked object after import
-    void prune(ObjectFlag f);
-    
-    /// unmark objects after import
-    void thaw();
-    
+    /// delete objects that were not updated during import
+    void prune();
+
     /// check internal consistency, returns 0 if everything is OK
     int bad() const;
 

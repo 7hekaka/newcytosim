@@ -89,20 +89,6 @@ private:
     
     /// release Couples from reserve lists
     void uniRelax();
-    
-    /// detach AA Couple
-    void detachAA(Couple*);
-    /// detach AF Couple
-    void detachAF(Couple*);
-    /// detach FA Couple
-    void detachFA(Couple*);
-
-    /// delete AA Couple
-    void deleteAA(Couple*);
-    /// delete AF Couple
-    void deleteAF(Couple*);
-    /// delete FA Couple
-    void deleteFA(Couple*);
 
 public:
         
@@ -160,9 +146,6 @@ public:
     void relinkA2(Couple *);
     /// reassign Couple to sublist following detachment of Hand 2
     void relinkD2(Couple *);
-
-    /// reassign Couple to different sublist, given previous state
-    void relink(Object *, bool attached1, bool attached2);
 
     /// first unattached Couple
     Couple * firstFF() const{ return static_cast<Couple*>(ffList.front()); }
@@ -263,17 +246,14 @@ public:
 
     //--------------------------
 
-    /// mark object before import
-    void freeze(ObjectFlag f);
+    /// unlink all objects before import
+    void freeze();
     
-    /// detach marked object after import
-    void pruneDetach(ObjectFlag f);
+    /// detach objects that were not updated during import
+    void pruneDetach();
 
-    /// delete marked object after import
-    void prune(ObjectFlag f);
-    
-    /// unmark objects after import
-    void thaw();
+    /// delete objects that were not updated during import
+    void prune();
     
     ///debug function
     int bad() const;

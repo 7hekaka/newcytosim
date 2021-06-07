@@ -106,7 +106,7 @@ public:
     void flipFiberPolarity();
     
     /// delete marked object after import
-    void prune(ObjectFlag);
+    void prune();
 
     //--------------------------------------------------------------------------
     

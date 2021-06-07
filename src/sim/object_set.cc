@@ -22,7 +22,9 @@ void ObjectSet::link(Object * obj)
 {
     assert_true( !obj->objset() );
     obj->objset(this);
-    pool_.push_front(obj);
+    pool_.push_back(obj);
+    
+    //std::clog << "ObjectSet has " << pool_.size() << '\n';
 }
 
 
@@ -440,18 +442,32 @@ void ObjectSet::flag(ObjectPool const& list, ObjectFlag f)
 }
 
 
-void ObjectSet::prune(ObjectPool const& list, ObjectFlag f, ObjectFlag g)
+void ObjectSet::prune()
 {
-    Object * n = list.front();
-    
-    while ( n )
+    Inventoried * i = inventory_.first();
+    while ( i )
     {
-        Object * p = n->next();
-        if ( n->flag() == f )
-            delete(n);
-        else
-            n->flag(g);
-        n = p;
+        Object* o = static_cast<Object*>(i);
+        i = inventory_.next(i);
+        if ( !o->linked() )
+        {
+            inventory_.unassign(o);
+            o->objset(nullptr);
+            delete(o);
+        }
+    }
+}
+
+
+void ObjectSet::thaw()
+{
+    Inventoried * i = inventory_.first();
+    while ( i )
+    {
+        Object* o = static_cast<Couple*>(i);
+        i = inventory_.next(i);
+        if ( ! o->linked() )
+            link(o);
     }
 }
 
@@ -527,7 +543,7 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
  If 'update==true', the corresponding object is changed, or a new object is created.
  If 'discard==true', the object is deleted / not loaded
  */
-void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool discard, bool update)
+void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool update)
 {
     PropertyID ix = 0;
     ObjectID id = 0;
@@ -568,6 +584,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool dis
             throw InvalidIO("invalid ObjectTag "+str+" referenced in file");
         }
         obj->identity(id);
+        inventory_.assign(obj);
         //std::clog << "- new " << Object::reference(tag, ix, id) << '\n';
     }
     assert_true( obj->identity() == id );
@@ -584,15 +601,10 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool dis
         throw;
     }
     
-    if ( discard )
-        delete(obj);
-    else
+    if ( !obj->linked() )
     {
-        if ( !obj->linked() )
-            add(obj);
-        // clear flag to indicate that object was refreshed:
-        obj->flag(0);
-        obj->mark(mk);
+        link(obj);
+        if ( mk ) obj->mark(mk);
     }
 }
 

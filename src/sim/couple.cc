@@ -547,27 +547,12 @@ void Couple::write(Outputter& out) const
 
 void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    const bool s1 = attached1();
-    const bool s2 = attached2();
-    
     const bool a1 = cHand1->read(in, sim);
     const bool a2 = cHand2->read(in, sim);
     
     if ( a1 || a2 )
-        cPos = position();
+        ;//cPos = position();
     else
         in.readFloats(cPos, DIM);
-    
-    /*
-     Because the CoupleSet contains 4 sublists where Couple are stored depending
-     on their bound/unbound state, we need to relink *this Couple now,
-     since the state stored on file could be different from the current state.
-     */
-    if ( s1 != attached1() || s2 != attached2() )
-    {
-        CoupleSet * set = static_cast<CoupleSet*>(objset());
-        if ( set )
-            set->relink(this, s1, s2);
-    }
 }
 

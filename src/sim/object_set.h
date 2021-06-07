@@ -57,9 +57,6 @@ protected:
     /// mark all objects from given list with value `f`
     static void flag(ObjectPool const&, ObjectFlag f);
     
-    /// delete objects which are marked as `f` from given list, and mark objects with `s`
-    static void prune(ObjectPool const&, ObjectFlag f, ObjectFlag g);
-    
     /// collect objects from ObjectPool for which func(obj, val) == true
     static size_t count(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
 
@@ -77,14 +74,14 @@ protected:
 
 public:
     
-    /// mark objects before import
-    virtual void freeze(ObjectFlag f) { flag(pool_, f); }
+    /// unlink all objects before import
+    virtual void freeze() { pool_.clear(); }
     
-    /// delete marked objects
-    virtual void prune(ObjectFlag f)  { prune(pool_, f, 0); }
+    /// delete objects that were not updated during import
+    virtual void prune();
     
-    /// unmark objects after import
-    virtual void thaw()               { flag(pool_, 0); }
+    /// relink all objects after import
+    void thaw();
     
     /// apply translation to all Objects in ObjectList
     static void translateObjects(ObjectList const&, Vector const&);
@@ -194,7 +191,7 @@ public:
     ObjectList collect(Property const*) const;
     
     /// load one Object from file, or skip it if `skip==true`
-    void loadObject(Inputter&, ObjectTag tag, bool fat, bool skip, bool update);
+    void loadObject(Inputter&, ObjectTag tag, bool fat, bool update);
     
     /// write all Objects to file
     virtual void write(Outputter&) const = 0;
