@@ -85,11 +85,11 @@ new 300 creator ( surface 1 )
 
 report microtubule:plus_state states.txt { verbose = 1 }
 
-repeat 500
+repeat 100
 {
-    run 1000 system
+    run 5000 system
     {
-        nb_frames = 10
+        nb_frames = 1
     }
     report microtubule:plus_state states.txt { verbose = 0; }
 }

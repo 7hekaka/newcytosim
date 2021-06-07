@@ -409,8 +409,8 @@ static void flashLineStyle(int val)
         case 3: flashText("Fiber jet color by axial tensions"); break;
         case 4: flashText("Fiber color by curvature"); break;
         case 5: flashText("Fiber color by orientation"); break;
-        case 6: flashText("Fiber color by distance to minus-end"); break;
-        case 7: flashText("Fiber color by distance to plus-end"); break;
+        case 6: flashText("Fiber highlight near minus-end"); break;
+        case 7: flashText("Fiber highlight near plus-end"); break;
         case 8: flashText("Fiber color by height"); break;
         case 9: flashText("Fiber color by grid (if style=3)"); break;
         default: flashText("unknown fiber:line style"); break;

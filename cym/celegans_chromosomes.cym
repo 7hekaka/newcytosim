@@ -143,6 +143,6 @@ new star
 run system
 {
     nb_steps = 50000
-    nb_frames = 1000
+    nb_frames = 100
 }
 
