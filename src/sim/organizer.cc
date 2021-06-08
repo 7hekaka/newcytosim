@@ -48,17 +48,15 @@ void Organizer::goodbye(Buddy const* b)
         *i = nullptr;
 }
 
-
-void Organizer::addOrganized(Simul & sim)
+/* This is not necessary anymore, and object should all be linked */
+void Organizer::checkOrganized() const
 {
     for ( Mecable * i : mObjects )
     {
         if ( i && ! i->linked() )
         {
-            std::clog << " Registering " << i->reference() << "\n";
-            sim.add(i);
+            std::clog << " Organized " << i->reference() << " is not linked\n";
         }
-        //i->mark(identity());
     }
 }
 

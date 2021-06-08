@@ -191,7 +191,7 @@ public:
 #if UNCONSTRAINED_LENGTH
     void constrainLength(bool s) { unconstrainLength = !s; }
 #else
-    void constrainLength(bool) { std::clog << "Warning: unconstrained length not supported\n"; }
+    void constrainLength(bool s) { if (!s) { std::cerr<<"UNCONSTRAINED_LENGTH is disabled\n"; exit(1); } }
 #endif
 
     //---------------------

@@ -38,10 +38,10 @@ class alignas(64) Random
     /// reserve of random integers
     uint32_t integers_[SFMT_N32];
 
-    /// reserve of standard normally-distributed numbers ~ N(0,1)
+    /// reserve of normally-distributed numbers, with zero mean and unit variance
     real gaussians_[SFMT_N32];
     
-    /// reserve of exponentially-distributed numbers
+    /// reserve of exponentially-distributed numbers, with unit mean
     real exponentials_[SFMT_N32];
 
     /// Mersenne Twister Generator

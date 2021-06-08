@@ -116,14 +116,6 @@ void OrganizerSet::write(Outputter& out) const
 
 //------------------------------------------------------------------------------
 
-void OrganizerSet::add(Object * obj)
-{
-    ObjectSet::add(obj);
-    // we also link all dependent objects:
-    static_cast<Organizer*>(obj)->addOrganized(simul_);
-}
-
-
 ObjectID OrganizerSet::findOrganizerID(const Mecable * m) const
 {
     ObjectID res = 0;

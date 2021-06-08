@@ -7,7 +7,7 @@
 void DisplayProp::clear()
 {
     style          = 1;
-    tile           = 0;
+    tile           = 8;
     fold           = 1;
     draw_links     = true;
 

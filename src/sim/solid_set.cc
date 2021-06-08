@@ -106,12 +106,6 @@ void SolidSet::write(Outputter& out) const
 
 //------------------------------------------------------------------------------
 
-void SolidSet::add(Object * obj)
-{
-    assert_true(obj->tag() == Solid::TAG);
-    ObjectSet::add(obj);
-}
-
 
 void SolidSet::remove(Object * obj)
 {

@@ -91,13 +91,14 @@ void SpaceSet::erase()
 /**
  This will change the Simul current Space if it was not set
 */
-void SpaceSet::add(Object * obj)
+void SpaceSet::link(Object * obj)
 {
     assert_true(obj->tag() == Space::TAG);
     //std::clog << "SpaceSet::add " << obj << '\n';
-    ObjectSet::add(obj);
+    ObjectSet::link(obj);
     
-    if ( !master() || obj->identity() < master()->identity() )
+    Space const* m = master();
+    if ( !m || obj->identity() < m->identity() )
         setMaster(static_cast<Space*>(obj));
 }
 
@@ -105,10 +106,10 @@ void SpaceSet::add(Object * obj)
  If the Simulation current Space is deleted,
  the 'oldest' remaining Space is chosen to replace it.
  */
-void SpaceSet::remove(Object * obj)
+void SpaceSet::unlink(Object * obj)
 {
     //std::clog << "SpaceSet::remove " << obj << '\n';
-    ObjectSet::remove(obj);
+    ObjectSet::unlink(obj);
 
     if ( obj == master() )
     {

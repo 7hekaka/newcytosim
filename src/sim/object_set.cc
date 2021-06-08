@@ -583,8 +583,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         if ( !obj )
         {
             std::string str = std::to_string(tag);
-            if ( isprint(tag) )
-                str += " ("+std::string(1,tag)+")";
+            if ( isprint(tag) ) str += " ("+std::string(1,tag)+")";
             throw InvalidIO("invalid ObjectTag "+str+" referenced in file");
         }
         obj->identity(id);

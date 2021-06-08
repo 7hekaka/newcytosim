@@ -46,10 +46,10 @@ public:
     //--------------------------
     
     /// add Object
-    void add(Object *);
+    void link(Object *);
     
     /// remove Object
-    void remove(Object *);
+    void unlink(Object *);
 
     /// erase all Object and all Property
     void erase();

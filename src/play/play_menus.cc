@@ -122,7 +122,7 @@ static void processMenuDisplay(int item)
     {
         case 0: return;
         case 1: view.reset(); break;
-        case 3: disp.tile = ( disp.tile ? 0 : 7 ); break;
+        case 3: disp.tile = ( disp.tile ? 0 : 8 ); break;
         case 4: glApp::toggleFullScreen(); break;
         case 6: view.track_fibers = !view.track_fibers; break;
         

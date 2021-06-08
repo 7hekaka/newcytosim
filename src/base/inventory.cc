@@ -65,10 +65,16 @@ void Inventory::assign(Inventoried * obj)
 {
     ObjectID& n = obj->identity();
     
-    if ( n == 0 )
+    if ( n <= 0 )
         n = ++highest_;
     else
+    {
+        // already allocated and registered
+        if ( n < allocated_ && byNames[n] == obj )
+            return;
+
         highest_ = std::max(highest_, n);
+    }
     
     if ( n >= allocated_ )
         allocate(n+1);

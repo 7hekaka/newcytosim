@@ -39,9 +39,6 @@ public:
     void        report(std::ostream&) const;
 
     //--------------------------
-
-    /// register Organizer
-    void        add(Object *);
     
     /// first Organizer
     Organizer * first() const;

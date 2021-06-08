@@ -211,7 +211,7 @@ void Display::drawSimul(Simul const& sim)
  and then all transparent objects for all tiles. Here, we calls Display::drawSimul()
  a number of times, and objects are only sorted within each tile. The result is imperfect.
  */
-void Display::drawTiled(Simul const& sim, int arg)
+void Display::drawTiled(Simul const& sim, int tile)
 {
     assert_true(modulo);
     
@@ -222,7 +222,7 @@ void Display::drawTiled(Simul const& sim, int arg)
     {
         if ( modulo->isPeriodic(d) )
         {
-            l[d] = (arg & (1<<d)) ? -1 : 0;
+            l[d] = -((tile>>d)&1);
             u[d] = +1;
         }
     }

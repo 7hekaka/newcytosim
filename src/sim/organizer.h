@@ -66,7 +66,7 @@ public:
     void goodbye(Buddy const*);
     
     /// add objects to Simul if they are not already linked
-    virtual void addOrganized(Simul&);
+    void checkOrganized() const;
 
     //--------------------------------------------------------------------------
 

@@ -146,7 +146,8 @@ void Tubule::setFamily(Fiber const* fam)
     if ( bone_ )
         bone_->family_ = fam;
 #else
-    std::clog << "WARNING: to use Tubule, please compile with FIBER_HAS_FAMILY\n";
+    std::cerr << "ERROR: to use Tubule, please compile with FIBER_HAS_FAMILY\n";
+    exit(1);
 #endif
 }
 

@@ -129,13 +129,13 @@ public:
     //--------------------------
     
     /// register Object, and add it at the end of the list
-    virtual void add(Object *);
+    void add(Object *);
+    
+    /// remove Object
+    void remove(Object *);
     
     /// add multiple Objects
     void add(ObjectList const&);
-    
-    /// remove Object
-    virtual void remove(Object *);
 
     /// remove all Objects in list
     void remove(ObjectList const&);
