@@ -20,8 +20,7 @@ extern Modulo const* modulo;
  */
 void ObjectSet::link(Object * obj)
 {
-    assert_true( !obj->objset() );
-    obj->objset(this);
+    //assert_true( !obj->objset() || obj->objset() == this );
     pool_.push_back(obj);
     
     //std::clog << "ObjectSet has " << pool_.size() << '\n';
@@ -30,9 +29,8 @@ void ObjectSet::link(Object * obj)
 
 void ObjectSet::unlink(Object * obj)
 {
-    assert_true( obj->objset() == this );
+    //assert_true( obj->objset() == this );
     pool_.pop(obj);
-    obj->objset(nullptr);
 }
 
 //------------------------------------------------------------------------------
@@ -145,7 +143,9 @@ void ObjectSet::add(Object * obj)
 {
     if ( !obj->linked() )
     {
+        assert_true( !obj->objset() || obj->objset() == this );
         inventory_.assign(obj);
+        obj->objset(this);
         link(obj);
         //std::clog << "ObjectSet::add(" << obj->reference() << ")\n";
     }
@@ -166,9 +166,10 @@ void ObjectSet::add(ObjectList const& list)
 void ObjectSet::remove(Object * obj)
 {
     //std::clog << "ObjectSet::remove " <<  obj->reference() << '\n';
+    assert_true( obj->objset() == this );
+    unlink(obj);
+    obj->objset(nullptr);
     inventory_.unassign(obj);
-    if ( obj->linked() )
-        unlink(obj);
 }
 
 
@@ -176,18 +177,6 @@ void ObjectSet::remove(ObjectList const& list)
 {
     for ( Object * obj : list )
         remove(obj);
-}
-
-
-void ObjectSet::erase(ObjectPool & list)
-{
-    Object * i = list.pop_front();
-    while ( i )
-    {
-        static_cast<Object*>(i)->objset(nullptr);
-        delete(i);
-        i = list.pop_front();
-    }
 }
 
 
@@ -199,9 +188,21 @@ void ObjectSet::erase(Object * obj)
 }
 
 
+void ObjectSet::erasePool(ObjectPool & list)
+{
+    Object * i = list.pop_front();
+    while ( i )
+    {
+        static_cast<Object*>(i)->objset(nullptr);
+        delete(i);
+        i = list.pop_front();
+    }
+}
+
+
 void ObjectSet::erase()
 {
-    erase(pool_);
+    erasePool(pool_);
     inventory_.clear();
 }
 

@@ -577,7 +577,6 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
             // dynamic of new ends are set as usual:
             setEndStateP(stateP);
             fib->setEndStateM(stateM);
-            //assert_true(!fib->linked());
             objset()->add(fib);
         }
     }
@@ -1663,12 +1662,12 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
     if ( glue->attached() )
     {
         if ( !glue->linked() )
-            simul().singles.link(glue);
+            simul().singles.add(glue);
     }
     else
     {
         if ( glue->linked() )
-            simul().singles.unlink(glue);
+            simul().singles.remove(glue);
     }
 #endif
 }

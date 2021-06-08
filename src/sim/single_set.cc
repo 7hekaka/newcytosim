@@ -181,28 +181,25 @@ ObjectList SingleSet::newObjects(const std::string& name, Glossary& opt)
 void SingleSet::relinkA(Single * obj)
 {
     fList.pop(obj);
-    aList.push_back(obj);
+    aList.push_front(obj);
 }
 
 
 void SingleSet::relinkD(Single * obj)
 {
     aList.pop(obj);
-    fList.push_back(obj);
+    fList.push_front(obj);
 }
 
 
 void SingleSet::link(Object * obj)
 {
-    assert_true( !obj->objset() );
     assert_true( obj->tag()==Single::TAG || obj->tag()==Wrist::TAG );
 
-    obj->objset(this);
-
     if ( static_cast<Single*>(obj)->attached() )
-        aList.push_back(obj);
+        aList.push_front(obj);
     else
-        fList.push_back(obj);
+        fList.push_front(obj);
     
     //std::clog << "SingleSet has " << fList.size() << "  " << aList.size() << '\n';
 }
@@ -212,19 +209,17 @@ void SingleSet::link(Object * obj)
  */
 void SingleSet::unlink(Object * obj)
 {
-    assert_true( obj->objset() == this );
-    
     Single * s = static_cast<Single*>(obj);
   
     if ( s->attached() )
-        s->detach();
-    
-    obj->objset(nullptr);
-
-    if ( s->attached() )
+    {
         aList.pop(obj);
+        s->detach();
+    }
     else
+    {
         fList.pop(obj);
+    }
 }
 
 
@@ -246,8 +241,8 @@ void SingleSet::shuffle()
 void SingleSet::erase()
 {
     relax();
-    ObjectSet::erase(fList);
-    ObjectSet::erase(aList);
+    ObjectSet::erasePool(fList);
+    ObjectSet::erasePool(aList);
     inventory_.clear();
 }
 
@@ -674,7 +669,6 @@ Single* SingleSet::uniCollect(Single * obj)
         if ( p->fast_diffusion )
         {
             fList.pop(obj);
-            obj->objset(nullptr);
             assert_true(p->number() < uniReserves.size());
             uniReserves[p->number()].second.push_back(obj);
         }

@@ -19,7 +19,6 @@ void Fake::step()
 
 void Fake::setInteractions(Meca& meca) const
 {
-    assert_true( linked() );
     assert_true( asterPoints.size() == solidPoints.size() );
     
     for ( size_t n = 0; n < asterPoints.size(); ++n )

@@ -74,6 +74,9 @@ protected:
     
     /// print a list of the content (nb of objects, class)
     void writeReport(std::ostream&, const std::string& title) const;
+    
+    /// delete  Objects from sub list
+    static void erasePool(ObjectPool&);
 
 public:
     
@@ -128,29 +131,26 @@ public:
 
     //--------------------------
     
-    /// register Object, and add it at the end of the list
-    void add(Object *);
-    
-    /// remove Object
-    void remove(Object *);
-    
-    /// add multiple Objects
-    void add(ObjectList const&);
-
-    /// remove all Objects in list
-    void remove(ObjectList const&);
-    
     /// link the object last in the list
     virtual void link(Object *);
     
     /// link the object last in the list
     virtual void unlink(Object *);
 
+    /// register Object, and add it at the end of the list
+    void add(Object *);
+    
+    /// remove Object
+    void remove(Object *);
+    
     /// remove Object, and delete it
     void erase(Object *);
-    
-    /// delete  Objects specified in given list
-    void erase(ObjectPool&);
+
+    /// add multiple Objects
+    void add(ObjectList const&);
+
+    /// remove all Objects in list
+    void remove(ObjectList const&);
 
     /// delete all Objects in list and forget all serial numbers
     virtual void erase();

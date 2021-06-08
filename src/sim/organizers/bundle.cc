@@ -72,8 +72,6 @@ void Bundle::linkAntiparallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
  */
 void Bundle::setInteractions(Meca& meca) const
 {
-    assert_true( linked() );
-    
     if ( nbOrganized() > 0 )
     {
         Fiber * mt0 = Fiber::toFiber(organized(0));

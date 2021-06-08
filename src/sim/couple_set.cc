@@ -28,10 +28,10 @@ void CoupleSet::step()
     /*
      ATTENTION: We ensure here that step() is called exactly once for each object.
      The Couples are stored in multiple lists, and are automatically transferred
-     from one list to another one if their Hands bind or unbind.
-     The code relies on the fact that a Couple will be moved to the start of the
-     list to which it is transferred. By proceeding always from the node, which was
-     first before any transfer could occur, we process each Couple only once.
+     from one list to another one if their Hands bind or unbind. The code relies
+     on the fact that a Couple will be moved to the start of the list to which it
+     is transferred, using 'push_front'. By proceeding always from the node, which
+     was first before any transfer could occur, we process each Couple only once.
      Moreover, we get the 'next' in the list always before calling 'step()', because
      'step()' may transfer the node to another list, changing the value of 'next()'
      */
@@ -282,12 +282,12 @@ void CoupleSet::relinkA1(Couple * obj)
     if ( obj->attached2() )
     {
         faList.pop(obj);
-        aaList.push_back(obj);
+        aaList.push_front(obj);
     }
     else
     {
         ffList.pop(obj);
-        afList.push_back(obj);
+        afList.push_front(obj);
     }
 }
 
@@ -299,12 +299,12 @@ void CoupleSet::relinkD1(Couple * obj)
     if ( obj->attached2() )
     {
         aaList.pop(obj);
-        faList.push_back(obj);
+        faList.push_front(obj);
     }
     else
     {
         afList.pop(obj);
-        ffList.push_back(obj);
+        ffList.push_front(obj);
     }
 }
 
@@ -316,12 +316,12 @@ void CoupleSet::relinkA2(Couple * obj)
     if ( obj->attached1() )
     {
         afList.pop(obj);
-        aaList.push_back(obj);
+        aaList.push_front(obj);
     }
     else
     {
         ffList.pop(obj);
-        faList.push_back(obj);
+        faList.push_front(obj);
     }
 }
 
@@ -333,22 +333,20 @@ void CoupleSet::relinkD2(Couple * obj)
     if ( obj->attached1() )
     {
         aaList.pop(obj);
-        afList.push_back(obj);
+        afList.push_front(obj);
     }
     else
     {
         faList.pop(obj);
-        ffList.push_back(obj);
+        ffList.push_front(obj);
     }
 }
 
 
 void CoupleSet::link(Object * obj)
 {
-    assert_true( !obj->objset() );
     assert_true( obj->tag() == Couple::TAG );
     
-    obj->objset(this);
     Couple * c = static_cast<Couple*>(obj);
     sublist(c->attached1(), c->attached2()).push_back(obj);
     
@@ -357,22 +355,15 @@ void CoupleSet::link(Object * obj)
 
 
 /**
- This will also detach the Hands
+ This will also detach both Hands
  */
 void CoupleSet::unlink(Object * obj)
 {
-    assert_true( obj->objset() == this );
-
     Couple * c = static_cast<Couple*>(obj);
 
-    if ( c->hand1()->attached() )
-        c->hand1()->detach();
-    
-    if ( c->hand2()->attached() )
-        c->hand2()->detach();
-    
-    obj->objset(nullptr);
     sublist(c->attached1(), c->attached2()).pop(obj);
+    if ( c->attached1() ) c->hand1()->detach();
+    if ( c->attached2() ) c->hand2()->detach();
 }
 
 
@@ -401,10 +392,10 @@ void CoupleSet::shuffle()
 void CoupleSet::erase()
 {
     relax();
-    ObjectSet::erase(aaList);
-    ObjectSet::erase(faList);
-    ObjectSet::erase(afList);
-    ObjectSet::erase(ffList);
+    ObjectSet::erasePool(aaList);
+    ObjectSet::erasePool(faList);
+    ObjectSet::erasePool(afList);
+    ObjectSet::erasePool(ffList);
     inventory_.clear();
 }
 
@@ -872,7 +863,6 @@ Couple* CoupleSet::uniCollect(Couple * obj)
         if ( p->fast_diffusion )
         {
             ffList.pop(obj);
-            obj->objset(nullptr);
             assert_true(p->number() < uniReserves.size());
             uniReserves[p->number()].second.push_back(obj);
         }
@@ -1078,7 +1068,7 @@ void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properti
                 nxt = c->next();
                 if ( c->property() == cop )
                 {
-                    unlink(c);
+                    ffList.pop(c);
                     can.push_back(c);
                 }
                 c = nxt;
@@ -1143,7 +1133,7 @@ void CoupleSet::bindToIntersections(CoupleProp const* cop)
         nxt = c->next();
         if ( cop == c->property() )
         {
-            unlink(c);
+            ffList.pop(c);
             can.push_back(c);
         }
         c = nxt;
@@ -1161,7 +1151,7 @@ void CoupleSet::bindToIntersections()
     while ( c )
     {
         nxt = c->next();
-        unlink(c);
+        ffList.pop(c);
         can.push_back(c);
         c = nxt;
     }

@@ -20,7 +20,6 @@
 
 void Aster::step()
 {
-    assert_true( linked() );
     Simul & sim = simul();
 
     // nucleation:
@@ -56,7 +55,6 @@ void Aster::step()
  */
 void Aster::setInteractions(Meca& meca) const
 {
-    assert_true( linked() );
     Solid const* sol = solid();
     if ( !sol )
         return;

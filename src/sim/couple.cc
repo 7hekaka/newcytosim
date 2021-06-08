@@ -31,10 +31,10 @@ Couple::Couple(CoupleProp const* p, Vector const& w)
 
 Couple::~Couple()
 {
-    if ( cHand1  &&  attached1() )
+    if ( cHand1 && attached1() )
         cHand1->detach();
     
-    if ( cHand2  &&  attached2() )
+    if ( cHand2 && attached2() )
         cHand2->detach();
     
     if ( linked() )

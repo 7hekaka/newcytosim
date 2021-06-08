@@ -12,7 +12,7 @@
 void ObjectPool::push_front(Object * n)
 {
     //Cytosim::log("ObjectPool: push_front   %p in   %p\n", n, this);
-
+    assert_true(n->set_);
     n->prevO = nullptr;
     n->nextO = frontO;
     if ( frontO )
@@ -27,7 +27,7 @@ void ObjectPool::push_front(Object * n)
 void ObjectPool::push_back(Object * n)
 {
     //Cytosim::log("ObjectPool: push_back   %p in   %p\n", n, this);
-    
+    assert_true(n->set_);
     n->prevO = backO;
     n->nextO = nullptr;
     if ( backO )
@@ -66,6 +66,7 @@ void ObjectPool::append(ObjectPool& list)
 
 void ObjectPool::push_after(Object * p, Object * n)
 {
+    assert_true(n->set_);
     n->prevO = p;
     n->nextO = p->nextO;
     if ( p->nextO )
@@ -79,6 +80,7 @@ void ObjectPool::push_after(Object * p, Object * n)
 
 void ObjectPool::push_before(Object * p, Object * n)
 {
+    assert_true(n->set_);
     n->nextO = p;
     n->prevO = p->prevO;
     if ( p->prevO )
@@ -103,7 +105,6 @@ Object* ObjectPool::pop_front()
         else
             backO = nullptr;
         
-        n->set_ = nullptr;
         n->nextO = nullptr;  // unnecessary?
     }
     return n;
@@ -123,7 +124,6 @@ Object* ObjectPool::pop_back()
         else
             frontO = nullptr;
         
-        n->set_ = nullptr;
         n->prevO = nullptr;  // unnecessary?
     }
     return n;
@@ -149,7 +149,6 @@ void ObjectPool::pop(Object * n)
         backO = n->prevO;
     }
     
-    n->set_ = nullptr;
     n->prevO = nullptr; // unnecessary?
     n->nextO = nullptr; // unnecessary?
     --nSize;
@@ -163,20 +162,10 @@ void ObjectPool::clear()
     Object * p, * n = frontO;
     while ( n )
     {
-        n->set_ = nullptr;
         n->prevO = nullptr;
         p = n->nextO;
         n->nextO = nullptr;
         n = p;
-    }
-#endif
-#if ( 1 )
-    // necessary cleanup
-    Object * n = frontO;
-    while ( n )
-    {
-        n->set_ = nullptr;
-        n = n->nextO;
     }
 #endif
     frontO = nullptr;
