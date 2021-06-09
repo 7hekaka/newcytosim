@@ -297,7 +297,6 @@ static void changeScale(FiberDisp* p, int d)
     else if ( p->line_style == 2 || p->line_style == 3 )
     {
         changeScale(p->tension_scale, d);
-        p->tension_alpha = 1 / p->tension_scale;
         flashText("fiber:tension_scale = %.5f", p->tension_scale);
     }
     else if ( p->force_style )
@@ -330,7 +329,6 @@ static void invertScale(FiberDisp* p, int)
     else if ( p->line_style == 2 || p->line_style == 3 )
     {
         p->tension_scale = -p->tension_scale;
-        p->tension_alpha = 1 / p->tension_scale;
         if ( p->tension_scale > 0 )
             flashText("fiber:tension_scale: pulling");
         else

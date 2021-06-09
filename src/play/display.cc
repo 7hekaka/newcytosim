@@ -337,12 +337,14 @@ void Display::prepareLineDisp(const Fiber * fib)
             break;
         case FiberDisp::COLORING_PSTATE:
             if ( fib->endStateP() > 0 )
-                col = disp->end_color[std::min(fib->endStateP(),5U)];
+                col = disp->end_colors[std::min(fib->endStateP(),5U)];
             break;
     }
     
     LineDisp * self = fib->disp;
     self->color = col;
+    self->color_scale = color_scale(fib, disp->line_style);
+    //std::cerr << fib->reference() << ":color_scale " << self->color_scale << "\n";
     
 #if ( 1 )
     // colors of ends set to match body color:
@@ -350,16 +352,16 @@ void Display::prepareLineDisp(const Fiber * fib)
     self->end_color[1] = col;
 #else
     // colors of ends for non-dynamic filaments:
-    self->end_color[0] = disp->end_color[0];
-    self->end_color[1] = disp->end_color[0];
+    self->end_color[0] = disp->end_colors[0];
+    self->end_color[1] = disp->end_colors[0];
 #endif
     
     // For dynamic Fibers, change colors of tips according to state:
     if ( fib->endStateP() > 0 )
-        self->end_color[0] = disp->end_color[std::min(fib->endStateP(),5U)];
+        self->end_color[0] = disp->end_colors[std::min(fib->endStateP(),5U)];
     
     if ( fib->endStateM() > 0 )
-        self->end_color[1] = disp->end_color[std::min(fib->endStateM(),5U)];
+        self->end_color[1] = disp->end_colors[std::min(fib->endStateM(),5U)];
 
     bool hide = false;
     // hide right or left-pointing fibers:

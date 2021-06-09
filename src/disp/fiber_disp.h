@@ -164,13 +164,14 @@ public:
     /**
      This determines the set of color that are used to display the fiber tips,
      according to their assembly state, Fiber::endState():
-     - 0, static ends use end_color[0],
-     - 1, growing end, use end_color[1],
-     - 2 and 3, intermediate states, use end_color[2] and end_color[3],
-     - 4, shrinking end, use end_color[4]
+     - end_colors[0]: static ends,
+     - end_colors[1]: growing ends,
+     - end_colors[2] and [3]: intermediate states,
+     - end_colors[4]: shrinking ends
      .
+     The default colors are: white, green, yellow, orange, red
      */
-    gle_color end_color[6];
+    gle_color end_colors[6];
     
     
     /// if true, specify the style for displaying lattice content (also known as `lattice[0]`)
@@ -302,9 +303,6 @@ public:
     int draw_average;
 
     /// @}
-
-    /// set to 1/tension_scale
-    real tension_alpha;
     
 public:
     

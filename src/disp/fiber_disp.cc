@@ -30,12 +30,12 @@ void FiberDisp::clear()
     end_size[0] = 6;
     end_size[1] = 6;
     
-    end_color[0] = 0xFFFFFFFF;  // white
-    end_color[1] = 0x00FF00FF;  // green
-    end_color[2] = 0xFFFF00FF;  // yellow
-    end_color[3] = 0xFF7538FF;  // orange
-    end_color[4] = 0xFF0000FF;  // red
-    end_color[5] = 0x777777FF;  // gray
+    end_colors[0] = 0xFFFFFFFF;  // white
+    end_colors[1] = 0x00FF00FF;  // green
+    end_colors[2] = 0xFFFF00FF;  // yellow
+    end_colors[3] = 0xFF7538FF;  // orange
+    end_colors[4] = 0xFF0000FF;  // red
+    end_colors[5] = 0x777777FF;  // gray
 
     lattice_style   = 0;
     lattice_scale   = 1;
@@ -55,7 +55,6 @@ void FiberDisp::clear()
     
     length_scale  = 1;
     tension_scale = 1;
-    tension_alpha = 1;
     
     force_style = 0;
     force_scale = 1;
@@ -107,7 +106,7 @@ void FiberDisp::read(Glossary& glos)
     
     glos.set(end_size,  2, "end_size");
     glos.set(end_style, 2, "end_style");
-    glos.set(end_color, 5, "end_color");
+    glos.set(end_colors, 5, "end_color");
     
 #ifdef BACKWARD_COMPATIBILITY
     glos.set(lattice_style, "draw_lattice");
@@ -149,7 +148,6 @@ void FiberDisp::read(Glossary& glos)
     
     glos.set(length_scale,  "length_scale");
     glos.set(tension_scale, "tension_scale");
-    tension_alpha = 1 / tension_scale;
 
     glos.set(force_style, "forces", "force");
     glos.set(force_scale, "forces", 1, "force", 1);
@@ -178,7 +176,7 @@ void FiberDisp::write_values(std::ostream& os) const
     write_value(os, "lines",        line_width, line_style, line_caps);
     write_value(os, "plus_end",     end_size[0], end_style[0]);
     write_value(os, "minus_end",    end_size[1], end_style[1]);
-    write_value(os, "end_color",    end_color, 5);
+    write_value(os, "end_color",    end_colors, 6);
  
     write_value(os, "lattice",      lattice_style, lattice_scale, lattice_rescale);
     write_value(os, "labels",       label_style);

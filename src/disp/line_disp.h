@@ -10,34 +10,35 @@
 /// Display parameters for a Line
 /**
  
- LineDisp holds the display attributes for a particular Fiber,
- and accordingly, there is one LineDisp for every Fiber.
+ LineDisp holds the display attributes for a particular Fiber, and accordingly,
+ there is one LineDisp for every Fiber. In contrast, FiberDisp holds class attributes.
  
- A user cannot set these attributes directly. Instead,
- the values are derived from the relevant FiberDisp automatically,
- when cytosim prepares the display.
+ A user cannot set these attributes directly. Instead, the values are derived
+ from the relevant FiberDisp automatically, when cytosim prepares the display.
  
- For example `end_color` will be set depending on the state of
- the ends of this fiber.
+ For example `end_color` will be set as one value of `FiberDisp::end_colors[]`,
+ depending on the states of the ends of this fiber.
 
 */
 class LineDisp
 {
-    
 public:
-
-    /// visibility flag
-    int          visible;
     
     /// color of body
-    gle_color    color;
+    gle_color color;
     
     /// colors of PLUS_END and MINUS_END
-    gle_color    end_color[2];
-
-    /// amount of lateral displacement added during display
-    real         explode_shift;
+    gle_color end_color[2];
     
+    /// scale to convert to color to display lines
+    real color_scale;
+    
+    /// amount of lateral displacement added during display
+    real explode_shift;
+
+    /// visibility flag
+    int visible;
+
 public:
     
     /// constructor

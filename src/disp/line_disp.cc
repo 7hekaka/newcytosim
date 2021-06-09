@@ -7,6 +7,7 @@ void LineDisp::clear()
 {
     visible       = 1;
     color         = 0xFFFFFFFF;
+    color_scale   = 1;
     explode_shift = 0;
     
     end_color[0]  = 0xFFFFFFFF;
