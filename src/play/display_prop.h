@@ -42,7 +42,7 @@ public:
     /// default diameter of points
     float point_size;
     
-    /// default width of hookean links
+    /// default width of Hookean links
     float link_width;
 
     /// default width of lines

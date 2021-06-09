@@ -10,9 +10,8 @@ set simul system
 set system display
 {
     point_size = 2
-    link_size = 0
+    link_width = 0
     report = single
-    style = 2
     zoom  = 0.66
     tile = 2, 2
 }
@@ -20,11 +19,6 @@ set system display
 set space cell
 {
     shape = periodic
-}
-
-new cell
-{
-    length = 10, 10, 10
 }
 
 set fiber microtubule
@@ -47,6 +41,11 @@ set single grafted
     hand = binder
     activity = fixed
     stiffness = 0
+}
+
+new cell
+{
+    length = 10, 10, 10
 }
 
 new microtubule

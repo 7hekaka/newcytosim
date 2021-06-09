@@ -131,24 +131,22 @@ public:
     
     /// if true, the Hand can also bind directly to the tip of fibers
     /**
-     The value of `bind_also_end` affects Hands that are located at a position
-     for which the orthogonal projection on the fiber backbone is beyond one
-     of the end. In this case, the attachement will occur only if `bind_also_end`
-     is set and matches this end. Attachment will occur at the end of the fiber,
-     if the distance is shorter than `binding_range`.
+     The value of `bind_also_end` determines binding from a position that does not
+     project inside a fiber backbone, for which the closest point on the fiber
+     is one of its tip. Even when attachment is permitted to the tips of the fiber,
+     the distance must be shorter than `binding_range` for binding to occur.
      
-     Values for  are `off`, `minus_end`, `plus_end` and `both_ends`.
+     By setting 'bind_also_end', you can extend the capture regions of the fibers
+     to include one or two hemi-spheres, of radius `binding_range`, at the tips of
+     the fibers.
      
-     In other words, setting 'bind_also_end==true', will extend the capture
-     regions of the fibers to include one or two hemi-spheres at the ends of
-     the fibers, with a radius `binding_range`.
-     
+     Values: `bind_also_end = {off, minus_end, plus_end, both_ends}`.
      <em>default value = off</em>
      */
     int          bind_also_end;
     
     
-    /// if true, the Hand can bind only near the ends of the fibers
+    /// if true, the Hand can bind only near the tips of the fibers
     /**
      This determines that a Hand can only bind near the ends of the fiber.
      This parameter can be 'none', 'plus_end', 'minus_end' or 'both_ends'.

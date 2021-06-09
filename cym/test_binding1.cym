@@ -8,20 +8,14 @@ set simul system
 
 set system display
 {
-    point_size = 8
-    link_size = 0
+    point_size = 5
+    link_width = 1
     report = single
-    style = 2
 }
 
 set space cell
 {
     shape = circle
-}
-
-new cell
-{
-    radius = 15
 }
 
 set fiber microtubule
@@ -31,25 +25,11 @@ set fiber microtubule
     display = ( line = 0.5 )
 }
 
-new microtubule
-{
-    position = 0 0 0
-    direction = vertical
-    length = 20
-}
-
-new microtubule
-{
-    position = 0 0 0
-    direction = horizontal
-    length = 20
-}
-
 set hand binder
 {
-    binding_rate    = 1
-    binding_range   = 5
-    unbinding       = 0, inf
+    binding_rate  = 1
+    binding_range = 1
+    unbinding     = 0, inf
     display = ( color=0x0000FF88; width=0.5; )
 }
 
@@ -58,6 +38,25 @@ set single simplex
     hand = binder
     activity = fixed
     stiffness = 0
+}
+
+new cell
+{
+    radius = 8
+}
+
+new microtubule
+{
+    position = 0 0 0
+    direction = vertical
+    length = 10
+}
+
+new microtubule
+{
+    position = 0 0 0
+    direction = horizontal
+    length = 10
 }
 
 new 25000 simplex
