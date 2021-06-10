@@ -53,7 +53,7 @@ void SphereProp::read(Glossary& glos)
     glos.set(confine_stiffness, "confine_stiffness");
     glos.set(confine_space,     "confine_space");
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( confine_space == "current" )
         confine_space = "last";
 

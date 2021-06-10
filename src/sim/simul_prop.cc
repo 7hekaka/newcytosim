@@ -105,7 +105,7 @@ void SimulProp::read(Glossary& glos)
     glos.set(property_file,     "property_file");
     glos.set(property_file,     "property");
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     glos.set(trajectory_file,   "object_file");
     bool a = false;
     if ( glos.set(a, "append_file") )

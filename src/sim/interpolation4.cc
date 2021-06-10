@@ -212,7 +212,7 @@ void Interpolation4::read(Inputter& in, Simul& sim)
     Object * obj = sim.readReference(in, g);
     mec_ = Simul::toMecable(obj);
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 55
     if ( mec_ || in.formatID() < 55 )
 #else
     if ( mec_ )

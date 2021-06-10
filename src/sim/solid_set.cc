@@ -65,7 +65,7 @@ Object * SolidSet::newObject(const ObjectTag tag, size_t num)
     if ( tag == Solid::TAG )
     {
         Property * p = simul_.properties.find("solid", num);
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 47
         // prior to 04.2016, "bead" and "solid" were used interchangeably
         if ( !p )
              p = simul_.properties.find("bead", num);

@@ -148,7 +148,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     tag = c & 127;
     // detect fat reference:
     int fat = ( c & 128 );
-#ifdef BACKWARD_COMPATIBILITY  // formatID() < 50
+#if BACKWARD_COMPATIBILITY < 50
     if ( c == '$' )
     {
         tag = in.get_char();
@@ -162,7 +162,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     if ( tag == Object::TAG )
         return nullptr;
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 32
     if ( in.formatID() < 32 )
     {
         ObjectID n = isupper(tag) ? in.readUInt32() : in.readUInt16();
@@ -185,13 +185,13 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
         if ( fat )
         {
             // long format
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 49
             // skip property index
             if ( in.formatID() < 49 )
                 in.readUInt16();
 #endif
             id = in.readUInt32();
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 34
             // skip ObjectMark
             if ( in.formatID() < 34 )
                 ;
@@ -204,7 +204,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
         else
         {
             // short format
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 49
             // skip property index
             if ( in.formatID() < 49 )
                 in.readUInt8();
@@ -215,7 +215,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     else
     {
         FILE * file = in.file();
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 49
         // skip property index
         if ( in.formatID() < 49 )
         {
@@ -228,7 +228,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
 #endif
         if ( 1 != fscanf(file, "%u", &id) )
             throw InvalidIO("readReference failed");
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 49
         if ( in.formatID() < 49 )
         {
             // skip ObjectMark which is not used
@@ -468,7 +468,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
             }
             tag = ( c & 127 );
             fat = ( c & 128 );
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
             // detect fat header, formatID() < 50
             if ( c == '$' )
             {
@@ -559,7 +559,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
             else if ( tok == "time" )
             {
                 iss >> prop->time;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 48
                 // old format info line "#time 14.000000, dim 2, format 47"
                 if ( iss.get() == ',' )
                 {
@@ -590,7 +590,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                 iss >> tok;
                 if ( tok == "cytosim" )
                     return 0;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
                 if ( tok == "frame" )
                     return 0;
 #endif
@@ -601,7 +601,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
             //std::clog << "OBJECT |" << (char)tag << "| " << (fat?"fat\n":"\n");
             assert_true( isalpha(tag) );
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 32
             // Compatibility with older format (before 2010)
             if ( in.formatID() < 32 )
             {
@@ -632,6 +632,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                     continue;
                 }
             }
+#endif
+#if BACKWARD_COMPATIBILITY < 50
             // this is an 'older' code pathway, before 2017?
             if ( !objset )
             {

@@ -324,7 +324,7 @@ void DynamicFiber::write(Outputter& out) const
 
 void DynamicFiber::readEndState(Inputter& in)
 {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 54
     if ( in.formatID() < 54 )
     {
         unitM[0] = in.readUInt8();
@@ -353,7 +353,7 @@ void DynamicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         readEndState(in);
     else
     {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 44
         if ( in.formatID() < 44 )
             readEndState(in);
 #endif

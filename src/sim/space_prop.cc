@@ -130,7 +130,7 @@ Space * SpaceProp::newSpace(Glossary& opt) const
     
     if ( spc )
     {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         std::string str = dimensions;
         if ( str.size() || opt.set(str, "dimensions") )
         {
@@ -174,7 +174,7 @@ void SpaceProp::read(Glossary& glos)
 {    
     if ( glos.set(shape, "shape") )
     {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         glos.set(dimensions, "dimensions");
     }
     if ( dimensions.empty() )

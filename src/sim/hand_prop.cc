@@ -197,11 +197,13 @@ void HandProp::read(Glossary& glos)
     
     glos.set(bind_end_range, "bind_end_range", 0, "bind_only_end", 1);
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     glos.set(bind_also_end, "bind_also_ends", {{"off",       NO_END},
                                                {"plus_end",  PLUS_END},
                                                {"minus_end", MINUS_END},
                                                {"both_ends", BOTH_ENDS}});
+#endif
+#if BACKWARD_COMPATIBILITY < 50
     glos.set(bind_only_end,      "bind_end", {{"off",       NO_END},
                                               {"plus_end",  PLUS_END},
                                               {"minus_end", MINUS_END},
@@ -220,7 +222,7 @@ void HandProp::read(Glossary& glos)
     if ( glos.set(display, "display") )
         display_fresh = true;
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     if ( glos.set(hold_growing_end, "hold_growing_ends") )
         Cytosim::warn << "hand:hold_growing_ends was renamed hold_growing_end\n";
 #endif
@@ -264,7 +266,7 @@ void HandProp::complete(Simul const& sim)
             Cytosim::warn << name() << ":unbinding_rate is too high: decrease time_step\n";
     }
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     if ( unbinding_force == 0 )
     {
         Cytosim::warn << "assuming that hand:unbinding_force=+inf, since the set value was zero\n";

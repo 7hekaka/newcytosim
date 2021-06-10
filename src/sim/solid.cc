@@ -365,7 +365,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             while ( opt.set(str, var, ++inx) )
                 res.append(sim.singles.makeWrists(this, fip, nbp, str));
             
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
             // this syntax is deprecated
             // attach Single to this set of points:
             inx = 0;
@@ -475,7 +475,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         var = "sphere" + std::to_string(++inp);
     }
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     /* attach Singles to be distributed over all the points:
      this is deprecated, since one can attach Single at any point since 03.2017
      using the 'sphere' specifications above

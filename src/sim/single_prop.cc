@@ -124,7 +124,7 @@ void SingleProp::read(Glossary& glos)
     
     glos.set(confine_space,  "confine", 2);
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( confine_space == "current" )
         confine_space = "last";
 #endif

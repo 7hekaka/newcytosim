@@ -113,7 +113,7 @@ void Wrist::read(Inputter& in, Simul& sim, ObjectTag tag)
     const bool s = attached();
     sHand->read(in, sim);
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 47
     if ( in.formatID() < 47 )
     {
         Mecapoint base;

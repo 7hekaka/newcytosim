@@ -60,7 +60,7 @@ void DynamicFiberProp::read(Glossary& glos)
     glos.set(zone_radius,             "zone_radius");
     glos.set(zone_hydrolysis_rate, 2, "zone_hydrolysis_rate");
 #endif
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 44
     
     if ( glos.set(growing_force[0], "dynamic_force") )
         Cytosim::warn << "fiber:dynamic_force was renamed growing_force\n";

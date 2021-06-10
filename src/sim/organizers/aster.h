@@ -10,7 +10,7 @@
 #include "fiber.h"
 
 /// A connection between a Fiber and a Solid
-//@todo new Interpolation4() to replace coef1[] and coef2[]
+//@todo use Interpolation4() to replace coef1[] and coef2[]
 class AsterLink
 {
     friend class Aster;
@@ -37,8 +37,10 @@ private:
     /// distance between the two anchoring points
     real     len_;
     
+#if BACKWARD_COMPATIBILITY < 47
     /// index used for backward compatibility
     size_t   alt_;
+#endif
     
 public:
     
@@ -59,7 +61,9 @@ public:
             coef1_[i] = 0.0;
             coef2_[i] = 0.0;
         }
+#if BACKWARD_COMPATIBILITY < 47
         alt_ = 0;
+#endif
     }
     
     /// calculate rank: how many coefficients are not null
@@ -130,7 +134,7 @@ public:
         rank_ = calcRank();
     }
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 47
     void readOldFormat(Inputter& in, Solid const* sol)
     {
         reset();

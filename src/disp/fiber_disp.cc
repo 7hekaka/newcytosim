@@ -4,7 +4,9 @@
 #include "glossary.h"
 #include "random.h"
 
-#define BACKWARD_COMPATIBILITY
+
+// this controls compatibility in display parameter, which is not critical
+#define BACKWARD_COMPATIBLE 1
 
 
 void FiberDisp::clear()
@@ -108,7 +110,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(end_style, 2, "end_style");
     glos.set(end_colors, 5, "end_color");
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBLE
     glos.set(lattice_style, "draw_lattice");
     glos.set(lattice_scale, "lattice_max");
     glos.set(tension_scale, "tension");
@@ -121,7 +123,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(label_style, "label_style", 0, "labels", 0);
 
     key = glos.has_key("speckle") ? "speckle" : "speckles";
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBLE
     if ( glos.num_values(key) == 2 )
     {
         speckle_size = line_width * 2;
@@ -156,7 +158,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(explode_style, "explode");
     glos.set(explode_range, "explode", 1);
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBLE
     if ( glos.set(explode_range, "display_shift") )
         explode_style = 1;
 #endif

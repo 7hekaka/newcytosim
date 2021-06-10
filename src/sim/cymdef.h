@@ -8,10 +8,12 @@
 #define CYMDEF_H
 
 /**
- Enable code to be able to read old trajectory files
- Option normally ON
+ Enable code to be able to read old trajectory files.
+ The value indicates the file format (currentFormatID) that can be read by the code.
+ 
+ default = 100
  */
-#define BACKWARD_COMPATIBILITY
+#define BACKWARD_COMPATIBILITY 41
 
 
 /** 

@@ -66,7 +66,7 @@ void ClassicFiberProp::read(Glossary& glos)
     glos.set(catastrophe_space, "catastrophe_outside", 1);
 #endif
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 44
     if ( glos.set(growing_force[0], "dynamic_force") )
         Cytosim::warn << "fiber:dynamic_force was renamed growing_force\n";
 

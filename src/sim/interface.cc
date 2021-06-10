@@ -326,7 +326,7 @@ void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& o
         PlacementType placement = PLACE_INSIDE;
         
         opt.set(placement, "placement",{{"off",       PLACE_NOT},
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
                                        {"none",       PLACE_NOT},
 #endif
                                        {"anywhere",   PLACE_ANYWHERE},
@@ -849,7 +849,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     bool   prune     = true;
     bool   binary    = true;
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     // check if 'event' is specified within the 'run' command,
     // and convert to a registered Event object
     Event * event = nullptr;
@@ -917,7 +917,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         }
     } while ( sss < nb_steps );
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( event )
         simul_.events.erase(event);
 #endif

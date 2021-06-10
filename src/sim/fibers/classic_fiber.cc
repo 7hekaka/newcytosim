@@ -217,7 +217,7 @@ void ClassicFiber::write(Outputter& out) const
 
 void ClassicFiber::readEndState(Inputter& in)
 {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 54
     if ( in.formatID() < 54 )
     {
         unsigned m = 0, p = 0;
@@ -254,7 +254,7 @@ void ClassicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         readEndState(in);
     else
     {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 44
         if ( in.formatID() < 44 )
             readEndState(in);
 #endif

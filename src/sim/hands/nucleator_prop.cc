@@ -41,7 +41,7 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(fiber_type, "nucleate", 1);
     glos.set(fiber_spec, "nucleate", 2);
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     glos.set(fiber_spec, "nucleation_spec");
     glos.set(fiber_spec, "spec");
 #endif

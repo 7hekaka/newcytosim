@@ -37,7 +37,7 @@ void WalkerProp::read(Glossary& glos)
     
     glos.set(stall_force,    "stall_force", "force");
     glos.set(unloaded_speed, "unloaded_speed", "speed");
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     glos.set(unloaded_speed,   "max_speed");
 #endif
     glos.set(unbinding_chance, "unbinding_chance", 0, "unbinding", 2);
@@ -49,7 +49,7 @@ void WalkerProp::read(Glossary& glos)
     if ( glos.has_key("dangling_chance") )
         Cytosim::warn << "use `hold_growing_end` instead of `dangling_chance`\n";
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     if ( glos.set(hold_growing_end,  "hold_fiber") )
         Cytosim::warn << "you should use hand:hold_growing_end instead of hand:hold_fiber\n";
 #endif

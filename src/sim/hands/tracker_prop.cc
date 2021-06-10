@@ -27,7 +27,7 @@ void TrackerProp::read(Glossary& glos)
     HandProp::read(glos);
     
     glos.set(track_end,  "track_end", {{"off",       NO_END},
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
                                        {"none",      NO_END},
 #endif
                                        {"plus_end",  PLUS_END},

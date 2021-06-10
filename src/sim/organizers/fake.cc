@@ -144,7 +144,7 @@ void Fake::write(Outputter& out) const
 void Fake::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     ObjectTag g;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 53
     if ( in.formatID() < 53 )
     {
         size_t n = in.readUInt16();

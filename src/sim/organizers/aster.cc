@@ -73,7 +73,7 @@ void Aster::setInteractions(Meca& meca) const
             const size_t off = sol->matIndex() + link.prime_;
             const size_t pts[] = { off, off+1, off+2, off+3 };
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 47
             if ( link.alt_ > 0 )
             {
                 meca.addLink(Mecapoint(sol, link.prime_), fib->exactEnd(prop->focus), prop->stiffness[0]);
@@ -231,7 +231,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     {
         Glossary fopt(fos);
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         if ( tif.empty() && opt.set(nbf, "nb_fibers") )
         {
             tif = prop->fiber_type;
@@ -346,7 +346,7 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
     
     // check that there is at least one point:
     if ( sol->sumRadius() < REAL_EPSILON )
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         sol->addSphere(Vector(0,0,0), asRadius);
 #else
         throw InvalidParameter("Aster's drag coefficient is null: please specify 'point1=center, RADIUS'");
@@ -557,13 +557,13 @@ void Aster::write(Outputter& out) const
 
 void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 40
     if ( in.formatID() < 40 )
         in.readUInt16();
 #endif
     
     ObjectTag g;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 53
     if ( in.formatID() < 53 )
     {
         size_t n = in.readUInt16();
@@ -584,7 +584,7 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( sol->nbPoints() > 1 )
         asRadius = ( sol->posPoint(0) - sol->posPoint(1) ).norm();
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 51
     // usual number of fiber links:
     size_t nbf = nbOrganized();
     if ( in.formatID() > 50 )
@@ -596,7 +596,7 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
     
     for ( size_t i = 0; i < nbf; ++i )
     {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 47
         if ( in.formatID() < 47 )
         {
             asLinks[i].readOldFormat(in, sol);
@@ -625,7 +625,7 @@ Vector Aster::posLink1(size_t inx) const
     real const* coef = asLinks[inx].coef1_;
     const size_t ref = asLinks[inx].prime_;
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 47
     if ( asLinks[inx].alt_ > 0 )
         return sol->posPoint(ref);
 #endif
@@ -644,7 +644,7 @@ Vector Aster::posLink2(size_t inx) const
     real const* coef = asLinks[inx].coef2_;
     const size_t ref = asLinks[inx].prime_;
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 47
     if ( asLinks[inx].alt_ > 0 )
         return sol->posPoint(asLinks[inx].alt_);
 #endif

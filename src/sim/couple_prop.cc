@@ -69,7 +69,7 @@ void CoupleProp::read(Glossary& glos)
     glos.set(min_loop, "min_loop", "stiff");
 
     glos.set(specificity, "specificity", {{"off",          BIND_ALWAYS},
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
                                           {"none",         BIND_ALWAYS},
 #endif
                                           {"orthogonal",   BIND_ORTHOGONAL},
@@ -96,7 +96,7 @@ void CoupleProp::read(Glossary& glos)
     //glos.set(confine_stiffness, "confine_stiffness");
     glos.set(confine_space,  "confine_space");
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( confine_space == "current" )
         confine_space = "last";
 #endif

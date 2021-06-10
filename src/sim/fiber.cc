@@ -1708,7 +1708,7 @@ void Fiber::write(Outputter& out) const
 void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     //std::clog << " Fiber::read(" << tag << ")\n";
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 34
         
     if ( in.formatID() == 33 )
         mark(in.readUInt32());
@@ -1742,7 +1742,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         if ( fMesh.ready() )
             fMesh.setRange(abscissaM(), abscissaP());
 #endif
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
             birthTime(in.readFloat());
 #endif
@@ -1791,7 +1791,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
             throw;
         }
     }
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     else if ( tag == TAG_DYNAMIC )
     {
         static bool virgin = true;
@@ -1810,6 +1810,8 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
             in.readUInt16();
         }
     }
+#endif
+#if BACKWARD_COMPATIBILITY < 32
     else if ( tag == 'm' )
     {
         Chain::read(in, sim, tag);

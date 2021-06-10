@@ -27,7 +27,7 @@ void AsterProp::read(Glossary& glos)
     glos.set(fiber_type, "nucleate", 1);
     glos.set(fiber_spec, "nucleate", 2);
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     glos.set(fiber_rate, "nucleation_rate");
     glos.set(fiber_type, "fibers");
     glos.set(fiber_spec, "fibers", 1);

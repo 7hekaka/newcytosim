@@ -2143,7 +2143,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     real seg    = in.readFloat();
     fnAbscissaM = in.readFloat();
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( in.formatID() > 49 ) // 12.12.2018 moved birthTime
 #endif
         fnBirthTime = in.readFloat();
@@ -2162,8 +2162,8 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-#ifdef BACKWARD_COMPATIBILITY
-    if ( in.formatID() <= 37 )
+#if BACKWARD_COMPATIBILITY < 38
+    if ( in.formatID() < 38 )
     {
         setSegmentation(len);
         len *= nbSegments();

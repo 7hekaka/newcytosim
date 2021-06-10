@@ -218,7 +218,7 @@ void SpaceStrip::setLengths(const real len[])
     half_[1] = len[1];
     bot_ = len[2];
     top_ = len[3];
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     // changed from 'length[2]' to 'bot_' & 'top_' on 12.06.2020
     if ( bot_ > top_ && top_ == 0 )
     {

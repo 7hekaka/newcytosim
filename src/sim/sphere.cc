@@ -621,7 +621,7 @@ void Sphere::read(Inputter& in, Simul& sim, ObjectTag tag)
     try
     {
         real rad;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 36
         if ( in.formatID() < 36 )
             rad = radius();
         else

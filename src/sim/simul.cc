@@ -385,7 +385,7 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case          Fake::TAG:    return &organizers;
         case         Event::TAG:    return &events;
         case        Object::TAG:    return nullptr;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 32
         case 'm':                   return &fibers;
 #endif
     }

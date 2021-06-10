@@ -212,7 +212,7 @@ int FrameReader::seekFrame(size_t frm)
             if ( inputter.eof() )
                 return END_OF_FILE;
             
-#ifdef BACKWARD_COMPATIBILITY // 2012
+#if 1 // backward compatibility code with format 42 before 2012
             if ( 0 == line.compare(0, 7, "#frame ") )
                 break;
 #endif

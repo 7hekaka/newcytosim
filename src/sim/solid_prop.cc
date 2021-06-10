@@ -49,7 +49,7 @@ void SolidProp::read(Glossary& glos)
                                          {"outside",      CONFINE_OUTSIDE},
                                          {"point",        CONFINE_POINT},
                                          {"point_inside", CONFINE_POINT_INSIDE},
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
                                          {"none",         CONFINE_OFF},
                                          {"surface",      CONFINE_ON},
 #endif
@@ -61,7 +61,7 @@ void SolidProp::read(Glossary& glos)
     glos.set(confine_stiffness, "confine_stiffness");
     glos.set(confine_space,     "confine_space");
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( confine_space == "current" )
         confine_space = "last";
     

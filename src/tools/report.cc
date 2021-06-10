@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
     if ( arg.read_strings(argc-ax, argv+ax) )
         return EXIT_FAILURE;
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( arg.set(str, "prefix") && str=="time" )
         prefix = 1;
 #endif

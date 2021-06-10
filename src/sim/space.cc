@@ -444,7 +444,7 @@ void Space::writeShape(Outputter& out, std::string const& arg)
 void Space::readShape(Inputter& in, std::string const& expected)
 {
     std::string str;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 52
     if ( in.formatID() < 52 )
         str = in.get_word(); // stored as a space-terminated string
     else
@@ -469,7 +469,7 @@ void Space::readShape(Inputter& in, std::string const& expected)
 void Space::readLengths(Inputter& in, size_t n_len, real len[])
 {
     size_t n = 0;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 43
     if ( in.formatID() < 43 )
         n = in.readUInt8();
     else
@@ -486,7 +486,7 @@ void Space::readLengths(Inputter& in, size_t n_len, real len[])
 
 void Space::readShape(Inputter& in, size_t n_len, real len[], std::string const& expected)
 {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 35
     if ( in.formatID() < 35 )
         return;
     

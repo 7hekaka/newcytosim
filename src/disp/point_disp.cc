@@ -502,7 +502,7 @@ void PointDisp::read(Glossary& glos)
         width = 2 * size / 3;
     else
         glos.set(size,     "point_size");
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     glos.set(size,         "points");
     glos.set(shape,        "points", 1);
 #endif

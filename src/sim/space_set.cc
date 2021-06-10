@@ -52,7 +52,7 @@ Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom,
     {
         if ( opt.peek(s, "shape") )
             ;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         // "geometry" was used before 2018
         else if ( opt.peek(s, "geometry") )
         {
@@ -64,7 +64,7 @@ Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom,
         if ( s=="dynamic_sphere" )        return new SpaceDynamicProp(nom);
         if ( s=="lid"  )                  return new SpaceDynamicProp(nom);
         if ( s=="dynamic_ellipse")        return new SpaceDynamicProp(nom);
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         if ( s=="contractile" )           return new SpaceDynamicProp(nom);
 #endif
         return new SpaceProp(nom);

@@ -497,7 +497,7 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
         {
             ix = in.readUInt16();
             id = in.readUInt32();
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 34
             if ( in.formatID() < 34 )
                 ;
             else if ( in.formatID() < 39 )
@@ -531,7 +531,7 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
         else
             in.unget(c);
     }
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 45
     if ( in.formatID() < 45 )
         ++ix;
 #endif

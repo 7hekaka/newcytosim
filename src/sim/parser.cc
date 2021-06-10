@@ -82,7 +82,7 @@ void Parser::parse_set(std::istream& is)
     std::string cat = Tokenizer::get_symbol(is);
     std::string name, para, blok;
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     {
         // Read formats anterior to 3.11.2017 ('set hand 2 kinesin')
         size_t inx = 0;
@@ -97,7 +97,7 @@ void Parser::parse_set(std::istream& is)
     
     if ( cat == "simul" )
     {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         // Patch to accept 'set simul:display NAME {}':
         if ( spec )
         {
@@ -110,7 +110,7 @@ void Parser::parse_set(std::istream& is)
 
         if ( do_change )
         {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
             if ( spec )
                 opt.define(para, blok);
             else
@@ -120,7 +120,7 @@ void Parser::parse_set(std::istream& is)
             if ( name != "*" )
                 simul_.rename(name);
         }
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         else if ( para == "display" )
         {
             opt.define(para, blok);
@@ -143,7 +143,7 @@ void Parser::parse_set(std::istream& is)
             pp = execute_set(cat, name, opt);
             
             PropertyID ix;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
             // name changed to `property_number` on 10.12.2017
             if ( opt.set(ix, "property_number", "property_index") )
 #else
@@ -164,7 +164,7 @@ void Parser::parse_set(std::istream& is)
     {
         name = cat;
         // in this form, 'set' changes the value of an existing Property
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         if ( spec )
         {
             //set CLASS:PARAMETER NAME { VALUE }
@@ -251,7 +251,7 @@ void Parser::parse_change(std::istream& is)
             throw InvalidSyntax("`"+name+"' is not a known class of object");
     }
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
     if ( is.peek() == ':' )
     {
@@ -271,7 +271,7 @@ void Parser::parse_change(std::istream& is)
         //change NAME PARAMETER { VALUE }
         para = Tokenizer::get_symbol(is);
         
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
         if ( is.peek() == '*' )
         {
             //change CLASS * { VALUE }
@@ -365,7 +365,7 @@ void Parser::parse_new(std::istream& is)
     Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
     if ( simul_.isCategory(name) )
     {
@@ -472,7 +472,7 @@ void Parser::parse_delete(std::istream& is)
     size_t cnt = 1;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
     if ( simul_.isCategory(name) )
     {
@@ -524,7 +524,7 @@ void Parser::parse_mark(std::istream& is)
     size_t cnt = 0;
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
     if ( simul_.isCategory(name) )
     {
@@ -625,7 +625,7 @@ void Parser::parse_run(std::istream& is)
     bool has_cnt = Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
     if ( name == "simul" )
     {
@@ -1166,7 +1166,7 @@ int Parser::evaluate_one(std::istream& is)
         parse_run(is);
     else if ( tok == "read" )
         parse_read(is);
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     else if ( tok == "include" )
         parse_read(is);
 #endif

@@ -44,7 +44,7 @@ void DigitProp::read(Glossary& glos)
             Cytosim::warn << "`footprint` is only valid with Integer-based Lattice\n";
     }
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     bool u = true;
     if ( glos.set(u, "use_lattice") && !u )
         throw InvalidParameter("`use_lattice` is deprecated: set footprint=0");

@@ -100,7 +100,7 @@ void ViewProp::read(Glossary& glos)
     
     glos.set(multisample, "multisample");
     glos.set(multisample, "samples");
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     glos.set(multisample, "gl_samples");
 #endif
     glos.set(label,       "label");

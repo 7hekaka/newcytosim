@@ -155,7 +155,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
         }
         else if ( tag == Fiber::TAG_LATTICE )
         {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 49
             if ( in.formatID() < 49 )
                 hAbs = in.readFloat();
 #endif
@@ -172,7 +172,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
             //throw InvalidIO("Cannot import Digit without fiber's lattice");
 #endif
         }
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 32
         else if ( tag == 'm' )
         {
             hAbs = in.readFloat();

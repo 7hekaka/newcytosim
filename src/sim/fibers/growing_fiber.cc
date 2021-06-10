@@ -153,7 +153,7 @@ void GrowingFiber::write(Outputter& out) const
 
 void GrowingFiber::readEndState(Inputter& in)
 {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 54
     if ( in.formatID() < 54 )
     {
         mGrowthM = in.readFloat();
@@ -182,7 +182,7 @@ void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         readEndState(in);
     else
     {
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 44
         if ( in.formatID() < 44 )
             readEndState(in);
         const real len = length();
@@ -190,7 +190,7 @@ void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         
         Fiber::read(in, sim, tag);
                 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 46
         if ( tag == TAG && in.formatID() < 46 )
         {
             // adjust growing variable

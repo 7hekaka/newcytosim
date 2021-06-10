@@ -28,7 +28,7 @@ real FiberProp::newFiberLength(Glossary& opt) const
 {
     real len = 1.0;
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     opt.set(len, "initial_length") ||
 #endif
     opt.set(len, "length", "fiber_length");
@@ -222,7 +222,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     
     // set state of plus ends:
     state_t p = STATE_WHITE;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( opt.set(p, "plus_end_state") )
     {
         fib->setEndStateP(p);
@@ -234,7 +234,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 
     // set state of minus ends:
     state_t m = STATE_WHITE;
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( opt.set(m, "minus_end_state") )
     {
         Cytosim::warn << "use `minus_end = STATE` instead of `minus_end_state = STATE`\n";
@@ -244,7 +244,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     if ( opt.set(m, "minus_end", keys) || opt.set(m, "end_state", 1, keys) )
         fib->setEndStateM(m);
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     if ( fib->prop->activity != "none" && m == 0 && p == 0 )
         Cytosim::warn << "Fiber may not grow as both ends are in state `white`\n";
 #endif
@@ -361,7 +361,7 @@ void FiberProp::read(Glossary& glos)
     glos.set(max_length,        "max_length");
     glos.set(total_polymer,     "total_polymer");
     glos.set(persistent,        "persistent");
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     bool ds;
     if ( glos.set(ds, "delete_stub") )
     {
@@ -375,7 +375,7 @@ void FiberProp::read(Glossary& glos)
     glos.set(drag_length,  "drag_length");
     glos.set(drag_model,   "drag_model");
     glos.set(drag_gap,     "drag_model", 1);
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     glos.set(drag_radius,  "hydrodynamic_radius");
     glos.set(drag_length,  "hydrodynamic_radius", 1);
     glos.set(drag_model,   "surface_effect");
@@ -443,7 +443,7 @@ void FiberProp::read(Glossary& glos)
 #endif
 
     
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 50
     if ( confine_space == "current" )
         confine_space = "last";
 
@@ -537,7 +537,7 @@ void FiberProp::complete(Simul const& sim)
     if ( max_length < 0 )
         throw InvalidParameter("fiber:max_length should be >= 0");
 
-#ifdef BACKWARD_COMPATIBILITY
+#if BACKWARD_COMPATIBILITY < 100
     if ( total_polymer == 0 )
         total_polymer = INFINITY;
 #endif
