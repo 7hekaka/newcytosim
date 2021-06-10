@@ -3,7 +3,6 @@
 #include "dim.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "common.h"
 #include "simul_prop.h"
 #include "chewer_prop.h"
 #include "chewer.h"

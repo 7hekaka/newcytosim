@@ -3,9 +3,9 @@
 #ifndef BUNDLE_PROP_H
 #define BUNDLE_PROP_H
 
+#include "cymdef.h"
 #include "real.h"
 #include "property.h"
-#include "common.h"
 
 class FiberSet;
 

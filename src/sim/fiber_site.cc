@@ -3,7 +3,7 @@
 #include "fiber_site.h"
 #include "iowrapper.h"
 #include "simul.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 FiberSite::FiberSite(Fiber* f, real a)

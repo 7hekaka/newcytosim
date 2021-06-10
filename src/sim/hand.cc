@@ -8,7 +8,7 @@
 #include "fiber_prop.h"
 #include "digit.h"
 #include "simul.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 /// this HandMonitor does nothing

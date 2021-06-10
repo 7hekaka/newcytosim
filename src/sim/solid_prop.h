@@ -3,9 +3,9 @@
 #ifndef SOLID_PROP_H
 #define SOLID_PROP_H
 
+#include "cymdef.h"
 #include "real.h"
 #include "property.h"
-#include "common.h"
 #include "vector.h"
 
 class PointDisp;

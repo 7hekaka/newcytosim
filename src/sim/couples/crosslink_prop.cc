@@ -4,7 +4,6 @@
 #include "messages.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "common.h"
 #include "simul_prop.h"
 #include "crosslink_prop.h"
 #include "crosslink_long.h"

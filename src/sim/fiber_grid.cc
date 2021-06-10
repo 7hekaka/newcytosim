@@ -10,7 +10,7 @@
 #include "hand.h"
 #include "hand_prop.h"
 #include "simul.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 #if ( 0 )

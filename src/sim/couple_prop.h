@@ -5,7 +5,6 @@
 #include "real.h"
 #include "property.h"
 #include "hand_prop.h"
-#include "common.h"
 
 class Couple;
 class Space;

@@ -3,9 +3,9 @@
 #ifndef ASTER_PROP_H
 #define ASTER_PROP_H
 
+#include "cymdef.h"
 #include "real.h"
 #include "property.h"
-#include "common.h"
 
 class FiberSet;
 

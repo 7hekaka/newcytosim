@@ -6,7 +6,7 @@
 #include "assert_macro.h"
 #include "interpolation.h"
 #include "fiber.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 /// FiberSite indicates a location on a Fiber by its curvilinear abscissa

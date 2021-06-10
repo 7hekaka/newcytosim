@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
-#include "sim.h"
+#include "cymdef.h"
 #include "parser.h"
 #include "messages.h"
 #include "tokenizer.h"

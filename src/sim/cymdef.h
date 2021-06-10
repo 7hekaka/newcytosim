@@ -1,11 +1,28 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 /**
  @file
- @brief Common definitions: FiberEnd, etc.
- */
+ @brief Global Compile Switches and common definitions: FiberEnd, etc.
+*/
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef CYMDEF_H
+#define CYMDEF_H
+
+/**
+ Enable code to be able to read old trajectory files
+ Option normally ON
+ */
+#define BACKWARD_COMPATIBILITY
+
+
+/** 
+ Enables advanced Space
+ */
+#define NEW_SPACES 1
+
+
+/// Option to not use constraints on the fiber's segment lengths
+#define UNCONSTRAINED_LENGTH 0
+
 
 
 /// Designates the tip of a Fiber, but also the origin and center points
@@ -21,7 +38,7 @@ enum FiberEnd
 
 
 /// Possible dynamic states for the tip of a Fiber [dynamic instability]
-/** 
+/**
  The naming is intentionally vague and does not refer to the nature of the states,
  since their actual interpretation may be be different in different types of Fiber.
  */
@@ -61,5 +78,3 @@ enum Confinement
 
 
 #endif
-
-

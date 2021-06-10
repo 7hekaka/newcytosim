@@ -2,7 +2,6 @@
 #ifndef TRACKER_PROP_H
 #define TRACKER_PROP_H
 
-#include "common.h"
 #include "hand_prop.h"
 
 /// additional Property for Tracker

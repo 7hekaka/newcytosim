@@ -2,7 +2,7 @@
 #ifndef TREADMILLING_FIBER_H
 #define TREADMILLING_FIBER_H
 
-#include "sim.h"
+#include "cymdef.h"
 #include "vector.h"
 #include "fiber.h"
 

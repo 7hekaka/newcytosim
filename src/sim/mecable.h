@@ -8,7 +8,7 @@
 #include "object.h"
 #include "buddy.h"
 #include "matfull.h"
-#include "sim.h"
+#include "cymdef.h"
 
 class Meca;
 

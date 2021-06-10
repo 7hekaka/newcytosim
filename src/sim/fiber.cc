@@ -12,7 +12,7 @@
 #include "simul.h"
 #include "meca.h"
 #include "hand.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 

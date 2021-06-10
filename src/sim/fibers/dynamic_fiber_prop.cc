@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include <cmath>
-#include "sim.h"
+#include "cymdef.h"
 #include "dynamic_fiber_prop.h"
 #include "dynamic_fiber.h"
 #include "simul_prop.h"

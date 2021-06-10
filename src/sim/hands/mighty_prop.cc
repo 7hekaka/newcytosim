@@ -3,7 +3,6 @@
 #include "messages.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "common.h"
 #include "mighty_prop.h"
 #include "mighty.h"
 #include "simul.h"

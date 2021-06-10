@@ -3,9 +3,8 @@
 #ifndef CHAIN_H
 #define CHAIN_H
 
-#include "sim.h"
+#include "cymdef.h"
 #include "vector.h"
-#include "common.h"
 #include "mecable.h"
 #include "interpolation.h"
 

@@ -6,7 +6,7 @@
 #include "glossary.h"
 #include "simul_prop.h"
 #include "simul.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 // include spaces that use SpaceDynamicProp

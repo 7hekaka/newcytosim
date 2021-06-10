@@ -5,7 +5,7 @@
 #include "messages.h"
 #include "sphere.h"
 #include "space.h"
-#include "sim.h"
+#include "cymdef.h"
 
 #include "sphere.h"
 #include "simul_prop.h"

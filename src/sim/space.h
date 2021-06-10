@@ -5,11 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "sim.h"
+#include "cymdef.h"
 #include "real.h"
 #include "vector.h"
 #include "object.h"
-#include "common.h"
 #include "modulo.h"
 #include "space_prop.h"
 

@@ -4,7 +4,6 @@
 #define NUCLEATOR_PROP_H
 
 #include "hand_prop.h"
-#include "common.h"
 
 class FiberProp;
 class FiberSet;

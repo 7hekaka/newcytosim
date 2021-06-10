@@ -5,7 +5,7 @@
 #include "messages.h"
 #include "simul_prop.h"
 #include "simul.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 void SolidProp::clear()

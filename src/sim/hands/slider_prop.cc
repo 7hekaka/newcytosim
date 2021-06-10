@@ -3,8 +3,7 @@
 #include "slider_prop.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "common.h"
-#include "sim.h"
+#include "cymdef.h"
 #include <cmath>
 #include "slider.h"
 #include "simul.h"

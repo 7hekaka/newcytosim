@@ -3,7 +3,6 @@
 #ifndef HAND_LIST_H
 #define HAND_LIST_H
 
-#include "common.h"
 #include "real.h"
 
 

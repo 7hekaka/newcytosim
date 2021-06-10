@@ -2,7 +2,7 @@
 #ifndef GROWING_FIBER_H
 #define GROWING_FIBER_H
 
-#include "sim.h"
+#include "cymdef.h"
 #include "vector.h"
 #include "fiber.h"
 

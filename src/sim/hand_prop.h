@@ -3,8 +3,8 @@
 #ifndef HAND_PROP
 #define HAND_PROP
 
+#include "cymdef.h"
 #include "real.h"
-#include "common.h"
 #include "property.h"
 
 

@@ -6,7 +6,7 @@
 #include "random.h"
 #include "modulo.h"
 #include "space.h"
-#include "sim.h"
+#include "cymdef.h"
 
 extern Modulo const* modulo;
 

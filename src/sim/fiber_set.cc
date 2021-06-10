@@ -13,7 +13,7 @@
 #include "treadmilling_fiber_prop.h"
 #include "lapack.h"
 #include "simul.h"
-#include "sim.h"
+#include "cymdef.h"
 
 //#include "vecprint.h"
 

@@ -4,7 +4,6 @@
 #include "messages.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "common.h"
 #include "motor_prop.h"
 #include "motor.h"
 #include "simul.h"

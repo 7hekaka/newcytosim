@@ -5,7 +5,7 @@
 #include "exceptions.h"
 #include "property.h"
 #include "object_set.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 Object::~Object()

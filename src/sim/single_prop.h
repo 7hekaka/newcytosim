@@ -6,7 +6,6 @@
 #include "vector.h"
 #include "property.h"
 #include "hand_prop.h"
-#include "common.h"
 
 class Mecable;
 class Single;

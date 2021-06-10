@@ -3,9 +3,8 @@
 #ifndef CLASSIC_FIBER_H
 #define CLASSIC_FIBER_H
 
-#include "sim.h"
+#include "cymdef.h"
 #include "vector.h"
-#include "common.h"
 #include "fiber.h"
 
 

@@ -3,7 +3,7 @@
 #ifndef DYNAMIC_FIBER_H
 #define DYNAMIC_FIBER_H
 
-#include "sim.h"
+#include "cymdef.h"
 #include "vector.h"
 #include "fiber.h"
 

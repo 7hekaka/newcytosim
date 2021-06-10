@@ -2,7 +2,6 @@
 #include "dim.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "common.h"
 #include "regulator_prop.h"
 #include "regulator.h"
 #include "simul.h"

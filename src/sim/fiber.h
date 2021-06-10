@@ -9,7 +9,7 @@
 #include "fiber_prop.h"
 #include "hand_list.h"
 #include "lattice.h"
-#include "sim.h"
+#include "cymdef.h"
 
 
 class Hand;

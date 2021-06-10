@@ -6,8 +6,7 @@
 #include "real.h"
 #include "vector.h"
 #include "property.h"
-#include "common.h"
-#include "sim.h"
+#include "cymdef.h"
 
 class Field;
 class Fiber;

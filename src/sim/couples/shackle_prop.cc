@@ -3,7 +3,6 @@
 #include "messages.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "common.h"
 #include "simul_prop.h"
 #include "shackle_prop.h"
 #include "shackle.h"
