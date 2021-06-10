@@ -1001,11 +1001,11 @@ void Interface::execute_import(std::string const& file, std::string const& what,
         if ( append )
         {
             real t = simul_.prop->time;
-            simul_.loadObjects(in, subset);
+            simul_.reloadObjects(in, 0, subset);
             simul_.prop->time = t;
         }
         else
-            simul_.reloadObjects(in, subset);
+            simul_.reloadObjects(in, 1, subset);
         if ( cnt >= frm )
             break;
         ++cnt;

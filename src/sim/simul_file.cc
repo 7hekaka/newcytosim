@@ -295,9 +295,8 @@ public:
         sim->fields.prune();
         frozen = false;
     }
-
-    /// reset flags
-    ~InputLock()
+    
+    void thaw()
     {
         /*
          Attention: The order of the thaw() below is important:
@@ -306,21 +305,25 @@ public:
          as if they had been updated from reading the file.
          Destroying couples and singles before the fibers avoids this problem.
          */
+        //sim->events.thaw();
+        sim->couples.thaw();
+        sim->singles.thaw();
+        sim->organizers.thaw();
+        sim->tubules.thaw();
+        sim->beads.thaw();
+        sim->solids.thaw();
+        sim->spheres.thaw();
+        sim->fibers.thaw();
+        sim->spaces.thaw();
+        sim->fields.thaw();
+        frozen = false;
+    }
+
+    /// reset flags
+    ~InputLock()
+    {
         if ( frozen )
-        {
-            //sim->events.thaw();
-            sim->couples.thaw();
-            sim->singles.thaw();
-            sim->organizers.thaw();
-            sim->tubules.thaw();
-            sim->beads.thaw();
-            sim->solids.thaw();
-            sim->spheres.thaw();
-            sim->fibers.thaw();
-            sim->spaces.thaw();
-            sim->fields.thaw();
-            frozen = false;
-        }
+            thaw();
         //Cytosim::log("Simul::InputLock deleted with %i objects\n", sim->nbObjects());
     }
 };
@@ -341,7 +344,7 @@ public:
  - 1 = EOF
  .
  */
-int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
+int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
 {
     in.lock();
     InputLock lock(this);
@@ -350,11 +353,16 @@ int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
         bool s, c;
         int res = readObjects(in, subset, s, c);
         in.unlock();
-        // if no error occurred, erase objects that have not been updated
         if ( 0 == res )
-            lock.prune(s, c);
-        // renew pointers to objects, particularly 'confine_space'
-        prop->complete(*this);
+        {
+            // if no error occurred, process objects that have not been updated
+            if ( prune )
+                lock.prune(s, c);
+            else
+                lock.thaw();
+            // renew pointers to objects, particularly 'confine_space'
+            prop->complete(*this);
+        }
         return res;
     }
     catch(Exception & e)
@@ -365,38 +373,6 @@ int Simul::reloadObjects(Inputter& in, ObjectSet* subset)
 }
 
 
-/**
- Read Objects from a file:
- update the ones that were already present in the simulation world,
- and otherwise create new ones. The Simulation worlds is augmented.
- If 'subset != NULL' only objects from this class will be imported.
- 
- @returns
- - 0 = success
- - 1 = EOF
- .
- */
-int Simul::loadObjects(Inputter& in, ObjectSet* subset)
-{
-    in.lock();
-    try
-    {
-        bool s, c;
-        int res = readObjects(in, subset, s, c);
-        in.unlock();
-        return res;
-    }
-    catch(Exception & e)
-    {
-        in.unlock();
-        throw;
-    }
-}
-
-
-/**
- Create an Inputter 'in' and call 'loadObjects(in)'
- */
 int Simul::loadObjects(char const* filename)
 {
     Inputter in(DIM, filename, true);
@@ -406,7 +382,7 @@ int Simul::loadObjects(char const* filename)
     if ( in.eof() )
         return 1;
 
-    return loadObjects(in, nullptr);
+    return reloadObjects(in, 0, nullptr);
 }
 
 

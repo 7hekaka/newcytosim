@@ -344,14 +344,11 @@ public:
     /// read objects from file, and add them to the simulation state
     int  readObjects(Inputter&, ObjectSet* subset, bool&, bool&);
 
-    /// load objects from a file, adding them to the simulation state
-    int  loadObjects(Inputter&, ObjectSet* subset = nullptr);
-
     /// load sim-world from the named file
     int  loadObjects(char const* filename);
     
     /// import objects from file, and delete objects that were not referenced in the file
-    int  reloadObjects(Inputter&, ObjectSet* subset = nullptr);
+    int  reloadObjects(Inputter&, bool prune = 1, ObjectSet* subset = nullptr);
 
     /// write sim-world to specified file
     void writeObjects(Outputter&) const;
