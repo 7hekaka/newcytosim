@@ -71,15 +71,26 @@ public:
     /// Read unsigned integer on 8 bytes
     uint64_t readUInt64();
     
+    /// Read unsigned integer on 2 bytes
+    uint16_t readUInt16bin();
+    /// Read unsigned integer on 4 bytes
+    uint32_t readUInt32bin();
+
     /// Reads one float on 4 bytes
     float    readFloat();
     /// Reads one double on 8 bytes
     double   readDouble();
     
     /// Reads one vector, setting `cnt` coordinates in the array
-    void     readFloats(float[], size_t D);
+    void     readFloats(float[], size_t dim);
     /// Reads one vector, setting `cnt` coordinates in the array
-    void     readFloats(double[], size_t D);
+    void     readFloats(double[], size_t dim);
+
+    /// Reads one vector, setting `cnt` coordinates in the array
+    void     readFloats(size_t cnt, float[], size_t dim);
+    /// Reads one vector, setting `cnt` coordinates in the array
+    void     readFloats(size_t cnt, double[], size_t dim);
+
     /// Reads one vector, setting `cnt` coordinates in the array
     void     readDoubles(double[], size_t D);
 

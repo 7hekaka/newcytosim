@@ -148,7 +148,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     tag = c & 127;
     // detect fat reference:
     int fat = ( c & 128 );
-#if BACKWARD_COMPATIBILITY < 50
+#if BACKWARD_COMPATIBILITY < 49
     if ( c == '$' )
     {
         tag = in.get_char();
@@ -164,28 +164,28 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     
     ObjectID id = 0;
 
-    if ( in.binary() )
+#if BACKWARD_COMPATIBILITY < 49
+    if ( in.binary() && in.formatID() < 49 )
     {
         if ( fat )
         {
-            // long format
-#if BACKWARD_COMPATIBILITY < 49
-            // skip property index
-            if ( in.formatID() < 49 )
-                in.readUInt16();
-#endif
+            in.readUInt16();         // skip property index
             id = in.readUInt32();
         }
         else
         {
-            // short format
-#if BACKWARD_COMPATIBILITY < 49
-            // skip property index
-            if ( in.formatID() < 49 )
-                in.readUInt8();
-#endif
+            in.readUInt8();          // skip property index
             id = in.readUInt16();
         }
+    }
+    else
+#endif
+    if ( in.binary() )
+    {
+        if ( fat )
+            id = in.readUInt32bin();
+        else
+            id = in.readUInt16bin();
     }
     else
     {

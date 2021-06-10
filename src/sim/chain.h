@@ -147,7 +147,7 @@ protected:
     static int   reshape_local(size_t, const real*, real*, real cut, real* tmp, size_t);
 
     /// change segmentation
-    void         setSegmentation(real c) { fnCut = std::max(c, REAL_EPSILON); iCut = 1.0 / fnCut; }
+    void         setSegmentation(real c) { fnCut = std::max(c, REAL_EPSILON); iCut = real(1) / fnCut; }
     
 public:
     
@@ -222,7 +222,7 @@ public:
     Interpolation interpolateCenter() const;
 
     /// interpolation of the site specified by its distance from the ORIGIN
-    Interpolation interpolate(real ab) const { return interpolateM(ab-fnAbscissaM); }
+    Interpolation interpolate(const real& ab) const { return interpolateM(ab-fnAbscissaM); }
     
     /// interpolation of the site specified from the MINUS_END
     Interpolation interpolateM(real ab) const;

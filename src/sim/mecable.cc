@@ -360,15 +360,14 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
     try
     {
         size_t nb = in.readUInt16();
-        allocateMecable(nb);
-        //we reset the point for a clean start:
-        resetPoints();
+        if ( allocateMecable(nb) )
+            resetPoints();    //we reset the point for a clean start
         nPoints = nb;
-#if ( 1 )
+#if !REAL_IS_DOUBLE
+        in.readFloats(nb, pPos, DIM);
+#else
         for ( size_t i = 0; i < nb ; ++i )
             in.readFloats(pPos+DIM*i, DIM);
-#else
-        in.readFloats(pPos, nb, DIM);
 #endif
     }
     catch( Exception & e )

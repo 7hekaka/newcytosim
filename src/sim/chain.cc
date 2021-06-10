@@ -1930,10 +1930,10 @@ Interpolation Chain::interpolateCenter() const
  */
 Interpolation Chain::interpolateM(const real ab) const
 {
-    real a = std::max(ab, (real)0) / fnCut;
+    real a = std::max(ab*iCut, (real)0);
     //beyond the last point, we interpolate the PLUS_END
-    size_t s = std::min((size_t)a, size_t(nPoints-2));
-    return Interpolation(this, s, s+1, std::min(a-s, (real)1));
+    size_t i = std::min(static_cast<size_t>(a), size_t(nPoints-2));
+    return Interpolation(this, i, i+1, std::min(a-(real)i, (real)1));
 }
 
 
@@ -2168,8 +2168,10 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     fnSegmentation = seg;
     //Mecable::write(std::cerr);
     
+#ifndef NDEBUG
     // verify the length and segmentation:
     if ( in.vectorSize() == DIM )
         checkLength(pPos, std::clog, len);
+#endif
 }
 

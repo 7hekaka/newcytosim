@@ -117,6 +117,17 @@ uint8_t Inputter::readUInt8()
 }
 
 
+uint16_t Inputter::readUInt16bin()
+{
+    uint16_t v;
+    if ( 1 != fread(&v, 2, 1, mFile) )
+        throw InvalidIO("readUInt16() failed");
+    if ( binary_ == 2 )
+        v = byteswap(v);
+    return v;
+}
+
+
 uint16_t Inputter::readUInt16()
 {
     uint16_t v;
@@ -136,6 +147,17 @@ uint16_t Inputter::readUInt16()
         if ( v != u )
             throw InvalidIO("invalid uint16");
     }
+    return v;
+}
+
+
+uint32_t Inputter::readUInt32bin()
+{
+    uint32_t v;
+    if ( 1 != fread(&v, 4, 1, mFile) )
+        throw InvalidIO("readUInt32() failed");
+    if ( binary_ == 2 )
+        v = byteswap(v);
     return v;
 }
 
@@ -234,16 +256,16 @@ double Inputter::readDouble()
 
 
 /**
- This will read `vecsize_` floats, and set `cnt` values in ptr[], filling in with zeros.
+ This will read `vecsize_` floats, and set `dim` values in ptr[], filling in with zeros.
  The default vector size can be changed by calling `vectorSize(INT)`
  */
-void Inputter::readFloats(float ptr[], const size_t cnt)
+void Inputter::readFloats(float ptr[], const size_t dim)
 {
-    size_t stop = std::min(vecsize_, cnt);
+    size_t stop = std::min(vecsize_, dim);
     size_t d = 0;
     while ( d < stop )
         ptr[d++] = readFloat();
-    while ( d < cnt )
+    while ( d < dim )
         ptr[d++] = 0.0f;
     for ( d = stop; d < vecsize_; ++d )
         readFloat();
@@ -251,19 +273,56 @@ void Inputter::readFloats(float ptr[], const size_t cnt)
 
 
 /**
- This will read `vecsize_` floats, and set `cnt` values in ptr[], filling in with zeros.
+ This will read `vecsize_` floats, and set `dim` values in ptr[], filling in with zeros.
  */
-void Inputter::readFloats(double ptr[], const size_t cnt)
+void Inputter::readFloats(double ptr[], const size_t dim)
 {
-    size_t stop = std::min(vecsize_, cnt);
+    size_t stop = std::min(vecsize_, dim);
     size_t d = 0;
     while ( d < stop )
         ptr[d++] = readFloat();
-    while ( d < cnt )
+    while ( d < dim )
         ptr[d++] = 0.0;
     for ( d = stop; d < vecsize_; ++d )
         readFloat();
 }
+
+
+/**
+This will read `n * vecsize_` floats, and store `n * dim` values in ptr[].
+*/
+void Inputter::readFloats(const size_t cnt, float ptr[], const size_t dim)
+{
+    if ( dim < vecsize_ || ! binary_ )
+    {
+        for ( size_t i = 0; i < cnt ; ++i )
+            readFloats(ptr+dim*i, dim);
+        return;
+    }
+
+    size_t n = cnt * vecsize_;
+    if ( n != fread(ptr, 4, n, mFile) )
+        throw InvalidIO("readFloats(D) failed");
+
+    if ( binary_ == 2 )
+    {
+        for ( size_t i = 0; i < n; ++i )
+            ptr[i] = byteswap(ptr[i]);
+    }
+    if ( vecsize_ < dim )
+    {
+        size_t u = cnt;
+        while ( u-- > 0 )
+        {
+            size_t i = dim;
+            while ( i-- > vecsize_ )
+                ptr[u*dim+i] = 0.f;
+            while ( i-- > 0 )
+                ptr[u*dim+i] = ptr[u*vecsize_+i];
+        }
+    }
+}
+
 
 
 /**

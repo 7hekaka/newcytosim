@@ -178,8 +178,9 @@ void FiberSite::read(Inputter& in, Simul& sim)
             throw InvalidIO("unexpected class in FiberSite");
         }
 
-        update();
-        checkAbscissa();
+        // this will be called in updateFiber();
+        //update();
+        //checkAbscissa();
     }
 }
 
@@ -218,14 +219,14 @@ int FiberSite::checkAbscissa() const
     assert_true(hFiber);
     
     real a = hFiber->abscissaM() - hAbs;
-    if ( a > 1e-3 )
+    if ( a > real(1e-3) )
     {
         std::cerr << "FiberSite:abscissa < fiber:abscissa(MINUS_END) by " << a << '\n';
         return 2;
     }
     
     real b = hAbs - hFiber->abscissaP();
-    if ( b > 1e-3 )
+    if ( b > real(1e-3) )
     {
         std::cerr << "FiberSite:abscissa > fiber:abscissa(PLUS_END) by " << b << '\n';
         return 1;

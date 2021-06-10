@@ -13,7 +13,7 @@
  
  default = 100
  */
-#define BACKWARD_COMPATIBILITY 41
+#define BACKWARD_COMPATIBILITY 50
 
 
 /** 
