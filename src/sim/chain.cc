@@ -2162,15 +2162,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-#if BACKWARD_COMPATIBILITY < 38
-    if ( in.formatID() < 38 )
-    {
-        setSegmentation(len);
-        len *= nbSegments();
-    }
-    else
-#endif
-        setSegmentation(len/nbSegments());
+    setSegmentation(len/nbSegments());
 
     fnAbscissaP = fnAbscissaM + len;
     fnSegmentation = seg;

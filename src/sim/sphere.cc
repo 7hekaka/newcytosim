@@ -621,11 +621,6 @@ void Sphere::read(Inputter& in, Simul& sim, ObjectTag tag)
     try
     {
         real rad;
-#if BACKWARD_COMPATIBILITY < 36
-        if ( in.formatID() < 36 )
-            rad = radius();
-        else
-#endif
         rad = in.readFloat();
         Mecable::read(in, sim, tag);
         resize(rad);

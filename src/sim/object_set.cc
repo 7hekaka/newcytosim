@@ -497,13 +497,6 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
         {
             ix = in.readUInt16();
             id = in.readUInt32();
-#if BACKWARD_COMPATIBILITY < 34
-            if ( in.formatID() < 34 )
-                ;
-            else if ( in.formatID() < 39 )
-                mk = in.readUInt16();
-            else
-#endif
             mk = in.readUInt32();
         }
         else

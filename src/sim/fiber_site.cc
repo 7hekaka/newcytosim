@@ -172,12 +172,6 @@ void FiberSite::read(Inputter& in, Simul& sim)
             //throw InvalidIO("Cannot import Digit without fiber's lattice");
 #endif
         }
-#if BACKWARD_COMPATIBILITY < 32
-        else if ( tag == 'm' )
-        {
-            hAbs = in.readFloat();
-        } 
-#endif
         else
         {
             ///\todo: we should allow binder to refer to any Mecable

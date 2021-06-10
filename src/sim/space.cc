@@ -486,26 +486,6 @@ void Space::readLengths(Inputter& in, size_t n_len, real len[])
 
 void Space::readShape(Inputter& in, size_t n_len, real len[], std::string const& expected)
 {
-#if BACKWARD_COMPATIBILITY < 35
-    if ( in.formatID() < 35 )
-        return;
-    
-    if ( in.formatID() < 36 )
-    {
-        for ( unsigned d = 0; d < 3; ++d )
-            len[d] = in.readFloat();
-        return;
-    }
-    
-    if ( in.formatID() < 41 )
-    {
-        unsigned n = in.readUInt8();
-        for ( unsigned d = 0; d < n; ++d )
-            len[d] = in.readFloat();
-        return;
-    }
-#endif
-    
     readShape(in, expected);
     readLengths(in, n_len, len);
 }

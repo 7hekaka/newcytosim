@@ -158,9 +158,6 @@ void Duo::write(Outputter& out) const
 
 void Duo::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-#if BACKWARD_COMPATIBILITY < 37
-    if ( in.formatID() > 36 )
-#endif
     active_ = in.readUInt8();
     Couple::read(in, sim, tag);
 }

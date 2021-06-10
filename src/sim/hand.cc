@@ -345,11 +345,6 @@ void Hand::write(Outputter& out) const
 
 bool Hand::read(Inputter& in, Simul& sim)
 {
-#if BACKWARD_COMPATIBILITY < 32
-    if ( in.formatID() < 32 )
-        prop = sim.findProperty<HandProp>("hand",in.readUInt16());
-#endif
-    
     Fiber * fib = hFiber;
     FiberSite::read(in, sim);
     resetTimers();

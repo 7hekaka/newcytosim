@@ -1708,29 +1708,6 @@ void Fiber::write(Outputter& out) const
 void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     //std::clog << " Fiber::read(" << tag << ")\n";
-#if BACKWARD_COMPATIBILITY < 34
-        
-    if ( in.formatID() == 33 )
-        mark(in.readUInt32());
-    
-    if ( tag == 'm' )
-    {
-        if ( in.formatID()==31 )
-        {
-            size_t p = in.readUInt16();
-            prop = sim.findProperty<FiberProp>("fiber", p);
-        }
-        //tag = TAG;
-    }
-    
-    if ( in.formatID() < 31 )
-    {
-        setEndStateM(in.readUInt8());
-        setEndStateP(in.readUInt8());
-    }
-    
-#endif
-    
     if ( tag == TAG )
     {
         Chain::read(in, sim, tag);
@@ -1811,16 +1788,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
     }
 #endif
-#if BACKWARD_COMPATIBILITY < 32
-    else if ( tag == 'm' )
-    {
-        Chain::read(in, sim, tag);
-    }
-#endif
-    else
-    {
-        Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'" << '\n';
-    }
+    Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'" << '\n';
 }
 
 

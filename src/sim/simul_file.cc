@@ -161,22 +161,6 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     // Object::TAG is the 'void' reference
     if ( tag == Object::TAG )
         return nullptr;
-
-#if BACKWARD_COMPATIBILITY < 32
-    if ( in.formatID() < 32 )
-    {
-        ObjectID n = isupper(tag) ? in.readUInt32() : in.readUInt16();
-        if ( n == 0 )
-            return nullptr;
-        ObjectSet const* set = findSetT(tolower(tag));
-        if ( !set )
-            throw InvalidIO("unknown ObjectTag in Simul::find()");
-        Object * w =  set->findID(n);
-        if ( !w )
-            throw InvalidIO("unknown Object referenced (old format)");
-        return w;
-    }
-#endif
     
     ObjectID id = 0;
 
@@ -191,15 +175,6 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
                 in.readUInt16();
 #endif
             id = in.readUInt32();
-#if BACKWARD_COMPATIBILITY < 34
-            // skip ObjectMark
-            if ( in.formatID() < 34 )
-                ;
-            else if ( in.formatID() < 39 )
-                in.readUInt16();
-            else if ( in.formatID() < 49 )
-                in.readInt32();
-#endif
         }
         else
         {
@@ -600,39 +575,6 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
         {
             //std::clog << "OBJECT |" << (char)tag << "| " << (fat?"fat\n":"\n");
             assert_true( isalpha(tag) );
-
-#if BACKWARD_COMPATIBILITY < 32
-            // Compatibility with older format (before 2010)
-            if ( in.formatID() < 32 )
-            {
-                ObjectSet * set = findSetT(tolower(tag));
-                if ( set )
-                {
-                    ObjectID n = isupper(tag) ? in.readUInt32() : in.readUInt16();
-                    if ( n == 0 )
-                        throw InvalidIO("invalid (null) Object reference");
-                    Object * obj = set->findID(n);
-                    if ( obj )
-                    {
-                        if ( tag!='i'  &&  ( tag!='m' || in.formatID()!=31 ))
-                            in.readUInt16();
-                        obj->read(in, *this, tag);
-                        obj->flag(0);
-                    }
-                    else
-                    {
-                        size_t pi = 0;
-                        if ( tag!='i'  &&  ( tag!='m' || in.formatID()!=31 ))
-                            pi = in.readUInt16();
-                        obj = set->newObject(tolower(tag), pi);
-                        obj->identity(n);
-                        obj->read(in, *this, tag);
-                        set->add(obj);
-                    }
-                    continue;
-                }
-            }
-#endif
 #if BACKWARD_COMPATIBILITY < 50
             // this is an 'older' code pathway, before 2017?
             if ( !objset )
