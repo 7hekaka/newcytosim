@@ -1788,7 +1788,8 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
     }
 #endif
-    Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'" << '\n';
+    else
+        Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'\n";
 }
 
 

@@ -108,6 +108,7 @@ real  FiberSite::abscissaFrom(const FiberEnd ref) const
 //------------------------------------------------------------------------------
 #pragma mark - I/O
 
+
 void FiberSite::write(Outputter& out) const
 {
     out.writeSoftSpace();
@@ -124,7 +125,7 @@ void FiberSite::write(Outputter& out) const
         else
 #endif
         {
-            Object::writeReference(out, hFiber);
+            Object::writeReference(out, Fiber::TAG, hFiber->identity());
             out.writeFloat(hAbs);
         }
     }
@@ -138,10 +139,9 @@ void FiberSite::write(Outputter& out) const
 void FiberSite::read(Inputter& in, Simul& sim)
 {
     ObjectTag tag = 0;
-    Object * w = sim.readReference(in, tag);
-    hFiber = static_cast<Fiber*>(w);
-
-    if ( w )
+    hFiber = sim.readFiberReference(in, tag);
+    
+    if ( hFiber )
     {
         //std::clog << "FiberSite::read() " << (char)tag << '\n';
         if ( tag == Fiber::TAG )

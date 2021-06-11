@@ -508,17 +508,17 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
     else
     {
         // read header in text format
-        FILE * file = in.file();
-        if ( 1 != fscanf(file, "%u", &ix) )
+        FILE * f = in.file();
+        if ( 1 != fscanf(f, "%u", &ix) )
             throw InvalidIO("invalid Object header");
         if ( in.get_char() != ':' )
             throw InvalidIO("invalid Object header");
-        if ( 1 != fscanf(file, "%u", &id) )
+        if ( 1 != fscanf(f, "%u", &id) )
             throw InvalidIO("invalid Object header");
         int c = in.get_char();
         if ( c == ':' )
         {
-            if ( 1 != fscanf(file, "%u", &mk) )
+            if ( 1 != fscanf(f, "%u", &mk) )
             throw InvalidIO("invalid Object header");
         }
         else

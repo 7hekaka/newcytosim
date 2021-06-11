@@ -16,6 +16,7 @@
  
  History of changes in file format:
 
+ - 57: 11/06/2021 References written always on 4 bytes with tag+identity
  - 56: 19/01/2021 All fiber dynamic stored on 16 bytes, really
  - 55: 02/10/2020 Interpolation4 stores coefficients only if mecable!=nullptr
  - 54: 25/05/2020 All fiber dynamic stored on 16 bytes
@@ -132,12 +133,10 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
 //------------------------------------------------------------------------------
 #pragma mark - Read Objects
 
-/**
- The Object is not modified
- */
-Object * Simul::readReference(Inputter& in, ObjectTag& tag)
+/** Compatibility function */
+static ObjectID readOldObjectID(Inputter& in, ObjectTag& tag)
 {
-    int c = 0;
+    int c;
     do
         c = in.get_char();
     while ( c == ' ' );
@@ -145,9 +144,9 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     if ( c == EOF )
         throw InvalidIO("unexpected end of file");
 
-    tag = c & 127;
+    tag = c & LOW_BITS;
     // detect fat reference:
-    int fat = ( c & 128 );
+    int fat = ( c & HIGH_BIT );
 #if BACKWARD_COMPATIBILITY < 49
     if ( c == '$' )
     {
@@ -160,7 +159,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     
     // Object::TAG is the 'void' reference
     if ( tag == Object::TAG )
-        return nullptr;
+        return 0;
     
     ObjectID id = 0;
 
@@ -219,8 +218,87 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
         }
 #endif
     }
+    return id;
+}
 
-    if ( id == 0 )
+
+static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
+{
+    ObjectID id = 0;
+
+    if ( in.binary() )
+    {
+#if BACKWARD_COMPATIBILITY < 57
+        if ( in.formatID() < 57 )
+        {
+            char c = in.get_char();
+            tag = c & LOW_BITS;
+            // Object::TAG is the 'void' reference
+            if ( tag == Object::TAG )
+                return 0;
+            if ( c & HIGH_BIT )
+                id = in.readUInt32bin();
+            else
+                id = in.readUInt16bin();
+        }
+        else
+#endif
+        {
+            uint32_t u = in.readUInt32bin();
+            tag = ( u >> 24 ) & LOW_BITS;
+            id = u & 0xFFFFFF;
+        }
+    }
+    else
+    {
+        do
+            tag = in.get_char();
+        while ( tag == ' ' );
+        id = in.readUInt();
+    }
+    return id;
+}
+
+
+/**
+ Read a fiber (new format 11.06.2021)
+ */
+Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
+{
+    ObjectID id;
+#if BACKWARD_COMPATIBILITY < 49
+    if ( in.formatID() < 49 )
+        id = readOldObjectID(in, tag);
+    else
+#endif
+        id = readObjectID(in, tag);
+    
+    // Object::TAG is the 'void' reference
+    if ( tag == Object::TAG )
+        return nullptr;
+    
+    if ( tag != Fiber::TAG && tag != Fiber::TAG_LATTICE )
+        throw InvalidIO("unexpected input");
+
+    return fibers.findID(id);
+}
+
+
+/**
+ Read a fiber (new format 11.06.2021)
+ */
+Object * Simul::readReference(Inputter& in, ObjectTag& tag)
+{
+    ObjectID id;
+#if BACKWARD_COMPATIBILITY < 49
+    if ( in.formatID() < 49 )
+        id = readOldObjectID(in, tag);
+    else
+#endif
+        id = readObjectID(in, tag);
+    
+    // Object::TAG is the 'void' reference
+    if ( tag == Object::TAG || id == 0 )
         return nullptr;
 
     const ObjectSet * set = findSetT(tag);
@@ -417,8 +495,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                 line = in.get_line();
                 break;
             }
-            tag = ( c & 127 );
-            fat = ( c & 128 );
+            tag = ( c & LOW_BITS );
+            fat = ( c & HIGH_BIT );
 #if BACKWARD_COMPATIBILITY < 50
             // detect fat header, formatID() < 50
             if ( c == '$' )

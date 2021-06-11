@@ -102,31 +102,55 @@ std::string Object::reference() const
      .
  .
  The ascii based format always the same.
- All formats are read by Simul::readReference()
+ This data is read by Simul::readReference()
  */
 void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
 {
     assert_true( id > 0 );
 
-    if ( id > 65535 )
+    if ( out.binary() )
     {
-        // long format (5 bytes)
-        // set the highest bit of the byte, which is not used by ASCII codes
-        out.writeChar(g, 128);
-        out.writeUInt32(id, 0);
+#if 1
+        // slim/fat format 50 -- 56 using different size
+        if ( id > 65535 )
+        {
+            // set the highest bit of the byte, which is not used by ASCII codes
+            out.put_char(g|HIGH_BIT);
+            out.writeUInt32(id, 0);
+        }
+        else
+        {
+            out.put_char(g);
+            out.writeUInt16(id, 0);
+        }
+#else
+        /*
+         format changed on 11.06.2021
+         combine `g` and 'id', leaving 3 bytes and at most 16777216 objects
+         Note that the topmost bit of ASCII is not used
+         */
+        out.writeUInt32(id|(uint32_t(g)<<24));
+#endif
     }
     else
     {
-        // short format (3 bytes)
         out.put_char(g);
-        out.writeUInt16(id, 0);
+        out.writeUInt(id, 0);
     }
 }
 
 
 void Object::writeNullReference(Outputter& out)
 {
-    out.put_char(TAG);
+    /*
+     format changed on 11.06.2021
+     combine `g` and 'id', leaving 3 bytes and at most 16777216 objects
+     Note that the topmost bit of ASCII is not used
+     */
+    if ( out.binary() )
+        out.writeUInt32(uint32_t(TAG)<<24);
+    else
+        out.put_char(TAG);
 }
 
 
@@ -155,24 +179,36 @@ Writes the info that is common to all objects to file
      .
  .
  The ascii based format is invariant.
+ This data is read back in `readObjectHeader()`
  */
 void Object::writeHeader(Outputter& out, ObjectTag g) const
 {
-    if ( ! out.binary() )
-        out.put_char('\n');
-    if ( identity() > 65535 || property()->number() > 255 || mark() )
+    if ( out.binary() )
     {
-        // set the highest bit of the byte, which is not used by ASCII codes
-        out.writeChar(g, 128);
-        out.writeUInt16(property()->number(), 0);
-        out.writeUInt32(identity(), ':');
-        out.writeUInt32(mark(), ':');
+        if ( identity() > 16777216 )
+            throw InvalidIO("file data format overflow");
+        if ( identity() > 65535 || property()->number() > 255 || mark() )
+        {
+            // set the highest bit of the byte, which is not used by ASCII codes
+            out.put_char(g|HIGH_BIT);
+            out.writeUInt16(property()->number(), 0);
+            out.writeUInt32(identity(), ':');
+            out.writeUInt32(mark(), ':');
+        }
+        else
+        {
+            out.put_char(g);
+            out.writeUInt8(property()->number(), 0);
+            out.writeUInt16(identity(), ':');
+        }
     }
     else
     {
+        out.put_char('\n');
         out.put_char(g);
-        out.writeUInt8(property()->number(), 0);
-        out.writeUInt16(identity(), ':');
+        out.writeUInt(property()->number(), 0);
+        out.writeUInt(identity(), ':');
+        out.writeUInt(mark(), ':');
     }
 }
 

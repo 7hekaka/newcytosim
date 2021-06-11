@@ -7,6 +7,12 @@
 #include <stdint.h>
 #include "filewrapper.h"
 
+
+/// the highest bit is not used by ASCII codes
+constexpr uint8_t HIGH_BIT = 128;
+constexpr uint8_t LOW_BITS = 127;
+
+
 /// Input in text or binary mode with automatic byte-swapping for endianess compatibility
 class Inputter : public FileWrapper
 {
@@ -24,7 +30,7 @@ private:
         on PC from mac, or vice et versa.
         */
     int binary_;
-
+    
 public:
     
     /// set defaults (not-binary)
@@ -57,11 +63,15 @@ public:
     /// initialize the automatic swapping of bytes in the binary format
     void     setEndianess(const char[2]);
     
+    /// Read ASCII integer
+    int      readInt();
     /// Read integer on 2 bytes
     int16_t  readInt16();
     /// Read integer on 4 bytes
     int32_t  readInt32();
 
+    /// Read ASCII integer
+    unsigned readUInt();
     /// Read unsigned integer on 1 byte
     uint8_t  readUInt8();
     /// Read unsigned integer on 2 bytes
@@ -76,6 +86,8 @@ public:
     /// Read unsigned integer on 4 bytes
     uint32_t readUInt32bin();
 
+    /// Reads floats on 2 bytes using an int scaled by 2048
+    float    readFixed();
     /// Reads one float on 4 bytes
     float    readFloat();
     /// Reads one double on 8 bytes
@@ -138,14 +150,18 @@ public:
     /// Inserts `N` space(s), but only in text output mode
     void writeSoftSpace(size_t N = 1);
     
-    /// Write integer on 1 byte 
+    /// Write integer in ASCII
+    void writeInt(int, char before=' ');
+    /// Write integer on 1 byte
     void writeInt8(int, char before=' ');
     /// Write integer on 2 bytes
     void writeInt16(int, char before=' ');
     /// Write integer on 4 bytes
     void writeInt32(int, char before=' ');
     
-    /// Write unsigned integer on 1 byte  
+    /// Write unsigned integer in ASCII
+    void writeUInt(unsigned, char before=' ');
+    /// Write unsigned integer on 1 byte
     void writeUInt8(unsigned, char before=' ');
     /// Write unsigned integer on 2 bytes
     void writeUInt16(unsigned, char before=' ');
@@ -154,6 +170,11 @@ public:
     /// Write unsigned integer on 4 bytes
     void writeUInt64(unsigned long, char before=' ');
 
+    /// check if x would overflow the fixed format
+    static bool overflowFixed(float x) { int32_t i=int32_t(x*2048.f); return i != uint16_t(i); }
+    /// store float as an integer on 2 bytes with a fixed scaling factor of 2048
+    void writeFixed(float);
+    
     /// Write value on 4 bytes
     void writeFloat(float);
     /// Write value on 4 bytes

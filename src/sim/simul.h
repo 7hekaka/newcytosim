@@ -289,6 +289,10 @@ public:
     /// read an Object reference and return the corresponding Object (`tag` is set)
     Object*      readReference(Inputter&, ObjectTag& tag);
 
+    /// read a Fiber reference and return the corresponding Object (`tag` is set)
+    Fiber*       readFiberReference(Inputter&, ObjectTag& tag);
+    
+    
     /// check if `name` corresponds to a property class, but excluding 'simul'
     bool         isCategory(const std::string& name) const;
     

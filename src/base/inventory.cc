@@ -183,7 +183,6 @@ Inventoried * Inventory::get(const size_t n) const
 {
     if ( n <= highest_ )
     {
-        assert_true(n < allocated_);
         assert_true(!byNames[n] || byNames[n]->identity()==n );
         return byNames[n];
     }
