@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 /**
  'Frametool' is a simple utility that can read and extract frames in
@@ -17,7 +17,7 @@
  Another tool 'sieve' can be used to read/write object-files,
  allowing finer manipulation of the simulation frames.
  
- Last updated 11.12.2019
+ FJN, last updated 11.06.2021
 */
 
 #include <errno.h>
@@ -33,10 +33,10 @@
 enum { COUNT, COPY, LAST, SIZE, EPID, SPLIT };
 enum { UNKNOWN, FRAME_START, FRAME_SECTION, FRAME_END };
 
-FILE * output = stdout;
 const size_t buf_size = 128;
 char buf[buf_size];
 
+FILE * output = stdout;
 unsigned long frame_pid = 0;
 double frame_time = 0;
 
@@ -200,31 +200,42 @@ void countFrame(const char str[], FILE* in)
 }
 
 
-void sizeFrame(FILE* in)
+void sizeFrame(FILE* in, int details)
 {
-    long pos = 0;
-    long cnt = 0, old = 0;
+    long pos = 0, sec = 0;
+    char str[buf_size] = { 0 };
     size_t frm = 0;
 
     while ( !ferror(in) )
     {
         switch(whatline(in, nullptr))
         {
+            case FRAME_SECTION:
+                if ( details ) {
+                    size_t bytes = ftell(in) - sec;
+                    if ( str[0] )
+                    {
+                        if ( bytes > 1024 )
+                            printf(" %24s : %6lu kB\n", str, bytes>>10);
+                        else
+                            printf(" %24s : %6lu B\n", str, bytes);
+                    }
+                    strncpy(str, buf, sizeof(str));
+                    str[strlen(buf)-1] = 0;
+                    sec = ftell(in);
+                } break;
             case FRAME_END: {
                 size_t kb = ( ftell(in) - pos ) >> 10;
-                printf("pid %lu   frame %6lu   time: %10.5f %6lu kB %7li lines (%+li)\n",
-                       frame_pid, frm, frame_time, kb, cnt, cnt-old);
-                old = cnt;
+                printf("pid %lu   frame %6lu   time: %10.5f %6lu kB\n",
+                       frame_pid, frm, frame_time, kb);
                 ++frm;
-            }
+            } // intentional fallthrough
             case FRAME_START:
                 pos = ftell(in);
-                cnt = 0;
+                *str = 0;
                 break;
             case EOF:
                 return;
-            default:
-                ++cnt;
         }
     }
 }
@@ -353,6 +364,7 @@ void help()
     printf("Syntax:\n");
     printf("    frametool FILENAME \n");
     printf("    frametool FILENAME size\n");
+    printf("    frametool FILENAME size+\n");
     printf("    frametool FILENAME pid=PID\n");
     printf("    frametool FILENAME INDICES\n");
     printf("    frametool FILENAME split\n");
@@ -393,6 +405,7 @@ int main(int argc, char* argv[])
 {
     int has_file = 0;
     int mode = COUNT;
+    int details = 0;
     char cmd[256] = "";
     char filename[256] = "objects.cmo";
     char outputname[256] = { 0 };
@@ -437,8 +450,11 @@ int main(int argc, char* argv[])
                 mode = LAST;
             else if ( 0 == strncmp(cmd, "split", 5) )
                 mode = SPLIT;
-            else if ( 0 == strncmp(cmd, "size", 4) || *cmd == '+' )
+            else if ( 0 == strncmp(cmd, "size", 4) )
+            {
                 mode = SIZE;
+                if ( cmd[4] == '+' ) details = 1;
+            }
             else if ( 0 == strncmp(cmd, "count", 5) )
                 mode = COUNT;
             else if ( 0 == strncmp(cmd, "pid=", 4) )
@@ -473,7 +489,7 @@ int main(int argc, char* argv[])
     if ( mode == COUNT )
         countFrame(filename, file);
     else if ( mode == SIZE )
-        sizeFrame(file);
+        sizeFrame(file, details);
     else
     {
         if ( *outputname )
