@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef HAND_PROP
 #define HAND_PROP
@@ -58,16 +58,16 @@ public:
      
      <em>default value = 0</em>
      */
-    real         binding_rate;
+    real binding_rate;
     
     
     /// maximum distance at which the Hand can bind (also known as `binding[1]`)
-    real         binding_range;
+    real binding_range;
     
     
 #if NEW_BINDING_LIMITS
     /// specifies a range of abscissa to which this motor can bind
-    real         binding_limits[2];
+    real binding_limits[2];
 #endif
     
     /// can be set to restrict binding to certain type of Fiber
@@ -117,7 +117,7 @@ public:
      <em>default value = 0</em>
      (see @ref Stochastic)
      */
-    real         unbinding_rate;
+    real unbinding_rate;
     
     
     /// characteristic force of unbinding (also known as `unbinding[1]`)
@@ -126,7 +126,7 @@ public:
      
      <em>default value = inf</em>
      */
-    real         unbinding_force;
+    real unbinding_force;
     
     
     /// if true, the Hand can also bind directly to the tip of fibers
@@ -143,7 +143,7 @@ public:
      Values: `bind_also_end = {off, minus_end, plus_end, both_ends}`.
      <em>default value = off</em>
      */
-    int          bind_also_end;
+    int bind_also_end;
     
     
     /// if true, the Hand can bind only near the tips of the fibers
@@ -155,15 +155,15 @@ public:
      
      <em>default value = off</em>
      */
-    FiberEnd     bind_only_end;
+    FiberEnd bind_only_end;
     
     
     /// cutoff associated with `bind_only_end` where hand may bind (set as `bind_only_end[1]`)
-    real         bind_end_range;
+    real bind_end_range;
 
 #if NEW_BIND_ONLY_FREE_END
     /// if true, only bind fiber tip if no other hand is bound already
-    bool         bind_only_free_end;
+    bool bind_only_free_end;
 #endif
     
     /// if false, the Hand will detach immediately upon reaching a growing or a static fiber end
@@ -175,7 +175,7 @@ public:
      
      <em>default = 0</em>
      */
-    real         hold_growing_end;
+    real hold_growing_end;
     
     
     /// if false, the Hand will detach immediately upon reaching a shrinking fiber end
@@ -188,34 +188,34 @@ public:
 
      <em>default = false</em>
      */
-    real         hold_shrinking_end;
+    real hold_shrinking_end;
     
     
     /// specialization
     /**
      @copydetails HandGroup
      */
-    std::string  activity;
+    std::string activity;
     
     
     /// display parameters (see @ref PointDispPar)
-    std::string  display;
+    std::string display;
     
     /** @} */
 
 public:
 
     /// derived variable: 1.0/unbinding_force
-    real   unbinding_force_inv;
+    real unbinding_force_inv;
     
     /// derived variable = probability to bind in one time step;
-    real   binding_prob;
+    real binding_prob;
     
     /// derived variable = unbinding_rate * timestep;
-    real   unbinding_rate_dt;
+    real unbinding_rate_dt;
     
     /// flag to indicate that `display` has a new value
-    bool   display_fresh;
+    bool display_fresh;
     
 public:
 

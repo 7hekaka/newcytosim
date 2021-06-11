@@ -27,7 +27,7 @@ void drawLive(View& view, int mag);
 #define HEADLESS_PLAYER 0
 
 #if HEADLESS_PLAYER
-void helpKeys(std::ostream& os) { os << "This is a headless display\n"; }
+void helpKeys(std::ostream& os) { os << "This executable has no display capability\n"; }
 #else
 #  include "glut.h"
 #  include "glapp.h"
@@ -41,11 +41,10 @@ void buildMenus();
 #  include "play_mouse.cc"
 #endif
 
-void goodbye()
-{
-    //printf("Goodbye...\n");
-    player.clear();
-}
+
+/// different modes:
+enum Style { ONSCREEN, OFFSCREEN };
+enum Mode { NORMAL = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
 
 //------------------------------------------------------------------------------
 #pragma mark - Display
@@ -92,7 +91,6 @@ void blitBuffers(GLuint normal, GLuint multi, GLint W, GLint H)
 //------------------------------------------------------------------------------
 #pragma mark - main
 
-
 void help(std::ostream& os)
 {
     os << "play [OPTIONS] [PATH] [FILE]\n"
@@ -112,9 +110,11 @@ void help(std::ostream& os)
 }
 
 
-/// different modes:
-enum Style { ONSCREEN, OFFSCREEN };
-enum Mode { NORMAL, SAVE_IMAGE, SAVE_MOVIE };
+void goodbye()
+{
+    //printf("Goodbye...\n");
+    player.clear();
+}
 
 
 void print_error(Exception const& e)
@@ -127,7 +127,7 @@ void print_error(Exception const& e)
 int main(int argc, char* argv[])
 {
     Style style = OFFSCREEN;
-    Mode mode = NORMAL;
+    int mode = NORMAL;
     int magnify = 1;
     Glossary arg;
     
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
     std::atexit(goodbye);
 
     if ( arg.read_strings(argc-1, argv+1) )
-        return EXIT_FAILURE;
+        return 1;
     
     // check for major options:
     if ( arg.use_key("-") )
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     {
         splash(std::cout);
         help(std::cout);
-        return EXIT_SUCCESS;
+        return 0;
     }
 
     if ( arg.use_key("info") || arg.use_key("--version") )
@@ -156,7 +156,7 @@ int main(int argc, char* argv[])
         print_version(std::cout);
         if ( SaveImage::supported("png") )
             std::cout << "   PNG enabled\n";
-        return EXIT_SUCCESS;
+        return 0;
     }
     
     if ( arg.use_key("live") || arg.has_key(".cym") )
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     if ( arg.set(prop.image_name, ".ppm") )
     {
         prop.image_format = "ppm";
-        mode = SAVE_IMAGE;
+        mode |= SAVE_IMAGE;
     }
     else if ( arg.use_key("ppm") )
         prop.image_format = "ppm";
@@ -189,7 +189,7 @@ int main(int argc, char* argv[])
     if ( arg.set(prop.image_name, ".png") )
     {
         prop.image_format = "png";
-        mode = SAVE_IMAGE;
+        mode |= SAVE_IMAGE;
     }
     else if ( arg.use_key("png") )
         prop.image_format = "png";
@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
     if ( arg.set(prop.image_name, ".tga") )
     {
         prop.image_format = "tga";
-        mode = SAVE_IMAGE;
+        mode |= SAVE_IMAGE;
     }
     else if ( arg.use_key("tga") )
         prop.image_format = "tga";
@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
     catch( Exception & e )
     {
         print_error(e);
-        return EXIT_FAILURE;
+        return 2;
     }
     
 #if HEADLESS_PLAYER
@@ -279,7 +279,7 @@ int main(int argc, char* argv[])
     catch( Exception & e )
     {
         print_error(e);
-        return EXIT_FAILURE;
+        return 3;
     }
 
     //---------Open setup file and read display parameters from command line
@@ -312,7 +312,7 @@ int main(int argc, char* argv[])
     {
         arg.print_warning(std::cerr, 1, "\n");
         print_error(e);
-        return EXIT_FAILURE;
+        return 4;
     }
     
 #ifndef __APPLE__
@@ -330,13 +330,13 @@ int main(int argc, char* argv[])
         if ( !OffScreen::openContext() )
         {
             std::cerr << "Failed to create off-screen context\n";
-            return EXIT_FAILURE;
+            return 5;
         }
         GLuint fbo = OffScreen::createBuffer(W, H, 0);
         if ( !fbo )
         {
             std::cerr << "Failed to create off-screen pixels\n";
-            return EXIT_FAILURE;
+            return 6;
         }
         GLuint multi = 0;
         if ( view.multisample > 1 )
@@ -348,7 +348,22 @@ int main(int argc, char* argv[])
         player.setStyle(disp.style);
         view.initGL();
 
-        if ( mode == SAVE_IMAGE )
+        if ( mode & SAVE_MOVIE )
+        {
+            // save every prop.period
+            unsigned s = prop.period;
+            do {
+                if ( ++s >= prop.period )
+                {
+                    player.drawScene(view, magnify);
+                    if ( multi )
+                        blitBuffers(fbo, multi, W, H);
+                    player.saveView(frm++, prop.downsample);
+                    s = 0;
+                }
+            } while ( 0 == thread.loadNextFrame() );
+        }
+        else if ( mode & SAVE_IMAGE )
         {
             size_t inx = 0;
             // it is possible to specify multiple frame indices:
@@ -364,25 +379,10 @@ int main(int argc, char* argv[])
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }
-        else if ( mode == SAVE_MOVIE )
-        {
-            // save every prop.period
-            unsigned s = prop.period;
-            do {
-                if ( ++s >= prop.period )
-                {
-                    player.drawScene(view, magnify);
-                    if ( multi )
-                        blitBuffers(fbo, multi, W, H);
-                    player.saveView(frm++, prop.downsample);
-                    s = 0;
-                }
-            } while ( 0 == thread.loadNextFrame() );
-        }
         printf("\n");
         OffScreen::closeContext();
         arg.print_warning(std::cerr, 1, "\n");
-        return EXIT_SUCCESS;
+        return 0;
     }
     
     arg.print_warning(std::cerr, 1, "\n");
@@ -401,20 +401,19 @@ int main(int argc, char* argv[])
     glApp::normalKeyFunc(processNormalKey);
     glApp::newWindow(drawLive);
 
-    if ( mode == SAVE_IMAGE )
+    if ( mode & SAVE_MOVIE )
+    {
+        prop.auto_exit = 1;
+        prop.save_images = 9999;
+        prop.play = 1;
+    }
+    else if ( mode & SAVE_IMAGE )
     {
         prop.auto_exit = 2;
         prop.save_images = 1;
         prop.play = 1;
     }
     
-    if ( mode == SAVE_MOVIE )
-    {
-        prop.auto_exit = 1;
-        prop.save_images = 9999;
-        prop.play = 1;
-    }
-
     //-------- initialize graphical user interface and graphics
 
     try
@@ -431,7 +430,7 @@ int main(int argc, char* argv[])
     catch ( Exception & e )
     {
         print_error(e);
-        return EXIT_FAILURE;
+        return 7;
     }
     
     if ( prop.goLive )
@@ -447,7 +446,7 @@ int main(int argc, char* argv[])
         catch( Exception & e )
         {
             print_error(e);
-            return EXIT_FAILURE;
+            return 8;
         }
     }
 

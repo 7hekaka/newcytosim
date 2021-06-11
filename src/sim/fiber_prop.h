@@ -109,15 +109,15 @@ public:
     /**
      If set, `total_polymer` will limit the total length of all the Fibers of this
      class, by making the assembly rate of the fibers dependent on the amount of
-     unused material (ie. 'monomers'):
+     unused material (i.e. 'monomers'):
 
          assembly_speed = ( 1 - sum_of_all_fiber_length / total_polymer ) * (...)
 
      This links the assembly for all the fibers within one class, as their assembly
-     speed decreases linearly with the total amount of polymer in the cell,
-     effectively proportional to the normalized concentration of remaining 'monomers'.
+     speed decreases as a function of the total amount of polymer in the cell,
+     effectively proportional to the normalized concentration of available 'monomers'.
      
-     By default `total_polymer = infinite`, and this model is disabled.
+     By default `total_polymer = infinite`, and this effect is disabled.
      */
     real         total_polymer;
     

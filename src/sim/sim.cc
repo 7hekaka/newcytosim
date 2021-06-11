@@ -86,20 +86,20 @@ int main(int argc, char* argv[])
 
     //parse the command line:
     if ( arg.read_strings(argc-1, argv+1) )
-        return EXIT_FAILURE;
+        return 1;
 
     if ( arg.use_key("help") || arg.use_key("--help") )
     {
         splash(cout);
         help(cout);
-        return EXIT_SUCCESS;
+        return 0;
     }
 
     if ( arg.use_key("info") || arg.use_key("--version")  )
     {
         splash(cout);
         print_version(cout);
-        return EXIT_SUCCESS;
+        return 0;
     }
     
     if ( ! arg.use_key("+") )
@@ -145,11 +145,11 @@ int main(int argc, char* argv[])
     catch( Exception & e ) {
         print_magenta(cerr, e.brief());
         cerr << e.info() << '\n';
-        return EXIT_FAILURE;
+        return 2;
     }
     catch(...) {
-        print_magenta(cerr, "Error: an unknown exception occurred during initialization\n");
-        return EXIT_FAILURE;
+        print_red(cerr, "Error: an unknown exception occurred during initialization\n");
+        return 3;
     }
     
     arg.print_warning(cerr, 1, " on command line\n");
@@ -161,11 +161,11 @@ int main(int argc, char* argv[])
     catch( Exception & e ) {
         print_magenta(cerr, e.brief());
         cerr << e.info() << '\n';
-        return EXIT_FAILURE;
+        return 4;
     }
     catch(...) {
-        print_magenta(cerr, "Error: an unknown exception occurred\n");
-        return EXIT_FAILURE;
+        print_red(cerr, "Error: an unknown exception occurred\n");
+        return 5;
     }
     
     Cytosim::out << "% " << TicToc::date() << "\n";
