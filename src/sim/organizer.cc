@@ -125,10 +125,8 @@ real Organizer::sumDragCoefficient() const
 void Organizer::write(Outputter& out) const
 {
     out.writeUInt16(mObjects.size());
-    out.writeSoftNewline();
     for ( Mecable const* i : mObjects )
     {
-        out.writeSoftSpace();
         Mecable::writeReference(out, i);
     }
 }

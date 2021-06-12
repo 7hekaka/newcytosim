@@ -145,30 +145,37 @@ public:
     void writeEndianess();
         
     /// Inserts a new line symbol, but only in text output mode
-    void writeSoftNewline();
+    void writeSoftNewline() { if ( !binary_ ) put_char('\n'); }
     
-    /// Inserts `N` space(s), but only in text output mode
-    void writeSoftSpace(size_t N = 1);
+    /// Inserts a space, but only in text output mode
+    void writeSoftSpace() { if ( !binary_ ) put_char(' '); }
     
     /// Write integer in ASCII
-    void writeInt(int, char before=' ');
+    void writeInt(int);
     /// Write integer on 1 byte
-    void writeInt8(int, char before=' ');
+    void writeInt8(int);
     /// Write integer on 2 bytes
-    void writeInt16(int, char before=' ');
+    void writeInt16(int);
     /// Write integer on 4 bytes
-    void writeInt32(int, char before=' ');
+    void writeInt32(int);
     
     /// Write unsigned integer in ASCII
-    void writeUInt(unsigned, char before=' ');
+    void writeUInt(unsigned);
     /// Write unsigned integer on 1 byte
-    void writeUInt8(unsigned, char before=' ');
+    void writeUInt8(unsigned);
     /// Write unsigned integer on 2 bytes
-    void writeUInt16(unsigned, char before=' ');
+    void writeUInt16(unsigned);
     /// Write unsigned integer on 4 bytes
-    void writeUInt32(unsigned, char before=' ');
+    void writeUInt32(unsigned);
     /// Write unsigned integer on 4 bytes
-    void writeUInt64(unsigned long, char before=' ');
+    void writeUInt64(unsigned long);
+
+    /// Write unsigned integer in ASCII
+    void writeUInt(unsigned, char before);
+    /// Write unsigned integer on 1 byte
+    void writeUInt16(unsigned, char before);
+    /// Write unsigned integer on 2 bytes
+    void writeUInt32(unsigned, char before);
 
     /// check if x would overflow the fixed format
     static bool overflowFixed(float x) { int32_t i=int32_t(x*2048.f); return i != uint16_t(i); }

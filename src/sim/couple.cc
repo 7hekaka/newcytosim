@@ -545,6 +545,18 @@ void Couple::write(Outputter& out) const
 }
 
 
+/**
+ To speedup reading, Couple should always be stored on the same number of bytes,
+ in all configurations. For example with 16 bytes:
+ AA: IAIA
+ AF: IAVV
+ FA: VVIA
+ FF: WXYZ
+ I = Merged fiber tag/index over 4 bytes
+ A = Abscissa over 4 bytes
+ V = Void reference
+ W = new reference to indicate free Couples
+ */
 void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     const bool a1 = cHand1->read(in, sim);

@@ -195,7 +195,6 @@ int Interpolation4::bad() const
 
 void Interpolation4::write(Outputter& out) const
 {
-    out.writeSoftSpace();
     Object::writeReference(out, mec_);
     if ( mec_ )
     {

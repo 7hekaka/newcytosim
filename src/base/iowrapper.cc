@@ -346,17 +346,17 @@ void Outputter::writeEndianess()
 }
 
 
-void Outputter::writeInt(const int n, char before)
+void Outputter::writeInt(const int n)
 {
-    if ( 2 > fprintf(mFile, "%c%i", before, n) )
+    if ( 1 > fprintf(mFile, "%i", n) )
         throw InvalidIO("writeInt failed");
 }
 
 
-void Outputter::writeInt8(const int n, char before)
+void Outputter::writeInt8(const int n)
 {
     if ( !binary_ )
-        return writeInt(n, before);
+        return writeInt(n);
     
     int8_t v = (int8_t)n;
     
@@ -367,10 +367,10 @@ void Outputter::writeInt8(const int n, char before)
 }
 
 
-void Outputter::writeInt16(const int n, char before)
+void Outputter::writeInt16(const int n)
 {
     if ( !binary_ )
-        return writeInt(n, before);
+        return writeInt(n);
 
     int16_t v = (int16_t)n;
     
@@ -382,10 +382,10 @@ void Outputter::writeInt16(const int n, char before)
 }
 
 
-void Outputter::writeInt32(const int n, char before)
+void Outputter::writeInt32(const int n)
 {
     if ( !binary_ )
-        return writeInt(n, before);
+        return writeInt(n);
 
     int32_t v = (int32_t)n;
     
@@ -397,23 +397,17 @@ void Outputter::writeInt32(const int n, char before)
 }
 
 
-void Outputter::writeUInt(const unsigned n, char before)
+void Outputter::writeUInt(const unsigned n)
 {
-    if ( before )
-    {
-        if ( 2 > fprintf(mFile, "%c%u", before, n) )
-            throw InvalidIO("writeUInt8 failed");
-    }
-    else {
-        if ( 1 > fprintf(mFile, "%u", n) )
-            throw InvalidIO("writeUInt8 failed");
-    }
+    if ( 1 > fprintf(mFile, "%u", n) )
+        throw InvalidIO("writeUInt failed");
 }
 
-void Outputter::writeUInt8(const unsigned n, char before)
+
+void Outputter::writeUInt8(const unsigned n)
 {
     if ( !binary_ )
-        return writeUInt(n, before);
+        return writeUInt(n);
 
     uint8_t v = (uint8_t)n;
     
@@ -422,6 +416,59 @@ void Outputter::writeUInt8(const unsigned n, char before)
     
     if ( 1 != fwrite(&v, 1, 1, mFile) )
         throw InvalidIO("writeUInt8() failed");
+}
+
+
+void Outputter::writeUInt16(const unsigned n)
+{
+    if ( !binary_ )
+        return writeUInt(n);
+
+    uint16_t v = (uint16_t)n;
+    
+    if ( n != v )
+        throw InvalidIO("value out of range for writeUInt16()");
+
+    if ( 2 != fwrite(&v, 1, 2, mFile) )
+        throw InvalidIO("writeUInt16() failed");
+}
+
+
+void Outputter::writeUInt32(const unsigned n)
+{
+    if ( !binary_ )
+        return writeUInt(n);
+
+    uint32_t v = (uint32_t)n;
+    
+    if ( n != v )
+        throw InvalidIO("value out of range for writeUInt32()");
+    
+    if ( 4 != fwrite(&v, 1, 4, mFile) )
+        throw InvalidIO("writeUInt32() failed");
+}
+
+
+void Outputter::writeUInt64(const unsigned long n)
+{
+    if ( !binary_ )
+        return writeUInt(n);
+
+    uint64_t v = (uint64_t)n;
+    
+    if ( n != v )
+        throw InvalidIO("value out of range for writeUInt64()");
+    
+    if ( 8 != fwrite(&v, 1, 8, mFile) )
+        throw InvalidIO("writeUInt64() failed");
+}
+
+
+
+void Outputter::writeUInt(const unsigned n, char before)
+{
+    if ( 2 > fprintf(mFile, "%c%u", before, n) )
+        throw InvalidIO("writeUInt failed");
 }
 
 
@@ -452,21 +499,6 @@ void Outputter::writeUInt32(const unsigned n, char before)
     
     if ( 4 != fwrite(&v, 1, 4, mFile) )
         throw InvalidIO("writeUInt32() failed");
-}
-
-
-void Outputter::writeUInt64(const unsigned long n, char before)
-{
-    if ( !binary_ )
-        return writeUInt(n, before);
-
-    uint64_t v = (uint64_t)n;
-    
-    if ( n != v )
-        throw InvalidIO("value out of range for writeUInt64()");
-    
-    if ( 8 != fwrite(&v, 1, 8, mFile) )
-        throw InvalidIO("writeUInt64() failed");
 }
 
 
@@ -535,25 +567,5 @@ void Outputter::writeDoubles(const double* a, const size_t n, char before)
     
     for ( size_t d = 0; d < n; ++d )
         writeDouble(a[d]);
-}
-
-
-void Outputter::writeSoftNewline()
-{
-    if ( !binary_ )
-        putc('\n', mFile);
-    fflush(mFile);
-}
-
-
-void Outputter::writeSoftSpace(size_t N)
-{
-    if ( !binary_ )
-    {
-        while ( N > 0 ) {
-            fprintf(mFile, " ");
-            N--;
-        }
-    }
 }
 

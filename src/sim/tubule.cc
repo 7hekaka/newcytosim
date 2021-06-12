@@ -428,11 +428,9 @@ void Tubule::setInteractionsD(Meca& meca) const
 void Tubule::write(Outputter& out) const
 {
     out.writeUInt16(NFIL+1);
-    out.writeSoftNewline();
     Object::writeReference(out, bone_);
     for ( size_t i = 0; i < NFIL; ++i )
     {
-        out.writeSoftSpace();
         Object::writeReference(out, fil_[i]);
     }
 }

@@ -1332,7 +1332,7 @@ void Solid::write(Outputter& out) const
     for ( size_t p = 0; p < nPoints ; ++p )
     {
         out.writeFloats(pPos + DIM * p, DIM, '\n');
-        out.writeSoftSpace(2);
+        out.writeSoftSpace();
         out.writeFloat(soRadius[p]);
     }
 }

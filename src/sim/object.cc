@@ -116,12 +116,12 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
         {
             // set the highest bit of the byte, which is not used by ASCII codes
             out.put_char(g|HIGH_BIT);
-            out.writeUInt32(id, 0);
+            out.writeUInt32(id);
         }
         else
         {
             out.put_char(g);
-            out.writeUInt16(id, 0);
+            out.writeUInt16(id);
         }
 #else
         /*
@@ -134,23 +134,32 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
     }
     else
     {
-        out.put_char(g);
-        out.writeUInt(id, 0);
+        out.put_char(' ');
+        out.writeUInt(id, g);
     }
 }
 
 
 void Object::writeNullReference(Outputter& out)
 {
-    /*
-     format changed on 11.06.2021
-     combine `g` and 'id', leaving 3 bytes and at most 16777216 objects
-     Note that the topmost bit of ASCII is not used
-     */
     if ( out.binary() )
-        out.writeUInt32(uint32_t(TAG)<<24);
-    else
+    {
+#if 1
         out.put_char(TAG);
+#else
+        /*
+         format changed on 11.06.2021
+         combine `g` and 'id', leaving 3 bytes and at most 16777216 objects
+         Note that the topmost bit of ASCII is not used
+         */
+        out.writeUInt32(uint32_t(TAG)<<24);
+#endif
+    }
+    else
+    {
+        out.put_char(' ');
+        out.put_char(TAG);
+    }
 }
 
 
@@ -191,24 +200,25 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
         {
             // set the highest bit of the byte, which is not used by ASCII codes
             out.put_char(g|HIGH_BIT);
-            out.writeUInt16(property()->number(), 0);
-            out.writeUInt32(identity(), ':');
-            out.writeUInt32(mark(), ':');
+            out.writeUInt16(property()->number());
+            out.writeUInt32(identity());
+            out.writeUInt32(mark());
         }
         else
         {
             out.put_char(g);
-            out.writeUInt8(property()->number(), 0);
-            out.writeUInt16(identity(), ':');
+            out.writeUInt8(property()->number());
+            out.writeUInt16(identity());
         }
     }
     else
     {
         out.put_char('\n');
         out.put_char(g);
-        out.writeUInt(property()->number(), 0);
+        out.writeUInt(property()->number());
         out.writeUInt(identity(), ':');
-        out.writeUInt(mark(), ':');
+        if ( mark() )
+            out.writeUInt(mark(), ':');
     }
 }
 

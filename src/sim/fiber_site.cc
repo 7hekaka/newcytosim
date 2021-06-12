@@ -111,7 +111,6 @@ real  FiberSite::abscissaFrom(const FiberEnd ref) const
 
 void FiberSite::write(Outputter& out) const
 {
-    out.writeSoftSpace();
     if ( hFiber )
     {
         checkAbscissa();

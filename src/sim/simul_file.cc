@@ -254,7 +254,8 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         do
             tag = in.get_char();
         while ( tag == ' ' );
-        id = in.readUInt();
+        if ( tag != Object::TAG )
+            id = in.readUInt();
     }
     return id;
 }
@@ -278,7 +279,7 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
         return nullptr;
     
     if ( tag != Fiber::TAG && tag != Fiber::TAG_LATTICE )
-        throw InvalidIO("unexpected input");
+        throw InvalidIO("expected reference to a fiber");
 
     return fibers.findID(id);
 }

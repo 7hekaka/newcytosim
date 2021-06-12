@@ -273,13 +273,11 @@ public:
             out.writeUInt16(DIM);
             for ( size_t d = 0; d < DIM; ++d )
             {
-                out.writeSoftSpace();
-                out.writeUInt32(mGrid.breadth(d));
+                out.writeUInt32(mGrid.breadth(d), ' ');
                 out.writeFloat(mGrid.inf(d));
                 out.writeFloat(mGrid.sup(d));
             }
-            out.writeSoftSpace();
-            out.writeUInt32(mGrid.nbCells());
+            out.writeUInt32(mGrid.nbCells(), ' ');
             for ( size_t c = 0; c < mGrid.nbCells(); ++c )
                 mGrid.icell(c).write(out);
             out.writeSoftNewline();
