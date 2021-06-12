@@ -293,16 +293,16 @@ void SingleSet::write(Outputter& out, bool skip) const
 {
     if ( sizeA() > 0 )
     {
-        out.put_line("\n#section single A", out.binary());
+        out.writeLine("\n#section single A");
         writeObjects(out, aList);
     }
     if ( sizeF() > 0 )
     {
         if ( skip & skip_free )
-            out.put_line("\n#section single F 1", out.binary());
+            out.writeLine("\n#section single F 1");
         else
         {
-            out.put_line("\n#section single F 0", out.binary());
+            out.writeLine("\n#section single F 0");
             writeObjects(out, fList);
             skip_free = skip;
         }

@@ -43,7 +43,7 @@ void help(std::ostream& os)
 }
 
 
-FILE * openFile(const char base[], unsigned inx, bool binary)
+FILE * openFile(const char base[], unsigned inx)
 {
     char name[256] = { 0 };
     FILE * f = nullptr;

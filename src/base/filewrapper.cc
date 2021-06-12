@@ -101,21 +101,18 @@ void FileWrapper::close()
 
 /**
  This will write a null-terminated C-string to output stream.
- If it is non-zero, character 'end' is appended.
+ In ASCII mode, a new line is added
  */
-void FileWrapper::put_line(const char * str, bool end)
+void FileWrapper::put_line(const std::string& str, bool bin)
 {
-    size_t s = strlen(str);
-    fwrite(str, 1, s, mFile);
-    if ( end )
+    size_t s = str.size();
+    if ( bin )
+        fwrite(str.c_str(), 1, s+1, mFile);
+    else
+    {
+        fwrite(str.c_str(), 1, s, mFile);
         putc('\n', mFile);
-    //printf("* putline |%s|\n", str);
-}
-
-
-void FileWrapper::put_line(const std::string& str, bool end)
-{
-    put_line(str.c_str(), end);
+    }
 }
 
 
@@ -143,6 +140,7 @@ void FileWrapper::put_characters(std::string const& str, size_t cnt)
     while ( cnt > 0 )
         cnt -= fwrite(buf, 1, std::min(sizeof(buf), cnt), mFile);
 }
+
 
 std::string FileWrapper::get_characters(size_t cnt)
 {

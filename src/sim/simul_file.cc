@@ -98,9 +98,7 @@ void Simul::writeObjects(Outputter& out) const
     tubules.write(out);
     //events.write(out);
     
-    out.put_line("\n#section end");
-    out.put_line("\n#end cytosim");
-    fprintf(out, " %s\n\n", TicToc::date());
+    fprintf(out, "\n#section end\n#end cytosim\n");
 }
 
 
@@ -131,7 +129,7 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Read Objects
+#pragma mark - Read from file
 
 /** Compatibility function */
 static ObjectID readOldObjectID(Inputter& in, ObjectTag& tag)

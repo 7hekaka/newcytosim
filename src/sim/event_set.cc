@@ -67,7 +67,7 @@ void EventSet::write(Outputter& out) const
 {
     if ( size() > 0 )
     {
-        out.put_line("\n#section "+title(), out.binary());
+        out.writeLine("\n#section "+title());
         writeObjects(out, pool_);
     }
 }

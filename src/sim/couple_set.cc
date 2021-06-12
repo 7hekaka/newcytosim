@@ -451,25 +451,25 @@ void CoupleSet::prune()
 
 void CoupleSet::writeAA(Outputter& out) const
 {
-    out.put_line("\n#section couple AA", out.binary());
+    out.writeLine("\n#section couple AA");
     writeObjects(out, aaList);
 }
 
 void CoupleSet::writeAF(Outputter& out) const
 {
-    out.put_line("\n#section couple AF", out.binary());
+    out.writeLine("\n#section couple AF");
     writeObjects(out, afList);
 }
 
 void CoupleSet::writeFA(Outputter& out) const
 {
-    out.put_line("\n#section couple FA", out.binary());
+    out.writeLine("\n#section couple FA");
     writeObjects(out, faList);
 }
 
 void CoupleSet::writeFF(Outputter& out) const
 {
-    out.put_line("\n#section couple FF 0", out.binary());
+    out.writeLine("\n#section couple FF 0");
     writeObjects(out, ffList);
 }
 
@@ -484,7 +484,7 @@ void CoupleSet::write(Outputter& out, bool skip) const
     if ( sizeFF() > 0 )
     {
         if ( skip & skip_free )
-            out.put_line("\n#section couple FF 1", out.binary());
+            out.writeLine("\n#section couple FF 1");
         else
         {
             writeFF(out);

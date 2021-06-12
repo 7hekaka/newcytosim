@@ -115,12 +115,12 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
         if ( id > 65535 )
         {
             // set the highest bit of the byte, which is not used by ASCII codes
-            out.put_char(g|HIGH_BIT);
+            out.writeChar(g|HIGH_BIT);
             out.writeUInt32(id);
         }
         else
         {
-            out.put_char(g);
+            out.writeChar(g);
             out.writeUInt16(id);
         }
 #else
@@ -134,7 +134,7 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
     }
     else
     {
-        out.put_char(' ');
+        out.writeChar(' ');
         out.writeUInt(id, g);
     }
 }
@@ -145,7 +145,7 @@ void Object::writeNullReference(Outputter& out)
     if ( out.binary() )
     {
 #if 1
-        out.put_char(TAG);
+        out.writeChar(TAG);
 #else
         /*
          format changed on 11.06.2021
@@ -157,8 +157,8 @@ void Object::writeNullReference(Outputter& out)
     }
     else
     {
-        out.put_char(' ');
-        out.put_char(TAG);
+        out.writeChar(' ');
+        out.writeChar(TAG);
     }
 }
 
@@ -199,22 +199,22 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
         if ( identity() > 65535 || property()->number() > 255 || mark() )
         {
             // set the highest bit of the byte, which is not used by ASCII codes
-            out.put_char(g|HIGH_BIT);
+            out.writeChar(g|HIGH_BIT);
             out.writeUInt16(property()->number());
             out.writeUInt32(identity());
             out.writeUInt32(mark());
         }
         else
         {
-            out.put_char(g);
+            out.writeChar(g);
             out.writeUInt8(property()->number());
             out.writeUInt16(identity());
         }
     }
     else
     {
-        out.put_char('\n');
-        out.put_char(g);
+        out.writeChar('\n');
+        out.writeChar(g);
         out.writeUInt(property()->number());
         out.writeUInt(identity(), ':');
         if ( mark() )

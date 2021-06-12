@@ -76,7 +76,7 @@ FILE * openFile(const char base[], unsigned inx, bool binary)
 #pragma mark - write data chunk
 
 
-void writeBinary(FILE* file, uint16_t a, uint16_t b, uint32_t c, Vector3 const& pos)
+void writeBinary(FILE* file, uint16_t a, uint16_t b, uint32_t c, Vector const& pos)
 {
     fwrite(&a, 1, 2, file);
     fwrite(&b, 1, 2, file);
@@ -86,6 +86,12 @@ void writeBinary(FILE* file, uint16_t a, uint16_t b, uint32_t c, Vector3 const& 
     fwrite(vec, 3, sizeof(float), file);
 }
 
+
+void writeText(FILE* file, uint16_t a, uint16_t b, uint32_t c, Vector2 const& pos)
+{
+    fprintf(file, "%i %i %i ", a, b, c);
+    fprintf(file, "%.6f %.6f 0\n", pos.XX, pos.YY);
+}
 
 void writeText(FILE* file, uint16_t a, uint16_t b, uint32_t c, Vector3 const& pos)
 {

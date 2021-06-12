@@ -91,12 +91,9 @@ public:
     /// change current reading position to `p`
     void seek(const fpos_t& p) { fsetpos(mFile, &p); }
     
-    
-    /// put a C-string
-    void put_line(const char * line, bool end = 0);
 
     /// put a C++ string
-    void put_line(const std::string&, bool end = 0);
+    void put_line(const std::string&, bool bin);
 
     /// read until character `end` is found and set `line`, including terminating character
     std::string get_line();

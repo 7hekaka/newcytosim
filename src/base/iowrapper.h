@@ -143,12 +143,6 @@ public:
 
     /// Puts given string, and '01' or '10', to specify the byte order 
     void writeEndianess();
-        
-    /// Inserts a new line symbol, but only in text output mode
-    void writeSoftNewline() { if ( !binary_ ) put_char('\n'); }
-    
-    /// Inserts a space, but only in text output mode
-    void writeSoftSpace() { if ( !binary_ ) put_char(' '); }
     
     /// Write integer in ASCII
     void writeInt(int);
@@ -196,13 +190,18 @@ public:
     /// Write multiple values using 8 bytes per value
     void writeDoubles(const double*, size_t, char before=0);
 
-    int  writeChar(int c, int b)
-    {
-        if ( binary_ )
-            return putc_unlocked(c|b, mFile);
-        else
-            return putc_unlocked(c, mFile);
-    }
+       
+    /// Add new line symbol, but only in text output mode
+    void writeSoftNewline() { if ( !binary_ ) put_char('\n'); }
+    
+    /// Add a space, but only in text output mode
+    void writeSoftSpace() { if ( !binary_ ) put_char(' '); }
+    
+    /// put a C++ string
+    void writeLine(const std::string& arg) { put_line(arg, binary_); }
+
+    /// put character
+    void writeChar(const int c) { putc_unlocked(c, mFile); }
 
 };
 
