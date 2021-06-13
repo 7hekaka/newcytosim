@@ -172,7 +172,7 @@ void SpaceBanana::draw2D() const
 
     //number of sections in the quarter-circle
     constexpr size_t fin = 8 * gle::finesse;
-    float* arc = gle::mapFloatBuffer(8*fin+8);
+    float* arc = (float*)gle::mapBuffer200(4*fin+4);
     // lower swing
     gle::compute_arc(fin, arc      , C+R, A-M_PI, M_PI+B-A, cX, cY);
     // right cap
@@ -182,7 +182,7 @@ void SpaceBanana::draw2D() const
     // left cap
     gle::compute_arc(fin, arc+6*fin, R, A, M_PI, -eX, eY);
     
-    gle::unmapFloatBuffer(2, 0);
+    gle::unmapBuffer200();
     glDrawArrays(GL_LINE_LOOP, 0, 4*fin);
 }
 

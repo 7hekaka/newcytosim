@@ -192,6 +192,7 @@ void SpacePolygonZ::setInteractions(Meca& meca) const
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gle_flute.h"
 
 void SpacePolygonZ::draw3D() const
 {
@@ -210,7 +211,7 @@ void SpacePolygonZ::draw3D() const
         
         if (( R1 >= 0 ) & ( R2 >= 0 ))
         {
-            flute6 * flu = gle::mapVertexNormalBuffer(2+2*gle::pi_twice);
+            flute6 * flu = gle::mapBuffer330(2+2*gle::pi_twice);
             size_t i = 0;
             for ( size_t j = 0; j <= gle::pi_twice; ++j )
             {
@@ -218,7 +219,7 @@ void SpacePolygonZ::draw3D() const
                 flu[i++] = {R2*C, R2*S, Z2, nX*C, nX*S, nY};
                 flu[i++] = {R1*C, R1*S, Z1, nX*C, nX*S, nY};
             }
-            gle::unmapVertexNormalBuffer();
+            gle::unmapBuffer330();
             glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
         }
     }
@@ -241,14 +242,14 @@ void SpacePolygonZ::drawRings() const
         if ( R > 0 )
         {
             float nX(pts[n].dy), nY(-pts[n].dx);
-            flute6 * flu = gle::mapVertexNormalBuffer(2+gle::pi_twice);
+            flute6 * flu = gle::mapBuffer330(2+gle::pi_twice);
             size_t i = 0;
             for ( size_t j = 0; j <= gle::pi_twice; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 flu[i++] = {R*C, R*S, Z, nX*C, nX*S, nY};
             }
-            gle::unmapVertexNormalBuffer();
+            gle::unmapBuffer330();
             glDrawArrays(GL_LINE_LOOP, 0, i);
         }
     }

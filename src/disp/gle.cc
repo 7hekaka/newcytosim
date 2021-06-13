@@ -10,7 +10,7 @@
 #include "simd.h"
 #include "simd_float.h"
 #include "simd_math.h"
-#include "flute.h"
+#include "gle_flute.h"
 
 namespace gle
 {
@@ -92,53 +92,6 @@ namespace gle
         return (GLuint)i;
     }
     
-    float* mapFloatBuffer(size_t cnt)
-    {
-        //assert_true(glIsBuffer(stream_[1]));
-        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
-        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(float), nullptr, GL_STREAM_DRAW);
-        return (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    }
-    
-    void unmapFloatBuffer(size_t dim, size_t color)
-    {
-        assert_true(stream_[1] == boundBuffer());
-        //glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        size_t size = (dim+color) * sizeof(float);
-        glVertexPointer(dim, GL_FLOAT, size, nullptr);
-        if ( color > 0 )
-            glColorPointer(4, GL_FLOAT, size, (void*)(dim*sizeof(float)));
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    flute6* mapVertexNormalBuffer(size_t cnt)
-    {
-        //assert_true(glIsBuffer(stream_[1]));
-        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
-        glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(flute6), nullptr, GL_STREAM_DRAW);
-        return (flute6*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    }
-    
-    void unmapVertexNormalBuffer()
-    {
-        assert_true(stream_[1] == boundBuffer());
-        //glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glVertexPointer((DIM>2?3:2), GL_FLOAT, sizeof(flute6), nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, sizeof(flute6), (void*)0xC);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    
-    void bindVertexNormalBuffer(size_t skip)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, stream_[1]);
-        glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(flute6), nullptr);
-        glNormalPointer(GL_FLOAT, skip*sizeof(flute6), (void*)0xC);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle
     
@@ -151,11 +104,10 @@ namespace gle
         ptr[1+2*i] = rad * sin(start+i*delta) + cY
      ptr[] should be allocated to hold `2*cnt+2' values
     */
-    void set_arc(size_t cnt, GLfloat ptr[], double rad,
-                 double start, double delta, GLfloat cX, GLfloat cY)
+    void set_arc(size_t cnt, float ptr[], double rad,
+                 double start, double delta, float cX, float cY)
     {
 #ifdef __SSE3__
-        // This assumes that 'GLfloat == float'
         return set_arc_SEE(cnt, ptr, rad, start, delta, cX, cY);
 #endif
         const double c = std::cos(delta);
@@ -179,15 +131,15 @@ namespace gle
         ptr[1+2*cnt] = GLfloat(y);
     }
     
-    void compute_circle(size_t cnt, GLfloat ptr[], double rad, double start)
+    void compute_circle(size_t cnt, float ptr[], double rad, double start)
     {
         set_arc(cnt, ptr, rad, start, 2*M_PI/cnt, 0, 0);
         ptr[  2*cnt] = ptr[0];
         ptr[1+2*cnt] = ptr[1];
     }
     
-    void compute_arc(size_t cnt, GLfloat ptr[], double rad, double start,
-                     double angle, GLfloat cX, GLfloat cY)
+    void compute_arc(size_t cnt, float ptr[], double rad, double start,
+                     double angle, float cX, float cY)
     {
         set_arc(cnt, ptr, rad, start, angle/(cnt-1), cX, cY);
     }
@@ -849,25 +801,9 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-
-    /// this does not set normals
-    void cubeF()
-    {
-        constexpr GLfloat R = 1.f, U = -1.f;
-        const GLfloat pts[] = {
-             R, U, U, U, U, U,
-             R, R, U, U, R, U,
-             U, R, R, U, U, U,
-             U, U, R, R, U, U,
-             R, U, R, R, R, U,
-             R, R, R, U, R, R,
-             R, U, R, U, U, R };
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 14);
-    }
     
     /// this only sets vertices, skipping normals
-    size_t setCube(flute3*& flu, float R)
+    void setCublob(flute3*& flu, float R)
     {
         const float U = -R;
         flu[0] = {R, U, U};
@@ -885,22 +821,9 @@ namespace gle
         flu[12] = {R, U, R};
         flu[13] = {U, U, R};
         flu += 14;
-        return 14;
     }
 
-    /// this does not really work, since normals are not set correctly
-    void tetrahedronF()
-    {
-        constexpr GLfloat R = 1.f, U = -1.f;
-        GLfloat pts[3*8] = {
-            0, 0, R, R, 0, 0, 0, R, 0,
-            0, 0, U, U, 0, 0, 0, U, 0,
-            0, 0, R, R, 0, 0 };
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
-    }
-
-    size_t setBlob(flute3* flu)
+    void setBlob(flute3* flu)
     {
         constexpr GLfloat R = 1.f, U = -1.f, H(M_SQRT2);
         /* start from a centerred cube, rotated appropriately
@@ -943,7 +866,7 @@ namespace gle
         a = {pts[0], pts[1], pts[2]};
         flu[i++] = normalize(c+c);
         flu[i++] = normalize(a+c);
-        return i;
+        flu += i;
     }
     
     /* This moves some vertices to add an hexagonal needle to the blob */
@@ -964,16 +887,14 @@ namespace gle
         for ( int u : {11, 41 } ) flu[u] = {-X, Y, Z};
         for ( int u : {1,40,51} ) flu[u] = { X, Y, Z};
     }
-
-    void setBlob(flute3*& flu, bool modified)
-    {
-        size_t n = setBlob(flu);
-        assert_true(n==52);
-        if ( modified )
-            modifyBlob(flu);
-        flu += n;
-    }
     
+    void setPin(flute3*& flu)
+    {
+        flute3* ptr = flu;
+        setBlob(flu);
+        modifyBlob(ptr);
+    }
+
     void loadBuffer(GLuint buf)
     {
         assert_true(glIsBuffer(buf));
@@ -988,11 +909,12 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void pinS()
+#if 0
+    void pinTest()
     {
         flute3 flu[52];
-        size_t i = setBlob(flu);
-        assert_true(i == 52);
+        flute3* ptr = flu;
+        setBlob(ptr);
         modifyBlob(flu);
         glVertexPointer(3, GL_FLOAT, 0, flu);
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -1004,9 +926,10 @@ namespace gle
         glColor3f(1,1,1);
         for ( unsigned u : { 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 } )
             glDrawArrays(GL_POINTS, u, 1);
-        glDrawArrays(GL_LINE_STRIP, 0, i);
+        glDrawArrays(GL_LINE_STRIP, 0, 52);
     }
-
+#endif
+    
     //-----------------------------------------------------------------------
     
     /// draw
@@ -1044,9 +967,9 @@ namespace gle
         buf_pos_[7] = ptr-flu; setHexTube(ptr, 0, 1, 0.5f);
         buf_pos_[8] = ptr-flu; setHexTube(ptr, 0, 256.f, 0.5f);
         flute3 * fl3 = (flute3*)ptr;
-        buf_pos_[9] = fl3-(flute3*)flu; setBlob(fl3, false);
-        buf_pos_[10] = fl3-(flute3*)flu; setBlob(fl3, true);
-        buf_pos_[11] = fl3-(flute3*)flu; setCube(fl3, 1.0);
+        buf_pos_[9] = fl3-(flute3*)flu; setBlob(fl3);
+        buf_pos_[10] = fl3-(flute3*)flu; setPin(fl3);
+        buf_pos_[11] = fl3-(flute3*)flu; setCublob(fl3, 1.0);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
     
@@ -1407,7 +1330,7 @@ namespace gle
     {
         for ( size_t n = 0; n < pi_twice; n += inc )
         {
-            flute6 * flu = mapVertexNormalBuffer(2+pi_twice);
+            flute6 * flu = mapBuffer330(2+pi_twice);
             float X0 = cos_(n), X1 = cos_(n+inc);
             float Y0 = sin_(n), Y1 = sin_(n+inc);
             size_t i = 0;
@@ -1417,7 +1340,7 @@ namespace gle
                 flu[i++] = {X0*(R+T*C), Y0*(R+T*C), T*S, X0*C, Y0*C, S};
                 flu[i++] = {X1*(R+T*C), Y1*(R+T*C), T*S, X1*C, Y1*C, S};
             }
-            unmapVertexNormalBuffer();
+            unmapBuffer330();
             glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
         }
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1435,7 +1358,7 @@ namespace gle
         float W(width * A / M_SQRT3);
         float R(1.0f / cosf(A*0.5f));
         
-        flute6 * flu = mapVertexNormalBuffer(3*(1+pi_twice/(2*inc)));
+        flute6 * flu = mapBuffer330(3*(1+pi_twice/(2*inc)));
         size_t i = 0;
         flu[i++] = {R, 0, W, 1, 0, 0};
         flu[i++] = {R, 0,-W, 1, 0, 0};
@@ -1448,7 +1371,7 @@ namespace gle
             flu[i++] = {c, s,-W, c, s, 0};
         }
         flu[i++] = {R, 0, 0, 1, 0, 0};
-        unmapVertexNormalBuffer();
+        unmapBuffer330();
         glDrawArrays(GL_TRIANGLES, 0, i);
         glDisableClientState(GL_NORMAL_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1474,7 +1397,7 @@ namespace gle
         float R = radius(Z);
         while ( Z < T )
         {
-            flute6 * flu = mapVertexNormalBuffer(2+2*pi_twice);
+            flute6 * flu = mapBuffer330(2+2*pi_twice);
             float Y = Z;
             float Q = R;
             Z += dZ;
@@ -1491,7 +1414,7 @@ namespace gle
                 flu[i++] = {R*C, R*S, Z, dN*C, dN*S,-dR};
                 flu[i++] = {Q*C, Q*S, Y, dN*C, dN*S,-dR};
             }
-            unmapVertexNormalBuffer();
+            unmapBuffer330();
             glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
         }
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1606,12 +1529,12 @@ namespace gle
     {
         GLfloat AX(A.XX);
         GLfloat BX(B.XX);
-        flute6 * flu = (flute6*)mapFloatBuffer(4*6);
+        flute6 * flu = mapBuffer204(4);
         flu[0] = { AX, -rA, cA };
         flu[1] = { AX,  rA, cA };
         flu[2] = { BX, -rB, cB };
         flu[3] = { BX,  rB, cB };
-        unmapFloatBuffer(2, 4);
+        unmapBuffer204();
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);
@@ -1627,12 +1550,12 @@ namespace gle
             GLfloat dX(d.XX/n), dY(d.YY/n);
             GLfloat AX(A.XX), AY(A.YY);
             GLfloat BX(B.XX), BY(B.YY);
-            flute6 * flu = (flute6*)mapFloatBuffer(4*6);
+            flute6 * flu = mapBuffer204(6);
             flu[0] = { AX+rA*dX, AY+rA*dY, cA };
             flu[1] = { AX-rA*dX, AY-rA*dY, cA };
             flu[2] = { BX+rB*dX, BY+rB*dY, cB };
             flu[3] = { BX-rB*dX, BY-rB*dY, cB };
-            unmapFloatBuffer(2, 4);
+            unmapBuffer204();
             glEnableClientState(GL_COLOR_ARRAY);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glDisableClientState(GL_COLOR_ARRAY);
@@ -1659,14 +1582,14 @@ namespace gle
     void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color cA,
                        Vector2 const& b, Vector2 const& db, gle_color cB)
     {
-        flute6 * flu = (flute6*)mapFloatBuffer(6*6);
+        flute6 * flu = mapBuffer204(6);
         flu[0] = { b-db, cB };
         flu[1] = { b, cB };
         flu[2] = { a-da, cA };
         flu[3] = { a+da, cA };
         flu[4] = { b, cB };
         flu[5] = { b+db, cB };
-        unmapFloatBuffer(2, 4);
+        unmapBuffer204();
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_COLOR_ARRAY);

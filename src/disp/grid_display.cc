@@ -47,7 +47,7 @@ void drawBoundaries(Map<2> const& map)
         float x = map.position(0, n);
         pts[n] = {x, i, x, s};
     }
-    //glVertexPointer(2, GL_FLOAT, 0, pts);
+    glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 2*sup0);
     delete[] pts;
 }

@@ -163,16 +163,19 @@ void timerFunction(int value)
 //------------------------------------------------------------------------------
 void display(View& view, int)
 {
+    pthread_mutex_lock(&mutex);
     view.openDisplay();
     view.setLabel(std::to_string(sTime));
 
+    fluteD4 * flu = gle::mapBufferD04(PAM.max);
+    
+    for (size_t i = 0; i < PAM.max; ++i)
+        flu[i] = { things[i].pos, things[i].col };
+    
+    gle::unmapBufferD04();
     glPointSize(6);
-    glBegin(GL_POINTS);
-    pthread_mutex_lock(&mutex);
-    for(size_t i = 0; i < PAM.max; ++i)
-        things[i].draw();
-    glEnd();
-
+    glDrawArrays(GL_POINTS, 0, PAM.max);
+    
     view.closeDisplay();
     pthread_mutex_unlock(&mutex);
 }
@@ -239,6 +242,10 @@ int main(int argc, char* argv[])
     arg.print_warning(std::cerr, 1, "\n");
     glApp::newWindow(display);
     gle::initialize();
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
     simReset();
     
     pthread_mutex_init(&mutex, nullptr);

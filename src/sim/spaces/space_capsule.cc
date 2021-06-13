@@ -259,11 +259,11 @@ void SpaceCapsule::draw2D() const
     const float L(half_);
     const real R(radius_);
     constexpr size_t fin = 16 * gle::finesse;
-    float* arc = gle::mapFloatBuffer(4*fin+4);
+    float* arc = (float*)gle::mapBuffer200(2*fin+2);
     float* cra = arc + 2*fin + 2;
     gle::compute_arc(fin, arc, R, -M_PI_2, M_PI,  L, 0);
     gle::compute_arc(fin, cra, R,  M_PI_2, M_PI, -L, 0);
-    gle::unmapFloatBuffer(2, 0);
+    gle::unmapBuffer200();
     glDrawArrays(GL_LINE_LOOP, 0, 2*fin+2);
 }
 

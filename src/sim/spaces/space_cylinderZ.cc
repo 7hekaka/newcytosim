@@ -506,7 +506,9 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
+
 #include "gle.h"
+#include "gle_flute.h"
 
 void SpaceCylinderZ::draw3D() const
 {
@@ -519,7 +521,7 @@ void SpaceCylinderZ::draw3D() const
     
     for ( size_t u = 0; u < gle::pi_twice; ++u )
     {
-        flute6 * flu = gle::mapVertexNormalBuffer(cnt);
+        flute6 * flu = gle::mapBuffer330(cnt);
         float CU = gle::cos_(u), CL = gle::cos_(u+1);
         float SU = gle::sin_(u), SL = gle::sin_(u+1);
 
@@ -559,7 +561,7 @@ void SpaceCylinderZ::draw3D() const
             flu[i++] = {CL*R, SL*R, B, CL, SL, 0};
         }
         flu[i++] = {0, 0, B, 0, 0, -1};
-        gle::unmapVertexNormalBuffer();
+        gle::unmapBuffer330();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
     glDisableClientState(GL_NORMAL_ARRAY);

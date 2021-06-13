@@ -171,7 +171,7 @@ void display(View& view, int)
 
     //--------------draw content of cells
     const real gold = 2.0 / ( 1.0 + sqrt(5) );
-    fluteVC * flu = gle::mapVertexColorBuffer(16*myGrid.nbCells()+2);
+    fluteD4 * flu = gle::mapBufferD04(16*myGrid.nbCells()+2);
     size_t i = 0;
 
     for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
@@ -194,7 +194,7 @@ void display(View& view, int)
     //-------------draw selected-cell
     flu[i++] = {Vector2(pos), gle_color(1,1,0)};
     flu[i++] = {Vector2(nod), gle_color(1,1,0)};
-    unmapVertexColorBuffer();
+    unmapBufferD04();
     glPointSize(12);
     glEnableClientState(GL_COLOR_ARRAY);
     glDrawArrays(GL_POINTS, 0, i);

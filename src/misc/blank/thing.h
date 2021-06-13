@@ -12,10 +12,10 @@ class Thing
 private:
     
     /// display color
-    gle_color     color;
+    gle_color color;
     
     /// position
-    Vector3       pos;
+    Vector3 pos;
     
 public:
     
@@ -32,7 +32,7 @@ public:
     void step();
     
     /// draw using OpenGL
-    void        draw() const;
+    void draw() const;
     
     ///record state to FILE, the current time is provided
     void write(FILE*, real time) const;

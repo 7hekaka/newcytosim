@@ -329,9 +329,9 @@ void SpaceDice::draw3D() const
     
     size_t cnt = mesh.num_vertices();
 #if 0
-    fluteV * flu = gle::mapVertexBuffer(cnt);
+    fluteD * flu = gle::mapBufferD00(cnt);
     mesh.store_vertices((float*)flu);
-    gle::unmapVertexBuffer();
+    gle::unmapBufferD00();
 #else
     glBindBuffer(GL_ARRAY_BUFFER, gle::stream_[0]);
     glBufferData(GL_ARRAY_BUFFER, 3*cnt*sizeof(float), nullptr, GL_STREAM_DRAW);

@@ -876,13 +876,13 @@ void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
     glLineWidth(1);
     gle::drawRectangle(-s/2, a, s/2, b, 0);
     flute4 pts[24];
-    glVertexPointer(2, GL_FLOAT, 0, pts);
+    setTicksH(pts, 5, s, a, b);
 
     // draw bars
     s /= 10;
     GLfloat w(2);
     glLineWidth(w);
-    setTicksH(pts, 5, s, a, b);
+    glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 18);
     
     // draw tick marks
@@ -918,13 +918,13 @@ void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
     glLineWidth(1);
     gle::drawRectangle(a, -s/2, b, s/2, 0);
     flute4 pts[24];
-    glVertexPointer(2, GL_FLOAT, 0, pts);
+    setTicksV(pts, 5, s, a, b);
 
     // draw bars
     s /= 10;
     GLfloat w(2);
     glLineWidth(w);
-    setTicksV(pts, 5, s, a, b);
+    glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 18);
     
     // draw tick marks

@@ -49,15 +49,12 @@ namespace gle
    
     /// initialize more buffer objects
     void setBuffers();
-    
-    /// calculate sine and cosine
-    void compute_circle(size_t cnt, GLfloat CS[], double rad, double start, double theta, GLfloat cX, GLfloat cY);
 
     /// calculate sine and cosine
-    void compute_circle(size_t cnt, GLfloat CS[], double rad, double start = 0);
+    void compute_circle(size_t cnt, float CS[], double rad, double start = 0);
 
     /// calculate sine and cosine for a circular arc
-    void compute_arc(size_t cnt, GLfloat CS[], double rad, double start, double angle, GLfloat cx, GLfloat cy);
+    void compute_arc(size_t cnt, float CS[], double rad, double start, double angle, float cx, float cy);
     
     /// inverse square root
 #if defined(__SSE3__)
@@ -72,18 +69,6 @@ namespace gle
     /// used in debug mode
     GLuint boundBuffer();
     
-    /// map GPU buffer
-    flute6* mapVertexNormalBuffer(size_t);
-    /// unmap GPU buffer
-    void unmapVertexNormalBuffer();
-    /// remap GPU buffer
-    void bindVertexNormalBuffer(size_t);
-
-    /// map GPU buffer
-    float* mapFloatBuffer(size_t);
-    /// unmap GPU buffer
-    void unmapFloatBuffer(size_t, size_t);
-
 #pragma mark -
     
     inline void scale(float x)  { glScalef(x,x,x); }
@@ -187,11 +172,6 @@ namespace gle
     void icosahedron();
     /// returns tetrahedron or octahedron
     inline void (*hedron(bool x))() { return x ? octahedron : tetrahedron; }
-    
-    /// draw a cube of side length 2, but without normals
-    void cubeF();
-    /// draw a tetrahedron, without normals
-    void tetrahedronF();
 
     /// draw a roughly spherical shape made of few triangles
     void blob();

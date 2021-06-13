@@ -126,7 +126,7 @@ void display(View& view, int)
 {
     view.openDisplay();
     pam.face_color = view.front_color;
-    mesh.display(pam);
+    mesh.draw(pam);
     view.closeDisplay();
 }
 

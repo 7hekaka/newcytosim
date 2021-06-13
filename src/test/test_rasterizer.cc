@@ -5,8 +5,9 @@
 #include "dim.h"
 #include <ctime>
 #include "vector.h"
-#include "glapp.h"
+#include "gle.h"
 #include "glut.h"
+#include "glapp.h"
 #include "real.h"
 #include "random.h"
 #include "rasterizer.h"
@@ -344,6 +345,7 @@ int main(int argc, char* argv[])
         glApp::normalKeyFunc(processNormalKey);
         glApp::setScale(2*(size+radius+1));
         glApp::newWindow(display);
+        gle::initialize();
 
         glutMainLoop();
     }

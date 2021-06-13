@@ -13,13 +13,13 @@ class Mesh
 private:
 
     /// number of points
-    size_t   n_points;
+    size_t n_points;
     
     /// number of faces
-    size_t   n_faces;
+    size_t n_faces;
     
     /// coordinates of points
-    float    * points;
+    float * points;
     
     /// indices of points in the faces
     unsigned * faces;
@@ -54,6 +54,6 @@ public:
     unsigned pick() const;
     
     /// display using OpenGL
-    void display(MechouiParam const&) const;
+    void draw(MechouiParam const&) const;
 
 };

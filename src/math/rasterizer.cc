@@ -10,7 +10,8 @@
  and should be defined for compiling test_rasterizer.cc
  */
 #ifdef DISPLAY
-#  include "opengl.h"
+#  include "gle.h"
+#  include "gle_flute.h"
 bool rasterizer_draws = false;
 #endif
 
@@ -123,18 +124,15 @@ static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
 #ifdef DISPLAY
     if ( rasterizer_draws )
     {
+        gle_color col(0, 0, 1);
+        flute8 * flu = gle::mapBuffer404(n_pts);
+        for ( size_t i = 0; i < n_pts; ++i )
+            flu[i] = { pts[i].XX, pts[i].YY, float(zz), col };
+        gle::unmapBuffer404();
         glLineWidth(1);
-        glColor3f(0.f, 0.f, 1.f);
-        glBegin(GL_LINE_LOOP);
-        for ( size_t n = 0; n < n_pts; ++n )
-            glVertex3d(pts[n].XX, pts[n].YY, zz);
-        glEnd();
-        
+        glDrawArrays(GL_LINE_LOOP, 0, n_pts);
         glPointSize(7);
-        glColor3f(1.f, 0.f, 1.f);
-        glBegin(GL_POINTS);
-        glVertex3d(pts[0].XX, pts[0].YY, zz);
-        glEnd();
+        glDrawArrays(GL_POINTS, 0, 1);
     }
 #endif
 
@@ -353,26 +351,23 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
 #ifdef DISPLAY
     if ( rasterizer_draws )
     {
-        //draw the vertex of the volume:
-        glPointSize(6);
-        glBegin(GL_POINTS);
-        glColor3f(1.f, 0.f, 0.f);
+        gle_color col(0, 1, 1);
         for ( size_t n = 0; n < n_pts; ++n )
-            glVertex3d(pts[n].XX, pts[n].YY, pts[n].ZZ);
-        glEnd();
-        
-        //draw the edges of the volume:
-        glLineWidth(0.5);
-        glBegin(GL_LINES);
-        glColor3f(0.f, 1.f, 1.f);
-        for ( size_t n = 0;   n < n_pts; ++n )
-        for ( size_t m = n+1; m < n_pts; ++m )
-            if ( pts[n].UU  &  pts[m].UU )
+        {
+            flute8* flu = gle::mapBuffer404(n_pts);
+            size_t i = 0;
+            for ( size_t u = n+1; u < n_pts; ++u )
             {
-                glVertex3d(pts[n].XX, pts[n].YY, pts[n].ZZ);
-                glVertex3d(pts[m].XX, pts[m].YY, pts[m].ZZ);
+                if ( pts[n].UU  &  pts[u].UU )
+                {
+                    flu[i++] = { pts[n].XX, pts[n].YY, pts[n].ZZ, col };
+                    flu[i++] = { pts[u].XX, pts[u].YY, pts[u].ZZ, col };
+                }
             }
-        glEnd();
+            gle::unmapBuffer404();
+            glLineWidth(0.5);
+            glDrawArrays(GL_LINES, 0, 2*i);
+        }
     }
 #endif
     

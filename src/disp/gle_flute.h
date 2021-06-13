@@ -12,28 +12,51 @@
  */
 
 #if ( DIM >= 3 )
-typedef flute3 fluteV;
-typedef flute8 fluteVC;
+typedef flute3 fluteD;
+typedef flute8 fluteD4;
 #else
-typedef flute2 fluteV;
-typedef flute6 fluteVC;
+typedef flute2 fluteD;
+typedef flute6 fluteD4;
 #endif
 
 namespace gle
 {
-    fluteV* mapVertexBuffer(size_t);
-    void  unmapVertexBuffer();
-    void   bindVertexBuffer(size_t);
-
-    fluteVC* mapVertexColorBuffer(size_t);
-    flute6* mapVertex2ColorBuffer(size_t);
-    flute8* mapVertex4ColorBuffer(size_t);
-    void  unmapVertexColorBuffer();
-    void   bindVertexColorBuffer(size_t);
+    /// map GPU buffer
+    float* mapFloatBuffer(size_t cnt);
+    /// unmap GPU buffer
+    void unmapFloatBuffer(size_t vertex, size_t normals, size_t colors);
+    /// bind GPU buffer
+    void bindFloatBuffer(size_t vertex, size_t normals, size_t colors, size_t skip);
     
-    unsigned* mapIndexBuffer(size_t);
+    /// map / unmap GPU buffer for 2D vertex + 4 color data
+    inline flute2* mapBuffer200(size_t n) { return (flute2*)mapFloatBuffer(2*n); }
+    inline void  unmapBuffer200() { unmapFloatBuffer(2, 0, 0); }
+
+    /// map / unmap GPU buffer for 2D vertex + 4 color data
+    inline flute6* mapBuffer204(size_t n) { return (flute6*)mapFloatBuffer(6*n); }
+    inline void  unmapBuffer204() { unmapFloatBuffer(2, 0, 4); }
+    
+    /// map / unmap GPU buffer for 4D vertex + 4 color data
+    inline flute8* mapBuffer404(size_t n) { return (flute8*)mapFloatBuffer(8*n); }
+    inline void  unmapBuffer404() { unmapFloatBuffer(4, 0, 4); }
+    
+    /// map / unmap GPU buffer for 3D vertex + 3 normal data
+    inline flute6* mapBuffer330(size_t n) { return (flute6*)mapFloatBuffer(6*n); }
+    inline void unmapBuffer330() { unmapFloatBuffer(3, 3, 0); }
+    
+    /// map / unmap GPU buffer for vertex data only
+    fluteD* mapBufferD00(size_t cnt);
+    void  unmapBufferD00();
+    void   bindBufferD00(size_t skip);
+
+    /// map / unmap GPU buffer for vertex + color data
+    fluteD4* mapBufferD04(size_t cnt);
+    void  unmapBufferD04();
+    void   bindVertexD04(size_t skip);
+
+    unsigned* mapIndexBuffer(size_t cnt);
     void  unmapIndexBuffer();
-    void   bindIndexBuffer(size_t);
+    void   bindIndexBuffer(size_t skip);
 };
 
 #endif

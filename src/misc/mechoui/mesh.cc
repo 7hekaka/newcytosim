@@ -182,7 +182,7 @@ static int compareTriangle(const void * A, const void * B)
 
 
 /// OpenGL display function
-void Mesh::display(MechouiParam const& pam) const
+void Mesh::draw(MechouiParam const& pam) const
 {
     glEnable(GL_NORMALIZE);
     glEnableClientState(GL_VERTEX_ARRAY);

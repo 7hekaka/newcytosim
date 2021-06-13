@@ -20,8 +20,7 @@ bool showFaces = true;
 
 Tesselator * ico = nullptr;
 
-GLuint glpts = 0;
-GLuint gldir = 0;
+GLuint buffers[2] = { 0 };
 
 //------------------------------------------------------------------------------
 void initVBO();
@@ -125,15 +124,14 @@ void drawFacesArray()
 
 void initVBO()
 {
-    glGenBuffers(1, &glpts);
-    glGenBuffers(1, &gldir);
+    glGenBuffers(2, buffers);
     //Create a new VBO for the vertex information
 #if 0
-    glBindBuffer(GL_ARRAY_BUFFER, glpts);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), ico->vertex_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #else
-    glBindBuffer(GL_ARRAY_BUFFER, glpts);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), nullptr, GL_STATIC_DRAW);
     void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     ico->store_vertices((float*)glb);
@@ -141,7 +139,7 @@ void initVBO()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
     //Create a new VBO for the indices
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gldir);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->num_faces()*sizeof(unsigned), ico->face_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
@@ -152,12 +150,12 @@ void drawFacesVBO()
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
-    glBindBuffer(GL_ARRAY_BUFFER, glpts);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glNormalPointer(GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gldir);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
     glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_INT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
@@ -212,7 +210,7 @@ void drawVertices()
     glPointSize(10);
     glColor3f(1, 1, 1);
     glEnableClientState(GL_VERTEX_ARRAY);
-    glBindBuffer(GL_ARRAY_BUFFER, glpts);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDrawArrays(GL_POINTS, 0, ico->num_vertices());
