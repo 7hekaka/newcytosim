@@ -78,20 +78,12 @@ namespace gle
     inline void translate(double x, double y, double z) { glTranslated(x, y, z); }
 
 #if REAL_IS_DOUBLE
-    
-    inline void gleVertex(Vector1 const& v) { glVertex2d(v.XX, 0); }
-    inline void gleVertex(Vector2 const& v) { glVertex2d(v.XX, v.YY); }
-    inline void gleVertex(Vector3 const& v) { glVertex3d(v.XX, v.YY, v.ZZ); }
-    
+   
     inline void translate(Vector1 const& v) { glTranslated(v.XX, 0, 0); }
     inline void translate(Vector2 const& v) { glTranslated(v.XX, v.YY, 0); }
     inline void translate(Vector3 const& v) { glTranslated(v.XX, v.YY, v.ZZ); }
 
 #else
-
-    inline void gleVertex(Vector1 const& v) { glVertex2f(v.XX, 0); }
-    inline void gleVertex(Vector2 const& v) { glVertex2f(v.XX, v.YY); }
-    inline void gleVertex(Vector3 const& v) { glVertex3f(v.XX, v.YY, v.ZZ); }
     
     inline void translate(Vector1 const& v) { glTranslatef(v.XX, 0, 0); }
     inline void translate(Vector2 const& v) { glTranslatef(v.XX, v.YY, 0); }

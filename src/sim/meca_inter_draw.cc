@@ -3,6 +3,7 @@
 
 #include "../disp/gle.h"
 #include "../disp/gle_color_list.h"
+#include "../disp/gle_flute.h"
 
 #define DRAW_LINK(PTA, ...)\
 { if ( drawLinks ) drawLink(gle::bright_color(PTA.mecable()->signature()), __VA_ARGS__); }
@@ -11,80 +12,66 @@
 /// Display link between 2 positions
 void drawLink(gle_color const& col, Vector const& a, Vector const& b)
 {
-    col.load();
+    fluteD4* flu = gle::mapBufferD04(2);
+    flu[0] = { a, col };
+    flu[1] = { b, col };
+    gle::unmapBufferD04();
     glLineStipple(1, 0xFFFF);
-    glBegin(GL_LINES);
-    gle::gleVertex(a);
-    gle::gleVertex(b);
-    glEnd();
+    glDrawArrays(GL_LINES, 0, 2);
 }
 
 /// Display link between 2 positions, with resting length `len`
 void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
 {
-    col.load();
     Vector b = a + ab;
     Vector dx = ab * (( 1 - len / ab.norm() ) / 2);
+    fluteD4* flu = gle::mapBufferD04(4);
+    flu[0] = { a, col };
+    flu[1] = { a+dx, col };
+    flu[2] = { b-dx, col };
+    flu[3] = { b, col };
+    gle::unmapBufferD04();
     glLineStipple(1, 0x3333);
-    glBegin(GL_LINES);
-    gle::gleVertex(a+dx);
-    gle::gleVertex(b-dx);
-    glEnd();
+    glDrawArrays(GL_LINES, 1, 2);
     glLineStipple(1, 0xFFFF);
-    glBegin(GL_LINES);
-    gle::gleVertex(a);
-    gle::gleVertex(a+dx);
-    gle::gleVertex(b-dx);
-    gle::gleVertex(b);
-    glEnd();
-    glBegin(GL_POINTS);
-    gle::gleVertex(a);
-    gle::gleVertex(b);
-    glEnd();
+    glDrawArrays(GL_LINES, 0, 2);
+    glDrawArrays(GL_LINES, 2, 2);
+    glDrawArrays(GL_POINTS, 0, 1);
+    glDrawArrays(GL_POINTS, 3, 1);
 }
 
 /// Display link between 3 positions
 void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
 {
-    col.load();
     if ( modulo )
         modulo->fold(c, a);
     Vector b = a + ab;
+    fluteD4* flu = gle::mapBufferD04(4);
+    flu[0] = { a, col };
+    flu[1] = { b, col };
+    flu[2] = { c, col };
+    gle::unmapBufferD04();
     glLineStipple(1, 0x7310);
-    glBegin(GL_LINES);
-    gle::gleVertex(a);
-    gle::gleVertex(b);
-    glEnd();
+    glDrawArrays(GL_LINES, 0, 2);
     glLineStipple(1, 0x5555);
-    glBegin(GL_LINES);
-    gle::gleVertex(b);
-    gle::gleVertex(c);
-    glEnd();
-    glBegin(GL_POINTS);
-    gle::gleVertex(b);
-    glEnd();
+    glDrawArrays(GL_LINES, 1, 2);
+    glDrawArrays(GL_POINTS, 1, 1);
 }
 
 /// Display link between 4 positions
 void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector const& dc, Vector const& d)
 {
-    col.load();
     Vector b = a + ab;
     Vector c = d + dc;
+    fluteD4* flu = gle::mapBufferD04(4);
+    flu[0] = { a, col };
+    flu[1] = { b, col };
+    flu[2] = { c, col };
+    flu[3] = { d, col };
+    gle::unmapBufferD04();
     glLineStipple(1, 0x7171);
-    glBegin(GL_LINES);
-    gle::gleVertex(a);
-    gle::gleVertex(b);
-    gle::gleVertex(c);
-    gle::gleVertex(d);
-    glEnd();
+    glDrawArrays(GL_LINES, 0, 4);
     glLineStipple(1, 0xFFFF);
-    glBegin(GL_LINES);
-    gle::gleVertex(b);
-    gle::gleVertex(c);
-    glEnd();
-    glBegin(GL_POINTS);
-    gle::gleVertex(b);
-    gle::gleVertex(c);
-    glEnd();
+    glDrawArrays(GL_LINES, 1, 2);
+    glDrawArrays(GL_POINTS, 1, 2);
 }

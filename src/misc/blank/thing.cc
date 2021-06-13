@@ -55,6 +55,6 @@ void Thing::write(FILE * f, real time) const
 void Thing::draw() const
 {
     color.load();
-    gleVertex(pos);
+    glVertex3f(pos.XX, pos.YY, pos.ZZ);
 }
 

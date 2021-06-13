@@ -19,6 +19,7 @@
 #include "glut.h"
 #include "gle.h"
 #include "gle_color.h"
+#include "gle_flute.h"
 
 
 using namespace gle;
@@ -37,7 +38,7 @@ bool draw_space = true;
 // number of points
 const size_t maxpts = 1<<17;
 size_t nbpts = 1024;
-size_t scan  = 100;
+size_t scan  = 16;
 
 // INFLATION of the rectangle containing point to be projected
 const real INFLATION = 1;
@@ -491,85 +492,90 @@ void display(View& view, int)
 #endif
     }
     
-    //use green for points inside, magenta for point outside:
-    glPointSize(2.0);
-    glBegin(GL_POINTS);
-    for ( size_t i = 0; i < nbpts; ++i )
+    if ( 1 )
     {
-        if ( visible(i) )
+        //use green for points inside, magenta for point outside:
+        flute8* flu = gle::mapBuffer404(nbpts);
+        gle_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
+        size_t n = 0;
+        for ( size_t i=0; i < nbpts; ++i )
         {
-            if ( inside[i] )
-                glColor3f(0.f, COL, 0.f);
-            else
-                glColor3f(COL, 0.f, COL);
-            gleVertex( point[i] );
-        }
+            if ( visible(i) )
+                flu[n++] = { point[i], inside[i] ? col : lor };
+         }
+        gle::unmapBuffer404();
+        glPointSize(2.0);
+        glDrawArrays(GL_POINTS, 0, n);
     }
-    glEnd();
     
     if ( showProject )
     {
-        //plot a blue line from the point to its projection:
-        glLineWidth(line_width);
-        glBegin(GL_LINES);
+        flute8* flu = gle::mapBuffer404(2*nbpts);
+        gle_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
+        size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {
             if ( visible(i) )
             {
-                if ( inside[i] )
-                    glColor3f(0.f, COL, 0.f);
-                else
-                    glColor3f(0.f, 0.f, COL);
-                gleVertex( point[i] );
-                gleVertex( project[i] );
+                gle_color c = inside[i] ? col : lor;
+                flu[n++] = { point[i], c };
+                flu[n++] = { project[i], c };
             }
         }
-        glEnd();
+        gle::unmapBuffer404();
+        glLineWidth(line_width);
+        glDrawArrays(GL_LINES, 0, n);
     }
     
     if ( showNormals )
     {
-        glLineWidth(line_width);
-        glBegin(GL_LINES);
-        for ( size_t ii = 0; ii < nbpts; ++ii )
+        flute8* flu = gle::mapBuffer404(2*nbpts);
+        gle_color col(1.f, 1.f, 1.f), lor(1.f, 1.f, 1.f, 0.f);
+        size_t n = 0;
+        for ( size_t i = 0; i < nbpts; ++i )
         {
-            glColor4f(1.f, 1.f, 1.f, 1.f);
-            gleVertex(project[ii]);
-            glColor4f(1.f, 1.f, 1.f, 0.f);
-            gleVertex(project[ii] + normal[ii]);
+            flu[n++] = { project[i], col };
+            flu[n++] = { project[i]+normal[i], lor };
         }
-        glEnd();
+        gle::unmapBuffer404();
+        glLineWidth(line_width);
+        glDrawArrays(GL_LINES, 0, n);
     }
     
     if ( showReproject )
     {
-        glLineWidth(2*line_width);
-        glBegin(GL_LINES);
-        for ( size_t ii = 0; ii < nbpts; ++ii )
+        flute8* flu = gle::mapBuffer404(2*nbpts);
+        gle_color col(COL, 0.f, 0.f), lor(COL, 0.f, 0.f, 0.5f);
+        size_t n = 0;
+        for ( size_t i = 0; i < nbpts; ++i )
         {
-            if ( visible(ii) )
+            if ( visible(i) )
             {
-                glColor3f(COL, 0.f, 0.f);
-                gleVertex(project[ii]);
-                gleVertex(project2[ii]);
+                flu[n++] = { project[i], col };
+                flu[n++] = { project2[i], lor };
             }
         }
-        glEnd();
+        gle::unmapBuffer404();
+        glLineWidth(2*line_width);
+        glDrawArrays(GL_LINES, 0, n);
     }
     
     if ( showEdges )
     {
+        flute8* flu = gle::mapBuffer404(2*nbpts);
+        gle_color col(0.f, COL, COL), lor(0.f, COL, 0.f);
+        size_t n = 0;
+        for ( size_t i = 0; i < nbpts; ++i )
+        {
+            if ( visible(i) )
+            {
+                flu[n++] = { edge[i], col };
+                flu[n++] = { project[i], lor };
+            }
+         }
+        gle::unmapBuffer404();
         glPointSize(2.0);
-        glBegin(GL_POINTS);
-        glColor3f(1.f, COL, COL);
-        for ( size_t ii = 0; ii < nbpts; ++ii )
-            gleVertex(edge[ii]);
-        glEnd();
-        glBegin(GL_POINTS);
-        glColor3f( 0.f, COL, 0.f);
-        for ( size_t ii = 0; ii < nbpts; ++ii )
-            gleVertex(project[ii]);
-        glEnd();
+        glDrawArrays(GL_POINTS, 0, n);
     }
     view.closeDisplay();
 }

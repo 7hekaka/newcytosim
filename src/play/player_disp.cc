@@ -269,11 +269,13 @@ void Player::drawCytosim()
 #if DRAW_MECA_LINKS
         if ( disp.draw_links )
         {
-            glDisable(GL_LIGHTING);
             glLineWidth(6);
             glPointSize(8);
+            glDisable(GL_LIGHTING);
             glEnable(GL_LINE_STIPPLE);
+            glEnableClientState(GL_COLOR_ARRAY);
             simul.drawLinks();
+            glDisableClientState(GL_COLOR_ARRAY);
             glDisable(GL_LINE_STIPPLE);
             CHECK_GL_ERROR("Simul::drawLinks()");
         }

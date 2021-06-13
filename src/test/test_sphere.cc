@@ -7,6 +7,7 @@
 #include "glapp.h"
 #include "glut.h"
 #include "gle.h"
+#include "gle_flute.h"
 
 using namespace gle;
 
@@ -104,14 +105,13 @@ void processNormalKey(unsigned char c, int x, int y)
 //------------------------------------------------------------------------------
 void drawVertices()
 {
-    glBegin(GL_POINTS);
-    for ( size_t i=0; i < front->nbPoints(); ++i )
-    {
-        GLfloat x, y, z;
-        front->putPoint(&x, &y, &z, i);
-        glVertex3f(x, y, z);
-    }
-    glEnd();
+    size_t cnt = front->nbPoints();
+    flute4* flu = gle::mapBuffer400(4*front->nbPoints());
+    for ( size_t i = 0; i < cnt; ++i )
+        flu[i] = { Vector3(front->addr(i)) };
+    glPointSize(5);
+    gle::unmapBuffer400();
+    glDrawArrays(GL_POINTS, 0, cnt);
 }
 
 void nameVertices()
@@ -140,39 +140,23 @@ void display(View& view, int)
     drawVertices();
     nameVertices();
     
-#if ( 0 )
-    glLineWidth(3);
-    glBegin(GL_LINES);
-    for ( size_t i=0; i < front->nbPoints(); ++i )
-    {
-        Vector3 p(front->addr(i));
-        Vector3 n = p.orthogonal();
-        glColor3f(1.f, 1.f, 1.f);
-        gleVertex(p);
-        glColor3f(0.f, 0.f, 0.f);
-        gleVertex(p+0.1*n);
-    }
-    glEnd();
-#endif
 #if ( 1 )
-    const real e = 0.1;
-    glLineWidth(2);
-    glBegin(GL_LINES);
-    for ( size_t i=0; i < front->nbPoints(); ++i )
+    const real E = 0.1;
+    flute8* flu = gle::mapBuffer404(4*front->nbPoints());
+    gle_color col(1,1,1), lor(0,0,0);
+    size_t n = 0;
+    for ( size_t i = 0; i < front->nbPoints(); ++i )
     {
         Vector3 b, c, a(front->addr(i));
         a.orthonormal(b, c);
-        
-        glColor3f(0.f, 1.f, 0.f);
-        gleVertex(a);
-        glColor3f(0.f, 0.f, 0.f);
-        gleVertex(a+e*b);
-        glColor3f(1.f, 0.f, 1.f);
-        gleVertex(a);
-        glColor3f(0.f, 0.f, 0.f);
-        gleVertex(a+e*c);
+        flu[n++] = { a, col };
+        flu[n++] = { a+E*b, lor };
+        flu[n++] = { a, col };
+        flu[n++] = { a+E*c, lor };
     }
-    glEnd();
+    glLineWidth(3);
+    gle::unmapBuffer404();
+    glDrawArrays(GL_LINES, 0, n);
 #endif
     
     if ( 0 )

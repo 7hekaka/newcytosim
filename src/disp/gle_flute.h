@@ -37,6 +37,10 @@ namespace gle
     inline void  unmapBuffer204() { unmapFloatBuffer(2, 0, 4); }
     
     /// map / unmap GPU buffer for 4D vertex + 4 color data
+    inline flute4* mapBuffer400(size_t n) { return (flute4*)mapFloatBuffer(8*n); }
+    inline void  unmapBuffer400() { unmapFloatBuffer(4, 0, 0); }
+
+    /// map / unmap GPU buffer for 4D vertex + 4 color data
     inline flute8* mapBuffer404(size_t n) { return (flute8*)mapFloatBuffer(8*n); }
     inline void  unmapBuffer404() { unmapFloatBuffer(4, 0, 4); }
     
