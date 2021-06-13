@@ -153,7 +153,6 @@ void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "opengl.h"
-#include "gle.h"
 
 void SpaceDisc::draw2D() const
 {

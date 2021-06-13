@@ -6,7 +6,6 @@
 #include "display2.h"
 #include "modulo.h"
 
-#include "opengl.h"
 #include "gle.h"
 #include "gle_color_list.h"
 #include "glut.h"

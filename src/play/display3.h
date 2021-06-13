@@ -5,8 +5,8 @@
 
 #include "display.h"
 #include "real.h"
-#include "opengl.h"
 #include "vector.h"
+#include "gle_color.h"
 #include "point_disp.h"
 
 

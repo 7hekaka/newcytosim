@@ -43,7 +43,7 @@ int OffScreen::openContext()
 }
 
 
-GLuint OffScreen::createBuffer(const int width, const int height, int)
+int OffScreen::createBuffer(const int width, const int height, int)
 {
     dpy = XOpenDisplay(0);
     

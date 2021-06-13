@@ -558,6 +558,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
 #ifdef DISPLAY
 
 #include "opengl.h"
+
 void drawBoundaries(Map<DIM> const&);
 
 void FiberGrid::drawGrid() const

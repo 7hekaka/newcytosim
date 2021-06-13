@@ -3,7 +3,6 @@
 #define DISPLAY_PROP_H
 
 #include "property.h"
-#include "opengl.h"
 
 
 /// Parameters for Play

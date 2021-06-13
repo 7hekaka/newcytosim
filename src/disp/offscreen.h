@@ -4,9 +4,6 @@
 #define OFFSCREEN_H
 
 
-#include "opengl.h"
-
-
 /// functions to open/close an OpenGL off-screen display
 namespace OffScreen
 {
@@ -15,7 +12,7 @@ namespace OffScreen
     int openContext();
 
     /// allocate display buffer of requested size (width,height)
-    GLuint createBuffer(int width, int height, int multisample);
+    int createBuffer(int width, int height, int multisample);
 
     /// allocate display buffer of requested size (width,height)
     int blitBuffer();

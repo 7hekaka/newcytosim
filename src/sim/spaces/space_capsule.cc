@@ -250,7 +250,7 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
+
 #include "gle.h"
 #include "gle_flute.h"
 

@@ -1,7 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "offscreen.h"
-#include "opengl.h"
 
 
 #if defined(__APPLE__) && defined(GL_VERSION_2_1)
@@ -25,7 +24,7 @@ int OffScreen::openContext()
     return 0;
 }
 
-GLuint OffScreen::createBuffer(int, int, int)
+int OffScreen::createBuffer(int, int, int)
 {
     fprintf(stderr,"This program cannot render off-screen\n");
     return 0;

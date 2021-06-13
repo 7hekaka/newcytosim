@@ -190,7 +190,7 @@ void SpacePolygonZ::setInteractions(Meca& meca) const
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
+
 #include "gle.h"
 
 void SpacePolygonZ::draw3D() const

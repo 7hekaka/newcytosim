@@ -4,7 +4,6 @@
 #include "point_disp.h"
 #include "offscreen.h"
 #include "glossary.h"
-#include "opengl.h"
 #include "glut.h"
 #include "gle.h"
 #include "gle_zoo.h"

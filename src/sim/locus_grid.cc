@@ -1112,6 +1112,7 @@ void LocusGrid::setSterics(Meca& meca, real stiff, size_t pan1, size_t pan2) con
 #ifdef DISPLAY
 
 #include "opengl.h"
+
 void drawBoundaries(Map<DIM> const&);
 
 void LocusGrid::drawGrid() const

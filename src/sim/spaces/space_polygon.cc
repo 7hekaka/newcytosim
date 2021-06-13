@@ -303,7 +303,7 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 #pragma mark - Display
 
 #ifdef DISPLAY
-#include "opengl.h"
+
 #include "gle.h"
 #include "flute.h"
 

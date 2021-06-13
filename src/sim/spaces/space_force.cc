@@ -68,7 +68,7 @@ void SpaceForce::setInteractions(Meca& meca) const
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
+
 #include "gle.h"
 
 void SpaceForce::draw3D() const

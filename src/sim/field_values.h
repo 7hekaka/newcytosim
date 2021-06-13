@@ -7,7 +7,6 @@
 #include "iowrapper.h"
 
 #ifdef DISPLAY
-#  include "opengl.h"
 #  include "gle_color.h"
 #endif
 

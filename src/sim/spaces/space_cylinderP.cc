@@ -204,7 +204,7 @@ void SpaceCylinderP::read(Inputter& in, Simul&, ObjectTag)
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
+
 #include "gle.h"
 
 void SpaceCylinderP::draw3D() const

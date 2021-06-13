@@ -5,7 +5,6 @@
 #define GLAPP_H
 
 #include "real.h"
-#include "gle_color.h"
 #include "vector3.h"
 #include "quaternion.h"
 #include "view.h"
@@ -60,7 +59,7 @@ namespace glApp
     void resetView();
     
     /// save higher resolution image with magnification 'mag'
-    //int        saveImage(const char* name, unsigned mag, unsigned downsample);
+    //int saveImage(const char* name, unsigned mag, unsigned downsample);
     
     //--------------------------------- MENUS -----------------------------------
     

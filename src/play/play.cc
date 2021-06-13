@@ -9,10 +9,9 @@
 #include "splash.h"
 #include "print_color.h"
 
-#include "opengl.h"
+#include "gle.h"
 #include "player.h"
 #include "view.h"
-#include "gle.h"
 
 Player player;
 
@@ -332,13 +331,13 @@ int main(int argc, char* argv[])
             std::cerr << "Failed to create off-screen context\n";
             return 5;
         }
-        GLuint fbo = OffScreen::createBuffer(W, H, 0);
+        int fbo = OffScreen::createBuffer(W, H, 0);
         if ( !fbo )
         {
             std::cerr << "Failed to create off-screen pixels\n";
             return 6;
         }
-        GLuint multi = 0;
+        int multi = 0;
         if ( view.multisample > 1 )
         {
             multi = OffScreen::createBuffer(W, H, view.multisample);

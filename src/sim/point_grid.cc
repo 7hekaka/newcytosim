@@ -789,6 +789,7 @@ void PointGrid::setSterics(Meca& meca, Stiffness const& stiff, size_t pan1, size
 #ifdef DISPLAY
 
 #include "opengl.h"
+
 void drawBoundaries(Map<DIM> const&);
 
 void PointGrid::drawGrid() const

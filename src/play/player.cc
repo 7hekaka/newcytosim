@@ -1,12 +1,12 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "player.h"
-#include "opengl.h"
+
 #include "gle.h"
+#include "gle_color.h"
 #include "gle_color_list.h"
 #include "glapp.h"
 
-using namespace gle;
 using glApp::flashText;
 
 #include "fiber_disp.h"

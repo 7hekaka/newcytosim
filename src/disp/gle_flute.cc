@@ -2,7 +2,6 @@
 
 #include "gle.h"
 #include "gle_flute.h"
-#include "opengl.h"
 #include "gle_color.h"
 
 namespace gle

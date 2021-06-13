@@ -9,7 +9,6 @@
 #include "vector3.h"
 #include "map.h"
 #include "grid.h"
-#include "opengl.h"
 #include "gle.h"
 #include "gle_flute.h"
 

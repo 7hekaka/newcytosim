@@ -12,10 +12,11 @@
 #include "field.h"
 #include "fake.h"
 
-#include "opengl.h"
 #include "gle.h"
 #include "gle_color.h"
 #include "gle_color_list.h"
+#include "gle_flute.h"
+
 #include "glut.h"
 #include "glapp.h"
 
@@ -23,7 +24,6 @@
 #include "fiber_disp.h"
 #include "line_disp.h"
 #include "display_color.h"
-#include "gle_flute.h"
 
 extern Modulo const* modulo;
 

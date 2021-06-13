@@ -241,7 +241,7 @@ void OffScreen::closeContext()
  Set up a Frame Buffer object with two Render buffers attached,
  for color and depth data.
  */
-GLuint OffScreen::createBuffer(const int width, const int height, int multisample)
+int OffScreen::createBuffer(const int width, const int height, int multisample)
 {
     GLint s = 0;
     glGetIntegerv(GL_MAX_SAMPLES, &s);

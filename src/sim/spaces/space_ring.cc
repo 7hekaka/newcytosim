@@ -173,7 +173,7 @@ void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
+
 #include "gle.h"
 
 void SpaceRing::draw3D() const
