@@ -42,11 +42,17 @@ namespace gle
     void release();
     
     /// initialize the Vertex Buffer Objects
-    void setTubeBuffers();
+    flute6* setTubeBuffers(flute6*, flute6* const);
 
     /// initialize the Vertex Buffer Objects
-    void setSphereBuffers();
-   
+    void setIcosBuffers(float*&, float* const, unsigned*&, unsigned* const);
+    
+    /// initialize more buffer objects
+    flute6* setCubeBuffers(flute6*, flute6* const);
+
+    /// initialize more buffer objects
+    flute3* setBlobBuffers(flute3*, flute3* const);
+
     /// initialize more buffer objects
     void setBuffers();
 

@@ -325,7 +325,7 @@ void SpaceDice::draw3D() const
     const float Z(half_[2] - edge_);
     
     Tesselator mesh;
-    mesh.initDice(X, Y, Z, edge_, gle::finesse, 1);
+    mesh.buildDice(X, Y, Z, edge_, gle::finesse, 1, 1);
     
     size_t cnt = mesh.num_vertices();
 #if 0

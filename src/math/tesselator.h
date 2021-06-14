@@ -16,6 +16,12 @@
  */
 class Tesselator
 {
+    /// Disabled copy constructor
+    Tesselator(Tesselator const&);
+    
+    /// disabled assignment operator
+    Tesselator& operator =(const Tesselator&);
+
 public:
     /// floating type used for calculations
     typedef float FLOAT;
@@ -34,8 +40,6 @@ public:
         
         Corner()
         { inx_=0; pos_[0]=0; pos_[1]=0; pos_[2]=0; }
-        
-        ~Corner() {}
         
         void init(unsigned n, FLOAT x, FLOAT y, FLOAT z)
         { inx_=n; pos_[0]=x; pos_[1]=y; pos_[2]=z; }
@@ -65,8 +69,6 @@ public:
         Vertex() { index_[0]=-1; index_[1]=-1; index_[2]=-1; }
         
         //Vertex(Corner *, unsigned, Corner *, unsigned, Corner *, unsigned) { set(); }
-        
-        ~Vertex() {}
         
         void set(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
         
@@ -122,7 +124,7 @@ private:
     unsigned addVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
     unsigned makeVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
     
-    void setCorners(unsigned, FLOAT vex[][3], unsigned div);
+    void setCorners(FLOAT vex[][3], unsigned div);
     void refineTriangles(unsigned, unsigned fac[][3], unsigned div);
     
     void addFace(unsigned, unsigned, unsigned);
@@ -132,33 +134,28 @@ private:
     void refineQuad(unsigned*, unsigned quad[4], unsigned div);
     void refineStrip(unsigned cnt, unsigned inx[], unsigned div);
     
-    void build();
-    void allocate(unsigned nv, unsigned ne, unsigned nf, unsigned div);
-    
+    void allocate();
+    void destroy();
+    void init(unsigned nv, unsigned ne, unsigned nf, unsigned div);
+
     void interpolate(Vertex const&, float vec[3], int half) const;
     void interpolate(Vertex const&, double vec[3], int half) const;
     
 public:
-    
-    void initTetrahedron(unsigned div);
-    void initOctahedron(unsigned div);
-    void initIcosahedron(unsigned div);
-    void initIcosahedronRotated(unsigned div);
-    void initHemisphere(unsigned div);
-    void initDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid);
-    
-    /// build as polyhedra refined by order `div`
-    Tesselator(Polyhedra K, unsigned div, int make = 0) { build(K, div, make); }
-    
-    /// build as polyhedra refined by order `div`
-    void build(Polyhedra, unsigned div, int make = 0);
 
     /// build as empty structure
-    Tesselator() { build(); }
+    Tesselator();
     
     /// destructor
-    ~Tesselator();
+    ~Tesselator() { destroy(); }
     
+    void buildTetrahedron(unsigned div, bool make = 1);
+    void buildOctahedron(unsigned div, bool make = 1);
+    void buildIcosahedron(unsigned div, bool make = 1);
+    void buildIcosahedronRotated(unsigned div, bool make = 1);
+    void buildHemisphere(unsigned div, bool make = 1);
+    void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, bool make);
+
     /// set array of indices that define the edges
     void setEdges();
     void setVertices();
@@ -174,25 +171,32 @@ public:
     
     
     /// number of derived vertices
+    unsigned max_vertices() const { return max_vertices_; }
+       
+    /// number of faces (each face is a triangle of 3 vertices)
+    unsigned int max_faces() const { return max_faces_; }
+
+    
+    /// number of derived vertices
     unsigned num_vertices() const { return num_vertices_; }
     
     /// return pointer to array of coordinates of vertices
-    const float* vertex_data()      const { return vex_; }
+    const float* vertex_data() const { return vex_; }
     
     /// address of coordinates for vertex `v` ( `v < num_vertices()` )
     const float* vertex_data(int v) const { return vex_ + 3 * v; }
     
     /// number of points in the edges = 2 * nb-of-edges
-    unsigned int num_edges()        const { return num_edges_; }
+    unsigned int num_edges() const { return num_edges_; }
     
     /// array of indices to the vertices in each edge (2 per edge)
-    unsigned int* edge_data()      const { return edges_; }
+    unsigned int* edge_data() const { return edges_; }
     
     /// number of faces (each face is a triangle of 3 vertices)
-    unsigned int num_faces()        const { return num_faces_; }
+    unsigned int num_faces() const { return num_faces_; }
     
     /// array of indices to the vertices in each face (3 vertices per face)
-    unsigned int* face_data()      const { return faces_; }
+    unsigned int* face_data() const { return faces_; }
     
     /// export ascii PLY format
     void exportPLY(FILE *) const;
