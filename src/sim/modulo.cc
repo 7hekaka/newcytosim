@@ -4,8 +4,8 @@
 #include "dim.h"
 #include "exceptions.h"
 
-constexpr int PERIODIC_XYZ = ( 1 << DIM ) - 1;
-constexpr int PERIODIC_XY  = PERIODIC_XYZ & 3;
+constexpr int PERIODIC_XYZ = 7;
+constexpr int PERIODIC_XY  = 3;
 constexpr int PERIODIC_X   = 1;
 
 
@@ -33,37 +33,36 @@ Vector Modulo::period(size_t d) const
 
 void Modulo::fold(Vector& vec) const
 {
+#if ( DIM > 2 )
     if ( mMode == PERIODIC_XYZ )
     {
         vec.XX = fold_real(vec.XX, period_[0]);
-#if ( DIM > 1 )
         vec.YY = fold_real(vec.YY, period_[1]);
-#endif
-#if ( DIM > 2 )
         vec.ZZ = fold_real(vec.ZZ, period_[2]);
-#endif
+        return;
     }
-    else if ( mMode == PERIODIC_XY )
+#endif
+#if ( DIM > 1 )
+    if ( mMode == PERIODIC_XY )
     {
         vec.XX = fold_real(vec.XX, period_[0]);
-#if ( DIM > 1 )
         vec.YY = fold_real(vec.YY, period_[1]);
-#endif
+        return;
     }
-    else if ( mMode == PERIODIC_X )
+#endif
+    if ( mMode == PERIODIC_X )
     {
         vec.XX = fold_real(vec.XX, period_[0]);
+        return;
     }
-    else
-    {
-        if ( mMode & 1 ) vec.XX = fold_real(vec.XX, period_[0]);
+
+    if ( mMode & 1 ) vec.XX = fold_real(vec.XX, period_[0]);
 #if ( DIM > 1 )
-        if ( mMode & 2 ) vec.YY = fold_real(vec.YY, period_[1]);
+    if ( mMode & 2 ) vec.YY = fold_real(vec.YY, period_[1]);
 #endif
 #if ( DIM > 2 )
-        if ( mMode & 4 ) vec.ZZ = fold_real(vec.ZZ, period_[2]);
+    if ( mMode & 4 ) vec.ZZ = fold_real(vec.ZZ, period_[2]);
 #endif
-    }
 }
 
 

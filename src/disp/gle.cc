@@ -889,20 +889,6 @@ namespace gle
         return res;
     }
 
-    void loadBuffer(GLuint buf)
-    {
-        assert_true(glIsBuffer(buf));
-        glBindBuffer(GL_ARRAY_BUFFER, buf);
-        glVertexPointer(3, GL_FLOAT, 0, nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
-    }
-    void unloadBuffer()
-    {
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
 #if 0
     void pinTest()
     {
