@@ -290,7 +290,7 @@ void ObjectPool::bubblesort(int (*comp)(const Object*, const Object*))
 {
     Object * ii = front();
     
-    if ( ii == nullptr )
+    if ( !ii )
         return;
     
     ii = ii->nextO;
@@ -577,7 +577,7 @@ int ObjectPool::bad() const
     while ( p )
     {
         q = p->nextO;
-        if ( q == nullptr )
+        if ( !q )
         {
             if ( p != backO )
                 return 2;

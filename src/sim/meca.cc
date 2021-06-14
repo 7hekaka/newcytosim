@@ -2341,7 +2341,7 @@ static void dumpVector(FILE * file, size_t dim, real* vec, bool nat)
     static float * low = nullptr;
     static size_t alc = 0;
     
-    if ( file == nullptr )
+    if ( !file )
     {
         delete[] low;
         low = nullptr;

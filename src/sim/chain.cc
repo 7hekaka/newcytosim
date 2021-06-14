@@ -965,7 +965,7 @@ void Chain::getPoints(real const* ptr)
 
     thread_local static std::unique_ptr<real, decltype(delete_real)> uptr(nullptr, delete_real);
     
-    if ( alc < allocated() || uptr.get() == nullptr )
+    if ( alc < allocated() || !uptr.get() )
     {
         alc = allocated();
         free_real(uptr.release());

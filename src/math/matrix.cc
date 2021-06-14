@@ -9,7 +9,7 @@
 real Matrix::value(const size_t x, const size_t y) const
 {
     real* v = addr( x, y );
-    if ( v == nullptr )
+    if ( !v )
         return 0;
     else
         return *v;

@@ -260,7 +260,7 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
         disp = static_cast<FiberDisp*>(alldisp.find("fiber:display", fp->name()));
 
     // create new property with default values:
-    if ( disp == nullptr )
+    if ( !disp )
     {
         disp = new FiberDisp(fp->name());
         alldisp.push_back(disp);

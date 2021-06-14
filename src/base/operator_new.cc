@@ -30,7 +30,7 @@ void* operator new(std::size_t size)
     // system's default (unaligned) memory
     ptr = std::malloc(size);
 #endif
-    if ( ptr == nullptr )
+    if ( !ptr )
         throw std::bad_alloc();
     //std::printf("Cytosim:new(%5zu) %p\n", size, ptr);
     return ptr;

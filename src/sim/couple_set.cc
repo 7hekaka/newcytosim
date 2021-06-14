@@ -759,7 +759,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
     for ( CoupleReserve & reserve : uniReserves )
     {
         CoupleProp const * p = reserve.first;
-        if ( p == nullptr )
+        if ( !p )
             continue;
 
         CoupleList& can = reserve.second;

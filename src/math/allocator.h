@@ -68,7 +68,7 @@ namespace LinearSolvers
         /// return the memory allocated for i-th vector
         real * bind(size_t i)
         {
-            if ( mem_ == nullptr )
+            if ( !mem_ )
             {
                 fprintf(stderr, "Error: Allocator::allocate() not called\n");
                 return nullptr;

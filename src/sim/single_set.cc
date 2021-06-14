@@ -584,7 +584,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
     for ( SingleReserve & reserve : uniReserves )
     {
         SingleProp const* p = reserve.first;
-        if ( p == nullptr )
+        if ( !p )
             continue;
         
         const real vol = p->spaceVolume();
