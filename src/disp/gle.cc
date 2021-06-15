@@ -197,8 +197,8 @@ namespace gle
      */
     void stretchAlignZ(Vector2 const& A, Vector2 const& B, float R)
     {
-        float X = float(B.XX-A.XX);
-        float Y = float(B.YY-A.YY);
+        float X(B.XX-A.XX);
+        float Y(B.YY-A.YY);
         float r = R * invsqrt(X*X+Y*Y);
         //warning! this matrix appears here transposed
         float mat[16] = {
@@ -215,9 +215,9 @@ namespace gle
      */
     void stretchAlignZ(Vector3 const& A, Vector3 const& B, float R)
     {
-        float X = float(B.XX-A.XX);
-        float Y = float(B.YY-A.YY);
-        float Z = float(B.ZZ-A.ZZ);
+        float X(B.XX-A.XX);
+        float Y(B.YY-A.YY);
+        float Z(B.ZZ-A.ZZ);
         float N = R / std::sqrt(X*X+Y*Y+Z*Z);
         float vec[3] = { N*X, N*Y, N*Z };
         float mat[16] = {
@@ -288,8 +288,8 @@ namespace gle
     // rotate to align Z with 'D' and translate to center 'P'
     void transAlignZ(Vector2 const& P, float R, Vector2 const& D)
     {
-        float X = float(D.XX);
-        float Y = float(D.YY);
+        float X(D.XX);
+        float Y(D.YY);
         float n = R * invsqrt(X*X+Y*Y);
         X *= n;
         Y *= n;
@@ -304,9 +304,9 @@ namespace gle
     // rotate to align Z with 'D' and translate to center 'P', scale uniformly by `R`
     void transAlignZ(Vector3 const& P, float R, Vector3 const& D)
     {
-        float X = float(D.XX);
-        float Y = float(D.YY);
-        float Z = float(D.ZZ);
+        float X(D.XX);
+        float Y(D.YY);
+        float Z(D.ZZ);
         float N = R / std::sqrt(X*X+Y*Y+Z*Z);
         float vec[3] = { N*X, N*Y, N*Z };
         float mat[16] = {
@@ -334,8 +334,8 @@ namespace gle
     // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
     void stretchAlignZ1(Vector2 const& P, float R, Vector2 const& D, float S)
     {
-        float X = float(D.XX);
-        float Y = float(D.YY);
+        float X(D.XX);
+        float Y(D.YY);
         float mat[16] = {
             R*Y, -R*X,  0,  0,
             0,      0, -R,  0,
@@ -347,9 +347,9 @@ namespace gle
     // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P', scale Z axis by S
     void stretchAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
     {
-        float X = float(D.XX);
-        float Y = float(D.YY);
-        float Z = float(D.ZZ);
+        float X(D.XX);
+        float Y(D.YY);
+        float Z(D.ZZ);
         float vec[3] = { R*X, R*Y, R*Z };
         float mat[16] = {
             0, 0, 0, 0,
@@ -482,7 +482,7 @@ namespace gle
     }
 
     /// Tetrahedron is make of 4 triangles = 12 vertices
-    flute6* setTetrahedron(drawCall func, flute6* flt, float R=1.2f)
+    flute6* setTetrahedron(flute6* flt, float R=1.2f)
     {
         const float S = R / M_SQRT3;
         const float Y = 2 * S;
@@ -493,125 +493,119 @@ namespace gle
         // +R,-S, B
         //  0, Y, B
         //  0, 0, Z
-        float pts[9*4] = {
-             R,-S, B,-R,-S, B, 0, Y, B,
-             R,-S, B, 0, Y, B, 0, 0, Z,
-             0, Y, B,-R,-S, B, 0, 0, Z,
-            -R,-S, B, R,-S, B, 0, 0, Z,
-        };
-        //printNormals(4, pts);
-        float dir[9*4] = {
-            +0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
-            +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
-            -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
-            +0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333
-        };
-        assert_true( sizeof(pts) == sizeof(dir) );
-        return func(flt, 12, pts, dir);
+        flt[0] = { R,-S, B, 0.00000, 0.00000,-1.00000};
+        flt[1] = {-R,-S, B, 0.00000, 0.00000,-1.00000};
+        flt[2] = { 0, Y, B, 0.00000, 0.00000,-1.00000};
+        flt[3] = { R,-S, B, 0.81650, 0.47140, 0.33333};
+        flt[4] = { 0, Y, B, 0.81650, 0.47140, 0.33333};
+        flt[5] = { 0, 0, Z, 0.81650, 0.47140, 0.33333};
+        flt[6] = { 0, Y, B,-0.81650, 0.47140, 0.33333};
+        flt[7] = {-R,-S, B,-0.81650, 0.47140, 0.33333};
+        flt[8] = { 0, 0, Z,-0.81650, 0.47140, 0.33333};
+        flt[9] = {-R,-S, B, 0.00000,-0.94281, 0.33333};
+        flt[10] = { R,-S, B, 0.00000,-0.94281, 0.33333};
+        flt[11] = { 0, 0, Z, 0.00000,-0.94281, 0.33333};
+        return flt + 12;
     }
     
-    /// The star is made of two Tetrahedrons: 8 triangles = 24 vertices
-    flute6* setStar(drawCall func, flute6* flt, float R=1.2f)
+    /// inversed Tetrahedrons by central symmetry
+    flute6* invTetrahedron(flute6* flt, float R=1.2f)
     {
         const float S = R / M_SQRT3;
         const float Y = 2 * S;
         const float B = -M_SQRT1_2 * S;
         const float Z = -3.0 * B;
 
-        float pts[9*8] = {
-             R,-S, B,-R,-S, B, 0, Y, B,
-             R,-S, B, 0, Y, B, 0, 0, Z,
-             0, Y, B,-R,-S, B, 0, 0, Z,
-            -R,-S, B, R,-S, B, 0, 0, Z,
-            // reversed tetrahedron by central symmetry
-             R, S,-B,-R, S,-B, 0,-Y,-B,
-             0,-Y,-B,-R, S,-B, 0, 0,-Z,
-             R, S,-B, 0,-Y,-B, 0, 0,-Z,
-            -R, S,-B, R, S,-B, 0, 0,-Z,
-        };
-        
-        float dir[9*8] = {
-            +0.00000, 0.00000,-1.00000, 0.00000, 0.00000,-1.00000,+0.00000, 0.00000,-1.00000,
-            +0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333, 0.81650, 0.47140, 0.33333,
-            -0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,-0.81650, 0.47140, 0.33333,
-            +0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333, 0.00000,-0.94281, 0.33333,
-            // reversed tetrahedron by central symmetry
-            -0.00000,-0.00000, 1.00000, 0.00000, 0.00000, 1.00000, 0.00000, 0.00000, 1.00000,
-            -0.81650,-0.47140,-0.33333,-0.81650,-0.47140,-0.33333,-0.81650,-0.47140,-0.33333,
-            +0.81650,-0.47140,-0.33333, 0.81650,-0.47140,-0.33333, 0.81650,-0.47140,-0.33333,
-            -0.00000, 0.94281,-0.33333, 0.00000, 0.94281,-0.33333, 0.00000, 0.94281,-0.33333
-        };
-        assert_true( sizeof(pts) == sizeof(dir) );
-        return func(flt, 24, pts, dir);
+        // reversed tetrahedron by central symmetry
+        flt[0] = { R, S,-B, 0.00000, 0.00000, 1.00000};
+        flt[1] = {-R, S,-B, 0.00000, 0.00000, 1.00000};
+        flt[2] = { 0,-Y,-B, 0.00000, 0.00000, 1.00000};
+        flt[3] = { 0,-Y,-B,-0.81650,-0.47140,-0.33333};
+        flt[4] = {-R, S,-B,-0.81650,-0.47140,-0.33333};
+        flt[5] = { 0, 0,-Z,-0.81650,-0.47140,-0.33333};
+        flt[6] = { R, S,-B, 0.81650,-0.47140,-0.33333};
+        flt[7] = { 0,-Y,-B, 0.81650,-0.47140,-0.33333};
+        flt[8] = { 0, 0,-Z, 0.81650,-0.47140,-0.33333};
+        flt[9] = {-R, S,-B, 0.00000, 0.94281,-0.33333};
+        flt[10] = { R, S,-B, 0.00000, 0.94281,-0.33333};
+        flt[11] = { 0, 0,-Z, 0.00000, 0.94281,-0.33333};
+        return flt + 12;
     }
 
     
-    /// Cube is make of 12 triangles = 36 vertices
-    flute6* setCube(drawCall func, flute6* flt, float R)
+    /// Cube is made of 12 triangles = 36 vertices
+    flute6* setCube(flute6* flt, float R)
     {
-        float pts[9*12] = {
-            +R, R, R, R,-R,-R, R, R,-R,
-            +R,-R,-R, R, R, R, R,-R, R,
-            +R, R, R, R, R,-R,-R, R,-R,
-            +R, R, R,-R, R,-R,-R, R, R,
-            -R, R, R,-R,-R, R, R,-R, R,
-            +R, R, R,-R, R, R, R,-R, R,
-            -R,-R,-R,-R,-R, R,-R, R, R,
-            -R,-R,-R,-R, R, R,-R, R,-R,
-            +R,-R, R,-R,-R,-R, R,-R,-R,
-            +R,-R, R,-R,-R, R,-R,-R,-R,
-            +R, R,-R,-R,-R,-R,-R, R,-R,
-            +R, R,-R, R,-R,-R,-R,-R,-R
-        };
-        
-        float dir[9*12] = {
-            +1, 0, 0, 1, 0, 0, 1, 0, 0,
-            +1, 0, 0, 1, 0, 0, 1, 0, 0,
-            +0, 1, 0, 0, 1, 0, 0, 1, 0,
-            +0, 1, 0, 0, 1, 0, 0, 1, 0,
-            +0, 0, 1, 0, 0, 1, 0, 0, 1,
-            +0, 0, 1, 0, 0, 1, 0, 0, 1,
-            -1, 0, 0,-1, 0, 0,-1, 0, 0,
-            -1, 0, 0,-1, 0, 0,-1, 0, 0,
-            +0,-1, 0, 0,-1, 0, 0,-1, 0,
-            +0,-1, 0, 0,-1, 0, 0,-1, 0,
-            +0, 0,-1, 0, 0,-1, 0, 0,-1,
-            +0, 0,-1, 0, 0,-1, 0, 0,-1
-        };
-        assert_true( sizeof(pts) == sizeof(dir) );
-        return func(flt, 36, pts, dir);
+        flt[0] = { R, R, R, 1, 0, 0};
+        flt[1] = { R,-R,-R, 1, 0, 0};
+        flt[2] = { R, R,-R, 1, 0, 0};
+        flt[3] = { R,-R,-R, 1, 0, 0};
+        flt[4] = { R, R, R, 1, 0, 0};
+        flt[5] = { R,-R, R, 1, 0, 0};
+        flt[6] = { R, R, R, 0, 1, 0};
+        flt[7] = { R, R,-R, 0, 1, 0};
+        flt[8] = {-R, R,-R, 0, 1, 0};
+        flt[9] = { R, R, R, 0, 1, 0};
+        flt[10] = {-R, R,-R, 0, 1, 0};
+        flt[11] = {-R, R, R, 0, 1, 0};
+        flt[12] = {-R, R, R, 0, 0, 1};
+        flt[13] = {-R,-R, R, 0, 0, 1};
+        flt[14] = { R,-R, R, 0, 0, 1};
+        flt[15] = { R, R, R, 0, 0, 1};
+        flt[16] = {-R, R, R, 0, 0, 1};
+        flt[17] = { R,-R, R, 0, 0, 1};
+        flt[18] = {-R,-R,-R,-1, 0, 0};
+        flt[19] = {-R,-R, R,-1, 0, 0};
+        flt[20] = {-R, R, R,-1, 0, 0};
+        flt[21] = {-R,-R,-R,-1, 0, 0};
+        flt[22] = {-R, R, R,-1, 0, 0};
+        flt[23] = {-R, R,-R,-1, 0, 0};
+        flt[24] = { R,-R, R, 0,-1, 0};
+        flt[25] = {-R,-R,-R, 0,-1, 0};
+        flt[26] = { R,-R,-R, 0,-1, 0};
+        flt[27] = { R,-R, R, 0,-1, 0};
+        flt[28] = {-R,-R, R, 0,-1, 0};
+        flt[29] = {-R,-R,-R, 0,-1, 0};
+        flt[30] = { R, R,-R, 0, 0,-1};
+        flt[31] = {-R,-R,-R, 0, 0,-1};
+        flt[32] = {-R, R,-R, 0, 0,-1};
+        flt[33] = { R, R,-R, 0, 0,-1};
+        flt[34] = { R,-R,-R, 0, 0,-1};
+        flt[35] = {-R,-R,-R, 0, 0,-1};
+        return flt + 36;
     }
     
     /// Octahedron is make of 8 triangles = 24 vertices
-    flute6* setOctahedron(drawCall func, flute6* flt, float R=1.46459188756f)
+    flute6* setOctahedron(flute6* flt, float R=1.46459188756f)
     {
+        // the default size is set to match the volume of the unit sphere
         // Eight triangles, ordered counterclockwise
-        // set size to match the volume of the unit sphere
-        float pts[9*8] = {
-            +R, 0, 0, 0, 0, R, 0,-R, 0,
-            +0, 0,-R,-R, 0, 0, 0, R, 0,
-            +0, 0, R,-R, 0, 0, 0,-R, 0,
-            +0, 0,-R, 0, R, 0, R, 0, 0,
-            -R, 0, 0, 0, 0, R, 0, R, 0,
-            +0, 0,-R, R, 0, 0, 0,-R, 0,
-            +0, 0, R, R, 0, 0, 0, R, 0,
-            +0, 0,-R, 0,-R, 0,-R, 0, 0
-        };
-        
-        // normals
         const float N = 1 / M_SQRT3;
-        float dir[9*8] = {
-            +N,-N, N, N,-N, N, N,-N, N,
-            -N, N,-N,-N, N,-N,-N, N,-N,
-            -N,-N, N,-N,-N, N,-N,-N, N,
-            +N, N,-N, N, N,-N, N, N,-N,
-            -N, N, N,-N, N, N,-N, N, N,
-            +N,-N,-N, N,-N,-N, N,-N,-N,
-            +N, N, N, N, N, N, N, N, N,
-            -N,-N,-N,-N,-N,-N,-N,-N,-N
-        };
-        assert_true( sizeof(pts) == sizeof(dir) );
-        return func(flt, 24, pts, dir);
+        flt[0] = { R, 0, 0,  N,-N, N};
+        flt[1] = { 0, 0, R,  N,-N, N};
+        flt[2] = { 0,-R, 0,  N,-N, N};
+        flt[3] = { 0, 0,-R, -N, N,-N};
+        flt[4] = {-R, 0, 0, -N, N,-N};
+        flt[5] = { 0, R, 0, -N, N,-N};
+        flt[6] = { 0, 0, R, -N,-N, N};
+        flt[7] = {-R, 0, 0, -N,-N, N};
+        flt[8] = { 0,-R, 0, -N,-N, N};
+        flt[9] = { 0, 0,-R,  N, N,-N};
+        flt[10] = { 0, R, 0,  N, N,-N};
+        flt[11] = { R, 0, 0,  N, N,-N};
+        flt[12] = {-R, 0, 0, -N, N, N};
+        flt[13] = { 0, 0, R, -N, N, N};
+        flt[14] = { 0, R, 0, -N, N, N};
+        flt[15] = { 0, 0,-R,  N,-N,-N};
+        flt[16] = { R, 0, 0,  N,-N,-N};
+        flt[17] = { 0,-R, 0,  N,-N,-N};
+        flt[18] = { 0, 0, R,  N, N, N};
+        flt[19] = { R, 0, 0,  N, N, N};
+        flt[20] = { 0, R, 0,  N, N, N};
+        flt[21] = { 0, 0,-R, -N,-N,-N};
+        flt[22] = { 0,-R, 0, -N,-N,-N};
+        flt[23] = {-R, 0, 0, -N,-N,-N};
+        return flt + 24;
     }
 
     
@@ -703,63 +697,82 @@ namespace gle
 #endif
     
     /// Icosahedrong with 20 triangles = 60 vertices
-    flute6* setIcosahedron(drawCall func, flute6* flt, float R=1.0f)
+    flute6* setIcosahedron(flute6* flt, float R=1.0f)
     {
         const float T = R * 0.8506508084f;      // (1 + sqrt(5))/2
         const float O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
+        const float N = 1 / M_SQRT3; // 0.5773503
+        const float X = 0.3568221;
+        const float Y = 0.9341724;
 
-        float pts[9*20] = {
-            -O,  0, -T,   O,  0, -T,   0, -T, -O,
-            -O,  0, -T,   0,  T, -O,   O,  0, -T,
-            +O,  0, -T,   T, -O,  0,   0, -T, -O,
-            -T,  O,  0,   0,  T, -O,  -O,  0, -T,
-            -T, -O,  0,  -O,  0, -T,   0, -T, -O,
-            +T,  O,  0,   O,  0, -T,   0,  T, -O,
-            +T,  O,  0,   T, -O,  0,   O,  0, -T,
-            -T, -O,  0,  -T,  O,  0,  -O,  0, -T,
-            -T, -O,  0,   0, -T, -O,   0, -T,  O,
-            +T,  O,  0,   0,  T, -O,   0,  T,  O,
-            +0,  T,  O,   0,  T, -O,  -T,  O,  0,
-            +0, -T, -O,   T, -O,  0,   0, -T,  O,
-            +T,  O,  0,   O,  0,  T,   T, -O,  0,
-            -T, -O,  0,  -O,  0,  T,  -T,  O,  0,
-            +T,  O,  0,   0,  T,  O,   O,  0,  T,
-            -T, -O,  0,   0, -T,  O,  -O,  0,  T,
-            +T, -O,  0,   O,  0,  T,   0, -T,  O,
-            -O,  0,  T,   0,  T,  O,  -T,  O,  0,
-            +O,  0,  T,   0,  T,  O,  -O,  0,  T,
-            +O,  0,  T,  -O,  0,  T,   0, -T,  O,
-        };
-        
-        float dir[9*20] = {
-            +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724, +0.0000000,-0.3568221,-0.9341724,
-            +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724, +0.0000000,+0.3568221,-0.9341724,
-            +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503, +0.5773503,-0.5773503,-0.5773503,
-            -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503, -0.5773503,+0.5773503,-0.5773503,
-            -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503, -0.5773503,-0.5773503,-0.5773503,
-            +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503, +0.5773503,+0.5773503,-0.5773503,
-            +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221, +0.9341724,+0.0000000,-0.3568221,
-            -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221, -0.9341724,+0.0000000,-0.3568221,
-            -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000, -0.3568221,-0.9341724,+0.0000000,
-            +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000, +0.3568221,+0.9341724,+0.0000000,
-            -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000, -0.3568221,+0.9341724,+0.0000000,
-            +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000, +0.3568221,-0.9341724,+0.0000000,
-            +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221, +0.9341724,+0.0000000,+0.3568221,
-            -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221, -0.9341724,+0.0000000,+0.3568221,
-            +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503, +0.5773503,+0.5773503,+0.5773503,
-            -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503, -0.5773503,-0.5773503,+0.5773503,
-            +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503, +0.5773503,-0.5773503,+0.5773503,
-            -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503, -0.5773503,+0.5773503,+0.5773503,
-            +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724, +0.0000000,+0.3568221,+0.9341724,
-            +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724, +0.0000000,-0.3568221,+0.9341724,
-        };
-        assert_true( sizeof(pts) == sizeof(dir) );
-        return func(flt, 60, pts, dir);
+        size_t i = 0;
+        flt[i++] = {-O,  0, -T, +0,-X,-Y};
+        flt[i++] = { O,  0, -T, +0,-X,-Y};
+        flt[i++] = { 0, -T, -O, +0,-X,-Y};
+        flt[i++] = {-O,  0, -T, +0,+X,-Y};
+        flt[i++] = { 0,  T, -O, +0,+X,-Y};
+        flt[i++] = { O,  0, -T, +0,+X,-Y};
+        flt[i++] = { O,  0, -T, +N,-N,-N};
+        flt[i++] = { T, -O,  0, +N,-N,-N};
+        flt[i++] = { 0, -T, -O, +N,-N,-N};
+        flt[i++] = {-T,  O,  0, -N,+N,-N};
+        flt[i++] = { 0,  T, -O, -N,+N,-N};
+        flt[i++] = {-O,  0, -T, -N,+N,-N};
+        flt[i++] = {-T, -O,  0, -N,-N,-N};
+        flt[i++] = { O,  0, -T, -N,-N,-N};
+        flt[i++] = { 0, -T, -O, -N,-N,-N};
+        flt[i++] = { T,  O,  0, +N,+N,-N};
+        flt[i++] = { O,  0, -T, +N,+N,-N};
+        flt[i++] = { 0,  T, -O, +N,+N,-N};
+        flt[i++] = { T,  O,  0, +Y,+0,-X};
+        flt[i++] = { T, -O,  0, +Y,+0,-X};
+        flt[i++] = { O,  0, -T, +Y,+0,-X};
+        flt[i++] = {-T, -O,  0, -Y,+0,-X};
+        flt[i++] = { T,  O,  0, -Y,+0,-X};
+        flt[i++] = {-O,  0, -T, -Y,+0,-X};
+        flt[i++] = {-T, -O,  0, -X,-Y,+0};
+        flt[i++] = { 0, -T, -O, -X,-Y,+0};
+        flt[i++] = { 0, -T,  O, -X,-Y,+0};
+        flt[i++] = { T,  O,  0, +X,+Y,+0};
+        flt[i++] = { 0,  T, -O, +X,+Y,+0};
+        flt[i++] = { 0,  T,  O, +X,+Y,+0};
+        flt[i++] = { 0,  T,  O, -X,+Y,+0};
+        flt[i++] = { 0,  T, -O, -X,+Y,+0};
+        flt[i++] = {-T,  O,  0, -X,+Y,+0};
+        flt[i++] = { 0, -T, -O, +X,-Y,+0};
+        flt[i++] = { T, -O,  0, +X,-Y,+0};
+        flt[i++] = { 0, -T,  O, +X,-Y,+0};
+        flt[i++] = { T,  O,  0, +Y,+0,+X};
+        flt[i++] = { O,  0,  T, +Y,+0,+X};
+        flt[i++] = { T, -O,  0, +Y,+0,+X};
+        flt[i++] = {-T, -O,  0, -Y,+0,+X};
+        flt[i++] = { O,  0,  T, -Y,+0,+X};
+        flt[i++] = {-T,  O,  0, -Y,+0,+X};
+        flt[i++] = { T,  O,  0, +N,+N,+N};
+        flt[i++] = { 0,  T,  O, +N,+N,+N};
+        flt[i++] = { O,  0,  T, +N,+N,+N};
+        flt[i++] = {-T, -O,  0, -N,-N,+N};
+        flt[i++] = { 0, -T,  O, -N,-N,+N};
+        flt[i++] = {-O,  0,  T, -N,-N,+N};
+        flt[i++] = { T, -O,  0, +N,-N,+N};
+        flt[i++] = { O,  0,  T, +N,-N,+N};
+        flt[i++] = { 0, -T,  O, +N,-N,+N};
+        flt[i++] = {-O,  0,  T, -N,+N,+N};
+        flt[i++] = { 0,  T,  O, -N,+N,+N};
+        flt[i++] = {-T,  O,  0, -N,+N,+N};
+        flt[i++] = { O,  0,  T, +0,+X,+Y};
+        flt[i++] = { 0,  T,  O, +0,+X,+Y};
+        flt[i++] = {-O,  0,  T, +0,+X,+Y};
+        flt[i++] = { O,  0,  T, +0,-X,+Y};
+        flt[i++] = { O,  0,  T, +0,-X,+Y};
+        flt[i++] = { 0, -T,  O, +0,-X,+Y};
+        assert_true( i == 60 );
+        return flt + i;
     }
     
     /// Three fins similar to the tail of a V2 rocket
-    flute6* setArrowTail(drawCall func, flute6* flt, float R=0.1f,
-                         float B=-0.5f, float H=-1.5f, float L=2.0f)
+    flute6* setArrowTail(flute6* flt, float R=0.1f, float B=-0.5f,
+                         float H=-1.5f, float L=2.0f)
     {
         const float T = B + L;
         const float U = H + L;
@@ -767,44 +780,54 @@ namespace gle
         const float S = 0.5f * M_SQRT3;
         const float cR = R * C;
         const float sR = R * S;
-
-        float pts[9*15] = {
-            cR,-sR, B,  1,  0, H,  1,  0, U,
-            cR,-sR, B,  1,  0, U,  0,  0, T,
-            cR, sR, B,  0,  0, T,  1,  0, U,
-            cR, sR, B,  1,  0, U,  1,  0, H,
-            cR,-sR, B,  0,  0, T, -C, -S, U,
-            cR,-sR, B, -C, -S, U, -C, -S, H,
-            -R,  0, B, -C, -S, H, -C, -S, U,
-            -R,  0, B, -C, -S, U,  0,  0, T,
-            cR, sR, B, -C,  S, H, -C,  S, U,
-            cR, sR, B, -C,  S, U,  0,  0, T,
-            -R,  0, B,  0,  0, T, -C,  S, U,
-            -R,  0, B, -C,  S, U, -C,  S, H,
-            cR, sR, B, -R,  0, B, -C,  S, H,
-            -R,  0, B, cR,-sR, B, -C, -S, H,
-            cR,-sR, B, cR, sR, B,  1,  0, H
-        };
-        
-        float dir[9*15] = {
-            0, -1, 0,  0, -1, 0,  0, -1, 0,
-            0, -1, 0,  0, -1, 0,  0, -1, 0,
-            0, +1, 0,  0, +1, 0,  0, +1, 0,
-            0, +1, 0,  0, +1, 0,  0, +1, 0,
-            S, -C, 0,  S, -C, 0,  S, -C, 0,
-            S, -C, 0,  S, -C, 0,  S, -C, 0,
-           -S,  C, 0, -S,  C, 0, -S,  C, 0,
-           -S,  C, 0, -S,  C, 0, -S,  C, 0,
-            S,  C, 0,  S,  C, 0,  S,  C, 0,
-            S,  C, 0,  S,  C, 0,  S,  C, 0,
-           -S, -C, 0, -S, -C, 0, -S, -C, 0,
-           -S, -C, 0, -S, -C, 0, -S, -C, 0,
-            C, -S,-1,  C, -S,-1,  C, -S,-1,
-            C,  S,-1,  C,  S,-1,  C,  S,-1,
-            -1, 0,-1, -1,  0,-1, -1,  0,-1
-        };
-        assert_true( sizeof(pts) == sizeof(dir) );
-        return func(flt, 45, pts, dir);
+        size_t i = 0;
+        flt[i++] = { cR,-sR, B,  0, -1, 0};
+        flt[i++] = {  1,  0, H,  0, -1, 0};
+        flt[i++] = {  1,  0, U,  0, -1, 0};
+        flt[i++] = { cR,-sR, B,  0, -1, 0};
+        flt[i++] = {  1,  0, U,  0, -1, 0};
+        flt[i++] = {  0,  0, T,  0, -1, 0};
+        flt[i++] = { cR, sR, B,  0, +1, 0};
+        flt[i++] = {  0,  0, T,  0, +1, 0};
+        flt[i++] = {  1,  0, U,  0, +1, 0};
+        flt[i++] = { cR, sR, B,  0, +1, 0};
+        flt[i++] = {  1,  0, U,  0, +1, 0};
+        flt[i++] = {  1,  0, H,  0, +1, 0};
+        flt[i++] = { cR,-sR, B,  S, -C, 0};
+        flt[i++] = {  0,  0, T,  S, -C, 0};
+        flt[i++] = { -C, -S, U,  S, -C, 0};
+        flt[i++] = { cR,-sR, B,  S, -C, 0};
+        flt[i++] = { -C, -S, U,  S, -C, 0};
+        flt[i++] = { -C, -S, H,  S, -C, 0};
+        flt[i++] = { -R,  0, B, -S,  C, 0};
+        flt[i++] = { -C, -S, H, -S,  C, 0};
+        flt[i++] = { -C, -S, U, -S,  C, 0};
+        flt[i++] = { -R,  0, B, -S,  C, 0};
+        flt[i++] = { -C, -S, U, -S,  C, 0};
+        flt[i++] = {  0,  0, T, -S,  C, 0};
+        flt[i++] = { cR, sR, B,  S,  C, 0};
+        flt[i++] = { -C,  S, H,  S,  C, 0};
+        flt[i++] = { -C,  S, U,  S,  C, 0};
+        flt[i++] = { cR, sR, B,  S,  C, 0};
+        flt[i++] = { -C,  S, U,  S,  C, 0};
+        flt[i++] = {  0,  0, T,  S,  C, 0};
+        flt[i++] = { -R,  0, B, -S, -C, 0};
+        flt[i++] = {  0,  0, T, -S, -C, 0};
+        flt[i++] = { -C,  S, U, -S, -C, 0};
+        flt[i++] = { -R,  0, B, -S, -C, 0};
+        flt[i++] = { -C,  S, U, -S, -C, 0};
+        flt[i++] = { -C,  S, H, -S, -C, 0};
+        flt[i++] = { cR, sR, B,  C, -S,-1};
+        flt[i++] = { -R,  0, B,  C, -S,-1};
+        flt[i++] = { -C,  S, H,  C, -S,-1};
+        flt[i++] = { -R,  0, B,  C,  S,-1};
+        flt[i++] = { cR,-sR, B,  C,  S,-1};
+        flt[i++] = { -C, -S, H,  C,  S,-1};
+        flt[i++] = { cR,-sR, B, -1,  0,-1};
+        flt[i++] = { cR, sR, B, -1,  0,-1};
+        flt[i++] = {  1,  0, H, -1,  0,-1};
+        assert_true( i == 45 );
+        return flt + i;
     }
     
     //-----------------------------------------------------------------------
@@ -937,28 +960,19 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    /// draw
-    flute6* drawVNBuffer(flute6* ptr, size_t cnt, float const* pts, float const* dir)
+    /// draw triangles with interleaved Vertex + Normal data
+    static void drawVNTriangles(flute6* ptr, size_t cnt)
     {
         glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glNormalPointer(GL_FLOAT, 0, dir);
+        glVertexPointer(3, GL_FLOAT, 6*sizeof(float), ptr);
+        glNormalPointer(GL_FLOAT, 6*sizeof(float), ptr);
         glDrawArrays(GL_TRIANGLES, 0, cnt);
         glDisableClientState(GL_NORMAL_ARRAY);
-        return ptr;
-    }
-
-    // intertwine vertex and normal data:
-    flute6* knitData(flute6* dst, size_t cnt, float const* pts, float const* dir)
-    {
-        for ( size_t i = 0; i < cnt; ++i )
-            dst[i] = { pts[3*i], pts[1+3*i], pts[2+3*i], dir[3*i], dir[1+3*i], dir[2+3*i] };
-        return dst + cnt;
     }
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12 + 24 + 60 + 45 + 36 + 24 + 3 * 14 );
+        return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 );
     }
     
     flute6* setCubeBuffers(flute6* ptr, flute6* const ori)
@@ -967,12 +981,12 @@ namespace gle
          check pointer alignment, which is required to get indices
          by substracting pointer values below */
         assert_true( 0 == ( ptr - ori ) % 6 );
-        start_[24+0] = ptr-ori; ptr = setTetrahedron(knitData, ptr);
-        start_[24+1] = ptr-ori; ptr = setOctahedron(knitData, ptr);
-        start_[24+2] = ptr-ori; ptr = setIcosahedron(knitData, ptr);
-        start_[24+3] = ptr-ori; ptr = setArrowTail(knitData, ptr);
-        start_[24+4] = ptr-ori; ptr = setCube(knitData, ptr, 0.5773502692f);
-        start_[24+5] = ptr-ori; ptr = setStar(knitData, ptr);
+        start_[24+0] = ptr-ori; ptr = setTetrahedron(ptr);
+        start_[24+1] = ptr-ori; ptr = invTetrahedron(ptr);
+        start_[24+2] = ptr-ori; ptr = setOctahedron(ptr);
+        start_[24+3] = ptr-ori; ptr = setIcosahedron(ptr);
+        start_[24+4] = ptr-ori; ptr = setArrowTail(ptr);
+        start_[24+5] = ptr-ori; ptr = setCube(ptr, 0.5773502692f);
         start_[24+6] = ptr-ori; ptr = setHexTube(ptr, 0, 1, 1.0f);
         start_[24+7] = ptr-ori; ptr = setHexTube(ptr, 0, 1, 0.5f);
         start_[24+8] = ptr-ori; ptr = setHexTube(ptr, 0, 256.f, 0.5f);
@@ -996,7 +1010,7 @@ namespace gle
         return ptr;
     }
 
-    inline void drawVNBuffer(GLenum mode, GLint start, size_t cnt)
+    void drawVNBuffer(GLenum mode, GLint start, size_t cnt)
     {
         glEnableClientState(GL_NORMAL_ARRAY);
         glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
@@ -1034,13 +1048,13 @@ namespace gle
     }
 
     void tetrahedron() { drawVNTriangles(start_[24+0], 12); }
-    void octahedron()  { drawVNTriangles(start_[24+1], 24); }
-    void icosahedron() { drawVNTriangles(start_[24+2], 60); }
-    void ICOSAHEDRON() { setIcosahedron(drawVNBuffer, nullptr); }
+    void octahedron()  { drawVNTriangles(start_[24+2], 24); }
+    void icosahedron() { drawVNTriangles(start_[24+3], 60); }
+    void ICOSAHEDRON() { flute6 tmp[60]; setIcosahedron(tmp); drawVNTriangles(tmp, 60); }
     
-    void arrowTail() { drawVNTriangles(start_[24+3], 45); }
-    void cube()      { drawVNTriangles(start_[24+4], 36); }
-    void star()      { drawVNTriangles(start_[24+5], 24); }
+    void arrowTail() { drawVNTriangles(start_[24+4], 45); }
+    void cube()      { drawVNTriangles(start_[24+5], 36); }
+    void star()      { drawVNTriangles(start_[24+0], 24); }
     
     void hexTube()      { drawVNStrip(start_[24+6], 14); }
     void thinTube()     { drawVNStrip(start_[24+7], 14); }
@@ -1278,6 +1292,24 @@ namespace gle
         glDisableClientState(GL_NORMAL_ARRAY);
     }
     
+    void dualPassIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
+    {
+        assert_true(glIsEnabled(GL_CULL_FACE));
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
+        glVertexPointer(3, GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
+        // the normal in each vertex is equal to the vertex!
+        glNormalPointer(GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+        glCullFace(GL_FRONT);
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(inx*sizeof(GLuint)));
+        glCullFace(GL_BACK);
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(inx*sizeof(GLuint)));
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+
     void sphere1()     { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void sphere2()     { drawIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
     void sphere4()     { drawIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
@@ -1286,39 +1318,10 @@ namespace gle
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
     
-    void dualPassSphere1()
-    {
-        assert_true(glIsEnabled(GL_CULL_FACE));
-        glCullFace(GL_FRONT);
-        sphere1();
-        glCullFace(GL_BACK);
-        sphere1();
-    }
-    void dualPassSphere2()
-    {
-        assert_true(glIsEnabled(GL_CULL_FACE));
-        glCullFace(GL_FRONT);
-        sphere2();
-        glCullFace(GL_BACK);
-        sphere2();
-    }
-    void dualPassSphere4()
-    {
-        assert_true(glIsEnabled(GL_CULL_FACE));
-        glCullFace(GL_FRONT);
-        sphere4();
-        glCullFace(GL_BACK);
-        sphere4();
-    }
-    void dualPassSphere8()
-    {
-        assert_true(glIsEnabled(GL_CULL_FACE));
-        glCullFace(GL_FRONT);
-        sphere8();
-        glCullFace(GL_BACK);
-        sphere8();
-    }
-    
+    void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
+    void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
+    void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
+    void dualPassSphere8() { dualPassIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
     
     void setBuffers()
     {
