@@ -596,23 +596,33 @@ void glApp::specialKeyFunc(void (*func)(int, int, int))
 //------------------------------------------------------------------------------
 #pragma mark -
 
+/// shortcut
+static int createMenu(void (*func)(int)) { return glutCreateMenu(func); }
+
+/// shortcut
+static void addMenuEntry(char const* str, int val) { glutAddMenuEntry(str, val); }
+
+/// shortcut
+static void addSubMenu(char const* str, int val) { glutAddSubMenu(str, val); }
+
+
 int buildFogMenu()
 {
     static int menu = 0;
     if ( menu == 0 )
     {
-        menu = glutCreateMenu(glApp::processMenuEvent);
-        glutAddMenuEntry("Disable",          100);
-        glutAddMenuEntry("Linear ",          101);
-        glutAddMenuEntry("Exponential 1/16", 102);
-        glutAddMenuEntry("Exponential 1/8",  103);
-        glutAddMenuEntry("Exponential 1/4",  104);
-        glutAddMenuEntry("Exponential 1/2",  105);
-        glutAddMenuEntry("Exponential 1",    106);
-        glutAddMenuEntry("Exponential 2",    107);
-        glutAddMenuEntry("Exponential 4",    108);
-        glutAddMenuEntry("Exponential 8",    109);
-        glutAddMenuEntry("Exponential 16",   110);
+        menu = createMenu(glApp::processMenuEvent);
+        addMenuEntry("Disable",          100);
+        addMenuEntry("Linear ",          101);
+        addMenuEntry("Exponential 1/16", 102);
+        addMenuEntry("Exponential 1/8",  103);
+        addMenuEntry("Exponential 1/4",  104);
+        addMenuEntry("Exponential 1/2",  105);
+        addMenuEntry("Exponential 1",    106);
+        addMenuEntry("Exponential 2",    107);
+        addMenuEntry("Exponential 4",    108);
+        addMenuEntry("Exponential 8",    109);
+        addMenuEntry("Exponential 16",   110);
     }
     return menu;
 }
@@ -622,29 +632,29 @@ int buildWindowSizeMenu()
     static int menu = 0;
     if ( menu == 0 )
     {
-        menu = glutCreateMenu(glApp::processMenuEvent);
-        glutAddMenuEntry("256x256",   200);
-        glutAddMenuEntry("384x384",   201);
-        glutAddMenuEntry("512x256",   202);
-        glutAddMenuEntry("512x384",   203);
-        glutAddMenuEntry("512x512",   204);
-        glutAddMenuEntry("768x256",   205);
-        glutAddMenuEntry("768x512",   206);
-        glutAddMenuEntry("768x768",   207);
-        glutAddMenuEntry("1024x128",  208);
-        glutAddMenuEntry("1024x256",  209);
-        glutAddMenuEntry("1024x512",  210);
-        glutAddMenuEntry("1024x768",  211);
-        glutAddMenuEntry("1024x1024", 212);
-        glutAddMenuEntry("1280x640",  213);
-        glutAddMenuEntry("1280x1280", 214);
-        glutAddMenuEntry("-", 0);
-        glutAddMenuEntry("426x240 (240p)",    220);
-        glutAddMenuEntry("640x360 (360p)",    221);
-        glutAddMenuEntry("854x480 (480p)",    222);
-        glutAddMenuEntry("1280x720 (720p)",   223);
-        glutAddMenuEntry("1920x1080 (1080p)", 224);
-        glutAddMenuEntry("2560x1440 (1440p)", 225);
+        menu = createMenu(glApp::processMenuEvent);
+        addMenuEntry("256x256",   200);
+        addMenuEntry("384x384",   201);
+        addMenuEntry("512x256",   202);
+        addMenuEntry("512x384",   203);
+        addMenuEntry("512x512",   204);
+        addMenuEntry("768x256",   205);
+        addMenuEntry("768x512",   206);
+        addMenuEntry("768x768",   207);
+        addMenuEntry("1024x128",  208);
+        addMenuEntry("1024x256",  209);
+        addMenuEntry("1024x512",  210);
+        addMenuEntry("1024x768",  211);
+        addMenuEntry("1024x1024", 212);
+        addMenuEntry("1280x640",  213);
+        addMenuEntry("1280x1280", 214);
+        addMenuEntry("-", 0);
+        addMenuEntry("426x240 (240p)",    220);
+        addMenuEntry("640x360 (360p)",    221);
+        addMenuEntry("854x480 (480p)",    222);
+        addMenuEntry("1280x720 (720p)",   223);
+        addMenuEntry("1920x1080 (1080p)", 224);
+        addMenuEntry("2560x1440 (1440p)", 225);
     }
     return menu;
 }
@@ -655,24 +665,24 @@ int buildClipMenu()
     static int menu = 0;
     if ( menu == 0 )
     {
-        menu = glutCreateMenu(glApp::processMenuEvent);
-        glutAddMenuEntry("Disable",    300);
+        menu = createMenu(glApp::processMenuEvent);
+        addMenuEntry("Disable",    300);
         
-        glutAddMenuEntry(" X > 0",     301);
-        glutAddMenuEntry(" X < 0",     302);
-        glutAddMenuEntry("-1 < X < 1", 303);
+        addMenuEntry(" X > 0",     301);
+        addMenuEntry(" X < 0",     302);
+        addMenuEntry("-1 < X < 1", 303);
         
-        glutAddMenuEntry(" Y > 0",     311);
-        glutAddMenuEntry(" Y < 0",     312);
-        glutAddMenuEntry("-1 < Y < 1", 313);
+        addMenuEntry(" Y > 0",     311);
+        addMenuEntry(" Y < 0",     312);
+        addMenuEntry("-1 < Y < 1", 313);
         
-        glutAddMenuEntry(" 0 < Z",     321);
-        glutAddMenuEntry(" Z < 0",     322);
-        glutAddMenuEntry(" 0.25 < Z",  323);
-        glutAddMenuEntry(" Z < 0.25",  324);
-        glutAddMenuEntry("-1 < Z < 1", 325);
-        glutAddMenuEntry("-0.5 < Z < 0.5", 326);
-        glutAddMenuEntry("-0.25 < Z < 0.25", 327);
+        addMenuEntry(" 0 < Z",     321);
+        addMenuEntry(" Z < 0",     322);
+        addMenuEntry(" 0.25 < Z",  323);
+        addMenuEntry(" Z < 0.25",  324);
+        addMenuEntry("-1 < Z < 1", 325);
+        addMenuEntry("-0.5 < Z < 0.5", 326);
+        addMenuEntry("-0.25 < Z < 0.25", 327);
     }
     return menu;
 }
@@ -690,20 +700,20 @@ int glApp::buildMenu()
         menu1 = buildFogMenu();
         menu2 = buildWindowSizeMenu();
         menu3 = buildClipMenu();
-        menu  = glutCreateMenu(processMenuEvent);
+        menu  = createMenu(processMenuEvent);
     }
     
-    glutAddSubMenu("Fog",            menu1);
-    glutAddSubMenu("Window Size",    menu2);
-    glutAddSubMenu("Slice",          menu3);
-    glutAddMenuEntry("Reset View",         1);
-    glutAddMenuEntry("Match ROI to View",  2);
-    glutAddMenuEntry("Match View to ROI",  3);
-    glutAddMenuEntry("Show/hide Scalebar", 4);
-    glutAddMenuEntry("Show/hide XYZ-axes", 5);
-    glutAddMenuEntry("Toggle fullscreen mode", 6);
-    glutAddMenuEntry(mDIM==2?"Use 3D Controls":"Use 2D Controls", 7);
-    glutAddMenuEntry("Quit",         20);
+    addSubMenu("Fog",            menu1);
+    addSubMenu("Window Size",    menu2);
+    addSubMenu("Slice",          menu3);
+    addMenuEntry("Reset View",         1);
+    addMenuEntry("Match ROI to View",  2);
+    addMenuEntry("Match View to ROI",  3);
+    addMenuEntry("Show/hide Scalebar", 4);
+    addMenuEntry("Show/hide XYZ-axes", 5);
+    addMenuEntry("Toggle fullscreen mode", 6);
+    addMenuEntry(mDIM==2?"Use 3D Controls":"Use 2D Controls", 7);
+    addMenuEntry("Quit",         20);
     
     return menu;
 }
@@ -726,55 +736,58 @@ void glApp::attachMenu(int b)
     glutAttachMenu(b);
 }
 
+/// shortcut
+static void reshapeWindow(int w, int h) { glutReshapeWindow(w, h); }
+
 void glApp::processMenuEvent(int item)
 {
     View & view = glApp::currentView();
     switch( item )
     {
-        case 0:   return;
-        case 1:   view.reset();                      break;
-        case 2:   view.adjustROI(nearZ);             break;
-        case 3:   view.matchROI();                   break;
-        case 4:   view.scalebar = ! view.scalebar;   break;
-        case 5:   view.axes = (view.axes?0:mDIM );   break;
-        case 6:   toggleFullScreen();                break;
-        case 7:   setDimensionality(mDIM==2?3:2);    break;
+        case 0: return;
+        case 1: view.reset(); break;
+        case 2: view.adjustROI(nearZ); break;
+        case 3: view.matchROI(); break;
+        case 4: view.scalebar = ! view.scalebar; break;
+        case 5: view.axes = (view.axes?0:mDIM ); break;
+        case 6: toggleFullScreen();              break;
+        case 7: setDimensionality(mDIM==2?3:2);  break;
         
-        case 20:  exit(EXIT_SUCCESS);                break;
+        case 20:  exit(EXIT_SUCCESS); break;
         
-        case 100: view.enableFog(0, 0);              break;
-        case 101: view.enableFog(1, 0);              break;
-        case 102: view.enableFog(2, 0.0625);         break;
-        case 103: view.enableFog(2, 0.125);          break;
-        case 104: view.enableFog(2, 0.25);           break;
-        case 105: view.enableFog(2, 0.5);            break;
-        case 106: view.enableFog(2, 1);              break;
-        case 107: view.enableFog(2, 2);              break;
-        case 108: view.enableFog(2, 4);              break;
-        case 109: view.enableFog(2, 8);              break;
-        case 110: view.enableFog(2, 16);             break;
+        case 100: view.enableFog(0, 0);      break;
+        case 101: view.enableFog(1, 0);      break;
+        case 102: view.enableFog(2, 0.0625); break;
+        case 103: view.enableFog(2, 0.125);  break;
+        case 104: view.enableFog(2, 0.25);   break;
+        case 105: view.enableFog(2, 0.5);    break;
+        case 106: view.enableFog(2, 1);      break;
+        case 107: view.enableFog(2, 2);      break;
+        case 108: view.enableFog(2, 4);      break;
+        case 109: view.enableFog(2, 8);      break;
+        case 110: view.enableFog(2, 16);     break;
             
-        case 200: glutReshapeWindow(256, 256);       break;
-        case 201: glutReshapeWindow(384, 384);       break;
-        case 202: glutReshapeWindow(512, 256);       break;
-        case 203: glutReshapeWindow(512, 384);       break;
-        case 204: glutReshapeWindow(512, 512);       break;
-        case 205: glutReshapeWindow(768, 256);       break;
-        case 206: glutReshapeWindow(768, 512);       break;
-        case 207: glutReshapeWindow(768, 768);       break;
-        case 208: glutReshapeWindow(1024, 128);      break;
-        case 209: glutReshapeWindow(1024, 256);      break;
-        case 210: glutReshapeWindow(1024, 512);      break;
-        case 211: glutReshapeWindow(1024, 768);      break;
-        case 212: glutReshapeWindow(1024, 1024);     break;
-        case 213: glutReshapeWindow(1280, 640);      break;
-        case 214: glutReshapeWindow(1280, 1280);     break;
-        case 220: glutReshapeWindow(426, 240);       break;
-        case 221: glutReshapeWindow(640, 360);       break;
-        case 222: glutReshapeWindow(854, 480);       break;
-        case 223: glutReshapeWindow(1280, 720);      break;
-        case 224: glutReshapeWindow(1920, 1080);     break;
-        case 225: glutReshapeWindow(2560, 1440);     break;
+        case 200: reshapeWindow(256, 256);   break;
+        case 201: reshapeWindow(384, 384);   break;
+        case 202: reshapeWindow(512, 256);   break;
+        case 203: reshapeWindow(512, 384);   break;
+        case 204: reshapeWindow(512, 512);   break;
+        case 205: reshapeWindow(768, 256);   break;
+        case 206: reshapeWindow(768, 512);   break;
+        case 207: reshapeWindow(768, 768);   break;
+        case 208: reshapeWindow(1024, 128);  break;
+        case 209: reshapeWindow(1024, 256);  break;
+        case 210: reshapeWindow(1024, 512);  break;
+        case 211: reshapeWindow(1024, 768);  break;
+        case 212: reshapeWindow(1024, 1024); break;
+        case 213: reshapeWindow(1280, 640);  break;
+        case 214: reshapeWindow(1280, 1280); break;
+        case 220: reshapeWindow(426, 240);   break;
+        case 221: reshapeWindow(640, 360);   break;
+        case 222: reshapeWindow(854, 480);   break;
+        case 223: reshapeWindow(1280, 720);  break;
+        case 224: reshapeWindow(1920, 1080); break;
+        case 225: reshapeWindow(2560, 1440); break;
         
         case 300:
             view.disableClipPlane(0);

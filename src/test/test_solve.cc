@@ -293,7 +293,7 @@ void initGLUT()
     glHint(GL_POINT_SMOOTH_HINT, GL_FASTEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_FASTEST);
     
-    glutCreateMenu(processMenu);
+    createMenu(processMenu);
     glutAddMenuEntry("Quit", MENU_QUIT);
     glutAttachMenu(MENU_BUTTON);
     
