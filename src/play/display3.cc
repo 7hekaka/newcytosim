@@ -109,6 +109,7 @@ void Display3::drawObjects(Simul const& sim)
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+    //gle::bindBuffer();
 
     drawBeads(sim.beads);
     drawSolids(sim.solids);
@@ -128,6 +129,8 @@ void Display3::drawObjects(Simul const& sim)
 
     if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
+
+    //gle::unbindBuffer();
 
     if ( stencil_ )
     {

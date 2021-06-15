@@ -40,21 +40,6 @@ namespace gle
     
     /// release requested memory
     void release();
-    
-    /// initialize the Vertex Buffer Objects
-    flute6* setTubeBuffers(flute6*, flute6* const);
-
-    /// initialize the Vertex Buffer Objects
-    void setIcosBuffers(float*&, float* const, unsigned*&, unsigned* const);
-    
-    /// initialize more buffer objects
-    flute6* setCubeBuffers(flute6*, flute6* const);
-
-    /// initialize more buffer objects
-    flute3* setBlobBuffers(flute3*, flute3* const);
-
-    /// initialize more buffer objects
-    void setBuffers();
 
     /// calculate sine and cosine
     void compute_circle(size_t cnt, float CS[], double rad, double start = 0);
@@ -71,6 +56,25 @@ namespace gle
     
     /// OpenGL buffers objects for streaming
     extern GLuint stream_[4];
+    
+    /// initialize the Vertex Buffer Objects
+    flute6* setTubeBuffers(flute6*, flute6* const);
+
+    /// initialize the Vertex Buffer Objects
+    void setIcosBuffers(float*&, float* const, unsigned*&, unsigned* const);
+    
+    /// initialize more buffer objects
+    flute6* setCubeBuffers(flute6*, flute6* const);
+
+    /// initialize more buffer objects
+    flute3* setBlobBuffers(flute3*, flute3* const);
+
+    /// initialize more buffer objects
+    void setBuffers();
+    
+    void bindBuffer();
+    
+    void unbindBuffer();
 
     /// used in debug mode
     GLuint boundBuffer();
@@ -256,6 +260,8 @@ namespace gle
 
     //------------------------------------------------------------------------------
     
+    /// draw something
+    void thing();
     /// do not draw
     void nothing();
     

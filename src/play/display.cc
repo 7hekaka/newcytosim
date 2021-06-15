@@ -567,11 +567,11 @@ void Display::drawSpace(Space const* obj, bool opaque)
             disp->color2.load_front();
             glCullFace(GL_FRONT);
             obj->draw3D();
+            glCullFace(GL_BACK);
         }
         if ( front )
         {
             disp->color.load_load();
-            glCullFace(GL_BACK);
             obj->draw3D();
         }
         if ( !cull ) glDisable(GL_CULL_FACE);
@@ -1528,7 +1528,6 @@ void Display::drawFiber(Fiber const& fib)
     {
         lineWidth(disp->line_width);
         fib.disp->color.load();
-        assert_true(!glIsEnabled(GL_LIGHTING));
         glDisable(GL_LIGHTING);
         drawStrip(fib.nbPoints(), fib.addrPoints(), GL_LINE_STRIP);
         return;

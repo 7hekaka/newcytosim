@@ -78,6 +78,20 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - maps
     
+    void bindBuffer()
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
+        glVertexPointer(3, GL_FLOAT, 0, nullptr);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_FLOAT, 0, nullptr);
+    }
+    
+    void unbindBuffer()
+    {
+        glDisableClientState(GL_NORMAL_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
     GLuint boundBuffer()
     {
         GLint i = 0;
@@ -863,6 +877,11 @@ namespace gle
         return flu + i;
     }
     
+    /* This moves some vertices to smoothen the blob */
+    void refineBlob(flute3 * flu, size_t cnt)
+    {
+    }
+
     /* This moves some vertices to add an hexagonal needle to the blob */
     void modifyBlob(flute3 * flu)
     {
@@ -889,26 +908,32 @@ namespace gle
         return res;
     }
 
-#if 0
-    void pinTest()
+    void thing()
     {
         flute3 flu[52];
-        flute3* ptr = flu;
-        setBlob(ptr);
-        modifyBlob(flu);
+        setBlob(flu);
+        //modifyBlob(flu);
         glVertexPointer(3, GL_FLOAT, 0, flu);
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 0, flu);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 26);
-        glColor4f(1,1,1,0.5);
-        glDrawArrays(GL_TRIANGLE_STRIP, 26, 26);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glColor3f(1,1,1);
+
+        gle_color(1,1,1).load_both();
+        glPointSize(8);
         for ( unsigned u : { 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 } )
             glDrawArrays(GL_POINTS, u, 1);
+        glLineWidth(1);
         glDrawArrays(GL_LINE_STRIP, 0, 52);
+
+        gle_color(0,1,1,0.5).load_both();
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 26);
+        gle_color(1,1,0,0.5).load_both();
+        glDrawArrays(GL_TRIANGLE_STRIP, 26, 26);
+        glDisableClientState(GL_NORMAL_ARRAY);
     }
-#endif
+    
+    void nothing()
+    {
+    }
     
     //-----------------------------------------------------------------------
     
@@ -923,10 +948,9 @@ namespace gle
         return ptr;
     }
 
-    /// load data to GPU
+    // intertwine vertex and normal data:
     flute6* knitData(flute6* dst, size_t cnt, float const* pts, float const* dir)
     {
-        // intertwine vertex and normal data:
         for ( size_t i = 0; i < cnt; ++i )
             dst[i] = { pts[3*i], pts[1+3*i], pts[2+3*i], dir[3*i], dir[1+3*i], dir[2+3*i] };
         return dst + cnt;
@@ -939,6 +963,10 @@ namespace gle
     
     flute6* setCubeBuffers(flute6* ptr, flute6* const ori)
     {
+        /*
+         check pointer alignment, which is required to get indices
+         by substracting pointer values below */
+        assert_true( 0 == ( ptr - ori ) % 6 );
         start_[24+0] = ptr-ori; ptr = setTetrahedron(knitData, ptr);
         start_[24+1] = ptr-ori; ptr = setOctahedron(knitData, ptr);
         start_[24+2] = ptr-ori; ptr = setIcosahedron(knitData, ptr);
@@ -958,6 +986,10 @@ namespace gle
 
     flute3* setBlobBuffers(flute3* ptr, flute3* const ori)
     {
+        /*
+         check pointer alignment, which is required to get indices
+         by substracting pointer values below */
+        assert_true( 0 == ( ptr - ori ) % 3 );
         start_[24+9] = ptr-ori; ptr = setBlob(ptr);
         start_[24+10] = ptr-ori; ptr = setPin(ptr);
         start_[24+11] = ptr-ori; ptr = setCublob(ptr, 1.0);
@@ -989,12 +1021,15 @@ namespace gle
 
     void drawTriangleStrip(GLsizei start, GLsizei cnt)
     {
+        //assert_true(buf_[0] == boundBuffer());
+        //glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
         glVertexPointer(3, GL_FLOAT, 0, nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 0, nullptr);
         glDrawArrays(GL_TRIANGLE_STRIP, start, cnt);
         glDisableClientState(GL_NORMAL_ARRAY);
+        //glPointSize(7); glDrawArrays(GL_POINTS, start, cnt);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -1029,11 +1064,25 @@ namespace gle
         return flu + i;
     }
     
-    flute6* setCircle(flute6* flu, size_t inc, float Z, float R, float N)
+    size_t sizeCircBuffers()
     {
-        return 1+(flute6*)setCircle((flute2*)flu, inc, Z, R, N);
+        return 4 + 2 * pi_twice;
     }
     
+    flute2* setCircBuffers(flute2* ptr, flute2* const ori)
+    {
+        /*
+         check pointer alignment, which is required to get indices
+         by substracting pointer values below */
+        assert_true( 0 == ( ptr - ori ) % 2 );
+        start_[22] = ptr-ori; ptr = setCircle(ptr, 1, 0, 1, 1);
+        start_[23] = ptr-ori; ptr = setCircle(ptr, 1, 0, 1, 2);
+        return ptr;
+    }
+
+    //-----------------------------------------------------------------------
+    #pragma mark - Tubes
+
     /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
     flute6* setTube(flute6* flu, size_t inc, float B, float T)
     {
@@ -1104,11 +1153,15 @@ namespace gle
     
     size_t sizeTubeBuffers()
     {
-        return 24 * pi_twice;  // this is empirical!
+        return 21 * pi_twice;  // this is empirical!
     }
     
     flute6* setTubeBuffers(flute6* ptr, flute6* const ori)
     {
+        /*
+         check pointer alignment, which is required to get indices
+         by substracting pointer values below */
+        assert_true( 0 == ( ptr - ori ) % 6 );
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const float B = -32.f, T = 256.f, E = 0.03125;
         start_[0] = ptr-ori; ptr = setTube(ptr, 1, 0, 1);
@@ -1132,8 +1185,6 @@ namespace gle
         start_[19] = ptr-ori; ptr = setDisc(ptr, 2, 1, 1);
         start_[20] = ptr-ori; ptr = setDisc(ptr, 1, 0, -1);
         start_[21] = ptr-ori; ptr = setDisc(ptr, 2, 0, -1);
-        start_[22] = ptr-ori; ptr = setCircle(ptr, 1, 0, 1, 1);
-        start_[23] = ptr-ori; ptr = setCircle(ptr, 1, 0, 1, 2);
         return ptr;
     }
 
@@ -1153,7 +1204,7 @@ namespace gle
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
         glVertexPointer(2, GL_FLOAT, skip*sizeof(flute2), nullptr);
-        glDrawArrays(GL_LINE_STRIP, 3*start, cnt/skip);
+        glDrawArrays(GL_LINE_STRIP, start, cnt/skip);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
@@ -1196,6 +1247,10 @@ namespace gle
     /// using icosahedrons to render the sphere:
     void setIcoBuffer(Tesselator& ico, int i, float*& ptr, float* const ptr0, unsigned*& idx, unsigned* const idx0)
     {
+        /*
+         check pointer alignment, which is required to get indices
+         by substracting pointer values below */
+        assert_true( 0 == ( ptr - ptr0 ) % 3 );
         //fprintf(stderr, "setIcoBuffer %i: %u %u\n", i, ico.max_vertices(), ico.num_vertices());
         ico_pts_[i] = ptr - ptr0;
         ico_idx_[i] = idx - idx0;
@@ -1288,8 +1343,9 @@ namespace gle
         size_t t = 6 * sizeTubeBuffers();
         size_t c = 6 * sizeCubeBuffers();
         size_t b = 3 * sizeBlobBuffers();
+        size_t o = 2 * sizeCircBuffers();
 
-        glBufferData(GL_ARRAY_BUFFER, (t+c+b+s)*sizeof(float), nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (s+t+c+b+o)*sizeof(float), nullptr, GL_STATIC_DRAW);
         float* ptr = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*f*sizeof(unsigned), nullptr, GL_STATIC_DRAW);
@@ -1300,15 +1356,24 @@ namespace gle
         
         ptr = (float*)setTubeBuffers((flute6*)ptr, (flute6*)ptr0);
         //fprintf(stderr, "setTubeBuffers : %li %li\n", ptr-ptr0, t); float* sub=ptr;
+
         ptr = (float*)setCubeBuffers((flute6*)ptr, (flute6*)ptr0);
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
-        ptr = (float*)setBlobBuffers((flute3*)ptr, (flute3*)ptr0);
-        //fprintf(stderr, "setBlobBuffers : %li %li\n", ptr-sub, b); sub=ptr;
-
+        
         for ( int i = 0; i < 7; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
-        //fprintf(stderr, "setIcosBuffers : %li %li -- %li\n", ptr-sub, s, idx-idx0);
+        //fprintf(stderr, "setIcosBuffers : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
+
+        ptr = (float*)setBlobBuffers((flute3*)ptr, (flute3*)ptr0);
+        //fprintf(stderr, "setBlobBuffers : %li %li\n", ptr-sub, b); sub=ptr;
         
+        // align pointer:
+        ptr += (ptr-ptr0) & 1;
+        
+        ptr = (float*)setCircBuffers((flute2*)ptr, (flute2*)ptr0);
+        //fprintf(stderr, "setCircBuffers : %li %li\n", ptr-sub, o);
+
+        assert_true( ptr < ptr0 + (s+t+c+b+o) );
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }

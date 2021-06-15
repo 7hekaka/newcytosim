@@ -28,6 +28,7 @@ struct flute3
     flute3(Vector2 const& v, float z) : xyz{float(v.XX), float(v.YY), z} {}
     flute3(Vector3 const& v) : xyz{float(v.XX), float(v.YY), float(v.ZZ)} {}
     static flute3 cast(double x, double y, double z) { return flute3(float(x), float(y), float(z)); }
+    /// elementary vector operations:
     float operator[](size_t i) const { return xyz[i]; }
     friend flute3 operator +(flute3 const& a, flute3 const& b) { return flute3{a[0]+b[0], a[1]+b[1], a[2]+b[2]}; }
     friend flute3 operator -(flute3 const& a, flute3 const& b) { return flute3{a[0]-b[0], a[1]-b[1], a[2]-b[2]}; }
