@@ -42,7 +42,7 @@ F. Nedelec
 - Update OpenGL code to use Shaders and eliminate immediate rendering
 
 - Replace GLUT by GLFW:  http://www.glfw.org/index.html
-- Rename gle: gym and glApp: gymapp
+- Rename gle->gym;  gle_color->gym::color and glApp->gymnast
 - use Dear imGUI for rendering text and minimal GUI components (Omar Cornut)
      https://github.com/ocornut/imgui
 
@@ -86,16 +86,6 @@ test write / read systematically on all cym files
 - Represents an actin filament with two strands... a microtubule with 13.
      the strands can be in register, such that vertices describe circles in 3D, 
      while the abscissaM() can be shifted appropriately
-
-Build:
-
-- build with modern 'make', eg:
-    scons: http://www.scons.org instead of make
-    cmake: http://www.cmake.org
-    meson: https://mesonbuild.com
-- Replace GLUT:
-    glfw:  http://www.glfw.org/index.html
-- new font renderer, eg. FreeType (http://www.freetype.org/index.html)
 
 # Performance:
 

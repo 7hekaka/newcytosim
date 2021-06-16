@@ -185,8 +185,7 @@ public:
             drawPixelmap(0);
     #else
             glPushMatrix();
-            gle::translate(pos);
-            gle::scale(realSize);
+            gle::transScale(pos, realSize);
             color2.load();
             gle::disc();
             glPopMatrix();
@@ -205,8 +204,7 @@ public:
             drawPixelmap(1);
     #else
             glPushMatrix();
-            gle::translate(pos);
-            gle::scale(realSize);
+            gle::transScale(pos, realSize);
             color2.load();
             strokeA();
             glPopMatrix();
@@ -225,8 +223,7 @@ public:
             drawPixelmap(2);
     #else
             glPushMatrix();
-            gle::translate(pos);
-            gle::scale(realSize);
+            gle::transScale(pos, realSize);
             color.load();
             strokeA();
             glPopMatrix();

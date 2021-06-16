@@ -23,13 +23,13 @@ int correct = 1;
 int mobile = 1;
 
 real radius = 1;
-real dt = 1./16;
-real km = 10;
+real time_step = 1./16;
+real stiff = 10;
 real noise = 1;
 
 void timerFunction(int value)
 {
-    real s, h = km * dt;
+    real s, h = stiff * time_step;
     Matrix22 I, P, D, C;
     I = Matrix22::identity();
     real xn = px.norm();
@@ -41,11 +41,11 @@ void timerFunction(int value)
     P(1,1) = 1 - pxn[1] * pxn[1];
     
     Vector2 rhs, f, fx;
-    Vector2 random(RNG.gauss()*noise/km, RNG.gauss()*noise/km, 0);
+    Vector2 random(RNG.gauss()*noise/stiff, RNG.gauss()*noise/stiff, 0);
     
     
-    printf("\nkm*dt %2f noise %f correct %i norm %i :\n",
-           km*dt, noise, correct, normalization);
+    printf("\nstiff*time_step %2f noise %f correct %i norm %i :\n",
+           stiff*time_step, noise, correct, normalization);
     printf("px    : "); px.println();
     //P.println();
     
@@ -174,13 +174,13 @@ void processNormalKey(unsigned char c, int x, int y)
             if ( delay > 1 ) delay /= 2;
             break;
         case 'K':
-            km *= 2; break;
+            stiff *= 2; break;
         case 'J':
-            km /= 2; break;
+            stiff /= 2; break;
         case 'k':
-            km += 1; break;
+            stiff += 1; break;
         case 'j':
-            km -= 1; break;
+            stiff -= 1; break;
             
         case 'i':
             noise *= 2; break;

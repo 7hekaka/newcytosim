@@ -58,8 +58,7 @@ void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
     if ( rad > pixelSize )
     {
         glPushMatrix();
-        gle::translate(pos);
-        gle::scale(rad);
+        gle::transScale(pos, rad);
         obj();
         glPopMatrix();
     }
@@ -83,8 +82,7 @@ void Display::drawFlat(Vector const& pos, float rad, void(*obj)()) const
     if ( rad > pixelSize )
     {
         glPushMatrix();
-        gle::translate(pos);
-        gle::scale(rad);
+        gle::transScale(pos, rad);
         obj();
         glPopMatrix();
     }
@@ -94,8 +92,7 @@ void Display::drawFlat(Vector const& pos, float rad, void(*obj)()) const
 void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
 {
     glPushMatrix();
-    gle::translate(pos);
-    gle::scale(rad);
+    gle::transScale(pos, rad);
 #if ( DIM >= 3 )
     glEnable(GL_LIGHTING);
     col.load_both();
@@ -113,8 +110,7 @@ void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
 inline void drawMonomer(Vector3 const& pos, real rad)
 {
     glPushMatrix();
-    gle::translate(pos);
-    gle::scale(rad);
+    gle::transScale(pos, rad);
     gle::sphere2();
     glPopMatrix();
 }

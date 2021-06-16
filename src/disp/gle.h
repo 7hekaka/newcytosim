@@ -87,18 +87,28 @@ namespace gle
     inline void translate(float x, float y, float z)    { glTranslatef(x, y, z); }
     inline void translate(double x, double y, double z) { glTranslated(x, y, z); }
 
+    inline void transScale(float x, float y, float z, double s) { glTranslatef(x, y, z); glScaled(s,s,s); }
+
 #if REAL_IS_DOUBLE
    
     inline void translate(Vector1 const& v) { glTranslated(v.XX, 0, 0); }
     inline void translate(Vector2 const& v) { glTranslated(v.XX, v.YY, 0); }
     inline void translate(Vector3 const& v) { glTranslated(v.XX, v.YY, v.ZZ); }
 
+    inline void transScale(Vector1 const& v, double s) { glTranslated(v.XX, 0, 0); glScaled(s,s,s); }
+    inline void transScale(Vector2 const& v, double s) { glTranslated(v.XX, v.YY, 0); glScaled(s,s,s); }
+    inline void transScale(Vector3 const& v, double s) { glTranslated(v.XX, v.YY, v.ZZ); glScaled(s,s,s); }
+
 #else
     
     inline void translate(Vector1 const& v) { glTranslatef(v.XX, 0, 0); }
     inline void translate(Vector2 const& v) { glTranslatef(v.XX, v.YY, 0); }
     inline void translate(Vector3 const& v) { glTranslatef(v.XX, v.YY, v.ZZ); }
- 
+    
+    inline void transScale(Vector1 const& v, float s) { glTranslatef(v.XX, 0, 0); glScalef(s,s,s); }
+    inline void transScale(Vector2 const& v, float s) { glTranslatef(v.XX, v.YY, 0); glScalef(s,s,s); }
+    inline void transScale(Vector3 const& v, float s) { glTranslatef(v.XX, v.YY, v.ZZ); glScalef(s,s,s); }
+
 #endif
 
     // colors that vary with the direction of a vector:

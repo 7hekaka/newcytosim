@@ -190,7 +190,11 @@ void SpaceBanana::draw3D() const
 {
     glMatrixMode(GL_MODELVIEW);
 
+    float U(bCurve);
+    float R(bRadius);
+    
     GLdouble C = std::cos(bAngle), S = std::sin(bAngle);
+    
     GLdouble plane1[] = {-C,-S, 0, 0 };
     GLdouble plane2[] = { C,-S, 0, 0 };
     GLdouble plane3[] = { C, S, 0, 0 };
@@ -204,27 +208,25 @@ void SpaceBanana::draw3D() const
     
     //center part:
     glPushMatrix();
-    glTranslated(bCenter[0], bCenter[1], 0);
+    gle::transScale(bCenter[0], bCenter[1], 0, R);
     glClipPlane(glp1, plane1);
     glClipPlane(glp2, plane2);
-    gle::torusZ(bCurve, bRadius);
+    gle::torusZ(U, 1);
     glPopMatrix();
 
     glDisable(glp2);
 
     //right cap:
     glPushMatrix();
-    glTranslated(bEnd[0], bEnd[1], 0);
+    gle::transScale(bEnd[0], bEnd[1], 0, R);
     glClipPlane(glp1, plane3);
-    gle::scale(bRadius);
     gle::sphere8();
     glPopMatrix();
 
     //left cap:
     glPushMatrix();
-    glTranslated(-bEnd[0], bEnd[1], 0);
+    gle::transScale(-bEnd[0], bEnd[1], 0, R);
     glClipPlane(glp1, plane4);
-    gle::scale(bRadius);
     gle::sphere8();
     glPopMatrix();
     

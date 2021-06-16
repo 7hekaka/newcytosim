@@ -460,8 +460,8 @@ void SpaceTee::draw3D() const
     const GLenum glp2 = GL_CLIP_PLANE5;
 
     GLfloat R(tRadius);
-    GLfloat L(tLength/tRadius);
-    GLfloat J(tJunction/tRadius);
+    GLfloat J(tJunction);
+    GLfloat L((tLength-tJunction)/tRadius);
     GLfloat A(tArmLength/tRadius);
 
     glEnable(glp1);
@@ -469,11 +469,10 @@ void SpaceTee::draw3D() const
 
     //right side:
     glPushMatrix();
-    gle::scale(R);
-    glTranslatef(J, 0, 0);
+    gle::transScale(J, 0, 0, R);
     setClipPlane(glp1, M_SQRT1_2, -M_SQRT1_2);
     setClipPlane(glp2, 1, 0);
-    glTranslatef(L-J, 0, 0);
+    glTranslatef(L, 0, 0);
     glRotatef(-90, 0, 1, 0);
     gle::halfTube1();
     gle::hemisphere4();
@@ -481,11 +480,10 @@ void SpaceTee::draw3D() const
 
     //left side:
     glPushMatrix();
-    gle::scale(R);
-    glTranslatef(J, 0, 0);
+    gle::transScale(J, 0, 0, R);
     setClipPlane(glp1, -M_SQRT1_2, -M_SQRT1_2);
     setClipPlane(glp2, -1, 0);
-    glTranslatef(-L-J, 0, 0);
+    glTranslatef(-L, 0, 0);
     glRotated(90, 0, 1, 0);
     gle::halfTube1();
     gle::hemisphere4();
@@ -493,8 +491,7 @@ void SpaceTee::draw3D() const
 
     //the arm:
     glPushMatrix();
-    gle::scale(R);
-    glTranslated(J, 0, 0);
+    gle::transScale(J, 0, 0, R);
     setClipPlane(glp1, -M_SQRT1_2, M_SQRT1_2);
     setClipPlane(glp2, M_SQRT1_2, M_SQRT1_2);
     glTranslatef(0, A, 0);

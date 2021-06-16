@@ -379,19 +379,13 @@ void View::setModelView() const
 
     // setup the OpenGL transformation matrix
     glMatrixMode(GL_MODELVIEW);
-#if ( 1 )
+
     GLfloat mat[16];
     rotation.setOpenGLMatrix(mat, eyePosition);
     glLoadMatrixf(mat);
-#else
-    glLoadIdentity();
-    real axs[3];
-    real ang = rotation.getAngle(axs) * 180 / M_PI;
-    glTranslatef(eyePosition[0], eyePosition[1], eyePosition[2]);
-    glRotatef(ang, axs[0], axs[1], axs[2]);
-#endif
-    gle::scale(zoom);
     
+    // to be updated with GLM
+    gle::scale(zoom);
     // point-of-focus:
     gle::translate(-(focus+focus_shift));
     
@@ -1010,17 +1004,15 @@ void View::drawScaleBar(int mode, const real scale) const
         case 0:
             break;
         case 1:
-            gle::translate(0, shift-0.5*visRegion[1], 0);
-            gle::scale(zoom);
+            gle::transScale(0, shift-0.5*visRegion[1], 0, zoom);
             drawScaleH(S, S/10, 0);
             break;
         case 2:
-            gle::translate(0.5*visRegion[0]-shift, 0, 0);
-            gle::scale(zoom);
+            gle::transScale(0.5*visRegion[0]-shift, 0, 0, zoom);
             drawScaleV(S, -S/10, 0);
             break;
         case 3: {
-            gle::scale(zoom);
+            gle::transScale(0, 0, 0, zoom);
             drawScaleX(S);
         } break;
     }

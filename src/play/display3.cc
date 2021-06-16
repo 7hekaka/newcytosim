@@ -921,8 +921,7 @@ void Display3::drawSingleB(Single const* obj) const
 #endif
     {
         glPushMatrix();
-        gle::translate(pf);
-        gle::scale(rad*0.5);
+        gle::transScale(pf, rad*0.5);
         gle::blob();
         glPopMatrix();
     }
