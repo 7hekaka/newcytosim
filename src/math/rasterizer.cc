@@ -125,10 +125,10 @@ static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
     if ( rasterizer_draws )
     {
         gle_color col(0, 0, 1);
-        flute8 * flu = gle::mapBuffer404(n_pts);
+        flute8 * flu = gle::mapBufferC4V4(n_pts);
         for ( size_t i = 0; i < n_pts; ++i )
             flu[i] = { pts[i].XX, pts[i].YY, float(zz), col };
-        gle::unmapBuffer404();
+        gle::unmapBufferC4V4();
         glLineWidth(1);
         glDrawArrays(GL_LINE_LOOP, 0, n_pts);
         glPointSize(7);
@@ -354,7 +354,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
         gle_color col(0, 1, 1);
         for ( size_t n = 0; n < n_pts; ++n )
         {
-            flute8* flu = gle::mapBuffer404(n_pts);
+            flute8* flu = gle::mapBufferC4V4(n_pts);
             size_t i = 0;
             for ( size_t u = n+1; u < n_pts; ++u )
             {
@@ -364,7 +364,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
                     flu[i++] = { pts[u].XX, pts[u].YY, pts[u].ZZ, col };
                 }
             }
-            gle::unmapBuffer404();
+            gle::unmapBufferC4V4();
             glLineWidth(0.5);
             glDrawArrays(GL_LINES, 0, 2*i);
         }

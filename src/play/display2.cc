@@ -253,7 +253,7 @@ void Display2::drawCoupleB(Couple const* cx) const
     if ( pd1->perceptible || pd2->perceptible )
     {
         glEnableClientState(GL_COLOR_ARRAY);
-        fluteD4* flu = gle::mapBufferD04(4);
+        fluteD4* flu = gle::mapBufferC4VD(4);
 #if 0
         flu[0] = { p1, pd1->color };
         flu[1] = { p2, pd2->color };
@@ -274,7 +274,7 @@ void Display2::drawCoupleB(Couple const* cx) const
         flu[2] = { pp, col2 };
         flu[3] = { p2, col2 };
 #endif
-        gle::unmapBufferD04();
+        gle::unmapBufferC4VD();
         lineWidth(pd1->width);
         glDrawArrays(GL_LINES, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);

@@ -830,7 +830,7 @@ void Display::drawFiberBackbone(Fiber const& fib)
 void Display::drawFiberLines(Fiber const& fib, int style) const
 {
     size_t i = 0, cnt = 2 * fib.nbSegments() + 8;
-    fluteD4* flu = gle::mapBufferD04(cnt+4);
+    fluteD4* flu = gle::mapBufferC4VD(cnt+4);
     
     switch ( style )
     {
@@ -887,7 +887,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
                 flu[i] = {fib.posP(i), color_by_height(fib, i)};
             break;
     }
-    gle::unmapBufferD04();
+    gle::unmapBufferC4VD();
     glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(fib.prop->disp->line_width);
     if ( i == cnt )
@@ -902,7 +902,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     size_t i = 0, cnt = 8;
-    fluteD4* flu = gle::mapBufferD04(cnt);
+    fluteD4* flu = gle::mapBufferC4VD(cnt);
     
     if ( disp->line_style == 6 )
     {
@@ -940,7 +940,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         flu[i++] = {fib.posP(inx+1), c};
     }
     glDisable(GL_LIGHTING);
-    gle::unmapBufferD04();
+    gle::unmapBufferC4VD();
     glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(fib.prop->disp->line_width);
     glDrawArrays(GL_LINE_STRIP, 0, i);
@@ -954,7 +954,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
     const real gap = disp->speckle_gap;
 
     size_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/gap);
-    fluteD* pts = gle::mapBufferD00(cnt);
+    fluteD* pts = gle::mapBufferVD(cnt);
 
     // display random speckles:
     if ( disp->speckle_style == 1 )
@@ -1012,7 +1012,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
         }
     }
     
-    gle::unmapBufferD00();
+    gle::unmapBufferVD();
     glDisable(GL_LIGHTING);
     pointSize(disp->speckle_size);
     glDrawArrays(GL_POINTS, 0, i);
@@ -1067,7 +1067,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     gle_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
     size_t i = 0, cnt = 2 * ( sup - inf );
-    fluteD4* flu = gle::mapBufferD04(cnt+4);
+    fluteD4* flu = gle::mapBufferC4VD(cnt+4);
 
     if ( inf == sup )
     {
@@ -1108,7 +1108,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
             flu[i++] = {fib.pos(uni*(sup+0.5)), c};
         flu[i++] = {fib.posEndP(), c};
     }
-    gle::unmapBufferD04();
+    gle::unmapBufferC4VD();
     glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(width);
     glDisable(GL_LIGHTING);
@@ -1132,7 +1132,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     gle_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
     size_t i = 0, cnt = 2 * ( sup - inf );
-    fluteD4* flu = gle::mapBufferD04(cnt+4);
+    fluteD4* flu = gle::mapBufferC4VD(cnt+4);
     
     if ( inf == sup )
     {
@@ -1172,7 +1172,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
         flu[i++] = {fib.pos(uni*sup), c};
         flu[i++] = {fib.posEndP(), c};
     }
-    gle::unmapBufferD04();
+    gle::unmapBufferC4VD();
     glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(width);
     glDisable(GL_LIGHTING);
@@ -1199,10 +1199,10 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     
     size_t i = 0, cnt = sup - inf + 4;
     gle_color col = fib.disp->color;
-    fluteD4* flu = gle::mapBufferD04(cnt);
+    fluteD4* flu = gle::mapBufferC4VD(cnt);
     for ( auto h = inf+1; h <= sup; ++h )
         flu[i++] = { fib.posM(uni*h-fib.abscissaM()), col };
-    gle::unmapBufferD04();
+    gle::unmapBufferC4VD();
     glDisable(GL_LIGHTING);
     pointSize(fib.prop->disp->point_size);
     glDrawArrays(GL_POINTS, 0, i);
@@ -1273,7 +1273,7 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
     gle_color col = fib.prop->disp->force_color;
     gle_color lor = col.alpha_scaled(0.5f);
     size_t cnt = 2 * fib.nbPoints();
-    fluteD4* flu = gle::mapBufferD04(cnt);
+    fluteD4* flu = gle::mapBufferC4VD(cnt);
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {
         Vector P = fib.posP(i);
@@ -1281,7 +1281,7 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
         flu[  2*i] = { P, col };
         flu[1+2*i] = { P+F, lor };
     }
-    gle::unmapBufferD04();
+    gle::unmapBufferC4VD();
     glDisable(GL_LIGHTING);
     glDrawArrays(GL_LINES, 0, cnt);
 }
@@ -1975,7 +1975,7 @@ void Display::drawOrganizer(Organizer const& obj) const
     {
         Vector P, Q;
         gle_color c = bodyColorF(disp, obj.signature());
-        fluteD4* flu = gle::mapBufferD04(2*cnt);
+        fluteD4* flu = gle::mapBufferC4VD(2*cnt);
         while ( obj.getLink(i, P, Q) )
         {
             if ( modulo ) modulo->fold(Q, P);
@@ -1983,12 +1983,12 @@ void Display::drawOrganizer(Organizer const& obj) const
             flu[1+2*i] = { Q, c };
             if ( ++i >= cnt ) break;
         }
-        gle::unmapBufferD04();
+        gle::unmapBufferC4VD();
         glDisable(GL_LIGHTING);
         lineWidth(disp->width);
         glDrawArrays(GL_LINES, 0, 2*i);
 
-        gle::bindVertexD04(2);
+        gle::bindBufferC4VD(2);
         pointSize(disp->size);
         glDrawArrays(GL_POINTS, 0, i);
     }

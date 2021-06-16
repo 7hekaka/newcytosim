@@ -83,35 +83,35 @@ namespace gle
     }
 
     
-    fluteD* mapBufferD00(size_t cnt)
+    fluteD* mapBufferVD(size_t cnt)
     {
         glBindBuffer(GL_ARRAY_BUFFER, nextStream());
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteD), nullptr, GL_STREAM_DRAW);
         return (fluteD*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
     
-    void unmapBufferD00()
+    void unmapBufferVD()
     {
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glVertexPointer((DIM>2?3:2), GL_FLOAT, 0, nullptr);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
-    void bindBufferD00(size_t skip)
+    void bindBufferVD(size_t skip)
     {
         glBindBuffer(GL_ARRAY_BUFFER, currStream());
         glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(fluteD), nullptr);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
-    fluteD4* mapBufferD04(size_t cnt)
+    fluteD4* mapBufferC4VD(size_t cnt)
     {
         glBindBuffer(GL_ARRAY_BUFFER, nextStream());
         glBufferData(GL_ARRAY_BUFFER, cnt*sizeof(fluteD4), nullptr, GL_STREAM_DRAW);
         return (fluteD4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
     
-    void unmapBufferD04()
+    void unmapBufferC4VD()
     {
         glUnmapBuffer(GL_ARRAY_BUFFER);
         glVertexPointer((DIM>2?3:2), GL_FLOAT, sizeof(fluteD4), nullptr);
@@ -119,7 +119,7 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
-    void bindVertexD04(size_t skip)
+    void bindBufferC4VD(size_t skip)
     {
         glBindBuffer(GL_ARRAY_BUFFER, currStream());
         glVertexPointer((DIM>2?3:2), GL_FLOAT, skip*sizeof(fluteD4), nullptr);

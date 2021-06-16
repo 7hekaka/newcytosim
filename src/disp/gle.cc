@@ -1384,7 +1384,7 @@ namespace gle
     {
         for ( size_t n = 0; n < pi_twice; n += inc )
         {
-            flute6 * flu = mapBuffer330(2+pi_twice);
+            flute6 * flu = mapBufferN3V3(2+pi_twice);
             float X0 = cos_(n), X1 = cos_(n+inc);
             float Y0 = sin_(n), Y1 = sin_(n+inc);
             size_t i = 0;
@@ -1394,7 +1394,7 @@ namespace gle
                 flu[i++] = {X0*(R+T*C), Y0*(R+T*C), T*S, X0*C, Y0*C, S};
                 flu[i++] = {X1*(R+T*C), Y1*(R+T*C), T*S, X1*C, Y1*C, S};
             }
-            unmapBuffer330();
+            unmapBufferN3V3();
             glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
         }
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1412,7 +1412,7 @@ namespace gle
         float W(width * A / M_SQRT3);
         float R(1.0f / cosf(A*0.5f));
         
-        flute6 * flu = mapBuffer330(3*(1+pi_twice/(2*inc)));
+        flute6 * flu = mapBufferN3V3(3*(1+pi_twice/(2*inc)));
         size_t i = 0;
         flu[i++] = {R, 0, W, 1, 0, 0};
         flu[i++] = {R, 0,-W, 1, 0, 0};
@@ -1425,7 +1425,7 @@ namespace gle
             flu[i++] = {c, s,-W, c, s, 0};
         }
         flu[i++] = {R, 0, 0, 1, 0, 0};
-        unmapBuffer330();
+        unmapBufferN3V3();
         glDrawArrays(GL_TRIANGLES, 0, i);
         glDisableClientState(GL_NORMAL_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1451,7 +1451,7 @@ namespace gle
         float R = radius(Z);
         while ( Z < T )
         {
-            flute6 * flu = mapBuffer330(2+2*pi_twice);
+            flute6 * flu = mapBufferN3V3(2+2*pi_twice);
             float Y = Z;
             float Q = R;
             Z += dZ;
@@ -1468,7 +1468,7 @@ namespace gle
                 flu[i++] = {R*C, R*S, Z, dN*C, dN*S,-dR};
                 flu[i++] = {Q*C, Q*S, Y, dN*C, dN*S,-dR};
             }
-            unmapBuffer330();
+            unmapBufferN3V3();
             glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
         }
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1583,12 +1583,12 @@ namespace gle
     {
         GLfloat AX(A.XX);
         GLfloat BX(B.XX);
-        flute6 * flu = mapBuffer204(4);
+        flute6 * flu = mapBufferC4V2(4);
         flu[0] = { AX, -rA, cA };
         flu[1] = { AX,  rA, cA };
         flu[2] = { BX, -rB, cB };
         flu[3] = { BX,  rB, cB };
-        unmapBuffer204();
+        unmapBufferC4V2();
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);
@@ -1604,12 +1604,12 @@ namespace gle
             GLfloat dX(d.XX/n), dY(d.YY/n);
             GLfloat AX(A.XX), AY(A.YY);
             GLfloat BX(B.XX), BY(B.YY);
-            flute6 * flu = mapBuffer204(6);
+            flute6 * flu = mapBufferC4V2(6);
             flu[0] = { AX+rA*dX, AY+rA*dY, cA };
             flu[1] = { AX-rA*dX, AY-rA*dY, cA };
             flu[2] = { BX+rB*dX, BY+rB*dY, cB };
             flu[3] = { BX-rB*dX, BY-rB*dY, cB };
-            unmapBuffer204();
+            unmapBufferC4V2();
             glEnableClientState(GL_COLOR_ARRAY);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             glDisableClientState(GL_COLOR_ARRAY);
@@ -1636,14 +1636,14 @@ namespace gle
     void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color cA,
                        Vector2 const& b, Vector2 const& db, gle_color cB)
     {
-        flute6 * flu = mapBuffer204(6);
+        flute6 * flu = mapBufferC4V2(6);
         flu[0] = { b-db, cB };
         flu[1] = { b, cB };
         flu[2] = { a-da, cA };
         flu[3] = { a+da, cA };
         flu[4] = { b, cB };
         flu[5] = { b+db, cB };
-        unmapBuffer204();
+        unmapBufferC4V2();
         glEnableClientState(GL_COLOR_ARRAY);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
         glDisableClientState(GL_COLOR_ARRAY);
