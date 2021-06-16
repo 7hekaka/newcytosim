@@ -220,17 +220,14 @@ void SpaceCylinderP::draw3D() const
     if ( 1 )
     {
         // mark the edge of the periodicity with dotted lines
-        glLineStipple(1, 0x000F);
-        glEnable(GL_LINE_STIPPLE);
         glPushMatrix();
         gle::transAlignZX(-L, R, -1);
-        gle::circle();
+        gle::circle_dotted();
         glPopMatrix();
         glPushMatrix();
         gle::transAlignZX(L, R, -1);
-        gle::circle();
+        gle::circle_dotted();
         glPopMatrix();
-        glDisable(GL_LINE_STIPPLE);
     }
 }
 

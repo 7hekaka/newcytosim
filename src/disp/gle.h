@@ -59,9 +59,6 @@ namespace gle
     
     /// initialize the Vertex Buffer Objects
     flute6* setTubeBuffers(flute6*, flute6* const);
-
-    /// initialize the Vertex Buffer Objects
-    void setIcosBuffers(float*&, float* const, unsigned*&, unsigned* const);
     
     /// initialize more buffer objects
     flute6* setCubeBuffers(flute6*, flute6* const);
@@ -159,8 +156,10 @@ namespace gle
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void circle();
-    /// draw 2D circle of radius 1 in XY plane, with +Z as normal
+    /// draw 2D circle of radius 1 in XY plane, with +Z as normal, fewer points
     void circle2();
+    /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
+    void circle_dotted();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal

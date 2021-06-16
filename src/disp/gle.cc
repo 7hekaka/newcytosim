@@ -1209,11 +1209,11 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
-    inline void drawLineStrip(GLint start, size_t cnt, size_t skip)
+    inline void drawLineStrip(GLint start, size_t cnt, size_t skip, GLenum mode)
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
         glVertexPointer(2, GL_FLOAT, skip*sizeof(flute2), nullptr);
-        glDrawArrays(GL_LINE_STRIP, start, cnt/skip);
+        glDrawArrays(mode, start, cnt/skip);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
@@ -1239,8 +1239,9 @@ namespace gle
     void discTop2()      { drawTubeStrip(start_[19], pi_twice/2); }
     void discBottom1()   { drawTubeStrip(start_[20], pi_twice); }
     void discBottom2()   { drawTubeStrip(start_[21], pi_twice/2); }
-    void circle()        { drawLineStrip(start_[22], 1+pi_twice, 1); }
-    void circle2()       { drawLineStrip(start_[23], 1+pi_twice, 2); }
+    void circle()        { drawLineStrip(start_[22], 1+pi_twice, 1, GL_LINE_STRIP); }
+    void circle2()       { drawLineStrip(start_[23], 1+pi_twice, 2, GL_LINE_STRIP); }
+    void circle_dotted() { drawLineStrip(start_[23], 1+pi_twice, 1, GL_LINES); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }
