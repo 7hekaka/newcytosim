@@ -21,6 +21,18 @@ typedef flute6 fluteD4;
 
 namespace gle
 {
+    /// current buffer
+    GLuint currStream();
+    
+    /// switch to next buffer
+    GLuint nextStream();
+    
+    /// init buffers for data streaming
+    void initStreams();
+    
+    /// release buffers
+    void releaseStreams();
+    
     /// map GPU buffer
     float* mapFloatBuffer(size_t cnt);
     /// unmap GPU buffer

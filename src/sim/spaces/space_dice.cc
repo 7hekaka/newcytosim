@@ -333,7 +333,7 @@ void SpaceDice::draw3D() const
     mesh.store_vertices((float*)flu);
     gle::unmapBufferD00();
 #else
-    glBindBuffer(GL_ARRAY_BUFFER, gle::stream_[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, gle::nextStream());
     glBufferData(GL_ARRAY_BUFFER, 3*cnt*sizeof(float), nullptr, GL_STREAM_DRAW);
     float * flu = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     mesh.store_vertices(flu);

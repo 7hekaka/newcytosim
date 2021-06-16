@@ -19,10 +19,7 @@ namespace gle
     
     /// non modifiable values of cosine, sine
     const float* circle_ = const_cast<float*>(cir_);
-    
-    /// OpenGL buffers objects for streaming
-    GLuint stream_[4] = { 0 };
-    
+        
     /// vertex buffer objects for static draw
     GLuint buf_[4] = { 0 };
 
@@ -61,9 +58,7 @@ namespace gle
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
-        if ( !glIsBuffer(stream_[0]) )
-            glGenBuffers(4, stream_);
-        CHECK_GL_ERROR("glGenBuffers(4, stream_)");
+        initStreams();
         std::atexit(release);
     }
     
@@ -71,13 +66,12 @@ namespace gle
     {
         glDeleteBuffers(2, buf_);
         buf_[0] = 0;
-        glDeleteBuffers(4, stream_);
-        stream_[0] = 0;
+        releaseStreams();
     }
 
     //-----------------------------------------------------------------------
     #pragma mark - maps
-    
+
     void bindBuffer()
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
@@ -116,7 +110,7 @@ namespace gle
     {
 #ifdef __SSE3__
         return set_arc_SEE(cnt, ptr, rad, start, delta, cX, cY);
-#endif
+#else
         const double c = std::cos(delta);
         const double s = std::sin(delta);
 
@@ -126,16 +120,17 @@ namespace gle
         
         for( size_t n = 0; n < cnt; ++n )
         {
-            ptr[  2*n] = GLfloat(x) + cX;
-            ptr[1+2*n] = GLfloat(y) + cY;
+            ptr[  2*n] = float(x) + cX;
+            ptr[1+2*n] = float(y) + cY;
             //apply the rotation matrix
             t = x;
             x = c * x - s * y;
             y = s * t + c * y;
             //std::clog << n << " " << x << " " << y << "\n";
         }
-        ptr[  2*cnt] = GLfloat(x);
-        ptr[1+2*cnt] = GLfloat(y);
+        ptr[  2*cnt] = float(x);
+        ptr[1+2*cnt] = float(y);
+#endif
     }
     
     void compute_circle(size_t cnt, float ptr[], double rad, double start)
