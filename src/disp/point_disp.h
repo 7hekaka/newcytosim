@@ -5,6 +5,7 @@
 #include "gle_color.h"
 #include "property.h"
 #include "gle.h"
+#include "gle_zoo.h"
 
 
 #define POINTDISP_USES_PIXELMAPS 1
@@ -68,10 +69,10 @@ private:
     unsigned pixSize;
     
     /// draw outline of shape
-    void strokeShape() const;
+    void strokeShape() const { gle::zoo_stroke(shape); }
     
     /// draw surface of shape
-    void paintShape() const;
+    void paintShape() const { gle::zoo_paint(shape); }
 
     /// draw active state with OpenGL vector primitives
     void strokeA() const;

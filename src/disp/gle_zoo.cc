@@ -3,278 +3,194 @@
 #include <cmath>
 #include "opengl.h"
 #include "gle_zoo.h"
+#include "vector.h"
+#include "gle_color.h"
+#include "flute.h"
 
-void gle::triangleS()
+/*
+ This is a set of 2D shape, which is unfinished
+ */
+
+static GLuint buffer_ = 0;
+
+static GLsizei zoo_[16] = { 0 };
+
+
+static void zoo_draw(int i)
 {
-    constexpr GLfloat B(-0.5f); //std::sqrt(3)/2;
-    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
-    constexpr GLfloat pts[] = { 0, 1, 0,-T, B, 0, T, B, 0 };
-    constexpr GLfloat dir[] = { 0, 0, 1, 0, 0, 1, 0, 0, 1 };
-    
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, pts);
-    glNormalPointer(GL_FLOAT, 0, dir);
-    glDrawArrays(GL_TRIANGLES, 0, 1);
-    glEnableClientState(GL_NORMAL_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer_);
+    glVertexPointer(2, GL_FLOAT, 0, nullptr);
+    glDrawArrays(GL_LINE_STRIP, 1+zoo_[i], zoo_[i+1]-zoo_[i]-1);
 }
 
-void gle::triangleL()
+static void zoo_fill(int i)
 {
-    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    glVertex2f( 0,  1.0);
-    glVertex2f(-T, -0.5);
-    glVertex2f( T, -0.5);
-    glEnd();
+    glBindBuffer(GL_ARRAY_BUFFER, buffer_);
+    glVertexPointer(2, GL_FLOAT, 0, nullptr);
+    glDrawArrays(GL_TRIANGLE_FAN, zoo_[i], zoo_[i+1]-zoo_[i]);
 }
 
-//-----------------------------------------------------------------------
-
-void gle::nablaS()
+void gle::zoo_stroke(char c)
 {
-    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
-    glBegin(GL_TRIANGLES);
-    glNormal3f(0, 0, 1);
-    glVertex2f( 0, -1.0);
-    glVertex2f( T,  0.5);
-    glVertex2f(-T,  0.5);
-    glEnd();
-}
-
-void gle::nablaL()
-{
-    constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    glVertex2f( 0, -1.0);
-    glVertex2f( T,  0.5);
-    glVertex2f(-T,  0.5);
-    glEnd();
-}
-
-//-----------------------------------------------------------------------
-void gle::squareS()
-{
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f( 1,  1);
-    glVertex2f(-1,  1);
-    glVertex2f(-1, -1);
-    glVertex2f( 1, -1);
-    glEnd();
-}
-
-void gle::squareL()
-{
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    glVertex2f( 1,  1);
-    glVertex2f(-1,  1);
-    glVertex2f(-1, -1);
-    glVertex2f( 1, -1);
-    glEnd();
-}
-
-//-----------------------------------------------------------------------
-void gle::rectangleS()
-{
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f( 1,  0.5);
-    glVertex2f(-1,  0.5);
-    glVertex2f(-1, -0.5);
-    glVertex2f( 1, -0.5);
-    glEnd();
-}
-
-void gle::rectangleL()
-{
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    glVertex2f( 1,  0.5);
-    glVertex2f(-1,  0.5);
-    glVertex2f(-1, -0.5);
-    glVertex2f( 1, -0.5);
-    glEnd();
-}
-
-//-----------------------------------------------------------------------
-
-void gle::plusS()
-{
-    const GLfloat R = 1.1f;
-    const GLfloat C = 0.4f;
-    
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f( R,  C);
-    glVertex2f(-R,  C);
-    glVertex2f(-R, -C);
-    glVertex2f( R, -C);
-    glEnd();
-    
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f( C,  R);
-    glVertex2f(-C,  R);
-    glVertex2f(-C,  C);
-    glVertex2f( C,  C);
-    glEnd();
-    
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f( C, -C);
-    glVertex2f(-C, -C);
-    glVertex2f(-C, -R);
-    glVertex2f( C, -R);
-    glEnd();
-}
-
-void gle::plusL()
-{
-    const GLfloat R = 1.2f;
-    const GLfloat C = 0.6f;
-    
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    glVertex2f( C,  R);
-    glVertex2f(-C,  R);
-    glVertex2f(-C,  C);
-    glVertex2f(-R,  C);
-    glVertex2f(-R, -C);
-    glVertex2f(-C, -C);
-    glVertex2f(-C, -R);
-    glVertex2f( C, -R);
-    glVertex2f( C, -C);
-    glVertex2f( R, -C);
-    glVertex2f( R,  C);
-    glVertex2f( C,  C);
-    glEnd();
-}
-//-----------------------------------------------------------------------
-/// draw pentagon that has the same surface as a disc of radius 1.
-void gle::pentagonS()
-{
-    const GLfloat A(M_PI * 0.1);
-    const GLfloat B(M_PI * 0.3);
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f(0, 0);
-    const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
-    const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
-    const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
-    
-    glVertex2f(  0,  R);
-    glVertex2f(-C1,  S1);
-    glVertex2f(-C3, -S3);
-    glVertex2f( C3, -S3);
-    glVertex2f( C1,  S1);
-    glVertex2f(  0,  R);
-    glEnd();
-}
-
-void gle::pentagonL()
-{
-    const GLfloat A(M_PI * 0.1);
-    const GLfloat B(M_PI * 0.3);
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
-    const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
-    const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
-    
-    glVertex2f(  0,  R);
-    glVertex2f(-C1,  S1);
-    glVertex2f(-C3, -S3);
-    glVertex2f( C3, -S3);
-    glVertex2f( C1,  S1);
-    glEnd();
-}
-
-//-----------------------------------------------------------------------
-/// draw hexagon that has the same surface as a disc of radius 1.
-void gle::hexagonS()
-{
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f(0, 0);
-    const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-    const GLfloat H = R * 0.8660254037844386f; // sqrtf(3)/2;
-    const GLfloat X = R * 0.5f;
-    glVertex2f( R,  0);
-    glVertex2f( X,  H);
-    glVertex2f(-X,  H);
-    glVertex2f(-R,  0);
-    glVertex2f(-X, -H);
-    glVertex2f( X, -H);
-    glVertex2f( R,  0);
-    glEnd();
-}
-
-void gle::hexagonL()
-{
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-    const GLfloat H = R * 0.8660254037844386f; // sqrtf(3)/2;
-    const GLfloat X = R * 0.5f;
-    glVertex2f( R,  0);
-    glVertex2f( X,  H);
-    glVertex2f(-X,  H);
-    glVertex2f(-R,  0);
-    glVertex2f(-X, -H);
-    glVertex2f( X, -H);
-    glEnd();
+    switch ( c )
+    {
+        case 't': zoo_draw(0); break;
+        case 'v': zoo_draw(1); break;
+        case 'q': zoo_draw(2); break;
+        case 'r': zoo_draw(3); break;
+        case '+': zoo_draw(4); break;
+        case 'p': zoo_draw(5); break;
+        case 'h': zoo_draw(6); break;
+        case 's': zoo_draw(7); break;
+        default:
+        case 'c': zoo_draw(8); break;
+    }
 }
 
 
-//-----------------------------------------------------------------------
-
-void gle::starS()
+void gle::zoo_paint(char c)
 {
-    const GLfloat A(M_PI * 0.1);
-    const GLfloat B(M_PI * 0.3);
-    const GLfloat R  = 1.2f, H = -0.6f;
-    const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
-    const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
-
-    glBegin(GL_TRIANGLE_FAN);
-    glNormal3f(0, 0, 1);
-    glVertex2f(0, 0);
-    glVertex2f(    0,     R);
-    glVertex2f( H*C3, -H*S3);
-    glVertex2f(  -C1,    S1);
-    glVertex2f( H*C1,  H*S1);
-    glVertex2f(  -C3,   -S3);
-    glVertex2f(    0,   H*R);
-    glVertex2f(   C3,   -S3);
-    glVertex2f(-H*C1,  H*S1);
-    glVertex2f(   C1,    S1);
-    glVertex2f(-H*C3, -H*S3);
-    glVertex2f(    0,     R);
-    glEnd();
+    switch ( c )
+    {
+        case 't': zoo_fill(0); break;
+        case 'v': zoo_fill(1); break;
+        case 'q': zoo_fill(2); break;
+        case 'r': zoo_fill(3); break;
+        case '+': zoo_fill(4); break;
+        case 'p': zoo_fill(5); break;
+        case 'h': zoo_fill(6); break;
+        case 's': zoo_fill(7); break;
+        default:
+        case 'c': zoo_fill(8); break;
+    }
 }
 
-void gle::starL()
+
+void gle::zoo_init(flute2* flt, flute2* const ori)
 {
-    const GLfloat A(M_PI * 0.1);
-    const GLfloat B(M_PI * 0.3);
-    const GLfloat R  = 1.2f, H = -0.6f;
-    const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
-    const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
-    glBegin(GL_LINE_LOOP);
-    glNormal3f(0, 0, 1);
-    glVertex2f(    0,     R);
-    glVertex2f( H*C3, -H*S3);
-    glVertex2f(  -C1,    S1);
-    glVertex2f( H*C1,  H*S1);
-    glVertex2f(  -C3,   -S3);
-    glVertex2f(    0,   H*R);
-    glVertex2f(   C3,   -S3);
-    glVertex2f(-H*C1,  H*S1);
-    glVertex2f(   C1,    S1);
-    glVertex2f(-H*C3, -H*S3);
-    glEnd();
+    size_t j = 0;
+    // triangle
+    {
+        zoo_[j++] = flt - ori;
+        constexpr GLfloat B(-0.5f); //std::sqrt(3)/2;
+        constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
+        *flt++ = { 0, 0 };
+        *flt++ = { 0, 1 };
+        *flt++ = {-T, B };
+        *flt++ = { T, B };
+        *flt++ = { 0, 1 };
+    }
+    // inverted triangle
+    {
+        zoo_[j++] = flt - ori;
+        constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
+        *flt++ = { 0, 0 };
+        *flt++ = { 0, -1.f };
+        *flt++ = { T,  0.5 };
+        *flt++ = {-T,  0.5 };
+        *flt++ = { 0, -1.f };
+    }
+    // square
+    {
+        zoo_[j++] = flt - ori;
+        *flt++ = { 0, 0 };
+        *flt++ = { 1,  1};
+        *flt++ = {-1,  1};
+        *flt++ = {-1, -1};
+        *flt++ = { 1, -1};
+        *flt++ = { 1,  1};
+    }
+    // rectangle
+    {
+        zoo_[j++] = flt - ori;
+        *flt++ = { 0, 0 };
+        *flt++ = { 1,  0.5};
+        *flt++ = {-1,  0.5};
+        *flt++ = {-1, -0.5};
+        *flt++ = { 1, -0.5};
+        *flt++ = { 1,  0.5};
+    }
+    // plus
+    {
+        zoo_[j++] = flt - ori;
+        const GLfloat R = 1.1f;
+        const GLfloat C = 0.4f;
+        *flt++ = { 0, 0 };
+        *flt++ = { R,  C};
+        *flt++ = { C,  C};
+        *flt++ = { C,  R};
+        *flt++ = {-C,  R};
+        *flt++ = {-C,  C};
+        *flt++ = {-R,  C};
+        *flt++ = {-R, -C};
+        *flt++ = {-C, -C};
+        *flt++ = {-C, -R};
+        *flt++ = { C, -R};
+        *flt++ = { C, -C};
+        *flt++ = { R, -C};
+        *flt++ = { R,  C};
+    }
+    // pentagon
+    {
+        zoo_[j++] = flt - ori;
+        const GLfloat A(M_PI * 0.1);
+        const GLfloat B(M_PI * 0.3);
+        const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
+        const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
+        const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
+        *flt++ = {  0,  0};
+        *flt++ = {  0,  R};
+        *flt++ = {-C1,  S1};
+        *flt++ = {-C3, -S3};
+        *flt++ = { C3, -S3};
+        *flt++ = { C1,  S1};
+        *flt++ = {  0,  R};
+    }
+    // hexagon
+    {
+        zoo_[j++] = flt - ori;
+        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const GLfloat H = R * 0.8660254037844386f; // sqrtf(3)/2;
+        const GLfloat X = R * 0.5f;
+        *flt++ = { 0,  0};
+        *flt++ = { R,  0};
+        *flt++ = { X,  H};
+        *flt++ = {-X,  H};
+        *flt++ = {-R,  0};
+        *flt++ = {-X, -H};
+        *flt++ = { X, -H};
+        *flt++ = { R,  0};
+    }
+    // star
+    {
+        zoo_[j++] = flt - ori;
+        const GLfloat A(M_PI * 0.1);
+        const GLfloat B(M_PI * 0.3);
+        const GLfloat R  = 1.2f, H = -0.6f;
+        const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
+        const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
+        *flt++ = {    0,     0};
+        *flt++ = {    0,     R};
+        *flt++ = { H*C3, -H*S3};
+        *flt++ = {  -C1,    S1};
+        *flt++ = { H*C1,  H*S1};
+        *flt++ = {  -C3,   -S3};
+        *flt++ = {    0,   H*R};
+        *flt++ = {   C3,   -S3};
+        *flt++ = {-H*C1,  H*S1};
+        *flt++ = {   C1,    S1};
+        *flt++ = {-H*C3, -H*S3};
+        *flt++ = {    0,     R};
+    }
+    // nearly a circle
+    {
+        zoo_[j++] = flt - ori;
+        GLfloat a(M_PI/6.0);
+        *flt++ = { 1, 0 };
+        for ( int u = 1; u < 12; ++u )
+            *flt++ = { cosf(u*a),  sinf(u*a) };
+        *flt++ = { 1, 0 };
+    }
+    zoo_[j] = flt - ori;
 }
 

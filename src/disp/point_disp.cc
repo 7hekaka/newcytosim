@@ -105,42 +105,6 @@ void PointDisp::clear()
     symbol_color = 0xFFFFFFFF;
 }
 
-
-void PointDisp::strokeShape() const
-{
-    switch ( tolower(shape) )
-    {
-        case 'v': gle::nablaL();     break;
-        case 't': gle::triangleL();  break;
-        case 'q': gle::squareL();    break;
-        case 'r': gle::rectangleL(); break;
-        case 'p': gle::pentagonL();  break;
-        case 'h': gle::hexagonL();   break;
-        case 's': gle::starL();      break;
-        case '+': gle::plusL();      break;
-        case 'c': gle::circle();     break;
-        default: break;
-    }
-}
-
-
-void PointDisp::paintShape() const
-{
-    switch ( tolower(shape) )
-    {
-        case 'v': gle::nablaS();     break;
-        case 't': gle::triangleS();  break;
-        case 'q': gle::squareS();    break;
-        case 'r': gle::rectangleS(); break;
-        case 'p': gle::pentagonS();  break;
-        case 'h': gle::hexagonS();   break;
-        case 's': gle::starS();      break;
-        case '+': gle::plusS();      break;
-        case 'c': break;
-        default: gle::disc(); break;
-    }
-}
-
 void PointDisp::strokeA() const
 {
     paintShape();
@@ -514,6 +478,7 @@ void PointDisp::read(Glossary& glos)
     
     if ( ! isprint(symbol) )
         symbol = 0;
+    shape = tolower(shape);
     
 #if POINTDISP_USES_PIXELMAPS
     releasePixelmap();
