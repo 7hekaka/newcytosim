@@ -13,8 +13,8 @@
 void drawLink(gle_color const& col, Vector const& a, Vector const& b)
 {
     fluteD4* flu = gle::mapBufferC4VD(2);
-    flu[0] = { a, col };
-    flu[1] = { b, col };
+    flu[0] = { col, a };
+    flu[1] = { col, b };
     gle::unmapBufferC4VD();
     glLineStipple(1, 0xFFFF);
     glDrawArrays(GL_LINES, 0, 2);
@@ -26,10 +26,10 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
     Vector b = a + ab;
     Vector dx = ab * (( 1 - len / ab.norm() ) / 2);
     fluteD4* flu = gle::mapBufferC4VD(4);
-    flu[0] = { a, col };
-    flu[1] = { a+dx, col };
-    flu[2] = { b-dx, col };
-    flu[3] = { b, col };
+    flu[0] = { col, a };
+    flu[1] = { col, a+dx };
+    flu[2] = { col, b-dx };
+    flu[3] = { col, b };
     gle::unmapBufferC4VD();
     glLineStipple(1, 0x3333);
     glDrawArrays(GL_LINES, 1, 2);
@@ -47,9 +47,9 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
         modulo->fold(c, a);
     Vector b = a + ab;
     fluteD4* flu = gle::mapBufferC4VD(4);
-    flu[0] = { a, col };
-    flu[1] = { b, col };
-    flu[2] = { c, col };
+    flu[0] = { col, a };
+    flu[1] = { col, b };
+    flu[2] = { col, c };
     gle::unmapBufferC4VD();
     glLineStipple(1, 0x7310);
     glDrawArrays(GL_LINES, 0, 2);
@@ -64,10 +64,10 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector co
     Vector b = a + ab;
     Vector c = d + dc;
     fluteD4* flu = gle::mapBufferC4VD(4);
-    flu[0] = { a, col };
-    flu[1] = { b, col };
-    flu[2] = { c, col };
-    flu[3] = { d, col };
+    flu[0] = { col, a };
+    flu[1] = { col, b };
+    flu[2] = { col, c };
+    flu[3] = { col, d };
     gle::unmapBufferC4VD();
     glLineStipple(1, 0x7171);
     glDrawArrays(GL_LINES, 0, 4);

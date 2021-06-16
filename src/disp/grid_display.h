@@ -44,10 +44,10 @@ void drawValues(Grid<CELL, 1> const& grid,
         float x = grid.position(0, ix);
         gle_color col = color(arg, grid.icell1D(ix), Vector1(x+cx));
         // use a full quad to achieve uniform color within
-        flu[i++] = { x+dx, dy, col };
-        flu[i++] = { x, 0, col };
-        flu[i++] = { x, dy, col };
-        flu[i++] = { x+dx, 0, col };
+        flu[i++] = { col, x+dx, dy };
+        flu[i++] = { col, x, 0 };
+        flu[i++] = { col, x, dy };
+        flu[i++] = { col, x+dx, 0 };
     }
     gle::unmapBufferC4V2();
     glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
@@ -80,10 +80,10 @@ void drawValues(Grid<CELL, 2> const& grid,
             float y = grid.position(1, iy);
             gle_color col = color(arg, grid.icell2D(ix, iy), Vector2(x+cx, y+cy));
             // use a full quad to achieve uniform color within
-            flu[i++] = { x, y+dy, col };
-            flu[i++] = { x, y, col };
-            flu[i++] = { x+dx, y+dy, col };
-            flu[i++] = { x+dx, y, col };
+            flu[i++] = { col, x, y+dy };
+            flu[i++] = { col, x, y };
+            flu[i++] = { col, x+dx, y+dy };
+            flu[i++] = { col, x+dx, y };
         }
         gle::unmapBufferC4V2();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
@@ -119,10 +119,10 @@ void drawValues(Grid<CELL, 3> const& grid,
             float y = grid.position(1, iy);
             gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, y+cy, zzz));
             // use a full quad to achieve uniform color within
-            flu[i++] = { x, y+dy, z, col };
-            flu[i++] = { x, y, z, col };
-            flu[i++] = { x+dx, y+dy, z, col };
-            flu[i++] = { x+dx, y, z, col };
+            flu[i++] = { col, x, y+dy, z };
+            flu[i++] = { col, x, y, z };
+            flu[i++] = { col, x+dx, y+dy, z };
+            flu[i++] = { col, x+dx, y, z };
         }
         gle::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
@@ -158,10 +158,10 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
             float x = grid.position(0, ix);
             float z = grid.position(2, iz);
             gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, yyy, z+cz));
-            flu[i++] = { x, y, z+dz, col };
-            flu[i++] = { x, y, z, col };
-            flu[i++] = { x+dx, y, z+dz, col };
-            flu[i++] = { x+dx, y, z, col };
+            flu[i++] = { col, x, y, z+dz };
+            flu[i++] = { col, x, y, z };
+            flu[i++] = { col, x+dx, y, z+dz };
+            flu[i++] = { col, x+dx, y, z };
         }
         gle::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
@@ -197,10 +197,10 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
             float y = grid.position(1, iy);
             float z = grid.position(2, iz);
             gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(xxx, y+cy, z+cz));
-            flu[i++] = { x, y, z+dz, col };
-            flu[i++] = { x, y, z, col };
-            flu[i++] = { x, y+dy, z+dz, col };
-            flu[i++] = { x, y+dy, z, col };
+            flu[i++] = { col, x, y, z+dz };
+            flu[i++] = { col, x, y, z };
+            flu[i++] = { col, x, y+dy, z+dz };
+            flu[i++] = { col, x, y+dy, z };
         }
         gle::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
@@ -243,8 +243,8 @@ void drawValues(Grid<CELL, 3> const& grid,
         {
             Vector3 V = A + n * dx;
             Vector3 W = B + n * dx;
-            flu[i++] = { V, color(arg, grid.interpolate3D(V), V) };
-            flu[i++] = { W, color(arg, grid.interpolate3D(W), W) };
+            flu[i++] = { color(arg, grid.interpolate3D(V), V), V };
+            flu[i++] = { color(arg, grid.interpolate3D(W), W), W };
         }
         gle::unmapBufferC4VD();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
@@ -255,8 +255,8 @@ void drawValues(Grid<CELL, 3> const& grid,
         {
             Vector3 V = A + n * dx;
             Vector3 W = B + n * dx;
-            flu[i++] = { V, color(arg, grid.interpolate3D(V), V) };
-            flu[i++] = { W, color(arg, grid.interpolate3D(W), W) };
+            flu[i++] = { color(arg, grid.interpolate3D(V), V), V };
+            flu[i++] = { color(arg, grid.interpolate3D(W), W), W };
         }
         gle::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);

@@ -58,11 +58,11 @@ struct flute6
     float xyz[6];
     flute6() : xyz{0, 0, 0, 0, 0, 0} {}
     flute6(float x, float y, float z, float a, float b, float c) : xyz{x, y, z, a, b, c} {}
-    flute6(float x, float y, gle_color const& c) : xyz{x, y, c.r(), c.g(), c.b(), c.a()} {}
+    flute6(gle_color const& c, float x, float y) : xyz{c.r(), c.g(), c.b(), c.a(), x, y} {}
+    flute6(gle_color const& c, Vector1 const& v) : xyz{c.r(), c.g(), c.b(), c.a(), float(v.XX), 0.f, } {}
+    flute6(gle_color const& c, Vector2 const& v) : xyz{c.r(), c.g(), c.b(), c.a(), float(v.XX), float(v.YY)} {}
+    flute6(gle_color const& c, flute2 const& v) : xyz{c.r(), c.g(), c.b(), c.a(), v.xy[0], v.xy[1]} {}
     flute6(flute3 const& a, flute3 const& b) : xyz{a.xyz[0], a.xyz[1], a.xyz[2], b.xyz[0], b.xyz[1], b.xyz[2]} {}
-    flute6(Vector1 const& v, gle_color const& c) : xyz{float(v.XX), 0.f, c.r(), c.g(), c.b(), c.a()} {}
-    flute6(Vector2 const& v, gle_color const& c) : xyz{float(v.XX), float(v.YY), c.r(), c.g(), c.b(), c.a()} {}
-    flute6(flute2 const& v, gle_color const& c) : xyz{v.xy[0], v.xy[1], c.r(), c.g(), c.b(), c.a()} {}
     flute6(Vector3 const& v, Vector3 const& w) : xyz{float(v.XX), float(v.YY), float(v.ZZ), float(w.XX), float(w.YY), float(w.ZZ)} {}
     static flute6 cast(double x, double y, double z, double a, double b, double c)
     { return flute6(float(x), float(y), float(z), float(a), float(b), float(c)); }
@@ -75,11 +75,11 @@ struct flute8
     float xyz[8];
     flute8() : xyz{0, 0, 0, 0, 0, 0, 0, 0} {}
     flute8(float x, float y, float z, float t, float r, float g, float b, float a) : xyz{x, y, z, t, r, g, b, a} {}
-    flute8(float x, float y, float z, gle_color const& c) : xyz{x, y, z, 1.f, c.r(), c.g(), c.b(), c.a()} {}
-    flute8(Vector1 const& v, gle_color const& c) : xyz{float(v.XX), 0.f, 0.f, 1.f, c.r(), c.g(), c.b(), c.a()} {}
-    flute8(Vector2 const& v, gle_color const& c) : xyz{float(v.XX), float(v.YY), 0.f, 1.f, c.r(), c.g(), c.b(), c.a()} {}
-    flute8(Vector3 const& v, gle_color const& c) : xyz{float(v.XX), float(v.YY), float(v.ZZ), 1.f, c.r(), c.g(), c.b(), c.a()} {}
-    flute8(flute3 const& v, gle_color const& c) : xyz{v.xyz[0], v.xyz[1], v.xyz[2], 1.f, c.r(), c.g(), c.b(), c.a()} {}
+    flute8(gle_color const& c, float x, float y, float z) : xyz{c.r(), c.g(), c.b(), c.a(), x, y, z, 1.f} {}
+    flute8(gle_color const& c, Vector1 const& v) : xyz{c.r(), c.g(), c.b(), c.a(), float(v.XX), 0.f, 0.f, 1.f} {}
+    flute8(gle_color const& c, Vector2 const& v) : xyz{c.r(), c.g(), c.b(), c.a(), float(v.XX), float(v.YY), 0.f, 1.f} {}
+    flute8(gle_color const& c, Vector3 const& v) : xyz{c.r(), c.g(), c.b(), c.a(), float(v.XX), float(v.YY), float(v.ZZ), 1.f} {}
+    flute8(gle_color const& c, flute3 const& v) : xyz{c.r(), c.g(), c.b(), c.a(), v.xyz[0], v.xyz[1], v.xyz[2], 1.f} {}
     flute8(gle_color const& c, gle_color const& d) : xyz{c.r(), c.g(), c.b(), c.a(), d.r(), d.g(), d.b(), d.a()} {}
 };
 

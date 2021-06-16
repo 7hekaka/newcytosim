@@ -255,8 +255,8 @@ void Display2::drawCoupleB(Couple const* cx) const
         glEnableClientState(GL_COLOR_ARRAY);
         fluteD4* flu = gle::mapBufferC4VD(4);
 #if 0
-        flu[0] = { p1, pd1->color };
-        flu[1] = { p2, pd2->color };
+        flu[0] = { pd1->color, p1 };
+        flu[1] = { pd2->color, p2 };
 #else
         /*
          Can shift positions towards the minus-end by couple's length
@@ -269,10 +269,10 @@ void Display2::drawCoupleB(Couple const* cx) const
         Vector pp = 0.5*(p1+p2) + (0.25*cx->prop->length)*(d1+d2);
         gle_color col1 = pd1->visible ? pd1->color : air;
         gle_color col2 = pd2->visible ? pd2->color : air;
-        flu[0] = { p1, col1 };
-        flu[1] = { pp, col1 };
-        flu[2] = { pp, col2 };
-        flu[3] = { p2, col2 };
+        flu[0] = { col1, p1 };
+        flu[1] = { col1, pp };
+        flu[2] = { col2, pp };
+        flu[3] = { col2, p2 };
 #endif
         gle::unmapBufferC4VD();
         lineWidth(pd1->width);

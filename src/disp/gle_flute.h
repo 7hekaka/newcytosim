@@ -21,6 +21,16 @@ typedef flute6 fluteD4;
 
 namespace gle
 {
+    /// define buffer layout
+    void setBufferV(size_t vertex, size_t skip = 1);
+
+    /// define buffer layout
+    void setBufferVN(size_t normals, size_t vertex);
+
+    /// define buffer layout
+    void setBufferCNV(size_t colors, size_t normals, size_t vertex, size_t skip = 1);
+
+    
     /// current buffer
     GLuint currStream();
     
@@ -35,42 +45,42 @@ namespace gle
     
     /// map GPU buffer
     float* mapFloatBuffer(size_t cnt);
-    /// unmap GPU buffer
-    void unmapFloatBuffer(size_t vertex, size_t normals, size_t colors);
-    /// bind GPU buffer
-    void bindFloatBuffer(size_t vertex, size_t normals, size_t colors, size_t skip);
+    /// private
+    inline void unmap() { glUnmapBuffer(GL_ARRAY_BUFFER); }
+    /// private
+    inline void bind() { glBindBuffer(GL_ARRAY_BUFFER, currStream()); }
     
     /// map / unmap GPU buffer for 2D vertex
     inline flute2* mapBufferV2(size_t n) { return (flute2*)mapFloatBuffer(2*n); }
-    inline void  unmapBufferV2() { unmapFloatBuffer(2, 0, 0); }
+    inline void  unmapBufferV2() { unmap(); setBufferV(2); }
     
     /// map / unmap GPU buffer for 3D vertex
     inline flute3* mapBufferV3(size_t n) { return (flute3*)mapFloatBuffer(3*n); }
-    inline void  unmapBufferV3() { unmapFloatBuffer(3, 0, 0); }
+    inline void  unmapBufferV3() { unmap(); setBufferV(3); }
 
-    /// map / unmap GPU buffer for 2D vertex + 4 color data
+    /// map / unmap GPU buffer for 4 color data + 2D vertex
     inline flute6* mapBufferC4V2(size_t n) { return (flute6*)mapFloatBuffer(6*n); }
-    inline void  unmapBufferC4V2() { unmapFloatBuffer(2, 0, 4); }
+    inline void  unmapBufferC4V2() { unmap(); setBufferCNV(4, 0, 2); }
 
-    /// map / unmap GPU buffer for 4D vertex + 4 color data
+    /// map / unmap GPU buffer for 4 color data + 4D vertex
     inline flute8* mapBufferC4V4(size_t n) { return (flute8*)mapFloatBuffer(8*n); }
-    inline void  unmapBufferC4V4() { unmapFloatBuffer(4, 0, 4); }
+    inline void  unmapBufferC4V4() { unmap(); setBufferCNV(4, 0, 4); }
     
     /// map / unmap GPU buffer for 3D vertex + 3 normal data
-    inline flute6* mapBufferN3V3(size_t n) { return (flute6*)mapFloatBuffer(6*n); }
-    inline void unmapBufferN3V3() { unmapFloatBuffer(3, 3, 0); }
+    inline flute6* mapBufferV3N3(size_t n) { return (flute6*)mapFloatBuffer(6*n); }
+    inline void unmapBufferV3N3() { unmap(); setBufferVN(3, 3); }
     
     /// map / unmap GPU buffer for vertex data only
-    fluteD* mapBufferVD(size_t cnt);
-    void  unmapBufferVD();
-    void   bindBufferVD(size_t skip);
+    inline fluteD* mapBufferVD(size_t n) { return (fluteD*)mapFloatBuffer((DIM>2?3:2)*n); }
+    inline void  unmapBufferVD() { unmap(); setBufferV((DIM>2?3:2)); }
+    inline void   bindBufferVD(size_t skip) { bind(); setBufferV((DIM>2?3:2), skip); }
 
-    /// map / unmap GPU buffer for vertex + color data
-    fluteD4* mapBufferC4VD(size_t cnt);
-    void   unmapBufferC4VD();
-    void   bindBufferC4VD(size_t skip);
+    /// map / unmap GPU buffer for color data + vertex
+    inline fluteD4* mapBufferC4VD(size_t n) { return (fluteD4*)mapFloatBuffer((DIM>2?8:6)*n); }
+    inline void   unmapBufferC4VD() { unmap(); setBufferCNV(4, 0, (DIM>2?4:2)); }
+    inline void    bindBufferC4VD(size_t skip) { bind(); setBufferCNV(4, 0, (DIM>2?4:2), skip); }
 
-    unsigned* mapIndexBuffer(size_t cnt);
+    unsigned* mapIndexBuffer(size_t n);
     void  unmapIndexBuffer();
     void   bindIndexBuffer(size_t skip);
 };

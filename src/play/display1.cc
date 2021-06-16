@@ -164,7 +164,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
-                flu[i++] = {setVertex(obj->posFoot(), obj), obj->disp()->color2};
+                flu[i++] = {obj->disp()->color2, setVertex(obj->posFoot(), obj)};
         }
         gle::unmapBufferC4VD();
         pointSize(prop->point_size);
@@ -193,8 +193,8 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 Q = P;
                 d = air;
             }
-            flu[i++] = {setVertex(P, fib), c};
-            flu[i++] = {setVertex(Q, obj), d};
+            flu[i++] = {c, setVertex(P, fib)};
+            flu[i++] = {d, setVertex(Q, obj)};
         }
     }
     gle::unmapBufferC4VD();
@@ -227,7 +227,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( obj->active() && obj->disp1()->perceptible )
-                flu[i++] = {setVertex(obj->posFree(), obj), obj->disp1()->color2};
+                flu[i++] = {obj->disp1()->color2, setVertex(obj->posFree(), obj)};
         }
         gle::unmapBufferC4VD();
         pointSize(prop->point_size);
@@ -240,7 +240,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( !obj->active() && obj->disp1()->perceptible )
-                flu[i++] = {obj->posFree(), obj->disp1()->color2};
+                flu[i++] = {obj->disp1()->color2, obj->posFree()};
         }
         gle::unmapBufferC4VD();
         glDisable(GL_POINT_SMOOTH);
@@ -270,17 +270,17 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
         {
             nxt = obj->next();
             if ( obj->disp12()->perceptible )
-                flu[i++] = {setVertex(obj->posFree(), obj), obj->disp12()->color2};
+                flu[i++] = { obj->disp12()->color2, setVertex(obj->posFree(), obj) };
             obj = nxt;
         }
         while ( obj )
         {
             nxt = obj->next();
             if ( obj->disp21()->perceptible )
-                flu[i++] = {setVertex(obj->posFree(), obj), obj->disp21()->color2};
+                flu[i++] = { obj->disp21()->color2, setVertex(obj->posFree(), obj) };
             obj = nxt->next();
             if ( nxt->disp12()->perceptible )
-                flu[i++] = {setVertex(nxt->posFree(), nxt), nxt->disp12()->color2};
+                flu[i++] = { nxt->disp12()->color2, setVertex(nxt->posFree(), nxt) };
         }
         gle::unmapBufferC4VD();
         pointSize(prop->point_size);
@@ -299,13 +299,13 @@ void Display1::drawCouplesA(CoupleSet const& set) const
         {
             Fiber const* fib = obj->fiber1();
             if ( obj->disp1()->perceptible & fib->disp->visible )
-                flu[i++] = {setVertex(obj->posHand1(), fib), obj->disp1()->color2};
+                flu[i++] = { obj->disp1()->color2, setVertex(obj->posHand1(), fib) };
         }
         for ( Couple * obj=set.firstFA(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber2();
             if ( obj->disp2()->perceptible & fib->disp->visible )
-                flu[i++] = {setVertex(obj->posHand2(), fib), obj->disp2()->color2};
+                flu[i++] = { obj->disp2()->color2, setVertex(obj->posHand2(), fib) };
         }
         gle::unmapBufferC4VD();
         pointSize(prop->point_size);
@@ -340,14 +340,14 @@ void Display1::drawCouplesB(CoupleSet const& set) const
         if ( modulo ) modulo->fold(Q, P);
         if ( vis1 | vis2 )
         {
-            flu[i++] = {setVertex(P, fib1), col1};
-            flu[i++] = {setVertex(Q, fib1), col2};
+            flu[i++] = { col1, setVertex(P, fib1) };
+            flu[i++] = { col2, setVertex(Q, fib1) };
         }
 #if ENABLE_EXPLODED_DISPLAY
         if ( vis2 )
         {
-            flu[i++] = {setVertex(Q, fib2), col2};
-            flu[i++] = {setVertex(P, fib2), col1};
+            flu[i++] = { col2, setVertex(Q, fib2) };
+            flu[i++] = { col1, setVertex(P, fib2) };
         }
 #endif
     }
