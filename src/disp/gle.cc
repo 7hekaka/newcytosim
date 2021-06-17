@@ -956,7 +956,7 @@ namespace gle
     //-----------------------------------------------------------------------
     
     /// draw triangles with interleaved Vertex + Normal data
-    static void drawVNTriangles(flute6* ptr, size_t cnt)
+    static void drawVNTriangles(flute6* ptr, GLsizei cnt)
     {
         glEnableClientState(GL_NORMAL_ARRAY);
         glVertexPointer(3, GL_FLOAT, 6*sizeof(float), ptr);
@@ -1093,7 +1093,7 @@ namespace gle
     #pragma mark - Tubes
 
     /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
-    flute6* setTube(flute6* flu, size_t inc, float B, float T)
+    size_t setTube(flute6* flu, size_t inc, float B, float T)
     {
         assert_true( B <= T );
         size_t i = 0;
@@ -1103,11 +1103,11 @@ namespace gle
             flu[i++] = { C, S, T, C, S, 0 };
             flu[i++] = { C, S, B, C, S, 0 };
         }
-        return flu + i;
+        return i;
     }
     
     /// set triangle strip for a tube of constant radius R with Z in [B, T]
-    flute6* setTube(flute6* flu, size_t inc, float B, float T, float R)
+    size_t setTube(flute6* flu, size_t inc, float B, float T, float R)
     {
         assert_true( B <= T );
         size_t i = 0;
@@ -1117,18 +1117,19 @@ namespace gle
             flu[i++] = { R*C, R*S, T, C, S, 0 };
             flu[i++] = { R*C, R*S, B, C, S, 0 };
         }
-        return flu + i;
+        return i;
     }
     
     /// set triangle strip for a double-walled tube of inner radius R with Z in [B, T]
-    flute6* setDoubleTube(flute6* flu, size_t inc, float B, float T, float R)
+    size_t setDoubleTube(flute6* flu, size_t inc, float B, float T, float R)
     {
-        flute6 * ptr = setTube(flu, inc, B, T);
-        return setTube(ptr, inc, B, T, R);
+        size_t i = setTube(flu, inc, B, T);
+        i += setTube(flu+i, inc, B, T, R);
+        return i;
     }
 
     /// set triangle strip for a cone of radius rB at Z=B, and rT at Z=T
-    flute6* setCone(flute6* flu, size_t inc, float B, float T, float rB, float rT)
+    size_t setCone(flute6* flu, size_t inc, float B, float T, float rB, float rT)
     {
         assert_true( B <= T );
         const float H(T-B), R(rT-rB);
@@ -1142,11 +1143,11 @@ namespace gle
             flu[i++] = { rT*C, rT*S, T, tC*C, tC*S, tS };
             flu[i++] = { rB*C, rB*S, B, tC*C, tC*S, tS };
         }
-        return flu + i;
+        return i;
     }
 
     /// set triangle strip for a disc at Z, with given normal in Z
-    flute6* setDisc(flute6* flu, size_t inc, float Z, float N)
+    size_t setDisc(flute6* flu, size_t inc, float Z, float N)
     {
         size_t i = 0;
         flu[i++] = { 1, 0, Z, 0, 0, N };
@@ -1157,7 +1158,7 @@ namespace gle
             flu[i++] = { C, -S, Z, 0, 0, N };
         }
         flu[i++] = {-1, 0, Z, 0, 0, N };
-        return flu + i;
+        return i;
     }
     
     size_t sizeTubeBuffers()
@@ -1173,28 +1174,29 @@ namespace gle
         assert_true( 0 == ( ptr - ori ) % 6 );
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const float B = -32.f, T = 256.f, E = 0.03125;
-        start_[0] = ptr-ori; ptr = setTube(ptr, 1, 0, 1);
-        start_[1] = ptr-ori; ptr = setTube(ptr, 2, 0, 1);
-        start_[2] = ptr-ori; ptr = setTube(ptr, 4, 0, 1);
-        start_[3] = ptr-ori; ptr = setTube(ptr, 4, 0, 1+E);
-        start_[4] = ptr-ori; ptr = setTube(ptr, 4,-E, 1+E);
-        start_[5] = ptr-ori; ptr = setTube(ptr, 4,-E, 1);
-        start_[6] = ptr-ori; ptr = setTube(ptr, 1, B, T);
-        start_[8] = ptr-ori; ptr = setTube(ptr, 2, B, T);
-        start_[9] = ptr-ori; ptr = setTube(ptr, 4, B, T);
-        start_[10] = ptr-ori; ptr = setTube(ptr, 1, 0, T);
-        start_[11] = ptr-ori; ptr = setTube(ptr, 2, 0, T);
-        start_[12] = ptr-ori; ptr = setTube(ptr, 4, 0, T);
-        start_[13] = ptr-ori; ptr = setCone(ptr, 1, 0, 1, 1, 0);
-        start_[14] = ptr-ori; ptr = setCone(ptr, 2, 0, 1, 1, 0);
-        start_[15] = ptr-ori; ptr = setCone(ptr, 2, 0, 1, 1, 0.25);
-        start_[16] = ptr-ori; ptr = setDisc(ptr, 1, 0, 1);
-        start_[17] = ptr-ori; ptr = setDisc(ptr, 2, 0, 1);
-        start_[18] = ptr-ori; ptr = setDisc(ptr, 1, 1, 1);
-        start_[19] = ptr-ori; ptr = setDisc(ptr, 2, 1, 1);
-        start_[20] = ptr-ori; ptr = setDisc(ptr, 1, 0, -1);
-        start_[21] = ptr-ori; ptr = setDisc(ptr, 2, 0, -1);
-        return ptr;
+        size_t i = 0, s = ptr - ori;
+        start_[0] = i+s; i += setTube(ptr+i, 1, 0, 1);
+        start_[1] = i+s; i += setTube(ptr+i, 2, 0, 1);
+        start_[2] = i+s; i += setTube(ptr+i, 4, 0, 1);
+        start_[3] = i+s; i += setTube(ptr+i, 4, 0, 1+E);
+        start_[4] = i+s; i += setTube(ptr+i, 4,-E, 1+E);
+        start_[5] = i+s; i += setTube(ptr+i, 4,-E, 1);
+        start_[6] = i+s; i += setTube(ptr+i, 1, B, T);
+        start_[8] = i+s; i += setTube(ptr+i, 2, B, T);
+        start_[9] = i+s; i += setTube(ptr+i, 4, B, T);
+        start_[10] = i+s; i += setTube(ptr+i, 1, 0, T);
+        start_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
+        start_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
+        start_[13] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0);
+        start_[14] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0);
+        start_[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.25);
+        start_[16] = i+s; i += setDisc(ptr+i, 1, 0, 1);
+        start_[17] = i+s; i += setDisc(ptr+i, 2, 0, 1);
+        start_[18] = i+s; i += setDisc(ptr+i, 1, 1, 1);
+        start_[19] = i+s; i += setDisc(ptr+i, 2, 1, 1);
+        start_[20] = i+s; i += setDisc(ptr+i, 1, 0, -1);
+        start_[21] = i+s; i += setDisc(ptr+i, 2, 0, -1);
+        return ptr + i;
     }
 
     inline size_t nbTrianglesTube(size_t inc)
