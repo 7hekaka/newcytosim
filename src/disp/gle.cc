@@ -1993,7 +1993,7 @@ namespace gle
      Note: width and height are the current size of the viewport (window)
      */
     void drawText(const char text[], void* font, const gle_color back,
-                     const int position, int width, int height)
+                  const int position, int width, int height)
     {
         assert_true( width > 0 );
         assert_true( height > 0 );

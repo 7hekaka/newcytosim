@@ -84,7 +84,7 @@ namespace gle
     inline void translate(float x, float y, float z)    { glTranslatef(x, y, z); }
     inline void translate(double x, double y, double z) { glTranslated(x, y, z); }
 
-    inline void transScale(float x, float y, float z, double s) { glTranslatef(x, y, z); glScaled(s,s,s); }
+    inline void transScale(float x, float y, float z, float s) { glTranslatef(x, y, z); glScalef(s,s,s); }
 
 #if REAL_IS_DOUBLE
    

@@ -552,8 +552,8 @@ static void changeEndStyle(FiberDisp* p, int val)
 static void changeEndSize(FiberDisp* p, int inc)
 {
     float* size = p->end_size;
-    real s0 = std::max(1.0f, size[0] + inc);
-    real s1 = std::max(1.0f, size[1] + inc);
+    real s0 = grained(size[0], inc);
+    real s1 = grained(size[1], inc);
     if ( p->end_style[0] )
     {
         size[0] = s0;

@@ -32,6 +32,7 @@ static void zoo_fill(int i)
 
 void gle::zoo_stroke(char c)
 {
+    return;
     switch ( c )
     {
         case 't': zoo_draw(0); break;
@@ -50,6 +51,7 @@ void gle::zoo_stroke(char c)
 
 void gle::zoo_paint(char c)
 {
+    return;
     switch ( c )
     {
         case 't': zoo_fill(0); break;

@@ -1845,8 +1845,10 @@ real Chain::someAbscissa(real dis, FiberEnd ref, int mod, real alpha) const
     dis = abscissaFrom(a, ref);
 
     if ( !betweenMP(dis) )
-        throw InvalidParameter("hand::abscissa is out of range");
-        
+    {
+        std::string str = "["+std::to_string(abscissaM())+" "+std::to_string(abscissaP())+"]";
+        throw InvalidParameter("hand::abscissa is out of range "+str);
+    }
     return dis;
 }
 

@@ -232,16 +232,16 @@ public:
     void drawText(std::string const& str, void* font, gle_color, int pos) const;
 
     /// display a scale bar vertical or horizontal
-    void drawScaleH(GLfloat, GLfloat, GLfloat) const;
+    void drawScaleH(float, float, float) const;
     
     /// display a scale bar vertical or horizontal
-    void drawScaleV(GLfloat, GLfloat, GLfloat) const;
+    void drawScaleV(float, float, float) const;
     
     /// display a scale bar vertical or horizontal
-    void drawScaleX(GLfloat) const;
+    void drawScaleX(float) const;
 
     /// display a scale bar (mode is vertical, horizontal, centered)
-    void drawScaleBar(int mode, real) const;
+    void drawScaleBar(int mode, float) const;
     
 };
 

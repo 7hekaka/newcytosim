@@ -1,0 +1,136 @@
+% The new logo of Cytosim made with filaments
+% F. Nedelec, 17.06.2021
+
+set simul system
+{
+    time_step = 0.001
+    viscosity = 10
+}
+
+set system display { size = 1024; }
+
+set space cell
+{
+    shape = sphere
+    display = ( color=blue, blue; width=1; visible=3; )
+}
+
+set fiber text
+{
+    rigidity = 10
+    segmentation = 0.1
+    display = ( line=32, 1; )
+}
+
+set fiber filament
+{
+    rigidity = 10
+    segmentation = 0.1
+    display = ( line=32, 1; )
+}
+
+set hand binder
+{
+    binding = 10, 0.001
+    unbinding = 0, inf
+    bind_also_end = both_ends
+    display = ( width=3; size=9; color=red; )
+}
+
+set single pinch
+{
+    hand = binder
+    activity = fixed
+    stiffness = 1000
+}
+
+set couple joint
+{
+    hand1 = binder
+    hand2 = binder
+    stiffness = 1000
+}
+
+new cell
+{
+    radius = 11
+}
+
+
+% Letter C
+new text { placement=off; shape = -7 -2, -8.3 -1.5, -8.4 1.5, -7 2; }
+new pinch { position = -7 -2; attach = last, 0; }
+new pinch { position = -8.5 0; attach = last, 2.9; }
+new pinch { position = -7 2; attach = last, 5.8; }
+
+% Letter Y
+new text { length = 2.5; position = -5.3 1; direction = -1 1.5;}
+new text { length = 4.2; position = -4.5 0; direction = 1 3;}
+new joint { attach1 = last-1, 0; attach2 = last, 2 }
+
+% Letter T
+new text { length = 2; position = -2.0 1.9; direction = 1 0;}
+new text { length = 4; position = -2.1 0; direction = 0 1;}
+new joint { attach1 = last-1, 1; attach2 = last, 4 }
+
+% Letter O
+new text { placement=off; shape = 1.3 -1, 1.3 1.6, -0.5 1.6, -0.5 -1.6, 1.3 -1.6, 1.3 0; }
+new joint { attach1 = last, 0; attach2 = last, 10 }
+new joint { attach1 = last, 1; attach2 = last, 11 }
+new pinch { position = 0.5  2; attach = last, 3.4; }
+new pinch { position = 0.3 -2; attach = last, 8.4; }
+
+% Letter S
+new text { placement=off; shape = 3.8 2, 2.4 1.5, 2.3 0.5, 4.1 -0.5, 4 -1.5, 2.6 -2; }
+new pinch { position = 2.3 -2; attach = last, 7; }
+new pinch { position = 3.2 0; attach = last, 3.5; }
+new pinch { position = 3.9 2; attach = last, 0; }
+
+% Letter I
+new text { length = 4.2; position = 5 -0.2; direction = 0 -1;}
+new pinch { position = 5 -2; attach = last, 4; }
+new pinch { position = 5  2; attach = last, 0; }
+
+% Letter M
+new text { length = 4.2; position = 6 -0.2; direction = 0 -1;}
+new pinch { position = 6 0; attach = last, 2; }
+new text { length = 1.25; position = 6.5 1.5; direction = -1 1;}
+new joint { attach1 = last, 1.25; attach2 = last-1, 0 }
+new text { length = 1.25; position = 7.5 1.5; direction = 1 1;}
+new joint { attach1 = last, 0; attach2 = last-1, 0 }
+new text { length = 4.2; position = 8 -0.2; direction = 0 -1;}
+new joint { attach1 = last-1, 1.25; attach2 = last, 0 }
+new pinch { position = 8 0; attach = last, 2; }
+
+% understroke
+new filament { length = 12; position = 0 -5; direction = 1 0; }
+new pinch { position = -6 -5; attach = last, 0; }
+new pinch { position =  1 -4.5; attach = last, 7; }
+new pinch { position = +5 -5; attach = last, 12; }
+
+% equilibrate text
+run 1234 system
+
+% add over lines
+new filament { length = 4; position = -5 7; direction = -1 0; }
+new pinch { position = -7 4; attach = last, 0, plus_end; }
+
+new filament { length = 3.5; position = -3 7; direction = -1 0; }
+new pinch { position = -4 4; attach = last, 0, plus_end; }
+
+new filament { length = 3.2; position = -1.5 7; direction = -1 0; }
+new pinch { position = -1.7 4; attach = last, 0, plus_end; }
+
+new filament { length = 3.2; position = 1.5 7; direction = 1 0; }
+new pinch { position = 1.7 4; attach = last, 0, plus_end; }
+
+new filament { length = 3.5; position = 3 7; direction = 1 0; }
+new pinch { position = 4 4; attach = last, 0, plus_end; }
+
+new filament { length = 4; position = 5 7; direction = 1 0; }
+new pinch { position = 7 4; attach = last, 0, plus_end; }
+
+run 2000 system
+{
+    nb_frames = 10
+}

@@ -865,16 +865,16 @@ size_t setTicksV(flute4* pts, int cnt, float d, float a, float b)
  - lines every scale/1000, of width (b-a)/125
  .
  */
-void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
+void View::drawScaleH(float s, float a, float b) const
 {
     glLineWidth(1);
     gle::drawRectangle(-s/2, a, s/2, b, 0);
     flute4 pts[24];
-    setTicksH(pts, 5, s, a, b);
+    GLfloat w(2);
 
     // draw bars
     s /= 10;
-    GLfloat w(2);
+    setTicksH(pts, 5, s, a, b);
     glLineWidth(w);
     glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 18);
@@ -907,16 +907,16 @@ void View::drawScaleH(GLfloat s, GLfloat a, GLfloat b) const
  - lines every scale/1000, of width (b-a)/125
  .
  */
-void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
+void View::drawScaleV(float s, float a, float b) const
 {
     glLineWidth(1);
     gle::drawRectangle(a, -s/2, b, s/2, 0);
     flute4 pts[24];
-    setTicksV(pts, 5, s, a, b);
+    GLfloat w(2);
 
     // draw bars
     s /= 10;
-    GLfloat w(2);
+    setTicksV(pts, 5, s, a, b);
     glLineWidth(w);
     glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_LINES, 0, 18);
@@ -948,12 +948,12 @@ void View::drawScaleV(GLfloat s, GLfloat a, GLfloat b) const
  - tiny lines every scale/1000, of width 0.25
  .
  */
-void View::drawScaleX(GLfloat scale) const
+void View::drawScaleX(float scale) const
 {
-    GLfloat s(scale);
-    GLfloat a( scale/20);
-    GLfloat b(-scale/20);
-    GLfloat w(2);
+    float s(scale);
+    float a( scale/20);
+    float b(-scale/20);
+    float w(2);
 
     flute4 pts[24] = {
         {-s, a,-s, b}, {s, a, s, b},
@@ -983,7 +983,7 @@ void View::drawScaleX(GLfloat scale) const
 
 /**
  */
-void View::drawScaleBar(int mode, const real scale) const
+void View::drawScaleBar(int mode, const float S) const
 {
     GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
     GLboolean light = glIsEnabled(GL_LIGHTING);
@@ -997,7 +997,6 @@ void View::drawScaleBar(int mode, const real scale) const
     glLoadIdentity();
     
     GLfloat shift(32 * pixelSize() * zoom);
-    GLfloat S(scale);
     
     switch( mode )
     {

@@ -66,7 +66,7 @@ namespace gle
     
     void setBufferCNV(size_t col, size_t nor, size_t pts, size_t skip)
     {
-        size_t tot = skip * ( pts + nor + col) * sizeof(float);
+        size_t tot = skip * ( pts + nor + col ) * sizeof(float);
         if ( col > 0 )
         {
             glEnableClientState(GL_COLOR_ARRAY);
@@ -75,9 +75,9 @@ namespace gle
         if ( nor > 1 )
         {
             glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_FLOAT, tot, (void*)(pts*sizeof(float)));
+            glNormalPointer(GL_FLOAT, tot, (void*)(col*sizeof(float)));
         }
-        glVertexPointer(pts, GL_FLOAT, tot, (void*)((pts+nor)*sizeof(float)));
+        glVertexPointer(pts, GL_FLOAT, tot, (void*)((col+nor)*sizeof(float)));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
