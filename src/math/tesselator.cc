@@ -352,9 +352,6 @@ void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
 }
 
 
-//------------------------------------------------------------------------------
-#pragma mark -
-
 void Tesselator::setCorners(FLOAT vex[][3], unsigned div)
 {
     for ( unsigned c = 0; c < num_corners_; ++c )
@@ -365,6 +362,7 @@ void Tesselator::setCorners(FLOAT vex[][3], unsigned div)
     }
     num_edge_vertices_ = num_corners_;
 }
+
 
 
 void Tesselator::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div)
@@ -387,7 +385,25 @@ void Tesselator::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div
 }
 
 
-void Tesselator::buildTetrahedron(unsigned div, bool make)
+//------------------------------------------------------------------------------
+#pragma mark -
+
+
+void Tesselator::build(Tesselator::Polyhedra kind, unsigned div, int make)
+{
+    switch( kind )
+    {
+        case UNSET: break;
+        case TETRAHEDRON: buildTetrahedron(div, make); break;
+        case OCTAHEDRON: buildOctahedron(div, make); break;
+        case ICOSAHEDRON: buildIcosahedron(div, make); break;
+        case HEMISPHERE: buildHemisphere(div, make); break;
+        case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
+    }
+}
+
+
+void Tesselator::buildTetrahedron(unsigned div, int make)
 {
     kind_ = TETRAHEDRON;
     init(4, 6, 4, div);
@@ -424,7 +440,7 @@ void Tesselator::buildTetrahedron(unsigned div, bool make)
 }
 
 
-void Tesselator::buildOctahedron(unsigned div, bool make)
+void Tesselator::buildOctahedron(unsigned div, int make)
 {
     kind_ = OCTAHEDRON;
     init(6, 12, 8, div);
@@ -462,7 +478,7 @@ void Tesselator::buildOctahedron(unsigned div, bool make)
 }
 
 
-void Tesselator::buildIcosahedron(unsigned div, bool make)
+void Tesselator::buildIcosahedron(unsigned div, int make)
 {
     kind_ = ICOSAHEDRON;
     init(12, 30, 20, div);
@@ -521,7 +537,7 @@ void Tesselator::buildIcosahedron(unsigned div, bool make)
     }
 }
 
-void Tesselator::buildIcosahedronRotated(unsigned div, bool make)
+void Tesselator::buildIcosahedronRotated(unsigned div, int make)
 {
     kind_ = ICOSAHEDRON;
     init(12, 30, 20, div);
@@ -582,7 +598,7 @@ void Tesselator::buildIcosahedronRotated(unsigned div, bool make)
     }
 }
 
-void Tesselator::buildHemisphere(unsigned div, bool make)
+void Tesselator::buildHemisphere(unsigned div, int make)
 {
     kind_ = HEMISPHERE;
     halfZ_ = 1;
@@ -648,7 +664,7 @@ void Tesselator::buildHemisphere(unsigned div, bool make)
 /**
  This divides the edges by 'div' and the 6 square faces bi 'vid'
  */
-void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, bool make)
+void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make)
 {
     kind_ = DICE;
     init(24, 90, 44, div);

@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "gle.h"
+#include "gle_flute.h"
 #include "glut.h"
 #include "glapp.h"
 #include "tesselator.h"
@@ -29,7 +30,8 @@ void reset()
 {
     if ( ico )
         delete ico;
-    ico = new Tesselator((Tesselator::Polyhedra)kind, rank, 1);
+    ico = new Tesselator();
+    ico->build((Tesselator::Polyhedra)kind, rank, 1);
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points, %i faces",
@@ -103,7 +105,6 @@ void processNormalKey(unsigned char c, int x, int y)
 void drawPlane()
 {
     glColor3f(0.25f, 0.25f, 0.25f);
-    glEnableClientState(GL_VERTEX_ARRAY);
     GLfloat pts[8] = {1, 1,-1, 1, 1,-1,-1,-1};
     glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -112,13 +113,11 @@ void drawPlane()
 
 void drawFacesArray()
 {
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
     glNormalPointer(GL_FLOAT, 0, ico->vertex_data());
     glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_INT, ico->face_data());
     glDisableClientState(GL_NORMAL_ARRAY);
-    //glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -147,7 +146,6 @@ void initVBO()
 
 void drawFacesVBO()
 {
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
@@ -160,7 +158,6 @@ void drawFacesVBO()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glDisableClientState(GL_NORMAL_ARRAY);
-    //glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 
@@ -174,15 +171,8 @@ void drawFaces()
 
 void drawEdges()
 {
-    glColor3f(1,1,1);
-    glLineWidth(0.5);
-    glBegin(GL_LINES);
-    for ( unsigned i = 0; i < ico->num_edges(); ++i )
-    {
-        glVertex3fv(ico->edge_vertex0(i));
-        glVertex3fv(ico->edge_vertex1(i));
-    }
-    glEnd();
+    glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
+    glDrawElements(GL_LINES, 2*ico->num_edges(), GL_UNSIGNED_INT, ico->edge_data());
 }
 
 void nameVertices()
@@ -209,12 +199,10 @@ void drawVertices()
 {
     glPointSize(10);
     glColor3f(1, 1, 1);
-    glEnableClientState(GL_VERTEX_ARRAY);
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDrawArrays(GL_POINTS, 0, ico->num_vertices());
-    glDisableClientState(GL_VERTEX_ARRAY);
 }
 
 void display(View& view, int)
@@ -252,10 +240,10 @@ void display(View& view, int)
     }
     if ( showEdges )
     {
-#if 1
         glDisable(GL_LIGHTING);
         glLineWidth(0.25);
         glColor3f(1, 1, 1);
+#if 1
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         drawFaces();
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -291,5 +279,6 @@ int main(int argc, char* argv[])
     glApp::setScale(3);
     gle::initialize();
     reset();
+    glEnableClientState(GL_VERTEX_ARRAY);
     glutMainLoop();
 }

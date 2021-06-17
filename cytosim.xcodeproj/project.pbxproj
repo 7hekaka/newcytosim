@@ -618,22 +618,15 @@
 		BB8EE1E42542DE5E00E15C40 /* test_tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9A56010A74E9E40069E362 /* test_tesselator.cc */; };
 		BB8EE1E62542DE6D00E15C40 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8EE1E52542DE6D00E15C40 /* GLUT.framework */; };
 		BB8EE1E82542DE7400E15C40 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB8EE1E72542DE7400E15C40 /* OpenGL.framework */; };
-		BB8EE1E92542DEA100E15C40 /* gle.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711501DECDA1300352630 /* gle.cc */; };
 		BB8EE1EA2542DEB200E15C40 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
-		BB8EE1EB2542DF1000E15C40 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
-		BB8EE1EC2542DF1000E15C40 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
-		BB8EE1ED2542DF2400E15C40 /* offscreen.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711591DECDA1300352630 /* offscreen.cc */; };
 		BB8EE1EE2542DF3300E15C40 /* property.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50D0D70FFA30CD00278580 /* property.cc */; };
 		BB8EE1EF2542DF3300E15C40 /* property_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD8A4B70FF253B8005A6615 /* property_list.cc */; };
 		BB8EE1F02542DF3C00E15C40 /* glossary.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1F9C2C0FD5A9790047327F /* glossary.cc */; };
-		BB8EE1F12542DF4800E15C40 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
 		BB8EE1F22542DF4F00E15C40 /* tokenizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50D6120FFAE51900278580 /* tokenizer.cc */; };
 		BB8EE1F32542DF5800E15C40 /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
 		BB8EE1F42542DF6100E15C40 /* tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* tesselator.cc */; };
 		BB8EE1F52542DF6C00E15C40 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
 		BB8EE1F62542DF7800E15C40 /* filepath.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB65DBE911AD53AC005DD116 /* filepath.cc */; };
-		BB8EE1F72542DF8B00E15C40 /* gle_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711521DECDA1300352630 /* gle_color.cc */; };
-		BB8EE1F82542DF8B00E15C40 /* gle_color_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711541DECDA1300352630 /* gle_color_list.cc */; };
 		BB8EE1F92542DF9C00E15C40 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
 		BB8EE1FA2542E01B00E15C40 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
 		BB90E7EE12CA635C000DF711 /* wrist.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB90E7EC12CA635C000DF711 /* wrist.cc */; };
@@ -777,6 +770,8 @@
 		BBB1E47E126DC70B00B19D26 /* actor_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47A126DC70B00B19D26 /* actor_prop.h */; };
 		BBB1E47F126DC70B00B19D26 /* actor.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB1E47B126DC70B00B19D26 /* actor.cc */; };
 		BBB1E480126DC70B00B19D26 /* actor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47C126DC70B00B19D26 /* actor.h */; };
+		BBB22114267B25E200B7DE26 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BBB22115267B260400B7DE26 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
 		BBBD34E01AABA5BE00819326 /* map.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBD34DF1AABA5BE00819326 /* map.h */; };
 		BBBF3BEA260DEA2100079BE3 /* grid_display.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3092292164BAC300C6DEE4 /* grid_display.cc */; };
 		BBBF3BEB260DEA4F00079BE3 /* grid_display.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3092282164BAC300C6DEE4 /* grid_display.h */; };
@@ -2075,6 +2070,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBB22114267B25E200B7DE26 /* libcytodisp.a in Frameworks */,
 				BB8EE1E82542DE7400E15C40 /* OpenGL.framework in Frameworks */,
 				BB8EE1E62542DE6D00E15C40 /* GLUT.framework in Frameworks */,
 			);
@@ -4902,24 +4898,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBB22115267B260400B7DE26 /* print_color.cc in Sources */,
 				BB8EE1FA2542E01B00E15C40 /* exceptions.cc in Sources */,
 				BB8EE1F92542DF9C00E15C40 /* vector3.cc in Sources */,
-				BB8EE1F72542DF8B00E15C40 /* gle_color.cc in Sources */,
-				BB8EE1F82542DF8B00E15C40 /* gle_color_list.cc in Sources */,
 				BB8EE1F62542DF7800E15C40 /* filepath.cc in Sources */,
 				BB8EE1F52542DF6C00E15C40 /* tictoc.cc in Sources */,
 				BB8EE1F42542DF6100E15C40 /* tesselator.cc in Sources */,
 				BB8EE1F32542DF5800E15C40 /* stream_func.cc in Sources */,
 				BB8EE1F22542DF4F00E15C40 /* tokenizer.cc in Sources */,
-				BB8EE1F12542DF4800E15C40 /* print_color.cc in Sources */,
 				BB8EE1F02542DF3C00E15C40 /* glossary.cc in Sources */,
 				BB8EE1EE2542DF3300E15C40 /* property.cc in Sources */,
 				BB8EE1EF2542DF3300E15C40 /* property_list.cc in Sources */,
-				BB8EE1ED2542DF2400E15C40 /* offscreen.cc in Sources */,
-				BB8EE1EB2542DF1000E15C40 /* view.cc in Sources */,
-				BB8EE1EC2542DF1000E15C40 /* view_prop.cc in Sources */,
 				BB8EE1EA2542DEB200E15C40 /* glapp.cc in Sources */,
-				BB8EE1E92542DEA100E15C40 /* gle.cc in Sources */,
 				BB8EE1E42542DE5E00E15C40 /* test_tesselator.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -149,12 +149,15 @@ public:
     /// destructor
     ~Tesselator() { destroy(); }
     
-    void buildTetrahedron(unsigned div, bool make = 1);
-    void buildOctahedron(unsigned div, bool make = 1);
-    void buildIcosahedron(unsigned div, bool make = 1);
-    void buildIcosahedronRotated(unsigned div, bool make = 1);
-    void buildHemisphere(unsigned div, bool make = 1);
-    void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, bool make);
+    /// build as polyhedra refined by order `div`
+    void build(Polyhedra, unsigned div, int make = 0);
+
+    void buildTetrahedron(unsigned div, int make = 1);
+    void buildOctahedron(unsigned div, int make = 1);
+    void buildIcosahedron(unsigned div, int make = 1);
+    void buildIcosahedronRotated(unsigned div, int make = 1);
+    void buildHemisphere(unsigned div, int make = 1);
+    void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
 
     /// set array of indices that define the edges
     void setEdges();
