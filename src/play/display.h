@@ -86,6 +86,9 @@ protected:
     
     /// the value of the size & width unit in natural units (ie. micrometers)
     float sizeScale;
+    
+    /// direction of view
+    Vector3 depthAxis;
 
     /// flag used to calculate clusterAnalysis only once
     size_t fiber_prep;
@@ -137,7 +140,7 @@ public:
     void setPixelFactors(float pixel_size, float unit_value);
     
     /// get ready to display
-    void prepareForDisplay(Simul const&, PropertyList&);
+    void prepareForDisplay(Simul const&, PropertyList&, Vector3 const&);
 
     /// display the whole simulation
     void drawSimul(Simul const&);

@@ -8,6 +8,7 @@
 #include "gle_zoo.h"
 
 
+/** \todo: replace PIXELMAPS by a texture, and draw each particle as a textured Square */
 #define POINTDISP_USES_PIXELMAPS 1
 
 
@@ -25,16 +26,16 @@ private:
 #if POINTDISP_USES_PIXELMAPS
     
     /// pointer to 3 square bitmaps with 4*nPix*nPix pixels each
-    uint8_t   *bmp_[3];
+    uint8_t * bmp_[3];
 
     /// index of the Pixel Buffer Objects on GPU
-    GLuint     pbo_[3];
+    GLuint pbo_[3];
     
     /// center of bitmap
-    GLfloat    mOffs;
+    GLfloat mOffs;
     
     /// allocated size of bitmap
-    unsigned   nPix;
+    unsigned nPix;
 
     /// allocate pixelmap memory
     void allocatePixelmap();
@@ -69,10 +70,10 @@ private:
     unsigned pixSize;
     
     /// draw outline of shape
-    void strokeShape() const { gle::zoo_stroke(shape); }
+    void strokeShape() const { gle::circle(); /*gle::zoo_stroke(shape);*/ }
     
     /// draw surface of shape
-    void paintShape() const { gle::zoo_paint(shape); }
+    void paintShape() const { gle::disc(); /*gle::zoo_paint(shape);*/ }
 
     /// draw active state with OpenGL vector primitives
     void strokeA() const;
@@ -101,10 +102,10 @@ public:
      - 3 : display both sides.
      .
      */
-    int        visible;
+    int visible;
     
     /// color of object (in 3D display, the color of outer surfaces)
-    gle_color  color;
+    gle_color color;
     
     /// second color (set as color[1])
     /**
@@ -112,36 +113,36 @@ public:
      and the inner surfaces of objects such as Sphere, Solid, Bead and Space.
      If it is not defined, `color2` is set to be a darker tone of `color`.
      */
-    gle_color  color2;
+    gle_color color2;
 
     /// if true, attribute random colors to individual objects
-    int        coloring;
+    int coloring;
     
     /// display diameter of points in pixel units
-    float      size;
+    float size;
     
     /// display width of lines
-    float      width;
+    float width;
     
     /// 'c' for circle, 'h' for hexagon, 's' for star, etc.
-    char       shape;
+    char shape;
     
     /// a bitfield to set different display options
-    int        style;
+    int style;
     
     /// character displayed (do not set, or set as 0 to disable this feature)
-    char       symbol;
+    char symbol;
     
     /// color of symbol (set as symbol[1])
-    gle_color  symbol_color;
+    gle_color symbol_color;
     
     /// @}
     
     /// visible and big enough to be seen
-    bool       perceptible;
+    bool perceptible;
     
     /// this is the size in real unit
-    float      realSize;
+    float realSize;
     
 public:
     
@@ -173,7 +174,7 @@ public:
     void write_values(std::ostream&) const;
     
     /// recalculate bitmaps
-    void prepare(GLfloat uf, GLfloat sf, bool make_maps);
+    void prepare_pixels(GLfloat uf, GLfloat sf, bool make_maps);
     
     /// draw inactive state
     template < typename VECTOR >

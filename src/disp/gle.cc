@@ -415,17 +415,6 @@ namespace gle
         primitive();
         if ( !cull ) glDisable(GL_CULL_FACE);
     }
-    
-    /**
-     return axis orthogonal to the display plane, and corresponding to depth
-     obtained from the current modelview transformation
-     */
-    Vector3 depthAxis()
-    {
-        GLfloat mat[16];
-        glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-        return normalize(Vector3(mat[2], mat[6], mat[10]));
-    }
 
     //-----------------------------------------------------------------------
     #pragma mark - Some 3D objects

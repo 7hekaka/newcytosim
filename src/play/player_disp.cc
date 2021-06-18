@@ -222,7 +222,7 @@ void Player::prepareDisplay(View& view, int mag)
     view.setLabel(buildLabel());
     view.setMessage(buildReport(prop.report));
     
-    //----------------- set pixel size and unit-size:
+    //----------------- set pixel size, unit-size and direction:
 
     GLfloat pix = view.pixelSize();
     /*
@@ -240,7 +240,7 @@ void Player::prepareDisplay(View& view, int mag)
     CHECK_GL_ERROR("in prepareDisplay");
 
     try {
-        mDisplay->prepareForDisplay(simul, dispList);
+        mDisplay->prepareForDisplay(simul, dispList, view.depthAxis());
         //std::clog << " dispList.size() = " << dispList.size() << '\n';
     }
     catch(Exception & e)

@@ -18,10 +18,10 @@ private:
     GLint mViewport[4];
     
     /// modelview obtained by getMatrices()
-    GLdouble mModelview[16];
+    GLfloat mModelview[16];
     
     /// projection obtained by getMatrices()
-    GLdouble mProjection[16];
+    GLfloat mProjection[16];
     
     /// half-size of the OpenGL visible region in OpenGL units
     GLfloat visRegion[4];
@@ -96,6 +96,9 @@ public:
     
     /// size of pixel in drawing units
     GLfloat pixelSize() const { return view_size / ( zoom * std::max(width(), height()) ); }
+    
+    /// return direction of view that is orthogonal to display screen
+    Vector3 depthAxis() const;
 
     //---------------------------------------------------------------------------
     
@@ -159,13 +162,13 @@ public:
     //---------------------------------------------------------------------------
     
     /// set local projection matrix as if it had been set by glOrtho()
-    void setOrthoMat(GLdouble * mat);
+    void setOrthoMat(GLfloat * mat);
 
     /// store the matrices defining the current OpenGL Model-View and Projection
     void getMatrices();
     
     /// transform window coordinates to 3D world-coordinates
-    Vector3 unproject(GLdouble x, GLdouble y, GLdouble z, bool get_matrices = false);
+    Vector3 unproject(GLfloat x, GLfloat y, GLfloat z, bool get_matrices = false);
     
     //---------------------------------------------------------------------------
     

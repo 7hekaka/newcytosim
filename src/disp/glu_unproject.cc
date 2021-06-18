@@ -12,7 +12,7 @@ This code is derived from the MESA3D project:
 #include <cstdio>
 
 
-#define FLOAT GLdouble
+#define FLOAT GLfloat
 
 
 void mulMatrixVec(const FLOAT matrix[16], const FLOAT in[4], FLOAT out[4])

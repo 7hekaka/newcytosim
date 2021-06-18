@@ -29,7 +29,7 @@ extern Modulo const* modulo;
 
 
 Display::Display(DisplayProp const* dp)
-: pixelSize(1), unitValue(1), sizeScale(1), prop(dp)
+: pixelSize(1), unitValue(1), sizeScale(1), depthAxis(0,0,1), prop(dp)
 {
     assert_true(dp);
     prep_time = -1;
@@ -457,7 +457,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
         p->display_fresh = false;
     }
     
-    disp->prepare(unitValue, sizeScale, prop->style==2);
+    disp->prepare_pixels(unitValue, sizeScale, prop->style==2);
 }
 
 /**
@@ -468,8 +468,10 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
  - parse display strings
  .
 */
-void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp)
+void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3 const& axis)
 {
+    depthAxis = axis;
+    
     if ( prop->fold )
         sim.foldPositions();
     
@@ -626,7 +628,7 @@ void Display::drawTransparentSpaces(SpaceSet const& set)
 void Display::drawFields(FieldSet const& set)
 {
 #if ( DIM >= 3 )
-    Vector3 dir = gle::depthAxis();
+    Vector3 dir = depthAxis;
 #else
     Vector3 dir(0,0,1);
 #endif
@@ -2078,10 +2080,8 @@ static int compareZObject(const void * A, const void * B)
 */
 void Display::drawTransparentObjects(Array<zObject>& list)
 {
-    Vector3 vertical = gle::depthAxis();
-    
     for ( zObject & i : list )
-        i.depth(dot(i.position(), vertical));
+        i.depth(dot(i.position(), depthAxis));
     
     // depth-sort objects:
     list.sort(compareZObject);

@@ -32,6 +32,8 @@ PointDisp::PointDisp(const std::string& k, const std::string& n)
     mKind = k;
     clearPixelmaps();
     clear();
+    realSize = 0;
+    pixSize = 0;
 }
 
 
@@ -432,13 +434,14 @@ void PointDisp::createPixelmaps(GLfloat uf)
 }
 
 
-void PointDisp::prepare(GLfloat uf, GLfloat sf, bool pixelmaps)
+void PointDisp::prepare_pixels(GLfloat uf, GLfloat sf, bool pixelmaps)
 {
-    realSize    = size * sf;
-    unsigned sz = static_cast<unsigned>(std::ceil(uf*(size+width)));
-    // make it a multiple of 4:
-    pixSize     = ( sz + 4U ) & ~3U;
     perceptible = visible && ( uf*(size+width) > 0.25 );
+
+    realSize = size * sf;
+    unsigned S = static_cast<unsigned>(std::ceil(uf*(size+width)));
+    // make it a multiple of 4:
+    pixSize = ( S + 4U ) & ~3U;
     
 #if POINTDISP_USES_PIXELMAPS
     if ( pixelmaps )

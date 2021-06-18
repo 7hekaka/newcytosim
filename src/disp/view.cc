@@ -434,7 +434,7 @@ void View::sliceView(int mode) const
             setClipPlaneEye(GL_CLIP_PLANE2, Vector3(0,0,+1), thk+off);
         } break;
         case 4: {
-            setClipPlane(GL_CLIP_PLANE1, -gle::depthAxis(), 0);
+            setClipPlane(GL_CLIP_PLANE1, -depthAxis(), 0);
         } break;
     }
 }
@@ -548,23 +548,35 @@ void View::setROI(Vector3 a, Vector3 b)
 void View::getMatrices()
 {
     //get the transformation matrices, to be used for mouse control
-    glGetIntegerv(GL_VIEWPORT,         mViewport);
-    glGetDoublev(GL_PROJECTION_MATRIX, mProjection);
-    glGetDoublev(GL_MODELVIEW_MATRIX,  mModelview);
+    glGetIntegerv(GL_VIEWPORT, mViewport);
+    glGetFloatv(GL_PROJECTION_MATRIX, mProjection);
+    glGetFloatv(GL_MODELVIEW_MATRIX, mModelview);
     hasMatrices = true;
 }
 
 /**
+ return axis orthogonal to the display plane, and corresponding to depth
+ obtained from the current modelview transformation
+ */
+Vector3 View::depthAxis() const
+{
+    GLfloat mat[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, mat);
+    return normalize(Vector3(mat[2], mat[6], mat[10]));
+}
+
+
+/**
  This set a matrix like glOrtho()
  */
-void View::setOrthoMat(GLdouble * mat)
+void View::setOrthoMat(GLfloat * mat)
 {
-    GLdouble L =-0.5*visRegion[0];
-    GLdouble R = 0.5*visRegion[0];
-    GLdouble B =-0.5*visRegion[1];
-    GLdouble T = 0.5*visRegion[1];
-    GLdouble N = 0;
-    GLdouble F = visRegion[2];
+    GLfloat L =-0.5*visRegion[0];
+    GLfloat R = 0.5*visRegion[0];
+    GLfloat B =-0.5*visRegion[1];
+    GLfloat T = 0.5*visRegion[1];
+    GLfloat N = 0;
+    GLfloat F = visRegion[2];
 
     for ( int i = 0; i < 16; ++i )
         mat[i] = 0;
@@ -588,18 +600,18 @@ void View::setOrthoMat(GLdouble * mat)
  
  For more info, try `man gluUnProject`
  */
-Vector3 View::unproject(GLdouble x, GLdouble y, GLdouble z, bool get_matrices)
+Vector3 View::unproject(GLfloat x, GLfloat y, GLfloat z, bool get_matrices)
 {
-    GLdouble ux = 0, uy = 0, uz = 0;
+    GLfloat ux = 0, uy = 0, uz = 0;
     if ( get_matrices )
     {
-        GLint      vp[4];
-        GLdouble   mv[16];
-        GLdouble   pj[16];
+        GLint   vp[4];
+        GLfloat mv[16];
+        GLfloat pj[16];
         
-        glGetIntegerv(GL_VIEWPORT,         vp);
-        glGetDoublev(GL_PROJECTION_MATRIX, pj);
-        glGetDoublev(GL_MODELVIEW_MATRIX,  mv);
+        glGetIntegerv(GL_VIEWPORT,        vp);
+        glGetFloatv(GL_PROJECTION_MATRIX, pj);
+        glGetFloatv(GL_MODELVIEW_MATRIX,  mv);
 
         setOrthoMat(pj);
         myUnproject(x, y, z, mv, pj, vp, &ux, &uy, &uz);
