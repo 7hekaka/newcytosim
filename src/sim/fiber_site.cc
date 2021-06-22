@@ -50,14 +50,16 @@ Vector FiberSite::outerPos() const
     if ( hFiber->family_ != hFiber )
     {
         real a = hAbs - hFiber->abscissaM();
-#if 1
+#if DIM == 3
+        // using the two flanking protofilaments to set the outer direction
         assert_true( hFiber->brother_ != hFiber->sister_ );
         Vector b = hFiber->brother_->posM(a);
         Vector s = hFiber->sister_->posM(a);
         return hFiber->posM(a) + cross(b-s, hFiber->dirM(a));
 #else
-        Vector p = hFiber->posM(ab);
-        Vector c = hFiber->family_->posM(ab); //centerline
+        // using a central backbone to set the outer direction
+        Vector p = hFiber->posM(a);
+        Vector c = hFiber->family_->posM(a); //centerline
         return p + 0.5 * ( p - c );
 #endif
         //return 2 * pos - hFiber->family_->posM(ab);
