@@ -92,8 +92,8 @@ public:
     void seek(const fpos_t& p) { fsetpos(mFile, &p); }
     
 
-    /// put a C++ string
-    void put_line(const std::string&, bool bin);
+    /// put a C++ string plus a new line character
+    void put_line(const std::string&);
 
     /// read until character `end` is found and set `line`, including terminating character
     std::string get_line();

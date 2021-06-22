@@ -82,9 +82,10 @@ void Parser::parse_set(std::istream& is)
     std::string cat = Tokenizer::get_symbol(is);
     std::string name, para, blok;
     
-#if BACKWARD_COMPATIBILITY < 50
+#if BACKWARD_COMPATIBILITY <= 50
     {
-        // Read formats anterior to 3.11.2017 ('set hand 2 kinesin')
+        /* Read ouput config files anterior to 3.11.2017, which included
+         a identification number ('set hand 2 kinesin') */
         size_t inx = 0;
         Tokenizer::get_integer(is, inx);
     }
@@ -147,11 +148,12 @@ void Parser::parse_set(std::istream& is)
             // name changed to `property_number` on 10.12.2017
             if ( opt.set(ix, "property_number", "property_index") )
 #else
-            if ( opt.set(ix, "property_number") )
+            // name changed to `identification` on 22.06.2021
+            if ( opt.set(ix, "identification", "property_number") )
 #endif
             {
                 if ( ix != pp->number() )
-                    throw InvalidSyntax("Property number missmatch");
+                    throw InvalidSyntax("Property identification missmatch");
             }
         }
         else if ( do_change )

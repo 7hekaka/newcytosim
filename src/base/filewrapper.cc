@@ -101,18 +101,13 @@ void FileWrapper::close()
 
 /**
  This will write a null-terminated C-string to output stream.
- In ASCII mode, a new line is added
+ and a new line is added
  */
-void FileWrapper::put_line(const std::string& str, bool bin)
+void FileWrapper::put_line(const std::string& str)
 {
     size_t s = str.size();
-    if ( bin )
-        fwrite(str.c_str(), 1, s+1, mFile);
-    else
-    {
-        fwrite(str.c_str(), 1, s, mFile);
-        putc('\n', mFile);
-    }
+    fwrite(str.c_str(), 1, s+1, mFile);
+    putc('\n', mFile);
 }
 
 

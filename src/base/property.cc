@@ -128,7 +128,7 @@ void Property::write(std::ostream& os, const bool prune) const
         os << "\nset " << category() << ' ' << name_;
     os << "\n{\n";
     if ( number() > 0 )
-        write_value(os, "property_number", number_);
+        write_value(os, "identification", number_);
     write_values_diff(os, prune);
     os << "}\n";
 }

@@ -59,9 +59,9 @@ new cell
 
 % Letter C
 new text { placement=off; shape = -7 -2, -8.3 -1.5, -8.4 1.5, -7 2; }
-new pinch { position = -7 -2; attach = last, 0; }
+new pinch { position = -6.8 -2; attach = last, 0; }
 new pinch { position = -8.5 0; attach = last, 2.9; }
-new pinch { position = -7 2; attach = last, 5.8; }
+new pinch { position = -6.8 2; attach = last, 5.8; }
 
 % Letter Y
 new text { length = 2.5; position = -5.3 1; direction = -1 1.5;}
