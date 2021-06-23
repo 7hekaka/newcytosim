@@ -100,13 +100,13 @@ private:
     void createCells()
     {
         assert_true( mGrid.hasDimensions() );
-        // delete preexisting grid if necessary:
-        mGrid.destroy();
         // create the grid using the calculated dimensions:
-        mGrid.createCells();
-        // set all values to zero (already done in the constructor of FieldValue)
-        // mGrid.clear();
-        mGrid.printSummary(Cytosim::log, "Field");
+        if ( mGrid.createCells() )
+        {
+            // set all values to zero (already done in the constructor of FieldValue)
+            // mGrid.clear();
+            mGrid.printSummary(Cytosim::log, "Field");
+        }
     }
     
 public:

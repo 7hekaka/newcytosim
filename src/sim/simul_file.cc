@@ -132,7 +132,7 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
 //------------------------------------------------------------------------------
 #pragma mark - Read from file
 
-/** Compatibility function */
+/** Compatibility function for formats < 50 */
 static ObjectID readOldObjectID(Inputter& in, ObjectTag& tag)
 {
     int c;
@@ -146,7 +146,8 @@ static ObjectID readOldObjectID(Inputter& in, ObjectTag& tag)
     tag = c & LOW_BITS;
     // detect fat reference:
     int fat = ( c & HIGH_BIT );
-#if BACKWARD_COMPATIBILITY < 49
+#if BACKWARD_COMPATIBILITY < 50
+    // up to format 49, a '$' was added to indicate fat format
     if ( c == '$' )
     {
         tag = in.get_char();
@@ -267,8 +268,8 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
 Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
 {
     ObjectID id;
-#if BACKWARD_COMPATIBILITY < 49
-    if ( in.formatID() < 49 )
+#if BACKWARD_COMPATIBILITY < 50
+    if ( in.formatID() < 50 )
         id = readOldObjectID(in, tag);
     else
 #endif
@@ -291,8 +292,8 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
 Object * Simul::readReference(Inputter& in, ObjectTag& tag)
 {
     ObjectID id;
-#if BACKWARD_COMPATIBILITY < 49
-    if ( in.formatID() < 49 )
+#if BACKWARD_COMPATIBILITY < 50
+    if ( in.formatID() < 50 )
         id = readOldObjectID(in, tag);
     else
 #endif

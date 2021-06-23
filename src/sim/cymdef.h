@@ -9,9 +9,9 @@
 
 /**
  Enable code to be able to read old trajectory files.
- The value indicates the file format (currentFormatID) that can be read by the code.
+ The value indicates the file format (currentFormatID) to be readable.
  
- default = 100
+ default = 50
  */
 #define BACKWARD_COMPATIBILITY 50
 

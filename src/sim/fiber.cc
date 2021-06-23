@@ -197,7 +197,7 @@ Fiber::~Fiber()
     fHands.detachAll();
     
 #if FIBER_HAS_MESH
-    if ( prop->field_ptr )
+    if ( fMesh.ready() && prop->field_ptr )
         releaseMeshValues(fMesh, prop->field_ptr);
 #endif
 
@@ -1189,8 +1189,7 @@ VisibleLattice const* Fiber::visibleLattice() const
 #if FIBER_HAS_MESH
     if ( fMesh.ready() )
         return &fMesh;
-#endif
-#if FIBER_HAS_LATTICE
+#elif FIBER_HAS_LATTICE
     return &fLattice;
 #endif
     return nullptr;
@@ -1745,41 +1744,31 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         fGlue = nullptr;
 #endif
     }
-    else if ( tag == TAG_LATTICE || tag == 'l' ) // TAG_LATTICE was 'l' before 23/06/2021
+    else if ( tag == TAG_LATTICE ) // TAG_LATTICE was 'l' before 23/06/2021
     {
-        try {
 #if FIBER_HAS_LATTICE
-            if ( fLattice.ready() )
-                fLattice.setRange(abscissaM(), abscissaP());
-            fLattice.read(in);
+        if ( fLattice.ready() )
+            fLattice.setRange(abscissaM(), abscissaP());
+        fLattice.read(in);
 #else
-            FiberLattice dummy;
-            dummy.read(in);
-            // store unit, to get digits at the right abscissa
-            const_cast<FiberProp*>(prop)->lattice_unit = dummy.unit();
+        FiberLattice dummy;
+        dummy.read(in);
+        // store unit, to get digits at the right abscissa
+        const_cast<FiberProp*>(prop)->lattice_unit = dummy.unit();
 #endif
-        }
-        catch( Exception & e ) {
-            e << "reading Lattice for " << reference();
-            throw;
-        }
     }
-    else if ( tag == TAG_FIBMESH || tag == 'L' ) // TAG_FIBMESH was 'L' before 23/06/2021
+    else if ( tag == TAG_FIBMESH || tag == 'l' ) // TAG_FIBMESH was 'L' before 23/06/2021
     {
-        try {
 #if FIBER_HAS_MESH
-            if ( fMesh.ready() )
-                fMesh.setRange(abscissaM(), abscissaP());
-            fMesh.read(in);
+        if ( fMesh.ready() )
+            fMesh.setRange(abscissaM(), abscissaP());
+        fMesh.read(in);
+        //real S = fMesh.sum();
+        //if ( S ) std::cerr << reference() << " sum(mesh) = " << S << "\n";
 #else
-            Lattice<real> dummy;
-            dummy.read(in);
+        Lattice<real> dummy;
+        dummy.read(in);
 #endif
-        }
-        catch( Exception & e ) {
-            e << "reading value Lattice for " << reference();
-            throw;
-        }
     }
 #if BACKWARD_COMPATIBILITY < 100
     else if ( tag == TAG_DYNAMIC )
