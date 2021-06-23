@@ -2087,7 +2087,7 @@ int Chain::checkLength(real const* ptr, std::ostream& os, real len) const
     real dev = ( mx - mn ) / segmentation();
     real con = contourLength(ptr, nPoints);
     real err = abs_real( con - len ) / ( con + len );
-    int res = ( dev > 0.05 ) + ( err > 0.05 );
+    int res = ( dev > 0.02 ) + ( err > 0.02 );
     if ( res )
         document(os, len, con, mn, mx);
     return res;
@@ -2141,15 +2141,17 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     ObjectSignature s = in.readUInt32();
     if ( s ) signature(s);
     
-    real len    = in.readFloat();
-    real seg    = in.readFloat();
-    fnAbscissaM = in.readFloat();
+    float len = in.readFloat();
+    float seg = in.readFloat();
+    float abs = in.readFloat();
     
 #if BACKWARD_COMPATIBILITY < 50
     if ( in.formatID() > 49 ) // 12.12.2018 moved birthTime
 #endif
         fnBirthTime = in.readFloat();
 
+    Mecable::read(in, sim, tag);
+    
     if ( len <= 0 )
         throw InvalidIO("invalid (negative) fiber length");
 
@@ -2159,15 +2161,14 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( seg <= 1e-6 || seg > 1e6 )
         throw InvalidIO("invalid fiber segmentation");
 
-    Mecable::read(in, sim, tag);
-    
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-    setSegmentation(len/nbSegments());
+    assert_small(seg - len/nbSegments());
 
-    fnAbscissaP = fnAbscissaM + len;
-    fnSegmentation = seg;
+    fnAbscissaM = abs;
+    fnAbscissaP = abs + len;
+    setSegmentation(seg);
     //Mecable::write(std::cerr);
     
 #ifndef NDEBUG
@@ -2175,5 +2176,98 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( in.vectorSize() == DIM )
         checkLength(pPos, std::clog, len);
 #endif
+}
+
+
+/**
+ Write angles between consecutive points instead of coordinates.
+ This reduces size, without loosing information if the segments all have
+ the same length, which should normally be the case.
+ The angles can be stored on 2 bytes, as their range is known: [-PI, PI]
+ There is a loss of precision, but overflow is not possible
+ */
+void Chain::writeAngles(Outputter& out) const
+{
+    assert_small( length1() - length() );
+    //out.writeUInt32(signature());
+    out.writeFloat(length());
+    //out.writeFloat(fnSegmentation);
+    out.writeFloat(fnAbscissaM);
+    //out.writeFloat(fnBirthTime);
+    out.writeUInt16(nPoints-1);
+    // first point:
+    out.writeFloats(pPos, DIM, '\n');
+    // angles:
+    for ( size_t i = DIM; i < DIM*nPoints; i += DIM )
+    {
+        // in 2D, there is only one angle:
+        real x = pPos[i  ] - pPos[i-DIM  ];
+#if ( DIM > 1 )
+        real y = pPos[i+1] - pPos[i-DIM+1];
+#else
+        real y = 0;
+#endif
+        real a = std::atan2(y, x);
+        out.writeAngle(a);
+#if ( DIM == 3 )
+        real z = pPos[i+2] - pPos[i-DIM+2];
+        real b = std::atan2(std::sqrt(x*x+y*y), z);
+        // the second angle is always in [0, PI]
+        out.writePositiveAngle(b);
+#endif
+    }
+}
+
+
+/**
+ Read angles, and recalculate the coordinates of the points
+ This might be slow due to trigonometry calls
+ */
+void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
+{
+    //Cytosim::log << "  reading Chain at " << in.pos() << '\n';
+    
+    float len   = in.readFloat();
+    fnAbscissaM = in.readFloat();
+    fnAbscissaP = fnAbscissaM + len;
+
+    if ( len <= 0 )
+        throw InvalidIO("invalid (negative) fiber length");
+
+    if ( len > 1e6 )
+        throw InvalidIO("excessive fiber length");
+
+    size_t cnt = in.readUInt16();
+    if ( cnt < 1 )
+        throw InvalidIO("invalid fiber with 0 or 1 point");
+    
+    setNbPoints(cnt+1);
+    //resetPoints();
+    in.readFloats(pPos, DIM);   // read first point
+    const float S = len / float(cnt);
+    if ( in.vectorSize() > 2 )
+    {
+        for ( size_t i = 0; i < DIM*cnt; i += DIM )
+        {
+            float a = in.readAngle();
+            float b = in.readPositiveAngle();
+            pPos[i+DIM  ] = pPos[i  ] + S * std::cos(a) * std::sin(b);
+            pPos[i+DIM+1] = pPos[i+1] + S * std::sin(a) * std::sin(b);
+            pPos[i+DIM+2] = pPos[i+2] + S * std::cos(b);
+        }
+    }
+    else
+    {
+        for ( size_t i = 0; i < DIM*cnt; i += DIM )
+        {
+            float a = in.readAngle();
+            pPos[i+DIM  ] = pPos[i  ] + S * std::cos(a);
+#if ( DIM > 1 )
+            pPos[i+DIM+1] = pPos[i+1] + S * std::sin(a);
+#endif
+        }
+    }
+    setSegmentation(S);
+    //checkLength(pPos, std::clog, len);
 }
 

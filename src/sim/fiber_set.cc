@@ -204,7 +204,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
  */
 Object * FiberSet::newObject(const ObjectTag tag, size_t num)
 {
-    if ( tag == Fiber::TAG )
+    if ( tag == Fiber::TAG || tag == Fiber::TAG_ANGLES )
     {
         FiberProp const* fp = simul_.findProperty<FiberProp>("fiber", num);
         Fiber * obj = fp->newFiber();
@@ -221,7 +221,11 @@ void FiberSet::write(Outputter& out) const
     if ( size() > 0 )
     {
         out.writeLine("\n#section "+title());
-        writeObjects(out, pool_);
+        for ( Object const* n=pool_.front(); n; n=n->next() )
+        {
+            //std::clog << "writeFiber " << n->reference() << '\n';
+            n->write(out);
+        }
     }
 }
 

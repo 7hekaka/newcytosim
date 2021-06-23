@@ -1077,6 +1077,38 @@ real Fiber::freshAssembly(const FiberEnd end) const
 }
 
 
+void Fiber::updateRange(Field* field)
+{
+#if FIBER_HAS_LATTICE
+    // this will allocate the Lattice's site to cover the range of Abscissa:
+    if ( fLattice.ready() )
+    {
+        fLattice.setRange(abscissaM(), abscissaP());
+    }
+#endif
+#if FIBER_HAS_MESH
+    // this will allocate the Lattice's site to cover the range of Abscissa:
+    if ( fMesh.ready() )
+    {
+        fMesh.setRange(abscissaM(), abscissaP());
+        
+        if ( field )
+        {
+            real sumM;
+            // release Lattice substance located outside the valid abscissa range
+            fMesh.collectM(sumM);
+            field->cell(posEndM()) += sumM;
+            //Cytosim::log << " Fiber::MINUS_END releases " << sumM << '\n';
+            
+            real sumP;
+            fMesh.collectP(sumP);
+            field->cell(posEndP()) += sumP;
+            //Cytosim::log << " Fiber::PLUS_END releases " << sumP << '\n';
+        }
+    }
+#endif
+}
+
 /**
  Assuming that the length has changed, or that the abscissa of the ends have changed,
  this updates the segmentation of the fiber if needed, the position of the Hands,
@@ -1107,34 +1139,7 @@ void Fiber::updateFiber()
         ha->checkFiberRange();
         ha = nx;
     }
-#if FIBER_HAS_LATTICE
-    // this will allocate the Lattice's site to cover the range of Abscissa:
-    if ( fLattice.ready() )
-    {
-        fLattice.setRange(abscissaM(), abscissaP());
-    }
-#endif
-#if FIBER_HAS_MESH
-    // this will allocate the Lattice's site to cover the range of Abscissa:
-    if ( fMesh.ready() )
-    {
-        fMesh.setRange(abscissaM(), abscissaP());
-        
-        if ( prop->field_ptr )
-        {
-            real sumM;
-            // release Lattice substance located outside the valid abscissa range
-            fMesh.collectM(sumM);
-            prop->field_ptr->cell(posEndM()) += sumM;
-            //Cytosim::log << " Fiber::MINUS_END releases " << sumM << '\n';
-            
-            real sumP;
-            fMesh.collectP(sumP);
-            prop->field_ptr->cell(posEndP()) += sumP;
-            //Cytosim::log << " Fiber::PLUS_END releases " << sumP << '\n';
-        }
-    }
-#endif
+    updateRange(prop->field_ptr);
 }
 
 //------------------------------------------------------------------------------
@@ -1678,8 +1683,15 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
 
 void Fiber::write(Outputter& out) const
 {
+#if 1
+    writeHeader(out, tag());
     Chain::write(out);
-
+#else
+    // compact format created on 23/06/2021
+    writeHeader(out, TAG_ANGLES);
+    Chain::writeAngles(out);
+#endif
+    
 #if FIBER_HAS_LATTICE && 0
     /*
      We can save the occupancy Lattice here, but this is not necessary
@@ -1711,19 +1723,11 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( tag == TAG )
     {
         Chain::read(in, sim, tag);
-#if FIBER_HAS_LATTICE
-        if ( fLattice.ready() )
-            fLattice.setRange(abscissaM(), abscissaP());
-#endif
-#if FIBER_HAS_MESH
-        if ( fMesh.ready() )
-            fMesh.setRange(abscissaM(), abscissaP());
-#endif
+        updateRange(nullptr);
 #if BACKWARD_COMPATIBILITY < 50
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
             birthTime(in.readFloat());
 #endif
-
         if ( length() + 128*FLT_EPSILON < prop->min_length )
         {
             Cytosim::warn << "fiber:length < min_length ( " << length() << " < " << prop->min_length << " )\n";
@@ -1732,7 +1736,16 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         fGlue = nullptr;
 #endif
     }
-    else if ( tag == TAG_LATTICE )
+    //std::clog << " Fiber::read(" << tag << ")\n";
+    else if ( tag == TAG_ANGLES )
+    {
+        Chain::readAngles(in, sim, tag);
+        updateRange(nullptr);
+#if FIBER_HAS_GLUE
+        fGlue = nullptr;
+#endif
+    }
+    else if ( tag == TAG_LATTICE || tag == 'l' ) // TAG_LATTICE was 'l' before 23/06/2021
     {
         try {
 #if FIBER_HAS_LATTICE
@@ -1751,7 +1764,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
             throw;
         }
     }
-    else if ( tag == TAG_FIBMESH )
+    else if ( tag == TAG_FIBMESH || tag == 'L' ) // TAG_FIBMESH was 'L' before 23/06/2021
     {
         try {
 #if FIBER_HAS_MESH

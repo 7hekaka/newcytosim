@@ -96,7 +96,7 @@ static inline gle_color color_by_height(Fiber const& fib, size_t pti)
     real beta = fib.disp->color_scale;
     real Z = 0;
     Space const* spc = fib.prop->confine_space_ptr;
-    if ( spc )
+    if ( spc && fib.prop->confine )
         Z = -spc->signedDistanceToEdge(fib.posPoint(pti));
 #if ( DIM > 2 )
     else

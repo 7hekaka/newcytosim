@@ -154,7 +154,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
                 hSite = hLattice->index(hAbs);
 #endif
         }
-        else if ( tag == Fiber::TAG_LATTICE )
+        else if ( tag == Fiber::TAG_LATTICE || tag == 'l' ) // TAG_LATTICE was 'l' before 23/06/2021
         {
 #if BACKWARD_COMPATIBILITY < 49
             if ( in.formatID() < 49 )

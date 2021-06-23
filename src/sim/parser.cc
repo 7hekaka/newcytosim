@@ -146,7 +146,7 @@ void Parser::parse_set(std::istream& is)
             PropertyID ix;
 #if BACKWARD_COMPATIBILITY < 50
             // name changed to `property_number` on 10.12.2017
-            if ( opt.set(ix, "property_number", "property_index") )
+            if ( opt.set(ix, "identification") || opt.set(ix, "property_number", "property_index") )
 #else
             // name changed to `identification` on 22.06.2021
             if ( opt.set(ix, "identification", "property_number") )

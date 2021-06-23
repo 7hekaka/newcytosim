@@ -221,7 +221,8 @@ void sizeFrame(FILE* in, int details)
                             printf(" %24s : %6lu B\n", str, bytes);
                     }
                     strncpy(str, buf, sizeof(str));
-                    str[strlen(buf)-1] = 0;
+                    if ( isspace(str[strlen(buf)-1]) )
+                        str[strlen(buf)-1] = 0;
                     sec = ftell(in);
                 } break;
             case FRAME_END: {

@@ -552,7 +552,12 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     if ( update )
     {
         obj = findID(id);
-        if ( obj && tag == obj->tag() )
+        /*
+         only 'primary' objects with a lowercase TAG are linked:
+         but we exclude the old TAG_LATTICE = 'l' for backward compatibility
+         for files before 23/06/2021
+         */
+        if ( obj && islower(tag) && tag != 'l' )
         {
             ice_.pop(obj);
             // check that property index has not changed:
@@ -567,6 +572,8 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
                 obj = nullptr;
             }
         }
+        else
+            update = false;
     }
     
     if ( !obj )
@@ -582,6 +589,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         }
         obj->identity(id);
         obj->objset(this);
+        update = true;
         inventory_.assign(obj);
         //std::clog << "- new " << Object::reference(tag, ix, id) << '\n';
     }
@@ -599,8 +607,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         throw;
     }
     
-    // link only primary object:
-    if ( tag == obj->tag() )
+    if ( update )
     {
         link(obj);
         if ( mk ) obj->mark(mk);

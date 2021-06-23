@@ -494,6 +494,12 @@ public:
     /// read from Inputter
     void         read(Inputter&, Simul&, ObjectTag);
     
+    /// write to Outputter
+    void         writeAngles(Outputter&) const;
+
+    /// read from Inputter
+    void         readAngles(Inputter&, Simul&, ObjectTag);
+
 };
 
 

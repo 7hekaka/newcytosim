@@ -193,11 +193,8 @@ void Mecable::truncateP(const size_t p)
 
 void Mecable::resetPoints()
 {
-    if ( pPos )
-    {
-        for ( size_t i = 0; i < DIM*pAllocated; ++i )
-            pPos[i] = 0;
-    }
+    for ( size_t i = 0; i < DIM*pAllocated; ++i )
+        pPos[i] = 0;
 }
 
 

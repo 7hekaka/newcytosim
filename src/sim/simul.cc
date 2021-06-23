@@ -370,9 +370,14 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case        Single::TAG:    return &singles;
         case         Wrist::TAG:    return &singles;
         case         Fiber::TAG:    return &fibers;
+        case  Fiber::TAG_ANGLES:    return &fibers;
         case Fiber::TAG_DYNAMIC:    return &fibers;
         case Fiber::TAG_LATTICE:    return &fibers;
         case Fiber::TAG_FIBMESH:    return &fibers;
+#if BACKWARD_COMPATIBILITY < 57
+        case 'l': return &fibers; // TAG_LATTICE before 23/06/2021
+        case 'L': return &fibers; // TAG_FIBMESH before 23/06/2021
+#endif
         case          Bead::TAG:    return &beads;
         case         Solid::TAG:    return &solids;
         case        Sphere::TAG:    return &spheres;

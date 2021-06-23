@@ -24,7 +24,7 @@ class LineDisp;
 #define FIBER_HAS_LATTICE 0
 
 /// Flag to add a Lattice of reals to each Fiber {0, 1}
-#define FIBER_HAS_MESH 1
+#define FIBER_HAS_MESH 0
 
 /// Flag to allow `family` member variable to control Couple's binding {0, 1}
 #define FIBER_HAS_FAMILY 0
@@ -229,6 +229,9 @@ public:
     /// simulation step
     virtual void   step();
     
+    /// update Lattice and Mesh ranges
+    void           updateRange(Field*);
+    
     /// called if a Fiber tip has elongated or shortened
     void           updateFiber();
     
@@ -405,14 +408,17 @@ public:
     /// a unique character identifying the class
     static const ObjectTag TAG = 'f';
     
+    /// identifies angle data format
+    static const ObjectTag TAG_ANGLES = 'g';
+
     /// identifies data for dynamic ends of fibers
     static const ObjectTag TAG_DYNAMIC = 'F';
     
     /// identifies FiberLattice data
-    static const ObjectTag TAG_LATTICE = 'l';
+    static const ObjectTag TAG_LATTICE = 'T';
     
     /// identifies Lattice<real> data
-    static const ObjectTag TAG_FIBMESH = 'L';
+    static const ObjectTag TAG_FIBMESH = 'M';
 
     /// return unique character identifying the class
     ObjectTag       tag() const { return TAG; }

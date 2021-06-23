@@ -16,7 +16,8 @@
  
  History of changes in file format:
 
- - 57: 11/06/2021 References written always on 4 bytes with tag+identity
+ - ??: 11/06/2021 References written always on 4 bytes with tag+identity
+ - 56: 23/06/2021 Secondary TAG use capital letters, but ID was not changed
  - 56: 19/01/2021 All fiber dynamic stored on 16 bytes, really
  - 55: 02/10/2020 Interpolation4 stores coefficients only if mecable!=nullptr
  - 54: 25/05/2020 All fiber dynamic stored on 16 bytes
@@ -168,6 +169,7 @@ static ObjectID readOldObjectID(Inputter& in, ObjectTag& tag)
         {
             in.readUInt16();         // skip property index
             id = in.readUInt32();
+            in.readUInt32();         // skip ObjectMark
         }
         else
         {
@@ -226,8 +228,8 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
 
     if ( in.binary() )
     {
-#if BACKWARD_COMPATIBILITY < 57
-        if ( in.formatID() < 57 )
+#if BACKWARD_COMPATIBILITY < 58
+        if ( in.formatID() < 58 )
         {
             char c = in.get_char();
             tag = c & LOW_BITS;

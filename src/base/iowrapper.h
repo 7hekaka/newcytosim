@@ -88,6 +88,10 @@ public:
 
     /// Reads floats on 2 bytes using an int scaled by 2048
     float    readFixed();
+    /// Read angle on 2 bytes
+    float    readAngle();
+    /// Read angle on 2 bytes
+    float    readPositiveAngle();
     /// Reads one float on 4 bytes
     float    readFloat();
     /// Reads one double on 8 bytes
@@ -172,10 +176,15 @@ public:
     void writeUInt32(unsigned, char before);
 
     /// check if x would overflow the fixed format
-    static bool overflowFixed(float x) { int32_t i=int32_t(x*2048.f); return i != uint16_t(i); }
+    static bool overflowFixed(float x) { int16_t i=int16_t(x*2048.f); return i != int16_t(i); }
     /// store float as an integer on 2 bytes with a fixed scaling factor of 2048
     void writeFixed(float);
     
+    /// store an angle in [-PI, PI] using 2 bytes
+    void writeAngle(float);
+    /// store an angle in [0, PI] using 2 bytes
+    void writePositiveAngle(float);
+
     /// Write value on 4 bytes
     void writeFloat(float);
     /// Write value on 4 bytes

@@ -101,7 +101,7 @@ std::string Object::reference() const
      - 4 bytes for the identity
      .
  .
- The ascii based format always the same.
+ The ascii-based format is always the same.
  This data is read by Simul::readReference()
  */
 void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
@@ -125,7 +125,7 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
         }
 #else
         /*
-         format changed on 11.06.2021
+         aborted format change on 11.06.2021
          combine `g` and 'id', leaving 3 bytes and at most 16777216 objects
          Note that the topmost bit of ASCII is not used
          */

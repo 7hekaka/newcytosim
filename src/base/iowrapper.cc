@@ -168,9 +168,31 @@ uint64_t Inputter::readUInt64()
 
 float Inputter::readFixed()
 {
-    uint16_t i;
+    int16_t i;
     if ( 1 != fread(&i, 2, 1, mFile) )
         throw InvalidIO("readFixed() failed");
+    if ( binary_ == 2 )
+        i = byteswap(i);
+    return float(i) * 0x1p-11;
+}
+
+
+float Inputter::readAngle()
+{
+    int16_t i;
+    if ( 1 != fread(&i, 2, 1, mFile) )
+        throw InvalidIO("readAngle() failed");
+    if ( binary_ == 2 )
+        i = byteswap(i);
+    return float(i) * 0x1p-10;
+}
+
+
+float Inputter::readPositiveAngle()
+{
+    uint16_t i;
+    if ( 1 != fread(&i, 2, 1, mFile) )
+        throw InvalidIO("readPositiveAngle() failed");
     if ( binary_ == 2 )
         i = byteswap(i);
     return float(i) * 0x1p-11;
@@ -255,11 +277,13 @@ void Inputter::readFloats(const size_t cnt, float ptr[], const size_t dim)
 {
     if ( dim < vecsize_ || ! binary_ )
     {
+        // read values sequentially
         for ( size_t i = 0; i < cnt ; ++i )
             readFloats(ptr+dim*i, dim);
         return;
     }
 
+    // read all values in one call to fread()
     size_t n = cnt * vecsize_;
     if ( n != fread(ptr, 4, n, mFile) )
         throw InvalidIO("readFloats(D) failed");
@@ -271,6 +295,7 @@ void Inputter::readFloats(const size_t cnt, float ptr[], const size_t dim)
     }
     if ( vecsize_ < dim )
     {
+        // pad data to match dimensionality
         size_t u = cnt;
         while ( u-- > 0 )
         {
@@ -504,9 +529,31 @@ void Outputter::writeUInt32(const unsigned n, char before)
 
 void Outputter::writeFixed(const float x)
 {
-    uint16_t i = uint16_t(x * 2048.f);
+    int16_t i = int16_t(x * 2048.f);
     if ( 2 != fwrite(&i, 1, 2, mFile) )
         throw InvalidIO("writeFixed() failed");
+}
+
+/*
+ Since the angle is within [-PI, PI], we can use 2 bytes and scale by 1024,
+ which covers the range [-3.2, 3.2]. The precision is about ~ 10-3
+ */
+void Outputter::writeAngle(const float x)
+{
+    int16_t i = int16_t(x * 1024.f);
+    if ( 2 != fwrite(&i, 1, 2, mFile) )
+        throw InvalidIO("writeAngle() failed");
+}
+
+/*
+ Since the angle is within [0, PI], we can use 2 bytes and scale by 2048,
+ which covers the range [0, 3.2]. The precision is about ~ 5.10-4
+ */
+void Outputter::writePositiveAngle(const float x)
+{
+    uint16_t i = uint16_t(x * 2048.f);
+    if ( x < 0 || 2 != fwrite(&i, 1, 2, mFile) )
+        throw InvalidIO("writePositiveAngle() failed");
 }
 
 

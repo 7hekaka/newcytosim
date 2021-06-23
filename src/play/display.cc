@@ -1611,8 +1611,7 @@ void Display::drawFiber(Fiber const& fib)
 
     if ( disp->point_style > 0 )
     {
-        //fib.disp->color.load_load();
-        disp->color.load_load();
+        fib.disp->color.load_load();
         disp->back_color.load_back();
         drawFiberPoints(fib);
     }
