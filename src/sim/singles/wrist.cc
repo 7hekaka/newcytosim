@@ -110,7 +110,6 @@ void Wrist::write(Outputter& out) const
 
 void Wrist::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    const bool s = attached();
     sHand->read(in, sim);
     
 #if BACKWARD_COMPATIBILITY < 47
@@ -123,22 +122,5 @@ void Wrist::read(Inputter& in, Simul& sim, ObjectTag tag)
     else
 #endif
         base_.read(in, sim);
-    
-    /*
-     Because the SingleSet has 2 lists where Single are stored depending
-     on their bound/unbound state, we need to unlink and relink here, in
-     case the state stored on file is different from the current state.
-     */
-    if ( s != attached() )
-    {
-        SingleSet * set = static_cast<SingleSet*>(objset());
-        if ( set )
-        {
-            if ( s )
-                set->relinkD(this);
-            else
-                set->relinkA(this);
-        }
-    }
 }
 

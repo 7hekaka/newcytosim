@@ -225,6 +225,7 @@ void SingleSet::unlink(Object * obj)
 
 void SingleSet::foldPositions(Modulo const* m) const
 {
+    //std::cerr << "SingleSet::foldPositions()\n";
     Single * obj;
     for ( obj=firstF(); obj; obj=obj->next() ) obj->foldPosition(m);
     for ( obj=firstA(); obj; obj=obj->next() ) obj->foldPosition(m);

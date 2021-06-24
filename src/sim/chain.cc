@@ -2164,7 +2164,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-    assert_small(seg - len/nbSegments());
+    assert_small(seg-len/nbSegments());
 
     fnAbscissaM = abs;
     fnAbscissaP = abs + len;
