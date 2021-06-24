@@ -218,6 +218,7 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "point_disp.h"
 
 void SpaceEllipse::draw2D() const
 {
@@ -228,6 +229,13 @@ void SpaceEllipse::draw2D() const
     glPushMatrix();
     glScalef(X, Y, Z);
     gle::circle();
+    
+    if ( prop->disp->visible & 2 )
+    {
+        prop->disp->color2.load_load();
+        gle::disc1();
+    }
+
     glPopMatrix();
 }
 
