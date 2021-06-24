@@ -12,7 +12,7 @@
 
 
 /**
- By default, both ends are growing
+ By default, the plus end is growing and the minus end is shrinking
  */
 DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p), prop(p)
 {
@@ -29,11 +29,11 @@ DynamicFiber::~DynamicFiber()
 //------------------------------------------------------------------------------
 #pragma mark - MINUS END
 
-/** set MINUS_END as growing */
+/** set MINUS_END as shrinking */
 void DynamicFiber::initM()
 {
-    unitM[0] = 1;
-    unitM[1] = 1;
+    unitM[0] = 0;
+    unitM[1] = 0;
     mStateM  = calculateStateM();
     mGrowthM = 0;
 
@@ -51,7 +51,6 @@ state_t DynamicFiber::calculateStateM() const
 
 state_t DynamicFiber::endStateM() const
 {
-    return STATE_WHITE;
     assert_true( mStateM == calculateStateM() );
     return mStateM;
 }
@@ -59,14 +58,20 @@ state_t DynamicFiber::endStateM() const
 
 void DynamicFiber::setEndStateM(state_t s)
 {
+    if ( s < 0 || 4 < s )
+        throw InvalidParameter("Invalid AssemblyState for DynamicFiber MINUS_END");
+    
     if ( s != mStateM )
     {
         mStateM = s;
-        unitM[0] = ( 4 - s ) & 1;
-        unitM[1] = ( 4 - s ) / 2;
-        assert_true( 0==unitP[0] || unitP[0]==1 );
-        assert_true( 0==unitP[1] || unitP[1]==1 );
-        assert_true( mStateM == calculateStateM() );
+        if ( STATE_WHITE < s )
+        {
+            unitM[1] = ( 4 - s ) / 2;
+            unitM[0] = ( 4 - s ) & 1;
+            assert_true( 0==unitM[0] || 1==unitM[0] );
+            assert_true( 0==unitM[1] || 1==unitM[1] );
+            assert_true( mStateM == calculateStateM() );
+        }
     }
 }
 
@@ -76,11 +81,11 @@ void DynamicFiber::setEndStateM(state_t s)
  */
 int DynamicFiber::stepMinusEnd()
 {
-    int res = 0;
+	constexpr size_t M = 1;
+	int res = 0;
     real chewing = 0;
     
     // add chewing rate to stochastic off rate:
-    
 #if NEW_FIBER_CHEW
     
     // convert chewing rate to stochastic off rate:
@@ -94,12 +99,82 @@ int DynamicFiber::stepMinusEnd()
     
 #endif
     
-    nextShrinkM -= prop->shrinking_rate_dt[1] + chewing;
-    while ( nextShrinkM <= 0 )
-    {
-        --res;
-        nextShrinkM += RNG.exponential();
-    }
+    if ( mStateM == STATE_RED )
+	{
+		nextShrinkM -= prop->shrinking_rate_dt[M] + chewing;
+		while ( nextShrinkM <= 0 )
+		{
+			// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
+			unitM[0] = unitM[1];
+			unitM[1] = RNG.test(prop->unhydrolyzed_prob[M]);
+			--res;
+			nextShrinkM += RNG.exponential();
+			mStateM = calculateStateM();
+		}
+	}
+    else if ( mStateM > STATE_WHITE )
+	{
+		// calculate the force acting on the point at the end:
+		real forceM = projectedForceEndM();
+
+		// growth is reduced if free monomers are scarce:
+		real growth = prop->growing_rate_dt[M] * prop->free_polymer;
+
+		// antagonistic force (< 0) decreases assembly rate exponentially
+		if (( forceM < 0 ) & ( growth > 0 ))
+			growth *= std::exp(forceM*prop->growing_force_inv[M]);
+
+		real hydrol = prop->hydrolysis_rate_2dt[M];
+
+#if OLD_DYNAMIC_ZONE
+        // change Hydrolysis rate if PLUS_END is far from origin:
+        if ( posEndM().normSqr() > prop->zone_radius_sqr )
+            hydrol = prop->zone_hydrolysis_rate_2dt[M];
+
+        if ( prop->zone_space_ptr && !prop->zone_space_ptr->inside(posEndM()) )
+            hydrol = prop->zone_hydrolysis_rate_2dt[M];
+#endif
+
+		// @todo detach_rate should depend on the state of the subunit
+		real detach = prop->growing_off_rate_dt[M] + chewing;
+
+		nextGrowthM -= growth;
+		nextShrinkM -= detach;
+		nextHydrolM -= hydrol;
+
+		while (( nextGrowthM < 0 ) | ( nextShrinkM < 0 ) | ( nextHydrolM < 0 ))
+		{
+			// Select the earliest event:
+			int ii = sMath::arg_min(nextGrowthM/growth, nextHydrolM/hydrol, nextShrinkM/detach);
+
+			switch ( ii )
+			{
+				case 0:
+					// add fresh unit, shifting old terminal to penultimate position
+					unitM[1] = unitM[0];
+					unitM[0] = 1;
+					++res;
+					nextGrowthM += RNG.exponential();
+					break;
+
+				case 1:
+					// hydrolyze one of the unit with equal chance:
+					unitM[RNG.flip()] = 0;
+					nextHydrolM += RNG.exponential();
+					break;
+
+				case 2:
+					// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
+					unitM[0] = unitM[1];
+					unitM[1] = RNG.test(prop->unhydrolyzed_prob[M]);
+					--res;
+					nextShrinkM += RNG.exponential();
+					break;
+
+			}
+			mStateM = calculateStateM();
+		}
+	}
     return res;
 }
 
@@ -142,16 +217,16 @@ state_t DynamicFiber::endStateP() const
 
 void DynamicFiber::setEndStateP(state_t s)
 {
-    if ( s < 1 || 4 < s )
+    if ( s < 0 || 4 < s )
         throw InvalidParameter("invalid AssemblyState for DynamicFiber PLUS_END");
     
     if ( s != mStateP )
     {
         mStateP = s;
-        unitP[0] = ( 4 - s ) & 1;
         unitP[1] = ( 4 - s ) / 2;
-        assert_true( 0==unitP[0] || unitP[0]==1 );
-        assert_true( 0==unitP[1] || unitP[1]==1 );
+        unitP[0] = ( 4 - s ) & 1;
+        assert_true( 0==unitP[0] || 1==unitP[0] );
+        assert_true( 0==unitP[1] || 1==unitP[1] );
         assert_true( mStateP == calculateStateP() );
     }
 }
@@ -269,6 +344,8 @@ int DynamicFiber::stepPlusEnd()
 void DynamicFiber::step()
 {
     constexpr size_t P = 0;
+    constexpr size_t M = 1;
+
     // perform stochastic simulation:
     int incP = stepPlusEnd();
     int incM = mStateM ? stepMinusEnd() : 0;
@@ -287,9 +364,14 @@ void DynamicFiber::step()
                 // exit to avoid doing anything with a dead object:
                 return;
             }
+
             // possibly rescue:
-            if ( RNG.test(prop->rebirth_prob[P]) )
-                setEndStateP(STATE_GREEN);
+            if ( mStateM == STATE_RED && RNG.test(prop->rebirth_prob[M]) )
+            	setEndStateM(STATE_GREEN);
+
+            if ( mStateP == STATE_RED && RNG.test(prop->rebirth_prob[P]) )
+            	setEndStateP(STATE_GREEN);
+
         }
         else if ( length() + mGrowthM + mGrowthP < prop->max_length )
         {
