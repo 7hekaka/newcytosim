@@ -943,7 +943,7 @@ void Simul::reportFiberEnds(std::ostream& out, FiberEnd end, Property const* sel
     
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( sel && sel == fib->prop )
+        if ( sel && sel != fib->prop )
             continue;
         out << LIN << fib->prop->number();
         out << SEP << fib->identity();
@@ -975,7 +975,7 @@ void Simul::reportFiberPoints(std::ostream& out, Property const* sel, bool com) 
     // list fibers in the order of the inventory:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( sel && sel == fib->prop )
+        if ( sel && sel != fib->prop )
             continue;
         out << COM << "fiber " << fib->reference() << "  " << fib->segmentation();
         
@@ -1084,7 +1084,7 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
 
 
 /**
- Export Mean Squared displacement of fibers since the last call
+ Export Mean Squared Displacement of fiber's MINUS_ENDs since the last call
  to this function.
  */
 void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel, bool com) const
@@ -1100,8 +1100,10 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel, bool
     size_t cnt = 0;
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( sel && sel == fib->prop )
+        if ( sel && sel != fib->prop )
             continue;
+        /* using minus end to avoid effects of plus-end growth,
+         but there is no check that the minus-end is not growing... */
         Vector pos = fib->posEndM();
         fiber_map::iterator i = positions.find(fib->identity());
         if ( i != positions.end() )
