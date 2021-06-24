@@ -1063,7 +1063,7 @@ void processKey(unsigned char key)
             setFiberDisp(player.allVisibleFiberDisp(), changeLatticeStyle, 0);
             break;
 
-        //------------------------ Solid / Sphere ------------------------------
+        //------------------------ Solid, Bead & Sphere ------------------------
   
         case '5':
             if ( altKeyDown )

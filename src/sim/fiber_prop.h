@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef FIBER_PROP
 #define FIBER_PROP
@@ -75,7 +75,7 @@ public:
      http://www.jbc.org/content/270/19/11437
      </em>
      */
-    real         rigidity;
+    real rigidity;
     
     
     /// desired distance between vertices
@@ -97,13 +97,13 @@ public:
      In that case, the simulation should be redone with a segmentation divided by 2,
      and the segmentation should be reduced until kinks do not appear.
      */
-    real         segmentation;
+    real segmentation;
     
     /// Minimum length (this limits the length in some cases)
-    real         min_length;
+    real min_length;
     
     /// Maximum length (this limits the length in some cases)
-    real         max_length;
+    real max_length;
 
     /// amount of monomer available to make this type of fiber
     /**
@@ -119,23 +119,23 @@ public:
      
      By default `total_polymer = infinite`, and this effect is disabled.
      */
-    real         total_polymer;
+    real total_polymer;
     
     /// if `false`, the fiber will be destroyed if it is shorter than `min_length` (default=`false`)
-    bool         persistent;
+    bool persistent;
 
     /// effective viscosity (if unspecified, simul:viscosity is used)
     /**
      Set the effective `viscosity` to lower or increase the drag coefficient of a particular class of fibers. This makes it possible for example to reduce the total drag coefficient of an aster.
      If unspecified, the global `simul:viscosity` is used.
      */
-    real         viscosity;
+    real viscosity;
     
     /// radius used to calculate mobility, corresponding to the radius of the fiber
-    real         drag_radius;
+    real drag_radius;
     
     /// cut-off on the length of the fiber, above which drag is proportional to length
-    real         drag_length;
+    real drag_length;
 
     /// if true, calculate mobility for a cylinder moving near a immobile planar surface
     /**
@@ -151,10 +151,10 @@ public:
      <hr>
      @copydetails Fiber::dragCoefficientSurface
      */
-    int          drag_model;
+    int drag_model;
     
     /// distance of fluid between immobile surface and cylinder (set as `drag_model[1]`)
-    real         drag_gap;
+    real drag_gap;
 
     
     /// can be set to control which Hands may bind
@@ -174,37 +174,37 @@ public:
      However, more complex combinations can be created by using all the bits of binding_key.
      With the example above, a Hand with `binding_key=3` can bind to both type of fibers.
      */
-    unsigned int binding_key;
+    unsigned binding_key;
     
     /// if true, a Lattice is associated to this fiber
-    int          lattice;
+    int lattice;
     
     /// unit length associated with Lattice
-    real         lattice_unit;
+    real lattice_unit;
     
     /// if true, associate an analog lattice
-    int          mesh;
+    int mesh;
     
     /// unit length associated with the analog Lattice
-    real         mesh_unit;
+    real mesh_unit;
     
     /// if true, the quantities in the lattice can cut the fiber
-    int          mesh_cut_fiber;
+    int mesh_cut_fiber;
 
     /// flux speed of substance on Lattice (speed<0 is MINUS_END directed)
-    real         mesh_flux_speed;
+    real mesh_flux_speed;
     
     /// loading rate of substance from Field to Lattice
     /**
      This is a binding rate per unit time and per unit length of Fiber.
      Binding is proportional to the concentration of substance in the field.
      */
-    real         mesh_binding_rate;
+    real mesh_binding_rate;
 
     /// unloading rate of substance from Lattice to Field (unit is 1/second)
-    real         mesh_unbinding_rate;
+    real mesh_unbinding_rate;
     
-    real         mesh_aging_rate;
+    real mesh_aging_rate;
     
     /// flag controlling the forces exerted by Space on fiber points
     /**
@@ -218,13 +218,13 @@ public:
      - `both_ends`
      .
      */
-    Confinement  confine;
+    Confinement confine;
     
     /// stiffness of confinement (also known as `confine[1]`)
-    real         confine_stiffness;
+    real confine_stiffness;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string  confine_space;
+    std::string confine_space;
     
 #if NEW_FIBER_CONFINE2
     /// flag controlling the forces exerted by Space on fiber points
@@ -236,16 +236,16 @@ public:
      - `outside`
      .
      */
-    Confinement  confine2;
+    Confinement confine2;
     
     /// stiffness of confinement (also known as `confine[1]`)
-    real         confine2_stiffness;
+    real confine2_stiffness;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string  confine2_space;
+    std::string confine2_space;
 #endif
 #if NEW_FIBER_CONFINE_RANGE
-    real         confine_range[2];
+    real confine_range[2];
 #endif
     
     /// if true, include steric interaction for this object
@@ -263,16 +263,16 @@ public:
      This force is repulsive at short range ( d < d_0 ),
      and attractive elsewhere ( d > d_0 ).
      */
-    int          steric;
+    int steric;
     
     /// radius of repulsive steric interaction (also known as `steric[1]`)
-    real         steric_radius;
+    real steric_radius;
     
     /// extra radius of attractive steric interaction (also known as `steric[2]`)
-    real         steric_range;
+    real steric_range;
     
     /// name of field
-    std::string  field;
+    std::string field;
     
     /// type of glue (interaction between fiber PLUS_END and Space)
     /**
@@ -281,10 +281,10 @@ public:
      - the Single is deleted if the associated Hand detaches.
      .
     */
-    int          glue;
+    int glue;
     
     /// name of Single used for glue (set a `glue[1]`)
-    std::string  glue_single;
+    std::string glue_single;
     
 #if NEW_COLINEAR_FORCE
     /// a force parallel to the fiber (force per fiber length)
@@ -294,25 +294,25 @@ public:
      - a negative 'colinear_force' is directed toward the minus end.
      .
      */
-    real         colinear_force;
+    real colinear_force;
 #endif
 #if NEW_FIBER_CHEW
     /// maximum speed of disassembly due to chewing (speed)
-    real         max_chewing_speed;
+    real max_chewing_speed;
 #endif
     
     /// specialization
     /**
      @copydetails FiberGroup
      */
-    std::string  activity;
+    std::string activity;
     
     /// display string (see @ref FiberDispPar)
-    std::string  display;
+    std::string display;
     
 #if OLD_SQUEEZE_FORCE
     /// add a force toward the X-axis
-    int  squeeze;
+    int squeeze;
     /// max norm of squeezing force (set as \c squeeze[1])
     real squeeze_force;
     /// range below which squeezing is linear (set as \c squeeze[2])
@@ -321,28 +321,28 @@ public:
     
 #if NEW_END_FORCE
     /// the force vector added to an end of the fiber
-    Vector       end_force;
+    Vector end_force;
     /// the fiber end to which a force is added (set as end_force[1])
-    FiberEnd     end_force_mode;
+    FiberEnd end_force_mode;
 #endif
     
 #if NEW_FIBER_LOOP
     /// if `true`, link MINUS and PLUS ends together to form a loop
-    bool         loop;
+    bool loop;
 #endif
     
 #if UNCONSTRAINED_LENGTH
     /// if `true` do not enforce segment length constraints
-    bool         contrain_length;
+    bool contrain_length;
 #endif
     
     /// @}
 
     /// derived variable: flag to indicate that `display` has a new value
-    bool         display_fresh;
+    bool display_fresh;
     
     /// derived variable: display
-    FiberDisp *  disp;
+    FiberDisp * disp;
     
     /// pointer to actual confinement Space, derived from `confine_space`
     Space const* confine_space_ptr;
@@ -353,15 +353,15 @@ public:
 #endif
     
     /// derived variable: pointer to associated Field
-    Field *      field_ptr;
+    Field * field_ptr;
 
 protected:
     
     /// maximum speed of shrinkage
-    real    max_chewing_speed_dt;
+    real max_chewing_speed_dt;
     
     /// fraction of unpolymerized monomers in [0, 1]
-    real    free_polymer;
+    real free_polymer;
     
     /// total length of fiber for this type
     mutable real used_polymer;

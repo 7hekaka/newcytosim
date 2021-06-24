@@ -2164,7 +2164,9 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-    assert_small(seg-len/nbSegments());
+    real e = seg - len/nbSegments();
+    if ( abs_real(e) > 0.1 )
+        fprintf(stderr, "inaccurate segmentation %f read for f%x\n", e, identity());
 
     fnAbscissaM = abs;
     fnAbscissaP = abs + len;
@@ -2188,7 +2190,10 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
  */
 void Chain::writeAngles(Outputter& out) const
 {
-    assert_small( length1() - length() );
+    real e = length1() - length();
+    if ( abs_real(e) > 0.1 )
+        fprintf(stderr, "inaccurate segmentation %f read for f%x\n", e, identity());
+
     //out.writeUInt32(signature());
     out.writeFloat(length());
     //out.writeFloat(fnSegmentation);

@@ -335,6 +335,7 @@ void View::setProjection()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
+#if ( DIM == 3 )
     if ( perspective == 3 )
     {
         // this creates a stronger perspective:
@@ -354,6 +355,7 @@ void View::setProjection()
         glFrustum(-X, X, -Y, Y, Z, 11.0f*Z);
     }
     else
+#endif
     {
         // The back-plane is set behind to avoid clipping
         eyePosition[2] = -0.5f * S;

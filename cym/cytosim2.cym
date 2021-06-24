@@ -32,7 +32,7 @@ set fiber filament
 {
     rigidity = 10
     segmentation = 0.1
-    display = ( line=32, 1; )
+    display = ( line=40, 1; )
 }
 
 set hand binder
@@ -69,48 +69,48 @@ new back
 
 
 % Letter C
-new text { placement=off; shape = -0.5 3.5, -2.3 4, -1.9 6.8, -0.5 7.3; }
-new pinch { position = -0.3 3.8; attach = last, 0; }
-new pinch { position = -0.3 7.1; attach = last, 6; }
+new text { placement=off; shape = -0.8 3.5, -2.6 4, -2.2 6.8, -0.8 7.3; }
+new pinch { position = -0.6 3.8; attach = last, 0; }
+new pinch { position = -0.6 7.1; attach = last, 6; }
 
 % Letter Y
-new text { length = 2.5; position = 1 5.3; direction = -1 1;}
-new text { length = 4.2; position = 2 4.5; direction = 1 1.8;}
+new text { length = 2.5; position = 0.7 5.3; direction = -1 1;}
+new text { length = 4.2; position = 1.7 4.5; direction = 1 1.8;}
 new joint { attach1 = last-1, 0; attach2 = last, 2 }
 
 % Letter T
-new text { length = 2.6; position = -1.1 2.8; direction = 1 0;}
-new text { length = 4; position = -1.2 0.9; direction = 0 1;}
+new text { length = 2.6; position = -1.4 2.8; direction = 1 0;}
+new text { length = 4; position = -1.5 0.9; direction = 0 1;}
 new joint { attach1 = last-1, 1.3; attach2 = last, 4 }
 
 % Letter O
-new text { placement=off; shape = 3.6 -0.7, 3.2 1.2, 2.2 2, 0.7 1.6, 0.3 0, 1 -1.5, 2.7 -1.5, 3.4 -0.1; }
+new text { placement=off; shape = 3.3 -0.7, 2.9 1.2, 1.9 2, 0.4 1.6, 0 0, 0.7 -1.5, 2.4 -1.5, 3.1 -0.1; }
 new joint { attach1 = last, 0; attach2 = last, 10.8 }
 new joint { attach1 = last, 0.5; attach2 = last, 11.3 }
-new pinch { position = 2  1.9; attach = last, 3.4; }
-new pinch { position = 1.2 -1.5; attach = last, 8.4; }
+new pinch { position = 1.7  1.9; attach = last, 3.4; }
+new pinch { position = 0.9 -1.5; attach = last, 8.4; }
 
 % Letter S
-new text { placement=off; shape = -1.5 -2, -2.9 -2.5, -3 -3.5, -1.2 -4.5, -1.3 -5.5, -2.7 -6; }
-new pinch { position = -3.0 -6; attach = last, 7; }
-new pinch { position = -2.1 -4; attach = last, 3.5; }
-new pinch { position = -1.4 -2; attach = last, 0; }
+new text { placement=off; shape = -1.7 -2, -3.1 -2.5, -3.2 -3.5, -1.4 -4.5, -1.5 -5.5, -2.9 -6; }
+new pinch { position = -3.2 -6; attach = last, 7; }
+new pinch { position = -2.3 -4; attach = last, 3.5; }
+new pinch { position = -1.6 -2; attach = last, 0; }
 
 % Letter I
-new text { length = 4.2; position = -0.2 -4.5; direction = 0 -1;}
-new pinch { position = -0.2 -6.3; attach = last, 4; }
-new pinch { position = -0.2 -2.3; attach = last, 0; }
+new text { length = 4.2; position = -0.5 -4.5; direction = 0 -1;}
+new pinch { position = -0.5 -6.3; attach = last, 4; }
+new pinch { position = -0.5 -2.3; attach = last, 0; }
 
 % Letter M
-new text { length = 4.2; position = 1 -4.9; direction = 0 -1;}
-new pinch { position = 1 -4.7; attach = last, 2; }
-new text { length = 1.25; position = 1.5 -3.2; direction = -1 1;}
+new text { length = 4.2; position = 0.7 -4.9; direction = 0 -1;}
+new pinch { position = 0.7 -4.7; attach = last, 2; }
+new text { length = 1.25; position = 1.2 -3.2; direction = -1 1;}
 new joint { attach1 = last, 1.25; attach2 = last-1, 0 }
-new text { length = 1.25; position = 2.5 -3.2; direction = 1 1;}
+new text { length = 1.25; position = 2.2 -3.2; direction = 1 1;}
 new joint { attach1 = last, 0; attach2 = last-1, 0 }
-new text { length = 4.2; position = 3 -4.9; direction = 0 -1;}
+new text { length = 4.2; position = 2.7 -4.9; direction = 0 -1;}
 new joint { attach1 = last-1, 1.25; attach2 = last, 0 }
-new pinch { position = 3 -4.7; attach = last, 2; }
+new pinch { position = 2.7 -4.7; attach = last, 2; }
 
 % equilibrate text
 run 1234 system
