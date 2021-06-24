@@ -103,10 +103,12 @@ new joint { attach1 = last-1, 1.25; attach2 = last, 0 }
 new pinch { position = 8 0; attach = last, 2; }
 
 % understroke
+repeat 0 {
 new filament { length = 12; position = 0 -5; direction = 1 0; }
 new pinch { position = -6 -5; attach = last, 0; }
 new pinch { position =  1 -4.5; attach = last, 7; }
 new pinch { position = +5 -5; attach = last, 12; }
+}
 
 % equilibrate text
 run 1234 system
@@ -129,6 +131,26 @@ new pinch { position = 4 4; attach = last, 0, plus_end; }
 
 new filament { length = 4; position = 5 7; direction = 1 0; }
 new pinch { position = 7 4; attach = last, 0, plus_end; }
+
+
+% add under lines
+new filament { length = 4; position = -5 -7; direction = -1 0; }
+new pinch { position = -7 -4; attach = last, 0, plus_end; }
+
+new filament { length = 3.5; position = -3 -7; direction = -1 0; }
+new pinch { position = -4 -4; attach = last, 0, plus_end; }
+
+new filament { length = 3.2; position = -1.5 -7; direction = -1 0; }
+new pinch { position = -1.7 -4; attach = last, 0, plus_end; }
+
+new filament { length = 3.2; position = 1.5 -7; direction = 1 0; }
+new pinch { position = 1.7 -4; attach = last, 0, plus_end; }
+
+new filament { length = 3.5; position = 3 -7; direction = 1 0; }
+new pinch { position = 4 -4; attach = last, 0, plus_end; }
+
+new filament { length = 4; position = 5 -7; direction = 1 0; }
+new pinch { position = 7 -4; attach = last, 0, plus_end; }
 
 run 2000 system
 {
