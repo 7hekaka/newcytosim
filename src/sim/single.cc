@@ -26,7 +26,7 @@ Single::Single(SingleProp const* p, Vector const& w)
 Single::~Single()
 {
     if ( sHand  &&  sHand->attached() )
-        sHand->detach();
+        sHand->detachHand();
 
     if ( linked() )
         objset()->remove(this);

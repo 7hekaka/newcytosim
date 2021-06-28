@@ -139,9 +139,9 @@ void Simul::erase()
     relax();
     tubules.erase();
     organizers.erase();
-    fibers.erase();
     singles.erase();
     couples.erase();
+    fibers.erase();
     spheres.erase();
     beads.erase();
     solids.erase();

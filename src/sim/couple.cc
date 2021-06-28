@@ -32,10 +32,10 @@ Couple::Couple(CoupleProp const* p, Vector const& w)
 Couple::~Couple()
 {
     if ( cHand1 && attached1() )
-        cHand1->detach();
+        cHand1->detachHand();
     
     if ( cHand2 && attached2() )
-        cHand2->detach();
+        cHand2->detachHand();
     
     if ( linked() )
         objset()->remove(this);
@@ -559,11 +559,18 @@ void Couple::write(Outputter& out) const
  */
 void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    const bool a1 = cHand1->read(in, sim);
-    const bool a2 = cHand2->read(in, sim);
+    cHand1->read(in, sim);
+    cHand2->read(in, sim);
     
-    if ( a1 || a2 )
-        ;//cPos = position();
+    if ( attached1() || attached2() )
+    {
+#if 0
+        // it can be nice to set the position, but not essential
+        if ( attached1() ) cHand1->update();
+        if ( attached2() ) cHand2->update();
+        cPos = position();
+#endif
+    }
     else
         in.readFloats(cPos, DIM);
 }

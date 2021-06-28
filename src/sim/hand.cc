@@ -343,7 +343,7 @@ void Hand::write(Outputter& out) const
 }
 
 
-bool Hand::read(Inputter& in, Simul& sim)
+void Hand::read(Inputter& in, Simul& sim)
 {
     Fiber * fib = hFiber;
     FiberSite::read(in, sim);
@@ -375,8 +375,6 @@ bool Hand::read(Inputter& in, Simul& sim)
             detachHand();
     }
 #endif
-    
-    return ( fib != nullptr );
 }
 
 

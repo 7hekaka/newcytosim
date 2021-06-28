@@ -179,7 +179,7 @@ public:
     real linkStiffness() const;
     
     /// read from file
-    bool read(Inputter&, Simul&);
+    void read(Inputter&, Simul&);
     
     /// write to file
     void write(Outputter&) const;
