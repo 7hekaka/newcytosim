@@ -86,7 +86,7 @@ public:
     /// Read unsigned integer on 4 bytes
     uint32_t readUInt32bin();
 
-    /// Reads floats on 2 bytes using an int scaled by 2048
+    /// Reads float in [0, 1] stored on 2 bytes
     float    readFixed();
     /// Read angle on 2 bytes
     float    readAngle();
@@ -177,7 +177,7 @@ public:
 
     /// check if x would overflow the fixed format
     static bool overflowFixed(float x) { int16_t i=int16_t(x*2048.f); return i != int16_t(i); }
-    /// store float as an integer on 2 bytes with a fixed scaling factor of 2048
+    /// store float in [0, 1] using 2 bytes
     void writeFixed(float);
     
     /// store an angle in [-PI, PI] using 2 bytes

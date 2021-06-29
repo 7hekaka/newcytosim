@@ -126,8 +126,17 @@ void FiberSite::write(Outputter& out) const
         else
 #endif
         {
+#if 1
+            // normal way
             Object::writeReference(out, Fiber::TAG, hFiber->identity());
             out.writeFloat(hAbs);
+#else
+            // sacrificing precision to save a bit of space (29/06/2021)
+            Object::writeReference(out, Fiber::TAG_ALT, hFiber->identity());
+            // calculate relative position on fiber, which should be in [0, 1]:
+            real x = ( hAbs - hFiber->abscissaM() ) / ( hFiber->length() );
+            out.writeFixed(x); // 2 bytes
+#endif
         }
     }
     else
@@ -149,8 +158,16 @@ void FiberSite::read(Inputter& in, Simul& sim)
         {
             hAbs = in.readFloat();
 #if FIBER_HAS_LATTICE
-            // set mSite to closest integral position
-            if ( hLattice )
+            if ( hLattice ) // set site to closest integral position
+                hSite = hLattice->index(hAbs);
+#endif
+        }
+        else if ( tag == Fiber::TAG_ALT )
+        {
+            real x = in.readFixed();
+            hAbs = x * hFiber->length() + hFiber->abscissaM();
+#if FIBER_HAS_LATTICE
+            if ( hLattice ) // set site to closest integral position
                 hSite = hLattice->index(hAbs);
 #endif
         }

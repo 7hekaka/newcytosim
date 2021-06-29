@@ -168,12 +168,12 @@ uint64_t Inputter::readUInt64()
 
 float Inputter::readFixed()
 {
-    int16_t i;
+    uint16_t i;
     if ( 1 != fread(&i, 2, 1, mFile) )
         throw InvalidIO("readFixed() failed");
     if ( binary_ == 2 )
         i = byteswap(i);
-    return float(i) * 0x1p-11;
+    return float(i) * 0x1p-16;
 }
 
 
@@ -529,8 +529,9 @@ void Outputter::writeUInt32(const unsigned n, char before)
 
 void Outputter::writeFixed(const float x)
 {
-    int16_t i = int16_t(x * 2048.f);
-    if ( 2 != fwrite(&i, 1, 2, mFile) )
+    bool out = ( x < 0 || x > 1 );
+    uint16_t i = uint16_t(x * 65536.f);
+    if ( out || 2 != fwrite(&i, 1, 2, mFile) )
         throw InvalidIO("writeFixed() failed");
 }
 

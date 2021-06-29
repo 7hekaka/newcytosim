@@ -1683,11 +1683,12 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
 void Fiber::write(Outputter& out) const
 {
 #if 1
+    // normal way
     writeHeader(out, tag());
     Chain::write(out);
 #else
     // compact format created on 23/06/2021
-    writeHeader(out, TAG_ANGLES);
+    writeHeader(out, TAG_ALT);
     Chain::writeAngles(out);
 #endif
     
@@ -1736,7 +1737,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
     }
     //std::clog << " Fiber::read(" << tag << ")\n";
-    else if ( tag == TAG_ANGLES )
+    else if ( tag == TAG_ALT )
     {
         Chain::readAngles(in, sim, tag);
         updateRange(nullptr);

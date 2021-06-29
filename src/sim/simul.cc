@@ -370,7 +370,7 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case        Single::TAG:    return &singles;
         case         Wrist::TAG:    return &singles;
         case         Fiber::TAG:    return &fibers;
-        case  Fiber::TAG_ANGLES:    return &fibers;
+        case     Fiber::TAG_ALT:    return &fibers;
         case Fiber::TAG_DYNAMIC:    return &fibers;
         case Fiber::TAG_LATTICE:    return &fibers;
         case Fiber::TAG_FIBMESH:    return &fibers;

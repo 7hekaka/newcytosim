@@ -409,7 +409,7 @@ public:
     static const ObjectTag TAG = 'f';
     
     /// identifies angle data format
-    static const ObjectTag TAG_ANGLES = 'g';
+    static const ObjectTag TAG_ALT = 'g';
 
     /// identifies data for dynamic ends of fibers
     static const ObjectTag TAG_DYNAMIC = 'F';

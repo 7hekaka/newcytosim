@@ -204,7 +204,7 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
  */
 Object * FiberSet::newObject(const ObjectTag tag, size_t num)
 {
-    if ( tag == Fiber::TAG || tag == Fiber::TAG_ANGLES )
+    if ( tag == Fiber::TAG || tag == Fiber::TAG_ALT )
     {
         FiberProp const* fp = simul_.findProperty<FiberProp>("fiber", num);
         Fiber * obj = fp->newFiber();

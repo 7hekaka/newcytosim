@@ -279,8 +279,8 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
     if ( tag == Object::TAG )
         return nullptr;
     
-    if ( tag != Fiber::TAG && tag != Fiber::TAG_LATTICE )
-        throw InvalidIO("expected reference to a fiber");
+    if ( tag != Fiber::TAG && tag != Fiber::TAG_ALT && tag != Fiber::TAG_LATTICE )
+        throw InvalidIO("expected reference to a fiber ("+std::string(1,tag)+")");
 
     return fibers.findID(id);
 }
