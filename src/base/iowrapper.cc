@@ -173,7 +173,8 @@ float Inputter::readFixed()
         throw InvalidIO("readFixed() failed");
     if ( binary_ == 2 )
         i = byteswap(i);
-    return float(i) * 0x1p-16;
+    constexpr float F = 1.f / 65535.f;
+    return float(i) * F;
 }
 
 
@@ -530,7 +531,7 @@ void Outputter::writeUInt32(const unsigned n, char before)
 void Outputter::writeFixed(const float x)
 {
     bool out = ( x < 0 || x > 1 );
-    uint16_t i = uint16_t(x * 65536.f);
+    uint16_t i = uint16_t(x * 65535.f);
     if ( out || 2 != fwrite(&i, 1, 2, mFile) )
         throw InvalidIO("writeFixed() failed");
 }
