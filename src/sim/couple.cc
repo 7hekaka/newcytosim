@@ -31,19 +31,25 @@ Couple::Couple(CoupleProp const* p, Vector const& w)
 
 Couple::~Couple()
 {
-    if ( cHand1 && attached1() )
-        cHand1->detachHand();
+    if ( cHand1 )
+    {
+        if ( attached1() )
+            cHand1->detachHand();
+        delete(cHand1);
+        cHand1 = nullptr;
+    }
     
-    if ( cHand2 && attached2() )
-        cHand2->detachHand();
+    if ( cHand2 )
+    {
+        if ( attached2() )
+            cHand2->detachHand();
+        delete(cHand2);
+        cHand2 = nullptr;
+    }
     
     if ( linked() )
         objset()->remove(this);
     
-    delete(cHand1);
-    cHand1 = nullptr;
-    delete(cHand2);
-    cHand2 = nullptr;
     prop = nullptr;
 }
 
@@ -445,7 +451,7 @@ void Couple::randomizePosition()
     else if ( prop->confine == CONFINE_INSIDE )
         cPos = prop->confine_space_ptr->randomPlace();
     else if ( prop->confine != CONFINE_OFF )
-        throw InvalidParameter("`confine` is incompatible `fast_diffusion`");
+        throw InvalidParameter("`confine` is incompatible with `fast_diffusion`");
 }
 
 //------------------------------------------------------------------------------

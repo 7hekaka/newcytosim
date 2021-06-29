@@ -422,6 +422,7 @@ void CoupleSet::pruneDetach()
         i = ice_.pop_front();
         if ( o->attached1() ) o->hand1()->detachHand();
         if ( o->attached2() ) o->hand2()->detachHand();
+        o->randomizePosition();
         link(o);
     }
 }
@@ -436,8 +437,6 @@ void CoupleSet::pruneDelete()
     {
         Couple* o = static_cast<Couple*>(i);
         i = ice_.pop_front();
-        if ( o->attached1() ) o->hand1()->detachHand();
-        if ( o->attached2() ) o->hand2()->detachHand();
         inventory_.unassign(o);
         o->objset(nullptr);
         delete(o);

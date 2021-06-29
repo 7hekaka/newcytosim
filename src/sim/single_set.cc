@@ -268,6 +268,7 @@ void SingleSet::pruneDetach()
         i = ice_.pop_front();
         if ( o->attached() )
             o->hand()->detachHand();
+        o->randomizePosition();
         link(o);
     }
 }
@@ -281,8 +282,6 @@ void SingleSet::pruneDelete()
     {
         Single* o = static_cast<Single*>(i);
         i = ice_.pop_front();
-        if ( o->attached() )
-            o->hand()->detachHand();
         inventory_.unassign(o);
         o->objset(nullptr);
         delete(o);

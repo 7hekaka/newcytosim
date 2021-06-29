@@ -25,14 +25,17 @@ Single::Single(SingleProp const* p, Vector const& w)
 
 Single::~Single()
 {
-    if ( sHand  &&  sHand->attached() )
-        sHand->detachHand();
+    if ( sHand )
+    {
+        if ( sHand->attached() )
+            sHand->detachHand();
+        delete(sHand);
+        sHand = nullptr;
+    }
 
     if ( linked() )
         objset()->remove(this);
     
-    delete(sHand);
-    sHand = nullptr;
     prop = nullptr;
 }
 
@@ -101,7 +104,7 @@ void Single::randomizePosition()
     else if ( prop->confine == CONFINE_INSIDE )
         sPos = prop->confine_space_ptr->randomPlace();
     else if ( prop->confine != CONFINE_OFF )
-        throw InvalidParameter("`confine` is incompatible `fast_diffusion`");
+        throw InvalidParameter("`confine` is incompatible with `fast_diffusion`");
 }
 
 
