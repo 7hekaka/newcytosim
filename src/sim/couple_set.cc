@@ -482,7 +482,7 @@ void CoupleSet::writeFF(Outputter& out) const
     writeObjects(out, ffList);
 }
 
-void CoupleSet::write(Outputter& out, bool skip) const
+void CoupleSet::write(Outputter& out) const
 {
     if ( sizeAA() > 0 )
         writeAA(out);
@@ -492,12 +492,13 @@ void CoupleSet::write(Outputter& out, bool skip) const
         writeFA(out);
     if ( sizeFF() > 0 )
     {
-        if ( skip & skip_free )
+        int skip = simul_.prop->skip_free_couple || prune_mode;
+        if ( skip & skip_now )
             out.writeLine("\n#section couple FF 1");
         else
         {
             writeFF(out);
-            skip_free = skip;
+            skip_now = skip;
         }
     }
 }

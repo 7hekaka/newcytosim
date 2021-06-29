@@ -117,7 +117,7 @@ void Simul::initialize(Glossary & glos)
     if ( signal(SIGFPE, signal_handler) == SIG_ERR )
         std::cerr << "Could not register SIGFPE handler\n";
     
-    // read parameters, and complete
+    // read parameters
     prop->read(glos);
 }
 

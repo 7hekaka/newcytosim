@@ -93,8 +93,8 @@ void Simul::writeObjects(Outputter& out) const
     solids.write(out);
     beads.write(out);
     spheres.write(out);
-    singles.write(out, prop->skip_free_single);
-    couples.write(out, prop->skip_free_couple);
+    singles.write(out);
+    couples.write(out);
     organizers.write(out);
     tubules.write(out);
     //events.write(out);

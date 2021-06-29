@@ -99,10 +99,10 @@ private:
 public:
         
     /// flags to skip unattached Couple in trajectory file
-    mutable bool skip_free, prune_mode;
+    mutable int skip_now, prune_mode;
 
     ///creator
-    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(false), skip_free(false), prune_mode(false) {}
+    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(0), skip_now(0), prune_mode(0) {}
     
     //--------------------------
     
@@ -131,10 +131,7 @@ public:
     void writeAA(Outputter&) const;
 
     /// save objects
-    void write(Outputter&, bool skip) const;
-    
-    /// save objects
-    void write(Outputter& out) const { write(out, false); }
+    void write(Outputter&) const;
 
     //--------------------------
 
