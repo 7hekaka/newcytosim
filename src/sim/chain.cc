@@ -2142,7 +2142,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( s ) signature(s);
     
     float len = in.readFloat();
-    float seg = in.readFloat();
+    float seg = in.readFloat(); // this is the target value for segmentation
     float abs = in.readFloat();
     
 #if BACKWARD_COMPATIBILITY < 50
@@ -2164,13 +2164,10 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-    real e = seg - len/nbSegments();
-    if ( abs_real(e) > 0.1 )
-        fprintf(stderr, "inaccurate segmentation %f read for f%x\n", e, identity());
-
     fnAbscissaM = abs;
     fnAbscissaP = abs + len;
-    setSegmentation(seg);
+    setSegmentation(len/nbSegments());  // set segments' length
+    //targetSegmentation(seg); // keep value
     //Mecable::write(std::cerr);
     
 #ifndef NDEBUG
@@ -2192,7 +2189,7 @@ void Chain::writeAngles(Outputter& out) const
 {
     real e = length1() - length();
     if ( abs_real(e) > 0.1 )
-        fprintf(stderr, "inaccurate segmentation %f read for f%x\n", e, identity());
+        fprintf(stderr, "inaccurate length %f in f%x\n", e, identity());
 
     //out.writeUInt32(signature());
     out.writeFloat(length());
