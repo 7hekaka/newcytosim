@@ -429,7 +429,7 @@ void CoupleSet::pruneDetach()
 
 /* After reading from file, the Hands should not
  update any Fiber, Single or Couple as they will be deleted */
-void CoupleSet::prune()
+void CoupleSet::pruneDelete()
 {
     Object * i = ice_.pop_front();
     while ( i )
@@ -442,6 +442,15 @@ void CoupleSet::prune()
         o->objset(nullptr);
         delete(o);
     }
+}
+
+
+void CoupleSet::prune()
+{
+    if ( prune_mode )
+        pruneDetach();
+    else
+        pruneDelete();
 }
 
 

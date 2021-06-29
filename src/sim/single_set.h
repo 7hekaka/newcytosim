@@ -63,13 +63,20 @@ private:
     /// release Single from reserve lists
     void uniRelax();
 
+    
+    /// detach objects that were not updated during import
+    void pruneDetach();
+    
+    /// delete objects that were not updated during import
+    void pruneDelete();
+
 public:
         
     /// flags to skip unattached Single in trajectory file
-    mutable bool skip_free;
+    mutable bool skip_free, prune_mode;
     
     ///creator
-    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(false), skip_free(false) {}
+    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(false), skip_free(false), prune_mode(false) {}
     
     //--------------------------
 
@@ -173,9 +180,6 @@ public:
     
     /// unlink all objects before import
     void freeze();
-    
-    /// detach objects that were not updated during import
-    void pruneDetach();
 
     /// delete objects that were not updated during import
     void prune();

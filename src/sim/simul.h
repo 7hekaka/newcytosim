@@ -346,7 +346,7 @@ public:
     class InputLock;
     
     /// read objects from file, and add them to the simulation state
-    int  readObjects(Inputter&, ObjectSet* subset, bool&, bool&);
+    int  readObjects(Inputter&, ObjectSet* subset);
 
     /// load sim-world from the named file
     int  loadObjects(char const* filename);

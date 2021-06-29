@@ -354,19 +354,13 @@ public:
     }
     
     /// erase objects flagged with FLAG
-    void prune(bool alt_single, bool alt_couple)
+    void prune()
     {
         //sim->events.prune();
         sim->organizers.prune();
         sim->tubules.prune();
-        if ( alt_couple )
-            sim->couples.pruneDetach();
-        else
-            sim->couples.prune();
-        if ( alt_single )
-            sim->singles.pruneDetach();
-        else
-            sim->singles.prune();
+        sim->couples.prune();
+        sim->singles.prune();
         sim->beads.prune();
         sim->solids.prune();
         sim->spheres.prune();
@@ -430,14 +424,13 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
     InputLock lock(this);
     try
     {
-        bool s, c;
-        int res = readObjects(in, subset, s, c);
+        int res = readObjects(in, subset);
         in.unlock();
         if ( 0 == res )
         {
             // if no error occurred, process objects that have not been updated
             if ( prune )
-                lock.prune(s, c);
+                lock.prune();
             else
                 lock.thaw();
             // renew pointers to objects, particularly 'confine_space'
@@ -480,7 +473,7 @@ int Simul::loadObjects(char const* filename)
  - 2 : the file does not appear to be a valid cytosim archive
  
   */
-int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool& prune_couple)
+int Simul::readObjects(Inputter& in, ObjectSet* subset)
 {
     ObjectSet * objset = nullptr;
     std::string section, line;
@@ -537,7 +530,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                         if ( prop->skip_free_single > 1 )
                             in.skip_until("#section ");
                         else
-                            prune_single = mod;
+                            singles.prune_mode = mod;
                     }
                 }
                 else if ( section == "couple" )
@@ -550,7 +543,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset, bool& prune_single, bool
                         if ( prop->skip_free_couple > 1 )
                             in.skip_until("#section ");
                         else
-                            prune_couple = mod;
+                            couples.prune_mode = mod;
                     }
                 }
                 objset = findSet(section);
