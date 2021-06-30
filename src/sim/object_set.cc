@@ -587,9 +587,9 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
             if ( isprint(tag) ) str += " ("+std::string(1,tag)+")";
             throw InvalidIO("invalid ObjectTag "+str+" referenced in file");
         }
+        update = true;
         obj->identity(id);
         obj->objset(this);
-        update = true;
         inventory_.assign(obj);
         //std::clog << "- new " << Object::reference(tag, ix, id) << '\n';
     }

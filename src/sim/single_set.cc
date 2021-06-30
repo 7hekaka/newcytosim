@@ -496,6 +496,7 @@ void SingleSet::uniRefill(SingleList& can, size_t cnt, SingleProp const* p)
     {
         Single* s = p->newSingle();
         inventory_.assign(s);
+        s->objset(this);
         can.push_back(s);
     }
 }

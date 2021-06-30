@@ -634,6 +634,7 @@ void CoupleSet::uniRefill(CoupleList& can, size_t cnt, CoupleProp const* p)
     {
         Couple* c = p->newCouple();
         inventory_.assign(c);
+        c->objset(this);
         can.push_back(c);
     }
 }

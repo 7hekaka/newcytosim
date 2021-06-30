@@ -78,7 +78,7 @@ set couple crosslinker
 }
 
 
-new 200 fiber filament
+new 200 filament
 {
     length    = 1.0
     direction = X

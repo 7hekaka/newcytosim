@@ -56,28 +56,30 @@ void Single::beforeDetachment(Hand const* h)
 {
     assert_true( h == sHand );
     
-#if ( DIM < 2 )
-    /*
-     Relocate Single to the position where it is attached.
-     This is necessary to start the diffusion process from the correct location
-     */
-    sPos = h->posHand();
-#else
-    /*
-     Set position near the attachment point, but offset in the perpendicular
-     direction at a random distance within the range of attachment of the Hand.
-     
-     This is necessary to achieve detailed balance, which in particular implies
-     that rounds of binding/unbinding should not get the Singles closer to
-     the Filaments to which they bind.
-     */
-    sPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
-#endif
-
-    // link into correct SingleSet sublist:
     SingleSet * set = static_cast<SingleSet*>(objset());
     if ( set )
+    {
+#if ( DIM < 2 )
+        /*
+         Relocate Single to the position where it is attached.
+         This is necessary to start the diffusion process from the correct location
+         */
+        sPos = h->posHand();
+#else
+        /*
+         Set position near the attachment point, but offset in the perpendicular
+         direction at a random distance within the range of attachment of the Hand.
+         
+         This is necessary to achieve detailed balance, which in particular implies
+         that rounds of binding/unbinding should not get the Singles closer to
+         the Filaments to which they bind.
+         */
+        sPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
+#endif
+        
+        // link into correct SingleSet sublist:
         set->relinkD(this);
+    }
 }
 
 

@@ -132,14 +132,15 @@ void Simul::step()
     
     //printf("     ::steps    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
     
-    // if no Hands are present, we can skip attachment altogether:
-    if ( singles.size() + couples.size() == 0 )
-        return;
+    // if no Hands are present, we can skip attachment
+    int doAttach = singles.size() + couples.size();
     
 #if POOL_HAND_ATTACHMENT
     dontAttach = ( dontAttach + 1 ) % POOL_HAND_ATTACHMENT;
     
-    if ( 0 == dontAttach )
+    if ( doAttach && !dontAttach )
+#else
+    if ( doAttach )
 #endif
     {
         // calculate grid range from Hand's binding range:

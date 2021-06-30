@@ -381,34 +381,41 @@ void Couple::afterAttachment(Hand const* h)
 void Couple::beforeDetachment(Hand const* h)
 {
     assert_true(h->attached());
- 
-#if ( DIM < 2 )
-    /*
-     Relocate the Couple unbound position vector to where it is attached.
-     This ensures that the diffusion process starts from the correct location
-     */
-    cPos = h->posHand();
-#else
-    /*
-     Set position near the attachment point, but offset in the perpendicular
-     direction at a random distance within the range of attachment of the Hand
-     
-     This is necessary to achieve detailed balance, which in particular implies
-     that rounds of binding/unbinding should not get the Couples closer to
-     the Filaments to which they bind.
-     */
-    if ( ! Couple::otherHand(h)->attached() )
-        cPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
-#endif
     
-    // link into correct CoupleSet sublist:
     CoupleSet * set = static_cast<CoupleSet*>(objset());
     if ( set )
     {
+        bool fee;
+        // link into correct CoupleSet sublist:
         if ( h == cHand1 )
+        {
             set->relinkD1(this);
+            fee = !cHand2->attached();
+        }
         else
+        {
             set->relinkD2(this);
+            fee = !cHand1->attached();
+        }
+        
+#if ( DIM < 2 )
+        /*
+         Relocate the Couple unbound position vector to where it is attached.
+         This ensures that the diffusion process starts from the correct location
+         */
+        cPos = h->posHand();
+#else
+        /*
+         Set position near the attachment point, but offset in the perpendicular
+         direction at a random distance within the range of attachment of the Hand
+         
+         This is necessary to achieve detailed balance, which in particular implies
+         that rounds of binding/unbinding should not get the Couples closer to
+         the Filaments, even after successive rounds of binding / unbinding.
+         */
+        if ( fee )
+            cPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
+#endif
     }
 }
 
