@@ -106,6 +106,9 @@ public:
     /// remove object
     void unlink(Object *);
     
+    /// link unattached Single
+    void linkF(Single * s) { assert_true(!s->attached()); fList.push_back(s); }
+
     /// reassign Single to different sublist following attachement of Hand
     void relinkA(Single *);
     

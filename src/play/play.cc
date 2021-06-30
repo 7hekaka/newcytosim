@@ -109,13 +109,6 @@ void help(std::ostream& os)
 }
 
 
-void goodbye()
-{
-    //printf("Goodbye...\n");
-    player.clear();
-}
-
-
 void print_error(Exception const& e)
 {
     print_magenta(std::cerr, e.brief());
@@ -132,8 +125,6 @@ int main(int argc, char* argv[])
     
     Cytosim::out.silent();
     Cytosim::log.silent();
-    
-    std::atexit(goodbye);
 
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;

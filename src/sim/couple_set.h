@@ -141,6 +141,9 @@ public:
     /// remove object (should be a Couple)
     void unlink(Object *);
 
+    /// link unattached Couple into FF list
+    void linkFF(Couple * c) { assert_true(!c->attached1()&&!c->attached2()); ffList.push_back(c); }
+
     /// reassign Couple to sublist following attachement of Hand 1
     void relinkA1(Couple *);
     /// reassign Couple to sublist following detachment of Hand 1

@@ -423,7 +423,7 @@ void CoupleSet::pruneDetach()
         if ( o->attached1() ) o->hand1()->detachHand();
         if ( o->attached2() ) o->hand2()->detachHand();
         o->randomizePosition();
-        link(o);
+        linkFF(o);
     }
 }
 
@@ -659,8 +659,8 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleList& can)
         if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
             can.pop_back();
+            linkFF(c);
             h->attach(i);
-            link(c);
         }
     }
 }
@@ -686,8 +686,8 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& can)
         if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
             can.pop_back();
+            linkFF(c);
             h->attach(i);
-            link(c);
         }
     }
 }
@@ -710,11 +710,11 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
     {
         Couple * c = can.back();
         can.pop_back();
+        linkFF(c);
         // pick a random point to attach:
         size_t p = RNG.pint32(nbc);
         c->attach1(loc1[p]);
         c->attach2(loc2[p]);
-        link(c);
     }
 }
 
@@ -894,7 +894,7 @@ void CoupleSet::uniRelax()
         {
             assert_true(!c->attached1() && !c->attached2());
             c->randomizePosition();
-            link(c);
+            linkFF(c);
         }
         reserve.second.clear();
     }
@@ -1087,8 +1087,8 @@ void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properti
                 equilibrate(fibers, can, cop);
                 
                 // release all collected Couple
-                for ( Couple * cx : can )
-                    link(cx);
+                for ( Couple * x : can )
+                    linkFF(x);
                 can.clear();
             }
         }

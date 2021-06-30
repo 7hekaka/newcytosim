@@ -269,7 +269,7 @@ void SingleSet::pruneDetach()
         if ( o->attached() )
             o->hand()->detachHand();
         o->randomizePosition();
-        link(o);
+        linkF(o);
     }
 }
 
@@ -555,9 +555,9 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
             }
 
             can.pop_back();
+            linkF(s);
             s->setPosition(pos);
             s->attach(i);
-            link(s);
         }
     }
 }
@@ -700,7 +700,7 @@ void SingleSet::uniRelax()
         {
             assert_true(!s->attached());
             s->randomizePosition();
-            link(s);
+            linkF(s);
         }
         reserve.second.clear();
     }
