@@ -133,15 +133,14 @@ float Random::pfloat()
 {
     //This assumes IEEE Standard 754 Floating point numbers
     //32 bits: 1 for sign, 8 for exponents, 23 for fraction
-    union { uint32_t i; float f; } tmp;
-    tmp.i = URAND32();
+    uint32_t i = URAND32();
     uint32_t E = 126;
-    while (( tmp.i < BIT31 ) && ( E > 94 ))
+    while (( i < BIT31 ) && ( E > 94 ))
     {
-        tmp.i = tmp.i << 1; --E;
+        i = i << 1; --E;
     }
-    tmp.i = (( tmp.i << 1 ) >> 9 ) | ( E << 23 );
-    return tmp.f;
+    i = (( i << 1 ) >> 9 ) | ( E << 23 );
+    return reinterpret_cast<float&>(i);
 }
 
 
@@ -149,17 +148,16 @@ float Random::sfloat()
 {
     //This assumes IEEE Standard 754 Floating point numbers
     //32 bits: 1 for sign, 8 for exponents, 23 for fraction
-    union { uint32_t i; float f; } tmp;
-    tmp.i = URAND32();
-    uint32_t sign = tmp.i & BIT31;
-    tmp.i = tmp.i << 1;
+    uint32_t i = URAND32();
+    uint32_t sign = i & BIT31;
+    i = i << 1;
     uint32_t E = 126;
-    while (( tmp.i < BIT31 ) && ( E > 94 ))
+    while (( i < BIT31 ) && ( E > 94 ))
     {
-        tmp.i = tmp.i << 1; --E;
+        i = i << 1; --E;
     }
-    tmp.i = sign | (( tmp.i << 1 ) >> 9 ) | ( E << 23 );
-    return tmp.f;
+    i = sign | (( i << 1 ) >> 9 ) | ( E << 23 );
+    return reinterpret_cast<float&>(i);
 }
 
 /// fast (dirty) random float in [0,1[, requires IEEE Standard 754
@@ -168,9 +166,8 @@ float Random::pfloat23()
     //by setting random bits for the fraction-bits of a float IEEE 754,
     //we get a random number between 1 and 2. We substract 1.0,
     //but that drops the lower bits, reducing the precision
-    union { uint32_t i; float f; } tmp;
-    tmp.i = EXPON32 | ( URAND32() >> 9 );
-    return tmp.f - 1.0f;
+    uint32_t i = EXPON32 | ( URAND32() >> 9 );
+    return reinterpret_cast<float&>(i) - 1.f;
 }
 
 
@@ -184,9 +181,8 @@ double Random::pdouble()
     {
         w = w << 1; --E;
     }
-    union { uint64_t i; double f; } tmp;
-    tmp.i = ((w >> 11) & 0x000FFFFFFFFFFFFFULL) | ( E << 52 );
-    return tmp.f;
+    uint64_t i = ((w >> 11) & 0x000FFFFFFFFFFFFFULL) | ( E << 52 );
+    return reinterpret_cast<double&>(i);
 }
 
 
@@ -202,9 +198,8 @@ double Random::sdouble()
     {
         w = w << 1; --E;
     }
-    union { uint64_t i; double f; } tmp;
-    tmp.i = sign | ((w >> 11) & 0x000FFFFFFFFFFFFFULL) | ( E << 52 );
-    return tmp.f;
+    uint64_t i = sign | ((w >> 11) & 0x000FFFFFFFFFFFFFULL) | ( E << 52 );
+    return reinterpret_cast<double&>(i);
 }
 
 //------------------------------------------------------------------------------

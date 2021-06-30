@@ -1,8 +1,9 @@
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include <stdint.h>
 
 /**
- Can use the Intel SIMD function _bswap() and _bswap64()
+ Could use the Intel SIMD function _bswap() and _bswap64() here
  */
 
 template <class T>
@@ -52,19 +53,15 @@ inline static uint64_t byteswap(uint64_t i)
 }
 
 /// reverse byte order of float
-inline static float byteswap(float i)
+inline static float byteswap(float& x)
 {
-    union { uint32_t i; float f; } tmp;
-    tmp.f = i;
-    tmp.i = byteswap(tmp.i);
-    return tmp.f;
+    uint32_t i = byteswap(reinterpret_cast<uint32_t&>(x));
+    return reinterpret_cast<float&>(i);
 }
 
 /// reverse byte order of double
-inline static double byteswap(double i)
+inline static double byteswap(double& x)
 {
-    union { uint64_t i; double f; } tmp;
-    tmp.f = i;
-    tmp.i = byteswap(tmp.i);
-    return tmp.f;
+    uint64_t i = byteswap(reinterpret_cast<uint64_t&>(x));
+    return reinterpret_cast<double&>(i);
 }
