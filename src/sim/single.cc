@@ -25,6 +25,9 @@ Single::Single(SingleProp const* p, Vector const& w)
 
 Single::~Single()
 {
+    if ( linked() )
+        objset()->remove(this);
+
     if ( sHand )
     {
         if ( sHand->attached() )
@@ -32,9 +35,6 @@ Single::~Single()
         delete(sHand);
         sHand = nullptr;
     }
-
-    if ( linked() )
-        objset()->remove(this);
     
     prop = nullptr;
 }

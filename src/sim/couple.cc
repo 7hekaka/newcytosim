@@ -31,6 +31,9 @@ Couple::Couple(CoupleProp const* p, Vector const& w)
 
 Couple::~Couple()
 {
+    if ( linked() )
+        objset()->remove(this);
+
     if ( cHand1 )
     {
         if ( attached1() )
@@ -46,9 +49,6 @@ Couple::~Couple()
         delete(cHand2);
         cHand2 = nullptr;
     }
-    
-    if ( linked() )
-        objset()->remove(this);
     
     prop = nullptr;
 }

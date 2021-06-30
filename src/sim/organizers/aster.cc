@@ -346,7 +346,7 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
     
     // check that there is at least one point:
     if ( sol->sumRadius() < REAL_EPSILON )
-#if BACKWARD_COMPATIBILITY < 50
+#if BACKWARD_COMPATIBILITY <= 50
         sol->addSphere(Vector(0,0,0), asRadius);
 #else
         throw InvalidParameter("Aster's drag coefficient is null: please specify 'point1=center, RADIUS'");
