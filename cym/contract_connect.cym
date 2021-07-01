@@ -2,13 +2,14 @@
 % The filament are initialized with a random walk,
 % and motors are distributed on the crosspoints
 % Both motor and crosslinkers do not unbind
-% Jan 2016
+% FJN, Jan 2016
 
 set simul system
 {
     time_step = 0.001
     viscosity = 0.1
     display = ( point_size=2; )
+    dim = 2
 }
 
 set space cell
@@ -71,10 +72,10 @@ new 250 filament
     equilibrate = 17
 }
 
-new 2000 motor
-new 2000 crosslinker
+new 1000 motor
+new 1000 crosslinker
 
-% motors are distributed on the crosspoints
+% distribute connectors on the crosspoints
 call connect
 
 run 2500 system

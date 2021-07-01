@@ -101,7 +101,7 @@ change motor_head
     max_speed = 0.5
 }
 
-run simul system
+run system
 {   
     nb_frames = 2
     nb_steps = 2000

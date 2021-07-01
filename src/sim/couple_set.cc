@@ -698,15 +698,19 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleList& can)
 
 /**
  Distribute up to `nb` Couples from `can` by attaching them to locations specified
- by `loc1` and `loc2`. These positions correspond fibers crossings, calculated by
+ by `loc1` and `loc2`. These positions correspond to fibers crossings, found by
  FiberSet::allIntersections().
+ The Couples are distributed randomly on the crosspoints
  */
 void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
                             CoupleList& can, size_t nb)
 {
-    assert_true(loc1.size() == loc2.size());
-    
     const size_t nbc = loc1.size();
+    assert_true(nbc == loc2.size());
+    
+    if ( nbc < 1 )
+        return;
+    
     const size_t sup = std::min(nb, can.size());
 
     for ( size_t n = 0; n < sup; ++n )
@@ -714,7 +718,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
         Couple * c = can.back();
         can.pop_back();
         linkFF(c);
-        // pick a random point to attach:
+        // pick randomly with replacement:
         size_t p = RNG.pint32(nbc);
         c->attach1(loc1[p]);
         c->attach2(loc2[p]);
@@ -1126,10 +1130,8 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleList& can, Pro
     // get all crosspoints within this range:
     Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
     fibers.allIntersections(loc1, loc2, range);
-    const size_t nbc = loc1.size();
-    assert_true(nbc == loc2.size());
     
-    Cytosim::log << "Connect on " << nbc << " intersections within range " << range << "\n";
+    Cytosim::log << "Connect on " << loc1.size() << " intersections within range " << range << "\n";
     
     uniAttach12(loc1, loc2, can, can.size());
 }

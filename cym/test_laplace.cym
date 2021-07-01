@@ -55,17 +55,17 @@ set couple complex
     length      = 0.00
 }
 
-new fiber actin
+new actin
 {
-    length = 3.5
+    length = 3.14
     orientation = 1 0 0
     position = ( 0 1 0 )
     placement = anywhere
 }
 
-new fiber actin
+new actin
 {
-    length = 3.5
+    length = 3.14
     orientation = -1 0 0
     position = ( 0 -1 0 )
     placement = anywhere
@@ -87,15 +87,15 @@ run 300 system
 {
 }
 
-change fiber actin { confine = on, 100; }
-change couple complex { stiffness = 10 }
-change fiber actin { rigidity = 0.06 }
+change actin { confine = on, 100; }
+change complex { stiffness = 10 }
+change actin { rigidity = 0.06 }
 
 run 200 system
 {
 }
 
-change fiber actin { confine = outside, 1000; }
+change actin { confine = outside, 1000; }
 
 report platelet *
 
@@ -108,7 +108,7 @@ repeat 10
     report platelet * { verbose = 0 }
 }
 
-change space cell { radius = 1.1 }
+change cell { radius = 1.1 }
 
 repeat 20
 {

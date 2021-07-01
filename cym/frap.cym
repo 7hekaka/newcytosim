@@ -41,22 +41,22 @@ run 100 system
     nb_frames = 2
 }
 
-set space A
+set space box
 {
     shape = rectangle
 }
 
-new A
+new box
 {
     length = 6, 6, 6
 }
 
 delete all simplex
 {
-    position = inside, A
+    position = inside, box
 }
 
-delete space A
+delete box
 
 run 2000 system
 {

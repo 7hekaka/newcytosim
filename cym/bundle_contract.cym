@@ -75,7 +75,7 @@ set couple crosslinker
 }
 
 
-new 150 fiber actin
+new 150 actin
 {
     length    = 1.0, 0.3
     direction = X
