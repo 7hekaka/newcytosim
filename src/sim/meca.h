@@ -9,6 +9,7 @@
 //#include "sparmat.h"
 #include "sparmatsym1.h"
 #include "sparmatsymblk.h"
+#include "sparmatsymblkdiag.h"
 #include "sparmatblk.h"
 #include "allocator.h"
 
@@ -221,7 +222,7 @@ private:
 #if PARALLELIZE_MATRIX
     SparMatBlk    mFUL;
 #else
-    SparMatSymBlk mFUL;
+    SparMatSymBlkDiag mFUL;
 #endif
     
 public:

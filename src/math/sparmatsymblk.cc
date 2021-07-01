@@ -87,17 +87,21 @@ SparMatSymBlk::Column::Column()
 }
 
 
+/*
+ \todo Columns should use partitions of a single memory pool allocated by Matrix
+ This may require some smart allocation scheme.
+ */
 void SparMatSymBlk::Column::allocate(size_t alc)
 {
     if ( alc > allo_ )
     {
-        //fprintf(stderr, "SMSB reallocates column %i for %u: %p\n", inx_[0], alc);
-        //else fprintf(stderr, "SMSB allocates column for %u: %p\n", alc);
+        //if ( inx_ ) fprintf(stderr, "SMSB reallocates column %lu for %lu\n", inx_[0], alc);
+        //else fprintf(stderr, "SMSB allocates column for %u\n", alc);
         /*
          'chunk' can be increased, to possibly gain performance:
          more memory will be used, but reallocation will be less frequent
          */
-        constexpr size_t chunk = 16;
+        constexpr size_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
