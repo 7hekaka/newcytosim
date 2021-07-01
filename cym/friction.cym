@@ -9,7 +9,7 @@ set simul system
 {
     time_step = 0.001
     viscosity = 0.01
-    display = ( style=2; point_size=8; line_width=8; window_size=1024,128; )
+    display = ( point_size=8; line_width=8; window_size=1024,128; )
 }
 
 set space cell

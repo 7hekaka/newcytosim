@@ -6,7 +6,7 @@ set simul system
     time_step = 0.005
     viscosity = 0.2
     steric = 1, 33
-    display = ( delay=2; period=20; style=2; zoom=0.6; point_size=9; )
+    display = ( delay=2; period=20; zoom=0.6; point_size=9; )
 }
 
 set space cell

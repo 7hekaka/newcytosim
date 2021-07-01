@@ -7,7 +7,7 @@ set simul system
     time_step = 0.005
     viscosity = 0.1
     precondition = 0
-    display = ( style=2; label=(Gliding assay -); )
+    display = ( label=(Gliding assay -); )
 }
 
 set space cell

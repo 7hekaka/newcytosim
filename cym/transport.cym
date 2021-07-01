@@ -3,7 +3,7 @@
 set simul system
 {
     time_step = 0.001
-    display = ( style=2; point_size=1; window_size = 1200, 600; )
+    display = ( point_size=1; window_size = 1200, 600; )
 }
 
 set space cell

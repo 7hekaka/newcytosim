@@ -7,7 +7,7 @@ set simul system
     viscosity = 0.2
     precondition = 0
     binding_grid_step = 0.25
-    display = ( style=2; delay=4; period=2; zoom=0.6; label="Cytoskeleton" )
+    display = ( delay=4; period=2; zoom=0.6; label="Cytoskeleton" )
 }
 
 set space cell

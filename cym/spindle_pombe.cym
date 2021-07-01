@@ -59,7 +59,7 @@ set fiber microtubule
 set solid core
 {
     confine = inside, 10, cell
-    display = ( style=2; visible=1; )
+    display = ( visible=1; )
 }
 
 set aster mtoc

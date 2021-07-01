@@ -5,7 +5,7 @@ set simul system
 {
     time_step = 0.005
     viscosity = 0.05
-    display = ( point_size=6; style=2; )
+    display = ( point_size=6; )
 }
 
 

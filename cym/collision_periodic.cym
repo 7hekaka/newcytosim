@@ -9,7 +9,7 @@ set simul system
     viscosity = 0.2
     precondition = 0
     steric = 1, 777
-    display = ( style=2; point_value=0.010; )
+    display = ( point_value=0.010; )
 }
 
 set space cell

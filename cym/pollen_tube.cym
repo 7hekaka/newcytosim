@@ -7,7 +7,7 @@ set simul system
 {
     time_step = 0.0025
     viscosity = 0.1
-    display = ( style=2; point_size=3; size=1024,512 )
+    display = ( point_size=3; size=1024,512 )
 }
 
 set space cell

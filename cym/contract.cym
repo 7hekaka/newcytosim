@@ -7,7 +7,7 @@ set simul system
     viscosity = 0.2
 }
 
-set system display { style=2; point_size=5; }
+set system display { point_size=5; }
 
 set space cell
 {

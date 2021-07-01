@@ -6,7 +6,7 @@ set simul system
     time_step = 0.01
     viscosity = 0.1
     precondition = 0
-    display = ( style=2; delay=4; zoom=0.6; label="Nedelec et al. 1998 -" )
+    display = ( delay=4; zoom=0.6; label="Nedelec et al. 1998 -" )
 }
 
 set space cell

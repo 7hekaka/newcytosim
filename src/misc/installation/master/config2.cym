@@ -6,7 +6,7 @@ set simul system
     dim = 2
     time_step = 0.01
     viscosity = 0.1
-    display = ( style=2; delay=20; period=4; zoom=0.6; label="Self organization -" )
+    display = ( delay=20; period=4; zoom=0.6; label="Self organization -" )
 }
 
 set space cell

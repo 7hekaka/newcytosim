@@ -119,7 +119,7 @@ set solid core
 {
     confine = inside, 10, cell
     viscosity = 10
-    display = ( style=2; visible=1; )
+    display = ( visible=1; )
 }
 
 set aster pole_body
