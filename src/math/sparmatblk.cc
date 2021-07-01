@@ -110,11 +110,13 @@ void SparMatBlk::Line::allocate(size_t alc)
 
 void SparMatBlk::Line::deallocate()
 {
-    //if ( inx_ ) fprintf(stderr, "SMB deallocates line %i\n", inx_[0]);
+    //if ( inx_ ) fprintf(stderr, "SMB deallocates column %lu of size %lu\n", inx_[0], allo_);
     free(inx_);
     free_real(blk_);
     inx_ = nullptr;
     blk_ = nullptr;
+    allo_ = 0;
+    size_ = 0;
 }
 
 

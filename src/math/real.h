@@ -99,9 +99,9 @@ inline static real* new_real(size_t cnt)
 /// release an array of reals allocated by `new_real`
 inline static void free_real(void* ptr)
 {
+#if CHECK_ALLOCATIONS
     if ( ptr )
     {
-#if CHECK_ALLOCATIONS
         auto i = allocations.find(ptr);
         if ( i == allocations.end() )
         {
@@ -110,10 +110,10 @@ inline static void free_real(void* ptr)
         }
         else
             allocations.erase(i);
-#endif
         //printf("free_real(%p)\n", ptr);
-        free(ptr);
     }
+#endif
+    free(ptr);
 }
 
 

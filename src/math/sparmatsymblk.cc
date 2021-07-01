@@ -133,11 +133,13 @@ void SparMatSymBlk::Column::allocate(size_t alc)
 
 void SparMatSymBlk::Column::deallocate()
 {
-    //if ( inx_ ) fprintf(stderr, "SMSB deallocates column %i\n", inx_[0]);
+    //if ( inx_ ) fprintf(stderr, "SMSB deallocates column %lu of size %lu\n", inx_[0], allo_);
     free(inx_);
     free_real(blk_);
     inx_ = nullptr;
     blk_ = nullptr;
+    allo_ = 0;
+    size_ = 0;
 }
 
 
