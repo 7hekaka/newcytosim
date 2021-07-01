@@ -503,7 +503,9 @@ void FiberSet::uniFiberSites(Array<FiberSite>& res, const real spread) const
 
 /// a random site on the fiber, equidistributed over length
 /**
- This method is unefficient if multiple sites are desired
+ This method is unefficient if multiple sites are desired:
+ It requires two passes to first add the lengths of the fibers
+ In principle, one pass would be sufficient, using one random number per fiber
  */
 FiberSite FiberSet::randomSite() const
 {
@@ -531,6 +533,7 @@ FiberSite FiberSet::randomSite() const
 /// a random site on the fibers of class 'prop'
 /**
  This method is unefficient if multiple sites are desired
+ It requires two passes to first add the lengths of the fibers
  */
 FiberSite FiberSet::randomSite(FiberProp const* sel) const
 {
@@ -575,37 +578,37 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
     std::string str;
     if ( opt.set(str, key) )
     {
-        if ( str == "all" )
+        // the first case designates all fibers:
+        if ( str == title() )
             return randomSite();
         else
         {
+            // check property name, designating all fiber with that name:
+            Property const* p = simul_.findProperty(title(), str);
+            if ( p )
+            {
+                return randomSite(static_cast<FiberProp const*>(p));
+            }
+
+            // check if some individual fiber was requested:
             Fiber* fib = Fiber::toFiber(findObject(str, title()));
             
-            if ( !fib )
+            if ( fib )
             {
-                // without argument, a fiber name specifies uniform attachment:
-                if ( opt.num_values(key) == 1 )
-                {
-                    Property const* p = simul_.findProperty(title(), str);
-                    if ( p )
-                        return randomSite(static_cast<FiberProp const*>(p));
-                }
-                throw InvalidParameter("could not find fiber specified for attachment `"+str+"'");
-            }
-            
-            // variables defining an abscissa:
-            int mod = 7;
-            real abs = 0;
-            FiberEnd ref = ORIGIN;
-            if ( opt.set(abs, key, 1) )
-                mod = 0;
-            opt.set(ref, key, 2, {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}, {"center", CENTER}});
-            opt.set(mod, key, 3, {{"off", 0}, {"uniform", 1}, {"exponential", 2}});
+                // variables defining an abscissa:
+                int mod = 7;
+                real abs = 0;
+                FiberEnd ref = ORIGIN;
+                if ( opt.set(abs, key, 1) )
+                    mod = 0;
+                opt.set(ref, key, 2, {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}, {"center", CENTER}});
+                opt.set(mod, key, 3, {{"off", 0}, {"uniform", 1}, {"exponential", 2}});
 
-            return FiberSite(fib, fib->someAbscissa(abs, ref, mod, 1.0));
+                return FiberSite(fib, fib->someAbscissa(abs, ref, mod, 1.0));
+            }
         }
     }
-    throw InvalidParameter("unrecognized site specification");
+    throw InvalidParameter("could not determine specified attachment `"+str+"'");
     return FiberSite();
 }
 

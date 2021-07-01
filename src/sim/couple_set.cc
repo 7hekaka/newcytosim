@@ -258,6 +258,7 @@ ObjectList CoupleSet::newObjects(const std::string& name, Glossary& opt)
     if ( opt.has_key("attach2") )
         obj->attach2(simul_.fibers.someSite("attach2", opt));
 
+#if BACKWARD_COMPATIBILITY < 100
     /* It would be possible to create Couple with custom hand type, and the
     syntax below to attach the Hands could be better used for this */
     
@@ -268,7 +269,8 @@ ObjectList CoupleSet::newObjects(const std::string& name, Glossary& opt)
     // Allow user to attach hand2:
     if ( opt.has_key("site2") )
         obj->attach2(simul_.fibers.someSite("site2", opt));
-
+#endif
+    
     return res;
 }
 

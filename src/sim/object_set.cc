@@ -395,7 +395,7 @@ ObjectList ObjectSet::collect(const ObjectPool & list)
 ObjectList ObjectSet::collect(const ObjectPool & list,
                               bool (*func)(Object const*, void const*), void const* arg)
 {
-    ObjectList res;
+    ObjectList res(list.size(), 16);
     Object * n = list.front();
     while ( n )
     {
