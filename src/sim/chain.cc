@@ -2202,6 +2202,7 @@ void Chain::writeAngles(Outputter& out) const
     // angles:
     for ( size_t i = DIM; i < DIM*nPoints; i += DIM )
     {
+        out.writeSoftNewline();
         // in 2D, there is only one angle:
         real x = pPos[i  ] - pPos[i-DIM  ];
 #if ( DIM > 1 )
@@ -2245,21 +2246,28 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
     
     setNbPoints(cnt+1);
     //resetPoints();
+    /** in binary mode, we should read all the data in one go */
     in.readFloats(pPos, DIM);   // read first point
     const float S = len / float(cnt);
     if ( in.vectorSize() > 2 )
     {
+        // 3D case, two angles per segment
         for ( size_t i = 0; i < DIM*cnt; i += DIM )
         {
             float a = in.readAngle();
             float b = in.readPositiveAngle();
             pPos[i+DIM  ] = pPos[i  ] + S * std::cos(a) * std::sin(b);
+#if ( DIM > 1 )
             pPos[i+DIM+1] = pPos[i+1] + S * std::sin(a) * std::sin(b);
+#endif
+#if ( DIM > 2 )
             pPos[i+DIM+2] = pPos[i+2] + S * std::cos(b);
+#endif
         }
     }
     else
     {
+        // 2D case, one angle per segment
         for ( size_t i = 0; i < DIM*cnt; i += DIM )
         {
             float a = in.readAngle();

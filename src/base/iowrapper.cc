@@ -168,35 +168,65 @@ uint64_t Inputter::readUInt64()
 
 float Inputter::readFixed()
 {
-    uint16_t i;
-    if ( 1 != fread(&i, 2, 1, mFile) )
-        throw InvalidIO("readFixed() failed");
-    if ( binary_ == 2 )
-        i = byteswap(i);
-    constexpr float F = 1.f / 65535.f;
-    return float(i) * F;
+    if ( binary_ )
+    {
+        uint16_t i;
+        if ( 1 != fread(&i, 2, 1, mFile) )
+            throw InvalidIO("readFixed() failed");
+        if ( binary_ == 2 )
+            i = byteswap(i);
+        constexpr float F = 1.f / 65535.f;
+        return float(i) * F;
+    }
+    else
+    {
+        float v;
+        if ( 1 != fscanf(mFile, " %f", &v) )
+            throw InvalidIO("readAngle failed");
+        return v;
+    }
 }
 
 
 float Inputter::readAngle()
 {
-    int16_t i;
-    if ( 1 != fread(&i, 2, 1, mFile) )
-        throw InvalidIO("readAngle() failed");
-    if ( binary_ == 2 )
-        i = byteswap(i);
-    return float(i) * 0x1p-10;
+    if ( binary_ )
+    {
+        int16_t i;
+        if ( 1 != fread(&i, 2, 1, mFile) )
+            throw InvalidIO("readAngle() failed");
+        if ( binary_ == 2 )
+            i = byteswap(i);
+        return float(i) * 0x1p-10;
+    }
+    else
+    {
+        float v;
+        if ( 1 != fscanf(mFile, " %f", &v) )
+            throw InvalidIO("readAngle failed");
+        return v;
+    }
 }
 
 
 float Inputter::readPositiveAngle()
 {
-    uint16_t i;
-    if ( 1 != fread(&i, 2, 1, mFile) )
-        throw InvalidIO("readPositiveAngle() failed");
-    if ( binary_ == 2 )
-        i = byteswap(i);
-    return float(i) * 0x1p-11;
+    if ( binary_ )
+    {
+        uint16_t i;
+        if ( 1 != fread(&i, 2, 1, mFile) )
+            throw InvalidIO("readPositiveAngle() failed");
+        if ( binary_ == 2 )
+            i = byteswap(i);
+        return float(i) * 0x1p-11;
+    }
+    else
+    {
+        float v;
+        if ( 1 != fscanf(mFile, " %f", &v) )
+            throw InvalidIO("readPositiveAngle failed");
+        return v;
+    }
 }
 
 
@@ -372,17 +402,40 @@ void Outputter::writeEndianess()
 }
 
 
-void Outputter::writeInt(const int n)
+/// write the null terminating character in binary mode
+void Outputter::writeLine(const std::string& arg)
 {
-    if ( 1 > fprintf(mFile, "%i", n) )
+    size_t s = arg.size() + size_t(binary_);
+    fwrite(arg.c_str(), 1, s, mFile);
+    if ( binary_ ) putc('\n', mFile);
+}
+
+
+void Outputter::writeInt(const int n, char before)
+{
+    if ( 2 > fprintf(mFile, "%c%i", before, n) )
         throw InvalidIO("writeInt failed");
+}
+
+
+void Outputter::writeUInt(const unsigned n)
+{
+    if ( 1 > fprintf(mFile, "%u", n) )
+        throw InvalidIO("writeUInt failed");
+}
+
+
+void Outputter::writeUInt(const unsigned n, char before)
+{
+    if ( 2 > fprintf(mFile, "%c%u", before, n) )
+        throw InvalidIO("writeUInt failed");
 }
 
 
 void Outputter::writeInt8(const int n)
 {
     if ( !binary_ )
-        return writeInt(n);
+        return writeInt(n, ' ');
     
     int8_t v = (int8_t)n;
     
@@ -396,7 +449,7 @@ void Outputter::writeInt8(const int n)
 void Outputter::writeInt16(const int n)
 {
     if ( !binary_ )
-        return writeInt(n);
+        return writeInt(n, ' ');
 
     int16_t v = (int16_t)n;
     
@@ -411,7 +464,7 @@ void Outputter::writeInt16(const int n)
 void Outputter::writeInt32(const int n)
 {
     if ( !binary_ )
-        return writeInt(n);
+        return writeInt(n, ' ');
 
     int32_t v = (int32_t)n;
     
@@ -423,17 +476,10 @@ void Outputter::writeInt32(const int n)
 }
 
 
-void Outputter::writeUInt(const unsigned n)
-{
-    if ( 1 > fprintf(mFile, "%u", n) )
-        throw InvalidIO("writeUInt failed");
-}
-
-
 void Outputter::writeUInt8(const unsigned n)
 {
     if ( !binary_ )
-        return writeUInt(n);
+        return writeUInt(n, ' ');
 
     uint8_t v = (uint8_t)n;
     
@@ -448,7 +494,7 @@ void Outputter::writeUInt8(const unsigned n)
 void Outputter::writeUInt16(const unsigned n)
 {
     if ( !binary_ )
-        return writeUInt(n);
+        return writeUInt(n, ' ');
 
     uint16_t v = (uint16_t)n;
     
@@ -463,7 +509,7 @@ void Outputter::writeUInt16(const unsigned n)
 void Outputter::writeUInt32(const unsigned n)
 {
     if ( !binary_ )
-        return writeUInt(n);
+        return writeUInt(n, ' ');
 
     uint32_t v = (uint32_t)n;
     
@@ -478,7 +524,7 @@ void Outputter::writeUInt32(const unsigned n)
 void Outputter::writeUInt64(const unsigned long n)
 {
     if ( !binary_ )
-        return writeUInt(n);
+        return writeUInt(n, ' ');
 
     uint64_t v = (uint64_t)n;
     
@@ -487,14 +533,6 @@ void Outputter::writeUInt64(const unsigned long n)
     
     if ( 8 != fwrite(&v, 1, 8, mFile) )
         throw InvalidIO("writeUInt64() failed");
-}
-
-
-
-void Outputter::writeUInt(const unsigned n, char before)
-{
-    if ( 2 > fprintf(mFile, "%c%u", before, n) )
-        throw InvalidIO("writeUInt failed");
 }
 
 
@@ -530,10 +568,18 @@ void Outputter::writeUInt32(const unsigned n, char before)
 
 void Outputter::writeFixed(const float x)
 {
-    bool out = ( x < 0 || x > 1 );
-    uint16_t i = uint16_t(x * 65535.f);
-    if ( out || 2 != fwrite(&i, 1, 2, mFile) )
-        throw InvalidIO("writeFixed() failed");
+    if ( binary_ )
+    {
+        bool out = ( x < 0 || x > 1 );
+        uint16_t i = uint16_t(x * 65535.f);
+        if ( out || 2 != fwrite(&i, 1, 2, mFile) )
+            throw InvalidIO("writeFixed() failed");
+    }
+    else
+    {
+        if ( 6 > fprintf(mFile, " %.6f", x) )
+            throw InvalidIO("writeFixed failed");
+    }
 }
 
 /*
@@ -542,9 +588,17 @@ void Outputter::writeFixed(const float x)
  */
 void Outputter::writeAngle(const float x)
 {
-    int16_t i = int16_t(x * 1024.f);
-    if ( 2 != fwrite(&i, 1, 2, mFile) )
-        throw InvalidIO("writeAngle() failed");
+    if ( binary_ )
+    {
+        int16_t i = int16_t(x * 1024.f);
+        if ( 2 != fwrite(&i, 1, 2, mFile) )
+            throw InvalidIO("writeAngle() failed");
+    }
+    else
+    {
+        if ( 6 > fprintf(mFile, " %.6f", x) )
+            throw InvalidIO("writeAngle failed");
+    }
 }
 
 /*
@@ -553,9 +607,17 @@ void Outputter::writeAngle(const float x)
  */
 void Outputter::writePositiveAngle(const float x)
 {
-    uint16_t i = uint16_t(x * 2048.f);
-    if ( x < 0 || 2 != fwrite(&i, 1, 2, mFile) )
-        throw InvalidIO("writePositiveAngle() failed");
+    if ( binary_ )
+    {
+        uint16_t i = uint16_t(x * 2048.f);
+        if ( x < 0 || 2 != fwrite(&i, 1, 2, mFile) )
+            throw InvalidIO("writePositiveAngle() failed");
+    }
+    else
+    {
+        if ( 6 > fprintf(mFile, " %.6f", x) )
+            throw InvalidIO("writePositiveAngle failed");
+    }
 }
 
 

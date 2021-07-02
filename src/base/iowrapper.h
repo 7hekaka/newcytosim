@@ -149,7 +149,12 @@ public:
     void writeEndianess();
     
     /// Write integer in ASCII
-    void writeInt(int);
+    void writeInt(int, char before);
+    /// Write unsigned integer in ASCII
+    void writeUInt(unsigned);
+    /// Write unsigned integer in ASCII
+    void writeUInt(unsigned, char before);
+
     /// Write integer on 1 byte
     void writeInt8(int);
     /// Write integer on 2 bytes
@@ -157,8 +162,6 @@ public:
     /// Write integer on 4 bytes
     void writeInt32(int);
     
-    /// Write unsigned integer in ASCII
-    void writeUInt(unsigned);
     /// Write unsigned integer on 1 byte
     void writeUInt8(unsigned);
     /// Write unsigned integer on 2 bytes
@@ -168,8 +171,6 @@ public:
     /// Write unsigned integer on 4 bytes
     void writeUInt64(unsigned long);
 
-    /// Write unsigned integer in ASCII
-    void writeUInt(unsigned, char before);
     /// Write unsigned integer on 1 byte
     void writeUInt16(unsigned, char before);
     /// Write unsigned integer on 2 bytes
@@ -207,7 +208,7 @@ public:
     void writeSoftSpace() { if ( !binary_ ) put_char(' '); }
     
     /// put a C++ string
-    void writeLine(const std::string& arg) { put_line(arg); }
+    void writeLine(const std::string& arg);
 
     /// put character
     void writeChar(const int c) { putc_unlocked(c, mFile); }
