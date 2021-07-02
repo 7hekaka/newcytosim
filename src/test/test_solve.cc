@@ -12,7 +12,7 @@
 
 
 //a point in space:
-GLdouble Gx=1, Gy=1, Gz;
+float Gx=1, Gy=1, Gz=0;
 
 Vector2 pg(5,0,0), px(1,0,0), pf, pn, pc, pp;
 
@@ -145,8 +145,8 @@ GLint viewport[4];
 
 //----------------matrices to compute the inverse projection of mouse locations
 
-GLdouble mat_model[16];
-GLdouble mat_proj[16];
+GLfloat mat_model[16];
+GLfloat mat_proj[16];
 
 #define MOUSE_ZOOM    GLUT_RIGHT_BUTTON
 #define MOUSE_SET     GLUT_LEFT_BUTTON
@@ -250,10 +250,9 @@ void processMouse(int button, int state, int x, int y)
             break;
             
         case MOUSE_SET:
-            glGetDoublev(GL_MODELVIEW_MATRIX, mat_model);
-            glGetDoublev(GL_PROJECTION_MATRIX, mat_proj);
-            myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport,
-                         &Gx, &Gy, &Gz);
+            glGetFloatv(GL_MODELVIEW_MATRIX, mat_model);
+            glGetFloatv(GL_PROJECTION_MATRIX, mat_proj);
+            myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, &Gx, &Gy, &Gz);
             pg.set(Gx, Gy, Gz);
             glutPostRedisplay();
             break;
@@ -274,10 +273,9 @@ void processMotion(int x, int y)
             break;
             
         case MOUSE_SET:
-            glGetDoublev(GL_MODELVIEW_MATRIX, mat_model);
-            glGetDoublev(GL_PROJECTION_MATRIX, mat_proj);
-            myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport,
-                         &Gx, &Gy, &Gz);
+            glGetFloatv(GL_MODELVIEW_MATRIX, mat_model);
+            glGetFloatv(GL_PROJECTION_MATRIX, mat_proj);
+            myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, &Gx, &Gy, &Gz);
             pg.set(Gx, Gy, Gz);
             glutPostRedisplay();
             break;

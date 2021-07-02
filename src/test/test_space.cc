@@ -495,22 +495,22 @@ void display(View& view, int)
     if ( 1 )
     {
         //use green for points inside, magenta for point outside:
-        flute8* flu = gle::mapBuffer404(nbpts);
+        flute8* flu = gle::mapBufferC4V4(nbpts);
         gle_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
         size_t n = 0;
         for ( size_t i=0; i < nbpts; ++i )
         {
             if ( visible(i) )
-                flu[n++] = { point[i], inside[i] ? col : lor };
+                flu[n++] = { inside[i] ? col : lor, point[i] };
          }
-        gle::unmapBuffer404();
+        gle::unmapBufferC4V4();
         glPointSize(2.0);
         glDrawArrays(GL_POINTS, 0, n);
     }
     
     if ( showProject )
     {
-        flute8* flu = gle::mapBuffer404(2*nbpts);
+        flute8* flu = gle::mapBufferC4V4(2*nbpts);
         gle_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
@@ -518,62 +518,62 @@ void display(View& view, int)
             if ( visible(i) )
             {
                 gle_color c = inside[i] ? col : lor;
-                flu[n++] = { point[i], c };
-                flu[n++] = { project[i], c };
+                flu[n++] = { c, point[i] };
+                flu[n++] = { c, project[i] };
             }
         }
-        gle::unmapBuffer404();
+        gle::unmapBufferC4V4();
         glLineWidth(line_width);
         glDrawArrays(GL_LINES, 0, n);
     }
     
     if ( showNormals )
     {
-        flute8* flu = gle::mapBuffer404(2*nbpts);
+        flute8* flu = gle::mapBufferC4V4(2*nbpts);
         gle_color col(1.f, 1.f, 1.f), lor(1.f, 1.f, 1.f, 0.f);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {
-            flu[n++] = { project[i], col };
-            flu[n++] = { project[i]+normal[i], lor };
+            flu[n++] = { col, project[i] };
+            flu[n++] = { lor, project[i]+normal[i] };
         }
-        gle::unmapBuffer404();
+        gle::unmapBufferC4V4();
         glLineWidth(line_width);
         glDrawArrays(GL_LINES, 0, n);
     }
     
     if ( showReproject )
     {
-        flute8* flu = gle::mapBuffer404(2*nbpts);
+        flute8* flu = gle::mapBufferC4V4(2*nbpts);
         gle_color col(COL, 0.f, 0.f), lor(COL, 0.f, 0.f, 0.5f);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {
             if ( visible(i) )
             {
-                flu[n++] = { project[i], col };
-                flu[n++] = { project2[i], lor };
+                flu[n++] = { col, project[i] };
+                flu[n++] = { lor, project2[i] };
             }
         }
-        gle::unmapBuffer404();
+        gle::unmapBufferC4V4();
         glLineWidth(2*line_width);
         glDrawArrays(GL_LINES, 0, n);
     }
     
     if ( showEdges )
     {
-        flute8* flu = gle::mapBuffer404(2*nbpts);
+        flute8* flu = gle::mapBufferC4V4(2*nbpts);
         gle_color col(0.f, COL, COL), lor(0.f, COL, 0.f);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {
             if ( visible(i) )
             {
-                flu[n++] = { edge[i], col };
-                flu[n++] = { project[i], lor };
+                flu[n++] = { col, edge[i] };
+                flu[n++] = { lor, project[i] };
             }
          }
-        gle::unmapBuffer404();
+        gle::unmapBufferC4V4();
         glPointSize(2.0);
         glDrawArrays(GL_POINTS, 0, n);
     }

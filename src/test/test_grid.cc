@@ -171,12 +171,13 @@ void display(View& view, int)
 
     //--------------draw content of cells
     const real gold = 2.0 / ( 1.0 + sqrt(5) );
-    fluteD4 * flu = gle::mapBufferD04(16*myGrid.nbCells()+2);
+    fluteD4 * flu = gle::mapBufferC4VD(16*myGrid.nbCells()+2);
     size_t i = 0;
 
     for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
     {
         int cnt = myGrid.icell(c);
+        gle_color col(0, 1, 1);
         // use Fibonacci's spiral on the sphere:
         if ( cnt > 0 )
         {
@@ -186,15 +187,16 @@ void display(View& view, int)
             for ( int u = 0; u < std::min(16, cnt); ++u )
             {
                 Vector off(fmod(u*gold,1.0), float(u)/cnt, 0);
-                flu[i++] = {x+(y-x).e_mul(off), gle_color(0, 1, 1)};
+                flu[i++] = { col, x+(y-x).e_mul(off) };
             }
         }
     }
 
     //-------------draw selected-cell
-    flu[i++] = {Vector2(pos), gle_color(1,1,0)};
-    flu[i++] = {Vector2(nod), gle_color(1,1,0)};
-    unmapBufferD04();
+    gle_color lor(1,1,0);
+    flu[i++] = { lor, Vector2(pos) };
+    flu[i++] = { lor, Vector2(nod) };
+    unmapBufferC4VD();
     glPointSize(12);
     glEnableClientState(GL_COLOR_ARRAY);
     glDrawArrays(GL_POINTS, 0, i);

@@ -114,10 +114,10 @@ void mulMatrices(const FLOAT a[16], const FLOAT b[16], FLOAT r[16])
  We use a different name to avoid a possible name collision with GLUT
  */
 GLint myUnproject(FLOAT winx, FLOAT winy, FLOAT winz,
-                   const FLOAT modelMatrix[16],
-                   const FLOAT projMatrix[16],
-                   const GLint viewport[4],
-                   FLOAT *objx, FLOAT *objy, FLOAT *objz)
+                  const FLOAT modelMatrix[16],
+                  const FLOAT projMatrix[16],
+                  const GLint viewport[4],
+                  FLOAT *objx, FLOAT *objy, FLOAT *objz)
 {
     FLOAT mat[16];
     FLOAT inv[16];
