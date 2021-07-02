@@ -28,7 +28,7 @@ set fiber microtubule
     steric = 1, 0.1
     rigidity = 1
     segmentation = 0.2
-    confine = surface, 1000
+    confine = on, 1000
     activity = grow
     growing_speed = 0.1
     max_length = 1.0

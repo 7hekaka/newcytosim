@@ -27,7 +27,7 @@ set fiber microtubule
 {
     rigidity = 1
     segmentation = 0.20
-    confine = surface, 1000
+    confine = on, 1000
     activity = grow
     growing_speed = 0.1, 0.1
     growing_force = 1, 1

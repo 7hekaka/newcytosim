@@ -161,7 +161,7 @@ run 1000 system
 % metaphase is completed, start anaphase
 % --------------------------------------
 
-delete space squeeze
+delete squeeze
 
 change ase1_clasp
 {

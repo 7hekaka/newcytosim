@@ -34,7 +34,7 @@ set fiber actin
     binding_key = 2
     rigidity = 0.2
     segmentation = 0.1
-    confine = surface, 100
+    confine = on, 100
     display = ( line_width=0.5; )
 }
 
@@ -70,7 +70,7 @@ new template
 
 change microtubule
 {
-    confine = surface, 100, template
+    confine = on, 100, template
 }
 
 new 100 microtubule

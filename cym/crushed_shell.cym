@@ -24,7 +24,7 @@ set fiber actin
 {
     rigidity = 0.1
     segmentation = 0.2
-    confine = surface, 200
+    confine = on, 200
     display = ( line = 1,2; )
 }
 

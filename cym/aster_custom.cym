@@ -31,7 +31,7 @@ set fiber microtubule
 set solid core
 {
     display = ( style=3 )
-    confine = surface, 500
+    confine = on, 500
 }
 
 new core

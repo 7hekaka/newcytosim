@@ -52,7 +52,7 @@ set fiber chromosome
 set fiber k_fiber
 {
     activity = classic
-    confine = surface, 10, squeeze
+    confine = on, 10, squeeze
     growing_speed = 0.0
     shrinking_speed = 0.0
     rigidity = 20
@@ -407,7 +407,7 @@ change k_fiber
 {
     confine = 0
 }
-delete space squeeze
+delete squeeze
 run 1000 system
 {
     nb_frames = 5

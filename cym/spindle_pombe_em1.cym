@@ -1127,7 +1127,7 @@ new microtubule2
 
 new 2000 bridge
 {
-   attach1 = all
+   attach1 = fiber
 }
 
 run 1000 system

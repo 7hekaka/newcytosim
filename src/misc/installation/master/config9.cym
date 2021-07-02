@@ -120,7 +120,7 @@ set bead vacuole
 new 5 envelope
 {
     radius = 0.7
-    point1 = surface, 3 handle
+    point1 = on, 3 handle
 }
 
 new 200 anchored_dynein ( surface )
