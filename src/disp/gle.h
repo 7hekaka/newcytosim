@@ -72,9 +72,6 @@ namespace gle
     void bindBuffer();
     
     void unbindBuffer();
-
-    /// used in debug mode
-    GLuint boundBuffer();
     
 #pragma mark -
     

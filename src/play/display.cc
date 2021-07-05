@@ -831,7 +831,7 @@ void Display::drawFiberBackbone(Fiber const& fib)
 
 void Display::drawFiberLines(Fiber const& fib, int style) const
 {
-    size_t i = 0, cnt = 2 * fib.nbSegments() + 8;
+    size_t i = 0, cnt = 2 * fib.nbSegments();
     fluteD4* flu = gle::mapBufferC4VD(cnt+4);
     
     switch ( style )
@@ -890,7 +890,6 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             break;
     }
     gle::unmapBufferC4VD();
-    glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(fib.prop->disp->line_width);
     if ( i == cnt )
         glDrawArrays(GL_LINES, 0, i);
@@ -943,7 +942,6 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     glDisable(GL_LIGHTING);
     gle::unmapBufferC4VD();
-    glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(fib.prop->disp->line_width);
     glDrawArrays(GL_LINE_STRIP, 0, i);
     glDisableClientState(GL_COLOR_ARRAY);
@@ -1111,7 +1109,6 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
         flu[i++] = {c, fib.posEndP()};
     }
     gle::unmapBufferC4VD();
-    glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(width);
     glDisable(GL_LIGHTING);
     glDrawArrays(GL_LINE_STRIP, 0, i);
@@ -1175,7 +1172,6 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
         flu[i++] = {c, fib.posEndP()};
     }
     gle::unmapBufferC4VD();
-    glEnableClientState(GL_COLOR_ARRAY);
     lineWidth(width);
     glDisable(GL_LIGHTING);
     glDrawArrays(GL_LINE_STRIP, 0, i);
@@ -1208,6 +1204,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     glDisable(GL_LIGHTING);
     pointSize(fib.prop->disp->point_size);
     glDrawArrays(GL_POINTS, 0, i);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 
@@ -1286,6 +1283,7 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
     gle::unmapBufferC4VD();
     glDisable(GL_LIGHTING);
     glDrawArrays(GL_LINES, 0, cnt);
+    glDisableClientState(GL_COLOR_ARRAY);
 }
 
 //------------------------------------------------------------------------------
@@ -1782,6 +1780,8 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
     if (( disp->style & 1 ) && ( obj.radius(inx) > 0 ))
     {
         Vector X = obj.posP(inx);
+#if 1
+        // using cliping planes to cleanup overlapping Spheres
         size_t near[3];
         size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
         //printf("nearest balls to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
@@ -1795,6 +1795,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
             glEnable(glp);
             gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
+#endif
         drawBallT(X, obj.radius(inx), bodyColorF(obj));
         glDisable(GL_CLIP_PLANE3);
         glDisable(GL_CLIP_PLANE4);
@@ -1992,6 +1993,7 @@ void Display::drawOrganizer(Organizer const& obj) const
         gle::bindBufferC4VD(2);
         pointSize(disp->size);
         glDrawArrays(GL_POINTS, 0, i);
+        glDisableClientState(GL_COLOR_ARRAY);
     }
 
     /**

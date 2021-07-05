@@ -4,6 +4,7 @@
 #define GLE_FLUTE_H
 
 #include "flute.h"
+#include "dim.h"
 
 /*
  Attention:
@@ -34,6 +35,9 @@ namespace gle
     /// current buffer
     GLuint currStream();
     
+    /// used in debug mode
+    GLuint boundBuffer();
+
     /// switch to next buffer
     GLuint nextStream();
     

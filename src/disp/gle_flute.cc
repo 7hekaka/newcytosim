@@ -7,7 +7,7 @@
 namespace gle
 {
     /// number of buffers used to stream data to GPU
-    const unsigned N_STREAMS = 128;
+    const unsigned N_STREAMS = 32;
     
     /// index of current stream
     unsigned stream_indx = 0;
@@ -38,6 +38,13 @@ namespace gle
         stream_indx = ( stream_indx + 1 ) % N_STREAMS;
         return streams_[stream_indx];
     }
+    
+    GLuint boundBuffer()
+    {
+        GLint i = 0;
+        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &i);
+        return i;
+    }
 
     float* mapFloatBuffer(size_t cnt)
     {
@@ -58,6 +65,7 @@ namespace gle
         glVertexPointer(pts, GL_FLOAT, tot, nullptr);
         if ( nor > 1 )
         {
+            assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
             glEnableClientState(GL_NORMAL_ARRAY);
             glNormalPointer(GL_FLOAT, tot, (void*)(pts*sizeof(float)));
         }
@@ -66,17 +74,27 @@ namespace gle
     
     void setBufferCNV(size_t col, size_t nor, size_t pts, size_t skip)
     {
+        assert_true(currStream() == boundBuffer());
         size_t tot = skip * ( pts + nor + col ) * sizeof(float);
         if ( col > 0 )
         {
             glEnableClientState(GL_COLOR_ARRAY);
             glColorPointer(4, GL_FLOAT, tot, nullptr);
         }
+        else
+        {
+            assert_true(!glIsEnabled(GL_COLOR_ARRAY));
+        }
         if ( nor > 1 )
         {
             glEnableClientState(GL_NORMAL_ARRAY);
             glNormalPointer(GL_FLOAT, tot, (void*)(col*sizeof(float)));
         }
+        else
+        {
+            assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
+        }
+        assert_true(glIsEnabled(GL_VERTEX_ARRAY));
         glVertexPointer(pts, GL_FLOAT, tot, (void*)((col+nor)*sizeof(float)));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

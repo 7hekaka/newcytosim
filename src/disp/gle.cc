@@ -68,30 +68,6 @@ namespace gle
         buf_[0] = 0;
         releaseStreams();
     }
-
-    //-----------------------------------------------------------------------
-    #pragma mark - maps
-
-    void bindBuffer()
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        glVertexPointer(3, GL_FLOAT, 0, nullptr);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
-    }
-    
-    void unbindBuffer()
-    {
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    
-    GLuint boundBuffer()
-    {
-        GLint i = 0;
-        glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &i);
-        return (GLuint)i;
-    }
     
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle
@@ -1019,7 +995,6 @@ namespace gle
 
     void drawTriangleStrip(GLsizei start, GLsizei cnt)
     {
-        //assert_true(buf_[0] == boundBuffer());
         //glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
@@ -1292,8 +1267,8 @@ namespace gle
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(inx*sizeof(GLuint)));
         glCullFace(GL_BACK);
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(inx*sizeof(GLuint)));
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDisableClientState(GL_NORMAL_ARRAY);
     }
 

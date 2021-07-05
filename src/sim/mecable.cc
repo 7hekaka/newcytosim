@@ -27,6 +27,7 @@ Mecable::Mecable()
     pBlockType = 0;
     pPos       = nullptr;
     pForce     = nullptr;
+    pForceMax  = 0;
     pIndex     = 0;
 }
 
