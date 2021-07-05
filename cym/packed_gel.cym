@@ -68,11 +68,11 @@ new 3000 crosslink
 
 run 100 system
 
-delete couple crosslink
+delete all crosslink
 {
     state1 = 0
 }
-delete couple crosslink
+delete all crosslink
 {
     state2 = 0
 }

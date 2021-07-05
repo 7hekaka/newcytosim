@@ -195,6 +195,7 @@ void SingleSet::relinkD(Single * obj)
 void SingleSet::link(Object * obj)
 {
     assert_true( obj->tag()==Single::TAG || obj->tag()==Wrist::TAG );
+    assert_true( obj->objset() == this );
 
     if ( static_cast<Single*>(obj)->attached() )
         aList.push_front(obj);
@@ -210,7 +211,8 @@ void SingleSet::link(Object * obj)
 void SingleSet::unlink(Object * obj)
 {
     Single * s = static_cast<Single*>(obj);
-  
+    assert_true(obj->objset() == nullptr);
+
     if ( s->attached() )
     {
         aList.pop(obj);

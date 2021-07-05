@@ -246,7 +246,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 
 #if BACKWARD_COMPATIBILITY < 100
     if ( fib->prop->activity != "none" && m == 0 && p == 0 )
-        Cytosim::warn << "Fiber may not grow as both ends are in state `white`\n";
+        Cytosim::warn << "`" << fib->prop->name() << "' may not grow as both ends are in state `white`\n";
 #endif
     
     fib->updateFiber();

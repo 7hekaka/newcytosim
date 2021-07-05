@@ -20,7 +20,7 @@ extern Modulo const* modulo;
  */
 void ObjectSet::link(Object * obj)
 {
-    //assert_true( !obj->objset() || obj->objset() == this );
+    assert_true( obj->objset() == this );
     pool_.push_back(obj);
     
     //std::clog << "ObjectSet has " << pool_.size() << '\n';
@@ -167,8 +167,8 @@ void ObjectSet::remove(Object * obj)
 {
     //std::clog << "ObjectSet::remove " <<  obj->reference() << '\n';
     assert_true( obj->objset() == this );
-    unlink(obj);
     obj->objset(nullptr);
+    unlink(obj);
     inventory_.unassign(obj);
 }
 

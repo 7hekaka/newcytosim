@@ -1618,11 +1618,11 @@ void Fiber::makeGlue(Single*& glue)
 {
     SingleSet& set = simul().singles;
 
-    for ( Single * gh = set.firstA(); gh; gh=gh->next() )
+    for ( Single * s = set.firstA(); s; s=s->next() )
     {
-        if ( gh->hand()->fiber() == this  &&  gh->mark() == identity() )
+        if ( s->hand()->fiber() == this  &&  s->mark() == identity() )
         {
-            glue = gh;
+            glue = s;
             //Cytosim::log << "found Fiber:glue for " << reference() << '\n';
             return;
         }
@@ -1666,12 +1666,15 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
     if ( glue->attached() )
     {
         if ( !glue->linked() )
-            simul().singles.add(glue);
+        {
+            glue->objset(&simul().singles);
+            simul().singles.link(glue);
+        }
     }
-    else
+    else if ( glue->linked() )
     {
-        if ( glue->linked() )
-            simul().singles.remove(glue);
+        glue->objset(nullptr);
+        simul().singles.unlink(glue);
     }
 #endif
 }
@@ -1682,7 +1685,7 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
 
 void Fiber::write(Outputter& out) const
 {
-#if 1
+#if 0
     // normal way
     writeHeader(out, tag());
     Chain::write(out);

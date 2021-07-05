@@ -133,14 +133,14 @@ new 3 k_fiber
     length = 1.9
     position = -1.05 0 0
     direction = 1 0 0
-    end_state = shrinking
+    plus_end = shrinking
 }
 new 3 k_fiber
 {
     length = 1.9
     position = 1.05 0 0
     direction = -1 0 0    
-    end_state = shrinking
+    plus_end = shrinking
 }
 new 2 chromosome
 {
@@ -217,7 +217,7 @@ new 1 pole_body
     point1 = center, 0.2
     radius = 0.06, 0.04
     type = disc
-    fibers = 6, microtubule, ( length=3.0; )
+    fibers = 6, microtubule, ( length=3.0; plus_end = growing; )
     seed_diameter = 0.025
     position = -2.0 0 0
     direction = 1 0 0
@@ -229,7 +229,7 @@ new 1 pole_body
     point1 = center, 0.2
     radius = 0.06, 0.04
     type = disc
-    fibers = 6, microtubule, ( length=3.0; )
+    fibers = 6, microtubule, ( length=3.0; plus_end = growing; )
     seed_diameter = 0.025
     position = 2.0 0 0
     direction = -1 0 0
@@ -423,7 +423,7 @@ change ase1_clasp_hand
 {
     unbinding_rate = 0.01;   % reduce turnover of ase1
 }
-delete cohesin
+delete all cohesin
 
 run 1000 system
 {

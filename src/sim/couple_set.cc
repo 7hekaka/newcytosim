@@ -348,7 +348,8 @@ void CoupleSet::relinkD2(Couple * obj)
 void CoupleSet::link(Object * obj)
 {
     assert_true( obj->tag() == Couple::TAG );
-    
+    assert_true( obj->objset() == this );
+
     Couple * c = static_cast<Couple*>(obj);
     sublist(c->attached1(), c->attached2()).push_back(obj);
     
@@ -364,6 +365,7 @@ void CoupleSet::unlink(Object * obj)
     Couple * c = static_cast<Couple*>(obj);
 
     sublist(c->attached1(), c->attached2()).pop(obj);
+    assert_true(obj->objset() == nullptr);
     if ( c->attached1() ) c->hand1()->detach();
     if ( c->attached2() ) c->hand2()->detach();
 }
