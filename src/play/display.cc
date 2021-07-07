@@ -562,7 +562,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
         glEnable(GL_CULL_FACE);
         if ( back )
         {
-            disp->color2.load_front();
+            disp->color2.load_back();
             glCullFace(GL_FRONT);
             obj->draw3D();
             glCullFace(GL_BACK);
