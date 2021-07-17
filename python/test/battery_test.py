@@ -2,7 +2,7 @@
 #
 # battery_test.py
 #
-# Copyright F. Nedelec, March 19 2011 --- 22.05.2018
+# Copyright F. Nedelec, March 19 2011 --- 17.07.2021
 
 """
 battery_test.py:
@@ -18,26 +18,26 @@ Example - runs:
     battery_test.py bin/sim cym/*.cym
     make_image.py 'play frame=100 window_size=512,512' *_cym
 
-F. Nedelec, March-June 2011 - Feb 2013 - Jan 2020
+F. Nedelec, March-June 2011 - Feb 2013 - Jan 2020 - July 2021
 """
 
 import shutil, sys, os, subprocess, time
 
+home = os.getcwd()
+
 #------------------------------------------------------------------------
 
-def run_live(file, executable):
+def live(tool, file):
     """run live test"""
     print(file.center(100, '~'))
-    cmd = executable + ['live', file]
+    cmd = tool + ['live', file]
     val = subprocess.call(cmd)
     if val != 0:
         print('returned %i' % val)
 
-#------------------------------------------------------------------------
 
-def run(file, executable):
+def execute(tool, file, verbose):
     """run test in separate directory"""
-    cdir = os.getcwd()
     name = os.path.split(file)[1]
     wdir = 'run_'+name.partition('.')[0];
     try:
@@ -45,44 +45,64 @@ def run(file, executable):
     except OSError:
         print('skipping  '+file)
         return
-    shutil.copyfile(file, os.path.join(wdir, 'config.cym'))
-    print(name.rjust(100, '-'))
     os.chdir(wdir)
-    outfile = open("out.txt", 'w')
-    errfile = open("err.txt", 'w')
-    start = time.time()
-    val = subprocess.call(executable, stdout=outfile, stderr=errfile)
-    errfile.close()
-    outfile.close()
-    print('%5.2f sec' % (time.time()-start))
+    shutil.copyfile(file, 'config.cym')
+    out = open("out.txt", 'w')
+    err = open("err.txt", 'w')
+    sec = time.time()
+    val = subprocess.call(tool, stdout=out, stderr=err)
+    sec = time.time() - sec
+    err.close()
+    out.close()
     if val:
-        print('returned %i' % val)
-    # copy standard-error:
-    with open("err.txt", 'r') as f:
-        for line in f:
-            print("> "+line, end='');
-    os.chdir(cdir);
+        print(' %6.2f sec returned %i   %s' % (sec, val, name))
+    else:
+        print(' %6.2f sec : %s' % (sec, name))
+    if verbose:
+        # copy standard-error:
+        print(name.rjust(100, '-'))
+        with open("err.txt", 'r') as f:
+            for line in f:
+                print("> "+line, end='')
+
+
+def queued(queue):
+    """
+    run executable taking argument from queue
+    """
+    while True:
+        os.chdir(home)
+        try:
+            t, f = queue.get(True, 1)
+            #print(' queue %s %s' % (t, f))
+        except:
+            break;
+        execute(t, f, 0)
 
 #------------------------------------------------------------------------
 
 def main(args):
-    " run cytosim for many files"
-    files = []
-    live = False;
-    err = sys.stderr;
-
-    executable = args[0].split()
-    if os.access(executable[0], os.X_OK):
-        executable[0] = os.path.abspath(executable[0])
+    " run cytosim for many config files"
+    tool = args[0].split()[0]
+    if os.access(tool, os.X_OK):
+        tool = os.path.abspath(tool)
     else:
         err.write("Error: you must specify an executable on the command line\n")
         sys.exit()
-    
+
+    njobs = 1
+    files = []
+    live = False
+    err = sys.stderr
     for arg in args[1:]:
         if os.path.isfile(arg):
             files.append(os.path.abspath(arg))
         elif arg=='live' or arg=='live=1':
             live = True
+        elif arg.startswith('jobs='):
+            njobs = int(arg[5:])
+        elif arg.startswith('njobs='):
+            njobs = int(arg[6:])
         else:
             err.write("Ignored`"+arg+"' on the command line\n")
     
@@ -90,12 +110,32 @@ def main(args):
         print("You must specify config files!")
         sys.exit()
 
+    njobs = min(njobs, len(files))
+    
+    if njobs > 1:
+        #process in parallel with child threads:
+        try:
+            from multiprocessing import Process, Queue
+            queue = Queue()
+            for p in files:
+                queue.put((tool, p))
+            jobs = [Process(target=queued, args=(queue,)) for n in range(njobs)]
+            for job in jobs:
+                job.start()
+            for job in jobs:
+                job.join()
+            # job completed:
+            return 0
+        except ImportError:
+            out.write("Warning: multiprocessing module unavailable\n")
+    #process sequentially:
     if live:
         for f in files:
-            run_live(f, executable)
+            live(tool, f)
     else:
         for f in files:
-            run(f, executable)
+            os.chdir(home);
+            execute(tool, f, 1)
 
 
 #------------------------------------------------------------------------
