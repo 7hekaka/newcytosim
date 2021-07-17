@@ -7,10 +7,11 @@
 
 # Cytosim used in other groups
 
-*Please, let us know of any citations we could add*
+*Please, let us know of any citation we could add*
 
 2021
 
+- [Self-organized optimal packing of kinesin-5-driven microtubule asters scales with cell size](https://doi.org/10.1242/jcs.257543)
 - [Effect of plant tubulin kinetic diversification on microtubule lengths](https://www.biorxiv.org/content/10.1101/2021.05.11.443582v1)
 - [Dynein self-organizes while translocating the centrosome in T cells](https://www.molbiolcell.org/doi/abs/10.1091/mbc.E20-10-0668)
 - [Kinesin-4 KIF21B limits microtubule growth to allow rapid centrosome polarization in T cells](https://doi.org/10.7554/eLife.62876)
@@ -24,7 +25,7 @@
 - [Mechanosensitive single molecule dynamics of myosin II](http://hdl.handle.net/2445/171220)
 - [Reverse-engineering forces responsible for dynamic clustering and spreading of multiple nuclei in developing muscle cells](https://doi.org/10.1091/mbc.E19-12-0711)
 - [Wrinkling instability in 3D active nematics](https://pubs.acs.org/doi/abs/10.1021/acs.nanolett.0c01546)
-- [Deep learning the assembly parameters of growing cytoskeletal networks]() Kros, Maury F, Eindhoven University.
+- [Deep learning the assembly parameters of growing cytoskeletal networks](https://pure.tue.nl/ws/portalfiles/portal/148470406/Kros_M.F._0875844_BEP_verslag.pdf) Kros, Maury F, Eindhoven University.
 - [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/abs/1804.11044)
 - [Chromosomes function as a barrier to mitotic spindle bipolarity in polyploid cells](https://doi.org/10.1083/jcb.201908006)   
 
