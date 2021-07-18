@@ -16,6 +16,11 @@
 #define BACKWARD_COMPATIBILITY 50
 
 
+// enable compact trajectory format created on 23/06/2021
+/** This makes the trajectory files smaller, at the expense of precision
+ This option is normally not desired, expect to compress old simulations files */
+#define COMPACT_STORAGE 0
+
 /** 
  Enables advanced Space
  */

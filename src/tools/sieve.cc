@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         
         if ( in.vectorSize() != dim )
         {
-            std::cerr << "Abort: dimensionality mismatch (file is " << in.vectorSize() << "D)\n";
+            std::cerr << "Aborting due to dimensionality mismatch (file is " << in.vectorSize() << "D)\n";
             return 1;
         }
 

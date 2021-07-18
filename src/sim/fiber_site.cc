@@ -126,11 +126,12 @@ void FiberSite::write(Outputter& out) const
         else
 #endif
         {
-#if 1
+#if !COMPACT_STORAGE
             // normal way
             Object::writeReference(out, Fiber::TAG, hFiber->identity());
             out.writeFloat(hAbs);
 #else
+            // compact format created on 23/06/2021
             // sacrificing precision to save a bit of space (29/06/2021)
             Object::writeReference(out, Fiber::TAG_ALT, hFiber->identity());
             // calculate relative position on fiber, which should be in [0, 1]:
