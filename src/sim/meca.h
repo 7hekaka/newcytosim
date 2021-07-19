@@ -489,23 +489,23 @@ public:
     /// Link of stiffness `weight` and sphere of radius `rad` and center `cen`
     void addSphereClamp(Interpolation const&, Vector  cen, real rad, real weight);
     
-    /// Link of stiffness `weight` with cylinder of axis X and radius `len`
+    /// Link of stiffness `weight` with cylinder of axis X and radius `rad`
     void addCylinderClampX(Mecapoint const&, real rad, real weight);
     
-    /// Link of stiffness `weight` with cylinder of axis T and radius `len`
+    /// Link of stiffness `weight` with cylinder of axis T and radius `rad`
     void addCylinderClampY(Mecapoint const&, real rad, real weight);
 
-    /// Link of stiffness `weight` with cylinder of axis Z and radius `len`
+    /// Link of stiffness `weight` with cylinder of axis Z and radius `rad`
     void addCylinderClampZ(Mecapoint const&, real rad, real weight);
     
-    /// Link of stiffness `weight` with cylinder of axis X and radius `len`
+    /// Link of stiffness `weight` with cylinder of axis X and radius `rad`
     void addCylinderClamp(Mecapoint const&, Vector const&, Vector const&, real rad, real weight);
 
 #if ( DIM == 2 )
-    /// Link of stiffness `weight` and resting length `len`, on the side of first segment
+    /// Link of stiffness `weight` and resting length `arm`, on the side of first segment
     void addSidePointClamp2D(Interpolation const&, Vector, real arm, real weight);
 #endif
-    /// Link of stiffness `weight` and resting length `len`, on the side of first segment
+    /// Link of stiffness `weight` and resting length `arm`, on the side of first segment
     void addSidePointClamp3D(Interpolation const&, Vector, Torque const& arm, real weight);
 
     /// Link of stiffness `weight` with fixed position `pos`, on the side of the segment

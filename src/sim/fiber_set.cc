@@ -1268,7 +1268,7 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs, size_t& cnt,
 /**
  Sum tensions of all fiber segments intersecting the plane defined by
       <em> n.pos + a = 0 </em>
- (the vector `n` defines the direction orthogonal to the plane)
+ (hence vector `n` defines the direction orthogonal to the plane)
  
  The intersecting segments are determined by testing all Fibers.
  The tension dipole along a segment is obtained from the Lagrange multiplier 
@@ -1277,8 +1277,9 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs, size_t& cnt,
  the segment and the plane normal, yielding axial components that can be summed.
  
  @return cnt = number of segments intersecting the plane
- @return ten = sum of tension in these segments
- @return max = maximum of tension
+ @return sum = sum of tension in these segments
+ @return inf = minimum of tension
+ @return sup = maximum of tension
 */
 void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const
 {

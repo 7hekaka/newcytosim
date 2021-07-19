@@ -363,12 +363,12 @@ void Mecafil::addRigidity(const real* X, real* Y) const
         {
             /*
              With Serge DMITRIEFF:
-             Link first and last point in the same way as all other points,
-             making the fiber mechanically homogeneous and all points equivalent
+             Link fiber end points in the same way as consecutive points triplets,
+             making the fiber mechanically homogeneous for bending elasticity
              */
-            const size_t L = lastPoint();
-            add_rigidity(L,   0, 1, X, iRigidity, Y);
-            add_rigidity(L-1, L, 0, X, iRigidity, Y);
+            const size_t L = nbPoint() - 2;
+            add_rigidity(L+1, 0, 1, X, iRigidity, Y);
+            add_rigidity(L, L+1, 0, X, iRigidity, Y);
         }
 #endif
     }
