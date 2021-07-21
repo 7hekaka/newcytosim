@@ -930,12 +930,12 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
         Fiber * fib = Fiber::toFiber(i);
         if ( fib )
         {
-            size_t N = fib->nbSegments();
-            const real w = fib->segmentation();
+            const size_t N = fib->nbSegments();
+            const real w = fib->segmentationInv();
             real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
             for ( size_t n = 0; n < N; ++n )
             {
-                Vector p = fib->dirSegment(n);
+                Vector p = fib->diffPoints(n);
                 XX += p.XX * p.XX;
 #if ( DIM > 1 )
                 XY += p.YY * p.XX;
@@ -947,7 +947,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
                 ZZ += p.ZZ * p.ZZ;
 #endif
             }
-            // set lower triangle of 3x3 second rank traceless tensor:
+            // update lower triangle of 3x3 second rank traceless tensor:
             M[0] += w * XX;
             M[1] += w * XY;
             M[2] += w * XZ;
