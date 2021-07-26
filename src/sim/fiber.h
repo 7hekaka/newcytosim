@@ -414,10 +414,10 @@ public:
     /// identifies data for dynamic ends of fibers
     static const ObjectTag TAG_DYNAMIC = 'F';
     
-    /// identifies FiberLattice data
+    /// identifies FiberLattice data (was 'l' before 23/06/2021)
     static const ObjectTag TAG_LATTICE = 'T';
     
-    /// identifies Lattice<real> data
+    /// identifies Lattice<real> data (was 'L' before 23/06/2021)
     static const ObjectTag TAG_FIBMESH = 'M';
 
     /// return unique character identifying the class

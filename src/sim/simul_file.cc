@@ -278,6 +278,11 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
     // Object::TAG is the 'void' reference
     if ( tag == Object::TAG )
         return nullptr;
+
+#if BACKWARD_COMPATIBILITY < 57
+    if ( tag == 'l' ) // TAG_LATTICE was 'l' before 23/06/2021
+        tag = Fiber::TAG_LATTICE;
+#endif
     
     if ( tag != Fiber::TAG && tag != Fiber::TAG_ALT && tag != Fiber::TAG_LATTICE )
         throw InvalidIO("expected reference to a fiber ("+std::string(1,tag)+")");

@@ -1722,6 +1722,14 @@ void Fiber::write(Outputter& out) const
 
 void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
+#if BACKWARD_COMPATIBILITY < 57
+    // before 23/06/2021, TAG_LATTICE was 'l' and TAG_FIBMESH was 'L'
+    if ( in.formatID() < 57 )
+    {
+        if ( tag == 'l' ) tag = TAG_LATTICE;
+        if ( tag == 'L' ) tag = TAG_FIBMESH;
+    }
+#endif
     //std::clog << " Fiber::read(" << tag << ")\n";
     if ( tag == TAG )
     {
@@ -1739,7 +1747,6 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         fGlue = nullptr;
 #endif
     }
-    //std::clog << " Fiber::read(" << tag << ")\n";
     else if ( tag == TAG_ALT )
     {
         Chain::readAngles(in, sim, tag);
@@ -1748,7 +1755,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         fGlue = nullptr;
 #endif
     }
-    else if ( tag == TAG_LATTICE ) // TAG_LATTICE was 'l' before 23/06/2021
+    else if ( tag == TAG_LATTICE )
     {
 #if FIBER_HAS_LATTICE
         if ( fLattice.ready() )
@@ -1761,7 +1768,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         const_cast<FiberProp*>(prop)->lattice_unit = dummy.unit();
 #endif
     }
-    else if ( tag == TAG_FIBMESH || tag == 'l' ) // TAG_FIBMESH was 'L' before 23/06/2021
+    else if ( tag == TAG_FIBMESH )
     {
 #if FIBER_HAS_MESH
         if ( fMesh.ready() )

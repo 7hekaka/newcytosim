@@ -553,9 +553,8 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     {
         obj = findID(id);
         /*
-         only 'primary' objects with a lowercase TAG are linked:
-         but we exclude the old TAG_LATTICE = 'l' for backward compatibility
-         for files before 23/06/2021
+         only 'primary' objects with a lowercase TAG are linked, but we exclude the old
+         TAG_LATTICE = 'l' for backward compatibility with format 56 (before 23/06/2021)
          */
         if ( obj && islower(tag) && tag != 'l' )
         {
