@@ -49,29 +49,29 @@ Property* OrganizerSet::newProperty(const std::string& cat, const std::string& n
 }
 
 
-Object * OrganizerSet::newObject(const ObjectTag tag, size_t num)
+Object * OrganizerSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Aster::TAG )
     {
-        AsterProp * p = simul_.findProperty<AsterProp>("aster", num);
+        AsterProp * p = simul_.findProperty<AsterProp>("aster", pid);
         return new Aster(p);
     }
     
     if ( tag == Bundle::TAG )
     {
-        BundleProp * p = simul_.findProperty<BundleProp>("bundle", num);
+        BundleProp * p = simul_.findProperty<BundleProp>("bundle", pid);
         return new Bundle(p);
     }
     
     if ( tag == Nucleus::TAG )
     {
-        NucleusProp * p = simul_.findProperty<NucleusProp>("nucleus", num);
+        NucleusProp * p = simul_.findProperty<NucleusProp>("nucleus", pid);
         return new Nucleus(p);
     }
     
     if ( tag == Fake::TAG )
     {
-        FakeProp * p = simul_.findProperty<FakeProp>("fake", num);
+        FakeProp * p = simul_.findProperty<FakeProp>("fake", pid);
         return new Fake(p);
     }
     

@@ -6,10 +6,10 @@
 #include "object.h"
 #include "object_pool.h"
 #include "inventory.h"
+#include "property.h"
 #include <vector>
 
 class Outputter;
-class Property;
 class PropertyList;
 class Glossary;
 class Simul;
@@ -126,8 +126,8 @@ public:
     /// create objects of class `name`, given the options provided in `opt`
     virtual ObjectList newObjects(const std::string& name, Glossary& opt) = 0;
    
-    /// create new Object with given Tag and Property `num` (used for reading trajectory file)
-    virtual Object * newObject(ObjectTag, size_t num) = 0;
+    /// create new Object with given Tag and PropertyID (used for reading trajectory file)
+    virtual Object * newObject(ObjectTag, PropertyID) = 0;
 
     //--------------------------
     

@@ -19,6 +19,7 @@
 Bead::Bead(BeadProp const* p, Vector pos, real rad)
 : paRadius(rad), paDrag(0), prop(p)
 {
+    assert_true(rad >= 0);
     setNbPoints(1);
     setPoint(0, pos);
 }

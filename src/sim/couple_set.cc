@@ -205,11 +205,11 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-Object * CoupleSet::newObject(const ObjectTag tag, size_t num)
+Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Couple::TAG )
     {
-        CoupleProp * p = simul_.findProperty<CoupleProp>("couple", num);
+        CoupleProp * p = simul_.findProperty<CoupleProp>("couple", pid);
         return p->newCouple();
     }
     std::cerr << "Warning: unknown Couple tag `"+std::string(1,tag)+"' requested\n";

@@ -116,7 +116,7 @@ public:
     ObjectList newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object * newObject(ObjectTag, size_t);
+    Object * newObject(ObjectTag, PropertyID);
     
     /// save free Couples
     void writeFF(Outputter&) const;

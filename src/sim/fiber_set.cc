@@ -202,11 +202,11 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
 /**
  The returned object is not initialized, since this is used for file input
  */
-Object * FiberSet::newObject(const ObjectTag tag, size_t num)
+Object * FiberSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Fiber::TAG || tag == Fiber::TAG_ALT )
     {
-        FiberProp const* fp = simul_.findProperty<FiberProp>("fiber", num);
+        FiberProp const* fp = simul_.findProperty<FiberProp>("fiber", pid);
         Fiber * obj = fp->newFiber();
         obj->birthTime(simul_.time());
         return obj;

@@ -80,16 +80,16 @@ Property* SingleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-Object * SingleSet::newObject(const ObjectTag tag, size_t num)
+Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Single::TAG )
     {
-        SingleProp * p = simul_.findProperty<SingleProp>("single", num);
+        SingleProp * p = simul_.findProperty<SingleProp>("single", pid);
         return p->newSingle();
     }
     else if ( tag == Wrist::TAG )
     {
-        SingleProp * p = simul_.findProperty<SingleProp>("single", num);
+        SingleProp * p = simul_.findProperty<SingleProp>("single", pid);
         return p->newWrist(nullptr, 0);
     }
     std::cerr << "Warning: unknown Single tag `"+std::string(1,tag)+"' requested\n";

@@ -61,11 +61,11 @@ Property* FieldSet::newProperty(const std::string& cat, const std::string& nom, 
 }
 
 
-Object * FieldSet::newObject(const ObjectTag tag, size_t num)
+Object * FieldSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Field::TAG )
     {
-        FieldProp * p = simul_.findProperty<FieldProp>("field", num);
+        FieldProp * p = simul_.findProperty<FieldProp>("field", pid);
         return new Field(p);
     }
     std::cerr << "Warning: unknown Field tag `"+std::string(1,tag)+"' requested\n";

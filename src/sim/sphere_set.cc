@@ -22,11 +22,11 @@ Property* SphereSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-Object * SphereSet::newObject(const ObjectTag tag, size_t num)
+Object * SphereSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Sphere::TAG )
     {
-        SphereProp * p = simul_.findProperty<SphereProp>("sphere", num);
+        SphereProp * p = simul_.findProperty<SphereProp>("sphere", pid);
         return new Sphere(p);
     }
     std::cerr << "Warning: unknown Sphere tag `"+std::string(1,tag)+"' requested\n";

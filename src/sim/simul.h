@@ -309,9 +309,11 @@ public:
     template < typename T >
     T* findProperty(std::string const& cat, PropertyID id) const
     {
+        if ( !id )
+            throw InvalidIO("invalid (null) `"+cat+"' class ID");
         Property * p = properties.find(cat, id);
         if ( !p )
-            ;//throw InvalidIO("could not find `"+cat+"' class with ID "+std::to_string(id));
+            throw InvalidIO("could not find `"+cat+"' class with ID "+std::to_string(id));
         return static_cast<T*>(p);
     }
     

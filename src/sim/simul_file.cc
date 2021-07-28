@@ -648,7 +648,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             catch( Exception & e )
             {
                 print_blue(std::cerr, e.brief());
-                std::cerr << e.info() << " ("+section+")\n";
+                std::cerr << e.info() << " (section "+section+")\n";
                 if ( objset )
                     in.skip_until("#section ");
             }

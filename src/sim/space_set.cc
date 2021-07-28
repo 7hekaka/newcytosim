@@ -128,17 +128,14 @@ void SpaceSet::unlink(Object * obj)
 
 //------------------------------------------------------------------------------
 
-Object * SpaceSet::newObject(const ObjectTag tag, size_t num)
+Object * SpaceSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Space::TAG )
     {
-        SpaceProp * p = simul_.findProperty<SpaceProp>("space", num);
+        SpaceProp * p = simul_.findProperty<SpaceProp>("space", pid);
         Space * s = p->newSpace();
-        if ( !s )
-            std::cerr << "Warning: unknown Space class `"+p->shape+"'\n";
         return s;
     }
-    std::cerr << "Warning: unknown Space tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

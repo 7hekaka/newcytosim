@@ -30,7 +30,7 @@ Property* EventSet::newProperty(const std::string& cat, const std::string& nom, 
 }
 
 
-Object * EventSet::newObject(const ObjectTag tag, size_t num)
+Object * EventSet::newObject(const ObjectTag tag, PropertyID)
 {
     if ( tag == Event::TAG )
         return new Event();

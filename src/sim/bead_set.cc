@@ -16,14 +16,13 @@ Property* BeadSet::newProperty(const std::string& cat, const std::string& nom, G
 }
 
 
-Object * BeadSet::newObject(const ObjectTag tag, size_t num)
+Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Bead::TAG )
     {
-        BeadProp * p = simul_.findProperty<BeadProp>("bead", num);
+        BeadProp * p = simul_.findProperty<BeadProp>("bead", pid);
         return new Bead(p, Vector(0,0,0), 0);
     }
-    std::cerr << "Warning: unknown Bead tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }
 

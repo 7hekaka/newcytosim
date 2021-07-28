@@ -141,6 +141,7 @@ void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso, ObjectF
 
 void ObjectSet::add(Object * obj)
 {
+    //std::clog << "ObjectSet::add " << obj->reference() << '\n';
     if ( !obj->linked() )
     {
         assert_true( !obj->objset() || obj->objset() == this );

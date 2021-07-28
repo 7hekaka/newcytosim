@@ -60,18 +60,18 @@ Property* SolidSet::newProperty(const std::string& cat, const std::string& nom, 
 }
 
 
-Object * SolidSet::newObject(const ObjectTag tag, size_t num)
+Object * SolidSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Solid::TAG )
     {
-        Property * p = simul_.properties.find("solid", num);
+        Property * p = simul_.properties.find("solid", pid);
 #if BACKWARD_COMPATIBILITY < 47
         // prior to 04.2016, "bead" and "solid" were used interchangeably
         if ( !p )
-             p = simul_.properties.find("bead", num);
+             p = simul_.properties.find("bead", pid);
 #endif
         if ( !p )
-            throw InvalidIO("could not find `solid' class with ID "+std::to_string(num));
+            throw InvalidIO("could not find `solid' class with ID "+std::to_string(pid));
         return new Solid(static_cast<SolidProp*>(p));
    }
     std::cerr << "Warning: unknown Solid tag `"+std::string(1,tag)+"' requested\n";

@@ -28,7 +28,7 @@ public:
     ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, size_t);
+    Object *    newObject(ObjectTag, PropertyID);
     
     /// write all Objects to file
     void        write(Outputter&) const;

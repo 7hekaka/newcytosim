@@ -11,7 +11,7 @@
 
 void ObjectPool::push_front(Object * n)
 {
-    //Cytosim::log("ObjectPool: push_front   %p in   %p\n", n, this);
+    //std::clog << "ObjectPool: push_front " << n->reference() << "\n";
     assert_true(n->set_);
     n->prevO = nullptr;
     n->nextO = frontO;
@@ -26,7 +26,7 @@ void ObjectPool::push_front(Object * n)
 
 void ObjectPool::push_back(Object * n)
 {
-    //Cytosim::log("ObjectPool: push_back   %p in   %p\n", n, this);
+    //std::clog << "ObjectPool: push_back " << n->reference() << "\n";
     assert_true(n->set_);
     n->prevO = backO;
     n->nextO = nullptr;
