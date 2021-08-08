@@ -205,6 +205,19 @@ double Random::sdouble()
 //------------------------------------------------------------------------------
 #pragma mark - Gaussian derivates
 
+
+/**
+ Set two signed real number, following a normal law N(0,v*v)
+ using Box-Muller method (George E. P. Box et Mervin E. Muller, 1958)
+ */
+void Random::box_muller(real & x, real & y)
+{
+    real w = std::sqrt( -2 * std::log(preal()) );
+    real a = M_PI * sreal();
+    x = w * std::cos(a);
+    y = w * std::sin(a);
+}
+
 /**
  Set two signed real number, following a normal law N(0,v*v)
  using Marsaglia polar method (George Marsaglia, 1964)
@@ -301,7 +314,7 @@ void Random::refill_gaussians()
  */
 void Random::refill_gaussians()
 {
-    next_gaussian_ = makeGaussians_AVX0(gaussians_, SFMT_N256, (__m256i*)twister_.state);
+    next_gaussian_ = makeGaussians_AVXBM(gaussians_, SFMT_N256, (__m256i*)twister_.state);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
     sfmt_gen_rand_all(&twister_);
 }

@@ -80,7 +80,7 @@ static inline void fold_corners(vec8f& x, vec8f& y)
 
 
 /** This follows Box-Muller's method with approximate Log and Sin/Cos functions */
-static real * makeGaussians_AVX0(real dst[], size_t cnt, const __m256i src[])
+static real * makeGaussians_AVXBM(real dst[], size_t cnt, const __m256i src[])
 {
     const vec8f eps = set8f(0x1p-31); //TWO_POWER_MINUS_31
     const vec8f one = set8f(1.0f);

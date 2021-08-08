@@ -646,7 +646,7 @@ void test_gaussian(int cnt)
     runGaussian<makeGaussians_>(sfmt, "Gauss_", cnt);
 #if defined(__AVX__)
     real *end, vec[SFMT_N32] = { 0 };
-    runGaussian<makeGaussians_AVX0>(sfmt, "GaussAVX0", cnt);
+    runGaussian<makeGaussians_AVXBM>(sfmt, "GaussAVXBM", cnt);
     runGaussian<makeGaussians_AVX1>(sfmt, "GaussAVX1", cnt);
     runGaussian<makeGaussians_AVX2>(sfmt, "GaussAVX2", cnt);
     runGaussian<makeExponentialsAVX>(sfmt, "Expon.AVX", cnt);

@@ -278,6 +278,9 @@ public:
     
     /// refill array `gaussians_[]`, resetting `next_gaussian_`
     void refill_gaussians();
+  
+    /// set two independent random numbers, both following a normal law N(0,1)
+    void box_muller(real&, real&);
     
     /// set two independent random numbers, both following a normal law N(0,v*v)
     void gauss_set(real&, real&, real v);
