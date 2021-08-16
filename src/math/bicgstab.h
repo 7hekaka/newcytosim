@@ -290,6 +290,14 @@ namespace LinearSolvers
             else
                 omega = 0.0;
         }
+#if 0
+        /* recalculate the true residual r0 = rhs - MAT * sol */
+        real est = monitor.residual();
+        mat.multiply(sol, r);
+        blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
+        monitor.finished(dim, r);
+        fprintf(stderr, "[BCGSP %4i res %14.9f %14.9f]", monitor.count(), est, monitor.residual());
+#endif
 #if SAFER_CONVERGENCE
         /* With numerical drift, the residual 'r' can be far from its exact mathematical
          value, and to avoid returning a wrong information on the residual achieved,

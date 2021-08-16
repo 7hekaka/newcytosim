@@ -197,7 +197,7 @@ Isometry Interface::read_placement(Glossary& opt)
 }
 
 
-enum PlacementType { PLACE_NOT, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
+enum PlacementType { PLACE_NOT = 0, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
                      PLACE_OUTSIDE, PLACE_ALL_INSIDE };
 
 
