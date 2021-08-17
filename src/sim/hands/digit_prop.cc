@@ -40,8 +40,12 @@ void DigitProp::read(Glossary& glos)
         footprint = i;
         if ( (unsigned)footprint != i )
             throw InvalidParameter("the `footprint` value overflows");
+#if FIBER_HAS_LATTICE
         if ( std::is_same<real, FiberLattice::cell_t>::value )
             Cytosim::warn << "`footprint` is only valid with Integer-based Lattice\n";
+#else
+        Cytosim::warn << "with no Lattice support, `footprint` is ignored\n";
+#endif
     }
 
 #if BACKWARD_COMPATIBILITY < 100

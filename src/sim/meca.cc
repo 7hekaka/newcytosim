@@ -1920,7 +1920,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             zero_real(dimension(), vSOL);
 #endif
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
-            Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+            Cytosim::out(" --> restarted precond 6: count %4i residual %.3e\n", monitor.count(), monitor.residual());
         }
 
 #if SAFER_CONVERGENCE

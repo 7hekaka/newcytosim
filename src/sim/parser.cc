@@ -1078,7 +1078,7 @@ void Parser::parse_dump(std::istream& is)
 {
     const std::string str = Tokenizer::get_token(is);
     if ( str.empty() )
-        throw InvalidSyntax("missing directory name after 'save'");
+        throw InvalidSyntax("missing directory name after 'dump'");
     std::string blok = Tokenizer::get_block(is, '{');
 
     if ( do_write && do_run )
