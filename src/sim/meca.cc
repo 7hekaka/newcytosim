@@ -403,6 +403,7 @@ inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
 #if CHOUCROUTE
+    // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xpotrsL(bks, mec->block(), bks, Y);
 #elif 1
     iso_xpotrsL<1>(bks, mec->block(), bks, Y);
@@ -418,9 +419,14 @@ inline void applyPrecondHalf(Mecable const* mec, real* Y)
 inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     int bks = mec->blockSize();
-#if 1
+#if CHOUCROUTE
+    // assuming that diagonal terms of the preconditionner block have been inverted:
+    alsatian_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
+#elif 1
+    // translated LAPACK's reference code:
     lapack_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
 #else
+    // using LAPACK's library
     int info = 0;
     lapack::xgetrs('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
     assert_true(info==0);
@@ -1355,7 +1361,11 @@ void Meca::computePrecondFull(Mecable* mec)
     
     // calculate LU factorization:
     int info = 0;
+#if CHOUCROUTE
+    alsatian_xgetf2(bks, mec->block(), bks, mec->pivot(), &info);
+#else
     lapack::xgetf2(bks, bks, mec->block(), bks, mec->pivot(), &info);
+#endif
     
     if ( 0 == info )
     {

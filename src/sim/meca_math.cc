@@ -227,6 +227,27 @@ void threshold_matrix(size_t siz, real* mat, real val)
 }
 
 
+/// remove 2 bytes of fraction data, rounding up the value
+inline double truncate_double(const double& arg)
+{
+    constexpr uint64_t MASK = ~(0xFFFFFFFFUL);
+    union { double d; uint64_t i; } udi { arg };
+    udi.i &= MASK;
+    return udi.d;
+}
+
+/// reduce precision of double
+void truncate_double(size_t siz, double* mat)
+{
+    for ( size_t i = 0; i < siz*siz; ++i )
+    {
+        real y = truncate_double(mat[i]);
+        //printf(" %.12f --> %.12f\n", mat[i], y);
+        mat[i] = y;
+    }
+}
+
+
 /// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
 void init_matrix(size_t siz, real* mat, real dia, real off)
 {

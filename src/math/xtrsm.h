@@ -1047,8 +1047,7 @@ void iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
 
 
 /**
- This calls the standard lapack::xpotf2()
- and then inverts the diagonal terms
+ This calls lapack::xpotf2() and then inverts the diagonal terms
 */
 void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
 {
@@ -1127,6 +1126,21 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK-STYLE ROUTINES for General LU factorization
 
+/**
+ This calls lapack::xgetf2() and then inverts the diagonal terms
+*/
+void alsatian_xgetf2(const int N, real* A, const int LDA, int* IPIV, int* INFO)
+{
+    lapack::xgetf2(N, N, A, LDA, IPIV, INFO);
+    if ( 0 == *INFO )
+    {
+        const int S = LDA+1;
+        for ( int u = 0; u < N*S; u += S )
+            A[u] = real(1) / A[u];
+    }
+}
+
+
 /*
  DLASWP performs a series of row interchanges on the matrix A.
 
@@ -1155,9 +1169,10 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
  */
 
 template < int ORD, typename REAL >
-inline void swap(REAL* A, REAL* B)
+inline void xswap(REAL* A, REAL* B)
 {
-    for ( int d = 0; d < ORD; ++d )
+    // this is adjusted for the one-based array index:
+    for ( int d = -ORD; d < 0; ++d )
     {
         REAL t = A[d];
         A[d] = B[d];
@@ -1165,7 +1180,7 @@ inline void swap(REAL* A, REAL* B)
     }
 }
 
-
+// as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
 template < int ORD, typename REAL >
 void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
 {
@@ -1173,18 +1188,18 @@ void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
     {
         for ( int I = K1; I <= K2; ++I )
         {
-            int IP = IPIV[I-1];  // IP is one-based array index!
-            if ( IP != I )
-                swap<ORD>(A+ORD*(I-1), A+ORD*(IP-1));
+            int P = IPIV[I-1];  // P is a one-based array index!
+            if ( P != I )
+                xswap<ORD>(A+ORD*I, A+ORD*P);
         }
     }
     else if ( INCX > 0 )
     {
         for ( int I = K1; I <= K2; ++I )
         {
-            int IP = IPIV[INCX*I-1];  // IP is one-based array index!
-            if ( IP != I )
-                swap<ORD>(A+ORD*(I-1), A+ORD*(IP-1));
+            int P = IPIV[INCX*I-1];  // P is a one-based array index!
+            if ( P != I )
+                xswap<ORD>(A+ORD*I, A+ORD*P);
         }
     }
     else if ( INCX < 0 )
@@ -1192,10 +1207,32 @@ void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
         int IX = 1 + ( 1 - K2 )*INCX;
         for ( int I = K2; I >= K1; --I )
         {
-            int IP = IPIV[IX-1];  // IP is one-based array index!
-            if ( IP != I )
-                swap<ORD>(A+ORD*(I-1), A+ORD*(IP-1));
+            int P = IPIV[IX-1];  // P is a one-based array index!
+            if ( P != I )
+                xswap<ORD>(A+ORD*I, A+ORD*P);
             IX += INCX;
+        }
+    }
+}
+
+
+/// version of iso_xlaswp() with ORD=1 and INCX=1
+// as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
+template < typename REAL >
+void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)
+{
+    for ( int I = K1-1; I < K2; ++I )
+    {
+        const int P = IPIV[I] - 1;  // IPIV is a one-based array index!
+        /*
+         Useless swaps can be avoided, but this adds a branching point to the code,
+         which might decreased performance, so the tradeoff is not clear
+         */
+        //if ( P != I )
+        {
+            REAL t = A[I];
+            A[I] = A[P];
+            A[P] = t;
         }
     }
 }
@@ -1233,7 +1270,7 @@ void lapack_xgetrsN(int N, int NRHS, const REAL* A, int LDA, const int* IPIV, RE
     for ( int i = 0; i < NRHS; ++i )
     {
         // Apply row interchanges to the right hand side.
-        iso_xlaswp<1>(B, 1, N, IPIV, 1);
+        xlaswp1(B, 1, N, IPIV); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
         // Solve L*X = B, overwriting B with X.
         alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
         // Solve U*X = B, overwriting B with X.
@@ -1247,7 +1284,7 @@ template < typename REAL >
 void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 {
     // Apply row interchanges to the right hand side.
-    iso_xlaswp<1>(B, 1, N, IPIV, 1);
+    xlaswp1(B, 1, N, IPIV); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
@@ -1255,6 +1292,20 @@ void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 }
 
 
+/// version of xgetrs('N', ...) for NRHS==1 and inverted diagonal terms
+template < typename REAL >
+void alsatian_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
+{
+    // Apply row interchanges to the right hand side.
+    xlaswp1(B, 1, N, IPIV); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1<'I'>(N, A, LDA, B);
+}
+
+
+/// version of xgetrs('N', ...) for ORD interleaved vectors in right-hand-side B
 template < int ORD >
 void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
@@ -1292,6 +1343,7 @@ void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, rea
 }
 
 
+/// version of xgetrs('N', ...) for ORD interleaved vectors in right-hand-side B
 template < int ORD >
 void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
