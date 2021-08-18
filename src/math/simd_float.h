@@ -67,6 +67,15 @@ inline static int any_true4f(vec4f a) { return !_mm_test_all_zeros((__m128i)a, (
 inline static vec4f cvt4if(__m128i a) { return _mm_cvtepi32_ps(a); }
 inline static vec4f cast4f(__m128i a) { return _mm_castsi128_ps(a); }
 
+/// convert 1 half-float to float
+inline static unsigned short cvt1sh(float a) { return _cvtss_sh(a, _MM_FROUND_NO_EXC); }
+/// convert 1 half-floats to floats
+inline static float cvt4hs(unsigned short a) { return _cvtsh_ss(a); }
+/// convert 4 floats to half-floats
+inline static __m128i cvt4sh(__m128i a) { return _mm_cvtps_ph(a, _MM_FROUND_NO_EXC); }
+/// convert 4 half-floats to floats
+inline static vec4f cvt4hs(__m128i a) { return _mm_cvtph_ps(a); }
+
 /// approximate reciprocal square root: 1 / sqrt(a)
 inline static vec4f rsqrt4f(vec4f a)  { return _mm_rsqrt_ps(a); }
 

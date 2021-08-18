@@ -1378,6 +1378,10 @@ void Meca::computePrecondFull(Mecable* mec)
         //std::clog << "failed to compute full Preconditionner block of size " << bks << "\n";
         ++bump_;
     }
+    
+#if REAL_IS_DOUBLE
+    convert_to_floats(bks, mec->block());
+#endif
 }
 
 

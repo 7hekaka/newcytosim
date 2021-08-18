@@ -248,6 +248,41 @@ void truncate_double(size_t siz, double* mat)
 }
 
 
+/// reduce precision of double
+void compactify_double(size_t siz, double* mat)
+{
+#if 0
+    // print first column of 'A' for checking
+    for ( size_t i = 0; i < siz; ++i )
+        printf(" > %.12f\n", mat[i]);
+#endif
+    char * ptr = (char*)mat;
+    short int num = 0x1;
+    // copy the most significant 2 bytes of the IEEE 754 'double' format:
+    if ( ((char*)&num)[0] )
+    {
+        // little-Endian
+        for ( size_t i = 0; i < siz*siz; ++i )
+            memcpy(ptr+4*i, ptr+8*i+4, 4);
+    }
+    else
+    {
+        // big-Endian
+        for ( size_t i = 0; i < siz*siz; ++i )
+            memcpy(ptr+4*i, ptr+8*i, 4);
+    }
+}
+
+
+/// convert doubles to floats
+void convert_to_floats(size_t siz, double* mat)
+{
+    float * ptr = (float*)mat;
+    for ( size_t i = 0; i < siz*siz; ++i )
+        ptr[i] = (float)mat[i];
+}
+
+
 /// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
 void init_matrix(size_t siz, real* mat, real dia, real off)
 {

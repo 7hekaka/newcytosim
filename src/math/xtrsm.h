@@ -990,6 +990,41 @@ void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
 }
 
 //------------------------------------------------------------------------------
+#pragma mark - 1D ALSATIAN DTRSM for single-precision matrix argument
+
+/// specialized version for ORD==1
+template < typename REAL >
+void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, REAL* B)
+{
+    assert_true( M <= lda );
+    for ( int K = 0; K < M; ++K )
+    {
+        const REAL tmp = B[K];
+        # pragma ivdep
+        for ( int I = K + 1; I < M; ++I )
+            B[I] -= tmp * A[I];
+        A += lda;
+    }
+}
+
+/// specialized version for ORD==1
+template < typename REAL >
+void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, REAL* B)
+{
+    assert_true( M <= lda );
+    A += M * lda;
+    for ( int K = M-1; K >= 0; --K )
+    {
+        A -= lda;
+        const REAL tmp = B[K] * A[K];
+        B[K] = tmp;
+        # pragma ivdep
+        for ( int I = 0; I < K; ++I )
+            B[I] -= tmp * A[I];
+    }
+}
+
+//------------------------------------------------------------------------------
 #pragma mark - LAPACK-STYLE ROUTINES for Positive Symmetric Matrices
 
 inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, real* B, int LDB, int* INFO)
@@ -1298,10 +1333,17 @@ void alsatian_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 {
     // Apply row interchanges to the right hand side.
     xlaswp1(B, 1, N, IPIV); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
+#if REAL_IS_DOUBLE
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1U(N, (float*)A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1I(N, (float*)A, LDA, B);
+#else
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1<'I'>(N, A, LDA, B);
+#endif
 }
 
 
