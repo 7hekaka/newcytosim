@@ -707,7 +707,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) c
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Manually Optimized Vector Multiplication
+#pragma mark - Single Precision Optimized Vector Multiplication
 
 #if ( BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
 void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
@@ -726,9 +726,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t
     vec4f s1 = mul4f(streamload4f(D+4), tt);
     vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-    vec4f s0 = mul4f(load3f(D      ), tt);
-    vec4f s1 = mul4f(load3f(D+BLD  ), tt);
-    vec4f s2 = mul4f(load3f(D+BLD*2), tt);
+    vec4f s0 = mul4f(load3fZ(D      ), tt);
+    vec4f s1 = mul4f(load3fZ(D+BLD  ), tt);
+    vec4f s2 = mul4f(load3fZ(D+BLD*2), tt);
 # endif
     const vec4f x0 = permute4f(tt, 0x00);
     const vec4f x1 = permute4f(tt, 0x55);
@@ -748,9 +748,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t
         const vec4f M345 = streamload4f(M+4);
         const vec4f M678 = streamload4f(M+8);
 # else
-        const vec4f M012 = load3f(M      );
-        const vec4f M345 = load3f(M+BLD  );
-        const vec4f M678 = load3f(M+BLD*2);
+        const vec4f M012 = load3fZ(M      );
+        const vec4f M345 = load3fZ(M+BLD  );
+        const vec4f M678 = load3fZ(M+BLD*2);
 # endif
         // multiply with the full block:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
@@ -811,9 +811,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_
         vec4f s1 = mul4f(streamload4f(D+4), tt);
         vec4f s2 = mul4f(streamload4f(D+8), tt);
 # else
-        vec4f s0 = mul4f(load3f(D      ), tt);
-        vec4f s1 = mul4f(load3f(D+BLD  ), tt);
-        vec4f s2 = mul4f(load3f(D+BLD*2), tt);
+        vec4f s0 = mul4f(load3fZ(D      ), tt);
+        vec4f s1 = mul4f(load3fZ(D+BLD  ), tt);
+        vec4f s2 = mul4f(load3fZ(D+BLD*2), tt);
 # endif
         size_t n = 0;
         {
@@ -835,12 +835,12 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_
                 const vec4f P345 = streamload4f(P+4);
                 const vec4f P678 = streamload4f(P+8);
 # else
-                const vec4f M012 = load3f(M      );
-                const vec4f M345 = load3f(M+BLD  );
-                const vec4f M678 = load3f(M+BLD*2);
-                const vec4f P012 = load3f(P      );
-                const vec4f P345 = load3f(P+BLD  );
-                const vec4f P678 = load3f(P+BLD*2);
+                const vec4f M012 = load3fZ(M      );
+                const vec4f M345 = load3fZ(M+BLD  );
+                const vec4f M678 = load3fZ(M+BLD*2);
+                const vec4f P012 = load3fZ(P      );
+                const vec4f P345 = load3fZ(P+BLD  );
+                const vec4f P678 = load3fZ(P+BLD*2);
 # endif
                 // multiply with the full block:
                 vec4f z = fmadd4f(M012, x0, loadu4f(Y+ii));
@@ -872,9 +872,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_
             const vec4f M345 = streamload4f(M+4);
             const vec4f M678 = streamload4f(M+8);
 # else
-            const vec4f M012 = load3f(M      );
-            const vec4f M345 = load3f(M+BLD  );
-            const vec4f M678 = load3f(M+BLD*2);
+            const vec4f M012 = load3fZ(M      );
+            const vec4f M345 = load3fZ(M+BLD  );
+            const vec4f M678 = load3fZ(M+BLD*2);
 # endif
             // multiply with the full block:
             //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
@@ -912,9 +912,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_
         vec4f s1 = mul4f(streamload4f(D+4), x1);
         vec4f s2 = mul4f(streamload4f(D+8), x2);
 # else
-        vec4f s0 = mul4f(load3f(D      ), x0);
-        vec4f s1 = mul4f(load3f(D+BLD  ), x1);
-        vec4f s2 = mul4f(load3f(D+BLD*2), x2);
+        vec4f s0 = mul4f(load3fZ(D      ), x0);
+        vec4f s1 = mul4f(load3fZ(D+BLD  ), x1);
+        vec4f s2 = mul4f(load3fZ(D+BLD*2), x2);
 # endif
         storeu4f(Y+jj, add4f(add4f(loadu4f(Y+jj), s0), add4f(s1, s2)));
     }
@@ -962,12 +962,12 @@ void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_SSE(const float* X, float* Y
             const vec4f P345 = streamload4f(P+4);
             const vec4f P678 = streamload4f(P+8);
 # else
-            const vec4f M012 = load3f(M      );
-            const vec4f M345 = load3f(M+BLD  );
-            const vec4f M678 = load3f(M+BLD*2);
-            const vec4f P012 = load3f(P      );
-            const vec4f P345 = load3f(P+BLD  );
-            const vec4f P678 = load3f(P+BLD*2);
+            const vec4f M012 = load3fZ(M      );
+            const vec4f M345 = load3fZ(M+BLD  );
+            const vec4f M678 = load3fZ(M+BLD*2);
+            const vec4f P012 = load3fZ(P      );
+            const vec4f P345 = load3fZ(P+BLD  );
+            const vec4f P678 = load3fZ(P+BLD*2);
 # endif
             // multiply with the full block:
             vec4f z = fmadd4f(M012, x0, loadu4f(Y+ii));
@@ -1000,9 +1000,9 @@ void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_SSE(const float* X, float* Y
         const vec4f L345 = streamload4f(L+4);
         const vec4f L678 = streamload4f(L+8);
 # else
-        const vec4f L012 = load3f(L      );
-        const vec4f L345 = load3f(L+BLD  );
-        const vec4f L678 = load3f(L+BLD*2);
+        const vec4f L012 = load3fZ(L      );
+        const vec4f L345 = load3fZ(L+BLD  );
+        const vec4f L678 = load3fZ(L+BLD*2);
 # endif
         // multiply with the transposed block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
@@ -1036,7 +1036,7 @@ void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_SSE(const float* X, float* Y
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark - Manually Optimized Vector Multiplication
+#pragma mark - Double Precision Optimized Vector Multiplication
 
 #if ( BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
 void SparMatSymBlkDiag::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
@@ -1874,9 +1874,9 @@ void SparMatSymBlkDiag::vecMulDiagonal3D(const float* X, float* Y) const
         vec4f s1 = mul4f(streamload4f(D+4), permute4f(tt, 0x55));
         vec4f s2 = mul4f(streamload4f(D+8), permute4f(tt, 0xAA));
 # else
-        vec4f s0 = mul4f(load3f(D      ), permute4f(tt, 0x00));
-        vec4f s1 = mul4f(load3f(D+BLD  ), permute4f(tt, 0x55));
-        vec4f s2 = mul4f(load3f(D+BLD*2), permute4f(tt, 0xAA));
+        vec4f s0 = mul4f(load3fZ(D      ), permute4f(tt, 0x00));
+        vec4f s1 = mul4f(load3fZ(D+BLD  ), permute4f(tt, 0x55));
+        vec4f s2 = mul4f(load3fZ(D+BLD*2), permute4f(tt, 0xAA));
 # endif
         storeu4f(Y+3*j, add4f(s2, add4f(s0, s1)));
     }

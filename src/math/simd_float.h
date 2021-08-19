@@ -72,7 +72,7 @@ inline static unsigned short cvt1sh(float a) { return _cvtss_sh(a, _MM_FROUND_NO
 /// convert 1 half-floats to floats
 inline static float cvt4hs(unsigned short a) { return _cvtsh_ss(a); }
 /// convert 4 floats to half-floats
-inline static __m128i cvt4sh(__m128i a) { return _mm_cvtps_ph(a, _MM_FROUND_NO_EXC); }
+inline static __m128i cvt4sh(__m128 a) { return _mm_cvtps_ph(a, _MM_FROUND_NO_EXC); }
 /// convert 4 half-floats to floats
 inline static vec4f cvt4hs(__m128i a) { return _mm_cvtph_ps(a); }
 
@@ -97,8 +97,9 @@ inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos)
     return _mm_blendv_ps(pos, neg, val);
 }
 
-// loading 4 and clearing one
 inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
+// loading 4 and clearing one
+inline static vec4f load3fZ(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
 
 #elif defined(__SSE3__)
 
@@ -106,7 +107,9 @@ inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a)
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,b,0xEE), 0xC4); }
 
 // loading 3 elements
-inline static vec4f load3f(float const* a) { vec4f b; b[0]=a[0]; b[1]=a[2]; b[1]=a[2]; return b; }
+inline static vec4f load3f(float const* a) { return vec4f{a[0], a[1], a[2], 0}; }
+// loading 4 and clearing one
+inline static vec4f load3fZ(float const* a) { return vec4f{a[0], a[1], a[2], 0}; }
 
 #endif
 

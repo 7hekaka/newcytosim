@@ -116,24 +116,24 @@ struct PaintJob
  */
 void paintCell(const int x_inf, const int x_sup, const int y, const int z, void * arg)
 {
-    auto* grid = static_cast<PaintJob*>(arg)->grid;
+    const auto* grid = static_cast<PaintJob*>(arg)->grid;
     const auto& seg = static_cast<PaintJob*>(arg)->segment;
     //printf("paint %p in (%i to %i, %i, %i)\n", seg, x_inf, x_sup, y, z);
 
 #if   ( DIM == 1 )
-    FiberGrid::SegmentList * inf = & grid->icell1D( x_inf );
-    FiberGrid::SegmentList * sup = & grid->icell1D( x_sup );
+    FiberGrid::SegmentList * list = & grid->icell1D(x_inf);
+    FiberGrid::SegmentList * last = & grid->icell1D(x_sup);
 #elif ( DIM == 2 )
-    FiberGrid::SegmentList * inf = & grid->icell2D( x_inf, y );
-    FiberGrid::SegmentList * sup = & grid->icell2D( x_sup, y );
+    FiberGrid::SegmentList * list = & grid->icell2D(x_inf, y);
+    FiberGrid::SegmentList * last = & grid->icell2D(x_sup, y);
 #else
-    FiberGrid::SegmentList * inf = & grid->icell3D( x_inf, y, z );
-    FiberGrid::SegmentList * sup = & grid->icell3D( x_sup, y, z );
+    FiberGrid::SegmentList * list = & grid->icell3D(x_inf, y, z);
+    FiberGrid::SegmentList * last = & grid->icell3D(x_sup, y, z);
 #endif
     
     // Since all the lists are independent, they can be updated in parallel
     # pragma ivdep
-    for ( FiberGrid::SegmentList * list = inf; list <= sup; ++list )
+    for ( ; list <= last; ++list )
         list->push_back(seg);
 }
 

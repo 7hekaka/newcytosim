@@ -27,7 +27,11 @@
 
 
 /// 3x3 matrix class with 9 'real' elements stored in column order
+#if ( BLD == 4 )
 class alignas(4*sizeof(real)) Matrix33 final
+#else
+class Matrix33 final
+#endif
 {
 public:
     
@@ -513,9 +517,10 @@ public:
         yyyy = mul4(load4(val+BLD), yyyy);
         return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx, yyyy));
 #else
-        xxxx = mul4(load3(val), xxxx);
-        yyyy = mul4(load3(val+BLD), yyyy);
-        return fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
+        xxxx = mul4(loadu4(val), xxxx);
+        yyyy = mul4(loadu4(val+BLD), yyyy);
+        zzzz = fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
+        return blend31(zzzz, setzero4());
 #endif
     }
 
@@ -531,9 +536,10 @@ public:
         yyyy = mul4(load4(val+BLD), yyyy);
         return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx, yyyy));
 #else
-        xxxx = mul4(load3(val), xxxx);
-        yyyy = mul4(load3(val+BLD), yyyy);
-        return fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
+        xxxx = mul4(loadu4(val), xxxx);
+        yyyy = mul4(loadu4(val+BLD), yyyy);
+        zzzz = fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
+        return blend31(zzzz, setzero4());
 #endif
     }
 

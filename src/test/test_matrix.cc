@@ -307,7 +307,7 @@ void testMatrix(MATRIX & mat,
     }
     double t3 = toc(DIV);
 
-    printf("\n%-24s ", mat.what().c_str());
+    printf("\n%-32s ", mat.what().c_str());
     printf("set %9.2f  muladd %9.2f  alt %9.2f  mul %9.2f", ts, t1, t2, t3);
     checkMatrix(mat, size, x, y, z);
 }
@@ -375,7 +375,7 @@ void testMatrixParallel(MATRIX & mat,
         t[i] = toc();
     }
 
-    printf("\n%-20s", mat.what().c_str());
+    printf("\n%-28s", mat.what().c_str());
     for ( int i = 0; i < sup; ++i )
         printf("  %luT %6.3f", 1<<i, t[i]);
 }
@@ -420,7 +420,7 @@ void testIsoMatrix(MATRIX & mat,
     }
     double tm = toc(DIV);
     
-    printf("\n%-21s ", mat.what().c_str());
+    printf("\n%-29s ", mat.what().c_str());
     printf("isoset %9.2f  isomul %9.2f", ts, tm);
 
     zero_real(size, z);
@@ -581,7 +581,7 @@ This compares the Scalar and SIMD implementations of one matrix
     }
     double t2 = toc(nop);
     
-    printf("%6lu %18s ", size, mat.what().c_str());
+    printf("%6lu %26s ", size, mat.what().c_str());
     printf("set %8.1f mul %8.1f  alt %8.1f", ts, t1, t2);
     printf(" :  checksum  %+24.16f %+24.16f", sum, res);
     if ( sum != res )
@@ -625,7 +625,7 @@ int compareInt(const void* A, const void* B)
 
 int main( int argc, char* argv[] )
 {
-    printf("Matrix test and timing code --- real %lu --- %s\n", sizeof(real), __VERSION__);
+    printf("Matrix test and timing code --- real %lu bytes --- %s\n", sizeof(real), __VERSION__);
 
     RNG.seed();
 #if ( 0 )
@@ -692,7 +692,7 @@ int main( int argc, char* argv[] )
     //testMatrices(DIM*8*169, 1<<17);
     testMatrices(DIM*8*331, 1<<18);
 #endif
-    testMatrices(DIM*8*255, 1<<18);
+    testMatrices(DIM*8*111, 1<<18);
 #if ( 0 )
     //testMatrices(DIM*17, 23);
     size_t dim[5] = { 0 };

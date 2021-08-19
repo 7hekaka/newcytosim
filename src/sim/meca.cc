@@ -1389,7 +1389,7 @@ void Meca::computePrecondFull(Mecable* mec)
     }
     
 #if REAL_IS_DOUBLE
-    convert_to_floats(bks, mec->block());
+    convert_to_floats(bks*bks, mec->block());
 #endif
 }
 

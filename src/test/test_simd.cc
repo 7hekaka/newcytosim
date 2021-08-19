@@ -490,6 +490,16 @@ void test_load()
     dump(load4(mem), "load(store3)");
 }
 
+void test_load_float()
+{
+    printf("------ test_load_float\n");
+    float mem[4] = { 1, 2, 3, 4 };
+    vec4f x{1.0, 2.0, 3.0, 4.0};
+    dump(x, "set ");
+    
+    vec4f y = load4f(mem);
+    dump(y, "load");
+}
 
 void test_broadcast()
 {
@@ -997,6 +1007,7 @@ int main(int argc, char * argv[])
         case 2:
             test_cat();
             test_load();
+            test_load_float();
             test_broadcast();
             test_store();
             break;
