@@ -294,8 +294,11 @@ public:
     /// true if matrix is non-zero
     bool isNotZero() const;
     
-    /// number of blocks which are not null
-    size_t nbElements() const;
+    /// number of blocks in columns [start, stop[. Set allocated size
+    size_t nbElements(size_t start, size_t stop, size_t& alc) const;
+    
+    /// total number of blocks currently in use
+    size_t nbElements() const { size_t alc=0; return nbElements(0, size_, alc); }
 
     /// returns a string which a description of the type of matrix
     std::string what() const;

@@ -48,8 +48,8 @@ void Simul::setFiberGrid(Space const* spc) const
 
     if ( res != prop->binding_grid_step )
     {
+        Cytosim::log("   simul:binding_grid_step <-- %.3f\n", res);
         prop->binding_grid_step = res;
-        Cytosim::log("adjusting simul:binding_grid_step = %.3f\n", res);
     }
 
     // create the grid cells:

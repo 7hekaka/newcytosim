@@ -42,7 +42,7 @@ void SparMatSymBlk::allocate(size_t alc)
          'chunk' can be increased to gain performance:
           more memory will be used, but reallocation will be less frequent
         */
-        constexpr size_t chunk = 64;
+        constexpr size_t chunk = 32;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
         //fprintf(stderr, "SMSB allocates %u\n", alc);
@@ -429,13 +429,17 @@ int SparMatSymBlk::bad() const
 
 
 /** all allocated elements are counted, even if zero */
-size_t SparMatSymBlk::nbElements(size_t start, size_t stop) const
+size_t SparMatSymBlk::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
+    alc = 0;
     size_t cnt = 0;
-    for ( size_t jj = start; jj < stop; jj += BLOCK_SIZE )
-        cnt += column_[jj].size_;
+    for ( size_t i = start; i < stop; i += BLOCK_SIZE )
+    {
+        cnt += column_[i].size_;
+        alc += column_[i].allo_;
+    }
     return cnt;
 }
 
@@ -446,6 +450,8 @@ size_t SparMatSymBlk::nbElements(size_t start, size_t stop) const
 
 std::string SparMatSymBlk::what() const
 {
+    size_t alc = 0;
+    size_t cnt = nbElements(0, size_, alc);
     std::ostringstream msg;
 #if SMSB_USES_AVX && REAL_IS_DOUBLE
     msg << "SMSBx ";
@@ -456,7 +462,7 @@ std::string SparMatSymBlk::what() const
 #else
     msg << "SMSB ";
 #endif
-    msg << Block::what() << "*" << nbElements();
+    msg << Block::what() << "*" << cnt << " (" << alc*SB << ")";
     return msg.str();
 }
 

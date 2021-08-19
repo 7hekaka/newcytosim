@@ -238,7 +238,7 @@ void blas_xtrsmLUT(const int M, const int N, REAL ALPHA, const REAL* A, const in
 }
 
 /**
- Patch to BLAS' DTRSM
+ Patch to a BLAS' style interface to DTRSM
  */
 template < typename REAL >
 void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, REAL ALPHA, const REAL* A, int LDA, REAL* B, int LDB)
@@ -921,7 +921,7 @@ void alsatian_xtrsmLUN2(const int M, const double* A, const int lda, double* B)
 #pragma mark - 1D ALSATIAN DTRSM
 
 
-/// specialized version for ORD==1
+/// specialized DTRSM('L','L','N', diag, M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
 template < char diag, typename REAL >
 void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
 {
@@ -944,7 +944,7 @@ void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
 }
 
 
-/// specialized version for ORD==1
+/// specialized DTRSM('L','L','T', diag, M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
 template < char diag, typename REAL >
 void alsatian_xtrsmLLT1(const int M, const REAL* A, const int lda, REAL* B)
 {
@@ -992,7 +992,7 @@ void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
 //------------------------------------------------------------------------------
 #pragma mark - 1D ALSATIAN DTRSM for single-precision matrix argument
 
-/// specialized version for ORD==1
+/// specialized DTRSM('L','L','N','U', M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
 template < typename REAL >
 void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, REAL* B)
 {
@@ -1007,7 +1007,9 @@ void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, REAL* B)
     }
 }
 
-/// specialized version for ORD==1
+/** specialized DTRSM('L','U','N','I', M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED),
+ with multiplication by the diagonal term instead of division in BLAS
+ */
 template < typename REAL >
 void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, REAL* B)
 {
@@ -1162,7 +1164,7 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 #pragma mark - LAPACK-STYLE ROUTINES for General LU factorization
 
 /**
- This calls lapack::xgetf2() and then inverts the diagonal terms
+ Call lapack::xgetf2() to compute the LU factorization, and inverts diagonal terms
 */
 void alsatian_xgetf2(const int N, real* A, const int LDA, int* IPIV, int* INFO)
 {
@@ -1176,33 +1178,6 @@ void alsatian_xgetf2(const int N, real* A, const int LDA, int* IPIV, int* INFO)
 }
 
 
-/*
- DLASWP performs a series of row interchanges on the matrix A.
-
-  if ( INCX > 0 )
-  {
-      IX0 = K1
-      I1 = K1
-      I2 = K2
-      INC = 1
-  }
-  else if ( INCX < 0 )
-  {
-      IX0 = 1 + ( 1-K2 )*INCX
-      I1 = K2
-      I2 = K1
-      INC = -1
-  }
-  int IX = IX0;
-  for ( int I = I1; I <= I2; I += INC )
-  {
-      int IP = IPIV[IX];
-      if ( IP != I )
-          swap<ORD>(A+ORD*I, A+ORD*IP);
-      IX = IX + INCX;
-  }
- */
-
 template < int ORD, typename REAL >
 inline void xswap(REAL* A, REAL* B)
 {
@@ -1215,7 +1190,38 @@ inline void xswap(REAL* A, REAL* B)
     }
 }
 
-// as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
+
+/**
+ for ORD=1, this is equivalent to
+    DLASWP(N=1, A, LDA=UNUSED, K1, K2, IPIV, INCX)
+ for ORD>1, this performs a series of row interchanges on the matrix A,
+ always swapping chunks of 'ORD' scalars.
+
+ Note that, following LAPACK's convention, K1, K2 and IPIV contain one-based array indices
+
+ if ( INCX > 0 )
+ {
+     IX0 = K1
+     I1 = K1
+     I2 = K2
+     INC = 1
+ }
+ else if ( INCX < 0 )
+ {
+     IX0 = 1 + ( 1-K2 )*INCX
+     I1 = K2
+     I2 = K1
+     INC = -1
+ }
+ int IX = IX0;
+ for ( int I = I1; I <= I2; I += INC )
+ {
+     int IP = IPIV[IX];
+     if ( IP != I )
+         swap<ORD>(A+ORD*I, A+ORD*IP);
+     IX = IX + INCX;
+ }
+*/
 template < int ORD, typename REAL >
 void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
 {
@@ -1251,7 +1257,7 @@ void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
 }
 
 
-/// version of iso_xlaswp() with ORD=1 and INCX=1
+/// Should be equivalent to DLASWP(N=1, A, LDA=UNUSED, K1, K2, IPIV, INCX=1)
 // as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
 template < typename REAL >
 void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)

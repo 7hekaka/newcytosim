@@ -63,7 +63,7 @@ typedef Matrix33 MatrixBlock;
  Finally, the parallelization code does not consider the ISO matrix, hence
  this option should be disabled if PARALLELIZE_MATRIX == 1
  */
-#define USE_ISO_MATRIX 1
+#define USE_ISO_MATRIX 0
 
 /**
  Option to allow 'play' to display Meca links graphically.
@@ -400,6 +400,9 @@ public:
     
     /// Implementation of LinearOperator::size()
     size_t dimension() const { return DIM * nPoints_; }
+    
+    /// total allocated memory size for preconditionner
+    size_t preconditionnerSize() const;
     
     /// calculate Y <- M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;

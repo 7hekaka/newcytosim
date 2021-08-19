@@ -49,21 +49,21 @@ Mecable& Mecable::operator =(const Mecable& o)
 //------------------------------------------------------------------------------
 
 /**
-Set block size and allocate if necessary to hold 'alc' scalars
+Set block size to 'bks' and allocate as necessary to hold 'alc' scalars
  */
-void Mecable::blockSize(size_t bks, size_t block, size_t pivot)
+void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
 {
     assert_true( bks <= DIM * nPoints );
     pBlockSize = bks;
     
-    if ( block > pBlockAlc )
+    if ( alc > pBlockAlc )
     {
         free_real(pBlock);
-        pBlockAlc = static_cast<unsigned>(chunk_real(block));
-        assert_true( pBlockAlc == chunk_real(block) );
+        pBlockAlc = static_cast<unsigned>(chunk_real(alc));
+        assert_true( pBlockAlc == chunk_real(alc) );
         // add 4 slots to allow for some SIMD instruction burr:
         pBlock = new_real(pBlockAlc+4);
-        //zero_real(pBlockAlc, pBlock);
+        //zero_real(pBlockAlc+4, pBlock);
         //std::clog << reference() << " allocateBlock " << bks << " " << pBlockAlc << "\n";
     }
     
@@ -112,11 +112,11 @@ void Mecable::release()
 {
     free_real(pBlock);
     pBlock = nullptr;
+    pBlockSize = 0;
+    pBlockAlc = 0;
+
     delete[] pPivot;
     pPivot = nullptr;
-    
-    pBlockAlc  = 0;
-    pBlockSize = 0;
     
     free_real(pPos);
     pPos = nullptr;

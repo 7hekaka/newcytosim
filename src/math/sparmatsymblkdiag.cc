@@ -36,21 +36,21 @@ SparMatSymBlkDiag::SparMatSymBlkDiag()
 
 void SparMatSymBlkDiag::allocate(size_t alc)
 {
-    if ( alc > alloc_ )
+    if ( alc > alloc_*BLOCK_SIZE )
     {
         /*
-         'chunk' can be increased to gain performance:
+         'chunk' can be adjusted to tune performance: by increasing 'chunk',
           more memory will be used, but reallocation will be less frequent
         */
-        constexpr size_t chunk = 64;
-        alc = ( alc + chunk - 1 ) & ~( chunk -1 );
+        constexpr size_t chunk = 8;
+        alc = ( alc/BLOCK_SIZE + chunk - 1 ) & ~( chunk -1 );
         
         //fprintf(stderr, "SMSBD allocates %u\n", alc);
-        Column * ptr = new Column[alc/BLOCK_SIZE];
+        Column * ptr = new Column[alc];
         
         if ( pilar_ )
         {
-            for (size_t n = 0; n < alloc_/BLOCK_SIZE; ++n )
+            for (size_t n = 0; n < alloc_; ++n )
                 ptr[n] = pilar_[n];
             delete[] pilar_;
         }
@@ -59,8 +59,8 @@ void SparMatSymBlkDiag::allocate(size_t alc)
         alloc_ = alc;
         
         delete[] colix_;
-        colix_ = new size_t[alc/BLOCK_SIZE+1];
-        for ( size_t n = 0; n <= alc/BLOCK_SIZE; ++n )
+        colix_ = new size_t[alc+1];
+        for ( size_t n = 0; n <= alc; ++n )
             colix_[n] = n;
     }
 }
@@ -100,10 +100,10 @@ void SparMatSymBlkDiag::Column::allocate(size_t alc)
         //if ( inx_ ) fprintf(stderr, "SMSBD reallocates column %lu for %lu\n", inx_[0], alc);
         //else fprintf(stderr, "SMSBD allocates column for %lu\n", alc);
         /*
-         'chunk' can be increased, to possibly gain performance:
-         more memory will be used, but reallocation will be less frequent
-         */
-        constexpr size_t chunk = 16;
+         'chunk' can be adjusted to tune performance: by increasing 'chunk',
+          more memory will be used, but reallocation will be less frequent
+        */
+        constexpr size_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
@@ -253,7 +253,7 @@ real* SparMatSymBlkDiag::addr(size_t iii, size_t jjj) const
 
 void SparMatSymBlkDiag::reset()
 {
-    for ( size_t n = 0; n < alloc_/BLOCK_SIZE; ++n )
+    for ( size_t n = 0; n < alloc_; ++n )
         pilar_[n].reset();
 }
 
@@ -403,14 +403,18 @@ int SparMatSymBlkDiag::bad() const
 }
 
 
-/** all allocated elements are counted, even if zero */
-size_t SparMatSymBlkDiag::nbElements(size_t start, size_t stop) const
+/** all elements are counted, even if zero */
+size_t SparMatSymBlkDiag::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_) / BLOCK_SIZE;
-    size_t cnt = stop; // counting all diagonal elements
-    for ( size_t jj = start/BLOCK_SIZE; jj < stop; ++jj )
-        cnt += pilar_[jj].size_;
+    alc = 0;
+    size_t cnt = stop - start; // counting diagonal elements
+    for ( size_t i = start/BLOCK_SIZE; i < stop; ++i )
+    {
+        cnt += pilar_[i].size_;
+        alc += pilar_[i].allo_;
+    }
     return cnt;
 }
 
@@ -421,6 +425,8 @@ size_t SparMatSymBlkDiag::nbElements(size_t start, size_t stop) const
 
 std::string SparMatSymBlkDiag::what() const
 {
+    size_t alc = 0;
+    size_t cnt = nbElements(0, size_, alc);
     std::ostringstream msg;
 #if SMSBD_USES_AVX && REAL_IS_DOUBLE
     msg << "SMSBDx ";
@@ -429,7 +435,7 @@ std::string SparMatSymBlkDiag::what() const
 #else
     msg << "SMSBD ";
 #endif
-    msg << Block::what() << "*" << nbElements();
+    msg << Block::what() << "*" << cnt << " (" << alc*SB << ")";
     return msg.str();
 }
 

@@ -474,6 +474,15 @@ void Meca::precondition(const real* X, real* Y) const
 }
 
 
+/// total allocated memory size for preconditionner
+size_t Meca::preconditionnerSize() const
+{
+    size_t res = 0;
+    for ( Mecable const* mec : mecables )
+        res += mec->blockAllocated();
+    return res;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Combined Multiply-Precondition
 /*
@@ -1975,13 +1984,13 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         if ( useFullMatrix )
 #endif
         oss << " " << mFUL.what();
-        oss << " precond " << precond;
+        oss << " precond " << precond << " (" << preconditionnerSize() << ")";
         oss << " count " << std::setw(4) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
         size_t dim = dimension();
         if ( prop->verbose & 8 )
         {
-            // calculate true residual = rhs - A * x
+            // calculate true residual: tmp = rhs - A * x
             real * tmp = allocator_.bind(0);
             multiply(vSOL, tmp);
             blas::sub(dim, vRHS, tmp);

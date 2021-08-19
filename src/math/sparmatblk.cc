@@ -74,7 +74,7 @@ void SparMatBlk::Line::allocate(size_t alc)
          'chunk' can be increased, to possibly gain performance:
          more memory will be used, but reallocation will be less frequent
          */
-        constexpr size_t chunk = 32;
+        constexpr size_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
@@ -324,12 +324,17 @@ int SparMatBlk::bad() const
 }
 
 
-/** all allocated elements are counted, even if zero */
-size_t SparMatBlk::nbElements() const
+size_t SparMatBlk::nbElements(size_t start, size_t stop, size_t& alc) const
 {
+    assert_true( start <= stop );
+    stop = std::min(stop, size_);
+    alc = 0;
     size_t cnt = 0;
-    for ( size_t jj = 0; jj < size_; ++jj )
-        cnt += row_[jj].size_;
+    for ( size_t i = start; i < stop; ++i )
+    {
+        cnt += row_[i].size_;
+        alc += row_[i].allo_;
+    }
     return cnt;
 }
 
@@ -340,12 +345,15 @@ size_t SparMatBlk::nbElements() const
 
 std::string SparMatBlk::what() const
 {
+    size_t alc = 0;
+    size_t cnt = nbElements(0, size_, alc);
     std::ostringstream msg;
 #if SPARMATBLK_USES_AVX
-    msg << "SMBx " << Block::what() << "*" << nbElements();
+    msg << "SMBx ";
 #else
-    msg << "SMB " << Block::what() << "*" << nbElements();
+    msg << "SMB ";
 #endif
+    msg << Block::what() << "*" << cnt << " (" << alc*SB << ")";
     return msg.str();
 }
 

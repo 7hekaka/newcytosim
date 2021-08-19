@@ -312,7 +312,7 @@ inline void xtrtrs(char UPLO, char trans, char diag, int N, int NRHS, const real
     LAPACK(trtrs)(&UPLO, &trans, &diag, &N, &NRHS, A, &LDA, B, &LDB, INFO);
 }
 
-inline void xlaswp(int N, const real* A, int LDA, int K1, int K2, const int* IPIV, int INCX)
+inline void xlaswp(int N, real* A, int LDA, int K1, int K2, const int* IPIV, int INCX)
 {
     LAPACK(laswp)(&N, A, &LDA, &K1, &K2, IPIV, &INCX);
 }

@@ -60,7 +60,7 @@ private:
     /// Matrix block used for preconditionning in Meca::solve()
     real *      pBlock;
     
-    /// Pivot indices for LAPACK
+    /// array of pivot indices for LAPACK
     int  *      pPivot;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
@@ -82,7 +82,7 @@ private:
     /// Currently allocated size of arrays pPos[]
     SIZE_T      pAllocated;
     
-    /// type of block
+    /// type of preconditionner
     SIZE_T      pBlockType;
     
     /// Allocated size of pPivot[]
@@ -274,12 +274,15 @@ public:
      */
     size_t      matIndex()   const { return pIndex; }
 
-    /// Returns current size of block allocated for preconditionning
+    /// Returns current size of preconditionner block
     size_t      blockSize()  const { return pBlockSize; }
     
-    /// set size of block needed for preconditionning, allocating memory 'alc'
-    void        blockSize(size_t, size_t block, size_t pivot);
+    /// set size of preconditionner block, allocating memory for 'alc' scalars
+    void        blockSize(size_t, size_t alc, size_t pivot);
     
+    /// Returns allocated size of preconditionner block
+    size_t      blockAllocated()  const { return pBlockAlc; }
+
     /// True if preconditionner block is 'in use'
     SIZE_T      blockType()  const { return pBlockType; }
 
