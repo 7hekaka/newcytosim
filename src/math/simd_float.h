@@ -124,8 +124,10 @@ inline static vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 // copy a[0] into all elements of destination
 inline static vec4f broadcastlof(vec4f a)         { return _mm_permute_ps(a,0x00); }
 inline static vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
+
 // non-temporal load
 inline static vec4f streamload4f(float const* a)  { return _mm_castsi128_ps(_mm_stream_load_si128((__m128i*)a)); }
+
 #define permute4f(a,k)    _mm_permute_ps(a,k)
 // Convert between single and double types
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }

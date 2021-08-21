@@ -19,7 +19,7 @@ constexpr __m128d sgn11 = {-0.0, -0.0};
 inline static vec2 load1(double const* a)           { return _mm_load_sd(a); }
 inline static vec2 load1Z(double const* a)          { return _mm_loadl_pd(_mm_setzero_pd(), a); }
 
-// Attention: load2() do not initialize the upper AVX registers
+// Attention: load2() does not initialize the upper AVX registers
 inline static vec2 load2(double const* a)           { return _mm_load_pd(a); }
 
 // unaligned load
@@ -67,7 +67,7 @@ inline static vec2 unpacklo2(vec2 a, vec2 b)        { return _mm_unpacklo_pd(a,b
 inline static vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
 inline static vec2 swap2(vec2 a)                    { return _mm_shuffle_pd(a, a, 0b01); }
 
-/// combine and swap to return { low = a[1], high = b[0] }
+/// concatenate and crop to return { low = a[1], high = b[0] }
 inline static vec2 gethilo2(vec2 a, vec2 b)         { return _mm_shuffle_pd(a, b, 0b01); }
 
 #define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
@@ -118,10 +118,13 @@ inline static vec2 normalize2(vec2 vec, double n)
 /// blend to return { low = a[0], high = b[1] }
 inline static vec2 blend11(vec2 a, vec2 b) { return _mm_blend_pd(a, b, 0b10); }
 
-inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos)
-{
-    return _mm_blendv_pd(pos, neg, val);
-}
+inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(pos, neg, val); }
+
+inline static vec2 streamload2(double const* a) { return _mm_castsi128_pd(_mm_stream_load_si128((__m128i const*)a)); }
+
+#else
+
+inline static vec2 streamload2(double const* a) { return _mm_load_pd(a)); }
 
 #endif
 

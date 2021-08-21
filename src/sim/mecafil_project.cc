@@ -36,6 +36,9 @@ Selection of projectForces() routines optimized for some architectures
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
 #  define projectForcesU projectForcesU3D_AVX
 #  define projectForcesD projectForcesD3D_AVX
+#elif ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#  define projectForcesU projectForcesU3D_SSE
+#  define projectForcesD projectForcesD3D_SSE
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
 #  define projectForcesU projectForcesU2D_AVX
 #  define projectForcesD projectForcesD2D_AVX
@@ -244,13 +247,13 @@ void projectForcesU_(size_t nbs, const real* dir, const real* src, real* mul)
  
  Note that this should work even if 'dst==src'
  */
-void projectForcesD_(size_t nbs, const real* dir, const real* src, const real* mul, real* dst)
+void projectForcesD_(const size_t nbs, const real* dir, const real* src, const real* mul, real* dst)
 {
-    for ( size_t s = 0, e = DIM*nbs; s < DIM; ++s, ++e )
-    {
-        dst[s] = src[s] + dir[s    ] * mul[    0];
+    for ( size_t s = 0; s < DIM; ++s )
+        dst[s] = src[s] + dir[s] * mul[0];
+    
+    for ( size_t e = DIM*nbs; e < DIM*(nbs+1); ++e )
         dst[e] = src[e] - dir[e-DIM] * mul[nbs-1];
-    }
     
     for ( size_t jj = 1; jj < nbs; ++jj )
     {
