@@ -16,6 +16,16 @@
 #  define XTRSM_USES_AVX 0
 #endif
 
+
+/* CLANG offers builtin non temporal load functions */
+#ifdef __clang__
+template < typename T >
+static inline float ntload(T const* x) { return __builtin_nontemporal_load(x); }
+#else
+template < typename T >
+static inline float ntload(T const* x) { return *x; }
+#endif
+
 /**
  This is a C-translation of the BLAS reference implementation of DTRSM
  FJN 03.05.2020
@@ -1002,7 +1012,7 @@ void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, real* B)
         # pragma ivdep
         # pragma vector nontemporal(A)
         for ( int I = K + 1; I < M; ++I )
-            B[I] -= tmp * A[I];
+            B[I] -= tmp * ntload(A+I); //A[I];
         A += lda;
     }
 }
@@ -1017,12 +1027,12 @@ void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, real* B)
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        const real tmp = B[K] * A[K];
+        const real tmp = B[K] * ntload(A+K); //A[K];
         B[K] = tmp;
         # pragma ivdep
         # pragma vector nontemporal(A)
         for ( int I = 0; I < K; ++I )
-            B[I] -= tmp * A[I];
+            B[I] -= tmp * ntload(A+I); //A[I];
     }
 }
 
@@ -1160,23 +1170,9 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 #endif
 }
 
+
 //------------------------------------------------------------------------------
-#pragma mark - LAPACK-STYLE ROUTINES for General LU factorization
-
-/**
- Call lapack::xgetf2() to compute the LU factorization, and inverts diagonal terms
-*/
-void alsatian_xgetf2(const int N, real* A, const int LDA, int* IPIV, int* INFO)
-{
-    lapack::xgetf2(N, N, A, LDA, IPIV, INFO);
-    if ( 0 == *INFO )
-    {
-        const int S = LDA+1;
-        for ( int u = 0; u < N*S; u += S )
-            A[u] = real(1) / A[u];
-    }
-}
-
+#pragma mark - LAPACK:LASWP equivalent swap routines
 
 template < int ORD, typename REAL >
 inline void xswap(REAL* A, REAL* B)
@@ -1264,7 +1260,7 @@ void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)
 {
     for ( int I = K1-1; I < K2; ++I )
     {
-        const int P = IPIV[I] - 1;  // IPIV is a one-based array index!
+        const int P = ntload(IPIV+I) - 1;  // IPIV is a one-based array index!
         /*
          Useless swaps can be avoided, but this adds a branching point to the code,
          which might decreased performance, so the tradeoff is not clear
@@ -1275,6 +1271,24 @@ void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)
             A[I] = A[P];
             A[P] = t;
         }
+    }
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - LAPACK-STYLE ROUTINES for General LU factorization
+
+/**
+ Call lapack::xgetf2() to compute the LU factorization, and inverts diagonal terms
+*/
+void alsatian_xgetf2(const int N, real* A, const int LDA, int* IPIV, int* INFO)
+{
+    lapack::xgetf2(N, N, A, LDA, IPIV, INFO);
+    if ( 0 == *INFO )
+    {
+        const int S = LDA+1;
+        for ( int u = 0; u < N*S; u += S )
+            A[u] = real(1) / A[u];
     }
 }
 
