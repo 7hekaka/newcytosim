@@ -234,6 +234,8 @@ inline static vec4 blend31(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1000);
 inline static vec4 blend22(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1100); }
 inline static vec4 blend13(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1110); }
 
+inline static vec4 clear4th(vec4 a) { return _mm256_blend_pd(a,_mm256_setzero_pd(),0b1000); }
+
 inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos)
 {
     return _mm256_blendv_pd(pos, neg, val);
@@ -321,15 +323,8 @@ inline static vec4 cross4(vec4 a, vec4 b)
 #endif
 }
 
-/*
- Using `stream_load` may or may not improve performance
- It is a aligned load intruction that bypasses the cache.
- It would be advantageous if the cache is too small to hold the whole `data',
- since in this case data caching would simply load value that are not used anymore
- */
-inline static vec4 streamload4(double const* a) { return (vec4)_mm256_stream_load_si256((__m256i const*)a); }
-
-/// streamload is a load that bypass the cache
+// Non-temporal load: an aligned load intruction that bypasses the cache.
+inline static vec4 streamload4(double const* a) { return _mm256_castsi256_pd(_mm256_stream_load_si256((__m256i const*)a)); }
 //inline static vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
 #elif defined(__AVX__)

@@ -90,6 +90,8 @@ inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1000)
 inline static vec4f blend22f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1100); }
 inline static vec4f blend13f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1110); }
 
+inline static vec4f clear4th(vec4f a) { return _mm_blend_ps(a,_mm_setzero_ps(),0b1000); }
+
 #  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
 
 inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos)
@@ -106,10 +108,12 @@ inline static vec4f load3fZ(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a
 // emulating the blend function using two shuffles
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,b,0xEE), 0xC4); }
 
+inline static vec4f clear4th(vec4f a) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,_mm_setzero_ps(),0xEE), 0xC4); }
+
 // loading 3 elements
 inline static vec4f load3f(float const* a) { return vec4f{a[0], a[1], a[2], 0}; }
 // loading 4 and clearing one
-inline static vec4f load3fZ(float const* a) { return vec4f{a[0], a[1], a[2], 0}; }
+inline static vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 
 #endif
 
@@ -120,7 +124,8 @@ inline static vec4f load3fZ(float const* a) { return vec4f{a[0], a[1], a[2], 0};
 // copy a[0] into all elements of destination
 inline static vec4f broadcastlof(vec4f a)         { return _mm_permute_ps(a,0x00); }
 inline static vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
-inline static vec4f streamload4f(float const* a)  { return (vec4f)_mm_stream_load_si128((__m128i*)a); }
+// non-temporal load
+inline static vec4f streamload4f(float const* a)  { return _mm_castsi128_ps(_mm_stream_load_si128((__m128i*)a)); }
 #define permute4f(a,k)    _mm_permute_ps(a,k)
 // Convert between single and double types
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
