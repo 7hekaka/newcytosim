@@ -993,14 +993,14 @@ void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
 #pragma mark - 1D ALSATIAN DTRSM for single-precision matrix argument
 
 /// specialized DTRSM('L','L','N','U', M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
-template < typename REAL >
-void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, REAL* B)
+void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, real* B)
 {
     assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
     {
-        const REAL tmp = B[K];
+        const real tmp = B[K];
         # pragma ivdep
+        # pragma vector nontemporal(A)
         for ( int I = K + 1; I < M; ++I )
             B[I] -= tmp * A[I];
         A += lda;
@@ -1010,17 +1010,17 @@ void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, REAL* B)
 /** specialized DTRSM('L','U','N','I', M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED),
  with multiplication by the diagonal term instead of division in BLAS
  */
-template < typename REAL >
-void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, REAL* B)
+void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, real* B)
 {
     assert_true( M <= lda );
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        const REAL tmp = B[K] * A[K];
+        const real tmp = B[K] * A[K];
         B[K] = tmp;
         # pragma ivdep
+        # pragma vector nontemporal(A)
         for ( int I = 0; I < K; ++I )
             B[I] -= tmp * A[I];
     }
@@ -1334,22 +1334,19 @@ void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 
 
 /// version of xgetrs('N', ...) for NRHS==1 and inverted diagonal terms
-template < typename REAL >
-void alsatian_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
+/**
+ This is used to apply the full block preconditionner and we could use
+ Non-temporal loads for the matrix A, since it will not fit in the cache,
+ but the vector B should be cached!
+ */
+void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
 {
     // Apply row interchanges to the right hand side.
     xlaswp1(B, 1, N, IPIV); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
-#if REAL_IS_DOUBLE
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U(N, (float*)A, LDA, B);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1I(N, (float*)A, LDA, B);
-#else
-    // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
-    // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1<'I'>(N, A, LDA, B);
-#endif
 }
 
 
