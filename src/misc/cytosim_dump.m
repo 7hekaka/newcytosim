@@ -5,7 +5,8 @@ function [SYS, rhs, CON] = cytosim_dump(path)
 % - plot convergence pattern of BICGstab, with and without preconditionning
 %
 % F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019, 11.08.2019, 
-% 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020, 27.12.2020, 13.01.2021
+% 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020, 27.12.2020, 13.01.2021, 
+% 21.08.2021
 
 if nargin < 1
     path = '.';
@@ -50,11 +51,25 @@ end
 
 fprintf(1, '----------------------- loaded system of size %i with time_step %f -----------------------\n', dim, time_step);
 
-%% Check matrix
+%% Report some
 
-%figure('name', 'System matrix'); imshow(abs(SYS)); 
-%imshow(abs(PRJ)); set(gcf, 'name','Projection matrix');
-%imshow(abs(ela)); set(gcf, 'name','Elasticity matrix');
+if 0
+    fprintf(2, '    norm(rhs) = %f\n', norm(rhs));
+    fprintf(2, '    norm(sol) = %f\n', norm(sol));
+    fprintf(2, '    norm(ela) = %f\n', norm(ela, 2));
+    fprintf(2, '    norm(PRJ) = %f\n', norm(PRJ, 2));
+    mag = time_step * max(max(abs(sparse(PRJ) * sparse(ela))));
+    fprintf(1, '    norm8(system-eye) : %e\n', mag);
+end
+
+if ( 0 )
+    figure('name', 'System matrix'); imshow(abs(SYS));
+    figure('name', 'Projection matrix'); imshow(abs(PRJ));
+    figure('name', 'Elasticity matrix'); imshow(abs(ela));
+    return;
+end
+
+%% Check matrix
 
 if ( 0 )
     
@@ -80,18 +95,8 @@ if ( 0 )
         imshow(abs(MAT));
         set(gcf, 'name', 'Reconstituted matrix');
     end
-
-    norm_rhs = norm(rhs);
-    fprintf(2, '    norm(rhs) = %f', norm(rhs));
-    fprintf(2, '    norm(sol) = %f', norm(sol));
-    fprintf(2, '    norm(CON*rhs) = %f\n', norm(CON*rhs));
-
 end
 
-if ( 0 )
-    mag = time_step * max(max(abs(PRJ * ela)));
-    fprintf(1, 'norm8(system matrix - eye) : %e\n', mag);
-end
 if ( 0 )
     figure('Position', [50 50 1000 1000]);
     plot(reshape(MAT,1,dim*dim), reshape(SYS,1,dim*dim), '.')
@@ -106,7 +111,20 @@ if ( 0 )
     plot(abs(MAT), 'vr');
 end
 if ( 0 )
-    uuu = eye(dim) - time_step * ela;
+    % checking the formula to calculate transposed(SYS)*X:
+    MAT = speye(dim) - time_step * sparse(PRJ) * sparse(ela);
+    TAM = speye(dim) - time_step * sparse(ela) * sparse(PRJ);
+    fprintf(2, ' I - tau * PRJ * ela  has %9i elements\n', nnz(MAT));
+    fprintf(2, ' I - tau * ela * PRJ  has %9i elements\n', nnz(TAM));
+    figure('name', 'System structure', 'Position', [50 100 2000 1000]);
+    subplot(1,2,1);
+    imshow(abs(MAT));
+    subplot(1,2,2);
+    imshow(abs(TAM));
+end
+
+if ( 0 )
+    uuu = speye(dim) - time_step * sparse(ela);
     figure('name', 'System structure', 'Position', [150 300 1800 600]);
     subplot(1,3,1);
     spy(uuu);
@@ -118,7 +136,6 @@ if ( 0 )
     amd = symamd(uuu);
     spy(uuu(amd,amd));
     title('Approximate Minimum Degree permutation');
-    drawnow;
 end
 
 drawnow;
@@ -127,16 +144,16 @@ drawnow;
 
 reltol = abstol / norm(rhs);
 
-maxit = dim;
 system = sparse(SYS);
 
 mulcnt = 0;
-solution = bicgstab(@multiply, rhs, reltol*0.001, maxit);
+solution = bicgstab(@multiply, rhs, reltol*0.001, dim);
+maxit = mulcnt;
 
 fprintf(2, '    %i matvecs; norm(sol - matlab_sol) = %f\n', mulcnt, norm(sol-solution));
     
 if 0
-    figure('Name', 'Validation of solution');;
+    figure('Name', 'Validation of solution');
     plot(solution, sol, 'k.');
     xlabel('matlab solution');
     ylabel('cytosim solution');
@@ -145,7 +162,16 @@ if 0
     drawnow;
 end
 
-%% BCGS
+if 1
+    % Check equivalent system obtained by Woodbury's identity
+    TAM = speye(dim) - time_step * sparse(ela) * sparse(PRJ);
+    [vec,~,~,itr] = bicgstab(TAM, ela*rhs, reltol*norm(rhs)/norm(ela*rhs), maxit);
+    wood = rhs + time_step * PRJ * vec;
+    fprintf(2, '    %i matvecs; norm(woodbury_sol - sol) = %f\n', 2*itr, norm(wood-solution));
+end
+
+%% Try different iterative solvers
+
 convergence_axes = [];
 
 mulcnt = 0;
@@ -153,12 +179,17 @@ mulcnt = 0;
 report('bicgstab', mulcnt, vec, res, rv0, '-');
 
 if 0
+    % Matlab BiCG
+    mulcnt = 0;
+    [vec,~,res,itr,rv0] = bicg(@multiply, rhs, reltol, maxit);
+    report('bicg', mulcnt, vec, res, rv0, '-');
+end
+if 1
     % Matlab BiCGStab(L)
     mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit);
     report('bicgstab(1)', mulcnt, vec, res, rv0, '-');
 end
-
 if 0
     % Matlab CGS
     mulcnt = 0;
@@ -204,7 +235,7 @@ if 0 %% no preconditionning
         report(sprintf('IDRS %03i', RS), 2*itr, vec, res, rv0, ':');
     end
 end
-if 1
+if 0
     % CORS
     mulcnt = 0;
     [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit);
@@ -247,11 +278,12 @@ mulcnt = 0;
 [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @precondition);
 report('P bicgstab', mulcnt, vec, res, rv0);
 
-% checking the reconstituted block preconditionner:
-mulcnt = 0;
-[vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionBDP);
-report('R bicgstab', mulcnt, vec, res, rv0);
-
+if 0
+    % checking the reconstituted block preconditionner:
+    mulcnt = 0;
+    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionBDP);
+    report('R bicgstab', mulcnt, vec, res, rv0);
+end
 if 0
     mulcnt = 0;
     % Matlab BiCGStab(L)
@@ -268,7 +300,7 @@ if 0
         report(str, mulcnt, vec, res, rv0);
     end
 end
-if 1
+if 0
     % CORS
     mulcnt = 0;
     [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit, @precondition);
@@ -315,8 +347,8 @@ fprintf(2, 'Mecable point mobility coefficients : %f +/- %f\n', mean(mob), var(m
 
 if 0
     
-    val = time_step * mean(mob);
-    DRY = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
+    avm = time_step * mean(mob);
+    DRY = eye(dim) - diag(avm.*ones(length(ela), 1)) * ela;
     DRY = sparse(DRY);
     
     fprintf(2, '--- DRY is symmetric with %i elements; ', nnz(DRY));
@@ -358,8 +390,8 @@ end
 
 if 0
     
-    val = time_step * mean(mob);
-    SML = eye(dim) - diag(val.*ones(length(ela), 1)) * ela;
+    avm = time_step * mean(mob);
+    SML = eye(dim) - diag(avm.*ones(length(ela), 1)) * ela;
     
     if ( ord(2) == 3 )
         SML = SML(1:3:end, 1:3:end) + SML(2:3:end, 2:3:end) + SML(3:3:end, 3:3:end);
@@ -377,16 +409,7 @@ if 0
     SML = ichol(SML, OPT);
     fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(SML));
     
-    if ( ord(2) == 3 )
-        L = sparse(dim, dim);
-        L(1:3:end, 1:3:end) = SML;
-        L(2:3:end, 2:3:end) = SML;
-        L(3:3:end, 3:3:end) = SML;
-    elseif ( ord(2) == 2 )
-        L = sparse(dim, dim);
-        L(1:2:end, 1:2:end) = SML;
-        L(2:2:end, 2:2:end) = SML;
-    end
+    L = diagonal_expand(SML, ord(2));
     
     mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
@@ -400,16 +423,15 @@ end
 
 %% incomplete LU factorization
 
-% the WET matrix is not necessarily symmetric because of the diagonal matrix
+% the WET matrix is not necessarily symmetric because the diagonal matrix
 % may not commute with 'ela'. However, if all point drags are equal, then
 % surely WET is symmetric and we can use incomplete Cholesky factorization
 
 if 0
     
-    WET = eye(dim) - diag(time_step.*mob) * ela;
-    
-    sWET = sparse(WET);
-    
+    % without the projection:
+    WET = speye(dim) - time_step .* spdiags(mob) * sparse(ela);
+        
     fprintf(2, '--- WET has %i elements; ', nnz(sWET));
     fprintf(2, 'norm(WET-transpose(WET)) = %.2f; ', norm(WET-WET',1));
     
@@ -450,11 +472,54 @@ if 1
     OPT.type = 'nofill';
     OPT.milu = 'off';
     [L, U] = ilu(system, OPT);
-    fprintf(2, 'incomplete LU      has %i + %i elements\n', nnz(L), nnz(U));
+    fprintf(2, 'incomplete LU    has %i + %i elements\n', nnz(L), nnz(U));
     
     mulcnt = 0;
     [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
     report('iLU bicgstab', mulcnt, vec, res, rv0);
+    
+    LU = L*U;
+    fprintf(2, 'incomplete L*U   has %i elements\n', nnz(LU));
+
+end
+if 0
+    
+    % try to threshold the preconditionner:
+    aval = abs(nonzeros(LU));
+    fprintf(2, ' %i LU values in [ %f %f ]\n', numel(aval), min(aval), max(aval));
+    
+    for i = -2 : 3
+        l = 10^i;
+        u = 10^(i+1);
+        c = sum((l<aval).*(aval<u));
+        fprintf(2, '    %9i LU values in [ %.0f %.0f ]\n', c, l, u);
+    end
+    
+    %figure('Name', 'iLU elements'); histogram(nL, 1000); 
+    
+    rLU = LU .* ( abs(LU) > 0.1 );
+    fprintf(2, 'thresholded iLU (>0.1)     has %i elements\n', nnz(rLU));
+    mulcnt = 0;
+    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, rLU);
+    report('tiLU bicgstab', mulcnt, vec, res, rv0);
+    
+    rLU = LU .* ( abs(LU) > 0.2 );
+    fprintf(2, 'thresholded iLU (>0.2)     has %i elements\n', nnz(rLU));
+    mulcnt = 0;
+    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, rLU);
+    report('tiLU bicgstab', mulcnt, vec, res, rv0);
+
+end
+if 0
+    
+    % try to reduce the preconditionner:    
+    rLU = dimension_collapse(LU, ord(2));
+    fprintf(2, 'reduced rLU     has %i elements\n', nnz(rLU));
+    rLU = diagonal_expand(rLU, ord(2));
+    
+    mulcnt = 0;
+    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, rLU);
+    report('pilu bicgstab', mulcnt, vec, res, rv0);
 
 end
 
@@ -525,6 +590,36 @@ drawnow;
         fprintf(1, '    %-14s     converged after %4i matvecs residual %f %f error %e\n', s, mv, tr, r, norm(v-solution));
         convergence_plot(s, mv, rv0./rv0(1), lin);
         mulcnt = 0;
+    end
+
+
+    function res = dimension_collapse(mat, ord)
+        res = sparse(size(mat,1)/ord, size(mat,2)/ord);
+        if ( ord == 3 )
+            for j = 1:3
+                ii = i:3:size(mat,1);
+                res = res + mat(ii, 1:3:end) + mat(ii, 2:3:end) + mat(ii, 3:3:end);
+            end
+            res = (1/9) * res;
+        elseif ( ord == 2 )
+            for j = 1:2
+                ii = i:2:size(mat,1);
+                res = res + mat(ii, 1:2:end) + mat(ii, 2:2:end);
+            end
+            res = (1/4) * res;
+        end
+    end
+
+    function res = diagonal_expand(mat, ord)
+        res = sparse(size(mat,1)*ord, size(mat,2)*ord);
+        if ( ord == 3 )
+            res(1:3:end, 1:3:end) = mat;
+            res(2:3:end, 2:3:end) = mat;
+            res(3:3:end, 3:3:end) = mat;
+        elseif ( ord == 2 )
+            res(1:2:end, 1:2:end) = mat;
+            res(2:2:end, 2:2:end) = mat;
+        end
     end
 
 if nargin < 1 && dim > 0

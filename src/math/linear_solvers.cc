@@ -114,7 +114,7 @@ void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Mon
     double alpha, beta, dold, dnew;
     
     blas::xcopy(dim, rhs, 1, r, 1 );
-    mat.multiply( x, rb );
+    mat.multiply(x, rb);
     blas::xaxpy(dim, -1.0, rb, 1, r, 1);          //   r = rhs - A * x
     
     blas::xcopy(dim, r, 1, p, 1 );
@@ -125,8 +125,8 @@ void LinearSolvers::BCG(const LinearOperator& mat, const real* rhs, real* x, Mon
     
     while ( ! monitor.finished(dim, r) )
     {
-        mat.multiply( p, q );                       //   q = A * p
-        mat.trans_multiply( pb, qb );               //   qb = A' * pb
+        mat.multiply(p, q);                       //   q = A * p
+        mat.trans_multiply(pb, qb);               //   qb = A' * pb
         monitor += 2;
        
         alpha = dnew / blas::dot(dim, pb, q);
