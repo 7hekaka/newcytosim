@@ -1000,7 +1000,7 @@ void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - 1D ALSATIAN DTRSM for single-precision matrix argument
+#pragma mark - ALSATIAN DTRSM for single-precision matrix argument
 
 /// specialized DTRSM('L','L','N','U', M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
 void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, real* B)
@@ -1010,9 +1010,8 @@ void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, real* B)
     {
         const real tmp = B[K];
         # pragma ivdep
-        # pragma vector nontemporal(A)
         for ( int I = K + 1; I < M; ++I )
-            B[I] -= tmp * ntload(A+I); //A[I];
+            B[I] -= tmp * A[I];
         A += lda;
     }
 }
@@ -1027,14 +1026,237 @@ void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, real* B)
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        const real tmp = B[K] * ntload(A+K); //A[K];
+        const real tmp = B[K] * A[K];
         B[K] = tmp;
         # pragma ivdep
-        # pragma vector nontemporal(A)
         for ( int I = 0; I < K; ++I )
-            B[I] -= tmp * ntload(A+I); //A[I];
+            B[I] -= tmp * A[I];
     }
 }
+
+//------------------------------------------------------------------------------
+#pragma mark - SIMD ALSATIAN DTRSM for single-precision matrix argument
+
+#if defined(__SSE3__)
+void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double* B)
+{
+    assert_true( M <= lda );
+    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    int K = 0;
+    if ( M & 1 )
+    {
+        vec2 t = loaddup2(B);
+        double * pB = B + 1;
+        double * end = B + M;
+        float const* pA = A + 1;
+        // there is an even number of scalars, fitting perfectly:
+        # pragma ivdep
+        while ( pB < end )
+        {
+            vec2 a = _mm_cvtps_pd(load2f(pA));
+            storeu2(pB, fnmadd2(t, a, loadu2(pB)));
+            pA += 2;
+            pB += 2;
+        }
+        A += lda;
+        ++K;
+    }
+    for ( ; K < M; K += 2 )
+    {
+        double * pB = B + K;
+        double * end = B + M;
+        float const* pA = A + K;
+        /*
+        const real tmp = B[K];
+        for ( int I = K + 1; I < M; ++I )
+            B[I] -= tmp * A[I];
+         */
+        vec2 b = loadu2(pB);
+        vec2 e = _mm_cvtps_pd(load2f(pA)); // will use upper value
+        e = fnmadd2(unpacklo2(setzero2(), b), e, b);
+        storeu2(pB, e);
+        b = unpacklo2(b, b);
+        e = unpackhi2(e, e);
+        pB += 2;
+        pA += 2;
+        # pragma ivdep
+        while ( pB < end )
+        {
+            vec2 a = _mm_cvtps_pd(load2f(pA));
+            vec2 x = _mm_cvtps_pd(load2f(pA+lda));
+            storeu2(pB, fnmadd2(e, x, fnmadd2(b, a, loadu2(pB))));
+            pA += 2;
+            pB += 2;
+        }
+        A += 2*lda;
+    }
+}
+
+void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double* B)
+{
+    assert_true( M <= lda );
+    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    //if ( M & 1 ) return alsatian_xtrsmLUN1I(M, A, lda, B);
+    A += M * lda;
+    int K = M - 1;
+    if ( M & 1 )
+    {
+        A -= lda;
+        double * pB = B;
+        double * end = B + K;
+        float const* pA = A;
+        /*
+         const real tmp = B[K] * A[K];
+         B[K] = tmp;
+         for ( int I = 0; I < K; ++I )
+             B[I] -= tmp * A[I];
+         */
+        vec2 t = mul2(load1(end), _mm_cvtps_pd(load1f(pA+K)));
+        t = unpacklo2(t, t); // { T0, T0 }
+        // there is an even number of scalars remaining, fitting perfectly:
+        # pragma ivdep
+        while ( pB < end )
+        {
+            vec2 a = _mm_cvtps_pd(load2f(pA));
+            storeu2(pB, fnmadd2(t, a, loadu2(pB)));
+            pA += 2;
+            pB += 2;
+        }
+        store1(end, t);
+        --K;
+    }
+    --K;
+    for ( ; K >= 0; K -= 2 )
+    {
+        A -= 2*lda;
+        double * pB = B;
+        double * end = B + K;
+        float const* pA = A;
+        /*
+         const real tmp = B[K] * A[K];
+         B[K] = tmp;
+         for ( int I = 0; I < K; ++I )
+             B[I] -= tmp * A[I];
+         */
+        // real T1 = B[K+1] * A[lda+K+1];
+        // real T0 = (B[K] - T1 * A[lda+K]) * A[K];
+        // B[K] = T0; B[K+1] = T1;
+        
+        vec2 b = loadu2(end);
+        vec2 z = _mm_cvtps_pd(load2f(pA+lda+K));
+        vec2 e = mul2(z, b); // { --, T1 }
+        e = unpackhi2(e, e); // { T1, T1 }
+        b = mul2(fnmadd2(e, z, b), _mm_cvtps_pd(load2f(pA+K))); // { T0, ? }
+        storeu2(pB+K, blend11(b, e));
+        b = unpacklo2(b, b); // { T0, T0 }
+        # pragma ivdep
+        while ( pB < end )
+        {
+            vec2 a = _mm_cvtps_pd(load2f(pA));
+            vec2 x = _mm_cvtps_pd(load2f(pA+lda));
+            storeu2(pB, fnmadd2(e, x, fnmadd2(b, a, loadu2(pB))));
+            pA += 2;
+            pB += 2;
+        }
+    }
+}
+#endif
+
+
+#if defined(__SSE3__)
+void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* B)
+{
+    assert_true( M <= lda );
+    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    int K = 0;
+    if ( M & 1 )
+    {
+        vec4f t = broadcast1f(B);
+        float * pB = B + 1;
+        float * end = B + M;
+        float const* pA = A + 1;
+        # pragma ivdep
+        while ( pB < end )
+        {
+            store2f(pB, fnmadd4f(t, load2f(pA), load2f(pB)));
+            pA += 2;
+            pB += 2;
+        }
+        A += lda;
+        ++K;
+    }
+    for ( ; K < M; K += 2 )
+    {
+        float * pB = B + K;
+        float * end = B + M;
+        float const* pA = A + K;
+        vec4f b = load2f(pB);
+        vec4f e = fnmadd4f(unpacklo4f(setzero2(), b), load2f(pA), b);
+        store2f(pB, e);
+        b = duplo4f(b);
+        e = duphi4f(e);
+        pB += 2;
+        pA += 2;
+        # pragma ivdep
+        while ( pB < end )
+        {
+            store2f(pB, fnmadd4f(e, load2f(pA+lda), fnmadd4f(b, load2f(pA), load2f(pB))));
+            pA += 2;
+            pB += 2;
+        }
+        A += 2*lda;
+    }
+}
+
+void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* B)
+{
+    assert_true( M <= lda );
+    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    A += M * lda;
+    int K = M - 1;
+    if ( M & 1 )
+    {
+        A -= lda;
+        float * pB = B;
+        float * end = B + K;
+        float const* pA = A;
+        vec4f t = mul4f(load1f(end), load1f(pA+K));
+        t = duplo4f(t); // { T0, T0 }
+        // there is an even number of scalars remaining, fitting perfectly:
+        # pragma ivdep
+        while ( pB < end )
+        {
+            store2f(pB, fnmadd4f(t, load2f(pA), load2f(pB)));
+            pA += 2;
+            pB += 2;
+        }
+        store1f(end, t);
+        --K;
+    }
+    --K;
+    for ( ; K >= 0; K -= 2 )
+    {
+        A -= 2*lda;
+        float * pB = B;
+        float * end = B + K;
+        float const* pA = A;
+        vec4f b = load2f(end);
+        vec4f z = load2f(pA+lda+K);
+        vec4f e = mul4f(z, b); // { --, T1 }
+        e = duphi4f(e); // { T1, T1 }
+        b = mul4f(fnmadd4f(e, z, b), load2f(pA+K)); // { T0, ? }
+        store2f(pB+K, blend13f(b, e));
+        b = unpacklo4f(b, b); // { T0, T0 }
+        # pragma ivdep
+        while ( pB < end )
+        {
+            store2f(pB, fnmadd4f(e, load2f(pA+lda), fnmadd4f(b, load2f(pA), load2f(pB))));
+            pA += 2;
+            pB += 2;
+        }
+    }
+}
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK-STYLE ROUTINES for Positive Symmetric Matrices
@@ -1361,6 +1583,33 @@ void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
     alsatian_xtrsmLLN1U(N, (float*)A, LDA, B);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1I(N, (float*)A, LDA, B);
+}
+
+
+void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* B)
+{
+#if 1
+    // checking result against other routine:
+    real * T = new_real(N); copy_real(N, B, T);
+#endif
+    // Apply row interchanges to the right hand side.
+    xlaswp1(B, 1, N, IPIV);
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1U_SSE(N, (float*)A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1I_SSE(N, (float*)A, LDA, B);
+#if 1
+    // checking result against other routine:
+    alsatian_xgetrsN(N, A, LDA, IPIV, T);
+    real err = blas::max_diff(N, B, T);
+    if ( err > 0.01 )
+    {
+        int S = std::min(N, 8), E = N - 1 - S;
+        printf("\n xgetrs %3i ",N); VecPrint::print(stdout, S, B, 3); VecPrint::print(stdout, S, B+E, 3);
+        printf("\n xgetrs  L  "); VecPrint::print(stdout, S, T, 3); VecPrint::print(stdout, S, T+E, 3);
+    }
+    free_real(T);
+#endif
 }
 
 

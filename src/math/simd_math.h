@@ -239,7 +239,7 @@ void set_arc_SEE(size_t cnt, float ptr[], float rad, float start,
         // apply the rotation matrix
         // x = c * x - s * y;
         // y = s * x + c * y;
-        xx = add4f(mul4f(CS, dupeven4f(xx)), mul4f(SC, dupodd4f(xx)));
+        xx = add4f(mul4f(CS, duplo4f(xx)), mul4f(SC, duphi4f(xx)));
         ptr += 4;
     }
     storeu4f(ptr, add4f(xx, cc));

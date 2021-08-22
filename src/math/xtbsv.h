@@ -4,7 +4,7 @@
 #ifndef XTBSV_H
 #define XTBSV_H
 
-#ifdef __AVX__
+#if defined(__AVX__)
 #  include "simd.h"
 #  include "simd_float.h"
 #elif defined(__SSE3__)

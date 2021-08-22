@@ -17,12 +17,12 @@ inline static vec4f setzero4f()                   { return _mm_setzero_ps(); }
 inline static vec4f set4f(float a)                { return _mm_set1_ps(a); }
 inline static vec4f set4fi(uint32_t a)            { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
 inline static vec4f load1f(float const* a)        { return _mm_load_ss(a); }
-inline static vec4f load2f(float const* a)        { return (vec4f)_mm_loadl_epi64((__m128i*)a); }
+inline static vec4f load2f(float const* a)        { return _mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a)); }
 inline static vec4f load4f(float const* a)        { return _mm_load_ps(a); }
 inline static vec4f loadu4f(float const* a)       { return _mm_loadu_ps(a); }
 
 inline static void store1f(float* a, vec4f b)     { _mm_store_ss(a,b); }
-//inline static void store2f(float* a, vec4f b)     { _mm_storeu_si64((void*)a,_mm_castps_si128(b)); } //_mm_storel_pi((__m64*)a, b); }
+inline static void store2f(float* a, vec4f b)     { _mm_storel_pi((__m64*)a, b); }
 inline static void store3f(float* a, vec4f b)     { a[0]=b[0]; a[1]=b[1]; a[2]=b[2]; }
 inline static void store4f(float* a, vec4f b)     { _mm_store_ps(a,b); }
 inline static void storeu4f(float* a, vec4f b)    { _mm_storeu_ps(a,b); }
@@ -39,13 +39,15 @@ inline static vec4f and4f(vec4f a, vec4f b)       { return _mm_and_ps(a,b); }
 inline static vec4f andnot4f(vec4f a, vec4f b)    { return _mm_andnot_ps(a,b); }
 inline static vec4f abs4f(vec4f a)                { return _mm_andnot_ps(_mm_set1_ps(-0.0f), a); }
 
+// returns { a[0], b[0], a[2], b[2] }
 inline static vec4f unpacklo4f(vec4f a, vec4f b)  { return _mm_unpacklo_ps(a,b); }
+// returns { a[1], b[1], a[3], b[3] }
 inline static vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b); }
 
 // returns { a[0], a[0], a[2], a[2] }
-inline static vec4f dupeven4f(vec4f a)            { return _mm_shuffle_ps(a, a, 0xA0); }
+inline static vec4f duplo4f(vec4f a)             { return _mm_shuffle_ps(a, a, 0xA0); }
 // returns { a[1], a[1], a[3], a[3] }
-inline static vec4f dupodd4f(vec4f a)             { return _mm_shuffle_ps(a, a, 0xF5); }
+inline static vec4f duphi4f(vec4f a)             { return _mm_shuffle_ps(a, a, 0xF5); }
 
 // return { B1, A1 } from a = { A0, A1 } and b = { B0, B1 }
 inline static vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }
@@ -196,7 +198,7 @@ inline static vec8f blendv8f(vec8f a, vec8f b, vec8f k) { return _mm256_blendv_p
 inline static vec8f swap2f128(vec8f a) { return _mm256_permute2f128_ps(a, a, 0x01); }
 // permute positions 1&2, 3&4, 5&6, 7&8
 inline static vec8f permute8f(vec8f a) { return _mm256_permute_ps(a, 0xB1); }
-// permute positions 12 and 34, 45 and 67
+// permute positions 1&2 and 3&4, 4&5 and 6&7
 inline static vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
 
 

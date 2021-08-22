@@ -31,41 +31,41 @@ inline static vec2 loaddup2(double const* a)        { return _mm_loaddup_pd(a); 
 inline static vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
 inline static vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
 
-inline static void store1(double* a, vec2 b)        { _mm_store_sd(a, b); }
-inline static void store2(double* a, vec2 b)        { _mm_store_pd(a, b); }
-inline static void storedup(double* a, vec2 b)      { _mm_store1_pd(a, b); }
-inline static void storelo(double* a, vec2 b)       { _mm_store_sd(a, b); }
-inline static void storeu2(double* a, vec2 b)       { _mm_storeu_pd(a, b); }
+inline static void store1(double* a, vec2 b)   { _mm_store_sd(a, b); }
+inline static void store2(double* a, vec2 b)   { _mm_store_pd(a, b); }
+inline static void storedup(double* a, vec2 b) { _mm_store1_pd(a, b); }
+inline static void storelo(double* a, vec2 b)  { _mm_store_sd(a, b); }
+inline static void storeu2(double* a, vec2 b)  { _mm_storeu_pd(a, b); }
 
-inline static vec2 movedup2(vec2 a)                 { return _mm_movedup_pd(a); }
+inline static vec2 movedup2(vec2 a)          { return _mm_movedup_pd(a); }
 
-inline static vec2 mul1(vec2 a, vec2 b)             { return _mm_mul_sd(a,b); }
-inline static vec2 div1(vec2 a, vec2 b)             { return _mm_div_sd(a,b); }
-inline static vec2 add1(vec2 a, vec2 b)             { return _mm_add_sd(a,b); }
-inline static vec2 sub1(vec2 a, vec2 b)             { return _mm_sub_sd(a,b); }
+inline static vec2 mul1(vec2 a, vec2 b)      { return _mm_mul_sd(a,b); }
+inline static vec2 div1(vec2 a, vec2 b)      { return _mm_div_sd(a,b); }
+inline static vec2 add1(vec2 a, vec2 b)      { return _mm_add_sd(a,b); }
+inline static vec2 sub1(vec2 a, vec2 b)      { return _mm_sub_sd(a,b); }
 
-inline static vec2 mul2(vec2 a, vec2 b)             { return _mm_mul_pd(a,b); }
-inline static vec2 div2(vec2 a, vec2 b)             { return _mm_div_pd(a,b); }
-inline static vec2 add2(vec2 a, vec2 b)             { return _mm_add_pd(a,b); }
-inline static vec2 sub2(vec2 a, vec2 b)             { return _mm_sub_pd(a,b); }
-inline static vec2 hadd2(vec2 a, vec2 b)            { return _mm_hadd_pd(a,b); }
+inline static vec2 mul2(vec2 a, vec2 b)      { return _mm_mul_pd(a,b); }
+inline static vec2 div2(vec2 a, vec2 b)      { return _mm_div_pd(a,b); }
+inline static vec2 add2(vec2 a, vec2 b)      { return _mm_add_pd(a,b); }
+inline static vec2 sub2(vec2 a, vec2 b)      { return _mm_sub_pd(a,b); }
+inline static vec2 hadd2(vec2 a, vec2 b)     { return _mm_hadd_pd(a,b); }
 
-inline static vec2 sqrt2(vec2 a)                    { return _mm_sqrt_pd(a); }
-inline static vec2 max2(vec2 a, vec2 b)             { return _mm_max_pd(a,b); }
-inline static vec2 min2(vec2 a, vec2 b)             { return _mm_min_pd(a,b); }
-inline static vec2 and2(vec2 a, vec2 b)             { return _mm_and_pd(a,b); }
-inline static vec2 andnot2(vec2 a, vec2 b)          { return _mm_andnot_pd(a,b); }
-inline static vec2 abs2(vec2 a)                     { return _mm_andnot_pd(sgn11, a); }
-inline static vec2 flipsign2(vec2 a)                { return _mm_xor_pd(a, sgn11); }
+inline static vec2 sqrt2(vec2 a)             { return _mm_sqrt_pd(a); }
+inline static vec2 max2(vec2 a, vec2 b)      { return _mm_max_pd(a,b); }
+inline static vec2 min2(vec2 a, vec2 b)      { return _mm_min_pd(a,b); }
+inline static vec2 and2(vec2 a, vec2 b)      { return _mm_and_pd(a,b); }
+inline static vec2 andnot2(vec2 a, vec2 b)   { return _mm_andnot_pd(a,b); }
+inline static vec2 abs2(vec2 a)              { return _mm_andnot_pd(sgn11, a); }
+inline static vec2 flipsign2(vec2 a)         { return _mm_xor_pd(a, sgn11); }
 
-inline static vec2 setr2(double a, double b)        { return _mm_setr_pd(a,b); }
-inline static vec2 set2(double a, double b)         { return _mm_set_pd(a, b); }
-inline static vec2 set2(double a)                   { return _mm_set1_pd(a); }
-inline static vec2 setzero2()                       { return _mm_setzero_pd(); }
+inline static vec2 setr2(double a, double b) { return _mm_setr_pd(a,b); }
+inline static vec2 set2(double a, double b)  { return _mm_set_pd(a, b); }
+inline static vec2 set2(double a)            { return _mm_set1_pd(a); }
+inline static vec2 setzero2()                { return _mm_setzero_pd(); }
 
-inline static vec2 unpacklo2(vec2 a, vec2 b)        { return _mm_unpacklo_pd(a,b); }
-inline static vec2 unpackhi2(vec2 a, vec2 b)        { return _mm_unpackhi_pd(a,b); }
-inline static vec2 swap2(vec2 a)                    { return _mm_shuffle_pd(a, a, 0b01); }
+inline static vec2 unpacklo2(vec2 a, vec2 b) { return _mm_unpacklo_pd(a,b); }
+inline static vec2 unpackhi2(vec2 a, vec2 b) { return _mm_unpackhi_pd(a,b); }
+inline static vec2 swap2(vec2 a)             { return _mm_shuffle_pd(a, a, 0b01); }
 
 /// concatenate and shift left by 1 steps, making { BC } from a={ AB } b={ CD }
 inline static vec2 catshift1(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b01); }

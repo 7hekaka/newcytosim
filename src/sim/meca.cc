@@ -380,7 +380,7 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 /// apply preconditionner block in full storage
 inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
-    int bks = mec->blockSize();
+    const int bks = mec->blockSize();
     assert_true( (int)BAND_NUD < bks );
 #if CHOUCROUTE
     alsatian_xpbtrsLK<BAND_NUD>(bks, mec->block(), BAND_LDD, Y);
@@ -401,7 +401,7 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
 /// apply preconditionner block in full storage
 inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
-    int bks = mec->blockSize();
+    const int bks = mec->blockSize();
 #if CHOUCROUTE
     // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xpotrsL(bks, mec->block(), bks, Y);
@@ -418,7 +418,7 @@ inline void applyPrecondHalf(Mecable const* mec, real* Y)
 /// apply preconditionner block in full storage
 inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
-    int bks = mec->blockSize();
+    const int bks = mec->blockSize();
 #if CHOUCROUTE
     // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
@@ -1364,16 +1364,25 @@ Compute preconditionner block corresponding to 'mec'
 void Meca::computePrecondFull(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
+    
+#if REAL_IS_DOUBLE
+    mec->blockSize(bks, 1+bks*bks/2, bks);
+    // temporary memory to build matrix block:
+    real * blk = new_real(bks*bks);
+#else
     mec->blockSize(bks, bks*bks, bks);
-    getFullBlock(mec, mec->block());
-    //verifyBlock(mec, mec->block());
+    real * blk = mec->block();
+#endif
+    
+    getFullBlock(mec, blk);
+    //verifyBlock(mec, blk);
     
     // calculate LU factorization:
     int info = 0;
 #if CHOUCROUTE
-    alsatian_xgetf2(bks, mec->block(), bks, mec->pivot(), &info);
+    alsatian_xgetf2(bks, blk, bks, mec->pivot(), &info);
 #else
-    lapack::xgetf2(bks, bks, mec->block(), bks, mec->pivot(), &info);
+    lapack::xgetf2(bks, bks, blk, bks, mec->pivot(), &info);
 #endif
     
     if ( 0 == info )
@@ -1389,7 +1398,8 @@ void Meca::computePrecondFull(Mecable* mec)
     }
     
 #if REAL_IS_DOUBLE
-    convert_to_floats(bks*bks, mec->block());
+    convert_to_floats(bks*bks, blk, (float*)mec->block());
+    free_real(blk);
 #endif
 }
 
