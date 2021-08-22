@@ -123,21 +123,8 @@ int main(int argc, char* argv[])
         std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
     }
 
-#ifdef CODE_VERSION
-    Cytosim::out << "CYTOSIM " << DIM << "D version " << CODE_VERSION << '\n';
-#else
-    Cytosim::out << "CYTOSIM " << DIM << "D\n";
-#endif
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    Cytosim::out << "    ANISOTROPIC_FIBER_DRAG = 1\n";
-#endif
-    if ( 1 )
-    {
-        char name[1024];
-        gethostname(name, sizeof(name));
-        Cytosim::out << "host " << name << '\n';
-    }
-
+    print_version(Cytosim::out);
+    
     Simul simul;
     try {
         simul.initialize(arg);

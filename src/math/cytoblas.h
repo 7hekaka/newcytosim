@@ -211,9 +211,9 @@ inline real max_diff(const size_t N, const real* X, const real* Y)
 {
     if ( N == 0 )
         return 0;
-    real u = abs_real(X[0] - Y[0]);
+    real u = abs_real(X[0]-Y[0]);
     for ( size_t i = 1; i < N; ++i )
-        u = std::max(u, abs_real(X[i] - Y[i]));
+        u = std::max(u, abs_real(X[i]-Y[i]));
     return u;
 }
 
