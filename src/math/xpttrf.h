@@ -282,21 +282,29 @@ void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
     *INFO = 0;
 
     real w = real(1) / D[0];
-    real e = E[0] * E[0];
     D[0] = w;
-    E[0] = w * E[0];
-
-    for ( int n = 1; n < size; ++n )
+    if ( size > 1 )
     {
-        if ( D[n] < 0 )
+        real e = E[0] * E[0];
+        E[0] = w * E[0];
+        
+        for ( int n = 1; n < size; ++n )
         {
-            *INFO = n;
-            return;
+            if ( D[n] < 0 )
+            {
+                *INFO = n;
+                return;
+            }
+            w = real(1) / ( D[n] - w * e );
+            e = E[n] * E[n];
+            D[n] = w;
+            E[n] = w * E[n];
         }
-        w = real(1) / ( D[n] - w * e );
-        e = E[n] * E[n];
-        D[n] = w;
-        E[n] = w * E[n];
+    }
+    else
+    {
+        // this makes alsatian_xptts2 work for size=1
+        E[0] = 0;
     }
 }
 
@@ -309,32 +317,31 @@ void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
 void alsatian_xptts2(int size, real const* D, real const* DE, real* B)
 {
     assert_true(size > 0);
-
-    // upward recursion on B[]
+    /*
+     for size==1, alsatian_xpttrf sets DE[0]==0,
+     and the code below is equivalent to:
+     B[0] = D[0] *  B[0];
+     */
     real x = B[0];
-    real y = D[0] * x;
+    const real y = x * D[0];
+    // upward recursion on B[]
     for ( int n = 1; n < size; ++n )
     {
         x = B[n] - x * DE[n-1];
-        B[n] = D[n] * x;
+        B[n] = x * D[n];
     }
-
-    if ( size > 1 )
+    x = x * D[size-1];
+    // downward recursion on B[]
+    for ( int n = size-2; n > 0; --n )
     {
-        x = D[size-1] * x;
-        // downward recursion on B[]
-        for ( int n = size-2; n > 0; --n )
-        {
-            x = B[n] - x * DE[n];
-            B[n] = x;
-        }
-        B[0] = y - x * DE[0];
+        x = B[n] - x * DE[n];
+        B[n] = x;
     }
-    else
-        B[0] = y;
+    B[0] = y - x * DE[0];
 }
 
 
+/// offering LAPACK's standard arguments
 inline void alsatian_xptts2(int size, size_t nrhs, real const* D, real const* DE, real* B, size_t LDB)
 {
     assert_true(nrhs == 1); // in this case, the last argument is ignored

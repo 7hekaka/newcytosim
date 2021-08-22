@@ -27,6 +27,7 @@ inline void print(size_t n, real const* vec)
     if ( n > 16 )
     {
         VecPrint::print(std::cout, 8, vec, 3);
+        printf("...");
         VecPrint::print(std::cout, 8, vec+n-8, 3);
     }
     else
@@ -105,13 +106,17 @@ void check(int N, real const* Ds, real const* Us, real const* Bs, real* D, real*
     copy_real(N, Bs, B);
     FACTOR(N, D, U, &info);
     SOLVE(N, D, U, B);
-    copy_real(N, B, S);
     print(N, B);
-    printf(" err %f", blas::max_diff(N, S, B));
-    tic();
-    for ( size_t n = 0; n < cnt; ++n )
-        SOLVE(N, D, U, B);
-    printf(" %12s %5.2f\n", str, toc(N*cnt));
+    real err = blas::max_diff(N, S, B);
+    printf(" err %f %12s", err, str);
+    if ( err < 0.001 )
+    {
+        tic();
+        for ( size_t n = 0; n < cnt; ++n )
+            SOLVE(N, D, U, B);
+        printf(" %5.2f", toc(N*cnt));
+    }
+    printf("\n");
 }
 
 /**
@@ -134,6 +139,14 @@ void testSolve(int NSEG, size_t cnt)
         Us[i] = -RNG.preal();
         Bs[i] = RNG.sreal();
     }
+
+    // calculate reference result:
+    int info;
+    copy_real(NSEG, Ds, D);
+    copy_real(NSEG, Us, U);
+    copy_real(NSEG, Bs, S);
+    lapack::xpttrf(NSEG, D, U, &info);
+    lapack::xptts2(NSEG, D, U, S);
 
     check<lapack_xpttrf, lapack_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "clapack", cnt);
     check<lapack::xpttrf, lapack::xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "lapack", cnt);
@@ -237,7 +250,8 @@ int main(int argc, char* argv[])
         nbs = std::max(1, atoi(argv[1]));
     
     RNG.seed();
-    std::cout << "Tridiagonal positive symmetric matrix solve --- real " << sizeof(real) << " --- " << __VERSION__ << "\n";
+    std::cout << "Tridiagonal positive symmetric matrix --- real " << sizeof(real) << " bytes --- " << __VERSION__ << "\n";
+    std::cout << "testPTTRF\n";
     testFactor(nbs, 1<<10);
     std::cout << "testPTTS\n";
     testSolve(nbs, 1<<17);
