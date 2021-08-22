@@ -227,19 +227,19 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
     while ( Y < end )
     {
         vec4 nnn = loadu4(X+4);
-        vec4 iii = twine2f128(xxx, nnn);
+        vec4 iii = catshift2(xxx, nnn);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = loadu4(X+8);
         X += 8;
-        vec4 ppp = twine2f128(eee, ddd);
-        vec4 jjj = twine2f128(nnn, xxx);
+        vec4 ppp = catshift2(eee, ddd);
+        vec4 jjj = catshift2(nnn, xxx);
 #ifdef __FMA__
         storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
         storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
 #endif
         eee = sub4(sub4(xxx, jjj), sub4(jjj, nnn));
-        ppp = twine2f128(ddd, eee);
+        ppp = catshift2(ddd, eee);
 #ifdef __FMA__
         storeu4(Y+4, fmadd4(R, fmsub4(two, ppp, add4(ddd, eee)), loadu4(Y+4)));
 #else
@@ -253,10 +253,10 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
     {
         vec4 nnn = loadu4(X+4);
         X += 4;
-        vec4 iii = twine2f128(xxx, nnn);
+        vec4 iii = catshift2(xxx, nnn);
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = nnn;
-        vec4 ppp = twine2f128(eee, ddd);
+        vec4 ppp = catshift2(eee, ddd);
 #ifdef __FMA__
         storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
@@ -442,9 +442,9 @@ void projectForcesU2D_SSE(size_t nbs, const real* dir, const real* src, real* mu
     {
         y = load2(src+2);
         src += 4;
-        vec2 a = mul2(sub2(y, x), load2(dir));
+        vec2 a = mul2(sub2(y, x), streamload2(dir));
         x = load2(src);
-        vec2 b = mul2(sub2(x, y), load2(dir+2));
+        vec2 b = mul2(sub2(x, y), streamload2(dir+2));
         dir += 4;
         //storeu2(mul, hadd2(a, b));
         storeu2(mul, add2(unpacklo2(a, b), unpackhi2(a, b)));
@@ -454,7 +454,7 @@ void projectForcesU2D_SSE(size_t nbs, const real* dir, const real* src, real* mu
     if ( mul < end+1 )
     {
         y = load2(src+2);
-        vec2 a = mul2(sub2(y, x), load2(dir));
+        vec2 a = mul2(sub2(y, x), streamload2(dir));
         //store1(mul, hadd2(a, a));
         store1(mul, add2(a, unpackhi2(a, a)));
     }
@@ -472,7 +472,7 @@ void projectForcesD2D_SSE(size_t nbs, const real* dir,
     while ( mul < end )
     {
         src += DIM;
-        vec2 d = mul2(load2(dir), loaddup2(mul));
+        vec2 d = mul2(streamload2(dir), loaddup2(mul));
         ++mul;
         dir += DIM;
         store2(dst, add2(cc, d));
@@ -499,8 +499,8 @@ void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, doub
 
     while ( mul < end )
     {
-        vec4 a = mul4(sub4(loadu4(src+2), loadu4(src  )), load4(dir  ));
-        vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), load4(dir+4));
+        vec4 a = mul4(sub4(loadu4(src+2), loadu4(src  )), streamload4(dir  ));
+        vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), streamload4(dir+4));
         dir += 8;
         src += 8;
         vec4 p = permute2f128(a,b,0x20);
@@ -512,7 +512,7 @@ void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, doub
     while ( mul < end+2 )
     {
         //mul[jj] = dir[0] * ( X[DIM] - X[0] ) + dir[1] * ( X[DIM+1] - X[1] )
-        vec4 d = mul4(sub4(loadu4(src+2), loadu4(src)), load4(dir));
+        vec4 d = mul4(sub4(loadu4(src+2), loadu4(src)), streamload4(dir));
         src += 4;
         dir += 4;
         vec2 h = gethi(d);
@@ -522,7 +522,7 @@ void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, doub
     
     if ( mul < end+3 )
     {
-        vec2 a = mul2(sub2(load2(src+2), load2(src)), load2(dir));
+        vec2 a = mul2(sub2(load2(src+2), load2(src)), streamload2(dir));
         store1(mul, add2(a, permute2(a,1)));
     }
 }
@@ -548,9 +548,9 @@ void projectForcesD2D_AVX(size_t nbs, const real* dir,
         vec4 x = loadu4(src);
         mul += 2;
         vec4 m = permute4(t, 0b1100);
-        vec4 d = mul4(m, load4(dir));
+        vec4 d = mul4(m, streamload4(dir));
         dir += 4;
-        vec4 n = twine2f128(cc,d);
+        vec4 n = catshift2(cc,d);
         cc = d;
         vec4 z = add4(x, sub4(d, n));
         src += 4;
@@ -563,7 +563,7 @@ void projectForcesD2D_AVX(size_t nbs, const real* dir,
     if ( odd )
     {
         vec2 m = loaddup2(mul);
-        vec2 x = mul2(m, load2(dir));
+        vec2 x = mul2(m, streamload2(dir));
         dir += 2;
         vec2 z = add2(load2(src), sub2(x, c));
         storeu2(dst, z);
@@ -596,15 +596,15 @@ void projectForcesU3D_SSE(size_t nbs, const real* dir, const real* src, real* mu
               + dir[1] * ( src[DIM+1] - src[1] )
               + dir[2] * ( src[DIM+2] - src[2] );
          */
-        vec2 s0 = mul2(load2(dir  ), sub2(loadu2(src+3), loadu2(src  )));
-        vec2 s1 = mul2(load2(dir+2), sub2(loadu2(src+5), loadu2(src+2)));
-        vec2 s2 = mul2(load2(dir+4), sub2(loadu2(src+7), loadu2(src+4)));
+        vec2 s0 = mul2(streamload2(dir  ), sub2(loadu2(src+3), loadu2(src  )));
+        vec2 s1 = mul2(streamload2(dir+2), sub2(loadu2(src+5), loadu2(src+2)));
+        vec2 s2 = mul2(streamload2(dir+4), sub2(loadu2(src+7), loadu2(src+4)));
         vec2 ss = unpacklo2(s0, s2);
         vec2 tt = unpackhi2(s0, s2);
 
-        vec2 t0 = mul2(load2(dir+ 6), sub2(loadu2(src+ 9), loadu2(src+ 6)));
-        vec2 t1 = mul2(load2(dir+ 8), sub2(loadu2(src+11), loadu2(src+ 8)));
-        vec2 t2 = mul2(load2(dir+10), sub2(loadu2(src+13), loadu2(src+10)));
+        vec2 t0 = mul2(streamload2(dir+ 6), sub2(loadu2(src+ 9), loadu2(src+ 6)));
+        vec2 t1 = mul2(streamload2(dir+ 8), sub2(loadu2(src+11), loadu2(src+ 8)));
+        vec2 t2 = mul2(streamload2(dir+10), sub2(loadu2(src+13), loadu2(src+10)));
         vec2 xx = unpacklo2(t0, t2);
         vec2 yy = unpackhi2(t0, t2);
 
@@ -624,9 +624,9 @@ void projectForcesU3D_SSE(size_t nbs, const real* dir, const real* src, real* mu
               + dir[1] * ( src[DIM+1] - src[1] )
               + dir[2] * ( src[DIM+2] - src[2] );
          */
-        vec2 s0 = mul2(load2(dir  ), sub2(loadu2(src+3), loadu2(src  )));
-        vec2 s1 = mul2(load2(dir+2), sub2(loadu2(src+5), loadu2(src+2)));
-        vec2 s2 = mul2(load2(dir+4), sub2(loadu2(src+7), loadu2(src+4)));
+        vec2 s0 = mul2(streamload2(dir  ), sub2(loadu2(src+3), loadu2(src  )));
+        vec2 s1 = mul2(streamload2(dir+2), sub2(loadu2(src+5), loadu2(src+2)));
+        vec2 s2 = mul2(streamload2(dir+4), sub2(loadu2(src+7), loadu2(src+4)));
 
         vec2 ss = unpacklo2(s0, s2);
         vec2 tt = unpackhi2(s0, s2);
@@ -645,8 +645,8 @@ void projectForcesU3D_SSE(size_t nbs, const real* dir, const real* src, real* mu
                + dir[1] * ( src[DIM+1] - src[1] )
                + dir[2] * ( src[DIM+2] - src[2] );
           */
-         vec2 s0 = mul2(load2(dir  ), sub2(loadu2(src+3), loadu2(src)));
-         vec2 s1 = mul1(load1(dir+2), sub1(load1(src+5), load1(src+2)));
+         vec2 s0 = mul2(streamload2(dir  ), sub2(loadu2(src+3), loadu2(src)));
+         vec2 s1 = mul1(streamload2(dir+2), sub1(load1(src+5), load1(src+2)));
          vec2 ss = unpackhi2(s0, setzero2());
 
          store1(mul, add1(s0, add1(s1, ss)));
@@ -668,8 +668,8 @@ void projectForcesU3D_SSE(size_t nbs, const real* dir, const real* src, real* mu
 void projectForcesD3D_SSE(size_t nbs, const real* dir,
                           const real* src, const real* mul, real* dst)
 {
-    real const*const end = mul - 1 + nbs;
-    vec2 d0 = streamload2(dir  );
+    real const*const end = mul + nbs - 1;
+    vec2 d0 = streamload2(dir);
     vec2 d1 = streamload2(dir+2);
     vec2 d2;
 
@@ -689,8 +689,8 @@ void projectForcesD3D_SSE(size_t nbs, const real* dir,
         vec2 a2 = fmadd2(CC, d2, loadu2(src+4));
 
         storeu2(dst  , a0);
-        storeu2(dst+2, fnmadd2(AB, unpacklo2(d0, d0), a1));
-        storeu2(dst+4, fnmadd2(BB, gethilo2(d0, d1), a2));
+        storeu2(dst+2, fnmadd2(AB, catshift1(d0, d0), a1));
+        storeu2(dst+4, fnmadd2(BB, catshift1(d0, d1), a2));
         dir += 6;
         dst += 6;
         src += 6;
@@ -706,11 +706,11 @@ void projectForcesD3D_SSE(size_t nbs, const real* dir,
         vec2 a1 = fmadd2(BC, d1, loadu2(src+2));
         
         storeu2(dst  , a0);
-        storeu2(dst+2, fnmadd2(AB, unpacklo2(d0, d0), a1));
-        storeu2(dst+4, fnmadd2(BB, gethilo2(d0, d1), loadu2(src+4)));
+        storeu2(dst+2, fnmadd2(AB, catshift1(d0, d0), a1));
+        storeu2(dst+4, fnmadd2(BB, catshift1(d0, d1), loadu2(src+4)));
         return;
     }
-#if 0
+#if 1
     // unrolled processing 4 multipliers
     while ( mul < end-3 )
     {
@@ -725,21 +725,29 @@ void projectForcesD3D_SSE(size_t nbs, const real* dir,
         vec2 EE = unpackhi2(DE, DE);
 
         mul += 4;
-        vec2 a0 = fnmadd2(loadu2(dir-3), AA, loadu2(src  ));
-        vec2 a1 = fnmadd2(loadu2(dir-1), AB, loadu2(src+2));
-        vec2 a2 = fnmadd2(loadu2(dir+1), BB, loadu2(src+4));
-        
-        vec2 b0 = fnmadd2(loadu2(dir+3), CC, loadu2(src+6));
-        vec2 b1 = fnmadd2(loadu2(dir+5), CD, loadu2(src+8));
-        vec2 b2 = fnmadd2(loadu2(dir+7), DD, loadu2(src+10));
+        vec2 dA = d1; // dir-4
+        vec2 dB = d2; // dir-2
+        vec2 dC = streamload2(dir  );
+        vec2 dD = streamload2(dir+2);
+        vec2 dE = streamload2(dir+4);
+        d0 = streamload2(dir+6);
+        d1 = streamload2(dir+8);
+        d2 = streamload2(dir+10);
 
-        storeu2(dst  , fmadd2(load2(dir  ), BB, a0));
-        storeu2(dst+2, fmadd2(load2(dir+2), BC, a1));
-        storeu2(dst+4, fmadd2(load2(dir+4), CC, a2));
+        vec2 a0 = fnmadd2(catshift1(dA, dB), AA, loadu2(src  ));
+        vec2 a1 = fnmadd2(catshift1(dB, dC), AB, loadu2(src+2));
+        vec2 a2 = fnmadd2(catshift1(dC, dD), BB, loadu2(src+4));
+        vec2 b0 = fnmadd2(catshift1(dD, dE), CC, loadu2(src+6));
+        vec2 b1 = fnmadd2(catshift1(dE, d0), CD, loadu2(src+8));
+        vec2 b2 = fnmadd2(catshift1(d0, d1), DD, loadu2(src+10));
+
+        storeu2(dst  , fmadd2(dC, BB, a0));
+        storeu2(dst+2, fmadd2(dD, BC, a1));
+        storeu2(dst+4, fmadd2(dE, CC, a2));
+        storeu2(dst+ 6, fmadd2(d0, DD, b0));
+        storeu2(dst+ 8, fmadd2(d1, DE, b1));
+        storeu2(dst+10, fmadd2(d2, EE, b2));
         
-        storeu2(dst+ 6, fmadd2(load2(dir+6), DD, b0));
-        storeu2(dst+ 8, fmadd2(load2(dir+8), DE, b1));
-        storeu2(dst+10, fmadd2(load2(dir+10), EE, b2));
         dir += 12;
         dst += 12;
         src += 12;
@@ -761,9 +769,9 @@ void projectForcesD3D_SSE(size_t nbs, const real* dir,
         d1 = streamload2(dir+2);
         d2 = streamload2(dir+4);
         
-        vec2 a0 = fnmadd2(AA, gethilo2(dA, dB), loadu2(src  ));
-        vec2 a1 = fnmadd2(AB, gethilo2(dB, d0), loadu2(src+2));
-        vec2 a2 = fnmadd2(BB, gethilo2(d0, d1), loadu2(src+4));
+        vec2 a0 = fnmadd2(AA, catshift1(dA, dB), loadu2(src  ));
+        vec2 a1 = fnmadd2(AB, catshift1(dB, d0), loadu2(src+2));
+        vec2 a2 = fnmadd2(BB, catshift1(d0, d1), loadu2(src+4));
 
         storeu2(dst  , fmadd2(BB, d0, a0));
         storeu2(dst+2, fmadd2(BC, d1, a1));
@@ -785,9 +793,9 @@ void projectForcesD3D_SSE(size_t nbs, const real* dir,
         d0 = streamload2(dir  );
         d1 = streamload2(dir+2);
 
-        vec2 a0 = fnmadd2(AA, gethilo2(dA, dB), loadu2(src  ));
-        vec2 a1 = fnmadd2(AB, gethilo2(dB, d0), loadu2(src+2));
-        vec2 a2 = fnmadd2(BB, gethilo2(d0, d1), loadu2(src+4));
+        vec2 a0 = fnmadd2(AA, catshift1(dA, dB), loadu2(src  ));
+        vec2 a1 = fnmadd2(AB, catshift1(dB, d0), loadu2(src+2));
+        vec2 a2 = fnmadd2(BB, catshift1(d0, d1), loadu2(src+4));
 
         storeu2(dst  , fmadd2(BB, d0, a0));
         storeu2(dst+2, fmadd2(BB, d1, a1));
@@ -798,8 +806,8 @@ void projectForcesD3D_SSE(size_t nbs, const real* dir,
         // 1 point remains = 3 scalars
         vec2 AA = loaddup2(mul-1);
 
-        storeu2(dst, fnmadd2(AA, gethilo2(d1, d2), loadu2(src)));
-        store1(dst+2, fnmadd1(AA, unpackhi2(d2, d2), load1(src+2)));
+        storeu2(dst, fnmadd2(AA, catshift1(d1, d2), loadu2(src)));
+        store1(dst+2, fnmadd1(AA, catshift1(d2, d2), load1(src+2)));
     }
 }
 #endif
@@ -845,7 +853,7 @@ void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, doub
         vec2 xy = getlo(s0);
         vec2 zx = gethi(s0);
 
-        vec2 mm = gethilo2(xy, s1);
+        vec2 mm = catshift1(xy, s1);
         zx = add2(blend11(zx, s1), blend11(xy, zx));
         store2(mul, add2(mm, zx));
 
@@ -873,73 +881,44 @@ void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, doub
 
 /*
  Ugly piece of code to harvest AVX power...
- FJN @ Strasbourg, 18 and 19.04.2020
+ FJN @ Strasbourg, 18 and 19.04.2020, improved+streamload 22.08.2021
  */
 void projectForcesD3D_AVX(size_t nbs, const double* dir, const double* src, const double* mul, double* dst)
 {
+    // we can assume nbs > 0
     const double* const end = mul - 3 + nbs;
     /*
-     This follows the standard pattern defined below, except
-     that the negative terms are not present on the first vector.
-     This handles 12 scalars (4 vectors) in one round.
+     This is where the bulk of the work is done, handing 12 scalars per pass.
+     The loop is executed if nbs >= 4
      */
-    if ( mul < end )
+    vec4 d2 = setzero4(), m3 = setzero4();
+    while ( mul < end )
     {
         vec4 m1 = broadcast1(mul  );
-        vec4 m0 = blend31(setzero4(), m1); // { 0 0 0 m }
+        vec4 m0 = blend31(m3, m1);  // <- m3 = broadcast1(mul-1)
         vec4 m2 = broadcast1(mul+1);
         vec4 p0 = blend31(m1, m2);
         vec4 p2 = broadcast1(mul+2);
         m1 = blend22(m1, m2);
         vec4 p1 = blend22(m2, p2);
         m2 = blend13(m2, p2);
-        p2 = blend13(p2, broadcast1(mul+3));
+        m3 = broadcast1(mul+3);
+        p2 = blend13(p2, m3);
         
         mul += 4;
+        vec4 dA = d2;
         vec4 d0 = streamload4(dir  );
         vec4 d1 = streamload4(dir+4);
-        vec4 d2 = streamload4(dir+8);
+        d2 = streamload4(dir+8);
+        
         vec4 a0 = fmadd4(p0, d0, loadu4(src  ));
         vec4 a1 = fmadd4(p1, d1, loadu4(src+4));
         vec4 a2 = fmadd4(p2, d2, loadu4(src+8));
-
-        storeu4(dst  , fnmadd4(m0, broadcast1(dir), a0)); // using dir[0] in 4th position
-        storeu4(dst+4, fnmadd4(m1, loadu4(dir+1), a1));
-        storeu4(dst+8, fnmadd4(m2, loadu4(dir+5), a2));
-        dir += 12;
-        dst += 12;
-        src += 12;
-    }
-    /*
-     This is where the bulk of the work is done, handing 12 scalars per pass.
-     The loop can be unrolled.
-     */
-    while ( mul < end )
-    {
-        vec4 m0 = broadcast1(mul-1);
-        vec4 m1 = broadcast1(mul  );
-        m0 = blend31(m0, m1);
-        vec4 m2 = broadcast1(mul+1);
-        vec4 p0 = blend31(m1, m2);
-        vec4 p2 = broadcast1(mul+2);
-        m1 = blend22(m1, m2);
-        vec4 p1 = blend22(m2, p2);
-        m2 = blend13(m2, p2);
-        p2 = blend13(p2, broadcast1(mul+3));
         
-        mul += 4;
-        vec4 d0 = streamload4(dir  );
-        vec4 d1 = streamload4(dir+4);
-        vec4 d2 = streamload4(dir+8);
-
-        vec4 a0 = fnmadd4(m0, loadu4(dir-3), loadu4(src  ));
-        vec4 a1 = fnmadd4(m1, loadu4(dir+1), loadu4(src+4));
-        vec4 a2 = fnmadd4(m2, loadu4(dir+5), loadu4(src+8));
-
-        storeu4(dst  , fmadd4(p0, d0, a0));
-        storeu4(dst+4, fmadd4(p1, d1, a1));
-        storeu4(dst+8, fmadd4(p2, d2, a2));
-
+        storeu4(dst  , fnmadd4(m0, catshift1(dA, d0), a0));
+        storeu4(dst+4, fnmadd4(m1, catshift1(d0, d1), a1));
+        storeu4(dst+8, fnmadd4(m2, catshift1(d1, d2), a2));
+        
         dir += 12;
         dst += 12;
         src += 12;
@@ -947,89 +926,78 @@ void projectForcesD3D_AVX(size_t nbs, const double* dir, const double* src, cons
     /*
      We need to consider here multiple cases depending on how many vectors are
      left, since the positive terms are not present on the last vector.
-     In addition the above code was not executed if there was less than 5 vectors
-     in total, and the first vector is still a special case.
-     We introduce: `mm` and `dd` for this reason, avoiding to load outside the
-     valid data range.
+     In addition the above code was not executed if there was 4 or less vectors,
+     and the first vector is still a special case.
      */
-    vec4 mm, dd;
-    if ( nbs < 4 )
-    {
-        mm = setzero4();
-        dd = blend31(mm, broadcast1(dir));
-    }
-    else
-    {
-        mm = broadcast1(mul-1);
-        dd = loadu4(dir-3);
-    }
     switch ( mul - end )
     {
         case 0: {
+            assert_true( mul == end );
             // 4 vectors remaining
             vec4 m1 = broadcast1(mul  );
-            vec4 m0 = blend31(mm, m1);
+            vec4 m0 = blend31(m3, m1);  // m3 from previous round
             vec4 m2 = broadcast1(mul+1);
             vec4 p0 = blend31(m1, m2);
             vec4 p2 = broadcast1(mul+2);
             m1 = blend22(m1, m2);
             vec4 p1 = blend22(m2, p2);
             m2 = blend13(m2, p2);
-            p2 = blend13(p2, setzero4());
-            
-            mul += 3;
-            vec4 a0 = fmadd4(p0, streamload4(dir  ), loadu4(src  ));
-            vec4 a1 = fmadd4(p1, streamload4(dir+4), loadu4(src+4));
-            vec4 a2 = fmadd4(p2, broadcast1(dir+8), loadu4(src+8));
-            a0 = fnmadd4(m0, dd, a0);
-            a1 = fnmadd4(m1, loadu4(dir+1), a1);
-            a2 = fnmadd4(m2, loadu4(dir+5), a2);
-            storeu4(dst  , a0);
-            storeu4(dst+4, a1);
-            storeu4(dst+8, a2);
+            p2 = blend13(p2, setzero4()); // { P 0 0 0 }
+            vec4 dA = d2;
+            vec4 d0 = streamload4(dir  );
+            vec4 d1 = streamload4(dir+4);
+            d2 = concatenate22(streamload2(dir+8), setzero2()); // loading crap, only [0] used
+            // d2 = cast4(load1(dir+8));
+            vec4 a0 = fmadd4(p0, d0, loadu4(src  ));
+            vec4 a1 = fmadd4(p1, d1, loadu4(src+4));
+            vec4 a2 = fmadd4(p2, d2, loadu4(src+8));
+            storeu4(dst  , fnmadd4(m0, catshift1(dA, d0), a0));
+            storeu4(dst+4, fnmadd4(m1, catshift1(d0, d1), a1));
+            storeu4(dst+8, fnmadd4(m2, catshift1(d1, d2), a2));
             //dir += 12; dst += 12; src += 12;
         } break;
         case 1: {
+            assert_true( mul == end+1 );
             // 3 vectors remaining
             vec4 m1 = broadcast1(mul  );
-            vec4 m0 = blend31(mm, m1);
+            vec4 m0 = blend31(m3, m1);
             vec4 m2 = broadcast1(mul+1);
             vec4 p0 = blend31(m1, m2);
             m1 = blend22(m1, m2);
-            vec4 p1 = blend22(m2, setzero4());
-            
-            mul += 2;
-            vec4 a0 = fmadd4(p0, streamload4(dir), loadu4(src));
-            vec4 a1 = fmadd4(p1, load2Z(dir+4), loadu4(src+4));
-            storeu4(dst  , fnmadd4(m0, dd, a0));
-            storeu4(dst+4, fnmadd4(m1, loadu4(dir+1), a1));
-             store1(dst+8, fnmadd2(getlo(m2), load1(dir+5), load1(src+8)));
+            vec4 p1 = blend22(m2, setzero4()); // { M M 0 0 }
+            vec4 d0 = streamload4(dir  );
+            vec2 d1 = streamload2(dir+4);
+            vec4 a0 = fmadd4(p0, d0, loadu4(src  ));
+            vec4 a1 = fmadd4(p1, concatenate22(d1, setzero2()), loadu4(src+4));
+            storeu4(dst  , fnmadd4(m0, catshift1(d2, d0), a0));
+            storeu4(dst+4, fnmadd4(m1, catshift1(d0, cast4(d1)), a1));
+             store1(dst+8, fnmadd2(getlo(m2), unpackhi2(d1,d1), load1(src+8)));
             //dir += 9; dst += 9; src += 9;
         } break;
         case 2: {
+            assert_true( mul == end+2 );
             // 2 vectors remaining
             vec4 m1 = broadcast1(mul);
-            vec4 m0 = blend31(mm, m1);
-            vec4 p0 = blend31(m1, setzero4());
-            
-            mul += 1;
-            vec4 a0 = fmadd4(p0, load3(dir), loadu4(src));
-
-            storeu4(dst  , fnmadd4(m0, dd, a0));
-            storeu2(dst+4, fnmadd2(getlo(m1), loadu2(dir+1), loadu2(src+4)));
+            vec4 m0 = blend31(m3, m1);
+            vec4 p0 = blend31(m1, setzero4()); // { P 0 0 0 }
+            vec4 d0 = streamload4(dir);  // loading crap; load3(dir);
+            vec4 a0 = fmadd4(p0, d0, loadu4(src));
+            storeu4(dst  , fnmadd4(m0, catshift1(d2, d0), a0));
+            storeu2(dst+4, fnmadd2(getlo(m1), getlo(catshift1(d0, d0)), loadu2(src+4)));
             //dir += 6; dst += 6; src += 6;
         } break;
         case 3: {
+            assert_true( mul == end+3 );
             // 1 vector remaining
-            //store3(dst, fnmadd4(mm, blend31(dd, setzero4()), load3(src)));
-            storeu2(dst, fnmadd2(getlo(mm), getlo(dd), loadu2(src)));
-            store1(dst+2, fnmadd1(getlo(mm), gethi(dd), load1(src+2)));
+            vec4 aa = catshift1(d2, setzero4());
+            //store3(dst, fnmadd4(mm, aa, load3(src)));
+            storeu2(dst, fnmadd2(getlo(m3), getlo(aa), loadu2(src)));
+            store1(dst+2, fnmadd1(getlo(m3), gethi(aa), load1(src+2)));
             //dir += 3; dst += 3; src += 3;
         } break;
         default:
-            puts("unexpected case in projectForcesD3D_AVX!");
+            puts("ERROR: unexpected case in projectForcesD3D_AVX!");
     }
-    assert_true( mul == end+3 );
 }
 
 #endif

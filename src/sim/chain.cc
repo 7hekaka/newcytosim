@@ -21,7 +21,7 @@
 #include "vecprint.h"
 
 
-// defined in "mecafil_code.cc"
+// defined in "mecafil_project.cc"
 //extern void projectForcesD_(size_t, const real*, const real*, const real*, real*);
 
 

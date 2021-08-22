@@ -322,8 +322,8 @@ public:
         vec4 u1 = unpackhi4(v0, v1);
         v0 = unpacklo4(v2, v3);
         v1 = unpackhi4(v2, v3);
-        v2 = twine2f128(u0, v0);
-        v3 = twine2f128(u1, v1);
+        v2 = catshift2(u0, v0);
+        v3 = catshift2(u1, v1);
         store4(res.val   , blend22(u0, v2));
         store4(res.val+4 , blend22(u1, v3));
         store4(res.val+8 , blend22(v2, v0));
@@ -350,8 +350,8 @@ public:
         vec4 u1 = unpackhi4(v0, v1);
         v0 = unpacklo4(v2, v3);
         v1 = unpackhi4(v2, v3);
-        v2 = twine2f128(u0, v0);
-        v3 = twine2f128(u1, v1);
+        v2 = catshift2(u0, v0);
+        v3 = catshift2(u1, v1);
         store4(res.val   , blend22(u0, v2));
         store4(res.val+4 , blend22(u1, v3));
         store4(res.val+8 , blend22(v2, v0));
@@ -423,7 +423,7 @@ public:
         vec4 s3 = setzero4();
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(twine2f128(s0, s2), blend22(s0, s2));
+        return add4(catshift2(s0, s2), blend22(s0, s2));
     }
 
     /// multiplication by a 4-components vector: this * V
@@ -449,7 +449,7 @@ public:
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
         //return add4(permute2f128(s0, s2, 0x20), permute2f128(s0, s2, 0x31));
-        return add4(twine2f128(s0, s2), blend22(s0, s2));
+        return add4(catshift2(s0, s2), blend22(s0, s2));
     }
 
 /*

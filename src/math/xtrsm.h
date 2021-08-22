@@ -733,7 +733,7 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
              into s0 = { X+X+X, Y+Y+Y, Z+Z+Z, ? }
              */
             vec4 h = shuffle4(blend31(s1, s0), s2, 0b0101);
-            vec4 d3 = twine2f128(s1, s2);
+            vec4 d3 = catshift2(s1, s2);
             vec4 d2 = shuffle4(s2, s1, 0b0101);
             vec4 d1 = swap2f128(h);
             s0 = add4(add4(s0, d2), add4(d3, d1));

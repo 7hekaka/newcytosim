@@ -519,7 +519,7 @@ public:
         but this is required only once when doing a lot of vecmul */
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        return add4(twine2f128(s0, s2), blend22(s0, s2));
+        return add4(catshift2(s0, s2), blend22(s0, s2));
     }
     
     /// multiplication by a vector: transpose(M) * V

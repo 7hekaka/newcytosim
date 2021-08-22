@@ -93,22 +93,22 @@ void free_reals(real*& x, real*& y, real*& z, real*& t)
 
 
 #pragma STDC_FENV_ACCESS on
-void print_fe_exceptions(const char* str)
+void print_fe_exceptions(const char* str, FILE * out = stdout)
 {
     int n = std::fetestexcept(FE_ALL_EXCEPT);
     n &= ~FE_INEXACT;
     if ( n )
     {
-        fprintf(stderr, " %s(", str);
-        if (n&FE_DIVBYZERO)  fprintf(stderr, "DIVBYZERO ");
-        if (n&FE_INEXACT)    fprintf(stderr, "INEXACT ");
-        if (n&FE_INVALID)    fprintf(stderr, "INVALID ");
-        if (n&FE_OVERFLOW)   fprintf(stderr, "OVERFLOW ");
-        if (n&FE_UNDERFLOW)  fprintf(stderr, "UNDERFLOW ");
-        if (n&FE_ALL_EXCEPT) fprintf(stderr, "UNKNOWN ");
+        fprintf(out, " %s(", str);
+        if (n&FE_DIVBYZERO)  fprintf(out, "DIVBYZERO ");
+        if (n&FE_INEXACT)    fprintf(out, "INEXACT ");
+        if (n&FE_INVALID)    fprintf(out, "INVALID ");
+        if (n&FE_OVERFLOW)   fprintf(out, "OVERFLOW ");
+        if (n&FE_UNDERFLOW)  fprintf(out, "UNDERFLOW ");
+        if (n&FE_ALL_EXCEPT) fprintf(out, "UNKNOWN ");
         if ( std::feclearexcept(FE_ALL_EXCEPT) )
-            fprintf(stderr, "unclear ");
-        fprintf(stderr, "\b)");
+            fprintf(out, "unclear ");
+        fprintf(out, "\b)");
     }
 }
 
@@ -188,8 +188,6 @@ void setFilament(SIZE_T nbs, real seg, real persistence_length, real mag)
     
     for ( SIZE_T i = 0 ; i < nbv; ++i )
         force_[i] = mag * RNG.sreal();
-    
-    print_fe_exceptions("setFilament");
 }
 
 
@@ -216,7 +214,6 @@ void setProjection(SIZE_T nbs)
     std::clog << "\nD "; VecPrint::print(std::clog, nbs, diag_, 3);
     std::clog << "\nU "; VecPrint::print(std::clog, nbs-1, upper_, 3); std::clog << '\n';
 #endif
-    print_fe_exceptions("setProjection");
 }
 
 
@@ -756,55 +753,53 @@ void projectForces_AVX(SIZE_T nbs, const real* X, real* Y)
 #endif
 
 
-void checkProject()
+void checkProject(SIZE_T nbs)
 {
+    printf("CHECK %2lu ", nbs);
     real *x = nullptr, *y = nullptr, *z = nullptr;
-
-    for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
-    {
-        SIZE_T nbv = DIM * ( nbs + 1 );
-        new_nans(nbv, x, y, z);
-        setFilament(nbs, 0.1, 20.0, 1.0);
-        setProjection(nbs);
-        
-        for ( SIZE_T i = 0; i < nbv; ++i )
-            x[i] = RNG.sreal();
-        //VecPrint::print(std::cout, nbv, dir_, 2); printf(" dir_\n");
-
-        nan_fill(nbs, lag_);
-        //projectForces(nbs, x, y);
-        projectForcesU_(nbs, dir_, x, lag_);
-        DPTTS2(nbs);
-        projectForcesD_(nbs, dir_, x, lag_, y);
-        printf("%2lu ", nbs);
-        //VecPrint::print(std::cout, std::min(DISP,nbv), y);
-        print_fe_exceptions("projectForces");
-        printf(" SCA ");
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
-
-        nan_fill(nbs, lag_);
+    SIZE_T nbv = DIM * ( nbs + 1 );
+    new_nans(nbv, x, y, z);
+    setFilament(nbs, 0.1, 20.0, 1.0);
+    setProjection(nbs);
+    std::feclearexcept(FE_ALL_EXCEPT);
+    
+    for ( SIZE_T i = 0; i < nbv; ++i )
+        x[i] = RNG.sreal();
+    //VecPrint::print(std::cout, nbv, dir_, 2); printf(" dir_\n");
+    
+    nan_fill(nbs, lag_);
+    //projectForces(nbs, x, y);
+    projectForcesU_(nbs, dir_, x, lag_);
+    DPTTS2(nbs);
+    projectForcesD_(nbs, dir_, x, lag_, y);
+    //VecPrint::print(std::cout, std::min(DISP,nbv), y);
+    print_fe_exceptions("projectForces");
+    printf(" SCA ");
+    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+    
+    nan_fill(nbs, lag_);
 #if REAL_IS_DOUBLE && defined(__AVX__)
-        projectForces_AVX(nbs, x, z);
-        printf(" AVX ");
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
-        print_fe_exceptions("projectForcesAVX");
+    projectForces_AVX(nbs, x, z);
+    printf(" AVX ");
+    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
+    print_fe_exceptions("projectForcesAVX");
 #elif REAL_IS_DOUBLE && defined(__SSE3__)
-        projectForces_SSE(nbs, x, z);
-        printf(" SSE ");
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
-        //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
-        print_fe_exceptions("projectForces_SSE");
+    projectForces_SSE(nbs, x, z);
+    printf(" SSE ");
+    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
+    print_fe_exceptions("projectForces_SSE");
 #else
-        projectForces(nbs, x, z);
-        printf(" ... ");
+    projectForces(nbs, x, z);
+    printf(" ... ");
 #endif
-        real err = blas::max_diff(nbv, y, z);
-        if ( abs_real(err) > 64*REAL_EPSILON )
-            printf(" XXXX %e\n", err);
-        else
-            printf("  --> %e\n", err);
-    }
+    
+    real err = blas::max_diff(nbv, y, z);
+    if ( abs_real(err) > 64*REAL_EPSILON )
+        printf(" XXXX %e\n", err);
+    else
+        printf(" okay--> %e\n", err);
     free_reals(x,y,z);
 }
 
@@ -886,16 +881,19 @@ int main(int argc, char* argv[])
 {
     const SIZE_T CNT = 1<<20;
     RNG.seed();
-    checkProject();
-    
-    std::cout << __VERSION__ << "\n";
+    std::cout << "DIM=" << DIM << "   " << __VERSION__ << "\n";
+    if ( 0 )
+    {
+        for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
+            checkProject(nbs);
+    }
     if ( 1 )
     {
         setFilament(NSEG, 0.1, 20.0, 1.0);
         testProjectionU(CNT);
         testProjectionD(CNT);
     }
-    if ( 1 )
+    if ( 0 )
     {
         setProjection(NSEG);
         setAnisotropy(NSEG);

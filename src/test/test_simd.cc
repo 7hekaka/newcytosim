@@ -302,7 +302,7 @@ inline void sumXXX(double const* src, double* dst)
     vec4 s2 = load4(src+8);
     
     vec4 h = shuffle4(blend31(s1, s0), s2, 0b0101);
-    vec4 d3 = twine2f128(s1, s2);
+    vec4 d3 = catshift2(s1, s2);
     vec4 d2 = shuffle4(s2, s1, 0b0101);
     vec4 d1 = swap2f128(h);
 
@@ -335,7 +335,6 @@ inline void sumXYZ(double const* src, double* dst)
     vec4 sum = add4(d2, add4(d3, d1));
     store4(dst, sum);
 }
-
 
 void test_twine()
 {
@@ -372,7 +371,7 @@ inline void destride3x4(double const* src, double* dst)
     vec4 s2 = load4(src+8);
     store4(dst, s0);
     
-    vec4 d1 = twine2f128(s0, s1);
+    vec4 d1 = catshift2(s0, s1);
     d1 = shuffle4(d1, s1, 0b0101);
     store4(dst+4 , d1);
     
@@ -425,7 +424,7 @@ void unpack_matrix()
     
     vec2 m0h = blend11(cd, zz),  m0l = ab;
     vec2 m1h = blend11(ef, zz),  m1l = unpackhi2(ab, cd);
-    vec2 m2h = gethilo2(ef, zz), m2l = unpacklo2(cd, ef);
+    vec2 m2h = catshift1(ef, zz), m2l = unpacklo2(cd, ef);
     
     dump(cat4(m0h, m0l), "m0 ");
     dump(cat4(m1h, m1l), "m1 ");
@@ -600,6 +599,19 @@ void test_store()
 }
 
 
+
+/**
+ shift left by 3 steps, making
+ dst = { DEFG }
+ from
+ src = { ABCD EFGH }
+ */
+inline vec4 shift3(vec4 a, vec4 b)
+{
+    vec4 p = permute2f128(a, b, 0x21);
+    return shuffle4(p, b, 0b0101); // { DEFG }
+}
+
 void test_swap1()
 {
     printf("------ test_swap1\n");
@@ -614,18 +626,26 @@ void test_swap1()
     dump(permute2f128(a,b,0x20), "permute2f128(a,b,0x20)");
     dump(permute2f128(a,b,0x31), "permute2f128(a,b,0x31)");
     dump(permute2f128(a,b,0x01), "permute2f128(a,b,0x01)");
+}
 
-    vec4 x = permute2f128(a, a, 0x21);
-    dump(shuffle4(a, x, 0b0101), "rotate >");
-    dump(shuffle4(x, a, 0b0101), "rotate <");
+
+void test_rotate()
+{
+    printf("------ test_rotate\n");
+    vec4 a{ 1, 2, 3, 4 };
+    vec4 b{ 5, 6, 7, 8 };
+    dump(a, "a = ");
+    dump(b, "b = ");
     
-#if 0 //def __AVX2__
-    dump(rotater4(a), "rotate >");
-    dump(rotatel4(a), "rotate <");
-#endif
+    dump(catshift1(a, b), "catshift1(a, b)");
+    dump(catshift2(a, b), "catshift2(a, b)");
+    dump(catshift3(a, b), "catshift3(a, b)");
     
-    vec4 u = shuffle4(a, x, 0b0101);
-    dump(blend22(u, x), "rotate 3");
+    vec4f x{ 1, 2, 3, 4 };
+    vec4f y{ 5, 6, 7, 8 };
+    dump(catshift1(x, y), "catshift1(x, y)");
+    dump(catshift2(x, y), "catshift2(x, y)");
+    dump(catshift3(x, y), "catshift3(x, y)");
 }
 
 
@@ -895,8 +915,8 @@ void transpose16(double const* src, double* dst)
     vec4 v1 = unpackhi4(u0, u1);
     u0 = unpacklo4(v2, v3);
     u1 = unpackhi4(v2, v3);
-    v2 = twine2f128(v0, u0);
-    v3 = twine2f128(v1, u1);
+    v2 = catshift2(v0, u0);
+    v3 = catshift2(v1, u1);
     storeu4(dst   , blend22(v0, v2));
     storeu4(dst+4 , blend22(v1, v3));
     storeu4(dst+8 , blend22(v2, u0));
@@ -1012,19 +1032,22 @@ int main(int argc, char * argv[])
             test_store();
             break;
         case 3:
-            //test_swap1();
-            //test_swap2();
-            test_swap4();
+            test_rotate();
             test_hadd();
             test_hsum();
             break;
         case 4:
+            test_swap1();
+            test_swap2();
+            test_swap4();
+            break;
+        case 5:
             test_transpose2();
             test_transpose3();
             test_transpose4();
             test_transpose16();
             break;
-        case 5:
+        case 6:
             test_swapSSE();
             test_shuffle();
             test_swap7();

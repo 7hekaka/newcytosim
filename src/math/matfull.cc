@@ -212,7 +212,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
         // sum y0 = { Y0 Y0 Y0 Y0 }, y1 = { Y1 Y1 Y1 Y1 }, y2 = { Y2 Y2 Y2 Y2 }
         y0 = add4(unpacklo4(y0, y1), unpackhi4(y0, y1));
         y2 = add4(unpacklo4(y2, y3), unpackhi4(y2, y3));
-        y0 = add4(twine2f128(y0, y2), blend22(y0, y2));
+        y0 = add4(catshift2(y0, y2), blend22(y0, y2));
         maskstore4(Y+i, makemask(size_-i), y0);
     }
 }

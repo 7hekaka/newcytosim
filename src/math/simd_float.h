@@ -47,12 +47,17 @@ inline static vec4f dupeven4f(vec4f a)            { return _mm_shuffle_ps(a, a, 
 // returns { a[1], a[1], a[3], a[3] }
 inline static vec4f dupodd4f(vec4f a)             { return _mm_shuffle_ps(a, a, 0xF5); }
 
-// return { A1, B0 } from a = { A0, A1 } and b = { B0, B1 }
-inline static vec4f twine2f64(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
 // return { B1, A1 } from a = { A0, A1 } and b = { B0, B1 }
 inline static vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }
 // return { A0, B0 } from a = { A0, A1 } and b = { B0, B1 }
 inline static vec4f movelh4f(vec4f a, vec4f b) { return _mm_movelh_ps(a, b); }
+
+// return { A1, A2, A3, B0 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
+inline static vec4f catshift1(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 4); }
+// return { A2, A3, B0, B1 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
+inline static vec4f catshift2(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
+// return { A3, B0, B1, B2 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
+inline static vec4f catshift3(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 12); }
 
 inline static vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
 inline static vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }
@@ -94,10 +99,8 @@ inline static vec4f clear4th(vec4f a) { return _mm_blend_ps(a,_mm_setzero_ps(),0
 
 #  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
 
-inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos)
-{
-    return _mm_blendv_ps(pos, neg, val);
-}
+/// return `neg` if `val < 0` and `pos` otherwise
+inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos) { return _mm_blendv_ps(pos, neg, val); }
 
 inline static vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
 // loading 4 and clearing one
@@ -219,10 +222,8 @@ inline static vec8f cast8f(__m256i a) { return _mm256_castsi256_ps(a); }
 #define cmp8f(a,b,c)         _mm256_cmp_ps(a,b,c)
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
 
-inline static vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos)
-{
-    return _mm256_blendv_ps(pos, neg, val);
-}
+/// return `neg` if `val < 0` and `pos` otherwise
+inline static vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv_ps(pos, neg, val); }
 
 #endif // AVX
 

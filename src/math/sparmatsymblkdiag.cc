@@ -1359,7 +1359,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVX(const double* X, double* Y, size
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s0 = add4(twine2f128(s0, s2), blend22(s0, s2));
+    s0 = add4(catshift2(s0, s2), blend22(s0, s2));
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 #endif
 }
@@ -1475,7 +1475,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_AVXU(const double* X, double* Y, siz
     x0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
-    s0 = add4(twine2f128(s0, s2), blend22(s0, s2));
+    s0 = add4(catshift2(s0, s2), blend22(s0, s2));
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 }
 #endif
@@ -1587,7 +1587,7 @@ void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_AVX(const double* X, double*
     x0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
-    s0 = add4(twine2f128(s0, s2), blend22(s0, s2));
+    s0 = add4(catshift2(s0, s2), blend22(s0, s2));
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 }
 #endif
@@ -1652,7 +1652,7 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const double* X, double* Y, size
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-    s1 = add4(twine2f128(s0, s2), blend22(s0, s2));
+    s1 = add4(catshift2(s0, s2), blend22(s0, s2));
     store4(Y+jj, add4(load4(Y+jj), s1));
 }
 #endif
