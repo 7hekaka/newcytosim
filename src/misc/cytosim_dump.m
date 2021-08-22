@@ -62,7 +62,7 @@ if 0
     fprintf(1, '    norm8(system-eye) : %e\n', mag);
 end
 
-if ( 0 )
+if 0
     figure('name', 'System matrix'); imshow(abs(SYS));
     figure('name', 'Projection matrix'); imshow(abs(PRJ));
     figure('name', 'Elasticity matrix'); imshow(abs(ela));
@@ -258,9 +258,9 @@ fprintf(1, '  --  --  --  --  --  --  --  -- PRECONDITIONNED --  --  --  --  -- 
 % Calculate block-diagonal preconditionner
 BDP = zeros(dim);
 for o = 0:max(max(obj))
-    i = find(obj==o);
-    if ~isempty(i)
-        BDP(i,i) = inv(SYS(i,i));
+    x = find(obj==o);
+    if ~isempty(x)
+        BDP(x,x) = inv(SYS(x,x));
     end
 end
 
@@ -510,16 +510,21 @@ if 0
     report('tiLU bicgstab', mulcnt, vec, res, rv0);
 
 end
-if 0
+if 1
     
     % try to reduce the preconditionner:    
     rLU = dimension_collapse(LU, ord(2));
-    fprintf(2, 'reduced rLU     has %i elements\n', nnz(rLU));
-    rLU = diagonal_expand(rLU, ord(2));
-    
+    fprintf(2, 'collapsed rLU    has %i elements\n', nnz(rLU));
+
+    xLU = diagonal_expand(rLU, ord(2));
     mulcnt = 0;
-    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, rLU);
+    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, xLU);
     report('pilu bicgstab', mulcnt, vec, res, rv0);
+    
+    xLU = block_expand(rLU, ord(2));
+    mulcnt = 0;
+    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, xLU);
+    report('xilu bicgstab', mulcnt, vec, res, rv0);
 
 end
 
@@ -596,29 +601,47 @@ drawnow;
     function res = dimension_collapse(mat, ord)
         res = sparse(size(mat,1)/ord, size(mat,2)/ord);
         if ( ord == 3 )
-            for j = 1:3
-                ii = i:3:size(mat,1);
-                res = res + mat(ii, 1:3:end) + mat(ii, 2:3:end) + mat(ii, 3:3:end);
+            for d = 1:3
+                iii = d:3:size(mat,1);
+                res = res + mat(iii, 1:3:end) + mat(iii, 2:3:end) + mat(iii, 3:3:end);
             end
             res = (1/9) * res;
         elseif ( ord == 2 )
-            for j = 1:2
-                ii = i:2:size(mat,1);
-                res = res + mat(ii, 1:2:end) + mat(ii, 2:2:end);
+            for d = 1:2
+                iii = d:2:size(mat,1);
+                res = res + mat(iii, 1:2:end) + mat(iii, 2:2:end);
             end
             res = (1/4) * res;
         end
     end
 
-    function res = diagonal_expand(mat, ord)
-        res = sparse(size(mat,1)*ord, size(mat,2)*ord);
-        if ( ord == 3 )
+    function res = diagonal_expand(mat, D)
+        res = sparse(size(mat,1)*D, size(mat,2)*D);
+        if ( D == 3 )
             res(1:3:end, 1:3:end) = mat;
             res(2:3:end, 2:3:end) = mat;
             res(3:3:end, 3:3:end) = mat;
-        elseif ( ord == 2 )
+        elseif ( D == 2 )
             res(1:2:end, 1:2:end) = mat;
             res(2:2:end, 2:2:end) = mat;
+        end
+    end
+
+    function res = block_expand(mat, D)
+        res = sparse(size(mat,1)*D, size(mat,2)*D);
+        if ( D == 3 )
+            for d = 1:3
+                iii = d:3:size(mat,1);
+                res(iii, 1:3:end) = mat;
+                res(iii, 2:3:end) = mat;
+                res(iii, 3:3:end) = mat;
+            end
+        elseif ( D == 2 )
+            for d = 1:2
+                iii = d:2:size(mat,1);
+                res(iii, 1:2:end) = mat;
+                res(iii, 2:2:end) = mat;
+            end
         end
     end
 
