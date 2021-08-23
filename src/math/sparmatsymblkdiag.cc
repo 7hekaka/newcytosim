@@ -106,8 +106,8 @@ void SparMatSymBlkDiag::Column::allocate(size_t alc)
         constexpr size_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
-        // use aligned memory:
-        void * ptr = new_real(alc*SB);
+        // use aligned memory, with some extra for SIMD burr:
+        void * ptr = new_real(alc*SB+4);
         Block * blk_new  = new(ptr) Block[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
