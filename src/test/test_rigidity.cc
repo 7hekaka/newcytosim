@@ -470,9 +470,9 @@ void testRigidity(size_t cnt, char const* str)
     zero_real(ALOC, vZ);
     
     FUNC(nbt, vP, alpha, vX);
-    VecPrint::print(std::cout, std::min(DISP,nbt), vX);
+    VecPrint::print(std::min(DISP,nbt), vX);
     std::cout << " |";
-    VecPrint::print(std::cout, DIM, vX+NVAL);
+    VecPrint::print(DIM, vX+NVAL);
     add_rigidity0(nbt, vP, alpha, vY);
     real err = blas::max_diff(nbt+2*DIM, vX, vY);
 

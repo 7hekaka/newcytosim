@@ -1641,13 +1641,13 @@ void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
     copy_real(N, B, tmp);
     alsatian_xtbsvLNNK<KD>(N, AB, LDAB, B);
     alsatian_xtbsvLNN(N, KD, AB, LDAB, tmp);
-    printf("\n  t "); VecPrint::print(std::cout, S, tmp, 5);
-    printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
+    printf("\n  t "); VecPrint::print(S, tmp, 5);
+    printf("\n  L "); VecPrint::print(S, B, 5);
     copy_real(N, B, tmp);
     alsatian_xtbsvLTNK<KD>(N, AB, LDAB, B);
     alsatian_xtbsvLTN(N, KD, AB, LDAB, tmp);
-    printf("\n  - "); VecPrint::print(std::cout, S, tmp, 5);
-    printf("\n  L "); VecPrint::print(std::cout, S, B, 5);
+    printf("\n  - "); VecPrint::print(S, tmp, 5);
+    printf("\n  L "); VecPrint::print(S, B, 5);
     printf("\n");
     free_real(tmp);
 #else

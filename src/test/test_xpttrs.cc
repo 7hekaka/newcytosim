@@ -26,13 +26,13 @@ inline void print(size_t n, real const* vec)
 {
     if ( n > 16 )
     {
-        VecPrint::print(std::cout, 8, vec, 3);
+        VecPrint::print(8, vec, 3);
         printf("...");
-        VecPrint::print(std::cout, 8, vec+n-8, 3);
+        VecPrint::print(8, vec+n-8, 3);
     }
     else
     {
-        VecPrint::print(std::cout, n, vec, 3);
+        VecPrint::print(n, vec, 3);
     }
 }
 

@@ -377,7 +377,7 @@ int Chain::reshape_calculate(const size_t ns, real target,
     lapack::xptts2(ns, 1, dia, low, mul, ns);
 #if ( 0 )
     printf("\n    err0 %20.16f", err0);
-    printf(" mul "); VecPrint::print(std::cout, std::min(16UL, ns), mul, 3);
+    printf(" mul "); VecPrint::print(std::min(16UL, ns), mul, 3);
 #endif
     if ( err0 < ns * REAL_EPSILON )
         return 0;
@@ -436,15 +436,15 @@ int Chain::reshape_calculate(const size_t ns, real target,
             return 0;
         if ( err > err0 )
         {
-            //printf("  rhs"); VecPrint::print(std::cout, std::min(16UL, ns), rhs, 3);
+            //printf("  rhs"); VecPrint::print(std::min(16UL, ns), rhs, 3);
             return 3;
         }
 #if ( 0 )
         printf("\n diff(L,U) = %f", blas::max_diff(ns-1, upe, low+1));
-        printf("\n L"); VecPrint::print(std::cout, std::min(16UL, ns-1), low+1, 3);
-        printf("\n D"); VecPrint::print(std::cout, std::min(16UL, ns  ), dia, 3);
-        printf("\n U"); VecPrint::print(std::cout, std::min(16UL, ns-1), upe, 3);
-        //printf("\n rhs "); VecPrint::print(std::cout, std::min(16UL, ns), rhs, 6);
+        printf("\n L"); VecPrint::print(std::min(16UL, ns-1), low+1, 3);
+        printf("\n D"); VecPrint::print(std::min(16UL, ns  ), dia, 3);
+        printf("\n U"); VecPrint::print(std::min(16UL, ns-1), upe, 3);
+        //printf("\n rhs "); VecPrint::print(std::min(16UL, ns), rhs, 6);
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
@@ -466,10 +466,10 @@ int Chain::reshape_calculate(const size_t ns, real target,
         for ( size_t u = 0; u < ns; ++u )
             mul[u] -= 0.5 * rhs[u];
         
-        //printf(" >mul"); VecPrint::print(std::cout, std::min(16UL, ns), mul, 3);
+        //printf(" >mul"); VecPrint::print(std::min(16UL, ns), mul, 3);
     }
     //printf("\n   >> err %20.16f", err);
-    //printf("\n   >>mul "); VecPrint::print(std::cout, ns, mul, 3);
+    //printf("\n   >>mul "); VecPrint::print(ns, mul, 3);
     return ( err < err0 );
 }
 
@@ -511,7 +511,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
     lapack::xptts2(ns, 1, dia, low, sca, ns);
 
     //printf("\n ----err %20.16f", err0);
-    //printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+    //printf("\n     sca "); VecPrint::print(ns, sca, 3);
 
     size_t cnt = 0;
     while ( ++cnt < 16 )
@@ -545,8 +545,8 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
         err += abs_real(val[ns-1]);
 #if ( 0 )
         printf("\n %3i err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
-        printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
-        printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+        printf("\n     val "); VecPrint::print(ns, val, 3);
+        printf("\n     sca "); VecPrint::print(ns, sca, 3);
 #endif
         if ( err < 1e-10 )
             return 0;
@@ -555,9 +555,9 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
         err0 = err;
 #if ( 0 )
         printf("\n diff(L,U) = %f", max_diff(ns-1, upe, low+1));
-        printf("\n L"); VecPrint::print(std::cout, std::min(16UL, ns-1), low+1, 3);
-        printf("\n D"); VecPrint::print(std::cout, std::min(16UL, ns  ), dia, 3);
-        printf("\n U"); VecPrint::print(std::cout, std::min(16UL, ns-1), upe, 3);
+        printf("\n L"); VecPrint::print(std::min(16UL, ns-1), low+1, 3);
+        printf("\n D"); VecPrint::print(std::min(16UL, ns  ), dia, 3);
+        printf("\n U"); VecPrint::print(std::min(16UL, ns-1), upe, 3);
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
@@ -579,10 +579,10 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
         for ( size_t u = 0; u < ns; ++u )
             sca[u] = std::min(0.5, sca[u] - 0.5 * val[u]);
 
-        //printf("\n   ->sca "); VecPrint::print(std::cout, ns, sca, 3);
+        //printf("\n   ->sca "); VecPrint::print(ns, sca, 3);
     }
     //printf("\n   >>err %20.16f", err);
-    //printf("\n   >>sca "); VecPrint::print(std::cout, ns, sca, 3);
+    //printf("\n   >>sca "); VecPrint::print(ns, sca, 3);
     return 4;
 }
 
@@ -605,7 +605,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
     size_t cnt = 0;
     while ( ++cnt < 16 )
     {
-        //printf("\n   %i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
+        //printf("\n   %i sca  ", cnt); VecPrint::print(ns, sca, 3);
         // calculate the matrix elements and RHS of system
         {
             Vector dif0(dif), dif1(dif+DIM);
@@ -635,8 +635,8 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
         err += abs_real(val[ns-1]);
 #if ( 0 )
         printf("\n%4lu err %20.16f norm(val) %8.5f", cnt, err, blas::nrm2(ns, val));
-        printf("\n     val "); VecPrint::print(std::cout, ns, val, 3);
-        printf("\n     sca "); VecPrint::print(std::cout, ns, sca, 3);
+        printf("\n     val "); VecPrint::print(ns, val, 3);
+        printf("\n     sca "); VecPrint::print(ns, sca, 3);
 #endif
         if ( err < 1e-10 )
             return 0;
@@ -645,9 +645,9 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
         err0 = err;
 #if ( 0 )
         printf("\n diff(L,U) = %f", max_diff(ns-1, upe, low+1));
-        printf("\n L"); VecPrint::print(std::cout, std::min(16UL, ns-1), low+1, 3);
-        printf("\n D"); VecPrint::print(std::cout, std::min(16UL, ns  ), dia, 3);
-        printf("\n U"); VecPrint::print(std::cout, std::min(16UL, ns-1), upe, 3);
+        printf("\n L"); VecPrint::print(std::min(16UL, ns-1), low+1, 3);
+        printf("\n D"); VecPrint::print(std::min(16UL, ns  ), dia, 3);
+        printf("\n U"); VecPrint::print(std::min(16UL, ns-1), upe, 3);
 #endif
         int info = 0;
         lapack::xgtsv(ns, 1, low+1, dia, upe, val, ns, &info);
@@ -664,7 +664,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
 
 #if ( 0 )
     printf("\n%2i err %e", cnt, err);
-    printf("\n%2i sca  ", cnt); VecPrint::print(std::cout, ns, sca, 3);
+    printf("\n%2i sca  ", cnt); VecPrint::print(ns, sca, 3);
     printf("\n");
 #endif
     
@@ -775,9 +775,9 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     sec[nbs-1] = 0;
 #if ( 0 )
     size_t S = std::min(nbs, 24UL);
-    printf("\n mag "); VecPrint::print(std::cout, S, mag, 3);
-    printf("\n pri "); VecPrint::print(std::cout, S, pri, 3);
-    printf("\n sec "); VecPrint::print(std::cout, S, sec, 3);
+    printf("\n mag "); VecPrint::print(S, mag, 3);
+    printf("\n pri "); VecPrint::print(S, pri, 3);
+    printf("\n sec "); VecPrint::print(S, sec, 3);
 #endif
     res = reshape_calculate(nbs, 1.0, mag, pri, sec, mem, mem_size);
     
@@ -796,8 +796,8 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     if ( abs_real(errS) > 1e-8 )
     {
         printf("\n Chain:err scalar %20.16f", errS);
-        printf("\n mul "); VecPrint::print(std::cout, nbs, mag, 3);
-        printf("\nLmul "); VecPrint::print(std::cout, nbs, mem, 3);
+        printf("\n mul "); VecPrint::print(nbs, mag, 3);
+        printf("\nLmul "); VecPrint::print(nbs, mem, 3);
     }
 #endif
     //printf("reshape %3i cycles: %16llu\n", ns, __rdtsc()-rdt);
@@ -807,12 +807,12 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 #if ( 0 )
         if ( nbs <= S )
         {
-            printf("\n>>> mul "); VecPrint::print(std::cout, S, mem, 3);
+            printf("\n>>> mul "); VecPrint::print(S, mem, 3);
         }
         else
         {
-            printf("\n>>> mul "); VecPrint::print(std::cout, S/2, mem, 3);
-            printf("..."); VecPrint::print(std::cout, S/2, mem+nbs-S/2, 3);
+            printf("\n>>> mul "); VecPrint::print(S/2, mem, 3);
+            printf("..."); VecPrint::print(S/2, mem+nbs-S/2, 3);
         }
 #endif
         reshape_apply(nbs, src, mem, dst);
@@ -826,8 +826,8 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
         if ( abs_real(errP) > 1e-8 )
         {
             printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
-            printf("\n pts "); VecPrint::print(std::cout, nbv, dst, 2);
-            printf("\nLpts "); VecPrint::print(std::cout, nbv, mag, 2);
+            printf("\n pts "); VecPrint::print(nbv, dst, 2);
+            printf("\nLpts "); VecPrint::print(nbv, mag, 2);
         }
         free_real(dif);
 #endif

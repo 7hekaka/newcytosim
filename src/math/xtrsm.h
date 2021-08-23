@@ -1605,8 +1605,8 @@ void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* 
     if ( err > 0.01 )
     {
         int S = std::min(N, 8), E = N - 1 - S;
-        printf("\n xgetrs %3i ",N); VecPrint::print(stdout, S, B, 3); VecPrint::print(stdout, S, B+E, 3);
-        printf("\n xgetrs  L  "); VecPrint::print(stdout, S, T, 3); VecPrint::print(stdout, S, T+E, 3);
+        printf("\n xgetrs %3i ",N); VecPrint::print(S, B, 3); VecPrint::print(S, B+E, 3);
+        printf("\n xgetrs  L  "); VecPrint::print(S, T, 3); VecPrint::print(S, T+E, 3);
     }
     free_real(T);
 #endif

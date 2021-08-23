@@ -42,17 +42,17 @@ inline void print(size_t num, real const* vec)
 {
     if ( num > 16 )
     {
-        VecPrint::print(std::cout, 8, vec, 3);
+        VecPrint::print(8, vec, 3);
         fprintf(stdout, " :");
-        VecPrint::print(std::cout, 8, vec+num-8, 3);
+        VecPrint::print(8, vec+num-8, 3);
         fprintf(stdout, " |");
-        VecPrint::print(std::cout, 2, vec+num, 1);
+        VecPrint::print(2, vec+num, 1);
     }
     else
     {
-        VecPrint::print(std::cout, num, vec, 3);
+        VecPrint::print(num, vec, 3);
         fprintf(stdout, " |");
-        VecPrint::print(std::cout, 2, vec+num, 1);
+        VecPrint::print(2, vec+num, 1);
     }
     printf("  nrm %7.3f ", blas::nrm8(num, vec));
 }

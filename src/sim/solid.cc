@@ -915,7 +915,7 @@ void Solid::reshape()
         N[i] *= alpha;
     }
     
-    //VecPrint::print(std::cout, 4, 4, N, 4, 3);
+    //VecPrint::print(4, 4, N, 4, 3);
 
     /* 
      Use LApack to find the largest Eigenvalue, and associated Eigenvector,

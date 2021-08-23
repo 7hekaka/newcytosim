@@ -405,9 +405,9 @@ void testU(SIZE_T cnt, char const* str)
     nan_fill(NVAL, lag_);
 
     FUNC(NSEG, dir_, force_, lag_);
-    VecPrint::print(std::cout, std::min(DISP,NSEG), lag_);
+    VecPrint::print(std::min(DISP,NSEG), lag_);
     std::cout << " |";
-    VecPrint::print(std::cout, 1, lag_+NSEG);
+    VecPrint::print(1, lag_+NSEG);
     tic();
     for ( SIZE_T i=0; i<cnt; ++i )
     {
@@ -663,9 +663,9 @@ void testD(SIZE_T cnt, char const* str)
     nan_fill(NVAL, x);
     
     FUNC(NSEG, dir_, pos_, lag_, x);
-    VecPrint::print(std::cout, std::min(DISP,NVAL), x);
+    VecPrint::print(std::min(DISP,NVAL), x);
     std::cout << " |";
-    VecPrint::print(std::cout, DIM, x+NVAL);
+    VecPrint::print(DIM, x+NVAL);
 
     tic();
     for ( SIZE_T i=0; i<cnt; ++i )
@@ -765,30 +765,30 @@ void checkProject(SIZE_T nbs)
     
     for ( SIZE_T i = 0; i < nbv; ++i )
         x[i] = RNG.sreal();
-    //VecPrint::print(std::cout, nbv, dir_, 2); printf(" dir_\n");
+    //VecPrint::print(nbv, dir_, 2); printf(" dir_\n");
     
     nan_fill(nbs, lag_);
     //projectForces(nbs, x, y);
     projectForcesU_(nbs, dir_, x, lag_);
     DPTTS2(nbs);
     projectForcesD_(nbs, dir_, x, lag_, y);
-    //VecPrint::print(std::cout, std::min(DISP,nbv), y);
+    //VecPrint::print(std::min(DISP,nbv), y);
     print_fe_exceptions("projectForces");
     printf(" SCA ");
-    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
+    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbs), lag_); printf(" lag_\n");
     
     nan_fill(nbs, lag_);
 #if REAL_IS_DOUBLE && defined(__AVX__)
     projectForces_AVX(nbs, x, z);
     printf(" AVX ");
-    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
-    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
+    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbs), lag_); printf(" lag_\n");
+    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbv), z);
     print_fe_exceptions("projectForcesAVX");
 #elif REAL_IS_DOUBLE && defined(__SSE3__)
     projectForces_SSE(nbs, x, z);
     printf(" SSE ");
-    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbs), lag_); printf(" lag_\n");
-    //printf("%2lu ", nbs); VecPrint::print(std::cout, std::min(DISP,nbv), z);
+    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbs), lag_); printf(" lag_\n");
+    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbv), z);
     print_fe_exceptions("projectForces_SSE");
 #else
     projectForces(nbs, x, z);
@@ -860,7 +860,7 @@ void timeProject(SIZE_T cnt, char const* str)
 
     zero_real(ALOC, x);
     FUNC(NSEG, force_, x);
-    VecPrint::print(std::cout, std::min(DISP,NVAL+2), x);
+    VecPrint::print(std::min(DISP,NVAL+2), x);
 
     tic();
     for ( SIZE_T ii=0; ii<cnt; ++ii )

@@ -32,6 +32,13 @@ namespace VecPrint
 
     /// print 'len' components of 'vec[]' on a line
     template< typename T >
+    void print(size_t len, const T* vec, int digits = 2, size_t dim = 0)
+    {
+        print(stdout, len, vec, digits, dim);
+    }
+
+    /// print 'len' components of 'vec[]' on a line
+    template< typename T >
     std::ostream& print(std::ostream& os, size_t len, const T* vec, int digits = 2)
     {
         if ( !vec )
