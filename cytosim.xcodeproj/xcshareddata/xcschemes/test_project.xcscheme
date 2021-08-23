@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "BB18BBC61DFD7E3400567023"
-               BuildableName = "test_code"
-               BlueprintName = "test_code"
+               BuildableName = "test_project"
+               BlueprintName = "test_project"
                ReferencedContainer = "container:cytosim.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -31,8 +31,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BB18BBC61DFD7E3400567023"
-            BuildableName = "test_code"
-            BlueprintName = "test_code"
+            BuildableName = "test_project"
+            BlueprintName = "test_project"
             ReferencedContainer = "container:cytosim.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -55,8 +55,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BB18BBC61DFD7E3400567023"
-            BuildableName = "test_code"
-            BlueprintName = "test_code"
+            BuildableName = "test_project"
+            BlueprintName = "test_project"
             ReferencedContainer = "container:cytosim.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -72,8 +72,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "BB18BBC61DFD7E3400567023"
-            BuildableName = "test_code"
-            BlueprintName = "test_code"
+            BuildableName = "test_project"
+            BlueprintName = "test_project"
             ReferencedContainer = "container:cytosim.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

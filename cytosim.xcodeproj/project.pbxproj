@@ -1377,7 +1377,7 @@
 		BB17CD1425CD49DF00202087 /* test_variablerate.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_variablerate.cc; sourceTree = "<group>"; };
 		BB18BB8523CDC20400B3605E /* simd_print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_print.h; sourceTree = "<group>"; };
 		BB18BBB71DFD78F600567023 /* test_simd */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_simd; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB18BBC71DFD7E3400567023 /* test_code */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_code; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB18BBC71DFD7E3400567023 /* test_project */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_project; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB19DA9C231BF792001488A5 /* matrix34.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix34.h; sourceTree = "<group>"; };
 		BB19DA9D231BF792001488A5 /* matrix34.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix34.cc; sourceTree = "<group>"; };
 		BB19DAA206964B9900093FA2 /* simul_solve.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = simul_solve.cc; path = src/sim/simul_solve.cc; sourceTree = SOURCE_ROOT; };
@@ -2181,7 +2181,7 @@
 				BBCA9EF006AFCB4600638608 /* report */,
 				BBB1C6E40CB2CAA300679ADC /* blank */,
 				BB18BBB71DFD78F600567023 /* test_simd */,
-				BB18BBC71DFD7E3400567023 /* test_code */,
+				BB18BBC71DFD7E3400567023 /* test_project */,
 				BB9D87A01E76BAE500DD0F00 /* test_matrix */,
 				BB2D09F3243DBC3400C1C0AB /* test_solver */,
 				BB7086472449CBE900C73273 /* test_xpttrs */,
@@ -3883,9 +3883,9 @@
 			productReference = BB18BBB71DFD78F600567023 /* test_simd */;
 			productType = "com.apple.product-type.tool";
 		};
-		BB18BBC61DFD7E3400567023 /* test_code */ = {
+		BB18BBC61DFD7E3400567023 /* test_project */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = BB18BBCB1DFD7E3400567023 /* Build configuration list for PBXNativeTarget "test_code" */;
+			buildConfigurationList = BB18BBCB1DFD7E3400567023 /* Build configuration list for PBXNativeTarget "test_project" */;
 			buildPhases = (
 				BB18BBC31DFD7E3400567023 /* Sources */,
 				BB18BBC41DFD7E3400567023 /* Frameworks */,
@@ -3895,9 +3895,9 @@
 			);
 			dependencies = (
 			);
-			name = test_code;
+			name = test_project;
 			productName = test_code;
-			productReference = BB18BBC71DFD7E3400567023 /* test_code */;
+			productReference = BB18BBC71DFD7E3400567023 /* test_project */;
 			productType = "com.apple.product-type.tool";
 		};
 		BB201E0F24ABDCD900A8CA82 /* test_xtbsv */ = {
@@ -4412,7 +4412,7 @@
 				BBB1C6C70CB2CAA300679ADC /* blank */,
 				BBE2FB8D25680D5800EB88EA /* cympack */,
 				BBAA7E7F2455D94600C924DB /* test_block */,
-				BB18BBC61DFD7E3400567023 /* test_code */,
+				BB18BBC61DFD7E3400567023 /* test_project */,
 				BB51BC2205FA534000D4869F /* test_glapp */,
 				BB7C2BC005FA4EF8002C69A9 /* test_grid */,
 				BB9D879F1E76BAE500DD0F00 /* test_matrix */,
@@ -7653,7 +7653,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		BB18BBCB1DFD7E3400567023 /* Build configuration list for PBXNativeTarget "test_code" */ = {
+		BB18BBCB1DFD7E3400567023 /* Build configuration list for PBXNativeTarget "test_project" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BB18BBCC1DFD7E3400567023 /* Development */,
