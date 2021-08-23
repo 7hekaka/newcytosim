@@ -126,9 +126,13 @@ inline static vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 #if defined(__AVX__)
 // comparison
 #define cmp4f(a,b,c)     _mm_cmp_ps(a,b,c)
-// copy a[0] into all elements of destination
-inline static vec4f broadcastlof(vec4f a)         { return _mm_permute_ps(a,0x00); }
 inline static vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
+
+// copy a[0] into all elements of destination
+inline static vec4f broadcastXf(vec4f a)          { return _mm_permute_ps(a,0x00); }
+inline static vec4f broadcastYf(vec4f a)          { return _mm_permute_ps(a,0x55); }
+inline static vec4f broadcastZf(vec4f a)          { return _mm_permute_ps(a,0xAA); }
+inline static vec4f broadcastTf(vec4f a)          { return _mm_permute_ps(a,0xFF); }
 
 // non-temporal load
 inline static vec4f streamload4f(float const* a)  { return _mm_castsi128_ps(_mm_stream_load_si128((__m128i*)a)); }
@@ -138,10 +142,17 @@ inline static vec4f streamload4f(float const* a)  { return _mm_castsi128_ps(_mm_
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
 inline static __m256d cvt4sd(vec4f a)             { return _mm256_cvtps_pd(a); }
 inline static void store4d(float* a, __m256d b)   { _mm_storeu_ps(a, _mm256_cvtpd_ps(b)); }
+
 #elif defined(__SSE3__)
-inline static vec4f broadcastlof(vec4f a)         { return _mm_shuffle_ps(a,a,0x00); }
+
 inline static vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }
 inline static vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
+
+inline static vec4f broadcastXf(vec4f a)          { return _mm_shuffle_ps(a,a,0x00); }
+inline static vec4f broadcastYf(vec4f a)          { return _mm_shuffle_ps(a,a,0x55); }
+inline static vec4f broadcastZf(vec4f a)          { return _mm_shuffle_ps(a,a,0xAA); }
+inline static vec4f broadcastTf(vec4f a)          { return _mm_shuffle_ps(a,a,0xFF); }
+
 #define permute4f(a,k)    _mm_shuffle_ps(a,a,k)
 #endif
 

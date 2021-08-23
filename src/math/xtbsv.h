@@ -1177,7 +1177,7 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
     storeu4(pX, blend31(a1, a0));
     pA -= lda;
     pX -= ORD;
-    vec4 tt = broadcastd(a1);
+    vec4 tt = broadcastX(a1);
     vec4 af = loadu4(pX);
     while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
     {
@@ -1196,7 +1196,7 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
 #endif
         // restore 4th position that was saved in 'tt'
         storeu4(pX, blend31(a1, tt));
-        tt = broadcastd(a1); // save 4th position for next round
+        tt = broadcastX(a1); // save 4th position for next round
         pA -= lda;
         pX -= ORD;
     }
@@ -1299,7 +1299,7 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
     storeu4f(pX, blend31f(a1, a0));
     pA -= lda;
     pX -= ORD;
-    vec4f tt = broadcastlof(a1);
+    vec4f tt = broadcastXf(a1);
     vec4f af = loadu4f(pX);
     while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
     {
@@ -1318,7 +1318,7 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 #endif
         // restore 4th position that was saved in 'tt'
         storeu4f(pX, blend31f(a1, tt));
-        tt = broadcastlof(a1); // save 4th position for next round
+        tt = broadcastXf(a1); // save 4th position for next round
         pA -= lda;
         pX -= ORD;
     }

@@ -760,9 +760,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
     vec4f s1 = mul4f(load3fZ(D+BLD  ), tt);
     vec4f s2 = mul4f(load3fZ(D+BLD*2), tt);
 # endif
-    const vec4f x0 = permute4f(tt, 0x00);
-    const vec4f x1 = permute4f(tt, 0x55);
-    const vec4f x2 = permute4f(tt, 0xAA);
+    const vec4f x0 = broadcastXf(tt);
+    const vec4f x1 = broadcastYf(tt);
+    const vec4f x2 = broadcastZf(tt);
 
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
@@ -837,10 +837,10 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
     
     if ( size_ > 1 )
     {
-        const vec4f x0 = permute4f(tt, 0x00);
-        const vec4f x1 = permute4f(tt, 0x55);
-        const vec4f x2 = permute4f(tt, 0xAA);
-        
+        const vec4f x0 = broadcastXf(tt);
+        const vec4f x1 = broadcastYf(tt);
+        const vec4f x2 = broadcastZf(tt);
+
         size_t n = 1;
         {
             const size_t end = 1 + 2 * ((size_-1)/2);

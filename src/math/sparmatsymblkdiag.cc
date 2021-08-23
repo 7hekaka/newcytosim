@@ -730,10 +730,10 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t
     vec4f s1 = mul4f(load3fZ(D+BLD  ), tt);
     vec4f s2 = mul4f(load3fZ(D+BLD*2), tt);
 # endif
-    const vec4f x0 = permute4f(tt, 0x00);
-    const vec4f x1 = permute4f(tt, 0x55);
-    const vec4f x2 = permute4f(tt, 0xAA);
-    
+    const vec4f x0 = broadcastXf(tt);
+    const vec4f x1 = broadcastYf(tt);
+    const vec4f x2 = broadcastZf(tt);
+
     Block  const* blk = blk_;
     size_t const* inx = inx_;
 
@@ -797,9 +797,9 @@ void SparMatSymBlkDiag::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_
     // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     const vec4f tt = loadu4f(X+jj);
-    const vec4f x0 = permute4f(tt, 0x00);
-    const vec4f x1 = permute4f(tt, 0x55);
-    const vec4f x2 = permute4f(tt, 0xAA);
+    const vec4f x0 = broadcastXf(tt);
+    const vec4f x1 = broadcastYf(tt);
+    const vec4f x2 = broadcastZf(tt);
 
     Block  const* blk = blk_;
     size_t const* inx = inx_;
@@ -930,10 +930,10 @@ void SparMatSymBlkDiag::Column::vecMulAddTriangle3D_SSE(const float* X, float* Y
     assert_true(size_ > 0);
     vec4f tt = loadu4f(X+jj);
     
-    const vec4f x0 = permute4f(tt, 0x00);
-    const vec4f x1 = permute4f(tt, 0x55);
-    const vec4f x2 = permute4f(tt, 0xAA);
-    
+    const vec4f x0 = broadcastXf(tt);
+    const vec4f x1 = broadcastYf(tt);
+    const vec4f x2 = broadcastZf(tt);
+
     vec4f s0 = setzero4f();
     vec4f s1 = setzero4f();
     vec4f s2 = setzero4f();
@@ -1870,13 +1870,13 @@ void SparMatSymBlkDiag::vecMulDiagonal3D(const float* X, float* Y) const
         // Y2 = M[2] * X0 + M[5] * X1 + M[8] * X2;
         const vec4f tt = loadu4f(X+3*j);
 # if ( BLD == 4 )
-        vec4f s0 = mul4f(streamload4f(D  ), permute4f(tt, 0x00));
-        vec4f s1 = mul4f(streamload4f(D+4), permute4f(tt, 0x55));
-        vec4f s2 = mul4f(streamload4f(D+8), permute4f(tt, 0xAA));
+        vec4f s0 = mul4f(streamload4f(D  ), broadcastXf(tt));
+        vec4f s1 = mul4f(streamload4f(D+4), broadcastYf(tt));
+        vec4f s2 = mul4f(streamload4f(D+8), broadcastZf(tt));
 # else
-        vec4f s0 = mul4f(load3fZ(D      ), permute4f(tt, 0x00));
-        vec4f s1 = mul4f(load3fZ(D+BLD  ), permute4f(tt, 0x55));
-        vec4f s2 = mul4f(load3fZ(D+BLD*2), permute4f(tt, 0xAA));
+        vec4f s0 = mul4f(load3fZ(D      ), broadcastXf(tt));
+        vec4f s1 = mul4f(load3fZ(D+BLD  ), broadcastYf(tt));
+        vec4f s2 = mul4f(load3fZ(D+BLD*2), broadcastZf(tt));
 # endif
         storeu4f(Y+3*j, add4f(s2, add4f(s0, s1)));
     }

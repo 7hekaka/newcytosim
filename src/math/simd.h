@@ -207,7 +207,7 @@ inline static vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); }
 inline static vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_mm256_unpackhi_pd(a,a)
 
 /// copy a[0] into all elements of dst.
-inline static vec4 broadcastd(vec4 a) { return _mm256_movedup_pd(_mm256_permute2f128_pd(a, a, 0x00)); }
+inline static vec4 broadcastX(vec4 a) { return _mm256_movedup_pd(_mm256_permute2f128_pd(a, a, 0x00)); }
 
 /* Unused functions:
  inline static vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m128d(a,b); }
@@ -316,7 +316,7 @@ inline static vec4 interleave4(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 
 inline static vec4 interleave4(vec4 a) { return _mm256_permute4x64_pd(a, 0x50); }
 
 // copy a[0] into all elements of dst.
-inline static vec4 broadcastd(vec2 a)  { return _mm256_broadcastsd_pd(a); }
+inline static vec4 broadcastX(vec2 a)  { return _mm256_broadcastsd_pd(a); }
 
 
 /// cross product of two 3D vectors ( X Y Z T )

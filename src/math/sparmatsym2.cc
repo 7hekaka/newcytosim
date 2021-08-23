@@ -1158,10 +1158,10 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
         vec4f a3 = broadcast1f(val+3);
 #else
         vec4f a3 = loadu4f(val);
-        vec4f a0 = permute4f(a3, 0x00);
-        vec4f a1 = permute4f(a3, 0x55);
-        vec4f a2 = permute4f(a3, 0xAA);
-        a3 = permute4f(a3, 0xFF);
+        vec4f a0 = broadcastXf(a3);
+        vec4f a1 = broadcastYf(a3);
+        vec4f a2 = broadcastZf(a3);
+        a3 = broadcastTf(a3);
 #endif
         val += 4;
         s0 = fmadd4f(a0, loadu4f(X+i0), s0);
@@ -1187,8 +1187,8 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
         vec4f a1 = broadcast1f(val+1);
 #else
         vec4f a1 = load2f(val);
-        vec4f a0 = permute4f(a1, 0x00);
-        a1 = permute4f(a1, 0x55);
+        vec4f a0 = broadcastXf(a1);
+        a1 = broadcastYf(a1);
 #endif
         val += 2;
         s0 = fmadd4f(a0, loadu4f(X+i0), s0);
