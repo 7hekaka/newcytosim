@@ -380,7 +380,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
     
 #if CHECK_RIGIDITY
     static size_t cnt = 0;
-    real err = blas::max_diff(DIM*nPoints, tmp, Y);
+    real err = blas::difference(DIM*nPoints, tmp, Y);
     if ( err > 1.0e-6 || ++cnt > 100 )
     {
         cnt = 0;

@@ -440,7 +440,7 @@ int Chain::reshape_calculate(const size_t ns, real target,
             return 3;
         }
 #if ( 0 )
-        printf("\n diff(L,U) = %f", blas::max_diff(ns-1, upe, low+1));
+        printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
         printf("\n L"); VecPrint::print(std::min(16UL, ns-1), low+1, 3);
         printf("\n D"); VecPrint::print(std::min(16UL, ns  ), dia, 3);
         printf("\n U"); VecPrint::print(std::min(16UL, ns-1), upe, 3);
@@ -554,7 +554,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
             return 3;
         err0 = err;
 #if ( 0 )
-        printf("\n diff(L,U) = %f", max_diff(ns-1, upe, low+1));
+        printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
         printf("\n L"); VecPrint::print(std::min(16UL, ns-1), low+1, 3);
         printf("\n D"); VecPrint::print(std::min(16UL, ns  ), dia, 3);
         printf("\n U"); VecPrint::print(std::min(16UL, ns-1), upe, 3);
@@ -644,7 +644,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
             return 3;
         err0 = err;
 #if ( 0 )
-        printf("\n diff(L,U) = %f", max_diff(ns-1, upe, low+1));
+        printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
         printf("\n L"); VecPrint::print(std::min(16UL, ns-1), low+1, 3);
         printf("\n D"); VecPrint::print(std::min(16UL, ns  ), dia, 3);
         printf("\n U"); VecPrint::print(std::min(16UL, ns-1), upe, 3);
@@ -792,7 +792,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     // checking against older code
     copy_real(nbs, mem, mag);
     res = reshape_calculate_alt(nbs, 1.0, dif, mem, mem_size);
-    real errS = blas::max_diff(nbs, mem, mag);
+    real errS = blas::difference(nbs, mem, mag);
     if ( abs_real(errS) > 1e-8 )
     {
         printf("\n Chain:err scalar %20.16f", errS);
@@ -821,7 +821,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
         reshape_apply_alt(nbs, dif, src, mem, mag);
         //projectForcesD_(nbs, dif, src, mem, mag);  // similar calculation!
         size_t nbv = DIM*nbs+DIM;
-        real errP = blas::max_diff(nbv, mag, dst);
+        real errP = blas::difference(nbv, mag, dst);
         //printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
         if ( abs_real(errP) > 1e-8 )
         {

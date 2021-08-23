@@ -54,12 +54,15 @@ inline static vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }
 // return { A0, B0 } from a = { A0, A1 } and b = { B0, B1 }
 inline static vec4f movelh4f(vec4f a, vec4f b) { return _mm_movelh_ps(a, b); }
 
+inline static vec4f getlof(vec4f a)            { return _mm_movelh_ps(a, a); }
+inline static vec4f gethif(vec4f a)            { return _mm_movehl_ps(a, a); }
+
 // return { A1, A2, A3, B0 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-inline static vec4f catshift1(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 4); }
+inline static vec4f catshift1f(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 4); }
 // return { A2, A3, B0, B1 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-inline static vec4f catshift2(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
+inline static vec4f catshift2f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
 // return { A3, B0, B1, B2 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-inline static vec4f catshift3(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 12); }
+inline static vec4f catshift3f(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 12); }
 
 inline static vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
 inline static vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }
@@ -112,6 +115,8 @@ inline static vec4f load3fZ(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a
 
 // emulating the blend function using two shuffles
 inline static vec4f blend31f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,b,0xEE), 0xC4); }
+inline static vec4f blend22f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0xE4); }
+inline static vec4f blend13f(vec4f a, vec4f b) { return _mm_shuffle_ps(_mm_shuffle_ps(a, b, 0x44), b, 0xEC); }
 
 inline static vec4f clear4th(vec4f a) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,_mm_setzero_ps(),0xEE), 0xC4); }
 

@@ -1588,7 +1588,7 @@ void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
 
 void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* B)
 {
-#if 1
+#if 0
     // checking result against other routine:
     real * T = new_real(N); copy_real(N, B, T);
 #endif
@@ -1598,10 +1598,10 @@ void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* 
     alsatian_xtrsmLLN1U_SSE(N, (float*)A, LDA, B);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1I_SSE(N, (float*)A, LDA, B);
-#if 1
+#if 0
     // checking result against other routine:
     alsatian_xgetrsN(N, A, LDA, IPIV, T);
-    real err = blas::max_diff(N, B, T);
+    real err = blas::difference(N, B, T);
     if ( err > 0.01 )
     {
         int S = std::min(N, 8), E = N - 1 - S;

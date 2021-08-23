@@ -39,6 +39,9 @@ Selection of projectForces() routines optimized for some architectures
 #elif ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
 #  define projectForcesU projectForcesU3D_SSE
 #  define projectForcesD projectForcesD3D_SSE
+#elif ( DIM == 3 ) && defined(__SSE3__)
+#  define projectForcesU projectForcesU_
+#  define projectForcesD projectForcesD3D_SSE
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
 #  define projectForcesU projectForcesU2D_AVX
 #  define projectForcesD projectForcesD2D_AVX
@@ -369,7 +372,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     // Check here that iLLG[] contains the correct Lagrange multipliers
     // compute Lagrange multipliers corresponding to 'force' in iLag:
     computeTensions(force);
-    real e = blas::max_diff(nbs, iLLG, iLag);
+    real e = blas::difference(nbs, iLLG, iLag);
     if ( e > 1e-6 )
     {
         fprintf(stderr, "\n|iLag - iLLG| = %e", e);
@@ -438,7 +441,7 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
 #endif
     
 #if CHECK_PROJECTION_DIFF
-    real e = blas::max_diff(nbp, Y, vec);
+    real e = blas::difference(nbp, Y, vec);
     if ( e > 1e-6 )
     {
         std::clog << "\naddProjectionDiff(" << nbp << ") error " << e;

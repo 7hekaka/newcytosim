@@ -22,31 +22,6 @@ const size_t DISP = 16UL;
 real * vP = nullptr;
 real * vX = nullptr, * vY = nullptr, * vZ = nullptr;
 
-
-#ifdef __AVX__
-
-inline __m256d loadc4(double const* ptr)
-{
-#if ( 0 )
-    // we can check memory alignment here:
-    uintptr_t x = ((uintptr_t)ptr) & 31;
-    if ( x )
-    {
-        fprintf(stderr, "loading unaligned memory %i\n", x);
-        return _mm256_loadu_pd(ptr);
-    }
-#endif
-    return _mm256_load_pd(ptr);
-}
-
-#endif
-
-
-inline void print_alignment(real const* ptr, const char msg[])
-{
-    fprintf(stderr, "%s %p align %lu\n", msg, ptr, (uintptr_t)ptr&63);
-}
-
 //------------------------------------------------------------------------------
 
 void setFilament(size_t nbs, real* ptr, real seg, real persistence_length)
@@ -474,7 +449,7 @@ void testRigidity(size_t cnt, char const* str)
     std::cout << " |";
     VecPrint::print(DIM, vX+NVAL);
     add_rigidity0(nbt, vP, alpha, vY);
-    real err = blas::max_diff(nbt+2*DIM, vX, vY);
+    real err = blas::difference(nbt+2*DIM, vX, vY);
 
     tic();
     for ( size_t i=0; i<cnt; ++i )

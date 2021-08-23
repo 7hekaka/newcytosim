@@ -180,10 +180,11 @@ void test_shuffle()
     dump(_mm_shuffle_ps(b, a, 0x24), "_mm_shuffle_ps(b, a, 0x24)");
     dump(_mm_shuffle_ps(a, b, 0x23), "_mm_shuffle_ps(a, b, 0x23)");
     
-    vec4f x = _mm_movehl_ps(b, a);
-    dump(x, "shuffle-blend");
-    vec4f y = _mm_shuffle_ps(a, x, 0xC4);
-    dump(y, "shuffle-blend");
+    vec4f x = _mm_shuffle_ps(a, b, 0xEE);
+    dump(_mm_shuffle_ps(a, x, 0xC4), "blend13");
+    dump(_mm_shuffle_ps(a, b, 0xE4), "blend22");
+    vec4f y = _mm_shuffle_ps(a, b, 0x44);
+    dump(_mm_shuffle_ps(y, b, 0xEC), "blend31");
 }
 
 //------------------------------------------------------------------------------
@@ -633,19 +634,23 @@ void test_rotate()
 {
     printf("------ test_rotate\n");
     vec4 a{ 1, 2, 3, 4 };
-    vec4 b{ 5, 6, 7, 8 };
-    dump(a, "a = ");
-    dump(b, "b = ");
+    vec4 b{-5,-6,-7,-8 };
+    dump(a, "a/x = ");
+    dump(b, "b/y = ");
     
     dump(catshift1(a, b), "catshift1(a, b)");
     dump(catshift2(a, b), "catshift2(a, b)");
     dump(catshift3(a, b), "catshift3(a, b)");
     
     vec4f x{ 1, 2, 3, 4 };
-    vec4f y{ 5, 6, 7, 8 };
-    dump(catshift1(x, y), "catshift1(x, y)");
-    dump(catshift2(x, y), "catshift2(x, y)");
-    dump(catshift3(x, y), "catshift3(x, y)");
+    vec4f y{-5,-6,-7,-8 };
+    dump(catshift1f(x, y), "catshift1f(x, y)");
+    dump(catshift2f(x, y), "catshift2f(x, y)");
+    dump(catshift3f(x, y), "catshift3f(x, y)");
+
+    dump(blend13f(x, y), "blend13f(x, y)");
+    dump(blend22f(x, y), "blend22f(x, y)");
+    dump(blend31f(x, y), "blend31f(x, y)");
 }
 
 

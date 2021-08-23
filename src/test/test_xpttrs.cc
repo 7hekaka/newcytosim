@@ -107,7 +107,7 @@ void check(int N, real const* Ds, real const* Us, real const* Bs, real* D, real*
     FACTOR(N, D, U, &info);
     SOLVE(N, D, U, B);
     print(N, B);
-    real err = blas::max_diff(N, S, B);
+    real err = blas::difference(N, S, B);
     printf(" err %f %12s", err, str);
     if ( err < 0.001 )
     {

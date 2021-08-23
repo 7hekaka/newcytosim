@@ -39,8 +39,6 @@ const SIZE_T NSEG = 127;
 const SIZE_T NVAL = DIM * ( NSEG + 1 );
 const SIZE_T ALOC = NVAL + 8;
 
-const SIZE_T DISP = 24UL;
-
 
 /// fill vector with signalling NANs
 void nan_fill(SIZE_T cnt, real * ptr)
@@ -113,29 +111,21 @@ void print_fe_exceptions(const char* str, FILE * out = stdout)
 }
 
 
-
-#ifdef __AVX__
-
-inline __m256d loadc4(double const* ptr)
+/// print only 16 scalars from given vector
+inline void print(size_t N, real const* vec)
 {
-#if ( 0 )
-    // we can check memory alignment here:
-    uintptr_t x = ((uintptr_t)ptr) & 31;
-    if ( x )
+    if ( N > 16 )
     {
-        fprintf(stderr, "loading unaligned memory %i\n", x);
-        return _mm256_loadu_pd(ptr);
+        VecPrint::print(8, vec, 3);
+        printf("...");
+        VecPrint::print(8, vec+N-8, 3);
     }
-#endif
-    return _mm256_load_pd(ptr);
-}
-
-#endif
-
-
-inline void print_alignment(real const* ptr, const char msg[])
-{
-    fprintf(stderr, "%s %p alignment %lu\n", msg, ptr, (uintptr_t)ptr&31);
+    else
+    {
+        VecPrint::print(N, vec, 3);
+    }
+    printf(" |");
+    VecPrint::print(DIM, vec+N);
 }
 
 //------------------------------------------------------------------------------
@@ -211,8 +201,8 @@ void setProjection(SIZE_T nbs)
 
     DPTTRF(nbs);
 #if ( 0 )
-    std::clog << "\nD "; VecPrint::print(std::clog, nbs, diag_, 3);
-    std::clog << "\nU "; VecPrint::print(std::clog, nbs-1, upper_, 3); std::clog << '\n';
+    std::clog << "\nD "; print(nbs, diag_, 3);
+    std::clog << "\nU "; print(nbs-1, upper_, 3); std::clog << '\n';
 #endif
 }
 
@@ -337,8 +327,8 @@ void projectForcesU2D_AVY(SIZE_T nbs, const real* dir, const real* src, real* mu
     // calculate the terms 4 by 4
     while ( mul < end )
     {
-        vec4 a = mul4(sub4(loadu4(src+2), loadu4(src  )), loadc4(dir  ));
-        vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), loadc4(dir+4));
+        vec4 a = mul4(sub4(loadu4(src+2), loadu4(src  )), load4(dir  ));
+        vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), load4(dir+4));
         dir += 8;
         src += 8;
         vec4 p = permute2f128(a, b, 0x20);
@@ -405,9 +395,7 @@ void testU(SIZE_T cnt, char const* str)
     nan_fill(NVAL, lag_);
 
     FUNC(NSEG, dir_, force_, lag_);
-    VecPrint::print(std::min(DISP,NSEG), lag_);
-    std::cout << " |";
-    VecPrint::print(1, lag_+NSEG);
+    print(NSEG, lag_);
     tic();
     for ( SIZE_T i=0; i<cnt; ++i )
     {
@@ -663,9 +651,7 @@ void testD(SIZE_T cnt, char const* str)
     nan_fill(NVAL, x);
     
     FUNC(NSEG, dir_, pos_, lag_, x);
-    VecPrint::print(std::min(DISP,NVAL), x);
-    std::cout << " |";
-    VecPrint::print(DIM, x+NVAL);
+    print(NVAL, x);
 
     tic();
     for ( SIZE_T i=0; i<cnt; ++i )
@@ -697,7 +683,7 @@ void testProjectionD(SIZE_T cnt)
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testD<projectForcesD2D_AVX>(cnt, " D_AVX");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( DIM == 3 ) && defined(__SSE3__)
     testD<projectForcesD3D_SSE>(cnt, " D_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
@@ -732,6 +718,13 @@ void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
     projectForcesD3D_SSE(nbs, dir_, X, lag_, Y);
 #endif
 }
+#elif defined(__SSE3__)
+void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
+{
+    projectForcesU_(nbs, dir_, X, lag_);
+    DPTTS2(nbs);
+    projectForcesD3D_SSE(nbs, dir_, X, lag_, Y);
+}
 #endif
 
 
@@ -755,49 +748,52 @@ void projectForces_AVX(SIZE_T nbs, const real* X, real* Y)
 
 void checkProject(SIZE_T nbs)
 {
-    printf("CHECK %2lu ", nbs);
+    printf("projectForces %2lu ", nbs);
     real *x = nullptr, *y = nullptr, *z = nullptr;
     SIZE_T nbv = DIM * ( nbs + 1 );
-    new_nans(nbv, x, y, z);
+    new_nans(nbv+4, x, y, z);
     setFilament(nbs, 0.1, 20.0, 1.0);
     setProjection(nbs);
     std::feclearexcept(FE_ALL_EXCEPT);
     
     for ( SIZE_T i = 0; i < nbv; ++i )
         x[i] = RNG.sreal();
-    //VecPrint::print(nbv, dir_, 2); printf(" dir_\n");
+    //print(nbv, dir_, 2); printf(" dir_\n");
     
     nan_fill(nbs, lag_);
-    //projectForces(nbs, x, y);
     projectForcesU_(nbs, dir_, x, lag_);
     DPTTS2(nbs);
     projectForcesD_(nbs, dir_, x, lag_, y);
-    //VecPrint::print(std::min(DISP,nbv), y);
-    print_fe_exceptions("projectForces");
-    printf(" SCA ");
-    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbs), lag_); printf(" lag_\n");
+    //printf("%2lu ", nbs); print(nbv, y); printf("\n");
+    print_fe_exceptions("SCA");
+    //printf(" SCA ");
+    //printf("%2lu ", nbs); print(nbs, lag_); printf(" lag_\n");
     
     nan_fill(nbs, lag_);
 #if REAL_IS_DOUBLE && defined(__AVX__)
     projectForces_AVX(nbs, x, z);
     printf(" AVX ");
-    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbs), lag_); printf(" lag_\n");
-    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbv), z);
-    print_fe_exceptions("projectForcesAVX");
-#elif REAL_IS_DOUBLE && defined(__SSE3__)
+    //printf("%2lu ", nbs); print(nbs, lag_); printf(" lag_\n");
+    //printf("%2lu ", nbs); print(nbv, z);
+    print_fe_exceptions("AVX");
+#elif defined(__SSE3__)
     projectForces_SSE(nbs, x, z);
     printf(" SSE ");
-    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbs), lag_); printf(" lag_\n");
-    //printf("%2lu ", nbs); VecPrint::print(std::min(DISP,nbv), z);
-    print_fe_exceptions("projectForces_SSE");
+    //printf("%2lu ", nbs); print(nbs, lag_); printf(" lag_\n");
+    print_fe_exceptions("SSE");
 #else
     projectForces(nbs, x, z);
     printf(" ... ");
 #endif
     
-    real err = blas::max_diff(nbv, y, z);
-    if ( abs_real(err) > 64*REAL_EPSILON )
-        printf(" XXXX %e\n", err);
+    real err = blas::difference(nbv, y, z);
+    if ( std::isnan(err) || abs_real(err) > 64*REAL_EPSILON )
+    {
+        printf(" XXXX %e", err);
+        printf("\nSCA "); print(nbv, y);
+        printf("\nSSE "); print(nbv, z);
+        printf("\n");
+    }
     else
         printf(" okay--> %e\n", err);
     free_reals(x,y,z);
@@ -860,7 +856,7 @@ void timeProject(SIZE_T cnt, char const* str)
 
     zero_real(ALOC, x);
     FUNC(NSEG, force_, x);
-    VecPrint::print(std::min(DISP,NVAL+2), x);
+    print(NVAL+2, x);
 
     tic();
     for ( SIZE_T ii=0; ii<cnt; ++ii )
@@ -881,8 +877,8 @@ int main(int argc, char* argv[])
 {
     const SIZE_T CNT = 1<<20;
     RNG.seed();
-    std::cout << "DIM=" << DIM << "   " << __VERSION__ << "\n";
-    if ( 0 )
+    std::cout << "DIM=" << DIM << "  real " << sizeof(real) << " bytes   " << __VERSION__ << "\n";
+    if ( 1 )
     {
         for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
             checkProject(nbs);
