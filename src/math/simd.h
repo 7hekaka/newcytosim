@@ -34,7 +34,7 @@ inline static vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); 
 // load 1 float and convert to double and zero
 inline static vec2 load1d(float const* a) { return _mm_cvtps_pd(_mm_load_ss(a)); }
 // load 2 floats and convert to double
-inline static vec2 load2d(float const* a) { return _mm_cvtps_pd(_mm_loadl_epi64((__m128i*)a)); }
+inline static vec2 load2d(float const* a) { return _mm_cvtps_pd(_mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a))); }
 
 inline static void store1(double* a, vec2 b)   { _mm_store_sd(a, b); }
 inline static void store2(double* a, vec2 b)   { _mm_store_pd(a, b); }

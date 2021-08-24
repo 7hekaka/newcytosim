@@ -1380,7 +1380,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
         float * end = B + M;
         float const* pA = A + K;
         vec4f b = load2f(pB);
-        vec4f e = fnmadd4f(unpacklo4f(setzero2(), b), load2f(pA), b);
+        vec4f e = fnmadd4f(unpacklo4f(setzero4f(), b), load2f(pA), b);
         store2f(pB, e);
         b = duplo4f(b);
         e = duphi4f(e);

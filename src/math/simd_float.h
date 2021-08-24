@@ -58,11 +58,11 @@ inline static vec4f getlof(vec4f a)            { return _mm_movelh_ps(a, a); }
 inline static vec4f gethif(vec4f a)            { return _mm_movehl_ps(a, a); }
 
 // return { A1, A2, A3, B0 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-inline static vec4f catshift1f(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 4); }
+inline static vec4f catshift1f(vec4f a, vec4f b) { return _mm_castsi128_ps(_mm_alignr_epi8(_mm_castps_si128(b), _mm_castps_si128(a), 4)); }
 // return { A2, A3, B0, B1 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
 inline static vec4f catshift2f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
 // return { A3, B0, B1, B2 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-inline static vec4f catshift3f(vec4f a, vec4f b) { return _mm_alignr_epi8(b, a, 12); }
+inline static vec4f catshift3f(vec4f a, vec4f b) { return _mm_castsi128_ps(_mm_alignr_epi8(_mm_castps_si128(b), _mm_castps_si128(a), 12)); }
 
 inline static vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
 inline static vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }

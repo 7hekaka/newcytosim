@@ -28,7 +28,7 @@ set fiber actin
     segmentation = 0.5
     steric = 1, 0.01
 
-    display = ( line=2,1; tension=2 )
+    display = ( line=3; coloring=1; )
 }
 
 set hand binder
