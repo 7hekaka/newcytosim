@@ -2006,19 +2006,19 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             multiply(vSOL, tmp);
             blas::sub(dim, vRHS, tmp);
             oss << ": " << std::setw(11) << std::left << blas::nrm8(dim, tmp);
-            oss << " disp " << std::setw(11) << std::left << blas::nrm8(dim, vSOL);
+            oss << " dx " << std::setw(11) << std::left << blas::nrm8(dim, vSOL);
         }
         if ( prop->verbose & 4 )
         {
             unsigned cnt = std::max(1U, monitor.count());
-            factor = factor >> 10;
+            factor >>= 10;
             auto solve = cycles_ >> 10;
             oss << "  cycles " << precond << "T " << std::setw(8) << total;
             oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
             oss << " S " << std::setw(8) << solve << std::setw(6) << solve/cnt;
             oss << " R " << std::setw(6) << ( total - factor - solve ) / cnt;
         }
-        Cytosim::out << oss.str() << "\n";
+        Cytosim::out << oss.str() << std::endl;
     }
     
     cycles_ = total;
