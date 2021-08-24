@@ -47,7 +47,7 @@ inline static vec4f unpackhi4f(vec4f a, vec4f b)  { return _mm_unpackhi_ps(a,b);
 // returns { a[0], a[0], a[2], a[2] }
 inline static vec4f duplo4f(vec4f a)             { return _mm_shuffle_ps(a, a, 0xA0); }
 // returns { a[1], a[1], a[3], a[3] }
-inline static vec4f duphi4f(vec4f a)             { return _mm_shuffle_ps(a, a, 0xF5); }
+inline static vec4f duphi4f(vec4f a)             { return _mm_movehdup_ps(a); } //_mm_shuffle_ps(a, a, 0xF5); }
 
 // return { B1, A1 } from a = { A0, A1 } and b = { B0, B1 }
 inline static vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }

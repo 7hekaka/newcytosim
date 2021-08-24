@@ -31,13 +31,19 @@ inline static vec2 loaddup2(double const* a)        { return _mm_loaddup_pd(a); 
 inline static vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
 inline static vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
 
+// load 1 float and convert to double and zero
+inline static vec2 load1d(float const* a) { return _mm_cvtps_pd(_mm_load_ss(a)); }
+// load 2 floats and convert to double
+inline static vec2 load2d(float const* a) { return _mm_cvtps_pd(_mm_loadl_epi64((__m128i*)a)); }
+
 inline static void store1(double* a, vec2 b)   { _mm_store_sd(a, b); }
 inline static void store2(double* a, vec2 b)   { _mm_store_pd(a, b); }
 inline static void storedup(double* a, vec2 b) { _mm_store1_pd(a, b); }
 inline static void storelo(double* a, vec2 b)  { _mm_store_sd(a, b); }
 inline static void storeu2(double* a, vec2 b)  { _mm_storeu_pd(a, b); }
 
-inline static vec2 movedup2(vec2 a)          { return _mm_movedup_pd(a); }
+inline static vec2 duplo2(vec2 a)            { return _mm_movedup_pd(a); }
+inline static vec2 duphi2(vec2 a)            { return _mm_shuffle_pd(a, a, 0b11); }
 
 inline static vec2 mul1(vec2 a, vec2 b)      { return _mm_mul_sd(a,b); }
 inline static vec2 div1(vec2 a, vec2 b)      { return _mm_div_sd(a,b); }
@@ -203,7 +209,9 @@ inline static vec4 flipsign4(vec4 a)            { return _mm256_xor_pd(a, sgn111
 inline static vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
 inline static vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
 
+// returns { a[0], a[0], a[2], a[2] }
 inline static vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); } //_mm256_unpacklo_pd(a,a)
+// returns { a[1], a[1], a[3], a[3] }
 inline static vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_mm256_unpackhi_pd(a,a)
 
 /// copy a[0] into all elements of dst.

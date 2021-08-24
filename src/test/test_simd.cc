@@ -153,8 +153,8 @@ void test_swapSSE()
     dump(shuffle2(a,b,0b11), "0b11");
     dump(unpacklo2(a,b), "unpacklo");
     dump(unpackhi2(a,b), "unpackhi");
-    dump(movedup2(a),  "movedup(a)");
-    dump(movedup2(b),  "movedup(b)");
+    dump(duplo2(a),  "duplo2(a)");
+    dump(duphi2(a),  "duphi2(a)");
 }
 
 

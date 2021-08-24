@@ -12,6 +12,7 @@
  */
 
 #include <fstream>
+#include "dim.h"
 
 #include "assert_macro.h"
 #include "blas.h"
