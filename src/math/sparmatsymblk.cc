@@ -635,6 +635,8 @@ bool SparMatSymBlk::prepareForMultiply(int)
         {
             if ( column_[inx].isNotZero() )
                 nxt = inx;
+            else
+                column_[inx].deallocate();
             colidx_[inx] = nxt;
         }
     }

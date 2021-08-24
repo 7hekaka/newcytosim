@@ -614,6 +614,8 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
         {
             if ( pilar_[inx].size_ > 0 )
                 nxt = inx;
+            else
+                pilar_[inx].deallocate();
             colix_[inx] = nxt;
         }
     }
