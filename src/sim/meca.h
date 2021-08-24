@@ -130,7 +130,7 @@ The equation is formulated using linear-algebra:
  .
  
  
- Note: All Links have no effect if the given Mecapoint or Interpolation have a 
+ Note: addLinks() calls have no effect if the given Mecapoint or Interpolation have a
  point in common, because the matrix elements would not be calcuated correctly 
  in that case. Generally, such interactions are anyway not desirable. It would 
  correspond for example to a link between two point of the same segment, without 
@@ -220,7 +220,7 @@ private:
      arising from addSideLink() addSideSlidingLink(), etc.
     */
 #if PARALLELIZE_MATRIX
-    SparMatBlk    mFUL;
+    SparMatBlk mFUL;
 #else
     SparMatSymBlkDiag mFUL;
 #endif

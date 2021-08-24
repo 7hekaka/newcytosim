@@ -498,7 +498,7 @@ void Simul::solve_auto()
              Only adopt a more complicated method if the gain is significant.
              */
             autoPrecond = 0;
-            for ( unsigned m : { 0, 1, 4 } )
+            for ( unsigned m : { 0, 1, 6 } )
             {
                 if ( autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
                     autoPrecond = m;
@@ -508,7 +508,7 @@ void Simul::solve_auto()
                 char str[256], *ptr = str;
                 char*const end = str+sizeof(str);
                 ptr += snprintf(ptr, end-ptr, " precond selection %lu | method count cpu", N_TESTS);
-                for ( size_t u : { 0, 1, 4 } )
+                for ( size_t u : { 0, 1, 6 } )
                     ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, (real)autoCNT[u]/N_TESTS, autoCPU[u]/N_TESTS);
                 snprintf(ptr, end-ptr, " |  -----> %i", autoPrecond);
                 Cytosim::log << str << '\n';
@@ -521,8 +521,8 @@ void Simul::solve_auto()
         }
         else
         {
-            //alternate betwen { 0, 1, 4 }
-            autoPrecond = ( 1 + autoPrecond + 2*(autoPrecond==1) ) % 5;
+            //rotate betwen { 0, 1, 6 }
+            autoPrecond = ( 1 + autoPrecond + 4*(autoPrecond==1) ) % 7;
         }
     }
     else

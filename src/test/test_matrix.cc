@@ -26,8 +26,10 @@ typedef SparMatSymBlkDiag SparMatD;
 
 typedef unsigned SIZE_T;
 
-const size_t N_RUN = 16;
-const size_t N_MUL = 99;
+constexpr size_t N_RUN = 16;
+constexpr size_t N_MUL = 99;
+constexpr size_t CNT = N_RUN * N_MUL;
+constexpr size_t DIV = CNT << 18;
 
 #define PAD 4
 
@@ -269,8 +271,6 @@ void testMatrix(MATRIX & mat,
                 const size_t fill, size_t inx[], size_t iny[])
 {
     mat.resize(size);
-    const size_t CNT = N_RUN * N_MUL;
-    const size_t DIV = CNT << 18;
 
     tic();
     for ( size_t ii=0; ii<N_RUN; ++ii )
@@ -316,7 +316,7 @@ void testMatrix(MATRIX & mat,
 #ifdef _OPENMP
 #include <omp.h>
 
-constexpr size_t CHK = DIM*2;
+constexpr size_t CHUNK = DIM*4;
 
 
 template <typename MATRIX>
@@ -336,8 +336,8 @@ void checkMatrixParallel(MATRIX & mat, const size_t size,
         zero_real(size, z);
         omp_set_num_threads(1<<i);
         #pragma omp parallel for
-        for ( size_t u = 0; u < size; u += CHK )
-            mat.vecMulAdd(x, z, u, u+CHK);
+        for ( size_t u = 0; u < size; u += CHUNK )
+            mat.vecMulAdd(x, z, u, u+CHUNK);
         real sum1 = checksum(size, y, z);
         if ( sum != sum1 )
             printf(" %luT %+16.6f", 1<<i, sum1);
@@ -363,19 +363,19 @@ void testMatrixParallel(MATRIX & mat,
     {
         omp_set_num_threads(1<<i);
         tic();
-        for ( size_t j=0; j < N_RUN*N_MUL; ++j )
+        for ( size_t j=0; j < CNT; ++j )
         {
             #pragma omp parallel for
-            for ( size_t i = 0; i < size; i += CHK )
-            {
-                mat.vecMulAdd(y, z, i, i+CHK);
-                mat.vecMulAdd(x, z, i, i+CHK);
-            }
+            for ( size_t i = 0; i < size; i += CHUNK )
+                mat.vecMulAdd(y, z, i, i+CHUNK);
+            #pragma omp parallel for
+            for ( size_t i = 0; i < size; i += CHUNK )
+                mat.vecMulAdd(x, z, i, i+CHUNK);
         }
-        t[i] = toc();
+        t[i] = toc(DIV);
     }
 
-    printf("\n%-28s", mat.what().c_str());
+    printf("\n%-32s", mat.what().c_str());
     for ( int i = 0; i < sup; ++i )
         printf("  %luT %6.3f", 1<<i, t[i]);
 }
@@ -397,7 +397,6 @@ void testIsoMatrix(MATRIX & mat,
                    const size_t fill, size_t inx[], size_t iny[])
 {
     mat.resize(size);
-    const size_t DIV = ( N_RUN * N_MUL ) << 18;
 
     tic();
     for ( size_t i=0; i<N_RUN; ++i )
@@ -465,8 +464,10 @@ void testMatrices(const size_t size, const size_t fill)
     setVectors(DIM*size, x, y, z);
     alpha = RNG.sreal();
     
+#if 1
     SparMat1 mat1; testMatrix(mat1, size, x, y, z, fill, inx, iny);
     SparMat2 mat2; testMatrix(mat2, size, x, y, z, fill, inx, iny);
+#endif
 #if 1
     SparMatB mat3; testMatrix(mat3, size, x, y, z, fill, inx, iny);
     SparMatD mat4; testMatrix(mat4, size, x, y, z, fill, inx, iny);
@@ -692,7 +693,7 @@ int main( int argc, char* argv[] )
     //testMatrices(DIM*8*169, 1<<17);
     testMatrices(DIM*8*331, 1<<18);
 #endif
-    testMatrices(DIM*8*111, 1<<18);
+    testMatrices(DIM*8*111, 1<<17);
 #if ( 0 )
     //testMatrices(DIM*17, 23);
     size_t dim[5] = { 0 };

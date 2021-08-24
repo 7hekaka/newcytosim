@@ -10,14 +10,17 @@ The selection is done with the parameter 'precondition':
 	    verbose = 1
 	}
 	
-Possible values of `precondition` are: 0, 1, 2, 3 and 4:
+Possible values of `precondition` are:
 
 - 0 is no preconditionning
 - 1 is a reduced banded symmetric preconditionner with 2 off-diagonals
 - 2 is a reduced symmetric block preconditionner
 - 3 is a reduced non-symmetric block preconditionner
-- 4 is a fullsize non-symmetric block preconditionner
+- 4 is a full sized symmetric banded block preconditionner
+- 5 is a full sized symmetric block preconditionner
+- 6 is a full sized non-symmetric block preconditionner
 
+The 'reduced' preconditionners have size N instead of DIM*N, when N is the number of vertices of the Mecable.
 A higher setting uses more calculation and memory, to offer a better approximation of 
 the true matrix. This creates a tradeoff in terms of performance. 
 Preconditionning can improve convergence, and thus diminish the number of iterations needed 
@@ -36,8 +39,8 @@ where here on Frame 5:
 - `size` is the size of the linear system
 - `kern` is the size of the largest mecable in the system
 - `SMSBD ` is the type of matrix, in this case `Sparse Matrix Symmetric Block Diagonal`
-- `precond` is the preconditionning method
-- `count` is the number of step taken by the iterative solver (Bi-Conjugate Gradient Stabilized)
+- `precond` is the preconditionning method 
+- `count` is the number of steps taken by the iterative solver (Bi-Conjugate Gradient Stabilized) to converge
 - `residual` is the remaining error in the solution (required to be below the parameter `tolerance`)
 
 
@@ -69,14 +72,14 @@ In this case, `message.cmo` will include a summary as follows:
 	F10         9.00s   CPU      0.447s           4s
 	        size 3*3400 kern 17 SMSBx +9*6 precond 1 count   8 residual 0.00113671 
 	        size 3*3400 kern 17 SMSBx +9*5 precond 1 count   8 residual 0.000948063
-	 precond selection 8 | method count cpu | 0 34.2 4 | 1 7.8 2 | 2 12.8 5 | 4 2.0 16 |  -----> 1
+	 precond selection 8 | method count cpu | 0 34.2 4 | 1 7.8 2 | 2 12.8 5 | 6 2.0 16 |  -----> 1
 
 Line 1 is Frame 10, at 9 seconds and the system is 3D of size `3*3400`.
 
 - Preconditionnig 0 required 34.2 iterations and ~4 sec of CPU.
 - Preconditionnig 1 required 7.8 iterations and ~2 sec of CPU.
 - Preconditionnig 2 required 12.8 iterations and ~5 sec of CPU.
-- Preconditionnig 4 required 2.0 iterations and ~16 sec of CPU.
+- Preconditionnig 6 required 2.0 iterations and ~16 sec of CPU.
 
 Hence the best precondionning method is '1'. 
 In this case, it allowed to solve the system about twice faster than without preconditionning : 2 seconds versus 4.

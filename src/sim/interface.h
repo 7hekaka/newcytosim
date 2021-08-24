@@ -26,9 +26,9 @@ private:
     /// Simul member function pointer
     using SimulFuncPtr = void (Simul::*)();
     
-    /// perform `cnt` simulation steps using Simul::FUNC
+    /// perform `cnt` simulation steps also calling Simul::FUNC at each step
     template < SimulFuncPtr FUNC >
-    void execute_run(size_t& sss, size_t cnt);
+    void do_steps(size_t& sss, size_t cnt);
 
 public:
     

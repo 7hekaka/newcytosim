@@ -25,7 +25,7 @@ void SimulProp::clear()
     kT                = 0.0042;
     tolerance         = 0.05;
     acceptable_prob   = 0.5;
-    precondition      = 1;
+    precondition      = 0;
     precondition_span = 2;
     random_seed       = 0;
     

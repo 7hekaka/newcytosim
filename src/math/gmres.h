@@ -11,10 +11,11 @@
 //#include "vecprint.h"
 
 /**
- With this option set to 1, GMRES iterates with M*P instead of P*M,
- where M is the matrix and P the preconditionner.
- In both cases, the solution to M*sol = rhs is returned.
- With Right-sided preconditionner, the residual is calculated correctly
+ With this option set to 1, GMRES iterates with `M*Q` instead of `Q*M`,
+ where M is the matrix and Q the preconditionner.
+ In both cases, the solution to `M*sol = rhs` is returned.
+ 
+ Using a Right-sided preconditionner is preferred, since the residual is calculated correctly
 */
 #define RIGHTSIDED_PRECONDITIONNER 1
 

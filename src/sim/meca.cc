@@ -488,7 +488,10 @@ size_t Meca::preconditionnerSize() const
 #pragma mark - Combined Multiply-Precondition
 /*
  In parallel execution, the preconditionning and multiply can be intertwined,
- because preconditionning is a diagonal square matrix
+ because preconditionning is a diagonal square matrix.
+ 
+ The functions below apply the preconditionner after the system matrix, and
+ are not used currently.
  */
 
 #if PARALLELIZE_MATRIX
@@ -1366,7 +1369,7 @@ void Meca::computePrecondFull(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
     
-#if REAL_IS_DOUBLE
+#if CHOUCROUTE && REAL_IS_DOUBLE
     mec->blockSize(bks, 1+bks*bks/2, bks);
     // temporary memory to build matrix block:
     real * blk = new_real(bks*bks);
@@ -1398,7 +1401,7 @@ void Meca::computePrecondFull(Mecable* mec)
         ++bump_;
     }
     
-#if REAL_IS_DOUBLE
+#if CHOUCROUTE && REAL_IS_DOUBLE
     convert_to_floats(bks*bks, blk, (float*)mec->block());
     free_real(blk);
 #endif
@@ -1744,6 +1747,12 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real* fff, real 
      'vFOR' <- calculate force with new positions: 'M * Xnew + B'
  
  The function Meca::apply() sends 'VPTS' and 'vFOR' back to the Mecable.
+ 
+ 
+ Note: This currently solves the system ( 1 - time_step * P * M ) * x = b
+ Since both M and P are symmetric, we can obtain an equivalent system by Woodbury's identity:
+         x = b + time_step * P * inverse( 1 - time_step * M * P ) * M * b
+ This adds 2 Mat.vec, but swaps M and P for the iterative solver.
  */
 size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 {
