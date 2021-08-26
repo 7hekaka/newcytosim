@@ -32,8 +32,15 @@ namespace SaveImage
     int saveColorPPM(FILE*, const uint8_t[], int width, int height);
     
     /// uncompressed RGB TGA format (https://en.wikipedia.org/wiki/Truevision_TGA)
+    int saveTGA(FILE*, const uint8_t[], bool color, int width, int height);
+
+    /// save RGB Truevision TGA format
     int saveColorTGA(FILE*, const uint8_t[], int width, int height);
 
+    /// save Grayscale Truevision TGA format
+    int saveGrayTGA(FILE*, const uint8_t[], int width, int height);
+
+    
     /// write PNG image
     int savePNG(FILE*, const uint8_t[], int bit_depth, int num_colors, int width, int height);
 

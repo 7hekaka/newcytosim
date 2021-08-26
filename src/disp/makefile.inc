@@ -23,13 +23,16 @@ endif
 #----------------------------targets--------------------------------------------
 
 
-cytodisp.a: $(OBJ_DISP) saveimage.o offscreen.o
+cytodisp.a: $(OBJ_DISP) saveimageGL.o offscreen.o
 	$(MAKELIB)
 	$(DONE)
 
 
 saveimage.o: saveimage.cc saveimage.h
 	$(COMPILE) $(IMAGES_DEF) -c $< -o build/$@
+
+saveimageGL.o: saveimage.cc saveimage.h
+	$(COMPILE) $(IMAGES_DEF) -DDISPLAY -c $< -o build/$@
 
 
 offscreen.o: offscreen.cc offscreen.h offscreen_fbo.cc offscreen_glx.cc

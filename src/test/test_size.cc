@@ -21,19 +21,12 @@
 
 int main(int argc, char* argv[])
 {
-    if ( argc > 1 )
+    int x = ( argc>1 ? atoi(argv[1]) : 0 );
+    if ( x == 2 )
     {
         PRINT(Random);
         PRINT(Array<int>);
 
-        PRINT(SparMatSym::Element);
-        PRINT(SparMatSym1::Element);
-        PRINT(SparMatSym2::Element);
-        
-        PRINT(SparMatBlk::Line);
-        PRINT(SparMatSymBlk::Column);
-        PRINT(SparMatSymBlkDiag::Column);
-        
         PRINT(PointGrid)
         PRINT(FatVector);
         PRINT(FatPoint);
@@ -44,24 +37,13 @@ int main(int argc, char* argv[])
         PRINT(BigLocus);
         PRINT(BigLocusList);
         PRINT(LocusGrid);
-
+        
         PRINT(Rasterizer::Vertex2);
         PRINT(Rasterizer::Vertex2d);
         PRINT(Rasterizer::Vertex3);
     }
-    else
+    else if ( x == 1 )
     {
-        PRINT(Vector1);
-        PRINT(Vector2);
-        PRINT(Vector3);
-        PRINT(Vector4);
-        
-        PRINT(Matrix11);
-        PRINT(Matrix22);
-        PRINT(Matrix33);
-        PRINT(Matrix34);
-        PRINT(Matrix44);
-        
         PRINT(Mecapoint);
         PRINT(FiberSegment);
         PRINT(Interpolation);
@@ -88,5 +70,27 @@ int main(int argc, char* argv[])
         PRINT(Sphere);
         PRINT(Event);
         PRINT(Simul);
+    }
+    else
+    {
+        PRINT(Vector1);
+        PRINT(Vector2);
+        PRINT(Vector3);
+        PRINT(Vector4);
+        
+        PRINT(Matrix11);
+        PRINT(Matrix22);
+        PRINT(Matrix33);
+        PRINT(Matrix34);
+        PRINT(Matrix44);
+        
+        PRINT(SparMatSym::Element);
+        PRINT(SparMatSym1::Element);
+        PRINT(SparMatSym2::Element);
+        
+        PRINT(SparMatBlk::Line);
+        PRINT(SparMatSymBlk::Column);
+        PRINT(SparMatSymBlkDiag::Block);
+        PRINT(SparMatSymBlkDiag::Pilar);
     }
 }

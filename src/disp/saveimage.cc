@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#ifndef NO_OPENGL
+#ifdef DISPLAY
 #  include "opengl.h"
 #endif
 
@@ -35,9 +35,9 @@ static void free_pixels(uint8_t *& ptr)
 
 
 //------------------------------------------------------------------------------
-#pragma mark Images
+#pragma mark Getting Images from OpenGL
 
-#ifndef NO_OPENGL
+#ifdef DISPLAY
 
 /**
  saveImage(...) will read pixels from the current OpenGL read buffer,
@@ -390,13 +390,13 @@ int SaveImage::saveColorPPM(FILE* file,
  save RGB Truevision TGA format
  https://en.wikipedia.org/wiki/Truevision_TGA
  */
-int SaveImage::saveColorTGA(FILE* file,
-                            const uint8_t pixels[],
-                            const int width, const int height)
+int SaveImage::saveTGA(FILE* file,
+                       const uint8_t pixels[], const bool color,
+                       const int width, const int height)
 {
     uint8_t header[18] = { 0 };
     // Data code type -- 2 - uncompressed RGB image.
-    header[2] = 2;
+    header[2] = (color?2:3);
     // Image width - low byte
     header[12] = width & 0xFF;
     // Image width - high byte
@@ -406,13 +406,25 @@ int SaveImage::saveColorTGA(FILE* file,
     // Image height - high byte
     header[15] = (height >> 8) & 0xFF;
     // Color bit depth
-    header[16] = 24;
+    header[16] = (color?24:8);
 
-    fwrite(header, sizeof(uint8_t), 18, file);
-    fwrite(pixels, sizeof(uint8_t), width * height * 3, file);
+    fwrite(header, 1, 18, file);
+    fwrite(pixels, 1, width * height * (color?3:1), file);
     return NO_ERROR;
 }
 
+
+/// save RGB Truevision TGA format
+int SaveImage::saveColorTGA(FILE* file, const uint8_t pixels[], int width, int height)
+{
+    return saveTGA(file, pixels, 1, width, height);
+}
+
+/// save Grayscale Truevision TGA format
+int SaveImage::saveGrayTGA(FILE* file, const uint8_t pixels[], int width, int height)
+{
+    return saveTGA(file, pixels, 0, width, height);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - PNG format
