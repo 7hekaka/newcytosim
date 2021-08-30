@@ -1016,8 +1016,9 @@ void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, real* B)
     }
 }
 
-/** specialized DTRSM('L','U','N','I', M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED),
- with multiplication by the diagonal term instead of division in BLAS
+/**
+ Modified DTRSM('L','U','N','I', M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED),
+ with multiplication by the diagonal terms, when BLAS normally uses divisions
  */
 void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, real* B)
 {
@@ -1190,6 +1191,29 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
                 pA += 1;
                 pB += 1;
             }
+#if defined(__AVX__)
+            if ( ( end - pB ) & 3 )
+            {
+                vec2 a = fnmadd2(t0, load2d(pA), loadu2(pB));
+                a = fnmadd2(t1, load2d(pA+lda), a);
+                a = fnmadd2(t2, load2d(pA+lda*2), a);
+                storeu2(pB, a);
+                pA += 2;
+                pB += 2;
+            }
+            vec4 tt0 = duplo2f128(cast4(t0));
+            vec4 tt1 = duplo2f128(cast4(t1));
+            vec4 tt2 = duplo2f128(cast4(t2));
+            while ( pB < end )
+            {
+                vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
+                aa = fnmadd4(tt1, load4d(pA+lda), aa);
+                aa = fnmadd4(tt2, load4d(pA+lda*2), aa);
+                storeu4(pB, aa);
+                pA += 4;
+                pB += 4;
+            }
+#else
             # pragma ivdep
             while ( pB < end )
             {
@@ -1200,6 +1224,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
                 pA += 2;
                 pB += 2;
             }
+#endif
         }
         pA += lda*2;
     }
@@ -1335,7 +1360,29 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
                 a = fnmadd1(t2, load1d(pA+lda*2), a);
                 store1(pB, a);
             }
-            # pragma ivdep
+#if defined(__AVX__)
+            if ( ( pB - B ) & 3 )
+            {
+                pA -= 2;
+                pB -= 2;
+                vec2 a = fnmadd2(t0, load2d(pA), loadu2(pB));
+                a = fnmadd2(t1, load2d(pA+lda), a);
+                a = fnmadd2(t2, load2d(pA+lda*2), a);
+                storeu2(pB, a);
+            }
+            vec4 tt0 = duplo2f128(cast4(t0));
+            vec4 tt1 = duplo2f128(cast4(t1));
+            vec4 tt2 = duplo2f128(cast4(t2));
+            while ( pB > B )
+            {
+                pA -= 4;
+                pB -= 4;
+                vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
+                aa = fnmadd4(tt1, load4d(pA+lda), aa);
+                aa = fnmadd4(tt2, load4d(pA+lda*2), aa);
+                storeu4(pB, aa);
+            }
+#else
             while ( pB > B )
             {
                 pA -= 2;
@@ -1345,6 +1392,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
                 a = fnmadd2(t2, load2d(pA+lda*2), a);
                 storeu2(pB, a);
             }
+#endif
         }
     }
 }

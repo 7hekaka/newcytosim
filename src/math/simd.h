@@ -225,10 +225,10 @@ inline static vec4 broadcastX(vec4 a) { return _mm256_movedup_pd(_mm256_permute2
 /// swap the two 128 bit lanes
 inline static vec4 swap2f128(vec4 a)  { return _mm256_permute2f128_pd(a, a, 0x01); }
 
-/// return { A0, A0 } from a = { A0, A1 }
+/// return { a[0], a[1], a[0], a[1] }
 inline static vec4 duplo2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x00); }
 
-/// return { A1, A1 } from a = { A0, A1 }
+/// return { a[2], a[3], a[2], a[3] }
 inline static vec4 duphi2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x11); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
@@ -255,6 +255,9 @@ inline static vec4 catshift3(vec4 a, vec4 b) { return _mm256_shuffle_pd(_mm256_p
 
 /// zero out last scalar
 inline static vec4 clear4th(vec4 a) { return _mm256_blend_pd(a,_mm256_setzero_pd(),0b1000); }
+
+/// load 4 single precision and convert to double precision
+inline static vec4 load4d(float const* a) { return _mm256_cvtps_pd(_mm_load_ps(a)); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
 inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos) { return _mm256_blendv_pd(pos, neg, val); }
