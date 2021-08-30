@@ -740,7 +740,7 @@ public:
     void saveMatrix(FILE *, real threshold) const;
     
     /// Save right-hand-side vector
-    void saveRHS(FILE *) const;
+    void saveVector(FILE *, real const*) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
     void saveSystem() const;

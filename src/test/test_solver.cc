@@ -8,7 +8,7 @@
 */
 
 #include <cstdio>
-#define DEBUG_REAL
+
 #include "real.h"
 #include "real_print.h"
 #include "blas.h"
@@ -67,7 +67,7 @@ public:
 
     
     /// read MatrixMarket format
-    int read(FILE * file)
+    int readMatrix(FILE * file)
     {
         constexpr size_t MAX = 1024;
         char str[MAX], * ptr;
@@ -76,7 +76,6 @@ public:
             // skip comments:
         } while ( str[0] == '%' );
         // parse dimension line:
-        printf(" reading matrix: %s", str);
         unsigned long lin = strtoul(str, &ptr, 10);
         unsigned long col = strtoul(ptr, &ptr, 10);
         unsigned long cnt = strtoul(ptr, &ptr, 10);
@@ -95,17 +94,24 @@ public:
     }
     
     /// read matrix from file
-    int read(const char filename[])
+    int readMatrix(const char filename[])
     {
-        int err = 0;
+        int err = 1;
         FILE * f = fopen(filename, "r");
-        if ( f && ~ferror(f) )
+        if ( f )
         {
-            err = read(f);
-            if ( err )
-                fprintf(stderr, "failed to read matrix (error %i)\n", err);
+            if ( ~ferror(f) )
+            {
+                printf(" reading `%s`", filename);
+                err = readMatrix(f);
+                if ( err )
+                    printf(" ... failed (error %i)", err);
+                printf("\n");
+            }
             fclose(f);
         }
+        else
+            printf("file not found `%s`\n", filename);
         return err;
     }
 };
@@ -120,7 +126,6 @@ int readVector(FILE * file, size_t dim, real * vec)
         // skip comments:
     } while ( str[0] == '%' );
     // parse dimension line:
-    printf(" reading vector: %s", str);
     unsigned long cnt = strtoul(str, nullptr, 10);
     for ( size_t i = 0; i < cnt; ++i )
     {
@@ -134,15 +139,22 @@ int readVector(FILE * file, size_t dim, real * vec)
 
 int readVector(const char filename[], size_t dim, real * vec)
 {
-    int err = 0;
+    int err = 1;
     FILE * f = fopen(filename, "r");
-    if ( f && ~ferror(f) )
+    if ( f )
     {
-        err = readVector(f, dim, vec);
-        if ( err )
-            fprintf(stderr, "failed to read vector (error %i)\n", err);
+        if ( ~ferror(f) )
+        {
+            printf(" reading `%s`", filename);
+            err = readVector(f, dim, vec);
+            if ( err )
+                printf("... failed (error %i)", err);
+            printf("\n");
+        }
+        fclose(f);
     }
-    fclose(f);
+    else
+        printf("file not found `%s`\n", filename);
     return err;
 }
 
@@ -150,7 +162,8 @@ int readVector(const char filename[], size_t dim, real * vec)
 int main(int argc, char* argv[])
 {
     System sys;
-    sys.read("matrix.mtx");
+    if ( sys.readMatrix("matrix.mtx") )
+        return 1;
     const int dim = sys.dimension();
 
     LinearSolvers::Matrix mH, mV;           // Matrices used for GMRES
@@ -159,12 +172,18 @@ int main(int argc, char* argv[])
 
     // create vectors
     real * rhs = new_real(dim);
-    real * sol = new_real(dim);
-    real * vec = new_real(dim);
 
     // get system's right-hand-side
     zero_real(dim, rhs);
-    readVector("vector.mtx", dim, rhs);
+    if ( readVector("vector.mtx", dim, rhs) )
+    {
+        free_real(rhs);
+        return 2;
+    }
+    
+    real * sol = new_real(dim);
+    real * vec = new_real(dim);
+
     print_real(stdout, std::min(16, dim), rhs, " rhs\n");
 
     if ( 1 )

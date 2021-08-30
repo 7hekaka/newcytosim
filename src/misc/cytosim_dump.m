@@ -34,7 +34,7 @@ if isfolder(path)
     if ( length(stp) > 1 )
         abstol = stp(2);
     end
-    obj = fread(fopen('obj.bin'), dim, 'uint32');
+    obj = fread(fopen('obj.bin'), dim, 'uint32');  % object id
     mob = fread(fopen('mob.bin'), dim, precision);
     SYS = fread(fopen('sys.bin'), [dim, dim], precision);
     ela = fread(fopen('ela.bin'), [dim, dim], precision);  % elasticity matrix
@@ -78,11 +78,11 @@ if ( 0 )
     
     nbo = 0;
     nbv = 0;
-    for o = 0:max(max(obj))
-        i = find(obj==o);
-        if ~isempty(i)
+    for o = 0:max(obj)
+        n = sum(obj==o);
+        if n > 0
             nbo = nbo + 1;
-            nbv = nbv + length(i)^2;
+            nbv = nbv + n^2;
         end
     end
     
@@ -252,12 +252,34 @@ end
 title('Convergence');
 drawnow;
 
+
+%% Check convergence on each subspace
+fprintf(1, '  --  --  --  --  --  --  --  -- REDUCED SYSTEMS --  --  --  --  --  --  --  --  --\n');
+
+if 0
+    % solve a system using the block corresponding to each Mecable
+    off = 0;
+    for o = 0:max(obj)
+        n = sum(obj==o);
+        if n > 1
+            fprintf(2, '  Block %i size %3i:', o, n);
+            M = SYS(off+(1:n), off+(1:n));
+            [vec,~,res,itr] = bicgstab(M, rhs(off+(1:n)), reltol, maxit);
+            err = norm(vec-solution(off+(1:n)));
+            fprintf(1, ' bCGstab reached residual %f within %2.0f matvecs (error %f)\n', res, 2*itr, err);
+        end
+        off = off + n;
+    end
+    return;
+end
+
+
 %% USING LOADED PRECONDITIONNER CALCULATED BY CYTOSIM
 fprintf(1, '  --  --  --  --  --  --  --  -- PRECONDITIONNED --  --  --  --  --  --  --  --  --\n');
 
 % Calculate block-diagonal preconditionner
 BDP = zeros(dim);
-for o = 0:max(max(obj))
+for o = 0:max(obj)
     x = find(obj==o);
     if ~isempty(x)
         BDP(x,x) = inv(SYS(x,x));
@@ -465,7 +487,7 @@ end
 
 %% check preconditionning with iLU on the full matrix
 
-if 1
+if 0
     
     % preconditionner = incomplete LU factorization
     clear OPT;
@@ -510,18 +532,22 @@ if 0
     report('tiLU bicgstab', mulcnt, vec, res, rv0);
 
 end
-if 1
+if 0
     
     % try to reduce the preconditionner:    
     rLU = dimension_collapse(LU, ord(2));
-    fprintf(2, 'collapsed rLU    has %i elements\n', nnz(rLU));
+    fprintf(2, 'collapsed  rLU   has %i elements\n', nnz(rLU));
 
+    if 0
+        xLU = diagonal_expand(rLU, ord(2));
+        mulcnt = 0;
+        [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, xLU);
+        report('pilu bicgstab', mulcnt, vec, res, rv0);
+    end
     xLU = diagonal_expand(rLU, ord(2));
-    mulcnt = 0;
-    [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, xLU);
-    report('pilu bicgstab', mulcnt, vec, res, rv0);
-    
-    xLU = block_expand(rLU, ord(2));
+    % replace block diagonal by full preconditionner:
+    xLU(logical(CON)) = 0;
+    xLU = xLU + sparse(CON);
     mulcnt = 0;
     [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, xLU);
     report('xilu bicgstab', mulcnt, vec, res, rv0);
@@ -628,17 +654,18 @@ drawnow;
     end
 
     function res = block_expand(mat, D)
-        res = sparse(size(mat,1)*D, size(mat,2)*D);
+        zis = size(mat,1)*D;
+        res = sparse(zis, size(mat,2)*D);
         if ( D == 3 )
             for d = 1:3
-                iii = d:3:size(mat,1);
+                iii = d:3:zis;
                 res(iii, 1:3:end) = mat;
                 res(iii, 2:3:end) = mat;
                 res(iii, 3:3:end) = mat;
             end
         elseif ( D == 2 )
             for d = 1:2
-                iii = d:2:size(mat,1);
+                iii = d:2:zis;
                 res(iii, 1:2:end) = mat;
                 res(iii, 2:2:end) = mat;
             end

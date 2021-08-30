@@ -452,13 +452,13 @@ inline void applyPreconditionner(Mecable const* mec, real* Y)
 }
 
 
-/// apply preconditionner to entire system
+/// apply preconditionner to entire system: Y <- Preconditionner * X
+/** This can be done in parallel if the preconditionner is block-diagonal */
 void Meca::precondition(const real* X, real* Y) const
 {
     auto rdt = __rdtsc();
     if ( Y != X )
         copy_real(dimension(), X, Y);
-    blas::xscal(dimension(), 10, Y, 1);
     
 #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable const* mec : mecables )
@@ -2266,25 +2266,35 @@ void Meca::saveMatrix(FILE * file, real threshold) const
     real * dst = new_real(dim);
     zero_real(dim, src);
     
-    const size_t cnt = nbNonZeros(threshold);
-    fprintf(file, "%lu %lu %lu\n", dim, dim, cnt);
-    
+    fprintf(file, "%lu %lu ", dim, dim);
+
+    fpos_t pos;
+    fgetpos(file, &pos);
+    size_t cnt = 0;
+    fprintf(file, "%10lu\n", cnt);
+
     for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1;
         multiply(src, dst);
         for ( size_t i = 0; i < dim; ++i )
             if ( abs_real(dst[i]) > threshold )
+            {
                 fprintf(file, "%3lu %3lu %f\n", i, j, dst[i]);
+                ++cnt;
+            }
         src[j] = 0;
     }
     
+    fsetpos(file, &pos);
+    fprintf(file, "%10lu\n", cnt);
+
     free_real(dst);
     free_real(src);
 }
 
 
-void Meca::saveRHS(FILE * file) const
+void Meca::saveVector(FILE * file, real const* VEC) const
 {
     fprintf(file, "%% This is a vector produced by Cytosim\n");
     fprintf(file, "%% author: FJ Nedelec\n");
@@ -2294,7 +2304,7 @@ void Meca::saveRHS(FILE * file) const
     fprintf(file, "%lu\n", dim);
     
     for ( size_t i = 0; i < dim; ++i )
-        fprintf(file, "%f\n", vRHS[i]);
+        fprintf(file, "%f\n", VEC[i]);
 }
 
 /**
@@ -2307,7 +2317,7 @@ void Meca::saveSystem() const
     fclose(f);
     
     f = FilePath::open_file("vector.mtx", "w");
-    saveRHS(f);
+    saveVector(f, vRHS);
     fclose(f);
 }
 
@@ -2534,7 +2544,7 @@ void Meca::dumpObjectID(FILE * file) const
 {
     uint32_t * vec = new uint32_t[largestMecable()];
     
-    uint32_t i = 0;
+    uint32_t i = 1;
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
