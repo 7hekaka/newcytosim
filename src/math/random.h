@@ -51,7 +51,7 @@ class alignas(64) Random
     uint32_t const* start_;
 
     /// pointer to integer reserve, at unused upper end + 1
-    uint32_t const* end_;
+    uint32_t const* finish_;
     
     /// pointer to access the next value in `gaussians_[]`
     real * next_gaussian_;
@@ -66,33 +66,33 @@ protected:
     {
         memcpy(integers_, twister_.state, 4*SFMT_N32);
         start_ = integers_;
-        end_ = start_ + SFMT_N32;
+        finish_ = start_ + SFMT_N32;
         sfmt_gen_rand_all(&twister_);
     }
 
     /// extract next 32 random bits
     uint32_t URAND32()
     {
-        if ( end_ <= start_ )
+        if ( finish_ <= start_ )
             refill();
-        --end_;
-        return *end_;
+        --finish_;
+        return *finish_;
     }
 
     /// extract next 32 random bits as signed integer
     int32_t RAND32()
     {
-        if ( end_ <= start_ )
+        if ( finish_ <= start_ )
             refill();
-        --end_;
-        return *reinterpret_cast<int32_t const*>(end_);
+        --finish_;
+        return *reinterpret_cast<int32_t const*>(finish_);
     }
     
     /// extract next 64 random bits
     uint64_t URAND64()
     {
         // consume data from the 'start_' to preserve alignment
-        if ( end_ <= 1 + start_ )
+        if ( finish_ <= 1 + start_ )
             refill();
         uint64_t const* p = reinterpret_cast<uint64_t const*>(start_);
         start_ += 2;
@@ -103,7 +103,7 @@ protected:
     int64_t RAND64()
     {
         // consume data from the 'start_' to preserve alignment
-        if ( end_ <= 1 + start_ )
+        if ( finish_ <= 1 + start_ )
             refill();
         int64_t const* p = reinterpret_cast<int64_t const*>(start_);
         start_ += 2;

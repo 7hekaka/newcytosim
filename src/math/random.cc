@@ -52,7 +52,7 @@ Random::Random()
 
     // initialize pointers signalling an empty reserve:
     start_ = integers_;
-    end_ = start_;
+    finish_ = start_;
     next_gaussian_ = gaussians_;
     next_exponential_ = exponentials_;
 }
