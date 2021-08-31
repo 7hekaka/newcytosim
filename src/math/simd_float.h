@@ -54,7 +54,9 @@ inline static vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }
 // return { A0, B0 } from a = { A0, A1 } and b = { B0, B1 }
 inline static vec4f movelh4f(vec4f a, vec4f b) { return _mm_movelh_ps(a, b); }
 
+// return { A0, A1, A0, A1 }
 inline static vec4f getlof(vec4f a)            { return _mm_movelh_ps(a, a); }
+// return { A2, A3, A2, A3 }
 inline static vec4f gethif(vec4f a)            { return _mm_movehl_ps(a, a); }
 
 // return { A1, A2, A3, B0 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }

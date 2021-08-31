@@ -9,6 +9,7 @@
 #include "stream_func.h"
 #include "simul_prop.h"
 #include "simul.h"
+#include "print_color.h"
 #include <fstream>
 
 
@@ -35,8 +36,13 @@ Parser::Parser(Simul& sim, bool s, bool c, bool n, bool r, bool w)
 /// check for unused values in Glossary and issue a warning
 void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t cnt = 1)
 {
-    if ( opt.has_warning(std::cerr, cnt) )
+    std::string war;
+    if ( opt.has_warning(war, cnt) )
     {
+        size_t L;
+        Cytosim::log << war << " in " << StreamFunc::get_line(is, ipos, L) << " (line " << L << ")\n";
+        // also report to standard error:
+        print_yellow(std::cerr, war);
         std::cerr << '\n';
         StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
     }

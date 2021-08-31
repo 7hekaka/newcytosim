@@ -30,6 +30,9 @@ namespace StreamFunc
     
     
     /// extract line containing given `pos'
+    std::string get_line(std::istream&, std::streampos pos, size_t&);
+    
+    /// extract line containing given `pos'
     std::string get_line(std::istream&, std::streampos pos);
 
     /// extract the lines located between `start` and `end`, with line numbers

@@ -189,7 +189,9 @@ inline static vec4 broadcast1(double const* a)  { return _mm256_broadcast_sd(a);
 /// load 2 doubles and duplicate: X, Y, X, Y
 inline static vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d const*)a); }
 
+// return { A0, A1 }
 inline static vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
+// return { A2, A3 }
 inline static vec2 gethi(vec4 a)                { return _mm256_extractf128_pd(a,1); }
 
 inline static vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }

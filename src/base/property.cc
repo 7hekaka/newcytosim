@@ -29,12 +29,16 @@ void Property::read_string(std::string const& str, std::string const& msg)
 {
     if ( str.size() > 0 )
     {
+        std::string war;
         //std::clog << "reading " << msg << "=(" << str << ")\n";
         try {
             Glossary glos(str);
             read(glos);
-            if ( glos.has_warning(std::cerr) )
-                std::cerr << " in `" << msg << "'\n";
+            if ( glos.has_warning(war) )
+            {
+                //print_yellow(std::cerr, war);
+                std::cerr << war << " in `" << msg << "'\n";
+            }
         } catch(Exception & e) {
             std::cerr << e.brief() << e.info() << '\n';
         }

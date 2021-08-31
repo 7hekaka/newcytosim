@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
         return 3;
     }
     
-    arg.print_warning(cerr, 1, " on command line\n");
+    arg.print_warnings(cerr, 1, " on command line\n");
     time_t sec = TicToc::seconds_since_1970();
     
     try {

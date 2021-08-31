@@ -289,11 +289,11 @@ public:
     /// returns true if `key[inx]==val`, or false otherwise. Counter is incremented in case of match
     bool value_is(key_type const& key, size_t inx, std::string const& val) const;
     
-    /// print message about unused values and values used multiple times; return warning code
-    int has_warning(std::ostream&, size_t threshold = 1) const;
+    /// set message if values were unused or used multiple times; return warning code
+    int has_warning(std::string&, size_t threshold = 1) const;
     
     /// print message about unused values and values used multiple times
-    void print_warning(std::ostream&, size_t threshold, std::string const&) const;
+    void print_warnings(std::ostream&, size_t threshold, std::string const&) const;
 
     //-------------------------------------------------------------------------------
     #pragma mark -

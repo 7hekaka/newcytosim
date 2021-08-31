@@ -300,7 +300,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        arg.print_warning(std::cerr, 1, "\n");
+        arg.print_warnings(std::cerr, 1, "\n");
         print_error(e);
         return 4;
     }
@@ -371,11 +371,11 @@ int main(int argc, char* argv[])
         }
         printf("\n");
         OffScreen::closeContext();
-        arg.print_warning(std::cerr, 1, "\n");
+        arg.print_warnings(std::cerr, 1, "\n");
         return 0;
     }
     
-    arg.print_warning(std::cerr, 1, "\n");
+    arg.print_warnings(std::cerr, 1, "\n");
 
     //--------- initialize Window system and create Window
 #if ( HEADLESS_PLAYER )

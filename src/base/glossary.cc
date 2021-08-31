@@ -746,21 +746,21 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
 
 
 /**
- @returns the type of warning associated with entire set of terms
+ @returns the type of warning associated with the entire set of terms
  If the return value is not zero, a message was printed to 'os', and
  at least a terminating '\n' should be printed to 'os' by the calling function.
  */
-int Glossary::has_warning(std::ostream& os, size_t threshold) const
+int Glossary::has_warning(std::string& str, size_t threshold) const
 {
     int res = 0;
-    std::string msg;
+    std::string war;
     for ( auto const& i : mTerms )
     {
-        int val = warning(i, msg, threshold);
+        int val = warning(i, war, threshold);
         if ( val )
         {
-            if ( res ) os.put('\n');
-            print_yellow(os, msg);
+            if ( res ) str.push_back('\n');
+            str.append(war);
             res |= val;
         }
     }
@@ -768,10 +768,14 @@ int Glossary::has_warning(std::ostream& os, size_t threshold) const
 }
 
 
-void Glossary::print_warning(std::ostream& os, size_t threshold, std::string const& msg) const
+void Glossary::print_warnings(std::ostream& os, size_t threshold, std::string const& msg) const
 {
-    if ( has_warning(os, threshold) )
+    std::string war;
+    if ( has_warning(war, threshold) )
+    {
+        print_yellow(os, war);
         os << msg;
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -213,18 +213,32 @@ std::string StreamFunc::get_lines(std::istream& is, std::streampos s, std::strea
 }
 
 
-std::string StreamFunc::get_line(std::istream& is, std::streampos pos)
+std::string StreamFunc::get_line(std::istream& is, std::streampos pos, size_t& cnt)
 {
     if ( !is.good() )
         is.clear();
-    
+    std::streampos isp = is.tellg();
+
     is.seekg(0);
     std::string line;
+    cnt = 0;
     
     while ( is.good()  &&  is.tellg() <= pos )
+    {
         std::getline(is, line);
-
+        ++cnt;
+    }
+    
+    is.clear();
+    is.seekg(isp);
     return line;
+}
+
+
+std::string StreamFunc::get_line(std::istream& is, std::streampos pos)
+{
+    size_t cnt;
+    return get_line(is, pos, cnt);
 }
 
 
@@ -233,11 +247,11 @@ size_t StreamFunc::line_number(std::istream& is, std::streampos pos)
     if ( !is.good() )
         is.clear();
     
-    std::streampos sos = is.tellg();
+    std::streampos isp = is.tellg();
     is.seekg(0);
     
     if ( pos == -1 )
-        pos = sos;
+        pos = isp;
     
     size_t cnt = 0;
     std::string line;
@@ -249,7 +263,7 @@ size_t StreamFunc::line_number(std::istream& is, std::streampos pos)
     }
     
     is.clear();
-    is.seekg(sos);
+    is.seekg(isp);
     return cnt;
 }
 

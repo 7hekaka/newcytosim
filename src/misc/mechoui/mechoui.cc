@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
     
     pam.read(arg);
     glApp::currentView().read(arg);
-    arg.print_warning(std::cerr, 1, "\n");
+    arg.print_warnings(std::cerr, 1, "\n");
     glApp::newWindow(display);
     gle::initialize();
     

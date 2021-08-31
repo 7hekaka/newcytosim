@@ -168,5 +168,5 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    arg.print_warning(std::cerr, cnt, "\n");
+    arg.print_warnings(std::cerr, cnt, "\n");
 }
