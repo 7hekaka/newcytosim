@@ -1106,8 +1106,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double*
         # pragma ivdep
         while ( pB < end )
         {
-            vec2 a = load2d(pA);
-            storeu2(pB, fnmadd2(t, a, loadu2(pB)));
+            storeu2(pB, fnmadd2(t, load2d(pA), loadu2(pB)));
             pA += 2;
             pB += 2;
         }
@@ -1137,9 +1136,9 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double*
         # pragma ivdep
         while ( pB < end )
         {
-            vec2 a = fnmadd2(b, load2d(pA), loadu2(pB));
-            a = fnmadd2(c, load2d(pA+lda), a);
-            storeu2(pB, a);
+            vec2 x = fnmadd2(b, load2d(pA), loadu2(pB));
+            x = fnmadd2(c, load2d(pA+lda), x);
+            storeu2(pB, x);
             pA += 2;
             pB += 2;
         }
@@ -1184,20 +1183,20 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
         {
             if ( ( end - pB ) & 1 )
             {
-                vec2 a = fnmadd1(t0, load1d(pA), load1(pB));
-                a = fnmadd1(t1, load1d(pA+lda), a);
-                a = fnmadd1(t2, load1d(pA+lda*2), a);
-                store1(pB, a);
+                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+                x = fnmadd1(t1, load1d(pA+lda), x);
+                x = fnmadd1(t2, load1d(pA+lda*2), x);
+                store1(pB, x);
                 pA += 1;
                 pB += 1;
             }
 #if defined(__AVX__)
             if ( ( end - pB ) & 3 )
             {
-                vec2 a = fnmadd2(t0, load2d(pA), loadu2(pB));
-                a = fnmadd2(t1, load2d(pA+lda), a);
-                a = fnmadd2(t2, load2d(pA+lda*2), a);
-                storeu2(pB, a);
+                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x);
+                x = fnmadd2(t2, load2d(pA+lda*2), x);
+                storeu2(pB, x);
                 pA += 2;
                 pB += 2;
             }
@@ -1217,10 +1216,10 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
             # pragma ivdep
             while ( pB < end )
             {
-                vec2 a = fnmadd2(t0, load2d(pA), loadu2(pB));
-                a = fnmadd2(t1, load2d(pA+lda), a);
-                a = fnmadd2(t2, load2d(pA+lda*2), a);
-                storeu2(pB, a);
+                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x);
+                x = fnmadd2(t2, load2d(pA+lda*2), x);
+                storeu2(pB, x);
                 pA += 2;
                 pB += 2;
             }
@@ -1259,8 +1258,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
         # pragma ivdep
         while ( pB < end )
         {
-            vec2 a = load2d(pA);
-            storeu2(pB, fnmadd2(t, a, loadu2(pB)));
+            storeu2(pB, fnmadd2(t, load2d(pA), loadu2(pB)));
             pA += 2;
             pB += 2;
         }
@@ -1291,19 +1289,20 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
         double * pB = B;
         double * end = B + K;
         float const* pA = A;
-        vec2 b = loadu2(end);
-        vec2 z = load2d(pA+lda+K);
-        vec2 e = mul2(z, b); // { --, T1 }
-        e = unpackhi2(e, e); // { T1, T1 }
-        b = mul2(fnmadd2(e, z, b), load2d(pA+K)); // { T0, ? }
-        storeu2(end, blend11(b, e));
-        b = unpacklo2(b, b); // { T0, T0 }
+        vec2 t0 = loadu2(end);
+        vec2 a = load2d(pA+lda+K);
+        vec2 t1 = mul2(a, b); // { --, T1 }
+        t1 = unpackhi2(t1, t1); // { T1, T1 }
+        t0 = mul2(fnmadd2(t1, a, t0), load2d(pA+K)); // { T0, ? }
+        storeu2(end, blend11(t0, t1));
+        t0 = unpacklo2(t0, t0); // { T0, T0 }
         # pragma ivdep
         while ( pB < end )
         {
-            vec2 a = load2d(pA);
-            vec2 x = load2d(pA+lda);
-            storeu2(pB, fnmadd2(e, x, fnmadd2(b, a, loadu2(pB))));
+            vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+            x = fnmadd2(t1, load2d(pA+lda), x);
+            x = fnmadd2(t2, load2d(pA+lda*2), x);
+            storeu2(pB, x);
             pA += 2;
             pB += 2;
         }
@@ -1333,6 +1332,8 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
         real T2 = A[lda*2+K+2] * B[K+2];
         real T1 = A[lda  +K+1] * ( B[K+1] - T2 * A[lda*2+K+1] );
         real T0 = A[      K  ] * ( B[K  ] - T2 * A[lda*2+K  ] - T1 * A[lda+K] );
+#endif
+#if 0
         B[K  ] = T0;
         B[K+1] = T1;
         B[K+2] = T2;
@@ -1342,33 +1343,42 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
 #endif
         double * pB = B + K;
         float const* pA = A + K;
-        vec2 t2 = mul2(loaddup2(pB+2), duplo2(load1d(pA+2*lda+2))); // { T2, T2 }
-        vec2 t0 = fnmadd2(t2, load2d(pA+2*lda), loadu2(pB)); // { -, T1/A }
-        vec2 b = load2d(pA+lda);
-        vec2 t1 = duphi2(mul2(t0, b)); // { T1, T1 }
-        t0 = duplo2(mul2(fnmadd2(t1, b, t0), load2d(pA))); // { T0, T0 }
-        storeu2(pB, blend11(t0, t1));
-        store1(pB+2, t2);
+        vec2 t0, t1, t2;
+        {
+            vec4f f = loadu4f(pA+2*lda); // last value not used
+            vec2 a0 = _mm_cvtps_pd(f);
+            vec2 a1 = _mm_cvtps_pd(broadcastZf(f));
+            t2 = mul2(loaddup2(pB+2), a1); // { T2, T2 }
+            a1 = load2d(pA+lda);
+            t0 = fnmadd2(t2, a0, loadu2(pB)); // { preT0, T1/A }
+            a0 = load1d(pA);
+            t1 = duphi2(mul2(a1, t0)); // { T1, T1 }
+            t0 = fnmadd1(t1, a1, t0); // { T0/A, - }
+            t0 = duplo2(mul1(a0, t0)); // { T0, T0 }
+        }
+        storeu2(pB+1, blend11(t1, t2));
+        store1(pB, t0);
         if ( pB > B )
         {
+            // there could be a odd number of scalar remaining:
             if ( ( pB - B ) & 1 )
             {
                 --pA;
                 --pB;
-                vec2 a = fnmadd1(t0, load1d(pA), load1(pB));
-                a = fnmadd1(t1, load1d(pA+lda), a);
-                a = fnmadd1(t2, load1d(pA+lda*2), a);
-                store1(pB, a);
+                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+                x = fnmadd1(t1, load1d(pA+lda), x);
+                x = fnmadd1(t2, load1d(pA+lda*2), x);
+                store1(pB, x);
             }
 #if defined(__AVX__)
             if ( ( pB - B ) & 3 )
             {
                 pA -= 2;
                 pB -= 2;
-                vec2 a = fnmadd2(t0, load2d(pA), loadu2(pB));
-                a = fnmadd2(t1, load2d(pA+lda), a);
-                a = fnmadd2(t2, load2d(pA+lda*2), a);
-                storeu2(pB, a);
+                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x);
+                x = fnmadd2(t2, load2d(pA+lda*2), x);
+                storeu2(pB, x);
             }
             vec4 tt0 = duplo2f128(cast4(t0));
             vec4 tt1 = duplo2f128(cast4(t1));
@@ -1387,10 +1397,10 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
             {
                 pA -= 2;
                 pB -= 2;
-                vec2 a = fnmadd2(t0, load2d(pA), loadu2(pB));
-                a = fnmadd2(t1, load2d(pA+lda), a);
-                a = fnmadd2(t2, load2d(pA+lda*2), a);
-                storeu2(pB, a);
+                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x);
+                x = fnmadd2(t2, load2d(pA+lda*2), x);
+                storeu2(pB, x);
             }
 #endif
         }
@@ -1420,8 +1430,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
         # pragma ivdep
         while ( pB < end )
         {
-            vec2 a = load2d(pA);
-            storeu2(pB, fnmadd2(t, a, loadu2(pB)));
+            storeu2(pB, fnmadd2(t, load2d(pA), loadu2(pB)));
             pA += 2;
             pB += 2;
         }
