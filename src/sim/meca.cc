@@ -118,8 +118,7 @@ void Meca::allocate(size_t alc)
         // make a multiple of chunk to keep pointers aligned:
         allocated_ = chunk_real(alc);
         
-        // pad with 4 doubles to allow some SIMD instruction burr
-        alc = DIM * allocated_ + 4;
+        alc = DIM * allocated_;
         allocate_vector(alc, vPTS, 1);
         allocate_vector(alc, vSOL, 1);
         allocate_vector(alc, vBAS, 0);
@@ -182,19 +181,18 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
 {
     assert_true( empty() || ( X != F && X != B && F != B ));
     
-    // F <- B
-    copy_real(dimension(), B, F);      //blas::xcopy(dimension(), B, 1, F, 1);
+#if USE_ISO_MATRIX
+    if ( useFullMatrix )
+#endif
+        mFUL.vecMul(X, F);        // F <- mFUL * X
     
 #if USE_ISO_MATRIX
     // F <- F + mISO * X
     mISO.VECMULADDISO(X, F);
-
-    if ( useFullMatrix )
 #endif
-    {
-        // F <- F + mFUL * X
-        mFUL.vecMulAdd(X, F);
-    }
+    
+    // F <- F + B
+    blas::add(dimension(), B, F);
 }
 
 
@@ -1583,7 +1581,8 @@ void Meca::prepare(Simul const* sim)
         cnt += mec->nbPoints();
     }
     nPoints_ = cnt;
-    allocate(cnt);
+    // allocate extra to allow some SIMD instruction burr
+    allocate(cnt+1);
     
 #if USE_ISO_MATRIX
     //allocate the sparse matrices:
