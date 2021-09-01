@@ -6,7 +6,7 @@
 #include "vecprint.h"
 
 
-void Mecafil::buildProjection()
+void Mecafil::initProjection()
 {
     //reset all variables for the projections:
     iProj  = nullptr;
@@ -176,7 +176,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     // calculate the lagrangian coefficients:
     blas::xgemv('N', nbs, nbv, 1., iJJtiJ, nbs, force, 1, 0., iLag, 1);
     
-    //printf("Lagrange: "); VecPrint::print(std::clog, nbc, iLag);
+    //VecPrint::print("Lagrange: ", nbc, iLag);
     
     // select expensive forces ( lagrangian > 0 )
     useProjectionDiff = false;
@@ -191,7 +191,7 @@ void Mecafil::makeProjectionDiff(const real* force)
             iJJtJF[ii] = 0.0;
     }
     
-    //printf("diffP ");VecPrint::print(std::clog, nbs, iJJtJF);
+    //VecPrint::print("diffP ", nbs, iJJtJF);
     
     //set up the first term in the derivative of J with respect to variable x[ii]
     //set up term  P * (dJ)t * inverse(J*Jt) * J * force:

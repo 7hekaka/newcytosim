@@ -103,7 +103,7 @@ void Simul::step()
     //auto rdt = __rdtsc();
     // increment time:
     prop->time += prop->time_step;
-    //printf("\n------ time is %8.3f\n", prop->time);
+    //fprintf(stderr, "\n----------------------------------- time is %8.3f\n", prop->time);
 
     // mix object lists
     events.shuffle();

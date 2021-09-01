@@ -59,7 +59,7 @@ Selection of projectForces() routines optimized for some architectures
 #pragma mark -
 
 
-void Mecafil::buildProjection()
+void Mecafil::initProjection()
 {
     //reset all variables for the projections:
     iJJt   = nullptr;
@@ -102,7 +102,8 @@ void Mecafil::destroyProjection()
 
 #if NEW_ANISOTROPIC_FIBER_DRAG
 
-/// version for drag coefficients doubled in directions orthogonal to fiber
+/** This version assumes that drag coefficients are double in the directions
+ orthogonal to the fiber axis, ie. it works with anisotropic fiber drag  */
 void Mecafil::makeProjection()
 {
     assert_true( nbPoints() >= 2 );
@@ -132,9 +133,9 @@ void Mecafil::makeProjection()
 
     if ( 0 )
     {
-        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, iJJt, 3);
-        std::clog << "\nU "; VecPrint::print(std::clog, nbu, iJJtU, 3);
-        //std::clog << "\nX="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
+        VecPrint::print("D", nbu+1, iJJt, 2);
+        VecPrint::print("U", nbu, iJJtU, 2);
+        //VecPrint::print("X", DIM*(nbu+2), pPos, 2);
     }
 
     if ( info )
@@ -146,7 +147,7 @@ void Mecafil::makeProjection()
 
 #else
 
-/// standard version with isotropic drag coefficient
+/** This is the standard version assuming isotropic drag coefficients */
 void Mecafil::makeProjection()
 {
     assert_true( nbPoints() >= 2 );
@@ -186,11 +187,11 @@ void Mecafil::makeProjection()
     int info = 0;
     DPTTRF(nbu+1, iJJt, iJJtU, &info);
 
-    if ( 0 )
+    if ( 1 )
     {
-        std::clog << "\nD "; VecPrint::print(std::clog, nbu+1, iJJt, 3);
-        std::clog << "\nU "; VecPrint::print(std::clog, nbu, iJJtU, 3);
-        //std::clog << "\nX="; VecPrint::print(std::clog, DIM*(nbu+2), pPos);
+        VecPrint::print("D", nbu+1, iJJt, 2);
+        VecPrint::print("U", nbu, iJJtU, 2);
+        //VecPrint::print("X", DIM*(nbu+2), pPos, 2);
     }
 
     if ( info )
@@ -284,7 +285,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
 #endif
     
     const size_t nbs = nbSegments();
-    //printf("X  "); VecPrint::print(std::clog, DIM*nbPoints(), X);
+    //VecPrint::print("X", DIM*nbPoints(), X);
 
     // calculate `iLLG` without modifying `X`
 #if NEW_ANISOTROPIC_FIBER_DRAG
@@ -304,7 +305,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
 #if NEW_ANISOTROPIC_FIBER_DRAG
     scaleTangentially(nPoints, Y, iAni, Y);
 #endif
-    //printf("Y  "); VecPrint::print(std::clog, DIM*nbPoints(), Y);
+    //VecPrint::print("Y", DIM*nbPoints(), Y);
 }
 
 
@@ -325,6 +326,7 @@ void Mecafil::computeTensions(const real* force)
 }
 
 
+/** This extracts the matrix underlying the 'Mecafil::projectForces()' */
 void Mecafil::printProjection(std::ostream& os) const
 {
     const size_t nbv = DIM * nbPoints();
@@ -342,7 +344,7 @@ void Mecafil::printProjection(std::ostream& os) const
     }
     free_real(dst);
     free_real(src);
-    os << "Mecafil:Projection  " << reference() << '\n';
+    os << "Mecafil:Projection  " << reference() << " (" << nbPoints() << ")\n";
     VecPrint::print(os, nbv, nbv, res, nbv);
     free_real(res);
 }
@@ -375,9 +377,9 @@ void Mecafil::makeProjectionDiff(const real* force)
     real e = blas::difference(nbs, iLLG, iLag);
     if ( e > 1e-6 )
     {
-        fprintf(stderr, "\n|iLag - iLLG| = %e", e);
-        fprintf(stderr, "\niLag "); VecPrint::print(std::clog, std::min(16LU,nbs), iLag);
-        fprintf(stderr, "\niLLG "); VecPrint::print(std::clog, std::min(16LU,nbs), iLLG);
+        std::clog << "\n|iLag - iLLG| = " << e << "\n";
+        VecPrint::print("\niLag ", std::min(16LU,nbs), iLag);
+        VecPrint::print("\niLLG ", std::min(16LU,nbs), iLLG);
     }
 #endif
     
@@ -403,7 +405,7 @@ void Mecafil::makeProjectionDiff(const real* force)
             iJJtJF[jj] = std::max(threshold, alpha * iLLG[jj]);
         
         //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtJF) << '\n';
-        //std::clog << "projectionDiff:"; VecPrint::print(std::clog, std::min(20u,nbs), iJJtJF);
+        //VecPrint::print("projectionDiff:", std::min(20u,nbs), iJJtJF);
     }
 }
 
@@ -445,8 +447,8 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
     if ( e > 1e-6 )
     {
         std::clog << "\naddProjectionDiff(" << nbp << ") error " << e;
-        std::clog << "\nref "; VecPrint::print(std::clog, std::min(16UL,nbp), vec);
-        std::clog << "\nopt "; VecPrint::print(std::clog, std::min(16UL,nbp), Y);
+        VecPrint::print("\nref ", std::min(16UL,nbp), vec);
+        VecPrint::print("\nopt ", std::min(16UL,nbp), Y);
     }
     free_real(vec);
 #endif

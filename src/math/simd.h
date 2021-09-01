@@ -69,12 +69,14 @@ inline static vec2 set2(double a, double b)  { return _mm_set_pd(a, b); }
 inline static vec2 set2(double a)            { return _mm_set1_pd(a); }
 inline static vec2 setzero2()                { return _mm_setzero_pd(); }
 
+/// return { a[0], b[0] }
 inline static vec2 unpacklo2(vec2 a, vec2 b) { return _mm_unpacklo_pd(a,b); }
+/// return { a[1], b[1] }
 inline static vec2 unpackhi2(vec2 a, vec2 b) { return _mm_unpackhi_pd(a,b); }
 inline static vec2 swap2(vec2 a)             { return _mm_shuffle_pd(a, a, 0b01); }
 
-/// concatenate and shift left by 1 steps, making { BC } from a={ AB } b={ CD }
-inline static vec2 catshift1(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b01); }
+/// concatenate and shift left, returning { BC } from a={ AB } b={ CD }
+inline static vec2 catshift(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b01); }
 
 #define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
 #define cmp2(a,b,k)       _mm_cmp_pd(a,b,k)

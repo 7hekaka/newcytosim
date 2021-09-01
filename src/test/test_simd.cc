@@ -425,7 +425,7 @@ void unpack_matrix()
     
     vec2 m0h = blend11(cd, zz),  m0l = ab;
     vec2 m1h = blend11(ef, zz),  m1l = unpackhi2(ab, cd);
-    vec2 m2h = catshift1(ef, zz), m2l = unpacklo2(cd, ef);
+    vec2 m2h = catshift(ef, zz), m2l = unpacklo2(cd, ef);
     
     dump(cat4(m0h, m0l), "m0 ");
     dump(cat4(m1h, m1l), "m1 ");

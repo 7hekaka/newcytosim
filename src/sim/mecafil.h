@@ -104,7 +104,7 @@ protected:
 private:
     
     /// reset the memory pointers for the projection
-    void  buildProjection();
+    void  initProjection();
     
     /// allocate memory for the projection
     void  allocateProjection(size_t);
@@ -169,7 +169,7 @@ public:
 
     //--------------------- Projection  / Dynamics
     
-    /// prepare for projection
+    /// prepare for projection by building projection matrix
     void        makeProjection();
 
 #if ADD_PROJECTION_DIFF

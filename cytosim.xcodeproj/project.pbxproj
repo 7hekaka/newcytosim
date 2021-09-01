@@ -644,7 +644,7 @@
 		BB9711671DECDB7E00352630 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
 		BB9711681DECDB8200352630 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
 		BB9711691DECDB8500352630 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
-		BB97116A1DECDB8F00352630 /* saveimage.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97115E1DECDA1300352630 /* saveimage.cc */; };
+		BB97116A1DECDB8F00352630 /* saveimage.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97115E1DECDA1300352630 /* saveimage.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB97116B1DECDB9500352630 /* offscreen.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711591DECDA1300352630 /* offscreen.cc */; };
 		BB97116C1DECDBA000352630 /* gle_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711521DECDA1300352630 /* gle_color.cc */; };
 		BB97116D1DECDBA300352630 /* gle_color_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711541DECDA1300352630 /* gle_color_list.cc */; };

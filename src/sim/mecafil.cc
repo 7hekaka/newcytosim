@@ -12,7 +12,7 @@
 //------------------------------------------------------------------------------
 Mecafil::Mecafil()
 {
-    buildProjection();
+    initProjection();
     iPointMobility = 0;
     iRigidity = 0;
     iDir = nullptr;
@@ -138,7 +138,8 @@ void Mecafil::storeDirections()
     for ( size_t p = 0; p < lastPoint(); ++p )
         normalize(diffPoints(p)).store(iDir+DIM*p);
 #endif
-    
+    //VecPrint::print("iDir", end, iDir);
+
 #if NEW_ANISOTROPIC_FIBER_DRAG
     /*
      Calculate the average filament direction at each vertex
@@ -155,7 +156,7 @@ void Mecafil::storeDirections()
     for ( size_t p = DIM ; p < end; ++p )
         iAni[p] = 0.5 * ( dir[p-DIM] + dir[p] );
 
-    //VecPrint::print(std::clog, last+DIM, iAni);
+    //VecPrint::print("iAni", end+DIM, iAni);
 #endif
 }
 
@@ -173,8 +174,8 @@ void Mecafil::storeDirections()
 
 #else
 
-void Mecafil::buildProjection()   {}  //DIM == 1
-void Mecafil::makeProjection()    {}  //DIM == 1
+void Mecafil::initProjection() {}  //DIM == 1
+void Mecafil::makeProjection() {}  //DIM == 1
 void Mecafil::destroyProjection() {}  //DIM == 1
 void Mecafil::allocateProjection(size_t) {}  //DIM == 1
 
