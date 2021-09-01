@@ -187,7 +187,7 @@ void Mecafil::makeProjection()
     int info = 0;
     DPTTRF(nbu+1, iJJt, iJJtU, &info);
 
-    if ( 1 )
+    if ( 0 )
     {
         VecPrint::print("D", nbu+1, iJJt, 2);
         VecPrint::print("U", nbu, iJJtU, 2);

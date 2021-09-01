@@ -133,6 +133,9 @@ inline static vec2 streamload2(double const* a) { return _mm_castsi128_pd(_mm_st
 
 #else
 
+/// return { a[0], b[1] }
+inline static vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
+
 inline static vec2 streamload2(double const* a) { return _mm_load_pd(a); }
 
 #endif
@@ -247,7 +250,7 @@ inline static vec4 blend31(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1000);
 inline static vec4 blend22(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1100); }
 inline static vec4 blend13(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1110); }
 
-/// concatenate, making { BCDE } from a={ AB } b={ CD }
+/// concatenate, making { ABCD } from a={ AB } b={ CD }
 inline static vec4 concatenate22(vec2 a, vec2 b) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(a),b,1); }
 
 /// concatenate and shift left by 1 steps, making { BCDE } from a={ ABCD } b={ EFGH }

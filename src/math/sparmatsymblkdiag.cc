@@ -1601,31 +1601,22 @@ void SparMatSymBlkDiag::Column::vecMulAdd4D_AVX(const double* X, double* Y, size
     double const* D = dia_;
     //multiply with the symmetrized block, assuming it has been symmetrized:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-    vec4 s0, s1, s2;
+    vec4 s0, s1, s2, s3;
+    vec4 x0, x1, x2, x3;
     {
         vec4 tt = load4(X+jj);
         s0 = mul4(streamload4(D   ), tt);
         s1 = mul4(streamload4(D+4 ), tt);
         s2 = mul4(streamload4(D+8 ), tt);
         s3 = mul4(streamload4(D+12), tt);
-    }
-    // sum non-diagonal elements:
-#if ( 0 )
-    const vec4 x0 = broadcast1(X+jj);
-    const vec4 x1 = broadcast1(X+jj+1);
-    const vec4 x2 = broadcast1(X+jj+2);
-    const vec4 x3 = broadcast1(X+jj+3);
-#else
-    vec4 x0, x1, x2, x3;
-    {
-        x1 = duplo2f128(tt);
-        x3 = duphi2f128(tt);
-        x0 = duplo4(x1);
+        vec4 x1 = duplo2f128(tt);
+        vec4 x3 = duphi2f128(tt);
+        vec4 x0 = duplo4(x1);
         x1 = duphi4(x1);
-        x2 = duplo4(x3);
+        vec4 x2 = duplo4(x3);
         x3 = duphi4(x3);
     }
-#endif
+    // sum non-diagonal elements:
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
     for ( size_t n = 0; n < size_; ++n )

@@ -112,7 +112,7 @@ void print_fe_exceptions(const char* str, FILE * out = stdout)
 
 
 /// print only 16 scalars from given vector
-inline void print(size_t N, real const* vec)
+void print(size_t N, real const* vec)
 {
     if ( N > 16 )
     {
@@ -126,6 +126,12 @@ inline void print(size_t N, real const* vec)
     }
     printf(" |");
     VecPrint::print(DIM, vec+N);
+}
+
+void print(char const str[], size_t N, real const* vec)
+{
+    printf("%s", str);
+    print(N, vec);
 }
 
 //------------------------------------------------------------------------------
@@ -142,9 +148,9 @@ inline void DPTTRF(SIZE_T nbs)
     alsatian_xpttrf(nbs, diag_, upper_, &info);
 }
 
-inline void DPTTS2(SIZE_T nbs)
+inline void DPTTS2(SIZE_T nbs, real* lag)
 {
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, 0);
+    alsatian_xptts2(nbs, 1, diag_, upper_, lag, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -201,8 +207,8 @@ void setProjection(SIZE_T nbs)
 
     DPTTRF(nbs);
 #if ( 0 )
-    std::clog << "\nD "; print(nbs, diag_, 3);
-    std::clog << "\nU "; print(nbs-1, upper_, 3); std::clog << '\n';
+    print("\nD ", nbs, diag_, 3);
+    print("\nU ", nbs-1, upper_, 3); std::clog << '\n';
 #endif
 }
 
@@ -342,49 +348,6 @@ void projectForcesU2D_AVY(SIZE_T nbs, const real* dir, const real* src, real* mu
 
 //------------------------------------------------------------------------------
 #pragma mark - PROJECT UP 3D
-
-#if REAL_IS_DOUBLE && defined(__AVX__)
-
-inline void twine3x4(real const* X, real const* Y, real const* Z, real* dst)
-{
-    vec4 sx = load4(X);
-    vec4 sy = load4(Y);
-    vec4 sz = load4(Z);
-
-    vec4 zx = blend4(sx, sz, 0b0101);
-    zx = swap2f128(zx);
-    vec4 xy = unpacklo4(sx, sy);
-    vec4 yz = unpackhi4(sy, sz);
-    
-    storeu4(dst  , blend22(xy, zx));
-    storeu4(dst+4, blend22(yz, xy));
-    storeu4(dst+8, blend22(zx, yz));
-}
-
-/**
- make
-     dX = { XXXX }
-     dY = { YYYY }
-     dZ = { ZZZZ }
- from src = { XYZ XYZ XYZ XYZ }
- */
-inline void untwine4x3(real const* src, real* X, real* Y, real* Z)
-{
-    vec4 s0 = load4(src);
-    vec4 s1 = load4(src+4);
-    vec4 s2 = load4(src+8);
-
-    vec4 zx = blend22(s2, s0);
-    vec4 xy = blend22(s0, s1);
-    zx = swap2f128(zx);
-    vec4 yz = blend22(s1, s2);
-    
-    store4(X,   blend4(zx, xy, 0b0101));
-    store4(Y, shuffle4(xy, yz, 0b0101));
-    store4(Z,   blend4(zx, yz, 0b1010));
-}
-
-#endif
 
 template <void (*FUNC)(SIZE_T, const real*, const real*, real*)>
 void testU(SIZE_T cnt, char const* str)
@@ -641,6 +604,157 @@ void projectForcesD_FMA(SIZE_T nbs, const real* dir, const real* X, const real* 
      Y[B] = X[B] + dir[B] * mul[3] - dir[8] * mul[2];
  */
 
+#if ( DIM == 3 ) && defined(__SSE__)
+// SSE version using FMA
+void projectForcesD3D_sse(size_t nbs, const double* dir,
+                          const double* src, const double* mul, double* dst)
+{
+    real const*const end = mul + nbs - 1;
+    vec2 d0 = load2(dir);
+    vec2 d1 = load2(dir+2);
+    vec2 d2;
+
+    // first round involving 6 scalars = 3 SSE vectors
+    if ( mul < end )
+    {
+        vec2 BC = loadu2(mul);
+        vec2 BB = unpacklo2(BC, BC);
+        vec2 CC = unpackhi2(BC, BC);
+        vec2 AB = unpacklo2(setzero2(), BB);
+
+        d2 = load2(dir+4);
+
+        mul += 2;
+        vec2 a0 = fmadd2(BB, d0, loadu2(src  ));
+        vec2 a1 = fmadd2(BC, d1, loadu2(src+2));
+        vec2 a2 = fmadd2(CC, d2, loadu2(src+4));
+
+        storeu2(dst  , a0);
+        storeu2(dst+2, fnmadd2(AB, catshift(d0, d0), a1));
+        storeu2(dst+4, fnmadd2(BB, catshift(d0, d1), a2));
+        dir += 6;
+        dst += 6;
+        src += 6;
+    }
+    else
+    {
+        // only 2 points overall and one multiplicator
+        d1 = unpacklo2(d1, setzero2());
+
+        vec2 BB = loaddup2(mul);
+        vec2 AB = unpacklo2(setzero2(), BB);
+        vec2 BC = unpacklo2(BB, setzero2());
+
+        vec2 a0 = fmadd2(BB, d0, loadu2(src  ));
+        vec2 a1 = fmadd2(BC, d1, loadu2(src+2));
+        
+        storeu2(dst  , a0);
+        storeu2(dst+2, fnmadd2(AB, catshift(d0, d0), a1));
+        storeu2(dst+4, fnmadd2(BB, catshift(d0, d1), loadu2(src+4)));
+        return;
+    }
+#if 1
+    // unrolled processing 4 multipliers
+    while ( mul < end-3 )
+    {
+        vec2 AB = loadu2(mul-1);
+        vec2 CC = loaddup2(mul+1);
+        vec2 DE = loadu2(mul+2);
+        vec2 AA = unpacklo2(AB, AB);
+        vec2 BB = unpackhi2(AB, AB);
+        vec2 CD = unpacklo2(CC, DE);
+        vec2 DD = unpacklo2(DE, DE);
+        vec2 BC = unpackhi2(AB, CC);
+        vec2 EE = unpackhi2(DE, DE);
+
+        mul += 4;
+        vec2 dA = d1; // dir-4
+        vec2 dB = d2; // dir-2
+        vec2 dC = load2(dir  );
+        vec2 dD = load2(dir+2);
+        vec2 dE = load2(dir+4);
+        d0 = load2(dir+6);
+        d1 = load2(dir+8);
+        d2 = load2(dir+10);
+
+        vec2 a0 = fnmadd2(catshift(dA, dB), AA, loadu2(src  ));
+        vec2 a1 = fnmadd2(catshift(dB, dC), AB, loadu2(src+2));
+        vec2 a2 = fnmadd2(catshift(dC, dD), BB, loadu2(src+4));
+        vec2 b0 = fnmadd2(catshift(dD, dE), CC, loadu2(src+6));
+        vec2 b1 = fnmadd2(catshift(dE, d0), CD, loadu2(src+8));
+        vec2 b2 = fnmadd2(catshift(d0, d1), DD, loadu2(src+10));
+
+        storeu2(dst  , fmadd2(dC, BB, a0));
+        storeu2(dst+2, fmadd2(dD, BC, a1));
+        storeu2(dst+4, fmadd2(dE, CC, a2));
+        storeu2(dst+ 6, fmadd2(d0, DD, b0));
+        storeu2(dst+ 8, fmadd2(d1, DE, b1));
+        storeu2(dst+10, fmadd2(d2, EE, b2));
+        
+        dir += 12;
+        dst += 12;
+        src += 12;
+    }
+#endif
+    // bulk work processing 6 scalars = 2 vectors
+    while ( mul < end )
+    {
+        vec2 AB = loadu2(mul-1);
+        vec2 BC = loadu2(mul);
+        vec2 AA = unpacklo2(AB, AB);
+        vec2 BB = unpackhi2(AB, AB);
+        vec2 CC = unpackhi2(BC, BC);
+
+        mul += 2;
+        vec2 dA = d1;
+        vec2 dB = d2;
+        d0 = load2(dir  );
+        d1 = load2(dir+2);
+        d2 = load2(dir+4);
+        
+        vec2 a0 = fnmadd2(AA, catshift(dA, dB), loadu2(src  ));
+        vec2 a1 = fnmadd2(AB, catshift(dB, d0), loadu2(src+2));
+        vec2 a2 = fnmadd2(BB, catshift(d0, d1), loadu2(src+4));
+
+        storeu2(dst  , fmadd2(BB, d0, a0));
+        storeu2(dst+2, fmadd2(BC, d1, a1));
+        storeu2(dst+4, fmadd2(CC, d2, a2));
+        
+        dir += 6;
+        dst += 6;
+        src += 6;
+    }
+    // end points
+    if ( nbs & 1 )
+    {
+        // 2 points remaining = 6 scalars
+        vec2 AA = loaddup2(mul-1);
+        vec2 BB = loaddup2(mul);
+        vec2 AB = unpacklo2(AA, BB);
+
+        vec2 dA = d1;
+        vec2 dB = d2;
+        d0 = load2(dir);
+        d1 = unpacklo2(load2(dir+2), setzero2());
+
+        vec2 a0 = fnmadd2(AA, catshift(dA, dB), loadu2(src  ));
+        vec2 a1 = fnmadd2(AB, catshift(dB, d0), loadu2(src+2));
+        vec2 a2 = fnmadd2(BB, catshift(d0, d1), loadu2(src+4));
+
+        storeu2(dst  , fmadd2(BB, d0, a0));
+        storeu2(dst+2, fmadd2(BB, d1, a1));
+        storeu2(dst+4, a2);
+    }
+    else
+    {
+        // 1 point remains = 3 scalars
+        vec2 AA = loaddup2(mul-1);
+
+        storeu2(dst, fnmadd2(AA, catshift(d1, d2), loadu2(src)));
+        store1(dst+2, fnmadd1(AA, catshift(d2, d2), load1(src+2)));
+    }
+}
+#endif
 
 template < void (*FUNC)(SIZE_T, const real*, const real*, const real*, real*) >
 void testD(SIZE_T cnt, char const* str)
@@ -684,6 +798,7 @@ void testProjectionD(SIZE_T cnt)
     testD<projectForcesD2D_AVX>(cnt, " D_AVX");
 #endif
 #if ( DIM == 3 ) && defined(__SSE3__)
+    testD<projectForcesD3D_sse>(cnt, " D_sse");
     testD<projectForcesD3D_SSE>(cnt, " D_SSE");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
@@ -698,7 +813,7 @@ void testProjectionD(SIZE_T cnt)
 void projectForces(SIZE_T nbs, const real* X, real* Y)
 {
     projectForcesU_(nbs, dir_, X, lag_);
-    DPTTS2(nbs);
+    DPTTS2(nbs, lag_);
     projectForcesD_(nbs, dir_, X, lag_, Y);
 }
 
@@ -711,7 +826,7 @@ void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
 #else
     projectForcesU3D_SSE(nbs, dir_, X, lag_);
 #endif
-    DPTTS2(nbs);
+    DPTTS2(nbs, lag_);
 #if ( DIM == 2 )
     projectForcesD2D_SSE(nbs, dir_, X, lag_, Y);
 #else
@@ -722,7 +837,7 @@ void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
 void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
 {
     projectForcesU_(nbs, dir_, X, lag_);
-    DPTTS2(nbs);
+    DPTTS2(nbs, lag_);
     projectForcesD3D_SSE(nbs, dir_, X, lag_, Y);
 }
 #endif
@@ -736,7 +851,7 @@ void projectForces_AVX(SIZE_T nbs, const real* X, real* Y)
 #else
     projectForcesU3D_AVX(nbs, dir_, X, lag_);
 #endif
-    DPTTS2(nbs);
+    DPTTS2(nbs, lag_);
 #if ( DIM == 2 )
     projectForcesD2D_AVX(nbs, dir_, X, lag_, Y);
 #else
@@ -746,9 +861,10 @@ void projectForces_AVX(SIZE_T nbs, const real* X, real* Y)
 #endif
 
 
-void checkProject(SIZE_T nbs)
+template < void (*FUNC)(SIZE_T, const real*, real*) >
+void checkProject(SIZE_T nbs, const char msg[])
 {
-    printf("projectForces %2lu ", nbs);
+    printf("%s projectForces %2lu ", msg, nbs);
     real *x = nullptr, *y = nullptr, *z = nullptr;
     SIZE_T nbv = DIM * ( nbs + 1 );
     new_nans(nbv+4, x, y, z);
@@ -758,40 +874,21 @@ void checkProject(SIZE_T nbs)
     
     for ( SIZE_T i = 0; i < nbv; ++i )
         x[i] = RNG.sreal();
-    //print(nbv, dir_, 2); printf(" dir_\n");
     
     nan_fill(nbs, lag_);
-    projectForcesU_(nbs, dir_, x, lag_);
-    DPTTS2(nbs);
-    projectForcesD_(nbs, dir_, x, lag_, y);
-    //printf("%2lu ", nbs); print(nbv, y); printf("\n");
+    projectForces(nbs, x, y);
     print_fe_exceptions("SCA");
-    //printf(" SCA ");
-    //printf("%2lu ", nbs); print(nbs, lag_); printf(" lag_\n");
     
     nan_fill(nbs, lag_);
-#if REAL_IS_DOUBLE && defined(__AVX__)
-    projectForces_AVX(nbs, x, z);
-    printf(" AVX ");
-    //printf("%2lu ", nbs); print(nbs, lag_); printf(" lag_\n");
-    //printf("%2lu ", nbs); print(nbv, z);
-    print_fe_exceptions("AVX");
-#elif defined(__SSE3__)
-    projectForces_SSE(nbs, x, z);
-    printf(" SSE ");
-    //printf("%2lu ", nbs); print(nbs, lag_); printf(" lag_\n");
-    print_fe_exceptions("SSE");
-#else
-    projectForces(nbs, x, z);
-    printf(" ... ");
-#endif
+    FUNC(nbs, x, z);
+    print_fe_exceptions(msg);
     
     real err = blas::difference(nbv, y, z);
     if ( std::isnan(err) || abs_real(err) > 64*REAL_EPSILON )
     {
-        printf(" XXXX %e", err);
-        printf("\nSCA "); print(nbv, y);
-        printf("\nSSE "); print(nbv, z);
+        printf(" WRONG! %e", err);
+        print("\n ref ", nbv, y);
+        print("\n     ", nbv, z);
         printf("\n");
     }
     else
@@ -830,12 +927,12 @@ void scaleTangentiallyPTR(SIZE_T nbp, const real* src, const real* dir, real* ds
     }
 }
 
-void projectTangent(SIZE_T nbs, const real* X, real* Y)
+void projectAniso(SIZE_T nbs, const real* X, real* Y)
 {
     scaleTangentially(nbs+1, X, ani_, tmp_);
     projectForcesU_(nbs, dir_, tmp_, lag_);
     
-    DPTTS2(nbs);
+    DPTTS2(nbs, lag_);
 
     projectForcesD_(nbs, dir_, X, lag_, Y);
     scaleTangentially(nbs+1, Y, ani_, Y);
@@ -880,8 +977,14 @@ int main(int argc, char* argv[])
     std::cout << "DIM=" << DIM << "  real " << sizeof(real) << " bytes   " << __VERSION__ << "\n";
     if ( 1 )
     {
+#if REAL_IS_DOUBLE && defined(__AVX__)
         for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
-            checkProject(nbs);
+            checkProject<projectForces_AVX>(nbs, "AVX");
+#endif
+#if defined(__SSE3__)
+        for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
+            checkProject<projectForces_SSE>(nbs, "SSE");
+#endif
     }
     if ( 1 )
     {
@@ -889,7 +992,7 @@ int main(int argc, char* argv[])
         testProjectionU(CNT);
         testProjectionD(CNT);
     }
-    if ( 0 )
+    if ( 1 )
     {
         setProjection(NSEG);
         setAnisotropy(NSEG);
@@ -901,9 +1004,9 @@ int main(int argc, char* argv[])
 #if REAL_IS_DOUBLE && defined(__AVX__)
         timeProject<projectForces_AVX>(CNT, " prAVX");
 #endif
-        timeProject<projectDPTTS>(CNT,   " dptts");
-        timeProject<projectTangent>(CNT, " projT");
-        timeProject<projectScale>(CNT,   " scale");
+        timeProject<projectDPTTS>(CNT, " dptts");
+        timeProject<projectAniso>(CNT, " aniso");
+        timeProject<projectScale>(CNT, " scale");
     }
     
     free_reals(tmp_, lag_, force_, pos_);
