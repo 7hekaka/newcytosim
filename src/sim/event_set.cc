@@ -72,3 +72,12 @@ void EventSet::write(Outputter& out) const
     }
 }
 
+void EventSet::report(std::ostream& os) const
+{
+    if ( size() > 0 )
+    {
+        os << "\n" << size() << " events:\n";
+        for ( Event * e=first(); e; e=e->next() )
+            os << "   : " << e->activity << "\n";
+    }
+}

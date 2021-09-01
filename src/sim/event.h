@@ -44,13 +44,19 @@ public:
     std::string activity;
     
     /// true if event will fire multiple times
-    bool        recurrent;
+    bool recurrent;
 
+    /// true if event can fire multiple time within the same time step
+    bool multiplexed;
+    
     /// rate of occurence of firing events
-    double      rate;
+    double rate;
     
     /// delay in unit time between firing events (used if `rate` is not set)
-    double      delay;
+    double delay;
+    
+    /// time after which event will not fire
+    double stop;
     
     ///@}
     
@@ -67,6 +73,9 @@ public:
 
     /// destructor
     virtual ~Event();
+    
+    /// set next firing time
+    void fire_always_after(double time);
 
     /// set next firing time
     void fire_once_at(double time);
