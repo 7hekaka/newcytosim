@@ -144,13 +144,13 @@ class Meca
 private:
     
     /// time step for Brownian Mechanics = copy of simul:time_step
-    real   tau_;
+    real tau_;
     
     /// simul:kT / simul:time_step
-    real   alpha_;
+    real alpha_;
     
     /// accepted residual threshold when solving linear system
-    real   tolerance_;
+    real tolerance_;
     
     /// total number of points in the system
     size_t nPoints_;
@@ -702,11 +702,14 @@ public:
     /// set Mecable:flag() according to connectivity defined by matrix elements
     void flagClusters() const;
     
-    /// Count number of non-zero entries in the entire system
-    size_t nbNonZeros(real threshold) const;
+    /// export bitmap images to reveal the matrices' sparsity patterns
+    void saveMatrixBitmaps() const;
+
+    /// Count number of non-zero entries in the full system matrix
+    size_t countTerms(real threshold) const;
 
     /// Extract the complete dynamic matrix in column-major format in a C-array
-    void getMatrix(size_t, real * matrix) const;
+    void getMatrix(real * matrix, size_t lda) const;
 
     /// Save complete matrix in binary format
     void dumpMatrix(FILE *, bool nat=true) const;
@@ -738,9 +741,6 @@ public:
 
     /// Save complete matrix in Matrix Market format
     void saveMatrix(FILE *, real threshold) const;
-    
-    /// Save right-hand-side vector
-    void saveVector(FILE *, real const*) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
     void saveSystem() const;

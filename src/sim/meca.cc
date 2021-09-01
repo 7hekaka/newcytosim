@@ -2089,17 +2089,14 @@ void Meca::apply()
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Analysis Functions
+#pragma mark - Connectivity Analysis
 
 /** Assuming that Mecable::flag() have been set already */
 void Meca::flagClusters() const
 {
-    const size_t MAX = dimension() / DIM;
-    Mecable ** which = new Mecable*[MAX];
+    const size_t MAX = nbVertices();
+    Mecable ** which = new Mecable*[MAX]();
     
-    //for ( size_t i = 0; i < MAX; ++i )
-    //    which[i] = nullptr;
-
     for ( Mecable * mec : mecables )
     {
         //mec->matchFlagIdentity();
@@ -2165,18 +2162,16 @@ void Meca::flagClusters() const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Debug/Output Functions
-
+#pragma mark - Matrix Extraction
 
 /**
- Count number of non-zero entries in the entire system
+ Count number of non-zero entries in the full system matrix
  */
-size_t Meca::nbNonZeros(real threshold) const
+size_t Meca::countTerms(const real threshold) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
     real * dst = new_real(dim);
-    
     zero_real(dim, src);
     
     size_t cnt = 0;
@@ -2185,7 +2180,7 @@ size_t Meca::nbNonZeros(real threshold) const
         src[j] = 1;
         multiply(src, dst);
         for ( size_t i = 0; i < dim; ++i )
-            cnt += ( abs_real(dst[i]) > threshold );
+            cnt += ( abs_real(dst[i]) >= threshold );
         src[j] = 0;
     }
     
@@ -2195,56 +2190,64 @@ size_t Meca::nbNonZeros(real threshold) const
 }
 
 /**
- Extract the full matrix associated with matVect, in `mat[]`
- The matrix should be preallocated of size `dim`, which should be equal
- to the system's dimension().
+ Extract the full matrix associated with Meca::multiply().
+ The array `mat[]` should be preallocated to hold `dim*lda` real scalars,
+ with `dim >= Meca::dimension()`, and `lda >= dim` the leading dimension of
+ the array.
  */
-void Meca::getMatrix(size_t dim, real * mat) const
+void Meca::getMatrix(real * mat, size_t lda) const
 {
-    if ( dim != dimension() )
-        throw InvalidIO("wrong matrix dimension");
-    
+    size_t dim = dimension();
+    if ( lda < dim )
+        throw InvalidIO("invalid matrix dimensions");
     real * src = new_real(dim);
-    real * res = new_real(dim);
-    
     zero_real(dim, src);
-    zero_real(dim, res);
     
     for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1;
-        multiply(src, res);
-        blas::xcopy(dim, res, 1, mat+j*dim, 1);
+        multiply(src, mat+j*lda);
         src[j] = 0;
     }
     
-    free_real(res);
     free_real(src);
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Functions to export in text format
+#pragma mark - Text Export
 
-void Meca::saveObjectID(FILE * file) const
+static void saveVector(FILE * fp, size_t dim, real const* VEC)
 {
-    int i = 0;
+    fprintf(fp, "%% This is a vector produced by Cytosim\n");
+    fprintf(fp, "%% author: Francois J. Nedelec\n");
+    fprintf(fp, "%% kind: biological cell simulation (cytoskeleton)\n");
+    
+    fprintf(fp, "%lu\n", dim);
+    for ( size_t i = 0; i < dim; ++i )
+        fprintf(fp, "%f\n", VEC[i]);
+}
+
+
+void Meca::saveObjectID(FILE * fp) const
+{
+    int i = 1;
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = DIM * mec->nbPoints();
         for ( size_t p = 0; p < nbp; ++p )
-            fprintf(file, "%if\n", i);
+            fprintf(fp, "%if\n", i);
         ++i;
     }
 }
 
-void Meca::saveMobility(FILE * file) const
+void Meca::saveMobility(FILE * fp) const
 {
     for ( Mecable const* mec : mecables )
     {
         const size_t nbp = mec->nbPoints();
         const real val = mec->pointMobility();
         for ( size_t p = 0; p < DIM * nbp; ++p )
-            fprintf(file, "%f\n", val);
+            fprintf(fp, "%f\n", val);
     }
 }
 
@@ -2253,24 +2256,24 @@ void Meca::saveMobility(FILE * file) const
  https://math.nist.gov/MatrixMarket/formats.html
  This is a Sparse text format
  */
-void Meca::saveMatrix(FILE * file, real threshold) const
+void Meca::saveMatrix(FILE * fp, real threshold) const
 {
-    fprintf(file, "%%%%MatrixMarket matrix coordinate real general\n");
-    fprintf(file, "%% This is a matrix produced by Cytosim\n");
-    fprintf(file, "%% author: FJ Nedelec\n");
-    fprintf(file, "%% kind: biological cell simulation (cytoskeleton)\n");
+    fprintf(fp, "%%%%MatrixMarket matrix coordinate real general\n");
+    fprintf(fp, "%% This is a matrix produced by Cytosim\n");
+    fprintf(fp, "%% author: Francois J. Nedelec\n");
+    fprintf(fp, "%% kind: biological cell simulation (cytoskeleton)\n");
 
     const size_t dim = dimension();
     real * src = new_real(dim);
     real * dst = new_real(dim);
     zero_real(dim, src);
     
-    fprintf(file, "%lu %lu ", dim, dim);
+    fprintf(fp, "%lu %lu ", dim, dim);
 
     fpos_t pos;
-    fgetpos(file, &pos);
+    fgetpos(fp, &pos);
     size_t cnt = 0;
-    fprintf(file, "%10lu\n", cnt);
+    fprintf(fp, "%10lu\n", cnt);
 
     for ( size_t j = 0; j < dim; ++j )
     {
@@ -2279,32 +2282,19 @@ void Meca::saveMatrix(FILE * file, real threshold) const
         for ( size_t i = 0; i < dim; ++i )
             if ( abs_real(dst[i]) > threshold )
             {
-                fprintf(file, "%3lu %3lu %f\n", i, j, dst[i]);
+                fprintf(fp, "%3lu %3lu %f\n", i, j, dst[i]);
                 ++cnt;
             }
         src[j] = 0;
     }
     
-    fsetpos(file, &pos);
-    fprintf(file, "%10lu\n", cnt);
+    fsetpos(fp, &pos);
+    fprintf(fp, "%10lu\n", cnt);
 
     free_real(dst);
     free_real(src);
 }
 
-
-void Meca::saveVector(FILE * file, real const* VEC) const
-{
-    fprintf(file, "%% This is a vector produced by Cytosim\n");
-    fprintf(file, "%% author: FJ Nedelec\n");
-    fprintf(file, "%% kind: biological cell simulation (cytoskeleton)\n");
-    
-    const size_t dim = dimension();
-    fprintf(file, "%lu\n", dim);
-    
-    for ( size_t i = 0; i < dim; ++i )
-        fprintf(file, "%f\n", VEC[i]);
-}
 
 /**
  Save Matrix and Right-hand-side Vector
@@ -2316,7 +2306,7 @@ void Meca::saveSystem() const
     fclose(f);
     
     f = FilePath::open_file("vector.mtx", "w");
-    saveVector(f, vRHS);
+    saveVector(f, dimension(), vRHS);
     fclose(f);
 }
 
@@ -2386,14 +2376,14 @@ void Meca::exportSystem() const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Functions to export in binary format
+#pragma mark - Binary Export
 
-static void dumpVector(FILE * file, size_t dim, real* vec, bool nat)
+static void dumpVector(FILE * fp, size_t dim, real* vec, bool nat)
 {
     static float * low = nullptr;
     static size_t alc = 0;
     
-    if ( !file )
+    if ( !fp )
     {
         delete[] low;
         low = nullptr;
@@ -2408,16 +2398,54 @@ static void dumpVector(FILE * file, size_t dim, real* vec, bool nat)
             alc = dim;
         }
         copy_real(dim, vec, low);
-        fwrite(low, sizeof(float), dim, file);
+        fwrite(low, sizeof(float), dim, fp);
     }
     else
-        fwrite(vec, sizeof(real), dim, file);
+        fwrite(vec, sizeof(real), dim, fp);
 }
+
+
+void Meca::dumpObjectID(FILE * fp) const
+{
+    uint32_t * vec = new uint32_t[largestMecable()];
+    
+    uint32_t i = 1;
+    for ( Mecable const* mec : mecables )
+    {
+        const size_t nbp = mec->nbPoints();
+        for ( size_t p = 0; p < nbp; ++p )
+            vec[p] = i;
+        for ( int d = 0; d < DIM; ++d )
+            fwrite(vec, sizeof(uint32_t), nbp, fp);
+        ++i;
+    }
+    
+    delete[](vec);
+}
+
+
+void Meca::dumpMobility(FILE * fp, bool nat) const
+{
+    real * vec = new_real(largestMecable());
+    
+    for ( Mecable const* mec : mecables )
+    {
+        const size_t nbp = mec->nbPoints();
+        const real val = mec->pointMobility();
+        for ( size_t p=0; p < nbp; ++p )
+            vec[p] = val;
+        for ( int d = 0; d < DIM; ++ d )
+            dumpVector(fp, nbp, vec, nat);
+    }
+    
+    free_real(vec);
+}
+
 
 /**
  Save the full matrix associated with multiply(), in binary format
  */
-void Meca::dumpMatrix(FILE * file, bool nat) const
+void Meca::dumpMatrix(FILE * fp, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2429,7 +2457,7 @@ void Meca::dumpMatrix(FILE * file, bool nat) const
     {
         src[ii] = 1;
         multiply(src, res);
-        dumpVector(file, dim, res, nat);
+        dumpVector(fp, dim, res, nat);
         src[ii] = 0;
     }
     
@@ -2441,7 +2469,7 @@ void Meca::dumpMatrix(FILE * file, bool nat) const
 /**
  Save the elasticity matrix, in binary format
  */
-void Meca::dumpElasticity(FILE * file, bool nat) const
+void Meca::dumpElasticity(FILE * fp, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2472,7 +2500,7 @@ void Meca::dumpElasticity(FILE * file, bool nat) const
         }
 #endif
         
-        dumpVector(file, dim, res, nat);
+        dumpVector(fp, dim, res, nat);
         src[ii] = 0;
     }
     
@@ -2484,7 +2512,7 @@ void Meca::dumpElasticity(FILE * file, bool nat) const
 /**
  Save the projection matrix multiplied by the mobility, in binary format
  */
-void Meca::dumpProjection(FILE * file, bool nat) const
+void Meca::dumpProjection(FILE * fp, bool nat) const
 {
     const size_t dim = dimension();
     real * src = new_real(dim);
@@ -2504,8 +2532,8 @@ void Meca::dumpProjection(FILE * file, bool nat) const
             mec->projectForces(src+inx, res+inx);
             blas::xscal(DIM*mec->nbPoints(), mec->leftoverMobility(), res+inx, 1);
         }
-        // write column to file directly:
-        dumpVector(file, dim, res, nat);
+        // write column to fp directly:
+        dumpVector(fp, dim, res, nat);
         src[i] = 0;
     }
     
@@ -2518,7 +2546,7 @@ void Meca::dumpProjection(FILE * file, bool nat) const
  Save matrix associated with the preconditionner, in binary format
  This relies on `Meca::precondition()`, which may apply a dummy preconditionner
  */
-void Meca::dumpPreconditionner(FILE * file, bool nat) const
+void Meca::dumpPreconditionner(FILE * fp, bool nat) const
 {
     const size_t dim = dimension();
     real * vec = new_real(dim);
@@ -2532,48 +2560,12 @@ void Meca::dumpPreconditionner(FILE * file, bool nat) const
             const size_t inx = DIM * mec->matIndex();
             applyPreconditionner(mec, vec+inx);
         }
-        dumpVector(file, dim, vec, nat);
+        dumpVector(fp, dim, vec, nat);
     }
     
     free_real(vec);
 }
 
-
-void Meca::dumpObjectID(FILE * file) const
-{
-    uint32_t * vec = new uint32_t[largestMecable()];
-    
-    uint32_t i = 1;
-    for ( Mecable const* mec : mecables )
-    {
-        const size_t nbp = mec->nbPoints();
-        for ( size_t p = 0; p < nbp; ++p )
-            vec[p] = i;
-        for ( int d = 0; d < DIM; ++d )
-            fwrite(vec, sizeof(uint32_t), nbp, file);
-        ++i;
-    }
-    
-    delete[](vec);
-}
-
-
-void Meca::dumpMobility(FILE * file, bool nat) const
-{
-    real * vec = new_real(largestMecable());
-    
-    for ( Mecable const* mec : mecables )
-    {
-        const size_t nbp = mec->nbPoints();
-        const real val = mec->pointMobility();
-        for ( size_t p=0; p < nbp; ++p )
-            vec[p] = val;
-        for ( int d = 0; d < DIM; ++ d )
-            dumpVector(file, nbp, vec, nat);
-    }
-    
-    free_real(vec);
-}
 
 /**
  This dump the total matrix and some vectors in binary files.
