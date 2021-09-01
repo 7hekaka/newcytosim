@@ -105,7 +105,7 @@ private:
         {
             // set all values to zero (already done in the constructor of FieldValue)
             // mGrid.clear();
-            mGrid.printSummary(Cytosim::log, "Field");
+            mGrid.printSummary(Cytosim::log, "   Field");
         }
     }
     

@@ -67,7 +67,7 @@ size_t FiberGrid::setGrid(Space const* space, real max_step)
 void FiberGrid::createCells()
 {
     if ( fGrid.createCells() )
-        fGrid.printSummary(Cytosim::log, "FiberGrid");
+        fGrid.printSummary(Cytosim::log, "   FiberGrid");
 }
 
 

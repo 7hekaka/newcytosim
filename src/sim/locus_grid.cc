@@ -69,7 +69,7 @@ void LocusGrid::createCells()
     pGrid.createSideRegions(1);
     
     //report the grid size used
-    pGrid.printSummary(Cytosim::log, "LocusGrid");
+    pGrid.printSummary(Cytosim::log, "   LocusGrid");
 }
 
 

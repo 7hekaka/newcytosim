@@ -92,7 +92,7 @@ void Simul::setStericGrid(GRID& grid, Space const* spc) const
 
     if ( res != prop->steric_max_range )
     {
-        Cytosim::log("   simul:steric_max_range <-- %.3f\n", res);
+        Cytosim::log("simul:steric_max_range <-- %.3f\n", res);
         prop->steric_max_range = res;
     }
     
