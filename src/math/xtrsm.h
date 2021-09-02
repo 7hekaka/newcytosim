@@ -1191,7 +1191,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
                 pB += 1;
             }
 #if defined(__AVX__)
-            if ( ( end - pB ) & 3 )
+            if ( ( end - pB ) & 2 )
             {
                 vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
                 x = fnmadd2(t1, load2d(pA+lda), x);
@@ -1203,7 +1203,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
             vec4 tt0 = duplo2f128(cast4(t0));
             vec4 tt1 = duplo2f128(cast4(t1));
             vec4 tt2 = duplo2f128(cast4(t2));
-            while ( pB < end )
+            while ( pB < end-3 )
             {
                 vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
                 aa = fnmadd4(tt1, load4d(pA+lda), aa);
@@ -1371,7 +1371,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
                 store1(pB, x);
             }
 #if defined(__AVX__)
-            if ( ( pB - B ) & 3 )
+            if ( ( pB - B ) & 2 )
             {
                 pA -= 2;
                 pB -= 2;
@@ -1383,7 +1383,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
             vec4 tt0 = duplo2f128(cast4(t0));
             vec4 tt1 = duplo2f128(cast4(t1));
             vec4 tt2 = duplo2f128(cast4(t2));
-            while ( pB > B )
+            while ( pB > B+3 )
             {
                 pA -= 4;
                 pB -= 4;

@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
-#define DIM 2
+#define DIM 3
 
 #include "real.h"
 #include "vector.h"
@@ -64,11 +64,6 @@ void new_reals(real*& p, real*& x, real*& y, real*& z, real mag)
         zero_real(ALOC, vY);
         zero_real(ALOC, vZ);
     }
-    
-    print_alignment(p, "p");
-    print_alignment(x, "x");
-    print_alignment(y, "y");
-    print_alignment(y, "z");
 }
 
 void free_reals(real* p, real* x, real* y, real* z)

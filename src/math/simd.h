@@ -264,7 +264,7 @@ inline static vec4 catshift3(vec4 a, vec4 b) { return _mm256_shuffle_pd(_mm256_p
 inline static vec4 clear4th(vec4 a) { return _mm256_blend_pd(a,_mm256_setzero_pd(),0b1000); }
 
 /// load 4 single precision and convert to double precision
-inline static vec4 load4d(float const* a) { return _mm256_cvtps_pd(_mm_load_ps(a)); }
+inline static vec4 load4d(float const* a) { return _mm256_cvtps_pd(_mm_loadu_ps(a)); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
 inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos) { return _mm256_blendv_pd(pos, neg, val); }
