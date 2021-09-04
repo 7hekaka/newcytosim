@@ -91,8 +91,6 @@ inline static vec4f cvt4hs(__m128i a) { return _mm_cvtph_ps(a); }
 /// approximate reciprocal square root: 1 / sqrt(a)
 inline static vec4f rsqrt4f(vec4f a)  { return _mm_rsqrt_ps(a); }
 
-#define shuffle4f(a,b,k) _mm_shuffle_ps(a,b,k)
-
 #endif  // __SSE3__
 
 
@@ -104,7 +102,8 @@ inline static vec4f blend13f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1110)
 
 inline static vec4f clear4th(vec4f a) { return _mm_blend_ps(a,_mm_setzero_ps(),0b1000); }
 
-#  define blend4f(a,b,k) _mm_blend_ps(a,b,k)
+/// return { a[0], a[1], b[2], a[3] }
+inline static vec4f blend0010f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b0100); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
 inline static vec4f sign_select4f(vec4f val, vec4f neg, vec4f pos) { return _mm_blendv_ps(pos, neg, val); }

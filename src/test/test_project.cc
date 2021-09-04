@@ -337,8 +337,8 @@ void projectForcesU2D_AVY(SIZE_T nbs, const real* dir, const real* src, real* mu
         vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), load4(dir+4));
         dir += 8;
         src += 8;
-        vec4 p = permute2f128(a, b, 0x20);
-        vec4 q = permute2f128(a, b, 0x31);
+        vec4 p = unpacklo2f128(a, b);
+        vec4 q = unpackhi2f128(a, b);
         store4(mul, add4(unpacklo4(p, q), unpackhi4(p, q)));
         mul += 4;
     }
@@ -609,7 +609,7 @@ void projectForcesD_FMA(SIZE_T nbs, const real* dir, const real* X, const real* 
 void projectForcesD3D_sse(size_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
 {
-    real const*const end = mul + nbs - 1;
+    double const*const end = mul + nbs - 1;
     vec2 d0 = load2(dir);
     vec2 d1 = load2(dir+2);
     vec2 d2;
@@ -791,18 +791,22 @@ void testProjectionD(SIZE_T cnt)
     testD<projectForcesD_RIV>(cnt, " D_RIV");
     testD<projectForcesD_FMA>(cnt, " D_FMA");
     testD<projectForcesD_PTR>(cnt, " D_PTR");
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
-    testD<projectForcesD2D_SSE>(cnt, " D_SSE");
-#endif
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
-    testD<projectForcesD2D_AVX>(cnt, " D_AVX");
-#endif
 #if ( DIM == 3 ) && defined(__SSE3__)
-    testD<projectForcesD3D_sse>(cnt, " D_sse");
     testD<projectForcesD3D_SSE>(cnt, " D_SSE");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
+#if REAL_IS_DOUBLE
+#if ( DIM == 3 ) && defined(__SSE3__)
+    testD<projectForcesD3D_sse>(cnt, " D_sse");
+#endif
+#if ( DIM == 3 ) && defined(__AVX__)
     testD<projectForcesD3D_AVX>(cnt, " D_AVX");
+#endif
+#if ( DIM == 2 ) && defined(__SSE3__)
+    testD<projectForcesD2D_SSE>(cnt, " D_SSE");
+#endif
+#if ( DIM == 2 ) && defined(__AVX__)
+    testD<projectForcesD2D_AVX>(cnt, " D_AVX");
+#endif
 #endif
 }
 
@@ -998,7 +1002,7 @@ int main(int argc, char* argv[])
         setAnisotropy(NSEG);
         std::cout << "testProject " << DIM << "D, " << NSEG << " segments\n";
         timeProject<projectForces>(CNT,    " projF");
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if defined(__SSE3__)
         timeProject<projectForces_SSE>(CNT, " prSSE");
 #endif
 #if REAL_IS_DOUBLE && defined(__AVX__)

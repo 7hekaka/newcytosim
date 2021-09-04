@@ -448,7 +448,6 @@ public:
         vec4 s3 = mul4(load4(val+12), vec);
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
         s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
-        //return add4(permute2f128(s0, s2, 0x20), permute2f128(s0, s2, 0x31));
         return add4(catshift2(s0, s2), blend22(s0, s2));
     }
 

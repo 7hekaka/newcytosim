@@ -1193,10 +1193,9 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
 #if defined(__AVX__)
             if ( ( end - pB ) & 2 )
             {
-                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
-                x = fnmadd2(t1, load2d(pA+lda), x);
-                x = fnmadd2(t2, load2d(pA+lda*2), x);
-                storeu2(pB, x);
+                vec2 x = sub2(loadu2(pB), mul2(t0, load2d(pA)));
+                vec2 y = add2(mul2(t1, load2d(pA+lda)), mul2(t2, load2d(pA+lda*2)));
+                storeu2(pB, sub2(x, y));
                 pA += 2;
                 pB += 2;
             }
@@ -1291,7 +1290,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
         float const* pA = A;
         vec2 t0 = loadu2(end);
         vec2 a = load2d(pA+lda+K);
-        vec2 t1 = mul2(a, b); // { --, T1 }
+        vec2 t1 = mul2(a, t0); // { --, T1 }
         t1 = unpackhi2(t1, t1); // { T1, T1 }
         t0 = mul2(fnmadd2(t1, a, t0), load2d(pA+K)); // { T0, ? }
         storeu2(end, blend11(t0, t1));
@@ -1301,7 +1300,6 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
         {
             vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
             x = fnmadd2(t1, load2d(pA+lda), x);
-            x = fnmadd2(t2, load2d(pA+lda*2), x);
             storeu2(pB, x);
             pA += 2;
             pB += 2;
@@ -1422,7 +1420,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
     // process one column to leave an even number
     if ( M & 1 )
     {
-        vec4f t = loaddup2(B);
+        vec4f t = broadcast1f(B);
         float * pB = B + 1;
         float * end = B + M;
         float const* pA = A + 1;
@@ -1430,7 +1428,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
         # pragma ivdep
         while ( pB < end )
         {
-            storeu2(pB, fnmadd2(t, load2d(pA), loadu2(pB)));
+            store2f(pB, fnmadd4f(t, load2f(pA), load2f(pB)));
             pA += 2;
             pB += 2;
         }
@@ -1444,20 +1442,20 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
         float * pB = B + K;
         float * end = B + M;
         float const* pA = A + K;
-        vec4f b = load2f(pB);
-        vec4f c = load2f(pA); // will use upper value
-        c = fnmadd4f(unpacklo4f(setzero4f(), b), c, b);
-        store2f(pB, c);
-        b = duplo4f(b);
-        c = duphi4f(c);
+        vec4f t0 = load2f(pB);
+        vec4f t1 = load2f(pA); // will use upper value
+        t1 = fnmadd4f(unpacklo4f(setzero4f(), t0), t1, t0);
+        store2f(pB, t1);
+        t0 = duplo4f(t0);
+        t1 = duphi4f(t1);
         pB += 2;
         pA += 2;
         # pragma ivdep
         while ( pB < end )
         {
-            vec4f a = fnmadd4f(b, load2f(pA), load2f(pB));
-            a = fnmadd4f(c, load2f(pA+lda), a);
-            store2f(pB, a);
+            vec4f x = fnmadd4f(t0, load2f(pA), load2f(pB));
+            x = fnmadd4f(t1, load2f(pA+lda), x);
+            store2f(pB, x);
             pA += 2;
             pB += 2;
         }
@@ -1492,20 +1490,20 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float*
         {
             if ( ( end - pB ) & 1 )
             {
-                vec4f a = fnmadd1(t0, load1f(pA), load1f(pB));
-                a = fnmadd4f(t1, load1f(pA+lda), a);
-                a = fnmadd4f(t2, load1f(pA+lda*2), a);
-                store1f(pB, a);
+                vec4f x = fnmadd4f(t0, load1f(pA), load1f(pB));
+                x = fnmadd4f(t1, load1f(pA+lda), x);
+                x = fnmadd4f(t2, load1f(pA+lda*2), x);
+                store1f(pB, x);
                 pA += 1;
                 pB += 1;
             }
             # pragma ivdep
             while ( pB < end )
             {
-                vec4f a = fnmadd2(t0, load2f(pA), load2f(pB));
-                a = fnmadd4f(t1, load2f(pA+lda), a);
-                a = fnmadd4f(t2, load2f(pA+lda*2), a);
-                store2f(pB, a);
+                vec4f x = fnmadd4f(t0, load2f(pA), load2f(pB));
+                x = fnmadd4f(t1, load2f(pA+lda), x);
+                x = fnmadd4f(t2, load2f(pA+lda*2), x);
+                store2f(pB, x);
                 pA += 2;
                 pB += 2;
             }
@@ -1531,18 +1529,17 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
         float * pB = B;
         float * end = B + K;
         float const* pA = A;
-        vec4f t = mul4f(load1f(end), load1f(pA+K));
-        t = unpacklo4f(t, t); // { T0, T0 }
+        vec4f t0 = mul4f(load1f(end), load1f(pA+K));
+        t0 = unpacklo4f(t0, t0); // { T0, T0 }
         // there is an even number of scalars remaining, fitting perfectly:
         # pragma ivdep
         while ( pB < end )
         {
-            vec4f a = load2f(pA);
-            store2f(pB, fnmadd4f(t, a, load2f(pB)));
+            store2f(pB, fnmadd4f(t0, load2f(pA), load2f(pB)));
             pA += 2;
             pB += 2;
         }
-        store1f(end, t);
+        store1f(end, t0);
         --K;
     }
 #endif
@@ -1554,19 +1551,19 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
         float * pB = B;
         float * end = B + K;
         float const* pA = A;
-        vec4f b = load2f(end);
+        vec4f t0 = load2f(end);
         vec4f z = load2f(pA+lda+K);
-        vec4f e = mul4f(z, b); // { --, T1 }
-        e = duphi4f(e); // { T1, T1 }
-        b = mul4f(fnmadd4f(e, z, b), load2f(pA+K)); // { T0, ? }
-        store2f(end, blend13f(b, e));
-        b = duplo4f(b); // { T0, T0 }
+        vec4f t1 = mul4f(z, t0); // { --, T1 }
+        t1 = duphi4f(t1); // { T1, T1 }
+        t0 = mul4f(fnmadd4f(t1, z, t0), load2f(pA+K)); // { T0, ? }
+        store2f(end, blend13f(t0, t1));
+        t0 = duplo4f(t0); // { T0, T0 }
         # pragma ivdep
         while ( pB < end )
         {
-            vec4f a = load2f(pA);
-            vec4f x = load2f(pA+lda);
-            store2f(pB, fnmadd4f(e, x, fnmadd4f(b, a, load2f(pB))));
+            vec4f x = fnmadd4f(t0, load2f(pA), load2f(pB));
+            x = fnmadd4f(t1, load2f(pA+lda), x);
+            store2f(pB, x);
             pA += 2;
             pB += 2;
         }
@@ -1589,7 +1586,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
         float * pB = B + K;
         float const* pA = A + K;
         vec4f t2 = mul4f(broadcast1f(pB+2), duplo4f(load1f(pA+2*lda+2))); // { T2, T2 }
-        vec4f t0 = fnmadd2(t2, load2f(pA+2*lda), load2f(pB)); // { -, T1/A }
+        vec4f t0 = fnmadd4f(t2, load2f(pA+2*lda), load2f(pB)); // { -, T1/A }
         vec4f b = load2f(pA+lda);
         vec4f t1 = duphi4f(mul4f(t0, b)); // { T1, T1 }
         t0 = duplo4f(mul4f(fnmadd4f(t1, b, t0), load2f(pA))); // { T0, T0 }
@@ -1601,20 +1598,20 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
             {
                 --pA;
                 --pB;
-                vec4f a = fnmadd4f(t0, load1f(pA), load1f(pB));
-                a = fnmadd4f(t1, load1f(pA+lda), a);
-                a = fnmadd4f(t2, load1f(pA+lda*2), a);
-                store1f(pB, a);
+                vec4f x = fnmadd4f(t0, load1f(pA), load1f(pB));
+                x = fnmadd4f(t1, load1f(pA+lda), x);
+                x = fnmadd4f(t2, load1f(pA+lda*2), x);
+                store1f(pB, x);
             }
             # pragma ivdep
             while ( pB > B )
             {
                 pA -= 2;
                 pB -= 2;
-                vec4f a = fnmadd4f(t0, load2f(pA), load2f(pB));
-                a = fnmadd4f(t1, load2f(pA+lda), a);
-                a = fnmadd4f(t2, load2f(pA+lda*2), a);
-                store2f(pB, a);
+                vec4f x = fnmadd4f(t0, load2f(pA), load2f(pB));
+                x = fnmadd4f(t1, load2f(pA+lda), x);
+                x = fnmadd4f(t2, load2f(pA+lda*2), x);
+                store2f(pB, x);
             }
         }
     }

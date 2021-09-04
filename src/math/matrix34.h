@@ -354,9 +354,9 @@ public:
         vec4 m345 = load4(val+4);
         vec4 m678 = load4(val+8);
         vec4 z = shuffle4(m012, m345, 0b0011);
-        vec4 u = permute2f128(m678, z, 0x03);
+        vec4 u = catshift2(z, m678);
         vec4 t = shuffle4(m012, m345, 0b1000);
-        store4(res.val  , blend4(u, t, 0b1011));
+        store4(res.val  , blend0010(t, u));
         store4(res.val+4, blend22(z, shuffle4(u, m345, 0b1100)));
         store4(res.val+8, blend22(u, m678));
 #else
@@ -377,9 +377,9 @@ public:
         vec4 m345 = mul4(a, load4(val+4));
         vec4 m678 = mul4(a, load4(val+8));
         vec4 z = shuffle4(m012, m345, 0b0011);
-        vec4 u = permute2f128(m678, z, 0x03);
+        vec4 u = catshift2(z, m678);
         vec4 t = shuffle4(m012, m345, 0b1000);
-        store4(res.val  , blend4(u, t, 0b1011));
+        store4(res.val  , blend0010(t, u));
         store4(res.val+4, blend22(z, shuffle4(u, m345, 0b1100)));
         store4(res.val+8, blend22(u, m678));
 #else

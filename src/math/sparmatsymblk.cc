@@ -806,7 +806,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
     vec4f s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
-    s0 = add4f(shuffle4f(s0, s2, 0x4E), shuffle4f(s0, s2, 0xE4));
+    s0 = add4f(blend22f(s2, s0), blend22f(s0, s2));
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
 }
 #endif
@@ -935,7 +935,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
     vec4f s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
-    s0 = add4f(shuffle4f(s0, s2, 0x4E), shuffle4f(s0, s2, 0xE4));
+    s0 = add4f(blend22f(s2, s0), blend22f(s0, s2));
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
 }
 #endif

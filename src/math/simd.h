@@ -167,7 +167,7 @@ inline static vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 /// unaligned load 2 values, and zeros out the upper two
 inline static vec4 load2Z(double const* a)      { return _mm256_blend_pd(_mm256_castpd128_pd256(_mm_load_pd(a)), _mm256_setzero_pd(), 0b1100); }
 
-/// unaligned load 4 values, and zeros out the upper one
+/// unaligned load 3 values, and zeros out the upper one
 inline static vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
 
 /// unaligned load 2 values, allowing for undefined value in upper positions
@@ -229,26 +229,42 @@ inline static vec4 broadcastX(vec4 a) { return _mm256_movedup_pd(_mm256_permute2
  inline static void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
  */
 
-/// swap the two 128 bit lanes
-inline static vec4 swap2f128(vec4 a)  { return _mm256_permute2f128_pd(a, a, 0x01); }
+#define permute2f128(a,b,k) _mm256_permute2f128_pd(a,b,k)
+
+/// swap the two 128 bit lanes, return { a[2], a[3], a[0], a[1] }
+inline static vec4 swap2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x03); }
 
 /// return { a[0], a[1], a[0], a[1] }
-inline static vec4 duplo2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x00); }
-
+inline static vec4 duplo2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x20); }
 /// return { a[2], a[3], a[2], a[3] }
-inline static vec4 duphi2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x11); }
+inline static vec4 duphi2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x31); }
+
+/// extract the lower 128 bit lanes, return { a[0], a[1], b[0], b[1] }
+inline static vec4 unpacklo2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x20); }
+/// extract the higher 128 bit lanes, return { a[2], a[3], b[2], b[3] }
+inline static vec4 unpackhi2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x31); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,k)       _mm256_permute_pd(a,k)
 #define permute2(a,k)       _mm_permute_pd(a,k)       // same as shuffle2(a,a,k)
-#define permute2f128(a,b,k) _mm256_permute2f128_pd(a,b,k)
 #define shuffle4(a,b,k)     _mm256_shuffle_pd(a,b,k)
-#define blend4(a,b,k)       _mm256_blend_pd(a,b,k)
 #define cmp4(a,b,k)         _mm256_cmp_pd(a,b,k)
 
+/// return { a[0], a[1], a[2], b[3] }
 inline static vec4 blend31(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1000); }
+/// return { a[0], a[1], b[2], b[3] }
 inline static vec4 blend22(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1100); }
+/// return { a[0], b[1], b[2], b[3] }
 inline static vec4 blend13(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1110); }
+
+/// return { a[0], b[1], a[2], b[3] }
+inline static vec4 blend0101(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1010); }
+/// return { a[0], b[1], b[2], a[3] }
+inline static vec4 blend0110(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b0110); }
+/// return { a[0], a[1], b[2], a[3] }
+inline static vec4 blend0010(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b0100); }
+/// return { b[0], b[1], a[2], b[3] }
+inline static vec4 blend1101(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1011); }
 
 /// concatenate, making { ABCD } from a={ AB } b={ CD }
 inline static vec4 concatenate22(vec2 a, vec2 b) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(a),b,1); }
@@ -270,7 +286,7 @@ inline static vec4 load4d(float const* a) { return _mm256_cvtps_pd(_mm_loadu_ps(
 inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos) { return _mm256_blendv_pd(pos, neg, val); }
 
 #if 0
-  inline static vec4  load3(double const* a)    { return blend4(load2Z(a)), broadcast1(a+2), 0b0100); }
+  inline static vec4  load3(double const* a)    { return blend0010(load2Z(a)), broadcast1(a+2)); }
   inline static void store3(double* a, vec4 b)  { storeu2(a, getlo(b)); store1(a+2, gethi(b)); }
 #else
   //inline static vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }

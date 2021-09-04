@@ -504,8 +504,8 @@ void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, doub
         vec4 b = mul4(sub4(loadu4(src+6), loadu4(src+4)), load4(dir+4));
         dir += 8;
         src += 8;
-        vec4 p = permute2f128(a,b,0x20);
-        vec4 q = permute2f128(a,b,0x31);
+        vec4 p = unpacklo2f128(a,b);
+        vec4 q = unpackhi2f128(a,b);
         store4(mul, add4(unpacklo4(p, q), unpackhi4(p, q)));
         mul += 4;
     }
@@ -814,7 +814,7 @@ void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, doub
         vec4 yz = blend22(s1, s2);
         
         vec4 mm = shuffle4(xy, yz, 0b0101);
-        zx = add4(blend4(zx, yz, 0b1010), blend4(zx, xy, 0b0101));
+        zx = add4(blend0101(zx, yz), blend0101(xy, zx));
         store4(mul, add4(mm, zx));
         
         src += 12;

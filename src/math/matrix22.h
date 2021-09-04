@@ -408,7 +408,7 @@ public:
 #ifdef __AVX2__
         return permute4x64(mat, 0xD8);
 #else
-        return blend4(mat, permute4(swap2f128(mat),0b1100), 0b0110);
+        return blend0110(mat, permute4(swap2f128(mat),0b1100));
 #endif
     }
 
@@ -468,11 +468,11 @@ public:
     static const vec4 mul_avx(vec4 const& val, vec4 const& mat)
     {
 #ifdef __FMA__
-        vec4 s = mul4(permute2f128(val,val,0x20), duplo4(mat));
-        return fmadd4(permute2f128(val,val,0x31), duphi4(mat), s);
+        vec4 s = mul4(duplo2f128(val), duplo4(mat));
+        return fmadd4(duphi2f128(val), duphi4(mat), s);
 #else
-        vec4 s = mul4(permute2f128(val,val,0x20), duplo4(mat));
-        vec4 t = mul4(permute2f128(val,val,0x31), duphi4(mat));
+        vec4 s = mul4(duplo2f128(val), duplo4(mat));
+        vec4 t = mul4(duphi2f128(val), duphi4(mat));
         return add4(s, t);
 #endif
     }
@@ -496,8 +496,8 @@ public:
         return add4(s, t);
 #else
         vec4 a = transposed(val);
-        vec4 s = mul4(permute2f128(a,a,0x20), duplo4(mat));
-        return fmadd4(permute2f128(a,a,0x31), duphi4(mat), s);
+        vec4 s = mul4(duplo2f128(a), duplo4(mat));
+        return fmadd4(duphi2f128(a), duphi4(mat), s);
 #endif
     }
 

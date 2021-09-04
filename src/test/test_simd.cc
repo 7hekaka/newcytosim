@@ -204,7 +204,7 @@ inline static vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); 
 inline void twinedup12(double const* src, double* dst)
 {
     vec4 s = load3(src);
-    vec4 p = permute2f128(s, s, 0x01);
+    vec4 p = swap2f128(s);
     vec4 h = shuffle4(s, p, 0b0001);
     vec4 d0 = blend31(s, h);
     vec4 d1 = blend22(h, p);
@@ -253,7 +253,7 @@ inline void twine12(double const* X, double const* Y, double const* Z, double* d
     dump(sy, "sy");
     dump(sz, "sz");
 
-    vec4 zx = blend4(sx, sz, 0b0101);
+    vec4 zx = blend0101(sz, sx);
     zx = swap2f128(zx);
     vec4 xy = unpacklo4(sx, sy);
     vec4 yz = unpackhi4(sy, sz);
@@ -284,9 +284,9 @@ inline void untwine12(double const* src, double* X, double* Y, double* Z)
     vec4 xy = blend22(s0, s1);
     vec4 yz = blend22(s1, s2);
     
-    store4(X,   blend4(zx, xy, 0b0101));
+    store4(X, blend0101(xy, zx));
     store4(Y, shuffle4(xy, yz, 0b0101));
-    store4(Z,   blend4(zx, yz, 0b1010));
+    store4(Z, blend0101(zx, yz));
 }
 
 
@@ -325,13 +325,13 @@ inline void sumXYZ(double const* src, double* dst)
     vec4 s2 = load4(src+8);
     
     vec4 zx = blend22(s2, s0);
-    zx = permute2f128(zx, zx, 0x21);
+    zx = swap2f128(zx);
     vec4 xy = blend22(s0, s1);
     vec4 yz = blend22(s1, s2);
     
-    vec4 d1 =   blend4(zx, xy, 0b0101);
+    vec4 d1 = blend0101(xy, zx);
     vec4 d2 = shuffle4(xy, yz, 0b0101);
-    vec4 d3 =   blend4(zx, yz, 0b1010);
+    vec4 d3 = blend0101(zx, yz);
 
     vec4 sum = add4(d2, add4(d3, d1));
     store4(dst, sum);
@@ -522,8 +522,8 @@ void test_broadcast()
     
     // using 1 load
     vec4 xyzt = load4(mem);
-    xy = permute2f128(xyzt, xyzt, 0x00);
-    zt = permute2f128(xyzt, xyzt, 0x11);
+    xy = duplo2f128(xyzt);
+    zt = duphi2f128(xyzt);
     dump(duplo4(xy), "X ");
     dump(duphi4(xy), "T ");
     dump(duplo4(zt), "Z ");
@@ -599,19 +599,6 @@ void test_store()
     }
 }
 
-
-
-/**
- shift left by 3 steps, making
- dst = { DEFG }
- from
- src = { ABCD EFGH }
- */
-inline vec4 shift3(vec4 a, vec4 b)
-{
-    vec4 p = permute2f128(a, b, 0x21);
-    return shuffle4(p, b, 0b0101); // { DEFG }
-}
 
 void test_swap1()
 {
@@ -758,11 +745,11 @@ void test_hsum()
     //s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
-    s0 = add4f(shuffle4f(s0, s2, 0x4E), shuffle4f(s0, s2, 0xE4));
+    s0 = add4f(blend22f(s2, s0), blend22f(s0, s2));
     dump(s0, "sum ");
     
-    dump(blend4f(s0, s2, 0b1011), "blend  ");
-    dump(shuffle4f(s0, s2, 0xE4), "shuff  ");
+    dump(blend0010f(s2, s0), "blend0010");
+    dump(blend22f(s0, s2), "blend22");
 }
 
 
@@ -782,7 +769,7 @@ void test_mat()
     
     // symmetrized matrix:
     vec4 z = shuffle4(m012, m345, 0b0011);
-    vec4 u = permute2f128(m678, z, 0x03);
+    vec4 u = catshift2(z, m678);
     dump(z, "z");
     dump(u, "u");
     
@@ -793,7 +780,7 @@ void test_mat()
     
     // transposed matrix:
     vec4 m036 = blend31(u, shuffle4(m012, m345, 0b1000));
-    vec4 m147 = blend4(m145, permute4(u, 0b0101), 0b0100);
+    vec4 m147 = blend0010(m145, permute4(u, 0b0101));
     
     dump(m036, "m036");
     dump(m147, "m147");
@@ -804,7 +791,7 @@ void test_transpose2()
 {
     printf("------ test_transpose2\n");
     vec4 m{1, 2, 3, 4};
-    vec4 t = blend4(m, permute4(permute2f128(m,m,0x01),0b1100), 0b0110);
+    vec4 t = blend0110(m, permute4(permute2f128(m,m,0x01),0b1100));
     dump(m, "m");
     dump(t, "t");
 #ifdef __AVX2__
@@ -832,14 +819,14 @@ void test_transpose3()
     
     // symmetrized matrix:
     vec4 z = shuffle4(m012, m345, 0b0011);
-    vec4 u = permute2f128(m678, z, 0x03);
+    vec4 u = catshift2(z, m678);
     vec4 t = shuffle4(m012, m345, 0b1000);
     dump(z, "z");
     dump(u, "u");
     dump(t, "t");
     dump(shuffle4(u, m345, 0b1110), "tmp");
     // transposed matrix:
-    vec4 m036 = blend4(u, t, 0b1011);
+    vec4 m036 = blend0010(t, u);
     vec4 m147 = blend22(z, shuffle4(u, m345, 0b1100));
     vec4 m258 = blend22(u, m678);
     
@@ -1057,6 +1044,9 @@ int main(int argc, char * argv[])
             test_shuffle();
             test_swap7();
             break;
+#else
+        default:
+            printf("AVX was not enabled\n");
 #endif
     }
 }
