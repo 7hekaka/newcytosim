@@ -184,6 +184,7 @@ void setFilament(SIZE_T nbs, real seg, real persistence_length, real mag)
     
     for ( SIZE_T i = 0 ; i < nbv; ++i )
         force_[i] = mag * RNG.sreal();
+    print_fe_exceptions("setFilament");
 }
 
 
@@ -204,8 +205,11 @@ void setProjection(SIZE_T nbs)
         diag_[j] = 2.0;
     }
     diag_[j] = 2.0;
+    print_fe_exceptions("setProjection");
 
     DPTTRF(nbs);
+    print_fe_exceptions("DPTTRF");
+
 #if ( 0 )
     print("\nD ", nbs, diag_, 3);
     print("\nU ", nbs-1, upper_, 3); std::clog << '\n';
@@ -229,7 +233,7 @@ void setAnisotropy(SIZE_T nbs)
     for ( SIZE_T p = DIM ; p < sup; ++p )
         ani_[p] = 0.5 * ( dir_[p-DIM] + dir_[p] );
     
-    print_fe_exceptions("setAnisotroy");
+    print_fe_exceptions("setAnisotropy");
 }
 
 
@@ -388,6 +392,7 @@ void testProjectionU(SIZE_T cnt)
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
     testU<projectForcesU3D_SSE>(cnt, " U_SSE");
+    testU<projectForcesU3D_SSE1>(cnt, " U_SSE1");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testU<projectForcesU3D_AVX>(cnt, " U_AVX");
@@ -410,13 +415,13 @@ void projectForcesD_(const SIZE_T nbs, const real* dir, const real* X, const rea
     for ( SIZE_T e = DIM*nbs; e < DIM*(nbs+1); ++e )
         Y[e] = X[e] - dir[e-DIM] * mul[nbs-1];
 
-    for ( SIZE_T jj = 1; jj < nbs; ++jj )
+    for ( SIZE_T j = 1; j < nbs; ++j )
     {
-        const SIZE_T kk = DIM*jj;
-        Y[kk  ] = X[kk  ] + dir[kk  ] * mul[jj] - dir[kk-DIM  ] * mul[jj-1];
-        Y[kk+1] = X[kk+1] + dir[kk+1] * mul[jj] - dir[kk-DIM+1] * mul[jj-1];
+        const SIZE_T kk = DIM * j;
+        Y[kk  ] = X[kk  ] + dir[kk  ] * mul[j] - dir[kk-DIM  ] * mul[j-1];
+        Y[kk+1] = X[kk+1] + dir[kk+1] * mul[j] - dir[kk-DIM+1] * mul[j-1];
 #if ( DIM > 2 )
-        Y[kk+2] = X[kk+2] + dir[kk+2] * mul[jj] - dir[kk-DIM+2] * mul[jj-1];
+        Y[kk+2] = X[kk+2] + dir[kk+2] * mul[j] - dir[kk-DIM+2] * mul[j-1];
 #endif
     }
 }
@@ -793,6 +798,7 @@ void testProjectionD(SIZE_T cnt)
     testD<projectForcesD_PTR>(cnt, " D_PTR");
 #if ( DIM == 3 ) && defined(__SSE3__)
     testD<projectForcesD3D_SSE>(cnt, " D_SSE");
+    testD<projectForcesD3D_SSE1>(cnt, " D_SSE1");
 #endif
 #if REAL_IS_DOUBLE
 #if ( DIM == 3 ) && defined(__SSE3__)
@@ -846,6 +852,16 @@ void projectForces_SSE(SIZE_T nbs, const real* X, real* Y)
 }
 #endif
 
+#if REAL_IS_DOUBLE && defined(__SSE3__)
+void projectForcesFused(SIZE_T nbs, const real* X, real* Y)
+{
+#if ( DIM == 3 )
+    projectForces3D_SSE(nbs, dir_, X, lag_, diag_, upper_, Y);
+#elif ( DIM == 2 )
+    projectForces2D_SSE(nbs, dir_, X, lag_, diag_, upper_, Y);
+#endif
+}
+#endif
 
 #if REAL_IS_DOUBLE && defined(__AVX__)
 void projectForces_AVX(SIZE_T nbs, const real* X, real* Y)
@@ -979,7 +995,7 @@ int main(int argc, char* argv[])
     const SIZE_T CNT = 1<<20;
     RNG.seed();
     std::cout << "DIM=" << DIM << "  real " << sizeof(real) << " bytes   " << __VERSION__ << "\n";
-    if ( 1 )
+    if ( 0 )
     {
 #if REAL_IS_DOUBLE && defined(__AVX__)
         for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
@@ -992,18 +1008,27 @@ int main(int argc, char* argv[])
     }
     if ( 1 )
     {
+#if REAL_IS_DOUBLE && defined(__SSE3__)
+        for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
+            checkProject<projectForcesFused>(nbs, "Fus");
+#endif
+    }
+    if ( 0 )
+    {
         setFilament(NSEG, 0.1, 20.0, 1.0);
         testProjectionU(CNT);
         testProjectionD(CNT);
     }
     if ( 1 )
     {
+        setFilament(NSEG, 0.1, 20.0, 1.0);
         setProjection(NSEG);
         setAnisotropy(NSEG);
         std::cout << "testProject " << DIM << "D, " << NSEG << " segments\n";
         timeProject<projectForces>(CNT,    " projF");
 #if defined(__SSE3__)
         timeProject<projectForces_SSE>(CNT, " prSSE");
+        timeProject<projectForcesFused>(CNT, " fused");
 #endif
 #if REAL_IS_DOUBLE && defined(__AVX__)
         timeProject<projectForces_AVX>(CNT, " prAVX");

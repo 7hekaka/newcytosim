@@ -270,16 +270,14 @@ void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
  
      E'[n] <-  D[n] * E[n]
 
+ D[] is addressed within [0, size-1]
+ E[] is addressed withing [0, size-2]
  Improved on 02.04.2020: reduced memory use
  */
-void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
+int alsatian_xpttrf(int size, real* D, real* E)
 {
     if ( D[0] < 0 | size < 1 )
-    {
-        *INFO = 1;
-        return;
-    }
-    *INFO = 0;
+        return 1;
 
     real w = real(1) / D[0];
     D[0] = w;
@@ -287,27 +285,28 @@ void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
     {
         real e = E[0] * E[0];
         E[0] = w * E[0];
-        
-        for ( int n = 1; n < size; ++n )
+        const int end = size-1;
+        for ( int n = 1; n < end; ++n )
         {
             if ( D[n] < 0 )
-            {
-                *INFO = n;
-                return;
-            }
+                return n;
             w = real(1) / ( D[n] - w * e );
             e = E[n] * E[n];
             D[n] = w;
             E[n] = w * E[n];
         }
+        if ( D[end] < 0 )
+            return end;
+        D[end] = real(1) / ( D[end] - w * e );
     }
-    else
-    {
-        // this makes alsatian_xptts2 work for size=1
-        E[0] = 0;
-    }
+    return 0;
 }
 
+
+void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
+{
+    *INFO = alsatian_xpttrf(size, D, E);
+}
 
 /**
  Based on the 'Italian' version, using precalculated constant terms
@@ -317,27 +316,23 @@ void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
 void alsatian_xptts2(int size, real const* D, real const* DE, real* B)
 {
     assert_true(size > 0);
-    /*
-     for size==1, alsatian_xpttrf sets DE[0]==0,
-     and the code below is equivalent to:
-     B[0] = D[0] *  B[0];
-     */
     real x = B[0];
-    const real y = x * D[0];
+    B[0] = x * D[0];
     // upward recursion on B[]
+    #pragma nounroll
     for ( int n = 1; n < size; ++n )
     {
         x = B[n] - x * DE[n-1];
         B[n] = x * D[n];
     }
-    x = x * D[size-1];
     // downward recursion on B[]
-    for ( int n = size-2; n > 0; --n )
+    x = B[size-1]; // x * D[size-1] == B[size-1]
+    #pragma nounroll
+    for ( int n = size-2; n >= 0; --n )
     {
         x = B[n] - x * DE[n];
         B[n] = x;
     }
-    B[0] = y - x * DE[0];
 }
 
 

@@ -241,8 +241,8 @@ void projectForcesU_(size_t nbs, const real* dir, const real* src, real* mul)
  Perform second calculation needed by projectForces:
      dst <- src +/- dif * mul
  which is:
-     dst[i] <- src[i] + dif[i] * mul[i] - dif[i-1] * mul[i-1]
      for i in DIM * [ 0, nbs-1 ]
+         dst[i] <- src[i] + dif[i] * mul[i] - dif[i-1] * mul[i-1]
 
  with 'nbs' = number of segments, and
       dif[] of size nbs*DIM
@@ -259,10 +259,10 @@ void projectForcesD_(const size_t nbs, const real* dir, const real* src, const r
     for ( size_t e = DIM*nbs; e < DIM*(nbs+1); ++e )
         dst[e] = src[e] - dir[e-DIM] * mul[nbs-1];
     
-    for ( size_t jj = 1; jj < nbs; ++jj )
+    for ( size_t j = 1; j < nbs; ++j )
     {
-        const size_t kk = DIM*jj;
-        const real M = mul[jj], P = mul[jj-1];
+        const size_t kk = DIM * j;
+        const real M = mul[j], P = mul[j-1];
         dst[kk  ] = src[kk  ] + dir[kk  ] * M - dir[kk-DIM  ] * P;
         dst[kk+1] = src[kk+1] + dir[kk+1] * M - dir[kk-DIM+1] * P;
 #if ( DIM > 2 )
