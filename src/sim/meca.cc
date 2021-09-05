@@ -183,12 +183,14 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
     
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
-#endif
-        mFUL.vecMul(X, F);        // F <- mFUL * X
-    
-#if USE_ISO_MATRIX
+        mFUL.vecMul(X, F);    // F <- mFUL * X
+    else
+        zero_real(dimension(), F);
     // F <- F + mISO * X
     mISO.VECMULADDISO(X, F);
+#else
+    // F <- mFUL * X
+    mFUL.vecMul(X, F);
 #endif
     
     // F <- F + B
