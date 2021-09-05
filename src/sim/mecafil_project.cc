@@ -279,7 +279,7 @@ void projectForcesD_(const size_t nbs, const real* dir, const real* src, const r
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
-#if UNCONSTRAINED_LENGTH
+#if HAS_UNCONSTRAINED_LENGTH
     if ( unconstrainLength )
         return copy_real(DIM*nPoints, X, Y);
 #endif
@@ -363,7 +363,7 @@ void Mecafil::printProjection(std::ostream& os) const
 void Mecafil::makeProjectionDiff(const real* force)
 {
     useProjectionDiff = false;
-#if UNCONSTRAINED_LENGTH
+#if HAS_UNCONSTRAINED_LENGTH
     if ( unconstrainLength )
         return;
 #endif

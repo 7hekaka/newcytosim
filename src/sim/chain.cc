@@ -56,7 +56,7 @@ Chain::Chain()
 {
     fnCut          = 0;
     fnSegmentation = 0;
-#if UNCONSTRAINED_LENGTH
+#if HAS_UNCONSTRAINED_LENGTH
     unconstrainLength = false;
 #endif
 #if CURVATURE_DEPENDENT_SEGMENTATION
@@ -935,7 +935,7 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
  */
 void Chain::getPoints(real const* ptr)
 {
-#if UNCONSTRAINED_LENGTH
+#if HAS_UNCONSTRAINED_LENGTH
     if ( unconstrainLength )
         return copy_real(DIM*nPoints, ptr, pPos);
 #endif

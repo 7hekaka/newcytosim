@@ -843,14 +843,15 @@ void Fiber::prepareMecable()
 {
     setDragCoefficient();
     storeDirections();
+#if HAS_UNCONSTRAINED_LENGTH
+    constrainLength(prop->constrain_length);
+    if ( !unconstrainLength )
+#endif
     makeProjection();
     //printProjection(std::clog);
-    
+
     assert_true( iPointMobility >= 0 );
     
-#if UNCONSTRAINED_LENGTH
-    constrainLength(prop->contrain_length);
-#endif
     // the scaling of the bending elasticity depends on the length of the segments
     iRigidity = prop->rigidity / segmentationCube();
 #if NEW_FIBER_LOOP
