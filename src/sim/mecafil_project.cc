@@ -187,8 +187,8 @@ void Mecafil::makeProjectionAnisotropic()
 
     if ( 0 )
     {
-        VecPrint::print("D", nbu+1, iJJt, 2);
-        VecPrint::print("U", nbu, iJJtU, 2);
+        VecPrint::print("aD", nbu+1, iJJt, 2);
+        VecPrint::print("aU", nbu, iJJtU, 2);
         //VecPrint::print("X", DIM*(nbu+2), pPos, 2);
     }
 

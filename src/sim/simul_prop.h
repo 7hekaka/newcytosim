@@ -279,10 +279,10 @@ public:
     /// Name of output property file (<em>default = properties.cmo</em>)
     std::string property_file;
     
-    /// Name of output trajectory file (also known as `trajectory`, <em>default = objects.cmo</em>)
-    std::string trajectory_file;
+    /// Name of output trajectory file (also known as `system`, <em>default = objects.cmo</em>)
+    std::string system_file;
     
-    /// If `true`, any pre-existing trajectory_file will be erased (<em>default = true</em>)
+    /// If `true`, any pre-existing trajectory file will be cleared (<em>default = true</em>)
     bool clear_trajectory;
     
     /// If `true` free singles are not saved/read to/from file (<em>default = false</em>)

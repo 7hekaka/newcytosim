@@ -69,7 +69,7 @@ private:
     
 #if SPARMAT2_OPTIMIZED_MULTIPLY
 
-    /// data for the DSS Symmetric Matrix Storage format = Compact Column Storage
+    /// data for the Distributed Symmetric Matrix Storage format = Compact Column Storage
     unsigned   alcDSS_;  ///< number of values
     real     * valDSS_;  ///< values of size alcDSS_: values
     unsigned * colDSS_;  ///< columns of size alcDSS_: column index of value

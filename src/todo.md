@@ -22,6 +22,7 @@ F. Nedelec
 
 # Improvements
 
+- implement new [bicylinder](https://en.wikipedia.org/wiki/Steinmetz_solid) Space
 - fiber:max_length could trigger switch to a different Dynamic state
 - Could add color of Hands for summary obtained with 'I'
 - Implement two confinements for Mecables. That's easier than constructive geometry on Spaces

@@ -38,18 +38,18 @@ void SimulProp::clear()
     steric_max_range  = -1;
     binding_grid_step = -1;
     
-    verbose           = 0;
+    verbose = 0;
 
-    config_file       = "config.cym";
-    property_file     = "properties.cmo";
-    trajectory_file   = TRAJECTORY;
-    clear_trajectory  = true;
+    config_file      = "config.cym";
+    property_file    = "properties.cmo";
+    system_file      = TRAJECTORY;
+    clear_trajectory = true;
     
-    skip_free_single  = 0;
-    skip_free_couple  = 0;
+    skip_free_single = 0;
+    skip_free_couple = 0;
 
-    display           = "";
-    display_fresh     = false;
+    display       = "";
+    display_fresh = false;
 }
 
 
@@ -106,20 +106,18 @@ void SimulProp::read(Glossary& glos)
     glos.set(property_file,     "property");
     
 #if BACKWARD_COMPATIBILITY < 100
-    glos.set(trajectory_file,   "object_file");
+    glos.set(system_file, "object_file", "trajectory");
     bool a = false;
     if ( glos.set(a, "append_file") )
         clear_trajectory = !a;
 #endif
 
-    glos.set(trajectory_file,   "trajectory_file");
-    glos.set(trajectory_file,   "trajectory");
-    glos.set(trajectory_file,   ".cmo");
-
-    glos.set(clear_trajectory,  "clear_trajectory");
-    glos.set(skip_free_single,  "skip_free_single");
-    glos.set(skip_free_couple,  "skip_free_couple");
-    glos.set(random_seed,       "random_seed");
+    glos.set(system_file, "system_file", "system");
+    glos.set(clear_trajectory, "clear_trajectory");
+    
+    glos.set(skip_free_single, "skip_free_single");
+    glos.set(skip_free_couple, "skip_free_couple");
+    glos.set(random_seed, "random_seed");
     
     if ( glos.set(display, "display") )
         display_fresh = true;

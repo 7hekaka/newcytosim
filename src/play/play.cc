@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
             Parser(simul, 1, 1, 0, 0, 0).readConfig(file);
             
             // open trajectory file and load requested frame:
-            thread.openFile(simul.prop->trajectory_file);
+            thread.openFile(simul.prop->system_file);
             
             if ( thread.loadFrame(frm) )
             {
