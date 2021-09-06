@@ -100,53 +100,6 @@ void Mecafil::destroyProjection()
 }
 
 
-#if NEW_ANISOTROPIC_FIBER_DRAG
-
-/** This version assumes that drag coefficients are double in the directions
- orthogonal to the fiber axis, ie. it works with anisotropic fiber drag  */
-void Mecafil::makeProjection()
-{
-    assert_true( nbPoints() >= 2 );
-
-    //set the diagonal and off-diagonal of J*J'
-    const size_t nbu = nbPoints() - 2;
-    real b = 1;
-
-    for ( size_t jj = 0; jj < nbu; ++jj )
-    {
-        const real* X = iDir + DIM * jj;
-#if ( DIM == 2 )
-        real xn = X[0]*X[2] + X[1]*X[3];
-#else
-        real xn = X[0]*X[3] + X[1]*X[4] + X[2]*X[5];
-#endif
-        real a = 0.25 * ( 1 + xn ) * ( 1 + xn );
-        iJJt[jj]  = 2.0 + a + b;
-        iJJtU[jj] = -xn - a;
-        b = a;
-    }
-    
-    iJJt[nbu] = 3.0 + b;
-    
-    int info = 0;
-    DPTTRF(nbu+1, iJJt, iJJtU, &info);
-
-    if ( 0 )
-    {
-        VecPrint::print("D", nbu+1, iJJt, 2);
-        VecPrint::print("U", nbu, iJJtU, 2);
-        //VecPrint::print("X", DIM*(nbu+2), pPos, 2);
-    }
-
-    if ( info )
-    {
-        std::clog << "Mecafil::makeProjection failed (" << info << ")\n";
-        throw Exception("could not build Fiber's projection matrix");
-    }
-}
-
-#else
-
 /** This is the standard version assuming isotropic drag coefficients */
 void Mecafil::makeProjection()
 {
@@ -201,7 +154,52 @@ void Mecafil::makeProjection()
     }
 }
 
+
+#if NEW_ANISOTROPIC_FIBER_DRAG
+/** This version assumes that drag coefficients are doubled in the directions
+ orthogonal to the fiber axis. It must be used with anisotropic fiber drag. */
+void Mecafil::makeProjectionAnisotropic()
+{
+    assert_true( nbPoints() >= 2 );
+
+    //set the diagonal and off-diagonal of J*J'
+    const size_t nbu = nbPoints() - 2;
+    real b = 1;
+
+    for ( size_t jj = 0; jj < nbu; ++jj )
+    {
+        const real* X = iDir + DIM * jj;
+#if ( DIM == 2 )
+        real xn = X[0]*X[2] + X[1]*X[3];
+#else
+        real xn = X[0]*X[3] + X[1]*X[4] + X[2]*X[5];
 #endif
+        real a = 0.25 * ( 1 + xn ) * ( 1 + xn );
+        iJJt[jj]  = 2.0 + a + b;
+        iJJtU[jj] = -xn - a;
+        b = a;
+    }
+    
+    iJJt[nbu] = 3.0 + b;
+    
+    int info = 0;
+    DPTTRF(nbu+1, iJJt, iJJtU, &info);
+
+    if ( 0 )
+    {
+        VecPrint::print("D", nbu+1, iJJt, 2);
+        VecPrint::print("U", nbu, iJJtU, 2);
+        //VecPrint::print("X", DIM*(nbu+2), pPos, 2);
+    }
+
+    if ( info )
+    {
+        std::clog << "Mecafil::makeProjectionAnisotropic failed (" << info << ")\n";
+        throw Exception("could not build Fiber's projection matrix");
+    }
+}
+#endif
+
 //------------------------------------------------------------------------------
 #pragma mark - Reference (scalar) code
 

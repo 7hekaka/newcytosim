@@ -58,20 +58,20 @@ void Mecafil::destroyProjection()
 
 #pragma mark -
 
-/*
- Computes the projection matrix
+/**
+ Compute the projection matrix
 
      P = I - J' ( J J' )^-1 J
 
- that is associated with the length constraints:
+ associated with the length constraints:
 
-     | point(p+1) - point(p) |^2 = lambda^2
+     | point(p+1) - point(p) |^2 = segmentation^2
 
  */
 void Mecafil::makeProjection()
 {
-    const size_t nbc = nbSegments();             //number of constraints
-    const size_t nbv = DIM * nbPoints();         //number of variables
+    const size_t nbc = nbSegments();      // number of constraints
+    const size_t nbv = DIM * nbPoints();  // number of variables
     assert_true( nbc > 0 );
     
     //----- allocate temp space:
@@ -125,6 +125,7 @@ void Mecafil::makeProjection()
 
 
 /**
+ Apply the projection associated with the length constraints
  Attention, the vector 'X' and 'Y' may point to the same address!
  */
 void Mecafil::projectForces(const real* X, real* Y) const

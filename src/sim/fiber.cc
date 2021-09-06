@@ -633,11 +633,8 @@ void Fiber::join(Fiber * fib)
 #pragma mark - Mobility
 
 
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    const real DRAG = 4;
-#else
-    const real DRAG = 3;
-#endif
+/// A prefactor to the drag coefficient
+constexpr real DRAG = 3 + ( NEW_ANISOTROPIC_FIBER_DRAG > 0 );
 
 
 /**
@@ -847,7 +844,11 @@ void Fiber::prepareMecable()
     constrainLength(prop->constrain_length);
     if ( !unconstrainLength )
 #endif
+#if NEW_ANISOTROPIC_FIBER_DRAG
+    makeProjectionAnisotropic();
+#else
     makeProjection();
+#endif
     //printProjection(std::clog);
 
     assert_true( iPointMobility >= 0 );

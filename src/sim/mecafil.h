@@ -171,7 +171,11 @@ public:
     
     /// prepare for projection by building projection matrix
     void        makeProjection();
-
+    
+#if NEW_ANISOTROPIC_FIBER_DRAG
+    /// build projection matrix corresponding to current configuration
+    void        makeProjectionAnisotropic();
+#endif
 #if ADD_PROJECTION_DIFF
     /// prepare the correction to the projection
     void        makeProjectionDiff(const real* );
