@@ -1251,7 +1251,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
          for ( int I = 0; I < K; ++I )
              B[I] -= tmp * A[I];
          */
-        vec2 t = mul2(load1(end), load1d(pA+K));
+        vec2 t = mul1(load1(end), load1d(pA+K));
         t = unpacklo2(t, t); // { T0, T0 }
         // there is an even number of scalars remaining, fitting perfectly:
         # pragma ivdep

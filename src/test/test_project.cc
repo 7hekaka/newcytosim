@@ -379,7 +379,7 @@ void testU(SIZE_T cnt, char const* str)
 
 void testProjectionU(SIZE_T cnt)
 {
-    std::cout << "testProjection UP " << DIM << "D, " << NSEG << " segments\n";
+    std::cout << DIM << "D testProjection UP -- " << NSEG << " segments\n";
     testU<projectForcesU_>(cnt,    " U_   ");
     testU<projectForcesU_PTR>(cnt, " U_PTR");
     testU<projectForcesU_TWO>(cnt, " U_TWO");
@@ -789,7 +789,7 @@ void testD(SIZE_T cnt, char const* str)
 void testProjectionD(SIZE_T cnt)
 {
     projectForcesU_(NSEG, dir_, force_, lag_);
-    std::cout << "testProjection DOWN " << DIM << "D,  " << NSEG << " segments\n";
+    std::cout << DIM << "D testProjection DOWN -- " << NSEG << " segments\n";
     testD<projectForcesD_>(cnt,    " D_   ");
     testD<projectForcesD_ADD>(cnt, " D_ADD");
     testD<projectForcesD_REV>(cnt, " D_REV");
@@ -1024,7 +1024,7 @@ int main(int argc, char* argv[])
         setFilament(NSEG, 0.1, 20.0, 1.0);
         setProjection(NSEG);
         setAnisotropy(NSEG);
-        std::cout << "testProject " << DIM << "D, " << NSEG << " segments\n";
+        std::cout << DIM << "D testProject -- " << NSEG << " segments\n";
         timeProject<projectForces>(CNT,    " projF");
 #if defined(__SSE3__)
         timeProject<projectForces_SSE>(CNT, " prSSE");
