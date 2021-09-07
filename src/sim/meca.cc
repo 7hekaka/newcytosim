@@ -235,8 +235,9 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 #endif
 
     mec->projectForces(Y+inx, Y+inx);
-    // Y <- X + alpha * Y
-    blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
+    // Y <- X + beta * Y
+    const real beta = -tau_ * mec->leftoverMobility();
+    blas::xpay(bks, X+inx, beta, Y+inx);
 }
 
 
@@ -266,8 +267,9 @@ void Meca::multiply(const real* X, real* Y) const
             mec->addProjectionDiff(X+inx, Y+inx);
     #endif
         mec->projectForces(Y+inx, Y+inx);
-        // Y <- X + alpha * Y
-        blas::xpay(DIM*mec->nbPoints(), X+inx, -tau_*mec->leftoverMobility(), Y+inx);
+        // Y <- X + beta * Y
+        const real beta = -tau_ * mec->leftoverMobility();
+        blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
     }
 #endif
 }
@@ -300,7 +302,7 @@ void Meca::multiply(const real* X, real* Y) const
             mec->addProjectionDiff(X+inx, Y+inx);
 #endif
         mec->projectForces(Y+inx, Y+inx);
-        // Y <- X + alpha * Y
+        // Y <- X + beta * Y
         const real beta = -tau_ * mec->leftoverMobility();
         blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
     }
@@ -518,19 +520,21 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* T, re
         mec->addProjectionDiff(X+inx, T+inx);
 #endif
     
+    const real beta = -tau_ * mec->leftoverMobility();
+
     if ( Y == X )
     {
         // T <- P * T
         mec->projectForces(T+inx, T+inx);
-        // X <- X + alpha * T = X + alpha * P * FORCE
-        blas::xaxpy(bks, -tau_*mec->leftoverMobility(), T+inx, 1, Y+inx, 1);
+        // X <- X + beta * T = X + beta * P * FORCE
+        blas::xaxpy(bks, beta, T+inx, 1, Y+inx, 1);
     }
     else
     {
         // Y <- P * T
         mec->projectForces(T+inx, Y+inx);
-        // Y <- X + alpha * Y = X + alpha * P * FORCE
-        blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
+        // Y <- X + beta * Y = X + beta * P * FORCE
+        blas::xpay(bks, X+inx, beta, Y+inx);
     }
 
     // Y <- PRECONDITIONNER_BLOCK * Y
@@ -574,8 +578,9 @@ void Meca::multiply_precondition1(Mecable const* mec, real const* X, real* Y) co
     
     // Y <- P * Y
     mec->projectForces(Y+inx, Y+inx);
-    // Y <- X + alpha * Y = X + alpha * P * FORCE
-    blas::xpay(bks, X+inx, -tau_*mec->leftoverMobility(), Y+inx);
+    // Y <- X + beta * Y = X + beta * P * FORCE
+    const real beta = -tau_ * mec->leftoverMobility();
+    blas::xpay(bks, X+inx, beta, Y+inx);
     
     applyPreconditionner(mec, Y+inx);
 }
@@ -693,6 +698,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
     if ( useFullMatrix )
 #endif
         mFUL.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp, DIM*nbp, true);
+
 #if ( 0 )
 #if ADD_PROJECTION_DIFF
     if ( mec->hasProjectionDiff() )
@@ -711,12 +717,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
     }
 #endif
     
-    //compute the projection, by applying it to each column vector:
-    /*
-     This could be vectorized by having projectForces()
-     accept multiple vectors as arguments, using SIMD instructions
-     */
-    
+    //include the projection, by applying it to each column vector:
     for ( size_t i = 0; i < bks; ++i )
         mec->projectForces(res+bks*i, res+bks*i);
 
@@ -882,12 +883,8 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     }
 #endif
     
-    //compute the projection, by applying it to each column vector:
-    /*
-     This could be vectorized by having projectForces()
-     accept multiple vectors as arguments, using SIMD instructions
-     */
-    
+    // include the projection, by applying it to each column vector:
+    /* This could be vectorized */
     for ( size_t i = 0; i < bks; ++i )
         mec->projectForces(res+bks*i, res+bks*i);
     
@@ -1669,7 +1666,7 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real* fff, real 
 {
     real n = mec->addBrownianForces(rnd, alpha, fff);
     
-    // Calculate the right-hand-side of the system in vRHS:
+    // Calculate the right-hand-side of the system:
     mec->projectForces(fff, rhs);
     
     // rhs <- tau * rhs, resulting in time_step * P * fff:
@@ -1762,11 +1759,11 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 
     prepareMatrices();
     
-    // calculate external forces in vFOR:
-    calculateForces(vPTS, vBAS, vFOR);
+    // calculate external forces in vRHS:
+    calculateForces(vPTS, vBAS, vRHS);
     
 #if SEPARATE_RIGIDITY_TERMS
-    addAllRigidity(vPTS, vFOR);
+    addAllRigidity(vPTS, vRHS);
 #endif
     
     /* 
@@ -1776,7 +1773,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     RNG.gauss_set(vRND, dimension());
     
     /*
-     Add Brownian motions to 'vFOR', and calculate vRHS by multiplying by mobilities.
+     Add Brownian motions to 'vRHS', and calculate vRHS by multiplying by mobilities.
      As Brownian terms are added, we record the magnitude of the typical smallest
      scalar contribution in `noiseLevel`. The dynamics will later be solved with 
      a residual that is proportional to this level:
@@ -1791,8 +1788,8 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     
     /*
      Add Brownian contributions and calculate Minimum value of it
-      vFOR <- vFOR + mobility_coefficient * vRND
-      vRHS <- P * vFOR:
+      vRHS <- vRHS + mobility_coefficient * vRND
+      vRHS <- P * vRHS:
      */
     #pragma omp parallel num_threads(NUM_THREADS)
     {
@@ -1801,7 +1798,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         for ( Mecable * mec : mecables )
         {
             const size_t inx = DIM * mec->matIndex();
-            real n = brownian1(mec, vRND+inx, alpha_, vFOR+inx, tau_, vRHS+inx);
+            real n = brownian1(mec, vRND+inx, alpha_, tau_, vRHS+inx);
             local = std::min(local, n);
             //printf("thread %i min: %f\n", omp_get_thread_num(), local);
         }
@@ -1839,7 +1836,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     for ( Mecable * mec : mecables )
     {
         mec->getPoints(vPTS+DIM*mec->matIndex());
-        mec->getForces(vFOR+DIM*mec->matIndex());
+        mec->getForces(vRHS+DIM*mec->matIndex());
     }
     return 1;
 #endif
@@ -2041,6 +2038,21 @@ void Meca::apply()
 {
     if ( ready_ )
     {
+        /*
+         Re-calculate forces with the new coordinates, excluding bending elasticity.
+         In this way the forces returned to the fibers do not sum-up to zero, and
+         are appropriate for example to calculate the effect of force on assembly.
+         */
+        calculateForces(vPTS, vBAS, vFOR);
+        
+        // add Brownian terms:
+        for ( Mecable * mec : mecables )
+        {
+            const size_t inx = DIM * mec->matIndex();
+            mec->addBrownianForces(vRND+inx, alpha_, vFOR+inx);
+            //fprintf(stderr, "\n  "); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+inx, 2, DIM);
+        }
+        
         if ( 1 )
         {
             //check validity of the data:
@@ -2057,21 +2069,6 @@ void Meca::apply()
                 }
                 abort();
             }
-        }
-        
-        /*
-         Re-calculate forces with the new coordinates, excluding bending elasticity.
-         In this way the forces returned to the fibers do not sum-up to zero, and
-         are appropriate for example to calculate the effect of force on assembly.
-         */
-        calculateForces(vPTS, vBAS, vFOR);
-        
-        // add Brownian terms:
-        for ( Mecable * mec : mecables )
-        {
-            const size_t inx = DIM * mec->matIndex();
-            mec->addBrownianForces(vRND+inx, alpha_, vFOR+inx);
-            //fprintf(stderr, "\n  "); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+inx, 2, DIM);
         }
 
         #pragma omp parallel for num_threads(NUM_THREADS)
@@ -2517,30 +2514,25 @@ void Meca::dumpElasticity(FILE * fp, bool nat) const
 void Meca::dumpProjection(FILE * fp, bool nat) const
 {
     const size_t dim = dimension();
-    real * src = new_real(dim);
-    real * res = new_real(dim);
-    
-    zero_real(dim, src);
-    
+    real * vec = new_real(dim);
+        
     for ( size_t i = 0; i < dim; ++i )
     {
-        src[i] = 1;
-        zero_real(dim, res); // this should not be necessary
+        zero_real(dim, vec);
+        vec[i] = 1;
         
         for ( Mecable const* mec : mecables )
         {
             const size_t inx = DIM * mec->matIndex();
             // this includes the mobility, but not the time_step:
-            mec->projectForces(src+inx, res+inx);
-            blas::xscal(DIM*mec->nbPoints(), mec->leftoverMobility(), res+inx, 1);
+            mec->projectForces(vec+inx, vec+inx);
+            blas::xscal(DIM*mec->nbPoints(), mec->leftoverMobility(), vec+inx, 1);
         }
         // write column to fp directly:
-        dumpVector(fp, dim, res, nat);
-        src[i] = 0;
+        dumpVector(fp, dim, vec, nat);
     }
     
-    free_real(res);
-    free_real(src);
+    free_real(vec);
 }
 
 

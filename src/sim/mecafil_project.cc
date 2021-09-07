@@ -270,16 +270,53 @@ void projectForcesD_(const size_t nbs, const real* dir, const real* src, const r
 }
 
 
+/**
+ This will update each vector of `dst`:
+
+     dst <- src + (TT') src
+
+ Where T is a local direction given by `dir` at every vertex.
+ This is used to double the tangential component of force `X`,
+ without changing the orthogonal components.
+ 
+ Note that this must work properly even if `dst` == `src`
+ */
+void scaleTangentially(size_t nbp, const real* src, const real* dir, real* dst)
+{
+    for ( size_t i = 0; i < nbp; ++i )
+    {
+        real const* xxx = src + DIM * i;
+        real const* ddd = dir + DIM * i;
+        real      * yyy = dst + DIM * i;
+        // compute scalar product and add, assuming ||dir|| == 1
+#if ( DIM == 2 )
+        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1];
+        yyy[0] = xxx[0] + s * ddd[0];
+        yyy[1] = xxx[1] + s * ddd[1];
+#elif ( DIM >= 3 )
+        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1] + xxx[2] * ddd[2];
+        yyy[0] = xxx[0] + s * ddd[0];
+        yyy[1] = xxx[1] + s * ddd[1];
+        yyy[2] = xxx[2] + s * ddd[2];
+#endif
+    }
+}
+
 //------------------------------------------------------------------------------
 
 /*
- Note that this works fine even if ( X == Y )
+ Y <- components of X that are compatible with the length constaints
+ Note that this should work correctly even if ( X == Y ), which is always the case
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
 #if HAS_UNCONSTRAINED_LENGTH
     if ( unconstrainLength )
-        return copy_real(DIM*nPoints, X, Y);
+    {
+        if ( X != Y )
+            copy_real(DIM*nPoints, X, Y);
+        return;
+    }
 #endif
     
     const size_t nbs = nbSegments();
@@ -287,9 +324,8 @@ void Mecafil::projectForces(const real* X, real* Y) const
 
     // calculate `iLLG` without modifying `X`
 #if NEW_ANISOTROPIC_FIBER_DRAG
-    // iLLG is used as a temporary space to store nPoints * DIM scalars:
-    scaleTangentially(nPoints, X, iAni, iLLG);
-    projectForcesU(nbs, iDir, iLLG, iLLG);
+    scaleTangentially(nPoints, X, iAni, Y);
+    projectForcesU(nbs, iDir, Y, iLLG);
 #else
     projectForcesU(nbs, iDir, X, iLLG);
 #endif
