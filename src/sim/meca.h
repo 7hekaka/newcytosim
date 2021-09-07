@@ -305,12 +305,6 @@ private:
     
     /// calculate forces for one Mecable
     void multiply1(const Mecable*, const real* X, real* Y) const;
-    
-    /// implements multiply() followed by precondition() for one Mecable
-    void multiply_precondition1(const Mecable*, const real*, real*) const;
-
-    /// implements multiply() followed by precondition() for one Mecable
-    void multiply_precondition1(const Mecable*, const real*, real*, real*) const;
 
     /// calculate the linear part of forces:  Y <- B + ( mISO + mFUL ) * X
     void calculateForces(const real* X, const real* B, real* Y) const;
@@ -409,12 +403,6 @@ public:
 
     /// apply preconditionner: Y <- P*X (this works even if X == Y)
     void precondition(const real* X, real* Y) const;
-    
-    /// calculates Y <- P*M*X, for left-sided preconditinning
-    void multiply_precondition(const real* X, real* Y) const;
-    
-    /// equivalent to: multiply(X, T); precondition(T, Y);
-    void multiply_precondition(const real* X, real* T, real* Y) const;
 
     //---------------------- EXPLICIT FORCE ELEMENTS ---------------------------
 
