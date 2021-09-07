@@ -16,7 +16,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
 {
 #if ( 0 )
     std::clog << "\ncopy_subspace:\n";
-    VecPrint::print(std::clog, siz, siz, mat, ldd);
+    VecPrint::full(siz, siz, mat, ldd);
 #endif
     
     for ( size_t j = 0; j < siz; j += ORD )
@@ -29,7 +29,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
     
 #if ( 0 )
     std::clog << "copied:\n";
-    VecPrint::print(std::clog, siz, siz, mat, ldd);
+    VecPrint::full(siz, siz, mat, ldd);
 #endif
 }
 
@@ -47,7 +47,7 @@ void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
 {
 #if ( 0 )
     std::clog << "\ncopy_upper_subspace:\n";
-    VecPrint::print(std::clog, siz, siz, mat, ldd);
+    VecPrint::full(siz, siz, mat, ldd);
 #endif
     
     for ( size_t jj = 0; jj < siz; jj += ORD  )
@@ -67,7 +67,7 @@ void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
 
 #if ( 0 )
     std::clog << "Expanded:\n";
-    VecPrint::print(std::clog, siz, siz, mat, ldd);
+    VecPrint::full(siz, siz, mat, ldd);
 #endif
 }
 
@@ -85,7 +85,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
 #if ( 0 )
     size_t S = std::min(12UL, siz);
     std::clog << "\ncopy_lower_subspace:\n";
-    VecPrint::print(std::clog, S, S, mat, ldd);
+    VecPrint::full(S, S, mat, ldd);
 #endif
     
     for ( size_t jj =  0; jj < siz; jj += ORD )
@@ -105,7 +105,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
     
 #if ( 0 )
     std::clog << "Expanded:\n";
-    VecPrint::print(std::clog, S, S, mat, ldd);
+    VecPrint::full(S, S, mat, ldd);
 #endif
 }
 
@@ -119,7 +119,7 @@ void average_matrix(size_t siz, real* src, size_t ldd)
 #if ( 0 )
     size_t S = std::min(12UL, siz);
     std::clog << "\naverage_matrix:\n";
-    VecPrint::print(std::clog, S, S, src, ldd);
+    VecPrint::full(S, S, src, ldd);
 #endif
     for ( size_t jj = 0; jj < siz; jj += ORD  )
     for ( size_t ii = 0; ii < siz; ii += ORD  )
@@ -137,7 +137,7 @@ void average_matrix(size_t siz, real* src, size_t ldd)
     }
 #if (0 )
     std::clog << "Averaged:\n";
-    VecPrint::print(std::clog, S, S, src, ldd);
+    VecPrint::full(S, S, src, ldd);
 #endif
 }
 
@@ -151,7 +151,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
 #if ( 0 )
     size_t S = std::min(12UL, siz);
     std::clog << "\nproject_matrix:\n";
-    VecPrint::print(std::clog, ORD*S, ORD*S, src, lll);
+    VecPrint::full(ORD*S, ORD*S, src, lll);
 #endif
     for ( size_t jj = 0; jj < siz; ++jj )
     for ( size_t ii = 0; ii < siz; ++ii )
@@ -164,7 +164,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
     }
 #if ( 0 )
     std::clog << "Projected:\n";
-    VecPrint::print(std::clog, S, S, dst, ldd);
+    VecPrint::full(S, S, dst, ldd);
 #endif
 }
 
@@ -179,7 +179,7 @@ void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 {
 #if ( 0 )
     std::clog << "\ntruncate_matrix:\n";
-    VecPrint::print(std::clog, siz, siz, mat, ldd);
+    VecPrint::full(siz, siz, mat, ldd);
 #endif
 
     for ( size_t j = 0; j < siz; ++j )
@@ -196,7 +196,7 @@ void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
     
 #if ( 0 )
     std::clog << "Truncated:\n";
-    VecPrint::print(std::clog, siz, siz, mat, ldd);
+    VecPrint::full(siz, siz, mat, ldd);
 #endif
 }
 
@@ -418,14 +418,14 @@ real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* ma
         assert_true(info==0);
         blas::xgemv('N', siz, siz, 1.0/eig, mat, siz, tmp, 1, alpha/eig, vec, 1);
         oge = blas::nrm2(siz, vec);
-        //VecPrint::print(std::clog, std::min(16UL, siz), vec, 3);
+        //VecPrint::head(siz, vec, 3);
         
         blas::xcopy(siz, vec, 1, tmp, 1);
         lapack::xgetrs('N', siz, 1, blk, siz, piv, tmp, siz, &info);
         assert_true(info==0);
         blas::xgemv('N', siz, siz, 1.0/oge, mat, siz, tmp, 1, alpha/oge, vec, 1);
         eig = blas::nrm2(siz, vec);
-        //VecPrint::print(std::clog, std::min(16UL, siz), vec, 3);
+        //VecPrint::head(siz, vec, 3);
         
         //fprintf(stderr, "      power iter %3i: eigen %10.6f %10.6f\n", n, eig, oge);
         
@@ -454,12 +454,12 @@ real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, r
         blas::xgemv('N', siz, siz, 1.0/eig, mat, siz, vec, 1,       0.0, tmp, 1);
         blas::xgemv('N', siz, siz, 1.0,     tam, siz, tmp, 1, alpha/eig, vec, 1);
         oge = blas::nrm2(siz, vec);
-        //VecPrint::print(std::clog, std::min(16UL, siz), vec, 3);
+        //VecPrint::head(siz, vec, 3);
         
         blas::xgemv('N', siz, siz, 1.0/oge, mat, siz, vec, 1,       0.0, tmp, 1);
         blas::xgemv('N', siz, siz, 1.0,     tam, siz, tmp, 1, alpha/oge, vec, 1);
         eig = blas::nrm2(siz, vec);
-        //VecPrint::print(std::clog, std::min(16UL, siz), vec, 3);
+        //VecPrint::head(siz, vec, 3);
         //fprintf(stderr, "      power iter %3i: eigen %10.6f %10.6f\n", n, eig, oge);
         if ( abs_real(oge-eig) < TOLERANCE * ( abs_real(eig) + abs_real(oge) ) )
             break;

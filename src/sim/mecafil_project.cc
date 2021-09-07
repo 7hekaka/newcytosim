@@ -382,7 +382,7 @@ void Mecafil::printProjection(std::ostream& os) const
     free_real(dst);
     free_real(src);
     os << "Mecafil:Projection  " << reference() << " (" << nbPoints() << ")\n";
-    VecPrint::print(os, nbv, nbv, res, nbv);
+    VecPrint::full(os, nbv, nbv, res, nbv);
     free_real(res);
 }
 

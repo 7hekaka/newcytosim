@@ -37,9 +37,9 @@ namespace VecPrint
         print(stdout, len, vec, digits, dim);
     }
     
-    /// print only 16 scalars from given vector, from the start
+    /// print up to 16 scalars from given vector, from the start
     template< typename T >
-    void start(size_t len, const T* vec)
+    void head(size_t len, const T* vec)
     {
         if ( len <= 16 )
             print(len, vec, 3);
@@ -50,7 +50,7 @@ namespace VecPrint
         }
     }
 
-    /// print only 16 scalars from given vector, taken from the edges
+    /// print up to 16 scalars from given vector, taken from the edges
     template< typename T >
     void edges(size_t len, const T* vec, int digits = 2)
     {
@@ -158,7 +158,7 @@ namespace VecPrint
     
     /// print matrix `mat[]` of size 'lin*col', and leading dimension `ldd` with precision 'digits'
     template< typename T >
-    void print(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
+    void full(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
     {
         if ( !mat )
             os << " null";
@@ -200,6 +200,14 @@ namespace VecPrint
         //std::endl(os);
     }
     
+    
+    template< typename T >
+    void full(size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
+    {
+        full(std::cout, lin, col, mat, ldd, digits);
+    }
+    
+        
     /// print matrix in sparse format: line_index, column_index, value
     template< typename T >
     void sparse(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 8, T threshold = 0)

@@ -17,8 +17,6 @@ const size_t NSEG = 127;
 const size_t NVAL = FOR * ( NSEG + 1 );
 const size_t ALOC = NVAL + 8;
 
-const size_t DISP = 16UL;
-
 real * vP = nullptr;
 real * vX = nullptr, * vY = nullptr, * vZ = nullptr;
 
@@ -440,7 +438,7 @@ void testRigidity(size_t cnt, char const* str)
     zero_real(ALOC, vZ);
     
     FUNC(nbt, vP, alpha, vX);
-    VecPrint::print(std::min(DISP,nbt), vX);
+    VecPrint::head(nbt, vX);
     std::cout << " |";
     VecPrint::print(DIM, vX+NVAL);
     add_rigidity0(nbt, vP, alpha, vY);

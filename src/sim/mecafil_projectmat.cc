@@ -150,7 +150,7 @@ void Mecafil::printProjection(std::ostream& os) const
 {
     const size_t nbv = DIM * nbPoints();
     os << reference() << '\n';
-    VecPrint::print(os, nbv, nbv, iProj, nbv);
+    VecPrint::full(os, nbv, nbv, iProj, nbv);
 }
 
 
@@ -218,7 +218,7 @@ void Mecafil::makeProjectionDiff(const real* force)
      as can be seen from the above relations to set its columns
      */
     //printf("projectionDiff\n");
-    //VecPrint::print(std::clog, nbv, nbv, iDProj, nbv);
+    //VecPrint::full(nbv, nbv, iDProj, nbv);
 }
 
 

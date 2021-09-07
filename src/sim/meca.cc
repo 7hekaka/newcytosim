@@ -359,7 +359,7 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
     copy_real(DIM*nbp, Y, tmp);
     iso_xpotrsL<DIM>(nbp, mec->block(), nbp, tmp);
     size_t S = std::min(16, nbp);
-    std::clog << "\n "; VecPrint::print(std::clog, S, tmp, 3, 100.0);
+    std::clog << "\n "; VecPrint::print(S, tmp, 3, 100.0);
     free_real(tmp);
 #endif
 #if CHOUCROUTE
@@ -367,7 +367,7 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
 #else
     iso_xpotrsL<DIM>(nbp, mec->block(), nbp, Y);
 #endif
-    //std::clog << "\nL"; VecPrint::print(std::clog, S, Y, 3, 100.0);
+    //std::clog << "\nL"; VecPrint::print(S, Y, 3, 100.0);
 }
 
 
@@ -496,7 +496,7 @@ void printBlock(Mecable* mec, size_t sup)
     real * blk = mec->block();
 
     std::clog << "Diagonal block " << bks << "\n";
-    VecPrint::print(std::clog, S, S, mec->block(), bks, 3);
+    VecPrint::full(S, S, mec->block(), bks, 3);
     
     std::clog << "S ";
     char str[32];
@@ -535,7 +535,7 @@ void Meca::getIsoBBlock(const Mecable * mec, real* res, size_t ldd) const
         zero_real(ldd*nbp, res);
     
     //std::clog << "\nrigidity band " << nbp << "\n";
-    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), res, ldd, 1);
+    //VecPrint::full(3, std::min(nbp, 16UL), res, ldd, 1);
 
     /*
      The matrix `res` is stored in 'packed symmetric banded storage':
@@ -596,7 +596,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
             tmp[i] = 0;
         }
         //std::clog<<"dynamic with P'\n";
-        //VecPrint::print(std::clog, bs, bs, res, bs);
+        //VecPrint::full(bs, bs, res, bs);
     }
 #endif
     
@@ -645,15 +645,15 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
     {
         setBendingRigidity<DIM>(res, ldd-1, nbp, beta*mec->fiberRigidity());
         //std::clog<<"Rigidity block " << mec->reference() << "\n";
-        //VecPrint::print(std::clog, bks, bks, res, bks, 0);
+        //VecPrint::full(bks, bks, res, bks, 0);
     }
 #endif
 #if USE_ISO_MATRIX
     mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, rank/DIM);
 #endif
-    //std::clog << "\niso:\n"; VecPrint::print(std::clog, ldd, std::min(bks, 24ul), res, ldd);
+    //std::clog << "\niso:\n"; VecPrint::full(ldd, std::min(bks, 24ul), res, ldd);
     copy_lower_subspace<DIM>(bks, res, ldd-1, rank);
-    //std::clog << "\ncopy_subspace:\n"; VecPrint::print(std::clog, ldd, std::min(bks, 24ul), res, ldd);
+    //std::clog << "\ncopy_subspace:\n"; VecPrint::full(ldd, std::min(bks, 24ul), res, ldd);
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
@@ -686,7 +686,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
     {
         addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
         //std::clog<<"Rigidity block " << mec->reference() << "\n";
-        //VecPrint::print(std::clog, bks, bks, res, bks, 0);
+        //VecPrint::full(bks, bks, res, bks, 0);
     }
 #endif
 #if USE_ISO_MATRIX
@@ -732,7 +732,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     {
         addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
         //std::clog<<"Rigidity block " << mec->reference() << "\n";
-        //VecPrint::print(std::clog, bks, bks, res, bks, 0);
+        //VecPrint::full(bks, bks, res, bks, 0);
     }
 #endif
 #if USE_ISO_MATRIX
@@ -746,7 +746,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     
 #if ( 0 )
     std::clog<<"mISO+mFUL block:\n";
-    VecPrint::print(std::clog, bks, bks, res, bks);
+    VecPrint::full(bks, bks, res, bks);
 #endif
     
 #if ADD_PROJECTION_DIFF
@@ -762,7 +762,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
             tmp[i] = 0;
         }
         //std::clog<<"dynamic with P'\n";
-        //VecPrint::print(std::clog, bs, bs, res, bs);
+        //VecPrint::full(bs, bs, res, bs);
     }
 #endif
     
@@ -840,8 +840,8 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
         extractBlock(mec, wrk);
         
         const size_t S = std::min(9UL, bks);
-        std::clog << " extracted:\n"; VecPrint::print(std::clog, S, S, wrk, bks, 3);
-        std::clog << " computed:\n";  VecPrint::print(std::clog, S, S, blk, bks, 3);
+        std::clog << " extracted:\n"; VecPrint::full(S, S, wrk, bks, 3);
+        std::clog << " computed:\n";  VecPrint::full(S, S, blk, bks, 3);
     }
     
     free_real(wrk);
@@ -894,11 +894,11 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
         // print preconditionner block for visual inspection:
         const size_t S = std::min(16UL, bks);
         std::clog << " matrix: \n";
-        VecPrint::print(std::clog, S, S, wrk, bks);
+        VecPrint::full(S, S, wrk, bks);
         std::clog << "\nprecond: \n";
-        VecPrint::print(std::clog, S, S, blk, bks);
+        VecPrint::full(S, S, blk, bks);
         std::clog << "\nprecond * matrix:\n";
-        VecPrint::print(std::clog, S, S, mat, bks);
+        VecPrint::full(S, S, mat, bks);
         std::clog << "\n";
     }
     free_real(vec);
@@ -1016,7 +1016,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
     mec->blockSize(DIM*nbp, ISOB_LDD*nbp, 0);
     
     //std::clog << "banded preconditionner " << nbp << "\n";
-    //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
+    //VecPrint::full(3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
     
     /**
      Factorize banded matrix with Andre-Louis Cholesky's method
@@ -1051,7 +1051,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
     {
         mec->blockType(bt);
         //std::clog<<"factorized banded preconditionner: " << nbp << "\n";
-        //VecPrint::print(std::clog, 3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
+        //VecPrint::full(3, std::min(nbp, 16UL), mec->block(), ISOB_LDD, 1);
     }
     else
     {
@@ -1077,19 +1077,19 @@ void Meca::computePrecondIsoS(Mecable* mec)
     getFullBlock(mec, mec->block());
     project_matrix<DIM>(nbp, mec->block(), bks, mec->block(), nbp);
     std::clog<<"projected: " << bks << "\n";
-    VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
+    VecPrint::full(S, S, mec->block(), nbp, 2);
 #endif
 
     mec->blockSize(DIM*nbp, nbp*nbp, 0);
     
     //getIsoBBlock(mec, mec->block(), ISOB_LDD);
     //std::clog << "banded preconditionner " << nbp << "\n";
-    //VecPrint::print(std::clog, 3, S, mec->block(), ISOB_LDD, 1);
+    //VecPrint::full(3, S, mec->block(), ISOB_LDD, 1);
 
     getIsoBlock(mec, mec->block());
     
     //std::clog<<"iso symmetric preconditionner: " << nbp << "\n";
-    //VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
+    //VecPrint::full(S, S, mec->block(), nbp, 2);
 
     // calculate Cholesky factorization:
     int info = 0;
@@ -1129,7 +1129,7 @@ void Meca::computePrecondIsoP(Mecable* mec)
 
     //const size_t S = std::min(nbp, 16UL);
     //std::clog<<"isop preconditionner: " << nbp << "\n";
-    //VecPrint::print(std::clog, S, S, mec->block(), nbp, 2);
+    //VecPrint::full(S, S, mec->block(), nbp, 2);
 
     // calculate LU factorization:
     lapack::xgetf2(nbp, nbp, mec->block(), nbp, mec->pivot(), &info);
@@ -1165,11 +1165,11 @@ void Meca::computePrecondBand(Mecable* mec)
 #if ( 0 )
         size_t S = std::min(bks, 24UL);
         std::clog << "band block " << bks <<":\n";
-        VecPrint::print(std::clog, BAND_LDD, S, mec->block(), BAND_LDD);
+        VecPrint::full(BAND_LDD, S, mec->block(), BAND_LDD);
         mec->blockSize(bks, bks*bks, 0);
         getHalfBlock(mec, mec->block());
         std::clog << "half block :\n";
-        VecPrint::print(std::clog, S, S, mec->block(), bks);
+        VecPrint::full(S, S, mec->block(), bks);
 #endif
         
         // calculate Cholesky factorization for band storage:
@@ -1218,7 +1218,7 @@ void Meca::computePrecondHalf(Mecable* mec)
 #if ( 0 )
     std::clog << "half block " << bks <<":\n";
     size_t S = std::min(bks, 16UL);
-    VecPrint::print(std::clog, S, S, mec->block(), bks);
+    VecPrint::full(S, S, mec->block(), bks);
 #endif
 
     int info = 0;

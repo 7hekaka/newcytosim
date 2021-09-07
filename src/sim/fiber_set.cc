@@ -1144,7 +1144,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
     res[8] =  1;
 #endif
 
-    //VecPrint::print(std::clog, 3, 3, vec);
+    //VecPrint::full(3, 3, vec);
     
     return ( info == 0  &&  nbv == DIM-1 );
 }
