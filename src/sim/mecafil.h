@@ -177,6 +177,9 @@ public:
     void        makeProjectionAnisotropic();
 #endif
 #if ADD_PROJECTION_DIFF
+    /// select corrections to the projection, from the Lagrange multipliers
+    void        setProjectionDiff(real threshold);
+    
     /// prepare the correction to the projection
     void        makeProjectionDiff(const real* );
     

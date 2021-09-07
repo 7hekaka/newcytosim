@@ -20,22 +20,6 @@ inline void tic() { rdt = __rdtsc(); }
 /// return time since last `tic()`
 inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
-
-/// print only 16 scalars from given vector
-inline void print(size_t n, real const* vec)
-{
-    if ( n > 16 )
-    {
-        VecPrint::print(8, vec, 3);
-        printf("...");
-        VecPrint::print(8, vec+n-8, 3);
-    }
-    else
-    {
-        VecPrint::print(n, vec, 3);
-    }
-}
-
 //------------------------------------------------------------------------------
 
 template < void (*FUNC)(int, real*, real*, int*) >
@@ -106,7 +90,7 @@ void check(int N, real const* Ds, real const* Us, real const* Bs, real* D, real*
     copy_real(N, Bs, B);
     FACTOR(N, D, U, &info);
     SOLVE(N, D, U, B);
-    print(N, B);
+    VecPrint::edges(N, B);
     real err = blas::difference(N, S, B);
     printf(" err %f %12s", err, str);
     if ( err < 0.001 )
@@ -175,7 +159,7 @@ void verify(int N, real const* Ds, real const* Us, real const* Bs, real* D, real
         copy_real(N, Bs, B);
         alsatian_thomas(N, D, U, B);
     }
-    print(N, B);
+    VecPrint::edges(N, B);
     printf(" %12s %5.2f\n", str, toc(N*cnt));
 }
 

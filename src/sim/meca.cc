@@ -259,13 +259,13 @@ void Meca::multiply(const real* X, real* Y) const
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
-    #if SEPARATE_RIGIDITY_TERMS
+#   if SEPARATE_RIGIDITY_TERMS
         mec->addRigidity(X+inx, Y+inx);
-    #endif
-    #if ADD_PROJECTION_DIFF
+#   endif
+#   if ADD_PROJECTION_DIFF
         if ( mec->hasProjectionDiff() )
             mec->addProjectionDiff(X+inx, Y+inx);
-    #endif
+#   endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + beta * Y
         const real beta = -tau_ * mec->leftoverMobility();
@@ -1545,13 +1545,24 @@ This preforms:
 
  'rhs' and 'fff' are output. Input 'rnd' is a set of independent random numbers
 */
-real brownian1(Mecable* mec, real const* rnd, const real alpha, real* fff, real tau, real* rhs)
-{
-    real n = mec->addBrownianForces(rnd, alpha, fff);
-    
+real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* rhs)
+{        
+    real n = mec->addBrownianForces(rnd, alpha, rhs);
+
+#if ADD_PROJECTION_DIFF == 2
+    /* This uses the force to calculate the Lagrange multipliers */
+    mec->makeProjectionDiff(rhs);
+#endif
+
     // Calculate the right-hand-side of the system:
-    mec->projectForces(fff, rhs);
+    mec->projectForces(rhs, rhs);
     
+#if ADD_PROJECTION_DIFF
+    /* assumes that the Lagrange multipliers were set correctly in the
+     previous call to projectForces(); */
+    mec->makeProjectionDiff(nullptr);
+#endif
+
     // rhs <- tau * rhs, resulting in time_step * P * fff:
     blas::xscal(DIM*mec->nbPoints(), tau*mec->leftoverMobility(), rhs, 1);
 
@@ -1561,10 +1572,6 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real* fff, real 
      do not represent the true tension in the filaments.
      Hence we do not call 'computeTensions(fff)' here
      */
-
-#if ADD_PROJECTION_DIFF
-    mec->makeProjectionDiff(fff);
-#endif
     
     return n;
 }

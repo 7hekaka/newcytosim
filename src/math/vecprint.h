@@ -12,7 +12,7 @@ namespace VecPrint
 {
     /// print 'len' components of 'vec[]' on a line
     template< typename T >
-    void print(FILE * file, size_t len, const T* vec, int digits = 2, size_t dim = 0)
+    void print(FILE* file, size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
         if ( !vec )
             fprintf(file, " null");
@@ -30,12 +30,48 @@ namespace VecPrint
         }
     }
 
-    /// print 'len' components of 'vec[]' on a line
+    /// print vector to stdout
     template< typename T >
     void print(size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
         print(stdout, len, vec, digits, dim);
     }
+    
+    /// print only 16 scalars from given vector, from the start
+    template< typename T >
+    void start(size_t len, const T* vec)
+    {
+        if ( len <= 16 )
+            print(len, vec, 3);
+        else
+        {
+            print(std::min(16UL, len), vec, 3);
+            printf("...");
+        }
+    }
+
+    /// print only 16 scalars from given vector, taken from the edges
+    template< typename T >
+    void edges(size_t len, const T* vec, int digits = 2)
+    {
+        if ( len <= 16 )
+            print(len, vec, digits);
+        else
+        {
+            print(8, vec, digits);
+            printf("...");
+            print(8, vec+len-8, digits);
+        }
+    }
+    
+    template< typename T >
+    void edges(char const* msg, size_t len, const T* vec, int digits = 2)
+    {
+        printf("%6s ", msg);
+        edges(len, vec, digits);
+        printf("\n");
+    }
+    
 
     /// print 'len' components of 'vec[]' on a line
     template< typename T >

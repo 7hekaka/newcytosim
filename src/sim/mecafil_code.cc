@@ -400,8 +400,6 @@ void projectForcesD_PTR(size_t nbs, const real* dir,
 
 #if defined(__SSE3__) && REAL_IS_DOUBLE
 
-#include "simd.h"
-
 /**
  Perform first calculation needed by projectForces:
  */
@@ -457,8 +455,6 @@ void projectForcesD2D_SSE(size_t nbs, const double* dir,
 #endif
 
 #if defined(__AVX__) && REAL_IS_DOUBLE
-
-#include "simd.h"
 
 /**
  Perform first calculation needed by projectForces
@@ -1010,8 +1006,6 @@ void projectForcesD3D_SSE(size_t nbs, const double* dir,
 
 #if defined(__AVX__) && REAL_IS_DOUBLE
 
-#include "simd.h"
-
 /// FJN @ Strasbourg, 17 and 18.04.2020
 void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, double* mul)
 {
@@ -1392,33 +1386,33 @@ void addProjectionDiff_F(const size_t nbs, const real* mul, const real* X, real*
 #endif
 }
 
-#if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
 
-#include "simd.h"
-
-void addProjectionDiff_SSE(const size_t nbs, const double* mul, const double* X, double* Y)
+void addProjectionDiff2D_SSE(const size_t nbs, const double* mul, const double* src, double* dst)
 {
-    vec2 px = load2(X);
-    vec2 pw = setzero2();
+    vec2 p = load2(src);
+    vec2 n = load2(dst);
     
-    for ( size_t jj = 0; jj < nbs; ++jj )
+    const double* end = mul + nbs;
+    src += DIM;
+    
+    while ( mul < end )
     {
-        vec2 m = loaddup2(mul+jj);
-        vec2 x = load2(X+DIM*jj+DIM);
-        vec2 y = load2(Y+DIM*jj);
-        vec2 w = mul2(m, sub2(x, px));
-        px = x;
-        store2(Y+DIM*jj, add2(y, sub2(w, pw)));
-        pw = w;
+        vec2 x = load2(src);
+        src += DIM;
+        vec2 w = mul2(loaddup2(mul), sub2(x, p));
+        p = x;
+        store2(dst, add2(n, w));
+        dst += DIM;
+        n = sub2(load2(dst), w);
+        ++mul;
     }
-    store2(Y+DIM*nbs, sub2(load2(Y+DIM*nbs), pw));
+    store2(dst, n);
 }
 
 #endif
 
-#if ( DIM == 2 ) && defined(__AVX__) && REAL_IS_DOUBLE
-
-#include "simd.h"
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
 
 void addProjectionDiff_AVX(const size_t nbs, const double* mul, const double* X, double* Y)
 {
@@ -1453,6 +1447,80 @@ void addProjectionDiff_AVX(const size_t nbs, const double* mul, const double* X,
         pY += 2*DIM;
     }
     assert_true(pM==end);
+}
+
+#endif
+
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+
+/**
+ Idea of the calculation:
+    const real w = mul[i] * ( X[d+DIM*i+DIM] - X[d+DIM*i] );
+    Y[d+DIM*i    ] += w;
+    Y[d+DIM*i+DIM] -= w;
+ */
+void addProjectionDiff3D_SSE(const size_t nbs, const double* mul, const double* src, double* dst)
+{
+    // there should be at least 2 3D vectors, and these loads are safe:
+    vec2 p0 = loadu2(src);
+    vec2 p1 = load1(src+2); // upper value not used
+    vec2 n0 = loadu2(dst);
+    vec2 n1 = loadu2(dst+2);
+
+    const double* end = mul + nbs - 1;
+    src += DIM;
+    
+#if 1
+    p1 = catshift(p0, p1);
+    p0 = unpacklo2(p0, p0); // lower value will not be used
+    while ( mul < end )
+    {
+        // process 2 3D vectors = 6 scalars
+        vec2 x0 = loadu2(src);
+        vec2 x1 = loadu2(src+2);
+        vec2 x2 = loadu2(src+4);
+        src += DIM * 2;
+        vec2 m = loadu2(mul);
+        vec2 m0 = unpacklo2(m, m);
+        vec2 m1 = unpackhi2(m, m);
+        vec2 w0 = mul2(sub2(x0, catshift(p0, p1)), m0);
+        vec2 w1 = mul2(sub2(x1, catshift(p1, x0)), blend11(m0, m1));
+        vec2 w2 = mul2(sub2(x2, catshift(x0, x1)), m1);
+        p0 = x1;
+        p1 = x2;
+        x1 = sub2(n1, catshift(setzero2(), w0));
+        x2 = sub2(loadu2(dst+4), catshift(w0, w1));
+        storeu2(dst  , add2(w0, n0));
+        storeu2(dst+2, add2(w1, x1));
+        storeu2(dst+4, add2(w2, x2));
+        dst += DIM * 2;
+        n0 = sub2(loadu2(dst), catshift(w1, w2));
+        n1 = sub2(loadu2(dst+2), catshift(w2, setzero2()));
+        mul += 2;
+    }
+    p0 = catshift(p0, p1);
+    p1 = unpackhi2(p1, p1); // upper value not used
+#endif
+    
+    while ( mul <= end )
+    {
+        vec2 x0 = loadu2(src);
+        vec2 x1 = load1(src+2);
+        src += DIM;
+        vec2 m = loaddup2(mul);
+        vec2 w0 = mul2(m, sub2(x0, p0));
+        vec2 w1 = mul1(m, sub1(x1, p1));
+        p0 = x0;
+        p1 = x1;
+        storeu2(dst, add2(n0, w0));
+        store1(dst+2, add1(n1, w1));
+        dst += DIM;
+        n0 = sub2(loadu2(dst), w0);
+        n1 = sub1(load1(dst+2), w1);
+        ++mul;
+    }
+    storeu2(dst, n0);
+    store1(dst+2, n1);
 }
 
 #endif

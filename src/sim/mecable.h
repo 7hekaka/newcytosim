@@ -19,6 +19,7 @@ class Meca;
 /**
  Add correction terms to the projection in constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
+ Set ADD_PROJECTION_DIFF = 2 to enable validation codes in makeProjectionDiff()
 */
 #define ADD_PROJECTION_DIFF 1
 

@@ -343,6 +343,9 @@ void Mecafil::projectForces(const real* X, real* Y) const
 }
 
 
+/**
+ This sets `iLag` corresponding to the given forces
+ */
 void Mecafil::computeTensions(const real* force)
 {
     const size_t nbs = nbSegments();
@@ -355,7 +358,7 @@ void Mecafil::computeTensions(const real* force)
     projectForcesU(nbs, iDir, force, iLag);
 #endif
     
-    // tmp <- inv( J * Jt ) * tmp to find the multipliers
+    // determine the multipliers: iLag <- inv( J * Jt ) * iLag
     DPTTS2(nbs, 1, iJJt, iJJtU, iLag, nbs);
 }
 
@@ -393,31 +396,10 @@ void Mecafil::printProjection(std::ostream& os) const
 // add debug code to compare with reference implementation
 #define CHECK_PROJECTION_DIFF 0
 
-
-void Mecafil::makeProjectionDiff(const real* force)
+/** This assumes that the Lagrange multipliers in 'iLLG' can be used */
+void Mecafil::setProjectionDiff(const real threshold)
 {
-    useProjectionDiff = false;
-#if HAS_UNCONSTRAINED_LENGTH
-    if ( unconstrainLength )
-        return;
-#endif
     const size_t nbs = nbSegments();
-    assert_true( nbs > 0 );
-    
-#if CHECK_PROJECTION_DIFF
-    // Check here that iLLG[] contains the correct Lagrange multipliers
-    // compute Lagrange multipliers corresponding to 'force' in iLag:
-    computeTensions(force);
-    real e = blas::difference(nbs, iLLG, iLag);
-    if ( e > 1e-6 )
-    {
-        std::clog << "\n|iLag - iLLG| = " << e << "\n";
-        VecPrint::print("\niLag ", std::min(16LU,nbs), iLag);
-        VecPrint::print("\niLLG ", std::min(16LU,nbs), iLLG);
-    }
-#endif
-    
-    const real threshold = 0.0;
 
     // use Lagrange multipliers computed from the last projectForces() in iLLG
     // check for extensile ( positive ) multipliers
@@ -445,6 +427,9 @@ void Mecafil::makeProjectionDiff(const real* force)
 
 
 /// Reference (scalar) code
+/**
+ This looks similar to addProjectionD() except with dir[i] = X[i+DIM]-x[i]
+ */
 inline void addProjectionDiff_(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     for ( size_t i = 0; i < nbs; ++i )
@@ -468,9 +453,11 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
     addProjectionDiff_(nbSegments(), iJJtJF, X, vec);
 #endif
 
-#if ( DIM == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
-    addProjectionDiff_SSE(nbSegments(), iJJtJF, X, Y);
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+    addProjectionDiff2D_SSE(nbSegments(), iJJtJF, X, Y);
     //addProjectionDiff_AVX(nbSegments(), iJJtJF, X, Y);
+#elif ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+    addProjectionDiff3D_SSE(nbSegments(), iJJtJF, X, Y);
 #else
     addProjectionDiff_F(nbSegments(), iJJtJF, X, Y);
     //addProjectionDiff_(nbSegments(), iJJtJF, X, Y);
@@ -480,12 +467,53 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
     real e = blas::difference(nbp, Y, vec);
     if ( e > 1e-6 )
     {
-        std::clog << "\naddProjectionDiff(" << nbp << ") error " << e;
-        VecPrint::print("\nref ", std::min(16UL,nbp), vec);
-        VecPrint::print("\nopt ", std::min(16UL,nbp), Y);
+        std::clog << "Mecafil:addProjectionDiff(" << nbp << ") error " << e << "\n";
+        VecPrint::edges("ref ", nbp, vec, 3);
+        VecPrint::edges("sse ", nbp, Y, 3);
     }
     free_real(vec);
 #endif
+}
+
+#endif
+
+#if ADD_PROJECTION_DIFF == 2
+
+/** This is the debug pathway */
+void Mecafil::makeProjectionDiff(const real* force)
+{
+    if ( force )
+    {
+        // compute tensions in 'iLag' using the given forces
+        computeTensions(force);
+        return;
+    }
+    
+    // Check that `iLLG` contains the same values as `iLag`
+    real e = blas::difference(nbSegments(), iLLG, iLag);
+    if ( e > 1e-6 )
+    {
+        size_t S = std::min(16LU, nbSegments());
+        std::clog << "Mecafil: |iLag - iLLG| = " << e << "\n";
+        VecPrint::print("iLag ", S, iLag);
+        VecPrint::print("iLLG ", S, iLLG);
+    }
+
+#if HAS_UNCONSTRAINED_LENGTH
+    if ( !unconstrainLength )
+#endif
+        setProjectionDiff(0);
+}
+
+#elif ADD_PROJECTION_DIFF
+
+/** This is the normal pathway without verifications */
+void Mecafil::makeProjectionDiff(const real*)
+{
+#if HAS_UNCONSTRAINED_LENGTH
+    if ( !unconstrainLength )
+#endif
+    setProjectionDiff(0);
 }
 
 #endif
