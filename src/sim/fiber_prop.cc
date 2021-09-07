@@ -330,7 +330,7 @@ void FiberProp::clear()
 #if NEW_FIBER_LOOP
     loop                = 0;
 #endif
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     constrain_length     = true;
 #endif
     activity            = "none";
@@ -487,7 +487,7 @@ void FiberProp::read(Glossary& glos)
 #if NEW_FIBER_LOOP
     glos.set(loop,              "loop");
 #endif
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     glos.set(constrain_length, "constrain_length");
 #endif
     glos.set(activity, "activity");
@@ -690,7 +690,7 @@ void FiberProp::write_values(std::ostream& os) const
 #if NEW_FIBER_LOOP
     write_value(os, "loop",                loop);
 #endif
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     write_value(os, "constrain_length", constrain_length);
 #endif
     write_value(os, "activity",            activity);

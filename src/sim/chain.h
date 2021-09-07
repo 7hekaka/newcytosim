@@ -108,7 +108,7 @@ private:
     
 protected:
 
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     /// true if projection operator is identity
     bool unconstrainLength;
 #endif
@@ -187,10 +187,10 @@ public:
     /// change the current segmentation to force `length()==len` (normally not needed)
     void imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
    
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     void constrainLength(bool s) { unconstrainLength = !s; }
 #else
-    void constrainLength(bool s) { if (!s) { std::cerr<<"HAS_UNCONSTRAINED_LENGTH is off\n"; exit(1); } }
+    void constrainLength(bool s) { if (!s) { std::cerr<<"NEW_UNCONSTRAINED_LENGTH is off\n"; exit(1); } }
 #endif
 
     //---------------------

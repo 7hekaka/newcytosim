@@ -310,7 +310,7 @@ void scaleTangentially(size_t nbp, const real* src, const real* dir, real* dst)
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     if ( unconstrainLength )
     {
         if ( X != Y )
@@ -499,7 +499,7 @@ void Mecafil::makeProjectionDiff(const real* force)
         VecPrint::print("iLLG ", S, iLLG);
     }
 
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     if ( !unconstrainLength )
 #endif
         setProjectionDiff(0);
@@ -510,7 +510,7 @@ void Mecafil::makeProjectionDiff(const real* force)
 /** This is the normal pathway without verifications */
 void Mecafil::makeProjectionDiff(const real*)
 {
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     if ( !unconstrainLength )
 #endif
     setProjectionDiff(0);

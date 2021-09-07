@@ -331,7 +331,7 @@ public:
     bool loop;
 #endif
     
-#if HAS_UNCONSTRAINED_LENGTH
+#if NEW_UNCONSTRAINED_LENGTH
     /// if `true` do not enforce segment length constraints
     bool constrain_length;
 #endif

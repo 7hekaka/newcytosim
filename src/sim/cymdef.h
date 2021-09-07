@@ -28,7 +28,7 @@
 
 
 /// Option to not use constraints on the fiber's segment lengths
-#define HAS_UNCONSTRAINED_LENGTH 0
+#define NEW_UNCONSTRAINED_LENGTH 0
 
 
 

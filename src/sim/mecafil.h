@@ -21,7 +21,7 @@
  
  Conclusion : do not enable this normally
 */
-#define PROJECT_WITH_MATRIX 0
+#define OLD_PROJECT_WITH_MATRIX 0
 
 class Matrix;
 
@@ -55,7 +55,7 @@ private:
     real * iAni;
 #endif
 
-#if PROJECT_WITH_MATRIX
+#if OLD_PROJECT_WITH_MATRIX
     
     /* variables used for projecting with a matrix ( mecafil_projectmat.cc ) */
     
