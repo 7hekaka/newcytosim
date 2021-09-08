@@ -37,6 +37,15 @@ namespace VecPrint
         print(stdout, len, vec, digits, dim);
     }
     
+    /// print vector to stdout
+    template< typename T >
+    void print(char const* msg, size_t len, const T* vec, int digits = 2, size_t dim = 0)
+    {
+        printf("%6s ", msg);
+        print(stdout, len, vec, digits, dim);
+        printf("\n");
+    }
+
     /// print up to 16 scalars from given vector, from the start
     template< typename T >
     void head(size_t len, const T* vec)
@@ -48,6 +57,14 @@ namespace VecPrint
             print(std::min(16UL, len), vec, 3);
             printf("...");
         }
+    }
+    
+    template< typename T >
+    void head(char const* msg, size_t len, const T* vec, int digits = 2)
+    {
+        printf("%6s ", msg);
+        head(len, vec, digits);
+        printf("\n");
     }
 
     /// print up to 16 scalars from given vector, taken from the edges
