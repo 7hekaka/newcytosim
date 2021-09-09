@@ -64,7 +64,7 @@ new cell
 
 new back
 {
-    radius = 8, 6
+    radius = 8, 6, 1
 }
 
 

@@ -33,7 +33,7 @@ The first step in this tutorial is to set up a simple systems with a single fila
 
 Lets create a small simulation space with radius 2 um and add single actin filament of length 3 um at the center:
 
-    set simul tutorial
+    set simul system
     {
         time_step = 0.01
     }
@@ -60,7 +60,7 @@ Lets create a small simulation space with radius 2 um and add single actin filam
         position = 0,0
     }
     
-    run 5000 simul *
+    run 5000 system
     {
         nb_frames = 50
     }

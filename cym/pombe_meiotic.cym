@@ -95,7 +95,6 @@ set couple link
 
 new link
 {
-    position = 0 0 0
     attach1 = fiber1, 0
     attach2 = fiber2, 0
 }

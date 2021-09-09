@@ -43,7 +43,7 @@ The firs step in this tutorial is to create a simple simulation composed of many
 equal size randomly distributed inside a circle. Let's define a circular space of radius 5 um, 
 filled with 600 filaments of length 2 um.
 
-    set simul tutorial
+    set simul system
     {
         time_step = 0.01
     }
@@ -69,7 +69,7 @@ filled with 600 filaments of length 2 um.
         length = 2
     }
 
-    run 5000 simul *
+    run 5000 system
     {
         nb_frames = 50
     }

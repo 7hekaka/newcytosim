@@ -101,7 +101,7 @@ report platelet *
 
 repeat 10
 {
-    run 100 simul *
+    run 100 system
     {
         nb_frames = 5
     }
@@ -112,7 +112,7 @@ change cell { radius = 1.1 }
 
 repeat 20
 {
-    run 100 simul *
+    run 100 system
     {
         nb_frames = 5
     }

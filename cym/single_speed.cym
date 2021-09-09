@@ -1,5 +1,6 @@
 % Mobile Single (for Douglas W. Houston)
 % F. Nedelec, Cambridge 07.05.2019
+# This requires to enable NEW_MOBILE_SINGLE
 
 set simul system
 {

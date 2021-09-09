@@ -331,7 +331,7 @@ void FiberProp::clear()
     loop                = 0;
 #endif
 #if NEW_UNCONSTRAINED_LENGTH
-    constrain_length     = true;
+    constrain_length    = true;
 #endif
     activity            = "none";
     display             = "";

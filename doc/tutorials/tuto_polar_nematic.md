@@ -62,7 +62,7 @@ You should first set up a basic configuration file. Since we are interested in t
         length = 2.5
     }
     
-    run 10000 simul *
+    run 10000 system
     {
         nb_frames = 1000
     }

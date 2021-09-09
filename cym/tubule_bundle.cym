@@ -47,7 +47,7 @@ set fiber filament
     rigidity = 0.1
     segmentation = 0.032
     lattice = 1, 0.008
-    skip_projection = 1
+    constrain_length = 0
 }
 
 

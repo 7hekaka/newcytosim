@@ -55,12 +55,15 @@ set actin rigidity { 1 }
 
 %%%%%%%%%%%% old syntax:
 
+repeat 0 {
 change fiber actin { rigidity=1; }
 change fiber microtubule { rigidity=20; }
 change simul:display * { back_color=black; }
 change simul * { viscosity = 1; }
-
 set simul:display * { back_color = blue; }
+}
+
+change system display { back_color=black; }
 
 new 10 actin
 {
