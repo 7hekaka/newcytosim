@@ -134,7 +134,7 @@ public:
     char symbol;
     
     /// color of symbol (set as symbol[1])
-    gle_color symbol_color;
+    gle_color colorS;
     
     /// @}
     

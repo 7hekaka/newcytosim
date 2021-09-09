@@ -39,17 +39,17 @@ PointDisp::PointDisp(const std::string& k, const std::string& n)
 
 PointDisp::PointDisp(PointDisp const& o) : Property(o)
 {
-    mKind        = o.mKind;
-    visible      = o.visible;
-    color        = o.color;
-    color2       = o.color2;
-    coloring     = o.coloring;
-    size         = o.size;
-    width        = o.width;
-    shape        = o.shape;
-    style        = o.style;
-    symbol       = o.symbol;
-    symbol_color = o.symbol_color;
+    mKind    = o.mKind;
+    visible  = o.visible;
+    color    = o.color;
+    color2   = o.color2;
+    coloring = o.coloring;
+    size     = o.size;
+    width    = o.width;
+    shape    = o.shape;
+    style    = o.style;
+    symbol   = o.symbol;
+    colorS   = o.colorS;
 
     clearPixelmaps();
 }
@@ -57,20 +57,19 @@ PointDisp::PointDisp(PointDisp const& o) : Property(o)
 
 PointDisp& PointDisp::operator = (PointDisp const& o)
 {
-    mKind        = o.mKind;
-    visible      = o.visible;
-    color        = o.color;
-    color2       = o.color2;
-    coloring     = o.coloring;
-    size         = o.size;
-    width        = o.width;
-    shape        = o.shape;
-    style        = o.style;
-    symbol       = o.symbol;
-    symbol_color = o.symbol_color;
+    mKind    = o.mKind;
+    visible  = o.visible;
+    color    = o.color;
+    color2   = o.color2;
+    coloring = o.coloring;
+    size     = o.size;
+    width    = o.width;
+    shape    = o.shape;
+    style    = o.style;
+    symbol   = o.symbol;
+    colorS   = o.colorS;
     
     clearPixelmaps();
-    
     return *this;
 }
 
@@ -104,7 +103,7 @@ void PointDisp::clear()
     shape        = 'o';
     style        = 7;
     symbol       = 0;
-    symbol_color = 0xFFFFFFFF;
+    colorS = 0xFFFFFFFF;
 }
 
 void PointDisp::strokeA() const
@@ -128,7 +127,7 @@ void PointDisp::strokeA() const
             glTranslatef(-52.35f, -35, 0);
         else
             glTranslatef(-52.35f, -50, 0);
-        symbol_color.load();
+        colorS.load();
         glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, symbol);
     }
 }
@@ -455,29 +454,29 @@ void PointDisp::prepare_pixels(GLfloat uf, GLfloat sf, bool pixelmaps)
 
 void PointDisp::read(Glossary& glos)
 {
-    glos.set(visible,      "visible");
+    glos.set(visible, "visible");
     
     // set 'color2' as a darker tone of 'color':
-    if ( glos.set(color,   "color") )
+    if ( glos.set(color, "color") )
         color2 = color.alpha_scaled(DIM==2?0.25f:0.5f);
-    glos.set(color2,       "color", 1, "back_color", 0);
-    glos.set(coloring,     "coloring");
+    glos.set(color2, "color", 1, "back_color", 0);
+    glos.set(coloring, "coloring");
     
     // if 'size' is specified, width is set accordingly:
-    if ( glos.set(size,    "size") )
+    if ( glos.set(size, "size") )
         width = 2 * size / 3;
     else
-        glos.set(size,     "point_size");
+        glos.set(size, "point_size");
 #if BACKWARD_COMPATIBILITY < 100
-    glos.set(size,         "points");
-    glos.set(shape,        "points", 1);
+    glos.set(size, "points");
+    glos.set(shape, "points", 1);
 #endif
 
-    glos.set(width,        "width");
-    glos.set(style,        "style");
-    glos.set(shape,        "shape");
-    glos.set(symbol,       "symbol");
-    glos.set(symbol_color, "symbol", 1);
+    glos.set(width, "width");
+    glos.set(style, "style");
+    glos.set(shape, "shape");
+    glos.set(symbol, "symbol");
+    glos.set(colorS, "symbol", 1);
     
     if ( ! isprint(symbol) )
         symbol = 0;
@@ -491,16 +490,16 @@ void PointDisp::read(Glossary& glos)
 
 void PointDisp::write_values(std::ostream& os) const
 {
-    write_value(os, "visible",     visible);
+    write_value(os, "visible", visible);
     if ( color2 != color.alpha_scaled(DIM==2?0.25f:0.5f) )
-        write_value(os, "color",   color, color2);
+        write_value(os, "color", color, color2);
     else
-        write_value(os, "color",   color);
-    write_value(os, "coloring",    coloring);
-    write_value(os, "size",        size);
-    write_value(os, "width",       width);
-    write_value(os, "shape",       shape);
-    write_value(os, "style",       style);
-    write_value(os, "symbol",      symbol, symbol_color);
+        write_value(os, "color", color);
+    write_value(os, "coloring", coloring);
+    write_value(os, "size", size);
+    write_value(os, "width", width);
+    write_value(os, "shape", shape);
+    write_value(os, "style", style);
+    write_value(os, "symbol", symbol, colorS);
 }
 

@@ -12,7 +12,7 @@ set system display { size = 1024; }
 set space cell
 {
     shape = sphere
-    display = ( color=blue, blue; width=1; visible=3; )
+    display = ( color=blue, blue; width=1; visible=2; )
 }
 
 set fiber text
