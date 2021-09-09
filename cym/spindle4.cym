@@ -149,9 +149,14 @@ new 50 filament
     plus_end = grow
 }
 
+new event
+{
+    rate = 4;
+    code = ( new filament { position=rectangle 2 5; length=0.05; plus_end=grow; } )
+}
+
 run 2000 system
 {
     nb_frames = 10
-    event = 4, ( new filament { position=rectangle 2 5; length=0.05; plus_end=grow; } )
 }
 

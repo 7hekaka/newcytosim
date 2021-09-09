@@ -455,7 +455,7 @@ void testRigidity(size_t cnt, char const* str)
         printf(" XXXX %e ", err);
     else
         printf("  --> %e ", err);
-    printf(" %4s %5.2f cycles\n", str, toc(3*cnt*nbt));
+    printf(" %4s %5.2f cycles\n", str, toc(cnt*nbt));
 }
 
 
@@ -466,8 +466,6 @@ void test(size_t cnt)
     testRigidity<add_rigidity2>(cnt, "2  ");
 #endif
     testRigidity<add_rigidity3>(cnt, "3  ");
-    testRigidity<add_rigidityF>(cnt, "F  ");
-    testRigidity<add_rigidityG>(cnt, "G  ");
     testRigidity<add_rigidityF>(cnt, "F  ");
     testRigidity<add_rigidityG>(cnt, "G  ");
     testRigidity<add_rigidity4>(cnt, "4  ");

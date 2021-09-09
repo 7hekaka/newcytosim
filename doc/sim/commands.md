@@ -121,7 +121,6 @@ You may use `set` to change values of an existing Property:
      {
         duration   = POSITIVE_REAL
         solve      = SOLVE_MODE
-        event      = RATE, ( CODE )
         nb_frames  = INTEGER, ( CODE )
         prune      = BOOLEAN
         flux_speed = NEGATIVE_REAL
@@ -150,7 +149,6 @@ You may use `set` to change values of an existing Property:
  `nb_steps`   |  `1`    | number of simulation steps
  `duration`   |  `- `   | when specified, `nb_steps` is set to `ceil(duration/time_step)`
  `solve`      |  `on`   | Define the type of method used for the mechanics
- `event`      |  `none` | custom code executed stochastically with prescribed rate
  `nb_frames`  |  `0`    | number of states written to trajectory file
  `prune`      |  `true` | Print only parameters that are different from default
  
@@ -166,14 +164,6 @@ You may use `set` to change values of an existing Property:
  `auto`       | Same as 'on' but preconditionning method is set automatically.
  `horizontal` | Objects can move in the X-direction. The mechanics is solved partly.
  `flux`       | Fibers are translated at `flux_speed` according to their orientation.
- 
- If set, `event` defines an event occuring at a rate specified by the positive real `RATE`.
- The action is defined by CODE, a string enclosed with parenthesis containing cytosim commands.
- This code will be executed at stochastic times with the specified rate.
- 
- Example:
-
-     event = 10, ( new actin { position=(rectangle 1 6); length=0.1; } )
  
  Calling `run` will not output the initial state, but this can be done with a separate command:
  

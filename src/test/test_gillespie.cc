@@ -172,34 +172,34 @@ public:
     
     void step(real interval)
     {
-        real    earliest_time = 0;
-        Event * earliest_event = 0;
+        real next_time = 0;
+        Event * earliest = 0;
         
         for ( iterator i = head; i; i = i->next )
         {
             Event * e = static_cast<Event*>(i);
             e->step(interval);
             real t = e->time();
-            if ( t < earliest_time )
+            if ( t < next_time )
             {
-                earliest_time = t;
-                earliest_event = e;
+                next_time = t;
+                earliest = e;
             }
         }
         
-        while ( earliest_time < 0 )
+        while ( next_time < 0 )
         {
-            earliest_event->act(*this);
+            earliest->act(*this);
             
-            earliest_time = 0;
+            next_time = 0;
             for ( iterator i = head; i; i = i->next )
             {
                 Event * e = static_cast<Event*>(i);
                 real t = e->time();
-                if ( t < earliest_time )
+                if ( t < next_time )
                 {
-                    earliest_time = t;
-                    earliest_event = e;
+                    next_time = t;
+                    earliest = e;
                 }
             }
         }

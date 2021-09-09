@@ -48,7 +48,7 @@ set fiber filament
     segmentation = 1.0
     activity = classic
     growing_force = 1.67             % Dogterom 1997 
-    delete_stub = 0
+    persistent = 1
     rebirth_rate = inf
     min_length = 0.005
 

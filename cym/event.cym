@@ -84,10 +84,14 @@ new event
    code = ( delete ball )
 }
 
-% old syntax
+new event
+{
+    rate = 50
+    code = ( new ball { radius=0.25; position=0 0 0; } )
+}
+
 run 100 system
 {
-    event = 50, ( new ball { radius=0.25; position=0 0 0; } )
 }
 
 delete all event
@@ -118,11 +122,14 @@ new event
    mark = 1
 }
 
-% including 'event' inside 'run' is an old format,
-% that should be supported for backward compatibility
+new event
+{
+   rate = 50
+   code = ( new ball { radius=0.25; position=0 0 0; } )
+}
+
 run 100 system
 {
-    event = 50, ( new ball { radius=0.25; position=0 0 0; } )
 }
 
 delete all event

@@ -82,7 +82,7 @@ Like microtubules *in vivo*, we want these microtubules to be dynamic. Set the a
         catastrophe_rate = 0.03
         rescue_rate      = 0
         growing_force    = 1.67
-        delete_stub      = 1
+        persistent       = 0
         min_length       = 0.02
       ...
     }
@@ -96,7 +96,7 @@ The growing speed here is in um/s. One needs to specify the initial state of the
         plus_end = 1
     }
 
-We have also changed the initial length of the microtubules. Now the microtubules will grow to an average length of 2.5 um before undergoing a catastrophe. Rescues do not occur and once the microtubule is in its shrinking state and reaches the `min_length`, `delete_stub = 1` means that it will be deleted.
+We have also changed the initial length of the microtubules. Now the microtubules will grow to an average length of 2.5 um before undergoing a catastrophe. Rescues do not occur and once the microtubule is in its shrinking state and reaches the `min_length`, `persistent = 0` means that it will be deleted.
 
 ### Defining the nucleators
 

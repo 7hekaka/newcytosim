@@ -72,10 +72,15 @@ new 128 filament
 new 2500 complex
 new 3000 crosslinker
 
+new 0 event
+{
+    rate = 100;
+    code = ( delete 1 filament; new filament { length = 3.6; } )
+}
+
 run 10000 system
 {
     nb_frames = 50
-    %event = 100, ( delete 1 filament; new filament { length = 3.6; } )
 }
 
 

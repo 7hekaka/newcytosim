@@ -47,7 +47,7 @@ Let's see what this files contains.
 	    catastrophe_outside = 1;
 	    catastrophe_rate = 0.15;
 	    confine = inside, 100;
-	    delete_stub = 0;
+	    persistent = 1;
 	    growing_force = 1.67;
 	    growing_speed = 0.5;
 	    min_length = 0.25;

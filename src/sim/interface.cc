@@ -777,7 +777,6 @@ void Interface::do_steps(size_t& sss, size_t cnt)
      {
         duration   = POSITIVE_REAL
         solve      = SOLVE_MODE
-        event      = RATE, ( CODE )
         nb_frames  = INTEGER, ( CODE )
         prune      = BOOL
      }
@@ -805,7 +804,6 @@ void Interface::do_steps(size_t& sss, size_t cnt)
  `nb_steps`   |  1      | number of simulation steps
  `duration`   |  -      | when specified, `nb_steps` is set to `std::ceil(duration/time_step)`
  `solve`      |  `on`   | Define the type of method used for the mechanics
- `event`      |  `none` | custom code executed stochastically with prescribed rate
  `nb_frames`  |  0      | number of states written to trajectory file
  `prune`      |  `true` | Print only parameters that are different from default
  
@@ -823,23 +821,6 @@ void Interface::do_steps(size_t& sss, size_t cnt)
  `half`       | Solve mechanical system and calculate forces but do not apply movements.
  `horizontal` | The mechanics is solved only allowing motion in the X-direction.
  `flux`       | Fibers are translated at `flux_speed` according to their orientation.
- 
- If set, `event` defines an event occuring at a rate specified by the positive real `RATE`.
- The action is defined by CODE, a string enclosed with parenthesis containing cytosim commands.
- This code will be executed at stochastic times with the specified rate.
- 
- Example:
-
-     event = 10, ( new actin { position=(rectangle 1 6); length=0.1; } )
- 
- Calling `run` will not output the initial state, but this can be done with a separate command:
- 
-     export objects objects.cmo { append = 0 }
- 
-     run 1000 system
-     {
-        nb_frames = 10
-     }
  
  */
 void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)

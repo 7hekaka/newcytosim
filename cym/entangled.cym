@@ -5,7 +5,7 @@
 
 set simul system 
 {
-    time_step = 0.001
+    time_step = 0.0001
     steric = 1, 500
     kT = 0.00428
     viscosity = 0.001
@@ -25,8 +25,8 @@ new cell
 set fiber actin
 {
     rigidity = 0.04
-    segmentation = 0.5
-    steric = 1, 0.01
+    segmentation = 0.25
+    steric = 1, 0.05
 
     display = ( line=3; coloring=1; )
 }
