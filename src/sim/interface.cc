@@ -740,8 +740,10 @@ void Interface::execute_connect(std::string const& name, Glossary& opt)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-static void reportCPUtime(size_t frm, real simtime)
+/** Using a static frame counter */
+static void reportCPUtime(real t)
 {
+    static size_t frm = 1;
     static time_t nxt = 0;
     time_t now = TicToc::seconds_since_1970();
     if ( now > nxt )
@@ -749,11 +751,11 @@ static void reportCPUtime(size_t frm, real simtime)
         nxt = (nxt>0?nxt:now) + 3600;
         Cytosim::log << "% " << TicToc::date() << "\n";
     }
-    
     static double clk = 0;
     double cpu = double(clock()) / CLOCKS_PER_SEC;
-    Cytosim::log("F%-6lu  %7.2fs   CPU %10.3fs  %10.0fs\n", frm, simtime, cpu-clk, cpu);
+    Cytosim::log("F%-6lu  %7.2fs   CPU %10.3fs  %10.0fs\n", frm, t, cpu-clk, cpu);
     clk = cpu;
+    ++frm;
 }
 
 
@@ -872,7 +874,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     
     VLOG("+RUN START " << nb_steps);
     
-    size_t frame = 0;
+    size_t frm = 0;
     size_t sss = 0;
     do {
         switch ( solve )
@@ -885,14 +887,14 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
             case 5: do_steps<&Simul::solve_flux>(sss, check); break;
             case 7: do_steps<&Simul::solve_half>(sss, check); break;
         }
-        ++frame;
-        check = size_t(delta*(frame+1));
+        ++frm;
+        check = size_t(delta*(frm+1));
 
         if ( do_write )
         {
             simul_.relax();
             simul_.writeObjects(TRAJECTORY, true, binary);
-            reportCPUtime(frame, simul_.time());
+            reportCPUtime(simul_.time());
             simul_.sMeca.doNotify = 2;  // to print convergence parameters
             simul_.unrelax();
         }
