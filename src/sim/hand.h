@@ -189,21 +189,21 @@ public:
     
     /**
      Test for spontaneous detachment using Gillespie counter (@ref Stochastic)
-     @return true if the hand should remain attached
+     @return true if the hand should detach
      */
-    bool testDetachment()
+    bool checkDetachment()
     {
         assert_true( nextDetach >= 0 );
         nextDetach -= prop->unbinding_rate_dt;
         
-        return ( nextDetach > 0 );
+        return ( nextDetach < 0 );
     }
     
     /**
      Test for force-dependent detachment using Gillespie counter (@ref Stochastic)
-     @return true if the hand should remain attached
+     @return true if the hand should detach
      */
-    bool testKramersDetachment(const real force)
+    bool checkKramersDetachment(const real force)
     {
         assert_true( nextDetach >= 0 );
         /*
@@ -214,7 +214,7 @@ public:
         //std::cerr << prop->name() << " " << std::exp(force*prop->unbinding_force_inv) << "\n";
         nextDetach -= prop->unbinding_rate_dt * std::exp(force*prop->unbinding_force_inv);
         
-        return ( nextDetach > 0 );
+        return ( nextDetach < 0 );
     }
 };
 

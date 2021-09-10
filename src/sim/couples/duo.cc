@@ -93,10 +93,10 @@ void Duo::stepAF()
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
     cHand2->stepUnattached(simul(), cHand1->outerPos());
 
-    if ( cHand1->testDetachment() )
-        cHand1->stepUnloaded();
-    else
+    if ( cHand1->checkDetachment() )
         cHand1->detach();
+    else
+        cHand1->stepUnloaded();
 }
 
 
@@ -114,10 +114,10 @@ void Duo::stepFA()
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
     cHand1->stepUnattached(simul(), cHand2->outerPos());
 
-    if ( cHand2->testDetachment() )
-        cHand2->stepUnloaded();
-    else
+    if ( cHand2->checkDetachment() )
         cHand2->detach();
+    else
+        cHand2->stepUnloaded();
 }
 
 
@@ -135,15 +135,15 @@ void Duo::stepAA()
     Vector f = force();
     real fn = f.norm();
     
-    if ( cHand1->testKramersDetachment(fn) )
-        cHand1->stepLoaded( f);
-    else
+    if ( cHand1->checkKramersDetachment(fn) )
         cHand1->detach();
-    
-    if ( cHand2->testKramersDetachment(fn) )
-        cHand2->stepLoaded(-f);
     else
+        cHand1->stepLoaded( f);
+    
+    if ( cHand2->checkKramersDetachment(fn) )
         cHand2->detach();
+    else
+        cHand2->stepLoaded(-f);
 }
 
 

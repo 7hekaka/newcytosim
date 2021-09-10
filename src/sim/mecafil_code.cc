@@ -1470,7 +1470,7 @@ void addProjectionDiff3D_SSE(const size_t nbs, const double* mul, const double* 
     const double* end = mul + nbs - 1;
     src += DIM;
     
-#if 1
+#if 0
     p1 = catshift(p0, p1);
     p0 = unpacklo2(p0, p0); // lower value will not be used
     while ( mul < end )

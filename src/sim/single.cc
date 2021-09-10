@@ -146,10 +146,10 @@ void Single::stepA()
     sPos += prop->speed_dt;
 #endif
     
-    if ( sHand->testDetachment() )
-        sHand->stepUnloaded();
-    else
+    if ( sHand->checkDetachment() )
         sHand->detach();
+    else
+        sHand->stepUnloaded();
 }
 
 /**
