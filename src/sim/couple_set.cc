@@ -23,6 +23,41 @@ void CoupleSet::prepare(PropertyList const& properties)
 }
 
 
+/// templated member function pointer...
+template < void (Couple::*FUNC)() >
+static void couple_steps(Couple * obj)
+{
+    while ( obj )
+    {
+        Couple * nxt = obj->next();
+        (obj->*FUNC)();
+        obj = nxt;
+    }
+}
+
+
+/// templated member function pointer...
+template < void (Couple::*FUNC)() >
+static void couple_steps(Couple * obj, bool odd)
+{
+    Couple * nxt;
+    if ( odd )
+    {
+        nxt = obj->next();
+        (obj->*FUNC)();
+        obj = nxt;
+    }
+    // this loop is unrolled, processing objects 2 by 2:
+    while ( obj )
+    {
+        nxt = obj->next();
+        (obj->*FUNC)();
+        obj = nxt->next();
+        (nxt->*FUNC)();
+    }
+}
+
+
 void CoupleSet::step()
 {
     /*
@@ -48,87 +83,23 @@ void CoupleSet::step()
     bool const faOdd = faList.size() & 1;
     bool const afOdd = afList.size() & 1;
     bool const ffOdd = ffList.size() & 1;
+    
+    couple_steps<&Couple::stepAA>(firstAA(), aaList.size() & 1);
+    couple_steps<&Couple::stepFA>(faHead, faOdd);
+    couple_steps<&Couple::stepAF>(afHead, afOdd);
 
-    Couple * obj, * nxt;
-    
-    obj = firstAA();
-    // this loop is unrolled, processing objects 2 by 2:
-    if ( aaList.size() & 1 )
-    {
-        nxt = obj->next();
-        obj->stepAA();
-        obj = nxt;
-    }
-    while ( obj )
-    {
-        nxt = obj->next();
-        obj->stepAA();
-        obj = nxt->next();
-        nxt->stepAA();
-    }
-    
-    obj = faHead;
-    // this loop is unrolled, processing objects 2 by 2:
-    if ( faOdd )
-    {
-        nxt = obj->next();
-        obj->stepFA();
-        obj = nxt;
-    }
-    while ( obj )
-    {
-        nxt = obj->next();
-        obj->stepFA();
-        obj = nxt->next();
-        nxt->stepFA();
-    }
-
-    obj = afHead;
-    // this loop is unrolled, processing objects 2 by 2:
-    if ( afOdd )
-    {
-        nxt = obj->next();
-        obj->stepAF();
-        obj = nxt;
-    }
-    while ( obj )
-    {
-        nxt = obj->next();
-        obj->stepAF();
-        obj = nxt->next();
-        nxt->stepAF();
-    }
-    
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        obj = uniCollect(ffHead);
+        Couple * rest = uniCollect(ffHead);
         uniAttach(simul_.fibers);
-        while ( obj )
-        {
-            nxt = obj->next();
-            obj->stepFF();
-            obj = nxt;
-        }
+        couple_steps<&Couple::stepFF>(rest);
     }
     else
     {
         //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << '\n';
         // this loop is unrolled, processing objects 2 by 2:
-        obj = ffHead;
-        if ( ffOdd )
-        {
-            nxt = obj->next();
-            obj->stepFF();
-            obj = nxt;
-        }
-        while ( obj )
-        {
-            nxt = obj->next();
-            obj->stepFF();
-            obj = nxt->next();
-            nxt->stepFF();
-        }
+        couple_steps<&Couple::stepFF>(ffHead, ffOdd);
     }
 
     //printf("  : %lu couples [ %u %u ]\n", size(), inventory.first_identity(), inventory.last_identity());
@@ -868,7 +839,7 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
 
 /**
  Transfer free Couple with `fast_diffusion` to the reserves, starting from `obj`.
- Return first Couple that was not transferred.
+ Return first Couple that was not transferred. All followers also escape UniAttach
 */
 Couple* CoupleSet::uniCollect(Couple * obj)
 {

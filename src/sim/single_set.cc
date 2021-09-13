@@ -20,6 +20,41 @@ void SingleSet::prepare(PropertyList const& properties)
 }
 
 
+/// templated member function pointer...
+template < void (Single::*FUNC)() >
+static void single_steps(Single * obj)
+{
+    while ( obj )
+    {
+        Single * nxt = obj->next();
+        (obj->*FUNC)();
+        obj = nxt;
+    }
+}
+
+
+/// templated member function pointer...
+template < void (Single::*FUNC)() >
+static void single_steps(Single * obj, bool odd)
+{
+    Single * nxt;
+    if ( odd )
+    {
+        nxt = obj->next();
+        (obj->*FUNC)();
+        obj = nxt;
+    }
+    // this loop is unrolled, processing objects 2 by 2:
+    while ( obj )
+    {
+        nxt = obj->next();
+        (obj->*FUNC)();
+        obj = nxt->next();
+        (nxt->*FUNC)();
+    }
+}
+
+
 void SingleSet::step()
 {
     /*
@@ -33,34 +68,20 @@ void SingleSet::step()
     //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
     
     Single *const fHead = firstF();
-    Single * obj, * nxt;
+    bool fOdd = sizeF() & 1;
     
-    obj = firstA();
-    while ( obj )
-    {
-        nxt = obj->next();
-        obj->stepA();
-        if ( ! nxt ) break;
-        obj = nxt->next();
-        nxt->stepA();
-    }
+    single_steps<&Single::stepA>(firstA(), sizeA() & 1);
     
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        obj = uniCollect(fHead);
+        Single * rest = uniCollect(fHead);
         uniAttach(simul_.fibers);
+        single_steps<&Single::stepF>(rest);
     }
     else
-        obj = fHead;
-    
-    while ( obj )
     {
-        nxt = obj->next();
-        obj->stepF();
-        if ( ! nxt ) break;
-        obj = nxt->next();
-        nxt->stepF();
+        single_steps<&Single::stepF>(fHead, fOdd);
     }
 }
 
