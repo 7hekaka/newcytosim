@@ -14,6 +14,7 @@ SpaceEllipse::SpaceEllipse(SpaceProp const* p)
 #endif
     for ( int d = 0; d < 3; ++d )
         radius_[d] = 0;
+    thickness_ = 0;
 }
 
 
@@ -48,6 +49,7 @@ void SpaceEllipse::resize(Glossary& opt)
         if ( len < REAL_EPSILON )
             throw InvalidParameter("ellipse:radius[] must be > 0");
         radius_[d] = len;
+        opt.set(thickness_, "thickness");
     }
     update();
 }
@@ -193,7 +195,7 @@ void SpaceEllipse::write(Outputter& out) const
     out.writeFloat(radius_[0]);
     out.writeFloat(radius_[1]);
     out.writeFloat(radius_[2]);
-    out.writeFloat(0.f);
+    out.writeFloat(thickness_);
 }
 
 void SpaceEllipse::setLengths(const real len[])
@@ -201,6 +203,7 @@ void SpaceEllipse::setLengths(const real len[])
     radius_[0] = len[0];
     radius_[1] = len[1];
     radius_[2] = len[2];
+    thickness_ = len[3];
     update();
 }
 
@@ -242,9 +245,10 @@ void SpaceEllipse::draw2D() const
 
 void SpaceEllipse::draw3D() const
 {
-    GLfloat X(radius_[0]);
-    GLfloat Y((DIM>1)?radius_[1]:1);
-    GLfloat Z((DIM>2)?radius_[2]:1);
+    GLfloat T = thickness_;
+    GLfloat X(T+radius_[0]);
+    GLfloat Y(T+((DIM>1)?radius_[1]:1));
+    GLfloat Z(T+((DIM>2)?radius_[2]:1));
 
     glPushMatrix();
     glScalef(X, Y, Z);

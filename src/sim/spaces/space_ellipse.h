@@ -39,6 +39,9 @@ protected:
     int mSpheroid;
 #endif
     
+    /// amount added to radius for display
+    real thickness_;
+    
     /// update derived lengths
     void update();
     
