@@ -24,7 +24,16 @@ namespace gle
     GLuint buf_[4] = { 0 };
 
     /// offset for objects data stored in buffers
-    GLsizei start_[36] = { 0 };
+    GLsizei tubes_[24] = { 0 };
+
+    /// offset for objects data stored in buffers
+    GLsizei cubes_[12] = { 0 };
+    
+    /// offset for objects data stored in buffers
+    GLsizei blobs_[4] = { 0 };
+    
+    /// offset for objects data stored in buffers
+    GLsizei discs_[2] = { 0 };
 
     /// vertex buffer objects for icosahedrons
     GLsizei ico_pts_[8] = { 0 };
@@ -421,7 +430,7 @@ namespace gle
     }
     
     /// set triangle strip for tube with hexagonal crosssection
-    flute6* setHexTube(flute6* flu, float B, float T, float rad)
+    size_t setHexTube(flute6* flu, float B, float T, float rad)
     {
         // the hexagon has the same surface as a disc of radius rad.
         constexpr float C = 0.8660254037844386f; //std::sqrt(3)/2;
@@ -443,11 +452,11 @@ namespace gle
         flu[11] = { X,-Y, B, S,-C, 0};
         flu[12] = { R, 0, T, 1, 0, 0};
         flu[13] = { R, 0, B, 1, 0, 0};
-        return flu + 14;
+        return 14;
     }
 
     /// Tetrahedron is make of 4 triangles = 12 vertices
-    flute6* setTetrahedron(flute6* flt, float R=1.2f)
+    size_t setTetrahedron(flute6* flt, float R=1.2f)
     {
         const float S = R / M_SQRT3;
         const float Y = 2 * S;
@@ -470,11 +479,11 @@ namespace gle
         flt[9] = {-R,-S, B, 0.00000,-0.94281, 0.33333};
         flt[10] = { R,-S, B, 0.00000,-0.94281, 0.33333};
         flt[11] = { 0, 0, Z, 0.00000,-0.94281, 0.33333};
-        return flt + 12;
+        return 12;
     }
     
     /// inversed Tetrahedrons by central symmetry
-    flute6* invTetrahedron(flute6* flt, float R=1.2f)
+    size_t invTetrahedron(flute6* flt, float R=1.2f)
     {
         const float S = R / M_SQRT3;
         const float Y = 2 * S;
@@ -494,12 +503,12 @@ namespace gle
         flt[9] = {-R, S,-B, 0.00000, 0.94281,-0.33333};
         flt[10] = { R, S,-B, 0.00000, 0.94281,-0.33333};
         flt[11] = { 0, 0,-Z, 0.00000, 0.94281,-0.33333};
-        return flt + 12;
+        return 12;
     }
 
     
     /// Cube is made of 12 triangles = 36 vertices
-    flute6* setCube(flute6* flt, float R)
+    size_t setCube(flute6* flt, float R)
     {
         flt[0] = { R, R, R, 1, 0, 0};
         flt[1] = { R,-R,-R, 1, 0, 0};
@@ -537,11 +546,11 @@ namespace gle
         flt[33] = { R, R,-R, 0, 0,-1};
         flt[34] = { R,-R,-R, 0, 0,-1};
         flt[35] = {-R,-R,-R, 0, 0,-1};
-        return flt + 36;
+        return 36;
     }
     
     /// Octahedron is make of 8 triangles = 24 vertices
-    flute6* setOctahedron(flute6* flt, float R=1.46459188756f)
+    size_t setOctahedron(flute6* flt, float R=1.46459188756f)
     {
         // the default size is set to match the volume of the unit sphere
         // Eight triangles, ordered counterclockwise
@@ -570,7 +579,7 @@ namespace gle
         flt[21] = { 0, 0,-R, -N,-N,-N};
         flt[22] = { 0,-R, 0, -N,-N,-N};
         flt[23] = {-R, 0, 0, -N,-N,-N};
-        return flt + 24;
+        return 24;
     }
 
     
@@ -662,7 +671,7 @@ namespace gle
 #endif
     
     /// Icosahedrong with 20 triangles = 60 vertices
-    flute6* setIcosahedron(flute6* flt, float R=1.0f)
+    size_t setIcosahedron(flute6* flt, float R=1.0f)
     {
         const float T = R * 0.8506508084f;      // (1 + sqrt(5))/2
         const float O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
@@ -732,11 +741,11 @@ namespace gle
         flt[i++] = { O,  0,  T, +0,-X,+Y};
         flt[i++] = { 0, -T,  O, +0,-X,+Y};
         assert_true( i == 60 );
-        return flt + i;
+        return i;
     }
     
     /// Three fins similar to the tail of a V2 rocket
-    flute6* setArrowTail(flute6* flt, float R=0.1f, float B=-0.5f,
+    size_t setArrowTail(flute6* flt, float R=0.1f, float B=-0.5f,
                          float H=-1.5f, float L=2.0f)
     {
         const float T = B + L;
@@ -792,13 +801,13 @@ namespace gle
         flt[i++] = { cR, sR, B, -1,  0,-1};
         flt[i++] = {  1,  0, H, -1,  0,-1};
         assert_true( i == 45 );
-        return flt + i;
+        return i;
     }
     
     //-----------------------------------------------------------------------
     
     /// this only sets vertices, skipping normals
-    flute3* setCublob(flute3* flu, float R)
+    size_t setCuboid(flute3* flu, float R)
     {
         const float U = -R;
         flu[0] = {R, U, U};
@@ -815,10 +824,10 @@ namespace gle
         flu[11] = {U, R, R};
         flu[12] = {R, U, R};
         flu[13] = {U, U, R};
-        return flu + 14;
+        return 14;
     }
 
-    flute3* setBlob(flute3* flu)
+    size_t setBlob(flute3* flu)
     {
         constexpr GLfloat R = 1.f, U = -1.f, H(M_SQRT2);
         /* start from a centerred cube, rotated appropriately
@@ -862,7 +871,7 @@ namespace gle
         flu[i++] = normalize(c+c);
         flu[i++] = normalize(a+c);
         assert_true(i==52);
-        return flu + i;
+        return i;
     }
     
     /* This moves some vertices to smoothen the blob */
@@ -889,11 +898,11 @@ namespace gle
         for ( int u : {1,40,51} ) flu[u] = { X, Y, Z};
     }
     
-    flute3* setPin(flute3* flu)
+    size_t setPin(flute3* flu)
     {
-        flute3* res = setBlob(flu);
+        size_t i = setBlob(flu);
         modifyBlob(flu);
-        return res;
+        return i;
     }
 
     void thing()
@@ -940,22 +949,19 @@ namespace gle
         return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 );
     }
     
-    flute6* setCubeBuffers(flute6* ptr, flute6* const ori)
+    flute6* setCubeBuffers(flute6* ptr, flute6* const ori, GLsizei idx[])
     {
-        /*
-         check pointer alignment, which is required to get indices
-         by substracting pointer values below */
-        assert_true( 0 == ( ptr - ori ) % 6 );
-        start_[24+0] = ptr-ori; ptr = setTetrahedron(ptr);
-        start_[24+1] = ptr-ori; ptr = invTetrahedron(ptr);
-        start_[24+2] = ptr-ori; ptr = setOctahedron(ptr);
-        start_[24+3] = ptr-ori; ptr = setIcosahedron(ptr);
-        start_[24+4] = ptr-ori; ptr = setArrowTail(ptr);
-        start_[24+5] = ptr-ori; ptr = setCube(ptr, 0.5773502692f);
-        start_[24+6] = ptr-ori; ptr = setHexTube(ptr, 0, 1, 1.0f);
-        start_[24+7] = ptr-ori; ptr = setHexTube(ptr, 0, 1, 0.5f);
-        start_[24+8] = ptr-ori; ptr = setHexTube(ptr, 0, 256.f, 0.5f);
-        return ptr;
+        size_t i = 0, s = ptr - ori;
+        idx[0] = i+s; i += setTetrahedron(ptr);
+        idx[1] = i+s; i += invTetrahedron(ptr+i);
+        idx[2] = i+s; i += setOctahedron(ptr+i);
+        idx[3] = i+s; i += setIcosahedron(ptr+i);
+        idx[4] = i+s; i += setArrowTail(ptr+i);
+        idx[5] = i+s; i += setCube(ptr+i, 0.5773502692f);
+        idx[6] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
+        idx[7] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
+        idx[8] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
+        return ptr + i;
     }
     
     static size_t sizeBlobBuffers()
@@ -963,16 +969,13 @@ namespace gle
         return ( 52 + 52 + 14 );
     }
 
-    flute3* setBlobBuffers(flute3* ptr, flute3* const ori)
+    flute3* setBlobBuffers(flute3* ptr, flute3* const ori, GLsizei idx[])
     {
-        /*
-         check pointer alignment, which is required to get indices
-         by substracting pointer values below */
-        assert_true( 0 == ( ptr - ori ) % 3 );
-        start_[24+9] = ptr-ori; ptr = setBlob(ptr);
-        start_[24+10] = ptr-ori; ptr = setPin(ptr);
-        start_[24+11] = ptr-ori; ptr = setCublob(ptr, 1.0);
-        return ptr;
+        size_t i = 0, s = ptr - ori;
+        idx[0] = i+s; i += setBlob(ptr+i);
+        idx[1] = i+s; i += setPin(ptr+i);
+        idx[2] = i+s; i += setCuboid(ptr+i, 1.0);
+        return ptr + i;
     }
 
     void drawVNBuffer(GLenum mode, GLint start, size_t cnt)
@@ -1011,27 +1014,27 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void tetrahedron() { drawVNTriangles(start_[24+0], 12); }
-    void octahedron()  { drawVNTriangles(start_[24+2], 24); }
-    void icosahedron() { drawVNTriangles(start_[24+3], 60); }
+    void tetrahedron() { drawVNTriangles(cubes_[0], 12); }
+    void octahedron()  { drawVNTriangles(cubes_[2], 24); }
+    void icosahedron() { drawVNTriangles(cubes_[3], 60); }
     void ICOSAHEDRON() { flute6 tmp[60]; setIcosahedron(tmp); drawVNTriangles(tmp, 60); }
     
-    void arrowTail() { drawVNTriangles(start_[24+4], 45); }
-    void cube()      { drawVNTriangles(start_[24+5], 36); }
-    void star()      { drawVNTriangles(start_[24+0], 24); }
+    void arrowTail() { drawVNTriangles(cubes_[4], 45); }
+    void cube()      { drawVNTriangles(cubes_[5], 36); }
+    void star()      { drawVNTriangles(cubes_[0], 24); }
     
-    void hexTube()      { drawVNStrip(start_[24+6], 14); }
-    void thinTube()     { drawVNStrip(start_[24+7], 14); }
-    void thinLongTube() { drawVNStrip(start_[24+8], 14); }
+    void hexTube()      { drawVNStrip(cubes_[6], 14); }
+    void thinTube()     { drawVNStrip(cubes_[7], 14); }
+    void thinLongTube() { drawVNStrip(cubes_[8], 14); }
 
-    void blob()      { drawTriangleStrip(start_[24+9], 52); }
-    void needle()    { drawTriangleStrip(start_[24+10], 52); }
-    void smallCube() { drawTriangleStrip(start_[24+11], 14); }
+    void blob()   { drawTriangleStrip(blobs_[0], 52); }
+    void needle() { drawTriangleStrip(blobs_[1], 52); }
+    void cuboid() { drawTriangleStrip(blobs_[2], 14); }
 
     //-----------------------------------------------------------------------
-    #pragma mark - 2D circle
-
-    flute2* setCircle(flute2* flu, size_t inc, float Z, float R, float N)
+    #pragma mark - 2D Circle
+    
+    size_t setCircle(flute2* flu, size_t inc, float Z, float R, float N)
     {
         size_t i = 0;
         for ( size_t n = 0; n <= pi_twice; n += inc )
@@ -1039,7 +1042,7 @@ namespace gle
             float C = cos_(n), S = sin_(n);
             flu[i++] = {R*C, R*S};
         }
-        return flu + i;
+        return i;
     }
     
     size_t sizeCircBuffers()
@@ -1047,15 +1050,12 @@ namespace gle
         return 4 + 2 * pi_twice;
     }
     
-    flute2* setCircBuffers(flute2* ptr, flute2* const ori)
+    flute2* setCircBuffers(flute2* ptr, flute2* const ori, GLsizei idx[])
     {
-        /*
-         check pointer alignment, which is required to get indices
-         by substracting pointer values below */
-        assert_true( 0 == ( ptr - ori ) % 2 );
-        start_[22] = ptr-ori; ptr = setCircle(ptr, 1, 0, 1, 1);
-        start_[23] = ptr-ori; ptr = setCircle(ptr, 1, 0, 1, 2);
-        return ptr;
+        size_t i = 0, s = ptr - ori;
+        idx[0] = i+s; i += setCircle(ptr, 1, 0, 1, 1);
+        idx[1] = i+s; i += setCircle(ptr, 1, 0, 1, 2);
+        return ptr + i;
     }
 
     //-----------------------------------------------------------------------
@@ -1132,39 +1132,36 @@ namespace gle
     
     size_t sizeTubeBuffers()
     {
-        return 21 * pi_twice;  // this is empirical!
+        return 22 * pi_twice;  // this is empirical!
     }
     
-    flute6* setTubeBuffers(flute6* ptr, flute6* const ori)
+    flute6* setTubeBuffers(flute6* ptr, flute6* const ori, GLsizei idx[])
     {
-        /*
-         check pointer alignment, which is required to get indices
-         by substracting pointer values below */
-        assert_true( 0 == ( ptr - ori ) % 6 );
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const float B = -32.f, T = 256.f, E = 0.03125;
         size_t i = 0, s = ptr - ori;
-        start_[0] = i+s; i += setTube(ptr+i, 1, 0, 1);
-        start_[1] = i+s; i += setTube(ptr+i, 2, 0, 1);
-        start_[2] = i+s; i += setTube(ptr+i, 4, 0, 1);
-        start_[3] = i+s; i += setTube(ptr+i, 4, 0, 1+E);
-        start_[4] = i+s; i += setTube(ptr+i, 4,-E, 1+E);
-        start_[5] = i+s; i += setTube(ptr+i, 4,-E, 1);
-        start_[6] = i+s; i += setTube(ptr+i, 1, B, T);
-        start_[8] = i+s; i += setTube(ptr+i, 2, B, T);
-        start_[9] = i+s; i += setTube(ptr+i, 4, B, T);
-        start_[10] = i+s; i += setTube(ptr+i, 1, 0, T);
-        start_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
-        start_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
-        start_[13] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0);
-        start_[14] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0);
-        start_[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.25);
-        start_[16] = i+s; i += setDisc(ptr+i, 1, 0, 1);
-        start_[17] = i+s; i += setDisc(ptr+i, 2, 0, 1);
-        start_[18] = i+s; i += setDisc(ptr+i, 1, 1, 1);
-        start_[19] = i+s; i += setDisc(ptr+i, 2, 1, 1);
-        start_[20] = i+s; i += setDisc(ptr+i, 1, 0, -1);
-        start_[21] = i+s; i += setDisc(ptr+i, 2, 0, -1);
+        idx[0] = i+s; i += setTube(ptr+i, 1, 0, 1);
+        idx[1] = i+s; i += setTube(ptr+i, 2, 0, 1);
+        idx[2] = i+s; i += setTube(ptr+i, 4, 0, 1);
+        idx[3] = i+s; i += setTube(ptr+i, 4, 0, 1+E);
+        idx[4] = i+s; i += setTube(ptr+i, 4,-E, 1+E);
+        idx[5] = i+s; i += setTube(ptr+i, 4,-E, 1);
+        idx[6] = i+s; i += setTube(ptr+i, 1, B, T);
+        idx[8] = i+s; i += setTube(ptr+i, 2, B, T);
+        idx[9] = i+s; i += setTube(ptr+i, 4, B, T);
+        idx[10] = i+s; i += setTube(ptr+i, 1, 0, T);
+        idx[11] = i+s; i += setTube(ptr+i, 2, 0, T);
+        idx[12] = i+s; i += setTube(ptr+i, 4, 0, T);
+        idx[13] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0);
+        idx[14] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0);
+        idx[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.25);
+        idx[16] = i+s; i += setCone(ptr+i, 2, 0, 9, 1, 0);
+        idx[17] = i+s; i += setDisc(ptr+i, 1, 0, 1);
+        idx[18] = i+s; i += setDisc(ptr+i, 2, 0, 1);
+        idx[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);
+        idx[20] = i+s; i += setDisc(ptr+i, 2, 1, 1);
+        idx[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
+        idx[22] = i+s; i += setDisc(ptr+i, 2, 0, -1);
         return ptr + i;
     }
 
@@ -1189,30 +1186,33 @@ namespace gle
     }
     
     // using Vertex Buffer Objects
-    void tube1()         { drawTubeStrip(start_[0], nbTrianglesTube(1)); }
-    void tube2()         { drawTubeStrip(start_[1], nbTrianglesTube(2)); }
-    void tube4()         { drawTubeStrip(start_[2], nbTrianglesTube(4)); }
-    void tubeS()         { drawTubeStrip(start_[3], nbTrianglesTube(4)); }
-    void tubeM()         { drawTubeStrip(start_[4], nbTrianglesTube(4)); }
-    void tubeE()         { drawTubeStrip(start_[5], nbTrianglesTube(4)); }
-    void longTube1()     { drawTubeStrip(start_[7], nbTrianglesTube(1)); }
-    void longTube2()     { drawTubeStrip(start_[8], nbTrianglesTube(2)); }
-    void longTube4()     { drawTubeStrip(start_[9], nbTrianglesTube(4)); }
-    void halfTube1()     { drawTubeStrip(start_[10], nbTrianglesTube(1)); }
-    void halfTube2()     { drawTubeStrip(start_[11], nbTrianglesTube(2)); }
-    void halfTube4()     { drawTubeStrip(start_[12], nbTrianglesTube(4)); }
-    void cone1()         { drawTubeStrip(start_[13], nbTrianglesTube(1)); }
-    void cone2()         { drawTubeStrip(start_[14], nbTrianglesTube(2)); }
-    void truncatedCone() { drawTubeStrip(start_[15], nbTrianglesTube(2)); }
-    void disc1()         { drawTubeStrip(start_[16], pi_twice); }
-    void disc2()         { drawTubeStrip(start_[17], pi_twice/2); }
-    void discTop1()      { drawTubeStrip(start_[18], pi_twice); }
-    void discTop2()      { drawTubeStrip(start_[19], pi_twice/2); }
-    void discBottom1()   { drawTubeStrip(start_[20], pi_twice); }
-    void discBottom2()   { drawTubeStrip(start_[21], pi_twice/2); }
-    void circle()        { drawLineStrip(start_[22], 1+pi_twice, 1, GL_LINE_STRIP); }
-    void circle2()       { drawLineStrip(start_[23], 1+pi_twice, 2, GL_LINE_STRIP); }
-    void circle_dotted() { drawLineStrip(start_[23], 1+pi_twice, 1, GL_LINES); }
+    void tube1()         { drawTubeStrip(tubes_[0], nbTrianglesTube(1)); }
+    void tube2()         { drawTubeStrip(tubes_[1], nbTrianglesTube(2)); }
+    void tube4()         { drawTubeStrip(tubes_[2], nbTrianglesTube(4)); }
+    void tubeS()         { drawTubeStrip(tubes_[3], nbTrianglesTube(4)); }
+    void tubeM()         { drawTubeStrip(tubes_[4], nbTrianglesTube(4)); }
+    void tubeE()         { drawTubeStrip(tubes_[5], nbTrianglesTube(4)); }
+    void longTube1()     { drawTubeStrip(tubes_[7], nbTrianglesTube(1)); }
+    void longTube2()     { drawTubeStrip(tubes_[8], nbTrianglesTube(2)); }
+    void longTube4()     { drawTubeStrip(tubes_[9], nbTrianglesTube(4)); }
+    void halfTube1()     { drawTubeStrip(tubes_[10], nbTrianglesTube(1)); }
+    void halfTube2()     { drawTubeStrip(tubes_[11], nbTrianglesTube(2)); }
+    void halfTube4()     { drawTubeStrip(tubes_[12], nbTrianglesTube(4)); }
+    void cone1()         { drawTubeStrip(tubes_[13], nbTrianglesTube(1)); }
+    void cone2()         { drawTubeStrip(tubes_[14], nbTrianglesTube(2)); }
+    void truncatedCone() { drawTubeStrip(tubes_[15], nbTrianglesTube(2)); }
+    void cone3()         { drawTubeStrip(tubes_[16], nbTrianglesTube(2)); }
+    
+    void disc1()         { drawTubeStrip(tubes_[17], pi_twice); }
+    void disc2()         { drawTubeStrip(tubes_[18], pi_twice/2); }
+    void discTop1()      { drawTubeStrip(tubes_[19], pi_twice); }
+    void discTop2()      { drawTubeStrip(tubes_[20], pi_twice/2); }
+    void discBottom1()   { drawTubeStrip(tubes_[21], pi_twice); }
+    void discBottom2()   { drawTubeStrip(tubes_[22], pi_twice/2); }
+    
+    void circle()        { drawLineStrip(discs_[0], 1+pi_twice, 1, GL_LINE_STRIP); }
+    void circle2()       { drawLineStrip(discs_[1], 1+pi_twice, 2, GL_LINE_STRIP); }
+    void circle_dotted() { drawLineStrip(discs_[1], 1+pi_twice, 1, GL_LINES); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }
@@ -1324,23 +1324,27 @@ namespace gle
         float*const ptr0 = ptr;
         unsigned*const idx0 = idx;
         
-        ptr = (float*)setTubeBuffers((flute6*)ptr, (flute6*)ptr0);
+        ptr = (float*)setTubeBuffers((flute6*)ptr, (flute6*)ptr0, tubes_);
         //fprintf(stderr, "setTubeBuffers : %li %li\n", ptr-ptr0, t); float* sub=ptr;
+        assert_true( ptr < ptr0 + t );
 
-        ptr = (float*)setCubeBuffers((flute6*)ptr, (flute6*)ptr0);
+        ptr = (float*)setCubeBuffers((flute6*)ptr, (flute6*)ptr0, cubes_);
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
-        
+        assert_true( ptr < ptr0 + c + t );
+
         for ( int i = 0; i < 7; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
         //fprintf(stderr, "setIcosBuffers : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
+        assert_true( ptr < ptr0 + s + c + t );
 
-        ptr = (float*)setBlobBuffers((flute3*)ptr, (flute3*)ptr0);
+        ptr = (float*)setBlobBuffers((flute3*)ptr, (flute3*)ptr0, blobs_);
         //fprintf(stderr, "setBlobBuffers : %li %li\n", ptr-sub, b); sub=ptr;
-        
+        assert_true( ptr < ptr0 + s + t + c + b );
+
         // align pointer:
         ptr += (ptr-ptr0) & 1;
         
-        ptr = (float*)setCircBuffers((flute2*)ptr, (flute2*)ptr0);
+        ptr = (float*)setCircBuffers((flute2*)ptr, (flute2*)ptr0, discs_);
         //fprintf(stderr, "setCircBuffers : %li %li\n", ptr-sub, o);
 
         assert_true( ptr < ptr0 + (s+t+c+b+o) );

@@ -586,6 +586,10 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     glPushMatrix();
     gle::stretchAlignZ(A, B, rad);
     gle::tube4();
+    if ( inx == 0 )
+        gle::hemisphere4();
+    if ( inx == fib.lastSegment() )
+        gle::discTop2();
     glPopMatrix();
 #endif
     if ( !cull ) glDisable(GL_CULL_FACE);
@@ -1103,7 +1107,7 @@ void Display3::drawCoupleBside(Couple const* cx) const
         glTranslatef(0, 0, Z);
         gle::blob();
         glTranslatef(0, 0,Lr-Z);
-        gle::smallCube();
+        gle::cuboid();
         glTranslatef(0, 0,-Lr);
         glScalef(iLr, iLr, Lr);
         gle::hexTube();
@@ -1163,7 +1167,8 @@ void Display3::drawCoupleBneedle(Couple const* cx) const
             pd1->color.load_both();
             glPushMatrix();
             transAlignZ(p1, scale(pd1->size), dir);
-            gle::needle(); //sphere1(); gle::thinLongTube();
+            //gle::needle();
+            sphere2(); gle::cone3();
             glPopMatrix();
         }
         if ( pd2->visible )
@@ -1172,7 +1177,8 @@ void Display3::drawCoupleBneedle(Couple const* cx) const
             pd2->color.load_both();
             glPushMatrix();
             transAlignZ(p2, scale(pd2->size), -dir);
-            gle::needle(); //sphere1(); gle::thinLongTube();
+            //gle::needle();
+            sphere2(); gle::cone3();
             glPopMatrix();
         }
         glDisable(GL_CLIP_PLANE5);
@@ -1226,26 +1232,25 @@ void Display3::drawCoupleB(Couple const* cx) const
     }
 #endif
         
-    GLfloat rad = scale(pd1->size);
-    GLfloat Lr = norm( p2 - p1 ) / rad;
-    GLfloat iLr = (pd1->width / pd1->size); // * gle::invsqrt(Lr);
+    GLfloat wid = scale(pd1->width);
+    GLfloat R = scale(pd1->size) / wid;
+    GLfloat Lr = wid / norm( p2 - p1 );
     
     glPushMatrix();
-    gle::transAlignZ(p1, rad, p2-p1);
-    if ( pd2->visible )
-    {
-        glTranslatef(0, 0, Lr);
-        pd2->color.load_both();
-        gle::blob();
-        glTranslatef(0, 0,-Lr);
-    }
+    gle::stretchAlignZ(p1, p2, wid);
+    pd1->color.load_both();
+    gle::hexTube();
     if ( pd1->visible )
     {
-        pd1->color.load_both();
+        glScalef(R, R, R*Lr);
         gle::blob();
     }
-    glScalef(iLr, iLr, Lr);
-    gle::hexTube();
+    if ( pd2->visible )
+    {
+        glTranslatef(0, 0, 1/(R*Lr));
+        pd2->color.load_both();
+        gle::blob();
+    }
     glPopMatrix();
 }
 

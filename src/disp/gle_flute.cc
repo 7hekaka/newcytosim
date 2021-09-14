@@ -64,7 +64,7 @@ namespace gle
         glVertexPointer(pts, GL_FLOAT, tot, nullptr);
         if ( nor > 1 )
         {
-            assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
+            //assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
             glEnableClientState(GL_NORMAL_ARRAY);
             glNormalPointer(GL_FLOAT, tot, (void*)(pts*sizeof(float)));
         }

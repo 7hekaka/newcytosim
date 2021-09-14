@@ -58,13 +58,13 @@ namespace gle
     GLuint nextStream();
     
     /// initialize the Vertex Buffer Objects
-    flute6* setTubeBuffers(flute6*, flute6* const);
+    flute6* setTubeBuffers(flute6*, flute6* const, GLsizei inx[]);
     
     /// initialize more buffer objects
-    flute6* setCubeBuffers(flute6*, flute6* const);
+    flute6* setCubeBuffers(flute6*, flute6* const, GLsizei inx[]);
 
     /// initialize more buffer objects
-    flute3* setBlobBuffers(flute3*, flute3* const);
+    flute3* setBlobBuffers(flute3*, flute3* const, GLsizei inx[]);
 
     /// initialize more buffer objects
     void setBuffers();
@@ -185,7 +185,7 @@ namespace gle
     /// draw a Cube of side 2
     void cube();
     /// draw a Cube of side 1
-    void smallCube();
+    void cuboid();
     /// draw a stellated octahedron
     void star();
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
@@ -231,6 +231,8 @@ namespace gle
     void cone1();
     /// display a nicer cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone2();
+    /// display a long cone of axis Z, radius 1 at Z=0, summit at Z=3
+    void cone3();
 
     /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
     void cylinder1();
@@ -268,13 +270,13 @@ namespace gle
     /// do not draw
     void nothing();
     
-    /// draw a sphere at the origin of radius 1
+    /// draw a sphere of radius 1 at the origin
     void sphere1();
-    /// draw a nice sphere at the origin of radius 1
+    /// draw a nice sphere of radius 1 at the origin
     void sphere2();
-    /// draw a very nice sphere at the origin of radius 1
+    /// draw a very nice sphere of radius 1 at the origin
     void sphere4();
-    /// draw a refined sphere at the origin of radius 1
+    /// draw a refined sphere of radius 1 at the origin
     void sphere8();
     
     void dualPassSphere1();
@@ -282,11 +284,11 @@ namespace gle
     void dualPassSphere4();
     void dualPassSphere8();
 
-    /// draw half a sphere in Z < 0
+    /// draw half a sphere of radius 1 in Z < 0
     void hemisphere1();
-    /// draw a nice half-sphere in Z < 0
+    /// draw a nice half-sphere of radius 1 in Z < 0
     void hemisphere2();
-    /// draw a very nice half-sphere in Z < 0
+    /// draw a very nice half-sphere of radius 1 in Z < 0
     void hemisphere4();
 
 #if 1

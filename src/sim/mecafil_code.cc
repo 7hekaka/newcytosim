@@ -781,7 +781,6 @@ void projectForces2D_SSE(size_t nbs, const double* dir, const double* src,
         p0 = add2(loadu2(src), x0);
         --DE;
         --mul;
-        assert_true(mul >= mul0);
         x = fnmadd1(x, load1(DE), load1(mul)); // x = mul[n] - x * DE[n];
         store1(mul, x); // mul[n] = x;
     }
