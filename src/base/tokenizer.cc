@@ -260,14 +260,17 @@ std::string Tokenizer::get_integer(std::istream& is)
 
 /**
  Read an integer, or return false if this was not possible.
- 
- Note that the value of `what` will not change, if the input fails.
+ This does not skip newline characters.
+ Note that the value of `var` will not change, if the input fails.
  */
 bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
 {
+    int c = skip_space(is, false);
+    if ( c == '-' )
+        throw InvalidParameter("a non-negative integer is expected");
     std::streampos isp = is.tellg();
     unsigned long num = 0;
-    is >> num;
+    is >> std::noskipws >> num;
     if ( is.fail() )
     {
         is.clear();
@@ -286,14 +289,15 @@ bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
 
 /**
  Read an integer, or return false if that was not possible.
- 
- Note that the value of `what` will not change, if the input fails.
+ This does not skip newline characters.
+ Note that the value of `var` will not change, if the input fails.
  */
 bool Tokenizer::get_integer(std::istream& is, long& var)
 {
+    skip_space(is, false);
     std::streampos isp = is.tellg();
     long num = 0;
-    is >> num;
+    is >> std::noskipws >> num;
     if ( is.fail() )
     {
         is.clear();

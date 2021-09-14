@@ -143,6 +143,9 @@ void Parser::parse_set(std::istream& is)
          */
         name = Tokenizer::get_symbol(is);
         blok = Tokenizer::get_block(is, '{', true);
+        
+        if ( name.empty() )
+            throw InvalidParameter("unexpected syntax");
 
         if ( do_set )
         {
@@ -395,6 +398,9 @@ void Parser::parse_new(std::istream& is)
         opt.define("position", 0, blok);
     }
     
+    if ( name.empty() )
+        throw InvalidParameter("unexpected syntax");
+
     if ( do_new & ( cnt > 0 ))
     {
         if ( opt.num_keys() == 0 )
@@ -496,6 +502,9 @@ void Parser::parse_delete(std::istream& is)
     }
     std::string blok = Tokenizer::get_block(is, '{');
     
+    if ( name.empty() )
+        throw InvalidParameter("unexpected syntax");
+
     if ( do_new )
     {
         Glossary opt(blok);

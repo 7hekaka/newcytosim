@@ -426,6 +426,9 @@ Property* Simul::findProperty(const std::string& cat, const std::string& nom) co
     if ( cat == "simul" && nom == prop->name() )
         return prop;
 
+    if ( cat.empty() || nom.empty() )
+        throw InvalidSyntax("unexpected syntax");
+
     return properties.find(cat, nom);
 }
 
@@ -434,7 +437,10 @@ Property* Simul::findProperty(const std::string& nom) const
 {
     if ( nom == prop->name() )
         return prop;
-    
+
+    if ( nom.empty() )
+        throw InvalidSyntax("unexpected syntax");
+
     return properties.find(nom);
 }
 
@@ -447,7 +453,9 @@ PropertyList Simul::findAllProperties(const std::string& cat) const
         list.push_back(prop);
         return list;
     }
-    
+    if ( cat.empty() )
+        throw InvalidSyntax("unexpected syntax");
+
     return properties.find_all(cat);
 }
 
@@ -512,6 +520,9 @@ PropertyList Simul::findAllProperties(const std::string& cat) const
  */
 Property* Simul::newProperty(const std::string& cat, const std::string& nom, Glossary& glos)
 {
+    if ( cat.empty() || nom.empty() )
+        throw InvalidSyntax("unexpected syntax");
+
     if ( cat == "simul" )
     {
         assert_true(prop);
