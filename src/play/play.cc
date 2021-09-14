@@ -76,15 +76,15 @@ void drawOffscreen(View & view, int mag)
 }
 
 
-/// copy data from multisample to normal buffer
-void blitBuffers(GLuint normal, GLuint multi, GLint W, GLint H)
+/// copy color data from 'back' to 'front'
+void blitBuffers(GLuint back, GLuint front, GLint W, GLint H)
 {
     //std::clog << "blitting multisample buffer\n";
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, multi);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, normal);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, back);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, front);
     glBlitFramebuffer(0, 0, W, H, 0, 0, W, H, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, multi);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, normal);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, front);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, back);
 }
 
 //------------------------------------------------------------------------------
@@ -347,7 +347,7 @@ int main(int argc, char* argv[])
                 {
                     player.drawScene(view, magnify);
                     if ( multi )
-                        blitBuffers(fbo, multi, W, H);
+                        blitBuffers(multi, fbo, W, H);
                     player.saveView(frm++, prop.downsample);
                     s = 0;
                 }
@@ -364,7 +364,7 @@ int main(int argc, char* argv[])
                 {
                     player.drawScene(view, magnify);
                     if ( multi )
-                        blitBuffers(fbo, multi, W, H);
+                        blitBuffers(multi, fbo, W, H);
                     player.saveView(frm, prop.downsample);
                 }
             } while ( arg.set(frm, "frame", ++inx) );

@@ -32,6 +32,16 @@ namespace gle
     /// number of faces in icosahedrons
     GLsizei ico_cnt_[8] = { 0 };
 
+    void initBuffers()
+    {
+        glGenBuffers(2, buf_);
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+        setBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
     void initialize()
     {
         CHECK_GL_ERROR("before gle:initialize()");
@@ -50,22 +60,17 @@ namespace gle
         
         if ( !glIsBuffer(buf_[0]) )
         {
-            glGenBuffers(2, buf_);
-            glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-            setBuffers();
-            CHECK_GL_ERROR("gle:setBuffers()");
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            initBuffers();
+            initStreams();
+            CHECK_GL_ERROR("gle:initBuffers()");
+            std::atexit(quit);
         }
-        initStreams();
-        std::atexit(release);
     }
     
-    void release()
+    void quit()
     {
         glDeleteBuffers(2, buf_);
-        buf_[0] = 0;
+        for (int i=0; i<4; ++i) buf_[i] = 0;
         releaseStreams();
     }
     

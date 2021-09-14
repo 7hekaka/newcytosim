@@ -39,7 +39,7 @@ namespace gle
     void initialize();
     
     /// release requested memory
-    void release();
+    void quit();
 
     /// calculate sine and cosine
     void compute_circle(size_t cnt, float CS[], double rad, double start = 0);

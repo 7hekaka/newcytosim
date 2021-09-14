@@ -13,30 +13,29 @@ namespace gle
     unsigned stream_indx = 0;
     
     /// OpenGL buffers objects for streaming
-    GLuint streams_[N_STREAMS] = { 0 };
+    GLuint stream_[N_STREAMS] = { 0 };
 
     void initStreams()
     {
-        if ( !glIsBuffer(streams_[0]) )
-            glGenBuffers(N_STREAMS, streams_);
+        glGenBuffers(N_STREAMS, stream_);
         CHECK_GL_ERROR("glGenBuffers(-, streams_)");
     }
     
     void releaseStreams()
     {
-        glDeleteBuffers(N_STREAMS, streams_);
-        streams_[0] = 0;
+        glDeleteBuffers(N_STREAMS, stream_);
+        for (unsigned i=0; i<N_STREAMS; ++i) stream_[i] = 0;
     }
     
     GLuint currStream()
     {
-        return streams_[stream_indx];
+        return stream_[stream_indx];
     }
     
     GLuint nextStream()
     {
         stream_indx = ( stream_indx + 1 ) % N_STREAMS;
-        return streams_[stream_indx];
+        return stream_[stream_indx];
     }
     
     GLuint boundBuffer()
