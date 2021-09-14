@@ -119,6 +119,8 @@ Vector SpaceStrip::randomPlaceOnEdge(real) const
     return Vector(RNG.sfloat()*half_[0], RNG.sfloat()*half_[0], Z);
 #elif ( DIM > 1 )
     return Vector(RNG.sfloat()*half_[0], Z, 0);
+#else
+    return Vector(Z, 0, 0);
 #endif
 }
 
