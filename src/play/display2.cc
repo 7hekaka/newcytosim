@@ -128,11 +128,11 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 
                 disp->color.load();
 #if ( DIM >= 3 )
-                stretchTube(pf, ph, disp->width*sizeScale, gle::truncatedCone);
-                //drawCone(pf, ph-pf, disp->width*sizeScale);
+                stretchTube(pf, ph, scale(disp->width), gle::truncatedCone);
+                //drawCone(pf, ph-pf, scale(disp->width));
 #else
-                gle::drawBand(ph, disp->width*sizeScale, ps, disp->width*sizeScale);
-                gle::drawBand(ps, disp->width*sizeScale, disp->color, pf, disp->width*sizeScale, disp->color.alpha_scaled(0.5f));
+                gle::drawBand(ph, scale(disp->width), ps, scale(disp->width));
+                gle::drawBand(ps, scale(disp->width), disp->color, pf, scale(disp->width), disp->color.alpha_scaled(0.5f));
 #endif
             }
         }

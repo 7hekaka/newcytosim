@@ -160,14 +160,14 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* dis) const
     if ( dis->perceptible )
     {
         assert_true(glIsEnabled(GL_LIGHTING));
-        drawObject(pos, dis->size*sizeScale, gle::sphere1);
+        drawObject(pos, scale(dis->size), gle::sphere1);
     }
 }
 
 
 inline void Display3::drawObject3(Vector const& pos, float rad, void(*obj)()) const
 {
-    drawObject(pos, rad*sizeScale, obj);
+    drawObject(pos, scale(rad), obj);
 }
 
 
@@ -178,7 +178,7 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color.load_both();
-        drawObject(pos, dis->size*sizeScale, gle::blob);
+        drawObject(pos, scale(dis->size), gle::blob);
     }
 }
 
@@ -189,7 +189,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
     {
         assert_true(glIsEnabled(GL_LIGHTING));
         dis->color2.load_both();
-        drawObject(pos, dis->size*sizeScale, gle::blob);
+        drawObject(pos, scale(dis->size), gle::blob);
     }
 }
 
@@ -438,7 +438,7 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 void Display3::drawFiberLines(Fiber const& fib, int style) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    const real rad = disp->line_width * sizeScale;
+    const real rad = scale(disp->line_width);
 
     // set back color:
     if ( disp->coloring )
@@ -495,7 +495,7 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
 void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    const real rad = disp->line_width * sizeScale;
+    const real rad = scale(disp->line_width);
     real iseg = fib.segmentationInv();
 
     Vector A = fib.posP(inx);
@@ -615,7 +615,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
 
     const real fac = 1 / disp->lattice_scale;
     const real uni = lat.unit();
-    const real rad = width * sizeScale;
+    const real rad = scale(width);
     
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -674,7 +674,7 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
  */
 void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 {
-    float rad = size * sizeScale;
+    float rad = scale(size);
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -700,7 +700,7 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
  */
 void Display3::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
-    float rad = size * sizeScale;
+    float rad = scale(size);
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -717,7 +717,7 @@ void Display3::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 void Display3::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    float rad = disp->speckle_size * sizeScale;
+    float rad = scale(disp->speckle_size);
 
     // display random speckles:
     if ( disp->speckle_style == 1 )
@@ -783,7 +783,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     // diameter of lines and points in space units:
-    const GLfloat rad = disp->point_size * sizeScale;
+    const GLfloat rad = scale(disp->point_size);
     int style = disp->point_style & 3;
 
     if ( style == 1 )
@@ -818,7 +818,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
     {
         Vector P, Q;
         bodyColor(disp, obj.signature());
-        const float wid = disp->width * sizeScale;
+        const float wid = scale(disp->width);
 
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
@@ -846,7 +846,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             gle::dualPass(gle::barrel);
             glPopMatrix();
 #else
-            const float wid = disp->width * sizeScale;
+            const float wid = scale(disp->width);
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
                 stretchTube(sol->posPoint(i), sol->posPoint(i+1), wid, gle::hexTube);
 #endif
@@ -864,7 +864,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
         if ( obj->disp()->perceptible )
         {
             obj->disp()->color2.load_both();
-            const GLfloat rad = obj->disp()->size * sizeScale;
+            const GLfloat rad = scale(obj->disp()->size);
 #if ( 0 )
             if ( obj->disp()->style == 2 )
             {
@@ -907,8 +907,8 @@ void Display3::drawSingleB(Single const* obj) const
     Vector ph = obj->posHand();
     Vector pf = obj->posFoot();
     if ( modulo ) modulo->fold(pf, ph);
-    GLfloat rad = disp->size * sizeScale;
-    GLfloat wid = disp->width * sizeScale;
+    GLfloat wid = scale(disp->width);
+    GLfloat rad = scale(disp->size);
 
     disp->color2.load_both();
 #if ( 0 )
@@ -936,7 +936,6 @@ void Display3::drawSingleB(Single const* obj) const
     gle::hexTube();
     glPopMatrix();
 #elif ( 0 )
-    GLfloat rad = disp->size*sizeScale;
     Vector dir = normalize( pf - ph );
     glEnable(GL_CLIP_PLANE5);
     setClipPlane(GL_CLIP_PLANE5, -dir, pf);
@@ -1008,7 +1007,7 @@ void Display3::drawCouplesF2(CoupleSet const& set) const
 
 void Display3::drawCouplesA(CoupleSet const& set) const
 {
-    //const float R = 0.5f * sizeScale;
+    //const float R = scale(0.5f);
     for ( Couple * cx=set.firstAF(); cx ; cx=cx->next() )
     {
         Hand const* h = cx->hand1();
@@ -1059,7 +1058,7 @@ void Display3::drawCoupleBplain(Couple const* cx) const
     Vector p2 = cx->posHand2();
 
     pd1->color.load_both();
-    stretchTube(p1, p2, pd1->width*sizeScale, gle::hexTube);
+    stretchTube(p1, p2, scale(pd1->width), gle::hexTube);
     if ( pd1->visible ) drawHand(p1, pd1);
     if ( pd2->visible ) drawHand(p2, pd2);
 }
@@ -1081,16 +1080,16 @@ void Display3::drawCoupleBside(Couple const* cx) const
         // semi-accurate rendering of Couple's side-side link
         pd1->color.load_both();
         Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
-        drawPoint(mid, pd1->width*sizeScale);
-        stretchTube(p2, mid, pd2->width*sizeScale, gle::hexTube);
-        stretchTube(p1, mid, pd1->width*sizeScale, gle::hexTube);
+        drawPoint(mid, scale(pd1->width));
+        stretchTube(p2, mid, scale(pd2->width), gle::hexTube);
+        stretchTube(p1, mid, scale(pd1->width), gle::hexTube);
         drawPoint(p1, pd1);
         drawPoint(p2, pd2);
         return;
     }
 #endif
     
-    GLfloat rad = pd1->size * sizeScale;
+    GLfloat rad = scale(pd1->size);
     GLfloat Lr = cx->prop->length / rad;
     GLfloat iLr = ( pd1->width / pd1->size );
     
@@ -1142,7 +1141,7 @@ void Display3::drawCoupleBneedle(Couple const* cx) const
     {
 #if !FIBER_HAS_FAMILY
         // moving the 'hands' to the surface of the fiber:
-        dns = sizeScale * gle::invsqrt(dns);
+        dns = scale(gle::invsqrt(dns));
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
         const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
@@ -1163,7 +1162,7 @@ void Display3::drawCoupleBneedle(Couple const* cx) const
             setClipPlane(GL_CLIP_PLANE5, -dir, mid);
             pd1->color.load_both();
             glPushMatrix();
-            transAlignZ(p1, pd1->size*sizeScale, dir);
+            transAlignZ(p1, scale(pd1->size), dir);
             gle::needle(); //sphere1(); gle::thinLongTube();
             glPopMatrix();
         }
@@ -1172,7 +1171,7 @@ void Display3::drawCoupleBneedle(Couple const* cx) const
             setClipPlane(GL_CLIP_PLANE5,  dir, mid);
             pd2->color.load_both();
             glPushMatrix();
-            transAlignZ(p2, pd2->size*sizeScale, -dir);
+            transAlignZ(p2, scale(pd2->size), -dir);
             gle::needle(); //sphere1(); gle::thinLongTube();
             glPopMatrix();
         }
@@ -1201,7 +1200,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:
-        dns = sizeScale * gle::invsqrt(dns);
+        dns = scale(gle::invsqrt(dns));
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
         const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
@@ -1221,13 +1220,13 @@ void Display3::drawCoupleB(Couple const* cx) const
     {
         pd1->color.load_both(cx->fiber1()->disp->color.transparency());
         glDepthMask(GL_FALSE);
-        stretchTube(p1, p2, pd2->width*sizeScale, gle::hexTube);
+        stretchTube(p1, p2, scale(pd2->width), gle::hexTube);
         glDepthMask(GL_TRUE);
         return;
     }
 #endif
         
-    GLfloat rad = pd1->size * sizeScale;
+    GLfloat rad = scale(pd1->size);
     GLfloat Lr = norm( p2 - p1 ) / rad;
     GLfloat iLr = (pd1->width / pd1->size); // * gle::invsqrt(Lr);
     

@@ -660,7 +660,7 @@ void Display::drawAverageFiber(ObjectList const& objs)
     if ( S > REAL_EPSILON )
     {
         Vector MP = normalize( P - M );
-        const float rad = 10 * sizeScale;
+        const float rad = scale(10);
         gle::drawCylinder(M, MP, rad);
         gle::drawCone(P, MP, rad);
         drawObject(G, rad, gle::sphere2);
@@ -761,7 +761,7 @@ void Display::drawMisc(Simul const& sim)
  */
 void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 {
-    float rad = size * sizeScale;
+    float rad = scale(size);
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -786,7 +786,7 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
  */
 void Display::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
-    float rad = size * sizeScale;
+    float rad = scale(size);
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -1035,7 +1035,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( style == 2 )
     {
         // display arrowheads along the fiber:
-        const float rad = disp->point_size*sizeScale;
+        const float rad = scale(disp->point_size);
         const real gap = disp->point_gap;
         real ab = std::ceil(fib.abscissaM()/gap) * gap;
         for ( ; ab <= fib.abscissaP(); ab += gap )
@@ -1044,7 +1044,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( style == 3 )
     {
         // display only middle of fiber:
-        drawObject(fib.posMiddle(), 2*disp->point_size*sizeScale, gle::sphere2);
+        drawObject(fib.posMiddle(), scale(2*disp->point_size), gle::sphere2);
     }
 }
 
@@ -1719,7 +1719,7 @@ void Display::drawSolid(Solid const& obj)
     {
         bodyColor(obj);
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), disp->size*sizeScale, gle::hedron(obj.radius(i)>0));
+            drawObject(obj.posP(i), scale(disp->size), gle::hedron(obj.radius(i)>0));
     }
     
     //display outline of spheres
@@ -1838,7 +1838,7 @@ void Display::drawBead(Bead const& obj)
     if ( disp->style & 2 )
     {
         bodyColor(obj);
-        drawObject(obj.position(), disp->size*sizeScale, gle::tetrahedron);
+        drawObject(obj.position(), scale(disp->size), gle::tetrahedron);
     }
     
 #if ( DIM == 2 )
@@ -1898,9 +1898,9 @@ void Display::drawSphere(Sphere const& obj)
     if (( disp->style & 2 ) && disp->perceptible )
     {
         bodyColor(obj);
-        drawObject(obj.posP(0), disp->size*sizeScale, gle::star);
+        drawObject(obj.posP(0), scale(disp->size), gle::star);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), disp->size*sizeScale, gle::sphere1);
+            drawObject(obj.posP(i), scale(disp->size), gle::sphere1);
     }
     
     //display reference points
@@ -1908,7 +1908,7 @@ void Display::drawSphere(Sphere const& obj)
     {
         bodyColor(obj);
         for ( size_t i = 1; i < obj.nbRefPoints; ++i )
-            drawObject(obj.posP(i), disp->size*sizeScale, gle::tetrahedron);
+            drawObject(obj.posP(i), scale(disp->size), gle::tetrahedron);
     }
 }
 
