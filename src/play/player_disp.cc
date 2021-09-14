@@ -220,8 +220,9 @@ void Player::prepareDisplay(View& view, int mag)
     //----------------- texts:
     
     view.setLabel(buildLabel());
+    view.setMemo(buildMemo(view.draw_memo));
     view.setMessage(buildReport(prop.report));
-    
+
     //----------------- set pixel size, unit-size and direction:
 
     GLfloat pix = view.pixelSize();

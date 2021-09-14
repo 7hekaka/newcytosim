@@ -131,6 +131,9 @@ public:
     /// set text displayed in center of window
     void setLabel(std::string const& arg) { full_label = label + " " + arg; }
     
+    /// set message displayed on current window
+    void setMemo(std::string const& arg) { memo = arg; };
+
     /// set text displayed near top of window
     void setMessage(std::string const& arg) { top_message = arg; }
 

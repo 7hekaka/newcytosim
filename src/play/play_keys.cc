@@ -738,10 +738,8 @@ void processKey(unsigned char key)
     switch (key)
     {
         case 'h':
-        {
             view.draw_memo = ( view.draw_memo + 1 ) % 6;
-            view.memo = player.buildMemo(view.draw_memo);
-        } break;
+            break;
         
         case 'N':
             /**Need to share OpenGL context with the main window */
