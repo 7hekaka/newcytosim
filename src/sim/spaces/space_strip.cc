@@ -88,17 +88,37 @@ void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 }
 
 
+/** bounce within [bot_, top_] in the last dimension, and periodic in the others */
 void SpaceStrip::bounce(Vector& pos) const
 {
-    if ( !SpaceStrip::inside(pos) )
-        bounceOnEdges(pos);
-    
-    // periodic in all except the last dimension:
-#if ( DIM > 1 )
+    real W = top_ - bot_;
+#if ( DIM >= 3 )
     pos.XX = fold_real(pos.XX, modulo_.period_[0]);
-#endif
-#if ( DIM > 2 )
     pos.YY = fold_real(pos.YY, modulo_.period_[1]);
+    real Z = ( pos.ZZ - bot_ ) / W;
+    int i = (int)floor(Z);
+    W = std::copysign(W, (i&1)?-1:1);
+    pos.ZZ = bot_ + W * ( Z - ((i+1)&~1) );
+#elif ( DIM > 1 )
+    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
+    real Z = ( pos.YY - bot_ ) / W;
+    int i = (int)floor(Z);
+    W = std::copysign(W, (i&1)?-1:1);
+    pos.YY = bot_ + W * ( Z - ((i+1)&~1) );
+#endif
+}
+
+
+/**
+ place only at top/bottom surface. This overrides the function in Space
+ */
+Vector SpaceStrip::randomPlaceOnEdge(real) const
+{
+    real Z = RNG.choice(bot_, top_);
+#if ( DIM >= 3 )
+    return Vector(RNG.sfloat()*half_[0], RNG.sfloat()*half_[0], Z);
+#elif ( DIM > 1 )
+    return Vector(RNG.sfloat()*half_[0], Z, 0);
 #endif
 }
 

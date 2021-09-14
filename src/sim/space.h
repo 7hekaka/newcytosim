@@ -142,11 +142,11 @@ public:
     /// the distance to the edge, positive if `point` is outside, and negative if inside
     real signedDistanceToEdge(Vector const&) const;
     
-    /// calculate a random position located inside and at most at distance `rad` from the edge
+    /// return a random position located inside and at most at distance `rad` from the edge
     Vector randomPlaceNearEdge(real rad, size_t num_trials) const;
     
-    /// calculate a random position located on the edge
-    Vector randomPlaceOnEdge(real rad, size_t num_trials) const;
+    /// return a random position located on the surface
+    Vector onSurface(real rad, size_t num_trials) const;
 
     //------------- DERIVED FUNCTIONS THAT CAN BE OVERWRITTEN ------------------
 
@@ -156,11 +156,11 @@ public:
     /// a Vector perpendicular to the space edge at `point`, directed towards the outside
     virtual Vector normalToEdge(Vector const& pos) const;
     
-    /// a random position located on the edge of the Space, uniformly distributed on the surface
+    /// a random position located in the volume surrounding the surface
     virtual Vector randomPlaceNearEdge(real rad) const { return randomPlaceNearEdge(rad, 1<<20); }
     
-    /// a random position located on the edge of the Space, uniformly distributed on the surface
-    virtual Vector randomPlaceOnEdge(real rad) const { return randomPlaceOnEdge(rad, 1<<20); }
+    /// a random position located on the surface of the Space, broadly distributed
+    virtual Vector randomPlaceOnEdge(real rad) const { return onSurface(rad, 1<<20); }
 
     //------------------------------ SIMULATION --------------------------------
     

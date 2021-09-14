@@ -147,6 +147,7 @@ Vector SpaceCylinderP::project(Vector const& W) const
 
 void SpaceCylinderP::bounce(Vector& pos) const
 {
+    /* This is not correct and may lead to artifacts for small radius */
     if ( !inside(pos) )
         bounceOnEdges(pos);
 

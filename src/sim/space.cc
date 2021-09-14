@@ -78,8 +78,10 @@ Vector Space::randomPlaceNearEdge(real rad, size_t num_trials) const
  - project `pos` on the edge
  - return projection if the distance to `pos` is less than `rad`
  .
+ This does not give a uniform distribution on the surface, and accumulation can
+ occur in regions of high curvature, since more volume projects on the surface.
  */
-Vector Space::randomPlaceOnEdge(real rad, size_t max_trials) const
+Vector Space::onSurface(real rad, size_t max_trials) const
 {
     size_t ouf = 0;
     real D = abs_real(rad), RR = rad * rad;

@@ -79,15 +79,20 @@ void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 
 void SpaceLid::bounce(Vector& pos) const
 {
-    if ( !SpaceLid::inside(pos) )
-        bounceOnEdges(pos);
-    
-    // periodic in all except the last dimension:
-#if ( DIM > 1 )
+    real W = top_ - bot_;
+#if ( DIM >= 3 )
     pos.XX = fold_real(pos.XX, modulo_.period_[0]);
-#endif
-#if ( DIM > 2 )
     pos.YY = fold_real(pos.YY, modulo_.period_[1]);
+    real Z = ( pos.ZZ - bot_ ) / W;
+    int i = (int)floor(Z);
+    W = std::copysign(W, (i&1)?-1:1);
+    pos.ZZ = bot_ + W * ( Z - ((i+1)&~1) );
+#elif ( DIM > 1 )
+    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
+    real Z = ( pos.YY - bot_ ) / W;
+    int i = (int)floor(Z);
+    W = std::copysign(W, (i&1)?-1:1);
+    pos.YY = bot_ + W * ( Z - ((i+1)&~1) );
 #endif
 }
 
