@@ -8,6 +8,7 @@
 
 #include "assert_macro.h"
 #include "real.h"
+#include "timer.h"
 #include "vector.h"
 #include "random.h"
 #include "vecprint.h"
@@ -20,14 +21,6 @@
 #include "simd_print.h"
 
 #include "../sim/mecafil_code.cc"
-
-
-/// keeping time using Intel's cycle counters
-unsigned long long rdt = 0;
-/// start timer
-inline void tic() { rdt = __rdtsc(); }
-/// stop timer and print time
-inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
 
 /// type used for indexing

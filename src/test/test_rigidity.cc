@@ -3,6 +3,7 @@
 #define DIM 3
 
 #include "real.h"
+#include "timer.h"
 #include "vector.h"
 #include "random.h"
 #include "blas.h"
@@ -418,14 +419,6 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
 
 //------------------------------------------------------------------------------
 #pragma mark - TEST Rigidity
-
-/// keeping time using Intel's cycle counters
-unsigned long long rdt = 0;
-/// start timer
-inline void tic() { rdt = __rdtsc(); }
-/// return time since last `tic()`
-inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
-
 
 template < void (*FUNC)(const size_t, const real*, real, real*) >
 void testRigidity(size_t cnt, char const* str)

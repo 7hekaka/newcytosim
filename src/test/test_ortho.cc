@@ -3,6 +3,9 @@
 #include <cmath>
 #include <algorithm>
 #include <cstdlib>
+#include <cstdio>
+
+#include "timer.h"
 
 
 typedef double real;
@@ -29,14 +32,6 @@ real srand()
     int i = random() << 1;
     return static_cast<real>(i) * 0x1p-31;
 }
-
-
-/// keeping time using Intel's cycle counters
-unsigned long long rdt = 0;
-/// start timer
-inline void tic() { rdt = __rdtsc(); }
-/// stop timer and print time
-inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
 
 class Vector3

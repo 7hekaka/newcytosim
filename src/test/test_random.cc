@@ -466,8 +466,8 @@ inline float logapprox(float val)
 inline vec8f log_approx8f(__m256 xxx)
 {
     // masks:
-    const __m256 mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x007fffff));
-    const __m256 expo = _mm256_castsi256_ps(_mm256_set1_epi32(0x3f800000));
+    const __m256 mant = _mm256_castsi256_ps(_mm256_set1_epi32(0x007FFFFF));
+    const __m256 expo = _mm256_castsi256_ps(_mm256_set1_epi32(0x3F800000));
     // polynomial coefficients
     const __m256 a = _mm256_set1_ps(+3.529304993f);
     const __m256 b = _mm256_set1_ps(-2.461222105f);

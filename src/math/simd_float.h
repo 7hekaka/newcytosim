@@ -15,7 +15,7 @@ typedef __m128 vec4f;
 
 inline static vec4f setzero4f()                   { return _mm_setzero_ps(); }
 inline static vec4f set4f(float a)                { return _mm_set1_ps(a); }
-inline static vec4f set4fi(uint32_t a)            { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
+inline static vec4f set4fi(int a)                 { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
 inline static vec4f load1f(float const* a)        { return _mm_load_ss(a); }
 inline static vec4f load2f(float const* a)        { return _mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a)); }
 inline static vec4f load4f(float const* a)        { return _mm_load_ps(a); }
@@ -184,7 +184,7 @@ typedef __m256 vec8f;
 
 inline static vec8f setzero8f()                  { return _mm256_setzero_ps(); }
 inline static vec8f set8f(float a)               { return _mm256_set1_ps(a); }
-inline static vec8f set8fi(uint32_t a)           { return _mm256_castsi256_ps(_mm256_set1_epi32(a)); }
+inline static vec8f set8fi(int a)                { return _mm256_castsi256_ps(_mm256_set1_epi32(a)); }
 inline static vec8f load8f(float const* a)       { return _mm256_load_ps(a); }
 inline static vec8f loadu8f(float const* a)      { return _mm256_loadu_ps(a); }
 

@@ -2,8 +2,8 @@
 
 #include <sys/time.h>
 
-
 #include "real.h"
+#include "timer.h"
 #include "random.h"
 #include "vecprint.h"
 #include "blas.h"
@@ -11,14 +11,6 @@
 #include "assert_macro.h"
 #include "xpttrf.h"
 #include "cytoblas.h"
-
-
-/// keeping time using Intel's cycle counters
-unsigned long long rdt = 0;
-/// start timer
-inline void tic() { rdt = __rdtsc(); }
-/// return time since last `tic()`
-inline double toc(double num) { return double(__rdtsc()-rdt)/num; }
 
 //------------------------------------------------------------------------------
 

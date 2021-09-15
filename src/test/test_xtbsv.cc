@@ -3,8 +3,10 @@
 
 #include <sys/time.h>
 
+#define DIM 3
+
 #include "real.h"
-#include "tictoc.h"
+#include "timer.h"
 #include "random.h"
 #include "vecprint.h"
 #include "blas.h"
@@ -25,9 +27,6 @@ namespace U
 #include "xtbsv.h"
 }
 
-using namespace TicToc;
-
-#define DIM 3
 
 /// number of segments:
 constexpr size_t NPTS = 113;
@@ -43,7 +42,7 @@ inline void print(size_t num, real const* vec)
     if ( num > 16 )
     {
         VecPrint::print(8, vec, 3);
-        fprintf(stdout, " :");
+        fprintf(stdout, "...");
         VecPrint::print(8, vec+num-8, 3);
         fprintf(stdout, " |");
         VecPrint::print(2, vec+num, 1);
@@ -79,7 +78,7 @@ void check(int N, int ORD, real const* S, real const* AB, real* B, char const st
         for ( size_t u = 0; u < SUB; ++u )
             FUNC(N, AB, B);
     }
-    printf(" %-14s %7.3f\n", str, toc(cnt*SUB));
+    printf(" %-14s cpu %7.0f\n", str, toc(cnt*SUB));
 }
 
 //------------------------------------------------------------------------------
@@ -158,8 +157,8 @@ void isoLT(int N, real const* AB, real* B)
  */
 void testISO(size_t cnt)
 {
-    std::cout << "isoTBSV " << NPTS << " points --- real " << sizeof(real);
-    std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
+    std::cout << DIM << "D isoTBSV " << NPTS << " points --- real " << sizeof(real);
+    std::cout << " --- " << __VERSION__ << "\n";
 
     real * AB = new_real(NPTS*LDAB+4);
     real * S = new_real(NVAL);
@@ -222,14 +221,14 @@ void pot3(int N, real const* AB, real* B)
     alsatian_xtrsmLLT1<'I'>(N, AB, N, B);
 #endif
 #else
-    zero_real(N, B);
+    zero_real(DIM*N, B);
 #endif
 }
 
 void testPOTRS(size_t cnt)
 {
-    std::cout << "xTBSVLN " << NPTS << " points --- real " << sizeof(real);
-    std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
+    std::cout << DIM << "D xTBSVLN " << NPTS << " points --- real " << sizeof(real);
+    std::cout << " --- " << __VERSION__ << "\n";
 
     real * AB = new_real(NPTS*NPTS+4);
     real * S = new_real(NVAL);
@@ -394,8 +393,8 @@ void uniLT5(int N, real const* AB, real* B)
  */
 void test(size_t cnt)
 {
-    std::cout << "xTBSV " << NPTS << " points --- real " << sizeof(real);
-    std::cout << " --- " << DIM << "D --- " << __VERSION__ << "\n";
+    std::cout << DIM << "D xTBSV " << NPTS << " points --- real " << sizeof(real);
+    std::cout << " --- "  << __VERSION__ << "\n";
 
     real * AB = new_real(NVAL*std::max(NVAL, BLDD)+4);
     real * S = new_real(NVAL);

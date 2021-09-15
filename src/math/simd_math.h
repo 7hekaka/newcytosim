@@ -58,8 +58,8 @@ inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
 inline vec4f logapprox4f(vec4f x)
 {
     // masks:
-    const vec4f mant = set4fi(0x007fffff);
-    const vec4f expo = set4fi(0x3f800000);
+    const vec4f mant = set4fi(0x007FFFFF);
+    const vec4f expo = set4fi(0x3F800000);
     // polynomial coefficients
     const vec4f a = set4f(+3.529304993f);
     const vec4f b = set4f(-2.461222105f);
@@ -99,8 +99,8 @@ inline vec4f logapprox4f(vec4f x)
 inline vec8f logapprox8f(vec8f x)
 {
     // masks:
-    const vec8f mant = set8fi(0x007fffff);
-    const vec8f expo = set8fi(0x3f800000);
+    const vec8f mant = set8fi(0x007FFFFF);
+    const vec8f expo = set8fi(0x3F800000);
     // polynomial coefficients
     const vec8f a1 = set8f(+3.529304993f);
     const vec8f a2 = set8f(-2.461222105f);

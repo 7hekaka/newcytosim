@@ -7,6 +7,7 @@
 #include "exceptions.h"
 #include "vecprint.h"
 #include "random.h"
+#include "timer.h"
 
 #include "dim.h"
 #include "matrix33.h"
@@ -16,7 +17,6 @@
 #include "sparmatsymblk.h"
 #include "sparmatsymblkdiag.h"
 #include "sparmatblk.h"
-
 
 typedef SparMatSym1       SparMat1;
 typedef SparMatSym2       SparMat2;
@@ -35,18 +35,6 @@ constexpr size_t DIV = CNT << 18;
 
 real alpha = 2.0;
 real beta = -1.0;
-
-#if 1
-/// keeping time using Intel's cycle counters
-unsigned long long rdt = 0;
-/// start timer
-inline void tic() { rdt = __rdtsc(); }
-/// return time since last 'tic()'
-inline double toc(double num) { return double(__rdtsc()-rdt) / num; }
-#else
-# include "tictoc.h"
-using namespace TicToc;
-#endif
 
 
 //------------------------------------------------------------------------------

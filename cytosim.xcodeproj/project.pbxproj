@@ -759,6 +759,7 @@
 		BBAEC50F0EF1D23400955B64 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BBAF2B300FD01048006E8E27 /* hand_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBAF2B2E0FD01048006E8E27 /* hand_prop.h */; };
 		BBAF2B310FD01048006E8E27 /* hand_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAF2B2F0FD01048006E8E27 /* hand_prop.cc */; };
+		BBB13B9B26F2657D0021C934 /* timer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB13B9A26F2657D0021C934 /* timer.h */; };
 		BBB1C6D20CB2CAA300679ADC /* messages.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587905B98DA3006956D5 /* messages.cc */; };
 		BBB1C6D30CB2CAA300679ADC /* iowrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587B05B98DA3006956D5 /* iowrapper.cc */; };
 		BBB1C6D40CB2CAA300679ADC /* filewrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB20484A0AF203A0004EDA21 /* filewrapper.cc */; };
@@ -1788,6 +1789,7 @@
 		BBAE3DD3155B102600BE1914 /* simul_solvef.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simul_solvef.cc; sourceTree = "<group>"; };
 		BBAF2B2E0FD01048006E8E27 /* hand_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hand_prop.h; path = src/sim/hand_prop.h; sourceTree = SOURCE_ROOT; };
 		BBAF2B2F0FD01048006E8E27 /* hand_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hand_prop.cc; path = src/sim/hand_prop.cc; sourceTree = SOURCE_ROOT; };
+		BBB13B9A26F2657D0021C934 /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
 		BBB1C6E40CB2CAA300679ADC /* blank */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = blank; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBB1E479126DC70B00B19D26 /* actor_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = actor_prop.cc; path = hands/actor_prop.cc; sourceTree = "<group>"; };
 		BBB1E47A126DC70B00B19D26 /* actor_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = actor_prop.h; path = hands/actor_prop.h; sourceTree = "<group>"; };
@@ -2671,6 +2673,7 @@
 		BB73586C05B98DA3006956D5 /* base */ = {
 			isa = PBXGroup;
 			children = (
+				BBB13B9A26F2657D0021C934 /* timer.h */,
 				BB2BF8DA0E085C880024546A /* makefile.inc */,
 				BB72EA642662263600FF7352 /* CMakeLists.txt */,
 				BB73586E05B98DA3006956D5 /* assert_macro.h */,
@@ -3734,6 +3737,7 @@
 				BB19DA9E231BF792001488A5 /* matrix34.h in Headers */,
 				BBC96C5724A8A9CD00864F9B /* sparmatsymblkdiag.h in Headers */,
 				BB71918D0EF1CD9900CED9E2 /* vector3.h in Headers */,
+				BBB13B9B26F2657D0021C934 /* timer.h in Headers */,
 				BB7191960EF1CD9900CED9E2 /* vector.h in Headers */,
 				BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */,
 				BB0E4BD81002698100A96B34 /* random_vector.h in Headers */,

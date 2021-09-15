@@ -35,7 +35,7 @@
 template < char diag >
 void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     assert_true( incX != 0 );
     int kx = 0;
     if ( incX > 0 )
@@ -65,7 +65,7 @@ void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real*
 template < char diag >
 void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real* X)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     for (int j = N-1; j >= 0; --j)
     {
         if (X[j] != 0.)
@@ -85,7 +85,7 @@ void blas_xtbsvUN(const int N, const int KD, const real* A, const int lda, real*
 template < char diag >
 void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     assert_true( incX != 0 );
     int kx = 0;
     if ( incX <= 0 )
@@ -115,7 +115,7 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
 template < char diag >
 void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real* X)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     for (int j = 0; j < N; ++j)
     {
         if ( X[j] != 0 )
@@ -135,7 +135,7 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
 template < char diag >
 void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     assert_true( incX != 0 );
     int kx = 0;
     if ( incX <= 0 )
@@ -163,7 +163,7 @@ void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real*
 template < char diag >
 void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real* X)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     for (int j = 0; j < N; ++j)
     {
         real tmp = X[j];
@@ -180,7 +180,7 @@ void blas_xtbsvUT(const int N, const int KD, const real* A, const int lda, real*
 template < char diag >
 void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real* X, const int incX)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     assert_true( incX != 0 );
     int kx = 0;
     if ( incX > 0 )
@@ -209,7 +209,7 @@ void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real*
 template < char diag >
 void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real* X)
 {
-    assert_true( lda >= N );
+    assert_true( lda > KD );
     for (int j = N-1; j >= 0; --j)
     {
         real tmp = X[j];
