@@ -1129,7 +1129,7 @@ void Display3::drawCoupleBside(Couple const* cx) const
 
 
 
-void Display3::drawCoupleBneedle(Couple const* cx) const
+void Display3::drawCoupleB(Couple const* cx) const
 {
     const PointDisp * pd1 = cx->disp1();
     const PointDisp * pd2 = cx->disp2();
@@ -1191,7 +1191,7 @@ void Display3::drawCoupleBneedle(Couple const* cx) const
 }
 
 
-void Display3::drawCoupleB(Couple const* cx) const
+void Display3::drawCoupleBalt(Couple const* cx) const
 {
     const PointDisp * pd1 = cx->disp1();
     const PointDisp * pd2 = cx->disp2();
