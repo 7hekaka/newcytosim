@@ -45,7 +45,7 @@ public:
     /// true if the bead is inside the Space
     bool        allInside(Vector const&, real rad) const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector      project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space

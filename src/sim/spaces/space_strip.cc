@@ -112,7 +112,7 @@ void SpaceStrip::bounce(Vector& pos) const
 /**
  place only at top/bottom surface. This overrides the function in Space
  */
-Vector SpaceStrip::randomPlaceOnEdge(real) const
+Vector SpaceStrip::placeOnEdge(real) const
 {
     real Z = RNG.choice(bot_, top_);
 #if ( DIM >= 3 )

@@ -61,7 +61,7 @@ public:
     real volume() const;
     
     /// near the top edge
-    Vector randomPlaceOnEdge(real) const;
+    Vector placeOnEdge(real) const;
 
     /// true if the point is inside the Space
     bool inside(Vector const&) const;

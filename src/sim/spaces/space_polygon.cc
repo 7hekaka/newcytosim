@@ -120,11 +120,11 @@ bool SpacePolygon::inside(Vector const& W) const
 }
 
 
-Vector SpacePolygon::randomPlace() const
+Vector SpacePolygon::place() const
 {
     if ( surface_ <= 0 )
         throw InvalidParameter("cannot pick point inside polygon of null surface");
-    return Space::randomPlace();
+    return Space::place();
 }
 
 

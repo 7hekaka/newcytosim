@@ -71,7 +71,7 @@ void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
 }
 
 
-Vector SpaceCylinderZ::randomPlace() const
+Vector SpaceCylinderZ::place() const
 {
 #if HAS_SMOOTH_EDGES
     Vector W;
@@ -138,7 +138,7 @@ For a half-circle, this is GC = 2 R / M_PI
 
 https://en.wikipedia.org/wiki/Pappus%27s_centroid_theorem
 */
-Vector SpaceCylinderZ::randomPlaceOnEdge(real) const
+Vector SpaceCylinderZ::placeOnEdge(real) const
 {
 #if ( DIM > 2 )
 #if HAS_SMOOTH_EDGES

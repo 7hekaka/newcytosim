@@ -87,7 +87,7 @@ bool SpaceCylinderP::allInside(Vector const& W, const real rad) const
 }
 
 
-Vector SpaceCylinderP::randomPlace() const
+Vector SpaceCylinderP::place() const
 {
 #if ( DIM >= 3 )
     const Vector2 V = Vector2::randB(radius_);
@@ -112,7 +112,7 @@ Vector SpaceCylinderP::normalToEdge(Vector const& pos) const
 }
 
 
-Vector SpaceCylinderP::randomPlaceOnEdge(real) const
+Vector SpaceCylinderP::placeOnEdge(real) const
 {
 #if ( DIM >= 3 )
     const Vector2 YZ = Vector2::randU(radius_);

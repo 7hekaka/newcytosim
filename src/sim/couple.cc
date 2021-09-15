@@ -454,9 +454,9 @@ void Couple::foldPosition(Modulo const* m)
 void Couple::randomizePosition()
 {
     if ( prop->confine == CONFINE_ON )
-        cPos = prop->confine_space_ptr->randomPlaceOnEdge(1.0);
+        cPos = prop->confine_space_ptr->placeOnEdge(1.0);
     else if ( prop->confine == CONFINE_INSIDE )
-        cPos = prop->confine_space_ptr->randomPlace();
+        cPos = prop->confine_space_ptr->place();
     else if ( prop->confine != CONFINE_OFF )
         throw InvalidParameter("`confine` is incompatible with `fast_diffusion`");
 }

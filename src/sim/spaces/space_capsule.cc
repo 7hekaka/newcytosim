@@ -106,7 +106,7 @@ Vector SpaceCapsule::project(Vector const& pos) const
 }
 
 
-Vector SpaceCapsule::randomPlace() const
+Vector SpaceCapsule::place() const
 {
 #if ( DIM >= 3 )
     // volume elements divided by 4 * M_PI * radius_
@@ -157,7 +157,7 @@ Vector SpaceCapsule::normalToEdge(Vector const& pos) const
 }
 
 
-Vector SpaceCapsule::randomPlaceOnEdge(real) const
+Vector SpaceCapsule::placeOnEdge(real) const
 {
 #if ( DIM >= 3 )
     // surface elements divided by 4 * M_PI * radius_

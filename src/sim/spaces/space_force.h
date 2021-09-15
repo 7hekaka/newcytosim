@@ -52,7 +52,7 @@ public:
     /// true if a sphere (center w[], radius) is entirely outside
     bool        allOutside(Vector const&, real rad) const { return false; }
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector      project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space

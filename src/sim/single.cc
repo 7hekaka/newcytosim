@@ -102,9 +102,9 @@ void Single::foldPosition(Modulo const* m)
 void Single::randomizePosition()
 {
     if ( prop->confine == CONFINE_ON )
-        sPos = prop->confine_space_ptr->randomPlaceOnEdge(1.0);
+        sPos = prop->confine_space_ptr->placeOnEdge(1.0);
     else if ( prop->confine == CONFINE_INSIDE )
-        sPos = prop->confine_space_ptr->randomPlace();
+        sPos = prop->confine_space_ptr->place();
     else if ( prop->confine != CONFINE_OFF )
         throw InvalidParameter("`confine` is incompatible with `fast_diffusion`");
 }

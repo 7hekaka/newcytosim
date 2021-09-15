@@ -105,13 +105,13 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( spc )
         {
             if ( tok == "inside" || tok == "random" )
-                return spc->randomPlace();
+                return spc->place();
             
             if ( tok == "XY" || tok == "YZ" || tok == "XZ" )
             {
                 real H = 0;
                 is >> H;
-                Vector V = spc->randomPlace();
+                Vector V = spc->place();
                 if ( tok == "YZ" ) V.XX = H;
 #if ( DIM > 1 )
                 if ( tok == "XZ" ) V.YY = H;
@@ -128,7 +128,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                 is >> R;
                 if ( R < REAL_EPSILON )
                     throw InvalidParameter("distance R must be > 0 in `edge R`");
-                return spc->randomPlaceNearEdge(R);
+                return spc->placeNearEdge(R);
             }
             
             if ( tok == "surface" )
@@ -137,7 +137,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                 is >> R;
                 if ( R < REAL_EPSILON )
                     throw InvalidParameter("distance R must be > 0 in `surface R`");
-                return spc->randomPlaceOnEdge(R);
+                return spc->placeOnEdge(R);
             }
 
             if ( tok == "outside_sphere" )
@@ -148,7 +148,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                     throw InvalidParameter("distance R must be >= 0 in `outside_sphere R`");
                 Vector P;
                 do
-                    P = spc->randomPlace();
+                    P = spc->place();
                 while ( P.norm() < R );
                 return P;
             }
@@ -173,7 +173,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                     Vector vec;
                     real p;
                     do {
-                        vec = spc->randomPlace();
+                        vec = spc->place();
                         p = ( vec.XX - S ) / ( E - S );
                     } while ( p < 0 || p > 1 || p < RNG.preal() );
                     return vec;
@@ -196,7 +196,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
                     Vector vec;
                     real p;
                     do {
-                        vec = spc->randomPlace();
+                        vec = spc->place();
                         p = std::exp( ( S - vec.XX ) / E );
                     } while ( p < 0 || p > 1 || p < RNG.preal() );
                     return vec;

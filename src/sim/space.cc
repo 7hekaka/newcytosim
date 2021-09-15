@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "dim.h"
 #include "space.h"
@@ -32,7 +32,7 @@ Space::~Space()
  Algorithm: throw a point in the rectangular volume provided by boundaries()
  until inside() returns true.
 */
-Vector Space::randomPlace() const
+Vector Space::place() const
 {
     size_t ouf = 0, max_trials = 1<<14;
     Vector res, inf, sup;
@@ -58,12 +58,12 @@ Vector Space::randomPlace() const
  - inside(point) = true
  - inside(point, radius) = false
  */
-Vector Space::randomPlaceNearEdge(real rad, size_t num_trials) const
+Vector Space::placeNearEdge(real rad, size_t num_trials) const
 {
     size_t ouf = 0;
     Vector res;
     do {
-        res = randomPlace();
+        res = place();
         assert_true( inside(res) );
         if ( ++ouf > num_trials )
             throw InvalidParameter("edge placement failed for space `"+prop->name()+"'");

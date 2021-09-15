@@ -50,7 +50,7 @@ real  SpaceRing::volume() const
 }
 
 
-Vector SpaceRing::randomPlace() const
+Vector SpaceRing::place() const
 {
 #if ( DIM >= 3 )
     const Vector2 V = Vector2::randB(radius_);

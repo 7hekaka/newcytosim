@@ -159,7 +159,7 @@ Isometry Interface::read_placement(Glossary& opt)
     if ( opt.set(str, "position") )
         iso.mov = Movable::readPosition(str, spc);
     else if ( spc )
-        iso.mov = spc->randomPlace();
+        iso.mov = spc->place();
     
     // Rotation applied before the translation
     if ( opt.set(str, "direction") )
@@ -508,12 +508,12 @@ void Interface::execute_new(std::string const& name, size_t cnt)
                 {
                     case 2: obj->rotate(Rotation::randomRotation()); break;
                     case 3: obj->rotate(Rotation::randomRotation());
-                    case 1: obj->translate(spc->randomPlace());
+                    case 1: obj->translate(spc->place());
                 }
             }
             else
             {
-                Isometry iso(spc->randomPlace(), Rotation::randomRotation());
+                Isometry iso(spc->place(), Rotation::randomRotation());
                 ObjectSet::moveObjects(objs, iso);
             }
         }

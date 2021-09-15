@@ -52,12 +52,12 @@ public:
     void        boundaries(Vector& inf, Vector& sup) const;
 
     /// a random position inside the volume
-    Vector      randomPlace() const { return Vector::randB(radius_); }
+    Vector      place() const { return Vector::randB(radius_); }
     
     /// direct normal direction calculation
     Vector      normalToEdge(Vector const& pos) const { return normalize(pos); }
 
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector      project(Vector const& pos) const;
 
     

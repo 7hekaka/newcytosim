@@ -46,15 +46,15 @@ public:
     bool        inside(Vector const&) const;
     
     /// a random position inside the volume
-    Vector      randomPlace() const { return Vector::randB(radius_); }
+    Vector      place() const { return Vector::randB(radius_); }
     
     /// direct normal direction calculation
     Vector      normalToEdge(Vector const& pos) const { return normalize(pos); }
     
     /// direct surface placement
-    Vector      randomPlaceOnEdge(real) const { return Vector::randU(radius_); }
+    Vector      placeOnEdge(real) const { return Vector::randU(radius_); }
 
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector      project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space

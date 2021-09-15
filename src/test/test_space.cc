@@ -125,7 +125,7 @@ void generatePoints(real len)
         for ( size_t ii = 0; ii <= nbpts; ++ii )
             point[ii] = inf + dif.e_mul(Vector::randP());
         //point[ii] = Vector::randU();
-        //point[ii] = spc->randomPlaceNearEdge(0.1);
+        //point[ii] = spc->placeNearEdge(0.1);
     }
 }
 
@@ -153,7 +153,7 @@ void distributePoints(real len = INFLATION)
         //calculate the projection of the projection:
         project2[ii] = spc->project(project[ii]);
         
-        edge[ii] = spc->randomPlaceOnEdge(1);
+        edge[ii] = spc->placeOnEdge(1);
         
         real d = ( project[ii] - project2[ii] ).normSqr();
         error = std::max(d, error);

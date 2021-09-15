@@ -55,9 +55,9 @@ public:
     bool allInside(Vector const&, real rad) const;
     
     /// a random position inside the volume
-    Vector randomPlace() const;
+    Vector place() const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector project(Vector const& pos) const;
 
     /// apply a force directed towards the edge of the Space

@@ -166,7 +166,7 @@ void Simul::step()
             Space const* spc = spaces.master();
             for ( size_t i = 0; i < 16; ++i )
             {
-                Vector pos = spc->randomPlace();
+                Vector pos = spc->place();
                 fiberGrid.testAttach(stdout, pos, fibers, &hp);
             }
         }

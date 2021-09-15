@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 #ifndef SPACE_H
 #define SPACE_H
 
@@ -35,6 +35,9 @@ class Space : public Object
 {
 protected:
     
+    /// write shape on 16 characters
+    static void writeShape(Outputter&, std::string const&);
+
     /// read shape string from file
     static void readShape(Inputter&, std::string const& expected);
     
@@ -84,7 +87,7 @@ public:
     /// true if `point` is inside or on the edge of this Space
     virtual bool inside(Vector const&) const { return true; }
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     /*
      If the edge is a smooth surface, this should correspond to the usual orthogonal projection.
      */
@@ -118,7 +121,7 @@ public:
     /// true if `point` is outside this Space ( defined as !inside(point) )
     bool outside(Vector const& pos)  const { return ! inside(pos); }
     
-    /// project `point` on this Space deflated by `radius`, putting the result in `proj`
+    /// return projection of `point` on edges deflated by `rad`
     Vector projectDeflated(Vector const&, real rad) const;
     
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
@@ -143,28 +146,28 @@ public:
     real signedDistanceToEdge(Vector const&) const;
     
     /// return a random position located inside and at most at distance `rad` from the edge
-    Vector randomPlaceNearEdge(real rad, size_t num_trials) const;
+    Vector placeNearEdge(real rad, size_t num_trials) const;
     
-    /// return a random position located on the surface
+    /// a crude method returning a random position located on the surface
     Vector onSurface(real rad, size_t num_trials) const;
 
     //------------- DERIVED FUNCTIONS THAT CAN BE OVERWRITTEN ------------------
 
     /// a random position inside the volume, uniformly distributed in the volume
-    virtual Vector randomPlace() const;
+    virtual Vector place() const;
 
-    /// a Vector perpendicular to the space edge at `point`, directed towards the outside
+    /// a Vector perpendicular to the space edge at `pos`, directed outward
     virtual Vector normalToEdge(Vector const& pos) const;
     
-    /// a random position located in the volume surrounding the surface
-    virtual Vector randomPlaceNearEdge(real rad) const { return randomPlaceNearEdge(rad, 1<<20); }
+    /// a random position located inside and within distance `rad` from the surface
+    virtual Vector placeNearEdge(real rad) const { return placeNearEdge(rad, 1<<20); }
     
     /// a random position located on the surface of the Space, broadly distributed
-    virtual Vector randomPlaceOnEdge(real rad) const { return onSurface(rad, 1<<20); }
+    virtual Vector placeOnEdge(real rad) const { return onSurface(rad, 1<<20); }
 
     //------------------------------ SIMULATION --------------------------------
     
-    /// one Monte-Carlo simulation step
+    /// perform one Monte-Carlo simulation step
     virtual void step() {}
     
     /// add interactions to a Meca
@@ -190,19 +193,16 @@ public:
     /// a static_cast<> of Object::prev()
     Space * prev() const { return static_cast<Space*>(prevO); }
     
-    /// write shape on 16 characters
-    static void writeShape(Outputter&, std::string const&);
-    
-    /// write to file
+    /// write dimensions to file
     virtual void write(Outputter&) const;
 
-    /// read from file
+    /// read dimensions from file
     virtual void read(Inputter&, Simul&, ObjectTag);
     
     /// get dimensions from array `len`
     virtual void setLengths(const real len[8]) {}
     
-    /// print descriptive quantities to stream
+    /// print a description to stream
     virtual void report(std::ostream&) const {}
 
     //------------------------------ DISPLAY -----------------------------------

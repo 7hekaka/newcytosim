@@ -100,7 +100,7 @@ void SpaceLid::bounce(Vector& pos) const
 /**
  place only at upper boundary. This overrides the function in Space
  */
-Vector SpaceLid::randomPlaceOnEdge(real) const
+Vector SpaceLid::placeOnEdge(real) const
 {
     return Vector(RNG.sfloat()*half_[0], top_, 0);
 }

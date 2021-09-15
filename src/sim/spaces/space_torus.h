@@ -52,7 +52,7 @@ public:
     /// true if the point is inside the Space
     bool inside(Vector const&) const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector project(Vector const& pos) const;
     
     /// write to file

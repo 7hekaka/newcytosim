@@ -65,16 +65,16 @@ public:
     /// true if the point is inside the Space
     bool inside(Vector const&) const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector1 project1D(Vector1 const&) const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector2 project2D(Vector2 const&) const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector3 project3D(Vector3 const&) const;
     
-    /// set `proj` as the point on the edge that is closest to `point`
+    /// return point on the edge that is closest to `pos`
     Vector project(Vector const& pos) const
     {
 #if ( DIM == 1 )

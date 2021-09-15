@@ -64,7 +64,7 @@ public:
     void boundaries(Vector& inf, Vector& sup) const;
     
     /// near the top edge
-    Vector randomPlaceOnEdge(real) const;
+    Vector placeOnEdge(real) const;
 
     /// the volume inside
     real volume() const;
