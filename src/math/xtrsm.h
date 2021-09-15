@@ -1477,7 +1477,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float*
         float * pB = B + K;
         float * end = B + M;
         pA += K;
-        const vec2 t0 = broadcast1f(pB);  // { T0 T0 }
+        const vec4f t0 = broadcast1f(pB);  // { T0 T0 }
         vec4f t2 = fnmadd4f(t0, load2f(pA+1), load2f(pB+1));  // { T1 B2-T0*A[2] }
         vec4f t1 = load2f(pA+1+lda);  // using upper value
         t2 = fnmadd4f(unpacklo4f(setzero4f(), t2), t1, t2);  // { T1 T2 }

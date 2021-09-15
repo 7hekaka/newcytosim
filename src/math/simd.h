@@ -129,14 +129,10 @@ inline static vec2 blend11(vec2 a, vec2 b) { return _mm_blend_pd(a, b, 0b10); }
 /// return `neg` if `val < 0` and `pos` otherwise
 inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(pos, neg, val); }
 
-inline static vec2 streamload2(double const* a) { return _mm_castsi128_pd(_mm_stream_load_si128((__m128i const*)a)); }
-
 #else
 
 /// return { a[0], b[1] }
 inline static vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
-
-inline static vec2 streamload2(double const* a) { return _mm_load_pd(a); }
 
 #endif
 
