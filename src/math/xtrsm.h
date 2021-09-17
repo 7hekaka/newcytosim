@@ -1951,6 +1951,7 @@ void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
 }
 
 
+#if defined(__SSE3__)
 void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* B)
 {
 #if 0
@@ -1976,7 +1977,7 @@ void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* 
     free_real(T);
 #endif
 }
-
+#endif
 
 /// version of xgetrs('N', ...) for ORD interleaved vectors in right-hand-side B
 template < int ORD >

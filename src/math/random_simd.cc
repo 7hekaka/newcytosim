@@ -103,10 +103,10 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const __m256i src[])
         y = mul8f(n, y);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
-        store4(d   , cvt4sd(getlo4f(x)));
-        store4(d+4 , cvt4sd(getlo4f(y)));
-        store4(d+8 , cvt4sd(gethi4f(x)));
-        store4(d+12, cvt4sd(gethi4f(y)));
+        store4d(d   , getlo4f(x));
+        store4d(d+4 , getlo4f(y));
+        store4d(d+8 , gethi4f(x));
+        store4d(d+12, gethi4f(y));
 #else
         // store 16 single-precision values
         store8f(d, x);
@@ -140,10 +140,10 @@ static real * makeGaussians_AVX1(real dst[], size_t cnt, const __m256i src[])
         y = unpackhi8f(x, y);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
-        store4(d   , cvt4sd(getlo4f(z)));
-        store4(d+4 , cvt4sd(getlo4f(y)));
-        store4(d+8 , cvt4sd(gethi4f(z)));
-        store4(d+12, cvt4sd(gethi4f(y)));
+        store4d(d   , getlo4f(z));
+        store4d(d+4 , getlo4f(y));
+        store4d(d+8 , gethi4f(z));
+        store4d(d+12, gethi4f(y));
 #else
         // store 16 single-precision values
         store8f(d  , z);
@@ -252,14 +252,14 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const __m256i src[])
 #endif
 #if REAL_IS_DOUBLE
         // convert to single-precision values
-        store4(d   , cvt4sd(getlo4f(x)));
-        store4(d+4 , cvt4sd(gethi4f(x)));
-        store4(d+8 , cvt4sd(getlo4f(y)));
-        store4(d+12, cvt4sd(gethi4f(y)));
-        store4(e   , cvt4sd(getlo4f(z)));
-        store4(e+4 , cvt4sd(gethi4f(z)));
-        store4(f   , cvt4sd(getlo4f(t)));
-        store4(f+4 , cvt4sd(gethi4f(t)));
+        store4d(d   , getlo4f(x));
+        store4d(d+4 , gethi4f(x));
+        store4d(d+8 , getlo4f(y));
+        store4d(d+12, gethi4f(y));
+        store4d(e   , getlo4f(z));
+        store4d(e+4 , gethi4f(z));
+        store4d(f   , getlo4f(t));
+        store4d(f+4 , gethi4f(t));
 #else
         // store 16 single-precision values
         store8f(d, x);
@@ -290,8 +290,8 @@ static real* makeExponentialsAVX(real dst[], size_t cnt, const __m256i src[])
         x = abs8f(logapprox8f(x));
 #if REAL_IS_DOUBLE
         // convert 8 single-precision values
-        store4(dst  , cvt4sd(getlo4f(x)));
-        store4(dst+4, cvt4sd(gethi4f(x)));
+        store4d(dst  , getlo4f(x));
+        store4d(dst+4, gethi4f(x));
 #else
         // store 8 single-precision values
         store8f(dst, x);

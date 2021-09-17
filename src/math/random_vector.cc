@@ -71,7 +71,7 @@ Vector2 Vector2::randU()
         x = RNG.sreal();
         y = RNG.sreal();
         d = x*x + y*y;
-    } while ( d > 1.0 | d == 0 );
+    } while (( d > 1.0 )|( d == 0 ));
     return Vector2(x*x-y*y, 2*x*y) / d;
 }
 
@@ -82,7 +82,7 @@ Vector2 Vector2::randU(const real n)
         x = RNG.sreal();
         y = RNG.sreal();
         d = x*x + y*y;
-    } while ( d > 1.0 | d == 0 );
+    } while (( d > 1.0 )|( d == 0 ));
     return Vector2(x*x-y*y, 2*x*y) * (n/d);
 }
 

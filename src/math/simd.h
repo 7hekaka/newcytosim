@@ -129,7 +129,7 @@ inline static vec2 blend11(vec2 a, vec2 b) { return _mm_blend_pd(a, b, 0b10); }
 /// return `neg` if `val < 0` and `pos` otherwise
 inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(pos, neg, val); }
 
-#else
+#elif defined(__SSE3__)
 
 /// return { a[0], b[1] }
 inline static vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
@@ -169,12 +169,14 @@ inline static vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_
 /// unaligned load 2 values, allowing for undefined value in upper positions
 inline static vec4 load2crap(double const* a)   { return _mm256_castpd128_pd256(_mm_load_pd(a)); }
 
-inline static void store1(double* a, vec4 b)    { _mm_store_sd(a, cast2(b)); }
-inline static void store2(double* a, vec4 b)    { _mm_store_pd(a, cast2(b)); }
-inline static void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, cast2(b)); }
+//inline static void store1(double* a, vec4 b)    { _mm_store_sd(a, cast2(b)); }
+//inline static void store2(double* a, vec4 b)    { _mm_store_pd(a, cast2(b)); }
+//inline static void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, cast2(b)); }
 inline static void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
 inline static void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
-inline static void store4(double* a, __m128 b)  { _mm256_store_pd(a, _mm256_cvtps_pd(b)); }
+
+/// convert single and store them in double precision
+inline static void store4d(double* a, __m128 b)  { _mm256_store_pd(a, _mm256_cvtps_pd(b)); }
 
 inline static __m256i makemask(long i)
 {
@@ -190,10 +192,12 @@ inline static vec4 broadcast1(double const* a)  { return _mm256_broadcast_sd(a);
 /// load 2 doubles and duplicate: X, Y, X, Y
 inline static vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d const*)a); }
 
-// return { A0, A1 }
+/// return { A0, A1 }
 inline static vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
-// return { A2, A3 }
+/// return { A2, A3 }
 inline static vec2 gethi(vec4 a)                { return _mm256_extractf128_pd(a,1); }
+/// concatenate two vec2 into a vec4
+inline static vec4 cat22(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
 
 inline static vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }
 inline static vec4 div4(vec4 a, vec4 b)         { return _mm256_div_pd(a,b); }
@@ -212,9 +216,9 @@ inline static vec4 flipsign4(vec4 a)            { return _mm256_xor_pd(a, sgn111
 inline static vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
 inline static vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
 
-// returns { a[0], a[0], a[2], a[2] }
+/// returns { a[0], a[0], a[2], a[2] }
 inline static vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); } //_mm256_unpacklo_pd(a,a)
-// returns { a[1], a[1], a[3], a[3] }
+/// returns { a[1], a[1], a[3], a[3] }
 inline static vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_mm256_unpackhi_pd(a,a)
 
 /// copy a[0] into all elements of dst.
@@ -341,11 +345,12 @@ inline static vec4 normalize4(vec4 vec, double n)
 
 #define permute4x64(a,k)    _mm256_permute4x64_pd(a,k)
 
-// load a memory address = [ X Y ] into [ X X Y Y ]:
-inline static vec4 interleave4(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 0x50); }
+/// return { X X Y Y } from { X Y }
+inline static vec4 interleave2(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 0x50); }
+/// return { X X Y Y } from { X Y - - }
 inline static vec4 interleave4(vec4 a) { return _mm256_permute4x64_pd(a, 0x50); }
 
-// copy a[0] into all elements of dst.
+/// copy a[0] into all elements of dst.
 inline static vec4 broadcastX(vec2 a)  { return _mm256_broadcastsd_pd(a); }
 
 
@@ -369,7 +374,9 @@ inline static vec4 streamload4(double const* a) { return _mm256_castsi256_pd(_mm
 
 inline static vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
-inline static vec4 interleave4(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
+/// return { X X Y Y } from { X Y }
+inline static vec4 interleave2(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
+/// return { X X Y Y } from { X Y - - }
 inline static vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
 
 #endif

@@ -422,9 +422,11 @@ inline void applyPrecondHalf(Mecable const* mec, real* Y)
 inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     const int bks = mec->blockSize();
-#if CHOUCROUTE
+#if CHOUCROUTE && defined(__SSE3__)
     // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xgetrsN_SSE(bks, mec->block(), bks, mec->pivot(), Y);
+#elif CHOUCROUTE
+    alsatian_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);
 #elif 1
     // translated LAPACK's reference code:
     lapack_xgetrsN(bks, mec->block(), bks, mec->pivot(), Y);

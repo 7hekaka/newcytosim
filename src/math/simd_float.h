@@ -79,20 +79,10 @@ inline static int any_true4f(vec4f a) { return !_mm_test_all_zeros((__m128i)a, (
 inline static vec4f cvt4if(__m128i a) { return _mm_cvtepi32_ps(a); }
 inline static vec4f cast4f(__m128i a) { return _mm_castsi128_ps(a); }
 
-/// convert 1 half-float to float
-inline static unsigned short cvt1sh(float a) { return _cvtss_sh(a, _MM_FROUND_NO_EXC); }
-/// convert 1 half-floats to floats
-inline static float cvt4hs(unsigned short a) { return _cvtsh_ss(a); }
-/// convert 4 floats to half-floats
-inline static __m128i cvt4sh(__m128 a) { return _mm_cvtps_ph(a, _MM_FROUND_NO_EXC); }
-/// convert 4 half-floats to floats
-inline static vec4f cvt4hs(__m128i a) { return _mm_cvtph_ps(a); }
-
 /// approximate reciprocal square root: 1 / sqrt(a)
 inline static vec4f rsqrt4f(vec4f a)  { return _mm_rsqrt_ps(a); }
 
 #endif  // __SSE3__
-
 
 #if defined(__SSE4_1__)
 
@@ -147,7 +137,9 @@ inline static vec4f streamload4f(float const* a)  { return _mm_castsi128_ps(_mm_
 // Convert between single and double types
 inline static vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
 inline static __m256d cvt4sd(vec4f a)             { return _mm256_cvtps_pd(a); }
-inline static void store4d(float* a, __m256d b)   { _mm_storeu_ps(a, _mm256_cvtpd_ps(b)); }
+
+/// convert double and store them in single precision
+inline static void store4df(float* a, __m256d b)  { _mm_storeu_ps(a, _mm256_cvtpd_ps(b)); }
 
 #elif defined(__SSE3__)
 
@@ -212,10 +204,10 @@ inline static vec8f unpackhi8f(vec8f a, vec8f b) { return _mm256_unpackhi_ps(a,b
 inline static vec8f isnan8f(vec8f a) { return _mm256_cmp_ps(a,a,3); }
 // blend to select `b` if `k == true`, and `a` otherwise:
 inline static vec8f blendv8f(vec8f a, vec8f b, vec8f k) { return _mm256_blendv_ps(a,b,k); }
-inline static vec8f swap2f128(vec8f a) { return _mm256_permute2f128_ps(a, a, 0x01); }
-// permute positions 1&2, 3&4, 5&6, 7&8
+inline static vec8f swap4f128(vec8f a) { return _mm256_permute2f128_ps(a, a, 0x01); }
+// return { 1 0 3 2  5 4 7 6 }, permutting positions 1&2, 3&4, 5&6, 7&8
 inline static vec8f permute8f(vec8f a) { return _mm256_permute_ps(a, 0xB1); }
-// permute positions 1&2 and 3&4, 4&5 and 6&7
+// return { 2 3 0 1  6 7 4 5 }, permutting positions 1+2 with 3+4, 4+5 with 6+7
 inline static vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
 
 
@@ -232,7 +224,7 @@ inline static vec8f rsqrt8f(vec8f a)  { return _mm256_rsqrt_ps(a); }
 inline static vec4f getlo4f(vec8f a)  { return _mm256_castps256_ps128(a); }
 inline static vec4f gethi4f(vec8f a)  { return _mm256_extractf128_ps(a,1); }
 /// concatenate two vec4f into a vec8f
-inline static vec8f cat4f(vec4f h, vec4f l) { return _mm256_set_m128(h, l); }
+inline static vec8f cat44f(vec4f l, vec4f h) { return _mm256_insertf128_ps(_mm256_castps128_ps256(l), h, 1); }
 
 inline static vec8f cvt8if(__m256i a) { return _mm256_cvtepi32_ps(a); }
 inline static vec8f cast8f(__m256i a) { return _mm256_castsi256_ps(a); }
@@ -245,5 +237,18 @@ inline static vec8f cast8f(__m256i a) { return _mm256_castsi256_ps(a); }
 inline static vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv_ps(pos, neg, val); }
 
 #endif // AVX
+
+#if 0
+
+/// convert 1 half-float to float
+inline static unsigned short cvt1sh(float a) { return _cvtss_sh(a, _MM_FROUND_NO_EXC); }
+/// convert 1 half-floats to floats
+inline static float cvt4hs(unsigned short a) { return _cvtsh_ss(a); }
+/// convert 4 floats to half-floats
+inline static __m128i cvt4sh(__m128 a) { return _mm_cvtps_ph(a, _MM_FROUND_NO_EXC); }
+/// convert 4 half-floats to floats
+inline static vec4f cvt4hs(__m128i a) { return _mm_cvtph_ps(a); }
+
+#endif
 
 #endif // SIMD_FLOAT_H

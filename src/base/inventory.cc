@@ -10,7 +10,7 @@ Inventory::Inventory()
 {
     allocated_ = 31;
     byNames    = new Inventoried*[1+allocated_];
-    lowest_    = std::numeric_limits<ObjectID>::max();
+    lowest_    = ~0;
     highest_   = 0;
 
     for ( ObjectID n = 0; n <= allocated_; ++n )
@@ -42,7 +42,7 @@ void Inventory::release()
     delete[] byNames;
     byNames = nullptr;
     allocated_ = 0;
-    lowest_    = std::numeric_limits<ObjectID>::max();
+    lowest_    = ~0;
     highest_   = 0;
 }
 
@@ -51,7 +51,7 @@ void Inventory::clear()
 {
     for ( ObjectID n = lowest_; n <= highest_; ++n )
         byNames[n] = nullptr;
-    lowest_ = std::numeric_limits<ObjectID>::max();
+    lowest_ = ~0;
     highest_ = 0;
 }
 

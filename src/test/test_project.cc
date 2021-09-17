@@ -18,7 +18,6 @@
 #include "cytoblas.h"
 #include "simd.h"
 #include "simd_float.h"
-#include "simd_print.h"
 
 #include "../sim/mecafil_code.cc"
 
@@ -539,7 +538,7 @@ void projectForcesD_FMA(SIZE_T nbs, const real* dir, const real* X, const real* 
      Y[B] = X[B] + dir[B] * mul[3] - dir[8] * mul[2];
  */
 
-#if ( DIM == 3 ) && defined(__SSE__)
+#if ( DIM == 3 ) && defined(__SSE3__)
 // SSE version using FMA
 void projectForcesD3D_sse(size_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
@@ -896,6 +895,7 @@ void projectDiff_F(SIZE_T nbs, const real* X, real* Y)
     addProjectionDiff_F(nbs, lag_, X, Y);
 }
 
+#if defined(__SSE3__)
 void projectDiff_SSE(SIZE_T nbs, const real* X, real* Y)
 {
 #if ( DIM == 2 )
@@ -904,7 +904,7 @@ void projectDiff_SSE(SIZE_T nbs, const real* X, real* Y)
     addProjectionDiff3D_SSE(nbs, lag_, X, Y);
 #endif
 }
-
+#endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
 void projectDiff_AVX(SIZE_T nbs, const real* X, real* Y)
 {

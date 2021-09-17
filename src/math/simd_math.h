@@ -115,11 +115,9 @@ inline vec8f logapprox8f(vec8f x)
 #ifdef __AVX2__
     vec8f a0 = cvt8if(_mm256_srli_epi32(_mm256_castps_si256(x), 23));
 #else
-    __m128 hi = gethi4f(x);
-    __m128 lo = getlo4f(x);
-    hi = cvt4if(_mm_srli_epi32(_mm_castps_si128(hi), 23));
-    lo = cvt4if(_mm_srli_epi32(_mm_castps_si128(lo), 23));
-    vec8f a0 = cat4f(hi, lo);
+    vec4f h = cvt4if(_mm_srli_epi32(_mm_castps_si128(gethi4f(x)), 23));
+    vec4f l = cvt4if(_mm_srli_epi32(_mm_castps_si128(getlo4f(x)), 23));
+    vec8f a0 = cat44f(l, h);
 #endif
     a0 = add8f(mul8f(a0, G), F);
     // clear exponents:
@@ -212,7 +210,7 @@ inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
 
 
 #if defined(__SSE3__)
-#include "simd_print.h"
+
 /**
  Initialize ptr[] to a circle:
  delta = 2 * PI / cnt;

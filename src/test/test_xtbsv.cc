@@ -2,6 +2,7 @@
 // FJN 30.06.2020
 
 #include <sys/time.h>
+#include <limits>
 
 #define DIM 3
 
@@ -370,7 +371,7 @@ void uniLT3(int N, real const* AB, real* B)
 
 void uniLT4(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__SSE3__)
     U::alsatian_xtbsvLTN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);
@@ -379,7 +380,7 @@ void uniLT4(int N, real const* AB, real* B)
 
 void uniLT5(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && defined(__SSE3__)
     alsatian_xtbsvLTN6SSE(N, AB, BLDD, B);
 #else
     zero_real(N, B);

@@ -482,11 +482,9 @@ inline vec8f log_approx8f(__m256 xxx)
 #ifdef __AVX2__
     __m256 cst = _mm256_cvtepi32_ps(_mm256_srli_epi32(_mm256_castps_si256(xxx), 23));
 #else
-    __m128 hi = _mm256_extractf128_ps(xxx, 1);
-    __m128 lo = _mm256_extractf128_ps(xxx, 0);
-    hi = _mm_cvtepi32_ps(_mm_srli_epi32(_mm_castps_si128(hi), 23));
-    lo = _mm_cvtepi32_ps(_mm_srli_epi32(_mm_castps_si128(lo), 23));
-    __m256 cst = _mm256_set_m128(hi, lo);
+    vec4f h = cvt4if(_mm_srli_epi32(_mm_castps_si128(gethi4f(xxx)), 23));
+    vec4f l = cvt4if(_mm_srli_epi32(_mm_castps_si128(getlo4f(xxx)), 23));
+    vec8f cst = cat44f(l, h);
 #endif
     cst = _mm256_add_ps(_mm256_mul_ps(cst, g), f);
     // clear exponents:
@@ -510,6 +508,7 @@ inline vec8f log_approx8f(__m256 xxx)
 }
 
 
+#if ( 0 )
 /**
  Another implementation of logapproxf(float) found online...
  */
@@ -556,6 +555,7 @@ __m256 logf_app(__m256 val)
     res = _mm256_add_ps(_mm256_mul_ps(exp, log2), res);
     return _mm256_or_ps(res, invalid);
 }
+#endif
 
 
 /// use this to check the log()
@@ -573,10 +573,10 @@ static real* check_log(real dst[], size_t cnt, const __m256i src[])
         vec8f y = logapprox8f(n);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
-        store4(d   , cvt4sd(getlo4f(x)));
-        store4(d+4 , cvt4sd(gethi4f(x)));
-        store4(d+8 , cvt4sd(getlo4f(y)));
-        store4(d+12, cvt4sd(gethi4f(y)));
+        store4d(d   , getlo4f(x));
+        store4d(d+4 , gethi4f(x));
+        store4d(d+8 , getlo4f(y));
+        store4d(d+12, gethi4f(y));
 #else
         // store 16 single-precision values
         store8f(d  , x);

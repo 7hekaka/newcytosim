@@ -276,7 +276,7 @@ void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
  */
 int alsatian_xpttrf(int size, real* D, real* E)
 {
-    if ( D[0] < 0 | size < 1 )
+    if ( size < 1 || D[0] < 0 )
         return 1;
 
     real w = real(1) / D[0];

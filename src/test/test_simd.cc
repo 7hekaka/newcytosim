@@ -1,9 +1,9 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 /*
- Tests Intel's Streaming SIMD
- F. Nedelec, HD, July 2013
+ Testing Intel's Streaming SIMD
+ FJN, started July 2013
  
- To compile: c++ -O4 tictoc.cc -mavx test.cc
+ To compile: c++ -O2 -mavx test.cc
  To generate assembly: c++ -S test.cc
  */
 
@@ -192,9 +192,6 @@ void test_shuffle()
 
 #ifdef __AVX__
 
-/// concatenate two vec2 into a vec4
-inline static vec4 cat4(vec2 h, vec2 l) { return _mm256_set_m128d(h, l); }
-inline static vec4 cat4(vec2 h, vec4 l) { return _mm256_set_m128d(h, cast2(l)); }
 
 
 /**
@@ -427,9 +424,9 @@ void unpack_matrix()
     vec2 m1h = blend11(ef, zz),  m1l = unpackhi2(ab, cd);
     vec2 m2h = catshift(ef, zz), m2l = unpacklo2(cd, ef);
     
-    dump(cat4(m0h, m0l), "m0 ");
-    dump(cat4(m1h, m1l), "m1 ");
-    dump(cat4(m2h, m2l), "m2 ");
+    dump(cat22(m0l, m0h), "m0 ");
+    dump(cat22(m1l, m1h), "m1 ");
+    dump(cat22(m2l, m2h), "m2 ");
 }
 
 
@@ -446,8 +443,8 @@ void test_cat()
     dump(x, "x");
     dump(y, "y");
 
-    dump(cat4(x, y), "cat4(x, y)");
-    dump(cat4(y, x), "cat4(y, x)");
+    dump(cat22(y, x), "cat22(x, y)");
+    dump(cat22(x, y), "cat22(y, x)");
 }
 
 void test_load()
@@ -466,7 +463,7 @@ void test_load()
     dump(load2Z(mem), "load2Z");
 
     dump(load3(mem), "load3");
-    dump(cat4(load1(mem+2), load2(mem)), "cat4(load1, load2)");
+    dump(cat22(load2(mem), load1(mem+2)), "cat22(load2, load1)");
 
     vec4 t = blend31(load4(mem), setzero4());
     dump(t, "blend(load4, zero)");
@@ -478,11 +475,11 @@ void test_load()
 
     dump(u, "src");
     dump(n, "permute4(broadcast2)");
-    dump(interleave4(u), "interleave4");
-    dump(cat4(u,u), "cat4");
+    dump(interleave2(u), "interleave2");
+    dump(cat22(u,u), "cat22");
     dump(_mm256_set_m128d(u,u),    "set_m128d");
     dump(insertf128(cast4(u),u,1), "insertf128");
-    dump(permute4(cat4(u,u), 0b1100), "permute4(cat4, 0b1100)");
+    dump(permute4(cat22(u,u), 0b1100), "permute4(cat22, 0b1100)");
     
     vec4 p{-1.0, -2.0, -3.0, -4.0};
     _mm_storeu_pd(mem, _mm256_castpd256_pd128(p));
