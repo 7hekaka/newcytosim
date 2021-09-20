@@ -322,6 +322,15 @@ void Mecafil::projectForces(const real* X, real* Y) const
     const size_t nbs = nbSegments();
     //VecPrint::print("X", DIM*nbPoints(), X);
 
+// using the fused projectForces if possible, since this is fastest
+#if REAL_IS_DOUBLE && defined(__SSE3__) && !NEW_ANISOTROPIC_FIBER_DRAG
+#  if ( DIM == 3 )
+    return projectForces3D_SSE(nbs, iDir, X, iLLG, iJJt, iJJtU, Y);
+#  elif ( DIM == 2 )
+    return projectForces2D_SSE(nbs, iDir, X, iLLG, iJJt, iJJtU, Y);
+#  endif
+#endif
+    
     // calculate `iLLG` without modifying `X`
 #if NEW_ANISOTROPIC_FIBER_DRAG
     scaleTangentially(nPoints, X, iAni, Y);
