@@ -167,20 +167,22 @@ This will create a file `objects.cmi`. The frame index start at 0, and we extrac
 		
 Note that `frametool objects.cmo` will tell you how many frames are contained in the file.
 
-3. Adjust the `config.cym` to import this frame.
-Use the `import` command to read the file created in step 1:
-	
-		import objects objects.cmi
+3. Copy `objects.cmi` in a new directory. Also copy `properties.cmo` and rename it `properties.cmi`.
+Start the `sim` with a new config file, containing these instructions:
+
+           read properties.cmi
+		import all objects.cmi
 		
-		% simulate as usual:
 		run 1000000 system
 		{
 			nb_frames = 100
 		}
 
-The `import` command replaces the objects of the simulation, without changing their Properties. The config file should thus define all the Properties with `set` as usual, before the `import` command. From an existing configuration, one simply adds the 'import' and deletes all the 'new'.
+The `read` command loads the properties, and the `import` command loads the objects. 
+Starting `sim` will erase any preexisting `object.cmo` file, so it is important to use a new directory.
 
-However, any `new` placed after `import` will add objects as usual. The simulation should be started in a fresh directory, as `sim` will erase the `object.cmo` file.
+Alternatively, it is also possible to edit the config file, keeping all the `set`, deleting all the `new`, and adding the `import` command. The `import` command has options to keep the objects or to delete them. 
+Any `new` placed after the `import` will add objects as usual. 
 
 One can merge two trajectory files later with 'cat' if necessary:
 

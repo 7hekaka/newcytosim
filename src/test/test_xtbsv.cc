@@ -33,7 +33,7 @@ namespace U
 constexpr size_t NPTS = 113;
 constexpr size_t NVAL = DIM * NPTS;
 
-constexpr size_t BRANK = 2*DIM;
+constexpr size_t RANK = 2*DIM;
 constexpr size_t BLDD = 2*DIM+1;
 
 
@@ -262,56 +262,56 @@ void testPOTRS(size_t cnt)
 
 void uni0(int N, real const* AB, real* B)
 {
-    blas::xtbsv('L', 'N', 'N', N, BRANK, AB, BLDD, B, 1);
-    blas::xtbsv('L', 'T', 'N', N, BRANK, AB, BLDD, B, 1);
+    blas::xtbsv('L', 'N', 'N', N, RANK, AB, BLDD, B, 1);
+    blas::xtbsv('L', 'T', 'N', N, RANK, AB, BLDD, B, 1);
 }
 
 void uni1(int N, real const* AB, real* B)
 {
-    blas_xtbsvLN<'I'>(N, BRANK, AB, BLDD, B);
-    blas_xtbsvLT<'I'>(N, BRANK, AB, BLDD, B);
+    blas_xtbsvLN<'I'>(N, RANK, AB, BLDD, B);
+    blas_xtbsvLT<'I'>(N, RANK, AB, BLDD, B);
 }
 
 void uni2(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN(N, BRANK, AB, BLDD, B);
-    alsatian_xtbsvLTN(N, BRANK, AB, BLDD, B);
+    alsatian_xtbsvLNN(N, RANK, AB, BLDD, B);
+    alsatian_xtbsvLTN(N, RANK, AB, BLDD, B);
 }
 
 void uni3(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNNK<BRANK>(N, AB, BLDD, B);
-    alsatian_xtbsvLTNK<BRANK>(N, AB, BLDD, B);
+    alsatian_xtbsvLNNK<RANK>(N, AB, BLDD, B);
+    alsatian_xtbsvLTNK<RANK>(N, AB, BLDD, B);
 }
 
 void uni4(int N, real const* AB, real* B)
 {
-    alsatian_xpbtrsLK<BRANK>(N, AB, BLDD, B);
+    alsatian_xpbtrsLK<RANK>(N, AB, BLDD, B);
 }
 
 // this gives wrong results
 void uniLNB(int N, real const* AB, real* B)
 {
-    blas::xtbsv('L', 'N', 'N', N, BRANK, AB, BLDD, B, 1);
-    //blas::xtbsv('L', 'T', 'N', N, BRANK, AB, BLDD, B);
+    blas::xtbsv('L', 'N', 'N', N, RANK, AB, BLDD, B, 1);
+    //blas::xtbsv('L', 'T', 'N', N, RANK, AB, BLDD, B);
 }
 
 void uniLN0(int N, real const* AB, real* B)
 {
-    blas_xtbsvLN<'I'>(N, BRANK, AB, BLDD, B);
-    //blas_xtbsvLT<'I'>(N, BRANK, AB, BLDD, B);
+    blas_xtbsvLN<'I'>(N, RANK, AB, BLDD, B);
+    //blas_xtbsvLT<'I'>(N, RANK, AB, BLDD, B);
 }
 
 void uniLN1(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNN(N, BRANK, AB, BLDD, B);
-    //alsatian_xtbsvLTN(N, BRANK, AB, BLDD, B);
+    alsatian_xtbsvLNN(N, RANK, AB, BLDD, B);
+    //alsatian_xtbsvLTN(N, RANK, AB, BLDD, B);
 }
 
 void uniLN2(int N, real const* AB, real* B)
 {
-    alsatian_xtbsvLNNK<BRANK>(N, AB, BLDD, B);
-    //alsatian_xtbsvLTNK<BRANK>(N, AB, BLDD, B);
+    alsatian_xtbsvLNNK<RANK>(N, AB, BLDD, B);
+    //alsatian_xtbsvLTNK<RANK>(N, AB, BLDD, B);
 }
 
 void uniLN3(int N, real const* AB, real* B)
@@ -341,26 +341,26 @@ void uniLN5(int N, real const* AB, real* B)
 // this gives wrong results
 void uniLTB(int N, real const* AB, real* B)
 {
-    //blas::xtbsv('L', 'N', 'N', N, BRANK, AB, BLDD, B);
-    blas::xtbsv('L', 'T', 'N', N, BRANK, AB, BLDD, B, 1);
+    //blas::xtbsv('L', 'N', 'N', N, RANK, AB, BLDD, B);
+    blas::xtbsv('L', 'T', 'N', N, RANK, AB, BLDD, B, 1);
 }
 
 void uniLT0(int N, real const* AB, real* B)
 {
-    //blas_xtbsvLN<'I'>(N, BRANK, AB, BLDD, B);
-    blas_xtbsvLT<'I'>(N, BRANK, AB, BLDD, B);
+    //blas_xtbsvLN<'I'>(N, RANK, AB, BLDD, B);
+    blas_xtbsvLT<'I'>(N, RANK, AB, BLDD, B);
 }
 
 void uniLT1(int N, real const* AB, real* B)
 {
-    //alsatian_xtbsvLNN(N, BRANK, AB, BLDD, B);
-    alsatian_xtbsvLTN(N, BRANK, AB, BLDD, B);
+    //alsatian_xtbsvLNN(N, RANK, AB, BLDD, B);
+    alsatian_xtbsvLTN(N, RANK, AB, BLDD, B);
 }
 
 void uniLT2(int N, real const* AB, real* B)
 {
-    //alsatian_xtbsvLNNK<BRANK>(N, AB, BLDD, B);
-    alsatian_xtbsvLTNK<BRANK>(N, AB, BLDD, B);
+    //alsatian_xtbsvLNNK<RANK>(N, AB, BLDD, B);
+    alsatian_xtbsvLTNK<RANK>(N, AB, BLDD, B);
 }
 
 void uniLT3(int N, real const* AB, real* B)
@@ -419,7 +419,7 @@ void test(size_t cnt)
         AB[2+BLDD*i] -= r;
     }
     int info;
-    alsatian_xpbtf2L<BRANK>(NVAL, AB, BLDD, &info);
+    alsatian_xpbtf2L<RANK>(NVAL, AB, BLDD, &info);
     
 #if 1
     check<uni0>(NVAL, 1, S, AB, B, "blas::tbsv", cnt);

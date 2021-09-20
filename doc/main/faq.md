@@ -560,15 +560,15 @@ This approach is generic and it should work for most object class in Cytosim
 <summary>
 **Is it possible to restart the simulation from the same configuration at which it stopped?**
 </summary>
-Yes, you will need to extract the frame you want to restart from, with the program `frametool`, which you first need to compile, in cytosim source directory:
+Yes, you will need to extract the frame you want to restart from, with the program `frametool`.
+`Frametool` needs to be compiled, in cytosim source directory (`make frametool`).
 
-	make frametool
-
-then navigate to the old run dir, and run:
+1. navigate to the old run dir, and run:
 	
 	frametool objects.cmo 30 > objects.cmi
 
-in this example, we extracted frame #30 (index start at 0), to create the file `objects.cmi`. Run `frametool objects.cmo` to know how many frames are in the file.
+in this example, we extracted frame #30 (index start at 0), to create the file `objects.cmi`. 
+Run `frametool objects.cmo` to know how many frames are contained the file.
 
 2. Use a fresh directory, copy `objects.cmi` and `config.cym` from the old simulation.
 Edit `config.cym` and add the `import` command to read the frame.

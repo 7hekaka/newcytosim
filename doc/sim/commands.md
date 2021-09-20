@@ -296,8 +296,8 @@ Examples:
      import all my_file.cmo { frame = 10 }
  
  By default, this will replace the simulation state by the one loaded from file.
- To add the file objects to the simulation without deleting any of the current 
- object, you should specify `append = 1`:
+ To add the file objects to the simulation without deleting the current objects, 
+ you should specify `append = 1`:
  
      import all my_file.cmo { append = 1 }
  

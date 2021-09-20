@@ -1181,12 +1181,8 @@ int Parser::evaluate_one(std::istream& is)
         parse_mark(is);
     else if ( tok == "run" )
         parse_run(is);
-    else if ( tok == "read" )
+    else if ( tok == "read" || tok == "include" )
         parse_read(is);
-#if BACKWARD_COMPATIBILITY < 50
-    else if ( tok == "include" )
-        parse_read(is);
-#endif
     else if ( tok == "report" )
         parse_report(is);
     else if ( tok == "write" )
