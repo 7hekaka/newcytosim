@@ -67,12 +67,12 @@ void nan_spill(real * dst)
 template < void (*FUNC)(int, real const*, real*) >
 void check(int N, int ORD, real const* S, real const* AB, real* B, char const str[], size_t cnt)
 {
-    const size_t SUB = 128;
     copy_real(ORD*N, S, B);
     nan_spill(B+ORD*N);
     FUNC(N, AB, B);
     print(ORD*N, B);
     tic();
+    const size_t SUB = 128;
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(ORD*N, S, B);
@@ -83,6 +83,7 @@ void check(int N, int ORD, real const* S, real const* AB, real* B, char const st
 }
 
 //------------------------------------------------------------------------------
+#pragma mark -
 
 const size_t KD = 2;
 const size_t LDAB = 3;
@@ -196,6 +197,7 @@ void testISO(size_t cnt)
 }
 
 //------------------------------------------------------------------------------
+#pragma mark -
 
 void pot1(int N, real const* AB, real* B)
 {
@@ -259,6 +261,7 @@ void testPOTRS(size_t cnt)
 }
 
 //------------------------------------------------------------------------------
+#pragma mark -
 
 void uni0(int N, real const* AB, real* B)
 {
@@ -392,7 +395,7 @@ void uniLT5(int N, real const* AB, real* B)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void test(size_t cnt)
+void testTBSV(size_t cnt)
 {
     std::cout << DIM << "D xTBSV " << NPTS << " points --- real " << sizeof(real);
     std::cout << " --- "  << __VERSION__ << "\n";
@@ -455,11 +458,102 @@ void test(size_t cnt)
     free_real(AB);
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - GETRS
+
+int* pivot = nullptr;
+
+void getrs1(int N, real const* B, real* Y)
+{
+#if defined(__SSE3__)
+    alsatian_xgetrsN_SSE(N, B, N, pivot, Y);
+#endif
+}
+
+void getrs2(int N, real const* B, real* Y)
+{
+    //alsatian_xgetrsN(N, B, N, pivot, Y);
+    // Apply row interchanges to the right hand side.
+    xlaswp1(Y, 1, N, pivot); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1U(N, (float*)B, N, Y);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1I(N, (float*)B, N, Y);
+}
+
+void getrs3(int N, real const* B, real* Y)
+{
+    lapack_xgetrsN(N, B, N, pivot, Y);
+}
+
+void getrs4(int N, real const* B, real* Y)
+{
+    int info = 0;
+    lapack::xgetrs('N', N, 1, B, N, pivot, Y, N, &info);
+    assert_true(info==0);
+}
+
+/// convert doubles to floats
+void convert_to_floats(size_t cnt, double const* src, float* dst)
+{
+    #pragma ivdep
+    for ( size_t i = 0; i < cnt; ++i )
+        dst[i] = (float)src[i];
+}
+
+void testGETRS(size_t cnt)
+{
+    std::cout << DIM << "D xGETRS " << NPTS << " points --- real " << sizeof(real);
+    std::cout << " --- "  << __VERSION__ << "\n";
+
+    real * A = new_real(NVAL*NVAL+4);
+    real * M = new_real(NVAL*NVAL+4);
+    real * Y = new_real(NVAL+4);
+    real * S = new_real(NVAL);
+    pivot = new int[NVAL+4];
+    
+    for ( size_t i = 0; i < NVAL; ++i )
+        S[i] = RNG.sreal();
+    
+    zero_real(NVAL*NVAL, A);
+    nan_spill(A+NVAL*NVAL);
+    for ( size_t i = 0; i < NVAL; ++i )
+    {
+        for ( size_t j = 0; j < NVAL; ++j )
+            A[j+NVAL*i] = 0.0125 * RNG.sreal();
+        A[i+NVAL*i] = 2.0; //diagonal term
+    }
+    copy_real(NVAL*NVAL, A, M);
+
+    int info = 0;
+    lapack::xgetf2(NVAL, NVAL, M, NVAL, pivot, &info);
+    if ( info == 0 )
+    {
+        check<getrs4>(NVAL, 1, S, M, Y, "lapack::xgetrs", cnt);
+        check<getrs3>(NVAL, 1, S, M, Y, "lapack_xgetrsN", cnt);
+    }
+    alsatian_xgetf2(NVAL, A, NVAL, pivot, &info);
+#if REAL_IS_DOUBLE
+    convert_to_floats(NVAL*NVAL, A, (float*)A);
+#endif
+    if ( info == 0 )
+    {
+        check<getrs2>(NVAL, 1, S, A, Y, "alsa_getrsN", cnt);
+        check<getrs1>(NVAL, 1, S, A, Y, "alsa_getrsNSSE", cnt);
+    }
+    free_real(Y);
+    free_real(S);
+    free_real(A);
+    free_real(M);
+    delete[] pivot;
+}
+
 
 int main(int argc, char* argv[])
 {
     RNG.seed();
     testISO(1<<9);
     testPOTRS(1<<7);
-    test(1<<9);
+    testTBSV(1<<9);
+    testGETRS(1<<9);
 }

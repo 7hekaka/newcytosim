@@ -275,15 +275,6 @@ void compactify_double(size_t siz, double* mat)
 
 
 /// convert doubles to floats
-void convert_to_floats(size_t cnt, double* mat)
-{
-    float * ptr = (float*)mat;
-    #pragma ivdep
-    for ( size_t i = 0; i < cnt; ++i )
-        ptr[i] = (float)mat[i];
-}
-
-/// convert doubles to floats
 void convert_to_floats(size_t cnt, double const* src, float* dst)
 {
     #pragma ivdep
