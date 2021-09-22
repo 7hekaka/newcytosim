@@ -1254,7 +1254,7 @@ void Meca::computePrecondFull(Mecable* mec)
 #if CHOUCROUTE && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*bks/2, bks);
     // use temporary memory to build matrix block:
-    real * blk = new_real(4+bks*bks);
+    double* blk = new_real(4+bks*bks);
 #else
     mec->blockSize(bks, bks*bks, bks);
     real * blk = mec->block();

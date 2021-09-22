@@ -1879,6 +1879,18 @@ void alsatian_xgetf2(const int N, real* A, const int LDA, int* IPIV, int* INFO)
     }
 }
 
+/// factorize a single-precision matrix
+void alsatian_sgetf2(const int N, float* A, const int LDA, int* IPIV, int* INFO)
+{
+    lapack::sgetf2(N, N, A, LDA, IPIV, INFO);
+    if ( 0 == *INFO )
+    {
+        const int S = LDA+1;
+        for ( int u = 0; u < N*S; u += S )
+            A[u] = float(1) / A[u];
+    }
+}
+
 
 inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int* INFO)
 {

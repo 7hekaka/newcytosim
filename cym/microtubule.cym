@@ -11,6 +11,7 @@ set simul system
 set space cell
 {
     shape = sphere
+    display = ( visible = 0 )
 }
 
 new cell
