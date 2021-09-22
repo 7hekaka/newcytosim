@@ -865,7 +865,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         simul_.writeProperties(nullptr, prune);
         if ( simul_.prop->clear_trajectory )
         {
-            simul_.writeObjects(TRAJECTORY, false, binary);
+            simul_.writeObjects(simul_.prop->system_file, false, binary);
             simul_.prop->clear_trajectory = false;
         }
         delta = real(nb_steps) / real(nb_frames);
@@ -893,7 +893,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         if ( do_write )
         {
             simul_.relax();
-            simul_.writeObjects(TRAJECTORY, true, binary);
+            simul_.writeObjects(simul_.prop->system_file, true, binary);
             reportCPUtime(simul_.time());
             simul_.sMeca.doNotify = 2;  // to print convergence parameters
             simul_.unrelax();

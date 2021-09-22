@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     try
     {
         simul.loadProperties();
-        reader.openFile(TRAJECTORY);
+        reader.openFile(simul_.prop->system_file);
     }
     catch( Exception & e )
     {

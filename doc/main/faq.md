@@ -596,7 +596,7 @@ You can later merge two object files later if you want to display them continuou
 
 *My HPC team suggested that in order to debug the code, they would need to know if there is a way to make it run with the same seed for the random number generator to make reproducible simulation results. Could you please help me with that?*
 
-There is a parameter `random_seed` in `simul`. By default, it is set to zero, and then cytosim seeds using the timer. The value that is used is then reported in `properties.cmo`.
+There is a parameter `random_seed` in `simul`. By default, it is set to zero, and then cytosim seeds using the timer. The value that is used is then reported in `properties.cmp`.
 So you can rerun the same simulation by copy-pasting that value into config.cym (and using the same machine). However, you can also set `random_seed=1` from the start.
 </details>
 

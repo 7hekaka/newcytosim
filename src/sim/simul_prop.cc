@@ -41,7 +41,7 @@ void SimulProp::clear()
     verbose = 0;
 
     config_file      = "config.cym";
-    property_file    = "properties.cmo";
+    property_file    = "properties.cmp";
     system_file      = TRAJECTORY;
     clear_trajectory = true;
     

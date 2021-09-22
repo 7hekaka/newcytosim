@@ -15,7 +15,7 @@ Extension | Type             | Typical usage
  
 File             | Type           | Content  
 -----------------|----------------|--------------------------------------------------
-`properties.cmo` | text           | properties of the objects
+`properties.cmp` | text           | properties of the objects
 `objects.cmo`    | binary or text | positions of the objects at different time points
 `messages.cmo`   | text           | information such as the execution time 
  
@@ -23,11 +23,11 @@ The file `objects.cmo` is called the trajectory file.
  
 # Files associated with `play`
  
-`play` in the normal replay mode reads:
+`play` in the normal replay mode will read this file for input:
  
  File             | Type           | Content  
 ------------------|----------------|--------------------------------------------------
-`properties.cmo`  | text           | properties of the objects
+`properties.cmp`  | text           | properties of the objects
 `objects.cmo`     | binary or text | positions of the objects at different time points
 `style.cyp`       | text           | display parameters
 
@@ -37,5 +37,5 @@ except to save images or export simulation snapshot (a trajectory file containin
 
 # Files associated with `report`
 
-`report` reads `properties.cmo` and `objects.cmo`, and sends output to the terminal.
+`report` reads `properties.cmp` and `objects.cmo`, and sends output to the terminal.
 

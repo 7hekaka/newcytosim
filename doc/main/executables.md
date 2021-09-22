@@ -14,14 +14,14 @@ and usually creates 3 output files:
  
 File              |  Type  |   Content                                                  |
 ------------------|--------|-------------------------------------------------------------
-`properties.cmo`  | text   | the attributes of the different classes of objects
+`properties.cmp`  | text   | the attributes of the different classes of objects
 `objects.cmo`     | binary | positions and states of the objects at different time points
 `messages.cmo`    | text   | informations concerning the execution, such as CPU time
  
-The trajectory file `properties.cmo` is by default a binary file, but it can
+The trajectory file `objects.cmo` is by default a binary file, but it can
 also be written in a text-based format (see command `write`). The property file
-contains the parameters of the simulation. Most of the values are copied from
-the config file, but parameters that specify the initial state are not included.
+ `properties.cmp` is a text file containing parameters of the simulation. 
+ Most of the values are copied from the config file, but parameters that specify the initial state are not included.
  
 By default the config file is `config.cym` in the current working directory, but one may
 give a name ending with a <b>.cym</b> on the command line to specify a different file:
@@ -40,7 +40,7 @@ and some of its functionalities (eg. PNG support) depend on external libraries.
 The [display parameters](../sim/graphics.md) controlling the graphical output can
 be embedded within the config file, or be specified from a second configuration file.
 Most objects have a `display` parameter controlling their appearance in `play` (color, etc.).
-These parameters are ignored by `sim`, but they are copied verbatim to `properties.cmo`,
+These parameters are ignored by `sim`, but they are copied verbatim to `properties.cmp`,
 from which they are read when you replay a simulation. 
 
 The display parameters can also be specified in a separate file with extension ".cyp",
@@ -64,7 +64,7 @@ The live mode is automatically started if a config file extending with '.cym' is
 ## Play - Replay mode
 
 Use `play` to display a simulation calculated by `sim`.
-By default, play reads `properties.cmo` and `objects.cmo`, in the current directory.
+By default, play reads `properties.cmp` and `objects.cmo`, in the current directory.
  
 A different trajectory file can be specified:
 

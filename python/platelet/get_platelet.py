@@ -214,7 +214,7 @@ def process(path):
     else:
         res = [ path ]
     os.chdir(path)
-    if not os.path.isfile('properties.cmo'):
+    if not os.path.isfile('properties.cmo') and not os.path.isfile('properties.cmp'):
         return []
     res.extend(get_parameters('config.cym'))    
     res.append('nan')

@@ -52,7 +52,7 @@ will fix problem for off-screen: glutBitmapCharacter() requires GLUT to be initi
 
 # To reach v4
 
-- Extend 'properties.cmo' to be able to store multiple time-points?
+- Extend the 'properties' file to be able to store multiple time-points?
 - Find a solution for 'confine = type, stiff, space' and 'confine = type, space' in Single.
 
 - add generic classes that can be customized: OpenFiber, OpenHand, OpenCouple, OpenSingle...

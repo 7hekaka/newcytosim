@@ -108,7 +108,9 @@ def process(path):
         par = 'unknown_parameters'
     res.extend(par)
     os.chdir(path)
-    if not os.path.isfile('objects.cmo') or not os.path.isfile('properties.cmo'):
+    if not os.path.isfile('objects.cmo'):
+        return []
+    if not os.path.isfile('properties.cmo') and not os.path.isfile('properties.cmp'):
         return []
     res.append('nan')
     # get forces:

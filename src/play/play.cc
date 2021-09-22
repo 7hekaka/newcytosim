@@ -239,15 +239,10 @@ int main(int argc, char* argv[])
 
     try
     {
-        std::string file = simul.prop->config_file;
-        
         if ( ! prop.goLive || has_frame )
         {
-            // config file is `properties.cmo` in replay mode:
-            file = simul.prop->property_file;
-            
-            // read config to create all properties
-            Parser(simul, 1, 1, 0, 0, 0).readConfig(file);
+            // read the `properties` file to import properties
+            simul.loadProperties();
             
             // open trajectory file and load requested frame:
             thread.openFile(simul.prop->system_file);
@@ -263,7 +258,7 @@ int main(int argc, char* argv[])
         else
         {
             // get the name of 'simul' and simul:display from config file
-            Parser(simul, 0, 1, 0, 0, 0).readConfig(file);
+            Parser(simul, 0, 1, 0, 0, 0).readConfig();
         }
     }
     catch( Exception & e )

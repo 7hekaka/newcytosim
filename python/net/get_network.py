@@ -179,7 +179,7 @@ def process(path):
     os.chdir(path)
     if not os.path.isfile('objects.cmo'):
         return []
-    if not os.path.isfile('properties.cmo'):
+    if not os.path.isfile('properties.cmo') and not os.path.isfile('properties.cmp'):
         return []
 
     # get bridge characteristics:

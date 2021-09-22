@@ -31,7 +31,7 @@ and then `play` to display the results once `sim` has finished:
 	sim
 	play
 
-By default, `sim` uses the configuration file `config.cym` in the current directory, and `play` will read two files written by `sim`: `properties.cmo` and `objects.cmo`.
+By default, `sim` uses the configuration file `config.cym` in the current directory, and `play` will read two files written by `sim`: `properties.cmp` and `objects.cmo`.
 If you do not want to wait until `sim` finishes, you may run `sim` in the background:
 
 	sim&
@@ -167,7 +167,7 @@ This will create a file `objects.cmi`. The frame index start at 0, and we extrac
 		
 Note that `frametool objects.cmo` will tell you how many frames are contained in the file.
 
-3. Copy `objects.cmi` in a new directory. Also copy `properties.cmo` and rename it `properties.cmi`.
+3. Copy `objects.cmi` in a new directory. Also copy `properties.cmp` and rename it `properties.cmi`.
 Start the `sim` with a new config file, containing these instructions:
 
            read properties.cmi
@@ -197,7 +197,7 @@ file containing all the simulation state variables.
 
 Simply execute a following config file:
 
-	read properties.cmo
+	read properties.cmp
 	import objects.cmo { frame=10; }
 	export objects objects.txt { binary=0; }
 

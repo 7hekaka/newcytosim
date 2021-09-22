@@ -711,5 +711,13 @@ void Simul::writeProperties(char const* name, bool prune) const
 
 void Simul::loadProperties()
 {
-    Parser(*this, 1, 1, 0, 0, 0).readConfig(prop->property_file);
+    std::string file = prop->property_file;
+    std::ifstream is(file.c_str(), std::ifstream::in);
+#if BACKWARD_COMPATIBILITY < 57
+    if ( !is.is_open() && file == "properties.cmp" )
+        is.open("properties.cmo", std::ifstream::in);
+#endif
+    if ( !is.good() )
+        throw InvalidIO("could not find or read `"+file+"'");
+    Parser(*this, 1, 1, 0, 0, 0).evaluate(is);
 }

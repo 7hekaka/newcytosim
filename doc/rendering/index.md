@@ -26,7 +26,7 @@ As usual, create a config file and run `sim` in a separate directory:
 	edit config.cym
 	./sim
 
-This should create `object.cmo` and `properties.cmo` in the `run` directory.
+This should create `object.cmo` and `properties.cmp` in the `run` directory.
 
 ### Step 2
 

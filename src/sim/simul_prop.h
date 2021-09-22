@@ -276,7 +276,7 @@ public:
     /// Name of configuration file (<em>default = config.cym</em>)
     std::string config_file;
     
-    /// Name of output property file (<em>default = properties.cmo</em>)
+    /// Name of output property file (<em>default = properties.cmp</em>)
     std::string property_file;
     
     /// Name of output trajectory file (also known as `system`, <em>default = objects.cmo</em>)
