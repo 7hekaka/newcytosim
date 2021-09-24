@@ -1841,7 +1841,7 @@ void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)
 {
     /*
      as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
-     but we can shift the pointers to use one-based array indices
+     but we can shift the pointers to directly use these one-based array indices
      */
     --A;
     --IPIV;

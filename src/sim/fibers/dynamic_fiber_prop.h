@@ -38,7 +38,7 @@ public:
     /**
      Filament      |   Max. possible    | Measured stall force |
      --------------|--------------------|-----------------------
-     Microtubule   | ~ 1GTP per 8nm/13  | ~ 1.67 pN
+     Microtubule   | ~ 1GTP per 8nm/13  | ~ 1.33 pN
      Actin         | ~ 1ATP per 4nm/2   | ~ 1 pN
 
      With 1 ATP bringing ~ 80--100 pN.nm of energy
