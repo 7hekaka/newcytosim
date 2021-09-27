@@ -118,9 +118,9 @@ real SpaceCylinderZ::surface() const
     const real LE = top_ - bot_ - 2 * edge_;
     const real GC = RE + edge_ * ( 2.0 / M_PI );
     // surface elements divided by 2 * M_PI:
-    const real S0 = radius_ * LE;
-    const real S1 = square(RE);
-    const real S2 = M_PI * GC * edge_;
+    const real S0 = radius_ * LE;      // cylindrical surface
+    const real S1 = square(RE);        // top/bottom discs
+    const real S2 = M_PI * GC * edge_; // rounded edges
     return ( 2 * M_PI ) * ( S0 + S1 + S2 );
 #else
     // surface elements divided by 2 * M_PI:
@@ -150,7 +150,7 @@ Vector SpaceCylinderZ::placeOnEdge(real) const
     const real S1 = square(RE);
     const real S2 = M_PI * GC * edge_;
     const real P = RNG.preal() * ( S0 + S1 + S2 );
-    if ( P < S0 )
+    if ( P <= S0 )
     {
         Vector2 XY = Vector2::randU(radius_);
         real Z = bot_ + edge_ + LE * RNG.preal();

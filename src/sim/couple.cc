@@ -24,6 +24,7 @@ Couple::Couple(CoupleProp const* p, Vector const& w)
     cHand1 = prop->hand1_prop->newHand(this);
     cHand2 = prop->hand2_prop->newHand(this);
 
+    assert_true(w==w);
     assert_true(cHand1);
     assert_true(cHand2);
 }

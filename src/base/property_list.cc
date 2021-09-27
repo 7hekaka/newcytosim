@@ -284,7 +284,7 @@ void PropertyList::write_names(std::ostream& os, std::string const& pf) const
         os << "empty property list!";
         return;
     }
-    os << pf << "\nKnown:\n";
+    os << "\nKnown properties:\n";
     for ( Property const* i : vec_ )
     {
         os << pf << std::setw(10);

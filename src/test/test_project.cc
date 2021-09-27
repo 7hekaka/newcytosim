@@ -1096,9 +1096,6 @@ int main(int argc, char* argv[])
         for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
             checkProject<projectForces_SSE>(nbs, "SSE");
 #endif
-    }
-    if ( 1 )
-    {
 #if REAL_IS_DOUBLE && defined(__SSE3__)
         for ( SIZE_T nbs = std::min(NSEG,(SIZE_T)11); nbs > 0; --nbs )
             checkProject<projectForcesFused>(nbs, "Fus");

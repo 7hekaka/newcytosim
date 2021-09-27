@@ -404,6 +404,8 @@ public:
     /// return (validated) index encoded in `str`
     size_t point_index(std::string const& str) const;
 
+    /// check for NaNs in the position vector
+    bool valid() const;
 };
 
 

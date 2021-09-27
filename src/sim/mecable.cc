@@ -411,3 +411,11 @@ size_t Mecable::point_index(std::string const& str) const
     return 0;
 }
 
+
+bool Mecable::valid() const
+{
+    for ( size_t i = 0; i < nPoints ; ++i )
+        if ( pPos[i] != pPos[i] )
+            return false;
+    return true;
+}

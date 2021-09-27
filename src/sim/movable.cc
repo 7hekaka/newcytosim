@@ -478,6 +478,7 @@ restart:
     if ( is.fail() )
         return pos;
     pos = readPositionPrimitive(is, spc);
+    assert_true(pos==pos);
     is.clear();
     
     while ( !is.eof() )
