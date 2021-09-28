@@ -31,8 +31,8 @@ void ViewProp::clear()
 
     track_fibers = 0;
     
-    window_size[0]     = 800;
-    window_size[1]     = 800;
+    window_size[0] = 800;
+    window_size[1] = 800;
     window_position[0] = 8;
     window_position[1] = 32;
     
@@ -40,8 +40,8 @@ void ViewProp::clear()
     scalebar_length = 10;
     scalebar_color  = 0xFFFF88AA;
     
-    axes         = 0;
-    axes_size    = 1;
+    axes      = 0;
+    axes_size = 1;
 
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {

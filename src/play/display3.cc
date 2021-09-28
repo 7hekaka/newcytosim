@@ -1168,7 +1168,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             glPushMatrix();
             transAlignZ(p1, scale(pd1->size), dir);
             //gle::needle();
-            sphere2(); gle::cone3();
+            hemisphere2(); gle::cone3();
             glPopMatrix();
         }
         if ( pd2->visible )
@@ -1178,7 +1178,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             glPushMatrix();
             transAlignZ(p2, scale(pd2->size), -dir);
             //gle::needle();
-            sphere2(); gle::cone3();
+            hemisphere2(); gle::cone3();
             glPopMatrix();
         }
         glDisable(GL_CLIP_PLANE5);

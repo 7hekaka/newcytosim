@@ -92,8 +92,8 @@ ifeq ($(COMPILER),gcc)
 # export CPATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
 
     CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
-    FAST     := -O3 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
-    FAST     := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native # -mavx2 -mfma
+    FAST     := -O2 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
+    FAST     := -O2 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native # -mavx2 -mfma
 
     DEBUG    := -g3 -ggdb # -Wconversion
     COVERAGE := -fprofile-arcs -ftest-coverage
@@ -111,8 +111,8 @@ else ifeq ($(COMPILER),icc)
     # '-msse3' for SSE3 or '-xAVX' for AVX
     # '-march=corei7-avx' for AVX
     # '-march=core-avx2' for Intel core i7 (ca. 2015)
-    FAST     := -O3 -march=core-avx2
-    FAST     := -O3 -march=core-avx2 -mfma -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
+    FAST     := -O2 -march=core-avx2
+    FAST     := -O2 -march=core-avx2 -mfma -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
     WARN     := -qopt-report=2 -qopt-report-phase=vec# -opt-report-file=stderr
     WARN     :=
 
@@ -125,8 +125,8 @@ else ifeq ($(COMPILER),clang)
 # the old library: -stdlib=libstdc++ (deprecated)
 
     CXX      := c++ -Wfatal-errors
-    FAST     := -O3 -funroll-loops -mavx2 -mfma
-    FAST     := -O3 -funroll-loops
+    FAST     := -O2 -funroll-loops -mavx2 -mfma
+    FAST     := -O2 -funroll-loops
     DEBUG    := -g3 -ggdb
     COVERAGE := -fprofile-arcs -ftest-coverage
 
@@ -179,7 +179,7 @@ ifeq ($(MACHINE),cluster)
     MKLDIR := $(MKLROOT)/lib/intel64
 
     # Beware of AVX2 and other advanced features on heterogeneous clusters:
-    FAST   :=-O3 -fno-tree-vectorize-funroll-loops -mavx -ffp-contract=fast
+    FAST   :=-O2 -fno-tree-vectorize-funroll-loops -mavx -ffp-contract=fast
 
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := $(FAST) $(ALIGN) -O0 -fno-inline -pg
@@ -215,7 +215,7 @@ ifeq ($(MACHINE),linux)
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := -O0 -fno-inline -pg $(ALIGN) $(FAST)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
-    FlagsF := -O3 -finline-functions $(ALIGN) $(FAST)
+    FlagsF := -O2 -finline-functions $(ALIGN) $(FAST)
 
     # specify the library path:
     LIBDIR := /usr/lib
@@ -274,7 +274,7 @@ ifeq ($(MACHINE),cygwin)
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := -O0 -fno-inline -pg $(ALIGN) $(FAST)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
-    FlagsF := -O3 -finline-functions $(ALIGN) $(FAST)
+    FlagsF := -O2 -finline-functions $(ALIGN) $(FAST)
 
     ### Needs
     # blas:   yum install blas-devel
@@ -309,8 +309,8 @@ ifeq ($(MACHINE),windows)
     # copying "libblas.a" and "liblapack.a" in "/usr/lib"
 
     FlagsD := -g  $(WARN)
-    FlagsP := -pg -O3 -march=i686 $(ALIGN)
-    FlagsF := -O3 -finline-functions -march=i686 $(ALIGN)
+    FlagsP := -pg -O2 -march=i686 $(ALIGN)
+    FlagsF := -O2 -finline-functions -march=i686 $(ALIGN)
   
     LINK   := -llapack -lblas
     GRAFIX := -lglut32 -lglu32 -lopengl32

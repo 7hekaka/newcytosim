@@ -78,9 +78,12 @@ namespace gle
     
     void quit()
     {
+        // The system will release all GPU resources, so this is not necessary
+        /*
         glDeleteBuffers(2, buf_);
         for (int i=0; i<4; ++i) buf_[i] = 0;
         releaseStreams();
+        */
     }
     
     //-----------------------------------------------------------------------

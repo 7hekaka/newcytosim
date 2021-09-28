@@ -127,7 +127,6 @@ test write / read systematically on all cym files
 - extensions of fast_diffusion:
    - dirichlet boundary conditions: set concentration of molecules at edges of Space
 
-- remove variadic functions (#include <stdarg>)
 - option to pull on beads with mouse
 - use sidePos() for display more systematically
 - Crank-Nicholson diffusion in Field (Jonathan did this)

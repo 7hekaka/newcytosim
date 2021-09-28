@@ -779,6 +779,7 @@ void processKey(unsigned char key)
                 thread.writeProperties(std::cout, true);
             else
             {
+                std::cout << '\n';
                 player.writePlayParameters(std::cout, true);
                 player.writeDisplayParameters(std::cout, true);
             }
