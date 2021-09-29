@@ -6,9 +6,7 @@
 #include <cstring>
 #include <iostream>
 #include <climits>
-#include "tictoc.h"
-
-using namespace TicToc;
+#include "timer.h"
 
 template < typename T >
 void print_bits(FILE* f, const T& val, char spc)

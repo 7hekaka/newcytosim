@@ -7,7 +7,7 @@
 #include "assert_macro.h"
 #include "exceptions.h"
 #include "vecprint.h"
-#include "tictoc.h"
+#include "timer.h"
 #include "random.h"
 #include "blas.h"
 
@@ -19,8 +19,6 @@
 #include "matrix34.h"
 #include "matrix44.h"
 #include "matfull.h"
-
-using namespace TicToc;
 
 Vector4 dir(0, 1, 0);
 Vector4 off(0.1, 0.2, -0.3);

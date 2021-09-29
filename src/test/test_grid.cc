@@ -10,14 +10,13 @@
 #include "glapp.h"
 #include "glut.h"
 #include "real.h"
-#include "tictoc.h"
+#include "timer.h"
 #include "gle.h"
 #include "gle_flute.h"
 
 #include "grid.h"
 #include "grid_display.h"
 
-using namespace TicToc;
 using namespace gle;
 
 //area of the grid

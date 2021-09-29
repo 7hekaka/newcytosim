@@ -4,9 +4,7 @@
 
 #include "random.h"
 #include <cstdio>
-#include "tictoc.h"
-
-using namespace TicToc;
+#include "timer.h"
 
 const size_t maxTime = 512;
 const size_t SAMPLES = 1<<18;
