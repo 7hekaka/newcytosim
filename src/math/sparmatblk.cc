@@ -996,7 +996,7 @@ void SparMatBlk::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t sto
     assert_true( start <= stop );
     assert_true( stop <= size_ );
     size_t cnt = 0, row = 0;
-    //auto rdt = __rdtsc();
+    //auto rdt = timer();
     for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
         row++;
@@ -1015,7 +1015,7 @@ void SparMatBlk::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t sto
     /*
     if ( cnt > 0 )
         fprintf(stderr, "SMB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
-                row, cnt, real(__rdtsc()-rdt)/cnt);
+                row, cnt, real(timer()-rdt)/cnt);
      */
 }
 

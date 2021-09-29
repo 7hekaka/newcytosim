@@ -100,7 +100,7 @@ void Simul::prepare()
  */
 void Simul::step()
 {
-    //auto rdt = __rdtsc();
+    //auto rdt = timer();
     // increment time:
     prop->time += prop->time_step;
     //fprintf(stderr, "\n----------------------------------- time is %8.3f\n", prop->time);
@@ -117,7 +117,7 @@ void Simul::step()
     singles.shuffle();
     spaces.shuffle();
     
-    //printf("Simul::shuffles %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
+    //printf("Simul::shuffles %16llu\n", (timer()-rdt)>>5); rdt = timer();
 
     // Monte-Carlo step for all objects
     events.step();
@@ -130,7 +130,7 @@ void Simul::step()
     solids.step();
     fibers.step();
     
-    //printf("     ::steps    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
+    //printf("     ::steps    %16llu\n", (timer()-rdt)>>5); rdt = timer();
     
     // if no Hands are present, we can skip attachment
     int doAttach = singles.size() + couples.size();
@@ -151,7 +151,7 @@ void Simul::step()
         // distribute Fibers over a grid for binding of Hands:
         fiberGrid.paintGrid(fibers.first(), nullptr, range);
         
-        //printf("     ::paint    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
+        //printf("     ::paint    %16llu\n", (timer()-rdt)>>5); rdt = timer();
     
 #if ( 0 )
         // This code continuously tests the binding algorithm.
@@ -176,7 +176,7 @@ void Simul::step()
     // step Hand-containing objects, giving them a possibility to attach Fibers:
     couples.step();
     singles.step();
-    //printf("     ::attach   %16llu\n", (__rdtsc()-rdt)>>3);
+    //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
 }
 
 

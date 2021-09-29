@@ -31,6 +31,7 @@
 #include "tictoc.h"
 #include "bicgstab.h"
 #include "gmres.h"
+#include "timer.h"
 
 #include "meca_inter.cc"
 #include "meca_rigidity.cc"
@@ -460,7 +461,7 @@ inline void applyPreconditionner(Mecable const* mec, real* Y)
 /** This can be done in parallel if the preconditionner is block-diagonal */
 void Meca::precondition(const real* X, real* Y) const
 {
-    auto rdt = __rdtsc();
+    auto rdt = timer();
     if ( Y != X )
         copy_real(dimension(), X, Y);
     
@@ -475,7 +476,7 @@ void Meca::precondition(const real* X, real* Y) const
 #endif
             applyPreconditionner(mec, Y+inx);
     }
-    cycles_ += __rdtsc() - rdt;
+    cycles_ += timer() - rdt;
 }
 
 
@@ -1734,9 +1735,9 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 #endif
 
     // compute preconditionner:
-    auto start = __rdtsc();
+    auto start = timer();
     computePreconditionner(precond, prop->precondition_span);
-    auto factor = __rdtsc() - start;
+    auto factor = timer() - start;
     cycles_ = 0;
 
     /*
@@ -1873,7 +1874,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
                             " achieved ", monitor.residual()/tolerance_);
     }
     
-    const auto total = ( __rdtsc() - start ) >> 10;
+    const auto total = ( timer() - start ) >> 10;
 
     //printf("\n   /sol "); VecPrint::print(std::cerr, dimension(), vSOL, 3);
     //printf("\n   >pts "); VecPrint::print(std::cerr, dimension(), vPTS, 3);

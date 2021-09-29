@@ -425,13 +425,13 @@ void Simul::setAllInteractions(Meca& meca) const
 void Simul::solve()
 {
     sMeca.prepare(this);
-    //auto rdt = __rdtsc();
+    //auto rdt = timer();
     setAllInteractions(sMeca);
-    //printf("     ::set      %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
+    //printf("     ::set      %16llu\n", (timer()-rdt)>>5); rdt = timer();
     sMeca.solve(prop, prop->precondition);
-    //printf("     ::solve    %16llu\n", (__rdtsc()-rdt)>>5); rdt = __rdtsc();
+    //printf("     ::solve    %16llu\n", (timer()-rdt)>>5); rdt = timer()
     sMeca.apply();
-    //printf("     ::apply    %16llu\n", (__rdtsc()-rdt)>>5);
+    //printf("     ::apply    %16llu\n", (timer()-rdt)>>5);
 #if ( 0 )
     // check that recalculating gives similar forces
     fibers.firstID()->printTensions(stderr, 47);

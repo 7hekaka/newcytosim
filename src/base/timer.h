@@ -17,6 +17,9 @@ __rdtsc (void)
 /// keeping time using Intel's cycle counters
 unsigned long long rdt_ = 0;
 
+/// return current time value (64 bits)
+inline unsigned long long timer() { return __rdtsc(); }
+
 /// start timer
 inline void tic() { rdt_ = __rdtsc(); }
 
@@ -29,6 +32,14 @@ inline double toc(double arg = 1) { return double(__rdtsc()-rdt_) / arg; }
 
 // using real time
 struct timeval tic_t;
+
+/// return current time value
+inline unsigned long long timer()
+{
+    timeval tv;
+    gettimeofday(&tv, nullptr);
+    return double(1e6*tv.tv_sec + tv.tv_usec);
+}
 
 /// start timer
 inline void tic()
@@ -49,6 +60,12 @@ inline double toc(double arg = 1e3)
 
 #include <ctime>
 clock_t tic_t;
+
+/// return current time value
+inline clock_t timer()
+{
+    return clock();
+}
 
 /// start timer
 void tic()
