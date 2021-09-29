@@ -56,7 +56,7 @@ set fiber microtubule
     max_length = 10 
     min_length = 0.1
     persistent = 1
-    display = ( line=2.5, 8; length_scale=0.02; )
+    display = ( line=2.5, 8; plus_end=7; length_scale=0.02; )
 }
 
 set fiber obstacle
@@ -67,7 +67,7 @@ set fiber obstacle
     rigidity = 10.625
     segmentation = 0.1
     activity = none
-    display = ( line=2.5, 1; )
+    display = ( line=2.5, line; plus_end=2.5, tip; )
 }
 
 set hand anchor
@@ -76,7 +76,7 @@ set hand anchor
     binding_range = 0.050
     unbinding_rate = 0.1
     unbinding_force = 5.0
-    display = ( size=1; color = green; )
+    display = ( size=1; color=gray; )
 }
 
 set single grafted

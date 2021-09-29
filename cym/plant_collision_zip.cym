@@ -41,7 +41,7 @@ set fiber microtubule
     max_length = 10 
     min_length = 0.1
     persistent = 1
-    display = ( line=2.5, 8; length_scale=0.02; )
+    display = ( line=2.5, height; length_scale=0.02; plus_end=2.5, tip; )
 }
 
 set fiber obstacle
@@ -59,34 +59,34 @@ set hand anchor
     binding_range = 0.015
     unbinding_rate = 0.175
     unbinding_force = 5.0625 
-    display = ( size=3; color = green; )
+    display = ( size=3; color=gray; )
 }
 
 set single grafted
 {
     hand = anchor
-    stiffness = 200
+    stiffness = 400
     activity = fixed
 }
 
 
 new 1 obstacle
 {
-    length = 2
-    position = 0.6 0 0.02
+    length = 2.5
+    position = 0 0 0.02
     direction = 0 1 0
 }
 
 
 new 1 microtubule
 {
-    length = 1
-    position = -0.533 -0.528 0.02
-    direction = 0.906 0.423 0
+    length = 0.7
+    position = -0.3 -0.8 0.02
+    direction = 0.3 0.8 0
     end_state = grow
 }
 
-new 1000 grafted ( XY 0.020 )
+new 1234 grafted ( XY 0.020 )
 
 run 100 system { solve = 0 }
 run 100 system
