@@ -4,11 +4,11 @@
 #ifndef SIMD_FLOAT_H
 #define SIMD_FLOAT_H
 
-#include <immintrin.h>
-
 //--------------------------- SSE Single Precision -----------------------------
 
 #if defined(__SSE3__)
+
+#include <immintrin.h>
 
 /// Vector of 4 floats
 typedef __m128 vec4f;
