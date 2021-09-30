@@ -40,35 +40,35 @@
  
  Class reviewed by Andre Clapson on 10.03.2011.
  
- @todo parse and instantiate values like 'random.uniform()' or 'PI*30' or '0.1/60'
+ @todo parse and instantiate values like 'random.uniform()' or 'PI*30' or '0.1/60'?
 */
 
 class Glossary
 {
 public:
     
-    /// type for a key
-    typedef std::string  key_type;
+    /// a key is defined by its name, a string
+    typedef std::string key_type;
     
-    /// a string-encoded value with metadata
+    /// an string ASCII-encoded value with metadata
     struct val_type 
     {
         /// the value specified as a string
-        std::string    value_;
+        std::string value_;
+
+        /// true if this value has been explicitly defined by the user
+        bool defined_;
         
         /// the number of times this value has been read
-        mutable size_t count_;
+        mutable size_t read_;
 
-        /// true if this value has been intentionally set by the user
-        bool         defined_;
-        
         /// constructor
-        val_type()   { defined_=false; count_=0; }
+        val_type() { defined_=false; read_=0; }
         
         /// constructor with initialization
-        val_type(std::string const& s, bool d) { value_=s; defined_=d; count_=0; }
+        val_type(std::string const& s, bool d) { value_=s; defined_=d; read_=0; }
     };
-   
+    
     /// a record is a set of values associated with a key
     typedef std::vector<val_type>         rec_type;
     
@@ -85,7 +85,7 @@ public:
 private:
     
     /// ordered list of key-values pairs
-    map_type     mTerms;
+    map_type mTerms;
     
     //-------------------------------------------------------------------------------
     #pragma mark -
@@ -109,7 +109,7 @@ private:
     static void add_value(pair_type&, std::string&, bool);
 
     /// register a new pair into the dictionnary
-    void        add_entry(pair_type const&, int no_overwrite);
+    void add_entry(pair_type const&, int no_overwrite);
     
     //-------------------------------------------------------------------------------
     
@@ -378,7 +378,7 @@ public:
             if ( val.defined_ )
             {
                 set_value(var, key, val.value_);
-                ++val.count_;
+                ++val.read_;
                 return 1;
             }
         }
@@ -425,7 +425,7 @@ public:
             if ( val.defined_ )
             {
                 set_value(ptr[inx], key, val.value_);
-                ++rec->at(inx).count_;
+                ++rec->at(inx).read_;
                 ++set;
             }
         }
@@ -447,7 +447,7 @@ public:
             if ( val.defined_ )
             {
                 set_value(var, key, val.value_, dict, accept_all);
-                ++val.count_;
+                ++val.read_;
                 return 1;
             }
         }

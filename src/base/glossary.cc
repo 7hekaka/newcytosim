@@ -8,7 +8,6 @@
 #include <fstream>
 #include <cctype>
 #include <iomanip>
-#include "vector2.h"
 
 
 // Use the second definition to get some reports:
@@ -84,9 +83,9 @@ std::string format_counts(Glossary::pair_type const& pair)
     std::string res = pair.first;
     if ( pair.second.size() > 0 )
     {
-        res += " = " + pair.second[0].value_ + format_count(pair.second[0].count_);
+        res += " = " + pair.second[0].value_ + format_count(pair.second[0].read_);
         for ( size_t i = 1; i < pair.second.size(); ++i )
-            res += ", " + pair.second[i].value_ + format_count(pair.second[i].count_);
+            res += ", " + pair.second[i].value_ + format_count(pair.second[i].read_);
         res += ";";
     }
     return res;
@@ -166,7 +165,7 @@ void Glossary::clear_counts()
     for ( auto& i : mTerms )
     {
         for ( val_type const& v : i.second )
-            v.count_ = 0;
+            v.read_ = 0;
     }
 }
 
@@ -182,7 +181,7 @@ void Glossary::add_counts(Glossary const& opt)
             size_t sup = std::min(i.second.size(), w->second.size());
             //std::clog << " Glossary::add_counts `" << w->first << "' " << sup << "\n";
             for ( size_t n = 0; n < sup; ++n )
-                i.second[n].count_ = std::max(i.second[n].count_, w->second[n].count_);
+                i.second[n].read_ = std::max(i.second[n].read_, w->second[n].read_);
         }
     }
 }
@@ -207,7 +206,7 @@ Glossary Glossary::extract_unused() const
     {
         bool used = false;
         for ( val_type const& v : i.second )
-            if ( v.count_ == 0 )
+            if ( v.read_ == 0 )
                 used = true;
         
         if ( !used )
@@ -259,7 +258,7 @@ std::string Glossary::value(key_type const& key, size_t inx) const
     {
         if ( inx < w->second.size() )
         {
-            w->second[inx].count_++;
+            w->second[inx].read_++;
             return w->second[inx].value_;
         }
     }
@@ -280,7 +279,7 @@ bool Glossary::value_is(key_type const& key, size_t inx, std::string const& val)
         {
             if ( w->second[inx].value_ == val )
             {
-                w->second[inx].count_++;
+                w->second[inx].read_++;
                 return true;
             }
         }
@@ -724,11 +723,11 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
     for ( size_t i = 0; i < rec.size(); ++i )
     {
         val_type const& val = rec[i];
-        if ( val.count_ > 0 )
+        if ( val.read_ > 0 )
             code |= 4;  // one value used
-        if ( !val.count_ && val.defined_ )
+        if ( !val.read_ && val.defined_ )
             code |= 2;  // one value not used
-        else if ( val.count_ > threshold )
+        else if ( val.read_ > threshold )
             code |= 1;  // one value overused
     }
     
