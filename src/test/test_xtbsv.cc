@@ -210,9 +210,9 @@ void pot2(int N, real const* AB, real* B)
     iso_xtrsmLLT<DIM,'I'>(N, AB, N, B);
 }
 
+#if defined(__AVX__) && REAL_IS_DOUBLE
 void pot3(int N, real const* AB, real* B)
 {
-#if defined(__AVX__) && REAL_IS_DOUBLE
 #if ( DIM == 3 )
     alsatian_xtrsmLLN3<'I'>(N, AB, N, B);
     alsatian_xtrsmLLT3<'I'>(N, AB, N, B);
@@ -223,10 +223,8 @@ void pot3(int N, real const* AB, real* B)
     alsatian_xtrsmLLN1<'I'>(N, AB, N, B);
     alsatian_xtrsmLLT1<'I'>(N, AB, N, B);
 #endif
-#else
-    zero_real(DIM*N, B);
-#endif
 }
+#endif
 
 void testPOTRS(size_t cnt)
 {
@@ -253,8 +251,9 @@ void testPOTRS(size_t cnt)
 
     check<pot1>(NPTS, DIM, S, AB, B, "alsa_potrsLref", cnt);
     check<pot2>(NPTS, DIM, S, AB, B, "iso_trsmLLN<D>", cnt);
+#if defined(__AVX__) && REAL_IS_DOUBLE
     check<pot3>(NPTS, DIM, S, AB, B, "alsa_trsmLLND", cnt);
-
+#endif
     free_real(B);
     free_real(S);
     free_real(AB);
@@ -322,24 +321,17 @@ void uniLN3(int N, real const* AB, real* B)
     alsatian_xtbsvLNN6(N, AB, BLDD, B);
 }
 
+#if REAL_IS_DOUBLE && defined(__SSE3__)
 void uniLN4(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE && defined(__SSE3__)
     U::alsatian_xtbsvLNN6SSE(N, AB, BLDD, B);
-#else
-    zero_real(N, B);
-#endif
 }
 
 void uniLN5(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE && defined(__SSE3__)
     alsatian_xtbsvLNN6SSE(N, AB, BLDD, B);
-#else
-    zero_real(N, B);
-#endif
 }
-
+#endif
 
 // this gives wrong results
 void uniLTB(int N, real const* AB, real* B)
@@ -372,24 +364,17 @@ void uniLT3(int N, real const* AB, real* B)
     alsatian_xtbsvLTN6(N, AB, BLDD, B);
 }
 
+#if REAL_IS_DOUBLE && defined(__SSE3__)
 void uniLT4(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE && defined(__SSE3__)
     U::alsatian_xtbsvLTN6SSE(N, AB, BLDD, B);
-#else
-    zero_real(N, B);
-#endif
 }
 
 void uniLT5(int N, real const* AB, real* B)
 {
-#if REAL_IS_DOUBLE && defined(__SSE3__)
     alsatian_xtbsvLTN6SSE(N, AB, BLDD, B);
-#else
-    zero_real(N, B);
-#endif
 }
-
+#endif
 
 /**
  Test Lapack and custom implementation of routines used to factorize
@@ -439,6 +424,8 @@ void testTBSV(size_t cnt)
     check<uniLN1>(NVAL, 1, S, AB, B, "xtbsvLNN", cnt);
     check<uniLN2>(NVAL, 1, S, AB, B, "LNNK<KD>", cnt);
     check<uniLN3>(NVAL, 1, S, AB, B, "LLN6", cnt);
+#endif
+#if REAL_IS_DOUBLE && defined(__SSE3__)
     check<uniLN4>(NVAL, 1, S, AB, B, "LNN6SSE_U", cnt);
     check<uniLN5>(NVAL, 1, S, AB, B, "LNN6SSE", cnt);
 #endif
@@ -450,8 +437,10 @@ void testTBSV(size_t cnt)
     check<uniLT1>(NVAL, 1, S, AB, B, "xtbsvLTN", cnt);
     check<uniLT2>(NVAL, 1, S, AB, B, "LTNK<KD>", cnt);
     check<uniLT3>(NVAL, 1, S, AB, B, "LTN6", cnt);
+#if REAL_IS_DOUBLE && defined(__SSE3__)
     check<uniLT4>(NVAL, 1, S, AB, B, "LTN6SSE_U", cnt);
     check<uniLT5>(NVAL, 1, S, AB, B, "LTN6SSE", cnt);
+#endif
 
     free_real(B);
     free_real(S);
@@ -463,12 +452,12 @@ void testTBSV(size_t cnt)
 
 int* pivot = nullptr;
 
+#if defined(__SSE3__)
 void getrs1(int N, real const* B, real* Y)
 {
-#if defined(__SSE3__)
     alsatian_xgetrsN_SSE(N, B, N, pivot, Y);
-#endif
 }
+#endif
 
 void getrs2(int N, real const* B, real* Y)
 {
@@ -539,7 +528,9 @@ void testGETRS(size_t cnt)
     if ( info == 0 )
     {
         check<getrs2>(NVAL, 1, S, A, Y, "alsa_getrsN", cnt);
+#if defined(__SSE3__)
         check<getrs1>(NVAL, 1, S, A, Y, "alsa_getrsNSSE", cnt);
+#endif
     }
     free_real(Y);
     free_real(S);
