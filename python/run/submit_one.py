@@ -12,7 +12,6 @@ Syntax:
     
     submit_one.py ARG [mem=????] [queue=????] [hours=INT] [days=INT] dir1 [dir2] [dir3] [...]
     
-    Unless specified otherwise, the queue is 'medium_priority'.
     The amount of requested memory (default=2G) should be specified in MB:
        mem=1024 (for 1 GB)
        mem=512  (for 512 MB)
@@ -23,21 +22,21 @@ Example:
     submit_one.py 'report platelet > platelet.txt' run????
     Submit one job to run command in the directories provided
     
-F. Nedelec, Last updated 18.11.2018
+F. Nedelec, Last updated 30.09.2021
 """
 
 
 import sys, os, subprocess, tempfile
 
 # default parameters for submission:
-subcmd  = 'sbatch'
-queue   = 'htc'
+submit  = 'sbatch'
+queue   = 'skylake'
 runtime = '1:00:00'   # 1 hour
 memory  = '4096'      # in MB
 ncpu    = 1           # nb of threads per job
 
-# parameters of the program:
-out     = sys.stderr
+# where output is sent:
+out = sys.stderr
 
 #-------------------------------------------------------------------------------
 
@@ -52,21 +51,19 @@ def execute(cmd):
         out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
 
-def write_script(fid, cmd):
-    """write that will run the job"""
-    os.write(fid, '#!/bin/bash\n')
-    os.write(fid, 'module -q purge\n')
-    os.write(fid, 'module -q load LAPACK OpenBLAS\n')
-    os.write(fid, 'module -q load foss\n')
-    for c in cmd:
-        os.write(fid, c+'\n')
-    os.close(fid)
+def write_script(fd, cmd):
+    """create an executable file containing the commands"""
+    fid = os.fdopen(fd, "w")
+    fid.write("#!/bin/bash\n")
+    for s in cmd:
+        fid.write(s+'\n')
+    fid.close()
 
 
 def sub(file):
     """return command that will submit one job"""
     # specify memory, shell, minimum number of cores and queue
-    cmd  = [subcmd, '--nodes=1', '--ntasks=1']
+    cmd  = [submit, '--nodes=1', '--ntasks=1']
     # specify number of threads if executable is threaded:
     if ncpu > 1:
         cmd += ['--cpus-per-task=%i' % ncpu]
@@ -90,14 +87,14 @@ def sub(file):
 
 def main(args):
     """submit jobs, depending on the arguments provided"""
-    global subcmd, memory, runtime, queue, ncpu
+    global submit, memory, runtime, queue, ncpu
     
-    #find subcmd command:
-    proc = subprocess.Popen(['which', subcmd], stdout=subprocess.PIPE)
+    #find submit command:
+    proc = subprocess.Popen(['which', submit], stdout=subprocess.PIPE)
     if proc.wait():
-        out.write("Error: submit command `"+subcmd+"' not found!\n")
+        out.write("Error: submit command `"+submit+"' not found!\n")
     else:
-        subcmd = proc.stdout.readline().strip()
+        submit = proc.stdout.readline().strip()
 
     # first argument is used for go_sim.py:
     cmd = args.pop(0)
@@ -105,10 +102,9 @@ def main(args):
     # create job script file:
     if not os.path.isdir('log'):
         os.mkdir('log')
-    fid, file = tempfile.mkstemp('', '', 'log', True)
 
     job = []
-    cwd   = os.getcwd()
+    cwd = os.getcwd()
     for arg in args:
         if os.path.isdir(arg) and os.access(arg, os.X_OK):
             job += ['cd '+os.path.abspath(arg)+' && '+cmd+';']
@@ -132,7 +128,7 @@ def main(args):
                 out.write("Error: I do not understand argument `%s'\n" % arg)
                 sys.exit()
     
-    if memory < 64:
+    if memory < 128:
         out.write("Error: requested memory (%s MB) seems too low\n" % memory)
         sys.exit()
 
@@ -141,11 +137,13 @@ def main(args):
         sys.exit()
 
     if job:
-        write_script(fid, job)
+        fd, file = tempfile.mkstemp('', '', 'log', True)
+        out.write("script %s : " % file)
+        write_script(fd, job)
         os.chmod(file, 0700)
         execute(sub(file))
     else:
-        out.write("Error: you need to specify at least one directory\n" % arg)
+        out.write("Error: you need to specify at least one directory\n")
 
 
 #-------------------------------------------------------------------------------

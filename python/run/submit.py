@@ -70,6 +70,7 @@ def execute(cmd):
     except OSError:
         out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
+
 def makeNumberedDirectory(root):
     """Create an empty directory named as 'rootXX' with a 2-digits number XX"""
     cnt = 0
