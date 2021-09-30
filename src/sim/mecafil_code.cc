@@ -1121,7 +1121,7 @@ void projectForcesD3D_AVX(size_t nbs, const double* dir,
         case 0: {
             assert_true( mul == end );
             // 4 vectors remaining
-            vec4 m1 = broadcast1(mul  );
+            vec4 m1 = broadcast1(mul);
             vec4 m0 = blend31(m3, m1);  // m3 from previous round
             vec4 m2 = broadcast1(mul+1);
             vec4 p0 = blend31(m1, m2);
@@ -1131,7 +1131,7 @@ void projectForcesD3D_AVX(size_t nbs, const double* dir,
             m2 = blend13(m2, p2);
             p2 = blend13(p2, setzero4()); // { P 0 0 0 }
             vec4 dA = d2;
-            vec4 d0 = load4(dir  );
+            vec4 d0 = load4(dir);
             vec4 d1 = load4(dir+4);
             d2 = blend13(cast4(load2(dir+8)), setzero4()); // loading crap, only [0] used
             vec4 a0 = fmadd4(p0, d0, loadu4(src  ));
@@ -1145,15 +1145,15 @@ void projectForcesD3D_AVX(size_t nbs, const double* dir,
         case 1: {
             assert_true( mul == end+1 );
             // 3 vectors remaining
-            vec4 m1 = broadcast1(mul  );
+            vec4 m1 = broadcast1(mul);
             vec4 m0 = blend31(m3, m1);
             vec4 m2 = broadcast1(mul+1);
             vec4 p0 = blend31(m1, m2);
             m1 = blend22(m1, m2);
             vec4 p1 = blend22(m2, setzero4()); // { M M 0 0 }
-            vec4 d0 = load4(dir  );
+            vec4 d0 = load4(dir);
             vec2 d1 = load2(dir+4);
-            vec4 a0 = fmadd4(p0, d0, loadu4(src  ));
+            vec4 a0 = fmadd4(p0, d0, loadu4(src));
             vec4 a1 = fmadd4(p1, concatenate22(d1, setzero2()), loadu4(src+4));
             storeu4(dst  , fnmadd4(m0, catshift1(d2, d0), a0));
             storeu4(dst+4, fnmadd4(m1, catshift1(d0, cast4(d1)), a1));

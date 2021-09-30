@@ -50,8 +50,7 @@ void nan_fill(SIZE_T cnt, real * ptr)
 void new_nans(SIZE_T cnt, real*& ptr)
 {
     free_real(ptr);
-    // use non-aligned memory:
-    ptr = new real[cnt];
+    ptr = new_real(cnt);
     nan_fill(cnt, ptr);
     //printf("%p = new_nans(%lu)\n", ptr, cnt);
 }

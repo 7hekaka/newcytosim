@@ -22,27 +22,27 @@ GLTEST_MAKE = $(COMPILE) $(addprefix -Isrc/, math base sim disp) $(OBJECTS) $(LI
 
 #----------------------------Targets--------------------------------------------
 
-test: test.cc random.o SFMT.o tictoc.o backtrace.o | bin
+test: test.cc random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test bin
 
-test_code: test_code.cc random.o SFMT.o tictoc.o backtrace.o | bin
+test_code: test_code.cc random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_code bin
 
-test_bits: test_bits.cc random.o SFMT.o tictoc.o backtrace.o | bin
+test_bits: test_bits.cc random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_bits bin
 
-test_ortho: test_ortho.cc random.o SFMT.o tictoc.o backtrace.o | bin
+test_ortho: test_ortho.cc random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_ortho bin
 
-test_array: test_array.cc random.o SFMT.o tictoc.o backtrace.o | bin
+test_array: test_array.cc random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_array bin
@@ -52,7 +52,7 @@ test_blas: test_blas.cc random.o SFMT.o backtrace.o | bin
 	$(DONE)
 vpath test_blas bin
 
-test_project: test_project.cc random.o random_vector.o SFMT.o tictoc.o | bin
+test_project: test_project.cc random.o random_vector.o SFMT.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_project bin
@@ -62,12 +62,12 @@ test_xpttrs: xpttrf.h test_xpttrs.cc random.o SFMT.o | bin
 	$(DONE)
 vpath test_xpttrs bin
 
-test_xtbsv: xtbsv.h test_xtbsv.cc random.o SFMT.o tictoc.o | bin
+test_xtbsv: xtbsv.h test_xtbsv.cc random.o SFMT.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_xtbsv bin
 
-test_rigidity: test_rigidity.cc random.o random_vector.o SFMT.o tictoc.o | bin
+test_rigidity: test_rigidity.cc random.o random_vector.o SFMT.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_rigidity bin
@@ -77,12 +77,12 @@ test_size: test_size.cc cytolib.a cytomath.a cytobase.a | bin
 	$(DONE)
 vpath test_sizeof bin
 
-test_block: test_block.cc matrix33.o matrix34.o vector3.o matfull.o random_vector.o random.o tictoc.o SFMT.o backtrace.o | bin
+test_block: test_block.cc matrix33.o matrix34.o vector3.o matfull.o random_vector.o random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
 	$(DONE)
 vpath test_block bin
 
-test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o sparmatsym.o sparmatsym1.o sparmatsym2.o matrix.o random.o SFMT.o tictoc.o backtrace.o operator_new.o | bin
+test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o sparmatsym.o sparmatsym1.o sparmatsym2.o matrix.o random.o SFMT.o backtrace.o operator_new.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
 	$(DONE)
 vpath test_matrix bin
@@ -102,12 +102,12 @@ test_quaternion: test_quaternion.cc matrix33.o random_vector.o random.o SFMT.o |
 	$(DONE)
 vpath test_quaternion bin
 
-test_random: test_random.cc random.o SFMT.o exceptions.o filewrapper.o messages.o backtrace.o tictoc.o | bin
+test_random: test_random.cc random.o SFMT.o exceptions.o filewrapper.o messages.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_random bin
 
-test_variablerate: test_variablerate.cc random.o SFMT.o exceptions.o tictoc.o | bin
+test_variablerate: test_variablerate.cc random.o SFMT.o exceptions.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath test_variablerate bin
@@ -117,7 +117,7 @@ test_asm: test_asm.cc | bin
 	$(DONE)
 vpath test_asm.s build
 
-test_simd: test_simd.cc random.o SFMT.o tictoc.o | bin
+test_simd: test_simd.cc random.o SFMT.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) -o bin/$@
 	$(DONE)
 vpath test_simd bin
@@ -229,7 +229,7 @@ test_space: test_space.cc cytolibG.a gle_flute.o $(OBJ_GLAP) | bin
 	$(DONE)
 vpath test_space bin
 
-test_grid: test_grid.cc tictoc.o $(OBJ_GLAP) grid_display.o | bin
+test_grid: test_grid.cc $(OBJ_GLAP) grid_display.o | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 vpath test_grid bin
