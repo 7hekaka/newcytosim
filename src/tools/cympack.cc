@@ -12,7 +12,7 @@
  2. a file describing the objects: 'NAME.paths32'
     This is a binary file containing uniform records consisting of:
      [4 bytes, uint32: class]
-     [4 bytes, uint32: identification]
+     [4 bytes, uint32: identity]
      [4 bytes, uint32: first index in the vector file]
      [4 bytes, uint32: last index in the vector file]
 
@@ -44,7 +44,7 @@ void help(std::ostream& os)
     os << "2. a file describing the objects: 'NAME.paths32'\n";
     os << "   This is a binary file containing uniform records consisting of:\n";
     os << "    [4 bytes, uint32: class]\n";
-    os << "    [4 bytes, uint32: identification]\n";
+    os << "    [4 bytes, uint32: identity]\n";
     os << "    [4 bytes, uint32: first index in the vector file]\n";
     os << "    [4 bytes, uint32: last index in the vector file]\n";
 

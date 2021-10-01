@@ -6,7 +6,7 @@
  
      [2 bytes, unsigned integer: class]
      [2 bytes, unsigned integer: info/color]
-     [4 bytes, unsigned integer: identification]
+     [4 bytes, unsigned integer: identity]
      [4 bytes, float: X coordinate]
      [4 bytes, float: Y coordinate]
      [4 bytes, float: Z coordinate]
@@ -36,7 +36,7 @@ void help(std::ostream& os)
     os << "The binary format follows the `Sweet20` layout:\n";
     os << "        [2 bytes, unsigned integer: class]\n";
     os << "        [2 bytes, unsigned integer: info/color]\n";
-    os << "        [4 bytes, unsigned integer: identification]\n";
+    os << "        [4 bytes, unsigned integer: identity]\n";
     os << "        [4 bytes, float: X coordinate]\n";
     os << "        [4 bytes, float: Y coordinate]\n";
     os << "        [4 bytes, float: Z coordinate]\n";

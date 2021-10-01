@@ -395,6 +395,19 @@ public:
             res = set(var, alt, 0);
         return res;
     }
+    
+    /// try to set `var` from `key1[0]`, `key2[0]` or `key3[0]`. @return 1 if `var` was set, 0 otherwise
+    /** An internal counter is incremented to record that the value was read */
+    template <typename T>
+    int set(T & var, key_type const& key1, key_type const& key2, key_type const& key3) const
+    {
+        int res = set(var, key1, 0);
+        if ( !res )
+            res = set(var, key2, 0);
+        if ( !res && !key3.empty() )
+            res = set(var, key3, 0);
+        return res;
+    }
 
     /// try to set `var` from `key[inx]` or `alt[jax]`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */

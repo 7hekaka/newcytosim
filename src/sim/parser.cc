@@ -91,7 +91,7 @@ void Parser::parse_set(std::istream& is)
 #if BACKWARD_COMPATIBILITY <= 50
     {
         /* Read ouput config files anterior to 3.11.2017, which included
-         a identification number ('set hand 2 kinesin') */
+         a identity number ('set hand 2 kinesin') */
         size_t inx = 0;
         Tokenizer::get_integer(is, inx);
     }
@@ -155,14 +155,15 @@ void Parser::parse_set(std::istream& is)
             PropertyID ix;
 #if BACKWARD_COMPATIBILITY < 50
             // name changed to `property_number` on 10.12.2017
-            if ( opt.set(ix, "identification") || opt.set(ix, "property_number", "property_index") )
+            if ( opt.set(ix, "identity", "identification") || opt.set(ix, "property_number", "property_index") )
 #else
             // name changed to `identification` on 22.06.2021
-            if ( opt.set(ix, "identification", "property_number") )
+            // name changed to `identity` on 1.10.2022
+            if ( opt.set(ix, "identity", "identification", "property_number") )
 #endif
             {
                 if ( ix != pp->number() )
-                    throw InvalidSyntax("Property identification missmatch");
+                    throw InvalidSyntax("Property identity missmatch");
             }
         }
         else if ( do_change )
