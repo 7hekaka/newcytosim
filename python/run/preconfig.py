@@ -2,8 +2,8 @@
 #
 # PRECONFIG, a versatile configuration file generator
 #
-# Copyright Francois J. Nedelec, EMBL 2010--2017, Cambridge University 2019--2020
-# This is PRECONFIG version 1.4, last modified on 19.03.2020
+# Copyright Francois J. Nedelec, EMBL 2010--2017, Cambridge University 2019--2021
+# This is PRECONFIG version 1.41, last modified on 30.9.2021
 
 """
 # SYNOPSIS
@@ -250,7 +250,7 @@ def pop_sequence(dic, protected):
 
 def try_assignment(arg):
     """
-        Check if `arg` follows the format of a variable assignent,
+        Check if `arg` follows the format of a variable definition,
         and if that succeeds, return the key and value strings in a tuple.
     """
     res = re.match(r" *([a-zA-Z]\w*) *= *(.*)", arg)
@@ -260,7 +260,7 @@ def try_assignment(arg):
         return ('', arg)
     k = res.group(1)
     v = res.group(2).strip()
-    #print("   assigned `%s' = `%s'" % (k, v))
+    #print("   recognized `%s' = `%s'" % (k, v))
     return (k, v)
 
 
@@ -334,10 +334,10 @@ class Preconfig:
             res = eval(arg, GLOBALS, self.locals)
         except Exception as e:
             sys.stderr.write("\033[95m")
-            sys.stderr.write("Error evaluating '%s' in `%s`:\n" % (arg, self.template))
+            sys.stderr.write("Error: %s in '%s'\n" % (str(e), arg))
             sys.stderr.write("\033[0m")
-            sys.stderr.write("    "+str(e)+'\n')
-            sys.exit(1)
+            res = CODE+CODE+arg+DECO+DECO
+            #sys.exit(1)
         if not isinstance(res, str):
             try:
                 res = list(res)
@@ -352,9 +352,9 @@ class Preconfig:
             or return the value 'val'
         """
         if key:
+            #print("%s <-- %s" % (key, repr(val)) )
             exec(key+'='+repr(val), GLOBALS, self.locals)  #self.locals[key] = v
             self.out.write("|%50s <-- %s\n" % (key, str(val)) )
-            #print("%s <-- %s" % (key, str(val)) )
             return ''
         else:
             self.out.write("|%50s --> %s\n" % (block, str(val)) )
@@ -388,11 +388,11 @@ class Preconfig:
             val = cmd.strip()
             # print("%4i characters... code block '%s'" % (len(pre), val))
             if val[0]==CODE and val[1]==CODE and val[-1]==DECO and val[-2]==DECO:
-                # double-brackets are removed and the code not evaluated:
+                # any further level of bracketting is not evaluated:
                 pass
             elif val in self.locals:
                 # a plain variable is substituted but not expanded:
-                val = self.locals[val]
+                val = repr(self.locals[val])
             else:
                 # interpret command:
                 (key, vals) = try_assignment(val)
@@ -490,7 +490,7 @@ class Preconfig:
             # restore all values on upward recursion
             values[key] = vals
         else:
-            #copy dictionary:
+            #copy dictionary values:
             for key in values:
                 self.locals[key] = values[key]
             self.locals['n'] = self.file_index
@@ -532,6 +532,12 @@ class Preconfig:
                 inputs.append(arg)
             elif arg.isdigit():
                 repeat = int(arg)
+            elif arg == '{{}}':
+                CODE = '{'
+                DECO = '}'
+            elif arg == '<<>>':
+                CODE = '<'
+                DECO = '>'
             elif arg == '-':
                 verbose = 0
             elif arg == '+':
