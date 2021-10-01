@@ -343,6 +343,8 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportFiberMesh(out, false, sel, true);
         if ( what == "connector" )
             return reportFiberConnectors(out, opt);
+        if ( what == "collision" )
+            return reportFiberCollision(out, sel, opt);
 
         throw InvalidSyntax("I can only report fiber: position, end, minus_end, plus_end, "\
                             "point, moment, speckle, sample, segment, dynamic, length, extension,"\
@@ -3137,6 +3139,57 @@ void Simul::reportAshbya(std::ostream& out) const
     }
 }
 
+
+/**
+ categorize the configuration of two microtubules, with respect to collisions
+ This calculated 3 boolean values: K = catastrophe, X = crossing, Z = zippered
+ 1.10.2021
+ */
+void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
+{
+#if ( DIM == 1 )
+	throw InvalidParameter("reportCollisions not meaningful in 1D");
+#endif
+	if ( fibers.size() > 2 )
+		throw InvalidParameter("reportCollisions is designed for simulations of only two fibers");
+    
+    Fiber const * fib = nullptr, *fob = nullptr;
+    for ( Fiber const* f = fibers.first(); f; f = f->next() )
+    {
+        if ( f->prop == sel )
+            fib = f;
+        else
+            fob = f;
+    }
+    if ( !fib || !fob )
+        throw InvalidParameter("reportCollisions could not identify the two fibers");
+
+    const real sup = 2.0 * fib->prop->steric_radius;
+
+    bool K = ( fib->endStateP() == 4 );
+        
+    Vector dir = fob->posEndP() - fob->posEndM();
+    Torque TP = cross(dir, fib->posEndP());
+    Torque TM = cross(dir, fib->posEndM());
+#if ( DIM == 3 )
+    bool X = ( dot(TP, TM) < 0 );
+#else
+    bool X = ( TP * TM < 0 );
+#endif
+
+    // check if tip of 'fib' is close to 'fob':
+    Vector tip = fib->posEndP();
+    real dis2, abs;
+    abs = fob->projectPoint(tip, dis2);
+    // check direction of fib's tip to fob at closest point:
+    real C = dot(fib->dirEndP(), fob->dir(abs));
+    real A = acos(C);
+    
+    bool Z1 = ( dis2 < sup*sup );
+    bool Z2 = ( C > 0.9 );
+
+    out << LIN << A << SEP << K << SEP << X << SEP << Z1 << SEP << Z2;
+}
 
 /**
  Export end-to-end distance of Fiber

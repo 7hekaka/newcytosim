@@ -599,6 +599,9 @@ public:
     /// a special print for Romain Gibeaux
     void reportAshbya(std::ostream&) const;
     
+    /// analysis of MT collisions in the plant cortex
+    void reportFiberCollision(std::ostream&, Property const*, Glossary&) const;
+
     /// print something
     void reportCustom(std::ostream&) const;
 
