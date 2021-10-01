@@ -20,7 +20,7 @@ collect.py ./scan/run%04i/config.cym scan/config????.cym
 
 # Run simulations in parallel (This will take a while)
 
-scan.py ../sim nproc=4 scan/run????
+scan.py ../sim njobs=4 scan/run????
 
 # This is the step where the students have to make their own python script and analyse the data
 

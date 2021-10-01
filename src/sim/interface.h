@@ -43,7 +43,7 @@ public:
     /// `hold()` is called between commands during the execution process
     /**
      This callback provides an opportunity to stop/examine the simulation at regular
-     intervals. It does nothing for `sim` and it displays the system in `play`.
+     intervals. It does nothing for `sim` and displays the system in `play`.
      */
     virtual void hold() {}
     
@@ -65,7 +65,7 @@ public:
     Isometry   read_placement(Glossary&);
     
     /// return position and orientation of an object, with verification of 'placement'
-    Isometry   find_placement(Glossary&, int placement, size_t num_trials);
+    Isometry   find_placement(Glossary&, int placement, size_t nb_trials);
     
     /// create 1 object of type `name`, following options in Glossary
     void       execute_new(std::string const& name, ObjectSet*, Glossary&);

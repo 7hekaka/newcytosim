@@ -1,5 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
+#include <fstream>
+
+#include "cymdef.h"
 #include "interface.h"
 #include "stream_func.h"
 #include "exceptions.h"
@@ -11,8 +14,6 @@
 #include "tictoc.h"
 #include "simul.h"
 #include "event.h"
-#include "cymdef.h"
-#include <fstream>
 
 
 // Use the second definition to get some verbose reports:
@@ -207,7 +208,7 @@ enum PlacementType { PLACE_NOT = 0, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
      {
        position = POSITION
        placement = PLACEMENT, SPACE_NAME, CONDITION
-       num_trials = INTEGER
+       nb_trials = INTEGER
      }
  
  PLACEMENT can be:
@@ -220,19 +221,19 @@ enum PlacementType { PLACE_NOT = 0, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
  By default, the specifications are relative to the first Space to be defined,
  but a different space can be specified as second argument of PLACEMENT.
  
- You can set the density of objects with `num_trials=1`:
+ You can set the density of objects with `nb_trials=1`:
  
      new 100 grafted
      {
        position = ( rectangle 10 10 )
-       num_trials = 1
+       nb_trials = 1
      }
  
  In this way an object will be created only if its randomly chosen position falls
  inside the Space, and the density will thus be exactly what is specified from the
  `position` range (here 100/10*10 = 1 object per squared micrometer).
  */
-Isometry Interface::find_placement(Glossary& opt, int placement, size_t num_trials)
+Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trials)
 {
     size_t ouf = 0;
     std::string str;
@@ -246,7 +247,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t num_tria
     
     Isometry iso;
 
-    while ( ++ouf < num_trials )
+    while ( ++ouf < nb_trials )
     {
         // generate a new position:
         iso = read_placement(opt);
@@ -301,8 +302,8 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t num_tria
  */
 void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& opt)
 {
-    size_t ouf = 0, num_trials = 1<<14;
-    opt.set(num_trials, "num_trials");
+    size_t ouf = 0, nb_trials = 1<<14;
+    opt.set(nb_trials, "nb_trials");
 
     ObjectList objs;
     do {
@@ -338,7 +339,7 @@ void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& o
         if ( placement != PLACE_NOT )
         {
             // find a position:
-            Isometry iso = find_placement(opt, placement, num_trials);
+            Isometry iso = find_placement(opt, placement, nb_trials);
             // place object at this position:
             ObjectSet::moveObjects(objs, iso);
             // special case for which we check all vertices:
@@ -359,9 +360,9 @@ void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& o
                 }
             }
         }
-        if ( ++ouf > num_trials )
+        if ( ++ouf > nb_trials )
         {
-            Cytosim::log << "could not place `" << name << "' after " << num_trials << " trials\n";
+            Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
             break;
         }
     } while ( objs.empty() );
@@ -809,9 +810,10 @@ void Interface::do_steps(size_t& sss, size_t cnt)
  `nb_frames`  |  0      | number of states written to trajectory file
  `prune`      |  `true` | Print only parameters that are different from default
  
- 
+ Set `nb_frames = 1` to save the initial and last time point of the run.
+ Set `nb_frames = -1` to save only the last time point of the run.
  The parameter `solve` can be used to select alternative mechanical engines.
- The Monte-Carlo part of the simulation is always done, including
+ The Monte-Carlo parts of the simulation is always done, which includes
  fiber assembly dynamics, binding/unbinding and diffusion of molecules.
  
  `solve`      | Result                                                         |
@@ -827,10 +829,10 @@ void Interface::do_steps(size_t& sss, size_t cnt)
  */
 void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 {
-    size_t nb_frames = 0;
-    int    solve     = 1;
-    bool   prune     = true;
-    bool   binary    = true;
+    int  frames = 0;
+    int  solve = 1;
+    bool prune = true;
+    bool binary = true;
     
 #if BACKWARD_COMPATIBILITY < 50
     // check if 'event' is specified within the 'run' command,
@@ -847,12 +849,11 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 #endif
     opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
                              {"horizontal",4}, {"flux",5}, {"half",7}});
-
-    opt.set(prune,     "prune");
-    opt.set(binary,    "binary");
-    opt.set(nb_frames, "nb_frames");
+    opt.set(prune,  "prune");
+    opt.set(binary, "binary");
+    opt.set(frames, "nb_frames");
     
-    do_write &= ( nb_frames > 0 );
+    do_write &= ( frames > 0 );
 
     real   delta = (real)nb_steps;
     size_t check = nb_steps;
@@ -862,13 +863,13 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     if ( do_write )
     {
         // write frame 0
-        simul_.writeProperties(nullptr, prune);
+        simul_.writeProperties(prune);
         if ( simul_.prop->clear_trajectory )
         {
             simul_.writeObjects(simul_.prop->system_file, false, binary);
             simul_.prop->clear_trajectory = false;
         }
-        delta = real(nb_steps) / real(nb_frames);
+        delta = real(nb_steps) / real(frames);
         check = size_t(delta);
     }
     
@@ -904,9 +905,14 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     if ( event )
         simul_.events.erase(event);
 #endif
+    
     simul_.relax();
-    if ( do_write )
-        simul_.writeProperties(nullptr, prune);
+    if ( frames )
+    {
+        simul_.writeProperties(prune);
+        if ( frames < 0 )
+            simul_.writeObjects(simul_.prop->system_file, true, binary);
+    }
     
     VLOG("+RUN END");
 }
@@ -1083,11 +1089,11 @@ void Interface::execute_report(std::string const& name, std::string const& what,
     if ( ver > 1 )
         simul_.report_wrap(out, what, opt);
     else if ( ver > 0 )
-        simul_.report(out, what, opt);
+        simul_.report_one(out, what, opt);
     else
     {
         std::stringstream ss;
-        simul_.report(ss, what, opt);
+        simul_.report_one(ss, what, opt);
         StreamFunc::skip_lines(out, ss, '%');
     }
 }

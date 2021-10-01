@@ -332,10 +332,13 @@ public:
     
     /// export all Properties to speficied file
     void writeProperties(std::ostream&, bool prune) const;
-    
+
     /// export all Properties to a new file with specified name
     void writeProperties(char const* filename, bool prune) const;
     
+    /// export all Properties using default file name
+    void writeProperties(bool prune) const;
+
     /// load the properties contained in the standard output property file
     void loadProperties();
 

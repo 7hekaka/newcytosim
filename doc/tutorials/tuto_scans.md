@@ -141,7 +141,7 @@ You can now run the executable `sim` in each of the `run` directory. This is don
 
 It can take some time to compute all the simulations. If your computer has multiple cores, you can also run a number of processes in parallel, as below for 4 cores:
 
-    scan.py ../sim nproc=4 run????
+    scan.py ../sim njobs=4 run????
 
 ### Examine some results
 

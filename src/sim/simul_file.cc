@@ -683,28 +683,35 @@ void Simul::writeProperties(std::ostream& os, const bool prune) const
 
 
 /**
- At the first call, this will write all properties to file, 
- and save a copy of what was written to a string `properties_saved`.
- 
- The next time this is called, the properties will be compared to the string,
- and the file will be rewritten only if there is a difference.
+ Save properties to a file
  */
 void Simul::writeProperties(char const* name, bool prune) const
+{
+    std::ofstream os(name);
+    writeProperties(os, prune);
+}
+
+
+/**
+At the first call, this will write all properties to file,
+and save a copy of what was written to a string `properties_saved`.
+
+The next time this is called, the properties will be compared to the string,
+and the file will be rewritten only if there is a difference.
+*/
+void Simul::writeProperties(bool prune) const
 {
     std::ostringstream oss;
     writeProperties(oss, prune);
     if ( oss.str() != properties_saved )
     {
         properties_saved = oss.str();
-
-        // use default file name if 'name' is empty or not provided
-        if ( !name || *name==0 )
-            name = prop->property_file.c_str();
-        
+        // use default property file name
+        std::string name = prop->property_file.c_str();
         std::ofstream os(name);
         //this should be equivalent to: writeProperties(os, prune);
         os << properties_saved << std::endl;
-        //std::clog << "Writing properties at frame " << currentFrame() << '\n';
+        //std::clog << "Saved properties at frame " << currentFrame() << '\n';
     }
 }
 

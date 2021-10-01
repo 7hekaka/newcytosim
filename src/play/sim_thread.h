@@ -73,7 +73,7 @@ public:
     /// continue to run a simulation beyond its normal termination
     void          extend_run();
 
-    /// redefines Interface::hold(), will be called repeatedly during parsing
+    /// redefining Interface::hold(), which is called repeatedly at each timestep
     void          hold();
     
     /// return child process
