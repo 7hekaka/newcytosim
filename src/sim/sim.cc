@@ -102,18 +102,17 @@ int main(int argc, char* argv[])
         return 0;
     }
     
-    if ( ! arg.use_key("+") )
-    {
-        Cytosim::out.open("messages.cmo");
-        Cytosim::log.redirect(Cytosim::out);
-        Cytosim::warn.redirect(Cytosim::out);
-    }
-    
     if ( arg.use_key("-") )
     {
         Cytosim::out.silent();
         Cytosim::log.silent();
         Cytosim::warn.silent();
+    }
+    else if ( ! arg.use_key("+") )
+    {
+        Cytosim::out.open("messages.cmo");
+        Cytosim::log.redirect(Cytosim::out);
+        Cytosim::warn.redirect(Cytosim::out);
     }
 
     // change working directory if specified:
@@ -136,7 +135,7 @@ int main(int argc, char* argv[])
         return 2;
     }
     catch(...) {
-        print_red(cerr, "Error: an unknown exception occurred during initialization\n");
+        print_red(cerr, "Error: an exception occurred during initialization\n");
         return 3;
     }
     
@@ -152,7 +151,7 @@ int main(int argc, char* argv[])
         return 4;
     }
     catch(...) {
-        print_red(cerr, "Error: an unknown exception occurred\n");
+        print_red(cerr, "Error: an exception occurred\n");
         return 5;
     }
     

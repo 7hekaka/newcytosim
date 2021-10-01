@@ -469,8 +469,8 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         return reportPlatelet(out);
     if ( who == "ashbya" )
         return reportAshbya(out);
-    if ( who == "custom" )
-        return reportCustom(out);
+    if ( who == "something" )
+        return reportSomething(out);
 
     throw InvalidSyntax("unknown report `"+who+":"+what+"'");
 }
@@ -1444,15 +1444,15 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         unsigned cnt = 0;
-        for ( Fiber const* fob = fibers.nextID(fib); fob; fob = fibers.nextID(fob) )
+        for ( Fiber const* fox = fibers.nextID(fib); fox; fox = fibers.nextID(fox) )
         {
             for ( size_t ii = 0; ii < fib->nbSegments(); ++ii )
             {
                 FiberSegment seg(fib, ii);
-                for ( size_t jj = 0; jj < fob->nbSegments(); ++jj )
+                for ( size_t jj = 0; jj < fox->nbSegments(); ++jj )
                 {
                     real abs1, abs2, dis2;
-                    FiberSegment soc(fob, jj);
+                    FiberSegment soc(fox, jj);
                     if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
                     {
                         if ( seg.within(abs1) & soc.within(abs2) )
@@ -1464,7 +1464,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
                             {
                                 out << LIN << fib->identity();
                                 out << SEP << abs1 + seg.abscissa1();
-                                out << SEP << fob->identity();
+                                out << SEP << fox->identity();
                                 out << SEP << abs2 + soc.abscissa1();
                                 out << SEP << pos1;
                             }
@@ -3148,53 +3148,97 @@ void Simul::reportAshbya(std::ostream& out) const
 void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
 {
 #if ( DIM == 1 )
-	throw InvalidParameter("reportCollisions not meaningful in 1D");
+	throw InvalidParameter("fiber:collision meaningless in 1D");
 #endif
 	if ( fibers.size() > 2 )
-		throw InvalidParameter("reportCollisions is designed for simulations of only two fibers");
+		throw InvalidParameter("fiber:collision can only handle two fibers");
     
-    Fiber const * fib = nullptr, *fob = nullptr;
+    bool print = 0;
+    opt.set(print, "print");
+    static char cat = 'U'; // category
+    static real abs = 0;   // abscissa of contact point
+    static real ang = -1;  // angle at first contact
+
+    Fiber const * fib = nullptr, *fox = nullptr;
     for ( Fiber const* f = fibers.first(); f; f = f->next() )
     {
         if ( f->prop == sel )
             fib = f;
         else
-            fob = f;
+            fox = f;
     }
-    if ( !fib || !fob )
-        throw InvalidParameter("reportCollisions could not identify the two fibers");
+    if ( !fib || !fox )
+    {
+        if ( print )
+            out<<LIN<<ang<<SEP<<0<<SEP<<1<<SEP<<0<<SEP<<0<<SEP<<0<<SEP<<cat;
+        return;
+    }
+    const real sup = 3 * fib->prop->steric_radius;
 
-    const real sup = 2.0 * fib->prop->steric_radius;
-
+    // state at plus-end
     bool K = ( fib->endStateP() == 4 );
-        
-    Vector dir = fob->posEndP() - fob->posEndM();
-    Torque TP = cross(dir, fib->posEndP());
-    Torque TM = cross(dir, fib->posEndM());
-#if ( DIM == 3 )
-    bool X = ( dot(TP, TM) < 0 );
-#else
-    bool X = ( TP * TM < 0 );
-#endif
-
-    // check if tip of 'fib' is close to 'fob':
-    Vector tip = fib->posEndP();
-    real dis2, abs;
-    abs = fob->projectPoint(tip, dis2);
-    // check direction of fib's tip to fob at closest point:
-    real C = dot(fib->dirEndP(), fob->dir(abs));
-    real A = acos(C);
     
-    bool Z1 = ( dis2 < sup*sup );
-    bool Z2 = ( C > 0.9 );
-
-    out << LIN << A << SEP << K << SEP << X << SEP << Z1 << SEP << Z2;
+    // check if tip of 'fib' is close to 'fox':
+    Vector tip = fib->posEndP();
+    real dis = INFINITY;
+    real aaa = fox->projectPoint(tip, dis);
+    Vector dir = fox->dir(aaa);
+    dis = sqrt(dis);
+    bool D = ( dis < sup );
+    
+    bool X = 0;
+    if ( fib->length() > 1 )
+    {
+        // we consider a point 1um back from the plus-end:
+        Vector bak = fib->posFrom(1, PLUS_END);
+        real ddd, bbb = fox->projectPoint(bak, ddd);
+        bbb = 0.5 * ( aaa + bbb );
+        Vector mid = fox->pos(bbb);
+        Vector axs = fox->dir(bbb);
+        Torque TP = cross(axs, tip-mid);
+        Torque TM = cross(axs, bak-mid);
+#if ( DIM == 3 )
+        X = ( dot(TP, TM) < 0 );
+#else
+        X = ( TP * TM < 0 );
+#endif
+    }
+    
+    // check direction of fib's tip to fox at closest point:
+    real C = dot(fib->dirEndP(), dir);
+    real A = acos(abs_real(C));
+    
+    bool T = 0, Z = 0;
+    if ( D ) // tip is in contact:
+    {
+        // the angle is set at first contact:
+        if ( ang < 0 )
+        {
+            ang = A;
+            abs = aaa;
+        }
+        // 'zippering' implies 'being tangent' and 'moving along' the obstacle
+        T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
+        // distanced zipped is measured along the obstacle, with abscissa:
+        Z = ( abs_real(aaa-abs) > 1 ); // distance zipped sufficient
+    }
+    if ( cat == 'U' )
+    {
+        // catastrophes must be at contact
+        if ( K && D ) cat = 'K';
+        else if ( Z ) cat = 'Z';
+    }
+    // The 'X' may superseed the Z and U category
+    if ( X && !K ) cat = 'X';
+    
+    if ( print )
+        out<<LIN<<ang<<SEP<<dis<<SEP<<K<<SEP<<X<<SEP<<Z<<SEP<<T<<SEP<<cat;
 }
 
 /**
  Export end-to-end distance of Fiber
  */
-void Simul::reportCustom(std::ostream& out) const
+void Simul::reportSomething(std::ostream& out) const
 {
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {

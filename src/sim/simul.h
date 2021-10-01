@@ -603,7 +603,7 @@ public:
     void reportFiberCollision(std::ostream&, Property const*, Glossary&) const;
 
     /// print something
-    void reportCustom(std::ostream&) const;
+    void reportSomething(std::ostream&) const;
 
     //------------------------------ CUSTOM ------------------------------------
 

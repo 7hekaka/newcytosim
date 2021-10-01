@@ -294,16 +294,16 @@ bool Couple::allowAttachment(FiberSite const& sit, Hand const* h)
         return true;
     
     Fiber const* fib = that->fiber();
-    Fiber const* fob = sit.fiber();
+    Fiber const* fox = sit.fiber();
     
 #if FIBER_HAS_FAMILY
     // prevent binding if that would make a link inside the same family
-    if ( fib->family_  &&  fib->family_==fob->family_ )
+    if ( fib->family_  &&  fib->family_==fox->family_ )
         return false;
 #endif
 
     // prevent binding to the same fiber at adjacent locations:
-    if ( fib==fob  &&  abs_real(sit.abscissa()-that->abscissa()) <= prop->min_loop )
+    if ( fib==fox  &&  abs_real(sit.abscissa()-that->abscissa()) <= prop->min_loop )
         return false;
     
 #if ( 0 )
@@ -313,7 +313,7 @@ bool Couple::allowAttachment(FiberSite const& sit, Hand const* h)
      of this aster. Such links would be improductive, and would trap the Couples.
      */
     const Buddy * bud = fib->buddy(0);
-    if ( bud  &&  bud == fob->buddy(0) )
+    if ( bud  &&  bud == fox->buddy(0) )
     {
         real a = that->abscissa();
         real b = sit.abscissa();

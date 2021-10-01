@@ -1088,13 +1088,11 @@ void Interface::execute_report(std::string const& name, std::string const& what,
     
     if ( ver > 1 )
         simul_.report_wrap(out, what, opt);
-    else if ( ver > 0 )
-        simul_.report_one(out, what, opt);
     else
     {
         std::stringstream ss;
         simul_.report_one(ss, what, opt);
-        StreamFunc::skip_lines(out, ss, '%');
+        StreamFunc::skip_lines(out, ss, (ver>0?'%':0));
     }
 }
 
