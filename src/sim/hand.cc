@@ -358,7 +358,6 @@ void Hand::read(Inputter& in, Simul& sim)
             hFiber->addHand(this);
     }
     
-    fib = hFiber;
 #if FIBER_HAS_LATTICE
     if ( hFiber && !hLattice && isDigit() )
     {

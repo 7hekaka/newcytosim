@@ -761,7 +761,6 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     storeu2(X, unpacklo2(yy, mul1(aa, x0)));
     x0 = catshift(x0, x2);
     x2 = catshift(x2, x4);
-    x4 = setzero2();
     x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
     x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
     A += lda;
@@ -779,7 +778,6 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
     tt = unpacklo2(x0, x0);
     storeu2(X+2, unpacklo2(yy, mul1(aa, x0)));
     x0 = catshift(x0, x2);
-    x2 = setzero2();
     x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
     A += lda;
     // process last two cases
@@ -1273,15 +1271,12 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
             pA -= lda;
             pX -= ORD;
         }
-        a2 = a1;
         if ( N > 1 ) // j = N-2
         {
             a0 = loadu4f(pX);
             a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
             a1 = mul4f(broadcast1f(pA), a0);
             storeu4f(pX, blend31f(a1, a0));
-            pA -= lda;
-            pX -= ORD;
         }
         return;
     }
