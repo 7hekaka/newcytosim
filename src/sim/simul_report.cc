@@ -3147,6 +3147,9 @@ void Simul::reportAshbya(std::ostream& out) const
  */
 void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
 {
+    static bool finished = 0;
+    if ( finished )
+        std::exit(EXIT_SUCCESS);
 #if ( DIM == 1 )
 	throw InvalidParameter("fiber:collision meaningless in 1D");
 #endif
@@ -3231,7 +3234,11 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     // The 'X' may superseed the Z and U category
     if ( X && !K ) cat = 'X';
     
-    if ( print )
+    // since these states are final, we can terminate the simulation
+    if ( cat == 'K' || cat == 'X' )
+        finished = 1;
+
+    if ( print || finished )
         out<<LIN<<ang<<SEP<<dis<<SEP<<K<<SEP<<X<<SEP<<Z<<SEP<<T<<SEP<<cat;
 }
 

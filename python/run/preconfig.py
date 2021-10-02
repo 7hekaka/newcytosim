@@ -3,7 +3,7 @@
 # PRECONFIG, a versatile configuration file generator
 #
 # Copyright Francois J. Nedelec, EMBL 2010--2017, Cambridge University 2019--2021
-# This is PRECONFIG version 1.41, last modified on 30.9.2021
+# This is PRECONFIG version 1.42, last modified on 30.9.2021
 
 """
 # SYNOPSIS
@@ -217,9 +217,9 @@ except ImportError:
 
 #-------------------------------------------------------------------------------
 
-__VERSION__="1.41"
+__VERSION__="1.42"
 
-__DATE__   ="1.10.2020"
+__DATE__   ="30.9.2021"
 
 # code snippets are surrounded by double square brackets:
 CODE = '['
