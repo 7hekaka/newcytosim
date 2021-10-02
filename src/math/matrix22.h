@@ -353,7 +353,7 @@ public:
     /// return transposed matrix
     Matrix22 transposed() const
     {
-#if MATRIX22_USES_AVX && defined __AVX2__
+#if MATRIX22_USES_AVX && defined(__AVX2__)
         return Matrix22(permute4x64(mat, 0xD8));
 #else
         return Matrix22(val[0], val[2], val[1], val[3]);
@@ -363,7 +363,7 @@ public:
     /// return scaled transposed matrix
     Matrix22 transposed(real alpha) const
     {
-#if MATRIX22_USES_AVX && defined __AVX2__
+#if MATRIX22_USES_AVX && defined(__AVX2__)
         return Matrix22(mul4(set4(alpha), permute4x64(mat, 0xD8)));
 #else
         return Matrix22(alpha*val[0], alpha*val[2], alpha*val[1], alpha*val[3]);
@@ -405,7 +405,7 @@ public:
 #if MATRIX22_USES_AVX
     static const vec4 transposed(vec4 const& mat)
     {
-#ifdef __AVX2__
+#if defined(__AVX2__)
         return permute4x64(mat, 0xD8);
 #else
         return blend0110(mat, permute4(swap2f128(mat),0b1100));
@@ -456,7 +456,7 @@ public:
         res[0] = mat[0] * V[0] + mat[1] * V[1];
         res[1] = mat[2] * V[0] + mat[3] * V[1];
         return res;
-#elif defined __AVX__
+#elif defined(__AVX__)
         vec2 h = gethi(mat);
         vec2 l = mul2(unpacklo2(getlo(mat), h), loaddup2(V));
         h = mul2(unpackhi2(getlo(mat), h), loaddup2(V+1));
@@ -467,7 +467,7 @@ public:
     /// multiplication by another matrix: @returns val * mat
     static const vec4 mul_avx(vec4 const& val, vec4 const& mat)
     {
-#ifdef __FMA__
+#if defined(__FMA__)
         vec4 s = mul4(duplo2f128(val), duplo4(mat));
         return fmadd4(duphi2f128(val), duphi4(mat), s);
 #else
@@ -487,10 +487,10 @@ public:
     /// multiplication by another matrix: @returns transpose(this) * mat
     static const vec4 trans_mul_avx(vec4 const& val, vec4 const& mat)
     {
-#ifdef __FMA__
+#if defined(__FMA__) && defined(__AVX2__)
         vec4 s = mul4(permute4x64(val, 0x88), duplo4(mat));
         return fmadd4(permute4x64(val, 0xDD), duphi4(mat), s);
-#elif defined __AVX2__
+#elif defined(__AVX2__)
         vec4 s = mul4(permute4x64(val, 0x88), duplo4(mat));
         vec4 t = mul4(permute4x64(val, 0xDD), duphi4(mat));
         return add4(s, t);

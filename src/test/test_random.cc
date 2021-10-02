@@ -477,7 +477,7 @@ inline vec8f log_approx8f(__m256 xxx)
     // used to clear negative / NaN arguments:
     __m256 invalid = _mm256_cmp_ps(xxx, _mm256_setzero_ps(), _CMP_NGT_UQ);
     // extract exponent:
-#ifdef __AVX2__
+#if defined(__AVX2__)
     __m256 cst = _mm256_cvtepi32_ps(_mm256_srli_epi32(_mm256_castps_si256(xxx), 23));
 #else
     vec4f h = cvt4if(_mm_srli_epi32(_mm_castps_si128(gethi4f(xxx)), 23));
@@ -528,7 +528,7 @@ __m256 logf_app(__m256 val)
     __m256 invalid = _mm256_cmp_ps(val, _mm256_setzero_ps(), _CMP_NGT_UQ);
 
     // extract exponents
-#ifdef __AVX2__
+#if defined(__AVX2__)
     __m256 exp = _mm256_cvtepi32_ps(_mm256_srli_epi32((__m256i)val, 23));
 #else
     __m128 hi = _mm256_extractf128_ps(val, 1);

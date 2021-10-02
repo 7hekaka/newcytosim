@@ -112,7 +112,7 @@ inline vec8f logapprox8f(vec8f x)
     // used to clear negative / NaN arguments:
     vec8f invalid = cmp8f(x, setzero8f(), _CMP_NGT_UQ);
     // extract exponent:
-#ifdef __AVX2__
+#if defined(__AVX2__)
     vec8f a0 = cvt8if(_mm256_srli_epi32(_mm256_castps_si256(x), 23));
 #else
     vec4f h = cvt4if(_mm_srli_epi32(_mm_castps_si128(gethi4f(x)), 23));

@@ -791,7 +791,7 @@ void test_transpose2()
     vec4 t = blend0110(m, permute4(permute2f128(m,m,0x01),0b1100));
     dump(m, "m");
     dump(t, "t");
-#ifdef __AVX2__
+#if defined(__AVX2__)
     vec4 s = permute4x64(m, 0b11011000);
     dump(s, "s");
     dump(permute4x64(m, 0x88), "permute4x64(m, 0x88)");
@@ -977,7 +977,7 @@ void test_swap7()
     dump(unpacklo4(s, s), "unpacklo");
     dump(unpackhi4(s, s), "unpackhi");
 
-#ifdef __AVX2__
+#if defined(__AVX2__)
     dump(permute4x64(s, 0xDD), "permute4x64 0xDD");
     dump(permute4x64(s, 0x88), "permute4x64 0x88");
     dump(permute4x64(s, 0xD8), "permute4x64 0xD8");

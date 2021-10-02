@@ -882,7 +882,7 @@ public:
     /// cross product of two vectors
     friend Vector3 cross(Vector3 const& a, Vector3 const& b)
     {
-#if VECTOR3_USES_AVX && defined __AVX2__
+#if VECTOR3_USES_AVX && defined(__AVX2__)
         assert_true((a.vec[3] == 0) & (b.vec[3] == 0));
         return Vector3(cross4(a.vec, b.vec));
 #else

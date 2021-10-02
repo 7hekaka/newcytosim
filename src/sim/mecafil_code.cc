@@ -205,14 +205,14 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
         X += 8;
         vec4 ppp = catshift2(eee, ddd);
         vec4 jjj = catshift2(nnn, xxx);
-#ifdef __FMA__
+#if defined(__FMA__)
         storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
         storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
 #endif
         eee = sub4(sub4(xxx, jjj), sub4(jjj, nnn));
         ppp = catshift2(ddd, eee);
-#ifdef __FMA__
+#if defined(__FMA__)
         storeu4(Y+4, fmadd4(R, fmsub4(two, ppp, add4(ddd, eee)), loadu4(Y+4)));
 #else
         storeu4(Y+4, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y+4)));
@@ -229,7 +229,7 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
         vec4 ddd = sub4(sub4(nnn, iii), sub4(iii, xxx));
         xxx = nnn;
         vec4 ppp = catshift2(eee, ddd);
-#ifdef __FMA__
+#if defined(__FMA__)
         storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
         storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
@@ -252,7 +252,7 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
         nn = mm;
         oo = ff;
         storeu2(Y, fmadd2(getlo(R), sub2(yy, dd), loadu2(Y)));
-#ifdef __FMA__
+#if defined(__FMA__)
         yy = fmsub2(getlo(two), dd, ee);
 #else
         yy = sub2(add2(dd, dd), ee);
