@@ -22,7 +22,7 @@ void SingleSet::prepare(PropertyList const& properties)
 
 /// templated member function pointer...
 template < void (Single::*FUNC)() >
-static void single_steps(Single * obj)
+inline static void step_singles(Single * obj)
 {
     while ( obj )
     {
@@ -35,7 +35,7 @@ static void single_steps(Single * obj)
 
 /// templated member function pointer...
 template < void (Single::*FUNC)() >
-static void single_steps(Single * obj, bool odd)
+inline static void step_singles(Single * obj, bool odd)
 {
     Single * nxt;
     if ( odd )
@@ -70,18 +70,18 @@ void SingleSet::step()
     Single *const fHead = firstF();
     bool fOdd = sizeF() & 1;
     
-    single_steps<&Single::stepA>(firstA(), sizeA() & 1);
+    step_singles<&Single::stepA>(firstA(), sizeA() & 1);
     
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
         Single * rest = uniCollect(fHead);
         uniAttach(simul_.fibers);
-        single_steps<&Single::stepF>(rest);
+        step_singles<&Single::stepF>(rest);
     }
     else
     {
-        single_steps<&Single::stepF>(fHead, fOdd);
+        step_singles<&Single::stepF>(fHead, fOdd);
     }
 }
 
@@ -257,8 +257,8 @@ void SingleSet::foldPositions(Modulo const* m) const
 
 void SingleSet::shuffle()
 {
-    aList.shuffle();
-    fList.shuffle();
+    if ( aList.size() > 1 ) aList.shuffle();
+    if ( fList.size() > 1 ) fList.shuffle();
 }
 
 

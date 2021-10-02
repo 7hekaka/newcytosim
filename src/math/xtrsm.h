@@ -20,10 +20,10 @@
 /* CLANG offers builtin non temporal load functions */
 #ifdef __clang__
 template < typename T >
-static inline float ntload(T const* x) { return __builtin_nontemporal_load(x); }
+inline static float ntload(T const* x) { return __builtin_nontemporal_load(x); }
 #else
 template < typename T >
-static inline float ntload(T const* x) { return *x; }
+inline static float ntload(T const* x) { return *x; }
 #endif
 
 /**

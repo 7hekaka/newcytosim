@@ -501,9 +501,6 @@ void ObjectPool::shuffle_down(Object * p, Object * q)
  */
 void ObjectPool::shuffle()
 {
-    if ( nSize < 2 )
-        return;
-    
     size_t pp, qq;
     if ( nSize > UINT32_MAX )
     {

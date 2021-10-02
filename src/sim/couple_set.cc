@@ -25,7 +25,7 @@ void CoupleSet::prepare(PropertyList const& properties)
 
 /// templated member function pointer...
 template < void (Couple::*FUNC)() >
-static void couple_steps(Couple * obj)
+inline static void step_couples(Couple * obj)
 {
     while ( obj )
     {
@@ -38,7 +38,7 @@ static void couple_steps(Couple * obj)
 
 /// templated member function pointer...
 template < void (Couple::*FUNC)() >
-static void couple_steps(Couple * obj, bool odd)
+inline static void step_couples(Couple * obj, bool odd)
 {
     Couple * nxt;
     if ( odd )
@@ -84,22 +84,22 @@ void CoupleSet::step()
     bool const afOdd = afList.size() & 1;
     bool const ffOdd = ffList.size() & 1;
     
-    couple_steps<&Couple::stepAA>(firstAA(), aaList.size() & 1);
-    couple_steps<&Couple::stepFA>(faHead, faOdd);
-    couple_steps<&Couple::stepAF>(afHead, afOdd);
+    step_couples<&Couple::stepAA>(firstAA(), aaList.size() & 1);
+    step_couples<&Couple::stepFA>(faHead, faOdd);
+    step_couples<&Couple::stepAF>(afHead, afOdd);
 
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
         Couple * rest = uniCollect(ffHead);
         uniAttach(simul_.fibers);
-        couple_steps<&Couple::stepFF>(rest);
+        step_couples<&Couple::stepFF>(rest);
     }
     else
     {
         //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << '\n';
         // this loop is unrolled, processing objects 2 by 2:
-        couple_steps<&Couple::stepFF>(ffHead, ffOdd);
+        step_couples<&Couple::stepFF>(ffHead, ffOdd);
     }
 
     //printf("  : %lu couples [ %u %u ]\n", size(), inventory.first_identity(), inventory.last_identity());
@@ -357,10 +357,10 @@ void CoupleSet::foldPositions(Modulo const* m) const
 
 void CoupleSet::shuffle()
 {
-    ffList.shuffle();
-    afList.shuffle();
-    faList.shuffle();
-    aaList.shuffle();
+    if ( ffList.size() > 1 ) ffList.shuffle();
+    if ( afList.size() > 1 ) afList.shuffle();
+    if ( faList.size() > 1 ) faList.shuffle();
+    if ( aaList.size() > 1 ) aaList.shuffle();
 }
 
 

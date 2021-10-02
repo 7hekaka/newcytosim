@@ -126,16 +126,16 @@ public:
     
     
     ///returns the first free Single
-    Single * firstF()       const { return static_cast<Single*>(fList.front()); }
+    Single * firstF() const { return static_cast<Single*>(fList.front()); }
     
     ///returns the first bound Single
-    Single * firstA()       const { return static_cast<Single*>(aList.front()); }
+    Single * firstA() const { return static_cast<Single*>(aList.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found
     Single * findID(ObjectID n) const { return static_cast<Single*>(inventory_.get(n)); }
     
     /// first Single in inventory
-    Single * firstID()           const { return static_cast<Single*>(inventory_.first()); }
+    Single * firstID() const { return static_cast<Single*>(inventory_.first()); }
     
     /// returns Single immediately following 'obj' in inventory
     Single * nextID(Single const* obj) const { return static_cast<Single*>(inventory_.next(obj)); }

@@ -3,7 +3,7 @@
 
 /// pack array by removing all 'not-a-number's in arrray [s, e[
 /** Attention: this may not work with option `-ffast-math` */
-static inline real * remove_nan_pairs(real * s, real * e)
+inline static real * remove_nan_pairs(real * s, real * e)
 {
     //real * start = s;
     e -= 2;
@@ -60,7 +60,7 @@ static inline real * remove_nan_pairs(real * s, real * e)
  this increases the number of points within the unit circle by a factor 3-2*sqrt(2)
  without changing the property of being equidistributed within the unit circle.
  */
-static inline void fold_corners(vec8f& x, vec8f& y)
+inline static void fold_corners(vec8f& x, vec8f& y)
 {
     // fold the corners of the square, which is ~17% of the surface...
     // test if point is close to corner, separated by line |x|+|y| > sqrt(2)
@@ -157,7 +157,7 @@ static real * makeGaussians_AVX1(real dst[], size_t cnt, const __m256i src[])
 
 
 
-static inline void sort_nans(vec8f& x, vec8f& y)
+inline static void sort_nans(vec8f& x, vec8f& y)
 {
     vec8f u = x;
     vec8f k = isnan8f(x);

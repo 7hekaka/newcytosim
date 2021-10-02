@@ -106,17 +106,18 @@ void Simul::step()
     //fprintf(stderr, "\n----------------------------------- time is %8.3f\n", prop->time);
 
     // mix object lists
-    events.shuffle();
-    organizers.shuffle();
-    tubules.shuffle();
-    beads.shuffle();
-    solids.shuffle();
-    fibers.shuffle();
-    spheres.shuffle();
-    couples.shuffle();
-    singles.shuffle();
-    spaces.shuffle();
-    
+    if ( events.size() > 1 ) events.shuffle();
+    if ( organizers.size() > 1 ) organizers.shuffle();
+    if ( tubules.size() > 1 ) tubules.shuffle();
+    if ( beads.size() > 1 ) beads.shuffle();
+    if ( solids.size() > 1 ) solids.shuffle();
+    if ( fibers.size() > 1 ) fibers.shuffle();
+    if ( spheres.size() > 1 ) spheres.shuffle();
+    if ( couples.size() > 1 ) couples.shuffle();
+    if ( singles.size() > 1 ) singles.shuffle();
+    if ( spaces.size() > 1 ) spaces.shuffle();
+    if ( fields.size() > 1 ) fields.shuffle();
+
     //printf("Simul::shuffles %16llu\n", (timer()-rdt)>>5); rdt = timer();
 
     // Monte-Carlo step for all objects
