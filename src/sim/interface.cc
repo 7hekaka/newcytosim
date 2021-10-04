@@ -259,7 +259,7 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
             Evaluator evaluator{{'X', iso.mov.x()}, {'Y', iso.mov.y()}, {'Z', iso.mov.z()},
                                 {'R', iso.mov.norm()}, {'P', RNG.preal()}};
             try {
-                condition = ( 0 != evaluator.evaluate(str.c_str()) );
+                condition = ( 0 != evaluator.eval(str.c_str()) );
             }
             catch( Exception& e ) {
                 e.message(e.message()+" in `"+str+"'");
@@ -761,7 +761,7 @@ static void reportCPUtime(real t)
 
 
 template < Interface::SimulFuncPtr FUNC >
-void Interface::do_steps(size_t& sss, size_t cnt)
+inline void Interface::do_steps(size_t& sss, size_t cnt)
 {
     while ( sss < cnt )
     {

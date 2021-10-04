@@ -182,11 +182,11 @@ public:
         //print_variables(std::clog, variables_);
     }
     
-    real evaluate(char const* str)
+    real eval(char const* str)
     {
         ptr = str;
         real res = expression_();
-        //std::clog << "evaluate(" << str << ") = " << res << "\n";
+        //std::clog << "eval(" << str << ") = " << res << "\n";
         return res;
     }
 };

@@ -1194,7 +1194,7 @@ void Parser::evaluate(std::istream& is)
         {
             int c = Tokenizer::skip_space(is, true);
             if ( c == EOF )
-                return;
+                break;
             
             // skip matlab-style comments (%{ })
             if ( c == '%' )
@@ -1230,7 +1230,7 @@ void Parser::evaluate(std::istream& is)
             //StreamFunc::print_lines(std::clog, is, ipos, ipos);
             
             if ( evaluate_one(is) )
-                return;
+                break;
         }
     }
     catch( Exception & e )
@@ -1257,7 +1257,10 @@ void Parser::readConfig(std::string const& filename)
         throw InvalidIO("could not find or read `"+filename+"'");
     VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change);
     VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
+
+    simul_.parser_ = this;
     evaluate(is);
+    simul_.parser_ = nullptr;
 }
 
 

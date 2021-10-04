@@ -28,6 +28,7 @@
 
 class Meca1D;
 class SimulProp;
+class Parser;
 
 /// default name for output trajectory file
 const char TRAJECTORY[] = "objects.cmo";
@@ -51,8 +52,11 @@ public:
     mutable LocusGrid locusGrid;
 
     /// Meca used to solve the system with option 'solve=horizontal'
-    Meca1D *          pMeca1D;
+    Meca1D * pMeca1D;
 
+    /// current parser object
+    Parser * parser_;
+    
 #if POOL_HAND_ATTACHMENT
     /// flag to authorize Hand's attachment
     unsigned char     dontAttach;

@@ -76,7 +76,8 @@ fibers(*this), spheres(*this), beads(*this), solids(*this),
 singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
 {
     pMeca1D = nullptr;
-    primed_  = 0;
+    parser_ = nullptr;
+    primed_ = 0;
 #if POOL_HAND_ATTACHMENT
     dontAttach = 0;
 #endif
@@ -185,15 +186,10 @@ void Simul::foldPositions() const
 }
 
 
-/// @todo Simul::evaluate should use a Parser with limited rights
 void Simul::evaluate(std::string const& code)
 {
-    /*
-     @todo: restrict rights for Event's code
-     The code is executed with all rights, but this should not be
-     when this is executed from `play`
-     */
-    Parser(*this, 1, 1, 1, 1, 1).evaluate(code);
+    //Using the parser which has been given at the start of the config file
+    parser_->evaluate(code);
 }
 
 //------------------------------------------------------------------------------
