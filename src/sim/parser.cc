@@ -1168,7 +1168,7 @@ int Parser::evaluate_one(std::istream& is)
     else if ( tok == "restart" )
     {
         // reset simulation and rewind config file, repeating forever
-        simul_.erase();
+        simul_.erase_all(1);
         is.clear();
         is.seekg(0);
         return 0;

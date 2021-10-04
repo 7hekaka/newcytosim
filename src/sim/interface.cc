@@ -635,7 +635,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     {
         if ( name == "objects" )
         {
-            simul_.erase();     // deletes everything
+            simul_.erase_all(0);
             return;
         }
         throw InvalidSyntax("could not determine the class of `"+name+"'");

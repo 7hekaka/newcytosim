@@ -386,7 +386,7 @@ void SimThread::deleteHandles()
 void SimThread::clear()
 {
     assert_false( isChild() );
-    simul_.erase();
+    simul_.erase_all(1);
     mHandle = nullptr;
 }
 

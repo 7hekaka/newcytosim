@@ -93,8 +93,7 @@ singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
 
 Simul::~Simul()
 {
-    erase();
-    properties.erase();
+    erase_all(1);
     delete(pMeca1D);
     delete(prop);
 }
@@ -134,7 +133,7 @@ real Simul::time_step() const
     return prop->time_step;
 }
 
-void Simul::erase()
+void Simul::erase_all(bool erase_properties)
 {
     //std::cerr << "Simul::erase()\n";
     relax();
@@ -152,6 +151,9 @@ void Simul::erase()
  
     prop->time = 0;
     modulo = nullptr;
+    
+    if ( erase_properties )
+        properties.erase();
 }
 
 
