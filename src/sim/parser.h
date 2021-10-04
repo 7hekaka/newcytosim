@@ -17,11 +17,11 @@ private:
     /// disabled default constructor
     Parser();
     
-    /// control switch to enable command 'set' (creating a property)
-    bool do_set;
-    
     /// control switch to enable command 'change' (change a property)
     bool do_change;
+
+    /// control switch to enable command 'set' (creating a property)
+    bool do_set;
     
     /// control switch to enable command 'new' and 'delete' (object)
     bool do_new;
@@ -93,7 +93,7 @@ private:
 public:
     
     /// construct a Parser with given permissions
-    Parser(Simul&, bool Set, bool Change, bool New, bool Run, bool Write);
+    Parser(Simul&, bool Change, bool Set, bool New, bool Run, bool Write);
 
     /// Parse next command in stream, advance stream pointer, return 0 if success
     int  evaluate_one(std::istream&);

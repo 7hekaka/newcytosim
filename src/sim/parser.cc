@@ -28,8 +28,8 @@
  - do_write: can write to disc
  .
  */
-Parser::Parser(Simul& sim, bool s, bool c, bool n, bool r, bool w)
-: Interface(sim), do_set(s), do_change(c), do_new(n), do_run(r), do_write(w)
+Parser::Parser(Simul& sim, bool c, bool s, bool n, bool r, bool w)
+: Interface(sim), do_change(c), do_set(s), do_new(n), do_run(r), do_write(w)
 {
 }
 
