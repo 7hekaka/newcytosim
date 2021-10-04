@@ -473,21 +473,10 @@ std::string Tokenizer::get_hexadecimal(std::istream& is)
  - a single character, except '\n' if 'eat_line=false'
  */
 
-std::string Tokenizer::get_token(std::istream& is, bool eat_line)
+std::string Tokenizer::get_token(std::istream& is)
 {
     int c = skip_space(is, false);
- 
-    if ( c == EOF )
-        return "";
-    
-    if ( c == '\n' )
-    {
-        if ( !eat_line )
-            return "";
-        is.get();
-        return "\n";
-    }
-    
+
     if ( isalpha(c) )
         return get_symbol(is);
 

@@ -1131,44 +1131,7 @@ void Parser::parse_dump(std::istream& is)
  */
 int Parser::evaluate_one(std::istream& is)
 {
-    std::string tok = Tokenizer::get_token(is, true);
-    
-    if ( is.fail() )
-        return 1;
-    
-    // empty lines
-    if ( tok.length() < 1 || isspace(tok[0]) )
-        return 0;
-    
-    // matlab-style comments (%{ })
-    if ( tok[0] == '%' )
-    {
-        int c = is.get();
-        if ( c == '{' )
-            Tokenizer::get_block_text(is, 0, '}');
-        else
-            Tokenizer::get_line(is);
-        return 0;
-    }
-    
-    /*
-     skip C-style comments:
-     - single-line comment start with '/' and '/'
-     - multi-line comments start with '/' and '*'
-     */
-    if ( tok[0] == '/' )
-    {
-        int c = is.get();
-        if ( '/' == c )
-            Tokenizer::get_line(is);
-        else if ( '*' == c )
-            Tokenizer::get_until(is, "*/");
-        else
-            throw InvalidSyntax("unexpected token after / `"+tok+"'");
-        return 0;
-    }
-    
-    //if (spos) StreamFunc::print_lines(std::clog, is, *spos, *spos);
+    std::string tok = Tokenizer::get_token(is);
     
     if ( tok == "set" )
         parse_set(is);
@@ -1229,7 +1192,43 @@ void Parser::evaluate(std::istream& is)
     try {
         while ( is.good() )
         {
+            int c = Tokenizer::skip_space(is, true);
+            if ( c == EOF )
+                return;
+            
+            // skip matlab-style comments (%{ })
+            if ( c == '%' )
+            {
+                c = is.get();
+                int d = is.get();
+                if ( d == '{' )
+                    Tokenizer::get_block_text(is, 0, '}');
+                else
+                    Tokenizer::get_line(is);
+                continue;
+            }
+#if 0
+            /*
+             skip C-style comments:
+             - single-line comment start with '/' and '/'
+             - multi-line comments start with '/' and '*'
+             */
+            if ( c == '/' )
+            {
+                c = is.get();
+                int d = is.get();
+                if ( '/' == d )
+                    Tokenizer::get_line(is);
+                else if ( '*' == d )
+                    Tokenizer::get_until(is, "*/");
+                else
+                    throw InvalidSyntax("unexpected token `/"+std::string(d,1)+"'");
+                continue;
+            }
+#endif
             ipos = is.tellg();
+            //StreamFunc::print_lines(std::clog, is, ipos, ipos);
+            
             if ( evaluate_one(is) )
                 return;
         }

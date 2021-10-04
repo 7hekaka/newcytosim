@@ -67,9 +67,9 @@ namespace Tokenizer
     /// return next token if it looks like a file name
     std::string get_path(std::istream&, bool eat_line=false);
     
-    /// return next token
-    std::string get_token(std::istream&, bool eat_line=false);
-        
+    /// return next token on the same line (this does not eat new-line characters)
+    std::string get_token(std::istream&);
+    
     /// accumulate characters until the next new-line character
     std::string get_line(std::istream&);
 
