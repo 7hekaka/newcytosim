@@ -742,7 +742,7 @@ void test_hsum()
     //s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
-    s0 = add4f(blend22f(s2, s0), blend22f(s0, s2));
+    s0 = add4f(catshift2f(s0, s2), blend22f(s0, s2));
     dump(s0, "sum ");
     
     dump(blend0010f(s2, s0), "blend0010");
