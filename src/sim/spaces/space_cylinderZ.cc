@@ -21,7 +21,8 @@ SpaceCylinderZ::SpaceCylinderZ(SpaceProp const* p)
 
 void SpaceCylinderZ::resize(Glossary& opt)
 {
-    real rad = radius_, bot = bot_, top = top_, edg = edge_;
+    real rad = radius_, edg = edge_;
+    real bot = bot_, top = top_;
 
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
@@ -232,13 +233,13 @@ real SpaceCylinderZ::volume() const
 bool SpaceCylinderZ::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = W.XX * W.XX + W.YY * W.YY;
+    const real RT = W.normXYSqr();
 # if HAS_SMOOTH_EDGES
     const real R = max_real(0, std::sqrt(RT)-radius_+edge_);
     const real Z = max_real(0, std::max(bot_+edge_-W.ZZ, W.ZZ-top_+edge_));
     return ( R*R + Z*Z <= edgeSqr_ );
 # else
-    return (( bot_ <= W.ZZ ) & ( W.ZZ <= top_ ) & ( RT <= radius_ * radius_ ));
+    return (( bot_ <= W.ZZ ) & ( W.ZZ <= top_ ) & ( RT <= square(radius_) ));
 # endif
 #else
     ABORT_NOW("cylinderZ is only valid in 3D");
@@ -251,7 +252,7 @@ bool SpaceCylinderZ::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    const real RT = W.XX * W.XX + W.YY * W.YY;
+    const real RT = W.normXYSqr();
 # if HAS_SMOOTH_EDGES
     const real E = edge_ + rad;
     const real R = max_real(0, std::sqrt(RT)-E);

@@ -4,43 +4,40 @@
 #define SPACE_DISC_H
 
 #include "space.h"
-#include "space_prop.h"
+#include "space_dynamic_prop.h"
 
-/// A disc centered at the origin at adjustable Z position
+/// A disc centered at the origin, with variable radius.
 /**
- Space `disc` is a disc centered around the origin and parallel to the XY plane.
- It is only usable in 3D, where it offers forces only on the bottom plate.
+ Space `disc` is a disc centered around the origin.
+ Forces registered with 'setInteractions' are added, and used to update the
+ radius of the Space. How fast the radius changes is set by the value 'mobility'
+ in SpaceDynamicProp.
  
  Parameters:
      - radius = radius of the disc
-     - bottom = lower Z
-     - top = upper Z
 
  @ingroup SpaceGroup
  
- FJN, Cambridge 5.10.2021
+ FJN, Strasbourg 29.01.2017
  */
 
-class SpaceDisc : public Space
+class SpaceDynamicDisc : public Space
 {
 private:
     
     /// the radius of the disc
-    real radius_;
+    real   radius_;
     
-    /// position in Z of the bottom limit
-    real bot_;
+    /// radial force
+    mutable real force_;
     
-    /// position in Z of the top limit
-    real top_;
-
 public:
     
     /// constructor
-    SpaceDisc(SpaceProp const*);
+    SpaceDynamicDisc(SpaceDynamicProp const*);
     
     /// properties
-    const SpaceProp* prop;
+    const SpaceDynamicProp* prop;
 
     /// change dimensions
     void resize(Glossary& opt);
@@ -51,30 +48,30 @@ public:
     /// true if the point is inside the Space
     bool inside(Vector const&) const;
     
-    /// true if the bead is inside the Space
-    bool allInside(Vector const&, real rad) const;
-
     /// return bounding box in `inf` and `sup`
     void boundaries(Vector& inf, Vector& sup) const;
 
-    /// a random position in volume
-    Vector place() const;
+    /// a random position inside the volume
+    Vector place() const { return Vector::randB(radius_); }
     
     /// direct normal direction calculation
-    Vector normalToEdge(Vector const& pos) const { return Vector(0, 0, -1); }
-    
-    /// a random position on the bottom disc
-    Vector placeOnEdge(real) const;
+    Vector normalToEdge(Vector const& pos) const { return normalize(pos); }
 
     /// return point on the edge that is closest to `pos`
     Vector project(Vector const& pos) const;
 
     
+    /// add interactions to a Meca
+    void setInteractions(Meca&) const;
+
     /// apply a force directed towards the edge of the Space
     void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
 
     /// apply a force directed towards the edge of the Space
     void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    
+    ///    the step function can change the radius
+    void step();
     
     /// write to file
     void write(Outputter&) const;

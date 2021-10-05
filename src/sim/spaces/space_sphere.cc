@@ -63,6 +63,15 @@ bool SpaceSphere::inside(Vector const& pos) const
     return pos.normSqr() <= square(radius_);
 }
 
+
+bool SpaceSphere::allInside(Vector const& pos, const real rad) const
+{
+    assert_true( rad >= 0 );
+    real R = max_real(0, radius_-rad);  // remaining radius
+    return pos.normSqr() <= R * R;
+}
+
+
 Vector SpaceSphere::project(Vector const& pos) const
 {
     real n = pos.normSqr();

@@ -9,20 +9,22 @@
 #include "meca.h"
 
 
-SpaceDisc::SpaceDisc(SpaceDynamicProp const* p)
-: Space(p),prop(p)
+SpaceDisc::SpaceDisc(SpaceProp const* p)
+: Space(p), prop(p)
 {
-    if ( DIM != 2 )
-        throw InvalidParameter("disc is only usable in 2D");
+    if ( DIM != 3 )
+        throw InvalidParameter("disc is only usable in 3D");
     radius_ = 0;
-    force_  = 0;
+    bot_ = 0;
+    top_ = 0;
 }
 
 
 void SpaceDisc::resize(Glossary& opt)
 {
     real rad = radius_;
-    
+    real bot = bot_, top = top_;
+
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
     else opt.set(rad, "radius");
@@ -30,52 +32,69 @@ void SpaceDisc::resize(Glossary& opt)
     if ( rad < 0 )
         throw InvalidParameter("disc:radius must be >= 0");
     
+    if ( opt.set(top, "length") )
+    {
+        bot = -0.5 * top;
+        top =  0.5 * top;
+    }
+    else
+    {
+        opt.set(bot, "bottom");
+        opt.set(top, "top");
+    }
+    
+    if ( top < bot )
+        throw InvalidParameter("cylinderZ:bottom must be <= top");
+    
     radius_ = rad;
+    bot_ = bot;
+    top_ = top;
 }
 
 
 void SpaceDisc::boundaries(Vector& inf, Vector& sup) const
 {
-    inf.set(-radius_,-radius_,-radius_);
-    sup.set( radius_, radius_, radius_);
+    inf.set(-radius_,-radius_, bot_);
+    sup.set( radius_, radius_, top_);
 }
-
-
-#if ( DIM != 2 )
 
 
 real SpaceDisc::volume() const
 {
-    return 0;
-}
-
-bool SpaceDisc::inside(Vector const& pos) const
-{
-    return false;
-}
-
-Vector SpaceDisc::project(Vector const&) const
-{
-    return Vector(0, 0, 0);
-}
-
+#if ( DIM <= 2 )
+    return M_PI * square(radius_);
 #else
-
-
-real SpaceDisc::volume() const
-{
-    return M_PI * radius_ * radius_;
+    return M_PI * ( top_ - bot_ ) * square(radius_);
+#endif
 }
+
 
 bool SpaceDisc::inside(Vector const& pos) const
 {
-    return pos.normSqr() <= radius_ * radius_;
+#if ( DIM <= 2 )
+    return pos.normSqr() <= square(radius_);
+#else
+    return ( bot_ <= pos.ZZ ) & ( pos.ZZ <= top_ );
+#endif
 }
+
+
+bool SpaceDisc::allInside(Vector const& pos, const real rad) const
+{
+    assert_true( rad >= 0 );
+#if ( DIM <= 2 )
+    real R = max_real(0, radius_-rad);  // remaining radius
+    return pos.normSqr() <= square(R);
+#else
+    return ( bot_ + rad <= pos.ZZ ) & ( pos.ZZ + rad <= top_ );
+#endif
+}
+
 
 Vector SpaceDisc::project(Vector const& pos) const
 {
+#if ( DIM <= 2 )
     real n = pos.normSqr();
-    
     if ( n > 0 ) {
         return pos * ( radius_ / std::sqrt(n) );
     }
@@ -83,63 +102,71 @@ Vector SpaceDisc::project(Vector const& pos) const
         //select a random point on the surface
         return radius_ * Vector::randU();
     }
+#else
+    return Vector(pos.XX, pos.YY, bot_);
+#endif
 }
 
-#endif
 
-//------------------------------------------------------------------------------
-
-/// add interactions to a Meca
-void SpaceDisc::setInteractions(Meca&) const
+Vector SpaceDisc::place() const
 {
-    force_ = 0;
+    const Vector2 V = Vector2::randB(radius_);
+    return Vector(V.XX, V.YY, bot_+RNG.preal()*(top_-bot_));
+}
+
+
+Vector SpaceDisc::placeOnEdge(real) const
+{
+    const Vector2 V = Vector2::randB(radius_);
+    return Vector(V.XX, V.YY, bot_);
 }
 
 
 void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
+# if ( DIM <= 2 )
     meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
-    force_ += stiff * ( pos.norm() - radius_ );
+#else
+    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_, top_);
+    meca.addPlaneClampZ(pe, Z, stiff);
+#endif
 }
 
 
 void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
+# if ( DIM <= 2 )
     if ( radius_ > rad )
     {
         meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);
-        force_ += stiff * ( rad + pos.norm() - radius_ );
     }
     else {
         meca.addPointClamp( pe, Vector(0,0,0), stiff );
         std::cerr << "object is too big to fit in SpaceDisc\n";
-        force_ += 2 * stiff * ( rad - radius_ );
     }
+#else
+    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_+rad, top_-rad);
+    meca.addPlaneClampZ(pe, Z, stiff);
+#endif
 }
 
-
-void SpaceDisc::step()
-{
-    real dr = prop->mobility_dt * force_;
-    //std::clog << "SpaceDisc:  radius " << std::setw(12) << radius_ << " force " << force_ << " delta_radius " << dr << "\n";
-    radius_ += dr;
-}
-
-//------------------------------------------------------------------------------
 
 void SpaceDisc::write(Outputter& out) const
 {
     writeShape(out, "disc");
-    out.writeUInt16(2);
+    out.writeUInt16(4);
     out.writeFloat(radius_);
-    out.writeFloat(force_);
+    out.writeFloat(bot_);
+    out.writeFloat(top_);
+    out.writeFloat(0.0);
 }
 
 
 void SpaceDisc::setLengths(const real len[])
 {
     radius_ = len[0];
-    force_  = len[1];
+    bot_    = len[1];
+    top_    = len[2];
 }
 
 void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
@@ -153,18 +180,28 @@ void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "opengl.h"
+#include "gle.h"
 
 void SpaceDisc::draw2D() const
 {
     GLfloat R(radius_);
     glPushMatrix();
     glScalef(R, R, R);
+    gle::circle();
     glPopMatrix();
 }
 
 void SpaceDisc::draw3D() const
 {
-    draw2D(); // unfinished
+    const real R(radius_);
+    const real B(bot_);
+
+    glPushMatrix();
+    gle::transScale(0, 0, -B, R);
+    //gle::tube1();
+    gle::disc1();
+    //gle::discTop1();
+    glPopMatrix();
 }
 
 #else

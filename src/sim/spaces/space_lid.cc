@@ -163,13 +163,13 @@ bool SpaceLid::allOutside(Vector const& pos, const real rad) const
 Vector SpaceLid::project(Vector const& pos) const
 {
 #if ( DIM == 1 )
-    real X = sign_select(2 * pos.XX - bot_ - top_, bot_, top_);
+    real X = sign_select(2 * pos.XX - (bot_+top_), bot_, top_);
     return Vector(X);
 #elif ( DIM == 2 )
-    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_, top_);
+    real Y = sign_select(2 * pos.YY - (bot_+top_), bot_, top_);
     return Vector(pos.XX, Y);
 #else
-    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_, top_);
+    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_, top_);
     return Vector(pos.XX, pos.YY, Z);
 #endif
 }
@@ -183,9 +183,9 @@ void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real S = 2 * pos.YY - bot_ - top_;
+    real S = 2 * pos.YY - (bot_+top_);
 #elif ( DIM > 2 )
-    real S = 2 * pos.ZZ - bot_ - top_;
+    real S = 2 * pos.ZZ - (bot_+top_);
 #endif
 
     // record force only on top edge:
@@ -203,9 +203,9 @@ void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe, real rad,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real S = 2 * pos.YY - bot_ - top_;
+    real S = 2 * pos.YY - (bot_+top_);
 #elif ( DIM > 2 )
-    real S = 2 * pos.ZZ - bot_ - top_;
+    real S = 2 * pos.ZZ - (bot_+top_);
 #endif
 
     // record force only on top edge:

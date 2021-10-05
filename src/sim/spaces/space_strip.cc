@@ -182,13 +182,13 @@ bool SpaceStrip::allOutside(Vector const& pos, const real rad) const
 Vector SpaceStrip::project(Vector const& pos) const
 {
 #if ( DIM == 1 )
-    real X = sign_select(2 * pos.XX - bot_ - top_, bot_, top_);
+    real X = sign_select(2 * pos.XX - (bot_+top_), bot_, top_);
     return Vector(X);
 #elif ( DIM == 2 )
-    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_, top_);
+    real Y = sign_select(2 * pos.YY - (bot_+top_), bot_, top_);
     return Vector(pos.XX, Y);
 #else
-    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_, top_);
+    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_, top_);
     return Vector(pos.XX, pos.YY, Z);
 #endif
 }
@@ -201,10 +201,10 @@ Vector SpaceStrip::project(Vector const& pos) const
 void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_, top_);
+    real Y = sign_select(2 * pos.YY - (bot_+top_), bot_, top_);
     meca.addPlaneClampY(pe, Y, stiff);
 #elif ( DIM > 2 )
-    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_, top_);
+    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_, top_);
     meca.addPlaneClampZ(pe, Z, stiff);
 #endif
 }
@@ -213,10 +213,10 @@ void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& me
 void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real Y = sign_select(2 * pos.YY - bot_ - top_, bot_+rad, top_-rad);
+    real Y = sign_select(2 * pos.YY - (bot_+top_), bot_+rad, top_-rad);
     meca.addPlaneClampY(pe, Y, stiff);
 #elif ( DIM > 2 )
-    real Z = sign_select(2 * pos.ZZ - bot_ - top_, bot_+rad, top_-rad);
+    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_+rad, top_-rad);
     meca.addPlaneClampZ(pe, Z, stiff);
 #endif
 }

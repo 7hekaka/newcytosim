@@ -47,15 +47,15 @@ void SpaceCylinder::boundaries(Vector& inf, Vector& sup) const
 
 real SpaceCylinder::volume() const
 {
-    return 2 * M_PI * half_ * radius_ * radius_;
+    return 2 * M_PI * half_ * square(radius_);
 }
 
 
 bool SpaceCylinder::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
-    return ( abs_real(W.XX) < half_  &&  RT <= radius_ * radius_ );
+    const real RT = W.normYZSqr();
+    return ( abs_real(W.XX) < half_  &&  RT <= square(radius_) );
 #elif ( DIM > 1 )
     return ( abs_real(W.XX) < half_  &&  abs_real(W.YY) <= radius_ );
 #else
@@ -68,7 +68,7 @@ bool SpaceCylinder::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
+    const real RT = W.normYZSqr();
     return ( abs_real(W.XX) + rad < half_  &&  RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
     return ( abs_real(W.XX) + rad < half_  &&  abs_real(W.YY) <= radius_-rad );

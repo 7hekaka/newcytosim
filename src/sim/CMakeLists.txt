@@ -15,6 +15,7 @@ set(SOURCES_SPACES
     spaces/space_dynamic_prop.cc
     spaces/space_dynamic_ellipse.cc
     spaces/space_dynamic_sphere.cc
+    spaces/space_dynamic_disc.cc
     spaces/space_force.cc
     spaces/space_polygonZ.cc
     spaces/space_tee.cc

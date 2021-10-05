@@ -63,7 +63,7 @@ real SpaceCylinderP::volume() const
 bool SpaceCylinderP::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
+    const real RT = W.normYZSqr();
     return ( RT <= square(radius_) );
 #elif ( DIM > 1 )
     return ( abs_real(W.YY) <= radius_ );
@@ -77,7 +77,7 @@ bool SpaceCylinderP::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    const real RT = W.YY * W.YY + W.ZZ * W.ZZ;
+    const real RT =W.normYZSqr();
     return ( RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
     return ( abs_real(W.YY) <= radius_-rad );

@@ -6,23 +6,24 @@
 #include "cymdef.h"
 
 #include "space.h"
-#include "space_force.h"
-#include "space_square.h"
-#include "space_sphere.h"
-#include "space_polygon.h"
-#include "space_polygonZ.h"
-#include "space_capsule.h"
 #include "space_banana.h"
-#include "space_torus.h"
-#include "space_dice.h"
-#include "space_strip.h"
-#include "space_periodic.h"
-#include "space_ellipse.h"
+#include "space_capsule.h"
 #include "space_cylinder.h"
 #include "space_cylinderZ.h"
 #include "space_cylinderP.h"
+#include "space_dice.h"
+#include "space_disc.h"
+#include "space_ellipse.h"
+#include "space_force.h"
+#include "space_periodic.h"
+#include "space_polygon.h"
+#include "space_polygonZ.h"
 #include "space_ring.h"
+#include "space_sphere.h"
+#include "space_square.h"
+#include "space_strip.h"
 #include "space_tee.h"
+#include "space_torus.h"
 
 #if NEW_SPACES
 #include "space_mesh.h"
@@ -70,6 +71,7 @@
  `cylinderZ`   | SpaceCylinderZ       | radius bottom top
  `cylinderP`   | SpaceCylinderP       | length radius
  `ring`        | SpaceRing            | length radius
+ `disc`        | SpaceDisc            | radius bottom top
  `tee`         | SpaceTee             | length radius junction arm
  `mesh`        | SpaceMesh            | file_name
  
@@ -101,6 +103,7 @@ Space * SpaceProp::newSpace() const
     if ( s=="periodic" )                       return new SpacePeriodic(this);
     if ( s=="ellipse" || s=="ellipsoid" )      return new SpaceEllipse(this);
 #if ( DIM >= 3 )
+    if ( s=="disc" )                           return new SpaceDisc(this);
     if ( s=="cubic" )                          return new SpaceSquare(this);
     if ( s=="cylinder" )                       return new SpaceCylinder(this);
     if ( s=="cylinderZ" )                      return new SpaceCylinderZ(this);

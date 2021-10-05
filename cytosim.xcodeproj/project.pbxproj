@@ -62,6 +62,8 @@
 		BB109D3823D0788200805F16 /* fiber_disp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD4BB391007F2D300D00914 /* fiber_disp.cc */; };
 		BB1121841549B72B0031CC48 /* shackle_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1121821549B72B0031CC48 /* shackle_long.cc */; };
 		BB1121851549B72B0031CC48 /* shackle_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1121831549B72B0031CC48 /* shackle_long.h */; };
+		BB151D64270C85F2003ECD4E /* space_dynamic_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */; };
+		BB151D65270C85F2003ECD4E /* space_dynamic_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */; };
 		BB171C330B3DEBE700CFFC3B /* fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB171C310B3DEBE700CFFC3B /* fiber.h */; };
 		BB171C340B3DEBE700CFFC3B /* fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB171C320B3DEBE700CFFC3B /* fiber.cc */; };
 		BB1749A707D798E600BC7BDC /* lattice.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1749A507D798E600BC7BDC /* lattice.h */; };
@@ -1371,6 +1373,8 @@
 		BB1121821549B72B0031CC48 /* shackle_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shackle_long.cc; path = couples/shackle_long.cc; sourceTree = "<group>"; };
 		BB1121831549B72B0031CC48 /* shackle_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shackle_long.h; path = couples/shackle_long.h; sourceTree = "<group>"; };
 		BB1227AE114FB8640042589A /* test_blas.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_blas.cc; path = src/test/test_blas.cc; sourceTree = SOURCE_ROOT; };
+		BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_disc.h; path = spaces/space_dynamic_disc.h; sourceTree = "<group>"; };
+		BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_disc.cc; path = spaces/space_dynamic_disc.cc; sourceTree = "<group>"; };
 		BB171C310B3DEBE700CFFC3B /* fiber.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = fiber.h; path = src/sim/fiber.h; sourceTree = SOURCE_ROOT; };
 		BB171C320B3DEBE700CFFC3B /* fiber.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fiber.cc; path = src/sim/fiber.cc; sourceTree = SOURCE_ROOT; };
 		BB1749A407D798E600BC7BDC /* lattice.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = lattice.cc; path = src/sim/lattice.cc; sourceTree = SOURCE_ROOT; };
@@ -1624,8 +1628,8 @@
 		BB805D61241A3F1500B62699 /* space_dynamic_sphere.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_sphere.h; path = spaces/space_dynamic_sphere.h; sourceTree = "<group>"; };
 		BB805D6A241A5A5F00B62699 /* space_lid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_lid.h; path = spaces/space_lid.h; sourceTree = "<group>"; };
 		BB805D6B241A5A5F00B62699 /* space_lid.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_lid.cc; path = spaces/space_lid.cc; sourceTree = "<group>"; };
-		BB805D6C241A5A5F00B62699 /* space_disc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_disc.h; path = spaces/space_disc.h; sourceTree = "<group>"; };
-		BB805D6D241A5A5F00B62699 /* space_disc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_disc.cc; path = spaces/space_disc.cc; sourceTree = "<group>"; };
+		BB805D6C241A5A5F00B62699 /* space_disc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = space_disc.h; sourceTree = "<group>"; };
+		BB805D6D241A5A5F00B62699 /* space_disc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = space_disc.cc; sourceTree = "<group>"; };
 		BB81B868219EE37D009CA402 /* play_mouse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = play_mouse.cc; sourceTree = "<group>"; };
 		BB81B86A219EE55F009CA402 /* play_keys.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = play_keys.cc; sourceTree = "<group>"; };
 		BB8481B0158348E80076C8C2 /* couple_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = couple_long.cc; path = couples/couple_long.cc; sourceTree = "<group>"; };
@@ -2852,8 +2856,8 @@
 				BBF283282431EC0F00FADDD8 /* space_dynamic_prop.cc */,
 				BB805D6A241A5A5F00B62699 /* space_lid.h */,
 				BB805D6B241A5A5F00B62699 /* space_lid.cc */,
-				BB805D6C241A5A5F00B62699 /* space_disc.h */,
-				BB805D6D241A5A5F00B62699 /* space_disc.cc */,
+				BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */,
+				BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */,
 				BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */,
 				BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */,
 				BB805D61241A3F1500B62699 /* space_dynamic_sphere.h */,
@@ -2894,6 +2898,8 @@
 				E2F6428715D01466009B7C31 /* space_cylinderP.cc */,
 				BB8838C410B48EF900A4028F /* space_cylinderZ.h */,
 				BB8838C310B48EF900A4028F /* space_cylinderZ.cc */,
+				BB805D6C241A5A5F00B62699 /* space_disc.h */,
+				BB805D6D241A5A5F00B62699 /* space_disc.cc */,
 				BB8838C610B48EF900A4028F /* space_dice.h */,
 				BB8838C510B48EF900A4028F /* space_dice.cc */,
 				BB8838C810B48EF900A4028F /* space_ellipse.h */,
@@ -3727,6 +3733,7 @@
 				BB7191860EF1CD9900CED9E2 /* isometry.h in Headers */,
 				BB6485F2205803BB005F2CD1 /* gmres.h in Headers */,
 				BB7191870EF1CD9900CED9E2 /* matrix.h in Headers */,
+				BB151D64270C85F2003ECD4E /* space_dynamic_disc.h in Headers */,
 				BB3DA1DF254C8F0300226B81 /* object_pool.h in Headers */,
 				BB7191890EF1CD9900CED9E2 /* linear_solvers.h in Headers */,
 				BB71918A0EF1CD9900CED9E2 /* sparmatsymblk.h in Headers */,
@@ -4867,6 +4874,7 @@
 				BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */,
 				BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */,
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,
+				BB151D65270C85F2003ECD4E /* space_dynamic_disc.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,
 				BB19DA9F231BF792001488A5 /* matrix34.cc in Sources */,
 				BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */,

@@ -60,12 +60,12 @@ Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom,
             iss >> s;
         }
 #endif
-        if ( s=="disc" )                  return new SpaceDynamicProp(nom);
-        if ( s=="dynamic_sphere" )        return new SpaceDynamicProp(nom);
-        if ( s=="lid"  )                  return new SpaceDynamicProp(nom);
-        if ( s=="dynamic_ellipse")        return new SpaceDynamicProp(nom);
+        if ( s=="lid" )              return new SpaceDynamicProp(nom);
+        if ( s=="dynamic_disc" )     return new SpaceDynamicProp(nom);
+        if ( s=="dynamic_sphere" )   return new SpaceDynamicProp(nom);
+        if ( s=="dynamic_ellipse")   return new SpaceDynamicProp(nom);
 #if BACKWARD_COMPATIBILITY < 50
-        if ( s=="contractile" )           return new SpaceDynamicProp(nom);
+        if ( s=="contractile" )      return new SpaceDynamicProp(nom);
 #endif
         return new SpaceProp(nom);
     }

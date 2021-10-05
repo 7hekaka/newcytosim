@@ -11,7 +11,7 @@
 
 // include spaces that use SpaceDynamicProp
 #include "space_lid.h"
-#include "space_disc.h"
+#include "space_dynamic_disc.h"
 #include "space_dynamic_sphere.h"
 #include "space_dynamic_ellipse.h"
 
@@ -43,7 +43,7 @@
  SHAPE              | Class                | PARAMETER        |
  -------------------|----------------------|--------------------
  `lid`              | SpaceLid             | width height
- `disc`             | SpaceDisc            | radius
+ `dynamic_disc`     | SpaceDynamicDisc     | radius
  `dynamic_sphere`   | SpaceDynamicSphere   | radius
  `dynamic_ellipse`  | SpaceDynamicEllipse  | DIM lengths
  
@@ -67,7 +67,7 @@ Space * SpaceDynamicProp::newSpace() const
 {
     const std::string& s = SpaceProp::shape;
     if ( s=="lid" )                   return new SpaceLid(this);
-    if ( s=="disc" )                  return new SpaceDisc(this);
+    if ( s=="dynamic_disc" )          return new SpaceDynamicDisc(this);
     if ( s=="dynamic_sphere" )        return new SpaceDynamicSphere(this);
     if ( s=="dynamic_ellipse" )       return new SpaceDynamicEllipse(this);
 #if BACKWARD_COMPATIBILITY < 50
