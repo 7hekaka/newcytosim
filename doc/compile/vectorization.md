@@ -60,10 +60,6 @@ With Intel compiler (icpc):
 
 # SLURM submission
 
-If you compile with 'avx2' support on the EMBL SLURM cluster, you need to request nodes with `avx2` features. This is done with the SLURM option:
-
-    --constraint=avx2
-
 In `submit_slurm.py`, make sure this option is set in `sub()`
 
     def sub(exe):
@@ -71,9 +67,6 @@ In `submit_slurm.py`, make sure this option is set in `sub()`
         # specify memory, shell, minimum number of cores and queue
         cmd  = [subcmd, '--nodes=1', '--ntasks=1']
         ...
-        # request special hardware:
-        cmd += ['--constraint=avx2']
-  	   	...
   	   	 
 and also for any job arrays in `array()`:
 
@@ -82,9 +75,6 @@ and also for any job arrays in `array()`:
         # define parameters directly in the script:
         cmd  = ['#SBATCH --nodes=1']
         cmd += ['#SBATCH --ntasks=1']
-        ...
-        # request special hardware:
-        cmd += ['#SBATCH --constraint=avx2']
         ...
 
 # Troubleshooting

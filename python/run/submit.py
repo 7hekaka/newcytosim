@@ -122,8 +122,6 @@ def sub(exe):
     # define signals sent if time is exceeded:
     cmd += ['--signal=15@120']
     cmd += ['--signal=2@60']
-    # request special hardware:
-    #cmd += ['--constraint=avx2']
     # redirect stderr and sdtout to files:
     cmd += ['--output='+jdir+'/logs/out']
     cmd += ['--error='+jdir+'/logs/err']
@@ -146,8 +144,6 @@ def array(jobcnt):
     # define signals sent if time is exceeded:
     cmd += ['#SBATCH --signal=INT@60']
     cmd += ['#SBATCH --signal=TERM@120']
-    # request special hardware:
-    #cmd += ['#SBATCH --constraint=avx2']
     # redirect stderr and sdtout to files:
     cmd += ['#SBATCH --output='+jdir+'/logs/%a.out']
     cmd += ['#SBATCH --error='+jdir+'/logs/%a.err']

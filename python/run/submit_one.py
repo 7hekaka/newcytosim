@@ -30,7 +30,7 @@ import sys, os, subprocess, tempfile
 
 # default parameters for submission:
 submit  = 'sbatch'
-queue   = 'skylake'
+queue   = 'icelake'
 runtime = '1:00:00'   # 1 hour
 memory  = '4096'      # in MB
 ncpu    = 1           # nb of threads per job
@@ -73,8 +73,6 @@ def sub(file):
     # define signals sent if time is exceeded:
     cmd += ['--signal=15@120']
     cmd += ['--signal=2@60']
-    # request special hardware:
-    cmd += ['--constraint=avx2']
     # redirect stderr and sdtout to files:
     cmd += ['--output='+file+'.out']
     cmd += ['--error='+file+'.err']
