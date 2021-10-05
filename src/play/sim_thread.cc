@@ -150,6 +150,7 @@ void SimThread::extend_run()
 {
     assert_true( isChild() );
     try {
+        simul_.parser_ = this;
         Parser::execute_run(1<<20);
     }
     catch( Exception & e ) {
@@ -157,6 +158,7 @@ void SimThread::extend_run()
         simul_.relax();
         //flashText("Error: %s", e.what());
     }
+    simul_.parser_ = nullptr;
     hold_callback();
 }
 
