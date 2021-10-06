@@ -70,6 +70,7 @@ void Simul::report_wrap(std::ostream& out, std::string const& arg, Glossary& opt
 {
     std::streamsize p = out.precision();
     out.precision(6);
+    //out << "% start\n";
     out << "% time " << std::fixed << prop->time;
     out.precision(p);
     out << "\n% report " << arg;
@@ -2148,7 +2149,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel, bool com) const
         }
     }
     
-    if ( 1 )
+    if ( com )
     {
         out << COM << ljust("single", 2, 2);
         out << SEP << "total";
@@ -2550,7 +2551,7 @@ void Simul::reportCouple(std::ostream& out, Property const* sel, bool com) const
         }
     }
     
-    if ( 1 )
+    if ( com )
     {
         out << COM << ljust("couple", 2, 2);
         out << SEP << "total";
@@ -2585,7 +2586,8 @@ void Simul::reportCouple(std::ostream& out, Property const* sel, bool com) const
  */
 void Simul::reportCoupleHands(std::ostream& out, Property const* sel, bool com) const
 {
-    out << COM << "hand_id" << SEP << rjust("hand_name", 2, 1);
+    if ( com )
+        out << COM << "hand_id" << SEP << rjust("hand_name", 2, 1);
     
     for ( Property const* i : properties.find_all("hand") )
     {
@@ -2595,9 +2597,11 @@ void Simul::reportCoupleHands(std::ostream& out, Property const* sel, bool com) 
     }
     out << '\n';
 
-    out << COM << "class_id" << SEP << rjust("couple_name", 2, 1);
-    out << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
-
+    if ( com )
+    {
+        out << COM << "class_id" << SEP << rjust("couple_name", 2, 1);
+        out << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
+    }
     for ( Property const* i : properties.find_all("couple") )
     {
         if ( sel && i != sel )
