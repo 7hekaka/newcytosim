@@ -2,7 +2,7 @@
 #
 # collect.py renames files from subdirectories
 #
-# Copyright F. Nedelec, 2007--2020
+# Copyright F. Nedelec, 2007--2021
 
 
 """
@@ -48,7 +48,7 @@ Examples:
     collect.py run%%%%/config.cym config*.cym
        will create directories `run????` and move the `config*.cym` files into them
     
-F. Nedelec, 2012--2018. Last modified 2.10.2017
+F. Nedelec, 2012--2021. Last modified 6.10.2021
 """
 
 
@@ -73,42 +73,45 @@ def copy_recursive(src, dst):
             copy_recursive(s, d)
 
 
-def main(args):
-    """rename files"""
-    do_copy = False
-    arg = args.pop(0);
-    # check if 'copy' specified before pattern
-    if arg=='-c' or arg=='--copy' or arg=='copy=1':
-        do_copy = True
-        pattern = args.pop(0);
-    else:
-        pattern = arg
+def validate_pattern(arg):
     # check validity of the pattern
-    if os.path.isfile(pattern):
+    if os.path.isfile(arg):
         sys.stderr.write("Error: first argument should be the pattern used to build output file name")
-        return 1
+        sys.exit(1)
     try:
-        res = ( pattern % 0 )
+        res = ( arg % 0 )
     except:
         # check for repeated '%' character:
-        for n in range(10,0,-1):
-            s = pattern.find('%'*n)
-            if s > 0:
-                pattern = pattern.replace('%'*n, '%0'+str(n)+'i', 1);
+        c = arg.count('%')
+        for n in range(c,0,-1):
+            if arg.find('%'*n) > 0:
+                arg = arg.replace('%'*n, '%0'+str(n)+'i', 1);
                 break
-        try:
-            res = ( pattern % 0 )
-        except:
-            sys.stderr.write("Error: the pattern should accept an integer: eg. '%04i'\n")
-            return 1
+    try:
+        res = ( arg % 0 )
+    except:
+        sys.stderr.write("Error: the pattern should accept an integer: eg. '%04i'\n")
+        sys.exit(1)
     for c in res:
         if curses.ascii.isspace(c):
             sys.stderr.write("Error: the pattern includes or generates white space character\n")
-            return 1
-    # go
-    paths = []
-    idx = 0
+            sys.exit(1)
+    return arg
+
+
+def main(args):
+    """rename files"""
+    do_copy = False
+    arg = args[0]
+    # check if 'copy' specified before pattern
+    if arg=='-c' or arg=='--copy' or arg=='copy=1':
+        do_copy = True
+        args.pop(0);
+    # get pattern for moving files:
+    pattern = validate_pattern(args.pop(0))
     # parse arguments:
+    idx = 0
+    paths = []
     for arg in args:
         if arg=='-c' or arg=='--copy' or arg=='copy=1':
             do_copy = True
@@ -119,7 +122,7 @@ def main(args):
         else:
             sys.stderr.write("Error: '%s' is not a file or directory" % arg)
             return 1
-    # process all files
+    # process all files:
     res = []
     for src in paths:
         while idx < 1000000:
