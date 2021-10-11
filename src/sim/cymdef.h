@@ -19,11 +19,9 @@
 // enable compact trajectory format created on 23/06/2021
 /** This makes the trajectory files smaller, at the expense of precision
  This option is normally not desired, expect to compress old simulations files */
-#define COMPACT_STORAGE 0
+#define NEW_COMPACT_STORAGE 0
 
-/** 
- Enables advanced Space
- */
+/// Enables support for some advanced Space class
 #define NEW_SPACES 1
 
 

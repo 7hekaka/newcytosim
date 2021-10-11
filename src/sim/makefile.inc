@@ -75,8 +75,6 @@ OBJ_CYTOLIBG:=$(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOLIB)) $(OBJ_GRAFIX:%.o=%G.o)
 #----------------------------targets--------------------------------------------
 
 INC_BM:=-Isrc/base -Isrc/math
-INC_BMD=$(addprefix -Isrc/, base math sim sim/spaces disp)
-INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
 
 #--- normal build:
 
@@ -145,8 +143,35 @@ cytolibGD3.a: $(OBJ_CYTOLIBG:%.o=%D3.o) | lib
 
 #----------------------------target rules---------------------------------------
 
-$(OBJ_CYTOLIB): %.o: %.cc %.h | build
+INC_BMS=$(addprefix -Isrc/, base math sim)
+
+INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
+
+$(OBJ_SPACE): %.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/spaces -c $< -o build/$@
+
+$(OBJ_HANDS): %.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o build/$@
+
+$(OBJ_DIGITS): %.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o build/$@
+
+$(OBJ_FIBERS): %.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/fibers -c $< -o build/$@
+
+$(OBJ_SINGLES): %.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/singles -c $< -o build/$@
+
+$(OBJ_COUPLES): %.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/couples -c $< -o build/$@
+
+$(OBJ_ORGANIZERS): %.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/organizers -c $< -o build/$@
+
+$(OBJ_SIM): %.o: %.cc %.h | build
 	$(COMPILE) $(INC_SIM) -c $< -o build/$@
+
+#----------------------------target rules---------------------------------------
 
 $(OBJ_CYTOLIB1): %D1.o: %.cc %.h | build
 	$(COMPILE) -DDIM=1 $(INC_SIM) -c $< -o build/$@
@@ -159,6 +184,8 @@ $(OBJ_CYTOLIB3): %D3.o: %.cc %.h | build
 
 
 # builds with DISPLAY enabled:
+
+INC_BMD=$(addprefix -Isrc/, base math sim sim/spaces disp)
 
 $(OBJ_GRAFIX:%.o=%G.o): %G.o: %.cc %.h | build
 	$(COMPILE) -DDISPLAY $(INC_BMD) -c $< -o build/$@

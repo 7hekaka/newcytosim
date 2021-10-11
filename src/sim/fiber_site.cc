@@ -126,7 +126,7 @@ void FiberSite::write(Outputter& out) const
         else
 #endif
         {
-#if !COMPACT_STORAGE
+#if !NEW_COMPACT_STORAGE
             // normal way
             Object::writeReference(out, Fiber::TAG, hFiber->identity());
             out.writeFloat(hAbs);

@@ -100,9 +100,8 @@ void ViewProp::read(Glossary& glos)
     
     glos.set(multisample, "multisample");
     glos.set(multisample, "samples");
-#if BACKWARD_COMPATIBILITY < 100
+    // harmless backward compatibility
     glos.set(multisample, "gl_samples");
-#endif
     glos.set(label,       "label");
     glos.set(draw_memo,   "draw_memo");
     

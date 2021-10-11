@@ -11,8 +11,6 @@
 #include "simul.h"
 #include "space.h"
 #include "modulo.h"
-#include "aster.h"
-#include "aster_prop.h"
 
 extern Modulo const* modulo;
 

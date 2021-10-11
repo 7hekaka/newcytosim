@@ -1690,7 +1690,7 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
 
 void Fiber::write(Outputter& out) const
 {
-#if !COMPACT_STORAGE
+#if !NEW_COMPACT_STORAGE
     // normal way
     writeHeader(out, tag());
     Chain::write(out);

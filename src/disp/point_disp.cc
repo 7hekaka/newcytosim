@@ -467,10 +467,9 @@ void PointDisp::read(Glossary& glos)
         width = 2 * size / 3;
     else
         glos.set(size, "point_size");
-#if BACKWARD_COMPATIBILITY < 100
+    // harmless backward compatibility
     glos.set(size, "points");
     glos.set(shape, "points", 1);
-#endif
 
     glos.set(width, "width");
     glos.set(style, "style");
