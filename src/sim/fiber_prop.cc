@@ -503,28 +503,42 @@ void FiberProp::complete(Simul const& sim)
     
     if ( viscosity <= 0 )
         throw InvalidParameter("fiber:viscosity or simul:viscosity should be defined > 0");
-    
-    confine_space_ptr = sim.findSpace(confine_space);
-    if ( confine_space_ptr )
-        confine_space = confine_space_ptr->name();
-    else if ( confine != CONFINE_OFF )
+
+    if ( confine != CONFINE_OFF )
     {
-        if ( sim.primed() )
-            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-        //confine = CONFINE_OFF;
+        confine_space_ptr = sim.findSpace(confine_space);
+        if ( confine_space_ptr )
+            confine_space = confine_space_ptr->name();
+        else
+        {
+            if ( sim.primed() )
+                throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+            confine = CONFINE_OFF;
+        }
     }
+    else
+        confine_space_ptr = nullptr;
     
-    if ( sim.primed() && confine && confine_stiffness < 0 )
-        throw InvalidParameter(name()+":confine_stiffness must be specified and >= 0");
+    if ( confine_stiffness < 0 )
+        throw InvalidParameter(name()+":confine_stiffness must be >= 0");
 
 #if NEW_FIBER_CONFINE2
-    confine2_space_ptr = sim.findSpace(confine2_space);
-    if ( confine2_space_ptr )
-        confine2_space = confine2_space_ptr->name();
-    else if ( sim.primed() && confine2 != CONFINE_OFF )
-        throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
-    
-    if ( sim.primed() && confine2 && confine2_stiffness < 0 )
+    if ( confine2 != CONFINE_OFF )
+    {
+        confine2_space_ptr = sim.findSpace(confine2_space);
+        if ( confine2_space_ptr )
+            confine2_space = confine2_space_ptr->name();
+        else
+        {
+            if ( sim.primed() )
+                throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
+            confine2 = CONFINE_OFF;
+        }
+    }
+    else
+        confine2_space_ptr = nullptr;
+
+    if ( confine2_stiffness < 0 )
         throw InvalidParameter(name()+":confine2_stiffness must be specified and >= 0");
 #endif
     

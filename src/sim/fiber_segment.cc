@@ -3,7 +3,6 @@
 #include "fiber_segment.h"
 #include "space.h"
 #include "fiber.h"
-#include "simul.h"
 #include "modulo.h"
 
 extern Modulo const* modulo;

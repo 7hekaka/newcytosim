@@ -133,16 +133,20 @@ void SingleProp::read(Glossary& glos)
 
 void SingleProp::complete(Simul const& sim)
 {
-    confine_space_ptr = sim.findSpace(confine_space);
-    
-    if ( confine_space_ptr )
-        confine_space = confine_space_ptr->name();
-    else if ( confine != CONFINE_OFF )
+    if ( confine != CONFINE_OFF )
     {
-        if ( sim.primed() )
-            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-        //confine = CONFINE_OFF;
+        confine_space_ptr = sim.findSpace(confine_space);
+        if ( confine_space_ptr )
+            confine_space = confine_space_ptr->name();
+        else
+        {
+            if ( sim.primed() )
+                throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+            confine = CONFINE_OFF;
+        }
     }
+    else
+        confine_space_ptr = nullptr;
 
     if ( hand.empty() )
         throw InvalidParameter(name()+":hand must be defined");

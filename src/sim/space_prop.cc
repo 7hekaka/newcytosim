@@ -2,7 +2,6 @@
 #include "space_prop.h"
 #include "glossary.h"
 #include "simul_prop.h"
-#include "simul.h"
 #include "cymdef.h"
 
 #include "space.h"
@@ -200,7 +199,7 @@ void SpaceProp::read(Glossary& glos)
 
 //------------------------------------------------------------------------------
 
-void SpaceProp::complete(Simul const& sim)
+void SpaceProp::complete(Simul const&)
 {
     if ( shape.empty() )
         throw InvalidParameter("space:shape must be defined");

@@ -325,8 +325,8 @@ Space const* Simul::findSpace(std::string const& str) const
     
     if ( sp )
         return spaces.findObject(sp);
-    else
-        return nullptr;
+    
+    return nullptr;
 }
 
 /**

@@ -97,18 +97,20 @@ void SolidProp::complete(Simul const& sim)
     if ( viscosity <= 0 )
         throw InvalidParameter("bead:viscosity or simul:viscosity should be defined > 0");
     
-    confine_space_ptr = sim.findSpace(confine_space);
-    
-    if ( confine_space_ptr )
-        confine_space = confine_space_ptr->name();
-    else if ( confine != CONFINE_OFF )
+    if ( confine != CONFINE_OFF )
     {
-        if ( sim.primed() )
-            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-        //confine = CONFINE_OFF;
+        confine_space_ptr = sim.findSpace(confine_space);
+        if ( confine_space_ptr )
+            confine_space = confine_space_ptr->name();
+        else
+        {
+            if ( sim.primed() )
+                throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+            confine = CONFINE_OFF;
+        }
     }
     
-    if ( sim.primed() && confine_stiffness < 0 )
+    if ( confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
     
     if ( sim.primed() && steric && !sim.prop->steric_mode )

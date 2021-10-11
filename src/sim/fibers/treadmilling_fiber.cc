@@ -5,7 +5,6 @@
 #include "treadmilling_fiber_prop.h"
 #include "exceptions.h"
 #include "iowrapper.h"
-#include "simul.h"
 #include "space.h"
 
 

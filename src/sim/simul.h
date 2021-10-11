@@ -279,7 +279,7 @@ public:
     /// find a Sphere by name
     Sphere *     findSphere(std::string s) { return Sphere::toSphere(spheres.findObject(s, "sphere")); }
     
-    /// return first Space with given name
+    /// return first Space with given name, or return nullptr
     Space const* findSpace(std::string const&) const;
     
     /// Parse a text containing cytosim commands
