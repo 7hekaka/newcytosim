@@ -1,7 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "dim.h"
-#include "cymdef.h"
 #include "mecafil.h"
 #include "blas.h"
 #include "lapack.h"
@@ -367,7 +366,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
              Link fiber end points in the same way as consecutive points triplets,
              making the fiber mechanically homogeneous for bending elasticity
              */
-            const size_t L = nbPoint() - 2;
+            const size_t L = nbPoints() - 2;
             add_rigidity(L+1, 0, 1, X, iRigidity, Y);
             add_rigidity(L, L+1, 0, X, iRigidity, Y);
         }

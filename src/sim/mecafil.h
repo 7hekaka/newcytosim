@@ -3,7 +3,7 @@
 #define MECAFIL_H
 
 #include "chain.h"
-#include "fiber_prop.h"  // needed for NEW_FIBER_LOOP
+#include "cymdef.h"  // needed for NEW_FIBER_LOOP
 
 /**
  If the keyword below is defined, the viscous drag of the fibers
