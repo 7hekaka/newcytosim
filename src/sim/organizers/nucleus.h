@@ -73,11 +73,8 @@ public:
 
     //------------------------------ read/write --------------------------------
     
-    /// a unique character identifying the class
-    static const ObjectTag TAG = 'n';
-    
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG_NUCLEUS; }
     
     /// return associated Property
     Property const* property() const { return prop; }

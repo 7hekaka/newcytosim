@@ -272,12 +272,9 @@ public:
     PointDisp const* disp() const { if ( asSolid ) return asSolid->prop->disp; return nullptr; }
 
     //--------------------------------------------------------------------------
-
-    /// a unique character identifying the class
-    static const ObjectTag TAG = 'a';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return Organizer::TAG_ASTER; }
 
     /// return associated Property
     Property const* property() const { return prop; }
@@ -285,7 +282,7 @@ public:
     /// convert pointer to Aster* if the conversion seems valid; returns 0 otherwise
     static Aster* toAster(Object * obj)
     {
-        if ( obj  &&  obj->tag() == TAG )
+        if ( obj  &&  obj->tag() == Organizer::TAG_ASTER )
             return static_cast<Aster*>(obj);
         return nullptr;
     }

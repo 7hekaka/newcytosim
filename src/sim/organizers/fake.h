@@ -65,12 +65,9 @@ public:
     
     /// return display parameters
     PointDisp const* disp() const { if ( fkSolid ) return fkSolid->prop->disp; return nullptr; }
-
-    /// a unique character identifying the class
-    static const ObjectTag TAG = 'k';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG_FAKE; }
     
     /// return associated Property
     Property const* property() const { return prop; }

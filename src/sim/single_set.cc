@@ -108,7 +108,7 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
         SingleProp * p = simul_.findProperty<SingleProp>("single", pid);
         return p->newSingle();
     }
-    else if ( tag == Wrist::TAG )
+    else if ( tag == Single::TAG_WRIST )
     {
         SingleProp * p = simul_.findProperty<SingleProp>("single", pid);
         return p->newWrist(nullptr, 0);
@@ -215,7 +215,7 @@ void SingleSet::relinkD(Single * obj)
 
 void SingleSet::link(Object * obj)
 {
-    assert_true( obj->tag()==Single::TAG || obj->tag()==Wrist::TAG );
+    assert_true( obj->tag()==Single::TAG || obj->tag()==Single::TAG_WRIST );
     assert_true( obj->objset() == this );
 
     if ( static_cast<Single*>(obj)->attached() )

@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "fiber_segment.h"
+#include "map.h"  // for GRID_HAS_PERIODIC
 #include "space.h"
 #include "fiber.h"
 #include "modulo.h"

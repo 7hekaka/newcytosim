@@ -69,8 +69,8 @@ private:
     
 public:
     
-    /// Object::TAG = 'v' represents the 'void' pointer
-    static const ObjectTag TAG = 'v';
+    /// Object::NULL_TAG = 'v' is the 'void' pointer
+    static const ObjectTag NULL_TAG = 'v';
     
     /// build a reference string by concatenating (tag, property_number, ObjectID)
     static std::string reference(ObjectTag, size_t, ObjectID);
@@ -103,7 +103,7 @@ public:
     
     
     /// a character identifying the class of this object
-    virtual ObjectTag tag() const { return TAG; }
+    virtual ObjectTag tag() const { return NULL_TAG; }
     
     /// Property associated with the Object
     virtual Property const* property() const = 0;

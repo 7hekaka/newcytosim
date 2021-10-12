@@ -11,7 +11,6 @@
 #include "space_prop.h"
 #include "space.h"
 #include "sphere.h"
-#include "wrist.h"
 #include "meca.h"
 #include "modulo.h"
 #include "simul.h"

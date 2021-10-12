@@ -51,25 +51,25 @@ Property* OrganizerSet::newProperty(const std::string& cat, const std::string& n
 
 Object * OrganizerSet::newObject(const ObjectTag tag, PropertyID pid)
 {
-    if ( tag == Aster::TAG )
+    if ( tag == Organizer::TAG_ASTER )
     {
         AsterProp * p = simul_.findProperty<AsterProp>("aster", pid);
         return new Aster(p);
     }
     
-    if ( tag == Bundle::TAG )
+    if ( tag == Organizer::TAG_BUNDLE )
     {
         BundleProp * p = simul_.findProperty<BundleProp>("bundle", pid);
         return new Bundle(p);
     }
     
-    if ( tag == Nucleus::TAG )
+    if ( tag == Organizer::TAG_NUCLEUS )
     {
         NucleusProp * p = simul_.findProperty<NucleusProp>("nucleus", pid);
         return new Nucleus(p);
     }
     
-    if ( tag == Fake::TAG )
+    if ( tag == Organizer::TAG_FAKE )
     {
         FakeProp * p = simul_.findProperty<FakeProp>("fake", pid);
         return new Fake(p);

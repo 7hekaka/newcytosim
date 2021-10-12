@@ -6,6 +6,8 @@
 #include <set>
 #include "tokenizer.h"
 #include "stream_func.h"
+#include "organizer.h"
+
 
 /// width of columns in formatted output, in number of characters
 static int column_width = 10;
@@ -1601,16 +1603,6 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
     accum.print(out, 1);
 }
 
-
-#include "motor_prop.h"
-
-real hand_speed(HandProp const* hp)
-{
-    if ( hp->activity == "move" )
-        return static_cast<MotorProp const*>(hp)->unloaded_speed;
-    return 0;
-}
-
 /**
  F. Nedelec, 18/08/2017
  */
@@ -1629,8 +1621,8 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
     HandProp const* hp1 = findProperty<HandProp>("hand", 1);
     HandProp const* hp2 = findProperty<HandProp>("hand", 2);
     
-    const real speedh1 = hand_speed(hp1);
-    const real speedh2 = hand_speed(hp2);
+    const real speedh1 = hp1->motorSpeed();
+    const real speedh2 = hp2->motorSpeed();
 
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
@@ -1804,7 +1796,7 @@ void Simul::reportAster(std::ostream& out) const
     
     for ( Organizer const* obj=organizers.first(); obj; obj=obj->next() )
     {
-        if ( obj->tag() == Aster::TAG )
+        if ( obj->tag() == Organizer::TAG_ASTER )
         {
             out << LIN << obj->property()->number();
             out << SEP << obj->identity();

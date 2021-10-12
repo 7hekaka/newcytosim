@@ -14,8 +14,9 @@
 
 #include "tubule.h"
 #include "fiber.h"
-#include "aster.h"
 #include "field.h"
+#include "event.h"
+#include "parser.h"
 
 extern Modulo const* modulo;
 
@@ -25,16 +26,6 @@ extern Modulo const* modulo;
 #include "simul_report.cc"
 #include "simul_solve.cc"
 #include "simul_solvef.cc"
-
-#include "nucleus.h"
-#include "fake.h"
-#include "wrist.h"
-#include "bundle.h"
-#include "space_strip.h"
-#include "space_periodic.h"
-#include "space_cylinderP.h"
-#include "event.h"
-#include "parser.h"
 
 #include <csignal>
 
@@ -363,30 +354,30 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
 {
     switch( tag )
     {
-        case        Couple::TAG:    return &couples;
-        case        Single::TAG:    return &singles;
-        case         Wrist::TAG:    return &singles;
-        case         Fiber::TAG:    return &fibers;
-        case     Fiber::TAG_ALT:    return &fibers;
-        case Fiber::TAG_DYNAMIC:    return &fibers;
-        case Fiber::TAG_LATTICE:    return &fibers;
-        case Fiber::TAG_FIBMESH:    return &fibers;
+        case        Couple::TAG: return &couples;
+        case        Single::TAG: return &singles;
+        case  Single::TAG_WRIST: return &singles;
+        case         Fiber::TAG: return &fibers;
+        case     Fiber::TAG_ALT: return &fibers;
+        case Fiber::TAG_DYNAMIC: return &fibers;
+        case Fiber::TAG_LATTICE: return &fibers;
+        case Fiber::TAG_FIBMESH: return &fibers;
 #if BACKWARD_COMPATIBILITY < 57
         case 'l': return &fibers; // TAG_LATTICE before 23/06/2021
         case 'L': return &fibers; // TAG_FIBMESH before 23/06/2021
 #endif
-        case          Bead::TAG:    return &beads;
-        case         Solid::TAG:    return &solids;
-        case        Sphere::TAG:    return &spheres;
-        case         Field::TAG:    return &fields;
-        case         Space::TAG:    return &spaces;
-        case        Tubule::TAG:    return &tubules;
-        case       Nucleus::TAG:    return &organizers;
-        case        Bundle::TAG:    return &organizers;
-        case         Aster::TAG:    return &organizers;
-        case          Fake::TAG:    return &organizers;
-        case         Event::TAG:    return &events;
-        case        Object::TAG:    return nullptr;
+        case          Bead::TAG: return &beads;
+        case         Solid::TAG: return &solids;
+        case        Sphere::TAG: return &spheres;
+        case         Field::TAG: return &fields;
+        case         Space::TAG: return &spaces;
+        case        Tubule::TAG: return &tubules;
+        case         Event::TAG: return &events;
+        case Organizer::TAG_NUCLEUS: return &organizers;
+        case Organizer::TAG_BUNDLE:  return &organizers;
+        case Organizer::TAG_FAKE:    return &organizers;
+        case Organizer::TAG_ASTER:   return &organizers;
+        case   Object::NULL_TAG: return nullptr;
     }
     return nullptr;
 }

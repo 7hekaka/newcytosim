@@ -157,8 +157,7 @@ static ObjectID readOldObjectID(Inputter& in, ObjectTag& tag)
     }
 #endif
     
-    // Object::TAG is the 'void' reference
-    if ( tag == Object::TAG )
+    if ( tag == Object::NULL_TAG )
         return 0;
     
     ObjectID id = 0;
@@ -234,8 +233,7 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         {
             char c = in.get_char();
             tag = c & LOW_BITS;
-            // Object::TAG is the 'void' reference
-            if ( tag == Object::TAG )
+            if ( tag == Object::NULL_TAG )
                 return 0;
             if ( c & HIGH_BIT )
                 id = in.readUInt32bin();
@@ -255,7 +253,7 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         do
             tag = in.get_char();
         while ( tag == ' ' );
-        if ( tag != Object::TAG )
+        if ( tag != Object::NULL_TAG )
             id = in.readUInt();
     }
     return id;
@@ -263,7 +261,7 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
 
 
 /**
- Read a fiber (new format 11.06.2021)
+ Read a fiber (format tryout 11.06.2021)
  */
 Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
 {
@@ -275,8 +273,7 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
 #endif
         id = readObjectID(in, tag);
     
-    // Object::TAG is the 'void' reference
-    if ( tag == Object::TAG )
+    if ( tag == Object::NULL_TAG )
         return nullptr;
 
 #if BACKWARD_COMPATIBILITY < 57
@@ -292,7 +289,7 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
 
 
 /**
- Read a fiber (new format 11.06.2021)
+ Read a fiber (format tryout 11.06.2021)
  */
 Object * Simul::readReference(Inputter& in, ObjectTag& tag)
 {
@@ -304,8 +301,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
 #endif
         id = readObjectID(in, tag);
     
-    // Object::TAG is the 'void' reference
-    if ( tag == Object::TAG || id == 0 )
+    if ( tag == Object::NULL_TAG || id == 0 )
         return nullptr;
 
     const ObjectSet * set = findSetT(tag);

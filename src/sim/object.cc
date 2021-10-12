@@ -125,8 +125,8 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
         }
 #else
         /*
-         aborted format change on 11.06.2021
-         combine `g` and 'id', leaving 3 bytes and at most 16777216 objects
+         format tryout on 11.06.2021:
+         combine `tag` and 'id', leaving 3 bytes and at most 16777216 objects
          Note that the topmost bit of ASCII is not used
          */
         out.writeUInt32(id|(uint32_t(g)<<24));
@@ -145,20 +145,20 @@ void Object::writeNullReference(Outputter& out)
     if ( out.binary() )
     {
 #if 1
-        out.writeChar(TAG);
+        out.writeChar(NULL_TAG);
 #else
         /*
-         format changed on 11.06.2021
-         combine `g` and 'id', leaving 3 bytes and at most 16777216 objects
+         format tryout on 11.06.2021:
+         combining `tag` and 'id', leaving 3 bytes and at most 16777216 objects
          Note that the topmost bit of ASCII is not used
          */
-        out.writeUInt32(uint32_t(TAG)<<24);
+        out.writeUInt32(uint32_t(NULL_TAG)<<24);
 #endif
     }
     else
     {
         out.writeChar(' ');
-        out.writeChar(TAG);
+        out.writeChar(NULL_TAG);
     }
 }
 

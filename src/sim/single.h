@@ -180,7 +180,10 @@ public:
 
     /// a unique character identifying the class
     static const ObjectTag TAG = 's';
-    
+   
+    /// a unique character identifying the class
+    static const ObjectTag TAG_WRIST = 'w';
+
     /// return unique character identifying the class
     ObjectTag tag() const { return TAG; }
     

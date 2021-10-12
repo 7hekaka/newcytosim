@@ -131,6 +131,9 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
     
+    /// return 'unload_speed' for the Motor class
+    real motorSpeed() const { return unloaded_speed; }
+
 };
 
 #endif

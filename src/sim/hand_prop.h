@@ -245,6 +245,9 @@ public:
     
     /// perform additional tests for the validity of parameters, given the elasticity
     virtual void checkStiffness(real stiff, real len, real mul, real kT) const;
+
+    /// return 'unload_speed' for the Motor class
+    virtual real motorSpeed() const { return 0; }
     
     /// Attachment rate per unit length of fiber
     real bindingSectionRate() const;

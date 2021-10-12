@@ -108,11 +108,17 @@ public:
     
     //--------------------------------------------------------------------------
     
+    /// character identifying each class
+    static const ObjectTag TAG_ASTER = 'a';
+    static const ObjectTag TAG_BUNDLE = 'u';
+    static const ObjectTag TAG_NUCLEUS = 'n';
+    static const ObjectTag TAG_FAKE = 'k';
+
     /// a static_cast<> of Object::next()
-    Organizer *   next() const { return static_cast<Organizer*>(nextO); }
+    Organizer * next() const { return static_cast<Organizer*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    Organizer *   prev() const { return static_cast<Organizer*>(prevO); }
+    Organizer * prev() const { return static_cast<Organizer*>(prevO); }
     
     //--------------------------------------------------------------------------
     

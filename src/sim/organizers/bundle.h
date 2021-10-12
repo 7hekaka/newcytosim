@@ -60,12 +60,9 @@ public:
     PointDisp const* disp() const { return nullptr; }
 
     //------------------------------ read/write --------------------------------
-
-    /// a unique character identifying the class in 
-    static const ObjectTag TAG = 'u';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag       tag() const { return TAG_BUNDLE; }
     
     /// return associated Property
     Property const* property() const { return prop; }

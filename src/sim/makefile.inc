@@ -2,10 +2,10 @@
 # Copyright 2018-- Francois J. Nedelec.
 
 
-OBJ_SPACE := space.o space_prop.o space_square.o space_sphere.o space_disc.o\
-             space_mesh.o space_dice.o space_tee.o space_torus.o space_polygon.o\
-             space_polygonZ.o space_ellipse.o space_cylinder.o space_ring.o\
-             space_cylinderZ.o space_capsule.o space_strip.o space_periodic.o\
+OBJ_SPACE := space.o space_prop.o space_set.o space_square.o space_sphere.o space_disc.o\
+             space_capsule.o space_dice.o space_tee.o space_torus.o space_polygon.o\
+             space_ellipse.o space_cylinder.o space_ring.o space_mesh.o\
+             space_cylinderZ.o space_polygonZ.o space_strip.o space_periodic.o\
              space_banana.o space_cylinderP.o space_lid.o space_force.o\
              space_dynamic_prop.o space_dynamic_sphere.o space_dynamic_ellipse.o\
              space_dynamic_disc.o
@@ -38,7 +38,7 @@ OBJ_COUPLES := couple.o couple_prop.o couple_set.o couple_long.o\
                shackle.o shackle_long.o shackle_prop.o\
                fork.o fork_prop.o
          
-OBJ_FIBERS := chain.o fiber.o mecafil.o fiber_prop.o fiber_set.o\
+OBJ_FIBERS := chain.o mecafil.o fiber.o fiber_prop.o fiber_set.o\
               fiber_segment.o fiber_site.o lattice.o\
               dynamic_fiber.o dynamic_fiber_prop.o\
               classic_fiber.o classic_fiber_prop.o\
@@ -52,9 +52,8 @@ OBJ_ORGANIZERS := organizer.o organizer_set.o \
 OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            sphere_prop.o sphere.o sphere_set.o\
            solid_prop.o solid.o solid_set.o bead.o bead_set.o\
-           field.o field_prop.o field_set.o\
+           field.o field_prop.o field_set.o event.o event_set.o\
            tubule_prop.o tubule.o tubule_set.o\
-           event.o event_set.o space_set.o\
            mecapoint.o interpolation.o interpolation4.o\
            meca.o fiber_grid.o point_grid.o locus_grid.o\
            simul_prop.o simul.o interface.o parser.o
@@ -141,11 +140,10 @@ cytolibGD3.a: $(OBJ_CYTOLIBG:%.o=%D3.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
-#----------------------------target rules---------------------------------------
+#-----------minimal include directories, DIM defined in 'dim.h'-----------------
 
 INC_BMS=$(addprefix -Isrc/, base math sim)
 
-INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
 
 $(OBJ_SPACE): %.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/spaces -c $< -o build/$@
@@ -169,9 +167,12 @@ $(OBJ_ORGANIZERS): %.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/organizers -c $< -o build/$@
 
 $(OBJ_SIM): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_SIM) -c $< -o build/$@
+	$(COMPILE) $(INC_BMS) -c $< -o build/$@
 
-#----------------------------target rules---------------------------------------
+#------------targets with 'DIM' defined in makefile-----------------------------
+
+INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
+
 
 $(OBJ_CYTOLIB1): %D1.o: %.cc %.h | build
 	$(COMPILE) -DDIM=1 $(INC_SIM) -c $< -o build/$@
@@ -183,19 +184,19 @@ $(OBJ_CYTOLIB3): %D3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o build/$@
 
 
-# builds with DISPLAY enabled:
+#---------------------targets with DISPLAY elements-----------------------------
 
-INC_BMD=$(addprefix -Isrc/, base math sim sim/spaces disp)
+INC_BMSD=$(addprefix -Isrc/, base math sim sim/spaces disp)
 
 $(OBJ_GRAFIX:%.o=%G.o): %G.o: %.cc %.h | build
-	$(COMPILE) -DDISPLAY $(INC_BMD) -c $< -o build/$@
+	$(COMPILE) -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 
 $(OBJ_GRAFIX:%.o=%GD1.o): %GD1.o: %.cc %.h | build
-	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMD) -c $< -o build/$@
+	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 
 $(OBJ_GRAFIX:%.o=%GD2.o): %GD2.o: %.cc %.h | build
-	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMD) -c $< -o build/$@
+	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 
 $(OBJ_GRAFIX:%.o=%GD3.o): %GD3.o: %.cc %.h | build
-	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMD) -c $< -o build/$@
+	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 

@@ -89,11 +89,8 @@ public:
 
     //--------------------------------------------------------------------------
     
-    /// the Wrist uses a specific TAG to distinguish itself from the Single
-    static const ObjectTag TAG = 'w';
-    
     /// return unique character identifying the class
-    ObjectTag    tag() const { return TAG; }
+    ObjectTag    tag() const { return TAG_WRIST; }
     
     /// read from file
     void    read(Inputter&, Simul&, ObjectTag);

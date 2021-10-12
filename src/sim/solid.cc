@@ -12,7 +12,7 @@
 #include "meca.h"
 #include "simul.h"
 #include "space.h"
-#include "wrist.h"
+#include "singles/wrist.h"
 #include "lapack.h"
 
 #if ( DIM >= 3 )
@@ -433,12 +433,11 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 Tokenizer::split_integer(num, str);
                 SingleProp * sip = sim.findProperty<SingleProp>("single", str);
                 
-                /* add Wrists anchored on the local coordinate system:
-                 we use unit vectors here since the Triad is build with 'rad' */
-                // we use unit vectors here since the Triad is build with 'rad'
+                //add Wrists anchored on the local coordinate system:
                 Vector pos = pts[inx-3];
                 for ( size_t i = 0; i < num; ++i )
                 {
+                    // we use unit vectors here since the Triad is build with 'rad'
                     Vector vec = normalize(pos+pos.randOrthoB(dev/rad));
                     res.push_back(new Wrist(sip, this, ref, vec));
                 }
