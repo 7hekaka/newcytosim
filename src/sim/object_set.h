@@ -205,7 +205,7 @@ public:
 };
 
 
-// This is declared here rather than in object.h for inlining
+// This is declared here rather than in object.cc to permit inlining
 inline Simul & Object::simul() const { return set_->simul_; }
 
 #endif
