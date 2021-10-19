@@ -8,7 +8,10 @@
 /// additional Property for TreadmillingFiber
 /**
  @ingroup Properties
- Assembly is continuous, and can occur at both ends.
+ Assembly is a continuous process, and can occur at both ends, typically:
+ 
+      delta_length = growing_speed * time_step
+ 
  */
 class TreadmillingFiberProp : public FiberProp
 {
@@ -26,22 +29,26 @@ public:
     /// see @ref TreadmillingFiber
 
     /// Characteristic force for polymer assembly
-    real    growing_force[2];
+    real growing_force[2];
     
     /// Speed of assembly
-    real    growing_speed[2];
+    real growing_speed[2];
     
     /// Speed of disassembly
-    real    shrinking_speed[2];
+    real shrinking_speed[2];
     
     /// @}
     
 private:
     
-    /// derived variables
-    real    growing_speed_dt[2];
-    real    growing_force_inv[2];
-    real    shrinking_speed_dt[2];
+    /// growing_speed * time_step
+    real growing_speed_dt[2];
+    
+    /// 1.0 / growing_force
+    real growing_force_inv[2];
+    
+    /// shrinking_speed * time_step
+    real shrinking_speed_dt[2];
     
 public:
     

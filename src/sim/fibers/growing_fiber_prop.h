@@ -9,7 +9,10 @@
 /// additional Property for GrowingFiber
 /**
  @ingroup Properties
- Assembly is continuous, and can occur at both ends.
+ Assembly is a continuous process, and can occur at both ends, typically:
+ 
+      delta_length = growing_speed * time_step
+ 
  The dynamic states of the end are ignored with this model.
  */
 class GrowingFiberProp : public FiberProp
@@ -45,13 +48,13 @@ public:
      In this equation, `free_polymer` represents the fraction of free monomers in [0,1].
      Antagonistic force is negative ( force < 0 ) if it is directed against fiber assembly.
      */
-    real    growing_speed[2];
+    real growing_speed[2];
     
     /// Constant term in the growing speed equation (can be negative or positive)
-    real    growing_off_speed[2];
+    real growing_off_speed[2];
 
     /// Characteristic force for polymer assembly
-    real    growing_force[2];
+    real growing_force[2];
 
     /// Flag to enable special dynamics in which growth is determined by the position of the fiber end
     /**
@@ -63,26 +66,26 @@ public:
 
      The shrinking speed is equal to the specified growing_speed.
      */
-    bool    shrink_outside[2];
+    bool shrink_outside[2];
     
     /// Shrinking speed of end that are outside, for option 'shrink_outside'
-    real    shrinking_speed[2];
+    real shrinking_speed[2];
 
     /// @}
     
 private:
     
-    /// derived variable
-    real    growing_speed_dt[2];
+    /// growing_speed * time_step
+    real growing_speed_dt[2];
     
-    /// derived variable
-    real    growing_off_speed_dt[2];
+    /// growing_off_speed * time_step
+    real growing_off_speed_dt[2];
     
     /// 1.0 / growing_force
-    real    growing_force_inv[2];
+    real growing_force_inv[2];
     
-    /// derived variable
-    real    shrinking_speed_dt[2];
+    /// shrinking_speed * time_step
+    real shrinking_speed_dt[2];
 
 public:
     

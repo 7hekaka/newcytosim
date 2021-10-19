@@ -15,6 +15,12 @@
 
 /// additional Property for ClassicFiber
 /**
+ Assembly is a continuous process, and can occur at both ends, typically:
+ 
+      delta_length = growing_speed * time_step
+ 
+ Transitions are stochastic between two states: Growing and Shrinking
+ 
  @ingroup Properties
  */
 class ClassicFiberProp : public FiberProp
@@ -50,17 +56,17 @@ public:
      In this equation, `free_polymer` represents the fraction of free monomers in [0,1].
      Antagonistic force is negative ( force < 0 ) if it is directed against fiber assembly.
      */
-    real    growing_speed[2];
+    real growing_speed[2];
 
     /// Constant term in the growing speed equation
-    real    growing_off_speed[2];
+    real growing_off_speed[2];
 
     
     /// Characteristic force of the assembly state (default=+inf)
     /**
      Antagonistic force decreases assembly rate exponentially.
      */
-    real    growing_force[2];
+    real growing_force[2];
     
     
     /// speed of disassembly state
@@ -70,13 +76,13 @@ public:
          speed = shrinking_speed;
 
      */
-    real    shrinking_speed[2];
+    real shrinking_speed[2];
     
     /// Characteristic force of the shrinking state (default=+inf)
     /**
      Antagonistic force decreases disassembly rate exponentially.
      */
-    real    shrinking_force[2];
+    real shrinking_force[2];
 
     
     /// Rate of stochastic switching from assembly to disassembly
@@ -97,13 +103,13 @@ public:
          catastrophe_rate_real = catastrophe_rate * growing_speed_unloaded / growing_speed_real
 
      */
-    real    catastrophe_rate[2];
+    real catastrophe_rate[2];
 
     /// Rate of catastrophe when the growth is stalled
     /**
      If this parameter is not set, the catastrophe rate will not depend on growth speed.
      */
-    real    catastrophe_rate_stalled[2];
+    real catastrophe_rate_stalled[2];
 
 #if NEW_CATASTROPHE_OUTSIDE
     
@@ -111,7 +117,7 @@ public:
     /**
      A value < 1 inhibits catastrophe at the edge; A value > 1 accelerates catastrophes
      */
-    real    catastrophe_outside;
+    real catastrophe_outside;
 
     /// space used for `catastrophe_outside'
     std::string catastrophe_space;
@@ -127,29 +133,29 @@ public:
          catastrophe_rate_real = catastrophe_rate * length() / catastrophe_length;
 
      */
-    real    catastrophe_length;
+    real catastrophe_length;
     
 #endif
     
     /// Rate of stochastic switching from disassembly to assembly
-    real    rescue_rate[2];
+    real rescue_rate[2];
     
     /// switching rate to the growing state for a fiber shorter than `min_length` (default=0)
-    real    rebirth_rate[2];
+    real rebirth_rate[2];
     
     /// @}
     
 private:
     
-    real    growing_speed_dt[2];
-    real    growing_off_speed_dt[2];
-    real    growing_force_inv[2];
-    real    catastrophe_rate_dt[2];
-    real    catastrophe_rate_stalled_dt[2];
-    real    catastrophe_coef[2];
-    real    rescue_prob[2], rebirth_prob[2];
-    real    shrinking_speed_dt[2];
-    real    shrinking_force_inv[2];
+    real growing_speed_dt[2];
+    real growing_off_speed_dt[2];
+    real growing_force_inv[2];
+    real catastrophe_rate_dt[2];
+    real catastrophe_rate_stalled_dt[2];
+    real catastrophe_coef[2];
+    real rescue_prob[2], rebirth_prob[2];
+    real shrinking_speed_dt[2];
+    real shrinking_force_inv[2];
 
 #if NEW_CATASTROPHE_OUTSIDE
     /// pointer to actual Space used for `catastrophe_outside`
