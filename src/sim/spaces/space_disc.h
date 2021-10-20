@@ -68,6 +68,9 @@ public:
 
     /// return point on the edge that is closest to `pos`
     Vector project(Vector const& pos) const;
+    
+    /// return a position inside, resulting from bouncing off on the edges of the Space
+    Vector bounce(Vector const&) const;
 
     
     /// apply a force directed towards the edge of the Space

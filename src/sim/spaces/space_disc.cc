@@ -108,6 +108,30 @@ Vector SpaceDisc::project(Vector const& pos) const
 }
 
 
+/**
+ The implementation here is not physically exact, as we only consider the
+ radial component, and leads to artifacts in particular for small radius
+ @todo Implement correct bounce in Disc/Sphere
+ */
+Vector SpaceDisc::bounce(Vector const& pos) const
+{
+#if ( DIM >= 3 )
+    real X = pos.XX;
+    real Y = pos.YY;
+    real n = X*X + Y*Y;
+    if ( n > square(radius_) )
+    {
+        n = 2 * ( radius_ / std::sqrt(n) ) - 1;
+        X *= n;
+        Y *= n;
+    }
+    real Z = bounce1(pos.ZZ, bot_, top_-bot_);
+    return Vector(X, Y, Z);
+#endif
+    return pos;
+}
+
+
 Vector SpaceDisc::place() const
 {
     const Vector2 V = Vector2::randB(radius_);

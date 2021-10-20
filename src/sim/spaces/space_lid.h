@@ -81,8 +81,8 @@ public:
     /// project point on the closest edge of the Space
     Vector project(Vector const& pos) const;
     
-    /// equivalent to 'Modulo::fold'
-    void bounce(Vector&) const;
+    /// return a position inside, resulting from bouncing off on the edges of the Space
+    Vector bounce(Vector const&) const;
 
     
     /// apply a force directed towards the edge of the Space

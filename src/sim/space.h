@@ -127,13 +127,21 @@ public:
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
     real estimateVolume(size_t cnt) const;
     
+    /// bounce Z between boundaries at B and B+W, returning image within [B, B+W]
+    static real bounce1(real Z, real const& B, real W)
+    {
+        Z = ( Z - B ) / W;
+        int i = (int)floor(Z);
+        W = std::copysign(W, (i&1)?-1:1);
+        return B + W * ( Z - ((i+1)&~1) );
+    }
     
     /// bring a position back inside, as if it bounced off the edges of the Space
-    void bounceOnEdges(Vector&) const;
+    Vector bounceOnEdges(Vector const&) const;
 
-    /// bring a position back inside, as if it bounced off the edges of the Space
+    /// return a position inside, resulting from bouncing off on the edges of the Space
     /** This is also used for periodic boundary conditions*/
-    virtual void bounce(Vector&) const;
+    virtual Vector bounce(Vector const&) const;
 
     
     /// the square of the distance to the edge of this Space

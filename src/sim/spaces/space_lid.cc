@@ -77,23 +77,19 @@ void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 }
 
 
-void SpaceLid::bounce(Vector& pos) const
+Vector SpaceLid::bounce(Vector const& pos) const
 {
-    real W = top_ - bot_;
 #if ( DIM >= 3 )
-    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
-    pos.YY = fold_real(pos.YY, modulo_.period_[1]);
-    real Z = ( pos.ZZ - bot_ ) / W;
-    int i = (int)floor(Z);
-    W = std::copysign(W, (i&1)?-1:1);
-    pos.ZZ = bot_ + W * ( Z - ((i+1)&~1) );
+    real X = fold_real(pos.XX, modulo_.period_[0]);
+    real Y = fold_real(pos.YY, modulo_.period_[1]);
+    real Z = bounce1(pos.ZZ, bot_, top_-bot_);
+    return Vector(X, Y, Z);
 #elif ( DIM > 1 )
-    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
-    real Z = ( pos.YY - bot_ ) / W;
-    int i = (int)floor(Z);
-    W = std::copysign(W, (i&1)?-1:1);
-    pos.YY = bot_ + W * ( Z - ((i+1)&~1) );
+    real X = fold_real(pos.XX, modulo_.period_[0]);
+    real Y = bounce1(pos.YY, bot_, top_-bot_);
+    return Vector(X, Y);
 #endif
+    return pos;
 }
 
 

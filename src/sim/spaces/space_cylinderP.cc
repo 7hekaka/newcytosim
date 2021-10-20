@@ -145,13 +145,15 @@ Vector SpaceCylinderP::project(Vector const& W) const
 }
 
 
-void SpaceCylinderP::bounce(Vector& pos) const
+Vector SpaceCylinderP::bounce(Vector const& pos) const
 {
     /* This is not correct and may lead to artifacts for small radius */
     if ( !inside(pos) )
-        bounceOnEdges(pos);
-
-    pos.XX = fold_real(pos.XX, modulo_.period_[0]);
+        return bounceOnEdges(pos);
+    
+    Vector P = pos;
+    P.XX = fold_real(pos.XX, modulo_.period_[0]);
+    return P;
 }
 
 //------------------------------------------------------------------------------

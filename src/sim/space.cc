@@ -220,33 +220,29 @@ real Space::estimateVolume(size_t cnt) const
  In general, this does not satisfies detailed balance, and may lead to artificial
  accumulations in certain part of space, such as the center of a sphere.
 */
-void Space::bounceOnEdges(Vector& pos) const
+Vector Space::bounceOnEdges(Vector const& pos) const
 {
-    Vector P;
+    Vector P = pos;
     // bounce on the edge, and return if inside
     int cnt = 0;
     do {
-        P = project(pos);
-        pos = 2*P - pos;
-        if ( inside(pos) )
-            return;
+        P = 2*project(P) - P;
+        if ( inside(P) )
+            return P;
     } while ( ++cnt < 8 );
     
-    Vector Q;
+    Vector Q, R;
     do {
-        Q = project(pos);
-        pos = 2*Q - pos;
-        if ( inside(pos) )
-            return;
-        if ( distanceSqr(P, Q) < REAL_EPSILON )
-        {
-            pos = ( P + Q ) * 0.5;
-            return;
-        }
-        P = project(pos);
-        pos = 2*P - pos;
-        if ( inside(pos) )
-            return;
+        Q = project(P);
+        P = 2*Q - P;
+        if ( inside(P) )
+            return P;
+        R = project(P);
+        P = 2*R - P;
+        if ( inside(P) )
+            return P;
+        if ( distanceSqr(Q, R) < REAL_EPSILON )
+            return ( Q + R ) * 0.5;
     } while ( ++cnt < 16 );
 
     static size_t msg = 0;
@@ -254,23 +250,24 @@ void Space::bounceOnEdges(Vector& pos) const
     {
         std::cerr << "Warning: "+prop->name()+":bounce fails?\n";
         do {
-            P = project(pos);
-            pos = 2*P - pos;
-            std::cerr << cnt << "  " << pos << " proj " << P << '\n';
-            if ( inside(pos) )
-                return;
+            Q = project(P);
+            P = 2*Q - P;
+            std::cerr << cnt << "  " << P << " proj " << Q << '\n';
+            if ( inside(P) )
+                return P;
         } while ( ++cnt < 24 );
     }
     
     // if space is convex, the midpoint should be inside
-    pos = ( P + Q ) * 0.5;
+    return ( Q + R ) * 0.5;
 }
 
 
-void Space::bounce(Vector& pos) const
+Vector Space::bounce(Vector const& pos) const
 {
     if ( !inside(pos) )
-        bounceOnEdges(pos);
+        return bounceOnEdges(pos);
+    return pos;
 }
 
 
