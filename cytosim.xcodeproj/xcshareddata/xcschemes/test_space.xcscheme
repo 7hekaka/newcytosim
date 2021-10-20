@@ -61,16 +61,12 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "&apos;capsule 1 2&apos;"
+            argument = "shape=ellipse length=3,4,5"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "geometry=&apos;capsule 1 2&apos;"
+            argument = "shape=dice length=3,4,5 edge=1"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "geometry=&apos;ellipse 10 5 5&apos;"
-            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>
