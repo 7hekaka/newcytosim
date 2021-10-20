@@ -85,8 +85,8 @@ namespace gle
     inline void    bindBufferC4VD(size_t skip) { bind(); setBufferCNV(4, 0, (DIM>2?4:2), skip); }
 
     unsigned* mapIndexBuffer(size_t n);
-    void  unmapIndexBuffer();
-    void   bindIndexBuffer(size_t skip);
+    void    unmapIndexBuffer();
+    void     bindIndexBuffer(size_t skip);
 };
 
 #endif
