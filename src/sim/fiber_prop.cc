@@ -513,7 +513,7 @@ void FiberProp::complete(Simul const& sim)
         {
             if ( sim.primed() )
                 throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-            confine = CONFINE_OFF;
+            // this condition occur when the Property is created before the Space
         }
     }
     else
@@ -532,7 +532,7 @@ void FiberProp::complete(Simul const& sim)
         {
             if ( sim.primed() )
                 throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
-            confine2 = CONFINE_OFF;
+            // this condition occur when the Property is created before the Space
         }
     }
     else

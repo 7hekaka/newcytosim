@@ -142,7 +142,7 @@ void SingleProp::complete(Simul const& sim)
         {
             if ( sim.primed() )
                 throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-            confine = CONFINE_OFF;
+            // this condition occur when the Property is created before the Space
         }
     }
     else

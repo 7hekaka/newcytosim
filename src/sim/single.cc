@@ -121,16 +121,20 @@ void Single::stepF()
 #endif
 
     // diffusion:
-    sPos.addRand(prop->diffusion_dt);
-    
+    Vector pos = sPos + Vector::randS(prop->diffusion_dt);
+
     // confinement:
     if ( prop->confine == CONFINE_INSIDE )
     {
-        prop->confine_space_ptr->bounce(sPos);
+        sPos = prop->confine_space_ptr->bounce(pos);
     }
     else if ( prop->confine == CONFINE_ON )
     {
-        sPos = prop->confine_space_ptr->project(sPos);
+        sPos = prop->confine_space_ptr->project(pos);
+    }
+    else
+    {
+        sPos = pos;
     }
     
     sHand->stepUnattached(simul(), sPos);

@@ -171,12 +171,15 @@ void Couple::diffuse()
          Set concentration of molecules at edges of Space by letting molecules
          out, and put some back at a constant rate
          */
-        cPos = pos;
-        prop->confine_space_ptr->bounce(cPos);
+        cPos = prop->confine_space_ptr->bounce(pos);
     }
     else if ( prop->confine == CONFINE_ON )
     {
         cPos = prop->confine_space_ptr->project(pos);
+    }
+    else
+    {
+        cPos = pos;
     }
 }
 
@@ -457,7 +460,7 @@ void Couple::randomizePosition()
     else if ( prop->confine == CONFINE_INSIDE )
         cPos = prop->confine_space_ptr->place();
     else if ( prop->confine != CONFINE_OFF )
-        throw InvalidParameter("`confine` is incompatible with `fast_diffusion`");
+        throw InvalidParameter("`confine==off` is incompatible with `fast_diffusion`");
 }
 
 //------------------------------------------------------------------------------
