@@ -270,7 +270,7 @@ void PointDisp::storePixelmap(uint8_t* bitmap, unsigned dim, GLuint pbi) const
 
 #if ( 0 )
 
-#include "saveimage.h"
+#include "save_image.h"
 
 // Export bitmap to file in PNG format
 void PointDisp::savePixelmap(uint8_t* bitmap, unsigned dim, unsigned id) const

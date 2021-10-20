@@ -8,7 +8,7 @@
 #include "display1.h"
 #include "display2.h"
 #include "display3.h"
-#include "saveimage.h"
+#include "save_image.h"
 #include "tictoc.h"
 #include <unistd.h>
 #include <cstdlib>

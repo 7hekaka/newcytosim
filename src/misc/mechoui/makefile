@@ -38,7 +38,7 @@ OBJ=exceptions.o vector3.o glossary.o property.o backtrace.o offscreen.o\
 
 #----------------------------targets--------------------------------------------
 
-mechoui: $(OBJ) SFMT.o saveimage.o
+mechoui: $(OBJ) SFMT.o save_image.o
 	$(COMPILE) $(addprefix build/, $(notdir $^)) $(GRAFIX) $(IMAGES) -o $@
 	@printf "\x1B[35m >>>>>> made %s\x1B[0m\n" $@
 vpath mechoui .
@@ -58,7 +58,7 @@ INCLUDE=$(addprefix -I, $(INCDIR))
 $(OBJ): %.o: %.cc
 	$(COMPILE) -c $(INCLUDE) $< -o build/$@
 
-build/saveimage.o: saveimage.cc saveimage.h
+build/save_image.o: save_image.cc save_image.h
 	$(COMPILE) -c $(IMAGES_DEF) $< -o $@
 
 # Attention: Mersenne-Twister is coded in C-language,

@@ -8,7 +8,7 @@ set(SOURCES_DISP
     view_prop.cc
     grid_display.cc
     glapp.cc
-    saveimage.cc
+    save_image.cc
     offscreen.cc
     fiber_disp.cc
     line_disp.cc
@@ -18,6 +18,7 @@ set(SOURCES_DISP
 list(TRANSFORM SOURCES_DISP PREPEND "${SRC_DISP_DIR}/")
 
 add_library(${DISP_LIB_TARGET} STATIC ${SOURCES_DISP})
+target_compile_definitions(${DISP_LIB_TARGET} PRIVATE DISPLAY)
 
 target_include_directories(${DISP_LIB_TARGET} PUBLIC
     "${SRC_MATH_DIR}"

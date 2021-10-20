@@ -103,7 +103,7 @@ sweet: sweet.cc frame_reader.o $(TOOL_OBJ) | bin
 vpath sweet bin
 
 
-micimage: micimage.cc saveimage.cc glossary.o filepath.o tokenizer.o
+micimage: micimage.cc save_image.cc glossary.o filepath.o tokenizer.o
 micimage: stream_func.o exceptions.o random.o SFMT.o print_color.o backtrace.o
 	$(COMPILE) -Isrc/math -Isrc/base -Isrc/disp -DHAS_PNG $(OBJECTS) $(LIB_PNG) -o bin/$@
 	$(DONE)

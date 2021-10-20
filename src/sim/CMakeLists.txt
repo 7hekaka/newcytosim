@@ -107,7 +107,7 @@ set(SOURCES_CYTOSIM
 )
 
 # objects containing graphical code under the DISPLAY keyword:
-set(SOURCES_DISPLAY_SENSITIVE
+set(SOURCES_WITH_DISPLAY
     ${SOURCES_SPACES}
     space.cc
     field.cc
@@ -116,7 +116,7 @@ set(SOURCES_DISPLAY_SENSITIVE
 )
 
 list(TRANSFORM SOURCES_CYTOSIM PREPEND "${SRC_SIM_DIR}/")
-list(TRANSFORM SOURCES_DISPLAY_SENSITIVE PREPEND "${SRC_SIM_DIR}/")
+list(TRANSFORM SOURCES_WITH_DISPLAY PREPEND "${SRC_SIM_DIR}/")
 
 
 if(BUILD_SIM)
@@ -150,7 +150,7 @@ endif(BUILD_SIM)
 if(BUILD_PLAY)
 
     #set(SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_CYTOSIM})
-    #list(REMOVE_ITEM SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_DISPLAY_SENSITIVE})
+    #list(REMOVE_ITEM SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_WITH_DISPLAY})
 
     add_library(${SIMG_LIB_TARGET} STATIC ${SOURCES_CYTOSIM})
 
@@ -162,7 +162,7 @@ if(BUILD_PLAY)
     )
 
 
-    # It is only necessary to compile files in ${SOURCES_DISPLAY_SENSITIVE} with this flag
+    # It is only necessary to compile files in ${SOURCES_WITH_DISPLAY} with this flag
     # but I do not know how to specify this with CMake
     # Hence by setting a target_compile_definitions, all source will be compiled with -DDISPLAY
 
@@ -170,7 +170,7 @@ if(BUILD_PLAY)
 
     # This below does not work, as it sets the compile options for all targets including the files
 
-    foreach(FILE ${SOURCES_DISPLAY_SENSITIVE})
+    foreach(FILE ${SOURCES_WITH_DISPLAY})
         #set_source_files_properties(${FILE} TARGET_DIRECTORY ${SIMG_LIB_TARGET} PROPERTIES COMPILE_DEFINITIONS "DISPLAY")
         #message(${FILE} "will be compiled with -DDISPLAY")
     endforeach()

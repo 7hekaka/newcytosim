@@ -646,7 +646,7 @@
 		BB9711671DECDB7E00352630 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97114C1DECDA1300352630 /* glapp.cc */; };
 		BB9711681DECDB8200352630 /* view_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711621DECDA1300352630 /* view_prop.cc */; };
 		BB9711691DECDB8500352630 /* view.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711601DECDA1300352630 /* view.cc */; };
-		BB97116A1DECDB8F00352630 /* saveimage.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97115E1DECDA1300352630 /* saveimage.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BB97116A1DECDB8F00352630 /* save_image.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB97115E1DECDA1300352630 /* save_image.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB97116B1DECDB9500352630 /* offscreen.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711591DECDA1300352630 /* offscreen.cc */; };
 		BB97116C1DECDBA000352630 /* gle_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711521DECDA1300352630 /* gle_color.cc */; };
 		BB97116D1DECDBA300352630 /* gle_color_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9711541DECDA1300352630 /* gle_color_list.cc */; };
@@ -1704,8 +1704,8 @@
 		BB97115B1DECDA1300352630 /* offscreen_fbo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = offscreen_fbo.cc; sourceTree = "<group>"; };
 		BB97115C1DECDA1300352630 /* offscreen_glx.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = offscreen_glx.cc; sourceTree = "<group>"; };
 		BB97115D1DECDA1300352630 /* opengl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = opengl.h; sourceTree = "<group>"; };
-		BB97115E1DECDA1300352630 /* saveimage.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = saveimage.cc; sourceTree = "<group>"; };
-		BB97115F1DECDA1300352630 /* saveimage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = saveimage.h; sourceTree = "<group>"; };
+		BB97115E1DECDA1300352630 /* save_image.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = save_image.cc; sourceTree = "<group>"; };
+		BB97115F1DECDA1300352630 /* save_image.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = save_image.h; sourceTree = "<group>"; };
 		BB9711601DECDA1300352630 /* view.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = view.cc; sourceTree = "<group>"; };
 		BB9711611DECDA1300352630 /* view.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = view.h; sourceTree = "<group>"; };
 		BB9711621DECDA1300352630 /* view_prop.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = view_prop.cc; sourceTree = "<group>"; };
@@ -3006,8 +3006,8 @@
 			children = (
 				BB9711571DECDA1300352630 /* glut.h */,
 				BB97115D1DECDA1300352630 /* opengl.h */,
-				BB97115E1DECDA1300352630 /* saveimage.cc */,
-				BB97115F1DECDA1300352630 /* saveimage.h */,
+				BB97115E1DECDA1300352630 /* save_image.cc */,
+				BB97115F1DECDA1300352630 /* save_image.h */,
 				BB9711591DECDA1300352630 /* offscreen.cc */,
 				BB97115A1DECDA1300352630 /* offscreen.h */,
 				BB97115B1DECDA1300352630 /* offscreen_fbo.cc */,
@@ -4494,7 +4494,7 @@
 				BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
 				BB97116B1DECDB9500352630 /* offscreen.cc in Sources */,
-				BB97116A1DECDB8F00352630 /* saveimage.cc in Sources */,
+				BB97116A1DECDB8F00352630 /* save_image.cc in Sources */,
 				BB109D3823D0788200805F16 /* fiber_disp.cc in Sources */,
 				BB30922C2164BB2B00C6DEE4 /* grid_display.cc in Sources */,
 				BB97116C1DECDBA000352630 /* gle_color.cc in Sources */,

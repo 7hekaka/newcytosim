@@ -5,7 +5,7 @@
 #include "glapp.h"
 #include <unistd.h>
 #include "exceptions.h"
-#include "saveimage.h"
+#include "save_image.h"
 #include "glossary.h"
 #include "tictoc.h"
 #include "gle.h"

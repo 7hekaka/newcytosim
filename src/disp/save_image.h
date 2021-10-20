@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
-#ifndef SAVEIMAGE_H
-#define SAVEIMAGE_H
+#ifndef SAVE_IMAGE_H
+#define SAVE_IMAGE_H
 
 #include <cstdio>
 #include <stdint.h>
