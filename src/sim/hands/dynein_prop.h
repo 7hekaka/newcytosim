@@ -34,7 +34,7 @@ public:
      - Figure 5: unbinding_force = 5.25 pN
      .
      */
-    real    stall_force;
+    real stall_force;
     
     /// speed if force=0 ( unloaded_speed = rate * step_size )
     /**
@@ -48,14 +48,14 @@ public:
      
      unloaded_speed = -0.06 um/s
      */
-    real    unloaded_speed;
+    real unloaded_speed;
     
     /// @}
     
 private:
     
-    real    var_rate_dt;
-    real    walking_rate_dt;
+    real var_rate_dt;
+    real walking_rate_dt;
     
 public:
 

@@ -35,7 +35,7 @@ public:
     ~Mighty() {}
     
     /// check if attachement is possible according to properties
-    bool   attachmentAllowed(FiberSite&) const;
+    bool attachmentAllowed(FiberSite&) const;
 
     /// simulate when `this` is attached but not under load
     void stepUnloaded();

@@ -31,7 +31,7 @@ public:
      - the fiber continues to shrink, and the Rescuer detaches
      .
      */    
-    real    rescue_prob;
+    real rescue_prob;
     
     /// @}
     

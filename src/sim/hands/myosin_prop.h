@@ -24,21 +24,21 @@ public:
      */
 
     /// force at which stepping rate becomes zero
-    real    stall_force;
+    real stall_force;
     
     /// speed if force=0 ( unloaded_speed = rate * step_size )
     /**
      A positive value specifies a plus-end directed motor.
      A negative value specifies a minus-end directed motor.
      */
-    real    unloaded_speed;
+    real unloaded_speed;
     
     /// @}
     
 private:
     
-    real    var_rate_dt;
-    real    walking_rate_dt;
+    real var_rate_dt;
+    real walking_rate_dt;
     
 public:
 

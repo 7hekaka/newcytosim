@@ -37,7 +37,7 @@ public:
      So measuring the 1D diffusion constant of the molecules bound to a filament
      may provide an estimate of the mobility.
      */
-    real    mobility;
+    real mobility;
     
     
     /// stiffness used to calculate the mobility associated with passive movements
@@ -59,14 +59,14 @@ public:
      
      By default, this parameter is unset, and `mobility` is used unmodified.
      */
-    real    stiffness;
+    real stiffness;
     
     /// @}
     
 private:
     
     /// derived variable:
-    real    mobility_dt;
+    real mobility_dt;
 
 public:
     

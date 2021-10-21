@@ -24,7 +24,7 @@ public:
      */
     
     /// size of one step
-    real   step_size;
+    real step_size;
     
     /// list of cell's bits covered upon binding on the lattice
     FiberLattice::cell_t footprint;
@@ -37,7 +37,7 @@ public:
      - at `step_size/2`, the attachment is midway
      [default = step_size/2]
      */
-    real   site_shift;
+    real site_shift;
     
     /// @}
     

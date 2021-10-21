@@ -27,12 +27,12 @@ public:
     /**
      This parameter is not used
      */
-    real    rate;
+    real rate;
     
     /// @}
     
     /// derived variable
-    real    rate_dt;
+    real rate_dt;
     
 public:
     

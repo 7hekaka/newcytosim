@@ -16,10 +16,10 @@ public:
     //--------------------------------------------------------------------------
 
     size_t  max;
-    real    diffusion, diffusion_dt;
+    real diffusion, diffusion_dt;
     
-    real    time_step;
-    real    time;
+    real time_step;
+    real time;
     
     unsigned    delay;
     unsigned    repeat;

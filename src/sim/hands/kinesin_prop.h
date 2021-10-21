@@ -24,13 +24,13 @@ public:
      */
     
     /// force parameter expressing the sensitivity of stepping
-    real    force;
+    real force;
 
     /// rate of forward step
-    real    forward_rate;
+    real forward_rate;
     
     /// backward rate
-    real    backward_rate;
+    real backward_rate;
     
     /// probability to detach per step
     /**
@@ -41,19 +41,19 @@ public:
      
      Hence, this does not contributes to the detachment of a stalled motor.
      */
-    real    unbinding_chance;
+    real unbinding_chance;
     
     /// directionality ( -1 / +1 )
-    int     stride;
+    int stride;
     
     /// @}
     
 private:
     
-    real    directionality;
-    real    forward_rate_dt;
-    real    backward_rate_dt;
-    real    force_inv;
+    real directionality;
+    real forward_rate_dt;
+    real backward_rate_dt;
+    real force_inv;
     
 public:
 

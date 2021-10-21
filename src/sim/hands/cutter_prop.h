@@ -24,7 +24,7 @@ public:
      */
     
     /// rate of cutting event
-    real    cutting_rate;
+    real cutting_rate;
     
     
     /// dynamic state of newly created Fiber ends

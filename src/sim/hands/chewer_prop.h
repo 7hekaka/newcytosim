@@ -24,10 +24,10 @@ public:
      */
     
     /// length of Fiber eaten per unit time, once the engaged with an end.
-    real    chewing_speed;
+    real chewing_speed;
     
     /// unidimensional diffusion coefficient while bound to the Fiber
-    real    diffusion;
+    real diffusion;
     
     /// @}
     
