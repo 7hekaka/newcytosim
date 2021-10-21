@@ -93,7 +93,7 @@ void DynamicFiberProp::complete(Simul const& sim)
 
         if ( growing_off_speed[i] > 0 )
             throw InvalidParameter("growing_off_speed should be <= 0");
-        growing_off_rate_dt[i] = sim.time_step() * growing_off_speed[i] / unit_length;
+        growing_off_rate_dt[i] = -sim.time_step() * growing_off_speed[i] / unit_length;
 
         if ( hydrolysis_rate[i] < 0 )
             throw InvalidParameter("fiber:hydrolysis_rate should be >= 0");
