@@ -150,7 +150,7 @@ public:
     size_t count(bool (*func)(Object const*, void const*), void const*) const;
 
     /// erase all Object and all Property
-    void   erase();
+    void erase();
     
     /// number of unattached Simgles
     size_t sizeF() const { return fList.size(); }

@@ -37,7 +37,7 @@ private:
     Object * backO;
     
     /// Number of Objects in the list
-    size_t   nSize;
+    size_t nSize;
     
     /// Disabled copy constructor
     ObjectPool(ObjectPool const&);
@@ -57,31 +57,31 @@ public:
     Object * front() const { return frontO; }
     
     /// Last Object in list
-    Object * back()  const { return backO; }
+    Object * back() const { return backO; }
     
     /// Number of objects in the list
-    size_t size()  const { return nSize; }
+    size_t size() const { return nSize; }
     
     /// true if list has zero elements
-    bool   empty() const { return frontO == nullptr; }
+    bool empty() const { return frontO == nullptr; }
     
     /// put Object first in the list
-    void   push_front(Object *);
+    void push_front(Object *);
     
     /// put Object last in the list
-    void   push_back(Object *);
+    void push_back(Object *);
     
     /// import all objects from given list, emptying it
-    void   append(ObjectPool& list);
+    void append(ObjectPool& list);
     
     /// link `n` after already linked `p`
-    void   push_after(Object * p, Object * n);
+    void push_after(Object * p, Object * n);
     
     /// link `n` before already linked `p`
-    void   push_before(Object * p, Object * n);
+    void push_before(Object * p, Object * n);
     
     /// Remove Object `n` from list
-    void   pop(Object * n);
+    void pop(Object * n);
     
     /// Remove top Object from list, returning it
     Object* pop_front();
@@ -90,51 +90,51 @@ public:
     Object* pop_back();
     
     /// clear the list
-    void   clear();
+    void clear();
     
     /// delete all pool, clearing the list on the way
-    void   erase();
+    void erase();
     
     /// slowly sort according to given function
-    void   bubblesort(int (*comp)(const Object*, const Object*));
+    void bubblesort(int (*comp)(const Object*, const Object*));
     
     /// sort according to given function
-    void   mergesort(int (*comp)(const Object*, const Object*));
+    void mergesort(int (*comp)(const Object*, const Object*));
     
     /// quicksort according to given function using std::qsort()
-    void   quicksort(int (*comp)(const void*, const void*));
+    void quicksort(int (*comp)(const void*, const void*));
     
     /// sort according to given function
-    void   blinksort(int (*comp)(const Object*, const Object*));
+    void blinksort(int (*comp)(const Object*, const Object*));
     
     /// Rearrange the list by exchanging the portions before and after `p`
-    void   permute(Object *);
+    void permute(Object *);
     
     /// Rearrange the list by moving a central portion to the top
-    void   shuffle_up(Object *, Object *);
+    void shuffle_up(Object *, Object *);
     
     /// Rearrange the list by moving a central portion to the bottom
-    void   shuffle_down(Object *, Object *);
+    void shuffle_down(Object *, Object *);
     
     /// Mix list using permute() and shuffle() functions
-    void   shuffle();
+    void shuffle();
     
     /// count number of elements in the list
     size_t count() const;
     
     /// returns 1 if element appears in the list
-    bool   count(Object const* n) const;
+    bool count(Object const* n) const;
     
     /// test coherence of list
-    int    bad() const;
+    int bad() const;
     
 private:
     
     /// move sublist
-    void   move_behind(Object*&, Object*&, Object*, Object*);
+    void move_behind(Object*&, Object*&, Object*, Object*);
     
     /// sort sublist
-    void   blinksort(int (*comp)(const Object*, const Object*), Object*, Object*);
+    void blinksort(int (*comp)(const Object*, const Object*), Object*, Object*);
     
     /// split linked list roughly in two
     static Object * split(Object*);

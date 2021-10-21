@@ -34,38 +34,38 @@ public:
     ~SpaceRotate();
     
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// volume is unchanged
-    real        volume() const { return mSpace->volume(); }
+    real volume() const { return mSpace->volume(); }
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// true if the bead is inside the Space
-    bool        allInside(Vector const&, real rad) const;
+    bool allInside(Vector const&, real rad) const;
     
     /// return point on the edge that is closest to `pos`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif

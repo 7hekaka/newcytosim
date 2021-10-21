@@ -30,13 +30,13 @@ public:
     virtual ~CoupleLong();
     
     /// position on the side of fiber1 to which the link is made
-    Vector  sidePos1() const;
+    Vector sidePos1() const;
 
     /// force between hands, essentially: stiffness * ( cHand2->pos() - sidePos1() )
-    Vector  force() const;
+    Vector force() const;
     
     /// add interactions to a Meca
-    void    setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
 };
 

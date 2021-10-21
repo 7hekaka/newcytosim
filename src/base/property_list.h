@@ -32,33 +32,33 @@ private:
 public:
     
     /// constructor
-    PropertyList()   { }
+    PropertyList() { }
     
     /// destructor forget things without deleting objects
-    ~PropertyList()  { }
+    ~PropertyList() { }
     
     //-------------------------------------------------------------------------------
     
     /// allocate for `s` slots
-    void         reserve(size_t s) { vec_.reserve(s); }
+    void reserve(size_t s) { vec_.reserve(s); }
     
     /// add a new Property in the list, and set its number
-    void         deposit(Property *);
+    void deposit(Property *);
     
     /// push a new Property in the list
-    void         push_back(Property * p) { vec_.push_back(p); }
+    void push_back(Property * p) { vec_.push_back(p); }
 
     /// forget pointer to p
-    void         remove(Property const*);
+    void remove(Property const*);
     
     /// delete all Property
-    void         erase();
+    void erase();
     
     /// iterator pointing to first element
-    iterator     begin()   { return vec_.begin(); }
+    iterator begin()   { return vec_.begin(); }
     
     /// iterator that points to a position just past the last element
-    iterator     end()     { return vec_.end(); }
+    iterator end()     { return vec_.end(); }
 
     /// iterator pointing to first element
     const_iterator begin() const { return vec_.begin(); }
@@ -67,48 +67,48 @@ public:
     const_iterator end()   const { return vec_.end(); }
     
     /// iterator pointing to first element
-    Property*    front()   const { return vec_.front(); }
+    Property * front()   const { return vec_.front(); }
     
     /// iterator pointing to last element
-    Property*    back()    const { return vec_.back(); }
+    Property * back()    const { return vec_.back(); }
     
     //-------------------------------------------------------------------------------
     
     /// true if no property are known
-    bool         empty()   const { return vec_.empty(); }
+    bool empty()   const { return vec_.empty(); }
     
     /// number of known Property
-    size_t       size()    const { return vec_.size(); }
+    size_t size()    const { return vec_.size(); }
 
     /// number of Property of given category
-    size_t       size(std::string const& cat) const;
+    size_t size(std::string const& cat) const;
 
     /// apply function to all objects
-    void         for_each(void func(Property *)) const;
+    void for_each(void func(Property *)) const;
     
     /// complete all objects
-    void         complete(Simul const&) const;
+    void complete(Simul const&) const;
     
     //-------------------------------------------------------------------------------
     
     /// return property which has the provided name, or zero if it cannot be found
-    Property *   find(std::string const& name) const;
+    Property * find(std::string const& name) const;
 
     /// return property which has the provided name, or zero if it cannot be found
-    Property *   find(std::string const& cat, std::string const& name) const;
+    Property * find(std::string const& cat, std::string const& name) const;
     
     /// return property which has the provided index, or zero if it cannot be found
-    Property *   find(std::string const& cat, const PropertyID) const;
+    Property * find(std::string const& cat, const PropertyID) const;
     
     
     /// return property with provided name, throwing an exception if it cannot be found
-    Property *   find_or_die(std::string const& name) const;
+    Property * find_or_die(std::string const& name) const;
 
     /// return property with provided name, throwing an exception if it cannot be found
-    Property *   find_or_die(std::string const& cat, std::string const& name) const;
+    Property * find_or_die(std::string const& cat, std::string const& name) const;
 
     /// return property with provided name, throwing an exception if it cannot be found
-    Property *   find_or_die(std::string const& cat, const PropertyID) const;
+    Property * find_or_die(std::string const& cat, const PropertyID) const;
     
     
     /// return list of properties of the given category
@@ -122,21 +122,21 @@ public:
     
     
     /// return the Property of the given category that follows the given one
-    Property *   find_next(std::string const& cat, Property*) const;
+    Property * find_next(std::string const& cat, Property*) const;
     
     /// return list of properties which are not of the given category
     PropertyList find_all_except(std::string const&) const;
 
     //-------------------------------------------------------------------------------
 
-    /// print names of known Property
-    void         write_names(std::ostream&, std::string const&) const;
-
     /// return names of known Property
     std::string  all_names(std::string const&) const;
 
+    /// print names of known Property
+    void write_names(std::ostream&, std::string const&) const;
+
     /// write all Property
-    void         write(std::ostream&, bool prune) const;
+    void write(std::ostream&, bool prune) const;
 };
 
 #endif

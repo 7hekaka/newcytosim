@@ -28,7 +28,7 @@ private:
     Myosin();
     
     /// Gillespie countdown timer for stepping
-    real   nextStep;
+    real nextStep;
 
 public:
     
@@ -42,13 +42,13 @@ public:
     ~Myosin() {}
 
     /// attach and update variables
-    void   attach(FiberSite const&);
+    void attach(FiberSite const&);
 
     /// simulate when `this` is attached but not under load
-    void   stepUnloaded();
+    void stepUnloaded();
     
     /// simulate when `this` is attached and under load
-    void   stepLoaded(Vector const& force);
+    void stepLoaded(Vector const& force);
     
 };
 

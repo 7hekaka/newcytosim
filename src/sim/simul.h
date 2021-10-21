@@ -92,37 +92,37 @@ public:
     
     
     /// list of Space in the Simulation
-    SpaceSet     spaces;
+    SpaceSet spaces;
     
     /// list of Field in the Simulation
-    FieldSet     fields;
+    FieldSet fields;
     
     /// list of Fiber in the Simulation
-    FiberSet     fibers;
+    FiberSet fibers;
     
     /// list of Sphere in the Simulation
-    SphereSet    spheres;
+    SphereSet spheres;
     
     /// list of Bead in the Simulation
-    BeadSet      beads;
+    BeadSet beads;
     
     /// list of Solid in the Simulation
-    SolidSet     solids;
+    SolidSet solids;
     
     /// list of Single in the Simulation
-    SingleSet    singles;
+    SingleSet singles;
     
     /// list of Couple in the Simulation
-    CoupleSet    couples;
+    CoupleSet couples;
     
     /// list of Organizer in the Simulation
     OrganizerSet organizers;
 
     /// list of Tubules
-    TubuleSet    tubules;
+    TubuleSet tubules;
     
     /// list of Events in the Simulation
-    EventSet     events;
+    EventSet events;
     
     //--------------------------------------------------------------------------
     
@@ -167,13 +167,13 @@ public:
     //----------------------------- SIMULATING ---------------------------------
    
     /// perform basic initialization; register callbacks
-    void  initialize(Glossary&);
+    void initialize(Glossary&);
     
     /// ready the engine for a subsequent call to `step()` and `solve()`
-    void  prepare();
+    void prepare();
     
     /// perform one Monte-Carlo step, corresponding to the time step
-    void  step();
+    void step();
 
     /// time in the simulated world (shortcut to `prop->time`)
     double time() const;
@@ -182,59 +182,59 @@ public:
     real  time_step() const;
 
     /// this is called after a sequence of `step()` have been done
-    void  relax();
+    void relax();
     
     /// this is called to signal that engine is ready to proceed
-    void  unrelax() { primed_ = 2; }
+    void unrelax() { primed_ = 2; }
 
     /// true if engine is ready to go (between `prepare()` and `relax()`)
     int   primed() const { return primed_; }
 
     
     /// call setInteractions(Meca) for all objects (this is called before `solve()`
-    void  setAllInteractions(Meca&) const;
+    void setAllInteractions(Meca&) const;
 
     /// display Meca's links
-    void  drawLinks() const;
+    void drawLinks() const;
     
     /// bring all objects to centered image using periodic boundary conditions
-    void  foldPositions() const;
+    void foldPositions() const;
 
     /// simulate the mechanics of the system and move Mecables accordingly
-    void  solve();
+    void solve();
     
     /// calculate forces given the current positions
-    void  solve_force();
+    void solve_force();
 
     /// solve mechanical system and calculate forces but do not apply movements
-    void  solve_half();
+    void solve_half();
 
     /// replace coordinates of Mecables by the ones calculated in solve()
-    void  apply() const { sMeca.apply(); }
+    void apply() const { sMeca.apply(); }
     
     /// like 'solve' but automatically selects the fastest preconditionning method
-    void  solve_auto();
+    void solve_auto();
 
     /// do nothing
-    void  solve_not() {};
+    void solve_not() {};
 
     /// calculate the motion of objects, but only in the X-direction
-    void  solve_onlyX();
+    void solve_onlyX();
     
     /// move every Fiber backward by `shift` (this is an extremely crude model)
-    void  solve_flux();
+    void solve_flux();
     
     /// calculate Forces and Lagrange multipliers on the Mecables
-    void  computeForces() const;
+    void computeForces() const;
     
     /// calculate clusters of Mecable derived from all interactions
-    void  flagClustersMeca() const;
+    void flagClustersMeca() const;
     
     /// this is used for development
-    void  addExperimentalInteractions(Meca&) const;
+    void addExperimentalInteractions(Meca&) const;
     
     /// set FiberGrid and StericGrid over the given space
-    void  setFiberGrid(Space const*) const;
+    void setFiberGrid(Space const*) const;
 
 private:
     
@@ -262,46 +262,46 @@ private:
 public:
     
     /// return the ObjectSet corresponding to a class
-    ObjectSet *  findSet(const std::string& cat);
+    ObjectSet * findSet(const std::string& cat);
     
     /// convert Object to Mecable* if the conversion seems valid; returns 0 otherwise
-    static Mecable* toMecable(Object *);
+    static Mecable * toMecable(Object *);
 
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
-    Mecable *    findMecable(const std::string&) const;
+    Mecable * findMecable(const std::string&) const;
     
     /// find a Solid by name
-    Solid *      findSolid(std::string s) { return Solid::toSolid(solids.findObject(s, "solid")); }
+    Solid * findSolid(std::string s) { return Solid::toSolid(solids.findObject(s, "solid")); }
     
     /// find a Fiber by name
-    Fiber *      findFiber(std::string s) { return Fiber::toFiber(fibers.findObject(s, "fiber")); }
+    Fiber * findFiber(std::string s) { return Fiber::toFiber(fibers.findObject(s, "fiber")); }
     
     /// find a Sphere by name
-    Sphere *     findSphere(std::string s) { return Sphere::toSphere(spheres.findObject(s, "sphere")); }
+    Sphere * findSphere(std::string s) { return Sphere::toSphere(spheres.findObject(s, "sphere")); }
     
     /// return first Space with given name, or return nullptr
     Space const* findSpace(std::string const&) const;
     
     /// Parse a text containing cytosim commands
-    void         evaluate(std::string const&);
+    void evaluate(std::string const&);
 
     //---------------------------- PROPERTIES ----------------------------------
 
     /// change the name of the simulation
-    void         rename(std::string const&);
+    void rename(std::string const&);
     
     /// read an Object reference and return the corresponding Object (`tag` is set)
-    Object*      readReference(Inputter&, ObjectTag& tag);
+    Object * readReference(Inputter&, ObjectTag& tag);
 
     /// read a Fiber reference and return the corresponding Object (`tag` is set)
-    Fiber*       readFiberReference(Inputter&, ObjectTag& tag);
+    Fiber * readFiberReference(Inputter&, ObjectTag& tag);
     
     
     /// check if `name` corresponds to a property class, but excluding 'simul'
-    bool         isCategory(const std::string& name) const;
+    bool isCategory(const std::string& name) const;
     
     /// return existing property of given class and name, or return zero
-    Property*    findProperty(const std::string&, const std::string&) const;
+    Property * findProperty(const std::string&, const std::string&) const;
     
     /// return existing property of given name, or return zero
     Property*    findProperty(const std::string&) const;
@@ -355,13 +355,13 @@ public:
     class InputLock;
     
     /// read objects from file, and add them to the simulation state
-    int  readObjects(Inputter&, ObjectSet* subset);
+    int readObjects(Inputter&, ObjectSet* subset);
 
     /// load sim-world from the named file
-    int  loadObjects(char const* filename);
+    int loadObjects(char const* filename);
     
     /// import objects from file, and delete objects that were not referenced in the file
-    int  reloadObjects(Inputter&, bool prune = 1, ObjectSet* subset = nullptr);
+    int reloadObjects(Inputter&, bool prune = 1, ObjectSet* subset = nullptr);
 
     /// write sim-world to specified file
     void writeObjects(Outputter&) const;

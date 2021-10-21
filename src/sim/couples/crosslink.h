@@ -26,13 +26,13 @@ public:
     Crosslink(CrosslinkProp const*, Vector const& w = Vector(0,0,0));
 
     /// destructor
-    virtual      ~Crosslink();
+    virtual ~Crosslink();
     
     /// simulation step for a free Couple: diffusion
-    virtual void  stepFF();
+    virtual void stepFF();
     
     /// add interactions to a Meca
-    void          setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
 
 };
 

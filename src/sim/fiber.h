@@ -185,63 +185,63 @@ public:
     //--------------------------------------------------------------------------
     
     /// prepare for Meca
-    void           prepareMecable();
+    void prepareMecable();
 
     /// calculate viscous drag coefficient
-    void           setDragCoefficient();
+    void setDragCoefficient();
     
     /// add force elements relevant for this Fiber to a Meca
-    void           setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
 
     /// adjust abscissa of Hands by applying mirror image around fiber midpoint
-    void           flipHandsPolarity();
+    void flipHandsPolarity();
     
     /// remove the portion of size `len` that includes the MINUS_END
-    void           cutM(real len);
+    void cutM(real len);
     
     /// remove the portion of size `len` that includes the PLUS_END
-    void           cutP(real len);
+    void cutP(real len);
     
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
-    void           planarCut(Vector const& n, real a, state_t stateP, state_t stateM);
+    void planarCut(Vector const& n, real a, state_t stateP, state_t stateM);
     
     /// cut fiber at distance `abs` from the MINUS_END; returns section `[ abs - PLUS_END ]`
-    Fiber *        severP(real abs);
+    Fiber * severP(real abs);
 
     /// cut fiber at abscissa `abs`; returns section `[ abs - PLUS_END ]`
-    Fiber *        severNow(real abs) { return severP(abs-abscissaM()); }
+    Fiber * severNow(real abs) { return severP(abs-abscissaM()); }
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
-    void           sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }
+    void sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }
     
     /// perform all the cuts registered by sever()
-    void           severNow();
+    void severNow();
 
 #if NEW_FIBER_CHEW
     /// register a chewing quantity
-    void           chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
+    void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
 #endif
 
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
-    virtual void   join(Fiber * fib);
+    virtual void join(Fiber * fib);
     
     /// simulation step
-    virtual void   step();
+    virtual void step();
     
     /// update Lattice and Mesh ranges
-    void           updateRange(Field*);
+    void updateRange(Field*);
     
     /// called if a Fiber tip has elongated or shortened
-    void           updateFiber();
+    void updateFiber();
     
     //--------------------------------------------------------------------------
 
     /// the energy due to bending rigidity: 1/2 * rigidity * sum( curvature(s)^2 ds ),
-    real           bendingEnergy() const { return bendingEnergy0() * prop->rigidity; }
+    real bendingEnergy() const { return bendingEnergy0() * prop->rigidity; }
     
     /// return the abscissa of the closest position to `w` on this Fiber, and set `dis` to the square of the distance
-    real           projectPoint(Vector const& w, real & dis) const;
+    real projectPoint(Vector const& w, real & dis) const;
     
     //--------------------------------------------------------------------------
     
@@ -252,66 +252,66 @@ public:
     virtual state_t endStateP() const { return STATE_WHITE; }
 
     /// return assembly/disassembly state of the FiberEnd
-    state_t         endState(FiberEnd end) const;
+    state_t endState(FiberEnd end) const;
 
     
     /// change state of MINUS_END
-    virtual void   setEndStateM(state_t) {}
+    virtual void setEndStateM(state_t) {}
 
     /// change state of PLUS_END
-    virtual void   setEndStateP(state_t) {}
+    virtual void setEndStateP(state_t) {}
 
     /// change state of FiberEnd `end` to `s`
-    void           setEndState(FiberEnd end, state_t s);
+    void setEndState(FiberEnd end, state_t s);
     
     
     /// the length of freshly assembled polymer at the MINUS_END during the last time step
-    virtual real   freshAssemblyM() const { return 0; }
+    virtual real freshAssemblyM() const { return 0; }
 
     /// the length of freshly assembled polymer at the PLUS_END during the last time step
-    virtual real   freshAssemblyP() const { return 0; }
+    virtual real freshAssemblyP() const { return 0; }
 
     /// the length of freshly assembled polymer during the last time step
-    real           freshAssembly(FiberEnd end) const;
+    real freshAssembly(FiberEnd end) const;
     
     
     /// true if the tip `end` has grown in the last time step ( freshAssembly(which) > 0 )
-    bool           isGrowing(FiberEnd end) const { return freshAssembly(end) > 0; }
+    bool isGrowing(FiberEnd end) const { return freshAssembly(end) > 0; }
     
     /// true if the tip `end` has shrunk in the last time step ( freshAssembly(which) < 0 )
-    bool           isShrinking(FiberEnd end) const { return freshAssembly(end) < 0; }
+    bool isShrinking(FiberEnd end) const { return freshAssembly(end) < 0; }
     
     //--------------------------------------------------------------------------
     
     /// register a new Hands that attached to this Fiber
-    void           addHand(Hand* h) const { fHands.add(h); }
+    void addHand(Hand* h) const { fHands.add(h); }
     
     /// unregister bound Hands (which has detached)
-    void           removeHand(Hand* h) const  { fHands.remove(h); }
+    void removeHand(Hand* h) const  { fHands.remove(h); }
     
     /// update all Hands bound to this
-    void           updateHands() const { fHands.update(); }
+    void updateHands() const { fHands.update(); }
 
     /// detach all Hands
-    void           detachHands() const { fHands.detachAll(); }
+    void detachHands() const { fHands.detachAll(); }
     
     /// sort Hands by order of increasing abscissa
-    void           sortHands() const { fHands.sort(); }
+    void sortHands() const { fHands.sort(); }
     
     /// return Hand bound to this fiber (use ->next() to access all other Hands)
-    Hand *         firstHand() const { return fHands.front(); }
+    Hand * firstHand() const { return fHands.front(); }
    
     /// number of attached Hands
-    size_t         nbHands() const { return fHands.count(); }
+    size_t nbHands() const { return fHands.count(); }
     
     /// a function to count Hands using a custom criteria
-    size_t         nbHands(int (*func)(Hand const*)) const { return fHands.count(func); }
+    size_t nbHands(int (*func)(Hand const*)) const { return fHands.count(func); }
 
     /// number of Hands attached within a range of abscissa
-    size_t         nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;
+    size_t nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;
     
     /// number of Hands attached at a distance less than 'len' from the specified FiberEnd
-    size_t         nbHandsNearEnd(real len, FiberEnd end) const;
+    size_t nbHandsNearEnd(real len, FiberEnd end) const;
     
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE
@@ -322,17 +322,17 @@ public:
     FiberLattice const& lattice() const { return fLattice; }
         
     /// recalculate occupancy lattice from bound Digits
-    void           resetLattice();
+    void resetLattice();
 #else
     /// does nothing
-    void           resetLattice() {}
+    void resetLattice() {}
 #endif
     
     /// record minium, maximum and sum of lattice values
-    void           infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx) const;
+    void infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx) const;
 
     /// print Lattice data (for debugging purpose)
-    void           printLattice(std::ostream&) const;
+    void printLattice(std::ostream&) const;
 
     
 #if FIBER_HAS_MESH
@@ -341,33 +341,33 @@ public:
     Lattice<real>& mesh() { return fMesh; }
 
     /// value of the fMesh at given abscissa
-    real           meshValue(real a) const { if ( fMesh.ready() ) return fMesh.cell(a); return 0; }
+    real meshValue(real a) const { if ( fMesh.ready() ) return fMesh.cell(a); return 0; }
 
 #endif
     
     /// initialize lattice sites to represent a constant linear density
-    void           setMeshValues(Lattice<real>&, real density) const;
+    void setMeshValues(Lattice<real>&, real density) const;
 
     /// transfer all lattice substance to the Field
-    void           releaseMeshValues(Lattice<real>&, Field*) const;
+    void releaseMeshValues(Lattice<real>&, Field*) const;
 
     /// update lattice values as `value <- cst + fac * value`
-    void           evolveMeshValues(Lattice<real>&, real cst, real fac) const;
+    void evolveMeshValues(Lattice<real>&, real cst, real fac) const;
 
     /// transfer from Field to Lattice at rate `on` and back at rate `off`
-    void           equilibrateMesh(Lattice<real>&, Field*, real on, real off) const;
+    void equilibrateMesh(Lattice<real>&, Field*, real on, real off) const;
     
     /// transfer from Field to Lattice at rate `on`
-    void           bindMesh(Lattice<real>&, Field*, real rate) const;
+    void bindMesh(Lattice<real>&, Field*, real rate) const;
     
     /// transfer from Field to Lattice at rate `on`
-    void           fluxMesh(Lattice<real>&, Field*, real speed) const;
+    void fluxMesh(Lattice<real>&, Field*, real speed) const;
     
     /// sever fiber proportionally to the quantity stored in the Lattice
-    void           cutFiberMesh(Lattice<real>&);
+    void cutFiberMesh(Lattice<real>&);
 
     /// find minium, maximum and sum of mesh values
-    void           infoMesh(real& len, size_t&, real& sm, real& mn, real& mx, bool density) const;
+    void infoMesh(real& len, size_t&, real& sm, real& mn, real& mx, bool density) const;
 
     /// lattice to be displayed
     VisibleLattice const* visibleLattice() const;
@@ -375,25 +375,25 @@ public:
     //--------------------------------------------------------------------------
     
     /// set Space glue for pure pushing
-    void           setGlue1(Single* glue, FiberEnd, Space const*);
+    void setGlue1(Single* glue, FiberEnd, Space const*);
     
     /// set Space glue for pure pulling
-    void           setGlue2(Single* glue, FiberEnd, Space const*);
+    void setGlue2(Single* glue, FiberEnd, Space const*);
     
     /// set Space glue for pushing and pulling
-    void           setGlue3(Single* glue, Space const*);
+    void setGlue3(Single* glue, Space const*);
     
     /// set Solid glue type 4
-    void           setGlueG(Single* glue, FiberEnd);
+    void setGlueG(Single* glue, FiberEnd);
     
     /// set Solid glue type 5
-    void           setGlueE(Single* glue, FiberEnd);
+    void setGlueE(Single* glue, FiberEnd);
 
     /// a setGlue to rule them all
-    void           setGlue(Single*& glue, FiberEnd, int mode);
+    void setGlue(Single*& glue, FiberEnd, int mode);
     
     /// create a Single that can be used as glue
-    void           makeGlue(Single*& glue);
+    void makeGlue(Single*& glue);
     
     //--------------------------------------------------------------------------
 
@@ -421,7 +421,7 @@ public:
     static const ObjectTag TAG_FIBMESH = 'M';
 
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }
@@ -448,10 +448,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
 };
 

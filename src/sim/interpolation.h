@@ -29,13 +29,13 @@ private:
     Mecable const*  mec_;
 
     /// index of vertex 1 in mec_
-    size_t          pt1_;
+    size_t pt1_;
 
     /// index of vertex 2 in mec_
-    size_t          pt2_;
+    size_t pt2_;
     
     /// interpolation coefficient: pos = (1-coef) * pt1_ + coef * pt2_
-    real           coef_;
+    real coef_;
     
 public:
 
@@ -65,73 +65,73 @@ public:
     }
     
     /// Index of point 1 in the matrix of dynamics (Meca::mISO)
-    size_t          matIndex1() const { return mec_->matIndex() + pt1_; }
+    size_t matIndex1() const { return mec_->matIndex() + pt1_; }
     
     /// Index of point 2 in the matrix of dynamics (Meca::mISO)
-    size_t          matIndex2() const { return mec_->matIndex() + pt2_; }
+    size_t matIndex2() const { return mec_->matIndex() + pt2_; }
     
     /// true if the pointer seems to be valid.
-    bool            valid()    const { return (mec_!=nullptr) & (pt1_<mec_->nbPoints()) & (pt2_<mec_->nbPoints()); }
+    bool valid()    const { return (mec_!=nullptr) & (pt1_<mec_->nbPoints()) & (pt2_<mec_->nbPoints()); }
 
     /// Constant pointer to the Mecable
     Mecable const*  mecable()  const { return mec_; }
 
     /// Mecapoint corresponding to first point
-    Mecapoint       vertex1()  const { return Mecapoint(mec_, pt1_); }
+    Mecapoint vertex1()  const { return Mecapoint(mec_, pt1_); }
     
     /// Mecapoint corresponding to second point
-    Mecapoint       vertex2()  const { return Mecapoint(mec_, pt2_); }
+    Mecapoint vertex2()  const { return Mecapoint(mec_, pt2_); }
     
     /// Index of point 1 in object
-    size_t          point1()   const { return pt1_; }
+    size_t point1()   const { return pt1_; }
   
     /// Index of point 2 in object
-    size_t          point2()   const { return pt2_; }
+    size_t point2()   const { return pt2_; }
 
     /// interpolation coefficient on first point
-    real            coef0()    const { return 1 - coef_; }
+    real coef0()    const { return 1 - coef_; }
 
     /// interpolation coefficient on second point
-    real            coef1()    const { return coef_; }
+    real coef1()    const { return coef_; }
 
     /// interpolation coefficient on first point (historical function)
-    //real          coef2()    const { return 1 - coef_; }
+    //real coef2()    const { return 1 - coef_; }
 
     /// Set interpolation coefficient
-    void            coef(real c)     { coef_ = c; }
+    void coef(real c)     { coef_ = c; }
     
     /// Interpolated position in space
-    Vector          pos()      const { return mec_->interpolatePoints(pt1_, pt2_, coef_); }
+    Vector pos()      const { return mec_->interpolatePoints(pt1_, pt2_, coef_); }
     
     /// position of first point
-    Vector          pos1()     const { return mec_->posP(pt1_); }
+    Vector pos1()     const { return mec_->posP(pt1_); }
     
     /// position of second point 
-    Vector          pos2()     const { return mec_->posP(pt2_); }
+    Vector pos2()     const { return mec_->posP(pt2_); }
     
     /// that is pos2() - pos1()
-    Vector          diff()     const { return mec_->diffPoints(pt1_, pt2_); }
+    Vector diff()     const { return mec_->diffPoints(pt1_, pt2_); }
     
     /// distance between point1 and point2
-    real            len()      const { return diff().norm(); }
+    real len()      const { return diff().norm(); }
 
     /// squared distance between point1 and point2
-    real            lenSqr()   const { return diff().normSqr(); }
+    real lenSqr()   const { return diff().normSqr(); }
 
     /// normalize(pos2() - pos1())
-    Vector          dir()      const { return normalize(diff()); }
+    Vector dir()      const { return normalize(diff()); }
 
     /// true if the coefficient is in [0, 1]
-    bool            inside()   const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }
+    bool inside()   const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }
 
     /// test if `this` has a common point with argument
-    bool            overlapping(Mecapoint const&) const;
+    bool overlapping(Mecapoint const&) const;
     
     /// test if `this` has a common point with argument
-    bool            overlapping(Interpolation const&) const;
+    bool overlapping(Interpolation const&) const;
 
     /// Human friendly ouput
-    void            print(std::ostream&) const;
+    void print(std::ostream&) const;
 };
 
 /// output operator for debugging purpose

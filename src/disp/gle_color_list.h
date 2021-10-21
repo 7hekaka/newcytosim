@@ -24,7 +24,7 @@ namespace gle
     gle_color alt_color(size_t indx);
     
     /// set a list of colors that are different from `back`
-    size_t    filter_colors(gle_color list[], size_t list_size, const gle_color back);
+    size_t filter_colors(gle_color list[], size_t list_size, const gle_color back);
     
     /// color used to select a 'bright_color()'
     extern gle_color background_color;
@@ -33,10 +33,10 @@ namespace gle
     gle_color bright_color(size_t indx, gle_color back=background_color);
 
     /// print a list of colors with names and values
-    void      print_colors(std::ostream&, named_color* list, size_t list_size);
+    void print_colors(std::ostream&, named_color* list, size_t list_size);
     
     /// print the list of standard colors
-    void      print_std_colors(std::ostream&);
+    void print_std_colors(std::ostream&);
 
 }
 

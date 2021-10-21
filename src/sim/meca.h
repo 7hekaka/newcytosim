@@ -378,7 +378,7 @@ public:
     ~Meca() { release(); }
     
     /// Add a Mecable to the list of objects to be simulated
-    void   addMecable(Mecable* p) { mecables.push_back(p); }
+    void addMecable(Mecable* p) { mecables.push_back(p); }
     
     /// Number of Mecable
     size_t nbMecables() const { return mecables.size(); }
@@ -387,7 +387,7 @@ public:
     size_t largestMecable() const;
 
     /// true if system does not contain any object
-    bool   empty() const { return nPoints_ == 0; }
+    bool empty() const { return nPoints_ == 0; }
     
     /// number of points in the system
     size_t nbVertices() const { return nPoints_; }

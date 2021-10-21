@@ -4723,7 +4723,7 @@ and for the first point:
 
     f1 = ( w1 / sum ) * [ w2 * ( pt2 - pt1 ) + w3 * ( pt3 - pt1 ) ]
 */
-void  Meca::addTriLink(Interpolation const& pt1, const real w1,
+void Meca::addTriLink(Interpolation const& pt1, const real w1,
                        Interpolation const& pt2, const real w2,
                        Interpolation const& pt3, const real w3)
 {

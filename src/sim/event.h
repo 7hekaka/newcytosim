@@ -87,7 +87,7 @@ public:
     static const ObjectTag TAG = 'q';
 
     /// an ASCII character identifying the class of this object
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
 
     /// returns 0, since Event have no Property
     Property const* property() const { return nullptr; }
@@ -95,24 +95,24 @@ public:
     //--------------------------------------------------------------------------
     
     /// Stochastic simulation
-    void      step(Simul&);
+    void step(Simul&);
     
     /// add interactions to a Meca
-    void      setInteractions(Meca&) const {}
+    void setInteractions(Meca&) const {}
     
     
     /// a static_cast<> of Object::next()
-    Event *   next() const { return static_cast<Event*>(nextO); }
+    Event * next() const { return static_cast<Event*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    Event *   prev() const { return static_cast<Event*>(prevO); }
+    Event * prev() const { return static_cast<Event*>(prevO); }
     
 
     /// read
-    void      read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write
-    void      write(Outputter&) const;
+    void write(Outputter&) const;
 };
 
 

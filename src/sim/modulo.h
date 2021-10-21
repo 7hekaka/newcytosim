@@ -55,16 +55,16 @@ public:
     Vector period(size_t d) const;
     
     /// shift `pos` to its canonical image, which is the one closest to the origin
-    void   fold(Vector& pos) const;
+    void fold(Vector& pos) const;
     
     /// shift `pos` to its image which is closest to `ref`
-    void   fold(Vector& pos, Vector const& ref) const;
+    void fold(Vector& pos, Vector const& ref) const;
     
     /// return translation necessary to bring `pos` to its canonical image
     Vector offset(Vector const& pos) const;
     
     /// set `pos` to its canonical image, and return offset = pos - fold(pos)
-    void   foldOffset(Vector& pos, Vector& off) const;
+    void foldOffset(Vector& pos, Vector& off) const;
     
 };
 

@@ -24,7 +24,7 @@ class Nucleus : public Organizer
 public:
         
     /// Sphere on which the Nucleus is built
-    Sphere*       nuSphere;
+    Sphere * nuSphere;
 
     /// Properties for the Nucleus
     NucleusProp const* prop;
@@ -34,39 +34,39 @@ public:
     Nucleus(NucleusProp const* p) : nuSphere(nullptr), prop(p) { }
     
     /// destructor
-    virtual      ~Nucleus();
+    virtual ~Nucleus();
 
     /// create a Nucleus and requested associated Objects
-    ObjectList    build(Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
     
     //------------------- simulation -------------------------------------------    
 
     /// Stochastic simulation
-    void          step();
+    void step();
     
     ///add interactions for this object to a Meca
-    void          setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
 
     //------------------- querying the nucleus ---------------------------------    
     
     ///position of center of gravity (returns the center of the sphere)
-    Vector        position() const { return nuSphere->position(); }
+    Vector position() const { return nuSphere->position(); }
     
     ///the Sphere on which the nucleus is built
-    Sphere *      sphere()   const { return nuSphere; }
+    Sphere * sphere()   const { return nuSphere; }
     
     /// i-th fiber attached to the nucleus
-    Fiber *       fiber(size_t i) const { return static_cast<Fiber*>(organized(i)); }
+    Fiber * fiber(size_t i) const { return static_cast<Fiber*>(organized(i)); }
     
     
     /// number of links to be displayed using getLink()
-    size_t        nbLinks() const { return nuSphere->nbPoints(); }
+    size_t nbLinks() const { return nuSphere->nbPoints(); }
 
     /// retrieve link between Sphere and ends of Fiber
-    bool          getLink(size_t, Vector&, Vector&) const;
+    bool getLink(size_t, Vector&, Vector&) const;
     
     /// return Sphere
-    Mecable*      core() const { return nuSphere; }
+    Mecable* core() const { return nuSphere; }
     
     /// display parameters
     PointDisp const* disp() const { if ( nuSphere ) return nuSphere->prop->disp; return nullptr; }
@@ -74,16 +74,16 @@ public:
     //------------------------------ read/write --------------------------------
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG_NUCLEUS; }
+    ObjectTag tag() const { return TAG_NUCLEUS; }
     
     /// return associated Property
     Property const* property() const { return prop; }
     
     /// read from IO
-    void            read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to IO
-    void            write(Outputter&) const;
+    void write(Outputter&) const;
 
 };
 

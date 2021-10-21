@@ -28,10 +28,10 @@ class Bundle : public Organizer
 private:
     
     /// add interactions to a Meca
-    void       linkAntiparallel(Meca&, Fiber *, Fiber *) const;
+    void linkAntiparallel(Meca&, Fiber *, Fiber *) const;
     
     /// add interactions to a Meca
-    void       linkParallel(Meca&, Fiber *, Fiber *) const;
+    void linkParallel(Meca&, Fiber *, Fiber *) const;
 
 public:
 
@@ -42,19 +42,19 @@ public:
     Bundle(BundleProp const* p) : prop(p) {}
     
     /// destructor  
-    virtual   ~Bundle();
+    virtual ~Bundle();
     
     /// construct all the dependent Objects of the Organizer
     ObjectList build(Glossary&, Simul&);
 
     /// perform one Monte-Carlo step
-    void       step();
+    void step();
     
     /// add interactions to a Meca
-    void       setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
     /// return the center of gravity from all MT central ends
-    Vector     position() const;
+    Vector position() const;
     
     /// display parameters
     PointDisp const* disp() const { return nullptr; }
@@ -62,7 +62,7 @@ public:
     //------------------------------ read/write --------------------------------
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG_BUNDLE; }
+    ObjectTag tag() const { return TAG_BUNDLE; }
     
     /// return associated Property
     Property const* property() const { return prop; }

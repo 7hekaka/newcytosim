@@ -139,34 +139,34 @@ public:
     //--------------------------------------------------------------------------
     
     /// the position of the anchoring point
-    virtual Vector  posFoot()     const { return sPos; }
+    virtual Vector posFoot()     const { return sPos; }
     
     /// position on the side of fiber used for sideInteractions
-    virtual Vector  sidePos()     const { return sHand->pos(); }
+    virtual Vector sidePos()     const { return sHand->pos(); }
     
     /// the Mecable to which this is anchored, or zero
     virtual Mecable const* base() const { return nullptr; }
     
     /// the Mecable to which this is anchored, or zero
-    virtual void    unbase() {}
+    virtual void unbase() {}
 
     /// true if Single creates an interaction
-    virtual bool    hasLink()     const { return false; }
+    virtual bool hasLink()     const { return false; }
     
     /// stretch = ( position_anchor - position_hand ), or zero for a diffusible Single
-    virtual Vector  stretch()     const { return Vector(0,0,0); }
+    virtual Vector stretch()     const { return Vector(0,0,0); }
 
     /// force = stiffness * ( position_anchor - position_hand ), or zero for a diffusible Single
-    virtual Vector  force()       const { return Vector(0,0,0); }
+    virtual Vector force()       const { return Vector(0,0,0); }
 
     /// Monte-Carlo step if the Hand is not attached
-    virtual void    stepF();
+    virtual void stepF();
     
     /// Monte-Carlo step if the Hand is attached
-    virtual void    stepA();
+    virtual void stepA();
     
     /// add interactions to a Meca
-    virtual void    setInteractions(Meca&) const;
+    virtual void setInteractions(Meca&) const;
     
     //--------------------------------------------------------------------------
     
@@ -197,10 +197,10 @@ public:
     Space const* confineSpace() const { return prop->confine_space_ptr; }
     
     /// read from file
-    virtual void read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to file
-    virtual void write(Outputter&) const;
+    void write(Outputter&) const;
     
 };
 

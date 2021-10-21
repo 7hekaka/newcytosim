@@ -59,10 +59,10 @@ private:
 public:
     
     /// constructor must provide a name
-    explicit     Property(std::string const& n);
+    explicit Property(std::string const& n);
 
     /// destructor
-    virtual     ~Property();
+    virtual ~Property();
     
     //-------------------------------------------------------------------------------
     
@@ -72,25 +72,25 @@ public:
     //-------------------------------------------------------------------------------
     
     /// return copy of name given to property
-    std::string  name()                   const { return name_; }
+    std::string name()                   const { return name_; }
     
     /// return name of property
-    const char*  name_str()               const { return name_.c_str(); }
+    const char * name_str()               const { return name_.c_str(); }
 
     /// change name
-    void         rename(std::string const& n)   { name_ = n; }
+    void rename(std::string const& n)   { name_ = n; }
         
     /// true if this->name() is `n`
-    bool         is_named(std::string const& n) { return ( n == name_ ); }
+    bool is_named(std::string const& n) { return ( n == name_ ); }
     
     //-------------------------------------------------------------------------------
     
     /// index, unique among all Property of similar category()
-    PropertyID   number() const { return number_; }
+    PropertyID number() const { return number_; }
     
     /// set index in the array of Properties
-    void         renumber(PropertyID x) { number_ = x; }
-    //void       renumber(PropertyID x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
+    void renumber(PropertyID x) { number_ = x; }
+    //void renumber(PropertyID x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
 
     //-------------------------------------------------------------------------------
     
@@ -106,7 +106,7 @@ public:
     virtual Property* clone() const = 0;
     
     /// true if at least one value is different from its default setting
-    bool         modified() const;
+    bool modified() const;
     
     //-------------------------------------------------------------------------------
     
@@ -114,13 +114,13 @@ public:
     virtual void read(Glossary&) = 0;
 
     /// set from a `str` and indicate `msg` in errors/warnings
-    void         read_string(std::string const& str, std::string const& msg);
+    void read_string(std::string const& str, std::string const& msg);
 
     /// read a file specified by name
-    void         read_file(const char filename[]);
+    void read_file(const char filename[]);
     
     /// read a file specified by name
-    void         read_file(std::string const& str) { read_file(str.c_str()); }
+    void read_file(std::string const& str) { read_file(str.c_str()); }
    
     //-------------------------------------------------------------------------------
     
@@ -179,13 +179,13 @@ public:
     virtual void write_values(std::ostream&) const = 0;
     
     /// write only values that differ from the ones specified in `ref`
-    void         write_values_diff(std::ostream&, Property const* ref) const;
+    void write_values_diff(std::ostream&, Property const* ref) const;
 
     /// if ( prune == true ), write values that differ from the default values
-    void         write_values_diff(std::ostream&, bool prune) const;
+    void write_values_diff(std::ostream&, bool prune) const;
     
     /// write header + data
-    void         write(std::ostream&, bool prune = false) const;
+    void write(std::ostream&, bool prune = false) const;
 
 };
 

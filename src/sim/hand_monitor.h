@@ -49,10 +49,10 @@ public:
     virtual Vector linkBase(Hand const*) const { return Vector(0,0,0); }
 
     /// resting length of the link involving this Hand
-    virtual real   linkRestingLength() const { return 0; }
+    virtual real linkRestingLength() const { return 0; }
     
     /// stiffness of the link involving this Hand
-    virtual real   linkStiffness() const { return 0; }
+    virtual real linkStiffness() const { return 0; }
 
     /// identity() of containing object
     virtual ObjectID nucleatorID() const { return 0; }

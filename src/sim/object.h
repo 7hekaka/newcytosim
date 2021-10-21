@@ -85,7 +85,7 @@ public:
     static void writeReference(Outputter&, Object const*);
     
     /// write header to object data, using provided tag
-    void        writeHeader(Outputter&, ObjectTag) const;
+    void writeHeader(Outputter&, ObjectTag) const;
 
 public:
     
@@ -123,10 +123,10 @@ public:
     Object * prev()    const { return prevO; }
     
     /// set next Object
-    void     next(Object* n) { nextO = n; }
+    void next(Object* n) { nextO = n; }
     
     /// set previous Object
-    void     prev(Object* n) { prevO = n; }
+    void prev(Object* n) { prevO = n; }
 
     //--------------------------
 
@@ -134,13 +134,13 @@ public:
     ObjectSet * objset() const { return set_; }
     
     /// returns container Simul
-    Simul &     simul() const;
+    Simul & simul() const;
     
     /// change container class
-    void        objset(ObjectSet* s) { set_ = s; }
+    void objset(ObjectSet* s) { set_ = s; }
     
     /// true if Object is registered in a container class
-    bool        linked() const { return set_ != nullptr; }
+    bool linked() const { return set_ != nullptr; }
 
     /// concatenation of [ tag(), property()->number(), identity() ] in plain ascii
     std::string reference() const;
@@ -148,20 +148,20 @@ public:
     //--------------------------
 
     /// get mark
-    ObjectMark  mark()        const { return mark_; }
+    ObjectMark  mark() const { return mark_; }
     
     /// set mark
-    void        mark(ObjectMark m)  { mark_ = m; }
+    void mark(ObjectMark m)  { mark_ = m; }
     
     
     /// retrieve flag value
     ObjectFlag  flag()       const  { return flag_; }
     
     /// set flag (this value is not stored in trajectory files)
-    void        flag(ObjectFlag f)  { flag_ = f; }
+    void flag(ObjectFlag f)  { flag_ = f; }
     
     /// set flag to match identity()
-    void        matchFlagIdentity() { flag_ = identity(); }
+    void matchFlagIdentity() { flag_ = identity(); }
 
     
     /// a random number that makes objects unique

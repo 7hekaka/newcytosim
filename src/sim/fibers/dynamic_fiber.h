@@ -121,39 +121,39 @@ public:
     //--------------------------------------------------------------------------
     
     /// initialize minus end
-    void        initM();
+    void initM();
     
     /// initialize plus end
-    void        initP();
+    void initP();
 
     /// return assembly/disassembly state of MINUS_END
-    state_t     endStateM() const;
+    state_t endStateM() const;
     
     /// return assembly/disassembly state of PLUS_END
-    state_t     endStateP() const;
+    state_t endStateP() const;
     
     /// change state of MINUS_END
-    void        setEndStateM(state_t s);
+    void setEndStateM(state_t s);
     
     /// change state of PLUS_END
-    void        setEndStateP(state_t s);
+    void setEndStateP(state_t s);
     
     /// length increment at MINUS_END during last time-step
-    real        freshAssemblyM() const { return mGrowthM; }
+    real freshAssemblyM() const { return mGrowthM; }
     
     /// length increment at PLUS_END during last time-step
-    real        freshAssemblyP() const { return mGrowthP; }
+    real freshAssemblyP() const { return mGrowthP; }
 
     //--------------------------------------------------------------------------
     
     /// simulate dynamic instability of PLUS_END
-    int         stepPlusEnd();
+    int stepPlusEnd();
     
     /// simulate dynamic instability of MINUS_END
-    int         stepMinusEnd();
+    int stepMinusEnd();
     
     /// Stochastic simulation
-    void        step();
+    void step();
     
     //--------------------------------------------------------------------------
     
@@ -161,13 +161,13 @@ public:
     std::string activity() const { return "dynamic"; }
 
     /// write to Outputter
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// read from Inputter
-    void        readEndState(Inputter&);
+    void readEndState(Inputter&);
 
     /// read from Inputter
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
 };
 

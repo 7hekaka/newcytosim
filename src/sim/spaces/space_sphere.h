@@ -28,59 +28,59 @@ public:
     SpaceSphere(SpaceProp const*);
 
     /// check number and validity of specified lengths
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        thickness() const { return 2*radius_; }
+    real thickness() const { return 2*radius_; }
 
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// the area of the edge surface
-    real        surface() const;
+    real surface() const;
 
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// true if the bead is inside the Space
-    bool        allInside(Vector const&, real rad) const;
+    bool allInside(Vector const&, real rad) const;
 
     /// a random position inside the volume
-    Vector      place() const { return Vector::randB(radius_); }
+    Vector place() const { return Vector::randB(radius_); }
     
     /// direct normal direction calculation
-    Vector      normalToEdge(Vector const& pos) const { return normalize(pos); }
+    Vector normalToEdge(Vector const& pos) const { return normalize(pos); }
     
     /// direct surface placement
-    Vector      placeOnEdge(real) const { return Vector::randU(radius_); }
+    Vector placeOnEdge(real) const { return Vector::randU(radius_); }
 
     /// return point on the edge that is closest to `pos`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
 
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     
     /// OpenGL display function
-    void        draw2D() const;
+    void draw2D() const;
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif

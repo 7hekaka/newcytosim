@@ -22,10 +22,10 @@ class FiberSegment final
 private:
     
     /// Fiber to which the segment belongs to
-    Fiber const*  fib_;
+    Fiber const * fib_;
     
     /// index of segment's first point
-    size_t        pti_;
+    size_t pti_;
     
 public:
     
@@ -36,86 +36,86 @@ public:
     FiberSegment(Fiber const* f, size_t p) : fib_(f), pti_(p) {}
     
     /// setter
-    void     set(Fiber const* f, size_t p) { fib_ = f; pti_ = p; }
+    void set(Fiber const* f, size_t p) { fib_ = f; pti_ = p; }
 
     /// the Fiber
-    Fiber const* fiber()       const { return fib_; }
+    Fiber const* fiber() const { return fib_; }
     
     /// index of segment
-    size_t       point()       const { return pti_; }
+    size_t point()      const { return pti_; }
     
     /// Index of the point-of-interest in the isotropic matrix (Meca::mISO)
-    size_t       matIndex()    const { return fib_->matIndex() + pti_; }
+    size_t matIndex()   const { return fib_->matIndex() + pti_; }
 
     /// abscissa at start of segment (i.e. corresponding to point())
-    real         abscissa1()   const { return fib_->abscissaPoint(pti_); }
+    real abscissa1()    const { return fib_->abscissaPoint(pti_); }
     
     /// abscissa of second point
-    real         abscissa2()   const { return fib_->abscissaPoint(pti_+1); }
+    real abscissa2()    const { return fib_->abscissaPoint(pti_+1); }
 
     /// the length of the segment
-    real         len()         const { return fib_->segmentation(); }
+    real len()          const { return fib_->segmentation(); }
     
     /// should return 1.0 / len()
-    real         lenInv()      const { return fib_->segmentationInv(); }
+    real lenInv()       const { return fib_->segmentationInv(); }
     
     /// true if abscissa 'a', counted from point 0 is within the segment
-    bool         within(real a) const { return ( 0 <= a ) & ( a <= fib_->segmentation() ); }
+    bool within(real a) const { return ( 0 <= a ) & ( a <= fib_->segmentation() ); }
     
     /// position of first point
-    Vector       pos1()        const { return fib_->posP(pti_); }
+    Vector pos1()       const { return fib_->posP(pti_); }
     
     /// position of second point
-    Vector       pos2()        const { return fib_->posP(pti_+1); }
+    Vector pos2()       const { return fib_->posP(pti_+1); }
 
     /// interpolated position, where c is in [0, 1]
-    Vector       pos(real c)   const { return fib_->posPoint(pti_, c); }
+    Vector pos(real c)  const { return fib_->posPoint(pti_, c); }
     
     /// that is [ pos2() + pos1() ] / 2
-    Vector       middle()      const { return fib_->posPoint(pti_, 0.5); }
+    Vector middle()     const { return fib_->posPoint(pti_, 0.5); }
 
     /// that is pos2() - pos1()
-    Vector       diff()        const { return fib_->diffPoints(pti_); }
+    Vector diff()       const { return fib_->diffPoints(pti_); }
 
     /// normalized tangent to Fiber
-    Vector       dir()         const { return fib_->dirSegment(pti_); }
+    Vector dir()        const { return fib_->dirSegment(pti_); }
     
     /// Mecapoint corresponding to first point
-    Mecapoint    vertex1()     const { return Mecapoint(fib_, pti_); }
+    Mecapoint vertex1() const { return Mecapoint(fib_, pti_); }
     
     /// Mecapoint corresponding to second point
-    Mecapoint    vertex2()     const { return Mecapoint(fib_, pti_+1); }
+    Mecapoint vertex2() const { return Mecapoint(fib_, pti_+1); }
     
     /// true if the segment is the first of the Fiber
-    bool         isFirst()     const { return ( pti_ == 0 ); }
+    bool isFirst()     const { return ( pti_ == 0 ); }
 
     /// true if the segment is not the first of the Fiber
-    bool         notFirst()    const { return ( pti_ > 0 ); }
+    bool notFirst()    const { return ( pti_ > 0 ); }
     
     /// true if the segment is the last of the fiber
-    bool         isLast()      const { return ( pti_+2 == fib_->nbPoints() ); }
+    bool isLast()      const { return ( pti_+2 == fib_->nbPoints() ); }
     
     /// true if the segment is not the last of the fiber
-    bool         notLast()     const { return ( pti_+2 < fib_->nbPoints() ); }
+    bool notLast()     const { return ( pti_+2 < fib_->nbPoints() ); }
 
     
     /// return abscissa of the projection of `w` on the line supporting the segment, and set distance
-    real         projectPoint0(Vector w, real& dist) const;
+    real projectPoint0(Vector w, real& dist) const;
 
     /// return abscissa in [0, 1] of the closest point to `w` on the segment, and set distance
-    real         projectPoint(Vector w, real& dist) const;
+    real projectPoint(Vector w, real& dist) const;
 
     /// old hand-crafted projectionPoint(), but incompatible with periodic boundary conditions
-    real         projectPointF(const real[], real& dist) const;
+    real projectPointF(const real[], real& dist) const;
     
     /// calculates the closest distance between two infinite lines and set corresponding abscissa
-    bool         belowDistance(FiberSegment const&, real sup, real& a, real& b, real& dis2) const;
+    bool belowDistance(FiberSegment const&, real sup, real& a, real& b, real& dis2) const;
 
     /// Human friendly ouput
-    void         print(std::ostream&) const;
+    void print(std::ostream&) const;
 
     /// Human friendly ouput
-    std::string  toString() const;
+    std::string toString() const;
 };
 
 /// print for debug purpose

@@ -77,29 +77,29 @@ public:
          if ( mobile() & 2 ):
              rotate() should be implemented
      */
-    virtual int       mobile()  const { return 0; }
+    virtual int mobile()  const { return 0; }
     
     /// return the spatial position of the Object
-    virtual Vector    position()  const { return Vector(0.0,0.0,0.0); }
+    virtual Vector position()  const { return Vector(0.0,0.0,0.0); }
     
     /// move Object ( position += given vector )
-    virtual void      translate(Vector const&);
+    virtual void translate(Vector const&);
     
     /// move Object to specified position
-    virtual void      setPosition(Vector const& x) { translate( x - position() ); }
+    virtual void setPosition(Vector const& x) { translate( x - position() ); }
 
     /// translate Object by applying rotation around the Origin
-    void              rotateT(Rotation const&);
+    void rotateT(Rotation const&);
     
     /// rotate Object around the Origin
-    virtual void      rotate(Rotation const&);
+    virtual void rotate(Rotation const&);
     
     /// rotate Object around its current position, using translate() and rotate()
-    void              revolve(Rotation const&);
+    void revolve(Rotation const&);
     
     
     /// bring object to centered image using periodic boundary conditions
-    virtual void      foldPosition(Modulo const*) {}
+    virtual void foldPosition(Modulo const*) {}
     
 };
 

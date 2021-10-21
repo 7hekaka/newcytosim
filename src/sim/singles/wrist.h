@@ -36,16 +36,16 @@ public:
     //--------------------------------------------------------------------------
     
     /// return the position in space of the object
-    Vector  position() const { return base_.position(); }
+    Vector position() const { return base_.position(); }
     
     /// Wrist accepts translation
-    int     mobile() const { return 0; }
+    int mobile() const { return 0; }
     
     /// translate object's position by the given vector
-    void    translate(Vector const&) { }
+    void translate(Vector const&) { }
     
     /// bring object to centered image using periodic boundary conditions
-    void    foldPosition(Modulo const*) { }
+    void foldPosition(Modulo const*) { }
 
     //--------------------------------------------------------------------------
     
@@ -53,50 +53,50 @@ public:
     Mecable const* base() const { return base_.mecable(); }
     
     /// attach at one Mecapoint
-    void    rebase(Mecable const* mec, size_t pti) { base_.set(mec, pti); }
+    void rebase(Mecable const* mec, size_t pti) { base_.set(mec, pti); }
     
     /// attach between two Mecapoint
-    void    rebase(Mecable const* mec, size_t a, size_t b, real c) { base_.set(mec, a, b, c); }
+    void rebase(Mecable const* mec, size_t a, size_t b, real c) { base_.set(mec, a, b, c); }
     
     /// attach over a triad of Mecapoint
-    void    rebase(Mecable const* mec, size_t ref, Vector pos) { base_.set(mec, ref, pos); }
+    void rebase(Mecable const* mec, size_t ref, Vector pos) { base_.set(mec, ref, pos); }
     
     
     /// true if Single creates a link
-    bool    hasLink() const { return true; }
+    bool hasLink() const { return true; }
 
     /// stiffness of the interaction
-    real    linkStiffness() const { return prop->stiffness; }
+    real linkStiffness() const { return prop->stiffness; }
 
     /// the position of the anchoring point
-    Vector  posFoot() const { return base_.position(); }
+    Vector posFoot() const { return base_.position(); }
     
     /// stretch of the link = ( posFoot() - posHand() )
-    Vector  stretch() const;
+    Vector stretch() const;
 
     /// force = stiffness * ( posFoot() - posHand() )
-    Vector  force() const;
+    Vector force() const;
     
     
     /// Monte-Carlo step for a free Single
-    void    stepF();
+    void stepF();
     
     /// Monte-Carlo step for a bound Single
-    void    stepA();
+    void stepA();
 
     /// add interactions to a Meca
-    void    setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
 
     //--------------------------------------------------------------------------
     
     /// return unique character identifying the class
-    ObjectTag    tag() const { return TAG_WRIST; }
+    ObjectTag tag() const { return TAG_WRIST; }
     
     /// read from file
-    void    read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to file
-    void    write(Outputter&) const;
+    void write(Outputter&) const;
     
 };
 

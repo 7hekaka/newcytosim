@@ -35,13 +35,13 @@ public:
     //--------------------------------------------------------------------------
     
     /// position on the side of fiber used for sideInteractions
-    Vector  sidePos() const;
+    Vector sidePos() const;
     
     /// force = stiffness * ( posFoot() - posHand() )
-    Vector  force() const;
+    Vector force() const;
         
     /// add interactions to a Meca
-    void    setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
 };
 

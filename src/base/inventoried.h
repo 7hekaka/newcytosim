@@ -22,7 +22,7 @@ class Inventoried
 protected:
     
     /// object identifier, unique within each class
-    ObjectID   ID_;
+    ObjectID ID_;
     
 public:
     
@@ -34,13 +34,13 @@ public:
     
     
     /// change the identity of this object
-    void      identity(ObjectID n) { ID_ = n; }
+    void identity(ObjectID n) { ID_ = n; }
     
     /// returns identity (strictly positive integer, unique within each class)
-    ObjectID  identity()     const { return ID_; }
+    ObjectID  identity() const { return ID_; }
     
     /// returns modifiable identity
-    ObjectID& identity()           { return ID_; }
+    ObjectID& identity() { return ID_; }
 
 };
 

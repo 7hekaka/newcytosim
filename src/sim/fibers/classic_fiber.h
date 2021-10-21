@@ -53,16 +53,16 @@ class ClassicFiber : public Fiber
 private:
     
     /// state of MINUS_END
-    state_t    mStateM;
+    state_t mStateM;
     
     /// length increment at MINUS_END during last time-step
-    real       mGrowthM;
+    real mGrowthM;
 
     /// state of PLUS_END
-    state_t    mStateP;
+    state_t mStateP;
     
     /// length increment at PLUS_END during last time-step
-    real       mGrowthP;
+    real mGrowthP;
      
 public:
     
@@ -73,32 +73,32 @@ public:
     ClassicFiber(ClassicFiberProp const*);
 
     /// destructor
-    virtual    ~ClassicFiber();
+    virtual ~ClassicFiber();
         
     //--------------------------------------------------------------------------
     
     /// return assembly/disassembly state of MINUS_END
-    state_t     endStateM() const { return mStateM; }
+    state_t endStateM() const { return mStateM; }
 
     /// return assembly/disassembly state of PLUS_END
-    state_t     endStateP() const { return mStateP; }
+    state_t endStateP() const { return mStateP; }
 
     
     /// length increment at MINUS_END during last time-step
-    real        freshAssemblyM() const { return mGrowthM; }
+    real freshAssemblyM() const { return mGrowthM; }
     
     /// length increment at PLUS_END during last time-step
-    real        freshAssemblyP() const { return mGrowthP; }
+    real freshAssemblyP() const { return mGrowthP; }
 
     
     /// change state of MINUS_END
-    void        setEndStateM(state_t s);
+    void setEndStateM(state_t s);
     
     /// change state of PLUS_END
-    void        setEndStateP(state_t s);
+    void setEndStateP(state_t s);
 
     /// Stochastic simulation
-    void        step();
+    void step();
     
     //--------------------------------------------------------------------------
     
@@ -106,13 +106,13 @@ public:
     std::string activity() const { return "classic"; }
 
     /// write to Outputter
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// read from Inputter
-    void        readEndState(Inputter&);
+    void readEndState(Inputter&);
 
     /// read from Inputter
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
 };
 

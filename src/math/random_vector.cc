@@ -18,7 +18,7 @@ Vector1 Vector1::randP()       { return Vector1(  RNG.preal()); }
 Vector1 Vector1::randP(real n) { return Vector1(n*RNG.preal()); }
 Vector1 Vector1::randU()       { return Vector1(  RNG.sflip()); }
 Vector1 Vector1::randU(real n) { return Vector1(n*RNG.sflip()); }
-void  Vector1::addRand(real n) { XX += n*RNG.sreal(); }
+void Vector1::addRand(real n) { XX += n*RNG.sreal(); }
 
 Vector1 Vector1::randB()       { return Vector1(  RNG.sreal()); }
 Vector1 Vector1::randB(real n) { return Vector1(n*RNG.sreal()); }
@@ -36,7 +36,7 @@ Vector2 Vector2::randS(real n) { return Vector2(n*RNG.sreal(), n*RNG.sreal()); }
 Vector2 Vector2::randP()       { return Vector2(  RNG.preal(),   RNG.preal()); }
 Vector2 Vector2::randP(real n) { return Vector2(n*RNG.preal(), n*RNG.preal()); }
 Vector2 Vector2::randG(real n) { return Vector2(n*RNG.gauss(), n*RNG.gauss()); }
-void  Vector2::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); }
+void Vector2::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); }
 
 #if ( 0 )
 
@@ -134,7 +134,7 @@ Vector3 Vector3::randS(real n) { return Vector3(n*RNG.sreal(), n*RNG.sreal(), n*
 Vector3 Vector3::randP()       { return Vector3(RNG.preal(),     RNG.preal(),   RNG.preal()); }
 Vector3 Vector3::randP(real n) { return Vector3(n*RNG.preal(), n*RNG.preal(), n*RNG.preal()); }
 Vector3 Vector3::randG(real n) { return Vector3(n*RNG.gauss(), n*RNG.gauss(), n*RNG.gauss()); }
-void  Vector3::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); ZZ += n*RNG.sreal(); }
+void Vector3::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); ZZ += n*RNG.sreal(); }
 
 
 #if ( 0 )

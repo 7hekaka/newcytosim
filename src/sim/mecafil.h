@@ -83,34 +83,34 @@ private:
     real * iJJtJF;
     
     /// true if all elements of iJJtJF[] are null
-    bool  useProjectionDiff;
+    bool useProjectionDiff;
 #endif
 protected:
     
     /// mobility of the points (all points have the same drag coefficient)
-    real  iPointMobility;
+    real iPointMobility;
     
     /// rigidity scaling factor used in addRigidity()
-    real  iRigidity;
+    real iRigidity;
     
 #if NEW_FIBER_LOOP
     /// link filament into a loop
-    bool  iRigidityLoop;
+    bool iRigidityLoop;
 #endif
     
     /// calculate the normalized difference of successive vertices in iDir[]
-    void  storeDirections();
+    void storeDirections();
 
 private:
     
     /// reset the memory pointers for the projection
-    void  initProjection();
+    void initProjection();
     
     /// allocate memory for the projection
-    void  allocateProjection(size_t);
+    void allocateProjection(size_t);
     
     /// free the memory for the projection
-    void  destroyProjection();
+    void destroyProjection();
 
 public:
     
@@ -124,27 +124,27 @@ public:
     Mecafil& operator=(Mecafil const&);
     
     /// Destructor
-    virtual    ~Mecafil();
+    virtual ~Mecafil();
     
     //------------------------------- Mecable ----------------------------------
 
     /// allocate memory
-    size_t      allocateMecable(size_t);
+    size_t allocateMecable(size_t);
     
     /// free allocated memory
-    void        release();
+    void release();
 
     /// compute Lagrange multipliers associated with length constraints, given the force
-    void        computeTensions(const real* force);
+    void computeTensions(const real* force);
     
     /// set Lagrange multipliers
-    void        setTensions(const real* ptr) { copy_real(nbSegments(), ptr, iLag); }
+    void setTensions(const real* ptr) { copy_real(nbSegments(), ptr, iLag); }
     
     /// debug output
-    void        printTensions(FILE *, char = ' ') const;
+    void printTensions(FILE *, char = ' ') const;
     
     /// replace current forces by the ones provided as argument, and compute tensions
-    void        getForces(const real* ptr);
+    void getForces(const real* ptr);
 
     /// longitudinal force dipole between vertices `p` and `p+1`
     /**
@@ -156,59 +156,59 @@ public:
      .
      It is given in units of force (picoNewton, in Cytosim's standard units).
      */
-    real        tension(size_t p) const { assert_true(p+1<nPoints); return iLag[p]; }
+    real tension(size_t p) const { assert_true(p+1<nPoints); return iLag[p]; }
     
     /// total drag-coefficient of object (force = drag * speed)
-    real        dragCoefficient() const { return nPoints / iPointMobility; }
+    real dragCoefficient() const { return nPoints / iPointMobility; }
     
     /// The mobility of a model vertex ( speed = mobility * point_force )
-    real        pointMobility() const { return iPointMobility; }
+    real pointMobility() const { return iPointMobility; }
 
     /// drag coefficient of one point
-    real        leftoverMobility() const { return iPointMobility; }
+    real leftoverMobility() const { return iPointMobility; }
 
     //--------------------- Projection  / Dynamics
     
     /// prepare for projection by building projection matrix
-    void        makeProjection();
+    void makeProjection();
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     /// build projection matrix corresponding to current configuration
-    void        makeProjectionAnisotropic();
+    void makeProjectionAnisotropic();
 #endif
 #if ADD_PROJECTION_DIFF
     /// select corrections to the projection, from the Lagrange multipliers
-    void        setProjectionDiff(real threshold);
+    void setProjectionDiff(real threshold);
     
     /// prepare the correction to the projection
-    void        makeProjectionDiff(const real* );
+    void makeProjectionDiff(const real* );
     
     /// add the contribution from the projection correction
-    void        addProjectionDiff(const real*, real*) const;
+    void addProjectionDiff(const real*, real*) const;
     
     /// true if addProjectionDiff() does something
-    bool        hasProjectionDiff() const { return useProjectionDiff; }
+    bool hasProjectionDiff() const { return useProjectionDiff; }
 #endif
     
     /// add displacements due to the Brownian motion to rhs[]
-    real        addBrownianForces(real const* rnd, real, real* rhs) const;
+    real addBrownianForces(real const* rnd, real, real* rhs) const;
 
     /// calculate the speeds from the forces, including projection
-    void        projectForces(const real* X, real* Y) const;
+    void projectForces(const real* X, real* Y) const;
     
     /// print projection matrix
-    void        printProjection(std::ostream&) const;
+    void printProjection(std::ostream&) const;
 
     //--------------------- Rigidity
     
     /// return fiber rigidity
-    int         hasRigidity() const { return ( nPoints > 2 ) & ( iRigidity > 0 ); }
+    int hasRigidity() const { return ( nPoints > 2 ) & ( iRigidity > 0 ); }
 
     /// return fiber rigidity
-    real        fiberRigidity() const { return iRigidity; }
+    real fiberRigidity() const { return iRigidity; }
 
     /// add the rigidity force corresponding to configuration X into vector Y
-    void        addRigidity(const real* X, real* Y) const;
+    void addRigidity(const real* X, real* Y) const;
 
 };
 

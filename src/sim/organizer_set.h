@@ -30,13 +30,13 @@ public:
     ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, PropertyID);
+    Object * newObject(ObjectTag, PropertyID);
     
     /// write all Objects to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream&) const;
+    void report(std::ostream&) const;
 
     //--------------------------
     
@@ -47,10 +47,10 @@ public:
     Organizer * findID(ObjectID n) const;
     
     /// find highest ObjectID among Organizers containing given Mecable
-    ObjectID    findOrganizerID(Mecable const*) const;
+    ObjectID findOrganizerID(Mecable const*) const;
 
     /// Monte-Carlo simulation step for every Object
-    void        step();
+    void step();
 
 };
 

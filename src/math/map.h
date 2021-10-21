@@ -327,13 +327,13 @@ public:
 #pragma mark -
 
     /// total number of cells in the map
-    size_t       nbCells()           const { return mNbCells; }
+    size_t nbCells()           const { return mNbCells; }
 
     /// number of cells in dimensionality `d`
-    size_t       breadth(size_t d)   const { return mDim[d]; }
+    size_t breadth(size_t d)   const { return mDim[d]; }
     
     /// offset to the next cell in the direction `d`
-    size_t       stride(size_t d)    const { return mStride[d]; }
+    size_t stride(size_t d)    const { return mStride[d]; }
     
     /// position of the inferior (left/bottom/etc) edge
     const real*  inf()               const { return mInf;    }
@@ -351,13 +351,13 @@ public:
     real         cellWidth(size_t d) const { return cWidth[d]; }
     
     /// the volume of a cell
-    real         cellVolume()        const { return cVolume; }
+    real cellVolume()        const { return cVolume; }
 
     /// position in dimension `d`, of the cell of index `c`
-    real         position(size_t d, real c) const { return mInf[d] + c * cWidth[d]; }
+    real position(size_t d, real c) const { return mInf[d] + c * cWidth[d]; }
     
     /// index in dimension `d` corresponding to position `w`
-    int          index(size_t d, real w) const { return (int)map(d, w); }
+    int index(size_t d, real w) const { return (int)map(d, w); }
 
     /// half the diagonal length of the unit cell
     real cellRadius() const

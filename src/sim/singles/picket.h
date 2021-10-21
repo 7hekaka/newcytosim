@@ -18,13 +18,13 @@ class Picket : public Single
 public:
     
     /// sPos should never change
-    void    beforeDetachment(Hand const*);
+    void beforeDetachment(Hand const*);
     
     /// stiffness of the interaction
-    real    linkStiffness() const { return prop->stiffness; }
+    real linkStiffness() const { return prop->stiffness; }
     
     /// true if Single creates an interaction
-    bool    hasLink() const { return true; }
+    bool hasLink() const { return true; }
 
 public:
 
@@ -35,31 +35,31 @@ public:
     ~Picket();
     
     ///return the position in space of the object
-    Vector  position() const { return sPos; }
+    Vector position() const { return sPos; }
 
     /// Picket accepts translation
-    int     mobile()   const { return 1; }
+    int mobile()   const { return 1; }
     
     /// translate object's position by the given vector
-    void    translate(Vector const& w)  { sPos += w; }
+    void translate(Vector const& w)  { sPos += w; }
     
     /// move object to specified position
-    void    setPosition(Vector const& x) { sPos = x; }
+    void setPosition(Vector const& x) { sPos = x; }
     
     /// stretch of the link = ( posFoot() - posHand() )
-    Vector  stretch() const;
+    Vector stretch() const;
 
     /// tension in the link = stiffness * ( posFoot() - posHand() )
-    Vector  force() const;
+    Vector force() const;
 
     /// Monte-Carlo step for a free Single
-    void    stepF();
+    void stepF();
     
     /// Monte-Carlo step for a bound Single
-    void    stepA();
+    void stepA();
     
     /// add interactions to a Meca
-    void    setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
 };
 

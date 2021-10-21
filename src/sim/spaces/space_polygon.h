@@ -34,19 +34,19 @@ class SpacePolygon : public Space
 private:
         
     /// pre-calculated bounding box derived from poly_
-    Vector      inf_, sup_;
+    Vector inf_, sup_;
 
     /// The 2D polygon object
-    Polygon     poly_;
+    Polygon poly_;
     
     /// Surface of polygon
-    real        surface_;
+    real surface_;
     
     /// half the total height in Z
-    real        height_;
+    real height_;
 
     /// update derived lengths
-    void        update();
+    void update();
 
 public:
         
@@ -57,47 +57,47 @@ public:
     ~SpacePolygon();
     
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
     
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
+    void boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
     
     /// the volume inside
-    real        volume() const { return ( DIM>2 ? 2*height_ : 1 ) * surface_; }
+    real volume() const { return ( DIM>2 ? 2*height_ : 1 ) * surface_; }
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// a random position inside the volume
-    Vector      place() const;
+    Vector place() const;
 
     /// return point on the edge that is closest to `pos`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
 
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions between fibers and reentrant corners
-    void        setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
 
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
     /// OpenGL display function
-    void        drawPolygon(bool, bool) const;
+    void drawPolygon(bool, bool) const;
     /// OpenGL display function
-    void        draw2D() const { drawPolygon(true, true); }
+    void draw2D() const { drawPolygon(true, true); }
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 
 };
 

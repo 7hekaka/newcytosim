@@ -44,16 +44,16 @@ public:
     ~Rescuer() {}
     
     /// this is called when the attachment point is beyond the PLUS_END
-    void   handleDisassemblyM();
+    void handleDisassemblyM();
     
     /// this is called when the attachment point is below the MINUS_END
-    void   handleDisassemblyP();
+    void handleDisassemblyP();
 
     /// simulate when `this` is attached but not under load
-    void   stepUnloaded();
+    void stepUnloaded();
     
     /// simulate when `this` is attached and under load
-    void   stepLoaded(Vector const& force);
+    void stepLoaded(Vector const& force);
     
 };
 

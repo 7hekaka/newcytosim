@@ -29,22 +29,22 @@ class SpaceCylinderZ : public Space
 private:
     
     /// the radius of the cylinder
-    real        radius_;
+    real radius_;
     
     /// position in Z of the bottom limit
-    real        bot_;
+    real bot_;
     
     /// position in Z of the top limit
-    real        top_;
+    real top_;
     
     /// the radius of smoothing of the edges
-    real        edge_;
+    real edge_;
     
     /// square of edge_
-    real        edgeSqr_;
+    real edgeSqr_;
     
     /// calculate radiusSqr
-    void  update() { edgeSqr_ = square(edge_); }
+    void update() { edgeSqr_ = square(edge_); }
 
 public:
         
@@ -52,56 +52,56 @@ public:
     SpaceCylinderZ(SpaceProp const*);
 
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
  
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// radius
-    real        thickness() const { return 2*radius_; }
+    real thickness() const { return 2*radius_; }
     
     /// direct normal direction calculation
-    Vector      normalToEdge(Vector const& pos) const;
+    Vector normalToEdge(Vector const& pos) const;
     
     /// direct surface placement
-    Vector      placeOnEdge(real) const;
+    Vector placeOnEdge(real) const;
 
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// the area of the edge surface
-    real        surface() const;
+    real surface() const;
 
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// true if the bead is inside the Space
-    bool        allInside(Vector const&, real rad) const;
+    bool allInside(Vector const&, real rad) const;
     
     /// a random position inside the volume
-    Vector      place() const;
+    Vector place() const;
     
     /// return point on the edge that is closest to `pos`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// get dimensions from array `len`
-    void        setLengths(const real len[8]);
+    void setLengths(const real len[8]);
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
 
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif

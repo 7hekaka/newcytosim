@@ -117,37 +117,37 @@ protected:
     bool needUpdate;
 
     /// callback to signal that update is needed, to be called after a change in length
-    void         postUpdate() { needUpdate = true; }
+    void postUpdate() { needUpdate = true; }
     
     /// called if a Fiber tip has elongated or shortened
     virtual void updateFiber() {}
 
     /// restore the distance between two points
-    static void  reshape_two(const real*, real*, real cut);
+    static void reshape_two(const real*, real*, real cut);
 
     /// oldest method to restore the distance between successive vertices
-    static void  reshape_global(size_t, const real*, real*, real cut);
+    static void reshape_global(size_t, const real*, real*, real cut);
 
     /// apply the forces movements needed to the distance between two points
-    static void  reshape_apply_alt(size_t, const real*, const real*, const real*, real*);
+    static void reshape_apply_alt(size_t, const real*, const real*, const real*, real*);
 
     /// (old) iterative method to restore the distance between successive vertices
-    static int   reshape_calculate_alt(size_t, real, const real*, real*, size_t);
+    static int reshape_calculate_alt(size_t, real, const real*, real*, size_t);
     
     /// (old) iterative method to restore the distance between successive vertices
-    static int   reshape_calculate_old(size_t, real, const real*, real*, size_t);
+    static int reshape_calculate_old(size_t, real, const real*, real*, size_t);
 
     /// (old) apply the forces movements needed to the distance between two points
-    static void  reshape_apply(size_t, const real*, const real*, real*);
+    static void reshape_apply(size_t, const real*, const real*, real*);
 
     /// iterative method to restore the distance between successive vertices
-    static int   reshape_calculate(size_t, real, real const*, real const*, real const*, real*, size_t);
+    static int reshape_calculate(size_t, real, real const*, real const*, real const*, real*, size_t);
 
     /// iterative method to restore the distance between successive vertices
-    static int   reshape_local(size_t, const real*, real*, real cut, real* tmp, size_t);
+    static int reshape_local(size_t, const real*, real*, real cut, real* tmp, size_t);
 
     /// change segmentation
-    void         setSegmentation(real c) { fnCut = std::max(c, REAL_EPSILON); iCut = real(1) / fnCut; }
+    void setSegmentation(real c) { fnCut = std::max(c, REAL_EPSILON); iCut = real(1) / fnCut; }
     
 public:
     
@@ -196,10 +196,10 @@ public:
     //---------------------
 
     /// returns simulation time at which Fiber was created
-    real   birthTime() const { return fnBirthTime; }
+    real birthTime() const { return fnBirthTime; }
 
     /// set birth time
-    void   birthTime(double t) { fnBirthTime = t; }
+    void birthTime(double t) { fnBirthTime = t; }
     
     /// returns current age of the fiber
     double age() const;
@@ -207,7 +207,7 @@ public:
     //---------------------
     
     /// return Mecapoint of given end
-    Mecapoint     exactEnd(FiberEnd) const;
+    Mecapoint exactEnd(FiberEnd) const;
 
     /// interpolation of MINUS_END
     Interpolation interpolateEndM() const { return Interpolation(this, 0, 1, 0); }
@@ -234,235 +234,235 @@ public:
     
     /// length of the Fiber, estimated from the difference of abscissa at the ends
     /** This is the quantity that defines the length that the filament should have! */
-    real         length()                const { return fnAbscissaP - fnAbscissaM; }
+    real length()                const { return fnAbscissaP - fnAbscissaM; }
 
     /// length of the Fiber, estimated from the segmentation and number of segments
     /** This should be equal to length(), if computers did exact calculus */
-    real         length1()               const { return nPoints * fnCut - fnCut; }
+    real length1()               const { return nPoints * fnCut - fnCut; }
     
     /// the sum of the distance between consecutive vertices (used for debugging)
-    real         contourLength()         const { return contourLength(pPos, nPoints); }
+    real contourLength()         const { return contourLength(pPos, nPoints); }
     
     /// true if ( abscissaM() <= a ) AND ( a <= abscissaP() )
-    bool         betweenMP(const real a) const { return abscissaM() <= a + REAL_EPSILON && a <= abscissaP() + REAL_EPSILON; }
+    bool betweenMP(const real a) const { return abscissaM() <= a + REAL_EPSILON && a <= abscissaP() + REAL_EPSILON; }
     
     /// true if ( a < abscissaM() ) OR ( abscissaP() < a )
-    bool         outsideMP(const real a) const { return a < abscissaM() || abscissaP() < a; }
+    bool outsideMP(const real a) const { return a < abscissaM() || abscissaP() < a; }
 
     /// true if abscissa is smaller than abscissa of PLUS_END
-    bool         belowP(const real a)    const { return a <= abscissaP(); }
+    bool belowP(const real a)    const { return a <= abscissaP(); }
     
     /// true if abscissa is greater than abscissa of MINUS_END
-    bool         aboveM(const real a)    const { return abscissaM() <= a; }
+    bool aboveM(const real a)    const { return abscissaM() <= a; }
     
     /// calculate the domain in which ab is located (near a FiberEnd, or central)
-    FiberEnd     whichEndDomain(real a, real lambda) const;
+    FiberEnd whichEndDomain(real a, real lambda) const;
     
     /// return P where segment [ P, P+1 [ contains point at distance `a` from the MINUS_END
     /** returns 0 if ( a < 0 ) and last point index if ( a > lastSegment() ) */
-    size_t       clampedIndexM(const real a) const { return std::min((size_t)(std::max(a,(real)0)/fnCut), lastSegment()); }
+    size_t clampedIndexM(const real a) const { return std::min((size_t)(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
     
     /// displace the ORIGIN of abscissa at distance `a` from the MINUS_END
-    void         setOrigin(real a) { fnAbscissaM = -a; fnAbscissaP = fnCut * real(nbSegments()) - a; }
+    void setOrigin(real a) { fnAbscissaM = -a; fnAbscissaP = fnCut * real(nbSegments()) - a; }
 
     /// signed distance from ORIGIN to MINUS_END (abscissa of MINUS_END)
-    real         abscissaM() const { return fnAbscissaM; }
+    real abscissaM() const { return fnAbscissaM; }
     
     /// abscissa of center, midway between MINUS_END and PLUS_END
-    real         abscissaC() const { return 0.5 * (fnAbscissaM + fnAbscissaP); }
+    real abscissaC() const { return 0.5 * (fnAbscissaM + fnAbscissaP); }
 
     /// signed distance from ORIGIN to PLUS_END (abscissa of PLUS_END)
-    real         abscissaP() const { return fnAbscissaP; }
+    real abscissaP() const { return fnAbscissaP; }
 
     /// signed distance from ORIGIN to vertex specified with index (or intermediate position)
-    real         abscissaPoint(const real n) const { return fnAbscissaM + fnCut * n; }
+    real abscissaPoint(const real n) const { return fnAbscissaM + fnCut * n; }
 
     /// distance from MINUS_END to a vertex specified as index (or intermediate position)
-    real         distancePointM(const real n) const { return fnCut * n; }
+    real distancePointM(const real n) const { return fnCut * n; }
 
     /// distance from PLUS_END to a vertex specified as index (or intermediate position)
-    real         distancePointP(const real n) const { return fnCut * ( lastPoint() - n ); }
+    real distancePointP(const real n) const { return fnCut * ( lastPoint() - n ); }
 
     /// signed distance from the ORIGIN to the specified FiberEnd
-    real         abscissaEnd(FiberEnd end) const;
+    real abscissaEnd(FiberEnd end) const;
     
     /// converts distance from the specified FiberEnd, to abscissa from the ORIGIN
-    real         abscissaFrom(real dis, FiberEnd ref) const;
+    real abscissaFrom(real dis, FiberEnd ref) const;
     
     /// return abscissa specified with `dis, ref, mod`
-    real         someAbscissa(real dis, FiberEnd ref, int mod, real alpha) const;
+    real someAbscissa(real dis, FiberEnd ref, int mod, real alpha) const;
 
     //---------------------
 
 #if ( DIM == 1 )
     /// position at distance `ab` from the MINUS_END
-    Vector       posM(real ab) const { return Vector(pPos[0]+std::copysign(ab, pPos[1]-pPos[0])); }
+    Vector posM(real ab) const { return Vector(pPos[0]+std::copysign(ab, pPos[1]-pPos[0])); }
 #else
     /// position at distance `ab` from the MINUS_END
-    Vector       posM(real ab) const;
+    Vector posM(real ab) const;
 #endif
     /// position of a point specified by abscissa from the ORIGIN
-    Vector       pos(real ab) const { return posM(ab-fnAbscissaM); }
+    Vector pos(real ab) const { return posM(ab-fnAbscissaM); }
 
     /// position of a point specified by abscissa `ab` from reference `ref`
-    Vector       posFrom(real ab, FiberEnd ref) const { return pos(abscissaFrom(ab, ref)); }
+    Vector posFrom(real ab, FiberEnd ref) const { return pos(abscissaFrom(ab, ref)); }
 
     /// position of the point taken mid-way along the curve
-    Vector       posMiddle() const { return posM(0.5*length()); }
+    Vector posMiddle() const { return posM(0.5*length()); }
     
     /// position of a FiberEnd
-    Vector       posEnd(FiberEnd end) const;
+    Vector posEnd(FiberEnd end) const;
     
     /// position of MINUS_END
-    Vector       posEndM() const { return Vector(pPos); }
+    Vector posEndM() const { return Vector(pPos); }
 
     /// position of PLUS_END
-    Vector       posEndP() const { return Vector(pPos+DIM*(nPoints-1)); }
+    Vector posEndP() const { return Vector(pPos+DIM*(nPoints-1)); }
     
     /// external force acting on MINUS_END
-    Vector       netForceEndM() const { return netForce(0); }
+    Vector netForceEndM() const { return netForce(0); }
     
     /// external force acting on PLUS_END
-    Vector       netForceEndP() const { return netForce(nPoints-1); }
+    Vector netForceEndP() const { return netForce(nPoints-1); }
 
     //---------------------
 
 #if ( 1 )
     /// unit tangent vector to the fiber within segment [p, p+1]
     /** Using iCut, expected to be the inverse of the distance between vertices */
-    Vector       dirSegment(size_t p)  const { return diffPoints(p) * iCut; }
+    Vector dirSegment(size_t p)  const { return diffPoints(p) * iCut; }
 #else
     /// normalized tangent vector to the fiber within segment [p, p+1]
-    Vector       dirSegment(size_t p)  const { return normalize(diffPoints(p)); }
+    Vector dirSegment(size_t p)  const { return normalize(diffPoints(p)); }
 #endif
 #if ( DIM == 1 )
     /// direction at distance `ab` from the MINUS_END
-    Vector       dirM(real ab) const { return Vector(sign_real(pPos[1]-pPos[0])); }
+    Vector dirM(real ab) const { return Vector(sign_real(pPos[1]-pPos[0])); }
 #else
     /// direction at distance `ab` from the MINUS_END
-    Vector       dirM(real ab) const;
+    Vector dirM(real ab) const;
 #endif
     /// normalized tangent vector to the fiber at given abscissa from the origin
-    Vector       dir(real ab) const { return dirM(ab-fnAbscissaM); }
+    Vector dir(real ab) const { return dirM(ab-fnAbscissaM); }
 
     /// normalized tangent vector to the fiber at given abscissa from given reference
-    Vector       dir(real ab, FiberEnd ref) const { return dirM(abscissaFrom(ab, ref)); }
+    Vector dir(real ab, FiberEnd ref) const { return dirM(abscissaFrom(ab, ref)); }
     
     /// normalized tangent vector to the fiber at given end
-    Vector       dirEnd(FiberEnd end) const;
+    Vector dirEnd(FiberEnd end) const;
     
     /// normalized tangent vector at MINUS_END, orientated towards the PLUS_END
-    Vector       dirEndM() const { return dirSegment(0); }
+    Vector dirEndM() const { return dirSegment(0); }
     
     /// normalized tangent vector to the fiber at PLUS_END
-    Vector       dirEndP() const { return dirSegment(lastSegment()); }
+    Vector dirEndP() const { return dirSegment(lastSegment()); }
 
     /// force on the MINUS_END projected on the direction of elongation
-    real         projectedForceEndM() const;
+    real projectedForceEndM() const;
 
     /// force on the PLUS_END projected on the direction of elongation
-    real         projectedForceEndP() const;
+    real projectedForceEndP() const;
 
     /// dot-product (force at the end of the Fiber).(direction of Fiber growth)
-    real         projectedForceEnd(FiberEnd end) const;
+    real projectedForceEnd(FiberEnd end) const;
     
     /// direction averaged over the entire length
-    Vector       avgDirection() const { return normalize(posEndP()-posEndM()); }
+    Vector avgDirection() const { return normalize(posEndP()-posEndM()); }
     
     /// return updated `normal` that is orthogonal to `d` (used for fake 3D display)
-    Vector3      adjustedNormal(Vector3 const& d) const;
+    Vector3 adjustedNormal(Vector3 const& d) const;
 
     //--------------------- Segmentation / discrete representation
     
     /// set desired segmentation
-    void         targetSegmentation(real c) { assert_true(c>0); fnSegmentation = c; }
+    void targetSegmentation(real c) { assert_true(c>0); fnSegmentation = c; }
     
     /// return desired segmentation (this is not the length of the segments)
-    real         targetSegmentation() const { return fnSegmentation; }
+    real targetSegmentation() const { return fnSegmentation; }
     
     /// the current segment length (distance between successive vertices)
-    real         segmentation() const { return fnCut; }
+    real segmentation() const { return fnCut; }
     
     /// should return 1.0 / segmentation()
-    real         segmentationInv() const { return iCut; }
+    real segmentationInv() const { return iCut; }
 
     /// returns third power of segmentation()
-    real         segmentationCube() const { return fnCut*fnCut*fnCut; }
+    real segmentationCube() const { return fnCut*fnCut*fnCut; }
     
     /// reinterpolate vertices and adjust fiber to have `ns` segments
-    void         resegment(size_t ns);
+    void resegment(size_t ns);
     
     /// automatically select the number of points if needed, and resegment the fiber
-    void         adjustSegmentation();
+    void adjustSegmentation();
     
     /// change the target segmentation, and adjust number of points if needed
-    void         adjustSegmentation(real);
+    void adjustSegmentation(real);
 
     /// change all vertices to given array of coordinates
-    void         getPoints(real const*);
+    void getPoints(real const*);
     
     /// restore the distance between successive vertices
-    void         reshape() { getPoints(pPos); }
+    void reshape() { getPoints(pPos); }
 
     /// invert polarity (swap PLUS end MINUS ends in place)
-    void         flipChainPolarity();
+    void flipChainPolarity();
     
     //--------------------- Info
     
     /// calculate the minimum and maximum segment length
-    void         segmentationMinMax(real const* ptr, real&, real&) const;
+    void segmentationMinMax(real const* ptr, real&, real&) const;
     
     /// calculate the minimum and maximum segment length
-    void         segmentationMinMax(real& n, real& x) const { segmentationMinMax(pPos, n, x); }
+    void segmentationMinMax(real& n, real& x) const { segmentationMinMax(pPos, n, x); }
 
     /// calculate average and variance of the segment length
-    void         segmentationVariance(real const* ptr, real&, real&) const;
+    void segmentationVariance(real const* ptr, real&, real&) const;
 
     /// curvature calculated at joint `p`, where `0 < p < nbPoints()-1`
-    real         curvature(size_t p) const;
+    real curvature(size_t p) const;
     
     /// normalized energy associated with bending
-    real         bendingEnergy0() const;
+    real bendingEnergy0() const;
 
     /// the cosine of the maximum segment angle: indicate the errors due to curvature
-    real         minCosine() const;
+    real minCosine() const;
     
     /// number of joints at which ( cosine(angle) < threshold )
-    size_t       nbKinks(real threshold = 0) const;
+    size_t nbKinks(real threshold = 0) const;
     
     /// calculate intersection between segment `s` and the plane defined by <em> n.pos + a = 0 </em>
-    real         planarIntersect(size_t s, Vector const& n, const real a) const;
+    real planarIntersect(size_t s, Vector const& n, const real a) const;
 
     //--------------------- Growing/Shrinking
     
     /// merge two fibers by attaching given Chain at the PLUS_END of `this`
-    void         join(Chain const*);
+    void join(Chain const*);
 
     /// increase/decrease length of Fiber by `delta`, at the MINUS_END
-    void         growM(real delta);
+    void growM(real delta);
     
     /// add a segment of length segmentation() at the MINUS_END
-    void         addSegmentM();
+    void addSegmentM();
     
     /// remove a portion of length `delta` including the MINUS_END
-    void         cutM(real delta);
+    void cutM(real delta);
     
     /// increase/decrease length of Fiber by `delta`, at the PLUS_END
-    void         growP(real delta);
+    void growP(real delta);
     
     /// add a segment of length segmentation() at the PLUS_END
-    void         addSegmentP();
+    void addSegmentP();
     
     /// remove a portion of length `delta` including the PLUS_END
-    void         cutP(real delta);
+    void cutP(real delta);
     
     /// grow at specified end (PLUS_END or MINUS_END)
-    void         grow(FiberEnd end, real delta);
+    void grow(FiberEnd end, real delta);
     
     /// shorten or lengthen Fiber without changing the position of `ref`
-    void         adjustLength(real len, FiberEnd ref);
+    void adjustLength(real len, FiberEnd ref);
 
     /// Discard vertices in [ 0, P-1 ] and keep [ P, end ]
     virtual void truncateM(size_t p);
@@ -473,31 +473,31 @@ public:
     //---------------------
     
     /// print info such as length and segmentation
-    void         briefdoc(std::ostream&, real, real, real, real) const;
+    void briefdoc(std::ostream&, real, real, real, real) const;
 
     /// print info such as length and segmentation
-    void         document(std::ostream&, real, real, real, real) const;
+    void document(std::ostream&, real, real, real, real) const;
     
     /// print info such as length and segmentation
-    void         document(real const* ptr, std::ostream&) const;
+    void document(real const* ptr, std::ostream&) const;
     
     /// return string with info such as length and segmentation
-    std::string  document(real const* ptr) const;
+    std::string document(real const* ptr) const;
 
     /// check length and segmentation and write if suspicious
-    int          checkLength(real const* ptr, std::ostream&, real len) const;
+    int checkLength(real const* ptr, std::ostream&, real len) const;
 
     /// write to Outputter
-    void         write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// read from Inputter
-    void         read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to Outputter
-    void         writeAngles(Outputter&) const;
+    void writeAngles(Outputter&) const;
 
     /// read from Inputter
-    void         readAngles(Inputter&, Simul&, ObjectTag);
+    void readAngles(Inputter&, Simul&, ObjectTag);
 
 };
 

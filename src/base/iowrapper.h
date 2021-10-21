@@ -34,7 +34,7 @@ private:
 public:
     
     /// set defaults (not-binary)
-    void     reset();
+    void reset();
     
     /// Constructor
     Inputter(size_t d) : FileWrapper(nullptr) { reset(); vecsize_=d; }
@@ -46,29 +46,29 @@ public:
     Inputter(size_t d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r") { reset(); vecsize_=d; }
 
     /// return dimensionnally of vectors
-    size_t   vectorSize()     const { return vecsize_; }
+    size_t vectorSize()     const { return vecsize_; }
     
     /// Set dimentionnality of vectors
-    void     vectorSize(size_t d) { vecsize_ = d; }
+    void vectorSize(size_t d) { vecsize_ = d; }
     
     /// returns the type of input
-    size_t   formatID()       const { return format_; }
+    size_t formatID()       const { return format_; }
 
     /// returns the type of input
-    void     formatID(size_t f)   { format_ = f; }
+    void formatID(size_t f)   { format_ = f; }
 
     /// Returns 1 for native binary format, 2 for non-native binary format, and 0 if not binary
-    int      binary()         const { return binary_; }
+    int binary()         const { return binary_; }
     
     /// initialize the automatic swapping of bytes in the binary format
-    void     setEndianess(const char[2]);
+    void setEndianess(const char[2]);
     
     /// Read ASCII integer
-    int      readInt();
+    int readInt();
     /// Read integer on 2 bytes
-    int16_t  readInt16();
+    int16_t readInt16();
     /// Read integer on 4 bytes
-    int32_t  readInt32();
+    int32_t readInt32();
 
     /// Read ASCII integer
     unsigned readUInt();
@@ -87,28 +87,28 @@ public:
     uint32_t readUInt32bin();
 
     /// Reads float in [0, 1] stored on 2 bytes
-    float    readFixed();
+    float readFixed();
     /// Read angle on 2 bytes
-    float    readAngle();
+    float readAngle();
     /// Read angle on 2 bytes
-    float    readPositiveAngle();
+    float readPositiveAngle();
     /// Reads one float on 4 bytes
-    float    readFloat();
+    float readFloat();
     /// Reads one double on 8 bytes
-    double   readDouble();
+    double readDouble();
     
     /// Reads one vector, setting `cnt` coordinates in the array
-    void     readFloats(float[], size_t dim);
+    void readFloats(float[], size_t dim);
     /// Reads one vector, setting `cnt` coordinates in the array
-    void     readFloats(double[], size_t dim);
+    void readFloats(double[], size_t dim);
 
     /// Reads one vector, setting `cnt` coordinates in the array
-    void     readFloats(size_t cnt, float[], size_t dim);
+    void readFloats(size_t cnt, float[], size_t dim);
     /// Reads one vector, setting `cnt` coordinates in the array
-    void     readFloats(size_t cnt, double[], size_t dim);
+    void readFloats(size_t cnt, double[], size_t dim);
 
     /// Reads one vector, setting `cnt` coordinates in the array
-    void     readDoubles(double[], size_t D);
+    void readDoubles(double[], size_t D);
 
 };
 
@@ -137,7 +137,7 @@ public:
     Outputter(const char* name, bool a, bool b=false);
     
     /// Open a file where `a` specifies append and `b` binary mode.
-    int  open(const char* name, bool a, bool b=false);
+    int open(const char* name, bool a, bool b=false);
     
     /// Sets to write in binary format
     void binary(bool b) { binary_ = b; }

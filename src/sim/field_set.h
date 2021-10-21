@@ -32,30 +32,30 @@ public:
     ObjectList  newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, PropertyID);
+    Object * newObject(ObjectTag, PropertyID);
     
     /// write all Objects to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream& os) const { writeReport(os, title()); }
+    void report(std::ostream& os) const { writeReport(os, title()); }
 
     //--------------------------
     
     /// first object
-    Field *     first() const;
+    Field * first() const;
     
     /// find object
-    Field *     findObject(Property const* p) const;
+    Field * findObject(Property const* p) const;
     
     /// return pointer to the Object of given ID, or zero if not found
-    Field *     findID(ObjectID n) const;
+    Field * findID(ObjectID n) const;
     
     /// get ready to do a step()
-    void        prepare();
+    void prepare();
     
     /// Monte-Carlo simulation step for every Object
-    void        step();
+    void step();
 
 };
 

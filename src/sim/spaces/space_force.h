@@ -21,13 +21,13 @@
 class SpaceForce : public Space
 {
     /// stiffness of interaction
-    real        stiffness;
+    real stiffness;
     
     /// center
-    Vector      center;
+    Vector center;
     
     /// force applied in every point
-    Vector      force;
+    Vector force;
     
 public:
     
@@ -35,37 +35,37 @@ public:
     SpaceForce(SpaceProp const*);
     
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const;
+    void boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real        volume() const;
+    real volume() const;
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const { return true; }
+    bool inside(Vector const&) const { return true; }
 
     /// true if a sphere (center w, radius) fits in the space, edges included
-    bool        allInside(Vector const&, real rad) const { return true; }
+    bool allInside(Vector const&, real rad) const { return true; }
     
     /// true if a sphere (center w[], radius) is entirely outside
-    bool        allOutside(Vector const&, real rad) const { return false; }
+    bool allOutside(Vector const&, real rad) const { return false; }
     
     /// return point on the edge that is closest to `pos`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     /// apply force to all objects in Meca
-    void        setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 
 };
 

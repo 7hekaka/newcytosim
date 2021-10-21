@@ -50,61 +50,61 @@ public:
     //-------------------------------------------------------------------------------
     
     /// create a new Property of category `cat` from values specified in Glossary
-    Property*  execute_set(std::string const& cat, std::string const& name, Glossary&);
+    Property * execute_set(std::string const& cat, std::string const& name, Glossary&);
 
     /// change values in given Property as specified in Glossary
-    void       execute_change(Property*, Glossary&);
+    void execute_change(Property*, Glossary&);
 
     /// change values in Property called `name` as specified in Glossary
-    Property*  execute_change(std::string const& name, Glossary&, bool strict);
+    Property * execute_change(std::string const& name, Glossary&, bool strict);
     
     /// change values of all Property of category `cat`
-    void       execute_change_all(std::string const& cat, Glossary&);
+    void execute_change_all(std::string const& cat, Glossary&);
 
     /// read the specification of position and orientation of an object
-    Isometry   read_placement(Glossary&);
+    Isometry read_placement(Glossary&);
     
     /// return position and orientation of an object, with verification of 'placement'
-    Isometry   find_placement(Glossary&, int placement, size_t nb_trials);
+    Isometry find_placement(Glossary&, int placement, size_t nb_trials);
     
     /// create 1 object of type `name`, following options in Glossary
-    void       execute_new(std::string const& name, ObjectSet*, Glossary&);
+    void execute_new(std::string const& name, ObjectSet*, Glossary&);
     
     /// create `cnt` objects of type `name`, following options in Glossary
-    void       execute_new(std::string const& name, Glossary&, size_t cnt);
+    void execute_new(std::string const& name, Glossary&, size_t cnt);
 
     /// create `cnt` objects of type `name`, randomly placed in space (no option)
-    void       execute_new(std::string const& name, size_t cnt);
+    void execute_new(std::string const& name, size_t cnt);
     
     /// delete `cnt` objects of type `name`, following options in Glossary
-    void       execute_delete(std::string const& name, Glossary&, size_t cnt);
+    void execute_delete(std::string const& name, Glossary&, size_t cnt);
     
     /// mark `cnt`  objects of type `name`, following options in Glossary
-    void       execute_mark(std::string const& name, Glossary&, size_t cnt);
+    void execute_mark(std::string const& name, Glossary&, size_t cnt);
 
     /// cut fibers of type `name`, following different options in Glossary
-    void       execute_cut(std::string const& name, Glossary&);
+    void execute_cut(std::string const& name, Glossary&);
     
     /// cut fibers of type `name`, following different options in Glossary
-    void       execute_connect(std::string const& name, Glossary&);
+    void execute_connect(std::string const& name, Glossary&);
 
     /// import objects (or `what`) from a file
-    void       execute_import(std::string const& filename, std::string const& what, Glossary&);
+    void execute_import(std::string const& filename, std::string const& what, Glossary&);
 
     /// export objects (or `what`) to a file
-    void       execute_export(std::string const& filename, std::string const& what, Glossary&);
+    void execute_export(std::string const& filename, std::string const& what, Glossary&);
 
     /// write information (specified in `what`) to a file
-    void       execute_report(std::string const& filename, std::string const& what, Glossary&);
+    void execute_report(std::string const& filename, std::string const& what, Glossary&);
     
     /// perform `cnt` simulation steps, following options specified in Glossary
-    void       execute_run(size_t cnt, Glossary&, bool write_permission);
+    void execute_run(size_t cnt, Glossary&, bool write_permission);
     
     /// perform `cnt` simulation steps
-    void       execute_run(size_t cnt);
+    void execute_run(size_t cnt);
 
     /// execute miscellaneous functions
-    void       execute_call(std::string& func, Glossary&);
+    void execute_call(std::string& func, Glossary&);
 
 };
 

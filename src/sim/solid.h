@@ -51,35 +51,35 @@ private:
     
 #if ( DIM > 2 )
     /// matrix containing the reduced momentum of inertia for 3D
-    Matrix33       soMomentum;
+    Matrix33 soMomentum;
 #endif
 
     /// the mean of the the points weighted by their drag coefficients
-    Vector         soCenter;
+    Vector soCenter;
     
     /// the dimensions used in Stokes' law to calculate overall mobility
-    real     *     soRadius;
+    real * soRadius;
     
     /// array to store the reference shape of the solid, as coordinates
-    real     *     soShape;
+    real * soShape;
     
     /// the number of points when fixShape() was last called, used for verifications.
-    size_t         soShapeSize;
+    size_t soShapeSize;
     
     /// the reduced total (all points summed) drag coefficient for translation
-    real           soDrag;
+    real soDrag;
     
     /// the reduced total drag coefficient for rotation
-    real           soDragRot;
+    real soDragRot;
 
     /// second momentum of the reference shape
-    real           soShapeSqr;
+    real soShapeSqr;
     
     /// a counter used in reshape()
-    unsigned int   soReshapeTimer;
+    unsigned int soReshapeTimer;
 
     /// reset private variables
-    void           reset();
+    void reset();
     
 public:
     
@@ -99,106 +99,106 @@ public:
     Solid& operator =(const Solid&);
 
     /// destructor
-    virtual    ~Solid();
+    virtual ~Solid();
     
     /// initialize according to options given in Glossary
-    ObjectList  build(Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
 
     //------------------------------- Mecable ----------------------------------
     
     /// allocate memory
-    size_t      allocateMecable(size_t);
+    size_t allocateMecable(size_t);
     
     /// free allocated memory
-    void        release();
+    void release();
 
     /// prepare for Meca
-    void        prepareMecable();
+    void prepareMecable();
 
     /// sets the mobility
-    void        setDragCoefficient();
+    void setDragCoefficient();
 
     /// total translation drag-coefficient (force = drag * speed)
-    real        dragCoefficient() const { return ( 6 * M_PI ) * prop->viscosity * sumRadius(); }
+    real dragCoefficient() const { return ( 6 * M_PI ) * prop->viscosity * sumRadius(); }
     
     /// The mobility of a model vertex ( speed = mobility * point_force )
-    real        pointMobility() const { return nbPoints() / dragCoefficient(); }
+    real pointMobility() const { return nbPoints() / dragCoefficient(); }
 
     /// add the interactions due to confinement
-    void        setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
 
     /// prepare for constrained projection
-    void        makeProjection();
+    void makeProjection();
     
     /// calculates the speed of points in Y, for the forces given in X
-    void        projectForces(const real* X, real* Y) const;
+    void projectForces(const real* X, real* Y) const;
     
     /// calculates the speed of points in Y, for the forces given in X
-    void        projectForces0(const real* X, real* Y) const;
+    void projectForces0(const real* X, real* Y) const;
 
     /// add contribution of Brownian forces
-    real        addBrownianForces(real const* rnd, real, real* rhs) const;
+    real addBrownianForces(real const* rnd, real, real* rhs) const;
     
     /// Stochastic simulation
-    void        step();
+    void step();
     
     //------------------------------- Shaping ----------------------------------
 
     /// set the reference shape as a copy of the current one
-    void        fixShape();
+    void fixShape();
     
     /// scale the reference shape
-    void        scaleShape(const real[DIM]);
+    void scaleShape(const real[DIM]);
     
     /// scale current shape to match the reference set in fixShape()
-    void        rescale();
+    void rescale();
     
     /// restore the reference shape in the place and orientation of the current one
-    void        reshape();
+    void reshape();
     
     /// change coordinate values
-    void        getPoints(real const*);
+    void getPoints(real const*);
 
     /// add a new point with a sphere (extends Mecable::addPoint)
-    size_t      addSphere(Vector const&, real radius);
+    size_t addSphere(Vector const&, real radius);
     
     /// change radius of the sphere around point `i`
-    void        setRadius(size_t i, real val);
+    void setRadius(size_t i, real val);
 
     /// add DIM points separated by `len`, to make a coordinate system around the last point
-    size_t      addTriad(real len);
+    size_t addTriad(real len);
 
     //--------------------------------------------------------------------------
     
     /// radius of the sphere around point `i`
-    real        radius(const size_t i) const { return soRadius[i]; }
+    real radius(const size_t i) const { return soRadius[i]; }
     
     /// sum of all sphere's radius
-    real        sumRadius() const;
+    real sumRadius() const;
 
     /// set index of Spheres that are nearest neighbors to `inx`; return number of values set
-    size_t      closestSpheres(size_t inx, size_t&, size_t&, size_t&) const;
+    size_t closestSpheres(size_t inx, size_t&, size_t&, size_t&) const;
 
     /// mean of all spheres weighted with their drag coefficients (or equivalently radius)
-    Vector      centroid() const;
+    Vector centroid() const;
     
     /// direction calculated from all the points
-    Vector      orientation() const;
+    Vector orientation() const;
 
     /// Position of center of gravity
-    Vector      position() const { return centroid(); }
+    Vector position() const { return centroid(); }
 
 #if NEW_SOLID_CLAMP
-    Vector      clampForce() const { return prop->clamp_stiff * ( prop->clamp_pos - posPoint(0) ); }
+    Vector clampForce() const { return prop->clamp_stiff * ( prop->clamp_pos - posPoint(0) ); }
 #endif
     
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Solid *     next() const { return static_cast<Solid*>(nextO); }
+    Solid * next() const { return static_cast<Solid*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    Solid *     prev() const { return static_cast<Solid*>(prevO); }
+    Solid * prev() const { return static_cast<Solid*>(prevO); }
     
     //--------------------------------------------------------------------------
 
@@ -206,7 +206,7 @@ public:
     static const ObjectTag TAG = 'd';
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG; }
+    ObjectTag tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }
@@ -222,13 +222,13 @@ public:
     //--------------------------------------------------------------------------
 
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
 
     /// Human friendly ouput
-    void        print(std::ostream&, bool write_shape = false) const;
+    void print(std::ostream&, bool write_shape = false) const;
 };
 
 /// output operator:

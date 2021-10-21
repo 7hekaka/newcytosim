@@ -36,10 +36,10 @@ public:
     
     
     /// simulate when `this` is attached but not under load
-    void   stepUnloaded();
+    void stepUnloaded();
     
     /// simulate when `this` is attached and under load
-    void   stepLoaded(Vector const& force);
+    void stepLoaded(Vector const& force);
     
 };
 

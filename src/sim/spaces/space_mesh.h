@@ -36,40 +36,40 @@ public:
     ~SpaceMesh();
     
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
+    void boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
     
     /// the volume inside
-    real        volume() const { return volume_; }
+    real volume() const { return volume_; }
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// return point on the edge that is closest to `pos`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
 
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions between fibers and reentrant corners
-    void        setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
 
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
     
     /// write to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
     
     /// read from file
-    void        read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
 
     /// OpenGL display function
-    void        draw2D() const {};
+    void draw2D() const {};
 
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif

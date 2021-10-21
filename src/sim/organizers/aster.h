@@ -189,10 +189,10 @@ class Aster : public Organizer
 {
 private:
     
-    Solid*     asSolid;
+    Solid * asSolid;
     
     /// scale of local reference frame
-    real       asRadius;
+    real asRadius;
     
     /// store the coefficients needed to make the links between Solid and Fiber
     Array<AsterLink> asLinks;
@@ -204,10 +204,10 @@ private:
     ObjectList makeFiber(Simul&, size_t inx, std::string const&, Glossary& opt);
 
     /// define the attachment position of fiber 'inx'
-    void       placeAnchor(Vector const&, Vector const&, size_t origin);
+    void placeAnchor(Vector const&, Vector const&, size_t origin);
 
     /// define the anchor points of Fibers
-    void       placeAnchors(Glossary& opt, size_t origin, size_t nbf);
+    void placeAnchors(Glossary& opt, size_t origin, size_t nbf);
     
     /// Property
     AsterProp const* prop;
@@ -218,55 +218,55 @@ public:
     Aster(AsterProp const* p) : asSolid(nullptr), asRadius(0), prop(p) {}
     
     /// destructor
-    virtual      ~Aster();
+    virtual ~Aster();
     
     /// construct all the dependent Objects of the Organizer
-    ObjectList    build(Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
     
     /// return the scaffolding Solid
-    Solid *       solid() const { return asSolid; }
+    Solid * solid() const { return asSolid; }
     
     /// return the center of the Solid
-    Vector        position() const { return solid()->posP(0); }
+    Vector position() const { return solid()->posP(0); }
     
     /// return Fiber `n`
-    size_t        nbFibers() const { return nbOrganized(); }
+    size_t nbFibers() const { return nbOrganized(); }
 
     /// return Fiber `n`
-    Fiber *       fiber(size_t n) const { return Fiber::toFiber(organized(n)); }
+    Fiber * fiber(size_t n) const { return Fiber::toFiber(organized(n)); }
     
     /// perform one Monte-Carlo step
-    void          step();
+    void step();
     
     /// add interactions to a Meca
-    void          setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
     /// position of first clamp for Fiber n
-    Vector        posLink1(size_t n) const;
+    Vector posLink1(size_t n) const;
     
     /// position of second clamp for Fiber n
-    Vector        posLink2(size_t n) const;
+    Vector posLink2(size_t n) const;
 
     /// position of end on Fiber corresponding to first link
-    Vector        posFiber1(size_t n) const { return fiber(n)->posEnd(prop->focus); }
+    Vector posFiber1(size_t n) const { return fiber(n)->posEnd(prop->focus); }
     
     /// position of attachment point on Fiber corresponding to second link
-    Vector        posFiber2(size_t n) const;
+    Vector posFiber2(size_t n) const;
     
     /// number of links to be displayed using getLink()
-    size_t        nbLinks() const { return 2 * nbFibers(); }
+    size_t nbLinks() const { return 2 * nbFibers(); }
 
     /// retrieve link between Solid and end of Fiber number `i`, returning stiffness
-    real          getLink1(size_t i, Vector&, Vector&) const;
+    real getLink1(size_t i, Vector&, Vector&) const;
     
     /// retrieve link between Solid and side of Fiber number `i`, returning stiffness
-    real          getLink2(size_t i, Vector&, Vector&) const;
+    real getLink2(size_t i, Vector&, Vector&) const;
     
     /// retrieve link of type 1 if `i` is even, of type 2 if `i` is odd
-    bool          getLink(size_t i, Vector&, Vector&) const;
+    bool getLink(size_t i, Vector&, Vector&) const;
 
     /// return Solid
-    Mecable*      core() const { return asSolid; }
+    Mecable* core() const { return asSolid; }
     
     /// return PointDisp of Solid
     PointDisp const* disp() const { if ( asSolid ) return asSolid->prop->disp; return nullptr; }
@@ -290,10 +290,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// read from IO
-    void          read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to IO
-    void          write(Outputter&) const;
+    void write(Outputter&) const;
 
 };
 

@@ -35,19 +35,19 @@ public:
     static std::string title() { return "fiber"; }
     
     /// create a new property of category `cat` for a class `name`
-    Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
+    Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    ObjectList  newObjects(const std::string& name, Glossary& opt);
+    ObjectList newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, PropertyID);
+    Object * newObject(ObjectTag, PropertyID);
     
     /// write all Objects to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream&) const;
+    void report(std::ostream&) const;
 
     //--------------------------
 
@@ -117,52 +117,52 @@ public:
     //--------------------------------------------------------------------------
     
     /// total length of Fiber 
-    real         totalLength() const;
+    real totalLength() const;
 
     /// total length of Fiber for Fibers with given FiberProp
-    real         totalLength(FiberProp const *) const;
+    real totalLength(FiberProp const *) const;
     
     /// calculate: number of fibers, mean, variance, min and max of fiber length
-    static void  infoLength(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);
+    static void infoLength(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);
     
     /// calculate: number of fibers, mean, variance, min and max of fiber length
-    static void  infoBirthtime(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);
+    static void infoBirthtime(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);
 
     /// calculate: number of fibers, number of joints and number of kinks
-    static void  infoSegments(ObjectList const&, size_t& cnt, size_t& points, real&, real&, real&);
+    static void infoSegments(ObjectList const&, size_t& cnt, size_t& points, real&, real&, real&);
     
     /// calculate: number of fibers, number of joints and number of kinks
     static size_t nbKinks(ObjectList const&);
 
     /// calculate center of gravity G, average of MINUS_END and PLUS_END
-    static real  infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector& P);
+    static real infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector& P);
 
     /// calculate the nematic directors, return the nematic scalar order parameter
-    static real  infoNematic(ObjectList const&, real vec[9]);
+    static real infoNematic(ObjectList const&, real vec[9]);
 
     /// calculate center of gravity G, and principal components axes
-    static int   infoComponents(ObjectList const&, real& sum, real avg[3], real mom[9], real vec[9]);
+    static int infoComponents(ObjectList const&, real& sum, real avg[3], real mom[9], real vec[9]);
 
     /// Count Fibers intersecting the plane defined by <em> n.pos + a = 0 </em>
-    void         infoPlane(int& np, int& na, Vector const& n, real a) const;
+    void infoPlane(int& np, int& na, Vector const& n, real a) const;
     
     /// Calculate characteristics of bendingEnergy()
-    static void  infoBendingEnergy(ObjectList const&, size_t& cnt, real& avg, real& var);
+    static void infoBendingEnergy(ObjectList const&, size_t& cnt, real& avg, real& var);
     
     /// sum Lagrange multipliers for segments that intersect the plane <em> n.pos + a = 0 </em>
-    void  infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const;
+    void infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector const& n, real a) const;
     
     /// sum Lagrange multipliers for all fibers
-    void  infoTension(size_t& cnt, real& sum, real& inf, real& sup) const;
+    void infoTension(size_t& cnt, real& sum, real& inf, real& sup) const;
 
     /// Calculate spindle indices
-    void  infoSpindle(real& ixa, real& ixs, Vector const& n, real a, real m, real da) const;
+    void infoSpindle(real& ixa, real& ixs, Vector const& n, real a, real m, real da) const;
 
     /// Calculate averaged distance from origin - for all vertices
-    void  infoRadius(size_t&, real& rad) const;
+    void infoRadius(size_t&, real& rad) const;
     
     /// Calculate averaged distance from origin - for fiber ends
-    void  infoRadius(size_t&, real& rad, FiberEnd) const;
+    void infoRadius(size_t&, real& rad, FiberEnd) const;
 
 };
 

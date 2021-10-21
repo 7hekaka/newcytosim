@@ -67,31 +67,31 @@ public:
     size_t nbPoints()  const { return num_points_;  }
     
     /// the 'virtual' total energy of the configuration
-    real   finalEnergy() const { return energy_; }
+    real finalEnergy() const { return energy_; }
     
     /// minimum distance in the actual configuration, in 3D space
-    real   minimumDistance();
+    real minimumDistance();
     
     /// multiply all coordinates by `factor`
-    void   scale(real factor);
+    void scale(real factor);
     
     /// address where the coordinates for point `inx` are stored
     const real* addr(const size_t inx) const { return &coord_[3 * inx]; }
     
     /// copy the coordinates from point `inx` onto the given 3-dim array ptr
-    void   putPoint(real ptr[3], size_t inx);
+    void putPoint(real ptr[3], size_t inx);
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void   putPoint(double* x, double* y, double* z, size_t inx);
+    void putPoint(double* x, double* y, double* z, size_t inx);
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void   putPoint(float* x, float* y, float* z, size_t inx);
+    void putPoint(float* x, float* y, float* z, size_t inx);
     
     /// copy the points coordinates onto `x[]`, allocated to hold `ptr_n` elements
-    void   putPoints(real ptr[], const size_t ptr_n);
+    void putPoints(real ptr[], const size_t ptr_n);
     
     /// write points coordinates
-    void   printAllPositions(FILE* file = stdout);
+    void printAllPositions(FILE* file = stdout);
     
     
 private:

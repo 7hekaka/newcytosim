@@ -132,10 +132,10 @@ public:
     ~Random();
 
     /// true if state vector is not entirely zero
-    bool     seeded();
+    bool seeded();
 
     /// seed with given 32 bit integer
-    void     seed(const uint32_t s);
+    void seed(const uint32_t s);
     
     /// seed by reading /dev/random and if this fails using the clock
     uint32_t seed();

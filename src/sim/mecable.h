@@ -51,7 +51,7 @@ protected:
      X1 Y1,    X2 Y2,    etc. for DIM==2
      X1 Y1 Z1, X2 Y2 Z2, etc. for DIM==3
      */
-    real *      pPos;
+    real * pPos;
 
 private:
     
@@ -59,42 +59,42 @@ private:
     real const* pForce;
 
     /// Matrix block used for preconditionning in Meca::solve()
-    real *      pBlock;
+    real * pBlock;
     
     /// array of pivot indices for LAPACK
-    int  *      pPivot;
+    int  * pPivot;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
-    unsigned    pIndex;
+    unsigned pIndex;
     
     /// Allocated size of pBlock[], capable of size^2
-    unsigned    pBlockAlc;
+    unsigned pBlockAlc;
 
 protected:
 
     /// Number of points in the Mecable
-    SIZE_T      nPoints;
+    SIZE_T nPoints;
 
 private:
 
     /// Number of points in pForce[]
-    SIZE_T      pForceMax;
+    SIZE_T pForceMax;
 
     /// Currently allocated size of arrays pPos[]
-    SIZE_T      pAllocated;
+    SIZE_T pAllocated;
     
     /// type of preconditionner
-    SIZE_T      pBlockType;
+    SIZE_T pBlockType;
     
     /// Allocated size of pPivot[]
-    SIZE_T      pPivotAlc;
+    SIZE_T pPivotAlc;
     
     /// Current size of pBlock[]
-    SIZE_T      pBlockSize;
+    SIZE_T pBlockSize;
 
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Flag that pBlock[] is used for preconditionning
-    SIZE_T      pBlockAge;
+    SIZE_T pBlockAge;
     
     /// Matrix used for preconditionning
     MatrixFull  pBlockMatrix;
@@ -117,25 +117,25 @@ public:
     //--------------------------------------------------------------------------
     
     /// Set the number of points of the object
-    void         setNbPoints(const size_t n) { allocateMecable(n); nPoints=(SIZE_T)n; assert_true(nPoints==n); }
+    void setNbPoints(const size_t n) { allocateMecable(n); nPoints=(SIZE_T)n; assert_true(nPoints==n); }
     
     /// Returns number of points
-    size_t       nbPoints()  const { return nPoints; }
+    size_t nbPoints()  const { return nPoints; }
     
     /// Index of the last point = nbPoints() - 1
-    size_t       lastPoint() const { return nPoints - 1; }
+    size_t lastPoint() const { return nPoints - 1; }
     
     /// size currently allocated
-    size_t       allocated() const { return pAllocated; }
+    size_t allocated() const { return pAllocated; }
 
     //--------------------------------------------------------------------------
     
     /// Position of vertex number 'p' (indices starting at zero)
-    Vector       posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
+    Vector posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
     
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/
-    Vector       posP(size_t p)      const { return Vector(pPos+DIM*p); }
+    Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
 
     /// Address of coordinate array
     const real * addrPoints()        const { return pPos; }
@@ -144,34 +144,34 @@ public:
     const real * addrPoint(size_t p) const { return pPos + DIM*p; }
 
     /// Set position of point `i` to `x`
-    void         setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
+    void setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
     
     /// Shift point at index `i` by `x`
-    void         movePoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
+    void movePoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
     
     /// replace current coordinates by values from the given array
     virtual void getPoints(real const*);
     
     /// Set to `n_pts` points copied from `pts[]`
-    void         setPoints(const real pts[], size_t n_pts);
+    void setPoints(const real pts[], size_t n_pts);
     
     /// copy current vertex coordinates to given array, assuming it is suitably allocated
-    void         putPoints(real*) const;
+    void putPoints(real*) const;
 
     /// Copy current vertex coordinates to `ptr[]`, already allocated to hold `cnt` scalars
-    int          putPoints(float ptr[], size_t cnt) const;
+    int putPoints(float ptr[], size_t cnt) const;
 
     /// Add a point and expand the object, returning the array index that was used
-    size_t       addPoint(Vector const& w);
+    size_t addPoint(Vector const& w);
     
     /// Remove `nbp` points starting from index `inx`
-    void         removePoints(size_t inx, size_t nbp);
+    void removePoints(size_t inx, size_t nbp);
     
     /// Remove all points
-    void         clearPoints()  { nPoints = 0; }
+    void clearPoints()  { nPoints = 0; }
     
     /// Shift `nbp` points starting from index `inx`
-    void         shiftPoints(size_t inx, size_t nbp);
+    void shiftPoints(size_t inx, size_t nbp);
     
     /// Remove all points with indices [ 0, p-1 ], keep [ p, nbPoints() ]
     virtual void truncateM(size_t p);
@@ -180,13 +180,13 @@ public:
     virtual void truncateP(size_t p);
     
     /// Set all coordinates to zero (nicer for debug/testing)
-    void         resetPoints();
+    void resetPoints();
     
     /// Add random noise uniformly to all coordinate (used for testing purposes)
-    void         addNoise(real amount);
+    void addNoise(real amount);
     
     /// calculate first and second momentum of point coordinates
-    void         calculateMomentum(Vector& avg, Vector& dev);
+    void calculateMomentum(Vector& avg, Vector& dev);
     
     //--------------------------------------------------------------------------
     
@@ -263,7 +263,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Store the index where coordinates are located in Meca
-    void        setIndex(size_t inx)       { pIndex = static_cast<unsigned>(inx); }
+    void setIndex(size_t inx) { pIndex = static_cast<unsigned>(inx); }
     
     /// Index of the first vertex in the isotropic matrix (Meca::mISO)
     /**
@@ -273,49 +273,49 @@ public:
      The index can be used directly to address the isotropic matrix (Meca::mISO)
      and should be multiplied by DIM to address the general matrix (Meca::mFUL)
      */
-    size_t      matIndex()   const { return pIndex; }
+    size_t matIndex()   const { return pIndex; }
 
     /// Returns current size of preconditionner block
-    size_t      blockSize()  const { return pBlockSize; }
+    size_t blockSize()  const { return pBlockSize; }
     
     /// set size of preconditionner block, allocating memory for 'alc' scalars
-    void        blockSize(size_t, size_t alc, size_t pivot);
+    void blockSize(size_t, size_t alc, size_t pivot);
     
     /// Returns allocated size of preconditionner block
-    size_t      blockAllocated()  const { return pBlockAlc; }
+    size_t blockAllocated()  const { return pBlockAlc; }
 
     /// True if preconditionner block is 'in use'
-    SIZE_T      blockType()  const { return pBlockType; }
+    SIZE_T blockType()       const { return pBlockType; }
 
     /// Returns address of memory allocated for preconditionning
-    real *      block()      const { return pBlock; }
+    real * block()           const { return pBlock; }
     
     /// Returns address of memory allocated for preconditionning (pivot)
-    int *       pivot()      const { return pPivot; }
+    int * pivot()            const { return pPivot; }
     
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void        blockType(SIZE_T t) { pBlockType = t; pBlockAge = 0; }
+    void blockType(SIZE_T t) { pBlockType = t; pBlockAge = 0; }
 
     /// True if preconditionner block is 'in use'
-    SIZE_T      blockAge()   const { return pBlockAge; }
+    SIZE_T blockAge() const { return pBlockAge; }
     
     /// Change preconditionning flag
-    void        blockAge(SIZE_T b) { pBlockAge = b; }
+    void blockAge(SIZE_T b) { pBlockAge = b; }
 
     /// Returns matrix allocated for preconditionning
-    MatrixFull& blockMatrix()      { return pBlockMatrix; }
+    MatrixFull& blockMatrix() { return pBlockMatrix; }
     
     /// Returns matrix allocated for preconditionning
-    void        blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
+    void blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
 #else
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void        blockType(SIZE_T t) { pBlockType = t; }
+    void blockType(SIZE_T t) { pBlockType = t; }
 #endif
     //--------------------------------------------------------------------------
     
     /// returns the force on point `p` calculated at the previous Meca::solve()
-    Vector      netForce(const size_t p) const;
+    Vector netForce(const size_t p) const;
     
     /// replace current forces by the ones provided as argument
     virtual void getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
@@ -376,19 +376,19 @@ public:
     virtual Vector position() const;
     
     /// Mecable accepts translation and rotation
-    virtual int    mobile() const { return 3; }
+    virtual int mobile() const { return 3; }
     
     /// Translate object (moves all the points by the same vector)
-    virtual void   translate(Vector const&);
+    virtual void translate(Vector const&);
     
     /// Rotate object by given rotation
-    virtual void   rotate(Rotation const&);
+    virtual void rotate(Rotation const&);
     
     /// bring object to centered image using periodic boundary conditions
-    virtual void   foldPosition(Modulo const*);
+    virtual void foldPosition(Modulo const*);
     
     /// true if all points are inside Space
-    bool           allInside(Space const*) const;
+    bool allInside(Space const*) const;
     
     //--------------------------------------------------------------------------
     

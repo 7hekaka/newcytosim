@@ -36,13 +36,13 @@ public:
     virtual ~DuoLong();
      
     /// position on the side of fiber1 used for sideInteractions
-    Vector  sidePos1() const;
+    Vector sidePos1() const;
  
     /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
-    Vector  force() const;
+    Vector force() const;
     
     /// add interactions to a Meca
-    void    setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
 };
 

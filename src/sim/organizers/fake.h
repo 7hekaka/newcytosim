@@ -25,7 +25,7 @@ class Fake : public Organizer
 private:
 
     /// Solid on which Fake is build
-    Solid *  fkSolid;
+    Solid * fkSolid;
     
     /// Property
     FakeProp const* prop;
@@ -45,38 +45,38 @@ public:
     ObjectList build(Glossary&, Simul&);
 
     /// perform one Monte-Carlo step
-    void       step();
+    void step();
     
     /// add interactions to a Meca
-    void       setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
     /// return pointer to central Solid
-    Solid *    solid() const { return fkSolid; }
+    Solid * solid() const { return fkSolid; }
 
     
     /// number of links to be displayed using getLink()
-    size_t     nbLinks() const { return asterPoints.size(); }
+    size_t nbLinks() const { return asterPoints.size(); }
 
     /// retrieve link between Solid and Aster's core
-    bool       getLink(size_t, Vector&, Vector&) const;
+    bool getLink(size_t, Vector&, Vector&) const;
     
     /// return Solid
-    Mecable*   core() const { return fkSolid; }
+    Mecable * core() const { return fkSolid; }
     
     /// return display parameters
     PointDisp const* disp() const { if ( fkSolid ) return fkSolid->prop->disp; return nullptr; }
     
     /// return unique character identifying the class
-    ObjectTag       tag() const { return TAG_FAKE; }
+    ObjectTag tag() const { return TAG_FAKE; }
     
     /// return associated Property
     Property const* property() const { return prop; }
     
     /// read from IO
-    void            read(Inputter&, Simul&, ObjectTag);
+    void read(Inputter&, Simul&, ObjectTag);
     
     /// write to IO
-    void            write(Outputter&) const;
+    void write(Outputter&) const;
 
  };
 

@@ -24,21 +24,21 @@ public:
     Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    ObjectList  newObjects(const std::string& name, Glossary& opt);
+    ObjectList newObjects(const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
-    Object *    newObject(ObjectTag, PropertyID);
+    Object * newObject(ObjectTag, PropertyID);
     
     /// write all Objects to file
-    void        write(Outputter&) const;
+    void write(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
-    void        report(std::ostream& os) const { writeReport(os, title()); }
+    void report(std::ostream& os) const { writeReport(os, title()); }
 
     //--------------------------
     
     /// remove from the list
-    void    remove(Object *);
+    void remove(Object *);
     
     /// first Solid
     Solid * first() const { return static_cast<Solid*>(pool_.front()); }
@@ -56,13 +56,13 @@ public:
     Solid * findID(ObjectID n) const { return static_cast<Solid*>(inventory_.get(n)); }
     
     /// bring all objects to centered image using periodic boundary conditions
-    void    foldPositions(Modulo const*) const;
+    void foldPositions(Modulo const*) const;
     
     /// returns Solid, if one of its Sphere covers the given position (`inx` is set by this function)
     Solid * insideSphere(Vector const&, real range, size_t& inx, SolidProp const*) const;
                              
     /// Monte-Carlo simulation step for every Object
-    void    step() {}
+    void step() {}
 };
 
 

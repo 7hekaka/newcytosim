@@ -25,13 +25,13 @@ class SpacePolygonZ : public Space
 private:
     
     /// The 2D polygon
-    Polygon           poly_;
+    Polygon poly_;
         
     /// pre-calculated bounding box since this is called often
-    Vector            inf_, sup_;
+    Vector inf_, sup_;
     
     /// Volume calculated from polygon
-    real              volume_;
+    real volume_;
 
     /// update data structure
     void update();
@@ -45,37 +45,37 @@ public:
     ~SpacePolygonZ();
     
     /// change dimensions
-    void        resize(Glossary& opt);
+    void resize(Glossary& opt);
 
     /// return bounding box in `inf` and `sup`
-    void        boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
+    void boundaries(Vector& inf, Vector& sup) const { inf=inf_; sup=sup_; }
     
     /// the volume inside
-    real        volume() const { return volume_; }
+    real volume() const { return volume_; }
     
     /// true if the point is inside the Space
-    bool        inside(Vector const&) const;
+    bool inside(Vector const&) const;
     
     /// return point on the edge that is closest to `pos`
-    Vector      project(Vector const& pos) const;
+    Vector project(Vector const& pos) const;
 
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
     
     /// apply a force directed towards the edge of the Space
-    void        setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
+    void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions between fibers and reentrant corners
-    void        setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
 
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
-    real        estimateVolumeZ(size_t cnt) const;
+    real estimateVolumeZ(size_t cnt) const;
 
     /// OpenGL display function
-    void        drawRings() const;
+    void drawRings() const;
 
     /// OpenGL display function
-    void        draw3D() const;
+    void draw3D() const;
 };
 
 #endif

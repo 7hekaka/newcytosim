@@ -31,16 +31,16 @@ public:
     virtual ~CrosslinkLong();
     
     /// position on the side of fiber1 used for sideInteractions
-    Vector  sidePos1() const;
+    Vector sidePos1() const;
     
     /// position on the side of fiber2 used for sideInteractions
-    Vector  sidePos2() const;
+    Vector sidePos2() const;
 
     /// force between hands, essentially: stiffness * ( cHand2->posHand() - cHand1->posHand() )
-    Vector  force() const;
+    Vector force() const;
     
     /// add interactions to a Meca
-    void    setInteractions(Meca&) const;
+    void setInteractions(Meca&) const;
     
 };
 

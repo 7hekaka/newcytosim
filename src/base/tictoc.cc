@@ -55,7 +55,7 @@ char const* TicToc::date()
 }
 
 
-int  TicToc::days_since_2000()
+int TicToc::days_since_2000()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);
@@ -70,13 +70,13 @@ time_t TicToc::seconds_since_1970()
 }
 
 /** Attention: this will fail after Jan. 2038 */
-time_t  TicToc::seconds_since_2000()
+time_t TicToc::seconds_since_2000()
 {
     return time(nullptr) - 946684800;
 }
 
 
-int  TicToc::year()
+int TicToc::year()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);
@@ -84,7 +84,7 @@ int  TicToc::year()
 }
 
 
-int  TicToc::day_of_the_year()
+int TicToc::day_of_the_year()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);
@@ -92,7 +92,7 @@ int  TicToc::day_of_the_year()
 }
 
 
-int  TicToc::hours_today()
+int TicToc::hours_today()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);

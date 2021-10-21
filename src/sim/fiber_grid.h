@@ -96,22 +96,22 @@ public:
     FiberGrid() : modulo_(nullptr) { }
 
     /// set a grid to cover the specified Space with cells of width `max_step` at most
-    size_t       setGrid(Space const*, real max_step);
+    size_t setGrid(Space const*, real max_step);
     
     /// true if the grid was initialized by setGrid(); return allocated size
-    size_t       hasGrid() const;
+    size_t hasGrid() const;
 
     /// allocate memory for the grid, with the dimensions set by setGrid()
-    void         createCells();
+    void createCells();
     
     /// number of cells in grid
-    size_t       nbCells() const;
+    size_t nbCells() const;
 
     /// distribute the Fiber segments over the grid cells
-    void         paintGrid(const Fiber * first, const Fiber * last, real range);
+    void paintGrid(const Fiber * first, const Fiber * last, real range);
     
     /// given a position, find nearby Fiber segments and test attachement of the provided Hand
-    void         tryToAttach(Vector const&, Hand&) const;
+    void tryToAttach(Vector const&, Hand&) const;
 
     /// return all Fiber segments located near P, within distance squared, except those belonging to `exclude`
     SegmentList  nearbySegments(Vector const&, real disSqr, Fiber const* exclude = nullptr) const;
@@ -120,7 +120,7 @@ public:
     FiberSegment closestSegment(Vector const&) const;
     
     /// total number of segments in grid
-    size_t       nbTargets() const;
+    size_t nbTargets() const;
 
     /// return segment list associated with cell containing 'pos'
     SegmentList& cellTargets(Vector const& pos) const
@@ -132,7 +132,7 @@ public:
     }
     
     /// test the results of tryToAttach(), at a particular position
-    void         testAttach(FILE *, Vector place, FiberSet const&, HandProp const*) const;
+    void testAttach(FILE *, Vector place, FiberSet const&, HandProp const*) const;
     
     /// underlying spatial grid
     Map<DIM> const& map() const { return fGrid; }
