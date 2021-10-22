@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 #ifndef SIM_THREAD_H
 #define SIM_THREAD_H
 
@@ -28,30 +28,30 @@ private:
     /// callback invoked when the thread is halted, set in constructor
     void (*hold_callback)(void);
     
-    /// slave thread
-    pthread_t child_;
+    /// thread used to run the simulation
+    pthread_t worker_;
     
     /// a flag reflecting if the child thread is running or not
-    volatile bool hasChild;
+    volatile bool alone_;
     
     /// a flag to indicate that child thread should terminate or restart
-    volatile int mFlag;
+    volatile int flag_;
     
     /// mutex protecting write access to simulation state
-    pthread_mutex_t mMutex;
+    pthread_mutex_t mutex_;
 
     /// condition variable used to control the thread execution
-    pthread_cond_t mCondition;
+    pthread_cond_t condition_;
     
     /// counter for hold()
-    unsigned int mHold;
+    unsigned int hold_;
     
     /// period for hold()
-    unsigned int mPeriod;
+    unsigned int period_;
 
     
     /// the current Single being controlled with the mouse
-    mutable Single * mHandle;
+    mutable Single * handle_;
     
     /// return the SingleProp used for the handles
     SingleProp * getHandleProperty() const;
@@ -62,8 +62,8 @@ private:
     /// return list of Handles
     ObjectList allHandles(SingleProp const*) const;
 
-    /// True if current thread is 'child'
-    bool isChild() const { return pthread_equal(pthread_self(), child_); }
+    /// True if current thread is the worker thread
+    bool isWorker() const { return pthread_equal(pthread_self(), worker_); }
     
 public:
     
@@ -75,9 +75,6 @@ public:
 
     /// redefining Interface::hold(), which is called repeatedly at each timestep
     void hold();
-    
-    /// return child process
-    pthread_t     child() { return child_; }
     
     /// print message to identify thread
     void debug(const char *) const;
@@ -94,50 +91,50 @@ public:
 #if ( 1 )
 
     /// lock access to the Simulation data
-    void lock()   { pthread_mutex_lock(&mMutex); }
+    void lock()   { pthread_mutex_lock(&mutex_); }
     
     /// unlock access to the Simulation data
-    void unlock() { pthread_mutex_unlock(&mMutex);}
+    void unlock() { pthread_mutex_unlock(&mutex_);}
     
     /// try to lock access to the Simulation data
-    int trylock() { return pthread_mutex_trylock(&mMutex); }
+    int trylock() { return pthread_mutex_trylock(&mutex_); }
 
     /// unlock access to data and wait for the condition
-    int wait()    { return pthread_cond_wait(&mCondition, &mMutex); }
+    int wait()    { return pthread_cond_wait(&condition_, &mutex_); }
     
     /// send signal to other threads
-    void signal() { if ( hasChild ) pthread_cond_signal(&mCondition); }
+    void signal() { if ( !alone_ ) pthread_cond_signal(&condition_); }
 
 #else
     
     /// lock access to the Simulation data
-    void lock()   {  debug("  lock..."); pthread_mutex_lock(&mMutex); debug("  locked!"); }
+    void lock()   {  debug("  lock..."); pthread_mutex_lock(&mutex_); debug("  locked!"); }
     
     /// unlock access to the Simulation data
-    void unlock() { pthread_mutex_unlock(&mMutex); gubed("  unlock"); }
+    void unlock() { pthread_mutex_unlock(&mutex_); gubed("  unlock"); }
     
     /// try to lock access to the Simulation data
-    int trylock() { int R=pthread_mutex_trylock(&mMutex); debug(R?"  failed trylock":"  trylock"); return R; }
+    int trylock() { int R=pthread_mutex_trylock(&mutex_); debug(R?"  failed trylock":"  trylock"); return R; }
     
     /// wait for the condition
-    int wait()    { debug("unlock, wait"); int R=pthread_cond_wait(&mCondition, &mMutex); debug("wake, lock"); return R; }
+    int wait()    { debug("unlock, wait"); int R=pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); return R; }
     
     /// signal other thread to continue
-    void signal() { debug("signal"); pthread_cond_signal(&mCondition); }
+    void signal() { debug("signal"); pthread_cond_signal(&condition_); }
     
 #endif
     
     /// set how many 'hold()' are necessary to halt the thread
-    void period(unsigned int c) { mPeriod = c; }
+    void period(unsigned int c) { period_ = c; }
     
     /// true if child thread is running
-    bool       alive() const { return hasChild; }
+    bool alive() const { return !alone_; }
     
     /// start the thread that will run a simulation
     void start();
     
     /// continue to run the simulation after its normal termination
-    int        extend();
+    int extend();
     
     /// perform one simulation step
     void step();
@@ -155,7 +152,7 @@ public:
     void clear();
     
     /// execute commands from standard input, return number of lines processed
-    size_t     executePipedCommands(size_t max_nb_lines);
+    size_t executePipedCommands(size_t max_nb_lines);
     
     /// halt the live simulation, read the config file and change the object parameters
     void reloadParameters(std::string const& file);
@@ -174,24 +171,24 @@ public:
     void openFile(std::string const& name) { reader_.openFile(name); }
     
     /// true if ready to read from file
-    bool goodFile()    const { return reader_.good(); }
+    bool goodFile() const { return reader_.good(); }
     
     /// status of file
-    int eof()          const { return reader_.eof(); }
+    int eof()       const { return reader_.eof(); }
     
     /// rewind file
-    void rewind()            { lock(); reader_.rewind(); unlock(); }
+    void rewind()         { lock(); reader_.rewind(); unlock(); }
     
     /// attempt to load specified frame from file (0 = first frame; -1 = last frame)
-    int loadFrame(size_t f)  { lock(); int r=reader_.loadFrame(simul_, f); unlock(); return r; }
+    int loadFrame(size_t f) { lock(); int r=reader_.loadFrame(simul_, f); unlock(); return r; }
 
     /// load next frame in file
-    int loadNextFrame()      { lock(); int r=reader_.loadNextFrame(simul_); unlock(); return r; }
+    int loadNextFrame()     { lock(); int r=reader_.loadNextFrame(simul_); unlock(); return r; }
     
     /// attempt to load last frame from file
-    int loadLastFrame()      { lock(); int r=reader_.loadLastFrame(simul_); unlock(); return r; }
+    int loadLastFrame()     { lock(); int r=reader_.loadLastFrame(simul_); unlock(); return r; }
 
-    /// index of current framee (0 is lowest valid value)
+    /// index of current frame (0 is lowest valid value)
     size_t currentFrame() const { return reader_.currentFrame(); }
 
     
@@ -199,7 +196,7 @@ public:
     Single const* handle() const;
 
     /// make a new Single that can be controlled by the user
-    Single *   createHandle(Vector const&, real range);
+    Single * createHandle(Vector const&, real range);
     
     /// switch current handle
     bool selectClosestHandle(Vector const&, real range);
@@ -217,7 +214,7 @@ public:
     void deleteHandles();
     
     /// detach current handle from mouse control
-    void releaseHandle() { mHandle = nullptr; }
+    void releaseHandle() { handle_ = nullptr; }
     
 };
 

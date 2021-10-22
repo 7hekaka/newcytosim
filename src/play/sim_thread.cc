@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -20,12 +20,12 @@
 SimThread::SimThread(Simul& sim, void (*callback)(void))
 : Parser(sim, 1, 1, 1, 1, 0), hold_callback(callback)
 {
-    hasChild = false;
-    mFlag   = 0;
-    mHold   = 0;
-    mPeriod = 1;
-    pthread_mutex_init(&mMutex, nullptr);
-    pthread_cond_init(&mCondition, nullptr);
+    alone_  = 1;
+    flag_   = 0;
+    hold_   = 0;
+    period_ = 1;
+    pthread_mutex_init(&mutex_, nullptr);
+    pthread_cond_init(&condition_, nullptr);
 }
 
 /**
@@ -38,8 +38,8 @@ SimThread::~SimThread()
 {
     //std::cerr << "~SimThread()\n";
     stop();
-    pthread_cond_destroy(&mCondition);
-    pthread_mutex_destroy(&mMutex);
+    pthread_cond_destroy(&condition_);
+    pthread_mutex_destroy(&mutex_);
 }
 
 //------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ SimThread::~SimThread()
 
 void SimThread::debug(const char* msg) const
 {
-    if ( isChild() )
+    if ( isWorker() )
         fprintf(stdout, "\n- - -  %-16s", msg);
     else
         fprintf(stdout, "\n* * *  %-16s", msg);
@@ -57,7 +57,7 @@ void SimThread::debug(const char* msg) const
 
 void SimThread::gubed(const char* msg) const
 {
-    if ( isChild() )
+    if ( isWorker() )
         fprintf(stdout, "  - - %12s ", msg);
     else
         fprintf(stdout, "  * * %12s ", msg);
@@ -66,17 +66,17 @@ void SimThread::gubed(const char* msg) const
 
 void SimThread::hold()
 {
-    assert_true( isChild() );
+    assert_true( isWorker() );
 
-    if ( mFlag )
+    if ( flag_ )
         pthread_exit(nullptr);
     
-    if ( ++mHold >= mPeriod )
+    if ( ++hold_ >= period_ )
     {
-        mHold = 0;
+        hold_ = 0;
         //debug("holding");
         hold_callback();
-        if ( mFlag )
+        if ( flag_ )
             pthread_exit(nullptr);
         wait();  // this also unlocks and locks the mutex
     }
@@ -89,7 +89,7 @@ void SimThread::hold()
 
 void SimThread::run()
 {
-    assert_true( isChild() );
+    assert_true( isWorker() );
     try {
         Parser::readConfig();
     }
@@ -106,7 +106,7 @@ void SimThread::run()
 void child_cleanup(void * arg)
 {
     SimThread * st = static_cast<SimThread*>(arg);
-    st->hasChild = 0;
+    st->alone_ = 1;
     st->unlock();
     //st->debug("ended");
 }
@@ -131,14 +131,14 @@ void* run_launcher(void * arg)
  */
 void SimThread::start()
 {
-    assert_false( isChild() );
-    if ( !hasChild )
+    assert_false( isWorker() );
+    if ( alone_ )
     {
-        mFlag = 0;
+        flag_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
-        if ( pthread_create(&child_, nullptr, run_launcher, this) )
+        if ( pthread_create(&worker_, nullptr, run_launcher, this) )
             throw Exception("failed to create thread");
-        hasChild = 1;
+        alone_ = 0;
     }
 }
 
@@ -148,7 +148,7 @@ void SimThread::start()
 
 void SimThread::extend_run()
 {
-    assert_true( isChild() );
+    assert_true( isWorker() );
     try {
         simul_.parser_ = this;
         Parser::execute_run(1<<20);
@@ -179,14 +179,14 @@ void* extend_launcher(void * arg)
 /// call `extend_run()` in a slave thread
 int SimThread::extend()
 {
-    assert_false( isChild() );
-    if ( !hasChild )
+    assert_false( isWorker() );
+    if ( alone_ )
     {
-        mFlag = 0;
+        flag_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
-        if ( pthread_create(&child_, nullptr, extend_launcher, this) )
+        if ( pthread_create(&worker_, nullptr, extend_launcher, this) )
             throw Exception("failed to create thread");
-        hasChild = 1;
+        alone_ = 0;
         return 0;
     }
     return 1;
@@ -199,8 +199,8 @@ int SimThread::extend()
 
 void SimThread::step()
 {
-    assert_false( isChild() );
-    if ( hasChild )
+    assert_false( isWorker() );
+    if ( !alone_ )
         signal();
 }
 
@@ -210,19 +210,19 @@ void SimThread::step()
 */ 
 void SimThread::stop()
 {
-    assert_false( isChild() );
-    if ( hasChild )
+    assert_false( isWorker() );
+    if ( !alone_ )
     {
         // request clean termination:
-        mFlag = 1;
+        flag_ = 1;
         signal();
         // wait for termination:
-        if ( hasChild )
+        if ( !alone_ )
         {
             //debug("join...");
             // wait for termination:
-            pthread_join(child_, nullptr);
-            hasChild = 0;
+            pthread_join(worker_, nullptr);
+            alone_ = 1;
         }
     }
 }
@@ -232,17 +232,17 @@ void SimThread::stop()
  */
 void SimThread::cancel()
 {
-    assert_false( isChild() );
-    if ( hasChild )
+    assert_false( isWorker() );
+    if ( !alone_ )
     {
-        mFlag = 2;
+        flag_ = 2;
         //debug("cancel...");
         // force termination:
-        if ( 0 == pthread_cancel(child_) )
+        if ( 0 == pthread_cancel(worker_) )
         {
             // wait for termination:
-            pthread_join(child_, nullptr);
-            hasChild = 0;
+            pthread_join(worker_, nullptr);
+            alone_ = 1;
             unlock();
         }
     }
@@ -251,7 +251,7 @@ void SimThread::cancel()
 
 void SimThread::restart()
 {
-    assert_false( isChild() );
+    assert_false( isWorker() );
     stop();
     clear();
     start();
@@ -296,7 +296,7 @@ Single * SimThread::createHandle(Vector const& pos, real range)
         sip = makeHandleProperty(range);
     Single * res = new Picket(sip, pos);
     simul_.singles.add(res);
-    mHandle = res;
+    handle_ = res;
     return res;
 }
 
@@ -327,7 +327,7 @@ bool SimThread::selectClosestHandle(Vector const& pos, real range)
         }
         if ( res && dsm < range )
         {
-            mHandle = res;
+            handle_ = res;
             return 1;
         }
     }
@@ -338,31 +338,31 @@ bool SimThread::selectClosestHandle(Vector const& pos, real range)
 Single const* SimThread::handle() const
 {
     SingleProp * sip = getHandleProperty();
-    if ( sip && mHandle )
+    if ( sip && handle_ )
     {
         for ( Object * i : allHandles(sip) )
-            if ( i == mHandle )
-                return mHandle;
+            if ( i == handle_ )
+                return handle_;
     }
-    mHandle = nullptr;
+    handle_ = nullptr;
     return nullptr;
 }
 
 
 void SimThread::detachHandle()
 {
-    if ( mHandle )
+    if ( handle_ )
     {
-        if ( mHandle->attached() )
-            mHandle->detach();
+        if ( handle_->attached() )
+            handle_->detach();
     }
 }
 
 void SimThread::moveHandle(Vector const& pos)
 {
-    if ( mHandle )
+    if ( handle_ )
     {
-        mHandle->setPosition(pos);
+        handle_->setPosition(pos);
     }
 }
 
@@ -381,15 +381,15 @@ void SimThread::deleteHandles()
     SingleProp * sip = getHandleProperty();
     if ( sip )
         simul_.erase(allHandles(sip));
-    mHandle = nullptr;
+    handle_ = nullptr;
     unlock();
 }
 
 void SimThread::clear()
 {
-    assert_false( isChild() );
+    assert_false( isWorker() );
     simul_.erase_all(1);
-    mHandle = nullptr;
+    handle_ = nullptr;
 }
 
 //------------------------------------------------------------------------------
