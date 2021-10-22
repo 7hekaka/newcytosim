@@ -45,9 +45,6 @@ public:
     /// first object
     Field * first() const;
     
-    /// find object
-    Field * findObject(Property const* p) const;
-    
     /// return pointer to the Object of given ID, or zero if not found
     Field * findID(ObjectID n) const;
     

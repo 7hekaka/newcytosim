@@ -327,7 +327,6 @@ int DynamicFiber::stepPlusEnd()
                     --res;
                     nextShrinkP += RNG.exponential();
                     break;
-
             }
             
             mStateP = calculateStateP();

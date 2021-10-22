@@ -565,8 +565,8 @@ void FiberProp::complete(Simul const& sim)
     
     if ( field != "none" )
     {
-        Property * fp = sim.properties.find("field", field);
-        field_ptr = static_cast<Field*>(sim.fields.findObject(fp));
+        Property * p = sim.properties.find_or_die("field", field);
+        field_ptr = sim.pickField(p);
     }
     
     if ( lattice && sim.primed() )

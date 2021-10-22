@@ -171,13 +171,13 @@ public:
     Object * findID(ObjectID n) const { return static_cast<Object*>(inventory_.get(n)); }
     
     /// return an Object which has this property
-    Object * findObject(Property const*) const;
+    Object * pickObject(Property const*) const;
 
     /// return Object corresponding to specifications
-    Object * findObject(std::string spec, long identity, const std::string&) const;
+    Object * findObject(const std::string& cat, std::string spec, long identity) const;
     
     /// return Object corresponding to a certain criteria (eg. 'first' or 'last')
-    Object * findObject(std::string spec, const std::string&) const;
+    Object * findObject(const std::string& cat, std::string spec) const;
     
     //--------------------------
     

@@ -210,10 +210,10 @@ Mecable* Simul::toMecable(Object * obj)
  */
 Mecable * Simul::findMecable(const std::string& arg) const
 {
-    Object  * obj = fibers.findObject(arg, fibers.title());
-    if (!obj) obj = solids.findObject(arg, solids.title());
-    if (!obj) obj = spheres.findObject(arg, spheres.title());
-    if (!obj) obj = beads.findObject(arg, beads.title());
+    Object  * obj = fibers.findObject("fiber", arg);
+    if (!obj) obj = solids.findObject("solid", arg);
+    if (!obj) obj = spheres.findObject("sphere", arg);
+    if (!obj) obj = beads.findObject("bead", arg);
     return static_cast<Mecable*>(obj);
 }
 
@@ -304,6 +304,7 @@ void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 //------------------------------------------------------------------------------
 #pragma mark -
 
+/** This should be equivalent to ObjectSet::findObject() */
 Space const* Simul::findSpace(std::string const& str) const
 {
     if ( str == "first" )
@@ -315,9 +316,14 @@ Space const* Simul::findSpace(std::string const& str) const
     Property * sp = properties.find("space", str);
     
     if ( sp )
-        return spaces.findObject(sp);
+        return pickSpace(sp);
     
     return nullptr;
+}
+
+Field * Simul::pickField(const Property * p) const
+{
+    return static_cast<Field*>(fields.pickObject(p));
 }
 
 /**

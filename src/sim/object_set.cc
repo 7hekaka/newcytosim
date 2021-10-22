@@ -208,11 +208,11 @@ void ObjectSet::erase()
 }
 
 
-Object* ObjectSet::findObject(std::string spec, long num, const std::string& title) const
+Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num) const
 {
-    //std::clog << "findObject(" << spec << "|" << num << "|" << title << ")\n";
+    //std::clog << "findObject(" << cat << "|" << num << "|" << spec << ")\n";
     // check for a string starting with the class name (eg. 'fiber'):
-    if ( spec == title )
+    if ( spec == cat )
     {
         Inventoried * inv = nullptr;
         if ( num > 0 )
@@ -248,7 +248,7 @@ Object* ObjectSet::findObject(std::string spec, long num, const std::string& tit
     }
     
     // finally search for a property name:
-    Property * pp = simul_.findProperty(title, spec);
+    Property * pp = simul_.findProperty(cat, spec);
 
     if ( pp )
     {
@@ -286,7 +286,7 @@ Object* ObjectSet::findObject(std::string spec, long num, const std::string& tit
 }
 
 
-// split into a word and a number, without a space:
+// split string into a word and a number, without a space, like 'fiber1':
 bool splitObjectSpec(std::string& str, long& num)
 {
     size_t pos = str.find_first_of("0123456789+-");
@@ -318,9 +318,9 @@ bool splitObjectSpec(std::string& str, long& num)
  - `fiber-1` the penultimate fiber, etc.
  .
  */
-Object* ObjectSet::findObject(std::string spec, const std::string& title) const
+Object* ObjectSet::findObject(const std::string& cat, std::string spec) const
 {
-    //std::clog << "ObjectSet::findObject " << spec << '\n';
+    //std::clog << "ObjectSet::findObject(" << cat << ", " << spec << ")\n";
     
     if ( spec == "first" )
         return static_cast<Object*>(inventory_.first());
@@ -331,10 +331,10 @@ Object* ObjectSet::findObject(std::string spec, const std::string& title) const
     // try to split into a word and a number:
     long num = 0;
     if ( splitObjectSpec(spec, num) )
-        return findObject(spec, num, title);
+        return findObject(cat, spec, num);
 
     // check category name, eg. 'fiber':
-    if ( spec == title )
+    if ( spec == cat )
     {
         ObjectList all = collect();
         //std::clog << "findObject -> random pick among " << sel.size() << " " << title << "\n";
@@ -343,7 +343,7 @@ Object* ObjectSet::findObject(std::string spec, const std::string& title) const
     }
     
     // check property name:
-    Property const* p = simul_.findProperty(title, spec);
+    Property const* p = simul_.findProperty(cat, spec);
     if ( p )
     {
         ObjectList sel = collect(match_property, p);
@@ -361,7 +361,7 @@ Object* ObjectSet::findObject(std::string spec, const std::string& title) const
  but it can be any one of them, since the lists are regularly
  shuffled to randomize the order in the list.
  */
-Object * ObjectSet::findObject(Property const* p) const
+Object * ObjectSet::pickObject(Property const* p) const
 {
     for ( Object* obj=first(); obj; obj=obj->next() )
         if ( obj->property() == p )

@@ -271,17 +271,23 @@ public:
     Mecable * findMecable(const std::string&) const;
     
     /// find a Solid by name
-    Solid * findSolid(std::string s) { return Solid::toSolid(solids.findObject(s, "solid")); }
+    Solid * findSolid(std::string s) { return Solid::toSolid(solids.findObject("solid", s)); }
     
     /// find a Fiber by name
-    Fiber * findFiber(std::string s) { return Fiber::toFiber(fibers.findObject(s, "fiber")); }
+    Fiber * findFiber(std::string s) { return Fiber::toFiber(fibers.findObject("fiber", s)); }
     
     /// find a Sphere by name
-    Sphere * findSphere(std::string s) { return Sphere::toSphere(spheres.findObject(s, "sphere")); }
-    
+    Sphere * findSphere(std::string s) { return Sphere::toSphere(spheres.findObject("sphere", s)); }
+
     /// return first Space with given name, or return nullptr
     Space const* findSpace(std::string const&) const;
     
+    /// first Space with this Property
+    Space * pickSpace(const Property * p) const { return static_cast<Space*>(spaces.pickObject(p)); }
+    
+    /// first Field with this Property
+    Field * pickField(const Property * p) const;
+
     /// Parse a text containing cytosim commands
     void evaluate(std::string const&);
 
@@ -304,14 +310,14 @@ public:
     Property * findProperty(const std::string&, const std::string&) const;
     
     /// return existing property of given name, or return zero
-    Property*    findProperty(const std::string&) const;
+    Property * findProperty(const std::string&) const;
 
     /// return all existing properties of requested class
     PropertyList findAllProperties(const std::string&) const;
     
     /// return Property in the requested type, or throw an exception
     template < typename T >
-    T* findProperty(std::string const& cat, PropertyID id) const
+    T * findProperty(std::string const& cat, PropertyID id) const
     {
         if ( !id )
             throw InvalidIO("invalid (null) `"+cat+"' class ID");
@@ -323,7 +329,7 @@ public:
     
     /// return Property in the requested type, or throw an exception
     template < typename T >
-    T* findProperty(std::string const& cat, std::string const& nom) const
+    T * findProperty(std::string const& cat, std::string const& nom) const
     {
         Property * p = properties.find(cat, nom);
         if ( !p )

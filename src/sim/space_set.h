@@ -59,9 +59,6 @@ public:
     
     /// first Space
     Space * first() const { return static_cast<Space*>(pool_.front()); }
-
-    /// first Space with this Property
-    Space * findObject(const Property * p) const { return static_cast<Space*>(ObjectSet::findObject(p)); }
     
     /// last Space
     Space * last() const

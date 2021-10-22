@@ -591,7 +591,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
             }
 
             // check if some individual fiber was requested:
-            Fiber* fib = Fiber::toFiber(findObject(str, title()));
+            Fiber* fib = Fiber::toFiber(findObject("fiber", str));
             
             if ( fib )
             {
