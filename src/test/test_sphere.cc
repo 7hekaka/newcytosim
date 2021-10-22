@@ -7,6 +7,7 @@
 #include "glapp.h"
 #include "glut.h"
 #include "gle.h"
+#include "gym_text.h"
 #include "gle_flute.h"
 
 using namespace gle;
@@ -122,7 +123,7 @@ void nameVertices()
         GLfloat x, y, z;
         front->putPoint(&x, &y, &z, i);
         snprintf(tmp, sizeof(tmp), "%lu", i);
-        gle::drawText(Vector3(x, y, z), tmp, GLUT_BITMAP_8_BY_13, 0.5);
+        gym::drawText(Vector3(x, y, z), tmp, GLUT_BITMAP_8_BY_13, 0.5);
     }
 }
 

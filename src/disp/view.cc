@@ -3,6 +3,7 @@
 #include "view.h"
 #include "gle.h"
 #include "flute.h"
+#include "gym_text.h"
 #include "offscreen.h"
 #include "glu_unproject.cc"
 #include "glut.h"
@@ -815,7 +816,7 @@ void View::displayMagnifier(GLint Z, Vector3 foc, GLint mX, GLint mY) const
 
 void View::drawText(std::string const& str, void* font, gle_color col, int pos) const
 {
-    gle::drawText(str.c_str(), font, col, pos, width(), height());
+    gym::drawText(str.c_str(), font, col, pos, width(), height());
 }
 
 //------------------------------------------------------------------------------
@@ -907,7 +908,7 @@ void View::drawScaleH(float s, float a, float b) const
             glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(s-6*pixelSize(), b-12*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gle::bitmapString(str);
+            gym::bitmapString(str);
         }
     } while ( w >= 0.5 );
 }
@@ -949,7 +950,7 @@ void View::drawScaleV(float s, float a, float b) const
             glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(b+pixelSize(), s-4*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gle::bitmapString(str);
+            gym::bitmapString(str);
         }
     } while ( w >= 0.5 );
 }

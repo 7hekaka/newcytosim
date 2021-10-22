@@ -12,6 +12,7 @@
 #include "real.h"
 #include "timer.h"
 #include "gle.h"
+#include "gym_text.h"
 #include "gle_flute.h"
 
 #include "grid.h"
@@ -214,7 +215,7 @@ void display(View& view, int)
             Vector x;
             myGrid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
             snprintf(str, sizeof(str), "%lu", j);
-            gle::drawText(x, str, GLUT_BITMAP_HELVETICA_10);
+            gym::drawText(x, str, GLUT_BITMAP_HELVETICA_10);
         }
     }
     else

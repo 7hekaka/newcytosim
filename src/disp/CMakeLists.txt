@@ -1,5 +1,6 @@
 set(SOURCES_DISP
     gle.cc
+    gle_text.cc
     gle_flute.cc
     gle_zoo.cc
     gle_color.cc

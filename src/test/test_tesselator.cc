@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "gle.h"
+#include "gym_text.h"
 #include "gle_flute.h"
 #include "glut.h"
 #include "glapp.h"
@@ -191,7 +192,7 @@ void nameVertices()
         const float* v = ico->vertex_data(i);
         Vector3 pos(v[0], v[1], v[2]);
         snprintf(tmp, sizeof(tmp), "%u", i);
-        gle::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
+        gym::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
     }
 }
 

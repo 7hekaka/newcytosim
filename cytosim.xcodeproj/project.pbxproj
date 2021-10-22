@@ -797,6 +797,8 @@
 		BBCB085B244B49C9004E7C32 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBCB085F244C4A4E004E7C32 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBCB0860244C4B17004E7C32 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
+		BBCC8FFF2722C8550066FF75 /* gym_text.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBCC8FFD2722C8550066FF75 /* gym_text.cc */; };
+		BBCC90002722C8550066FF75 /* gym_text.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCC8FFE2722C8550066FF75 /* gym_text.h */; };
 		BBD025DE1B28DF950002B9FE /* chewer_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DA1B28DF950002B9FE /* chewer_prop.cc */; };
 		BBD025DF1B28DF950002B9FE /* chewer_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DB1B28DF950002B9FE /* chewer_prop.h */; };
 		BBD025E01B28DF950002B9FE /* chewer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DC1B28DF950002B9FE /* chewer.cc */; };
@@ -1830,6 +1832,8 @@
 		BBCAA49D06B0655A00638608 /* mecafil_project.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = mecafil_project.cc; path = src/sim/mecafil_project.cc; sourceTree = SOURCE_ROOT; };
 		BBCAA49E06B0655A00638608 /* mecafil_projectmat.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = mecafil_projectmat.cc; path = src/sim/mecafil_projectmat.cc; sourceTree = SOURCE_ROOT; };
 		BBCB085C244C44AB004E7C32 /* mecafil_code.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mecafil_code.cc; sourceTree = "<group>"; };
+		BBCC8FFD2722C8550066FF75 /* gym_text.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_text.cc; sourceTree = "<group>"; };
+		BBCC8FFE2722C8550066FF75 /* gym_text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_text.h; sourceTree = "<group>"; };
 		BBCD0E910C5E84CC00B463EB /* test_sizeof.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_sizeof.cc; path = src/test/test_sizeof.cc; sourceTree = SOURCE_ROOT; };
 		BBCD6993126F818F00D19DDF /* sieve.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sieve.cc; sourceTree = "<group>"; };
 		BBD025DA1B28DF950002B9FE /* chewer_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chewer_prop.cc; path = hands/chewer_prop.cc; sourceTree = "<group>"; };
@@ -2992,6 +2996,8 @@
 				BB9711521DECDA1300352630 /* gle_color.cc */,
 				BB9711551DECDA1300352630 /* gle_color_list.h */,
 				BB9711541DECDA1300352630 /* gle_color_list.cc */,
+				BBCC8FFE2722C8550066FF75 /* gym_text.h */,
+				BBCC8FFD2722C8550066FF75 /* gym_text.cc */,
 				BB3CFAA225DBD0E80016A7A3 /* flute.h */,
 				BB3CFA9E25DBCC340016A7A3 /* gle_flute.h */,
 				BB3CFA9F25DBCC350016A7A3 /* gle_flute.cc */,
@@ -3390,6 +3396,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBCC90002722C8550066FF75 /* gym_text.h in Headers */,
 				BB3CFAA025DBCC350016A7A3 /* gle_flute.h in Headers */,
 				BBFF79CC2670A57400EB5870 /* display_color.h in Headers */,
 				BB3CFAA325DBD0E90016A7A3 /* flute.h in Headers */,
@@ -4492,6 +4499,7 @@
 				BB109D3723D0788200805F16 /* point_disp.cc in Sources */,
 				BB3CFAA125DBCC350016A7A3 /* gle_flute.cc in Sources */,
 				BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */,
+				BBCC8FFF2722C8550066FF75 /* gym_text.cc in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
 				BB97116B1DECDB9500352630 /* offscreen.cc in Sources */,
 				BB97116A1DECDB8F00352630 /* save_image.cc in Sources */,

@@ -13,6 +13,7 @@
 #include "fake.h"
 
 #include "gle.h"
+#include "gym_text.h"
 #include "gle_color.h"
 #include "gle_color_list.h"
 #include "gle_flute.h"
@@ -1222,7 +1223,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%lu", i);
-            gle::drawText(fib.posP(i), str, font);
+            gym::drawText(fib.posP(i), str, font);
         }
     } 
     else if ( style & 2 )
@@ -1232,25 +1233,25 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
-            gle::drawText(fib.posP(i), str, font);
+            gym::drawText(fib.posP(i), str, font);
         }
     }
     if ( style & 4 )
     {
         // display integral abscissa along the fiber
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
-        gle::drawText(fib.posEndM(), str, font);
+        gym::drawText(fib.posEndM(), str, font);
         
         int s = (int)std::ceil(fib.abscissaM());
         int e = (int)std::floor(fib.abscissaP());
         for ( int a = s; a <= e; ++a )
         {
             snprintf(str, sizeof(str), "%i", a);
-            gle::drawText(fib.pos(a), str, font);
+            gym::drawText(fib.pos(a), str, font);
         }
         
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
-        gle::drawText(fib.posEndP(), str, font);
+        gym::drawText(fib.posEndP(), str, font);
     }
     if ( style & 8 )
     {
@@ -1260,7 +1261,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         {
             Vector b = fib.posPoint(i);
             snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
-            gle::drawText(0.5*(a+b), str, font, 0.5);
+            gym::drawText(0.5*(a+b), str, font, 0.5);
             a = b;
         }
     }
@@ -1758,7 +1759,7 @@ void Display::drawSolid(Solid const& obj)
         char tmp[8];
         bodyColorF(obj).load();
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
-        gle::drawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
+        gym::drawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
     }
     
     //draw polygon around vertices of Solid

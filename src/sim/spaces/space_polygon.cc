@@ -333,7 +333,7 @@ void SpacePolygon::drawPolygon(bool points, bool lines) const
         {
             snprintf(tmp, sizeof(tmp), "%i", n);
             Vector p(pts[n].xx, pts[n].yy, height_);
-            gle::drawText(p, tmp, 0);
+            gym::drawText(p, tmp, 0);
         }
 #endif
     }
