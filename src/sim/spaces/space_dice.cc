@@ -309,7 +309,7 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 #include "tesselator.h"
 
 void SpaceDice::draw2D() const
@@ -329,11 +329,11 @@ void SpaceDice::draw3D() const
     
     size_t cnt = mesh.num_vertices();
 #if 0
-    fluteD * flu = gle::mapBufferVD(cnt);
+    fluteD * flu = gym::mapBufferVD(cnt);
     mesh.store_vertices((float*)flu);
-    gle::unmapBufferVD();
+    gym::unmapBufferVD();
 #else
-    glBindBuffer(GL_ARRAY_BUFFER, gle::nextStream());
+    glBindBuffer(GL_ARRAY_BUFFER, gym::nextStream());
     glBufferData(GL_ARRAY_BUFFER, 3*cnt*sizeof(float), nullptr, GL_STREAM_DRAW);
     float * flu = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
     mesh.store_vertices(flu);
@@ -352,9 +352,9 @@ void SpaceDice::draw3D() const
 
     // remove the last 12 triangles, corresponding to the faces
     size_t tri = 3 * ( mesh.num_faces() - 12 );
-    unsigned* inx = gle::mapIndexBuffer(tri);
+    unsigned* inx = gym::mapIndexBuffer(tri);
     memcpy(inx, mesh.face_data(), tri*sizeof(unsigned));
-    gle::unmapIndexBuffer();
+    gym::unmapIndexBuffer();
     
     glEnableClientState(GL_NORMAL_ARRAY);
     glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_INT, nullptr);

@@ -1,8 +1,8 @@
 set(SOURCES_DISP
     gle.cc
-    gle_text.cc
-    gle_flute.cc
-    gle_zoo.cc
+    gym_text.cc
+    gym_flute.cc
+    gym_zoo.cc
     gle_color.cc
     gle_color_list.cc
     view.cc

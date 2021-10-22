@@ -13,7 +13,7 @@
 #include "timer.h"
 #include "gle.h"
 #include "gym_text.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 
 #include "grid.h"
 #include "grid_display.h"
@@ -171,7 +171,7 @@ void display(View& view, int)
 
     //--------------draw content of cells
     const real gold = 2.0 / ( 1.0 + sqrt(5) );
-    fluteD4 * flu = gle::mapBufferC4VD(16*myGrid.nbCells()+2);
+    fluteD4 * flu = gym::mapBufferC4VD(16*myGrid.nbCells()+2);
     size_t i = 0;
 
     for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )

@@ -5,7 +5,7 @@
 #include "gle_color.h"
 #include "property.h"
 #include "gle.h"
-#include "gle_zoo.h"
+#include "gym_zoo.h"
 
 
 /** \todo: replace PIXELMAPS by a texture, and draw each particle as a textured Square */

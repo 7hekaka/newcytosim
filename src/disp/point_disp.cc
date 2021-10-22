@@ -6,7 +6,7 @@
 #include "glossary.h"
 #include "glut.h"
 #include "gle.h"
-#include "gle_zoo.h"
+#include "gym_zoo.h"
 
 
 /// if this is defined, the pixelmap are stored in graphical memory

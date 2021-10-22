@@ -2,7 +2,7 @@
 
 #include "gle.h"
 #include "gym_text.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 #include "glut.h"
 #include "glapp.h"
 #include "tesselator.h"

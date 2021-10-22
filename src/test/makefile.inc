@@ -196,7 +196,7 @@ vpath test_solve bin
 
 #----------------------------Targets using GLAPP--------------------------------
 
-OBJ_GLAP := $(OBJ_DISP) gle_flute.o offscreen.o cytobase.a cytomath.a SFMT.o
+OBJ_GLAP := $(OBJ_DISP) gym_flute.o offscreen.o cytobase.a cytomath.a SFMT.o
 
 test_glapp: test_glapp.cc $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
@@ -224,7 +224,7 @@ test_rasterizer: test_rasterizer.cc rasterizerG.o $(OBJ_GLAP) | bin
 	$(DONE)
 vpath test_rasterizer bin
 
-test_space: test_space.cc cytolibG.a gle_flute.o $(OBJ_GLAP) | bin
+test_space: test_space.cc cytolibG.a gym_flute.o $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 vpath test_space bin

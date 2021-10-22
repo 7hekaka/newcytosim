@@ -105,8 +105,8 @@
 		BB2D09FB243DBC5E00C1C0AB /* test_solver.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EFCAD230AAF7100073B5A /* test_solver.cc */; };
 		BB2EBF470FCF1F3F00CCA721 /* fiber_site.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */; };
 		BB2EBF480FCF1F3F00CCA721 /* fiber_site.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */; };
-		BB2F144C257D8E260033F86D /* gle_zoo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2F144A257D8E260033F86D /* gle_zoo.cc */; };
-		BB2F144D257D8E260033F86D /* gle_zoo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2F144B257D8E260033F86D /* gle_zoo.h */; };
+		BB2F144C257D8E260033F86D /* gym_zoo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2F144A257D8E260033F86D /* gym_zoo.cc */; };
+		BB2F144D257D8E260033F86D /* gym_zoo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2F144B257D8E260033F86D /* gym_zoo.h */; };
 		BB30922C2164BB2B00C6DEE4 /* grid_display.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3092292164BAC300C6DEE4 /* grid_display.cc */; };
 		BB30922D216543C000C6DEE4 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB31697C24A0F3EE008DFDB3 /* operator_new.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6E174B223E5B2F00AF850D /* operator_new.cc */; };
@@ -129,8 +129,8 @@
 		BB39EC26153806070047768E /* duo_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB39EC24153806070047768E /* duo_long.cc */; };
 		BB39EC27153806070047768E /* duo_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB39EC25153806070047768E /* duo_long.h */; };
 		BB3A4AE919351389005CD868 /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
-		BB3CFAA025DBCC350016A7A3 /* gle_flute.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3CFA9E25DBCC340016A7A3 /* gle_flute.h */; };
-		BB3CFAA125DBCC350016A7A3 /* gle_flute.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3CFA9F25DBCC350016A7A3 /* gle_flute.cc */; };
+		BB3CFAA025DBCC350016A7A3 /* gym_flute.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3CFA9E25DBCC340016A7A3 /* gym_flute.h */; };
+		BB3CFAA125DBCC350016A7A3 /* gym_flute.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3CFA9F25DBCC350016A7A3 /* gym_flute.cc */; };
 		BB3CFAA325DBD0E90016A7A3 /* flute.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3CFAA225DBD0E80016A7A3 /* flute.h */; };
 		BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3DA1DC254C8F0200226B81 /* object_pool.cc */; };
 		BB3DA1DF254C8F0300226B81 /* object_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3DA1DD254C8F0300226B81 /* object_pool.h */; };
@@ -1417,8 +1417,8 @@
 		BB2EBF450FCF1F3F00CCA721 /* fiber_site.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = fiber_site.cc; path = src/sim/fiber_site.cc; sourceTree = SOURCE_ROOT; };
 		BB2EBF460FCF1F3F00CCA721 /* fiber_site.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = fiber_site.h; path = src/sim/fiber_site.h; sourceTree = SOURCE_ROOT; };
 		BB2EFCAD230AAF7100073B5A /* test_solver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_solver.cc; sourceTree = "<group>"; };
-		BB2F144A257D8E260033F86D /* gle_zoo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gle_zoo.cc; sourceTree = "<group>"; };
-		BB2F144B257D8E260033F86D /* gle_zoo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gle_zoo.h; sourceTree = "<group>"; };
+		BB2F144A257D8E260033F86D /* gym_zoo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_zoo.cc; sourceTree = "<group>"; };
+		BB2F144B257D8E260033F86D /* gym_zoo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_zoo.h; sourceTree = "<group>"; };
 		BB30391F16FB42C700CDF586 /* reportF.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reportF.cc; sourceTree = "<group>"; };
 		BB3092282164BAC300C6DEE4 /* grid_display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = grid_display.h; sourceTree = "<group>"; };
 		BB3092292164BAC300C6DEE4 /* grid_display.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_display.cc; sourceTree = "<group>"; };
@@ -1430,8 +1430,8 @@
 		BB3A4AE519351389005CD868 /* space_tee.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_tee.cc; path = src/sim/spaces/space_tee.cc; sourceTree = SOURCE_ROOT; };
 		BB3A4AE619351389005CD868 /* space_tee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_tee.h; path = src/sim/spaces/space_tee.h; sourceTree = SOURCE_ROOT; };
 		BB3AAF5806076A8B00508E18 /* fiber_grid2.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = fiber_grid2.cc; path = src/sim/fiber_grid2.cc; sourceTree = SOURCE_ROOT; };
-		BB3CFA9E25DBCC340016A7A3 /* gle_flute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gle_flute.h; sourceTree = "<group>"; };
-		BB3CFA9F25DBCC350016A7A3 /* gle_flute.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gle_flute.cc; sourceTree = "<group>"; };
+		BB3CFA9E25DBCC340016A7A3 /* gym_flute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_flute.h; sourceTree = "<group>"; };
+		BB3CFA9F25DBCC350016A7A3 /* gym_flute.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_flute.cc; sourceTree = "<group>"; };
 		BB3CFAA225DBD0E80016A7A3 /* flute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = flute.h; sourceTree = "<group>"; };
 		BB3D2ADA05C8396B0022ACE5 /* spherical_code.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = spherical_code.cc; path = src/math/spherical_code.cc; sourceTree = SOURCE_ROOT; };
 		BB3D8E1615F490D0001851E1 /* simul_report.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simul_report.cc; sourceTree = "<group>"; };
@@ -2999,10 +2999,10 @@
 				BBCC8FFE2722C8550066FF75 /* gym_text.h */,
 				BBCC8FFD2722C8550066FF75 /* gym_text.cc */,
 				BB3CFAA225DBD0E80016A7A3 /* flute.h */,
-				BB3CFA9E25DBCC340016A7A3 /* gle_flute.h */,
-				BB3CFA9F25DBCC350016A7A3 /* gle_flute.cc */,
-				BB2F144B257D8E260033F86D /* gle_zoo.h */,
-				BB2F144A257D8E260033F86D /* gle_zoo.cc */,
+				BB3CFA9E25DBCC340016A7A3 /* gym_flute.h */,
+				BB3CFA9F25DBCC350016A7A3 /* gym_flute.cc */,
+				BB2F144B257D8E260033F86D /* gym_zoo.h */,
+				BB2F144A257D8E260033F86D /* gym_zoo.cc */,
 			);
 			name = GLE;
 			sourceTree = "<group>";
@@ -3397,7 +3397,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBCC90002722C8550066FF75 /* gym_text.h in Headers */,
-				BB3CFAA025DBCC350016A7A3 /* gle_flute.h in Headers */,
+				BB3CFAA025DBCC350016A7A3 /* gym_flute.h in Headers */,
 				BBFF79CC2670A57400EB5870 /* display_color.h in Headers */,
 				BB3CFAA325DBD0E90016A7A3 /* flute.h in Headers */,
 				BB7B5A9C241A81BB0063F252 /* tesselator.h in Headers */,
@@ -3643,7 +3643,7 @@
 				BB69216F233D359F00F528D2 /* walker_prop.h in Headers */,
 				BB3FF4D12644902300969E5E /* space.h in Headers */,
 				BB692170233D359F00F528D2 /* walker.h in Headers */,
-				BB2F144D257D8E260033F86D /* gle_zoo.h in Headers */,
+				BB2F144D257D8E260033F86D /* gym_zoo.h in Headers */,
 				BB692171233D359F00F528D2 /* cutter_prop.h in Headers */,
 				BB692172233D359F00F528D2 /* cutter.h in Headers */,
 				BB692173233D359F00F528D2 /* actor_prop.h in Headers */,
@@ -4497,7 +4497,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB109D3723D0788200805F16 /* point_disp.cc in Sources */,
-				BB3CFAA125DBCC350016A7A3 /* gle_flute.cc in Sources */,
+				BB3CFAA125DBCC350016A7A3 /* gym_flute.cc in Sources */,
 				BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */,
 				BBCC8FFF2722C8550066FF75 /* gym_text.cc in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
@@ -4732,7 +4732,7 @@
 				BB6921C5233D359F00F528D2 /* single.cc in Sources */,
 				BB6921C6233D359F00F528D2 /* single_prop.cc in Sources */,
 				BB6921C7233D359F00F528D2 /* couple_prop.cc in Sources */,
-				BB2F144C257D8E260033F86D /* gle_zoo.cc in Sources */,
+				BB2F144C257D8E260033F86D /* gym_zoo.cc in Sources */,
 				BB6921C8233D359F00F528D2 /* simul_prop.cc in Sources */,
 				BB3FF4D52644902D00969E5E /* modulo.cc in Sources */,
 				BB6921C9233D359F00F528D2 /* solid_prop.cc in Sources */,

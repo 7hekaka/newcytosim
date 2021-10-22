@@ -13,7 +13,7 @@
 #include "line_disp.h"
 #include "point_disp.h"
 //#include "display_color.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 
 using namespace gle;
 extern Modulo const* modulo;
@@ -159,13 +159,13 @@ void Display1::drawSinglesF(const SingleSet & set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeF();
-        fluteD4* flu = gle::mapBufferC4VD(cnt);
+        fluteD4* flu = gym::mapBufferC4VD(cnt);
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
                 flu[i++] = {obj->disp()->color2, setVertex(obj->posFoot(), obj)};
         }
-        gle::unmapBufferC4VD();
+        gym::unmapBufferC4VD();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -176,7 +176,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
 {
     gle_color air(0,0,0,0);
     size_t i = 0, cnt = 2*set.sizeA();
-    fluteD4* flu = gle::mapBufferC4VD(cnt);
+    fluteD4* flu = gym::mapBufferC4VD(cnt);
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
         Fiber const* fib = obj->fiber();
@@ -196,7 +196,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
             flu[i++] = {d, setVertex(Q, obj)};
         }
     }
-    gle::unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     
     if ( prop->link_width > 0 )
     {
@@ -206,7 +206,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
     
     if ( prop->point_size > 0 )
     {
-        gle::bindBufferC4VD(2);
+        gym::bindBufferC4VD(2);
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i/2);
     }
@@ -222,26 +222,26 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeFF();
-        fluteD4* flu = gle::mapBufferC4VD(cnt);
+        fluteD4* flu = gym::mapBufferC4VD(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( obj->active() && obj->disp1()->perceptible )
                 flu[i++] = {obj->disp1()->color2, setVertex(obj->posFree(), obj)};
         }
-        gle::unmapBufferC4VD();
+        gym::unmapBufferC4VD();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
 
 #if ( DIM > 1 )
         // display inactive Couples with square dots:
         i = 0;
-        flu = gle::mapBufferC4VD(cnt);
+        flu = gym::mapBufferC4VD(cnt);
         for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
         {
             if ( !obj->active() && obj->disp1()->perceptible )
                 flu[i++] = {obj->disp1()->color2, obj->posFree()};
         }
-        gle::unmapBufferC4VD();
+        gym::unmapBufferC4VD();
         glDisable(GL_POINT_SMOOTH);
         pointSize(M_SQRT1_2*prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
@@ -261,7 +261,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeFF();
-        fluteD4* flu = gle::mapBufferC4VD(cnt);
+        fluteD4* flu = gym::mapBufferC4VD(cnt);
         Couple * nxt;
         Couple * obj = set.firstFF();
 
@@ -281,7 +281,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
             if ( nxt->disp12()->perceptible )
                 flu[i++] = { nxt->disp12()->color2, setVertex(nxt->posFree(), nxt) };
         }
-        gle::unmapBufferC4VD();
+        gym::unmapBufferC4VD();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -293,7 +293,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         size_t i = 0, cnt = set.sizeA();
-        fluteD4* flu = gle::mapBufferC4VD(cnt);
+        fluteD4* flu = gym::mapBufferC4VD(cnt);
         for ( Couple * obj=set.firstAF(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber1();
@@ -306,7 +306,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
             if ( obj->disp2()->perceptible & fib->disp->visible )
                 flu[i++] = { obj->disp2()->color2, setVertex(obj->posHand2(), fib) };
         }
-        gle::unmapBufferC4VD();
+        gym::unmapBufferC4VD();
         pointSize(prop->point_size);
         glDrawArrays(GL_POINTS, 0, i);
     }
@@ -317,7 +317,7 @@ void Display1::drawCouplesB(CoupleSet const& set) const
 {
     gle_color air(0,0,0,0);
     size_t i = 0, cnt = 2 * set.sizeAA() * (1+ENABLE_EXPLODED_DISPLAY);
-    fluteD4* flu = gle::mapBufferC4VD(cnt);
+    fluteD4* flu = gym::mapBufferC4VD(cnt);
     for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
     {
 #if ( 0 )
@@ -350,7 +350,7 @@ void Display1::drawCouplesB(CoupleSet const& set) const
         }
 #endif
     }
-    gle::unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     
     if ( prop->link_width > 0 )
     {
@@ -362,7 +362,7 @@ void Display1::drawCouplesB(CoupleSet const& set) const
     {
         pointSize(prop->point_size);
 #if ENABLE_EXPLODED_DISPLAY
-        gle::bindBufferC4VD(2);
+        gym::bindBufferC4VD(2);
         glDrawArrays(GL_POINTS, 0, i/2);
 #else
         glDrawArrays(GL_POINTS, 0, i);

@@ -13,7 +13,7 @@
 #include "point_disp.h"
 #include "fiber_disp.h"
 //#include "display_color.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 
 using namespace gle;
 extern Modulo const* modulo;
@@ -252,7 +252,7 @@ void Display2::drawCoupleB(Couple const* cx) const
     if ( pd1->perceptible || pd2->perceptible )
     {
         glEnableClientState(GL_COLOR_ARRAY);
-        fluteD4* flu = gle::mapBufferC4VD(4);
+        fluteD4* flu = gym::mapBufferC4VD(4);
 #if 0
         flu[0] = { pd1->color, p1 };
         flu[1] = { pd2->color, p2 };
@@ -273,7 +273,7 @@ void Display2::drawCoupleB(Couple const* cx) const
         flu[2] = { col2, pp };
         flu[3] = { col2, p2 };
 #endif
-        gle::unmapBufferC4VD();
+        gym::unmapBufferC4VD();
         lineWidth(pd1->width);
         glDrawArrays(GL_LINES, 0, 4);
         glDisableClientState(GL_COLOR_ARRAY);

@@ -3,7 +3,7 @@
 
 #include "../disp/gle.h"
 #include "../disp/gle_color_list.h"
-#include "../disp/gle_flute.h"
+#include "../disp/gym_flute.h"
 
 #define DRAW_LINK(PTA, ...)\
 { if ( drawLinks ) drawLink(gle::bright_color(PTA.mecable()->signature()), __VA_ARGS__); }
@@ -12,10 +12,10 @@
 /// Display link between 2 positions
 void drawLink(gle_color const& col, Vector const& a, Vector const& b)
 {
-    fluteD4* flu = gle::mapBufferC4VD(2);
+    fluteD4* flu = gym::mapBufferC4VD(2);
     flu[0] = { col, a };
     flu[1] = { col, b };
-    gle::unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     glLineStipple(1, 0xFFFF);
     glDrawArrays(GL_LINES, 0, 2);
 }
@@ -25,12 +25,12 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
 {
     Vector b = a + ab;
     Vector dx = ab * (( 1 - len / ab.norm() ) / 2);
-    fluteD4* flu = gle::mapBufferC4VD(4);
+    fluteD4* flu = gym::mapBufferC4VD(4);
     flu[0] = { col, a };
     flu[1] = { col, a+dx };
     flu[2] = { col, b-dx };
     flu[3] = { col, b };
-    gle::unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     glLineStipple(1, 0x3333);
     glDrawArrays(GL_LINES, 1, 2);
     glLineStipple(1, 0xFFFF);
@@ -46,11 +46,11 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
     if ( modulo )
         modulo->fold(c, a);
     Vector b = a + ab;
-    fluteD4* flu = gle::mapBufferC4VD(4);
+    fluteD4* flu = gym::mapBufferC4VD(4);
     flu[0] = { col, a };
     flu[1] = { col, b };
     flu[2] = { col, c };
-    gle::unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     glLineStipple(1, 0x7310);
     glDrawArrays(GL_LINES, 0, 2);
     glLineStipple(1, 0x5555);
@@ -63,12 +63,12 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector co
 {
     Vector b = a + ab;
     Vector c = d + dc;
-    fluteD4* flu = gle::mapBufferC4VD(4);
+    fluteD4* flu = gym::mapBufferC4VD(4);
     flu[0] = { col, a };
     flu[1] = { col, b };
     flu[2] = { col, c };
     flu[3] = { col, d };
-    gle::unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     glLineStipple(1, 0x7171);
     glDrawArrays(GL_LINES, 0, 4);
     glLineStipple(1, 0xFFFF);

@@ -2,7 +2,7 @@
 
 struct flute2;
 
-namespace gle
+namespace gym
 {
     void zoo_init(flute2*, flute2* const);
 

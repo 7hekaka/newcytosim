@@ -53,9 +53,6 @@ namespace gle
 #else
     inline float invsqrt(float x) { return x / sqrtf(x); }
 #endif
-   
-    /// OpenGL buffers objects for streaming
-    GLuint nextStream();
     
     /// initialize the Vertex Buffer Objects
     flute6* setTubeBuffers(flute6*, flute6* const, GLsizei inx[]);

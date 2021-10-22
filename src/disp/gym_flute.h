@@ -20,7 +20,7 @@ typedef flute2 fluteD;
 typedef flute6 fluteD4;
 #endif
 
-namespace gle
+namespace gym
 {
     /// define buffer layout
     void setBufferV(size_t vertex, size_t skip = 1);

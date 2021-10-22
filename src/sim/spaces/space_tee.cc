@@ -421,7 +421,7 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 
 
 void SpaceTee::draw2D() const
@@ -432,7 +432,7 @@ void SpaceTee::draw2D() const
     float A(tArmLength);
     
     constexpr size_t fin = 8 * gle::finesse;
-    float* arc = (float*)gle::mapBufferV2(3*fin+4);
+    float* arc = (float*)gym::mapBufferV2(3*fin+4);
     float* top = arc+2*fin+2, *lft = top+2*fin+2;
     gle::compute_arc(fin, arc, R, -M_PI_2, M_PI, L, 0);
     gle::compute_arc(fin, top, R, 0, M_PI, J, A);
@@ -442,7 +442,7 @@ void SpaceTee::draw2D() const
     lft[-2] = J-R;
     lft[-1] = R;
 
-    gle::unmapBufferV2();
+    gym::unmapBufferV2();
     glVertexPointer(2, GL_FLOAT, 0, arc);
     glDrawArrays(GL_LINE_LOOP, 0, 3*fin+2);
 }

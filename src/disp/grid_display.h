@@ -10,7 +10,7 @@
 #include "map.h"
 #include "grid.h"
 #include "gle.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 
 /// display the edges of a 1D grid using OpenGL
 template<int ORD> void drawBoundaries(Map<ORD> const&) {};
@@ -37,7 +37,7 @@ void drawValues(Grid<CELL, 1> const& grid,
     float dx = grid.cellWidth(0), cx = 0.5f * dx;
     float dy = 1;
 
-    flute6 * flu = gle::mapBufferC4V2(4*grid.breadth(0)+4);
+    flute6 * flu = gym::mapBufferC4V2(4*grid.breadth(0)+4);
     size_t i = 0;
     for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
     {
@@ -49,7 +49,7 @@ void drawValues(Grid<CELL, 1> const& grid,
         flu[i++] = { col, x, dy };
         flu[i++] = { col, x+dx, 0 };
     }
-    gle::unmapBufferC4V2();
+    gym::unmapBufferC4V2();
     glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     glDisableClientState(GL_COLOR_ARRAY);
 }
@@ -72,7 +72,7 @@ void drawValues(Grid<CELL, 2> const& grid,
     glEnableClientState(GL_COLOR_ARRAY);
     for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
     {
-        flute6 * flu = gle::mapBufferC4V2(4*grid.breadth(0)+4);
+        flute6 * flu = gym::mapBufferC4V2(4*grid.breadth(0)+4);
         size_t i = 0;
         for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
         {
@@ -85,7 +85,7 @@ void drawValues(Grid<CELL, 2> const& grid,
             flu[i++] = { col, x+dx, y+dy };
             flu[i++] = { col, x+dx, y };
         }
-        gle::unmapBufferC4V2();
+        gym::unmapBufferC4V2();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
     glDisableClientState(GL_COLOR_ARRAY);
@@ -111,7 +111,7 @@ void drawValues(Grid<CELL, 3> const& grid,
     size_t iz = grid.index(2, zzz);
     for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
     {
-        flute8 * flu = gle::mapBufferC4V4(4*grid.breadth(0)+4);
+        flute8 * flu = gym::mapBufferC4V4(4*grid.breadth(0)+4);
         size_t i = 0;
         for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
         {
@@ -124,7 +124,7 @@ void drawValues(Grid<CELL, 3> const& grid,
             flu[i++] = { col, x+dx, y+dy, z };
             flu[i++] = { col, x+dx, y, z };
         }
-        gle::unmapBufferC4V4();
+        gym::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
     glDisableClientState(GL_COLOR_ARRAY);
@@ -151,7 +151,7 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
     size_t iy = grid.index(1, yyy);
     for ( size_t iz = 0; iz < grid.breadth(2); ++iz )
     {
-        flute8 * flu = gle::mapBufferC4V4(4*grid.breadth(0)+4);
+        flute8 * flu = gym::mapBufferC4V4(4*grid.breadth(0)+4);
         size_t i = 0;
         for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
         {
@@ -163,7 +163,7 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
             flu[i++] = { col, x+dx, y, z+dz };
             flu[i++] = { col, x+dx, y, z };
         }
-        gle::unmapBufferC4V4();
+        gym::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
     glDisableClientState(GL_COLOR_ARRAY);
@@ -190,7 +190,7 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
     size_t ix = grid.index(0, xxx);
     for ( size_t iz = 0; iz < grid.breadth(2); ++iz )
     {
-        flute8 * flu = gle::mapBufferC4V4(4*grid.breadth(1)+4);
+        flute8 * flu = gym::mapBufferC4V4(4*grid.breadth(1)+4);
         size_t i = 0;
         for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
         {
@@ -202,7 +202,7 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
             flu[i++] = { col, x, y+dy, z+dz };
             flu[i++] = { col, x, y+dy, z };
         }
-        gle::unmapBufferC4V4();
+        gym::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
     glDisableClientState(GL_COLOR_ARRAY);
@@ -235,7 +235,7 @@ void drawValues(Grid<CELL, 3> const& grid,
 
     for ( int y = -R; y <= R; y+=2 )
     {
-        flute8 * flu = gle::mapBufferC4V4(4*R+2);
+        flute8 * flu = gym::mapBufferC4V4(4*R+2);
         Vector3 A = y * dy + pos * dir;
         Vector3 B = A + dy + 0.5 * dx;
         size_t i = 0;
@@ -246,9 +246,9 @@ void drawValues(Grid<CELL, 3> const& grid,
             flu[i++] = { color(arg, grid.interpolate3D(V), V), V };
             flu[i++] = { color(arg, grid.interpolate3D(W), W), W };
         }
-        gle::unmapBufferC4VD();
+        gym::unmapBufferC4VD();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
-        flu = gle::mapBufferC4V4(4*R+2);
+        flu = gym::mapBufferC4V4(4*R+2);
         i = 0;
         A += 2 * dy;
         for ( int n = -R; n <= R; ++n )
@@ -258,7 +258,7 @@ void drawValues(Grid<CELL, 3> const& grid,
             flu[i++] = { color(arg, grid.interpolate3D(V), V), V };
             flu[i++] = { color(arg, grid.interpolate3D(W), W), W };
         }
-        gle::unmapBufferC4V4();
+        gym::unmapBufferC4V4();
         glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
     }
     glDisableClientState(GL_COLOR_ARRAY);

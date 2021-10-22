@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include "opengl.h"
-#include "gle_zoo.h"
+#include "gym_zoo.h"
 #include "vector.h"
 #include "gle_color.h"
 #include "flute.h"
@@ -30,7 +30,7 @@ static void zoo_fill(int i)
     glDrawArrays(GL_TRIANGLE_FAN, zoo_[i], zoo_[i+1]-zoo_[i]);
 }
 
-void gle::zoo_stroke(char c)
+void gym::zoo_stroke(char c)
 {
     switch ( c )
     {
@@ -48,7 +48,7 @@ void gle::zoo_stroke(char c)
 }
 
 
-void gle::zoo_paint(char c)
+void gym::zoo_paint(char c)
 {
     switch ( c )
     {
@@ -66,7 +66,7 @@ void gle::zoo_paint(char c)
 }
 
 
-void gle::zoo_init(flute2* flt, flute2* const ori)
+void gym::zoo_init(flute2* flt, flute2* const ori)
 {
     size_t j = 0;
     // triangle

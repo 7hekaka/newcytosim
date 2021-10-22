@@ -167,12 +167,12 @@ void display(View& view, int)
     view.openDisplay();
     view.setLabel(std::to_string(sTime));
 
-    fluteD4 * flu = gle::mapBufferC4VD(PAM.max);
+    fluteD4 * flu = gym::mapBufferC4VD(PAM.max);
     
     for (size_t i = 0; i < PAM.max; ++i)
         flu[i] = { things[i].col, things[i].pos };
     
-    gle::unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     glPointSize(6);
     glDrawArrays(GL_POINTS, 0, PAM.max);
     

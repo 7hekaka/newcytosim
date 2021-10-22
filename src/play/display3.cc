@@ -109,7 +109,7 @@ void Display3::drawObjects(Simul const& sim)
     glEnable(GL_LIGHTING);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
-    //gle::bindBuffer();
+    //gym::bindBuffer();
 
     drawBeads(sim.beads);
     drawSolids(sim.solids);

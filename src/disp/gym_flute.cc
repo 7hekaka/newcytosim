@@ -1,10 +1,10 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "gle.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 #include "gle_color.h"
 
-namespace gle
+namespace gym
 {
     /// number of buffers used to stream data to GPU
     const unsigned N_STREAMS = 32;

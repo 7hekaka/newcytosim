@@ -8,7 +8,7 @@
 #include "glut.h"
 #include "gle.h"
 #include "gym_text.h"
-#include "gle_flute.h"
+#include "gym_flute.h"
 
 using namespace gle;
 
@@ -107,11 +107,11 @@ void processNormalKey(unsigned char c, int x, int y)
 void drawVertices()
 {
     size_t cnt = front->nbPoints();
-    flute3* flu = gle::mapBufferV3(4*front->nbPoints());
+    flute3* flu = gym::mapBufferV3(4*front->nbPoints());
     for ( size_t i = 0; i < cnt; ++i )
         flu[i] = { Vector3(front->addr(i)) };
     glPointSize(5);
-    gle::unmapBufferV3();
+    gym::unmapBufferV3();
     glDrawArrays(GL_POINTS, 0, cnt);
 }
 
@@ -143,7 +143,7 @@ void display(View& view, int)
     
 #if ( 1 )
     const real E = 0.1;
-    flute8* flu = gle::mapBufferC4V4(4*front->nbPoints());
+    flute8* flu = gym::mapBufferC4V4(4*front->nbPoints());
     gle_color col(1,1,1), lor(0,0,0);
     size_t n = 0;
     for ( size_t i = 0; i < front->nbPoints(); ++i )
@@ -156,7 +156,7 @@ void display(View& view, int)
         flu[n++] = { lor, a+E*c };
     }
     glLineWidth(3);
-    gle::unmapBufferC4V4();
+    gym::unmapBufferC4V4();
     glDrawArrays(GL_LINES, 0, n);
 #endif
     
