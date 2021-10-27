@@ -525,10 +525,6 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
         else
             in.unget(c);
     }
-#if BACKWARD_COMPATIBILITY < 45
-    if ( in.formatID() < 45 )
-        ++ix;
-#endif
 }
 
 

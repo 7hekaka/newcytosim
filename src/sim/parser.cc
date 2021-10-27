@@ -88,13 +88,11 @@ void Parser::parse_set(std::istream& is)
     std::string cat = Tokenizer::get_symbol(is);
     std::string name, para, blok;
     
-#if BACKWARD_COMPATIBILITY <= 50
-    {
-        /* Read ouput config files anterior to 3.11.2017, which included
-         a identity number ('set hand 2 kinesin') */
-        size_t inx = 0;
-        Tokenizer::get_integer(is, inx);
-    }
+#if BACKWARD_COMPATIBILITY < 48
+    size_t ido = 0;
+    /* Read ouput config files anterior to 3.11.2017, which included
+     a identity number ('set hand 2 kinesin'): */
+    bool has_ido = Tokenizer::get_integer(is, ido);
 #endif
     
     Glossary opt;
@@ -151,18 +149,21 @@ void Parser::parse_set(std::istream& is)
         {
             opt.read(blok);
             pp = execute_set(cat, name, opt);
-            
-            PropertyID ix;
-#if BACKWARD_COMPATIBILITY < 50
+#if BACKWARD_COMPATIBILITY < 48
+            if ( has_ido )
+            {
+                //std::clog << "`" << pp->name() << "' is " << pp->category() << ido << '\n';
+                pp->renumber(ido);
+            }
             // name changed to `property_number` on 10.12.2017
-            if ( opt.set(ix, "identity", "identification") || opt.set(ix, "property_number", "property_index") )
+            if ( opt.set(ido, "identity", "identification") || opt.set(ido, "property_number", "property_index") )
 #else
             // name changed to `identification` on 22.06.2021
             // name changed to `identity` on 1.10.2022
-            if ( opt.set(ix, "identity", "identification", "property_number") )
+            if ( opt.set(ido, "identity", "identification", "property_number") )
 #endif
             {
-                if ( ix != pp->number() )
+                if ( ido != pp->number() )
                     throw InvalidSyntax("Property identity missmatch");
             }
         }

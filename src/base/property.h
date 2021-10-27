@@ -90,7 +90,6 @@ public:
     
     /// set index in the array of Properties
     void renumber(PropertyID x) { number_ = x; }
-    //void renumber(PropertyID x) { number_ = x; std::clog<<category()<<x<<" is `"<<name_<<"'\n"; }
 
     //-------------------------------------------------------------------------------
     

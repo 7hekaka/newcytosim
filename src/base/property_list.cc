@@ -31,6 +31,7 @@ void PropertyList::deposit(Property * p)
                 
         vec_.push_back(p);
         p->renumber(cnt+1);
+        //std::clog << "deposited " << p->category() << p->number() << " `" << p->name() << "'\n";
     }
 }
 
@@ -148,8 +149,6 @@ Property * PropertyList::find(std::string const& cat, std::string const& nom) co
 Property * PropertyList::find(std::string const& cat, const PropertyID id) const
 {
     //std::clog << this << "->find(" << cat << ", " << idx << ")" << '\n';
-    if ( id <= 0 )
-        return nullptr;
     
     for ( Property* i : vec_ )
         if ( i->category()==cat  &&  i->number()==id )
