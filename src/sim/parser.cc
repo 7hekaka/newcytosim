@@ -88,8 +88,8 @@ void Parser::parse_set(std::istream& is)
     std::string cat = Tokenizer::get_symbol(is);
     std::string name, para, blok;
     
-#if BACKWARD_COMPATIBILITY < 48
     size_t ido = 0;
+#if BACKWARD_COMPATIBILITY < 48
     /* Read ouput config files anterior to 3.11.2017, which included
      a identity number ('set hand 2 kinesin'): */
     bool has_ido = Tokenizer::get_integer(is, ido);

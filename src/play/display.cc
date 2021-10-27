@@ -824,7 +824,7 @@ void Display::drawStrip(size_t cnt, real const* pts, GLenum prim)
 }
 
 
-void Display::drawFiberBackbone(Fiber const& fib)
+void Display::drawFiberBackbone(Fiber const& fib) const
 {
     glDisable(GL_LIGHTING);
     fib.disp->color.load();
@@ -835,6 +835,9 @@ void Display::drawFiberBackbone(Fiber const& fib)
 
 void Display::drawFiberLines(Fiber const& fib, int style) const
 {
+    if ( style == 1 )
+        return drawFiberBackbone(fib);
+             
     size_t i = 0, cnt = 2 * fib.nbSegments();
     fluteD4* flu = gym::mapBufferC4VD(cnt+4);
     
@@ -1524,11 +1527,11 @@ void Display::drawFiber(Fiber const& fib)
     FiberDisp const*const disp = fib.prop->disp;
     int style = disp->line_style;
     
-    if ( disp->style & 4 )
-        return drawFiberBackbone(fib);
-    
     if ( disp->style )
     {
+        if ( disp->style & 4 )
+            return drawFiberBackbone(fib);
+
         gle_color col1 = fib.disp->color;
         gle_color col2 = fib.disp->color.darken(0.75);
         gle_color colE = fib.disp->end_color[0];
@@ -1602,9 +1605,7 @@ void Display::drawFiber(Fiber const& fib)
     }
 #endif
 
-    if ( style == 1 )
-        drawFiberBackbone(fib);
-    else if ( style > 1 )
+    if ( style )
         drawFiberLines(fib, style);
 
     if ( disp->point_style > 0 )
