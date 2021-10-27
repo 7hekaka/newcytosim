@@ -46,19 +46,19 @@ public:
     Inputter(size_t d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r") { reset(); vecsize_=d; }
 
     /// return dimensionnally of vectors
-    size_t vectorSize()     const { return vecsize_; }
+    size_t vectorSize() const { return vecsize_; }
     
     /// Set dimentionnality of vectors
     void vectorSize(size_t d) { vecsize_ = d; }
     
     /// returns the type of input
-    size_t formatID()       const { return format_; }
+    size_t formatID() const { return format_; }
 
     /// returns the type of input
-    void formatID(size_t f)   { format_ = f; }
+    void setFormatID(size_t f) { format_ = f; }
 
     /// Returns 1 for native binary format, 2 for non-native binary format, and 0 if not binary
-    int binary()         const { return binary_; }
+    int binary() const { return binary_; }
     
     /// initialize the automatic swapping of bytes in the binary format
     void setEndianess(const char[2]);

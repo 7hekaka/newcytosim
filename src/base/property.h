@@ -48,7 +48,7 @@ private:
     PropertyID number_;
 
     /// pad string by adding white-space on the right up to size 20
-    static std::string format_(std::string const& str)
+    static std::string format(std::string const& str)
     {
         if ( str.size() < 20 )
             return " " + str + std::string(20-str.size(), ' ') + " = ";
@@ -138,7 +138,7 @@ public:
     template<typename C>
     static  void write_value(std::ostream& os, std::string const& name, C const& c)
     {
-        os << format_(name) << c << ";\n";
+        os << format(name) << c << ";\n";
     }
 
     /// formatted output of one array parameter, `cnt` values
@@ -146,7 +146,7 @@ public:
     static  void write_value(std::ostream& os, std::string const& name, C const* c, int cnt)
     {
         assert_true( cnt > 0 );
-        os << format_(name) << c[0];
+        os << format(name) << c[0];
         for ( int i = 1; i < cnt; ++i )
             os << ", " << c[i];
         os << ";\n";
@@ -156,21 +156,21 @@ public:
     template<typename C, typename D>
     static  void write_value(std::ostream& os, std::string const& name, C const& c, D const& d)
     {
-        os << format_(name) << c << ", " << d << ";\n";
+        os << format(name) << c << ", " << d << ";\n";
     }
 
     /// formatted output of one parameter, three values
     template<typename C, typename D, typename E>
     static  void write_value(std::ostream& os, std::string const& name, C const& c, D const& d, E const& e)
     {
-        os << format_(name) << c << ", " << d << ", " << e << ";\n";
+        os << format(name) << c << ", " << d << ", " << e << ";\n";
     }
 
     /// formatted output of one parameter, four values
     template<typename C, typename D, typename E, typename F>
     static  void write_value(std::ostream& os, std::string const& name, C const& c, D const& d, E const& e, F const& f)
     {
-        os << format_(name) << c << ", " << d << ", " << e << ", " << f << ";\n";
+        os << format(name) << c << ", " << d << ", " << e << ", " << f << ";\n";
     }
     
     //-------------------------------------------------------------------------------

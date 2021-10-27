@@ -12,7 +12,7 @@ void help(std::ostream& os)
 {
     os << "Cytosim-sieve:\n";
     os << "   Sieve reads a cytosim trajectory file, loading frames into memory,\n";
-    os << "   and writes them to a new file using the latest cytosim format.\n";
+    os << "   and writes them to a new or existing file using the latest cytosim format.\n";
     os << "   The output can be generated in either binary or text format.\n";
     os << "   A category of objects can be removed by specifying `skip=WHAT`.\n";
     os << "   If the specified output file already exists, data is appended to it.\n";
@@ -79,12 +79,11 @@ int main(int argc, char* argv[])
     
     std::clog << ">>>>>> Sieve `" << argv[1] << "' -> `" << argv[2] << "'\n";
     
-    size_t frm = 0, frame = 0;
-    
-    // a frame index can be specified:
+    size_t frm = 0, frame = ~0;
+    // the index for a single frame can be specified:
     bool has_frame = arg.set(frame, "frame");
     
-    while ( in.good() )
+    while ( in.good() && frm <= frame )
     {
         try {
             if ( simul.reloadObjects(in) )
@@ -93,6 +92,9 @@ int main(int argc, char* argv[])
         catch( Exception & e ) {
             std::cerr << "Frame " << frm << ":" << e.brief() << '\n';
         }
+        
+        if ( has_frame && frm < frame )
+            continue;
         
         if ( in.vectorSize() != dim )
         {
@@ -109,15 +111,12 @@ int main(int argc, char* argv[])
         */
         
         try {
-            if ( !has_frame || ( frm == frame ) )
-                simul.writeObjects(argv[2], true, binary);
+            simul.writeObjects(argv[2], true, binary);
         }
         catch( Exception & e ) {
             std::cerr << e.brief() << '\n';
             return EXIT_FAILURE;
         }
-        if ( has_frame && frm == frame )
-            break;
         ++frm;
     }
 }

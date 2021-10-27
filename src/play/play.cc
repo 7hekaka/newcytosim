@@ -53,6 +53,7 @@ enum Mode { NORMAL = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
  */
 void drawLive(View& view, int mag)
 {
+    //std::clog << " drawLive(" << std::setprecision(3) << simul.time() << "s) " << "\n";
     CHECK_GL_ERROR("before drawLive");
     if ( 0 == thread.trylock() )
     {
@@ -410,7 +411,7 @@ int main(int argc, char* argv[])
         glutMenuStatusFunc(menuCallback);
         if ( glApp::isFullScreen() )
             glutFullScreen();
-        glutTimerFunc(200, timerCallback, 0);
+        glutTimerFunc(100, timerCallback, 0);
     }
     catch ( Exception & e )
     {

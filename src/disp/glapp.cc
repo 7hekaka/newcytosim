@@ -1140,6 +1140,15 @@ void glApp::flashText(std::string const& str)
 }
 
 
+
+void glApp::displayAll()
+{
+    for ( unsigned n = 1; n < views.size(); ++n )
+        if ( views[n].window() > 0 )
+            views[n].display();
+}
+
+
 /**
  This is used for any secondary window.
  It does not show the interactive feedback to user.
@@ -1192,17 +1201,19 @@ void glApp::displayMain()
 
 void glApp::postRedisplay()
 {
-    //std::clog << " post\n";
+    //std::clog << " postRedisplay\n";
     glutPostRedisplay();
 }
 
 
 void glApp::postRedisplayAll()
 {
-    //std::clog << " postAll\n";
     for ( unsigned n = 1; n < views.size(); ++n )
         if ( views[n].window() > 0 )
+        {
+            //std::clog << " postRedisplay(" << n << ")\n";
             glutPostWindowRedisplay(n);
+        }
 }
 
 

@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "space_prop.h"
 #include "glossary.h"
+#include "messages.h"
 #include "simul_prop.h"
 #include "cymdef.h"
 
@@ -89,7 +90,10 @@
 Space * SpaceProp::newSpace() const
 {
     const std::string& s = SpaceProp::shape;
-    
+
+    if ( s=="circle" )
+        Cytosim::log << "Please use shape = 'sphere' instead of 'circle'\n";
+
     if ( s=="rectangle" || s=="square" )       return new SpaceSquare(this);
     if ( s=="circle" || s=="sphere" )          return new SpaceSphere(this);
     if ( s=="polygon" )                        return new SpacePolygon(this);

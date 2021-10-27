@@ -70,9 +70,9 @@ Object * SolidSet::newObject(const ObjectTag tag, PropertyID pid)
              p = simul_.properties.find("bead", pid);
 #endif
         if ( !p )
-            throw InvalidIO("could not find `solid' class with ID "+std::to_string(pid));
+            throw InvalidIO("undefined `solid' class with ID "+std::to_string(pid));
         return new Solid(static_cast<SolidProp*>(p));
-   }
+    }
     std::cerr << "Warning: unknown Solid tag `"+std::string(1,tag)+"' requested\n";
     return nullptr;
 }

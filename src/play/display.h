@@ -188,7 +188,7 @@ public:
     static void drawStrip(size_t cnt, real const* pts, GLenum);
 
     /// draw thin lines joining the Fiber vertices
-    static void drawFiberBackbone(Fiber const&);
+    void drawFiberBackbone(Fiber const&);
 
     /// draw Fiber MINUS_END
     virtual void drawFiberMinusEnd(Fiber const&, int style, float size) const;

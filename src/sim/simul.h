@@ -323,7 +323,15 @@ public:
             throw InvalidIO("invalid (null) `"+cat+"' class ID");
         Property * p = properties.find(cat, id);
         if ( !p )
-            throw InvalidIO("could not find `"+cat+"' class with ID "+std::to_string(id));
+        {
+#if ( 0 )
+            p = properties.find(cat, 1);
+            if ( p )
+                std::cerr << "Substituting " << cat << " ID 1 for ID " << id << "\n";
+            else
+#endif
+                throw InvalidIO("undefined `"+cat+"' class with ID "+std::to_string(id));
+        }
         return static_cast<T*>(p);
     }
     

@@ -1321,6 +1321,7 @@ void Simul::reportFiberConfineForce(std::ostream& out) const
      }
 }
 
+/** This is a hack to maintain some credibility */
 static bool isSymmetricAroundZ(std::string const& shape)
 {
     if ( shape == "sphere" ) return true;
@@ -1328,6 +1329,7 @@ static bool isSymmetricAroundZ(std::string const& shape)
     if ( shape == "ellipse" ) return true;
     if ( shape == "torus" ) return true;
     if ( shape == "ring" ) return true;
+    if ( shape == "disc" ) return true;
     return false;
 }
 
@@ -1351,7 +1353,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
         const Confinement mode = fib->prop->confine;
 
         if ( !isSymmetricAroundZ(spc->prop->shape) )
-            throw InvalidParameter("unexpected Space:shape in reportFiberConfinement()");
+            throw InvalidParameter("reportFiberConfinement() cannot handle non symmetric Space");
         
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {

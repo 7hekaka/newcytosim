@@ -535,17 +535,17 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
 /**
  Load one object from file
  
+ If 'fat==true', read the larger header format
  If 'update==true', the corresponding object is changed, or a new object is created.
- If 'discard==true', the object is deleted / not loaded
  */
 void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool update)
 {
-    PropertyID ix = 0;
+    PropertyID pid = 0;
     ObjectID id = 0;
     ObjectMark mk = 0;
     Object * obj = nullptr;
     
-    readObjectHeader(in, fat, ix, id, mk);
+    readObjectHeader(in, fat, pid, id, mk);
     
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");
@@ -560,17 +560,19 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         if ( obj && islower(tag) && tag != 'l' )
         {
             ice_.pop(obj);
+#if ( 1 )
             // check that property index has not changed:
-            if ( obj->property()->number() != ix )
+            if ( obj->property()->number() != pid )
             {
                 Property const* P = obj->property();
-#if ( 1 )
                 std::clog << "Warning: erasing " << P->category() << P->number() << " `" << P->name();
-                std::clog << "' to load object with property #" << ix << '\n';
-#endif
-                erase(obj);
+                std::clog << "' to load object with property #" << pid << '\n';
+                inventory_.unassign(obj);
+                obj->objset(nullptr);
+                delete(obj);
                 obj = nullptr;
             }
+#endif
         }
         else
             update = false;
@@ -580,7 +582,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     {
         assert_true(isprint(tag));
         // create new object of required class
-        obj = newObject(tag, ix);
+        obj = newObject(tag, pid);
         if ( !obj )
         {
             std::string str = std::to_string(tag);
@@ -603,7 +605,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     }
     catch( Exception & e )
     {
-        e << "while loading " << Object::reference(tag, ix, id);
+        e << "while loading " << Object::reference(tag, pid, id);
         throw;
     }
     

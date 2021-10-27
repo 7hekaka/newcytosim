@@ -85,12 +85,12 @@ void timerCallback(const int value)
             for ( unsigned s = 1; s < prop.period; ++s )
                 player.nextFrame();
             player.nextFrame();
-            glApp::postRedisplayAll();
+            glApp::displayAll();
         }
         else if ( prop.play < 0 )
         {
             player.previousFrame();
-            glApp::postRedisplayAll();
+            glApp::displayAll();
         }
         else
             millisec = 100;

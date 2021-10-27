@@ -115,9 +115,16 @@ std::string Player::buildReport(std::string arg) const
     if ( ! arg.empty() )
     {
         Glossary glos;
-        std::stringstream ss;
-        simul.report(ss, arg, glos);
-        std::string res = ss.str();
+        std::string res;
+        try {
+            std::stringstream ss;
+            simul.report(ss, arg, glos);
+            res = ss.str();
+        }
+        catch ( Exception& e )
+        {
+            res = e.info();
+        }
         // remove extra new-line
         if ( res.size() > 1  &&  res.at(0) == '\n' )
             return res.substr(1);
