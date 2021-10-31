@@ -19,7 +19,7 @@ void ViewProp::clear()
     front_color  = 0xFFFFFFFF;
     
     buffered     = 0;
-    depth_test   = 1;
+    depth_test   = (DIM==3);
     depth_clamp  = 0;
     retina       = 0;
     stencil      = 0;

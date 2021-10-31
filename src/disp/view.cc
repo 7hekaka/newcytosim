@@ -137,12 +137,13 @@ void View::openDisplay()
     
     if ( floor_radius > 1 )
     {
+        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
         glDepthMask(GL_FALSE);
         gle::drawTiledFloor(floor_radius, floor_tile, floor_height, floor_color, back_color);
         glDepthMask(GL_TRUE);
-        glEnable(GL_DEPTH_TEST);
+        if ( depth ) glEnable(GL_DEPTH_TEST);
     }
 }
 
