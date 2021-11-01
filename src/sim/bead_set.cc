@@ -22,6 +22,7 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
         BeadProp * p = simul_.findProperty<BeadProp>("bead", pid);
         return new Bead(p, Vector(0,0,0), 0);
     }
+    throw InvalidIO("Warning: unknown Bead tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

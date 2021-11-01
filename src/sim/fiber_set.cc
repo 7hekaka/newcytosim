@@ -211,7 +211,7 @@ Object * FiberSet::newObject(const ObjectTag tag, PropertyID pid)
         obj->birthTime(simul_.time());
         return obj;
     }
-    std::cerr << "Warning: unknown Fiber tag `"+std::string(1,tag)+"' requested\n";
+    throw InvalidIO("Warning: unknown Fiber tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

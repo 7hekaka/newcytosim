@@ -43,7 +43,7 @@ Object * TubuleSet::newObject(const ObjectTag tag, PropertyID pid)
         TubuleProp * p = simul_.findProperty<TubuleProp>("tubule", pid);
         return new Tubule(p);
     }
-    std::cerr << "Warning: unknown Tubule tag `"+std::string(1,tag)+"' requested\n";
+    throw InvalidIO("Warning: unknown Tubule tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

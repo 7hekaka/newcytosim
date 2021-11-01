@@ -61,7 +61,7 @@ Object * FieldSet::newObject(const ObjectTag tag, PropertyID pid)
         FieldProp * p = simul_.findProperty<FieldProp>("field", pid);
         return new Field(p);
     }
-    std::cerr << "Warning: unknown Field tag `"+std::string(1,tag)+"' requested\n";
+    throw InvalidIO("Warning: unknown Field tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

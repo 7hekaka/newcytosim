@@ -183,7 +183,7 @@ Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
         CoupleProp * p = simul_.findProperty<CoupleProp>("couple", pid);
         return p->newCouple();
     }
-    std::cerr << "Warning: unknown Couple tag `"+std::string(1,tag)+"' requested\n";
+    throw InvalidIO("Warning: unknown Couple tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

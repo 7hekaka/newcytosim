@@ -195,7 +195,7 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
     if ( out.binary() )
     {
         if ( identity() > 16777216 )
-            throw InvalidIO("file data format overflow");
+            throw InvalidIO("binary file data format overflow");
         if ( identity() > 65535 || property()->number() > 255 || mark() )
         {
             // set the highest bit of the byte, which is not used by ASCII codes

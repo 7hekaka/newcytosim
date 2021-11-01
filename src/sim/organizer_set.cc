@@ -75,7 +75,7 @@ Object * OrganizerSet::newObject(const ObjectTag tag, PropertyID pid)
         return new Fake(p);
     }
     
-    std::cerr << "Warning: unknown Organizer tag `"+std::string(1,tag)+"' requested\n";
+    throw InvalidIO("Warning: unknown Organizer tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

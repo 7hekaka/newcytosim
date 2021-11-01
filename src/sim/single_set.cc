@@ -113,7 +113,7 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
         SingleProp * p = simul_.findProperty<SingleProp>("single", pid);
         return p->newWrist(nullptr, 0);
     }
-    std::cerr << "Warning: unknown Single tag `"+std::string(1,tag)+"' requested\n";
+    throw InvalidIO("Warning: unknown Single tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

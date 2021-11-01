@@ -136,6 +136,7 @@ Object * SpaceSet::newObject(const ObjectTag tag, PropertyID pid)
         Space * s = p->newSpace();
         return s;
     }
+    throw InvalidIO("Warning: unknown Space tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

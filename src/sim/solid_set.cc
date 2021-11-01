@@ -73,7 +73,7 @@ Object * SolidSet::newObject(const ObjectTag tag, PropertyID pid)
             throw InvalidIO("undefined `solid' class with ID "+std::to_string(pid));
         return new Solid(static_cast<SolidProp*>(p));
     }
-    std::cerr << "Warning: unknown Solid tag `"+std::string(1,tag)+"' requested\n";
+    throw InvalidIO("Warning: unknown Solid tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

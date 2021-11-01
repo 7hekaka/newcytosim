@@ -34,7 +34,8 @@ Object * EventSet::newObject(const ObjectTag tag, PropertyID)
 {
     if ( tag == Event::TAG )
         return new Event();
-    std::cerr << "Warning: unknown Event tag `"+std::string(1,tag)+"' requested\n";
+
+    throw InvalidIO("Warning: unknown Event tag `"+std::to_string(tag)+"'");
     return nullptr;
 }
 

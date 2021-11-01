@@ -261,7 +261,7 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
 
 
 /**
- Read a fiber (format tryout 11.06.2021)
+ Read a fiber (compatible with format tryout 11.06.2021)
  */
 Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
 {
@@ -282,14 +282,19 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
 #endif
     
     if ( tag != Fiber::TAG && tag != Fiber::TAG_ALT && tag != Fiber::TAG_LATTICE )
-        throw InvalidIO("expected reference to a fiber ("+std::string(1,tag)+")");
+        throw InvalidIO("expected reference to a fiber ("+std::to_string(tag)+")");
 
-    return fibers.findID(id);
+    Fiber* fib = fibers.findID(id);
+    
+    if ( !fib )
+        throw InvalidIO("unknown fiber ID "+std::to_string(id)+"");
+
+    return fib;
 }
 
 
 /**
- Read a fiber (format tryout 11.06.2021)
+ Read an object reference (compatible with format tryout 11.06.2021)
  */
 Object * Simul::readReference(Inputter& in, ObjectTag& tag)
 {
@@ -518,7 +523,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             if ( tok == "section" )
             {
                 iss >> section;
-                //std::clog << " section |" << section << "|\n";
+                //std::clog << "-- section |" << section << "|\n";
                 if ( section == "end" )
                     continue;
                 else if ( section == "single" )
@@ -606,7 +611,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                             if ( i != in.formatID() )
                             {
                                 in.setFormatID(i);
-                                //std::clog << "Cytosim is reading old format " << i << "\n";
+                                if ( i < BACKWARD_COMPATIBILITY )
+                                    std::clog << "Cytosim is attempting to read old format " << i << "\n";
                             }
                         }
                     }
@@ -648,9 +654,13 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             catch( Exception & e )
             {
                 print_blue(std::cerr, e.brief());
-                std::cerr << e.info() << " (section "+section+")\n";
                 if ( objset )
+                {
                     in.skip_until("#section ");
+                    std::cerr << e.info() << " (skipping section "+section+")\n";
+                }
+                else
+                    std::cerr << e.info() << " (section "+section+")\n";
             }
         }
     }

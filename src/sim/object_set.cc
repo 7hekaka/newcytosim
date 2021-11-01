@@ -545,6 +545,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");
+    //std::clog << "- load " << Object::reference(tag, pid, id) << '\n';
 
     if ( update )
     {
@@ -579,23 +580,18 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         assert_true(isprint(tag));
         // create new object of required class
         obj = newObject(tag, pid);
-        if ( !obj )
-        {
-            std::string str = std::to_string(tag);
-            if ( isprint(tag) ) str += " ("+std::string(1,tag)+")";
-            throw InvalidIO("invalid ObjectTag "+str+" referenced in file");
-        }
+        assert_true(obj);
         update = true;
         obj->identity(id);
         obj->objset(this);
         inventory_.assign(obj);
-        //std::clog << "- new " << Object::reference(tag, ix, id) << '\n';
+        //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
     }
     assert_true( obj->identity() == id );
     assert_true( obj->property() );
     
     try {
-        //std::clog << "- loading " << Object::reference(tag, ix, id) << '\n';
+        //std::clog << "- read " << Object::reference(tag, pid, id) << '\n';
         // read object data:
         obj->read(in, simul_, tag);
     }
