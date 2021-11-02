@@ -48,37 +48,37 @@ public:
     /// push a new Property in the list
     void push_back(Property * p) { vec_.push_back(p); }
 
-    /// forget pointer to p
+    /// forget given property
     void remove(Property const*);
     
     /// delete all Property
     void erase();
     
     /// iterator pointing to first element
-    iterator begin()   { return vec_.begin(); }
+    iterator begin() { return vec_.begin(); }
     
     /// iterator that points to a position just past the last element
-    iterator end()     { return vec_.end(); }
+    iterator end() { return vec_.end(); }
 
     /// iterator pointing to first element
     const_iterator begin() const { return vec_.begin(); }
     
     /// iterator pointing to a position past the last element
-    const_iterator end()   const { return vec_.end(); }
+    const_iterator end() const { return vec_.end(); }
     
     /// iterator pointing to first element
-    Property * front()   const { return vec_.front(); }
+    Property * front() const { return vec_.front(); }
     
     /// iterator pointing to last element
-    Property * back()    const { return vec_.back(); }
-    
+    Property * back() const { return vec_.back(); }
+
     //-------------------------------------------------------------------------------
     
     /// true if no property are known
-    bool empty()   const { return vec_.empty(); }
+    bool empty() const { return vec_.empty(); }
     
     /// number of known Property
-    size_t size()    const { return vec_.size(); }
+    size_t size() const { return vec_.size(); }
 
     /// number of Property of given category
     size_t size(std::string const& cat) const;
@@ -89,6 +89,9 @@ public:
     /// complete all objects
     void complete(Simul const&) const;
     
+    /// decrease all index by 1 (used for backward compatibility)
+    void decrement_all();
+
     //-------------------------------------------------------------------------------
     
     /// return property which has the provided name, or zero if it cannot be found
@@ -130,7 +133,7 @@ public:
     //-------------------------------------------------------------------------------
 
     /// return names of known Property
-    std::string  all_names(std::string const&) const;
+    std::string all_names(std::string const&) const;
 
     /// print names of known Property
     void write_names(std::ostream&, std::string const&) const;

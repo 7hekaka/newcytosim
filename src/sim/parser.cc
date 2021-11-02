@@ -92,7 +92,7 @@ void Parser::parse_set(std::istream& is)
 #if BACKWARD_COMPATIBILITY < 48
     /* Read ouput config files anterior to 3.11.2017, which included
      a identity number ('set hand 2 kinesin'): */
-    bool has_ido = Tokenizer::get_integer(is, ido);
+    Tokenizer::get_integer(is, ido);
 #endif
     
     Glossary opt;
@@ -150,11 +150,6 @@ void Parser::parse_set(std::istream& is)
             opt.read(blok);
             pp = execute_set(cat, name, opt);
 #if BACKWARD_COMPATIBILITY < 48
-            if ( has_ido )
-            {
-                //std::clog << "`" << pp->name() << "' is " << pp->category() << ido << '\n';
-                pp->renumber(ido);
-            }
             // name changed to `property_number` on 10.12.2017
             if ( opt.set(ido, "identity", "identification") || opt.set(ido, "property_number", "property_index") )
 #else

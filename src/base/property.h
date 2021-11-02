@@ -67,15 +67,15 @@ public:
     //-------------------------------------------------------------------------------
     
     /// identifies the class of objects made with this Property
-    virtual std::string category()        const { return "undefined"; }
+    virtual std::string category() const { return "undefined"; }
     
     //-------------------------------------------------------------------------------
     
     /// return copy of name given to property
-    std::string name()                   const { return name_; }
+    std::string name() const { return name_; }
     
     /// return name of property
-    const char * name_str()               const { return name_.c_str(); }
+    const char * name_str() const { return name_.c_str(); }
 
     /// change name
     void rename(std::string const& n)   { name_ = n; }

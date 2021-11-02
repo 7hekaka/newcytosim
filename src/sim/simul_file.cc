@@ -613,6 +613,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                                 in.setFormatID(i);
                                 if ( i < BACKWARD_COMPATIBILITY )
                                     std::clog << "Cytosim is attempting to read old format " << i << "\n";
+                                if ( in.formatID() < 45 )
+                                    properties.decrement_all();
                             }
                         }
                     }

@@ -92,6 +92,22 @@ void PropertyList::complete(Simul const& sim) const
         i->complete(sim);
 }
 
+/**
+ Use for backward compatibility with formatID < 45
+ */
+void PropertyList::decrement_all()
+{
+    PropertyID inf = ~0;
+    for ( Property* i : vec_ )
+        inf = std::min(inf, i->number());
+
+    if ( inf == 1 )
+    {
+        for ( Property* i : vec_ )
+            i->renumber(i->number()-1);
+    }
+}
+
 //-------------------------------------------------------------------------------
 #pragma mark -
 

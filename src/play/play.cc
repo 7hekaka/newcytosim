@@ -245,9 +245,10 @@ int main(int argc, char* argv[])
             // read the `properties` file to import properties
             simul.loadProperties();
             
-            // open trajectory file and load requested frame:
+            // open trajectory file:
             thread.openFile(simul.prop->system_file);
             
+            // load requested frame:
             if ( thread.loadFrame(frm) )
             {
                 // load last frame in file:
