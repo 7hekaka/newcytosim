@@ -9,10 +9,10 @@ A simulation of the cytoskeleton was started in 1995 at Princeton and pursued at
 - 1996 Implemented filament bending elasticity
 - 1999 Project named `Cytosim`
 - 2001 Complete rewrite using implicit integration scheme
-- 2012 Complete rewrite with scripting language
+- 2012 Complete rewrite with scripting language and 'config' file
 - 2017 Major revision using matric block operations
 - 2019 Introduced markdown documentation, version 4
-  
+- 2020-2021 Wide & deep code review during COVID confinement
 
 ## Contributors
  

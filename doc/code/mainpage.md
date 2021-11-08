@@ -7,7 +7,7 @@
  Development is now conducted at [Cambridge University](https://www.cam.ac.uk).  
  
 
- @date 2009-2020  
+ @date 2009-2021  
  @version PI - Increased Modularity
  
  
@@ -24,7 +24,7 @@
  Serge Dmitrieff         2013-\n
  Julio Belmonte          2014-\n
  Manuel Lera-Ramirez     2017-\n
- Maud Formanek           2020-\n
+ Maud Formanek           2020-2021\n
 
  @par Contact:
  Email: feedback@cytosim.org\n
