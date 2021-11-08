@@ -9,7 +9,7 @@
 #include "display2.h"
 #include "display3.h"
 #include "save_image.h"
-#include "tictoc.h"
+#include "time_date.h"
 #include <unistd.h>
 #include <cstdlib>
 #include "filepath.h"
@@ -83,9 +83,9 @@ std::string Player::buildLabel() const
             oss << " " << prop.period;
 #if ( 0 )
         // display speedup compared to clock time
-        static double sec = TicToc::seconds_today();
+        static double sec = TimeDate::seconds_today();
         static double sim = 0, spd = 0;
-        double SEC = TicToc::seconds_today();
+        double SEC = TimeDate::seconds_today();
         if ( SEC > sec + 1.0 )
         {
             double SIM = simul.time();
@@ -261,8 +261,8 @@ void Player::prepareDisplay(View& view, int mag)
 void Player::drawCytosim()
 {
 #if 0
-    static double sec = TicToc::milliseconds();
-    double now = TicToc::milliseconds();
+    static double sec = TimeDate::milliseconds();
+    double now = TimeDate::milliseconds();
     std::clog << " drawCytosim(" << std::setprecision(3) << simul.time() << "s) " << now-sec << "\n";
     sec = now;
 #endif

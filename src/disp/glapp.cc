@@ -7,7 +7,7 @@
 #include "exceptions.h"
 #include "save_image.h"
 #include "glossary.h"
-#include "tictoc.h"
+#include "time_date.h"
 #include "gle.h"
 
 
@@ -1133,7 +1133,7 @@ void glApp::flashText(std::string const& str)
     {
         //std::clog << " flashText " << str << "\n";
         flashString = str;
-        flashFinish = TicToc::seconds_since_1970() + 3.0;
+        flashFinish = TimeDate::seconds_since_1970() + 3.0;
         if ( views.size() > 1  &&  views[1].window()==1 )
             glutPostWindowRedisplay(1);
     }
@@ -1184,7 +1184,7 @@ void glApp::displayMain()
     if ( flashString.size() )
     {
         /// check time
-        if ( TicToc::seconds_since_1970() > flashFinish )
+        if ( TimeDate::seconds_since_1970() > flashFinish )
             flashString = "";
         else
         {

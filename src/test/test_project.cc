@@ -925,14 +925,14 @@ void testU(SIZE_T cnt, char const* str)
 
     FUNC(NSEG, dir_, force_, lag_);
     VecPrint::edges(NSEG, lag_);
-    tic();
+    tick();
     for ( SIZE_T i=0; i<cnt; ++i )
     {
         FUNC(NSEG, dir_, y, z);
         FUNC(NSEG, dir_, x, y);
         FUNC(NSEG, dir_, z, y);
     }
-    printf("  %10s %5.2f", str, toc(cnt*NSEG));
+    printf("  %10s %5.2f", str, tock(cnt*NSEG));
     print_fe_exceptions("");
     printf("\n");
     free_reals(x,y,z);
@@ -949,14 +949,14 @@ void testD(SIZE_T cnt, char const* str)
     
     FUNC(NSEG, dir_, pos_, lag_, x);
     VecPrint::edges(NVAL, x);
-    tic();
+    tick();
     for ( SIZE_T i=0; i<cnt; ++i )
     {
         FUNC(NSEG, dir_, x, lag_, z);
         FUNC(NSEG, dir_, y, lag_, x);
         FUNC(NSEG, dir_, z, lag_, y);
     }
-    printf("  %10s %5.2f", str, toc(cnt*NSEG));
+    printf("  %10s %5.2f", str, tock(cnt*NSEG));
     print_fe_exceptions("");
     printf("\n");
     free_reals(x,y,z);
@@ -974,14 +974,14 @@ void timeProject(SIZE_T cnt, char const* str)
     FUNC(NSEG, force_, x);
     print_fe_exceptions("P");
     VecPrint::edges(NVAL+2, x);
-    tic();
+    tick();
     for ( SIZE_T i=0; i<cnt; ++i )
     {
         FUNC(NSEG, x, y);
         FUNC(NSEG, y, z);
         FUNC(NSEG, z, x);
     }
-    printf("  %10s %5.2f", str, toc(cnt*NSEG));
+    printf("  %10s %5.2f", str, tock(cnt*NSEG));
     print_fe_exceptions("");
     printf("\n");
     free_reals(x,y,z);

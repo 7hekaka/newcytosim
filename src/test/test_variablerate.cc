@@ -51,10 +51,10 @@ void testMethod(const char str[])
 {
     unsigned bins[maxTime+1] = { 0 };
     
-    tic();
+    tick();
     for ( size_t i = 0; i < SAMPLES; ++i )
         ++bins[FUNC()];
-    printf("%s   %5.2f\n", str, toc(SAMPLES));
+    printf("%s   %5.2f\n", str, tock(SAMPLES));
 
     if ( *str )
     {

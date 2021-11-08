@@ -29,14 +29,14 @@ void print_bits(FILE* f, const T& val, char spc)
 void speed_test()
 {
     const size_t cnt = 1 << 30;
-    tic();
+    tick();
     uint32_t u = 10;
     for (size_t j=0; j<cnt; ++j)
     {
         u = RNG.pint32(1024);
         RNG.pint32(u);
     }
-    printf("int %5.2f\n", toc(cnt));
+    printf("int %5.2f\n", tock(cnt));
 }
 
 
@@ -594,14 +594,14 @@ template < float* (*FUNC)(float*, size_t, const int32_t*) >
 void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
 {
     float flt[SFMT_N32] = { 0 };
-    tic();
+    tick();
     for ( int i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
         FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
     }
     float* end = FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
-    printf("%-12s %5.2f :", str, toc(cnt));
+    printf("%-12s %5.2f :", str, tock(cnt));
     check_gaussian(end-flt, flt);
     print_gaussian(std::min(end-flt, 16l), flt);
 }
@@ -614,13 +614,13 @@ void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
     real *end, vec[SFMT_N32];
     for ( int i = 0; i < SFMT_N32; ++i )
         vec[i] = NAN;
-    tic();
+    tick();
     for ( int i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
         end = FUNC(vec, SFMT_N256, (__m256i*)sfmt.state);
     }
-    printf("%-12s %5.2f :", str, toc(cnt));
+    printf("%-12s %5.2f :", str, tock(cnt));
     check_gaussian(end-vec, vec);
     print_gaussian(std::min(end-vec, 16l), vec);
 }
@@ -635,10 +635,10 @@ void test_gaussian(int cnt)
     sfmt_t sfmt;
     sfmt_init_gen_rand(&sfmt, time(nullptr));
 
-    tic();
+    tick();
     for ( int i = 0; i < cnt; ++i )
         sfmt_gen_rand_all(&sfmt);
-    printf("RNG.refill   %5.2f\n", toc(cnt));
+    printf("RNG.refill   %5.2f\n", tock(cnt));
     //print(vec, end);
     
     runGaussian<makeGaussians_>(sfmt, "Gauss_", cnt);

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <unistd.h>
 #include "messages.h"
+#include "time_date.h"
 #include "parser.h"
 #include "print_color.h"
 
@@ -68,7 +69,7 @@
 void Simul::writeObjects(Outputter& out) const
 {
     // write a line identifying a new frame:
-    fprintf(out, "\n\n#Cytosim  %i  %s", getpid(), TicToc::date());
+    fprintf(out, "\n\n#Cytosim  %i  %s", getpid(), TimeDate::date_string());
     
     // record file format:
     fprintf(out, "\n#format %i dim %i", currentFormatID, DIM);
@@ -687,7 +688,7 @@ void Simul::writeProperties(std::ostream& os, const bool prune) const
 {
     //std::clog << "Writing properties" << '\n';
     os << "% Cytosim property file, pid " << getpid() << '\n';
-    os << "% " << TicToc::date() << '\n';
+    os << "% " << TimeDate::date_string() << '\n';
 
     prop->write(os, prune);
     properties.write(os, prune);

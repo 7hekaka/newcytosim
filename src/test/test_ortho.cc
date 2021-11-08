@@ -155,7 +155,7 @@ void test(size_t cnt)
     for ( size_t i = 0; i < MAX; ++i )
         printf("%9.3f %9.3f %9.3f\n", vec[i].XX, vec[i].YY, vec[i].ZZ);
      */
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         for ( size_t i = 0; i < MAX; ++i )
@@ -163,10 +163,10 @@ void test(size_t cnt)
         for ( size_t i = 0; i < MAX; ++i )
             vec[i] = vic[i].orthogonal();
     }
-    printf("  orthogonal    %7.3f\n", toc(cnt*MAX));
+    printf("  orthogonal    %7.3f\n", tock(cnt*MAX));
     
 #if 1
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         for ( size_t i = 0; i < MAX; ++i )
@@ -174,7 +174,7 @@ void test(size_t cnt)
         for ( size_t i = 0; i < MAX; ++i )
             vec[i] = vic[i].orthogonalB();
     }
-    printf("  orthogonalB   %7.3f\n", toc(cnt*MAX));
+    printf("  orthogonalB   %7.3f\n", tock(cnt*MAX));
 #endif
 }
 

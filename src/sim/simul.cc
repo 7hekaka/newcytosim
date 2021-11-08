@@ -10,7 +10,6 @@
 #include "simul_prop.h"
 #include "backtrace.h"
 #include "modulo.h"
-#include "tictoc.h"
 
 #include "tubule.h"
 #include "fiber.h"

@@ -11,7 +11,7 @@
 #include "evaluator.h"
 #include "messages.h"
 #include "glossary.h"
-#include "tictoc.h"
+#include "time_date.h"
 #include "simul.h"
 #include "event.h"
 
@@ -746,11 +746,11 @@ static void reportCPUtime(real t)
 {
     static size_t frm = 1;
     static time_t nxt = 0;
-    time_t now = TicToc::seconds_since_1970();
+    time_t now = TimeDate::seconds_since_1970();
     if ( now > nxt )
     {
         nxt = (nxt>0?nxt:now) + 3600;
-        Cytosim::log << "% " << TicToc::date() << "\n";
+        Cytosim::log << "% " << TimeDate::date_string() << '\n';
     }
     static double clk = 0;
     double cpu = double(clock()) / CLOCKS_PER_SEC;

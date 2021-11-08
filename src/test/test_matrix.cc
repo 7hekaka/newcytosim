@@ -260,7 +260,7 @@ void testMatrix(MATRIX & mat,
 {
     mat.resize(size);
 
-    tic();
+    tick();
     for ( size_t ii=0; ii<N_RUN; ++ii )
     {
         mat.reset();
@@ -268,32 +268,32 @@ void testMatrix(MATRIX & mat,
             fillMatrix(mat, iny[n], inx[n]);
         //            mat(iny[n], inx[n]) += alpha;
     }
-    double ts = toc(DIV);
+    double ts = tock(DIV);
     mat.prepareForMultiply(1);
 
-    tic();
+    tick();
     for ( size_t n=0; n<CNT; ++n )
     {
         mat.vecMulAdd(y, z);
         mat.vecMulAdd(x, z);
     }
-    double t1 = toc(DIV);
+    double t1 = tock(DIV);
     
-    tic();
+    tick();
     for ( size_t n=0; n<CNT; ++n )
     {
         mat.vecMulAdd_ALT(x, z);
         mat.vecMulAdd_ALT(y, z);
     }
-    double t2 = toc(DIV);
+    double t2 = tock(DIV);
 
-    tic();
+    tick();
     for ( size_t n=0; n<CNT; ++n )
     {
         mat.vecMul(y, z);
         mat.vecMul(x, z);
     }
-    double t3 = toc(DIV);
+    double t3 = tock(DIV);
 
     printf("\n%-32s ", mat.what().c_str());
     printf("set %9.2f  muladd %9.2f  alt %9.2f  mul %9.2f", ts, t1, t2, t3);
@@ -350,7 +350,7 @@ void testMatrixParallel(MATRIX & mat,
     for ( int i = 0; i < sup; ++i )
     {
         omp_set_num_threads(1<<i);
-        tic();
+        tick();
         for ( size_t j=0; j < CNT; ++j )
         {
             #pragma omp parallel for
@@ -360,7 +360,7 @@ void testMatrixParallel(MATRIX & mat,
             for ( size_t i = 0; i < size; i += CHUNK )
                 mat.vecMulAdd(x, z, i, i+CHUNK);
         }
-        t[i] = toc(DIV);
+        t[i] = tock(DIV);
     }
 
     printf("\n%-32s", mat.what().c_str());
@@ -386,16 +386,16 @@ void testIsoMatrix(MATRIX & mat,
 {
     mat.resize(size);
 
-    tic();
+    tick();
     for ( size_t i=0; i<N_RUN; ++i )
     {
         mat.reset();
         for ( size_t n=0; n<fill; ++n )
             fillMatrixIso(mat, inx[n], iny[n]);
     }
-    double ts = toc(DIV);
+    double ts = tock(DIV);
     
-    tic();
+    tick();
     for ( size_t i=0; i<N_RUN; ++i )
     {
         mat.prepareForMultiply(DIM);
@@ -405,7 +405,7 @@ void testIsoMatrix(MATRIX & mat,
             mat.VECMULADDISO(y, z);
         }
     }
-    double tm = toc(DIV);
+    double tm = tock(DIV);
     
     printf("\n%-29s ", mat.what().c_str());
     printf("isoset %9.2f  isomul %9.2f", ts, tm);
@@ -532,13 +532,13 @@ This compares the Scalar and SIMD implementations of one matrix
 {
     mat.resize(size);
     
-    tic();
+    tick();
     for ( size_t r = 0; r < N_RUN; ++r )
     {
         mat.reset();
         fillMatrixBlock(mat, fill, inx, iny);
     }
-    double ts = toc(N_RUN);
+    double ts = tock(N_RUN);
 
     mat.prepareForMultiply(1);
     
@@ -551,7 +551,7 @@ This compares the Scalar and SIMD implementations of one matrix
     mat.vecMulAdd(x, z);
     real res = checksum(size, z, x);
 
-    tic();
+    tick();
     for ( size_t n = 0; n < N_RUN; ++n )
     {
         mat.prepareForMultiply(1);
@@ -559,16 +559,16 @@ This compares the Scalar and SIMD implementations of one matrix
             mat.vecMulAdd_ALT(x, z);
     }
     double nop = N_MUL * N_RUN * mat.nbElements();
-    double t1 = toc(nop);
+    double t1 = tock(nop);
 
-    tic();
+    tick();
     for ( size_t n = 0; n < N_RUN; ++n )
     {
         mat.prepareForMultiply(1);
         for ( size_t m = 0; m < N_MUL; ++m )
             mat.vecMulAdd(x, z);
     }
-    double t2 = toc(nop);
+    double t2 = tock(nop);
     
     printf("%6lu %26s ", size, mat.what().c_str());
     printf("set %8.1f mul %8.1f  alt %8.1f", ts, t1, t2);

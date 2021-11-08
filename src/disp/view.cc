@@ -7,7 +7,7 @@
 #include "offscreen.h"
 #include "glu_unproject.cc"
 #include "glut.h"
-#include "tictoc.h"
+#include "time_date.h"
 
 using namespace gle;
 
@@ -201,9 +201,9 @@ void View::drawInteractiveFeatures() const
     // display FPS = frames per seconds
     static char buf[16];
     static size_t cnt = 0;
-    static double sec = TicToc::seconds_today();
+    static double sec = TimeDate::seconds_today();
     ++cnt;
-    double now = TicToc::seconds_today();
+    double now = TimeDate::seconds_today();
     if ( now > sec + 1.0 )
     {
         double fps = cnt / ( now - sec );

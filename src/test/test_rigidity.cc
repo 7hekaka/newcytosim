@@ -437,7 +437,7 @@ void testRigidity(size_t cnt, char const* str)
     add_rigidity0(nbt, vP, alpha, vY);
     real err = blas::difference(nbt+2*DIM, vX, vY);
 
-    tic();
+    tick();
     for ( size_t i=0; i<cnt; ++i )
     {
         FUNC(nbt, vY, alpha, vZ);
@@ -448,7 +448,7 @@ void testRigidity(size_t cnt, char const* str)
         printf(" XXXX %e ", err);
     else
         printf("  --> %e ", err);
-    printf(" %4s %5.2f cycles\n", str, toc(cnt*nbt));
+    printf(" %4s %5.2f cycles\n", str, tock(cnt*nbt));
 }
 
 

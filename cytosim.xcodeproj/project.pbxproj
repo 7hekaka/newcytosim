@@ -38,7 +38,7 @@
 
 /* Begin PBXBuildFile section */
 		BB003F3020EDEDA4007C9593 /* vector4.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB003F2F20EDEDA4007C9593 /* vector4.cc */; };
-		BB04E2751E1A4E7B000BDBC9 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BB04E2751E1A4E7B000BDBC9 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BB04E2761E1A4E89000BDBC9 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB06D6BD152F0A5300AD8355 /* crosslink_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB06D6BB152F0A5300AD8355 /* crosslink_long.cc */; };
 		BB06D6BE152F0A5300AD8355 /* crosslink_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB06D6BC152F0A5300AD8355 /* crosslink_long.h */; };
@@ -67,8 +67,8 @@
 		BB171C330B3DEBE700CFFC3B /* fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB171C310B3DEBE700CFFC3B /* fiber.h */; };
 		BB171C340B3DEBE700CFFC3B /* fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB171C320B3DEBE700CFFC3B /* fiber.cc */; };
 		BB1749A707D798E600BC7BDC /* lattice.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1749A507D798E600BC7BDC /* lattice.h */; };
-		BB18BBC01DFD7C0C00567023 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
-		BB18BBC11DFD7C0E00567023 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BB18BBC01DFD7C0C00567023 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
+		BB18BBC11DFD7C0E00567023 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BB18BBC21DFD7DD900567023 /* test_simd.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */; };
 		BB18BBCF1DFD7E4A00567023 /* test_project.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */; };
 		BB19DA9E231BF792001488A5 /* matrix34.h in Headers */ = {isa = PBXBuildFile; fileRef = BB19DA9C231BF792001488A5 /* matrix34.h */; };
@@ -86,7 +86,7 @@
 		BB201E1324ABDCD900A8CA82 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
 		BB201E1424ABDCD900A8CA82 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB201E1524ABDCD900A8CA82 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
-		BB201E1624ABDCD900A8CA82 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BB201E1624ABDCD900A8CA82 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BB201E1824ABDCD900A8CA82 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BB201E1F24ABDD9F00A8CA82 /* test_xtbsv.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB201E0D24ABD9A900A8CA82 /* test_xtbsv.cc */; };
 		BB20484C0AF203A0004EDA21 /* filewrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB20484A0AF203A0004EDA21 /* filewrapper.cc */; };
@@ -486,11 +486,11 @@
 		BB70863C2449CBE900C73273 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
 		BB70863D2449CBE900C73273 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB70863E2449CBE900C73273 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
-		BB70863F2449CBE900C73273 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BB70863F2449CBE900C73273 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BB70864B2449CBF300C73273 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
 		BB70864C2449CBF300C73273 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB70864D2449CBF300C73273 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
-		BB70864E2449CBF300C73273 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BB70864E2449CBF300C73273 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BB7086572449CC2500C73273 /* test_rigidity.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7086372449C83100C73273 /* test_rigidity.cc */; };
 		BB7086582449CC3000C73273 /* test_xpttrs.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7086342448BC3700C73273 /* test_xpttrs.cc */; };
 		BB71916B0EF1CD9900CED9E2 /* sparmatsym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0C409F069A043600CF45A8 /* sparmatsym.h */; };
@@ -627,7 +627,7 @@
 		BB8EE1F22542DF4F00E15C40 /* tokenizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50D6120FFAE51900278580 /* tokenizer.cc */; };
 		BB8EE1F32542DF5800E15C40 /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
 		BB8EE1F42542DF6100E15C40 /* tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* tesselator.cc */; };
-		BB8EE1F52542DF6C00E15C40 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BB8EE1F52542DF6C00E15C40 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BB8EE1F62542DF7800E15C40 /* filepath.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB65DBE911AD53AC005DD116 /* filepath.cc */; };
 		BB8EE1F92542DF9C00E15C40 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
 		BB8EE1FA2542E01B00E15C40 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
@@ -665,7 +665,7 @@
 		BB9D87AE1E76BBAB00DD0F00 /* sparmatsym2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA331AE06CA7059002C3684 /* sparmatsym2.cc */; };
 		BB9D87AF1E76BBAE00DD0F00 /* sparmatsymblk.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBDF72AD0B5C2327007CAD2A /* sparmatsymblk.cc */; };
 		BB9D87B01E76BBB800DD0F00 /* sparmatsym2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA331AE06CA7059002C3684 /* sparmatsym2.cc */; };
-		BB9D87B31E76BBDD00DD0F00 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BB9D87B31E76BBDD00DD0F00 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BB9D87B41E76BBF100DD0F00 /* backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEF3A86118318AE000F2EED /* backtrace.cc */; };
 		BB9D992908D6281100DBD2BF /* mecafil.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9D992508D6281100DBD2BF /* mecafil.cc */; };
 		BB9D992A08D6281100DBD2BF /* mecafil.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9D992608D6281100DBD2BF /* mecafil.h */; };
@@ -706,7 +706,7 @@
 		BBA5790905FA6259009AE66E /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BBA5790C05FA625D009AE66E /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BBA5795D05FA652D009AE66E /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
-		BBA5E5820E8EBA620009F6D0 /* tictoc.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA5E5800E8EBA620009F6D0 /* tictoc.h */; };
+		BBA5E5820E8EBA620009F6D0 /* time_date.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA5E5800E8EBA620009F6D0 /* time_date.h */; };
 		BBA61CBF234E891F00D6A81F /* tubule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CBD234E891F00D6A81F /* tubule.cc */; };
 		BBA61CC0234E891F00D6A81F /* tubule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA61CBD234E891F00D6A81F /* tubule.cc */; };
 		BBA61CC1234E891F00D6A81F /* tubule.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA61CBE234E891F00D6A81F /* tubule.h */; };
@@ -741,7 +741,7 @@
 		BBA9869C132246870031200B /* bridge.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA98698132246870031200B /* bridge.cc */; };
 		BBA9869D132246870031200B /* bridge.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA98699132246870031200B /* bridge.h */; };
 		BBA9B6A42456C2D300F0EF47 /* matfull.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matfull.cc */; };
-		BBA9B6A5245714A700F0EF47 /* tictoc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* tictoc.cc */; };
+		BBA9B6A5245714A700F0EF47 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
 		BBA9B6A62457217400F0EF47 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBAA7E8A2455D96C00C924DB /* test_block.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBAA7E7D2455D86300C924DB /* test_block.cc */; };
 		BBAA7E8B2455DE5500C924DB /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
@@ -1757,8 +1757,8 @@
 		BBA578F005FA61DE009AE66E /* sim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sim; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBA5793405FA64A3009AE66E /* play */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = play; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBA5E4E00E8EB4A60009F6D0 /* test_matrix.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_matrix.cc; path = src/test/test_matrix.cc; sourceTree = SOURCE_ROOT; };
-		BBA5E5800E8EBA620009F6D0 /* tictoc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tictoc.h; path = src/base/tictoc.h; sourceTree = SOURCE_ROOT; };
-		BBA5E5810E8EBA620009F6D0 /* tictoc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tictoc.cc; path = src/base/tictoc.cc; sourceTree = SOURCE_ROOT; };
+		BBA5E5800E8EBA620009F6D0 /* time_date.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = time_date.h; path = src/base/time_date.h; sourceTree = SOURCE_ROOT; };
+		BBA5E5810E8EBA620009F6D0 /* time_date.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = time_date.cc; path = src/base/time_date.cc; sourceTree = SOURCE_ROOT; };
 		BBA61CBD234E891F00D6A81F /* tubule.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = tubule.cc; sourceTree = "<group>"; };
 		BBA61CBE234E891F00D6A81F /* tubule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tubule.h; sourceTree = "<group>"; };
 		BBA61CC4234E8DC700D6A81F /* tubule_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tubule_set.h; sourceTree = "<group>"; };
@@ -2638,14 +2638,15 @@
 		BB7190A40EF1C9AE00CED9E2 /* misc */ = {
 			isa = PBXGroup;
 			children = (
-				BB73587505B98DA3006956D5 /* exceptions.h */,
-				BBB750830D15CFCA00B79171 /* exceptions.cc */,
-				BBA5E5800E8EBA620009F6D0 /* tictoc.h */,
-				BBA5E5810E8EBA620009F6D0 /* tictoc.cc */,
 				BBEF3A85118318AE000F2EED /* backtrace.h */,
 				BBEF3A86118318AE000F2EED /* backtrace.cc */,
+				BB73587505B98DA3006956D5 /* exceptions.h */,
+				BBB750830D15CFCA00B79171 /* exceptions.cc */,
 				BB61B7EF19B7622800B1F4F6 /* print_color.h */,
 				BB61B7F119B7626A00B1F4F6 /* print_color.cc */,
+				BBB13B9A26F2657D0021C934 /* timer.h */,
+				BBA5E5800E8EBA620009F6D0 /* time_date.h */,
+				BBA5E5810E8EBA620009F6D0 /* time_date.cc */,
 			);
 			name = misc;
 			sourceTree = "<group>";
@@ -2681,7 +2682,6 @@
 		BB73586C05B98DA3006956D5 /* base */ = {
 			isa = PBXGroup;
 			children = (
-				BBB13B9A26F2657D0021C934 /* timer.h */,
 				BB2BF8DA0E085C880024546A /* makefile.inc */,
 				BB72EA642662263600FF7352 /* CMakeLists.txt */,
 				BB73586E05B98DA3006956D5 /* assert_macro.h */,
@@ -3421,7 +3421,7 @@
 				BB55BF310A25FB13003333C9 /* dim.h in Headers */,
 				BB20484D0AF203A0004EDA21 /* filewrapper.h in Headers */,
 				BB4DB5990C69D5F8001E5E4F /* array.h in Headers */,
-				BBA5E5820E8EBA620009F6D0 /* tictoc.h in Headers */,
+				BBA5E5820E8EBA620009F6D0 /* time_date.h in Headers */,
 				BB1F9C2D0FD5A9790047327F /* glossary.h in Headers */,
 				BBD8A4BA0FF253B8005A6615 /* property_list.h in Headers */,
 				BB50D0D80FFA30CD00278580 /* property.h in Headers */,
@@ -4453,7 +4453,7 @@
 			files = (
 				BB31697F24A0F3F0008DFDB3 /* operator_new.cc in Sources */,
 				BB18BBC21DFD7DD900567023 /* test_simd.cc in Sources */,
-				BB18BBC11DFD7C0E00567023 /* tictoc.cc in Sources */,
+				BB18BBC11DFD7C0E00567023 /* time_date.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4466,7 +4466,7 @@
 				BBE447DB2064ED200058ADAC /* SFMT.c in Sources */,
 				BB04E2761E1A4E89000BDBC9 /* random.cc in Sources */,
 				BB70863624499A7000C73273 /* random_vector.cc in Sources */,
-				BB04E2751E1A4E7B000BDBC9 /* tictoc.cc in Sources */,
+				BB04E2751E1A4E7B000BDBC9 /* time_date.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4479,7 +4479,7 @@
 				BB201E1324ABDCD900A8CA82 /* SFMT.c in Sources */,
 				BB201E1424ABDCD900A8CA82 /* random.cc in Sources */,
 				BB201E1524ABDCD900A8CA82 /* random_vector.cc in Sources */,
-				BB201E1624ABDCD900A8CA82 /* tictoc.cc in Sources */,
+				BB201E1624ABDCD900A8CA82 /* time_date.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4540,7 +4540,7 @@
 				BB65DBEB11AD53AC005DD116 /* filepath.cc in Sources */,
 				BB7085E91285A2CA00D8D79A /* stream_func.cc in Sources */,
 				BB19FEF812F352A400ACEA12 /* inventory.cc in Sources */,
-				BB18BBC01DFD7C0C00567023 /* tictoc.cc in Sources */,
+				BB18BBC01DFD7C0C00567023 /* time_date.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4835,7 +4835,7 @@
 				BB70863C2449CBE900C73273 /* SFMT.c in Sources */,
 				BB70863D2449CBE900C73273 /* random.cc in Sources */,
 				BB70863E2449CBE900C73273 /* random_vector.cc in Sources */,
-				BB70863F2449CBE900C73273 /* tictoc.cc in Sources */,
+				BB70863F2449CBE900C73273 /* time_date.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4848,7 +4848,7 @@
 				BB70864B2449CBF300C73273 /* SFMT.c in Sources */,
 				BB70864C2449CBF300C73273 /* random.cc in Sources */,
 				BB70864D2449CBF300C73273 /* random_vector.cc in Sources */,
-				BB70864E2449CBF300C73273 /* tictoc.cc in Sources */,
+				BB70864E2449CBF300C73273 /* time_date.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4922,7 +4922,7 @@
 				BB8EE1FA2542E01B00E15C40 /* exceptions.cc in Sources */,
 				BB8EE1F92542DF9C00E15C40 /* vector3.cc in Sources */,
 				BB8EE1F62542DF7800E15C40 /* filepath.cc in Sources */,
-				BB8EE1F52542DF6C00E15C40 /* tictoc.cc in Sources */,
+				BB8EE1F52542DF6C00E15C40 /* time_date.cc in Sources */,
 				BB8EE1F42542DF6100E15C40 /* tesselator.cc in Sources */,
 				BB8EE1F32542DF5800E15C40 /* stream_func.cc in Sources */,
 				BB8EE1F22542DF4F00E15C40 /* tokenizer.cc in Sources */,
@@ -4951,7 +4951,7 @@
 				BB9D87AA1E76BB9B00DD0F00 /* matrix.cc in Sources */,
 				BB9D87AB1E76BBA100DD0F00 /* sparmat.cc in Sources */,
 				BB9D87AE1E76BBAB00DD0F00 /* sparmatsym2.cc in Sources */,
-				BB9D87B31E76BBDD00DD0F00 /* tictoc.cc in Sources */,
+				BB9D87B31E76BBDD00DD0F00 /* time_date.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4986,7 +4986,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBA9B6A5245714A700F0EF47 /* tictoc.cc in Sources */,
+				BBA9B6A5245714A700F0EF47 /* time_date.cc in Sources */,
 				BBA9B6A42456C2D300F0EF47 /* matfull.cc in Sources */,
 				BBAA7E8E2455DEED00C924DB /* vector2.cc in Sources */,
 				BBAA7E8F2455DEED00C924DB /* vector3.cc in Sources */,

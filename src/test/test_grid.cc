@@ -296,19 +296,19 @@ void testInterpolate(unsigned CNT)
     for ( size_t i = 0; i < CNT; ++i )
         vec[i] = rand + RNG.pint32(MAX);
 
-    tic();
+    tick();
     real sum = 0;
     for ( size_t r = 0; r < 100; ++r )
     for ( size_t i = 0; i < CNT; ++i )
         sum += map.interpolate3D(vec[i]) + map.interpolate3D(vec[i]);
-    printf("  interpolate3D  CPU %7.3f  sum = %f\n", toc(CNT), sum);
+    printf("  interpolate3D  CPU %7.3f  sum = %f\n", tock(CNT), sum);
     
-    tic();
+    tick();
     real som = 0;
     for ( size_t r = 0; r < 100; ++r )
     for ( size_t i = 0; i < CNT; ++i )
         som += map.interpolate(vec[i]) + map.interpolate(vec[i]);
-    printf("  interpolate    CPU %7.3f  sum = %f\n", toc(CNT), som);
+    printf("  interpolate    CPU %7.3f  sum = %f\n", tock(CNT), som);
 
     delete[] vec;
 }

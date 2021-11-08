@@ -11,7 +11,7 @@
 #include "backtrace.h"
 #include "filepath.h"
 #include "splash.h"
-#include "tictoc.h"
+#include "time_date.h"
 #include "unistd.h"
 
 
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
         std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
     }
 
-    Cytosim::out << "% " << TicToc::date() << "\n";
+    Cytosim::out << "% " << TimeDate::date_string() << '\n';
     print_version(Cytosim::out);
     
     Simul simul;
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
     }
     
     arg.print_warnings(cerr, 1, " on command line\n");
-    time_t sec = TicToc::seconds_since_1970();
+    time_t sec = TimeDate::seconds_since_1970();
     
     try {
         Parser(simul, 1, 1, 1, 1, 1).readConfig();
@@ -155,8 +155,8 @@ int main(int argc, char* argv[])
         return 5;
     }
     
-    Cytosim::out << "% " << TicToc::date() << "\n";
-    sec = TicToc::seconds_since_1970() - sec;
+    Cytosim::out << "% " << TimeDate::date_string() << '\n';
+    sec = TimeDate::seconds_since_1970() - sec;
     Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";
     Cytosim::out.close();
 }

@@ -34,7 +34,7 @@ vpath %.o  build
 OBJ=exceptions.o vector3.o glossary.o property.o backtrace.o offscreen.o\
     tokenizer.o stream_func.o print_color.o view.o view_prop.o glapp.o\
     gle.o gym_text.o gym_flute.o tesselator.o gle_color.o gle_color_list.o\
-	tictoc.o filepath.o mesh.o mechoui_param.o mechoui.o
+	time_date.o filepath.o mesh.o mechoui_param.o mechoui.o
 
 #----------------------------targets--------------------------------------------
 

@@ -71,7 +71,7 @@ void check(int N, int ORD, real const* S, real const* AB, real* B, char const st
     nan_spill(B+ORD*N);
     FUNC(N, AB, B);
     print(ORD*N, B);
-    tic();
+    tick();
     const size_t SUB = 128;
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -79,7 +79,7 @@ void check(int N, int ORD, real const* S, real const* AB, real* B, char const st
         for ( size_t u = 0; u < SUB; ++u )
             FUNC(N, AB, B);
     }
-    printf(" %-14s cpu %7.0f\n", str, toc(cnt*SUB));
+    printf(" %-14s cpu %7.0f\n", str, tock(cnt*SUB));
 }
 
 //------------------------------------------------------------------------------

@@ -28,7 +28,6 @@
 #include "exceptions.h"
 #include "vecprint.h"
 #include "filepath.h"
-#include "tictoc.h"
 #include "bicgstab.h"
 #include "gmres.h"
 #include "timer.h"

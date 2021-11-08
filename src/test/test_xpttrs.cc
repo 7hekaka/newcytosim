@@ -18,14 +18,14 @@ template < void (*FUNC)(int, real*, real*, int*) >
 void test(int N, real const* Ds, real const* Us, real* D, real* U, char const str[], size_t cnt)
 {
     int info;
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(N, Ds, D);
         copy_real(N, Us, U);
         FUNC(N, D, U, &info);
     }
-    printf(" %12s %5.2f\n", str, toc(N*cnt));
+    printf(" %12s %5.2f\n", str, tock(N*cnt));
 }
 
 
@@ -87,10 +87,10 @@ void check(int N, real const* Ds, real const* Us, real const* Bs, real* D, real*
     printf(" err %f %12s", err, str);
     if ( err < 0.001 )
     {
-        tic();
+        tick();
         for ( size_t n = 0; n < cnt; ++n )
             SOLVE(N, D, U, B);
-        printf(" %5.2f", toc(N*cnt));
+        printf(" %5.2f", tock(N*cnt));
     }
     printf("\n");
 }
@@ -143,7 +143,7 @@ void testSolve(int NSEG, size_t cnt)
 template < void (*FUNC)(int, real*, real*, real*) >
 void verify(int N, real const* Ds, real const* Us, real const* Bs, real* D, real* U, real* B, char const str[], size_t cnt)
 {
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(N, Ds, D);
@@ -152,7 +152,7 @@ void verify(int N, real const* Ds, real const* Us, real const* Bs, real* D, real
         alsatian_thomas(N, D, U, B);
     }
     VecPrint::edges(N, B);
-    printf(" %12s %5.2f\n", str, toc(N*cnt));
+    printf(" %12s %5.2f\n", str, tock(N*cnt));
 }
 
 void solve1(int N, real* D, real* U, real* B)

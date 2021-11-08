@@ -81,14 +81,14 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
     const int N = (int)size;
     blas::xgemv('N', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
     VecPrint::head(size, x);
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         blas::xgemv('N', N, N, 1.0, mem, N, x, 1, 0.0, y, 1);
         blas::xgemv('N', N, N, 1.0, mem, N, y, 1, 0.0, z, 1);
         blas::xgemv('N', N, N, 1.0, mem, N, z, 1, 0.0, x, 1);
     }
-    printf("  DGEMV %5.2f\n", toc(cnt));
+    printf("  DGEMV %5.2f\n", tock(cnt));
 
     // transpose matrix
     for ( size_t i = 0  ; i < size; ++i )
@@ -101,14 +101,14 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
     
     blas::xgemv('T', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
     VecPrint::head(size, x);
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         blas::xgemv('T', N, N, 1.0, mem, N, x, 1, 0.0, y, 1);
         blas::xgemv('T', N, N, 1.0, mem, N, y, 1, 0.0, z, 1);
         blas::xgemv('T', N, N, 1.0, mem, N, z, 1, 0.0, x, 1);
     }
-    printf(" tDGEMV %5.2f\n", toc(cnt));
+    printf(" tDGEMV %5.2f\n", tock(cnt));
     
     free_real(mem);
 }
@@ -135,39 +135,39 @@ void speedMatrix(size_t size, size_t cnt)
 
     mat.vecMul0(s, x);
     VecPrint::head(size, x);
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         mat.vecMul0(x, y);
         mat.vecMul0(y, z);
         mat.vecMul0(z, x);
     }
-    printf(" SCALAR %5.2f\n", toc(cnt));
+    printf(" SCALAR %5.2f\n", tock(cnt));
 
     mat.vecMul(s, x);
     VecPrint::head(size, x);
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         mat.vecMul(x, y);
         mat.vecMul(y, z);
         mat.vecMul(z, x);
     }
-    printf("   AVX? %5.2f\n", toc(cnt));
+    printf("   AVX? %5.2f\n", tock(cnt));
 
     speedBLAS(cnt, mat, s, x, y, z);
     
     mat.transpose();
     mat.transVecMul(s, x);
     VecPrint::head(size, x);
-    tic();
+    tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
         mat.transVecMul(x, y);
         mat.transVecMul(y, z);
         mat.transVecMul(z, x);
     }
-    printf(" TRANSP %5.2f\n", toc(cnt));
+    printf(" TRANSP %5.2f\n", tock(cnt));
     
     free_real(x);
     free_real(y);

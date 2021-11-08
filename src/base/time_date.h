@@ -1,17 +1,16 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 // This file create by FJN on 27/9/2008.
 
-#ifndef TICTOC_H
-#define TICTOC_H
+#ifndef TIME_DATE_H
+#define TIME_DATE_H
 
 #include <ctime>
 
 /// A set of functions related to time
 /**
- Functions to get wall-time, and processor-time,
- derived from the C-standard library.
+ Functions to get (real) time and date, from the C-standard library.
  */
-namespace TicToc
+namespace TimeDate
 {
     /// set current date in short format, `buf` should be 26 character long or more
     void get_date(char * buf, size_t buf_size);
@@ -20,7 +19,7 @@ namespace TicToc
     void get_date(char * buf, size_t buf_size, bool no_year);
 
     /// using a local char[] to call get_date()
-    char const* date();
+    char const* date_string();
 
     
     /// approximately the number of days since Jan 1 2000
@@ -50,7 +49,7 @@ namespace TicToc
     /// number of microseconds
     double microseconds();
     
-    /// return CPU time in seconds and update `clk` to current time
+    /// return CPU time in seconds and update argument to current time
     double processor_time(clock_t&);
 
 }

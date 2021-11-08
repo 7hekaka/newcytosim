@@ -2,7 +2,7 @@
 
 
 OBJ_BASE := messages.o filewrapper.o filepath.o iowrapper.o exceptions.o\
-            tictoc.o inventory.o stream_func.o tokenizer.o\
+            time_date.o inventory.o stream_func.o tokenizer.o\
             glossary.o property.o property_list.o backtrace.o print_color.o\
 
 #----------------------------rules----------------------------------------------

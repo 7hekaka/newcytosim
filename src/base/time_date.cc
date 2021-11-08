@@ -1,9 +1,8 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 // Created by Francois Nedelec on 27/9/2008.
 
+#include "time_date.h"
 
-#include "tictoc.h"
-#include <ctime>
 #include <cstring>
 #include <sys/time.h>
 
@@ -13,7 +12,7 @@
 /**
  This get current time from the C-library functions time() and ctime_r()
  */
-void TicToc::get_date(char * buf, size_t buf_size)
+void TimeDate::get_date(char * buf, size_t buf_size)
 {
     if ( buf_size > 25 )
     {
@@ -35,11 +34,11 @@ void TicToc::get_date(char * buf, size_t buf_size)
 }
 
 
-void TicToc::get_date(char * buf, size_t buf_size, bool no_year)
+void TimeDate::get_date(char * buf, size_t buf_size, bool no_year)
 {
     if ( buf_size > 25 )
     {
-        TicToc::get_date(buf, buf_size);
+        TimeDate::get_date(buf, buf_size);
         // remove year:
         if ( no_year )
             buf[19] = 0;
@@ -47,7 +46,7 @@ void TicToc::get_date(char * buf, size_t buf_size, bool no_year)
 }
 
 
-char const* TicToc::date()
+char const* TimeDate::date_string()
 {
     static char buf[32];
     get_date(buf, sizeof(buf));
@@ -55,7 +54,7 @@ char const* TicToc::date()
 }
 
 
-int TicToc::days_since_2000()
+int TimeDate::days_since_2000()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);
@@ -64,19 +63,19 @@ int TicToc::days_since_2000()
 
 
 /** Attention: this will fail after Jan. 2038 */
-time_t TicToc::seconds_since_1970()
+time_t TimeDate::seconds_since_1970()
 {
     return time(nullptr);
 }
 
 /** Attention: this will fail after Jan. 2038 */
-time_t TicToc::seconds_since_2000()
+time_t TimeDate::seconds_since_2000()
 {
     return time(nullptr) - 946684800;
 }
 
 
-int TicToc::year()
+int TimeDate::year()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);
@@ -84,7 +83,7 @@ int TicToc::year()
 }
 
 
-int TicToc::day_of_the_year()
+int TimeDate::day_of_the_year()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);
@@ -92,7 +91,7 @@ int TicToc::day_of_the_year()
 }
 
 
-int TicToc::hours_today()
+int TimeDate::hours_today()
 {
     time_t now = time(nullptr);
     tm * loc = localtime(&now);
@@ -100,7 +99,7 @@ int TicToc::hours_today()
 }
 
 
-double TicToc::seconds_today()
+double TimeDate::seconds_today()
 {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
@@ -108,14 +107,14 @@ double TicToc::seconds_today()
 }
 
 
-double TicToc::milliseconds()
+double TimeDate::milliseconds()
 {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
     return 1000 * tv.tv_sec + tv.tv_usec / 1000.0;
 }
 
-double TicToc::microseconds()
+double TimeDate::microseconds()
 {
     struct timeval tv;
     gettimeofday(&tv, nullptr);
@@ -124,12 +123,10 @@ double TicToc::microseconds()
 
 
 //------------------------------------------------------------------------------
-#pragma mark - CPU time
+#pragma mark - CPU time, from the C-library function clock()
 
-/**
- This calls the C-library function clock()
- */
-double TicToc::processor_time(clock_t& clk)
+
+double TimeDate::processor_time(clock_t& clk)
 {
     clock_t now = clock();
     double sec = double( now - clk ) / CLOCKS_PER_SEC;

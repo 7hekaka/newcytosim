@@ -21,10 +21,10 @@ unsigned long long rdt_ = 0;
 inline unsigned long long timer() { return __rdtsc(); }
 
 /// start timer
-inline void tic() { rdt_ = __rdtsc(); }
+inline void tick() { rdt_ = __rdtsc(); }
 
-/// return time since last 'tic()', divided by 'arg'
-inline double toc(double arg = 1) { return double(__rdtsc()-rdt_) / arg; }
+/// return time since last 'tick()', divided by 'arg'
+inline double tock(double arg = 1) { return double(__rdtsc()-rdt_) / arg; }
 
 #elif ( 1 )
 
@@ -42,13 +42,13 @@ inline unsigned long long timer()
 }
 
 /// start timer
-inline void tic()
+inline void tick()
 {
     gettimeofday(&tic_t, nullptr);
 }
 
-/// return time since last 'tic()', divided by 'arg'
-inline double toc(double arg = 1e3)
+/// return time since last 'tick()', divided by 'arg'
+inline double tock(double arg = 1e3)
 {
     timeval tv;
     gettimeofday(&tv, nullptr);
@@ -68,13 +68,13 @@ inline clock_t timer()
 }
 
 /// start timer
-void tic()
+void tick()
 {
     tic_t = clock();
 }
 
-/// return time since last 'tic()', divided by 'arg'
-double toc(double arg = CLOCKS_PER_SEC)
+/// return time since last 'tick()', divided by 'arg'
+double tock(double arg = CLOCKS_PER_SEC)
 {
     return (1e3*( clock() - tic_t )) / arg;
 }
