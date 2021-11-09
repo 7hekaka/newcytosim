@@ -196,7 +196,7 @@ void display(View& view, int)
     gle_color lor(1,1,0);
     flu[i++] = { lor, Vector2(pos) };
     flu[i++] = { lor, Vector2(nod) };
-    unmapBufferC4VD();
+    gym::unmapBufferC4VD();
     glPointSize(12);
     glEnableClientState(GL_COLOR_ARRAY);
     glDrawArrays(GL_POINTS, 0, i);
