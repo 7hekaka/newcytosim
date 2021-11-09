@@ -18,17 +18,15 @@ set(MATH_LIB_TARGET "libcytomath")
 set(DISP_LIB_TARGET "libcytodisp")
 
 if(DEFINED DIMENSION)
-    add_definitions(-DDIM=${DIMENSION})
+    add_compile_definitions(-DDIM=${DIMENSION})
     set(SIM_LIB_TARGET "cytolibD${DIMENSION}")
     set(SIMG_LIB_TARGET "cytospaceD${DIMENSION}G")
 endif()
 
-
-option(BUILD_SIM "build the simulation executable" ON)
-option(BUILD_PLAY "build the Graphical viewer" ON)
-option(BUILD_REPORT "build the report executable" OFF)
-option(BUILD_TOOLS "build all cytosim/tools executables" ON)
-option(BUILD_TESTS "build all cytosim/test executables" ON)
+option(MAKE_SIM "build the simulation executable" ON)
+option(MAKE_PLAY "build the graphical OpenGL viewer" ON)
+option(MAKE_TOOLS "build all cytosim/tools executables" ON)
+option(MAKE_TESTS "build all cytosim/test executables" OFF)
 
 
 set(SRC_BASE_DIR "${PROJECT_SOURCE_DIR}/src/base")
@@ -55,44 +53,50 @@ set(PLAY_TARGET "play")
 
 #-------------------------------- Libraries ------------------------------------
 
-find_library(LAPACK_LIB lapack REQUIRED)
-if(LAPACK_LIB)
-    message("Found LAPACK: ${LAPACK_LIB}")
+if(NOT UNIX)
+    message(FATAL_ERROR "CMake File currently only setup to build on Linux and Mac")
+elseif(APPLE)
+    message(">>>>>> Building for APPLE")
+else()
+    message(">>>>>> Building for Linux")
+    link_libraries("gfortran")
 endif()
 
-if(NOT LAPACK_LIB)
-    message(FATAL_ERROR "LAPACK library not found")
-endif()
-
-find_library(BLAS_LIB blas REQUIRED)
+# static linking preferred here:
+find_library(BLAS_LIB libblas.a blas REQUIRED)
 if(BLAS_LIB)
-    message("Found BLAS: ${BLAS_LIB}")
+    message(">>>>>> BLAS: ${BLAS_LIB}")
+else()
+    message(FATAL_ERROR "BLAS library not found")
 endif()
 
-if(NOT BLAS_LIB)
-    message(FATAL_ERROR "BLAS library not found")
+find_library(LAPACK_LIB liblapack.a lapack REQUIRED)
+if(LAPACK_LIB)
+    message(">>>>>> LAPACK: ${LAPACK_LIB}")
+else()
+    message(FATAL_ERROR "LAPACK library not found")
 endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-if(NOT UNIX)
-    message(FATAL_ERROR "CMake File currently only setup to build on Linux and Mac")
-endif()
+#-------------------------- Graphical Libraries --------------------------------
 
-if(BUILD_PLAY OR BUILD_TESTS OR BUILD_TOOLS)
+if(MAKE_PLAY)
     if(UNIX AND NOT APPLE)
-        message("Building for Linux")
         find_package(OpenGL)
         find_package(GLEW)
         find_package(GLUT)
+        find_package(X11)
+        find_package(Xt)
         set(OPENGL_LIBS
             OpenGL::GL
             GLEW
             glut
+            X11
+            Xt
         )
     elseif(UNIX AND APPLE)
-        message("Building for MacOS")
         set(OPENGL_LIBS
             "-framework Accelerate"
             "-framework GLUT"
@@ -104,28 +108,30 @@ endif()
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(CXX_FLAGS "-Wno-deprecated-declarations")
-    set(FAST_FLAGS "-Wno-deprecated-declarations -ffast-math -funroll-loops")
-    set(DEBUG_FLAGS "-g3 -ggdb")
+    set(FAST_FLAGS -Wno-deprecated-declarations -ffast-math -funroll-loops)
+    set(DEBUG_FLAGS -g3 -ggdb)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-    set(CXX_FLAGS "-Wno-deprecated-declarations")
-    set(FAST_FLAGS "-Wno-deprecated-declarations -ffast-math -funroll-loops")
-    set(DEBUG_FLAGS "-g3 -ggdb")
+    set(FAST_FLAGS -Wno-deprecated-declarations -ffast-math -funroll-loops)
+    set(DEBUG_FLAGS -g3 -ggdb)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CXX_FLAGS "-fprofile-arcs -ftest-coverage")
-    set(FAST_FLAGS "-O3 -fno-tree-vectorize -ffast-math -funroll-loops -march=native -Wno-deprecated")
-    set(DEBUG_FLAGS "-g3 -ggdb -Wno-deprecated")
+    set(RUN_FLAGS -O1 -fno-tree-vectorize -ffast-math -funroll-loops -march=native)
+    set(FAST_FLAGS -O2 -fno-tree-vectorize -ffast-math -funroll-loops -march=native)
+    set(DEBUG_FLAGS -g3 -ggdb -Wno-deprecated)
+    set(COVERAGE_FLAGS -fprofile-arcs -ftest-coverage)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
-    set(CXX_FLAGS "-no-parallel -mkl=sequential -wd1224,161")
-    set(FAST_FLAGS "-O3 -mdynamic-no-pic -funroll-loops -fno-math-errno -mavx")
-    set(DEBUG_FLAGS "-g -Wall -no-pie -wd279,383,810,869,981,1418,1419,1572,2259")
+    add_compile_options(-no-parallel -mkl=sequential -wd1224,161)
+    set(FAST_FLAGS -O2 -mdynamic-no-pic -funroll-loops -fno-math-errno -mavx)
+    set(DEBUG_FLAGS -g -Wall -no-pie -wd279,383,810,869,981,1418,1419,1572,2259)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     message(FATAL_ERROR "Microsoft Visual Studio not supported for compilation")
 else()
-    message(FATAL_ERROR "Unrecognized compiler used: ${CMAKE_CXX_COMPILER_ID}")
+    message(FATAL_ERROR "Unrecognized compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
 
-file(COPY ${PROJECT_SOURCE_DIR}/cym DESTINATION ${PROJECT_BINARY_DIR})
-add_definitions("-finline-functions ${FAST_FLAGS}")
+#file(COPY ${PROJECT_SOURCE_DIR}/cym DESTINATION ${PROJECT_BINARY_DIR})
+
+add_compile_options(-Wno-deprecated-declarations)
+add_compile_options(-finline-functions)
+add_compile_options(${FAST_FLAGS})
 add_subdirectory("src")

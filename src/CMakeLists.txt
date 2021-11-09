@@ -3,15 +3,15 @@ add_subdirectory("base")
 add_subdirectory("math")
 add_subdirectory("sim")
 
-if (BUILD_PLAY)
+if (MAKE_PLAY)
     add_subdirectory("disp")
     add_subdirectory("play")
 endif()
 
-if (BUILD_TOOLS)
+if (MAKE_TOOLS)
     add_subdirectory("tools")
 endif()
 
-if (BUILD_TESTS)
+if (MAKE_TESTS)
     add_subdirectory("test")
 endif()

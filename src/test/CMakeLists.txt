@@ -39,6 +39,8 @@ foreach(TEST ${TEST_LIST})
     target_link_libraries(${TEST} PUBLIC "${TEST_LIBS}")
 endforeach()
 
+if(OPENGL_LIBS)
+
 set(TEST_GL_LIBS
     rasterizerGL
     "${DISP_LIB_TARGET}"
@@ -67,3 +69,5 @@ foreach(TEST ${GL_TEST_LIST})
     target_include_directories(${TEST} PUBLIC "${TEST_INCLUDES}")
     target_link_libraries(${TEST} PUBLIC "${TEST_GL_LIBS}")
 endforeach()
+
+endif()

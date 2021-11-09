@@ -31,7 +31,7 @@ target_include_directories(${MATH_LIB_TARGET} PUBLIC
     "${SRC_BASE_DIR}"
 )
 
-if(BUILD_TESTS)
+if(MAKE_TESTS)
     add_library(rasterizerGL "${SRC_MATH_DIR}/rasterizer.cc")
     target_compile_definitions(rasterizerGL PRIVATE -DDISPLAY)
     target_include_directories(rasterizerGL PUBLIC

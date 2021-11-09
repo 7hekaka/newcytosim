@@ -119,7 +119,7 @@ list(TRANSFORM SOURCES_CYTOSIM PREPEND "${SRC_SIM_DIR}/")
 list(TRANSFORM SOURCES_WITH_DISPLAY PREPEND "${SRC_SIM_DIR}/")
 
 
-if(BUILD_SIM)
+if(MAKE_SIM)
 
     add_library(${SIM_LIB_TARGET} STATIC ${SOURCES_CYTOSIM})
     target_include_directories(${SIM_LIB_TARGET} PUBLIC
@@ -143,11 +143,11 @@ if(BUILD_SIM)
         "${SRC_SIM_DIR}"
     )
     
-endif(BUILD_SIM)
+endif(MAKE_SIM)
 
 
 
-if(BUILD_PLAY)
+if(MAKE_PLAY)
 
     #set(SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_CYTOSIM})
     #list(REMOVE_ITEM SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_WITH_DISPLAY})
@@ -175,4 +175,4 @@ if(BUILD_PLAY)
         #message(${FILE} "will be compiled with -DDISPLAY")
     endforeach()
 
-endif(BUILD_PLAY)
+endif(MAKE_PLAY)

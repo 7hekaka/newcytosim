@@ -6,7 +6,6 @@ set(TOOL_INCLUDES
     "${SRC_MATH_DIR}"
     "${SRC_BASE_DIR}"
     "${SRC_SIM_ALL_DIR}"
-    "${SRC_DISP_DIR}"
     "${SRC_PLAY_DIR}"
 )
 

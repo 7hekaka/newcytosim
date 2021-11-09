@@ -1,0 +1,67 @@
+# This file made by FJN Nov. 2021
+
+image: gcc
+
+make_sim:
+    stage: build
+    rules:
+      - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    before_script:
+      - apt update && apt -y install cmake autoconf libblas-dev liblapack-dev
+    script:
+      - mkdir build && cd build
+      - cmake --verbose -DMAKE_PLAY=OFF -DMAKE_TESTS=OFF ..
+      - make sim report reader sieve
+    artifacts:
+      paths:
+        - build/bin/sim
+        - build/bin/sieve
+        - build/bin/reader
+        - build/bin/report
+ 
+make_play:
+  stage: build
+  when: manual
+  before_script:
+    - apt update && apt -y install cmake autoconf libblas-dev liblapack-dev mesa-common-dev libglew-dev freeglut3-dev
+  script:
+    - mkdir build && cd build
+    - cmake -DMAKE_SIM=OFF -DMAKE_TOOLS=OFF ..
+    - make play
+  artifacts:
+    paths:
+      - build/bin/play
+  cache:
+    paths:
+      - /usr/lib/x86_64-linux-gnu/libglut*
+       
+# run test simulation using the binary built before
+test_sim:
+  stage: test
+  needs: ["make_sim"]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  before_script:
+    - ldd build/bin/sim || true
+  script:
+    - build/bin/sim help
+    - mkdir run && cd run
+    - cp ../cym/aster.cym config.cym
+    - ../build/bin/sim
+    - cd ..
+  artifacts:
+    paths:
+      - run/
+
+# make image using Cytosim's run done before
+test_play:
+  stage: test
+  needs: ["make_play"]
+  when: manual
+  before_script:
+    - apt update && apt -y install mesa-common-dev
+  script:
+    - build/bin/play run image.tga frame=100
+  artifacts:
+    paths:
+      - run/image.tga
