@@ -12,13 +12,12 @@ set(TEST_LIBS
     Threads::Threads
     "${MATH_LIB_TARGET}"
     "${BASE_LIB_TARGET}"
-    "${OPENGL_LIBS}"
 )
 
 set(TEST_LIST
     #"test" # Test is a reserved word in CMake 3.10.x
     "test_blas"
-    "test_glos"
+    "test_glossary"
     "test_random"
     "test_quaternion"
     "test_simd"

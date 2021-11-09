@@ -83,19 +83,13 @@ endif()
 if(BUILD_PLAY OR BUILD_TESTS OR BUILD_TOOLS)
     if(UNIX AND NOT APPLE)
         message("Building for Linux")
-        find_package(GLUT)
         find_package(OpenGL)
-        find_package(GLU)
-        find_package(Xt)
-        find_package(X11)
         find_package(GLEW)
+        find_package(GLUT)
         set(OPENGL_LIBS
-            glut
             OpenGL::GL
-            GLU
-            Xt
-            X11
             GLEW
+            glut
         )
     elseif(UNIX AND APPLE)
         message("Building for MacOS")

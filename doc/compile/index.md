@@ -157,7 +157,7 @@ Ensure that no other line changes the value of `LIBDIR`. For example, this one i
 
 #### Check if it can read a configuration file:
 
-	make test_glos
+	make test_glossary
 
 #### At this stage, you can attempt to compile `sim`:
 

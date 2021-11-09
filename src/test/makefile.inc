@@ -1,7 +1,7 @@
 # Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 
-TESTS:=test_bits test_gillespie test_random test_math test_glos\
+TESTS:=test_bits test_gillespie test_random test_math test_glossary\
        test_xpttrs test_xtbsv test_quaternion test_rigidity test_project\
        test_ortho test_matrix test_thread test_blas test_simd test_solver
 
@@ -87,10 +87,10 @@ test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o spa
 	$(DONE)
 vpath test_matrix bin
 
-test_glos: test_glos.cc glossary.o filepath.o tokenizer.o stream_func.o exceptions.o backtrace.o print_color.o | bin
+test_glossary: test_glossary.cc glossary.o filepath.o tokenizer.o stream_func.o exceptions.o backtrace.o print_color.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
-vpath test_glos bin
+vpath test_glossary bin
 
 test_quartic: test_quartic.cc quartic_solver.o random.o SFMT.o backtrace.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@

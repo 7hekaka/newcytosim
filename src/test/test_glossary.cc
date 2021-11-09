@@ -1,11 +1,7 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "exceptions.h"
 #include "glossary.h"
-
-int i = 0;
-float f = 0;
-std::string s;
 
 
 int main(int argc, char* argv[])
@@ -17,11 +13,14 @@ int main(int argc, char* argv[])
 
     try {
         
+        int i = 0;
+        float f = 0;
+        std::string s;
+        
         // read file if provided on command line:
         // the file name is recognized by its extension
-        std::string str;
-        if ( arg.set(str, ".cym") )
-            arg.read_file(str);
+        if ( arg.set(s, ".cym") )
+            arg.read_file(s);
         
         // print content of Glossary:
         printf("%lu keys:\n", arg.num_keys());
