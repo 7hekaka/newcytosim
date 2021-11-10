@@ -2,8 +2,14 @@
 
 #include "iowrapper.h"
 #include "exceptions.h"
-#include "byteswap.h"
 
+#if 0
+#  include "byteswap.h"
+#else
+template<typename T> static inline T byteswap16(T& x) { return __builtin_bswap16(x); }
+template<typename T> static inline T byteswap32(T& x) { return __builtin_bswap32(x); }
+template<typename T> static inline T byteswap64(T& x) { return __builtin_bswap64(x); }
+#endif
 
 /// check the size of some types that are baked in the code
 static void sanityCheck()
@@ -65,7 +71,7 @@ int16_t Inputter::readInt16()
     if ( 1 != fread(&v, 2, 1, mFile) )
         throw InvalidIO("readInt16() failed");
     if ( binary_ == 2 )
-        v = byteswap(v);
+        v = byteswap16(v);
     return v;
 }
 
@@ -79,7 +85,7 @@ int32_t Inputter::readInt32()
     if ( 1 != fread(&v, 4, 1, mFile) )
         throw InvalidIO("readInt32() failed");
     if ( binary_ == 2 )
-        v = byteswap(v);
+        v = byteswap32(v);
     return v;
 }
 
@@ -108,7 +114,7 @@ uint16_t Inputter::readUInt16bin()
     if ( 1 != fread(&v, 2, 1, mFile) )
         throw InvalidIO("readUInt16() failed");
     if ( binary_ == 2 )
-        v = byteswap(v);
+        v = byteswap16(v);
     return v;
 }
 
@@ -122,7 +128,7 @@ uint16_t Inputter::readUInt16()
     if ( 1 != fread(&v, 2, 1, mFile) )
         throw InvalidIO("readUInt16() failed");
     if ( binary_ == 2 )
-        v = byteswap(v);
+        v = byteswap16(v);
     return v;
 }
 
@@ -133,7 +139,7 @@ uint32_t Inputter::readUInt32bin()
     if ( 1 != fread(&v, 4, 1, mFile) )
         throw InvalidIO("readUInt32() failed");
     if ( binary_ == 2 )
-        v = byteswap(v);
+        v = byteswap32(v);
     return v;
 }
 
@@ -147,7 +153,7 @@ uint32_t Inputter::readUInt32()
     if ( 1 != fread(&v, 4, 1, mFile) )
         throw InvalidIO("readUInt32() failed");
     if ( binary_ == 2 )
-        v = byteswap(v);
+        v = byteswap32(v);
     return v;
 }
 
@@ -161,7 +167,7 @@ uint64_t Inputter::readUInt64()
     if ( 1 != fread(&v, 8, 1, mFile) )
         throw InvalidIO("readUInt64() failed");
     if ( binary_ == 2 )
-        v = byteswap(v);
+        v = byteswap64(v);
     return v;
 }
 
@@ -174,7 +180,7 @@ float Inputter::readFixed()
         if ( 1 != fread(&i, 2, 1, mFile) )
             throw InvalidIO("readFixed() failed");
         if ( binary_ == 2 )
-            i = byteswap(i);
+            i = byteswap16(i);
         constexpr float F = 1.f / 65535.f;
         return float(i) * F;
     }
@@ -196,7 +202,7 @@ float Inputter::readAngle()
         if ( 1 != fread(&i, 2, 1, mFile) )
             throw InvalidIO("readAngle() failed");
         if ( binary_ == 2 )
-            i = byteswap(i);
+            i = byteswap16(i);
         return float(i) * 0x1p-10;
     }
     else
@@ -217,7 +223,7 @@ float Inputter::readPositiveAngle()
         if ( 1 != fread(&i, 2, 1, mFile) )
             throw InvalidIO("readPositiveAngle() failed");
         if ( binary_ == 2 )
-            i = byteswap(i);
+            i = byteswap16(i);
         return float(i) * 0x1p-11;
     }
     else
@@ -238,7 +244,7 @@ float Inputter::readFloat()
         if ( 1 != fread(&v, 4, 1, mFile) )
             throw InvalidIO("readFloat() failed");
         if ( binary_ == 2 )
-            v = byteswap(v);
+            v = byteswap32(v);
     }
     else
     {
@@ -257,7 +263,7 @@ double Inputter::readDouble()
         if ( 1 != fread(&v, 8, 1, mFile) )
             throw InvalidIO("readDouble() failed");
         if ( binary_ == 2 )
-            v = byteswap(v);
+            v = byteswap64(v);
     }
     else
     {
@@ -272,14 +278,14 @@ double Inputter::readDouble()
  This will read `vecsize_` floats, and set `dim` values in ptr[], filling in with zeros.
  The default vector size can be changed by calling `vectorSize(INT)`
  */
-void Inputter::readFloats(float ptr[], const size_t dim)
+void Inputter::readFloats(float flt[], const size_t dim)
 {
     size_t stop = std::min(vecsize_, dim);
     size_t d = 0;
     while ( d < stop )
-        ptr[d++] = readFloat();
+        flt[d++] = readFloat();
     while ( d < dim )
-        ptr[d++] = 0.0f;
+        flt[d++] = 0.0f;
     for ( d = stop; d < vecsize_; ++d )
         readFloat();
 }
@@ -304,25 +310,25 @@ void Inputter::readFloats(double ptr[], const size_t dim)
 /**
 This will read `n * vecsize_` floats, and store `n * dim` values in ptr[].
 */
-void Inputter::readFloats(const size_t cnt, float ptr[], const size_t dim)
+void Inputter::readFloats(const size_t cnt, float flt[], const size_t dim)
 {
     if ( dim < vecsize_ || ! binary_ )
     {
         // read values sequentially
         for ( size_t i = 0; i < cnt ; ++i )
-            readFloats(ptr+dim*i, dim);
+            readFloats(flt+dim*i, dim);
         return;
     }
 
     // read all values in one call to fread()
     size_t n = cnt * vecsize_;
-    if ( n != fread(ptr, 4, n, mFile) )
+    if ( n != fread(flt, 4, n, mFile) )
         throw InvalidIO("readFloats(D) failed");
 
     if ( binary_ == 2 )
     {
         for ( size_t i = 0; i < n; ++i )
-            ptr[i] = byteswap(ptr[i]);
+            flt[i] = byteswap32(flt[i]);
     }
     if ( vecsize_ < dim )
     {
@@ -332,9 +338,9 @@ void Inputter::readFloats(const size_t cnt, float ptr[], const size_t dim)
         {
             size_t i = dim;
             while ( i-- > vecsize_ )
-                ptr[u*dim+i] = 0.f;
+                flt[u*dim+i] = 0.f;
             while ( i-- > 0 )
-                ptr[u*dim+i] = ptr[u*vecsize_+i];
+                flt[u*dim+i] = flt[u*vecsize_+i];
         }
     }
 }
