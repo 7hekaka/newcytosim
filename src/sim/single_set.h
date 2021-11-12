@@ -168,7 +168,7 @@ public:
     void prepare(PropertyList const& properties);
     
     /// Monte-Carlo step
-    void step();
+    void step(bool);
     
     /// cleanup at end of simulation period
     void relax() { uniRelax(); }

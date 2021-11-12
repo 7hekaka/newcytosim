@@ -69,7 +69,7 @@ singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
     parser_ = nullptr;
     primed_ = 0;
 #if POOL_HAND_ATTACHMENT
-    dontAttach = 0;
+    skipAttach = 0;
 #endif
     autoPrecond = 0;
     autoCounter = 0;

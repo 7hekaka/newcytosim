@@ -55,7 +55,7 @@ inline static void step_singles(Single * obj, bool odd)
 }
 
 
-void SingleSet::step()
+void SingleSet::step(bool doAttach)
 {
     /*
      ATTENTION: we have multiple lists, and Objects are automatically transferred
@@ -79,7 +79,7 @@ void SingleSet::step()
         uniAttach(simul_.fibers);
         step_singles<&Single::stepF>(rest);
     }
-    else
+    else if ( doAttach )
     {
         step_singles<&Single::stepF>(fHead, fOdd);
     }

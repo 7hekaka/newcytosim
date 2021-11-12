@@ -59,7 +59,7 @@ public:
     
 #if POOL_HAND_ATTACHMENT
     /// flag to authorize Hand's attachment
-    unsigned char     dontAttach;
+    unsigned int skipAttach;
 #endif
     
 private:

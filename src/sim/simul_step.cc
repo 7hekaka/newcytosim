@@ -134,14 +134,14 @@ void Simul::step()
     //printf("     ::steps    %16llu\n", (timer()-rdt)>>5); rdt = timer();
     
     // if no Hands are present, we can skip attachment
-    int doAttach = singles.size() + couples.size();
+    int hasHands = singles.size() + couples.size();
     
 #if POOL_HAND_ATTACHMENT
-    dontAttach = ( dontAttach + 1 ) % POOL_HAND_ATTACHMENT;
+    skipAttach = ( skipAttach + 1 ) % POOL_HAND_ATTACHMENT;
     
-    if ( doAttach && !dontAttach )
+    if ( hasHands && !skipAttach )
 #else
-    if ( doAttach )
+    if ( hasHands )
 #endif
     {
         // calculate grid range from Hand's binding range:
@@ -176,7 +176,11 @@ void Simul::step()
     
     // step Hand-containing objects, giving them a possibility to attach Fibers:
     couples.step();
-    singles.step();
+#if POOL_HAND_ATTACHMENT
+    singles.step(!skipAttach);
+#else
+    singles.step(true);
+#endif
     //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
 }
 
