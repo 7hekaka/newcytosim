@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2021
-# This is PRECONFIG version 1.44, last modified on 6.10.2021
+# This is PRECONFIG version 1.45, last modified on 15.11.2021
 
 """
 # SYNOPSIS
@@ -221,9 +221,9 @@ except ImportError:
 
 #-------------------------------------------------------------------------------
 
-__VERSION__="1.44"
+__VERSION__="1.45"
 
-__DATE__ ="6.10.2021"
+__DATE__ ="15.11.2021"
 
 # code snippets are surrounded by double square brackets:
 CODE = '['
@@ -331,23 +331,30 @@ class Preconfig:
         # name of current input file being processed (used for error reporting)
         self.template = ''
     
-    def evaluate(self, arg):
+    def evaluate(self, code, verbose=1):
         """ Evaluate `arg` and return result """
-        res = eval(arg, GLOBALS, self.locals)
+        try:
+            res = eval(code, GLOBALS, self.locals)
+        except NameError as e:
+            sys.stderr.write("\033[95m")
+            sys.stderr.write("Warning: %s in `%s'\n" % (e.message, code))
+            sys.stderr.write("\033[0m")
+            return code
         if not isinstance(res, str):
             try:
                 res = list(res)
             except Exception:
                 pass
-        self.out.write("|%50s --> %s\n" % (arg, str(res)) )
-        #print("   evaluate("+arg+") = "+str(res))
+        if verbose:
+            self.out.write("|%50s --> %s\n" % (code, str(res)) )
         return res
     
     def define(self, key, code):
         """ Define a variable 'key' by executing 'code' """
-        #print("define(%s) with key `%s`" % (code, key) )
-        exec(code, GLOBALS, self.locals)  #self.locals[key] = v
-        res = self.locals[key]
+        #exec(code, GLOBALS, self.locals)
+        #res = self.locals[key]
+        res = self.evaluate(code, 0)
+        #self.locals[key] = v
         self.out.write("|%50s <-- %s\n" % (key, repr(res)) )
         return res
     
@@ -384,33 +391,26 @@ class Preconfig:
             else:
                 # interpret command:
                 key, stuff = try_assignment(code)
+                vals = code
+                if key:
+                    vals = self.define(key, stuff)
+                else:
+                    vals = self.evaluate(code)
                 try:
-                    vals = code
-                    if key:
-                        vals = self.define(key, code)
-                    else:
-                        vals = self.evaluate(code)
-                    try:
-                        # use 'pop()' to probe if multiple values were specified...
-                        # puting last value aside for later:
-                        val = vals.pop()
-                        ipos = file.tell()
-                        for v in vals:
-                            if key:
-                                self.locals[key] = v
-                                self.process(file, output)
-                            else:
-                                self.process(file, output+str(v))
-                            file.seek(ipos)
-                    except (AttributeError, IndexError):
-                        # a single value was specified:
-                        val = vals
-                except Exception as e:
-                    sys.stderr.write("\033[95m")
-                    sys.stderr.write("Warning: %s in `%s'\n" % (str(e), code))
-                    sys.stderr.write("\033[0m")
-                    val = block
-                    key = ''
+                    # use 'pop()' to probe if multiple values were specified...
+                    # setting last value aside for later:
+                    val = vals.pop()
+                    ipos = file.tell()
+                    for v in vals:
+                        if key:
+                            self.locals[key] = v
+                            self.process(file, output)
+                        else:
+                            self.process(file, output+str(v))
+                        file.seek(ipos)
+                except (AttributeError, IndexError):
+                    # a single value was specified:
+                    val = vals
             # handle remaining value:
             if key:
                 self.locals[key] = val
@@ -429,14 +429,16 @@ class Preconfig:
         """
         insert the number before the first '.' on the pattern
         """
-        [main, ext] = os.path.basename(name).split('.', 1)
-        ext, drop = os.path.splitext(ext)
-        res = main + '%0' + repr(self.nb_digits) + 'i' + '.' + ext
+        name = os.path.basename(name)
+        [main, ext] = os.path.splitext(name)
+        if ext == '.tpl':
+            main, ext = main.split('.', 1)
+            ext = '.' + ext
+        self.pattern = main + '%0' + repr(self.nb_digits) + 'i' + ext
         if os.path.isdir(path):
-            res = os.path.join(path, res)
+            self.pattern = os.path.join(path, self.pattern)
         elif path:
             self.file_name = path
-        self.pattern = res
 
     def next_file_name(self):
         """
