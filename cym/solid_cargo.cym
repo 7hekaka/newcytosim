@@ -1,0 +1,105 @@
+% A bead coated with Kinesins near a microtubule
+% Inspired by "Roles of motor on-rate and cargo mobility in intracellular transport" Bovyn et al. 2021
+% FJN in Aussois, 17.11.2021
+
+set simul system
+{
+    time_step = 0.0001
+    viscosity = 0.001
+    steric = 1, 100
+    display = ( point_value=0.010; style=3; size=1024,512; zoom=4 )
+}
+
+set space cell
+{
+    shape = capsule
+}
+
+set space trap
+{
+    shape = sphere
+}
+
+set fiber microtubule
+{
+    steric = 1, 0.025
+    rigidity = 10
+    segmentation = 0.25
+    display = ( color=white; width=2.5; )
+}
+
+set hand binder
+{
+    binding_rate = 10
+    binding_range = 0.1
+    unbinding_rate = 0
+    display = ( color=blue; size=3; )
+}
+
+set single anchor
+{
+    hand = binder
+    stiffness = 300
+    activity = fixed
+}
+
+
+set hand kinesin
+{
+    binding_rate = 100
+    binding_range = 0.100
+    unbinding_rate = 0
+    unbinding_force = 3
+    activity = walk
+    step_size = 0.008
+    unloaded_speed = 1
+    stall_force = 5
+    display = ( color=yellow, green; size=5; )
+}
+
+set single grafted
+{
+    hand = kinesin
+    length = 0.080
+    stiffness = 300
+}
+
+set solid particle
+{
+    steric = 1
+    confine = point, 1, trap
+    display = ( style=7; color=dark_gray )
+}
+
+new cell
+{
+    length = 10
+    radius = 3
+}
+
+new trap
+{
+    radius = 0
+}
+
+new particle
+{
+    sphere1 = 0 0 0, 0.5, 10 grafted
+    position = 0 0 0
+    orientation = none
+}
+
+new microtubule
+{
+    length = 5
+    position = 0 -0.5 0
+    direction = 1 0 0
+    attach1 = anchor, 0, minus_end
+    attach2 = anchor, 0, plus_end
+}
+
+run system
+{
+    nb_steps = 50000
+    nb_frames = 1000
+}

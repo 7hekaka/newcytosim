@@ -85,7 +85,7 @@ void Walker::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
-    // calculate displacement, dependent on the load along the desired direction of displacement
+    // evaluate displacement, given the load parallel to filament:
     real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
 
 #if NEW_VARIABLE_WALK
