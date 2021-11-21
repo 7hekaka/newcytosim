@@ -28,6 +28,8 @@ extern Modulo const* modulo;
 /** This is significantly faster on machine with the AVX instruction set */
 #define USE_MATRIX_BLOCK 1
 
+/// use Mecapoint::pos() instead of interpolating vPTS[]
+#define USE_GLOBAL_POSITION 0
 
 //------------------------------------------------------------------------------
 #pragma mark - Accessory functions
@@ -39,19 +41,25 @@ extern Modulo const* modulo;
 #endif
 
 
-/// true if any two values are equal
-inline bool any_equal(const size_t a, const size_t b,
-                      const size_t c)
+/// true if 'a' is equal to 'b' or 'c'
+inline bool any_equal(const size_t a, const size_t b, const size_t c)
 {
     return ( a == c ) | ( b == c );
 }
 
 
-/// true if any two values are equal
+/// true if 'a' is equal to 'b', 'c' or 'd'
 inline bool any_equal(const size_t a, const size_t b,
                       const size_t c, const size_t d)
 {
-    return ( a == c ) | ( a == d ) | ( b == c ) | ( b == d );
+    return ( a == b ) | ( a == c ) | ( a == d );
+}
+
+/// true if 'a' is equal to 'b', 'c', 'd' or 'e'
+inline bool any_equal(const size_t a, const size_t b, const size_t c,
+                      const size_t d, const size_t e)
+{
+    return ( a == b ) | ( a == c ) | ( a == d ) | ( a == e );
 }
 
 
@@ -388,7 +396,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     Vector da = ptA.diff();
@@ -461,7 +469,7 @@ void Meca::addTorqueExplicit(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     Vector da = ptA.diff();
@@ -1183,63 +1191,67 @@ void Meca::addTorque(Mecapoint const& ptA,
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Interpolation of positions
+#pragma mark - Linear Interpolation of Vectors
 //------------------------------------------------------------------------------
 
-
-Vector Meca::position1(const size_t inx) const
+static Vector interpolate1(const real vec[], const size_t inx)
 {
-    return Vector(vPTS+inx);
+    return Vector(vec+DIM*inx);
 }
 
-Vector Meca::position2(const size_t inx[2], const real coef[2]) const
+static Vector interpolate2(const real vec[], const size_t inx[2], real f0, real f1)
 {
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    return coef[0] * P0 + coef[1] * P1;
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    return f0 * P0 + f1 * P1 ;
 }
 
-
-Vector Meca::position3(const size_t inx[3], const real coef[3]) const
+static Vector interpolate3(const real vec[], const size_t inx[3], real f0, real f1, real f2)
 {
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + coef[2] * P2;
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    return ( f0 * P0 + f1 * P1 ) + f2 * P2;
 }
 
-
-Vector Meca::position4(const size_t inx[4], const real coef[4]) const
+static Vector interpolate4(const real vec[], const size_t inx[4], real f0, real f1, real f2, real f3)
 {
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    Vector P3(vPTS+inx[3]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 );
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    Vector P3(vec+DIM*inx[3]);
+    return ( f0 * P0 + f1 * P1 ) + ( f2 * P2 + f3 * P3 );
 }
 
-
-Vector Meca::position5(const size_t inx[5], const real coef[5]) const
+static Vector interpolate5(const real vec[], const size_t inx[5], real f0, real f1, real f2, real f3, real f4)
 {
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    Vector P3(vPTS+inx[3]);
-    Vector P4(vPTS+inx[4]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + coef[4] * P4;
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    Vector P3(vec+DIM*inx[3]);
+    Vector P4(vec+DIM*inx[4]);
+    return ( f0 * P0 + f1 * P1 ) + ( f2 * P2 + f3 * P3 ) + f4 * P4;
 }
 
-
-Vector Meca::position6(const size_t inx[6], const real coef[6]) const
+static Vector interpolate6(const real vec[], const size_t inx[6], real f0, real f1, real f2, real f3, real f4, real f5)
 {
-    Vector P0(vPTS+inx[0]);
-    Vector P1(vPTS+inx[1]);
-    Vector P2(vPTS+inx[2]);
-    Vector P3(vPTS+inx[3]);
-    Vector P4(vPTS+inx[4]);
-    Vector P5(vPTS+inx[5]);
-    return ( coef[0] * P0 + coef[1] * P1 ) + ( coef[2] * P2 + coef[3] * P3 ) + ( coef[4] * P4 + coef[5] * P5 );
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    Vector P3(vec+DIM*inx[3]);
+    Vector P4(vec+DIM*inx[4]);
+    Vector P5(vec+DIM*inx[5]);
+    return ( f0 * P0 + f1 * P1 ) + ( f2 * P2 + f3 * P3 ) + ( f4 * P4 + f5 * P5 );
 }
+
+/// Attention: this indices are already multiplied by DIM
+static Vector interpolateX(const real vec[], const size_t i0, real f0, size_t i1, real f1)
+{
+    Vector P0(vec+i0);
+    Vector P1(vec+i1);
+    return f0 * P0 + f1 * P1 ;
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Isotropic links between Mecables
@@ -1290,23 +1302,17 @@ void Meca::addLink(Mecapoint const& ptA,
 
     if ( modulo )
     {
-        const real ww[] = { -weight, weight };
-#if ( 1 )
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
-        if ( off.is_not_zero() )
-        {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-        }
+#if USE_GLOBAL_POSITION
+        Vector off = ptB.pos() - ptA.pos();
 #else
-        const size_t inx[] = { DIM*ii0, DIM*ii1 };
-        Vector off = modulo->offset(position2(inx, ww));
+        Vector off = interpolate1(vPTS, ii1) - interpolate1(vPTS, ii0);
+#endif
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            sub_base(DIM*ii0, off);
-            add_base(DIM*ii1, off);
+            add_base(DIM*ii0, off,-weight);
+            add_base(DIM*ii1, off, weight);
         }
-#endif
     }
     DRAW_LINK(ptA, ptA.pos(), ptB.pos());
 }
@@ -1331,33 +1337,40 @@ void Meca::addLink(Interpolation const& ptA,
     const size_t ii1 = ptA.matIndex2();
     const size_t ii2 = ptB.matIndex();
     
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
-
-    //coefficients to form B-A:
-    const real cc[] = { -ptA.coef0(), -ptA.coef1(),    1.0 };
-    const real ww[] = { weight*cc[0], weight*cc[1], weight };
     
-    sub_iso_diag(ii0, ww[0] * cc[0]);
-    sub_iso(ii1, ii0, ww[1] * cc[0]);
-    add_iso(ii2, ii0, ww[0]);         // since cc[2] == 1
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    add_iso(ii2, ii1, ww[1]);         // since cc[2] == 1
-    add_iso_diag(ii2, ww[2]);         // since cc[2] == 1
+    //coefficients to form B-A:
+    const real cc0 = -ptA.coef0();
+    const real cc1 = -ptA.coef1();
+    //const real cc2 = 1.0;
+    
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight;
+    
+    sub_iso_diag(ii0, ww0 * cc0);
+    sub_iso(ii1, ii0, ww1 * cc0);
+    add_iso(ii2, ii0, ww0);         // since cc2 == 1
+    sub_iso_diag(ii1, ww1 * cc1);
+    add_iso(ii2, ii1, ww1);         // since cc2 == 1
+    add_iso_diag(ii2, ww2);         // since cc2 == 1
  
     if ( modulo )
     {
-#if ( 1 )
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+#if USE_GLOBAL_POSITION
+        Vector off = ptB.pos() - ptA.pos();
 #else
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2 };
-        Vector off = modulo->offset(position3(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2 };
+        //Vector off = interpolate3(vPTS, inx, cc0, cc1, 1.0);
+        Vector off = interpolate2(vPTS, inx, cc0, cc1) + interpolate1(vPTS, ii2);
 #endif
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
         }
     }
     DRAW_LINK(ptA, ptA.pos(), ptB.pos());
@@ -1386,32 +1399,38 @@ void Meca::addLink(Mecapoint const& ptA,
     if ( any_equal(ii0, ii1, ii2) )
         return;
     
-    //coefficients to form B-A:
-    const real cc[] = {    -1.0,  ptB.coef0(),  ptB.coef1() };
-    const real ww[] = { -weight, weight*cc[1], weight*cc[2] };
+    //const real cc0 = -1.0;
+    const real cc1 = ptB.coef0();
+    const real cc2 = ptB.coef1();
     
-    add_iso_diag(ii0, ww[0]);  // since cc[0] == -1.0
-    add_iso(ii1, ii0, ww[1]);  // since cc[0] == -1.0
-    add_iso(ii2, ii0, ww[2]);  // since cc[0] == -1.0
+    const real ww0 = -weight;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
     
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
+    add_iso_diag(ii0, ww0);  // since cc0 == -1.0
+    add_iso(ii1, ii0, ww1);  // since cc0 == -1.0
+    add_iso(ii2, ii0, ww2);  // since cc0 == -1.0
     
-    sub_iso_diag(ii2, ww[2] * cc[2]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    
+    sub_iso_diag(ii2, ww2 * cc2);
   
     if ( modulo )
     {
-#if ( 1 )
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+#if USE_GLOBAL_POSITION
+        Vector off = ptB.pos() - ptA.pos();
 #else
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2 };
-        Vector off = modulo->offset(position3(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2 };
+        //Vector off = interpolate3(vPTS, inx, -1.0, cc1, cc2);
+        Vector off = interpolate2(vPTS, inx+1, cc1, cc2) - interpolate1(vPTS, ii0);
 #endif
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
         }
     }
     DRAW_LINK(ptB, ptB.pos(), ptA.pos());
@@ -1438,41 +1457,51 @@ void Meca::addLink(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
-    //coefficients to form B-A:
-    const real cc[] = { -ptA.coef0(), -ptA.coef1(),  ptB.coef0(),  ptB.coef1() };
-    const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3] };
+    const real cc0 = -ptA.coef0();
+    const real cc1 = -ptA.coef1();
+    const real cc2 = ptB.coef0();
+    const real cc3 = ptB.coef1();
     
-    sub_iso_diag(ii0, ww[0] * cc[0]);
-    sub_iso(ii1, ii0, ww[1] * cc[0]);
-    sub_iso(ii2, ii0, ww[2] * cc[0]);
-    sub_iso(ii3, ii0, ww[3] * cc[0]);
+    assert_small(cc0+cc1+cc2+cc3);
+
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
+    const real ww3 = weight * cc3;
     
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
-    sub_iso(ii3, ii1, ww[3] * cc[1]);
+    sub_iso_diag(ii0, ww0 * cc0);
+    sub_iso(ii1, ii0, ww1 * cc0);
+    sub_iso(ii2, ii0, ww2 * cc0);
+    sub_iso(ii3, ii0, ww3 * cc0);
     
-    sub_iso_diag(ii2, ww[2] * cc[2]);
-    sub_iso(ii3, ii2, ww[3] * cc[2]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    sub_iso(ii3, ii1, ww3 * cc1);
     
-    sub_iso_diag(ii3, ww[3] * cc[3]);
+    sub_iso_diag(ii2, ww2 * cc2);
+    sub_iso(ii3, ii2, ww3 * cc2);
+    
+    sub_iso_diag(ii3, ww3 * cc3);
     
     if ( modulo )
     {
-#if ( 1 )
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+#if USE_GLOBAL_POSITION
+        Vector off = ptB.pos() - ptA.pos();
 #else
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2, DIM*ii3 };
-        Vector off = modulo->offset(position4(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2, ii3 };
+        //Vector off = interpolate4(vPTS, inx, cc0, cc1, cc2, cc3);
+        Vector off = interpolate2(vPTS, inx+2, cc2, cc3) - interpolate2(vPTS, inx, cc0, cc1);
 #endif
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
-            add_base(DIM*ii3, off, ww[3]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
+            add_base(DIM*ii3, off, ww3);
         }
     }
     DRAW_LINK(ptA, ptA.pos(), ptB.pos());
@@ -1506,27 +1535,34 @@ void Meca::addLink1(Interpolation const& pti,
     if ( any_equal(ii0, ii1, ii2) )
         return;
     
-    const real cc[] = {    -1.0,  pti.coef0(),  pti.coef1() };
-    const real ww[] = { -weight, weight*cc[1], weight*cc[2] };
+    //const real cc0 = -1.0;
+    const real cc1 = pti.coef0();
+    const real cc2 = pti.coef1();
     
-    add_iso_diag(ii0, ww[0]); // since cc[0] == -1.0
-    add_iso(ii1, ii0, ww[1]);
-    add_iso(ii2, ii0, ww[2]);
+    const real ww0 = -weight;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
     
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
+    add_iso_diag(ii0, ww0); // since cc0 == -1.0
+    add_iso(ii1, ii0, ww1);
+    add_iso(ii2, ii0, ww2);
     
-    sub_iso_diag(ii2, ww[2] * cc[2]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    
+    sub_iso_diag(ii2, ww2 * cc2);
     
     if ( modulo )
     {
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2 };
-        Vector off = modulo->offset(position3(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2 };
+        //Vector off = interpolate3(vPTS, inx, -1.0, cc1, cc2);
+        Vector off = interpolate2(vPTS, inx+1, cc1, cc2) - interpolate1(vPTS, ii0);
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
         }
     }
 }
@@ -1557,29 +1593,36 @@ void Meca::addLink2(Mecapoint const& ptA,
     if ( any_equal(ii0, ii1, ii2) )
         return;
 
-    const real cc[] = {   -1.0,      coef[0],      coef[1] };
-    const real ww[] = {-weight, weight*cc[1], weight*cc[2] };
+    //const real cc0 = -1.0;
+    const real cc1 = coef[0];
+    const real cc2 = coef[1];
     
-    assert_small(coef[0]+coef[1]-1.0);
+    assert_small(cc1+cc2-1.0);
+
+    const real ww0 = -weight;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
     
-    add_iso_diag(ii0, ww[0]); // since cc[0] == -1.0
-    add_iso(ii1, ii0, ww[1]); // since cc[0] == -1.0
-    add_iso(ii2, ii0, ww[2]); // since cc[0] == -1.0
+    add_iso_diag(ii0, ww0); // since cc0 == -1.0
+    add_iso(ii1, ii0, ww1); // since cc0 == -1.0
+    add_iso(ii2, ii0, ww2); // since cc0 == -1.0
     
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
     
-    sub_iso_diag(ii2, ww[2] * cc[2]);
+    sub_iso_diag(ii2, ww2 * cc2);
     
     if ( modulo )
     {
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2 };
-        Vector off = modulo->offset(position3(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2 };
+        //Vector off = interpolate3(vPTS, inx, cc0, cc1, cc2);
+        Vector off = interpolate2(vPTS, inx+1, cc1, cc2) - interpolate1(vPTS, ii0);
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
         }
     }
 }
@@ -1607,35 +1650,44 @@ void Meca::addLink2(Interpolation const& pti,
     const size_t ii2 = pts[0];
     const size_t ii3 = pts[1];
     
-    const real cc[] = { -pti.coef0(), -pti.coef1(),      coef[0],      coef[1] };
-    const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3] };
-
-    assert_small(coef[0]+coef[1]-1.0);
+    const real cc0 = -pti.coef0();
+    const real cc1 = -pti.coef1();
+    const real cc2 = coef[0];
+    const real cc3 = coef[1];
     
-    sub_iso_diag(ii0, ww[0] * cc[0]);
-    sub_iso(ii1, ii0, ww[1] * cc[0]);
-    sub_iso(ii2, ii0, ww[2] * cc[0]);
-    sub_iso(ii3, ii0, ww[3] * cc[0]);
+    assert_small(cc2+cc3-1.0);
 
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
-    sub_iso(ii3, ii1, ww[3] * cc[1]);
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
+    const real ww3 = weight * cc3;
+    
+    sub_iso_diag(ii0, ww0 * cc0);
+    sub_iso(ii1, ii0, ww1 * cc0);
+    sub_iso(ii2, ii0, ww2 * cc0);
+    sub_iso(ii3, ii0, ww3 * cc0);
 
-    sub_iso_diag(ii2, ww[2] * cc[2]);
-    sub_iso(ii3, ii2, ww[3] * cc[2]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    sub_iso(ii3, ii1, ww3 * cc1);
 
-    sub_iso_diag(ii3, ww[3] * cc[3]);
+    sub_iso_diag(ii2, ww2 * cc2);
+    sub_iso(ii3, ii2, ww3 * cc2);
+
+    sub_iso_diag(ii3, ww3 * cc3);
     
     if ( modulo )
     {
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2, DIM*ii3 };
-        Vector off = modulo->offset(position4(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2, ii3 };
+        //Vector off = interpolate4(vPTS, inx, cc0, cc1, cc2, cc3);
+        Vector off = interpolate2(vPTS, inx+2, cc2, cc3) + interpolate2(vPTS, inx, cc0, cc1);
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
-            add_base(DIM*ii3, off, ww[3]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
+            add_base(DIM*ii3, off, ww3);
         }
     }
 }
@@ -1663,36 +1715,45 @@ void Meca::addLink3(Mecapoint const& ptA,
     const size_t ii1 = pts[0];
     const size_t ii2 = pts[1];
     const size_t ii3 = pts[2];
+    
+    const real cc0 = -1.0;
+    const real cc1 = coef[0];
+    const real cc2 = coef[1];
+    const real cc3 = coef[2];
+    
+    assert_small(cc1+cc2+cc3-1.0);
 
-    const real cc[] = {   -1.0,      coef[0],      coef[1],      coef[2] };
-    const real ww[] = {-weight, weight*cc[1], weight*cc[2], weight*cc[3] };
-
-    assert_small(coef[0]+coef[1]+coef[2]-1.0);
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
+    const real ww3 = weight * cc3;
     
-    add_iso_diag(ii0, ww[0]);  // since cc[0] = -1
-    add_iso(ii1, ii0, ww[1]);
-    add_iso(ii2, ii0, ww[2]);
-    add_iso(ii3, ii0, ww[3]);
+    add_iso_diag(ii0, ww0);  // since cc0 = -1
+    add_iso(ii1, ii0, ww1);
+    add_iso(ii2, ii0, ww2);
+    add_iso(ii3, ii0, ww3);
     
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
-    sub_iso(ii3, ii1, ww[3] * cc[1]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    sub_iso(ii3, ii1, ww3 * cc1);
     
-    sub_iso_diag(ii2, ww[2] * cc[2]);
-    sub_iso(ii3, ii2, ww[3] * cc[2]);
+    sub_iso_diag(ii2, ww2 * cc2);
+    sub_iso(ii3, ii2, ww3 * cc2);
     
-    sub_iso_diag(ii3, ww[3] * cc[3]);
+    sub_iso_diag(ii3, ww3 * cc3);
     
     if ( modulo )
     {
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2, DIM*ii3 };
-        Vector off = modulo->offset(position4(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2, ii3 };
+        //Vector off = interpolate4(vPTS, inx, cc0, cc1, cc2, cc3);
+        Vector off = interpolate3(vPTS, inx+1, cc1, cc2, cc3) - interpolate1(vPTS, ii0);
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
-            add_base(DIM*ii3, off, ww[3]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
+            add_base(DIM*ii3, off, ww3);
         }
     }
 }
@@ -1721,46 +1782,58 @@ void Meca::addLink3(Interpolation const& pti,
     const size_t ii2 = pts[0];
     const size_t ii3 = pts[1];
     const size_t ii4 = pts[2];
+    
+    const real cc0 = -pti.coef0();
+    const real cc1 = -pti.coef1();
+    const real cc2 = coef[0];
+    const real cc3 = coef[1];
+    const real cc4 = coef[2];
+    
+    assert_small(cc2+cc3+cc4-1.0);
 
-    const real cc[] = { -pti.coef0(), -pti.coef1(),      coef[0],      coef[1],      coef[2] };
-    const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3], weight*cc[4] };
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
+    const real ww3 = weight * cc3;
+    const real ww4 = weight * cc4;
     
-    assert_small(coef[0]+coef[1]+coef[2]-1.0);
+    sub_iso_diag(ii0, ww0 * cc0);
+    sub_iso(ii1, ii0, ww1 * cc0);
+    sub_iso(ii2, ii0, ww2 * cc0);
+    sub_iso(ii3, ii0, ww3 * cc0);
+    sub_iso(ii4, ii0, ww4 * cc0);
     
-    sub_iso_diag(ii0, ww[0] * cc[0]);
-    sub_iso(ii1, ii0, ww[1] * cc[0]);
-    sub_iso(ii2, ii0, ww[2] * cc[0]);
-    sub_iso(ii3, ii0, ww[3] * cc[0]);
-    sub_iso(ii4, ii0, ww[4] * cc[0]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    sub_iso(ii3, ii1, ww3 * cc1);
+    sub_iso(ii4, ii1, ww4 * cc1);
     
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
-    sub_iso(ii3, ii1, ww[3] * cc[1]);
-    sub_iso(ii4, ii1, ww[4] * cc[1]);
+    sub_iso_diag(ii2, ww2 * cc2);
+    sub_iso(ii3, ii2, ww3 * cc2);
+    sub_iso(ii4, ii2, ww4 * cc2);
     
-    sub_iso_diag(ii2, ww[2] * cc[2]);
-    sub_iso(ii3, ii2, ww[3] * cc[2]);
-    sub_iso(ii4, ii2, ww[4] * cc[2]);
+    sub_iso_diag(ii3, ww3 * cc3);
+    sub_iso(ii4, ii3, ww4 * cc3);
     
-    sub_iso_diag(ii3, ww[3] * cc[3]);
-    sub_iso(ii4, ii3, ww[4] * cc[3]);
-    
-    sub_iso_diag(ii4, ww[4] * cc[4]);
+    sub_iso_diag(ii4, ww4 * cc4);
     
     if ( modulo )
     {
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2, DIM*ii3, DIM*ii4 };
-        Vector off = modulo->offset(position5(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2, ii3, ii4 };
+        //Vector off = interpolate5(vPTS, inx, cc0, cc1, cc2, cc3, cc4);
+        Vector off = interpolate3(vPTS, inx+2, cc2, cc3, cc4) + interpolate2(vPTS, inx, cc0, cc1);
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
-            add_base(DIM*ii3, off, ww[3]);
-            add_base(DIM*ii4, off, ww[4]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
+            add_base(DIM*ii3, off, ww3);
+            add_base(DIM*ii4, off, ww4);
         }
     }
 }
+
 
 /**
  Link vertex (A) and interpolated point (B)
@@ -1786,42 +1859,53 @@ void Meca::addLink4(Mecapoint const& ptA,
     const size_t ii3 = pts[2];
     const size_t ii4 = pts[3];
 
-    const real cc[] = {   -1.0,      coef[0],      coef[1],      coef[2],      coef[3] };
-    const real ww[] = {-weight, weight*cc[1], weight*cc[2], weight*cc[3], weight*cc[4] };
+    const real cc0 = -1.0;
+    const real cc1 = coef[0];
+    const real cc2 = coef[1];
+    const real cc3 = coef[2];
+    const real cc4 = coef[3];
     
-    assert_small(coef[0]+coef[1]+coef[2]+coef[3]-1.0);
+    assert_small(cc1+cc2+cc3+cc4-1.0);
+
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
+    const real ww3 = weight * cc3;
+    const real ww4 = weight * cc4;
     
-    add_iso_diag(ii0, ww[0]);  // since cc[0] = -1
-    add_iso(ii1, ii0, ww[1]);
-    add_iso(ii2, ii0, ww[2]);
-    add_iso(ii3, ii0, ww[3]);
-    add_iso(ii4, ii0, ww[4]);
+    add_iso_diag(ii0, ww0);  // since cc0 = -1
+    add_iso(ii1, ii0, ww1);
+    add_iso(ii2, ii0, ww2);
+    add_iso(ii3, ii0, ww3);
+    add_iso(ii4, ii0, ww4);
     
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
-    sub_iso(ii3, ii1, ww[3] * cc[1]);
-    sub_iso(ii4, ii1, ww[4] * cc[1]);
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    sub_iso(ii3, ii1, ww3 * cc1);
+    sub_iso(ii4, ii1, ww4 * cc1);
     
-    sub_iso_diag(ii2, ww[2] * cc[2]);
-    sub_iso(ii3, ii2, ww[3] * cc[2]);
-    sub_iso(ii4, ii2, ww[4] * cc[2]);
+    sub_iso_diag(ii2, ww2 * cc2);
+    sub_iso(ii3, ii2, ww3 * cc2);
+    sub_iso(ii4, ii2, ww4 * cc2);
     
-    sub_iso_diag(ii3, ww[3] * cc[3]);
-    sub_iso(ii4, ii3, ww[4] * cc[3]);
+    sub_iso_diag(ii3, ww3 * cc3);
+    sub_iso(ii4, ii3, ww4 * cc3);
     
-    sub_iso_diag(ii4, ww[4] * cc[4]);
+    sub_iso_diag(ii4, ww4 * cc4);
     
     if ( modulo )
     {
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2, DIM*ii3, DIM*ii4 };
-        Vector off = modulo->offset(position5(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2, ii3, ii4 };
+        //Vector off = interpolate5(vPTS, inx, cc0, cc1, cc2, cc3, cc4);
+        Vector off = interpolate4(vPTS, inx+1, cc1, cc2, cc3, cc4) - interpolate1(vPTS, ii0);
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
-            add_base(DIM*ii3, off, ww[3]);
-            add_base(DIM*ii4, off, ww[4]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
+            add_base(DIM*ii3, off, ww3);
+            add_base(DIM*ii4, off, ww4);
         }
     }
 }
@@ -1852,50 +1936,63 @@ void Meca::addLink4(Interpolation const& pti,
     const size_t ii4 = pts[2];
     const size_t ii5 = pts[3];
 
-    const real cc[] = { -pti.coef0(), -pti.coef1(),      coef[0],      coef[1],      coef[2],      coef[3] };
-    const real ww[] = { weight*cc[0], weight*cc[1], weight*cc[2], weight*cc[3], weight*cc[4], weight*cc[5] };
+    const real cc0 = -pti.coef0();
+    const real cc1 = -pti.coef1();
+    const real cc2 = coef[0];
+    const real cc3 = coef[1];
+    const real cc4 = coef[2];
+    const real cc5 = coef[3];
     
-    assert_small(coef[0]+coef[1]+coef[2]+coef[3]-1.0);
-    
-    sub_iso_diag(ii0, ww[0] * cc[0]);
-    sub_iso(ii1, ii0, ww[1] * cc[0]);
-    sub_iso(ii2, ii0, ww[2] * cc[0]);
-    sub_iso(ii3, ii0, ww[3] * cc[0]);
-    sub_iso(ii4, ii0, ww[4] * cc[0]);
-    sub_iso(ii5, ii0, ww[5] * cc[0]);
-    
-    sub_iso_diag(ii1, ww[1] * cc[1]);
-    sub_iso(ii2, ii1, ww[2] * cc[1]);
-    sub_iso(ii3, ii1, ww[3] * cc[1]);
-    sub_iso(ii4, ii1, ww[4] * cc[1]);
-    sub_iso(ii5, ii1, ww[5] * cc[1]);
-    
-    sub_iso_diag(ii2, ww[2] * cc[2]);
-    sub_iso(ii3, ii2, ww[3] * cc[2]);
-    sub_iso(ii4, ii2, ww[4] * cc[2]);
-    sub_iso(ii5, ii2, ww[5] * cc[2]);
-    
-    sub_iso_diag(ii3, ww[3] * cc[3]);
-    sub_iso(ii4, ii3, ww[4] * cc[3]);
-    sub_iso(ii5, ii3, ww[5] * cc[3]);
-    
-    sub_iso_diag(ii4, ww[4] * cc[4]);
-    sub_iso(ii5, ii4, ww[5] * cc[4]);
+    assert_small(cc2+cc3+cc4+cc5-1.0);
 
-    sub_iso_diag(ii5, ww[5] * cc[5]);
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
+    const real ww2 = weight * cc2;
+    const real ww3 = weight * cc3;
+    const real ww4 = weight * cc4;
+    const real ww5 = weight * cc5;
+    
+    sub_iso_diag(ii0, ww0 * cc0);
+    sub_iso(ii1, ii0, ww1 * cc0);
+    sub_iso(ii2, ii0, ww2 * cc0);
+    sub_iso(ii3, ii0, ww3 * cc0);
+    sub_iso(ii4, ii0, ww4 * cc0);
+    sub_iso(ii5, ii0, ww5 * cc0);
+    
+    sub_iso_diag(ii1, ww1 * cc1);
+    sub_iso(ii2, ii1, ww2 * cc1);
+    sub_iso(ii3, ii1, ww3 * cc1);
+    sub_iso(ii4, ii1, ww4 * cc1);
+    sub_iso(ii5, ii1, ww5 * cc1);
+    
+    sub_iso_diag(ii2, ww2 * cc2);
+    sub_iso(ii3, ii2, ww3 * cc2);
+    sub_iso(ii4, ii2, ww4 * cc2);
+    sub_iso(ii5, ii2, ww5 * cc2);
+    
+    sub_iso_diag(ii3, ww3 * cc3);
+    sub_iso(ii4, ii3, ww4 * cc3);
+    sub_iso(ii5, ii3, ww5 * cc3);
+    
+    sub_iso_diag(ii4, ww4 * cc4);
+    sub_iso(ii5, ii4, ww5 * cc4);
+
+    sub_iso_diag(ii5, ww5 * cc5);
 
     if ( modulo )
     {
-        const size_t inx[] = { DIM*ii0, DIM*ii1, DIM*ii2, DIM*ii3, DIM*ii4, DIM*ii5 };
-        Vector off = modulo->offset(position6(inx, cc));
+        const size_t inx[] = { ii0, ii1, ii2, ii3, ii4, ii5 };
+        //Vector off = interpolate6(vPTS, inx, cc0, cc1, cc2, cc3, cc4, cc5);
+        Vector off = interpolate4(vPTS, inx+2, cc2, cc3, cc4, cc5) + interpolate2(vPTS, inx, cc0, cc1);
+        off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
-            add_base(DIM*ii0, off, ww[0]);
-            add_base(DIM*ii1, off, ww[1]);
-            add_base(DIM*ii2, off, ww[2]);
-            add_base(DIM*ii3, off, ww[3]);
-            add_base(DIM*ii4, off, ww[4]);
-            add_base(DIM*ii5, off, ww[5]);
+            add_base(DIM*ii0, off, ww0);
+            add_base(DIM*ii1, off, ww1);
+            add_base(DIM*ii2, off, ww2);
+            add_base(DIM*ii3, off, ww3);
+            add_base(DIM*ii4, off, ww4);
+            add_base(DIM*ii5, off, ww5);
         }
     }
 }
@@ -2114,7 +2211,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     const size_t ii1 = DIM * ptB.matIndex2();
     const size_t ii2 = DIM * ptA.matIndex();
 
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
 
     Vector off, axi = ptA.pos() - ptB.pos();
@@ -2185,7 +2282,7 @@ void Meca::addLongLink(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
 
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form B-A:
@@ -2204,10 +2301,10 @@ void Meca::addLongLink(Interpolation const& ptA,
     const real abn = std::sqrt(ab2);
     const real wla = weight * len / abn;
 
-    add_base(ii0, axi, cc0 * wla);
-    add_base(ii1, axi, cc1 * wla);
-    add_base(ii2, axi, cc2 * wla);
-    add_base(ii3, axi, cc3 * wla);
+    add_base(ii0, axi, cc0*wla);
+    add_base(ii1, axi, cc1*wla);
+    add_base(ii2, axi, cc2*wla);
+    add_base(ii3, axi, cc3*wla);
     
     MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
@@ -2251,6 +2348,113 @@ void Meca::addLongLink(Interpolation const& ptA,
 }
 
 
+void Meca::addLongLink4(Interpolation const& ptA,
+                        const size_t inx[4], const real coef[4],
+                        const real len,
+                        const real weight)
+{
+    assert_true( weight >= 0 );
+    assert_true( len >= 0 );
+
+    // full indices:
+    const size_t ii0 = DIM * ptA.matIndex1();
+    const size_t ii1 = DIM * ptA.matIndex2();
+    const size_t ii2 = DIM * inx[0];
+    const size_t ii3 = DIM * inx[1];
+    const size_t ii4 = DIM * inx[2];
+    const size_t ii5 = DIM * inx[3];
+
+    if ( any_equal(ii0, ii2, ii3, ii4, ii5) | any_equal(ii1, ii2, ii3, ii4, ii5) )
+        return;
+    
+    // coefficients to form B-A:
+    const real cc0 = -ptA.coef0();
+    const real cc1 = -ptA.coef1();
+    const real cc2 = coef[0];
+    const real cc3 = coef[1];
+    const real cc4 = coef[2];
+    const real cc5 = coef[3];
+    
+    assert_small(cc0+cc1+cc2+cc3-1.0);
+
+    //Vector axi = interpolate4(vPTS, inx, cc2, cc3, cc4, cc5) - ptA.pos();
+    Vector axi = interpolate4(vPTS, inx, cc2, cc3, cc4, cc5) + interpolateX(vPTS, ii0, cc0, ii1, cc1);
+    Vector off;
+
+    if ( modulo )
+        modulo->foldOffset(axi, off);
+    
+    const real ab2 = axi.normSqr();
+    if ( ab2 < REAL_EPSILON ) return;
+    const real abn = std::sqrt(ab2);
+    const real wla = weight * len / abn;
+
+    add_base(ii0, axi, cc0*wla);
+    add_base(ii1, axi, cc1*wla);
+    add_base(ii2, axi, cc2*wla);
+    add_base(ii3, axi, cc3*wla);
+    add_base(ii4, axi, cc4*wla);
+    add_base(ii5, axi, cc5*wla);
+
+    MatrixBlock wT;
+    /* To stabilize the matrix with compression, we remove negative eigenvalues
+     This is done by using len = 1 in the formula for links that are shorter
+     than the desired target. */
+    if ( len > abn )
+        wT = MatrixBlock::outerProduct(axi, -weight/ab2);
+    else
+        wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
+    
+    add_block_diag(ii0, cc0*cc0, wT);
+    add_block_diag(ii1, cc1*cc1, wT);
+    add_block_diag(ii2, cc2*cc2, wT);
+    add_block_diag(ii3, cc3*cc3, wT);
+    add_block_diag(ii4, cc4*cc4, wT);
+    add_block_diag(ii5, cc5*cc5, wT);
+    add_block(ii1, ii0, cc1*cc0, wT);
+    if ( ii2 > ii0 )
+    {
+        add_block(ii2, ii0, cc2*cc0, wT);
+        add_block(ii3, ii0, cc3*cc0, wT);
+        add_block(ii4, ii0, cc4*cc0, wT);
+        add_block(ii5, ii0, cc5*cc0, wT);
+        add_block(ii2, ii1, cc2*cc1, wT);
+        add_block(ii3, ii1, cc3*cc1, wT);
+        add_block(ii4, ii1, cc4*cc1, wT);
+        add_block(ii5, ii1, cc5*cc1, wT);
+    }
+    else
+    {
+        add_block(ii0, ii2, cc2*cc0, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
+        add_block(ii0, ii4, cc4*cc0, wT);
+        add_block(ii0, ii5, cc5*cc0, wT);
+        add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii1, ii3, cc3*cc1, wT);
+        add_block(ii1, ii4, cc4*cc1, wT);
+        add_block(ii1, ii5, cc5*cc1, wT);
+    }
+    add_block(ii3, ii2, cc3*cc2, wT);
+    add_block(ii4, ii2, cc4*cc2, wT);
+    add_block(ii5, ii2, cc5*cc2, wT);
+    add_block(ii4, ii3, cc4*cc3, wT);
+    add_block(ii5, ii3, cc5*cc3, wT);
+    add_block(ii5, ii4, cc5*cc4, wT);
+
+    if ( modulo && off.is_not_zero() )
+    {
+        off = -( wT * off );
+        add_base(ii0, off, cc0);
+        add_base(ii1, off, cc1);
+        add_base(ii2, off, cc2);
+        add_base(ii3, off, cc3);
+        add_base(ii4, off, cc4);
+        add_base(ii5, off, cc5);
+    }
+    DRAW_LINK(ptA, ptA.pos(), axi, len);
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark - Off-axis links between Mecables
 //------------------------------------------------------------------------------
@@ -2283,7 +2487,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     const size_t ia1 = ptA.matIndex2(),  ii1 = DIM * ia1;
     const size_t ib2 = ptB.matIndex(),   ii2 = DIM * ib2;
 
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ib2, ia0, ia1) )
         return;
     const real ee = arm / ptA.len(), we = weight * ee;
 
@@ -2358,7 +2562,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
     
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
     
     // interpolation coefficients:
@@ -2507,7 +2711,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     const size_t ib2 = ptB.matIndex1(),  ii2 = DIM * ib2;
     const size_t ib3 = ptB.matIndex2(),  ii3 = DIM * ib3;
     
-    if ( any_equal(ia0, ia1, ib2, ib3) )
+    if ( any_equal(ia0, ib2, ib3) | any_equal(ia1, ib2, ib3) )
         return;
     
     const real ee = -arm/ptA.len(),  we = weight * ee;
@@ -2603,7 +2807,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
 
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     //coefficients to form A-B:
@@ -2757,7 +2961,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA, const real armA,
     size_t ia1 = ptA.matIndex1(), ia2 = ptA.matIndex2();
     size_t ib1 = ptB.matIndex1(), ib2 = ptB.matIndex2();
     
-    if ( any_equal(ia1, ia2, ib1, ib2) )
+    if ( any_equal(ia1, ib1, ib2) | any_equal(ia2, ib1, ib2) )
         return;
 
     const real ca1 =  ptA.coef0(), ca2 =  ptA.coef1();
@@ -2847,7 +3051,7 @@ void Meca::addSideSideLink(Interpolation const& ptA, Torque const& armA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
  
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
 
     //coefficients to form A-B:
@@ -2980,7 +3184,7 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, MatrixBlock const& R,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
  
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
 
     //coefficients to form A-B:
@@ -3102,7 +3306,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
     
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
     
     // interpolation coefficients:
@@ -3170,7 +3374,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     //coefficients to form A-B:
@@ -3246,7 +3450,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
     
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
     
     const real cc0 = ptA.coef0();
@@ -3324,7 +3528,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
     
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
     
     // set vector 'axi' perpendicular to Fiber:
@@ -3379,7 +3583,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
 
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
     
     /*
@@ -3448,7 +3652,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     const size_t ii1 = DIM * ptA.matIndex2();
     const size_t ii2 = DIM * ptB.matIndex();
     
-    if ( any_equal(ii0, ii1, ii2) )
+    if ( any_equal(ii2, ii0, ii1) )
         return;
     
     // interpolation coefficients:
@@ -3596,7 +3800,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form A-B
@@ -3668,7 +3872,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
 
     // set vector 'axi' perpendicular to Fiber:
@@ -3745,7 +3949,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form A-B
@@ -3832,7 +4036,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     const size_t ii2 = DIM * ptB.matIndex1();
     const size_t ii3 = DIM * ptB.matIndex2();
     
-    if ( any_equal(ii0, ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form A-B

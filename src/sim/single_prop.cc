@@ -66,7 +66,7 @@ Single * SingleProp::newSingle() const
  */
 Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
 {
-    //std::clog << "SingleProp::newWrist" << '\n';
+    //std::clog << "SingleProp::newWrist(length=" << length << ")\n";
     if ( length > 0 )
         return new WristLong(this, mec, point);
     else

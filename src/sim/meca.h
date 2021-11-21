@@ -18,6 +18,7 @@ class Modulo;
 class Mecable;
 class Mecapoint;
 class Interpolation;
+class Interpolation4;
 class FiberSegment;
 class SimulProp;
 class Simul;
@@ -229,24 +230,6 @@ public:
 
     /// return address of vector where positions are stored
     real const* addrPTS() const { return vPTS; }
-
-    /// position interpolated from two points in vPTS[]
-    Vector position1(const size_t inx) const;
-
-    /// position interpolated from two points in vPTS[]
-    Vector position2(const size_t inx[2], const real coef[2]) const;
-
-    /// position interpolated from three points in vPTS[]
-    Vector position3(const size_t inx[3], const real coef[3]) const;
-
-    /// position interpolated from four points in vPTS[]
-    Vector position4(const size_t inx[4], const real coef[4]) const;
-    
-    /// position interpolated from five points in vPTS[]
-    Vector position5(const size_t inx[5], const real coef[5]) const;
-    
-    /// position interpolated from six points in vPTS[]
-    Vector position6(const size_t inx[6], const real coef[6]) const;
 
 private:
     
@@ -581,7 +564,10 @@ public:
     
     /// Link of stiffness `weight` and resting length `len`
     void addLongLink(Interpolation const&, Interpolation const&, real len, real weight);
-
+    
+    /// Link of stiffness `weight` and resting length `len`
+    void addLongLink4(Interpolation const&, const size_t pts[4], const real coef[4], real len, real weight);
+    
 #if ( DIM == 2 )
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
     void addSideLink2D(Interpolation const&, Mecapoint const&, real arm, real weight);

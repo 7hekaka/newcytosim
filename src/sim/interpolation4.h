@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef INTERPOLATION4_H
 #define INTERPOLATION4_H
@@ -15,20 +15,20 @@ class Meca;
 /** FJN 17.9.2018 */
 class Interpolation4
 {
-private:
+public:
     
     /// Mecable from which points are interpolated
     Mecable const* mec_;
 
     /// index of first interpolated point
-    size_t       prime_;
+    size_t prime_;
     
     /// interpolation coefficients for points [ref, ref+1, ref+2, ref+3]
     /** The sum of these 4 coefficients is equal to one */
-    real       coef_[4];
+    real coef_[4];
     
     /// number of interpolated points (order)
-    size_t        rank_;
+    size_t rank_;
 
     /// calculate rank: how many coefficients are not null
     size_t calcRank() const;
@@ -53,11 +53,20 @@ public:
     /// attachment mecable
     Mecable const* mecable() const { return mec_; }
     
-    /// position in space
-    Vector position() const;
+    /// position in space calculated from interpolation
+    Vector pos() const;
     
     /// attachement point
-    Mecapoint point() const { return Mecapoint(mec_, prime_); }
+    size_t rank() const { return rank_; }
+
+    /// attachement point
+    Mecapoint vertex0() const { return Mecapoint(mec_, prime_); }
+    
+    /// index of prime point in matrix
+    size_t primeIndex() const { return mec_->matIndex() + prime_; }
+    
+    /// interpolation coefficients
+    const real* coef() const { return coef_; }
 
     /// create addLink with given Interpolation
     void addLink(Meca&, Interpolation const&, real weight) const;

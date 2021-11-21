@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef INTERPOLATION_H
 #define INTERPOLATION_H
@@ -74,19 +74,19 @@ public:
     bool valid()    const { return (mec_!=nullptr) & (pt1_<mec_->nbPoints()) & (pt2_<mec_->nbPoints()); }
 
     /// Constant pointer to the Mecable
-    Mecable const*  mecable()  const { return mec_; }
+    Mecable const*  mecable() const { return mec_; }
 
     /// Mecapoint corresponding to first point
-    Mecapoint vertex1()  const { return Mecapoint(mec_, pt1_); }
+    Mecapoint vertex1() const { return Mecapoint(mec_, pt1_); }
     
     /// Mecapoint corresponding to second point
-    Mecapoint vertex2()  const { return Mecapoint(mec_, pt2_); }
+    Mecapoint vertex2() const { return Mecapoint(mec_, pt2_); }
     
     /// Index of point 1 in object
-    size_t point1()   const { return pt1_; }
+    size_t point1() const { return pt1_; }
   
     /// Index of point 2 in object
-    size_t point2()   const { return pt2_; }
+    size_t point2() const { return pt2_; }
 
     /// interpolation coefficient on first point
     real coef0()    const { return 1 - coef_; }
@@ -95,22 +95,22 @@ public:
     real coef1()    const { return coef_; }
 
     /// interpolation coefficient on first point (historical function)
-    //real coef2()    const { return 1 - coef_; }
+    //real coef2()  const { return 1 - coef_; }
 
     /// Set interpolation coefficient
-    void coef(real c)     { coef_ = c; }
+    void coef(real c) { coef_ = c; }
     
     /// Interpolated position in space
-    Vector pos()      const { return mec_->interpolatePoints(pt1_, pt2_, coef_); }
+    Vector pos()    const { return mec_->interpolatePoints(pt1_, pt2_, coef_); }
     
     /// position of first point
-    Vector pos1()     const { return mec_->posP(pt1_); }
+    Vector pos1()   const { return mec_->posP(pt1_); }
     
     /// position of second point 
-    Vector pos2()     const { return mec_->posP(pt2_); }
+    Vector pos2()   const { return mec_->posP(pt2_); }
     
     /// that is pos2() - pos1()
-    Vector diff()     const { return mec_->diffPoints(pt1_, pt2_); }
+    Vector diff()   const { return mec_->diffPoints(pt1_, pt2_); }
     
     /// distance between point1 and point2
     real len()      const { return diff().norm(); }
@@ -119,7 +119,7 @@ public:
     real lenSqr()   const { return diff().normSqr(); }
 
     /// normalize(pos2() - pos1())
-    Vector dir()      const { return normalize(diff()); }
+    Vector dir()    const { return normalize(diff()); }
 
     /// true if the coefficient is in [0, 1]
     bool inside()   const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }

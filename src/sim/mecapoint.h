@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef MECAPOINT_H
 #define MECAPOINT_H
@@ -38,16 +38,16 @@ public:
     Mecable const* mecable() const { return mec_; }
     
     /// true if the pointer seems to be valid.
-    bool valid()         const { return (mec_!=nullptr) & (pti_<mec_->nbPoints()); }
+    bool valid() const { return (mec_!=nullptr) & (pti_<mec_->nbPoints()); }
     
     /// Index of point in object
-    size_t point()       const { return pti_; }
+    size_t point() const { return pti_; }
         
     /// Position of the point-of-interest in space
-    Vector pos()         const { return mec_->posPoint(pti_); }
+    Vector pos() const { return mec_->posPoint(pti_); }
     
     /// Index of the point-of-interest in the isotropic matrix (Meca::mISO)
-    size_t matIndex()    const { return mec_->matIndex() + pti_; }
+    size_t matIndex() const { return mec_->matIndex() + pti_; }
     
     /// Write to file
     void write(Outputter&) const;

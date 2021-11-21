@@ -35,7 +35,7 @@ class PointDisp;
  Wrist and Picket may exert force on the Fiber to which their Hand attaches.
  For WristLong and PicketLong, this force can have a non-zero resting length.
  For these class, `hasLink()` returns true. The force may still be zero if the
- link stiffness is not set or set to zero.
+ link stiffness is zero, which is the default value.
 
  Wrist and Picket can be distinguished with Single::base():
  - for Single and Picket, this returns zero,
@@ -151,13 +151,13 @@ public:
     virtual void unbase() {}
 
     /// true if Single creates an interaction
-    virtual bool hasLink()     const { return false; }
+    virtual bool hasLink() const { return false; }
     
     /// stretch = ( position_anchor - position_hand ), or zero for a diffusible Single
-    virtual Vector stretch()     const { return Vector(0,0,0); }
+    virtual Vector stretch() const { return Vector(0,0,0); }
 
     /// force = stiffness * ( position_anchor - position_hand ), or zero for a diffusible Single
-    virtual Vector force()       const { return Vector(0,0,0); }
+    virtual Vector force() const { return Vector(0,0,0); }
 
     /// Monte-Carlo step if the Hand is not attached
     virtual void stepF();

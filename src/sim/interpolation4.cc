@@ -108,7 +108,7 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
 }
 
 
-Vector Interpolation4::position() const
+Vector Interpolation4::pos() const
 {
     assert_true(mec_);
     size_t top = std::min(rank_, mec_->nbPoints()-prime_);

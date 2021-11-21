@@ -126,9 +126,9 @@ public:
     /// create a Single with this property
     virtual Single * newSingle() const;
     
-    /// create a Write with this property
-    Wrist * newWrist(Mecable const*, size_t) const;
-    
+    /// create a Wrist attached to given point
+    Wrist * newWrist(Mecable const*, size_t inx) const;
+
     /// identifies the property
     std::string category() const { return "single"; }
     
