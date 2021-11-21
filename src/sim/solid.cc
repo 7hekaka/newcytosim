@@ -239,6 +239,177 @@ void Solid::release()
 //------------------------------------------------------------------------------
 #pragma mark - Build
 
+
+ObjectList Solid::makePoint(Glossary& opt, std::string const& var, Simul& sim)
+{
+    ObjectList res;
+    std::string str;
+    size_t inx;
+    inx = 0;
+    size_t nbp = 1;
+    // optionally specify a number of points
+    if ( opt.is_positive_integer(var, 0) && opt.set(nbp, var) )
+        ++inx;
+    
+    if ( nbp > 0 )
+    {
+        // get sphere radius:
+        real rad = 0;
+        opt.set(rad, var, inx+1);
+        
+        if ( rad < 0 )
+            throw InvalidParameter("radius of solid:sphere must be >= 0");
+        
+        size_t fip = nPoints;
+        str = opt.value(var, inx);
+        // add 'nbp' points:
+        for ( size_t n = 0; n < nbp; ++n )
+        {
+            Vector vec = Movable::readPosition(str, nullptr);
+            addSphere(vec, rad);
+        }
+        
+        // attach Single to this set of points:
+        ++inx;
+        while ( opt.set(str, var, ++inx) )
+            res.append(sim.singles.makeWrists(this, fip, nbp, str));
+    }
+    return res;
+}
+
+
+ObjectList Solid::makeSphere(Glossary& opt, std::string const& var, Simul& sim)
+{
+    ObjectList res;
+    std::string str;
+    size_t inx;
+
+    // get sphere radius:
+    real rad = 0;
+    opt.set(rad, var, 1);
+    
+    if ( rad <= 0 )
+        throw InvalidParameter("radius of sphere specified in solid must be > 0");
+    
+    // get position of center:
+    Vector cen = Movable::readPosition(opt.value(var, 0), nullptr);
+    
+    // add a bead with a local coordinate system
+    size_t ref = addSphere(cen, rad);
+    addTriad(rad);
+    
+#if ( DIM > 1 )
+    real sep = 1.0;
+    if ( opt.set(sep, "separation") )
+    {
+        // attach Single on the surface of this sphere:
+        size_t nbs = opt.num_values(var) - 2;
+        // 'pts' is a set of unit vectors:
+        std::vector<Vector> pts(nbs, Vector(0,0,0));
+        
+        // separation should not be greater than diameter:
+        sep = std::min(sep, 2*rad);
+        // decrease separation gradually, until all points can fit:
+        real dis = sep;
+        size_t ouf = 0;
+        while ( tossPointsSphere(pts, dis/rad, 128) < nbs )
+        {
+            if ( ++ouf > 128 )
+            {
+                ouf = 0;
+                dis /= 1.0905044; // std::sqrt(sqrt(std::sqrt(2)))
+            }
+        }
+        if ( dis < sep )
+            Cytosim::warn << "solid:separation reduced to " << dis << "\n";
+        real dev = 0.0;
+        if ( opt.set(dev, "deviation") && dev > rad )
+            throw InvalidParameter("solid:deviation should be <= radius");
+        
+        inx = 2;
+        while ( opt.set(str, var, inx++) )
+        {
+            // get a number and the name of a class:
+            size_t num = 1;
+            Tokenizer::split_integer(num, str);
+            SingleProp * sip = sim.findProperty<SingleProp>("single", str);
+            
+            //add Wrists anchored on the local coordinate system:
+            Vector pos = pts[inx-3];
+            for ( size_t i = 0; i < num; ++i )
+            {
+                // we use unit vectors here since the Triad is build with 'rad'
+                Vector vec = normalize(pos+pos.randOrthoB(dev/rad));
+                Wrist * w = sip->newWrist(this, 0);
+                w->rebase(this, ref, vec);
+                res.push_back(w);
+            }
+        }
+    }
+    else
+#endif
+    {
+        // associate Singles with this sphere
+        inx = 2;
+        while ( opt.set(str, var, inx++) )
+        {
+            // get a number and the name of a class:
+            size_t num = 1;
+            Tokenizer::split_integer(num, str);
+            std::string nam = Tokenizer::split_symbol(str);
+            if ( nam.empty() )
+                throw InvalidParameter("the name of a single should be specified in `"+var+"'");
+            SingleProp * sip = sim.findProperty<SingleProp>("single", nam);
+            
+            Vector vec;
+            /* add Wrists anchored on the local coordinate system:
+             need to use unit vectors here since the Triad is build with 'rad' */
+            for ( size_t i = 0; i < num; ++i )
+            {
+                if ( str.size() )
+                    vec = Movable::readPosition(str, nullptr);
+                else
+                    vec = Vector::randU();
+                Wrist * w = sip->newWrist(this, 0);
+                w->rebase(this, ref, vec);
+                res.push_back(w);
+            }
+        }
+    }
+    return res;
+}
+
+
+ObjectList Solid::makeGrafted(Glossary& opt, std::string const& var, Simul& sim)
+{
+    ObjectList res;
+    std::string str;
+    size_t a = 0, b = 0;
+    real c = 0.0;
+    
+    // get index of point A
+    opt.set(str, var, 0);
+    a = point_index(str);
+
+    // get index of point B
+    opt.set(str, var, 1);
+    b = point_index(str);
+
+    // get coefficient
+    opt.set(c, var, 2);
+    if ( c < 0 || 1 < c )
+        throw InvalidParameter("interpolation coefficient must be in [0, 1]");
+
+    opt.set(str, var, 3);
+    SingleProp * sip = sim.findProperty<SingleProp>("single", str);
+    
+    // add a Wrist anchored between 'a' and 'b':
+    Wrist * w = sip->newWrist(this, 0);
+    w->rebase(this, a, b, c);
+    res.push_back(w);
+    return res;
+}
+
 /**
  @ingroup NewObject
  
@@ -325,156 +496,32 @@ void Solid::release()
 ObjectList Solid::build(Glossary& opt, Simul& sim)
 {
     ObjectList res;
-    std::string str;
+    std::string var, str;
     size_t inp, inx, nbp;
 
-    if ( opt.has_key("point0") )
-        throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
-    
-    // interpret each instruction as a command to add points:
-    inp = 1;
-    std::string var = "point1";
-    while ( opt.has_key(var) )
-    {
-        inx = 0;
-        nbp = 1;
-        // optionally specify a number of points
-        if ( opt.is_positive_integer(var, 0) && opt.set(nbp, var) )
-            ++inx;
-        
-        if ( nbp > 0 )
-        {
-            // get sphere radius:
-            real rad = 0;
-            opt.set(rad, var, inx+1);
-            
-            if ( rad < 0 )
-                throw InvalidParameter("radius of solid:sphere must be >= 0");
-
-            size_t fip = nPoints;
-            str = opt.value(var, inx);
-            // add 'nbp' points:
-            for ( size_t n = 0; n < nbp; ++n )
-            {
-                Vector vec = Movable::readPosition(str, nullptr);
-                addSphere(vec, rad);
-            }
-            
-            // attach Single to this set of points:
-            ++inx;
-            while ( opt.set(str, var, ++inx) )
-                res.append(sim.singles.makeWrists(this, fip, nbp, str));
-            
-#if BACKWARD_COMPATIBILITY < 100
-            // this syntax is deprecated
-            // attach Single to this set of points:
-            inx = 0;
-            var = "attach" + std::to_string(inp);
-            while ( opt.set(str, var, inx++) )
-                res.append(sim.singles.makeWrists(this, fip, nbp, str));
-#endif
-        }
-        
-        var = "point" + std::to_string(++inp);
-    }
-    
-    // interpret each instruction as a command to add spheres:
+    // options named 'sphere???' will add spheres:
     inp = 1;
     var = "sphere1";
     while ( opt.has_key(var) )
     {
-        // get sphere radius:
-        real rad = 0;
-        opt.set(rad, var, 1);
-        
-        if ( rad <= 0 )
-            throw InvalidParameter("radius of sphere specified in solid must be > 0");
-
-        // get position of center:
-        Vector cen = Movable::readPosition(opt.value(var, 0), nullptr);
-        
-        // add a bead with a local coordinate system
-        size_t ref = addSphere(cen, rad);
-        addTriad(rad);
-
-#if ( DIM > 1 )
-        real sep = 1.0;
-        if ( opt.set(sep, "separation") )
-        {
-            // attach Single on the surface of this sphere:
-            size_t nbs = opt.num_values(var) - 2;
-            // 'pts' is a set of unit vectors:
-            std::vector<Vector> pts(nbs, Vector(0,0,0));
-
-            // separation should not be greater than diameter:
-            sep = std::min(sep, 2*rad);
-            // decrease separation gradually, until all points can fit:
-            real dis = sep;
-            size_t ouf = 0;
-            while ( tossPointsSphere(pts, dis/rad, 128) < nbs )
-            {
-                if ( ++ouf > 128 )
-                {
-                    ouf = 0;
-                    dis /= 1.0905044; // std::sqrt(sqrt(std::sqrt(2)))
-                }
-            }
-            if ( dis < sep )
-                Cytosim::warn << "solid:separation reduced to " << dis << "\n";
-            real dev = 0.0;
-            if ( opt.set(dev, "deviation") && dev > rad )
-                throw InvalidParameter("solid:deviation should be <= radius");
-            
-            inx = 2;
-            while ( opt.set(str, var, inx++) )
-            {
-                // get a number and the name of a class:
-                size_t num = 1;
-                Tokenizer::split_integer(num, str);
-                SingleProp * sip = sim.findProperty<SingleProp>("single", str);
-                
-                //add Wrists anchored on the local coordinate system:
-                Vector pos = pts[inx-3];
-                for ( size_t i = 0; i < num; ++i )
-                {
-                    // we use unit vectors here since the Triad is build with 'rad'
-                    Vector vec = normalize(pos+pos.randOrthoB(dev/rad));
-                    res.push_back(new Wrist(sip, this, ref, vec));
-                }
-            }
-        }
-        else
-#endif
-        {
-            // associate Singles with this sphere
-            inx = 2;
-            while ( opt.set(str, var, inx++) )
-            {
-                // get a number and the name of a class:
-                size_t num = 1;
-                Tokenizer::split_integer(num, str);
-                std::string nam = Tokenizer::split_symbol(str);
-                if ( nam.empty() )
-                    throw InvalidParameter("the name of a single should be specified in `"+var+"'");
-                SingleProp * sip = sim.findProperty<SingleProp>("single", nam);
-                
-                Vector vec;
-                /* add Wrists anchored on the local coordinate system:
-                 need to use unit vectors here since the Triad is build with 'rad' */
-                for ( size_t i = 0; i < num; ++i )
-                {
-                    if ( str.size() )
-                        vec = Movable::readPosition(str, nullptr);
-                    else
-                        vec = Vector::randU();
-                    res.push_back(new Wrist(sip, this, ref, vec));
-                }
-            }
-        }
+        res.append(makeSphere(opt, var, sim));
         var = "sphere" + std::to_string(++inp);
     }
     
+    if ( opt.has_key("point0") )
+        throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
+    
+    // options named 'point???' will add points:
+    inp = 1;
+    var = "point1";
+    while ( opt.has_key(var) )
+    {
+        res.append(makePoint(opt, var, sim));
+        var = "point" + std::to_string(++inp);
+    }
+    
 #if BACKWARD_COMPATIBILITY < 100
+    
     /* attach Singles to be distributed over all the points:
      this is deprecated, since one can attach Single at any point since 03.2017
      using the 'sphere' specifications above
@@ -491,28 +538,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     var = "anchor1";
     while ( opt.has_key(var) )
     {
-        size_t a = 0, b = 0;
-        real c = 0.0;
-        
-        // get index of point A
-        opt.set(str, var, 0);
-        a = point_index(str);
-
-        // get index of point B
-        opt.set(str, var, 1);
-        b = point_index(str);
-
-        // get coefficient
-        opt.set(c, var, 2);
-        if ( c < 0 || 1 < c )
-            throw InvalidParameter("interpolation coefficient must be in [0, 1]");
-
-        opt.set(str, var, 3);
-        SingleProp * sip = sim.findProperty<SingleProp>("single", str);
-        
-        // add Wrists anchored between 'a' and 'b':
-        res.push_back(new Wrist(sip, this, a, b, c));
-
+        makeGrafted(opt, var, sim);
         var = "anchor" + std::to_string(++inp);
     }
     

@@ -23,12 +23,6 @@ public:
     
     /// Construct object anchored at one Mecapoint
     Wrist(SingleProp const*, Mecable const*, size_t point);
-    
-    /// Construct object anchored between two Mecapoint
-    Wrist(SingleProp const*, Mecable const*, size_t, size_t, real);
-   
-    /// Constructor object interpolated over a triad of Mecapoint
-    Wrist(SingleProp const*, Mecable const*, size_t ref, Vector pos);
 
     /// destructor
     ~Wrist();
@@ -36,7 +30,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// return the position in space of the object
-    Vector position() const { return base_.position(); }
+    Vector position() const { return base_.pos(); }
     
     /// Wrist accepts translation
     int mobile() const { return 0; }
@@ -69,7 +63,7 @@ public:
     real linkStiffness() const { return prop->stiffness; }
 
     /// the position of the anchoring point
-    Vector posFoot() const { return base_.position(); }
+    Vector posFoot() const { return base_.pos(); }
     
     /// stretch of the link = ( posFoot() - posHand() )
     Vector stretch() const;

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 #include "wrist_long.h"
 #include "simul.h"
 #include "meca.h"
@@ -9,8 +9,13 @@ extern Modulo const* modulo;
 
 
 WristLong::WristLong(SingleProp const* sp, Mecable const* mec, const size_t pti)
-: Wrist(sp, mec, pti), mArm(nullTorque)
+: Wrist(sp, mec, pti)
 {
+#if WRIST_USES_LONGLINK
+    mArm = Vector(0,0,0);
+#else
+    mArm = nullTorque;
+#endif
 }
 
 
@@ -19,24 +24,6 @@ WristLong::~WristLong()
 }
 
 //------------------------------------------------------------------------------
-
-Torque WristLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
-{
-    Vector off = pt.pos1() - pos;
-    if ( modulo )
-        modulo->fold(off);
-#if ( DIM >= 3 )
-    off = cross(off, pt.diff());
-    real n = off.norm();
-    if ( n > REAL_EPSILON )
-        return off * ( len / n );
-    else
-        return pt.diff().randOrthoU(len);
-#else
-    return std::copysign(len, cross(off, pt.diff()));
-#endif
-}
-
 
 Vector WristLong::force() const
 {
@@ -50,7 +37,58 @@ Vector WristLong::force() const
 }
 
 
-#if ( 1 )
+#if WRIST_USES_LONGLINK
+
+Vector WristLong::calcArm(Interpolation const& itp, Vector const& pos, real len)
+{
+    Vector off = pos - itp.pos();
+    if ( modulo )
+        modulo->fold(off);
+    return off.normalized(len);
+}
+
+Vector WristLong::sidePos() const
+{
+    return sHand->pos() + mArm;
+}
+
+/**
+ This uses Meca::addLongLink()
+ */
+void WristLong::setInteractions(Meca& meca) const
+{
+    Interpolation const& itp = sHand->interpolation();
+    mArm = calcArm(itp, posFoot(), prop->length);
+    
+    // 'mArm' is not used to calculate the interaction here:
+    if ( base_.rank() == 1 )
+        meca.addLongLink(base_.vertex0(), itp, prop->length, prop->stiffness);
+    else
+    {
+        const size_t off = base_.vertex0().matIndex();
+        const size_t pts[] = { off, off+1, off+2, off+3 };
+        meca.addLongLink4(itp, pts, base_.coef(), prop->length, prop->stiffness);
+    }
+}
+
+#else
+
+Torque WristLong::calcArm(Interpolation const& itp, Vector const& pos, real len)
+{
+    Vector off = itp.pos1() - pos;
+    if ( modulo )
+        modulo->fold(off);
+#if ( DIM >= 3 )
+    off = cross(off, itp.diff());
+    real n = off.norm();
+    if ( n > REAL_EPSILON )
+        return off * ( len / n );
+    else
+        return itp.diff().randOrthoU(len);
+#else
+    return std::copysign(len, cross(off, itp.diff()));
+#endif
+}
 
 /*
  Note that, since `mArm` is calculated by setInteractions(),
@@ -70,7 +108,7 @@ Vector WristLong::sidePos() const
  */
 void WristLong::setInteractions(Meca& meca) const
 {
-    Interpolation const& pt = sHand->interpolation();
+    Interpolation const& itp = sHand->interpolation();
     
     /* 
      The 'arm' is recalculated each time, but in 2D at least,
@@ -79,32 +117,15 @@ void WristLong::setInteractions(Meca& meca) const
     
 #if ( DIM == 2 )
     
-    mArm = calcArm(pt, posFoot(), prop->length);
-    meca.addSideLink2D(pt, base_.point(), mArm, prop->stiffness);
+    mArm = calcArm(itp, posFoot(), prop->length);
+    meca.addSideLink2D(itp, base_.vertex0(), mArm, prop->stiffness);
     
 #elif ( DIM >= 3 )
     
-    mArm = calcArm(pt, posFoot(), prop->length);
-    meca.addSideLink3D(pt, base_.point(), mArm, prop->stiffness);
+    mArm = calcArm(itp, posFoot(), prop->length);
+    meca.addSideLink3D(itp, base_.vertex0(), mArm, prop->stiffness);
     
 #endif
-}
-
-#else
-
-Vector WristLong::sidePos() const
-{
-    return sHand->pos() + mArm;
-}
-
-/** 
- This uses Meca::addLongLink() 
- */
-void WristLong::setInteractions(Meca& meca) const
-{
-    Interpolation const& pt = sHand->interpolation();
-    mArm = ( sBase.pos() - sHand->pos() ).normalized(prop->length);
-    meca.addLongLink(pt, sBase, prop->length, prop->stiffness);
 }
 
 #endif

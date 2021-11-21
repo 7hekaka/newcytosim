@@ -5,6 +5,9 @@
 #include "wrist.h"
 #include "mecapoint.h"
 
+/// Switch to use Meca::addLongLink of Meca::addSideLink
+#define WRIST_USES_LONGLINK 1
+
 
 /// a Wrist with a non-zero resting length.
 /**
@@ -18,11 +21,17 @@
  */
 class WristLong : public Wrist
 {
-    /// the side (top/bottom) of the interaction
-    mutable Torque  mArm;
+#if WRIST_USES_LONGLINK
+    typedef Vector WristArm;
+#else
+    typedef Torque WristArm;
+#endif
     
+    /// the side (top/bottom) of the interaction
+    mutable WristArm mArm;
+
     /// used to calculate `mArm`
-    static Torque calcArm(Interpolation const& pt, Vector const& pos, real len);
+    static WristArm calcArm(Interpolation const& pt, Vector const& pos, real len);
     
 public:
      

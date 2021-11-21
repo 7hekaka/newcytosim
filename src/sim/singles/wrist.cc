@@ -21,32 +21,6 @@ Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const size_t pti)
 }
 
 
-Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t a, size_t b, real c)
-: Single(sp)
-{
-    assert_true(mec);
-    rebase(mec, a, b, c);
-    assert_false(base_.bad());
-#if ( 0 )
-    if ( p->diffusion > 0 )
-        throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
-#endif
-}
-
-
-Wrist::Wrist(SingleProp const* sp, Mecable const* mec, size_t ref, Vector pos)
-: Single(sp)
-{
-    assert_true(mec);
-    rebase(mec, ref, pos);
-    assert_false(base_.bad());
-#if ( 0 )
-    if ( p->diffusion > 0 )
-        throw InvalidParameter(name()+":diffusion cannot be > 0 if activity=anchored");
-#endif
-}
-
-
 Wrist::~Wrist()
 {
 }

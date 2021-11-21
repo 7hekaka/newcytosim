@@ -10,6 +10,8 @@
 #include "solid_prop.h"
 
 class Meca;
+class SingleProp;
+class Wrist;
 
 /// Undeformable set of points
 /**
@@ -81,6 +83,15 @@ private:
     /// reset private variables
     void reset();
     
+    /// part of build()
+    ObjectList makePoint(Glossary&, std::string const&, Simul&);
+    
+    /// part of build()
+    ObjectList makeSphere(Glossary&, std::string const&, Simul&);
+    
+    /// part of build()
+    ObjectList makeGrafted(Glossary&, std::string const&, Simul&);
+
 public:
     
     /// Property
