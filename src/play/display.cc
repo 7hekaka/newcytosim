@@ -94,15 +94,20 @@ void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
 {
     glPushMatrix();
     gle::transScale(pos, rad);
-#if ( DIM >= 3 )
     glEnable(GL_LIGHTING);
     col.load_both();
     gle::dualPassSphere2();
-#else
+    glPopMatrix();
+}
+
+
+void Display::drawDiscT(Vector const& pos, real rad, gle_color const& col) const
+{
+    glPushMatrix();
+    gle::transScale(pos, rad);
     glDisable(GL_LIGHTING);
     col.load();
     gle::disc();
-#endif
     glPopMatrix();
 }
 
@@ -1716,14 +1721,14 @@ void Display::drawSolid(Solid const& obj)
     const PointDisp * disp = obj.prop->disp;
     
     //display points:
-    if (( disp->style & 2 ) && ( disp->size > 0 ))
+    if (( disp->style & 2 ) && disp->perceptible )
     {
         bodyColor(obj);
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), scale(disp->size), gle::hedron(obj.radius(i)>0));
     }
     
-    //display outline of spheres
+    //display outline of spheres in 2D
     if ( disp->style & 4 )
     {
 #if ( DIM == 2 )
@@ -1781,7 +1786,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
     if (( disp->style & 1 ) && ( obj.radius(inx) > 0 ))
     {
         Vector X = obj.posP(inx);
-#if 1
+#if ( DIM > 2 )
         // using cliping planes to cleanup overlapping Spheres
         size_t near[3];
         size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
@@ -1796,11 +1801,13 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
             glEnable(glp);
             gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
-#endif
         drawBallT(X, obj.radius(inx), bodyColorF(obj));
         glDisable(GL_CLIP_PLANE3);
         glDisable(GL_CLIP_PLANE4);
         glDisable(GL_CLIP_PLANE5);
+#else
+        drawDiscT(X, obj.radius(inx), bodyColorF(obj));
+#endif
     }
 }
 
@@ -1865,7 +1872,11 @@ void Display::drawBeadT(Bead const& obj) const
     
     if ( disp->style & 1 )
     {
+#if ( DIM > 2 )
         drawBallT(obj.position(), obj.radius(), bodyColorF(obj));
+#else
+        drawDiscT(obj.position(), obj.radius(), bodyColorF(obj));
+#endif
     }
 }
 
@@ -1895,21 +1906,21 @@ void Display::drawSphere(Sphere const& obj)
 {
     const PointDisp * disp = obj.prop->disp;
     
-    //display center and surface points
-    if (( disp->style & 2 ) && disp->perceptible )
+    // display surface points
+    if ( disp->style & 2 )
     {
         bodyColor(obj);
-        drawObject(obj.posP(0), scale(disp->size), gle::star);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), scale(disp->size), gle::sphere1);
     }
     
-    //display reference points
-    if (( disp->style & 8 ) && disp->perceptible )
+    // display center and reference points
+    if ( disp->style & 8 )
     {
         bodyColor(obj);
-        for ( size_t i = 1; i < obj.nbRefPoints; ++i )
-            drawObject(obj.posP(i), scale(disp->size), gle::tetrahedron);
+        drawObject(obj.posP(0), scale(disp->size), gle::star);
+        for ( size_t i = 0; i < obj.nbRefPoints; ++i )
+            drawObject(obj.posP(i), scale(disp->size), gle::cube);
     }
 }
 
@@ -1928,7 +1939,7 @@ void Display::drawSphereT(Sphere const& obj) const
         if ( disp->style & 2 )
             drawFlat(C, obj.radius(), gle::disc);
         if ( disp->style & 4 )
-            drawBallT(C, obj.radius(), bodyColorF(obj));
+            drawDiscT(C, obj.radius(), bodyColorF(obj));
 #else
         /* Note: The rotation matrix for the sphere calculated below from the
          reference points, includes scaling by the radius of the sphere.
@@ -1954,7 +1965,8 @@ void Display::drawSpheres(SphereSet const& set)
     {
         if ( obj->prop->disp->visible )
         {
-            drawSphere(*obj);
+            if ( obj->prop->disp->perceptible )
+                drawSphere(*obj);
 #if ( DIM >= 3 )
             if ( obj->prop->disp->color.transparent() )
                 zObjects.push_back(zObject(obj));

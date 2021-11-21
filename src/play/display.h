@@ -169,6 +169,9 @@ public:
     /// draw a fine spherical object
     void drawBallT(Vector const&, real radius, gle_color const&) const;
     
+    /// draw a fine spherical object
+    void drawDiscT(Vector const&, real radius, gle_color const&) const;
+
 
     
     /// draw a scalar field

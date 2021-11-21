@@ -172,8 +172,6 @@ namespace gle
     void octahedron();
     /// draw a icosahedron of radius 1
     void icosahedron();
-    /// returns tetrahedron or octahedron
-    inline void (*hedron(bool x))() { return x ? octahedron : tetrahedron; }
 
     /// draw a roughly spherical shape made of few triangles
     void blob();
@@ -185,6 +183,10 @@ namespace gle
     void cuboid();
     /// draw a stellated octahedron
     void star();
+    
+    /// returns tetrahedron or octahedron
+    inline void (*hedron(bool x))() { return x ? tetrahedron : cube; }
+
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
     void arrowTail();
 

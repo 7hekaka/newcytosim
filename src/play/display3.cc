@@ -885,10 +885,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
                 }
             }
 #endif
-            if ( obj->base() )
-                drawObject(obj->posFoot(), rad, gle::octahedron);
-            else
-                drawHandF(obj->posFoot(), obj->disp());
+            drawHandF(obj->posFoot(), obj->disp());
         }
     }
 }
@@ -899,11 +896,7 @@ void Display3::drawSingleA(Single const* obj) const
     const PointDisp * disp = obj->disp();
     Vector ph = obj->posHand();
     disp->color.load_both();
-
-    if ( obj->base() )
-        drawObject3(ph, disp->size, gle::octahedron);
-    else
-        drawHand(ph, disp);
+    drawHand(ph, disp);
 }
 
 
@@ -927,8 +920,8 @@ void Display3::drawSingleB(Single const* obj) const
 #endif
     {
         glPushMatrix();
-        gle::transScale(pf, rad*0.5);
-        gle::blob();
+        gle::transScale(pf, wid);
+        gle::blob(); // the foot
         glPopMatrix();
     }
     disp->color.load_both();
@@ -965,7 +958,7 @@ void Display3::drawSinglesA(SingleSet const& set) const
     {
         if ( obj->disp()->perceptible && obj->fiber()->disp->visible )
         {
-            if ( obj->hasLink() && obj->disp()->width > 0 )
+            if ( obj->hasLink() )
                 drawSingleB(obj);
             else
                 drawSingleA(obj);
