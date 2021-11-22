@@ -38,8 +38,10 @@ void Crosslink::stepFF()
     diffuse();
     
     // activity:
-    cHand1->stepUnattached(simul(), cPos);
-    cHand2->stepUnattached(simul(), cPos);
+    if ( RNG.flip() )
+        cHand1->stepUnattached(simul(), cPos);
+    else
+        cHand2->stepUnattached(simul(), cPos);
 }
 
 

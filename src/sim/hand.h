@@ -115,10 +115,7 @@ public:
     void locate(Fiber* f, real a);
 
     // Check that binding can occur on Fiber, from BITWISE AND of the binding keys
-    bool keyMatch(Fiber const* fib) const
-    {
-        return prop->binding_key & fib->prop->binding_key;
-    }
+    bool keyMatch(Fiber const* fib) const { return prop->binding_key & fib->prop->binding_key; }
     
     /// only checks the Monitor's permission
     bool monitorAllowsAttachment(FiberSite& sit) const;

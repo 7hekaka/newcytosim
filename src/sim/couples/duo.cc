@@ -61,8 +61,9 @@ void Duo::stepFF()
         }
     
         // hands may bind:
-        cHand1->stepUnattached(simul(), cPos);
-        if ( !prop->trans_activated )
+        if ( RNG.flip() )
+            cHand1->stepUnattached(simul(), cPos);
+        else if ( !prop->trans_activated )
             cHand2->stepUnattached(simul(), cPos);
     }
 }

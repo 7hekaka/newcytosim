@@ -1,3 +1,6 @@
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
+// [Grand Central Dispatch](https://developer.apple.com/documentation/DISPATCH)
+
 #include <dispatch/dispatch.h>
 #include <stdio.h>
 #include <cmath>
