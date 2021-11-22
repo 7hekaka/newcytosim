@@ -21,6 +21,15 @@ Vector4::Vector4(const Vector3& arg) : XX(arg.XX), YY(arg.YY), ZZ(arg.ZZ), TT(0.
 {
 }
 
+// copy from Vector3
+void Vector4::operator =(const Vector3& arg)
+{
+    XX = arg.XX;
+    YY = arg.YY;
+    ZZ = arg.ZZ;
+    TT = 0;
+}
+
 /**
  This accepts 'X Y Z' but also 'X' and 'X Y'.
  At least one scalar must be read to be valid

@@ -224,7 +224,7 @@ public:
         fprintf(f, " \\ %9.3f %+9.3f %+9.3f /\n", val[2], val[2+BLD], val[2+BLD*2]);
     }
     
-    /// output operator
+    /// print [ line1; line2; line3 ]
     void print(std::ostream& os) const
     {
         const int w = (int)os.width();

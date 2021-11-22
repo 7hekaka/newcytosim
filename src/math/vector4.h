@@ -80,6 +80,9 @@ public:
     
     /// copy 3 coordinates from Vector3
     explicit Vector4(const Vector3&);
+    
+    /// copy 3 coordinates
+    void operator =(const Vector3&);
 
     /// address of coordinate array
     real * data()                { return &XX; }
@@ -502,7 +505,7 @@ public:
     /// Calculate intermediate position = A + C * ( B - A )
     static Vector4 interpolated(const double a[], const double C, const double b[])
     {
-#if VECTOR3_USES_AVX
+#if VECTOR4_USES_AVX
         vec4 A = loadu4(a), B = loadu4(b);
         return Vector4(fmadd4(set4(C), sub4(B, A), A));
 #else

@@ -1,7 +1,7 @@
 # Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 
-OBJ_MATH := vector1.o vector2.o vector3.o matrix11.o matrix22.o matrix33.o\
+OBJ_MATH := vector1.o vector2.o vector3.o vector4.o matrix11.o matrix22.o matrix33.o\
     	rasterizer.o matrix.o sparmat.o sparmatsym.o project_ellipse.o\
     	sparmatsym1.o sparmatsym2.o matrix34.o matfull.o polygon.o\
         spherical_code.o random.o random_vector.o quartic_solver.o

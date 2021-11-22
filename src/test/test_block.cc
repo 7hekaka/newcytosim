@@ -20,9 +20,6 @@
 #include "matrix44.h"
 #include "matfull.h"
 
-Vector4 dir(0, 1, 0);
-Vector4 off(0.1, 0.2, -0.3);
-Vector4 sun(0, 0, 0);
 
 real diff(size_t size, real const* a, real const* b)
 {
@@ -33,21 +30,22 @@ real diff(size_t size, real const* a, real const* b)
 }
 
 
-template <typename MATRIX>
-void checkMatrix(MATRIX & mat)
+template <typename MATRIX, typename VECTOR>
+void checkMatrix(MATRIX & mat, VECTOR dir, VECTOR off, VECTOR sun)
 {
     mat = MATRIX::outerProduct(dir, off);
-    Vector4 vec = mat.vecmul(sun);
-    Vector4 vik = mat.trans_vecmul(sun);
+    VECTOR vec = mat.vecmul(sun);
+    VECTOR vik = mat.trans_vecmul(sun);
 
-    std::clog << vec << " | " << vik << "  ";
-    std::clog << mat << "  " << mat.transposed() << "\n";
+    std::clog << "block " << std::setw(3) << mat.what() << ":  ";
+    std::clog << vec << " | " << vik << "     ";
+    std::clog << mat << "\n";
+    //std::clog << mat.transposed() << "\n";
 
     //printf("  check %+16.6f  %+16.6f ", diff);
 }
 
-
-void checkMatrixFull(Matrix44 const& src)
+void checkMatrix44(Matrix44 const& src, Vector4 sun)
 {
     const size_t SUP = 4;
     MatrixFull mat;
@@ -57,12 +55,13 @@ void checkMatrixFull(Matrix44 const& src)
     for ( size_t j = 0; j < SUP; ++j )
         mat(i,j) = src(i,j);
     
-    Vector3 vec, vik(0,0,0), vok;
+    Vector4 vec, vik(0,0,0), vok;
     mat.vecMul0(sun, vec);
     mat.vecMulAdd(sun, vik);
     mat.vecMul(sun, vok);
 
-    std::clog << vec << " | " << vik << " | " << vok << "\n";
+    std::clog << "m-full 16:  ";
+    std::clog << vec << " = " << vik << " = " << vok << "\n";
     std::clog << mat << "\n";
 
     //printf("  check %+16.6f  %+16.6f ", diff);
@@ -70,19 +69,18 @@ void checkMatrixFull(Matrix44 const& src)
 
 
 template <typename MATRIX>
-void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, real * z)
+void speedBLAS(int cnt, MATRIX const& mat, real* src, real * x, real * y, real * z)
 {
-    size_t size = mat.size();
-    real* mem = new_real(size*size);
-    for ( size_t i = 0; i < size; ++i )
-    for ( size_t j = 0; j < size; ++j )
-        mem[i+size*j] = mat(i,j);
+    const int N = (int)mat.size();
+    real* mem = new_real(N*N);
+    for ( int i = 0; i < N; ++i )
+    for ( int j = 0; j < N; ++j )
+        mem[i+N*j] = mat(i,j);
     
-    const int N = (int)size;
     blas::xgemv('N', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
-    VecPrint::head(size, x);
+    VecPrint::head(N, x);
     tick();
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( int n = 0; n < cnt; ++n )
     {
         blas::xgemv('N', N, N, 1.0, mem, N, x, 1, 0.0, y, 1);
         blas::xgemv('N', N, N, 1.0, mem, N, y, 1, 0.0, z, 1);
@@ -91,18 +89,18 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
     printf("  DGEMV %5.2f\n", tock(cnt));
 
     // transpose matrix
-    for ( size_t i = 0  ; i < size; ++i )
-    for ( size_t j = i+1; j < size; ++j )
+    for ( int i = 0  ; i < N; ++i )
+    for ( int j = i+1; j < N; ++j )
     {
-        real tmp = mem[i+size*j];
-        mem[i+size*j] = mem[j+size*i];
-        mem[j+size*i] = tmp;
+        real tmp = mem[i+N*j];
+        mem[i+N*j] = mem[j+N*i];
+        mem[j+N*i] = tmp;
     }
     
     blas::xgemv('T', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
-    VecPrint::head(size, x);
+    VecPrint::head(N, x);
     tick();
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( int n = 0; n < cnt; ++n )
     {
         blas::xgemv('T', N, N, 1.0, mem, N, x, 1, 0.0, y, 1);
         blas::xgemv('T', N, N, 1.0, mem, N, y, 1, 0.0, z, 1);
@@ -114,7 +112,7 @@ void speedBLAS(size_t cnt, MATRIX const& mat, real* src, real * x, real * y, rea
 }
     
     
-void speedMatrix(size_t size, size_t cnt)
+void speedMatrix(int size, int cnt)
 {
     MatrixFull mat;
     mat.resize(size);
@@ -124,19 +122,19 @@ void speedMatrix(size_t size, size_t cnt)
     real * z = new_real(size);
     real * s = new_real(size);
 
-    for ( size_t i = 0; i < size; ++i )
+    for ( int i = 0; i < size; ++i )
         s[i] = RNG.sreal();
     
-    for ( size_t i = 0; i < size; ++i )
-    for ( size_t j = 0; j < size; ++j )
+    for ( int i = 0; i < size; ++i )
+    for ( int j = 0; j < size; ++j )
         mat(i,j) = RNG.preal();
 
-    printf("Matrix %s size %lu\n", mat.what().c_str(), size);
+    printf("Matrix %s size %i\n", mat.what().c_str(), size);
 
     mat.vecMul0(s, x);
     VecPrint::head(size, x);
     tick();
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( int n = 0; n < cnt; ++n )
     {
         mat.vecMul0(x, y);
         mat.vecMul0(y, z);
@@ -147,7 +145,7 @@ void speedMatrix(size_t size, size_t cnt)
     mat.vecMul(s, x);
     VecPrint::head(size, x);
     tick();
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( int n = 0; n < cnt; ++n )
     {
         mat.vecMul(x, y);
         mat.vecMul(y, z);
@@ -161,7 +159,7 @@ void speedMatrix(size_t size, size_t cnt)
     mat.transVecMul(s, x);
     VecPrint::head(size, x);
     tick();
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( int n = 0; n < cnt; ++n )
     {
         mat.transVecMul(x, y);
         mat.transVecMul(y, z);
@@ -186,20 +184,25 @@ int main( int argc, char* argv[] )
     std::clog.precision(3);
     RNG.seed();
     
-    if ( 0 )
+    if ( 1 )
     {
         Matrix33 M33(1,0);
         Matrix34 M34(1,0);
         Matrix44 M44(1,0);
+
+        Vector3 dir(1, 0, 0);
+        Vector3 off(0, 1, 0);
         
-        sun = Vector3::randS();
-        dir = Vector3::randU();
-        off = Vector3::randU();
-        
-        checkMatrix(M33);
-        checkMatrix(M34);
-        checkMatrix(M44);
-        checkMatrixFull(M44);
+        dir = Vector3::randS();
+        off = Vector3::randS();
+
+        Vector3 vec = Vector3::randS();
+
+        checkMatrix(M33, dir, off, vec);
+        checkMatrix(M34, dir, off, vec);
+
+        checkMatrix(M44, Vector4(dir), Vector4(off), Vector4(vec));
+        checkMatrix44(M44, Vector4(vec));
     }
     
     speedMatrix(119, 1<<12);

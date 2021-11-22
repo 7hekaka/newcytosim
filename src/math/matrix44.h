@@ -189,7 +189,7 @@ public:
         fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n", val[0x3], val[0x7], val[0xB], val[0xF]);
     }
     
-    /// print
+    /// print [ line1; line2; line3 ]
     void print(std::ostream& os) const
     {
         const int w = (int)os.width();

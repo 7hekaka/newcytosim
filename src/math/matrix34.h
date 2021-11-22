@@ -27,7 +27,7 @@
  without swap or shuffles.
 
  Matrix34 is defacto a 3x4 matrix, which can be used as a 3x3 matrix.
- The function clear_shadow() clears the data that is not part of the 3x3 matrix.
+ The function clear_shadow() clears the data outside the 3x3 core.
  */
 class alignas(4*sizeof(real)) Matrix34 final
 {
@@ -222,7 +222,7 @@ public:
         fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n", val[8], val[9], val[10], val[11]);
     }
     
-    /// print on one line
+    /// print [ line1; line2; line3 ]
     void print(std::ostream& os) const
     {
         const int w = (int)os.width();
@@ -937,16 +937,16 @@ public:
 #endif
     }
     
-    /// return outer product: [ vec (x) transpose(dir) ]
-    static Matrix34 outerProduct(Vector3 const& vec, Vector3 const& dir)
+    /// return outer product: [ dir (x) transpose(vec) ]
+    static Matrix34 outerProduct(Vector3 const& dir, Vector3 const& vec)
     {
 #if MATRIX34_USES_AVX
         Matrix34 res;
-        vec4 v = vec;
+        vec4 v = dir;
         vec4 p = swap2f128(v);
         vec4 l = blend22(v, p);
         vec4 u = blend22(p, v);
-        vec4 d = dir;
+        vec4 d = vec;
         store4(res.val  , mul4(d, duplo4(l)));
         store4(res.val+4, mul4(d, duphi4(l)));
         store4(res.val+8, mul4(d, duplo4(u)));
@@ -958,15 +958,15 @@ public:
 #endif
     }
     
-    /// return outer product: [ vec (x) transpose(dir) ]
-    static Matrix34 outerProduct(real const* vec, real const* dir)
+    /// return outer product: [ dir (x) transpose(vec) ]
+    static Matrix34 outerProduct(real const* dir, real const* vec)
     {
 #if MATRIX34_USES_AVX
         Matrix34 res;
-        vec4 d = load3(dir);
-        store4(res.val  , mul4(d, broadcast1(vec  )));
-        store4(res.val+4, mul4(d, broadcast1(vec+1)));
-        store4(res.val+8, mul4(d, broadcast1(vec+2)));
+        vec4 d = load3(vec);
+        store4(res.val  , mul4(d, broadcast1(dir  )));
+        store4(res.val+4, mul4(d, broadcast1(dir+1)));
+        store4(res.val+8, mul4(d, broadcast1(dir+2)));
         return res;
 #else
         return Matrix34(dir[0]*vec[0], dir[1]*vec[0], dir[2]*vec[0],
