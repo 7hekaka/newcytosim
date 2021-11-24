@@ -29,9 +29,12 @@ public:
     
     /// number of interpolated points (order)
     size_t rank_;
+    
+    /// set coefficients
+    void set_coef(real a, real b, real c) { coef_[1]=a; coef_[2]=b; coef_[3]=c; polish(); }
 
-    /// calculate rank: how many coefficients are not null
-    size_t calcRank() const;
+    /// calculate rank by considering which coefficients are not null
+    void polish();
     
 public:
     
@@ -56,22 +59,22 @@ public:
     /// position in space calculated from interpolation
     Vector pos() const;
     
-    /// attachement point
+    /// number of points beeing interpolated
     size_t rank() const { return rank_; }
 
-    /// attachement point
+    /// first attachement point
     Mecapoint vertex0() const { return Mecapoint(mec_, prime_); }
     
-    /// index of prime point in matrix
-    size_t primeIndex() const { return mec_->matIndex() + prime_; }
-    
+    /// index of first interpolated point in matrix
+    size_t matIndex() const { return mec_->matIndex() + prime_; }
+
     /// interpolation coefficients
     const real* coef() const { return coef_; }
 
-    /// create addLink with given Interpolation
+    /// call Meca::addLink to given Interpolation
     void addLink(Meca&, Interpolation const&, real weight) const;
     
-    /// create addLink with given Mecapoint
+    /// call Meca::addLink to given Mecapoint
     void addLink(Meca&, Mecapoint const&, real weight) const;
 
     /// check validity

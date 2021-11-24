@@ -23,25 +23,38 @@ private:
      1 = the interpolation corresponds exactly to point 'prime_'
      2 or 3 = link fiber-end with coef1_, fiber-side with coef2_
      */
-    size_t   rank_;
+    size_t rank_;
 
     /// index of first point on the Solid
-    size_t   prime_;
+    size_t prime_;
     
     /// interpolation coefficient for Fiber end
-    real     coef1_[4];
+    real coef1_[4];
     
     /// interpolation coefficient for Fiber side
-    real     coef2_[4];
+    real coef2_[4];
     
     /// distance between the two anchoring points
-    real     len_;
+    real len_;
     
 #if BACKWARD_COMPATIBILITY < 47
     /// index used for backward compatibility
-    size_t   alt_;
+    size_t alt_;
 #endif
     
+    /// set coefficients
+    void set_coef1(real a, real b, real c) { coef1_[0]=1.0-a-b-c; coef1_[1]=a; coef1_[2]=b; coef1_[3]=c; }
+    void set_coef2(real a, real b, real c) { coef2_[0]=1.0-a-b-c; coef2_[1]=a; coef2_[2]=b; coef2_[3]=c; }
+    
+    /// calculate rank: how many coefficients are not null
+    void polish()
+    {
+        size_t R = 4;
+        while ((R > 0) & (abs_real(coef1_[R-1]) < REAL_EPSILON))
+            --R;
+        rank_ = R;
+    }
+
 public:
     
     /// constructor
@@ -49,30 +62,18 @@ public:
     {
         reset();
     }
-    
+
     /// set to zero
     void reset()
     {
         rank_ = 0;
         prime_ = 0;
         len_ = 0;
-        for ( int i = 0; i < 4; ++i )
-        {
-            coef1_[i] = 0.0;
-            coef2_[i] = 0.0;
-        }
+        set_coef1(0.0, 0.0, 0.0);
+        set_coef2(0.0, 0.0, 0.0);
 #if BACKWARD_COMPATIBILITY < 47
         alt_ = 0;
 #endif
-    }
-    
-    /// calculate rank: how many coefficients are not null
-    size_t calcRank() const
-    {
-        size_t res = 4;
-        while ((res > 0) & (abs_real(coef1_[res-1]) < REAL_EPSILON))
-            --res;
-        return res;
     }
 
     /// set to interpolate from A to B
@@ -80,31 +81,17 @@ public:
     {
         len_ = ( A - B ).norm();
         
-        coef1_[1] = A.XX;
-        coef2_[1] = B.XX;
 #if ( DIM == 1 )
-        coef1_[2] = 0.0;
-        coef2_[2] = 0.0;
-        coef1_[3] = 0.0;
-        coef2_[3] = 0.0;
-        coef1_[0] = 1.0 - A.XX;
-        coef2_[0] = 1.0 - B.XX;
+        set_coef1(A.XX, 0.0, 0.0);
+        set_coef2(B.XX, 0.0, 0.0);
 #elif ( DIM == 2 )
-        coef1_[2] = A.YY;
-        coef2_[2] = B.YY;
-        coef1_[3] = 0.0;
-        coef2_[3] = 0.0;
-        coef1_[0] = 1.0 - A.XX - A.YY;
-        coef2_[0] = 1.0 - B.XX - B.YY;
-#elif ( DIM == 3 )
-        coef1_[2] = A.YY;
-        coef2_[2] = B.YY;
-        coef1_[3] = A.ZZ;
-        coef2_[3] = B.ZZ;
-        coef1_[0] = 1.0 - A.XX - A.YY - A.ZZ;
-        coef2_[0] = 1.0 - B.XX - B.YY - B.ZZ;
+        set_coef1(A.XX, A.YY, 0.0);
+        set_coef2(B.XX, B.YY, 0.0);
+#else
+        set_coef1(A.XX, A.YY, A.ZZ);
+        set_coef2(B.XX, B.YY, B.ZZ);
 #endif
-        rank_ = calcRank();
+        polish();
     }
 
     /// save coefficient to file
@@ -124,14 +111,12 @@ public:
         
         for ( int d = 1; d < 4; ++d )
             coef1_[d] = in.readFloat();
-        coef1_[0] = 1.0 - coef1_[1] - coef1_[2] - coef1_[3] * (DIM==3);
         
         for ( int d = 1; d < 4; ++d )
             coef2_[d] = in.readFloat();
-        coef2_[0] = 1.0 - coef2_[1] - coef2_[2] - coef2_[3] * (DIM==3);
         
         len_ = rad * ( Vector3(coef1_+1) - Vector3(coef2_+1) ).norm();
-        rank_ = calcRank();
+        polish();
     }
     
 #if BACKWARD_COMPATIBILITY < 47
@@ -140,9 +125,10 @@ public:
         reset();
         prime_ = in.readUInt16();
         alt_ = in.readUInt16();
-        coef1_[0] = 1.0;
         len_ = ( sol->posPoint(prime_) - sol->posPoint(alt_) ).norm();
-        rank_ = 1;
+        set_coef1(0.0, 0.0, 0.0);
+        set_coef2(0.0, 0.0, 0.0);
+        polish();
         if ( prime_ >= sol->nbPoints() )
             throw InvalidIO("invalid AsterLink index");
         if ( alt_ >= sol->nbPoints() )

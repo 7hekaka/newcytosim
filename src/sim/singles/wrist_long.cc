@@ -118,13 +118,18 @@ void WristLong::setInteractions(Meca& meca) const
 #if ( DIM == 2 )
     
     mArm = calcArm(itp, posFoot(), prop->length);
-    meca.addSideLink2D(itp, base_.vertex0(), mArm, prop->stiffness);
-    
+    if ( base_.rank() == 1 )
+        meca.addSideLink2D(itp, base_.vertex0(), mArm, prop->stiffness);
+    else
+        throw InvalidParameter("unfinished WristLong::setInteractions(length>0, Interpolation4)");
+
 #elif ( DIM >= 3 )
     
     mArm = calcArm(itp, posFoot(), prop->length);
-    meca.addSideLink3D(itp, base_.vertex0(), mArm, prop->stiffness);
-    
+    if ( base_.rank() == 1 )
+        meca.addSideLink3D(itp, base_.vertex0(), mArm, prop->stiffness);
+    else
+        throw InvalidParameter("unfinished WristLong::setInteractions(length>0, Interpolation4)");
 #endif
 }
 

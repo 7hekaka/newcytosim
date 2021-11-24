@@ -11,12 +11,23 @@ void Interpolation4::clear()
 {
     mec_ = nullptr;
     prime_ = 0;
+    set_coef(0.0, 0.0, 0.0);
+}
+
+
+void Interpolation4::polish()
+{
+    // ensures that sum of coefficients is 1
+    coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
+
+    size_t R = 4;
+    while ((R > 0) & (abs_real(coef_[R-1]) < REAL_EPSILON))
+        --R;
+    rank_ = R;
     
-    rank_ = 0;
-    coef_[0] = 1.0;
-    coef_[1] = 0.0;
-    coef_[2] = 0.0;
-    coef_[3] = 0.0;
+    // the last point to be interpolated is ( prime_ + rank_ -1 )
+    if ( mec_ && prime_+rank_ > mec_->nbPoints() )
+        throw InvalidParameter("out-of-range Interpolation4");
 }
 
 
@@ -29,21 +40,7 @@ void Interpolation4::set(Mecable const* m, size_t p)
     
     mec_ = m;
     prime_ = p;
-    
-    rank_ = 1;
-    coef_[0] = 1.0;
-    coef_[1] = 0.0;
-    coef_[2] = 0.0;
-    coef_[3] = 0.0;
-}
-
-
-size_t Interpolation4::calcRank() const
-{
-    size_t res = 4;
-    while ((res > 0) & (abs_real(coef_[res-1]) < REAL_EPSILON))
-        --res;
-    return res;
+    set_coef(0.0, 0.0, 0.0);
 }
 
 /**
@@ -60,12 +57,7 @@ void Interpolation4::set(Mecable const* m, size_t p, size_t q, real c)
     
     mec_ = m;
     prime_ = p;
-    
-    rank_ = 2;
-    coef_[0] = c;
-    coef_[1] = 1.0 - c;
-    coef_[2] = 0.0;
-    coef_[3] = 0.0;
+    set_coef(1.0-c, 0.0, 0.0);
 }
 
 /**
@@ -86,25 +78,13 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
     mec_ = m;
     prime_ = p;
 
-    coef_[1] = vec.XX;
 #if ( DIM == 1 )
-    coef_[2] = 0.0;
-    coef_[3] = 0.0;
-    coef_[0] = 1.0 - vec.XX;
+    set_coef(vec.XX, 0.0, 0.0);
 #elif ( DIM == 2 )
-    coef_[2] = vec.YY;
-    coef_[3] = 0.0;
-    coef_[0] = 1.0 - vec.XX - vec.YY;
+    set_coef(vec.XX, vec.YY, 0.0);
 #else
-    coef_[2] = vec.YY;
-    coef_[3] = vec.ZZ;
-    coef_[0] = 1.0 - vec.XX - vec.YY - vec.ZZ;
+    set_coef(vec.XX, vec.YY, vec.ZZ);
 #endif
-
-    rank_ = calcRank();
-
-    // the last point to be interpolated is ( prime_ + rank_ -1 )
-    assert_true(prime_+rank_ <= m->nbPoints());
 }
 
 
@@ -220,9 +200,7 @@ void Interpolation4::read(Inputter& in, Simul& sim)
         prime_ = in.readUInt16();
         for ( int d = 1; d < 4; ++d )
             coef_[d] = in.readFloat();
-        // set derived variables:
-        coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
-        rank_ = calcRank();
+        polish();
     }
     else
     {
