@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2019 Cambridge University
 
 #include "dim.h"
 #include "cymdef.h"
@@ -62,6 +62,107 @@ inline bool any_equal(const size_t a, const size_t b, const size_t c,
     return ( a == b ) | ( a == c ) | ( a == d ) | ( a == e );
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Linear Interpolation of Vectors
+//------------------------------------------------------------------------------
+
+static Vector interpolate1(const real vec[], const size_t inx)
+{
+    return Vector(vec+DIM*inx);
+}
+
+static Vector interpolate2(const real vec[], const size_t i0, real f0, const size_t i1, real f1)
+{
+    Vector P0(vec+DIM*i0);
+    Vector P1(vec+DIM*i1);
+    return f0 * P0 + f1 * P1 ;
+}
+
+static Vector interpolate3(const real vec[], const size_t inx[3], const real f[3])
+{
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    return ( f[0] * P0 + f[1] * P1 ) + f[2] * P2;
+}
+
+static Vector interpolate4(const real vec[], const size_t inx[4], const real f[4])
+{
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    Vector P3(vec+DIM*inx[3]);
+    return ( f[0] * P0 + f[1] * P1 ) + ( f[2] * P2 + f[3] * P3 );
+}
+
+static Vector interpolate5(const real vec[], const size_t inx[5], const real f[5])
+{
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    Vector P3(vec+DIM*inx[3]);
+    Vector P4(vec+DIM*inx[4]);
+    return ( f[0] * P0 + f[1] * P1 ) + ( f[2] * P2 + f[3] * P3 ) + f[4] * P4;
+}
+
+static Vector interpolate6(const real vec[], const size_t inx[6], const real f[6])
+{
+    Vector P0(vec+DIM*inx[0]);
+    Vector P1(vec+DIM*inx[1]);
+    Vector P2(vec+DIM*inx[2]);
+    Vector P3(vec+DIM*inx[3]);
+    Vector P4(vec+DIM*inx[4]);
+    Vector P5(vec+DIM*inx[5]);
+    return ( f[0] * P0 + f[1] * P1 + f[2] * P2 ) + ( f[3] * P3 + f[4] * P4 + f[5] * P5 );
+}
+
+/// Attention: here indices are already multiplied by DIM
+static Vector interpolateX(const real vec[], const size_t i0, real f0, size_t i1, real f1)
+{
+    Vector P0(vec+i0);
+    Vector P1(vec+i1);
+    return f0 * P0 + f1 * P1;
+}
+
+inline static Vector position_delta(Mecapoint const& A, Mecapoint const& B)
+{
+    return B.pos() - A.pos();
+}
+
+inline static Vector position_delta(Mecapoint const& A, Interpolation const& B)
+{
+    return B.pos() - A.pos();
+}
+
+inline static Vector position_delta(Interpolation const& A, Mecapoint const& B)
+{
+    return B.pos() - A.pos();
+}
+
+inline static Vector position_delta(Interpolation const& A, Interpolation const& B)
+{
+    return B.pos() - A.pos();
+}
+
+inline static Vector modulo_offset(Mecapoint const& A, Mecapoint const& B)
+{
+    return modulo->offset(position_delta(A, B));
+}
+
+inline static Vector modulo_offset(Mecapoint const& A, Interpolation const& B)
+{
+    return modulo->offset(position_delta(A, B));
+}
+
+inline static Vector modulo_offset(Interpolation const& A, Mecapoint const& B)
+{
+    return modulo->offset(position_delta(A, B));
+}
+
+inline static Vector modulo_offset(Interpolation const& A, Interpolation const& B)
+{
+    return modulo->offset(position_delta(A, B));
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Functions to set matrix elements
@@ -957,7 +1058,7 @@ void Meca::addTorque(Mecapoint const& ptA,
     const size_t iiC = DIM * ptC.matIndex();
 
     /*
-    Vector CD = ptB.pos() + R * AB - ptC.pos();
+    Vector CD = position_delta(ptC, ptB) + R * AB;
     Vector fA = T * CD;
     Vector fB = ( W + T ) * ( -CD );
     Vector fC = weight * CD;
@@ -1004,8 +1105,8 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
 
 #if ( DIM >= 3 )
     /*
-    const Vector3 AB = ptB.pos() - ptA.pos();
-    const Vector3 BC = ptC.pos() - ptB.pos();
+    const Vector3 AB = position_delta(ptA, ptB);
+    const Vector3 BC = position_delta(ptB, ptC);
     Vector3 axi = normalize(cross(AB, BC));
     if ( axi != axi )
         return;
@@ -1064,7 +1165,7 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
     assert_true( weight >= 0 );
     assert_true( weightL >= 0 );
     const MatrixBlock W(0, -weight);
-    const Vector AB = ptB.pos() - ptA.pos();
+    const Vector AB = position_delta(ptA, ptB);
     const MatrixBlock T = R.transposed();
     
     // full indices:
@@ -1190,68 +1291,6 @@ void Meca::addTorque(Mecapoint const& ptA,
 #endif
 }
 
-//------------------------------------------------------------------------------
-#pragma mark - Linear Interpolation of Vectors
-//------------------------------------------------------------------------------
-
-static Vector interpolate1(const real vec[], const size_t inx)
-{
-    return Vector(vec+DIM*inx);
-}
-
-static Vector interpolate2(const real vec[], const size_t inx[2], real f0, real f1)
-{
-    Vector P0(vec+DIM*inx[0]);
-    Vector P1(vec+DIM*inx[1]);
-    return f0 * P0 + f1 * P1 ;
-}
-
-static Vector interpolate3(const real vec[], const size_t inx[3], real f0, real f1, real f2)
-{
-    Vector P0(vec+DIM*inx[0]);
-    Vector P1(vec+DIM*inx[1]);
-    Vector P2(vec+DIM*inx[2]);
-    return ( f0 * P0 + f1 * P1 ) + f2 * P2;
-}
-
-static Vector interpolate4(const real vec[], const size_t inx[4], real f0, real f1, real f2, real f3)
-{
-    Vector P0(vec+DIM*inx[0]);
-    Vector P1(vec+DIM*inx[1]);
-    Vector P2(vec+DIM*inx[2]);
-    Vector P3(vec+DIM*inx[3]);
-    return ( f0 * P0 + f1 * P1 ) + ( f2 * P2 + f3 * P3 );
-}
-
-static Vector interpolate5(const real vec[], const size_t inx[5], real f0, real f1, real f2, real f3, real f4)
-{
-    Vector P0(vec+DIM*inx[0]);
-    Vector P1(vec+DIM*inx[1]);
-    Vector P2(vec+DIM*inx[2]);
-    Vector P3(vec+DIM*inx[3]);
-    Vector P4(vec+DIM*inx[4]);
-    return ( f0 * P0 + f1 * P1 ) + ( f2 * P2 + f3 * P3 ) + f4 * P4;
-}
-
-static Vector interpolate6(const real vec[], const size_t inx[6], real f0, real f1, real f2, real f3, real f4, real f5)
-{
-    Vector P0(vec+DIM*inx[0]);
-    Vector P1(vec+DIM*inx[1]);
-    Vector P2(vec+DIM*inx[2]);
-    Vector P3(vec+DIM*inx[3]);
-    Vector P4(vec+DIM*inx[4]);
-    Vector P5(vec+DIM*inx[5]);
-    return ( f0 * P0 + f1 * P1 ) + ( f2 * P2 + f3 * P3 ) + ( f4 * P4 + f5 * P5 );
-}
-
-/// Attention: this indices are already multiplied by DIM
-static Vector interpolateX(const real vec[], const size_t i0, real f0, size_t i1, real f1)
-{
-    Vector P0(vec+i0);
-    Vector P1(vec+i1);
-    return f0 * P0 + f1 * P1 ;
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark - Isotropic links between Mecables
@@ -1303,18 +1342,18 @@ void Meca::addLink(Mecapoint const& ptA,
     if ( modulo )
     {
 #if USE_GLOBAL_POSITION
-        Vector off = ptB.pos() - ptA.pos();
+        Vector off = modulo_offset(ptA, ptB);
 #else
         Vector off = interpolate1(vPTS, ii1) - interpolate1(vPTS, ii0);
-#endif
         off = modulo->offset(off);
+#endif
         if ( off.is_not_zero() )
         {
             add_base(DIM*ii0, off,-weight);
             add_base(DIM*ii1, off, weight);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), ptB.pos());
+    DRAW_LINK(ptA, ptB.pos());
 }
 
 
@@ -1359,13 +1398,11 @@ void Meca::addLink(Interpolation const& ptA,
     if ( modulo )
     {
 #if USE_GLOBAL_POSITION
-        Vector off = ptB.pos() - ptA.pos();
+        Vector off = modulo_offset(ptA, ptB);
 #else
-        const size_t inx[] = { ii0, ii1, ii2 };
-        //Vector off = interpolate3(vPTS, inx, cc0, cc1, 1.0);
-        Vector off = interpolate2(vPTS, inx, cc0, cc1) + interpolate1(vPTS, ii2);
-#endif
+        Vector off = interpolate2(vPTS, ii0, cc0, ii1, cc1) + interpolate1(vPTS, ii2);
         off = modulo->offset(off);
+#endif
         if ( off.is_not_zero() )
         {
             add_base(DIM*ii0, off, ww0);
@@ -1373,7 +1410,7 @@ void Meca::addLink(Interpolation const& ptA,
             add_base(DIM*ii2, off, ww2);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), ptB.pos());
+    DRAW_LINK(ptA, ptB.pos());
 }
 
 
@@ -1419,13 +1456,11 @@ void Meca::addLink(Mecapoint const& ptA,
     if ( modulo )
     {
 #if USE_GLOBAL_POSITION
-        Vector off = ptB.pos() - ptA.pos();
+        Vector off = modulo_offset(ptA, ptB);
 #else
-        const size_t inx[] = { ii0, ii1, ii2 };
-        //Vector off = interpolate3(vPTS, inx, -1.0, cc1, cc2);
-        Vector off = interpolate2(vPTS, inx+1, cc1, cc2) - interpolate1(vPTS, ii0);
-#endif
+        Vector off = interpolate2(vPTS, ii1, cc1, ii2, cc2) - interpolate1(vPTS, ii0);
         off = modulo->offset(off);
+#endif
         if ( off.is_not_zero() )
         {
             add_base(DIM*ii0, off, ww0);
@@ -1433,7 +1468,7 @@ void Meca::addLink(Mecapoint const& ptA,
             add_base(DIM*ii2, off, ww2);
         }
     }
-    DRAW_LINK(ptB, ptB.pos(), ptA.pos());
+    DRAW_LINK(ptB, ptA.pos());
 }
 
 
@@ -1489,13 +1524,11 @@ void Meca::addLink(Interpolation const& ptA,
     if ( modulo )
     {
 #if USE_GLOBAL_POSITION
-        Vector off = ptB.pos() - ptA.pos();
+        Vector off = modulo_offset(ptA, ptB);
 #else
-        const size_t inx[] = { ii0, ii1, ii2, ii3 };
-        //Vector off = interpolate4(vPTS, inx, cc0, cc1, cc2, cc3);
-        Vector off = interpolate2(vPTS, inx+2, cc2, cc3) - interpolate2(vPTS, inx, cc0, cc1);
-#endif
+        Vector off = interpolate2(vPTS, ii0, cc0, ii1, cc1) + interpolate2(vPTS, ii2, cc2, ii3, cc3);
         off = modulo->offset(off);
+#endif
         if ( off.is_not_zero() )
         {
             add_base(DIM*ii0, off, ww0);
@@ -1504,7 +1537,7 @@ void Meca::addLink(Interpolation const& ptA,
             add_base(DIM*ii3, off, ww3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), ptB.pos());
+    DRAW_LINK(ptA, ptB.pos());
 }
 
 //------------------------------------------------------------------------------
@@ -1554,9 +1587,7 @@ void Meca::addLink1(Interpolation const& pti,
     
     if ( modulo )
     {
-        const size_t inx[] = { ii0, ii1, ii2 };
-        //Vector off = interpolate3(vPTS, inx, -1.0, cc1, cc2);
-        Vector off = interpolate2(vPTS, inx+1, cc1, cc2) - interpolate1(vPTS, ii0);
+        Vector off = interpolate2(vPTS, ii1, cc1, ii2, cc2) - interpolate1(vPTS, ii0);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1614,9 +1645,7 @@ void Meca::addLink2(Mecapoint const& ptA,
     
     if ( modulo )
     {
-        const size_t inx[] = { ii0, ii1, ii2 };
-        //Vector off = interpolate3(vPTS, inx, cc0, cc1, cc2);
-        Vector off = interpolate2(vPTS, inx+1, cc1, cc2) - interpolate1(vPTS, ii0);
+        Vector off = interpolate2(vPTS, ii1, cc1, ii2, cc2) - interpolate1(vPTS, ii0);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1678,9 +1707,7 @@ void Meca::addLink2(Interpolation const& pti,
     
     if ( modulo )
     {
-        const size_t inx[] = { ii0, ii1, ii2, ii3 };
-        //Vector off = interpolate4(vPTS, inx, cc0, cc1, cc2, cc3);
-        Vector off = interpolate2(vPTS, inx+2, cc2, cc3) + interpolate2(vPTS, inx, cc0, cc1);
+        Vector off = interpolate2(vPTS, ii0, cc0, ii1, cc1) + interpolate2(vPTS, ii2, cc2, ii3, cc3);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1744,9 +1771,7 @@ void Meca::addLink3(Mecapoint const& ptA,
     
     if ( modulo )
     {
-        const size_t inx[] = { ii0, ii1, ii2, ii3 };
-        //Vector off = interpolate4(vPTS, inx, cc0, cc1, cc2, cc3);
-        Vector off = interpolate3(vPTS, inx+1, cc1, cc2, cc3) - interpolate1(vPTS, ii0);
+        Vector off = interpolate3(vPTS, pts, coef) - interpolate1(vPTS, ii0);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1819,9 +1844,7 @@ void Meca::addLink3(Interpolation const& pti,
     
     if ( modulo )
     {
-        const size_t inx[] = { ii0, ii1, ii2, ii3, ii4 };
-        //Vector off = interpolate5(vPTS, inx, cc0, cc1, cc2, cc3, cc4);
-        Vector off = interpolate3(vPTS, inx+2, cc2, cc3, cc4) + interpolate2(vPTS, inx, cc0, cc1);
+        Vector off = interpolate2(vPTS, ii0, cc0, ii1, cc1) + interpolate3(vPTS, pts, coef);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1895,9 +1918,7 @@ void Meca::addLink4(Mecapoint const& ptA,
     
     if ( modulo )
     {
-        const size_t inx[] = { ii0, ii1, ii2, ii3, ii4 };
-        //Vector off = interpolate5(vPTS, inx, cc0, cc1, cc2, cc3, cc4);
-        Vector off = interpolate4(vPTS, inx+1, cc1, cc2, cc3, cc4) - interpolate1(vPTS, ii0);
+        Vector off = interpolate4(vPTS, pts, coef) - interpolate1(vPTS, ii0);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1981,9 +2002,7 @@ void Meca::addLink4(Interpolation const& pti,
 
     if ( modulo )
     {
-        const size_t inx[] = { ii0, ii1, ii2, ii3, ii4, ii5 };
-        //Vector off = interpolate6(vPTS, inx, cc0, cc1, cc2, cc3, cc4, cc5);
-        Vector off = interpolate4(vPTS, inx+2, cc2, cc3, cc4, cc5) + interpolate2(vPTS, inx, cc0, cc1);
+        Vector off = interpolate2(vPTS, ii0, cc0, ii1, cc1) + interpolate4(vPTS, pts, coef);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -2009,7 +2028,7 @@ void Meca::addLink4(Interpolation const& pti,
      force_B = weight * ( A - B ) * ( length / |AB| - 1 )
  
  This streamlined version of addLongLink() is used for Steric interaction, with:
- - axi = ptB.pos() - ptA.pos()
+ - axi = position(ptB) - position(ptA)
  - ab2 = normSqr(axi)
  - periodic boundary conditions have been applied to `axi` if necessary
  - 'ab2 < len * len', thus leading to a repulsive force only.
@@ -2032,7 +2051,7 @@ void Meca::addLongLink1(Mecapoint const& ptA,
 
     if ( ab2 > REAL_EPSILON )
     {
-        DRAW_LINK(ptA, ptA.pos(), axi, len);
+        DRAW_LINK(ptA, axi, len);
 
         const real abn = std::sqrt(ab2);
         const real wab = weight / ab2;
@@ -2048,7 +2067,7 @@ void Meca::addLongLink1(Mecapoint const& ptA,
         
         if ( modulo )
         {
-            Vector off = modulo->offset(ptB.pos() - ptA.pos());
+            Vector off = modulo_offset(ptA, ptB);
             if ( off.is_not_zero() )
             {
                 off = wT * off;
@@ -2068,7 +2087,7 @@ The force is affine with non-zero resting length:
     force_B = weight * ( A - B ) * ( length / |AB| - 1 )
 
 This streamlined version of addLongLink() is used for Steric interaction, with:
- - axi = ptB.pos() - ptA.pos()
+ - axi = position(ptB) - position(ptA)
  - ab2 = normSqr(axi)
  - periodic boundary conditions have been applied to `axi` if necessary
 */
@@ -2088,7 +2107,7 @@ void Meca::addLongLink2(Mecapoint const& ptA,
 
     if ( ab2 > REAL_EPSILON )
     {
-        DRAW_LINK(ptA, ptA.pos(), axi, len);
+        DRAW_LINK(ptA, axi, len);
 
         const real iab = 1.0 / ab2;
         const real abn = std::sqrt(ab2);
@@ -2113,7 +2132,7 @@ void Meca::addLongLink2(Mecapoint const& ptA,
         
         if ( modulo )
         {
-            Vector off = modulo->offset(ptB.pos()-ptA.pos());
+            Vector off = modulo_offset(ptA, ptB);
             if ( off.is_not_zero() )
             {
                 off = wT * off;
@@ -2148,7 +2167,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     if ( ia == ib )
         return;
     
-    Vector off, axi = ptB.pos() - ptA.pos();
+    Vector off, axi = position_delta(ptA, ptB);
 
     if ( modulo )
         modulo->foldOffset(axi, off);
@@ -2158,7 +2177,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     const real abn = std::sqrt(ab2);
     const real wla = weight * len / abn;
     
-    DRAW_LINK(ptA, ptA.pos(), axi, len);
+    DRAW_LINK(ptA, axi, len);
     
     MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
@@ -2214,7 +2233,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     if ( any_equal(ii2, ii0, ii1) )
         return;
 
-    Vector off, axi = ptA.pos() - ptB.pos();
+    Vector off, axi = position_delta(ptB, ptA);
 
     if ( modulo )
         modulo->foldOffset(axi, off);
@@ -2255,7 +2274,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
         add_base(ii1, off, cc1);
         add_base(ii2, off);
     }
-    DRAW_LINK(ptB, ptB.pos(), axi, len);
+    DRAW_LINK(ptB, axi, len);
 }
 
 
@@ -2291,7 +2310,7 @@ void Meca::addLongLink(Interpolation const& ptA,
     const real cc2 =  ptB.coef0();
     const real cc3 =  ptB.coef1();
 
-    Vector off, axi = ptB.pos() - ptA.pos();
+    Vector off, axi = position_delta(ptA, ptB);
 
     if ( modulo )
         modulo->foldOffset(axi, off);
@@ -2344,7 +2363,7 @@ void Meca::addLongLink(Interpolation const& ptA,
         add_base(ii2, off, cc2);
         add_base(ii3, off, cc3);
     }
-    DRAW_LINK(ptA, ptA.pos(), axi, len);
+    DRAW_LINK(ptA, axi, len);
 }
 
 
@@ -2377,8 +2396,8 @@ void Meca::addLongLink4(Interpolation const& ptA,
     
     assert_small(cc0+cc1+cc2+cc3-1.0);
 
-    //Vector axi = interpolate4(vPTS, inx, cc2, cc3, cc4, cc5) - ptA.pos();
-    Vector axi = interpolate4(vPTS, inx, cc2, cc3, cc4, cc5) + interpolateX(vPTS, ii0, cc0, ii1, cc1);
+    //Vector axi = interpolate4(vPTS, inx, coef) - ptA.pos();
+    Vector axi = interpolate4(vPTS, inx, coef) + interpolateX(vPTS, ii0, cc0, ii1, cc1);
     Vector off;
 
     if ( modulo )
@@ -2451,7 +2470,7 @@ void Meca::addLongLink4(Interpolation const& ptA,
         add_base(ii4, off, cc4);
         add_base(ii5, off, cc5);
     }
-    DRAW_LINK(ptA, ptA.pos(), axi, len);
+    DRAW_LINK(ptA, axi, len);
 }
 
 
@@ -2515,7 +2534,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             Matrix22 wAt(ww0,  we, -we, ww0);
@@ -2525,7 +2544,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
             add_base(ii2, off, weight);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
 #endif
@@ -2603,7 +2622,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             add_base(ii0, wAt*off);
@@ -2611,7 +2630,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
             add_base(ii2, off, weight);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
 /**
@@ -2758,7 +2777,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             Matrix22 wAt(ww0,  we, -we, ww0);
@@ -2769,7 +2788,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
             add_base(ii3, off, ww3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
 #endif
@@ -2778,7 +2797,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 /**
  Link `B` to an interpolated point `S` on the side of `A`:
  
-     S = A.pos() + cross( arm, A.dir() )
+     S = position(A) + cross( arm, A.dir() )
  
  Where A.dir() is the direction of the Fiber supporting `A`, in `A`.
  The vector `arm` should ideally be perpendicular to A.dir(), and in this case,
@@ -2850,7 +2869,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             add_base(ii0, wAt*off);
@@ -2859,7 +2878,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
             add_base(ii3, off, wcc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
  
@@ -3030,7 +3049,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA, const real armA,
     mFUL(ia2+1, ib1) +=  ee2ca2w - ee1cb1w;
     mFUL(ia2+1, ib2) -=  ee2ca2w + ee1cb2w;
     
-    DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
     
     if ( modulo )
         throw Exception("addSideSideLink2D is not usable with periodic boundary conditions");
@@ -3109,7 +3128,7 @@ void Meca::addSideSideLink(Interpolation const& ptA, Torque const& armA,
     if ( modulo )
     {
         //this was not tested!
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             add_base(ii0, wAt*off);
@@ -3118,7 +3137,7 @@ void Meca::addSideSideLink(Interpolation const& ptA, Torque const& armA,
             add_base(ii3, wDt*off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(armA, ptA.dir()), cross(armB, ptB.dir()), ptB.pos());
 }
 
 
@@ -3149,14 +3168,14 @@ void Meca::addSideSideLink(Interpolation const& ptA,
     
 #elif ( DIM == 2 )
     
-    Vector dir = ptB.pos() - ptA.pos();
+    Vector dir = position_delta(ptA, ptB);
     real armA = std::copysign(0.5*len, cross(ptA.diff(), dir));
     real armB = std::copysign(0.5*len, cross(dir, ptB.diff()));
     addSideSideLink(ptA, armA, ptB, armB, weight);
 
 #else
     
-    Vector dir = ptB.pos() - ptA.pos();
+    Vector dir = position_delta(ptA, ptB);
     Vector armA = cross(ptA.diff(), dir).normalized(0.5*len);
     Vector armB = cross(dir, ptB.diff()).normalized(0.5*len);
     addSideSideLink(ptA, armA, ptB, armB, weight);
@@ -3239,7 +3258,7 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, MatrixBlock const& R,
     if ( modulo )
     {
         //this was not tested!
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             add_base(ii0, wAt*off);
@@ -3248,7 +3267,7 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, MatrixBlock const& R,
             add_base(ii3, wDt*off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), R * ptA.diff(), T * ptB.diff(), ptB.pos());
+    DRAW_LINK(ptA, R * ptA.diff(), T * ptB.diff(), ptB.pos());
 }
 
 
@@ -3337,7 +3356,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             off = wT * off;
@@ -3346,7 +3365,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), ptB.pos());
+    DRAW_LINK(ptA, ptB.pos());
 }
 
 
@@ -3416,7 +3435,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
 
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             off = wT * off;
@@ -3426,7 +3445,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
             add_base(ii3, off, cc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), ptB.pos());
+    DRAW_LINK(ptA, ptB.pos());
 }
 
 //------------------------------------------------------------------------------
@@ -3499,7 +3518,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             //off = -weight * ( off - dot(off, dir) * dir );
@@ -3509,7 +3528,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.diff()), ptB.pos());
+    DRAW_LINK(ptA, cross(leg, ptA.diff()), ptB.pos());
 }
 
 
@@ -3555,7 +3574,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
 
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             off = wT * off;
@@ -3564,7 +3583,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), axi, ptB.pos());
+    DRAW_LINK(ptA, axi, ptB.pos());
 }
 
 #elif ( DIM == 3 )
@@ -3621,7 +3640,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
 
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             off = wT * off;
@@ -3630,7 +3649,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), arm, ptB.pos());
+    DRAW_LINK(ptA, arm, ptB.pos());
 }
 
 #endif
@@ -3685,7 +3704,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             add_base(ii0, aTwP*off);
@@ -3693,7 +3712,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
             sub_base(ii2, wP*off);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.diff()), ptB.pos());
+    DRAW_LINK(ptA, cross(leg, ptA.diff()), ptB.pos());
 }
 
 
@@ -3740,7 +3759,7 @@ void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
     
 #elif ( DIM == 2 )
     
-    Vector ab = ptB.pos()-segA.pos1();
+    Vector ab = ptB.pos() - segA.pos1();
     if ( modulo )
         modulo->fold(ab);
     real leg = std::copysign(len*segA.lenInv(), cross(segA.diff(), ab));
@@ -3843,7 +3862,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     {
         throw Exception("addSideSlidingLink2D untested with periodic boundary conditions");
         
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             add_base(ii0, aTwP*off);
@@ -3852,7 +3871,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
             add_base(ii3, wP*off, cc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(leg, ptA.dir()), ptB.pos());
 }
 
 
@@ -3916,7 +3935,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             off = wT * off;
@@ -3926,7 +3945,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             add_base(ii3, off, cc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), axi, ptB.pos());
+    DRAW_LINK(ptA, axi, ptB.pos());
 }
 
 
@@ -3989,7 +4008,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             off = wT * off;
@@ -3999,7 +4018,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             add_base(ii3, off, cc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), ptB.pos());
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
 #endif
@@ -4077,7 +4096,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     
     if ( modulo )
     {
-        Vector off = modulo->offset( ptB.pos() - ptA.pos() );
+        Vector off = modulo_offset(ptA, ptB);
         if ( off.is_not_zero() )
         {
             add_base(ii0, aTwP*off);
@@ -4086,7 +4105,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
             add_base(ii3, wP*off, cc3);
         }
     }
-    DRAW_LINK(ptA, ptA.pos(), cross(leg, ptA.diff()), ptB.pos());
+    DRAW_LINK(ptA, cross(leg, ptA.diff()), ptB.pos());
 }
 
 
@@ -4163,7 +4182,7 @@ void Meca::addPointClamp(Mecapoint const& ptA,
 
     add_base(DIM*inx, pos, weight);
     
-    DRAW_LINK(ptA, ptA.pos(), pos);
+    DRAW_LINK(ptA, pos);
 }
 
 
@@ -4204,7 +4223,7 @@ void Meca::addPointClamp(Interpolation const& pti,
     add_base(DIM*ii0, pos, c1w);
     add_base(DIM*ii1, pos, c2w);
     
-    DRAW_LINK(pti, pti.pos(), pos);
+    DRAW_LINK(pti, pos);
 }
 
 /**
@@ -4637,7 +4656,7 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     add_base(ii0, wA*pos+off);
     add_base(ii1, wB*pos-off);
     
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), pos);
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), pos);
 }
 
 #endif
@@ -4649,8 +4668,8 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
  
      offset_point = fiber_point + cross(arm, fiber_dir)
  
- with fiber_point = ptA.pos() and fiber_dir = ptA.diff().normalized.
- `arm` must be perpendicular to link ( G - ptA.pos() )
+ with fiber_point = position(ptA) and fiber_dir = ptA.diff().normalized.
+ `arm` must be perpendicular to link ( G - position(ptA) )
 
  F. Nedelec, March 2011
  
@@ -4687,7 +4706,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     sub_base(ii0, wAt*pos);
     sub_base(ii1, wBt*pos);
     
-    DRAW_LINK(ptA, ptA.pos(), cross(arm, ptA.dir()), pos);
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), pos);
 }
 
 
@@ -4946,7 +4965,7 @@ void Meca::addTriLink(Interpolation const& pt1, const real w1,
  */
 void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
 {
-    Vector ab = ptB.pos() - ptA.pos();
+    Vector ab = position_delta(ptA, ptB);
     real abnSqr = ab.normSqr(), abn=std::sqrt(abnSqr);
     
     const size_t inxA = DIM * ptA.matIndex();

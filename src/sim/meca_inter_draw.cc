@@ -5,8 +5,8 @@
 #include "../disp/gle_color_list.h"
 #include "../disp/gym_flute.h"
 
-#define DRAW_LINK(PTA, ...)\
-{ if ( drawLinks ) drawLink(gle::bright_color(PTA.mecable()->signature()), __VA_ARGS__); }
+#define DRAW_LINK(PT, ...)\
+{ if ( drawLinks ) drawLink(gle::bright_color(PT.mecable()->signature()), PT.pos(), __VA_ARGS__); }
 
 
 /// Display link between 2 positions

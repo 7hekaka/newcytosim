@@ -312,7 +312,7 @@ void Meca::multiply(const real* X, real* Y) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Precondition
+#pragma mark - Apply Preconditionner
 
 
 // the leading dimension of the banded matrix used for preconditionning
