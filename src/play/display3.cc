@@ -870,13 +870,13 @@ void Display3::drawSinglesF(SingleSet const& set) const
         if ( obj->disp()->perceptible )
         {
             obj->disp()->color2.load_both();
-            const GLfloat rad = scale(obj->disp()->size);
 #if ( 0 )
             if ( obj->disp()->style == 2 )
             {
                 Space const* spc = obj->confineSpace();
                 if ( spc )
                 {
+                    const GLfloat rad = scale(obj->disp()->size);
                     /// draw a disc tangent to the Space:
                     Vector pos = obj->posFoot();
                     Vector dir = spc->normalToEdge(pos);

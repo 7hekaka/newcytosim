@@ -1192,33 +1192,28 @@ void Parser::evaluate(std::istream& is)
             if ( c == EOF )
                 break;
             
-            // skip matlab-style comments (%{ })
+            // skip matlab-style comments: % or %{...}
             if ( c == '%' )
             {
-                c = is.get();
-                int d = is.get();
-                if ( d == '{' )
+                is.get();
+                if ( is.get() == '{' )
                     Tokenizer::get_block_text(is, 0, '}');
                 else
                     Tokenizer::get_line(is);
                 continue;
             }
 #if 0
-            /*
-             skip C-style comments:
-             - single-line comment start with '/' and '/'
-             - multi-line comments start with '/' and '*'
-             */
+            // skip C++-style comments: '//' or '/*...*/'
             if ( c == '/' )
             {
+                is.get();
                 c = is.get();
-                int d = is.get();
-                if ( '/' == d )
+                if ( '/' == c )
                     Tokenizer::get_line(is);
-                else if ( '*' == d )
+                else if ( '*' == c )
                     Tokenizer::get_until(is, "*/");
                 else
-                    throw InvalidSyntax("unexpected token `/"+std::string(d,1)+"'");
+                    throw InvalidSyntax("unexpected token `/"+std::string(c,1)+"'");
                 continue;
             }
 #endif

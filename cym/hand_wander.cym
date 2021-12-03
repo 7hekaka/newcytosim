@@ -1,9 +1,9 @@
-/**
+%{
  @example hand_wander.cym
  test Wanderer with `hand:activity=wander`
 
  FJN, 3.12.2021
-*/
+}
 
 set simul system
 {

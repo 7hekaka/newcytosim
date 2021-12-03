@@ -1,9 +1,9 @@
-/**
+%{
 @example hand_regulator.cym
 We create a Regulator with `hand:activity=regulate`
 
 F. Nedelec, 13 Oct 2016
-*/
+}
 
 
 set simul system
