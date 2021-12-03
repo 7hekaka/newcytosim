@@ -1,4 +1,8 @@
-# This file made by FJN Nov. 2021
+# This file updated by FJN 3.12.2021
+
+stages:
+  - build
+  - test
 
 image: gcc
 
@@ -6,10 +10,13 @@ make_sim:
     stage: build
     rules:
       - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      - changes:
+        - src/*/*.{h, cc}
+        - src/*/*/*.{h, cc}
     before_script:
       - apt update && apt -y install cmake autoconf libblas-dev liblapack-dev
     script:
-      - mkdir build && cd build
+      - mkdir -p build; cd build
       - cmake --verbose -DMAKE_PLAY=OFF -DMAKE_TESTS=OFF ..
       - make sim report reader sieve
     artifacts:
@@ -18,14 +25,18 @@ make_sim:
         - build/bin/sieve
         - build/bin/reader
         - build/bin/report
- 
+    cache:
+      key: $CI_COMMIT_REF_SLUG
+      paths:
+        - build
+
 make_play:
   stage: build
   when: manual
   before_script:
     - apt update && apt -y install cmake autoconf libblas-dev liblapack-dev mesa-common-dev libglew-dev freeglut3-dev
   script:
-    - mkdir build && cd build
+    - mkdir -p build; cd build
     - cmake -DMAKE_SIM=OFF -DMAKE_TOOLS=OFF ..
     - make play
   artifacts:
@@ -38,14 +49,13 @@ make_play:
 # run test simulation using the binary built before
 test_sim:
   stage: test
+  when: manual
   needs: ["make_sim"]
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   before_script:
     - ldd build/bin/sim || true
   script:
     - build/bin/sim help
-    - mkdir run && cd run
+    - mkdir -p run; cd run
     - cp ../cym/aster.cym config.cym
     - ../build/bin/sim
     - cd ..
@@ -56,8 +66,8 @@ test_sim:
 # make image using Cytosim's run done before
 test_play:
   stage: test
-  needs: ["make_play"]
   when: manual
+  needs: ["make_play"]
   before_script:
     - apt update && apt -y install mesa-common-dev
   script:
