@@ -201,7 +201,7 @@ public:
      the approximation is improved from 0 to 4, but the CPU cost also increases.
      
      If there is only one filament in the system, `precondition=0` should perform best.
-     With many filaments, trying `precondition = [0, 1, 2, 3, 4]' is a good strategy.
+     With many filaments, trying `precondition = [0, 1, 2, 3, 4, 6]' is a good strategy.
      <em>default value = 0</em>
      */
     unsigned precondition;
@@ -214,7 +214,7 @@ public:
      to keep a preconditionner calculated at some time point, for later times.
      Trying different values, starting from `1` up is advised.
      
-     This only apply to 'precondition == 5'
+     This only apply to 'precondition == 7'
      <em>default value = 2</em>
      */
     unsigned precondition_span;

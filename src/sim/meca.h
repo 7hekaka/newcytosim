@@ -368,6 +368,9 @@ public:
     
     /// Number of points in the Mecable that has the most number of points
     size_t largestMecable() const;
+    
+    /// Number of distance constraints applied to the movements of vertices
+    size_t nbConstraints() const;
 
     /// true if system does not contain any object
     bool empty() const { return nPoints_ == 0; }

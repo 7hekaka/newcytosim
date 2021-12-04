@@ -72,7 +72,7 @@ public:
     Sphere& operator =(const Sphere&);
 
     /// destructor
-    virtual    ~Sphere();
+    virtual ~Sphere();
     
     //-------------------------------- info ------------------------------------
 
@@ -104,10 +104,10 @@ public:
     void setInteractions(Meca&) const;
 
     /// returns position of center of gravity (the center of the sphere)
-    Vector position()        const { return posP(0); }
+    Vector position() const { return posP(0); }
     
     /// radius of the sphere
-    real radius()          const { return spRadius; }
+    real radius() const { return spRadius; }
 
     /// change radius
     void resize(real);
@@ -144,6 +144,9 @@ public:
     /// calculate speed of points in Y, for the forces given in X, scaled by sc
     void projectForces(const real* X, real* Y) const;
     
+    /// Number of distance constraints applied to the movements of vertices
+    size_t nbConstraints() const { return DIM * nbRefPoints - ( DIM + DIM - 1 ) + nPoints - nbRefPoints; }
+
     //--------------------------------------------------------------------------
     
     /// a static_cast<> of Object::next()

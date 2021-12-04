@@ -146,6 +146,9 @@ public:
     
     /// calculates the speed of points in Y, for the forces given in X
     void projectForces0(const real* X, real* Y) const;
+    
+    /// Number of distance constraints applied to the movements of vertices
+    size_t nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
 
     /// add contribution of Brownian forces
     real addBrownianForces(real const* rnd, real, real* rhs) const;

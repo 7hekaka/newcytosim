@@ -401,7 +401,7 @@ real Sphere::addBrownianForces(real const* rnd, real alpha, real* res) const
     }
 
     /*
-     The Torque is distributed to the surface points.
+     The Torque is distributed to reference points fixed on the surface of the Sphere.
      In 2D, there is one point, and the coefficient is therefore 1.
      in 3D, there are 3 points, but always one is parallel to the axis of the torque,
      and the decomposition over these 3 points gives a factor 2.
@@ -563,9 +563,6 @@ void Sphere::projectForces(const real* X, real* Y) const
     T -= cross(cen, F);       // reduce the torque to the center of mass
     T *= 1.0/spDragRot;       // multiply by the mobility
     F  = F*(1.0/spDrag) + cross(cen, T);
-    
-    //scale by point mobility:
-    real mob = prop->point_mobility;
 
     for ( size_t p = 0; p < nbRefPoints; ++p )
     {
@@ -583,6 +580,9 @@ void Sphere::projectForces(const real* X, real* Y) const
 #endif
     }
     
+    //scale by point mobility:
+    const real mob = prop->point_mobility;
+
     for ( size_t p = nbRefPoints; p < nPoints; ++p )
     {
         real * yyy = Y + DIM * p;

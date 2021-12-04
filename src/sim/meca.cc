@@ -152,6 +152,14 @@ size_t Meca::largestMecable() const
     return res;
 }
 
+size_t Meca::nbConstraints() const
+{
+    size_t res = 0;
+    for ( Mecable * mec : mecables )
+        res += mec->nbConstraints();
+    return res;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Multiply
 
@@ -194,7 +202,7 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
 #endif
     
     // F <- F + B
-    blas::add(dimension(), B, F);
+    blas::xadd(dimension(), B, F);
 }
 
 
@@ -259,13 +267,13 @@ void Meca::multiply(const real* X, real* Y) const
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
-#   if SEPARATE_RIGIDITY_TERMS
+#  if SEPARATE_RIGIDITY_TERMS
         mec->addRigidity(X+inx, Y+inx);
-#   endif
-#   if ADD_PROJECTION_DIFF
+#  endif
+#  if ADD_PROJECTION_DIFF
         if ( mec->hasProjectionDiff() )
             mec->addProjectionDiff(X+inx, Y+inx);
-#   endif
+#  endif
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + beta * Y
         const real beta = -tau_ * mec->leftoverMobility();
@@ -1023,7 +1031,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
     /**
      Factorize banded matrix with Andre-Louis Cholesky's method
      born 15.10.1875 in Montguyon, France
-     died 31.08.1918 in Bagneux, following wounds received in battlefield.
+     died 31.08.1918 in Bagneux, following wounds received in battle.
      */
     int bt, info = 0;
     if ( 1 ) //ISOB_LDD <= nbp )
@@ -1364,6 +1372,10 @@ void Meca::renewPreconditionner(int span)
 }
 
 
+/*
+ Here the preconditionner blocks are calculated,
+ according to Simul::precondition
+ */
 void Meca::computePreconditionner(int precond, int span)
 {
     bump_ = 0;
@@ -1538,14 +1550,14 @@ void Meca::computeForces()
 
 
 /**
-This preforms:
+This updates the right-hand-side:
  
-    fff <- fff + Brownian
-    rhs <- time_step * P * fff:
+    rhs <- tau * Projection * ( rhs + alpha * rnd )
  
  Also prepare Projection diff is requested
 
- 'rhs' and 'fff' are output. Input 'rnd' is a set of independent random numbers
+ Vector 'rnd' is input, a set of independent Gaussian random numbers
+ Vector 'rhs' is both input and output.
 */
 real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* rhs)
 {        
@@ -1585,7 +1597,7 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
      drag * ( Xnew - Xold ) / time_step = P * Force + Noise
  
  Where X is large a vector containing all the coordinates.
- P is the projection associated with constrains in the dynamics.
+ P is the projection associated with constrains in the dynamics: P*P = P
  The projection P and scaling by `mobility = 1/drag` are implemented together via
  
      Mecable::projectForces()
@@ -1594,33 +1606,42 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
  We note here `mobP` the combination: mobP * X = ( 1/drag ) * P * X.
  To calculate Xnew, explicit integration would be:
  
-     Xnew = Xold + time_step * mobP * Force + Noise
+     Xnew = Xold + time_step * mobP * ( Force + Noise )
  
  For a semi-implicit integration, we use a linearization of the force:
  
      Force(X) = M * X + B
  
- where M is a matrix and B a vector. The linearlization is performed by the
- functions such as Meca::addLink() in `meca_inter.cc`, usually around the
- positions of equilibrium. The linearization is used around Xold:
+ where M is a matrix and B a vector. The linearization is performed by the
+ functions that update the matrix M, such as Meca::addLink() in `meca_inter.cc`.
+ The force is usually linearized around the positions of equilibrium of that force,
+ but it is then used around Xold, so we write:
  
      Force(X) = M * ( X - Xold ) + F
  
  where F = M * Xold + B = Force(Xold), leading to:
  
-     ( I - time_step * mobP * M ) ( Xnew - Xold ) = time_step * mobP * F + Noise
+     ( I - time_step * mobP * M ) ( Xnew - Xold ) = time_step * mobP * ( F + Noise )
  
  with:
  
      Noise = std::sqrt(2*kT*time_step*mobility) * Gaussian(0,1)
  
- Implicit integration ensures numerical stability: a large time_step can be used.
- Moreover, the matrix M is sparse, and it is decomposed as:
+ With implicit integration a large time step can be used.
+ The matrix ( I - time_step * mobP * M ) remains definite positive.
+ Moreover, both mobP and M are sparse, such that the matrix-vector product
+ is calculated as follows in Meca::multiply():
+ 
+ ( I - time_step * mobP * M ) * X = X - time_step * ( mobP * ( M * X ) )
+ 
+ Further, M is not formed and instead we keep separate components:
  
      M = mISO + mFUL + Rigidity
  
  Where mISO is isotropic: it applies similarly in the X, Y and Z subspaces, while
  mFUL can accept crossterms between different subspaces. Using mISO is optional.
+ In this way when calculating M * X, components can be processed in parallel.
+ 
  Normally, Meca::solve is called after:
 
      'mISO', 'mFUL' and 'B=vBAS' are set in Meca::setAllInteractions()
@@ -1639,10 +1660,10 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
  The function Meca::apply() sends 'VPTS' and 'vFOR' back to the Mecable.
  
  
- Note: This currently solves the system ( 1 - time_step * P * M ) * x = b
- Since both M and P are symmetric, we can obtain an equivalent system by Woodbury's identity:
-         x = b + time_step * P * inverse( 1 - time_step * M * P ) * M * b
- This adds 2 Mat.vec, but swaps M and P for the iterative solver.
+ Note: We currently solve ( 1 - time_step * P * M ) * X = Y
+ Since both M and P are symmetric, following Woodbury's identity we have:
+         X = Y + time_step * P * inverse( 1 - time_step * M * P ) * M * Y
+ This adds 2 MAT.vec, but swaps M and P for the iterative solver.
  */
 size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 {
@@ -1681,7 +1702,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     /*
      Add Brownian contributions and calculate Minimum value of it
       vRHS <- vRHS + mobility_coefficient * vRND
-      vRHS <- P * vRHS:
+      vRHS <- tau * P * vRHS:
      */
     #pragma omp parallel num_threads(NUM_THREADS)
     {
@@ -1786,6 +1807,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     //------- call the iterative solver:
     if ( precond )
     {
+        // change initial condition to be `P * RHS`:
         precondition(vRHS, vSOL);
         LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         //fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
@@ -1879,7 +1901,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     //printf("\n   >pts "); VecPrint::print(std::cerr, dimension(), vPTS, 3);
 
     //add the solution (the displacement) to update the Mecable's vertices
-    blas::add(dimension(), vSOL, vPTS);
+    blas::xadd(dimension(), vSOL, vPTS);
 
     ready_ = 1;
 
@@ -1889,6 +1911,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         --doNotify;
         std::stringstream oss;
         oss << "\tsize " << DIM << "*" << nbVertices() << " kern " << largestMecable();
+        //oss << " constraints " << nbConstraints();
 #if USE_ISO_MATRIX
         oss << " " << mISO.what();
         if ( useFullMatrix )
@@ -1903,7 +1926,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             // calculate true residual: tmp = rhs - A * x
             real * tmp = allocator_.bind(0);
             multiply(vSOL, tmp);
-            blas::sub(dim, vRHS, tmp);
+            blas::xsub(dim, vRHS, tmp);
             oss << ": " << std::setw(11) << std::left << blas::nrm8(dim, tmp);
             oss << " dx " << std::setw(11) << std::left << blas::nrm8(dim, vSOL);
         }
@@ -1925,7 +1948,10 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 }
 
 
-// transfer newly calculated point coordinates back to Mecables
+/**
+ This transfers coordinates calculated in Meca::solve() back to the Mecables
+ It also calculates the corresponding Forces and transfer them back.
+ */
 void Meca::apply()
 {
     if ( ready_ )

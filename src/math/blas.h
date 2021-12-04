@@ -4,13 +4,16 @@
  This contains C front-ends to some functions of BLAS
  see http://www.netlib.org/blas
   
- Functions are renamed : 
+ Functions are renamed depending on what type is REAL:
  
- xcopy calls scopy if ( real is float ), or dcopy if ( real is double ).
+ xcopy() calls scopy() if REAL_IS_FLOAT and dcopy() if REAL_IS_DOUBLE.
 */
 
 #ifndef BLAS_H
 #define BLAS_H
+
+//#include "cblas.h"
+#define CBLAS_INDEX size_t  /* this may vary between platforms */
 
 #include "real.h"
 
@@ -23,9 +26,6 @@
 #   define iBLAS(x) is##x##_
 #endif
 
-//#include "cblas.h"
-
-#define CBLAS_INDEX size_t  /* this may vary between platforms */
 
 extern "C"
 {
@@ -85,19 +85,20 @@ namespace blas
 #pragma mark - Level 1
 
 /**
- This follows William Kahan summation to calculate the dot product
+ This follows William Kahan's summation to calculate the dot product
  with minimal numerical error.
  https://en.wikipedia.org/wiki/Kahan_summation_algorithm
  */
-inline double dotKahan(int N, const real* X, const real* Y)
+template < typename FLOAT >
+inline FLOAT dot_kahan(int N, const real* X, const real* Y)
 {
-    double sum = 0.0;
-    double c = 0.0;
+    FLOAT sum = 0.0;
+    FLOAT c = 0.0;
     
     for ( int i = 0; i < N; ++i )
     {
-        double y = X[i] * Y[i] - c;
-        double t = sum + y;
+        FLOAT y = X[i] * Y[i] - c;
+        FLOAT t = sum + y;
         c = ( t - sum ) - y;
         sum = t;
     }
@@ -113,8 +114,10 @@ inline double dot(int N, const real* X, const real* Y)
     res = ddot_(&N, X, &ONE, Y, &ONE);
 #else
     res = dsdot_(&N, X, &ONE, Y, &ONE);
-    //res = dotKahan(N, X, Y);
-    //printf("   %.12e\n   %.12e\n", res, kahanDot(N, X, Y));
+#endif
+#if 0
+    real k = dot_kahan<double>(N, X, Y);
+    printf("   sum-kahan = %+8.3e (%+8.3e)\n", res-k, (res-k)/k);
 #endif
     return res;
 }

@@ -24,14 +24,11 @@ void Nucleus::setInteractions(Meca& meca) const
     
     if ( sph )
     {
-        size_t nix = nuSphere->nbPoints() - Sphere::nbRefPoints;
-        
-        for ( size_t i = 0; i < nix; ++i )
+        for ( size_t i = Sphere::nbRefPoints; i < nuSphere->nbPoints(); ++i )
         {
-            Fiber const* fib = fiber(i);
+            Fiber const* fib = fiber(i-Sphere::nbRefPoints);
             if ( fib )
-                meca.addLink(Mecapoint(sph, i+Sphere::nbRefPoints),
-                             fib->exactEnd(MINUS_END), prop->stiffness);
+                meca.addLink(Mecapoint(sph, i), fib->exactEnd(MINUS_END), prop->stiffness);
         }
     }
 }

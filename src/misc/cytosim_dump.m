@@ -6,13 +6,13 @@ function [SYS, rhs, CON] = cytosim_dump(path)
 %
 % F. Nedelec, 16.10.2014, 03.2018, 06.2018, 26.01.2019, 30.06.2019, 11.08.2019, 
 % 17.08.2019, 7.01.2020, 03.06.2020, 19.06.2020, 27.12.2020, 13.01.2021, 
-% 21.08.2021
+% 21.08.2021, 5.12.2021
 
 if nargin < 1
     path = '.';
 end
 
-abstol = 0.001;
+abstol = 0.0001;
 
 
 %% Loading
@@ -62,14 +62,24 @@ if 0
     fprintf(1, '    norm8(system-eye) : %e\n', mag);
 end
 
+%% Display some Matrices
+
 if 0
     figure('name', 'System matrix'); imshow(abs(SYS));
     figure('name', 'Projection matrix'); imshow(abs(PRJ));
     figure('name', 'Elasticity matrix'); imshow(abs(ela));
     return;
 end
+if 0
+    figure('Position', [50 50 1024 1024]);
+    spy(SYS); title(sprintf('System matrix (size %i)', dim))
+    
+    figure('Position', [100 100 1024 1024]);
+    spy(PRJ); title(sprintf('Projection matrix (size %i)', dim))
+end
+drawnow;
 
-%% Check matrix
+%% Check System's matrix
 
 if ( 0 )
     
@@ -98,7 +108,7 @@ if ( 0 )
 end
 
 if ( 0 )
-    figure('Position', [50 50 1000 1000]);
+    figure('Position', [50 50 1024 1024]);
     plot(reshape(MAT,1,dim*dim), reshape(SYS,1,dim*dim), '.')
     xl = xlim;
     ylim(xl);
@@ -138,20 +148,18 @@ if ( 0 )
     title('Approximate Minimum Degree permutation');
 end
 
-drawnow;
-
-%% RECALCULATE SOLUTION
+%% RECALCULATE SOLUTION with MATLAB BiConjugate Gradient Stabilized
 
 reltol = abstol / norm(rhs);
 
-system = sparse(SYS);
-
 mulcnt = 0;
+system = sparse(SYS);
 solution = bicgstab(@multiply, rhs, reltol*0.001, dim);
 maxit = mulcnt;
 
-fprintf(2, '    %i matvecs; norm(sol - matlab_sol) = %f\n', mulcnt, norm(sol-solution));
-    
+fprintf(2, '    %3i matvecs: norm(sol - matlab_sol) = %f\n', mulcnt, norm(sol-solution));
+fprintf(2, '                 norm(System*sol - rhs) = %f\n', norm(SYS*solution-rhs));
+
 if 0
     figure('Name', 'Validation of solution');
     plot(solution, sol, 'k.');
@@ -162,8 +170,109 @@ if 0
     drawnow;
 end
 
+
+%% Check System truncated to Range and Null-space of Projection matrix
+% 5.12.2021
+
+if ( 0 )
+    % Establish reference:
+    mulcnt = 0;
+    vec = bicgstab(@multiply, rhs, abstol, dim);
+    fprintf(2, '    %i matvecs; norm(SYS*X-rhs) = %f\n', mulcnt, norm(system*vec-rhs));
+    
+    % A real symmetric matrix always has a eigenvalue decomposition:
+    PK = null(PRJ);
+    fprintf(2, '    Projection has kernel of dimension %i\n', size(PK,2));
+    fprintf(2, '    norm(   rhs   ) = %.3f\n', norm(rhs));
+    fprintf(2, '    norm(in kernel) = %.3f\n', norm(PK'*rhs));
+
+    if ( 0 )
+        % compare solution on kernel of P:
+        X = PK' * rhs;
+        Y = PK' * solution;
+        figure; plot(X, Y, '.'); axis equal;
+    end
+    % the solution is equal to 'rhs' on the nullspace of PRJ:
+    S = solution + PK * ( PK' * ( rhs - solution ) );
+    % figure; plot(solution, S, '.');
+    fprintf(2, '    norm(SYS*X - rhs) = %.3f\n', norm(SYS*solution-rhs));
+    fprintf(2, '    norm(SYS*S - rhs) = %.3f\n', norm(SYS*S-rhs));
+    
+    % Truncate System to operate in the range of the projection
+    R = orth(PRJ);
+    fprintf(2, '    Projection has range of dimension %i\n', size(R,2));
+    system = R' * SYS * R;
+    figure('Position', [150 150 1024 1024]);
+    spy(system); title(sprintf('Reduced matrix (size %i)', dim-size(PK,2)))
+    
+    mulcnt = 0;
+    vec = bicgstab(@multiply, R' * rhs, abstol, dim);
+    fprintf(2, '    %i matvecs; norm(RED*X-rhs) = %.3f\n', mulcnt, norm(system*vec-R'*rhs));
+end
+
+%% Check reduced System to certain eigenvalues
+% 5.12.2021
+
+if ( 0 )
+    % Establish reference:
+    mulcnt = 0;
+    system = SYS;
+    vec = bicgstab(@multiply, rhs, abstol, dim);
+    fprintf(2, '    %3i matvecs; norm(SYS*X-rhs) = %.3f\n', mulcnt, norm(system*vec-rhs));
+    
+    % Find some eigenvalues:
+    %[U,D,V] = svd(SYS);  E = diag(D);
+    [V,E] = eig(SYS, 'vector');
+    
+    fprintf(2, '    max imaginary part of system values = %.3f\n', max(abs(imag(E))));
+    figure; histogram(log(abs(E)), 32); title('System matrix values');
+    drawnow;
+    
+    SR = [];
+    i = 1;
+    while i <= dim
+        if ( 1.001 < abs(E(i)) && abs(E(i)) < 4000 )
+            vec = V(:,i);
+            nk = norm( PK' * vec );
+            if isreal(vec)
+                SR = horzcat(SR, vec);
+            else
+                fprintf(1, ' imag %5.2f %5.2f', norm(vec-conj(V(:,i+1))), norm(real(vec)'*imag(vec)) );
+                SR = horzcat(SR, real(vec), imag(vec));
+                i = i+1;
+            end
+            %fprintf(1, '  %8.2f norm(vector %i) = %.3f (%.3f)\n', E(i), i, norm(vec), nk);
+        end
+        i = i+1;
+    end
+    fprintf(1, '\n');
+    
+    % cleanup:
+    SR = orth(SR);
+    fprintf(2, '    Considering %i eigenvalues:\n', size(SR, 2));
+    
+    mulcnt = 0;
+    system = SR' * SYS * SR;
+    vec = bicgstab(@multiply, SR'*rhs, abstol, dim);
+    fprintf(2, '    %3i matvecs; norm(RED*X-rhs) = %.3f\n', mulcnt, norm(system*vec-SR'*rhs));
+    S = SR * vec;
+    fprintf(2, '                 norm(SYS*S-rhs) = %.3f\n', norm(SYS*S-rhs));
+    fprintf(2, '                 norm(rhs in subspace) = %.3f\n', norm(SR'*rhs));
+    fprintf(2, '                 norm(not in subspace) = %.3f\n', norm(rhs-SR*(SR'*rhs)));
+
+    T = rhs + SR * ( vec - SR' * rhs );
+    figure; plot(solution, T, '.'); axis equal;
+
+    % solution equal to SR * vec + rhs on Projection's kernel
+    fprintf(2, '                 norm(S-T) = %f\n', norm(T-S));
+    fprintf(2, '                 norm(SYS*T-rhs) = %.3f\n', norm(SYS*T-rhs));
+    return;
+end
+
+
+%% Check equivalent system obtained by Woodbury's identity
+
 if 1
-    % Check equivalent system obtained by Woodbury's identity
     TAM = speye(dim) - time_step * sparse(ela) * sparse(PRJ);
     [vec,~,~,itr] = bicgstab(TAM, ela*rhs, reltol*norm(rhs)/norm(ela*rhs), maxit);
     wood = rhs + time_step * PRJ * vec;
@@ -180,25 +289,21 @@ report('bicgstab', mulcnt, vec, res, rv0, '-');
 
 if 0
     % Matlab BiCG
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = bicg(@multiply, rhs, reltol, maxit);
     report('bicg', mulcnt, vec, res, rv0, '-');
 end
 if 1
     % Matlab BiCGStab(L)
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit);
     report('bicgstab(1)', mulcnt, vec, res, rv0, '-');
 end
 if 0
     % Matlab CGS
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = cgs(@multiply, rhs, reltol, maxit);
     report('CGS', mulcnt, vec, res, rv0, '-');
 end
 if 0
     % BiCORSTAB
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = BiCORSTAB(@multiply, rhs, reltol, maxit);
     report('BiCORstab', mulcnt, vec, res, rv0, ':');
 end
@@ -214,7 +319,6 @@ end
 if 1
     % GMRES
     for i = 4:6
-        mulcnt = 0;
         RS = min(2^i, dim);
         [vec,~,res,itr,rv0] = gmres(@multiply, rhs, RS, reltol, maxit);
         report(sprintf('GMRES %03i', RS), mulcnt, vec, res, rv0, '-.');
@@ -237,11 +341,9 @@ if 0 %% no preconditionning
 end
 if 0
     % CORS
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit);
     report('CORS', mulcnt, vec, res, rv0, ':');
     % BiCOR
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = BiCOR(@multiply, rhs, reltol, maxit);
     report('BiCOR', mulcnt, vec, res, rv0, ':');
     % BiCGCR2
@@ -302,12 +404,10 @@ report('P bicgstab', mulcnt, vec, res, rv0);
 
 if 0
     % checking the reconstituted block preconditionner:
-    mulcnt = 0;
     [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, @preconditionBDP);
     report('R bicgstab', mulcnt, vec, res, rv0);
 end
 if 0
-    mulcnt = 0;
     % Matlab BiCGStab(L)
     [vec,~,res,~,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, @precondition);
     report('P bicgstab(1)', mulcnt, vec, res, rv0);
@@ -315,7 +415,6 @@ end
 if 0
     % GMRES
     for i = 2:6
-        mulcnt = 0;
         RS = min(2^i, dim);
         [vec,~,res,itr,rv0] = gmres(@multiply, rhs, RS, reltol/3, maxit, [], @precondition);
         str = sprintf('P GMRES %03i', RS);
@@ -324,11 +423,9 @@ if 0
 end
 if 0
     % CORS
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = CORS(@multiply, rhs, reltol, maxit, @precondition);
     report('P CORS', mulcnt, vec, res, rv0);
     % BiCOR
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = BiCOR(@multiply, rhs, reltol, maxit, @precondition);
     report('P BiCOR', mulcnt, vec, res, rv0);
     % BiCGCR2
@@ -381,7 +478,6 @@ if 0
     L = ichol(DRY, OPT);
     fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
     
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
     report('y bicgstab', mulcnt, vec, res, rv0);
     
@@ -392,7 +488,6 @@ if 0
         L = ichol(DRY, OPT);
         fprintf(2, 'dropped incomplete Cholesky has %i elements\n', nnz(L));
         
-        mulcnt = 0;
         [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
         report('y bicgstab', mulcnt, vec, res, rv0);
     catch
@@ -402,7 +497,6 @@ if 0
     L = chol(DRY, 'lower');
     fprintf(2, 'complete Cholesky has %i elements\n', nnz(L));
     
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
     report('y bicgstab', mulcnt, vec, res, rv0);
 end
@@ -433,11 +527,9 @@ if 0
     
     L = diagonal_expand(SML, ord(2));
     
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
     report('s bicgstab', mulcnt, vec, res, rv0);
     
-    mulcnt = 0;
     [vec,~,res,itr,rv0] = bicgstabl(@multiply, rhs, reltol, maxit, L, L');
     report('s bicgstab(1)', mulcnt, vec, res, rv0);
 end
@@ -465,7 +557,6 @@ if 0
         L = ichol(sWET, OPT);
         fprintf(2, 'incomplete Cholesky has %i elements\n', nnz(L));
         
-        mulcnt = 0;
         [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, L');
         report('I bicgstab', mulcnt, vec, res, rv0);
         
@@ -477,7 +568,6 @@ if 0
         [L, U] = ilu(sWET, OPT);
         fprintf(2, '    incomplete LU has %i + %i elements\n', nnz(L), nnz(U));
         
-        mulcnt = 0;
         [vec,~,res,itr,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
         report('i bicgstab', mulcnt, vec, res, rv0);
         
@@ -496,7 +586,6 @@ if 0
     [L, U] = ilu(system, OPT);
     fprintf(2, 'incomplete LU    has %i + %i elements\n', nnz(L), nnz(U));
     
-    mulcnt = 0;
     [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, L, U);
     report('iLU bicgstab', mulcnt, vec, res, rv0);
     
@@ -521,13 +610,11 @@ if 0
     
     rLU = LU .* ( abs(LU) > 0.1 );
     fprintf(2, 'thresholded iLU (>0.1)     has %i elements\n', nnz(rLU));
-    mulcnt = 0;
     [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, rLU);
     report('tiLU bicgstab', mulcnt, vec, res, rv0);
     
     rLU = LU .* ( abs(LU) > 0.2 );
     fprintf(2, 'thresholded iLU (>0.2)     has %i elements\n', nnz(rLU));
-    mulcnt = 0;
     [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, rLU);
     report('tiLU bicgstab', mulcnt, vec, res, rv0);
 
@@ -540,7 +627,6 @@ if 0
 
     if 0
         xLU = diagonal_expand(rLU, ord(2));
-        mulcnt = 0;
         [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, xLU);
         report('pilu bicgstab', mulcnt, vec, res, rv0);
     end
@@ -548,7 +634,6 @@ if 0
     % replace block diagonal by full preconditionner:
     xLU(logical(CON)) = 0;
     xLU = xLU + sparse(CON);
-    mulcnt = 0;
     [vec,~,res,~,rv0] = bicgstab(@multiply, rhs, reltol, maxit, xLU);
     report('xilu bicgstab', mulcnt, vec, res, rv0);
 

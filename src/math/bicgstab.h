@@ -335,14 +335,14 @@ namespace LinearSolvers
         const size_t dim = mat.dimension();
         
         allocator.allocate(dim, 8);
-        real * p     = allocator.bind(0);
-        real * r     = allocator.bind(1);
-        real * rstar = allocator.bind(2);
-        real * s     = allocator.bind(3);
-        real * Mp    = allocator.bind(4);
-        real * AMp   = allocator.bind(5);
-        real * Ms    = allocator.bind(6);
-        real * AMs   = allocator.bind(7);
+        real * p   = allocator.bind(0);
+        real * r   = allocator.bind(1);
+        real * r0  = allocator.bind(2);
+        real * s   = allocator.bind(3);
+        real * Mp  = allocator.bind(4);
+        real * AMp = allocator.bind(5);
+        real * Ms  = allocator.bind(6);
+        real * AMs = allocator.bind(7);
         
         // r <- A*x
         mat.multiply(sol, p);
@@ -355,9 +355,9 @@ namespace LinearSolvers
         blas::xcopy(dim, r, 1, p, 1);
         
         // r_star <- r
-        blas::xcopy(dim, r, 1, rstar, 1);
+        blas::xcopy(dim, r, 1, r0, 1);
         
-        double r_rstar_old = blas::dot(dim, rstar, r);
+        double r0_old = blas::dot(dim, r0, r);
         
         while ( !monitor.finished(dim, r) )
         {
@@ -368,7 +368,7 @@ namespace LinearSolvers
             mat.multiply(Mp, AMp);
 
             // alpha = (r_j, r_star) / (A*M*p, r_star)
-            double alpha = r_rstar_old / blas::dot(dim, rstar, AMp);
+            double alpha = r0_old / blas::dot(dim, r0, AMp);
             
             // s_j = r_j - alpha * AMp
             blas::xcopy(dim, r, 1, s, 1);
@@ -401,9 +401,9 @@ namespace LinearSolvers
             blas::xaxpy(dim, -omega, AMs, 1, r, 1);
 
             // beta_j = (r_{j+1}, r_star) / (r_j, r_star) * (alpha/omega)
-            double r_rstar_new = blas::dot(dim, rstar, r);
-            double beta = (r_rstar_new / r_rstar_old) * (alpha / omega);
-            r_rstar_old = r_rstar_new;
+            double r0_new = blas::dot(dim, r0, r);
+            double beta = (r0_new / r0_old) * (alpha / omega);
+            r0_old = r0_new;
             
             // p_{j+1} = r_{j+1} + beta*(p_j - omega*A*M*p)
             blas::xaxpy(dim, -omega, AMp, 1, p, 1);

@@ -127,6 +127,9 @@ public:
     
     /// size currently allocated
     size_t allocated() const { return pAllocated; }
+    
+    /// Number of distance constraints applied to the movements of vertices
+    virtual size_t nbConstraints() const { return 0; }
 
     //--------------------------------------------------------------------------
     

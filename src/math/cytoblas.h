@@ -66,7 +66,7 @@ inline void xpay(size_t N, const real* X, real alpha, real* Y)
 
 
 /// addition Y[] <- Y[] + X[], for array of size N
-inline void add(size_t N, const real* X, real* Y)
+inline void xadd(size_t N, const real* X, real* Y)
 {
     //xaxpy(N, 1.0, X, 1, Y, 1);
     #pragma ivdep
@@ -76,7 +76,7 @@ inline void add(size_t N, const real* X, real* Y)
 }
     
 /// subtraction Y[] <- Y[] - X[], for array of size N
-inline void sub(size_t N, const real* X, real* Y)
+inline void xsub(size_t N, const real* X, real* Y)
 {
     //xaxpy(N, -1.0, X, 1, Y, 1);
     #pragma ivdep
