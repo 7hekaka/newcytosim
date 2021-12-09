@@ -74,16 +74,13 @@ public:
     
     /// copy 1 coordinate from Vector1
     explicit Vector4(const Vector1&);
-
+    
     /// copy 2 coordinates from Vector2
     explicit Vector4(const Vector2&);
     
     /// copy 3 coordinates from Vector3
     explicit Vector4(const Vector3&);
     
-    /// copy 3 coordinates
-    void operator =(const Vector3&);
-
     /// address of coordinate array
     real * data()                { return &XX; }
     

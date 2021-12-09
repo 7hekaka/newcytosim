@@ -286,7 +286,7 @@ void SpaceStrip::draw3D() const
     const GLfloat T(top_);
     const GLfloat B(bot_);
 
-    // draw faces:
+    // draw top and bottom faces:
     GLfloat pts[24] = {
         -X, Y, B, X, Y, B,-X,-Y, B, X,-Y, B,
         -X, Y, T,-X,-Y, T, X, Y, T, X,-Y, T };
@@ -302,7 +302,7 @@ void SpaceStrip::draw3D() const
     glDrawArrays(GL_LINE_STRIP, 0, 5);
     glDrawArrays(GL_LINE_STRIP, 5, 5);
     
-    // draw edges on periodic boundaries:
+    // draw vertical edges in corners of periodic boundaries:
     GLfloat edg[24] = {
         +X, Y, T, X, Y, B, X,-Y, T, X,-Y, B,
         -X, Y, T,-X, Y, B,-X,-Y, T,-X,-Y, B };

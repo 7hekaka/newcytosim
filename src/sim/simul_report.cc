@@ -899,7 +899,7 @@ void Simul::reportFibersSorted(std::ostream& out, Property const* sel, bool com)
     {
         out << COM << "class" << SEP << "identity" << SEP << "length";
         out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
-        out << SEP << "cosine" << SEP << "sine" << SEP << "organizer";
+        out << SEP << "cos" << SEP << "sin" << SEP << "organizer";
     }
 
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
@@ -919,7 +919,7 @@ void Simul::reportFibers(std::ostream& out, Property const* sel, bool com) const
     {
         out << COM << "class" << SEP << "identity" << SEP << "length";
         out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
-        out << SEP << "cosine" << SEP << "sine" << SEP << "organizer";
+        out << SEP << "cos" << SEP << "sin" << SEP << "organizer";
     }
 
     // list fibers in the order of the inventory:

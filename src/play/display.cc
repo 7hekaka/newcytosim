@@ -208,10 +208,20 @@ void Display::drawSimul(Simul const& sim)
 }
 
 
+/// function for qsort: compares the Z component of two points
+static int compareVector4(const void * a, const void * b)
+{
+    real az = ((Vector4 const*)(a))->TT;
+    real bz = ((Vector4 const*)(b))->TT;
+    return ( az > bz ) - ( bz > az );
+}
+
 /**
  To get correct display, it would be necessary to display all opaque objects first,
- and then all transparent objects for all tiles. Here, we calls Display::drawSimul()
- a number of times, and objects are only sorted within each tile. The result is imperfect.
+ and then all transparent objects for all tiles.
+ However, we call Display::drawSimul() a number of times,
+ and objects are only sorted within each tile.
+ So we depth-sort the views, but the result is still imperfect.
  */
 void Display::drawTiled(Simul const& sim, int tile)
 {
@@ -229,17 +239,29 @@ void Display::drawTiled(Simul const& sim, int tile)
         }
     }
     
-    glMatrixMode(GL_MODELVIEW);
-    
     const Vector px = modulo->period(0);
     const Vector py = modulo->period(1);
     const Vector pz = modulo->period(2);
 
+    Vector4 pos[32];
+    int cnt = 0;
+    
     for ( int dx = l[0]; dx <= u[0]; ++dx )
     for ( int dy = l[1]; dy <= u[1]; ++dy )
     for ( int dz = l[2]; dz <= u[2]; ++dz )
     {
-        Vector T = dx * px + dy * py + dz * pz;
+        Vector P = dx * px + dy * py + dz * pz;
+        pos[cnt] = Vector4(P);
+        pos[cnt++].TT = dot(depthAxis, Vector3(P));
+    }
+    
+    // depth-sort positions:
+    qsort(pos, cnt, sizeof(Vector4), &compareVector4);
+
+    glMatrixMode(GL_MODELVIEW);
+    for ( int i = 0; i < cnt; ++i )
+    {
+        Vector3 T(pos[i]);
         gle::translate( T);
         drawSimul(sim);
         gle::translate(-T);
@@ -558,7 +580,7 @@ void Display::drawSpace(Space const* obj, bool opaque)
     const PointDisp * disp = obj->prop->disp;
     
     bool back = ( disp->visible & 2 ) && ( disp->color2.opaque() == opaque );
-    bool front = ( disp->visible & 1 ) & ( disp->color.opaque() == opaque );
+    bool front = ( disp->visible & 1 ) && ( disp->color.opaque() == opaque );
     
     if ( back | front )
     {
