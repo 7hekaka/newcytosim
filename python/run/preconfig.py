@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2021
-# This is PRECONFIG version 1.45, last modified on 15.11.2021
+# This is PRECONFIG version 1.46, last modified on 16.12.2021
 
 """
 # SYNOPSIS
@@ -221,9 +221,9 @@ except ImportError:
 
 #-------------------------------------------------------------------------------
 
-__VERSION__="1.45"
+__VERSION__="1.46"
 
-__DATE__ ="15.11.2021"
+__DATE__ ="16.12.2021"
 
 # code snippets are surrounded by double square brackets:
 CODE = '['
@@ -250,22 +250,6 @@ def pop_sequence(dic, protected):
         except:
             pass
     return ('', [])
-
-
-def try_assignment(arg):
-    """
-        Check if `arg` follows the format of a variable definition,
-        and if that succeeds, return the key and value strings in a tuple.
-    """
-    res = re.match(r" *([a-zA-Z]\w*) *= *(.*)", arg)
-    #print("   try_assignment `%s'" % arg);
-    #print(res.groups())
-    if not res or not len(res.groups()) == 2:
-        return ('', arg)
-    k = res.group(1)
-    v = res.group(2).strip()
-    #print("   recognized `%s' = `%s'" % (k, v))
-    return (k, v)
 
 
 def get_block(file, S, E):
@@ -331,15 +315,22 @@ class Preconfig:
         # name of current input file being processed (used for error reporting)
         self.template = ''
     
-    def evaluate(self, code, verbose=1):
+    def evaluate(self, code, blok, verbose=1):
         """ Evaluate `arg` and return result """
+        #print("preconfig:evaluate %s" % blok)
         try:
             res = eval(code, GLOBALS, self.locals)
         except NameError as e:
             sys.stderr.write("\033[95m")
             sys.stderr.write("Warning: %s in `%s'\n" % (e.message, code))
             sys.stderr.write("\033[0m")
-            return code
+            print(self.locals)
+            return blok
+        except Exception as e:
+            sys.stderr.write("\033[95m")
+            sys.stderr.write("Syntax Error in `%s': %s\n" % (code, str(e)))
+            sys.stderr.write("\033[0m")
+            sys.exit()
         if not isinstance(res, str):
             try:
                 res = list(res)
@@ -349,14 +340,32 @@ class Preconfig:
             self.out.write("|%50s --> %s\n" % (code, str(res)) )
         return res
     
-    def define(self, key, code):
-        """ Define a variable 'key' by executing 'code' """
-        #exec(code, GLOBALS, self.locals)
-        #res = self.locals[key]
-        res = self.evaluate(code, 0)
-        #self.locals[key] = v
-        self.out.write("|%50s <-- %s\n" % (key, repr(res)) )
-        return res
+    def try_assignment(self, arg, verbose=1):
+        """
+            Check if `arg` follows the format of a variable definition (X=CODE),
+            and if that succeeds, return the key and value strings in a tuple.
+        """
+        #print("preconfig:try_assignment %s" % arg);
+        res = re.match(r" *([a-zA-Z]\w*) *= *(.*)", arg)
+        #print(res.groups())
+        if res and len(res.groups()) > 1:
+            k = res.group(1)
+            v = res.group(2).strip()
+            if v[0] == '=':
+                # with '==' use raw right-hand side 
+                v = v[1:]
+                self.protected.append(k)
+                #print("   protected `%s' = `%s'" % (k, v))
+            else:
+                #exec(arg, GLOBALS, self.locals)
+                #res = self.locals[key]
+                v = self.evaluate(v, v, 0)
+                #print("   assigned `%s' = `%s'" % (k, v))
+            if verbose:
+                self.out.write("|%50s <-- %s\n" % (k, repr(v)) )
+            return (k, v)
+        else:
+            return ('', arg)
     
     def process(self, file, text):
         """
@@ -390,12 +399,11 @@ class Preconfig:
                 val = repr(self.locals[code])
             else:
                 # interpret command:
-                key, stuff = try_assignment(code)
-                vals = code
+                key, vals = self.try_assignment(code)
                 if key:
-                    vals = self.define(key, stuff)
+                    self.locals[key] = vals
                 else:
-                    vals = self.evaluate(code)
+                    vals = self.evaluate(code, block)
                 try:
                     # use 'pop()' to probe if multiple values were specified...
                     # setting last value aside for later:
@@ -562,14 +570,10 @@ class Preconfig:
             elif arg[0] == '-' and arg[1:].isdigit():
                 self.nb_digits = int(arg[1:])
             else:
-                (k,v) = try_assignment(arg)
+                # a double '==' will prevent expansion of the variable
+                k, v = self.try_assignment(arg, 0)
                 if k:
-                    # a double '==' will prevent expansion of the variable
-                    if v[0] == '=':
-                        values[k] = v[1:]
-                        self.protected.append(k)
-                    else:
-                        values[k] = self.evaluate(v)
+                    values[k] = v
                 else:
                     sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
                     sys.exit()
