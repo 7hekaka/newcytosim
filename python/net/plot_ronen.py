@@ -20,13 +20,17 @@ Description:
 
 #font size:
 fts = 14
+do_plot = 1
 add_fit = 1
+results = []
 
 import sys, os, math, subprocess
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-#matplotlib.use('SVG')
+try:
+    import matplotlib
+    #matplotlib.use('SVG')
+    import matplotlib.pyplot as plt
+except:
+    do_plot = 0
 try:
     from pyned import exponential_fit
 except:
@@ -52,6 +56,14 @@ def prune_values(time, data):
         i-=1
 
 
+def fit_curve(time, data):
+    """
+        Fit exponential and save results
+    """
+    (A, B) = exponential_fit(zip(time, data))
+    return (A, -B)
+
+
 def plot_size(time, data):
     """
         Plot size as a function of time
@@ -61,11 +73,6 @@ def plot_size(time, data):
     # add horizontal bar at starting size:
     h = data[0]
     plt.plot([min(time), max(time)], [h, h], 'k-', linewidth=1)
-    # add exponential fit to data:
-    if add_fit:
-        (A,B) = exponential_fit(zip(time, data))
-        fit = [ A*math.exp(B*t) for t in time ]
-        plt.plot(time, fit, 'g.', markersize=7)
     #plt.xlim(0, 100)
     plt.ylim(0, min(data)+max(data))
     plt.xlabel('Time (s)', fontsize=fts)
@@ -128,54 +135,86 @@ def process(dirpath):
         Process given directory
     """
     os.chdir(dirpath)
-    if 1:
-        filename='mom.txt'
-        if not os.path.isfile(filename):
-            subprocess.call(['reportN', 'fiber:moment'], stdout=open(filename, 'w'))
-        with open(filename, 'r') as f:
-            time, data = get_size(f)
+    filename='mom.txt'
+    if not os.path.isfile(filename):
+        subprocess.call(['reportN', 'fiber:moment'], stdout=open(filename, 'w'))
+    with open(filename, 'r') as f:
+        time, data = get_size(f)
+        if do_plot:
             plot_size(time, data)
-    if 0:
-        filename = 'cross.txt'
-        if not os.path.isfile(filename):
-            subprocess.call(['reportN', 'fiber:intersection'], stdout=open(filename, 'w'))
-        with open(filename, 'r') as f:
-            time, data = get_size(f)
-            prune_values(time, data)
-            plt.plot(time, data, 'k-', linewidth=2)
-    if 0:
-        filename = 'connectors.txt'
-        if not os.path.isfile(filename):
-            subprocess.call(['reportN', 'fiber:connector'], stdout=open(filename, 'w'))
-        with open(filename, 'r') as f:
-            time, data = get_size(f)
-            prune_values(time, data)
-            plt.plot(time, data, 'r-', linewidth=2)
-    plt.savefig('size.png', dpi=150)
-    #plt.show()
-    plt.close()
+            plt.savefig('size.png', dpi=150)
+            #plt.show()
+            plt.close()
+        if add_fit:
+            (A, B) = fit_curve(time, data)
+            results.append([dirpath, A, B])
 
 
-#------------------------------------------------------------------------
+def print_results():
+    for i in results:
+        S = round(i[1]*math.exp(-12*i[2]))
+        print(i[0], S, i[2])
+
+
+def read_results(filename):
+    """
+        Read numeric data from file
+    """
+    data = []
+    with open(filename, 'r') as f:
+        for line in f:
+            if len(line) > 5 and line[0]!='%':
+                s = line.split()
+                data.append([s[0], float(s[1]), float(s[2])])
+    return data
+
+
+def master_plot(data):
+    P, A, B = zip(*data)
+    B1 = B[0:len(B)-1:2]
+    B2 = B[1:len(B):2]
+    fig = plt.figure(figsize=(5, 4))
+    plt.plot(B1, B2, 'bo', markersize=7)
+    # add diagonal:
+    h = math.ceil(10*max(B))*0.1
+    plt.plot([0, h], [0, h], 'k-', linewidth=1)
+    plt.xlim(0, h)
+    plt.ylim(0, h)
+    plt.xlabel('Contraction Rate (mod=0)', fontsize=fts)
+    plt.ylabel('Contraction Rate (mod=1)', fontsize=fts)
+    plt.title('Rate correlation', fontsize=fts)
+    fig.tight_layout()
+    plt.savefig('result.png', dpi=150)
+
+#-----------------------------------------------------------------------------
 
 def main(args):
     paths = []
+    files = []
     
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
+        elif os.path.isfile(arg):
+            files.append(arg)
         else:
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     
     if not paths:
-        process('.')
+        if files:
+            results = read_results(files[0])
+        else:
+            process('.')
     else:
         cdir = os.getcwd()
         for p in paths:
             sys.stdout.write('- '*32+p+"\n")
             process(p)
             os.chdir(cdir)
+    if do_plot:
+        master_plot(results)
+    print_results()
 
 
 if __name__ == "__main__":
