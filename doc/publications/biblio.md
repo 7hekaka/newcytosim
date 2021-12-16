@@ -37,11 +37,10 @@
 
 - [Deep learning the assembly parameters of growing cytoskeletal networks](https://pure.tue.nl/ws/portalfiles/portal/148470406/Kros_M.F._0875844_BEP_verslag.pdf)
 - [PP2A-B55/SUR-6 collaborates with the nuclear lamina for centrosome separation during mitotic entry](https://doi.org/10.1091/mbc.E18-10-0631)
-- [Spherical spindle shape promotes perpendicular cortical orientation by preventing isometric cortical pulling on both spindle poles during C. elegans female meiosis](http://dx.doi.org/10.1242/dev.178863)  
+- [Spherical spindle shape promotes perpendicular cortical orientation by preventing isometric cortical pulling on both spindle poles during C. elegans female meiosis](http://dx.doi.org/10.1242/dev.178863)[preprin](https://www.biorxiv.org/content/10.1101/596510v1)  
 - [Collective effects of yeast cytoplasmic dynein based microtubule transport](http://dx.doi.org/10.1039/c8sm01434e)  
 - [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/pdf/1804.11044.pdf)  
 - [Visualization of myosin II filament dynamics in remodeling acto-myosin networks with interferometric scattering microscopy](https://www.biorxiv.org/content/10.1101/199778v4)  
-- [Spherical Spindle Shape Promotes Perpendicular Cortical Orientation by Preventing Isometric Cortical Pulling on both Spindle Poles during C. elegans Female Meiosis](https://www.biorxiv.org/content/10.1101/596510v1)  
 - [Centrosome-nuclear envelope tethering and microtubule motor-based pulling forces collaborate in centrosome positioning during mitotic entry](https://www.biorxiv.org/content/10.1101/442368v1)  
 
 2018

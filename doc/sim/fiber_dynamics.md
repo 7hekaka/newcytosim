@@ -1,12 +1,17 @@
 # Filament Assembly Dynamics
 
-This document provides an overview of different models that can be used to simulate filament growth and shrinkage. They are selected by the `activity` parameter. Each of this model is implemented in a separate class and represent a specialization of the `fiber` class. 
+This document provides an overview of available models covering filament growth and shrinkage. 
+They are accessible by the `activity` parameter, and implemented in separate classes, derived 
+from the `fiber` class. 
 
-Note that you do not have to worry about the vertices that are used to represent the filaments. Points are dynamically added or removed as filament grow and shrink. All points on a filament remain at any time regularly distributed and equidistant. The number of points is always such that this distance is as close as possible to the preferred section length provided with the `segmentation` parameter.
+Generally, names of parameters are similar between the different classes: `growing_speed`, `growing_force`, `max_length`, `total_polymer`.
+
+Note that Vertices may be added automatically to a filament as it grow, and similarly removed upon shrinking.
+All points on a filament remain at any time regularly distributed and equidistant. The number of points is always such that the distance separating adjacent points is as close as possible to the `segmentation` parameter.
 
 # 1. Growing filament
 
-Set the activity of a filament to `grow` to make it grow smoothly, up to a maximum length:
+Use the filament's activity `grow` to make it grow smoothly, up to a maximum length:
 
     set fiber microtubule
     {
@@ -23,7 +28,8 @@ Set the activity of a filament to `grow` to make it grow smoothly, up to a maxim
  * `growing_force`, the characteristic force of polymerization in pN.
 
 Positive values of the rate correspond to assembly, and negative values to disassembly. 
-By default `growing_force = inf`, and the growth speed will be constant, but if a value is given, the growth will depend on force (see below).
+The value of `growing_speed` must be specified, but by default `growing_force = inf`. 
+Thus by default, growth will occur at constant speed, but if `growing_force` is specified, the growth will depend on force (see below).
 
 ### Initial state
 
@@ -32,10 +38,10 @@ For all type of dynamic filaments, one needs to specify the initial state in the
     new microtubule
     {
         length = 1
-        end_state = grow
+        plus_end = grow
     }
 
-The number of possible `end_state` values depends on the class, but the ends are static by default.
+The exact possible values for `plus_end` would depends on the class, but in general `static`, `grow` and `shrink` should be supported. The ends are static by default.
 
 ### Defining a maximum length
 
@@ -65,7 +71,7 @@ In this case, growth rate will be linearly dependent on the availability of poly
 
     speed = growing_speed * free_polymer
          
-In this equation, `free_polymer` is a number in [0,1], representing the fraction of free monomers:
+In this equation, `free_polymer` is a number in [0,1], representing the fraction of available monomers:
 
     free_polymer = 1.0 - sum(all_fiber_length) / total_polymer
 
@@ -77,14 +83,14 @@ You can make assembly exponentially dependent on force.
 Disassembly will always occurs at the specified rate.
 For assembly, only the component of the force parallel to the direction of the fiber at the end is taken into account:
  
-     force = force_vector * fiber_direction;
+     force = dot(force_vector, fiber_direction);
      
 The projected force is negative ( antagonistic ) if it is directed against fiber assembly.
 
      if ( force < 0 )
-         speed = growing_speed * free_polymer * exp( force / growing_force );
+         speed = growing_speed * free_polymer * exp( force / growing_force ) + growing_off_speed;
      else
-         speed = growing_speed * free_polymer;
+         speed = growing_speed * free_polymer + growing_off_speed;
 
 ### Assembly at the minus-end
 
@@ -155,9 +161,9 @@ Only the component of the force parallel to the direction of the fiber at the en
 The projected force is negative ( antagonistic ) if it is directed against fiber assembly.
 
      if ( force < 0 )
-         speed = growing_speed * free_polymer * exp( force / growing_force );
+         speed = growing_speed * free_polymer * exp( force / growing_force ) + growing_off_speed;
      else
-         speed = growing_speed * free_polymer;
+         speed = growing_speed * free_polymer + growing_off_speed;
          
 In this equation, `free_polymer` is a number in [0,1], representing the fraction of free monomers.
 It is defined as:
