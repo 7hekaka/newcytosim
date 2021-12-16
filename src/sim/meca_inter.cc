@@ -2367,6 +2367,14 @@ void Meca::addLongLink(Interpolation const& ptA,
 }
 
 
+/**
+Link `ptA` (A) and the point described by `coef[]` and `inx[]` (B),
+The force is affine with non-zero resting length:
+
+    force_A = weight * ( B - A ) * ( len / |AB| - 1 )
+    force_B = weight * ( A - B ) * ( len / |AB| - 1 )
+
+*/
 void Meca::addLongLink4(Interpolation const& ptA,
                         const size_t inx[4], const real coef[4],
                         const real len,

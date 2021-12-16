@@ -90,7 +90,7 @@ private:
     ObjectList makeSphere(Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    ObjectList makeGrafted(Glossary&, std::string const&, Simul&);
+    ObjectList makeWrist(Glossary&, std::string const&, Simul&);
 
 public:
     

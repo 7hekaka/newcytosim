@@ -380,7 +380,7 @@ ObjectList Solid::makeSphere(Glossary& opt, std::string const& var, Simul& sim)
 }
 
 
-ObjectList Solid::makeGrafted(Glossary& opt, std::string const& var, Simul& sim)
+ObjectList Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
 {
     ObjectList res;
     std::string str;
@@ -417,9 +417,9 @@ ObjectList Solid::makeGrafted(Glossary& opt, std::string const& var, Simul& sim)
  
      new solid NAME
      {
-       point1 = [INTEGER,] POSITION, RADIUS [, SINGLE_SPEC]
-       point2 = [INTEGER,] POSITION, RADIUS [, SINGLE_SPEC]
-       point3 = [INTEGER,] POSITION, RADIUS [, SINGLE_SPEC]
+       point1 = [INTEGER,] POSITION, RADIUS [, SINGLE]
+       point2 = [INTEGER,] POSITION, RADIUS [, SINGLE]
+       point3 = [INTEGER,] POSITION, RADIUS [, SINGLE]
        etc.
      }
  
@@ -450,8 +450,8 @@ ObjectList Solid::makeGrafted(Glossary& opt, std::string const& var, Simul& sim)
 
      new solid NAME
      {
-       sphere0 = POSITION, RADIUS [, SINGLE_SPEC]
-       sphere1 = POSITION, RADIUS [, SINGLE_SPEC]
+       sphere1 = POSITION, RADIUS [, SINGLE]
+       sphere2 = POSITION, RADIUS [, SINGLE]
        etc.
      }
  
@@ -468,19 +468,19 @@ ObjectList Solid::makeGrafted(Glossary& opt, std::string const& var, Simul& sim)
  
      new solid NAME
      {
-       point0   = ... , SINGLE_SPEC
-       sphere0  = ... , SINGLE_SPEC
+       point1  = ... , SINGLE
+       sphere1 = ... , SINGLE
        etc.
-       anchor   = SINGLE_SPEC [, SINGLE_SPEC] ...
+       anchor  = SINGLE [, SINGLE] ...
        etc.
      }
  
- Where `SINGLE_SPEC` is string containing at most 3 words: `[INTEGER] NAME [each]`,
+ Where `SINGLE` is string containing at most 3 words: `[INTEGER] NAME [each]`,
  where the `INTEGER` specifies the number of Singles, `NAME` specifies their name,
  and the optional word `each` species that the command applies to every point.
  
- The command `attach` applies to all the points of the Solid, while `attach0`,
- `attach1`, etc. apply to the points specified by `point0`, `point1`, etc. only.
+ The command `attach` applies to all the points of the Solid, while `attach1`,
+ `attach2`, etc. apply to the points specified by `point1`, `point2`, etc. only.
  With `attach`, the Singles are distributed randomly on all the points,
  and if `each` is specified, the specification is repeated for each point.
  
@@ -489,7 +489,7 @@ ObjectList Solid::makeGrafted(Glossary& opt, std::string const& var, Simul& sim)
      new solid NAME
      {
         point1 = center, 1, grafted
-        sphere1 = 1 0 0, 7 grafted
+        sphere1 = 1 0 0, 1, 7 grafted
      }
  */
 
@@ -498,17 +498,8 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     ObjectList res;
     std::string var, str;
     size_t inp, inx, nbp;
-
-    // options named 'sphere???' will add spheres:
-    inp = 1;
-    var = "sphere1";
-    while ( opt.has_key(var) )
-    {
-        res.append(makeSphere(opt, var, sim));
-        var = "sphere" + std::to_string(++inp);
-    }
     
-    if ( opt.has_key("point0") )
+    if ( opt.has_key("point0") || opt.has_key("sphere0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
     
     // options named 'point???' will add points:
@@ -518,6 +509,15 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     {
         res.append(makePoint(opt, var, sim));
         var = "point" + std::to_string(++inp);
+    }
+
+    // options named 'sphere???' will add spheres:
+    inp = 1;
+    var = "sphere1";
+    while ( opt.has_key(var) )
+    {
+        res.append(makeSphere(opt, var, sim));
+        var = "sphere" + std::to_string(++inp);
     }
     
 #if BACKWARD_COMPATIBILITY < 100
@@ -538,7 +538,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     var = "anchor1";
     while ( opt.has_key(var) )
     {
-        makeGrafted(opt, var, sim);
+        makeWrist(opt, var, sim);
         var = "anchor" + std::to_string(++inp);
     }
     

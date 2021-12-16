@@ -46,11 +46,11 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
      new bead NAME
      {
        radius = REAL
-       attach = SINGLE_SPEC [, SINGLE_SPEC] ...
+       attach = SINGLE [, SINGLE] ...
      }
  
- Where `SINGLE_SPEC` is string containing at most 3 words: `[INTEGER] NAME`,
- where the `INTEGER` specifies the number of Singles, `NAME` specifies their name.
+ Where `SINGLE` is string containing at most 2 words: `[INTEGER] NAME`,
+ where `INTEGER` specifies the number of Singles and `NAME` their name.
  
  For example if `grafted` is the name of a Single, one can use:
  
@@ -64,7 +64,6 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
 ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
 {
     ObjectList res;
-    // get sphere radius:
     real rad = -1;
     size_t inx = 2;
 
@@ -102,7 +101,7 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
     res.push_back(obj);
     
     std::string str;
-    // attach different kinds of SINGLE
+    // attach anchored Singles:
     while ( opt.set(str, var, inx++) )
         res.append(simul_.singles.makeWrists(obj, 0, 1, str));
 

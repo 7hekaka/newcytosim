@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # `go_sim_lib.py` is a miniature library to run Cytosim.
 #  It is not executable by directly, but it used by go_sim.py
 #  to create directory, copy files, move directories, etc.
@@ -206,7 +207,7 @@ def run(exe, conf, name, args=[]):
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf);    
-    wdir = make_run_directory('run')
+    wdir = make_run_directory('R')
     os.chmod(wdir, 504)
     os.chdir(wdir)
     shutil.copyfile(conf, config_name)

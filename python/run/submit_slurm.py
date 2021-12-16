@@ -104,7 +104,7 @@ def job(cwd, conf, jarg):
     cmd += ['cd %s;' % cwd]
     cmd += ['touch %s;' % conf]
     # the job will call go_sim.py once:
-    cmd += ['python go_sim.py %s %s;' % (jarg, conf)]
+    cmd += ['go_sim.py %s %s;' % (jarg, conf)]
     cmd += ['mv '+conf+' '+jdir+'/done/.;']
     # cleanup
     cmd += ['mv $0 '+jdir+'/done/.;']

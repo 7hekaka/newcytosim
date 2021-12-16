@@ -8,7 +8,7 @@
 
 """
     Plot the radius of the network as a function of time.
-    This relies on 'reportN' to produce the data
+    This relies on 'reportN' to produce data in 'mom.txt'
     
 Syntax:
     
@@ -83,8 +83,6 @@ def get_moment(file):
     T = 0
     M = 0
     for line in file:
-        if not line or line[0] == '%':
-            continue
         s = uncode(line).split()
         if len(s) < 2:
             pass
@@ -132,7 +130,7 @@ def process(dirpath):
             time, data = get_size(f)
             prune_values(time, data)
             plt.plot(time, data, 'k-', linewidth=2)
-    if 1:
+    if 0:
         filename = 'connectors.txt'
         if not os.path.isfile(filename):
             subprocess.call(['reportN', 'fiber:connector'], stdout=open(filename, 'w'))

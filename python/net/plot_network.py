@@ -66,7 +66,7 @@ def differentiate(size):
 
 def get_meshsize(filename):
     """
-        This extracts parameters from the config file, and compute the meshsize
+        This extracts parameters from the config file, and compute meshsize
     """
     pile = read_config.parse(filename)
     com = read_config.get_command(pile, ['set', 'space', '*'])

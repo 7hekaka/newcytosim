@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # A script to run simulations sequentially.
 # Copyright F. Nedelec, 2010--2018, Cambridge University 2019--2021
 # Using multiprocessing thanks to Adolfo Alsina and Serge Dmitrieff, March 2016

@@ -98,7 +98,7 @@ size_t Sphere::addSurfacePoint(Vector const& cp)
      new sphere NAME
      {
         radius = VALUE, DEVIATION, MINIMUM
-        point1 = INTEGER, POSITION [, SINGLE_SPEC]
+        point1 = INTEGER, POSITION [, SINGLE]
      }
  
  Variability around the mean radius is added if 'DEVIATION' and 'MINIMUM' are specified.
@@ -113,19 +113,19 @@ size_t Sphere::addSurfacePoint(Vector const& cp)
      new sphere NAME
      {
         radius   = ...
-        point0   = ...
+        point1   = ...
         etc.
-        attach   = SINGLE_SPEC [, SINGLE_SPEC] ...
-        attach0  = SINGLE_SPEC [, SINGLE_SPEC] ...
+        attach   = SINGLE [, SINGLE] ...   //this will attach to all points
+        attach1  = SINGLE [, SINGLE] ...   //this will attach to point1
         etc.
      }
  
- Where `SINGLE_SPEC` is string containing at most 3 words: `[INTEGER] NAME [each]`,
+ Where `SINGLE` is string containing at most 3 words: `[INTEGER] NAME [each]`,
  where the `INTEGER` specifies the number of Singles, `NAME` specifies their name,
  and the optional word `each` species that the command applies to every point.
  
- The command `attach` applies to all the points of the Solid, while `attach0`,
- `attach1`, etc. apply to the points specified by `point0`, `point1`, etc.
+ The command `attach` applies to all the points of the Solid, while `attach1`,
+ `attach2`, etc. apply to the points specified by `point1`, `point2`, etc.
  With `attach`, the Singles are distributed randomly on all the points,
  and if `each` is specified, the specification is repeated for each point.
  

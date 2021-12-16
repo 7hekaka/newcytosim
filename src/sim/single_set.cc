@@ -425,7 +425,7 @@ size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* ar
  If 'each' is specified, this number is multiplied by the number of point `nbp`,
  and every point receives the same number of Singles.
  
- This is used to decorate Solid and Sphere
+ This is used to attach Single to Bead, Solid and Sphere
  */
 ObjectList SingleSet::makeWrists(Mecable const* obj, size_t fip, size_t nbp, std::string& arg)
 {

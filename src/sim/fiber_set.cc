@@ -69,7 +69,8 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
 
 
 /**
- The initialization options depend on the type of fiber: Fiber, DynamicFiber, ClassicFiber, etc.
+ Many options depend on the type of fiber: Fiber, DynamicFiber, ClassicFiber, etc.
+ Here only the common options are described.
 
  <hr>
  
@@ -88,19 +89,22 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
 
      new filament
      {
-        attach1 = [NUMBER] NAME, ABSCISSA, REFERENCE [, MODIFIER] [, POSITION]
+        attach1 = [NUMBER] NAME, ABSCISSA, REFERENCE [, MODIFIER [, POSITION]]
      }
  
  If `ABSCISSA` is specified (in micrometers), the Single/Couple will be attached
  at the specified distance from the `REFERENCE = { minus_end, plus_end, center }
  (default is `minus_end`). The distance is counted towards the other end.
- Moreover, a `MODIFIER = { uniform, exponential, regular }` can be specified (default: `uniform`).
- With `uniform` Single/Couple are attached uniformly over distance `[0, DISTANCE]` from the `REFERENCE`.
- With `regular`, they are distributed regularly.
- Finally, `POSITION` can be specified. This is mostly relevant for `SINGLE` with
+ 
+ A `MODIFIER = { uniform, exponential, regular }` can be specified (default: `uniform`):
+     - with `uniform` Single/Couple are uniformly distributed over distance `[0, DISTANCE]`
+       from the `REFERENCE`.
+     - with `regular`, they are distributed regularly.
+     .
+ Finally, `POSITION` can be specified. This is mostly relevant for Singles with
  activity `fixed`.
  
- One can specify multiple attachement instructions with `attach1`, `attach2`, etc.
+ Multiple attachement instructions can be specified as `attach1`, `attach2`, etc.
  For example, this attaches one `simplex` at each end of the filaments:
  
      new filament
