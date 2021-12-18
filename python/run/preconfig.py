@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# PRECONFIG, a versatile configuration file generator
+# PRECONFIG, a versatile configuration file generator for varying parameters
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2021
@@ -316,7 +316,7 @@ class Preconfig:
         self.template = ''
     
     def evaluate(self, code, blok, verbose=1):
-        """ Evaluate `arg` and return result """
+        """ Return evaluation of `code`, or 'blok' in case of syntax error"""
         #print("preconfig:evaluate %s" % blok)
         try:
             res = eval(code, GLOBALS, self.locals)
@@ -342,8 +342,9 @@ class Preconfig:
     
     def try_assignment(self, arg, verbose=1):
         """
-            Check if `arg` follows the format of a variable definition (X=CODE),
-            and if that succeeds, return the key and value strings in a tuple.
+            Check if `arg` follows the format of a variable definition (X=RHS),
+            and if that succeeds, return (key, value).
+            If this is not an assignment, return self.evaluate(arg)
         """
         #print("preconfig:try_assignment %s" % arg);
         res = re.match(r" *([a-zA-Z]\w*) *= *(.*)", arg)
@@ -369,8 +370,8 @@ class Preconfig:
     
     def process(self, file, text):
         """
-            `process()` will identify and substitute bracketed code blocks
-            embedded in the input file, and generate a file at EOF.
+            Identify and recursively substitute bracketed code blocks embedded
+            in the input `file`. Generate output file evetytime EOF is reached.
         """
         output = text
 
