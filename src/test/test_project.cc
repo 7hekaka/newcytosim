@@ -899,7 +899,7 @@ void projectDiff_SSE(SIZE_T nbs, const real* X, real* Y)
 {
 #if ( DIM == 2 )
     addProjectionDiff2D_SSE(nbs, lag_, X, Y);
-#elif ( DIM == 3 )
+#elif ( DIM == 3 ) && REAL_IS_DOUBLE
     addProjectionDiff3D_SSE(nbs, lag_, X, Y);
 #endif
 }
@@ -1024,6 +1024,8 @@ void testProjectionD(SIZE_T cnt)
     testD<projectForcesD_PTR>(cnt, "D_PTR");
 #if ( DIM == 3 ) && defined(__SSE3__)
     testD<projectForcesD3D_SSE>(cnt, "D_SSE");
+#endif
+#if REAL_IS_DOUBLE && ( DIM == 3 ) && defined(__SSE3__)
     testD<projectForcesD3D_SSE1>(cnt, "D_SSE1");
 #endif
 #if REAL_IS_DOUBLE
@@ -1050,6 +1052,8 @@ void testProjection(SIZE_T cnt)
     timeProject<projectForces>(cnt,    "projF");
 #if defined(__SSE3__)
     timeProject<projectForces_SSE>(cnt, "prSSE");
+#endif
+#if REAL_IS_DOUBLE && defined(__SSE3__)
     timeProject<projectForcesFused>(cnt, "fused");
 #endif
 #if REAL_IS_DOUBLE && defined(__AVX__)

@@ -8,8 +8,6 @@
 #include "tesselator.h"
 #include <cstdio>
 
-using namespace gle;
-
 int style = 0;
 int kind = 2;
 int rank = 1;

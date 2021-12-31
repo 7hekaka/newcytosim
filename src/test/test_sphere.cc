@@ -10,7 +10,6 @@
 #include "gym_text.h"
 #include "gym_flute.h"
 
-using namespace gle;
 
 SphericalCode S, T;
 SphericalCode * front = &S;

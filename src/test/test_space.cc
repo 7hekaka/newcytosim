@@ -22,8 +22,6 @@
 #include "gym_flute.h"
 
 
-using namespace gle;
-
 // List of options
 Glossary opt;
 

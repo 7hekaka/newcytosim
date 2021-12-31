@@ -18,8 +18,6 @@
 #include "grid.h"
 #include "grid_display.h"
 
-using namespace gle;
-
 //area of the grid
 const int range = 5;
 real     left[] = {  -range,  -range,  0 };
