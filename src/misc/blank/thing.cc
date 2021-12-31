@@ -5,7 +5,6 @@
 #include "blank_param.h"
 
 extern BlankParam PAM;
-using namespace gle;
 
 //-----------------------------------------------------------------------
 //--------------------------- INITIALIZATION ----------------------------

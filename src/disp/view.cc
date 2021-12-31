@@ -9,7 +9,6 @@
 #include "glut.h"
 #include "time_date.h"
 
-using namespace gle;
 
 //------------------------------------------------------------------------------
 

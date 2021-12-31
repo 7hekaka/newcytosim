@@ -140,9 +140,8 @@ void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceSphere::draw2D() const
 {
-    GLfloat R(radius_);
     glPushMatrix();
-    glScalef(R, R, R);
+    gle::scale(radius_);
     gle::circle();
 
     if ( prop->disp->visible & 2 )
@@ -155,9 +154,8 @@ void SpaceSphere::draw2D() const
 
 void SpaceSphere::draw3D() const
 {
-    GLfloat R(radius_);
     glPushMatrix();
-    glScalef(R, R, R);
+    gle::scale(radius_);
     gle::sphere8();
     gle::threeArrowStrip(0.5, 1);
     glPopMatrix();

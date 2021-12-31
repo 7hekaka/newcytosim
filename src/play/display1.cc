@@ -15,7 +15,6 @@
 //#include "display_color.h"
 #include "gym_flute.h"
 
-using namespace gle;
 extern Modulo const* modulo;
 
 

@@ -15,7 +15,6 @@
 //#include "display_color.h"
 #include "gym_flute.h"
 
-using namespace gle;
 extern Modulo const* modulo;
 
 //------------------------------------------------------------------------------
@@ -127,7 +126,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 
                 disp->color.load();
 #if ( DIM >= 3 )
-                stretchTube(pf, ph, pixscale(disp->width), gle::truncatedCone);
+                gle::stretchTube(pf, ph, pixscale(disp->width), gle::truncatedCone);
                 //drawCone(pf, ph-pf, pixscale(disp->width));
 #else
                 gle::drawBand(ph, pixscale(disp->width), ps, pixscale(disp->width));

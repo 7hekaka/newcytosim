@@ -157,9 +157,8 @@ void SpaceDynamicDisc::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceDynamicDisc::draw2D() const
 {
-    GLfloat R(radius_);
     glPushMatrix();
-    glScalef(R, R, R);
+    gle::scale(radius_);
     gle::circle();
     glPopMatrix();
 }

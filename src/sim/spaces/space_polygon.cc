@@ -349,7 +349,7 @@ void SpacePolygon::drawPolygon(bool points, bool lines) const
 
 void SpacePolygon::draw3D() const
 {
-    float H(-height_);
+    const float H(-height_);
     const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     flute6 * flt = new flute6[nbp+1];

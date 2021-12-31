@@ -11,9 +11,6 @@
 #include "gle.h"
 
 
-using namespace gle;
-
-
 namespace glApp
 {
     std::vector<View> views;

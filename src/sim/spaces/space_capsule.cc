@@ -257,7 +257,7 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 void SpaceCapsule::draw2D() const
 {
     const float L(half_);
-    const real R(radius_);
+    const float R(radius_);
     constexpr size_t fin = 16 * gle::finesse;
     float* arc = (float*)gym::mapBufferV2(2*fin+2);
     float* cra = arc + 2*fin + 2;
@@ -270,7 +270,7 @@ void SpaceCapsule::draw2D() const
 
 void SpaceCapsule::draw3D() const
 {
-    const real L(half_);
+    const float L(half_);
     const float R(radius_);
 
     //right side:

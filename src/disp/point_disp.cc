@@ -137,7 +137,7 @@ void PointDisp::strokeI() const
     paintShape();
     
     // radius of the spot that indicate an inactive Hand
-    const GLfloat DOT_SIZE = 0.55f;
+    const GLfloat DS = 0.55f;
 
     // draw a transparent hole in the center:
     GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
@@ -145,7 +145,7 @@ void PointDisp::strokeI() const
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
     glPushMatrix();
-    glScalef(DOT_SIZE, DOT_SIZE, DOT_SIZE);
+    glScalef(DS, DS, DS);
     glColor4f(0, 0, 0, 0);
     gle::disc(); //strokeShape();
     glPopMatrix();

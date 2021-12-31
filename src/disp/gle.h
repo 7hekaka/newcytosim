@@ -74,7 +74,10 @@ namespace gle
     
     inline void scale(float x)  { glScalef(x,x,x); }
     inline void scale(double x) { glScaled(x,x,x); }
-   
+    
+    inline void scale(float x, float y, float z)  { glScalef(x,y,z); }
+    inline void scale(double x, double y, double z) { glScaled(x,y,z); }
+
     inline void translate(float x, float y, float z)    { glTranslatef(x, y, z); }
     inline void translate(double x, double y, double z) { glTranslated(x, y, z); }
 

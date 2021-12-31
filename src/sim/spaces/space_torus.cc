@@ -116,16 +116,13 @@ void SpaceTorus::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
-using namespace gle;
 
 void SpaceTorus::draw2D() const
 {
-    GLfloat Ro(bCurve+bRadius);
-    GLfloat Rio((bCurve-bRadius)/(bCurve+bRadius));
     glPushMatrix();
-    glScalef(Ro, Ro, Ro);
+    gle::scale(bCurve+bRadius);
     gle::circle();
-    glScalef(Rio, Rio, Rio);
+    gle::scale((bCurve-bRadius)/(bCurve+bRadius));
     gle::circle();
     glPopMatrix();
 }

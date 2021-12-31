@@ -225,12 +225,12 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceEllipse::draw2D() const
 {
-    GLfloat X(radius_[0]);
-    GLfloat Y((DIM>1)?radius_[1]:1);
-    GLfloat Z((DIM>2)?radius_[2]:1);
+    const float X(radius_[0]);
+    const float Y((DIM>1)?radius_[1]:1);
+    const float Z((DIM>2)?radius_[2]:1);
 
     glPushMatrix();
-    glScalef(X, Y, Z);
+    gle::scale(X, Y, Z);
     gle::circle();
     
     if ( prop->disp->visible & 2 )
@@ -245,13 +245,13 @@ void SpaceEllipse::draw2D() const
 
 void SpaceEllipse::draw3D() const
 {
-    GLfloat T = thickness_;
-    GLfloat X(T+radius_[0]);
-    GLfloat Y(T+((DIM>1)?radius_[1]:1));
-    GLfloat Z(T+((DIM>2)?radius_[2]:1));
+    const float T = thickness_;
+    const float X(T+radius_[0]);
+    const float Y(T+((DIM>1)?radius_[1]:1));
+    const float Z(T+((DIM>2)?radius_[2]:1));
 
     glPushMatrix();
-    glScalef(X, Y, Z);
+    gle::scale(X, Y, Z);
     gle::sphere8();
     glPopMatrix();
 }

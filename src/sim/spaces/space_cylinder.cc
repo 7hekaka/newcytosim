@@ -222,8 +222,8 @@ void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceCylinder::draw3D() const
 {
-    const real L(half_);
-    const real R(radius_);
+    const float L(half_);
+    const float R(radius_);
 
     glPushMatrix();
     gle::stretchAlignZX(-L, L, R);

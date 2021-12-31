@@ -208,17 +208,16 @@ void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceDisc::draw2D() const
 {
-    GLfloat R(radius_);
     glPushMatrix();
-    glScalef(R, R, R);
+    gle::scale(radius_);
     gle::circle();
     glPopMatrix();
 }
 
 void SpaceDisc::draw3D() const
 {
-    const real R(radius_);
-    const real B(bot_);
+    const float R(radius_);
+    const float B(bot_);
 
     glPushMatrix();
     gle::transScale(0, 0, -B, R);
