@@ -40,7 +40,7 @@ static void changeStyle(PointDisp * p, int)
     flashText("%s:style = %i", p->name_str(), p->style);
 }
 
-static void setSize(PointDisp * p, GLfloat s)
+static void setSize(PointDisp * p, float s)
 {
     if ( s >= 0.5 )
     {
@@ -49,7 +49,7 @@ static void setSize(PointDisp * p, GLfloat s)
     }
 }
 
-static void setWidth(PointDisp * p, GLfloat s)
+static void setWidth(PointDisp * p, float s)
 {
     if ( s > 0.5 )
     {
@@ -473,7 +473,7 @@ static void changePointSize(FiberDisp* p, int inc)
     bool alt = p->speckle_style && !p->point_style;
     float& size = alt ? p->speckle_size : p->point_size;
     
-    GLfloat s = grained(size, inc);
+    float s = grained(size, inc);
     
     if ( s > 0 )
     {
@@ -487,7 +487,7 @@ static void changePointSize(FiberDisp* p, int inc)
 
 static void changeLineWidth(FiberDisp* p, int inc)
 {
-    GLfloat s = grained(p->line_width, inc);
+    float s = grained(p->line_width, inc);
     
     if ( s > 0 )
     {
@@ -498,7 +498,7 @@ static void changeLineWidth(FiberDisp* p, int inc)
 
 static void changeSize(FiberDisp* p, int inc)
 {
-    GLfloat s = grained(p->line_width, inc);
+    float s = grained(p->line_width, inc);
     
     if ( s > 0 )
     {

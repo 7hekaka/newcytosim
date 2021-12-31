@@ -95,7 +95,7 @@ public:
     int height() const { return window_size[1]; }
     
     /// size of pixel in drawing units
-    GLfloat pixelSize() const { return view_size / ( zoom * std::max(width(), height()) ); }
+    float pixelSize() const { return view_size / ( zoom * std::max(width(), height()) ); }
     
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;

@@ -183,19 +183,19 @@ void glApp::maximizeDisplay()
     int H = glutGet(GLUT_WINDOW_HEIGHT);
 
     /// using addition by Renaud Blanch to handle Retina display:
-    int s = 1; //std::max(1, glutGet(GLUT_WINDOW_SCALE));
+    int S = 1; //std::max(1, glutGet(GLUT_WINDOW_SCALE));
     
-    const int maxW = s * glutGet(GLUT_SCREEN_WIDTH);
-    const int maxH = s * ( glutGet(GLUT_SCREEN_HEIGHT) - 49 );
+    int maxW = S * glutGet(GLUT_SCREEN_WIDTH);
+    int maxH = S * ( glutGet(GLUT_SCREEN_HEIGHT) - 49 );
     
-    const GLfloat zw(maxW/(GLfloat)W);
-    const GLfloat zh(maxH/(GLfloat)H);
+    float zW(maxW/(float)W);
+    float zH(maxH/(float)H);
     
     glutPositionWindow(0, 45);
-    if ( zw < zh )
-        glutReshapeWindow(maxW, int(zw*H));
+    if ( zW < zH )
+        glutReshapeWindow(maxW, int(zW*H));
     else
-        glutReshapeWindow(int(zh*W), maxH);
+        glutReshapeWindow(int(zH*W), maxH);
 }
 
 //------------------------------------------------------------------------------
@@ -297,7 +297,7 @@ void glApp::resizeWindow(int w, int h)
 }
 
 
-void glApp::setScale(GLfloat s)
+void glApp::setScale(float s)
 {
     if ( 0 == views.size() )
         initialize();
@@ -899,7 +899,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
          
          The zoom preserves the position pointed at by the mouse.
          */
-        GLfloat wZ = 1.f;
+        float wZ = 1.f;
 
         if ( button == GLUT_WHEEL_UP )
             wZ = 0.96969696f;
@@ -1053,8 +1053,8 @@ void glApp::processMouseDrag(int mX, int mY)
             Quaternion<real> q;
             q.setFromAxis(mouseAxis, std::atan2( sin, cos ));
             view.rotate_to(savedView.rotation * q);
-            real Z = norm( mouse - viewFocus ) / norm( mouseDown - viewFocus );
-            if ( Z > 0.001 ) view.zoom_to(savedView.zoom * (GLfloat)Z);
+            float Z = norm( mouse - viewFocus ) / norm( mouseDown - viewFocus );
+            if ( Z > 0.001 ) view.zoom_to(savedView.zoom * Z);
         } break;
 
         

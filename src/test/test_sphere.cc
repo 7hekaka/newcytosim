@@ -120,7 +120,7 @@ void nameVertices()
     char tmp[128];
     for ( size_t i=0; i < front->nbPoints(); ++i )
     {
-        GLfloat x, y, z;
+        real x, y, z;
         front->putPoint(&x, &y, &z, i);
         snprintf(tmp, sizeof(tmp), "%lu", i);
         gym::drawText(Vector3(x, y, z), tmp, GLUT_BITMAP_8_BY_13, 0.5);

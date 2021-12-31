@@ -50,7 +50,7 @@ namespace glApp
     void resizeWindow(int, int);
     
     /// set the range normally visible for zoom = 1
-    void setScale(GLfloat);
+    void setScale(float);
 
     /// return view associated with current window
     View& currentView();

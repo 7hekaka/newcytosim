@@ -112,7 +112,7 @@ bool SpaceTee::inside(Vector const& W) const
 //------------------------------------------------------------------------------
 real SpaceTee::projectOnBase(const Vector& W, Vector& P) const
 {
-real scale, nrm = 0;
+    real mag, nrm = 0;
 #if ( DIM > 1 )
 #if ( DIM == 2 )
     nrm = square(W.YY);
@@ -125,29 +125,29 @@ real scale, nrm = 0;
         nrm += square(W.XX + tLength);
     
     if ( nrm > 0 ) {
-        nrm   = std::sqrt(nrm);
-        scale = tRadius/nrm;
+        nrm = std::sqrt(nrm);
+        mag = tRadius/nrm;
     }
     else {
-        nrm   = 0;
-        scale = 0;
+        nrm = 0;
+        mag = 0;
     }
     
     real pX, pY = 0, pZ = 0;
     
     if ( W.XX >  tLength )
-        pX =  tLength + scale*(W.XX - tLength);
+        pX =  tLength + mag*(W.XX - tLength);
     else if ( W.XX < -tLength )
-        pX = -tLength + scale*(W.XX + tLength);
+        pX = -tLength + mag*(W.XX + tLength);
     else
         pX = W.XX;
     
-    if ( scale != 0 )
-        pY = scale*W.YY;
+    if ( mag != 0 )
+        pY = mag*W.YY;
     else
         pY = tRadius;
 #if ( DIM > 2 )
-    pZ = scale*W.ZZ;
+    pZ = mag*W.ZZ;
 #endif
     
     P.set(pX, pY, pZ);
@@ -159,10 +159,10 @@ real scale, nrm = 0;
 //------------------------------------------------------------------------------
 real SpaceTee::projectOnArm(const Vector& W, Vector& P) const
 {
-    real  scale, nrm = 0;
+    real mag, nrm = 0;
 #if ( DIM > 1 )
-    const real totArmLength = tArmLength+tRadius;
-    const real xRel         = (W.XX - tJunction);
+    const real aLen = tArmLength+tRadius;
+    const real xRel = (W.XX - tJunction);
     
     //this projection is only valid for W.YY >= 0
     assert_true( W.YY >= 0 );
@@ -172,30 +172,30 @@ real SpaceTee::projectOnArm(const Vector& W, Vector& P) const
 #elif ( DIM > 2 )
     nrm = square(xRel) + square(W.ZZ);
 #endif
-    if ( W.YY > totArmLength )
-        nrm += square(W.YY-totArmLength);
+    if ( W.YY > aLen )
+        nrm += square(W.YY-aLen);
     if ( nrm > 0 ) {
-        nrm   = std::sqrt(nrm);
-        scale = tRadius/nrm;
+        nrm = std::sqrt(nrm);
+        mag = tRadius/nrm;
     }
     else {
-        nrm   = 0;
-        scale = 0;
+        nrm = 0;
+        mag = 0;
     }
     
     real pX, pY = 0, pZ = 0;
-    if ( scale != 0 )
-        pX = tJunction + scale*xRel;
+    if ( mag != 0 )
+        pX = tJunction + mag*xRel;
     else
         pX = tJunction + tRadius;
     
-    if ( W.YY > totArmLength )
-        pY = totArmLength + scale*(W.YY-totArmLength);
+    if ( W.YY > aLen )
+        pY = aLen + mag*(W.YY-aLen);
     else
         pY = W.YY;
 
 #if ( DIM > 2 )
-    pZ = scale*W.ZZ;
+    pZ = mag*W.ZZ;
 #endif
     P.set(pX, pY, pZ);
 #endif

@@ -14,7 +14,7 @@ namespace gym
     int maxTextWidth(const char text[], void* font, int& lines);
     
     /// draw text at the current OpenGL raster position and raster color
-    void bitmapString(const char text[], void* font = nullptr, GLfloat vshift=0);
+    void bitmapString(const char text[], void* font = nullptr, float vshift=0);
 
     /// display text on a rectangle of color `bcol`, in a corner of the center of the display window
     void drawText(const char text[], void* font, gle_color bcol, int position, int width, int height);

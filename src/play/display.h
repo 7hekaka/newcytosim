@@ -149,7 +149,7 @@ public:
     void drawTiled(Simul const&, int nine);
 
     /// scale from pixel size / line width to natural units
-    float scale(float w) const { return w * sizeScale; }
+    float pixscale(float w) const { return w * sizeScale; }
     
     /// set OpenGL line width
     void lineWidth(float w) const { glLineWidth(std::max(w*unitValue, 0.25f)); }

@@ -45,7 +45,7 @@ public:
     /// set OpenGL color associated with value
     gle_color color(const real scale) const
     {
-        GLfloat x(scale * val);
+        gle_color::COLOF x(scale * val);
         if ( x > 0 )
             return gle_color::jet_color_dark(x, 1.0);
         return gle_color(-x, 0, -x);
@@ -82,14 +82,14 @@ public:
     void read(Inputter& in)           { for (int n=0; n<N; ++n) val[n] = in.readFloat(); }
 
 #ifdef DISPLAY
-    /// set OpenGL color associated with value
-    gle_color color(const real scale) const
+    /// set OpenGL color associated with value, scaled by 'mag'
+    gle_color color(const real mag) const
     {
         //this maps val[0] to the red channel, val[1] to green and val[2] to blue
-        GLfloat rgb[3] = { 0, 0, 0 };
+        gle_color::COLOF rgb[3] = { 0, 0, 0 };
         const int sup = std::min(3UL, N);
         for ( int c = 0; c < sup; ++c )
-           rgb[c] = scale * val[c];
+           rgb[c] = mag * val[c];
         return gle_color(rgb[0], rgb[1], rgb[2]);
     }
 #endif

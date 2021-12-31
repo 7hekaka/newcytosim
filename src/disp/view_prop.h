@@ -23,10 +23,10 @@ public:
      */
     
     /// zoom factor = ratio between visible area and `view_size`
-    GLfloat zoom;
+    float zoom;
     
     /// size of area visible in the window, in sim-units (default=10)
-    GLfloat view_size;
+    float view_size;
     
     /// enables the display area to be set from the size of the simulation space
     /**
@@ -179,7 +179,7 @@ public:
     int fog_type;
     
     /// density of fog (also known as `fog[1]`)
-    GLfloat fog_param;
+    float fog_param;
     
     /// color of fog (also known as `fog[2]`)
     gle_color fog_color;

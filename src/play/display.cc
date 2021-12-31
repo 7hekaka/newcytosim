@@ -688,7 +688,7 @@ void Display::drawAverageFiber(ObjectList const& objs)
     if ( S > REAL_EPSILON )
     {
         Vector MP = normalize( P - M );
-        const float rad = scale(10);
+        const float rad = pixscale(10);
         gle::drawCylinder(M, MP, rad);
         gle::drawCone(P, MP, rad);
         drawObject(G, rad, gle::sphere2);
@@ -789,7 +789,7 @@ void Display::drawMisc(Simul const& sim)
  */
 void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 {
-    float rad = scale(size);
+    const float rad = pixscale(size);
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -815,7 +815,7 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
  */
 void Display::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
-    float rad = scale(size);
+    const float rad = pixscale(size);
     if ( rad > 0 ) switch(style)
     {
         default: break;
@@ -1069,7 +1069,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( style == 2 )
     {
         // display arrowheads along the fiber:
-        const float rad = scale(disp->point_size);
+        const float rad = pixscale(disp->point_size);
         const real gap = disp->point_gap;
         real ab = std::ceil(fib.abscissaM()/gap) * gap;
         for ( ; ab <= fib.abscissaP(); ab += gap )
@@ -1078,7 +1078,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( style == 3 )
     {
         // display only middle of fiber:
-        drawObject(fib.posMiddle(), scale(2*disp->point_size), gle::sphere2);
+        drawObject(fib.posMiddle(), pixscale(2*disp->point_size), gle::sphere2);
     }
 }
 
@@ -1300,8 +1300,8 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
 }
 
 
-/// display forces acting on the fiber's vertices, using lines scaled by 'scale'
-void Display::drawFiberForces(Fiber const& fib, real scale) const
+/// display forces acting on the fiber's vertices, using lines scaled by 'mag'
+void Display::drawFiberForces(Fiber const& fib, real mag) const
 {
     gle_color col = fib.prop->disp->force_color;
     gle_color lor = col.alpha_scaled(0.5f);
@@ -1310,7 +1310,7 @@ void Display::drawFiberForces(Fiber const& fib, real scale) const
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {
         Vector P = fib.posP(i);
-        Vector F = scale * fib.netForce(i);
+        Vector F = mag * fib.netForce(i);
         flu[  2*i] = { col, P };
         flu[1+2*i] = { lor, P+F };
     }
@@ -1747,7 +1747,7 @@ void Display::drawSolid(Solid const& obj)
     {
         bodyColor(obj);
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), scale(disp->size), gle::hedron(obj.radius(i)>0));
+            drawObject(obj.posP(i), pixscale(disp->size), gle::hedron(obj.radius(i)>0));
     }
     
     //display outline of spheres in 2D
@@ -1868,7 +1868,7 @@ void Display::drawBead(Bead const& obj)
     if ( disp->style & 2 )
     {
         bodyColor(obj);
-        drawObject(obj.position(), scale(disp->size), gle::tetrahedron);
+        drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
     }
     
 #if ( DIM == 2 )
@@ -1933,16 +1933,16 @@ void Display::drawSphere(Sphere const& obj)
     {
         bodyColor(obj);
         for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), scale(disp->size), gle::sphere1);
+            drawObject(obj.posP(i), pixscale(disp->size), gle::sphere1);
     }
     
     // display center and reference points
     if ( disp->style & 8 )
     {
         bodyColor(obj);
-        drawObject(obj.posP(0), scale(disp->size), gle::star);
+        drawObject(obj.posP(0), pixscale(disp->size), gle::star);
         for ( size_t i = 0; i < obj.nbRefPoints; ++i )
-            drawObject(obj.posP(i), scale(disp->size), gle::cube);
+            drawObject(obj.posP(i), pixscale(disp->size), gle::cube);
     }
 }
 

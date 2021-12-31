@@ -773,13 +773,13 @@ void Solid::fixShape()
  If axis==-1 (default), then all dimensions are scaled uniformly.
  The next call to reshape() will then apply the new reference to the current shape.
  */
-void Solid::scaleShape(const real scale[DIM])
+void Solid::scaleShape(const real mag[DIM])
 {
     //scale in only in the specified dimension
     for ( size_t p = 0; p < soShapeSize; ++p )
     {
         for ( size_t d = 0; d < DIM; ++d )
-            soShape[DIM*p+d] *= scale[d];
+            soShape[DIM*p+d] *= mag[d];
     }
     
     //recalculate the momentum needed in rescale():
@@ -805,15 +805,15 @@ void Solid::rescale()
     if ( M > 0 )
     {
         // calculate the scaling factor to restore the size to 'soShapeSqr':
-        real scale = std::sqrt( soShapeSqr / M );
+        real mag = std::sqrt( soShapeSqr / M );
     
         // scale the shape around the center of gravity:
         for ( size_t p = 0; p < nPoints; ++p )
         {
             real * ptr = pPos + DIM * p;
-            (avg+scale*(Vector(ptr)-avg)).store(ptr);
+            (avg+mag*(Vector(ptr)-avg)).store(ptr);
             //for ( size_t d = 0; d < DIM; ++d )
-            //    ptr[d] = scale * ( ptr[d] - avg[d] ) + avg[d];
+            //    ptr[d] = mag * ( ptr[d] - avg[d] ) + avg[d];
         }
     }
 }

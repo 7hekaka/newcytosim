@@ -832,7 +832,7 @@ namespace gle
 
     size_t setBlob(flute3* flu)
     {
-        constexpr GLfloat R = 1.f, U = -1.f, H(M_SQRT2);
+        constexpr float R = 1.f, U = -1.f, H(M_SQRT2);
         /* start from a centerred cube, rotated appropriately
          with vertices ordered to draw all surfaces of the cube
          with a single triangle strip. */

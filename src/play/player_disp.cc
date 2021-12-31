@@ -203,7 +203,7 @@ void Player::autoScale(SpaceSet const& spaces, View& view)
     if ( rad > 0 )
     {
         //std::clog << "auto_scale " << rad << '\n';
-        view.view_size = GLfloat(2*rad);
+        view.view_size = float(2*rad);
         view.zoom_in(0.933033);
         --view.auto_scale;
     }
@@ -231,12 +231,12 @@ void Player::prepareDisplay(View& view, int mag)
 
     //----------------- set pixel size, unit-size and direction:
 
-    GLfloat pix = view.pixelSize();
+    float pix = view.pixelSize();
     /*
      if `disp.point_value` is set, line width and point size are to be understood
      in 'real' units, and otherwise, they are understood as number of pixels.
      */
-    GLfloat val = (disp.point_value > 0 ? disp.point_value/pix : 1 );
+    float val = (disp.point_value > 0 ? disp.point_value/pix : 1 );
     //std::clog << " pixel size = " << pix << '\n';
 
     mDisplay->setPixelFactors(pix/mag, mag*val);

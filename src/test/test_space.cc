@@ -89,7 +89,7 @@ int timerOn = false;
 int timerDelay = 50;
 
 //display parameter for OpenGL
-GLfloat line_width = 0.5f;
+GLfloat LW = 0.5f;
 
 //amount of white added to colors
 const GLfloat COL = 0.8f;
@@ -523,7 +523,7 @@ void display(View& view, int)
             }
         }
         gym::unmapBufferC4V4();
-        glLineWidth(line_width);
+        glLineWidth(LW);
         glDrawArrays(GL_LINES, 0, n);
     }
     
@@ -538,7 +538,7 @@ void display(View& view, int)
             flu[n++] = { lor, project[i]+normal[i] };
         }
         gym::unmapBufferC4V4();
-        glLineWidth(line_width);
+        glLineWidth(LW);
         glDrawArrays(GL_LINES, 0, n);
     }
     
@@ -556,7 +556,7 @@ void display(View& view, int)
             }
         }
         gym::unmapBufferC4V4();
-        glLineWidth(2*line_width);
+        glLineWidth(2*LW);
         glDrawArrays(GL_LINES, 0, n);
     }
     

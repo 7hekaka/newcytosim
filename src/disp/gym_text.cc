@@ -57,7 +57,7 @@ namespace gym
      draw the string character per character using:
      glutBitmapCharacter()
      */
-    void bitmapString(const char text[], void* font, GLfloat vshift)
+    void bitmapString(const char text[], void* font, float vshift)
     {
         if ( !font )
         {
