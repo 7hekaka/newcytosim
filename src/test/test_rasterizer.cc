@@ -1,151 +1,174 @@
-// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
-// Visual test for the rasterizer used in attachment algorithm of Cytosim
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2022
+// This is a visual test for the rasterizer used for attachment of Hands in Cytosim
 // Created by Francois Nedelec, October 2002
 
-#include "dim.h"
 #include <ctime>
-#include "vector.h"
 #include "gle.h"
 #include "glut.h"
 #include "glapp.h"
 #include "real.h"
 #include "random.h"
 #include "rasterizer.h"
-#include "vector.h"
+#include "vector2.h"
+#include "vector3.h"
 
-extern bool rasterizer_draws;
+#include "gym_flute.h"
 
-const int size = 50;
-const size_t MAX = 16;
+// select between 2D or 3D mode:
+#define FLAT_RASTERIZER 0
+
+
+#if FLAT_RASTERIZER
+typedef Vector2 Vector;
+#else
+typedef Vector3 Vector;
+#endif
+
+
+const int SIZE = 10;  // dimension of grid
+const size_t MAX = 16;  // max nb of points
+
 size_t n_pts = 2;
+real radius = 2;
 
-real radius = 10;
 Vector shift(0, 0, 0);
 Vector delta(1, 1, 1);
 Vector pts[MAX];
 
-#if ( DIM >= 3 )
-int hit[2*size+1][2*size+1][2*size+1];
+#if FLAT_RASTERIZER
+int hit[2*SIZE+1][2*SIZE+1];
 #else
-int hit[2*size+1][2*size+1];
+int hit[2*SIZE+1][2*SIZE+1][2*SIZE+1];
 #endif
 
-//-------------------------------------------------------------------
+extern bool rasterizer_draws;
+
+//------------------------------------------------------------------------------
+
+void drawPoints(size_t N, const Vector P[], float size)
+{
+    gle_color col(1, 0, 1);
+    flute8 * flu = gym::mapBufferC4V4(N);
+    size_t i = 0;
+    for ( ; i < N; ++i )
+        flu[i] = { col, P[i] };
+    flu[0] = { gle_color(0, 1, 0), P[0] };
+    gym::unmapBufferC4V4();
+    glPointSize(size);
+    glDrawArrays(GL_POINTS, 0, i);
+}
+
+void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
+{
+    gle_color col(1, 0, 1);
+    flute8 * flu = gym::mapBufferC4V4(N);
+    size_t i = 0;
+    for ( ; i < N; ++i )
+        flu[i] = { col, P[i].XX, P[i].YY, 0.f };
+    flu[0] = { gle_color(0, 1, 0), P[0].XX, P[0].YY, 0.f };
+    gym::unmapBufferC4V4();
+    glLineWidth(size);
+    glDrawArrays(GL_LINE_LOOP, 0, i);
+}
 
 void newPoints()
 {
     for ( size_t i = 0; i < MAX ; ++i )
-        pts[i] = (size-1) * Vector::randS();
+        pts[i] = (SIZE-1) * Vector::randS();
 }
 
 
 void clearHits()
 {
-    for ( int i = 0; i <= 2*size; ++i )
-    for ( int j = 0; j <= 2*size; ++j )
-#if ( DIM >= 3 )
-    for ( int k = 0; k <= 2*size; ++k )
-        hit[i][j][k] = 0;
+    for ( int i = 0; i <= 2*SIZE; ++i )
+    for ( int j = 0; j <= 2*SIZE; ++j )
+#if FLAT_RASTERIZER
+        hit[i][j] = 0;
 #else
-    hit[i][j] = 0;
+    for ( int k = 0; k <= 2*SIZE; ++k )
+        hit[i][j][k] = 0;
 #endif
 }
 
 
-void paintHit(int x_inf, int x_sup, int y, int z, void*)
+void punch(int x_inf, int x_sup, int y, int z, void*)
 {
     if ( x_sup < x_inf )
         printf("inverted order x = %i %i at y = %i\n", x_inf, x_sup, y);
     
-    if ( std::abs(y) > size ) return;
-    if ( std::abs(z) > size ) return;
+    if ( std::abs(y) > SIZE ) return;
+    if ( std::abs(z) > SIZE ) return;
     
     for ( int x = x_inf; x <= x_sup; ++x )
     {
-        if ( -size <= x && x <= size )
+        if ( -SIZE <= x && x <= SIZE )
         {
-#if ( DIM >= 3 )
-            ++hit[x+size][y+size][z+size];
+#if FLAT_RASTERIZER
+            ++hit[x+SIZE][y+SIZE];
 #else
-            ++hit[x+size][y+size];
+            ++hit[x+SIZE][y+SIZE][z+SIZE];
 #endif
         }
     }
 }
 
-void paintDraw(int x_inf, int x_sup, int y, int z, void*)
+void paint(int x_inf, int x_sup, int y, int z, void*)
 {
-    glColor4f(0, 1, 0, 0.5);
-
-    glPointSize(3);
-    glBegin(GL_POINTS);
-    glVertex3i( x_inf, y, z );
-    //glVertex3i( x_sup, y, z );
-    glEnd();
-    
+    gle_color col(0, 1, 0, 0.5);
+    flute8 * flu = gym::mapBufferC4V4(2);
+    flu[0] = { col, (float)x_inf, (float)y, (float)z };
+    flu[1] = { col, (float)x_sup, (float)y, (float)z };
+    gym::unmapBufferC4V4();
     glLineWidth(1);
-    glBegin(GL_LINES);
-    glVertex3i( x_inf, y, z );
-    glVertex3i( x_sup, y, z );
-    glEnd();
+    glDrawArrays(GL_LINES, 0, 2);
+    glPointSize(3);
+    glDrawArrays(GL_POINTS, 0, 1);
 }
 
-void rasterize(Vector P, Vector Q, void (paint)(int, int, int, int, void*))
+void rasterize(Vector P, Vector Q, void (func)(int, int, int, int, void*))
 {
     real iPQ = 1 / ( P - Q ).norm();
-#if ( DIM == 2 )
-    Rasterizer::paintRectangle(paint, nullptr, P, Q, iPQ, radius, shift, delta);
-    //Rasterizer::paintRectangle(paint, nullptr, P, Q, iPQ, radius);
-    //Rasterizer::paintBox2D(paint, nullptr, P, Q, radius, shift, delta);
-#elif ( DIM >= 3 )
-    //Rasterizer::paintHexagonalPrism(paint, nullptr, P, Q, iPQ, radius, shift, delta);
-    Rasterizer::paintCuboid(paint, nullptr, P, Q, iPQ, radius, shift, delta);
-    //Rasterizer::paintBox3D(paint, nullptr, P, Q, radius, shift, delta);
+#if FLAT_RASTERIZER
+    Rasterizer::paintRectangle(func, nullptr, P, Q, iPQ, radius, shift, delta);
+    //Rasterizer::paintRectangle(func, nullptr, P, Q, iPQ, radius);
+    //Rasterizer::paintBox2D(func, nullptr, P, Q, radius, shift, delta);
+#else
+    //Rasterizer::paintHexagonalPrism(func, nullptr, P, Q, iPQ, radius, shift, delta);
+    Rasterizer::paintCuboid(func, nullptr, P, Q, iPQ, radius, shift, delta);
+    //Rasterizer::paintBox3D(func, nullptr, P, Q, radius, shift, delta);
 #endif
 }
 
-//-------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 /// check if 'x' is within distance 'radius' from segment [pq]
-bool inCylinder(Vector const& p, Vector const& q, Vector const& x)
+bool inCylinder(Vector const& P, Vector const& Q, Vector const& X)
 {
-    const Vector pq = q - p;
-    const real pqn = pq.norm();
-    real abs = dot(pq, x-p) / pqn;
+    const Vector PQ = Q - P;
+    const real PQn = PQ.norm();
+    real abs = dot(PQ, X-P) / PQn;
     if ( abs <   0-radius ) return false;
-    if ( abs > pqn+radius ) return false;
-    abs /= pqn;
+    if ( abs > PQn+radius ) return false;
+    abs /= PQn;
     if ( abs < 0 ) abs = 0;
     if ( abs > 1 ) abs = 1;
-    return ( x-p-pq*abs ).normSqr() <= radius * radius;
+    return ( X-P-PQ*abs ).normSqr() <= radius * radius;
 }
 
 
-bool checkPoint(Vector const& p, Vector const& q, int i, int j, int k)
+bool checkPoint(Vector const& P, Vector const& Q, int i, int j, int k)
 {
-    int in = inCylinder(p,q,Vector(i,j,k));
+    Vector V(i,j,k);
+    int in = inCylinder(P,Q,V);
     
-#if ( DIM >= 3 )
-    int ht = hit[i+size][j+size][k+size];
+#if FLAT_RASTERIZER
+    int ht = hit[i+SIZE][j+SIZE];
 #else
-    int ht = hit[i+size][j+size];
+    int ht = hit[i+SIZE][j+SIZE][k+SIZE];
 #endif
     
     if ( ht != in )
-    {
-        glPointSize(5);
-        glBegin(GL_POINTS);
-        if ( ht == 1 )
-            glColor4f(0, 0, 1, 0.5);
-        else
-            glColor3f(1, 0, 0);
-#if ( DIM >= 3 )
-        glVertex3i(i, j, k);
-#else
-        glVertex2i(i, j);
-#endif
-        glEnd();
-    }
+        drawPoints(1, &V, 5);
     
     return ( ht != in );
 }
@@ -155,14 +178,14 @@ bool testFatLine(Vector P, Vector Q)
 {
     bool res = false;
     clearHits();
-    rasterize(P, Q, paintHit);
-    for ( int i = -size; i <= size; ++i )
-    for ( int j = -size; j <= size; ++j )
-#if ( DIM >= 3 )
-    for ( int k = -size; k <= size; ++k )
-        res |= checkPoint(P, Q, i, j, k);
+    rasterize(P, Q, punch);
+    for ( int i = -SIZE; i <= SIZE; ++i )
+    for ( int j = -SIZE; j <= SIZE; ++j )
+#if FLAT_RASTERIZER
+        res |= checkPoint(P, Q, i, j, 0);
 #else
-    res |= checkPoint(P, Q, i, j, 0);
+    for ( int k = -SIZE; k <= SIZE; ++k )
+        res |= checkPoint(P, Q, i, j, k);
 #endif
     return res;
 }
@@ -172,14 +195,14 @@ void manyTest()
 {
     size_t ouf = 0;
     do {
-        pts[0] = (size-1) * Vector::randS();
-        pts[1] = (size-1) * Vector::randS();
+        pts[0] = (SIZE-1) * Vector::randS();
+        pts[1] = (SIZE-1) * Vector::randS();
         if ( testFatLine(pts[0], pts[1]) )
             break;
     } while ( ++ouf < 1<<10 );
 }
 
-//===================================================================
+//------------------------------------------------------------------------------
 
 
 void processNormalKey(unsigned char c, int x=0, int y=0)
@@ -196,8 +219,15 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             break;
         case 'p': n_pts = std::min(n_pts+1, MAX); break;
         case 'o': n_pts = std::max(n_pts-1, (size_t)1); break;
+        case '2': n_pts = 2; break;
+        case '3': n_pts = 3; break;
+        case '4': n_pts = 4; break;
+        case '5': n_pts = 5; break;
         case 'r':
             manyTest();
+            break;
+        case 'd':
+            rasterizer_draws = !rasterizer_draws;
             break;
         case 'h':
             printf("keyboard commands:\n"
@@ -211,96 +241,74 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
     glApp::postRedisplay();
 }
 
-//===================================================================
+//------------------------------------------------------------------------------
+
+void drawGridPoints()
+{
+    size_t S = 2 * SIZE + 1;
+    gle_color col(.5f, .5f, .5f);
+    flute8 * flu = gym::mapBufferC4V4(S*S);
+    size_t n = 0;
+    for ( int i = -SIZE; i <= SIZE; i += 1)
+    for ( int j = -SIZE; j <= SIZE; j += 1)
+        flu[n++] = { col, (float)i, (float)j, 0.f };
+    gym::unmapBufferC4V4();
+    glPointSize(1);
+    glDrawArrays(GL_POINTS, 0, n);
+}
+
+void drawGrid()
+{
+    float S = (float)SIZE;
+    gle_color col(.5f, .5f, .5f);
+    flute8 * flu = gym::mapBufferC4V4(2*SIZE+1);
+    size_t n = 0;
+    for ( int i = -SIZE; i <= SIZE; i += 5 )
+    {
+        float I = (float)i;
+        flu[n++] = { col, I, -S, 0.f };
+        flu[n++] = { col, I,  S, 0.f };
+        flu[n++] = { col, -S, I, 0.f };
+        flu[n++] = { col,  S, I, 0.f };
+    }
+    gym::unmapBufferC4V4();
+    glLineWidth(0.5);
+    glDrawArrays(GL_LINES, 0, n);
+}
 
 
 void display(View& view, int)
 {
     view.openDisplay();
 
-    //--------------draw points on the grid:
-#if ( DIM == 2 )
-    glPointSize(1);
-    glColor3f(.5f, .5f, .5f);
-    glBegin(GL_POINTS);
-    for ( int i = -size; i <= size; i += 1)
-    for ( int j = -size; j <= size; j += 1)
-        glVertex2i(i, j);
-    glEnd();
+#if FLAT_RASTERIZER
+    drawGrid();
+    drawGridPoints();
 #endif
-
-    //--------------draw a grid in gray:
-#if ( DIM == 2 )
-    glLineWidth(0.5);
-    glColor3f(.5f, .5f, .5f);
-    glBegin(GL_LINES);
-    for ( int i = -size; i <= size; i += 5)
-    {
-        glVertex2i(i, -size);
-        glVertex2i(i, +size);
-        glVertex2i(-size, i);
-        glVertex2i(+size, i);
-    }
-    glEnd();
-#endif
+    drawPoints(n_pts, pts, 16);
     
-    /// draw large points:
-    glPointSize(16);
-    glBegin(GL_POINTS);
-    glColor3f(1, 0, 1);
-    for ( size_t i = 0; i < n_pts ; ++i )
-    {
-#if ( DIM >= 3 )
-        glVertex3d(pts[i].XX, pts[i].YY, pts[i].ZZ);
-#elif ( DIM == 2 )
-        glVertex2d(pts[i].XX, pts[i].YY);
-#endif
-        glColor3f(0, 0, 1);
-    }
-    glEnd();
-
-#if ( DIM == 2 )
+#if FLAT_RASTERIZER
     if ( n_pts > 2 )
     {
-        glLineWidth(1);
-        Rasterizer::Vertex2 ver[MAX];
+        Rasterizer::Vertex2 vex[MAX];
         for ( size_t i = 0; i < n_pts; ++i )
-            ver[i] = pts[i];
-        size_t nb = Rasterizer::convexHull2D(n_pts, ver);
-        Rasterizer::paintPolygon2D(paintDraw, nullptr, nb, ver, 0);
+            vex[i] = pts[i];
         
-        // draw convex-hull
-        glLineWidth(2);
-        glColor3f(1, 1, 0);
-        glBegin(GL_LINE_LOOP);
-        glVertex2d(pts[0].XX, pts[0].YY);
-        glColor3f(0, 0, 1);
-        for ( size_t i = 1; i < nb ; ++i )
-           glVertex2d(pts[i].XX, pts[i].YY);
-        glVertex2d(pts[0].XX, pts[0].YY);
-        glEnd();
-        
-        /// draw first points:
-        glPointSize(16);
-        glBegin(GL_POINTS);
-        glColor3f(1, 0, 1);
-#if ( DIM == 2 )
-        glVertex2d(pts[0].XX, pts[0].YY);
-#else
-        glVertex3d(pts[0].XX, pts[0].YY, pts[0].ZZ);
-#endif
-        glEnd();
+        // compute and draw convex-hull
+        size_t nb = Rasterizer::convexHull2D(n_pts, vex);
+        drawLines(nb, vex, 2);
 
-        return;
+        Rasterizer::paintPolygon2D(paint, nullptr, nb, vex, 0);
     }
+    else
 #endif
-    
-
-    Vector P = pts[0];
-    Vector Q = pts[1];
-    testFatLine(P,Q);
-    rasterize(P,Q,paintDraw);
-    view.closeDisplay();
+    {
+        Vector P = pts[0];
+        Vector Q = pts[1];
+        testFatLine(P,Q);
+        rasterize(P,Q,paint);
+        view.closeDisplay();
+    }
 }
 
 /* 
@@ -316,16 +324,16 @@ void speedTest(size_t cnt)
         real iPQ = 1 / ( P - Q ).norm();
         for ( size_t c = 0; c < cnt; ++c )
         {
-#if ( DIM == 2 )
-            Rasterizer::paintRectangle(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
-#elif ( DIM >= 3 )
-            Rasterizer::paintCuboid(paintHit, nullptr, P, Q, iPQ, radius, shift, delta);
+#if FLAT_RASTERIZER
+            Rasterizer::paintRectangle(punch, nullptr, P, Q, iPQ, radius, shift, delta);
+#else
+            Rasterizer::paintCuboid(punch, nullptr, P, Q, iPQ, radius, shift, delta);
 #endif
         }
     }
 }
 
-//===================================================================
+//------------------------------------------------------------------------------
 
 int main(int argc, char* argv[])
 {
@@ -343,7 +351,7 @@ int main(int argc, char* argv[])
         glApp::setDimensionality(3);
         glApp::attachMenu(GLUT_RIGHT_BUTTON);
         glApp::normalKeyFunc(processNormalKey);
-        glApp::setScale(2*(size+radius+1));
+        glApp::setScale(2*(SIZE+radius+1));
         glApp::newWindow(display);
         gle::initialize();
 

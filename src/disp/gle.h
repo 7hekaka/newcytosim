@@ -6,7 +6,9 @@
 #include "real.h"
 #include "opengl.h"
 #include "gle_color.h"
-#include "vector.h"
+#include "vector1.h"
+#include "vector2.h"
+#include "vector3.h"
 #include "flute.h"
 
 /// Simple geometrical objects drawn with OpenGL

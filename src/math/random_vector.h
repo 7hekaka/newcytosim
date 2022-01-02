@@ -3,7 +3,8 @@
 #define RANDOM_VECTOR_H
 
 #include <vector>
-#include "vector.h"
+#include "vector2.h"
+#include "vector3.h"
 
 /**
  Functions to generate single random vectors are members of Vector1, Vector2, etc.

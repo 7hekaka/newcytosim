@@ -206,8 +206,6 @@
 		BB56FA7712D0A0BF008B2260 /* player_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB56FA7512D0A0BF008B2260 /* player_prop.h */; };
 		BB56FA7812D0A0BF008B2260 /* player_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB56FA7612D0A0BF008B2260 /* player_prop.cc */; };
 		BB5A0CB021C38BF7000DBC0E /* interpolation4.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD89B2F214FEABB00DB4ECA /* interpolation4.cc */; };
-		BB5C56E0243DC42000814EDD /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
-		BB5C56E1243DC44500814EDD /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BB5CDDCA06AC4C4B008296B1 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB5CF1F916DD2D5A00EF0FE3 /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; };
 		BB5CF1FB16DD2D5A00EF0FE3 /* space_force.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */; };
@@ -560,7 +558,6 @@
 		BB805D4A2419639500B62699 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB805D4B241963B000B62699 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB805D4C241963CB00B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
-		BB805D4D241963E400B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BB805D4E241967B100B62699 /* rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589E05B98DA3006956D5 /* rasterizer.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB805D62241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */; };
 		BB805D63241A3F1500B62699 /* space_dynamic_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */; };
@@ -807,6 +804,22 @@
 		BBD096E724D0767400084292 /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBD1B1EE18FFD5DA00E5D80A /* project_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */; };
 		BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */; };
+		BBD49F292781C4DA00F31EB2 /* rasterizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589F05B98DA3006956D5 /* rasterizer.h */; };
+		BBD49F2A2781C57300F31EB2 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BBD49F2B2781C59A00F31EB2 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589D05B98DA3006956D5 /* random.h */; };
+		BBD49F2D2781C59D00F31EB2 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
+		BBD49F2E2781C5C500F31EB2 /* glossary.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1F9C2C0FD5A9790047327F /* glossary.cc */; };
+		BBD49F2F2781C5CE00F31EB2 /* glossary.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1F9C2B0FD5A9790047327F /* glossary.h */; };
+		BBD49F302781C5E400F31EB2 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
+		BBD49F312781C5FF00F31EB2 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
+		BBD49F322781C60200F31EB2 /* vector2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED50BE3DED10054838A /* vector2.cc */; };
+		BBD49F332781C60500F31EB2 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
+		BBD49F342781C61C00F31EB2 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
+		BBD49F352781C62300F31EB2 /* tokenizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50D6120FFAE51900278580 /* tokenizer.cc */; };
+		BBD49F362781C63600F31EB2 /* filepath.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB65DBE911AD53AC005DD116 /* filepath.cc */; };
+		BBD49F372781C63B00F31EB2 /* property.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB50D0D70FFA30CD00278580 /* property.cc */; };
+		BBD49F382781C65200F31EB2 /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
+		BBD49F392781C81A00F31EB2 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
 		BBD59C972498C738002A2E7B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBD5DA7A0FF7956C0010D08D /* organizer_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5DA760FF7956C0010D08D /* organizer_set.cc */; };
 		BBD5DA7B0FF7956C0010D08D /* organizer_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5DA770FF7956C0010D08D /* organizer_set.h */; };
@@ -996,13 +1009,6 @@
 			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
 			remoteInfo = cytomath;
 		};
-		BB3416DD0C328F6E0016CF18 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BB51BC5B05FA559800D4869F;
-			remoteInfo = libcytobase;
-		};
 		BB3417590C3294350016CF18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
@@ -1046,13 +1052,6 @@
 			remoteInfo = glapp;
 		};
 		BB5C02E6100A1AE50073DC21 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
-			remoteInfo = cytomath;
-		};
-		BB5C56E2243DC45200814EDD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
 			proxyType = 1;
@@ -2014,9 +2013,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB5C56E0243DC42000814EDD /* libcytobase.a in Frameworks */,
-				BB5C56E1243DC44500814EDD /* libcytomath.a in Frameworks */,
-				BB805D4D241963E400B62699 /* libcytodisp.a in Frameworks */,
+				BBD49F2A2781C57300F31EB2 /* libcytodisp.a in Frameworks */,
 				BB97B7D720DE3B7E004D659C /* GLUT.framework in Frameworks */,
 				BB55C0A90A260F19003333C9 /* OpenGL.framework in Frameworks */,
 			);
@@ -3776,7 +3773,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBD49F2F2781C5CE00F31EB2 /* glossary.h in Headers */,
 				BB692132233D349E00F528D2 /* random_vector.h in Headers */,
+				BBD49F292781C4DA00F31EB2 /* rasterizer.h in Headers */,
+				BBD49F2B2781C59A00F31EB2 /* random.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4158,8 +4158,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				BB5C56E3243DC45200814EDD /* PBXTargetDependency */,
-				BB3416DE0C328F6E0016CF18 /* PBXTargetDependency */,
 				BBF7B9FE10CD350F0089F5B1 /* PBXTargetDependency */,
 			);
 			name = test_rasterizer;
@@ -4894,10 +4892,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBD49F372781C63B00F31EB2 /* property.cc in Sources */,
 				BB31698924A0F3F5008DFDB3 /* operator_new.cc in Sources */,
+				BBD49F302781C5E400F31EB2 /* print_color.cc in Sources */,
+				BBD49F392781C81A00F31EB2 /* exceptions.cc in Sources */,
 				BB692134233D34C300F528D2 /* SFMT.c in Sources */,
+				BBD49F332781C60500F31EB2 /* random_vector.cc in Sources */,
 				BB805D4E241967B100B62699 /* rasterizer.cc in Sources */,
+				BBD49F312781C5FF00F31EB2 /* vector3.cc in Sources */,
+				BBD49F342781C61C00F31EB2 /* time_date.cc in Sources */,
+				BBD49F2E2781C5C500F31EB2 /* glossary.cc in Sources */,
+				BBD49F2D2781C59D00F31EB2 /* random.cc in Sources */,
+				BBD49F382781C65200F31EB2 /* stream_func.cc in Sources */,
+				BBD49F362781C63600F31EB2 /* filepath.cc in Sources */,
 				BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */,
+				BBD49F322781C60200F31EB2 /* vector2.cc in Sources */,
+				BBD49F352781C62300F31EB2 /* tokenizer.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5125,11 +5135,6 @@
 			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
 			targetProxy = BB1707180F30F76C00E5DE24 /* PBXContainerItemProxy */;
 		};
-		BB3416DE0C328F6E0016CF18 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BB51BC5B05FA559800D4869F /* cytobase */;
-			targetProxy = BB3416DD0C328F6E0016CF18 /* PBXContainerItemProxy */;
-		};
 		BB34175A0C3294350016CF18 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BB51BC5B05FA559800D4869F /* cytobase */;
@@ -5164,11 +5169,6 @@
 			isa = PBXTargetDependency;
 			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
 			targetProxy = BB5C02E6100A1AE50073DC21 /* PBXContainerItemProxy */;
-		};
-		BB5C56E3243DC45200814EDD /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
-			targetProxy = BB5C56E2243DC45200814EDD /* PBXContainerItemProxy */;
 		};
 		BB5F2B7A245F13FB007DDD06 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

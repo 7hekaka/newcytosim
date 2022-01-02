@@ -458,7 +458,7 @@ void PointDisp::read(Glossary& glos)
     
     // set 'color2' as a darker tone of 'color':
     if ( glos.set(color, "color") )
-        color2 = color.alpha_scaled(DIM==2?0.25f:0.5f);
+        color2 = color.alpha_scaled(0.5f);
     glos.set(color2, "color", 1, "back_color", 0);
     glos.set(coloring, "coloring");
     
@@ -490,7 +490,7 @@ void PointDisp::read(Glossary& glos)
 void PointDisp::write_values(std::ostream& os) const
 {
     write_value(os, "visible", visible);
-    if ( color2 != color.alpha_scaled(DIM==2?0.25f:0.5f) )
+    if ( color2 != color.alpha_scaled(0.5f) )
         write_value(os, "color", color, color2);
     else
         write_value(os, "color", color);

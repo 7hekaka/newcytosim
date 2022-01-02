@@ -352,10 +352,11 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
     if ( rasterizer_draws )
     {
         gle_color col(0, 1, 1);
+        const size_t n_max = n_pts*(n_pts-1);
+        flute8* flu = gym::mapBufferC4V4(n_max);
+        size_t i = 0;
         for ( size_t n = 0; n < n_pts; ++n )
         {
-            flute8* flu = gym::mapBufferC4V4(n_pts);
-            size_t i = 0;
             for ( size_t u = n+1; u < n_pts; ++u )
             {
                 if ( pts[n].UU  &  pts[u].UU )
@@ -364,10 +365,11 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
                     flu[i++] = { col, pts[u].XX, pts[u].YY, pts[u].ZZ };
                 }
             }
-            gym::unmapBufferC4V4();
-            glLineWidth(0.5);
-            glDrawArrays(GL_LINES, 0, 2*i);
         }
+        assert_true(i < n_max);
+        gym::unmapBufferC4V4();
+        glLineWidth(0.5);
+        glDrawArrays(GL_LINES, 0, i);
     }
 #endif
     

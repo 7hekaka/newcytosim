@@ -1,6 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "random_vector.h"
+#include "vector1.h"
+#include "vector4.h"
 #include "random.h"
 
 /**
