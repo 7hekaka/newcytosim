@@ -602,15 +602,10 @@ namespace gle
         glVertexPointer(3, GL_FLOAT, 0, pts);
         glNormalPointer(GL_FLOAT, 0, nor);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        if ( 0 ) {
-            printf("%2.0f, %2.0f, %2.0f,  ", a[0], a[1], a[2]);
-            printf("%2.0f, %2.0f, %2.0f,  ", b[0], b[1], b[2]);
-            printf("%2.0f, %2.0f, %2.0f,\n", c[0], c[1], c[2]);
-        }
-        if ( 0 ) {
-            printf("%+9.7f,%+9.7f,%+9.7f, ", nx, ny, nz);
-            printf("%+9.7f,%+9.7f,%+9.7f, ", nx, ny, nz);
-            printf("%+9.7f,%+9.7f,%+9.7f,\n", nx, ny, nz);
+        if ( 1 ) {
+            printf("%2.0f, %2.0f, %2.0f, %+9.7f, %+9.7f, %+9.7f\n", a[0], a[1], a[2], nx, ny, nz);
+            printf("%2.0f, %2.0f, %2.0f, %+9.7f, %+9.7f, %+9.7f\n", b[0], b[1], b[2], nx, ny, nz);
+            printf("%2.0f, %2.0f, %2.0f, %+9.7f, %+9.7f, %+9.7f\n", c[0], c[1], c[2], nx, ny, nz);
         }
     }
     
@@ -622,23 +617,23 @@ namespace gle
     void icosahedron()
     {
         const float G = 0.5+0.5*std::sqrt(5.0);
-        const float O = 1/std::sqrt(G*G+1); //0.5257311121f;
-        const float T = G * O;   //0.8506508084f;
+        const float H = 1/std::sqrt(G*G+1); //0.5257311121f;
+        const float T = G * H;   //0.8506508084f;
         
         // Twelve vertices of icosahedron on unit sphere
         float pts[3*12] = {
-            +T,  O,  0, // 0
-            -T, -O,  0, // 1
-            -T,  O,  0, // 2
-            +T, -O,  0, // 3
-            +O,  0,  T, // 4
-            -O,  0, -T, // 5
-            +O,  0, -T, // 6
-            -O,  0,  T, // 7
-            +0,  T,  O, // 8
-            +0, -T, -O, // 9
-            +0, -T,  O, // 10
-            +0,  T, -O  // 11
+            +T,  H,  0, // 0
+            -T, -H,  0, // 1
+            -T,  H,  0, // 2
+            +T, -H,  0, // 3
+            +H,  0,  T, // 4
+            -H,  0, -T, // 5
+            +H,  0, -T, // 6
+            -H,  0,  T, // 7
+            +0,  T,  H, // 8
+            +0, -T, -H, // 9
+            +0, -T,  H, // 10
+            +0,  T, -H  // 11
         };
         
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -677,72 +672,91 @@ namespace gle
     size_t setIcosahedron(flute6* flt, float R=1.0f)
     {
         const float T = R * 0.8506508084f;      // (1 + sqrt(5))/2
-        const float O = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
+        const float H = R * 0.5257311121f;      // 1 / sqrt(1+T^2)
         const float N = 1 / M_SQRT3; // 0.5773503
         const float X = 0.3568221;
         const float Y = 0.9341724;
 
         size_t i = 0;
-        flt[i++] = {-O,  0, -T, +0,-X,-Y};
-        flt[i++] = { O,  0, -T, +0,-X,-Y};
-        flt[i++] = { 0, -T, -O, +0,-X,-Y};
-        flt[i++] = {-O,  0, -T, +0,+X,-Y};
-        flt[i++] = { 0,  T, -O, +0,+X,-Y};
-        flt[i++] = { O,  0, -T, +0,+X,-Y};
-        flt[i++] = { O,  0, -T, +N,-N,-N};
-        flt[i++] = { T, -O,  0, +N,-N,-N};
-        flt[i++] = { 0, -T, -O, +N,-N,-N};
-        flt[i++] = {-T,  O,  0, -N,+N,-N};
-        flt[i++] = { 0,  T, -O, -N,+N,-N};
-        flt[i++] = {-O,  0, -T, -N,+N,-N};
-        flt[i++] = {-T, -O,  0, -N,-N,-N};
-        flt[i++] = { O,  0, -T, -N,-N,-N};
-        flt[i++] = { 0, -T, -O, -N,-N,-N};
-        flt[i++] = { T,  O,  0, +N,+N,-N};
-        flt[i++] = { O,  0, -T, +N,+N,-N};
-        flt[i++] = { 0,  T, -O, +N,+N,-N};
-        flt[i++] = { T,  O,  0, +Y,+0,-X};
-        flt[i++] = { T, -O,  0, +Y,+0,-X};
-        flt[i++] = { O,  0, -T, +Y,+0,-X};
-        flt[i++] = {-T, -O,  0, -Y,+0,-X};
-        flt[i++] = { T,  O,  0, -Y,+0,-X};
-        flt[i++] = {-O,  0, -T, -Y,+0,-X};
-        flt[i++] = {-T, -O,  0, -X,-Y,+0};
-        flt[i++] = { 0, -T, -O, -X,-Y,+0};
-        flt[i++] = { 0, -T,  O, -X,-Y,+0};
-        flt[i++] = { T,  O,  0, +X,+Y,+0};
-        flt[i++] = { 0,  T, -O, +X,+Y,+0};
-        flt[i++] = { 0,  T,  O, +X,+Y,+0};
-        flt[i++] = { 0,  T,  O, -X,+Y,+0};
-        flt[i++] = { 0,  T, -O, -X,+Y,+0};
-        flt[i++] = {-T,  O,  0, -X,+Y,+0};
-        flt[i++] = { 0, -T, -O, +X,-Y,+0};
-        flt[i++] = { T, -O,  0, +X,-Y,+0};
-        flt[i++] = { 0, -T,  O, +X,-Y,+0};
-        flt[i++] = { T,  O,  0, +Y,+0,+X};
-        flt[i++] = { O,  0,  T, +Y,+0,+X};
-        flt[i++] = { T, -O,  0, +Y,+0,+X};
-        flt[i++] = {-T, -O,  0, -Y,+0,+X};
-        flt[i++] = { O,  0,  T, -Y,+0,+X};
-        flt[i++] = {-T,  O,  0, -Y,+0,+X};
-        flt[i++] = { T,  O,  0, +N,+N,+N};
-        flt[i++] = { 0,  T,  O, +N,+N,+N};
-        flt[i++] = { O,  0,  T, +N,+N,+N};
-        flt[i++] = {-T, -O,  0, -N,-N,+N};
-        flt[i++] = { 0, -T,  O, -N,-N,+N};
-        flt[i++] = {-O,  0,  T, -N,-N,+N};
-        flt[i++] = { T, -O,  0, +N,-N,+N};
-        flt[i++] = { O,  0,  T, +N,-N,+N};
-        flt[i++] = { 0, -T,  O, +N,-N,+N};
-        flt[i++] = {-O,  0,  T, -N,+N,+N};
-        flt[i++] = { 0,  T,  O, -N,+N,+N};
-        flt[i++] = {-T,  O,  0, -N,+N,+N};
-        flt[i++] = { O,  0,  T, +0,+X,+Y};
-        flt[i++] = { 0,  T,  O, +0,+X,+Y};
-        flt[i++] = {-O,  0,  T, +0,+X,+Y};
-        flt[i++] = { O,  0,  T, +0,-X,+Y};
-        flt[i++] = { O,  0,  T, +0,-X,+Y};
-        flt[i++] = { 0, -T,  O, +0,-X,+Y};
+        flt[i++] = {-H,  0, -T, +0,-X,-Y};
+        flt[i++] = { H,  0, -T, +0,-X,-Y};
+        flt[i++] = { 0, -T, -H, +0,-X,-Y};
+        
+        flt[i++] = {-H,  0, -T, +0,+X,-Y};
+        flt[i++] = { 0,  T, -H, +0,+X,-Y};
+        flt[i++] = { H,  0, -T, +0,+X,-Y};
+        
+        flt[i++] = { H,  0, -T, +N,-N,-N};
+        flt[i++] = { T, -H,  0, +N,-N,-N};
+        flt[i++] = { 0, -T, -H, +N,-N,-N};
+        
+        flt[i++] = {-T,  H,  0, -N,+N,-N};
+        flt[i++] = { 0,  T, -H, -N,+N,-N};
+        flt[i++] = {-H,  0, -T, -N,+N,-N};
+        
+        flt[i++] = {-T, -H,  0, -N,-N,-N};
+        flt[i++] = {-H,  0, -T, -N,-N,-N};
+        flt[i++] = { 0, -T, -H, -N,-N,-N};
+        
+        flt[i++] = { T,  H,  0, +N,+N,-N};
+        flt[i++] = { H,  0, -T, +N,+N,-N};
+        flt[i++] = { 0,  T, -H, +N,+N,-N};
+        
+        flt[i++] = { T,  H,  0, +Y,+0,-X};
+        flt[i++] = { T, -H,  0, +Y,+0,-X};
+        flt[i++] = { H,  0, -T, +Y,+0,-X};
+        
+        flt[i++] = {-T, -H,  0, -Y,+0,-X};
+        flt[i++] = {-T,  H,  0, -Y,+0,-X};
+        flt[i++] = {-H,  0, -T, -Y,+0,-X};
+        
+        flt[i++] = {-T, -H,  0, -X,-Y,+0};
+        flt[i++] = { 0, -T, -H, -X,-Y,+0};
+        flt[i++] = { 0, -T,  H, -X,-Y,+0};
+        
+        flt[i++] = { T,  H,  0, +X,+Y,+0};
+        flt[i++] = { 0,  T, -H, +X,+Y,+0};
+        flt[i++] = { 0,  T,  H, +X,+Y,+0};
+        
+        flt[i++] = { 0,  T,  H, -X,+Y,+0};
+        flt[i++] = { 0,  T, -H, -X,+Y,+0};
+        flt[i++] = {-T,  H,  0, -X,+Y,+0};
+        
+        flt[i++] = { 0, -T, -H, +X,-Y,+0};
+        flt[i++] = { T, -H,  0, +X,-Y,+0};
+        flt[i++] = { 0, -T,  H, +X,-Y,+0};
+        
+        flt[i++] = { T,  H,  0, +Y,+0,+X};
+        flt[i++] = { H,  0,  T, +Y,+0,+X};
+        flt[i++] = { T, -H,  0, +Y,+0,+X};
+        
+        flt[i++] = {-T, -H,  0, -Y,+0,+X};
+        flt[i++] = {-H,  0,  T, -Y,+0,+X};
+        flt[i++] = {-T,  H,  0, -Y,+0,+X};
+        
+        flt[i++] = { T,  H,  0, +N,+N,+N};
+        flt[i++] = { 0,  T,  H, +N,+N,+N};
+        flt[i++] = { H,  0,  T, +N,+N,+N};
+        
+        flt[i++] = {-T, -H,  0, -N,-N,+N};
+        flt[i++] = { 0, -T,  H, -N,-N,+N};
+        flt[i++] = {-H,  0,  T, -N,-N,+N};
+        
+        flt[i++] = { T, -H,  0, +N,-N,+N};
+        flt[i++] = { H,  0,  T, +N,-N,+N};
+        flt[i++] = { 0, -T,  H, +N,-N,+N};
+        
+        flt[i++] = {-H,  0,  T, -N,+N,+N};
+        flt[i++] = { 0,  T,  H, -N,+N,+N};
+        flt[i++] = {-T,  H,  0, -N,+N,+N};
+        
+        flt[i++] = { H,  0,  T, +0,+X,+Y};
+        flt[i++] = { 0,  T,  H, +0,+X,+Y};
+        flt[i++] = {-H,  0,  T, +0,+X,+Y};
+        
+        flt[i++] = { H,  0,  T, +0,-X,+Y};
+        flt[i++] = {-H,  0,  T, +0,-X,+Y};
+        flt[i++] = { 0, -T,  H, +0,-X,+Y};
         assert_true( i == 60 );
         return i;
     }
@@ -758,51 +772,65 @@ namespace gle
         const float cR = R * C;
         const float sR = R * S;
         size_t i = 0;
-        flt[i++] = { cR,-sR, B,  0, -1, 0};
-        flt[i++] = {  1,  0, H,  0, -1, 0};
-        flt[i++] = {  1,  0, U,  0, -1, 0};
-        flt[i++] = { cR,-sR, B,  0, -1, 0};
-        flt[i++] = {  1,  0, U,  0, -1, 0};
-        flt[i++] = {  0,  0, T,  0, -1, 0};
-        flt[i++] = { cR, sR, B,  0, +1, 0};
-        flt[i++] = {  0,  0, T,  0, +1, 0};
-        flt[i++] = {  1,  0, U,  0, +1, 0};
-        flt[i++] = { cR, sR, B,  0, +1, 0};
-        flt[i++] = {  1,  0, U,  0, +1, 0};
-        flt[i++] = {  1,  0, H,  0, +1, 0};
-        flt[i++] = { cR,-sR, B,  S, -C, 0};
-        flt[i++] = {  0,  0, T,  S, -C, 0};
-        flt[i++] = { -C, -S, U,  S, -C, 0};
-        flt[i++] = { cR,-sR, B,  S, -C, 0};
-        flt[i++] = { -C, -S, U,  S, -C, 0};
-        flt[i++] = { -C, -S, H,  S, -C, 0};
-        flt[i++] = { -R,  0, B, -S,  C, 0};
-        flt[i++] = { -C, -S, H, -S,  C, 0};
-        flt[i++] = { -C, -S, U, -S,  C, 0};
-        flt[i++] = { -R,  0, B, -S,  C, 0};
-        flt[i++] = { -C, -S, U, -S,  C, 0};
-        flt[i++] = {  0,  0, T, -S,  C, 0};
-        flt[i++] = { cR, sR, B,  S,  C, 0};
-        flt[i++] = { -C,  S, H,  S,  C, 0};
-        flt[i++] = { -C,  S, U,  S,  C, 0};
-        flt[i++] = { cR, sR, B,  S,  C, 0};
-        flt[i++] = { -C,  S, U,  S,  C, 0};
-        flt[i++] = {  0,  0, T,  S,  C, 0};
-        flt[i++] = { -R,  0, B, -S, -C, 0};
-        flt[i++] = {  0,  0, T, -S, -C, 0};
-        flt[i++] = { -C,  S, U, -S, -C, 0};
-        flt[i++] = { -R,  0, B, -S, -C, 0};
-        flt[i++] = { -C,  S, U, -S, -C, 0};
-        flt[i++] = { -C,  S, H, -S, -C, 0};
-        flt[i++] = { cR, sR, B,  C, -S,-1};
-        flt[i++] = { -R,  0, B,  C, -S,-1};
-        flt[i++] = { -C,  S, H,  C, -S,-1};
-        flt[i++] = { -R,  0, B,  C,  S,-1};
-        flt[i++] = { cR,-sR, B,  C,  S,-1};
-        flt[i++] = { -C, -S, H,  C,  S,-1};
-        flt[i++] = { cR,-sR, B, -1,  0,-1};
-        flt[i++] = { cR, sR, B, -1,  0,-1};
-        flt[i++] = {  1,  0, H, -1,  0,-1};
+        flt[i++] = {cR,-sR, B,  0, -1, 0};
+        flt[i++] = { 1,  0, H,  0, -1, 0};
+        flt[i++] = { 1,  0, U,  0, -1, 0};
+        
+        flt[i++] = {cR,-sR, B,  0, -1, 0};
+        flt[i++] = { 1,  0, U,  0, -1, 0};
+        flt[i++] = { 0,  0, T,  0, -1, 0};
+        
+        flt[i++] = {cR, sR, B,  0, +1, 0};
+        flt[i++] = { 0,  0, T,  0, +1, 0};
+        flt[i++] = { 1,  0, U,  0, +1, 0};
+        
+        flt[i++] = {cR, sR, B,  0, +1, 0};
+        flt[i++] = { 1,  0, U,  0, +1, 0};
+        flt[i++] = { 1,  0, H,  0, +1, 0};
+        
+        flt[i++] = {cR,-sR, B,  S, -C, 0};
+        flt[i++] = { 0,  0, T,  S, -C, 0};
+        flt[i++] = {-C, -S, U,  S, -C, 0};
+        
+        flt[i++] = {cR,-sR, B,  S, -C, 0};
+        flt[i++] = {-C, -S, U,  S, -C, 0};
+        flt[i++] = {-C, -S, H,  S, -C, 0};
+        
+        flt[i++] = {-R,  0, B, -S,  C, 0};
+        flt[i++] = {-C, -S, H, -S,  C, 0};
+        flt[i++] = {-C, -S, U, -S,  C, 0};
+        
+        flt[i++] = {-R,  0, B, -S,  C, 0};
+        flt[i++] = {-C, -S, U, -S,  C, 0};
+        flt[i++] = { 0,  0, T, -S,  C, 0};
+        
+        flt[i++] = {cR, sR, B,  S,  C, 0};
+        flt[i++] = {-C,  S, H,  S,  C, 0};
+        flt[i++] = {-C,  S, U,  S,  C, 0};
+        
+        flt[i++] = {cR, sR, B,  S,  C, 0};
+        flt[i++] = {-C,  S, U,  S,  C, 0};
+        flt[i++] = { 0,  0, T,  S,  C, 0};
+        
+        flt[i++] = {-R,  0, B, -S, -C, 0};
+        flt[i++] = { 0,  0, T, -S, -C, 0};
+        flt[i++] = {-C,  S, U, -S, -C, 0};
+        
+        flt[i++] = {-R,  0, B, -S, -C, 0};
+        flt[i++] = {-C,  S, U, -S, -C, 0};
+        flt[i++] = {-C,  S, H, -S, -C, 0};
+        
+        flt[i++] = {cR, sR, B,  C, -S,-1};
+        flt[i++] = {-R,  0, B,  C, -S,-1};
+        flt[i++] = {-C,  S, H,  C, -S,-1};
+        
+        flt[i++] = {-R,  0, B,  C,  S,-1};
+        flt[i++] = {cR,-sR, B,  C,  S,-1};
+        flt[i++] = {-C, -S, H,  C,  S,-1};
+        
+        flt[i++] = {cR,-sR, B, -1,  0,-1};
+        flt[i++] = {cR, sR, B, -1,  0,-1};
+        flt[i++] = { 1,  0, H, -1,  0,-1};
         assert_true( i == 45 );
         return i;
     }
@@ -997,6 +1025,14 @@ namespace gle
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
+    void drawVNLines(GLsizei start, GLsizei cnt)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
+        glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
+        glDrawArrays(GL_LINES, start, cnt);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
     void drawVNStrip(GLsizei start, GLsizei cnt)
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
@@ -1033,6 +1069,8 @@ namespace gle
     void blob()   { drawTriangleStrip(blobs_[0], 52); }
     void needle() { drawTriangleStrip(blobs_[1], 52); }
     void cuboid() { drawTriangleStrip(blobs_[2], 14); }
+
+    void wireCube() { drawVNLines(cubes_[5], 36); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D Circle

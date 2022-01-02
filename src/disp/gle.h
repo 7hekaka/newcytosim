@@ -72,14 +72,11 @@ namespace gle
     
 #pragma mark -
     
-    inline void scale(float x)  { glScalef(x,x,x); }
-    inline void scale(double x) { glScaled(x,x,x); }
+    inline void scale(float x) { glScalef(x,x,x); }
     
-    inline void scale(float x, float y, float z)  { glScalef(x,y,z); }
-    inline void scale(double x, double y, double z) { glScaled(x,y,z); }
+    inline void scale(float x, float y, float z) { glScalef(x,y,z); }
 
-    inline void translate(float x, float y, float z)    { glTranslatef(x, y, z); }
-    inline void translate(double x, double y, double z) { glTranslated(x, y, z); }
+    inline void translate(float x, float y, float z) { glTranslatef(x, y, z); }
 
     inline void transScale(float x, float y, float z, float s) { glTranslatef(x, y, z); glScalef(s,s,s); }
 
@@ -175,6 +172,8 @@ namespace gle
     void octahedron();
     /// draw a icosahedron of radius 1
     void icosahedron();
+    /// draw a icosahedron of radius 1
+    void ICOSAHEDRON();
 
     /// draw a roughly spherical shape made of few triangles
     void blob();
@@ -182,6 +181,8 @@ namespace gle
     void needle();
     /// draw a Cube of side 2
     void cube();
+    /// draw a Cube of side 2
+    void wireCube();
     /// draw a Cube of side 1
     void cuboid();
     /// draw a stellated octahedron

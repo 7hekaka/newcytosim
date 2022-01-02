@@ -128,6 +128,7 @@ void View::toggleDepthClamp()
 void View::openDisplay()
 {
     load();
+    glDepthMask(GL_TRUE);
     back_color.load_clear();
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     setFog(fog_type, fog_param, fog_color);

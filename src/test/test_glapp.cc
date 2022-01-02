@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2007-2022 Cambridge University.
 
 /*
  This is a test for glApp
@@ -18,35 +18,49 @@ void display(View& view, int)
 {
     view.openDisplay();
     glEnable(GL_LIGHTING);
-
-    // rendering of icosahedron:
-    gle_color(1.0, 0.0, 1.0, 1.0).load_front();
-    gle_color(0.0, 0.0, 0.5, 1.0).load_back();
-    gle::icosahedron();
-
-    gle_color(1.0, 1.0, 1.0, 1.0).load_both();
-    glLineWidth(3.0);
-    glutWireCube(2);
-
-    gle_color(1.0, 1.0, 1.0, 0.2).load_both();
-    glDepthMask(GL_FALSE);
-    glutSolidCube(2);
     glDepthMask(GL_TRUE);
-    
-    glDisable(GL_LIGHTING);
-    glPointSize(16.0);
-    glBegin(GL_POINTS);
-    glColor3f(1.0, 1.0, 1.0);
-    glVertex3d(origin.XX, origin.YY, origin.ZZ);
-    glColor3f(0.0, 1.0, 0.0);
-    glVertex3d(position.XX, position.YY, position.ZZ);
-    glEnd();
-    
-    glPointSize(7.0);
-    glBegin(GL_POINTS);
-    glColor3f(1.0, 0.0, 1.0);
-    glVertex3f(0, 0, 0);
-    glEnd();
+
+    // icosahedron:
+    gle_color(1.0, 0.0, 1.0).load_front();
+    gle_color(0.0, 0.0, 0.1).load_back();
+    gle::icosahedron();
+    //gle::ICOSAHEDRON();
+
+    if ( 1 )
+    {
+        const float rad = 0.1f;
+        gle_color(1.0, 1.0, 1.0).load_both();
+        glPushMatrix();
+        gle::transScale(origin, rad);
+        gle::sphere2();
+        glPopMatrix();
+
+        gle_color(0.0, 1.0, 0.0).load_both();
+        glPushMatrix();
+        gle::transScale(position, rad);
+        gle::sphere2();
+        glPopMatrix();
+        
+        gle_color(1.0, 0.0, 1.0).load_both();
+        glPushMatrix();
+        gle::scale(rad);
+        gle::sphere2();
+        glPopMatrix();
+    }
+    if ( 1 )
+    {
+        // transparent cube
+        glDisable(GL_LIGHTING);
+        glDepthMask(GL_FALSE);
+        glLineWidth(1);
+        glPushMatrix();
+        gle::scale(1.732f);
+        gle_color(1.0, 1.0, 1.0, 0.1).load();
+        gle::cube();
+        gle_color(1.0, 1.0, 1.0).load();
+        //gle::wireCube();
+        glPopMatrix();
+    }
     view.closeDisplay();
 }
 
@@ -61,7 +75,7 @@ void processMouseClick(int, int, const Vector3 & a, int)
 ///set callback for shift-drag, with unprojected mouse and click positions 
 void processMouseDrag(int, int, Vector3 & a, const Vector3 & b, int)
 {
-    origin   = a;
+    origin = a;
     position = b;
     glApp::postRedisplay();
 }
