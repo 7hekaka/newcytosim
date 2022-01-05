@@ -13,8 +13,8 @@ int kind = 2;
 int rank = 1;
 
 bool showPlane = true;
-bool showIndices = false;
-bool showVertices = false;
+bool showNames = false;
+bool showPoints = false;
 bool showEdges = false;
 bool showFaces = true;
 
@@ -31,7 +31,8 @@ void reset()
         delete ico;
     ico = new Tesselator();
     ico->build((Tesselator::Polyhedra)kind, rank, 1);
-
+    ico->setVertices();
+    
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points, %i faces",
              rank, ico->num_vertices(), ico->num_faces());
@@ -57,7 +58,6 @@ FILE * openFile(const char name[])
     return f;
 }
 
-
 void exportPLY()
 {
     FILE * f = openFile("mesh.ply");
@@ -76,28 +76,6 @@ void exportSTL()
         fclose(f);
         glApp::flashText("exported `mesh.stl'");
     }
-}
-
-void processNormalKey(unsigned char c, int x, int y)
-{
-    switch (c) 
-    {
-        case ' ': break; // update the Platonic
-        case 'k': kind = ( kind + 1 ) % 6; reset(); break;
-        case ']': rank += 1; reset(); break;
-        case '}': rank += 16; reset(); break;
-        case '[': rank = std::max(rank-1, 1); reset(); break;
-        case '{': rank = std::max(rank-16, 1); reset(); break;
-        case 'y': exportPLY(); return;
-        case 'Y': exportSTL(); return;
-        case 'e': showEdges = !showEdges; break;
-        case 't': showFaces = !showFaces; break;
-        case 'i': showIndices = !showIndices; break;
-        case 'p': showVertices = !showVertices; break;
-        case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
-        default: glApp::processNormalKey(c,x,y); return;
-    }
-    glApp::postRedisplay();
 }
 
 //------------------------------------------------------------------------------
@@ -123,12 +101,13 @@ void drawFacesArray()
 void initVBO()
 {
     glGenBuffers(2, buffers);
-    //Create a new VBO for the vertex information
 #if 0
+    // copy vertex data to device memory
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), ico->vertex_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #else
+    // calculate vertex data into device memory
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), nullptr, GL_STATIC_DRAW);
     void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -136,7 +115,7 @@ void initVBO()
     glUnmapBuffer(GL_ARRAY_BUFFER);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
-    //Create a new VBO for the indices
+    // create a new VBO for vertex indices defining the triangles
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->num_faces()*sizeof(unsigned), ico->face_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -174,7 +153,7 @@ void drawEdges()
     glDrawElements(GL_LINES, 2*ico->num_edges(), GL_UNSIGNED_INT, ico->edge_data());
 }
 
-void nameVertices()
+void drawNames()
 {
     char tmp[128];
     for ( unsigned i=0; i < ico->num_vertices(); ++i )
@@ -194,7 +173,7 @@ void nameVertices()
     }
 }
 
-void drawVertices()
+void drawPoints()
 {
     glPointSize(10);
     glColor3f(1, 1, 1);
@@ -227,7 +206,10 @@ void display(View& view, int)
     }
 
     if ( showPlane )
+    {
+        glEnable(GL_LIGHTING);
         drawPlane();
+    }
     if ( showFaces )
     {
         glColor3f(0, 0, 0.75f);
@@ -252,19 +234,45 @@ void display(View& view, int)
         drawEdges();
 #endif
     }
-    if ( showVertices )
+    if ( showPoints )
     {
         glDisable(GL_LIGHTING);
-        drawVertices();
+        drawPoints();
     }
-    if ( showIndices )
+    if ( showNames )
     {
         glDisable(GL_LIGHTING);
-        nameVertices();
+        drawNames();
     }
     view.closeDisplay();
 }
 
+//------------------------------------------------------------------------------
+
+void processNormalKey(unsigned char c, int x, int y)
+{
+    switch (c)
+    {
+        case ' ': break; // update the Platonic
+        case 'k': kind = ( kind + 1 ) % 6; reset(); break;
+        case 'i': kind = Tesselator::ICOSAHEDRON; reset(); break;
+        case 'o': kind = Tesselator::OCTAHEDRON; reset(); break;
+        case 'd': kind = Tesselator::DICE; reset(); break;
+        case ']': rank += 1; reset(); break;
+        case '}': rank += 16; reset(); break;
+        case '[': rank = std::max(rank-1, 1); reset(); break;
+        case '{': rank = std::max(rank-16, 1); reset(); break;
+        case 'y': exportPLY(); return;
+        case 'Y': exportSTL(); return;
+        case 'e': showEdges = !showEdges; break;
+        case 'f': showFaces = !showFaces; break;
+        case 'n': showNames = !showNames; break;
+        case 'p': showPoints = !showPoints; break;
+        case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
+        default: glApp::processNormalKey(c,x,y); return;
+    }
+    glApp::postRedisplay();
+}
 
 //------------------------------------------------------------------------------
 

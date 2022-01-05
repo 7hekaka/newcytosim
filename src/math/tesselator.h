@@ -161,6 +161,7 @@ public:
 
     /// set array of indices that define the edges
     void setEdges();
+    /// calculate coordinates of vertices used in vertex_data()
     void setVertices();
     
     /// reference to derived vertex `ii`
@@ -183,7 +184,7 @@ public:
     /// number of derived vertices
     unsigned num_vertices() const { return num_vertices_; }
     
-    /// return pointer to array of coordinates of vertices
+    /// return pointer to array of coordinates of vertices, initialized in setVertices()
     const float* vertex_data() const { return vex_; }
     
     /// address of coordinates for vertex `v` ( `v < num_vertices()` )

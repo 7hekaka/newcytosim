@@ -168,7 +168,7 @@ namespace gle
     /// nicer 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom2();
 
-    /// draw a tetrahedron of side 2 in 3D
+    /// draw a tetrahedron of radius 1
     void tetrahedron();
     /// draw a octahedron of radius 1
     void octahedron();

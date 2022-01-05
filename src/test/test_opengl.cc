@@ -1,8 +1,8 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 /*
  Francois Nedelec, Nov. 2003,  nedelec@embl.de
- To compile on mac-osx:
+ To compile on macOS:
  g++ test_opengl.cc -framework GLUT -framework openGL
  On Linux:
  g++ test_opengl.cc -L/usr/X11R6/lib -lglut -lGL -lGLU -lXt -lX11
