@@ -222,7 +222,7 @@ void display(View& view, int)
     if ( showEdges )
     {
         glDisable(GL_LIGHTING);
-        glLineWidth(0.25);
+        glLineWidth(0.5);
         glColor3f(1, 1, 1);
 #if 1
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

@@ -614,7 +614,7 @@ namespace gle
         icoFace(pts+3*a, pts+3*b, pts+3*c);
     }
     
-    void icosahedron()
+    void ICOSAHEDRON()
     {
         const float G = 0.5+0.5*std::sqrt(5.0);
         const float H = 1/std::sqrt(G*G+1); //0.5257311121f;
@@ -624,8 +624,8 @@ namespace gle
         float pts[3*12] = {
             +T,  H,  0, // 0
             -T, -H,  0, // 1
-            -T,  H,  0, // 2
             +T, -H,  0, // 3
+            -T,  H,  0, // 2
             +H,  0,  T, // 4
             -H,  0, -T, // 5
             +H,  0, -T, // 6
@@ -641,26 +641,26 @@ namespace gle
         icoFace(pts, 5,  6, 9);
         icoFace(pts, 5, 11, 6);
         
-        icoFace(pts, 6, 3,  9);
-        icoFace(pts, 2, 11, 5);
+        icoFace(pts, 6, 2,  9);
+        icoFace(pts, 3, 11, 5);
         icoFace(pts, 1, 5,  9);
         icoFace(pts, 0, 6, 11);
         
-        icoFace(pts, 0, 3,  6);
-        icoFace(pts, 1, 2,  5);
+        icoFace(pts, 0, 2,  6);
+        icoFace(pts, 1, 3,  5);
         
         icoFace(pts, 1, 9, 10);
         icoFace(pts, 0, 11, 8);
-        icoFace(pts, 8, 11, 2);
-        icoFace(pts, 9, 3, 10);
+        icoFace(pts, 8, 11, 3);
+        icoFace(pts, 9, 2, 10);
         
-        icoFace(pts, 0, 4,  3);
-        icoFace(pts, 1, 7,  2);
+        icoFace(pts, 0, 4,  2);
+        icoFace(pts, 1, 7,  3);
         
         icoFace(pts, 0, 8,  4);
         icoFace(pts, 1, 10, 7);
-        icoFace(pts, 3, 4, 10);
-        icoFace(pts, 7, 8,  2);
+        icoFace(pts, 2, 4, 10);
+        icoFace(pts, 7, 8,  3);
         
         icoFace(pts, 4, 8,  7);
         icoFace(pts, 4, 7, 10);
@@ -835,6 +835,52 @@ namespace gle
         return i;
     }
     
+    /// this only sets vertices, skipping normals
+    size_t setIcoid(flute3* flu, float R)
+    {
+        const float G = 0.5 + 0.5 * std::sqrt(5.0);
+        const float Z = R / std::sqrt(G*G+1.0);
+        const float T = R * G * Z;
+        size_t i = 0;
+        flu[i++] = { T,  0, 0 };//0+2
+        flu[i++] = { T, -Z,  0};//2
+        flu[i++] = { Z,  0, -T};// 6
+        flu[i++] = { 0, -T, -Z};//9
+        flu[i++] = {-Z,  0, -T};//5
+        //flu[i++] = { 0, -T/3, -(2*T+Z)/3};//5+6+9
+        flu[i++] = {-Z,  0, -T};//5
+        flu[i++] = { 0,  0, -T};//5+6
+        flu[i++] = { 0,  T, -Z};//11
+        flu[i++] = { Z,  0, -T};// 6
+        flu[i++] = { T,  Z,  0};// 0
+        flu[i++] = { T,  0, 0 };//0+2
+
+        flu[i++] = { Z,  0,  T};// 4
+        flu[i++] = { T, -Z,  0};// 2
+        flu[i++] = { 0, -T,  Z};// 10
+        flu[i++] = { 0, -T, -Z};// 9
+        flu[i++] = {-T, -Z,  0};// 1
+        flu[i++] = {-Z,  0, -T};// 5
+        flu[i++] = {-T,  Z,  0};// 3
+        flu[i++] = { 0,  T, -Z};// 11
+        flu[i++] = { 0,  T,  Z};// 8
+        flu[i++] = { T,  Z,  0};//0
+        
+        flu[i++] = { Z/2, T/2, (Z+T)/2};//4+8
+        flu[i++] = { Z,  0,  T};//4
+        flu[i++] = {-Z,  0,  T};// 7
+        flu[i++] = { 0, -T,  Z};//10
+        flu[i++] = {-(T+Z)/2, -Z/2, T/2};//1+7
+        flu[i++] = {-T, -Z,  0};//1
+        flu[i++] = {-T, -Z,  0};//1
+        //flu[i++] = {-(2*T+Z)/3, 0, T/3};//1+3+7
+        flu[i++] = {-T,  Z,  0};//3
+        flu[i++] = {-Z,  0,  T};//7
+        flu[i++] = { 0,  T,  Z};//8
+        flu[i++] = { Z/2, T/2, (Z+T)/2};//4+8
+        return i;
+    }
+
     //-----------------------------------------------------------------------
     
     /// this only sets vertices, skipping normals
@@ -997,7 +1043,7 @@ namespace gle
     
     static size_t sizeBlobBuffers()
     {
-        return ( 52 + 52 + 14 );
+        return ( 52 + 52 + 14 + 24 );
     }
 
     flute3* setBlobBuffers(flute3* ptr, flute3* const ori, GLsizei idx[])
@@ -1006,6 +1052,7 @@ namespace gle
         idx[0] = i+s; i += setBlob(ptr+i);
         idx[1] = i+s; i += setPin(ptr+i);
         idx[2] = i+s; i += setCuboid(ptr+i, 1.0);
+        idx[3] = i+s; i += setIcoid(ptr+i, 1.0);
         return ptr + i;
     }
 
@@ -1056,7 +1103,7 @@ namespace gle
     void tetrahedron() { drawVNTriangles(cubes_[0], 12); }
     void octahedron()  { drawVNTriangles(cubes_[2], 24); }
     void icosahedron() { drawVNTriangles(cubes_[3], 60); }
-    void ICOSAHEDRON() { flute6 tmp[60]; setIcosahedron(tmp); drawVNTriangles(tmp, 60); }
+    //void ICOSAHEDRON() { flute6 tmp[60]; setIcosahedron(tmp); drawVNTriangles(tmp, 60); }
     
     void arrowTail() { drawVNTriangles(cubes_[4], 45); }
     void cube()      { drawVNTriangles(cubes_[5], 36); }
@@ -1069,7 +1116,8 @@ namespace gle
     void blob()   { drawTriangleStrip(blobs_[0], 52); }
     void needle() { drawTriangleStrip(blobs_[1], 52); }
     void cuboid() { drawTriangleStrip(blobs_[2], 14); }
-
+    void icoid()  { drawTriangleStrip(blobs_[3], 32); }
+    
     void wireCube() { drawVNLines(cubes_[5], 36); }
 
     //-----------------------------------------------------------------------

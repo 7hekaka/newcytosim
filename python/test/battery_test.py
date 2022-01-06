@@ -47,6 +47,8 @@ def execute(tool, file, verbose):
         return
     os.chdir(wdir)
     shutil.copyfile(file, 'config.cym')
+    if verbose:
+        print(name.rjust(100, '-'))
     out = open("out.txt", 'w')
     err = open("err.txt", 'w')
     sec = time.time()
@@ -55,12 +57,11 @@ def execute(tool, file, verbose):
     err.close()
     out.close()
     if val:
-        print(' %6.2f sec returned %i   %s' % (sec, val, name))
+        print(' %6.2f sec : %s returned %i' % (sec, name, val))
     else:
         print(' %6.2f sec : %s' % (sec, name))
     if verbose:
         # copy standard-error:
-        print(name.rjust(100, '-'))
         with open("err.txt", 'r') as f:
             for line in f:
                 print("> "+line, end='')

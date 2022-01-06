@@ -25,8 +25,19 @@ void display(View& view, int)
     gle_color(0.0, 0.0, 0.1).load_back();
     gle::icosahedron();
     //gle::ICOSAHEDRON();
-
-    if ( 1 )
+    //gle::icoid();
+    if ( 0 )
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        gle_color(1, 1, 1).load_both();
+        glDisable(GL_DEPTH_TEST);
+        glLineWidth(0.5);
+        gle::icoid();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEnable(GL_DEPTH_TEST);
+    }
+    
+    if ( 0 )
     {
         const float rad = 0.1f;
         gle_color(1.0, 1.0, 1.0).load_both();

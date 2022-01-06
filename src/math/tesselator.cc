@@ -492,8 +492,8 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
         FLOAT vex[12][3] = {
             { T,  Z,  0},
             {-T, -Z,  0},
-            {-T,  Z,  0},
             { T, -Z,  0},
+            {-T,  Z,  0},
             { Z,  0,  T},
             {-Z,  0, -T},
             { Z,  0, -T},
@@ -506,10 +506,10 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
         
         // Faces are ordered for OpenGL's default rule: Counter-Clockwise = facing out
         unsigned fac[20][3] = {
-            {0,  3,  6},
-            {1,  7,  2},
-            {0,  4,  3},
-            {1,  2,  5},
+            {0,  2,  6},
+            {1,  7,  3},
+            {0,  4,  2},
+            {1,  3,  5},
             {0,  8,  4},
             {1,  5,  9},
             {0, 11,  8},
@@ -518,12 +518,12 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
             {1, 10,  7},
             {4,  8,  7},
             {5,  6,  9},
-            {2,  7,  8},
-            {6,  3,  9},
-            {2,  8, 11},
-            {9,  3, 10},
-            {5,  2, 11},
-            {3,  4, 10},
+            {3,  7,  8},
+            {6,  2,  9},
+            {3,  8, 11},
+            {9,  2, 10},
+            {5,  3, 11},
+            {2,  4, 10},
             {6,  5, 11},
             {4,  7, 10},
         };

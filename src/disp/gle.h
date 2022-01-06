@@ -179,6 +179,8 @@ namespace gle
 
     /// draw a roughly spherical shape made of few triangles
     void blob();
+    /// draw a icosahedron without normals
+    void icoid();
     /// draw a centered blob of radius 1 with a cone extending up in Z
     void needle();
     /// draw a Cube of side 2
