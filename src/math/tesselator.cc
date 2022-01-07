@@ -135,16 +135,19 @@ void Tesselator::init(unsigned V, unsigned E, unsigned F, unsigned N)
 
 void Tesselator::allocate()
 {
+    assert_true(corners_ == nullptr);
+    assert_true(vertices_ == nullptr);
+    assert_true(faces_ == nullptr);
     corners_ = new Corner[num_corners_];
     vertices_ = new Vertex[max_vertices_];
-    faces_ = new unsigned[3*max_faces_];
+    faces_ = new INDEX[3*max_faces_];
 }
 
 
 void Tesselator::destroy()
 {
+    delete[] corners_;
     delete[] vertices_;
-    delete(corners_);
     delete(edges_);
     delete(faces_);
     delete(vex_);
@@ -265,9 +268,13 @@ void Tesselator::addFace(unsigned a, unsigned b, unsigned c)
         if ( out > 1 )
             return;
     }
-    faces_[3*num_faces_  ] = a;
-    faces_[3*num_faces_+1] = b;
-    faces_[3*num_faces_+2] = c;
+    unsigned f = 3 * num_faces_;
+    faces_[f  ] = (INDEX)a;
+    faces_[f+1] = (INDEX)b;
+    faces_[f+2] = (INDEX)c;
+    assert_true(faces_[f  ] == a);
+    assert_true(faces_[f+1] == b);
+    assert_true(faces_[f+2] == c);
     ++num_faces_;
 }
 
@@ -851,8 +858,9 @@ void Tesselator::store_vertices(float * vec) const
     
     if ( kind_ == DICE )
     {
+        float len[4] = { (float)length_[0], (float)length_[1], (float)length_[2], (float)length_[3] };
         for ( unsigned n = 0; n < num_vertices_; ++n )
-            projectDice(vec+3*n, length_);
+            projectDice(vec+3*n, len);
     }
     else
     {
@@ -886,8 +894,11 @@ void Tesselator::store_vertices(double * vec) const
 
 void Tesselator::addEdge(unsigned a, unsigned b)
 {
-    edges_[2*num_edges_  ] = a;
-    edges_[2*num_edges_+1] = b;
+    size_t e = 2 * num_edges_;
+    edges_[e  ] = (INDEX)a;
+    edges_[e+1] = (INDEX)b;
+    assert_true(edges_[e  ] == a);
+    assert_true(edges_[e+1] == b);
     ++num_edges_;
 }
 
@@ -895,7 +906,7 @@ void Tesselator::addEdge(unsigned a, unsigned b)
 void Tesselator::setEdges()
 {
     delete[] edges_;
-    edges_ = new unsigned[2*max_edges_];
+    edges_ = new INDEX[2*max_edges_];
     num_edges_ = 0;
     
     // build edges from the faces:

@@ -23,9 +23,13 @@ class Tesselator
     Tesselator& operator =(const Tesselator&);
 
 public:
+    
     /// floating type used for calculations
     typedef float FLOAT;
-    
+
+    /// floating type used for calculations
+    typedef unsigned short INDEX;
+
     /// starting shapes
     enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3, HEMISPHERE=4, DICE=5 };
     
@@ -94,10 +98,10 @@ private:
     Vertex * vertices_;
     
     /// Array of indices of the points making the edges
-    unsigned *edges_;
+    INDEX * edges_;
     
     /// Array of indices of the points making the faces
-    unsigned *faces_;
+    INDEX * faces_;
     
     /// number of primary vertices
     unsigned num_corners_;
@@ -194,13 +198,13 @@ public:
     unsigned int num_edges() const { return num_edges_; }
     
     /// array of indices to the vertices in each edge (2 per edge)
-    unsigned int* edge_data() const { return edges_; }
+    INDEX * edge_data() const { return edges_; }
     
     /// number of faces (each face is a triangle of 3 vertices)
     unsigned int num_faces() const { return num_faces_; }
     
     /// array of indices to the vertices in each face (3 vertices per face)
-    unsigned int* face_data() const { return faces_; }
+    INDEX * face_data() const { return faces_; }
     
     /// export ascii PLY format
     void exportPLY(FILE *) const;

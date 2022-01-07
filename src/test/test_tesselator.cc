@@ -93,7 +93,8 @@ void drawFacesArray()
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
     glNormalPointer(GL_FLOAT, 0, ico->vertex_data());
-    glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_INT, ico->face_data());
+    assert_true( sizeof(Tesselator::INDEX) == sizeof(GLshort) );
+    glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_SHORT, ico->face_data());
     glDisableClientState(GL_NORMAL_ARRAY);
 }
 
@@ -117,7 +118,7 @@ void initVBO()
 #endif
     // create a new VBO for vertex indices defining the triangles
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->num_faces()*sizeof(unsigned), ico->face_data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*ico->num_faces()*sizeof(Tesselator::INDEX), ico->face_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -132,7 +133,8 @@ void drawFacesVBO()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-    glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_INT, nullptr);
+    assert_true( sizeof(Tesselator::INDEX) == sizeof(GLshort) );
+    glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_SHORT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glDisableClientState(GL_NORMAL_ARRAY);
@@ -149,8 +151,16 @@ void drawFaces()
 
 void drawEdges()
 {
+#if 0
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    drawFaces();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#else
+    if ( ico->num_edges() == 0 )
+        ico->setEdges();
     glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
-    glDrawElements(GL_LINES, 2*ico->num_edges(), GL_UNSIGNED_INT, ico->edge_data());
+    glDrawElements(GL_LINES, 2*ico->num_edges(), GL_UNSIGNED_SHORT, ico->edge_data());
+#endif
 }
 
 void drawNames()
@@ -224,15 +234,7 @@ void display(View& view, int)
         glDisable(GL_LIGHTING);
         glLineWidth(0.5);
         glColor3f(1, 1, 1);
-#if 1
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        drawFaces();
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-#else
-        if ( ico->num_edges() == 0 )
-            ico->setEdges();
         drawEdges();
-#endif
     }
     if ( showPoints )
     {

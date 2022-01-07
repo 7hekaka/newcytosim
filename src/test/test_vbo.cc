@@ -97,7 +97,7 @@ void initVBO()
                         -c,  -b, -a };
     
     // indices of the vertices that make each face
-    GLuint indices[] = { 0, 2, 1,  1, 3, 0,  0, 3, 2,  1, 2, 3 };
+    GLushort indices[] = { 0, 2, 1,  1, 3, 0,  0, 3, 2,  1, 2, 3 };
 
     
     //Create a new VBO and use the variable id to store the VBO id
@@ -155,7 +155,7 @@ void displayVBO()
     // Draw 4 triangles, giving the number of vertices provided
     glColor4f(1,1,1,0.3);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[1]);
-    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glDisableClientState(GL_VERTEX_ARRAY);
     glDepthMask(GL_TRUE);

@@ -353,11 +353,12 @@ void SpaceDice::draw3D() const
     // remove the last 12 triangles, corresponding to the faces
     size_t tri = 3 * ( mesh.num_faces() - 12 );
     unsigned* inx = gym::mapIndexBuffer(tri);
-    memcpy(inx, mesh.face_data(), tri*sizeof(unsigned));
+    memcpy(inx, mesh.face_data(), tri*sizeof(Tesselator::INDEX));
     gym::unmapIndexBuffer();
     
     glEnableClientState(GL_NORMAL_ARRAY);
-    glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_INT, nullptr);
+    assert_true( sizeof(Tesselator::INDEX) == sizeof(unsigned short) );
+    glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_SHORT, nullptr);
     glDisableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);

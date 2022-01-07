@@ -1319,7 +1319,7 @@ namespace gle
 #pragma mark - Spheres made from refined Icosahedrons
     
     /// using icosahedrons to render the sphere:
-    void setIcoBuffer(Tesselator& ico, int i, float*& ptr, float* const ptr0, unsigned*& idx, unsigned* const idx0)
+    void setIcoBuffer(Tesselator& ico, int i, float*& ptr, float* const ptr0, Tesselator::INDEX*& idx, Tesselator::INDEX* const idx0)
     {
         /*
          check pointer alignment, which is required to get indices
@@ -1333,8 +1333,9 @@ namespace gle
         ico.store_vertices(ptr);
         ptr += 3 * ico.num_vertices();
         
+        assert_true(ico.num_vertices() <= 65535 );
         size_t cnt = 3 * ico.num_faces();
-        memcpy(idx, ico.face_data(), cnt*sizeof(unsigned));
+        memcpy(idx, ico.face_data(), cnt*sizeof(Tesselator::INDEX));
         idx += cnt;
     }
     
@@ -1346,7 +1347,8 @@ namespace gle
         // the normal in each vertex is equal to the vertex!
         glNormalPointer(GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(inx*sizeof(GLuint)));
+        assert_true( sizeof(Tesselator::INDEX) == sizeof(GLshort) );
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1362,9 +1364,10 @@ namespace gle
         glNormalPointer(GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
         glCullFace(GL_FRONT);
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(inx*sizeof(GLuint)));
+        assert_true( sizeof(Tesselator::INDEX) == sizeof(GLshort) );
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glCullFace(GL_BACK);
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_INT, (void*)(inx*sizeof(GLuint)));
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glDisableClientState(GL_NORMAL_ARRAY);
@@ -1411,11 +1414,11 @@ namespace gle
         glBufferData(GL_ARRAY_BUFFER, (s+t+c+b+o)*sizeof(float), nullptr, GL_STATIC_DRAW);
         float* ptr = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, f*sizeof(unsigned), nullptr, GL_STATIC_DRAW);
-        unsigned* idx = (unsigned*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, f*sizeof(Tesselator::INDEX), nullptr, GL_STATIC_DRAW);
+        Tesselator::INDEX* idx = (unsigned short*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
 
         float*const ptr0 = ptr;
-        unsigned*const idx0 = idx;
+        Tesselator::INDEX*const idx0 = idx;
         
         ptr = (float*)setTubeBuffers((flute6*)ptr, (flute6*)ptr0, tubes_);
         //fprintf(stderr, "setTubeBuffers : %li %li\n", ptr-ptr0, t); float* sub=ptr;

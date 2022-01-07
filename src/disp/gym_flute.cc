@@ -101,7 +101,7 @@ namespace gym
     unsigned* mapIndexBuffer(size_t cnt)
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, nextStream());
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cnt*sizeof(unsigned), nullptr, GL_STREAM_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cnt*sizeof(short), nullptr, GL_STREAM_DRAW);
         return (unsigned*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
     }
     
