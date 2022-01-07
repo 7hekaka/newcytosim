@@ -1038,12 +1038,13 @@ namespace gle
         idx[6] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
         idx[7] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
         idx[8] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
+        assert_true( i <= sizeCubeBuffers() );
         return ptr + i;
     }
     
     static size_t sizeBlobBuffers()
     {
-        return ( 52 + 52 + 14 + 24 );
+        return ( 52 + 52 + 14 + 32 );
     }
 
     flute3* setBlobBuffers(flute3* ptr, flute3* const ori, GLsizei idx[])
@@ -1053,6 +1054,7 @@ namespace gle
         idx[1] = i+s; i += setPin(ptr+i);
         idx[2] = i+s; i += setCuboid(ptr+i, 1.0);
         idx[3] = i+s; i += setIcoid(ptr+i, 1.0);
+        assert_true( i <= sizeBlobBuffers() );
         return ptr + i;
     }
 
@@ -1134,7 +1136,7 @@ namespace gle
         return i;
     }
     
-    size_t sizeCircBuffers()
+    static size_t sizeCircBuffers()
     {
         return 4 + 2 * pi_twice;
     }
@@ -1144,6 +1146,7 @@ namespace gle
         size_t i = 0, s = ptr - ori;
         idx[0] = i+s; i += setCircle(ptr, 1, 0, 1, 1);
         idx[1] = i+s; i += setCircle(ptr, 1, 0, 1, 2);
+        assert_true( i <= sizeCircBuffers() );
         return ptr + i;
     }
 
@@ -1219,7 +1222,7 @@ namespace gle
         return i;
     }
     
-    size_t sizeTubeBuffers()
+    static size_t sizeTubeBuffers()
     {
         return 22 * pi_twice;  // this is empirical!
     }
@@ -1251,6 +1254,7 @@ namespace gle
         idx[20] = i+s; i += setDisc(ptr+i, 2, 1, 1);
         idx[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
         idx[22] = i+s; i += setDisc(ptr+i, 2, 0, -1);
+        assert_true( i <= sizeTubeBuffers() );
         return ptr + i;
     }
 
@@ -1407,7 +1411,7 @@ namespace gle
         glBufferData(GL_ARRAY_BUFFER, (s+t+c+b+o)*sizeof(float), nullptr, GL_STATIC_DRAW);
         float* ptr = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3*f*sizeof(unsigned), nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, f*sizeof(unsigned), nullptr, GL_STATIC_DRAW);
         unsigned* idx = (unsigned*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
 
         float*const ptr0 = ptr;
@@ -1425,6 +1429,7 @@ namespace gle
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
         //fprintf(stderr, "setIcosBuffers : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
         assert_true( ptr < ptr0 + s + c + t );
+        assert_true( idx < idx0 + f );
 
         ptr = (float*)setBlobBuffers((flute3*)ptr, (flute3*)ptr0, blobs_);
         //fprintf(stderr, "setBlobBuffers : %li %li\n", ptr-sub, b); sub=ptr;
@@ -2093,7 +2098,7 @@ namespace gle
     }
     
     /**
-     This is similart to glutReportError,
+     This is similar to glutReportError,
      but the additional argument can provide useful feedback for debugging
      */
     void reportErrors(FILE * out, const char* msg)
