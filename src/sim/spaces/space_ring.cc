@@ -147,7 +147,7 @@ void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& pe, real rad,
 
 void SpaceRing::write(Outputter& out) const
 {
-    writeShape(out, "ring");
+    writeShape(out, "LR");
     out.writeUInt16(2);
     out.writeFloat(half_);
     out.writeFloat(radius_);
@@ -164,7 +164,7 @@ void SpaceRing::setLengths(const real len[])
 void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    readShape(in, 8, len, "ring");
+    readShape(in, 8, len, "LR");
     setLengths(len);
 }
 

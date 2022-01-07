@@ -177,7 +177,7 @@ void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& pe, real rad,
 
 void SpaceDisc::write(Outputter& out) const
 {
-    writeShape(out, "disc");
+    writeShape(out, "RBT");
     out.writeUInt16(4);
     out.writeFloat(radius_);
     out.writeFloat(bot_);
@@ -196,7 +196,7 @@ void SpaceDisc::setLengths(const real len[])
 void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    readShape(in, 8, len, "disc");
+    readShape(in, 8, len, "RBT");
     setLengths(len);
 }
 

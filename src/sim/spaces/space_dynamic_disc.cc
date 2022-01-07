@@ -129,7 +129,7 @@ void SpaceDynamicDisc::step()
 
 void SpaceDynamicDisc::write(Outputter& out) const
 {
-    writeShape(out, "disc");
+    writeShape(out, "RF");
     out.writeUInt16(2);
     out.writeFloat(radius_);
     out.writeFloat(force_);
@@ -145,7 +145,7 @@ void SpaceDynamicDisc::setLengths(const real len[])
 void SpaceDynamicDisc::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    readShape(in, 8, len, "disc");
+    readShape(in, 8, len, "RF");
     setLengths(len);
 }
 

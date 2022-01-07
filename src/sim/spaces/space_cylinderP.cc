@@ -180,7 +180,7 @@ void SpaceCylinderP::setConfinement(Vector const& pos, Mecapoint const& pe, real
 
 void SpaceCylinderP::write(Outputter& out) const
 {
-    writeShape(out, "cylinderP");
+    writeShape(out, "LR");
     out.writeUInt16(2);
     out.writeFloat(half_);
     out.writeFloat(radius_);
@@ -198,7 +198,7 @@ void SpaceCylinderP::setLengths(const real len[])
 void SpaceCylinderP::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    readShape(in, 8, len, "cylinderP");
+    readShape(in, 8, len, "LR");
     setLengths(len);
 }
 

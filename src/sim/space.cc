@@ -450,16 +450,16 @@ void Space::readShape(Inputter& in, std::string const& expected)
 #endif
         str = in.get_characters(16); // stored as 16 characters
     
-    // compare with expected shape:
+    // compare with expected layout:
     if ( str != expected )
     {
 #if 0
-        InvalidIO e("shape mismatch");
+        InvalidIO e("dimension layout mismatch");
         e << "found `" << str << "' in file when `" << expected << "' was expected";
         throw e;
 #else
-        std::cerr << "Warning: shape mismatch: ";
-        std::cerr << "found `" << str << "' in file when `" << expected << "' was expected\n";
+        std::cerr << "Notice: dimension layout mismatch: found `" << str;
+        std::cerr << "' but `" << expected << "' was expected\n";
 #endif
     }
 }

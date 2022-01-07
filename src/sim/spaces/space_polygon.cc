@@ -273,7 +273,7 @@ void SpacePolygon::setInteractions(Meca& meca) const
 
 void SpacePolygon::write(Outputter& out) const
 {
-    writeShape(out, "polygon");
+    writeShape(out, "L");
     out.writeUInt16(2);
     out.writeFloat(height_);
     out.writeFloat(0.f);
@@ -289,7 +289,7 @@ void SpacePolygon::setLengths(const real len[])
 void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    readShape(in, 8, len, "polygon");
+    readShape(in, 8, len, "L");
     setLengths(len);
     if ( !prop->dimensions.empty() )
     {

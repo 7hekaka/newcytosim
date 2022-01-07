@@ -89,7 +89,7 @@ Vector SpacePeriodic::project(Vector const&) const
 
 void SpacePeriodic::write(Outputter& out) const
 {
-    writeShape(out, "periodic");
+    writeShape(out, "LLL");
     out.writeUInt16(4);
     out.writeFloat(half_[0]);
     out.writeFloat(half_[1]);
@@ -110,7 +110,7 @@ void SpacePeriodic::setLengths(const real len[])
 void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 {
     real len[8] = { 0 };
-    readShape(in, 8, len, "periodic");
+    readShape(in, 8, len, "LLL");
     setLengths(len);
 }
 
