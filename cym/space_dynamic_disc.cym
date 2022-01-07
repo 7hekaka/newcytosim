@@ -11,7 +11,7 @@ set simul system
 
 set space cell
 {
-    shape = disc
+    shape = dynamic_disc
     viscosity = 100
 }
 

@@ -11,13 +11,13 @@ set simul system
     viscosity = 1
     kT = 0.01
 
-    display = ( style = 3 )
+    display = ( style=3; )
 }
 
 set space cell
 {
     shape = sphere
-    display = ( visible=0 )
+    display = ( visible=0; )
 }
 
 new cell
@@ -25,7 +25,7 @@ new cell
     radius = 5
 }
 
-set fiber 0 beam
+set fiber beam
 {
     rigidity = 1000
     segmentation = 10
@@ -51,7 +51,7 @@ set couple link
 }
 
 %initial configuration is stored in a file:
-import objects toy_start.cmi
+import objects toy_start.cmi { append = 1; }
 
 run 5000 system
 {

@@ -8,9 +8,9 @@
 
 /// A disc centered at the origin, with variable radius.
 /**
- Space `disc` is a disc centered around the origin.
+ Space `dynamic_disc` is a disc centered around the origin in the XY plane.
  Forces registered with 'setInteractions' are added, and used to update the
- radius of the Space. How fast the radius changes is set by the value 'mobility'
+ radius of the disc. How fast the radius changes is set by the value 'mobility'
  in SpaceDynamicProp.
  
  Parameters:

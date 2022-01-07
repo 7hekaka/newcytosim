@@ -24,7 +24,7 @@ new cell
     radius = 0.25
 }
 
-set fiber tubule
+set fiber microtubule
 {
     rigidity = 30
     segmentation = 0.5
@@ -57,14 +57,14 @@ set couple complex
     stiffness = 100
 }
 
-new tubule
+new microtubule
 {
     length = 1
     direction = 1 0 0
     position = 0.25 -0.025 0
 }
 
-new tubule
+new microtubule
 {
     length = 1
     direction = -1 0 0

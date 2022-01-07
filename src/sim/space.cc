@@ -465,7 +465,7 @@ void Space::readShape(Inputter& in, std::string const& expected)
 }
 
 
-void Space::readLengths(Inputter& in, size_t n_len, real len[])
+size_t Space::readLengths(Inputter& in, size_t n_len, real len[])
 {
     size_t n = 0;
 #if BACKWARD_COMPATIBILITY < 43
@@ -480,13 +480,14 @@ void Space::readLengths(Inputter& in, size_t n_len, real len[])
         len[d] = in.readFloat();
     for ( ; d < n; ++d )
         in.readFloat();
+    return n;
 }
 
 
-void Space::readShape(Inputter& in, size_t n_len, real len[], std::string const& expected)
+size_t Space::readShape(Inputter& in, size_t n_len, real len[], std::string const& expected)
 {
     readShape(in, expected);
-    readLengths(in, n_len, len);
+    return readLengths(in, n_len, len);
 }
 
 void Space::write(Outputter& out) const

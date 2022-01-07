@@ -12,7 +12,7 @@
 SpaceDynamicDisc::SpaceDynamicDisc(SpaceDynamicProp const* p)
 : Space(p),prop(p)
 {
-    if ( DIM != 3 )
+    if ( DIM != 2 )
         throw InvalidParameter("dymamic_disc is only usable in 2D");
     radius_ = 0;
     force_  = 0;
@@ -28,7 +28,7 @@ void SpaceDynamicDisc::resize(Glossary& opt)
     else opt.set(rad, "radius");
 
     if ( rad < 0 )
-        throw InvalidParameter("disc:radius must be >= 0");
+        throw InvalidParameter("dymamic_disc:radius must be >= 0");
     
     radius_ = rad;
 }

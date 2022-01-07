@@ -42,10 +42,10 @@ protected:
     static void readShape(Inputter&, std::string const& expected);
     
     /// read lengths from file into array `len` of size `n_len`
-    static void readLengths(Inputter&, size_t n_len, real* len);
+    static size_t readLengths(Inputter&, size_t n_len, real* len);
     
     /// read shape string and lengths
-    static void readShape(Inputter&, size_t n_len, real* len, std::string const&);
+    static size_t readShape(Inputter&, size_t n_len, real* len, std::string const&);
     
 public:
     

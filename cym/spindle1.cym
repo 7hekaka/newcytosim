@@ -89,7 +89,7 @@ set system display
 new event
 {
     rate = 20;
-    code = ( new microtubule { position = (rectangle 1 6); length=0.05; plus_end=grow; }
+    code = (new microtubule { position = (rectangle 1 6); length=0.05; plus_end=grow; })
 }
 
 run 2000 system

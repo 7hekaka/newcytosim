@@ -51,7 +51,7 @@
  
      set space cell
      {
-         shape = disc
+         shape = dynamic_disc
      }
      new cell
      {
