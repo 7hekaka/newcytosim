@@ -584,7 +584,7 @@ inline int four_near(vec4f const& xyzr, BigLocus const* src)
     // calculate test:
     uu = add4f(mul4f(xx, xx), uu); // x*x + y*y
     tt = sub4f(mul4f(rr, rr), tt); // r*r - z*z
-    return movemask4f(_mm_cmplt_ps(uu, tt));  // x*x + y*y < r*r - z*z
+    return lower_mask4f(uu, tt);  // x*x + y*y < r*r - z*z
 }
 
 
@@ -747,7 +747,7 @@ typedef unsigned long bitfield;
 
 /**
 Evaluate `cnt` pos.near(jj->pos_) using SIMD instructions
-@return a bitfield representint the result of all tests
+@return a bitfield representing the result of all tests
 */
 bitfield near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
 {

@@ -328,7 +328,7 @@ void Parser::parse_change(std::istream& is)
 /**
  The command `new` creates one or more objects with given specifications:
  
-     new [MULTIPLICITY] NAME
+     new [COUNT] NAME
      {
        position         = POSITION, [SPACE]
        direction        = DIRECTION
@@ -343,25 +343,28 @@ void Parser::parse_change(std::istream& is)
  
  Parameter        | Type      | Default | Description                          |
  -----------------|-----------|---------|---------------------------------------
- MULTIPLICITY     | INTEGER   |   1     | number of objects.
+ COUNT            | INTEGER   |   1     | number of objects to add.
  `position`       | POSITION  | random  | initial position of the object.
  `orientation`    | ROTATION  | random  | a rotation specified with respect to the object's center of gravity.
  `orientation[1]` | ROTATION  | none    | a rotation specified around the origin.
  `direction`      | DIRECTION | random  | specifies the direction of a fiber.
  `mark`           | INTEGER   |   0     | specifies a mark to be given to all objects created.
  `required`       | INTEGER   |   0     | minimum number of objects that should be created.
+ `nb_objects`     | INTEGER   |   -     | add or delete objects to reach specified number.
  
 
- Note that `position` only applies to movable objects, and `orientation` will have an effect only on objects that can be rotated. In addition, `position[1]` and `orientation[1]` are relevant only if `(MULTIPLICITY > 1)`, and do not apply to the first object.\n
- 
+ Note that `position` applies to movable objects only, and `orientation` will be
+ considered only for objects that can be rotated.
+ With multiple objects (COUNT > 1), `range = POSITION, POSITION` can be specified
+ to indicate a line along which the objects will be placed.\n
  
  Short syntax:
  
-     new [MULTIPLICITY] NAME ( POSITION )
+     new [COUNT] NAME ( POSITION )
  
  Shorter syntax:
  
-     new [MULTIPLICITY] NAME
+     new [COUNT] NAME
  
 */
 
@@ -421,7 +424,7 @@ void Parser::parse_new(std::istream& is)
 /**
  Delete objects:
 
-     delete [MULTIPLICITY] NAME
+     delete [COUNT] NAME
      {
         mark      = INTEGER
         position  = [inside|outside], SPACE
