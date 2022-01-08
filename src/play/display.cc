@@ -24,7 +24,7 @@
 #include "point_disp.h"
 #include "fiber_disp.h"
 #include "line_disp.h"
-#include "display_color.h"
+#include "display_color.cc"
 
 extern Modulo const* modulo;
 

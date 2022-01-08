@@ -13,7 +13,7 @@
 #include "fiber_disp.h"
 #include "line_disp.h"
 #include "point_disp.h"
-#include "display_color.h"
+#include "display_color.cc"
 
 /// Cliping planes permit nice junctions to be made between tubes, but are slow
 #define USE_CLIP_PLANES 0

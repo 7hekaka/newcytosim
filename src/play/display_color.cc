@@ -226,3 +226,4 @@ LOCAL void bodyColor(PointDisp const* disp, size_t s)
     }
 }
 
+#undef LOCAL

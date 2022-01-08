@@ -12,7 +12,6 @@
 #include "fiber_disp.h"
 #include "line_disp.h"
 #include "point_disp.h"
-//#include "display_color.h"
 #include "gym_flute.h"
 
 extern Modulo const* modulo;
