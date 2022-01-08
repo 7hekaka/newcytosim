@@ -30,7 +30,7 @@ static const w128_t sse2_param_mask = {{SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MS
  * @param c a 128-bit part of the interal state array
  * @param d a 128-bit part of the interal state array
  */
-inline static __m128i mm_recursion(__m128i x, __m128i y, __m128i z, __m128i v)
+static inline __m128i mm_recursion(__m128i x, __m128i y, __m128i z, __m128i v)
 {
     y = _mm_srli_epi32(y, SFMT_SR1);
     z = _mm_srli_si128(z, SFMT_SR2);

@@ -369,12 +369,12 @@ extern Random RNG;
  
  */
 
-inline static uint32_t lcrng1(uint32_t z) { return z * 2024337845U + 797082193U; }
+static inline uint32_t lcrng1(uint32_t z) { return z * 2024337845U + 797082193U; }
 
-inline static uint32_t lcrng2(uint32_t z) { return z * 279470273U + 4294967291U; }
+static inline uint32_t lcrng2(uint32_t z) { return z * 279470273U + 4294967291U; }
 
-inline static uint32_t lcrng3(uint32_t z) { return z * 1372383749U + 1289706101U; }
+static inline uint32_t lcrng3(uint32_t z) { return z * 1372383749U + 1289706101U; }
 
-inline static uint32_t lcrng4(uint32_t z) { return z * 1103515245U + 12345U; }
+static inline uint32_t lcrng4(uint32_t z) { return z * 1103515245U + 12345U; }
 
 #endif  //RANDOM_H

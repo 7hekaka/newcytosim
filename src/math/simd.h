@@ -4,6 +4,9 @@
 #ifndef SIMD_H
 #define SIMD_H
 
+// restrict functions to local scope
+#define LOCAL static inline
+
 //---------------------------------- SSE ---------------------------------------
 
 #if defined(__SSE3__)
@@ -16,93 +19,93 @@ typedef __m128d vec2;
 constexpr __m128d sgn11 = {-0.0, -0.0};
 
 // Attention: the second value returned by load1() is not set and will be garbage!
-inline static vec2 load1(double const* a)           { return _mm_load_sd(a); }
-inline static vec2 load1Z(double const* a)          { return _mm_loadl_pd(_mm_setzero_pd(), a); }
+LOCAL vec2 load1(double const* a)           { return _mm_load_sd(a); }
+LOCAL vec2 load1Z(double const* a)          { return _mm_loadl_pd(_mm_setzero_pd(), a); }
 
 // Attention: load2() does not initialize the upper AVX registers
-inline static vec2 load2(double const* a)           { return _mm_load_pd(a); }
+LOCAL vec2 load2(double const* a)           { return _mm_load_pd(a); }
 
 // unaligned load
-inline static vec2 loadu2(double const* a)          { return _mm_loadu_pd(a); }
+LOCAL vec2 loadu2(double const* a)          { return _mm_loadu_pd(a); }
 
 // load 1 double and duplicate
-inline static vec2 loaddup2(double const* a)        { return _mm_loaddup_pd(a); }
+LOCAL vec2 loaddup2(double const* a)        { return _mm_loaddup_pd(a); }
 
-inline static vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
-inline static vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
+LOCAL vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
+LOCAL vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
 
 // load 1 float and convert to double and zero
-inline static vec2 load1d(float const* a) { return _mm_cvtps_pd(_mm_load_ss(a)); }
+LOCAL vec2 load1d(float const* a) { return _mm_cvtps_pd(_mm_load_ss(a)); }
 // load 2 floats and convert to double
-inline static vec2 load2d(float const* a) { return _mm_cvtps_pd(_mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a))); }
+LOCAL vec2 load2d(float const* a) { return _mm_cvtps_pd(_mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a))); }
 
-inline static void store1(double* a, vec2 b)   { _mm_store_sd(a, b); }
-inline static void store2(double* a, vec2 b)   { _mm_store_pd(a, b); }
-inline static void storedup(double* a, vec2 b) { _mm_store1_pd(a, b); }
-inline static void storelo(double* a, vec2 b)  { _mm_store_sd(a, b); }
-inline static void storeu2(double* a, vec2 b)  { _mm_storeu_pd(a, b); }
+LOCAL void store1(double* a, vec2 b)   { _mm_store_sd(a, b); }
+LOCAL void store2(double* a, vec2 b)   { _mm_store_pd(a, b); }
+LOCAL void storedup(double* a, vec2 b) { _mm_store1_pd(a, b); }
+LOCAL void storelo(double* a, vec2 b)  { _mm_store_sd(a, b); }
+LOCAL void storeu2(double* a, vec2 b)  { _mm_storeu_pd(a, b); }
 
-inline static vec2 duplo2(vec2 a)            { return _mm_movedup_pd(a); }
-inline static vec2 duphi2(vec2 a)            { return _mm_shuffle_pd(a, a, 0b11); }
+LOCAL vec2 duplo2(vec2 a)            { return _mm_movedup_pd(a); }
+LOCAL vec2 duphi2(vec2 a)            { return _mm_shuffle_pd(a, a, 0b11); }
 
-inline static vec2 mul1(vec2 a, vec2 b)      { return _mm_mul_sd(a,b); }
-inline static vec2 div1(vec2 a, vec2 b)      { return _mm_div_sd(a,b); }
-inline static vec2 add1(vec2 a, vec2 b)      { return _mm_add_sd(a,b); }
-inline static vec2 sub1(vec2 a, vec2 b)      { return _mm_sub_sd(a,b); }
+LOCAL vec2 mul1(vec2 a, vec2 b)      { return _mm_mul_sd(a,b); }
+LOCAL vec2 div1(vec2 a, vec2 b)      { return _mm_div_sd(a,b); }
+LOCAL vec2 add1(vec2 a, vec2 b)      { return _mm_add_sd(a,b); }
+LOCAL vec2 sub1(vec2 a, vec2 b)      { return _mm_sub_sd(a,b); }
 
-inline static vec2 mul2(vec2 a, vec2 b)      { return _mm_mul_pd(a,b); }
-inline static vec2 div2(vec2 a, vec2 b)      { return _mm_div_pd(a,b); }
-inline static vec2 add2(vec2 a, vec2 b)      { return _mm_add_pd(a,b); }
-inline static vec2 sub2(vec2 a, vec2 b)      { return _mm_sub_pd(a,b); }
-inline static vec2 hadd2(vec2 a, vec2 b)     { return _mm_hadd_pd(a,b); }
+LOCAL vec2 mul2(vec2 a, vec2 b)      { return _mm_mul_pd(a,b); }
+LOCAL vec2 div2(vec2 a, vec2 b)      { return _mm_div_pd(a,b); }
+LOCAL vec2 add2(vec2 a, vec2 b)      { return _mm_add_pd(a,b); }
+LOCAL vec2 sub2(vec2 a, vec2 b)      { return _mm_sub_pd(a,b); }
+LOCAL vec2 hadd2(vec2 a, vec2 b)     { return _mm_hadd_pd(a,b); }
 
-inline static vec2 sqrt2(vec2 a)             { return _mm_sqrt_pd(a); }
-inline static vec2 max2(vec2 a, vec2 b)      { return _mm_max_pd(a,b); }
-inline static vec2 min2(vec2 a, vec2 b)      { return _mm_min_pd(a,b); }
-inline static vec2 and2(vec2 a, vec2 b)      { return _mm_and_pd(a,b); }
-inline static vec2 andnot2(vec2 a, vec2 b)   { return _mm_andnot_pd(a,b); }
-inline static vec2 abs2(vec2 a)              { return _mm_andnot_pd(sgn11, a); }
-inline static vec2 flipsign2(vec2 a)         { return _mm_xor_pd(a, sgn11); }
+LOCAL vec2 sqrt2(vec2 a)             { return _mm_sqrt_pd(a); }
+LOCAL vec2 max2(vec2 a, vec2 b)      { return _mm_max_pd(a,b); }
+LOCAL vec2 min2(vec2 a, vec2 b)      { return _mm_min_pd(a,b); }
+LOCAL vec2 and2(vec2 a, vec2 b)      { return _mm_and_pd(a,b); }
+LOCAL vec2 andnot2(vec2 a, vec2 b)   { return _mm_andnot_pd(a,b); }
+LOCAL vec2 abs2(vec2 a)              { return _mm_andnot_pd(sgn11, a); }
+LOCAL vec2 flipsign2(vec2 a)         { return _mm_xor_pd(a, sgn11); }
 
-inline static vec2 setr2(double a, double b) { return _mm_setr_pd(a,b); }
-inline static vec2 set2(double a, double b)  { return _mm_set_pd(a, b); }
-inline static vec2 set2(double a)            { return _mm_set1_pd(a); }
-inline static vec2 setzero2()                { return _mm_setzero_pd(); }
+LOCAL vec2 setr2(double a, double b) { return _mm_setr_pd(a,b); }
+LOCAL vec2 set2(double a, double b)  { return _mm_set_pd(a, b); }
+LOCAL vec2 set2(double a)            { return _mm_set1_pd(a); }
+LOCAL vec2 setzero2()                { return _mm_setzero_pd(); }
 
 /// return { a[0], b[0] }
-inline static vec2 unpacklo2(vec2 a, vec2 b) { return _mm_unpacklo_pd(a,b); }
+LOCAL vec2 unpacklo2(vec2 a, vec2 b) { return _mm_unpacklo_pd(a,b); }
 /// return { a[1], b[1] }
-inline static vec2 unpackhi2(vec2 a, vec2 b) { return _mm_unpackhi_pd(a,b); }
-inline static vec2 swap2(vec2 a)             { return _mm_shuffle_pd(a, a, 0b01); }
+LOCAL vec2 unpackhi2(vec2 a, vec2 b) { return _mm_unpackhi_pd(a,b); }
+LOCAL vec2 swap2(vec2 a)             { return _mm_shuffle_pd(a, a, 0b01); }
 
 /// concatenate and shift left, returning { BC } from a={ AB } b={ CD }
-inline static vec2 catshift(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b01); }
+LOCAL vec2 catshift(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b01); }
 
 #define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
 #define cmp2(a,b,k)       _mm_cmp_pd(a,b,k)
 
 /// returns the sum of the elements, broadcasted
-inline static vec2 esum2(vec2 v)
+LOCAL vec2 esum2(vec2 v)
 {
     return add2(v, swap2(v));
 }
 
 /// returns the dot product of two vectors, broadcasted
-inline static vec2 dot2(vec2 a, vec2 b)
+LOCAL vec2 dot2(vec2 a, vec2 b)
 {
     vec2 p = mul2(a, b);
     return add2(p, swap2(p));
 }
 
 /// square of vector norm, broadcasted
-inline static vec2 normsqr2(vec2 vec)
+LOCAL vec2 normsqr2(vec2 vec)
 {
     vec2 p = mul2(vec, vec);
     return add2(p, swap2(p));
 }
 
 /// normalize vector
-inline static vec2 normalize2(vec2 vec)
+LOCAL vec2 normalize2(vec2 vec)
 {
     vec2 p = mul2(vec, vec);
     vec2 s = add2(p, swap2(p));
@@ -110,7 +113,7 @@ inline static vec2 normalize2(vec2 vec)
 }
 
 /// normalize vector to 'n'
-inline static vec2 normalize2(vec2 vec, double n)
+LOCAL vec2 normalize2(vec2 vec, double n)
 {
     vec2 p = mul2(vec, vec);
     vec2 s = add2(p, swap2(p));
@@ -124,15 +127,15 @@ inline static vec2 normalize2(vec2 vec, double n)
 #define blend2(a,b,k) _mm_blend_pd(a,b,k)
 
 /// blend to return { low = a[0], high = b[1] }
-inline static vec2 blend11(vec2 a, vec2 b) { return _mm_blend_pd(a, b, 0b10); }
+LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_blend_pd(a, b, 0b10); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
-inline static vec2 sign_select2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(pos, neg, val); }
+LOCAL vec2 sign_select2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(pos, neg, val); }
 
 #elif defined(__SSE3__)
 
 /// return { a[0], b[1] }
-inline static vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
+LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
 
 #endif
 
@@ -148,101 +151,101 @@ typedef __m256d vec4;
 constexpr __m256d sgn1111 = {-0.0, -0.0, -0.0, -0.0};
 
 
-inline static vec4 setr4(double a, double b, double c, double d) { return _mm256_setr_pd(a,b,c,d); }
-inline static vec4 set4(double a, double b, double c, double d)  { return _mm256_set_pd(a,b,c,d); }
+LOCAL vec4 setr4(double a, double b, double c, double d) { return _mm256_setr_pd(a,b,c,d); }
+LOCAL vec4 set4(double a, double b, double c, double d)  { return _mm256_set_pd(a,b,c,d); }
 
-inline static vec4 set4(double a)               { return _mm256_set1_pd(a); }
-inline static vec4 setzero4()                   { return _mm256_setzero_pd(); }
+LOCAL vec4 set4(double a)               { return _mm256_set1_pd(a); }
+LOCAL vec4 setzero4()                   { return _mm256_setzero_pd(); }
 
-inline static vec4 cast4(vec2 a)                { return _mm256_castpd128_pd256(a); }
-inline static vec2 cast2(vec4 a)                { return _mm256_castpd256_pd128(a); }
+LOCAL vec4 cast4(vec2 a)                { return _mm256_castpd128_pd256(a); }
+LOCAL vec2 cast2(vec4 a)                { return _mm256_castpd256_pd128(a); }
 
-inline static vec4 load4(double const* a)       { return _mm256_load_pd(a); }
-inline static vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
+LOCAL vec4 load4(double const* a)       { return _mm256_load_pd(a); }
+LOCAL vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
 /// unaligned load 2 values, and zeros out the upper two
-inline static vec4 load2Z(double const* a)      { return _mm256_blend_pd(_mm256_castpd128_pd256(_mm_load_pd(a)), _mm256_setzero_pd(), 0b1100); }
+LOCAL vec4 load2Z(double const* a)      { return _mm256_blend_pd(_mm256_castpd128_pd256(_mm_load_pd(a)), _mm256_setzero_pd(), 0b1100); }
 
 /// unaligned load 3 values, and zeros out the upper one
-inline static vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
+LOCAL vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }
 
 /// unaligned load 2 values, allowing for undefined value in upper positions
-inline static vec4 load2crap(double const* a)   { return _mm256_castpd128_pd256(_mm_load_pd(a)); }
+LOCAL vec4 load2crap(double const* a)   { return _mm256_castpd128_pd256(_mm_load_pd(a)); }
 
-//inline static void store1(double* a, vec4 b)    { _mm_store_sd(a, cast2(b)); }
-//inline static void store2(double* a, vec4 b)    { _mm_store_pd(a, cast2(b)); }
-//inline static void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, cast2(b)); }
-inline static void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
-inline static void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
+//LOCAL void store1(double* a, vec4 b)    { _mm_store_sd(a, cast2(b)); }
+//LOCAL void store2(double* a, vec4 b)    { _mm_store_pd(a, cast2(b)); }
+//LOCAL void storeu2(double* a, vec4 b)   { _mm_storeu_pd(a, cast2(b)); }
+LOCAL void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
+LOCAL void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
 
 /// convert single and store them in double precision
-inline static void store4d(double* a, __m128 b)  { _mm256_store_pd(a, _mm256_cvtps_pd(b)); }
+LOCAL void store4d(double* a, __m128 b)  { _mm256_store_pd(a, _mm256_cvtps_pd(b)); }
 
-inline static __m256i makemask(long i)
+LOCAL __m256i makemask(long i)
 {
     constexpr __m256d ramp{0.5, 1.5, 2.5, 3.5};
     return _mm256_castpd_si256(_mm256_cmp_pd(ramp, _mm256_set1_pd((double)i), _CMP_LT_OQ));
 }
 
-inline static vec4 maskload4(double const* a, __m256i k)     { return _mm256_maskload_pd(a,k); }
-inline static void maskstore4(double* a, __m256i k, vec4 b)  { _mm256_maskstore_pd(a,k,b); }
+LOCAL vec4 maskload4(double const* a, __m256i k)     { return _mm256_maskload_pd(a,k); }
+LOCAL void maskstore4(double* a, __m256i k, vec4 b)  { _mm256_maskstore_pd(a,k,b); }
 
 /// load 1 double into all 4 positions
-inline static vec4 broadcast1(double const* a)  { return _mm256_broadcast_sd(a); }
+LOCAL vec4 broadcast1(double const* a)  { return _mm256_broadcast_sd(a); }
 /// load 2 doubles and duplicate: X, Y, X, Y
-inline static vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d const*)a); }
+LOCAL vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d const*)a); }
 
 /// return { A0, A1 }
-inline static vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
+LOCAL vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
 /// return { A2, A3 }
-inline static vec2 gethi(vec4 a)                { return _mm256_extractf128_pd(a,1); }
+LOCAL vec2 gethi(vec4 a)                { return _mm256_extractf128_pd(a,1); }
 /// concatenate two vec2 into a vec4
-inline static vec4 cat22(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
+LOCAL vec4 cat22(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
 
-inline static vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }
-inline static vec4 div4(vec4 a, vec4 b)         { return _mm256_div_pd(a,b); }
-inline static vec4 add4(vec4 a, vec4 b)         { return _mm256_add_pd(a,b); }
-inline static vec4 sub4(vec4 a, vec4 b)         { return _mm256_sub_pd(a,b); }
-inline static vec4 hadd4(vec4 a, vec4 b)        { return _mm256_hadd_pd(a,b); }
+LOCAL vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }
+LOCAL vec4 div4(vec4 a, vec4 b)         { return _mm256_div_pd(a,b); }
+LOCAL vec4 add4(vec4 a, vec4 b)         { return _mm256_add_pd(a,b); }
+LOCAL vec4 sub4(vec4 a, vec4 b)         { return _mm256_sub_pd(a,b); }
+LOCAL vec4 hadd4(vec4 a, vec4 b)        { return _mm256_hadd_pd(a,b); }
 
-inline static vec4 sqrt4(vec4 a)                { return _mm256_sqrt_pd(a); }
-inline static vec4 max4(vec4 a, vec4 b)         { return _mm256_max_pd(a,b); }
-inline static vec4 min4(vec4 a, vec4 b)         { return _mm256_min_pd(a,b); }
-inline static vec4 and4(vec4 a, vec4 b)         { return _mm256_and_pd(a,b); }
-inline static vec4 andnot4(vec4 a, vec4 b)      { return _mm256_andnot_pd(a,b); }
-inline static vec4 abs4(vec4 a)                 { return _mm256_andnot_pd(sgn1111, a); }
-inline static vec4 flipsign4(vec4 a)            { return _mm256_xor_pd(a, sgn1111); }
+LOCAL vec4 sqrt4(vec4 a)                { return _mm256_sqrt_pd(a); }
+LOCAL vec4 max4(vec4 a, vec4 b)         { return _mm256_max_pd(a,b); }
+LOCAL vec4 min4(vec4 a, vec4 b)         { return _mm256_min_pd(a,b); }
+LOCAL vec4 and4(vec4 a, vec4 b)         { return _mm256_and_pd(a,b); }
+LOCAL vec4 andnot4(vec4 a, vec4 b)      { return _mm256_andnot_pd(a,b); }
+LOCAL vec4 abs4(vec4 a)                 { return _mm256_andnot_pd(sgn1111, a); }
+LOCAL vec4 flipsign4(vec4 a)            { return _mm256_xor_pd(a, sgn1111); }
 
-inline static vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
-inline static vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
+LOCAL vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
+LOCAL vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
 
 /// returns { a[0], a[0], a[2], a[2] }
-inline static vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); } //_mm256_unpacklo_pd(a,a)
+LOCAL vec4 duplo4(vec4 a)               { return _mm256_movedup_pd(a); } //_mm256_unpacklo_pd(a,a)
 /// returns { a[1], a[1], a[3], a[3] }
-inline static vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_mm256_unpackhi_pd(a,a)
+LOCAL vec4 duphi4(vec4 a)               { return _mm256_permute_pd(a,15); } //_mm256_unpackhi_pd(a,a)
 
 /// copy a[0] into all elements of dst.
-inline static vec4 broadcastX(vec4 a) { return _mm256_movedup_pd(_mm256_permute2f128_pd(a, a, 0x00)); }
+LOCAL vec4 broadcastX(vec4 a) { return _mm256_movedup_pd(_mm256_permute2f128_pd(a, a, 0x00)); }
 
 /* Unused functions:
- inline static vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m128d(a,b); }
- inline static void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
+ LOCAL vec4 loadu22(double const* a, double const* b) { return _mm256_loadu2_m128d(a,b); }
+ LOCAL void store22(double* a, double* b, vec4 c) { return _mm256_storeu2_m128d(a,b,c); }
  */
 
 #define permute2f128(a,b,k) _mm256_permute2f128_pd(a,b,k)
 
 /// swap the two 128 bit lanes, return { a[2], a[3], a[0], a[1] }
-inline static vec4 swap2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x03); }
+LOCAL vec4 swap2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x03); }
 
 /// return { a[0], a[1], a[0], a[1] }
-inline static vec4 duplo2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x20); }
+LOCAL vec4 duplo2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x20); }
 /// return { a[2], a[3], a[2], a[3] }
-inline static vec4 duphi2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x31); }
+LOCAL vec4 duphi2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x31); }
 
 /// extract the lower 128 bit lanes, return { a[0], a[1], b[0], b[1] }
-inline static vec4 unpacklo2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x20); }
+LOCAL vec4 unpacklo2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x20); }
 /// extract the higher 128 bit lanes, return { a[2], a[3], b[2], b[3] }
-inline static vec4 unpackhi2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x31); }
+LOCAL vec4 unpackhi2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x31); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,k)       _mm256_permute_pd(a,k)
@@ -251,60 +254,60 @@ inline static vec4 unpackhi2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd
 #define cmp4(a,b,k)         _mm256_cmp_pd(a,b,k)
 
 /// return { a[0], a[1], a[2], b[3] }
-inline static vec4 blend31(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1000); }
+LOCAL vec4 blend31(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1000); }
 /// return { a[0], a[1], b[2], b[3] }
-inline static vec4 blend22(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1100); }
+LOCAL vec4 blend22(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1100); }
 /// return { a[0], b[1], b[2], b[3] }
-inline static vec4 blend13(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1110); }
+LOCAL vec4 blend13(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1110); }
 
 /// return { a[0], b[1], a[2], b[3] }
-inline static vec4 blend0101(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1010); }
+LOCAL vec4 blend0101(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1010); }
 /// return { a[0], b[1], b[2], a[3] }
-inline static vec4 blend0110(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b0110); }
+LOCAL vec4 blend0110(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b0110); }
 /// return { a[0], a[1], b[2], a[3] }
-inline static vec4 blend0010(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b0100); }
+LOCAL vec4 blend0010(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b0100); }
 /// return { b[0], b[1], a[2], b[3] }
-inline static vec4 blend1101(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1011); }
+LOCAL vec4 blend1101(vec4 a, vec4 b) { return _mm256_blend_pd(a,b,0b1011); }
 
 /// concatenate, making { ABCD } from a={ AB } b={ CD }
-inline static vec4 concatenate22(vec2 a, vec2 b) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(a),b,1); }
+LOCAL vec4 concatenate22(vec2 a, vec2 b) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(a),b,1); }
 
 /// concatenate and shift left by 1 steps, making { BCDE } from a={ ABCD } b={ EFGH }
-inline static vec4 catshift1(vec4 a, vec4 b) { return _mm256_shuffle_pd(a, _mm256_permute2f128_pd(a, b, 0x21), 0b0101); } // { CDEF }
+LOCAL vec4 catshift1(vec4 a, vec4 b) { return _mm256_shuffle_pd(a, _mm256_permute2f128_pd(a, b, 0x21), 0b0101); } // { CDEF }
 /// concatenate and shift left by 2 steps, making { CDEF } from a={ ABCD } b={ EFGH }
-inline static vec4 catshift2(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x21); }
+LOCAL vec4 catshift2(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x21); }
 /// concatenate and shift left by 3 steps, making { DEFG } from a={ ABCD } b={ EFGH }
-inline static vec4 catshift3(vec4 a, vec4 b) { return _mm256_shuffle_pd(_mm256_permute2f128_pd(a, b, 0x21), b, 0b0101); }
+LOCAL vec4 catshift3(vec4 a, vec4 b) { return _mm256_shuffle_pd(_mm256_permute2f128_pd(a, b, 0x21), b, 0b0101); }
 
 /// zero out last scalar
-inline static vec4 clear4th(vec4 a) { return _mm256_blend_pd(a,_mm256_setzero_pd(),0b1000); }
+LOCAL vec4 clear4th(vec4 a) { return _mm256_blend_pd(a,_mm256_setzero_pd(),0b1000); }
 
 /// load 4 single precision and convert to double precision
-inline static vec4 load4d(float const* a) { return _mm256_cvtps_pd(_mm_loadu_ps(a)); }
+LOCAL vec4 load4d(float const* a) { return _mm256_cvtps_pd(_mm_loadu_ps(a)); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
-inline static vec4 sign_select4(vec4 val, vec4 neg, vec4 pos) { return _mm256_blendv_pd(pos, neg, val); }
+LOCAL vec4 sign_select4(vec4 val, vec4 neg, vec4 pos) { return _mm256_blendv_pd(pos, neg, val); }
 
 #if 0
-  inline static vec4  load3(double const* a)    { return blend0010(load2Z(a)), broadcast1(a+2)); }
-  inline static void store3(double* a, vec4 b)  { storeu2(a, getlo(b)); store1(a+2, gethi(b)); }
+  LOCAL vec4  load3(double const* a)    { return blend0010(load2Z(a)), broadcast1(a+2)); }
+  LOCAL void store3(double* a, vec4 b)  { storeu2(a, getlo(b)); store1(a+2, gethi(b)); }
 #else
-  //inline static vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }
+  //LOCAL vec4  load3(double const* a)  { return _mm256_loadu_pd(a); }
   constexpr __m256i msk1110 = {-1, -1, -1, 0};  // -1 = all bits to 1
-  inline static vec4  load3(double const* a)    { return _mm256_maskload_pd(a, msk1110); }
-  inline static void store3(double* a, vec4 b)  { _mm256_maskstore_pd(a, msk1110, b); }
+  LOCAL vec4  load3(double const* a)    { return _mm256_maskload_pd(a, msk1110); }
+  LOCAL void store3(double* a, vec4 b)  { _mm256_maskstore_pd(a, msk1110, b); }
 #endif
 
 
 /// returns the sum of the elements, broadcasted
-inline static vec4 esum4(vec4 v)
+LOCAL vec4 esum4(vec4 v)
 {
     vec4 s = add4(v, swap2f128(v));
     return add4(s, permute4(s, 0b0101));
 }
 
 /// returns the dot product of two vectors, broadcasted
-inline static vec4 dot4(vec4 a, vec4 b)
+LOCAL vec4 dot4(vec4 a, vec4 b)
 {
     vec4 m = mul4(a, b);
     vec4 s = add4(m, swap2f128(m));
@@ -312,7 +315,7 @@ inline static vec4 dot4(vec4 a, vec4 b)
 }
 
 /// square of vector norm, broadcasted
-inline static vec4 normsqr4(vec4 vec)
+LOCAL vec4 normsqr4(vec4 vec)
 {
     vec4 m = mul4(vec, vec);
     vec4 s = add4(m, swap2f128(m));
@@ -320,7 +323,7 @@ inline static vec4 normsqr4(vec4 vec)
 }
 
 /// normalize vector
-inline static vec4 normalize4(vec4 vec)
+LOCAL vec4 normalize4(vec4 vec)
 {
     vec4 m = mul4(vec, vec);
     vec4 s = add4(m, swap2f128(m));
@@ -329,7 +332,7 @@ inline static vec4 normalize4(vec4 vec)
 }
 
 /// normalize vector to 'n'
-inline static vec4 normalize4(vec4 vec, double n)
+LOCAL vec4 normalize4(vec4 vec, double n)
 {
     vec4 m = mul4(vec, vec);
     vec4 s = add4(m, swap2f128(m));
@@ -346,16 +349,16 @@ inline static vec4 normalize4(vec4 vec, double n)
 #define permute4x64(a,k)    _mm256_permute4x64_pd(a,k)
 
 /// return { X X Y Y } from { X Y }
-inline static vec4 interleave2(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 0x50); }
+LOCAL vec4 interleave2(vec2 a) { return _mm256_permute4x64_pd(cast4(a), 0x50); }
 /// return { X X Y Y } from { X Y - - }
-inline static vec4 interleave4(vec4 a) { return _mm256_permute4x64_pd(a, 0x50); }
+LOCAL vec4 interleave4(vec4 a) { return _mm256_permute4x64_pd(a, 0x50); }
 
 /// copy a[0] into all elements of dst.
-inline static vec4 broadcastX(vec2 a)  { return _mm256_broadcastsd_pd(a); }
+LOCAL vec4 broadcastX(vec2 a)  { return _mm256_broadcastsd_pd(a); }
 
 
 /// cross product of two 3D vectors ( X Y Z T )
-inline static vec4 cross4(vec4 a, vec4 b)
+LOCAL vec4 cross4(vec4 a, vec4 b)
 {
     vec4 a1 = permute4x64(a, 0xC9); // Y Z X T
     vec4 b1 = permute4x64(b, 0xC9); // Y Z X T
@@ -367,50 +370,52 @@ inline static vec4 cross4(vec4 a, vec4 b)
 }
 
 // Non-temporal load: an aligned load intruction that bypasses the cache.
-inline static vec4 streamload4(double const* a) { return _mm256_castsi256_pd(_mm256_stream_load_si256((__m256i const*)a)); }
-//inline static vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
+LOCAL vec4 streamload4(double const* a) { return _mm256_castsi256_pd(_mm256_stream_load_si256((__m256i const*)a)); }
+//LOCAL vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
 #elif defined(__AVX__)
 
-inline static vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
+LOCAL vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 
 /// return { X X Y Y } from { X Y }
-inline static vec4 interleave2(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
+LOCAL vec4 interleave2(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
 /// return { X X Y Y } from { X Y - - }
-inline static vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
+LOCAL vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
 
 #endif
 
 //----------------------------------- FMA --------------------------------------
 
 #if defined(__FMA__)
-inline static vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_sd(a,b,c); }  // a * b + c
-inline static vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_fmsub_sd(a,b,c); }  // a * b - c
-inline static vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_sd(a,b,c); } // c - a * b
+LOCAL vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_sd(a,b,c); }  // a * b + c
+LOCAL vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_fmsub_sd(a,b,c); }  // a * b - c
+LOCAL vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_sd(a,b,c); } // c - a * b
 
-inline static vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_pd(a,b,c); }
-inline static vec2 fmsub2(vec2 a, vec2 b, vec2 c)  { return _mm_fmsub_pd(a,b,c); }
-inline static vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_pd(a,b,c); }
+LOCAL vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_pd(a,b,c); }
+LOCAL vec2 fmsub2(vec2 a, vec2 b, vec2 c)  { return _mm_fmsub_pd(a,b,c); }
+LOCAL vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_pd(a,b,c); }
 
-inline static vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_fmadd_pd(a,b,c); }
-inline static vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_fmsub_pd(a,b,c); }
-inline static vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_fnmadd_pd(a,b,c); }
+LOCAL vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_fmadd_pd(a,b,c); }
+LOCAL vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_fmsub_pd(a,b,c); }
+LOCAL vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_fnmadd_pd(a,b,c); }
 #else
 // erzatz functions
 #  if defined(__SSE3__)
-inline static vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_add_sd(_mm_mul_sd(a,b), c); }
-inline static vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_sub_sd(_mm_mul_sd(a,b), c); }
-inline static vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_sub_sd(c, _mm_mul_sd(a,b)); }
+LOCAL vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_add_sd(_mm_mul_sd(a,b), c); }
+LOCAL vec2 fmsub1(vec2 a, vec2 b, vec2 c)  { return _mm_sub_sd(_mm_mul_sd(a,b), c); }
+LOCAL vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_sub_sd(c, _mm_mul_sd(a,b)); }
 
-inline static vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_add_pd(_mm_mul_pd(a,b), c); }
-inline static vec2 fmsub2(vec2 a, vec2 b, vec2 c)  { return _mm_sub_pd(_mm_mul_pd(a,b), c); }
-inline static vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_sub_pd(c, _mm_mul_pd(a,b)); }
+LOCAL vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_add_pd(_mm_mul_pd(a,b), c); }
+LOCAL vec2 fmsub2(vec2 a, vec2 b, vec2 c)  { return _mm_sub_pd(_mm_mul_pd(a,b), c); }
+LOCAL vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_sub_pd(c, _mm_mul_pd(a,b)); }
 #  endif
 #  if defined(__AVX__)
-inline static vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_add_pd(_mm256_mul_pd(a,b), c); }
-inline static vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_sub_pd(_mm256_mul_pd(a,b), c); }
-inline static vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_sub_pd(c, _mm256_mul_pd(a,b)); }
+LOCAL vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_add_pd(_mm256_mul_pd(a,b), c); }
+LOCAL vec4 fmsub4(vec4 a, vec4 b, vec4 c)  { return _mm256_sub_pd(_mm256_mul_pd(a,b), c); }
+LOCAL vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_sub_pd(c, _mm256_mul_pd(a,b)); }
 #  endif
 #endif
+
+#undef LOCAL
 
 #endif // SIMD_H

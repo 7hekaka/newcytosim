@@ -124,42 +124,42 @@ static Vector interpolateX(const real vec[], const size_t i0, real f0, size_t i1
     return f0 * P0 + f1 * P1;
 }
 
-inline static Vector position_delta(Mecapoint const& A, Mecapoint const& B)
+static inline Vector position_delta(Mecapoint const& A, Mecapoint const& B)
 {
     return B.pos() - A.pos();
 }
 
-inline static Vector position_delta(Mecapoint const& A, Interpolation const& B)
+static inline Vector position_delta(Mecapoint const& A, Interpolation const& B)
 {
     return B.pos() - A.pos();
 }
 
-inline static Vector position_delta(Interpolation const& A, Mecapoint const& B)
+static inline Vector position_delta(Interpolation const& A, Mecapoint const& B)
 {
     return B.pos() - A.pos();
 }
 
-inline static Vector position_delta(Interpolation const& A, Interpolation const& B)
+static inline Vector position_delta(Interpolation const& A, Interpolation const& B)
 {
     return B.pos() - A.pos();
 }
 
-inline static Vector modulo_offset(Mecapoint const& A, Mecapoint const& B)
+static inline Vector modulo_offset(Mecapoint const& A, Mecapoint const& B)
 {
     return modulo->offset(position_delta(A, B));
 }
 
-inline static Vector modulo_offset(Mecapoint const& A, Interpolation const& B)
+static inline Vector modulo_offset(Mecapoint const& A, Interpolation const& B)
 {
     return modulo->offset(position_delta(A, B));
 }
 
-inline static Vector modulo_offset(Interpolation const& A, Mecapoint const& B)
+static inline Vector modulo_offset(Interpolation const& A, Mecapoint const& B)
 {
     return modulo->offset(position_delta(A, B));
 }
 
-inline static Vector modulo_offset(Interpolation const& A, Interpolation const& B)
+static inline Vector modulo_offset(Interpolation const& A, Interpolation const& B)
 {
     return modulo->offset(position_delta(A, B));
 }

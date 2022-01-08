@@ -1,9 +1,12 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
+// restrict functions to local scope
+#define LOCAL static inline
+
 //------------------------------------------------------------------------------
 #pragma mark - Color schemes for Fibers
 
-static inline real color_scale(Fiber const* fib, int style)
+LOCAL real color_scale(Fiber const* fib, int style)
 {
     switch ( style )
     {
@@ -20,18 +23,18 @@ static inline real color_scale(Fiber const* fib, int style)
     return 1;
 }
 
-static inline gle_color color_fiber(Fiber const& fib, size_t)
+LOCAL gle_color color_fiber(Fiber const& fib, size_t)
 {
     return fib.disp->color;
 }
 
-static inline gle_color color_by_tension(Fiber const& fib, size_t seg)
+LOCAL gle_color color_by_tension(Fiber const& fib, size_t seg)
 {
     real x = fib.disp->color_scale * fib.tension(seg);
     return fib.disp->color.alpha(x);
 }
 
-static inline gle_color color_by_tension_jet(Fiber const& fib, size_t seg)
+LOCAL gle_color color_by_tension_jet(Fiber const& fib, size_t seg)
 {
     real x = fib.disp->color_scale * fib.tension(seg);
     // use jet coloring, where Lagrange multipliers are negative under compression
@@ -39,26 +42,26 @@ static inline gle_color color_by_tension_jet(Fiber const& fib, size_t seg)
     //return fib.disp->color.alpha(x-1);
 }
 
-static inline gle_color color_by_curvature(Fiber const& fib, size_t pti)
+LOCAL gle_color color_by_curvature(Fiber const& fib, size_t pti)
 {
     real beta = fib.disp->color_scale;
     return gle_color::jet_color(beta*fib.curvature(pti));
 }
 
-static inline gle_color color_seg_curvature(Fiber const& fib, size_t seg)
+LOCAL gle_color color_seg_curvature(Fiber const& fib, size_t seg)
 {
     real beta = fib.disp->color_scale;
     real c = 0.5 * (fib.curvature(seg) + fib.curvature(seg+1));
     return gle_color::jet_color(beta*c);
 }
 
-static inline gle_color color_by_direction(Fiber const& fib, size_t seg)
+LOCAL gle_color color_by_direction(Fiber const& fib, size_t seg)
 {
     return gle::radial_color(fib.dirSegment(seg));
 }
 
 /// using distance from the minus end to the start of segment `seg`
-static inline gle_color color_by_distanceM(Fiber const& fib, real pti)
+LOCAL gle_color color_by_distanceM(Fiber const& fib, real pti)
 {
     real beta = fib.disp->color_scale;
     real x = std::min(pti*beta, (real)32.0);
@@ -66,7 +69,7 @@ static inline gle_color color_by_distanceM(Fiber const& fib, real pti)
 }
 
 /// using the distance from the plus end to vertex `pti`
-static inline gle_color color_by_distanceP(Fiber const& fib, real pti)
+LOCAL gle_color color_by_distanceP(Fiber const& fib, real pti)
 {
     real beta = fib.disp->color_scale;
     // using the distance at the vertex
@@ -75,7 +78,7 @@ static inline gle_color color_by_distanceP(Fiber const& fib, real pti)
 }
 
 /// using distance from the plus end to the end of segment `seg`
-static inline gle_color color_by_abscissaM(Fiber const& fib, size_t seg)
+LOCAL gle_color color_by_abscissaM(Fiber const& fib, size_t seg)
 {
     real beta = fib.disp->color_scale;
     real x = std::min(seg*beta, (real)32.0);
@@ -83,7 +86,7 @@ static inline gle_color color_by_abscissaM(Fiber const& fib, size_t seg)
 }
 
 /// using distance from the plus end to the end of segment `seg`
-static inline gle_color color_by_abscissaP(Fiber const& fib, size_t seg)
+LOCAL gle_color color_by_abscissaP(Fiber const& fib, size_t seg)
 {
     real beta = fib.disp->color_scale;
     real x = std::min((fib.lastSegment()-seg)*beta, (real)32.0);
@@ -91,7 +94,7 @@ static inline gle_color color_by_abscissaP(Fiber const& fib, size_t seg)
 }
 
 /// color set according to distance to the confining Space
-static inline gle_color color_by_height(Fiber const& fib, size_t pti)
+LOCAL gle_color color_by_height(Fiber const& fib, size_t pti)
 {
     real beta = fib.disp->color_scale;
     real Z = 0;
@@ -106,7 +109,7 @@ static inline gle_color color_by_height(Fiber const& fib, size_t pti)
 }
 
 /// color set according to steric grid
-static inline gle_color color_by_grid(Fiber const& fib, size_t seg)
+LOCAL gle_color color_by_grid(Fiber const& fib, size_t seg)
 {
     Map<DIM> const& map = fib.simul().locusGrid.map();
     Vector w = fib.posPoint(seg, 0.5);
@@ -118,7 +121,7 @@ static inline gle_color color_by_grid(Fiber const& fib, size_t seg)
 //------------------------------------------------------------------------------
 #pragma mark - Color schemes for Fiber Lattice
 
-static inline gle_color color_alternate(Fiber const& fib, long ix, real)
+LOCAL gle_color color_alternate(Fiber const& fib, long ix, real)
 {
     if ( ix & 1 )
         return fib.disp->color;
@@ -126,23 +129,23 @@ static inline gle_color color_alternate(Fiber const& fib, long ix, real)
         return fib.disp->color.darken(0.75);
 }
 
-static inline gle_color color_by_lattice(Fiber const& fib, long ix, real beta)
+LOCAL gle_color color_by_lattice(Fiber const& fib, long ix, real beta)
 {
     return fib.disp->color.darken(beta*fib.visibleLattice()->data(ix));
 }
 
-static inline gle_color color_by_lattice_jet(Fiber const& fib, long ix, real beta)
+LOCAL gle_color color_by_lattice_jet(Fiber const& fib, long ix, real beta)
 {
     return gle_color::jet_color(beta*fib.visibleLattice()->data(ix));
 }
 
-static inline gle_color color_by_lattice_striped(Fiber const& fib, long ix, real beta)
+LOCAL gle_color color_by_lattice_striped(Fiber const& fib, long ix, real beta)
 {
     real x = beta * fib.visibleLattice()->data(ix);
     return gle_color::jet_color(x).lighten(0.9375 + ( ix & 1 ) * 0.125);
 }
 
-static inline gle_color lattice_color(gle_color const& col, real val)
+LOCAL gle_color lattice_color(gle_color const& col, real val)
 {
     return col.darken(val);
     //return gle_color::jet_color(val);
@@ -173,7 +176,7 @@ gle_color bodyColorF(T const& obj)
  if `coloring` is enabled, this loads the N-th bright color,
  otherwise load the object's display color
  */
-static inline gle_color bodyColorF(PointDisp const* disp, size_t s)
+LOCAL gle_color bodyColorF(PointDisp const* disp, size_t s)
 {
     if ( disp->coloring )
         return gle::bright_color(s).match_a(disp->color);
@@ -208,7 +211,7 @@ void bodyColor(T const& obj)
  if `coloring` is enabled, this loads the N-th bright color,
  otherwise load the object's display color
  */
-static inline void bodyColor(PointDisp const* disp, size_t s)
+LOCAL void bodyColor(PointDisp const* disp, size_t s)
 {
     if ( disp->coloring )
     {

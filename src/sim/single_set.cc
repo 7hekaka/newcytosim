@@ -22,7 +22,7 @@ void SingleSet::prepare(PropertyList const& properties)
 
 /// templated member function pointer...
 template < void (Single::*FUNC)() >
-inline static void step_singles(Single * obj)
+static inline void step_singles(Single * obj)
 {
     while ( obj )
     {
@@ -35,7 +35,7 @@ inline static void step_singles(Single * obj)
 
 /// templated member function pointer...
 template < void (Single::*FUNC)() >
-inline static void step_singles(Single * obj, bool odd)
+static inline void step_singles(Single * obj, bool odd)
 {
     Single * nxt;
     if ( odd )

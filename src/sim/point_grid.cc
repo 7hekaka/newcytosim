@@ -398,14 +398,14 @@ void PointGrid::checkLL(Meca& meca, Stiffness const& pam,
  */
 
 /// excluding two spheres when they are from the same Solid
-inline static bool not_adjacent(FatPoint const* a, FatPoint const* b)
+static inline bool not_adjacent(FatPoint const* a, FatPoint const* b)
 {
     return a->pnt_.mecable() != b->pnt_.mecable();
 }
 
 
 /// excluding Fiber and Solid from the same Aster
-inline static bool not_adjacent(FatPoint const* a, FatLocus const* b)
+static inline bool not_adjacent(FatPoint const* a, FatLocus const* b)
 {
     //a->pnt_.mecable()->Buddy::print(std::clog);
     //b->seg_.fiber()->Buddy::print(std::clog);
@@ -414,7 +414,7 @@ inline static bool not_adjacent(FatPoint const* a, FatLocus const* b)
 
 
 /// excluding segments that are adjacent on the same fiber, or protofilaments from Tubule
-inline static bool not_adjacent(FatLocus const* a, FatLocus const* b)
+static inline bool not_adjacent(FatLocus const* a, FatLocus const* b)
 {
 #if FIBER_HAS_FAMILY
     return (( a->seg_.fiber()->family_ != b->seg_.fiber()->family_ )

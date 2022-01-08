@@ -384,14 +384,14 @@ void LocusGrid::checkLL(Meca& meca, real stiff,
  */
 
 /// excluding two spheres when they are from the same Solid
-inline static bool not_adjacentPP(BigPoint const& a, BigPoint const& b)
+static inline bool not_adjacentPP(BigPoint const& a, BigPoint const& b)
 {
     return a.obj_ != b.obj_;
 }
 
 
 /// excluding Fiber and Solid from the same Aster
-inline static bool not_adjacentPL(BigPoint const& a, BigLocus const& b)
+static inline bool not_adjacentPL(BigPoint const& a, BigLocus const& b)
 {
     //a->mec_->Buddy::print(std::clog);
     //b->obj_->Buddy::print(std::clog);
@@ -400,7 +400,7 @@ inline static bool not_adjacentPL(BigPoint const& a, BigLocus const& b)
 
 
 /// excluding segments that are adjacent on the same fiber, or protofilaments from Tubule
-inline static bool not_adjacentLL(BigLocus const& a, BigLocus const& b)
+static inline bool not_adjacentLL(BigLocus const& a, BigLocus const& b)
 {
 #if FIBER_HAS_FAMILY
     Fiber const* fibA = static_cast<Fiber const*>(a.obj_);

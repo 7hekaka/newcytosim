@@ -819,7 +819,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y,
 
 #if defined(__SSE3__) && REAL_IS_DOUBLE
 
-inline static void multiply2(const double* X, double* Y, size_t ii,
+static inline void multiply2(const double* X, double* Y, size_t ii,
                       const double* val, vec2 const& xx, vec2& ss)
 {
     vec2 aa = loaddup2(val);
@@ -965,7 +965,7 @@ Accumulation is done here in the higher part of 'ss'
 The high position of 'xx' is not used
 The low position of 'ss' is used locally
 */
-inline static void multiply4(const double* X, double* Y, size_t ii,
+static inline void multiply4(const double* X, double* Y, size_t ii,
                       const double* val, vec4 const& xx, vec4& ss)
 {
     vec4 x = blend22(xx, broadcast2(X+ii));  // hi <- X , lo <- xx

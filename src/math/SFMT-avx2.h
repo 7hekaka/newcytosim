@@ -81,7 +81,7 @@ static const w256_t avx2_param_mask = {{SFMT_MSK1, SFMT_MSK2, SFMT_MSK3, SFMT_MS
  * @param b double 128-bit part of the interal state array
  * @param c double 128-bit part of the interal state array
  */
-inline static __m256i mm256_recursion(__m256i a, __m256i y, __m256i c)
+static inline __m256i mm256_recursion(__m256i a, __m256i y, __m256i c)
 {
     __m256i x, z;
 

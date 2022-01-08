@@ -7,19 +7,19 @@ template <class T> void byteswap32(T) = delete;
 template <class T> void byteswap64(T) = delete;
 
 /// reverse byte order
-inline static uint16_t byteswap16(uint16_t i)
+static inline uint16_t byteswap16(uint16_t i)
 {
     return ( i & 0xff ) << 8 | ( i & 0xff00 ) >> 8;
 }
 
 /// reverse byte order
-inline static int16_t byteswap16(int16_t i)
+static inline int16_t byteswap16(int16_t i)
 {
     return (int16_t)byteswap16((uint16_t)i);
 }
 
 /// reverse byte order
-inline static uint32_t byteswap32(uint32_t i)
+static inline uint32_t byteswap32(uint32_t i)
 {
     return (i & 0xff) << 24 |
     (i & 0x0000ff00) << 8 |
@@ -28,13 +28,13 @@ inline static uint32_t byteswap32(uint32_t i)
 }
 
 /// reverse byte order
-inline static int32_t byteswap32(int32_t i)
+static inline int32_t byteswap32(int32_t i)
 {
     return (int32_t)byteswap32((uint32_t)i);
 }
 
 /// reverse byte order
-inline static uint64_t byteswap64(uint64_t i)
+static inline uint64_t byteswap64(uint64_t i)
 {
     return (i & 0xff) << 56 |
     (i & 0x000000000000ff00) << 40 |
@@ -47,14 +47,14 @@ inline static uint64_t byteswap64(uint64_t i)
 }
 
 /// reverse byte order of float
-inline static float byteswap32(float& x)
+static inline float byteswap32(float& x)
 {
     uint32_t i = byteswap32(reinterpret_cast<uint32_t&>(x));
     return reinterpret_cast<float&>(i);
 }
 
 /// reverse byte order of double
-inline static double byteswap64(double& x)
+static inline double byteswap64(double& x)
 {
     uint64_t i = byteswap64(reinterpret_cast<uint64_t&>(x));
     return reinterpret_cast<double&>(i);

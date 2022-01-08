@@ -148,7 +148,7 @@ protected:
 protected:
     
     /// return closest integer to `c` in the segment [ 0, s-1 ]
-    inline static size_t imagei_periodic(size_t s, long c)
+    static inline size_t imagei_periodic(size_t s, long c)
     {
         ///@todo use remainder() function for branchless code?
         while ( c <  0 ) c += s;
@@ -157,7 +157,7 @@ protected:
         return u;
     }
 
-    inline static size_t imagei_clamped(size_t s, long c)
+    static inline size_t imagei_clamped(size_t s, long c)
     {
         return std::min((size_t)std::max(0L, c), s-1);
         //return c <= 0 ? 0 : ( c >= s ? s-1 : c );
@@ -176,7 +176,7 @@ protected:
 
 
     /// return f modulo s in [ 0, s-1 ]
-    inline static size_t imagef_periodic(size_t s, real f)
+    static inline size_t imagef_periodic(size_t s, real f)
     {
         while ( f <  0 )  f += (real)s;
         size_t u = (size_t) f;
@@ -184,7 +184,7 @@ protected:
         return u;
     }
 
-    inline static size_t imagef_clamped(size_t s, real f)
+    static inline size_t imagef_clamped(size_t s, real f)
     {
         if ( f > 0 )
         {

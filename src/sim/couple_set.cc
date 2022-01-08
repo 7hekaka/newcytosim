@@ -25,7 +25,7 @@ void CoupleSet::prepare(PropertyList const& properties)
 
 /// templated member function pointer...
 template < void (Couple::*FUNC)() >
-inline static void step_couples(Couple * obj)
+static inline void step_couples(Couple * obj)
 {
     while ( obj )
     {
@@ -38,7 +38,7 @@ inline static void step_couples(Couple * obj)
 
 /// templated member function pointer...
 template < void (Couple::*FUNC)() >
-inline static void step_couples(Couple * obj, bool odd)
+static inline void step_couples(Couple * obj, bool odd)
 {
     Couple * nxt;
     if ( odd )
