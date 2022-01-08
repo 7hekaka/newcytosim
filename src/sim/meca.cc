@@ -1425,7 +1425,7 @@ void Meca::computePreconditionner(int precond, int span)
 #pragma mark - Solve
 
 
-/// function to sort Mecables
+/// qsort function comparing number of points of Mecables
 static int compareMecables(const void * A, const void * B)
 {
     size_t a = (*static_cast<Mecable *const*>(A))->nbPoints();

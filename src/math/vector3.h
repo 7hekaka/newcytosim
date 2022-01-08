@@ -84,7 +84,7 @@ public:
     
     /// copy 1 coordinate from Vector1
     explicit Vector3(const Vector1&);
-
+    
     /// copy 2 coordinates from Vector2
     explicit Vector3(const Vector2&);
     

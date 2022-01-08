@@ -73,9 +73,7 @@ void HandList::detachAll()
     assert_true(haBack==nullptr);
 }
 
-/**
-Sort in ascending order
-*/
+/// qsort function comparing Hand::abscissa()
 static int compareAbscissa(const void* A, const void* B)
 {
     real a = (*static_cast<Hand *const*>(A))->abscissa();

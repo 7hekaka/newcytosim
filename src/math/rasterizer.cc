@@ -333,7 +333,7 @@ void Rasterizer::paintBox2D(void (*paint)(int, int, int, int, void*), void * arg
 #pragma mark - 3D
 
 
-/// function for qsort: compares the Z component of two points
+/// qsort function comparing the Z component of two points
 static int compareVertex3(const void * a, const void * b)
 {
     Rasterizer::FLOAT az = ((Rasterizer::Vertex3 const*)(a))->ZZ;

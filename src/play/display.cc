@@ -208,7 +208,7 @@ void Display::drawSimul(Simul const& sim)
 }
 
 
-/// function for qsort: compares the Z component of two points
+/// qsort function comparing the 4th component of two vectors
 static int compareVector4(const void * a, const void * b)
 {
     real az = ((Vector4 const*)(a))->TT;
@@ -2100,7 +2100,7 @@ void zObject::draw(Display const* disp) const
 }
 
 
-/// function to sort zObjects according to their position 'depth'
+/// qsort function comparing the zObjects::depth()
 static int compareZObject(const void * A, const void * B)
 {
     real a = static_cast<const zObject*>(A)->depth();

@@ -256,7 +256,7 @@ std::string FiberGrid::SegmentHit::toString() const
     return oss.str();
 }
     
-/// used to qsort segments according to distance
+/// qsort function comparing distance between segment and target
 static int compareSegments(const void * A, const void * B)
 {
     real a = static_cast<FiberGrid::SegmentHit const*>(A)->dis_;

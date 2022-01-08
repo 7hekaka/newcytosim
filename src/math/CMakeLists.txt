@@ -2,6 +2,7 @@ set(SOURCES_MATH
     vector1.cc
     vector2.cc
     vector3.cc
+    vector4.cc
     matrix11.cc
     matrix22.cc
     matrix33.cc

@@ -877,7 +877,7 @@ void Simul::reportFiber(std::ostream& out, Fiber const* fib) const
 }
 
     
-/// to sort in ascending order: return -1 if ( a < b ) and +1 if ( a > b )
+/// qsort function comparing length of Fibers
 static int compareFibers(Object const* A, Object const* B)
 {
     real a = static_cast<Fiber const*>(A)->length();
