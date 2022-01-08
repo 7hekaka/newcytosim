@@ -23,7 +23,6 @@ fts = 14
 add_fit = 1
 
 import sys, os, math, subprocess
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 #matplotlib.use('SVG')
@@ -52,9 +51,9 @@ def prune_values(time, data):
         i-=1
 
 
-def plot_size(time, data):
+def nice_plot(time, data):
     """
-        Plot size as a function of time
+        Plot surface as a function of time
     """
     fig = plt.figure(figsize=(5, 4))
     plt.plot(time, data, 'b-', linewidth=7)
@@ -63,9 +62,9 @@ def plot_size(time, data):
     plt.plot([min(time), max(time)], [h, h], 'k-', linewidth=1)
     # add exponential fit to data:
     if add_fit:
-        (A,B) = exponential_fit(zip(time, data))
+        (A, B) = exponential_fit(zip(time, data))
         fit = [ A*math.exp(B*t) for t in time ]
-        plt.plot(time, fit, 'g.', markersize=7)
+        plt.plot(time, fit, 'w.', markersize=7)
     #plt.xlim(0, 100)
     plt.ylim(0, min(data)+max(data))
     plt.xlabel('Time (s)', fontsize=fts)
@@ -74,7 +73,7 @@ def plot_size(time, data):
     fig.tight_layout()
 
 
-def plot_size_mini(time, size):
+def mini_plot(time, size):
     """
         Make small plot of size as a function of time
     """
@@ -118,7 +117,12 @@ def get_moment(file):
 
 
 def get_size(file):
+    """
+        Extract surface from moment variance
+    """
     T, M = get_moment(file)
+    if not T:
+        raise Exception("Could not find time information")
     S = [ 2*math.pi*x for x in M ]
     return T, S
 
@@ -134,7 +138,7 @@ def process(dirpath):
             subprocess.call(['reportN', 'fiber:moment'], stdout=open(filename, 'w'))
         with open(filename, 'r') as f:
             time, data = get_size(f)
-            plot_size(time, data)
+            nice_plot(time, data)
     if 0:
         filename = 'cross.txt'
         if not os.path.isfile(filename):

@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 #
-# Make a plot using matplotlib
+# A script to plot for project with Ronen Zaidel-Bar
 #
-# F. Nedelec, February 2016
-# Strasbourg, 16 December 2021
+# F. Nedelec, Strasbourg, 16.12.2021, 8.1.2022
 
 
 """
@@ -12,7 +11,7 @@
     
 Syntax:
     
-    plot_size.py DIRECTORY_PATH
+    plot_ronen.py DIRECTORY_PATH
     
 Description:
     
@@ -64,7 +63,7 @@ def fit_curve(time, data):
     return (A, -B)
 
 
-def plot_size(time, data):
+def nice_plot(time, data):
     """
         Plot size as a function of time
     """
@@ -74,14 +73,18 @@ def plot_size(time, data):
     h = data[0]
     plt.plot([min(time), max(time)], [h, h], 'k-', linewidth=1)
     #plt.xlim(0, 100)
-    plt.ylim(0, min(data)+max(data))
+    if add_fit:
+        (A, B) = exponential_fit(zip(time, data))
+        fit = [ A*math.exp(B*t) for t in time ]
+        plt.plot(time, fit, 'w.', markersize=7)
+    plt.ylim(0, 7)
     plt.xlabel('Time (s)', fontsize=fts)
-    plt.ylabel('Surface (um^2)', fontsize=fts)
+    plt.ylabel('Radius (um)', fontsize=fts)
     plt.title('Network size', fontsize=fts)
     fig.tight_layout()
 
 
-def plot_size_mini(time, size):
+def mini_plot(time, size):
     """
         Make small plot of size as a function of time
     """
@@ -115,7 +118,7 @@ def get_moment(file):
                 tim.append(T)
                 mom.append(M)
         elif len(s) == 9 and s[0].isalpha():
-            M = float(s[8])
+            M = float(s[8]) # sum of variances in X, Y, Z
         elif len(s) == 10 and s[1].isalpha():
             T = []
             M = []
@@ -124,24 +127,30 @@ def get_moment(file):
     return tim, mom
 
 
-def get_size(file):
+def get_radius(file):
+    """
+        Extract radius from moment variance
+    """
     T, M = get_moment(file)
-    S = [ 2*math.pi*x for x in M ]
-    return T, S
+    if not T:
+        raise Exception("Could not find time information")
+    R = [ math.sqrt(2*x) for x in M ]
+    #S = [ 2*math.pi*x for x in M ]
+    return T, R
 
 
-def process(dirpath):
+def process(dirpath, filename):
     """
         Process given directory
     """
     os.chdir(dirpath)
-    filename='mom.txt'
     if not os.path.isfile(filename):
-        subprocess.call(['reportN', 'fiber:moment'], stdout=open(filename, 'w'))
+        args = ['reportN', 'fiber:moment']
+        subprocess.call(args, stdout=open(filename, 'w'))
     with open(filename, 'r') as f:
-        time, data = get_size(f)
+        time, data = get_radius(f)
         if do_plot:
-            plot_size(time, data)
+            nice_plot(time, data)
             plt.savefig('size.png', dpi=150)
             #plt.show()
             plt.close()
@@ -150,10 +159,16 @@ def process(dirpath):
             results.append([dirpath, A, B])
 
 
-def print_results():
+def print_results(filename=''):
+    if filename:
+        file = open(filename, 'w')
+    else:
+        file = sys.stdout
     for i in results:
-        S = round(i[1]*math.exp(-12*i[2]))
-        print(i[0], S, i[2])
+        S = round(i[1]*math.exp(-5*i[2]), 3)
+        file.write("%s %f %f\n" % (i[0], S, i[2]))
+    if filename:
+        file.close()
 
 
 def read_results(filename):
@@ -170,6 +185,9 @@ def read_results(filename):
 
 
 def master_plot(data):
+    """
+        Read numeric data from file
+    """
     P, A, B = zip(*data)
     B1 = B[0:len(B)-1:2]
     B2 = B[1:len(B):2]
@@ -191,7 +209,7 @@ def master_plot(data):
 def main(args):
     paths = []
     files = []
-    
+    global results
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
@@ -205,12 +223,12 @@ def main(args):
         if files:
             results = read_results(files[0])
         else:
-            process('.')
+            process('.', 'mom.txt')
     else:
         cdir = os.getcwd()
         for p in paths:
             sys.stdout.write('- '*32+p+"\n")
-            process(p)
+            process(p, 'mom.txt')
             os.chdir(cdir)
     if do_plot:
         master_plot(results)

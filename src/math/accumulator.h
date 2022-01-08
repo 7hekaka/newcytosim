@@ -68,7 +68,6 @@ public:
     /// transform the second-order acumulators into variance
     void subtract_mean()
     {
-        //Remove the mean:
         avg[0] /= sum;
         var[0] = var[0]/(sum-1) - avg[0] * avg[0];
 #if ( DIM > 1 )

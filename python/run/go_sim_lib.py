@@ -57,7 +57,7 @@ def make_directory(root, n=0):
 
 
 def make_run_directory(root):
-    """create a directory to run the simulation"""
+    """create a temporary directory starting by `root`"""
     import tempfile
     if 'SLURM_JOB_ID' in os.environ or 'LSB_JOBID' in os.environ:
         try:
@@ -207,7 +207,7 @@ def run(exe, conf, name, args=[]):
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf);    
-    wdir = make_run_directory('R')
+    wdir = make_run_directory('_')
     os.chmod(wdir, 504)
     os.chdir(wdir)
     shutil.copyfile(conf, config_name)
