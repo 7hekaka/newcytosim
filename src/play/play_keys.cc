@@ -877,11 +877,11 @@ void processKey(unsigned char key)
             break;
 
         case 'r':
-            prop.toggleReport(0);
+            prop.toggleReport(altKeyDown);
             break;
             
         case 'R':
-            prop.toggleReport(1);
+            prop.toggleReport(-1);
             break;
 
         //------------------------- play / stop / reverse ----------------------

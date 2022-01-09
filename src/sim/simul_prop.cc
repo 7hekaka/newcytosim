@@ -65,15 +65,15 @@ void SimulProp::read(Glossary& glos)
         //throw InvalidParameter("dimensionality missmatch");
     }
     
-    glos.set(viscosity,         "viscosity");
+    glos.set(viscosity, "viscosity");
 #if NEW_CYTOPLASMIC_FLOW
-    glos.set(flow,              "flow");
+    glos.set(flow, "flow");
 #endif
 #if OLD_SPINDLE_FLUX
-    glos.set(flux_speed,        "flux_speed");
+    glos.set(flux_speed, "flux_speed");
 #endif
-    glos.set(time,              "time");
-    glos.set(time_step,         "time_step");
+    glos.set(time, "time");
+    glos.set(time_step, "time_step");
     
     real T = 0;
     if ( glos.set(T, "temperature" ) )
@@ -95,15 +95,15 @@ void SimulProp::read(Glossary& glos)
     glos.set(binding_grid_step, "binding_grid_step");
     
     // these parameters are not written:
-    glos.set(verbose,           "verbose");
+    glos.set(verbose, "verbose");
     
     // names of files and path:
-    glos.set(config_file,       "config");
-    glos.set(config_file,       ".cytosim"); // fullname extension
-    glos.set(config_file,       ".cym");
+    glos.set(config_file, "config");
+    glos.set(config_file, ".cytosim"); // fullname extension
+    glos.set(config_file, ".cym");
     
-    glos.set(property_file,     "property_file");
-    glos.set(property_file,     "property");
+    glos.set(property_file, "property_file");
+    glos.set(property_file, "property");
     
 #if BACKWARD_COMPATIBILITY < 100
     glos.set(system_file, "object_file", "trajectory");

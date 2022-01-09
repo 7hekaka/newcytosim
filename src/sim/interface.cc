@@ -1087,7 +1087,7 @@ void Interface::execute_report(std::string const& name, std::string const& what,
         out.rdbuf(ofs.rdbuf());
     }
     
-    if ( ver > 1 )
+    if ( ver > 0 )
         simul_.report_wrap(out, what, opt);
     else
     {

@@ -163,9 +163,10 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
     remove_plural(who);
     remove_plural(what);
 
-    int com = 1, split = false;
+    int com = 2, split = false;
     opt.peek(com, "verbose");
     opt.set(split, "split");
+    com = ( com > 1 );
     
     //std::clog << "report("<< what << "|" << who << ")\n";
     if ( isCategory(who) )

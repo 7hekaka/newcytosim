@@ -86,7 +86,7 @@ void PlayerProp::write_values(std::ostream& os) const
 
 //------------------------------------------------------------------------------
 
-std::string standardReport(unsigned inx)
+static std::string standardReport(unsigned inx)
 {
     switch( inx )
     {
@@ -100,36 +100,33 @@ std::string standardReport(unsigned inx)
         case 7: return "couple:configuration";
         case 8: return "platelet";
         case 9: return "space";
+        case 10: return "";
+        case 11: return "simul:inventory";
+        case 12: return "simul";
+        case 13: return "fiber:energy";
+        case 14: return "fiber:mesh,field";
+        case 15: return "fiber:lattice";
+        case 16: return "fiber:segment";
+        case 17: return "fiber:cluster{couple=1}";
+        case 18: return "fiber:age";
+        case 19: return "fiber:distribution";
     }
     return "";
 }
 
-std::string alternativeReport(unsigned inx)
+
+void PlayerProp::toggleReport(int alt)
 {
-    switch( inx )
+    if ( alt < 0 )
     {
-        case 0: return "";
-        case 1: return "simul:inventory";
-        case 2: return "simul";
-        case 3: return "fiber:energy";
-        case 4: return "fiber:mesh,field";
-        case 5: return "fiber:lattice";
-        case 6: return "fiber:segment";
-        case 7: return "fiber:cluster{couple=1}";
-        case 8: return "fiber:age";
-        case 9: return "fiber:distribution";
+        report_index = 0;
+        report = "";
     }
-    return "";
-}
-
-
-void PlayerProp::toggleReport(bool alt)
-{
-    report_index = ( report_index + 1 ) % 10;
-    
-    if ( alt )
-        report = alternativeReport(report_index);
     else
+    {
+        if ( alt && !report_index ) report_index = 10;
+        report_index = ( report_index + 1 ) % 20;
         report = standardReport(report_index);
+    }
 }
 

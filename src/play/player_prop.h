@@ -127,8 +127,8 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
     
-    /// change `report` to be one of `report?`
-    void toggleReport(bool alt);
+    /// change `report` that is display onscreen
+    void toggleReport(int alt);
 };
 
 
