@@ -2,7 +2,7 @@
 #
 # A script to submit jobs to the SLURM queuing system
 #
-# F. Nedelec, 10.2007 --- 9.02.2021
+# F. Nedelec, 10.2007 --- 9.02.2021, 10.01.2022
 # Adapted to SLURM at Cambridge on 29.01.2021
 
 """
@@ -96,9 +96,9 @@ def write_script(filename, cmd):
 
 #------------------------------------------------------------------------
 
-def job(cwd, conf, jarg):
+def job(path, conf, jarg):
     """return bash script that will run one simulation"""
-    cmd  = ['cd %s;' % cwd]
+    cmd  = ['cd %s;' % path]
     cmd += ['touch %s;' % conf]
     # the job will call go_sim.py once:
     cmd += ['go_sim.py %s %s;' % (jarg, conf)]
@@ -185,11 +185,11 @@ def main(args):
 
     print("    go_sim.py will run `%s' in %s" % (jarg, jdir))
 
-    jdup  = 1
-    jcnt  = 0
-    jname = ''
-    cwd   = os.getcwd()
-    todo  = os.path.join(jdir,'todo')
+    jdup = 1
+    jcnt = 0
+    jame = ''
+    wdir = os.getcwd()
+    todo = os.path.join(jdir,'todo')
     
     for arg in args:
         if os.path.isfile(arg):
@@ -200,9 +200,9 @@ def main(args):
                 jcnt += 1
                 conf = todo + '/config%04i.cym' % jcnt
                 shutil.copyfile(arg, conf)
-                jname = todo + '/R' + str(jcnt)
-                cmd = job(cwd, conf, jarg+' name=run%04i'%jcnt+' park='+jdir+'/save')
-                write_script(jname, cmd)
+                jame = todo + '/R' + str(jcnt)
+                cmd = job(wdir, conf, jarg+' name=run%04i'%jcnt+' park='+jdir+'/save')
+                write_script(jame, cmd)
         elif arg.isdigit():
             jdup = int(arg)
         else:
@@ -240,13 +240,13 @@ def main(args):
     if jcnt > 1:
         print("    submit.py created %i scripts in `%s'" % (jcnt, todo))
         cmd = array(jcnt)
-        # create script file:
-        name = jdir + '/job.bash';
-        write_script(name, cmd)
+        # create script file to run job array:
+        jame = jdir + '/job.bash';
+        write_script(jame, cmd)
         # make command to submit this script:
-        cmd = (submit, name)
+        cmd = (submit, jame)
     else:
-        cmd = sub(jname);
+        cmd = sub(jame);
     execute(cmd)
 
 

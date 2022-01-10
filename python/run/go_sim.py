@@ -58,8 +58,8 @@ except ImportError:
 
 
 #define output for error messages:
-err    = sys.stderr
-out    = sys.stdout
+err = sys.stderr
+out = sys.stdout
 
 njobs  = 1
 repeat = 1
@@ -86,7 +86,7 @@ def run(conf, name):
     try:
         (val, res) = go_sim_lib.run(exe, conf, name)
         if val == 0:
-            out.write("Completed run `%s` in %s\n" % (conf, res))
+            out.write("Completed run `%s` in %s; " % (conf, res))
         else:
             out.write("Failed run `%s` in %s with value %i\n" % (conf, res, val))
     except KeyboardInterrupt:
@@ -97,7 +97,6 @@ def run(conf, name):
             res = go_sim_lib.park_directory(res, park, name)
             with open(res+"/log.txt", "a") as f:
                 f.write("parked    %s\n" % time.asctime())
-            out.write("            ---> parked in %s\n" % res)
         except Exception as e:
             err.write("go_sim.py cannot move directory: %s\n" % repr(e))
 
