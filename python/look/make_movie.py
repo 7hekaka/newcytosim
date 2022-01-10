@@ -1,20 +1,13 @@
 #!/usr/bin/env python
 #
-# make_movie.py:
-# create QuickTime and MPEG movies for cytosim
+# make_movie.py creates MPEG4 movies for cytosim
 #
-# Copyright F. Nedelec, 2007 - 2020
+# Copyright F. Nedelec, 2007 - 2022
 #
 # To make MP4 Quicktime movies, you need to install ffmpeg:
 # http://www.ffmpeg.org
 # via Macports: sudo port install ffmpeg
 # via Brew: brew install ffmpeg
-#
-# To make PNG Quicktime movies, you need:
-# http://www.3am.pair.com/QTCoffee.html
-# and to encode with other codecs, you will need:
-# http://www.omino.com/sw/qt_tools/
-# 
 #
 # Note that given a set of images, one can assemble them directly with ffmpeg
 # Movie with a subjective quality (lower is better), use -crf X, with X in [0, 51]:
@@ -46,21 +39,18 @@ Procedure:
 Options are specified as 'option=value', without space around the '=' sign.
 Existing options and their values:
 
-    format    mp4, mov            movie file format (default = 'mp4')
-    codec     mpeg4, h264, h265   if format='mp4'   (default = 'h264')
-              png, h263, h264     if format='mov'   (default = 'png')
+    codec     mpeg4, h264, h265   movie codec (default = 'h264')
     rate      integer             images per second (default = 12)
     quality   integer (default=3) subjective quality for MPEG4: 1=great, 4=good
                                   data rate for Quicktime (eg. 64)
     
     cleanup   0 or 1 (default=1)  remove temporary files (default = 1)
-    lazy      0 or 1 (default=1)  bail out if output file exists
+    lazy      0 or 1 (default=1)  bail out if output file already exists
 
 Examples:
 
-    make_movie.py 'play window_size=512,256' format=mp4 run*
-    make_movie.py '~/bin/play3 zoom=2' format=mp4 run*
-    make_movie.py images format=mov
+    make_movie.py 'play window_size=512,256' run*
+    make_movie.py '~/bin/play3 zoom=2' run*
     make_movie.py imgs codec=265
 
 History:
@@ -68,7 +58,7 @@ History:
     Improved by Beat Rupp, March 2010
     Revised on March 19 2011 and Sept-Nov 2012 by F. Nedelec.
     F. Nedelec, 10.2013: images are created in sub-directories
-    F. Nedelec, 12.2013, 9.2014, 04.2016, 15.03.2020
+    F. Nedelec, 12.2013, 9.2014, 04.2016, 15.03.2020, 10.01.2022
     
     https://ffmpeg.org/ffmpeg.html
 """
@@ -83,14 +73,13 @@ def executable(arg):
     return os.path.isfile(arg) and os.access(arg, os.X_OK)
 
 # some parameters:
-executable = []
-source_dir = ''
-format     = 'mp4'
-codec      = 'h264'
-rate       = 12
-lazy       = 1
-cleanup    = True
-quality    = '3'
+tool    = []
+codec   = 'h264'
+rate    = 12
+lazy    = 1
+cleanup = True
+quality = '3'
+tmp_dir = 'tmp'
 
 prefix = 'make_movie.py:  '
 err = sys.stderr
@@ -115,20 +104,18 @@ def copyFiles(files, dir):
 
 #-------------------------------------------------------------------------------
 
-def makeImages(image_format):
+def makeImages(format):
     """
-        call executable to generate images in sub-directory
+        call `tool` to generate images in temporary directory
     """
-    if not executable or not os.access(executable[0], os.X_OK):
-        raise IOError("no executable set to make images")
-    val = subprocess.call(executable + ['movie', 'image_dir='+image_dir, 'image_format='+image_format], stderr=None)
+    val = subprocess.call(tool + ['movie', 'image_dir='+tmp_dir, 'image_format='+format], stderr=None)
     if val:
-        raise IOError("`%s' failed with value %i\n" % (executable[0], val))
+        raise IOError("`%s' failed with value %i\n" % (tool[0], val))
 
 
-def makeImagesUnzip(image_format, src='objects.cmo'):
+def makeImagesUnzip(format, src='objects.cmo'):
     """
-        unzip cytosim's input if necessary to make the images
+        unzip cytosim's input if necessary to generate the images
     """
     tmp_file = ''
     if not os.path.isfile(src):
@@ -140,26 +127,28 @@ def makeImagesUnzip(image_format, src='objects.cmo'):
             tmp_file = ''
     if not os.path.isfile(src):
         raise IOError("file '%s' not found!\n" % src)
-    makeImages(image_format)
+    makeImages(format)
     if tmp_file:
         os.remove(tmp_file)
 
 
-def getImages(image_format):
+def getImages(path, format):
     """
-        Get images in source directory, of call makeImage() to generate them
+        Get images or call makeImage() to generate them
     """
-    if os.path.isdir(source_dir):
-        import glob
-        err.write(prefix+"using images in folder `%s'\n" % source_dir)
-        images = sorted(glob.glob(source_dir+'/*.'+image_format));
-        return copyFiles(images, image_dir)
+    if tool and os.access(tool[0], os.X_OK):
+        makeImagesUnzip(format)
+        images = [os.path.join(tmp_dir, s) for s in os.listdir(tmp_dir)]
     else:
-        makeImagesUnzip(image_format)
-        images = [os.path.join(image_dir, s) for s in os.listdir(image_dir)]
+        # search for images already made:
+        import glob
+        images = sorted(glob.glob('m*[0-9].'+format));
         if not images:
-            raise IOError("could not produce images!")
-        return copyFiles(images, image_dir)
+            images = sorted(glob.glob('i*[0-9].'+format));
+        err.write(prefix+" using %i images found in `%s'\n" % (len(images), path))
+    if not images:
+        raise IOError("could not produce images!")
+    return copyFiles(images, tmp_dir)
 
 
 def getImageSize(file):
@@ -179,141 +168,74 @@ def getImageSize(file):
 
 #-------------------------------------------------------------------------------
 
-
-def makeMovieMPEG(output):
+def makeMovie(path, filename):
     """
         create movie.mp4 from PNG or PPM files in the current directory
         This entirely relies on ffmpeg
     """
-    image_pat = image_dir+'/image%04d.png'
-    images = getImages('png')
+    pattern = tmp_dir+'/image%04d.png'
+    images = getImages(path, 'png')
     if not images:
         #print('looking for PPM images')
-        image_pat = image_dir+'/image%04d.ppm'
-        images = getImages(format)
+        pattern = tmp_dir+'/image%04d.ppm'
+        images = getImages(path, 'ppm')
     if not images:
         raise IOError("no suitable images found")
     # build arguments for 'ffmpeg':
-    args = ['ffmpeg', '-v', 'quiet', '-r', '%i'%rate, '-i', image_pat]
+    args = ['ffmpeg', '-v', 'quiet', '-r', '%i'%rate, '-i', pattern]
     if codec == 'h265':
         args.extend(['-vcodec', 'libx265', '-tag:v', 'hvc1'])
     elif codec == 'h264':
         args.extend(['-vcodec', 'libx264'])
     else:
         args.extend(['-vcodec', 'mpeg4'])
-    args.extend(['-pix_fmt', 'yuv420p', '-q:v', quality, output])
-    print(' '.join(args))
+    args.extend(['-pix_fmt', 'yuv420p', '-q:v', quality, filename])
+    print(prefix + ' '.join(args))
     val = subprocess.call(args) #, stdout=None,stderr=None)
     if val:
         raise IOError("`ffmpeg` failed with value %i\n  %s\n" % (val, ' '.join(args)))
-    return output
-
-
-def makeMovieMOV(output):
-    """
-        create movie.mov from PNG files in the current directory
-    """
-    images = getImages('png')
-    if images:
-        args = [ 'catmovie', '-q', '-self-contained', '-o', output ]
-        args.extend(images)
-        val = subprocess.call(args)
-        if val:
-            raise IOError("catmovie failed with value %i\n" % val)
-        #adjust the frame-rate:
-        args = [ 'modmovie', '-scaleMovieTo', '%.2f' % (len(images)/rate), output, '-save-in-place']
-        val = subprocess.call(args)
-        if val:
-            raise IOError("modmovie failed with value %i\n" % val)
-        return output
-    return ''
-
-
-def makeMovieQT(output):
-    """
-    re-encode existing MOV file with QT_export,
-    http://omino.com/sw/qt_tools/
-    ~/bin/qt_export --audio=0 --datarate=256 --video=avc1,10,100 movie_png.mov movie.mov
-    """
-    if codec == 'png':
-        return makeMovieMOV(output)
-    mov = makeMovieMOV('movie_png.mov')
-    if not os.path.isfile(mov):
-        err.write(prefix+"could not make Quicktime movie\n")
-        return ''
-    args = ['~/bin/qt_export', '--audio=0', '--datarate='+quality]
-    if not os.path.isfile(qt_export):
-        err.write(prefix+"missing `qt_export' executable\n")
-        os.rename(mov, output)
-        return output
-    if codec == 'h263':
-        args.extend(['--video=h263,%i,100'%rate, mov, output])
-    elif codec == 'h264':
-        args.extend(['--video=avc1,%i,100'%rate, mov, output])
-    else:
-        raise IOError("codec `%s' not supported" % codec)
-    subprocess.call(args)
-    os.remove(mov)
-    err.write(prefix+"created movie with datarate = %s\n" % quality)
-    return output
-
-
-def makeMovie(dirpath):
-    """
-        make movie in directory dirpath
-    """
-    res = 'nothing'
-    if format == 'mp4':
-        res = makeMovieMPEG('movie.mp4')
-    elif format == 'mov':
-        res = makeMovieQT('movie.mov')
-    elif format == 'images':
-        makeImagesUnzip('png')
-    else:
-        raise IOError("format `%s' not supported" % format)
-    return res
 
 #-------------------------------------------------------------------------------
 
-def process(dirpath, dir, filenames):
+def process(cwd, filenames):
     """
-        make movie in directory dirpath
+        make movie in cirremt working directory (`cwd`)
     """
-    global image_dir, cleanup
-    output = 'movie.'+format
-    if ( output in filenames ) and lazy:
-        err.write(prefix+"`operation aborted: %s/%s' already exists!\n" % (dirpath, output))
+    global tmp_dir, cleanup
+    res = 'movie.mp4'
+    if ( res in filenames ) and lazy:
+        err.write(prefix+"bailing out: `%s/%s' already exists!\n" % (cwd, res))
+        return ''
+    err.write("\n")
+    try:
+        import tempfile
+        tmp_dir = tempfile.mkdtemp('', 'imgs-', '.')
+        #err.write(prefix+"created directory %s\n" % tmp_dir)
+    except Exception as e:
+        err.write(prefix+"could not make temporary directory %s\n" % repr(e));
+    try:
+        makeMovie(cwd, res)
+    except Exception as e:
+        err.write(prefix+" %s\n" % str(e));
+        return ''
+    if cleanup:
+        shutil.rmtree(tmp_dir)
+        #err.write(prefix+"deleted directory %s\n" % tmp_dir)
     else:
-        err.write("\n")
-        os.chdir(dirpath)
-        try:
-            import tempfile
-            image_dir = tempfile.mkdtemp('', 'imgs-', '.')
-            #err.write(prefix+"created directory %s\n" % image_dir)
-        except Exception as e:
-            err.write(prefix+"cannot make temporary directory %s\n" % repr(e));
-        try:
-            res = makeMovie(dirpath)
-            err.write(prefix+"created %s/%s\n" % (dir, res));
-        except Exception as e:
-            err.write(prefix+" %s\n" % str(e));
-        if cleanup:
-            shutil.rmtree(image_dir)
-            #err.write(prefix+"deleted directory %s\n" % image_dir)
-        else:
-            err.write(prefix+"folder `%s' contains generated images\n" % image_dir)
+        err.write(prefix+"folder `%s' contains generated images\n" % tmp_dir)
+    return res
 
 
-def process_dir(dirpath):
+def process_dir(cwd):
     """
         call process() with appropriate arguments
     """
-    files = os.listdir(dirpath)
+    files = os.listdir('.')
     for f in files:
         if os.path.isdir(f):
             files.remove(f)
-    process(dirpath, os.path.basename(dirpath), files)
-
+    return process(cwd, files)
+    
 
 #-------------------------------------------------------------------------------
 
@@ -321,7 +243,7 @@ def main(args):
     """
         process command line arguments
     """
-    global executable, source_dir, format, cleanup, lazy, codec, rate, quality
+    global tool, cleanup, lazy, codec, rate, quality
     paths = []
     
     try:
@@ -333,10 +255,10 @@ def main(args):
     arg0 = os.path.expanduser(arg.split()[0])
     if os.access(arg0, os.X_OK):
         if os.path.isdir(arg):
-            source_dir = arg
+            paths.append(arg)
         else:
-            executable = arg.split();
-            executable[0] = os.path.abspath(arg0)
+            tool = arg.split();
+            tool[0] = os.path.abspath(arg0)
     else:
         err.write(prefix+"You must specify an executable or a directory containing images\n")
         sys.exit()
@@ -358,10 +280,6 @@ def main(args):
                 rate = int(value)
             elif key=='cleanup':
                 cleanup = bool(value)
-            elif key=='format':
-                format = value
-                if format == 'mov':
-                    quality = '256'
             elif key=='codec':
                 codec = value
             elif key=='quality':
@@ -374,20 +292,24 @@ def main(args):
     if not paths:
         paths.append('.')
 
-    cdir = os.getcwd()
-    for path in paths:
-        os.chdir(cdir)
-        #err.write(prefix+"visiting `%s'" % path)
-        process_dir(path)
+    home = os.getcwd()
+    for p in paths:
+        os.chdir(p)
+        res = process_dir(p)
+        os.chdir(home)
+        if res and len(paths) == 1 and not os.path.isfile(res):
+            # copy to parent directory if only one path specified
+            os.rename(p+'/'+res, os.path.basename(res))
+            err.write(prefix+"created %s\n" % res);
+        elif res:
+            err.write(prefix+"created %s/%s\n" % (p, res));
 
 
 #-------------------------------------------------------------------------------
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].endswith("help"):
         print(__doc__)
     else:
         main(sys.argv[1:])
-
 
