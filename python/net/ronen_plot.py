@@ -2,7 +2,7 @@
 #
 # A script to plot for project with Ronen Zaidel-Bar
 #
-# F. Nedelec, Strasbourg, 16.12.2021, 8-9.1.2022
+# F. Nedelec, Strasbourg, 16.12.2021, 8-12.1.2022
 
 
 """
@@ -16,7 +16,6 @@ Description:
     
 """
 
-order = 7
 #font size:
 fts = 10
 
@@ -31,36 +30,19 @@ except:
 
 #-------------------------------------------------------------------------------
 
-def read_data(filename):
-    """
-        Read numeric data from file
-    """
-    data = []
-    with open(filename, 'r') as f:
-        for line in f:
-            if len(line) > 5:
-                s = line.split()
-                if s[0] != '%':
-                    data.append([s[0], float(s[1]), float(s[2]), float(s[3]), int(s[4])])
-    return data
-
-
-def plot(poolX, poolY, modX, modY, title='Rate correlation'):
+def plot(X, Y):
     """
         Make one plot to compare data in conditions X and Y
     """
     fig = plt.figure(figsize=(5, 4))
-    plt.plot(poolX, poolY, 'bo', markersize=3)
+    plt.scatter(X, Y, marker='o', s=8, c='blue')
     # add diagonal:
-    M = math.ceil(20*max(poolX))*0.05
+    M = math.ceil(20*max(X))*0.05
     plt.plot([0, M], [0, M], 'k-', linewidth=1)
     plt.xlim(0, M)
     plt.ylim(0, M)
-    plt.xlabel('Contraction (%s)' % modX, fontsize=fts)
-    plt.ylabel('Contraction (%s)' % modY, fontsize=fts)
-    plt.title(title, fontsize=fts)
-    fig.tight_layout()
-
+    return fig
+    
 
 def modifs(mod):
     keys = ['Reference', 'MoreActin', 'LessArp23', 'MoreMyosin']
@@ -80,30 +62,57 @@ def modifs(mod):
 
 
 def one_plot(pool, X, Y):
-    plot(pool[X], pool[Y], modifs(X), modifs(Y));
+    fig = plot(pool[X], pool[Y]);
+    plt.xlabel('Contraction (%s)' % modifs(X), fontsize=fts)
+    plt.ylabel('Contraction (%s)' % modifs(Y), fontsize=fts)
+    plt.title('Rate correlation', fontsize=fts)
+    fig.tight_layout()
     plt.savefig('result%i%i.png' %(X,Y), dpi=150)
     plt.close()
 
 
-def many_plots(data, ord):
+def many_plots(data):
     """
         Make summary plots
     """
-    print("Master plot with %i datapoints" % len(data))
     P, A, B, C, M = zip(*data)
     # get unique values:
     pool = {}
     for m in set(M):
-        P = [ d[2] for d in data if d[4]==m ]
-        print(m, ': ', len(P))
-        pool[m] = P
-    
+        pool[m] = [ d[2] for d in data if d[4]==m ]
+        print(m, ': ', len(pool[m]))
+    # reduce to smallest common size:
+    if len(pool[2]) == 2 * len(pool[0]):
+        pool[2] = pool[2][0::2]
+    # check all conditions:
     for X in { 0 }:
-        for Y in { 1, 2, 4, 5, 7 }:
-            one_plot(pool, X, Y)
-    one_plot(pool, 5, 7)
+        for Y in pool.keys():
+            if Y > X:
+                one_plot(pool, X, Y)
+    # check some pairs:
+    if 7 in pool:
+        one_plot(pool, 5, 7)
+    if { 1, 4, 7 }.issubset(pool):
+        #check combination of 1 and 4 against 5:
+        pool[21] = [ b * c / a for a, b, c in zip(pool[0], pool[1], pool[4]) ]
+        one_plot(pool, 5, 21)
 
 #-------------------------------------------------------------------------------
+
+def read_data(filename):
+    """
+        Read numeric data from file
+    """
+    data = []
+    f = open(filename, 'r')
+    for line in f:
+        s = line.split()
+        if len(line) > 4 and s[0] != '%':
+            data.append([s[0], float(s[1]), float(s[2]), float(s[3]), int(s[4])])
+    f.close()
+    print("Collected %i datapoints" % len(data))
+    return data
+
 
 def main(args):
     paths = []
@@ -121,8 +130,11 @@ def main(args):
     if not files:
         files = ['scores.txt']
     for f in files:
-        data = read_data(f)
-        many_plots(data, order)
+        try:
+            data = read_data(f)
+            many_plots(data)
+        except FileNotFoundError as e:
+            sys.stderr.write(str(e)+'\n')
 
 
 if __name__ == "__main__":

@@ -141,7 +141,8 @@ def get_radius(file):
     if not T:
         raise Exception("Could not find time information")
     earliest = min(T)
-    R = [ math.sqrt(2*x) for x in M ]  # radius of disc
+    #R = [ math.sqrt(2*x) for x in M ]  # radius of disc
+    R = [ math.sqrt(x) for x in M ]    # radius of circle
     #S = [ math.pi*2*x for x in M ]   # surface of disc
     return T, R
 
@@ -151,16 +152,22 @@ def get_type(filename):
     Get some value from the file
     """
     try:
-        with open(filename, 'r') as f:
-            for line in f:
-                if line.startswith('%preconfig.type='):
-                    return int(line[16:-1])
-                elif line.startswith('%preconfig.mod='):
-                    return int(line[15:-1])
-                elif 'preconfig' in line:
-                    print("  Warning: config.cym has " + line)
+        f = open(filename, 'r')
     except:
         return -2
+    for line in f:
+        s = line.find('preconfig.')
+        if s > 0:
+            s = s + len('preconfig.')
+            [key, equal, val] = line[s:-1].partition('=')
+            print(key, val)
+            if key == 'type':
+                return int(val)
+            elif key == 'mod':
+                return int(val)
+            else:
+                print("  Warning: config.cym has " + line)
+    f.close()
     return -1
 
 
