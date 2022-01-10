@@ -1143,29 +1143,29 @@ void Simul::reportFiberMoments(std::ostream& out) const
     out << SEP << "varX" << SEP << "varY" << SEP << "varZ" << SEP << "var_sum";
     out << std::fixed;
     
-    Accumulator accum;
+    Accumulator acc;
     
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
         
-        accum.reset();
+        acc.reset();
         
         for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
         {
             if ( fib->prop == fp )
             {
                 const real w = fib->segmentation();
-                accum.add(0.5*w, fib->posEndM());
+                acc.add(0.5*w, fib->posEndM());
                 for ( size_t n = 1; n < fib->lastPoint(); ++n )
-                    accum.add(w, fib->posPoint(n));
-                accum.add(0.5*w, fib->posEndP());
+                    acc.add(w, fib->posPoint(n));
+                acc.add(0.5*w, fib->posEndP());
             }
         }
         
-        accum.subtract_mean();
+        acc.subtract_mean();
         out << LIN << ljust(fp->name(), 2);
-        accum.print(out, 0);
+        acc.print(out, 0);
     }
 }
 
@@ -1445,7 +1445,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
         out << COM << "id1" << SEP << "abs1";
         out << SEP << "id2" << SEP << "abs2" << SEP << repeatXYZ("pos");
     }
-    Accumulator accum;
+    Accumulator acc;
     
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
@@ -1474,7 +1474,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
                                 out << SEP << abs2 + soc.abscissa1();
                                 out << SEP << pos1;
                             }
-                            accum.add(pos1);
+                            acc.add(pos1);
                         }
                     }
                 }
@@ -1487,9 +1487,9 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
             out << SEP << cnt;
         }
     }
-    accum.subtract_mean();
-    accum.print_doc(out);
-    accum.print(out, 1);
+    acc.subtract_mean();
+    acc.print_doc(out);
+    acc.print(out, 1);
 }
 
 
@@ -1528,7 +1528,7 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
     }
     
     // used to calculate the size of the network from the position of connectors
-    Accumulator accum;
+    Accumulator acc;
     
     typedef std::vector<Connector> clist_t;
     typedef std::map<ObjectID, clist_t> map_t;
@@ -1590,7 +1590,7 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
                         out << SEP << 0;
                 }
                 p = c;
-                accum.add(fib->pos(p->a));
+                acc.add(fib->pos(p->a));
             }
             if ( details > 0 )
             {
@@ -1601,9 +1601,9 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
             }
         }
     }
-    accum.subtract_mean();
-    accum.print_doc(out);
-    accum.print(out, 1);
+    acc.subtract_mean();
+    acc.print_doc(out);
+    acc.print(out, 1);
 }
 
 /**

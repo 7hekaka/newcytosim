@@ -451,16 +451,10 @@ void Space::readShape(Inputter& in, std::string const& expected)
         str = in.get_characters(16); // stored as 16 characters
     
     // compare with expected layout:
-    if ( str != expected )
+    if ( str != expected && in.formatID() > 56 )
     {
-#if 0
-        InvalidIO e("dimension layout mismatch");
-        e << "found `" << str << "' in file when `" << expected << "' was expected";
-        throw e;
-#else
-        std::cerr << "Notice: dimension layout mismatch: found `" << str;
+        std::cerr << "Notice: space layout mismatch: found `" << str;
         std::cerr << "' but `" << expected << "' was expected\n";
-#endif
     }
 }
 
