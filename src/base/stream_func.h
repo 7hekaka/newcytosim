@@ -16,6 +16,9 @@ namespace StreamFunc
     /// copy lines that do not start with character `skip`
     void skip_lines(std::ostream&, std::istream&, char skip);
 
+    /// send lines starting with character `skip` to second stream
+    void redirect_lines(std::ostream&, std::ostream&, std::istream&, char sel);
+
     /// add `prefix` before every line, but skip lines starting with `skip`
     void prefix_lines(std::ostream&, std::istream&, const char prefix[], char verbatim, char skip);
 
@@ -41,7 +44,9 @@ namespace StreamFunc
     /// same as print_lines(), but output is returned as a string
     std::string get_lines(std::istream&, std::streampos start, std::streampos end);
     
-    
+    /// return number of lines in stream
+    size_t number_lines(std::istream&);
+
     /// return line number corresponding to `pos` (or current position if not specified)
     size_t line_number(std::istream&, std::streampos pos = -1);
 

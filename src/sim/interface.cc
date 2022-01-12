@@ -1070,9 +1070,6 @@ void Interface::execute_export(std::string const& name, std::string const& what,
  */
 void Interface::execute_report(std::string const& name, std::string const& what, Glossary& opt)
 {
-    int ver = 1;
-    opt.set(ver, "verbose");
-    std::string str;
     VLOG("-REPORT " << what << " to " << name);
     
     std::ofstream ofs;
@@ -1087,14 +1084,7 @@ void Interface::execute_report(std::string const& name, std::string const& what,
         out.rdbuf(ofs.rdbuf());
     }
     
-    if ( ver > 0 )
-        simul_.report_wrap(out, what, opt);
-    else
-    {
-        std::stringstream ss;
-        simul_.report_one(ss, what, opt);
-        StreamFunc::skip_lines(out, ss, (ver>0?'%':0));
-    }
+    simul_.mono_report(out, what, opt, true);
 }
 
 

@@ -97,7 +97,7 @@ static std::string standardReport(unsigned inx)
         case 4: return "single:force";
         case 5: return "couple";
         case 6: return "couple:force";
-        case 7: return "couple:configuration";
+        case 7: return "couple:configuration{split=1}";
         case 8: return "platelet";
         case 9: return "space";
         case 10: return "";

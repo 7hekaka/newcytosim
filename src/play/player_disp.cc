@@ -106,9 +106,7 @@ std::string Player::buildLabel() const
 
 
 /**
- This information is displayed in the top corner of the window.
- Calling simul.report() ensures that the message is identical to what
- would be printed by the command 'report'.
+ Compute information to be displayed in the top corner of the window.
  */
 std::string Player::buildReport(std::string arg) const
 {
@@ -118,7 +116,7 @@ std::string Player::buildReport(std::string arg) const
         std::string res;
         try {
             std::stringstream ss;
-            simul.report(ss, arg, glos);
+            simul.poly_report(ss, arg, glos, false);
             res = ss.str();
         }
         catch ( Exception& e )

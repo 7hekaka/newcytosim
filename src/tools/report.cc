@@ -54,22 +54,6 @@ void help(std::ostream& os)
 
 //------------------------------------------------------------------------------
 
-void report_raw(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
-{
-    if ( verbose > 0 )
-    {
-        os << "\n% frame   " << frm << '\n';
-        sim.report_wrap(os, what, opt);
-    }
-    else
-    {
-        std::stringstream ss;
-        sim.report(ss, what, opt);
-        StreamFunc::skip_lines(os, ss, '%');
-    }
-}
-
-
 void report_prefix(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
     char str[256] = { 0 };
@@ -83,28 +67,21 @@ void report_prefix(Simul const& sim, std::ostream& os, std::string const& what, 
     
     std::stringstream ss;
  
-    if ( verbose )
-    {
-        os << "% frame   " << frm << '\n';
-        sim.report_wrap(ss, what, opt);
-        StreamFunc::prefix_lines(os, ss, str, '%', 0);
-    }
-    else
-    {
-        sim.report(ss, what, opt);
-        StreamFunc::prefix_lines(os, ss, str, 0, '%');
-    }
+    sim.poly_report(ss, what, opt, false);
+    StreamFunc::prefix_lines(os, ss, str, 0, '%');
 }
 
 
-void report(Simul const& simul, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
+void report(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
+    if ( verbose )
+        os << "% frame " << frm << '\n';
     try
     {
         if ( prefix )
-            report_prefix(simul, os, what, frm, opt);
+            report_prefix(sim, os, what, frm, opt);
         else
-            report_raw(simul, os, what, frm, opt);
+            sim.poly_report(os, what, opt, true);
     }
     catch( Exception & e )
     {

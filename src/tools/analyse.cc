@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
             if ( 0 == reader.loadFrame(simul, frm) )
             {
                 std::cout << "% frame   " << frm << '\n';
-                simul.report(std::cout, what, arg);
+                simul.poly_report(std::cout, what, arg, true);
             }
             else
             {
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
         while ( 0 == reader.loadNextFrame(simul) )
         {
             std::cout << "% frame   " << frm << '\n';
-            simul.report(std::cout, what, arg);
+            simul.poly_report(std::cout, what, arg, true);
         }
     }
 }

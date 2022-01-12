@@ -57,14 +57,38 @@ void StreamFunc::diff_stream(std::ostream& os, std::istream& val, std::istream& 
 void StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
 {
     std::string line;
+    while ( is.good() )
+    {
+        std::getline(is, line);
+        if ( !line.size() || line[0] != skip )
+        {
+            os << line;
+            if ( !is.eof() )
+                os << '\n';
+        }
+    }
+}
+
+
+void StreamFunc::redirect_lines(std::ostream& os, std::ostream& alt, std::istream& is, char sel)
+{
+    std::string line;
     
     while ( is.good() )
     {
         std::getline(is, line);
-        if ( line.size() < 1 )
-            ;
-        else if ( line[0] != skip )
-            os << line << '\n';
+        if ( line.size() > 0 && line[0] == sel )
+        {
+            alt << line;
+            if ( !is.eof() )
+                alt << '\n';
+        }
+        else
+        {
+            os << line;
+            if ( !is.eof() )
+                os << '\n';
+        }
     }
 }
 
@@ -82,9 +106,17 @@ void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char pre
         else if ( line[0] == skip )
             ;
         else if ( line[0] == verbatim )
-            os << line << '\n';
+        {
+            os << line;
+            if ( !is.eof() )
+                os << '\n';
+        }
         else
-            os << prefix << line << '\n';
+        {
+            os << prefix << line;
+            if ( !is.eof() )
+                os << '\n';
+        }
     }
 }
 
@@ -239,6 +271,29 @@ std::string StreamFunc::get_line(std::istream& is, std::streampos pos)
 {
     size_t cnt;
     return get_line(is, pos, cnt);
+}
+
+
+size_t StreamFunc::number_lines(std::istream& is)
+{
+    if ( !is.good() )
+        is.clear();
+    
+    std::streampos isp = is.tellg();
+    is.seekg(0);
+    
+    size_t cnt = 0;
+    std::string line;
+    
+    while ( is.good() )
+    {
+        std::getline(is, line);
+        ++cnt;
+    }
+    
+    is.clear();
+    is.seekg(isp);
+    return cnt;
 }
 
 
