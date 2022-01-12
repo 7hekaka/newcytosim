@@ -8,7 +8,7 @@
 """
     Plot the radius of the network as a function of time.
     This relies on 'reportN' to produce data in 'mom.txt'
-    All data sent to 'scores.txt'
+    All data sent to 'rates.txt'
 
 Syntax:
     
@@ -81,10 +81,12 @@ def nice_plot(time, data):
     if add_fit:
         (A, B) = exponential_fit(zip(time, data))
         fit = [ A*math.exp(B*t) for t in time ]
-        plt.plot(time, fit, 'w.', markersize=7)
+        txt = str(round(A,3)) + " exp("+str(round(B,5))+" t )"
+        plt.plot(time, fit, 'w.', markersize=7, label=txt)
     plt.ylim(0, 7)
     plt.xlabel('Time (s)', fontsize=fts)
     plt.ylabel('Radius (um)', fontsize=fts)
+    plt.legend(loc='upper right', fontsize=7)
     plt.title('Network size', fontsize=fts)
     fig.tight_layout()
 
@@ -141,9 +143,9 @@ def get_radius(file):
     if not T:
         raise Exception("Could not find time information")
     earliest = min(T)
-    #R = [ math.sqrt(2*x) for x in M ]  # radius of disc
-    R = [ math.sqrt(x) for x in M ]    # radius of circle
+    R = [ math.sqrt(2*x) for x in M ]  # radius of disc
     #S = [ math.pi*2*x for x in M ]   # surface of disc
+    #R = [ math.sqrt(x) for x in M ]    # radius of circle
     return T, R
 
 
@@ -183,6 +185,7 @@ def process(dirpath, filename):
         time, data = get_radius(f)
         if do_plot:
             nice_plot(time, data)
+            plt.title(dirpath, fontsize=fts)
             plt.savefig('size.png', dpi=150)
             #plt.show()
             plt.close()
@@ -229,7 +232,7 @@ def main(args):
         sys.stdout.write('- '*32+p+"\n")
         process(p, 'mom.txt')
         os.chdir(cdir)
-    print_results('scores.txt')
+    print_results('rates.txt')
 
 
 if __name__ == "__main__":

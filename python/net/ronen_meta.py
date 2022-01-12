@@ -6,7 +6,7 @@
 
 
 """
-    Read all contraction rates in 'scores.txt' and make master plot
+    Read all contraction rates in 'rates.txt' and make master plot
     
 Syntax:
     
@@ -231,9 +231,9 @@ def main(args):
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     for p in paths:
-        files.append(p+'/scores.txt');
+        files.append(p+'/rates.txt');
     if not files:
-        files = ['scores.txt']
+        files = ['rates.txt']
     for f in files:
         try:
             data = read_data(f)

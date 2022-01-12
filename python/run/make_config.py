@@ -53,9 +53,9 @@ def write_file(name, content):
     """
         Write content to a new file, called `name`
     """
-    file = open(name, 'w')
-    file.write(content)
-    file.close()
+    f = open(name, 'w')
+    f.write(content)
+    f.close()
 
 #------------------------------------------------------------------------
 

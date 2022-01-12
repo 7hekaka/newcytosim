@@ -87,11 +87,11 @@ def makeNumberedDirectory(root):
 
 def write_script(filename, cmd):
     """create an executable file containing the commands"""
-    fid = open(filename, 'w')
-    fid.write("#!/bin/bash\n")
+    f = open(filename, 'w')
+    f.write("#!/bin/bash\n")
     for s in cmd:
-        fid.write(s+'\n')
-    fid.close()
+        f.write(s+'\n')
+    f.close()
     os.chmod(filename, 0700)
 
 #------------------------------------------------------------------------

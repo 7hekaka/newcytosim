@@ -6,7 +6,7 @@
 
 
 """
-    Read all contraction rates in 'scores.txt' and make master plot
+    Read all contraction rates in 'rates.txt' and make master plot
     
 Syntax:
     
@@ -45,7 +45,7 @@ def plot(X, Y):
     
 
 def modifs(mod):
-    keys = ['Reference', 'MoreActin', 'LessArp23', 'MoreMyosin']
+    keys = ['Reference', 'MoreActin', 'MoreArp23', 'MoreMyosin']
     res = ''
     if not mod:
         return keys[0]
@@ -67,7 +67,7 @@ def one_plot(pool, X, Y):
     plt.ylabel('Contraction (%s)' % modifs(Y), fontsize=fts)
     plt.title('Rate correlation', fontsize=fts)
     fig.tight_layout()
-    plt.savefig('result%i%i.png' %(X,Y), dpi=150)
+    plt.savefig('0_contraction%i%i.png' %(X,Y), dpi=150)
     plt.close()
 
 
@@ -82,7 +82,7 @@ def many_plots(data):
         pool[m] = [ d[2] for d in data if d[4]==m ]
         print(m, ': ', len(pool[m]))
     # reduce to smallest common size:
-    if len(pool[2]) == 2 * len(pool[0]):
+    if 2 in pool and len(pool[2]) == 2 * len(pool[0]):
         pool[2] = pool[2][0::2]
     # check all conditions:
     for X in { 0 }:
@@ -126,9 +126,9 @@ def main(args):
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     for p in paths:
-        files.append(p+'/scores.txt');
+        files.append(p+'/rates.txt');
     if not files:
-        files = ['scores.txt']
+        files = ['rates.txt']
     for f in files:
         try:
             data = read_data(f)
