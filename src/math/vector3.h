@@ -615,7 +615,7 @@ public:
             // this should not happen...
             E = orthogonal(1);
             F = cross(*this, E).normalized();
-            std::clog << "rescued orthonormal(" << toString() << ")\n";
+            std::clog << "rescued orthonormal(" << to_string() << ")\n";
             return;
         }
 #else
@@ -657,7 +657,7 @@ public:
             // this should not happen...
             E = orthogonal(1);
             F = cross(*this, E).normalized();
-            std::clog << "rescued orthonormal(" << toString() << ")\n";
+            std::clog << "rescued orthonormal(" << to_string() << ")\n";
             return;
         }
 #else
@@ -1019,7 +1019,7 @@ public:
     }
 
     /// conversion to a string
-    std::string toString() const
+    std::string to_string() const
     {
         std::ostringstream oss;
         print(oss);
@@ -1027,7 +1027,7 @@ public:
     }
     
     /// conversion to a string with given precision
-    std::string toString(int w, int p) const
+    std::string to_string(int w, int p) const
     {
         std::ostringstream oss;
         print(oss, w, p);

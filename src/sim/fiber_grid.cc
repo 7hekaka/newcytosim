@@ -247,7 +247,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 
 #if BIND_CLOSEST_FIBER
 
-std::string FiberGrid::SegmentHit::toString() const
+std::string FiberGrid::SegmentHit::to_string() const
 {
     std::ostringstream oss;
     oss << "f" << seg_.fiber()->identity() << ":" << seg_.point();
@@ -327,12 +327,12 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             FiberSite sit(const_cast<Fiber*>(hit.fiber()), hit.abscissa());
             if ( ha.attachmentAllowed(sit) )
             {
-                //std::clog << hit.toString() << "\n";
+                //std::clog << hit.to_string() << "\n";
                 ha.attach(sit);
                 return;
             }
         }
-        //std::clog << hit.toString() << " | ";
+        //std::clog << hit.to_string() << " | ";
     }
     //std::clog << "\n";
 }

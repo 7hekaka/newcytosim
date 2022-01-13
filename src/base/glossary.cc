@@ -528,6 +528,27 @@ void Glossary::write(std::ostream& os, std::string const& prefix) const
 }
 
 
+std::string Glossary::to_string() const
+{
+    std::stringstream ss;
+    ss << '{';
+    for ( auto const& i : mTerms )
+    {
+        ss << i.first;
+        if ( i.second.size() > 0 )
+        {
+            ss << '=' << i.second[0].value_;
+            for ( size_t x = 1; x < i.second.size(); ++x )
+                ss << ", " + i.second[x].value_;
+        }
+        ss << ";";
+    }
+    
+    ss << '}';
+    return ss.str();
+}
+
+
 std::ostream& operator << (std::ostream& os, Glossary::pair_type const& arg)
 {
     os << "  " << format(arg);

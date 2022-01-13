@@ -283,7 +283,7 @@ void FiberSegment::print(std::ostream& os) const
         os << "(null)";
 }
 
-std::string FiberSegment::toString() const
+std::string FiberSegment::to_string() const
 {
     std::ostringstream oss;
     print(oss);

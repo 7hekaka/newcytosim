@@ -74,7 +74,7 @@ public:
         Fiber const* fiber() const { return seg_.fiber(); }
         real abscissa() const { return seg_.abscissa1() + abs_; }
         
-        std::string toString() const;
+        std::string to_string() const;
     };
     
     /// list of SegmentHits used in tryToAttach()

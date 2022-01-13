@@ -342,6 +342,9 @@ public:
     
     /// write all [key, values]
     void write_counts(std::ostream&, std::string const& prefix = "") const;
+    
+    /// write all [key, values] on a single line
+    std::string to_string() const;
 
     //-------------------------------------------------------------------------------
     

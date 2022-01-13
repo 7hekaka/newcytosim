@@ -115,7 +115,7 @@ public:
     void print(std::ostream&) const;
 
     /// Human friendly ouput
-    std::string toString() const;
+    std::string to_string() const;
 };
 
 /// print for debug purpose

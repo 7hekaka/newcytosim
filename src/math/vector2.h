@@ -700,7 +700,7 @@ public:
     }
     
     /// conversion to a string
-    std::string toString() const
+    std::string to_string() const
     {
         std::ostringstream oss;
         print(oss);
@@ -708,7 +708,7 @@ public:
     }
     
     /// conversion to a string with given precision
-    std::string toString(int w, int p) const
+    std::string to_string(int w, int p) const
     {
         std::ostringstream oss;
         print(oss, w, p);

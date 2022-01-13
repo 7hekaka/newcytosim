@@ -151,7 +151,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     }
     if ( ver > 0 )
     {
-        out << "\n% report " << arg;
+        out << "\n% report " << arg << " " << opt.to_string();
         report_one(out, arg, opt);
     }
     else
@@ -199,25 +199,25 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
             int com = 1;
             opt.peek(com, "verbose");
             // generate a separate report for all classes in this category:
-            std::stringstream ss;
             PropertyList plist = properties.find_all(who);
+            if ( com )
+            {
+                out << COM << "split:";
+                for ( Property const* sel : plist )
+                    out << SEP << sel->name();
+            }
             for ( Property const* sel : plist )
             {
-                std::stringstream tmp;
-                report_one(tmp, who, sel, what, opt);
                 if ( com )
                 {
-                    StreamFunc::redirect_lines(ss, out, tmp, '%');
-                    //out << "% class " + std::to_string(sel->number()) + " is `" + sel->name() << "'\n";
-                    //out << std::setw(column_width) << sel->name() << SEP;
-                    tmp.clear(); tmp.seekg(0);
-                    StreamFunc::skip_lines(out, tmp, '%');
+                    report_one(out, who, sel, what, opt);
                     com = 0;
                 }
                 else
                 {
-                    //out << "%class " + std::to_string(sel->number()) + " is `" + sel->name() << "'\n";
-                    StreamFunc::skip_lines(out, tmp, '%');
+                    std::stringstream ss;
+                    report_one(ss, who, sel, what, opt);
+                    StreamFunc::skip_lines(out, ss, '%');
                 }
             }
         }
@@ -2326,8 +2326,8 @@ void Simul::reportCoupleLink(std::ostream& out, Property const* sel) const
 
 /**
  Export configuration of bridging couple, as
- P: parallel
- A: antiparallel
+ P: parallel side-side links
+ A: antiparallel side-side links
  X: other side-side links
  T: side-end
  V: end-end
@@ -2342,17 +2342,14 @@ void Simul::reportCoupleLink(std::ostream& out, Property const* sel) const
 void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
                                       Glossary& opt) const
 {
-    real threshold = 0.010;
-    FiberEnd end = PLUS_END;
-    
-    opt.set(threshold, "threshold");
-    opt.set(end, "end", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    real dis = 0.010;  // max distance to end to constitute T or V link
+    opt.set(dis, "distance", "threshold");
     
     size_t T[8] = { 0 };
     for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
     {
         if ( !sel || sel == obj->prop )
-            ++T[obj->configuration(threshold)];
+            ++T[obj->configuration(dis)];
     }
     size_t S = T[0]+T[1]+T[2]+T[3]+T[4]+T[5]+T[6];
     
