@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2021
-# This is PRECONFIG version 1.46, last modified on 22.12.2021
+# This is PRECONFIG version 1.47, last modified on 13.01.2022
 
 """
 # SYNOPSIS
@@ -42,6 +42,8 @@
 
    The width of the variable part (default=4) can be changed on the command line.
    For instance, to specify a width of 2 characters, invoke "preconfig -2 ...".
+
+   By default, indexing starts at zero, but this can be changed with 'n=INTEGER'.
 
 # SYNTAX
 
@@ -91,9 +93,9 @@
    Any plain python code can be embedded in the file, and functions from the
    [Random Module](https://docs.python.org/library/random.html) can be used.
    It is possible to use multiple bracketed expressions in the same file, and
-   to define variables in the python environment. An integer 'n', starting at
-   zero and corresponding to the file being generated is automatically defined.
-   
+   to define variables in the python environment.
+   The index of the file being generated is defined as variable 'n'.
+
    Note that variables defined in embedded code are not expanded when they appear
    alone in another code (eg. [[vec]]). Furthermore, Preconfig will keep any code
    that it cannot evaluate verbatim, which happens for example if they contain
@@ -296,18 +298,18 @@ class Preconfig:
     """ A class container for preconfig,
     contains inner variables and methods """
     def __init__(self):
-        # initialization
-        self.locals = {}
+        # local dictionary with index of file being generated
+        self.locals = { 'n' : 0 }
+        # variables for which expension is disabled:
         self.protected = []
         # streams for output (all output is hidden by default):
         self.out = open(os.devnull, 'w')
         self.log = []
+        self.log_doc = 1
         # motif used to compose file names
         self.pattern = ''
         # number of digits used to compose `pattern`
         self.nb_digits = 4
-        # index of file being generated
-        self.file_index = 0
         # list of files generated
         self.files_made = []
         # name of first output file (only one file can be made with this name)
@@ -443,7 +445,6 @@ class Preconfig:
         """
         Initialize variable to process template file 'name'
         """
-        self.file_index = 0
         self.files_made = []
         self.template = name
 
@@ -470,13 +471,23 @@ class Preconfig:
             n = self.file_name
             self.file_name = ''
         elif self.pattern:
-            n = self.pattern % self.file_index
+            n = self.pattern % self.locals['n']
         else:
-            n = 'config%04i.txt' % self.file_index
-        self.file_index += 1
-        # update variable
-        self.locals['n'] = self.file_index
+            n = 'config%04i.txt' % self.locals['n']
         return n
+
+    def write_log(self, log, name):
+        keys = sorted(self.locals.keys())
+        if self.log_doc:
+            log.write('%20s' % 'file')
+            for k in keys:
+                log.write(', %10s' % k)
+            log.write('\n')
+            self.log_doc = 0
+        log.write('%20s' % name)
+        for k in keys:
+            log.write(', %10s' % repr(self.locals[k]))
+        log.write('\n')
 
     def make_file(self, text):
         """
@@ -495,24 +506,17 @@ class Preconfig:
         self.out.write('  \\'+('> '+dst+'\n').rjust(96, '-'))
         # write log:
         if self.log:
-            keys = sorted(self.locals.keys())
-            if self.file_index == 1:
-                self.log.write('%20s' % 'file')
-                for k in keys:
-                    self.log.write(', %10s' % k)
-                self.log.write('\n')
-            self.log.write('%20s' % dst)
-            for k in keys:
-                self.log.write(', %10s' % repr(self.locals[k]))
-            self.log.write('\n')
+            self.write_log(self.log, dst)
+        # get ready for next file:
+        self.locals['n'] += 1
 
     def expand(self, values, file, text):
         """
-            Calls itself recursively to remove all entries of the 
+            Calls itself recursively to remove all entries of the `values`
             dictionary that are associated with multiple values.
         """
-        #print("expand("+repr(values)+")")
         (key, vals) = pop_sequence(values, self.protected)
+        #print("expand"+repr(values)+" "+key)
         if key:
             ipos = file.tell()
             for v in vals:
@@ -524,10 +528,11 @@ class Preconfig:
             # restore all values on upward recursion
             values[key] = vals
         else:
-            #copy dictionary values:
-            for key in values:
-                self.locals[key] = values[key]
-            self.locals['n'] = self.file_index
+            #copy variables to local dictionnary:
+            for k, v in values.items():
+                self.locals[k] = v
+            #the file index should only be copied once:
+            values.pop('n', 0)
             self.process(file, text)
 
     def parse(self, name, values, repeat=1, path=''):
@@ -584,11 +589,14 @@ class Preconfig:
             elif arg[0] == '-' and arg[1:].isdigit():
                 self.nb_digits = int(arg[1:])
             else:
-                k, v = self.try_assignment(arg, arg, 0)
-                if not k:
+                try:
+                    k, v = self.try_assignment(arg, arg, 0)
+                    if k:
+                        values[k] = v
+                        continue
+                except:
                     sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
                     sys.exit()
-                values[k] = v
 
         if not inputs:
             sys.stderr.write("  Error: you must specify an input template file\n")
