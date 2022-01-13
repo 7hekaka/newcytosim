@@ -65,7 +65,7 @@ def transform_value(x, a, b):
         return x * b
 
 def transform(Z):
-    L = [ math.log(x) for x in Z ]
+    L = [ math.log(max(x, 0.01)) for x in Z ]
     print("%i  log(Z) values in [ %f %f ]" % (len(L), min(L), max(L)), end='')
     print(" %i negative" % len([ 1 for x in L if x < 0 ]), end='')
     print(" %i positive" % len([ 1 for x in L if x > 0 ]), end='')
@@ -117,23 +117,6 @@ def plot(X, Y, Z):
     plt.xlim(0, mX)
     plt.ylim(0, mY)
     return fig
-
-
-def modifs(mod):
-    keys = ['Reference', 'MoreActin', 'LessArp23', 'MoreMyosin']
-    res = ''
-    if not mod:
-        return keys[0]
-    mod1=int(mod&1)
-    mod2=int((mod>>1)&1)
-    mod4=int((mod>>2)&1)
-    if mod1:
-        res+=keys[1]
-    if mod2:
-        res+=keys[2]
-    if mod4:
-        res+=keys[3]
-    return res
 
 
 def one_plot(params, i, j, values):

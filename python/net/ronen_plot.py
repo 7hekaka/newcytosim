@@ -42,22 +42,16 @@ def plot(X, Y):
     plt.xlim(0, M)
     plt.ylim(0, M)
     return fig
-    
+
 
 def modifs(mod):
-    keys = ['Reference', 'MoreActin', 'MoreArp23', 'MoreMyosin']
+    keys = ['Reference', 'MoreActin', 'MoreArp23', 'MoreMyosin', 'DeadArp23']
     res = ''
     if not mod:
         return keys[0]
-    mod1=int(mod&1)
-    mod2=int((mod>>1)&1)
-    mod4=int((mod>>2)&1)
-    if mod1:
-        res+=keys[1]
-    if mod2:
-        res+=keys[2]
-    if mod4:
-        res+=keys[3]
+    for i in { 0, 1, 2, 3 }:
+        if int((mod>>i)&1):
+            res+=keys[i+1]
     return res
 
 

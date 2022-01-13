@@ -2,7 +2,7 @@
 #
 # A script to plot for project with Ronen Zaidel-Bar
 #
-# F. Nedelec, Strasbourg, 16.12.2021, 8-9.1.2022
+# F. Nedelec, Strasbourg, 16.12.2021, 8-13.1.2022
 
 
 """
@@ -22,7 +22,7 @@ Description:
 fts = 14
 do_plot = 1
 add_fit = 1
-results = []
+length = 0
 
 # earliest time point
 earliest = 0
@@ -106,40 +106,43 @@ def mini_plot(time, size):
 
 def get_moment(file):
     """
-        Get network size as a function of time
+        Get fiber's position variance as a function of time
     """
-    tim = []
-    mom = []
-    T = 0
-    M = 0
+    res = []
+    T = []
+    M = []
+    L = []
     for line in file:
         s = uncode(line).split()
         if len(s) < 2:
             pass
         elif s[0] == '%':
-            if s[1] == "start" or s[1] == "time":
+            if s[1] == "time":
+                if T and M:
+                    res.append([T, M, L])
+                    M = []
+                    L = []
                 T = float(s[2])
-            elif s[1] == "moment":
-                M = float(s[-1])
             elif s[1] == "end":
-                tim.append(T)
-                mom.append(M)
+                if T and M:
+                    res.append([T, M, L])
+                T = []
+                M = []
+                L = []
         elif len(s) == 9 and s[0].isalpha():
             M = float(s[8]) # sum of variances in X, Y, Z
-        elif len(s) == 10 and s[1].isalpha():
-            T = []
-            M = []
-            tim.append(float(s[0]))
-            mom.append(float(s[9]))
-    return tim, mom
+            L = float(s[1])
+    return zip(*res)
 
 
 def get_radius(file):
     """
-        Extract radius from moment variance
+        Compute radius of network from moment variance
     """
-    global earliest
-    T, M = get_moment(file)
+    global earliest, length
+    T, M, L = get_moment(file)
+    length = sum(L) / len(L)
+    print("Length <- " + str(length))
     if not T:
         raise Exception("Could not find time information")
     earliest = min(T)
@@ -149,12 +152,12 @@ def get_radius(file):
     return T, R
 
 
-def get_type(filename):
+def get_type(confname):
     """
     Get some value from the file
     """
     try:
-        f = open(filename, 'r')
+        f = open(confname, 'r')
     except:
         return -2
     for line in f:
@@ -173,34 +176,38 @@ def get_type(filename):
     return -1
 
 
-def process(dirpath, filename):
+def process(dirpath, momfile, results):
     """
         Process given directory
     """
     os.chdir(dirpath)
-    if not os.path.isfile(filename):
+    if not os.path.isfile(momfile) and os.path.isfile('properties.cmp'):
         args = ['reportN', 'fiber:moment']
-        subprocess.call(args, stdout=open(filename, 'w'))
-    with open(filename, 'r') as f:
-        time, data = get_radius(f)
-        if do_plot:
-            nice_plot(time, data)
-            plt.title(dirpath, fontsize=fts)
-            plt.savefig('size.png', dpi=150)
-            #plt.show()
-            plt.close()
-        if add_fit:
-            (A, B) = fit_curve(time, data)
-            C = A*math.exp(-earliest*B)
-        else:
-            A = 0
-            B = 0
-            C = 0
-        D = get_type('config.cym')
-        results.append([dirpath, A, B, C, D])
+        subprocess.call(args, stdout=open(momfile, 'w'))
+    try:
+        f = open(momfile, 'r')
+    except IOError as e:
+        sys.stderr.write("Error in `%s`: %s\n"%(dirpath, str(e)))
+        return
+    time, data = get_radius(f)
+    if do_plot:
+        nice_plot(time, data)
+        plt.title(dirpath, fontsize=fts)
+        plt.savefig('size.png', dpi=150)
+        #plt.show()
+        plt.close()
+    if add_fit:
+        (A, B) = fit_curve(time, data)
+        C = A*math.exp(-earliest*B)
+    else:
+        A = 0
+        B = 0
+        C = 0
+    D = get_type('config.cym')
+    results.append([dirpath, A, B, C, D, length])
 
 
-def print_results(filename=''):
+def print_results(res, filename=''):
     """
         Save numeric data from file
     """
@@ -208,9 +215,9 @@ def print_results(filename=''):
         f = open(filename, 'w')
     else:
         f = sys.stdout
-    f.write("% dirpath fit_size fit_rate init_size type\n")
-    for i in results:
-        f.write("%s %f %f %f %i\n" % (i[0], i[1], i[2], i[3], i[4]))
+    f.write("% path fit_size fit_rate size0 type polymer\n")
+    for i in res:
+        f.write("%s %f %f %f %i %.2f\n" % (i[0], i[1], i[2], i[3], i[4], i[5]))
     if filename:
         f.close()
 
@@ -218,7 +225,6 @@ def print_results(filename=''):
 
 def main(args):
     paths = []
-    global results
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
@@ -228,11 +234,12 @@ def main(args):
     if not paths:
         sys.stderr.write("Please specify some directory paths\n")
     cdir = os.getcwd()
+    results = []
     for p in paths:
         sys.stdout.write('- '*32+p+"\n")
-        process(p, 'mom.txt')
+        process(p, 'mom.txt', results)
         os.chdir(cdir)
-    print_results('rates.txt')
+    print_results(results, 'rates.txt')
 
 
 if __name__ == "__main__":
