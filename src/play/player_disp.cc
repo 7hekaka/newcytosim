@@ -377,6 +377,8 @@ int Player::saveView(const char* filename, const char* format, int downsample, i
         printf("\r saved %ix%i snapshot %s    ", vp[2]/downsample, vp[3]/downsample, filename);
         fflush(stdout);
     }
+    if ( err )
+        fprintf(stderr, "Cytosim could not save %s    ", filename);
     return err;
 }
 
@@ -389,20 +391,27 @@ int Player::saveView(const char* filename, const char* format, int downsample, i
  */
 int Player::saveView(size_t indx, int downsample, int verbose) const
 {
-    char str[1024] = { 0 };
     char const* format = prop.image_format.c_str();
-    std::string& name = prop.image_name;
-    std::string::size_type d = name.find('.');
-    if ( d != std::string::npos )
-    {
-        // if there is a '.', copy name verbatim:
-        strncpy(str, name.c_str(), sizeof(str));
-        name = name.substr(0, d);
-    }
+    char str[1024] = { 0 };
+
+    strncpy(str, prop.image_name.c_str(), sizeof(str));
+    // remove file extension:
+    char* ptr = strchr(str, '.');
+    if ( ptr ) *ptr = 0;
+    // check for an integer printf() pattern:
+    ptr = strchr(str, '%');
+    if ( !ptr && indx > 0 )
+        ptr = str + strlen(str);
+    // add number:
+    if ( ptr )
+        ptr += snprintf(ptr, sizeof(str)-(ptr-str), "%04lu", indx);
     else
+        ptr = str + strlen(str);
+    // add file extension:
+    if ( ptr - str + strlen(format) < sizeof(str) )
     {
-        // with no '.', build name using integer:
-        snprintf(str, sizeof(str), "%s%04lu.%s", name.c_str(), indx, format);
+        *ptr++ = '.';
+        strncpy(ptr, format, strlen(format));
     }
     int cwd = FilePath::change_dir(prop.image_dir, true);
     int err = saveView(str, format, downsample, verbose);
