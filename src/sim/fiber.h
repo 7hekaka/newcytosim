@@ -41,7 +41,7 @@ class LineDisp;
  */
 #if FIBER_HAS_LATTICE > 0
 // Lattice composed of integers, appropriate for discrete occupancy
-typedef Lattice<uint16_t> FiberLattice;
+typedef Lattice<uint8_t> FiberLattice;
 #else
 // Lattice composed of floating point values, for continuous values
 typedef Lattice<real> FiberLattice;
@@ -290,7 +290,7 @@ public:
     void removeHand(Hand* h) const  { fHands.remove(h); }
     
     /// update all Hands bound to this
-    void updateHands() const { fHands.update(); }
+    void updateHands();
 
     /// detach all Hands
     void detachHands() const { fHands.detachAll(); }
@@ -320,7 +320,7 @@ public:
     
     /// const reference to Fiber's Lattice
     FiberLattice const& lattice() const { return fLattice; }
-        
+    
     /// recalculate occupancy lattice from bound Digits
     void resetLattice();
 #else

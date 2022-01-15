@@ -197,9 +197,9 @@ void Fiber::resetLattice()
         {
             if ( ha->isDigit() && ha->lattice() == &fLattice )
             {
-                Digit* dig = static_cast<Digit*>(ha);
-                dig->inc();
-                dig->moveTo(fLattice.unit() * dig->site()+ dig->prop->site_shift);
+                Digit* i = static_cast<Digit*>(ha);
+                i->inc();
+                i->moveTo(fLattice.unit() * i->site()+ i->prop->site_shift);
             }
         }
     }

@@ -1114,6 +1114,24 @@ void Fiber::updateRange(Field* field)
 #endif
 }
 
+
+/**
+ Update all bound Hands, allowing them to detach if they are out of range
+ */
+void Fiber::updateHands()
+{
+    Hand * h = fHands.front();
+    while ( h )
+    {
+        Hand * x = h->next();
+        assert_true(h->fiber()==this);
+        h->update();
+        // must iterate ahead, because `checkFiberRange` may lead to detachment:
+        h->checkFiberRange();
+        h = x;
+    }
+}
+
 /**
  Assuming that the length has changed, or that the abscissa of the ends have changed,
  this updates the segmentation of the fiber if needed, the position of the Hands,
@@ -1127,24 +1145,8 @@ void Fiber::updateFiber()
     Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << '\n';
 #endif
     
-    /*
-     Update all bound Hands.
-     Some Hands may be updated more than once in a time-step,
-     but that is only a small performance penalty.
-
-     We must iterate one step ahead, because `checkFiberRange()` may lead to detachment.
-     The loop could be unrolled, or parallelized
-     */
-    Hand * ha = fHands.front();
-    while ( ha )
-    {
-        Hand * nx = ha->next();
-        assert_true(ha->fiber()==this);
-        ha->update();
-        ha->checkFiberRange();
-        ha = nx;
-    }
     updateRange(prop->field_ptr);
+    updateHands();
 }
 
 //------------------------------------------------------------------------------
@@ -1700,12 +1702,12 @@ void Fiber::write(Outputter& out) const
     Chain::writeAngles(out);
 #endif
     
-#if FIBER_HAS_LATTICE && 0
+#if FIBER_HAS_LATTICE
     /*
      We can save the occupancy Lattice here, but this is not necessary
      as it can be recalculated on the fly, so we save space by skipping
      */
-    if ( fLattice.ready() )
+    if ( prop->save_lattice && fLattice.ready() )
     {
         writeHeader(out, TAG_LATTICE);
         // fLattice.write(out);
@@ -1739,7 +1741,14 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( tag == TAG )
     {
         Chain::read(in, sim, tag);
-        updateRange(nullptr);
+#if FIBER_HAS_LATTICE
+        if ( fLattice.data() )
+            fLattice.setRange(abscissaM(), abscissaP());
+#endif
+#if FIBER_HAS_MESH
+        if ( fMesh.data() )
+            fMesh.setRange(abscissaM(), abscissaP());
+#endif
 #if BACKWARD_COMPATIBILITY < 50
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
             birthTime(in.readFloat());

@@ -181,6 +181,9 @@ public:
     /// unit length associated with Lattice
     real lattice_unit;
     
+    /// save lattice in files
+    bool save_lattice;
+    
     /// if true, associate an analog lattice
     int mesh;
     

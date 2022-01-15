@@ -282,8 +282,10 @@ void FiberSet::step()
         
         if ( fp->free_polymer < 0 )
         {
-            Cytosim::warn << "Inconsistent negative monomer pool: check parameter `total_polymer`\n";
-            // this should not happen
+            // this may happen with a fast grow_speed / large time_step
+            Cytosim::warn << "Inconsistent monomer pool for " + fp->name();
+            Cytosim::warn << ": total_polymer=" + std::to_string(fp->total_polymer);
+            Cytosim::warn << ", used_polymer= " + std::to_string(fp->used_polymer) + "\n";
             fp->free_polymer = 0;
         }
     }
@@ -684,33 +686,36 @@ void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real spread) const
 }
 
 
-void FiberSet::flipFiberPolarity()
+void FiberSet::flipFiberPolarity(FiberProp * sel)
 {
     for ( Fiber* fib=first(); fib; fib=fib->next() )
     {
-        fib->flipChainPolarity();
-        // this will put back the Hands in their original position:
-        fib->flipHandsPolarity();
+        if ( fib->prop == sel )
+        {
+            fib->flipChainPolarity();
+            // this will put back the Hands in their original position:
+            fib->flipHandsPolarity();
+        }
     }
 }
 
 
-void FiberSet::update()
+/**
+Update Hands after reading all fibers from file, and reset Lattice values
+*/
+void FiberSet::updateFibers()
 {
     Object * i = pool_.front();
     while ( i )
     {
         Fiber * o = static_cast<Fiber*>(i);
         i = i->next();
-        o->updateFiber();
+        o->updateHands();
         o->resetLattice();
     }
 }
 
-/**
- After reading from file, the fiber structure need to be updated,
- as well as the Hands bound to them.
- */
+
 void FiberSet::prune()
 {
     Object * i = ice_.pop_front();
@@ -722,7 +727,7 @@ void FiberSet::prune()
         o->objset(nullptr);
         delete(o);
     }
-    update();
+    updateFibers();
 }
 
 
@@ -735,7 +740,7 @@ void FiberSet::thaw()
         i = ice_.pop_front();
         link(o);
     }
-    update();
+    updateFibers();
 }
 
 

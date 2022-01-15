@@ -504,7 +504,7 @@ public:
         write(out, laInf, laSup);
     }
 
-    /// clear all cells and read data from file 
+    /// clear all cells and read data from file
     void read(Inputter& in)
     {
         lati_t inf = in.readInt32();
@@ -527,6 +527,8 @@ public:
         
         allocate(inf, sup, 0);
         clear();
+        
+        //std::clog << "reading fiber:lattice " << nbytes << "bytes " << sup-inf << " cells\n";
         
         if ( nbytes == 1 )
         {

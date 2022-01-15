@@ -463,8 +463,12 @@ static void changeSpeckleStyle(FiberDisp* p, int)
 
 static void changeLatticeStyle(FiberDisp* p, int)
 {
+#if FIBER_HAS_LATTICE
     p->lattice_style = ( 1 + p->lattice_style ) % 5;
     flashText("Fibers: lattice_style=%i", p->lattice_style);
+#else
+    flashText("Warning: cannot display fiber:lattice");
+#endif
 }
 
 

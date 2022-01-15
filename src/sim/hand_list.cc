@@ -51,7 +51,7 @@ void HandList::remove(Hand * n)
 }
 
 
-void HandList::update() const
+void HandList::updateAll() const
 {
     for ( Hand * h = haFront; h; h = h->next() )
         h->update();

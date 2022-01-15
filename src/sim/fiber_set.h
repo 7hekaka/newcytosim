@@ -103,10 +103,10 @@ public:
     void newFiberSitesM(Array<FiberSite>&, real spread) const;
     
     /// reverse the polarity of all fibers
-    void flipFiberPolarity();
+    void flipFiberPolarity(FiberProp *);
     
     /// update object after import
-    void update();
+    void updateFibers();
 
     /// delete objects that were not updated during import
     void prune();

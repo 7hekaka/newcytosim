@@ -81,7 +81,7 @@ void report(Simul const& sim, std::ostream& os, std::string const& what, size_t 
         if ( prefix )
             report_prefix(sim, os, what, frm, opt);
         else
-            sim.poly_report(os, what, opt, true);
+            sim.poly_report(os, what, opt, verbose);
     }
     catch( Exception & e )
     {

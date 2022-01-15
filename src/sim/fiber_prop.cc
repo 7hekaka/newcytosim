@@ -284,6 +284,7 @@ void FiberProp::clear()
 
     lattice             = 0;
     lattice_unit        = 0;
+    save_lattice        = 0;
     
     mesh                = 0;
     mesh_unit           = 0;
@@ -385,6 +386,7 @@ void FiberProp::read(Glossary& glos)
     
     glos.set(lattice,      "lattice");
     glos.set(lattice_unit, "lattice", 1, "lattice_unit", 0);
+    glos.set(save_lattice, "save_lattice");
     
 #if FIBER_HAS_MESH
     // the analog lattice containing 'real' values was named 'mesh' on 28.11.2019

@@ -37,7 +37,7 @@ public:
     void remove(Hand*);
     
     /// update all Hands bound to this
-    void update() const;
+    void updateAll() const;
     
     /// detach all Hands
     void detachAll();

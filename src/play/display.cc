@@ -1578,6 +1578,7 @@ void Display::drawFiber(Fiber const& fib)
         style = 0;
     }
 
+#if FIBER_HAS_LATTICE
     VisibleLattice const* lat = fib.visibleLattice();
     if ( lat && lat->ready() )
     {
@@ -1602,7 +1603,7 @@ void Display::drawFiber(Fiber const& fib)
                 break;
         }
     }
-    
+#endif
 #if ( DIM >= 3 )
     /*
      Handle styles in 3D that are using transparency to draw fiber's segments
