@@ -22,10 +22,13 @@ void NucleatorProp::clear()
     rate         = 0;
     fiber_type   = "";
     fiber_spec   = "";
-    specificity  = NUCLEATE_DIRECTED;
     track_end    = NO_END;
     hold_end     = MINUS_END;
     addictive    = false;
+    nucleation_angle = 0;
+#if BACKWARD_COMPATIBILITY < 57
+    specificity = 0;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -41,6 +44,8 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(fiber_type, "nucleate", 1);
     glos.set(fiber_spec, "nucleate", 2);
 
+    glos.set(nucleation_angle, "nucleation_angle");
+    
 #if BACKWARD_COMPATIBILITY < 100
     glos.set(fiber_spec, "nucleation_spec");
     glos.set(fiber_spec, "spec");
@@ -55,9 +60,10 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(hold_end, "hold_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}});
     
-    glos.set(specificity, "specificity", {{"off", NUCLEATE_DIRECTED},
-        {"parallel", NUCLEATE_PARALLEL}, {"antiparallel", NUCLEATE_ANTIPARALLEL},
-        {"parallel_if", NUCLEATE_PARALLEL_IF}});
+#if BACKWARD_COMPATIBILITY < 57
+    /// deprecated value, used here just for reading old files
+    glos.set(specificity, "specificity");
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -77,6 +83,11 @@ void NucleatorProp::complete(Simul const& sim)
         throw InvalidParameter("if set, hand:track_end should be equal to hold_end");
         
     rate_dt = rate * sim.time_step();
+
+#if BACKWARD_COMPATIBILITY < 57
+    if ( specificity && sim.primed() )
+        throw InvalidParameter("`nucleator:specificity' is deprecated: set `nucleation_angle' instead");
+#endif
 }
 
 
@@ -86,6 +97,7 @@ void NucleatorProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);
     write_value(os, "nucleate",  rate, fiber_type, "("+fiber_spec+")");
+    write_value(os, "nucleation_angle", nucleation_angle);
     write_value(os, "hold_end",  hold_end);
     write_value(os, "track_end", track_end);
     write_value(os, "addictive", addictive);

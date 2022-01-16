@@ -51,7 +51,7 @@ set hand nucleator
     unbinding = 0, 3
     activity = nucleate
     nucleate = 1, microtubule, ( length=0.1; plus_end=grow; )
-    specificity = parallel
+    nucleation_angle = 0.3 % almost parallel
     display = ( size=7; color=white; )
 }
 
@@ -64,6 +64,7 @@ set couple complex
     diffusion = 1
     stiffness = 100
     trans_activated = 1
+    length = 0.1
 }
 
 new 100 complex

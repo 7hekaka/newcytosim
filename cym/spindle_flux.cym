@@ -109,7 +109,7 @@ set hand nucleator
     hold_growing_end = 1;
 
     activity = nucleate
-    specificity = parallel_if
+    nucleation_angle = 0 % parallel
     nucleate = 0.2, microtubule, ( length=0.2; direction=X; plus_end=grow; )
     display = ( color=yellow; size=8; width=1; )
 }

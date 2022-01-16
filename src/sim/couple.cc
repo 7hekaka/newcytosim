@@ -521,26 +521,6 @@ Vector Couple::linkBase(Hand const* h) const
     }
 }
 
-
-Vector Couple::otherDirection(Hand const* h) const
-{
-    if ( h == cHand1 )
-    {
-        if ( attached2() )
-            return cHand2->dirFiber();
-        else
-            return Vector::randU();
-    }
-    else
-    {
-        if ( attached1() )
-            return cHand1->dirFiber();
-        else
-            return Vector::randU();
-    }
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark -
 

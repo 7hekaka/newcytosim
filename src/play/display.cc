@@ -34,6 +34,8 @@ Display::Display(DisplayProp const* dp)
 {
     assert_true(dp);
     prep_time = -1;
+    age_start = 0;
+    age_scale = 1.0;
 }
 
 void Display::setPixelFactors(float ps, float uv)

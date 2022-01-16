@@ -59,8 +59,6 @@ private:
     real linkRestingLength() const { return prop->length; }
     /// stiffness of the interaction
     real linkStiffness() const { return 0; }
-    /// return Base::identity() or Single::identity()
-    ObjectID nucleatorID() const { return base()?base()->identity():Object::identity(); }
 
 protected:
     

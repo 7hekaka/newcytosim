@@ -19,15 +19,6 @@ public:
     
     friend class Nucleator;
     
-    /// indicates a specificity
-    enum Specificity
-    {
-        NUCLEATE_DIRECTED,
-        NUCLEATE_PARALLEL, 
-        NUCLEATE_ANTIPARALLEL, 
-        NUCLEATE_PARALLEL_IF
-    };
-    
 public:
     
     /**
@@ -38,30 +29,20 @@ public:
      */
     
     /// rate for nucleation (also known as `nucleate[0]`)
-    real         rate;
+    real rate;
 
     /// type of fiber that is nucleated (also known as `nucleate[1]`)
-    std::string  fiber_type;
+    std::string fiber_type;
     
     /// specifications of a new fiber (also known as `nucleate[2]`)
     /**
      Options for the newly created Fiber may be specified here:
      see @ref FiberGroup.
      */
-    std::string  fiber_spec;
+    std::string fiber_spec;
     
-    /// specifies the direction of the new Fiber
-    /**
-     The `specificity` can be:
-     - off (default)
-     - parallel
-     - antiparallel
-     .
-     
-     With 'specificity=none', the direction will follow the value of 'orientation',
-     specified within the spec `nucleation[2]`.
-     */
-    Specificity  specificity;
+    /// angle of newly made fiber, relative to mother filament for Nucleator in Couple
+    real nucleation_angle;
     
     /// specifies if the nucleator attaches to fibers that it creates [none, minus_end, plus_end]
     /**
@@ -77,7 +58,7 @@ public:
      can only be released when the fiber is deleted, for example after a catastrophe.
      (default value is `minus_end`)
      */
-    FiberEnd     hold_end;
+    FiberEnd hold_end;
 
     /// option to track a specified end [none, minus_end, plus_end]
     /**
@@ -89,16 +70,21 @@ public:
      - minus_end
      .
      */
-    FiberEnd     track_end;
+    FiberEnd track_end;
     
     /// if true, set the Dynamic State of the nearest filament end to STATE_RED upon detachment
-    int          addictive;
+    int addictive;
     
     /// @}
 
+#if BACKWARD_COMPATIBILITY < 57
+    /// deprecated value, used here just for reading old files
+    int specificity;
+#endif
+    
 private:
     
-    real         rate_dt;
+    real rate_dt;
     
     
 public:

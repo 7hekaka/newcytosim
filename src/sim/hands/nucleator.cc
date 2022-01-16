@@ -31,85 +31,59 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
     // register the new objects:
     sim.add(objs);
     
-    // indicate the origin of nucleation:
     ObjectMark mk = 0;
-    if ( opt.set(mk, "mark") )
-        Simul::mark(objs, mk);
-    else
-        Simul::mark(objs, hMonitor->nucleatorID());
-
-    // the Fiber will be oriented depending on specificity:
-    Rotation rot;
+    Rotation rot(0, 1);
     
-    real ang = 0;
-    if ( opt.set(ang, "nucleation_angle") )
+    Hand const* h = hMonitor->otherHand(this);
+
+    if ( h && h->attached() )
     {
-        Vector dir = hMonitor->otherDirection(this);
-        rot = Rotation::rotationToVector(dir);
+        // nucleating on the side of a 'mother' fiber:
+        Vector dir = h->dirFiber();
+        // select rotation to align with direction of 'mother' fiber:
+        rot = Rotation::randomRotationToVector(dir);
+        real A = prop->nucleation_angle;
+        // add deviation 'nucleation_angle' in branching
+        real L = hMonitor->linkRestingLength();
 #if ( DIM == 2 )
-        rot = rot * Rotation::randomRotation(ang);
+        real F = RNG.sflip();
+        // shift position by the length of the interaction:
+        pos += rot * Vector(0, L*F, 0);
+        rot = rot * Rotation::rotation(std::cos(A), std::sin(A)*F);
 #elif ( DIM == 3 )
-        rot = rot * Rotation::rotationAroundX(RNG.sreal()*M_PI) * Rotation::rotationAroundZ(ang);
+        // shift position by the length of the interaction:
+        pos += rot * Vector(0, L, 0);
+        rot = rot * Rotation::rotationAroundZ(A);
 #endif
+        // equalize marks to highlight amplification:
+        mk = h->fiber()->mark();
+        if ( mk == 0 )
+        {
+            mk = h->fiber()->identity();
+            h->fiber()->mark(mk);
+        }
+        // remove key to avoid unused warning:
+        opt.clear("direction");
     }
-    else switch( prop->specificity )
-    {            
-        case NucleatorProp::NUCLEATE_PARALLEL:
-        {
-            Vector dir = hMonitor->otherDirection(this);
-            rot = Rotation::randomRotationToVector(dir);
-        }
-        break;
-        
-        case NucleatorProp::NUCLEATE_ANTIPARALLEL:
-        {
-            Vector dir = -hMonitor->otherDirection(this);
-            rot = Rotation::randomRotationToVector(dir);
-        }
-        break;
-        
-        case NucleatorProp::NUCLEATE_PARALLEL_IF:
-        {
-            Hand * ha = hMonitor->otherHand(this);
-            if ( ha && ha->attached() )
-            {
-                rot = Rotation::randomRotationToVector(ha->dirFiber());
-                // remove key to avoid unused warning:
-                opt.clear("direction");
-                break;
-            }
-            fib->mark(0);
-        }
-        // here is an intentional fallback on the next case:
-        
-        case NucleatorProp::NUCLEATE_DIRECTED:
-        {
-            std::string str;
-            if ( opt.set(str, "direction") )
-            {
-                std::istringstream iss(str);
-                Vector vec = Movable::readDirection(iss, pos, fib->prop->confine_space_ptr);
-                rot = Rotation::randomRotationToVector(vec);
-            }
-            else {
-                rot = Rotation::randomRotation();
-            }
-        }
-        break;
-
-        default:
-            throw InvalidParameter("unknown nucleator:specificity");
-    }
-    
-    ObjectSet::rotateObjects(objs, rot);
-    
-    // shift position by the length of the interaction:
-    if ( hMonitor->linkRestingLength() > 0 )
+    else
     {
-        Vector dir = hMonitor->otherDirection(this);
-        pos += dir.randOrthoU(hMonitor->linkRestingLength());
+        // nucleating in the bulk:
+        std::string str;
+        if ( opt.set(str, "direction") )
+        {
+            std::istringstream ss(str);
+            Vector dir = Movable::readDirection(ss, pos, fib->prop->confine_space_ptr);
+            rot = Rotation::randomRotationToVector(dir);
+        }
+        else
+            rot = Rotation::randomRotation();
     }
+    
+    // mark fiber to highlight mode of nucleation:
+    opt.set(mk, "mark");
+    Simul::mark(objs, mk);
 
+    ObjectSet::rotateObjects(objs, rot);
     /*
      We translate Fiber to match the Nucleator's position,
      and if prop->hold_end, the Hand is attached to the new fiber
@@ -117,16 +91,17 @@ void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type,
     if ( prop->hold_end == MINUS_END )
     {
         attachEnd(fib, MINUS_END);
-        ObjectSet::translateObjects(objs, pos-fib->posEndM());
+        pos -= fib->posEndM();
     }
     else if ( prop->hold_end == PLUS_END )
     {
         attachEnd(fib, PLUS_END);
-        ObjectSet::translateObjects(objs, pos-fib->posEndP());
+        pos -= fib->posEndP();
     }
     else
-        ObjectSet::translateObjects(objs, pos-fib->position());
-
+        pos -= fib->position();
+    
+    ObjectSet::translateObjects(objs, pos);
     //std::clog << "nucleated fiber in direction " << fib->dirEndM() << "\n";
 
     opt.print_warnings(std::cerr, 1, "nucleator:spec\n");

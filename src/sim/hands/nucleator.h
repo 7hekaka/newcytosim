@@ -15,8 +15,9 @@ class NucleatorProp;
  The rate, the type of fiber and the characteristics of the fiber are set
  as three values in property @ref NucleatorPar "nucleate".
  
- The parameter @ref NucleatorPar "specificity" allow to constrain
- the direction of the new fiber that is nucleated.
+ If the nucleator is part of a Couple, the paramter "nucleation_angle"
+ can be set to define the direction of the new fiber with respect to the
+ preexisting fiber (the one that is bound by the other Hand of the Couple).
  
  By default the nucleator stays attached at the MINUS_END
  of the fiber that it has created.
@@ -36,6 +37,9 @@ private:
     /// Gillespie countdown timer
     real nextNuc;
     
+    /// create a new Fiber
+    void makeFiber(Simul&, Vector pos, std::string const&, Glossary&);
+
 public:
     
     /// Property
@@ -47,9 +51,6 @@ public:
     /// destructor
     ~Nucleator() {}
     
-    
-    /// create a new Fiber
-    void makeFiber(Simul&, Vector pos, std::string const&, Glossary&);
     
     /// simulate when is not attached
     void stepUnattached(Simul&, Vector const& pos);

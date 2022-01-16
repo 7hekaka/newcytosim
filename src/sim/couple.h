@@ -65,8 +65,6 @@ protected:
     
     /// specialization of HandMonitor
     Hand * otherHand(Hand const*) const;
-    /// specialization of HandMonitor
-    Vector otherDirection(Hand const*) const;
     
     /// true if both Hands are attached
     bool hasLink() const { return cHand1->attached() && cHand2->attached(); }
@@ -76,8 +74,6 @@ protected:
     Vector linkBase(Hand const*) const;
     /// specialization of HandMonitor
     real linkRestingLength() const { return prop->length; }
-    /// specialization of HandMonitor
-    ObjectID nucleatorID() const { return Object::identity(); }
 
     /// update position to account for diffusion in one time step
     void diffuse();
