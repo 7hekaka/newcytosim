@@ -72,7 +72,7 @@ def nice_plot(time, data):
     """
         Plot size as a function of time
     """
-    fig = plt.figure(figsize=(5, 4))
+    fig = plt.figure(figsize=(5.12, 3.84))
     plt.plot(time, data, 'b-', linewidth=7)
     # add horizontal bar at starting size:
     h = data[0]
@@ -95,7 +95,7 @@ def mini_plot(time, size):
     """
         Make small plot of size as a function of time
     """
-    fig = plt.figure(figsize=(2, 2))
+    fig = plt.figure(figsize=(2.56, 1.92))
     ax = fig.add_axes([0, 0, 1, 1])
     plt.plot(time, data, 'b-', linewidth=3)
     h = data[0]
@@ -135,17 +135,22 @@ def get_moment(file):
     return zip(*res)
 
 
+def print_data(data):
+    for t, m, l in data:
+        print("%.2f : %.2f %.2f" % (t, m, l))
+
+
 def get_radius(file):
     """
         Compute radius of network from moment variance
     """
     global earliest, length
     T, M, L = get_moment(file)
-    length = sum(L) / len(L)
-    print("Length <- " + str(length))
+    length = max(L) #sum(L) / len(L)
     if not T:
         raise Exception("Could not find time information")
     earliest = min(T)
+    print("length <- %.2f, earliest <- %.2f" % (length, earliest))
     R = [ math.sqrt(2*x) for x in M ]  # radius of disc
     #S = [ math.pi*2*x for x in M ]   # surface of disc
     #R = [ math.sqrt(x) for x in M ]    # radius of circle
@@ -176,13 +181,13 @@ def get_type(confname):
     return -1
 
 
-def process(dirpath, momfile, results):
+def process(dirpath, momfile):
     """
         Process given directory
     """
     os.chdir(dirpath)
     if not os.path.isfile(momfile) and os.path.isfile('properties.cmp'):
-        args = ['reportN', 'fiber:moment']
+        args = ['reportN', 'fiber:moment,couple']
         subprocess.call(args, stdout=open(momfile, 'w'))
     try:
         f = open(momfile, 'r')
@@ -193,7 +198,7 @@ def process(dirpath, momfile, results):
     if do_plot:
         nice_plot(time, data)
         plt.title(dirpath, fontsize=fts)
-        plt.savefig('size.png', dpi=150)
+        plt.savefig('size.png', dpi=100)
         #plt.show()
         plt.close()
     if add_fit:
@@ -204,7 +209,7 @@ def process(dirpath, momfile, results):
         B = 0
         C = 0
     D = get_type('config.cym')
-    results.append([dirpath, A, B, C, D, length])
+    return [dirpath, A, B, C, D, length];
 
 
 def print_results(res, filename=''):
@@ -225,21 +230,27 @@ def print_results(res, filename=''):
 
 def main(args):
     paths = []
+    output = 'rates.txt'
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
+        elif arg[0].isalpha():
+            output = arg
         else:
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     if not paths:
         sys.stderr.write("Please specify some directory paths\n")
+        sys.exit()
     cdir = os.getcwd()
     results = []
     for p in paths:
         sys.stdout.write('- '*32+p+"\n")
-        process(p, 'mom.txt', results)
+        res = process(p, 'mom.txt')
+        results.append(res)
         os.chdir(cdir)
-    print_results(results, 'rates.txt')
+    if results and not os.path.isfile(output) or not do_plot:
+        print_results(results, output)
 
 
 if __name__ == "__main__":

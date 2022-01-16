@@ -34,7 +34,7 @@ def plot(X, Y):
     """
         Make one plot to compare data in conditions X and Y
     """
-    fig = plt.figure(figsize=(5, 4))
+    fig = plt.figure(figsize=(5.12, 3.84))
     plt.scatter(X, Y, marker='o', s=8, c='blue')
     # add diagonal:
     M = math.ceil(20*max(X))*0.05
@@ -61,7 +61,7 @@ def one_plot(pool, X, Y):
     plt.ylabel('Contraction (%s)' % modifs(Y), fontsize=fts)
     plt.title('Rate correlation', fontsize=fts)
     fig.tight_layout()
-    plt.savefig('0_contraction%i%i.png' %(X,Y), dpi=150)
+    plt.savefig('0_contraction%i%i.png' %(X,Y), dpi=100)
     plt.close()
 
 
@@ -83,6 +83,10 @@ def many_plots(data):
         for Y in pool.keys():
             if Y > X:
                 one_plot(pool, X, Y)
+    # check for odd outcome in which myosin decreased contraction:
+    for a, b in zip(pool[0], pool[4]):
+        if ( b < a ):
+            print(a, b)
     # check some pairs:
     if 7 in pool:
         one_plot(pool, 5, 7)
