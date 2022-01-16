@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 #
-# scan.py executes a given command in many directories
+# scan.py executes a given command sequentially or in parallel, in specified directories
 #
-# Copyright  F. Nedelec and S. Dmitrieff 2007--2021
+# Copyright  F. Nedelec and S. Dmitrieff; 2007--2022
 
 """
-    Execute specified command in given directories, sequentially using a given number of processes
+    Execute specified command in given directories, sequentially or in parallel,
+    using independent threads.
  
 Syntax:
 
-    scan.py command directory1 [directory2] [directory3] [...] [jobs=N]
+    scan.py command [-] directory1 [directory2] [directory3] [...] [jobs=INTEGER]
     
-Example:
+    if '-' is specified, reduce output to the command
+    if 'jobs' is set, run in parallel using specified number of threads
+
+Examples:
     
+    scan.py 'play image' run*
     scan.py 'play image' run* jobs=2
+    
     
 F. Nedelec, 02.2011, 09.2012, 03.2013, 01.2014, 06.2017, 07.2021
 S. Dmitreff, 06.2017

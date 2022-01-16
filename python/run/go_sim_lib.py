@@ -119,7 +119,7 @@ def park_directory(path, park, name):
         return src
     else:
         shutil.rmtree(src)
-    out.write(" ---> done\n")
+    out.write(" : done\n")
     return dst
 
 
