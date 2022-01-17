@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "dim.h"
 #include "assert_macro.h"
@@ -66,9 +66,6 @@ void Aster::setInteractions(Meca& meca) const
         if ( fib )
         {
             AsterLink const& link = asLinks[n];
-            
-            if ( link.rank_ == 0 )
-                continue;
             
             const size_t off = sol->matIndex() + link.prime_;
             const size_t pts[] = { off, off+1, off+2, off+3 };
@@ -273,8 +270,8 @@ ObjectList Aster::makeFiber(Simul& sim, size_t inx, std::string const& fiber_typ
 
     grasp(fib, inx);
 
-    Vector pos = posLink1(inx);
-    Vector dir = posLink2(inx) - pos;
+    Vector pos = posSolid1(inx);
+    Vector dir = posSolid2(inx) - pos;
     real n = dir.normSqr();
     
     if ( n > REAL_EPSILON )
@@ -604,8 +601,8 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
 #endif
         asLinks[i].read(in, asRadius);
-        if ( asLinks[i].prime_ + asLinks[i].rank_ > sol->nbPoints() )
-            throw InvalidIO("invalid AsterLink index");
+        if ( asLinks[i].prime_ + DIM >= sol->nbPoints() )
+            throw InvalidIO("out-of-range AsterLink index");
     }
     
     if ( nbf > 0 )
@@ -619,43 +616,41 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
-Vector Aster::posLink1(size_t inx) const
+static Vector interpolateSolid(Solid const* sol, real const coef[], size_t ref, size_t rank)
 {
-    Solid const* sol = solid();
-    real const* coef = asLinks[inx].coef1_;
-    const size_t ref = asLinks[inx].prime_;
-    
-#if BACKWARD_COMPATIBILITY < 47
-    if ( asLinks[inx].alt_ > 0 )
-        return sol->posPoint(ref);
-#endif
-
-    size_t top = std::min(DIM+1LU, sol->nbPoints());
+    assert_true( rank > 0 );
+    assert_true( ref < sol->nbPoints() );
+    size_t top = std::min(rank, sol->nbPoints()-ref);
     Vector res = coef[0] * sol->posPoint(ref);
     for ( size_t i = 1; i < top; ++i )
-        res += coef[i] * sol->posPoint(i+ref);
-    
+        res += coef[i] * sol->posPoint(ref+i);
     return res;
 }
 
-Vector Aster::posLink2(size_t inx) const
+Vector Aster::posSolid1(size_t inx) const
 {
-    Solid const* sol = solid();
-    real const* coef = asLinks[inx].coef2_;
-    const size_t ref = asLinks[inx].prime_;
+    AsterLink const& link = asLinks[inx];
     
 #if BACKWARD_COMPATIBILITY < 47
-    if ( asLinks[inx].alt_ > 0 )
-        return sol->posPoint(asLinks[inx].alt_);
+    if ( link.alt_ > 0 )
+        return sol->posPoint(link.prime_);
 #endif
-
-    size_t top = std::min(DIM+1LU, sol->nbPoints());
-    Vector res = coef[0] * sol->posPoint(ref);
-    for ( size_t i = 1; i < top; ++i )
-        res += coef[i] * sol->posPoint(i+ref);
     
-    return res;
+    return interpolateSolid(solid(), link.coef1_, link.prime_, link.rank_);
 }
+
+Vector Aster::posSolid2(size_t inx) const
+{
+    AsterLink const& link = asLinks[inx];
+    
+#if BACKWARD_COMPATIBILITY < 47
+    if ( link.alt_ > 0 )
+        return sol->posPoint(link.alt_);
+#endif
+    
+    return interpolateSolid(solid(), link.coef2_, link.prime_, DIM+1);
+}
+
 
 Vector Aster::posFiber2(size_t inx) const
 {
@@ -664,10 +659,7 @@ Vector Aster::posFiber2(size_t inx) const
     
     if ( fib->length() >= len )
     {
-        if ( len > 0 )
-            return fib->posFrom(len, prop->focus);
-        else
-            return fib->posEnd(prop->focus);
+        return fib->posFrom(len, prop->focus);
     }
     else
     {
@@ -683,16 +675,13 @@ Vector Aster::posFiber2(size_t inx) const
  */
 real Aster::getLink1(size_t inx, Vector& pos1, Vector& pos2) const
 {
-    if ( inx < asLinks.size() && asLinks[inx].rank_ > 0 )
+    pos1 = posSolid1(inx);
+    if ( fiber(inx) )
     {
-        pos1 = posLink1(inx);
-        if ( fiber(inx) )
-        {
-            pos2 = posFiber1(inx);
-            return prop->stiffness[0];
-        }
-        pos2 = pos1;
+        pos2 = posFiber1(inx);
+        return prop->stiffness[0];
     }
+    pos2 = pos1;
     return 0;
 }
 
@@ -703,32 +692,27 @@ real Aster::getLink1(size_t inx, Vector& pos1, Vector& pos2) const
  */
 real Aster::getLink2(size_t inx, Vector& pos1, Vector& pos2) const
 {
-    if ( inx < asLinks.size() && asLinks[inx].rank_ > 0 )
+    Fiber const* fib = fiber(inx);
+    
+    if ( fib )
     {
-        Fiber const* fib = fiber(inx);
-
-        if ( fib )
+        real len = asLinks[inx].len_;
+        if ( fib->length() >= len )
         {
-            real len = asLinks[inx].len_;
-            if ( fib->length() >= len )
-            {
-                pos1 = posLink2(inx);
-            }
-            else
-            {
-                // interpolate between the two solid-points:
-                real c = fib->length() / len;
-                pos1 = ( 1.0 - c ) * posLink1(inx) + c * posLink2(inx);
-            }
-            pos2 = posFiber2(inx);
-            return prop->stiffness[1];
+            pos1 = posSolid2(inx);
         }
         else
         {
-            pos1 = posLink2(inx);
-            pos2 = pos1;
+            // interpolate between the two solid-points:
+            real c = fib->length() / len;
+            pos1 = ( 1.0 - c ) * posSolid1(inx) + c * posSolid2(inx);
         }
+        pos2 = posFiber2(inx);
+        return prop->stiffness[1];
     }
+
+    pos1 = posSolid2(inx);
+    pos2 = pos1;
     return 0;
 }
 
@@ -739,12 +723,15 @@ real Aster::getLink2(size_t inx, Vector& pos1, Vector& pos2) const
  */
 bool Aster::getLink(size_t inx, Vector& pos1, Vector& pos2) const
 {
-    if ( inx & 1 )
-        getLink2(inx/2, pos1, pos2);
-    else
-        getLink1(inx/2, pos1, pos2);
-    
-    return ( inx < 2 * asLinks.size() );
+    if ( inx < 2 * asLinks.size() )
+    {
+        if ( inx & 1 )
+            getLink2(inx/2, pos1, pos2);
+        else
+            getLink1(inx/2, pos1, pos2);
+        return 1;
+    }
+    return 0;
 }
 
 

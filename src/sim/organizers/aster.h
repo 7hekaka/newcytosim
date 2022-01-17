@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #ifndef ASTER_H
 #define ASTER_H
@@ -17,7 +17,7 @@ class AsterLink
     
 private:
     
-    /// type of link:
+    /// rank of link 1
     /**
      0 = no link
      1 = the interpolation corresponds exactly to point 'prime_'
@@ -28,10 +28,10 @@ private:
     /// index of first point on the Solid
     size_t prime_;
     
-    /// interpolation coefficient for Fiber end
+    /// interpolation coefficients on Solid for link 1
     real coef1_[4];
     
-    /// interpolation coefficient for Fiber side
+    /// interpolation coefficients on Solid for link 2
     real coef2_[4];
     
     /// distance between the two anchoring points
@@ -49,10 +49,12 @@ private:
     /// calculate rank: how many coefficients are not null
     void polish()
     {
-        size_t R = 4;
-        while ((R > 0) & (abs_real(coef1_[R-1]) < REAL_EPSILON))
-            --R;
-        rank_ = R;
+        rank_ = 1;
+        for ( int i = 1; i <= DIM; ++i )
+        {
+            if ( abs_real(coef1_[i]) > 0 )
+                rank_ = i+1;
+        }
     }
 
 public:
@@ -66,7 +68,7 @@ public:
     /// set to zero
     void reset()
     {
-        rank_ = 0;
+        rank_ = 1;
         prime_ = 0;
         len_ = 0;
         set_coef1(0.0, 0.0, 0.0);
@@ -182,7 +184,11 @@ private:
     
     /// store the coefficients needed to make the links between Solid and Fiber
     Array<AsterLink> asLinks;
+    
+    /// Property
+    AsterProp const* prop;
 
+    
     /// create and configure the Solid
     ObjectList makeSolid(Simul&, Glossary& opt, size_t& origin);
 
@@ -195,8 +201,17 @@ private:
     /// define the anchor points of Fibers
     void placeAnchors(Glossary& opt, size_t origin, size_t nbf);
     
-    /// Property
-    AsterProp const* prop;
+    /// position on Solid of the first link to n-th fiber
+    Vector posSolid1(size_t n) const;
+    
+    /// position on Solid of the second link to n-th fiber
+    Vector posSolid2(size_t n) const;
+
+    /// position of Fiber's end involved in first link
+    Vector posFiber1(size_t n) const { return fiber(n)->posEnd(prop->focus); }
+    
+    /// position of Fiber's point involved in second link
+    Vector posFiber2(size_t n) const;
     
 public:
     
@@ -226,18 +241,6 @@ public:
     
     /// add interactions to a Meca
     void setInteractions(Meca&) const;
-    
-    /// position of first clamp for Fiber n
-    Vector posLink1(size_t n) const;
-    
-    /// position of second clamp for Fiber n
-    Vector posLink2(size_t n) const;
-
-    /// position of end on Fiber corresponding to first link
-    Vector posFiber1(size_t n) const { return fiber(n)->posEnd(prop->focus); }
-    
-    /// position of attachment point on Fiber corresponding to second link
-    Vector posFiber2(size_t n) const;
     
     /// number of links to be displayed using getLink()
     size_t nbLinks() const { return 2 * nbFibers(); }
