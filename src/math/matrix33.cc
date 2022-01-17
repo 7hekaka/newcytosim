@@ -4,14 +4,19 @@
 #include "vector2.h"
 #include "random.h"
 
+/// this only works for non-symmetric matrices
 Vector3 Matrix33::rotationAxis() const
 {
-    return Vector3(val[2+BLD]-val[1+2*BLD], val[2*BLD]-val[2], val[1]-val[BLD]);
+    real x = val[2+BLD] - val[1+2*BLD];
+    real y = val[2*BLD] - val[2];
+    real z = val[1] - val[BLD];
+    real n = std::sqrt(x*x + y*y + z*z);
+    return Vector3(x/n, y/n, z/n);
 }
 
 real Matrix33::rotationAngle() const
 {
-    return std::acos(0.5*(1-trace()));
+    return std::acos(0.5-0.5*trace());
 }
 
 
@@ -134,10 +139,12 @@ Matrix33 Matrix33::rotationAroundAxisEuler(const real a[3])
 Matrix33 Matrix33::randomRotation()
 {
     //James Arvo, Fast random rotation matrices. in Graphics Gems 3.
+    real u1 = M_PI * RNG.sreal();
     real u2 = M_PI * RNG.sreal();
     real u3 = RNG.preal();
-    Vector3 V( std::cos(u2)*std::sqrt(u3), std::sin(u2)*std::sqrt(u3), std::sqrt(1-u3) );
-    return householder(V).mul(rotationAroundZ(M_PI*RNG.sreal()));
+    real uu = std::sqrt(u3);
+    Vector3 V( uu*std::cos(u2), uu*std::sin(u2), std::sqrt(1-u3) );
+    return householder(V) * rotationAroundZ(std::cos(u1), std::sin(u1));
 }
 
 

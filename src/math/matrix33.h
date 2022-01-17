@@ -1044,7 +1044,7 @@ public:
                          Z * dir.ZZ + dia);
     }
     
-    // build the rotation matrix `M = 2 V (x) V - Id` of angle 180
+    /// build the rotation matrix `M = 2 * dir (x) dir - Id` of axis `dir` and angle 180
     static Matrix33 householder(const Vector3& axis)
     {        
         real X = axis.XX, Y = axis.YY, Z = axis.ZZ;
@@ -1069,6 +1069,7 @@ public:
     
     /// 2D Rotation around `axis` (of norm 1) with angle set by cosine and sine values
     /**
+     This is not a 3D rotation and the images of 'axis' is zero!
      This is equivalent to rotationAroundAxis(axis, c, s) - outerProduct(axis)
      Attention: This is meant to be called with `norm(axis)==1` and `c*c + s*s == 1`
      but the values of 'c' and 's' can be tweaked to scale the resulting matrix.
@@ -1129,6 +1130,12 @@ public:
     
     /// return a rotation that transforms (1,0,0) into (-1,0,0)
     static Matrix33 rotation180();
+    
+    /// return rotation of axis Z with angle defined by cosine, sine values
+    static Matrix33 rotationAroundZ(const real C, const real S)
+    {
+        return Matrix33(C, S, 0, -S, C, 0, 0, 0, 1);
+    }
 
     /// a rotation around the X axis of specified angle
     static Matrix33 rotationAroundX(real angle);

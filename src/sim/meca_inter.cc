@@ -3304,6 +3304,7 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
     MatrixBlock T = MatrixBlock::planarRotation(armB/len, b*ang.XX, b*ang.YY);
     
     addTiltedSideSideLink(ptA, R, ptB, T, weight);
+    throw Exception("Meca::addTiltedSideSideLink is not torque-balanced!");
 }
 
 //------------------------------------------------------------------------------

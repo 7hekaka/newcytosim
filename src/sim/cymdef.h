@@ -9,7 +9,7 @@
 
 /**
  Enable code to be able to read old trajectory files.
- The value indicates the file format (currentFormatID) to be readable.
+ The value indicates the earliest file format that should still be readable.
  
  default = 50
  */
