@@ -155,13 +155,13 @@ int main(int argc, char* argv[])
 
     if ( arg.use_key("image") )
     {
-        prop.image_name = "image";
+        prop.image_name = "image%";
         mode = SAVE_IMAGE;
     }
     
     if ( arg.use_key("poster") )
     {
-        prop.image_name = "poster";
+        prop.image_name = "poster%";
         mode = SAVE_IMAGE;
         magnify = 3;
     }
@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
     if ( arg.use_key("movie") )
     {
         if ( mode == NORMAL )
-            prop.image_name = "movie";
+            prop.image_name = "movie%";
         mode = SAVE_MOVIE;
     }
 

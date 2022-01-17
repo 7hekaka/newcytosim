@@ -505,20 +505,17 @@ void FiberProp::complete(Simul const& sim)
     if ( viscosity <= 0 )
         throw InvalidParameter("fiber:viscosity or simul:viscosity should be defined > 0");
 
-    if ( confine != CONFINE_OFF )
-    {
-        confine_space_ptr = sim.findSpace(confine_space);
-        if ( confine_space_ptr )
-            confine_space = confine_space_ptr->name();
-        else
-        {
-            if ( sim.primed() )
-                throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
-            // this condition occur when the Property is created before the Space
-        }
-    }
+    /* confine_space is also used for `glue' and `shrink_outside',
+     and needs to be set here */
+    confine_space_ptr = sim.findSpace(confine_space);
+    if ( confine_space_ptr )
+        confine_space = confine_space_ptr->name();
     else
-        confine_space_ptr = nullptr;
+    {
+        if ( confine != CONFINE_OFF && sim.primed() )
+            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+        // this condition occur when the Property is created before the Space
+    }
     
     if ( confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
