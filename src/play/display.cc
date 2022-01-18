@@ -575,14 +575,16 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
 
 
 /**
- Draw a transparent Spaces (3D only)
+ Draw the back and front sides of Spaces in 3D
+ This function is called twice at the start and end of drawSimul
  */
-void Display::drawSpace(Space const* obj, bool opaque)
+void Display::drawSpace(Space const* obj, bool back)
 {
     const PointDisp * disp = obj->prop->disp;
+    bool front = back ^ ( disp->color.transparent() );
     
-    bool back = ( disp->visible & 2 ) && ( disp->color2.opaque() == opaque );
-    bool front = ( disp->visible & 1 ) && ( disp->color.opaque() == opaque );
+    back = ( disp->visible & 2 ) && back;
+    front = ( disp->visible & 1 ) && front;
     
     if ( back | front )
     {

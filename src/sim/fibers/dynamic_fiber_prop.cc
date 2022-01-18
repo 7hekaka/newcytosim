@@ -61,7 +61,6 @@ void DynamicFiberProp::read(Glossary& glos)
     glos.set(zone_hydrolysis_rate, 2, "zone_hydrolysis_rate");
 #endif
 #if BACKWARD_COMPATIBILITY < 44
-    
     if ( glos.set(growing_force[0], "dynamic_force") )
         Cytosim::warn << "fiber:dynamic_force was renamed growing_force\n";
     
@@ -72,8 +71,30 @@ void DynamicFiberProp::read(Glossary& glos)
         persistent = ( f != 1 );
         rebirth_rate[0] = ( f == 2 ? INFINITY : 0 );
     }
-    
 #endif
+    /*
+     If 'length' is specified, we calculate the corresponding hydrolysis_rate
+     */
+    real len = 0;
+    if ( glos.set(len, "length") )
+    {
+        const real g = growing_speed[0] / unit_length;
+        const real g2 = g * g;
+        const real t = len / ( g * unit_length );
+        /* Use Newton's method to find root of:
+         F = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
+         d = -2*(7*h^3+24*g*h^2+27*g^2*h+9*g^3) / (3*h^3*(2*h+3*g)^2)
+         */
+        real h = std::sqrt(0.3333/g); //t = g / ( 3*h*h );
+        for ( int i = 0; i < 9; ++i )
+        {
+            real h2 = h * h, hg = 2*h + 3*g;
+            real F = ( 7*h2 + 12*g*h + 3*g2 - t * (3*h2 * hg) ) * h * hg;
+            real d = -2 * ( h2 * ( 7*h + 24*g ) + 9 * g2 * ( 3*h + g ));
+            h -= F / d;
+        }
+        splash(std::clog, g, h);
+    }
 }
 
 
@@ -131,14 +152,14 @@ void DynamicFiberProp::complete(Simul const& sim)
 }
 
 
+/**
+ Estimate the life time and length of fiber using formula from:
+ A theory of microtubule catastrophes and their regulation</b>\n
+ Brun L, Rupp B, Ward J, Nedelec F\n
+ PNAS 106 (50) 21173-21178; 2009\n
+ */
 void DynamicFiberProp::splash(std::ostream& os, real g, real h) const
 {
-    /*
-     Using formula from:
-     A theory of microtubule catastrophes and their regulation</b>\n
-     Brun L, Rupp B, Ward J, Nedelec F\n
-     PNAS 106 (50) 21173-21178; 2009\n
-     */
     real ctime = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
     real len = g * unit_length * ctime;
     
