@@ -59,10 +59,9 @@ namespace sMath
     template <typename T>
     inline void sort(const T& a, const T& b)
     {
-        T i = std::min(a, b);
-        T s = std::max(a, b);
-        a = i;
-        b = s;
+        T i = a;
+        a = std::min(a, b);
+        b = std::max(i, b);
     }
     
     /// sort in ascending order
@@ -105,21 +104,21 @@ namespace sMath
 
     /// return index of the arguments that is the smallest, in {0, 1, 2}
     template <typename T>
-    inline int arg_min(const T& a, const T& b, const T& c)
+    inline size_t arg_min(const T& a, const T& b, const T& c)
     {
         return 2*( c < std::min(b,a) ) | ( b < std::min(a,c) );
     }
     
     /// return index of the arguments that is the largest, in {0, 1, 2}
     template <typename T>
-    inline int arg_max(const T& a, const T& b, const T& c)
+    inline size_t arg_max(const T& a, const T& b, const T& c)
     {
         return 2*( c > std::max(b,a) ) | ( b > std::max(a,c) );
     }
 
     /// return index of the arguments that is the smallest
     template <typename T>
-    inline int arg_min(const T& a, const T& b, const T& c, const T& d)
+    inline size_t arg_min(const T& a, const T& b, const T& c, const T& d)
     {
         T ab = std::min(a, b);
         T cd = std::min(c, d);
@@ -128,7 +127,7 @@ namespace sMath
     
     /// return index of the arguments that is the largest
     template <typename T>
-    inline int arg_max(const T& a, const T& b, const T& c, const T& d)
+    inline size_t arg_max(const T& a, const T& b, const T& c, const T& d)
     {
         T ab = std::max(a, b);
         T cd = std::max(c, d);

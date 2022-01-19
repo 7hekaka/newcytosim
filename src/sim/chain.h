@@ -393,9 +393,6 @@ public:
     
     /// should return 1.0 / segmentation()
     real segmentationInv() const { return iCut; }
-
-    /// returns third power of segmentation()
-    real segmentationCube() const { return fnCut*fnCut*fnCut; }
     
     /// reinterpolate vertices and adjust fiber to have `ns` segments
     void resegment(size_t ns);

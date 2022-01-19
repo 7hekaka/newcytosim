@@ -103,7 +103,7 @@ int DynamicFiber::stepMinusEnd()
 		nextShrinkM -= prop->shrinking_rate_dt[M] + chewing;
 		while ( nextShrinkM <= 0 )
 		{
-			// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
+            // remove last unit, while penultimate position can be a GTP survivor
 			unitM[0] = unitM[1];
 			unitM[1] = RNG.test(prop->unhydrolyzed_prob[M]);
 			--res;
@@ -135,16 +135,16 @@ int DynamicFiber::stepMinusEnd()
 #endif
 
 		// @todo detach_rate should depend on the state of the subunit
-		real detach = prop->growing_off_rate_dt[M] + chewing;
+		real shrink = prop->growing_off_rate_dt[M] + chewing;
 
 		nextGrowthM -= growth;
-		nextShrinkM -= detach;
+		nextShrinkM -= shrink;
 		nextHydrolM -= hydrol;
-
-		while (( nextGrowthM < 0 ) | ( nextShrinkM < 0 ) | ( nextHydrolM < 0 ))
-		{
-			// Select the earliest event:
-			int ii = sMath::arg_min(nextGrowthM/growth, nextHydrolM/hydrol, nextShrinkM/detach);
+        
+        while (( nextGrowthM < 0 ) | ( nextShrinkM < 0 ) | ( nextHydrolM < 0 ))
+        {
+            // Select the earliest event (in most cases, only one event will fire up)
+            size_t ii = sMath::arg_min(nextGrowthM/growth, nextHydrolM/hydrol, nextShrinkM/shrink);
 
 			switch ( ii )
 			{
@@ -163,7 +163,7 @@ int DynamicFiber::stepMinusEnd()
 					break;
 
 				case 2:
-					// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
+					// remove last unit, while penultimate position can be a GTP survivor
 					unitM[0] = unitM[1];
 					unitM[1] = RNG.test(prop->unhydrolyzed_prob[M]);
 					--res;
@@ -260,7 +260,7 @@ int DynamicFiber::stepPlusEnd()
         nextShrinkP -= prop->shrinking_rate_dt[P] + chewing;
         while ( nextShrinkP <= 0 )
         {
-        	// remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
+            // remove last unit, while penultimate position can be a GTP survivor
 			unitP[0] = unitP[1];
             unitP[1] = RNG.test(prop->unhydrolyzed_prob[P]);
 			--res;
@@ -293,17 +293,23 @@ int DynamicFiber::stepPlusEnd()
 #endif
         
         // @todo detach_rate should depend on the state of the subunit
-        real detach = prop->growing_off_rate_dt[P] + chewing;
+        real shrink = prop->growing_off_rate_dt[P] + chewing;
         
         nextGrowthP -= growth;
-        nextShrinkP -= detach;
+        nextShrinkP -= shrink;
         nextHydrolP -= hydrol;
         
         while (( nextGrowthP < 0 ) | ( nextShrinkP < 0 ) | ( nextHydrolP < 0 ))
         {
-            // Select the earliest event:
-            int ii = sMath::arg_min(nextGrowthP/growth, nextHydrolP/hydrol, nextShrinkP/detach);
-            
+            // Select the earliest event (in most cases, only one event will fire up)
+#if 0
+            size_t ii = sMath::arg_min(nextGrowthP/growth, nextHydrolP/hydrol, nextShrinkP/shrink);
+#else
+            // it is possible to replace the divisions by multiplications following arg_min()'s implementation...
+            size_t cba = ( nextShrinkP*growth*hydrol < std::min(nextHydrolP*growth, nextGrowthP*hydrol)*shrink );
+            size_t bac = ( nextHydrolP*shrink*growth < std::min(nextGrowthP*shrink, nextShrinkP*growth)*hydrol );
+            size_t ii = 2*cba | bac;
+#endif
             switch ( ii )
             {
                 case 0:
@@ -321,7 +327,7 @@ int DynamicFiber::stepPlusEnd()
                     break;
 
                 case 2:
-                    // remove last unit, with a finite probability that a GTP-tubulin is encountered along the lattice
+                    // remove last unit, while penultimate position can be a GTP survivor
                     unitP[0] = unitP[1];
                     unitP[1] = RNG.test(prop->unhydrolyzed_prob[P]);
                     --res;

@@ -130,8 +130,6 @@ public:
     /// write
     void write_values(std::ostream&) const;
 
-    /// print predicted length and time
-    void splash(std::ostream&, real, real) const;
 };
 
 #endif

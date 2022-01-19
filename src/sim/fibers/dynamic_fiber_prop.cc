@@ -43,18 +43,56 @@ void DynamicFiberProp::clear()
 }
 
 
+/**
+ Estimate the life time and length of fiber using formula from:
+ A theory of microtubule catastrophes and their regulation</b>\n
+ Brun L, Rupp B, Ward J, Nedelec F\n
+ PNAS 106 (50) 21173-21178; 2009\n
+ */
+static void splash(std::ostream& os, real g, real h, real unit)
+{
+    real ctime = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
+    real len = g * unit * ctime;
+    
+    //const real ctime = g / ( 3*h*h );  // that is only true if g >> h
+    std::streamsize p = os.precision();
+    os.precision(5);
+    os << "  DynamicFiber h " << h << " g " << g << " :";
+    os << " catastrophe_time " << ctime << "  rate " << 1/ctime;
+    os << " length " << len << "\n";
+    os.precision(p);
+}
+
+static real back_calculate(real g, real t)
+{
+    const real g2 = g * g;
+    /* Use Newton's method to find root of:
+     F = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
+     d = -2*(7*h^3+24*g*h^2+27*g^2*h+9*g^3) / (3*h^3*(2*h+3*g)^2)
+     */
+    real h = std::sqrt(0.3333/g); //t = g / ( 3*h*h );
+    for ( int i = 0; i < 9; ++i )
+    {
+        real h2 = h * h, hg = 2*h + 3*g;
+        real F = ( 7*h2 + 12*g*h + 3*g2 - t * (3*h2 * hg) ) * h * hg;
+        real d = -2 * ( h2 * ( 7*h + 24*g ) + 9 * g2 * ( 3*h + g ));
+        h -= F / d;
+    }
+    return h;
+}
+
 void DynamicFiberProp::read(Glossary& glos)
 {
     FiberProp::read(glos);
     
-    glos.set(unit_length,             "unit_length");
-    glos.set(growing_speed,        2, "growing_speed");
-    glos.set(growing_off_speed,    2, "growing_off_speed");
-    glos.set(growing_force,        2, "growing_force");
-    glos.set(hydrolysis_rate,      2, "hydrolysis_rate");
-    glos.set(shrinking_speed,      2, "shrinking_speed");
-    glos.set(rebirth_rate,         2, "rebirth_rate");
-    glos.set(unhydrolyzed_prob,    2, "unhydrolyzed_prob");
+    glos.set(unit_length,          "unit_length");
+    glos.set(growing_speed,     2, "growing_speed");
+    glos.set(growing_off_speed, 2, "growing_off_speed");
+    glos.set(growing_force,     2, "growing_force");
+    glos.set(hydrolysis_rate,   2, "hydrolysis_rate");
+    glos.set(shrinking_speed,   2, "shrinking_speed");
+    glos.set(rebirth_rate,      2, "rebirth_rate");
+    glos.set(unhydrolyzed_prob, 2, "unhydrolyzed_prob");
 #if OLD_DYNAMIC_ZONE
     glos.set(zone_space,              "zone_space");
     glos.set(zone_radius,             "zone_radius");
@@ -76,24 +114,11 @@ void DynamicFiberProp::read(Glossary& glos)
      If 'length' is specified, we calculate the corresponding hydrolysis_rate
      */
     real len = 0;
-    if ( glos.set(len, "length") )
+    if ( glos.set(len, "length") && 0 == growing_off_speed[0] )
     {
-        const real g = growing_speed[0] / unit_length;
-        const real g2 = g * g;
-        const real t = len / ( g * unit_length );
-        /* Use Newton's method to find root of:
-         F = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
-         d = -2*(7*h^3+24*g*h^2+27*g^2*h+9*g^3) / (3*h^3*(2*h+3*g)^2)
-         */
-        real h = std::sqrt(0.3333/g); //t = g / ( 3*h*h );
-        for ( int i = 0; i < 9; ++i )
-        {
-            real h2 = h * h, hg = 2*h + 3*g;
-            real F = ( 7*h2 + 12*g*h + 3*g2 - t * (3*h2 * hg) ) * h * hg;
-            real d = -2 * ( h2 * ( 7*h + 24*g ) + 9 * g2 * ( 3*h + g ));
-            h -= F / d;
-        }
-        splash(std::clog, g, h);
+        real g = growing_speed[0]/unit_length;
+        real h = back_calculate(g, len/growing_speed[0]);
+        splash(std::clog, g, h, unit_length);
     }
 }
 
@@ -147,29 +172,8 @@ void DynamicFiberProp::complete(Simul const& sim)
         min_length = 3 * unit_length;
      
     /// print predicted average length in verbose mode:
-    if ( sim.primed() && sim.prop->verbose )
-        splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0]);
-}
-
-
-/**
- Estimate the life time and length of fiber using formula from:
- A theory of microtubule catastrophes and their regulation</b>\n
- Brun L, Rupp B, Ward J, Nedelec F\n
- PNAS 106 (50) 21173-21178; 2009\n
- */
-void DynamicFiberProp::splash(std::ostream& os, real g, real h) const
-{
-    real ctime = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
-    real len = g * unit_length * ctime;
-    
-    //const real ctime = g / ( 3*h*h );  // that is only true if g >> h
-    std::streamsize p = os.precision();
-    os.precision(5);
-    os << "  DynamicFiber h " << h << " g " << g << " :";
-    os << " catastrophe_time " << ctime << "  rate " << 1/ctime;
-    os << " length " << len << "\n";
-    os.precision(p);
+    if ( sim.primed() && sim.prop->verbose && 0 == growing_off_speed[0] )
+        splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
 }
 
 

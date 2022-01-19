@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 // branchless code with sign extension;  FJN 14.06.2020
 // https://en.wikipedia.org/wiki/Sign_extension
 
@@ -41,6 +41,7 @@ inline T sox(const T& arg)
     return arg >> (CHAR_BIT*sizeof(T)-1);
 }
 
+/// implements sign-extension, copying the sign bit of `arg` to all bits
 inline int sex(const int32_t& arg)
 {
     union
@@ -51,6 +52,7 @@ inline int sex(const int32_t& arg)
     return u.h;
 }
 
+/// implements sign-extension, copying the sign bit of `arg` to all bits
 inline int sex(const int16_t& arg)
 {
     union
@@ -61,12 +63,14 @@ inline int sex(const int16_t& arg)
     return u.h;
 }
 
+/// implements sign-extension, copying the sign bit of `arg` to all bits
 inline uint32_t sex(const float& arg)
 {
     union { float d; int32_t i; } udi { arg };
     return udi.i >> (CHAR_BIT*sizeof(float)-1);
 }
 
+/// implements sign-extension, copying the sign bit of `arg` to all bits
 inline uint64_t sex(const double& arg)
 {
     union { double d; int64_t i; } udi { arg };

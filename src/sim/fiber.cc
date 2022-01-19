@@ -857,7 +857,7 @@ void Fiber::prepareMecable()
     assert_true( iPointMobility >= 0 );
     
     // the scaling of the bending elasticity depends on the length of the segments
-    iRigidity = prop->rigidity / segmentationCube();
+    iRigidity = prop->rigidity / cube(segmentation());
 #if NEW_FIBER_LOOP
     iRigidityLoop = prop->loop;
 #endif
