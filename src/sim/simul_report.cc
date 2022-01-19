@@ -2888,7 +2888,7 @@ size_t Simul::flagRing() const
                 if ( 0 <= abs  &&  abs < 1 )
                 {
                     // check that intersection is located on 'dir' side of Z-axis:
-                    Vector pos = fib->posPoint(s, abs);
+                    Vector pos = fib->midPoint(s, abs);
                     if ( dot(pos, dir) > 0 )
                     {
                         // transfer cluster if it was already present before:
@@ -2968,7 +2968,7 @@ void Simul::analyzeRing(ObjectFlag flg, real& length, real& radius) const
                     real abs = fib->planarIntersect(s, nor, 0);
                     if ( 0 <= abs  &&  abs < 1 )
                     {
-                        Vector pos = fib->posPoint(s, abs);
+                        Vector pos = fib->midPoint(s, abs);
                         // check that intersection is located on 'dir' side of Z-axis:
                         real H = dot(pos, dir);
                         if ( H > 0 )

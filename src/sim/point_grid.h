@@ -436,7 +436,7 @@ public:
     void add(Fiber const* f, size_t i, real rad, real rge, real sup) const
     {
         // link in cell containing the middle of the segment
-        Vector w = f->posPoint(i, 0.5);
+        Vector w = f->midPoint(i, 0.5);
         locus_list(w).emplace(FiberSegment(f, i), rad, rge, sup, w);
     }
     

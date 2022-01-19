@@ -76,7 +76,7 @@ void Aster::setInteractions(Meca& meca) const
                 meca.addLink(Mecapoint(sol, link.prime_), fib->exactEnd(prop->focus), prop->stiffness[0]);
                 if ( fib->length() > link.len_ )
                 {
-                    meca.addLink(Mecapoint(sol, link.alt_), fib->interpolate(link.len_, prop->focus), prop->stiffness[1]);
+                    meca.addLink(Mecapoint(sol, link.alt_), fib->interpolateFrom(link.len_, prop->focus), prop->stiffness[1]);
                 }
                 else
                 {
@@ -100,7 +100,7 @@ void Aster::setInteractions(Meca& meca) const
             if ( fib->length() >= len )
             {
                 if ( len > 0 )
-                    meca.ADDLINK(fib->interpolate(len, prop->focus), pts, link.coef2_, prop->stiffness[1]);
+                    meca.ADDLINK(fib->interpolateFrom(len, prop->focus), pts, link.coef2_, prop->stiffness[1]);
                 else
                     meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef2_, prop->stiffness[1]);
             }
@@ -625,7 +625,7 @@ Vector Aster::posSolid1(size_t inx) const
         return solid()->posPoint(link.prime_);
 #endif
     
-    return solid()->interpolate(link.prime_, link.coef1_, link.rank_);
+    return solid()->interpolatePoints(link.prime_, link.coef1_, link.rank_);
 }
 
 Vector Aster::posSolid2(size_t inx) const
@@ -637,7 +637,7 @@ Vector Aster::posSolid2(size_t inx) const
         return solid()->posPoint(link.alt_);
 #endif
     
-    return solid()->interpolate(link.prime_, link.coef2_, DIM+1);
+    return solid()->interpolatePoints(link.prime_, link.coef2_, DIM+1);
 }
 
 

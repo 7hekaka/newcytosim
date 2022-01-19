@@ -112,7 +112,7 @@ LOCAL gle_color color_by_height(Fiber const& fib, size_t pti)
 LOCAL gle_color color_by_grid(Fiber const& fib, size_t seg)
 {
     Map<DIM> const& map = fib.simul().locusGrid.map();
-    Vector w = fib.posPoint(seg, 0.5);
+    Vector w = fib.midPoint(seg, 0.5);
     size_t i = map.index(w);
     return gle::alt_color(i);
 }

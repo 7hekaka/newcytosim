@@ -399,7 +399,7 @@ public:
     // link in the cell containing the middle of the segment:
     void add(Fiber const* f, size_t i, real rad, real rge)
     {
-        Vector w = f->posPoint(i, 0.5);
+        Vector w = f->midPoint(i, 0.5);
         cell_list(w).pane.emplace(f, i, rad, rge, w);
     }
     
@@ -422,7 +422,7 @@ public:
     {
         if ( pan == 0 || pan > MAX_STERIC_PANES )
             throw InvalidParameter("line:steric is out-of-range");
-        Vector w = fib->posPoint(inx, 0.5);
+        Vector w = fib->midPoint(inx, 0.5);
         cell_list(w, pan).pane.emplace(fib, inx, rad, sup, w);
     }
     

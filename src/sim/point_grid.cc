@@ -101,7 +101,7 @@ void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge
         throw InvalidParameter("line:steric is out-of-range");
     
     // link in the cell containing the middle of the segment:
-    Vector w = fib->posPoint(inx, 0.5);
+    Vector w = fib->midPoint(inx, 0.5);
     locus_list(w, pan).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
 }
 

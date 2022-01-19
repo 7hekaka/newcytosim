@@ -908,9 +908,9 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             }
             break;
         case 6: // color according to the distance from the minus end
-            flu[i++] = {color_by_distanceM(fib, 0), fib.posPoint(0)};
+            flu[i++] = {color_by_distanceM(fib, 0), fib.posP(0)};
             for ( real a = 0.0625; a < 0.6; a *= 2 )
-                flu[i++] = {color_by_distanceM(fib, a), fib.posPoint(0, a)};
+                flu[i++] = {color_by_distanceM(fib, a), fib.midPoint(0, a)};
             for ( size_t n = 1; n < fib.nbPoints(); ++n )
                 flu[i++] = {color_by_distanceM(fib, n), fib.posP(n)};
             break;
@@ -919,8 +919,8 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             for ( size_t n = 0; n < last; ++n )
                 flu[i++] = {color_by_distanceP(fib, n), fib.posP(n)};
             for ( real a = 0.5; a > 0.06; a /= 2 )
-                flu[i++] = {color_by_distanceP(fib, last-a), fib.posPoint(last-1, 1-a)};
-            flu[i++] = {color_by_distanceP(fib, last), fib.posPoint(last)};
+                flu[i++] = {color_by_distanceP(fib, last-a), fib.midPoint(last-1, 1-a)};
+            flu[i++] = {color_by_distanceP(fib, last), fib.posP(last)};
         } break;
         case 8: // color according to distance to the confining Space
             for ( i = 0; i < fib.nbPoints(); ++i )
@@ -950,7 +950,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         if ( inx == 0 )
         {
             for ( real dx = 0.125; dx < 0.6; dx *= 2 )
-                flu[i++] = {color_by_distanceM(fib, dx), fib.posPoint(0, dx)};
+                flu[i++] = {color_by_distanceM(fib, dx), fib.midPoint(0, dx)};
         }
         flu[i++] = {color_by_distanceM(fib, inx+1), fib.posP(inx+1)};
     }
@@ -961,7 +961,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         if ( inx == fib.lastSegment() )
         {
             for ( real dx = 0.5; dx > 0.12; dx /= 2 )
-                flu[i++] = {color_by_distanceP(fib, inx+1-dx), fib.posPoint(inx, 1-dx)};
+                flu[i++] = {color_by_distanceP(fib, inx+1-dx), fib.midPoint(inx, 1-dx)};
         }
         flu[i++] = {color_by_distanceP(fib, inx+1), fib.posP(inx+1)};
     }
@@ -1294,7 +1294,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         Vector a = fib.posEndM();
         for ( size_t i = 1; i < fib.nbPoints(); ++i )
         {
-            Vector b = fib.posPoint(i);
+            Vector b = fib.posP(i);
             snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
             gym::drawText(0.5*(a+b), str, font, 0.5);
             a = b;
@@ -1822,7 +1822,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         for ( size_t i = 0; i < num; ++i )
         {
             size_t J = near[i];
-            Vector P = obj.posPoint(J);
+            Vector P = obj.posP(J);
             real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
             GLenum glp = GL_CLIP_PLANE5 - i;
             glEnable(glp);

@@ -234,7 +234,7 @@ public:
     Interpolation interpolateM(real ab) const;
     
     /// interpolation of a site specified by its distance from a FiberEnd
-    Interpolation interpolate(real ab, FiberEnd ref) const;
+    Interpolation interpolateFrom(real ab, FiberEnd ref) const;
     
     //---------------------
     

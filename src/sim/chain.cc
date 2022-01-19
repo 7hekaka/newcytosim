@@ -1937,7 +1937,7 @@ Interpolation Chain::interpolateM(const real ab) const
 }
 
 
-Interpolation Chain::interpolate(const real ab, const FiberEnd end) const
+Interpolation Chain::interpolateFrom(const real ab, const FiberEnd end) const
 {
     switch( end )
     {
@@ -1974,7 +1974,7 @@ Vector Chain::posM(const real ab) const
     
     // check if PLUS_END is reached:
     if ( s+1 < nPoints )
-        return posPoint(s, a-s);
+        return midPoint(s, a-s);
     else
         return posP(lastPoint());
 }

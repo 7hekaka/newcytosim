@@ -43,7 +43,7 @@ void Bundle::linkParallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
     const real stiff = prop->stiffness;
     const real dis = prop->overlap;
     
-    meca.addLink(mt1->interpolate(dis, prop->focus), mt2->interpolate(dis, prop->focus), stiff);
+    meca.addLink(mt1->interpolateFrom(dis, prop->focus), mt2->interpolateFrom(dis, prop->focus), stiff);
     meca.addLink(mt1->exactEnd(prop->focus), mt2->exactEnd(prop->focus), stiff);
 }
 
@@ -59,8 +59,8 @@ void Bundle::linkAntiparallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
     if ( dis < REAL_EPSILON )
         meca.addLink(mt1->exactEnd(prop->focus), mt2->exactEnd(prop->focus), stiff+stiff);
     else {
-        meca.addLink(mt2->exactEnd(prop->focus), mt1->interpolate(dis, prop->focus), stiff);
-        meca.addLink(mt1->exactEnd(prop->focus), mt2->interpolate(dis, prop->focus), stiff);
+        meca.addLink(mt2->exactEnd(prop->focus), mt1->interpolateFrom(dis, prop->focus), stiff);
+        meca.addLink(mt1->exactEnd(prop->focus), mt2->interpolateFrom(dis, prop->focus), stiff);
     }
 }
 

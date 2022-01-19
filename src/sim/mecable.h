@@ -139,9 +139,6 @@ public:
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/
     Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
-
-    /// interpolate 'rank' points starting from 'ref'
-    Vector interpolate(size_t ref, real const coef[], size_t rank) const;
     
     /// Address of coordinate array
     const real * addrPoints()        const { return pPos; }
@@ -217,7 +214,7 @@ public:
     
     /// intermediate position between P and Q=P+1 = P + A * ( Q - P )
     /** with A = 0.5, this returns the middle of segment P */
-    Vector posPoint(size_t P, const real A) const
+    Vector midPoint(const size_t P, const real A) const
     {
         assert_true( P+1 < nPoints );
         //assert_true( 0 <= A && A <= 1 );
@@ -233,6 +230,9 @@ public:
         return Vector::interpolated(pPos+DIM*P, A, pPos+DIM*Q);
     }
     
+    /// interpolate 'rank' points starting from 'ref'
+    Vector interpolatePoints(size_t ref, real const coef[], size_t rank) const;
+
     //--------------------------------------------------------------------------
     
     /// Allocate memory to store given number of vertices
