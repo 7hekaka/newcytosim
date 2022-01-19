@@ -26,17 +26,17 @@ void DynamicFiberProp::clear()
     
     for ( int i = 0; i < 2; ++i )
     {
-        growing_speed[i]        = 0;
-        growing_off_speed[i]    = 0;
-        growing_force[i]        = INFINITY;
-        hydrolysis_rate[i]      = 0;
-        shrinking_speed[i]      = 0;
-        rebirth_rate[i]         = 0;
-        unhydrolyzed_prob[i]    = 0;
+        growing_speed[i]     = 0;
+        growing_off_speed[i] = 0;
+        growing_force[i]     = INFINITY;
+        hydrolysis_rate[i]   = 0;
+        shrinking_speed[i]   = 0;
+        rebirth_rate[i]      = 0;
+        unhydrolyzed_prob[i] = 0;
     }
 #if OLD_DYNAMIC_ZONE
-    zone_radius    = INFINITY;
-    zone_space     = "";
+    zone_radius = INFINITY;
+    zone_space  = "";
     for ( int i = 0; i < 2; ++i )
         zone_hydrolysis_rate[i] = 0;
 #endif
@@ -172,8 +172,16 @@ void DynamicFiberProp::complete(Simul const& sim)
         min_length = 3 * unit_length;
      
     /// print predicted average length in verbose mode:
-    if ( sim.primed() && sim.prop->verbose && 0 == growing_off_speed[0] )
+    if ( sim.primed() && sim.prop->verbose )
+    {
+        if ( 0 == growing_off_speed[0] )
         splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
+        
+        // calculate stall force, from:
+        // 0 = growing_speed * std::exp(force/growing_force) + growing_off_speed;
+        real f = -growing_force[0] * std::log(-growing_off_speed[0]/growing_speed[0]);
+        std::clog << name() << ":stall_force = " << f << "\n";
+    }
 }
 
 

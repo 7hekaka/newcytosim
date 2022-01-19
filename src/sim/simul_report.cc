@@ -135,7 +135,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
 {
     int ver = 1;
     std::streamsize p = 4;
-    opt.peek(ver, "verbose");
+    opt.set(ver, "verbose");
     opt.set(p, "precision");
     opt.set(column_width, "column", "width");
     

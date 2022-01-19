@@ -87,6 +87,9 @@ void Fiber::step()
     {
         adjustSegmentation();
         updateFiber();
+        // We may need to update again, as Hand may act in handleDisassemblyM()
+        if ( needUpdate )
+            updateFiber();
 #if FIBER_HAS_FAMILY
         salute();
 #endif
@@ -348,7 +351,7 @@ Fiber* Fiber::severPoint(size_t pti)
     // remove MINUS_END portion on new piece:
     fib->truncateM(pti);
     assert_true(fib->abscissaM() == abs);
-    fib->updateFiber();
+    fib->updateRange(prop->field_ptr);
 
 #if FIBER_HAS_MESH
     if ( fMesh.ready() )
@@ -363,20 +366,19 @@ Fiber* Fiber::severPoint(size_t pti)
     truncateP(pti);
     
     // transfer Hands above point P, at same abscissa
-    Hand * ha = fHands.front();
-    while ( ha )
+    Hand * h = fHands.front();
+    while ( h )
     {
-        Hand * nx = ha->next();
-        if ( ha->abscissa() > abs )
-            ha->relocate(fib);
+        Hand * x = h->next();
+        if ( h->abscissa() > abs )
+            h->relocate(fib);
         else
-            ha->update();
-        ha = nx;
+            h->update();
+        h = x;
     }
     
     resetLattice();
     fib->resetLattice();
-    
     return fib;
 }
 
@@ -416,7 +418,7 @@ Fiber* Fiber::severP(real abs)
     // remove MINUS_END portion on new piece
     fib->Chain::cutM(abs);
     // initialize Lattice on new piece
-    fib->updateFiber();
+    fib->updateRange(prop->field_ptr);
 
 #if FIBER_HAS_MESH
     if ( fMesh.ready() )
@@ -435,15 +437,15 @@ Fiber* Fiber::severP(real abs)
     // transfer all Hands above cut to new piece
     // their abscissa should not change in this transfer
     abs += abscissaM();
-    Hand * ha = fHands.front();
-    while ( ha )
+    Hand * h = fHands.front();
+    while ( h )
     {
-        Hand * nx = ha->next();
-        if ( ha->abscissa() >= abs )
-            ha->relocate(fib);
+        Hand * x = h->next();
+        if ( h->abscissa() >= abs )
+            h->relocate(fib);
         else
-            ha->update();
-        ha = nx;
+            h->update();
+        h = x;
     }
 
     resetLattice();

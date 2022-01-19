@@ -5,8 +5,8 @@ set simul system
 {
     time_step = 0.001
     viscosity = 0.05
-    verbose = 0
-    display = ( size = 2000,600 )
+    display = ( size = 1536,512 )
+    verbose = 1
 }
 
 set space cell
@@ -28,10 +28,12 @@ set fiber filament
     confine = inside, 100
 
     activity = dynamic
-    growing_speed = 0.100
+    growing_speed = 0.120
+    growing_off_speed = -0.030
     growing_force = 0.5
     shrinking_speed = -0.250
-    hydrolysis_rate = 0.22525  % length = 2.3
+    hydrolysis_rate = 0.01  % length = 2.3
+    unhydrolyzed_prob = 1
     display = ( line_width=3; )
 }
 
@@ -45,8 +47,8 @@ set hand nucleator
 
 set hand binder
 {
-    binding = 20, 0.015
-    unbinding = 0, 3
+    binding = 10, 0.025
+    unbinding = 1, 3
 }
 
 set single target
@@ -60,7 +62,7 @@ set couple complex
     hand1 = binder
     hand2 = binder
     specificity = antiparallel
-    stiffness = 100
+    stiffness = 2
     diffusion = 1
 }
 
@@ -76,10 +78,12 @@ new 2 plasmid
     attach = 3 target
 }
 
-new 999 complex
+new 666 complex
 
 run system
 {
     nb_steps = 100000
     nb_frames = 100
 }
+
+report plasmid:position * { verbose = 0 }

@@ -38,8 +38,6 @@ void Rescuer::handleDisassemblyM()
         fib->setEndStateM(STATE_GREEN);
         // increase MT length to cover position of Hand
         fib->growM(fiber()->abscissaM()-hAbs);
-        // update all Hands:
-        fib->updateHands();
     }
     else
         detach();
@@ -70,8 +68,6 @@ void Rescuer::handleDisassemblyP()
         fib->setEndStateP(STATE_GREEN);
         // increase MT length to cover position of Hand
         fib->growP(hAbs-fiber()->abscissaP());
-        // update all Hands:
-        fib->updateHands();
     }
     else
         detach();

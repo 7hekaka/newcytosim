@@ -232,7 +232,7 @@ public:
     /// update Lattice and Mesh ranges
     void updateRange(Field*);
     
-    /// called if a Fiber tip has elongated or shortened
+    /// should be called if any Fiber tip has elongated or shortened
     void updateFiber();
     
     //--------------------------------------------------------------------------
