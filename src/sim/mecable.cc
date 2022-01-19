@@ -220,6 +220,17 @@ void Mecable::rotate(Rotation const& T)
 }
 
 
+Vector Mecable::interpolate(size_t ref, real const coef[], size_t rank) const
+{
+    assert_true( rank > 0 );
+    assert_true( ref < nPoints );
+    size_t top = std::min(rank, nPoints-ref);
+    Vector res = coef[0] * posP(ref);
+    for ( size_t i = 1; i < top; ++i )
+        res += coef[i] * posP(ref+i);
+    return res;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Export/Inport
 

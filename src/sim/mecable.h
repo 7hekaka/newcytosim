@@ -140,6 +140,9 @@ public:
     /** this is identical to posPoint(), it exists for historical reasons*/
     Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
 
+    /// interpolate 'rank' points starting from 'ref'
+    Vector interpolate(size_t ref, real const coef[], size_t rank) const;
+    
     /// Address of coordinate array
     const real * addrPoints()        const { return pPos; }
     

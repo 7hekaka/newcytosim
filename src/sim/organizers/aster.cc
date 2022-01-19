@@ -616,27 +616,16 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
-static Vector interpolateSolid(Solid const* sol, real const coef[], size_t ref, size_t rank)
-{
-    assert_true( rank > 0 );
-    assert_true( ref < sol->nbPoints() );
-    size_t top = std::min(rank, sol->nbPoints()-ref);
-    Vector res = coef[0] * sol->posPoint(ref);
-    for ( size_t i = 1; i < top; ++i )
-        res += coef[i] * sol->posPoint(ref+i);
-    return res;
-}
-
 Vector Aster::posSolid1(size_t inx) const
 {
     AsterLink const& link = asLinks[inx];
     
 #if BACKWARD_COMPATIBILITY < 47
     if ( link.alt_ > 0 )
-        return sol->posPoint(link.prime_);
+        return solid()->posPoint(link.prime_);
 #endif
     
-    return interpolateSolid(solid(), link.coef1_, link.prime_, link.rank_);
+    return solid()->interpolate(link.prime_, link.coef1_, link.rank_);
 }
 
 Vector Aster::posSolid2(size_t inx) const
@@ -645,10 +634,10 @@ Vector Aster::posSolid2(size_t inx) const
     
 #if BACKWARD_COMPATIBILITY < 47
     if ( link.alt_ > 0 )
-        return sol->posPoint(link.alt_);
+        return solid()->posPoint(link.alt_);
 #endif
     
-    return interpolateSolid(solid(), link.coef2_, link.prime_, DIM+1);
+    return solid()->interpolate(link.prime_, link.coef2_, DIM+1);
 }
 
 

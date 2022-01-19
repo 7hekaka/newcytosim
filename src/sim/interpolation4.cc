@@ -88,17 +88,6 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
 }
 
 
-Vector Interpolation4::pos() const
-{
-    assert_true(mec_);
-    size_t top = std::min(rank_, mec_->nbPoints()-prime_);
-    Vector res = coef_[0] * mec_->posPoint(prime_);
-    for ( size_t i = 1; i < top; ++i )
-        res += coef_[i] * mec_->posPoint(prime_+i);
-    return res;
-}
-
-
 void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real weight) const
 {
     assert_true(mec_);

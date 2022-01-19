@@ -57,7 +57,7 @@ public:
     Mecable const* mecable() const { return mec_; }
     
     /// position in space calculated from interpolation
-    Vector pos() const;
+    Vector pos() const { return mec_->interpolate(prime_, coef_, rank_); }
     
     /// number of points beeing interpolated
     size_t rank() const { return rank_; }
