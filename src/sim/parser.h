@@ -32,6 +32,9 @@ private:
     /// control switch to enable command 'write' (write files)
     bool do_write;
     
+    /// counter for the 'restart' command
+    size_t restart;
+    
     //--------------------------------------------------------------------------
     
     /// parse command `set`
