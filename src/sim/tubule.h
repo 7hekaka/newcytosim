@@ -107,7 +107,7 @@ public:
     void write(Outputter&) const;
     
     /// debug printout
-    void report(std::ostream&);
+    void report(std::ostream&) const;
 };
 
 #endif

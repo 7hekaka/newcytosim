@@ -209,9 +209,6 @@ public:
     
     /// get dimensions from array `len`
     virtual void setLengths(const real len[8]) {}
-    
-    /// print a description to stream
-    virtual void report(std::ostream&) const {}
 
     //------------------------------ DISPLAY -----------------------------------
     

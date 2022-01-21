@@ -455,7 +455,7 @@ void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
 }
 
 
-void Tubule::report(std::ostream& os)
+void Tubule::report(std::ostream& os) const
 {
     os << reference() << " " << bone_->segmentation() << " " << bone_->nbPoints() << " " << bone_->length() << "\n";
     for ( size_t i = 0; i < NFIL; ++i )

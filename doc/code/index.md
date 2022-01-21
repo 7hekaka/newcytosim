@@ -1,7 +1,15 @@
 # Cytosim Code Documentation
 
 Cytosim is built around [a core C++ engine](../../src/index.md) constituted of the files in [`src/`](../../src) and subdirectories.  
+
 Handy [Python scripts](../../python/index.md) are located in [`python/`](../../python).
+
+# Code structure
+
+- [Modularity](modularity.md)
+
+
+# Code documentation
 
 The C++ code contains documentation embedded in the comments.
 
@@ -12,7 +20,7 @@ This documentation can be extracted automatically with [`doxygen`](http://www.do
 The output will be accessible [from the index](doxygen/index.html) located in [`doc/code/doxygen`](doxygen).
 
 
-# Cytosim Testing
+# Testing Cytosim
 
 - [How to validate the executable](validation.md)
 

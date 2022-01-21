@@ -114,6 +114,9 @@ public:
     /// read Object from file, within the Simul
     virtual void read(Inputter&, Simul&, ObjectTag) = 0;
     
+    /// return some characteristics of the object, used for reporting
+    virtual void report(std::ostream&) const { }
+
     //--------------------------
     
     /// the next Object in the list, or zero if this is last
