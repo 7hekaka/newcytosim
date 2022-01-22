@@ -19,9 +19,9 @@
  effective binding rate by a factor N. This can be advantageous since paintGrid()
  is spared during N-1 steps as attachment algorithm runs only once every N steps.
  The defined value is N, the number of steps over which attachments are pooled.
- Define POOL_HAND_ATTACHMENT as 0 to disable, or 4, 8 or 16 to enable.
+ Define POOL_HAND_ATTACHMENT as 1 to disable, or 4, 8 or 16 to enable.
  */
-#define POOL_HAND_ATTACHMENT 0
+#define POOL_HAND_ATTACHMENT 1
 
 class Hand;
 class HandMonitor;

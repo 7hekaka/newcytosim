@@ -621,15 +621,17 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
     }
     colix_[last] = last;
 
+    bool res = false;
     for ( size_t j = 0; j < last; ++j )
     {
         pilar_[j].dia_.copy_lower();
+        res |= ( pilar_[j].isNotZero() );
     }
     
     sortElements();
 
     //printColumns(std::cout, 0, size_);
-    return true;
+    return res;
 }
 
 

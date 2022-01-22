@@ -33,12 +33,12 @@ inline double tock(double arg = 1) { return double(__rdtsc()-rdt_) / arg; }
 // using real time
 struct timeval tic_t;
 
-/// return current time value
-inline unsigned long long timer()
+/// return current time value in microseconds
+inline unsigned long timer()
 {
     timeval tv;
     gettimeofday(&tv, nullptr);
-    return double(1e6*tv.tv_sec + tv.tv_usec);
+    return 1000000 * (unsigned long)tv.tv_sec + tv.tv_usec;
 }
 
 /// start timer

@@ -1894,12 +1894,13 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             throw Exception("no convergence, residual ", monitor.residual(),
                             " achieved ", monitor.residual()/tolerance_);
     }
-    
-    const auto total = ( timer() - start ) >> 10;
 
     //printf("\n   /sol "); VecPrint::print(std::cerr, dimension(), vSOL, 3);
     //printf("\n   >pts "); VecPrint::print(std::cerr, dimension(), vPTS, 3);
 
+    auto solve = cycles_;
+    cycles_ = timer() - start;
+    
     //add the solution (the displacement) to update the Mecable's vertices
     blas::xadd(dimension(), vSOL, vPTS);
 
@@ -1933,17 +1934,17 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         if ( prop->verbose & 4 )
         {
             unsigned cnt = std::max(1U, monitor.count());
-            factor >>= 10;
-            auto solve = cycles_ >> 10;
-            oss << "  cycles " << precond << "T " << std::setw(8) << total;
-            oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
-            oss << " S " << std::setw(8) << solve << std::setw(6) << solve/cnt;
-            oss << " R " << std::setw(6) << ( total - factor - solve ) / cnt;
+            auto tot = cycles_ >> 10;
+            auto fac = factor >> 10;
+            auto sol = solve >> 10;
+            oss << "  cycles " << precond << "T " << std::setw(8) << tot;
+            oss << " F " << std::setw(8) << fac << std::setw(6) << fac/cnt;
+            oss << " S " << std::setw(8) << sol << std::setw(6) << sol/cnt;
+            oss << " R " << std::setw(6) << ( tot - fac - sol ) / cnt;
         }
         Cytosim::out << oss.str() << std::endl;
     }
     
-    cycles_ = total;
     return monitor.count();
 }
 

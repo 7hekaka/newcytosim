@@ -25,19 +25,6 @@ void CoupleSet::prepare(PropertyList const& properties)
 
 /// templated member function pointer...
 template < void (Couple::*FUNC)() >
-static inline void step_couples(Couple * obj)
-{
-    while ( obj )
-    {
-        Couple * nxt = obj->next();
-        (obj->*FUNC)();
-        obj = nxt;
-    }
-}
-
-
-/// templated member function pointer...
-template < void (Couple::*FUNC)() >
 static inline void step_couples(Couple * obj, bool odd)
 {
     Couple * nxt;
@@ -85,17 +72,33 @@ void CoupleSet::step()
     bool const ffOdd = ffList.size() & 1;
     
     step_couples<&Couple::stepAA>(firstAA(), aaList.size() & 1);
-    step_couples<&Couple::stepFA>(faHead, faOdd);
-    step_couples<&Couple::stepAF>(afHead, afOdd);
-
+    if ( simul_.doAttach )
+    {
+        step_couples<&Couple::stepFA>(faHead, faOdd);
+        step_couples<&Couple::stepAF>(afHead, afOdd);
+    }
+    else
+    {
+        step_couples<&Couple::stepXA>(faHead, faOdd);
+        step_couples<&Couple::stepAX>(afHead, afOdd);
+    }
+    
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        Couple * rest = uniCollect(ffHead);
+        Couple * obj = uniCollect(ffHead);
         uniAttach(simul_.fibers);
-        step_couples<&Couple::stepFF>(rest);
+        if ( simul_.doAttach )
+        {
+            while ( obj )
+            {
+                Couple * nxt = obj->next();
+                obj->stepFF();
+                obj = nxt;
+            }
+        }
     }
-    else
+    else if ( simul_.doAttach )
     {
         //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << '\n';
         // this loop is unrolled, processing objects 2 by 2:

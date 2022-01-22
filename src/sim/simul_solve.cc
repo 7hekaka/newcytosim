@@ -470,8 +470,9 @@ void Simul::solve_auto()
     // solve the system, recording time:
     //double cpu = TimeDate::milliseconds();
     size_t cnt = sMeca.solve(prop, autoPrecond);
-    //cpu = TimeDate::milliseconds() - cpu;
-    float cpu = sMeca.cycles_ >> 10;
+    //float cpu = TimeDate::milliseconds() - cpu;
+    // use Meca::cycles_ that only includes preconditionning parts!
+    float cpu = sMeca.cycles_;
     
     sMeca.apply();
 

@@ -81,9 +81,9 @@ void NucleatorProp::complete(Simul const& sim)
 
     if ( track_end && track_end != hold_end )
         throw InvalidParameter("if set, hand:track_end should be equal to hold_end");
-        
-    rate_dt = rate * sim.time_step();
-
+    
+    rate_dt = rate * sim.time_step() * POOL_HAND_ATTACHMENT;
+    
 #if BACKWARD_COMPATIBILITY < 57
     if ( specificity && sim.primed() )
         throw InvalidParameter("`nucleator:specificity' is deprecated: set `nucleation_angle' instead");

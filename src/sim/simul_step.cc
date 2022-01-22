@@ -136,10 +136,13 @@ void Simul::step()
     // if no Hands are present, we can skip attachment
     int hasHands = singles.size() + couples.size();
     
-#if POOL_HAND_ATTACHMENT
-    skipAttach = ( skipAttach + 1 ) % POOL_HAND_ATTACHMENT;
+#if POOL_HAND_ATTACHMENT < 1
+    ABORT_NOW(" POOL_HAND_ATTACHMENT must be >= 1");
+#elif POOL_HAND_ATTACHMENT > 1
+    doAttach = ( doAttachCounter == 0 );
+    doAttachCounter = ( doAttachCounter + 1 ) % POOL_HAND_ATTACHMENT;
     
-    if ( hasHands && !skipAttach )
+    if ( hasHands && doAttach )
 #else
     if ( hasHands )
 #endif
@@ -176,11 +179,7 @@ void Simul::step()
     
     // step Hand-containing objects, giving them a possibility to attach Fibers:
     couples.step();
-#if POOL_HAND_ATTACHMENT
-    singles.step(!skipAttach);
-#else
-    singles.step(true);
-#endif
+    singles.step();
     //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
 }
 

@@ -302,10 +302,7 @@ void Hand::stepUnattached(Simul& sim, Vector const& pos)
     assert_true( unattached() );
 
     // test for attachment
-#if POOL_HAND_ATTACHMENT
-    if ( 0 == sim.skipAttach )
-#endif
-        sim.fiberGrid.tryToAttach(pos, *this);
+    sim.fiberGrid.tryToAttach(pos, *this);
 }
 
 

@@ -22,19 +22,6 @@ void SingleSet::prepare(PropertyList const& properties)
 
 /// templated member function pointer...
 template < void (Single::*FUNC)() >
-static inline void step_singles(Single * obj)
-{
-    while ( obj )
-    {
-        Single * nxt = obj->next();
-        (obj->*FUNC)();
-        obj = nxt;
-    }
-}
-
-
-/// templated member function pointer...
-template < void (Single::*FUNC)() >
 static inline void step_singles(Single * obj, bool odd)
 {
     Single * nxt;
@@ -55,7 +42,7 @@ static inline void step_singles(Single * obj, bool odd)
 }
 
 
-void SingleSet::step(bool doAttach)
+void SingleSet::step()
 {
     /*
      ATTENTION: we have multiple lists, and Objects are automatically transferred
@@ -75,11 +62,19 @@ void SingleSet::step(bool doAttach)
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        Single * rest = uniCollect(fHead);
+        Single * obj = uniCollect(fHead);
         uniAttach(simul_.fibers);
-        step_singles<&Single::stepF>(rest);
+        if ( simul_.doAttach )
+        {
+            while ( obj )
+            {
+                Single * nxt = obj->next();
+                obj->stepF();
+                obj = nxt;
+            }
+        }
     }
-    else if ( doAttach )
+    else if ( simul_.doAttach )
     {
         step_singles<&Single::stepF>(fHead, fOdd);
     }

@@ -57,9 +57,13 @@ public:
     /// current parser object
     Parser * parser_;
     
-#if POOL_HAND_ATTACHMENT
+#if POOL_HAND_ATTACHMENT > 1
+    /// counter for occasional Hand's attachment
+    unsigned doAttachCounter;
     /// flag to authorize Hand's attachment
-    unsigned int skipAttach;
+    bool     doAttach;
+#else
+    static constexpr bool doAttach = true;
 #endif
     
 private:

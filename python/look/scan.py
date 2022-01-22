@@ -41,8 +41,6 @@ def execute(tool, path):
     run executable in specified directory
     """
     os.chdir(path)
-    if verbose:
-        out.write('-  '*24+path+"\n")
     try:
         subprocess.call(tool, shell=True)
     except Exception as e:
@@ -59,6 +57,8 @@ def queued(queue):
         except:
             break;
         execute(t, p)
+        if verbose:
+            out.write("done "+p+"\n")
 
 
 def main(args):
@@ -111,6 +111,8 @@ def main(args):
             out.write("Warning: multiprocessing module unavailable\n")
     #process sequentially:
     for p in paths:
+        if verbose:
+            out.write('-  '*24+p+"\n")
         execute(tool, p)
     return 0
 

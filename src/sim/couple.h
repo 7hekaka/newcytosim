@@ -168,6 +168,12 @@ public:
     
     /// simulation step for a doubly-attached Couple
     virtual void stepAA();
+    
+    /// simulation step for a Couple attached by Hand1
+    virtual void stepAX();
+    
+    /// simulation step for a Couple attached by Hand2
+    virtual void stepXA();
 
     //--------------------------------------------------------------------------
 

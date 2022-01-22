@@ -264,6 +264,31 @@ void Couple::stepAA()
 }
 
 
+
+/**
+ Simulates only attached activity of cHand1
+ */
+void Couple::stepAX()
+{
+    if ( cHand1->checkDetachment() )
+        cHand1->detach();
+    else
+        cHand1->stepUnloaded();
+}
+
+
+/**
+ Simulates only attached activity of cHand2
+ */
+void Couple::stepXA()
+{
+    if ( cHand2->checkDetachment() )
+        cHand2->detach();
+    else
+        cHand2->stepUnloaded();
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
