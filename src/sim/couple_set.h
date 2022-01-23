@@ -60,7 +60,7 @@ private:
     /// an array of SingleReserveList
     typedef std::vector<CoupleReserve> CoupleReserveList;
     
-    /// uniReserves[p] contains the Couples with ( property()->number() == p ) that are diffusing
+    /// uniReserves[p] holds Couples with ( property()->number() == p+1 )
     CoupleReserveList uniReserves;
     
     /// flag to enable `fast_diffusion` attachment algorithm

@@ -39,7 +39,7 @@ private:
     /// an array of SingleReserveList
     typedef std::vector<SingleReserve> SingleReserveList;
     
-    /// uniReserves[p] contains the Single with ( property()->number() == p ) that are diffusing
+    /// uniReserves[p] holds Singles with ( property()->number() == p+1 )
     SingleReserveList uniReserves;
     
     /// flag to enable `fast_diffusion` attachment algorithm

@@ -690,19 +690,20 @@ bool SingleSet::uniPrepare(PropertyList const& properties)
     {
         SingleProp const* p = static_cast<SingleProp const*>(i);
         last = std::max(last, p->number());
+        assert_true(p->number() > 0);
         res |= p->fast_diffusion;
     }
     
     if ( res )
     {
-        uniReserves.resize(last+1);
+        uniReserves.resize(last);
         for ( SingleReserve & reserve : uniReserves )
             reserve.first = nullptr;
         for ( Property const* i : allprop )
         {
             SingleProp const* p = static_cast<SingleProp const*>(i);
             if ( p->fast_diffusion )
-                uniReserves[p->number()].first = p;
+                uniReserves[p->number()-1].first = p;
         }
     }
     
@@ -725,8 +726,7 @@ Single* SingleSet::uniCollect(Single * obj)
         if ( p->fast_diffusion )
         {
             fList.pop(obj);
-            assert_true(p->number() < uniReserves.size());
-            uniReserves[p->number()].second.push_back(obj);
+            uniReserves[p->number()-1].second.push_back(obj);
         }
         else if ( !res )
             res = obj;

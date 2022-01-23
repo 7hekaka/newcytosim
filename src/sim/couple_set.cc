@@ -847,19 +847,20 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
     {
         CoupleProp const * p = static_cast<CoupleProp const*>(i);
         last = std::max(last, p->number());
+        assert_true(p->number() > 0);
         res |= p->fast_diffusion;
     }
     
     if ( res )
     {
-        uniReserves.resize(last+1);
+        uniReserves.resize(last);
         for ( CoupleReserve & reserve : uniReserves )
             reserve.first = nullptr;
         for ( Property const* i : allprop )
         {
             CoupleProp const* p = static_cast<CoupleProp const*>(i);
             if ( p->fast_diffusion )
-                uniReserves[p->number()].first = p;
+                uniReserves[p->number()-1].first = p;
         }
     }
     
@@ -882,8 +883,7 @@ Couple* CoupleSet::uniCollect(Couple * obj)
         if ( p->fast_diffusion )
         {
             ffList.pop(obj);
-            assert_true(p->number() < uniReserves.size());
-            uniReserves[p->number()].second.push_back(obj);
+            uniReserves[p->number()-1].second.push_back(obj);
         }
         else if ( !res )
             res = obj;
