@@ -53,6 +53,15 @@ void Single::afterAttachment(Hand const*)
 }
 
 
+/**
+When a Single transitions into the unboud diffusing state, we set its
+position near the current location on the fiber, but offset in the perpendicular
+direction by a random distance within the range of attachment of the Hand.
+
+This is necessary to achieve detailed balance, which in particular implies
+that rounds of binding/unbinding should not get the Couples any closer to
+the Filaments.
+*/
 void Single::beforeDetachment(Hand const* h)
 {
     assert_true( h == sHand );
@@ -60,23 +69,7 @@ void Single::beforeDetachment(Hand const* h)
     SingleSet * set = static_cast<SingleSet*>(objset());
     if ( set )
     {
-#if ( DIM < 2 )
-        /*
-         Relocate Single to the position where it is attached.
-         This is necessary to start the diffusion process from the correct location
-         */
-        sPos = h->posHand();
-#else
-        /*
-         Set position near the attachment point, but offset in the perpendicular
-         direction at a random distance within the range of attachment of the Hand.
-         
-         This is necessary to achieve detailed balance, which in particular implies
-         that rounds of binding/unbinding should not get the Singles closer to
-         the Filaments to which they bind.
-         */
-        sPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
-#endif
+        sPos = h->posSide();
         
         // link into correct SingleSet sublist:
         set->relinkD(this);

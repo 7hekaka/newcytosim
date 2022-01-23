@@ -14,7 +14,7 @@ FiberSite::FiberSite(Fiber* f, real a)
     hLattice = nullptr;
     hSite = 0;
 #endif
-    hTerp = f->interpolate(a);
+    //interpolate();
 }
 
 
@@ -198,7 +198,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
         }
 
         // this will be called in updateFiber();
-        //update();
+        //interpolate();
         //checkAbscissa();
     }
 }

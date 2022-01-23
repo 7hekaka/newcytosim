@@ -42,7 +42,7 @@ private:
     /**
      If all is well, ( inter.mecable() == hFiber ) and ( abscissaInterp() == hAbs )
      */
-    Interpolation hTerp;
+    mutable Interpolation hTerp;
     
     /// the abscissa of the interpolated point, which should be equal to `abscissa()`
     real abscissaInterp() const { return hFiber->abscissaPoint(real(hTerp.point1())+hTerp.coef1()); }
@@ -107,10 +107,10 @@ public:
     const Interpolation& interpolation() const { assert_false(bad()); return hTerp; }
     
     /// recalculate the Interpolation
-    void update() { hTerp = hFiber->interpolate(hAbs); }
+    void interpolate() const { hTerp = hFiber->interpolate(hAbs); }
     
     /// move to a different abscissa on the current fiber
-    void moveTo(real a) { hAbs = a; update(); }
+    void moveTo(real a) { hAbs = a; interpolate(); }
 
     /// relocate to MINUS_END of current fiber
     void relocateM();
@@ -130,27 +130,24 @@ public:
     Fiber* fiber() const { return hFiber; }
     
     /// position in space (using current interpolation)
-    Vector pos() const { return hTerp.pos(); }
+    Vector pos() const { assert_false(bad()); return hTerp.pos(); }
     
 #if FIBER_HAS_FAMILY
     /// the position around which attachment is seeked
     Vector outerPos() const;
 #else
     /// the position around which attachment is seeked
-    Vector outerPos() const { return hTerp.pos(); }
+    Vector outerPos() const { assert_false(bad()); return hTerp.pos(); }
 #endif
-    
-    /// position (recalculated on the fly)
-    Vector posHand() const { return hFiber->pos(hAbs); }
     
     /// position at abscissa shifted by 'x'
     Vector posHand(real x) const { return hFiber->pos(hAbs+x); }
 
     /// direction of Fiber obtained by normalization
-    Vector dir() const { return hTerp.dir(); }
+    Vector dir() const { assert_false(bad()); return hTerp.dir(); }
     
     /// the direction of the Fiber at the point of attachment
-    Vector dirFiber() const { return hFiber->dirSegment(hTerp.point1()); }
+    Vector dirFiber() const { assert_false(bad()); return hFiber->dirSegment(hTerp.point1()); }
     
     /// the abscissa, from the origin of the Fiber
     real abscissa() const { return hAbs; }

@@ -68,6 +68,29 @@ void Hand::resetTimers()
 //------------------------------------------------------------------------------
 #pragma mark -
 
+Vector Hand::posSide() const
+{
+#if ( DIM < 2 )
+    /*
+     Relocate the Couple unbound position vector to where it is attached.
+     This ensures that the diffusion process starts from the correct location
+     */
+    return hFiber->pos(hAbs);
+#else
+    /*
+     Set position near the attachment point, but offset in the perpendicular
+     direction at a random distance within the range of attachment of the Hand
+     
+     This is necessary to achieve detailed balance, which in particular implies
+     that rounds of binding/unbinding should not get the Couples closer to
+     the Filaments, even after successive rounds of binding / unbinding.
+     */
+    interpolate();
+    return pos() + dirFiber().randOrthoB(prop->binding_range);
+#endif
+}
+
+
 void Hand::relocate(Fiber* f)
 {
     assert_true(f);
@@ -81,7 +104,7 @@ void Hand::relocate(Fiber* f)
 #endif
     }
     f->addHand(this);
-    update();
+    interpolate();
 }
 
 
@@ -102,7 +125,7 @@ void Hand::relocate(Fiber* f, const real a)
         f->addHand(this);
     }
     hAbs = a;
-    update();
+    interpolate();
 }
 
 
@@ -219,7 +242,7 @@ void Hand::locate(Fiber* f, real a)
     hAbs = a;
     hFiber = f;
     f->addHand(this);
-    update();
+    interpolate();
     hMonitor->afterAttachment(this);
     nextDetach = RNG.exponential();
 }

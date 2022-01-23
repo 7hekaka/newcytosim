@@ -399,7 +399,15 @@ void Couple::afterAttachment(Hand const* h)
     }
 }
 
-
+/**
+ When a Couple transitions into the unboud diffusing state, we set its
+ position near the current location on the fiber, but offset in the perpendicular
+ direction by a random distance within the range of attachment of the Hand.
+ 
+ This is necessary to achieve detailed balance, which in particular implies
+ that rounds of binding/unbinding should not get the Couples any closer to
+ the Filaments.
+ */
 void Couple::beforeDetachment(Hand const* h)
 {
     assert_true(h->attached());
@@ -407,37 +415,20 @@ void Couple::beforeDetachment(Hand const* h)
     CoupleSet * set = static_cast<CoupleSet*>(objset());
     if ( set )
     {
-        bool fee;
-        // link into correct CoupleSet sublist:
         if ( h == cHand1 )
         {
+            // cHand1 will detach
             set->relinkD1(this);
-            fee = !cHand2->attached();
+            if ( cHand2->unattached() )
+                cPos = cHand1->posSide();
         }
         else
         {
+            // cHand2 will detach
             set->relinkD2(this);
-            fee = !cHand1->attached();
+            if ( cHand1->unattached() )
+                cPos = cHand2->posSide();
         }
-        
-#if ( DIM < 2 )
-        /*
-         Relocate the Couple unbound position vector to where it is attached.
-         This ensures that the diffusion process starts from the correct location
-         */
-        cPos = h->posHand();
-#else
-        /*
-         Set position near the attachment point, but offset in the perpendicular
-         direction at a random distance within the range of attachment of the Hand
-         
-         This is necessary to achieve detailed balance, which in particular implies
-         that rounds of binding/unbinding should not get the Couples closer to
-         the Filaments, even after successive rounds of binding / unbinding.
-         */
-        if ( fee )
-            cPos = h->posHand() + h->dirFiber().randOrthoB(h->prop->binding_range);
-#endif
     }
 }
 
@@ -581,8 +572,8 @@ void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
 #if 0
         // it can be nice to set the position, but not essential
-        if ( attached1() ) cHand1->update();
-        if ( attached2() ) cHand2->update();
+        if ( attached1() ) cHand1->interpolate();
+        if ( attached2() ) cHand2->interpolate();
         cPos = position();
 #endif
     }

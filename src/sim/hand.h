@@ -101,6 +101,9 @@ public:
     
     /// identify as Digital class
     virtual bool isDigit() const { return false; }
+    
+    /// a random position, at distance `binding_range' on the side of the fiber
+    Vector posSide() const;
 
     /// move to a different fiber, at the same abscissa
     void relocate(Fiber* f);
