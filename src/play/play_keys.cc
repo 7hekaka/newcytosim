@@ -342,14 +342,14 @@ static void flashColoring(int val)
     switch ( val )
     {
         case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");          break;
-        case FiberDisp::COLORING_RANDOM:    flashText("Fibers: random coloring");      break;
-        case FiberDisp::COLORING_DIRECTION: flashText("Fibers coloring by direction"); break;
-        case FiberDisp::COLORING_MARK:      flashText("Fibers coloring by mark");      break;
-        case FiberDisp::COLORING_FLAG:      flashText("Fibers coloring by flag");      break;
-        case FiberDisp::COLORING_FAMILY:    flashText("Fibers coloring by family");    break;
-        case FiberDisp::COLORING_CLUSTER:   flashText("Fibers coloring by cluster");   break;
-        case FiberDisp::COLORING_AGE:       flashText("Fibers coloring by age");       break;
-        case FiberDisp::COLORING_PSTATE:    flashText("Fibers coloring by +end state");break;
+        case FiberDisp::COLORING_RANDOM:    flashText("Fibers randomly colored");      break;
+        case FiberDisp::COLORING_DIRECTION: flashText("Fibers colored by direction"); break;
+        case FiberDisp::COLORING_MARK:      flashText("Fibers colored by mark");      break;
+        case FiberDisp::COLORING_FLAG:      flashText("Fibers colored by flag");      break;
+        case FiberDisp::COLORING_FAMILY:    flashText("Fibers colored by family");    break;
+        case FiberDisp::COLORING_CLUSTER:   flashText("Fibers colored by cluster");   break;
+        case FiberDisp::COLORING_AGE:       flashText("Fibers colored by age");       break;
+        case FiberDisp::COLORING_PSTATE:    flashText("Fibers colored by +end state");break;
         default: flashText("unknown fiber:coloring mode"); break;
     }
 }
@@ -719,10 +719,12 @@ void helpKeys(std::ostream& os)
     os << "   %           Change point size\n";
     os << "\nSingles - Couples\n";
     os << "   6           Change Single visibility based on state\n";
-    os << "   7 ALT-7     Change Couple visibility based on state;\n";
+    os << "   7 ALT-7     Change Couple visibility based on state\n";
     os << "   0           Change visibility flags of Hands\n";
     os << "   8 9         Decrease; Increase point size of visible Hands\n";
     os << "   ALT-8 ALT-9 Decrease; Increase line width of visible Hands\n";
+    os << "\nSpaces\n";
+    os << "   u           Rotate visibility\n";
 }
 
 
@@ -1089,8 +1091,8 @@ void processKey(unsigned char key)
             shufflePointDispVisible(player.allSpaceDisp(), 3);
             break;
             
-        case '^':
-            shufflePointDispVisible(player.allSpaceDisp(), 1);
+        case 'u':
+            shufflePointDispVisible(player.allSpaceDisp(), 3-altKeyDown);
             break;
 
         case '7':
