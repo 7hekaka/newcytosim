@@ -70,7 +70,6 @@ singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
     primed_ = 0;
 #if POOL_HAND_ATTACHMENT > 1
     doAttachCounter = 0;
-    doAttach = true;
 #endif
     autoPrecond = 0;
     autoCounter = 0;

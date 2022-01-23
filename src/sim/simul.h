@@ -60,10 +60,6 @@ public:
 #if POOL_HAND_ATTACHMENT > 1
     /// counter for occasional Hand's attachment
     unsigned doAttachCounter;
-    /// flag to authorize Hand's attachment
-    bool     doAttach;
-#else
-    static constexpr bool doAttach = true;
 #endif
     
 private:

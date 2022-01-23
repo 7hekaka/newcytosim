@@ -24,6 +24,10 @@ void CoupleSet::prepare(PropertyList const& properties)
 
 
 /// templated member function pointer...
+/**
+ In the loops we get the 'next' in the list always before calling 'FUNC', since
+ 'step()' may transfer the node to another list, changing the value of 'next()'
+ */
 template < void (Couple::*FUNC)() >
 static inline void step_couples(Couple * obj, bool odd)
 {
@@ -45,19 +49,18 @@ static inline void step_couples(Couple * obj, bool odd)
 }
 
 
+/**
+ CoupleSet::step() must call the appropriate Couple::step() exactly once
+ for each Couple: either stepFF(), stepFA(), stepAF() or stepAA().
+ 
+ The Couples are stored in multiple lists, and are automatically transferred
+ from one list to another one if their Hands bind or unbind. The code relies
+ on the fact that a Couple will be moved to the start of the list to which it
+ is transferred, by 'push_front'. By starting always from the node that
+ was first before any transfer could occur, we process each Couple only once.
+ */
 void CoupleSet::step()
 {
-    /*
-     ATTENTION: We ensure here that step() is called exactly once for each object.
-     The Couples are stored in multiple lists, and are automatically transferred
-     from one list to another one if their Hands bind or unbind. The code relies
-     on the fact that a Couple will be moved to the start of the list to which it
-     is transferred, using 'push_front'. By proceeding always from the node, which
-     was first before any transfer could occur, we process each Couple only once.
-     Moreover, we get the 'next' in the list always before calling 'step()', because
-     'step()' may transfer the node to another list, changing the value of 'next()'
-     */
-    
     /*
     Cytosim::log("CoupleSet::step : FF %5i AF %5i FA %5i AA %5i\n",
                  ffList.size(), afList.size(), faList.size(), aaList.size());
@@ -72,42 +75,66 @@ void CoupleSet::step()
     bool const ffOdd = ffList.size() & 1;
     
     step_couples<&Couple::stepAA>(firstAA(), aaList.size() & 1);
-    if ( simul_.doAttach )
-    {
-        step_couples<&Couple::stepFA>(faHead, faOdd);
-        step_couples<&Couple::stepAF>(afHead, afOdd);
-    }
-    else
-    {
-        step_couples<&Couple::stepXA>(faHead, faOdd);
-        step_couples<&Couple::stepAX>(afHead, afOdd);
-    }
+    step_couples<&Couple::stepFA>(faHead, faOdd);
+    step_couples<&Couple::stepAF>(afHead, afOdd);
     
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
         Couple * obj = uniCollect(ffHead);
         uniAttach(simul_.fibers);
-        if ( simul_.doAttach )
+        // handle Couples for which 'fast_diffusion = false':
+        while ( obj )
         {
-            while ( obj )
-            {
-                Couple * nxt = obj->next();
-                obj->stepFF();
-                obj = nxt;
-            }
+            Couple * nxt = obj->next();
+            obj->stepFF();
+            obj = nxt;
         }
     }
-    else if ( simul_.doAttach )
+    else
     {
         //std::clog << "CoupleSet::step : FF " << ffList.size() << " head " << ffHead << '\n';
         // this loop is unrolled, processing objects 2 by 2:
         step_couples<&Couple::stepFF>(ffHead, ffOdd);
     }
 
-    //printf("  : %lu couples [ %u %u ]\n", size(), inventory.first_identity(), inventory.last_identity());
+    //printf("  : %lu couples [ %u %u ]\n", size(), inventory_.first_identity(), inventory_.last_identity());
 }
 
+
+/**
+ This version does not simulate the attachment of free Hand, and hence calls
+ specialized versions of Couple::step() that do not include Hand::stepUnattached():
+ either stepFASkipAttach(), stepAFSkipAttach() or stepAA().
+ Couple::stepFF() is never called.
+ 
+ This is only used if POOL_HAND_ATTACHMENT > 1
+ */
+void CoupleSet::stepSkipAttach()
+{
+    /*
+    Cytosim::log("CoupleSet::stepSkipAttach : FF %5i AF %5i FA %5i AA %5i\n",
+                 ffList.size(), afList.size(), faList.size(), aaList.size());
+    */
+    
+    Couple *const ffHead = firstFF();
+    Couple *const afHead = firstAF();
+    Couple *const faHead = firstFA();
+    
+    bool const faOdd = faList.size() & 1;
+    bool const afOdd = afList.size() & 1;
+    
+    step_couples<&Couple::stepAA>(firstAA(), aaList.size() & 1);
+    step_couples<&Couple::stepFASkipAttach>(faHead, faOdd);
+    step_couples<&Couple::stepAFSkipAttach>(afHead, afOdd);
+    
+    // use alternative attachment strategy:
+    if ( uniEnabled )
+    {
+        uniCollect(ffHead);
+        uniAttach(simul_.fibers);
+    }
+}
 
 //------------------------------------------------------------------------------
 #pragma mark -

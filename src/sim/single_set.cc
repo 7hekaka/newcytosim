@@ -21,6 +21,10 @@ void SingleSet::prepare(PropertyList const& properties)
 
 
 /// templated member function pointer...
+/**
+In the loops we get the 'next' in the list always before calling 'FUNC', since
+'step()' may transfer the node to another list, changing the value of 'next()'
+*/
 template < void (Single::*FUNC)() >
 static inline void step_singles(Single * obj, bool odd)
 {
@@ -41,17 +45,18 @@ static inline void step_singles(Single * obj, bool odd)
     }
 }
 
+/**
+SingleSet::step() must call the appropriate Single::step() exactly once
+for each Single: either stepF() or stepAA().
 
+The Singles are stored in two lists, and are automatically transferred
+from one list to the other if their Hands bind or unbind. The code relies
+on the fact that a Single will be moved to the start of the list to which it
+is transferred, by 'push_front'. By starting always from the node that
+was first before any transfer could occur, we process each Couple only once.
+*/
 void SingleSet::step()
 {
-    /*
-     ATTENTION: we have multiple lists, and Objects are automatically transferred
-     from one list to another if their Hands bind or unbind. We ensure here that
-     step() is called exactly once for each object. THe code relies on the fact
-     that a transferred node would be linked at the start of the new list.
-     We start always at the node, which was first before any transfer could occur.
-     */
-    
     //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
     
     Single *const fHead = firstF();
@@ -64,7 +69,7 @@ void SingleSet::step()
     {
         Single * obj = uniCollect(fHead);
         uniAttach(simul_.fibers);
-        if ( simul_.doAttach )
+        // handle Single for which 'fast_diffusion = false':
         {
             while ( obj )
             {
@@ -74,9 +79,32 @@ void SingleSet::step()
             }
         }
     }
-    else if ( simul_.doAttach )
+    else
     {
         step_singles<&Single::stepF>(fHead, fOdd);
+    }
+}
+
+
+/**
+ This version does not simulate the attachment of free Hand, and hence skips
+ Single::stepF() that calls Hand::stepUnattached().
+
+ This is only used if POOL_HAND_ATTACHMENT > 1
+*/
+void SingleSet::stepSkipAttach()
+{
+    //Cytosim::log("SingleSet::stepSkipAttach : F %5i A %5i\n", fList.size(), aList.size());
+    
+    Single *const fHead = firstF();
+    
+    step_singles<&Single::stepA>(firstA(), sizeA() & 1);
+    
+    // use alternative attachment strategy:
+    if ( uniEnabled )
+    {
+        uniCollect(fHead);
+        uniAttach(simul_.fibers);
     }
 }
 

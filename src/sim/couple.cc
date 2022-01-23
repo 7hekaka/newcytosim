@@ -268,7 +268,7 @@ void Couple::stepAA()
 /**
  Simulates only attached activity of cHand1
  */
-void Couple::stepAX()
+void Couple::stepAFSkipAttach()
 {
     if ( cHand1->checkDetachment() )
         cHand1->detach();
@@ -280,7 +280,7 @@ void Couple::stepAX()
 /**
  Simulates only attached activity of cHand2
  */
-void Couple::stepXA()
+void Couple::stepFASkipAttach()
 {
     if ( cHand2->checkDetachment() )
         cHand2->detach();
