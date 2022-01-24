@@ -128,7 +128,7 @@ void Inventory::reassign()
 {
     ObjectID nxt = first_unassigned();
     ObjectID inf = nxt;
-    ObjectID sup = last_identity();
+    ObjectID sup = highest_;
     assert_true(!byNames[inf]);
     
     while ( inf <= sup )

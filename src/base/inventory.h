@@ -59,10 +59,10 @@ public:
     ~Inventory() { release(); }
     
     /// the smallest assigned identity
-    ObjectID first_identity() const { return lowest_; }
+    ObjectID lowest() const { return lowest_; }
 
     /// the largest assigned identity
-    ObjectID last_identity() const { return highest_; }
+    ObjectID highest() const { return highest_; }
     
     /// lowest assigned number strictly greater than `n`
     ObjectID next_identity(ObjectID n) const;
