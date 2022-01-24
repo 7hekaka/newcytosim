@@ -1918,22 +1918,24 @@ Interpolation Chain::interpolateCenter() const
 
 
 /**
- return Interpolation corresponding to a distance `ab` from the MINUS_END
+ return Interpolation corresponding to a distance `abs` from the MINUS_END
  The interpolation describes a position:
-       X = P(r) * (1-a) + P(r+1) * a
+       X = P(i) * (1-a) + P(i+1) * a
  where
- - `r` is an integer: 0 <= r < lastPoint(),
+ - `i` is an integer: 0 <= i < lastPoint(),
  - `a` is a positive real coefficient: 0 <= a <= 1
  .
- When `ab` is above the PLUS_END, an interpolation of the last point is returned.
+ When `abs` is above the PLUS_END, an interpolation of the last point is returned.
  
  */
 Interpolation Chain::interpolateM(const real ab) const
 {
-    real a = std::max(ab*iCut, (real)0);
-    //beyond the last point, we interpolate the PLUS_END
-    size_t i = std::min(static_cast<size_t>(a), size_t(nPoints-2));
-    return Interpolation(this, i, i+1, std::min(a-(real)i, (real)1));
+    real a = std::max(ab*iCut, real(0));
+    // beyond the last point, we interpolate the PLUS_END
+    real s = std::min(std::floor(a), real(nPoints-2));
+    SIZE_T i = static_cast<SIZE_T>(s);
+    a = a - s;
+    return Interpolation(this, i, i+1, std::min(a, real(1)));
 }
 
 
