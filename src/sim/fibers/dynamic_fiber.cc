@@ -302,10 +302,11 @@ int DynamicFiber::stepPlusEnd()
         while (( nextGrowthP < 0 ) | ( nextShrinkP < 0 ) | ( nextHydrolP < 0 ))
         {
             // Select the earliest event (in most cases, only one event will fire up)
-#if 0
+#if 1
             size_t ii = sMath::arg_min(nextGrowthP/growth, nextHydrolP/hydrol, nextShrinkP/shrink);
 #else
             // it is possible to replace the divisions by multiplications following arg_min()'s implementation...
+            // but it fails if 'shrink' is zero
             size_t cba = ( nextShrinkP*growth*hydrol < std::min(nextHydrolP*growth, nextGrowthP*hydrol)*shrink );
             size_t bac = ( nextHydrolP*shrink*growth < std::min(nextGrowthP*shrink, nextShrinkP*growth)*hydrol );
             size_t ii = 2*cba | bac;
