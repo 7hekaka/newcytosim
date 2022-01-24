@@ -72,7 +72,7 @@ Vector SpaceMesh::project(Vector const& W) const
 
 /**
  The current procedure tests the vertices of fibers against the segments of the polygon.
- This fails for non-convext polygon since the re-entrant corners can intersect the fibers.
+ This fails for non-convext polygon since the re-entrant corners can intersect the Fiber.
  
  @todo Also project re-entrant polygon corners on the segments of the Fiber.
  */

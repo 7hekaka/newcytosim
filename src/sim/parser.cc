@@ -815,9 +815,9 @@ void Parser::parse_import(std::istream& is)
        binary = BOOL
      }
  
- WHAT must be ``objects`` of ``properties``, and by default, both `binary` 
+ WHAT must be ``objects`` or ``properties``, and by default, both `binary`
  and `append` are `true`. If `*` is specified instead of a file name,
- the current trajectory file will be used.
+ the standard output will be used.
  
  Short syntax:
  

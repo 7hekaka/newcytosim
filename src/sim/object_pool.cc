@@ -427,25 +427,27 @@ void ObjectPool::quicksort(int (*comp)(const void*, const void*))
 
 
 /**
- Rearrange [F--P][Q--L] into [Q--L][F--P]
+ Rearrange [F--Q][P--B] into [P--B][F--Q]
  */
 void ObjectPool::permute(Object * p)
 {
-    if ( p  &&  p->nextO )
-    {
-        backO->nextO  = frontO;
-        frontO->prevO = backO;
-        frontO        = p->nextO;
-        backO         = p;
-        backO->nextO  = nullptr;
-        frontO->prevO = nullptr;
-    }
+    // close list into a loop
+    backO->nextO  = frontO;
+    frontO->prevO = backO;
+    
+    // open loop at 'p'
+    frontO = p;
+    backO  = p->prevO;
+    
+    backO->nextO  = nullptr;
+    frontO->prevO = nullptr;
+
     //assert_false( bad() );
 }
 
 
 /**
- Rearrange [F--P][X--Y][Q--L] into [X--Y][F--P][Q--L]
+ Rearrange [F--P][X--Y][Q--B] into [X--Y][F--P][Q--B]
  
  Q must be after P
  If Q is between Front and P, this will destroy the list,
@@ -470,7 +472,7 @@ void ObjectPool::shuffle_up(Object * p, Object * q)
 
 
 /**
- Rearrange [F--P][X--Y][Q--L] into [F--P][Q--L][X--Y]
+ Rearrange [F--P][X--Y][Q--B] into [F--P][Q--B][X--Y]
  
  Q must be after P
  If Q is between Front and P, this will destroy the list,
