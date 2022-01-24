@@ -38,19 +38,16 @@ void Shackle::stepAA()
     //std::clog << "Shackle " << proj.abscissa() - cHand1->abscissa() << '\n';
     cHand1->moveTo(a);
     
-    if ( attached1() )
-    {
-        Vector f = force();
-        real fn = f.norm();
-        
-        if ( cHand1->checkKramersDetachment(fn) )
-            cHand1->stepLoaded( f);
-        else
-            cHand1->detach();
-        
-        if ( cHand2->checkKramersDetachment(fn) )
-            cHand2->stepLoaded(-f);
-        else
-            cHand2->detach();
-    }
+    Vector f = force();
+    real fn = f.norm();
+    
+    if ( cHand1->checkKramersDetachment(fn) )
+        cHand1->stepLoaded( f);
+    else
+        cHand1->detach();
+    
+    if ( cHand2->checkKramersDetachment(fn) )
+        cHand2->stepLoaded(-f);
+    else
+        cHand2->detach();
 }

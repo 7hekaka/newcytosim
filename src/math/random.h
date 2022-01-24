@@ -192,6 +192,9 @@ public:
     /// integer in [0,n] for n < 2^32, (slow) bitwise algorithm
     uint32_t pint32_slow(uint32_t n);
     
+    /// integer in [a,b] for a, b < 2^32
+    uint32_t pint32(uint32_t a, uint32_t b) { return a + pint32(1+b-a); }
+
     /// a random unsigned integer with exactly `b` bit equal to `1`
     uint32_t distributed_bits(int b);
 

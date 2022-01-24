@@ -70,11 +70,12 @@ void CoupleSet::step()
     Couple *const afHead = firstAF();
     Couple *const faHead = firstFA();
     
+    bool const aaOdd = aaList.size() & 1;
     bool const faOdd = faList.size() & 1;
     bool const afOdd = afList.size() & 1;
     bool const ffOdd = ffList.size() & 1;
     
-    step_couples<&Couple::stepAA>(firstAA(), aaList.size() & 1);
+    step_couples<&Couple::stepAA>(firstAA(), aaOdd);
     step_couples<&Couple::stepFA>(faHead, faOdd);
     step_couples<&Couple::stepAF>(afHead, afOdd);
     
@@ -98,7 +99,7 @@ void CoupleSet::step()
         step_couples<&Couple::stepFF>(ffHead, ffOdd);
     }
 
-    //printf("  : %lu couples [ %u %u ]\n", size(), inventory_.first_identity(), inventory_.last_identity());
+    //printf("  : %lu couples [ %u %u ]\n", size(), inventory_.lowest(), inventory_.highest());
 }
 
 
@@ -121,10 +122,11 @@ void CoupleSet::stepSkipAttach()
     Couple *const afHead = firstAF();
     Couple *const faHead = firstFA();
     
+    bool const aaOdd = aaList.size() & 1;
     bool const faOdd = faList.size() & 1;
     bool const afOdd = afList.size() & 1;
     
-    step_couples<&Couple::stepAA>(firstAA(), aaList.size() & 1);
+    step_couples<&Couple::stepAA>(firstAA(), aaOdd);
     step_couples<&Couple::stepFASkipAttach>(faHead, faOdd);
     step_couples<&Couple::stepAFSkipAttach>(afHead, afOdd);
     
@@ -391,6 +393,17 @@ void CoupleSet::shuffle()
     if ( afList.size() > 1 ) afList.shuffle();
     if ( faList.size() > 1 ) faList.shuffle();
     if ( aaList.size() > 1 ) aaList.shuffle();
+    
+    ObjectID id = RNG.pint32(inventory_.lowest(), inventory_.highest());
+    Couple * c = static_cast<Couple*>(inventory_.get(id));
+    if ( c )
+    switch( c->state() )
+    {
+        case 0: break;
+        case 1: afList.permute(c); break;
+        case 2: faList.permute(c); break;
+        case 3: aaList.permute(c); break;
+    }
 }
 
 
@@ -596,34 +609,41 @@ void CoupleSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector
 
 int CoupleSet::bad() const
 {
-    int code = 0;
+    int code = ffList.bad() | afList.bad() | faList.bad() | aaList.bad();
+    if ( code )
+        return code;
+
     Couple * obj;
-    code |= ffList.bad();
     for ( obj=firstFF(); obj ; obj = obj->next() )
     {
         if ( obj->attached1() || obj->attached2() )
             code |= 8;
     }
     
-    code |= afList.bad();
     for ( obj=firstAF(); obj ; obj = obj->next() )
     {
         if ( !obj->attached1() || obj->attached2() )
             code |= 16;
+        if ( obj->hand1()->bad() )
+            code |= 128;
     }
     
-    code |= faList.bad();
     for ( obj=firstFA(); obj ; obj = obj->next() )
     {
         if ( obj->attached1() || !obj->attached2() )
             code |= 32;
+        if ( obj->hand2()->bad() )
+            code |= 128;
     }
     
-    code |= aaList.bad();
     for ( obj=firstAA(); obj ; obj = obj->next() )
     {
         if ( !obj->attached1() || !obj->attached2() )
             code |= 64;
+        if ( obj->hand1()->bad() )
+            code |= 256;
+        if ( obj->hand2()->bad() )
+            code |= 256;
     }
     return code;
 }

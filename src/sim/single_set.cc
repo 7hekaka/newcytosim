@@ -367,21 +367,24 @@ void SingleSet::write(Outputter& out) const
 
 int SingleSet::bad() const
 {
-    int code = 0;
-    Single * obj;
+    int code = fList.bad() | aList.bad();
+
+    if ( code )
+        return code;
     
-    code |= fList.bad();
+    Single * obj;
     for ( obj = firstF(); obj ; obj=obj->next() )
     {
         if ( obj->attached() )
             code |= 8;
     }
     
-    code |= 16*aList.bad();
     for ( obj = firstA();  obj ; obj=obj->next() )
     {
         if ( !obj->attached() )
-            code |= 128;
+            code |= 16;
+        if ( obj->hand()->bad() )
+            code |= 32;
     }
     return code;
 }
