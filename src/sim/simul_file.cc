@@ -335,9 +335,6 @@ private:
     
     /// pointer
     Simul * sim;
-
-    /// state
-    bool  frozen;
     
 public:
     
@@ -357,11 +354,10 @@ public:
         sim->fields.freeze();
         sim->spaces.freeze();
         //sim->events.freeze();
-        frozen = true;
     }
     
     /// erase objects flagged with FLAG
-    void prune()
+    void prune_all()
     {
         //sim->events.prune();
         sim->organizers.prune();
@@ -374,10 +370,10 @@ public:
         sim->fibers.prune();
         sim->spaces.prune();
         sim->fields.prune();
-        frozen = false;
+        sim = nullptr;
     }
     
-    void thaw()
+    void thaw_all()
     {
         /*
          Attention: The order of the thaw() below is important:
@@ -397,14 +393,14 @@ public:
         sim->fibers.thaw();
         sim->spaces.thaw();
         sim->fields.thaw();
-        frozen = false;
+        sim = nullptr;
     }
 
     /// reset flags
     ~InputLock()
     {
-        if ( frozen )
-            thaw();
+        if ( sim )
+            thaw_all();
         //Cytosim::log("Simul::InputLock deleted with %i objects\n", sim->nbObjects());
     }
 };
@@ -437,12 +433,14 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
         {
             // if no error occurred, process objects that have not been updated
             if ( prune )
-                lock.prune();
+                lock.prune_all();
             else
-                lock.thaw();
+                lock.thaw_all();
             // renew pointers to objects, particularly 'confine_space'
             prop->complete(*this);
         }
+        assert_false(couples.bad());
+        assert_false(singles.bad());
         return res;
     }
     catch(Exception & e)
