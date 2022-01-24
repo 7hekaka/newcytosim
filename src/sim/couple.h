@@ -57,7 +57,7 @@ protected:
     Hand * cHand2;
     
     /// specialization of HandMonitor
-    bool allowAttachment(FiberSite const&, Hand const*);
+    bool allowAttachment(FiberSite&, Hand const*);
     /// specialization of HandMonitor
     void afterAttachment(Hand const*);
     /// specialization of HandMonitor
@@ -128,7 +128,7 @@ public:
     /// activity flag
     virtual int active() const { return 1; }
 
-    /// the state of the Couple in { 0 ... 3 } representing { FF, FA, FA, AA }
+    /// the state of the Couple in { 0 ... 3 } representing { FF, AF, FA, AA }
     int state() const { return cHand1->attached() + 2 * cHand2->attached(); }
     
     /// category of link: Parallel; Anti-parallel; X; T+; V+; T-; V-

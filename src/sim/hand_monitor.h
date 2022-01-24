@@ -28,7 +28,7 @@ class HandMonitor
 public:
     
     /// Returning `false` prevents the attachment (this is called before every attempt)
-    virtual bool allowAttachment(FiberSite const&, Hand const*) { return true; }
+    virtual bool allowAttachment(FiberSite&, Hand const*) { return true; }
     
     /// called after attachement
     virtual void afterAttachment(Hand const*) {}

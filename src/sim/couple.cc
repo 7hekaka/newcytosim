@@ -306,7 +306,7 @@ void Couple::stepFASkipAttach()
  
  */
 
-bool Couple::allowAttachment(FiberSite const& sit, Hand const* h)
+bool Couple::allowAttachment(FiberSite& sit, Hand const* h)
 {
     assert_true( h == cHand1 || h == cHand2 );
     FiberSite const* that = ( h == cHand1 ? cHand2 : cHand1 );
@@ -353,26 +353,31 @@ bool Couple::allowAttachment(FiberSite const& sit, Hand const* h)
             return true;
             
         case CoupleProp::BIND_PARALLEL:
+            sit.interpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) < 0.5 )
                 return false;
             break;
             
         case CoupleProp::BIND_NOT_PARALLEL:
+            sit.interpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) > 0.5 )
                 return false;
             break;
   
         case CoupleProp::BIND_ANTIPARALLEL:
+            sit.interpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) > -0.5 )
                 return false;
             break;
             
         case CoupleProp::BIND_NOT_ANTIPARALLEL:
+            sit.interpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) < -0.5 )
                 return false;
             break;
             
         case CoupleProp::BIND_ORTHOGONAL:
+            sit.interpolate();
             if ( abs_real(dot(sit.dirFiber(), that->dirFiber())) > 0.866025 )
                 return false;
             break;
