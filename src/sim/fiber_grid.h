@@ -10,6 +10,7 @@
 #include "grid.h"
 #include "fiber.h"
 #include "fiber_segment.h"
+#include "fiber_site.h"
 //#include <vector>
 
 class Simul;
@@ -60,25 +61,23 @@ public:
 
 #if BIND_CLOSEST_FIBER
 
-    /// SegmentHit is used to calculate distance of segments to a point
-    class SegmentHit
+    /// BindingTarget is used to calculate distance of segments to a point
+    class BindingTarget
     {
     public:
-        FiberSegment seg_;   ///< The segment
-        real         dis_;   ///< shortest distance squared from point to segment
-        real         abs_;   ///< abscissa of projection of target point
+        FiberSite sit_;   ///< The segment
+        real      dis_;   ///< shortest distance squared from point to segment
         
-        SegmentHit() {}
-        SegmentHit(FiberSegment const& s, real d, real a) { seg_ = s; dis_ = d; abs_ = a; }
+        BindingTarget() {}
+        BindingTarget(FiberSite const& s, real d) { sit_ = s; dis_ = d; }
         
-        Fiber const* fiber() const { return seg_.fiber(); }
-        real abscissa() const { return seg_.abscissa1() + abs_; }
+        FiberSite site() const { return sit_; }
         
         std::string to_string() const;
     };
     
     /// list of SegmentHits used in tryToAttach()
-    mutable Array<SegmentHit> targets;
+    mutable Array<BindingTarget> targets;
     
 #endif
     

@@ -57,7 +57,7 @@ protected:
     Hand * cHand2;
     
     /// specialization of HandMonitor
-    bool allowAttachment(FiberSite&, Hand const*);
+    bool permitAttachment(FiberSite&, Hand const*) const;
     /// specialization of HandMonitor
     void afterAttachment(Hand const*);
     /// specialization of HandMonitor

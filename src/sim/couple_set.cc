@@ -824,6 +824,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
             
             if ( fixed ) // create enough candidates for all sites
                 uniRefill(can, loc.size(), p);
+            
             uniAttach1(loc, can);
             
             if ( p->trans_activated )
@@ -843,6 +844,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
             
             if ( fixed ) // create enough candidates for all sites
                 uniRefill(can, loc.size(), p);
+            
             uniAttach2(loc, can);
         }
     }

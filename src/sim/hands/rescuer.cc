@@ -28,24 +28,25 @@ Rescuer::Rescuer(RescuerProp const* p, HandMonitor* h)
  */
 void Rescuer::handleDisassemblyM()
 {
-    assert_true( attached() );
-    
-    if ( RNG.test(prop->rescue_prob) )
+    Fiber * fib = fiber();
+
+    if ( hAbs < fib->abscissaM() && fib->freshAssemblyM() < 0 )
     {
-        Fiber * fib = fiber();
-        assert_true( hAbs < hFiber->abscissaM() );
-        // induce rescue:
-        fib->setEndStateM(STATE_GREEN);
-        // increase MT length to cover position of Hand
-        fib->growM(fiber()->abscissaM()-hAbs);
+        if ( RNG.test(prop->rescue_prob) )
+        {
+            //revert the last disassembly step:
+            fib->growM(-fib->freshAssemblyM());
+            // induce rescue:
+            fib->setEndStateM(STATE_GREEN);
+        }
+        else
+            detach();
     }
-    else
-        detach();
 }
 
 /**
  Warning:
- This will only work if the time step is small such that only one Hand is
+ This will work best if the time step is small such that only one Hand is
  affected at any time step by the shrinkage of the Fiber.
  Otherwise, the order in which the Hand are considered is random,
  and a distal Hand might be detached, even if the Fiber is rescued prior to this.
@@ -54,23 +55,28 @@ void Rescuer::handleDisassemblyM()
  - Shrinking speed ~ -0.1 um/second
  - time_step = 0.010 seconds
  -> shrinkage = 1 nm / time_step
- which would work for the density of 13 binding sites / 8 nm of microtubule.
+ With a density of 13 binding sites / 8 nm of microtubule, this is at most
+ 2 events / time_step
  */
 void Rescuer::handleDisassemblyP()
 {
-    assert_true( attached() );
-    
-    if ( RNG.test(prop->rescue_prob) )
+    Fiber * fib = fiber();
+
+    /* increase MT length to cover position of Hand after checking that increment
+    would be positive, since another Hand might have done the same job already. */
+    if ( hAbs > fib->abscissaP() && fib->freshAssemblyP() < 0 )
     {
-        Fiber * fib = fiber();
-        assert_true( hAbs > hFiber->abscissaP() );
-        // induce rescue:
-        fib->setEndStateP(STATE_GREEN);
-        // increase MT length to cover position of Hand
-        fib->growP(hAbs-fiber()->abscissaP());
+        if ( RNG.test(prop->rescue_prob) )
+        {
+            //revert the last disassembly step:
+            fib->growP(-fib->freshAssemblyP());
+            // induce rescue:
+            fib->setEndStateP(STATE_GREEN);
+            //assert_true(hAbs <= fib->abscissaP())
+        }
+        else
+            detach();
     }
-    else
-        detach();
 }
 
 

@@ -247,10 +247,10 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 
 #if BIND_CLOSEST_FIBER
 
-std::string FiberGrid::SegmentHit::to_string() const
+std::string FiberGrid::BindingTarget::to_string() const
 {
     std::ostringstream oss;
-    oss << "f" << seg_.fiber()->identity() << ":" << seg_.point();
+    oss << " " << sit_;
     // convert distance squared to nm
     oss << " " << std::setprecision(1) << std::fixed << 1000 * sqrt(dis_);
     return oss.str();
@@ -259,8 +259,8 @@ std::string FiberGrid::SegmentHit::to_string() const
 /// qsort function comparing distance between segment and target
 static int compareSegments(const void * A, const void * B)
 {
-    real a = static_cast<FiberGrid::SegmentHit const*>(A)->dis_;
-    real b = static_cast<FiberGrid::SegmentHit const*>(B)->dis_;
+    real a = static_cast<FiberGrid::BindingTarget const*>(A)->dis_;
+    real b = static_cast<FiberGrid::BindingTarget const*>(B)->dis_;
     
     return ( a > b ) - ( b > a );
 }
@@ -296,10 +296,11 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             real abs = seg.projectPoint(place, dis);
             if ( dis < sup )
             {
-                FiberSite sit(const_cast<Fiber*>(seg.fiber()), abs);
-                if ( ha.monitorAllowsAttachment(sit) )
+                // ATTENTION: convert `abs` relative to the segment to Fiber's abscissa
+                FiberSite sit(const_cast<Fiber*>(seg.fiber()), seg.abscissa1()+abs);
+                if ( ha.attachmentAllowed(sit) )
                 {
-                    targets.emplace(seg, dis, abs);
+                    targets.emplace(sit, abs);
                     //std::clog << "   target " << sit << " at " << dis << " nm\n";
                 }
                 //else std::clog << "   verbot " << sit << " at " << dis << " nm\n";
@@ -320,17 +321,13 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      distribution */
     const uint64_t prob = 0x1p+32 * ha.prop->binding_prob;
     //std::clog << &ha << " trying ";
-    for ( SegmentHit const& hit : targets )
+    for ( BindingTarget const& hit : targets )
     {
         if ( RNG.pint32() < prob )
         {
-            FiberSite sit(const_cast<Fiber*>(hit.fiber()), hit.abscissa());
-            if ( ha.attachmentAllowed(sit) )
-            {
-                //std::clog << hit.to_string() << "\n";
-                ha.attach(sit);
-                return;
-            }
+            //std::clog << hit.to_string() << "\n";
+            ha.attach(hit.site());
+            return;
         }
         //std::clog << hit.to_string() << " | ";
     }
@@ -376,11 +373,11 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             if ( dis < sup )
             {
                 Fiber * fib = const_cast<Fiber*>(seg.fiber());
-                FiberSite pos(fib, seg.abscissa1()+abs);
+                FiberSite sit(fib, seg.abscissa1()+abs);
                 
-                if ( ha.keyMatch(fib) &&  ha.attachmentAllowed(pos) )
+                if ( ha.keyMatch(fib) && ha.attachmentAllowed(sit) )
                 {
-                    ha.attach(pos);
+                    ha.attach(sit);
                     return;
                 }
             }

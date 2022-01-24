@@ -96,6 +96,7 @@ void Fiber::step()
     }
     else
         updateHands();
+    assert_false(needUpdate);
     
 #if FIBER_HAS_MESH
     
@@ -1126,7 +1127,6 @@ void Fiber::updateHands()
 {
     real M = abscissaM();
     real P = abscissaP();
-    //assert_small(segmentation()*segmentationInv()-1.0);
     Hand * h = fHands.front();
     while ( h )
     {
@@ -1134,7 +1134,6 @@ void Fiber::updateHands()
         assert_true(h->fiber()==this);
         // this is equivalent to h->interpolate();
         h->hTerp = interpolateM(h->abscissa() - M);
-        assert_true(h->hTerp.mecable()==this);
         // must iterate ahead, because `checkFiberRange` may lead to detachment:
         h->checkFiberRange(M, P);
         h = x;

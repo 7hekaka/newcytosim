@@ -306,7 +306,7 @@ void Couple::stepFASkipAttach()
  
  */
 
-bool Couple::allowAttachment(FiberSite& sit, Hand const* h)
+bool Couple::permitAttachment(FiberSite& sit, Hand const* h) const
 {
     assert_true( h == cHand1 || h == cHand2 );
     FiberSite const* that = ( h == cHand1 ? cHand2 : cHand1 );

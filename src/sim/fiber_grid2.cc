@@ -81,11 +81,11 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             if ( dis < sup )
             {
                 Fiber * fib = const_cast<Fiber*>(seg.fiber());
-                FiberSite pos(fib, seg.abscissa1()+abs);
+                FiberSite sit(fib, seg.abscissa1()+abs);
                 
-                if ( ha.keyMatch(fib) && ha.attachmentAllowed(pos) )
+                if ( ha.keyMatch(fib) && ha.attachmentAllowed(sit) )
                 {
-                    ha.attach(pos);
+                    ha.attach(sit);
                     return;
                 }
             }

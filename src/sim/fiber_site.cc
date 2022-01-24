@@ -218,7 +218,7 @@ void FiberSite::print(std::ostream& os) const
             os.precision(p);
         }
     } else
-        os << "(null)";
+        os << "[null]";
 }
 
 std::ostream& operator << (std::ostream& os, FiberSite const& arg)
