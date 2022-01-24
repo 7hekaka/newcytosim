@@ -52,9 +52,9 @@ void Chewer::stepUnloaded()
     }
     
     if ( engaged && RNG.test_not(prop->hold_growing_end) )
-        detach();
-    else
-        moveTo(a);
+        return detach();
+
+    moveTo(a);
 }
 
 
@@ -93,8 +93,8 @@ void Chewer::stepLoaded(Vector const& force)
     }
     
     if ( engaged && RNG.test_not(prop->hold_growing_end) )
-        detach();
-    else
-        moveTo(a);
+        return detach();
+
+    moveTo(a);
 }
 

@@ -8,7 +8,7 @@ class ActorProp;
 
 /// A Hand that can act on a Fiber
 /**
- The Actor is a Hand, and can thus bind and unbind from fibers.
+ The Actor is a Hand, and can thus bind and unbind from Fiber.
  
  The Actor currently does nothing else.
  It exists as a template, or as a class that can be used when new functionalities are needed

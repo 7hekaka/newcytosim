@@ -72,7 +72,6 @@ void Digit::hop(lati_t s)
 #else
     hAbs = s * prop->step_size + prop->site_shift;
 #endif
-    interpolate();
 }
 
 //------------------------------------------------------------------------------

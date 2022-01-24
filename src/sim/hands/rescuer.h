@@ -7,7 +7,7 @@ class RescuerProp;
 
 /// A Hand that may rescue a shrinking fiber.
 /**
- The Rescuer is a Hand, and as such can bind and unbind from fibers.
+ The Rescuer is a Hand, and as such can bind and unbind from Fiber.
  
  A bound rescuer has the ability to switch a shrinking fiber to a growing state.
  This may occur if the shrinking end of the fiber is reaching the position of the Rescuer.

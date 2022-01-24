@@ -30,24 +30,17 @@ void Slider::stepLoaded(Vector const& force)
     if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaP();
     }
 
-    // movement can lead to detachment, so we do it last:
     moveTo(a);
 }
 

@@ -8,7 +8,7 @@ class MightyProp;
 
 /// A Hand that can move and do other things to a Fiber
 /**
- The Mighty is a Hand, and can thus bind and unbind from fibers.
+ The Mighty is a Hand, and can thus bind and unbind from Fiber.
  
  Mighty is currently is a copy of Motor.
  It can be used to implement custom advanced functionalities.

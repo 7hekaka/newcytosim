@@ -7,7 +7,7 @@ class SliderProp;
 
 /// A Hand that will move on a Fiber passively with viscous resistance
 /**
- The Slider is a Hand, and can thus bind and unbind from fibers.
+ The Slider is a Hand, and can thus bind and unbind from Fiber.
  
  A bound Slider will move on the fiber it is pulled by external force.
  The Slider is a passive element that may move which staying attached to the fiber.

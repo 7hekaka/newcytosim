@@ -8,7 +8,7 @@
 
 /// a Hand that can move smoothly on a Fiber
 /**
- The Motor is a Hand, and thus can bind and unbind from fibers.
+ The Motor is a Hand, and thus can bind and unbind from Fiber.
  
  A bound Motor can move along its fiber.
  The direction of the motor is set by the sign of @ref MotorPar "unloaded_speed".

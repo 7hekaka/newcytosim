@@ -8,7 +8,7 @@ class ChewerProp;
 
 /// A Hand that can eat Fibers at their ends
 /**
- The Chewer can bind and unbind from fibers. It will diffuse on the lattice,
+ The Chewer can bind and unbind from Fiber. It will diffuse on the lattice,
  (set by `diffusion`) and it will induce depolymerization at the end of the Fiber.
  To be active in depolymerization, it needs to reach the end by 1D diffusion,
  after binding onto the lattice. It is equally active on both ends.

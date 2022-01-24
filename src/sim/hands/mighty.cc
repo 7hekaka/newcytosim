@@ -31,20 +31,14 @@ void Mighty::stepUnloaded()
     if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaP();
     }
     
@@ -52,9 +46,9 @@ void Mighty::stepUnloaded()
     assert_true( nextDetach >= 0 );
     nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
     if ( nextDetach <= 0 )
-        detach();
-    else
-        moveTo(a);
+        return detach();
+
+    moveTo(a);
 }
 
 
@@ -80,20 +74,14 @@ void Mighty::stepLoaded(Vector const& force)
     if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaP();
     }
     
@@ -102,8 +90,8 @@ void Mighty::stepLoaded(Vector const& force)
     nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
     
     if ( nextDetach <= 0 )
-        detach();
-    else
-        moveTo(a);
+        return detach();
+    
+    moveTo(a);
 }
 

@@ -30,32 +30,26 @@ void Motor::stepUnloaded()
     if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaP();
     }
-    
-    moveTo(a);
 
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
     nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
     if ( nextDetach <= 0 )
-        detach();
+        return detach();
 #endif
+
+    moveTo(a);
 }
 
 
@@ -88,32 +82,26 @@ void Motor::stepLoaded(Vector const& force)
     if ( a < hFiber->abscissaM() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
         if ( RNG.test_not(prop->hold_growing_end) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         a = hFiber->abscissaP();
     }
-
-    //std::cerr << this << " > " << hAbs << "  " << dab << "\n";
-    moveTo(a);
-    
+        
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
     nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
     if ( nextDetach <= 0 )
-        detach();
+        return detach();
 #endif
+
+    //std::cerr << this << " > " << hAbs << "  " << dab << "\n";
+    moveTo(a);
 }
 

@@ -43,7 +43,7 @@ void Cutter::stepUnloaded()
     if ( nextCut < 0 )
     {
         nextCut = RNG.exponential();
-        cut();
+        return cut();
     }
 }
 
@@ -57,7 +57,7 @@ void Cutter::stepLoaded(Vector const& force)
     if ( nextCut < 0 )
     {
         nextCut = RNG.exponential();
-        cut();
+        return cut();
     }
 }
 

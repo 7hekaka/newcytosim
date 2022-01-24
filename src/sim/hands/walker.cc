@@ -53,20 +53,14 @@ void Walker::stepUnloaded()
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
-        {
-            detach();
-            return;
-        }
+            return detach();
         
         lati_t s = site() + stride;
         
         if ( outsideMP(s) )
         {
             if ( RNG.test_not(prop->hold_growing_end) )
-            {
-                detach();
-                return;
-            }
+                return detach();
         }
         else if ( vacant(s) )
             hop(s);
@@ -99,20 +93,14 @@ void Walker::stepLoaded(Vector const& force)
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
-        {
-            detach();
-            return;
-        }
+            return detach();
 
         lati_t s = site() + stride;
 
         if ( outsideMP(s) )
         {
             if ( RNG.test_not(prop->hold_growing_end) )
-            {
-                detach();
-                return;
-            }
+                return detach();
         }
         else if ( vacant(s) )
             hop(s);

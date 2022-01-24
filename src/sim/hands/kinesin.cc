@@ -38,10 +38,7 @@ void Kinesin::stepUnloaded()
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
-        {
-            detach();
-            return;
-        }
+            return detach();
 
         int dir = ( nextStep <= nextBack ) - ( nextStep > nextBack );
 
@@ -50,10 +47,7 @@ void Kinesin::stepUnloaded()
         if ( outsideMP(s) )
         {
             if ( RNG.test_not(prop->hold_growing_end) )
-            {
-                detach();
-                return;
-            }
+                return detach();
         }
         else if ( vacant(s) )
             hop(s);
@@ -80,10 +74,7 @@ void Kinesin::stepLoaded(Vector const& force)
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
-        {
-            detach();
-            return;
-        }
+            return detach();
 
         int dir = ( nextStep <= nextBack ) - ( nextStep > nextBack );
 
@@ -92,10 +83,7 @@ void Kinesin::stepLoaded(Vector const& force)
         if ( outsideMP(s) )
         {
             if ( RNG.test_not(prop->hold_growing_end) )
-            {
-                detach();
-                return;
-            }
+            return detach();
         }
         else if ( vacant(s) )
             hop(s);

@@ -8,7 +8,7 @@ class RegulatorProp;
 
 /// A Hand that may induce a catastrophe.
 /**
- The Regulator is a Hand, and as such can bind and unbind from fibers.
+ The Regulator is a Hand, and as such can bind and unbind from Fiber.
  
  This class is not implemented.
  

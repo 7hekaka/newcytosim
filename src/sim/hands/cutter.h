@@ -8,7 +8,7 @@ class CutterProp;
 
 /// A Hand that can cut a Fiber
 /**
- The Cutter is a Hand, and thus can bind and unbind from fibers.
+ The Cutter is a Hand, and thus can bind and unbind from Fiber.
  
  A bound Cutter can cut the fiber at the position where it is attached.
  The rate of cutting is set by @ref CutterPar "cutting_rate".
