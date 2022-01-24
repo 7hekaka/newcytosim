@@ -129,7 +129,6 @@ void Simul::step()
     spheres.step();
     beads.step();
     solids.step();
-    fibers.step();
     
     //printf("     ::steps    %16llu\n", (timer()-rdt)>>5); rdt = timer();
     
@@ -186,6 +185,9 @@ void Simul::step()
             //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
         }
     }
+
+    // This will also update all the attached Hands
+    fibers.step();
 }
 
 

@@ -70,12 +70,14 @@ void Hand::resetTimers()
 
 Vector Hand::posSide() const
 {
+    // needed if the interpolation is not up-to-date
+    //interpolate();
 #if ( DIM < 2 )
     /*
      Relocate the Couple unbound position vector to where it is attached.
      This ensures that the diffusion process starts from the correct location
      */
-    return hFiber->pos(hAbs);
+    return pos();
 #else
     /*
      Set position near the attachment point, but offset in the perpendicular
@@ -85,7 +87,6 @@ Vector Hand::posSide() const
      that rounds of binding/unbinding should not get the Couples closer to
      the Filaments, even after successive rounds of binding / unbinding.
      */
-    interpolate();
     return pos() + dirFiber().randOrthoB(prop->binding_range);
 #endif
 }
@@ -287,13 +288,13 @@ void Hand::detach()
 #pragma mark -
 
 
-void Hand::checkFiberRange()
+void Hand::checkFiberRange(real absM, real absP)
 {
     assert_true( attached() );
     
-    if ( hAbs < hFiber->abscissaM() )
+    if ( hAbs < absM )
         handleDisassemblyM();
-    else if ( hAbs > hFiber->abscissaP() )
+    else if ( hAbs > absP )
         handleDisassemblyP();
 }
 

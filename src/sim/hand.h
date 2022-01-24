@@ -151,7 +151,7 @@ public:
     virtual void stepLoaded(Vector const& force);
     
     /// check abscissa against fiber edge, and calls handle functions if necessary.
-    void checkFiberRange();
+    void checkFiberRange(real absM, real absP);
 
     /// this is called when disassembly occured PLUS_END
     virtual void handleDisassemblyM();

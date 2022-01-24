@@ -297,7 +297,6 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             if ( dis < sup )
             {
                 FiberSite sit(const_cast<Fiber*>(seg.fiber()), abs);
-                sit.interpolate();
                 if ( ha.monitorAllowsAttachment(sit) )
                 {
                     targets.emplace(seg, dis, abs);
@@ -326,7 +325,6 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
         if ( RNG.pint32() < prob )
         {
             FiberSite sit(const_cast<Fiber*>(hit.fiber()), hit.abscissa());
-            sit.interpolate();
             if ( ha.attachmentAllowed(sit) )
             {
                 //std::clog << hit.to_string() << "\n";

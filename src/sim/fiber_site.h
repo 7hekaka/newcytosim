@@ -36,16 +36,13 @@ public:
     /// propagate Lattice cell index type
     typedef FiberLattice::lati_t lati_t;
 
+    /// allowing update of the interpolation
+    friend void Fiber::updateHands();
+
 private:
     
-    /// the interpolation on the Fiber's vertices
-    /**
-     If all is well, ( inter.mecable() == hFiber ) and ( abscissaInterp() == hAbs )
-     */
+    /// the interpolation on the Fiber's vertices; `bad()` is used to check validity
     mutable Interpolation hTerp;
-    
-    /// the abscissa of the interpolated point, which should be equal to `abscissa()`
-    real abscissaInterp() const { return hFiber->abscissaPoint(real(hTerp.point1())+hTerp.coef1()); }
 
 protected:
     
@@ -106,7 +103,7 @@ public:
     /// return the interpolation
     const Interpolation& interpolation() const { assert_false(bad()); return hTerp; }
     
-    /// recalculate the Interpolation
+    /// update the Interpolation
     void interpolate() const { hTerp = hFiber->interpolate(hAbs); }
     
     /// move to a different abscissa on the current fiber

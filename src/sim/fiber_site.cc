@@ -197,8 +197,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
             throw InvalidIO("unexpected class in FiberSite");
         }
 
-        // this will be called in updateFiber();
-        //interpolate();
+        // interpolate() will be called in updateFiber();
         //checkAbscissa();
     }
 }
@@ -258,13 +257,21 @@ int FiberSite::bad() const
 {
     if ( hFiber != hTerp.mecable() )
     {
+        if ( !hTerp.mecable() )
+        {
+            std::cerr << "Interpolation unset " << hFiber << '\n';
+            return 6;
+        }
         std::cerr << "Interpolation mismatch " << hFiber << " " << hTerp.mecable() << '\n';
         return 7;
     }
     
     if ( hFiber->betweenMP(hAbs) )
     {
-        const real e = hAbs - abscissaInterp();
+        // the abscissa of the interpolated point:
+        real a = hFiber->abscissaPoint(real(hTerp.point1())+hTerp.coef1());
+
+        const real e = hAbs - a;
         
         //std::clog << "Interpolation " << std::scientific << e << '\n';
         if ( abs_real(e) > 1e-3 )
@@ -272,7 +279,7 @@ int FiberSite::bad() const
             std::cerr << "FiberSite::Interpolation error " << std::scientific << e << "\n";
             std::cerr << " abscissa:\n";
             std::cerr << "    binder       " << hAbs << "\n";
-            std::cerr << "    interpolated " << abscissaInterp() << "\n";
+            std::cerr << "    interpolated " << a << "\n";
             Interpolation pi = hFiber->interpolate(hAbs);
             std::cerr << "    updated      " << hFiber->abscissaPoint(pi.point1()+pi.coef1()) << "\n";
             return 8;
