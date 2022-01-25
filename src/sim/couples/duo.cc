@@ -45,7 +45,6 @@ void Duo::stepFF()
     ///@todo better Duo::activation criteria
     if ( prop->activation_space_ptr->inside(cPos) )
         activate();
-
     
     // activity
     if ( active_ )
