@@ -205,11 +205,14 @@ def main(args):
 
     # process jobs:
     if njobs > 1:
-        jobs = [Process(target=run_queue, args=(queue,)) for n in range(njobs)]
-        for job in jobs:
-            job.start()
-        for job in jobs:
-            job.join()
+        jobs = []
+        for n in range(njobs):
+            j = Process(target=run_queue, args=(queue,))
+            jobs.append(j)
+            j.start()
+        # wait for completion of all jobs:
+        for j in jobs:
+            j.join()
     return 0
 
 

@@ -120,12 +120,14 @@ def main(args):
             queue = Queue()
             for p in files:
                 queue.put((tool, p))
-            jobs = [Process(target=queued, args=(queue,)) for n in range(njobs)]
-            for job in jobs:
-                job.start()
-            for job in jobs:
-                job.join()
-            # job completed:
+            jobs = []
+            for n in range(njobs):
+                j = Process(target=queued, args=(queue,))
+                jobs.append(j)
+                j.start()
+            # wait for completion of all jobs:
+            for j in jobs:
+                j.join()
             return 0
         except ImportError:
             out.write("Warning: multiprocessing module unavailable\n")
