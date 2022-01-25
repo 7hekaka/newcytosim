@@ -29,11 +29,11 @@ set fiber filament
     max_length = 3
     
     activity = dynamic
-    growing_speed = 0.0958
+    growing_speed = [[round(growth,4)]]
     growing_off_speed = -0.030
     growing_force = 0.5
     shrinking_speed = -0.250
-    hydrolysis_rate = 0.0196  % length = 2.3
+    hydrolysis_rate = [[round(hydrolysis,4)]]  % length = 2.3
     unhydrolyzed_prob = 0
     display = ( line_width=3; )
 }
@@ -48,18 +48,18 @@ set hand nucleator
 
 set hand binder
 {
-    binding = 5, 0.0975
+    binding = 5, [[round(range,4)]]
     unbinding = 1, 3
     activity = rescue
-    rescue_prob = 0.0961
+    rescue_prob = [[round(rate,4)]]
 }
 
 set hand motor
 {
-    binding = 5, 0.0975
+    binding = 5, [[round(range,4)]]
     unbinding = 1, 3
     activity = move
-    unloaded_speed = 0.0486
+    unloaded_speed = [[round(speed,4)]]
     stall_force = 1
 }
 
@@ -88,15 +88,15 @@ set bead plasmid
 new 2 plasmid
 {
     radius = 0.075
-    attach = 1 target
+    attach = [[int(target)]] target
     position = 0.75 0 0
 }
 
-new 1015 complex
+new [[int(complex)]] complex
 
 run 50000 system
 {
-    nb_frames = 100
+    nb_frames = 0
 }
 
 report plasmid:position * { verbose = 0 }

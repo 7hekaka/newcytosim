@@ -25,6 +25,7 @@ set fiber microtubule
     steric = 1, 0.025
     rigidity = 10
     segmentation = 0.25
+    lattice = 1, 0.008
     display = ( color=white; width=2.5; )
 }
 
