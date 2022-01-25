@@ -88,7 +88,8 @@ def main(args):
             sys.exit()
 
     if not paths:
-        out.write("Error: you should specify at least one directory\n")
+        out.write(" scan.py will execute `%s`\n"%tool)
+        out.write("Error: you must specify directories: scan.py COMMAND PATHS\n")
         return 2
     
     njobs = min(njobs, len(paths))

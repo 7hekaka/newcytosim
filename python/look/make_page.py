@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # make_page.py creates a HTML page with links to files in given directories
 #
@@ -153,13 +153,14 @@ def process(dirpath, directories, files):
 def process_dir(dirpath):
     """call process() with appropriate arguments"""
     files = []
-    directories = []
-    for f in os.listdir(dirpath):
-        if os.path.isdir(os.path.join(dirpath, f)):
-            directories.append(f)
-        else:
-            files.append(f)
-    process(dirpath, directories, files)
+    paths = []
+    with os.scandir() as it:
+        for e in it:
+            if e.is_file():
+                files.append(e.name)
+            elif e.is_dir():
+                paths.append(e.name)
+    process(dirpath, paths, files)
 
 
 #------------------------------------------------------------------------

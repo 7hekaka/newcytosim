@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # make_image.py:
 # create the image for one frame in cytosim's result file
@@ -39,11 +39,11 @@ except ImportError:
 
 
 # some parameters:
-playexe      = []
-known_format = [ 'png', 'ppm' ]
-format       = 'png'
-output       = 'image.'+format
-lazy         = 1
+playexe = []
+formats = [ 'png', 'ppm', 'tga' ]
+format  = 'png'
+output  = 'image.'+format
+lazy    = 1
 
 err = sys.stderr
 
@@ -59,12 +59,15 @@ def makeImages(format):
     if val != 0:
         err.write("`%s' failed with value %i\n" % (playexe[0], val))
         return [];
-    files = os.listdir(os.getcwd())
-    images = filter(is_image, files)
-    if not images:
+    files = []
+    with os.scandir() as it:
+        for e in it:
+            if e.is_file() and is_image(e.name):
+                files.append(e.name)
+    if not files:
         raise IOError("'%s' did not produce any image!" % playexe[0])
     #newest = max(images, key=lambda x: os.stat(x).st_mtime)
-    return images
+    return files
 
 
 def makeImagesUnzip(format, input_file='objects.cmo'):
@@ -86,17 +89,15 @@ def makeImagesUnzip(format, input_file='objects.cmo'):
 
 #------------------------------------------------------------------------
 
-def process(dirpath, directories, filenames):
+def process(dirpath, filenames):
     """make image in directory dirpath"""
     if ( output in filenames ) and lazy:
         print("Folder '%s' already has %s" % (dirpath, output))
         return
-    os.chdir(dirpath)
-    print('- '*32+"make_image.py visiting %s:" % dirpath)
     try:
         image = makeImagesUnzip(format)
         if len(image) == 0:
-            err.write("No image produced in `%s'\n")
+            err.write("no image produced in `%s'\n"%dirpath)
         elif len(image) == 1:
             os.rename(image[0], output)
             print(image[0] + ' -> ' + output)
@@ -106,11 +107,12 @@ def process(dirpath, directories, filenames):
 
 def process_dir(dirpath):
     """call process() with appropriate arguments"""
-    files = os.listdir(dirpath)
-    for f in files:
-        if os.path.isdir(f):
-            files.remove(f)
-    process(dirpath, os.path.basename(dirpath), files)
+    files = []
+    with os.scandir() as it:
+        for e in it:
+            if e.is_file():
+                files.append(e.name)
+    process(dirpath, files)
 
 
 #------------------------------------------------------------------------
@@ -122,7 +124,7 @@ def main(args):
     
     playexe = args[0].split()
     arg0 = os.path.expanduser(playexe[0])
-    if os.access(arg0, os.X_OK):
+    if os.access(arg0, os.X_OK) and os.path.isfile(arg0):
         playexe[0] = os.path.abspath(arg0)
     else:
         err.write("Error: you must specify an executable on the command line\n")
@@ -142,7 +144,7 @@ def main(args):
             elif key=='format':
                 format = value
                 output = 'image.'+format
-                if not format in known_format:
+                if not format in formats:
                     err.write("Invalid image format '%s'\n" % format)
             elif key=='colors':
                 colors = int(value)
@@ -154,12 +156,12 @@ def main(args):
     if not paths:
         paths.append('.')
     
-    cdir = os.getcwd()
-    for path in paths:
-        os.chdir(cdir)
-        if len(path) > 1:
-            err.write("--------- visiting `%s'\n" % path)
-        process_dir(path)
+    cwd = os.getcwd()
+    for p in paths:
+        print("make_image.py "+"- "*32+p)
+        os.chdir(p)
+        process_dir(p)
+        os.chdir(cwd)
 
 
 if __name__ == "__main__":

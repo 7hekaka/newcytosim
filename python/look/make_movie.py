@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # make_movie.py creates MPEG4 movies for cytosim
 #
@@ -226,15 +226,14 @@ def process(cwd, filenames):
     return res
 
 
-def process_dir(cwd):
-    """
-        call process() with appropriate arguments
-    """
-    files = os.listdir('.')
-    for f in files:
-        if os.path.isdir(f):
-            files.remove(f)
-    return process(cwd, files)
+def process_dir(dirpath):
+    """call process() with appropriate arguments"""
+    files = []
+    with os.scandir() as it:
+        for e in it:
+            if e.is_file():
+                files.append(e.name)
+    process(dirpath, files)
     
 
 #-------------------------------------------------------------------------------
@@ -253,7 +252,7 @@ def main(args):
         sys.exit()
 
     arg0 = os.path.expanduser(arg.split()[0])
-    if os.access(arg0, os.X_OK):
+    if os.access(arg0, os.X_OK) and os.path.isfile(arg0):
         if os.path.isdir(arg):
             paths.append(arg)
         else:

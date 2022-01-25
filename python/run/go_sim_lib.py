@@ -78,22 +78,6 @@ def make_run_directory(root):
     #return tempfile.mkdtemp('', root, '.')
 
 
-def copy_recursive(src, dst):
-    """recursively copy everything from src to dst"""
-    if os.path.isfile(src):
-        shutil.copy2(src, dst)
-    elif os.path.isdir(src):
-        try:
-            os.mkdir(dst)
-        except OSError:
-            pass
-        files = os.listdir(src)
-        for f in files:
-            s = os.path.join(src, f)
-            d = os.path.join(dst, f)
-            copy_recursive(s, d)
-
-
 def park_directory(path, park, name):
     """Copy directory 'path' to park, under a similar name"""
     src = os.path.abspath(path)
@@ -110,7 +94,7 @@ def park_directory(path, park, name):
             err.write("go_sim_lib.py found no parking space for '%s'\n" % path)
             return src
     out.write("moving ( %s -> %s )" % (src, dst))
-    copy_recursive(src, dst)
+    shutil.copytree(src, dst)
     from filecmp import dircmp
     dcmp = dircmp(src, dst)
     if dcmp.left_only or dcmp.diff_files:

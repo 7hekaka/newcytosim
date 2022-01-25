@@ -57,22 +57,6 @@ import sys, shutil, os, curses.ascii
 
 #------------------------------------------------------------------------
 
-def copy_recursive(src, dst):
-    """Copy directory recursively"""
-    if os.path.isfile(src):
-        shutil.copy2(src, dst)
-    elif os.path.isdir(src):
-        try:
-            os.mkdir(dst)
-        except OSError:
-            pass
-        files = os.listdir(src)
-        for f in files:
-            s = os.path.join(src, f)
-            d = os.path.join(dst, f)
-            copy_recursive(s, d)
-
-
 def validate_pattern(arg):
     # check validity of the pattern
     if os.path.isfile(arg):
@@ -138,7 +122,7 @@ def main(args):
                     os.mkdir(dir)
                 # process file:
                 if do_copy:
-                    copy_recursive(src, dst)
+                    shutil.copytree(src, dst)
                 else:
                     os.rename(src, dst)
                 res.append(dst)
