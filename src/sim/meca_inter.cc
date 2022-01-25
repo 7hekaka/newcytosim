@@ -2402,7 +2402,7 @@ void Meca::addLongLink4(Interpolation const& ptA,
     const real cc4 = coef[2];
     const real cc5 = coef[3];
     
-    assert_small(cc0+cc1+cc2+cc3-1.0);
+    assert_small(cc2+cc3+cc4+cc5-1.0);
 
     //Vector axi = interpolate4(vPTS, inx, coef) - ptA.pos();
     Vector axi = interpolate4(vPTS, inx, coef) + interpolateX(vPTS, ii0, cc0, ii1, cc1);
