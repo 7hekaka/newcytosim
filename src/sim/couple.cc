@@ -306,20 +306,20 @@ void Couple::stepFASkipAttach()
  
  */
 
-bool Couple::permitAttachment(FiberSite& sit, Hand const* h) const
+bool Couple::permitAttachment(FiberSite const& sit, Hand const* h) const
 {
     assert_true( h == cHand1 || h == cHand2 );
     FiberSite const* that = ( h == cHand1 ? cHand2 : cHand1 );
-
-    if ( !that->attached() )
+    
+    Fiber const* fox = that->fiber();
+    if ( ! fox )
         return true;
     
-    Fiber const* fib = that->fiber();
-    Fiber const* fox = sit.fiber();
+    Fiber const* fib = sit.fiber();
     
 #if FIBER_HAS_FAMILY
     // prevent binding if that would make a link inside the same family
-    if ( fib->family_  &&  fib->family_==fox->family_ )
+    if ( fox->family_  &&  fox->family_==fib->family_ )
         return false;
 #endif
 

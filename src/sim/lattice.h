@@ -312,10 +312,10 @@ public:
     /// pointer to data array
     cell_t*       data()        const  { return laCell; }
     
-    /// value at index `s`, equivalent to []
+    /// modifiable value at index `s`, equivalent to []
     cell_t&       data(lati_t s)       { assert_true(valid(s)); return laCell[s]; }
 
-    /// value at index `s`, equivalent to []
+    /// constant value at index `s`, equivalent to []
     cell_t const& data(lati_t s) const { assert_true(valid(s)); return laCell[s]; }
     
     /// reference to Site at index s

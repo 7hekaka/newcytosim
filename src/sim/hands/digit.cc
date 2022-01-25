@@ -15,6 +15,9 @@ Digit::Digit(DigitProp const* p, HandMonitor* h)
 {
 }
 
+/**
+ This sets 'sit.site()' which is thus modified in a meaningful way!
+ */
 bool Digit::attachmentAllowed(FiberSite& sit) const
 {
     if ( Hand::attachmentAllowed(sit) )

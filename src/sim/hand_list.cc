@@ -66,7 +66,8 @@ void HandList::detachAll()
     while ( h )
     {
         Hand * n = h->next();
-        h->detach();
+        // no need to update Lattice here:
+        h->Hand::detach();
         h = n;
     }
     assert_true(haFront==nullptr);

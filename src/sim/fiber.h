@@ -30,7 +30,7 @@ class LineDisp;
 #define FIBER_HAS_FAMILY 0
 
 /// Flag to allow dynamic Single creation/binding at fiber's ends {0, 1}
-#define FIBER_HAS_GLUE 1
+#define FIBER_HAS_GLUE 0
 
 /// Flag to enable the sorting of targets for attachment of Hands {0, 1}
 #define BIND_CLOSEST_FIBER 1
@@ -291,9 +291,6 @@ public:
     
     /// update all Hands bound to this
     void updateHands();
-
-    /// detach all Hands
-    void detachHands() const { fHands.detachAll(); }
     
     /// sort Hands by order of increasing abscissa
     void sortHands() const { fHands.sort(); }

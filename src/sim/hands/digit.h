@@ -58,7 +58,7 @@ public:
     void inc() const { assert_true(vacant(hSite)); hLattice->data(hSite) ^= prop->footprint; }
 
     /// flip footprint bits on current site
-    void dec() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacant(hSite));  }
+    void dec() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacant(hSite)); }
     
 #elif FIBER_HAS_LATTICE < 0
 
