@@ -119,6 +119,9 @@ public:
     /// Mix list using permute() and shuffle() functions
     void shuffle();
     
+    /// Mix list using shuffle() functions
+    void shuffle(Object *);
+
     /// count number of elements in the list
     size_t count() const;
     

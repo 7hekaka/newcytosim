@@ -399,7 +399,7 @@ void CoupleSet::shuffle()
     if ( c )
     switch( c->state() )
     {
-        case 0: break;
+        case 0: if ( !uniEnabled ) ffList.permute(c);break;
         case 1: afList.permute(c); break;
         case 2: faList.permute(c); break;
         case 3: aaList.permute(c); break;

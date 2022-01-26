@@ -431,17 +431,19 @@ void ObjectPool::quicksort(int (*comp)(const void*, const void*))
  */
 void ObjectPool::permute(Object * p)
 {
-    // close list into a loop
-    backO->nextO  = frontO;
-    frontO->prevO = backO;
-    
-    // open loop at 'p'
-    frontO = p;
-    backO  = p->prevO;
-    
-    backO->nextO  = nullptr;
-    frontO->prevO = nullptr;
-
+    if ( p != frontO )
+    {
+        // close list into a loop
+        backO->nextO  = frontO;
+        frontO->prevO = backO;
+        
+        // open loop at 'p'
+        frontO = p;
+        backO  = p->prevO;
+        
+        backO->nextO  = nullptr;
+        frontO->prevO = nullptr;
+    }
     //assert_false( bad() );
 }
 
@@ -545,6 +547,22 @@ void ObjectPool::shuffle()
     }
 }
 
+/**
+ This traverses a quarter of the list on average, starting from a random
+ node in the list that is provided externally.
+ */
+void ObjectPool::shuffle(Object * p)
+{
+    assert_true(p);
+    size_t i = RNG.pint32((uint32_t)nSize>>1);
+    
+    Object * q;
+    for ( q = p ; q && i > 0; --i )
+        q = q->nextO;
+    
+    if ( q )
+        shuffle_up(p, q);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Check
