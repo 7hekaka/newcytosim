@@ -12,10 +12,10 @@
 
 ///real symmetric sparse Matrix, with optimized multiplication
 /**
- SparMatSym2 uses a sparse storage, with arrays of elements for each column.
+ SparMatSym2 is similar to SparMatSym1 and uses the same sparse storage scheme,
+ with independent arrays of elements for each column with sorted elements.
  Only the lower triangle of the matrix is stored.
- Elements are ordered within the columns.
-
+ 
  For multiplication, it uses the `DSS Symmetric Matrix Storage`
  The conversion is done by prepareForMultiply()
  
@@ -59,10 +59,7 @@ private:
 #endif
 
     /// allocate column to hold specified number of values
-    void allocateColumn(size_t jj, size_t nb);
-    
-    /// insert new element in column jj
-    Element* insertElement(size_t jj, size_t inx);
+    void allocateColumn(size_t jj, unsigned nb);
 
     /// update colidx_[], a pointer to the next non-empty column
     void setColumnIndex();
@@ -148,8 +145,8 @@ public:
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;
 
-    /// returns a modifiable reference to the diagonal term at given index
-    real& diagonal(size_t ix);
+    /// returns a modifiable diagonal element
+    real& diagonal(size_t i);
     
     /// returns the address of element at (x, y), allocating if necessary
     real& operator()(size_t x, size_t y);

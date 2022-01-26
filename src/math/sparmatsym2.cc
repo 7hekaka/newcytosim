@@ -130,177 +130,113 @@ static void copy(size_t cnt, SparMatSym2::Element * src, SparMatSym2::Element * 
         dst[ii] = src[ii];
 }
 
-/// move `cnt` elements to the next index, starting at vec[0]
-static void shift(size_t cnt, SparMatSym2::Element * vec)
-{
-    for ( size_t ii = cnt; ii > 0; --ii )
-        vec[ii] = vec[ii-1];
-}
 
-
-void SparMatSym2::allocateColumn(const size_t jj, size_t alc)
+void SparMatSym2::allocateColumn(const size_t j, unsigned alc)
 {
-    assert_true( jj < size_ );
-    if ( alc > colmax_[jj] )
+    assert_true( j < size_ );
+    if ( alc > colmax_[j] )
     {
-        //fprintf(stderr, "SMS2 allocate column %i size %u\n", jj, alc);
-        constexpr size_t chunk = 16;
+        constexpr size_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
+        //fprintf(stderr, "SMS2 column %lu: %u --> %u\n", j, colmax_[j], alc);
+
         Element * ptr = new Element[alc];
-        
-        if ( column_[jj] )
+        if ( column_[j] )
         {
             //copy over previous column elements
-            copy(colsiz_[jj], column_[jj], ptr);
+            copy(colsiz_[j], column_[j], ptr);
             
             //release old memory
-            delete[] column_[jj];
+            delete[] column_[j];
         }
-        column_[jj] = ptr;
-        colmax_[jj] = alc;
-        assert_true( alc == colmax_[jj] );
+        column_[j] = ptr;
+        colmax_[j] = alc;
+        assert_true( alc == colmax_[j] );
     }
 }
 
 
-SparMatSym2::Element * SparMatSym2::insertElement(const size_t jj, size_t inx)
-{
-    assert_true( jj < size_ );
-    // allocate space for new Element if necessary:
-    if ( colsiz_[jj] >= colmax_[jj] )
-    {
-        constexpr size_t chunk = 16;
-        size_t alc = ( colsiz_[jj] + chunk ) & ~( chunk -1 );
-        Element * ptr = new Element[alc];
-        if ( column_[jj] )
-        {
-            copy(inx, column_[jj], ptr);
-            copy(colsiz_[jj]-inx, column_[jj]+inx, ptr+inx+1);
-            delete[] column_[jj];
-        }
-        column_[jj] = ptr;
-        colmax_[jj] = alc;
-        assert_true( alc == colmax_[jj] );
-    }
-    else
-    {
-        shift(colsiz_[jj]-inx, column_[jj]+inx);
-    }
-    column_[jj][inx].reset(0);
-    ++colsiz_[jj];
-    return column_[jj]+inx;
-}
-
-
+/**
+This will allocate for 5 additional values in this column,
+corresponding to the maximal elements in a column from Meca::addLink4()
+In this way we minimize the number of allocations in `operator()`
+*/
 real& SparMatSym2::diagonal(size_t i)
 {
     assert_true( i < size_ );
     
-    Element * col;
-    
+    if ( 8 + colsiz_[i] > colmax_[i] )
+        allocateColumn(i, 8 + colsiz_[i]);
+
+    Element * col = column_[i];
     if ( colsiz_[i] == 0 )
     {
-        allocateColumn(i, 1);
-        col = column_[i];
-        //diagonal term always first:
         col->reset(i);
         colsiz_[i] = 1;
     }
-    else
-    {
-        col = column_[i];
-        assert_true( col->inx == i );
-    }
-    
+
+    assert_true( col->inx == i );
     return col->val;
 }
 
 /**
+ This should work for any value of (i, j)
  This allocates to be able to hold the matrix element if necessary
+ The diagonal element is always first in each column
 */
 real& SparMatSym2::operator()(size_t i, size_t j)
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
     //fprintf(stderr, "SMS2( %6i %6i )\n", i, j);
-        
-    Element * col;
     
-    if ( i == j )
-    {
-        // return diagonal element
-        if ( colsiz_[j] <= 0 )
-        {
-            allocateColumn(j, 1);
-            col = column_[j];
-            // put diagonal term always first:
-            col->reset(j);
-            colsiz_[j] = 1;
-        }
-        else
-        {
-            col = column_[j];
-            assert_true( col->inx == j );
-        }
-        return col->val;
-    }
- 
     // swap to get ii > jj (address lower triangle)
     size_t ii = std::max(i, j);
     size_t jj = std::min(i, j);
 
-    //check if the column is empty:
-    if ( colsiz_[jj] < 2 )
-    {
-        allocateColumn(jj, 2);
-        col = column_[jj];
-        if ( colsiz_[jj] == 0 )
-        {
-            // put diagonal term always first:
-            col->reset(jj);
-        }
-        //add the requested term:
-        col[1].reset(ii);
-        colsiz_[jj] = 2;
-        return col[1].val;
-    }
+    assert_true( colsiz_[jj] <= colmax_[jj] );
+    // make space always for two additional elements
+    if ( 2 + colsiz_[jj] > colmax_[jj] )
+        allocateColumn(jj, 2 + colsiz_[jj]);
     
-    col = column_[jj];
-    Element * e = col + 1;
-    Element * lst = col + colsiz_[jj] - 1;
-    
-    //search, knowing that elements are kept ordered in the column:
+    // the column pointer should not change anymore now:
+    Element * col = column_[jj];
+    // place value, beyond range, acting as a fence for linear search below:
+    Element * fence = col + colsiz_[jj];
+    fence->reset(ii);
+    // search column, given that elements are kept ordered in the column:
+    Element * e = col;
     while ( e->inx < ii )
-    {
-        if ( ++e > lst )
-        {
-            // add one element last
-            size_t n = colsiz_[jj];
-            if ( n >= colmax_[jj] )
-            {
-                allocateColumn(jj, n+1);
-                col = column_[jj];
-            }
-            ++colsiz_[jj];
-            col[n].reset(ii);
-            return col[n].val;
-        }
-    }
+        ++e;
     
     if ( e->inx == ii )
+    {
+        if ( fence == col )
+        {
+            // the column is empty, insert diagonal term first:
+            e->reset(jj);
+            e += ( ii != jj );
+            e->reset(ii);
+            colsiz_[jj] = 1 + ( ii != jj );
+            //printColumn(std::clog, jj);
+            return e->val;
+        }
+        colsiz_[jj] += ( e == fence );
+        //printColumn(std::clog, jj);
         return e->val;
+    }
     
+    assert_true( colsiz_[jj]+1 <= colmax_[jj] );
+    // shift all values above 'e', including 'e':
     size_t n = (size_t)( e - col );
-
-    assert_true( col[n].inx > ii );
-    col = insertElement(jj, n);
-    assert_true( n < colmax_[jj] );
+    for ( size_t k = colsiz_[jj]; k > n; --k )
+        col[k] = col[k-1];
 
     // add the requested term
-    col->reset(ii);
-
+    e->reset(ii);
+    ++colsiz_[jj];
     //printColumn(std::clog, jj);
-    return col->val;
+    return e->val;
 }
 
 

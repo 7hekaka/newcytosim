@@ -12,8 +12,8 @@
 
 ///real symmetric sparse Matrix, with optimized multiplication
 /**
- SparMatSym1 uses a sparse storage, with arrays of elements for each column.
- Elements are stored in order of increasing index in each column.
+ SparMatSym1 is similar to SparMatSym2 and uses the same sparse storage scheme,
+ with independent arrays of elements for each column with sorted elements.
  Only the lower triangle of the matrix is stored.
 
  For multiplication, it uses a another format, from Numerical Recipes.
@@ -58,11 +58,8 @@ private:
 #endif
 
     /// allocate column to hold specified number of values
-    void allocateColumn(size_t jj, size_t nb);
+    void allocateColumn(size_t jj, unsigned nb);
     
-    /// insert new element in column jj
-    Element* insertElement(size_t jj, size_t inx);
-
     /// update colidx_[], a pointer to the next non-empty column
     void setColumnIndex();
     
@@ -77,17 +74,17 @@ private:
 #endif
     
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    void vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 2D version
-    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    void vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 3D version
-    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    void vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt) const;
 
 
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, size_t, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddCol(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
     void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
@@ -97,20 +94,20 @@ private:
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSE(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSE(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSEU(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVX(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVX(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
 
 public:
     
@@ -144,8 +141,8 @@ public:
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;
 
-    /// returns a modifiable reference to the diagonal term at given index
-    real& diagonal(size_t ix);
+    /// returns a modifiable diagonal element
+    real& diagonal(size_t i);
     
     /// returns the address of element at (x, y), allocating if necessary
     real& operator()(size_t x, size_t y);

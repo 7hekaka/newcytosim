@@ -7,6 +7,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 
 #ifdef __AVX__
@@ -124,93 +125,58 @@ static void copy(size_t cnt, SparMatSym1::Element * src, SparMatSym1::Element * 
         dst[ii] = src[ii];
 }
 
-/// move `cnt` elements to the next index, starting at vec[0]
-static void shift(size_t cnt, SparMatSym1::Element * vec)
-{
-    for ( size_t ii = cnt; ii > 0; --ii )
-        vec[ii] = vec[ii-1];
-}
 
-
-void SparMatSym1::allocateColumn(const size_t jj, size_t alc)
+void SparMatSym1::allocateColumn(const size_t j, unsigned alc)
 {
-    assert_true( jj < size_ );
-    if ( alc > colmax_[jj] )
+    assert_true( j < size_ );
+    if ( alc > colmax_[j] )
     {
-        //fprintf(stderr, "SMS1 allocate column %i size %u\n", jj, alc);
-        constexpr size_t chunk = 16;
+        constexpr size_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
+        //fprintf(stderr, "SMS1 column %lu: %u --> %u\n", j, colmax_[j], alc);
+
         Element * ptr = new Element[alc];
-        
-        if ( column_[jj] )
+        if ( column_[j] )
         {
             //copy over previous column elements
-            copy(colsiz_[jj], column_[jj], ptr);
+            copy(colsiz_[j], column_[j], ptr);
             
             //release old memory
-            delete[] column_[jj];
+            delete[] column_[j];
         }
-        column_[jj] = ptr;
-        colmax_[jj] = alc;
-        assert_true( alc == colmax_[jj] );
+        column_[j] = ptr;
+        colmax_[j] = alc;
+        assert_true( alc == colmax_[j] );
     }
 }
 
-
-SparMatSym1::Element * SparMatSym1::insertElement(const size_t jj, size_t inx)
-{
-    assert_true( jj < size_ );
-    // allocate space for new Element if necessary:
-    if ( colsiz_[jj] >= colmax_[jj] )
-    {
-        constexpr size_t chunk = 16;
-        size_t alc = ( colsiz_[jj] + chunk ) & ~( chunk -1 );
-        Element * ptr = new Element[alc];
-        if ( column_[jj] )
-        {
-            copy(inx, column_[jj], ptr);
-            copy(colsiz_[jj]-inx, column_[jj]+inx, ptr+inx+1);
-            delete[] column_[jj];
-        }
-        column_[jj] = ptr;
-        colmax_[jj] = alc;
-        assert_true( alc == colmax_[jj] );
-    }
-    else
-    {
-        shift(colsiz_[jj]-inx, column_[jj]+inx);
-    }
-    column_[jj][inx].reset(0);
-    ++colsiz_[jj];
-    return column_[jj]+inx;
-}
-
-
+/**
+ This will allocate for 5 additional values in this column,
+ corresponding to the maximal elements in a column from Meca::addLink4()
+ In this way we minimize the number of allocations in `operator()`
+ */
 real& SparMatSym1::diagonal(size_t i)
 {
     assert_true( i < size_ );
     
-    Element * col;
-    
+    if ( 8 + colsiz_[i] > colmax_[i] )
+        allocateColumn(i, 8 + colsiz_[i]);
+
+    Element * col = column_[i];
     if ( colsiz_[i] == 0 )
     {
-        allocateColumn(i, 1);
-        col = column_[i];
-        //diagonal term always first:
         col->reset(i);
         colsiz_[i] = 1;
     }
-    else
-    {
-        col = column_[i];
-        assert_true( col->inx == i );
-    }
-    
+
+    assert_true( col->inx == i );
     return col->val;
 }
 
 /**
+ This should work for any value of (i, j)
  This allocates to be able to hold the matrix element if necessary
+ The diagonal element is always first in each column
 */
 real& SparMatSym1::operator()(size_t i, size_t j)
 {
@@ -218,83 +184,53 @@ real& SparMatSym1::operator()(size_t i, size_t j)
     assert_true( j < size_ );
     //fprintf(stderr, "SMS1( %6i %6i )\n", i, j);
     
-    Element * col;
-    
-    if ( i == j )
-    {
-        // return diagonal element
-        if ( colsiz_[j] <= 0 )
-        {
-            allocateColumn(j, 1);
-            col = column_[j];
-            // put diagonal term always first:
-            col->reset(j);
-            colsiz_[j] = 1;
-        }
-        else
-        {
-            col = column_[j];
-            assert_true( col->inx == j );
-        }
-        return col->val;
-    }
- 
     // swap to get ii > jj (address lower triangle)
     size_t ii = std::max(i, j);
     size_t jj = std::min(i, j);
 
-    //check if the column is empty:
-    if ( colsiz_[jj] < 2 )
-    {
-        allocateColumn(jj, 2);
-        col = column_[jj];
-        if ( colsiz_[jj] == 0 )
-        {
-            // put diagonal term always first:
-            col->reset(jj);
-        }
-        //add the requested term:
-        col[1].reset(ii);
-        colsiz_[jj] = 2;
-        return col[1].val;
-    }
+    assert_true( colsiz_[jj] <= colmax_[jj] );
+    // make space always for two additional elements
+    if ( 2 + colsiz_[jj] > colmax_[jj] )
+        allocateColumn(jj, 2 + colsiz_[jj]);
     
-    col = column_[jj];
-    Element * e = col + 1;
-    Element * lst = col + colsiz_[jj] - 1;
-    
-    //search, knowing that elements are kept ordered in the column:
+    // the column pointer should not change anymore now:
+    Element * col = column_[jj];
+    // place value, beyond range, acting as a fence for linear search below:
+    Element * fence = col + colsiz_[jj];
+    fence->reset(ii);
+    // search column, given that elements are kept ordered in the column:
+    Element * e = col;
     while ( e->inx < ii )
-    {
-        if ( ++e > lst )
-        {
-            // add one element last
-            size_t n = colsiz_[jj];
-            if ( n >= colmax_[jj] )
-            {
-                allocateColumn(jj, n+1);
-                col = column_[jj];
-            }
-            ++colsiz_[jj];
-            col[n].reset(ii);
-            return col[n].val;
-        }
-    }
+        ++e;
     
     if ( e->inx == ii )
+    {
+        if ( fence == col )
+        {
+            // the column is empty, insert diagonal term first:
+            e->reset(jj);
+            e += ( ii != jj );
+            e->reset(ii);
+            colsiz_[jj] = 1 + ( ii != jj );
+            //printColumn(std::clog, jj);
+            return e->val;
+        }
+        colsiz_[jj] += ( e == fence );
+        //printColumn(std::clog, jj);
         return e->val;
+    }
     
+    assert_true( colsiz_[jj]+1 <= colmax_[jj] );
+    // shift all values above 'e', including 'e':
     size_t n = (size_t)( e - col );
-
-    assert_true( col[n].inx > ii );
-    col = insertElement(jj, n);
-    assert_true( n < colmax_[jj] );
+    for ( size_t k = colsiz_[jj]; k > n; --k )
+        col[k] = col[k-1];
 
     // add the requested term
-    col->reset(ii);
-
+    e->reset(ii);
+    ++colsiz_[jj];
     //printColumn(std::clog, jj);
-    return col->val;
+    return e->val;
 }
 
 
@@ -510,7 +446,7 @@ void SparMatSym1::printColumn(std::ostream& os, const size_t jj)
     os << "SMS1 col " << jj << ":";
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
     {
-        os << "\n" << col[n].inx << " :";
+        os << "\n " << std::setw(6) << col[n].inx << " :";
         os << " " << col[n].val;
     }
     std::endl(os);
@@ -548,10 +484,10 @@ void SparMatSym1::printSparseArray(std::ostream& os) const
 /**
 Multiply by column `jj` provided in `col` of size `cnt`
 */
-void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
+void SparMatSym1::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
-    assert_true( col[0].inx == jj );
+    const size_t jj = col[0].inx;
     const real X0 = X[jj];
     real Y0 = Y[jj] + col[0].val * X0;
     for ( size_t n = 1 ; n < cnt ; ++n )
@@ -568,10 +504,10 @@ void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj, Element col[],
 /**
  Multiply by column `jj` provided in `col` of size `cnt`
  */
-void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
+void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
-    assert_true( 2*col[0].inx == jj );
+    const size_t jj = 2 * col[0].inx;
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
     real Y0 = Y[jj  ] + col[0].val * X0;
@@ -593,10 +529,10 @@ void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element c
 /**
 Multiply by column `jj` provided in `col` of size `cnt`
 */
-void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
+void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
-    assert_true( 3*col[0].inx == jj );
+    const size_t jj = 3 * col[0].inx;
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
     const real X2 = X[jj+2];
@@ -806,7 +742,7 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj,
 
 #if SPARMAT1_USES_SSE
 
-static inline void multiply2(const real* X, real* Y, size_t ii,
+static inline void multiply2(const double* X, double* Y, size_t ii,
                       const real* val, vec2 const& xx, vec2& ss)
 {
     vec2 aa = loaddup2(val);
@@ -815,7 +751,7 @@ static inline void multiply2(const real* X, real* Y, size_t ii,
 }
 
 
-void SparMatSym1::vecMulAddColIso2D_SSE(const real* X, real* Y, size_t jj,
+void SparMatSym1::vecMulAddColIso2D_SSE(const double* X, double* Y, size_t jj,
                                         real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
@@ -829,7 +765,7 @@ void SparMatSym1::vecMulAddColIso2D_SSE(const real* X, real* Y, size_t jj,
 }
 
 
-void SparMatSym1::vecMulAddColIso2D_SSEU(const real* X, real* Y, size_t jj,
+void SparMatSym1::vecMulAddColIso2D_SSEU(const double* X, double* Y, size_t jj,
                                          real const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
@@ -963,8 +899,8 @@ Accumulation is done here in the higher part of 'ss'
 The high position of 'xx' is not used
 The low position of 'ss' is used locally
 */
-static inline void multiply4(const real* X, real* Y, size_t ii,
-                             const real* val, vec4 const& xx, vec4& ss)
+static inline void multiply4(const double* X, double* Y, size_t ii,
+                             const double* val, vec4 const& xx, vec4& ss)
 {
     vec4 x = blend22(xx, broadcast2(X+ii));  // hi <- X , lo <- xx
     ss = blend22(load2crap(Y+ii), ss);    // hi <- ss, lo <- Y
@@ -973,8 +909,8 @@ static inline void multiply4(const real* X, real* Y, size_t ii,
 }
 
 
-void SparMatSym1::vecMulAddColIso2D_AVX(const real* X, real* Y, size_t jj,
-                                        real const* dia, size_t start, size_t stop) const
+void SparMatSym1::vecMulAddColIso2D_AVX(const double* X, double* Y, size_t jj,
+                                        double const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= nmax_ );
@@ -987,8 +923,8 @@ void SparMatSym1::vecMulAddColIso2D_AVX(const real* X, real* Y, size_t jj,
 }
 
 
-void SparMatSym1::vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj,
-                                         real const* dia, size_t start, size_t stop) const
+void SparMatSym1::vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj,
+                                         double const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= nmax_ );
@@ -1066,8 +1002,8 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const real* X, real* Y, size_t jj,
 
 
 #if SPARMAT1_USES_AVX && SPARMAT1_OPTIMIZED_MULTIPLY
-void SparMatSym1::vecMulAddColIso3D_AVX(const real* X, real* Y, size_t jj,
-                                        real const* dia, size_t start, size_t stop) const
+void SparMatSym1::vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj,
+                                        double const* dia, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
     assert_true( stop <= nmax_ );
@@ -1128,7 +1064,7 @@ void SparMatSym1::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) c
         if ( colsiz_[jj] > 0 )
         {
             assert_true(column_[jj][0].inx == jj);
-            vecMulAddCol(X, Y, jj, column_[jj], colsiz_[jj]);
+            vecMulAddCol(X, Y, column_[jj], colsiz_[jj]);
         }
 #endif
     }
