@@ -14,8 +14,6 @@ TreadmillingFiber::TreadmillingFiber(TreadmillingFiberProp const* p) : Fiber(p),
 {
     mStateM = STATE_WHITE;
     mStateP = STATE_WHITE;
-    mGrowthM = 0;
-    mGrowthP = 0;
 }
 
 
@@ -50,6 +48,7 @@ void TreadmillingFiber::setEndStateP(state_t s)
 void TreadmillingFiber::step()
 {
     constexpr size_t P = 0, M = 1;
+    real addP = 0, addM = 0;
 
     if ( mStateP == STATE_GREEN )
     {
@@ -57,19 +56,15 @@ void TreadmillingFiber::step()
         real forceP = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        mGrowthP = prop->growing_speed_dt[P] * prop->free_polymer;
+        addP = prop->growing_speed_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if (( forceP < 0 ) & ( mGrowthP > 0 ))
-            mGrowthP *= std::exp(forceP*prop->growing_force_inv[P]);
+        if (( forceP < 0 ) & ( addP > 0 ))
+            addP *= std::exp(forceP*prop->growing_force_inv[P]);
     }
     else if ( mStateP == STATE_RED )
     {
-        mGrowthP = prop->shrinking_speed_dt[P];
-    }
-    else
-    {
-        mGrowthP = 0;
+        addP = prop->shrinking_speed_dt[P];
     }
     
     // MINUS_END dynamics
@@ -79,53 +74,18 @@ void TreadmillingFiber::step()
         real forceM = projectedForceEndM();
         
         // growth is reduced if free monomers are scarce:
-        mGrowthM = prop->growing_speed_dt[M] * prop->free_polymer;
+        addM = prop->growing_speed_dt[M] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if (( forceM < 0 ) & ( mGrowthM > 0 ))
-            mGrowthM *= std::exp(forceM*prop->growing_force_inv[M]);
+        if (( forceM < 0 ) & ( addM > 0 ))
+            addM *= std::exp(forceM*prop->growing_force_inv[M]);
     }
     else if ( mStateM == STATE_RED )
     {
-        mGrowthM = prop->shrinking_speed_dt[M];
-    }
-    else
-    {
-        mGrowthM = 0;
-    }
-    
-    real len = length();
-    real inc = mGrowthP + mGrowthM;
-    if ( len + inc < prop->min_length )
-    {
-        if ( !prop->persistent )
-        {
-            delete(this);
-            return;
-        }
-    }
-    else if ( len + inc < prop->max_length )
-    {
-        if ( mGrowthM != 0 ) growM(mGrowthM);
-        if ( mGrowthP != 0 ) growP(mGrowthP);
-    }
-    else if ( len < prop->max_length )
-    {
-        // the remaining possible growth is distributed to the two ends:
-        inc = ( prop->max_length - len ) / inc;
-        mGrowthM *= inc;
-        mGrowthP *= inc;
-        if ( mGrowthM != 0 ) growM(mGrowthM);
-        if ( mGrowthP != 0 ) growP(mGrowthP);
-    }
-    else // len > prop->max_length
-    {
-        mGrowthM = 0;
-        mGrowthP = 0;
+        addM = prop->shrinking_speed_dt[M];
     }
 
-    Fiber::step();
-    //std::clog << reference() << " P " << mGrowthP << " M " << mGrowthM << " len " << length() << "\n";
+    Fiber::step(addM, addP);
 }
 
 

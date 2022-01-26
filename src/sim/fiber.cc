@@ -15,41 +15,12 @@
 #include "cymdef.h"
 
 
-
 void Fiber::step()
 {
     assert_small( length1() - length() );
 #if FIBER_HAS_GLUE
     if ( prop->glue )
         setGlue(fGlue, PLUS_END, prop->glue);
-#endif
-#if NEW_FIBER_CHEW
-    if ( fChewP > 0 )
-    {
-        if ( fChewP > prop->max_chewing_speed_dt )
-            fChewP = prop->max_chewing_speed_dt;
-        
-        if ( length() - fChewM - fChewP < prop->min_length )
-        {
-            delete(this);
-            return;
-        }
-        growP(-fChewP);
-        fChewP = 0;
-    }
-    if ( fChewM > 0 )
-    {
-        if ( fChewM > prop->max_chewing_speed_dt )
-            fChewM = prop->max_chewing_speed_dt;
-
-        if ( length() - fChewM < prop->min_length )
-        {
-            delete(this);
-            return;
-        }
-        growM(-fChewM);
-        fChewM = 0;
-    }
 #endif
     
     //assert_false(hasKink(0));
@@ -131,6 +102,82 @@ void Fiber::step()
 #endif
 }
 
+
+
+void Fiber::step(real addM, real addP, bool split)
+{
+    //std::clog << reference() << " P " << addP << " M " << addM << " len " << length() << "\n";
+
+    // reset increments; they will be set again by growP and growM
+    cDeltaM = 0;
+    cDeltaP = 0;
+    
+#if NEW_FIBER_CHEW
+    if ( split )
+    {
+        if ( fChewM > 0 )
+            addM -= std::min(fChewM, prop->max_chewing_speed_dt);
+        fChewM = 0;
+        if ( fChewP > 0 )
+            addP -= std::min(fChewP, prop->max_chewing_speed_dt);
+        fChewP = 0;
+    }
+#endif
+    
+    real inc = addM + addP;
+    real len = length() + inc;
+
+    if ( inc < 0 )
+    {
+        if ( len > prop->min_length )
+        {
+            if ( addM != 0 ) growM(addM);
+            if ( addP != 0 ) growP(addP);
+        }
+        else
+        {
+            if ( !prop->persistent )
+            {
+                delete(this);
+                return;
+            }
+            else
+            {
+                // set dormant state:
+                if ( addM < 0 ) setEndStateM(STATE_WHITE);
+                if ( addP < 0 ) setEndStateP(STATE_WHITE);
+                
+                if ( split && length() > prop->min_length )
+                {
+                    // the remaining possible shrinkage is distributed to the two ends:
+                    inc = ( prop->min_length - length() ) / inc;
+                    if ( addM != 0 ) growM(addM*inc);
+                    if ( addP != 0 ) growP(addP*inc);
+                }
+            }
+        }
+    }
+    else if ( inc > 0 )
+    {
+        if ( len < prop->max_length )
+        {
+            if ( addM != 0 ) growM(addM);
+            if ( addP != 0 ) growP(addP);
+        }
+        else
+        {
+            if ( split &&  length() < prop->max_length )
+            {
+                // the remaining possible growth is distributed to the two ends:
+                inc = ( prop->max_length - length() ) / inc;
+                if ( addM != 0 ) growM(addM*inc);
+                if ( addP != 0 ) growP(addP*inc);
+            }
+        }
+    }
+    
+    Fiber::step();
+}
 
 //------------------------------------------------------------------------------
 
@@ -501,11 +548,11 @@ void Fiber::severNow()
                 continue;
             }
 
-            //add new fragment to simulation:
-            objset()->add(frag);
-
             if ( frag )
             {
+                //add new fragment to simulation:
+                objset()->add(frag);
+
                 // check that ends spatially match:
                 assert_small((frag->posEndM() - posEndP()).norm());
                 
@@ -1073,17 +1120,6 @@ void Fiber::setEndState(const FiberEnd end, const state_t s)
         setEndStateP(s);
     else if ( end == MINUS_END )
         setEndStateM(s);
-}
-
-
-real Fiber::freshAssembly(const FiberEnd end) const
-{
-    if ( end == PLUS_END )
-        return freshAssemblyP();
-    if ( end == MINUS_END )
-        return freshAssemblyM();
-    ABORT_NOW("invalid argument value");
-    return 0;
 }
 
 

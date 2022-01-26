@@ -69,6 +69,8 @@ Chain::Chain()
 #if FIBER_HAS_NORMAL
     fnNormal.set(0, 0, 1);
 #endif
+    cDeltaM = 0;
+    cDeltaP = 0;
 }
 
 
@@ -1071,6 +1073,7 @@ void Chain::growM(const real delta)
             movePoint(p, ( a * n ) * diffPoints(p));
     }
     
+    cDeltaM = delta;
     fnAbscissaM -= delta;
     setSegmentation(length()/ns);
     postUpdate();
@@ -1134,6 +1137,14 @@ void Chain::cutM(const real delta)
 }
 
 
+void Chain::truncateM(size_t p)
+{
+    Mecable::truncateM(p);
+    fnAbscissaM = abscissaPoint(p);
+    postUpdate();
+}
+
+
 /**
  The argument 'delta' can be positive or negative:
  - delta > 0 : elongation,
@@ -1184,6 +1195,7 @@ void Chain::growP(const real delta)
             movePoint(p, ( a * p ) * diffPoints(p-1));
     }
     
+    cDeltaP = delta;
     fnAbscissaP += delta;
     setSegmentation(length()/ns);
     postUpdate();
@@ -1244,7 +1256,27 @@ void Chain::cutP(const real delta)
     postUpdate();
 }
 
+
+void Chain::truncateP(size_t p)
+{
+    Mecable::truncateP(p);
+    fnAbscissaP = abscissaPoint(p);
+    postUpdate();
+}
+
 //------------------------------------------------------------------------------
+#pragma mark -
+
+real Chain::freshAssembly(const FiberEnd end) const
+{
+    if ( end == PLUS_END )
+        return freshAssemblyP();
+    if ( end == MINUS_END )
+        return freshAssemblyM();
+    ABORT_NOW("invalid argument value");
+    return 0;
+}
+
 
 void Chain::grow(FiberEnd end, const real delta)
 {
@@ -1273,22 +1305,6 @@ void Chain::adjustLength(real len, FiberEnd ref)
         else
             growM(len-length());
     }
-}
-
-
-void Chain::truncateM(size_t p)
-{
-    Mecable::truncateM(p);
-    fnAbscissaM = abscissaPoint(p);
-    postUpdate();
-}
-
-
-void Chain::truncateP(size_t p)
-{
-    Mecable::truncateP(p);
-    fnAbscissaP = abscissaPoint(p);
-    postUpdate();
 }
 
 

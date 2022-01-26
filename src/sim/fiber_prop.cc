@@ -26,33 +26,44 @@ Fiber* FiberProp::newFiber() const
  */
 real FiberProp::newFiberLength(Glossary& opt) const
 {
-    real len = 1.0, var = 0.0;
-
+    real len = 1.0;
+    
     if ( 0 < opt.num_values("fiber_length") )
     {
         opt.set_from_least_used_value(len, "fiber_length");
-        return len;
     }
-    
-    opt.set(len, "length");
-
-    if ( opt.value_is("length", 1, "exponential") )
+    else if ( opt.set(len, "length") )
     {
-        // exponential distribution, truncated (Julio M.Belmonte's student):
-        real L;
-        do {
-            L = len * RNG.exponential();
-        } while (( L < min_length ) | ( L > max_length ));
-        len = L;
+        real var = 0.0;
+        if ( opt.value_is("length", 1, "exponential") )
+        {
+            // exponential distribution, truncated (Julio M.Belmonte's student):
+            real L = len;
+            do
+                len = L * RNG.exponential();
+            while (( len < min_length ) | ( len > max_length ));
+        }
+        else if ( opt.set(var, "length", 1) )
+        {
+            real L = len;
+            // add variability without changing mean:
+            do
+                len = L + var * RNG.sreal();
+            while (( len < min_length ) | ( len > max_length ));
+        }
+        else
+        {
+            if ( len < min_length )
+                std::cerr << "Warning: "<<name()<<"'s initial length < min_length\n";
+            if ( len > max_length )
+                std::cerr << "Warning: "<<name()<<"'s initial length > max_length\n";
+        }
     }
-    else if ( opt.set(var, "length", 1) )
+    else
     {
-        // add variability without changing mean:
-        len += var * RNG.sreal();
+        len = std::max(len, min_length);
+        len = std::min(len, max_length);
     }
-    
-    len = std::max(len, min_length);
-    len = std::min(len, max_length);
     return len;
 }
 
@@ -269,7 +280,7 @@ void FiberProp::clear()
 {
     rigidity            = -1;
     segmentation        = 1;
-    min_length          = 0.010;      // suitable for actin/microtubules
+    min_length          = 0.008;   // suitable for actin/microtubules
     max_length          = INFINITY;
     total_polymer       = INFINITY;
     persistent          = false;

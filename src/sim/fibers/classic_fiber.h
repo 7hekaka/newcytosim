@@ -54,15 +54,9 @@ private:
     
     /// state of MINUS_END
     state_t mStateM;
-    
-    /// length increment at MINUS_END during last time-step
-    real mGrowthM;
 
     /// state of PLUS_END
     state_t mStateP;
-    
-    /// length increment at PLUS_END during last time-step
-    real mGrowthP;
      
 public:
     
@@ -84,19 +78,18 @@ public:
     state_t endStateP() const { return mStateP; }
 
     
-    /// length increment at MINUS_END during last time-step
-    real freshAssemblyM() const { return mGrowthM; }
-    
-    /// length increment at PLUS_END during last time-step
-    real freshAssemblyP() const { return mGrowthP; }
-
-    
     /// change state of MINUS_END
     void setEndStateM(state_t s);
     
     /// change state of PLUS_END
     void setEndStateP(state_t s);
 
+    ///
+    real stepMinusEnd();
+    
+    ///
+    real stepPlusEnd();
+    
     /// Stochastic simulation
     void step();
     

@@ -16,8 +16,6 @@ ClassicFiber::ClassicFiber(ClassicFiberProp const* p) : Fiber(p), prop(p)
 {
     mStateM  = STATE_WHITE;
     mStateP  = STATE_WHITE;
-    mGrowthM = 0;
-    mGrowthP = 0;
 }
 
 
@@ -59,29 +57,29 @@ void ClassicFiber::setEndStateP(state_t s)
  cf. `Dynamic instability of MTs is regulated by force`
  M.Janson, M. de Dood, M. Dogterom. JCB 2003, Figure 2 C.
  */
-void ClassicFiber::step()
+real ClassicFiber::stepMinusEnd()
 {
-    constexpr size_t P = 0, M = 1;
-    const real len = length();
+    constexpr size_t M = 1;
+    real add = 0;
 
     if ( mStateM == STATE_GREEN )
     {
         // calculate the force acting on the point at the end:
-        real forceM = projectedForceEndM();
+        real force = projectedForceEndM();
         
         // growth is reduced if free monomers are scarce:
-        mGrowthM = prop->growing_speed_dt[M] * prop->free_polymer;
+        add = prop->growing_speed_dt[M] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if (( forceM < 0 ) & ( mGrowthM > 0 ))
-            mGrowthM *= std::exp(forceM*prop->growing_force_inv[M]);
+        if (( force < 0 ) & ( add > 0 ))
+            add *= std::exp(force*prop->growing_force_inv[M]);
 
-        mGrowthM += prop->growing_off_speed_dt[M];
+        add += prop->growing_off_speed_dt[M];
         
         // catastrophe may be constant, or it may depend on the growth rate
         real cata;
         if ( prop->catastrophe_coef[M] > 0 )
-            cata = prop->catastrophe_rate_stalled_dt[M] / ( 1.0 + prop->catastrophe_coef[M] * mGrowthM );
+            cata = prop->catastrophe_rate_stalled_dt[M] / ( 1.0 + prop->catastrophe_coef[M] * add );
         else
             cata = prop->catastrophe_rate_dt[M];
 
@@ -90,35 +88,44 @@ void ClassicFiber::step()
     }
     else if ( mStateM == STATE_RED )
     {
-        mGrowthM = prop->shrinking_speed_dt[M];
+        add = prop->shrinking_speed_dt[M];
         
-        if ( RNG.test(prop->rescue_prob[M]) )
+        real rate = prop->rescue_prob[M];
+        if ( RNG.test(rate) )
             mStateM = STATE_GREEN;
     }
     
-    
+    return add;
+}
+
+
+real ClassicFiber::stepPlusEnd()
+{
+    constexpr size_t P = 0;
+    real add = 0;
+
     if ( mStateP == STATE_GREEN )
     {
         // calculate the force acting on the point at the end:
-        real forceP = projectedForceEndP();
+        real force = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        mGrowthP = prop->growing_speed_dt[P] * prop->free_polymer;
+        add = prop->growing_speed_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if (( forceP < 0 ) & ( mGrowthP > 0 ))
-            mGrowthP *= std::exp(forceP*prop->growing_force_inv[P]);
+        if (( force < 0 ) & ( add > 0 ))
+            add *= std::exp(force*prop->growing_force_inv[P]);
 
-        mGrowthP += prop->growing_off_speed_dt[P];
+        add += prop->growing_off_speed_dt[P];
         
         // catastrophe may be constant, or it may depend on the growth rate
         real cata;
         if ( prop->catastrophe_coef[P] > 0 )
-            cata = prop->catastrophe_rate_stalled_dt[P] / ( 1.0 + prop->catastrophe_coef[P] * mGrowthP );
+            cata = prop->catastrophe_rate_stalled_dt[P] / ( 1.0 + prop->catastrophe_coef[P] * add );
         else
             cata = prop->catastrophe_rate_dt[P];
         
-        //printf("ClassicFiber %5u: force %9.2f growth %9.6f cata %9.6f\n", identity(), force, mGrowthP, cata);
+        //printf("ClassicFiber %5u: force %9.2f growth %9.6f cata %9.6f\n", identity(), force, addP, cata);
         
 #if NEW_CATASTROPHE_OUTSIDE
         // Catastrophe rate is multiplied if the PLUS_END is outside
@@ -140,7 +147,6 @@ void ClassicFiber::step()
             cata *= length() / prop->catastrophe_length;
         }
 #endif
-        
         if ( RNG.test(cata) )
             mStateP = STATE_RED;
     }
@@ -148,52 +154,43 @@ void ClassicFiber::step()
     {
         real force = -projectedForceEndP();
         
-        mGrowthP = prop->shrinking_speed_dt[P] * exp(force*prop->shrinking_force_inv[P]);
+        add = prop->shrinking_speed_dt[P] * exp(force*prop->shrinking_force_inv[P]);
 
-        //printf("ClassicFiber %5u: force %9.2f shrink %9.6f\n", identity(), force, mGrowthP);
+        //printf("ClassicFiber %5u: force %9.2f shrink %9.6f\n", identity(), force, addP);
         
         if ( RNG.test(prop->rescue_prob[P]) )
             mStateP = STATE_GREEN;
     }
     
-    real inc = mGrowthP + mGrowthM;
-    if ( inc < 0  &&  len + inc < prop->min_length )
+    return add;
+}
+
+
+void ClassicFiber::step()
+{
+    real addM = 0;
+    constexpr size_t M = 1;
+    // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
+    if ( mStateM == STATE_WHITE )
     {
-        // the fiber is too short, we may delete it:
-        if ( !prop->persistent )
-        {
-            delete(this);
-            return;
-        }
-   
-        // we may regrow:
-        if ( mStateM == STATE_RED && RNG.test(prop->rebirth_prob[M]) )
-            mStateM = STATE_GREEN;
-    
-        if ( mStateP == STATE_RED && RNG.test(prop->rebirth_prob[P]) )
-            mStateP = STATE_GREEN;
-    }
-    else if ( len + inc < prop->max_length )
-    {
-        if ( mGrowthM != 0 ) growM(mGrowthM);
-        if ( mGrowthP != 0 ) growP(mGrowthP);
-    }
-    else if ( 0 < inc  &&  len < prop->max_length )
-    {
-        // the remaining possible growth is distributed to the two ends:
-        inc = ( prop->max_length - len ) / inc;
-        mGrowthM *= inc;
-        mGrowthP *= inc;
-        if ( mGrowthM != 0 ) growM(mGrowthM);
-        if ( mGrowthP != 0 ) growP(mGrowthP);
+        if ( RNG.test(prop->rebirth_prob[M]) )
+            setEndStateM(STATE_GREEN);
     }
     else
-    {
-        mGrowthM = 0;
-        mGrowthP = 0;
-    }
+        addM = stepMinusEnd();
     
-    Fiber::step();
+    real addP = 0;
+    constexpr size_t P = 0;
+    // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
+    if ( mStateP == STATE_WHITE )
+    {
+        if ( RNG.test(prop->rebirth_prob[P]) )
+            setEndStateP(STATE_GREEN);
+    }
+    else
+        addP = stepPlusEnd();
+
+    Fiber::step(addM, addP);
 }
 
 

@@ -15,8 +15,6 @@ GrowingFiber::GrowingFiber(GrowingFiberProp const* p) : Fiber(p), prop(p)
 {
     mStateM = STATE_GREEN;
     mStateP = STATE_GREEN;
-    mGrowthM = 0;
-    mGrowthP = 0;
 }
 
 
@@ -52,11 +50,12 @@ void GrowingFiber::setEndStateP(state_t s)
 void GrowingFiber::step()
 {
     constexpr size_t P = 0, M = 1;
-
+    real addP = 0, addM = 0;
+    
     // PLUS_END
     if ( prop->shrink_outside[P] && prop->confine_space_ptr->outside(posEndP()) )
     {
-        mGrowthP = prop->shrinking_speed_dt[P];
+        addP = prop->shrinking_speed_dt[P];
     }
     else if ( mStateP == STATE_GREEN )
     {
@@ -64,23 +63,19 @@ void GrowingFiber::step()
         real forceP = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        mGrowthP = prop->growing_speed_dt[P] * prop->free_polymer;
+        addP = prop->growing_speed_dt[P] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if (( forceP < 0 ) & ( mGrowthP > 0 ))
-            mGrowthP *= std::exp(forceP*prop->growing_force_inv[P]);
+        if (( forceP < 0 ) & ( addP > 0 ))
+            addP *= std::exp(forceP*prop->growing_force_inv[P]);
         
-        mGrowthP += prop->growing_off_speed_dt[P];
-    }
-    else
-    {
-        mGrowthP = 0;
+        addP += prop->growing_off_speed_dt[P];
     }
     
     // MINUS_END
     if ( prop->shrink_outside[M] && prop->confine_space_ptr->outside(posEndM()) )
     {
-        mGrowthM = prop->shrinking_speed_dt[M];
+        addM = prop->shrinking_speed_dt[M];
     }
     else if ( mStateM == STATE_GREEN )
     {
@@ -88,51 +83,16 @@ void GrowingFiber::step()
         real forceM = projectedForceEndM();
         
         // growth is reduced if free monomers are scarce:
-        mGrowthM = prop->growing_speed_dt[M] * prop->free_polymer;
+        addM = prop->growing_speed_dt[M] * prop->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
-        if (( forceM < 0 ) & ( mGrowthM > 0 ))
-            mGrowthM *= std::exp(forceM*prop->growing_force_inv[M]);
+        if (( forceM < 0 ) & ( addM > 0 ))
+            addM *= std::exp(forceM*prop->growing_force_inv[M]);
 
-        mGrowthM += prop->growing_off_speed_dt[M];
-    }
-    else
-    {
-        mGrowthM = 0;
+        addM += prop->growing_off_speed_dt[M];
     }
 
-    
-    real len = length();
-    real inc = mGrowthP + mGrowthM;
-    if ( len + inc < prop->min_length )
-    {
-        if ( !prop->persistent )
-        {
-            delete(this);
-            return;
-        }
-    }
-    else if ( len + inc < prop->max_length )
-    {
-        if ( mGrowthM != 0 ) growM(mGrowthM);
-        if ( mGrowthP != 0 ) growP(mGrowthP);
-    }
-    else if ( len < prop->max_length )
-    {
-        // the remaining possible growth is distributed to the two ends:
-        inc = ( prop->max_length - len ) / inc;
-        mGrowthM *= inc;
-        mGrowthP *= inc;
-        if ( mGrowthM != 0 ) growM(mGrowthM);
-        if ( mGrowthP != 0 ) growP(mGrowthP);
-    }
-    else
-    {
-        mGrowthM = 0;
-        mGrowthP = 0;
-    }
-
-    Fiber::step();
+    Fiber::step(addM, addP);
 }
 
 
@@ -146,8 +106,8 @@ void GrowingFiber::write(Outputter& out) const
 
     // since states are constant, we write growth rates:
     writeHeader(out, TAG_DYNAMIC);
-    out.writeFloat(mGrowthM);
-    out.writeFloat(mGrowthP);
+    out.writeFloat(cDeltaM);
+    out.writeFloat(cDeltaP);
 }
 
 
@@ -156,22 +116,22 @@ void GrowingFiber::readEndState(Inputter& in)
 #if BACKWARD_COMPATIBILITY < 54
     if ( in.formatID() < 54 )
     {
-        mGrowthM = in.readFloat();
+        cDeltaM = in.readFloat();
         if ( in.formatID() > 45 )
-            mGrowthP = in.readFloat();
+            cDeltaP = in.readFloat();
     }
     else if ( in.formatID() < 56 )
     {
-        mGrowthM = in.readFloat();
+        cDeltaM = in.readFloat();
         in.readFloat();
-        mGrowthP = in.readFloat();
+        cDeltaP = in.readFloat();
         in.readFloat();
     }
     else
 #endif
     {
-        mGrowthM = in.readFloat();
-        mGrowthP = in.readFloat();
+        cDeltaM = in.readFloat();
+        cDeltaP = in.readFloat();
     }
 }
 
@@ -194,8 +154,8 @@ void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         if ( tag == TAG && in.formatID() < 46 )
         {
             // adjust growing variable
-            mGrowthP = length() - len;
-            mGrowthM = 0;
+            cDeltaP = length() - len;
+            cDeltaM = 0;
         }
 #endif
     }

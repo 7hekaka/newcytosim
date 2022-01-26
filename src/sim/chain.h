@@ -107,6 +107,12 @@ private:
 #endif
     
 protected:
+    
+    /// length increment at MINUS_END during last time-step
+    real cDeltaM;
+    
+    /// length increment at PLUS_END during last time-step
+    real cDeltaP;
 
 #if NEW_UNCONSTRAINED_LENGTH
     /// true if projection operator is identity
@@ -116,7 +122,7 @@ protected:
     /// flag to update
     bool needUpdate;
 
-    /// callback to signal that update is needed, to be called after a change in length
+    /// this signals that update is needed, to be called after a change in length
     void postUpdate() { needUpdate = true; }
     
     /// called if a Fiber tip has elongated or shortened
@@ -439,42 +445,59 @@ public:
     real planarIntersect(size_t s, Vector const& n, const real a) const;
 
     //--------------------- Growing/Shrinking
+
+    /// increase/decrease length of Fiber by `delta`, at the MINUS_END
+    void growM(real delta);
+    /// increase/decrease length of Fiber by `delta`, at the PLUS_END
+    void growP(real delta);
+
+    /// add a segment of length segmentation() at the MINUS_END
+    void addSegmentM();
+    /// add a segment of length segmentation() at the PLUS_END
+    void addSegmentP();
+
+    /// remove a portion of length `delta` including the MINUS_END
+    void cutM(real delta);
+    /// remove a portion of length `delta` including the PLUS_END
+    void cutP(real delta);
+
+    /// Discard vertices in [ 0, P-1 ] and keep [ P, end ]
+    virtual void truncateM(size_t P);
+    /// Keep vertices [ 0, P ] and discard the others
+    virtual void truncateP(size_t P);
+
+    /// the length of freshly assembled polymer at the MINUS_END
+    real freshAssemblyM() const { return cDeltaM; }
+    /// the length of freshly assembled polymer at the PLUS_END
+    real freshAssemblyP() const { return cDeltaP; }
+    
+    /// undo last length change at minus end
+    void undoGrowM() { growM(-cDeltaM); cDeltaM = 0; }
+    /// undo last length change at plus end
+    void undoGrowP() { growP(-cDeltaP); cDeltaP = 0; }
+
+    //---------------------
+
+    /// the length of freshly assembled polymer during the last time step
+    real freshAssembly(FiberEnd end) const;
+    
+    /// true if the tip `end` has grown ( freshAssembly(which) > 0 )
+    bool isGrowing(FiberEnd end) const { return freshAssembly(end) > 0; }
+    
+    /// true if the tip `end` has shrunk ( freshAssembly(which) < 0 )
+    bool isShrinking(FiberEnd end) const { return freshAssembly(end) < 0; }
+
+    /// grow at specified end (PLUS_END or MINUS_END)
+    void grow(FiberEnd end, real delta);
+    
+    /// shorten or lengthen Fiber without changing the position of `end`
+    void adjustLength(real len, FiberEnd end);
     
     /// merge two fibers by attaching given Chain at the PLUS_END of `this`
     void join(Chain const*);
 
-    /// increase/decrease length of Fiber by `delta`, at the MINUS_END
-    void growM(real delta);
-    
-    /// add a segment of length segmentation() at the MINUS_END
-    void addSegmentM();
-    
-    /// remove a portion of length `delta` including the MINUS_END
-    void cutM(real delta);
-    
-    /// increase/decrease length of Fiber by `delta`, at the PLUS_END
-    void growP(real delta);
-    
-    /// add a segment of length segmentation() at the PLUS_END
-    void addSegmentP();
-    
-    /// remove a portion of length `delta` including the PLUS_END
-    void cutP(real delta);
-    
-    /// grow at specified end (PLUS_END or MINUS_END)
-    void grow(FiberEnd end, real delta);
-    
-    /// shorten or lengthen Fiber without changing the position of `ref`
-    void adjustLength(real len, FiberEnd ref);
-
-    /// Discard vertices in [ 0, P-1 ] and keep [ P, end ]
-    virtual void truncateM(size_t p);
-
-    /// Keep vertices [ 0, P ] and discard the others
-    virtual void truncateP(size_t p);
-
     //---------------------
-    
+
     /// print info such as length and segmentation
     void briefdoc(std::ostream&, real, real, real, real) const;
 

@@ -35,7 +35,7 @@ void Rescuer::handleDisassemblyM()
         if ( RNG.test(prop->rescue_prob) )
         {
             //revert the last disassembly step:
-            fib->growM(-fib->freshAssemblyM());
+            fib->undoGrowM();
             // induce rescue:
             fib->setEndStateM(STATE_GREEN);
         }
@@ -69,7 +69,7 @@ void Rescuer::handleDisassemblyP()
         if ( RNG.test(prop->rescue_prob) )
         {
             //revert the last disassembly step:
-            fib->growP(-fib->freshAssemblyP());
+            fib->undoGrowP();
             // induce rescue:
             fib->setEndStateP(STATE_GREEN);
             //assert_true(hAbs <= fib->abscissaP())

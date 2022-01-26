@@ -169,7 +169,7 @@ void DynamicFiberProp::complete(Simul const& sim)
     }
 
     if ( min_length <= 0 )
-        min_length = 3 * unit_length;
+        min_length = unit_length;
      
     /// print predicted average length in verbose mode:
     if ( sim.primed() && sim.prop->verbose )

@@ -75,10 +75,6 @@ class DynamicFiber : public Fiber
 {
 private:
     
-    /// assembly during last time-step
-    real mGrowthP;
-    real mGrowthM;
-    
     /// Gillespie countdown timers for PLUS_END:
     real nextGrowthP;
     real nextHydrolP;
@@ -137,12 +133,6 @@ public:
     
     /// change state of PLUS_END
     void setEndStateP(state_t s);
-    
-    /// length increment at MINUS_END during last time-step
-    real freshAssemblyM() const { return mGrowthM; }
-    
-    /// length increment at PLUS_END during last time-step
-    real freshAssemblyP() const { return mGrowthP; }
 
     //--------------------------------------------------------------------------
     

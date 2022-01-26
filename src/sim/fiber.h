@@ -115,6 +115,7 @@ private:
 #endif
 
 protected:
+    
 #if NEW_FIBER_CHEW
     /// stored chewing at the end
     real fChewM, fChewP;
@@ -229,6 +230,9 @@ public:
     /// simulation step
     virtual void step();
     
+    /// simulation step with some growth/shrinkage from the ends
+    void step(real, real, bool = true);
+
     /// update Lattice and Mesh ranges
     void updateRange(Field*);
     
@@ -263,23 +267,6 @@ public:
 
     /// change state of FiberEnd `end` to `s`
     void setEndState(FiberEnd end, state_t s);
-    
-    
-    /// the length of freshly assembled polymer at the MINUS_END during the last time step
-    virtual real freshAssemblyM() const { return 0; }
-
-    /// the length of freshly assembled polymer at the PLUS_END during the last time step
-    virtual real freshAssemblyP() const { return 0; }
-
-    /// the length of freshly assembled polymer during the last time step
-    real freshAssembly(FiberEnd end) const;
-    
-    
-    /// true if the tip `end` has grown in the last time step ( freshAssembly(which) > 0 )
-    bool isGrowing(FiberEnd end) const { return freshAssembly(end) > 0; }
-    
-    /// true if the tip `end` has shrunk in the last time step ( freshAssembly(which) < 0 )
-    bool isShrinking(FiberEnd end) const { return freshAssembly(end) < 0; }
     
     //--------------------------------------------------------------------------
     

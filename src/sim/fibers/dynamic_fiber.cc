@@ -34,7 +34,6 @@ void DynamicFiber::initM()
     unitM[0] = 0;
     unitM[1] = 0;
     mStateM  = calculateStateM();
-    mGrowthM = 0;
 
     nextGrowthM = RNG.exponential();
     nextHydrolM = RNG.exponential();
@@ -82,25 +81,20 @@ int DynamicFiber::stepMinusEnd()
 {
 	constexpr size_t M = 1;
 	int res = 0;
-    real chewing = 0;
     
-    // add chewing rate to stochastic off rate:
 #if NEW_FIBER_CHEW
-    
+    ///@todo implement smooth saturation using logistic function
     // convert chewing rate to stochastic off rate:
-    if ( fChewM > prop->max_chewing_speed_dt )
-        chewing = prop->max_chewing_speed_dt / prop->unit_length;
-    else
-        chewing = fChewM / prop->unit_length;
-    
+    real chewed = std::min(fChewM, prop->max_chewing_speed_dt) / prop->unit_length;
     //std::clog << " chewing rate M " << chewing_rate / prop->time_step << '\n';
     fChewM = 0;
-    
+#else
+    constexpr real chewed(0);
 #endif
     
     if ( mStateM == STATE_RED )
 	{
-		nextShrinkM -= prop->shrinking_rate_dt[M] + chewing;
+		nextShrinkM -= prop->shrinking_rate_dt[M] + chewed;
 		while ( nextShrinkM <= 0 )
 		{
             // remove last unit, while penultimate position can be a GTP survivor
@@ -135,7 +129,7 @@ int DynamicFiber::stepMinusEnd()
 #endif
 
 		// @todo detach_rate should depend on the state of the subunit
-		real shrink = prop->growing_off_rate_dt[M] + chewing;
+		real shrink = prop->growing_off_rate_dt[M] + chewed;
 
 		nextGrowthM -= growth;
 		nextShrinkM -= shrink;
@@ -187,7 +181,6 @@ void DynamicFiber::initP()
     unitP[0] = 1;
     unitP[1] = 1;
     mStateP  = calculateStateP();
-    mGrowthP = 0;
     
     nextGrowthP = RNG.exponential();
     nextHydrolP = RNG.exponential();
@@ -240,24 +233,20 @@ int DynamicFiber::stepPlusEnd()
 {
     constexpr size_t P = 0;
     int res = 0;
-    real chewing = 0;
     
 #if NEW_FIBER_CHEW
-    
-    // convert chewing rate to stochastic off rate:
     ///@todo implement smooth saturation using logistic function
-    if ( fChewP > prop->max_chewing_speed_dt )
-        chewing = prop->max_chewing_speed_dt / prop->unit_length;
-    else
-        chewing = fChewP / prop->unit_length;
-    
+    // convert chewing rate to stochastic off rate:
+    real chewed = std::min(fChewP, prop->max_chewing_speed_dt) / prop->unit_length;
     //std::clog << " chewing rate P " << chewing / prop->time_step << '\n';
     fChewP = 0;
+#else
+    constexpr real chewed(0);
 #endif
     
     if ( mStateP == STATE_RED )
     {
-        nextShrinkP -= prop->shrinking_rate_dt[P] + chewing;
+        nextShrinkP -= prop->shrinking_rate_dt[P] + chewed;
         while ( nextShrinkP <= 0 )
         {
             // remove last unit, while penultimate position can be a GTP survivor
@@ -293,7 +282,7 @@ int DynamicFiber::stepPlusEnd()
 #endif
         
         // @todo detach_rate should depend on the state of the subunit
-        real shrink = prop->growing_off_rate_dt[P] + chewing;
+        real shrink = prop->growing_off_rate_dt[P] + chewed;
         
         nextGrowthP -= growth;
         nextShrinkP -= shrink;
@@ -306,7 +295,7 @@ int DynamicFiber::stepPlusEnd()
             size_t ii = sMath::arg_min(nextGrowthP/growth, nextHydrolP/hydrol, nextShrinkP/shrink);
 #else
             // it is possible to replace the divisions by multiplications following arg_min()'s implementation...
-            // but it fails if 'shrink' is zero
+            // but this fails if 'shrink' is zero
             size_t cba = ( nextShrinkP*growth*hydrol < std::min(nextHydrolP*growth, nextGrowthP*hydrol)*shrink );
             size_t bac = ( nextHydrolP*shrink*growth < std::min(nextGrowthP*shrink, nextShrinkP*growth)*hydrol );
             size_t ii = 2*cba | bac;
@@ -348,45 +337,29 @@ int DynamicFiber::stepPlusEnd()
 
 void DynamicFiber::step()
 {
-    constexpr size_t P = 0;
+    real addM = 0;
     constexpr size_t M = 1;
-
-    // perform stochastic simulation:
-    int incP = stepPlusEnd();
-    int incM = mStateM ? stepMinusEnd() : 0;
-
-    mGrowthP = incP * prop->unit_length;
-    mGrowthM = incM * prop->unit_length;
-
-    if ( incM || incP )
+    // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
+    if ( mStateM == STATE_WHITE )
     {
-        if ( length() + mGrowthM + mGrowthP < prop->min_length )
-        {
-            // do something if the fiber is too short:
-            if ( !prop->persistent )
-            {
-                delete(this);
-                // exit to avoid doing anything with a dead object:
-                return;
-            }
-
-            // possibly rescue:
-            if ( mStateM == STATE_RED && RNG.test(prop->rebirth_prob[M]) )
-            	setEndStateM(STATE_GREEN);
-
-            if ( mStateP == STATE_RED && RNG.test(prop->rebirth_prob[P]) )
-            	setEndStateP(STATE_GREEN);
-
-        }
-        else if ( length() + mGrowthM + mGrowthP < prop->max_length )
-        {
-            if ( incP ) growP(mGrowthP);
-            if ( incM ) growM(mGrowthM);
-            //std::clog << reference() << " " << mGrowthM << " " << mGrowthP << " " << length() << '\n';
-        }
+        if ( RNG.test(prop->rebirth_prob[M]) )
+            setEndStateM(STATE_GREEN);
     }
+    else
+        addM = stepMinusEnd() * prop->unit_length;
+    
+    real addP = 0;
+    constexpr size_t P = 0;
+    // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
+    if ( mStateP == STATE_WHITE )
+    {
+        if ( RNG.test(prop->rebirth_prob[P]) )
+            setEndStateP(STATE_GREEN);
+    }
+    else
+        addP = stepPlusEnd() * prop->unit_length;
 
-    Fiber::step();
+    Fiber::step(addM, addP, false);
 }
 
 
