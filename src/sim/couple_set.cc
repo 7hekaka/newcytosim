@@ -106,7 +106,7 @@ void CoupleSet::step()
 /**
  This version does not simulate the attachment of free Hand, and hence calls
  specialized versions of Couple::step() that do not include Hand::stepUnattached():
- either stepFASkipAttach(), stepAFSkipAttach() or stepAA().
+ either stepHand1(), stepHand2() or stepAA().
  Couple::stepFF() is never called.
  
  This is only used if POOL_HAND_ATTACHMENT > 1
@@ -127,8 +127,8 @@ void CoupleSet::stepSkipAttach()
     bool const afOdd = afList.size() & 1;
     
     step_couples<&Couple::stepAA>(firstAA(), aaOdd);
-    step_couples<&Couple::stepFASkipAttach>(faHead, faOdd);
-    step_couples<&Couple::stepAFSkipAttach>(afHead, afOdd);
+    step_couples<&Couple::stepHand2>(faHead, faOdd);
+    step_couples<&Couple::stepHand1>(afHead, afOdd);
     
     // use alternative attachment strategy:
     if ( uniEnabled )

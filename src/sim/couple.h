@@ -169,11 +169,11 @@ public:
     /// simulation step for a doubly-attached Couple
     virtual void stepAA();
     
-    /// simulate movement of Hand1
-    virtual void stepAFSkipAttach();
+    /// simulate movement of Hand1, skipping attachment
+    void stepHand1();
     
-    /// simulate movement of Hand2
-    virtual void stepFASkipAttach();
+    /// simulate movement of Hand2, skipping attachment
+    void stepHand2();
 
     //--------------------------------------------------------------------------
 

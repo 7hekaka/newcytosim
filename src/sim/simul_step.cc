@@ -142,7 +142,13 @@ void Simul::step()
     if ( singles.size() + couples.size() )
     {
 #if POOL_HAND_ATTACHMENT > 1
-        if ( doAttachCounter == 0 )
+        if ( doAttachCounter )
+        {
+            couples.stepSkipAttach();
+            singles.stepSkipAttach();
+            //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
+        }
+        else
 #endif
         {
             // calculate grid range from Hand's binding range:
@@ -177,12 +183,6 @@ void Simul::step()
             couples.step();
             singles.step();
             //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
-        }
-        else
-        {
-            couples.stepSkipAttach();
-            singles.stepSkipAttach();
-            //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
         }
     }
 

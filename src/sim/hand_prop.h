@@ -21,7 +21,7 @@
  The defined value is N, the number of steps over which attachments are pooled.
  Define POOL_HAND_ATTACHMENT as 1 to disable, or 4, 8 or 16 to enable.
  */
-#define POOL_HAND_ATTACHMENT 8
+#define POOL_HAND_ATTACHMENT 1
 
 class Hand;
 class HandMonitor;
