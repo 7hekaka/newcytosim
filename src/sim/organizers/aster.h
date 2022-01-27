@@ -49,6 +49,10 @@ private:
     /// calculate rank: how many coefficients are not null
     void polish()
     {
+        // ensures that sum of coefficients is 1
+        coef1_[0] = 1.0 - coef1_[1] - coef1_[2] - coef1_[3];
+        coef2_[0] = 1.0 - coef2_[1] - coef2_[2] - coef2_[3];
+        
         rank_ = 1;
         for ( int i = 1; i <= DIM; ++i )
         {
@@ -96,7 +100,7 @@ public:
         polish();
     }
 
-    /// save coefficient to file
+    /// save coefficient to file (not coef_[0])
     void write(Outputter& out) const
     {
         out.writeUInt16(prime_);
@@ -128,9 +132,6 @@ public:
         prime_ = in.readUInt16();
         alt_ = in.readUInt16();
         len_ = ( sol->posPoint(prime_) - sol->posPoint(alt_) ).norm();
-        set_coef1(0.0, 0.0, 0.0);
-        set_coef2(0.0, 0.0, 0.0);
-        polish();
         if ( prime_ >= sol->nbPoints() )
             throw InvalidIO("invalid AsterLink index");
         if ( alt_ >= sol->nbPoints() )

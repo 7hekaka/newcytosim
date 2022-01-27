@@ -7,11 +7,12 @@
 set simul system
 {
     dim = 3
-    time_step = 0.005
+    time_step = 0.001
     viscosity = 1
     steric = 1, 50
     steric_max_range = 0.75
     display = ( style=3; window_size=1024, 256; point_value=0.01; zoom=2; back_color=black; )
+    precondition = 1
 }
 
 set space cell
@@ -56,7 +57,6 @@ set fiber k_fiber
     growing_speed = 0.0
     shrinking_speed = 0.0
     rigidity = 20
-    min_length = 0.2
     rebirth_rate = 10000
     display = ( line_width=2.5; color=blue; )
 }
@@ -110,7 +110,6 @@ set fiber microtubule
     growing_speed            = 0      % static during equilibration
     
     total_polymer = 180   % total available=180; critical concentration ?
-    min_length  = 0.01
 
     display = ( line_width=2.5; plus_end=5, 2; color=white; )
 }
@@ -371,25 +370,25 @@ set couple klp9
 % total 1800 ase1 dimers per cell
 
 %new 50 ase1_clasp
-%run 1000 system
+%run system { time = 1 }
 
 %new 100 ase1_clasp
-%run 1000 system
+%run system { time = 1 }
 
 %new 100 ase1_clasp
-%run 1000 system
+%run system { time = 1 }
 
 %new 250 ase1_clasp
-%run 1000 system
+%run system { time = 1 }
 
 %new 500 ase1_clasp
-%run 1000 system
+%run system { time = 1 }
 
 %new 800 ase1_clasp
-%run 1000 system
+%run system { time = 1 }
 
 new 2200 ase1_clasp
-run 1000 system
+run system { time = 1 }
 
 %% --------------------------------------
 %% metaphase is completed, start anaphase
@@ -408,8 +407,9 @@ change k_fiber
     confine = 0
 }
 delete squeeze
-run 1000 system
+run system
 {
+    time = 1
     nb_frames = 5
 }
 
@@ -425,8 +425,9 @@ change ase1_clasp_hand
 }
 delete all cohesin
 
-run 1000 system
+run system
 {
+    time = 1
     nb_frames = 5
 }
 change k_fiber
@@ -447,7 +448,8 @@ change microtubule
 %new 400 klp9
 %new 400 dis1
 
-run 2000 system
+run system
 {
+    time = 2
     nb_frames = 100
 }
