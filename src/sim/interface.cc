@@ -919,9 +919,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 
 
 /**
- Perform plain simulation steps, without any option:
- alternating step() and solve()
- This is called by the player to extend a simulation past its normal end
+ Perform simulation steps, without any option, by alternating step() and solve()
 */
 void Interface::execute_run(size_t nb_steps)
 {

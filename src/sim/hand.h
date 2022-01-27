@@ -40,7 +40,7 @@ class Simul;
  */
 class Hand : public FiberSite
 {
-
+    /// a Monitor that does nothing
     static HandMonitor dummyMonitor;
     
 private:
@@ -104,12 +104,12 @@ public:
     
     /// a random position, at distance `binding_range' on the side of the fiber
     Vector posSide() const;
-
-    /// move to a different fiber, at the same abscissa
-    void relocate(Fiber* f);
     
-    /// move to a different fiber, at the given abscissa
+    /// move attached Hand to a different fiber, at the given abscissa
     void relocate(Fiber* f, real a);
+    
+    /// move to a different fiber, at the same abscissa
+    void relocate(Fiber* f) { relocate(f, abscissa()); }
 
     /// relocate to the specified tip of the current fiber
     void moveToEnd(FiberEnd);

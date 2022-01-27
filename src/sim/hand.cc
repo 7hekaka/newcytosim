@@ -17,12 +17,10 @@ HandMonitor Hand::dummyMonitor;
 //------------------------------------------------------------------------------
 
 Hand::Hand(HandProp const* p, HandMonitor* m)
- : hNext(nullptr), hPrev(nullptr), hMonitor(m), prop(p)
+ : hNext(nullptr), hPrev(nullptr), hMonitor(m), nextDetach(0), prop(p)
 {
     if ( !m )
         hMonitor = &dummyMonitor;
-    // initialize in unattached state:
-    nextDetach = 0;
 }
 
 
@@ -92,39 +90,17 @@ Vector Hand::posSide() const
 }
 
 
-void Hand::relocate(Fiber* f)
-{
-    assert_true(f);
-    if ( hFiber )
-    {
-        hFiber->removeHand(this);
-        hFiber = f;
-#if FIBER_HAS_LATTICE
-        if ( hLattice )
-            hLattice = &f->lattice();
-#endif
-    }
-    f->addHand(this);
-    reinterpolate();
-}
-
-
+/** Used to transfer a bound Hand normally to a different fiber */
 void Hand::relocate(Fiber* f, const real a)
 {
-    assert_true(f);
-    if ( f != hFiber )
-    {
-        if ( hFiber )
-        {
-            hFiber->removeHand(this);
-            hFiber = f;
+    assert_true(f && hFiber);
+    hFiber->removeHand(this);
+    hFiber = f;
 #if FIBER_HAS_LATTICE
-            if ( hLattice )
-                hLattice = &f->lattice();
+    if ( hLattice )
+        hLattice = &f->lattice();
 #endif
-        }
-        f->addHand(this);
-    }
+    f->addHand(this);
     hAbs = a;
     reinterpolate();
 }
