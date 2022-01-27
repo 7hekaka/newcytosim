@@ -9,10 +9,10 @@ image: gcc
 make_sim:
     stage: build
     rules:
+      - if: $CI_COMMIT_BRANCH =~ $CI_DEFAULT_BRANCH
+        when: never
       - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      - changes:
-        - src/*/*.{h, cc}
-        - src/*/*/*.{h, cc}
+        when: manual
     before_script:
       - apt update && apt -y install cmake autoconf libblas-dev liblapack-dev
     script:
@@ -26,52 +26,65 @@ make_sim:
         - build/bin/reader
         - build/bin/report
     cache:
-      key: $CI_COMMIT_REF_SLUG
+      key: $CI_COMMIT_BRANCH
       paths:
         - build
 
 make_play:
-  stage: build
-  when: manual
-  before_script:
-    - apt update && apt -y install cmake autoconf libblas-dev liblapack-dev mesa-common-dev libglew-dev freeglut3-dev
-  script:
-    - mkdir -p build; cd build
-    - cmake -DMAKE_SIM=OFF -DMAKE_TOOLS=OFF ..
-    - make play
-  artifacts:
-    paths:
-      - build/bin/play
-  cache:
-    paths:
-      - /usr/lib/x86_64-linux-gnu/libglut*
+    stage: build
+    rules:
+      - if: $CI_COMMIT_BRANCH =~ $CI_DEFAULT_BRANCH
+        when: never
+      - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+        when: manual
+    before_script:
+      - apt update && apt -y install cmake autoconf libblas-dev liblapack-dev mesa-common-dev libglew-dev freeglut3-dev
+    script:
+      - mkdir -p build; cd build
+      - cmake -DMAKE_SIM=OFF -DMAKE_TOOLS=OFF ..
+      - make play
+    artifacts:
+      paths:
+        - build/bin/play
+    cache:
+      key: libglut-cache 
+      paths:
+        - /usr/lib/x86_64-linux-gnu/libglut*
        
 # run test simulation using the binary built before
 test_sim:
-  stage: test
-  when: manual
-  needs: ["make_sim"]
-  before_script:
-    - ldd build/bin/sim || true
-  script:
-    - build/bin/sim help
-    - mkdir -p run; cd run
-    - cp ../cym/aster.cym config.cym
-    - ../build/bin/sim
-    - cd ..
-  artifacts:
-    paths:
-      - run/
+    stage: test
+    rules:
+      - if: $CI_COMMIT_BRANCH =~ $CI_DEFAULT_BRANCH
+        when: never
+      - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+        when: manual
+    needs: ["make_sim"]
+    before_script:
+      - ldd build/bin/sim || true
+    script:
+      - build/bin/sim help
+      - mkdir -p run; cd run
+      - cp ../cym/aster.cym config.cym
+      - ../build/bin/sim
+      - cd ..
+    artifacts:
+      paths:
+        - run/
 
 # make image using Cytosim's run done before
 test_play:
-  stage: test
-  when: manual
-  needs: ["make_play"]
-  before_script:
-    - apt update && apt -y install mesa-common-dev
-  script:
-    - build/bin/play run image.tga frame=100
-  artifacts:
-    paths:
-      - run/image.tga
+    stage: test
+    rules:
+      - if: $CI_COMMIT_BRANCH =~ $CI_DEFAULT_BRANCH
+        when: never
+      - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+        when: manual
+    needs: ["make_play"]
+    before_script:
+      - apt update && apt -y install mesa-common-dev
+    script:
+      - build/bin/play run image.tga frame=100
+    artifacts:
+      paths:
+        - run/image.tga
