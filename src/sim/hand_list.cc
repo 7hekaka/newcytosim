@@ -54,7 +54,7 @@ void HandList::remove(Hand * n)
 void HandList::updateAll() const
 {
     for ( Hand * h = haFront; h; h = h->next() )
-        h->interpolate();
+        h->reinterpolate();
 }
 
 
@@ -66,6 +66,8 @@ void HandList::detachAll()
     while ( h )
     {
         Hand * n = h->next();
+        // need to update since upon detachment Hands will need their position:
+        h->reinterpolate();
         // no need to update Lattice here:
         h->Hand::detach();
         h = n;

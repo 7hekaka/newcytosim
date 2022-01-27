@@ -104,10 +104,10 @@ public:
     const Interpolation& interpolation() const { assert_false(bad()); return hTerp; }
     
     /// update the Interpolation
-    void interpolate() const { hTerp = hFiber->interpolate(hAbs); }
+    void reinterpolate() const { hTerp = hFiber->interpolate(hAbs); }
     
     /// move to a different abscissa on the current fiber
-    void moveTo(real a) { hAbs = a; interpolate(); }
+    void moveTo(real a) { hAbs = a; reinterpolate(); }
 
     /// relocate to MINUS_END of current fiber
     void relocateM();

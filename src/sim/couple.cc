@@ -353,31 +353,31 @@ bool Couple::permitAttachment(FiberSite const& sit, Hand const* h) const
             return true;
             
         case CoupleProp::BIND_PARALLEL:
-            sit.interpolate();
+            sit.reinterpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) < 0.5 )
                 return false;
             break;
             
         case CoupleProp::BIND_NOT_PARALLEL:
-            sit.interpolate();
+            sit.reinterpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) > 0.5 )
                 return false;
             break;
   
         case CoupleProp::BIND_ANTIPARALLEL:
-            sit.interpolate();
+            sit.reinterpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) > -0.5 )
                 return false;
             break;
             
         case CoupleProp::BIND_NOT_ANTIPARALLEL:
-            sit.interpolate();
+            sit.reinterpolate();
             if ( dot(sit.dirFiber(), that->dirFiber()) < -0.5 )
                 return false;
             break;
             
         case CoupleProp::BIND_ORTHOGONAL:
-            sit.interpolate();
+            sit.reinterpolate();
             if ( abs_real(dot(sit.dirFiber(), that->dirFiber())) > 0.866025 )
                 return false;
             break;
@@ -577,8 +577,8 @@ void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
 #if 0
         // it can be nice to set the position, but not essential
-        if ( attached1() ) cHand1->interpolate();
-        if ( attached2() ) cHand2->interpolate();
+        if ( attached1() ) cHand1->reinterpolate();
+        if ( attached2() ) cHand2->reinterpolate();
         cPos = position();
 #endif
     }

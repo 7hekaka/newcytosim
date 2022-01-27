@@ -14,7 +14,7 @@ FiberSite::FiberSite(Fiber* f, real a)
     hLattice = nullptr;
     hSite = 0;
 #endif
-    //interpolate();
+    //reinterpolate();
 }
 
 
@@ -197,7 +197,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
             throw InvalidIO("unexpected class in FiberSite");
         }
 
-        // interpolate() will be called in updateFiber();
+        // reinterpolate() will be called in updateFiber();
         //checkAbscissa();
     }
 }

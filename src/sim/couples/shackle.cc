@@ -38,7 +38,7 @@ void Shackle::stepAA()
     //std::clog << "Shackle " << proj.abscissa() - cHand1->abscissa() << '\n';
     cHand1->moveTo(a);
     // need to update to calculate force:
-    cHand1->interpolate();
+    cHand1->reinterpolate();
     
     Vector f = force();
     real fn = f.norm();

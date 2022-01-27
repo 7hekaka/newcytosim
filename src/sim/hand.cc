@@ -71,7 +71,7 @@ void Hand::resetTimers()
 Vector Hand::posSide() const
 {
     // needed if the interpolation is not up-to-date
-    //interpolate();
+    //reinterpolate();
 #if ( DIM < 2 )
     /*
      Relocate the Couple unbound position vector to where it is attached.
@@ -105,7 +105,7 @@ void Hand::relocate(Fiber* f)
 #endif
     }
     f->addHand(this);
-    interpolate();
+    reinterpolate();
 }
 
 
@@ -126,7 +126,7 @@ void Hand::relocate(Fiber* f, const real a)
         f->addHand(this);
     }
     hAbs = a;
-    interpolate();
+    reinterpolate();
 }
 
 
@@ -230,13 +230,13 @@ void Hand::locate(Fiber* f, real a)
 {
     assert_true(f);
     assert_true(!hFiber);
-    //assert_true(f->abscissaM() <= a + REAL_EPSILON);
-    //assert_true(a <= f->abscissaP() + REAL_EPSILON);
+    assert_true(f->abscissaM() <= a + REAL_EPSILON);
+    assert_true(a <= f->abscissaP() + REAL_EPSILON);
 
     hAbs = a;
     hFiber = f;
     f->addHand(this);
-    interpolate();
+    reinterpolate();
     hMonitor->afterAttachment(this);
     nextDetach = RNG.exponential();
 }

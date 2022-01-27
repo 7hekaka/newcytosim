@@ -340,7 +340,7 @@ void Fiber::cutM(real len)
         if ( h->abscissa() < abs )
             h->detach();
         else
-            h->interpolate();
+            h->reinterpolate();
         h = x;
     }
 }
@@ -363,7 +363,7 @@ void Fiber::cutP(real len)
         if ( h->abscissa() > abs )
             h->detach();
         else
-            h->interpolate();
+            h->reinterpolate();
         h = x;
     }
 }
@@ -423,7 +423,7 @@ Fiber* Fiber::severPoint(size_t pti)
         if ( h->abscissa() > abs )
             h->relocate(fib);
         else
-            h->interpolate();
+            h->reinterpolate();
         h = x;
     }
     
@@ -494,7 +494,7 @@ Fiber* Fiber::severP(real abs)
         if ( h->abscissa() >= abs )
             h->relocate(fib);
         else
-            h->interpolate();
+            h->reinterpolate();
         h = x;
     }
 
@@ -1168,7 +1168,7 @@ void Fiber::updateHands()
     {
         Hand * x = h->next();
         assert_true(h->fiber()==this);
-        // this is equivalent to h->interpolate();
+        // this is equivalent to h->reinterpolate():
         h->hTerp = interpolateM(h->abscissa() - M);
         // must iterate ahead, because `checkFiberRange` may lead to detachment:
         h->checkFiberRange(M, P);
