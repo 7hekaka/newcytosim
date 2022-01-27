@@ -1,124 +1,126 @@
 #!/usr/bin/env python3
 # A script to run simulations on the fly sequentially.
-# Copyright F. J. Nedelec, 22.3.2019
+# Copyright F. J. Nedelec, 22.3.2019, 27.01.2022
 
 
 """
     Run simulations sequentially and analyze the results on the fly.
  
-Syntax:
+Usage:
 
     screen.py executable template_config_file [repeat]
     
     [repeat] is an optional integer specifying the number of run for each config file.
     
-    This will uses 'preconfig.py' to vary the parameters, and the template
+    This will use 'preconfig.py' to vary parameter values, and the template
     file should be written accordingly (see `preconfig.py' documentation)
-    Copy `preconfig.py' into the directory.
- 
-F. Nedelec, 30.01.2020
+    Copy `preconfig.py' in your working directory.
+
+F. Nedelec, 30.01.2020, 27.01.2022
 """
 
-# Loading modules 
 try:
-    import os, sys, math, random, subprocess
-except ImportError:
-    sys.stderr.write("could not load essential python modules\n")
+    import os, sys, math, random, subprocess, preconfig
+except ImportError as e:
+    sys.stderr.write("Error loading module: %s\n"%str(e))
     sys.exit()
-
-try:
-    import preconfig
-except ImportError:
-    sys.stderr.write("could not load `preconfig'\n")
-    sys.exit()
-
 
 out = sys.stdout  #open("screen.txt", 'w')
 err = sys.stderr
 
+def error(arg):
+    err.write(arg)
+    sys.exit()
+
 #------------------------------------------------------------------------
 
-def job(execut, config, values, repeat):
+def run_one(simex, conf):
+    """
+        Run simulation in current working directory and return its output
+    """
+    try:
+        # simulation started as a subprocess
+        sub = subprocess.Popen([simex, '-', conf], stdout=subprocess.PIPE)
+        # get output from simulation
+        out, err = sub.communicate()
+        if err:
+            error("Subprocess failed in %s: %s\n" %(os.getcwd(), err))
+        return out.decode()
+    except Exception as e:
+        err.write("Failed: %s\n" % repr(e));
+    return ''
+
+
+def extract_data(text):
+    """ This reads the output of 'report fiber:length' """
+    val = []
+    for line in text.split('\n'):
+        s = line.split()
+        if len(s) == 7 and s[0] == 'filament':
+            val.append(float(s[2]));
+    # return mean of the length:
+    if val:
+        return sum(val)/len(val)
+    return 0
+
+
+def run_job(simex, config, values):
+    """ Generate files using preconfig and run one simulation for each file """
+    files = preconfig.Preconfig().parse(config, values)
     res = []
-    # Vary parameters and generate files in current folder:
-    confs = preconfig.Preconfig().parse(config, values, repeat, '')
-    # Run simulation:
-    for conf in confs:
-        sub = subprocess.Popen([execut, '-', conf], stdout=subprocess.PIPE)
-        # Get results from standard output:
-        val = []
-        for data in sub.stdout:
-            line = data.decode("utf-8").split()
-            #print(line)
-            if len(line) == 9:
-                if line[1] == '1':
-                    val.append(float(line[4]));
-                else:
-                    val.append(-float(line[4]));    
-        sub.stdout.close()
-        # calculate mean of the values:
-        res.append(sum(val)/len(val))
+    for conf in files:
+        text = run_one(simex, conf)
+        res.append(extract_data(text))
     return res
 
 
-#------------------------------------------------------------------------
+def run_many(simex, config, repeat):
+    """ Vary a parameter value and calls run_job() """
+    for i in range(repeat):
+        X = round(random.uniform(0, 0.040), 6)
+        res = run_job(simex, config, {'X':X})
+        out.write("\n%9.6f    " % (X))
+        for Y in res:
+            out.write(" %9.4f" % Y)
+        out.flush()
+    out.write("\n")
+
+#-------------------------------------------------------------------------------
 
 def executable(arg):
     return os.path.isfile(arg) and os.access(arg, os.X_OK)
 
-
 def main(args):
     config = ''
     repeat = 1
-    execut = ''
-    
+    simex = ''
     # parse arguments list:
     for arg in args:
         if arg.isdigit():
             repeat = int(arg)
         elif executable(arg):
-            if execut:
-                err.write("Error: executable `%s' was already specified\n" % execut)
-                sys.exit()
-            execut = os.path.abspath(os.path.expanduser(arg))
+            if simex:
+                error("Error: executable `%s' was already specified\n" % simex)
+            simex = os.path.abspath(os.path.expanduser(arg))
         elif os.path.isfile(arg):
             if config:
-                err.write("Error: duplicate `%s' specified\n" % arg)
-                sys.exit()
+                error("Error: duplicate `%s' specified\n" % arg)
             config = arg
         else:
-            err.write("Error: unexpected argument `%s'\n" % arg)
-            sys.exit()
-
-    if not executable(execut):
-        err.write("Error: executable `%s' could not be found\n" % execut)
-        sys.exit()
-
+            error("Error: unexpected argument `%s'\n" % arg)
+    # check
+    if not simex:
+        error("Error: executable `%s' could not be found\n" % simex)
     if not config:
-        err.write("You must specify a config file on the command line\n")
-        sys.exit()
-
-    # run the simulations varying the parameter
-    for k in range(1000):
-        R = round(random.uniform(1,10),3)
-        L = 10 #round(random.uniform(2,10),3)
-        H = round(random.uniform(0,10),3)
-        # rescaling factor:
-        X = L * L / ( math.pi * math.pi * R );
-        res = job(execut, config, {'L':L, 'H':H, 'R':R}, repeat)
-        out.write("\n%9.3f %9.3f %9.3f    " % (L, H, H/L))
-        for val in res:
-            out.write(" %9.3f" % (val*X))
-        out.flush()
+        error("You must specify a template file on the command line\n")
+    # run stuff
+    run_many(simex, config, repeat)
 
 
-#------------------------------------------------------------------------
-
+#-------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1]=='help':
         print(__doc__)
     else:
         main(sys.argv[1:])
-
-

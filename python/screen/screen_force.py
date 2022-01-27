@@ -36,7 +36,7 @@ def parameters(index):
     return dic
 
 
-def job(execut, template, index):
+def job(simex, template, index):
     """
         Run one simulation and ouput result as one line in 'out'
     """
@@ -47,7 +47,7 @@ def job(execut, template, index):
         file.write(content)
         file.close()
     # run simulation:
-    sub = subprocess.Popen([execut, '-', 'config.cym'], stdout=subprocess.PIPE)
+    sub = subprocess.Popen([simex, '-', 'config.cym'], stdout=subprocess.PIPE)
     # get result from standard output:
     line = sub.stdout.readline().encode("utf-8")
     while line.startswith('%'):
@@ -72,17 +72,17 @@ def executable(arg):
 def main(args):
     config = ''
     repeat = 1
-    execut = ''
+    simex = ''
     
     # parse arguments list:
     for arg in args:
         if arg.isdigit():
             repeat = int(arg)
         elif executable(arg):
-            if execut:
-                err.write("Error: executable `%s' was already specified\n" % execut)
+            if simex:
+                err.write("Error: executable `%s' was already specified\n" % simex)
                 sys.exit()
-            execut = os.path.abspath(os.path.expanduser(arg))
+            simex = os.path.abspath(os.path.expanduser(arg))
         elif os.path.isfile(arg):
             if config:
                 err.write("Error: config `%s' was already specified\n" % config)
@@ -92,8 +92,8 @@ def main(args):
             err.write("Error: unexpected argument `%s'\n" % arg)
             sys.exit()
 
-    if not executable(execut):
-        err.write("Error: executable '%s' could not be found\n" % execut)
+    if not executable(simex):
+        err.write("Error: executable '%s' could not be found\n" % simex)
         sys.exit()
 
     if not config:
@@ -109,7 +109,7 @@ def main(args):
 
     #run the simulations
     for i in range(repeat):
-        job(execut, template, i)
+        job(simex, template, i)
 
 
 #------------------------------------------------------------------------

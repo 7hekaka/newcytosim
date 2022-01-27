@@ -13,7 +13,7 @@ Syntax:
     Bracketted arguments are optional.
     [repeat] is an integer specifying the number of run for each config file.
     
-    This will uses 'preconfig.py' to vary the parameters, and the template 
+    This will use 'preconfig.py' to vary the parameters, and the template 
     file should be written accordingly (see `preconfig.py' documentation)
  
 F. Nedelec, 14.03.2016
@@ -37,7 +37,7 @@ def uncode(arg):
 
 #------------------------------------------------------------------------
 
-def job(execut, config):
+def job(simex, config):
     # Vary parameters and generate files in folder 'cym':
     confs = pre_config.parse(config, {}, 1, 'cym')
     for conf in confs:
@@ -49,7 +49,7 @@ def job(execut, config):
         except Exception as e:
             out.write(repr(e))
         # Run simulation
-        sub = subprocess.Popen([execut, '-', conf], stdout=subprocess.PIPE)
+        sub = subprocess.Popen([simex, '-', conf], stdout=subprocess.PIPE)
         # Get results from standard output:
         for line in sub.stdout:
             spl = uncode(line).split()
@@ -82,17 +82,17 @@ def executable(arg):
 def main(args):
     config = ''
     repeat = 1
-    execut = ''
+    simex = ''
     
     # parse arguments list:
     for arg in args:
         if arg.isdigit():
             repeat = int(arg)
         elif executable(arg):
-            if execut:
-                err.write("Error: executable `%s' was already specified\n" % execut)
+            if simex:
+                err.write("Error: executable `%s' was already specified\n" % simex)
                 sys.exit()
-            execut = os.path.abspath(os.path.expanduser(arg))
+            simex = os.path.abspath(os.path.expanduser(arg))
         elif os.path.isfile(arg):
             if config:
                 err.write("Error: config `%s' was already specified\n" % config)
@@ -102,8 +102,8 @@ def main(args):
             err.write("Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     
-    if not executable(execut):
-        err.write("Error: executable '%s' could not be found\n" % execut)
+    if not executable(simex):
+        err.write("Error: executable '%s' could not be found\n" % simex)
         sys.exit()
 
     if not config:
@@ -117,7 +117,7 @@ def main(args):
 
     #run the simulations
     for i in range(repeat):
-        job(execut, config)
+        job(simex, config)
 
 
 #------------------------------------------------------------------------
