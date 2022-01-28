@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #include <cmath>
 #include "real.h"
@@ -9,19 +9,20 @@
  Calculate the projection P = (pX, pY) of the point W = (wX, wY) on the ellipse
  that is aligned with the X and Y axis, with radii (radX, radY).
  
- Method:
+ Method: A vector orthogonal to the ellipse at position (X, Y) is
  
- A vector orthogonal to the ellipse at position (X, Y) is
+     N = ( X / radX^2, Y / radY^2 )
  
-     N = ( X / radX^2, Y / radY^2 ),
- 
- and we can thus write W = P + h * N, leading to:
+ and we can thus write W = P + h * N, for some scalar 'h':
 
+     wX = pX + h * pX / radX^2
+     wY = pY + h * pY / radY^2
+ 
+ leading to, if wX and wY are not both null:
+ 
      pX = wX * radX^2 / ( radX^2 + h );
      pY = wY * radY^2 / ( radY^2 + h );
 
- if wX and wY are not both null.
- 
  Moreover, the projection should be on the ellipse and thus `h` should be a zero of:
  
      F(h) = ( pX / radX )^2 + ( pY / radY )^2 - 1
@@ -30,9 +31,7 @@
  to avoid problematic behavior. Finally, we use the formula above to calculate
  the projection.
  */
-void projectEllipse(real&   pX, real&  pY,
-                    real    wX, real   wY,
-                    real  radX, real radY)
+void projectEllipse(real& pX, real& pY, real wX, real wY, real radX, real radY)
 {
     assert_true( radX > 0 );
     assert_true( radY > 0 );
@@ -55,63 +54,60 @@ void projectEllipse(real&   pX, real&  pY,
     real bb = radY * radY;
     
     // we derive a lower limit for 'h' from  pX^2 + pY^2 > max(radX,radY)^2
-    real RR = std::max(aa, bb);
-    // 'hmin' is the minimum value that 'h' could have
-    real hmin = std::sqrt( ( wX*wX*aa*aa + wY*wY*bb*bb ) / RR ) - RR;
+    real h_min = std::max(aa, bb);
+    // 'h_min' is the minimum value that 'h' could have
+    h_min = std::sqrt( ( wX*wX*aa*aa + wY*wY*bb*bb ) / h_min ) - h_min;
     
     // we derive another lower limit for 'h' from  |pX| < radX
-    hmin = std::max(hmin, ( abs_real(wX) - radX ) * radX);
+    h_min = std::max(h_min, ( abs_real(wX) - radX ) * radX);
 
     // we derive another lower limit for 'h' from  |pY| < radY
-    hmin = std::max(hmin, ( abs_real(wY) - radY ) * radY);
+    h_min = std::max(h_min, ( abs_real(wY) - radY ) * radY);
 
     // if the point is outside, then 'h' should be positive:
-    if ( wX*wX/aa + wY*wY/bb > 1  &&  hmin < 0 )
-        hmin = 0;
+    if ( wX*wX/aa + wY*wY/bb > 1  &&  h_min < 0 )
+        h_min = 0;
     
-    real h_old, h = hmin;
+    real h_old, h = h_min;
 
-    //fprintf(stderr, " <<< %+.10f  %+.10f    hmin %+10.4f", wX, wY, hmin);
+    //fprintf(stderr, " <<< %+.10f  %+.10f    h_min %+10.4f", wX, wY, h_min);
 
     // follow Newton's iteration to find the root
     unsigned cnt = 0;
     do {
         real aah = aa + h;
         real bbh = bb + h;
-#if ( 0 )
-        pX = wX * aa / aah;
-        pY = wY * bb / bbh;
-         
-        real pXX = pX * pX / aa;
-        real pYY = pY * pY / bb;
-#else
+        
         real waX = wX / aah;
         real waY = wY / bbh;
         
         real pXX = waX * waX * aa;
         real pYY = waY * waY * bb;
+#if ( 0 )
+        // will be set after exit
+        pX = waX * aa;
+        pY = waY * bb;
 #endif
         h_old = h;
         
-        real F    = 1 - ( pXX         + pYY       );
-        real dF   = 2 * ( pXX / aah   + pYY / bbh );
-#if ( 0 )
-        real ddF  =   - pXX / ( aah * aah ) - pYY / ( bbh * bbh );  // * 2
+        real F   = 1 - ( pXX       + pYY       );
+        real dF  = 2 * ( pXX / aah + pYY / bbh );
+#if ( 1 )
+        // Newtons' method
+        h -= F / dF;
+#else
+        real ddF = - pXX / ( aah * aah ) - pYY / ( bbh * bbh );  // * 2
         //dddF =    + pXX / ( aah * aah * aah ) + pYY / ( bbh * bbh * bbh );  // * 6
         //fprintf(stderr, "       %+.10f   %+.10f   %+.10f\n", F, dF, ddF);
 
         // Halley's method convergence is cubic in general
         h -= ( F * dF ) / ( dF * dF - F * ddF );
-#else
-        // Newtons' method
-        h -= F / dF;
 #endif
-        
         //fprintf(stderr, "  %i : h %+f  F %+20.16f  dF %+20.16f  dh %e\n", cnt, h, F, dF, h-h_old);
         
-        if ( h < hmin )
+        if ( h < h_min )
         {
-            h = 0.5 * ( h_old + hmin );
+            h = 0.5 * ( h_old + h_min );
             continue;
         }
         
@@ -160,13 +156,11 @@ void projectEllipse(real&   pX, real&  pY,
  We follow Newton's rule to find the root of F(h), and use the formula above to
  calculate the projection.
  */
-void projectEllipsoid(real  p[3],
-                      const real w[3],
-                      const real rad[3])
+void projectEllipsoid(real  p[3], const real w[3], const real rad[3])
 {
-    assert_true( rad[0]==rad[0] && rad[0] > 0 );
-    assert_true( rad[1]==rad[1] && rad[1] > 0 );
-    assert_true( rad[2]==rad[2] && rad[2] > 0 );
+    assert_true( rad[0] > 0 );
+    assert_true( rad[1] > 0 );
+    assert_true( rad[2] > 0 );
     
     // handle the pathological cases:
     if ( w[0] == 0 )
@@ -193,26 +187,27 @@ void projectEllipsoid(real  p[3],
     real cc = rad[2] * rad[2];
 
     // we derive a lower limit for 'h' from  pX^2 + pY^2 + pZ^2 < max(radX,radY,radZ)^2
-    real RR = std::max(aa, std::max(bb,cc));
-    // 'hmin' is the minimum value that 'h' can have
-    real hmin = std::sqrt( ( w[0]*w[0]*aa*aa + w[1]*w[1]*bb*bb + w[2]*w[2]*cc*cc ) / RR ) - RR;
+    real h_min = std::max(aa, std::max(bb,cc)); // used as temporary
+    
+    // 'h_min' is the minimum value that 'h' can have
+    h_min = std::sqrt( ( w[0]*w[0]*aa*aa + w[1]*w[1]*bb*bb + w[2]*w[2]*cc*cc ) / h_min ) - h_min;
 
     // we derive another lower limit for 'h' from  |pX| < radX
-    hmin = std::max(hmin, ( abs_real(w[0]) - rad[0] ) * rad[0]);
+    h_min = std::max(h_min, ( abs_real(w[0]) - rad[0] ) * rad[0]);
 
     // we derive another lower limit for 'h' from  |pY| < radY
-    hmin = std::max(hmin, ( abs_real(w[1]) - rad[1] ) * rad[1]);
+    h_min = std::max(h_min, ( abs_real(w[1]) - rad[1] ) * rad[1]);
     
     // we derive another lower limit for 'h' from  |pZ| < radZ
-    hmin = std::max(hmin, ( abs_real(w[2]) - rad[2] ) * rad[2]);
+    h_min = std::max(h_min, ( abs_real(w[2]) - rad[2] ) * rad[2]);
 
-    if ( w[0]*w[0]/aa + w[1]*w[1]/bb + w[2]*w[2]/cc > 1  &&  hmin < 0 )
+    if ( w[0]*w[0]/aa + w[1]*w[1]/bb + w[2]*w[2]/cc > 1  &&  h_min < 0 )
     {
         // if the point is outside, then 'h' should be positive:
-        hmin = 0;
+        h_min = 0;
     }
 
-    real h_old, h = hmin;
+    real h_old, h = h_min;
     //fprintf(stderr, "----- h %+f\n", h);
 
     /*
@@ -224,15 +219,7 @@ void projectEllipsoid(real  p[3],
         real aah = aa + h;
         real bbh = bb + h;
         real cch = cc + h;
-#if ( 0 )
-        real pX = w[0] * aa / aah;
-        real pY = w[1] * bb / bbh;
-        real pZ = w[2] * cc / cch;
-        
-        real pXX = pX * pX / aa;
-        real pYY = pY * pY / bb;
-        real pZZ = pZ * pZ / cc;
-#else
+
         real waX = w[0] / aah;
         real waY = w[1] / bbh;
         real waZ = w[2] / cch;
@@ -240,27 +227,30 @@ void projectEllipsoid(real  p[3],
         real pXX = waX * waX * aa;
         real pYY = waY * waY * bb;
         real pZZ = waZ * waZ * cc;
+#if ( 1 )
+        p[0] = waX * aa;
+        p[1] = waY * bb;
+        p[2] = waZ * cc;
 #endif
         h_old = h;
 
-        real   F = 1 - ( pXX         + pYY         + pZZ       );
-        real  dF = 2 * ( pXX / aah   + pYY / bbh   + pZZ / cch );
-#if ( 0 )
-        real ddF =   - pXX/(aah*aah) - pYY/(bbh*bbh) - pZZ/(cch*cch);  // * 2
+        real  F = 1 - ( pXX       + pYY       + pZZ       );
+        real dF = 2 * ( pXX / aah + pYY / bbh + pZZ / cch );
+#if ( 1 )
+        // Newton's method
+        h -= F / dF;
+#else
+        real ddF = - pXX/(aah*aah) - pYY/(bbh*bbh) - pZZ/(cch*cch);  // * 2
         
         // Halley's method convergence is cubic in general
         h -= ( F * dF ) / ( dF * dF - F * ddF );
-#else
-        // Newton's method
-        h -= F / dF;
 #endif
-        
         //fprintf(stderr, "  %i : h %+f  F %+e dh %+.20f\n", cnt, h_old, F, h-h_old);
         //fprintf(stderr, "       %+.10f   %+.10f   %+.10f   %+.10f\n", F, F/dF, ddF/dF, dddF/dF);
 
-        if ( h < hmin )
+        if ( h < h_min )
         {
-            h = 0.5 * ( h_old + hmin );
+            h = 0.5 * ( h_old + h_min );
             continue;
         }
 
