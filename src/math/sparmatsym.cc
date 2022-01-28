@@ -308,7 +308,7 @@ void SparMatSym::printSparse(std::ostream& os, real, size_t start, size_t stop) 
 }
 
 
-void SparMatSym::printColumns(std::ostream& os, size_t start, size_t stop)
+void SparMatSym::printSummary(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_);
     os << "SMS size " << size_ << ":";

@@ -501,7 +501,7 @@ void SparMatSymBlk::printSparse(std::ostream& os, real inf, size_t start, size_t
 }
 
 
-void SparMatSymBlk::printColumns(std::ostream& os, size_t start, size_t stop)
+void SparMatSymBlk::printSummary(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_);
     os << "SMSB size " << size_ << ":";
@@ -647,7 +647,7 @@ bool SparMatSymBlk::prepareForMultiply(int)
         return false;
     
     sortElements();
-    //printColumns(std::cout);
+    //printSummary(std::cout);
     return true;
 }
 

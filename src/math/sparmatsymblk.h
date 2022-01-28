@@ -278,7 +278,7 @@ public:
     void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
 
     /// print size of columns
-    void printColumns(std::ostream&, size_t start, size_t stop);
+    void printSummary(std::ostream&, size_t start, size_t stop);
     
     /// debug function
     int bad() const;

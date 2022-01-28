@@ -60,13 +60,54 @@ private:
     /// allocate column to hold specified number of values
     void allocateColumn(size_t jj, unsigned nb);
     
+    /// allocate column to hold specified number of values
+    void deallocateColumn(size_t jj);
+
     /// update colidx_[], a pointer to the next non-empty column
     void setColumnIndex();
     
 #if SPARMAT1_OPTIMIZED_MULTIPLY
 
-    ///array of index for the optmized multiplication
-    ///@todo migrate to DSS Symmetric Matrix Storage format
+    /*
+     The row-indexed scheme sets up two one-dimensional arrays: sa and ija.
+     sa[] stores matrix element values as real
+     ija[] stores integer values.
+     The storage rules are:
+     * The first N locations of sa[] store A’s diagonal matrix elements, in order.
+       (Diagonal elements are stored even if they are zero; this is at most a slight storage
+       inefficiency, since diagonal elements are nonzero in most realistic applications.)
+     * Each of the first N locations of ija[] stores the index of the array sa[] that
+       contains the first off-diagonal element of the corresponding row of the matrix.
+       (If there are no off-diagonal elements for that row, it is one greater than
+       the index in sa[] of the most recently stored element of a previous row.)
+     * ija[0] is always equal to N+2. (It can be read to determine N.)
+     * ija[N] is one greater than the index in sa[] of the last off-diagonal
+      element of the last row. (It can be read to determine the number of nonzero
+     elements in the matrix, or the number of elements in the arrays sa and ija.)
+     * sa[N] of is not used and can be set arbitrarily.
+     * Entries in sa[] at locations N+2 contain A’s off-diagonal values,
+       ordered by rows and, within each row, ordered by columns.
+      Entries in ija[] at locations N+2 contain the column number of the corresponding
+     element in sa[].
+
+    3: 0: 1: 0: 0:
+    0: 4: 0: 0: 0:
+    0: 7: 5: 9: 0:
+    0: 0: 0: 0: 2:
+    0: 0: 0: 6: 5:
+
+    In row-indexed compact storage, this 5x5 matrix is represented as follows:
+    ija[k]  6  7  7  9 10 11  2  1  3  4  3
+    sa[k]   3. 4. 5. 0. 5. X  1. 7. 9. 2. 6.
+     
+    The two arrays are of size 5 + nnz + 1, since there are nnz=5 off-diagonal non-zero elements.
+     
+     Here X is an arbitrary value. Notice that, according to the storage rules, the value of N
+     (namely 5) is N = ija[0]-1, and the length of each array is ija[N], namely 11.
+     The diagonal element in row i is sa[i], and the off-diagonal elements in that row are in
+     sa[k] where k loops from ija[i] to ija[i+1]-1, if the upper limit is greater or equal to
+     the lower one (as in C’s for loops).
+    */
     size_t nmax_;
     unsigned * ija_;
     real * sa_;
@@ -218,7 +259,7 @@ public:
     void printColumn(std::ostream&, size_t);
     
     /// print content of one column
-    void printColumns(std::ostream&, size_t start, size_t stop);
+    void printSummary(std::ostream&, size_t start, size_t stop);
 
     /// printf debug function in sparse mode: i, j : value
     void printSparseArray(std::ostream&) const;

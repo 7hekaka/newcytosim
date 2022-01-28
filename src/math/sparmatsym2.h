@@ -222,7 +222,7 @@ public:
     void printColumn(std::ostream&, size_t);
     
     /// print content of one column
-    void printColumns(std::ostream&, size_t start, size_t stop);
+    void printSummary(std::ostream&, size_t start, size_t stop);
 
     /// printf debug function in sparse mode: i, j : value
     void printSparseArray(std::ostream&) const;

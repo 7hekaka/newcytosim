@@ -485,7 +485,7 @@ void SparMatSymBlkDiag::printSparse(std::ostream& os, real inf, size_t start, si
 }
 
 
-void SparMatSymBlkDiag::printColumns(std::ostream& os, size_t start, size_t stop)
+void SparMatSymBlkDiag::printSummary(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_)/BLOCK_SIZE;
     os << "\nSMSBD size " << size_ << ":";
@@ -630,7 +630,7 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
     
     sortElements();
 
-    //printColumns(std::cout, 0, size_);
+    //printSummary(std::cout, 0, size_);
     return res;
 }
 

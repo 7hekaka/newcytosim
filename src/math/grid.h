@@ -281,12 +281,12 @@ public:
     {
         assert_true( ORD == 1 );
         
-        real  ax = 0.5 + MAP::map(0, xx);
+        real ax = 0.5 + MAP::map(0, xx);
         
 #if GRID_HAS_PERIODIC
-        int   ix = (int)std::floor(ax);
+        int ix = (int)std::floor(ax);
 #else
-        int   ix = (int)ax;
+        int ix = (int)ax;
 #endif
         
         ax -= ix;
@@ -303,15 +303,15 @@ public:
     {
         assert_true( ORD == 2 );
         
-        real  ax = 0.5 + MAP::map(0, w[0]);
-        real  ay = 0.5 + MAP::map(1, w[1]);
+        real ax = 0.5 + MAP::map(0, w[0]);
+        real ay = 0.5 + MAP::map(1, w[1]);
         
 #if GRID_HAS_PERIODIC
-        int   ix = (int)std::floor(ax);
-        int   iy = (int)std::floor(ay);
+        int ix = (int)std::floor(ax);
+        int iy = (int)std::floor(ay);
 #else
-        int   ix = (int)ax;
-        int   iy = (int)ay;
+        int ix = (int)ax;
+        int iy = (int)ay;
 #endif
         
         ax -= ix;
@@ -336,18 +336,18 @@ public:
     {
         assert_true( ORD == 3 );
         
-        real  ax = 0.5 + MAP::map(0, w[0]);
-        real  ay = 0.5 + MAP::map(1, w[1]);
-        real  az = 0.5 + MAP::map(2, w[2]);
+        real ax = 0.5 + MAP::map(0, w[0]);
+        real ay = 0.5 + MAP::map(1, w[1]);
+        real az = 0.5 + MAP::map(2, w[2]);
         
 #if GRID_HAS_PERIODIC
-        int   ix = (int)std::floor(ax);
-        int   iy = (int)std::floor(ay);
-        int   iz = (int)std::floor(az);
+        int ix = (int)std::floor(ax);
+        int iy = (int)std::floor(ay);
+        int iz = (int)std::floor(az);
 #else
-        int   ix = (int)ax;
-        int   iy = (int)ay;
-        int   iz = (int)az;
+        int ix = (int)ax;
+        int iy = (int)ay;
+        int iz = (int)az;
 #endif
         
         ax -= ix;

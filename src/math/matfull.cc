@@ -181,10 +181,10 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
                 y1 = fmadd4(streamload4(ptr+ 4), xx, y1);
                 y2 = fmadd4(streamload4(ptr+ 8), xx, y2);
                 y3 = fmadd4(streamload4(ptr+12), xx, y3);
-                s0 = fmadd4(streamload4(ptr   +SB), yy, s0);
-                s1 = fmadd4(streamload4(ptr+ 4+SB), yy, s1);
-                s2 = fmadd4(streamload4(ptr+ 8+SB), yy, s2);
-                s3 = fmadd4(streamload4(ptr+12+SB), yy, s3);
+                s0 = fmadd4(streamload4(ptr+ SB), yy, s0);
+                s1 = fmadd4(streamload4(ptr+(SB+4)), yy, s1);
+                s2 = fmadd4(streamload4(ptr+(SB+8)), yy, s2);
+                s3 = fmadd4(streamload4(ptr+(SB+12)), yy, s3);
                 ptr += 2*SB;
             }
             y0 = add4(y0, s0);

@@ -815,9 +815,9 @@ vec4 SparMatBlk::Line::vecMul3DU(const real* X) const
             s0 = fmadd4(streamload4(M  ), A, s0);
             s1 = fmadd4(streamload4(M+4), A, s1);
             s2 = fmadd4(streamload4(M+8), A, s2);
-            t0 = fmadd4(streamload4(M  +SB), B, t0);
-            t1 = fmadd4(streamload4(M+4+SB), B, t1);
-            t2 = fmadd4(streamload4(M+8+SB), B, t2);
+            t0 = fmadd4(streamload4(M+SB), B, t0);
+            t1 = fmadd4(streamload4(M+(SB+4)), B, t1);
+            t2 = fmadd4(streamload4(M+(SB+8)), B, t2);
         }
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
@@ -884,12 +884,12 @@ vec4 SparMatBlk::Line::vecMul3DUU(const real* X) const
             s0 = fmadd4(streamload4(M   ), A, s0);
             s1 = fmadd4(streamload4(M+4 ), A, s1);
             s2 = fmadd4(streamload4(M+8 ), A, s2);
-            t0 = fmadd4(streamload4(M  +SB), B, t0);
-            t1 = fmadd4(streamload4(M+4+SB), B, t1);
-            t2 = fmadd4(streamload4(M+8+SB), B, t2);
-            u0 = fmadd4(streamload4(M  +SB*2), C, u0);
-            u1 = fmadd4(streamload4(M+4+SB*2), C, u1);
-            u2 = fmadd4(streamload4(M+8+SB*2), C, u2);
+            t0 = fmadd4(streamload4(M+ SB), B, t0);
+            t1 = fmadd4(streamload4(M+(SB+4)), B, t1);
+            t2 = fmadd4(streamload4(M+(SB+8)), B, t2);
+            u0 = fmadd4(streamload4(M+ SB*2), C, u0);
+            u1 = fmadd4(streamload4(M+(SB*2+4)), C, u1);
+            u2 = fmadd4(streamload4(M+(SB*2+8)), C, u2);
         }
         s0 = add4(s0, add4(t0, u0));
         s1 = add4(s1, add4(t1, u1));

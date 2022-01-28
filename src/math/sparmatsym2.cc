@@ -447,7 +447,7 @@ void SparMatSym2::printSparse(std::ostream& os, real inf, size_t start, size_t s
 }
 
 
-void SparMatSym2::printColumns(std::ostream& os, size_t start, size_t stop)
+void SparMatSym2::printSummary(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_);
     os << "SMS2 size " << size_ << ":";
@@ -660,31 +660,31 @@ bool SparMatSym2::prepareForMultiply(int dimension)
     /*
      Create the DSS sparse matrix storage.
      */
-    unsigned inx = 0;
+    unsigned cnt = 0;
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        rowDSS_[jj] = inx;
+        rowDSS_[jj] = cnt;
         if ( colsiz_[jj] > 0 )
         {
             Element * col = column_[jj];
             assert_true( col[0].inx == jj );
             for ( size_t n = 0; n < colsiz_[jj]; ++n )
             {
-                assert_true( inx < alcDSS_ );
-                valDSS_[inx] = col[n].val;
-                colDSS_[inx] = col[n].inx * dimension;
-                ++inx;
+                assert_true( cnt < alcDSS_ );
+                valDSS_[cnt] = col[n].val;
+                colDSS_[cnt] = col[n].inx * dimension;
+                ++cnt;
             }
         }
         else {
-            valDSS_[inx] = 0.0;
-            colDSS_[inx] = jj * dimension;
-            ++inx;
+            valDSS_[cnt] = 0.0;
+            colDSS_[cnt] = jj * dimension;
+            ++cnt;
         }
     }
-    if ( inx != nbe ) ABORT_NOW("internal error");
+    if ( cnt != nbe ) ABORT_NOW("internal error");
     if ( size_ > 0 )
-        rowDSS_[size_] = inx;
+        rowDSS_[size_] = cnt;
     
     //printSparse(std::clog, 0, 22, 28);
     //printSparseArray(std::clog);
