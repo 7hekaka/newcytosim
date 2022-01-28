@@ -162,22 +162,37 @@ sterile:
 
 
 #---------------------------- dependencies -------------------------------------
-.PHONY: dep
 
 #command used to build the dependencies files automatically
 MAKEDEP := g++ -std=gnu++14 -MM $(addprefix -I, $(SRCDIR))
 
-dep:
-	if ! test -d dep; then mkdir dep; else rm -f dep/*; fi
-	$(foreach file, $(wildcard src/base/*.cc),  $(MAKEDEP) $(file) >> dep/part0.dep; )
-	$(foreach file, $(wildcard src/math/*.cc),  $(MAKEDEP) $(file) >> dep/part1.dep; )
-	$(foreach file, $(wildcard src/sim/*.cc),   $(MAKEDEP) $(file) >> dep/part2.dep; )
-	$(foreach file, $(wildcard src/sim/*/*.cc), $(MAKEDEP) $(file) >> dep/part3.dep; )
-	$(foreach file, $(wildcard src/disp/*.cc),  $(MAKEDEP) $(file) >> dep/part4.dep; )
-	$(foreach file, $(wildcard src/play/*.cc),  $(MAKEDEP) $(file) >> dep/part5.dep; )
-	$(foreach file, $(wildcard src/tools/*.cc), $(MAKEDEP) $(file) >> dep/part6.dep; )
-	$(foreach file, $(wildcard src/test/*.cc),  $(MAKEDEP) $(file) >> dep/part7.dep; )
+.PHONY: dep
+dep: $(addsuffix .dep, $(addprefix dep/part, 0 1 2 3 4 5 6 7))
+	$(DONE)
 
+dep/part0.dep: src/base/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part0.dep; done)
+
+dep/part1.dep: src/math/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part1.dep; done)
+
+dep/part2.dep: src/sim/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part2.dep; done)
+
+dep/part3.dep: src/sim/*/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part3.dep; done)
+
+dep/part4.dep: src/disp/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part4.dep; done)
+
+dep/part5.dep: src/play/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part5.dep; done)
+
+dep/part6.dep: src/tools/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part6.dep; done)
+
+dep/part7.dep: src/test/*.cc
+	(for F in $^; do $(MAKEDEP) $$F >> dep/part7.dep; done)
 
 -include dep/part?.dep
 

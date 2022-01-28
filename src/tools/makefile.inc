@@ -109,9 +109,3 @@ micimage: stream_func.o exceptions.o random.o SFMT.o print_color.o backtrace.o
 	$(DONE)
 vpath micimage bin
 
-
-#----------------------------makedep--------------------------------------------
-
-dep/part7.dep:
-	$(MAKEDEP) $(wildcard src/tools/*.cc) > $@
-
