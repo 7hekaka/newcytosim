@@ -238,9 +238,9 @@ real& SparMatSym2::operator()(size_t i, size_t j)
     
     assert_true( colsiz_[jj]+1 <= colmax_[jj] );
     // shift all values above 'e', including 'e':
-    size_t n = (size_t)( e - col );
-    for ( size_t k = colsiz_[jj]; k > n; --k )
-        col[k] = col[k-1];
+    col += colsiz_[jj];
+    while ( --col >= e )
+        col[1] = col[0];
 
     // add the requested term
     e->reset(ii);
@@ -309,6 +309,7 @@ void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd,
         {
             size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
+            assert_true( ii >= jj );
             if ( ii < end )
             {
                 size_t i = amp * ( ii - start );
@@ -370,8 +371,9 @@ int SparMatSym2::bad() const
     {
         for ( size_t kk = 0 ; kk < colsiz_[jj] ; ++kk )
         {
-            if ( column_[jj][kk].inx >= size_ ) return 2;
-            if ( column_[jj][kk].inx <= jj )   return 3;
+            size_t inx = column_[jj][kk].inx;
+            if ( inx >= size_ ) return 2;
+            if ( inx <= jj ) return 3;
         }
     }
     return 0;
@@ -516,12 +518,12 @@ Attention: this assumes that col[0] is the diagonal element
 void SparMatSym2::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
-    const size_t jj = col[0].inx;
+    const auto jj = col[0].inx;
     const real X0 = X[jj];
     real Y0 = Y[jj] + col[0].val * X0;
     for ( size_t n = 1 ; n < cnt ; ++n )
     {
-        const size_t ii = col[n].inx;
+        const auto ii = col[n].inx;
         const real a = col[n].val;
         Y[ii] += a * X0;
         assert_true( ii > jj );
@@ -537,14 +539,14 @@ void SparMatSym2::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt
 void SparMatSym2::vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
-    const size_t jj = 2 * col[0].inx;
+    const auto jj = 2 * col[0].inx;
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
     real Y0 = Y[jj  ] + col[0].val * X0;
     real Y1 = Y[jj+1] + col[0].val * X1;
     for ( size_t n = 1 ; n < cnt ; ++n )
     {
-        const size_t ii = 2 * col[n].inx;
+        const auto ii = 2 * col[n].inx;
         const real a = col[n].val;
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
@@ -563,7 +565,7 @@ Attention: this assumes that col[0] is the diagonal element
 void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt) const
 {
     assert_true( cnt > 0 );
-    const size_t jj = 3 * col[0].inx;
+    const auto jj = 3 * col[0].inx;
     const real X0 = X[jj  ];
     const real X1 = X[jj+1];
     const real X2 = X[jj+2];
@@ -572,7 +574,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_
     real Y2 = Y[jj+2] + col[0].val * X2;
     for ( size_t n = 1 ; n < cnt ; ++n )
     {
-        const size_t ii = 3 * col[n].inx;
+        const auto ii = 3 * col[n].inx;
         const real a = col[n].val;
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
@@ -631,8 +633,11 @@ bool SparMatSym2::prepareForMultiply(int dimension)
     
 #if ( 0 )
     size_t cnt = 0;
-    for ( size_t jj = 0; jj < size_; ++jj )
-        cnt += ( colsiz_[jj] == 0 );
+    for ( size_t j = 0; j < size_; ++j )
+    {
+        cnt += ( colsiz_[j] == 0 );
+        //printColumn(std::clog, j);
+    }
     std::clog << "SparMatSym2 has " << cnt << " / " << size_ << " empty columns\n";
 #endif
 
@@ -822,12 +827,12 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
         #pragma nounroll
         for ( ; val < pause; val += 6 )
         {
-            const size_t i0 = inx[0];
-            const size_t i1 = inx[1];
-            const size_t i2 = inx[2];
-            const size_t i3 = inx[3];
-            const size_t i4 = inx[4];
-            const size_t i5 = inx[5];
+            const auto i0 = inx[0];
+            const auto i1 = inx[1];
+            const auto i2 = inx[2];
+            const auto i3 = inx[3];
+            const auto i4 = inx[4];
+            const auto i5 = inx[5];
             inx += 6;
             vec2 y0 = load2(Y+i0);
             vec2 y1 = load2(Y+i1);
@@ -877,10 +882,10 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const size_t i0 = inx[0];
-        const size_t i1 = inx[1];
-        const size_t i2 = inx[2];
-        const size_t i3 = inx[3];
+        const auto i0 = inx[0];
+        const auto i1 = inx[1];
+        const auto i2 = inx[2];
+        const auto i3 = inx[3];
         inx += 4;
         vec2 y0 = load2(Y+i0);
         vec2 y1 = load2(Y+i1);
@@ -980,10 +985,10 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
         //printi(ii, "indx");
-        const size_t i0 = inx[0];
-        const size_t i1 = inx[1];
-        const size_t i2 = inx[2];
-        const size_t i3 = inx[3];
+        const auto i0 = inx[0];
+        const auto i1 = inx[1];
+        const auto i2 = inx[2];
+        const auto i3 = inx[3];
         s0 = blend22(load2crap(Y+i0),s0);    // lo = Y
         s1 = blend22(load2crap(Y+i1),s1);    // lo = Y
         s2 = blend22(load2crap(Y+i2),s2);    // lo = Y

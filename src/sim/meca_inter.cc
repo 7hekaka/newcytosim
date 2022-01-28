@@ -1256,8 +1256,8 @@ void Meca::addTorque(Mecapoint const& ptA,
     else
     {
         add_iso(iiA, iiC, weight);
-        sub_iso(iiA, iiD, weight);
         sub_iso(iiB, iiC, weight);
+        sub_iso(iiA, iiD, weight);
         add_iso(iiB, iiD, weight);
     }
 #else
@@ -1394,9 +1394,16 @@ void Meca::addLink(Interpolation const& ptA,
     add_iso_diag(ii2, ww2);         // since cc2 == 1
 
     sub_iso(ii1, ii0, ww1 * cc0);
-    add_iso(ii2, ii0, ww0);         // since cc2 == 1
-    add_iso(ii2, ii1, ww1);         // since cc2 == 1
- 
+    if ( ii2 > ii0 )
+    {
+        add_iso(ii2, ii0, ww0);         // since cc2 == 1
+        add_iso(ii2, ii1, ww1);         // since cc2 == 1
+    }
+    else
+    {
+        add_iso(ii0, ii2, ww0);         // since cc2 == 1
+        add_iso(ii1, ii2, ww1);         // since cc2 == 1
+    }
     if ( modulo )
     {
 #if USE_GLOBAL_POSITION
@@ -1450,9 +1457,16 @@ void Meca::addLink(Mecapoint const& ptA,
     sub_iso_diag(ii1, ww1 * cc1);
     sub_iso_diag(ii2, ww2 * cc2);
 
-    add_iso(ii1, ii0, ww1);  // since cc0 == -1.0
-    add_iso(ii2, ii0, ww2);  // since cc0 == -1.0
-    
+    if ( ii1 > ii0 )
+    {
+        add_iso(ii1, ii0, ww1);  // since cc0 == -1.0
+        add_iso(ii2, ii0, ww2);  // since cc0 == -1.0
+    }
+    else
+    {
+        add_iso(ii0, ii1, ww1);  // since cc0 == -1.0
+        add_iso(ii0, ii2, ww2);  // since cc0 == -1.0
+    }
     sub_iso(ii2, ii1, ww2 * cc1);
   
     if ( modulo )
@@ -1515,14 +1529,22 @@ void Meca::addLink(Interpolation const& ptA,
     sub_iso_diag(ii3, ww3 * cc3);
 
     sub_iso(ii1, ii0, ww1 * cc0);
-    sub_iso(ii2, ii0, ww2 * cc0);
-    sub_iso(ii3, ii0, ww3 * cc0);
-    
-    sub_iso(ii2, ii1, ww2 * cc1);
-    sub_iso(ii3, ii1, ww3 * cc1);
-    
+    if ( ii0 > ii2 )
+    {
+        sub_iso(ii0, ii2, ww2 * cc0);
+        sub_iso(ii1, ii2, ww2 * cc1);
+        sub_iso(ii0, ii3, ww3 * cc0);
+        sub_iso(ii1, ii3, ww3 * cc1);
+    }
+    else
+    {
+        sub_iso(ii2, ii0, ww2 * cc0);
+        sub_iso(ii3, ii0, ww3 * cc0);
+        sub_iso(ii2, ii1, ww2 * cc1);
+        sub_iso(ii3, ii1, ww3 * cc1);
+    }
     sub_iso(ii3, ii2, ww3 * cc2);
-    
+
     if ( modulo )
     {
 #if USE_GLOBAL_POSITION
@@ -1557,13 +1579,12 @@ void Meca::addLink(Interpolation const& ptA,
  Point B in the vertex of a Mecable, at index 'pts'.
  */
 void Meca::addLink1(Interpolation const& pti,
-                    const size_t pts,
+                    const size_t ii0,
                     const real weight)
 {
     assert_true( weight >= 0 );
     
     // reduced indices:
-    const size_t ii0 = pts;
     const size_t ii1 = pti.matIndex1();
     const size_t ii2 = pti.matIndex2();
     
@@ -1582,10 +1603,17 @@ void Meca::addLink1(Interpolation const& pti,
     sub_iso_diag(ii1, ww1 * cc1);
     sub_iso_diag(ii2, ww2 * cc2);
     
-    add_iso(ii1, ii0, ww1);
-    add_iso(ii2, ii0, ww2);
+    if ( ii0 > ii1 )
+    {
+        add_iso(ii0, ii1, ww1);
+        add_iso(ii0, ii2, ww2);
+    }
+    else
+    {
+        add_iso(ii1, ii0, ww1);
+        add_iso(ii2, ii0, ww2);
+    }
     sub_iso(ii2, ii1, ww2 * cc1);
-    
     if ( modulo )
     {
         Vector off = interpolate2(vPTS, ii1, cc1, ii2, cc2) - interpolate1(vPTS, ii0);
@@ -1639,9 +1667,16 @@ void Meca::addLink2(Mecapoint const& ptA,
     sub_iso_diag(ii1, ww1 * cc1);
     sub_iso_diag(ii2, ww2 * cc2);
 
-    add_iso(ii1, ii0, ww1); // since cc0 == -1.0
-    add_iso(ii2, ii0, ww2); // since cc0 == -1.0
-    
+    if ( ii1 > ii0 )
+    {
+        add_iso(ii1, ii0, ww1); // since cc0 == -1.0
+        add_iso(ii2, ii0, ww2); // since cc0 == -1.0
+    }
+    else
+    {
+        add_iso(ii0, ii1, ww1); // since cc0 == -1.0
+        add_iso(ii0, ii2, ww2); // since cc0 == -1.0
+    }
     sub_iso(ii2, ii1, ww2 * cc1);
         
     if ( modulo )
@@ -1698,12 +1733,20 @@ void Meca::addLink2(Interpolation const& pti,
     sub_iso_diag(ii3, ww3 * cc3);
 
     sub_iso(ii1, ii0, ww1 * cc0);
-    sub_iso(ii2, ii0, ww2 * cc0);
-    sub_iso(ii3, ii0, ww3 * cc0);
-
-    sub_iso(ii2, ii1, ww2 * cc1);
-    sub_iso(ii3, ii1, ww3 * cc1);
-
+    if ( ii2 > ii0 )
+    {
+        sub_iso(ii2, ii0, ww2 * cc0);
+        sub_iso(ii3, ii0, ww3 * cc0);
+        sub_iso(ii2, ii1, ww2 * cc1);
+        sub_iso(ii3, ii1, ww3 * cc1);
+    }
+    else
+    {
+        sub_iso(ii0, ii2, ww2 * cc0);
+        sub_iso(ii1, ii2, ww2 * cc1);
+        sub_iso(ii0, ii3, ww3 * cc0);
+        sub_iso(ii1, ii3, ww3 * cc1);
+    }
     sub_iso(ii3, ii2, ww3 * cc2);
     
     if ( modulo )
@@ -1761,13 +1804,20 @@ void Meca::addLink3(Mecapoint const& ptA,
     sub_iso_diag(ii2, ww2 * cc2);
     sub_iso_diag(ii3, ww3 * cc3);
 
-    add_iso(ii1, ii0, ww1);
-    add_iso(ii2, ii0, ww2);
-    add_iso(ii3, ii0, ww3);
-    
+    if ( ii1 > ii0 )
+    {
+        add_iso(ii1, ii0, ww1);
+        add_iso(ii2, ii0, ww2);
+        add_iso(ii3, ii0, ww3);
+    }
+    else
+    {
+        add_iso(ii0, ii1, ww1);
+        add_iso(ii0, ii2, ww2);
+        add_iso(ii0, ii3, ww3);
+    }
     sub_iso(ii2, ii1, ww2 * cc1);
     sub_iso(ii3, ii1, ww3 * cc1);
-    
     sub_iso(ii3, ii2, ww3 * cc2);
         
     if ( modulo )
@@ -1830,17 +1880,26 @@ void Meca::addLink3(Interpolation const& pti,
     sub_iso_diag(ii4, ww4 * cc4);
 
     sub_iso(ii1, ii0, ww1 * cc0);
-    sub_iso(ii2, ii0, ww2 * cc0);
-    sub_iso(ii3, ii0, ww3 * cc0);
-    sub_iso(ii4, ii0, ww4 * cc0);
-    
-    sub_iso(ii2, ii1, ww2 * cc1);
-    sub_iso(ii3, ii1, ww3 * cc1);
-    sub_iso(ii4, ii1, ww4 * cc1);
-    
+    if ( ii2 > ii0 )
+    {
+        sub_iso(ii2, ii0, ww2 * cc0);
+        sub_iso(ii3, ii0, ww3 * cc0);
+        sub_iso(ii4, ii0, ww4 * cc0);
+        sub_iso(ii2, ii1, ww2 * cc1);
+        sub_iso(ii3, ii1, ww3 * cc1);
+        sub_iso(ii4, ii1, ww4 * cc1);
+    }
+    else
+    {
+        sub_iso(ii0, ii2, ww2 * cc0);
+        sub_iso(ii1, ii2, ww2 * cc1);
+        sub_iso(ii0, ii3, ww3 * cc0);
+        sub_iso(ii1, ii3, ww3 * cc1);
+        sub_iso(ii0, ii4, ww4 * cc0);
+        sub_iso(ii1, ii4, ww4 * cc1);
+    }
     sub_iso(ii3, ii2, ww3 * cc2);
     sub_iso(ii4, ii2, ww4 * cc2);
-    
     sub_iso(ii4, ii3, ww4 * cc3);
         
     if ( modulo )
@@ -1903,18 +1962,26 @@ void Meca::addLink4(Mecapoint const& ptA,
     sub_iso_diag(ii3, ww3 * cc3);
     sub_iso_diag(ii4, ww4 * cc4);
 
-    add_iso(ii1, ii0, ww1);
-    add_iso(ii2, ii0, ww2);
-    add_iso(ii3, ii0, ww3);
-    add_iso(ii4, ii0, ww4);
+    if ( ii1 > ii0 )
+    {
+        add_iso(ii1, ii0, ww1);
+        add_iso(ii2, ii0, ww2);
+        add_iso(ii3, ii0, ww3);
+        add_iso(ii4, ii0, ww4);
+    }
+    else
+    {
+        add_iso(ii0, ii1, ww1);
+        add_iso(ii0, ii2, ww2);
+        add_iso(ii0, ii3, ww3);
+        add_iso(ii0, ii4, ww4);
+    }
     
     sub_iso(ii2, ii1, ww2 * cc1);
     sub_iso(ii3, ii1, ww3 * cc1);
     sub_iso(ii4, ii1, ww4 * cc1);
-    
     sub_iso(ii3, ii2, ww3 * cc2);
     sub_iso(ii4, ii2, ww4 * cc2);
-    
     sub_iso(ii4, ii3, ww4 * cc3);
         
     if ( modulo )
@@ -1982,23 +2049,34 @@ void Meca::addLink4(Interpolation const& pti,
     sub_iso_diag(ii5, ww5 * cc5);
 
     sub_iso(ii1, ii0, ww1 * cc0);
-    sub_iso(ii2, ii0, ww2 * cc0);
-    sub_iso(ii3, ii0, ww3 * cc0);
-    sub_iso(ii4, ii0, ww4 * cc0);
-    sub_iso(ii5, ii0, ww5 * cc0);
-    
-    sub_iso(ii2, ii1, ww2 * cc1);
-    sub_iso(ii3, ii1, ww3 * cc1);
-    sub_iso(ii4, ii1, ww4 * cc1);
-    sub_iso(ii5, ii1, ww5 * cc1);
-    
+    if ( ii2 > ii0 )
+    {
+        sub_iso(ii2, ii0, ww2 * cc0);
+        sub_iso(ii3, ii0, ww3 * cc0);
+        sub_iso(ii4, ii0, ww4 * cc0);
+        sub_iso(ii5, ii0, ww5 * cc0);
+        
+        sub_iso(ii2, ii1, ww2 * cc1);
+        sub_iso(ii3, ii1, ww3 * cc1);
+        sub_iso(ii4, ii1, ww4 * cc1);
+        sub_iso(ii5, ii1, ww5 * cc1);
+    }
+    else
+    {
+        sub_iso(ii0, ii2, ww2 * cc0);
+        sub_iso(ii1, ii2, ww2 * cc1);
+        sub_iso(ii0, ii3, ww3 * cc0);
+        sub_iso(ii1, ii3, ww3 * cc1);
+        sub_iso(ii0, ii4, ww4 * cc0);
+        sub_iso(ii1, ii4, ww4 * cc1);
+        sub_iso(ii0, ii5, ww5 * cc0);
+        sub_iso(ii1, ii5, ww5 * cc1);
+    }
     sub_iso(ii3, ii2, ww3 * cc2);
     sub_iso(ii4, ii2, ww4 * cc2);
     sub_iso(ii5, ii2, ww5 * cc2);
-    
     sub_iso(ii4, ii3, ww4 * cc3);
     sub_iso(ii5, ii3, ww5 * cc3);
-    
     sub_iso(ii5, ii4, ww5 * cc4);
 
     if ( modulo )

@@ -243,9 +243,9 @@ real& SparMatSym1::operator()(size_t i, size_t j)
     
     assert_true( colsiz_[jj]+1 <= colmax_[jj] );
     // shift all values above 'e', including 'e':
-    size_t n = (size_t)( e - col );
-    for ( size_t k = colsiz_[jj]; k > n; --k )
-        col[k] = col[k-1];
+    col += colsiz_[jj];
+    while ( --col >= e )
+        col[1] = col[0];
 
     // add the requested term
     e->reset(ii);
@@ -463,7 +463,7 @@ void SparMatSym1::printSparse(std::ostream& os, real inf, size_t start, size_t s
 void SparMatSym1::printSummary(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_);
-    os << "% SparMatSym1 size " << size_ << ":";
+    os << "% SMS1 size " << size_ << ":";
     for ( size_t jj = start; jj < stop; ++jj )
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
@@ -647,10 +647,10 @@ bool SparMatSym1::prepareForMultiply(int dim)
     
 #if ( 0 )
     size_t cnt = 0;
-    for ( size_t j = colidx_[0]; j < size_; j = colidx_[j+1] )
+    for ( size_t j = 0; j < size_; ++j )
     {
-        printColumn(std::clog, j);
-        ++cnt;
+        cnt += ( colsiz_[j] == 0 );
+        //printColumn(std::clog, j);
     }
     std::clog << "SMS1 has " << cnt << " / " << size_ << " empty columns\n";
 #endif
@@ -984,9 +984,9 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj,
     vec4 s3 = setzero4();
     
     unsigned * inx = ija_ + start;
-    const real * val = sa_ + start;
-    const real * end = sa_ + stop;
-    const real * halt = end - 3;  // val+3 <= end-1  is  val < end-3;
+    const double * val = sa_ + start;
+    const double * end = sa_ + stop;
+    const double * halt = end - 3;  // val+3 <= end-1  is  val < end-3;
         // process 4 by 4:
     #pragma nounroll
     for ( ; val < halt; val += 4 )
@@ -1008,10 +1008,10 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj,
          The compiler can reorder instructions to avoid lattencies */
         //__m128i ii = _mm_slli_epi32(_mm_loadu_si128((__m128i*)(ija_+n)), 0x1);
         //printi(ii, "indx");
-        const size_t i0 = inx[0];
-        const size_t i1 = inx[1];
-        const size_t i2 = inx[2];
-        const size_t i3 = inx[3];
+        const auto i0 = inx[0];
+        const auto i1 = inx[1];
+        const auto i2 = inx[2];
+        const auto i3 = inx[3];
         s0 = blend22(load2crap(Y+i0),s0);    // lo = Y
         s1 = blend22(load2crap(Y+i1),s1);    // lo = Y
         s2 = blend22(load2crap(Y+i2),s2);    // lo = Y
