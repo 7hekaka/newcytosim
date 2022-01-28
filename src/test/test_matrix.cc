@@ -298,6 +298,7 @@ void testMatrix(MATRIX & mat,
     printf("\n%-32s ", mat.what().c_str());
     printf("set %9.2f  muladd %9.2f  alt %9.2f  mul %9.2f", ts, t1, t2, t3);
     checkMatrix(mat, size, x, y, z);
+    fflush(stdout);
 }
 
 
@@ -366,6 +367,7 @@ void testMatrixParallel(MATRIX & mat,
     printf("\n%-32s", mat.what().c_str());
     for ( int i = 0; i < sup; ++i )
         printf("  %luT %6.3f", 1<<i, t[i]);
+    fflush(stdout);
 }
 
 #endif
@@ -414,62 +416,73 @@ void testIsoMatrix(MATRIX & mat,
     mat.VECMULADDISO(x, z);
     printf("  isocheck %+16.6f ", checksum(size, x, z));
     
-#if ( 0 )
-    // compute checksum with another matrix class
-    SparMat1 ful;
-    ful.resize(size*DIM);
-    for ( size_t j = 0; j < size; ++j )
-    for ( size_t i = j; i < size; ++i )
+    if ( 1 )
     {
-        real a = mat(i, j);
-        if ( abs_real(a) > 0 )
-        {
-            for ( int d = 0; d < DIM; ++d )
-                ful(DIM*i+d, DIM*j+d) = a;
-        }
+        // compute checksum after manually copying to every subspace:
+        MATRIX ful;
+        ful.resize(size*DIM);
+        for ( size_t j = 0; j < size; ++j )
+            for ( size_t i = j; i < size; ++i )
+            {
+                real * a = mat.addr(i, j);
+                if ( a )
+                {
+                    for ( int d = 0; d < DIM; ++d )
+                        ful(DIM*i+d, DIM*j+d) = *a;
+                }
+            }
+        ful.prepareForMultiply(1);
+        zero_real(size, z);
+        ful.vecMulAdd(x, z);
+        printf("  %+16.6f ", checksum(size, x, z));
     }
-    ful.prepareForMultiply(1);
-    zero_real(size, z);
-    ful.vecMulAdd(x, z);
-    printf("  %+16.6f ", checksum(size, x, z));
-#endif
+    fflush(stdout);
 }
 
 
 void testMatrices(const size_t size, const size_t fill)
 {
-    printf("------ %iD size %lu  filled %.1f %% :", DIM, size, fill*100.0/size/size);
-
     size_t * inx = nullptr;
     size_t * iny = nullptr;
-    
-    setIndices(fill, iny, inx, size, DIM);
-    
     real * x = nullptr;
     real * y = nullptr;
     real * z = nullptr;
 
+    setIndices(fill, iny, inx, size, DIM);
     setVectors(DIM*size, x, y, z);
     alpha = RNG.sreal();
     
-#if 1
-    SparMat1 mat1; testMatrix(mat1, size, x, y, z, fill, inx, iny);
-    SparMat2 mat2; testMatrix(mat2, size, x, y, z, fill, inx, iny);
-#endif
-#if 1
-    SparMatB mat3; testMatrix(mat3, size, x, y, z, fill, inx, iny);
-    SparMatD mat4; testMatrix(mat4, size, x, y, z, fill, inx, iny);
-    //testMatrix(mat4, size, x, y, z, fill, inx, iny);
-    SparMatA mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
-#endif
+    printf("------ %iD size %lu  filled %.1f %% :", DIM, size, fill*100.0/size/size);
+    
+    constexpr bool check_iso = 0;
+    if ( 1 )
+    {
+        SparMat1 mat1;
+        SparMat2 mat2;
+        if ( check_iso )
+        {
+            testIsoMatrix(mat1, size, x, y, z, fill, inx, iny);
+            testIsoMatrix(mat2, size, x, y, z, fill, inx, iny);
+            testIsoMatrix(mat1, size, x, y, z, fill, inx, iny);
+            testIsoMatrix(mat2, size, x, y, z, fill, inx, iny);
+        }
+        else
+        {
+            testMatrix(mat1, size, x, y, z, fill, inx, iny);
+            testMatrix(mat2, size, x, y, z, fill, inx, iny);
+        }
+    }
+    if ( !check_iso )
+    {
+        SparMatB mat3; testMatrix(mat3, size, x, y, z, fill, inx, iny);
+        SparMatD mat4; testMatrix(mat4, size, x, y, z, fill, inx, iny);
+        //testMatrix(mat4, size, x, y, z, fill, inx, iny);
+        SparMatA mat5; testMatrix(mat5, size, x, y, z, fill, inx, iny);
 #ifdef _OPENMP
-    testMatrixParallel(mat5, size, x, y, z, fill, inx, iny);
-    checkMatrixParallel(mat5, size, x, y, z);
+        testMatrixParallel(mat5, size, x, y, z, fill, inx, iny);
+        checkMatrixParallel(mat5, size, x, y, z);
 #endif
-#if 0
-    testIsoMatrix(mat1, size, x, y, z, fill, inx, iny);
-    testIsoMatrix(mat2, size, x, y, z, fill, inx, iny);
-#endif
+    }
     printf("\n");
     
 #if ( 0 )

@@ -95,6 +95,16 @@ void SparMatSym1::allocate(size_t alc)
 }
 
 
+size_t SparMatSym1::allocated() const
+{
+    size_t res = 0;
+    if ( column_ )
+        for ( size_t i = 0; i < alloc_; ++i )
+            res += colmax_[i];
+    return res;
+}
+    
+
 void SparMatSym1::deallocate()
 {
     if ( column_ )
@@ -253,8 +263,13 @@ real* SparMatSym1::addr(size_t i, size_t j) const
 
 void SparMatSym1::reset()
 {
-    for ( size_t jj = 0; jj < size_; ++jj )
-        colsiz_[jj] = 0;
+    for ( size_t j = 0; j < size_; ++j )
+    {
+        Element * col = column_[j];
+        for ( size_t i = 0; i < colsiz_[j]; ++i )
+            col[i].val = 0;
+        //colsiz_[j] = 0;
+    }
 }
 
 
@@ -363,14 +378,18 @@ int SparMatSym1::bad() const
 }
 
 
-size_t SparMatSym1::nbElements(size_t start, size_t stop) const
+//all allocated elements are counted, even if zero
+size_t SparMatSym1::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
     assert_true( stop <= size_ );
-    //all allocated elements are counted, even if zero
+    alc = 0;
     size_t cnt = 0;
-    for ( size_t jj = start; jj < stop; ++jj )
-        cnt += colsiz_[jj];
+    for ( size_t j = start; j < stop; ++j )
+    {
+        alc += colmax_[j];
+        cnt += colsiz_[j];
+    }
     return cnt;
 }
 
@@ -388,15 +407,17 @@ size_t SparMatSym1::nbDiagonalElements(size_t start, size_t stop) const
 
 std::string SparMatSym1::what() const
 {
+    size_t alc;
+    size_t cnt = nbElements(0, size_, alc);
     std::ostringstream msg;
 #if SPARMAT1_USES_AVX
-    msg << "SMS1x " << nbElements();
+    msg << "SMS1x ";
 #elif SPARMAT1_USES_SSE
-    msg << "SMS1e " << nbElements();
+    msg << "SMS1e ";
 #else
-    msg << "SMS1 " << nbElements();
+    msg << "SMS1 ";
 #endif
-    msg << " (" << nbDiagonalElements(0, size_) << ")";
+    msg << cnt << " (" << alc << ")";
     return msg.str();
 }
 
@@ -633,9 +654,10 @@ bool SparMatSym1::prepareForMultiply(int dim)
      indices however start here at zero, and everything is shifted by one index,
      compared to numerical recipe's code.
      */
-    ija_[0] = size_+1;
+    unsigned inx = size_;
+    assert_true(inx == size_);
+    ija_[0] = inx+1;
     sa_[size_] = 42; // this is the arbitrary value
-    size_t inx = size_;
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( colsiz_[jj] > 0 )

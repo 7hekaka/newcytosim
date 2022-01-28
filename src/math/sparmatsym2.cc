@@ -101,6 +101,16 @@ void SparMatSym2::allocate(size_t alc)
 }
 
 
+size_t SparMatSym2::allocated() const
+{
+    size_t res = 0;
+    if ( column_ )
+        for ( size_t i = 0; i < alloc_; ++i )
+            res += colmax_[i];
+    return res;
+}
+
+
 void SparMatSym2::deallocate()
 {
     if ( column_ )
@@ -368,14 +378,18 @@ int SparMatSym2::bad() const
 }
 
 
-size_t SparMatSym2::nbElements(size_t start, size_t stop) const
+size_t SparMatSym2::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_);
     //all allocated elements are counted, even if zero
+    alc = 0;
     size_t cnt = 0;
-    for ( size_t jj = start; jj < stop; ++jj )
-        cnt += colsiz_[jj];
+    for ( size_t j = start; j < stop; ++j )
+    {
+        alc += colmax_[j];
+        cnt += colsiz_[j];
+    }
     return cnt;
 }
 
@@ -393,14 +407,17 @@ size_t SparMatSym2::nbDiagonalElements(size_t start, size_t stop) const
 
 std::string SparMatSym2::what() const
 {
+    size_t alc;
+    size_t cnt = nbElements(0, size_, alc);
     std::ostringstream msg;
 #if SPARMAT2_USES_AVX
-    msg << "SMS2x " << nbElements();
+    msg << "SMS2x ";
 #elif SPARMAT2_USES_SSE
-    msg << "SMS2e " << nbElements();
+    msg << "SMS2e ";
 #else
-    msg << "SMS2 " << nbElements();
+    msg << "SMS2 ";
 #endif
+    msg << cnt << " (" << alc << ")";
     return msg.str();
 }
 

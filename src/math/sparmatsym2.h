@@ -115,27 +115,30 @@ private:
 
 public:
     
-    /// return the size of the matrix
-    size_t size() const { return size_; }
-    
-    /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; }
-
-    /// base for destructor
-    void deallocate();
-    
     /// default constructor
     SparMatSym2();
     
     /// default destructor
     ~SparMatSym2()  { deallocate(); }
+
+    /// return the size of the matrix
+    size_t size() const { return size_; }
     
-    /// set to zero
-    void reset();
+    /// change the size of the matrix
+    void resize(size_t s) { allocate(s); size_=s; }
     
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t sz);
     
+    /// return total allocated memory
+    size_t allocated() const;
+
+    /// release memory
+    void deallocate();
+    
+    /// set to zero
+    void reset();
+
     /// return column at index j
     Element const* column(size_t j) const { return column_[j]; }
     
@@ -198,13 +201,13 @@ public:
     bool isNotZero() const;
     
     /// number of elements in columns [start, stop[
-    size_t nbElements(size_t start, size_t stop) const;
+    size_t nbElements(size_t start, size_t stop, size_t& alc) const;
     
     /// number of diagonal elements in columns [start, stop[
     size_t nbDiagonalElements(size_t start, size_t stop) const;
 
     /// number of elements in matrix
-    size_t nbElements() const { return nbElements(0, size_); }
+    size_t nbElements() const { size_t alc; return nbElements(0, size_, alc); }
 
     /// returns a string which a description of the type of matrix
     std::string what() const;
