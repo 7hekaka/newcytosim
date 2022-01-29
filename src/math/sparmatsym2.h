@@ -67,7 +67,7 @@ private:
 #if SPARMAT2_OPTIMIZED_MULTIPLY
 
     /// data for the Distributed Symmetric Matrix Storage format (DSS format)
-    unsigned   alcDSS_;  ///< number of values allocated in valDSS_[] and colDSS_[]
+    size_t     alcDSS_;  ///< number of values allocated in valDSS_[] and colDSS_[]
     real     * valDSS_;  ///< non-zero entries of the matrix
     unsigned * colDSS_;  ///< colDSS_[i] is the index of valDSS_[i]
     unsigned * rowDSS_;  ///< rowDSS_[j] is the index where j-column starts in colDSS_[]
@@ -75,13 +75,13 @@ private:
 #endif
     
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt) const;
+    static void vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 2D version
-    void vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt) const;
+    static void vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 3D version
-    void vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt) const;
+    static void vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt);
 
 
     /// One column multiplication of a vector

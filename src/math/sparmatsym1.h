@@ -78,13 +78,13 @@ private:
 #endif
     
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    static void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 2D version
-    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    static void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 3D version
-    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
+    static void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt);
 
 
     /// One column multiplication of a vector

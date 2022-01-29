@@ -452,7 +452,7 @@ void SparMatSym2::printSparse(std::ostream& os, real inf, size_t start, size_t s
 void SparMatSym2::printSummary(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_);
-    os << "SMS2 size " << size_ << ":";
+    os << "SparseMatSym2 size " << size_ << ":";
     for ( size_t jj = start; jj < stop; ++jj )
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
@@ -466,14 +466,23 @@ void SparMatSym2::printSummary(std::ostream& os, size_t start, size_t stop)
 
 void SparMatSym2::printColumn(std::ostream& os, const size_t jj)
 {
+    std::streamsize p = os.precision();
+    os.precision(1);
     Element const* col = column_[jj];
-    os << "SMS2 col " << jj << ":";
+    os << "SparseMatSym2 col " << jj << ":";
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
     {
-        os << "\n" << col[n].inx << " :";
-        os << " " << col[n].val;
+        real v = col[n].val;
+        if ( ! v )
+            os << " !";  // this is a waste
+        else if ( abs_real(v) < REAL_EPSILON )
+            os << " *";  // this element could be removed
+        else
+            os << " ";
+        os << col[n].inx << " (" << std::fixed << v << ") ";
     }
     std::endl(os);
+    os.precision(p);
 }
 
 
@@ -515,7 +524,7 @@ void SparMatSym2::printSparseArray(std::ostream& os) const
 Multiply by column `jj` provided in `col` of size `cnt`
 Attention: this assumes that col[0] is the diagonal element
 */
-void SparMatSym2::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt) const
+void SparMatSym2::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt)
 {
     assert_true( cnt > 0 );
     const auto jj = col[0].inx;
@@ -536,7 +545,7 @@ void SparMatSym2::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt
  Multiply by column `jj` provided in `col` of size `cnt`
  Attention: this assumes that col[0] is the diagonal element
  */
-void SparMatSym2::vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt) const
+void SparMatSym2::vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt)
 {
     assert_true( cnt > 0 );
     const auto jj = 2 * col[0].inx;
@@ -562,7 +571,7 @@ void SparMatSym2::vecMulAddColIso2D(const real* X, real* Y, Element col[], size_
 Multiply by column `jj` provided in `col` of size `cnt`
 Attention: this assumes that col[0] is the diagonal element
 */
-void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt) const
+void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt)
 {
     assert_true( cnt > 0 );
     const auto jj = 3 * col[0].inx;
@@ -610,11 +619,12 @@ void SparMatSym2::setColumnIndex()
     colidx_[size_] = size_;
 #endif
 #if ( 0 )
+    std::clog << std::endl;
     size_t cnt = 0;
     for ( size_t j = 0; j < size_; ++j )
     {
         cnt += ( colsiz_[j] == 0 );
-        //printColumn(std::clog, j);
+        printColumn(std::clog, j);
     }
     std::clog << "SMS2 has " << cnt << " / " << size_ << " empty columns\n";
 #endif
@@ -687,11 +697,17 @@ bool SparMatSym2::prepareForMultiply(int dimension)
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         rowDSS_[jj] = cnt;
+        // always put diagonal term:
+        valDSS_[cnt] = 0.0;
+        colDSS_[cnt] = jj * dimension;
+        real & dia = valDSS_[cnt];
+        ++cnt;
         if ( colsiz_[jj] > 0 )
         {
             Element * col = column_[jj];
             assert_true( col[0].inx == jj );
-            for ( size_t k = 0; k < colsiz_[jj]; ++k )
+            dia = col[0].val;
+            for ( size_t k = 1; k < colsiz_[jj]; ++k )
             if ( col[k].val )
             {
                 assert_true( cnt < alcDSS_ );
@@ -700,17 +716,13 @@ bool SparMatSym2::prepareForMultiply(int dimension)
                 ++cnt;
             }
         }
-        else {
-            valDSS_[cnt] = 0.0;
-            colDSS_[cnt] = jj * dimension;
-            ++cnt;
-        }
     }
-    if ( cnt != nnz ) ABORT_NOW("internal error");
+    if ( cnt > nnz )
+        ABORT_NOW("internal error");
     if ( size_ > 0 )
         rowDSS_[size_] = cnt;
     
-    //printSparse(std::clog, 0, 22, 28);
+    //printSparse(std::clog, 0, 0, size_);
     //printSparseArray(std::clog);
     return true;
 }
@@ -1199,6 +1211,7 @@ void SparMatSym2::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) c
 #endif
     {
 #if SPARMAT2_OPTIMIZED_MULTIPLY
+        // check this is diagonal term:
         assert_true(colDSS_[rowDSS_[jj]] == jj);
         vecMulAddCol(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #else
@@ -1256,8 +1269,9 @@ void SparMatSym2::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t st
         vecMulAddColIso3D_AVX(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #  elif SPARMAT2_USES_SSE && !REAL_IS_DOUBLE
         vecMulAddColIso3D_SSE(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
+#  else
+        vecMulAddColIso3D(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #  endif
-        //vecMulAddColIso3D(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
 #else
         assert_true(column_[jj][0].inx == jj);
         vecMulAddColIso3D(X, Y, column_[jj], colsiz_[jj]);

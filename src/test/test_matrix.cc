@@ -68,11 +68,8 @@ void setIndices(size_t fill, size_t*& ii, size_t*& jj, unsigned sup, size_t dim)
     
     for ( size_t n = 0; n < fill; ++n )
     {
-        size_t i, j;
-        do {
-            i = RNG.pint32(sup) / dim;
-            j = RNG.pint32(sup) / dim;
-        } while ( i == j );
+        size_t i = RNG.pint32(sup) / dim;
+        size_t j = RNG.pint32(sup) / dim;
         ii[n] = dim * std::max(i,j);
         jj[n] = dim * std::min(i,j);
     }
@@ -137,12 +134,18 @@ void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
 template <typename MATRIX>
 void fillMatrixIso(MATRIX& mat, const size_t i, const size_t j)
 {
-    mat(i, i) += alpha;
+    //printf("fillMatrixIso %lu %lu <---- %f\n", i, j, alpha);
+    mat.diagonal(i) += alpha;
     if ( i > j )
+    {
+        mat.diagonal(j) += alpha;
         mat(i, j) += beta;
-    else
+    }
+    else if ( j > i )
+    {
+        mat.diagonal(j) += alpha;
         mat(j, i) += beta;
-    mat(j, j) += alpha;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -422,15 +425,20 @@ void testIsoMatrix(MATRIX & mat,
         MATRIX ful;
         ful.resize(size*DIM);
         for ( size_t j = 0; j < size; ++j )
-            for ( size_t i = j; i < size; ++i )
+        {
+            real e = mat.diagonal(j);
+            for ( int d = 0; d < DIM; ++d )
+                ful.diagonal(DIM*j+d) = e;
+            for ( size_t i = j+1; i < size; ++i )
             {
-                real * a = mat.addr(i, j);
-                if ( a )
+                real * p = mat.addr(i, j);
+                if ( p )
                 {
                     for ( int d = 0; d < DIM; ++d )
-                        ful(DIM*i+d, DIM*j+d) = *a;
+                        ful(DIM*i+d, DIM*j+d) = *p;
                 }
             }
+        }
         ful.prepareForMultiply(1);
         zero_real(size, z);
         ful.vecMulAdd(x, z);
@@ -651,6 +659,7 @@ int main( int argc, char* argv[] )
     compareMatrix(4*33, mat1, mat4, 1<<16);
 #endif
 #if ( 0 )
+    testMatrices(DIM, 1);
     testMatrices(DIM*2, 1);
     testMatrices(DIM*3, 3);
     testMatrices(DIM*4, 4);

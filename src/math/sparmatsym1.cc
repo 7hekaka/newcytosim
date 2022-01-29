@@ -528,7 +528,7 @@ void SparMatSym1::printSparseArray(std::ostream& os) const
 /**
 Multiply by column `jj` provided in `col` of size `cnt`
 */
-void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
+void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt)
 {
     assert_true( cnt > 0 );
     assert_true( jj == col[0].inx );
@@ -548,7 +548,7 @@ void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj, Element col[],
 /**
  Multiply by column `jj` provided in `col` of size `cnt`
  */
-void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
+void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt)
 {
     assert_true( cnt > 0 );
     assert_true( jj == 2 * col[0].inx );
@@ -573,7 +573,7 @@ void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element c
 /**
 Multiply by column `jj` provided in `col` of size `cnt`
 */
-void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const
+void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt)
 {
     assert_true( cnt > 0 );
     assert_true( jj == 3 * col[0].inx );
@@ -735,7 +735,7 @@ bool SparMatSym1::prepareForMultiply(int dim)
             else if ( col[k].val )
             {
                 // non-zero non-diagonal element
-                assert_true( inx < nnz );
+                assert_true( cnt < nnz );
                 sa_[cnt] = col[k].val;
                 ija_[cnt] = dim * col[k].inx;
                 ++cnt;
