@@ -592,9 +592,9 @@ public:
     {
         // r,  phi, theta, psi
         v[0] = norm();
-        v[1] = std::acos( q[0] / v[0] );
-        v[2] = std::acos( q[1] / (v[0] * std::sin(v[1])) );
-        v[3] = std::atan2( q[3], q[2] );
+        v[1] = std::acos(q[0] / v[0]);
+        v[2] = std::acos(q[1] / (v[0] * std::sin(v[1])));
+        v[3] = std::atan2(q[3], q[2]);
     }
     
 
@@ -602,26 +602,26 @@ public:
     void setFromAxis(const REAL v[3])
     {
         /** for small angles, we assume here angle ~ v.norm() */
-        REAL n  = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
-        REAL sd = std::sin( n * 0.5 );
+        REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+        REAL s = std::sin(n * 0.5);
         if ( n > 0 )
-            sd /= n;
-        q[0] = std::cos( n * 0.5 );
-        q[1] = v[0] * sd;
-        q[2] = v[1] * sd;
-        q[3] = v[2] * sd;
+            s /= n;
+        q[0] = std::cos(n * 0.5);
+        q[1] = v[0] * s;
+        q[2] = v[1] * s;
+        q[3] = v[2] * s;
     }
     
     /// set from rotation of axis v, and angle 'angle' in radian around this axis
     /** argument `v` is normalized for more security */
     void setFromAxis(const REAL v[3], REAL angle)
     {
-        REAL  n = std::sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
-        REAL sd = std::sin( angle * 0.5 ) / n;
-        q[0] = std::cos( angle * 0.5 );
-        q[1] = v[0] * sd;
-        q[2] = v[1] * sd;
-        q[3] = v[2] * sd;
+        REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+        REAL s = std::sin(angle * 0.5) / n;
+        q[0] = std::cos(angle * 0.5);
+        q[1] = v[0] * s;
+        q[2] = v[1] * s;
+        q[3] = v[2] * s;
     }
     
     /// set as rotation of angle 'angle' and axis X, Y or Z (axis=0,1,2)

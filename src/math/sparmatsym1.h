@@ -68,87 +68,50 @@ private:
     
 #if SPARMAT1_OPTIMIZED_MULTIPLY
 
-    /*
-     The row-indexed scheme sets up two one-dimensional arrays: sa and ija.
-     sa[] stores matrix element values as real
-     ija[] stores integer values.
-     The storage rules are:
-     * The first N locations of sa[] store A’s diagonal matrix elements, in order.
-       (Diagonal elements are stored even if they are zero; this is at most a slight storage
-       inefficiency, since diagonal elements are nonzero in most realistic applications.)
-     * Each of the first N locations of ija[] stores the index of the array sa[] that
-       contains the first off-diagonal element of the corresponding row of the matrix.
-       (If there are no off-diagonal elements for that row, it is one greater than
-       the index in sa[] of the most recently stored element of a previous row.)
-     * ija[0] is always equal to N+2. (It can be read to determine N.)
-     * ija[N] is one greater than the index in sa[] of the last off-diagonal
-      element of the last row. (It can be read to determine the number of nonzero
-     elements in the matrix, or the number of elements in the arrays sa and ija.)
-     * sa[N] of is not used and can be set arbitrarily.
-     * Entries in sa[] at locations N+2 contain A’s off-diagonal values,
-       ordered by rows and, within each row, ordered by columns.
-      Entries in ija[] at locations N+2 contain the column number of the corresponding
-     element in sa[].
-
-    3: 0: 1: 0: 0:
-    0: 4: 0: 0: 0:
-    0: 7: 5: 9: 0:
-    0: 0: 0: 0: 2:
-    0: 0: 0: 6: 5:
-
-    In row-indexed compact storage, this 5x5 matrix is represented as follows:
-    ija[k]  6  7  7  9 10 11  2  1  3  4  3
-    sa[k]   3. 4. 5. 0. 5. X  1. 7. 9. 2. 6.
-     
-    The two arrays are of size 5 + nnz + 1, since there are nnz=5 off-diagonal non-zero elements.
-     
-     Here X is an arbitrary value. Notice that, according to the storage rules, the value of N
-     (namely 5) is N = ija[0]-1, and the length of each array is ija[N], namely 11.
-     The diagonal element in row i is sa[i], and the off-diagonal elements in that row are in
-     sa[k] where k loops from ija[i] to ija[i+1]-1, if the upper limit is greater or equal to
-     the lower one (as in C’s for loops).
-    */
+    /// allocated size of compact sparse storage arrays
     size_t nmax_;
+    /// compact sparse storage indices
     unsigned * ija_;
+    /// compact sparse storage values
     real * sa_;
 
 #endif
     
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt) const;
+    void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 2D version
-    void vecMulAddColIso2D(const real* X, real* Y, Element col[], size_t cnt) const;
+    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
     
     /// One column multiplication of a vector, isotropic 3D version
-    void vecMulAddColIso3D(const real* X, real* Y, Element col[], size_t cnt) const;
+    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt) const;
 
 
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddCol(const real* X, real* Y, size_t jj, real dia, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real dia, size_t start, size_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real dia, size_t start, size_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSE(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSE(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSEU(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSEU(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVX(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVX(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj, double const* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
 
 public:
     

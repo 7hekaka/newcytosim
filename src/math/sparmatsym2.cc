@@ -593,9 +593,9 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_
 //------------------------------------------------------------------------------
 #pragma mark - Prepare Multiplication
 
-#if SPARMAT2_USES_COLNEXT
 void SparMatSym2::setColumnIndex()
 {
+#if SPARMAT2_USES_COLNEXT
     if ( size_ > 0 )
     {
         size_t inx = size_;
@@ -608,12 +608,17 @@ void SparMatSym2::setColumnIndex()
         }
     }
     colidx_[size_] = size_;
-}
-#else
-void SparMatSym2::setColumnIndex()
-{
-}
 #endif
+#if ( 0 )
+    size_t cnt = 0;
+    for ( size_t j = 0; j < size_; ++j )
+    {
+        cnt += ( colsiz_[j] == 0 );
+        //printColumn(std::clog, j);
+    }
+    std::clog << "SMS2 has " << cnt << " / " << size_ << " empty columns\n";
+#endif
+}
 
 #if !SPARMAT2_OPTIMIZED_MULTIPLY
 
@@ -625,37 +630,50 @@ bool SparMatSym2::prepareForMultiply(int)
 
 #else
 
+/**
+ This builds the lower half DSS Symmetric Matrix Storage.
+ This is also called the Compact Column Storage
+ In this class the matrix is symmetric and storing the upper half would be equivalent.
+ 
+ The storage uses three arrays: values, columns, and rows
+ 
+ * valDSS_[] contains the non-zero elements of the sparse matrix.
+ * colDSS_[i] is the index of the column corresponding to valDSS_[i].
+ * rowDSS_[j] gives the index of the first non-zero element in row j.
+ 
+ The length of valDSS_[] and colDSS_[i] is equal to the number of non-zero elements in the matrix.
+ The length of rowDSS_[] is the number of rows in the matrix plus one.
+ 
+ As rowDSS_[] gives the location of the first non-zero element within a row,
+ and the non-zero elements are stored consecutively, the number of non-zero
+ elements in the i-th row is equal to ( rowDSS_[i+1] - rowDSS_[i] ).
+ 
+ To have this relationship hold for the last row of the matrix, an additional entry
+ is added to the end of rowDSS_, equal to the number of non-zero elements plus one.
+ Thus the size of rowDSS_[] is one plus the number of row in the matrix, and
+ rowDSS_[size] = number_of_non_zero_elements
+ */
 bool SparMatSym2::prepareForMultiply(int dimension)
 {
     assert_true( size_ <= alloc_ );
     
     setColumnIndex();
-    
-#if ( 0 )
-    size_t cnt = 0;
-    for ( size_t j = 0; j < size_; ++j )
-    {
-        cnt += ( colsiz_[j] == 0 );
-        //printColumn(std::clog, j);
-    }
-    std::clog << "SparMatSym2 has " << cnt << " / " << size_ << " empty columns\n";
-#endif
 
     //count number of non-zero elements, always including the diagonal term
-    size_t nbe = 0;
+    size_t nnz = 0;
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         if ( colsiz_[jj] > 0 )
-            nbe += colsiz_[jj];
+            nnz += colsiz_[jj];
         else
-            nbe ++;
+            nnz ++;
     }
     
     // allocate DSS sparse matrix storage
-    if ( nbe > alcDSS_ )
+    if ( nnz > alcDSS_ )
     {
         constexpr size_t chunk = 16;
-        alcDSS_ = ( nbe + chunk - 1 ) & ~( chunk -1 );
+        alcDSS_ = ( nnz + chunk - 1 ) & ~( chunk -1 );
         delete[] colDSS_;
         free_real(valDSS_);
         colDSS_ = new unsigned[alcDSS_];
@@ -665,7 +683,7 @@ bool SparMatSym2::prepareForMultiply(int dimension)
     /*
      Create the DSS sparse matrix storage.
      */
-    unsigned cnt = 0;
+    size_t cnt = 0;
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         rowDSS_[jj] = cnt;
@@ -673,11 +691,12 @@ bool SparMatSym2::prepareForMultiply(int dimension)
         {
             Element * col = column_[jj];
             assert_true( col[0].inx == jj );
-            for ( size_t n = 0; n < colsiz_[jj]; ++n )
+            for ( size_t k = 0; k < colsiz_[jj]; ++k )
+            if ( col[k].val )
             {
                 assert_true( cnt < alcDSS_ );
-                valDSS_[cnt] = col[n].val;
-                colDSS_[cnt] = col[n].inx * dimension;
+                valDSS_[cnt] = col[k].val;
+                colDSS_[cnt] = col[k].inx * dimension;
                 ++cnt;
             }
         }
@@ -687,7 +706,7 @@ bool SparMatSym2::prepareForMultiply(int dimension)
             ++cnt;
         }
     }
-    if ( cnt != nbe ) ABORT_NOW("internal error");
+    if ( cnt != nnz ) ABORT_NOW("internal error");
     if ( size_ > 0 )
         rowDSS_[size_] = cnt;
     
@@ -793,6 +812,7 @@ void SparMatSym2::vecMulAddColIso2D_SSE(const double* X, double* Y,
     assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     const vec2 xx = load2(X+jj);
+    //process diagonal element:
     vec2 ss = fmadd2(loaddup2(valDSS_+start), xx, load2(Y+jj));
     // there is a dependence here for 'ss'
     for ( size_t n = start+1; n < stop; ++n )
@@ -809,6 +829,7 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
     
     size_t jj = colDSS_[start];
     const vec2 xx = load2(X+jj);
+    //process diagonal element:
     vec2 s0 = mul2(loaddup2(valDSS_+start), xx);
     vec2 s1 = load2(Y+jj);
     vec2 s2 = setzero2();
@@ -940,6 +961,7 @@ void SparMatSym2::vecMulAddColIso2D_AVX(const double* X, double* Y,
     assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     const vec4 xx = broadcast2(X+jj);  // hi position
+    //process diagonal element:
     vec4 ss = fmadd4(broadcast1(valDSS_+start), xx, broadcast2(Y+jj));
     // there is a dependence here for 'ss'
     for ( size_t n = start+1; n < stop; ++n )
@@ -955,6 +977,7 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
     assert_true( stop <= alcDSS_ );
     size_t jj = colDSS_[start];
     const vec4 xx = broadcast2(X+jj);  // hi and lo position
+    //process diagonal element:
     vec4 s0 = mul4(broadcast1(valDSS_+start), xx);
     vec4 s1 = broadcast2(Y+jj);
     vec4 s2 = setzero4();

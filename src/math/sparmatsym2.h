@@ -66,11 +66,11 @@ private:
     
 #if SPARMAT2_OPTIMIZED_MULTIPLY
 
-    /// data for the Distributed Symmetric Matrix Storage format = Compact Column Storage
-    unsigned   alcDSS_;  ///< number of values
-    real     * valDSS_;  ///< values of size alcDSS_: values
-    unsigned * colDSS_;  ///< columns of size alcDSS_: column index of value
-    unsigned * rowDSS_;  ///< rowIndex of size size_+1: index where column starts
+    /// data for the Distributed Symmetric Matrix Storage format (DSS format)
+    unsigned   alcDSS_;  ///< number of values allocated in valDSS_[] and colDSS_[]
+    real     * valDSS_;  ///< non-zero entries of the matrix
+    unsigned * colDSS_;  ///< colDSS_[i] is the index of valDSS_[i]
+    unsigned * rowDSS_;  ///< rowDSS_[j] is the index where j-column starts in colDSS_[]
 
 #endif
     
