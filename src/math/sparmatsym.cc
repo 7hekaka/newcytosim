@@ -138,17 +138,12 @@ real& SparMatSym::diagonal(size_t ix)
 /**
  This allocates to be able to hold the matrix element if necessary
  */
-real& SparMatSym::operator()(size_t i, size_t j)
+real& SparMatSym::element(size_t ii, size_t jj)
 {
-    assert_true( i < size_ );
-    assert_true( j < size_ );
+    assert_true( ii >= jj );
+    assert_true( jj < size_ );
     //fprintf(stderr, "SMS( %6i %6i )\n", i, j);
-    
-    // swap to get ii > jj (address lower triangle)
-    size_t ii = std::max(i, j);
-    size_t jj = std::min(i, j);
 
-    assert_true(jj < size_);
     Element * col = column_[jj];
     if ( colsiz_[jj] > 0 )
     {
@@ -272,7 +267,7 @@ int SparMatSym::bad() const
 size_t SparMatSym::nbElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
     //all allocated elements are counted, even if zero
     size_t cnt = 0;
     for ( size_t jj = start; jj < stop; ++jj )

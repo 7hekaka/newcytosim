@@ -194,15 +194,11 @@ real& SparMatSym2::diagonal(size_t i)
  This allocates to be able to hold the matrix element if necessary
  The diagonal element is always first in each column
 */
-real& SparMatSym2::operator()(size_t i, size_t j)
+real& SparMatSym2::element(size_t ii, size_t jj)
 {
-    assert_true( i < size_ );
-    assert_true( j < size_ );
+    assert_true( ii >= jj );
+    assert_true( jj < size_ );
     //fprintf(stderr, "SMS2( %6i %6i )\n", i, j);
-    
-    // swap to get ii > jj (address lower triangle)
-    size_t ii = std::max(i, j);
-    size_t jj = std::min(i, j);
 
     assert_true( colsiz_[jj] <= colmax_[jj] );
     // make space always for two additional elements
@@ -605,6 +601,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_
 void SparMatSym2::setColumnIndex()
 {
 #if SPARMAT2_USES_COLNEXT
+    colidx_[size_] = size_;
     if ( size_ > 0 )
     {
         size_t inx = size_;
@@ -616,7 +613,6 @@ void SparMatSym2::setColumnIndex()
             colidx_[inx] = nxt;
         }
     }
-    colidx_[size_] = size_;
 #endif
 #if ( 0 )
     std::clog << std::endl;
@@ -1064,6 +1060,7 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
 {
     assert_true( start < stop );
     assert_true( stop <= alcDSS_ );
+    //Attention: this assumes that jj is the diagonal element
     size_t jj = colDSS_[start];
     unsigned * inx = colDSS_ + start;
     double const* val = valDSS_ + start;
@@ -1111,6 +1108,7 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
 {
     assert_true( start < stop );
     assert_true( stop <= alcDSS_ );
+    //Attention: this assumes that jj is the diagonal element
     size_t jj = colDSS_[start];
     unsigned * inx = colDSS_ + start;
     float const* val = valDSS_ + start;

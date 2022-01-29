@@ -75,13 +75,13 @@ public:
         Block  *blk_;  ///< block elements
         Block  *sbk_;  ///< pointer for consolidated elements
         size_t *inx_;  ///< column index for each element
-        size_t size_;  ///< number of elements
+        size_t rlen_;  ///< number of elements in row
         size_t allo_;  ///< allocated size
 
     public:
         
         /// constructor
-        Line() { size_=0; allo_=0; inx_=nullptr; blk_=nullptr; sbk_=nullptr; }
+        Line() { rlen_=0; allo_=0; inx_=nullptr; blk_=nullptr; sbk_=nullptr; }
         
         /// the assignment operator will transfer memory
         void operator =(Line&);
@@ -102,10 +102,10 @@ public:
         void sortElements(Element[], size_t);
         
         /// print
-        void print(std::ostream&) const;
+        void printBlocks(std::ostream&) const;
         
         /// true if column is empty
-        bool isNotZero() const { return ( size_ > 0 ); }
+        bool isNotZero() const { return ( rlen_ > 0 ); }
 
         /// return n-th block (not necessarily, located at line inx_[n]
         Block& operator[](size_t n) const { return blk_[n]; }
@@ -121,22 +121,22 @@ public:
 
 #if SPARMATBLK_USES_AVX
         /// multiplication of a vector: L * X
-        vec2 vecMul2D(const real* X) const;
+        vec2 vecMul2D(const double* X) const;
         
         /// multiplication of a vector: L * X
-        vec2 vecMul2DU(const real* X) const;
+        vec2 vecMul2DU(const double* X) const;
         
         /// multiplication of a vector: L * X
-        vec4 vecMul3DU(const real* X) const;
+        vec4 vecMul3DU(const double* X) const;
         
         /// multiplication of a vector: L * X
-        vec4 vecMul3DUU(const real* X) const;
+        vec4 vecMul3DUU(const double* X) const;
 
         /// multiplication of a vector: L * X
-        vec4 vecMul3D(const real* X) const;
+        vec4 vecMul3D(const double* X) const;
         
         /// multiplication of a vector: L * X
-        vec4 vecMul4D(const real* X) const;
+        vec4 vecMul4D(const double* X) const;
 #endif
     };
 
@@ -189,7 +189,7 @@ public:
     SparMatBlk();
     
     /// default destructor
-    ~SparMatBlk()  { deallocate(); }
+    ~SparMatBlk() { deallocate(); }
     
     /// set to zero
     void reset();
@@ -310,8 +310,11 @@ public:
     void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
 
     /// print content of one column
-    void printLines(std::ostream&);
+    void printSummary(std::ostream&);
     
+    /// print
+    void printBlocks(std::ostream&) const;
+
     /// debug function
     int bad() const;
 };

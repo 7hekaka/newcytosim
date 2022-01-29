@@ -75,11 +75,17 @@ public:
     real* addr(size_t x, size_t y) const;
     
     /// returns a modifiable reference to the diagonal term at given index
-    real& diagonal(size_t ix);
+    real& diagonal(size_t i);
     
-    /// returns the address of element at (x, y), allocating if necessary
-    real& operator()(size_t x, size_t y);
+    /// returns the element at (i, j), allocating if necessary
+    real& element(size_t i, size_t j);
     
+    /// returns the element at (i, j), allocating if necessary
+    real& operator()(size_t i, size_t j)
+    {
+        return element(std::max(i, j), std::min(i, j));
+    }
+
     /// scale the matrix by a scalar factor
     void scale(real);
     

@@ -52,6 +52,9 @@ private:
     /// colmax_[c] is the number of Elements allocated in column 'c'
     unsigned * colmax_;
 
+    /// diagonal elements
+    real * diagon_;
+    
 #if SPARMAT1_USES_COLNEXT
     /// colidx_[i] is the index of the first non-empty column of index >= i
     size_t * colidx_;
@@ -78,13 +81,13 @@ private:
 #endif
     
     /// One column multiplication of a vector
-    static void vecMulAddCol(const real* X, real* Y, size_t jj, Element col[], size_t cnt);
+    static void vecMulAddCol(const real* X, real* Y, real dia, size_t jj, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 2D version
-    static void vecMulAddColIso2D(const real* X, real* Y, size_t jj, Element col[], size_t cnt);
+    static void vecMulAddColIso2D(const real* X, real* Y, real dia, size_t jj, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 3D version
-    static void vecMulAddColIso3D(const real* X, real* Y, size_t jj, Element col[], size_t cnt);
+    static void vecMulAddColIso3D(const real* X, real* Y, real dia, size_t jj, Element col[], size_t cnt);
 
 
     /// One column multiplication of a vector
@@ -149,11 +152,19 @@ public:
     real* addr(size_t x, size_t y) const;
 
     /// returns a modifiable diagonal element
-    real& diagonal(size_t i);
+    real& diagonal(size_t i) { return diagon_[i]; }
     
-    /// returns the address of element at (x, y), allocating if necessary
-    real& operator()(size_t x, size_t y);
+    /// returns the element at (i, j), allocating if necessary
+    real& element(size_t i, size_t j);
     
+    /// returns the element at (i, j), allocating if necessary
+    real& operator()(size_t i, size_t j)
+    {
+        if ( i == j )
+            return diagon_[i];
+        return element(std::max(i, j), std::min(i, j));
+    }
+
     /// scale the matrix by a scalar factor
     void scale(real);
     

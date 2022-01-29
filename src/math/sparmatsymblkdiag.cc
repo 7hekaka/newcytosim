@@ -501,13 +501,23 @@ void SparMatSymBlkDiag::printSummary(std::ostream& os, size_t start, size_t stop
 }
 
 
-void SparMatSymBlkDiag::Column::print(std::ostream& os) const
+void SparMatSymBlkDiag::Column::printBlocks(std::ostream& os) const
 {
+    os << " " << dia_;
     for ( size_t n = 0; n < size_; ++n )
-        os << "\n" << inx_[n] << " : " << blk_[n] << "\n";
-    std::endl(os);
+        os << " " << inx_[n] << " " << blk_[n];
 }
 
+
+void SparMatSymBlkDiag::printBlocks(std::ostream& os) const
+{
+    for ( size_t j = 0; j < size_; ++j )
+    {
+        os << "\nSMSBD  col " << j;
+        pilar_[j].printBlocks(os);
+    }
+    std::endl(os);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication

@@ -73,7 +73,8 @@ bool MatrixSymmetric::isNotZero() const
 size_t MatrixSymmetric::nbElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
+    start = std::min(start, size_);
 
     return size_ * ( stop - start );
 }

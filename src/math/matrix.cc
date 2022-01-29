@@ -44,7 +44,7 @@ bool Matrix::isNotZero() const
 size_t Matrix::nbElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
     
     size_t result = 0;
     for ( size_t jj = start; jj < stop; ++jj )

@@ -73,7 +73,7 @@ public:
     //----------------------------------------------------------------------
     
     /// Optional optimization to accelerate multiplications below
-    virtual void prepareForMultiply(int dim) {}
+    virtual bool prepareForMultiply(int dim) { return true; }
     
     /// Vector multiplication: Y <- Y + M * X, size(X) = size(Y) = size(M)
     virtual void vecMulAdd(const real* X, real* Y) const = 0;

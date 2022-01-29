@@ -255,7 +255,7 @@ bool SparMat::isNotZero() const
 size_t SparMat::nbElements(size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
     //all allocated elements are counted, even if the value is zero
     size_t cnt = 0;
     for ( size_t jj = start; jj < stop; ++jj )

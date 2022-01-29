@@ -432,7 +432,7 @@ int SparMatSymBlk::bad() const
 size_t SparMatSymBlk::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
     alc = 0;
     size_t cnt = 0;
     for ( size_t i = start; i < stop; i += BLOCK_SIZE )
@@ -515,10 +515,20 @@ void SparMatSymBlk::printSummary(std::ostream& os, size_t start, size_t stop)
 }
 
 
-void SparMatSymBlk::Column::print(std::ostream& os) const
+void SparMatSymBlk::Column::printBlocks(std::ostream& os) const
 {
     for ( size_t n = 0; n < size_; ++n )
-        os << "\n" << inx_[n] << " : " << blk_[n] << "\n";
+        os << " " << inx_[n] << " " << blk_[n];
+}
+
+
+void SparMatSymBlk::printBlocks(std::ostream& os) const
+{
+    for ( size_t j = 0; j < size_; ++j )
+    {
+        os << "\nSMSB  col " << j;
+        column_[j].printBlocks(os);
+    }
     std::endl(os);
 }
 
@@ -627,6 +637,7 @@ void SparMatSymBlk::sortElements()
 
 bool SparMatSymBlk::prepareForMultiply(int)
 {
+    colidx_[size_] = size_;
     if ( size_ > 0 )
     {
         size_t inx = size_;
@@ -636,11 +647,10 @@ bool SparMatSymBlk::prepareForMultiply(int)
             if ( column_[inx].isNotZero() )
                 nxt = inx;
             else
-                column_[inx].deallocate();
+                ;//column_[inx].deallocate();
             colidx_[inx] = nxt;
         }
     }
-    colidx_[size_] = size_;
 
     // check if matrix is empty:
     if ( colidx_[0] == size_ )
@@ -1479,7 +1489,7 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
 void SparMatSymBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    assert_true( stop <= size_ );
+    stop = std::min(stop, size_);
 #if ( 1 )
     for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
 #else

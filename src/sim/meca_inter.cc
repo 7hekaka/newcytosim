@@ -183,8 +183,8 @@ inline void Meca::add_block(size_t i, size_t j, MatrixBlock const& T)
     assert_true( i > j );
     mFUL.block(i, j).add_full(T);
     PRINT_BLOCK(i,j,T);
-#elif ( DIM == 1 )
-    mISO(i,j) += T.value();
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.element(i,j) += T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
@@ -201,8 +201,8 @@ inline void Meca::add_block(size_t i, size_t j, real alpha, MatrixBlock const& T
     assert_true( i > j );
     mFUL.block(i, j).add_full(alpha, T);
     PRINT_BLOCK(i,j,alpha*T);
-#elif ( DIM == 1 )
-    mISO(i,j) += alpha * T.value();
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.element(i,j) += alpha * T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
@@ -219,8 +219,8 @@ inline void Meca::sub_block(size_t i, size_t j, MatrixBlock const& T)
     assert_true( i > j );
     mFUL.block(i, j).sub_full(T);
     PRINT_BLOCK(i,j,-T);
-#elif ( DIM == 1 )
-    mISO(i,j) -= T.value();
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.element(i,j) -= T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
@@ -237,8 +237,8 @@ inline void Meca::sub_block(size_t i, size_t j, real alpha, MatrixBlock const& T
     assert_true( i > j );
     mFUL.block(i, j).sub_full(alpha, T);
     PRINT_BLOCK(i,j,-alpha*T);
-#elif ( DIM == 1 )
-    mISO(i,j) -= alpha * T.value();
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.element(i,j) -= alpha * T.value();
 #else
     assert_true( i > j );
     for ( size_t x = 0; x < DIM; ++x )
@@ -254,8 +254,8 @@ inline void Meca::add_block_diag(size_t i, MatrixBlock const& T)
     assert_small(T.asymmetry());
     mFUL.diag_block(i).add_half(T);
     PRINT_BLOCK(i,i,T);
-#elif ( DIM == 1 )
-    mISO(i,i) += T.value();
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.diagonal(i) += T.value();
 #else
     // add lower part of block
     for ( size_t x = 0; x < DIM; ++x )
@@ -271,8 +271,8 @@ inline void Meca::add_block_diag(size_t i, real alpha, MatrixBlock const& T)
     assert_small(T.asymmetry());
     mFUL.diag_block(i).add_half(alpha, T);
     PRINT_BLOCK(i,i,alpha*T);
-#elif ( DIM == 1 )
-    mISO(i,i) += alpha * T.value();
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.diagonal(i) += alpha * T.value();
 #else
     // add lower part of block
     for ( size_t x = 0; x < DIM; ++x )
@@ -288,8 +288,8 @@ inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
     assert_small(T.asymmetry());
     mFUL.diag_block(i).sub_half(T);
     PRINT_BLOCK(i,i,-T);
-#elif ( DIM == 1 )
-    mISO(i,i) -= T.value();
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.diagonal(i) -= T.value();
 #else
     // add lower part of block
     for ( size_t x = 0; x < DIM; ++x )
@@ -304,7 +304,7 @@ inline void Meca::add_iso(size_t i, size_t j, real val)
 {
     CHECK_INDICES(i,j,"add_iso");
 #if USE_ISO_MATRIX
-    mISO(i,j) += val;
+    mISO.element(i,j) += val;
 #else
     size_t ii = DIM * std::max(i, j);
     size_t jj = DIM * std::min(i, j);
@@ -317,7 +317,7 @@ inline void Meca::sub_iso(size_t i, size_t j, real val)
 {
     CHECK_INDICES(i,j,"sub_iso");
 #if USE_ISO_MATRIX
-    mISO(i,j) -= val;
+    mISO.element(i,j) -= val;
 #else
     size_t ii = DIM * std::max(i, j);
     size_t jj = DIM * std::min(i, j);
@@ -4955,7 +4955,7 @@ void Meca::addPlaneClamp(Mecapoint const& pte,
     add_base(inx, dir, weight*dot(pos, dir));
     
 #if ( DIM == 1 ) && USE_ISO_MATRIX
-    mISO(inx, inx) -= weight;
+    mISO.diagonal(inx) -= weight;
 #else
     // wT = -weight * [ dir (x) dir ]
     MatrixBlock wT = MatrixBlock::outerProduct(dir, -weight);

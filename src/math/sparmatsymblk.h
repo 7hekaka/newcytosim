@@ -92,7 +92,7 @@ public:
         void sortElements(Element[], size_t);
         
         /// print
-        void print(std::ostream&) const;
+        void printBlocks(std::ostream&) const;
         
         /// true if column is empty
         bool isNotZero() const { return ( size_ > 0 ); }
@@ -280,6 +280,9 @@ public:
     /// print size of columns
     void printSummary(std::ostream&, size_t start, size_t stop);
     
+    /// print
+    void printBlocks(std::ostream&) const;
+
     /// debug function
     int bad() const;
 };
