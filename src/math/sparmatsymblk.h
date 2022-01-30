@@ -11,19 +11,19 @@
 
 
 /**
- The block size 'BLOCK_SIZE' can be defined on the command line during compilation,
+ The block size 'S_BLOCK_SIZE' can be defined on the command line during compilation,
  and is otherwise set here, to match the dimensionality of the simulation
  */
 
-#define BLOCK_SIZE ( DIM < 3 ? DIM : 3 )
+#define S_BLOCK_SIZE ( DIM < 3 ? DIM : 3 )
 
-#if ( BLOCK_SIZE == 1 )
+#if ( S_BLOCK_SIZE == 1 )
 #   include "matrix11.h"
-#elif ( BLOCK_SIZE == 2 )
+#elif ( S_BLOCK_SIZE == 2 )
 #   include "matrix22.h"
-#elif ( BLOCK_SIZE == 3 )
+#elif ( S_BLOCK_SIZE == 3 )
 #   include "matrix33.h"
-#elif ( BLOCK_SIZE == 4 )
+#elif ( S_BLOCK_SIZE == 4 )
 #   include "matrix44.h"
 #endif
 
@@ -41,13 +41,13 @@ class SparMatSymBlk final
 {
 public:
 
-#if ( BLOCK_SIZE == 1 )
+#if ( S_BLOCK_SIZE == 1 )
     typedef Matrix11 Block;
-#elif ( BLOCK_SIZE == 2 )
+#elif ( S_BLOCK_SIZE == 2 )
     typedef Matrix22 Block;
-#elif ( BLOCK_SIZE == 3 )
+#elif ( S_BLOCK_SIZE == 3 )
     typedef Matrix33 Block;
-#elif ( BLOCK_SIZE == 4 )
+#elif ( S_BLOCK_SIZE == 4 )
     typedef Matrix44 Block;
 #endif
 
@@ -200,8 +200,8 @@ public:
     {
         assert_true( ii < size_ );
         assert_true( jj < size_ );
-        assert_true( ii % BLOCK_SIZE == 0 );
-        assert_true( jj % BLOCK_SIZE == 0 );
+        assert_true( ii % S_BLOCK_SIZE == 0 );
+        assert_true( jj % S_BLOCK_SIZE == 0 );
 #if ( 0 )
         // safe swap, with branchless code:
         size_t i = std::max(ii, jj);

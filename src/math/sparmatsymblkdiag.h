@@ -11,19 +11,19 @@
 
 
 /**
- The block size 'BLOCK_SIZE' can be defined on the command line during compilation,
+ The block size 'SD_BLOCK_SIZE' can be defined on the command line during compilation,
  and is otherwise set here, to match the dimensionality of the simulation
  */
 
-#define BLOCK_SIZE ( DIM < 3 ? DIM : 3 )
+#define SD_BLOCK_SIZE ( DIM < 3 ? DIM : 3 )
 
-#if ( BLOCK_SIZE == 1 )
+#if ( SD_BLOCK_SIZE == 1 )
 #   include "matrix11.h"
-#elif ( BLOCK_SIZE == 2 )
+#elif ( SD_BLOCK_SIZE == 2 )
 #   include "matrix22.h"
-#elif ( BLOCK_SIZE == 3 )
+#elif ( SD_BLOCK_SIZE == 3 )
 #   include "matrix33.h"
-#elif ( BLOCK_SIZE == 4 )
+#elif ( SD_BLOCK_SIZE == 4 )
 #   include "matrix44.h"
 #endif
 
@@ -41,13 +41,13 @@ class SparMatSymBlkDiag final
 {
 public:
 
-#if ( BLOCK_SIZE == 1 )
+#if ( SD_BLOCK_SIZE == 1 )
     typedef Matrix11 Block;
-#elif ( BLOCK_SIZE == 2 )
+#elif ( SD_BLOCK_SIZE == 2 )
     typedef Matrix22 Block;
-#elif ( BLOCK_SIZE == 3 )
+#elif ( SD_BLOCK_SIZE == 3 )
     typedef Matrix33 Block;
-#elif ( BLOCK_SIZE == 4 )
+#elif ( SD_BLOCK_SIZE == 4 )
     typedef Matrix44 Block;
 #endif
 
@@ -201,18 +201,18 @@ public:
     void allocate(size_t alc);
     
     /// return column at index j
-    Column const& column(size_t j) const { return pilar_[j/BLOCK_SIZE]; }
+    Column const& column(size_t j) const { return pilar_[j/SD_BLOCK_SIZE]; }
     
     /// return column at index j
-    Column&       column(size_t j)       { return pilar_[j/BLOCK_SIZE]; }
+    Column&       column(size_t j)       { return pilar_[j/SD_BLOCK_SIZE]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
     {
         assert_true( ii < size_ );
         assert_true( jj < size_ );
-        assert_true( ii % BLOCK_SIZE == 0 );
-        assert_true( jj % BLOCK_SIZE == 0 );
+        assert_true( ii % SD_BLOCK_SIZE == 0 );
+        assert_true( jj % SD_BLOCK_SIZE == 0 );
 #if ( 0 )
         // safe swap, with branchless code:
         size_t i = std::max(ii, jj);

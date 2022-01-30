@@ -663,7 +663,7 @@ void SparMatBlk::vecMulAdd_SCAL(const real* X, real* Y, size_t start, size_t sto
 real SparMatBlk::Line::vecMul1D(const real* X) const
 {
     real res = 0;
-    for ( size_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < rlen_; ++n )
         res += blk_[n].value() * X[inx_[n]];
     return res;
 }
@@ -941,7 +941,7 @@ vec4 SparMatBlk::Line::vecMul4D(const double* X) const
     vec4 s3 = setzero4();
 
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    for ( size_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < rlen_; ++n )
     {
         real const* M = blk_[n];
         const vec4 xyz = load4(X+inx_[n]);  // xyzt = { X0 X1 X2 X3 }
