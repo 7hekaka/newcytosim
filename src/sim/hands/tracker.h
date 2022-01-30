@@ -33,9 +33,6 @@ public:
    
     /// constructor
     Tracker(TrackerProp const*, HandMonitor* h);
-
-    /// destructor
-    ~Tracker() {}
     
     
     /// attach the hand at the position described by site, or return false

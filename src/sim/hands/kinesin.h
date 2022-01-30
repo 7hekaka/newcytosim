@@ -43,9 +43,7 @@ public:
     /// constructor
     Kinesin(KinesinProp const*, HandMonitor*);
     
-    /// destructor
-    ~Kinesin() {}
-
+    
     /// attach and update variables
     void attach(FiberSite const&);
 

@@ -31,9 +31,6 @@ public:
     /// constructor
     Actor(ActorProp const*, HandMonitor*);
     
-    /// destructor
-    ~Actor() {}
-    
     
     /// simulate when `this` is attached but not under load
     void stepUnloaded();

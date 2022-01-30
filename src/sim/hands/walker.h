@@ -51,15 +51,10 @@ public:
     /// Property
     WalkerProp const* prop;
     
-    /// change directionality
-    void setDirectionality(bool plus);
-
     /// constructor
     Walker(WalkerProp const*, HandMonitor*);
     
-    /// destructor
-    ~Walker() {}
-
+    
     /// attach and update variables
     void attach(FiberSite const&);
     

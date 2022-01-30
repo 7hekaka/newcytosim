@@ -35,9 +35,6 @@ public:
     /// constructor
     Digit(DigitProp const*, HandMonitor*);
     
-    /// destructor
-    ~Digit() {}
-    
     /// identify as Digital class
     bool isDigit() const { return true; }
     

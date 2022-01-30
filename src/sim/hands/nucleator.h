@@ -44,9 +44,6 @@ public:
     
     /// constructor
     Nucleator(NucleatorProp const*, HandMonitor*);
-
-    /// destructor
-    ~Nucleator() {}
     
     
     /// simulate when is not attached

@@ -34,9 +34,6 @@ public:
     /// constructor
     Cutter(CutterProp const*, HandMonitor*);
     
-    /// destructor
-    ~Cutter() {}
-    
     /// cut current fiber at attachement position
     void cut();
     

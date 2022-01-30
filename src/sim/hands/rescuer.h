@@ -39,9 +39,7 @@ public:
     
     /// constructor
     Rescuer(RescuerProp const*, HandMonitor*);
-    
-    /// destructor
-    ~Rescuer() {}
+
     
     /// this is called when the attachment point is beyond the PLUS_END
     void handleDisassemblyM();

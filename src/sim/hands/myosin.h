@@ -38,9 +38,7 @@ public:
     /// constructor
     Myosin(MyosinProp const*, HandMonitor*);
     
-    /// destructor
-    ~Myosin() {}
-
+    
     /// attach and update variables
     void attach(FiberSite const&);
 

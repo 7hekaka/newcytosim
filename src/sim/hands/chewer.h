@@ -45,9 +45,6 @@ public:
     /// constructor
     Chewer(ChewerProp const*, HandMonitor*);
     
-    /// destructor
-    ~Chewer() {}
-    
     
     /// attach and update variables
     void attach(FiberSite const&);

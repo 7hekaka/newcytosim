@@ -38,9 +38,7 @@ public:
     /// constructor
     Dynein(DyneinProp const*, HandMonitor*);
     
-    /// destructor
-    ~Dynein() {}
-
+    
     /// attach and update variables
     void attach(FiberSite const&);
 

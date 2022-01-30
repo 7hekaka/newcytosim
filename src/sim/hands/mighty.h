@@ -31,8 +31,6 @@ public:
     /// constructor
     Mighty(MightyProp const*, HandMonitor* h);
 
-    /// destructor
-    ~Mighty() {}
     
     /// check if attachement is possible according to properties
     bool attachmentAllowed(FiberSite&) const;

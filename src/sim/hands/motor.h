@@ -44,9 +44,6 @@ public:
     /// constructor
     Motor(MotorProp const*, HandMonitor*);
     
-    /// destructor
-    ~Motor() {}
-    
     
     /// simulate when `this` is attached but not under load
     void stepUnloaded();

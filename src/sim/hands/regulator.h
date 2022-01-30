@@ -30,9 +30,6 @@ public:
     /// constructor
     Regulator(RegulatorProp const*, HandMonitor*);
     
-    /// destructor
-    ~Regulator() {}
-    
     /// attach the hand at the position described by site
     void attach(FiberSite const&);
     

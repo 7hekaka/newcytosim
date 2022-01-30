@@ -35,9 +35,6 @@ public:
     /// constructor
     Slider(SliderProp const*, HandMonitor*);
 
-    /// destructor
-    ~Slider() {}
-
     
     /// simulate when `this` is attached but not under load
     void stepUnloaded();
