@@ -12,6 +12,21 @@ ShackleLong::ShackleLong(ShackleProp const* p, Vector const& w)
 {
 }
 
+void ShackleLong::stepAA()
+{
+    Vector f = ShackleLong::force();
+    real fn = f.norm();
+    
+    if ( cHand1->checkKramersDetachment(fn) )
+        cHand1->detach();
+    else
+        cHand1->stepLoaded( f);
+    
+    if ( cHand2->checkKramersDetachment(fn) )
+        cHand2->detach();
+    else
+        cHand2->stepLoaded(-f);
+}
 
 //------------------------------------------------------------------------------
 

@@ -62,6 +62,9 @@ protected:
     /// Gillespie normalized time for detachment (must be set at attachment)
     real nextDetach;
     
+    /// Gillespie countdown timer used for other activities
+    real nextAct;
+
 public:
     
     /// Property is constant, so we do not need to make it private

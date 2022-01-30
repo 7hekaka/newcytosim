@@ -19,6 +19,23 @@ DuoLong::~DuoLong()
 {
 }
 
+
+void DuoLong::stepAA()
+{
+    Vector f = DuoLong::force();
+    real fn = f.norm();
+    
+    if ( cHand1->checkKramersDetachment(fn) )
+        cHand1->detach();
+    else
+        cHand1->stepLoaded( f);
+    
+    if ( cHand2->checkKramersDetachment(fn) )
+        cHand2->detach();
+    else
+        cHand2->stepLoaded(-f);
+}
+
 //------------------------------------------------------------------------------
 
 Torque DuoLong::calcArm(Interpolation const& pt, Vector const& pos, real len)

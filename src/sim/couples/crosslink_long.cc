@@ -20,6 +20,25 @@ CrosslinkLong::~CrosslinkLong()
 {
 }
 
+
+void CrosslinkLong::stepAA()
+{
+    Vector f = CrosslinkLong::force();
+    real fn = f.norm();
+    
+    if ( cHand1->checkKramersDetachment(fn) )
+        cHand1->detach();
+    else
+        cHand1->stepLoaded( f);
+    
+    if ( cHand2->checkKramersDetachment(fn) )
+        cHand2->detach();
+    else
+        cHand2->stepLoaded(-f);
+}
+
+//------------------------------------------------------------------------------
+
 /*
  Note that, since `mArm` is calculated by setInteractions(),
  the result will be incorrect if 'solve=0'

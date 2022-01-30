@@ -25,9 +25,6 @@ private:
     
     /// disabled default constructor
     Cutter();
-    
-    /// Gillespie countdown timer
-    real nextCut;
 
 public:
     

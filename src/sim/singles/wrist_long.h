@@ -48,7 +48,10 @@ public:
     
     /// force = stiffness * ( posFoot() - posHand() )
     Vector force() const;
-        
+    
+    /// simulation step for a doubly-attached Couple
+    void stepAA();
+
     /// add interactions to a Meca
     void setInteractions(Meca&) const;
     

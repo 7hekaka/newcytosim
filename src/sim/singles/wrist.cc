@@ -61,7 +61,7 @@ void Wrist::stepF()
 void Wrist::stepA()
 {
     assert_true( sHand->attached() );
-    Vector f = force();
+    Vector f = Wrist::force();
     if ( sHand->checkKramersDetachment(f.norm()) )
         sHand->detach();
     else

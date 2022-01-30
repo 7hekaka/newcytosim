@@ -35,6 +35,9 @@ public:
     /// force between hands, essentially: stiffness * ( cHand2->pos() - sidePos1() )
     Vector force() const;
     
+    /// simulation step for a doubly-attached Couple
+    void stepAA();
+
     /// add interactions to a Meca
     void setInteractions(Meca&) const;
     

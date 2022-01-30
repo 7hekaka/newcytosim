@@ -40,7 +40,7 @@ void Shackle::stepAA()
     // need to update to calculate force:
     cHand1->reinterpolate();
     
-    Vector f = force();
+    Vector f = Couple::force();
     real fn = f.norm();
     
     if ( cHand1->checkKramersDetachment(fn) )
@@ -53,3 +53,4 @@ void Shackle::stepAA()
     else
         cHand2->stepLoaded(-f);
 }
+

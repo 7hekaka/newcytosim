@@ -12,7 +12,7 @@
 Cutter::Cutter(CutterProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {
-    nextCut = RNG.exponential();
+    nextAct = RNG.exponential();
 }
 
 
@@ -38,11 +38,11 @@ void Cutter::stepUnloaded()
 {
     assert_true( attached() );
 
-    nextCut -= prop->cutting_rate_dt;
+    nextAct -= prop->cutting_rate_dt;
     
-    if ( nextCut < 0 )
+    if ( nextAct < 0 )
     {
-        nextCut = RNG.exponential();
+        nextAct = RNG.exponential();
         return cut();
     }
 }
@@ -52,11 +52,11 @@ void Cutter::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
-    nextCut -= prop->cutting_rate_dt;
+    nextAct -= prop->cutting_rate_dt;
     
-    if ( nextCut < 0 )
+    if ( nextAct < 0 )
     {
-        nextCut = RNG.exponential();
+        nextAct = RNG.exponential();
         return cut();
     }
 }

@@ -46,7 +46,7 @@ void Picket::stepA()
 {
     assert_true( sHand->attached() );
     
-    Vector f = force();
+    Vector f = Picket::force();
     if ( sHand->checkKramersDetachment(f.norm()) )
         sHand->detach();
     else

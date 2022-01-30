@@ -35,6 +35,9 @@ public:
     /// force = stiffness * ( posFoot() - posHand() )
     Vector force() const;
     
+    /// Monte-Carlo step if the Hand is attached
+    void stepA();
+
     /// add interactions to a Meca
     void setInteractions(Meca&) const;
     

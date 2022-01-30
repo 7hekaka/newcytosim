@@ -15,7 +15,7 @@
 Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {
-    nextNuc = RNG.exponential();
+    nextAct = RNG.exponential();
 }
 
 //------------------------------------------------------------------------------
@@ -117,11 +117,11 @@ void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
 {
     assert_false( attached() );
     
-    nextNuc -= prop->rate_dt;
+    nextAct -= prop->rate_dt;
     
-    if ( nextNuc < 0 )
+    if ( nextAct < 0 )
     {
-        nextNuc = RNG.exponential();
+        nextAct = RNG.exponential();
         try {
             Glossary opt(prop->fiber_spec);
             makeFiber(sim, pos, prop->fiber_type, opt);

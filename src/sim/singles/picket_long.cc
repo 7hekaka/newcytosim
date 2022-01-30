@@ -72,6 +72,19 @@ Vector PicketLong::force() const
 }
 
 
+void PicketLong::stepA()
+{
+    assert_true( sHand->attached() );
+    assert_true( !hasLink() );
+
+    Vector f = PicketLong::force();
+    if ( sHand->checkKramersDetachment(f.norm()) )
+        sHand->detach();
+    else
+        sHand->stepLoaded(f);
+}
+
+
 void PicketLong::setInteractions(Meca& meca) const
 {
 #if ( DIM == 1 )

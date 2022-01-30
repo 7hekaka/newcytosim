@@ -22,6 +22,23 @@ Bridge::~Bridge()
     prop = nullptr;
 }
 
+
+void Bridge::stepAA()
+{
+    Vector f = Bridge::force();
+    real fn = f.norm();
+    
+    if ( cHand1->checkKramersDetachment(fn) )
+        cHand1->detach();
+    else
+        cHand1->stepLoaded( f);
+    
+    if ( cHand2->checkKramersDetachment(fn) )
+        cHand2->detach();
+    else
+        cHand2->stepLoaded(-f);
+}
+
 //------------------------------------------------------------------------------
 
 /**

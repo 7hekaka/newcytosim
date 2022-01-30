@@ -134,6 +134,9 @@ void Single::stepF()
 }
 
 
+/**
+ The default Single has no force
+ */
 void Single::stepA()
 {
     assert_true( sHand->attached() );

@@ -34,9 +34,6 @@ private:
     /// disabled default constructor
     Nucleator();
     
-    /// Gillespie countdown timer
-    real nextNuc;
-    
     /// create a new Fiber
     void makeFiber(Simul&, Vector pos, std::string const&, Glossary&);
 
