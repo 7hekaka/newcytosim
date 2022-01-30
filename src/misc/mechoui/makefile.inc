@@ -85,44 +85,44 @@ ifeq ($(COMPILER),gcc)
 
 # Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2)
 # You can use g++-8 to support Intel OMP directives
-    CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
-    FAST     :=-O3 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
-    FAST     :=-O3 -fno-trapping-math -funroll-loops -march=native -ffp-contract=fast
+    CXX := g++ -Wfatal-errors -Wno-deprecated-declarations
+    FAST :=-O3 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
+    FAST :=-O3 -fno-trapping-math -funroll-loops -march=native -ffp-contract=fast
 
-    DEBUG    :=-g3 -ggdb
-    COVERAGE :=-fprofile-arcs -ftest-coverage
+    DEBUG :=-g3 -ggdb
+    COVER :=-fprofile-arcs -ftest-coverage
     
 else ifeq ($(COMPILER),icc)
 
     LIBTOOL  := ar -rcs
 
-    #CXX     := icpc -fp-trap=common -vec-report0
-    #CXX     := icpc -bind_at_load -fvisibility=hidden -wd1224,161
-    CXX      := icpc -fp-trap=none -vec-report0 -wd1224,161,1478
-    CXX      := icpc -fargument-noalias -fp-trap=none -wd1224,161,1478
+    #CXX := icpc -fp-trap=common -vec-report0
+    #CXX := icpc -bind_at_load -fvisibility=hidden -wd1224,161
+    CXX := icpc -fp-trap=none -vec-report0 -wd1224,161,1478
+    CXX := icpc -fargument-noalias -fp-trap=none -wd1224,161,1478
     # Intel advanced instruction sets:
     # '-xHost' to optimize for host machine
     # '-xAVX' for AVX
     # '-march=corei7-avx' for AVX
     # '-march=core-avx2' for Intel core i7 (ca. 2015)
-    FAST     := -O3 -march=core-avx2
-    FAST     := -O3 -march=core-avx2 -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
-    WARN     := -qopt-report=2 -qopt-report-phase=vec# -opt-report-file=stderr
-    WARN     :=
+    FAST := -O3 -march=core-avx2
+    FAST := -O3 -march=core-avx2 -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
+    WARN := -qopt-report=2 -qopt-report-phase=vec# -opt-report-file=stderr
+    WARN :=
 
-    DEBUG    := -march=core-avx2 -g -wd279,383,810,869,981,1418,1419,1572,2259
-    COVERAGE :=
+    DEBUG := -march=core-avx2 -g -wd279,383,810,869,981,1418,1419,1572,2259
+    COVER :=
 
 else ifeq ($(COMPILER),clang)
 
 # for the standard library, use: -stdlib=libc++
 # the old library: -stdlib=libstdc++ (deprecated)
 
-    CXX      := c++ -Wfatal-errors
-    FAST     := -O3 -funroll-loops -mavx2 -mfma
-    FAST     := -O3 -funroll-loops
-    DEBUG    := -g3 -ggdb
-    COVERAGE := -fprofile-arcs -ftest-coverage
+    CXX := c++ -Wfatal-errors
+    FAST := -O3 -funroll-loops -mavx2 -mfma
+    FAST := -O3 -funroll-loops
+    DEBUG := -g3 -ggdb
+    COVER := -fprofile-arcs -ftest-coverage
 
 endif
 
@@ -134,7 +134,7 @@ ifeq ($(MACHINE),mac)
 
     MKLDIR := /opt/intel/mkl/lib
 
-    FlagsC := $(COVERAGE)
+    FlagsC := $(COVER)
     FlagsD := $(DEBUG) $(WARN)
     FlagsP := -O2 $(ALIGN) -fno-inline
     FlagsF := $(FAST) $(ALIGN)

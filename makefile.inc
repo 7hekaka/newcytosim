@@ -61,7 +61,7 @@ endif
 #------------------------  Compiler Specifications  ----------------------------
 #-------------------------------------------------------------------------------
 
-# common options for all C++ objects:
+# common options for all C++ objects: use '-fopenmp' to enable OpenMP
 CXXFLG := -std=gnu++14 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
 CXXFLG := -std=gnu++14 -fno-rtti -fopenmp #-g -fno-inline
 CXXFLG := -std=gnu++14 -fno-rtti
@@ -91,44 +91,44 @@ ifeq ($(COMPILER),gcc)
 # To use GCC on OSX, you need to specify the path to header files:
 # export CPATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
 
-    CXX      := g++ -Wfatal-errors -Wno-deprecated-declarations
-    FAST     := -O2 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
-    FAST     := -O2 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native # -mavx2 -mfma
+    CXX := g++ -Wfatal-errors -Wno-deprecated-declarations
+    FAST := -O2 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
+    FAST := -O2 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native # -mavx2 -mfma
 
-    DEBUG    := -g3 -ggdb # -Wconversion
-    COVERAGE := -fprofile-arcs -ftest-coverage
+    DEBUG := -g3 -ggdb # -Wconversion
+    COVER := -fprofile-arcs -ftest-coverage
     
 else ifeq ($(COMPILER),icc)
 
     LIBTOOL  := ar -rcs
 
-    #CXX     := icpc -fp-trap=common -vec-report0
-    #CXX     := icpc -bind_at_load -fvisibility=hidden -wd1224,161
-    CXX      := icpc -fp-trap=none -vec-report0 -wd1224,161,1478
-    CXX      := icpc -fargument-noalias -fp-trap=none -wd1224,161,1478
+    #CXX := icpc -fp-trap=common -vec-report0
+    #CXX := icpc -bind_at_load -fvisibility=hidden -wd1224,161
+    CXX := icpc -fp-trap=none -vec-report0 -wd1224,161,1478
+    CXX := icpc -fargument-noalias -fp-trap=none -wd1224,161,1478
     # Intel advanced instruction sets:
     # '-xHost' to optimize for host machine
     # '-msse3' for SSE3 or '-xAVX' for AVX
     # '-march=corei7-avx' for AVX
     # '-march=core-avx2' for Intel core i7 (ca. 2015)
-    FAST     := -O2 -march=core-avx2
-    FAST     := -O2 -march=core-avx2 -mfma -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
-    WARN     := -qopt-report=2 -qopt-report-phase=vec# -opt-report-file=stderr
-    WARN     :=
+    FAST := -O2 -march=core-avx2
+    FAST := -O2 -march=core-avx2 -mfma -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
+    WARN := -qopt-report=2 -qopt-report-phase=vec# -opt-report-file=stderr
+    WARN :=
 
-    DEBUG    := -march=core-avx2 -g -wd279,383,810,869,981,1418,1419,1572,2259
-    COVERAGE :=
+    DEBUG := -march=core-avx2 -g -wd279,383,810,869,981,1418,1419,1572,2259
+    COVER :=
 
 else ifeq ($(COMPILER),clang)
 
 # for the standard library, use: -stdlib=libc++
 # the old library: -stdlib=libstdc++ (deprecated)
 
-    CXX      := c++ -Wfatal-errors
-    FAST     := -O2 -funroll-loops -mavx2 -mfma
-    FAST     := -O2 -funroll-loops
-    DEBUG    := -g3 -ggdb
-    COVERAGE := -fprofile-arcs -ftest-coverage
+    CXX := c++ -Wfatal-errors
+    FAST := -O2 -funroll-loops -mavx2 -mfma
+    FAST := -O2 -funroll-loops
+    DEBUG := -g3 -ggdb
+    COVER := -fprofile-arcs -ftest-coverage
 
 endif
 
@@ -140,7 +140,7 @@ ifeq ($(MACHINE),mac)
 
     MKLDIR := /opt/intel/mkl/lib
 
-    FlagsC := $(COVERAGE)
+    FlagsC := $(COVER)
     FlagsD := $(DEBUG) $(WARN)
     FlagsP := -O2 $(ALIGN) -fno-inline
     FlagsF := $(FAST) $(ALIGN)
