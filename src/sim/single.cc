@@ -31,8 +31,7 @@ Single::~Single()
 
     if ( sHand )
     {
-        if ( sHand->attached() )
-            sHand->detachHand();
+        sHand->detachHand();
         delete(sHand);
         sHand = nullptr;
     }

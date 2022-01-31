@@ -438,8 +438,8 @@ void CoupleSet::pruneDetach()
     {
         Couple* o = static_cast<Couple*>(i);
         i = ice_.pop_front();
-        if ( o->attached1() ) o->hand1()->detachHand();
-        if ( o->attached2() ) o->hand2()->detachHand();
+        o->hand1()->detachHand();
+        o->hand2()->detachHand();
         o->randomizePosition();
         linkFF(o);
     }

@@ -312,8 +312,7 @@ void SingleSet::pruneDetach()
     {
         Single* o = static_cast<Single*>(i);
         i = ice_.pop_front();
-        if ( o->attached() )
-            o->hand()->detachHand();
+        o->hand()->detachHand();
         o->randomizePosition();
         linkF(o);
     }
