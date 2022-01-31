@@ -99,9 +99,6 @@ public:
     void prev(Hand * h) { hPrev = h; }
 
     
-    /// identify as Digital class
-    virtual bool isDigit() const { return false; }
-    
     /// a random position, at distance `binding_range' on the side of the fiber
     Vector posSide() const;
     
@@ -122,21 +119,16 @@ public:
     
     /// return Monitor
     HandMonitor const* monitor() const { return hMonitor; }
-
+    
+    
+    /// identify as Digital class
+    virtual bool isDigit() const { return false; }
+    
     /// tell if attachment at given site is permitted
     virtual bool attachmentAllowed(FiberSite&) const;
     
     /// bin at position represented by FiberSite
     virtual void attach(FiberSite const&);
-    
-    /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void attach(Fiber * f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
-    
-    /// attach at the given end of Fiber (this calls attach(FiberSite))
-    void attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
-
-    /// detach, without updating Monitor
-    void detachHand();
     
     /// detach
     virtual void detach();
@@ -149,15 +141,25 @@ public:
 
     /// simulate when the Hand is attached and under load
     virtual void stepLoaded(Vector const& force);
-    
-    /// check abscissa against fiber edge, and calls handle functions if necessary.
-    void checkFiberRange(real absM, real absP);
 
     /// this is called when disassembly occured PLUS_END
     virtual void handleDisassemblyM();
     
     /// this is called when the attachment point is below the MINUS_END
     virtual void handleDisassemblyP();
+
+        
+    /// check abscissa against fiber edge, and calls handle functions if necessary.
+    void checkFiberRange(real absM, real absP);
+
+    /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
+    void attach(Fiber * f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
+    
+    /// attach at the given end of Fiber (this calls attach(FiberSite))
+    void attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
+
+    /// detach, without updating Monitor
+    void detachHand();
 
     /// attach at abscissa of given Fiber (this calls attach(FiberSite))
     void attachTo(Fiber * f, real a) { attach(FiberSite(f, a)); }
