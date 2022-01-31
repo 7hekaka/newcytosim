@@ -776,7 +776,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
 void CoupleSet::uniAttach(FiberSet const& fibers)
 {
     // preallocate array:
-    Array<FiberSite> loc(1024, 1024);
+    Array<FiberSite> loc(128, 128);
     
 #if ( 0 )
     // this performs a basic verification of fibers.uniFiberSites()

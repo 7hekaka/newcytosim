@@ -636,7 +636,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
  */
 void SingleSet::uniAttach(FiberSet const& fibers)
 {
-    Array<FiberSite> loc(1024, 16);
+    Array<FiberSite> loc(128, 128);
     
     // uniform attachment for the reserves:
     for ( SingleReserve & reserve : uniReserves )
