@@ -8,13 +8,13 @@
 #include "nucleator.h"
 #include "simul.h"
 
-//------------------------------------------------------------------------------
+
 Hand * NucleatorProp::newHand(HandMonitor* m) const
 {
     return new Nucleator(this, m);
 }
 
-//------------------------------------------------------------------------------
+
 void NucleatorProp::clear()
 {
     HandProp::clear();
@@ -31,7 +31,7 @@ void NucleatorProp::clear()
 #endif
 }
 
-//------------------------------------------------------------------------------
+
 void NucleatorProp::read(Glossary& glos)
 {
     HandProp::read(glos);
@@ -66,7 +66,7 @@ void NucleatorProp::read(Glossary& glos)
 #endif
 }
 
-//------------------------------------------------------------------------------
+
 void NucleatorProp::complete(Simul const& sim)
 {
     HandProp::complete(sim);
@@ -91,7 +91,6 @@ void NucleatorProp::complete(Simul const& sim)
 }
 
 
-//------------------------------------------------------------------------------
 
 void NucleatorProp::write_values(std::ostream& os) const
 {
