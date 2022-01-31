@@ -247,7 +247,7 @@ void Couple::stepFA()
  */
 void Couple::stepAA()
 {
-    Vector f = force();
+    Vector f = Couple::force();
     real fn = f.norm();
     
     if ( cHand1->checkKramersDetachment(fn) )

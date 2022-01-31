@@ -132,7 +132,7 @@ void Duo::stepAA()
     if ( active_ && prop->vulnerable )
         tryDeactivate();
 
-    Vector f = force();
+    Vector f = Couple::force();
     real fn = f.norm();
     
     if ( cHand1->checkKramersDetachment(fn) )

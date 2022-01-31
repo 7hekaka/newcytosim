@@ -2,6 +2,8 @@
 
 #include "simul.h"
 #include "event.h"
+#include "hands/digit.h"
+#include "hands/walker.h"
 
 #include "matrix11.h"
 #include "matrix22.h"
@@ -50,7 +52,9 @@ int main(int argc, char* argv[])
         PRINT(HandMonitor);
         PRINT(FiberSite);
         PRINT(Hand);
-        
+        PRINT(Digit);
+        PRINT(Walker);
+
         PRINT(Inventoried);
         PRINT(Movable);
         PRINT(Buddy);
@@ -91,6 +95,6 @@ int main(int argc, char* argv[])
         PRINT(SparMatBlk::Line);
         PRINT(SparMatSymBlk::Column);
         PRINT(SparMatSymBlkDiag::Block);
-        PRINT(SparMatSymBlkDiag::Pilar);
+        //PRINT(SparMatSymBlkDiag::Pilar);
     }
 }

@@ -19,6 +19,20 @@
 #include <cmath>
 
 
+class Base
+{
+    int x;
+    Base() { x = 0; }
+    virtual void inc() { ++x; }
+};
+
+class Obj
+{
+    Base v;
+    
+};
+
+
 // hexadecimal floating point literal is a C++17 feature
 constexpr double CONSTANT = 0x1p-31;
 
@@ -30,11 +44,13 @@ int main ()
 {
     std::clog << "C++ version " << __cplusplus << '\n';
 
-    std::clog << "Constant = " << CONSTANT << '\n';
+    printf("Base %lu --- Obj %lu\n ", sizeof(Base), sizeof(Obj));
+    
+    std::clog << "0x1p-31 = " << CONSTANT << '\n';
     std::clog << "std::sqrt(3) = " << SQ3 << '\n';
 
-    int my_array[] = { 1, 2, 3, 5, 7, 11, 13, 17, 23 };
-    for (int &x : my_array) {
+    int array[] = { 1, 2, 3, 5, 7, 11, 13, 17, 23 };
+    for (int &x : array) {
         std::cout << " " << x;
     }
     std::cout << std::endl;

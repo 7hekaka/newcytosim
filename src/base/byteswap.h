@@ -2,9 +2,9 @@
 
 #include <stdint.h>
 
-template <class T> void byteswap16(T) = delete;
-template <class T> void byteswap32(T) = delete;
-template <class T> void byteswap64(T) = delete;
+template <typename T> void byteswap16(T) = delete;
+template <typename T> void byteswap32(T) = delete;
+template <typename T> void byteswap64(T) = delete;
 
 /// reverse byte order
 static inline uint16_t byteswap16(uint16_t i)
