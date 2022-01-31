@@ -37,8 +37,6 @@ class WalkerProp;
 class Walker : public Digit
 {
 private:
-    /// number of steps for a forward move
-    int stride;
 
     /// disabled default constructor
     Walker();

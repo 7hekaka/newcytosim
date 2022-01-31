@@ -22,12 +22,12 @@ void Walker::attach(FiberSite const& s)
 #if ( 0 )
     // this allows for step size being a multiple of lattice site
     unsigned n = std::round( prop->step_size / lattice()->unit() );
-    stride = std::copysign(n, prop->unloaded_speed);
+    prop->stride = std::copysign(n, prop->unloaded_speed);
 #else
     // here digit::step_size must be equal to fiber:step_size
     if ( lattice() && lattice()->unit() != prop->step_size  )
         throw InvalidParameter("walker:step_size must be equal to fiber:lattice_unit");
-    stride = (int)sign_real(prop->unloaded_speed);
+    prop->stride = (int)sign_real(prop->unloaded_speed);
 #endif
 }
 
@@ -55,7 +55,7 @@ void Walker::stepUnloaded()
         if ( RNG.test(prop->unbinding_chance) )
             return detach();
         
-        lati_t s = site() + stride;
+        lati_t s = site() + prop->stride;
         
         if ( outsideMP(s) )
         {
@@ -95,7 +95,7 @@ void Walker::stepLoaded(Vector const& force)
         if ( RNG.test(prop->unbinding_chance) )
             return detach();
 
-        lati_t s = site() + stride;
+        lati_t s = site() + prop->stride;
 
         if ( outsideMP(s) )
         {
