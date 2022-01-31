@@ -871,6 +871,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
              
     size_t i = 0, cnt = 2 * fib.nbSegments();
     fluteD4* flu = gym::mapBufferC4VD(cnt+4);
+    GLenum mode = GL_LINE_STRIP;
     
     switch ( style )
     {
@@ -880,6 +881,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
                 flu[i] = {c, fib.posP(i)};
         } break;
         case 2: // display segments with color indicating internal tension
+            mode = GL_LINES;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_tension(fib, n);
@@ -888,6 +890,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             }
             break;
         case 3: // display segments with color indicating internal tension
+            mode = GL_LINES;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_tension_jet(fib, n);
@@ -900,6 +903,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
                 flu[i] = {color_by_curvature(fib, i), fib.posP(i)};
             break;
         case 5: // color according to the angle with respect to the XY-plane:
+            mode = GL_LINES;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_direction(fib, n);
@@ -929,10 +933,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
     }
     gym::unmapBufferC4VD();
     lineWidth(fib.prop->disp->line_width);
-    if ( i == cnt )
-        glDrawArrays(GL_LINES, 0, i);
-    else
-        glDrawArrays(GL_LINE_STRIP, 0, i);
+    glDrawArrays(mode, 0, i);
     glDisableClientState(GL_COLOR_ARRAY);
 }
 
