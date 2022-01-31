@@ -40,9 +40,6 @@ class Simul;
  */
 class Hand : public FiberSite
 {
-    /// a Monitor that does nothing
-    static HandMonitor dummyMonitor;
-    
 private:
     
     /// disabled default constructor

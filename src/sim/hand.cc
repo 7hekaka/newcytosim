@@ -11,16 +11,12 @@
 #include "cymdef.h"
 
 
-/// this HandMonitor does nothing
-HandMonitor Hand::dummyMonitor;
-
 //------------------------------------------------------------------------------
 
 Hand::Hand(HandProp const* p, HandMonitor* m)
  : hNext(nullptr), hPrev(nullptr), hMonitor(m), nextDetach(0), nextAct(0), prop(p)
 {
-    if ( !m )
-        hMonitor = &dummyMonitor;
+    assert_true( m );
 }
 
 
