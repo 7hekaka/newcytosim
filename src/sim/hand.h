@@ -169,9 +169,6 @@ public:
     void attachToEnd(Fiber * f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
     
     
-    /// return other Hand if part of a Couple, and zero otherwise
-    Hand * otherHand() const;
-
     /// return position of other Hand, if part of a Couple, or of Single
     Vector linkBase() const;
     

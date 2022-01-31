@@ -1556,7 +1556,7 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
         // check all connecting Hands and record abscissa, depending on the fiber that is linked
         for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
         {
-            Hand const* oh = ha->otherHand();
+            Hand const* oh = ha->monitor()->otherHand(ha);
             if ( oh && oh->attached() )
             {
                 ObjectID f2 = oh->fiber()->identity();
@@ -1648,7 +1648,7 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
         // check all connecting Hands and record abscissa, depending on the fiber that is linked
         for ( Hand * ha = fib->firstHand(); ha; ha = ha->next() )
         {
-            Hand * oh = ha->otherHand();
+            Hand const* oh = ha->monitor()->otherHand(ha);
             if ( oh && oh->attached() )
             {
                 ObjectID f2 = oh->fiber()->identity();

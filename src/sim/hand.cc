@@ -28,12 +28,6 @@ Hand::~Hand()
 }
 
 
-Hand * Hand::otherHand() const
-{
-    return hMonitor->otherHand(this);
-}
-
-
 Vector Hand::linkBase() const
 {
     return hMonitor->linkBase(this);

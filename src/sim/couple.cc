@@ -517,7 +517,7 @@ Hand * Couple::attachedHand() const
 }
 
 
-Hand* Couple::otherHand(Hand const* h) const
+Hand const* Couple::otherHand(Hand const* h) const
 {
     if ( h == cHand1 )
         return cHand2;

@@ -64,7 +64,7 @@ protected:
     void beforeDetachment(Hand const*);
     
     /// specialization of HandMonitor
-    Hand * otherHand(Hand const*) const;
+    Hand const* otherHand(Hand const*) const;
     
     /// true if both Hands are attached
     bool hasLink() const { return cHand1->attached() && cHand2->attached(); }

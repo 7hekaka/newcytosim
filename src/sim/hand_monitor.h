@@ -38,7 +38,7 @@ public:
     
     
     /// return the Hand that is not the argument, in a Couple
-    virtual Hand * otherHand(Hand const*) const { return nullptr; }
+    virtual Hand const* otherHand(Hand const*) const { return nullptr; }
     
     /// return the distal position of the link attached to this Hand
     /** returns the position of the other Hand, if the Hand is part of a Couple */
