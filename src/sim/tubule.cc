@@ -49,7 +49,7 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
     // get the 'bone'
     if ( prop->bone_type.size() > 0 )
     {
-        res = sim.fibers.newObjects(prop->bone_type, opt);
+        sim.fibers.newObjects(res, prop->bone_type, opt);
         bone_ = static_cast<Fiber*>(res[0]);
         Buddy::connect(bone_);
         len = bone_->length();

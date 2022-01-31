@@ -258,7 +258,8 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
 
 ObjectList Aster::makeFiber(Simul& sim, size_t inx, std::string const& fiber_type, Glossary& opt)
 {
-    ObjectList objs = sim.fibers.newObjects(fiber_type, opt);
+    ObjectList objs;
+    sim.fibers.newObjects(objs, fiber_type, opt);
     
     if ( objs.empty() )
         throw InvalidParameter("could not create aster:fiber");

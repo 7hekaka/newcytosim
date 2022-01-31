@@ -21,7 +21,8 @@ void Bundle::step()
         if ( !organized(ii)  &&  RNG.test(prop->fiber_prob) )
         {
             Glossary opt(prop->fiber_spec);
-            ObjectList objs = sim.fibers.newObjects(prop->fiber_type, opt);
+            ObjectList objs;
+            sim.fibers.newObjects(objs, prop->fiber_type, opt);
             if ( objs.size() )
             {
                 Fiber * fib = Fiber::toFiber(objs[0]);
@@ -141,7 +142,8 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     for ( size_t inx = 0; inx < cnt; ++inx )
     {
         Glossary fiber_opt(spec);
-        ObjectList objs = sim.fibers.newObjects(type, fiber_opt);
+        ObjectList objs;
+        sim.fibers.newObjects(objs, type, fiber_opt);
         if ( objs.size() > 0 )
         {
             Fiber * fib = Fiber::toFiber(objs[0]);

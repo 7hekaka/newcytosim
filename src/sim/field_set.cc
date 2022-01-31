@@ -78,7 +78,7 @@ Object * FieldSet::newObject(const ObjectTag tag, PropertyID pid)
  
  \todo: read the value of the field from a file, at initialization
  */
-ObjectList FieldSet::newObjects(const std::string& name, Glossary& opt)
+void FieldSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
 {
     Property * p = simul_.properties.find_or_die("field", name);
     FieldProp * fp = static_cast<FieldProp*>(p);
@@ -106,9 +106,7 @@ ObjectList FieldSet::newObjects(const std::string& name, Glossary& opt)
         }
     }
 
-    ObjectList res;
     res.push_back(obj);
-    return res;
 }
 
 

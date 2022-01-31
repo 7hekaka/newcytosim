@@ -55,12 +55,10 @@ Object * EventSet::newObject(const ObjectTag tag, PropertyID)
  
   `rate` (inverse of time) or `interval` (time) must be specified but not both.
  */
-ObjectList EventSet::newObjects(const std::string&, Glossary& opt)
+void EventSet::newObjects(ObjectList& res, const std::string&, Glossary& opt)
 {
-    ObjectList res;
     Event * e = new Event(simul_.time(), opt);
     res.push_back(e);
-    return res;
 }
 
 

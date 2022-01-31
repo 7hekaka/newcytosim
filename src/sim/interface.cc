@@ -300,16 +300,16 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
 /**
  This would usually create ONE object of type 'name', placed according to `opt`
  */
-void Interface::execute_new(std::string const& name, ObjectSet* set, Glossary& opt)
+void Interface::execute_new(ObjectList& objs, std::string const& name, ObjectSet* set, Glossary& opt)
 {
     size_t ouf = 0, nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
 
-    ObjectList objs;
+    objs.clear();
     do {
         
         // create the objects:
-        objs = set->newObjects(name, opt);
+        set->newObjects(objs, name, opt);
         
 #if ( 0 )
         // check for `nullptr` in list, which should not happen:
@@ -432,10 +432,11 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
             throw InvalidParameter("cannot specify `position' if `range' is defined");
         Vector dAB = ( B - A ) / std::max(1UL, cnt-1);
         
+        ObjectList objs(4, 4);
         for ( size_t n = 0; n < cnt; ++n )
         {
             opt.define("position", 0, A + n * dAB);
-            execute_new(name, set, opt);
+            execute_new(objs, name, set, opt);
         }
     }
     else
@@ -451,8 +452,9 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
             opt.define("direction", 0, (B-A).normalized());
         }
 
+        ObjectList objs(4, 4);
         for ( size_t n = 0; n < cnt; ++n )
-            execute_new(name, set, opt);
+            execute_new(objs, name, set, opt);
     }
     //hold();
     
@@ -492,9 +494,10 @@ void Interface::execute_new(std::string const& name, size_t cnt)
 
     Glossary opt;
 
+    ObjectList objs(4, 4);
     for ( size_t n = 0; n < cnt; ++n )
     {
-        ObjectList objs = set->newObjects(name, opt);
+        set->newObjects(objs, name, opt);
         
         if ( objs.empty() )
             throw InvalidSyntax("could not create object class of `"+name+"'");
@@ -522,6 +525,7 @@ void Interface::execute_new(std::string const& name, size_t cnt)
         /* Call simul_.add() rather than directly set->add(), because the objects
          in ObjectList are not necessarily all of the same class */
         simul_.add(objs);
+        objs.clear();
     }
     
     VLOG("-NEW " << cnt << "`" << name << "' objects");

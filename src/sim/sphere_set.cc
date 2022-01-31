@@ -35,7 +35,7 @@ Object * SphereSet::newObject(const ObjectTag tag, PropertyID pid)
 /**
  @copydetails Sphere::build
  */
-ObjectList SphereSet::newObjects(const std::string& name, Glossary& opt)
+void SphereSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
 {
     SphereProp * p = simul_.findProperty<SphereProp>("sphere", name);
         
@@ -57,10 +57,8 @@ ObjectList SphereSet::newObjects(const std::string& name, Glossary& opt)
     
     Sphere * obj = new Sphere(p, rad);
 
-    ObjectList res;
     res.push_back(obj);
     res.append(obj->build(opt, simul_));
-    return res;
 }
 
 

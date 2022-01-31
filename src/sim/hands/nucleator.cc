@@ -22,7 +22,8 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 
 void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type, Glossary& opt)
 {    
-    ObjectList objs = sim.fibers.newObjects(fiber_type, opt);
+    ObjectList objs;
+    sim.fibers.newObjects(objs, fiber_type, opt);
     if ( objs.empty() )
         return;
 

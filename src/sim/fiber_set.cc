@@ -115,7 +115,7 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
 
  @}
  */
-ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
+void FiberSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
 {
     FiberProp * fp = simul_.findProperty<FiberProp>("fiber", name);
     Fiber * fib = fp->newFiber(opt);
@@ -128,7 +128,6 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         fib->family_ = simul_.findFiber(str);
 #endif
 
-    ObjectList res(8, 8);
     res.push_back(fib);
  
     size_t inp = 1;
@@ -200,8 +199,6 @@ ObjectList FiberSet::newObjects(const std::string& name, Glossary& opt)
         }
         var = "attach" + std::to_string(++inp);
     }
-
-    return res;
 }
 
 /**

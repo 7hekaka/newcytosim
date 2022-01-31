@@ -61,9 +61,8 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
 
  */
 
-ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
+void BeadSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
 {
-    ObjectList res;
     real rad = -1;
     size_t inx = 2;
 
@@ -104,8 +103,6 @@ ObjectList BeadSet::newObjects(const std::string& name, Glossary& opt)
     // attach anchored Singles:
     while ( opt.set(str, var, inx++) )
         res.append(simul_.singles.makeWrists(obj, 0, 1, str));
-
-    return res;
 }
 
 

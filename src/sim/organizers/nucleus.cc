@@ -66,7 +66,8 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
         for ( size_t ii = 0; ii < cnt; ++ii )
         {
             Glossary fiber_opt(spec);
-            ObjectList objs = sim.fibers.newObjects(str, fiber_opt);
+            ObjectList objs;
+            sim.fibers.newObjects(objs, str, fiber_opt);
             if ( objs.size() )
             {
                 Fiber * fib = Fiber::toFiber(objs[0]);

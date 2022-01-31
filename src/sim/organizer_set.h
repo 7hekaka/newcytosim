@@ -24,10 +24,10 @@ public:
     static std::string title() { return "organizer"; }
     
     /// create a new property of category `cat` for a class `name`
-    Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
+    Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    ObjectList  newObjects(const std::string& name, Glossary& opt);
+    void newObjects(ObjectList&, const std::string& name, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);

@@ -149,7 +149,7 @@ Object * SpaceSet::newObject(const ObjectTag tag, PropertyID pid)
      }
  
  */
-ObjectList SpaceSet::newObjects(const std::string& name, Glossary& opt)
+void SpaceSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
 {
     SpaceProp * p = simul_.findProperty<SpaceProp>("space", name);
     Space * obj = p->newSpace(opt);
@@ -161,9 +161,7 @@ ObjectList SpaceSet::newObjects(const std::string& name, Glossary& opt)
         //obj = new Space(p);
     }
     
-    ObjectList res(1, 4);
     res.push_back(obj);
-    return res;
 }
 
 

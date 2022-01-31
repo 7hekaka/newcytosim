@@ -80,7 +80,7 @@ Object * OrganizerSet::newObject(const ObjectTag tag, PropertyID pid)
 }
 
 
-ObjectList OrganizerSet::newObjects(const std::string& name, Glossary& opt)
+void OrganizerSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
 {
     Organizer * obj = nullptr;
     Property * p = simul_.properties.find_or_die(name);
@@ -94,14 +94,11 @@ ObjectList OrganizerSet::newObjects(const std::string& name, Glossary& opt)
     else if ( p->category() == "fake" )
         obj = new Fake(static_cast<FakeProp*>(p));
 
-    ObjectList res;
     if ( obj )
     {
         res = obj->build(opt, simul_);
         res.push_back(obj);
     }
-    
-    return res;
 }
 
 
