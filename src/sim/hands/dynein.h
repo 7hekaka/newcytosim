@@ -26,9 +26,6 @@ private:
     
     /// disabled default constructor
     Dynein();
-    
-    /// Gillespie countdown timer for stepping
-    real nextStep;
 
 public:
     

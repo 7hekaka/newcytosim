@@ -26,9 +26,6 @@ private:
     
     /// disabled default constructor
     Myosin();
-    
-    /// Gillespie countdown timer for stepping
-    real nextStep;
 
 public:
     

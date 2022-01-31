@@ -9,7 +9,7 @@
 
 
 Walker::Walker(WalkerProp const* p, HandMonitor* h)
-: Digit(p,h), nextStep(0), prop(p)
+: Digit(p,h), prop(p)
 {
 }
 
@@ -17,7 +17,7 @@ Walker::Walker(WalkerProp const* p, HandMonitor* h)
 void Walker::attach(FiberSite const& s)
 {
     Digit::attach(s);
-    nextStep = RNG.exponential();
+    nextAct = RNG.exponential();
     
 #if ( 0 )
     // this allows for step size being a multiple of lattice site
@@ -47,9 +47,9 @@ void Walker::stepUnloaded()
     R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
     
-    nextStep -= max_real(0, R);
+    nextAct -= max_real(0, R);
 
-    while ( nextStep <= 0 )
+    while ( nextAct <= 0 )
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
@@ -65,7 +65,7 @@ void Walker::stepUnloaded()
         else if ( vacant(s) )
             hop(s);
     
-        nextStep += RNG.exponential();
+        nextAct += RNG.exponential();
     }
 }
 
@@ -87,9 +87,9 @@ void Walker::stepLoaded(Vector const& force)
     R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
 
-    nextStep -= max_real(0, R);
+    nextAct -= max_real(0, R);
     
-    while ( nextStep <= 0 )
+    while ( nextAct <= 0 )
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
@@ -105,7 +105,7 @@ void Walker::stepLoaded(Vector const& force)
         else if ( vacant(s) )
             hop(s);
         
-        nextStep += RNG.exponential();
+        nextAct += RNG.exponential();
     }
 }
 

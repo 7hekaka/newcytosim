@@ -40,9 +40,6 @@ private:
 
     /// disabled default constructor
     Walker();
-    
-    /// Gillespie countdown timer for stepping
-    real nextStep;
 
 public:
     

@@ -18,7 +18,7 @@ Dynein::Dynein(DyneinProp const* p, HandMonitor* h)
 void Dynein::attach(FiberSite const& s)
 {
     Digit::attach(s);
-    nextStep = RNG.exponential();
+    nextAct = RNG.exponential();
 }
 
 
@@ -29,9 +29,9 @@ void Dynein::stepUnloaded()
 {
     assert_true( attached() );
     
-    nextStep -= prop->walking_rate_dt;
+    nextAct -= prop->walking_rate_dt;
     
-    while ( nextStep <= 0 )
+    while ( nextAct <= 0 )
     {
         assert_true( attached() );
         lati_t s = site() - 1;
@@ -39,7 +39,7 @@ void Dynein::stepUnloaded()
             return detach();
         if ( vacant(s) )
             hop(s);
-        nextStep += RNG.exponential();
+        nextAct += RNG.exponential();
     }
 }
 
@@ -56,9 +56,9 @@ void Dynein::stepLoaded(Vector const& force)
     // calculate displacement, dependent on the load along the desired direction of displacement
     real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
 
-    nextStep -= max_real(0, R);
+    nextAct -= max_real(0, R);
 
-    while ( nextStep <= 0 )
+    while ( nextAct <= 0 )
     {
         assert_true( attached() );
         lati_t s = site() - 1;
@@ -66,7 +66,7 @@ void Dynein::stepLoaded(Vector const& force)
             return detach();
         if ( vacant(s) )
             hop(s);
-        nextStep += RNG.exponential();
+        nextAct += RNG.exponential();
     }
 }
 

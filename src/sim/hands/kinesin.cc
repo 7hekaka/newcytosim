@@ -18,7 +18,7 @@ Kinesin::Kinesin(KinesinProp const* p, HandMonitor* h)
 void Kinesin::attach(FiberSite const& s)
 {
     Digit::attach(s);
-    nextStep = RNG.exponential();
+    nextAct = RNG.exponential();
     nextBack = RNG.exponential();
 
     // here digit::step_size must be equal to fiber:step_size
@@ -31,16 +31,16 @@ void Kinesin::stepUnloaded()
 {
     assert_true( attached() );
     
-    nextStep -= prop->forward_rate_dt / 2;
+    nextAct -= prop->forward_rate_dt / 2;
     nextBack -= prop->backward_rate_dt / 1.1;
 
-    while ( std::min(nextStep, nextBack) <= 0 )
+    while ( std::min(nextAct, nextBack) <= 0 )
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
             return detach();
 
-        int dir = ( nextStep <= nextBack ) - ( nextStep > nextBack );
+        int dir = ( nextAct <= nextBack ) - ( nextAct > nextBack );
 
         lati_t s = site() + dir * prop->stride;
         
@@ -53,7 +53,7 @@ void Kinesin::stepUnloaded()
             hop(s);
     
         if ( dir == 1 )
-            nextStep += RNG.exponential();
+            nextAct += RNG.exponential();
         else
             nextBack += RNG.exponential();
     }
@@ -67,16 +67,16 @@ void Kinesin::stepLoaded(Vector const& force)
     real load = dot(force, dirFiber()) * prop->directionality;
     
     // antagonistic load is negative
-    nextStep -= prop->forward_rate_dt / ( 1 + std::exp(-load*prop->force_inv) );
+    nextAct -= prop->forward_rate_dt / ( 1 + std::exp(-load*prop->force_inv) );
     nextBack -= prop->backward_rate_dt / ( 0.1 + std::exp(load*prop->force_inv) );
 
-    while ( std::min(nextStep, nextBack) <= 0 )
+    while ( std::min(nextAct, nextBack) <= 0 )
     {
         // test detachment due to stepping
         if ( RNG.test(prop->unbinding_chance) )
             return detach();
 
-        int dir = ( nextStep <= nextBack ) - ( nextStep > nextBack );
+        int dir = ( nextAct <= nextBack ) - ( nextAct > nextBack );
 
         lati_t s = site() + dir * prop->stride;
         
@@ -89,7 +89,7 @@ void Kinesin::stepLoaded(Vector const& force)
             hop(s);
     
         if ( dir == 1 )
-            nextStep += RNG.exponential();
+            nextAct += RNG.exponential();
         else
             nextBack += RNG.exponential();
     }
