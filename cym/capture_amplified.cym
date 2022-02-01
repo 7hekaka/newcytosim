@@ -53,7 +53,7 @@ set fiber microtubule
     growing_force    = 1.67
     persistent       = 1
     rebirth_rate     = 1
-    min_length       = 0.25
+    min_length       = 0.025
 }
 
 set solid core
@@ -80,7 +80,7 @@ set hand nucleator
 {
     unbinding = 0, inf
     activity = nucleate
-    nucleate = 10, microtubule, ( length=0.02; reference=minus_end; end_state=grow )
+    nucleate = 10, microtubule, ( length=0.025; reference=minus_end; end_state=grow )
     display = ( size=10; color=red; )
 }
 
@@ -109,7 +109,7 @@ new star
 {
     solid = core
     radius = 1
-    fibers = 127, microtubule, ( length = 2; plus_end = grow; )
+    fibers = 127, microtubule, ( length = 1; plus_end = grow; )
     position = 15 0 0
 }
 

@@ -61,7 +61,7 @@ set hand nucleator
 {
     unbinding = 0, inf      % never detach
     activity = nucleate
-    nucleate = 0.1, actin, ( length=0; plus_end=grow; )  % rate of nucleation... is is known?
+    nucleate = 0.1, actin, ( length=0.010; plus_end=grow; )  % rate of nucleation... is is known?
     display = { size=4; color=orange; }
 }
 

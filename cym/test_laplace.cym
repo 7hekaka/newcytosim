@@ -11,6 +11,7 @@
 
 set simul system
 {
+    dim = 3
     time_step = 0.001
     viscosity = 1
     kT        = 0.0001
