@@ -152,7 +152,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
     {
         inx = 0;
         nbp = 1;
-        if ( opt.is_positive_integer(var, 0) && opt.set(nbp, var) )
+        if ( opt.set_positive_integer(nbp, var) )
             ++inx;
         
         if ( nbp > 0 )

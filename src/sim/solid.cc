@@ -244,11 +244,10 @@ ObjectList Solid::makePoint(Glossary& opt, std::string const& var, Simul& sim)
 {
     ObjectList res;
     std::string str;
-    size_t inx;
-    inx = 0;
+    size_t inx = 0;
     size_t nbp = 1;
     // optionally specify a number of points
-    if ( opt.is_positive_integer(var, 0) && opt.set(nbp, var) )
+    if ( opt.set_positive_integer(nbp, var) )
         ++inx;
     
     if ( nbp > 0 )

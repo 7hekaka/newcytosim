@@ -560,6 +560,24 @@ public:
     {
         return is_number(key, inx) == 3;
     }
+    
+    template <typename T>
+    int set_positive_integer(T & var, key_type const& key, size_t inx = 0) const
+    {
+        rec_type const* rec = values(key);
+        if ( rec && inx < rec->size() )
+        {
+            val_type const& val = rec->at(inx);
+            
+            if ( val.defined_ && is_number(rec->at(inx).value_)==3 )
+            {
+                set_value(var, key, val.value_);
+                ++val.read_;
+                return 1;
+            }
+        }
+        return 0;
+    }
 
 };
 

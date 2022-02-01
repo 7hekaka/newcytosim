@@ -193,9 +193,8 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     if ( !Buddy::check(solid()) )
         Buddy::connect(solid());
 
-    if ( opt.is_positive_integer("fibers", 0) )
+    if ( opt.set_positive_integer(nbf, "fibers") )
     {
-        opt.set(nbf, "fibers");
         opt.set(tif, "fibers", 1);
         opt.set(fos, "fibers", 2);
     }
