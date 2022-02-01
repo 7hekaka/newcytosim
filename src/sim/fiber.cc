@@ -401,7 +401,7 @@ Fiber* Fiber::severPoint(size_t pti)
     // remove MINUS_END portion on new piece:
     fib->truncateM(pti);
     assert_true(fib->abscissaM() == abs);
-    fib->updateRange(prop->field_ptr);
+    fib->updateRange();
 
 #if FIBER_HAS_MESH
     if ( fMesh.ready() )
@@ -444,12 +444,12 @@ The Fiber is cut at distance `abs` from its MINUS_END:
  pointer may be zero, if `abs` was not within the valid range of abscissa.
  If a new Fiber was created, it should be added to the FiberSet.
  */
-Fiber* Fiber::severP(real abs)
+Fiber* Fiber::severM(real abs)
 {
     if ( abs <= REAL_EPSILON || abs + REAL_EPSILON >= length() )
         return nullptr;
     
-    //std::clog << "severP " << reference() << " at " << abscissaM()+abs << "\n";
+    //std::clog << "severM " << reference() << " at " << abscissaM()+abs << "\n";
 
     // create a new Fiber of the same class:
     Fiber* fib = prop->newFiber();
@@ -468,7 +468,7 @@ Fiber* Fiber::severP(real abs)
     // remove MINUS_END portion on new piece
     fib->Chain::cutM(abs);
     // initialize Lattice on new piece
-    fib->updateRange(prop->field_ptr);
+    fib->updateRange();
 
 #if FIBER_HAS_MESH
     if ( fMesh.ready() )
@@ -539,7 +539,7 @@ void Fiber::severNow()
         }
         else
         {
-            Fiber * frag = severP(cut.abs-abscissaM());
+            Fiber * frag = severM(cut.abs-abscissaM());
             
             // special case where the PLUS_END section is simply deleted
             if ( cut.stateM == STATE_BLACK )
@@ -1123,12 +1123,13 @@ void Fiber::setEndState(const FiberEnd end, const state_t s)
 }
 
 
-void Fiber::updateRange(Field* field)
+void Fiber::updateRange()
 {
 #if FIBER_HAS_LATTICE
     // this will allocate the Lattice's site to cover the range of Abscissa:
     if ( fLattice.ready() )
     {
+        // this will reallocate the Lattice
         fLattice.setRange(abscissaM(), abscissaP());
     }
 #endif
@@ -1136,6 +1137,7 @@ void Fiber::updateRange(Field* field)
     // this will allocate the Lattice's site to cover the range of Abscissa:
     if ( fMesh.ready() )
     {
+        Field* field = prop->field_ptr;
         fMesh.setRange(abscissaM(), abscissaP());
         
         if ( field )
@@ -1189,7 +1191,7 @@ void Fiber::updateFiber()
     Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << '\n';
 #endif
     
-    updateRange(prop->field_ptr);
+    updateRange();
     updateHands();
 }
 
@@ -1808,7 +1810,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     else if ( tag == TAG_ALT )
     {
         Chain::readAngles(in, sim, tag);
-        updateRange(nullptr);
+        updateRange();
 #if FIBER_HAS_GLUE
         fGlue = nullptr;
 #endif

@@ -79,6 +79,8 @@ void Simul::prepare()
     // prepare grid for attachments:
     setFiberGrid(spaces.master());
     
+    // this will allocate Fiber::Lattice
+    fibers.prepare();
     // this is necessary for diffusion in Field:
     fields.prepare();
     

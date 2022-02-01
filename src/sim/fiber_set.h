@@ -72,6 +72,9 @@ public:
     /// Cut fibers in the list
     void planarCut(ObjectList&, Vector const& n, real a, state_t stateP, state_t stateM);
     
+    /// get ready to do a step()
+    void prepare();
+
     /// Monte-Carlo step for every Fiber
     void step();
     

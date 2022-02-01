@@ -254,6 +254,16 @@ void FiberSet::report(std::ostream& os) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
+void FiberSet::prepare()
+{
+    for ( Fiber* fib=first(); fib; fib=fib->next() )
+    {
+        fib->updateFiber();
+        fib->resetLattice();
+    }
+}
+
+
 /**
  Calculate the free monomer concentration. 
  Calls step() once for every Fiber.
@@ -267,7 +277,7 @@ void FiberSet::step()
     for ( Property * i : plist )
         static_cast<FiberProp*>(i)->used_polymer = 0;
 
-    for ( Fiber const* fib = first(); fib; fib = fib->next() )
+    for ( Fiber const* fib=first(); fib; fib=fib->next() )
         fib->prop->used_polymer += fib->length();
     
     // calculate the ratio of free polymer for each class of Fiber:

@@ -208,10 +208,10 @@ public:
     void planarCut(Vector const& n, real a, state_t stateP, state_t stateM);
     
     /// cut fiber at distance `abs` from the MINUS_END; returns section `[ abs - PLUS_END ]`
-    Fiber * severP(real abs);
+    Fiber * severM(real abs);
 
     /// cut fiber at abscissa `abs`; returns section `[ abs - PLUS_END ]`
-    Fiber * severNow(real abs) { return severP(abs-abscissaM()); }
+    Fiber * severNow(real abs) { return severM(abs-abscissaM()); }
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
     void sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }
@@ -234,7 +234,7 @@ public:
     void step(real, real, bool = true);
 
     /// update Lattice and Mesh ranges
-    void updateRange(Field*);
+    void updateRange();
     
     /// should be called if any Fiber tip has elongated or shortened
     void updateFiber();
