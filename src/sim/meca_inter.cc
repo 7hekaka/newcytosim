@@ -302,6 +302,7 @@ inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
 /// add `val` to the XYZ-isometric matrix
 inline void Meca::add_iso(size_t i, size_t j, real val)
 {
+    assert_true( i < nPoints_ );
     CHECK_INDICES(i,j,"add_iso");
 #if USE_ISO_MATRIX
     mISO.element(i,j) += val;
@@ -315,6 +316,7 @@ inline void Meca::add_iso(size_t i, size_t j, real val)
 /// add `-val` to the XYZ-isometric matrix
 inline void Meca::sub_iso(size_t i, size_t j, real val)
 {
+    assert_true( i < nPoints_ );
     CHECK_INDICES(i,j,"sub_iso");
 #if USE_ISO_MATRIX
     mISO.element(i,j) -= val;
@@ -328,6 +330,7 @@ inline void Meca::sub_iso(size_t i, size_t j, real val)
 /// add `val` to the XYZ-isometric matrix
 inline void Meca::add_iso_diag(size_t i, real val)
 {
+    assert_true( i < nPoints_ );
 #if USE_ISO_MATRIX
     mISO.diagonal(i) += val;
 #else
@@ -338,6 +341,7 @@ inline void Meca::add_iso_diag(size_t i, real val)
 /// add `-val` to the XYZ-isometric matrix
 inline void Meca::sub_iso_diag(size_t i, real val)
 {
+    assert_true( i < nPoints_ );
 #if USE_ISO_MATRIX
     mISO.diagonal(i) -= val;
 #else
@@ -349,6 +353,7 @@ inline void Meca::sub_iso_diag(size_t i, real val)
 /// add `vec` to the base
 inline void Meca::add_base(size_t const& i, Vector const& vec) const
 {
+    assert_true( i < DIM*nPoints_ );
     assert_true( i % DIM == 0 );
     vec.add_to(vBAS+i);
 }
@@ -356,6 +361,7 @@ inline void Meca::add_base(size_t const& i, Vector const& vec) const
 /// add `alpha * vec` to the base
 inline void Meca::add_base(size_t const& i, Vector const& vec, real alpha) const
 {
+    assert_true( i < DIM*nPoints_ );
     assert_true( i % DIM == 0 );
     vec.add_to(alpha, vBAS+i);
 }
@@ -363,6 +369,7 @@ inline void Meca::add_base(size_t const& i, Vector const& vec, real alpha) const
 /// add `-vec` to the base
 inline void Meca::sub_base(size_t const& i, Vector const& vec) const
 {
+    assert_true( i < DIM*nPoints_ );
     assert_true( i % DIM == 0 );
     vec.sub_to(vBAS+i);
 }

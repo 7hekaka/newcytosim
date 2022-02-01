@@ -197,12 +197,12 @@ public:
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t alc);
     
-    /// return line at index j
-    Line const& row(size_t j) const { return row_[j]; }
+    /// number of elements in j-th column
+    size_t column_size(size_t j) const { assert_true(j<size_); return row_[j].rlen_; }
     
-    /// return line at index j
-    Line const& column(size_t j) const { return row_[j]; }
-    
+    /// index of ith-elements in j-th column
+    size_t column_index(size_t j, size_t n) const { return row_[j].inx_[n]; }
+
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
     {

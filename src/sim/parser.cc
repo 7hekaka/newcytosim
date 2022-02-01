@@ -1112,7 +1112,8 @@ void Parser::parse_dump(std::istream& is)
         if ( mode & 1 ) simul_.sMeca.saveSystem();
         if ( mode & 2 ) simul_.sMeca.dumpSystem();
         if ( mode & 4 ) simul_.sMeca.exportSystem();
-        
+        if ( mode & 8 ) simul_.sMeca.saveMatrixBitmaps();
+
         FilePath::change_dir(cwd);
         Cytosim::log("done\n");
     }

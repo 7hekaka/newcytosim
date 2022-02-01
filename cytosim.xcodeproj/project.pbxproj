@@ -539,6 +539,7 @@
 		BB74F420232024AB0019D68E /* byteswap.h in Headers */ = {isa = PBXBuildFile; fileRef = BB74F41F232024AB0019D68E /* byteswap.h */; };
 		BB7662C510E923A200C93DF6 /* frame_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7662C310E923A200C93DF6 /* frame_reader.cc */; };
 		BB7662C610E923A200C93DF6 /* frame_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7662C410E923A200C93DF6 /* frame_reader.h */; };
+		BB767DAA27A9C2210060D3FA /* save_bitmap.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB767DA927A9C2210060D3FA /* save_bitmap.cc */; };
 		BB770B6E12FF3E1900D018A0 /* fork_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB770B6C12FF3E1900D018A0 /* fork_prop.cc */; };
 		BB770B6F12FF3E1900D018A0 /* fork_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB770B6D12FF3E1900D018A0 /* fork_prop.h */; };
 		BB770C0512FF44D100D018A0 /* shackle_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB770C0112FF44D100D018A0 /* shackle_prop.cc */; };
@@ -1610,6 +1611,7 @@
 		BB74F41F232024AB0019D68E /* byteswap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = byteswap.h; sourceTree = "<group>"; };
 		BB7662C310E923A200C93DF6 /* frame_reader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_reader.cc; path = src/play/frame_reader.cc; sourceTree = SOURCE_ROOT; };
 		BB7662C410E923A200C93DF6 /* frame_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_reader.h; path = src/play/frame_reader.h; sourceTree = SOURCE_ROOT; };
+		BB767DA927A9C2210060D3FA /* save_bitmap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = save_bitmap.cc; sourceTree = "<group>"; };
 		BB770B6C12FF3E1900D018A0 /* fork_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fork_prop.cc; path = couples/fork_prop.cc; sourceTree = "<group>"; };
 		BB770B6D12FF3E1900D018A0 /* fork_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fork_prop.h; path = couples/fork_prop.h; sourceTree = "<group>"; };
 		BB770C0112FF44D100D018A0 /* shackle_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shackle_prop.cc; path = couples/shackle_prop.cc; sourceTree = "<group>"; };
@@ -2644,6 +2646,7 @@
 				BBB13B9A26F2657D0021C934 /* timer.h */,
 				BBA5E5800E8EBA620009F6D0 /* time_date.h */,
 				BBA5E5810E8EBA620009F6D0 /* time_date.cc */,
+				BB767DA927A9C2210060D3FA /* save_bitmap.cc */,
 			);
 			name = misc;
 			sourceTree = "<group>";
@@ -4867,6 +4870,7 @@
 				BB74F41B231C334D0019D68E /* sparmatblk.cc in Sources */,
 				BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */,
 				BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */,
+				BB767DAA27A9C2210060D3FA /* save_bitmap.cc in Sources */,
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
 				BB7191B00EF1CD9900CED9E2 /* sparmatsym.cc in Sources */,
 				BB7191B40EF1CD9900CED9E2 /* sparmatsym1.cc in Sources */,

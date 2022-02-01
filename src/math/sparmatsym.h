@@ -93,7 +93,7 @@ public:
     void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp=1) const;
     
     /// prepare matrix for multiplications by a vector (must be called)
-    void prepareForMultiply(int dim);
+    bool prepareForMultiply(int dim);
     
     /// multiplication of a vector: Y = Y + M * X with dim(X) = dim(M)
     void vecMulAdd(const real* X, real* Y) const;

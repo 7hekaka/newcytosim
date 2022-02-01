@@ -2009,6 +2009,38 @@ void Meca::apply()
 //------------------------------------------------------------------------------
 #pragma mark - Connectivity Analysis
 
+
+/// equalize flags for any existing matrix element between Mecables
+template < typename MatrixClass >
+void computeClusters(Array<Mecable*> const mecables, const size_t MAX, Mecable** which,
+                     MatrixClass const& MAT, size_t ORD)
+{
+    for ( size_t j = 0; j < MAX; ++j )
+    {
+        size_t jj = ORD * j;
+        Mecable const* A = which[j];
+        for ( size_t n = 0; n < MAT.column_size(jj); ++n )
+        {
+            // we do not check the value here, but just having a block
+            size_t i = MAT.column_index(jj, n) / ORD;
+            assert_true( i < MAX );
+            Mecable const* B = which[i];
+            if ( A->flag() != B->flag() )
+            {
+                ObjectFlag a = std::min(A->flag(), B->flag());
+                ObjectFlag b = std::max(A->flag(), B->flag());
+                // replace b -> a everywhere:
+                for ( Mecable * mec : mecables )
+                {
+                    if ( mec->flag() == b )
+                        mec->flag(a);
+                }
+            }
+        }
+    }
+}
+
+
 /** Assuming that Mecable::flag() have been set already */
 void Meca::flagClusters() const
 {
@@ -2026,54 +2058,10 @@ void Meca::flagClusters() const
     }
     
 #if USE_MATRIX_BLOCK
-    /// equalize flags for any non-zero matrix element between Mecables:
-    for ( size_t jj = 0; jj < MAX; ++jj )
-    {
-        Mecable const* A = which[jj];
-        auto const& col = mFUL.column(DIM*jj);
-        for ( size_t n = 0; n < col.size_; ++n )
-        {
-            size_t ii = col.inx_[n]/DIM;
-            assert_true( ii < MAX );
-            Mecable const* B = which[ii];
-            if ( A->flag() != B->flag() )
-            {
-                ObjectFlag a = std::min(A->flag(), B->flag());
-                ObjectFlag b = std::max(A->flag(), B->flag());
-                // replace b -> a everywhere:
-                for ( Mecable * mec : mecables )
-                {
-                    if ( mec->flag() == b )
-                        mec->flag(a);
-                }
-            }
-        }
-    }
+    computeClusters(mecables, MAX, which, mFUL, DIM);
 #endif
 #if USE_ISO_MATRIX
-    /// equalize flags for any non-zero matrix element between Mecables:
-    for ( size_t jj = 0; jj < MAX; ++jj )
-    {
-        Mecable const* A = which[jj];
-        auto const* col = mISO.column(jj);
-        for ( size_t n = 0; n < mISO.column_size(jj); ++n )
-        {
-            size_t ii = col[n].inx;
-            assert_true( ii < MAX );
-            Mecable const* B = which[ii];
-            if ( A->flag() != B->flag() )
-            {
-                ObjectFlag a = std::min(A->flag(), B->flag());
-                ObjectFlag b = std::max(A->flag(), B->flag());
-                // replace b -> a everywhere:
-                for ( Mecable * mec : mecables )
-                {
-                    if ( mec->flag() == b )
-                        mec->flag(a);
-                }
-            }
-        }
-    }
+    computeClusters(mecables, MAX, which, mISO, 1);
 #endif
     delete[] which;
 }
@@ -2558,3 +2546,70 @@ void Meca::dumpSystem(bool nat) const
     
     dumpVector(nullptr, 0, nullptr, nat);
 }
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Matrix Bitmap Export
+
+#include "../base/save_bitmap.cc"
+static const uint16_t BitsPerPixel = 1;
+static const uint8_t white = 1;
+static const uint8_t gray = 1;
+
+
+template < typename MatrixClass >
+void setMatrixBitmap(uint8_t* bytes, size_t bpr, size_t nbv, MatrixClass const& MAT, size_t ORD)
+{
+    memset(bytes, 0, bpr*nbv);
+    
+    for ( size_t j = 0; j < nbv; ++j )
+    {
+        size_t jj = j * ORD;
+        for ( size_t n = 0; n < MAT.column_size(jj); ++n )
+        {
+            size_t i = MAT.column_index(jj, n) / ORD;
+            // swap i,j and flip i to display matrix properly on screen
+            set_bitmap(bytes, bpr, BitsPerPixel*j, nbv-1-i, white);
+        }
+    }
+}
+
+void Meca::saveMatrixBitmaps() const
+{
+    static size_t cnt = 0;
+    const size_t nbv = nbVertices();
+    const size_t ims = bitmap_size(nbv, nbv, BitsPerPixel);
+    const size_t bpr = bytes_per_row(nbv, BitsPerPixel);
+    char str[32] = { 0 };
+    
+    uint8_t* bytes = new uint8_t[ims];
+#if USE_ISO_MATRIX
+    snprintf(str, sizeof(str), "iso%08lu.bmp", cnt);
+    FILE * f = fopen(str, "w");
+    if ( f ) {
+        if ( !ferror(f) ) {
+            setMatrixBitmap(bytes, bpr, nbv, mISO, 1);
+            save_bitmap(f, bytes, nbv, nbv, BitsPerPixel);
+        }
+        fclose(f);
+    }
+#endif
+    snprintf(str, sizeof(str), "ful%08lu.bmp", cnt);
+    FILE * g = fopen(str, "w");
+    if ( g ) {
+        if ( !ferror(g) ) {
+            setMatrixBitmap(bytes, bpr, nbv, mFUL, DIM);
+            // mark pixels on the diagonals to indicate where each block starts:
+            for ( Mecable * mec : mecables )
+            {
+                size_t i = mec->matIndex();
+                set_bitmap(bytes, bpr, BitsPerPixel*i, nbv-1-i, gray);
+            }
+            save_bitmap(g, bytes, nbv, nbv, BitsPerPixel);
+        }
+        fclose(g);
+    }
+    delete[] bytes;
+    ++cnt;
+}
+

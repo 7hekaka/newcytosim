@@ -331,8 +331,9 @@ void SparMatSym::printColumn(std::ostream& os, const size_t jj)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void SparMatSym::prepareForMultiply(int)
+bool SparMatSym::prepareForMultiply(int)
 {
+    return true;
 }
 
 

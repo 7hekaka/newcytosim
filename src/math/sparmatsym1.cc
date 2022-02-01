@@ -390,7 +390,7 @@ size_t SparMatSym1::nbElements(size_t start, size_t stop, size_t& alc) const
     assert_true( start <= stop );
     stop = std::min(stop, size_);
     alc = nmax_;
-    size_t cnt = size_; // diagonal elements
+    size_t cnt = 0; // diagonal elements
     for ( size_t j = start; j < stop; ++j )
     {
         alc += colmax_[j];

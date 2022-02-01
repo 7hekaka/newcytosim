@@ -358,10 +358,21 @@ std::string SparMatBlk::what() const
 }
 
 
+static void printSparseBlock(std::ostream& os, real inf, SparMatBlk::Block const& B, size_t ii, size_t jj)
+{
+    for ( size_t y = 0; y < BLOCK_SIZE; ++y )
+    for ( size_t x = (ii==jj?y:0); x < BLOCK_SIZE; ++x )
+    {
+        real v = B(y, x);
+        if ( abs_real(v) >= inf )
+            os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << v;
+    }
+}
+
+
 void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
     stop = std::min(stop, size_);
-    char str[256];
     std::streamsize p = os.precision();
     os.precision(8);
     if ( ! row_ )
@@ -373,20 +384,7 @@ void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t st
             os << "% line " << jj << "\n";
         size_t d = 1;
         for ( size_t n = 0 ; n < row.rlen_ ; ++n, d = 0 )
-        {
-            size_t ii = row.inx_[n];
-            Block B = row.blk_[n];
-            for ( size_t x = 0  ; x < BLOCK_SIZE; ++x )
-            for ( size_t y = x*d; y < BLOCK_SIZE; ++y )
-            {
-                real v = B(y, x);
-                if ( abs_real(v) >= inf )
-                {
-                    snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, v);
-                    os << str;
-                }
-            }
-        }
+            printSparseBlock(os, inf, row.blk_[n], row.inx_[n], jj);
     }
     os.precision(p);
 }

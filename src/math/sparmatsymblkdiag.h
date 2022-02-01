@@ -201,10 +201,13 @@ public:
     void allocate(size_t alc);
     
     /// return column at index j
-    Column const& column(size_t j) const { return pilar_[j/SD_BLOCK_SIZE]; }
+    Column& column(size_t j) { return pilar_[j/SD_BLOCK_SIZE]; }
     
-    /// return column at index j
-    Column&       column(size_t j)       { return pilar_[j/SD_BLOCK_SIZE]; }
+    /// number of elements in j-th column
+    size_t column_size(size_t j) const { assert_true(j<size_); return pilar_[j/SD_BLOCK_SIZE].size_; }
+    
+    /// index of ith-elements in j-th column
+    size_t column_index(size_t j, size_t n) const { return pilar_[j/SD_BLOCK_SIZE].inx_[n]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
