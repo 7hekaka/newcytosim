@@ -44,7 +44,7 @@ extern Modulo const* modulo;
 /// true if 'a' is equal to 'b' or 'c'
 inline bool any_equal(const size_t a, const size_t b, const size_t c)
 {
-    return ( a == c ) | ( b == c );
+    return ( a == c ) | ( a == b );
 }
 
 
