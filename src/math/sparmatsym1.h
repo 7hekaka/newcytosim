@@ -7,16 +7,18 @@
 #include <cstdio>
 #include <string>
 
-#define SPARMAT1_COMPACTED 1
+#define SPARMAT1_COMPACTED 0
 #define SPARMAT1_USES_COLNEXT 1
 
 ///real symmetric sparse Matrix, with optimized multiplication
 /**
- SparMatSym1 is similar to SparMatSym2 and uses the same sparse storage scheme,
- with independent arrays of elements for each column with sorted elements.
- Only the lower triangle of the matrix is stored.
+ SparMatSym1 is equivalent to SparMatSym2 and uses a similar storage scheme.
+ It stores diagonal elements in 'diagon_' and off-diagonal elements in sorted
+ array, with independent array for each column.
+ The matrix is symmetric and only the lower triangle of the matrix is stored.
 
- For multiplication, it uses a another format, from Numerical Recipes.
+ if SPARMAT1_COMPACTED==1, it uses a compact storage for multiplication.
+ This incurrs additional memory and performance may not be improved.
  The conversion is done by prepareForMultiply()
 */
 class SparMatSym1 final
@@ -73,6 +75,8 @@ private:
 
     /// allocated size of compact sparse storage arrays
     size_t nmax_;
+    /// index to ija_[] and elm_[] where each column starts
+    unsigned * off_;
     /// compact sparse storage indices
     unsigned * ija_;
     /// compact sparse storage values

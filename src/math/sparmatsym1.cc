@@ -34,6 +34,7 @@ SparMatSym1::SparMatSym1()
     diagon_ = nullptr;
 #if SPARMAT1_COMPACTED
     nmax_ = 0;
+    off_  = new unsigned[2];
     ija_  = nullptr;
     elm_  = nullptr;
 #endif
@@ -90,7 +91,10 @@ void SparMatSym1::allocate(size_t alc)
             colmax_[ii] = 0;
             diagon_[ii] = 0;
         }
-        
+#if SPARMAT1_COMPACTED
+        delete [] off_;
+        off_ = new unsigned[alc+2];
+#endif
 #if SPARMAT1_USES_COLNEXT
         delete[] colidx_;
         colidx_ = new size_t[alc+1];
@@ -390,9 +394,9 @@ size_t SparMatSym1::nbElements(size_t start, size_t stop, size_t& alc) const
     assert_true( start <= stop );
     stop = std::min(stop, size_);
 #if SPARMAT1_COMPACTED
-    alc = nmax_ + size_;
+    alc = nmax_ + alloc_;
 #else
-    alc = size_;
+    alc = alloc_;
 #endif
     size_t cnt = 0; // diagonal elements
     for ( size_t j = start; j < stop; ++j )
@@ -494,25 +498,33 @@ void SparMatSym1::printColumn(std::ostream& os, const size_t jj)
 void SparMatSym1::printSparseArray(std::ostream& os) const
 {
 #if SPARMAT1_COMPACTED
-    std::ios::fmtflags fgs = os.flags();
-    size_t end = ija_[size_];
-    
-    os << "ija ";
-    for ( size_t n = 0; n < end; ++n )
-        os << " " << std::setw(6) << ija_[n];
-    os << "\n";
-    
-    std::streamsize p = os.precision();
-    os.precision(2);
-    os << "elm ";
-    for ( size_t n = 0; n < end; ++n )
-        os << " " << std::setw(6) << elm_[n];
-    os << "\n";
-    os.precision(p);
-    os.setf(fgs);
-#else
-    os << "SMS1 has no consolidated sparse matrix storage\n";
+    if ( ija_ )
+    {
+        std::ios::fmtflags fgs = os.flags();
+        
+        os << "off ";
+        for ( size_t j = 0; j <= size_; ++j )
+            os << " " << std::setw(4) << off_[j];
+        os << "\n";
+
+        size_t end = off_[size_];
+        os << "ija ";
+        for ( size_t n = 0; n < end; ++n )
+            os << " " << std::setw(4) << ija_[n];
+        os << "\n";
+        
+        std::streamsize p = os.precision();
+        os.precision(2);
+        os << "elm ";
+        for ( size_t n = 0; n < end; ++n )
+            os << " " << std::setw(4) << elm_[n];
+        os << "\n";
+        os.precision(p);
+        os.setf(fgs);
+        return;
+    }
 #endif
+    os << "SMS1 has no compact storage\n";
 }
 
 
@@ -640,34 +652,28 @@ bool SparMatSym1::prepareForMultiply(int)
 
 
 /**
- Create the compressed sparse format described in
-     "Numerical Recipes: The Art of Scientific Computing"
- Chapter 2.7 Sparse Linear Systems - Indexed Storage of Sparse Matrices
+ Create the Compressed Sparse Row format described in
+     "SPARSKIT: a basic to ol kit for sparse matrix computations"
+ Youcef Saad, Version 2, 1994
  
- Attention: indices however start here at zero, and many things are thus
- shifted by one, compared to Numerical Recipes' code.
+ Attention: indices start here at zero, and many things are thus shifted by one,
+ compared to FORTRAN code and many related documentation.
 
- The row-indexed scheme uses two one-dimensional arrays: elm[] and ija[].
- elm[] stores matrix element values as real
- ija[] stores integer values.
- The storage rules are:
-     * The first N locations of elm[] store A’s diagonal matrix elements, in order.
-       (Diagonal elements are stored even if they are zero; this is at most a slight storage
-       inefficiency, since diagonal elements are nonzero in most realistic applications.)
-     * Each of the first N locations of ija[] stores the index of the array elm[] that
-       contains the first off-diagonal element of the corresponding row of the matrix.
-       (If there are no off-diagonal elements for that row, it is one greater than
-       the index in elm[] of the most recently stored element of a previous row.)
-     * ija[0] is always equal to N+2. (It can be read to determine N.)
-     * ija[N] is one greater than the index in elm[] of the last off-diagonal
-      element of the last row. (It can be read to determine the number of nonzero
-     elements in the matrix, or the number of elements in elm[] and ija[].)
-     * elm[N] of is not used and can be set arbitrarily.
-     * Entries in elm[] at locations N+2 contain A’s off-diagonal values,
-       ordered by rows and, within each row, ordered by columns.
-     * Entries in ija[] at locations N+2 contain the column number of the corresponding
-     element in elm[].
+ * dia[] stores the diagonal elements of the matrix.
+ Off-diagonal element are stored following the Compressed Sparse Row format,
+ using three one-dimensional arrays: off[], elm[] and ija[].
+ * elm[] stores matrix element values as real
+ * ija[] stores the line index corresponding to elm[] at the same position.
+ * off[j] is the index in elm[] and ija[] of the first off-element of column j
 
+ Thus:
+ * Array dia[] is of size N and off[] is of size N+1.
+ * off[size] = number of off-diagonal elements.
+ * Arrays ija[] and elm[] hold all off-diagonal non-zero elements.
+ the off-diagonal elements in row i are in elm[k] where ija[i] <= k < ija[i+1]
+ 
+ Example:
+ 
     3: 0: 1: 0: 0:
     0: 4: 0: 0: 0:
     0: 7: 5: 9: 0:
@@ -675,17 +681,13 @@ bool SparMatSym1::prepareForMultiply(int)
     0: 0: 0: 6: 5:
 
     In row-indexed compact storage, this 5x5 matrix is represented as follows:
-    ija[k]  6  7  7  9 10 11  2  1  3  4  3
-    elm[k]  3. 4. 5. 0. 5. X  1. 7. 9. 2. 6.
-     
- The two arrays are of size 5 + nnz + 1, since there are nnz=5 off-diagonal non-zero elements.
- 
- Here X is an arbitrary value. Notice that, according to the storage rules, the value of N
- (namely 5) is N = ija[0]-1, and the length of each array is ija[N], namely 11.
- The diagonal element in row i is elm[i], and the off-diagonal elements in that row are in
- elm[k] where k loops from ija[i] to ija[i+1]-1, if the upper limit is greater or equal to
- the lower one (as in C’s for loops).
-*/
+    dia[]  3. 4. 5. 0. 5.
+    off[]  0  1  1  3  4  5
+    ija[]  2  1  3  4  3
+    elm[]  1. 7. 9. 2. 6.
+
+    Since the number of off-diagonal non-zero elements is 5.
+ */
 
 bool SparMatSym1::prepareForMultiply(int dim)
 {
@@ -694,7 +696,7 @@ bool SparMatSym1::prepareForMultiply(int dim)
     setColumnIndex();
 
     // count number of non-zero elements
-    size_t nnz = 1 + size_;
+    size_t nnz = 0;
     for ( size_t jj = 0; jj < size_; ++jj )
         nnz += colsiz_[jj];
     
@@ -706,19 +708,14 @@ bool SparMatSym1::prepareForMultiply(int dim)
         delete[] ija_;
         free_real(elm_);
         ija_ = new unsigned[nmax_];
-        elm_  = new_real(nmax_);
+        elm_ = new_real(nmax_);
     }
     
     // Create the Compressed Sparse Storage
-    unsigned cnt = 1 + size_;
-    assert_true(cnt == 1 + size_);
-    ija_[0] = cnt;
-    elm_[size_] = 42; // this is the arbitrary value
+    unsigned cnt = 0;
+    off_[0] = 0;
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        /* We copy here the diagonal elements, but we could directly use
-         the array 'diagon_' and allocated elm_[] to a smaller size */
-        elm_[jj] = diagon_[jj];
         Element * col = column_[jj];
         for ( size_t k = 0; k < colsiz_[jj]; ++k )
         {
@@ -732,14 +729,14 @@ bool SparMatSym1::prepareForMultiply(int dim)
                 ++cnt;
             }
         }
-        ija_[jj+1] = cnt;
+        off_[jj+1] = cnt;
     }
     if ( cnt > nnz )
         ABORT_NOW("internal error");
     //std::clog << "SMS1 has " << cnt << " (" << nnz << ") non-zero elements\n";
     
     //printSparse(std::clog);
-    //printSparseArray(std::clog);
+    //printSparseArray(std::cout);
     return true;
 }
 
@@ -1084,13 +1081,14 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj,
 void SparMatSym1::vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj,
                                         const double* dia, size_t start, size_t stop) const
 {
+    //fprintf(stderr, "col %lu: %lu %lu\n", jj, start, stop);
     assert_true( start <= stop );
     assert_true( stop <= nmax_ );
     vec4 zz = setzero4();
     vec4 xx = blend31(loadu4(X+jj), zz);
     vec4 yy = fmadd4(broadcast1(dia), xx, loadu4(Y+jj));
-    real * val = elm_ + start;
-    real const*end = elm_ + stop - 1;
+    real * val = elm_ + start + 1;
+    real const*end = elm_ + stop;
     unsigned *inx = ija_ + start;
     while ( val < end )
     {
@@ -1098,8 +1096,8 @@ void SparMatSym1::vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj,
         size_t kk = *(inx+1);
         assert_true( kk > ii );
         inx += 2;
-        vec4 aa = broadcast1(val);
-        vec4 bb = broadcast1(val+1);
+        vec4 aa = broadcast1(val-1);
+        vec4 bb = broadcast1(val);
         vec4 nn = loadu4(Y+ii);
         vec4 mm = loadu4(Y+kk);
         val += 2;
@@ -1113,7 +1111,8 @@ void SparMatSym1::vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj,
     {
         size_t ii = *inx++;
         assert_true( ii > jj );
-        vec4 aa = broadcast1(val++);
+        vec4 aa = broadcast1(val-1);
+        ++val;
         yy = fmadd4(aa, loadu4(X+ii), yy);
         storeu4(Y+ii, fmadd4(aa, xx, loadu4(Y+ii)));
     }
@@ -1138,7 +1137,7 @@ void SparMatSym1::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) c
 #endif
     {
 #if SPARMAT1_COMPACTED
-        vecMulAddCol(X, Y, jj, elm_[jj], ija_[jj], ija_[jj+1]);
+        vecMulAddCol(X, Y, jj, diagon_[jj], off_[jj], off_[jj+1]);
 #else
         vecMulAddCol(X, Y, jj, diagon_[jj], column_[jj], colsiz_[jj]);
 #endif
@@ -1159,11 +1158,11 @@ void SparMatSym1::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t st
     {
 #if SPARMAT1_COMPACTED
 #  if SPARMAT1_USES_AVX
-        vecMulAddColIso2D_AVXU(X, Y, 2*jj, elm_+jj, ija_[jj], ija_[jj+1]);
+        vecMulAddColIso2D_AVXU(X, Y, 2*jj, diagon_+jj, off_[jj], off_[jj+1]);
 #  elif SPARMAT1_USES_SSE
-        vecMulAddColIso2D_SSEU(X, Y, 2*jj, elm_+jj, ija_[jj], ija_[jj+1]);
+        vecMulAddColIso2D_SSEU(X, Y, 2*jj, diagon_+jj, off_[jj], off_[jj+1]);
 #  else
-        vecMulAddColIso2D(X, Y, 2*jj, elm_[jj], ija_[jj], ija_[jj+1]);
+        vecMulAddColIso2D(X, Y, 2*jj, diagon_[jj], off_[jj], off_[jj+1]);
 #  endif
 #else
         vecMulAddColIso2D(X, Y, 2*jj, diagon_[jj], column_[jj], colsiz_[jj]);
@@ -1186,9 +1185,9 @@ void SparMatSym1::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t st
     {
 #if SPARMAT1_COMPACTED
 #  if SPARMAT1_USES_AVX
-        vecMulAddColIso3D_AVX(X, Y, 3*jj, elm_+jj, ija_[jj], ija_[jj+1]);
+        vecMulAddColIso3D_AVX(X, Y, 3*jj, diagon_+jj, off_[jj], off_[jj+1]);
 #  else
-        vecMulAddColIso3D(X, Y, 3*jj, elm_[jj], ija_[jj], ija_[jj+1]);
+        vecMulAddColIso3D(X, Y, 3*jj, diagon_[jj], off_[jj], off_[jj+1]);
 #  endif
 #else
         vecMulAddColIso3D(X, Y, 3*jj, diagon_[jj], column_[jj], colsiz_[jj]);
