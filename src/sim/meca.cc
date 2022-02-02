@@ -1934,13 +1934,10 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         if ( prop->verbose & 4 )
         {
             unsigned cnt = std::max(1U, monitor.count());
-            auto tot = cycles_ >> 10;
-            auto fac = factor >> 10;
-            auto sol = solve >> 10;
-            oss << "  cycles " << precond << "T " << std::setw(8) << tot;
-            oss << " F " << std::setw(8) << fac << std::setw(6) << fac/cnt;
-            oss << " S " << std::setw(8) << sol << std::setw(6) << sol/cnt;
-            oss << " R " << std::setw(6) << ( tot - fac - sol ) / cnt;
+            oss << "  cycles " << precond << "T " << std::setw(8) << cycles_;
+            oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
+            oss << " S " << std::setw(8) << solve << std::setw(6) << solve/cnt;
+            oss << " R " << std::setw(6) << ( cycles_ - factor - solve ) / cnt;
         }
         Cytosim::out << oss.str() << std::endl;
     }

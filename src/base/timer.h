@@ -1,8 +1,14 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 
-#if 0
-/* Using Intel's timer functions */
+#if ( 0 )
+
+/*
+ Using Intel's processor Cycle counting functions,
+ multiplying by 2^20 to get into the milli-second range
+ but exact conversion depends on the processor frequency and may vary
+*/
+
 #include <x86intrin.h>
 
 /* declare rdtsc from assembly if necessary
@@ -17,14 +23,14 @@ __rdtsc (void)
 /// keeping time using Intel's cycle counters
 unsigned long long rdt_ = 0;
 
-/// return current time value (64 bits)
-inline unsigned long long timer() { return __rdtsc(); }
+/// return current timer value (64 bits)
+inline unsigned long long timer() { return __rdtsc() >> 20; }
 
 /// start timer
 inline void tick() { rdt_ = __rdtsc(); }
 
 /// return time since last 'tick()', divided by 'arg'
-inline double tock(double arg = 1) { return double(__rdtsc()-rdt_) / arg; }
+inline double tock(double arg = 1) { return double((__rdtsc()-rdt_) >> 20) / arg; }
 
 #elif ( 1 )
 
@@ -33,12 +39,12 @@ inline double tock(double arg = 1) { return double(__rdtsc()-rdt_) / arg; }
 // using real time
 struct timeval tic_t;
 
-/// return current time value in microseconds
+/// return current timer value in milliseconds
 inline unsigned long timer()
 {
     timeval tv;
     gettimeofday(&tv, nullptr);
-    return 1000000 * (unsigned long)tv.tv_sec + tv.tv_usec;
+    return 1000 * (unsigned long)tv.tv_sec + tv.tv_usec / 1000;
 }
 
 /// start timer
@@ -52,7 +58,7 @@ inline double tock(double arg = 1e3)
 {
     timeval tv;
     gettimeofday(&tv, nullptr);
-    return double(1e9*(tv.tv_sec-tic_t.tv_sec) + 1e3*(tv.tv_usec-tic_t.tv_usec))/arg;
+    return double(1000*(tv.tv_sec-tic_t.tv_sec) + (tv.tv_usec-tic_t.tv_usec)/1000)/arg;
 }
 
 #else

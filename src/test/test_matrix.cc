@@ -24,10 +24,13 @@ typedef SparMatBlk        SparMatA;
 typedef SparMatSymBlk     SparMatB;
 typedef SparMatSymBlkDiag SparMatD;
 
-constexpr size_t N_RUN = 1;
-constexpr size_t N_MUL = 1;
+// number of multiplication in sequence
+constexpr size_t N_MUL = 47;
+
+// number of repeat of ( 1 prepare + N_MUL multiplications)
+constexpr size_t N_RUN = 4;
+
 constexpr size_t CNT = N_RUN * N_MUL;
-constexpr size_t DIV = CNT << 18;
 
 #define PAD 4
 
@@ -115,57 +118,6 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
             y[n] = 0;
             z[n] = 0;
         }
-    }
-}
-
-template <typename MATRIX>
-void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
-{
-    assert_true( i+DIM <= mat.size() );
-    assert_true( j+DIM <= mat.size() );
-    
-#if ( DIM == 3 )
-    Matrix33 M(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
-#elif ( DIM == 2 )
-    Matrix22 M(alpha, beta, -beta, alpha);
-#else
-    Matrix11 M(alpha);
-#endif
-    // this is a block on the diagonal:
-    for ( size_t x = 0; x < DIM; ++x )
-    for ( size_t y = x; y < DIM; ++y )
-        mat(i+y, i+x) += M(y,x);
-    
-    if ( i != j )
-    {
-        // this is a block on the diagonal:
-        for ( size_t x = 0; x < DIM; ++x )
-        for ( size_t y = x; y < DIM; ++y )
-            mat(j+y, j+x) += M(y,x);
-        // off-diagonal
-        size_t I = std::max(i, j);
-        size_t J = std::min(i, j);
-        for ( size_t x = 0; x < DIM; ++x )
-        for ( size_t y = 0; y < DIM; ++y )
-            mat(I+y, J+x) += M(y,x);
-    }
-}
-
-
-template <typename MATRIX>
-void fillMatrixIso(MATRIX& mat, const size_t i, const size_t j)
-{
-    //printf("fillMatrixIso %lu %lu <---- %f\n", i, j, alpha);
-    mat.diagonal(i) += alpha;
-    if ( i > j )
-    {
-        mat.diagonal(j) += alpha;
-        mat(i, j) += beta;
-    }
-    else if ( j > i )
-    {
-        mat.diagonal(j) += alpha;
-        mat(j, i) += beta;
     }
 }
 
@@ -259,6 +211,40 @@ void compareMatrix(size_t S, MATRIX & mat1, MATROX& mat2, size_t fill)
 
 
 template <typename MATRIX>
+void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
+{
+    assert_true( i+DIM <= mat.size() );
+    assert_true( j+DIM <= mat.size() );
+    
+#if ( DIM == 3 )
+    Matrix33 M(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
+#elif ( DIM == 2 )
+    Matrix22 M(alpha, beta, -beta, alpha);
+#else
+    Matrix11 M(alpha);
+#endif
+    // this is a block on the diagonal:
+    for ( size_t x = 0; x < DIM; ++x )
+    for ( size_t y = x; y < DIM; ++y )
+        mat(i+y, i+x) += M(y,x);
+    
+    if ( i != j )
+    {
+        // this is a block on the diagonal:
+        for ( size_t x = 0; x < DIM; ++x )
+        for ( size_t y = x; y < DIM; ++y )
+            mat(j+y, j+x) += M(y,x);
+        // off-diagonal
+        size_t I = std::max(i, j);
+        size_t J = std::min(i, j);
+        for ( size_t x = 0; x < DIM; ++x )
+        for ( size_t y = 0; y < DIM; ++y )
+            mat(I+y, J+x) += M(y,x);
+    }
+}
+
+
+template <typename MATRIX>
 void checkMatrix(MATRIX & mat, real const* x, real * z)
 {
     size_t S = mat.size();
@@ -281,14 +267,13 @@ template <typename MATRIX>
 void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 {
     tick();
-    for ( size_t ii=0; ii<N_RUN; ++ii )
+    for ( size_t n=0; n<N_RUN; ++n )
     {
         mat.reset();
-        for ( size_t n=0; n<icnt_; ++n )
-            fillMatrix(mat, iny_[n], inx_[n]);
-        // mat(iny[n], inx[n]) += alpha;
+        for ( size_t i=0; i<icnt_; ++i )
+            fillMatrix(mat, iny_[i], inx_[i]);
     }
-    double ts = tock(DIV);
+    double ts = tock(N_RUN);
     mat.prepareForMultiply(1);
 
     tick();
@@ -297,7 +282,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
         mat.vecMulAdd(y, z);
         mat.vecMulAdd(x, z);
     }
-    double t1 = tock(DIV);
+    double t1 = tock(N_RUN);
     
     tick();
     for ( size_t n=0; n<CNT; ++n )
@@ -305,7 +290,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
         mat.vecMulAdd_ALT(x, z);
         mat.vecMulAdd_ALT(y, z);
     }
-    double t2 = tock(DIV);
+    double t2 = tock(N_RUN);
 
     tick();
     for ( size_t n=0; n<CNT; ++n )
@@ -313,10 +298,10 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
         mat.vecMul(y, z);
         mat.vecMul(x, z);
     }
-    double t3 = tock(DIV);
+    double t3 = tock(N_RUN);
 
     printf("\n%-32s ", mat.what().c_str());
-    printf("set %9.2f  muladd %9.2f  alt %9.2f  mul %9.2f", ts, t1, t2, t3);
+    printf("set %9.0f  muladd %9.0f  alt %9.0f  mul %9.0f", ts, t1, t2, t3);
     checkMatrix(mat, x, z);
     fflush(stdout);
 }
@@ -381,7 +366,7 @@ void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z)
             for ( size_t i = 0; i < S; i += PARALLEL_CHUNK )
                 mat.vecMulAdd(x, z, i, i+PARALLEL_CHUNK);
         }
-        t[i] = tock(DIV);
+        t[i] = tock(N_RUN);
     }
 
     printf("\n%-32s", mat.what().c_str());
@@ -394,6 +379,23 @@ void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z)
 
 //------------------------------------------------------------------------------
 #pragma mark - Test Iso Matrix
+
+template <typename MATRIX>
+void fillMatrixIso(MATRIX& mat, const size_t i, const size_t j)
+{
+    //printf("fillMatrixIso %lu %lu <---- %f\n", i, j, alpha);
+    mat.diagonal(i) += alpha;
+    if ( i > j )
+    {
+        mat.diagonal(j) += alpha;
+        mat(i, j) += beta;
+    }
+    else if ( j > i )
+    {
+        mat.diagonal(j) += alpha;
+        mat(j, i) += beta;
+    }
+}
 
 #if ( DIM == 1 )
 #   define VECMULADDISO vecMulAdd
@@ -453,7 +455,7 @@ void testIsoMatrix(MATRIX & mat, real const* x, real const* y, real * z)
         for ( size_t n=0; n<icnt_; ++n )
             fillMatrixIso(mat, inx_[n], iny_[n]);
     }
-    double ts = tock(CNT);
+    double ts = tock(N_RUN);
     
     tick();
     for ( size_t i=0; i<N_RUN; ++i )
@@ -465,10 +467,10 @@ void testIsoMatrix(MATRIX & mat, real const* x, real const* y, real * z)
             mat.VECMULADDISO(y, z);
         }
     }
-    double tm = tock(CNT);
+    double tm = tock(N_RUN);
     
     printf("\n%-29s ", mat.what().c_str());
-    printf("isoset %9.2f  isomul %9.2f", ts, tm);
+    printf("isoset %9.0f  isomul %9.0f", ts, tm);
     checkIsoMatrix(mat, x, y, z);
     fflush(stdout);
 }
@@ -543,7 +545,7 @@ This compares the Scalar and SIMD implementations of one matrix
         for ( size_t m=0; m<N_MUL; ++m )
             mat.vecMulAdd_ALT(x, z);
     }
-    double nop = N_MUL * N_RUN * mat.nbElements();
+    double nop = N_RUN * mat.nbElements();
     double t1 = tock(nop);
 
     tick();
@@ -556,7 +558,7 @@ This compares the Scalar and SIMD implementations of one matrix
     double t2 = tock(nop);
     
     printf("%6lu %26s ", S, mat.what().c_str());
-    printf("set %8.1f mul %8.1f  alt %8.1f", ts, t1, t2);
+    printf("set %9.1f mul %9.1f  alt %9.1f", ts, t1, t2);
     printf(" :  checksum  %+24.16f %+24.16f", sum, res);
     if ( sum != res )
         printf("  failed!\n");
