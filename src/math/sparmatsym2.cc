@@ -33,7 +33,7 @@ SparMatSym2::SparMatSym2()
     column_ = nullptr;
     colsiz_ = nullptr;
     colmax_ = nullptr;
-#if SPARMAT2_OPTIMIZED_MULTIPLY
+#if SPARMAT2_COMPACTED
     alcDSS_ = 0;
     colDSS_ = nullptr;
     rowDSS_ = nullptr;
@@ -87,7 +87,7 @@ void SparMatSym2::allocate(size_t alc)
             colsiz_[ii] = 0;
             colmax_[ii] = 0;
         }
-#if SPARMAT2_OPTIMIZED_MULTIPLY
+#if SPARMAT2_COMPACTED
         delete[] rowDSS_;
         rowDSS_ = new unsigned[alc+2];
 #endif
@@ -123,7 +123,7 @@ void SparMatSym2::deallocate()
 #if SPARMAT2_USES_COLNEXT
         delete[] colidx_; colidx_ = nullptr;
 #endif
-#if SPARMAT2_OPTIMIZED_MULTIPLY
+#if SPARMAT2_COMPACTED
         delete[] colDSS_; colDSS_ = nullptr;
         delete[] rowDSS_; rowDSS_ = nullptr;
         free_real(valDSS_); valDSS_ = nullptr;
@@ -380,8 +380,11 @@ size_t SparMatSym2::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_);
-    //all allocated elements are counted, even if zero
+#if SPARMAT2_COMPACTED
+    alc = alcDSS_;
+#else
     alc = 0;
+#endif
     size_t cnt = 0;
     for ( size_t j = start; j < stop; ++j )
     {
@@ -408,6 +411,9 @@ std::string SparMatSym2::what() const
     size_t alc;
     size_t cnt = nbElements(0, size_, alc);
     std::ostringstream msg;
+#if SPARMAT2_COMPACTED
+    msg << "c";
+#endif
 #if SPARMAT2_USES_AVX
     msg << "SMS2x ";
 #elif SPARMAT2_USES_SSE
@@ -484,32 +490,35 @@ void SparMatSym2::printColumn(std::ostream& os, const size_t jj)
 
 void SparMatSym2::printSparseArray(std::ostream& os) const
 {
-#if SPARMAT2_OPTIMIZED_MULTIPLY
-    std::ios::fmtflags fgs = os.flags();
-    std::streamsize p = os.precision();
-
-    size_t cnt = rowDSS_[size_];
-    os << "\n% SparseMatSym2 size " << size_ << " DSS storage:";
-    os << "\nvalues   ";
-    os.precision(2);
-    for ( size_t i = 0; i < cnt; ++i )
-        os << " " << std::setw(5) << valDSS_[i];
-    
-    os << "\ncolumns  ";
-    for ( size_t i = 0; i < cnt; ++i )
-        os << " " << std::setw(5) << colDSS_[i];
-                
-    os.precision(2);
-    os << "\nrowIndex ";
-    for ( size_t i = 0; i <= size_; ++i )
-        os << " " << std::setw(5) << rowDSS_[i];
-
-    os.precision(p);
-    os.setf(fgs);
-    std::endl(os);
-#else
-    os << "no alternative sparse matrix storage\n";
+#if SPARMAT2_COMPACTED
+    if ( rowDSS_ )
+    {
+        std::ios::fmtflags fgs = os.flags();
+        std::streamsize p = os.precision();
+        
+        size_t cnt = rowDSS_[size_];
+        os << "\n% SparseMatSym2 size " << size_ << " DSS storage:";
+        os << "\nvalues   ";
+        os.precision(2);
+        for ( size_t i = 0; i < cnt; ++i )
+            os << " " << std::setw(5) << valDSS_[i];
+        
+        os << "\ncolumns  ";
+        for ( size_t i = 0; i < cnt; ++i )
+            os << " " << std::setw(5) << colDSS_[i];
+        
+        os.precision(2);
+        os << "\nrowIndex ";
+        for ( size_t i = 0; i <= size_; ++i )
+            os << " " << std::setw(5) << rowDSS_[i];
+        
+        os.precision(p);
+        os.setf(fgs);
+        std::endl(os);
+        return;
+    }
 #endif
+    os << "SMS2 has no compact storage\n";
 }
 
 
@@ -526,7 +535,7 @@ void SparMatSym2::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt
     const auto jj = col[0].inx;
     const real X0 = X[jj];
     real Y0 = Y[jj] + col[0].val * X0;
-    for ( size_t n = 1 ; n < cnt ; ++n )
+    for ( size_t n = 1; n < cnt; ++n )
     {
         const auto ii = col[n].inx;
         const real a = col[n].val;
@@ -549,7 +558,7 @@ void SparMatSym2::vecMulAddColIso2D(const real* X, real* Y, Element col[], size_
     const real X1 = X[jj+1];
     real Y0 = Y[jj  ] + col[0].val * X0;
     real Y1 = Y[jj+1] + col[0].val * X1;
-    for ( size_t n = 1 ; n < cnt ; ++n )
+    for ( size_t n = 1; n < cnt; ++n )
     {
         const auto ii = 2 * col[n].inx;
         const real a = col[n].val;
@@ -577,7 +586,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_
     real Y0 = Y[jj  ] + col[0].val * X0;
     real Y1 = Y[jj+1] + col[0].val * X1;
     real Y2 = Y[jj+2] + col[0].val * X2;
-    for ( size_t n = 1 ; n < cnt ; ++n )
+    for ( size_t n = 1; n < cnt; ++n )
     {
         const auto ii = 3 * col[n].inx;
         const real a = col[n].val;
@@ -626,7 +635,7 @@ void SparMatSym2::setColumnIndex()
 #endif
 }
 
-#if !SPARMAT2_OPTIMIZED_MULTIPLY
+#if !SPARMAT2_COMPACTED
 
 bool SparMatSym2::prepareForMultiply(int)
 {
@@ -1054,7 +1063,7 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
 //------------------------------------------------------------------------------
 #pragma mark - 3D SIMD
 
-#if SPARMAT2_USES_AVX && SPARMAT2_OPTIMIZED_MULTIPLY && REAL_IS_DOUBLE
+#if SPARMAT2_USES_AVX && SPARMAT2_COMPACTED && REAL_IS_DOUBLE
 void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
                                         size_t start, size_t stop) const
 {
@@ -1102,7 +1111,7 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
 #endif
 
 
-#if defined(__SSE3__) && SPARMAT2_OPTIMIZED_MULTIPLY && !REAL_IS_DOUBLE
+#if defined(__SSE3__) && SPARMAT2_COMPACTED && !REAL_IS_DOUBLE
 void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
                                         size_t start, size_t stop) const
 {
@@ -1208,7 +1217,7 @@ void SparMatSym2::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) c
     if ( colsiz_[jj] > 0 )
 #endif
     {
-#if SPARMAT2_OPTIMIZED_MULTIPLY
+#if SPARMAT2_COMPACTED
         // check this is diagonal term:
         assert_true(colDSS_[rowDSS_[jj]] == jj);
         vecMulAddCol(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
@@ -1232,7 +1241,7 @@ void SparMatSym2::vecMulAddIso2D(const real* X, real* Y, size_t start, size_t st
     if ( colsiz_[jj] > 0 )
 #endif
     {
-#if SPARMAT2_OPTIMIZED_MULTIPLY
+#if SPARMAT2_COMPACTED
         assert_true(colDSS_[rowDSS_[jj]] == 2*jj);
 #  if SPARMAT2_USES_AVX && REAL_IS_DOUBLE
         //vecMulAddColIso2D_AVXU(X, Y, rowDSS_[jj], rowDSS_[jj+1]);
@@ -1261,7 +1270,7 @@ void SparMatSym2::vecMulAddIso3D(const real* X, real* Y, size_t start, size_t st
     if ( colsiz_[jj] > 0 )
 #endif
     {
-#if SPARMAT2_OPTIMIZED_MULTIPLY
+#if SPARMAT2_COMPACTED
         assert_true(colDSS_[rowDSS_[jj]] == 3*jj);
 #  if SPARMAT2_USES_AVX && REAL_IS_DOUBLE
         vecMulAddColIso3D_AVX(X, Y, rowDSS_[jj], rowDSS_[jj+1]);

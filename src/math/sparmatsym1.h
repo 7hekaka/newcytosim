@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <string>
 
-#define SPARMAT1_OPTIMIZED_MULTIPLY 1
+#define SPARMAT1_COMPACTED 1
 #define SPARMAT1_USES_COLNEXT 1
 
 ///real symmetric sparse Matrix, with optimized multiplication
@@ -69,25 +69,25 @@ private:
     /// update colidx_[], a pointer to the next non-empty column
     void setColumnIndex();
     
-#if SPARMAT1_OPTIMIZED_MULTIPLY
+#if SPARMAT1_COMPACTED
 
     /// allocated size of compact sparse storage arrays
     size_t nmax_;
     /// compact sparse storage indices
     unsigned * ija_;
     /// compact sparse storage values
-    real * sa_;
+    real * elm_;
 
 #endif
     
     /// One column multiplication of a vector
-    static void vecMulAddCol(const real* X, real* Y, real dia, size_t jj, Element col[], size_t cnt);
+    static void vecMulAddCol(const real* X, real* Y, size_t jj, real dia, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 2D version
-    static void vecMulAddColIso2D(const real* X, real* Y, real dia, size_t jj, Element col[], size_t cnt);
+    static void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real dia, Element col[], size_t cnt);
     
     /// One column multiplication of a vector, isotropic 3D version
-    static void vecMulAddColIso3D(const real* X, real* Y, real dia, size_t jj, Element col[], size_t cnt);
+    static void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real dia, Element col[], size_t cnt);
 
 
     /// One column multiplication of a vector
