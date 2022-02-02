@@ -277,7 +277,7 @@ bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
         is.seekg(isp);
         return false;
     }
-    if ( !isspace(is.peek()) )
+    if ( !isspace(is.peek()) && is.peek()!=EOF )
     {
         // declare error, if there is no spacing character:
         is.seekg(isp);
@@ -304,7 +304,7 @@ bool Tokenizer::get_integer(std::istream& is, long& var)
         is.seekg(isp);
         return false;
     }
-    if ( !isspace(is.peek()) )
+    if ( !isspace(is.peek()) && is.peek()!=EOF )
     {
         // declare error, if there is no spacing character:
         is.seekg(isp);
