@@ -587,162 +587,6 @@ inline int four_near(vec4f const& xyzr, BigLocus const* src)
     return lower_mask4f(uu, tt);  // x*x + y*y < r*r - z*z
 }
 
-
-/**
- This will consider once all pairs of objects from the given lists,
- assuming that the list are different and no object is repeated.
-
- Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on BigVector::near()
- 
- This code was superseeded by setStericsX()
-*/
-void LocusGrid::setStericsU(Meca& meca, real stiff, BigLocusList const& list1,
-                            BigLocusList const& list2)
-{
-    assert_true( &list1 != &list2 );
-#if 0
-    {
-        size_t l1 = list1.num_locus(), p1 = list1.num_points();
-        size_t l2 = list2.num_locus(), p2 = list2.num_points();
-        printf(" stericsU: %2lu+%2lu  :  %2lu+%2lu\n", l1, p1, l2, p2);
-    }
-#endif
-    BigLocus const* mid1 = list1.middle();
-    for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
-    {
-        BigVector pos = ii->pos_;
-        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
-        int t;
-        
-        BigLocus const* jj = list2.begin();
-        #pragma nounroll
-        for ( ; jj < list2.pre_middle(); jj += 4 )
-        {
-            t = four_near(xyzr, jj);
-            if ( !t ) continue;
-#if 0
-            bool n0 = pos.near(jj->pos_);
-            bool n1 = pos.near((jj+1)->pos_);
-            bool n2 = pos.near((jj+2)->pos_);
-            bool n3 = pos.near((jj+3)->pos_);
-            printf("%i:%u%u%u%u \n", t, n3, n2, n1, n0);
-#endif
-            if ( (t&1) && not_adjacentLL(*ii, *(jj  )) ) checkLL(meca, stiff, *ii, *(jj));
-            if ( (t&2) && not_adjacentLL(*ii, *(jj+1)) ) checkLL(meca, stiff, *ii, *(jj+1));
-            if ( (t&4) && not_adjacentLL(*ii, *(jj+2)) ) checkLL(meca, stiff, *ii, *(jj+2));
-            if ( (t&8) && not_adjacentLL(*ii, *(jj+3)) ) checkLL(meca, stiff, *ii, *(jj+3));
-        }
-        if ( jj < list2.pre_end() )
-        {
-            // handle transition zone with BigLocus and BigPoint
-            t = four_near(xyzr, jj);
-            if ( t )
-            {
-                //printf(" XL%i");
-                //int u = 0, k = 1;
-                int u = __builtin_ctz(t), k = 1 << u;
-                int m = std::min(4, int(list2.middle()-jj));
-                int e = std::min(4, int(list2.end()-jj));
-                for ( ; u < m; ++u, k<<=1 )
-                    if ( (t&k) && not_adjacentLL(*ii, *(jj+u)) ) checkLL(meca, stiff, *ii, *(jj+u));
-                for ( ; u < e; ++u, k<<=1 )
-                    if ( (t&k) && not_adjacentPL(*(jj+u), *ii) ) checkPL(meca, stiff,*(jj+u), *ii);
-            }
-            jj += 4;
-            assert_true( jj > list2.middle() );
-            #pragma nounroll
-            for ( ; jj < list2.pre_end(); jj += 4 )
-            {
-                t = four_near(xyzr, jj);
-                if ( !t ) continue;
-                //printf(" LP%i", t);
-                if ( (t&1) && not_adjacentPL(*(jj  ), *ii) ) checkPL(meca, stiff, *(jj), *ii);
-                if ( (t&2) && not_adjacentPL(*(jj+1), *ii) ) checkPL(meca, stiff, *(jj+1), *ii);
-                if ( (t&4) && not_adjacentPL(*(jj+2), *ii) ) checkPL(meca, stiff, *(jj+2), *ii);
-                if ( (t&8) && not_adjacentPL(*(jj+3), *ii) ) checkPL(meca, stiff, *(jj+3), *ii);
-            }
-        }
-        else
-        {
-            // less than 3 BigLocus remaining
-            assert_true( list2.middle() - jj < 4 );
-            #pragma nounroll
-            for ( ; jj < list2.middle(); ++jj )
-                if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj) ) checkLL(meca, stiff, *ii, *jj);
-        }
-        // less than 3 BigPoint remaining
-        assert_true( list2.end() - jj < 4 );
-        #pragma nounroll
-        for ( ; jj < list2.end(); ++jj )
-            if ( pos.near(jj->pos_) && not_adjacentPL(*jj, *ii) ) checkPL(meca, stiff, *jj, *ii);
-    }
-    
-    for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
-    {
-        BigVector pos = ii->pos_;
-        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
-        int t;
-        
-        BigLocus const* jj = list2.begin();
-        #pragma nounroll
-        for ( ; jj < list2.pre_middle(); jj += 4 )
-        {
-            t = four_near(xyzr, jj);
-            if ( !t ) continue;
-            //printf(" PL%i", t);
-            if ( (t&1) && not_adjacentPL(*ii, *(jj  )) ) checkPL(meca, stiff, *ii, *(jj));
-            if ( (t&2) && not_adjacentPL(*ii, *(jj+1)) ) checkPL(meca, stiff, *ii, *(jj+1));
-            if ( (t&4) && not_adjacentPL(*ii, *(jj+2)) ) checkPL(meca, stiff, *ii, *(jj+2));
-            if ( (t&8) && not_adjacentPL(*ii, *(jj+3)) ) checkPL(meca, stiff, *ii, *(jj+3));
-        }
-        if ( jj < list2.pre_end() )
-        {
-            // handle transition zone with BigLocus and BigPoint
-            t = four_near(xyzr, jj);
-            if ( t )
-            {
-                //printf(" XL%i");
-                //int u = 0, k = 1;
-                int u = __builtin_ctz(t), k = 1 << u;
-                int m = int(list2.middle()-jj);
-                assert_true( m < 4 );
-                int e = std::min(4, int(list2.end()-jj));
-                for ( ; u < m; ++u, k<<=1 )
-                    if ( (t&k) && not_adjacentPL(*ii, *(jj+u)) ) checkPL(meca, stiff, *ii, *(jj+u));
-                for ( ; u < e; ++u, k<<=1 )
-                    if ( (t&k) && not_adjacentPP(*ii, *(jj+u)) ) checkPP(meca, stiff, *ii, *(jj+u));
-            }
-            jj += 4;
-            assert_true( jj > list2.middle() );
-            #pragma nounroll
-            for ( ; jj < list2.pre_end(); jj += 4 )
-            {
-                t = four_near(xyzr, jj);
-                if ( !t ) continue;
-                //printf(" PP%i", t);
-                if ( (t&1) && not_adjacentPP(*ii, *(jj  )) ) checkPP(meca, stiff, *ii, *(jj));
-                if ( (t&2) && not_adjacentPP(*ii, *(jj+1)) ) checkPP(meca, stiff, *ii, *(jj+1));
-                if ( (t&4) && not_adjacentPP(*ii, *(jj+2)) ) checkPP(meca, stiff, *ii, *(jj+2));
-                if ( (t&8) && not_adjacentPP(*ii, *(jj+3)) ) checkPP(meca, stiff, *ii, *(jj+3));
-            }
-        }
-        else
-        {
-            // less than 3 BigLocus remaining
-            assert_true( list2.middle() - jj < 4 );
-            #pragma nounroll
-            for ( ; jj < list2.middle(); ++jj )
-                if ( pos.near(jj->pos_) && not_adjacentPL(*ii, *jj) ) checkPL(meca, stiff, *ii, *jj);
-        }
-        // less than 3 BigPoint remaining
-        assert_true( list2.end() - jj < 4 );
-        #pragma nounroll
-        for ( ; jj < list2.end(); ++jj )
-            if ( pos.near(jj->pos_) && not_adjacentPP(*jj, *ii) ) checkPP(meca, stiff, *jj, *ii);
-    }
-}
-
 typedef unsigned long bitfield;
 
 /**
@@ -832,10 +676,14 @@ void near_bits(bitfield& bitL, bitfield& bitP, vec4f const& xyzr, BigLocusList c
  
  The same approach can be used for periodic boundary conditions, if:
  - BigVector should be folded to their cannonical representation
- - distance should should be calculated adding an offset, when the
-   two cells are accross a periodic boundary, and this offset is defined per
+ - distance should be calculated adding an offset, for cells that
+   are accross a periodic boundary. Note that this offset is defined per
    cell pairs, and not per object pair: just need to update `xyzr` below.
  .
+ 
+ This code relies on '__builtin_ctzl(x)' which gives the index of the first non-zero bit:
+ Returns the number of trailing 0-bits in x, starting at the least significant bit position.
+ If x is 0, the result is undefined.
 */
 void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
                             BigLocusList const& list2)
