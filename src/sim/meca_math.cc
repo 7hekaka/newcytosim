@@ -14,10 +14,7 @@
 template < size_t ORD >
 void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
 {
-#if ( 0 )
-    std::clog << "\ncopy_subspace:\n";
-    VecPrint::full(siz, siz, mat, ldd);
-#endif
+    //VecPrint::full("copy_subspace", siz, siz, mat, ldd);
     
     for ( size_t j = 0; j < siz; j += ORD )
     for ( size_t i = j; i <= std::min(siz-1, j+rank); i += ORD )
@@ -27,10 +24,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
             mat[i+d+ldd*(j+d)] = val;
     }
     
-#if ( 0 )
-    std::clog << "copied:\n";
-    VecPrint::full(siz, siz, mat, ldd);
-#endif
+    //VecPrint::full("copied", siz, siz, mat, ldd);
 }
 
 
@@ -45,10 +39,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
 template < size_t ORD, bool SYMMETRIZE >
 void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
 {
-#if ( 0 )
-    std::clog << "\ncopy_upper_subspace:\n";
-    VecPrint::full(siz, siz, mat, ldd);
-#endif
+    //VecPrint::full("copy_upper_subspace", siz, siz, mat, ldd);
     
     for ( size_t jj = 0; jj < siz; jj += ORD  )
     for ( size_t ii = 0; ii <= jj; ii += ORD  )
@@ -65,10 +56,7 @@ void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
         }
     }
 
-#if ( 0 )
-    std::clog << "Expanded:\n";
-    VecPrint::full(siz, siz, mat, ldd);
-#endif
+    //VecPrint::full("Expanded", siz, siz, mat, ldd);
 }
 
 /**
@@ -84,8 +72,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
-    std::clog << "\ncopy_lower_subspace:\n";
-    VecPrint::full(S, S, mat, ldd);
+    VecPrint::full("\ncopy_lower_subspace", S, S, mat, ldd);
 #endif
     
     for ( size_t jj =  0; jj < siz; jj += ORD )
@@ -103,10 +90,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
         }
     }
     
-#if ( 0 )
-    std::clog << "Expanded:\n";
-    VecPrint::full(S, S, mat, ldd);
-#endif
+    //VecPrint::full("Expanded", S, S, mat, ldd);
 }
 
 
@@ -118,8 +102,7 @@ void average_matrix(size_t siz, real* src, size_t ldd)
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
-    std::clog << "\naverage_matrix:\n";
-    VecPrint::full(S, S, src, ldd);
+    VecPrint::full("\naverage_matrix", S, S, src, ldd);
 #endif
     for ( size_t jj = 0; jj < siz; jj += ORD  )
     for ( size_t ii = 0; ii < siz; ii += ORD  )
@@ -135,10 +118,7 @@ void average_matrix(size_t siz, real* src, size_t ldd)
         for ( size_t d = 0; d < ORD; ++d )
             ptr[d*(ldd+1)] = val;
     }
-#if (0 )
-    std::clog << "Averaged:\n";
-    VecPrint::full(S, S, src, ldd);
-#endif
+    //VecPrint::full("Averaged", S, S, src, ldd);
 }
 
 
@@ -150,8 +130,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
-    std::clog << "\nproject_matrix:\n";
-    VecPrint::full(ORD*S, ORD*S, src, lll);
+    VecPrint::full("\nproject_matrix", ORD*S, ORD*S, src, lll);
 #endif
     for ( size_t jj = 0; jj < siz; ++jj )
     for ( size_t ii = 0; ii < siz; ++ii )
@@ -162,10 +141,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
             val += ptr[d*(lll+1)];
         dst[ii+ldd*jj] = val / (real)ORD;
     }
-#if ( 0 )
-    std::clog << "Projected:\n";
-    VecPrint::full(S, S, dst, ldd);
-#endif
+    //VecPrint::full("Projected", S, S, dst, ldd);
 }
 
 
@@ -177,10 +153,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
  */
 void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 {
-#if ( 0 )
-    std::clog << "\ntruncate_matrix:\n";
-    VecPrint::full(siz, siz, mat, ldd);
-#endif
+    //VecPrint::full("\ntruncate_matrix", siz, siz, mat, ldd);
 
     for ( size_t j = 0; j < siz; ++j )
     {
@@ -194,10 +167,7 @@ void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
             col[i] = 0;
     }
     
-#if ( 0 )
-    std::clog << "Truncated:\n";
-    VecPrint::full(siz, siz, mat, ldd);
-#endif
+    //VecPrint::full("Truncated", siz, siz, mat, ldd);
 }
 
 

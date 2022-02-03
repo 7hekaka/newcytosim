@@ -217,8 +217,7 @@ void Mecafil::makeProjectionDiff(const real* force)
      The final matrix is symmetric, for any force,
      as can be seen from the above relations to set its columns
      */
-    //printf("projectionDiff\n");
-    //VecPrint::full(nbv, nbv, iDProj, nbv);
+    //VecPrint::full("projectionDiff", nbv, nbv, iDProj, nbv);
 }
 
 

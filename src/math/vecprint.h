@@ -224,7 +224,13 @@ namespace VecPrint
         full(std::cout, lin, col, mat, ldd, digits);
     }
     
-        
+    template< typename T >
+    void full(std::string const& str, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
+    {
+        std::cout << str << ":\n";
+        full(std::cout, lin, col, mat, ldd, digits);
+    }
+
     /// print matrix in sparse format: line_index, column_index, value
     template< typename T >
     void sparse(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 8, T threshold = 0)

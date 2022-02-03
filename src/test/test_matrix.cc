@@ -185,13 +185,11 @@ void compareMatrix(size_t S, MATRIX & mat1, MATROX& mat2, size_t fill)
             std::clog << "Size " << S << " : " << mat1.what() << "  " << mat2.what();
             std::clog << " inx " << inx << " + " << cnt << " ";
             std::clog << ": error\n";
-            std::clog << mat2.what() << ":\n";
-            VecPrint::full(cnt, cnt, tmp2, S);
+            VecPrint::full(mat2.what(), cnt, cnt, tmp2, S);
             
             zero_real(nume, tmp2);
             mat1.addDiagonalBlock(tmp2, S, inx, cnt);
-            std::clog << mat1.what() << ":\n";
-            VecPrint::full(cnt, cnt, tmp2, S);
+            VecPrint::full(mat1.what(), cnt, cnt, tmp2, S);
             break;
         }
     }
