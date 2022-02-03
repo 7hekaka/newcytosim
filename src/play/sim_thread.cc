@@ -146,12 +146,12 @@ void SimThread::start()
 //------------------------------------------------------------------------------
 
 
-void SimThread::extend_run()
+void SimThread::extend_run(size_t n_steps)
 {
     assert_true( isWorker() );
     try {
         simul_.parser_ = this;
-        Parser::execute_run(1<<20);
+        Parser::execute_run(n_steps);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
@@ -170,7 +170,7 @@ void* extend_launcher(void * arg)
     SimThread * st = static_cast<SimThread*>(arg);
     st->lock();
     pthread_cleanup_push(child_cleanup, arg);
-    st->extend_run();
+    st->extend_run(1<<20);
     pthread_cleanup_pop(1);
     return nullptr;
 }

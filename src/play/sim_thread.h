@@ -71,7 +71,7 @@ public:
     void run();
     
     /// continue to run a simulation beyond its normal termination
-    void extend_run();
+    void extend_run(size_t n_steps);
 
     /// redefining Interface::hold(), which is called repeatedly at each timestep
     void hold();

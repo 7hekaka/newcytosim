@@ -846,7 +846,8 @@ void processKey(unsigned char key)
             }
             else
             {
-                player.extendLive();
+                // this will initialize the simulation engine without making a step
+                thread.extend_run(0);
             }
             break;
             

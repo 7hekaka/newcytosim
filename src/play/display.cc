@@ -1237,13 +1237,16 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     size_t i = 0, cnt = sup - inf + 4;
     gle_color col = fib.disp->color;
     fluteD4* flu = gym::mapBufferC4VD(cnt);
-    for ( auto h = inf+1; h <= sup; ++h )
-        flu[i++] = { col, fib.posM(uni*h-fib.abscissaM()) };
+    real abs = (inf+1) * uni - fib.abscissaM();
+    for ( auto h = inf+1; h <= sup; ++h, abs+=uni )
+        flu[i++] = { col, fib.posM(abs) };
     gym::unmapBufferC4VD();
     glDisable(GL_LIGHTING);
+    glDisable(GL_POINT_SMOOTH);
     pointSize(fib.prop->disp->point_size);
     glDrawArrays(GL_POINTS, 0, i);
     glDisableClientState(GL_COLOR_ARRAY);
+    glEnable(GL_POINT_SMOOTH);
 }
 
 
@@ -1585,7 +1588,7 @@ void Display::drawFiber(Fiber const& fib)
 
 #if FIBER_HAS_LATTICE
     VisibleLattice const* lat = fib.visibleLattice();
-    if ( lat && lat->ready() )
+    if ( lat )
     {
         // if the Lattice is displayed, do not draw backbone:
         switch ( disp->lattice_style )

@@ -164,6 +164,8 @@ public:
         laCell = nullptr;
         laIndexM = 0;
         laIndexP = 0;
+        laFirst = 0;
+        laFence = 0;
     }
     
     /// Copy constructor

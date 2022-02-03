@@ -250,7 +250,7 @@ Fiber::~Fiber()
     fHands.detachAll();
     
 #if FIBER_HAS_MESH
-    if ( fMesh.ready() && prop->field_ptr )
+    if ( fMesh.data() && prop->field_ptr )
         releaseMeshValues(fMesh, prop->field_ptr);
 #endif
 
@@ -404,7 +404,7 @@ Fiber* Fiber::severPoint(size_t pti)
     fib->updateRange();
 
 #if FIBER_HAS_MESH
-    if ( fMesh.ready() )
+    if ( fMesh.data() )
     {
         assert_true( fMesh.unit() == fib->fMesh.unit() );
         // transfer Lattice values located above the cut
@@ -471,7 +471,7 @@ Fiber* Fiber::severM(real abs)
     fib->updateRange();
 
 #if FIBER_HAS_MESH
-    if ( fMesh.ready() )
+    if ( fMesh.data() )
     {
         assert_true( fMesh.unit() == fib->fMesh.unit() );
         // transfer Lattice values located above the cut:
@@ -659,7 +659,7 @@ void Fiber::join(Fiber * fib)
     setEndStateP(fib->endStateP());
 
 #if FIBER_HAS_MESH
-    if ( fMesh.ready() )
+    if ( fMesh.data() )
     {
         assert_true( fMesh.unit() == fib->fMesh.unit() );
         // transfer Lattice values from other fiber
@@ -1220,7 +1220,7 @@ void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx)
 {
 #if FIBER_HAS_LATTICE
     FiberLattice const& lat = fLattice;
-    if ( lat.ready() )
+    if ( lat.data() )
     {
         const auto sup = lat.indexP();
         for ( auto i = lat.indexM(); i <= sup; ++i )
@@ -1240,10 +1240,11 @@ void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx)
 VisibleLattice const* Fiber::visibleLattice() const
 {
 #if FIBER_HAS_MESH
-    if ( fMesh.ready() )
+    if ( fMesh.data() )
         return &fMesh;
 #elif FIBER_HAS_LATTICE
-    return &fLattice;
+    if ( fLattice.data() )
+        return &fLattice;
 #endif
     return nullptr;
 }
@@ -1504,7 +1505,7 @@ void Fiber::infoMesh(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool 
 {
 #if FIBER_HAS_MESH
     Lattice<real> const& lat = fMesh;
-    if ( lat.ready() )
+    if ( lat.data() )
     {
         len += length();
         const real scale = ( density ? 1.0/lat.unit() : 1.0 );
@@ -1753,7 +1754,7 @@ void Fiber::write(Outputter& out) const
      We can save the occupancy Lattice here, but this is not necessary
      as it can be recalculated on the fly, so we save space by skipping
      */
-    if ( prop->save_lattice && fLattice.ready() )
+    if ( prop->save_lattice && fLattice.data() )
     {
         writeHeader(out, TAG_LATTICE);
         // fLattice.write(out);
@@ -1762,7 +1763,7 @@ void Fiber::write(Outputter& out) const
     }
 #endif
 #if FIBER_HAS_MESH
-    if ( fMesh.ready() )
+    if ( fMesh.data() )
     {
         writeHeader(out, TAG_FIBMESH);
         // fMesh.write(out);

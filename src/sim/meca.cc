@@ -332,7 +332,7 @@ constexpr size_t ISOB_LDD = 3;
 constexpr size_t BAND_NUD = 2*DIM;
 constexpr size_t BAND_LDD = BAND_NUD+DIM;
 
-/// apply preconditionner block in band storage
+/// apply banded symmetric isotropic preconditionner block
 inline void applyPrecondIsoB(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
@@ -354,7 +354,7 @@ inline void applyPrecondIsoB(Mecable const* mec, real* Y)
 }
 
 
-/// apply isotropic preconditionner block in full storage
+/// apply symmetric isotropic preconditionner block
 inline void applyPrecondIsoS(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
@@ -379,7 +379,7 @@ inline void applyPrecondIsoS(Mecable const* mec, real* Y)
 }
 
 
-/// apply isotropic preconditionner block in full storage
+/// apply non-symmetric but isotropic preconditionner block
 inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
@@ -388,7 +388,7 @@ inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 }
 
 
-/// apply preconditionner block in full storage
+/// apply banded symmetric preconditionner block
 inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     const int bks = mec->blockSize();
@@ -409,7 +409,7 @@ inline void applyPrecondBand(Mecable const* mec, real* Y)
 }
 
 
-/// apply preconditionner block in full storage
+/// apply symmetric preconditionner block in full storage
 inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
     const int bks = mec->blockSize();
@@ -426,7 +426,7 @@ inline void applyPrecondHalf(Mecable const* mec, real* Y)
 }
 
 
-/// apply preconditionner block in full storage
+/// apply non-symmetric preconditionner block in full storage
 inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     const int bks = mec->blockSize();
@@ -636,8 +636,8 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
      I - time_step * mob * ( mISO + mFUL )
  
  The result is constructed by using functions from mISO and mFUL, and then
- multiplied by the vertex mobility, to approximate the dynamics.
- This block is square and symmetric, and can be factorized by Cholesky's method!
+ multiplied by the vertex mobility, but projection is not applied.
+ This block is banded and symmetric, and can be factorized by Cholesky's method!
  */
 void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t rank) const
 {
@@ -1158,7 +1158,8 @@ void Meca::computePrecondIsoP(Mecable* mec)
 }
 
 /**
-Compute preconditionner block corresponding to 'mec'
+ Compute banded symmetric preconditionner block corresponding to 'mec',
+ factorized by Cholesky's method.
  */
 void Meca::computePrecondBand(Mecable* mec)
 {
@@ -1217,7 +1218,8 @@ void Meca::computePrecondBand(Mecable* mec)
 }
 
 /**
-Compute preconditionner block corresponding to 'mec'
+ Compute preconditionner block corresponding to 'mec'
+ This block is symmetric, and factorized by Cholesky's method.
  */
 void Meca::computePrecondHalf(Mecable* mec)
 {
