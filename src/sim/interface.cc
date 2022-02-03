@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include <fstream>
+#include <cstdio>
 
 #include "cymdef.h"
 #include "interface.h"
@@ -814,8 +815,8 @@ inline void Interface::do_steps(size_t& sss, size_t cnt)
  `nb_frames`  |  0      | number of states written to trajectory file
  `prune`      |  `true` | Print only parameters that are different from default
  
- Set `nb_frames = 1` to save the initial and last time point of the run.
- Set `nb_frames = -1` to save only the last time point of the run.
+ Set `nb_frames = 2` to save the initial and last time point of the run.
+ Set `nb_frames = 1` to save only the last time point of the run.
  The parameter `solve` can be used to select alternative mechanical engines.
  The Monte-Carlo parts of the simulation is always done, which includes
  fiber assembly dynamics, binding/unbinding and diffusion of molecules.
@@ -866,12 +867,15 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 
     if ( do_write )
     {
-        // write frame 0
         simul_.writeProperties(prune);
+        // write initial state:
         if ( simul_.prop->clear_trajectory )
         {
-            simul_.writeObjects(simul_.prop->system_file, false, binary);
             simul_.prop->clear_trajectory = false;
+            if ( frames > 1 )
+                simul_.writeObjects(simul_.prop->system_file, false, binary);
+            else
+                std::remove(simul_.prop->system_file.c_str());
         }
         delta = real(nb_steps) / real(frames);
         check = size_t(delta);
