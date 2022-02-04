@@ -329,25 +329,25 @@ private:
 
 #if ( NUM_STERIC_PANES == 1 )
     
-    /// cell corresponding to position `w`, and pane `p`
+    /// cell corresponding to position `w`
     FatPointList& point_list(Vector const& w) const
     {
         return pGrid.cell(w).point_pane;
     }
     
-    /// cell corresponding to position `w`, and pane `p`
+    /// cell corresponding to position `w`
     FatLocusList& locus_list(Vector const& w) const
     {
         return pGrid.cell(w).locus_pane;
     }
     
-    /// cell corresponding to index `w`, and pane `p`
+    /// cell corresponding to index `w`
     FatPointList& point_list(const size_t w) const
     {
         return pGrid.icell(w).point_pane;
     }
     
-    /// cell corresponding to index `w`, and pane `p`
+    /// cell corresponding to index `w`
     FatLocusList& locus_list(const size_t w) const
     {
         return pGrid.icell(w).locus_pane;

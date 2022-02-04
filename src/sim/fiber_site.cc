@@ -271,17 +271,18 @@ int FiberSite::bad() const
         // the abscissa of the interpolated point:
         real a = hFiber->abscissaPoint(real(hTerp.point1())+hTerp.coef1());
 
-        const real e = hAbs - a;
+        constexpr real MAG = 1000;
+        const real e = MAG * ( hAbs - a );
         
         //std::clog << "Interpolation " << std::scientific << e << '\n';
-        if ( abs_real(e) > 1e-3 )
+        if ( abs_real(e) > 1 )
         {
-            std::cerr << "FiberSite::Interpolation error " << std::scientific << e << "\n";
-            std::cerr << " abscissa:\n";
-            std::cerr << "    binder       " << hAbs << "\n";
-            std::cerr << "    interpolated " << a << "\n";
             Interpolation pi = hFiber->interpolate(hAbs);
-            std::cerr << "    updated      " << hFiber->abscissaPoint(pi.point1()+pi.coef1()) << "\n";
+            real b = hFiber->abscissaPoint(pi.point1() + pi.coef1());
+            std::cerr << "FiberSite::Interpolation error " << e << " nm in abscissa:\n";
+            std::cerr << "    binder       " << MAG * hAbs << "\n";
+            std::cerr << "    interpolated " << MAG * a << "\n";
+            std::cerr << "    updated      " << MAG * b << "\n";
             return 8;
         }
     }

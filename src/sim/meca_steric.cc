@@ -217,3 +217,51 @@ void Meca::addStericInteractionsAlt(Simul const& sim)
     //std::clog << "LocusGrid has capacity " << locusGrid.capacity() << "\n";
 }
 
+
+void Meca::addSomeStericInteractions(real stiff)
+{
+    locusGrid.clear();
+    
+    // distribute Fiber-points on the grid
+    for ( Mecable * mec : mecables )
+    {
+        Fiber * F = static_cast<Fiber*>(mec);
+        if ( F->prop->steric )
+        {
+            const real rad = F->prop->steric_radius;
+            const real rge = rad + 0.5 * F->segmentation();
+            // include segments, in the cell associated with their center
+            for ( size_t i = 0; i < F->nbSegments(); ++i )
+#if ( MAX_STERIC_PANES == 1 )
+                locusGrid.add(F, i, rad, rge);
+#else
+                locusGrid.add(F->prop->steric, F, i, rad, rge);
+#endif
+        }
+    }
+    
+    // mark edge between Fiber segments and other type of elements
+    locusGrid.delimit();
+
+#if ( MAX_STERIC_PANES == 1 )
+    
+    locusGrid.setSterics(*this, stiff);
+
+#elif ( MAX_STERIC_PANES == 2 )
+    
+    // add steric interactions inside pane 1:
+    locusGrid.setSterics(*this, stiff, 1);
+    // add steric interactions between panes 1 and 2:
+    locusGrid.setSterics(*this, stiff, 1, 2);
+    //pointGrid.setSterics(*this, pam, 2, 1);
+
+#else
+    
+    // add steric interactions within each pane:
+    for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
+        locusGrid.setSterics(*this, stiff, p);
+
+#endif
+    //std::clog << "LocusGrid has capacity " << locusGrid.capacity() << "\n";
+}
+

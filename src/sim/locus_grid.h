@@ -314,13 +314,13 @@ private:
 
 #if ( MAX_STERIC_PANES == 1 )
     
-    /// cell corresponding to position `w`, and pane `p`
+    /// cell corresponding to position `w`
     BigLocusList& cell_list(Vector const& w) const
     {
         return pGrid.cell(w);
     }
     
-    /// cell corresponding to index `w`, and pane `p`
+    /// cell corresponding to index `w`
     BigLocusList& cell_list(const size_t w) const
     {
         return pGrid.icell(w);

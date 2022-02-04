@@ -220,6 +220,10 @@ void Simul::solve()
 }
 
 
+/**
+ This is attempting to separate the system into subclusters
+ that can be solved independently -- should lead to parallelization
+ */
 void Simul::solve_separate()
 {
     size_t cnt = fibers.size();
@@ -234,6 +238,12 @@ void Simul::solve_separate()
     delete[] table;
 #endif
     
+    // ready steric interactions
+    if ( prop->steric_mode && spaces.master() )
+    {
+        if ( !sMeca.locusGrid.hasGrid() )
+            setStericGrid(sMeca.locusGrid, spaces.master(), prop->steric_max_range, estimateStericRange());
+    }
     //std::clog << "Separating " << cnt << " fibers\n";
     for ( ObjectFlag f = 0; f <= sup; ++f )
     {
@@ -248,6 +258,8 @@ void Simul::solve_separate()
             cnt -= num;
             sMeca.getReady();
             sMeca.setSomeInteractions();
+            if ( prop->steric_mode && spaces.master() )
+                sMeca.addSomeStericInteractions(prop->steric_stiff_push[0]);
             sMeca.solve(prop, prop->precondition);
             sMeca.apply();
         }
