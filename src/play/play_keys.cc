@@ -341,8 +341,8 @@ static void flashColoring(int val)
 {
     switch ( val )
     {
-        case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");          break;
-        case FiberDisp::COLORING_RANDOM:    flashText("Fibers randomly colored");      break;
+        case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");         break;
+        case FiberDisp::COLORING_RANDOM:    flashText("Fibers randomly colored");     break;
         case FiberDisp::COLORING_DIRECTION: flashText("Fibers colored by direction"); break;
         case FiberDisp::COLORING_MARK:      flashText("Fibers colored by mark");      break;
         case FiberDisp::COLORING_FLAG:      flashText("Fibers colored by flag");      break;

@@ -90,8 +90,8 @@ protected:
     /// direction of view
     Vector3 depthAxis;
 
-    /// flag used to calculate clusterAnalysis only once
-    size_t fiber_prep;
+    /// flag used to calculate expensive analysis only once
+    size_t prep_flag;
     
     /// used to calculate clusterAnalysis only once
     double prep_time;

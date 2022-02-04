@@ -304,14 +304,16 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
         fp->display_fresh = false;
     }
     
+    prep_flag = 0;
+    
     if ( disp->coloring == FiberDisp::COLORING_CLUSTER )
-        fiber_prep |= 1;
+        prep_flag |= 1;
     
     if ( disp->line_style == 2 || disp->line_style == 3 )
-        fiber_prep |= 2;
+        prep_flag |= 2;
 
     if ( disp->coloring == FiberDisp::COLORING_AGE )
-        fiber_prep |= 4;
+        prep_flag |= 4;
 }
 
 
@@ -510,7 +512,6 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
     
     PropertyList plist = sim.properties.find_all("fiber");
     
-    fiber_prep = 0;
     // create a FiberDisp for each FiberProp:
     for ( Property* p : plist )
         prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gle::nice_color(idx++));
@@ -520,15 +521,15 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
         // the analysis only needs to be done once per state:
         prep_time = sim.time();
         // compute clusters:
-        if ( fiber_prep & 1 )
+        if ( prep_flag & 1 )
             sim.flagClusters(1, 0, 0);
         
         // if fiber tensions are used for display, recompute them now:
-        if ( fiber_prep & 2 )
+        if ( prep_flag & 2 )
             sim.computeForces();
         
         // calculate Fiber::age() range and set color scaling factor:
-        if ( fiber_prep & 4 )
+        if ( prep_flag & 4 )
         {
             size_t cnt;
             real avg, dev, mn, mx;

@@ -36,8 +36,8 @@ void SparMat::allocate(size_t sz)
         {
             for ( ; ii < alloc_; ++ii )
             {
-                mxCol_new[ii] =  mxCol[ii];
-                mxRow_new[ii] =  mxRow[ii];
+                mxCol_new[ii] = mxCol[ii];
+                mxRow_new[ii] = mxRow[ii];
             }
             delete[] mxCol;
             delete[] mxRow;

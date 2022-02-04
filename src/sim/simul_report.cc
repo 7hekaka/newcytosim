@@ -2689,15 +2689,15 @@ void Simul::flagClustersSolids() const
 }
 
 
-void Simul::flagClusters(bool cop, bool sol, bool mec) const
+void Simul::flagClusters(bool C, bool S, bool M) const
 {
-    if ( ! ( cop | sol | mec ) )
+    if ( ! ( C | S | M ) )
         throw InvalidSyntax("you must specify a cluster type: couple=1 or solid=1 or meca=1");
 
     resetFlags(fibers);
-    if ( mec ) flagClustersMeca();
-    if ( cop ) flagClustersCouples();
-    if ( sol ) flagClustersSolids();
+    if ( C ) flagClustersCouples();
+    if ( S ) flagClustersSolids();
+    if ( M ) flagClustersMeca();
     flagLargestCluster(1UL);
 }
 
