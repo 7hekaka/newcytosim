@@ -1612,6 +1612,7 @@
 		BB7662C310E923A200C93DF6 /* frame_reader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_reader.cc; path = src/play/frame_reader.cc; sourceTree = SOURCE_ROOT; };
 		BB7662C410E923A200C93DF6 /* frame_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_reader.h; path = src/play/frame_reader.h; sourceTree = SOURCE_ROOT; };
 		BB767DA927A9C2210060D3FA /* save_bitmap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = save_bitmap.cc; sourceTree = "<group>"; };
+		BB767DAB27AD01B40060D3FA /* meca_steric.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_steric.cc; sourceTree = "<group>"; };
 		BB770B6C12FF3E1900D018A0 /* fork_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fork_prop.cc; path = couples/fork_prop.cc; sourceTree = "<group>"; };
 		BB770B6D12FF3E1900D018A0 /* fork_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fork_prop.h; path = couples/fork_prop.h; sourceTree = "<group>"; };
 		BB770C0112FF44D100D018A0 /* shackle_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shackle_prop.cc; path = couples/shackle_prop.cc; sourceTree = "<group>"; };
@@ -2418,6 +2419,7 @@
 				BB01791906B1C05100240785 /* meca_inter.cc */,
 				BB351EFF2535DFD800007B88 /* meca_inter_draw.cc */,
 				BBF283242430C7E600FADDD8 /* meca_rigidity.cc */,
+				BB767DAB27AD01B40060D3FA /* meca_steric.cc */,
 				BBF283262430E10100FADDD8 /* meca_math.cc */,
 				BB7358FC05B98DA3006956D5 /* simul.h */,
 				BB7358FB05B98DA3006956D5 /* simul.cc */,

@@ -86,14 +86,18 @@ public:
         }
     }
     
-    void prepare(Simul const* sim, real time_step, real kT)
+    void pickMecables(Simul const& sim)
     {
         ready_ = 0;
         mecables.clear();
         
-        for(Fiber * fib = sim->fibers.first(); fib; fib=fib->next())
+        for(Fiber * fib = sim.fibers.first(); fib; fib=fib->next())
             mecables.push_back(fib);
-
+    }
+    
+    void getReady(real time_step, real kT)
+    {
+        ready_ = 0;
         size_t dim = mecables.size();
         
         allocate(dim);

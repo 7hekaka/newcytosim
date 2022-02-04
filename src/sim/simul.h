@@ -20,8 +20,6 @@
 #include "field_set.h"
 #include "space_set.h"
 #include "event_set.h"
-#include "point_grid.h"
-#include "locus_grid.h"
 #include "property_list.h"
 #include "field_values.h"
 #include "meca.h"
@@ -40,16 +38,10 @@ class Simul
 public:
     
     /// Meca used to set and integrate the equations of motion of Mecables
-    mutable Meca      sMeca;
+    mutable Meca sMeca;
     
     /// grid used for attachment of Hand to Fiber
     mutable FiberGrid fiberGrid;
-    
-    /// grid used for steric interaction between Fiber/Solid/Bead/Sphere
-    mutable PointGrid pointGrid;
-    
-    /// alternative grid used for steric interaction, instead of pointGrid
-    mutable LocusGrid locusGrid;
 
     /// Meca used to solve the system with option 'solve=horizontal'
     Meca1D * pMeca1D;
@@ -214,6 +206,9 @@ public:
     
     /// like 'solve' but automatically selects the fastest preconditionning method
     void solve_auto();
+    
+    /// simulate the mechanics of the system and move Mecables accordingly
+    void solve_separate();
 
     /// do nothing
     void solve_not() {};
@@ -230,29 +225,25 @@ public:
     /// calculate clusters of Mecable derived from all interactions
     void flagClustersMeca() const;
     
+    /// calculate clusters based on Couples' connectivity and order Fibers accordingly
+    ObjectFlag orderClustersCouple(Object**, ObjectFlag);
+    
     /// this is used for development
     void addExperimentalInteractions(Meca&) const;
     
     /// set FiberGrid and StericGrid over the given space
     void setFiberGrid(Space const*) const;
+    
+    /// a Map to be displayed
+    Map<DIM> const& visibleMap() const { return sMeca.locusGrid.map(); }
 
 private:
     
-    /// give an estimate of the cell size of the FiberGrid
+    /// return estimate of the cell size of the Grid used for Hand attachment
     real estimateFiberGridStep() const;
     
-    /// give an estimate for the cell size of the PointGrid used for steric interactions
+    /// return estimate for the cell size of the PointGrid used for steric interactions
     real estimateStericRange() const;
-    
-    /// initialize the grid for steric interaction (pointGrid)
-    template < typename GRID >
-    void setStericGrid(GRID&, Space const*) const;
-    
-    /// add steric interactions between spheres, solids and fibers to Meca
-    void setStericInteractions(Meca&) const;
-
-    /// add steric interactions between spheres, solids and fibers to Meca
-    void setStericInteractionsAlt(Meca&) const;
     
     //----------------------------- PARSING ------------------------------------
     
@@ -587,9 +578,6 @@ public:
     
     /// change flag for fibers belonging to largest cluster
     void flagLargestCluster(ObjectFlag) const;
-
-    /// order clusters in decreasing number of fibers
-    size_t orderClusters(std::ostream&, size_t threshold, int details) const;
     
     /// print size of clusters defined by connections with Couples
     void reportClusters(std::ostream&, Glossary&) const;

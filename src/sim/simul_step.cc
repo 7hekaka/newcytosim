@@ -205,7 +205,8 @@ void Simul::drawLinks() const
 {
     if ( !primed_ )
         prop->complete(*this);
-    sMeca.prepare(this);
+    sMeca.pickMecables(*this);
+    sMeca.getReady();
     sMeca.drawLinks = 1;
     setAllInteractions(sMeca);
     sMeca.drawLinks = 0;

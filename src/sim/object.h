@@ -120,10 +120,10 @@ public:
     //--------------------------
     
     /// the next Object in the list, or zero if this is last
-    Object * next()    const { return nextO; }
+    Object * next() const { return nextO; }
     
     /// the previous Object in the list, or zero if this is first
-    Object * prev()    const { return prevO; }
+    Object * prev() const { return prevO; }
     
     /// set next Object
     void next(Object* n) { nextO = n; }
@@ -158,7 +158,7 @@ public:
     
     
     /// retrieve flag value
-    ObjectFlag  flag()       const  { return flag_; }
+    ObjectFlag  flag() const { return flag_; }
     
     /// set flag (this value is not stored in trajectory files)
     void flag(ObjectFlag f)  { flag_ = f; }

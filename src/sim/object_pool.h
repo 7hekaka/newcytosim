@@ -55,10 +55,16 @@ public:
     
     /// First Object in list
     Object * front() const { return frontO; }
-    
+
     /// Last Object in list
     Object * back() const { return backO; }
     
+    /// set first Object in list
+    void front(Object * o) { frontO = o; }
+    
+    /// set first Object in list
+    void back(Object * o) { backO = o; }
+
     /// Number of objects in the list
     size_t size() const { return nSize; }
     

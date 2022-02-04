@@ -12,6 +12,8 @@
 #include "sparmatsymblkdiag.h"
 #include "sparmatblk.h"
 #include "allocator.h"
+#include "point_grid.h"
+#include "locus_grid.h"
 
 
 class Modulo;
@@ -142,6 +144,8 @@ The equation is formulated using linear-algebra:
 
 class Meca
 {
+    friend class Simul;
+    
 private:
     
     /// time step for Brownian Mechanics = copy of simul:time_step
@@ -187,6 +191,12 @@ private:
     /// secondary memory allocator for GMRES
     LinearSolvers::Allocator temporary_;
     
+    /// grid used for steric interaction between Fiber/Solid/Bead/Sphere
+    PointGrid pointGrid;
+    
+    /// alternative grid used for steric interaction, instead of pointGrid
+    LocusGrid locusGrid;
+
     /// Matrices used for GMRES
     //LinearSolvers::Matrix mH, mV;
 
@@ -659,11 +669,25 @@ public:
 
     /// Linearized Coulomb repulsive force (experimental)
     void addCoulomb(Mecapoint const&, Mecapoint const&, real weight);
+
+    //-------------------------- COMPUTING METHODS -----------------------------
     
+    /// add steric interactions between spheres, solids and fibers to Meca
+    void addStericInteractions(Simul const&);
+
+    /// add steric interactions between spheres, solids and fibers to Meca
+    void addStericInteractionsAlt(Simul const&);
+
     //-------------------------- COMPUTING METHODS -----------------------------
 
+    /// get all Mecables from Simul
+    void pickMecables(Simul const&);
+    
+    /// call setInteractions(Meca) for registered mecables
+    void setSomeInteractions();
+
     /// Allocate the memory necessary to solve(). This must be called after the last add()
-    void prepare(Simul const*);
+    void getReady();
     
     /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver
     size_t solve(SimulProp const*, unsigned precondition);

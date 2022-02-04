@@ -853,7 +853,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     }
 #endif
     opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
-                             {"horizontal",4}, {"flux",5}, {"half",7}});
+        {"horizontal",4}, {"flux",5}, {"half",7}, {"separate", 8} });
     opt.set(prune,  "prune");
     opt.set(binary, "binary");
     opt.set(frames, "nb_frames");
@@ -895,6 +895,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
             case 4: do_steps<&Simul::solve_onlyX>(sss, check); break;
             case 5: do_steps<&Simul::solve_flux>(sss, check); break;
             case 7: do_steps<&Simul::solve_half>(sss, check); break;
+            case 8: do_steps<&Simul::solve_separate>(sss, check); break;
         }
         ++frm;
         check = size_t(delta*(frm+1));

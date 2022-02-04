@@ -2587,7 +2587,7 @@ void Simul::reportCoupleHands(std::ostream& out, Property const* sel) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Clusters
+#pragma mark - Cluster Analysis
 
 
 // set flag() to unique value for all fibers
@@ -2662,7 +2662,7 @@ void Simul::flagClustersCouples(Property const* sel) const
  */
 void Simul::flagClustersSolids() const
 {
-    for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
+    for ( Solid* obj=solids.first(); obj; obj=obj->next() )
     {
         SingleList anchored = singles.collectWrists(obj);
         // find the minimun flag value:
@@ -2684,6 +2684,7 @@ void Simul::flagClustersSolids() const
                 if ( s->attached() )
                     reFlag(fibers, s->fiber()->flag(), flg);
             }
+            obj->flag(flg);
         }
     }
 }
@@ -2761,7 +2762,7 @@ Order Clusters from 1 to max, in order of decreasing size,
 and set fiber:flag() to the corresponding cluster index.
 @return number of clusters
 */
-size_t Simul::orderClusters(std::ostream& out, size_t threshold, int details) const
+size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, int details)
 {
     typedef std::vector<Fiber*> list_t;
     typedef std::map<ObjectFlag, list_t> map_t;
@@ -2771,11 +2772,11 @@ size_t Simul::orderClusters(std::ostream& out, size_t threshold, int details) co
     set_t clusters;
 
     // extract clusters in 'map' and reset fiber's flag:
-    for ( Fiber* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    for ( Fiber* F = first; F; F = F->next() )
     {
         //std::clog << fib->reference() << " " << fib->flag() << "\n";
-        map[fib->flag()].push_back(fib);
-        fib->flag(0);
+        map[F->flag()].push_back(F);
+        F->flag(0);
     }
     
     // insert clusters with size information to get them sorted:
@@ -2840,7 +2841,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
     flagClusters(C, S, M);
     
     out << COM << "cluster by couples " << C << " solids " << S << " meca " << M;
-    orderClusters(out, 2, details);
+    reportOrderedClusters(out, fibers.first(), 2, details);
 }
 
 

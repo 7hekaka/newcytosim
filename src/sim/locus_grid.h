@@ -165,7 +165,7 @@ public:
     }
     
     /// mark the edge where non-Fiber elements start
-    void mark() { border = pane.size(); }
+    void delimit() { border = pane.size(); }
     
     /// number of elements in list
     size_t size() const { return pane.size(); }
@@ -233,10 +233,10 @@ public:
         return panes[p];
     }
     
-    void mark() const
+    void delimit() const
     {
         for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-            panes[p].mark();
+            panes[p].delimit();
     }
 
     size_t capacity() const
@@ -376,7 +376,8 @@ public:
     /// true if the grid was initialized by calling setGrid()
     size_t hasGrid() const { return pGrid.hasCells(); }
     
-    void mark() const;
+    // mark edge between Fiber segments and other type of elements
+    void delimit() const;
 
     /// sum of allocated size of lists for all cells
     size_t capacity() const;

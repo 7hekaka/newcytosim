@@ -108,10 +108,11 @@ LOCAL gle_color color_by_height(Fiber const& fib, size_t pti)
     return gle_color::jet_color(Z*beta);
 }
 
-/// color set according to steric grid
+
+/// color set according to some Map
 LOCAL gle_color color_by_grid(Fiber const& fib, size_t seg)
 {
-    Map<DIM> const& map = fib.simul().locusGrid.map();
+    Map<DIM> const& map = fib.simul().visibleMap();
     Vector w = fib.midPoint(seg, 0.5);
     size_t i = map.index(w);
     return gle::alt_color(i);

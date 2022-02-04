@@ -73,10 +73,10 @@ void LocusGrid::createCells()
 }
 
 
-void LocusGrid::mark() const
+void LocusGrid::delimit() const
 {
     for ( size_t i = 0; i < pGrid.nbCells(); ++i )
-        pGrid[i].mark();
+        pGrid[i].delimit();
 }
 
 

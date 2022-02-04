@@ -214,7 +214,7 @@ void Mecafil::getForces(const real* ptr)
 {
     Mecable::getForces(ptr);
     //fprintf(stderr, "\nF "); VecPrint::print(stderr, DIM*nbPoints(), ptr, 2, DIM);
-    computeTensions(ptr);
+    if ( ptr ) computeTensions(ptr);
     //printTensions(stderr);
 }
 
