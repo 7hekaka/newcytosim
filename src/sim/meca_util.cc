@@ -547,16 +547,12 @@ void Meca::dumpSystem(bool nat) const
 #pragma mark - Matrix Bitmap Export
 
 #include "../base/save_bitmap.cc"
-static const uint16_t BitsPerPixel = 1;
-static const uint8_t white = 1;
-static const uint8_t gray = 1;
 
 
 template < typename MatrixClass >
-void setMatrixBitmap(uint8_t* bytes, size_t bpr, size_t nbv, MatrixClass const& MAT, size_t ORD)
+static void setMatrixBitmap(BitMap& bmap, size_t nbv, MatrixClass const& MAT, size_t ORD)
 {
-    memset(bytes, 0, bpr*nbv);
-    
+    bmap.clear();
     for ( size_t j = 0; j < nbv; ++j )
     {
         size_t jj = j * ORD;
@@ -564,27 +560,43 @@ void setMatrixBitmap(uint8_t* bytes, size_t bpr, size_t nbv, MatrixClass const& 
         {
             size_t i = MAT.column_index(jj, n) / ORD;
             // swap i,j and flip i to display matrix properly on screen
-            set_bitmap(bytes, bpr, BitsPerPixel*j, nbv-1-i, white);
+            bmap.set(i, j, 1);
         }
     }
 }
+
+
+/// add vertical and horizontal lines to indicate mecables indices
+static void markMecables(BitMap& bmap, Array<Mecable*> const& mecables)
+{
+    for ( Mecable * mec : mecables ) {
+        size_t i = mec->matIndex();
+        size_t s = i + mec->nbPoints() - 1;
+        for ( size_t j = i+1; j < s; ++j )
+        {
+            bmap.set(i, j, 1);
+            bmap.set(j, s, 1);
+        }
+        bmap.set(i, s, 1);
+    }
+}
+
 
 void Meca::saveMatrixBitmaps() const
 {
     static size_t cnt = 0;
     const size_t nbv = nbVertices();
-    const size_t ims = bitmap_size(nbv, nbv, BitsPerPixel);
-    const size_t bpr = bytes_per_row(nbv, BitsPerPixel);
+    BitMap bmap(nbv, nbv, 1);
     char str[32] = { 0 };
     
-    uint8_t* bytes = new uint8_t[ims];
 #if USE_ISO_MATRIX
     snprintf(str, sizeof(str), "iso%08lu.bmp", cnt);
     FILE * f = fopen(str, "w");
     if ( f ) {
         if ( !ferror(f) ) {
-            setMatrixBitmap(bytes, bpr, nbv, mISO, 1);
-            save_bitmap(f, bytes, nbv, nbv, BitsPerPixel);
+            setMatrixBitmap(bmap, nbv, mISO, 1);
+            markMecables(bmap, mecables);
+            bmap.save(f);
         }
         fclose(f);
     }
@@ -593,18 +605,12 @@ void Meca::saveMatrixBitmaps() const
     FILE * g = fopen(str, "w");
     if ( g ) {
         if ( !ferror(g) ) {
-            setMatrixBitmap(bytes, bpr, nbv, mFUL, DIM);
-            // mark pixels on the diagonals to indicate where each block starts:
-            for ( Mecable * mec : mecables )
-            {
-                size_t i = mec->matIndex();
-                set_bitmap(bytes, bpr, BitsPerPixel*i, nbv-1-i, gray);
-            }
-            save_bitmap(g, bytes, nbv, nbv, BitsPerPixel);
+            setMatrixBitmap(bmap, nbv, mFUL, DIM);
+            markMecables(bmap, mecables);
+            bmap.save(g);
         }
         fclose(g);
     }
-    delete[] bytes;
     ++cnt;
 }
 

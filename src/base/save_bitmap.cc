@@ -18,10 +18,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <cstring>
 
 
 #if 0
-/**** BMP file header structure ****/
+/** BMP file header structure **/
 typedef struct __attribute__ ((__packed__))
 {
     uint16_t  FileType;     /* File type, always 4D42h ("BM") */
@@ -33,7 +34,7 @@ typedef struct __attribute__ ((__packed__))
 
 #  define BF_TYPE 0x4D42             /* "MB" */
 
-/**** BMP file info structure ****/
+/** BMP file info structure **/
 typedef struct __attribute__ ((__packed__))
 {
     uint32_t Size;            /* Size of this header in bytes */
@@ -85,6 +86,10 @@ static void write_color(FILE * fp, uint8_t X)
     write_color(fp, X, X, X);
 }
 
+static size_t bytes_per_row(unsigned w, uint16_t BitsPerPixel)
+{
+    return 4 * (((w * BitsPerPixel)+31)/32);
+}
 
 void save_bitmap(FILE* fp, uint8_t bytes[], unsigned width, unsigned height, uint16_t BitsPerPixel)
 {
@@ -96,7 +101,7 @@ void save_bitmap(FILE* fp, uint8_t bytes[], unsigned width, unsigned height, uin
     uint32_t PaletteSize = 4 * NumberColors;
     
     //------------
-    uint32_t BytesPerRow = 4 * (((width*BitsPerPixel)+31)/32);
+    uint32_t BytesPerRow = bytes_per_row(width, BitsPerPixel);
     uint32_t BytesSize = BytesPerRow * height;
     uint32_t OffBits = FileHeaderSize + InfoHeaderSize + PaletteSize;
     uint32_t FileSize = OffBits + BytesSize;
@@ -135,23 +140,78 @@ void save_bitmap(FILE* fp, uint8_t bytes[], unsigned width, unsigned height, uin
     fwrite(bytes,1,BytesSize,fp);
 }
 
-static size_t bytes_per_row(unsigned w, uint16_t BitsPerPixel)
+
+/**
+ set bytes[] at ( colum = x, line = y ) to specified color
+ argument `x` should be specified in bits: `BitsPerPixel` * pixel_X_coordinate
+ argument `y` should be speicifed in bytes: `BytesPerRow` * pixel_Y_coordinate
+*/
+static inline void set_bitmap(uint8_t bytes[], uint32_t x, uint32_t y, uint8_t color)
 {
-    return 4 * (((w * BitsPerPixel)+31)/32);
+    size_t i = y + x / 8;
+    bytes[i] |= color << ( 7 - x & 7 );
 }
 
-static size_t bitmap_size(unsigned w, unsigned h, uint16_t BitsPerPixel)
-{
-    unsigned lda = 4 * (((w * BitsPerPixel)+31)/32);
-    return lda * h;
-}
 
-/// argument `j` should be specified in bits, that is `BitsPerPixel * x_coordinate_of_pixel`
-static inline void set_bitmap(uint8_t bytes[], uint32_t bpr, uint32_t j, uint32_t y, uint8_t col)
+#ifdef __cplusplus
+
+
+class BitMap
 {
-    size_t i = y * bpr + j / 8;
-    bytes[i] |= col << ( 7 - j&7 );
-}
+    unsigned width;
+    unsigned height;
+    uint16_t depth;
+    uint32_t BPR;
+    uint8_t* bytes;
+
+public:
+    
+    BitMap(unsigned W, unsigned H, uint16_t B)
+    {
+        width = W;
+        height = H;
+        depth = B;
+        if ( B != 1 && B != 4 && B != 8 && B != 24 )
+        {
+            printf("invalid BitMap depth\n");
+            B = 8;
+        }
+        BPR = bytes_per_row(width, depth);
+        bytes = (uint8_t*)calloc(height*BPR, 1);
+    }
+    
+    ~BitMap()
+    {
+        free(bytes);
+        bytes = nullptr;
+    }
+    
+    void clear()
+    {
+        std::memset(bytes, 0, height*BPR);
+    }
+    
+    // matrix convention: i = line, with 0 at the top of the image
+    void set(uint32_t i, uint32_t j, uint8_t color = 1)
+    {
+        //assert_true(( i < height ) & ( j < width ));
+        set_bitmap(bytes, depth*j, BPR*(height-1-i), color);
+    }
+    
+    // y = line, x = horizontal, x is 0 at the bottom of the image
+    void flipset(uint32_t x, uint32_t y, uint8_t color)
+    {
+        //assert_true(( y < height ) & ( x < width ));
+        set_bitmap(bytes, depth*x, BPR*y, color);
+    }
+
+    void save(FILE * fp)
+    {
+        save_bitmap(fp, bytes, width, height, depth);
+    }
+};
+
+#endif
 
 #if 0
 int main()
