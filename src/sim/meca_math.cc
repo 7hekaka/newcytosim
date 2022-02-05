@@ -12,7 +12,7 @@
  */
 
 template < size_t ORD >
-void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
+static void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
 {
     //VecPrint::full("copy_subspace", siz, siz, mat, ldd);
     
@@ -37,7 +37,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
  at exit: `mat` is a full symmetric matrix if `SYMMETRIZE==true`
  */
 template < size_t ORD, bool SYMMETRIZE >
-void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
+static void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
 {
     //VecPrint::full("copy_upper_subspace", siz, siz, mat, ldd);
     
@@ -68,7 +68,7 @@ void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
  at exit, `mat` is a full symmetric matrix if `SYMMETRIZE==true`
  */
 template < size_t ORD, bool SYMMETRIZE >
-void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
+static void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
@@ -98,7 +98,7 @@ void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
  This averages the terms in the different subspaces
  */
 template < size_t ORD >
-void average_matrix(size_t siz, real* src, size_t ldd)
+static void average_matrix(size_t siz, real* src, size_t ldd)
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
@@ -126,7 +126,7 @@ void average_matrix(size_t siz, real* src, size_t ldd)
  This averages the terms in the different subspaces
  */
 template < size_t ORD >
-void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t ldd)
+static void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t ldd)
 {
 #if ( 0 )
     size_t S = std::min(12UL, siz);
@@ -151,7 +151,7 @@ void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t l
  if 'ku==0' and 'kl==0', only the diagonal is kept.
  if 'ku==1' and 'kl==1', the matrix is made tri-diagonal.
  */
-void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
+static void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 {
     //VecPrint::full("\ntruncate_matrix", siz, siz, mat, ldd);
 
@@ -172,7 +172,7 @@ void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 
 
 /// sum(element^2) / sum(diagonal^2)
-real off_diagonal_norm(size_t siz, real* mat)
+static real off_diagonal_norm(size_t siz, real* mat)
 {
     real all = 0;
     for ( size_t k = 0; k < siz*siz; ++k )
@@ -187,7 +187,7 @@ real off_diagonal_norm(size_t siz, real* mat)
 
 
 /// set all values between '-val' and 'val' to zero
-void threshold_matrix(size_t siz, real* mat, real val)
+static void threshold_matrix(size_t siz, real* mat, real val)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
     {
@@ -198,7 +198,7 @@ void threshold_matrix(size_t siz, real* mat, real val)
 
 
 /// remove 2 bytes of fraction data, rounding up the value
-inline double truncate_double(const double& arg)
+inline static double truncate_double(const double& arg)
 {
     constexpr uint64_t MASK = ~(0xFFFFFFFFUL);
     union { double d; uint64_t i; } udi { arg };
@@ -219,7 +219,7 @@ void truncate_double(size_t siz, double* mat)
 
 
 /// reduce precision of double
-void compactify_double(size_t siz, double* mat)
+static void compactify_double(size_t siz, double* mat)
 {
 #if 0
     // print first column of 'A' for checking
@@ -245,7 +245,7 @@ void compactify_double(size_t siz, double* mat)
 
 
 /// convert doubles to floats
-void convert_to_floats(size_t cnt, double const* src, float* dst)
+static void convert_to_floats(size_t cnt, double const* src, float* dst)
 {
     #pragma ivdep
     for ( size_t i = 0; i < cnt; ++i )
@@ -254,7 +254,7 @@ void convert_to_floats(size_t cnt, double const* src, float* dst)
 
 
 /// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
-void init_matrix(size_t siz, real* mat, real dia, real off)
+static void init_matrix(size_t siz, real* mat, real dia, real off)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
         mat[k] = off;
@@ -264,7 +264,7 @@ void init_matrix(size_t siz, real* mat, real dia, real off)
 
 
 /// erase all off-diagonal terms in `mat` of order `siz`
-void make_diagonal(size_t siz, real* mat, size_t ldd)
+static void make_diagonal(size_t siz, real* mat, size_t ldd)
 {
     for ( size_t j = 0; j < siz; ++j )
     {
@@ -278,7 +278,7 @@ void make_diagonal(size_t siz, real* mat, size_t ldd)
 
 
 /// a test matrix with integer components
-void test_matrix(size_t siz, real* mat, size_t ldd)
+static void test_matrix(size_t siz, real* mat, size_t ldd)
 {
     for ( size_t i = 0; i < siz; ++i )
     for ( size_t j = 0; j < siz; ++j )
@@ -303,7 +303,7 @@ Cholesky factorization by DPBTRF() or DPBTF2().
  This should work even if 'src==dst' provided `ldd <= N`
  */
 template < int KD >
-void lower_band_storage(int N, real const* src, real* dst, int ldd)
+static void lower_band_storage(int N, real const* src, real* dst, int ldd)
 {
     assert_true( ldd == KD+1 );
     assert_true( dst != src || ldd <= N );
@@ -339,7 +339,7 @@ void lower_band_storage(int N, real const* src, real* dst, int ldd)
            dst(KL+KU+i-j, j) = src(i,j)
  for max(0,j-KU) <= i <= min(N-1, j+KL)
 */
-void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, size_t ldd)
+static void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, size_t ldd)
 {
     assert_true( ldd == 2*kl+ku+1 );
     
@@ -364,7 +364,7 @@ void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, si
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* mat, real alpha, real* vec, real* tmp)
+static real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* mat, real alpha, real* vec, real* tmp)
 {
     assert_true(siz > 0);
     const real TOLERANCE = 0.05;
@@ -405,7 +405,7 @@ real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* ma
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
-real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, real* vec, real* tmp)
+static real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, real* vec, real* tmp)
 {
     const real TOLERANCE = 0.05;
     real oge, eig = blas::nrm2(siz, vec);

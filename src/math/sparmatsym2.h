@@ -145,7 +145,7 @@ public:
     /// number of elements in j-th column
     size_t column_size(size_t j) const { return colsiz_[j]; }
     
-    /// index of ith-elements in j-th column
+    /// line index of n-th element in j-th column
     size_t column_index(size_t j, size_t n) const { return column_[j][n].inx; }
 
     /// returns the address of element at (x, y), no allocation is done

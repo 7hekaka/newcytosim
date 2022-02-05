@@ -192,7 +192,7 @@ public:
     /// number of elements in j-th column
     size_t column_size(size_t j) const { assert_true(j<size_); return column_[j].size_; }
     
-    /// index of ith-elements in j-th column
+    /// line index of n-th element in j-th column
     size_t column_index(size_t j, size_t n) const { return column_[j].inx_[n]; }
 
     /// returns element at (i, i)

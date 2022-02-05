@@ -323,11 +323,11 @@ private:
     /// DEBUG: extract the matrix on-diagonal block corresponding to a Mecable using 'multiply()'
     void extractBlock(const Mecable*, real* mat) const;
     
-    /// DEBUG: compare `blk` with block extracted using extractBlockSlow()
-    void verifyBlock(const Mecable*, const real*);
+    /// DEBUG: compare `blk` with block returned by extractBlock()
+    void verifyBlock(const Mecable*, const real* blk);
     
-    /// DEBUG: test if `blk` is inverse of block extracted using extractBlockSlow()
-    void checkBlock(const Mecable*, const real*);
+    /// DEBUG: test if `blk` is inverse of block returned by extractBlock()
+    void checkBlock(const Mecable*, const real* blk);
     
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondAlt(Mecable*, real*, real*, size_t);

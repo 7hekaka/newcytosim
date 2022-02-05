@@ -362,6 +362,7 @@ void Simul::solve_auto()
     }
 }
 
+#pragma mark -
 
 void Simul::computeForces() const
 {
@@ -437,7 +438,8 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
         F->next(nullptr);
         F = X;
     }
-    for ( Couple const* C = couples.firstAA(); C ; C=C->next() )
+    // join subsets that are connected by a Couple:
+    for ( Couple const* C=couples.firstAA(); C ; C=C->next() )
     {
         ObjectFlag f = C->fiber1()->flag();
         ObjectFlag g = C->fiber2()->flag();
@@ -486,14 +488,14 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
                 fibers.pool_.front(F);
             G = F;
             F = F->next();
-        }
-        while ( F )
-        {
-            F->flag(num);
-            F->prev(G);
-            G->next(F);
-            G = F;
-            F = F->next();
+            while ( F )
+            {
+                F->flag(num);
+                F->prev(G);
+                G->next(F);
+                G = F;
+                F = F->next();
+            }
         }
     }
     fibers.pool_.back(G);
