@@ -549,8 +549,58 @@ void Meca::dumpSystem(bool nat) const
 #include "../base/save_bitmap.cc"
 
 
+// Just considering Couple between Fibers here:
+void setConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecables)
+{
+    bmap.clear();
+    unsigned i = 0;
+    for ( Mecable * mec : mecables )
+        mec->flag(i++);
+    
+    for ( Mecable const* mec : mecables )
+    {
+        i = mec->flag();
+
+        Fiber const* fib = Fiber::toFiber(mec);
+        for ( Hand * h = fib->firstHand(); h; h = h->next() )
+        {
+            HandMonitor const* m = h->monitor();
+            Hand const* oh = m->otherHand(h);
+            if ( oh > h  &&  oh->attached() )
+            {
+                unsigned j = oh->fiber()->flag();
+                bmap.set(i, j, 15);
+            }
+            else if ( oh )
+            {
+                
+            }
+        }
+    }
+}
+
+
+void Meca::saveConnectivityBitmap() const
+{
+    static size_t cnt = 0;
+    const size_t nbv = mecables.size();
+    BitMap<1> bmap(nbv, nbv);
+    char str[32] = { 0 };
+    
+    snprintf(str, sizeof(str), "net%08lu.bmp", cnt++);
+    FILE * f = fopen(str, "w");
+    if ( f ) {
+        if ( !ferror(f) ) {
+            setConnectivity(bmap, mecables);
+            bmap.save(f);
+        }
+        fclose(f);
+    }
+}
+
+
 template < typename MatrixClass >
-static void setMatrixBitmap(BitMap& bmap, size_t nbv, MatrixClass const& MAT, size_t ORD)
+static void setMatrixBitmap(BitMap<1>& bmap, size_t nbv, MatrixClass const& MAT, size_t ORD)
 {
     bmap.clear();
     for ( size_t j = 0; j < nbv; ++j )
@@ -567,9 +617,10 @@ static void setMatrixBitmap(BitMap& bmap, size_t nbv, MatrixClass const& MAT, si
 
 
 /// add vertical and horizontal lines to indicate mecables indices
-static void markMecables(BitMap& bmap, Array<Mecable*> const& mecables)
+static void markMecables(BitMap<1>& bmap, Array<Mecable*> const& mecables)
 {
-    for ( Mecable * mec : mecables ) {
+    for ( Mecable * mec : mecables )
+    {
         size_t i = mec->matIndex();
         size_t s = i + mec->nbPoints() - 1;
         for ( size_t j = i+1; j < s; ++j )
@@ -586,7 +637,7 @@ void Meca::saveMatrixBitmaps() const
 {
     static size_t cnt = 0;
     const size_t nbv = nbVertices();
-    BitMap bmap(nbv, nbv, 1);
+    BitMap<1> bmap(nbv, nbv);
     char str[32] = { 0 };
     
 #if USE_ISO_MATRIX
@@ -601,7 +652,7 @@ void Meca::saveMatrixBitmaps() const
         fclose(f);
     }
 #endif
-    snprintf(str, sizeof(str), "ful%08lu.bmp", cnt);
+    snprintf(str, sizeof(str), "ful%08lu.bmp", cnt++);
     FILE * g = fopen(str, "w");
     if ( g ) {
         if ( !ferror(g) ) {
@@ -611,6 +662,5 @@ void Meca::saveMatrixBitmaps() const
         }
         fclose(g);
     }
-    ++cnt;
 }
 

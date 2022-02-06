@@ -213,7 +213,7 @@ void Simul::solve()
 #if ( 0 )
     // check that recalculating gives similar forces
     fibers.firstID()->printTensions(stderr, 47);
-    sMeca.computeForces();
+    sMeca.calculateForces();
     fibers.firstID()->printTensions(stderr, 92);
     putc('\n', stderr);
 #endif
@@ -273,7 +273,7 @@ void Simul::solve_force()
     sMeca.pickMecables(*this);
     sMeca.getReady();
     setAllInteractions(sMeca);
-    sMeca.computeForces();
+    sMeca.calculateForces();
 }
 
 
@@ -362,7 +362,6 @@ void Simul::solve_auto()
     }
 }
 
-#pragma mark -
 
 void Simul::computeForces() const
 {
@@ -375,7 +374,7 @@ void Simul::computeForces() const
             sMeca.pickMecables(*this);
             sMeca.getReady();
             setAllInteractions(sMeca);
-            sMeca.computeForces();
+            sMeca.calculateForces();
         }
     }
     catch ( Exception & e )
@@ -385,6 +384,54 @@ void Simul::computeForces() const
     }
 }
 
+//==============================================================================
+//                              SOLVE-X 1D
+//==============================================================================
+
+#include "meca1d.h"
+
+void Simul::solve_onlyX()
+{
+    if ( !pMeca1D )
+        pMeca1D = new Meca1D();
+
+    //-----initialize-----
+
+    pMeca1D->pickMecables(*this);
+    pMeca1D->getReady(prop->time_step, prop->kT);
+
+    //-----set matrix-----
+
+    for ( Couple * c = couples.firstAA(); c ; c=c->next() )
+    {
+        Hand const* h1 = c->hand1();
+        Hand const* h2 = c->hand2();
+        
+        const size_t i1 = h1->fiber()->matIndex();
+        const size_t i2 = h2->fiber()->matIndex();
+        assert_true( i1 != i2 );
+        
+        pMeca1D->addLink(i1, i2, c->prop->stiffness, h2->pos().XX - h1->pos().XX);
+    }
+    
+    for ( Single * s = singles.firstA(); s ; s=s->next() )
+    {
+        Hand const* h = s->hand();
+        const size_t i = h->fiber()->matIndex();
+        
+        pMeca1D->addClamp(i, s->prop->stiffness, s->position().XX - h->pos().XX);
+    }
+    
+    //-----resolution-----
+
+    real noise = pMeca1D->setRightHandSide(prop->kT);
+    
+    pMeca1D->solve(prop->tolerance * noise);
+    pMeca1D->apply();
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Analysis
 
 
 void Simul::flagClustersMeca() const
@@ -424,8 +471,8 @@ static size_t depth(Object * ptr)
     }
     return cnt;
 }
-                   
-                   
+
+
 ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
 {
     Object * F = fibers.first();
@@ -581,52 +628,5 @@ void Simul::addExperimentalInteractions(Meca& meca) const
         meca.addForce(Mecapoint(O, 2), +force);
     }
 #endif
-}
-
-//==============================================================================
-//                              SOLVE-X 1D
-//==============================================================================
-#pragma mark -
-
-#include "meca1d.h"
-
-void Simul::solve_onlyX()
-{
-    if ( !pMeca1D )
-        pMeca1D = new Meca1D();
-
-    //-----initialize-----
-
-    pMeca1D->pickMecables(*this);
-    pMeca1D->getReady(prop->time_step, prop->kT);
-
-    //-----set matrix-----
-
-    for ( Couple * c = couples.firstAA(); c ; c=c->next() )
-    {
-        Hand const* h1 = c->hand1();
-        Hand const* h2 = c->hand2();
-        
-        const size_t i1 = h1->fiber()->matIndex();
-        const size_t i2 = h2->fiber()->matIndex();
-        assert_true( i1 != i2 );
-        
-        pMeca1D->addLink(i1, i2, c->prop->stiffness, h2->pos().XX - h1->pos().XX);
-    }
-    
-    for ( Single * s = singles.firstA(); s ; s=s->next() )
-    {
-        Hand const* h = s->hand();
-        const size_t i = h->fiber()->matIndex();
-        
-        pMeca1D->addClamp(i, s->prop->stiffness, s->position().XX - h->pos().XX);
-    }
-    
-    //-----resolution-----
-
-    real noise = pMeca1D->setRightHandSide(prop->kT);
-    
-    pMeca1D->solve(prop->tolerance * noise);
-    pMeca1D->apply();
 }
 

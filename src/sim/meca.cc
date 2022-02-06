@@ -454,7 +454,7 @@ void Meca::prepareMatrices()
  
  The function will not change the positions of any Mecable.
  */
-void Meca::computeForces()
+void Meca::calculateForces()
 {
     prepareMatrices();
     

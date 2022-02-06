@@ -699,15 +699,9 @@ public:
     void apply();
 
     /// calculate Forces on Mecables and Lagrange multipliers for Fiber, without thermal motion
-    void computeForces();
+    void calculateForces();
     
     //----------------------- EXPORT/DEBUG FUNCTIONS ---------------------------
-    
-    /// set Mecable:flag() according to connectivity defined by matrix elements
-    void flagClusters() const;
-    
-    /// export bitmap images to reveal the matrices' sparsity patterns
-    void saveMatrixBitmaps() const;
 
     /// Count number of non-zero entries in the full system matrix
     size_t countTerms(real threshold) const;
@@ -751,6 +745,16 @@ public:
 
     /// Output vectors and matrices in various files (for debugging)
     void exportSystem() const;
+
+    
+    /// set Mecable:flag() according to connectivity defined by matrix elements
+    void flagClusters() const;
+    
+    /// export bitmap images to reveal the matrices' sparsity patterns
+    void saveMatrixBitmaps() const;
+    
+    /// save image of connectivity between Mecables
+    void saveConnectivityBitmap() const;
 
 };
 
