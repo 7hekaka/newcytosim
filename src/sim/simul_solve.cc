@@ -107,9 +107,10 @@ static void setStericGrid(GRID& grid, Space const* spc, real& range, real inf)
  */
 void Simul::setAllInteractions(Meca& meca) const
 {
-    for ( Space const* s=spaces.first(); s; s=s->next() )
-        s->setInteractions(meca);
-    
+#if 1
+    for ( Mecable const* mec : meca.mecables )
+        mec->setInteractions(meca);
+#else
     for ( Fiber const* f=fibers.first(); f ; f=f->next() )
         f->setInteractions(meca);
     
@@ -121,6 +122,10 @@ void Simul::setAllInteractions(Meca& meca) const
     
     for ( Bead const* b=beads.first(); b ; b=b->next() )
         b->setInteractions(meca);
+#endif
+
+    for ( Space const* s=spaces.first(); s; s=s->next() )
+        s->setInteractions(meca);
 
     for ( Single const* i=singles.firstA(); i ; i=i->next() )
         i->setInteractions(meca);
@@ -220,54 +225,6 @@ void Simul::solve()
 }
 
 
-/**
- This is attempting to separate the system into subclusters
- that can be solved independently -- should lead to parallelization
- */
-void Simul::solve_separate()
-{
-    size_t cnt = fibers.size();
-    ObjectFlag sup = fibers.inventory_.highest();
-#if 0
-    resetFlags(fibers);
-    flagClustersCouples();
-#else
-    Object ** table = new Object*[sup+2]{nullptr};
-    sup = orderClustersCouple(table, sup);
-    std::clog << "Ordered " << sup << " clusters\n";
-    delete[] table;
-#endif
-    
-    // ready steric interactions
-    if ( prop->steric_mode && spaces.master() )
-    {
-        if ( !sMeca.locusGrid.hasGrid() )
-            setStericGrid(sMeca.locusGrid, spaces.master(), prop->steric_max_range, estimateStericRange());
-    }
-    //std::clog << "Separating " << cnt << " fibers\n";
-    for ( ObjectFlag f = 0; f <= sup; ++f )
-    {
-        sMeca.mecables.clear();
-        for ( Fiber * F=fibers.first(); F; F=F->next() )
-            if ( F->flag() == f )
-                sMeca.addMecable(F);
-        size_t num = sMeca.mecables.size();
-        if ( num > 0 )
-        {
-            std::clog << "  cluster " << f << " has " << num << " fibers\n";
-            cnt -= num;
-            sMeca.getReady();
-            sMeca.setSomeInteractions();
-            if ( prop->steric_mode && spaces.master() )
-                sMeca.addSomeStericInteractions(prop->steric_stiff_push[0]);
-            sMeca.solve(prop, prop->precondition);
-            sMeca.apply();
-        }
-    }
-    assert_true(cnt == 0);
-}
-
-
 void Simul::solve_force()
 {
     sMeca.pickMecables(*this);
@@ -284,7 +241,6 @@ void Simul::solve_half()
     setAllInteractions(sMeca);
     sMeca.solve(prop, prop->precondition);
 }
-
 
 
 /**
@@ -384,6 +340,55 @@ void Simul::computeForces() const
     }
 }
 
+
+
+/**
+ This is attempting to separate the system into subclusters
+ that can be solved independently -- should lead to parallelization
+ */
+void Simul::solve_separate()
+{
+    size_t cnt = fibers.size();
+#if 0
+    size_t sup = setUniqueFlags();
+    flagClustersCouples();
+#else
+    Object ** table = new Object*[cnt+2]{nullptr};
+    size_t sup = orderClustersCouple(table, cnt);
+    std::clog << "Ordered " << sup << " clusters\n";
+    delete[] table;
+#endif
+    
+    // ready steric interactions
+    if ( prop->steric_mode && spaces.master() )
+    {
+        if ( !sMeca.locusGrid.hasGrid() )
+            setStericGrid(sMeca.locusGrid, spaces.master(), prop->steric_max_range, estimateStericRange());
+    }
+    //std::clog << "Separating " << cnt << " fibers\n";
+    for ( ObjectFlag f = 0; f <= sup; ++f )
+    {
+        sMeca.mecables.clear();
+        for ( Fiber * F=fibers.first(); F; F=F->next() )
+            if ( F->flag() == f )
+                sMeca.addMecable(F);
+        size_t num = sMeca.mecables.size();
+        if ( num > 0 )
+        {
+            std::clog << "  cluster " << f << " has " << num << " fibers\n";
+            cnt -= num;
+            sMeca.getReady();
+            sMeca.setSomeInteractions();
+            if ( prop->steric_mode && spaces.master() )
+                sMeca.addSomeStericInteractions(prop->steric_stiff_push[0]);
+            sMeca.solve(prop, prop->precondition);
+            sMeca.apply();
+        }
+    }
+    assert_true(cnt == 0);
+}
+
+
 //==============================================================================
 //                              SOLVE-X 1D
 //==============================================================================
@@ -430,6 +435,36 @@ void Simul::solve_onlyX()
     pMeca1D->apply();
 }
 
+
+/**
+ The motion occurs along the X-axis for all fibers,
+ and is directed parallel to the Fiber axis if ( flux_speed > 0 ).
+ The horizontal speed is proportional to the X component of the fiber's direction.
+ 
+ If ( flux_speed < 0 ), right pointing fibers move left, while Left pointing fiber move right.
+ */
+void Simul::solve_flux()
+{
+#if OLD_SPINDLE_FLUX
+    if ( prop->flux_speed > 0 )
+        throw InvalidParameter("simul:flux_speed should be <= 0");
+    real shift = prop->flux_speed * prop->time_step;
+
+    for ( Fiber * fib = fibers.first(); fib ; fib=fib->next() )
+    {
+        real const* pos = fib->addrPoints();
+        if ( pos[DIM] > pos[0] )
+            fib->translate( Vector(-shift, 0, 0) );
+        else
+            fib->translate( Vector( shift, 0, 0) );
+    }
+#else
+    std::cerr << "ERROR: OLD_SPINDLE_FLUX is not enabled\n";
+    throw InvalidParameter("simul:flux_speed is not enabled");
+#endif
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark - Analysis
 
@@ -461,6 +496,7 @@ static void join(Object ** table, ObjectFlag f, ObjectFlag g)
 }
 
 
+/// number of points in list starting at 'ptr' and defined by 'next()'
 static size_t depth(Object * ptr)
 {
     size_t cnt = 0;
@@ -477,14 +513,16 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
 {
     Object * F = fibers.first();
     Object * G;
+    ObjectFlag flg = 0;
     while ( F )
     {
+        F->flag(++flg);
+        table[flg] = F;
         Object * X = F->next();
-        F->matchFlagIdentity();
-        table[F->flag()] = F;
         F->next(nullptr);
         F = X;
     }
+    assert_true( flg <= sup );
     // join subsets that are connected by a Couple:
     for ( Couple const* C=couples.firstAA(); C ; C=C->next() )
     {
@@ -629,4 +667,3 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     }
 #endif
 }
-

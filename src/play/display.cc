@@ -522,7 +522,7 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
         prep_time = sim.time();
         // compute clusters:
         if ( prep_flag & 1 )
-            sim.flagClusters(1, 0, 0);
+            sim.flagClusters(1, 1, 0);
         
         // if fiber tensions are used for display, recompute them now:
         if ( prep_flag & 2 )

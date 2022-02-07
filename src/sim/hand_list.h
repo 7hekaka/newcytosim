@@ -7,6 +7,7 @@
 
 
 class Hand;
+class Fiber;
 
 
 /// a list of Hands, used to keep track of Hands attached to a Fiber
@@ -54,6 +55,9 @@ public:
     /// a function to count Hands using a custom criteria
     size_t count(int (*func)(Hand const*)) const;
     
+    /// count Couple attached to another Fiber
+    size_t countLinks(Fiber const*) const;
+
     /// number of Hands attached within a range of abscissa
     size_t countInRange(real abs_min, real abs_max) const;
     

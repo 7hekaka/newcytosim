@@ -98,7 +98,7 @@ public:
     /// apply Isometry to all Objects in ObjectList
     static void moveObjects(ObjectList const&, Isometry const&);
 
-    /// flag all Objects in ObjectList
+    /// set flag of all Objects to `f`
     static void flagObjects(ObjectList const&, ObjectFlag f);
 
     /// apply translation to unflagged Objects in list

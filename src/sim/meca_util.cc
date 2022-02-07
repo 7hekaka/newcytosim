@@ -44,7 +44,6 @@ void Meca::flagClusters() const
     
     for ( Mecable * mec : mecables )
     {
-        //mec->matchFlagIdentity();
         const size_t inx = mec->matIndex();
         const size_t end = mec->nbPoints() + inx;
         assert_true( end <= MAX );

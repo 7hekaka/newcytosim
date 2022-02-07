@@ -24,7 +24,6 @@ extern Modulo const* modulo;
 #include "simul_custom.cc"
 #include "simul_report.cc"
 #include "simul_solve.cc"
-#include "simul_solvef.cc"
 
 #include <csignal>
 
@@ -292,12 +291,56 @@ void Simul::erase(ObjectList& objs, size_t cnt)
     }
 }
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
 
 void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 {
     //std::clog << " Simul::erase("<< objs.size() <<" objects):" << '\n';
     for ( Object * i : objs )
         i->mark(mrk);
+}
+
+
+ObjectFlag Simul::setUniqueFlags() const
+{
+    ObjectFlag f = 1;
+    for ( Fiber * F=fibers.first(); F; F=F->next() )
+        F->flag(f++);
+    for ( Solid * S=solids.first(); S; S=S->next() )
+        S->flag(f++);
+    for ( Bead  * B=beads.first(); B; B=B->next() )
+        B->flag(f++);
+    for ( Sphere* O=spheres.first(); O; O=O->next() )
+        O->flag(f++);
+    return f;
+}
+
+
+void Simul::setFlags(ObjectFlag f) const
+{
+    for ( Fiber * F=fibers.first(); F; F=F->next() )
+        F->flag(f);
+    for ( Solid * S=solids.first(); S; S=S->next() )
+        S->flag(f);
+    for ( Bead  * B=beads.first(); B; B=B->next() )
+        B->flag(f);
+    for ( Sphere* O=spheres.first(); O; O=O->next() )
+        O->flag(f);
+}
+
+
+void Simul::changeFlag(ObjectFlag f, ObjectFlag g) const
+{
+    for ( Fiber * F=fibers.first(); F; F=F->next() )
+        if ( F->flag() == f ) F->flag(g);
+    for ( Solid * S=solids.first(); S; S=S->next() )
+        if ( S->flag() == f ) S->flag(g);
+    for ( Bead  * B=beads.first(); B; B=B->next() )
+        if ( B->flag() == f ) B->flag(g);
+    for ( Sphere* O=spheres.first(); O; O=O->next() )
+        if ( O->flag() == f ) O->flag(g);
 }
 
 //------------------------------------------------------------------------------

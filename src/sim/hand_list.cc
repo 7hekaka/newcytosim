@@ -2,6 +2,7 @@
 
 
 #include "hand_list.h"
+#include "hand_monitor.h"
 #include "hand.h"
 
 /**
@@ -152,7 +153,23 @@ size_t HandList::count(int (*func)(Hand const*)) const
     for ( Hand const* h = haFront; h; h = h->next() )
         res += func(h);
     
-    //printf("nbHands(%p) = %u\n", count, res);
+    //printf("count(%p) = %u\n", this, res);
+    return res;
+}
+
+
+size_t HandList::countLinks(Fiber const* fib) const
+{
+    size_t res = 0;
+    
+    for ( Hand const* h = haFront; h; h = h->next() )
+    {
+        HandMonitor const* m = h->monitor();
+        Hand const* oh = m->otherHand(h);
+        if ( oh )
+            res += ( oh->fiber() == fib );
+    }
+    //printf("countLinks(%p) = %u\n", fib, res);
     return res;
 }
 
@@ -164,7 +181,7 @@ size_t HandList::countInRange(real i, real s) const
     for ( Hand const* h = haFront; h; h = h->next() )
         res += (( i <= h->abscissa()) & ( h->abscissa() <= s ));
     
-    //printf("nbHandsInRange(%8.2f, %8.2f) = %u\n", a, b, res);
+    //printf("countInRange(%8.2f, %8.2f) = %u\n", i, s, res);
     return res;
 }
 

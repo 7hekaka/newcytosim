@@ -171,7 +171,7 @@ public:
     double time() const;
     
     /// shortcut to prop->time_step;
-    real  time_step() const;
+    real time_step() const;
 
     /// this is called after a sequence of `step()` have been done
     void relax();
@@ -180,7 +180,7 @@ public:
     void unrelax() { primed_ = 2; }
 
     /// true if engine is ready to go (between `prepare()` and `relax()`)
-    int   primed() const { return primed_; }
+    int primed() const { return primed_; }
 
     
     /// call setInteractions(Meca) for all objects (this is called before `solve()`
@@ -221,9 +221,6 @@ public:
     
     /// calculate Forces and Lagrange multipliers on the Mecables
     void computeForces() const;
-    
-    /// calculate clusters of Mecable derived from all interactions
-    void flagClustersMeca() const;
     
     /// calculate clusters based on Couples' connectivity and order Fibers accordingly
     ObjectFlag orderClustersCouple(Object**, ObjectFlag);
@@ -269,12 +266,12 @@ public:
     
     /// find a Sphere by name
     Sphere * findSphere(std::string s) { return Sphere::toSphere(spheres.findObject("sphere", s)); }
-
-    /// return first Space with given name, or return nullptr
-    Space const* findSpace(std::string const&) const;
     
     /// first Space with this Property
     Space * pickSpace(const Property * p) const { return static_cast<Space*>(spaces.pickObject(p)); }
+
+    /// return first Space with given name, or return nullptr
+    Space const* findSpace(std::string const&) const;
     
     /// first Field with this Property
     Field * pickField(const Property * p) const;
@@ -562,17 +559,29 @@ public:
     /// print something about Fields
     void reportField(std::ostream&) const;
     
-    //------------------------- PROJECT SPECIFIC -------------------------------
+    //------------------------- CLUSTER ANALYSIS -------------------------------
     
-    /// flag fibers according to connectivity defined by Couple of given type
-    void flagClustersCouples(Property const*) const;
+    /// set Mecable's flag() to unique values, return highest value attributed + 1
+    ObjectFlag setUniqueFlags() const;
+
+    /// call `flag(f)` for all Mecable
+    void setFlags(ObjectFlag f) const;
+    
+    /// replace all occurence of flag `f` by `g`
+    void changeFlag(ObjectFlag f, ObjectFlag g) const;
+
+    /// calculate clusters of Mecable derived from all interactions
+    void flagClustersMeca() const;
     
     /// flag fibers according to connectivity defined by Couple
     void flagClustersCouples() const;
     
     /// flag fibers according to connectivity defined by Solids
-    void flagClustersSolids() const;
+    void flagClustersSingles() const;
     
+    /// flag fibers according to connectivity defined by Couple of given type
+    void flagClustersCouples(Property const*) const;
+
     /// analyse the network connectivity to identify isolated sub-networks
     void flagClusters(bool cop, bool sol, bool mec) const;
     
@@ -581,6 +590,8 @@ public:
     
     /// print size of clusters defined by connections with Couples
     void reportClusters(std::ostream&, Glossary&) const;
+
+    //------------------------- PROJECT SPECIFIC -------------------------------
 
     /// flag the fibers that appear to constitute a ring
     size_t flagRing() const;

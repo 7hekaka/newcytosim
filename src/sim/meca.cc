@@ -865,6 +865,10 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - Apply
+
+
 /**
  This transfers coordinates calculated in Meca::solve() back to the Mecables
  It also calculates the corresponding Forces and transfer them back.

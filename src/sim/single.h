@@ -38,8 +38,8 @@ class PointDisp;
  link stiffness is zero, which is the default value.
 
  Wrist and Picket can be distinguished with Single::base():
- - for Single and Picket, this returns zero,
- - for Wrist, this returns the Mecable on which the Wrist is attached.
+ - for Single and Picket, `base() == nullptr`,
+ - for Wrist, `base()` returns the Mecable on which the Wrist is attached.
  .
 
  @ingroup SingleGroup

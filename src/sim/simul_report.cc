@@ -2589,102 +2589,51 @@ void Simul::reportCoupleHands(std::ostream& out, Property const* sel) const
 //------------------------------------------------------------------------------
 #pragma mark - Cluster Analysis
 
-
-// set flag() to unique value for all fibers
-void resetFlags(FiberSet const& set)
-{
-    for ( Fiber * fib = set.first(); fib; fib=fib->next() )
-        fib->matchFlagIdentity();
-}
-
-
-// set flag() for all fibers to `f`
-void resetFlags(FiberSet const& set, ObjectFlag f)
-{
-    for ( Fiber * fib = set.first(); fib; fib=fib->next() )
-        fib->flag(f);
-}
-
-
 /**
- Substitute the values of fiber:flag() such that both `a` and `b`
- values are replaced by min(a, b).
- */
-void reFlag(FiberSet const& set, ObjectFlag a, ObjectFlag b)
-{
-    // swap to ensure b < a
-    if ( a < b )
-        std::swap(a, b);
-
-    // replace a -> b = min(a, b)
-    for ( Fiber* fib = set.first(); fib; fib=fib->next() )
-    {
-        if ( fib->flag() == a )
-            fib->flag(b);
-    }
-}
-
-
-/**
- equalize flag() when fibers are connected by a Couple:
+ equalize flag() if connected by a Couple
  */
 void Simul::flagClustersCouples() const
 {
-    for ( Couple const* cx = couples.firstAA(); cx ; cx=cx->next() )
+    for ( Couple const* X=couples.firstAA(); X ; X=X->next() )
     {
-        ObjectFlag f1 = cx->fiber1()->flag();
-        ObjectFlag f2 = cx->fiber2()->flag();
-        if ( f1 != f2 )
-            reFlag(fibers, f1, f2);
+        ObjectFlag f = X->fiber1()->flag();
+        ObjectFlag g = X->fiber2()->flag();
+        if ( f != g )
+            changeFlag(std::max(f, g), std::min(f, g));
     }
 }
 
 /**
- equalize flag() when fibers are connected by a Couple of given type:
+ equalize flag() if connected by a Couple of given type
  */
 void Simul::flagClustersCouples(Property const* sel) const
 {
-    for ( Couple const* cx = couples.firstAA(); cx ; cx=cx->next() )
+    for ( Couple const* X=couples.firstAA(); X ; X=X->next() )
     {
-        if ( cx->prop == sel )
+        if ( X->prop == sel )
         {
-            ObjectFlag f1 = cx->fiber1()->flag();
-            ObjectFlag f2 = cx->fiber2()->flag();
-            if ( f1 != f2 )
-                reFlag(fibers, f1, f2);
+            ObjectFlag f = X->fiber1()->flag();
+            ObjectFlag g = X->fiber2()->flag();
+            if ( f != g )
+                changeFlag(std::max(f, g), std::min(f, g));
         }
     }
 }
 
-
 /**
- equalize flag() when fibers are connected through blobs:
+ equalize flag() if connected through Single of class Wrist:
  */
-void Simul::flagClustersSolids() const
+void Simul::flagClustersSingles() const
 {
-    for ( Solid* obj=solids.first(); obj; obj=obj->next() )
+    for ( Single * X=singles.firstA(); X; X=X->next() )
     {
-        SingleList anchored = singles.collectWrists(obj);
-        // find the minimun flag value:
-        ObjectFlag flg = 0;
-        for ( Single const* s : anchored )
+        Mecable const* B = X->base();
+        if ( B )
         {
-            if ( s->attached() )
-            {
-                ObjectFlag f = s->fiber()->flag();
-                if ( flg == 0 || f < flg )
-                    flg = f;
-            }
-        }
-        // reflag:
-        if ( flg > 0 )
-        {
-            for ( Single const* s : anchored )
-            {
-                if ( s->attached() )
-                    reFlag(fibers, s->fiber()->flag(), flg);
-            }
-            obj->flag(flg);
+            ObjectFlag f = X->fiber()->flag();
+            ObjectFlag g = B->flag();
+            if ( f != g )
+                changeFlag(std::max(f, g), std::min(f, g));
         }
     }
 }
@@ -2695,9 +2644,9 @@ void Simul::flagClusters(bool C, bool S, bool M) const
     if ( ! ( C | S | M ) )
         throw InvalidSyntax("you must specify a cluster type: couple=1 or solid=1 or meca=1");
 
-    resetFlags(fibers);
+    setUniqueFlags();
     if ( C ) flagClustersCouples();
-    if ( S ) flagClustersSolids();
+    if ( S ) flagClustersSingles();
     if ( M ) flagClustersMeca();
     flagLargestCluster(1UL);
 }
@@ -2835,7 +2784,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
 
     opt.set(details, "details");
     opt.set(C, "couples", "couple");
-    opt.set(S, "solids", "solid");
+    opt.set(S, "singles", "single");
     opt.set(M, "meca");
     
     flagClusters(C, S, M);
@@ -2855,7 +2804,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
  */
 size_t Simul::flagRing() const
 {
-    flagClusters(1, 0, 0);
+    flagClusters(1, 1, 0);
 
     typedef std::list<ObjectFlag> list_t;
     list_t ring;

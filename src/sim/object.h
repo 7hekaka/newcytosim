@@ -163,10 +163,6 @@ public:
     /// set flag (this value is not stored in trajectory files)
     void flag(ObjectFlag f)  { flag_ = f; }
     
-    /// set flag to match identity()
-    void matchFlagIdentity() { flag_ = identity(); }
-
-    
     /// a random number that makes objects unique
     ObjectSignature signature() const { return signature_; }
     
