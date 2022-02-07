@@ -360,13 +360,10 @@ LOCAL vec4 broadcastX(vec2 a)  { return _mm256_broadcastsd_pd(a); }
 /// cross product of two 3D vectors ( X Y Z T )
 LOCAL vec4 cross4(vec4 a, vec4 b)
 {
-    vec4 a1 = permute4x64(a, 0xC9); // Y Z X T
-    vec4 b1 = permute4x64(b, 0xC9); // Y Z X T
-#if defined(__FMA__)
-    return permute4x64(_mm256_fmsub_pd(a, b1, mul4(a1,b)), 0xC9);
-#else
-    return permute4x64(sub4(mul4(a,b1), mul4(a1,b)), 0xC9);
-#endif
+    // this will not fly because permute accross 128bit boudaries are slow
+    vec4 at = permute4x64(a, 0xC9); // Y Z X T
+    vec4 bt = permute4x64(b, 0xD2); // Z X Y T
+    return sub4(mul4(at,bt), permute4x64(mul4(at,b), 0xC9));
 }
 
 // Non-temporal load: an aligned load intruction that bypasses the cache.

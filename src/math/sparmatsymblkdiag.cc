@@ -435,7 +435,7 @@ std::string SparMatSymBlkDiag::what() const
 #else
     msg << "SMSBD ";
 #endif
-    msg << Block::what() << "*" << cnt << " (" << alc*SB << ")";
+    msg << Block::what() << "*" << cnt << " (" << alc << ")";
     return msg.str();
 }
 

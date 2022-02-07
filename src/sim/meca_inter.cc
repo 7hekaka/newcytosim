@@ -4124,9 +4124,9 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
  The force is linear of zero resting length, but it is taken between B,
  and another point S located on the side of A:
  
-     S = A + len * N,
+     S = A + cross( leg, T )
  
- where N is a normalized vector orthogonal to the fiber in A, in the direction of B.
+ where T is the unit vector tangent to the fiber in A, towards the plus-end.
  In addition, the tangential part of the force is removed.
  
  If T is the normalized direction of the fiber in A:
