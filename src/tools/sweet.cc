@@ -144,20 +144,21 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
+    Simul simul;
     Glossary arg;
+    FrameReader reader;
+    bool binary = 1;
+
     if ( arg.read_strings(argc-2, argv+2) )
         return EXIT_FAILURE;
     
     if ( arg.has_key("directory") )
         FilePath::change_dir(arg.value("directory"));
 
-    bool binary = 1;
     arg.set(binary, "binary");
-    std::string input = TRAJECTORY;
+    std::string input = Simul::TRAJECTORY;
     arg.set(input, ".cmo") || arg.set(input, "input");
 
-    Simul simul;
-    FrameReader reader;
     reader.openFile(input);
     
     if ( !reader.good() )

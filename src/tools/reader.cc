@@ -57,8 +57,8 @@ void inventory(Simul& simul, size_t frame)
 int main(int argc, char* argv[])
 {
     Simul simul;
-    FrameReader reader;
     Glossary arg;
+    FrameReader reader;
     char cmd[1024] = "\0";
     size_t frm = 0;
 
@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
     if ( arg.has_key("directory") )
         FilePath::change_dir(arg.value("directory"));
 
-    std::string input = TRAJECTORY;
+    std::string input = Simul::TRAJECTORY;
     std::string output = "output.cmo";
     
     arg.set(output, "output");

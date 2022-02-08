@@ -675,7 +675,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 
     // compute preconditionner:
     auto start = timer();
-    computePreconditionner(precond, prop->precondition_span);
+    computePreconditionner(precond, prop->precond_span);
     auto factor = timer() - start;
     cycles_ = 0;
 

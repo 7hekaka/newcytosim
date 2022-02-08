@@ -28,9 +28,6 @@ class Meca1D;
 class SimulProp;
 class Parser;
 
-/// default name for output trajectory file
-const char TRAJECTORY[] = "objects.cmo";
-
 
 /// Simulator class containing all Objects
 class Simul
@@ -347,9 +344,12 @@ public:
     void loadProperties();
 
     //---------------------------- LOAD OBJECTS --------------------------------
-    
+
+    /// default name for output trajectory file
+    static const char TRAJECTORY[];
+
     /// current file format (check history in `simul_file.cc`)
-    static const unsigned currentFormatID = 56;
+    static constexpr unsigned currentFormatID = 56;
     
     /// class for reading trajectory file
     class InputLock;

@@ -217,7 +217,7 @@ public:
      This only apply to 'precondition == 7'
      <em>default value = 2</em>
      */
-    unsigned precondition_span;
+    unsigned precond_span;
     
     /// A flag to control the engine that implement steric interactions between objects
     int steric_mode;

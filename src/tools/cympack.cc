@@ -239,7 +239,10 @@ int main(int argc, char* argv[])
         help(std::cout);
         return EXIT_SUCCESS;
     }
+    Simul simul;
     Glossary arg;
+    FrameReader reader;
+    
     if ( arg.read_strings(argc-1, argv+1) )
         return EXIT_FAILURE;
     
@@ -247,11 +250,9 @@ int main(int argc, char* argv[])
         FilePath::change_dir(arg.value("directory"));
 
     arg.set(use_fixed16, "fixed");
-    std::string input = TRAJECTORY;
+    
+    std::string input = Simul::TRAJECTORY;
     arg.set(input, ".cmo") || arg.set(input, "input");
-
-    Simul simul;
-    FrameReader reader;
     reader.openFile(input);
     
     if ( !reader.good() )

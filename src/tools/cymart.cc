@@ -321,7 +321,10 @@ int main(int argc, char* argv[])
     std::string fiber_type = argv[1];
     Property * selected = 0;
     
+    Simul simul;
     Glossary arg;
+    FrameReader reader;
+
     if ( arg.read_strings(argc-2, argv+2) )
         return EXIT_FAILURE;
 
@@ -329,16 +332,14 @@ int main(int argc, char* argv[])
     arg.set(binary, "binary");
     arg.set(style, "style", {{"filament", 1}, {"actin", 2}, {"microtubule", 3}});
 
-    std::string input = TRAJECTORY;
+    std::string input = Simul::TRAJECTORY;
     arg.set(input, ".cmo") || arg.set(input, "input");
 
     unsigned frame = 0;
-    FrameReader reader;
     RNG.seed();
 
     try
     {
-        Simul simul;
         FiberSet const& fibers = simul.fibers;
         CoupleSet const& couples = simul.couples;
         simul.loadProperties();

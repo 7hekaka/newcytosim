@@ -19,6 +19,8 @@
 
 extern Modulo const* modulo;
 
+const char Simul::TRAJECTORY[] = "objects.cmo";
+
 #include "simul_step.cc"
 #include "simul_file.cc"
 #include "simul_custom.cc"

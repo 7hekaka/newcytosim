@@ -109,9 +109,11 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
     
+    Simul simul;
     Glossary arg;
+    FrameReader reader;
 
-    std::string input = TRAJECTORY;
+    std::string input = Simul::TRAJECTORY;
     std::string str, what;
     std::ofstream ofs;
     std::ostream out(std::cout.rdbuf());
@@ -145,8 +147,6 @@ int main(int argc, char* argv[])
     arg.set(verbose, "verbose");
     if ( arg.use_key("-") ) verbose = 0;
 
-    Simul simul;
-    FrameReader reader;
     RNG.seed();
 
     try

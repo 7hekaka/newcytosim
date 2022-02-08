@@ -13,23 +13,23 @@
 //------------------------------------------------------------------------------
 void SimulProp::clear()
 {
-    viscosity         = 1;
+    time         = 0;
+    time_step    = 0;
+    viscosity    = 1;
 #if NEW_CYTOPLASMIC_FLOW
     flow.reset();
 #endif
 #if OLD_SPINDLE_FLUX
-    flux_speed        = 0;
+    flux_speed = 0;
 #endif
-    time              = 0;
-    time_step         = 0;
-    kT                = 0.0042;
-    tolerance         = 0.05;
-    acceptable_prob   = 0.5;
-    precondition      = 0;
-    precondition_span = 2;
-    random_seed       = 0;
+    kT           = 0.0042;
+    random_seed  = 0;
+    tolerance    = 0.05;
+    acceptable_prob = 0.5;
+    precondition = 0;
+    precond_span = 2;
     
-    steric_mode       = 0;
+    steric_mode  = 0;
     steric_stiff_push[0] = 0;
     steric_stiff_pull[0] = 0;
     steric_stiff_push[1] = 0;
@@ -40,9 +40,9 @@ void SimulProp::clear()
     
     verbose = 0;
 
-    config_file      = "config.cym";
-    property_file    = "properties.cmp";
-    system_file      = TRAJECTORY;
+    config_file   = "config.cym";
+    property_file = "properties.cmp";
+    system_file   = Simul::TRAJECTORY;
     clear_trajectory = true;
     
     skip_free_single = 0;
@@ -80,10 +80,10 @@ void SimulProp::read(Glossary& glos)
         kT = 1.38064852e-5 * T;
     glos.set(kT, "kT", "thermal_energy");
 
-    glos.set(tolerance,         "tolerance");
-    glos.set(acceptable_prob,   "acceptable_prob");
-    glos.set(precondition,      "precondition");
-    glos.set(precondition_span, "precondition", 1);
+    glos.set(tolerance, "tolerance");
+    glos.set(acceptable_prob, "acceptable_prob");
+    glos.set(precondition, "precondition");
+    glos.set(precond_span, "precondition", 1);
     
     glos.set(steric_mode,          "steric", {{"off", 0}, {"on", 1}});
     glos.set(steric_stiff_push[0], "steric", 1);
@@ -187,7 +187,7 @@ void SimulProp::write_values(std::ostream& os) const
     std::endl(os);
     write_value(os, "tolerance",       tolerance);
     write_value(os, "acceptable_prob", acceptable_prob);
-    write_value(os, "precondition",    precondition, precondition_span);
+    write_value(os, "precondition",    precondition, precond_span);
     write_value(os, "random_seed",     random_seed);
     std::endl(os);
     write_value(os, "steric", steric_mode, steric_stiff_push[0], steric_stiff_pull[0]);
