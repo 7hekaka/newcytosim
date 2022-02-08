@@ -71,7 +71,7 @@ void SphereProp::read(Glossary& glos)
 void SphereProp::complete(Simul const& sim)
 {
     if ( viscosity < 0 )
-        viscosity = sim.prop->viscosity;
+        viscosity = sim.prop.viscosity;
         
     if ( viscosity <= 0 )
         throw InvalidParameter("sphere:viscosity or simul:viscosity should be defined > 0");
@@ -92,7 +92,7 @@ void SphereProp::complete(Simul const& sim)
     if ( confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
     
-    if ( sim.primed() && steric && !sim.prop->steric_mode )
+    if ( sim.primed() && steric && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( point_mobility < 0 )

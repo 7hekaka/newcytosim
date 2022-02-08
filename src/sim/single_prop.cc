@@ -177,7 +177,7 @@ void SingleProp::complete(Simul const& sim)
 
     if ( sim.primed() && stiffness > 0 )
     {
-        hand_prop->checkStiffness(stiffness, length, 1, sim.prop->kT);
+        hand_prop->checkStiffness(stiffness, length, 1, sim.prop.kT);
         
         /*
          If the length of a Single (L) is longer than the attachment range of its hands,

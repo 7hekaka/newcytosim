@@ -80,7 +80,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, bool
     if ( wrap )
     {
         //out << "% start\n";
-        out << "% time " << std::to_string(prop->time);
+        out << "% time " << std::to_string(prop.time);
     }
     std::stringstream is(what);
     while ( is.good() )
@@ -147,7 +147,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     if ( wrap )
     {
         //out << "% start\n";
-        out << "% time " << std::to_string(prop->time);
+        out << "% time " << std::to_string(prop.time);
     }
     if ( ver > 0 )
     {
@@ -531,7 +531,7 @@ void Simul::reportFiberAge(std::ostream& out) const
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
     out << SEP << "var_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
     
-    const real now = prop->time;
+    const real now = prop.time;
 
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -1732,7 +1732,7 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
 
 void Simul::reportTime(std::ostream& out) const
 {
-    out << LIN << prop->time;
+    out << LIN << prop.time;
 }
 
 

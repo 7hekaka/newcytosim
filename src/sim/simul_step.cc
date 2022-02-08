@@ -25,10 +25,10 @@ real Simul::estimateFiberGridStep() const
  2. if the number of cells is superior to 1e5, double the step size,
  3. initialize the grid with the estimated step size.
  */
-void Simul::setFiberGrid(Space const* spc) const
+void Simul::setFiberGrid(Space const* spc, real& grid_step) const
 {
     assert_true(spc);
-    real res = prop->binding_grid_step;
+    real res = grid_step;
     
     // try to find cell size from the filaments characteristics
     if ( res <= 0 )
@@ -46,10 +46,10 @@ void Simul::setFiberGrid(Space const* spc) const
     while ( fiberGrid.setGrid(spc, res) > sup )
         res *= M_SQRT2;
 
-    if ( res != prop->binding_grid_step )
+    if ( res != grid_step )
     {
         Cytosim::log("simul:binding_grid_step <-- %.3f\n", res);
-        prop->binding_grid_step = res;
+        grid_step = res;
     }
 
     // create the grid cells:
@@ -74,10 +74,10 @@ void Simul::prepare()
     primed_ = 1;
 
     // make sure properties are ready for simulations:
-    prop->complete(*this);
+    prop.complete(*this);
     
     // prepare grid for attachments:
-    setFiberGrid(spaces.master());
+    setFiberGrid(spaces.master(), prop.binding_grid_step);
     
     // this will allocate Fiber::Lattice
     fibers.prepare();
@@ -104,8 +104,8 @@ void Simul::step()
 {
     //auto rdt = timer();
     // increment time:
-    prop->time += prop->time_step;
-    //fprintf(stderr, "\n----------------------------------- time is %8.3f\n", prop->time);
+    prop.time += prop.time_step;
+    //fprintf(stderr, "\n----------------------------------- time is %8.3f\n", prop.time);
 
     // mix object lists
     if ( events.size() > 1 ) events.shuffle();
@@ -203,8 +203,7 @@ void Simul::relax()
 
 void Simul::drawLinks() const
 {
-    if ( !primed_ )
-        prop->complete(*this);
+    prop.complete(*this);
     sMeca.pickMecables(*this);
     sMeca.getReady();
     sMeca.drawLinks = 1;

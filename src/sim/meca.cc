@@ -584,10 +584,10 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
          X = Y + time_step * P * inverse( 1 - time_step * M * P ) * M * Y
  This adds 2 MAT.vec, but swaps M and P for the iterative solver.
  */
-size_t Meca::solve(SimulProp const* prop, const unsigned precond)
+size_t Meca::solve(SimulProp const& prop, const unsigned precond)
 {
     assert_true(ready_==0);
-    tau_ = prop->time_step;
+    tau_ = prop.time_step;
 
     prepareMatrices();
     
@@ -616,7 +616,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      */
     
     real noiseLevel = INFINITY;
-    alpha_ = prop->kT / tau_;
+    alpha_ = prop.kT / tau_;
     
     /*
      Add Brownian contributions and calculate Minimum value of it
@@ -675,7 +675,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
 
     // compute preconditionner:
     auto start = timer();
-    computePreconditionner(precond, prop->precond_span);
+    computePreconditionner(precond, prop.precond_span);
     auto factor = timer() - start;
     cycles_ = 0;
 
@@ -698,13 +698,13 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
      */
     
     if ( noiseLevel > 0 )
-        tolerance_ = noiseLevel * prop->tolerance;
+        tolerance_ = noiseLevel * prop.tolerance;
     else
     {
         if ( alpha_ > 0 )
             Cytosim::log << "Warning: all Brownian terms are zero\n";
         // when temperature == 0, use tolerance as an absolute quantity:
-        tolerance_ = prop->tolerance;
+        tolerance_ = prop.tolerance;
     }
     
     /*
@@ -826,7 +826,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
     ready_ = 1;
 
     // report on the matrix type and size, sparsity, and the number of iterations
-    if (( 0 < doNotify ) || ( prop->verbose & 1 ))
+    if (( 0 < doNotify ) || ( prop.verbose & 1 ))
     {
         --doNotify;
         std::stringstream oss;
@@ -841,7 +841,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
         oss << " count " << std::setw(4) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
         size_t dim = dimension();
-        if ( prop->verbose & 8 )
+        if ( prop.verbose & 8 )
         {
             // calculate true residual: tmp = rhs - A * x
             real * tmp = allocator_.bind(0);
@@ -850,7 +850,7 @@ size_t Meca::solve(SimulProp const* prop, const unsigned precond)
             oss << ": " << std::setw(11) << std::left << blas::nrm8(dim, tmp);
             oss << " dx " << std::setw(11) << std::left << blas::nrm8(dim, vSOL);
         }
-        if ( prop->verbose & 4 )
+        if ( prop.verbose & 4 )
         {
             unsigned cnt = std::max(1U, monitor.count());
             oss << "  cycles " << precond << "T " << std::setw(8) << cycles_;

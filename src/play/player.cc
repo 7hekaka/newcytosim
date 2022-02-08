@@ -277,7 +277,7 @@ FiberDisp * Player::firstFiberDisp() const
  */
 void Player::writePlayParameters(std::ostream& os, bool prune) const
 {
-    os << "set " << simul.prop->name() << " display\n{\n";
+    os << "set " << simul.prop.name() << " display\n{\n";
     if ( glApp::views.size() > 0 )
     {
         View& view = glApp::currentView();

@@ -62,9 +62,9 @@ void signal_handler(int sig)
 #pragma mark -
 
 Simul::Simul()
-: prop(nullptr), spaces(*this), fields(*this),
-fibers(*this), spheres(*this), beads(*this), solids(*this),
-singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
+: prop("system"), spaces(*this), fields(*this), fibers(*this),
+spheres(*this), beads(*this), solids(*this), singles(*this),
+couples(*this), organizers(*this), tubules(*this), events(*this)
 {
     pMeca1D = nullptr;
     parser_ = nullptr;
@@ -79,15 +79,12 @@ singles(*this), couples(*this), organizers(*this), tubules(*this), events(*this)
         autoCPU[u] = 0;
         autoCNT[u] = 0;
     }
-    
-    prop = new SimulProp("undefined");
 }
 
 Simul::~Simul()
 {
     erase_all(1);
     delete(pMeca1D);
-    delete(prop);
 }
 
 //------------------------------------------------------------------------------
@@ -110,20 +107,10 @@ void Simul::initialize(Glossary & glos)
         std::cerr << "Could not register SIGFPE handler\n";
     
     // read parameters
-    prop->read(glos);
+    prop.read(glos);
 }
 
 //------------------------------------------------------------------------------
-
-double Simul::time() const
-{
-    return prop->time;
-}
-
-real Simul::time_step() const
-{
-    return prop->time_step;
-}
 
 void Simul::erase_all(bool erase_properties)
 {
@@ -141,7 +128,7 @@ void Simul::erase_all(bool erase_properties)
     spaces.erase();
     events.erase();
  
-    prop->time = 0;
+    prop.time = 0;
     modulo = nullptr;
     
     if ( erase_properties )
@@ -438,12 +425,12 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
 /* There can only be one SimulProp and it is already created */
 void Simul::rename(std::string const& arg)
 {
-    if ( prop->name() == "undefined" )
+    if ( prop.name() == "undefined" )
     {
-        prop->rename(arg);
+        prop.rename(arg);
         //std::clog << "Simul is named `" << arg << "'\n";
     }
-    else if ( prop->name() != arg )
+    else if ( prop.name() != arg )
         throw InvalidSyntax("only one `simul' can be defined");
 }
 
@@ -461,8 +448,8 @@ bool Simul::isCategory(const std::string& name) const
 
 Property* Simul::findProperty(const std::string& cat, const std::string& nom) const
 {
-    if ( cat == "simul" && nom == prop->name() )
-        return prop;
+    if ( cat == "simul" && nom == prop.name() )
+        return &prop;
 
     if ( cat.empty() || nom.empty() )
         throw InvalidSyntax("unexpected syntax");
@@ -473,8 +460,8 @@ Property* Simul::findProperty(const std::string& cat, const std::string& nom) co
 
 Property* Simul::findProperty(const std::string& nom) const
 {
-    if ( nom == prop->name() )
-        return prop;
+    if ( nom == prop.name() )
+        return &prop;
 
     if ( nom.empty() )
         throw InvalidSyntax("unexpected syntax");
@@ -488,7 +475,7 @@ PropertyList Simul::findAllProperties(const std::string& cat) const
     if ( cat == "simul" )
     {
         PropertyList list;
-        list.push_back(prop);
+        list.push_back(&prop);
         return list;
     }
     if ( cat.empty() )
@@ -565,7 +552,7 @@ Property* Simul::newProperty(const std::string& cat, const std::string& nom, Glo
     {
         assert_true(prop);
         rename(nom);
-        return prop;
+        return &prop;
     }
     
     if ( isCategory(nom) )

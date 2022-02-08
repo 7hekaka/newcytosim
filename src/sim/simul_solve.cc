@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 /**
  Calculate the minimum grid cell size, given the segmentation of Fibers that
@@ -153,19 +153,19 @@ void Simul::setAllInteractions(Meca& meca) const
 #endif
     
     // add steric interactions
-    if ( prop->steric_mode && spaces.master() )
+    if ( prop.steric_mode && spaces.master() )
     {
         // in the presence of pulling, use the most complete steric engine:
-        if ( prop->steric_stiff_pull[0] > 0 )
+        if ( prop.steric_stiff_pull[0] > 0 )
         {
             if ( !meca.pointGrid.hasGrid() )
-                setStericGrid(meca.pointGrid, spaces.master(), prop->steric_max_range, estimateStericRange());
+                setStericGrid(meca.pointGrid, spaces.master(), prop.steric_max_range, estimateStericRange());
             meca.addStericInteractions(*this);
         }
         else
         {
             if ( !meca.locusGrid.hasGrid() )
-                setStericGrid(meca.locusGrid, spaces.master(), prop->steric_max_range, estimateStericRange());
+                setStericGrid(meca.locusGrid, spaces.master(), prop.steric_max_range, estimateStericRange());
             meca.addStericInteractionsAlt(*this);
         }
     }
@@ -211,7 +211,7 @@ void Simul::solve()
     //auto rdt = timer();
     setAllInteractions(sMeca);
     //printf("     ::set      %16llu\n", (timer()-rdt)>>5); rdt = timer();
-    sMeca.solve(prop, prop->precondition);
+    sMeca.solve(prop, prop.precondition);
     //printf("     ::solve    %16llu\n", (timer()-rdt)>>5); rdt = timer()
     sMeca.apply();
     //printf("     ::apply    %16llu\n", (timer()-rdt)>>5);
@@ -239,7 +239,7 @@ void Simul::solve_half()
     sMeca.pickMecables(*this);
     sMeca.getReady();
     setAllInteractions(sMeca);
-    sMeca.solve(prop, prop->precondition);
+    sMeca.solve(prop, prop.precondition);
 }
 
 
@@ -326,7 +326,7 @@ void Simul::computeForces() const
         if ( !primed() )
         {
             // we could use here a different Meca for safety
-            prop->complete(*this);
+            prop.complete(*this);
             sMeca.pickMecables(*this);
             sMeca.getReady();
             setAllInteractions(sMeca);
@@ -360,10 +360,10 @@ void Simul::solve_separate()
 #endif
     
     // ready steric interactions
-    if ( prop->steric_mode && spaces.master() )
+    if ( prop.steric_mode && spaces.master() )
     {
         if ( !sMeca.locusGrid.hasGrid() )
-            setStericGrid(sMeca.locusGrid, spaces.master(), prop->steric_max_range, estimateStericRange());
+            setStericGrid(sMeca.locusGrid, spaces.master(), prop.steric_max_range, estimateStericRange());
     }
     //std::clog << "Separating " << cnt << " fibers\n";
     for ( ObjectFlag f = 0; f <= sup; ++f )
@@ -379,9 +379,9 @@ void Simul::solve_separate()
             cnt -= num;
             sMeca.getReady();
             sMeca.setSomeInteractions();
-            if ( prop->steric_mode && spaces.master() )
-                sMeca.addSomeStericInteractions(prop->steric_stiff_push[0]);
-            sMeca.solve(prop, prop->precondition);
+            if ( prop.steric_mode && spaces.master() )
+                sMeca.addSomeStericInteractions(prop.steric_stiff_push[0]);
+            sMeca.solve(prop, prop.precondition);
             sMeca.apply();
         }
     }
@@ -403,7 +403,7 @@ void Simul::solve_onlyX()
     //-----initialize-----
 
     pMeca1D->pickMecables(*this);
-    pMeca1D->getReady(prop->time_step, prop->kT);
+    pMeca1D->getReady(prop.time_step, prop.kT);
 
     //-----set matrix-----
 
@@ -429,9 +429,9 @@ void Simul::solve_onlyX()
     
     //-----resolution-----
 
-    real noise = pMeca1D->setRightHandSide(prop->kT);
+    real noise = pMeca1D->setRightHandSide(prop.kT);
     
-    pMeca1D->solve(prop->tolerance * noise);
+    pMeca1D->solve(prop.tolerance * noise);
     pMeca1D->apply();
 }
 
@@ -471,7 +471,7 @@ void Simul::solve_flux()
 
 void Simul::flagClustersMeca() const
 {
-    prop->complete(*this);
+    prop.complete(*this);
     sMeca.pickMecables(*this);
     sMeca.getReady();
     setAllInteractions(sMeca);

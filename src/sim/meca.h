@@ -693,7 +693,7 @@ public:
     void getReady();
     
     /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver
-    size_t solve(SimulProp const*, unsigned precondition);
+    size_t solve(SimulProp const&, unsigned precondition);
     
     /// transfer newly calculated point coordinates back to Mecables
     void apply();

@@ -349,7 +349,7 @@ void SingleSet::write(Outputter& out) const
     }
     if ( sizeF() > 0 )
     {
-        int skip = simul_.prop->skip_free_single || prune_mode;
+        int skip = simul_.prop.skip_free_single || prune_mode;
         if ( skip & skip_now )
             out.writeLine("\n#section single F 1");
         else

@@ -1,4 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
+
 #include "simul_prop.h"
 #include "assert_macro.h"
 #include "space_prop.h"
@@ -10,7 +11,6 @@
 #include "random.h"
 
 
-//------------------------------------------------------------------------------
 void SimulProp::clear()
 {
     time         = 0;
@@ -164,8 +164,8 @@ void SimulProp::complete(Simul const& sim)
     }
     /*
      If the Global parameters have changed, we update all derived parameters.
-     To avoid an infinite recurence, the main SimulProp (*this) was
-     not included in the PropertyList Simul::properties;
+     To avoid an infinite recurence,  (*this), the main SimulProp should not
+     be included in Simul::properties;
      */
     sim.properties.complete(sim);
 }
@@ -174,10 +174,10 @@ void SimulProp::complete(Simul const& sim)
 
 void SimulProp::write_values(std::ostream& os) const
 {
-    //write_value(os, "time",            time);
-    write_value(os, "time_step",       time_step);
-    write_value(os, "kT",              kT);
-    write_value(os, "viscosity",       viscosity);
+    //write_value(os, "time",      time);
+    write_value(os, "time_step", time_step);
+    write_value(os, "kT",        kT);
+    write_value(os, "viscosity", viscosity);
 #if NEW_CYTOPLASMIC_FLOW
     write_value(os, "flow", flow);
 #endif

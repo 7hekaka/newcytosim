@@ -8,6 +8,7 @@
 #include <stack>
 #include <map>
 
+#include "simul_prop.h"
 #include "single_set.h"
 #include "couple_set.h"
 #include "fiber_set.h"
@@ -25,7 +26,6 @@
 #include "meca.h"
 
 class Meca1D;
-class SimulProp;
 class Parser;
 
 
@@ -74,9 +74,9 @@ private:
 public:
 
     /// Global cytosim parameters
-    SimulProp *  prop;
+    mutable SimulProp prop;
     
-    /// list of all Object Property (does not include the SimulProp)
+    /// list of all Object Property, except SimulProp
     PropertyList properties;
     
     
@@ -164,11 +164,11 @@ public:
     /// perform one Monte-Carlo step, corresponding to the time step
     void step();
 
-    /// time in the simulated world (shortcut to `prop->time`)
-    double time() const;
+    /// time in the simulated world (shortcut to `SimulProp::time`)
+    double time() const { return prop.time; }
     
     /// shortcut to prop->time_step;
-    real time_step() const;
+    real time_step() const { return prop.time_step; }
 
     /// this is called after a sequence of `step()` have been done
     void relax();
@@ -226,7 +226,7 @@ public:
     void addExperimentalInteractions(Meca&) const;
     
     /// set FiberGrid and StericGrid over the given space
-    void setFiberGrid(Space const*) const;
+    void setFiberGrid(Space const*, real& grid_step) const;
     
     /// a Map to be displayed
     Map<DIM> const& visibleMap() const { return sMeca.locusGrid.map(); }

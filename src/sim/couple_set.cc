@@ -506,7 +506,7 @@ void CoupleSet::write(Outputter& out) const
         writeFA(out);
     if ( sizeFF() > 0 )
     {
-        int skip = simul_.prop->skip_free_couple || prune_mode;
+        int skip = simul_.prop.skip_free_couple || prune_mode;
         if ( skip & skip_now )
             out.writeLine("\n#section couple FF 1");
         else

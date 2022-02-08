@@ -468,7 +468,7 @@ void SimThread::reloadParameters(std::string const& file)
     lock();
     // set a parser that can only change properties:
     Parser(simul_, 1, 0, 0, 0, 0).readConfig(file);
-    //std::cerr << "reloaded " << simul_.prop->config_file << '\n';
+    //std::cerr << "reloaded " << file << '\n';
     unlock();
 }
 

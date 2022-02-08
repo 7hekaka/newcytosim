@@ -55,9 +55,9 @@ void ChewerProp::complete(Simul const& sim)
     diffusion_dt = std::sqrt( 6.0 * diffusion * sim.time_step() );
     
     // use Einstein's relation to get a mobility:
-    mobility_dt = diffusion * sim.time_step() / sim.prop->kT;
+    mobility_dt = diffusion * sim.time_step() / sim.prop.kT;
     
-    std::clog << " Chewer `" << name() << "' has mobility = " << diffusion / sim.prop->kT << "\n";
+    std::clog << " Chewer `" << name() << "' has mobility = " << diffusion / sim.prop.kT << "\n";
 }
 
 

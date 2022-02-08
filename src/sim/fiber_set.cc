@@ -420,7 +420,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
     {
         Space const* spc = simul_.spaces.master();
         if ( spc )
-            simul_.setFiberGrid(spc);
+            simul_.setFiberGrid(spc, simul_.prop.binding_grid_step);
         else
             return allIntersections0(res1, res2, max_distance);
     }

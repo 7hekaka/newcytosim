@@ -349,10 +349,10 @@ void Player::drawScene(View& view)
 
 void Player::drawScene(View& view, int mag)
 {
-    if ( simul.prop->display_fresh )
+    if ( simul.prop.display_fresh )
     {
-        readDisplayString(view, simul.prop->display);
-        simul.prop->display_fresh = false;
+        readDisplayString(view, simul.prop.display);
+        simul.prop.display_fresh = false;
     }
     //thread.debug("drawScene");
     prepareDisplay(view, mag);

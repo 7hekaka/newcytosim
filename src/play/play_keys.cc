@@ -800,7 +800,7 @@ void processKey(unsigned char key)
 
         case 'l': {
             try {
-                std::string file = simul.prop->config_file;
+                std::string file = simul.prop.config_file;
                 thread.reloadParameters(file);
                 flashText("Reloaded %s", file.c_str());
             }

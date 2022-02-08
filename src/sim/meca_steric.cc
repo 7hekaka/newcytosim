@@ -84,7 +84,7 @@ void Meca::addStericInteractions(Simul const& sim)
     }
     
     /// create parameters
-    Stiffness pam(sim.prop->steric_stiff_push[0], sim.prop->steric_stiff_pull[0]);
+    Stiffness pam(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
     
 #if ( NUM_STERIC_PANES == 1 )
     
@@ -193,7 +193,7 @@ void Meca::addStericInteractionsAlt(Simul const& sim)
     }
     
     /// stiffness
-    real stiff = sim.prop->steric_stiff_push[0];
+    real stiff = sim.prop.steric_stiff_push[0];
 
 #if ( MAX_STERIC_PANES == 1 )
         

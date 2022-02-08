@@ -86,7 +86,7 @@ void Simul::writeObjects(Outputter& out) const
      For example, Aster is written after Fiber, Couple after Fiber...
      This makes it easier to reconstruct the state during input.
      */
-    fprintf(out, "\n#time %.6f sec", prop->time);
+    fprintf(out, "\n#time %.6f sec", prop.time);
 
     spaces.write(out);
     fields.write(out);
@@ -437,7 +437,7 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
             else
                 lock.thaw_all();
             // renew pointers to objects, particularly 'confine_space'
-            prop->complete(*this);
+            prop.complete(*this);
         }
         assert_false(couples.bad());
         assert_false(singles.bad());
@@ -532,7 +532,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     // skip unattached Singles
                     if ( tok == "F" )
                     {
-                        if ( prop->skip_free_single > 1 )
+                        if ( prop.skip_free_single > 1 )
                             in.skip_until("#section ");
                         else
                             singles.prune_mode = mod;
@@ -545,7 +545,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     // skip unattached Couples
                     if ( tok == "FF" )
                     {
-                        if ( prop->skip_free_couple > 1 )
+                        if ( prop.skip_free_couple > 1 )
                             in.skip_until("#section ");
                         else
                             couples.prune_mode = mod;
@@ -589,7 +589,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             // time data "#time 1.2345"
             else if ( tok == "time" )
             {
-                iss >> prop->time;
+                iss >> prop.time;
 #if BACKWARD_COMPATIBILITY < 48
                 // old format info line "#time 14.000000, dim 2, format 47"
                 if ( iss.get() == ',' )
@@ -688,7 +688,7 @@ void Simul::writeProperties(std::ostream& os, const bool prune) const
     os << "% Cytosim property file, pid " << getpid() << '\n';
     os << "% " << TimeDate::date_string() << '\n';
 
-    prop->write(os, prune);
+    prop.write(os, prune);
     properties.write(os, prune);
 }
 
@@ -718,7 +718,7 @@ void Simul::writeProperties(bool prune) const
     {
         properties_saved = oss.str();
         // use default property file name
-        std::string name = prop->property_file.c_str();
+        std::string name = prop.property_file.c_str();
         std::ofstream os(name);
         //this should be equivalent to: writeProperties(os, prune);
         os << properties_saved << std::endl;
@@ -729,7 +729,7 @@ void Simul::writeProperties(bool prune) const
 
 void Simul::loadProperties()
 {
-    std::string file = prop->property_file;
+    std::string file = prop.property_file;
     std::ifstream is(file.c_str(), std::ifstream::in);
 #if BACKWARD_COMPATIBILITY < 57
     if ( !is.is_open() && file == "properties.cmp" )

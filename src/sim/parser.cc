@@ -122,7 +122,7 @@ void Parser::parse_set(std::istream& is)
             else
 #endif
             opt.read(blok);
-            execute_change(simul_.prop, opt);
+            execute_change(&simul_.prop, opt);
             if ( name != "*" )
                 simul_.rename(name);
         }
@@ -130,7 +130,7 @@ void Parser::parse_set(std::istream& is)
         else if ( para == "display" )
         {
             opt.define(para, blok);
-            execute_change(simul_.prop, opt);
+            execute_change(&simul_.prop, opt);
         }
 #endif
     }
@@ -651,7 +651,7 @@ void Parser::parse_run(std::istream& is)
         if ( is.peek() == '*' )
         {
             is.get();
-            name = simul_.prop->name();
+            name = simul_.prop.name();
         }
     }
 #endif
@@ -663,10 +663,10 @@ void Parser::parse_run(std::istream& is)
         if ( Tokenizer::get_symbol(is) != "simul_" )
             throw InvalidSyntax("expected `run all simul_ { }')");
         // There can only be one Simul object:
-        name = simul_.prop->name();
+        name = simul_.prop.name();
     }
     
-    if ( name != "*"  &&  name != simul_.prop->name() )
+    if ( name != "*"  &&  name != simul_.prop.name() )
         throw InvalidSyntax("unknown simul name `"+name+"'");
 
     std::string blok = Tokenizer::get_block(is, '{');
@@ -1005,7 +1005,7 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( size_t c = 0; c < cnt; ++c )
     {
-        if ( simul_.prop->verbose )
+        if ( simul_.prop.verbose )
             Cytosim::log("repeat code %lu/%lu\n", c+1, cnt);
         evaluate(code);
     }
@@ -1270,6 +1270,6 @@ void Parser::readConfig(std::string const& filename)
 
 void Parser::readConfig()
 {
-    readConfig(simul_.prop->config_file);
+    readConfig(simul_.prop.config_file);
 }
 

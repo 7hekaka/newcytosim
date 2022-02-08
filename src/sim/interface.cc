@@ -869,13 +869,13 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     {
         simul_.writeProperties(prune);
         // write initial state:
-        if ( simul_.prop->clear_trajectory )
+        if ( simul_.prop.clear_trajectory )
         {
-            simul_.prop->clear_trajectory = false;
+            simul_.prop.clear_trajectory = false;
             if ( frames > 1 )
-                simul_.writeObjects(simul_.prop->system_file, false, binary);
+                simul_.writeObjects(simul_.prop.system_file, false, binary);
             else
-                std::remove(simul_.prop->system_file.c_str());
+                std::remove(simul_.prop.system_file.c_str());
         }
         delta = real(nb_steps) / real(frames);
         check = size_t(delta);
@@ -903,7 +903,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         if ( do_write )
         {
             simul_.relax();
-            simul_.writeObjects(simul_.prop->system_file, true, binary);
+            simul_.writeObjects(simul_.prop.system_file, true, binary);
             reportCPUtime(simul_.time());
             simul_.sMeca.doNotify = 2;  // to print convergence parameters
             simul_.unrelax();
@@ -920,7 +920,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     {
         simul_.writeProperties(prune);
         if ( frames < 0 )
-            simul_.writeObjects(simul_.prop->system_file, true, binary);
+            simul_.writeObjects(simul_.prop.system_file, true, binary);
     }
     
     VLOG("+RUN END");
@@ -997,9 +997,9 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     {
         if ( append )
         {
-            real t = simul_.prop->time;
+            real t = simul_.prop.time;
             simul_.reloadObjects(in, 0, subset);
-            simul_.prop->time = t;
+            simul_.prop.time = t;
         }
         else
             simul_.reloadObjects(in, 1, subset);
@@ -1023,7 +1023,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     // set time
     real t;
     if ( opt.set(t, "time") )
-        simul_.prop->time = t;
+        simul_.prop.time = t;
 }
 
 

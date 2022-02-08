@@ -148,7 +148,7 @@ void CoupleProp::complete(Simul const& sim)
     
     if ( sim.primed() )
     {
-        hand1_prop->checkStiffness(stiffness, length, 2, sim.prop->kT);
+        hand1_prop->checkStiffness(stiffness, length, 2, sim.prop.kT);
         /*
          If the length of a Couple (L) is longer than the attachment range of its hands,
          a Couple would place a pair of Fibers at a distance L, thus preventing further
@@ -160,7 +160,7 @@ void CoupleProp::complete(Simul const& sim)
 
         if ( hand2_prop != hand1_prop )
         {
-            hand2_prop->checkStiffness(stiffness, length, 2, sim.prop->kT);
+            hand2_prop->checkStiffness(stiffness, length, 2, sim.prop.kT);
         
             if ( length > hand2_prop->binding_range )
                 Cytosim::warn << hand2_prop->name() << ":binding_range should be >= " << name() << ":length\n";
