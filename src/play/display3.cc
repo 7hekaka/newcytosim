@@ -114,6 +114,8 @@ void Display3::drawObjects(Simul const& sim)
     drawSolids(sim.solids);
     drawSpheres(sim.spheres);
     
+    glEnable(GL_LIGHTING);
+
     if (( prop->single_select & 1 ) && ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
     

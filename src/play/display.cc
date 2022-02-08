@@ -1772,6 +1772,7 @@ void Display::drawSolid(Solid const& obj)
             if ( obj.radius(i) > 0 )
                 drawFlat(obj.posP(i), obj.radius(i), gle::circle);
         }
+        glEnable(GL_LIGHTING);
 #elif ( DIM >= 3 )
         //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
