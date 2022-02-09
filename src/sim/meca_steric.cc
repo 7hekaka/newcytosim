@@ -1,6 +1,62 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 
+
+template < typename GRID >
+static void setStericGrid(GRID& grid, Space const* spc, real& range, real inf)
+{
+    assert_true(spc);
+    real res = range;
+    
+    res = std::max(res, inf);
+
+    if ( res <= 0 )
+        throw InvalidParameter("simul:steric_max_range must be defined");
+
+    const size_t sup = 1 << 17;
+    while ( grid.setGrid(spc, res) > sup )
+        res *= M_SQRT2;
+
+    if ( res != range )
+    {
+        Cytosim::log("simul:steric_max_range <-- %.3f\n", res);
+        range = res;
+    }
+    
+    grid.createCells();
+}
+
+
+void Meca::selectStericEngine(Simul const& sim)
+{
+    Space const* spc = sim.spaces.master();
+
+    if ( !spc || !sim.prop.steric_mode )
+    {
+        steric_ = 0;
+        return;
+    }
+    
+    // without pulling, use `locusGrid` which is simpler:
+    steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
+    
+    switch ( steric_ )
+    {
+        case 1: if ( !pointGrid.hasGrid() )
+        {
+            real est = sim.estimateStericRange();
+            setStericGrid(pointGrid, spc, sim.prop.steric_max_range, est);
+        }
+
+        case 2: if ( !locusGrid.hasGrid() )
+        {
+            real est = sim.estimateStericRange();
+            setStericGrid(locusGrid, spc, sim.prop.steric_max_range, est);
+        }
+    }
+}
+
+
 /**
  The prop->steric of each object is a bit-field that
  specify one or more 'pane' where the object is present.
@@ -20,7 +76,7 @@
  This can be extended if necessary, but the steric_stiffness[]
  properties should be extended as well.
  */
-void Meca::addStericInteractions(Simul const& sim)
+void Meca::addStericInteractions1(Simul const& sim)
 {
     // clear grid
     pointGrid.clear();
@@ -128,7 +184,7 @@ void Meca::addStericInteractions(Simul const& sim)
  This can be extended if necessary, but the steric_stiffness[]
  properties should be extended as well.
  */
-void Meca::addStericInteractionsAlt(Simul const& sim)
+void Meca::addStericInteractions2(Simul const& sim)
 {
     // clear grid
     locusGrid.clear();

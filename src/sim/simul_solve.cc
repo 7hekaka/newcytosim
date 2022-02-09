@@ -73,31 +73,6 @@ real Simul::estimateStericRange() const
     return ran;
 }
 
-
-template < typename GRID >
-static void setStericGrid(GRID& grid, Space const* spc, real& range, real inf)
-{
-    assert_true(spc);
-    real res = range;
-    
-    res = std::max(res, inf);
-
-    if ( res <= 0 )
-        throw InvalidParameter("simul:steric_max_range must be defined");
-
-    const size_t sup = 1 << 17;
-    while ( grid.setGrid(spc, res) > sup )
-        res *= M_SQRT2;
-
-    if ( res != range )
-    {
-        Cytosim::log("simul:steric_max_range <-- %.3f\n", res);
-        range = res;
-    }
-    
-    grid.createCells();
-}
-
 //------------------------------------------------------------------------------
 /**
  This will:
@@ -153,22 +128,11 @@ void Simul::setAllInteractions(Meca& meca) const
 #endif
     
     // add steric interactions
-    if ( prop.steric_mode && spaces.master() )
-    {
-        // in the presence of pulling, use the most complete steric engine:
-        if ( prop.steric_stiff_pull[0] > 0 )
-        {
-            if ( !meca.pointGrid.hasGrid() )
-                setStericGrid(meca.pointGrid, spaces.master(), prop.steric_max_range, estimateStericRange());
-            meca.addStericInteractions(*this);
-        }
-        else
-        {
-            if ( !meca.locusGrid.hasGrid() )
-                setStericGrid(meca.locusGrid, spaces.master(), prop.steric_max_range, estimateStericRange());
-            meca.addStericInteractionsAlt(*this);
-        }
-    }
+    if ( meca.steric_ == 2 )
+        meca.addStericInteractions2(*this);
+    else if ( meca.steric_ == 1 )
+        meca.addStericInteractions1(*this);
+
     //addExperimentalInteractions(meca);
 
 #if ( 0 )
@@ -206,8 +170,7 @@ void Simul::setAllInteractions(Meca& meca) const
 
 void Simul::solve()
 {
-    sMeca.pickMecables(*this);
-    sMeca.getReady();
+    sMeca.getReady(*this);
     //auto rdt = timer();
     setAllInteractions(sMeca);
     //printf("     ::set      %16llu\n", (timer()-rdt)>>5); rdt = timer();
@@ -227,8 +190,7 @@ void Simul::solve()
 
 void Simul::solve_force()
 {
-    sMeca.pickMecables(*this);
-    sMeca.getReady();
+    sMeca.getReady(*this);
     setAllInteractions(sMeca);
     sMeca.calculateForces();
 }
@@ -236,8 +198,7 @@ void Simul::solve_force()
 
 void Simul::solve_half()
 {
-    sMeca.pickMecables(*this);
-    sMeca.getReady();
+    sMeca.getReady(*this);
     setAllInteractions(sMeca);
     sMeca.solve(prop, prop.precondition);
 }
@@ -248,8 +209,7 @@ void Simul::solve_half()
  */
 void Simul::solve_auto()
 {
-    sMeca.pickMecables(*this);
-    sMeca.getReady();
+    sMeca.getReady(*this);
     setAllInteractions(sMeca);
     
     // solve the system, recording time:
@@ -327,8 +287,7 @@ void Simul::computeForces() const
         {
             // we could use here a different Meca for safety
             prop.complete(*this);
-            sMeca.pickMecables(*this);
-            sMeca.getReady();
+            sMeca.getReady(*this);
             setAllInteractions(sMeca);
             sMeca.calculateForces();
         }
@@ -359,15 +318,12 @@ void Simul::solve_separate()
     delete[] table;
 #endif
     
-    // ready steric interactions
-    if ( prop.steric_mode && spaces.master() )
-    {
-        if ( !sMeca.locusGrid.hasGrid() )
-            setStericGrid(sMeca.locusGrid, spaces.master(), prop.steric_max_range, estimateStericRange());
-    }
+    // ready steric interactions:
+    sMeca.selectStericEngine(*this);
     //std::clog << "Separating " << cnt << " fibers\n";
     for ( ObjectFlag f = 0; f <= sup; ++f )
     {
+        // replacing Meca::pickMecables() here:
         sMeca.mecables.clear();
         for ( Fiber * F=fibers.first(); F; F=F->next() )
             if ( F->flag() == f )
@@ -377,9 +333,9 @@ void Simul::solve_separate()
         {
             std::clog << "  cluster " << f << " has " << num << " fibers\n";
             cnt -= num;
-            sMeca.getReady();
+            sMeca.readyMecables();
             sMeca.setSomeInteractions();
-            if ( prop.steric_mode && spaces.master() )
+            if ( sMeca.steric_ == 2 )
                 sMeca.addSomeStericInteractions(prop.steric_stiff_push[0]);
             sMeca.solve(prop, prop.precondition);
             sMeca.apply();
@@ -402,8 +358,7 @@ void Simul::solve_onlyX()
 
     //-----initialize-----
 
-    pMeca1D->pickMecables(*this);
-    pMeca1D->getReady(prop.time_step, prop.kT);
+    pMeca1D->getReady(*this);
 
     //-----set matrix-----
 
@@ -430,7 +385,6 @@ void Simul::solve_onlyX()
     //-----resolution-----
 
     real noise = pMeca1D->setRightHandSide(prop.kT);
-    
     pMeca1D->solve(prop.tolerance * noise);
     pMeca1D->apply();
 }
@@ -472,8 +426,7 @@ void Simul::solve_flux()
 void Simul::flagClustersMeca() const
 {
     prop.complete(*this);
-    sMeca.pickMecables(*this);
-    sMeca.getReady();
+    sMeca.getReady(*this);
     setAllInteractions(sMeca);
     sMeca.flagClusters();
 }

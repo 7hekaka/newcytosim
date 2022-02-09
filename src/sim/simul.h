@@ -230,14 +230,14 @@ public:
     
     /// a Map to be displayed
     Map<DIM> const& visibleMap() const { return sMeca.locusGrid.map(); }
+    
+    /// return estimate for the cell size of the PointGrid used for steric interactions
+    real estimateStericRange() const;
 
 private:
     
     /// return estimate of the cell size of the Grid used for Hand attachment
     real estimateFiberGridStep() const;
-    
-    /// return estimate for the cell size of the PointGrid used for steric interactions
-    real estimateStericRange() const;
     
     //----------------------------- PARSING ------------------------------------
     

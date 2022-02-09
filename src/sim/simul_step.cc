@@ -204,8 +204,7 @@ void Simul::relax()
 void Simul::drawLinks() const
 {
     prop.complete(*this);
-    sMeca.pickMecables(*this);
-    sMeca.getReady();
+    sMeca.getReady(*this);
     sMeca.drawLinks = 1;
     setAllInteractions(sMeca);
     sMeca.drawLinks = 0;

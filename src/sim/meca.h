@@ -167,7 +167,10 @@ private:
     size_t bump_;
     
     /// flag to indicate that result is available
-    int    ready_;
+    int ready_;
+    
+    /// flag to include steric interactions
+    int steric_;
     
     /// list of Mecable containing points to simulate
     Array<Mecable*> mecables;
@@ -671,26 +674,29 @@ public:
     void addCoulomb(Mecapoint const&, Mecapoint const&, real weight);
 
     //-------------------------- COMPUTING METHODS -----------------------------
-    
-    /// add steric interactions between spheres, solids and fibers to Meca
-    void addStericInteractions(Simul const&);
+
+    /// select which engine will be used, and ready it
+    void selectStericEngine(Simul const&);
 
     /// add steric interactions between spheres, solids and fibers to Meca
-    void addStericInteractionsAlt(Simul const&);
+    void addStericInteractions1(Simul const&);
+
+    /// add steric interactions between spheres, solids and fibers to Meca
+    void addStericInteractions2(Simul const&);
     
     /// add steric interactions between spheres, solids and fibers to Meca
     void addSomeStericInteractions(real stiff);
 
     //-------------------------- COMPUTING METHODS -----------------------------
-
-    /// get all Mecables from Simul
-    void pickMecables(Simul const&);
+    
+    /// import points and attributes indices
+    void readyMecables();
     
     /// call setInteractions(Meca) for registered mecables
     void setSomeInteractions();
 
     /// Allocate the memory necessary to solve(). This must be called after the last add()
-    void getReady();
+    void getReady(Simul const& sim);
     
     /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver
     size_t solve(SimulProp const&, unsigned precondition);

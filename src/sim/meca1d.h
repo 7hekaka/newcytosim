@@ -86,18 +86,14 @@ public:
         }
     }
     
-    void pickMecables(Simul const& sim)
+    void getReady(Simul const& sim)
     {
         ready_ = 0;
         mecables.clear();
         
         for(Fiber * fib = sim.fibers.first(); fib; fib=fib->next())
             mecables.push_back(fib);
-    }
-    
-    void getReady(real time_step, real kT)
-    {
-        ready_ = 0;
+        
         size_t dim = mecables.size();
         
         allocate(dim);
@@ -114,7 +110,7 @@ public:
             mec->setDragCoefficient();
             // Put the x coordinate of the origin in vSOL[inx]
             vSOL[inx] = mec->posPoint(0).XX;
-            vMOB[inx] = time_step / mec->dragCoefficient();
+            vMOB[inx] = sim.prop.time_step / mec->dragCoefficient();
             ++inx;
         }
     }
