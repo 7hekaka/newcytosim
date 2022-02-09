@@ -336,7 +336,7 @@ void Simul::solve_separate()
             sMeca.readyMecables();
             sMeca.setSomeInteractions();
             if ( sMeca.steric_ == 2 )
-                sMeca.addSomeStericInteractions(prop.steric_stiff_push[0]);
+                sMeca.addSomeStericInteractions();
             sMeca.solve(prop, prop.precondition);
             sMeca.apply();
         }

@@ -178,15 +178,9 @@ public:
 
     /// first element in list
     BigLocus const* begin() const { return pane.begin(); }
-    
-    /// first BigPoint in list
-    BigLocus const* pre_middle() const { return pane.begin() + (border & (~3UL)); }
 
     /// first BigPoint in list
     BigLocus const* middle() const { return pane.data() + border; }
-    
-    /// one past last element in list
-    BigLocus const* pre_end() const { return pane.begin() + (pane.size() & (~3UL)); }
     
     /// one past last element in list
     BigLocus const* end() const { return pane.end(); }
@@ -270,7 +264,7 @@ public:
 class LocusGrid
 {
 private:
-    
+     
 #if ( MAX_STERIC_PANES == 1 )
     /// grid for divide-and-conquer strategies:
     Grid<BigLocusList, DIM> pGrid;
@@ -278,39 +272,45 @@ private:
     /// grid for divide-and-conquer strategies:
     Grid<LocusGridCell, DIM> pGrid;
 #endif
+    
+    /// Meca
+    Meca& meca;
+    
+    /// stiffness
+    real push;
 
 private:
     
     /// check two Spheres
-    static void checkPP(Meca&, real stiff, BigPoint const&, BigPoint const&);
+    void checkPP(BigPoint const&, BigPoint const&) const;
     
     /// check Sphere against Line segment
-    static void checkPL(Meca&, real stiff, BigPoint const&, BigLocus const&);
+    void checkPL(BigPoint const&, BigLocus const&) const;
     
     /// check Line segment against Sphere
-    static void checkLL1(Meca&, real stiff, BigLocus const&, BigLocus const&);
+    void checkLL1(BigLocus const&, BigLocus const&) const;
     
     /// check Line segment against the terminal Sphere of a Fiber
-    static void checkLL2(Meca&, real stiff, BigLocus const&, BigLocus const&);
+    void checkLL2(BigLocus const&, BigLocus const&) const;
     
     /// check two Line segments
-    static void checkLL(Meca&, real stiff, BigLocus const&, BigLocus const&);
+    void checkLL(BigLocus const&, BigLocus const&) const;
     
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff, BigLocusList const&);
+    void setSterics0(BigLocusList const&) const;
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
+    void setSterics0(BigLocusList const&, BigLocusList const&) const;
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff, BigLocusList const&);
+    void setStericsT(BigLocusList const&) const;
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsT(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
+    void setStericsT(BigLocusList const&, BigLocusList const&) const;
     
     /// check all pairs between the two lists, checking center-to-center distance
-    static void setStericsX(Meca&, real stiff, BigLocusList const&, BigLocusList const&);
+    void setStericsX(BigLocusList const&, BigLocusList const&) const;
 
 #if ( MAX_STERIC_PANES == 1 )
     
@@ -326,11 +326,11 @@ private:
         return pGrid.icell(w);
     }
     
-    /// enter interactions into Meca with given stiffness
-    void setSterics0(Meca&, real stiff) const;
+    /// enter interactions into Meca
+    void setSterics0() const;
     
-    /// enter interactions into Meca with given stiffness
-    void setStericsT(Meca&, real stiff) const;
+    /// enter interactions into Meca
+    void setStericsT() const;
 
 #else
     
@@ -348,25 +348,28 @@ private:
         return pGrid.icell(c).panes[p];
     }
     
-    /// enter interactions into Meca in one panes with given parameters
-    void setSterics0(Meca&, real stiff, size_t pan) const;
+    /// enter interactions into Meca in one pane
+    void setSterics0(size_t pan) const;
     
-    /// enter interactions into Meca in one panes with given parameters
-    void setStericsT(Meca&, real stiff, size_t pan) const;
+    /// enter interactions into Meca in one pane
+    void setStericsT(size_t pan) const;
     
-    /// enter interactions into Meca between two panes with given parameters
-    void setSterics0(Meca&, real stiff, size_t pan1, size_t pan2) const;
+    /// enter interactions into Meca between two panes
+    void setSterics0(size_t pan1, size_t pan2) const;
     
-    /// enter interactions into Meca between two panes with given parameters
-    void setStericsT(Meca&, real stiff, size_t pan1, size_t pan2) const;
+    /// enter interactions into Meca between two panes
+    void setStericsT(size_t pan1, size_t pan2) const;
 
 #endif
     
 public:
     
     /// creator
-    LocusGrid();
+    LocusGrid(Meca& m) : meca(m) { push = 0; }
     
+    /// set stiffness
+    void stiffness(real s) { push = s; }
+               
     /// define grid covering specified Space, given a minimal cell size requirement
     size_t setGrid(Space const*, real min_width);
     
@@ -401,8 +404,8 @@ public:
         cell_list(w).pane.emplace(f, i, rad, rge, w);
     }
     
-    /// enter interactions into Meca with given stiffness
-    void setSterics(Meca&, real stiff) const;
+    /// enter interactions into Meca
+    void setSterics() const;
     
 #else
 
@@ -424,11 +427,11 @@ public:
         cell_list(w, pan).pane.emplace(fib, inx, rad, sup, w);
     }
     
-    /// enter interactions into Meca in one panes with given parameters
-    void setSterics(Meca&, real stiff, size_t pan) const;
+    /// enter interactions into Meca in one pane
+    void setSterics(size_t pan) const;
     
-    /// enter interactions into Meca between two panes with given parameters
-    void setSterics(Meca&, real stiff, size_t pan1, size_t pan2) const;
+    /// enter interactions into Meca between two panes
+    void setSterics(size_t pan1, size_t pan2) const;
     
 #endif
 

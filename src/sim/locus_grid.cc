@@ -15,11 +15,6 @@ extern Modulo const* modulo;
 
 //------------------------------------------------------------------------------
 
-LocusGrid::LocusGrid()
-{
-}
-
-
 size_t LocusGrid::setGrid(Space const* spc, real min_width)
 {
     assert_true( min_width > 0 );
@@ -100,8 +95,7 @@ size_t LocusGrid::capacity() const
  The force is applied if the objects are closer to the maximum
  of their specified range + radius.
  */
-void LocusGrid::checkPP(Meca& meca, real stiff,
-                        BigPoint const& aa, BigPoint const& bb)
+void LocusGrid::checkPP(BigPoint const& aa, BigPoint const& bb) const
 {
     //std::clog << "   PP- " << bb.mec_ << " " << aa.mec_ << '\n';
     assert_true( aa.obj_->tag() != Fiber::TAG );
@@ -117,7 +111,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
     real ab2 = vab.normSqr();
     
     if ( ab2 < ran*ran )
-        meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, stiff);
+        meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
 }
 
 
@@ -128,8 +122,7 @@ void LocusGrid::checkPP(Meca& meca, real stiff,
  The force is applied if the objects are closer than the maximum of the two range + radius,
  and if the center of the sphere projects inside the segment.
  */
-void LocusGrid::checkPL(Meca& meca, real stiff,
-                        BigPoint const& aa, BigLocus const& bb)
+void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
 {
     //std::clog << "   PL- " << aa.mec_ << " " << bb.obj_ << '\n';
     assert_true( aa.obj_->tag() != Fiber::TAG );
@@ -147,7 +140,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
         {
             // the point projects inside the segment
             if ( ab2 < ran*ran )
-                meca.addSideSlidingLink(bb.segment(), abs, aa.vertex1(), ran, stiff);
+                meca.addSideSlidingLink(bb.segment(), abs, aa.vertex1(), ran, push);
         }
         else
         {
@@ -161,7 +154,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
 #endif
                 ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
             }
         }
     }
@@ -180,7 +173,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
          or if this is the terminal point of a fiber.
          */
         if ( ab2 < ran*ran && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
-            meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, stiff);
+            meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
     }
 }
 
@@ -191,8 +184,7 @@ void LocusGrid::checkPL(Meca& meca, real stiff,
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void LocusGrid::checkLL1(Meca& meca, real stiff,
-                         BigLocus const& aa, BigLocus const& bb)
+void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
 {
     //std::clog << "   LL1 " << aa.obj_ << " " << bb.vertex1() << '\n';
     assert_true( aa.obj_->tag() == Fiber::TAG );
@@ -210,7 +202,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
         /*
          bb.vertex1() projects inside segment 'aa'
          */
-        meca.addSideSlidingLink(seg, abs, bb.vertex1(), ran, stiff);
+        meca.addSideSlidingLink(seg, abs, bb.vertex1(), ran, push);
     }
     else if ( abs < 0 )
     {
@@ -230,7 +222,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 #endif
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) >= 0 )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
             }
         }
         else
@@ -249,7 +241,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
             }
         }
     }
@@ -261,8 +253,7 @@ void LocusGrid::checkLL1(Meca& meca, real stiff,
 
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void LocusGrid::checkLL2(Meca& meca, real stiff,
-                         BigLocus const& aa, BigLocus const& bb)
+void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
 {
     //std::clog << "   LL2 " << aa.obj_ << " " << bb.vertex2() << '\n';
     assert_true( aa.obj_->tag() == Fiber::TAG );
@@ -281,7 +272,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
          bb.vertex2() projects inside segment 'aa'
          */
         if ( dis2 < ran*ran )
-            meca.addSideSlidingLink(seg, abs, bb.vertex2(), ran, stiff);
+            meca.addSideSlidingLink(seg, abs, bb.vertex2(), ran, push);
     }
     else if ( abs < 0 )
     {
@@ -301,7 +292,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
             real ab2 = vab.normSqr();
 
             if ( ab2 < ran*ran  && dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, stiff);
+                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
         }
         else
         {
@@ -309,7 +300,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
             {
                 real ab2 = vab.normSqr();
                 if ( ab2 < ran*ran )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, stiff);
+                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
             }
         }
     }
@@ -330,7 +321,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
         real ab2 = vab.normSqr();
         
         if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) <= 0 )
-            meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, ran, stiff);
+            meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, ran, push);
     }
 }
 
@@ -339,8 +330,7 @@ void LocusGrid::checkLL2(Meca& meca, real stiff,
  This is used to check two FiberSegment, that each represent a segment of a Fiber.
  The segments are tested for intersection in 3D.
  */
-void LocusGrid::checkLL(Meca& meca, real stiff,
-                        BigLocus const& aa, BigLocus const& bb)
+void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
 {
     assert_true( aa.obj_->tag() == Fiber::TAG );
     assert_true( bb.obj_->tag() == Fiber::TAG );
@@ -359,20 +349,20 @@ void LocusGrid::checkLL(Meca& meca, real stiff,
         return;
     
     if ( as.within(a) & bs.within(b) )
-        meca.addSideSlidingLink(as, a, Interpolation(bs, b), ran, stiff);
+        meca.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push);
     
 #endif
 
     //std::clog << "   LL " << aa.obj_ << " " << bb.obj_ << '\n';
-    checkLL1(meca, stiff, aa, bb);
+    checkLL1(aa, bb);
     
     if ( aa.isLast() )
-        checkLL2(meca, stiff, bb, aa);
+        checkLL2(bb, aa);
     
-    checkLL1(meca, stiff, bb, aa);
+    checkLL1(bb, aa);
     
     if ( bb.isLast() )
-        checkLL2(meca, stiff, aa, bb);
+        checkLL2(aa, bb);
 }
 
 //------------------------------------------------------------------------------
@@ -420,7 +410,7 @@ static inline bool not_adjacentLL(BigLocus const& a, BigLocus const& b)
 /**
  This will consider once all pairs of objects from the given lists
  */
-void LocusGrid::setSterics0(Meca& meca, real stiff, BigLocusList const& list)
+void LocusGrid::setSterics0(BigLocusList const& list) const
 {
     BigLocus const* mid = list.middle();
     
@@ -428,18 +418,18 @@ void LocusGrid::setSterics0(Meca& meca, real stiff, BigLocusList const& list)
     {
         for ( BigLocus const* jj = ii+1; jj < mid; ++jj )
             if ( not_adjacentLL(*ii, *jj) )
-                checkLL(meca, stiff, *ii, *jj);
+                checkLL(*ii, *jj);
         
         for ( BigPoint const* kk = mid; kk < list.end(); ++kk )
             if ( not_adjacentPL(*kk, *ii) )
-                checkPL(meca, stiff, *kk, *ii);
+                checkPL(*kk, *ii);
     }
 
     for ( BigPoint const* ii = mid; ii < list.end(); ++ii )
     {
         for ( BigPoint const* jj = ii+1; jj < list.end(); ++jj )
             if ( not_adjacentPP(*ii, *jj) )
-                checkPP(meca, stiff, *ii, *jj);
+                checkPP(*ii, *jj);
     }
 }
 
@@ -448,8 +438,8 @@ void LocusGrid::setSterics0(Meca& meca, real stiff, BigLocusList const& list)
  This will consider once all pairs of objects from the given lists,
  assuming that the list are different and no object is repeated
  */
-void LocusGrid::setSterics0(Meca& meca, real stiff, BigLocusList const& list1,
-                            BigLocusList const& list2)
+void LocusGrid::setSterics0(BigLocusList const& list1,
+                            BigLocusList const& list2) const
 {
     assert_true( &list1 != &list2 );
     BigLocus const* mid1 = list1.middle();
@@ -459,22 +449,22 @@ void LocusGrid::setSterics0(Meca& meca, real stiff, BigLocusList const& list1,
     {
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( not_adjacentLL(*ii, *jj)  )
-                checkLL(meca, stiff, *ii, *jj);
+                checkLL(*ii, *jj);
 
         for ( BigPoint const* kk = mid2; kk < list2.end(); ++kk )
             if ( not_adjacentPL(*kk, *ii) )
-                checkPL(meca, stiff, *kk, *ii);
+                checkPL(*kk, *ii);
     }
 
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
     {
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( not_adjacentPL(*ii, *jj) )
-                checkPL(meca, stiff, *ii, *jj);
+                checkPL(*ii, *jj);
 
         for ( BigPoint const* jj = mid2; jj < list2.end(); ++jj )
             if ( not_adjacentPP(*ii, *jj) )
-                checkPP(meca, stiff, *ii, *jj);
+                checkPP(*ii, *jj);
     }
 }
 
@@ -484,7 +474,7 @@ void LocusGrid::setSterics0(Meca& meca, real stiff, BigLocusList const& list1,
  Compared to `setSterics0()`, this performs additional tests to exclude
  objects that are too far appart to interact, based on BigVector::near()
  */
-void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list)
+void LocusGrid::setStericsT(BigLocusList const& list) const
 {
     BigLocus const* mid = list.middle();
 
@@ -494,11 +484,11 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list)
         
         for ( BigLocus const* jj = ii+1; jj < mid; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj) )
-                checkLL(meca, stiff, *ii, *jj);
+                checkLL(*ii, *jj);
         
         for ( BigPoint const* jj = mid; jj < list.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPL(*jj, *ii) )
-                checkPL(meca, stiff, *jj, *ii);
+                checkPL(*jj, *ii);
     }
 
     for ( BigPoint const* ii = mid; ii < list.end(); ++ii )
@@ -507,7 +497,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list)
 
         for ( BigPoint const* jj = ii+1; jj < list.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPP(*ii, *jj) )
-                checkPP(meca, stiff, *ii, *jj);
+                checkPP(*ii, *jj);
     }
 }
 
@@ -519,8 +509,8 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list)
  Compared to `setSterics0()`, this performs additional tests to exclude
  objects that are too far appart to interact, based on BigVector::near()
 */
-void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list1,
-                            BigLocusList const& list2)
+void LocusGrid::setStericsT(BigLocusList const& list1,
+                            BigLocusList const& list2) const
 {
     assert_true( &list1 != &list2 );
     BigLocus const* mid1 = list1.middle();
@@ -536,11 +526,11 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list1,
         
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj)  )
-                checkLL(meca, stiff, *ii, *jj);
+                checkLL(*ii, *jj);
 
         for ( BigPoint const* jj = mid2; jj < list2.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPL(*jj, *ii) )
-                checkPL(meca, stiff, *jj, *ii);
+                checkPL(*jj, *ii);
     }
 
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
@@ -549,11 +539,11 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, BigLocusList const& list1,
 
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPL(*ii, *jj) )
-                checkPL(meca, stiff, *ii, *jj);
+                checkPL(*ii, *jj);
 
         for ( BigPoint const* jj = mid2; jj < list2.end(); ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPP(*ii, *jj) )
-                checkPP(meca, stiff, *ii, *jj);
+                checkPP(*ii, *jj);
     }
 }
 
@@ -685,8 +675,8 @@ void near_bits(bitfield& bitL, bitfield& bitP, vec4f const& xyzr, BigLocusList c
  Returns the number of trailing 0-bits in x, starting at the least significant bit position.
  If x is 0, the result is undefined.
 */
-void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
-                            BigLocusList const& list2)
+void LocusGrid::setStericsX(BigLocusList const& list1,
+                            BigLocusList const& list2) const
 {
     assert_true( &list1 != &list2 );
 #if 0
@@ -731,7 +721,7 @@ void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
                 b = __builtin_ctzl(bitL);
                 u = b + offset;
                 if ( not_adjacentLL(*ii, *(jj+u)) )
-                    checkLL(meca, stiff, *ii, *(jj+u));
+                    checkLL(*ii, *(jj+u));
                 bitL &= mask << b;
             }
             while ( bitP )
@@ -740,7 +730,7 @@ void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
                 b = __builtin_ctzl(bitP);
                 u = b + offset;
                 if ( not_adjacentPL(*(jj+u), *ii) )
-                    checkPL(meca, stiff, *(jj+u), *ii);
+                    checkPL(*(jj+u), *ii);
                 bitP &= mask << b;
             }
         }
@@ -763,7 +753,7 @@ void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
                 b = __builtin_ctzl(bitL);
                 u = b + offset;
                 if ( not_adjacentPL(*ii, *(jj+u)) )
-                    checkPL(meca, stiff, *ii, *(jj+u));
+                    checkPL(*ii, *(jj+u));
                 bitL &= mask << b;
             }
             while ( bitP )
@@ -772,7 +762,7 @@ void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
                 b = __builtin_ctzl(bitP);
                 u = b + offset;
                 if ( not_adjacentPP(*ii, *(jj+u)) )
-                    checkPP(meca, stiff, *ii, *(jj+u));
+                    checkPP(*ii, *(jj+u));
                 bitP &= mask << b;
             }
         }
@@ -790,7 +780,7 @@ void LocusGrid::setStericsX(Meca& meca, real stiff, BigLocusList const& list1,
  Scan all cells to examine all object pairs (ii, jj) only once.
  This version can handle periodic boundary conditions
  */
-void LocusGrid::setSterics0(Meca& meca, real stiff) const
+void LocusGrid::setSterics0() const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -799,16 +789,16 @@ void LocusGrid::setSterics0(Meca& meca, real stiff) const
         assert_true(region[0] == 0);
         
         BigLocusList& base = cell_list(inx);
-        setSterics0(meca, stiff, base);
+        setSterics0(base);
         
         for ( int reg = 1; reg < nr; ++reg )
-            setSterics0(meca, stiff, base, cell_list(inx+region[reg]));
+            setSterics0(base, cell_list(inx+region[reg]));
     }
 }
 
 
 /** This calls setStericsT() */
-void LocusGrid::setStericsT(Meca& meca, real stiff) const
+void LocusGrid::setStericsT() const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -817,31 +807,31 @@ void LocusGrid::setStericsT(Meca& meca, real stiff) const
         assert_true(region[0] == 0);
         
         BigLocusList& base = cell_list(inx);
-        setStericsT(meca, stiff, base);
+        setStericsT(base);
         
         for ( int reg = 1; reg < nr; ++reg )
         {
 #if ( DIM == 3 ) && defined(__SSE3__)
             BigLocusList& side = cell_list(inx+region[reg]);
             if ( base.size() < side.size() )
-                setStericsX(meca, stiff, base, side);
+                setStericsX(base, side);
             else
-                setStericsX(meca, stiff, side, base);
+                setStericsX(side, base);
 #else
-            setStericsT(meca, stiff, base, cell_list(inx+region[reg]));
+            setStericsT(base, cell_list(inx+region[reg]));
 #endif
         }
     }
 }
 
 
-void LocusGrid::setSterics(Meca& meca, real stiff) const
+void LocusGrid::setSterics() const
 {
     //std::clog << "----" << '\n';
     if ( pGrid.isPeriodic() )
-        setSterics0(meca, stiff);
+        setSterics0();
     else
-        setStericsT(meca, stiff);
+        setStericsT();
 }
 
 #else
@@ -851,7 +841,7 @@ void LocusGrid::setSterics(Meca& meca, real stiff) const
  Scan all cells to examine all object pairs (ii, jj) only once.
  This version can handle periodic boundary conditions
  */
-void LocusGrid::setSterics0(Meca& meca, real stiff, size_t pan) const
+void LocusGrid::setSterics0(size_t pan) const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -860,15 +850,15 @@ void LocusGrid::setSterics0(Meca& meca, real stiff, size_t pan) const
         assert_true(region[0] == 0);
        
         BigLocusList& base = cell_list(inx, pan);
-        setSterics0(meca, stiff, base);
+        setSterics0(base);
         
         for ( int reg = 1; reg < nr; ++reg )
-            setSterics0(meca, stiff, base, cell_list(inx+region[reg], pan));
+            setSterics0(base, cell_list(inx+region[reg], pan));
     }
 }
 
 
-void LocusGrid::setStericsT(Meca& meca, real stiff, size_t pan) const
+void LocusGrid::setStericsT(size_t pan) const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -877,10 +867,10 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, size_t pan) const
          assert_true(region[0] == 0);
         
          BigLocusList& base = cell_list(inx, pan);
-         setStericsT(meca, stiff, base);
+         setStericsT(base);
          
          for ( int reg = 1; reg < nr; ++reg )
-             setStericsT(meca, stiff, base, cell_list(inx+region[reg], pan));
+             setStericsT(base, cell_list(inx+region[reg], pan));
     }
 }
 
@@ -889,7 +879,7 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, size_t pan) const
  Check interactions between the FatPoints contained in Panes `pan` and `bim`,
  where ( pan1 != pan2 )
  */
-void LocusGrid::setSterics0(Meca& meca, real stiff, size_t pan, size_t bim) const
+void LocusGrid::setSterics0(size_t pan, size_t bim) const
 {
     assert_true(pan != bim);
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
@@ -901,18 +891,18 @@ void LocusGrid::setSterics0(Meca& meca, real stiff, size_t pan, size_t bim) cons
         BigLocusList& base1 = cell_list(inx, pan);
         BigLocusList& base2 = cell_list(inx, bim);
 
-        setSterics0(meca, stiff, base1, base2);
+        setSterics0(base1, base2);
 
         for ( int reg = 1; reg < nr; ++reg )
         {
-            setSterics0(meca, stiff, base1, cell_list(inx+region[reg], bim));
-            setSterics0(meca, stiff, base2, cell_list(inx+region[reg], pan));
+            setSterics0(base1, cell_list(inx+region[reg], bim));
+            setSterics0(base2, cell_list(inx+region[reg], pan));
         }
     }
 }
 
 
-void LocusGrid::setStericsT(Meca& meca, real stiff, size_t pan, size_t bim) const
+void LocusGrid::setStericsT(size_t pan, size_t bim) const
 {
     assert_true(pan != bim);
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
@@ -924,32 +914,32 @@ void LocusGrid::setStericsT(Meca& meca, real stiff, size_t pan, size_t bim) cons
         BigLocusList& base1 = cell_list(inx, pan);
         BigLocusList& base2 = cell_list(inx, bim);
 
-        setStericsT(meca, stiff, base1, base2);
+        setStericsT(base1, base2);
 
         for ( int reg = 1; reg < nr; ++reg )
         {
-            setStericsT(meca, stiff, base1, cell_list(inx+region[reg], bim));
-            setStericsT(meca, stiff, base2, cell_list(inx+region[reg], pan));
+            setStericsT(base1, cell_list(inx+region[reg], bim));
+            setStericsT(base2, cell_list(inx+region[reg], pan));
         }
     }
 }
 
 
-void LocusGrid::setSterics(Meca& meca, real stiff, size_t pan) const
+void LocusGrid::setSterics(size_t pan) const
 {
     if ( pGrid.isPeriodic() )
-        setSterics0(meca, stiff, pan);
+        setSterics0(pan);
     else
-        setStericsT(meca, stiff, pan);
+        setStericsT(pan);
 }
 
 
-void LocusGrid::setSterics(Meca& meca, real stiff, size_t pan1, size_t pan2) const
+void LocusGrid::setSterics(size_t pan1, size_t pan2) const
 {
     if ( pGrid.isPeriodic() )
-        setSterics0(meca, stiff, pan1, pan2);
+        setSterics0(pan1, pan2);
     else
-        setStericsT(meca, stiff, pan1, pan2);
+        setStericsT(pan1, pan2);
 }
 
 #endif

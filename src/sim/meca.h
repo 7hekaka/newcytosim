@@ -685,7 +685,7 @@ public:
     void addStericInteractions2(Simul const&);
     
     /// add steric interactions between spheres, solids and fibers to Meca
-    void addSomeStericInteractions(real stiff);
+    void addSomeStericInteractions();
 
     //-------------------------- COMPUTING METHODS -----------------------------
     

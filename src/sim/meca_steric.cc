@@ -42,17 +42,21 @@ void Meca::selectStericEngine(Simul const& sim)
     
     switch ( steric_ )
     {
-        case 1: if ( !pointGrid.hasGrid() )
-        {
-            real est = sim.estimateStericRange();
-            setStericGrid(pointGrid, spc, sim.prop.steric_max_range, est);
-        }
+        case 1:
+            pointGrid.stiffness(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
+            if ( !pointGrid.hasGrid() )
+            {
+                real est = sim.estimateStericRange();
+                setStericGrid(pointGrid, spc, sim.prop.steric_max_range, est);
+            }
 
-        case 2: if ( !locusGrid.hasGrid() )
-        {
-            real est = sim.estimateStericRange();
-            setStericGrid(locusGrid, spc, sim.prop.steric_max_range, est);
-        }
+        case 2:
+            locusGrid.stiffness(sim.prop.steric_stiff_push[0]);
+            if ( !locusGrid.hasGrid() )
+            {
+                real est = sim.estimateStericRange();
+                setStericGrid(locusGrid, spc, sim.prop.steric_max_range, est);
+            }
     }
 }
 
@@ -139,26 +143,23 @@ void Meca::addStericInteractions1(Simul const& sim)
         }
     }
     
-    /// create parameters
-    Stiffness pam(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
-    
 #if ( NUM_STERIC_PANES == 1 )
     
-    pointGrid.setSterics(*this, pam);
+    pointGrid.setSterics();
 
 #elif ( NUM_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
-    pointGrid.setSterics(*this, pam, 1);
+    pointGrid.setSterics(1);
     // add steric interactions between panes 1 and 2:
-    pointGrid.setSterics(*this, pam, 1, 2);
+    pointGrid.setSterics(1, 2);
     //pointGrid.setSterics(*this, pam, 2, 1);
 
 #else
     
     // add steric interactions within each pane:
     for ( size_t p = 1; p <= NUM_STERIC_PANES; ++p )
-        pointGrid.setSterics(*this, pam, p);
+        pointGrid.setSterics(p);
 
 #endif
 }
@@ -247,34 +248,31 @@ void Meca::addStericInteractions2(Simul const& sim)
             }
         }
     }
-    
-    /// stiffness
-    real stiff = sim.prop.steric_stiff_push[0];
 
 #if ( MAX_STERIC_PANES == 1 )
         
-    locusGrid.setSterics(*this, stiff);
+    locusGrid.setSterics();
 
 #elif ( MAX_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
-    locusGrid.setSterics(*this, stiff, 1);
+    locusGrid.setSterics(1);
     // add steric interactions between panes 1 and 2:
-    locusGrid.setSterics(*this, stiff, 1, 2);
+    locusGrid.setSterics(1, 2);
     //pointGrid.setSterics(*this, pam, 2, 1);
 
 #else
     
     // add steric interactions within each pane:
     for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-        locusGrid.setSterics(*this, stiff, p);
+        locusGrid.setSterics(p);
 
 #endif
     //std::clog << "LocusGrid has capacity " << locusGrid.capacity() << "\n";
 }
 
 
-void Meca::addSomeStericInteractions(real stiff)
+void Meca::addSomeStericInteractions()
 {
     locusGrid.clear();
     
@@ -301,21 +299,21 @@ void Meca::addSomeStericInteractions(real stiff)
 
 #if ( MAX_STERIC_PANES == 1 )
     
-    locusGrid.setSterics(*this, stiff);
+    locusGrid.setSterics();
 
 #elif ( MAX_STERIC_PANES == 2 )
     
     // add steric interactions inside pane 1:
-    locusGrid.setSterics(*this, stiff, 1);
+    locusGrid.setSterics(1);
     // add steric interactions between panes 1 and 2:
-    locusGrid.setSterics(*this, stiff, 1, 2);
+    locusGrid.setSterics(1, 2);
     //pointGrid.setSterics(*this, pam, 2, 1);
 
 #else
     
     // add steric interactions within each pane:
     for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-        locusGrid.setSterics(*this, stiff, p);
+        locusGrid.setSterics(p);
 
 #endif
     //std::clog << "LocusGrid has capacity " << locusGrid.capacity() << "\n";

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 #ifndef POINT_GRID_H
 #define POINT_GRID_H
 
@@ -18,21 +18,6 @@ class Fiber;
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
 #define NUM_STERIC_PANES 1
-
-
-/// Stores the stiffness parameters for the steric engine
-class Stiffness
-{
-public:
-    real push;
-    real pull;
-    
-    Stiffness(real h, real l)
-    {
-        push = h;
-        pull = l;
-    }
-};
 
 
 /// Used for early exclusing of potential pairs, representing { position, interaction radius }
@@ -292,40 +277,45 @@ private:
     /// grid for divide-and-conquer strategies:
     Grid<PointGridCell, DIM> pGrid;
     
+    /// Meca
+    Meca& meca;
+    
+    /// stiffness
+    real push;
+    
+    ///
+    real pull;
+
 private:
     
     /// check two Spheres
-    static void checkPP(Meca&, Stiffness const&, FatPoint const&, FatPoint const&);
+    void checkPP(FatPoint const&, FatPoint const&) const;
     
     /// check Sphere against Line segment
-    static void checkPL(Meca&, Stiffness const&, FatPoint const&, FatLocus const&);
+    void checkPL(FatPoint const&, FatLocus const&) const;
     
     /// check Line segment against Sphere
-    static void checkLL1(Meca&, Stiffness const&, FatLocus const&, FatLocus const&);
+    void checkLL1(FatLocus const&, FatLocus const&) const;
     
     /// check Line segment against the terminal Sphere of a Fiber
-    static void checkLL2(Meca&, Stiffness const&, FatLocus const&, FatLocus const&);
+    void checkLL2(FatLocus const&, FatLocus const&) const;
     
     /// check two Line segments
-    static void checkLL(Meca&, Stiffness const&, FatLocus const&, FatLocus const&);
+    void checkLL(FatLocus const&, FatLocus const&) const;
+                 
+    /// check all pairs between the two lists
+    void setSterics0(FatPointList &, FatLocusList &) const;
     
     /// check all pairs between the two lists
-    static void setSterics0(Meca&, Stiffness const&,
-                            FatPointList &, FatLocusList &);
-    
-    /// check all pairs between the two lists
-    static void setSterics0(Meca&, Stiffness const&,
-                            FatPointList &, FatLocusList &,
-                            FatPointList &, FatLocusList &);
+    void setSterics0(FatPointList &, FatLocusList &,
+                     FatPointList &, FatLocusList &) const;
     
     /// check all pairs between two lists, checking center-to-center distance
-    static void setStericsT(Meca&, Stiffness const&,
-                            FatPointList &, FatLocusList &);
+    void setStericsT(FatPointList &, FatLocusList &) const;
     
     /// check all pairs between two lists, checking center-to-center distance
-    static void setStericsT(Meca&, Stiffness const&,
-                            FatPointList &, FatLocusList &,
-                            FatPointList &, FatLocusList &);
+    void setStericsT(FatPointList &, FatLocusList &,
+                     FatPointList &, FatLocusList &) const;
 
 #if ( NUM_STERIC_PANES == 1 )
     
@@ -353,11 +343,11 @@ private:
         return pGrid.icell(w).locus_pane;
     }
     
-    /// enter interactions into Meca with given stiffness
-    void setSterics0(Meca&, Stiffness const&) const;
+    /// enter interactions into Meca
+    void setSterics0() const;
     
-    /// enter interactions into Meca with given stiffness
-    void setStericsT(Meca&, Stiffness const&) const;
+    /// enter interactions into Meca
+    void setStericsT() const;
 
 #else
     
@@ -389,25 +379,28 @@ private:
         return pGrid.icell(c).locus_panes[p];
     }
     
-    /// enter interactions into Meca in one panes with given parameters
-    void setSterics0(Meca&, Stiffness const&, size_t pan) const;
+    /// enter interactions into Meca in one pane
+    void setSterics0(size_t pan) const;
     
-    /// enter interactions into Meca in one panes with given parameters
-    void setStericsT(Meca&, Stiffness const&, size_t pan) const;
+    /// enter interactions into Meca in one pane
+    void setStericsT(size_t pan) const;
     
-    /// enter interactions into Meca between two panes with given parameters
-    void setSterics0(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
+    /// enter interactions into Meca between two panes
+    void setSterics0(size_t pan1, size_t pan2) const;
     
-    /// enter interactions into Meca between two panes with given parameters
-    void setStericsT(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
+    /// enter interactions into Meca between two panes
+    void setStericsT(size_t pan1, size_t pan2) const;
 
 #endif
     
 public:
     
     /// creator
-    PointGrid();
+    PointGrid(Meca& m) : meca(m) { push = 0; pull = 0; }
     
+    /// set stiffness
+    void stiffness(real h, real l) { push = h; pull = l; }
+
     /// define grid covering specified Space, given a minimal cell size requirement
     size_t setGrid(Space const*, real min_width);
     
@@ -440,8 +433,8 @@ public:
         locus_list(w).emplace(FiberSegment(f, i), rad, rge, sup, w);
     }
     
-    /// enter interactions into Meca with given stiffness
-    void setSterics(Meca&, Stiffness const&) const;
+    /// enter interactions into Meca
+    void setSterics() const;
     
 #else
     
@@ -451,11 +444,11 @@ public:
     /// place FiberSegment on the grid
     void add(size_t pane, Fiber const*, size_t, real rad, real rge, real sup) const;
     
-    /// enter interactions into Meca in one panes with given parameters
-    void setSterics(Meca&, Stiffness const&, size_t pan) const;
+    /// enter interactions into Meca in one pane
+    void setSterics(size_t pan) const;
     
-    /// enter interactions into Meca between two panes with given parameters
-    void setSterics(Meca&, Stiffness const&, size_t pan1, size_t pan2) const;
+    /// enter interactions into Meca between two panes
+    void setSterics(size_t pan1, size_t pan2) const;
     
 #endif
     
