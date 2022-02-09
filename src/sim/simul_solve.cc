@@ -174,7 +174,7 @@ void Simul::solve()
     //auto rdt = timer();
     setAllInteractions(sMeca);
     //printf("     ::set      %16llu\n", (timer()-rdt)>>5); rdt = timer();
-    sMeca.solve(prop, prop.precondition);
+    sMeca.solve();
     //printf("     ::solve    %16llu\n", (timer()-rdt)>>5); rdt = timer()
     sMeca.apply();
     //printf("     ::apply    %16llu\n", (timer()-rdt)>>5);
@@ -200,7 +200,7 @@ void Simul::solve_half()
 {
     sMeca.getReady(*this);
     setAllInteractions(sMeca);
-    sMeca.solve(prop, prop.precondition);
+    sMeca.solve();
 }
 
 
@@ -210,11 +210,12 @@ void Simul::solve_half()
 void Simul::solve_auto()
 {
     sMeca.getReady(*this);
+    sMeca.precond_ = autoPrecond;
     setAllInteractions(sMeca);
     
     // solve the system, recording time:
     //double cpu = TimeDate::milliseconds();
-    size_t cnt = sMeca.solve(prop, autoPrecond);
+    size_t cnt = sMeca.solve();
     //float cpu = TimeDate::milliseconds() - cpu;
     // use Meca::cycles_ that only includes preconditionning parts!
     float cpu = sMeca.cycles_;
@@ -337,7 +338,7 @@ void Simul::solve_separate()
             sMeca.setSomeInteractions();
             if ( sMeca.steric_ == 2 )
                 sMeca.addSomeStericInteractions();
-            sMeca.solve(prop, prop.precondition);
+            sMeca.solve();
             sMeca.apply();
         }
     }

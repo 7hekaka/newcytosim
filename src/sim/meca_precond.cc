@@ -892,10 +892,10 @@ void Meca::computePrecondFull(Mecable* mec)
  Here the preconditionner blocks are calculated,
  according to Simul::precondition
  */
-void Meca::computePreconditionner(int precond, int span)
+void Meca::computePreconditionner()
 {
     bump_ = 0;
-    switch( precond )
+    switch( precond_ )
     {
         case 0:
             for ( Mecable * mec : mecables )

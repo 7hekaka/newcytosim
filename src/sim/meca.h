@@ -31,7 +31,7 @@ class Simul;
  This option can only be beneficial if NUM_THREADS > 1
  Do not enable this option for sequential code.
  */
-#define PARALLELIZE_MATRIX 0
+#define PARALLELIZE_MATRIX 1
 
 
 // known Matrix block types:
@@ -171,6 +171,12 @@ private:
     
     /// flag to include steric interactions
     int steric_;
+    
+    /// preconditionning mode
+    int precond_;
+    
+    /// verbosity level
+    int verbose_;
     
     /// list of Mecable containing points to simulate
     Array<Mecable*> mecables;
@@ -360,7 +366,7 @@ private:
     void computePrecondFull(Mecable*);
     
     /// compute all blocks of the preconditionner (method=1)
-    void computePreconditionner(int, int);
+    void computePreconditionner();
     
     /// compute all blocks of the preconditionner
     void renewPreconditionner(int);
@@ -699,7 +705,7 @@ public:
     void getReady(Simul const& sim);
     
     /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver
-    size_t solve(SimulProp const&, unsigned precondition);
+    size_t solve();
     
     /// transfer newly calculated point coordinates back to Mecables
     void apply();
