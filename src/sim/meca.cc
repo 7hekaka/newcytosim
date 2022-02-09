@@ -58,6 +58,15 @@ With a sequential simulation, the second option is usually faster.
 /// this define will enable explicit integration (should be off)
 #define EXPLICIT_INTEGRATION 0
 
+// shortcut
+#if ( DIM == 1 )
+#   define VECMULADDISO vecMulAdd
+#elif ( DIM == 2 )
+#   define VECMULADDISO vecMulAddIso2D
+#elif ( DIM == 3 )
+#   define VECMULADDISO vecMulAddIso3D
+#endif
+
 //------------------------------------------------------------------------------
 
 #include "meca_inter.cc"
@@ -162,17 +171,6 @@ size_t Meca::nbConstraints() const
 
 //------------------------------------------------------------------------------
 #pragma mark - Multiply
-
-
-// shortcut
-
-#if ( DIM == 1 )
-#   define VECMULADDISO vecMulAdd
-#elif ( DIM == 2 )
-#   define VECMULADDISO vecMulAddIso2D
-#elif ( DIM == 3 )
-#   define VECMULADDISO vecMulAddIso3D
-#endif
 
 /**
  calculate the forces into `F`, given the Mecable coordinates `X`:
