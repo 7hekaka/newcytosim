@@ -167,32 +167,32 @@ sterile:
 MAKEDEP := g++ -std=gnu++14 -MM $(addprefix -I, $(SRCDIR))
 
 .PHONY: dep
-dep: $(addsuffix .dep, $(addprefix dep/part, 0 1 2 3 4 5 6 7))
+dep: $(addsuffix .dep, $(addprefix dep/, 0 1 2 3 4 5 6 7))
 	$(DONE)
 
-dep/part0.dep: src/base/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part0.dep; done)
+dep/0.dep: src/base/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/part1.dep: src/math/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part1.dep; done)
+dep/1.dep: src/math/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/part2.dep: src/sim/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part2.dep; done)
+dep/2.dep: src/sim/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/part3.dep: src/sim/*/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part3.dep; done)
+dep/3.dep: src/sim/*/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/part4.dep: src/disp/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part4.dep; done)
+dep/4.dep: src/disp/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/part5.dep: src/play/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part5.dep; done)
+dep/5.dep: src/play/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/part6.dep: src/tools/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part6.dep; done)
+dep/6.dep: src/tools/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/part7.dep: src/test/*.cc
-	(for F in $^; do $(MAKEDEP) $$F >> dep/part7.dep; done)
+dep/7.dep: src/test/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
--include dep/part?.dep
+-include dep/?.dep
 
