@@ -4503,32 +4503,23 @@ void Meca::addCylinderClampX(Mecapoint const& pte, const real rad, const real we
     real dY = pos.YY / len;
     real dZ = pos.ZZ / len;
     
-    real YY, ZY, ZZ;
+    MatrixBlock B(0, 0);
     if ( rad < len )
     {
         // attractive
         real wla = weight * rad / len;
-        YY = wla * ( dY * dY - 1.0 ) + weight;
-        ZY = wla * dZ * dY;
-        ZZ = wla * ( dZ * dZ - 1.0 ) + weight;
+        B(1, 1) = wla * ( dY * dY - 1.0 ) + weight;
+        B(2, 1) = wla * dZ * dY;
+        B(2, 2) = wla * ( dZ * dZ - 1.0 ) + weight;
     }
     else
     {
         // repulsive
-        YY = weight * dY * dY;
-        ZY = weight * dZ * dY;
-        ZZ = weight * dZ * dZ;
+        B(1, 1) = weight * dY * dY;
+        B(2, 1) = weight * dZ * dY;
+        B(2, 2) = weight * dZ * dZ;
     }
-#if USE_MATRIX_BLOCK
-    MatrixBlock & B = mFUL.diag_block(inx);
-    B(1, 1) -= YY;
-    B(2, 1) -= ZY;
-    B(2, 2) -= ZZ;
-#else
-    mFUL(inx+1, inx+1) -= YY;
-    mFUL(inx+2, inx+1) -= ZY;
-    mFUL(inx+2, inx+2) -= ZZ;
-#endif
+    sub_block_diag(inx, B);
 
     real fac = weight * rad;
     // there should be no X component here!
@@ -4569,32 +4560,23 @@ void Meca::addCylinderClampY(Mecapoint const& pte, const real rad, const real we
     real dX = pos.XX / len;
     real dZ = pos.ZZ / len;
     
-    real XX, ZX, ZZ;
+    MatrixBlock B(0, 0);
     if ( rad < len )
     {
         // attractive
         real wla = weight * rad / len;
-        XX = wla * ( dX * dX - 1.0 ) + weight;
-        ZX = wla * dZ * dX;
-        ZZ = wla * ( dZ * dZ - 1.0 ) + weight;
+        B(0, 0) = wla * ( dX * dX - 1.0 ) + weight;
+        B(2, 0) = wla * dZ * dX;
+        B(2, 2) = wla * ( dZ * dZ - 1.0 ) + weight;
     }
     else
     {
         // repulsive
-        XX = weight * dX * dX;
-        ZX = weight * dZ * dX;
-        ZZ = weight * dZ * dZ;
+        B(0, 0) = weight * dX * dX;
+        B(2, 0) = weight * dZ * dX;
+        B(2, 2) = weight * dZ * dZ;
     }
-#if USE_MATRIX_BLOCK
-    MatrixBlock & B = mFUL.diag_block(inx);
-    B(0, 0) -= XX;
-    B(2, 0) -= ZX;
-    B(2, 2) -= ZZ;
-#else
-    mFUL(inx  , inx  ) -= XX;
-    mFUL(inx+2, inx  ) -= ZX;
-    mFUL(inx+2, inx+2) -= ZZ;
-#endif
+    sub_block_diag(inx, B);
 
     real fac = weight * rad;
     vBAS[inx  ] += fac * dX;
@@ -4629,33 +4611,24 @@ void Meca::addCylinderClampZ(Mecapoint const& pte, const real rad, const real we
     real dX = pos.XX / len;
     real dY = pos.YY / len;
 
-    real XX, YX, YY;
+    MatrixBlock B(0, 0);
     if ( rad < len )
     {
         // attractive
         real wla = weight * rad / len;
-        XX = wla * ( dX * dX - 1.0 ) + weight;
-        YX = wla * dY * dX;
-        YY = wla * ( dY * dY - 1.0 ) + weight;
+        B(0, 0) = wla * ( dX * dX - 1.0 ) + weight;
+        B(1, 0) = wla * dY * dX;
+        B(1, 1) = wla * ( dY * dY - 1.0 ) + weight;
     }
     else
     {
         // repulsive
-        XX = weight * dX * dX;
-        YX = weight * dY * dX;
-        YY = weight * dY * dY;
+        B(0, 0) = weight * dX * dX;
+        B(1, 0) = weight * dY * dX;
+        B(1, 1) = weight * dY * dY;
     }
-#if USE_MATRIX_BLOCK
-    MatrixBlock & B = mFUL.diag_block(inx);
-    B(0, 0) -= XX;
-    B(1, 0) -= YX;
-    B(1, 1) -= YY;
-#else
-    mFUL(inx  , inx  ) -= XX;
-    mFUL(inx+1, inx  ) -= YX;
-    mFUL(inx+1, inx+1) -= YY;
-#endif
-    
+    sub_block_diag(inx, B);
+
     real fac = weight * rad;
     vBAS[inx  ] += fac * dX;
     vBAS[inx+1] += fac * dY;
