@@ -1,7 +1,5 @@
 Cytosim Todo List
 
-F. Nedelec
-
 # Bugs
 
 - check diffusion of a looped filament
@@ -17,7 +15,6 @@ F. Nedelec
 # Important
 
 - Fiber::read should allow changing 'activity'
-- Geometrical primitives (eg. rectangle) should use diameter and not radius
 - add units to documentation of parameters
 
 # Improvements
@@ -36,7 +33,7 @@ F. Nedelec
   - saturating transport on lattice: convection stalls above a certain concentration
 
 
-# v2018
+# v2022
 
 - use 'hpp' for C++ header files
 - use 'cpp' extension for C++ code file
@@ -98,6 +95,38 @@ test write / read systematically on all cym files
 - multi-thread the steric engine
 - try direct sparse method: HSL MA27 http://www.hsl.rl.ac.uk/index.html
 
+- Implement Reverse CutHill-McKee reordering method in Simul::orderClustersCouple()
+http://ciprian-zavoianu.blogspot.com/2009/01/project-bandwidth-reduction.html
+
+- Implement BlockOuterProduct to speed up LongLink: (Idea 06.02.2022)
+each LongLink element currently covers four 3x3 blocks = 36 scalars + diagonal elements
+We shall keep the diagonal elements, but compress the off-diagonal ones:
+        add_block(ii2, ii0, cc2*cc0, wT);
+        add_block(ii3, ii0, cc3*cc0, wT);
+        add_block(ii2, ii1, cc2*cc1, wT);
+        add_block(ii3, ii1, cc3*cc1, wT);
+Since wT = MatrixBlock::offsetOuterProduct(), we have wT = weight [ d.1 - A (x) A ] 
+with d = diagonal scalar, A = axis vector
+and with interpolation coefficients ( a, b ) the 4 block are: a.b.wT, (1-a)b.wT, a.(1-b).wT, (1-a)(1-b)wT
+Each compressed element shall thus store: (a, b, d, A) since weigth can be distributed to d and A.
+This reduces the loading from 36 scalars down to 6 scalars, and the caculation
+        wT.V = [ d.1 - A (x) A ] V =  d.V + dot(A, V). A 
+        We only need to calculate this once for A = a . PT[i] + (1-a) . PT[i+1]
+        And redistribute to the two vectors: PT[j] += b.wT.A and PT[j+1] += (1-b).wT.A
+This can be done on the fly in mFUL.vecMul(), if we add a list of BlockOuterProduct elements to the matrix.
+This can speed up multiplication by a great deal. 
+The approach can be extended to others elements used extensively: SideSlidingLinks, SideLinks, etc.
+
+
+# Reporting:
+
+Export Cytosim's simulation world to Python
+
+https://www.boost.org/doc/libs/1_78_0/libs/python/doc/html/index.html
+https://www.boost.org/doc/libs/1_76_0/libs/python/doc/html/tutorial/index.html
+https://github.com/TNG/boost-python-examples
+
+
 # Examples:
 
   Would be great to revive some old models:
@@ -149,15 +178,16 @@ test write / read systematically on all cym files
 
 # Graphics:
 
-- Update OpenGL code: do not use any direct rendering method
+- Update OpenGL code: Matrix pipeline, State maintenance, Shaders
 - Improve control of whether bound Hands are hidden if fiber->disp->visible==0
-- use VBO to display each fiber with style=1 and 2
-- SimThread can store two simulation states, such as to be able to flip back-and-forth quickly.
+- SimThread could store two simulation states, such as to be able to flip back-and-forth quickly.
 - stereoscopic display for 3D
 
 # Misc:
 
 - Slider to change parameter value:
    - setup by a command in config.cym: slider actin:rigidity { range = 0, 1; }
+   can be done with ImGui?
 
 
+FJ Nedelec, 2022
