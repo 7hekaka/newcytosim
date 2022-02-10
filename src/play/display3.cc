@@ -151,7 +151,7 @@ void Display3::drawObjects(Simul const& sim)
 
 inline void Display3::drawPoint(Vector const& pos, float rad) const
 {
-    assert_true(glIsEnabled(GL_LIGHTING));
+    assert_enabled(GL_LIGHTING);
     drawObject(pos, rad, gle::sphere1);
 }
 
@@ -160,7 +160,7 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
-        assert_true(glIsEnabled(GL_LIGHTING));
+        assert_enabled(GL_LIGHTING);
         drawObject(pos, pixscale(dis->size), gle::sphere1);
     }
 }
@@ -177,7 +177,7 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
-        assert_true(glIsEnabled(GL_LIGHTING));
+        assert_enabled(GL_LIGHTING);
         dis->color.load_both();
         drawObject(pos, pixscale(dis->size), gle::blob);
     }
@@ -188,7 +188,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
-        assert_true(glIsEnabled(GL_LIGHTING));
+        assert_enabled(GL_LIGHTING);
         dis->color2.load_both();
         drawObject(pos, pixscale(dis->size), gle::blob);
     }

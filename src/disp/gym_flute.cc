@@ -93,7 +93,7 @@ namespace gym
         {
             assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
         }
-        assert_true(glIsEnabled(GL_VERTEX_ARRAY));
+        assert_enabled(GL_VERTEX_ARRAY);
         glVertexPointer(pts, GL_FLOAT, tot, (void*)((col+nor)*sizeof(float)));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

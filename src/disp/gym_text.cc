@@ -89,6 +89,17 @@ namespace gym
     }
     
     
+    // draw text at current raster position
+    void drawText(const char text[], void* font, float dx)
+    {
+        int L = 1;
+        int H = fontHeight(font);
+        int W = maxTextWidth(text, font, L);
+        // center text:
+        glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
+        bitmapString(text, font, H);
+    }
+    
     /**
      draw text at position `vec`, if this corresponds to a valid raster position
      */
@@ -106,12 +117,7 @@ namespace gym
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_ALPHA_TEST);
             glDisable(GL_LIGHTING);
-            int L = 1;
-            int H = fontHeight(font);
-            int W = maxTextWidth(text, font, L);
-            // center text:
-            glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
-            bitmapString(text, font, H);
+            drawText(text, font, dx);
             if ( depth ) glEnable(GL_DEPTH_TEST);
             if ( alpha ) glEnable(GL_ALPHA_TEST);
             if ( light ) glEnable(GL_LIGHTING);

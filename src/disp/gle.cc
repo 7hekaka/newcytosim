@@ -1356,7 +1356,7 @@ namespace gle
     
     void dualPassIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
     {
-        assert_true(glIsEnabled(GL_CULL_FACE));
+        assert_enabled(GL_CULL_FACE);
         glEnableClientState(GL_NORMAL_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
         glVertexPointer(3, GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
