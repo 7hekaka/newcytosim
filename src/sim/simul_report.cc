@@ -2804,7 +2804,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
  */
 size_t Simul::flagRing() const
 {
-    flagClusters(1, 1, 0);
+    flagClusters(1, 0, 0);
 
     typedef std::list<ObjectFlag> list_t;
     list_t ring;

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #ifndef FIBER_SET_H
 #define FIBER_SET_H
@@ -52,13 +52,13 @@ public:
     //--------------------------
 
     /// first Fiber
-    Fiber * first()            const { return static_cast<Fiber*>(pool_.front()); }
+    Fiber * first() const { return static_cast<Fiber*>(pool_.front()); }
     
     /// last Fiber
-    Fiber * last()             const { return static_cast<Fiber*>(pool_.back()); }
+    Fiber * last() const { return static_cast<Fiber*>(pool_.back()); }
     
     /// first Fiber in inventory
-    Fiber * firstID()          const { return static_cast<Fiber*>(inventory_.first()); }
+    Fiber * firstID() const { return static_cast<Fiber*>(inventory_.first()); }
 
     /// returns Fiber immediately following 'obj' in inventory
     Fiber * nextID(Fiber const* obj) const { return static_cast<Fiber*>(inventory_.next(obj)); }

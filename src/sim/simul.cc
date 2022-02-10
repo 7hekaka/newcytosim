@@ -295,13 +295,13 @@ void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 ObjectFlag Simul::setUniqueFlags() const
 {
     ObjectFlag f = 1;
-    for ( Fiber * F=fibers.first(); F; F=F->next() )
+    for ( Fiber * F = fibers.firstID(); F; F = fibers.nextID(F) )
         F->flag(f++);
-    for ( Solid * S=solids.first(); S; S=S->next() )
+    for ( Solid * S = solids.firstID(); S; S = solids.nextID(S) )
         S->flag(f++);
-    for ( Bead  * B=beads.first(); B; B=B->next() )
+    for ( Bead  * B = beads.firstID(); B; B = beads.nextID(B) )
         B->flag(f++);
-    for ( Sphere* O=spheres.first(); O; O=O->next() )
+    for ( Sphere* O = spheres.firstID(); O; O = spheres.nextID(O) )
         O->flag(f++);
     return f;
 }
