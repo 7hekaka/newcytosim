@@ -550,7 +550,6 @@ Property* Simul::newProperty(const std::string& cat, const std::string& nom, Glo
 
     if ( cat == "simul" )
     {
-        assert_true(prop);
         rename(nom);
         return &prop;
     }
