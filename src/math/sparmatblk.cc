@@ -10,12 +10,11 @@
 
 SparMatBlk::SparMatBlk()
 {
-    size_    = 0;
-    alloc_   = 0;
-    row_     = nullptr;
-    blocks_  = nullptr;
-    colidx_  = new size_t[2];
-    colidx_[0] = 0;
+    size_   = 0;
+    alloc_  = 0;
+    row_    = nullptr;
+    blocks_ = nullptr;
+    colidx_ = new size_t[2]();
 }
 
 
@@ -78,7 +77,7 @@ void SparMatBlk::Line::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
-        void * ptr = new_real(alc*SB+4);
+        void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+4);
         Block * blk_new  = new(ptr) Block[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
@@ -531,7 +530,7 @@ void SparMatBlk::consolidate()
     //std::cerr << "\nMatrixSparseBlock:consolidate with " << cnt << " blocks";
 
     free_real(blocks_);
-    real * ptr = new_real(cnt*SB);
+    real * ptr = new_real(cnt*sizeof(Block)/sizeof(real));
     blocks_ = new(ptr) Block[cnt];
     
     cnt = 0;
@@ -678,11 +677,11 @@ real SparMatBlk::Line::vecMul1D(const real* X) const
 vec2 SparMatBlk::Line::vecMul2D(const double* X) const
 {
     vec4 ss = setzero4();
-    const real* M = blk_[0];
-    const size_t* inx = inx_;
-    const real* end = blk_[rlen_];
+    Block const* blk = blk_;
+    Block const* end = blk_ + rlen_;
+    size_t const* inx = inx_;
     #pragma nounroll
-    for ( ; M < end; M += 4 )
+    for ( ; blk < end; ++blk )
     {
         vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
         ++inx;
@@ -692,7 +691,7 @@ vec2 SparMatBlk::Line::vecMul2D(const double* X) const
         //ss[1] += M[1] * xy[0];
         //ss[2] += M[2] * xy[1];
         //ss[3] += M[3] * xy[1];
-        ss = fmadd4(streamload4(M), permute4(xy, 0b1100), ss);
+        ss = fmadd4(blk->data0(), permute4(xy, 0b1100), ss);
     }
     // collapse result:
     return add2(getlo(ss), gethi(ss));
@@ -707,11 +706,11 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
     vec4 tt = setzero4();
     vec4 uu = setzero4();
     vec4 vv = setzero4();
-    const real* M = sbk_[0];
-    const size_t* inx = inx_;
-    const real* end = sbk_[rlen_-rlen_%4];
+    Block const* blk = sbk_;
+    Block const* end = sbk_ + (rlen_-rlen_%4);
+    size_t const* inx = inx_;
     #pragma nounroll
-    for ( ; M < end; M += 4*SB )
+    for ( ; blk < end; blk += 4, inx += 4 )
     {
         assert_true( inx[0] < inx[1] );
         assert_true( inx[1] < inx[2] );
@@ -720,34 +719,32 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
         vec4 xy1 = broadcast2(X+inx[1]);  // xy = { X Y }
         vec4 xy2 = broadcast2(X+inx[2]);  // xy = { X Y }
         vec4 xy3 = broadcast2(X+inx[3]);  // xy = { X Y }
-        inx += 4;
 #if TRANSPOSE_2D_BLOCKS
         //SX += M[0] * X + M[1] * Y;
         //SY += M[2] * X + M[3] * Y;
-        ss = fmadd4(streamload4(M   ), xy0, ss);
-        tt = fmadd4(streamload4(M+4 ), xy1, tt);
-        uu = fmadd4(streamload4(M+8 ), xy2, uu);
-        vv = fmadd4(streamload4(M+12), xy3, vv);
+        ss = fmadd4(blk[0].data0(), xy0, ss);
+        tt = fmadd4(blk[1].data0(), xy1, tt);
+        uu = fmadd4(blk[2].data0(), xy2, uu);
+        vv = fmadd4(blk[3].data0(), xy3, vv);
 #else
         //SX += M[0] * X + M[2] * Y;
         //SY += M[1] * X + M[3] * Y;
-        ss = fmadd4(streamload4(M   ), permute4(xy0, 0b1100), ss);
-        tt = fmadd4(streamload4(M+4 ), permute4(xy1, 0b1100), tt);
-        uu = fmadd4(streamload4(M+8 ), permute4(xy2, 0b1100), uu);
-        vv = fmadd4(streamload4(M+12), permute4(xy3, 0b1100), vv);
+        ss = fmadd4(blk[0].data0(), permute4(xy0, 0b1100), ss);
+        tt = fmadd4(blk[1].data0(), permute4(xy1, 0b1100), tt);
+        uu = fmadd4(blk[2].data0(), permute4(xy2, 0b1100), uu);
+        vv = fmadd4(blk[3].data0(), permute4(xy3, 0b1100), vv);
 #endif
     }
     ss = add4(add4(ss, tt), add4(uu, vv));
-    end = sbk_[rlen_];
+    end = sbk_ +rlen_;
     #pragma nounroll
-    for ( ; M < end; M += 4 )
+    for ( ; blk < end; ++blk, ++inx )
     {
         vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
-        ++inx;
 #if TRANSPOSE_2D_BLOCKS
-        ss = fmadd4(streamload4(M), xy, ss);
+        ss = fmadd4(blk[0].data0(), xy, ss);
 #else
-        ss = fmadd4(streamload4(M), permute4(xy, 0b1100), ss);
+        ss = fmadd4(blk[0].data0(), permute4(xy, 0b1100), ss);
 #endif
     }
     // collapse result:
@@ -768,11 +765,11 @@ vec4 SparMatBlk::Line::vecMul3D(const double* X) const
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    const real* M = blk_[0];
-    const size_t* inx = inx_;
-    const real* end = blk_[rlen_];
+    Block const* blk = blk_;
+    Block const* end = blk_ + rlen_;
+    size_t const* inx = inx_;
     #pragma nounroll
-    for ( ; M < end; M += 12 )
+    for ( ; blk < end; ++blk )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
@@ -780,9 +777,9 @@ vec4 SparMatBlk::Line::vecMul3D(const double* X) const
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        s0 = fmadd4(streamload4(M  ), xyz, s0);
-        s1 = fmadd4(streamload4(M+4), xyz, s1);
-        s2 = fmadd4(streamload4(M+8), xyz, s2);
+        s0 = fmadd4(blk->data0(), xyz, s0);
+        s1 = fmadd4(blk->data1(), xyz, s1);
+        s2 = fmadd4(blk->data2(), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     vec4 s3 = setzero4();
@@ -803,10 +800,9 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
     vec4 t1 = setzero4();
     vec4 t2 = setzero4();
 
-    static_assert(SB==12, "unexpected Block size");
-    const real* M = sbk_[0];
-    const size_t* inx = inx_;
-    const real* end = sbk_[rlen_-rlen_%2];
+    Block const* blk = sbk_;
+    Block const* end = sbk_ + (rlen_-rlen_%2);
+    size_t const* inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers
@@ -816,28 +812,28 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
          */
         // process blocks 2 by 2:
         #pragma nounroll
-        for ( ; M < end; M += 24 )
+        for ( ; blk < end; ++blk )
         {
             assert_true( inx[0] < inx[1] );
             vec4 A = loadu4(X+inx[0]);
             vec4 B = loadu4(X+inx[1]);
             inx += 2;
             // multiply each line of the two blocks:
-            s0 = fmadd4(streamload4(M  ), A, s0);
-            s1 = fmadd4(streamload4(M+4), A, s1);
-            s2 = fmadd4(streamload4(M+8), A, s2);
-            t0 = fmadd4(streamload4(M+SB), B, t0);
-            t1 = fmadd4(streamload4(M+(SB+4)), B, t1);
-            t2 = fmadd4(streamload4(M+(SB+8)), B, t2);
+            s0 = fmadd4(blk->data0(), A, s0);
+            s1 = fmadd4(blk->data1(), A, s1);
+            s2 = fmadd4(blk->data2(), A, s2);
+            ++blk;
+            t0 = fmadd4(blk->data0(), B, t0);
+            t1 = fmadd4(blk->data1(), B, t1);
+            t2 = fmadd4(blk->data2(), B, t2);
         }
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
         s2 = add4(s2, t2);
     }
     // process remaining blocks:
-    end = sbk_[rlen_];
     #pragma nounroll
-    for ( ; M < end; M += 12 )
+    for ( end = sbk_ + rlen_ ; blk < end; ++blk )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
@@ -845,9 +841,9 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        s0 = fmadd4(streamload4(M  ), xyz, s0);
-        s1 = fmadd4(streamload4(M+4), xyz, s1);
-        s2 = fmadd4(streamload4(M+8), xyz, s2);
+        s0 = fmadd4(blk->data0(), xyz, s0);
+        s1 = fmadd4(blk->data1(), xyz, s1);
+        s2 = fmadd4(blk->data2(), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     t0 = setzero4();
@@ -871,9 +867,9 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
     vec4 u1 = setzero4();
     vec4 u2 = setzero4();
 
-    const real* M = sbk_[0];
-    const size_t* inx = inx_;
-    const real* end = sbk_[rlen_-rlen_%3];
+    Block const* blk = sbk_;
+    Block const* end = sbk_ + (rlen_-rlen_%3);
+    size_t const* inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers
@@ -883,7 +879,7 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
          */
         // process blocks 3 by 3:
         #pragma nounroll
-        for ( ; M < end; M += 3*SB )
+        for ( ; blk < end; blk += 3 )
         {
             assert_true( inx[0] < inx[1] );
             assert_true( inx[1] < inx[2] );
@@ -892,24 +888,23 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
             vec4 C = loadu4(X+inx[2]);
             inx += 3;
             // multiply each line of the two blocks:
-            s0 = fmadd4(streamload4(M   ), A, s0);
-            s1 = fmadd4(streamload4(M+4 ), A, s1);
-            s2 = fmadd4(streamload4(M+8 ), A, s2);
-            t0 = fmadd4(streamload4(M+ SB), B, t0);
-            t1 = fmadd4(streamload4(M+(SB+4)), B, t1);
-            t2 = fmadd4(streamload4(M+(SB+8)), B, t2);
-            u0 = fmadd4(streamload4(M+ SB*2), C, u0);
-            u1 = fmadd4(streamload4(M+(SB*2+4)), C, u1);
-            u2 = fmadd4(streamload4(M+(SB*2+8)), C, u2);
+            s0 = fmadd4(blk[0].data0(), A, s0);
+            s1 = fmadd4(blk[0].data1(), A, s1);
+            s2 = fmadd4(blk[0].data2(), A, s2);
+            t0 = fmadd4(blk[1].data0(), B, t0);
+            t1 = fmadd4(blk[1].data1(), B, t1);
+            t2 = fmadd4(blk[1].data2(), B, t2);
+            u0 = fmadd4(blk[2].data0(), C, u0);
+            u1 = fmadd4(blk[2].data1(), C, u1);
+            u2 = fmadd4(blk[2].data2(), C, u2);
         }
         s0 = add4(s0, add4(t0, u0));
         s1 = add4(s1, add4(t1, u1));
         s2 = add4(s2, add4(t2, u2));
     }
     // process remaining blocks:
-    end = sbk_[rlen_];
     #pragma nounroll
-    for ( ; M < end; M += 12 )
+    for ( end = sbk_ + rlen_; blk < end; ++blk )
     {
         vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
@@ -917,9 +912,9 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        s0 = fmadd4(streamload4(M  ), xyz, s0);
-        s1 = fmadd4(streamload4(M+4), xyz, s1);
-        s2 = fmadd4(streamload4(M+8), xyz, s2);
+        s0 = fmadd4(blk->data0(), xyz, s0);
+        s1 = fmadd4(blk->data1(), xyz, s1);
+        s2 = fmadd4(blk->data2(), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
     t0 = setzero4();
@@ -938,15 +933,15 @@ vec4 SparMatBlk::Line::vecMul4D(const double* X) const
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
 
+    Block const* blk = blk_;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    for ( size_t n = 0; n < rlen_; ++n )
+    for ( size_t n = 0; n < rlen_; ++n, ++blk )
     {
-        real const* M = blk_[n];
-        const vec4 xyz = load4(X+inx_[n]);  // xyzt = { X0 X1 X2 X3 }
-        s0 = fmadd4(streamload4(M   ), xyz, s0);
-        s1 = fmadd4(streamload4(M+ 4), xyz, s1);
-        s2 = fmadd4(streamload4(M+ 8), xyz, s2);
-        s3 = fmadd4(streamload4(M+12), xyz, s3);
+        const vec4 xx = load4(X+inx_[n]);  // xyzt = { X0 X1 X2 X3 }
+        s0 = fmadd4(blk->data0(), xx, s0);
+        s1 = fmadd4(blk->data1(), xx, s1);
+        s2 = fmadd4(blk->data2(), xx, s2);
+        s3 = fmadd4(blk->data3(), xx, s3);
     }
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));

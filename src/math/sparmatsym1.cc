@@ -34,13 +34,12 @@ SparMatSym1::SparMatSym1()
     diagon_ = nullptr;
 #if SPARMAT1_COMPACTED
     nmax_ = 0;
-    off_  = new unsigned[2];
+    off_  = new unsigned[2]();
     ija_  = nullptr;
     elm_  = nullptr;
 #endif
 #if SPARMAT1_USES_COLNEXT
-    colidx_ = new size_t[2];
-    colidx_[0] = 0;
+    colidx_ = new size_t[2]();
 #endif
 }
 

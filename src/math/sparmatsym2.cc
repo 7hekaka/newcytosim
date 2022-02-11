@@ -40,8 +40,7 @@ SparMatSym2::SparMatSym2()
     valDSS_ = nullptr;
 #endif
 #if SPARMAT2_USES_COLNEXT
-    colidx_ = new size_t[2];
-    colidx_[0] = 0;
+    colidx_ = new size_t[2]();
 #endif
 }
 

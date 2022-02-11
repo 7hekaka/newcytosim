@@ -12,9 +12,12 @@
 /*
  This matrix can use AVX instructions if 'real == double'
  */
-#ifdef __AVX__
-#  define MATRIX22_USES_AVX REAL_IS_DOUBLE
+#if defined(__AVX__) && REAL_IS_DOUBLE
 #  include "simd.h"
+#  define MATRIX22_USES_AVX 1
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+#  include "simd_float.h"
+#  define MATRIX22_USES_AVX 0
 #else
 #  define MATRIX22_USES_AVX 0
 #endif
@@ -161,10 +164,16 @@ public:
     }
     
     /// conversion to pointer of real
-    operator real const*() const { return val; }
+    //operator real const*() const { return val; }
 
     /// return modifiable pointer of 'real'
     real* data() { return val; }
+
+#if defined(__AVX__) && REAL_IS_DOUBLE
+    vec4 data0() const { return streamload4(val); }
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+    vec4f data0() const { return streamload4f(val); }
+#endif
 
     /// return unmodifiable pointer of real
     real const* data() const { return val; }

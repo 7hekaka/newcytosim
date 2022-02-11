@@ -29,8 +29,7 @@ SparMatSymBlk::SparMatSymBlk()
     size_    = 0;
     alloc_   = 0;
     column_  = nullptr;
-    colidx_  = new size_t[2];
-    colidx_[0] = 0;
+    colidx_  = new size_t[2]();
 }
 
 
@@ -80,7 +79,7 @@ void SparMatSymBlk::deallocate()
 
 SparMatSymBlk::Column::Column()
 {
-    size_ = 0;
+    nbb_ = 0;
     allo_ = 0;
     inx_ = nullptr;
     blk_ = nullptr;
@@ -105,7 +104,7 @@ void SparMatSymBlk::Column::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
-        void * ptr = new_real(alc*SB+4);
+        void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+4);
         Block * blk_new  = new(ptr) Block[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
@@ -114,14 +113,14 @@ void SparMatSymBlk::Column::allocate(size_t alc)
 
         if ( inx_ )
         {
-            for ( size_t n = 0; n < size_; ++n )
+            for ( size_t n = 0; n < nbb_; ++n )
                 inx_new[n] = inx_[n];
             free(inx_);
         }
 
         if ( blk_ )
         {
-            for ( size_t n = 0; n < size_; ++n )
+            for ( size_t n = 0; n < nbb_; ++n )
                 blk_new[n] = blk_[n];
             free_real(blk_);
         }
@@ -143,7 +142,7 @@ void SparMatSymBlk::Column::deallocate()
     inx_ = nullptr;
     blk_ = nullptr;
     allo_ = 0;
-    size_ = 0;
+    nbb_ = 0;
 }
 
 
@@ -153,12 +152,12 @@ void SparMatSymBlk::Column::operator =(SparMatSymBlk::Column & col)
     free(inx_);
     free_real(blk_);
 
-    size_ = col.size_;
+    nbb_ = col.nbb_;
     allo_ = col.allo_;
     inx_ = col.inx_;
     blk_ = col.blk_;
     
-    col.size_ = 0;
+    col.nbb_ = 0;
     col.allo_ = 0;
     col.inx_ = nullptr;
     col.blk_ = nullptr;
@@ -170,12 +169,12 @@ void SparMatSymBlk::Column::operator =(SparMatSymBlk::Column & col)
 SparMatSymBlk::Block& SparMatSymBlk::Column::block(size_t ii, size_t jj)
 {
     assert_true( ii >= jj );
-    if ( size_ > 0 )
+    if ( nbb_ > 0 )
     {
         if ( inx_[0] == ii )
             return blk_[0];
         /* This is a silly search that could be optimized */
-        for ( size_t n = 1; n < size_; ++n )
+        for ( size_t n = 1; n < nbb_; ++n )
             if ( inx_[n] == ii )
                 return blk_[n];
     }
@@ -187,18 +186,18 @@ SparMatSymBlk::Block& SparMatSymBlk::Column::block(size_t ii, size_t jj)
         blk_[0].reset();
         if ( ii == jj )
         {
-            size_ = 1;
+            nbb_ = 1;
             return blk_[0];
         }
         //add the requested term:
         inx_[1] = ii;
         blk_[1].reset();
-        size_ = 2;
+        nbb_ = 2;
         return blk_[1];
     }
     
     // add the requested term last:
-    size_t n = size_;
+    size_t n = nbb_;
     
     // allocate space for new Element if necessary:
     if ( n >= allo_ )
@@ -207,7 +206,7 @@ SparMatSymBlk::Block& SparMatSymBlk::Column::block(size_t ii, size_t jj)
     assert_true( n < allo_ );
     inx_[n] = ii;
     blk_[n].reset();
-    size_ = n + 1;
+    nbb_ = n + 1;
     
     //printColumn(jj);
     return blk_[n];
@@ -216,18 +215,18 @@ SparMatSymBlk::Block& SparMatSymBlk::Column::block(size_t ii, size_t jj)
 
 void SparMatSymBlk::Column::reset()
 {
-    size_ = 0;
+    nbb_ = 0;
 }
 
 SparMatSymBlk::Block& SparMatSymBlk::diag_block(size_t ii)
 {
     assert_true( ii < size_ );
     Column & col = column_[ii];
-    if ( col.size_ == 0 )
+    if ( col.nbb_ == 0 )
     {
         //fprintf(stderr, "new diagonal element for column %i\n", ii);
         col.allocate(1);
-        col.size_ = 1;
+        col.nbb_ = 1;
         // put diagonal term always first:
         col.inx_[0] = ii;
         col.blk_[0].reset();
@@ -283,7 +282,7 @@ bool SparMatSymBlk::isNotZero() const
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         Column & col = column_[jj];
-        for ( size_t n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
             if ( col[n] != 0.0 )
                 return true;
     }
@@ -297,7 +296,7 @@ void SparMatSymBlk::scale(const real alpha)
     for ( size_t jj = 0; jj < size_; ++jj )
     {
         Column & col = column_[jj];
-        for ( size_t n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
             col[n].scale(alpha);
     }
 }
@@ -316,11 +315,11 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd,
     for ( size_t jj = start; jj < end; jj += S_BLOCK_SIZE )
     {
         Column & col = column_[jj];
-        if ( col.size_ > 0 )
+        if ( col.nbb_ > 0 )
         {
             assert_true(col.inx_[0] == jj);
             col[0].addto_symm(mat+(1+ldd)*jj-off, ldd);
-            for ( size_t n = 1; n < col.size_; ++n )
+            for ( size_t n = 1; n < col.nbb_; ++n )
             {
                 size_t ii = col.inx_[n];
                 assert_true(ii > jj);
@@ -349,15 +348,15 @@ void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd,
     for ( size_t jj = start; jj < end; jj += S_BLOCK_SIZE )
     {
         Column & col = column_[jj];
-        if ( col.size_ > 0 )
+        if ( col.nbb_ > 0 )
         {
             assert_true(col.inx_[0] == jj);
             col[0].addto_lower(mat+(1+ldd)*jj-off, ldd, alpha);
-            for ( size_t n = 1; n < col.size_; ++n )
+            for ( size_t n = 1; n < col.nbb_; ++n )
             {
                 size_t ii = col.inx_[n];
                 assert_true(ii > jj);
-                if ((ii <= jj+rank) & (ii < end))
+                if (( ii < end ) & ( ii <= jj+rank ))
                 {
                     //fprintf(stderr, "SMSB %4i %4i % .4f\n", ii, jj, a);
                     col[n].addto(mat+(ii+ldd*jj)-off, ldd, alpha);
@@ -385,13 +384,13 @@ void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
     for ( size_t jj = start; jj < end; jj += S_BLOCK_SIZE )
     {
         Column & col = column_[jj];
-        if ( col.size_ > 0 )
+        if ( col.nbb_ > 0 )
         {
             size_t j = ( jj - start ) / S_BLOCK_SIZE;
             assert_true(col.inx_[0] == jj);
             // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
             mat[j+ldd*j] += alpha * col[0].trace();  // diagonal term
-            for ( size_t n = 1; n < col.size_; ++n )
+            for ( size_t n = 1; n < col.nbb_; ++n )
             {
                 size_t ii = col.inx_[n];
                 // assuming lower triangle is stored:
@@ -418,7 +417,7 @@ int SparMatSymBlk::bad() const
     for ( size_t jj = 0; jj < size_; jj += S_BLOCK_SIZE )
     {
         Column & col = column_[jj];
-        for ( size_t n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
         {
             if ( col.inx_[n] >= size_ ) return 2;
             if ( col.inx_[n] <= jj )    return 3;
@@ -437,7 +436,7 @@ size_t SparMatSymBlk::nbElements(size_t start, size_t stop, size_t& alc) const
     size_t cnt = 0;
     for ( size_t i = start; i < stop; i += S_BLOCK_SIZE )
     {
-        cnt += column_[i].size_;
+        cnt += column_[i].nbb_;
         alc += column_[i].allo_;
     }
     return cnt;
@@ -491,7 +490,7 @@ void SparMatSymBlk::printSparse(std::ostream& os, real inf, size_t start, size_t
         Column & col = column_[jj];
         if ( col.isNotZero() )
             os << "% column " << jj << "\n";
-        for ( size_t n = 0 ; n < col.size_ ; ++n )
+        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
             printSparseBlock(os, inf, col.blk_[n], col.inx_[n], jj);
     }
     os.precision(p);
@@ -505,7 +504,7 @@ void SparMatSymBlk::printSummary(std::ostream& os, size_t start, size_t stop)
     for ( size_t j = start; j < stop; ++j )
         if ( column_[j].isNotZero() )
         {
-            os << "\n   " << j << "   " << column_[j].size_;
+            os << "\n   " << j << "   " << column_[j].nbb_;
             os << " index " << colidx_[j];
         }
     std::endl(os);
@@ -514,7 +513,7 @@ void SparMatSymBlk::printSummary(std::ostream& os, size_t start, size_t stop)
 
 void SparMatSymBlk::Column::printBlocks(std::ostream& os) const
 {
-    for ( size_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < nbb_; ++n )
         os << " " << inx_[n] << " " << blk_[n];
 }
 
@@ -560,17 +559,17 @@ static int compareSMSBElement(const void * A, const void * B)
  */
 void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
 {
-    assert_true( size_ <= tmp_size );
-    for ( size_t i = 1; i < size_; ++i )
+    assert_true( nbb_ <= tmp_size );
+    for ( size_t i = 1; i < nbb_; ++i )
     {
         blk_[i].store(tmp[i].blk);
         tmp[i].inx = inx_[i];
     }
     
     //std::clog << "sizeof(SparMatSymBlk::Element) " << sizeof(Element) << "\n";
-    qsort(tmp+1, size_-1, sizeof(Element), &compareSMSBElement);
+    qsort(tmp+1, nbb_-1, sizeof(Element), &compareSMSBElement);
     
-    for ( size_t i = 1; i < size_; ++i )
+    for ( size_t i = 1; i < nbb_; ++i )
     {
         blk_[i].load(tmp[i].blk);
         inx_[i] = tmp[i].inx;
@@ -601,14 +600,14 @@ void SparMatSymBlk::sortElements()
     {
         assert_true( j < size_ );
         Column & col = column_[j];
-        assert_true( col.size_ > 0 );
-        //std::clog << "SMSB column " << j << " has " << col.size_ << " elements\n";
+        assert_true( col.nbb_ > 0 );
+        //std::clog << "SMSB column " << j << " has " << col.nbb_ << " elements\n";
         
         // order the elements within the column:
-        if ( col.size_ > 2 )
+        if ( col.nbb_ > 2 )
         {
-            if ( tmp_size < col.size_ )
-                tmp_size = newElements(tmp, col.size_);
+            if ( tmp_size < col.nbb_ )
+                tmp_size = newElements(tmp, col.nbb_);
             col.sortElements(tmp, tmp_size);
         }
         
@@ -618,7 +617,7 @@ void SparMatSymBlk::sortElements()
         assert_true( col.inx_[0] == j );
         col.blk_[0].copy_lower();
 #ifndef NDEBUG
-        for ( size_t n = 1 ; n < col.size_ ; ++n )
+        for ( size_t n = 1 ; n < col.nbb_ ; ++n )
         {
             const size_t i = col.inx_[n];
             assert_true( i < size_ );
@@ -666,12 +665,12 @@ bool SparMatSymBlk::prepareForMultiply(int)
 #if ( S_BLOCK_SIZE == 1 )
 void SparMatSymBlk::Column::vecMulAdd1D(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     const real X0 = X[jj];
     real D = blk_[0].value();
     real Y0 = Y[jj] + D * X0;
     assert_true(inx_[0]==jj);
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
         const real M = blk_[n].value();
@@ -686,12 +685,12 @@ void SparMatSymBlk::Column::vecMulAdd1D(const real* X, real* Y, size_t jj) const
 #if ( S_BLOCK_SIZE == 2 )
 void SparMatSymBlk::Column::vecMulAdd2D(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     const Vector2 xx(X+jj);
     assert_true(inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
     Vector2 yy = blk_[0].vecmul(xx);
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
         Block const& M = blk_[n];
@@ -705,12 +704,12 @@ void SparMatSymBlk::Column::vecMulAdd2D(const real* X, real* Y, size_t jj) const
 #if ( S_BLOCK_SIZE == 3 )
 void SparMatSymBlk::Column::vecMulAdd3D(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     const Vector3 xxx(X+jj);
     assert_true(inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
     Vector3 yyy = blk_[0].vecmul(xxx);
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
         Block const& M = blk_[n];
@@ -725,12 +724,12 @@ void SparMatSymBlk::Column::vecMulAdd3D(const real* X, real* Y, size_t jj) const
 #if ( S_BLOCK_SIZE == 4 )
 void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     const Vector4 xxxx(X+jj);
     assert_true(inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
     Vector4 yyyy = blk_[0].vecmul(xxxx);
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
         Block const& M = blk_[n];
@@ -748,46 +747,32 @@ void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_SSE && !REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
-    printf("SMSB %lu : %lu\n", jj, size_);
     // load 3x3 matrix diagonal element into 3 vectors:
-    float const* D = blk_[0];
+    Block const& D = blk_[0];
     
     //multiply with the symmetrized block, assuming it has been symmetrized:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
     // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-    const vec4f tt = loadu4f(X+jj);
-# if ( BLD == 4 )
-    vec4f s0 = mul4f(streamload4f(D  ), tt);
-    vec4f s1 = mul4f(streamload4f(D+4), tt);
-    vec4f s2 = mul4f(streamload4f(D+8), tt);
-# else
-    vec4f s0 = mul4f(load3fZ(D      ), tt);
-    vec4f s1 = mul4f(load3fZ(D+BLD  ), tt);
-    vec4f s2 = mul4f(load3fZ(D+BLD*2), tt);
-# endif
-    const vec4f x0 = broadcastXf(tt);
-    const vec4f x1 = broadcastYf(tt);
-    const vec4f x2 = broadcastZf(tt);
+    const vec4f xxx = loadu4f(X+jj);
+    vec4f s0 = mul4f(D.data0(), xxx);
+    vec4f s1 = mul4f(D.data1(), xxx);
+    vec4f s2 = mul4f(D.data2(), xxx);
+    const vec4f x0 = clear4th(broadcastXf(xxx));
+    const vec4f x1 = clear4th(broadcastYf(xxx));
+    const vec4f x2 = clear4th(broadcastZf(xxx));
 
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
-        float const* M = blk_[n];
-# if ( BLD == 4 )
-        const vec4f m012 = streamload4f(M  );
-        const vec4f m345 = streamload4f(M+4);
-        const vec4f m678 = streamload4f(M+8);
-# else
-        const vec4f m012 = load3fZ(M      );
-        const vec4f m345 = load3fZ(M+BLD  );
-        const vec4f m678 = load3fZ(M+BLD*2);
-# endif
+        const vec4f m012 = blk_[n].data0();
+        const vec4f m345 = blk_[n].data1();
+        const vec4f m678 = blk_[n].data2();
         // multiply with the full block:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -810,10 +795,14 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
      s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
      to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
      */
+    s0 = clear4th(s0); // s0[3] is garbage
+    s1 = clear4th(s1); // s1[3] is garbage
+    s2 = clear4th(s2); // s2[3] is garbage
     vec4f s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
     s0 = add4f(catshift2f(s0, s2), blend22f(s0, s2));
+    assert_true(s0[3] == 0);
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
 }
 #endif
@@ -822,64 +811,48 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_SSE && !REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
-    //std::cout << blk_[0].to_string(7,1); printf(" MSSB %lu : %lu\n", jj, size_);
+    //std::cout << blk_[0].to_string(7,1); printf(" MSSB %lu : %lu\n", jj, nbb_);
     // load 3x3 matrix diagonal element into 3 vectors:
-    float const* D = blk_[0];
+    Block const& D = blk_[0];
     
     //multiply with the diagonal block, assuming it has been symmetrized:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
     // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-    const vec4f tt = loadu4f(X+jj);
-# if ( BLD == 4 )
-    vec4f s0 = mul4f(streamload4f(D  ), tt);
-    vec4f s1 = mul4f(streamload4f(D+4), tt);
-    vec4f s2 = mul4f(streamload4f(D+8), tt);
-# else
-    vec4f s0 = mul4f(load3fZ(D      ), tt);
-    vec4f s1 = mul4f(load3fZ(D+BLD  ), tt);
-    vec4f s2 = mul4f(load3fZ(D+BLD*2), tt);
-# endif
+    const vec4f xxx = loadu4f(X+jj);
+    vec4f s0 = mul4f(D.data0(), xxx);
+    vec4f s1 = mul4f(D.data1(), xxx);
+    vec4f s2 = mul4f(D.data2(), xxx);
     
-    if ( size_ > 1 )
+    if ( nbb_ > 1 )
     {
-        const vec4f x0 = broadcastXf(tt);
-        const vec4f x1 = broadcastYf(tt);
-        const vec4f x2 = broadcastZf(tt);
+        const vec4f x0 = clear4th(broadcastXf(xxx));
+        const vec4f x1 = clear4th(broadcastYf(xxx));
+        const vec4f x2 = clear4th(broadcastZf(xxx));
 
         size_t n = 1;
         {
-            const size_t end = 1 + 2 * ((size_-1)/2);
-            
+            const size_t end = 1 + 2 * ((nbb_-1)/2);
             // process 2 by 2
-#pragma nounroll
+            #pragma nounroll
             for ( ; n < end; n += 2 )
             {
-                const size_t ii = inx_[n  ];
+                const size_t ii = inx_[n];
+                const vec4f m012 = blk_[n].data0();
+                const vec4f m345 = blk_[n].data1();
+                const vec4f m678 = blk_[n].data2();
+
                 const size_t kk = inx_[n+1];
+                const vec4f p012 = blk_[n+1].data0();
+                const vec4f p345 = blk_[n+1].data1();
+                const vec4f p678 = blk_[n+1].data2();
+
                 assert_true( ii < kk );
-                float const* M = blk_[n  ];
-                float const* P = blk_[n+1];
                 vec4f z = loadu4f(Y+ii);
                 vec4f t = loadu4f(Y+kk);
-# if ( BLD == 4 )
-                const vec4f m012 = streamload4f(M);
-                const vec4f p012 = streamload4f(P);
-                const vec4f m345 = streamload4f(M+4);
-                const vec4f p345 = streamload4f(P+4);
-                const vec4f m678 = streamload4f(M+8);
-                const vec4f p678 = streamload4f(P+8);
-# else
-                const vec4f m012 = load3fZ(M);
-                const vec4f p012 = load3fZ(P);
-                const vec4f m345 = load3fZ(M+BLD);
-                const vec4f p345 = load3fZ(P+BLD);
-                const vec4f m678 = load3fZ(M+BLD*2);
-                const vec4f p678 = load3fZ(P+BLD*2);
-# endif
                 // multiply with the full block:
                 z = fmadd4f(m012, x0, z);
                 t = fmadd4f(p012, x0, t);
@@ -902,19 +875,12 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
         
         // process remaining blocks
 #pragma nounroll
-        for ( ; n < size_; ++n )
+        for ( ; n < nbb_; ++n )
         {
             const size_t ii = inx_[n];
-            float const* M = blk_[n];
-# if ( BLD == 4 )
-            const vec4f m012 = streamload4f(M  );
-            const vec4f m345 = streamload4f(M+4);
-            const vec4f m678 = streamload4f(M+8);
-# else
-            const vec4f m012 = load3fZ(M      );
-            const vec4f m345 = load3fZ(M+BLD  );
-            const vec4f m678 = load3fZ(M+BLD*2);
-# endif
+            const vec4f m012 = blk_[n].data0();
+            const vec4f m345 = blk_[n].data1();
+            const vec4f m678 = blk_[n].data2();
             // multiply with the full block:
             //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
             //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -934,15 +900,18 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
             s2 = fmadd4f(m678, xyz, s2);
         }
     }
-    
     /* finally sum horizontally:
      s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
      to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
      */
+    s0 = clear4th(s0); // s0[3] is garbage
+    s1 = clear4th(s1); // s1[3] is garbage
+    s2 = clear4th(s2); // s2[3] is garbage
     vec4f s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
     s0 = add4f(catshift2f(s0, s2), blend22f(s0, s2));
+    assert_true(s0[3] == 0);
     storeu4f(Y+jj, add4f(loadu4f(Y+jj), s0));
 }
 #endif
@@ -954,7 +923,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
 #if ( S_BLOCK_SIZE == 2 ) && defined(__SSE3__) && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     vec2 x0, x1;
     vec2 yy = load2(Y+jj);
     {
@@ -965,7 +934,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t j
         x1 = unpackhi2(xx, xx);
         
         // load 2x2 matrix element into 2 vectors:
-        double const* D = blk_[0];
+        double const* D = blk_->data();
         //assume the block is already symmetrized:
         // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
         // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
@@ -974,13 +943,13 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t j
     }
     
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
         vec2 xx = load2(X+ii);
         
         // load 2x2 matrix element into 2 vectors:
-        double const* M = blk_[n];
+        double const* M = blk_[n].data();
         vec2 m01 = load2(M);
         vec2 m23 = load2(M+2);
         
@@ -1007,7 +976,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t j
 #if ( S_BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
     // xy = { X0 X1 X0 X1 }
     vec4 xy = broadcast2(X+jj);
@@ -1017,7 +986,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
     
     // yyyy = { Y0 Y0 Y1 Y1 }
     // load 2x2 matrix element into 2 vectors:
-    vec4 ss = mul4(streamload4(blk_[0]), xy);
+    vec4 ss = mul4(blk_[0].data0(), xy);
 
     //const real X0 = X[jj  ];
     //const real X1 = X[jj+1];
@@ -1025,10 +994,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
     const vec4 xxyy = permute4(xy, 0b1100);
 
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t& ii = inx_[n];
-        vec4 mat = streamload4(blk_[n]);      // load 2x2 matrix
+        vec4 mat = blk_[n].data0();     // load 2x2 matrix
         vec4 yy = load2Z(Y+ii);         // yy = { Y0 Y1 0 0 }
         vec4 xx = broadcast2(X+ii);     // xx = { X0 X1 X0 X1 }
 
@@ -1067,15 +1036,15 @@ static inline void multiply2D(double const* X, double* Y, size_t ii, vec4 const&
 #if ( S_BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
     vec4 xyxy = broadcast2(X+jj);
-    vec4 ss = mul4(streamload4(blk_[0]), xyxy);
+    vec4 ss = mul4(blk_[0].data0(), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
 
     size_t n = 1;
-    const size_t end = 1 + 2 * ((size_-1)/2);
+    const size_t end = 1 + 2 * ((nbb_-1)/2);
     // process 2 by 2:
     #pragma nounroll
     for ( ; n < end; n += 2 )
@@ -1087,8 +1056,8 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, inx_[n  ], streamload4(blk_[n  ]), xxyy, ss);
-        multiply2D(X, Y, inx_[n+1], streamload4(blk_[n+1]), xxyy, s1);
+        multiply2D(X, Y, inx_[n  ], blk_[n  ].data0(), xxyy, ss);
+        multiply2D(X, Y, inx_[n+1], blk_[n+1].data0(), xxyy, s1);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
@@ -1096,8 +1065,8 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
         const size_t i0 = inx_[n  ];
         const size_t i1 = inx_[n+1];
         assert_true( i0 < i1 );
-        vec4 mat0 = streamload4(blk_[n  ]);
-        vec4 mat1 = streamload4(blk_[n+1]);
+        vec4 mat0 = blk_[n  ].data0();
+        vec4 mat1 = blk_[n+1].data0();
         vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
         vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
         ss = fmadd4(mat0, broadcast2(X+i0), ss);
@@ -1110,8 +1079,8 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
     ss = add4(ss, s1);
     // process remaining blocks:
     #pragma nounroll
-    for ( ; n < size_; ++n )
-        multiply2D(X, Y, inx_[n], streamload4(blk_[n]), xxyy, ss);
+    for ( ; n < nbb_; ++n )
+        multiply2D(X, Y, inx_[n], blk_[n].data0(), xxyy, ss);
     /* finally horizontally sum ss = { SX SX SY SY } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1123,17 +1092,17 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
 #if ( S_BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
     vec4 xyxy = broadcast2(X+jj);
-    vec4 ss = mul4(streamload4(blk_[0]), xyxy);
+    vec4 ss = mul4(blk_[0].data0(), xyxy);
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
 
     size_t n = 1;
-    const size_t end = 1 + 4 * ((size_-1)/4);
+    const size_t end = 1 + 4 * ((nbb_-1)/4);
     // process 4 by 4:
     #pragma nounroll
     for ( ; n < end; n += 4 )
@@ -1145,10 +1114,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, inx_[n  ], streamload4(blk_[n  ]), xxyy, ss);
-        multiply2D(X, Y, inx_[n+1], streamload4(blk_[n+1]), xxyy, s1);
-        multiply2D(X, Y, inx_[n+2], streamload4(blk_[n+2]), xxyy, s2);
-        multiply2D(X, Y, inx_[n+3], streamload4(blk_[n+3]), xxyy, s3);
+        multiply2D(X, Y, inx_[n  ], blk_[n  ].data0(), xxyy, ss);
+        multiply2D(X, Y, inx_[n+1], blk_[n+1].data0(), xxyy, s1);
+        multiply2D(X, Y, inx_[n+2], blk_[n+2].data0(), xxyy, s2);
+        multiply2D(X, Y, inx_[n+3], blk_[n+3].data0(), xxyy, s3);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
@@ -1160,10 +1129,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
         const size_t i1 = inx_[n+1];
         const size_t i2 = inx_[n+2];
         const size_t i3 = inx_[n+3];
-        vec4 mat0 = streamload4(blk_[n  ]);
-        vec4 mat1 = streamload4(blk_[n+1]);
-        vec4 mat2 = streamload4(blk_[n+2]);
-        vec4 mat3 = streamload4(blk_[n+3]);
+        vec4 mat0 = blk_[n  ].data0();
+        vec4 mat1 = blk_[n+1].data0();
+        vec4 mat2 = blk_[n+2].data0();
+        vec4 mat3 = blk_[n+3].data0();
         vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
         vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
         vec4 u2 = fmadd4(mat2, xxyy, load2Z(Y+i2));
@@ -1182,8 +1151,8 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
     ss = add4(add4(ss,s1), add4(s2,s3));
     // process remaining blocks:
     #pragma nounroll
-    for ( ; n < size_; ++n )
-        multiply2D(X, Y, inx_[n], streamload4(blk_[n]), xxyy, ss);
+    for ( ; n < nbb_; ++n )
+        multiply2D(X, Y, inx_[n], blk_[n].data0(), xxyy, ss);
     /* finally sum ss = { S0 S0 S1 S1 } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1195,10 +1164,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
     // load 3x3 matrix diagonal element into 3 vectors:
-    double const* D = blk_[0];
+    Block const& D = blk_[0];
     
     //multiply with the symmetrized block, assuming it has been symmetrized:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
@@ -1208,45 +1177,36 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
     vec4 s0, s1, s2;
     vec4 x0, x1, x2;
     {
-        vec4 tt = loadu4(X+jj);
-# if ( BLD == 4 )
-        s0 = mul4(streamload4(D  ), tt);
-        s1 = mul4(streamload4(D+4), tt);
-        s2 = mul4(streamload4(D+8), tt);
-# else
-        s0 = mul4(load3(D      ), tt);
-        s1 = mul4(load3(D+BLD  ), tt);
-        s2 = mul4(load3(D+BLD*2), tt);
-# endif
+        vec4 xxx = load3Z(X+jj);
+        s0 = mul4(D.data0(), xxx);
+        s1 = mul4(D.data1(), xxx);
+        s2 = mul4(D.data2(), xxx);
         // sum non-diagonal elements:
 #if ( 0 )
         x0 = broadcast1(X+jj);
         x1 = broadcast1(X+jj+1);
         x2 = broadcast1(X+jj+2);
 #else
-        vec4 p = swap2f128(tt);
-        vec4 l = blend22(tt, p);
-        vec4 u = blend22(p, tt);
-        x0 = duplo4(l);
-        x1 = duphi4(l);
-        x2 = duplo4(u);
-    }
+        x0 = swap2f128(xxx);
+        x1 = blend22(xxx, x0);
+        x2 = blend22(x0, xxx);
+        x0 = duplo4(x1);
+        x1 = duphi4(x1);
+        x2 = duplo4(x2);
 #endif
+        // zero out the 4th terms:
+        x0 = clear4th(x0);
+        x1 = clear4th(x1);
+        x2 = clear4th(x2);
+    }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
-        double const* M = blk_[n];
-# if ( BLD == 4 )
-        const vec4 m012 = streamload4(M  );
-        const vec4 m345 = streamload4(M+4);
-        const vec4 m678 = streamload4(M+8);
-# else
-        const vec4 m012 = load3(M      );
-        const vec4 m345 = load3(M+BLD  );
-        const vec4 m678 = load3(M+BLD*2);
-# endif
+        const vec4 m012 = blk_[n].data0();
+        const vec4 m345 = blk_[n].data1();
+        const vec4 m678 = blk_[n].data2();
         // multiply with the full block:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
@@ -1260,7 +1220,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        vec4 xyz = loadu4(X+ii);  // xyz = { X0 X1 X2 - }
+        vec4 xyz = load3Z(X+ii);  // xyz = { X0 X1 X2 0 }
         s0 = fmadd4(m012, xyz, s0);
         s1 = fmadd4(m345, xyz, s1);
         s2 = fmadd4(m678, xyz, s2);
@@ -1271,10 +1231,14 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
     Y[jj+1] += s1[0] + s1[1] + s1[2];
     Y[jj+2] += s2[0] + s2[1] + s2[2];
 #else
+    s0 = clear4th(s0); // s0[3] is garbage
+    s1 = clear4th(s1); // s1[3] is garbage
+    s2 = clear4th(s2); // s2[3] is garbage
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
     s1 = add4(catshift2(s0, s2), blend22(s0, s2));
+    assert_true(s1[3] == 0);
     storeu4(Y+jj, add4(loadu4(Y+jj), s1));
 #endif
 }
@@ -1284,9 +1248,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
-    const real* M = blk_[0];
+    Block const* blk = blk_;
 
     vec4 s0, s1, s2;
     vec4 x0, x1, x2;
@@ -1295,22 +1259,23 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
     vec4 t2 = setzero4();
     // load 3x3 matrix element into 3 vectors:
     {
-        vec4 tt = loadu4(X+jj);
+        vec4 xxx = load3Z(X+jj);
         // multiply by diagonal elements:
-        s0 = mul4(streamload4(M  ), tt);
-        s1 = mul4(streamload4(M+4), tt);
-        s2 = mul4(streamload4(M+8), tt);
+        s0 = mul4(blk->data0(), xxx);
+        s1 = mul4(blk->data1(), xxx);
+        s2 = mul4(blk->data2(), xxx);
         // prepare broadcasted vectors:
-        vec4 p = swap2f128(tt);
-        vec4 l = blend22(tt, p);
-        vec4 u = blend22(p, tt);
-        x0 = duplo4(l);
-        x1 = duphi4(l);
-        x2 = duplo4(u);
+        x0 = swap2f128(xxx);
+        x1 = blend22(xxx, x0);
+        x2 = blend22(x0, xxx);
+        // zero out the 4th terms:
+        x0 = clear4th(duplo4(x1));
+        x1 = clear4th(duphi4(x1));
+        x2 = clear4th(duplo4(x2));
     }
-    M += SB;
+    ++blk;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    const real* end = blk_[1+2*((size_-1)/2)];
+    Block const* end = blk_ + (1+2*((nbb_-1)/2));
     const size_t * inx = inx_+1;
     /*
      Unrolling will reduce the dependency chain, which may be limiting the
@@ -1319,77 +1284,82 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
      */
     //process 2 by 2:
     #pragma nounroll
-    for ( ; M < end; M += 2*SB )
+    for ( ; blk < end; blk += 2 )
     {
-        const size_t i0 = inx[0];
-        const size_t i1 = inx[1];
-        assert_true( i0 < i1 );
+        const size_t ii = inx[0];
+        const size_t kk = inx[1];
+        assert_true( ii < kk );
         inx += 2;
-        //printf("--- %4i %4i\n", i0, i1);
-        vec4 ma0 = streamload4(M);
-        vec4 ma1 = streamload4(M+SB);
-        vec4 z0 = fmadd4(ma0, x0, loadu4(Y+i0));
-        vec4 z1 = fmadd4(ma1, x0, loadu4(Y+i1));
-        vec4 xyz0 = loadu4(X+i0);
-        vec4 xyz1 = loadu4(X+i1);
-        s0 = fmadd4(ma0, xyz0, s0);
-        t0 = fmadd4(ma1, xyz1, t0);
+        //printf("--- %4i %4i\n", ii, kk);
+        vec4 M0 = blk[0].data0();
+        vec4 P0 = blk[1].data0();
+        vec4 z = fmadd4(M0, x0, loadu4(Y+ii));
+        vec4 t = fmadd4(P0, x0, loadu4(Y+kk));
+        vec4 xyz = loadu4(X+ii);
+        vec4 tuv = loadu4(X+kk);
+        s0 = fmadd4(M0, xyz, s0);
+        t0 = fmadd4(P0, tuv, t0);
         // multiply with the full block:
-        vec4 mb0 = streamload4(M+4);
-        vec4 mb1 = streamload4(M+(SB+4));
-        z0 = fmadd4(mb0, x1, z0);
-        z1 = fmadd4(mb1, x1, z1);
-        s1 = fmadd4(mb0, xyz0, s1);
-        t1 = fmadd4(mb1, xyz1, t1);
-        vec4 mc0 = streamload4(M+8);
-        vec4 mc1 = streamload4(M+(SB+8));
-        z0 = fmadd4(mc0, x2, z0);
-        z1 = fmadd4(mc1, x2, z1);
-        s2 = fmadd4(mc0, xyz0, s2);
-        t2 = fmadd4(mc1, xyz1, t2);
+        vec4 M1 = blk[0].data1();
+        vec4 P1 = blk[1].data1();
+        z = fmadd4(M1, x1, z);
+        t = fmadd4(P1, x1, t);
+        s1 = fmadd4(M1, xyz, s1);
+        t1 = fmadd4(P1, tuv, t1);
+        vec4 M2 = blk[0].data2();
+        vec4 P2 = blk[1].data2();
+        z = fmadd4(M2, x2, z);
+        t = fmadd4(P2, x2, t);
+        s2 = fmadd4(M2, xyz, s2);
+        t2 = fmadd4(P2, tuv, t2);
         /*
          Attention: the 4th elements of the vectors z0 and z1 would be correct,
          because only zero was added to the value loaded from 'Y'. However, in the
-         case where the indices i0 and i1 are consecutive and reverted (i1 < i0),
+         case where the indices ii and kk are consecutive and reverted (kk < ii),
          the value stored in z0 would not have been updated giving a wrong results.
-         The solution is to either use a 'store3(Y+i1, z1)', or to make sure that
+         The solution is to either use a 'store3(Y+kk, z1)', or to make sure that
          indices are non-consecutive or ordered in the column in increasing order.
          This affects performance since 'store3' is slower than 'storeu4'
          */
-        storeu4(Y+i0, z0);
-        storeu4(Y+i1, z1);
+        assert_true(z[3]==Y[ii+3]);
+        assert_true(t[3]==Y[kk+3]);
+        storeu4(Y+ii, z);
+        storeu4(Y+kk, t);
     }
     s0 = add4(s0, t0);
     s1 = add4(s1, t1);
     s2 = add4(s2, t2);
     
     // process remaining blocks:
-    end = blk_[size_];
     #pragma nounroll
-    for ( ; M < end; M += SB )
+    for ( end = blk_ + nbb_; blk < end; ++blk )
     {
         const size_t ii = inx[0];
         ++inx;
         //printf("--- %4i\n", ii);
-        vec4 ma = streamload4(M);
+        vec4 ma = blk->data0();
         vec4 z = fmadd4(ma, x0, loadu4(Y+ii));
         vec4 xyz = loadu4(X+ii);
         s0 = fmadd4(ma, xyz, s0);
         
-        vec4 mb = streamload4(M+4);
+        vec4 mb = blk->data1();
         z = fmadd4(mb, x1, z);
         s1 = fmadd4(mb, xyz, s1);
         
-        vec4 mc = streamload4(M+8);
+        vec4 mc = blk->data2();
         z = fmadd4(mc, x2, z);
         s2 = fmadd4(mc, xyz, s2);
         storeu4(Y+ii, z);
     }
     // finally sum s0 = { Y0 Y0 Y0 0 }, s1 = { Y1 Y1 Y1 0 }, s2 = { Y2 Y2 Y2 0 }
+    s0 = clear4th(s0); // s0[3] is garbage
+    s1 = clear4th(s1); // s1[3] is garbage
+    s2 = clear4th(s2); // s2[3] is garbage
     x0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s1 = add4(unpacklo4(s2, x0), unpackhi4(s2, x0));
     s0 = add4(catshift2(s0, s1), blend22(s0, s1));
+    assert_true(s0[3] == 0);
     storeu4(Y+jj, add4(loadu4(Y+jj), s0));
 }
 #endif
@@ -1398,19 +1368,19 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
 #if ( S_BLOCK_SIZE == 4 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t jj) const
 {
-    assert_true(size_ > 0);
+    assert_true(nbb_ > 0);
     assert_true(inx_[0] == jj);
-    double const* D = blk_[0];
+    Block const* blk = blk_;
     //multiply with the symmetrized block, assuming it has been symmetrized:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     vec4 s0, s1, s2, s3;
     vec4 x0, x1, x2, x3;
     {
         vec4 tt = load4(X+jj);
-        s0 = mul4(streamload4(D   ), tt);
-        s1 = mul4(streamload4(D+4 ), tt);
-        s2 = mul4(streamload4(D+8 ), tt);
-        s3 = mul4(streamload4(D+12), tt);
+        s0 = mul4(blk->data0(), tt);
+        s1 = mul4(blk->data1(), tt);
+        s2 = mul4(blk->data2(), tt);
+        s3 = mul4(blk->data3(), tt);
         // sum non-diagonal elements:
 #if ( 0 )
         x0 = broadcast1(X+jj);
@@ -1426,29 +1396,29 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
         x3 = duphi4(x3);
 #endif
     }
+    ++blk;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
-    for ( size_t n = 1; n < size_; ++n )
+    for ( size_t n = 1; n < nbb_; ++n )
     {
         const size_t ii = inx_[n];
-        double const* M = blk_[n];
         const vec4 yy = load4(Y+ii);
-        const vec4 xyzt = load4(X+ii);  // xyzt = { X0 X1 X2 X3 }
-        const vec4 m0 = streamload4(M);
+        const vec4 xx = load4(X+ii);  // xx = { X0 X1 X2 X3 }
+        const vec4 m0 = blk->data0();
         vec4 z = fmadd4(m0, x0, yy);
-        s0 = fmadd4(m0, xyzt, s0);
+        s0 = fmadd4(m0, xx, s0);
         
-        const vec4 m1 = streamload4(M+4);
+        const vec4 m1 = blk->data1();
         z  = fmadd4(m1, x1, z);
-        s1 = fmadd4(m1, xyzt, s1);
+        s1 = fmadd4(m1, xx, s1);
 
-        const vec4 m2 = streamload4(M+8);
+        const vec4 m2 = blk->data2();
         z  = fmadd4(m2, x2, z);
-        s2 = fmadd4(m2, xyzt, s2);
+        s2 = fmadd4(m2, xx, s2);
 
-        const vec4 m3 = streamload4(M+12);
+        const vec4 m3 = blk->data3();
         z  = fmadd4(m3, x3, z);
-        s3 = fmadd4(m3, xyzt, s3);
+        s3 = fmadd4(m3, xx, s3);
         store4(Y+ii, z);
     }
     // finally sum s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y1 }, s2 = { Y2 Y2 Y2 Y2 }
@@ -1473,7 +1443,7 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
 #   define VECMULADD4D vecMulAdd4D
 #elif SMSB_USES_SSE
 #   define VECMULADD2D vecMulAdd2D
-#   define VECMULADD3D vecMulAdd3D_SSEU
+#   define VECMULADD3D vecMulAdd3D_SSE
 #   define VECMULADD4D vecMulAdd4D
 #else
 #   define VECMULADD2D vecMulAdd2D
@@ -1488,21 +1458,21 @@ void SparMatSymBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop)
     assert_true( start <= stop );
     stop = std::min(stop, size_);
 #if ( 1 )
-    for ( size_t jj = colidx_[start]; jj < stop; jj = colidx_[jj+1] )
+    for ( size_t j = colidx_[start]; j < stop; j = colidx_[j+1] )
 #else
-    for ( size_t jj = start; jj < stop; jj += S_BLOCK_SIZE )
-        if ( !column_[jj].empty() )
+    for ( size_t j = start; j < stop; j += S_BLOCK_SIZE )
+        if ( !column_[j].empty() )
 #endif
             {
-                //std::clog << "SparMatSymBlk column " << jj << "  " << size_ << " \n";
+                //std::clog << "SparMatSymBlk column " << j << "  " << size_ << " \n";
 #if ( S_BLOCK_SIZE == 1 )
-                column_[jj].vecMulAdd1D(X, Y, jj);
+                column_[j].vecMulAdd1D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 2 )
-                column_[jj].VECMULADD2D(X, Y, jj);
+                column_[j].VECMULADD2D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 3 )
-                column_[jj].VECMULADD3D(X, Y, jj);
+                column_[j].VECMULADD3D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 4 )
-                column_[jj].VECMULADD4D(X, Y, jj);
+                column_[j].VECMULADD4D(X, Y, j);
 #endif
             }
 }
@@ -1511,17 +1481,17 @@ void SparMatSymBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop)
 // multiplication of a vector: Y = Y + M * X
 void SparMatSymBlk::vecMulAdd_ALT(const real* X, real* Y) const
 {
-    for ( size_t jj = colidx_[0]; jj < size_; jj = colidx_[jj+1] )
+    for ( size_t j = colidx_[0]; j < size_; j = colidx_[j+1] )
     {
-        //std::clog << "SparMatSymBlk column " << jj << "  " << size_ << " \n";
+        //std::clog << "SparMatSymBlk column " << j << "  " << size_ << " \n";
 #if ( S_BLOCK_SIZE == 1 )
-        column_[jj].vecMulAdd1D(X, Y, jj);
+        column_[j].vecMulAdd1D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 2 )
-        column_[jj].vecMulAdd2D(X, Y, jj);
+        column_[j].vecMulAdd2D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 3 )
-        column_[jj].vecMulAdd3D(X, Y, jj);
+        column_[j].vecMulAdd3D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 4 )
-        column_[jj].vecMulAdd4D(X, Y, jj);
+        column_[j].vecMulAdd4D(X, Y, j);
 #endif
     }
 }
@@ -1532,19 +1502,19 @@ void SparMatSymBlk::vecMulAdd_TIME(const real* X, real* Y) const
 {
     size_t cnt = 0, col = 0;
     //auto rdt = timer();
-    for ( size_t jj = colidx_[0]; jj < size_; jj = colidx_[jj+1] )
+    for ( size_t j = colidx_[0]; j < size_; j = colidx_[j+1] )
     {
         col++;
-        cnt += column_[jj].size_;
-        //std::clog << "SparMatSymBlk column " << jj << "  " << size_ << " \n";
+        cnt += column_[j].nbb_;
+        //std::clog << "SparMatSymBlk column " << j << "  " << size_ << " \n";
 #if ( S_BLOCK_SIZE == 1 )
-        column_[jj].vecMulAdd1D(X, Y, jj);
+        column_[j].vecMulAdd1D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 2 )
-        column_[jj].vecMulAdd2D(X, Y, jj);
+        column_[j].vecMulAdd2D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 3 )
-        column_[jj].vecMulAdd3D(X, Y, jj);
+        column_[j].vecMulAdd3D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 4 )
-        column_[jj].vecMulAdd4D(X, Y, jj);
+        column_[j].vecMulAdd4D(X, Y, j);
 #endif
     }
     /*

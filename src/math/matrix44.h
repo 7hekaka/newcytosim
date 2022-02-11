@@ -10,9 +10,12 @@
 #include <cstdio>
 #include <iostream>
 
-#ifdef __AVX__
-#  define MATRIX44_USES_AVX REAL_IS_DOUBLE
+#if defined(__AVX__) && REAL_IS_DOUBLE
 #  include "simd.h"
+#  define MATRIX44_USES_AVX 1
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+#  include "simd_float.h"
+#  define MATRIX44_USES_AVX 0
 #else
 #  define MATRIX44_USES_AVX 0
 #endif
@@ -127,11 +130,23 @@ public:
     }
     
     /// conversion to pointer of real
-    operator real const*() const { return val; }
+    //operator real const*() const { return val; }
 
     /// return modifiable pointer of 'real'
     real* data() { return val; }
     
+#if defined(__AVX__) && REAL_IS_DOUBLE
+    vec4 data0() const { return streamload4(val); }
+    vec4 data1() const { return streamload4(val+4); }
+    vec4 data2() const { return streamload4(val+8); }
+    vec4 data3() const { return streamload4(val+12); }
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+    vec4f data0() const { return streamload4f(val); }
+    vec4f data1() const { return streamload4f(val+4); }
+    vec4f data2() const { return streamload4f(val+8); }
+    vec4f data3() const { return streamload4f(val+12); }
+#endif
+
     /// return unmodifiable pointer of real
     real const* data() const { return val; }
 
@@ -521,7 +536,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline Vector3 vecmul(Vector3 const& vec) const
+    Vector3 vecmul3(Vector3 const& vec) const
     {
 #if MATRIX44_USES_AVX && VECTOR3_USES_AVX
         return vecmul3_avx(vec.vec);
@@ -533,7 +548,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline Vector3 trans_vecmul(Vector3 const& vec) const
+    Vector3 trans_vecmul3(Vector3 const& vec) const
     {
 #if MATRIX44_USES_AVX
         return trans_vecmul3_avx(vec.data());
@@ -545,7 +560,7 @@ public:
     /// vector multiplication
     friend Vector3 operator * (Matrix44 const& mat, Vector3 const& vec)
     {
-        return mat.vecmul(vec);
+        return mat.vecmul3(vec);
     }
 
     
@@ -587,7 +602,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline Vector4 vecmul(Vector4 const& vec) const
+    Vector4 vecmul(Vector4 const& vec) const
     {
 #if MATRIX44_USES_AVX && VECTOR3_USES_AVX
         return vecmul4_avx(vec.vec);
@@ -599,7 +614,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline Vector4 trans_vecmul(Vector4 const& vec) const
+    Vector4 trans_vecmul(Vector4 const& vec) const
     {
 #if MATRIX44_USES_AVX && VECTOR3_USES_AVX
         return trans_vecmul4_avx(vec.vec);

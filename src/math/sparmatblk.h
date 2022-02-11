@@ -62,9 +62,6 @@ public:
 
     /// accessory class
     class Element;
-
-    /// number of real in a block
-    static constexpr size_t SB = sizeof(Block) / sizeof(real);
     
     /// A line of the sparse matrix
     class Line

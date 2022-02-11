@@ -10,9 +10,12 @@
 #include <cstdio>
 #include <iostream>
 
-#ifdef __AVX__
-#  define MATRIX34_USES_AVX REAL_IS_DOUBLE
+#if defined(__AVX__) && REAL_IS_DOUBLE
 #  include "simd.h"
+#  define MATRIX34_USES_AVX 1
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+#  include "simd_float.h"
+#  define MATRIX34_USES_AVX 0
 #else
 #  define MATRIX34_USES_AVX 0
 #endif
@@ -129,10 +132,20 @@ public:
     }
     
     /// conversion to pointer of real
-    operator real const*() const { return val; }
+    //operator real const*() const { return val; }
 
     /// return modifiable pointer of 'real'
     real* data() { return val; }
+
+#if defined(__AVX__) && REAL_IS_DOUBLE
+    vec4 data0() const { return streamload4(val); }
+    vec4 data1() const { return streamload4(val+4); }
+    vec4 data2() const { return streamload4(val+8); }
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+    vec4f data0() const { return streamload4f(val); }
+    vec4f data1() const { return streamload4f(val+4); }
+    vec4f data2() const { return streamload4f(val+8); }
+#endif
 
     /// return unmodifiable pointer of real
     real const* data() const { return val; }
@@ -568,7 +581,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline Vector3 vecmul(Vector3 const& vec) const
+    Vector3 vecmul(Vector3 const& vec) const
     {
 #if MATRIX34_USES_AVX && VECTOR3_USES_AVX
         return vecmul3_avx(vec.vec);
@@ -590,7 +603,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    inline Vector3 trans_vecmul(real const* V) const
+    Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX34_USES_AVX
         return trans_vecmul3_avx(V);
@@ -1117,8 +1130,8 @@ public:
     /// a rotation around the Z axis of specified angle
     static Matrix34 rotationAroundZ(real angle);
     
-    /// a rotation around one the axis X if `x==0`, Y if `x==1` or Z if `x==2`
-    static Matrix34 rotationAroundPrincipalAxis(index x, real angle);
+    /// a rotation around one the axis: X if `i=0`, Y if `i=1` or Z if `i=2`
+    static Matrix34 rotationAroundPrincipalAxis(index i, real angle);
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix34 rotationToVector(const Vector3&);

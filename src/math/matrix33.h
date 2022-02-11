@@ -16,10 +16,14 @@
  but performance can be better with 4, as SIMD-AVX calls handle doubles by 4.
  */
 
-#ifdef __AVX__
-#  define MATRIX33_USES_AVX REAL_IS_DOUBLE
+#if defined(__AVX__) && REAL_IS_DOUBLE
 #  include "simd.h"
-#  define BLD 4
+#  define MATRIX33_USES_AVX 1
+#  define BLD 3
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+#  include "simd_float.h"
+#  define MATRIX33_USES_AVX 0
+#  define BLD 3
 #else
 #  define MATRIX33_USES_AVX 0
 #  define BLD 3
@@ -51,6 +55,7 @@ private:
     
 public:
     
+    /// default constructor
     Matrix33() { clear_shadow(); }
     
     /// copy constructor
@@ -131,10 +136,32 @@ public:
     }
     
     /// conversion to pointer of real
-    operator real const*() const { return val; }
+    //operator real const*() const { return val; }
 
     /// return modifiable pointer of 'real'
     real* data() { return val; }
+    
+#if defined(__AVX__) && REAL_IS_DOUBLE
+#  if ( BLD == 4 )
+    vec4 data0() const { return streamload4(val  ); }
+    vec4 data1() const { return streamload4(val+4); }
+    vec4 data2() const { return streamload4(val+8); }
+#  else
+    vec4 data0() const { return loadu4(val); }
+    vec4 data1() const { return loadu4(val+BLD); }
+    vec4 data2() const { return load3Z(val+BLD*2); } // last value may be garbage
+#  endif
+#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+#  if ( BLD == 4 )
+    vec4f data0() const { return streamload4f(val  ); }
+    vec4f data1() const { return streamload4f(val+4); }
+    vec4f data2() const { return streamload4f(val+8); }
+#  else
+    vec4f data0() const { return loadu4f(val); }
+    vec4f data1() const { return loadu4f(val+BLD); }
+    vec4f data2() const { return load3fZ(val+BLD*2); } // last value may be garbage
+#  endif
+#endif
 
     /// return unmodifiable pointer of real
     real const* data() const { return val; }
@@ -316,7 +343,7 @@ public:
     }
 
     /// subtract given matrix
-    void operator +=(Matrix33 const& M)
+    void operator += (Matrix33 const& M)
     {
 #if MATRIX33_USES_AVX && ( BLD == 4 )
         store4(val  , add4(load4(val  ), load4(M.val  )));
@@ -329,7 +356,7 @@ public:
     }
 
     /// add given matrix
-    void operator -=(Matrix33 const& M)
+    void operator -= (Matrix33 const& M)
     {
 #if MATRIX33_USES_AVX && ( BLD == 4 )
         store4(val  , sub4(load4(val  ), load4(M.val  )));
@@ -505,58 +532,39 @@ public:
 #if MATRIX33_USES_AVX
     
     /// multiplication by a 3-components vector: this * V
-    const vec4 vecmul3_avx(const vec4 xyzt) const
+    const vec4 vecmul3_avx(vec4 vec) const
     {
-        vec4 xyxy = duplo2f128(xyzt);
-        vec4 ztzt = duphi2f128(xyzt);
-        vec4 xxxx = duplo4(xyxy);
-        vec4 yyyy = duphi4(xyxy);
-        vec4 zzzz = duplo4(ztzt);
-#if ( BLD == 4 )
-        xxxx = mul4(load4(val), xxxx);
-        yyyy = mul4(load4(val+BLD), yyyy);
-        return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx, yyyy));
-#else
-        xxxx = mul4(loadu4(val), xxxx);
-        yyyy = mul4(loadu4(val+BLD), yyyy);
-        zzzz = fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
-        return blend31(zzzz, setzero4());
-#endif
+        vec4 xy = duplo2f128(vec); // xyxy
+        vec4 zzzz = duplo4(duphi2f128(vec));
+        vec = mul4(data0(), duplo4(xy)); // xxxx
+        xy = mul4(data1(), duphi4(xy)); // yyyy
+        zzzz = fmadd4(data2(), zzzz, add4(xy, vec));
+        return clear4th(zzzz);
     }
 
     /// multiplication by a vector: this * V
     const vec4 vecmul3_avx(double const* V) const
     {
-        vec4 xyxy = broadcast2(V);
-        vec4 xxxx = duplo4(xyxy); //broadcast1(V);
-        vec4 yyyy = duphi4(xyxy); //broadcast1(V+1);
-        vec4 zzzz = broadcast1(V+2);
-#if ( BLD == 4 )
-        xxxx = mul4(load4(val), xxxx);
-        yyyy = mul4(load4(val+BLD), yyyy);
-        return fmadd4(load4(val+BLD*2), zzzz, add4(xxxx, yyyy));
-#else
-        xxxx = mul4(loadu4(val), xxxx);
-        yyyy = mul4(loadu4(val+BLD), yyyy);
-        zzzz = fmadd4(load3(val+BLD*2), zzzz, add4(xxxx, yyyy));
-        return blend31(zzzz, setzero4());
-#endif
+        vec4 zzzz = broadcast2(V); // xyxy
+        vec4 xxxx = duplo4(zzzz); //broadcast1(V);
+        vec4 yyyy = duphi4(zzzz); //broadcast1(V+1);
+        zzzz = broadcast1(V+2);
+        xxxx = mul4(data0(), xxxx);
+        yyyy = mul4(data1(), yyyy);
+        zzzz = fmadd4(data2(), zzzz, add4(xxxx, yyyy));
+        return clear4th(zzzz);
     }
 
     /// multiplication by a vector: transpose(M) * V
     const vec4 trans_vecmul3_avx(double const* V) const
     {
-#if ( BLD == 4 )
-        vec4 vec = loadu4(V); // { x, y, z, garbage }
-#else
-        vec4 vec = load3(V); // { x, y, z, 0 }
-#endif
-        vec4 s0 = mul4(load4(val      ), vec);
-        vec4 s1 = mul4(load4(val+BLD  ), vec);
-        vec4 s2 = mul4(load4(val+BLD*2), vec);
-        vec4 s3 = setzero4();
+        vec4 zz = setzero4();
+        vec4 vec = blend31(loadu4(V), zz); // { x, y, z, 0 }
+        vec4 s0 = mul4(data0(), vec);
+        vec4 s1 = mul4(data1(), vec);
+        vec4 s2 = mul4(data2(), vec);
         s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-        s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
+        s2 = add4(unpacklo4(s2, zz), unpackhi4(s2, zz));
         return add4(catshift2(s0, s2), blend22(s0, s2));
     }
 #endif
@@ -594,7 +602,7 @@ public:
     }
 
     /// multiplication by a vector: this * V
-    inline Vector3 vecmul(Vector3 const& vec) const
+    Vector3 vecmul(Vector3 const& vec) const
     {
 #if MATRIX33_USES_AVX && VECTOR3_USES_AVX
         return vecmul3_avx(vec.vec);
@@ -622,7 +630,7 @@ public:
     }
 
     /// multiplication by a vector: transpose(M) * V
-    inline Vector3 trans_vecmul(real const* V) const
+    Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX33_USES_AVX
         return trans_vecmul3_avx(V);
@@ -1146,8 +1154,8 @@ public:
     /// a rotation around the Z axis of specified angle
     static Matrix33 rotationAroundZ(real angle);
     
-    /// a rotation around one the axis X if `x==0`, Y if `x==1` or Z if `x==2`
-    static Matrix33 rotationAroundPrincipalAxis(index x, real angle);
+    /// a rotation around one the axis: X if `i=0`, Y if `i=1` or Z if `i=2`
+    static Matrix33 rotationAroundPrincipalAxis(index i, real angle);
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix33 rotationToVector(const Vector3&);

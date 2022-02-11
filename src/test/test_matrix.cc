@@ -609,16 +609,20 @@ void testMatrices(const size_t S, const size_t F)
     setVectors(DIM*S, x, y, z);
     //beta = -RNG.preal();
 
-    printf("------ iso %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
-    setIndices(F, S, 1);
-    testIsoMatrices(S, x, y, z);
-    printf("\n");
-
-    printf("------ %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
-    setIndices(F, DIM*S, DIM);
-    testMatrices(DIM*S, x, y, z);
-    printf("\n");
-    
+    if ( 1 )
+    {
+        printf("------ iso %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
+        setIndices(F, S, 1);
+        testIsoMatrices(S, x, y, z);
+        printf("\n");
+    }
+    if ( 1 )
+    {
+        printf("------ %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
+        setIndices(F, DIM*S, DIM);
+        testMatrices(DIM*S, x, y, z);
+        printf("\n");
+    }
     setIndices(0, S, DIM);
     free_real(x);
     free_real(y);
