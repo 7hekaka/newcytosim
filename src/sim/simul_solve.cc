@@ -319,7 +319,7 @@ void Simul::solve_separate()
     delete[] table;
 #endif
     
-    // ready steric interactions:
+    sMeca.importParameters(prop);
     sMeca.selectStericEngine(*this);
     //std::clog << "Separating " << cnt << " fibers\n";
     for ( ObjectFlag f = 0; f <= sup; ++f )

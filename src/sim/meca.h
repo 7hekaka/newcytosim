@@ -31,7 +31,7 @@ class Simul;
  This option can only be beneficial if NUM_THREADS > 1
  Do not enable this option for sequential code.
  */
-#define PARALLELIZE_MATRIX 1
+#define PARALLELIZE_MATRIX 0
 
 
 // known Matrix block types:
@@ -697,6 +697,9 @@ public:
     
     /// import points and attributes indices
     void readyMecables();
+    
+    /// import useful parameters
+    void importParameters(SimulProp const&);
     
     /// call setInteractions(Meca) for registered mecables
     void setSomeInteractions();

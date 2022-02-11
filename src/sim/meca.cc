@@ -90,6 +90,8 @@ Meca::Meca()
     bump_ = 0;
     ready_ = -1;
     steric_ = 0;
+    precond_ = 0;
+    verbose_ = 0;
 
     vPTS = nullptr;
     vSOL = nullptr;
@@ -405,6 +407,16 @@ void Meca::readyMecables()
 }
 
 
+void inline Meca::importParameters(SimulProp const& prop)
+{
+    tau_ = prop.time_step;
+    alpha_ = prop.kT / tau_;
+    tolerance_ = prop.tolerance;
+    precond_ = prop.precondition;
+    verbose_ = prop.verbose;
+}
+
+
 void Meca::getReady(Simul const& sim)
 {
     mecables.clear();
@@ -431,14 +443,7 @@ void Meca::getReady(Simul const& sim)
         std::clog << mec->reference() << " sorted " << mec->nbPoints() << "\n";
      */
 #endif
-    
-    // import some parameter values:
-    tau_ = sim.prop.time_step;
-    alpha_ = sim.prop.kT / tau_;
-    tolerance_ = sim.prop.tolerance;
-    precond_ = sim.prop.precondition;
-    verbose_ = sim.prop.verbose;
-
+    importParameters(sim.prop);
     selectStericEngine(sim);
     readyMecables();
 }
