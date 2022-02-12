@@ -23,7 +23,7 @@
 #elif ( BLOCK_SIZE == 2 )
 #  include "matrix22.h"
 #elif ( BLOCK_SIZE == 3 )
-#  include "matrix34.h"
+#  include "matrix33.h"
 #elif ( BLOCK_SIZE == 4 )
 #  include "matrix44.h"
 #endif
@@ -55,7 +55,7 @@ public:
 #elif ( BLOCK_SIZE == 2 )
     typedef Matrix22 Block;
 #elif ( BLOCK_SIZE == 3 )
-    typedef Matrix34 Block;
+    typedef Matrix33 Block;
 #elif ( BLOCK_SIZE == 4 )
     typedef Matrix44 Block;
 #endif
@@ -243,9 +243,6 @@ public:
 
     /// multiplication of a vector, for columns within [start, stop[
     void vecMulAdd(const real*, real* Y, size_t start, size_t stop) const;
-    
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_SCAL(const real* X, real* Y, size_t start, size_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd2D(const real* X, real* Y, size_t start, size_t stop) const;
@@ -275,9 +272,6 @@ public:
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y) const { vecMulAdd_ALT(X, Y, 0, size_); }
-
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_SCAL(const real* X, real* Y) const { vecMulAdd_SCAL(X, Y, 0, size_); }
 
     /// 2D isotropic multiplication (not implemented)
     void vecMulAddIso2D(const real* X, real* Y) const {};

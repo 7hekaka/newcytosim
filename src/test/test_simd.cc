@@ -726,20 +726,24 @@ void test_hadd()
 void test_hsum()
 {
     /* finally sum horizontally:
-     s0 = { Y0 Y0 Y0 Y0 }, s1 = { Y1 Y1 Y1 Y0 }, s2 = { Y2 Y2 Y2 Y0 }
+     s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
      to { Y0+Y0+Y0, Y1+Y1+Y1, Y2+Y2+Y2, 0 }
      */
-    vec4f s0{  1,   2,   3,   4};
-    vec4f s1{0.1, 0.2, 0.3, 0.4};
-    vec4f s2{ -1,  -2,  -3,  -4};
-    vec4f s3{ -1,  -2,  -3,  -4};
+    vec4f s0{ 1, 2, 3, 0.1 };
+    vec4f s1{ 2, 3, 1, 0.1 };
+    vec4f s2{ 3, 1, 2, 0.3 };
+    vec4f s3{ 0, 0, 0, 0 };
 
+    printf("------ test_hsum\n");
     dump(s0, "s0  ");
     dump(s1, "s1  ");
     dump(s2, "s2  ");
     dump(s3, "s3  ");
+    
+    s0 = clear4th(s0); // clear garbage
+    s1 = clear4th(s1); // clear garbage
+    s2 = clear4th(s2); // clear garbage
 
-    //s3 = setzero4f();
     s0 = add4f(unpacklo4f(s0, s1), unpackhi4f(s0, s1));
     s2 = add4f(unpacklo4f(s2, s3), unpackhi4f(s2, s3));
     s0 = add4f(catshift2f(s0, s2), blend22f(s0, s2));

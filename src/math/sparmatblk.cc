@@ -646,16 +646,6 @@ Vector SparMatBlk::Line::vecMul(const real* X) const
 }
 
 
-// multiplication of a vector: Y = Y + M * X
-void SparMatBlk::vecMulAdd_SCAL(const real* X, real* Y, size_t start, size_t stop) const
-{
-    assert_true( start <= stop );
-    stop = std::min(stop, size_);
-    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
-        row_[i].vecMul(X).add_to(Y+i);
-}
-
-
 #if ( BLOCK_SIZE == 1 )
 real SparMatBlk::Line::vecMul1D(const real* X) const
 {
@@ -782,6 +772,9 @@ vec4 SparMatBlk::Line::vecMul3D(const double* X) const
         s2 = fmadd4(blk->data2(), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
+    s0 = clear4th(s0); // s0[3] is garbage
+    s1 = clear4th(s1); // s1[3] is garbage
+    s2 = clear4th(s2); // s2[3] is garbage
     vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
@@ -846,6 +839,9 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
         s2 = fmadd4(blk->data2(), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
+    s0 = clear4th(s0); // s0[3] is garbage
+    s1 = clear4th(s1); // s1[3] is garbage
+    s2 = clear4th(s2); // s2[3] is garbage
     t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
@@ -917,6 +913,9 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
         s2 = fmadd4(blk->data2(), xyz, s2);
     }
     // finally sum s0 = { Y0 Y0 Y0 - }, s1 = { Y1 Y1 Y1 - }, s2 = { Y2 Y2 Y2 - }
+    s0 = clear4th(s0); // s0[3] is garbage
+    s1 = clear4th(s1); // s1[3] is garbage
+    s2 = clear4th(s2); // s2[3] is garbage
     t0 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
     s2 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
