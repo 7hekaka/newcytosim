@@ -334,10 +334,9 @@ void Simul::solve_separate()
         {
             std::clog << "  cluster " << f << " has " << num << " fibers\n";
             cnt -= num;
+            sMeca.tolerance_ = prop.tolerance;
             sMeca.readyMecables();
             sMeca.setSomeInteractions();
-            if ( sMeca.steric_ == 2 )
-                sMeca.addSomeStericInteractions();
             sMeca.solve();
             sMeca.apply();
         }

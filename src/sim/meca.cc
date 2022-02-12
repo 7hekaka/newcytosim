@@ -351,6 +351,9 @@ void Meca::setSomeInteractions()
                 static_cast<Single const*>(m)->setInteractions(*this);
         }
     }
+    
+    if ( steric_ == 2 )
+        addSomeStericInteractions();
 }
 
 /**
@@ -713,13 +716,14 @@ size_t Meca::solve()
      of the Brownian contribution, this should work well if tolerance << 1
      */
     
+    // tolerance is normally relative to the level of noise
     if ( noiseLevel > 0 )
         tolerance_ *= noiseLevel;
     else
     {
+        // tolerance will be understood as an absolute quantity
         if ( alpha_ > 0 )
             Cytosim::log << "Warning: all Brownian terms are zero\n";
-        // tolerance_ will be understood as an absolute quantity
     }
     
     /*
