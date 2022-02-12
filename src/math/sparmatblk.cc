@@ -959,8 +959,7 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_);
-    //for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
-    for ( size_t i = start; i < stop; i+=BLOCK_SIZE )
+    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
@@ -981,19 +980,8 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_);
-    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
-    {
-#if ( BLOCK_SIZE == 1 )
-        Y[i] += row_[i].vecMul1D(X);
-#elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
-        store2(Y+i, add2(load2(Y+i), row_[i].vecMul2D(X)));
-#elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
-        // we need to use store3 only for the last line, if multithreaded
-        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3D(X)));
-#else
+    for ( size_t i = start; i < stop; i += BLOCK_SIZE )
         row_[i].vecMul(X).add_to(Y+i);
-#endif
-    }
 }
 
 

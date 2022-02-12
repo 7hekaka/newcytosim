@@ -40,7 +40,8 @@ size_t * iny_ = nullptr;
 
 real alpha = 2.0;
 real beta = -1.0;
-
+real kappa = 0.7;
+real iota = -0.3;
 
 //------------------------------------------------------------------------------
 #pragma mark - Functions
@@ -70,7 +71,7 @@ real diff(size_t size, real const* a, real const* b)
 }
 
 ///set indices within [0, sup] that are multiples of 'dim'
-void setIndices(size_t cnt, size_t sup, size_t dim)
+void setIndices(size_t cnt, size_t sup)
 {
     delete[] inx_;
     delete[] iny_;
@@ -81,13 +82,12 @@ void setIndices(size_t cnt, size_t sup, size_t dim)
     {
         inx_ = new size_t[icnt_];
         iny_ = new size_t[icnt_];
-        sup /= dim;
         for ( size_t n = 0; n < icnt_; ++n )
         {
             size_t i = RNG.pint32(sup);
             size_t j = RNG.pint32(sup);
-            inx_[n] = dim * std::max(i,j);
-            iny_[n] = dim * std::min(i,j);
+            inx_[n] = std::max(i,j);
+            iny_[n] = std::min(i,j);
         }
     }
 }
@@ -209,35 +209,41 @@ void compareMatrix(size_t S, MATRIX & mat1, MATROX& mat2, size_t fill)
 
 
 template <typename MATRIX>
-void fillMatrix(MATRIX& mat, const size_t i, const size_t j)
+void fillMatrix(MATRIX& mat)
 {
-    assert_true( i+DIM <= mat.size() );
-    assert_true( j+DIM <= mat.size() );
-    
 #if ( DIM == 3 )
-    Matrix33 M(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
+    Matrix33 S(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
+    Matrix33 U(kappa, iota, iota, -iota, kappa, iota, -iota,-iota, kappa);
 #elif ( DIM == 2 )
-    Matrix22 M(alpha, beta, -beta, alpha);
+    Matrix22 S(alpha, beta, -beta, alpha);
+    Matrix22 U(kappa, iota,  iota, kappa);
 #else
-    Matrix11 M(alpha);
+    Matrix11 S(alpha);
+    Matrix22 U(kappa);
 #endif
-    // this is a block on the diagonal:
-    for ( size_t x = 0; x < DIM; ++x )
-    for ( size_t y = x; y < DIM; ++y )
-        mat(i+y, i+x) += M(y,x);
-    
-    if ( i != j )
+    for ( size_t n = 0; n < icnt_; ++n )
     {
+        size_t i = DIM * inx_[n];
+        size_t j = DIM * iny_[n];
+        assert_true( i+DIM <= mat.size() );
+        assert_true( j+DIM <= mat.size() );
+        
         // this is a block on the diagonal:
         for ( size_t x = 0; x < DIM; ++x )
         for ( size_t y = x; y < DIM; ++y )
-            mat(j+y, j+x) += M(y,x);
-        // off-diagonal
-        size_t I = std::max(i, j);
-        size_t J = std::min(i, j);
-        for ( size_t x = 0; x < DIM; ++x )
-        for ( size_t y = 0; y < DIM; ++y )
-            mat(I+y, J+x) += M(y,x);
+            mat(i+y, i+x) += S(y,x);
+        
+        if ( i != j )
+        {
+            // this is a block on the diagonal:
+            for ( size_t x = 0; x < DIM; ++x )
+            for ( size_t y = x; y < DIM; ++y )
+                mat(j+y, j+x) += S(y,x);
+            // off-diagonal non-symmetric block!
+            for ( size_t x = 0; x < DIM; ++x )
+            for ( size_t y = 0; y < DIM; ++y )
+                mat(i+y, j+x) += U(y,x);
+        }
     }
 }
 
@@ -268,8 +274,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
     for ( size_t n=0; n<N_RUN; ++n )
     {
         mat.reset();
-        for ( size_t i=0; i<icnt_; ++i )
-            fillMatrix(mat, iny_[i], inx_[i]);
+        fillMatrix(mat);
     }
     double ts = tock(N_RUN);
     mat.prepareForMultiply(1);
@@ -344,8 +349,7 @@ void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z)
 {
     size_t S = mat.size();
     mat.reset();
-    for ( size_t n=0; n<icnt_; ++n )
-        fillMatrix(mat, iny_[n], inx_[n]);
+    fillMatrix(mat);
     mat.prepareForMultiply(1);
 
     const size_t sup = 7;
@@ -379,19 +383,24 @@ void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z)
 #pragma mark - Test Iso Matrix
 
 template <typename MATRIX>
-void fillMatrixIso(MATRIX& mat, const size_t i, const size_t j)
+void fillMatrixIso(MATRIX& mat)
 {
-    //printf("fillMatrixIso %lu %lu <---- %f\n", i, j, alpha);
-    mat.diagonal(i) += alpha;
-    if ( i > j )
+    for ( size_t n = 0; n < icnt_; ++n )
     {
-        mat.diagonal(j) += alpha;
-        mat(i, j) += beta;
-    }
-    else if ( j > i )
-    {
-        mat.diagonal(j) += alpha;
-        mat(j, i) += beta;
+        size_t i = inx_[n];
+        size_t j = iny_[n];
+        //printf("fillMatrixIso %lu %lu <---- %f\n", i, j, alpha);
+        mat.diagonal(i) += alpha;
+        if ( i > j )
+        {
+            mat.diagonal(j) += alpha;
+            mat(i, j) += beta;
+        }
+        else if ( j > i )
+        {
+            mat.diagonal(j) += alpha;
+            mat(j, i) += beta;
+        }
     }
 }
 
@@ -450,8 +459,7 @@ void testIsoMatrix(MATRIX & mat, real const* x, real const* y, real * z)
     for ( size_t i=0; i<N_RUN; ++i )
     {
         mat.reset();
-        for ( size_t n=0; n<icnt_; ++n )
-            fillMatrixIso(mat, inx_[n], iny_[n]);
+        fillMatrixIso(mat);
     }
     double ts = tock(N_RUN);
     
@@ -481,33 +489,19 @@ const real dir[4] = {  2, 1, -1, 3 };
 const real vec[4] = { -1, 3,  1, 2 };
 
 template < typename MATRIX >
-void fillBlockMatrix(MATRIX& mat)
+void fillMatrixBlock(MATRIX& mat)
 {
     typename MATRIX::Block S = MATRIX::Block::outerProduct(dir);
     typename MATRIX::Block U = MATRIX::Block::outerProduct(dir, vec);
     
-    for ( size_t n=0; n<icnt_; ++n )
+    for ( size_t n = 0; n < icnt_; ++n )
     {
-        size_t ii = inx_[n] - inx_[n] % MATRIX::Block::dimension();
-        size_t jj = iny_[n] - iny_[n] % MATRIX::Block::dimension();
+        size_t ii = DIM * inx_[n];
+        size_t jj = DIM * iny_[n];
         mat.diag_block(ii).sub_half(S);
         mat.diag_block(jj).add_half(S);
         mat.block(ii, jj).add_full(U);
     }
-}
-
-template < typename MATRIX >
-void fillBlockMatrix(MATRIX& mat, const size_t i, const size_t j)
-{
-    typename MATRIX::Block M(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
-    
-    mat.diag_block(i).add_half(M);
-    mat.diag_block(j).add_half(M);
-
-    if ( i > j )
-        mat.block(i,j).add_full(M);
-    else
-        mat.block(j,i).add_full(M.transposed());
 }
 
 /**
@@ -521,7 +515,7 @@ This compares the Scalar and SIMD implementations of one matrix
     for ( size_t r = 0; r < N_RUN; ++r )
     {
         mat.reset();
-        fillBlockMatrix(mat);
+        fillMatrixBlock(mat);
     }
     double ts = tock(N_RUN);
 
@@ -612,18 +606,18 @@ void testMatrices(const size_t S, const size_t F)
     if ( 1 )
     {
         printf("------ iso %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
-        setIndices(F, S, 1);
+        setIndices(F, S);
         testIsoMatrices(S, x, y, z);
         printf("\n");
     }
     if ( 1 )
     {
         printf("------ %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
-        setIndices(F, DIM*S, DIM);
+        setIndices(F, S);
         testMatrices(DIM*S, x, y, z);
         printf("\n");
     }
-    setIndices(0, S, DIM);
+    setIndices(0, S);
     free_real(x);
     free_real(y);
     free_real(z);
@@ -636,7 +630,7 @@ void testBlockMatrix(const size_t S, const size_t F)
     real * y = nullptr;
     real * z = nullptr;
 
-    setIndices(F, S, DIM);
+    setIndices(F, S);
     setVectors(S, x, y, z);
     //beta = -RNG.preal();
     
@@ -644,7 +638,7 @@ void testBlockMatrix(const size_t S, const size_t F)
     mat.resize(S);
     testBlockMatrix(mat, x, y, z);
     
-    setIndices(0, S, DIM);
+    setIndices(0, S);
     free_real(x);
     free_real(y);
     free_real(z);
