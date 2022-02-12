@@ -86,15 +86,17 @@ public:
     /// direct access to the scalar
     real  value() const { return val_; }
     
-    /// return modifiable pointer of 'real'
+    /// modifiable pointer of 'real'
     real* data() { return &val_; }
     
-    /// return unmodifiable pointer of 'real'
+    /// unmodifiable pointer of 'real'
     real const* data() const { return &val_; }
 
-    /// return address of element at (i, j)
+    /// address of element at line i, column j
     real* addr(const index i, const index j) { return &val_; }
-    
+    /// value of element at line i, column j
+    real value(const index i, const index j) const { return val_; }
+
     /// access functions to element by line and column indices
     real& operator()(const index i, const index j)       { return val_; }
     real  operator()(const index i, const index j) const { return val_; }

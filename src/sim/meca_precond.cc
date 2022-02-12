@@ -1,5 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
+#include "xtbsv.h"
+#include "xtrsm.h"
 
 /// if you like Alsatian specialities, set this to a prime number
 #define CHOUCROUTE 7

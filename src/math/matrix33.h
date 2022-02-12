@@ -55,6 +55,16 @@ private:
     
 public:
     
+    /// clear values that do not represent matrix elements
+    void clear_shadow()
+    {
+#if ( BLD == 4 )
+        val[3      ] = 0.0;
+        val[3+BLD  ] = 0.0;
+        val[3+BLD*2] = 0.0;
+#endif
+    }
+
     /// default constructor
     Matrix33() { clear_shadow(); }
     
@@ -163,16 +173,18 @@ public:
 #  endif
 #endif
 
-    /// return unmodifiable pointer of real
+    /// unmodifiable pointer of real
     real const* data() const { return val; }
 
-    /// return address of element at (i, j)
+    /// address of element at line i, column j
     real* addr(const index i, const index j) { return val + ( i + BLD*j ); }
-    
+    /// value of element at line i, column j
+    real value(const index i, const index j) const { return val[i+BLD*j]; }
+
     /// access functions to element by line and column indices
     real& operator()(const index i, const index j)       { return val[i+BLD*j]; }
     real  operator()(const index i, const index j) const { return val[i+BLD*j]; }
-    
+
     /// set elements from given array
     void load(const real ptr[])
     {
@@ -259,12 +271,40 @@ public:
         for ( index i = 0; i < 3; ++i )
         {
             for ( index j = 0; j < 3; ++j )
-                os << " " << std::fixed << std::setw(w) << (*this)(i,j);
+                os << " " << std::fixed << std::setw(w) << value(i,j);
             if ( i < 2 )
                 os << ";";
             else
                 os << " ]";
         }
+    }
+
+    /// print [ line1; line2; line3 ]
+    void print_smart(std::ostream& os) const
+    {
+        const int w = (int)os.width();
+        os << std::setw(1) << "[";
+        os << " " << std::fixed << std::setw(w) << value(0,0);
+        os << " " << std::fixed << std::setw(w) << value(1,0);
+        os << " " << std::fixed << std::setw(w) << value(2,0);
+        os << ";";
+        if ( value(0,1) == value(1,0) )
+            os << " " << std::fixed << std::setw(w) << "sym";
+        else
+            os << " " << std::fixed << std::setw(w) << value(0,1);
+        os << " " << std::fixed << std::setw(w) << value(1,1);
+        os << " " << std::fixed << std::setw(w) << value(2,1);
+        os << ";";
+        if ( value(0,2) == value(2,0) )
+            os << " " << std::fixed << std::setw(w) << "sym";
+        else
+            os << " " << std::fixed << std::setw(w) << value(0,2);
+        if ( value(1,2) == value(2,1) )
+            os << " " << std::fixed << std::setw(w) << "sym";
+        else
+            os << " " << std::fixed << std::setw(w) << value(1,2);
+        os << " " << std::fixed << std::setw(w) << value(2,2);
+        os << " ]";
     }
 
     /// conversion to string
@@ -275,16 +315,6 @@ public:
         os.width(w);
         print(os);
         return os.str();
-    }
-
-    /// clear values that do not represent matrix elements
-    void clear_shadow()
-    {
-#if ( BLD == 4 )
-        val[3      ] = 0.0;
-        val[3+BLD  ] = 0.0;
-        val[3+BLD*2] = 0.0;
-#endif
     }
     
     /// scale all elements
@@ -380,7 +410,7 @@ public:
     Matrix33 transposed() const
     {
         Matrix33 res;
-#if MATRIX33_USES_AVX
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         vec4 m012 = load4(val  );
         vec4 m345 = load4(val+4);
         vec4 m678 = load4(val+8);
@@ -402,7 +432,7 @@ public:
     Matrix33 transposed(real alpha) const
     {
         Matrix33 res;
-#if MATRIX33_USES_AVX
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         vec4 a = set4(alpha);
         vec4 m012 = mul4(a, load4(val  ));
         vec4 m345 = mul4(a, load4(val+4));
@@ -686,10 +716,14 @@ public:
     void add_full(Matrix33 const& M)
     {
         real const* src = M.val;
-#if MATRIX33_USES_AVX  && ( BLD == 4 )
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         store4(val  , add4(load4(val  ), load4(src  )));
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
+#elif MATRIX33_USES_AVX
+        storeu4(val  , add4(loadu4(val  ), loadu4(src  )));
+        storeu4(val+4, add4(loadu4(val+4), loadu4(src+4)));
+        store1(val+8, add1(load1(val+8), load1(src+8)));
 #else
         for ( index u = 0; u < BLD*3; ++u )
             val[u] += src[u];
@@ -763,8 +797,8 @@ public:
     {
         real const* src = M.val;
         for ( int x = 0; x < 3; ++x )
-            for ( int y = 0; y < 3; ++y )
-                val[y+BLD*x] += alpha * src[x+BLD*y];
+        for ( int y = 0; y < 3; ++y )
+            val[y+BLD*x] += alpha * src[x+BLD*y];
     }
 
     /// add lower triangle of matrix including diagonal: this <- this + M
@@ -1179,7 +1213,7 @@ public:
 inline std::ostream& operator << (std::ostream& os, Matrix33 const& arg)
 {
     std::ios::fmtflags fgs = os.flags();
-    arg.print(os);
+    arg.print_smart(os);
     os.setf(fgs);
     return os;
 }

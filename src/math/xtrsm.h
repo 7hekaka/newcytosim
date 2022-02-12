@@ -1036,14 +1036,14 @@ void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, real* B)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Unrolled ALSATIAN DTRSM for DIM == 3
+#pragma mark - Unrolled ALSATIAN DTRSM for dimension 3
 
 #if ( DIM == 3 )
 /// version for M = multiple of 3
 void alsatian_xtrsmLLN1U_3D(const int M, const float* A, const int lda, real* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 3D:6
+    assert_true( M >= 3 );
     assert_true( M%3 == 0 );
     //process columns 3 by 3
     for ( int K = 0; K < M; K += 3 )
@@ -1064,7 +1064,7 @@ void alsatian_xtrsmLLN1U_3D(const int M, const float* A, const int lda, real* B)
 void alsatian_xtrsmLUN1I_3D(const int M, const float* A, const int lda, real* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    assert_true( M >= 3 );
     assert_true( M%3 == 0 );
     A += M * lda;
     //process columns 3 by 3
@@ -1088,11 +1088,11 @@ void alsatian_xtrsmLUN1I_3D(const int M, const float* A, const int lda, real* B)
 #pragma mark - SIMD ALSATIAN DTRSM for mixed double/single-precision matrix argument
 
 #if ( DIM < 3 ) && defined(__SSE3__)
-/// this version works for any M, but there is another version for DIM==3 below
+/// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 2D:4
+    assert_true( M >= 3 );
     int K = 0;
 #if ( DIM & 1 )
     // process one column to leave an even number
@@ -1152,7 +1152,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double*
 void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 3D:6
+    assert_true( M >= 3 );
     assert_true( M%3 == 0 );
     //process columns 3 by 3
     for ( int K = 0; K < M; K += 3 )
@@ -1231,11 +1231,11 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
 
 
 #if ( DIM < 3 ) && defined(__SSE3__)
-/// this version works for any M, but there is another version for DIM==3 below
+/// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    assert_true( M >= DIM );
     A += M * lda;
     int K = M - 1;
 #if ( DIM & 1 )
@@ -1313,7 +1313,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
 void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    assert_true( M >= 3 );
     assert_true( M%3 == 0 );
     A += M * lda;
     //process columns 3 by 3
@@ -1410,11 +1410,11 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
 #pragma mark - SIMD ALSATIAN DTRSM for single-precision matrix argument
 
 #if ( DIM < 3 ) && defined(__SSE3__)
-/// this version works for any M, but there is another version for DIM==3 below
+/// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 2D:4
+    assert_true( M >= DIM );
     int K = 0;
 #if ( DIM & 1 )
     // process one column to leave an even number
@@ -1469,7 +1469,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
 void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 3D:6
+    assert_true( M >= 3 );
     assert_true( M%3 == 0 );
     //process columns 3 by 3
     for ( int K = 0; K < M; K += 3 )
@@ -1515,11 +1515,11 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float*
 
 
 #if ( DIM < 3 ) && defined(__SSE3__)
-/// this version works for any M, but there is another version for DIM==3 below
+/// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    assert_true( M >= DIM );
     A += M * lda;
     int K = M - 1;
 #if ( DIM & 1 )
@@ -1576,7 +1576,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
 void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 2*DIM ); // 2D:4 3D:6
+    assert_true( M >= 3 );
     assert_true( M%3 == 0 );
     A += M * lda;
     //process columns 3 by 3
@@ -1729,7 +1729,7 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
         alsatian_xtrsmLLT1<'I'>(N, A, LDA, B);
     }
     else
-        ABORT_NOW("unexpected DIM!");
+        ABORT_NOW("unexpected dimension!");
 #else
     // Solve L*X = B, overwriting B with X. ALPHA = 1.0
     iso_xtrsmLLN<ORD,'I'>(N, A, LDA, B);
@@ -2058,7 +2058,7 @@ void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV
         alsatian_xtrsmLUN1<'N'>(N, A, LDA, B);
     }
     else
-        ABORT_NOW("unexpected DIM!");
+        ABORT_NOW("unexpected dimension!");
 #else
     iso_xtrsmLLN<ORD,'U'>(N, A, LDA, B);
     iso_xtrsmLLT<ORD,'N'>(N, A, LDA, B);

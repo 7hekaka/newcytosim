@@ -175,12 +175,14 @@ public:
     vec4f data0() const { return streamload4f(val); }
 #endif
 
-    /// return unmodifiable pointer of real
+    /// unmodifiable pointer of real
     real const* data() const { return val; }
 
-    /// return address of element at (i, j)
+    /// address of element at line i, column j
     real* addr(const index i, const index j) { return val + ( i + 2*j ); }
-    
+    /// value of element at line i, column j
+    real value(const index i, const index j) const { return val[i+2*j]; }
+
     /// access functions to element by line and column indices
     real& operator()(const index i, const index j)       { return val[i+2*j]; }
     real  operator()(const index i, const index j) const { return val[i+2*j]; }
@@ -235,10 +237,10 @@ public:
     {
         const int w = (int)os.width();
         os << std::setw(2) << "[ ";
-        os << std::setw(w) << (*this)(0,0) << " ";
-        os << std::setw(w) << (*this)(0,1) << "; ";
-        os << std::setw(w) << (*this)(1,0) << " ";
-        os << std::setw(w) << (*this)(1,1) << " ]";
+        os << std::setw(w) << value(0,0) << " ";
+        os << std::setw(w) << value(0,1) << "; ";
+        os << std::setw(w) << value(1,0) << " ";
+        os << std::setw(w) << value(1,1) << " ]";
     }
 
     /// conversion to string

@@ -18,8 +18,6 @@
 #include "blas.h"
 #include "lapack.h"
 #include "cytoblas.h"
-#include "xtbsv.h"
-#include "xtrsm.h"
 
 #include "meca.h"
 #include "mecable.h"

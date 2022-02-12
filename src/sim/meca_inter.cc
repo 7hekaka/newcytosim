@@ -172,7 +172,7 @@ static inline Vector modulo_offset(Interpolation const& A, Interpolation const& 
 //#define CHECK_INDICES(I,J,C) { if (J>I) printf(" wrong-sided %s %lu %lu\n",C,I,J); }
 
 #define PRINT_BLOCK(I,J,B) ((void) 0)
-//#define PRINT_BLOCK(I,J,B) { std::clog<<std::setw(3)<<I<<" "<<J<<" "<<std::setw(10)<<B<<'\n'; }
+//#define PRINT_BLOCK(I,J,B) { std::clog<<std::setw(3)<<I<<" "<<std::setw(3)<<J<<" "<<std::setprecision(2)<<std::setw(10)<<B<<'\n'; }
 
 
 /// add `alpha * T` to the matrix.
@@ -1128,7 +1128,7 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
      */
     const MatrixBlock X = MatrixBlock::outerProduct(axi);
     const MatrixBlock R = MatrixBlock::rotationAroundAxis(axi, ang.XX, ang.YY) - X;
-    const MatrixBlock P = MatrixBlock(0,1) - X;
+    const MatrixBlock P = MatrixBlock(0,1) - X; // symmetric
 #elif ( DIM == 2 )
     const MatrixBlock R = MatrixBlock(ang.XX, ang.YY,-ang.YY, ang.XX);
     const MatrixBlock P(0,1);
@@ -1150,13 +1150,13 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
     if ( iiB > iiA )
         sub_block(iiB, iiA, wR+wP);
     else
-        sub_block(iiA, iiB, (wR+wP).transposed());
+        sub_block(iiA, iiB, wT+wP);
     if ( iiC > iiA )
         add_block(iiC, iiA, wR);
     else
         add_block(iiA, iiC, wT);
 
-    add_block_diag(iiB, (wP+wR)+(wP+wT));
+    add_block_diag(iiB, 2*wP+(wR+wT));
     if ( iiC > iiB )
         sub_block(iiC, iiB, wP+wR);
     else

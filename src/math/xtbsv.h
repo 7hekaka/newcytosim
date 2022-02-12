@@ -1589,7 +1589,7 @@ template < int ORD >
 void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
 {
 #if defined(__AVX__) && REAL_IS_DOUBLE
-    /* use routines for KD=2, and interleaved vectors of size `DIM*nbp` */
+    /* use routines for KD=2, and interleaved vectors of size `ORD*N` */
     if ( ORD == 3 )
     {
         alsatian_xtbsvLNN3(N, AB, LDAB, B);
@@ -1606,7 +1606,7 @@ void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
         alsatian_xtbsvLTN1(N, AB, LDAB, B);
     }
     else
-        ABORT_NOW("unexpected DIM!");
+        ABORT_NOW("unexpected dimension!");
 #elif defined(__SSE3__) && !REAL_IS_DOUBLE
     if ( ORD == 3 )
     {
