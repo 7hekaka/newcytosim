@@ -269,7 +269,7 @@ void SparMatSym2::reset()
 }
 
 
-bool SparMatSym2::isNotZero() const
+bool SparMatSym2::notZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
@@ -1202,6 +1202,20 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
 
 //------------------------------------------------------------------------------
 #pragma mark - Matrix-Vector Add-multiply
+
+
+void SparMatSym2::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    stop = std::min(stop, size_);
+
+    for ( size_t jj = start; jj < stop; ++jj )
+        if ( colsiz_[jj] > 0 )
+        {
+            assert_true(column_[jj][0].inx == jj);
+            vecMulAddCol(X, Y, column_[jj], colsiz_[jj]);
+        }
+}
 
 
 void SparMatSym2::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const

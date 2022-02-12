@@ -199,15 +199,19 @@ public:
     
     /// 3D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 3 * dim(M)
     void vecMulAddIso3D(const real* X, real* Y) const { vecMulAddIso3D(X, Y, 0, size_); }
-
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd(X, Y, 0, size_); }
     
     /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
     void vecMul(const real* X, real* Y)         const { vecMul(X, Y, 0, size_); }
+    
+    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
+    void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;
+    
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
+    void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd_ALT(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
-    bool isNotZero() const;
+    bool notZero() const;
     
     /// number of elements in columns [start, stop[
     size_t nbElements(size_t start, size_t stop, size_t& alc) const;

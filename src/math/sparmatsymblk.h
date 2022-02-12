@@ -92,7 +92,7 @@ public:
         void printBlocks(std::ostream&) const;
         
         /// true if column is empty
-        bool isNotZero() const { return ( nbb_ > 0 ); }
+        bool notEmpty() const { return ( nbb_ > 0 ); }
 
         /// return n-th block (not necessarily, located at line inx_[n]
         Block& operator[](size_t n) const { return blk_[n]; }
@@ -227,13 +227,14 @@ public:
     /// multiplication of a vector, for columns within [start, stop[
     void vecMulAdd(const real*, real* Y, size_t start, size_t stop) const;
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_TIME(const real* X, real* Y) const;
+
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y) const;
+    void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;
+    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
+    void vecMulAdd_ALT(const real* X, real* Y) const { vecMulAdd_ALT(X, Y, 0, size_); }
     
     /// 2D isotropic multiplication (not implemented)
     void vecMulAddIso2D(const real* X, real* Y) const {};
@@ -244,7 +245,7 @@ public:
     void vecMul(const real* X, real* Y) const;
 
     /// true if matrix is non-zero
-    bool isNotZero() const;
+    bool notZero() const;
     
     /// number of blocks in columns [start, stop[. Set allocated size
     size_t nbElements(size_t start, size_t stop, size_t& alc) const;

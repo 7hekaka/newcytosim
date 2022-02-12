@@ -254,7 +254,7 @@ void SparMatSymBlkDiag::reset()
 }
 
 
-bool SparMatSymBlkDiag::isNotZero() const
+bool SparMatSymBlkDiag::notZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_/SD_BLOCK_SIZE; ++jj )
@@ -633,7 +633,7 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
     for ( size_t j = 0; j < end; ++j )
     {
         pilar_[j].dia_.copy_lower();
-        res |= ( pilar_[j].isNotZero() );
+        res |= ( pilar_[j].notEmpty() );
     }
     
     sortElements();
@@ -1717,6 +1717,28 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd4D_AVX(const double* X, double* Y, size_
 //------------------------------------------------------------------------------
 #pragma mark - Matrix-Vector Add-multiply
 
+
+// multiplication of a vector: Y = Y + M * X
+void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    stop = std::min(stop, size_) / SD_BLOCK_SIZE;
+    for ( size_t j = start/SD_BLOCK_SIZE; j < stop; ++j )
+    {
+        //std::clog << "SparMatSymBlkDiag column " << j << "  " << size_ << " \n";
+#if ( SD_BLOCK_SIZE == 1 )
+        pilar_[j].vecMulAdd1D(X, Y, j*SD_BLOCK_SIZE);
+#elif ( SD_BLOCK_SIZE == 2 )
+        pilar_[j].vecMulAdd2D(X, Y, j*SD_BLOCK_SIZE);
+#elif ( SD_BLOCK_SIZE == 3 )
+        pilar_[j].vecMulAdd3D(X, Y, j*SD_BLOCK_SIZE);
+#elif ( SD_BLOCK_SIZE == 4 )
+        pilar_[j].vecMulAdd4D(X, Y, j*SD_BLOCK_SIZE);
+#endif
+    }
+}
+
+
 #if SMSBD_USES_AVX && REAL_IS_DOUBLE
 #   define VECMULADD2D vecMulAdd2D_AVXU
 #   define VECMULADD3D vecMulAdd3D_AVXU
@@ -1752,26 +1774,6 @@ void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t s
         pilar_[jj].VECMULADD3D(X, Y, jj*SD_BLOCK_SIZE);
 #elif ( SD_BLOCK_SIZE == 4 )
         pilar_[jj].VECMULADD4D(X, Y, jj*SD_BLOCK_SIZE);
-#endif
-    }
-}
-
-
-// multiplication of a vector: Y = Y + M * X
-void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y) const
-{
-    size_t stop = size_ / SD_BLOCK_SIZE;
-    for ( size_t j = 0; j < stop; ++j )
-    {
-        //std::clog << "SparMatSymBlkDiag column " << j << "  " << size_ << " \n";
-#if ( SD_BLOCK_SIZE == 1 )
-        pilar_[j].vecMulAdd1D(X, Y, j*SD_BLOCK_SIZE);
-#elif ( SD_BLOCK_SIZE == 2 )
-        pilar_[j].vecMulAdd2D(X, Y, j*SD_BLOCK_SIZE);
-#elif ( SD_BLOCK_SIZE == 3 )
-        pilar_[j].vecMulAdd3D(X, Y, j*SD_BLOCK_SIZE);
-#elif ( SD_BLOCK_SIZE == 4 )
-        pilar_[j].vecMulAdd4D(X, Y, j*SD_BLOCK_SIZE);
 #endif
     }
 }

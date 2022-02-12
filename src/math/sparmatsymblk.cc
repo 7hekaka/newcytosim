@@ -276,7 +276,7 @@ void SparMatSymBlk::reset()
 }
 
 
-bool SparMatSymBlk::isNotZero() const
+bool SparMatSymBlk::notZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
@@ -488,7 +488,7 @@ void SparMatSymBlk::printSparse(std::ostream& os, real inf, size_t start, size_t
     for ( size_t jj = start; jj < stop; ++jj )
     {
         Column & col = column_[jj];
-        if ( col.isNotZero() )
+        if ( col.notEmpty() )
             os << "% column " << jj << "\n";
         for ( size_t n = 0 ; n < col.nbb_ ; ++n )
             printSparseBlock(os, inf, col.blk_[n], col.inx_[n], jj);
@@ -502,7 +502,7 @@ void SparMatSymBlk::printSummary(std::ostream& os, size_t start, size_t stop)
     stop = std::min(stop, size_);
     os << "SMSB size " << size_ << ":";
     for ( size_t j = start; j < stop; ++j )
-        if ( column_[j].isNotZero() )
+        if ( column_[j].notEmpty() )
         {
             os << "\n   " << j << "   " << column_[j].nbb_;
             os << " index " << colidx_[j];
@@ -640,7 +640,7 @@ bool SparMatSymBlk::prepareForMultiply(int)
         size_t nxt = size_;
         while ( inx-- > 0 )
         {
-            if ( column_[inx].isNotZero() )
+            if ( column_[inx].notEmpty() )
                 nxt = inx;
             else
                 column_[inx].deallocate();
@@ -1433,6 +1433,29 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
 //------------------------------------------------------------------------------
 #pragma mark - Matrix-Vector Add-multiply
 
+
+// multiplication of a vector: Y = Y + M * X
+void SparMatSymBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    stop = std::min(stop, size_);
+    for ( size_t j = start; j < stop; j += S_BLOCK_SIZE )
+    if ( column_[j].notEmpty() )
+    {
+        //std::clog << "SparMatSymBlk column " << j << "  " << size_ << " \n";
+#if ( S_BLOCK_SIZE == 1 )
+        column_[j].vecMulAdd1D(X, Y, j);
+#elif ( S_BLOCK_SIZE == 2 )
+        column_[j].vecMulAdd2D(X, Y, j);
+#elif ( S_BLOCK_SIZE == 3 )
+        column_[j].vecMulAdd3D(X, Y, j);
+#elif ( S_BLOCK_SIZE == 4 )
+        column_[j].vecMulAdd4D(X, Y, j);
+#endif
+    }
+}
+
+
 #if SMSB_USES_AVX && REAL_IS_DOUBLE
 #   define VECMULADD2D vecMulAdd2D_AVXU
 #   define VECMULADD3D vecMulAdd3D_AVXU
@@ -1457,41 +1480,17 @@ void SparMatSymBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop)
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_);
-#if ( 1 )
     for ( size_t j = colidx_[start]; j < stop; j = colidx_[j+1] )
-#else
-    for ( size_t j = start; j < stop; j += S_BLOCK_SIZE )
-        if ( !column_[j].empty() )
-#endif
-            {
-                //std::clog << "SparMatSymBlk column " << j << "  " << size_ << " \n";
-#if ( S_BLOCK_SIZE == 1 )
-                column_[j].vecMulAdd1D(X, Y, j);
-#elif ( S_BLOCK_SIZE == 2 )
-                column_[j].VECMULADD2D(X, Y, j);
-#elif ( S_BLOCK_SIZE == 3 )
-                column_[j].VECMULADD3D(X, Y, j);
-#elif ( S_BLOCK_SIZE == 4 )
-                column_[j].VECMULADD4D(X, Y, j);
-#endif
-            }
-}
-
-
-// multiplication of a vector: Y = Y + M * X
-void SparMatSymBlk::vecMulAdd_ALT(const real* X, real* Y) const
-{
-    for ( size_t j = colidx_[0]; j < size_; j = colidx_[j+1] )
     {
         //std::clog << "SparMatSymBlk column " << j << "  " << size_ << " \n";
 #if ( S_BLOCK_SIZE == 1 )
         column_[j].vecMulAdd1D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 2 )
-        column_[j].vecMulAdd2D(X, Y, j);
+        column_[j].VECMULADD2D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 3 )
-        column_[j].vecMulAdd3D(X, Y, j);
+        column_[j].VECMULADD3D(X, Y, j);
 #elif ( S_BLOCK_SIZE == 4 )
-        column_[j].vecMulAdd4D(X, Y, j);
+        column_[j].VECMULADD4D(X, Y, j);
 #endif
     }
 }

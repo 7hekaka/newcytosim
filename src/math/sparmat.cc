@@ -241,7 +241,7 @@ void SparMat::printSparse(std::ostream& os, real, size_t start, size_t stop) con
 }
 
 
-bool SparMat::isNotZero() const
+bool SparMat::notZero() const
 {
     for ( size_t jj = 0; jj < size_; ++jj )
         if ( mxRow[jj] )

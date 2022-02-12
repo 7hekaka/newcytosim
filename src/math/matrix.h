@@ -87,7 +87,7 @@ public:
     virtual real norm_inf() const;
     
     /// true if the matrix is non-zero
-    virtual bool isNotZero() const;
+    virtual bool notZero() const;
     
     /// number of element which are not null
     virtual size_t nbElements(size_t start, size_t stop) const;

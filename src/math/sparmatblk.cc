@@ -201,7 +201,7 @@ void SparMatBlk::reset()
 }
 
 
-bool SparMatBlk::isNotZero() const
+bool SparMatBlk::notZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
@@ -379,7 +379,7 @@ void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t st
     for ( size_t jj = start; jj < stop; ++jj )
     {
         Line & row = row_[jj];
-        if ( row.isNotZero() )
+        if ( row.notEmpty() )
             os << "% line " << jj << "\n";
         size_t d = 1;
         for ( size_t n = 0 ; n < row.rlen_ ; ++n, d = 0 )
@@ -393,7 +393,7 @@ void SparMatBlk::printSummary(std::ostream& os)
 {
     os << "SMB size " << size_ << ":";
     for ( size_t i = 0; i < size_; ++i )
-        if ( row_[i].isNotZero() )
+        if ( row_[i].notEmpty() )
         {
             os << "\n   " << i << "   " << row_[i].rlen_;
             os << " index " << colidx_[i];
@@ -603,7 +603,7 @@ bool SparMatBlk::prepareForMultiply(int)
         size_t nxt = size_;
         while ( inx-- > 0 )
         {
-            if ( row_[inx].isNotZero() )
+            if ( row_[inx].notEmpty() )
                 nxt = inx;
             else
                 row_[inx].deallocate();
@@ -955,6 +955,16 @@ vec4 SparMatBlk::Line::vecMul4D(const double* X) const
 #pragma mark - Vector Multiplication
 
 // multiplication of a vector: Y = Y + M * X
+void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
+{
+    assert_true( start <= stop );
+    stop = std::min(stop, size_);
+    for ( size_t i = start; i < stop; i += BLOCK_SIZE )
+        row_[i].vecMul(X).add_to(Y+i);
+}
+
+
+// multiplication of a vector: Y = Y + M * X
 void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
@@ -972,16 +982,6 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
         row_[i].vecMul(X).add_to(Y+i);
 #endif
     }
-}
-
-
-// multiplication of a vector: Y = Y + M * X
-void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
-{
-    assert_true( start <= stop );
-    stop = std::min(stop, size_);
-    for ( size_t i = start; i < stop; i += BLOCK_SIZE )
-        row_[i].vecMul(X).add_to(Y+i);
 }
 
 

@@ -201,7 +201,7 @@ void SparMatSym::reset()
 }
 
 
-bool SparMatSym::isNotZero() const
+bool SparMatSym::notZero() const
 {
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )

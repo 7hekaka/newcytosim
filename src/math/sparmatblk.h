@@ -102,7 +102,7 @@ public:
         void printBlocks(std::ostream&) const;
         
         /// true if column is empty
-        bool isNotZero() const { return ( rlen_ > 0 ); }
+        bool notEmpty() const { return ( rlen_ > 0 ); }
 
         /// return n-th block (not necessarily, located at line inx_[n]
         Block& operator[](size_t n) const { return blk_[n]; }
@@ -289,7 +289,7 @@ public:
     void vecMul(const real* X, real* Y) const { vecMul(X, Y, 0, size_); }
 
     /// true if matrix is non-zero
-    bool isNotZero() const;
+    bool notZero() const;
     
     /// number of blocks in columns [start, stop[. Set allocated size
     size_t nbElements(size_t start, size_t stop, size_t& alc) const;

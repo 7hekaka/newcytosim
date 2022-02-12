@@ -108,7 +108,7 @@ public:
     void vecMulAddIso3D(const real* X, real* Y) const;
     
     /// true if matrix is non-zero
-    bool isNotZero() const;
+    bool notZero() const;
     
     /// number of elements in columns [start, stop[
     size_t nbElements(size_t start, size_t stop) const;
