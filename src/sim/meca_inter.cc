@@ -306,10 +306,11 @@ inline void Meca::add_iso(size_t i, size_t j, real val)
     CHECK_INDICES(i,j,"add_iso");
 #if USE_ISO_MATRIX
     mISO.element(i,j) += val;
+#elif USE_MATRIX_BLOCK
+    mFUL.block(DIM*i, DIM*j).add_diag(val);
 #else
-    size_t ii = DIM * std::max(i, j);
-    size_t jj = DIM * std::min(i, j);
-    mFUL.block(ii, jj).add_diag(val);
+    for ( size_t x = 0; x < DIM; ++x )
+        mFUL(DIM*i+x, DIM*j+x) += val;
 #endif
 }
 
@@ -320,10 +321,11 @@ inline void Meca::sub_iso(size_t i, size_t j, real val)
     CHECK_INDICES(i,j,"sub_iso");
 #if USE_ISO_MATRIX
     mISO.element(i,j) -= val;
+#elif USE_MATRIX_BLOCK
+    mFUL.block(DIM*i, DIM*j).sub_diag(val);
 #else
-    size_t ii = DIM * std::max(i, j);
-    size_t jj = DIM * std::min(i, j);
-    mFUL.block(ii, jj).sub_diag(val);
+    for ( size_t x = 0; x < DIM; ++x )
+        mFUL(DIM*i+x, DIM*j+x) -= val;
 #endif
 }
 
@@ -333,8 +335,11 @@ inline void Meca::add_iso_diag(size_t i, real val)
     assert_true( i < nPoints_ );
 #if USE_ISO_MATRIX
     mISO.diagonal(i) += val;
-#else
+#elif USE_MATRIX_BLOCK
     mFUL.diag_block(DIM*i).add_diag(val);
+#else
+    for ( size_t x = 0; x < DIM; ++x )
+        mFUL(DIM*i+x, DIM*i+x) += val;
 #endif
 }
 
@@ -344,8 +349,11 @@ inline void Meca::sub_iso_diag(size_t i, real val)
     assert_true( i < nPoints_ );
 #if USE_ISO_MATRIX
     mISO.diagonal(i) -= val;
-#else
+#elif USE_MATRIX_BLOCK
     mFUL.diag_block(DIM*i).sub_diag(val);
+#else
+    for ( size_t x = 0; x < DIM; ++x )
+        mFUL(DIM*i+x, DIM*i+x) -= val;
 #endif
 }
 
@@ -4335,9 +4343,10 @@ void Meca::addPointClampXY(Mecapoint const& ptA,
 #if ( DIM == 2 )
     sub_iso(ptA.matIndex(), ptA.matIndex(), weight);
 #elif ( DIM > 2 )
-    MatrixBlock & B = mFUL.diag_block(inx);
-    B(0, 0) -= weight;
-    B(1, 1) -= weight;
+    MatrixBlock B(0, 0);
+    B(0, 0) = weight;
+    B(1, 1) = weight;
+    sub_block_diag(inx, B);
     assert_true( pos.ZZ == 0 );
 #endif
     add_base(inx, pos, weight);

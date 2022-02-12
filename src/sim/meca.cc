@@ -407,7 +407,7 @@ void Meca::readyMecables()
 }
 
 
-void inline Meca::importParameters(SimulProp const& prop)
+void Meca::importParameters(SimulProp const& prop)
 {
     tau_ = prop.time_step;
     alpha_ = prop.kT / tau_;
