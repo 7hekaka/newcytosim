@@ -315,65 +315,59 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 #ifdef _OPENMP
 #include <omp.h>
 
-/// chunck for parallel execution
-constexpr size_t PARALLEL_CHUNK = DIM*4;
-
 
 template <typename MATRIX>
-void checkMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z)
+void checkMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
 {
     size_t S = mat.size();
     zero_real(S, z);
     // check processing columns one-by-one:
     for ( size_t i = 0; i < S; ++i )
         mat.vecMulAdd(x, z, i, i+1);
-    real sum = checksum(S, z);
-    printf(" check %+16.6f", sum);
+    printf(" check %+16.6f", checksum(S, z));
 
-    for ( int i = 0; i < 5; ++i )
+    for ( int i = 0; i < 4; ++i )
     {
         zero_real(S, z);
         omp_set_num_threads(1<<i);
         #pragma omp parallel for
-        for ( size_t u = 0; u < S; u += PARALLEL_CHUNK )
-            mat.vecMulAdd(x, z, u, u+PARALLEL_CHUNK);
-        real sum1 = checksum(S, z);
-        if ( sum != sum1 )
-            printf(" %luT %+16.6f", 1<<i, sum1);
+        for ( size_t u = 0; u < S; u += chunk )
+            mat.vecMulAdd(x, z, u, u+chunk);
+        printf(" %+16.6f", checksum(S, z));
     }
 }
 
 
 template <typename MATRIX>
-void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z)
+void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
 {
     size_t S = mat.size();
     mat.reset();
     fillMatrix(mat);
     mat.prepareForMultiply(1);
 
-    const size_t sup = 7;
+    const size_t sup = 32;
     double t[sup] = { 0 };
     
-    for ( int i = 0; i < sup; ++i )
+    for ( int u : { 1, 2, 3, 4, 6, 8, 10, 16 } )
     {
-        omp_set_num_threads(1<<i);
+        omp_set_num_threads(u);
         tick();
         for ( size_t j=0; j < CNT; ++j )
         {
             #pragma omp parallel for
-            for ( size_t i = 0; i < S; i += PARALLEL_CHUNK )
-                mat.vecMulAdd(y, z, i, i+PARALLEL_CHUNK);
+            for ( size_t i = 0; i < S; i += chunk )
+                mat.vecMulAdd(y, z, i, i+chunk);
             #pragma omp parallel for
-            for ( size_t i = 0; i < S; i += PARALLEL_CHUNK )
-                mat.vecMulAdd(x, z, i, i+PARALLEL_CHUNK);
+            for ( size_t i = 0; i < S; i += chunk )
+                mat.vecMulAdd(x, z, i, i+chunk);
         }
-        t[i] = tock(N_RUN);
+        t[u] = tock(N_RUN);
     }
 
-    printf("\n%-32s", mat.what().c_str());
-    for ( int i = 0; i < sup; ++i )
-        printf("  %luT %6.3f", 1<<i, t[i]);
+    printf("\n%-29s", mat.what().c_str());
+    for ( int u = 0; u < sup; ++u )
+        if ( t[u] ) printf(" %luT %4.1f", u, t[u]);
     fflush(stdout);
 }
 
@@ -582,8 +576,9 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
     SparMatD mat4; mat4.resize(S); testMatrix(mat4, x, y, z);
     SparMatA mat5; mat5.resize(S); testMatrix(mat5, x, y, z);
 #ifdef _OPENMP
-    testMatrixParallel(mat5, x, y, z);
-    checkMatrixParallel(mat5, x, y, z);
+    size_t chunk = S / 16;
+    testMatrixParallel(mat5, x, y, z, chunk);
+    checkMatrixParallel(mat5, x, y, z, chunk);
 #endif
     
 #if ( 0 )

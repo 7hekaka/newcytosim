@@ -21,6 +21,8 @@
 #endif
 
 
+/// LVD is the dimension of vectors in the matrix
+#define LVD 3
 
 /// 3x4 matrix class with 9 'real' elements stored in line order
 /**
@@ -32,7 +34,11 @@
  Matrix34 is defacto a 3x4 matrix, which can be used as a 3x3 matrix.
  The function clear_shadow() clears the data outside the 3x3 core.
  */
+#if ( LVD == 4 )
 class alignas(4*sizeof(real)) Matrix34 final
+#else
+class Matrix34 final
+#endif
 {
 public:
     
@@ -42,7 +48,7 @@ public:
 private:
     
     /// values of the elements, stored in line-major order
-    real val[12];
+    real val[3*LVD];
     
     /// access to modifiable element by index
     real& operator[](index i)       { return val[i]; }
@@ -52,12 +58,22 @@ private:
 
 public:
     
+    /// clear values in the 4-th column
+    void clear_shadow()
+    {
+#if ( LVD == 4 )
+        val[ 3] = 0.0;
+        val[ 7] = 0.0;
+        val[11] = 0.0;
+#endif
+    }
+
     Matrix34() { clear_shadow(); }
     
     /// copy constructor
     Matrix34(Matrix34 const& M)
     {
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] = M.val[u];
     }
 
@@ -69,12 +85,12 @@ public:
         val[0] = a;
         val[1] = d;
         val[2] = g;
-        val[4] = b;
-        val[5] = e;
-        val[6] = h;
-        val[8] = c;
-        val[9] = f;
-        val[10] = i;
+        val[0+LVD] = b;
+        val[1+LVD] = e;
+        val[2+LVD] = h;
+        val[0+LVD*2] = c;
+        val[1+LVD*2] = f;
+        val[2+LVD*2] = i;
         clear_shadow();
     }
 
@@ -84,12 +100,12 @@ public:
         val[0] = d;
         val[1] = z;
         val[2] = z;
-        val[4] = z;
-        val[5] = d;
-        val[6] = z;
-        val[8] = z;
-        val[9] = z;
-        val[10] = d;
+        val[0+LVD] = z;
+        val[1+LVD] = d;
+        val[2+LVD] = z;
+        val[0+LVD*2] = z;
+        val[1+LVD*2] = z;
+        val[2+LVD*2] = d;
         clear_shadow();
     }
 
@@ -102,30 +118,30 @@ public:
 
     /// human-readable identifier
 #if MATRIX34_USES_AVX
-    static std::string what() { return "+12"; }
+    static std::string what() { return "+10"; }
 #else
-    static std::string what() { return "12"; }
+    static std::string what() { return "10"; }
 #endif
     
     /// set all elements to zero
     void reset()
     {
-        for ( index u = 0; u < 4*3; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] = 0.0;
     }
     
     /// set diagonal to 'dia' and other elements to 'off'
     void reset(real dia, real off)
     {
-        for ( index u = 0; u < 4*3; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] = off;
         for ( index u = 0; u < 3; ++u )
-            val[u*5] = dia;
+            val[u*(LVD+1)] = dia;
     }
     
     bool operator != (real zero) const
     {
-        for ( index u = 0; u < 4*3; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -138,33 +154,45 @@ public:
     real* data() { return val; }
 
 #if defined(__AVX__) && REAL_IS_DOUBLE
-    vec4 data0() const { return streamload4(val); }
+#  if ( LVD == 4 )
+    vec4 data0() const { return streamload4(val  ); }
     vec4 data1() const { return streamload4(val+4); }
     vec4 data2() const { return streamload4(val+8); }
+#  else
+    vec4 data0() const { return loadu4(val); }
+    vec4 data1() const { return loadu4(val+LVD); }
+    vec4 data2() const { return loadu4(val+LVD*2); }
+#  endif
 #elif defined(__SSE3__) && !REAL_IS_DOUBLE
-    vec4f data0() const { return streamload4f(val); }
+#  if ( LVD == 4 )
+    vec4f data0() const { return streamload4f(val  ); }
     vec4f data1() const { return streamload4f(val+4); }
     vec4f data2() const { return streamload4f(val+8); }
+#  else
+    vec4f data0() const { return loadu4f(val); }
+    vec4f data1() const { return loadu4f(val+LVD); }
+    vec4f data2() const { return loadu4f(val+LVD*2); }
+#  endif
 #endif
 
     /// unmodifiable pointer of real
     real const* data() const { return val; }
 
     /// address of element at line i, column j
-    real* addr(const index i, const index j) { return val + ( 4*i + j ); }
+    real* addr(const index i, const index j) { return val + ( LVD*i + j ); }
     /// value of element at line i, column j
-    real value(const index i, const index j) const { return val[4*i+j]; }
+    real value(const index i, const index j) const { return val[LVD*i+j]; }
 
     /// element at line i, column j
-    real& operator()(const index i, const index j)       { return val[4*i+j]; }
-    real  operator()(const index i, const index j) const { return val[4*i+j]; }
+    real& operator()(const index i, const index j)       { return val[LVD*i+j]; }
+    real  operator()(const index i, const index j) const { return val[LVD*i+j]; }
     
     /// set elements from given array
     void load(const real ptr[])
     {
         for ( index i = 0; i < 3; ++i )
         for ( index j = 0; j < 3; ++j )
-            val[4*i+j] = ptr[i+3*j];
+            val[LVD*i+j] = ptr[i+3*j];
     }
 
     /// copy elements to given array
@@ -172,31 +200,31 @@ public:
     {
         for ( index i = 0; i < 3; ++i )
         for ( index j = 0; j < 3; ++j )
-            ptr[i+3*j] = val[4*i+j];
+            ptr[i+3*j] = val[LVD*i+j];
     }
 
     /// extract column vector at given index
     Vector3 column(const index i) const
     {
-        return Vector3(val[i], val[4+i], val[4*2+i]);
+        return Vector3(val[i], val[LVD+i], val[LVD*2+i]);
     }
     
     /// extract line vector at given index
     Vector3 line(const index i) const
     {
-        return Vector3(val+4*i);
+        return Vector3(val+LVD*i);
     }
     
     /// extract diagonal
     Vector3 diagonal() const
     {
-        return Vector3(val[0], val[5], val[10]);
+        return Vector3(val[0], val[LVD+1], val[LVD*2+2]);
     }
     
     /// sum of diagonal terms
     real trace() const
     {
-        return ( val[0] + val[5] + val[10] );
+        return ( val[0] + val[LVD+1] + val[LVD*2+2] );
     }
 
 #pragma mark -
@@ -207,12 +235,12 @@ public:
         val[0 ] = A.XX;
         val[1 ] = A.YY;
         val[2 ] = A.ZZ;
-        val[4 ] = B.XX;
-        val[5 ] = B.YY;
-        val[6 ] = B.ZZ;
-        val[8 ] = C.XX;
-        val[9 ] = C.YY;
-        val[10] = C.ZZ;
+        val[0+LVD] = B.XX;
+        val[1+LVD] = B.YY;
+        val[2+LVD] = B.ZZ;
+        val[0+LVD*2] = C.XX;
+        val[1+LVD*2] = C.YY;
+        val[2+LVD*2] = C.ZZ;
     }
     
     /// set matrix by giving columns
@@ -221,20 +249,29 @@ public:
         val[0 ] = A.XX;
         val[1 ] = B.XX;
         val[2 ] = C.XX;
-        val[4 ] = A.YY;
-        val[5 ] = B.YY;
-        val[6 ] = C.YY;
-        val[8 ] = A.ZZ;
-        val[9 ] = B.ZZ;
-        val[10] = C.ZZ;
+        val[0+LVD] = A.YY;
+        val[1+LVD] = B.YY;
+        val[2+LVD] = C.YY;
+        val[0+LVD*2] = A.ZZ;
+        val[1+LVD*2] = B.ZZ;
+        val[2+LVD*2] = C.ZZ;
     }
 
     /// print matrix in human readable format
     void print(FILE * f) const
     {
-        fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n", val[0], val[1], val[2], val[3]);
-        fprintf(f, " | %9.3f %+9.3f %+9.3f %+9.3f |\n" , val[4], val[5], val[6], val[7]);
-        fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n", val[8], val[9], val[10], val[11]);
+        if ( LVD == 4 )
+        {
+            fprintf(f, " / %9.3f %+9.3f %+9.3f %+9.3f \\\n", val[0], val[1], val[2], val[3]);
+            fprintf(f, " | %9.3f %+9.3f %+9.3f %+9.3f |\n" , val[4], val[5], val[6], val[7]);
+            fprintf(f, " \\ %9.3f %+9.3f %+9.3f %+9.3f /\n", val[8], val[9], val[10], val[11]);
+        }
+        else if ( LVD == 3 )
+        {
+            fprintf(f, " / %9.3f %+9.3f %+9.3f \\\n", val[0], val[3], val[6]);
+            fprintf(f, " | %9.3f %+9.3f %+9.3f |\n" , val[1], val[4], val[7]);
+            fprintf(f, " \\ %9.3f %+9.3f %+9.3f /\n", val[2], val[5], val[8]);
+        }
     }
     
     /// print [ line1; line2; line3 ]
@@ -262,19 +299,11 @@ public:
         print(os);
         return os.str();
     }
-
-    /// clear values in the 4-th column
-    void clear_shadow()
-    {
-        val[3 ] = 0.0;
-        val[7 ] = 0.0;
-        val[11] = 0.0;
-    }
     
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] *= alpha;
     }
 
@@ -288,7 +317,7 @@ public:
     const Matrix34 operator -() const
     {
         Matrix34 M;
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -297,7 +326,7 @@ public:
     const Matrix34 operator *(const real alpha) const
     {
         Matrix34 res;
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             res.val[u] = val[u] * alpha;
         return res;
     }
@@ -312,7 +341,7 @@ public:
     const Matrix34 operator +(Matrix34 const& M) const
     {
         Matrix34 res;
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -321,7 +350,7 @@ public:
     const Matrix34 operator -(Matrix34 const& M) const
     {
         Matrix34 res;
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -329,12 +358,12 @@ public:
     /// subtract given matrix
     void operator +=(Matrix34 const& M)
     {
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         store4(val  , add4(load4(val  ), load4(M.val  )));
         store4(val+4, add4(load4(val+4), load4(M.val+4)));
         store4(val+8, add4(load4(val+8), load4(M.val+8)));
 #else
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -342,12 +371,12 @@ public:
     /// add given matrix
     void operator -=(Matrix34 const& M)
     {
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         store4(val  , sub4(load4(val  ), load4(M.val  )));
         store4(val+4, sub4(load4(val+4), load4(M.val+4)));
         store4(val+8, sub4(load4(val+8), load4(M.val+8)));
 #else
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -355,16 +384,16 @@ public:
     /// transpose matrix in place
     void transpose()
     {
-        std::swap(val[1], val[4]);
-        std::swap(val[2], val[8]);
-        std::swap(val[6], val[9]);
+        std::swap(val[1], val[LVD]);
+        std::swap(val[2], val[LVD*2]);
+        std::swap(val[2+LVD], val[1+LVD*2]);
     }
     
     /// return matrix where 3x3 part is transposed
     Matrix34 transposed() const
     {
         Matrix34 res;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         vec4 m012 = load4(val  );
         vec4 m345 = load4(val+4);
         vec4 m678 = load4(val+8);
@@ -377,7 +406,7 @@ public:
 #else
         for ( index x = 0; x < 3; ++x )
         for ( index y = 0; y < 3; ++y )
-            res[y+4*x] = val[x+4*y];
+            res[y+LVD*x] = val[x+LVD*y];
 #endif
         return res;
     }
@@ -386,7 +415,7 @@ public:
     Matrix34 transposed(real alpha) const
     {
         Matrix34 res;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         vec4 a = set4(alpha);
         vec4 m012 = mul4(a, load4(val  ));
         vec4 m345 = mul4(a, load4(val+4));
@@ -400,7 +429,7 @@ public:
 #else
         for ( index x = 0; x < 3; ++x )
         for ( index y = 0; y < 3; ++y )
-            res[y+4*x] = alpha * val[x+4*y];
+            res[y+LVD*x] = alpha * val[x+LVD*y];
 #endif
         return res;
     }
@@ -411,7 +440,7 @@ public:
     real norm_inf() const
     {
         real res = abs_real(val[0]);
-        for ( index i = 1; i < 12; ++i )
+        for ( index i = 1; i < 3*LVD; ++i )
             res = std::max(res, abs_real(val[i]));
         return res;
     }
@@ -419,9 +448,9 @@ public:
     /// determinant of matrix
     real determinant() const
     {
-        return ( val[0]*val[5]*val[10] + val[2]*val[4]*val[9]
-                +val[1]*val[6]*val[8 ] - val[2]*val[5]*val[8]
-                -val[1]*val[4]*val[10] - val[0]*val[6]*val[9] );
+        return ( value(0,0) * ( value(1,1)*value(2,2) - value(2,1)*value(1,2) )
+                +value(0,1) * ( value(1,2)*value(2,0) - value(2,2)*value(1,0) )
+                +value(0,2) * ( value(1,0)*value(2,1) - value(2,0)*value(1,1) ));
     }
     
     /// inverse in place
@@ -471,11 +500,11 @@ public:
         real iu = 1.0 / u;
         real a = val[1] * iu;
         real b = val[2] * iu;
-        real v = val[1+4] - a * val[1];
+        real v = val[1+LVD] - a * val[1];
         real iv = 1.0 / v;
-        real x = val[2+4] - a * val[2];
+        real x = val[2+LVD] - a * val[2];
         real c = x * iv;
-        real iw = 1.0 / ( val[2+4*2] - b * val[2] - c * x );
+        real iw = 1.0 / ( val[2+LVD*2] - b * val[2] - c * x );
         // inverse triangular matrix U = inverse(L^t):
         b = -b + a * c;
         a = -a;
@@ -484,40 +513,42 @@ public:
         real biw = b * iw;
         real ciw = c * iw;
         // calculate U * inverse(D) * U^t:
-        val[0+4*0] = iu + a * aiv + b * biw;
-        val[1+4*0] = aiv + c * biw;
-        val[2+4*0] = biw;
-        val[0+4*1] = val[1+4*0];
-        val[1+4*1] = iv + c * ciw;
-        val[2+4*1] = ciw;
-        val[0+4*2] = biw;
-        val[1+4*2] = ciw;
-        val[2+4*2] = iw;
+        val[0+LVD*0] = iu + a * aiv + b * biw;
+        val[1+LVD*0] = aiv + c * biw;
+        val[2+LVD*0] = biw;
+        val[0+LVD*1] = val[1+LVD*0];
+        val[1+LVD*1] = iv + c * ciw;
+        val[2+LVD*1] = ciw;
+        val[0+LVD*2] = biw;
+        val[1+LVD*2] = ciw;
+        val[2+LVD*2] = iw;
         return 0;
     }
 
     /// copy values from upper triangle to lower triangle
     void copy_upper()
     {
-        val[4] = val[1];
-        val[8] = val[2];
-        val[9] = val[6];
+        val[LVD    ] = val[1];
+        val[LVD*2  ] = val[2];
+        val[LVD*2+1] = val[LVD*2];
     }
     
     /// copy values from lower triangle to upper triangle
     void copy_lower()
     {
-        val[1] = val[4];
-        val[2] = val[8];
-        val[6] = val[9];
+        val[1    ] = val[LVD];
+        val[2    ] = val[LVD*2];
+        val[2+LVD] = val[LVD*2+1];
     }
 
     /// asymmetry of 3x3 submatrice, divided by the trace
     real asymmetry() const
     {
-        real t = abs_real(val[0]) + abs_real(val[4]) + abs_real(val[8]);
-        return ( abs_real(val[4]-val[1]) + abs_real(val[8]-val[2])
-                + abs_real(val[9]-val[6]) ) / t;
+        real t = abs_real(value(0,0)) + abs_real(value(1,1)) + abs_real(value(2,2));
+        real a = abs_real(value(0,1) - value(1,0));
+        real b = abs_real(value(0,2) - value(2,0));
+        real c = abs_real(value(2,1) - value(1,2));
+        return ( a + b + c ) / t;
     }
 
 #pragma mark -
@@ -526,9 +557,9 @@ public:
     /// multiplication by a vector: this * V = { x, y, z, garbage }
     const vec4 vecmul3_avx(const vec4 vec) const
     {
-        vec4 s0 = mul4(load4(val  ), vec);
-        vec4 s1 = mul4(load4(val+4), vec);
-        vec4 s2 = mul4(load4(val+8), vec);
+        vec4 s0 = mul4(clear4th(loadu4(val  )), vec);
+        vec4 s1 = mul4(clear4th(loadu4(val+LVD)), vec);
+        vec4 s2 = mul4(clear4th(loadu4(val+LVD*2)), vec);
         vec4 s3 = setzero4();
         /* summing the components below requires a lot of shuffling
         but this is required only once when doing a lot of vecmul */
@@ -544,42 +575,42 @@ public:
         vec4 xxxx = duplo4(xyxy); //broadcast1(V);
         vec4 yyyy = duphi4(xyxy); //broadcast1(V+1);
         vec4 zzzz = broadcast1(V+2);
-        xxxx = mul4(load4(val), xxxx);
-        yyyy = mul4(load4(val+4), yyyy);
-        return fmadd4(load4(val+8), zzzz, add4(xxxx,yyyy));
+        xxxx = mul4(loadu4(val), xxxx);
+        yyyy = mul4(loadu4(val+LVD), yyyy);
+        return clear4th(fmadd4(loadu4(val+LVD*2), zzzz, add4(xxxx,yyyy)));
     }
 #endif
     
     /// multiplication by a vector: this * V
     Vector3 vecmul_(Vector3 const& V) const
     {
-        return Vector3(val[0] * V.XX + val[1] * V.YY + val[2] * V.ZZ,
-                       val[4] * V.XX + val[5] * V.YY + val[6] * V.ZZ,
-                       val[8] * V.XX + val[9] * V.YY + val[10] * V.ZZ);
+        return Vector3(val[0    ] * V.XX + val[1      ] * V.YY + val[2      ] * V.ZZ,
+                       val[LVD  ] * V.XX + val[1+LVD  ] * V.YY + val[2+LVD  ] * V.ZZ,
+                       val[LVD*2] * V.XX + val[1+LVD*2] * V.YY + val[2+LVD*2] * V.ZZ);
     }
     
     /// multiplication by a vector: this * V
     Vector3 vecmul_(real const* R) const
     {
-        return Vector3(val[0] * R[0] + val[1] * R[1] + val[2] * R[2],
-                       val[4] * R[0] + val[5] * R[1] + val[6] * R[2],
-                       val[8] * R[0] + val[9] * R[1] + val[10] * R[2]);
+        return Vector3(val[0    ] * R[0] + val[1      ] * R[1] + val[2      ] * R[2],
+                       val[LVD  ] * R[0] + val[1+LVD  ] * R[1] + val[2+LVD  ] * R[2],
+                       val[LVD*2] * R[0] + val[1+LVD*2] * R[1] + val[2+LVD*2] * R[2]);
     }
 
     /// multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul_(Vector3 const& V) const
     {
-        return Vector3(val[0] * V.XX + val[4] * V.YY + val[ 8] * V.ZZ,
-                       val[1] * V.XX + val[5] * V.YY + val[ 9] * V.ZZ,
-                       val[2] * V.XX + val[6] * V.YY + val[10] * V.ZZ);
+        return Vector3(val[0] * V.XX + val[  LVD] * V.YY + val[  LVD*2] * V.ZZ,
+                       val[1] * V.XX + val[1+LVD] * V.YY + val[1+LVD*2] * V.ZZ,
+                       val[2] * V.XX + val[2+LVD] * V.YY + val[2+LVD*2] * V.ZZ);
     }
 
     /// multiplication by a vector: transpose(M) * V
-    Vector3 trans_vecmul_(real const* V) const
+    Vector3 trans_vecmul_(real const* R) const
     {
-        return Vector3(val[0] * V[0] + val[4] * V[1] + val[ 8] * V[2],
-                       val[1] * V[0] + val[5] * V[1] + val[ 9] * V[2],
-                       val[2] * V[0] + val[6] * V[1] + val[10] * V[2]);
+        return Vector3(val[0] * R[0] + val[  LVD] * R[1] + val[  LVD*2] * R[2],
+                       val[1] * R[0] + val[1+LVD] * R[1] + val[1+LVD*2] * R[2],
+                       val[2] * R[0] + val[2+LVD] * R[1] + val[2+LVD*2] * R[2]);
     }
 
     /// multiplication by a vector: this * V
@@ -625,17 +656,17 @@ public:
     const Matrix34 mul(Matrix34 const& M) const
     {
         Matrix34 res;
-        res[0  ] = val[4*0] * M[0] + val[1+4*0] * M[4] + val[2+4*0] * M[8];
-        res[0+4] = val[4*1] * M[0] + val[1+4*1] * M[4] + val[2+4*1] * M[8];
-        res[0+8] = val[4*2] * M[0] + val[1+4*2] * M[4] + val[2+4*2] * M[8];
+        res[0] = val[LVD*0] * M[0] + val[1+LVD*0] * M[1] + val[2+LVD*0] * M[2];
+        res[1] = val[LVD*1] * M[0] + val[1+LVD*1] * M[1] + val[2+LVD*1] * M[2];
+        res[2] = val[LVD*2] * M[0] + val[1+LVD*2] * M[1] + val[2+LVD*2] * M[2];
         
-        res[1  ] = val[4*0] * M[1] + val[1+4*0] * M[5] + val[2+4*0] * M[9];
-        res[1+4] = val[4*1] * M[1] + val[1+4*1] * M[5] + val[2+4*1] * M[9];
-        res[1+8] = val[4*2] * M[1] + val[1+4*2] * M[5] + val[2+4*2] * M[9];
+        res[0+LVD] = val[LVD*0] * M[LVD] + val[1+LVD*0] * M[1+LVD] + val[2+LVD*0] * M[2+LVD];
+        res[1+LVD] = val[LVD*1] * M[LVD] + val[1+LVD*1] * M[1+LVD] + val[2+LVD*1] * M[2+LVD];
+        res[2+LVD] = val[LVD*2] * M[LVD] + val[1+LVD*2] * M[1+LVD] + val[2+LVD*2] * M[2+LVD];
         
-        res[2  ] = val[4*0] * M[2] + val[1+4*0] * M[6] + val[2+4*0] * M[10];
-        res[2+4] = val[4*1] * M[2] + val[1+4*1] * M[6] + val[2+4*1] * M[10];
-        res[2+8] = val[4*2] * M[2] + val[1+4*2] * M[6] + val[2+4*2] * M[10];
+        res[0+LVD*2] = val[LVD*0] * M[LVD*2] + val[1+LVD*0] * M[1+LVD*2] + val[2+LVD*0] * M[2+LVD*2];
+        res[1+LVD*2] = val[LVD*1] * M[LVD*2] + val[1+LVD*1] * M[1+LVD*2] + val[2+LVD*1] * M[2+LVD*2];
+        res[2+LVD*2] = val[LVD*2] * M[LVD*2] + val[1+LVD*2] * M[1+LVD*2] + val[2+LVD*2] * M[2+LVD*2];
         return res;
     }
     
@@ -649,17 +680,17 @@ public:
     const Matrix34 trans_mul(Matrix34 const& M) const
     {
         Matrix34 res;
-        res[0  ] = val[0] * M[0] + val[0+4] * M[4] + val[0+4*2] * M[8];
-        res[0+4] = val[1] * M[0] + val[1+4] * M[4] + val[1+4*2] * M[8];
-        res[0+8] = val[2] * M[0] + val[2+4] * M[4] + val[2+4*2] * M[8];
+        res[0] = val[0] * M[0] + val[0+LVD] * M[1] + val[0+LVD*2] * M[2];
+        res[1] = val[1] * M[0] + val[1+LVD] * M[1] + val[1+LVD*2] * M[2];
+        res[2] = val[2] * M[0] + val[2+LVD] * M[1] + val[2+LVD*2] * M[2];
         
-        res[1  ] = val[0] * M[1] + val[0+4] * M[5] + val[0+4*2] * M[9];
-        res[1+4] = val[1] * M[1] + val[1+4] * M[5] + val[1+4*2] * M[9];
-        res[1+8] = val[2] * M[1] + val[2+4] * M[5] + val[2+4*2] * M[9];
+        res[0+LVD] = val[0] * M[LVD] + val[0+LVD] * M[1+LVD] + val[0+LVD*2] * M[2+LVD];
+        res[1+LVD] = val[1] * M[LVD] + val[1+LVD] * M[1+LVD] + val[1+LVD*2] * M[2+LVD];
+        res[2+LVD] = val[2] * M[LVD] + val[2+LVD] * M[1+LVD] + val[2+LVD*2] * M[2+LVD];
         
-        res[2  ] = val[0] * M[2] + val[0+4] * M[6] + val[0+4*2] * M[10];
-        res[2+4] = val[1] * M[2] + val[1+4] * M[6] + val[1+4*2] * M[10];
-        res[2+8] = val[2] * M[2] + val[2+4] * M[6] + val[2+4*2] * M[10];
+        res[0+LVD*2] = val[0] * M[LVD*2] + val[0+LVD] * M[1+LVD*2] + val[0+LVD*2] * M[2+LVD*2];
+        res[1+LVD*2] = val[1] * M[LVD*2] + val[1+LVD] * M[1+LVD*2] + val[1+LVD*2] * M[2+LVD*2];
+        res[2+LVD*2] = val[2] * M[LVD*2] + val[2+LVD] * M[1+LVD*2] + val[2+LVD*2] * M[2+LVD*2];
         return res;
     }
     
@@ -668,12 +699,12 @@ public:
     void add_full(Matrix34 const& M)
     {
         real const* src = M.val;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         store4(val  , add4(load4(val  ), load4(src  )));
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #else
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] += src[u];
 #endif
     }
@@ -682,13 +713,13 @@ public:
     void add_full(const real alpha, Matrix34 const& M)
     {
         real const* src = M.val;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         vec4 a = set4(alpha);
         store4(val  , fmadd4(a, load4(src  ), load4(val  )));
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -697,12 +728,12 @@ public:
     void sub_full(Matrix34 const& M)
     {
         real const* src = M.val;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         store4(val  , sub4(load4(val  ), load4(src  )));
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #else
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] -= src[u];
 #endif
     }
@@ -711,13 +742,13 @@ public:
     void sub_full(const real alpha, Matrix34 const& M)
     {
         real const* src = M.val;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         vec4 a = set4(alpha);
         store4(val  , fnmadd4(a, load4(src  ), load4(val  )));
         store4(val+4, fnmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fnmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] -= alpha * src[u];
 #endif
     }
@@ -728,7 +759,7 @@ public:
         real const* src = M.val;
         for ( index x = 0; x < 3; ++x )
         for ( index y = 0; y < 3; ++y )
-            val[y+4*x] -= src[x+4*y];
+            val[y+LVD*x] -= src[x+LVD*y];
     }
     
     /// add transposed matrix: this <- this + alpha * transposed(M)
@@ -737,7 +768,7 @@ public:
         real const* src = M.val;
         for ( index x = 0; x < 3; ++x )
         for ( index y = 0; y < 3; ++y )
-            val[y+4*x] += src[x+4*y];
+            val[y+LVD*x] += src[x+LVD*y];
     }
     
     /// add transposed matrix: this <- this + alpha * transposed(M)
@@ -746,24 +777,24 @@ public:
         real const* src = M.val;
         for ( index x = 0; x < 3; ++x )
         for ( index y = 0; y < 3; ++y )
-            val[y+4*x] += alpha * src[x+4*y];
+            val[y+LVD*x] += alpha * src[x+LVD*y];
     }
 
     /// add lower triangle of matrix including diagonal: this <- this + M
     void add_half(Matrix34 const& M)
     {
         real const* src = M.val;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         store4(val  , add4(load4(val  ), load4(src  )));
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] += src[u];
 #else
         for ( index i = 0; i < 3; ++i )
         for ( index j = i; j < 3; ++j )
-            val[4*i+j] += src[4*i+j];
+            val[LVD*i+j] += src[LVD*i+j];
 #endif
     }
     
@@ -772,18 +803,18 @@ public:
     {
         real const* src = M.val;
         //std::clog << "matrix alignment " << ((uintptr_t)src & 63) << "\n";
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         vec4 a = set4(alpha);
         store4(val  , fmadd4(a, load4(src  ), load4(val  )));
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #elif ( 1 )
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] += alpha * src[u];
 #else
         for ( index i = 0; i < 3; ++i )
         for ( index j = i; j < 3; ++j )
-            val[4*i+j] += alpha * src[4*i+j];
+            val[LVD*i+j] += alpha * src[LVD*i+j];
 #endif
     }
     
@@ -791,98 +822,98 @@ public:
     void sub_half(Matrix34 const& M)
     {
         real const* src = M.val;
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         store4(val  , sub4(load4(val  ), load4(src  )));
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( index u = 0; u < 12; ++u )
+        for ( index u = 0; u < 3*LVD; ++u )
             val[u] -= src[u];
 #else
         for ( index i = 0; i < 3; ++i )
         for ( index j = i; j < 3; ++j )
-            val[4*i+j] -= src[4*i+j];
+            val[LVD*i+j] -= src[LVD*i+j];
 #endif
     }
     
     /// add alpha to diagonal
     void add_diag(real alpha)
     {
-        val[0]  += alpha;
-        val[5]  += alpha;
-        val[10] += alpha;
+        val[0]       += alpha;
+        val[1+LVD]   += alpha;
+        val[2+LVD*2] += alpha;
     }
     
     /// add -alpha to diagonal
     void sub_diag(real alpha)
     {
-        val[0]  -= alpha;
-        val[5]  -= alpha;
-        val[10] -= alpha;
+        val[0]       -= alpha;
+        val[1+LVD]   -= alpha;
+        val[2+LVD*2] -= alpha;
     }
 
     /// add all elements of block 'S' to array 'M'
     void addto(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
-        M[1      ] += val[4];
-        M[2      ] += val[8];
+        M[1      ] += val[LVD];
+        M[2      ] += val[LVD*2];
         M[  ldd  ] += val[1];
-        M[1+ldd  ] += val[5];
-        M[2+ldd  ] += val[9];
+        M[1+ldd  ] += val[1+LVD];
+        M[2+ldd  ] += val[1+LVD*2];
         M[  ldd*2] += val[2];
-        M[1+ldd*2] += val[6];
-        M[2+ldd*2] += val[10];
+        M[1+ldd*2] += val[2+LVD];
+        M[2+ldd*2] += val[2+LVD*2];
     }
     
     /// add scaled elements of block 'S' to array 'M'
     void addto(real * M, size_t ldd, real alpha) const
     {
         M[0      ] += alpha * val[0];
-        M[1      ] += alpha * val[4];
-        M[2      ] += alpha * val[8];
+        M[1      ] += alpha * val[LVD];
+        M[2      ] += alpha * val[LVD*2];
         M[  ldd  ] += alpha * val[1];
-        M[1+ldd  ] += alpha * val[5];
-        M[2+ldd  ] += alpha * val[9];
+        M[1+ldd  ] += alpha * val[1+LVD];
+        M[2+ldd  ] += alpha * val[1+LVD*2];
         M[  ldd*2] += alpha * val[2];
-        M[1+ldd*2] += alpha * val[6];
-        M[2+ldd*2] += alpha * val[10];
+        M[1+ldd*2] += alpha * val[2+LVD];
+        M[2+ldd*2] += alpha * val[2+LVD*2];
     }
 
     /// add lower elements of this block to lower triangle of 'M'
     void addto_lower(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
-        M[1      ] += val[1];
-        M[2      ] += val[2];
-        M[1+ldd  ] += val[4];
-        M[2+ldd*1] += val[5];
-        M[2+ldd*2] += val[10];
+        M[1      ] += val[LVD];
+        M[2      ] += val[LVD*2];
+        M[1+ldd  ] += val[1+LVD];
+        M[2+ldd  ] += val[1+LVD*2];
+        M[2+ldd*2] += val[2+LVD*2];
     }
     
     /// add scaled lower elements of this block to lower triangle of 'M'
     void addto_lower(real * M, size_t ldd, real alpha) const
     {
         M[0      ] += alpha * val[0];
-        M[1      ] += alpha * val[1];
-        M[2      ] += alpha * val[2];
-        M[1+ldd  ] += alpha * val[4];
-        M[2+ldd*1] += alpha * val[5];
-        M[2+ldd*2] += alpha * val[10];
+        M[1      ] += alpha * val[LVD];
+        M[2      ] += alpha * val[LVD*2];
+        M[1+ldd  ] += alpha * val[1+LVD];
+        M[2+ldd  ] += alpha * val[2+LVD];
+        M[2+ldd*2] += alpha * val[2+LVD*2];
     }
 
-    /// add upper elements of this block to both upper and lower triangles of 'M'
+    /// add lower elements of this block to both upper and lower triangles of 'M'
     void addto_symm(real * M, size_t ldd) const
     {
         M[0      ] += val[0];
-        M[1      ] += val[1];
-        M[2      ] += val[2];
+        M[1      ] += val[LVD];
+        M[2      ] += val[LVD*2];
         M[  ldd  ] += val[1];
-        M[1+ldd  ] += val[5];
-        M[2+ldd  ] += val[6];
+        M[1+ldd  ] += val[1+LVD];
+        M[2+ldd  ] += val[1+LVD*2];
         M[  ldd*2] += val[2];
-        M[1+ldd*2] += val[6];
-        M[2+ldd*2] += val[10];
+        M[1+ldd*2] += val[2+LVD];
+        M[2+ldd*2] += val[2+LVD*2];
     }
     
     /// add all elements of this block to 'M', with transposition
@@ -891,12 +922,12 @@ public:
         M[0      ] += val[0];
         M[1      ] += val[1];
         M[2      ] += val[2];
-        M[  ldd  ] += val[4];
-        M[1+ldd  ] += val[5];
-        M[2+ldd  ] += val[6];
-        M[  ldd*2] += val[8];
-        M[1+ldd*2] += val[9];
-        M[2+ldd*2] += val[10];
+        M[  ldd  ] += val[0+LVD];
+        M[1+ldd  ] += val[1+LVD];
+        M[2+ldd  ] += val[2+LVD];
+        M[  ldd*2] += val[0+LVD*2];
+        M[1+ldd*2] += val[1+LVD*2];
+        M[2+ldd*2] += val[2+LVD*2];
     }
     
 #pragma mark -
@@ -931,7 +962,7 @@ public:
     /// return a symmetric matrix: alpha * [ dir (x) transpose(dir) ]
     static Matrix34 outerProduct(Vector3 const& dir, real alpha)
     {
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         Matrix34 res;
         vec4 d = dir;
         vec4 p = swap2f128(d);
@@ -955,7 +986,7 @@ public:
     /// return outer product: [ dir (x) transpose(vec) ]
     static Matrix34 outerProduct(Vector3 const& dir, Vector3 const& vec)
     {
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         Matrix34 res;
         vec4 v = dir;
         vec4 p = swap2f128(v);
@@ -976,7 +1007,7 @@ public:
     /// return outer product: [ dir (x) transpose(vec) ]
     static Matrix34 outerProduct(real const* dir, real const* vec)
     {
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         Matrix34 res;
         vec4 d = load3(vec);
         store4(res.val  , mul4(d, broadcast1(dir  )));
@@ -993,21 +1024,21 @@ public:
     /// add outer product: [ vec (x) transpose(dir) ]
     void addOuterProduct(real const* vec, real const* dir)
     {
-#if MATRIX34_USES_AVX
+#if MATRIX34_USES_AVX && ( LVD == 4 )
         vec4 d = load3(dir);
         store4(val  , fmadd4(d, broadcast1(vec  ), load4(val  )));
         store4(val+4, fmadd4(d, broadcast1(vec+1), load4(val+4)));
         store4(val+8, fmadd4(d, broadcast1(vec+2), load4(val+8)));
 #else
-        val[0    ] += dir[0]*vec[0];
-        val[1    ] += dir[1]*vec[0];
-        val[2    ] += dir[2]*vec[0];
-        val[0+4  ] += dir[0]*vec[1];
-        val[1+4  ] += dir[1]*vec[1];
-        val[2+4  ] += dir[2]*vec[1];
-        val[0+4*2] += dir[0]*vec[2];
-        val[1+4*2] += dir[1]*vec[2];
-        val[2+4*2] += dir[2]*vec[2];
+        val[0      ] += dir[0]*vec[0];
+        val[1      ] += dir[1]*vec[0];
+        val[2      ] += dir[2]*vec[0];
+        val[0+LVD  ] += dir[0]*vec[1];
+        val[1+LVD  ] += dir[1]*vec[1];
+        val[2+LVD  ] += dir[2]*vec[1];
+        val[0+LVD*2] += dir[0]*vec[2];
+        val[1+LVD*2] += dir[1]*vec[2];
+        val[2+LVD*2] += dir[2]*vec[2];
 #endif
     }
 

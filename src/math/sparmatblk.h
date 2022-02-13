@@ -23,7 +23,7 @@
 #elif ( BLOCK_SIZE == 2 )
 #  include "matrix22.h"
 #elif ( BLOCK_SIZE == 3 )
-#  include "matrix33.h"
+#  include "matrix34.h"
 #elif ( BLOCK_SIZE == 4 )
 #  include "matrix44.h"
 #endif
@@ -55,7 +55,7 @@ public:
 #elif ( BLOCK_SIZE == 2 )
     typedef Matrix22 Block;
 #elif ( BLOCK_SIZE == 3 )
-    typedef Matrix33 Block;
+    typedef Matrix34 Block;
 #elif ( BLOCK_SIZE == 4 )
     typedef Matrix44 Block;
 #endif

@@ -13,7 +13,7 @@
 /// BLD is the leading dimension of the matrix
 /**
  The code works with BLD = 3 or 4, and typically memory storage is less with 3,
- but performance can be better with 4, as SIMD-AVX calls handle doubles by 4.
+ but performance might be better with 4, as SIMD-AVX calls handle doubles by 4.
  */
 
 #if defined(__AVX__) && REAL_IS_DOUBLE
@@ -464,9 +464,9 @@ public:
     /// determinant of matrix
     real determinant() const
     {
-        return ( val[0]*val[BLD+1]*val[BLD*2+2] + val[2]*val[BLD  ]*val[BLD*2+1]
-                +val[1]*val[BLD+2]*val[BLD*2  ] - val[2]*val[BLD+1]*val[BLD*2  ]
-                -val[1]*val[BLD  ]*val[BLD*2+2] - val[0]*val[BLD+2]*val[BLD*2+1] );
+        return ( value(0,0) * ( value(1,1)*value(2,2) - value(2,1)*value(1,2) )
+                +value(0,1) * ( value(1,2)*value(2,0) - value(2,2)*value(1,0) )
+                +value(0,2) * ( value(1,0)*value(2,1) - value(2,0)*value(1,1) ));
     }
     
     /// inverse in place
@@ -552,9 +552,11 @@ public:
     /// relative asymmetry of 3x3 submatrix (divided by the trace)
     real asymmetry() const
     {
-        real t = abs_real(val[0]) + abs_real(val[1+BLD]) + abs_real(val[2+BLD*2]);
-        return ( abs_real(val[BLD]-val[1]) + abs_real(val[BLD*2]-val[2])
-                + abs_real(val[1+BLD*2]-val[2+BLD]) ) / t;
+        real t = abs_real(value(0,0)) + abs_real(value(1,1)) + abs_real(value(2,2));
+        real a = abs_real(value(0,1) - value(1,0));
+        real b = abs_real(value(0,2) - value(2,0));
+        real c = abs_real(value(2,1) - value(1,2));
+        return ( a + b + c ) / t;
     }
     
 #pragma mark -

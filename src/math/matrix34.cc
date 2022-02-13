@@ -7,9 +7,9 @@
 /// this only works for non-symmetric matrices
 Vector3 Matrix34::rotationAxis() const
 {
-    real x = val[6]-val[9];
-    real y = val[8]-val[2];
-    real z = val[1]-val[4];
+    real x = value(2,1) - value(1,2);
+    real y = value(0,2) - value(2,0);
+    real z = value(1,0) - value(0,1);
     real n = std::sqrt(x*x + y*y + z*z);
     return Vector3(x/n, y/n, z/n);
 }
@@ -22,17 +22,17 @@ real Matrix34::rotationAngle() const
 
 void Matrix34::getEulerAngles(real& a, real& b, real& c) const
 {
-    real cb = std::sqrt(val[0] * val[0] + val[1] * val[1]);
+    real cb = std::sqrt(square(value(0,0)) + square(value(1,0)));
     
-    b = std::atan2(-val[2], cb);
+    b = std::atan2(-value(2,0), cb);
     
     if ( cb != 0 ) {
-        a = std::atan2(val[1], val[0]);
-        c = std::atan2(val[6], val[10]);
+        a = std::atan2(value(1,0), value(0,0));
+        c = std::atan2(value(2,1), value(2,2));
     }
     else {
         a = 0;
-        c = std::atan2(-val[5], val[6]);
+        c = std::atan2(-value(1,1), value(2,1));
     }
 }
 
