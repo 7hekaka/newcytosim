@@ -713,6 +713,7 @@ int main( int argc, char* argv[] )
     testMatrices(8*331, 1<<18);
 #endif
     testMatrices(8*111, 1<<17);
+    testMatrices(15494, 137676);
 #if ( 0 )
     //testMatrices(17, 23);
     size_t dim[5] = { 0 };

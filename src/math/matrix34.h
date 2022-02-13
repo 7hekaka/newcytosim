@@ -530,7 +530,7 @@ public:
     {
         val[LVD    ] = val[1];
         val[LVD*2  ] = val[2];
-        val[LVD*2+1] = val[LVD*2];
+        val[LVD*2+1] = val[2+LVD];
     }
     
     /// copy values from lower triangle to upper triangle
@@ -656,17 +656,17 @@ public:
     const Matrix34 mul(Matrix34 const& M) const
     {
         Matrix34 res;
-        res[0] = val[LVD*0] * M[0] + val[1+LVD*0] * M[1] + val[2+LVD*0] * M[2];
-        res[1] = val[LVD*1] * M[0] + val[1+LVD*1] * M[1] + val[2+LVD*1] * M[2];
-        res[2] = val[LVD*2] * M[0] + val[1+LVD*2] * M[1] + val[2+LVD*2] * M[2];
+        res(0,0) = value(0,0) * M(0,0) + value(0,1) * M(1,0) + value(0,2) * M(2,0);
+        res(1,0) = value(1,0) * M(0,0) + value(1,1) * M(1,0) + value(1,2) * M(2,0);
+        res(2,0) = value(2,0) * M(0,0) + value(2,1) * M(1,0) + value(2,2) * M(2,0);
         
-        res[0+LVD] = val[LVD*0] * M[LVD] + val[1+LVD*0] * M[1+LVD] + val[2+LVD*0] * M[2+LVD];
-        res[1+LVD] = val[LVD*1] * M[LVD] + val[1+LVD*1] * M[1+LVD] + val[2+LVD*1] * M[2+LVD];
-        res[2+LVD] = val[LVD*2] * M[LVD] + val[1+LVD*2] * M[1+LVD] + val[2+LVD*2] * M[2+LVD];
+        res(0,1) = value(0,0) * M(0,1) + value(0,1) * M(1,1) + value(0,2) * M(2,1);
+        res(1,1) = value(1,0) * M(0,1) + value(1,1) * M(1,1) + value(1,2) * M(2,1);
+        res(2,1) = value(2,0) * M(0,1) + value(2,1) * M(1,1) + value(2,2) * M(2,1);
         
-        res[0+LVD*2] = val[LVD*0] * M[LVD*2] + val[1+LVD*0] * M[1+LVD*2] + val[2+LVD*0] * M[2+LVD*2];
-        res[1+LVD*2] = val[LVD*1] * M[LVD*2] + val[1+LVD*1] * M[1+LVD*2] + val[2+LVD*1] * M[2+LVD*2];
-        res[2+LVD*2] = val[LVD*2] * M[LVD*2] + val[1+LVD*2] * M[1+LVD*2] + val[2+LVD*2] * M[2+LVD*2];
+        res(0,2) = value(0,0) * M(0,2) + value(0,1) * M(1,2) + value(0,2) * M(2,2);
+        res(1,2) = value(1,0) * M(0,2) + value(1,1) * M(1,2) + value(1,2) * M(2,2);
+        res(2,2) = value(2,0) * M(0,2) + value(2,1) * M(1,2) + value(2,2) * M(2,2);
         return res;
     }
     
@@ -680,17 +680,17 @@ public:
     const Matrix34 trans_mul(Matrix34 const& M) const
     {
         Matrix34 res;
-        res[0] = val[0] * M[0] + val[0+LVD] * M[1] + val[0+LVD*2] * M[2];
-        res[1] = val[1] * M[0] + val[1+LVD] * M[1] + val[1+LVD*2] * M[2];
-        res[2] = val[2] * M[0] + val[2+LVD] * M[1] + val[2+LVD*2] * M[2];
+        res(0,0) = value(0,0) * M(0,0) + value(1,0) * M(1,0) + value(2,0) * M(2,0);
+        res(1,0) = value(0,1) * M(0,0) + value(1,1) * M(1,0) + value(2,1) * M(2,0);
+        res(2,0) = value(0,2) * M(0,0) + value(1,2) * M(1,0) + value(2,2) * M(2,0);
         
-        res[0+LVD] = val[0] * M[LVD] + val[0+LVD] * M[1+LVD] + val[0+LVD*2] * M[2+LVD];
-        res[1+LVD] = val[1] * M[LVD] + val[1+LVD] * M[1+LVD] + val[1+LVD*2] * M[2+LVD];
-        res[2+LVD] = val[2] * M[LVD] + val[2+LVD] * M[1+LVD] + val[2+LVD*2] * M[2+LVD];
+        res(0,1) = value(0,0) * M(0,1) + value(1,0) * M(1,1) + value(2,0) * M(2,1);
+        res(1,1) = value(0,1) * M(0,1) + value(1,1) * M(1,1) + value(2,1) * M(2,1);
+        res(2,1) = value(0,2) * M(0,1) + value(1,2) * M(1,1) + value(2,2) * M(2,1);
         
-        res[0+LVD*2] = val[0] * M[LVD*2] + val[0+LVD] * M[1+LVD*2] + val[0+LVD*2] * M[2+LVD*2];
-        res[1+LVD*2] = val[1] * M[LVD*2] + val[1+LVD] * M[1+LVD*2] + val[1+LVD*2] * M[2+LVD*2];
-        res[2+LVD*2] = val[2] * M[LVD*2] + val[2+LVD] * M[1+LVD*2] + val[2+LVD*2] * M[2+LVD*2];
+        res(0,2) = value(0,0) * M(0,2) + value(1,0) * M(1,2) + value(2,0) * M(2,2);
+        res(1,2) = value(0,1) * M(0,2) + value(1,1) * M(1,2) + value(2,1) * M(2,2);
+        res(2,2) = value(0,2) * M(0,2) + value(1,2) * M(1,2) + value(2,2) * M(2,2);
         return res;
     }
     

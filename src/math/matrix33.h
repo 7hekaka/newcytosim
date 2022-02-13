@@ -675,17 +675,17 @@ public:
     const Matrix33 mul(Matrix33 const& M) const
     {
         Matrix33 res;
-        res[0] = val[0] * M[0] + val[0+BLD] * M[1] + val[0+BLD*2] * M[2];
-        res[1] = val[1] * M[0] + val[1+BLD] * M[1] + val[1+BLD*2] * M[2];
-        res[2] = val[2] * M[0] + val[2+BLD] * M[1] + val[2+BLD*2] * M[2];
+        res(0,0) = value(0,0) * M(0,0) + value(0,1) * M(1,0) + value(0,2) * M(2,0);
+        res(1,0) = value(1,0) * M(0,0) + value(1,1) * M(1,0) + value(1,2) * M(2,0);
+        res(2,0) = value(2,0) * M(0,0) + value(2,1) * M(1,0) + value(2,2) * M(2,0);
         
-        res[0+BLD] = val[0] * M[BLD] + val[0+BLD] * M[1+BLD] + val[0+BLD*2] * M[2+BLD];
-        res[1+BLD] = val[1] * M[BLD] + val[1+BLD] * M[1+BLD] + val[1+BLD*2] * M[2+BLD];
-        res[2+BLD] = val[2] * M[BLD] + val[2+BLD] * M[1+BLD] + val[2+BLD*2] * M[2+BLD];
-
-        res[0+BLD*2] = val[0] * M[BLD*2] + val[0+BLD] * M[1+BLD*2] + val[0+BLD*2] * M[2+BLD*2];
-        res[1+BLD*2] = val[1] * M[BLD*2] + val[1+BLD] * M[1+BLD*2] + val[1+BLD*2] * M[2+BLD*2];
-        res[2+BLD*2] = val[2] * M[BLD*2] + val[2+BLD] * M[1+BLD*2] + val[2+BLD*2] * M[2+BLD*2];
+        res(0,1) = value(0,0) * M(0,1) + value(0,1) * M(1,1) + value(0,2) * M(2,1);
+        res(1,1) = value(1,0) * M(0,1) + value(1,1) * M(1,1) + value(1,2) * M(2,1);
+        res(2,1) = value(2,0) * M(0,1) + value(2,1) * M(1,1) + value(2,2) * M(2,1);
+        
+        res(0,2) = value(0,0) * M(0,2) + value(0,1) * M(1,2) + value(0,2) * M(2,2);
+        res(1,2) = value(1,0) * M(0,2) + value(1,1) * M(1,2) + value(1,2) * M(2,2);
+        res(2,2) = value(2,0) * M(0,2) + value(2,1) * M(1,2) + value(2,2) * M(2,2);
         return res;
     }
     
@@ -699,17 +699,17 @@ public:
     const Matrix33 trans_mul(Matrix33 const& M) const
     {
         Matrix33 res;
-        res[0] = val[BLD*0] * M[0] + val[1+BLD*0] * M[1] + val[2+BLD*0] * M[2];
-        res[1] = val[BLD*1] * M[0] + val[1+BLD*1] * M[1] + val[2+BLD*1] * M[2];
-        res[2] = val[BLD*2] * M[0] + val[1+BLD*2] * M[1] + val[2+BLD*2] * M[2];
+        res(0,0) = value(0,0) * M(0,0) + value(1,0) * M(1,0) + value(2,0) * M(2,0);
+        res(1,0) = value(0,1) * M(0,0) + value(1,1) * M(1,0) + value(2,1) * M(2,0);
+        res(2,0) = value(0,2) * M(0,0) + value(1,2) * M(1,0) + value(2,2) * M(2,0);
         
-        res[0+BLD] = val[BLD*0] * M[BLD] + val[1+BLD*0] * M[1+BLD] + val[2+BLD*0] * M[2+BLD];
-        res[1+BLD] = val[BLD*1] * M[BLD] + val[1+BLD*1] * M[1+BLD] + val[2+BLD*1] * M[2+BLD];
-        res[2+BLD] = val[BLD*2] * M[BLD] + val[1+BLD*2] * M[1+BLD] + val[2+BLD*2] * M[2+BLD];
+        res(0,1) = value(0,0) * M(0,1) + value(1,0) * M(1,1) + value(2,0) * M(2,1);
+        res(1,1) = value(0,1) * M(0,1) + value(1,1) * M(1,1) + value(2,1) * M(2,1);
+        res(2,1) = value(0,2) * M(0,1) + value(1,2) * M(1,1) + value(2,2) * M(2,1);
         
-        res[0+BLD*2] = val[BLD*0] * M[BLD*2] + val[1+BLD*0] * M[1+BLD*2] + val[2+BLD*0] * M[2+BLD*2];
-        res[1+BLD*2] = val[BLD*1] * M[BLD*2] + val[1+BLD*1] * M[1+BLD*2] + val[2+BLD*1] * M[2+BLD*2];
-        res[2+BLD*2] = val[BLD*2] * M[BLD*2] + val[1+BLD*2] * M[1+BLD*2] + val[2+BLD*2] * M[2+BLD*2];
+        res(0,2) = value(0,0) * M(0,2) + value(1,0) * M(1,2) + value(2,0) * M(2,2);
+        res(1,2) = value(0,1) * M(0,2) + value(1,1) * M(1,2) + value(2,1) * M(2,2);
+        res(2,2) = value(0,2) * M(0,2) + value(1,2) * M(1,2) + value(2,2) * M(2,2);
         return res;
     }
     
