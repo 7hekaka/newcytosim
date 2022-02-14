@@ -26,10 +26,10 @@
 
 SparMatSymBlk::SparMatSymBlk()
 {
-    size_    = 0;
-    alloc_   = 0;
-    column_  = nullptr;
-    colidx_  = new size_t[2]();
+    size_   = 0;
+    alloc_  = 0;
+    column_ = nullptr;
+    colidx_ = new size_t[2]();
 }
 
 
@@ -163,53 +163,46 @@ void SparMatSymBlk::Column::operator =(SparMatSymBlk::Column & col)
     col.blk_ = nullptr;
 }
 
+
+
+
+/* This is a silly search that could be optimized */
+SparMatSymBlk::Block* SparMatSymBlk::Column::find_block(size_t ii) const
+{
+    for ( size_t n = 0; n < nbb_; ++n )
+        if ( inx_[n] == ii )
+            return blk_ + n;
+    return nullptr;
+}
+
 /**
  This allocates to be able to hold the matrix element if necessary
  */
 SparMatSymBlk::Block& SparMatSymBlk::Column::block(size_t ii, size_t jj)
 {
     assert_true( ii >= jj );
-    if ( nbb_ > 0 )
+    SparMatSymBlk::Block * B = find_block(ii);
+    if ( !B )
     {
-        if ( inx_[0] == ii )
-            return blk_[0];
-        /* This is a silly search that could be optimized */
-        for ( size_t n = 1; n < nbb_; ++n )
-            if ( inx_[n] == ii )
-                return blk_[n];
-    }
-    else
-    {
-        allocate(2);
-        // put diagonal term always first:
-        inx_[0] = jj;
-        blk_[0].reset();
-        if ( ii == jj )
+        allocate(nbb_+2);
+        if ( nbb_ == 0 )
         {
+            // put diagonal term always first:
+            inx_[0] = jj;
+            blk_[0].reset();
             nbb_ = 1;
-            return blk_[0];
+            if ( ii == jj )
+                return blk_[0];
         }
-        //add the requested term:
-        inx_[1] = ii;
-        blk_[1].reset();
-        nbb_ = 2;
-        return blk_[1];
+        assert_true( ii > jj );
+        //add the requested term last:
+        B = blk_ + nbb_;
+        inx_[nbb_] = ii;
+        B->reset();
+        ++nbb_;
     }
-    
-    // add the requested term last:
-    size_t n = nbb_;
-    
-    // allocate space for new Element if necessary:
-    if ( n >= allo_ )
-        allocate(n+1);
-    
-    assert_true( n < allo_ );
-    inx_[n] = ii;
-    blk_[n].reset();
-    nbb_ = n + 1;
-    
     //printColumn(jj);
-    return blk_[n];
+    return *B;
 }
 
 
@@ -236,7 +229,7 @@ SparMatSymBlk::Block& SparMatSymBlk::diag_block(size_t ii)
 }
 
 
-real& SparMatSymBlk::operator()(size_t iii, size_t jjj)
+real& SparMatSymBlk::element(size_t iii, size_t jjj)
 {
     // branchless code to address lower triangle
     size_t ii = std::max(iii, jjj);
@@ -257,7 +250,7 @@ real* SparMatSymBlk::addr(size_t iii, size_t jjj) const
     size_t ii = std::max(iii, jjj);
     size_t jj = std::min(iii, jjj);
 #if ( S_BLOCK_SIZE == 1 )
-    return &column_[jj].block(ii, jj).value();
+    return column_[jj].block(ii, jj).data();
 #else
     size_t i = ii % S_BLOCK_SIZE;
     size_t j = jj % S_BLOCK_SIZE;
@@ -468,18 +461,19 @@ std::string SparMatSymBlk::what() const
 
 static void printSparseBlock(std::ostream& os, real inf, SparMatSymBlk::Block const& B, size_t ii, size_t jj)
 {
-    for ( size_t y = 0; y < S_BLOCK_SIZE; ++y )
-    for ( size_t x = (ii==jj?y:0); x < S_BLOCK_SIZE; ++x )
+    for ( size_t x = 0; x < B.dimension(); ++x )
+    for ( size_t y = (ii==jj?x:0); y < B.dimension(); ++y )
     {
         real v = B(y, x);
         if ( abs_real(v) >= inf )
-            os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << v;
+            os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << std::setw(16) << v << "\n";
     }
 }
 
 
 void SparMatSymBlk::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
+    os << "% SparMatSymBlk size " << size_ << ":\n";
     stop = std::min(stop, size_);
     std::streamsize p = os.precision();
     os.precision(8);

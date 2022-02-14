@@ -1727,13 +1727,13 @@ void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y, size_t start, size
     {
         //std::clog << "SparMatSymBlkDiag column " << j << "  " << size_ << " \n";
 #if ( SD_BLOCK_SIZE == 1 )
-        pilar_[j].vecMulAdd1D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd1D(X, Y, j);
 #elif ( SD_BLOCK_SIZE == 2 )
-        pilar_[j].vecMulAdd2D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd2D(X, Y, j*2);
 #elif ( SD_BLOCK_SIZE == 3 )
-        pilar_[j].vecMulAdd3D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd3D(X, Y, j*3);
 #elif ( SD_BLOCK_SIZE == 4 )
-        pilar_[j].vecMulAdd4D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd4D(X, Y, j*4);
 #endif
     }
 }
@@ -1763,17 +1763,17 @@ void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t s
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_) / SD_BLOCK_SIZE;
-    for ( size_t jj = start/SD_BLOCK_SIZE; jj < stop; ++jj )
+    for ( size_t j = start/SD_BLOCK_SIZE; j < stop; ++j )
     {
         //std::clog << "SparMatSymBlkDiag column " << jj << "  " << size_ << " \n";
 #if ( SD_BLOCK_SIZE == 1 )
-        pilar_[jj].vecMulAdd1D(X, Y, jj*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd1D(X, Y, j);
 #elif ( SD_BLOCK_SIZE == 2 )
-        pilar_[jj].VECMULADD2D(X, Y, jj*SD_BLOCK_SIZE);
+        pilar_[j].VECMULADD2D(X, Y, j*2);
 #elif ( SD_BLOCK_SIZE == 3 )
-        pilar_[jj].VECMULADD3D(X, Y, jj*SD_BLOCK_SIZE);
+        pilar_[j].VECMULADD3D(X, Y, j*3);
 #elif ( SD_BLOCK_SIZE == 4 )
-        pilar_[jj].VECMULADD4D(X, Y, jj*SD_BLOCK_SIZE);
+        pilar_[j].VECMULADD4D(X, Y, j*4);
 #endif
     }
 }
@@ -1791,13 +1791,13 @@ void SparMatSymBlkDiag::vecMulAdd_TIME(const real* X, real* Y) const
         cnt += pilar_[j].noff_;
         //std::clog << "SparMatSymBlkDiag column " << j << "  " << size_ << " \n";
 #if ( SD_BLOCK_SIZE == 1 )
-        pilar_[j].vecMulAdd1D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd1D(X, Y, j);
 #elif ( SD_BLOCK_SIZE == 2 )
-        pilar_[j].vecMulAdd2D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd2D(X, Y, j*2);
 #elif ( SD_BLOCK_SIZE == 3 )
-        pilar_[j].vecMulAdd3D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd3D(X, Y, j*3);
 #elif ( SD_BLOCK_SIZE == 4 )
-        pilar_[j].vecMulAdd4D(X, Y, j*SD_BLOCK_SIZE);
+        pilar_[j].vecMulAdd4D(X, Y, j*4);
 #endif
     }
     /*

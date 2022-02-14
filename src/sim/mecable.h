@@ -296,7 +296,7 @@ public:
     SIZE_T blockType()       const { return pBlockType; }
 
     /// Returns address of memory allocated for preconditionning
-    real * block()           const { return pBlock; }
+    real * pblock()          const { return pBlock; }
     
     /// Returns address of memory allocated for preconditionning (pivot)
     int * pivot()            const { return pPivot; }

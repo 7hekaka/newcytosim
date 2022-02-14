@@ -435,22 +435,19 @@ std::string SparMatSym1::what() const
 
 void SparMatSym1::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
-    os << "% SparMatSym1 size " << size_ << ":";
     stop = std::min(stop, size_);
-    char str[256];
+    os << "% SparMatSym1 size " << size_ << ":\n";
     for ( size_t jj = start; jj < stop; ++jj )
     {
-        if ( colsiz_[jj] > 0 )
+        if ( colsiz_[jj] > 0 || diagon_[jj] )
         {
             os << "% column " << jj << " dia " << diagon_[jj] << "\n";
             for ( size_t n = 0 ; n < colsiz_[jj] ; ++n )
             {
+                size_t ii = column_[jj][n].inx;
                 real v = column_[jj][n].val;
                 if ( abs_real(v) >= inf )
-                {
-                    snprintf(str, sizeof(str), "%6u %6lu %16.6f\n", column_[jj][n].inx, jj, v);
-                    os << str;
-                }
+                    os << std::setw(6) << ii << " " << std::setw(6) << jj << " " << std::setw(16) << v << "\n";
             }
         }
     }
@@ -542,8 +539,8 @@ void SparMatSym1::vecMulAddCol(const real* X, real* Y, size_t jj,
     {
         const size_t ii = col[n].inx;
         const real a = col[n].val;
-        Y[ii] += a * X0;
         assert_true( ii > jj );
+        Y[ii] += a * X0;
         Y0 += a * X[ii];
     }
     Y[jj] = Y0;
@@ -564,9 +561,9 @@ void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj,
     {
         const size_t ii = 2 * col[n].inx;
         const real a = col[n].val;
+        assert_true( ii > jj );
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
-        assert_true( ii > jj );
         Y0 += a * X[ii  ];
         Y1 += a * X[ii+1];
     }
@@ -591,10 +588,10 @@ void SparMatSym1::vecMulAddColIso3D(const real* X, real* Y, size_t jj,
     {
         const size_t ii = 3 * col[n].inx;
         const real a = col[n].val;
+        assert_true( ii > jj );
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
         Y[ii+2] += a * X2;
-        assert_true( ii > jj );
         Y0 += a * X[ii  ];
         Y1 += a * X[ii+1];
         Y2 += a * X[ii+2];
@@ -771,9 +768,9 @@ void SparMatSym1::vecMulAddColIso2D(const real* X, real* Y, size_t jj,
     real Y1 = Y[jj+1] + dia * X1;
     for ( size_t n = start; n < stop; ++n )
     {
+        real a = elm_[n];
         auto ii = ija_[n];
         assert_true( ii > jj );
-        real a = elm_[n];
         Y0      += a * X[ii  ];
         Y1      += a * X[ii+1];
         Y[ii  ] += a * X0;

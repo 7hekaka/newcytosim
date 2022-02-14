@@ -93,9 +93,12 @@ public:
         
         /// true if column is empty
         bool notEmpty() const { return ( nbb_ > 0 ); }
-
+        
         /// return n-th block (not necessarily, located at line inx_[n]
         Block& operator[](size_t n) const { return blk_[n]; }
+
+        /// return block corresponding to index
+        Block* find_block(size_t j) const;
 
         /// return block located at line 'i' and column 'j'
         Block& block(size_t i, size_t j);
@@ -202,12 +205,15 @@ public:
 #endif
     }
     
-    /// returns the address of element at (x, y), no allocation is done
-    real* addr(size_t x, size_t y) const;
-    
-    /// returns the address of element at (x, y), allocating if necessary
-    real& operator()(size_t x, size_t y);
-    
+    /// returns the address of element at line i, column j, no allocation is done
+    real* addr(size_t i, size_t j) const;
+
+    /// returns the address of element at line i, column j, allocating if necessary
+    real& element(size_t i, size_t j);
+
+    /// returns the address of element at line i, column j, allocating if necessary
+    real& operator()(size_t i, size_t j) { return element(i,j); }
+
     /// scale the matrix by a scalar factor
     void scale(real);
     

@@ -4900,8 +4900,8 @@ void Meca::addLineClamp(Interpolation const& pti,
 
 
 /**
- This constrains a single degree of freedom indicated by 'inx', representing a
- planar constraint in 3D. Hence 'off' is the X, Y or Z component of the plane.
+ This constrains a single degree of freedom indicated by 'xyz = { 0, 1, 2 }',
+ to a plane in 3D. Hence 'off' is the X, Y or Z component of the plane.
 */
 void Meca::addPlaneClampXYZ(Mecapoint const& P, size_t xyz, real off, real weight)
 {
@@ -5045,8 +5045,8 @@ void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
     Vector ab = position_delta(ptA, ptB);
     real abnSqr = ab.normSqr(), abn=std::sqrt(abnSqr);
     
-    const size_t inxA = DIM * ptA.matIndex();
-    const size_t inxB = DIM * ptB.matIndex();
+    const size_t aa = DIM * ptA.matIndex();
+    const size_t bb = DIM * ptB.matIndex();
     
     if ( abn < REAL_EPSILON ) return;
     ab /= abn;
@@ -5054,22 +5054,14 @@ void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
     real abn3 = weight / abnSqr;
     real abn5 = weight / ( abnSqr * abn );
     
-    add_base(inxA, ab,-3*abn3);
-    add_base(inxB, ab, 3*abn3);
+    add_base(aa, ab,-3*abn3);
+    add_base(bb, ab, 3*abn3);
     
-    for ( unsigned ii = 0; ii < DIM; ++ii )
-    {
-        for ( unsigned jj = ii; jj < DIM; ++jj )
-        {
-            real m = abn5 * ( (ii==jj) - 3 * ab[ii] * ab[jj] );
-            
-            mFUL(inxA+ii, inxA+jj) -= m;
-            mFUL(inxB+ii, inxB+jj) -= m;
-            
-            mFUL(inxA+ii, inxB+jj) += m;
-            if ( ii != jj )
-                mFUL(inxA+jj, inxB+ii) += m;
-        }
-    }
+    // abn5 * I + [ ab (x) ab ] * (-3))
+    MatrixBlock B = MatrixBlock::offsetOuterProduct(abn5, ab, -3);
+
+    sub_block_diag(aa, B);
+    sub_block_diag(bb, B);
+    add_block(aa, bb, B);
 }
 

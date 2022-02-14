@@ -137,24 +137,32 @@ void SparMatBlk::Line::operator =(SparMatBlk::Line & row)
     row.blk_ = nullptr;
 }
 
+
+/* This is a silly search that could be optimized */
+SparMatBlk::Block* SparMatBlk::Line::find_block(size_t jj) const
+{
+    for ( size_t n = 0; n < rlen_; ++n )
+        if ( inx_[n] == jj )
+            return blk_ + n;
+    return nullptr;
+}
+
 /**
  This allocates to be able to hold the matrix element if necessary
  */
 SparMatBlk::Block& SparMatBlk::Line::block(size_t jj)
 {
-    size_t n = 0;
-    /* This is a silly search that could be optimized */
-    for ( n = 0; n < rlen_; ++n )
-        if ( inx_[n] == jj )
-            return blk_[n];
-
-    allocate(n+1);
-    
-    //add the requested term:
-    inx_[n] = jj;
-    blk_[n].reset();
-    rlen_ = n + 1;
-    return blk_[n];
+    SparMatBlk::Block * B = find_block(jj);
+    if ( !B )
+    {
+        allocate(rlen_+1);
+        //add the requested term:
+        B = blk_ + rlen_;
+        inx_[rlen_] = jj;
+        B->reset();
+        ++rlen_;
+    }
+    return *B;
 }
 
 
@@ -164,7 +172,7 @@ void SparMatBlk::Line::reset()
 }
 
 
-real& SparMatBlk::operator()(size_t ii, size_t jj)
+real& SparMatBlk::element(size_t ii, size_t jj)
 {
     assert_true( ii >= jj );
 #if ( BLOCK_SIZE == 1 )
@@ -181,7 +189,7 @@ real* SparMatBlk::addr(size_t ii, size_t jj) const
 {
     assert_true( ii >= jj );
 #if ( BLOCK_SIZE == 1 )
-    return &row_[ii].block(jj).value();
+    return row_[ii].block(jj).data();
 #else
     size_t i = ii % BLOCK_SIZE;
     size_t j = jj % BLOCK_SIZE;
@@ -359,18 +367,19 @@ std::string SparMatBlk::what() const
 
 static void printSparseBlock(std::ostream& os, real inf, SparMatBlk::Block const& B, size_t ii, size_t jj)
 {
-    for ( size_t y = 0; y < BLOCK_SIZE; ++y )
-    for ( size_t x = (ii==jj?y:0); x < BLOCK_SIZE; ++x )
+    for ( size_t x = 0; x < B.dimension(); ++x )
+    for ( size_t y = (ii==jj?x:0); y < B.dimension(); ++y )
     {
         real v = B(y, x);
         if ( abs_real(v) >= inf )
-            os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << v;
+            os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << std::setw(16) << v << "\n";
     }
 }
 
 
 void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
+    os << "% SparMatBlk size " << size_ << ":\n";
     stop = std::min(stop, size_);
     std::streamsize p = os.precision();
     os.precision(8);

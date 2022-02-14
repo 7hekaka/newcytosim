@@ -228,6 +228,7 @@ void SparMat::printSparse(std::ostream& os, real, size_t start, size_t stop) con
 {
     stop = std::min(stop, size_);
     os.precision(8);
+    os << "% SparMat size " << size_ << ":\n";
     for ( size_t jj = start; jj < stop; ++jj )
     {
         if ( mxRow[jj] )

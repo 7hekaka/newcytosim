@@ -291,6 +291,7 @@ void SparMatSym::printSparse(std::ostream& os, real, size_t start, size_t stop) 
     stop = std::min(stop, size_);
     std::streamsize p = os.precision();
     os.precision(8);
+    os << "% SparMatSym size " << size_ << ":\n";
     for ( size_t jj = start; jj < stop; ++jj )
     {
         for ( size_t n = 0 ; n < colsiz_[jj] ; ++n )

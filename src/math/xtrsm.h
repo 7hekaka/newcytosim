@@ -1996,7 +1996,7 @@ template < int ORD >
 void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
     /*
-     we cannot call lapack::DGETRS('N', bks, 1, mec->block(), bks, mec->pivot(), Y, bks, &info);
+     we cannot call lapack::DGETRS('N', bks, 1, mec->pblock(), bks, mec->pivot(), Y, bks, &info);
      because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
      But calling DTBSV gets the required work done.
      */

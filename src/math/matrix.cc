@@ -109,17 +109,14 @@ void Matrix::printFull(std::ostream& os) const
 void Matrix::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
     stop = std::min(stop, size_);
-    char str[256];
     const size_t Z = size();
+    os << "% Matrix size " << size_ << ":\n";
     for ( size_t ii = start; ii < stop; ++ii )
         for ( size_t jj = 0; jj < Z; ++jj )
         {
             real * v = addr(ii, jj);
             if ( v && abs_real(*v) >= inf )
-            {
-                snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii, jj, *v);
-                os << str;
-            }
+                os << std::setw(6) << ii << " " << std::setw(6) << jj << " " << std::setw(16) << v << "\n";
         }
 }
 

@@ -7,10 +7,10 @@
 
 /// equalize flags for any existing matrix element between Mecables
 template < typename MatrixClass >
-void computeClusters(Array<Mecable*> const mecables, const size_t MAX, Mecable** table,
+void computeClusters(Array<Mecable*> const mecables, const size_t sup, Mecable** table,
                      MatrixClass const& MAT, size_t ORD)
 {
-    for ( size_t j = 0; j < MAX; ++j )
+    for ( size_t j = 0; j < sup; ++j )
     {
         size_t jj = ORD * j;
         Mecable const* A = table[j];
@@ -18,7 +18,7 @@ void computeClusters(Array<Mecable*> const mecables, const size_t MAX, Mecable**
         {
             // we do not check the value here, but just having a block
             size_t i = MAT.column_index(jj, n) / ORD;
-            assert_true( i < MAX );
+            assert_true( i < sup );
             Mecable const* B = table[i];
             if ( A->flag() != B->flag() )
             {
@@ -599,17 +599,18 @@ void Meca::saveConnectivityBitmap() const
 
 
 template < typename MatrixClass >
-static void setMatrixBitmap(BitMap<1>& bmap, size_t nbv, MatrixClass const& MAT, size_t ORD)
+static void setMatrixBitmap(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT, size_t ORD)
 {
     bmap.clear();
-    for ( size_t j = 0; j < nbv; ++j )
+    for ( size_t j = 0; j < sup; ++j )
     {
         size_t jj = j * ORD;
         for ( size_t n = 0; n < MAT.column_size(jj); ++n )
         {
             size_t i = MAT.column_index(jj, n) / ORD;
             // swap i,j and flip i to display matrix properly on screen
-            bmap.set(i, j, 1);
+            if ( j < sup )
+                bmap.set(i, j, 1);
         }
     }
 }

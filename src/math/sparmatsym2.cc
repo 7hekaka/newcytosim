@@ -428,32 +428,28 @@ std::string SparMatSym2::what() const
 void SparMatSym2::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
     stop = std::min(stop, size_);
-    char str[256];
-    os << "\n% SparseMatSym2 size " << size_;
+    os << "% SparMatSym2 size " << size_ << ":\n";
     for ( size_t jj = start; jj < stop; ++jj )
     {
         if ( colsiz_[jj] > 0 )
         {
-            os << "\n% column " << jj;
+            os << "% column " << jj << "\n";
             for ( size_t n = 0 ; n < colsiz_[jj] ; ++n )
             {
+                size_t ii = column_[jj][n].inx;
                 real v = column_[jj][n].val;
                 if ( abs_real(v) >= inf )
-                {
-                    snprintf(str, sizeof(str), "\n%6u %6lu %16.6f", column_[jj][n].inx, jj, v);
-                    os << str;
-                }
+                    os << std::setw(6) << ii << " " << std::setw(6) << jj << " " << std::setw(16) << v << "\n";
             }
         }
     }
-    std::endl(os);
 }
 
 
 void SparMatSym2::printSummary(std::ostream& os, size_t start, size_t stop)
 {
     stop = std::min(stop, size_);
-    os << "SparseMatSym2 size " << size_ << ":";
+    os << "SparMatSym2 size " << size_ << ":";
     for ( size_t jj = start; jj < stop; ++jj )
     {
         os << "\n   " << jj << "   " << colsiz_[jj];
@@ -470,7 +466,7 @@ void SparMatSym2::printColumn(std::ostream& os, const size_t jj)
     std::streamsize p = os.precision();
     os.precision(1);
     Element const* col = column_[jj];
-    os << "SparseMatSym2 col " << jj << ":";
+    os << "SparMatSym2 col " << jj << ":";
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
     {
         real v = col[n].val;
@@ -496,7 +492,7 @@ void SparMatSym2::printSparseArray(std::ostream& os) const
         std::streamsize p = os.precision();
         
         size_t cnt = rowDSS_[size_];
-        os << "\n% SparseMatSym2 size " << size_ << " DSS storage:";
+        os << "\n% SparMatSym2 size " << size_ << " DSS storage:";
         os << "\nvalues   ";
         os.precision(2);
         for ( size_t i = 0; i < cnt; ++i )
@@ -538,8 +534,8 @@ void SparMatSym2::vecMulAddCol(const real* X, real* Y, Element col[], size_t cnt
     {
         const auto ii = col[n].inx;
         const real a = col[n].val;
-        Y[ii] += a * X0;
         assert_true( ii > jj );
+        Y[ii] += a * X0;
         Y0 += a * X[ii];
     }
     Y[jj] = Y0;
@@ -561,9 +557,9 @@ void SparMatSym2::vecMulAddColIso2D(const real* X, real* Y, Element col[], size_
     {
         const auto ii = 2 * col[n].inx;
         const real a = col[n].val;
+        assert_true( ii > jj );
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
-        assert_true( ii > jj );
         Y0 += a * X[ii  ];
         Y1 += a * X[ii+1];
     }
@@ -589,10 +585,10 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y, Element col[], size_
     {
         const auto ii = 3 * col[n].inx;
         const real a = col[n].val;
+        assert_true( ii > jj );
         Y[ii  ] += a * X0;
         Y[ii+1] += a * X1;
         Y[ii+2] += a * X2;
-        assert_true( ii > jj );
         Y0 += a * X[ii  ];
         Y1 += a * X[ii+1];
         Y2 += a * X[ii+2];
