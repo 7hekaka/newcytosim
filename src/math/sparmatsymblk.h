@@ -158,10 +158,10 @@ private:
 public:
     
     /// return the size of the matrix
-    size_t size() const { return size_; }
+    size_t size() const { return size_ * S_BLOCK_SIZE; }
     
     /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { size_ = s / S_BLOCK_SIZE; allocate(size_); }
 
     /// base for destructor
     void deallocate();
@@ -191,17 +191,14 @@ public:
     Block& block(const size_t ii, const size_t jj)
     {
         assert_true( ii < size_ );
+#if ( 1 )
+        assert_true( ii >= jj );
+        return column_[jj].block(ii, jj);
+#else
         assert_true( jj < size_ );
-        assert_true( ii % S_BLOCK_SIZE == 0 );
-        assert_true( jj % S_BLOCK_SIZE == 0 );
-#if ( 0 )
-        // safe swap, with branchless code:
         size_t i = std::max(ii, jj);
         size_t j = std::min(ii, jj);
         return column_[j].block(i, j);
-#else
-        assert_true( ii >= jj );
-        return column_[jj].block(ii, jj);
 #endif
     }
     
@@ -234,8 +231,6 @@ public:
     void vecMulAdd(const real*, real* Y, size_t start, size_t stop) const;
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_TIME(const real* X, real* Y) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;

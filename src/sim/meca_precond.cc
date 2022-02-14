@@ -374,7 +374,7 @@ void Meca::getIsoBBlock(const Mecable * mec, real* res, size_t ldd) const
     mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 2);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTrace(beta/DIM, res, ldd-1, DIM*mec->matIndex(), DIM*nbp, DIM*2, false);
+        mFUL.addDiagonalTrace(beta/DIM, res, ldd-1, mec->matIndex(), nbp, 2, false);
 
     // add Identity matrix to band storage:
     for ( size_t i = 0; i < nbp; ++i )
@@ -406,7 +406,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
     mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTrace(1.0/DIM, res, nbp, DIM*mec->matIndex(), DIM*nbp, DIM*nbp, true);
+        mFUL.addDiagonalTrace(1.0/DIM, res, nbp, mec->matIndex(), nbp, nbp, true);
 
 #if ( 0 )
 #if ADD_PROJECTION_DIFF
@@ -482,8 +482,11 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
+#if USE_BLOCK_MATRIX
+        mFUL.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, rank);
+#else
         mFUL.addLowerBand(beta, res, ldd-1, DIM*mec->matIndex(), bks, rank);
-    
+#endif
     // add Identity matrix to band storage:
     for ( size_t i = 0; i < bks; ++i )
         res[ldd*i] += 1;
@@ -520,7 +523,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalBlock(res, bks, DIM*mec->matIndex(), bks);
+        mFUL.addDiagonalBlock(res, bks, mec->matIndex(), nbp);
     
     // multiply by mobility coefficient, skipping projection
     const real beta = -tau_ * mec->pointMobility();
@@ -565,7 +568,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalBlock(res, bks, DIM*mec->matIndex(), bks);
+        mFUL.addDiagonalBlock(res, bks, mec->matIndex(), nbp);
     
     //VecPrint::full("mISO+mFUL block", bks, bks, res, bks);
     

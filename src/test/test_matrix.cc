@@ -219,14 +219,12 @@ void fillMatrix(MATRIX& mat)
     Matrix22 U(kappa, iota,  iota, kappa);
 #else
     Matrix11 S(alpha);
-    Matrix22 U(kappa);
+    Matrix11 U(kappa);
 #endif
     for ( size_t n = 0; n < icnt_; ++n )
     {
         size_t i = DIM * inx_[n];
         size_t j = DIM * iny_[n];
-        assert_true( i+DIM <= mat.size() );
-        assert_true( j+DIM <= mat.size() );
         
         // this is a block on the diagonal:
         for ( size_t x = 0; x < DIM; ++x )
@@ -319,21 +317,21 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 template <typename MATRIX>
 void checkMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
 {
-    size_t S = mat.size();
-    zero_real(S, z);
+    size_t S = mat.size() / DIM;
+    zero_real(DIM*S, z);
     // check processing columns one-by-one:
     for ( size_t i = 0; i < S; ++i )
         mat.vecMulAdd(x, z, i, i+1);
-    printf(" check %+16.6f", checksum(S, z));
+    printf(" check %+16.6f", checksum(DIM*S, z));
 
     for ( int i = 0; i < 4; ++i )
     {
-        zero_real(S, z);
+        zero_real(DIM*S, z);
         omp_set_num_threads(1<<i);
         #pragma omp parallel for
         for ( size_t u = 0; u < S; u += chunk )
             mat.vecMulAdd(x, z, u, u+chunk);
-        printf(" %+16.6f", checksum(S, z));
+        printf(" %+16.6f", checksum(DIM*S, z));
     }
 }
 
@@ -341,7 +339,7 @@ void checkMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, s
 template <typename MATRIX>
 void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
 {
-    size_t S = mat.size();
+    size_t S = mat.size() / DIM;
     mat.reset();
     fillMatrix(mat);
     mat.prepareForMultiply(1);
@@ -351,6 +349,7 @@ void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, si
     
     for ( int u : { 1, 2, 3, 4, 6, 8, 10, 16 } )
     {
+        zero_real(DIM*S, z);
         omp_set_num_threads(u);
         tick();
         for ( size_t j=0; j < CNT; ++j )
@@ -365,9 +364,10 @@ void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, si
         t[u] = tock(N_RUN);
     }
 
-    printf("\n%-29s", mat.what().c_str());
-    for ( int u = 0; u < sup; ++u )
-        if ( t[u] ) printf(" %luT %4.1f", u, t[u]);
+    //printf("\n%-29s", mat.what().c_str());
+    printf("\n--> Threaded ");
+    for ( int u : { 1, 2, 3, 4, 6, 8, 10, 16 } )
+        printf(" %luT %-6.1f", u, t[u]);
     fflush(stdout);
 }
 
@@ -490,11 +490,9 @@ void fillMatrixBlock(MATRIX& mat)
     
     for ( size_t n = 0; n < icnt_; ++n )
     {
-        size_t ii = DIM * inx_[n];
-        size_t jj = DIM * iny_[n];
-        mat.diag_block(ii).sub_half(S);
-        mat.diag_block(jj).add_half(S);
-        mat.block(ii, jj).add_full(U);
+        mat.diag_block(inx_[n]).sub_half(S);
+        mat.diag_block(iny_[n]).add_half(S);
+        mat.block(inx_[n], iny_[n]).add_full(U);
     }
 }
 
@@ -598,16 +596,16 @@ void testMatrices(const size_t S, const size_t F)
     setVectors(DIM*S, x, y, z);
     //beta = -RNG.preal();
 
-    if ( 1 )
+    if ( 0 )
     {
-        printf("------ iso %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
+        printf("------ iso %iD x %lu  filled %.2f %%", DIM, S, F*100.0/S/S);
         setIndices(F, S);
         testIsoMatrices(S, x, y, z);
         printf("\n");
     }
     if ( 1 )
     {
-        printf("------ %iD x %lu  filled %.1f %% :", DIM, S, F*100.0/S/S);
+        printf("------ %i x %lu  filled %.2f %%:", DIM, S, F*100.0/S/S);
         setIndices(F, S);
         testMatrices(DIM*S, x, y, z);
         printf("\n");
@@ -668,13 +666,13 @@ int main( int argc, char* argv[] )
     compareMatrix(4*33, mat1, mat4, 1<<16);
 #endif
 #if ( 0 )
-    testMatrices(DIM, 1);
+    testMatrices(1, 1);
     testMatrices(2, 1);
     testMatrices(3, 3);
     testMatrices(4, 4);
     testMatrices(7, 5);
     testMatrices(17, 7);
-    testMatrices(33, 1111);
+    testMatrices(33, 21);
 #endif
 #if ( 0 )
     printf("\ntest_matrix BLOCK_SIZE %i (%s)", DIM, SparMatSymB::Block::what().c_str());
@@ -687,9 +685,9 @@ int main( int argc, char* argv[] )
     }
 #endif
 #if ( 0 )
-    testBlockMatrix(DIM*17, 2);
-    testBlockMatrix(DIM*347, 1019);
-    testBlockMatrix(DIM*753, 43039);
+    testBlockMatrix(17, 2);
+    testBlockMatrix(347, 1019);
+    testBlockMatrix(753, 43039);
 #endif
 #if ( 0 )
     testBlockMatrix(2253, 1<<14);
@@ -698,24 +696,24 @@ int main( int argc, char* argv[] )
     testBlockMatrix(2253, 1<<14);
 #endif
 #if ( 0 )
-    testBlockMatrix(DIM*1251, 25821);
-    testBlockMatrix(DIM*1785, 153034);
-    testBlockMatrix(DIM*2311, 231111);
+    testBlockMatrix(1251, 25821);
+    testBlockMatrix(1785, 153034);
+    testBlockMatrix(2311, 231111);
     //testBlockMatrix(DIM*3217, 671234);
 #endif
 #if ( 0 )
+    //testMatrices(7, 23);
     //testMatrices(17, 23);
-    //testMatrices(91, 1<<12);
-    testMatrices(196, 1<<13);
-    //testMatrices(436, 1<<15);
-    testMatrices(8*94, 1<<16);
-    //testMatrices(8*169, 1<<17);
-    testMatrices(8*331, 1<<18);
+    //testMatrices(29, 1<<12);
+    testMatrices(65, 1<<13);
+    //testMatrices(145, 1<<15);
+    testMatrices(8*31, 1<<16);
+    //testMatrices(8*56, 1<<17);
+    testMatrices(8*110, 1<<18);
 #endif
-    testMatrices(8*111, 1<<17);
-    testMatrices(15494, 137676);
+    testMatrices(8*37, 1<<17);
+    testMatrices(5164, 137676);
 #if ( 0 )
-    //testMatrices(17, 23);
     size_t dim[5] = { 0 };
     for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));
     qsort(dim, 5, sizeof(size_t), compareInt);

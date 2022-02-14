@@ -178,9 +178,9 @@ real& SparMatBlk::element(size_t ii, size_t jj)
 #if ( BLOCK_SIZE == 1 )
     return row_[ii].block(jj).value();
 #else
-    size_t i = ii % BLOCK_SIZE;
-    size_t j = jj % BLOCK_SIZE;
-    return row_[ii-i].block(jj-j)(i, j);
+    size_t i = ii / BLOCK_SIZE;
+    size_t j = jj / BLOCK_SIZE;
+    return row_[i].block(j)(ii%BLOCK_SIZE, jj%BLOCK_SIZE);
 #endif
 }
 
@@ -191,9 +191,12 @@ real* SparMatBlk::addr(size_t ii, size_t jj) const
 #if ( BLOCK_SIZE == 1 )
     return row_[ii].block(jj).data();
 #else
-    size_t i = ii % BLOCK_SIZE;
-    size_t j = jj % BLOCK_SIZE;
-    return row_[ii-i].block(jj-j).addr(i, j);
+    size_t i = ii / BLOCK_SIZE;
+    size_t j = jj / BLOCK_SIZE;
+    Block * B = row_[i].find_block(j);
+    if ( B )
+        return B->addr(ii%BLOCK_SIZE, jj%BLOCK_SIZE);
+    return nullptr;
 #endif
 }
 
@@ -238,21 +241,21 @@ void SparMatBlk::scale(const real alpha)
 void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd,
                                   const size_t start, const size_t cnt) const
 {
-    assert_false( start % BLOCK_SIZE );
-    assert_false( cnt % BLOCK_SIZE );
-
     size_t end = start + cnt;
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( size_t i = start; i < end; i += BLOCK_SIZE )
+    for ( size_t i = start; i < end; ++i )
     {
         Line & row = row_[i];
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
             size_t j = row.inx_[n];
             if ((start <= j) & (j < end))
-                row[n].addto(mat+(i+ldd*j)-off, ldd);
+            {
+                real * ptr = mat + (( i + ldd * j ) - off ) * BLOCK_SIZE;
+                row[n].addto(ptr, ldd);
+            }
         }
     }
 }
@@ -261,9 +264,6 @@ void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd,
 void SparMatBlk::addLowerBand(real alpha, real* mat, size_t ldd,
                               const size_t start, const size_t cnt, size_t rank) const
 {
-    assert_false( start % BLOCK_SIZE );
-    assert_false( cnt % BLOCK_SIZE );
-
     size_t end = start + cnt;
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
@@ -274,10 +274,11 @@ void SparMatBlk::addLowerBand(real alpha, real* mat, size_t ldd,
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
             size_t j = row.inx_[n];
+            real * ptr = mat + (( i + ldd * j ) - off ) * BLOCK_SIZE;
             if ( i == j )
-                row[n].addto_lower(mat+(i+ldd*j)-off, ldd, alpha);
+                row[n].addto_lower(ptr, ldd, alpha);
             else if ((i < j) & (j < end) & (j <= i+rank))
-                row[n].addto(mat+(i+ldd*j)-off, ldd, alpha);
+                row[n].addto(ptr, ldd, alpha);
         }
     }
 }
@@ -288,22 +289,19 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
                                   const size_t start, const size_t cnt,
                                   size_t rank, bool sym) const
 {
-    assert_false( start % BLOCK_SIZE );
-    assert_false( cnt % BLOCK_SIZE );
-
     size_t end = start + cnt;
     assert_true( end <= size_ );
 
-    for ( size_t ii = start; ii < end; ii += BLOCK_SIZE )
+    for ( size_t ii = start; ii < end; ++ii )
     {
-        size_t i = ( ii - start ) / BLOCK_SIZE;
+        size_t i = ii - start;
         Line & row = row_[ii];
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
             size_t jj = row.inx_[n];
             if (( start <= jj ) & ( jj < end ) & ( jj <= ii+rank ) & ( ii <= jj+rank ))
             {
-                size_t j = ( jj - start ) / BLOCK_SIZE;
+                size_t j = jj - start;
                 real a = alpha * row[n].trace();
                 //fprintf(stderr, "SMB %4lu %4lu : %.4f\n", i, j, a);
                 mat[i+ldd*j] += a;
@@ -529,7 +527,6 @@ void SparMatBlk::sortElements()
 void SparMatBlk::consolidate()
 {
     size_t cnt = 0;
-    
     for ( size_t i = colidx_[0]; i < size_; i = colidx_[i+1] )
     {
         cnt += row_[i].rlen_;
@@ -542,18 +539,17 @@ void SparMatBlk::consolidate()
     real * ptr = new_real(cnt*sizeof(Block)/sizeof(real));
     blocks_ = new(ptr) Block[cnt];
     
-    cnt = 0;
+    Block * B = blocks_;
     for ( size_t i = 0; i < size_; ++i )
     {
         Line & row = row_[i];
-        row.sbk_ = blocks_ + cnt;
-        cnt += row.rlen_;
+        row.sbk_ = B;
 #if ( BLOCK_SIZE == 2 ) && TRANSPOSE_2D_BLOCKS
         for ( size_t j = 0; j < row.rlen_; ++j )
-            row.sbk_[j] = row.blk_[j].transposed();
+            *B++ = row.blk_[j].transposed();
 #else
         for ( size_t j = 0; j < row.rlen_; ++j )
-            row.sbk_[j] = row.blk_[j];
+            *B++ = row.blk_[j];
 #endif
     }
 }
@@ -633,7 +629,7 @@ bool SparMatBlk::prepareForMultiply(int)
         already_symmetric = true;
     }
     
-#if 1
+#if 0
     consolidate();
 #else
     for ( size_t i = 0; i < size_; ++i )
@@ -650,7 +646,7 @@ Vector SparMatBlk::Line::vecMul(const real* X) const
 {
     Vector res(0,0,0);
     for ( size_t n = 0; n < rlen_; ++n )
-        res += blk_[n] * Vector(X+inx_[n]);
+        res += blk_[n] * Vector(X+BLOCK_SIZE*inx_[n]);
     return res;
 }
 
@@ -682,7 +678,7 @@ vec2 SparMatBlk::Line::vecMul2D(const double* X) const
     #pragma nounroll
     for ( ; blk < end; ++blk )
     {
-        vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
+        vec4 xy = broadcast2(X+2*inx[0]);  // xy = { X Y }
         ++inx;
         //SX += M[0] * X + M[2] * Y;
         //SY += M[1] * X + M[3] * Y;
@@ -714,10 +710,10 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
         assert_true( inx[0] < inx[1] );
         assert_true( inx[1] < inx[2] );
         assert_true( inx[2] < inx[3] );
-        vec4 xy0 = broadcast2(X+inx[0]);  // xy = { X Y }
-        vec4 xy1 = broadcast2(X+inx[1]);  // xy = { X Y }
-        vec4 xy2 = broadcast2(X+inx[2]);  // xy = { X Y }
-        vec4 xy3 = broadcast2(X+inx[3]);  // xy = { X Y }
+        vec4 xy0 = broadcast2(X+2*inx[1]);  // xy = { X Y }
+        vec4 xy1 = broadcast2(X+2*inx[1]);  // xy = { X Y }
+        vec4 xy2 = broadcast2(X+2*inx[2]);  // xy = { X Y }
+        vec4 xy3 = broadcast2(X+2*inx[3]);  // xy = { X Y }
 #if TRANSPOSE_2D_BLOCKS
         //SX += M[0] * X + M[1] * Y;
         //SY += M[2] * X + M[3] * Y;
@@ -739,7 +735,7 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
     #pragma nounroll
     for ( ; blk < end; ++blk, ++inx )
     {
-        vec4 xy = broadcast2(X+inx[0]);  // xy = { X Y }
+        vec4 xy = broadcast2(X+2*inx[0]);  // xy = { X Y }
 #if TRANSPOSE_2D_BLOCKS
         ss = fmadd4(blk[0].data0(), xy, ss);
 #else
@@ -770,7 +766,7 @@ vec4 SparMatBlk::Line::vecMul3D(const double* X) const
     #pragma nounroll
     for ( ; blk < end; ++blk )
     {
-        vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
+        vec4 xyz = loadu4(X+3*inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
         // multiply with the block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
@@ -817,8 +813,8 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
         for ( ; blk < end; ++blk )
         {
             assert_true( inx[0] < inx[1] );
-            vec4 A = loadu4(X+inx[0]);
-            vec4 B = loadu4(X+inx[1]);
+            vec4 A = loadu4(X+3*inx[0]);
+            vec4 B = loadu4(X+3*inx[1]);
             inx += 2;
             // multiply each line of the two blocks:
             s0 = fmadd4(blk->data0(), A, s0);
@@ -837,7 +833,7 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
     #pragma nounroll
     for ( end = sbk_ + rlen_ ; blk < end; ++blk )
     {
-        vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
+        vec4 xyz = loadu4(X+3*inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
         // multiply with the block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
@@ -888,9 +884,9 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
         {
             assert_true( inx[0] < inx[1] );
             assert_true( inx[1] < inx[2] );
-            vec4 A = loadu4(X+inx[0]);
-            vec4 B = loadu4(X+inx[1]);
-            vec4 C = loadu4(X+inx[2]);
+            vec4 A = loadu4(X+3*inx[0]);
+            vec4 B = loadu4(X+3*inx[1]);
+            vec4 C = loadu4(X+3*inx[2]);
             inx += 3;
             // multiply each line of the two blocks:
             s0 = fmadd4(blk[0].data0(), A, s0);
@@ -911,7 +907,7 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
     #pragma nounroll
     for ( end = sbk_ + rlen_; blk < end; ++blk )
     {
-        vec4 xyz = loadu4(X+inx[0]);  // xyz = { X0 X1 X2 - }
+        vec4 xyz = loadu4(X+3*inx[0]);  // xyz = { X0 X1 X2 - }
         ++inx;
         // multiply with the block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
@@ -945,7 +941,7 @@ vec4 SparMatBlk::Line::vecMul4D(const double* X) const
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     for ( size_t n = 0; n < rlen_; ++n, ++blk )
     {
-        const vec4 xx = load4(X+inx_[n]);  // xyzt = { X0 X1 X2 X3 }
+        const vec4 xx = load4(X+4*inx_[n]);  // xyzt = { X0 X1 X2 X3 }
         s0 = fmadd4(blk->data0(), xx, s0);
         s1 = fmadd4(blk->data1(), xx, s1);
         s2 = fmadd4(blk->data2(), xx, s2);
@@ -967,8 +963,8 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_);
-    for ( size_t i = start; i < stop; i += BLOCK_SIZE )
-        row_[i].vecMul(X).add_to(Y+i);
+    for ( size_t i = start; i < stop; ++i )
+        row_[i].vecMul(X).add_to(Y+BLOCK_SIZE*i);
 }
 
 
@@ -982,46 +978,15 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
 #if ( BLOCK_SIZE == 1 )
         Y[i] += row_[i].vecMul1D(X);
 #elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
-        store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
+        store2(Y+2*i, add2(load2(Y+2*i), row_[i].vecMul2DU(X)));
 #elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
-        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DUU(X)));
+        store3(Y+3*i, add4(loadu4(Y+3*i), row_[i].vecMul3DUU(X)));
 #else
-        row_[i].vecMul(X).add_to(Y+i);
+        row_[i].vecMul(X).add_to(Y+BLOCK_SIZE*i);
 #endif
     }
 }
-
-
-// multiplication of a vector: Y = Y + M * X
-void SparMatBlk::vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t stop) const
-{
-    assert_true( start <= stop );
-    stop = std::min(stop, size_);
-    size_t cnt = 0, row = 0;
-    //auto rdt = timer();
-    for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
-    {
-        row++;
-        cnt += row_[i].rlen_;
-#if ( BLOCK_SIZE == 1 )
-        Y[i] += row_[i].vecMul1D(X);
-#elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
-        store2(Y+i, add2(load2(Y+i), row_[i].vecMul2DU(X)));
-#elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
-        // we need to use store3 only for the last line, if multithreaded
-        store3(Y+i, add4(loadu4(Y+i), row_[i].vecMul3DUU(X)));
-#else
-        row_[i].vecMul(X).add_to(Y+i);
-#endif
-    }
-    /*
-    if ( cnt > 0 )
-        fprintf(stderr, "SMB %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
-                row, cnt, real(timer()-rdt)/cnt);
-     */
-}
-
 
 
 // multiplication of a vector: Y = M * X
@@ -1030,21 +995,22 @@ void SparMatBlk::vecMul(const real* X, real* Y, size_t start, size_t stop) const
     assert_true( start <= stop );
     stop = std::min(stop, size_);
     //printf("msb %6i %6i : %p\n", start, stop, pthread_self());
+    
     /** All values need to be reset since as the matrix is sparse,
      not every line will be addressed below */
-    zero_real(stop-start, Y+start);
+    zero_real(BLOCK_SIZE*(stop-start), Y+BLOCK_SIZE*start);
     
     for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
         Y[i] = row_[i].vecMul1D(X);
 #elif ( BLOCK_SIZE == 2 ) && SPARMATBLK_USES_AVX
-        store2(Y+i, row_[i].vecMul2DU(X));
+        store2(Y+2*i, row_[i].vecMul2DU(X));
 #elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
-        store3(Y+i, row_[i].vecMul3DUU(X));
+        store3(Y+3*i, row_[i].vecMul3DUU(X));
 #else
-        row_[i].vecMul(X).store(Y+i);
+        row_[i].vecMul(X).store(Y+BLOCK_SIZE*i);
 #endif
     }
 }

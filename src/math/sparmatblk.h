@@ -177,10 +177,10 @@ private:
 public:
     
     /// return the size of the matrix
-    size_t size() const { return size_; }
+    size_t size() const { return size_ * BLOCK_SIZE; }
     
     /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { size_ = s / BLOCK_SIZE; allocate(size_); }
 
     /// base for destructor
     void deallocate();
@@ -258,9 +258,6 @@ public:
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;
-    
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_TIME(const real* X, real* Y, size_t start, size_t stop) const;
 
     
     /// multiplication of a vector, for columns within [start, stop[

@@ -97,12 +97,15 @@ public:
         
         /// return block located on the diagonal
         Block& diag_block() { return dia_; }
+        
+        /// return n-th block (not necessarily, located at line inx_[n]
+        Block& operator[](size_t n) const { return blk_[n]; }
+
+        /// return block corresponding to index
+        Block* find_block(size_t j) const;
 
         /// return block located at line 'i' and column 'j'
-        Block& block(size_t i, size_t j);
-        
-        /// return n-th off-diagonal block, located at line inx_[n]
-        Block& operator[](size_t n) const { return blk_[n]; }
+        Block& block(size_t i);
 
         /// multiplication of a vector: Y <- Y + M * X, block_size = 1
         void vecMulAdd1D(const real* X, real* Y, size_t j) const;
@@ -171,10 +174,10 @@ private:
 public:
     
     /// return the size of the matrix
-    size_t size() const { return size_; }
+    size_t size() const { return size_ * SD_BLOCK_SIZE; }
     
     /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; }
+    void resize(size_t s) { size_ = s / SD_BLOCK_SIZE; allocate(size_); }
 
     /// base for destructor
     void deallocate();
@@ -191,41 +194,36 @@ public:
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t alc);
     
-    /// return column at index j
-    Pilar& pilar(size_t j) { return pilar_[j/SD_BLOCK_SIZE]; }
-    
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { assert_true(j<size_); return pilar_[j/SD_BLOCK_SIZE].noff_; }
+    size_t column_size(size_t j) const { assert_true(j<size_); return pilar_[j].noff_; }
     
     /// line index of n-th element in j-th column
-    size_t column_index(size_t j, size_t n) const { return pilar_[j/SD_BLOCK_SIZE].inx_[n]; }
+    size_t column_index(size_t j, size_t n) const { return pilar_[j].inx_[n]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
     {
         assert_true( ii < size_ );
-        assert_true( jj < size_ );
-        assert_true( ii % SD_BLOCK_SIZE == 0 );
-        assert_true( jj % SD_BLOCK_SIZE == 0 );
-#if ( 0 )
-        // safe swap, with branchless code:
-        size_t i = std::max(ii, jj);
-        size_t j = std::min(ii, jj);
-        return pilar(j).block(i, j);
-#else
+#if ( 1 )
         assert_true( ii > jj );
-        return pilar(jj).block(ii, jj);
+        return pilar_[jj].block(ii);
+#else
+        assert_true( jj < size_ );
+        return pilar_[std::min(ii, jj)].block(std::max(ii, jj));
 #endif
     }
     
     /// returns element at (i, i)
-    Block& diag_block(size_t i) { return pilar(i).diag_block(); }
+    Block& diag_block(size_t i) { return pilar_[i].diag_block(); }
     
-    /// returns the address of element at (x, y), no allocation is done
-    real* addr(size_t x, size_t y) const;
-    
-    /// returns the address of element at (x, y), allocating if necessary
-    real& operator()(size_t x, size_t y);
+    /// returns the address of element at line i, column j, no allocation is done
+    real* addr(size_t i, size_t j) const;
+
+    /// returns the address of element at line i, column j, allocating if necessary
+    real& element(size_t i, size_t j);
+
+    /// returns the address of element at line i, column j, allocating if necessary
+    real& operator()(size_t i, size_t j) { return element(i,j); }
     
     /// scale the matrix by a scalar factor
     void scale(real);
@@ -247,8 +245,6 @@ public:
     void vecMulAdd(const real*, real* Y, size_t start, size_t stop) const;
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
-    /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_TIME(const real* X, real* Y) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;

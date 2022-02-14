@@ -226,10 +226,9 @@ calculate the matrix vector product corresponding to 'mec'
 void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 {
     const size_t inx = DIM * mec->matIndex();
-    const size_t bks = DIM * mec->nbPoints();
 
     // multiply the lines corresponding to this Mecable:
-    mFUL.vecMul(X, Y, inx, inx+bks);
+    mFUL.vecMul(X, Y, mec->matIndex(), mec->matIndex()+mec->nbPoints());
 
 #if SEPARATE_RIGIDITY_TERMS
     mec->addRigidity(X+inx, Y+inx);
@@ -243,7 +242,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
     mec->projectForces(Y+inx, Y+inx);
     // Y <- X + beta * Y
     const real beta = -tau_ * mec->leftoverMobility();
-    blas::xpay(bks, X+inx, beta, Y+inx);
+    blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
 }
 
 

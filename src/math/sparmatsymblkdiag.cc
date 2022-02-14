@@ -35,14 +35,14 @@ SparMatSymBlkDiag::SparMatSymBlkDiag()
 
 void SparMatSymBlkDiag::allocate(size_t alc)
 {
-    if ( alc > alloc_*SD_BLOCK_SIZE )
+    if ( alc > alloc_ )
     {
         /*
          'chunk' can be adjusted to tune performance: by increasing 'chunk',
           more memory will be used, but reallocation will be less frequent
         */
         constexpr size_t chunk = 8;
-        alc = ( alc/SD_BLOCK_SIZE + chunk - 1 ) & ~( chunk -1 );
+        alc = ( alc + chunk - 1 ) & ~( chunk -1 );
         
         //fprintf(stderr, "SMSBD allocates %u\n", alc);
         Pilar * ptr = new Pilar[alc];
@@ -167,37 +167,32 @@ void SparMatSymBlkDiag::Pilar::operator =(SparMatSymBlkDiag::Pilar & col)
     col.blk_ = nullptr;
 }
 
+
+/* This is a silly search that could be optimized */
+SparMatSymBlkDiag::Block* SparMatSymBlkDiag::Pilar::find_block(size_t ii) const
+{
+    for ( size_t n = 0; n < noff_; ++n )
+        if ( inx_[n] == ii )
+            return blk_ + n;
+    return nullptr;
+}
+
 /**
  This allocates to be able to hold the matrix element if necessary
  */
-SparMatSymBlkDiag::Block& SparMatSymBlkDiag::Pilar::block(size_t ii, size_t jj)
+SparMatSymBlkDiag::Block& SparMatSymBlkDiag::Pilar::block(size_t ii)
 {
-#if 0
-    // this is unnecessary
-    if ( ii == jj )
-        return dia_;
-#endif
-    
-    assert_true( ii > jj );
-    /* This is a silly search that could be optimized */
-    for ( size_t n = 0; n < noff_; ++n )
-        if ( inx_[n] == ii )
-            return blk_[n];
-    
-    // add the requested term:
-    size_t n = noff_;
-    
-    // allocate space for new Element if necessary:
-    if ( n >= allo_ )
-        allocate(n+1);
-    
-    assert_true( n < allo_ );
-    inx_[n] = ii;
-    blk_[n].reset();
-    noff_ = n + 1;
-    
+    SparMatSymBlkDiag::Block * B = find_block(ii);
+    if ( !B )
+    {
+        allocate(noff_+1);
+        B = blk_ + noff_;
+        inx_[noff_] = ii;
+        B->reset();
+        ++noff_;
+    }
     //printColumn(jj);
-    return blk_[n];
+    return *B;
 }
 
 
@@ -208,20 +203,23 @@ void SparMatSymBlkDiag::Pilar::reset()
 }
 
 
-real& SparMatSymBlkDiag::operator()(size_t iii, size_t jjj)
+real& SparMatSymBlkDiag::element(size_t iii, size_t jjj)
 {
     // branchless code to address lower triangle
     size_t ii = std::max(iii, jjj);
     size_t jj = std::min(iii, jjj);
 #if ( SD_BLOCK_SIZE == 1 )
-    return pilar_[jj/SD_BLOCK_SIZE].block(ii, jj).value();
+    if ( ii == jj )
+        return pilar_[jj].dia_.value();
+    return pilar_[jj].block(ii).value();
 #else
-    size_t i = ii % SD_BLOCK_SIZE;
+    size_t i = ii / SD_BLOCK_SIZE;
     size_t j = jj / SD_BLOCK_SIZE;
-    size_t jb = j * SD_BLOCK_SIZE;
-    if ( ii-i == j*SD_BLOCK_SIZE )
-        return pilar_[j].dia_(i, jj-jb);
-    return pilar_[j].block(ii-i, jb)(i, jj-jb);
+    size_t ir = ii % SD_BLOCK_SIZE;
+    size_t jr = jj % SD_BLOCK_SIZE;
+    if ( i == j )
+        return pilar_[j].dia_(ir, jr);
+    return pilar_[j].block(i)(ir, jr);
 #endif
 }
 
@@ -232,14 +230,20 @@ real* SparMatSymBlkDiag::addr(size_t iii, size_t jjj) const
     size_t ii = std::max(iii, jjj);
     size_t jj = std::min(iii, jjj);
 #if ( SD_BLOCK_SIZE == 1 )
-    return &pilar_[jj/SD_BLOCK_SIZE].block(ii, jj).value();
+    if ( ii == jj )
+        return pilar_[jj].dia_.data();
+    return pilar_[jj].block(ii).data();
 #else
-    size_t i = ii % SD_BLOCK_SIZE;
-    size_t j = jj % SD_BLOCK_SIZE;
-    size_t jb = j * SD_BLOCK_SIZE;
-    if ( ii-i == j*SD_BLOCK_SIZE )
-        return pilar_[j].dia_.addr(i, jj-jb);
-    return pilar_[j].block(ii-i, jb).addr(i, jj-jb);
+    size_t i = ii / SD_BLOCK_SIZE;
+    size_t j = jj / SD_BLOCK_SIZE;
+    size_t ir = ii % SD_BLOCK_SIZE;
+    size_t jr = jj % SD_BLOCK_SIZE;
+    if ( i == j )
+        return pilar_[j].dia_.addr(ir, jr);
+    Block * B = pilar_[j].find_block(i);
+    if ( B )
+        return B->addr(ir, jr);
+    return nullptr;
 #endif
 }
 
@@ -257,7 +261,7 @@ void SparMatSymBlkDiag::reset()
 bool SparMatSymBlkDiag::notZero() const
 {
     //check for any non-zero sparse term:
-    for ( size_t jj = 0; jj < size_/SD_BLOCK_SIZE; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         Pilar & col = pilar_[jj];
         if ( col.dia_ != 0.0 )
@@ -273,7 +277,7 @@ bool SparMatSymBlkDiag::notZero() const
 
 void SparMatSymBlkDiag::scale(const real alpha)
 {
-    for ( size_t jj = 0; jj < size_/SD_BLOCK_SIZE; ++jj )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         Pilar & col = pilar_[jj];
         col.dia_.scale(alpha);
@@ -286,27 +290,27 @@ void SparMatSymBlkDiag::scale(const real alpha)
 void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd,
                                          const size_t start, const size_t cnt) const
 {
-    assert_false( start % SD_BLOCK_SIZE );
-    assert_false( cnt % SD_BLOCK_SIZE );
-
     size_t end = start + cnt;
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( size_t jj = start; jj < end; jj += SD_BLOCK_SIZE )
+    for ( size_t jj = start; jj < end; ++jj )
     {
-        Pilar & col = pilar_[jj/SD_BLOCK_SIZE];
-        col.dia_.addto_symm(mat+(1+ldd)*jj-off, ldd);
+        Pilar & col = pilar_[jj];
+        real * dia = mat + (( jj + ldd * jj ) - off ) * SD_BLOCK_SIZE;
+        col.dia_.addto_symm(dia, ldd);
         for ( size_t n = 0; n < col.noff_; ++n )
         {
             size_t ii = col.inx_[n];
             // assuming lower triangle is stored:
-            assert_true(ii>jj);
+            assert_true( ii > jj );
             if ( ii < end )
             {
                 //fprintf(stderr, "SMSBD %4lu %4lu\n", ii, jj); col[n].print(stderr);
-                col[n].addto(mat+(ii+ldd*jj)-off, ldd);
-                col[n].addto_trans(mat+(jj+ldd*ii)-off, ldd);
+                real * mat1 = mat + (( ii + ldd * jj ) - off ) * SD_BLOCK_SIZE;
+                col[n].addto(mat1, ldd);
+                real * mat2 = mat + (( jj + ldd * ii ) - off ) * SD_BLOCK_SIZE;
+                col[n].addto_trans(mat2, ldd);
             }
         }
     }
@@ -316,17 +320,15 @@ void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd,
 void SparMatSymBlkDiag::addLowerBand(real alpha, real* mat, size_t ldd,
                                      const size_t start, const size_t cnt, size_t rank) const
 {
-    assert_false( start % SD_BLOCK_SIZE );
-    assert_false( cnt % SD_BLOCK_SIZE );
-
     size_t end = start + cnt;
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
     
-    for ( size_t jj = start; jj < end; jj += SD_BLOCK_SIZE )
+    for ( size_t jj = start; jj < end; ++jj )
     {
-        Pilar & col = pilar_[jj/SD_BLOCK_SIZE];
-        col.dia_.addto_lower(mat+(1+ldd)*jj-off, ldd, alpha);
+        Pilar & col = pilar_[jj];
+        real * dia = mat + (( jj + ldd * jj ) - off ) * SD_BLOCK_SIZE;
+        col.dia_.addto_lower(dia, ldd, alpha);
         for ( size_t n = 0; n < col.noff_; ++n )
         {
             size_t ii = col.inx_[n];
@@ -335,7 +337,8 @@ void SparMatSymBlkDiag::addLowerBand(real alpha, real* mat, size_t ldd,
             if ((ii <= jj+rank) & (ii < end))
             {
                 //fprintf(stderr, "SMSBD %4lu %4lu\n", ii, jj); col[n].print(stderr);
-                col[n].addto(mat+(ii+ldd*jj)-off, ldd, alpha);
+                real * mat1 = mat + (( ii + ldd * jj ) - off ) * SD_BLOCK_SIZE;
+                col[n].addto(mat1, ldd, alpha);
                 //col[n].addto_trans(mat+(jj+ldd*ii)-off, ldd, alpha);
             }
         }
@@ -350,26 +353,22 @@ void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
                                          const size_t start, const size_t cnt,
                                          const size_t rank, bool sym) const
 {
-    assert_false( start % SD_BLOCK_SIZE );
-    assert_false( cnt % SD_BLOCK_SIZE );
-
     size_t end = start + cnt;
     assert_true( end <= size_ );
 
-    for ( size_t jj = start; jj < end; jj += SD_BLOCK_SIZE )
+    for ( size_t jj = start; jj < end; ++jj )
     {
-        Pilar & col = pilar_[jj/SD_BLOCK_SIZE];
-        size_t j = ( jj - start ) / SD_BLOCK_SIZE;
+        Pilar & col = pilar_[jj];
+        size_t j = jj - start;
         // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
         mat[j+ldd*j] += alpha * col.dia_.trace();  // diagonal term
         for ( size_t n = 0; n < col.noff_; ++n )
         {
             size_t ii = col.inx_[n];
             // assuming lower triangle is stored:
-            assert_false( ii % SD_BLOCK_SIZE );
             if (( ii < end ) & ( ii <= jj+rank ))
             {
-                size_t i = ( ii - start ) / SD_BLOCK_SIZE;
+                size_t i = ii - start;
                 assert_true( i > j );
                 real a = alpha * col[n].trace();
                 //fprintf(stderr, "SMSBD %4lu %4lu : %.4f\n", i, j, a);
@@ -385,8 +384,7 @@ void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 
 int SparMatSymBlkDiag::bad() const
 {
-    size_t end = size_ / SD_BLOCK_SIZE;
-    for ( size_t j = 0; j < end; ++j )
+    for ( size_t j = 0; j < size_; ++j )
     {
         Pilar & col = pilar_[j];
         for ( size_t n = 0 ; n < col.noff_ ; ++n )
@@ -403,10 +401,10 @@ int SparMatSymBlkDiag::bad() const
 size_t SparMatSymBlkDiag::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
-    stop = std::min(stop, size_) / SD_BLOCK_SIZE;
+    stop = std::min(stop, size_);
     alc = 0;
     size_t cnt = stop - start; // counting diagonal elements
-    for ( size_t i = start/SD_BLOCK_SIZE; i < stop; ++i )
+    for ( size_t i = start; i < stop; ++i )
     {
         cnt += pilar_[i].noff_;
         alc += pilar_[i].allo_;
@@ -438,46 +436,34 @@ std::string SparMatSymBlkDiag::what() const
 }
 
 
+static void printSparseBlock(std::ostream& os, real inf, SparMatSymBlkDiag::Block const& B, size_t ii, size_t jj)
+{
+    for ( size_t x = 0; x < B.dimension(); ++x )
+    for ( size_t y = (ii==jj?x:0); y < B.dimension(); ++y )
+    {
+        real v = B(y, x);
+        if ( abs_real(v) >= inf )
+            os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << std::setw(16) << v << "\n";
+    }
+}
+
+
 void SparMatSymBlkDiag::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
-    stop = std::min(stop, size_) / SD_BLOCK_SIZE;
-
-    char str[256];
+    os << "% SparMatSymBlkDiag size " << size_ << ":\n";
+    stop = std::min(stop, size_);
     std::streamsize p = os.precision();
     os.precision(8);
     if ( ! pilar_ )
         return;
-    for ( size_t j = start/SD_BLOCK_SIZE; j < stop; ++j )
+    for ( size_t j = start; j < stop; ++j )
     {
-        size_t jj = j * SD_BLOCK_SIZE;
         Pilar & col = pilar_[j];
-        os << "% column " << jj << "\n";
-        Block D = col.dia_;
-        for ( size_t y = 0; y < SD_BLOCK_SIZE; ++y )
-        for ( size_t x = y; x < SD_BLOCK_SIZE; ++x )
-        {
-            real v = D(y, x);
-            if ( abs_real(v) >= inf )
-            {
-                snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", jj+y, jj+x, v);
-                os << str;
-            }
-        }
+        os << "% column " << j << "\n";
+        size_t jj = j *SD_BLOCK_SIZE;
+        printSparseBlock(os, inf, col.dia_, jj, jj);
         for ( size_t n = 0 ; n < col.noff_ ; ++n )
-        {
-            size_t ii = col.inx_[n];
-            Block B = col.blk_[n];
-            for ( size_t y = 0; y < SD_BLOCK_SIZE; ++y )
-            for ( size_t x = 0; x < SD_BLOCK_SIZE; ++x )
-            {
-                real v = B(y, x);
-                if ( abs_real(v) >= inf )
-                {
-                    snprintf(str, sizeof(str), "%6lu %6lu %16.6f\n", ii+y, jj+x, v);
-                    os << str;
-                }
-            }
-        }
+            printSparseBlock(os, inf, col.blk_[n], col.inx_[n]*SD_BLOCK_SIZE, jj);
     }
     os.precision(p);
 }
@@ -485,9 +471,9 @@ void SparMatSymBlkDiag::printSparse(std::ostream& os, real inf, size_t start, si
 
 void SparMatSymBlkDiag::printSummary(std::ostream& os, size_t start, size_t stop)
 {
-    stop = std::min(stop, size_)/SD_BLOCK_SIZE;
+    stop = std::min(stop, size_);
     os << "\nSMSBD size " << size_ << ":";
-    for ( size_t j = start/SD_BLOCK_SIZE; j < stop; ++j )
+    for ( size_t j = start; j < stop; ++j )
     {
         if ( pilar_[j].noff_ > 0 )
         {
@@ -583,8 +569,7 @@ void SparMatSymBlkDiag::sortElements()
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
-    size_t end = size_/SD_BLOCK_SIZE;
-    for ( size_t j = 0; j < end; ++j )
+    for ( size_t j = 0; j < size_; ++j )
     {
         Pilar & col = pilar_[j];
         //std::clog << "SMSBD column " << j << " has 1+" << col.noff_ << " elements\n";
@@ -613,7 +598,7 @@ void SparMatSymBlkDiag::sortElements()
 
 bool SparMatSymBlkDiag::prepareForMultiply(int)
 {
-    size_t end = size_/SD_BLOCK_SIZE;
+    size_t end = size_;
     if ( size_ > 0 )
     {
         size_t inx = end;
@@ -698,7 +683,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D(const real* X, real* Y, size_t jj) co
     Vector2 yy = dia_.vecmul(xx);
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n];
+        const size_t ii = 2 * inx_[n];
         Block const& M = blk_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
@@ -714,7 +699,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle2D(const real* X, real* Y, size_
     for ( size_t n = 0; n < noff_; ++n )
     {
         Block const& M = blk_[n];
-        const size_t ii = inx_[n];
+        const size_t ii = 2 * inx_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -724,11 +709,11 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle2D(const real* X, real* Y, size_
 void SparMatSymBlkDiag::vecMulDiagonal2D(const real* X, real* Y) const
 {
     Pilar const* pil = pilar_;
-    for ( size_t j = 0; j < size_; j += 2, ++pil )
+    for ( size_t j = 0; j < size_; ++j, ++pil )
     {
         assert_small(pil->dia_.asymmetry());
-        Vector2 yy = pil->dia_.vecmul(X+j);
-        yy.store(Y+j);
+        Vector2 yy = pil->dia_.vecmul(X+2*j);
+        yy.store(Y+2*j);
     }
 }
 #endif
@@ -741,7 +726,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D(const real* X, real* Y, size_t jj) co
     Vector3 yy = dia_.vecmul(xx);
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n];
+        const size_t ii = 3 * inx_[n];
         Block const& M = blk_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
@@ -757,7 +742,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D(const real* X, real* Y, size_
     for ( size_t n = 0; n < noff_; ++n )
     {
         Block const& M = blk_[n];
-        const size_t ii = inx_[n];
+        const size_t ii = 3 * inx_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -767,11 +752,11 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D(const real* X, real* Y, size_
 void SparMatSymBlkDiag::vecMulDiagonal3D(const real* X, real* Y) const
 {
     Pilar const* pil = pilar_;
-    for ( size_t j = 0; j < size_; j += 3, ++pil )
+    for ( size_t j = 0; j < size_; ++j, ++pil )
     {
         assert_small(pil->dia_.asymmetry());
-        Vector3 yy = pil->dia_.vecmul(X+j);
-        yy.store(Y+j);
+        Vector3 yy = pil->dia_.vecmul(X+3*j);
+        yy.store(Y+3*j);
     }
 }
 #endif
@@ -785,7 +770,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd4D(const real* X, real* Y, size_t jj) co
     vec4 yyyy = dia_.vecmul4(xxxx);
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n];
+        const size_t ii = 4 * inx_[n];
         Block const& M = blk_[n];
         store4(Y+ii, add4(load4(Y+ii), M.vecmul4(xxxx)));
         yyyy += M.trans_vecmul(X+ii);
@@ -801,7 +786,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle4D(const real* X, real* Y, size_
     for ( size_t n = 0; n < noff_; ++n )
     {
         Block const& M = blk_[n];
-        const size_t ii = inx_[n];
+        const size_t ii = 4 * inx_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -814,8 +799,8 @@ void SparMatSymBlkDiag::vecMulDiagonal4D(const real* X, real* Y) const
     for ( size_t j = 0; j < size_; j += 4, ++pil )
     {
         assert_small(pil->dia_.asymmetry());
-        Vector4 yy = pil->dia_.vecmul(X+j);
-        yy.store(Y+j);
+        Vector4 yy = pil->dia_.vecmul(X+4*j);
+        yy.store(Y+4*j);
     }
 }
 #endif
@@ -847,7 +832,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t 
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n, ++blk, ++inx )
     {
-        const size_t ii = *inx;
+        const size_t ii = 3 * inx[0];
         const vec4f M012 = blk->data0();
         const vec4f M345 = blk->data1();
         const vec4f M678 = blk->data2();
@@ -920,8 +905,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
             {
                 Block const& M = blk[0];
                 Block const& P = blk[1];
-                const size_t ii = inx[0];
-                const size_t kk = inx[1];
+                const size_t ii = 3 * inx[0];
+                const size_t kk = 3 * inx[1];
                 const vec4f M012 = M.data0();
                 const vec4f M345 = M.data1();
                 const vec4f M678 = M.data2();
@@ -954,7 +939,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
         #pragma nounroll
         for ( ; n < noff_; ++n, ++inx, ++blk )
         {
-            const size_t ii = *inx;
+            const size_t ii = 3 * inx[0];
             const vec4f M012 = blk->data0();
             const vec4f M345 = blk->data1();
             const vec4f M678 = blk->data2();
@@ -1030,11 +1015,11 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
         {
             Block const& M = blk[0];
             Block const& P = blk[1];
-            const size_t ii = inx[0];
+            const size_t ii = 3 * inx[0];
             const vec4f M012 = M.data0();
             const vec4f M345 = M.data1();
             const vec4f M678 = M.data2();
-            const size_t kk = inx[1];
+            const size_t kk = 3 * inx[1];
             const vec4f P012 = P.data0();
             const vec4f P345 = P.data1();
             const vec4f P678 = P.data2();
@@ -1065,7 +1050,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
     //assert_true( blk == blk_+noff_-1 );
     for ( ; blk < end; ++blk, ++inx ) //if ( blk < end )
     {
-        const size_t ii = inx[0];
+        const size_t ii = 3 * inx[0];
         const vec4f L012 = blk->data0();
         const vec4f L345 = blk->data1();
         const vec4f L678 = blk->data2();
@@ -1131,7 +1116,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n];
+        const size_t ii = inx_[n] * 2;
         vec2 xx = load2(X+ii);
         
         // load 2x2 matrix element into 2 vectors:
@@ -1181,7 +1166,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVX(const double* X, double* Y, size_
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n];
+        const size_t ii = inx_[n] * 2;
         vec4 mat = blk_[n].data0(); // load 2x2 matrix
         vec4 yy = load2Z(Y+ii);          // yy = { Y0 Y1 0 0 }
         vec4 xx = broadcast2(X+ii);      // xx = { X0 X1 X0 X1 }
@@ -1241,14 +1226,14 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, inx[0], blk[0].data0(), xxyy, ss);
-        multiply2D(X, Y, inx[1], blk[1].data0(), xxyy, s1);
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const size_t i0 = inx[0];
-        const size_t i1 = inx[1];
+        const size_t i0 = 2 * inx[0];
+        const size_t i1 = 2 * inx[1];
         assert_true( i0 < i1 );
         vec4 mat0 = blk[0].data0();
         vec4 mat1 = blk[1].data0();
@@ -1265,7 +1250,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size
     // process remaining blocks:
     #pragma nounroll
     for ( ; n < noff_; ++n, inx++ )
-        multiply2D(X, Y, inx[0], blk[n].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[0], blk[n].data0(), xxyy, ss);
     /* finally horizontally sum ss = { SX SX SY SY } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1299,10 +1284,10 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, inx[0], blk[0].data0(), xxyy, ss);
-        multiply2D(X, Y, inx[1], blk[1].data0(), xxyy, s1);
-        multiply2D(X, Y, inx[2], blk[2].data0(), xxyy, s2);
-        multiply2D(X, Y, inx[3], blk[3].data0(), xxyy, s3);
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
+        multiply2D(X, Y, 2*inx[2], blk[2].data0(), xxyy, s2);
+        multiply2D(X, Y, 2*inx[3], blk[3].data0(), xxyy, s3);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
@@ -1311,10 +1296,10 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
         vec4 mat1 = blk[1].data0();
         vec4 mat2 = blk[2].data0();
         vec4 mat3 = blk[3].data0();
-        const size_t i0 = inx[0];
-        const size_t i1 = inx[1];
-        const size_t i2 = inx[2];
-        const size_t i3 = inx[3];
+        const size_t i0 = 2 * inx[0];
+        const size_t i1 = 2 * inx[1];
+        const size_t i2 = 2 * inx[2];
+        const size_t i3 = 2 * inx[3];
         assert_true( i0 < i1 );
         assert_true( i1 < i2 );
         assert_true( i2 < i3 );
@@ -1337,7 +1322,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
     // process remaining blocks:
     #pragma nounroll
     for ( ; n < noff_; ++n, ++inx )
-        multiply2D(X, Y, inx[0], blk[n].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[0], blk[n].data0(), xxyy, ss);
     /* finally sum ss = { S0 S0 S1 S1 } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1381,7 +1366,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVX(const double* X, double* Y, size_
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n];
+        const size_t ii = inx_[n] * 3;
         const vec4 M012 = blk_[n].data0();
         const vec4 M345 = blk_[n].data1();
         const vec4 M678 = blk_[n].data2();
@@ -1463,8 +1448,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVXU(const double* X, double* Y, size
 #pragma nounroll
         for ( ; blk < end; blk += 2, inx += 2 )
         {
-            const size_t ii = inx[0];
-            const size_t kk = inx[1];
+            const size_t ii = 3 * inx[0];
+            const size_t kk = 3 * inx[1];
             assert_true( ii < kk );
             //printf("--- %4i %4i\n", ii, kk);
             vec4 M0 = blk[0].data0();
@@ -1510,7 +1495,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVXU(const double* X, double* Y, size
         #pragma nounroll
         for ( end = blk_ + noff_; blk < end; ++blk, ++inx )
         {
-            const size_t ii = inx[0];
+            const size_t ii = 3 * inx[0];
             //printf("--- %4i\n", ii);
             vec4 m0 = blk[0].data0();
             vec4 z = fmadd4(m0, x0, loadu4(Y+ii));
@@ -1585,8 +1570,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_AVX(const double* X, double* 
             vec4 P0 = blk[1].data0();
             vec4 P1 = blk[1].data1();
             vec4 P2 = blk[1].data2();
-            const size_t ii = inx[0];
-            const size_t kk = inx[1];
+            const size_t ii = 3 * inx[0];
+            const size_t kk = 3 * inx[1];
             assert_true( ii < kk );
             //printf("--- %4i %4i\n", ii, kk);
             vec4 z = fmadd4(M0, x0, loadu4(Y+ii));
@@ -1631,7 +1616,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_AVX(const double* X, double* 
             vec4 M1 = blk[0].data1();
             vec4 M2 = blk[0].data2();
             // extract index from the matrix data:
-            const size_t ii = inx[0];
+            const size_t ii = 3 * inx[0];
             //printf("--- %4i\n", ii);
             
             vec4 z = fmadd4(M0, x0, loadu4(Y+ii));
@@ -1685,7 +1670,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd4D_AVX(const double* X, double* Y, size_
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n];
+        const size_t ii = inx_[n] * 4;
         const vec4 yy = load4(Y+ii);
         const vec4 xx = load4(X+ii);  // xx = { X0 X1 X2 X3 }
         const vec4 m0 = blk_[n].data0();
@@ -1722,8 +1707,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd4D_AVX(const double* X, double* Y, size_
 void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    stop = std::min(stop, size_) / SD_BLOCK_SIZE;
-    for ( size_t j = start/SD_BLOCK_SIZE; j < stop; ++j )
+    stop = std::min(stop, size_);
+    for ( size_t j = start; j < stop; ++j )
     {
         //std::clog << "SparMatSymBlkDiag column " << j << "  " << size_ << " \n";
 #if ( SD_BLOCK_SIZE == 1 )
@@ -1762,8 +1747,8 @@ void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y, size_t start, size
 void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    stop = std::min(stop, size_) / SD_BLOCK_SIZE;
-    for ( size_t j = start/SD_BLOCK_SIZE; j < stop; ++j )
+    stop = std::min(stop, size_);
+    for ( size_t j = start; j < stop; ++j )
     {
         //std::clog << "SparMatSymBlkDiag column " << jj << "  " << size_ << " \n";
 #if ( SD_BLOCK_SIZE == 1 )
@@ -1779,34 +1764,6 @@ void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t s
 }
 
 
-// multiplication of a vector: Y = Y + M * X
-void SparMatSymBlkDiag::vecMulAdd_TIME(const real* X, real* Y) const
-{
-    size_t stop = size_ / SD_BLOCK_SIZE;
-    size_t cnt = 0, col = 0;
-    //auto rdt = timer();
-    for ( size_t j = 0; j < stop; ++j )
-    {
-        col++;
-        cnt += pilar_[j].noff_;
-        //std::clog << "SparMatSymBlkDiag column " << j << "  " << size_ << " \n";
-#if ( SD_BLOCK_SIZE == 1 )
-        pilar_[j].vecMulAdd1D(X, Y, j);
-#elif ( SD_BLOCK_SIZE == 2 )
-        pilar_[j].vecMulAdd2D(X, Y, j*2);
-#elif ( SD_BLOCK_SIZE == 3 )
-        pilar_[j].vecMulAdd3D(X, Y, j*3);
-#elif ( SD_BLOCK_SIZE == 4 )
-        pilar_[j].vecMulAdd4D(X, Y, j*4);
-#endif
-    }
-    /*
-    if ( cnt > 0 )
-        fprintf(stderr, "SMSBD %6lu rows %6lu blocks  cycles/block: %5.2f\n",\
-                col, cnt, real(timer()-rdt)/cnt);
-     */
-}
-
 //------------------------------------------------------------------------------
 #pragma mark - Vector Multiplication
 
@@ -1816,10 +1773,9 @@ This code is disabled here in favor of the next version which is unrolled
 #if ( SD_BLOCK_SIZE == 4 ) && REAL_IS_DOUBLE && defined(__AVX__)
 void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) const
 {
-    const size_t stop = size_ / SD_BLOCK_SIZE;
     #pragma ivdep unroll (4)
     #pragma clang loop unroll_count(4)
-    for ( size_t j = 0; j < stop; ++j )
+    for ( size_t j = 0; j < size_; ++j )
     {
         Block const& D = pilar_[0].dia_;
 #if 1
@@ -1875,10 +1831,9 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
         ++j;
     }
 
-    const size_t stop = size_ / SD_BLOCK_SIZE;
     #pragma ivdep
     #pragma clang loop unroll_count(2)
-    while ( j < stop )
+    while ( j < size_ )
     {
         Block const& D = pilar_[j++].dia_;
         Block const& N = pilar_[j++].dia_;
@@ -1908,9 +1863,8 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
 #if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
 void SparMatSymBlkDiag::vecMulDiagonal3D_SSE(const float* X, float* Y) const
 {
-    size_t stop = size_ / 3;
     #pragma unroll (4)
-    for ( size_t j = 0; j < stop; ++j )
+    for ( size_t j = 0; j < size_; ++j )
     {
         Block const& D = pilar_[j].dia_;
         //multiply with the diagonal block, assuming it has been symmetrized:
@@ -1937,9 +1891,8 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
     vecMulDiagonal3D_AVX(X, Y);
     
     // process off-diagonal elements:
-    const size_t stop = size_ / 3;
-    for ( size_t j = colix_[0]; j < stop; j = colix_[j+1] )
-        pilar_[j].vecMulAddTriangle3D_AVX(X, Y, j*3);
+    for ( size_t j = colix_[0]; j < size_; j = colix_[j+1] )
+        pilar_[j].vecMulAddTriangle3D_AVX(X, Y, 3*j);
 
 #elif ( SD_BLOCK_SIZE == 3 ) && SMSBD_USES_SSE && !REAL_IS_DOUBLE
     
@@ -1947,12 +1900,11 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
     vecMulDiagonal3D_SSE(X, Y);
     
     // process off-diagonal elements:
-    const size_t stop = size_ / 3;
-    for ( size_t j = colix_[0]; j < stop; j = colix_[j+1] )
-        pilar_[j].vecMulAddTriangle3D_SSE(X, Y, j*3);
+    for ( size_t j = colix_[0]; j < size_; j = colix_[j+1] )
+        pilar_[j].vecMulAddTriangle3D_SSE(X, Y, 3*j);
     
 #else
-    zero_real(size_, Y);
+    zero_real(SD_BLOCK_SIZE*size_, Y);
     vecMulAdd(X, Y, 0, size_);
 #endif
 }
