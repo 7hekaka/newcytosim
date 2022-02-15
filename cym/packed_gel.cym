@@ -32,6 +32,7 @@ set fiber actin
 
     activity      = grow
     growing_speed = 0.05
+    min_length    = 0.005 
     max_length    = 0.065
  
     display = ( lines=7, 1, 1; color=white, 0xFFFFFF16; coloring=3; points=1,0; )

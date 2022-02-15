@@ -166,7 +166,7 @@ class BitMap
 
 public:
     
-    BitMap(unsigned W, unsigned H)
+    void resize(unsigned W, unsigned H)
     {
         width = W;
         height = H;
@@ -174,6 +174,11 @@ public:
             printf("invalid BitMap depth\n");
         BPR = bytes_per_row(width, depth);
         bytes = (uint8_t*)calloc(height*BPR, 1);
+    }
+    
+    BitMap(unsigned W, unsigned H)
+    {
+        resize(W, H);
     }
     
     ~BitMap()

@@ -8,16 +8,15 @@
 /// equalize flags for any existing matrix element between Mecables
 template < typename MatrixClass >
 void computeClusters(Array<Mecable*> const mecables, const size_t sup, Mecable** table,
-                     MatrixClass const& MAT, size_t ORD)
+                     MatrixClass const& MAT)
 {
     for ( size_t j = 0; j < sup; ++j )
     {
-        size_t jj = ORD * j;
         Mecable const* A = table[j];
-        for ( size_t n = 0; n < MAT.column_size(jj); ++n )
+        for ( size_t n = 0; n < MAT.column_size(j); ++n )
         {
             // we do not check the value here, but just having a block
-            size_t i = MAT.column_index(jj, n) / ORD;
+            size_t i = MAT.column_index(j, n);
             assert_true( i < sup );
             Mecable const* B = table[i];
             if ( A->flag() != B->flag() )
@@ -52,10 +51,10 @@ void Meca::flagClusters() const
     }
     
 #if USE_MATRIX_BLOCK
-    computeClusters(mecables, MAX, table, mFUL, DIM);
+    computeClusters(mecables, MAX, table, mFUL);
 #endif
 #if USE_ISO_MATRIX
-    computeClusters(mecables, MAX, table, mISO, 1);
+    computeClusters(mecables, MAX, table, mISO);
 #endif
     delete[] table;
 }
@@ -599,15 +598,14 @@ void Meca::saveConnectivityBitmap() const
 
 
 template < typename MatrixClass >
-static void setMatrixBitmap(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT, size_t ORD)
+static void setMatrixBitmap(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT)
 {
     bmap.clear();
     for ( size_t j = 0; j < sup; ++j )
     {
-        size_t jj = j * ORD;
-        for ( size_t n = 0; n < MAT.column_size(jj); ++n )
+        for ( size_t n = 0; n < MAT.column_size(j); ++n )
         {
-            size_t i = MAT.column_index(jj, n) / ORD;
+            size_t i = MAT.column_index(j, n);
             // swap i,j and flip i to display matrix properly on screen
             if ( j < sup )
                 bmap.set(i, j, 1);
@@ -645,22 +643,24 @@ void Meca::saveMatrixBitmaps() const
     FILE * f = fopen(str, "w");
     if ( f ) {
         if ( !ferror(f) ) {
-            setMatrixBitmap(bmap, nbv, mISO, 1);
+            setMatrixBitmap(bmap, nbv, mISO);
             markMecables(bmap, mecables);
             bmap.save(f);
         }
         fclose(f);
     }
 #endif
+#if USE_MATRIX_BLOCK
     snprintf(str, sizeof(str), "ful%08lu.bmp", cnt++);
     FILE * g = fopen(str, "w");
     if ( g ) {
         if ( !ferror(g) ) {
-            setMatrixBitmap(bmap, nbv, mFUL, DIM);
+            setMatrixBitmap(bmap, nbv, mFUL);
             markMecables(bmap, mecables);
             bmap.save(g);
         }
         fclose(g);
     }
+#endif
 }
 

@@ -957,7 +957,7 @@ namespace gle
     }
 
     /* This moves some vertices to add an hexagonal needle to the blob */
-    void modifyBlob(flute3 * flu)
+    void modifyBlob(flute3 * flu, float F)
     {
         const float R = 0.6f;
         const float Y = R * 0.8660254037844386f; // sqrtf(3)/2;
@@ -965,7 +965,7 @@ namespace gle
         const float Z = 0.6f;
         //{ 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 }
         // pull some vertices far away in Z
-        for ( int u : { 42, 44, 46, 48, 50 } ) flu[u] = { 0, 0, 6 };
+        for ( int u : { 42, 44, 46, 48, 50 } ) flu[u] = { 0, 0, F };
         // set the 6 vertex of an hexagon:
         for ( int u : { 3, 49 } ) flu[u] = { R, 0, Z};
         for ( int u : { 5, 47 } ) flu[u] = { X,-Y, Z};
@@ -978,7 +978,7 @@ namespace gle
     size_t setPin(flute3* flu)
     {
         size_t i = setBlob(flu);
-        modifyBlob(flu);
+        modifyBlob(flu, 10);
         return i;
     }
 
@@ -986,7 +986,7 @@ namespace gle
     {
         flute3 flu[52];
         setBlob(flu);
-        //modifyBlob(flu);
+        //modifyBlob(flu, 10);
         glVertexPointer(3, GL_FLOAT, 0, flu);
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 0, flu);
@@ -1247,7 +1247,7 @@ namespace gle
         idx[13] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0);
         idx[14] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0);
         idx[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.25);
-        idx[16] = i+s; i += setCone(ptr+i, 2, 0, 9, 1, 0);
+        idx[16] = i+s; i += setCone(ptr+i, 2, 0,21, 1, 0);
         idx[17] = i+s; i += setDisc(ptr+i, 1, 0, 1);
         idx[18] = i+s; i += setDisc(ptr+i, 2, 0, 1);
         idx[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);

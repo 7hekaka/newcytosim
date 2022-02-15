@@ -34,7 +34,7 @@ set fiber filament
     activity = grow
     growing_speed  = 0.2,  0.2
     persistent     = 1
-    min_length     = 0.1
+    min_length     = 0.05
     max_length     = 2
     display = ( line_width=6; coloring=1; )
 }

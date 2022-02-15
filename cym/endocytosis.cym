@@ -46,6 +46,7 @@ set fiber actin
     activity = grow
     growing_speed = 0.550   % Berro JMB 2010 says 550 nm/s or 200 monomers / sec
     growing_force = inf
+    min_length = 0.00275
     max_length = 0.055
 }
 
