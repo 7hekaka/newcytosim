@@ -775,10 +775,9 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     sec[nbs-2] = 0;
     sec[nbs-1] = 0;
 #if ( 0 )
-    size_t S = std::min(nbs, 24UL);
-    printf("\n mag "); VecPrint::print(S, mag, 3);
-    printf("\n pri "); VecPrint::print(S, pri, 3);
-    printf("\n sec "); VecPrint::print(S, sec, 3);
+    printf("\n mag "); VecPrint::print(nbs, mag, 3);
+    printf("\n pri "); VecPrint::print(nbs, pri, 3);
+    printf("\n sec "); VecPrint::print(nbs, sec, 3);
 #endif
     res = reshape_calculate(nbs, 1.0, mag, pri, sec, mem, mem_size);
     
@@ -804,17 +803,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 
     if ( res == 0 )
     {
-#if ( 0 )
-        if ( nbs <= S )
-        {
-            printf("\n>>> mul "); VecPrint::print(S, mem, 3);
-        }
-        else
-        {
-            printf("\n>>> mul "); VecPrint::print(S/2, mem, 3);
-            printf("..."); VecPrint::print(S/2, mem+nbs-S/2, 3);
-        }
-#endif
+        //VecPrint::edges(">>> mul", nbs, mem, 3);
         reshape_apply(nbs, src, mem, dst);
 #if ( 0 )
         // checking against older code

@@ -502,10 +502,9 @@ void Mecafil::makeProjectionDiff(const real* force)
     real e = blas::difference(nbSegments(), iLLG, iLag);
     if ( e > 1e-6 )
     {
-        size_t S = std::min(16LU, nbSegments());
         std::clog << "Mecafil: |iLag - iLLG| = " << e << "\n";
-        VecPrint::print("iLag ", S, iLag);
-        VecPrint::print("iLLG ", S, iLLG);
+        VecPrint::print("iLag ", nbSegments(), iLag);
+        VecPrint::print("iLLG ", nbSegments(), iLLG);
     }
 
 #if NEW_UNCONSTRAINED_LENGTH

@@ -70,10 +70,7 @@ static void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
 template < size_t ORD, bool SYMMETRIZE >
 static void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
 {
-#if ( 0 )
-    size_t S = std::min(12UL, siz);
-    VecPrint::full("\ncopy_lower_subspace", S, S, mat, ldd);
-#endif
+    //VecPrint::full("\ncopy_lower_subspace", siz, siz, mat, ldd);
     
     for ( size_t jj =  0; jj < siz; jj += ORD )
     for ( size_t ii = jj; ii < siz; ii += ORD )
@@ -90,7 +87,7 @@ static void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
         }
     }
     
-    //VecPrint::full("Expanded", S, S, mat, ldd);
+    //VecPrint::full("Expanded", siz, siz, mat, ldd);
 }
 
 
@@ -100,10 +97,8 @@ static void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
 template < size_t ORD >
 static void average_matrix(size_t siz, real* src, size_t ldd)
 {
-#if ( 0 )
-    size_t S = std::min(12UL, siz);
-    VecPrint::full("\naverage_matrix", S, S, src, ldd);
-#endif
+    //VecPrint::full("\naverage_matrix", siz, siz, src, ldd);
+
     for ( size_t jj = 0; jj < siz; jj += ORD  )
     for ( size_t ii = 0; ii < siz; ii += ORD  )
     {
@@ -118,7 +113,7 @@ static void average_matrix(size_t siz, real* src, size_t ldd)
         for ( size_t d = 0; d < ORD; ++d )
             ptr[d*(ldd+1)] = val;
     }
-    //VecPrint::full("Averaged", S, S, src, ldd);
+    //VecPrint::full("Averaged", siz, siz, src, ldd);
 }
 
 
@@ -128,10 +123,8 @@ static void average_matrix(size_t siz, real* src, size_t ldd)
 template < size_t ORD >
 static void project_matrix(size_t siz, real const* src, size_t lll, real* dst, size_t ldd)
 {
-#if ( 0 )
-    size_t S = std::min(12UL, siz);
-    VecPrint::full("\nproject_matrix", ORD*S, ORD*S, src, lll);
-#endif
+    //VecPrint::full("\nproject_matrix", ORD*siz, ORD*siz, src, lll);
+
     for ( size_t jj = 0; jj < siz; ++jj )
     for ( size_t ii = 0; ii < siz; ++ii )
     {
@@ -141,7 +134,7 @@ static void project_matrix(size_t siz, real const* src, size_t lll, real* dst, s
             val += ptr[d*(lll+1)];
         dst[ii+ldd*jj] = val / (real)ORD;
     }
-    //VecPrint::full("Projected", S, S, dst, ldd);
+    //VecPrint::full("Projected", siz, siz, dst, ldd);
 }
 
 

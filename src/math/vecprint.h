@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 #ifndef VECPRINT_H
 #define VECPRINT_H
 
@@ -10,6 +10,8 @@
 /// Templated functions to print Vectors and Matrices with minimal formatting
 namespace VecPrint
 {
+    constexpr size_t SUP = 16UL;
+    
     /// print 'len' components of 'vec[]' on a line
     template< typename T >
     void print(FILE* file, size_t len, const T* vec, int digits = 2, size_t dim = 0)
@@ -102,7 +104,7 @@ namespace VecPrint
         {
             char str[32], fmt[32];
             snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
-            for ( size_t i = 0; i < len; ++i )
+            for ( size_t i = 0; i < std::min(len, SUP); ++i )
             {
                 snprintf(str, sizeof(str), fmt, vec[i]);
                 if ( i % 3 )
@@ -119,8 +121,8 @@ namespace VecPrint
     void print(std::string const& msg, size_t len, const T* vec, int digits = 2)
     {
         std::ostream & os = std::cout;
-        os << std::setw(6) << msg << " ";
-        print(os, len, vec, digits);
+        os << std::setw(6) << msg << " " << len << " ";
+        print(os, std::min(len, SUP), vec, digits);
         std::endl(os);
     }
     
@@ -225,10 +227,10 @@ namespace VecPrint
     }
     
     template< typename T >
-    void full(std::string const& str, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
+    void full(std::string const& msg, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
     {
-        std::cout << str << ":\n";
-        full(std::cout, lin, col, mat, ldd, digits);
+        std::cout << msg << " " << lin << "x" << col << " :\n";
+        full(std::cout, std::min(lin, SUP), std::min(col, SUP), mat, ldd, digits);
     }
 
     /// print matrix in sparse format: line_index, column_index, value

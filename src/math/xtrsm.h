@@ -1982,9 +1982,8 @@ void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* 
     real err = blas::difference(N, B, T);
     if ( std::isnan(err) || err > 0.01 )
     {
-        int S = std::min(N/(2*DIM), 2)*DIM, E = N - 1 - S;
-        printf("\n xgetrs %3i ",N); VecPrint::print(S, B, 3); VecPrint::print(S, B+E, 3);
-        printf("\n    ref --- "); VecPrint::print(S, T, 3); VecPrint::print(S, T+E, 3);
+        VecPrint::edges("xgetrs", N, B, 3);
+        VecPrint::edges("ref---", N, T, 3);
     }// else printf("\n xgetrs %3i okay!", N);
     free_real(T);
 #endif
