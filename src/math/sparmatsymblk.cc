@@ -298,12 +298,12 @@ void SparMatSymBlk::scale(const real alpha)
 }
 
 
-void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd,
-                                     const size_t start, const size_t cnt) const
+void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, const size_t cnt, size_t mul) const
 {
+    assert_true( mul == Block::dimension() );
     size_t end = start + cnt;
-    size_t off = start + ldd * start;
     assert_true( end <= size_ );
+    size_t off = start + ldd * start;
     
     for ( size_t jj = start; jj < end; ++jj )
     {
@@ -331,9 +331,10 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd,
 }
 
 
-void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd,
-                                 const size_t start, const size_t cnt, size_t rank) const
+void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt,
+                                 const size_t mul, const size_t rank) const
 {
+    assert_true( mul == Block::dimension() );
     size_t end = start + cnt;
     size_t off = start + ldd * start;
     assert_true( end <= size_ );
@@ -367,8 +368,9 @@ mat(i, j) is stored in mat[i-j+ldd*j]
 */
 void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
                                      const size_t start, const size_t cnt,
-                                     const size_t rank, bool sym) const
+                                     const size_t mul, const size_t rank, const bool sym) const
 {
+    assert_true( mul == Block::dimension() );
     size_t end = start + cnt;
     assert_true( end <= size_ );
 

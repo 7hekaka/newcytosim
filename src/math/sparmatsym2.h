@@ -167,13 +167,13 @@ public:
     void scale(real);
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp=1) const;
+    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t amp=1) const;
     
     /// add scaled terms with `i` in [start, start+cnt[ if ( j > i ) and ( j <= i + rank ) to `mat`
-    void addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t rank) const;
+    void addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank) const;
     
     /// add `alpha*trace()` for blocks within [start, start+cnt[ if ( j <= i + rank ) to `mat`
-    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t rank, bool sym) const;
+    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank, bool sym) const;
 
     /// create compressed storage from column-based data
     bool prepareForMultiply(int);

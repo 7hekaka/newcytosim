@@ -166,8 +166,8 @@ void compareMatrix(size_t S, MATRIX & mat1, MATROX& mat2, size_t fill)
         zero_real(nume, tmp1);
         zero_real(nume, tmp2);
 
-        mat1.addDiagonalBlock(tmp1, S, inx, cnt);
-        mat2.addDiagonalBlock(tmp2, S, inx, cnt);
+        mat1.addDiagonalBlock(tmp1, S, inx, cnt, 1, 1);
+        mat2.addDiagonalBlock(tmp2, S, inx, cnt, 1, 1);
         
         for ( size_t i = 0; i < S; ++i )
         for ( size_t j = 0; j < S; ++j )
@@ -188,7 +188,7 @@ void compareMatrix(size_t S, MATRIX & mat1, MATROX& mat2, size_t fill)
             VecPrint::full(mat2.what(), cnt, cnt, tmp2, S);
             
             zero_real(nume, tmp2);
-            mat1.addDiagonalBlock(tmp2, S, inx, cnt);
+            mat1.addDiagonalBlock(tmp2, S, inx, cnt, 1, 1);
             VecPrint::full(mat1.what(), cnt, cnt, tmp2, S);
             break;
         }

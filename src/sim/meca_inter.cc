@@ -1321,7 +1321,7 @@ void Meca::addLink(Mecapoint const& ptA,
 
     sub_iso_diag(ii0, weight);
     sub_iso_diag(ii1, weight);
-    add_iso(ii0, ii1, weight);
+    add_iso(std::max(ii0, ii1), std::min(ii0, ii1), weight);
 
     if ( modulo )
     {

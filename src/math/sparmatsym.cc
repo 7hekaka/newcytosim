@@ -222,20 +222,20 @@ void SparMatSym::scale(const real alpha)
 }
 
 
-void SparMatSym::addDiagonalBlock(real* mat, const size_t ldd,
-                                  const size_t start, const size_t cnt,
-                                  const size_t amp) const
+void SparMatSym::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
+                                  const size_t mul, const size_t amp) const
 {
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
+    start *= mul;
+    cnt = start + mul * cnt;
+    assert_true( cnt <= size_ );
     
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = start; jj < cnt; ++jj )
     {
         size_t j = amp * ( jj - start );
         for ( size_t n = 0; n < colsiz_[jj]; ++n )
         {
             size_t ii = column_[jj][n].inx;
-            if ( start <= ii && ii < end )
+            if ( start <= ii && ii < cnt )
             {
                 size_t i = amp * ( ii - start );
                 assert_true(i > j);

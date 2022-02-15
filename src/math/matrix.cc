@@ -65,9 +65,11 @@ void Matrix::copyBlock(real* mat, size_t ldd, size_t sx, size_t nx, size_t sy, s
 }
 
 
-void Matrix::addDiagonalBlock(real* mat, const size_t ldd, const size_t start,
-                              const size_t cnt, const size_t amp) const
+void Matrix::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
+                              const size_t mul, const size_t amp) const
 {
+    start *= mul;
+    cnt *= mul;
     assert_true( start + cnt < size() );
 
     for ( size_t jj = 0; jj < cnt; ++jj )

@@ -290,14 +290,14 @@ void SparMatSym2::scale(const real alpha)
 }
 
 
-void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd,
-                                   const size_t start, const size_t cnt,
-                                   const size_t amp) const
+void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
+                                   const size_t mul, const size_t amp) const
 {
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
+    start *= mul;
+    cnt = start + mul * cnt;
+    assert_true( cnt <= size_ );
     
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = start; jj < cnt; ++jj )
     {
         size_t j = amp * ( jj - start );
         for ( size_t n = 0; n < colsiz_[jj]; ++n )
@@ -305,7 +305,7 @@ void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd,
             size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
             assert_true( ii >= jj );
-            if ( ii < end )
+            if ( ii < cnt )
             {
                 size_t i = amp * ( ii - start );
                 //printf("SMS2 %4i %4i % .4f\n", ii, jj, a);
@@ -322,14 +322,14 @@ void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd,
 addresses `mat' using lower banded storage for a symmetric matrix
 mat(i, j) is stored in mat[i-j+ldd*j]
 */
-void SparMatSym2::addLowerBand(real alpha, real* mat, const size_t ldd,
-                               const size_t start, const size_t cnt,
-                               const size_t rank) const
+void SparMatSym2::addLowerBand(real alpha, real* mat, const size_t ldd, size_t start, size_t cnt,
+                               const size_t mul, const size_t rank) const
 {
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
-    
-    for ( size_t jj = start; jj < end; ++jj )
+    start *= mul;
+    cnt = start + mul * cnt;
+    assert_true( cnt <= size_ );
+
+    for ( size_t jj = start; jj < cnt; ++jj )
     {
         size_t j = jj - start;
         for ( size_t n = 0; n < colsiz_[jj]; ++n )
@@ -337,7 +337,7 @@ void SparMatSym2::addLowerBand(real alpha, real* mat, const size_t ldd,
             size_t ii = column_[jj][n].inx;
             assert_true( ii >= jj );
             // assuming lower triangle is stored:
-            if ( ii < end )
+            if ( ii < cnt )
             {
                 size_t i = ii - start;
                 //printf("SMS2 %4i %4i % .4f\n", ii, jj, a);
@@ -352,7 +352,7 @@ void SparMatSym2::addLowerBand(real alpha, real* mat, const size_t ldd,
 
 void SparMatSym2::addDiagonalTrace(real alpha, real* mat, const size_t ldd,
                                    const size_t start, const size_t cnt,
-                                   const size_t rank, bool sym) const
+                                   const size_t mul, const size_t rank, const bool sym) const
 {
     fprintf(stderr, "unfinished SparMatSym2::addDiagonalTrace()\n");
     exit(1);

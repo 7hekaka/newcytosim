@@ -238,22 +238,22 @@ void SparMatBlk::scale(const real alpha)
 }
 
 
-void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd,
-                                  const size_t start, const size_t cnt) const
+void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, const size_t cnt, size_t mul) const
 {
+    assert_true( mul == Block::dimension() );
     size_t end = start + cnt;
-    size_t off = start + ldd * start;
     assert_true( end <= size_ );
-    
-    for ( size_t i = start; i < end; ++i )
+    size_t off = start + ldd * start;
+
+    for ( size_t ii = start; ii < end; ++ii )
     {
-        Line & row = row_[i];
+        Line & row = row_[ii];
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
-            size_t j = row.inx_[n];
-            if ((start <= j) & (j < end))
+            size_t jj = row.inx_[n];
+            if ((start <= jj) & (jj < end))
             {
-                real * ptr = mat + (( i + ldd * j ) - off ) * BLOCK_SIZE;
+                real * ptr = mat + (( ii + ldd * jj ) - off ) * BLOCK_SIZE;
                 row[n].addto(ptr, ldd);
             }
         }
@@ -261,23 +261,25 @@ void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd,
 }
 
 
-void SparMatBlk::addLowerBand(real alpha, real* mat, size_t ldd,
-                              const size_t start, const size_t cnt, size_t rank) const
+void SparMatBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt,
+                              const size_t mul, const size_t rank) const
 {
-    size_t end = start + cnt;
+    assert_true( mul == Block::dimension() );
+    start *= mul;
+    cnt = start + mul * cnt;
+    assert_true( cnt <= size_ );
     size_t off = start + ldd * start;
-    assert_true( end <= size_ );
     
-    for ( size_t i = start; i < end; i += BLOCK_SIZE )
+    for ( size_t ii = start; ii < cnt; ++ii )
     {
-        Line & row = row_[i];
+        Line & row = row_[ii];
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
-            size_t j = row.inx_[n];
-            real * ptr = mat + (( i + ldd * j ) - off ) * BLOCK_SIZE;
-            if ( i == j )
+            size_t jj = row.inx_[n];
+            real * ptr = mat + (( ii + ldd * jj ) - off ) * BLOCK_SIZE;
+            if ( ii == jj )
                 row[n].addto_lower(ptr, ldd, alpha);
-            else if ((i < j) & (j < end) & (j <= i+rank))
+            else if ((ii < jj) & (jj < cnt) & (jj <= ii+rank))
                 row[n].addto(ptr, ldd, alpha);
         }
     }
@@ -287,8 +289,9 @@ void SparMatBlk::addLowerBand(real alpha, real* mat, size_t ldd,
 // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
 void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
                                   const size_t start, const size_t cnt,
-                                  size_t rank, bool sym) const
+                                  const size_t mul, const size_t rank, const bool sym) const
 {
+    assert_true( mul == Block::dimension() );
     size_t end = start + cnt;
     assert_true( end <= size_ );
 

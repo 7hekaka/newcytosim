@@ -262,7 +262,7 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
     blas::xaxpy(bks*bks, -1.0, blk, 1, wrk, 1);
     real err = blas::nrm2(bks*bks, wrk);
  
-    std::clog << "verifyBlock ";
+    std::clog << "\nverifyBlock ";
     std::clog << std::setw(8) << mec->reference() << "  " << std::setw(4) << bks;
     std::clog << " | B - K | = " << err << ' ';
 
@@ -371,10 +371,10 @@ void Meca::getIsoBBlock(const Mecable * mec, real* res, size_t ldd) const
      */
 
 #if USE_ISO_MATRIX
-    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 2);
+    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 1, 2);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTrace(beta/DIM, res, ldd-1, mec->matIndex(), nbp, 2, false);
+        mFUL.addDiagonalTrace(beta/DIM, res, ldd-1, mec->matIndex(), nbp, DIM, 2, false);
 
     // add Identity matrix to band storage:
     for ( size_t i = 0; i < nbp; ++i )
@@ -403,10 +403,10 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
         addBendingRigidity<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
 #endif
 #if USE_ISO_MATRIX
-    mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp);
+    mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp, 1, 1);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTrace(1.0/DIM, res, nbp, mec->matIndex(), nbp, nbp, true);
+        mFUL.addDiagonalTrace(1.0/DIM, res, nbp, mec->matIndex(), nbp, DIM, nbp, true);
 
 #if ( 0 )
 #if ADD_PROJECTION_DIFF
@@ -474,7 +474,7 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
     }
 #endif
 #if USE_ISO_MATRIX
-    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, rank/DIM);
+    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 1, rank/DIM);
 #endif
     // VecPrint::full("\niso", ldd, std::min(bks, 24ul), res, ldd);
     copy_lower_subspace<DIM>(bks, res, ldd-1, rank);
@@ -482,11 +482,7 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
-#if USE_BLOCK_MATRIX
-        mFUL.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, rank);
-#else
-        mFUL.addLowerBand(beta, res, ldd-1, DIM*mec->matIndex(), bks, rank);
-#endif
+        mFUL.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, DIM, rank);
     // add Identity matrix to band storage:
     for ( size_t i = 0; i < bks; ++i )
         res[ldd*i] += 1;
@@ -517,13 +513,13 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
     }
 #endif
 #if USE_ISO_MATRIX
-    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
+    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, 1, DIM);
 #endif
     copy_lower_subspace<DIM, true>(bks, res, bks);
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalBlock(res, bks, mec->matIndex(), nbp);
+        mFUL.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
     
     // multiply by mobility coefficient, skipping projection
     const real beta = -tau_ * mec->pointMobility();
@@ -562,13 +558,13 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     }
 #endif
 #if USE_ISO_MATRIX
-    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
+    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, 1, DIM);
 #endif
     copy_lower_subspace<DIM, true>(bks, res, bks);
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalBlock(res, bks, mec->matIndex(), nbp);
+        mFUL.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
     
     //VecPrint::full("mISO+mFUL block", bks, bks, res, bks);
     

@@ -232,7 +232,7 @@ void Simul::solve_auto()
     
     if ( ++autoCounter <= N_TESTS*N_METHODS )
     {
-        assert_true(autoPrecond < 6);
+        assert_true(autoPrecond < 8);
         autoCPU[autoPrecond] += cpu;
         autoCNT[autoPrecond] += cnt;
 

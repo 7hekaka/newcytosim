@@ -178,8 +178,11 @@ void SparMat::scale( real a )
 }
 
 
-void SparMat::addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t amp) const
+void SparMat::addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt,
+                               const size_t mul, const size_t amp) const
 {
+    start *= mul;
+    cnt *= mul;
     assert_true( start + cnt <= size_ );
     
     for ( size_t jj = 0; jj < cnt; ++jj )

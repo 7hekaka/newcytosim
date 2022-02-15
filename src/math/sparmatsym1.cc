@@ -293,14 +293,14 @@ void SparMatSym1::scale(const real alpha)
 }
 
 
-void SparMatSym1::addDiagonalBlock(real* mat, const size_t ldd,
-                                   const size_t start, const size_t cnt,
-                                   const size_t amp) const
+void SparMatSym1::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
+                                   const size_t mul, const size_t amp) const
 {
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
+    start *= mul;
+    cnt = start + mul * cnt;
+    assert_true( cnt <= size_ );
     
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = start; jj < cnt; ++jj )
     {
         size_t j = amp * ( jj - start );
         mat[j+ldd*j] += diagon_[jj];
@@ -310,12 +310,13 @@ void SparMatSym1::addDiagonalBlock(real* mat, const size_t ldd,
             size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
             assert_true( ii > jj );
-            if ( ii < end )
+            if ( ii < cnt )
             {
                 size_t i = amp * ( ii - start );
+                real a = column_[jj][n].val;
                 //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
-                mat[i+ldd*j] += column_[jj][n].val;
-                mat[j+ldd*i] += column_[jj][n].val;
+                mat[i+ldd*j] += a;
+                mat[j+ldd*i] += a;
             }
             else
                 break;
@@ -328,14 +329,14 @@ void SparMatSym1::addDiagonalBlock(real* mat, const size_t ldd,
 addresses `mat' using lower banded storage for a symmetric matrix
 mat(i, j) is stored in mat[i-j+ldd*j]
 */
-void SparMatSym1::addLowerBand(real alpha, real* mat, const size_t ldd,
-                               const size_t start, const size_t cnt,
-                               const size_t rank) const
+void SparMatSym1::addLowerBand(real alpha, real* mat, const size_t ldd, size_t start, size_t cnt,
+                               const size_t mul, const size_t rank) const
 {
-    size_t end = start + cnt;
-    assert_true( end <= size_ );
+    start *= mul;
+    cnt = start + mul * cnt;
+    assert_true( cnt <= size_ );
     
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = start; jj < cnt; ++jj )
     {
         size_t j = jj - start;
         mat[j+ldd*j] += alpha * diagon_[jj];
@@ -345,7 +346,7 @@ void SparMatSym1::addLowerBand(real alpha, real* mat, const size_t ldd,
             size_t ii = column_[jj][n].inx;
             assert_true( ii > jj );
             // assuming lower triangle is stored:
-            if ( ii < end )
+            if ( ii < cnt )
             {
                 size_t i = ii - start;
                 //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
@@ -360,12 +361,34 @@ void SparMatSym1::addLowerBand(real alpha, real* mat, const size_t ldd,
 }
 
 
-void SparMatSym1::addDiagonalTrace(real alpha, real* mat, const size_t ldd,
-                                   const size_t start, const size_t cnt,
-                                   const size_t rank, bool sym) const
+void SparMatSym1::addDiagonalTrace(real alpha, real* mat, const size_t ldd, size_t start, size_t cnt,
+                                   const size_t mul, const size_t rank, const bool sym) const
 {
-    fprintf(stderr, "unfinished SparMatSym1::addDiagonalTrace()\n");
-    exit(1);
+    start *= mul;
+    size_t end = start + mul * cnt;
+    assert_true( cnt <= size_ );
+
+    for ( size_t jj = start; jj < end; ++jj )
+    {
+        size_t j = ( jj - start ) / mul;
+        // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
+        mat[j+ldd*j] += alpha * diagon_[jj];
+        for ( size_t n = 0; n < colsiz_[jj]; ++n )
+        {
+            assert_true( column_[jj][n].inx > jj );
+            // assuming lower triangle is stored:
+            size_t ii = column_[jj][n].inx - start;
+            size_t i = ii / mul;
+            if (( ii-jj == (i-j)*mul ) & ( i < cnt ) & ( i <= j + rank ))
+            {
+                real a = alpha * column_[jj][n].val;
+                //fprintf(stderr, "SMS1 %4lu %4lu : %.4f\n", i, j, a);
+                // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
+                mat[i+ldd*j] += a;
+                if ( sym ) mat[j+ldd*i] += a;
+            }
+        }
+    }
 }
 
 
