@@ -107,6 +107,9 @@ void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge
 //------------------------------------------------------------------------------
 #pragma mark - Check two Objects: P = Point; L = Line segment
 
+/// used to check distance of two particles (dd = square of distance) against threshold L
+static bool below(real dd, real L) { return ( dd < L*L ) && ( dd > REAL_EPSILON ); }
+
 
 /**
  This is used to check two spherical objects:
@@ -125,7 +128,7 @@ void PointGrid::checkPP(FatPoint const& aa, FatPoint const& bb) const
         modulo->fold(vab);
 #endif
     real ab2 = vab.normSqr();
-    if ( ab2 < len*len )
+    if ( below(ab2, len) )
         meca.addLongLink1(aa.pnt_, bb.pnt_, vab, ab2, len, push);
 }
 
@@ -150,7 +153,7 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
         if ( abs <= bb.len() )
         {
             // the point projects inside the segment
-            if ( ab2 < ran*ran )
+            if ( below(ab2, ran) )
                 meca.addSideSlidingLink(bb.seg_, abs, aa.pnt_, ran, push);
         }
         else
@@ -164,7 +167,7 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
                     modulo->fold(vab);
 #endif
                 ab2 = vab.normSqr();
-                if ( ab2 < ran*ran )
+                if ( below(ab2, ran) )
                     meca.addLongLink1(aa.pnt_, bb.vertex2(), vab, ab2, ran, push);
             }
         }
@@ -183,7 +186,7 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
          interact with the node only if this projects on the previous segment
          or if this is the terminal point of a fiber.
          */
-        if ( ab2 < ran*ran && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
+        if ( below(ab2, ran) && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
             meca.addLongLink1(aa.pnt_, bb.vertex1(), vab, ab2, ran, push);
     }
 }
@@ -230,7 +233,7 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
 #endif
                 real ab2 = vab.normSqr();
                 real len = aa.rad_ + bb.rad_;
-                if ( ab2 < len*len  &&  dot(vab, bb.diff()) >= 0 )
+                if ( below(ab2, len)  &&  dot(vab, bb.diff()) >= 0 )
                     meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, len, push);
             }
         }
@@ -248,7 +251,7 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
                 real ab2 = vab.normSqr();
-                if ( ab2 < ran*ran )
+                if ( below(ab2, ran) )
                 {
                     real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(ab2-len*len, push, pull);
@@ -279,7 +282,7 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
         /*
          bb.vertex2() projects inside segment 'aa'
          */
-        if ( dis2 < ran*ran )
+        if ( below(dis2, ran) )
         {
             const real len = aa.rad_ + bb.rad_;
             real stiff = sign_select(dis2-len*len, push, pull);
@@ -302,7 +305,7 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
             assert_true(bb.isLast());
             real ab2 = vab.normSqr();
             real len = aa.rad_ + bb.rad_;
-            if ( ab2 < len*len  && dot(vab, bb.diff()) <= 0 )
+            if ( below(ab2, len)  &&  dot(vab, bb.diff()) <= 0 )
                 meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, len, push);
         }
         else
@@ -310,7 +313,7 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
                 real ab2 = vab.normSqr();
-                if ( ab2 < ran*ran )
+                if ( below(ab2, ran) )
                 {
                     real len = aa.rad_ + bb.rad_;
                     real stiff = sign_select(ab2-len*len, push, pull);
@@ -335,7 +338,7 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
 #endif
         real ab2 = vab.normSqr();
         real len = aa.rad_ + bb.rad_;
-        if ( ab2 < len*len  &&  dot(vab, bb.diff()) <= 0 )
+        if ( below(ab2, len)  &&  dot(vab, bb.diff()) <= 0 )
             meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, len, push);
     }
 }

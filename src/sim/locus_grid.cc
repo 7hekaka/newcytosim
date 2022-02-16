@@ -87,6 +87,9 @@ size_t LocusGrid::capacity() const
 //------------------------------------------------------------------------------
 #pragma mark - Check two Objects: P = Point; L = Line segment
 
+/// used to check distance of two particles (dd = square of distance) against threshold L
+static bool below(real dd, real L) { return ( dd < L*L ) && ( dd > REAL_EPSILON ); }
+
 
 /**
  This is used to check two spherical objects:
@@ -110,7 +113,7 @@ void LocusGrid::checkPP(BigPoint const& aa, BigPoint const& bb) const
 #endif
     real ab2 = vab.normSqr();
     
-    if ( ab2 < ran*ran )
+    if ( below(ab2, ran) )
         meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
 }
 
@@ -139,7 +142,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
         if ( abs <= bb.len() )
         {
             // the point projects inside the segment
-            if ( ab2 < ran*ran )
+            if ( below(ab2, ran) )
                 meca.addSideSlidingLink(bb.segment(), abs, aa.vertex1(), ran, push);
         }
         else
@@ -153,7 +156,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
                     modulo->fold(vab);
 #endif
                 ab2 = vab.normSqr();
-                if ( ab2 < ran*ran )
+                if ( below(ab2, ran) )
                     meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
             }
         }
@@ -172,7 +175,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
          interact with the node only if this projects on the previous segment
          or if this is the terminal point of a fiber.
          */
-        if ( ab2 < ran*ran && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
+        if ( below(ab2, ran) && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
             meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
     }
 }
@@ -197,7 +200,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
     FiberSegment seg = aa.segment();
     real abs = seg.projectPoint0(bb.pos1(), dis2);
     
-    if ((0 <= abs) & (abs <= aa.len()) & (dis2 < ran*ran))
+    if ( below(dis2, ran) &&  ((0 <= abs) & (abs <= aa.len())) )
     {
         /*
          bb.vertex1() projects inside segment 'aa'
@@ -221,7 +224,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
                     modulo->fold(vab);
 #endif
                 real ab2 = vab.normSqr();
-                if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) >= 0 )
+                if ( below(ab2, ran)  &&  dot(vab, bb.diff()) >= 0 )
                     meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
             }
         }
@@ -240,7 +243,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
                 real ab2 = vab.normSqr();
-                if ( ab2 < ran*ran )
+                if ( below(ab2, ran) )
                     meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
             }
         }
@@ -271,7 +274,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
         /*
          bb.vertex2() projects inside segment 'aa'
          */
-        if ( dis2 < ran*ran )
+        if ( below(dis2, ran) )
             meca.addSideSlidingLink(seg, abs, bb.vertex2(), ran, push);
     }
     else if ( abs < 0 )
@@ -291,7 +294,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
             assert_true(bb.isLast());
             real ab2 = vab.normSqr();
 
-            if ( ab2 < ran*ran  && dot(vab, bb.diff()) <= 0 )
+            if ( below(ab2, ran)  && dot(vab, bb.diff()) <= 0 )
                 meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
         }
         else
@@ -299,7 +302,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
                 real ab2 = vab.normSqr();
-                if ( ab2 < ran*ran )
+                if ( below(ab2, ran) )
                     meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
             }
         }
@@ -320,7 +323,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
 #endif
         real ab2 = vab.normSqr();
         
-        if ( ab2 < ran*ran  &&  dot(vab, bb.diff()) <= 0 )
+        if ( below(ab2, ran)  &&  dot(vab, bb.diff()) <= 0 )
             meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, ran, push);
     }
 }
