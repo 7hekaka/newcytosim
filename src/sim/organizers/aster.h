@@ -191,10 +191,10 @@ private:
 
     
     /// create and configure the Solid
-    ObjectList makeSolid(Simul&, Glossary& opt, size_t& origin);
+    void makeSolid(ObjectList&, Simul&, Glossary& opt, size_t& origin);
 
     /// create a Fiber for position 'inx'
-    ObjectList makeFiber(Simul&, size_t inx, std::string const&, Glossary& opt);
+    void makeFiber(ObjectList&, Simul&, size_t inx, std::string const&, Glossary& opt);
 
     /// define the attachment position of fiber 'inx'
     void placeAnchor(Vector const&, Vector const&, size_t origin);

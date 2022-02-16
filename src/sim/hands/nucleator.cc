@@ -20,18 +20,13 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 
 //------------------------------------------------------------------------------
 
-void Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type, Glossary& opt)
-{    
-    ObjectList objs;
+void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string const& fiber_type, Glossary& opt)
+{
     sim.fibers.newObjects(objs, fiber_type, opt);
     if ( objs.empty() )
         return;
 
     Fiber * fib = Fiber::toFiber(objs[0]);
-    
-    // register the new objects:
-    sim.add(objs);
-    
     ObjectMark mk = 0;
     Rotation rot(0, 1);
     
@@ -124,8 +119,10 @@ void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
     {
         nextAct = RNG.exponential();
         try {
+            ObjectList objs;
             Glossary opt(prop->fiber_spec);
-            makeFiber(sim, pos, prop->fiber_type, opt);
+            makeFiber(objs, sim, pos, prop->fiber_type, opt);
+            sim.add(objs);
         }
         catch( Exception & e )
         {

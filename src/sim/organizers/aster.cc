@@ -29,7 +29,9 @@ void Aster::step()
         if ( !fiber(ii) &&  RNG.test(prop->fiber_prob) )
         {
             Glossary opt(prop->fiber_spec);
-            sim.add(makeFiber(sim, ii, prop->fiber_type, opt));
+            ObjectList objs;
+            makeFiber(objs, sim, ii, prop->fiber_type, opt);
+            sim.add(objs);
             opt.print_warnings(std::cerr, 1, " in aster:nucleate[1]\n");
         }
     }
@@ -176,6 +178,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     assert_true(prop);
     assert_true(asSolid==nullptr);
     assert_true(nbOrganized()==0);
+    ObjectList res;
     
     // get number of fibers:
     size_t nbf = 0;
@@ -186,7 +189,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
         throw InvalidParameter("aster:radius must be specified and > 0");
     
     size_t origin = 0;
-    ObjectList res = makeSolid(sim, opt, origin);
+    makeSolid(res, sim, opt, origin);
     if ( !solid() )
         throw InvalidParameter("could not make aster:solid");
     //solid()->write(std::clog);
@@ -217,7 +220,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
             std::string str = fos;
             opt.set(str, var, 2);
             Glossary fopt(str);
-            res.append(makeFiber(sim, cnt, tif, fopt));
+            makeFiber(res, sim, cnt, tif, fopt);
             fopt.print_warnings(std::cerr, 1, "aster:build\n");
             ++cnt;
             var = "fiber" + std::to_string(cnt+1);
@@ -247,7 +250,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
         else
         {
             for ( size_t n = 0; n < nbf; ++n )
-                res.append(makeFiber(sim, n, tif, fopt));
+                makeFiber(res, sim, n, tif, fopt);
             fopt.print_warnings(std::cerr, nbf, "aster:build\n");
         }
     }
@@ -255,9 +258,20 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
 }
 
 
-ObjectList Aster::makeFiber(Simul& sim, size_t inx, std::string const& fiber_type, Glossary& opt)
+void Aster::makeFiber(ObjectList& objs, Simul& sim, size_t inx, std::string const& fiber_type, Glossary& opt)
 {
-    ObjectList objs;
+    Vector pos = posSolid1(inx);
+    Vector dir = posSolid2(inx) - pos;
+    real n = dir.normSqr();
+    
+    if ( n > REAL_EPSILON )
+        dir /= std::sqrt(n);
+    else
+        dir = Vector::randU();
+    
+    if ( prop->focus == PLUS_END )
+        dir = -dir;
+    
     sim.fibers.newObjects(objs, fiber_type, opt);
     
     if ( objs.empty() )
@@ -269,26 +283,10 @@ ObjectList Aster::makeFiber(Simul& sim, size_t inx, std::string const& fiber_typ
         throw InvalidParameter("unexpected object returned by fibers.newObjects()");
 
     grasp(fib, inx);
-
-    Vector pos = posSolid1(inx);
-    Vector dir = posSolid2(inx) - pos;
-    real n = dir.normSqr();
-    
-    if ( n > REAL_EPSILON )
-    {
-        if ( prop->focus == PLUS_END )
-            dir /= -std::sqrt(n);
-        else
-            dir /= std::sqrt(n);
-    }
-    else
-        dir = Vector::randU();
     
     //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
     ObjectSet::rotateObjects(objs, Rotation::rotationToVector(dir));
     ObjectSet::translateObjects(objs, pos - fib->posEnd(prop->focus));
-    
-    return objs;
 }
 
 
@@ -307,11 +305,9 @@ void Aster::placeAnchor(Vector const& A, Vector const& B, size_t ref)
 }
 
 
-ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
+void Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt, size_t& origin)
 {
-    ObjectList res(4, 4);
     Solid * sol = nullptr;
-    
     // find the Solid specified:
     std::string spec;
     if ( opt.set(spec, "solid") )
@@ -321,8 +317,8 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
         if ( p )
         {
             sol = new Solid(p);
-            res.push_back(sol);
-            res.append(sol->build(opt, sim));
+            objs.push_back(sol);
+            objs.append(sol->build(opt, sim));
             //std::clog << "Aster::makeSolid() created solid " << sol->reference() << "\n";
         }
         else
@@ -353,7 +349,6 @@ ObjectList Aster::makeSolid(Simul& sim, Glossary& opt, size_t& origin)
     origin = sol->addTriad(asRadius);
     sol->fixShape();
     asSolid = sol;
-    return res;
 }
 
 
