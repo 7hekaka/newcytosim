@@ -1472,25 +1472,23 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
                 FiberSegment seg(fib, ii);
                 for ( size_t jj = 0; jj < fox->nbSegments(); ++jj )
                 {
-                    real abs1, abs2, dis2;
                     FiberSegment soc(fox, jj);
-                    if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
+                    real abs1, abs2;
+                    real dis2 = seg.shortestDistanceSqr(soc, abs1, abs2);
+                    if (( dis2 < sup ) & seg.within(abs1) & soc.within(abs2))
                     {
-                        if ( seg.within(abs1) & soc.within(abs2) )
+                        ++cnt;
+                        Vector pos1 = seg.pos(abs1/seg.len());
+                        //Vector pos2 = loc2.pos(abs2/loc2.len());
+                        if ( details == 2 )
                         {
-                            ++cnt;
-                            Vector pos1 = seg.pos(abs1/seg.len());
-                            //Vector pos2 = loc2.pos(abs2/loc2.len());
-                            if ( details == 2 )
-                            {
-                                out << LIN << fib->identity();
-                                out << SEP << abs1 + seg.abscissa1();
-                                out << SEP << fox->identity();
-                                out << SEP << abs2 + soc.abscissa1();
-                                out << SEP << pos1;
-                            }
-                            acc.add(pos1);
+                            out << LIN << fib->identity();
+                            out << SEP << abs1 + seg.abscissa1();
+                            out << SEP << fox->identity();
+                            out << SEP << abs2 + soc.abscissa1();
+                            out << SEP << pos1;
                         }
+                        acc.add(pos1);
                     }
                 }
             }

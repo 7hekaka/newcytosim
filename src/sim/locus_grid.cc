@@ -88,7 +88,7 @@ size_t LocusGrid::capacity() const
 #pragma mark - Check two Objects: P = Point; L = Line segment
 
 /// used to check distance of two particles (dd = square of distance) against threshold L
-static bool below(real dd, real L) { return ( dd < L*L ) && ( dd > REAL_EPSILON ); }
+static inline bool below(const real dd, const real L) { return ( dd < L*L ) && ( dd > REAL_EPSILON ); }
 
 
 /**
@@ -344,14 +344,14 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     
     /* in 3D, check the shortest distance between two segments, and if close
      enough, use the result to build an interaction */
-    real a, b, d;
     FiberSegment as = aa.segment();
     FiberSegment bs = bb.segment();
+    real a, b;
+    /* We do not need to calculate `a` and `b` if the distance 'dis'
+     is greater than 'ran' since nothing will be done in that case... */
+    real dis2 = as.shortestDistanceSqr(bs, a, b);
     
-    if ( ! as.belowDistance(bs, ran, a, b, d) )
-        return;
-    
-    if ( as.within(a) & bs.within(b) )
+    if ( below(dis2, ran) & as.within(a) & bs.within(b) )
         meca.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push);
     
 #endif

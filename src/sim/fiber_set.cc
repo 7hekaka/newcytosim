@@ -374,14 +374,12 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
             for ( size_t s2 = s1+2; s2 < fib1->nbSegments(); ++s2 )
             {
                 FiberSegment soc(fib1, s2);
-                real abs1, abs2, dis2;
-                if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
+                real abs1, abs2;
+                real dis2 = seg.shortestDistanceSqr(soc, abs1, abs2);
+                if ((dis2 < sup) & seg.within(abs1) & soc.within(abs2))
                 {
-                    if ( seg.within(abs1) & soc.within(abs2) )
-                    {
-                        res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
-                        res2.emplace(fib1, abs2+fib1->abscissaPoint(s2));
-                    }
+                    res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
+                    res2.emplace(fib1, abs2+fib1->abscissaPoint(s2));
                 }
             }
             // check against other fibers:
@@ -390,14 +388,12 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
                 for ( size_t s2 = 0; s2 < fib2->nbSegments(); ++s2 )
                 {
                     FiberSegment soc(fib2, s2);
-                    real abs1, abs2, dis2;
-                    if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
+                    real abs1, abs2;
+                    real dis2 = seg.shortestDistanceSqr(soc, abs1, abs2);
+                    if ((dis2 < sup) & seg.within(abs1) & soc.within(abs2))
                     {
-                        if ( seg.within(abs1) & soc.within(abs2) )
-                        {
-                            res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
-                            res2.emplace(fib2, abs2+fib2->abscissaPoint(s2));
-                        }
+                        res1.emplace(fib1, abs1+fib1->abscissaPoint(s1));
+                        res2.emplace(fib2, abs2+fib2->abscissaPoint(s2));
                     }
                 }
             }
@@ -460,14 +456,12 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
                 if ( fib < bif )
                 {
                     //std::clog << "   " << can;
-                    real abs1, abs2, dis2;
-                    if ( seg.belowDistance(soc, sup, abs1, abs2, dis2) )
+                    real abs1, abs2;
+                    real dis2 = seg.shortestDistanceSqr(soc, abs1, abs2);
+                    if ((dis2 < sup) & seg.within(abs1) & soc.within(abs2))
                     {
-                        if ( seg.within(abs1) & soc.within(abs2) )
-                        {
-                            res1.emplace(fib, abs1+fib->abscissaPoint(s));
-                            res2.emplace(bif, abs2+bif->abscissaPoint(soc.point()));
-                        }
+                        res1.emplace(fib, abs1+fib->abscissaPoint(s));
+                        res2.emplace(bif, abs2+bif->abscissaPoint(soc.point()));
                     }
                 }
             }

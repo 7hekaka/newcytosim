@@ -109,7 +109,7 @@ public:
     real projectPointF(const real[], real& dist) const;
     
     /// calculates the closest distance between two infinite lines and set corresponding abscissa
-    bool belowDistance(FiberSegment const&, real sup, real& a, real& b, real& dis2) const;
+    real shortestDistanceSqr(FiberSegment const&, real& a, real& b) const;
 
     /// Human friendly ouput
     void print(std::ostream&) const;

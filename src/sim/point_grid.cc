@@ -108,7 +108,7 @@ void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge
 #pragma mark - Check two Objects: P = Point; L = Line segment
 
 /// used to check distance of two particles (dd = square of distance) against threshold L
-static bool below(real dd, real L) { return ( dd < L*L ) && ( dd > REAL_EPSILON ); }
+static inline bool below(const real dd, const real L) { return ( dd < L*L ) && ( dd > REAL_EPSILON ); }
 
 
 /**
@@ -207,7 +207,7 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
     real dis2 = INFINITY;
     real abs = aa.seg_.projectPoint0(bb.pos1(), dis2);
     
-    if ((0 <= abs) & (abs <= aa.len()) & (dis2 < ran*ran))
+    if ( below(dis2, ran) && ((0 <= abs) & (abs <= aa.len())))
     {
         /*
          bb.vertex1() projects inside segment 'aa'
@@ -357,11 +357,12 @@ void PointGrid::checkLL(FatLocus const& aa, FatLocus const& bb) const
 
     /* in 3D, check the shortest distance between two segments, and if close
      enough, use the result to build an interaction */
-    real a, b, dis2 = INFINITY;
-    if ( ! aa.seg_.belowDistance(bb.seg_, ran, a, b, dis2) )
-        return;
+    real a, b;
+    /* We do not need to calculate `a` and `b` if the distance 'dis'
+     is greater than 'ran' since nothing will be done in that case... */
+    real dis2 = aa.seg_.shortestDistanceSqr(bb.seg_, a, b);
     
-    if ( aa.seg_.within(a) & bb.seg_.within(b) )
+    if ( below(dis2, ran) & aa.seg_.within(a) & bb.seg_.within(b) )
     {
         const real len = aa.rad_ + bb.rad_;
         real stiff = sign_select(dis2-len*len, push, pull);
