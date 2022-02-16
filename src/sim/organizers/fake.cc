@@ -26,9 +26,8 @@ void Fake::setInteractions(Meca& meca) const
 }
 
 
-ObjectList Fake::build(Glossary& opt, Simul& sim)
+void Fake::build(ObjectList& res, Glossary& opt, Simul& sim)
 {
-    ObjectList res;
     real rad = 0;
     if ( ! opt.set(rad, "radius") ||  rad <= 0 )
         throw InvalidParameter("fake:radius must be specified and > 0");
@@ -121,8 +120,6 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
     
     fkSolid = so;
     res.push_back(so);
-    
-    return res;
 }
 
 

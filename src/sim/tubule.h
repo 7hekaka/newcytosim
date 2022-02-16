@@ -57,7 +57,7 @@ public:
     void reset();
     
     /// create filaments
-    ObjectList build(real radius, Glossary&, Simul&);
+    void build(ObjectList&, real radius, Glossary&, Simul&);
 
     /// position of centerline at distance 'dis' from the MINUS_END
     Vector posCenterlineM(real dis);

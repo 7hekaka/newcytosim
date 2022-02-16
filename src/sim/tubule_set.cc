@@ -62,8 +62,8 @@ void TubuleSet::newObjects(ObjectList& res, const std::string& name, Glossary& o
 {
     TubuleProp * p = simul_.findProperty<TubuleProp>("tubule", name);
     Tubule * o = new Tubule(p);
+    o->build(res, p->radius, opt, simul_);
     res.push_back(o);
-    res.append(o->build(p->radius, opt, simul_));
 }
 
 

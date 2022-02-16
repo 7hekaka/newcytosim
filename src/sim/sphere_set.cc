@@ -56,9 +56,8 @@ void SphereSet::newObjects(ObjectList& res, const std::string& name, Glossary& o
     }
     
     Sphere * obj = new Sphere(p, rad);
-
+    obj->build(res, opt, simul_);
     res.push_back(obj);
-    res.append(obj->build(opt, simul_));
 }
 
 

@@ -96,7 +96,7 @@ void OrganizerSet::newObjects(ObjectList& res, const std::string& name, Glossary
 
     if ( obj )
     {
-        res = obj->build(opt, simul_);
+        obj->build(res, opt, simul_);
         res.push_back(obj);
     }
 }

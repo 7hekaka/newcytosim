@@ -173,12 +173,11 @@ Aster::~Aster()
      }
  
  */
-ObjectList Aster::build(Glossary& opt, Simul& sim)
+void Aster::build(ObjectList& res, Glossary& opt, Simul& sim)
 {
     assert_true(prop);
     assert_true(asSolid==nullptr);
     assert_true(nbOrganized()==0);
-    ObjectList res;
     
     // get number of fibers:
     size_t nbf = 0;
@@ -254,7 +253,6 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
             fopt.print_warnings(std::cerr, nbf, "aster:build\n");
         }
     }
-    return res;
 }
 
 
@@ -272,16 +270,7 @@ void Aster::makeFiber(ObjectList& objs, Simul& sim, size_t inx, std::string cons
     if ( prop->focus == PLUS_END )
         dir = -dir;
     
-    sim.fibers.newObjects(objs, fiber_type, opt);
-    
-    if ( objs.empty() )
-        throw InvalidParameter("could not create aster:fiber");
-
-    Fiber * fib = Fiber::toFiber(objs[0]);
-
-    if ( !fib )
-        throw InvalidParameter("unexpected object returned by fibers.newObjects()");
-
+    Fiber * fib = sim.fibers.newFiber(objs, fiber_type, opt);
     grasp(fib, inx);
     
     //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
@@ -317,8 +306,8 @@ void Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt, size_t& origi
         if ( p )
         {
             sol = new Solid(p);
+            sol->build(objs, opt, sim);
             objs.push_back(sol);
-            objs.append(sol->build(opt, sim));
             //std::clog << "Aster::makeSolid() created solid " << sol->reference() << "\n";
         }
         else

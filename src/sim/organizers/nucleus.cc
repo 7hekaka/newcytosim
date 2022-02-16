@@ -35,11 +35,10 @@ void Nucleus::setInteractions(Meca& meca) const
 
 
 //------------------------------------------------------------------------------
-ObjectList Nucleus::build(Glossary& opt, Simul& sim)
+void Nucleus::build(ObjectList& res, Glossary& opt, Simul& sim)
 {
     std::string str, spec;
     assert_true(prop);
-    ObjectList res;
     size_t cnt = 0;
     
     real rad = -1;
@@ -66,18 +65,12 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
         for ( size_t ii = 0; ii < cnt; ++ii )
         {
             Glossary fiber_opt(spec);
-            ObjectList objs;
-            sim.fibers.newObjects(objs, str, fiber_opt);
-            if ( objs.size() )
-            {
-                Fiber * fib = Fiber::toFiber(objs[0]);
-                Vector pos = c + Vector::randU(rad);
-                Vector dir = Vector::randU();
-                fib->setStraight(pos, dir, fib->length());
-                nuSphere->addPoint(pos);
-                res.append(objs);
-                grasp(fib);
-            }
+            Fiber * fib = sim.fibers.newFiber(res, str, fiber_opt);
+            Vector pos = c + Vector::randU(rad);
+            Vector dir = Vector::randU();
+            fib->setStraight(pos, dir, fib->length());
+            nuSphere->addPoint(pos);
+            grasp(fib);
         }
     }
     
@@ -91,6 +84,7 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
 
         Rotation rot;
         // add bundles
+        ObjectList objs;
         const real len = 0.5 * bp->overlap;
         for ( size_t ii = 0; ii < cnt; ++ii  )
         {
@@ -98,26 +92,25 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
             rot = Rotation::randomRotation();
             //a random position on the sphere:
             Vector pos = rot * Vector(0, rad, 0);
-            //a direction tangent to the sphere:
-            Vector dir = rot * Vector(RNG.sflip(), 0, 0);
+            //a vector tangent to the sphere:
+            Vector dir = rot * Vector(len, 0, 0);
             
-            Bundle * bu = new Bundle(bp);
-            ObjectList objs = bu->build(bundle_opt, sim);
+            objs.clear();
+            Bundle * bun = new Bundle(bp);
+            bun->build(objs, bundle_opt, sim);
             res.append(objs);
-            res.push_back(bu);
-            
+            res.push_back(bun);
+
             //position the bundle (initially aligned with X) tangentially:
             ObjectSet::moveObjects(objs, Isometry(pos, rot));
             
-            nuSphere->addPoint( c + (pos-len*dir).normalized(rad) );
-            grasp(bu->organized(0));
+            nuSphere->addPoint( c + (pos-dir).normalized(rad) );
+            grasp(bun->organized(0));
             
-            nuSphere->addPoint( c + (pos+len*dir).normalized(rad) );
-            grasp(bu->organized(1));
+            nuSphere->addPoint( c + (pos+dir).normalized(rad) );
+            grasp(bun->organized(1));
         }
     }
-    
-    return res;
 }
 
 

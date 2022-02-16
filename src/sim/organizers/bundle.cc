@@ -20,17 +20,13 @@ void Bundle::step()
     {
         if ( !organized(ii)  &&  RNG.test(prop->fiber_prob) )
         {
-            Glossary opt(prop->fiber_spec);
             ObjectList objs;
-            sim.fibers.newObjects(objs, prop->fiber_type, opt);
-            if ( objs.size() )
-            {
-                Fiber * fib = Fiber::toFiber(objs[0]);
-                fib->adjustLength(prop->overlap, prop->focus);
-                ///\todo: we should orient the new Fiber in bundle direction
-                sim.add(objs);
-                grasp(fib, ii);
-            }
+            Glossary opt(prop->fiber_spec);
+            Fiber * fib = sim.fibers.newFiber(objs, prop->fiber_type, opt);
+            fib->adjustLength(prop->overlap, prop->focus);
+            ///\todo: we should orient the new Fiber in bundle direction
+            sim.add(objs);
+            grasp(fib, ii);
         }
     }
 }
@@ -123,11 +119,9 @@ Vector Bundle::position() const
  }
 
  */
-ObjectList Bundle::build(Glossary& opt, Simul& sim)
+void Bundle::build(ObjectList& objs, Glossary& opt, Simul& sim)
 {
     assert_true(prop);
-    ObjectList res;
-    
     size_t cnt = 0;
     std::string type, spec;
     opt.set(cnt,  "fibers");
@@ -141,33 +135,24 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     
     for ( size_t inx = 0; inx < cnt; ++inx )
     {
+        ObjectList list;
         Glossary fiber_opt(spec);
-        ObjectList objs;
-        sim.fibers.newObjects(objs, type, fiber_opt);
-        if ( objs.size() > 0 )
-        {
-            Fiber * fib = Fiber::toFiber(objs[0]);
-
-            if ( fib )
-            {
-                // rotate odd fibers by 180 degrees to make an anti-parallel overlap:
-                if ( inx & 1 )
-                    ObjectSet::rotateObjects(objs, Rotation::rotation180());
-                
-                // translate to adjust the overlap:
-                ObjectSet::translateObjects(objs, fib->posMiddle()-fib->posFrom(0.5*prop->overlap, prop->focus));
-                
-                real len;
-                if ( opt.set(len, "length", inx) )
-                    fib->adjustLength(len, prop->focus== PLUS_END?MINUS_END:PLUS_END);
-                
-                grasp(fib, inx);
-            }
-            res.append(objs);
-        }
+        Fiber * fib = sim.fibers.newFiber(list, type, fiber_opt);
+        objs.append(list);
+        
+        // rotate odd fibers by 180 degrees to make an anti-parallel overlap:
+        if ( inx & 1 )
+            ObjectSet::rotateObjects(list, Rotation::rotation180());
+        
+        // translate to adjust the overlap:
+        ObjectSet::translateObjects(list, fib->posMiddle()-fib->posFrom(0.5*prop->overlap, prop->focus));
+        
+        real len;
+        if ( opt.set(len, "length", inx) )
+            fib->adjustLength(len, prop->focus== PLUS_END?MINUS_END:PLUS_END);
+        
+        grasp(fib, inx);
     }
-    
-    return res;
 }
 
 

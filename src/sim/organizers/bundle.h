@@ -45,7 +45,7 @@ public:
     virtual ~Bundle();
     
     /// construct all the dependent Objects of the Organizer
-    ObjectList build(Glossary&, Simul&);
+    void build(ObjectList&, Glossary&, Simul&);
 
     /// perform one Monte-Carlo step
     void step();

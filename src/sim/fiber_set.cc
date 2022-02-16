@@ -115,20 +115,18 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
 
  @}
  */
-void FiberSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+Fiber * FiberSet::newFiber(ObjectList& res, const std::string& name, Glossary& opt)
 {
     FiberProp * fp = simul_.findProperty<FiberProp>("fiber", name);
     Fiber * fib = fp->newFiber(opt);
-    assert_true( fib->tag()==Fiber::TAG );
     fib->birthTime(simul_.time());
+    res.push_back(fib);
     
 #if FIBER_HAS_FAMILY
     std::string str;
     if ( opt.set(str, "family") )
         fib->family_ = simul_.findFiber(str);
 #endif
-
-    res.push_back(fib);
  
     size_t inp = 1;
     std::string spe, var = "attach1";
@@ -199,6 +197,7 @@ void FiberSet::newObjects(ObjectList& res, const std::string& name, Glossary& op
         }
         var = "attach" + std::to_string(++inp);
     }
+    return fib;
 }
 
 /**

@@ -492,9 +492,8 @@ ObjectList Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
      }
  */
 
-ObjectList Solid::build(Glossary& opt, Simul& sim)
+void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
 {
-    ObjectList res;
     std::string var, str;
     size_t inp, inx, nbp;
     
@@ -547,9 +546,6 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     {
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
-    
-    //std::cerr << *this << '\n';
-    return res;
 }
 
 

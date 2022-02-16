@@ -86,8 +86,8 @@ void SolidSet::newObjects(ObjectList& res, const std::string& name, Glossary& op
     SolidProp * p = simul_.findProperty<SolidProp>("solid", name);
     Solid * obj = new Solid(p);
     
+    obj->build(res, opt, simul_);
     res.push_back(obj);
-    res.append(obj->build(opt, simul_));
     obj->fixShape();
 }
 

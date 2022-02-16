@@ -40,7 +40,7 @@ public:
     virtual ~Organizer();
     
     /// create all the Objects of the Organizer, and return in list
-    virtual ObjectList build(Glossary&, Simul&) = 0;
+    virtual void build(ObjectList&, Glossary&, Simul&) = 0;
 
     //--------------------------------------------------------------------------
 

@@ -22,14 +22,10 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 
 void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string const& fiber_type, Glossary& opt)
 {
-    sim.fibers.newObjects(objs, fiber_type, opt);
-    if ( objs.empty() )
-        return;
-
-    Fiber * fib = Fiber::toFiber(objs[0]);
     ObjectMark mk = 0;
     Rotation rot(0, 1);
     
+    Fiber * fib = sim.fibers.newFiber(objs, fiber_type, opt);
     Hand const* h = hMonitor->otherHand(this);
 
     if ( h && h->attached() )

@@ -40,17 +40,15 @@ void Tubule::reset()
 }
 
 
-ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
+void Tubule::build(ObjectList& res, real rad, Glossary& opt, Simul& sim)
 {
     FiberProp const* fp = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
     real len = 1.0, dev = 0;
-    ObjectList res;
-
+    
     // get the 'bone'
     if ( prop->bone_type.size() > 0 )
     {
-        sim.fibers.newObjects(res, prop->bone_type, opt);
-        bone_ = static_cast<Fiber*>(res[0]);
+        bone_ = sim.fibers.newFiber(res, prop->bone_type, opt);
         Buddy::connect(bone_);
         len = bone_->length();
         if ( bone_->prop->segmentation != fp->segmentation )
@@ -110,7 +108,6 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
 #endif
 
     setFamily(bone_?bone_:fil_[0]);
-    return res;
 }
 
 

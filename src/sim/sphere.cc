@@ -137,9 +137,8 @@ size_t Sphere::addSurfacePoint(Vector const& cp)
         attach2 = 10 grafted
      }
  */
-ObjectList Sphere::build(Glossary & opt, Simul& sim)
+void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
 {
-    ObjectList res;
     std::string str;
     size_t inp = 1, inx = 0, nbp = 1;
 
@@ -202,9 +201,6 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
     {
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
-    
-    //std::cerr << *this << '\n';
-    return res;
 }
 
 
