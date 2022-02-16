@@ -161,10 +161,10 @@ static inline Vector modulo_offset(Interpolation const& A, Interpolation const& 
 #pragma mark - Functions to set matrix elements
 //------------------------------------------------------------------------------
 
-//#define CHECK_INDEX(I) ((void) 0)
-//#define CHECK_INDICES(I,J,C) ((void) 0)
-#define CHECK_INDEX(I) { assert_true(I<nPoints_); }
-#define CHECK_INDICES(I,J,C) { if (J>I) printf(" wrong-sided %s %lu %lu\n",C,I,J); }
+#define CHECK_INDEX(I) ((void) 0)
+#define CHECK_INDICES(I,J,C) ((void) 0)
+//#define CHECK_INDEX(I) { assert_true(I<nPoints_); }
+//#define CHECK_INDICES(I,J,C) { if (J>I) printf(" wrong-sided %s %lu %lu\n",C,I,J); }
 
 #define PRINT_BLOCK(I,J,B) ((void) 0)
 //#define PRINT_BLOCK(I,J,B) { std::clog<<std::setw(3)<<I<<" "<<std::setw(3)<<J<<" "<<std::setprecision(2)<<std::setw(10)<<B<<'\n'; }
@@ -3416,10 +3416,17 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     add_block_diag(ii1, BB, wT);
     add_block_diag(ii2, wT);
 
-    add_block(ii0, ii1, AB, wT);
-    sub_block(ii0, ii2,  A, wT);
-    sub_block(ii1, ii2,  B, wT);
-    
+    add_block(ii1, ii0, AB, wT);
+    if ( ii0 > ii2 )
+    {
+        sub_block(ii0, ii2,  A, wT);
+        sub_block(ii1, ii2,  B, wT);
+    }
+    else
+    {
+        sub_block(ii2, ii0,  A, wT);
+        sub_block(ii2, ii1,  B, wT);
+    }
     if ( modulo )
     {
         Vector off = modulo_offset(ptA, ptB);
@@ -4270,24 +4277,21 @@ void Meca::addPointClamp(Interpolation const& pti,
     const size_t ii0 = pti.matIndex1();
     const size_t ii1 = pti.matIndex2();
     
-    const real c1 = pti.coef0();
-    const real c2 = pti.coef1();
+    const real cc0 = pti.coef0();
+    const real cc1 = pti.coef1();
     
-    assert_true( 0 <= c1  &&  c1 <= 1 );
-    assert_true( 0 <= c2  &&  c2 <= 1 );
+    const real ww0 = weight * cc0;
+    const real ww1 = weight * cc1;
 
-    const real c2w = weight * c2;
-    const real c1w = weight * c1;
-    
-    sub_iso_diag(ii0, c1w * c1);
-    sub_iso_diag(ii1, c2w * c2);
-    sub_iso(ii0, ii1, c2w * c1);
+    sub_iso_diag(ii0, ww0*cc0);
+    sub_iso_diag(ii1, ww1*cc1);
+    sub_iso(ii1, ii0, ww1*cc0);
     
     if ( modulo )
         modulo->fold(pos, pti.pos());
     
-    add_base(ii0, pos, c1w);
-    add_base(ii1, pos, c2w);
+    add_base(ii0, pos, ww0);
+    add_base(ii1, pos, ww1);
     
     DRAW_LINK(pti, pos);
 }
@@ -4706,7 +4710,7 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     //isotropic terms:
     sub_iso_diag(ii0,  wA * A + wEE);
     sub_iso_diag(ii1,  wB * B + wEE);
-    sub_iso(ii0, ii1,  wA * B - wEE);
+    sub_iso(ii1, ii0,  wA * B - wEE);
     
     // non-isotropic:
     mFUL(DIM*ii0  , DIM*ii1+1) += wE;
@@ -4879,7 +4883,7 @@ void Meca::addLineClamp(Interpolation const& pti,
 
     add_block_diag(ii0, cc0*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
-    add_block(ii0, ii1, cc0*cc1, wT);
+    add_block(ii1, ii0, cc0*cc1, wT);
     
     //add the constant term:
     add_base(ii0, wT*pos, -cc0);
@@ -4972,7 +4976,7 @@ void Meca::addPlaneClamp(Interpolation const& pti,
     
     add_block_diag(ii0, cc0*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
-    add_block(ii0, ii1, cc0*cc1, wT);
+    add_block(ii1, ii0, cc1*cc0, wT);
     
     //add the constant term:
     add_base(ii0, wT*pos, -cc0);
