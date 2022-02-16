@@ -324,10 +324,6 @@ void Display::prepareLineDisp(const Fiber * fib)
 {
     assert_true(fib->prop);
     FiberDisp const*const disp = fib->prop->disp;
-    
-    if ( !fib->disp )
-        fib->disp = new LineDisp();
-    
     gle_color col = disp->color;
     
     // change body color depending on coloring mode:
@@ -369,6 +365,8 @@ void Display::prepareLineDisp(const Fiber * fib)
             break;
     }
     
+    if ( !fib->disp )
+        fib->disp = new LineDisp();
     LineDisp * self = fib->disp;
     self->color = col;
     self->color_scale = color_scale(fib, disp->line_style);
