@@ -132,8 +132,11 @@ int main(int argc, char* argv[])
     
     // check for major options:
     if ( arg.use_key("-") )
+    {
+        simul.prop.verbose = 0;
         Cytosim::warn.silent();
-
+    }
+    
     if ( arg.use_key("help") )
     {
         splash(std::cout);
@@ -366,7 +369,7 @@ int main(int argc, char* argv[])
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }
-        printf("\n");
+        if ( simul.prop.verbose ) printf("\n");
         OffScreen::closeContext();
         arg.print_warnings(std::cerr, 1, "\n");
         return 0;

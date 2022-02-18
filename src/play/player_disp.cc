@@ -367,12 +367,12 @@ void Player::drawScene(View& view, int mag)
  in the format specified by 'PlayerProp::image_format',
  in the current working directory
  */
-int Player::saveView(const char* filename, const char* format, int downsample, int verbose) const
+int Player::saveView(const char* filename, const char* format, int downsample) const
 {
     GLint vp[4];
     glGetIntegerv(GL_VIEWPORT, vp);
     int err = SaveImage::saveImage(filename, format, vp, downsample);
-    if ( err == 0 && verbose > 0 )
+    if ( err == 0 && simul.prop.verbose > 0 )
     {
         printf("\r saved %ix%i snapshot %s    ", vp[2]/downsample, vp[3]/downsample, filename);
         fflush(stdout);
@@ -389,7 +389,7 @@ int Player::saveView(const char* filename, const char* format, int downsample, i
  in the folder specified in `PlayerProp::image_dir`.
  The name of the file is formed by concatenating 'root' and 'indx'.
  */
-int Player::saveView(size_t indx, int downsample, int verbose) const
+int Player::saveView(size_t indx, int downsample) const
 {
     char const* format = prop.image_format.c_str();
     char str[1024] = { 0 };
@@ -414,7 +414,7 @@ int Player::saveView(size_t indx, int downsample, int verbose) const
         strncpy(ptr, format, strlen(format));
     }
     int cwd = FilePath::change_dir(prop.image_dir, true);
-    int err = saveView(str, format, downsample, verbose);
+    int err = saveView(str, format, downsample);
     FilePath::change_dir(cwd);
     return err;
 }

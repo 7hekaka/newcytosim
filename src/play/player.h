@@ -152,10 +152,10 @@ public:
     void drawScene(View&, int mag);
     
     /// export current viewport to a graphic file
-    int  saveView(const char* filename, const char* format, int downsample, int verbose) const;
+    int  saveView(const char* filename, const char* format, int downsample) const;
 
     /// export current viewport to a graphic file
-    int  saveView(size_t indx, int downsample, int verbose=1) const;
+    int  saveView(size_t indx, int downsample) const;
     
     /// save high-resolution image of the current scene
     int  saveScene(int mag, const char* filename, const char* format, int downsample=1);
