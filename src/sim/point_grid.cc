@@ -123,13 +123,18 @@ void PointGrid::checkPP(FatPoint const& aa, FatPoint const& bb) const
     //std::clog << "   PP- " << bb.pnt_ << " " << aa.pnt_ << '\n';
     Vector vab = bb.cen() - aa.cen();
     const real len = aa.rad_ + bb.rad_;
+    const real ran = std::max(aa.rge_ + bb.rad_, aa.rad_ + bb.rge_);
 #if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(vab);
 #endif
     real ab2 = vab.normSqr();
-    if ( below(ab2, len) )
-        meca.addLongLink1(aa.pnt_, bb.pnt_, vab, ab2, len, push);
+    if ( below(ab2, ran) )
+    {
+        real stiff = sign_select(ab2-len*len, push, pull);
+        meca.addLongLink(aa.pnt_, bb.pnt_, len, stiff);
+        //meca.addLongLink1(aa.pnt_, bb.pnt_, vab, ab2, len, push);
+    }
 }
 
 

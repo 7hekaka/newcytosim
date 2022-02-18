@@ -2236,9 +2236,9 @@ void Meca::addLongLink(Mecapoint const& ptA,
      This is done by using len = 1 in the formula for links that are shorter
      than the desired target: real wla = weight * min_real(len/abn, 1); */
     if ( len > abn )
-        wT = MatrixBlock::outerProduct(axi, -weight/ab2);
+        wT = MatrixBlock::outerProduct(axi, weight/ab2);
     else
-        wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
+        wT = MatrixBlock::offsetOuterProduct(weight-wla, axi, wla/ab2);
     
     axi *= wla;
     sub_base(aa, axi);

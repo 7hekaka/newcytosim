@@ -1,49 +1,53 @@
-% A growing fiber on the surface of a cylinder
-% F. Nedelec, 20 March 2015
+% test stochastic events in config file
+% F. Nedelec, Strasbourg, 18.02.2022
 
 set simul system
 {
-    dim = 3
-    time_step = 0.01
+    steric = 1, 1000, 10
+    steric_max_range = 0.5
+    
+    time_step = 0.0005
     viscosity = 1
-    steric = 1, 100
-    display = ( style=3; zoom=0.9; )
- }
+    precondition = 0
+    dim = 2
+}
 
 set space cell
 {
-    shape = ring
-    display = ( color=0x0000FFAA; visible=3 )
+    shape = sphere
 }
 
 new cell
 {
-    length = 2
-    radius = 2
+    radius = 5
 }
 
-set fiber microtubule
+set bead ball
 {
+    confine = inside, 100
     steric = 1, 0.1
-    rigidity = 10
-    segmentation = 0.5
-    confine = on, 200
-
-    activity = grow
-    growing_speed = 1,   1
-    growing_force = inf, inf
-
-    display = ( line=5 )
+    display = ( style=6; coloring=1; )
 }
 
-new 1 microtubule
+new ball
 {
-    length = 2
-    position = surface
-    direction = tangent
+    radius = 0.5
+    position = 0.5 0 0
+}
+new ball
+{
+    radius = 0.5
+    position = -0.5 0 0
 }
 
-run 5000 system
+new event
 {
-    nb_frames = 25
+   delay = 0.5
+   code = ( new ball { radius=0.5; position=0 0 0; } )
 }
+
+run 100000 system
+{
+    nb_frames = 50
+}
+

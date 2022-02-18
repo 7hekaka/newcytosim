@@ -678,16 +678,11 @@ size_t Meca::solve()
 #if EXPLICIT_INTEGRATION
     /*
      This implements the forward Euler integration, for testing purposes.
-     The result is very inefficient, since we have built the entire stiffness matrix,
-     which is not necessary for this simple explicit scheme.
+     The result is very inefficient, since we have built the stiffness matrix,
+     which is not necessary for this explicit scheme.
      */
-    blas::xaxpy(dimension(), 1.0, vRHS, 1, vPTS, 1);
-    
-    for ( Mecable * mec : mecables )
-    {
-        mec->getPoints(vPTS+DIM*mec->matIndex());
-        mec->getForces(vRHS+DIM*mec->matIndex());
-    }
+    blas::xadd(dimension(), vRHS, vPTS);
+    ready_ = 1;
     return 1;
 #endif
 
