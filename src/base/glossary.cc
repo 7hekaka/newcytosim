@@ -232,7 +232,7 @@ bool Glossary::has_value(key_type const& key, size_t inx) const
 {
     map_type::const_iterator w = mTerms.find(key);
     if ( w != mTerms.end() )
-        return inx < w->second.size();
+        return (inx < w->second.size()) && w->second[inx].value_.size();
     return false;
 }
 

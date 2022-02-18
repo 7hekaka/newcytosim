@@ -275,7 +275,7 @@ public:
     size_t num_values(key_type const&) const;
     
     /// return true if key is present and a value was set for given index
-    bool has_value(key_type const&, size_t inx) const;
+    bool has_value(key_type const&, size_t inx = 0) const;
     
     /// gives a pointer to the values corresponding to a key, or null if the key is not present
     rec_type * values(key_type const&);

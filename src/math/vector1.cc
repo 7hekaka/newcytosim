@@ -12,16 +12,18 @@ static void eatTwoZeros(std::istream& is)
         std::streampos isp = is.tellg();
         real Z = 0;
         is >> Z;
-        if ( is.good() && Z==0 )
+        if ( is.fail() || Z != 0 )
         {
-            isp = is.tellg();
-            is >> Z;
-            if ( is.good() && Z==0 )
-                return;
+            is.seekg(isp);
+            is.clear();
         }
-        // restore initial state:
-        is.seekg(isp);
-        is.clear();
+        isp = is.tellg();
+        is >> Z;
+        if ( is.fail() || Z != 0 )
+        {
+            is.seekg(isp);
+            is.clear();
+        }
     }
 }
 

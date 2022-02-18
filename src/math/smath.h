@@ -102,36 +102,36 @@ namespace sMath
         sort(c, d);
     }
 
-    /// return index of the arguments that is the smallest, in {0, 1, 2}
+    /// return index of the arguments that is the smallest: {0, 1, 2}
     template <typename T>
-    inline size_t arg_min(const T& a, const T& b, const T& c)
+    inline int arg_min(const T& a, const T& b, const T& c)
     {
-        return 2*( c < std::min(b,a) ) | ( b < std::min(a,c) );
+        return 2*int( c < std::min(b,a) ) | int( b < std::min(a,c) );
     }
     
-    /// return index of the arguments that is the largest, in {0, 1, 2}
+    /// return index of the arguments that is the largest: {0, 1, 2}
     template <typename T>
-    inline size_t arg_max(const T& a, const T& b, const T& c)
+    inline int arg_max(const T& a, const T& b, const T& c)
     {
-        return 2*( c > std::max(b,a) ) | ( b > std::max(a,c) );
+        return 2*int( c > std::max(b,a) ) | int( b > std::max(a,c) );
     }
 
-    /// return index of the arguments that is the smallest
+    /// return index of the arguments that is the smallest: {0, 1, 2, 3}
     template <typename T>
-    inline size_t arg_min(const T& a, const T& b, const T& c, const T& d)
+    inline int arg_min(const T& a, const T& b, const T& c, const T& d)
     {
         T ab = std::min(a, b);
         T cd = std::min(c, d);
-        return 3*( d < std::min(c,ab) ) | 2*( c < std::min(d,ab) ) | ( b < std::min(a,cd) );
+        return 3*int( d < std::min(c,ab) ) | 2*int( c < std::min(d,ab) ) | int( b < std::min(a,cd) );
     }
     
-    /// return index of the arguments that is the largest
+    /// return index of the arguments that is the largest: {0, 1, 2, 3}
     template <typename T>
-    inline size_t arg_max(const T& a, const T& b, const T& c, const T& d)
+    inline int arg_max(const T& a, const T& b, const T& c, const T& d)
     {
         T ab = std::max(a, b);
         T cd = std::max(c, d);
-        return 3*( d > std::max(c,ab) ) | 2*( c > std::max(d,ab) ) | ( b > std::max(a,cd) );
+        return 3*int( d > std::max(c,ab) ) | 2*int( c > std::max(d,ab) ) | int( b > std::max(a,cd) );
     }
 
 

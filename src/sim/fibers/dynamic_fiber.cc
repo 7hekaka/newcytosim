@@ -137,8 +137,15 @@ int DynamicFiber::stepMinusEnd()
         while (( nextGrowthM < 0 ) | ( nextShrinkM < 0 ) | ( nextHydrolM < 0 ))
         {
             // Select the earliest event (in most cases, only one event will fire up)
-            size_t ii = sMath::arg_min(nextGrowthM/growth, nextHydrolM/hydrol, nextShrinkM/shrink);
-
+            int ii = ( nextHydrolM * growth < nextGrowthM * hydrol );
+            if ( nextShrinkM < 0 )
+            {
+                if (( ii == 0 ) & ( nextShrinkM * growth < nextGrowthM * shrink ))
+                    ii = 2;
+                else if ( nextShrinkM * hydrol < nextHydrolM * shrink )
+                    ii = 2;
+            }
+            //printf("%s %6.2f %6.2f %6.2f: %i\n", reference().c_str(), nextGrowthM, nextHydrolM, nextShrinkM, ii);
 			switch ( ii )
 			{
 				case 0:
@@ -146,12 +153,14 @@ int DynamicFiber::stepMinusEnd()
 					unitM[1] = unitM[0];
 					unitM[0] = 1;
 					++res;
+                    assert_true(nextGrowthM < 0);
 					nextGrowthM += RNG.exponential();
 					break;
 
 				case 1:
 					// hydrolyze one of the unit with equal chance:
 					unitM[RNG.flip()] = 0;
+                    assert_true(nextHydrolM < 0);
 					nextHydrolM += RNG.exponential();
 					break;
 
@@ -160,6 +169,7 @@ int DynamicFiber::stepMinusEnd()
 					unitM[0] = unitM[1];
 					unitM[1] = RNG.test(prop->unhydrolyzed_prob[M]);
 					--res;
+                    assert_true(nextShrinkM < 0);
 					nextShrinkM += RNG.exponential();
 					break;
 
@@ -284,7 +294,7 @@ int DynamicFiber::stepPlusEnd()
         
         // @todo detach_rate should depend on the state of the subunit
         real shrink = prop->growing_off_rate_dt[P] + chewed;
-        
+
         nextGrowthP -= growth;
         nextShrinkP -= shrink;
         nextHydrolP -= hydrol;
@@ -292,7 +302,15 @@ int DynamicFiber::stepPlusEnd()
         while (( nextGrowthP < 0 ) | ( nextShrinkP < 0 ) | ( nextHydrolP < 0 ))
         {
             // Select the earliest event (in most cases, only one event will fire up)
-            size_t ii = sMath::arg_min(nextGrowthP/growth, nextHydrolP/hydrol, nextShrinkP/shrink);
+            int ii = ( nextHydrolP * growth < nextGrowthP * hydrol );
+            if ( nextShrinkP < 0 )
+            {
+                if (( ii == 0 ) & ( nextShrinkP * growth < nextGrowthP * shrink ))
+                    ii = 2;
+                else if ( nextShrinkP * hydrol < nextHydrolP * shrink )
+                    ii = 2;
+            }
+            //printf("%s %6.2f %6.2f %6.2f: %i\n", reference().c_str(), nextGrowthP, nextHydrolP, nextShrinkP, ii);
             switch ( ii )
             {
                 case 0:
@@ -300,12 +318,14 @@ int DynamicFiber::stepPlusEnd()
                     unitP[1] = unitP[0];
                     unitP[0] = 1;
                     ++res;
+                    assert_true(nextGrowthP < 0);
                     nextGrowthP += RNG.exponential();
                     break;
                     
                 case 1:
                     // hydrolyze one of the unit with equal chance:
                     unitP[RNG.flip()] = 0;
+                    assert_true(nextHydrolP < 0);
                     nextHydrolP += RNG.exponential();
                     break;
 
@@ -314,10 +334,10 @@ int DynamicFiber::stepPlusEnd()
                     unitP[0] = unitP[1];
                     unitP[1] = RNG.test(prop->unhydrolyzed_prob[P]);
                     --res;
+                    assert_true(nextShrinkP < 0);
                     nextShrinkP += RNG.exponential();
                     break;
             }
-            
             mStateP = calculateStateP();
         }
     }
