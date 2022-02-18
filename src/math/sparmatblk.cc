@@ -705,7 +705,7 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
     vec4 uu = setzero4();
     vec4 vv = setzero4();
     Block const* blk = sbk_;
-    Block const* end = sbk_ + (rlen_-rlen_%4);
+    Block const* end = sbk_ + ( rlen_ & ~3 );
     size_t const* inx = inx_;
     #pragma nounroll
     for ( ; blk < end; blk += 4, inx += 4 )
@@ -713,7 +713,7 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
         assert_true( inx[0] < inx[1] );
         assert_true( inx[1] < inx[2] );
         assert_true( inx[2] < inx[3] );
-        vec4 xy0 = broadcast2(X+2*inx[1]);  // xy = { X Y }
+        vec4 xy0 = broadcast2(X+2*inx[0]);  // xy = { X Y }
         vec4 xy1 = broadcast2(X+2*inx[1]);  // xy = { X Y }
         vec4 xy2 = broadcast2(X+2*inx[2]);  // xy = { X Y }
         vec4 xy3 = broadcast2(X+2*inx[3]);  // xy = { X Y }
@@ -813,12 +813,11 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
          */
         // process blocks 2 by 2:
         #pragma nounroll
-        for ( ; blk < end; ++blk )
+        for ( ; blk < end; blk += 2, inx += 2 )
         {
             assert_true( inx[0] < inx[1] );
             vec4 A = loadu4(X+3*inx[0]);
             vec4 B = loadu4(X+3*inx[1]);
-            inx += 2;
             // multiply each line of the two blocks:
             s0 = fmadd4(blk->data0(), A, s0);
             s1 = fmadd4(blk->data1(), A, s1);

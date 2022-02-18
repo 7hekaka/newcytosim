@@ -1035,7 +1035,7 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj,
     const double * halt = end - 3;  // val+3 <= end-1  is  val < end-3;
         // process 4 by 4:
     #pragma nounroll
-    for ( ; val < halt; val += 4 )
+    for ( ; val < halt; val += 4, inx += 4 )
     {
 #if ( 0 )
         /*
@@ -1075,7 +1075,6 @@ void SparMatSym1::vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj,
         store2(Y+i2, getlo(s2));
         store2(Y+i3, getlo(s3));
 #endif
-        inx += 4;
     }
     // collapse into 's0'
     s0 = add4(add4(s0,s1), add4(s2,s3));
@@ -1111,8 +1110,8 @@ void SparMatSym1::vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj,
     unsigned *inx = ija_ + start;
     while ( val < end )
     {
-        size_t ii = *(inx  );
-        size_t kk = *(inx+1);
+        size_t ii = inx[0];
+        size_t kk = inx[1];
         assert_true( kk > ii );
         inx += 2;
         vec4 aa = broadcast1(val-1);

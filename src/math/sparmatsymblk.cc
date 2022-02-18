@@ -828,7 +828,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
 
         size_t n = 1;
         {
-            const size_t end = 1 + 2 * ((nbb_-1)/2);
+            const size_t end = 1 + ( nbb_ & ~1 );
             // process 2 by 2
             #pragma nounroll
             for ( ; n < end; n += 2 )
@@ -837,12 +837,10 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
                 const vec4f m012 = blk_[n].data0();
                 const vec4f m345 = blk_[n].data1();
                 const vec4f m678 = blk_[n].data2();
-
-                const size_t kk = inx_[n+1];
+                const size_t kk = 3 * inx_[n+1];
                 const vec4f p012 = blk_[n+1].data0();
                 const vec4f p345 = blk_[n+1].data1();
                 const vec4f p678 = blk_[n+1].data2();
-
                 assert_true( ii < kk );
                 vec4f z = loadu4f(Y+ii);
                 vec4f t = loadu4f(Y+kk);
@@ -989,7 +987,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 1; n < nbb_; ++n )
     {
-        const size_t& ii = 2 * inx_[n];
+        const size_t ii = 2 * inx_[n];
         vec4 mat = blk_[n].data0();     // load 2x2 matrix
         vec4 yy = load2Z(Y+ii);         // yy = { Y0 Y1 0 0 }
         vec4 xx = broadcast2(X+ii);     // xx = { X0 X1 X0 X1 }
@@ -1036,11 +1034,12 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
 
-    size_t n = 1;
-    const size_t end = 1 + 2 * ((nbb_-1)/2);
+    size_t const* inx = inx_ + 1;
+    Block const* blk = blk_ + 1;
+    Block const* end = blk_ + 1 + ( (nbb_-1) & ~1 );
     // process 2 by 2:
     #pragma nounroll
-    for ( ; n < end; n += 2 )
+    for ( ; blk < end; blk += 2, inx += 2 )
     {
 #if ( 0 )
         /*
@@ -1049,17 +1048,17 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, 2*inx_[n  ], blk_[n  ].data0(), xxyy, ss);
-        multiply2D(X, Y, 2*inx_[n+1], blk_[n+1].data0(), xxyy, s1);
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const size_t i0 = 2 * inx_[n  ];
-        const size_t i1 = 2 * inx_[n+1];
+        const size_t i0 = 2 * inx[0];
+        const size_t i1 = 2 * inx[1];
         assert_true( i0 < i1 );
-        vec4 mat0 = blk_[n  ].data0();
-        vec4 mat1 = blk_[n+1].data0();
+        vec4 mat0 = blk[0].data0();
+        vec4 mat1 = blk[1].data0();
         vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
         vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
         ss = fmadd4(mat0, broadcast2(X+i0), ss);
@@ -1071,9 +1070,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
     // collapse 'ss'
     ss = add4(ss, s1);
     // process remaining blocks:
-    #pragma nounroll
-    for ( ; n < nbb_; ++n )
-        multiply2D(X, Y, 2*inx_[n], blk_[n].data0(), xxyy, ss);
+    end = blk_ + nbb_;
+    //#pragma nounroll
+    if ( blk < end ) //for ( ; blk < end; ++blk, ++inx )
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
     /* finally horizontally sum ss = { SX SX SY SY } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1094,11 +1094,12 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
 
-    size_t n = 1;
-    const size_t end = 1 + 4 * ((nbb_-1)/4);
+    size_t const* inx = inx_ + 1;
+    Block const* blk = blk_ + 1;
+    Block const* end = blk_ + 1 + ( (nbb_-1) & ~3 );
     // process 4 by 4:
     #pragma nounroll
-    for ( ; n < end; n += 4 )
+    for ( ; blk < end; blk += 4, inx += 4 )
     {
 #if ( 0 )
         /*
@@ -1107,25 +1108,25 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
          The compiler however cannot assume this, because the indices of the
          blocks are not known at compile time.
          */
-        multiply2D(X, Y, 2*inx_[n  ], blk_[n  ].data0(), xxyy, ss);
-        multiply2D(X, Y, 2*inx_[n+1], blk_[n+1].data0(), xxyy, s1);
-        multiply2D(X, Y, 2*inx_[n+2], blk_[n+2].data0(), xxyy, s2);
-        multiply2D(X, Y, 2*inx_[n+3], blk_[n+3].data0(), xxyy, s3);
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
+        multiply2D(X, Y, 2*inx[2], blk[2].data0(), xxyy, s2);
+        multiply2D(X, Y, 2*inx[3], blk[3].data0(), xxyy, s3);
 #else
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        assert_true( inx_[n  ] < inx_[n+1] );
-        assert_true( inx_[n+1] < inx_[n+2] );
-        assert_true( inx_[n+2] < inx_[n+3] );
-        const size_t i0 = 2 * inx_[n  ];
-        const size_t i1 = 2 * inx_[n+1];
-        const size_t i2 = 2 * inx_[n+2];
-        const size_t i3 = 2 * inx_[n+3];
-        vec4 mat0 = blk_[n  ].data0();
-        vec4 mat1 = blk_[n+1].data0();
-        vec4 mat2 = blk_[n+2].data0();
-        vec4 mat3 = blk_[n+3].data0();
+        assert_true( inx[0] < inx[1] );
+        assert_true( inx[1] < inx[2] );
+        assert_true( inx[2] < inx[3] );
+        const size_t i0 = 2 * inx[0];
+        const size_t i1 = 2 * inx[1];
+        const size_t i2 = 2 * inx[2];
+        const size_t i3 = 2 * inx[3];
+        vec4 mat0 = blk[0].data0();
+        vec4 mat1 = blk[1].data0();
+        vec4 mat2 = blk[2].data0();
+        vec4 mat3 = blk[3].data0();
         vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
         vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
         vec4 u2 = fmadd4(mat2, xxyy, load2Z(Y+i2));
@@ -1143,9 +1144,10 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
     // collapse 'ss'
     ss = add4(add4(ss,s1), add4(s2,s3));
     // process remaining blocks:
-    #pragma nounroll
-    for ( ; n < nbb_; ++n )
-        multiply2D(X, Y, 2*inx_[n], blk_[n].data0(), xxyy, ss);
+    end = blk_ + nbb_;
+    //#pragma nounroll
+    if ( blk < end ) //for ( ; blk < end; ++blk, ++inx )
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
     /* finally sum ss = { S0 S0 S1 S1 } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1268,8 +1270,8 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
     }
     ++blk;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-    Block const* end = blk_ + (1+2*((nbb_-1)/2));
-    const size_t * inx = inx_+1;
+    Block const* end = blk_ + 1 + ( (nbb_-1) & ~1 );
+    const size_t * inx = inx_ + 1;
     /*
      Unrolling will reduce the dependency chain, which may be limiting the
      throughput here. However the number of registers (16 for AVX CPU) limits
@@ -1277,12 +1279,11 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
      */
     //process 2 by 2:
     #pragma nounroll
-    for ( ; blk < end; blk += 2 )
+    for ( ; blk < end; blk += 2, inx += 2 )
     {
         const size_t ii = 3 * inx[0];
         const size_t kk = 3 * inx[1];
         assert_true( ii < kk );
-        inx += 2;
         //printf("--- %4i %4i\n", ii, kk);
         vec4 M0 = blk[0].data0();
         vec4 P0 = blk[1].data0();

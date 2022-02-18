@@ -164,7 +164,7 @@ LOCAL vec4 load4(double const* a)       { return _mm256_load_pd(a); }
 LOCAL vec4 loadu4(double const* a)      { return _mm256_loadu_pd(a); }
 
 /// unaligned load 2 values, and zeros out the upper two
-LOCAL vec4 load2Z(double const* a)      { return _mm256_blend_pd(_mm256_castpd128_pd256(_mm_load_pd(a)), _mm256_setzero_pd(), 0b1100); }
+LOCAL vec4 load2Z(double const* a)      { return _mm256_blend_pd(_mm256_castpd128_pd256(_mm_loadu_pd(a)), _mm256_setzero_pd(), 0b1100); }
 
 /// unaligned load 3 values, and zeros out the upper one
 LOCAL vec4 load3Z(double const* a)      { return _mm256_blend_pd(_mm256_loadu_pd(a), _mm256_setzero_pd(), 0b1000); }

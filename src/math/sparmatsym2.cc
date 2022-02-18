@@ -898,7 +898,7 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
     // process 4 by 4:
     const double * halt = end - 3;  // val+3 <= end-1  is  val < end-3;
 #pragma nounroll
-    for ( ; val < halt; val += 4 )
+    for ( ; val < halt; val += 4, inx += 4 )
     {
 #if ( 0 )
         /*
@@ -919,7 +919,6 @@ void SparMatSym2::vecMulAddColIso2D_SSEU(const double* X, double* Y,
         const auto i1 = inx[1];
         const auto i2 = inx[2];
         const auto i3 = inx[3];
-        inx += 4;
         vec2 y0 = load2(Y+i0);
         vec2 y1 = load2(Y+i1);
         vec2 y2 = load2(Y+i2);
@@ -1002,7 +1001,7 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
 
     // process 4 by 4:
 #pragma nounroll
-    for ( ; val < halt; val += 4 )
+    for ( ; val < halt; val += 4, inx += 4 )
     {
 #if ( 0 )
         /*
@@ -1041,7 +1040,6 @@ void SparMatSym2::vecMulAddColIso2D_AVXU(const double* X, double* Y,
         store2(Y+i2, getlo(s2));
         store2(Y+i3, getlo(s3));
 #endif
-        inx += 4;
     }
     // collapse into 's0'
     s0 = add4(add4(s0,s1), add4(s2,s3));
@@ -1086,8 +1084,8 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
     ++inx;
     while ( val < end )
     {
-        size_t ii = *(inx  );
-        size_t kk = *(inx+1);
+        size_t ii = inx[0];
+        size_t kk = inx[1];
         assert_true( kk > ii );
         inx += 2;
         vec4 aa = broadcast1(val);
@@ -1140,8 +1138,8 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
     #pragma clang loop unroll(disable)
     while ( val < halt )
     {
-        size_t i0 = *(inx  );
-        size_t i1 = *(inx+1);
+        size_t i0 = inx[0];
+        size_t i1 = inx[1];
         size_t i2 = *(inx+2);
         size_t i3 = *(inx+3);
         assert_true( i1 > i0 );
@@ -1173,8 +1171,8 @@ void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
 #endif
     while ( val < end )
     {
-        size_t i0 = *(inx  );
-        size_t i1 = *(inx+1);
+        size_t i0 = inx[0];
+        size_t i1 = inx[1];
         assert_true( i1 > i0 );
         inx += 2;
 #if 1

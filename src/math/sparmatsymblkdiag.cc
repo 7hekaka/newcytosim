@@ -809,7 +809,7 @@ void SparMatSymBlkDiag::vecMulDiagonal4D(const real* X, real* Y) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Single Precision Optimized Vector Multiplication
+#pragma mark - Single Precision 3D Optimized Vector Multiplication
 
 #if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
@@ -894,16 +894,15 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
 
     if ( noff_ > 0 )
     {
+        Block const* end = blk_ + ( noff_ & ~1 );
         // load 3x3 matrix diagonal element into 3 vectors:
         vec4f s0 = mul4f(dia_.data0(), xxx);
         vec4f s1 = mul4f(dia_.data1(), xxx);
         vec4f s2 = mul4f(dia_.data2(), xxx);
-        size_t n = 0;
         {
-            const size_t end = 2 * (noff_/2);
             // process 2 by 2
             #pragma nounroll
-            for ( ; n < end; n += 2, blk += 2, inx += 2 )
+            for ( ; blk < end; blk += 2, inx += 2 )
             {
                 Block const& M = blk[0];
                 Block const& P = blk[1];
@@ -938,8 +937,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
             }
         }
         // process remaining blocks
-        #pragma nounroll
-        for ( ; n < noff_; ++n, ++inx, ++blk )
+        end = blk_ + noff_;
+#pragma nounroll
+        for ( ; blk < end; ++inx, ++blk )
         {
             const size_t ii = 3 * inx[0];
             const vec4f M012 = blk->data0();
@@ -1118,7 +1118,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n] * 2;
+        const size_t ii = 2 * inx_[n];
         vec2 xx = load2(X+ii);
         
         // load 2x2 matrix element into 2 vectors:
@@ -1168,7 +1168,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVX(const double* X, double* Y, size_
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n] * 2;
+        const size_t ii = 2 * inx_[n];
         vec4 mat = blk_[n].data0(); // load 2x2 matrix
         vec4 yy = load2Z(Y+ii);          // yy = { Y0 Y1 0 0 }
         vec4 xx = broadcast2(X+ii);      // xx = { X0 X1 X0 X1 }
@@ -1213,13 +1213,12 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
     
-    Block  const* blk = blk_;
     size_t const* inx = inx_;
-
-    size_t n = 0;
+    Block const* blk = blk_;
+    Block const* end = blk_ + ( noff_ & ~1 );
     // process 2 by 2:
     #pragma nounroll
-    for ( const size_t end = 2 * (noff_/2); n < end; n += 2, blk += 2, inx += 2 )
+    for ( ; blk < end; blk += 2, inx += 2 )
     {
 #if ( 0 )
         /*
@@ -1250,9 +1249,10 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size
     // collapse 'ss'
     ss = add4(ss, s1);
     // process remaining blocks:
-    #pragma nounroll
-    for ( ; n < noff_; ++n, inx++ )
-        multiply2D(X, Y, 2*inx[0], blk[n].data0(), xxyy, ss);
+    end = blk_ + noff_;
+    //#pragma nounroll
+    if ( blk < end ) // for ( ; blk < end; ++blk, ++inx )
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
     /* finally horizontally sum ss = { SX SX SY SY } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1273,11 +1273,11 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
 
     Block  const* blk = blk_;
     size_t const* inx = inx_;
-    size_t n = 0;
+    Block const* end = blk_ + ( noff_ & ~3 );
     
     // process 4 by 4:
     #pragma nounroll
-    for ( const size_t end = 4 * (noff_/4); n < end; n += 4, blk += 4, inx += 4 )
+    for ( ; blk < end; blk += 4, inx += 4 )
     {
 #if ( 0 )
         /*
@@ -1322,9 +1322,10 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
     // collapse 'ss'
     ss = add4(add4(ss,s1), add4(s2,s3));
     // process remaining blocks:
-    #pragma nounroll
-    for ( ; n < noff_; ++n, ++inx )
-        multiply2D(X, Y, 2*inx[0], blk[n].data0(), xxyy, ss);
+    end = blk_ + noff_;
+    //#pragma nounroll
+    if ( blk < end ) // for ( ; blk < end; ++blk, ++inx )
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
     /* finally sum ss = { S0 S0 S1 S1 } */
     vec2 h = gethi(ss);
     h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
@@ -1368,7 +1369,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVX(const double* X, double* Y, size_
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n] * 3;
+        const size_t ii = 3 * inx_[n];
         const vec4 M012 = blk_[n].data0();
         const vec4 M345 = blk_[n].data1();
         const vec4 M678 = blk_[n].data2();
@@ -1440,7 +1441,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVXU(const double* X, double* Y, size
         // There is a dependency in the loop for 's0', 's1' and 's2'.
         size_t const* inx = inx_;
         Block const* blk = blk_;
-        Block const* end = blk_ + 2*(noff_/2);
+        Block const* end = blk_ + ( noff_ & ~1 );
         /*
          Unrolling will reduce the dependency chain, which may be limiting the
          throughput here. However the number of registers (16 for AVX CPU) limits
@@ -1556,7 +1557,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_AVX(const double* X, double* 
         // There is a dependency in the loop for 's0', 's1' and 's2'.
         size_t const* inx = inx_;
         Block const* blk = blk_;
-        Block const* end = blk_ + 2*(noff_/2);
+        Block const* end = blk_  + ( noff_ & ~1 );
         /*
          Unrolling will reduce the dependency chain, which may be limiting the
          throughput here. However the number of registers (16 for AVX CPU) limits
@@ -1672,7 +1673,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd4D_AVX(const double* X, double* Y, size_
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = inx_[n] * 4;
+        const size_t ii = 4 * inx_[n];
         const vec4 yy = load4(Y+ii);
         const vec4 xx = load4(X+ii);  // xx = { X0 X1 X2 X3 }
         const vec4 m0 = blk_[n].data0();
