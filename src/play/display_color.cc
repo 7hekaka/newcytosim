@@ -197,7 +197,7 @@ void bodyColor(T const& obj)
     {
         size_t i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
         gle_color col = gle::bright_color(i);
-        col.load_front();
+        col.load_load();
         col.darken(0.5).load_back();
     }
     else
