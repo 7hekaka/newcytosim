@@ -191,16 +191,16 @@ private:
 
     
     /// create and configure the Solid
-    void makeSolid(ObjectList&, Simul&, Glossary& opt, size_t& origin);
+    size_t makeSolid(ObjectList&, Simul&, Glossary& opt);
 
     /// create a Fiber for position 'inx'
-    void makeFiber(ObjectList&, Simul&, size_t inx, std::string const&, Glossary& opt);
+    Fiber * makeFiber(ObjectList&, Simul&, Vector, Vector, std::string const&, std::string const&);
 
     /// define the attachment position of fiber 'inx'
-    void placeAnchor(Vector const&, Vector const&, size_t origin);
+    size_t placeAnchor(Vector, Vector, size_t origin);
 
-    /// define the anchor points of Fibers
-    void placeAnchors(Glossary& opt, size_t origin, size_t nbf);
+    /// create a new fiber
+    void placeFiber(ObjectList&, Simul&, Vector, Vector, size_t ref, std::string const&, std::string const&);
     
     /// position on Solid of the first link to n-th fiber
     Vector posSolid1(size_t n) const;
@@ -214,6 +214,13 @@ private:
     /// position of Fiber's point involved in second link
     Vector posFiber2(size_t n) const;
     
+    void build0(ObjectList&, Glossary& opt, Simul&, size_t);
+    void build1(ObjectList&, Glossary& opt, Simul&, size_t);
+    void build2(ObjectList&, Glossary& opt, Simul&, size_t);
+    void build3(ObjectList&, Glossary& opt, Simul&, size_t);
+    void build4(ObjectList&, Glossary& opt, Simul&, size_t);
+    void build7(ObjectList&, Glossary& opt, Simul&, size_t);
+
 public:
     
     /// constructor

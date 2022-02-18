@@ -20,19 +20,18 @@
 
 void Aster::step()
 {
-    Simul & sim = simul();
-    std::string war;
-
     // nucleation:
-    for ( size_t ii = 0; ii < asLinks.size(); ++ii )
+    for ( size_t i = 0; i < asLinks.size(); ++i )
     {
-        if ( !fiber(ii) &&  RNG.test(prop->fiber_prob) )
+        if ( !fiber(i) &&  RNG.test(prop->fiber_prob) )
         {
-            Glossary opt(prop->fiber_spec);
             ObjectList objs;
-            makeFiber(objs, sim, ii, prop->fiber_type, opt);
+            Simul & sim = simul();
+            Vector A = posSolid1(i);
+            Vector B = posSolid2(i);
+            Fiber * F = makeFiber(objs, sim, A, B-A, prop->fiber_type, prop->fiber_spec);
+            grasp(F, i);
             sim.add(objs);
-            opt.print_warnings(std::cerr, 1, " in aster:nucleate[1]\n");
         }
     }
 }
@@ -172,94 +171,55 @@ Aster::~Aster()
         solid = core1
      }
  
+ 
+ The aster 'type' can be:
+ - `astral` fiberd are anchored at random positions near the center, pointing outward
+ - `radial` fibers are anchored always at the same distance from the center, pointing radially
+ - `regular` fibers are anchored regularly over the surface and point radially
+ - `angular` where all fibers are restricted within an specified solid angle,
+ .
+
  */
-void Aster::build(ObjectList& res, Glossary& opt, Simul& sim)
+void Aster::build(ObjectList& objs, Glossary& opt, Simul& sim)
 {
     assert_true(prop);
     assert_true(asSolid==nullptr);
     assert_true(nbOrganized()==0);
-    
-    // get number of fibers:
-    size_t nbf = 0;
-    std::string tif, fos;
 
     opt.set(asRadius, "radius");
     if ( asRadius <= 0 )
         throw InvalidParameter("aster:radius must be specified and > 0");
     
-    size_t origin = 0;
-    makeSolid(res, sim, opt, origin);
-    if ( !solid() )
-        throw InvalidParameter("could not make aster:solid");
-    //solid()->write(std::clog);
-    if ( !Buddy::check(solid()) )
-        Buddy::connect(solid());
+    if ( opt.has_value("nb_fibers") )
+    {
+        opt.define("fiber", 2, opt.value("fiber", 1));
+        opt.define("fiber", 1, opt.value("fiber", 0));
+        opt.define("fiber", 2, opt.value("nb_fibers", 0));
+        throw InvalidParameter("please specify `fibers = NUMBER, CLASS, SPEC`");
+    }
 
-    if ( opt.set_positive_integer(nbf, "fibers") )
-    {
-        opt.set(tif, "fibers", 1);
-        opt.set(fos, "fibers", 2);
-    }
-    else
-    {
-        opt.set(tif, "fibers");
-        opt.set(fos, "fibers", 1);
-    }
-    // fiber's anchor points can be specified directly:
-    std::string var = "fiber1";
-    if ( opt.has_key(var) )
-    {
-        size_t cnt = 0;
-        Vector pos1, pos2;
-        while ( opt.set(pos1, var) && opt.set(pos2, var, 1) )
-        {
-            //std::clog << "direct fiber anchor " << pos1 << " and " << pos2 << "\n";
-            placeAnchor(pos1, pos2, origin);
-            nbOrganized(1+cnt);
-            std::string str = fos;
-            opt.set(str, var, 2);
-            Glossary fopt(str);
-            makeFiber(res, sim, cnt, tif, fopt);
-            fopt.print_warnings(std::cerr, 1, "aster:build\n");
-            ++cnt;
-            var = "fiber" + std::to_string(cnt+1);
-        }
-    }
-    else
-    {
-        Glossary fopt(fos);
+    size_t origin = makeSolid(objs, sim, opt);
     
-#if BACKWARD_COMPATIBILITY < 50
-        if ( tif.empty() && opt.set(nbf, "nb_fibers") )
-        {
-            tif = prop->fiber_type;
-            fopt = opt;
-            fos = "unknown";
-        }
-#endif
-        nbOrganized(nbf);
-        placeAnchors(opt, origin, nbf);
-        nbf = std::min(nbf, asLinks.size());
-
-        if ( fos.empty() )
-        {
-            if ( prop->fiber_rate <= 0 )
-                throw InvalidParameter("you should specify aster::fiber_spec");
-        }
-        else
-        {
-            for ( size_t n = 0; n < nbf; ++n )
-                makeFiber(res, sim, n, tif, fopt);
-            fopt.print_warnings(std::cerr, nbf, "aster:build\n");
-        }
+    unsigned type = 7 * opt.has_key("fiber1");
+    opt.set(type, "type", {{"radial", 0}, {"astral", 1}, {"regular", 2},
+                           {"angular", 3}, {"disc", 4}, {"custom", 7}});
+    switch( type )
+    {
+        case 0: build0(objs, opt, sim, origin); break;
+        case 1: build1(objs, opt, sim, origin); break;
+        case 2: build2(objs, opt, sim, origin); break;
+        case 3: build3(objs, opt, sim, origin); break;
+        case 4: build4(objs, opt, sim, origin); break;
+        case 7: build7(objs, opt, sim, origin); break;
+        default:
+            throw InvalidParameter("unknown aster:type");
     }
 }
 
 
-void Aster::makeFiber(ObjectList& objs, Simul& sim, size_t inx, std::string const& fiber_type, Glossary& opt)
+Fiber * Aster::makeFiber(ObjectList& res, Simul& sim, const Vector pos, Vector dir,
+                         std::string const& fiber_type, std::string const& fos)
 {
-    Vector pos = posSolid1(inx);
-    Vector dir = posSolid2(inx) - pos;
     real n = dir.normSqr();
     
     if ( n > REAL_EPSILON )
@@ -270,20 +230,31 @@ void Aster::makeFiber(ObjectList& objs, Simul& sim, size_t inx, std::string cons
     if ( prop->focus == PLUS_END )
         dir = -dir;
     
-    Fiber * fib = sim.fibers.newFiber(objs, fiber_type, opt);
-    grasp(fib, inx);
+    if ( fos.empty() )
+        throw InvalidParameter("Error: unspecified fiber specs (aster:fibers[2])");
     
+    ObjectList objs;
+    Glossary opt(fos);
+    Fiber * F = sim.fibers.newFiber(objs, fiber_type, opt);
+
     //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
     ObjectSet::rotateObjects(objs, Rotation::rotationToVector(dir));
-    ObjectSet::translateObjects(objs, pos - fib->posEnd(prop->focus));
+    ObjectSet::translateObjects(objs, pos - F->posEnd(prop->focus));
+    
+    res.append(objs);
+    opt.print_warnings(std::cerr, 1, "aster:build\n");
+    return F;
 }
 
 
 /**
- Anchor a Fiber between positions A and B, specified in a local reference frame
- associated with the Aster. Dimensions will be scaled by 'asRadius' eventually.
+ define new Anchor point for a Fiber between at positions A and B, specified
+ in a local reference frame associated with the Aster: (0,0,0) is 'ref' and
+ (1,0,0) is 'ref+1' and (0,1,0) is 'ref+2'.
+ Dimensions will be scaled by 'asRadius' because that is the distance between
+ the Solid points.
  */
-void Aster::placeAnchor(Vector const& A, Vector const& B, size_t ref)
+size_t Aster::placeAnchor(const Vector A, const Vector B, size_t ref)
 {
     AsterLink & link = asLinks.new_val();
     //std::clog << "Aster::placeAnchor(" << asLinks.size() << ")\n";
@@ -291,10 +262,22 @@ void Aster::placeAnchor(Vector const& A, Vector const& B, size_t ref)
     link.len_ *= asRadius;
     link.prime_ = ref;
     //link.print(std::clog);
+    return asLinks.size() - 1;
 }
 
 
-void Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt, size_t& origin)
+void Aster::placeFiber(ObjectList& objs, Simul& sim, const Vector A, const Vector B,
+                       size_t ref, std::string const& fiber_type, std::string const& fos)
+{
+    size_t i = placeAnchor(A, B, ref);
+    Fiber * F = makeFiber(objs, sim, A, B-A, fiber_type, fos);
+    assert_true( i == nbOrganized() );
+    nbOrganized(i+1);
+    grasp(F, i);
+}
+
+
+size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
 {
     Solid * sol = nullptr;
     // find the Solid specified:
@@ -335,186 +318,241 @@ void Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt, size_t& origi
 #endif
     
     // add local coordinate system around the last point:
-    origin = sol->addTriad(asRadius);
+    size_t ref = sol->addTriad(asRadius);
     sol->fixShape();
     asSolid = sol;
+    //asSolid->write(std::clog);
+    if ( !Buddy::check(asSolid) )
+        Buddy::connect(asSolid);
+    return ref;
+}
+
+
+/// fiber's anchor points specified directly
+void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+{
+    std::string tif, fos;
+    opt.set(tif, "fibers");
+    opt.set(fos, "fibers", 1);
+
+    Vector A, B;
+    size_t cnt = 1;
+    std::string var = "fiber1";
+    while ( opt.set(A, var) && opt.set(B, var, 1) )
+    {
+        //std::clog << "direct fiber anchor " << pos1 << " and " << pos2 << "\n";
+        std::string str = fos;
+        opt.set(str, var, 2);
+        placeFiber(objs, sim, A, B, ref, tif, str);
+        var = "fiber" + std::to_string(++cnt);
+    }
+}
+
+
+/// This is a special case for Yeast's Spindle Pole Bodies
+void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+{
+    real dis = 0;
+    real sep = 0.025; // 25 nm by default, corresponding to Microtubules
+    size_t nbf = 7;
+    std::string tif, fos;
+    opt.set(nbf, "fibers");
+    opt.set(tif, "fibers", 1);
+    opt.set(fos, "fibers", 2);
+    opt.set(dis, "radius", 1);
+    dis *= 0.5;
+    opt.set(sep, "seed_diameter");
+    size_t ouf = 0;
+    size_t cnt = 0;
+    std::vector<Vector2> pts(nbf, Vector2(0,0));
+    do {
+        cnt = tossPointsDisc(pts, sep/asRadius, 1024);
+    } while ( cnt < nbf && ++ouf < 1024 );
+    if ( cnt < nbf )
+    {
+        std::clog << "warning: aster could only fit " << cnt << " seeds ";
+        std::clog << "with aster:seed_diameter = " << sep << '\n';
+    }
+    //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        // orient anchors by default along the X-axis:
+        real y = pts[i].y();
+#if ( DIM == 3 )
+        real x = pts[i].XX;
+        Vector3 A(-dis, x, y);
+        Vector3 B( dis, x, y);
+#else
+        Vector A(-dis, y, 0);
+        Vector B( dis, y, 0);
+#endif
+        placeFiber(objs, sim, A, B, ref, tif, fos);
+    }
 }
 
 
 /**
- One can specify the `radius` of the aster, and `nb_fibers`.
- 
- The aster 'type' can be:
- - `astral` fiberd are anchored at random positions near the center, pointing outward
- - `radial` fibers are anchored always at the same distance from the center, pointing radially
- - `regular` fibers are anchored regularly over the surface and point radially
- - `angular` where all fibers are restricted within an specified solid angle,
- .
+ For type 'angular' all fibers are restricted within an specified solid angle,
+ and their orientation is radial
+ initial code by GAELLE LETORT, 14.03.2017
  */
-void Aster::placeAnchors(Glossary & opt, size_t origin, size_t nbf)
+void Aster::build3(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
 {
     real dis = 0;
-    opt.set(dis, "radius", 1) ;
-    if ( dis > asRadius )
-        throw InvalidParameter("aster:radius[1] must be smaller than aster:radius[0]");
-    if ( dis < 0 )
-        throw InvalidParameter("aster:radius[1] must be specified and >= 0");
+    size_t nbf = 7;
+    std::string tif, fos;
+    opt.set(nbf, "fibers");
+    opt.set(tif, "fibers", 1);
+    opt.set(fos, "fibers", 2);
+    opt.set(dis, "radius", 1);
+    dis /= asRadius;
 
-    const real alpha = dis / asRadius;
-    
-    unsigned type = 0;
-    opt.set(type, "type", {{"radial", 0}, {"astral", 1}, {"regular", 2}, {"angular", 3}, {"disc", 4}});
-    
-    if ( type == 4 )
-    {
-        // This is a special case for Yeast spindles
-        // use a separation of 25 nm by default, corresponding to Microtubules
-        real sep = 0.025;
-        opt.set(sep, "seed_diameter");
-        std::vector<Vector2> pts(nbf);
-        size_t ouf = 0;
-        size_t cnt = 0;
-        do {
-            cnt = tossPointsDisc(pts, sep/asRadius, 1024);
-        } while ( cnt < nbf && ++ouf < 1024 );
-        if ( cnt < nbf )
-        {
-            std::clog << "warning: aster could only fit " << cnt << " seeds ";
-            std::clog << "with aster:seed_diameter = " << sep << '\n';
-        }
-        //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
-        dis *= 0.5;
-        for ( size_t n = 0; n < cnt; ++n )
-        {
-            // orient anchors by default along the X-axis:
-            real y = pts[n].YY;
-#if ( DIM == 2 )
-            placeAnchor(Vector2(-dis,y), Vector2(dis,y), origin);
-#elif ( DIM == 3 )
-            real x = pts[n].XX;
-            placeAnchor(Vector3(-dis,x,y), Vector3(dis,x,y), origin);
-#endif
-        }
-    }
-    else if ( type == 3 )
-    {
-        /*
-         For type 'angular' all fibers are restricted within an specified solid angle,
-         and their orientation is radial
-         initial code by GAELLE LETORT, 14.03.2017
-         */
-#if ( DIM == 1 )
-        // No effect of angle in 1D, same as default
-        for ( size_t n = 0; n < nbf; ++n )
-            placeAnchor(Vector(0.0), Vector(2*(n&1)-1), origin);
-#elif ( DIM == 2 )
-        real angle = M_PI;
-        opt.set(angle, "aster_angle");
-        real delta = 2 * angle / real(nbf);
-        // points are evenly distributed in [-aster_angle, aster_angle]
-        real ang = -angle;
-        for ( size_t n = 0; n < nbf; ++n )
-        {
-            Vector P(std::cos(ang), std::sin(ang));
-            placeAnchor(alpha*P, P, origin);
-            ang += delta;
-        }
-#else
-        real cap = 1.0, angle = M_PI;
-        // either 'angle' or 'cap' can be specified:
-        if ( opt.set(angle, "aster_angle") )
-            cap = 1.0 - std::cos(angle);
-        else
-            opt.set(cap, "aster_cap" );
-        // distribute points randomly over a portion of the unit sphere:
-        std::vector<Vector> pts(nbf, Vector(0,0,0));
-        size_t ouf = 0;
-        size_t cnt = 0;
-        real sep, sep0 = std::sqrt( 2 * M_PI * cap / nbf );
-        do {
-            // we decrease gradually the separation, to reach a good solution...
-            sep = 512 * sep0 / real(ouf+512);
-            cnt = tossPointsCap(pts, cap, sep, 1024);
-            //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
-        } while ( cnt < nbf && ++ouf < 1024 );
-        if ( cnt < nbf )
-            std::clog << "warning: aster could only fit " << cnt << " seeds\n";
-        //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
-        for ( size_t n = 0; n < cnt; ++n )
-            placeAnchor(alpha*pts[n], pts[n], origin);
-#endif
-    }
-    else if ( type == 2 )
-    {
-        /*
-         For type 'regular' we put fibers regularly on the surface,
-         */
-#if ( DIM == 1 )
-        for ( size_t n = 0; n < nbf; ++n )
-        {
-            Vector D(n%2?1:-1);
-            placeAnchor(Vector(0.0), D, origin);
-        }
-#elif ( DIM == 2 )
-        real ang = 0, delta = 2 * M_PI / real(nbf);
-        for ( size_t n = 0; n < nbf; ++n )
-        {
-            Vector P(std::cos(ang), std::sin(ang));
-            placeAnchor(alpha*P, P, origin);
-            ang += delta;
-        }
-#else
-        //we use SphericalCode to distribute points 'equally' on the sphere
-        SphericalCode code(nbf);
-        Vector P;
-        for ( size_t n = 0; n < nbf; ++n )
-        {
-            code.putPoint(P, n);
-            placeAnchor(alpha*P, P, origin);
-        }
-#endif
-    }
-    else if ( type == 1 )
-    {
-        /*
-         For type 'astral' we put fibers randomly on the surface,
-         with a constrain based on the scalar product: position*direction > 0
-         */
-        for ( size_t n = 0; n < nbf; ++n )
-        {
-            Vector P = Vector::randB();
-            Vector D = Vector::randU();
-            while ( dot(D, P) < 0 )
-                D = Vector::randU();
-            placeAnchor(P-alpha*D, P, origin);
-        }
-    }
-    else if ( type == 0 )
-    {
-        /*
-         For type 'radial' we put fibers randomly on the surface, and set their
-         direction as purely radial. We require a separation of 25 nm by default,
-         corresponding to Microtubule's size.
-         */
-        real sep = 0.025;
-        opt.set(sep, "seed_diameter");
-        size_t ouf = 0;
-        size_t cnt = 0;
-        std::vector<Vector> pts(nbf, Vector(0,0,0));
-        do {
-            cnt = tossPointsSphere(pts, sep/asRadius, 1024);
-        } while ( cnt < nbf && ++ouf < 1024 );
-        if ( cnt < nbf )
-        {
-            std::clog << "warning: aster could only fit " << cnt << " seeds ";
-            std::clog << "with aster:seed_diameter = " << sep << '\n';
-        }
-        //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
-        for ( size_t n = 0; n < cnt; ++n )
-            placeAnchor(alpha*pts[n], pts[n], origin);
-    }
+    real cap = 1.0, angle = M_PI;
+    // either 'angle' or 'cap' can be specified:
+    if ( opt.set(angle, "aster_angle") )
+        cap = 1.0 - std::cos(angle);
     else
-        throw InvalidParameter("unknown aster:type");
+        opt.set(cap, "aster_cap" );
+
+    std::vector<Vector> pts(nbf, Vector(0,0,0));
+    size_t cnt = nbf;
+
+#if ( DIM == 1 )
+    // No effect of angle in 1D:
+    for ( size_t i = 0; i < nbf; ++i )
+        pts[i] = Vector1(2*(i&2)-1);
+#elif ( DIM == 2 )
+    real delta = 2 * angle / real(nbf);
+    // points are evenly distributed in [-aster_angle, aster_angle]
+    real ang = -angle;
+    for ( size_t i = 0; i < nbf; ++i )
+    {
+        pts[i] = Vector(std::cos(ang), std::sin(ang));
+        ang += delta;
+    }
+#else
+    // distribute points randomly over a portion of the unit sphere:
+    size_t ouf = 0;
+    real sep, sep0 = std::sqrt( 2 * M_PI * cap / nbf );
+    do {
+        // we decrease gradually the separation, to reach a good solution...
+        sep = 512 * sep0 / real(ouf+512);
+        cnt = tossPointsCap(pts, cap, sep, 1024);
+        //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
+    } while ( cnt < nbf && ++ouf < 1024 );
+    if ( cnt < nbf )
+        std::clog << "warning: aster could only fit " << cnt << " seeds\n";
+    //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
+#endif
+    
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        Vector B = pts[i];
+        placeFiber(objs, sim, dis*B, B, ref, tif, fos);
+    }
+}
+
+/**
+ For type 'regular', fibers are regularly distributed on the surface,
+ */
+void Aster::build2(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+{
+    real dis = 0;
+    size_t nbf = 7;
+    std::string tif, fos;
+    opt.set(nbf, "fibers");
+    opt.set(tif, "fibers", 1);
+    opt.set(fos, "fibers", 2);
+    opt.set(dis, "radius", 1);
+    dis /= asRadius;
+#if ( DIM == 1 )
+    Vector A(0, 0, 0);
+    Vector B(dis, 0, 0);
+    for ( size_t i = 0; i < nbf; i += 2 )
+    {
+        real S = ( i & 1 ) ? -1 : 1;
+        placeFiber(objs, sim, A, S*B, ref, tif, fos);
+    }
+#elif ( DIM == 2 )
+    real a = 0;
+    real delta = 2 * M_PI / real(nbf);
+    for ( size_t i = 0; i < nbf; ++i, a+=delta )
+    {
+        Vector B(std::cos(a), std::sin(a));
+        placeFiber(objs, sim, dis*B, B, ref, tif, fos);
+    }
+#else
+    //we use SphericalCode to distribute points 'equally' on the sphere
+    SphericalCode code(nbf);
+    Vector B(0, 0, 0);
+    for ( size_t i = 0; i < nbf; ++i )
+    {
+        code.putPoint(B, i);
+        placeFiber(objs, sim, dis*B, B, ref, tif, fos);
+    }
+#endif
+}
+
+
+/**
+ For type 'astral' we put fibers randomly on the surface,
+ with a constrain based on the scalar product: position*direction > 0
+ */
+void Aster::build1(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+{
+    real dis = 0;
+    size_t nbf = 7;
+    std::string tif, fos;
+    opt.set(nbf, "fibers");
+    opt.set(tif, "fibers", 1);
+    opt.set(fos, "fibers", 2);
+    opt.set(dis, "radius", 1);
+    dis /= asRadius;
+    for ( size_t i = 0; i < nbf; ++i )
+    {
+        Vector P = Vector::randB();
+        Vector D = Vector::randU();
+        while ( dot(D, P) < 0 )
+            D = Vector::randU();
+        placeFiber(objs, sim, P-dis*D, P, ref, tif, fos);
+    }
+}
+
+
+/**
+ For type 'radial' we put fibers randomly on the surface, and set their
+ direction as purely radial. We require a separation of 25 nm by default,
+ corresponding to Microtubule's size.
+ */
+void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+{
+    real dis = 0;
+    real sep = 0.025; // 25 nm by default, corresponding to Microtubules
+    size_t nbf = 7;
+    std::string tif, fos;
+    opt.set(nbf, "fibers");
+    opt.set(tif, "fibers", 1);
+    opt.set(fos, "fibers", 2);
+    opt.set(dis, "radius", 1);
+    opt.set(sep, "seed_diameter");
+    dis /= asRadius;
+    size_t ouf = 0;
+    size_t cnt = 0;
+    std::vector<Vector> pts(nbf, Vector(0,0,0));
+    do {
+        cnt = tossPointsSphere(pts, sep/asRadius, 1024);
+    } while ( cnt < nbf && ++ouf < 1024 );
+    if ( cnt < nbf )
+    {
+        std::clog << "warning: aster could only fit " << cnt << " seeds ";
+        std::clog << "with aster:seed_diameter = " << sep << '\n';
+    }
+    //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        Vector B = pts[i];
+        placeFiber(objs, sim, dis*B, B, ref, tif, fos);
+    }
 }
 
 
