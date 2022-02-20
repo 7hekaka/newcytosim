@@ -236,13 +236,13 @@ Fiber * Aster::makeFiber(ObjectList& res, Simul& sim, const Vector pos, Vector d
     ObjectList objs;
     Glossary opt(fos);
     Fiber * F = sim.fibers.newFiber(objs, fiber_type, opt);
+    opt.print_warnings(std::cerr, 1, "aster:build\n");
 
     //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
     ObjectSet::rotateObjects(objs, Rotation::rotationToVector(dir));
-    ObjectSet::translateObjects(objs, pos - F->posEnd(prop->focus));
+    ObjectSet::translateObjects(objs, asRadius*pos - F->posEnd(prop->focus));
     
     res.append(objs);
-    opt.print_warnings(std::cerr, 1, "aster:build\n");
     return F;
 }
 
@@ -258,9 +258,8 @@ size_t Aster::placeAnchor(const Vector A, const Vector B, size_t ref)
 {
     AsterLink & link = asLinks.new_val();
     //std::clog << "Aster::placeAnchor(" << asLinks.size() << ")\n";
-    link.set(A, B);
+    link.set(A, B, ref);
     link.len_ *= asRadius;
-    link.prime_ = ref;
     //link.print(std::clog);
     return asLinks.size() - 1;
 }

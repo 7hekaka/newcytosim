@@ -83,8 +83,9 @@ public:
     }
 
     /// set to interpolate from A to B
-    void set(Vector const& A, Vector const& B)
+    void set(Vector const& A, Vector const& B, size_t P)
     {
+        prime_ = P;
         len_ = ( A - B ).norm();
         
 #if ( DIM == 1 )
