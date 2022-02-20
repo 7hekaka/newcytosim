@@ -1773,14 +1773,19 @@ void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t s
 /*
 This code is disabled here in favor of the next version which is unrolled
 */
-#if ( SD_BLOCK_SIZE == 4 ) && REAL_IS_DOUBLE && defined(__AVX__)
+#if ( SD_BLOCK_SIZE == -3 ) && REAL_IS_DOUBLE && defined(__AVX__)
 void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) const
 {
     #pragma ivdep unroll (4)
     #pragma clang loop unroll_count(4)
     for ( size_t j = 0; j < size_; ++j )
     {
-        Block const& D = pilar_[0].dia_;
+        Block const& D = pilar_[j].dia_;
+        /**
+         Since the diagonal block is symmetric, we only need to load 6 scalars
+         instead of 9 here. Moreover, the elements of the vector and matrix can be
+         handled together to limit the numbers of swaps. Particular in SSE code
+         this should be faster than the code below. */
 #if 1
         vec4 x0 = loadu4(src);
         vec4 x2 = swap2f128(x0);
@@ -1795,17 +1800,19 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
         vec4 x1 = unpackhi4(x2, x2);
         x2 = broadcast1(src+2);
 #endif
-        src += 4;
-        //multiply with the diagonal block:
+        src += 3;
+        //multiply with the diagonal block, which is symmetric:
         // Y0 = M[0] * X0 + M[3] * X1 + M[6] * X2;
         // Y1 = M[1] * X0 + M[4] * X1 + M[7] * X2;
         // Y2 = M[2] * X0 + M[5] * X1 + M[8] * X2;
         x0 = mul4(D.data0(), x0);
         x0 = fmadd4(D.data1(), x1, x0);
         x0 = fmadd4(D.data2(), x2, x0);
-        storeu4(dst, x0);
-        dst += 4;
+        storeu4(dst, x0); // the 4-th is overwritten in next iteration
+        dst += 3;
     }
+    // clear garbage:
+    Y[3*size_] = 0;
 }
 #endif
 
@@ -1822,14 +1829,14 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
         vec4 x1 = broadcast1(src+1);
         vec4 x2 = broadcast1(src+2);
         src += 3;
-        //multiply with the diagonal block:
+        //multiply with the diagonal block, which is symmetric:
         // Y0 = M[0] * X0 + M[3] * X1 + M[6] * X2;
         // Y1 = M[1] * X0 + M[4] * X1 + M[7] * X2;
         // Y2 = M[2] * X0 + M[5] * X1 + M[8] * X2;
         x0 = mul4(D.data0(), x0);
         x0 = fmadd4(D.data1(), x1, x0);
         x0 = fmadd4(D.data2(), x2, x0);
-        storeu4(dst, x0);
+        storeu4(dst, x0); // the 4-th is overwritten in next iteration
         dst += 3;
         ++j;
     }
@@ -1855,10 +1862,12 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
         x3 = mul4(N.data0(), x3);
         x4 = mul4(N.data1(), x4);
         x5 = mul4(N.data2(), x5);
-        storeu4(dst,   add4(add4(x0, x1), x2)); // the 4-th is overwritten below
-        storeu4(dst+3, add4(add4(x3, x4), x5)); // the 4-th term will be overwritten further in loop
+        storeu4(dst,   add4(add4(x0, x1), x2)); // the 4-th is overwritten in next iteration
+        storeu4(dst+3, add4(add4(x3, x4), x5)); // the 4-th is overwritten in next iteration
         dst += 6;
     }
+    // clear garbage:
+    Y[3*size_] = 0;
 }
 #endif
 
@@ -1881,7 +1890,8 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_SSE(const float* X, float* Y) const
         // garbage 4-th term will be overwritten
         storeu4f(Y+3*j, add4f(s2, add4f(s0, s1)));
     }
-    Y[size_] = 0;
+    // clear garbage:
+    Y[3*size_] = 0;
 }
 #endif
 
