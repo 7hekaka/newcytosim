@@ -69,7 +69,6 @@ void Aster::setInteractions(Meca& meca) const
             AsterLink const& link = asLinks[n];
             
             const size_t off = sol->matIndex() + link.prime_;
-            const size_t pts[] = { off, off+1, off+2, off+3 };
 
 #if BACKWARD_COMPATIBILITY < 47
             if ( link.alt_ > 0 )
@@ -92,7 +91,7 @@ void Aster::setInteractions(Meca& meca) const
             if ( link.rank_ == 1 )
                 meca.addLink(fib->exactEnd(prop->focus), Mecapoint(sol, link.prime_), prop->stiffness[0]);
             else
-                meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef1_, prop->stiffness[0]);
+                meca.ADDLINK(fib->exactEnd(prop->focus), off, link.coef1_, prop->stiffness[0]);
             
             
             // make second type of link:
@@ -101,9 +100,9 @@ void Aster::setInteractions(Meca& meca) const
             if ( fib->length() >= len )
             {
                 if ( len > 0 )
-                    meca.ADDLINK(fib->interpolateFrom(len, prop->focus), pts, link.coef2_, prop->stiffness[1]);
+                    meca.ADDLINK(fib->interpolateFrom(len, prop->focus), off, link.coef2_, prop->stiffness[1]);
                 else
-                    meca.ADDLINK(fib->exactEnd(prop->focus), pts, link.coef2_, prop->stiffness[1]);
+                    meca.ADDLINK(fib->exactEnd(prop->focus), off, link.coef2_, prop->stiffness[1]);
             }
             else
             {
@@ -114,7 +113,7 @@ void Aster::setInteractions(Meca& meca) const
                 real coef[4];
                 for ( int d = 0; d < 4; ++d )
                     coef[d] = u * link.coef1_[d] + c * link.coef2_[d];
-                meca.ADDLINK(fib->exactEnd(end), pts, coef, prop->stiffness[1]);
+                meca.ADDLINK(fib->exactEnd(end), off, coef, prop->stiffness[1]);
             }
         }
     }
