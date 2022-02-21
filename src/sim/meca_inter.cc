@@ -70,49 +70,28 @@ static Vector interpolate1(const real vec[], const size_t inx)
     return Vector(vec+DIM*inx);
 }
 
-static Vector interpolate2(const real vec[], const size_t inx, real f0, real f1)
+static Vector interpolate2(const real vec[], const size_t inx, real a, real b)
 {
     Vector P0(vec+DIM*inx);
     Vector P1(vec+DIM*(inx+1));
-    return f0 * P0 + f1 * P1 ;
+    return a * P0 + b * P1;
 }
 
-static Vector interpolate3(const real vec[], const size_t inx, const real f[3])
-{
-    Vector P0(vec+DIM*inx);
-    Vector P1(vec+DIM*(inx+1));
-    Vector P2(vec+DIM*(inx+2));
-    return ( f[0] * P0 + f[1] * P1 ) + f[2] * P2;
-}
-
-static Vector interpolate4(const real vec[], const size_t inx, const real f[4])
+static Vector interpolate3(const real vec[], const size_t inx, const real a, real b, real c)
 {
     Vector P0(vec+DIM*inx);
     Vector P1(vec+DIM*(inx+1));
     Vector P2(vec+DIM*(inx+2));
-    Vector P3(vec+DIM*(inx+3));
-    return ( f[0] * P0 + f[1] * P1 ) + ( f[2] * P2 + f[3] * P3 );
+    return ( a * P0 + b * P1 ) + c * P2;
 }
 
-static Vector interpolate5(const real vec[], const size_t inx, const real f[5])
+static Vector interpolate4(const real vec[], const size_t inx, const real a, real b, real c, real d)
 {
     Vector P0(vec+DIM*inx);
     Vector P1(vec+DIM*(inx+1));
     Vector P2(vec+DIM*(inx+2));
     Vector P3(vec+DIM*(inx+3));
-    Vector P4(vec+DIM*(inx+4));
-    return ( f[0] * P0 + f[1] * P1 ) + ( f[2] * P2 + f[3] * P3 ) + f[4] * P4;
-}
-
-static Vector interpolate6(const real vec[], const size_t inx, const real f[6])
-{
-    Vector P0(vec+DIM*inx);
-    Vector P1(vec+DIM*(inx+1));
-    Vector P2(vec+DIM*(inx+2));
-    Vector P3(vec+DIM*(inx+3));
-    Vector P4(vec+DIM*(inx+4));
-    Vector P5(vec+DIM*(inx+5));
-    return ( f[0] * P0 + f[1] * P1 + f[2] * P2 ) + ( f[3] * P3 + f[4] * P4 + f[5] * P5 );
+    return ( a * P0 + b * P1 ) + ( c * P2 + d * P3 );
 }
 
 //------------------------------------------------------------------------------
@@ -1618,7 +1597,8 @@ void Meca::addLink1(Interpolation const& pti,
  using the coefficients given in `coef[]`.
  */
 void Meca::addLink2(Mecapoint const& ptA,
-                    const size_t pts, const real coef[2],
+                    const size_t pts,
+                    const real cc1, const real cc2,
                     const real weight)
 {
     assert_true( weight >= 0 );
@@ -1632,8 +1612,6 @@ void Meca::addLink2(Mecapoint const& ptA,
         return;
 
     //const real cc0 = -1.0;
-    const real cc1 = coef[0];
-    const real cc2 = coef[1];
     
     assert_small(cc1+cc2-1.0);
 
@@ -1682,7 +1660,7 @@ void Meca::addLink2(Mecapoint const& ptA,
  using the coefficients given in `coef[]`.
  */
 void Meca::addLink2(Interpolation const& pti,
-                    const size_t pts, const real coef[2],
+                    const size_t pts, const real cc2, const real cc3,
                     const real weight)
 {
     assert_true( weight >= 0 );
@@ -1695,8 +1673,6 @@ void Meca::addLink2(Interpolation const& pti,
     
     const real cc0 = -pti.coef0();
     const real cc1 = -pti.coef1();
-    const real cc2 = coef[0];
-    const real cc3 = coef[1];
     
     assert_small(cc2+cc3-1.0);
 
@@ -1754,7 +1730,8 @@ void Meca::addLink2(Interpolation const& pti,
  using the coefficients given in `coef[]`.
  */
 void Meca::addLink3(Mecapoint const& ptA,
-                    const size_t pts, const real coef[3],
+                    const size_t pts,
+                    const real cc1, const real cc2, const real cc3,
                     const real weight)
 {
     assert_true( weight >= 0 );
@@ -1765,14 +1742,11 @@ void Meca::addLink3(Mecapoint const& ptA,
     const size_t ii2 = pts+1;
     const size_t ii3 = pts+2;
     
-    const real cc0 = -1.0;
-    const real cc1 = coef[0];
-    const real cc2 = coef[1];
-    const real cc3 = coef[2];
+    //const real cc0 = -1.0;
     
     assert_small(cc1+cc2+cc3-1.0);
 
-    const real ww0 = weight * cc0;
+    const real ww0 = -weight; // since cc0 = -1
     const real ww1 = weight * cc1;
     const real ww2 = weight * cc2;
     const real ww3 = weight * cc3;
@@ -1800,7 +1774,7 @@ void Meca::addLink3(Mecapoint const& ptA,
         
     if ( modulo )
     {
-        Vector off = interpolate3(vPTS, pts, coef) - interpolate1(vPTS, ii0);
+        Vector off = interpolate3(vPTS, pts, cc1, cc2, cc3) - interpolate1(vPTS, ii0);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1825,7 +1799,7 @@ void Meca::addLink3(Mecapoint const& ptA,
  using the coefficients given in `coef[]`.
 */
 void Meca::addLink3(Interpolation const& pti,
-                    const size_t pts, const real coef[3],
+                    const size_t pts, const real cc2, const real cc3, const real cc4,
                     const real weight)
 {
     assert_true( weight >= 0 );
@@ -1839,9 +1813,6 @@ void Meca::addLink3(Interpolation const& pti,
     
     const real cc0 = -pti.coef0();
     const real cc1 = -pti.coef1();
-    const real cc2 = coef[0];
-    const real cc3 = coef[1];
-    const real cc4 = coef[2];
     
     assert_small(cc2+cc3+cc4-1.0);
 
@@ -1882,7 +1853,7 @@ void Meca::addLink3(Interpolation const& pti,
         
     if ( modulo )
     {
-        Vector off = interpolate2(vPTS, ii0, cc0, cc1) + interpolate3(vPTS, pts, coef);
+        Vector off = interpolate2(vPTS, ii0, cc0, cc1) + interpolate3(vPTS, pts, cc2, cc3, cc4);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1908,7 +1879,8 @@ void Meca::addLink3(Interpolation const& pti,
  using the coefficients given in `coef[]`.
  */
 void Meca::addLink4(Mecapoint const& ptA,
-                    const size_t pts, const real coef[4],
+                    const size_t pts,
+                    const real cc1, const real cc2, const real cc3, const real cc4,
                     const real weight)
 {
     assert_true( weight >= 0 );
@@ -1920,15 +1892,10 @@ void Meca::addLink4(Mecapoint const& ptA,
     const size_t ii3 = pts+2;
     const size_t ii4 = pts+3;
 
-    const real cc0 = -1.0;
-    const real cc1 = coef[0];
-    const real cc2 = coef[1];
-    const real cc3 = coef[2];
-    const real cc4 = coef[3];
-    
+    //const real cc0 = -1.0;
     assert_small(cc1+cc2+cc3+cc4-1.0);
 
-    const real ww0 = weight * cc0;
+    const real ww0 = -weight;  // since cc0 = -1
     const real ww1 = weight * cc1;
     const real ww2 = weight * cc2;
     const real ww3 = weight * cc3;
@@ -1964,7 +1931,7 @@ void Meca::addLink4(Mecapoint const& ptA,
         
     if ( modulo )
     {
-        Vector off = interpolate4(vPTS, pts, coef) - interpolate1(vPTS, ii0);
+        Vector off = interpolate4(vPTS, pts, cc1, cc2, cc3, cc4) - interpolate1(vPTS, ii0);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -1990,7 +1957,7 @@ void Meca::addLink4(Mecapoint const& ptA,
  using the coefficients given in `coef[]`.
 */
 void Meca::addLink4(Interpolation const& pti,
-                    const size_t pts, const real coef[4],
+                    const size_t pts, const real cc2, const real cc3, const real cc4, const real cc5,
                     const real weight)
 {
     assert_true( weight >= 0 );
@@ -2005,10 +1972,6 @@ void Meca::addLink4(Interpolation const& pti,
 
     const real cc0 = -pti.coef0();
     const real cc1 = -pti.coef1();
-    const real cc2 = coef[0];
-    const real cc3 = coef[1];
-    const real cc4 = coef[2];
-    const real cc5 = coef[3];
     
     assert_small(cc2+cc3+cc4+cc5-1.0);
 
@@ -2059,7 +2022,7 @@ void Meca::addLink4(Interpolation const& pti,
 
     if ( modulo )
     {
-        Vector off = interpolate2(vPTS, ii0, cc0, cc1) + interpolate4(vPTS, pts, coef);
+        Vector off = interpolate2(vPTS, ii0, cc0, cc1) + interpolate4(vPTS, pts, cc2, cc3, cc4, cc5);
         off = modulo->offset(off);
         if ( off.is_not_zero() )
         {
@@ -2434,7 +2397,8 @@ The force is affine with non-zero resting length:
 
 */
 void Meca::addLongLink4(Interpolation const& ptA,
-                        const size_t inx, const real coef[4],
+                        const size_t inx,
+                        const real cc2, const real cc3, const real cc4, const real cc5,
                         const real len,
                         const real weight)
 {
@@ -2455,15 +2419,10 @@ void Meca::addLongLink4(Interpolation const& ptA,
     // coefficients to form B-A:
     const real cc0 = -ptA.coef0();
     const real cc1 = -ptA.coef1();
-    const real cc2 = coef[0];
-    const real cc3 = coef[1];
-    const real cc4 = coef[2];
-    const real cc5 = coef[3];
     
     assert_small(cc2+cc3+cc4+cc5-1.0);
 
-    //Vector axi = interpolate4(vPTS, inx, coef) - ptA.pos();
-    Vector axi = interpolate4(vPTS, inx, coef) + interpolate2(vPTS, ii0, cc0, cc1);
+    Vector axi = interpolate4(vPTS, inx, cc2, cc3, cc4, cc5) + interpolate2(vPTS, ii0, cc0, cc1);
     Vector off;
 
     if ( modulo )

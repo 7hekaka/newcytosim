@@ -101,13 +101,13 @@ void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real we
             meca.addLink1(arg, off, weight);
             break;
         case 2:
-            meca.addLink2(arg, off, coef_, weight);
+            meca.addLink2(arg, off, coef_[0], coef_[1], weight);
             break;
         case 3:
-            meca.addLink3(arg, off, coef_, weight);
+            meca.addLink3(arg, off, coef_[0], coef_[1], coef_[2], weight);
             break;
         case 4:
-            meca.addLink4(arg, off, coef_, weight);
+            meca.addLink4(arg, off, coef_[0], coef_[1], coef_[2], coef_[3], weight);
         break;
     }
 }
@@ -125,13 +125,13 @@ void Interpolation4::addLink(Meca& meca, Mecapoint const& arg, const real weight
             meca.addLink(arg, Mecapoint(mec_, prime_), weight);
             break;
         case 2:
-            meca.addLink2(arg, off, coef_, weight);
+            meca.addLink2(arg, off, coef_[0], coef_[1], weight);
             break;
         case 3:
-            meca.addLink3(arg, off, coef_, weight);
+            meca.addLink3(arg, off, coef_[0], coef_[1], coef_[2], weight);
             break;
         case 4:
-            meca.addLink4(arg, off, coef_, weight);
+            meca.addLink4(arg, off, coef_[0], coef_[1], coef_[2], coef_[3], weight);
         break;
     }
 }

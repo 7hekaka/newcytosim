@@ -549,26 +549,26 @@ public:
     
     
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink2(Mecapoint const&, const size_t, const real[], real weight);
+    void addLink2(Mecapoint const&, const size_t, real, real, real weight);
     
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink3(Mecapoint const&, const size_t, const real[], real weight);
+    void addLink3(Mecapoint const&, const size_t, real, real, real, real weight);
 
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink4(Mecapoint const&, const size_t, const real[], real weight);
+    void addLink4(Mecapoint const&, const size_t, real, real, real, real, real weight);
     
     
     /// Link of stiffness `weight` between Interpolation and vertex
     void addLink1(Interpolation const&, size_t, real weight);
 
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink2(Interpolation const&, const size_t, const real[], real weight);
+    void addLink2(Interpolation const&, const size_t, real, real, real weight);
     
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink3(Interpolation const&, const size_t, const real[], real weight);
+    void addLink3(Interpolation const&, const size_t, real, real, real, real weight);
 
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink4(Interpolation const&, const size_t, const real[], real weight);
+    void addLink4(Interpolation const&, const size_t, real, real, real, real, real weight);
 
     //----------------------- ELEMENTS LINKING POINTS --------------------------
 
@@ -588,7 +588,7 @@ public:
     void addLongLink(Interpolation const&, Interpolation const&, real len, real weight);
     
     /// Link of stiffness `weight` and resting length `len`
-    void addLongLink4(Interpolation const&, const size_t pts, const real coef[4], real len, real weight);
+    void addLongLink4(Interpolation const&, const size_t pts, real, real, real, real, real len, real weight);
     
 #if ( DIM == 2 )
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment

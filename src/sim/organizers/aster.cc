@@ -37,11 +37,11 @@ void Aster::step()
 }
 
 #if   ( DIM == 1 )
-#    define ADDLINK addLink2
+#    define ADDLINK(p, i, c, w) addLink2(p, i, c[0], c[1], w)
 #elif ( DIM == 2 )
-#    define ADDLINK addLink3
+#    define ADDLINK(p, i, c, w) addLink3(p, i, c[0], c[1], c[2], w)
 #else
-#    define ADDLINK addLink4
+#    define ADDLINK(p, i, c, w) addLink4(p, i, c[0], c[1], c[2], c[3], w)
 #endif
 
 /*
