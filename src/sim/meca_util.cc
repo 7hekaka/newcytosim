@@ -544,7 +544,7 @@ void Meca::dumpSystem(bool nat) const
 //------------------------------------------------------------------------------
 #pragma mark - Matrix Bitmap Export
 
-#include "../base/save_bitmap.cc"
+#include "../base/bitmap.cc"
 
 
 // Just considering Couple between Fibers here:
