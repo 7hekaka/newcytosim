@@ -1812,7 +1812,7 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
         dst += 3;
     }
     // clear garbage:
-    Y[3*size_] = 0;
+    dst[0] = 0;
 }
 #endif
 
@@ -1867,7 +1867,7 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
         dst += 6;
     }
     // clear garbage:
-    Y[3*size_] = 0;
+    dst[0] = 0;
 }
 #endif
 
