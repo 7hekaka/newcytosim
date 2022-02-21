@@ -642,13 +642,11 @@ public:
 #if ( DIM == 2 )
     /// Link on the side of first argument, using rotation `leg`, with the force along `dir` removed
     void addSideSlidingLink2D(Interpolation const&, real leg, Mecapoint const&, Vector const& dir, real weight);
-    
-    /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
-    void addSideSlidingLinkS(Interpolation const&, Mecapoint const&, real arm, real weight);
-#elif ( DIM >= 3 )
-    /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
-    void addSideSlidingLinkS(Interpolation const&, Mecapoint const&, Vector const& arm, real weight);
 #endif
+
+    /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
+    void addSideSlidingLinkS(Interpolation const&, Mecapoint const&, Torque const& arm, real weight);
+
     /// Link on the side of first argument, using rotation `leg`, with the force along `dir` removed
     void addSideSlidingLink3D(Interpolation const&, Torque const& leg, Mecapoint const&, Vector const& dir, real weight);
 
@@ -659,13 +657,11 @@ public:
 #if ( DIM == 2 )
     /// Link on the side of first argument, using rotation `leg`, with the force along `dir` removed
     void addSideSlidingLink2D(Interpolation const&, real leg, Interpolation const&, Vector const& dir, real weight);
-    
-    /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
-    void addSideSlidingLinkS(Interpolation const&, Interpolation const&, real arm, real weight);
-#elif ( DIM >= 3 )
+#endif
+
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment and perpendicular to this segment
     void addSideSlidingLinkS(Interpolation const&, Interpolation const&, Torque const& arm, real weight);
-#endif
+    
     /// Link on the side of first argument, using rotation `leg`, with the force along `dir` removed
     void addSideSlidingLink3D(Interpolation const&, Torque const& leg, Interpolation const&, Vector const& dir, real weight);
 

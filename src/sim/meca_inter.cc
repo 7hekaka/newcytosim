@@ -3564,13 +3564,29 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     DRAW_LINK(ptA, cross(leg, ptA.diff()), ptB.pos());
 }
 
+#endif
+
 
 /**
  Alternative 2D method in which we add an offset to vBAS
- */
+ Vector 'arm' must be parallel to the link and orthogonal to 'ptA'
+
+  Without tangential force, a 'long link' is in the perpendicular direction.
+  In the local reference frame, the matrix of interaction coefficients would be:
+  real T[9] = { 0, 0, 0, 0, -weight, 0, 0, 0, 0 };
+  we could transform it with a change-of-coordinates matrix R:
+  Vector a = ptA.dir();
+  Vector b = dir;
+  Vector c = cross(a, b);
+  real R[9] = { a.XX, a.YY, a.ZZ, b.XX, b.YY, b.ZZ, c.XX, c.YY, c.ZZ };
+  real TR[3*3];
+  blas::xgemm('N','T', 3, 3, 3, 1.0, T, 3, R, 3, 0.0, TR, 3);
+  blas::xgemm('N','N', 3, 3, 3, 1.0, R, 3, TR, 3, 0.0, T, 3);
+  equivalently, we can set directly the interaction coefficient matrix:
+  */
 void Meca::addSideSlidingLinkS(Interpolation const& ptA,
                                Mecapoint const& ptB,
-                               const real arm,
+                               Torque const& arm,
                                const real weight)
 {
     assert_true( weight >= 0 );
@@ -3582,95 +3598,44 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     
     if ( any_equal(ii2, ii0, ii1) )
         return;
-    
-    // set vector 'axi' perpendicular to Fiber:
-    const Vector2 axi = cross(1.0, ptA.dir());
-    
-    // P = -weight * [ I - dir (x) dir ]
-    Matrix22 wT = Matrix22::outerProduct(axi, -weight);
-    
+
     // interpolation coefficients:
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
-    
-    real wa = -weight * arm;
-    add_base(ii0, axi, wa*cc0);
-    add_base(ii1, axi, wa*cc1);
-    add_base(ii2, axi, wa);
-    
-    add_block_diag(ii0, cc0*cc0, wT);
-    add_block(ii1, ii0, cc1*cc0, wT);
-    sub_block(ii2, ii0,     cc0, wT);
-    add_block_diag(ii1, cc1*cc1, wT);
-    sub_block(ii2, ii1,     cc1, wT);
-    add_block_diag(ii2, wT);
 
-    if ( modulo )
-    {
-        Vector off = modulo_offset(ptA, ptB);
-        if ( off.is_not_zero() )
-        {
-            off = wT * off;
-            add_base(ii0, off, cc0);
-            add_base(ii1, off, cc1);
-            sub_base(ii2, off);
-        }
-    }
-    DRAW_LINK(ptA, axi, ptB.pos());
-}
-
-#elif ( DIM == 3 )
-/**
- Older code
- Vector 'arm' must be parallel to the link and orthogonal to 'ptA'
- */
-void Meca::addSideSlidingLinkS(Interpolation const& ptA,
-                               Mecapoint const& ptB,
-                               Vector3 const& arm,
-                               const real weight)
-{
-    assert_true( weight >= 0 );
-    
-    const size_t ii0 = ptA.matIndex1();
-    const size_t ii1 = ptA.matIndex2();
-    const size_t ii2 = ptB.matIndex();
-
-    if ( any_equal(ii2, ii0, ii1) )
-        return;
-    
-    /*
-     Without tangential force, a 'long link' is in the perpendicular direction.
-     In the local reference frame, the matrix of interaction coefficients would be:
-     real T[9] = { 0, 0, 0, 0, -weight, 0, 0, 0, 0 };
-     we could transform it with a change-of-coordinates matrix R:
-     Vector a = ptA.dir();
-     Vector b = dir;
-     Vector c = cross(a, b);
-     real R[9] = { a.XX, a.YY, a.ZZ, b.XX, b.YY, b.ZZ, c.XX, c.YY, c.ZZ };
-     real TR[3*3];
-     blas::xgemm('N','T', 3, 3, 3, 1.0, T, 3, R, 3, 0.0, TR, 3);
-     blas::xgemm('N','N', 3, 3, 3, 1.0, R, 3, TR, 3, 0.0, T, 3);
-     equivalently, we can set directly the interaction coefficient matrix:
-     */
-    
-    Vector3 warm = -weight * arm;
+#if ( DIM == 3 )
     MatrixBlock wT = MatrixBlock::outerProduct(arm, -weight/arm.normSqr());
-    
-    // interpolation coefficients:
-    const real cc0 = ptA.coef0();
-    const real cc1 = ptA.coef1();
+    Vector3 warm = -weight * arm;
+#elif ( DIM == 2 )
+    // set vector 'axi' perpendicular to Fiber:
+    Vector axi = cross(1.0, ptA.dir());
+    // P = -weight * [ I - dir (x) dir ]
+    MatrixBlock wT = MatrixBlock::outerProduct(axi, -weight);
+    Vector warm = axi * ( -weight / arm );
+#else
+    MatrixBlock wT(0,0);
+    Vector warm(0,0,0);
+#endif
 
     add_base(ii0, warm, cc0);
     add_base(ii1, warm, cc1);
     sub_base(ii2, warm);
-
+    
     add_block_diag(ii0, cc0*cc0, wT);
-    add_block(ii1, ii0, cc1*cc0, wT);
-    sub_block(ii2, ii0,     cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
-    sub_block(ii2, ii1,     cc1, wT);
     add_block_diag(ii2, wT);
 
+    add_block(ii1, ii0, cc1*cc0, wT);
+    if ( ii2 > ii0 )
+    {
+        sub_block(ii2, ii0, cc0, wT);
+        sub_block(ii2, ii1, cc1, wT);
+    }
+    else
+    {
+        sub_block(ii0, ii2, cc0, wT);
+        sub_block(ii1, ii2, cc1, wT);
+    }
     if ( modulo )
     {
         Vector off = modulo_offset(ptA, ptB);
@@ -3682,10 +3647,8 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
             sub_base(ii2, off);
         }
     }
-    DRAW_LINK(ptA, arm, ptB.pos());
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
-
-#endif
 
 
 /**
@@ -3907,82 +3870,8 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     DRAW_LINK(ptA, cross(leg, ptA.dir()), ptB.pos());
 }
 
+#endif
 
-/**
- Alternative old 2D method in which we add an offset to vBAS
- */
-void Meca::addSideSlidingLinkS(Interpolation const& ptA,
-                               Interpolation const& ptB,
-                               const real arm,
-                               const real weight)
-{
-    assert_true( weight >= 0 );
-    
-    // indices:
-    const size_t ii0 = ptA.matIndex1();
-    const size_t ii1 = ptA.matIndex2();
-    const size_t ii2 = ptB.matIndex1();
-    const size_t ii3 = ptB.matIndex2();
-    
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
-        return;
-
-    // set vector 'axi' perpendicular to Fiber:
-    Vector2 axi = cross(1.0, ptA.dir());
-    
-    Matrix22 wT = Matrix22::outerProduct(axi, -weight);
-
-    // coefficients to form A-B
-    const real cc0 =  ptA.coef0();
-    const real cc1 =  ptA.coef1();
-    const real cc2 = -ptB.coef0();
-    const real cc3 = -ptB.coef1();
-    
-    Vector warm = axi * ( -weight / arm );
-    
-    add_base(ii0, warm, cc0);
-    add_base(ii1, warm, cc1);
-    add_base(ii2, warm, cc2);
-    add_base(ii3, warm, cc3);
-    
-    add_block_diag(ii0, cc0*cc0, wT);
-    add_block(ii1, ii0, cc1*cc0, wT);
-    add_block_diag(ii1, cc1*cc1, wT);
-    if ( ii2 > ii0 )
-    {
-        add_block(ii2, ii0, cc2*cc0, wT);
-        add_block(ii3, ii0, cc3*cc0, wT);
-        add_block(ii2, ii1, cc2*cc1, wT);
-        add_block(ii3, ii1, cc3*cc1, wT);
-    }
-    else
-    {
-        add_block(ii0, ii2, cc2*cc0, wT);
-        add_block(ii0, ii3, cc3*cc0, wT);
-        add_block(ii1, ii2, cc2*cc1, wT);
-        add_block(ii1, ii3, cc3*cc1, wT);
-    }
-    add_block_diag(ii2, cc2*cc2, wT);
-    add_block(ii3, ii2, cc3*cc2, wT);
-    add_block_diag(ii3, cc3*cc3, wT);
-    
-    if ( modulo )
-    {
-        Vector off = modulo_offset(ptA, ptB);
-        if ( off.is_not_zero() )
-        {
-            off = wT * off;
-            add_base(ii0, off, cc0);
-            add_base(ii1, off, cc1);
-            add_base(ii2, off, cc2);
-            add_base(ii3, off, cc3);
-        }
-    }
-    DRAW_LINK(ptA, axi, ptB.pos());
-}
-
-
-#elif ( DIM >= 3 )
 
 /**
  Older code
@@ -3990,7 +3879,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
  */
 void Meca::addSideSlidingLinkS(Interpolation const& ptA,
                                Interpolation const& ptB,
-                               Vector3 const& arm,
+                               Torque const& arm,
                                const real weight)
 {
     assert_true( weight >= 0 );
@@ -4010,17 +3899,31 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
    
-    Vector3 warm = -weight * arm;
+#if ( DIM == 3 )
+    Vector3 warm = (-weight) * arm;
     MatrixBlock wT = MatrixBlock::outerProduct(arm, -weight/arm.normSqr());
-
+#elif ( DIM == 2 )
+    // set vector 'axi' perpendicular to Fiber:
+    Vector axi = cross(1.0, ptA.dir());
+    // P = -weight * [ I - dir (x) dir ]
+    MatrixBlock wT = MatrixBlock::outerProduct(axi, -weight);
+    Vector warm = axi * ( -weight / arm );
+#else
+    MatrixBlock wT(0,0);
+    Vector warm(0,0,0);
+#endif
+    
     add_base(ii0, warm, cc0);
     add_base(ii1, warm, cc1);
     add_base(ii2, warm, cc2);
     add_base(ii3, warm, cc3);
     
     add_block_diag(ii0, cc0*cc0, wT);
-    add_block(ii1, ii0, cc1*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
+    add_block_diag(ii2, cc2*cc2, wT);
+    add_block_diag(ii3, cc3*cc3, wT);
+
+    add_block(ii1, ii0, cc1*cc0, wT);
     if ( ii2 > ii0 )
     {
         add_block(ii2, ii0, cc2*cc0, wT);
@@ -4035,9 +3938,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
         add_block(ii1, ii2, cc2*cc1, wT);
         add_block(ii1, ii3, cc3*cc1, wT);
     }
-    add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
-    add_block_diag(ii3, cc3*cc3, wT);
     
     if ( modulo )
     {
@@ -4054,7 +3955,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
-#endif
 
 /**
  Link `ptA` (A) and `ptB` (B),
