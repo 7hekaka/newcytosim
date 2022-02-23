@@ -2128,7 +2128,7 @@ void Meca::addLongLink2(Mecapoint const& ptA,
     
     const real iab = 1.0 / ab2;
     const real abn = std::sqrt(ab2);
-    const real wla = -weight * len * abn * iab; // weight * len / abn
+    const real wla = weight * len * abn * iab; // weight * len / abn
     
     MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
@@ -2137,11 +2137,11 @@ void Meca::addLongLink2(Mecapoint const& ptA,
     if ( len > abn )
         wT = MatrixBlock::outerProduct(axi, -weight*iab);
     else
-        wT = MatrixBlock::offsetOuterProduct(-weight-wla, axi, wla*iab);
+        wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla*iab);
     
     axi *= wla;
-    add_base(aa, axi);
-    sub_base(bb, axi);
+    sub_base(aa, axi);
+    add_base(bb, axi);
 
     add_block_diag(aa, wT);
     add_block_diag(bb, wT);
@@ -2191,7 +2191,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
-    const real wla = -weight * len / abn;
+    const real wla = weight * len / abn;
     
     DRAW_LINK(ptA, axi, len);
     
@@ -2202,11 +2202,11 @@ void Meca::addLongLink(Mecapoint const& ptA,
     if ( len > abn )
         wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else
-        wT = MatrixBlock::offsetOuterProduct(-weight-wla, axi, wla/ab2);
+        wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
     axi *= wla;
-    add_base(aa, axi);
-    sub_base(bb, axi);
+    sub_base(aa, axi);
+    add_base(bb, axi);
 
     add_block_diag(aa, wT);
     add_block_diag(bb, wT);
@@ -2246,7 +2246,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     if ( any_equal(ii2, ii0, ii1) )
         return;
 
-    Vector off, axi = position_delta(ptB, ptA);
+    Vector off, axi = position_delta(ptA, ptB);
 
     if ( modulo )
         modulo->foldOffset(axi, off);
@@ -2260,9 +2260,9 @@ void Meca::addLongLink(Mecapoint const& ptA,
     const real cc0 = ptB.coef0();
     const real cc1 = ptB.coef1();
 
-    add_base(ii0, axi, -cc0 * wla);
-    add_base(ii1, axi, -cc1 * wla);
-    add_base(ii2, axi, wla);
+    add_base(ii0, axi, cc0 * wla);
+    add_base(ii1, axi, cc1 * wla);
+    add_base(ii2, axi, -wla);
 
     MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
@@ -2290,7 +2290,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     
     if ( modulo && off.is_not_zero() )
     {
-        off = wT * off;
+        off = -( wT * off );
         add_base(ii0, off, cc0);
         add_base(ii1, off, cc1);
         add_base(ii2, off);
@@ -3357,7 +3357,6 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     // interpolation coefficients:
     const real A = ptA.coef0();
     const real B = ptA.coef1();
-    const real AA = A * A, AB = A * B, BB = B * B;
     
     Vector dir = ptA.dir();
 
@@ -3372,20 +3371,20 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
-    add_block_diag(ii0, AA, wT);
-    add_block_diag(ii1, BB, wT);
+    add_block_diag(ii0, A*A, wT);
+    add_block_diag(ii1, B*B, wT);
     add_block_diag(ii2, wT);
 
-    add_block(ii1, ii0, AB, wT);
+    add_block(ii1, ii0, A*B, wT);
     if ( ii0 > ii2 )
     {
-        sub_block(ii0, ii2,  A, wT);
-        sub_block(ii1, ii2,  B, wT);
+        sub_block(ii0, ii2, A, wT);
+        sub_block(ii1, ii2, B, wT);
     }
     else
     {
-        sub_block(ii2, ii0,  A, wT);
-        sub_block(ii2, ii1,  B, wT);
+        sub_block(ii2, ii0, A, wT);
+        sub_block(ii2, ii1, B, wT);
     }
     if ( modulo )
     {
@@ -3393,8 +3392,8 @@ void Meca::addSlidingLink(Interpolation const& ptA,
         if ( off.is_not_zero() )
         {
             off = wT * off;
-            add_base(ii0, A*off);
-            add_base(ii1, B*off);
+            add_base(ii0, off, A);
+            add_base(ii1, off, B);
             sub_base(ii2, off);
         }
     }
