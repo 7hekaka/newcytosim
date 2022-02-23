@@ -506,7 +506,7 @@ public:
     /// Sort array using `std::qsort()` and the provided comparison function
     void sort(int (*comp)(const void *, const void *))
     {
-        assert_true(val_);
+        assert_true( val_ || nbo_==0 );
         qsort(val_, nbo_, sizeof(VAL), comp);
     }
     
