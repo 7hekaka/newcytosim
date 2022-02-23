@@ -2073,16 +2073,16 @@ void Meca::addLongLink1(Mecapoint const& ptA,
     DRAW_LINK(ptA, axi, len);
 
     const real abn = std::sqrt(ab2);
-    const real wab = weight / ab2;
+    const real wab = -weight / ab2;
     MatrixBlock wT = MatrixBlock::outerProduct(axi, wab);
     
     axi *= ( wab * len ) * abn;
-    sub_base(aa, axi);
-    add_base(bb, axi);
+    add_base(aa, axi);
+    sub_base(bb, axi);
 
-    sub_block_diag(aa, wT);
-    sub_block_diag(bb, wT);
-    add_block(std::max(aa, bb), std::min(aa, bb), wT);
+    add_block_diag(aa, wT);
+    add_block_diag(bb, wT);
+    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
     
     if ( modulo )
     {
@@ -2090,8 +2090,8 @@ void Meca::addLongLink1(Mecapoint const& ptA,
         if ( off.is_not_zero() )
         {
             off = wT * off;
-            sub_base(aa, off);
-            add_base(bb, off);
+            add_base(aa, off);
+            sub_base(bb, off);
         }
     }
 }
@@ -2128,24 +2128,24 @@ void Meca::addLongLink2(Mecapoint const& ptA,
     
     const real iab = 1.0 / ab2;
     const real abn = std::sqrt(ab2);
-    const real wla = weight * len * abn * iab; // weight * len / abn
+    const real wla = -weight * len * abn * iab; // weight * len / abn
     
     MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
      This is done by using len = 1 in the formula for links that are shorter
      than the desired target. */
     if ( len > abn )
-        wT = MatrixBlock::outerProduct(axi, weight*iab);
+        wT = MatrixBlock::outerProduct(axi, -weight*iab);
     else
-        wT = MatrixBlock::offsetOuterProduct(weight-wla, axi, wla*iab);
+        wT = MatrixBlock::offsetOuterProduct(-weight-wla, axi, wla*iab);
     
     axi *= wla;
-    sub_base(aa, axi);
-    add_base(bb, axi);
+    add_base(aa, axi);
+    sub_base(bb, axi);
 
-    sub_block_diag(aa, wT);
-    sub_block_diag(bb, wT);
-    add_block(std::max(aa, bb), std::min(aa, bb), wT);
+    add_block_diag(aa, wT);
+    add_block_diag(bb, wT);
+    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
 
     if ( modulo )
     {
@@ -2153,8 +2153,8 @@ void Meca::addLongLink2(Mecapoint const& ptA,
         if ( off.is_not_zero() )
         {
             off = wT * off;
-            sub_base(aa, off);
-            add_base(bb, off);
+            add_base(aa, off);
+            sub_base(bb, off);
         }
     }
 }
@@ -2191,7 +2191,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
-    const real wla = weight * len / abn;
+    const real wla = -weight * len / abn;
     
     DRAW_LINK(ptA, axi, len);
     
@@ -2200,23 +2200,23 @@ void Meca::addLongLink(Mecapoint const& ptA,
      This is done by using len = 1 in the formula for links that are shorter
      than the desired target: real wla = weight * min_real(len/abn, 1); */
     if ( len > abn )
-        wT = MatrixBlock::outerProduct(axi, weight/ab2);
+        wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else
-        wT = MatrixBlock::offsetOuterProduct(weight-wla, axi, wla/ab2);
+        wT = MatrixBlock::offsetOuterProduct(-weight-wla, axi, wla/ab2);
     
     axi *= wla;
-    sub_base(aa, axi);
-    add_base(bb, axi);
+    add_base(aa, axi);
+    sub_base(bb, axi);
 
-    sub_block_diag(aa, wT);
-    sub_block_diag(bb, wT);
-    add_block(std::max(aa, bb), std::min(aa, bb), wT);
+    add_block_diag(aa, wT);
+    add_block_diag(bb, wT);
+    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
 
     if ( modulo && off.is_not_zero() )
     {
         off = wT * off;
-        add_base(aa, off);
-        sub_base(bb, off);
+        sub_base(aa, off);
+        add_base(bb, off);
     }
 }
 
