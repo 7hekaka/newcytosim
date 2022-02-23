@@ -43,3 +43,25 @@ std::ostream& operator << (std::ostream& os, Interpolation const& arg)
     arg.print(os);
     return os;
 }
+
+
+int Interpolation::bad() const
+{
+    if ( !mec_ )
+        return 1;
+
+    if ( pt1_ >= mec_->nbPoints() )
+        return 2;
+
+    if ( pt2_ > mec_->nbPoints() )
+        return 3;
+
+    if ( coef_ < 0 )
+        return 4;
+    
+    if ( coef_ > 1 )
+        return 5;
+    
+    return 0;
+}
+

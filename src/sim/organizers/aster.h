@@ -17,6 +17,15 @@ class AsterLink
     
 private:
     
+    /// interpolation coefficients on Solid for link 1
+    real coef1_[4];
+    
+    /// interpolation coefficients on Solid for link 2
+    real coef2_[4];
+    
+    /// distance between the two anchoring points
+    real len_;
+    
     /// rank of link 1
     /**
      0 = no link
@@ -27,16 +36,7 @@ private:
 
     /// index of first point on the Solid
     size_t prime_;
-    
-    /// interpolation coefficients on Solid for link 1
-    real coef1_[4];
-    
-    /// interpolation coefficients on Solid for link 2
-    real coef2_[4];
-    
-    /// distance between the two anchoring points
-    real len_;
-    
+
 #if BACKWARD_COMPATIBILITY < 47
     /// index used for backward compatibility
     size_t alt_;

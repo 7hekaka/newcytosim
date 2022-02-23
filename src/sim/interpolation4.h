@@ -19,16 +19,16 @@ public:
     
     /// Mecable from which points are interpolated
     Mecable const* mec_;
-
-    /// index of first interpolated point
-    size_t prime_;
     
     /// interpolation coefficients for points [ref, ref+1, ref+2, ref+3]
     /** The sum of these 4 coefficients is equal to one */
     real coef_[4];
+
+    /// index of first interpolated point
+    Mecable::SIZE_T prime_;
     
     /// number of interpolated points (order)
-    size_t rank_;
+    Mecable::SIZE_T rank_;
     
     /// set coefficients
     void set_coef(real a, real b, real c) { coef_[1]=a; coef_[2]=b; coef_[3]=c; polish(); }
@@ -66,7 +66,7 @@ public:
     Mecapoint vertex0() const { return Mecapoint(mec_, prime_); }
     
     /// index of first interpolated point in matrix
-    size_t matIndex() const { return mec_->matIndex() + prime_; }
+    size_t matIndex() const { return mec_->matIndex() + (size_t)prime_; }
 
     /// interpolation coefficients
     const real* coef() const { return coef_; }

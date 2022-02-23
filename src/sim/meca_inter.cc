@@ -2079,10 +2079,6 @@ void Meca::addLongLink1(Mecapoint const& ptA,
     axi *= ( wab * len ) * abn;
     add_base(aa, axi);
     sub_base(bb, axi);
-
-    add_block_diag(aa, wT);
-    add_block_diag(bb, wT);
-    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
     
     if ( modulo )
     {
@@ -2094,6 +2090,10 @@ void Meca::addLongLink1(Mecapoint const& ptA,
             sub_base(bb, off);
         }
     }
+
+    add_block_diag(aa, wT);
+    add_block_diag(bb, wT);
+    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
 }
 
 
@@ -2142,11 +2142,7 @@ void Meca::addLongLink2(Mecapoint const& ptA,
     axi *= wla;
     sub_base(aa, axi);
     add_base(bb, axi);
-
-    add_block_diag(aa, wT);
-    add_block_diag(bb, wT);
-    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
-
+    
     if ( modulo )
     {
         Vector off = modulo_offset(ptA, ptB);
@@ -2157,6 +2153,10 @@ void Meca::addLongLink2(Mecapoint const& ptA,
             sub_base(bb, off);
         }
     }
+
+    add_block_diag(aa, wT);
+    add_block_diag(bb, wT);
+    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
 }
 
 
@@ -2207,17 +2207,17 @@ void Meca::addLongLink(Mecapoint const& ptA,
     axi *= wla;
     sub_base(aa, axi);
     add_base(bb, axi);
-
-    add_block_diag(aa, wT);
-    add_block_diag(bb, wT);
-    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
-
+    
     if ( modulo && off.is_not_zero() )
     {
         off = wT * off;
         sub_base(aa, off);
         add_base(bb, off);
     }
+
+    add_block_diag(aa, wT);
+    add_block_diag(bb, wT);
+    sub_block(std::max(aa, bb), std::min(aa, bb), wT);
 }
 
 
@@ -2272,6 +2272,15 @@ void Meca::addLongLink(Mecapoint const& ptA,
         wT = MatrixBlock::outerProduct(axi, -weight/ab2);
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
+    
+    if ( modulo && off.is_not_zero() )
+    {
+        off = -( wT * off );
+        add_base(ii0, off, cc0);
+        add_base(ii1, off, cc1);
+        add_base(ii2, off);
+    }
+    DRAW_LINK(ptB, axi, len);
 
     add_block_diag(ii0, cc0*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
@@ -2287,15 +2296,6 @@ void Meca::addLongLink(Mecapoint const& ptA,
         sub_block(ii0, ii2, cc0, wT);
         sub_block(ii1, ii2, cc1, wT);
     }
-    
-    if ( modulo && off.is_not_zero() )
-    {
-        off = -( wT * off );
-        add_base(ii0, off, cc0);
-        add_base(ii1, off, cc1);
-        add_base(ii2, off);
-    }
-    DRAW_LINK(ptB, axi, len);
 }
 
 
@@ -2355,6 +2355,16 @@ void Meca::addLongLink(Interpolation const& ptA,
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla/ab2);
     
+    if ( modulo && off.is_not_zero() )
+    {
+        off = -( wT * off );
+        add_base(ii0, off, cc0);
+        add_base(ii1, off, cc1);
+        add_base(ii2, off, cc2);
+        add_base(ii3, off, cc3);
+    }
+    DRAW_LINK(ptA, axi, len);
+
     add_block_diag(ii0, cc0*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
     add_block_diag(ii2, cc2*cc2, wT);
@@ -2375,16 +2385,6 @@ void Meca::addLongLink(Interpolation const& ptA,
         add_block(ii1, ii3, cc3*cc1, wT);
     }
     add_block(ii3, ii2, cc3*cc2, wT);
-
-    if ( modulo && off.is_not_zero() )
-    {
-        off = -( wT * off );
-        add_base(ii0, off, cc0);
-        add_base(ii1, off, cc1);
-        add_base(ii2, off, cc2);
-        add_base(ii3, off, cc3);
-    }
-    DRAW_LINK(ptA, axi, len);
 }
 
 
@@ -3371,6 +3371,19 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
 
+    if ( modulo )
+    {
+        Vector off = modulo_offset(ptA, ptB);
+        if ( off.is_not_zero() )
+        {
+            off = wT * off;
+            add_base(ii0, off, A);
+            add_base(ii1, off, B);
+            sub_base(ii2, off);
+        }
+    }
+    DRAW_LINK(ptA, ptB.pos());
+
     add_block_diag(ii0, A*A, wT);
     add_block_diag(ii1, B*B, wT);
     add_block_diag(ii2, wT);
@@ -3386,18 +3399,6 @@ void Meca::addSlidingLink(Interpolation const& ptA,
         sub_block(ii2, ii0, A, wT);
         sub_block(ii2, ii1, B, wT);
     }
-    if ( modulo )
-    {
-        Vector off = modulo_offset(ptA, ptB);
-        if ( off.is_not_zero() )
-        {
-            off = wT * off;
-            add_base(ii0, off, A);
-            add_base(ii1, off, B);
-            sub_base(ii2, off);
-        }
-    }
-    DRAW_LINK(ptA, ptB.pos());
 }
 
 
@@ -3444,6 +3445,20 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     // wT = -weight * [ I - dir (x) dir ]
     MatrixBlock wT = MatrixBlock::offsetOuterProduct(-weight, dir, weight);
     
+    if ( modulo )
+    {
+        Vector off = modulo_offset(ptA, ptB);
+        if ( off.is_not_zero() )
+        {
+            off = wT * off;
+            add_base(ii0, off, cc0);
+            add_base(ii1, off, cc1);
+            add_base(ii2, off, cc2);
+            add_base(ii3, off, cc3);
+        }
+    }
+    DRAW_LINK(ptA, ptB.pos());
+
     add_block_diag(ii0, cc0*cc0, wT);
     add_block(ii1, ii0, cc1*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
@@ -3464,20 +3479,6 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     add_block_diag(ii2, cc2*cc2, wT);
     add_block(ii3, ii2, cc3*cc2, wT);
     add_block_diag(ii3, cc3*cc3, wT);
-
-    if ( modulo )
-    {
-        Vector off = modulo_offset(ptA, ptB);
-        if ( off.is_not_zero() )
-        {
-            off = wT * off;
-            add_base(ii0, off, cc0);
-            add_base(ii1, off, cc1);
-            add_base(ii2, off, cc2);
-            add_base(ii3, off, cc3);
-        }
-    }
-    DRAW_LINK(ptA, ptB.pos());
 }
 
 //------------------------------------------------------------------------------
@@ -3539,6 +3540,19 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     add_base(ii1, warm, cc1);
     sub_base(ii2, warm);
     
+    if ( modulo )
+    {
+        Vector off = modulo_offset(ptA, ptB);
+        if ( off.is_not_zero() )
+        {
+            off = wT * off;
+            add_base(ii0, off, cc0);
+            add_base(ii1, off, cc1);
+            sub_base(ii2, off);
+        }
+    }
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
+
     add_block_diag(ii0, cc0*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
     add_block_diag(ii2, wT);
@@ -3554,18 +3568,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
         sub_block(ii0, ii2, cc0, wT);
         sub_block(ii1, ii2, cc1, wT);
     }
-    if ( modulo )
-    {
-        Vector off = modulo_offset(ptA, ptB);
-        if ( off.is_not_zero() )
-        {
-            off = wT * off;
-            add_base(ii0, off, cc0);
-            add_base(ii1, off, cc1);
-            sub_base(ii2, off);
-        }
-    }
-    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
 
@@ -3791,6 +3793,8 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
                                const real weight)
 {
     assert_true( weight >= 0 );
+    assert_false( ptA.bad() );
+    assert_false( ptB.bad() );
     
     // indices:
     const size_t ii0 = ptA.matIndex1();
@@ -3827,6 +3831,20 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     add_base(ii2, warm, cc2);
     add_base(ii3, warm, cc3);
     
+    if ( modulo )
+    {
+        Vector off = modulo_offset(ptA, ptB);
+        if ( off.is_not_zero() )
+        {
+            off = wT * off;
+            add_base(ii0, off, cc0);
+            add_base(ii1, off, cc1);
+            add_base(ii2, off, cc2);
+            add_base(ii3, off, cc3);
+        }
+    }
+    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
+
     add_block_diag(ii0, cc0*cc0, wT);
     add_block_diag(ii1, cc1*cc1, wT);
     add_block_diag(ii2, cc2*cc2, wT);
@@ -3848,20 +3866,6 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
         add_block(ii1, ii3, cc3*cc1, wT);
     }
     add_block(ii3, ii2, cc3*cc2, wT);
-    
-    if ( modulo )
-    {
-        Vector off = modulo_offset(ptA, ptB);
-        if ( off.is_not_zero() )
-        {
-            off = wT * off;
-            add_base(ii0, off, cc0);
-            add_base(ii1, off, cc1);
-            add_base(ii2, off, cc2);
-            add_base(ii3, off, cc3);
-        }
-    }
-    DRAW_LINK(ptA, cross(arm, ptA.dir()), ptB.pos());
 }
 
 

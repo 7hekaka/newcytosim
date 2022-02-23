@@ -27,6 +27,9 @@ private:
     
     /// Mecable from which the points are interpolated 
     Mecable const*  mec_;
+    
+    /// interpolation coefficient: pos = (1-coef) * pt1_ + coef * pt2_
+    real coef_;
 
     /// index of vertex 1 in mec_
     Mecable::SIZE_T pt1_;
@@ -34,19 +37,16 @@ private:
     /// index of vertex 2 in mec_
     Mecable::SIZE_T pt2_;
     
-    /// interpolation coefficient: pos = (1-coef) * pt1_ + coef * pt2_
-    real coef_;
-    
 public:
 
     Interpolation(Interpolation const&) { }
     
     /// reset member variables
-    Interpolation() : mec_(nullptr), pt1_(0), pt2_(0), coef_(0) { }
+    Interpolation() : mec_(nullptr), coef_(0), pt1_(0), pt2_(0) { }
     
     /// set to interpolate p1 and p2 on ps, with coefficient `c`
     Interpolation(const Mecable * m, Mecable::SIZE_T p, Mecable::SIZE_T q, real c)
-    : mec_(m), pt1_(p), pt2_(q), coef_(c) { }
+    : mec_(m), coef_(c), pt1_(p), pt2_(q) { }
 
     /// set to interpolate given fiber segment, with abscissa `c` 
     Interpolation(FiberSegment const&, real abs);
@@ -65,10 +65,10 @@ public:
     }
     
     /// Index of point 1 in the matrix of dynamics (Meca::mISO)
-    size_t matIndex1() const { return mec_->matIndex() + pt1_; }
+    size_t matIndex1() const { return mec_->matIndex() + (size_t)pt1_; }
     
     /// Index of point 2 in the matrix of dynamics (Meca::mISO)
-    size_t matIndex2() const { return mec_->matIndex() + pt2_; }
+    size_t matIndex2() const { return mec_->matIndex() + (size_t)pt2_; }
     
     /// true if the pointer seems to be valid.
     bool valid() const { return (mec_!=nullptr) & (pt1_<mec_->nbPoints()) & (pt2_<mec_->nbPoints()); }
@@ -132,6 +132,10 @@ public:
 
     /// Human friendly ouput
     void print(std::ostream&) const;
+    
+    /// check validity
+    int bad() const;
+
 };
 
 /// output operator for debugging purpose
