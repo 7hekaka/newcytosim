@@ -802,7 +802,7 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
     vec4 t2 = setzero4();
 
     Block const* blk = sbk_;
-    Block const* end = sbk_ + (rlen_-rlen_%2);
+    Block const* end = sbk_ + ( rlen_ & ~1 );
     size_t const* inx = inx_;
     {
         /*
@@ -819,13 +819,12 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
             vec4 A = loadu4(X+3*inx[0]);
             vec4 B = loadu4(X+3*inx[1]);
             // multiply each line of the two blocks:
-            s0 = fmadd4(blk->data0(), A, s0);
-            s1 = fmadd4(blk->data1(), A, s1);
-            s2 = fmadd4(blk->data2(), A, s2);
-            ++blk;
-            t0 = fmadd4(blk->data0(), B, t0);
-            t1 = fmadd4(blk->data1(), B, t1);
-            t2 = fmadd4(blk->data2(), B, t2);
+            s0 = fmadd4(blk[0].data0(), A, s0);
+            s1 = fmadd4(blk[0].data1(), A, s1);
+            s2 = fmadd4(blk[0].data2(), A, s2);
+            t0 = fmadd4(blk[1].data0(), B, t0);
+            t1 = fmadd4(blk[1].data1(), B, t1);
+            t2 = fmadd4(blk[1].data2(), B, t2);
         }
         s0 = add4(s0, t0);
         s1 = add4(s1, t1);
@@ -849,9 +848,9 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
     s0 = clear4th(s0); // s0[3] is garbage
     s1 = clear4th(s1); // s1[3] is garbage
     s2 = clear4th(s2); // s2[3] is garbage
-    t0 = setzero4();
+    vec4 s3 = setzero4();
     s0 = add4(unpacklo4(s0, s1), unpackhi4(s0, s1));
-    s2 = add4(unpacklo4(s2, t0), unpackhi4(s2, t0));
+    s2 = add4(unpacklo4(s2, s3), unpackhi4(s2, s3));
     return add4(catshift2(s0, s2), blend22(s0, s2));
 }
 #endif
@@ -983,7 +982,7 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
         store2(Y+2*i, add2(load2(Y+2*i), row_[i].vecMul2DU(X)));
 #elif ( BLOCK_SIZE == 3 ) && SPARMATBLK_USES_AVX
         // we need to use store3 only for the last line, if multithreaded
-        store3(Y+3*i, add4(loadu4(Y+3*i), row_[i].vecMul3DUU(X)));
+        store3(Y+3*i, add4(loadu4(Y+3*i), row_[i].vecMul3DU(X)));
 #else
         row_[i].vecMul(X).add_to(Y+BLOCK_SIZE*i);
 #endif
