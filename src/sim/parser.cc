@@ -123,8 +123,7 @@ void Parser::parse_set(std::istream& is)
 #endif
             opt.read(blok);
             execute_change(&simul_.prop, opt);
-            if ( name != "*" )
-                simul_.rename(name);
+            simul_.rename(name);
         }
 #if BACKWARD_COMPATIBILITY < 50
         else if ( para == "display" )

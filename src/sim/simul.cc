@@ -422,16 +422,13 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/* There can only be one SimulProp and it is already created */
 void Simul::rename(std::string const& arg)
 {
-    if ( prop.name() == "undefined" )
+    if ( prop.name() != arg )
     {
         prop.rename(arg);
-        //std::clog << "Simul is named `" << arg << "'\n";
+        std::clog << "Simul is named `" << arg << "'\n";
     }
-    else if ( prop.name() != arg )
-        throw InvalidSyntax("only one `simul' can be defined");
 }
 
 
