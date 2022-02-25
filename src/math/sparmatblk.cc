@@ -645,12 +645,12 @@ bool SparMatBlk::prepareForMultiply(int)
 //------------------------------------------------------------------------------
 #pragma mark - Basic Vector Multiplication
 
-Vector SparMatBlk::Line::vecMul(const real* X) const
+void SparMatBlk::Line::vecMulCol(const real* X, real* Y) const
 {
-    Vector res(0,0,0);
+    Vector vec(Y);
     for ( size_t n = 0; n < rlen_; ++n )
-        res += blk_[n].vecmul(X+BLOCK_SIZE*inx_[n]);
-    return res;
+        vec += blk_[n].vecmul(X+BLOCK_SIZE*inx_[n]);
+    vec.store(Y);
 }
 
 
@@ -965,7 +965,7 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
     assert_true( start <= stop );
     stop = std::min(stop, size_);
     for ( size_t i = start; i < stop; ++i )
-        row_[i].vecMul(X).add_to(Y+BLOCK_SIZE*i);
+        row_[i].vecMulCol(X, Y+BLOCK_SIZE*i);
 }
 
 
@@ -984,7 +984,7 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+3*i, add4(loadu4(Y+3*i), row_[i].vecMul3DU(X)));
 #else
-        row_[i].vecMul(X).add_to(Y+BLOCK_SIZE*i);
+        row_[i].vecMulCol(X, Y+BLOCK_SIZE*i);
 #endif
     }
 }
@@ -1011,7 +1011,7 @@ void SparMatBlk::vecMul(const real* X, real* Y, size_t start, size_t stop) const
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+3*i, row_[i].vecMul3DUU(X));
 #else
-        row_[i].vecMul(X).store(Y+BLOCK_SIZE*i);
+        row_[i].vecMulCol(X, Y+BLOCK_SIZE*i);
 #endif
     }
 }

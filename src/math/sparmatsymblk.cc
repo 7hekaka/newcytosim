@@ -406,7 +406,7 @@ void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 int SparMatSymBlk::bad() const
 {
     if ( size_ <= 0 ) return 1;
-    for ( size_t jj = 0; jj < size_; jj += S_BLOCK_SIZE )
+    for ( size_t jj = 0; jj < size_; ++jj )
     {
         Column & col = column_[jj];
         for ( size_t n = 0 ; n < col.nbb_ ; ++n )
@@ -426,7 +426,7 @@ size_t SparMatSymBlk::nbElements(size_t start, size_t stop, size_t& alc) const
     stop = std::min(stop, size_);
     alc = 0;
     size_t cnt = 0;
-    for ( size_t i = start; i < stop; i += S_BLOCK_SIZE )
+    for ( size_t i = start; i < stop; ++i )
     {
         cnt += column_[i].nbb_;
         alc += column_[i].allo_;

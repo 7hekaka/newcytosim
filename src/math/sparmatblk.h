@@ -114,7 +114,7 @@ public:
         Block& block(size_t j);
         
         /// multiplication of a vector: L * X
-        Vector vecMul(const real* X) const;
+        void vecMulCol(const real* X, real* Y) const;
         
         /// multiplication of a vector: L * X
         real vecMul1D(const real* X) const;

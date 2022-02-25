@@ -440,7 +440,7 @@ public:
     
 #pragma mark -
 
-#if MATRIX33SYM_USES_SSE
+#if MATRIX33SYM_USES_SSE && defined(__AVX__)
     
     /// multiplication by a 3-components vector: this * V
     const vec4 vecmul3_sse(vec4 vec) const
@@ -463,15 +463,15 @@ public:
         vec2 zz = loadu2(V); // xy
         vec2 xx = duplo2(zz);
         vec2 yy = duphi2(zz);
-        zz = loaddup2(V+2);  // zz
         vec2 ab = data0();
         vec2 cd = data1();
         vec2 ef = data2();
+        zz = loaddup2(V+2);  // zz
         ab = fmadd2(unpackhi2(ab, cd), yy, mul2(ab, xx));
+        xx = fmadd1(ef, yy, mul1(cd, xx));
         ab = fmadd2(unpacklo2(cd, ef), zz, ab);
-        cd = fmadd1(ef, yy, mul1(cd, xx));
-        cd = fmadd1(unpackhi2(ef, ef), zz, cd);
-        return cat22(blend11(cd, setzero2()), ab);
+        xx = fmadd1(unpackhi2(ef, ef), zz, xx);
+        return cat22(xx, ab);
     }
 
 #endif
@@ -513,8 +513,6 @@ public:
     {
 #if MATRIX33SYM_USES_SSE && VECTOR3_USES_AVX
         return vecmul3_sse(vec.vec);
-#elif MATRIX33SYM_USES_SSE
-        return vecmul3_sse(vec.data());
 #else
         return vecmul_(vec);
 #endif
@@ -523,7 +521,7 @@ public:
     /// multiplication by a vector: this * { ptr[0], ptr[1] }
     Vector3 vecmul(real const* ptr) const
     {
-#if MATRIX33SYM_USES_SSE
+#if MATRIX33SYM_USES_SSE && VECTOR3_USES_AVX
         return vecmul3_sse(ptr);
 #else
         return vecmul_(ptr);
@@ -539,7 +537,7 @@ public:
     /// multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul(real const* V) const
     {
-#if MATRIX33SYM_USES_SSE
+#if MATRIX33SYM_USES_SSE && VECTOR3_USES_AVX
         return vecmul3_sse(V);
 #else
         return vecmul_(V);
@@ -916,6 +914,12 @@ public:
      but the values of 'c' and 's' can be tweaked to scale the resulting matrix.
      */
     static Matrix33sym planarRotation(const Vector3& axis, const real c, const real s)
+    {
+        ABORT_NOW("non symmetric");
+        return Matrix33sym(0, 0);
+    }
+    
+    static Matrix33sym rotationAroundAxis(const Vector3& axis, const real c, const real s)
     {
         ABORT_NOW("non symmetric");
         return Matrix33sym(0, 0);

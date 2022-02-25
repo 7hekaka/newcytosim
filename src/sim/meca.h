@@ -34,26 +34,15 @@ class Simul;
 #define PARALLELIZE_MATRIX 0
 
 
-// known Matrix block types:
-class Matrix11;
-class Matrix22;
-class Matrix33;
-class Matrix34;
+#if PARALLELIZE_MATRIX
+typedef SparMatBlk BlockMatrixType;
+#else
+typedef SparMatSymBlkDiag BlockMatrixType;
+#endif
+
 
 /// MatrixBlock is an alias to a matrix class of size DIM * DIM
-/**
- MatrixBlock is used to update the matrix mFUL in 'meca_inter.cc',
- and should match the class used for the blocks of mFUL.
- */
-#if ( DIM == 1 )
-typedef Matrix11 MatrixBlock;
-#elif ( DIM == 2 )
-typedef Matrix22 MatrixBlock;
-#elif PARALLELIZE_MATRIX
-typedef Matrix34 MatrixBlock;
-#else
-typedef Matrix33 MatrixBlock;
-#endif
+typedef BlockMatrixType::Block MatrixBlock;
 
 
 /// set 1 to use matrix mISO and mFUL (the traditional way)
@@ -239,11 +228,7 @@ private:
      It contains terms which are different in the X, Y, Z subspaces,
      arising from addSideLink() addSideSlidingLink(), etc.
     */
-#if PARALLELIZE_MATRIX
-    SparMatBlk mFUL;
-#else
-    SparMatSymBlkDiag mFUL;
-#endif
+    BlockMatrixType mFUL;
     
 public:
 
