@@ -80,7 +80,7 @@ public:
 
     
     /// reset with 'dia' on diagonal and 'off' elsewhere
-    void reset(real dia, real off);
+    void reset(real off, real dia);
     
     /// reset terms 'kl' below the diagonal or 'ku' above
     void truncate(size_t kl, size_t ku);

@@ -63,7 +63,7 @@ public:
     }
     
     /// set diagonal to 'dia' and other elements to 'off'
-    void reset(real dia, real)
+    void reset(real, real dia)
     {
         val_ = dia;
     }

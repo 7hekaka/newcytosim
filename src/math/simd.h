@@ -199,7 +199,7 @@ LOCAL vec4 broadcast2(double const* a)  { return _mm256_broadcast_pd((__m128d co
 LOCAL vec2 getlo(vec4 a)                { return _mm256_castpd256_pd128(a); }
 /// return { A2, A3 }
 LOCAL vec2 gethi(vec4 a)                { return _mm256_extractf128_pd(a,1); }
-/// concatenate two vec2 into a vec4
+/// concatenate two vec2 into a vec4: { l[0], l[0], h[0], h[1] }
 LOCAL vec4 cat22(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
 
 LOCAL vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }

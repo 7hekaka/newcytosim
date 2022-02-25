@@ -209,8 +209,6 @@ public:
         assert_true( ii >= jj );
         assert_true( ii < size_ );
         assert_true( jj < size_ );
-        assert_true( ii % BLOCK_SIZE == 0 );
-        assert_true( jj % BLOCK_SIZE == 0 );
         return row_[ii].block(jj);
     }
     
@@ -218,7 +216,6 @@ public:
     Block& diag_block(const size_t ii)
     {
         assert_true( ii < size_ );
-        assert_true( ii % BLOCK_SIZE == 0 );
         return row_[ii].block(ii);
     }
 

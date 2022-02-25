@@ -649,7 +649,7 @@ Vector SparMatBlk::Line::vecMul(const real* X) const
 {
     Vector res(0,0,0);
     for ( size_t n = 0; n < rlen_; ++n )
-        res += blk_[n] * Vector(X+BLOCK_SIZE*inx_[n]);
+        res += blk_[n].vecmul(X+BLOCK_SIZE*inx_[n]);
     return res;
 }
 

@@ -131,7 +131,7 @@ public:
     }
     
     /// set diagonal to 'dia' and other elements to 'off'
-    void reset(real dia, real off)
+    void reset1(real off, real dia)
     {
         for ( index u = 0; u < 3*LVD; ++u )
             val[u] = off;

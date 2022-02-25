@@ -12,7 +12,7 @@ class Modulo;
 
 /// Can be moved and rotated in space
 /**
-Movable provides a common interface, for Object that can be moves or rotated.
+Movable provides a common interface, for Object that can be moved or rotated.
 The actual operations need to be implemented by redefining the virtual functions:
  
     if ( mobile() == 0 ):
@@ -27,7 +27,7 @@ The actual operations need to be implemented by redefining the virtual functions
     if ( mobile() == 3 ):
         position() and translate() are implemented
         rotate() is implemented
-     .
+
  To support periodic boundary conditions, foldPosition() should be defined.
  */
 class Movable

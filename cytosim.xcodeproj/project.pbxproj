@@ -550,6 +550,7 @@
 		BB786B1C0AF62D28005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
 		BB7B5A9C241A81BB0063F252 /* tesselator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF390A25FB22003333C9 /* tesselator.h */; };
 		BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* tesselator.cc */; };
+		BB7B89AA27C965C50094532C /* matrix33sym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7B89A927C965C50094532C /* matrix33sym.h */; };
 		BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591105B98DA3006956D5 /* test_rasterizer.cc */; };
 		BB7F684012D0F1B100F8FC84 /* display_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7F683E12D0F1B100F8FC84 /* display_prop.cc */; };
 		BB7F684112D0F1B100F8FC84 /* display_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7F683F12D0F1B100F8FC84 /* display_prop.h */; };
@@ -1620,6 +1621,7 @@
 		BB770C0312FF44D100D018A0 /* shackle.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shackle.cc; path = couples/shackle.cc; sourceTree = "<group>"; };
 		BB770C0412FF44D100D018A0 /* shackle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shackle.h; path = couples/shackle.h; sourceTree = "<group>"; };
 		BB77D6FB05F12F16001C0596 /* frametool.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = frametool.cc; path = src/tools/frametool.cc; sourceTree = SOURCE_ROOT; };
+		BB7B89A927C965C50094532C /* matrix33sym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix33sym.h; sourceTree = "<group>"; };
 		BB7C2B7F05F93FB9002C69A9 /* test_rasterizer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_rasterizer; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		BB7C2BC105FA4EF8002C69A9 /* test_grid */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_grid; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2447,6 +2449,7 @@
 				BB089A092228A26D00C070E7 /* matrix33.cc */,
 				BB19DA9C231BF792001488A5 /* matrix34.h */,
 				BB19DA9D231BF792001488A5 /* matrix34.cc */,
+				BB7B89A927C965C50094532C /* matrix33sym.h */,
 				BB89999320CECB5C00498F48 /* matrix44.h */,
 				BB73588505B98DA3006956D5 /* matrix.h */,
 				BB0E75E505E1440E00BC9B7A /* matrix.cc */,
@@ -3767,6 +3770,7 @@
 				BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */,
 				BB1D4B5A16B86B320087CC48 /* quartic_solver.h in Headers */,
 				BB749D671793645D00B43298 /* polygon.h in Headers */,
+				BB7B89AA27C965C50094532C /* matrix33sym.h in Headers */,
 				BB560C301813DC8800CB1BF5 /* vecprint.h in Headers */,
 				BB6E5EF5245C27E000CEE184 /* xtbsv.h in Headers */,
 				BB6485F02057FDD5005F2CD1 /* monitor.h in Headers */,

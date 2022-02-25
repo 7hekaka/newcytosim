@@ -25,13 +25,15 @@ typedef SparMatSymBlk     SparMatB;
 typedef SparMatSymBlkDiag SparMatD;
 
 // number of multiplication in sequence
-constexpr size_t N_MUL = 47;
+constexpr size_t N_MUL = 89;
 
 // number of repeat of ( 1 prepare + N_MUL multiplications)
-constexpr size_t N_RUN = 4;
+constexpr size_t N_RUN = 8;
+
 
 constexpr size_t CNT = N_RUN * N_MUL;
 
+// extra for allocation
 #define PAD 4
 
 size_t icnt_ = 0;
@@ -86,8 +88,8 @@ void setIndices(size_t cnt, size_t sup)
         {
             size_t i = RNG.pint32(sup);
             size_t j = RNG.pint32(sup);
-            inx_[n] = std::max(i,j);
-            iny_[n] = std::min(i,j);
+            inx_[n] = std::min(i,j);
+            iny_[n] = std::max(i,j);
         }
     }
 }
@@ -212,8 +214,9 @@ template <typename MATRIX>
 void fillMatrix(MATRIX& mat)
 {
 #if ( DIM == 3 )
-    Matrix33 S(alpha, beta, -beta, beta, alpha, beta, -beta, beta, alpha);
+    Matrix33 S(alpha, beta, -beta, beta, -alpha, beta, -beta, beta, alpha);
     Matrix33 U(kappa, iota, iota, -iota, kappa, iota, -iota,-iota, kappa);
+    //Matrix33 U(kappa, iota, -iota, iota, kappa, iota, -iota, iota, -kappa);
 #elif ( DIM == 2 )
     Matrix22 S(alpha, beta, -beta, alpha);
     Matrix22 U(kappa, iota,  iota, kappa);
@@ -223,8 +226,8 @@ void fillMatrix(MATRIX& mat)
 #endif
     for ( size_t n = 0; n < icnt_; ++n )
     {
-        size_t i = DIM * inx_[n];
-        size_t j = DIM * iny_[n];
+        size_t i = DIM * iny_[n];
+        size_t j = DIM * inx_[n];
         
         // this is a block on the diagonal:
         for ( size_t x = 0; x < DIM; ++x )
@@ -239,7 +242,7 @@ void fillMatrix(MATRIX& mat)
                 mat(j+y, j+x) += S(y,x);
             // off-diagonal non-symmetric block!
             for ( size_t x = 0; x < DIM; ++x )
-            for ( size_t y = 0; y < DIM; ++y )
+            for ( size_t y = x; y < DIM; ++y )
                 mat(i+y, j+x) += U(y,x);
         }
     }
@@ -381,8 +384,8 @@ void fillMatrixIso(MATRIX& mat)
 {
     for ( size_t n = 0; n < icnt_; ++n )
     {
-        size_t i = inx_[n];
-        size_t j = iny_[n];
+        size_t i = iny_[n];
+        size_t j = inx_[n];
         //printf("fillMatrixIso %lu %lu <---- %f\n", i, j, alpha);
         mat.diagonal(i) += alpha;
         if ( i > j )
@@ -486,20 +489,26 @@ template < typename MATRIX >
 void fillMatrixBlock(MATRIX& mat)
 {
     typename MATRIX::Block S = MATRIX::Block::outerProduct(dir);
-    typename MATRIX::Block U = MATRIX::Block::outerProduct(dir, vec);
+    typename MATRIX::Block U = MATRIX::Block::outerProduct(vec);
     
     for ( size_t n = 0; n < icnt_; ++n )
     {
-        mat.diag_block(inx_[n]).sub_half(S);
-        mat.diag_block(iny_[n]).add_half(S);
-        mat.block(inx_[n], iny_[n]).add_full(U);
+        size_t i = iny_[n];
+        size_t j = inx_[n];
+        mat.diag_block(i).sub_half(S);
+        mat.diag_block(j).add_half(S);
+        if ( i == j )
+            mat.diag_block(i).add_full(U);
+        else
+            mat.block(i, j).add_full(U);
     }
 }
 
 /**
 This compares the Scalar and SIMD implementations of one matrix
 */
- void testBlockMatrix(SparMatSymBlk & mat, real const* x, real const* y, real * z)
+template <typename MATRIX>
+void testBlockMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 {
     const size_t S = mat.size();
     
@@ -622,15 +631,15 @@ void testBlockMatrix(const size_t S, const size_t F)
     real * x = nullptr;
     real * y = nullptr;
     real * z = nullptr;
-
+    setVectors(DIM*S, x, y, z);
     setIndices(F, S);
-    setVectors(S, x, y, z);
     //beta = -RNG.preal();
     
-    SparMatSymBlk mat;
-    mat.resize(S);
-    testBlockMatrix(mat, x, y, z);
-    
+    printf("------ %i x %lu blocks:\n", DIM, S);
+    SparMatB B; B.resize(DIM*S); testBlockMatrix(B, x, y, z);
+    SparMatD D; D.resize(DIM*S); testBlockMatrix(D, x, y, z);
+    SparMatA A; A.resize(DIM*S); testBlockMatrix(A, x, y, z);
+
     setIndices(0, S);
     free_real(x);
     free_real(y);
@@ -684,7 +693,7 @@ int main( int argc, char* argv[] )
         testBlockMatrix(siz, fill);
     }
 #endif
-#if ( 0 )
+#if ( 1 )
     testBlockMatrix(17, 2);
     testBlockMatrix(347, 1019);
     testBlockMatrix(753, 43039);
