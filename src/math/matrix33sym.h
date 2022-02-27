@@ -903,7 +903,7 @@ public:
     static Matrix33sym vectorProduct(const real dia, const Vector3& vec)
     {
         ABORT_NOW("non symmetric");
-        return Matrix33sym(0, 0);
+        return Matrix33sym(dia, 0);
     }
     
     /// 2D Rotation around `axis` (of norm 1) with angle set by cosine and sine values

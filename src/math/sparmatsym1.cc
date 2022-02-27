@@ -39,7 +39,7 @@ SparMatSym1::SparMatSym1()
     elm_  = nullptr;
 #endif
 #if SPARMAT1_USES_COLNEXT
-    colidx_ = new size_t[2]();
+    colidx_ = new unsigned[2]();
 #endif
 }
 
@@ -96,7 +96,7 @@ void SparMatSym1::allocate(size_t alc)
 #endif
 #if SPARMAT1_USES_COLNEXT
         delete[] colidx_;
-        colidx_ = new size_t[alc+1];
+        colidx_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             colidx_[n] = n;
 #endif

@@ -69,9 +69,9 @@ public:
         friend class SparMatBlk;
         friend class Meca;
 
-        Block  *blk_;  ///< block elements
-        Block  *sbk_;  ///< pointer for consolidated elements
-        size_t *inx_;  ///< column index for each element
+        Block *blk_;  ///< block elements
+        Block *sbk_;  ///< pointer for consolidated elements
+        unsigned *inx_;  ///< column index for each element
         size_t rlen_;  ///< number of elements in row
         size_t allo_;  ///< allocated size
 
@@ -169,7 +169,7 @@ private:
     Line *  row_;
     
     /// colidx_[i] is the index of the first non-empty row of index >= i
-    size_t* colidx_;
+    unsigned* colidx_;
 
     /// memory for consolidated version
     Block * blocks_;

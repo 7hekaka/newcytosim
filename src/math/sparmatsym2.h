@@ -55,7 +55,7 @@ private:
 
 #if SPARMAT2_USES_COLNEXT
     /// colidx_[i] is the index of the first non-empty column of index >= i
-    size_t * colidx_;
+    unsigned * colidx_;
 #endif
 
     /// allocate column to hold specified number of values

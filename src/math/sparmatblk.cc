@@ -14,7 +14,7 @@ SparMatBlk::SparMatBlk()
     alloc_  = 0;
     row_    = nullptr;
     blocks_ = nullptr;
-    colidx_ = new size_t[2]();
+    colidx_ = new unsigned[2]();
 }
 
 
@@ -44,7 +44,7 @@ void SparMatBlk::allocate(size_t alc)
         alloc_ = alc;
         
         delete[] colidx_;
-        colidx_ = new size_t[alc+1];
+        colidx_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             colidx_[n] = n;
     }
@@ -80,9 +80,9 @@ void SparMatBlk::Line::allocate(size_t alc)
         void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+4);
         Block * blk_new  = new(ptr) Block[alc];
 
-        if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
+        if ( posix_memalign(&ptr, 32, alc*sizeof(unsigned)) )
             throw std::bad_alloc();
-        size_t * inx_new = (size_t*)ptr;
+        auto * inx_new = (unsigned*)ptr;
 
         if ( inx_ )
         {
@@ -677,7 +677,7 @@ vec2 SparMatBlk::Line::vecMul2D(const double* X) const
     vec4 ss = setzero4();
     Block const* blk = blk_;
     Block const* end = blk_ + rlen_;
-    size_t const* inx = inx_;
+    auto const* inx = inx_;
     #pragma nounroll
     for ( ; blk < end; ++blk )
     {
@@ -706,7 +706,7 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
     vec4 vv = setzero4();
     Block const* blk = sbk_;
     Block const* end = sbk_ + ( rlen_ & ~3 );
-    size_t const* inx = inx_;
+    auto const* inx = inx_;
     #pragma nounroll
     for ( ; blk < end; blk += 4, inx += 4 )
     {
@@ -765,7 +765,7 @@ vec4 SparMatBlk::Line::vecMul3D(const double* X) const
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     Block const* blk = blk_;
     Block const* end = blk_ + rlen_;
-    size_t const* inx = inx_;
+    auto const* inx = inx_;
     #pragma nounroll
     for ( ; blk < end; ++blk )
     {
@@ -803,7 +803,7 @@ vec4 SparMatBlk::Line::vecMul3DU(const double* X) const
 
     Block const* blk = sbk_;
     Block const* end = sbk_ + ( rlen_ & ~1 );
-    size_t const* inx = inx_;
+    auto const* inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers
@@ -871,7 +871,7 @@ vec4 SparMatBlk::Line::vecMul3DUU(const double* X) const
 
     Block const* blk = sbk_;
     Block const* end = sbk_ + (rlen_-rlen_%3);
-    size_t const* inx = inx_;
+    auto const* inx = inx_;
     {
         /*
          Unrolling will reduce the dependency chain but the number of registers

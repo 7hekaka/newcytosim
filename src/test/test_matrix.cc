@@ -37,8 +37,8 @@ constexpr size_t CNT = N_RUN * N_MUL;
 #define PAD 4
 
 size_t icnt_ = 0;
-size_t * inx_ = nullptr;
-size_t * iny_ = nullptr;
+unsigned * inx_ = nullptr;
+unsigned * iny_ = nullptr;
 
 real alpha = 2.0;
 real beta = -1.0;
@@ -82,8 +82,8 @@ void setIndices(size_t cnt, size_t sup)
     icnt_ = cnt;
     if ( cnt > 0 )
     {
-        inx_ = new size_t[icnt_];
-        iny_ = new size_t[icnt_];
+        inx_ = new unsigned[icnt_];
+        iny_ = new unsigned[icnt_];
         for ( size_t n = 0; n < cnt; ++n )
         {
             size_t i = RNG.pint32(sup);

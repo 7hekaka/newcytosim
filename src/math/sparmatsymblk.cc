@@ -29,7 +29,7 @@ SparMatSymBlk::SparMatSymBlk()
     size_   = 0;
     alloc_  = 0;
     column_ = nullptr;
-    colidx_ = new size_t[2]();
+    colidx_ = new unsigned[2]();
 }
 
 
@@ -58,7 +58,7 @@ void SparMatSymBlk::allocate(size_t alc)
         alloc_  = alc;
         
         delete[] colidx_;
-        colidx_ = new size_t[alc+1];
+        colidx_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             colidx_[n] = n;
     }
@@ -80,7 +80,7 @@ void SparMatSymBlk::deallocate()
 SparMatSymBlk::Column::Column()
 {
     nbb_ = 0;
-    allo_ = 0;
+    alo_ = 0;
     inx_ = nullptr;
     blk_ = nullptr;
 }
@@ -92,7 +92,7 @@ SparMatSymBlk::Column::Column()
  */
 void SparMatSymBlk::Column::allocate(size_t alc)
 {
-    if ( alc > allo_ )
+    if ( alc > alo_ )
     {
         //if ( inx_ ) fprintf(stderr, "SMSB reallocates column %lu for %lu\n", inx_[0], alc);
         //else fprintf(stderr, "SMSB allocates column for %u\n", alc);
@@ -107,9 +107,9 @@ void SparMatSymBlk::Column::allocate(size_t alc)
         void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+4);
         Block * blk_new  = new(ptr) Block[alc];
 
-        if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
+        if ( posix_memalign(&ptr, 32, alc*sizeof(unsigned)) )
             throw std::bad_alloc();
-        size_t * inx_new = (size_t*)ptr;
+        auto * inx_new = (unsigned*)ptr;
 
         if ( inx_ )
         {
@@ -124,9 +124,9 @@ void SparMatSymBlk::Column::allocate(size_t alc)
                 blk_new[n] = blk_[n];
             free_real(blk_);
         }
-        inx_  = inx_new;
-        blk_  = blk_new;
-        allo_ = alc;
+        inx_ = inx_new;
+        blk_ = blk_new;
+        alo_ = alc;
         
         //std::clog << "Column " << this << "  " << alc << ": ";
         //std::clog << " alignment " << ((uintptr_t)elem_ & 63) << "\n";
@@ -136,12 +136,12 @@ void SparMatSymBlk::Column::allocate(size_t alc)
 
 void SparMatSymBlk::Column::deallocate()
 {
-    //if ( inx_ ) fprintf(stderr, "SMSB deallocates column %lu of size %lu\n", inx_[0], allo_);
+    //if ( inx_ ) fprintf(stderr, "SMSB deallocates column %lu of size %lu\n", inx_[0], alo_);
     free(inx_);
     free_real(blk_);
     inx_ = nullptr;
     blk_ = nullptr;
-    allo_ = 0;
+    alo_ = 0;
     nbb_ = 0;
 }
 
@@ -153,12 +153,12 @@ void SparMatSymBlk::Column::operator =(SparMatSymBlk::Column & col)
     free_real(blk_);
 
     nbb_ = col.nbb_;
-    allo_ = col.allo_;
+    alo_ = col.alo_;
     inx_ = col.inx_;
     blk_ = col.blk_;
     
     col.nbb_ = 0;
-    col.allo_ = 0;
+    col.alo_ = 0;
     col.inx_ = nullptr;
     col.blk_ = nullptr;
 }
@@ -429,7 +429,7 @@ size_t SparMatSymBlk::nbElements(size_t start, size_t stop, size_t& alc) const
     for ( size_t i = start; i < stop; ++i )
     {
         cnt += column_[i].nbb_;
-        alc += column_[i].allo_;
+        alc += column_[i].alo_;
     }
     return cnt;
 }
@@ -1034,9 +1034,9 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
 
-    size_t const* inx = inx_ + 1;
     Block const* blk = blk_ + 1;
     Block const* end = blk_ + 1 + ( (nbb_-1) & ~1 );
+    auto const* inx = inx_ + 1;
     // process 2 by 2:
     #pragma nounroll
     for ( ; blk < end; blk += 2, inx += 2 )
@@ -1094,9 +1094,9 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();
 
-    size_t const* inx = inx_ + 1;
     Block const* blk = blk_ + 1;
     Block const* end = blk_ + 1 + ( (nbb_-1) & ~3 );
+    auto const* inx = inx_ + 1;
     // process 4 by 4:
     #pragma nounroll
     for ( ; blk < end; blk += 4, inx += 4 )
@@ -1271,7 +1271,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
     ++blk;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     Block const* end = blk_ + 1 + ( (nbb_-1) & ~1 );
-    const size_t * inx = inx_ + 1;
+    auto const* inx = inx_ + 1;
     /*
      Unrolling will reduce the dependency chain, which may be limiting the
      throughput here. However the number of registers (16 for AVX CPU) limits

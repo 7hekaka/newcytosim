@@ -60,11 +60,11 @@ public:
         friend class SparMatSymBlk;
         friend class Meca;
 
-        size_t  allo_;   ///< allocated size of array
-        size_t   nbb_;   ///< number of blocks in column
-        size_t * inx_;   ///< line index for each element
-        Block  * blk_;   ///< all blocks
-        
+        Block* blk_;    ///< all blocks
+        unsigned* inx_; ///< line index for each element
+        size_t alo_;   ///< allocated size of array
+        size_t nbb_;    ///< number of blocks in column
+
     public:
         
         /// constructor
@@ -153,7 +153,7 @@ private:
     Column * column_;
     
     /// colidx_[i] is the index of the first non-empty column of index >= i
-    size_t * colidx_;
+    unsigned * colidx_;
 
 public:
     

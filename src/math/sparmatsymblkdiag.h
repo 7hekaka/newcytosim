@@ -61,7 +61,7 @@ public:
         friend class Meca;
 
         Block   dia_;   ///< diagonal block
-        size_t* inx_;   ///< line index for each element
+        unsigned* inx_;   ///< line index for each element
         Block * blk_;   ///< off-diagonal blocks
         size_t allo_;   ///< allocated size of array
         size_t noff_;   ///< number of blocks in column
@@ -169,7 +169,7 @@ private:
     Pilar * pilar_;
     
     /// colix_[i] is the index of the first non-empty column of index >= i
-    size_t * colix_;
+    unsigned * colix_;
 
 public:
     

@@ -29,7 +29,7 @@ SparMatSymBlkDiag::SparMatSymBlkDiag()
     size_  = 0;
     alloc_ = 0;
     pilar_ = nullptr;
-    colix_ = new size_t[2]();
+    colix_ = new unsigned[2]();
 }
 
 
@@ -58,7 +58,7 @@ void SparMatSymBlkDiag::allocate(size_t alc)
         alloc_ = alc;
         
         delete[] colix_;
-        colix_ = new size_t[alc+1];
+        colix_ = new unsigned[alc+1];
         for ( size_t n = 0; n <= alc; ++n )
             colix_[n] = n;
     }
@@ -109,9 +109,9 @@ void SparMatSymBlkDiag::Pilar::allocate(size_t alc)
         void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+4);
         Block * blk_new  = new(ptr) Block[alc];
 
-        if ( posix_memalign(&ptr, 32, alc*sizeof(size_t)) )
+        if ( posix_memalign(&ptr, 32, alc*sizeof(unsigned)) )
             throw std::bad_alloc();
-        size_t * inx_new = (size_t*)ptr;
+        auto * inx_new = (unsigned*)ptr;
 
         if ( inx_ )
         {
@@ -827,8 +827,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t 
     const vec4f x1 = clear4th(broadcastYf(xxx));
     const vec4f x2 = clear4th(broadcastZf(xxx));
 
-    Block  const* blk = blk_;
-    size_t const* inx = inx_;
+    Block const* blk = blk_;
+    auto const* inx = inx_;
 
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
@@ -889,8 +889,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
     const vec4f x1 = clear4th(broadcastYf(xxx));
     const vec4f x2 = clear4th(broadcastZf(xxx));
 
-    Block  const* blk = blk_;
-    size_t const* inx = inx_;
+    Block const* blk = blk_;
+    auto const* inx = inx_;
 
     if ( noff_ > 0 )
     {
@@ -1007,7 +1007,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
 
     Block const* blk = blk_;
     Block const* end = blk_ + noff_;
-    size_t const* inx = inx_;
+    auto const* inx = inx_;
     
     //size_t n = 0;
     if ( 1 ) {
@@ -1213,9 +1213,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size
     const vec4 xxyy = permute4(xyxy, 0b1100);
     vec4 s1 = setzero4();
     
-    size_t const* inx = inx_;
     Block const* blk = blk_;
     Block const* end = blk_ + ( noff_ & ~1 );
+    auto const* inx = inx_;
     // process 2 by 2:
     #pragma nounroll
     for ( ; blk < end; blk += 2, inx += 2 )
@@ -1272,9 +1272,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
     vec4 s3 = setzero4();
 
     Block  const* blk = blk_;
-    size_t const* inx = inx_;
     Block const* end = blk_ + ( noff_ & ~3 );
-    
+    auto const* inx = inx_;
+
     // process 4 by 4:
     #pragma nounroll
     for ( ; blk < end; blk += 4, inx += 4 )
@@ -1439,9 +1439,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVXU(const double* X, double* Y, size
         vec4 t1 = setzero4();
         vec4 t2 = setzero4();
         // There is a dependency in the loop for 's0', 's1' and 's2'.
-        size_t const* inx = inx_;
         Block const* blk = blk_;
         Block const* end = blk_ + ( noff_ & ~1 );
+        auto const* inx = inx_;
         /*
          Unrolling will reduce the dependency chain, which may be limiting the
          throughput here. However the number of registers (16 for AVX CPU) limits
@@ -1555,9 +1555,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_AVX(const double* X, double* 
         vec4 t1 = setzero4();
         vec4 t2 = setzero4();
         // There is a dependency in the loop for 's0', 's1' and 's2'.
-        size_t const* inx = inx_;
         Block const* blk = blk_;
         Block const* end = blk_  + ( noff_ & ~1 );
+        auto const* inx = inx_;
         /*
          Unrolling will reduce the dependency chain, which may be limiting the
          throughput here. However the number of registers (16 for AVX CPU) limits
