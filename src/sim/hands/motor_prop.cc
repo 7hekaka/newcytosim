@@ -41,7 +41,8 @@ void MotorProp::read(Glossary& glos)
     glos.set(stall_force,    "stall_force", "force");
     glos.set(unloaded_speed, "unloaded_speed", "speed");
 #if BACKWARD_COMPATIBILITY < 100
-    glos.set(unloaded_speed, "max_speed");
+    if ( glos.set(unloaded_speed, "max_speed") )
+        Cytosim::warn << "'max_speed' is deprecated: use 'unloaded_speed'\n";
 #endif
 #if NEW_VARIABLE_SPEED
     glos.set(variable_speed, "variable_speed");
