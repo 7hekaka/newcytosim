@@ -2,7 +2,7 @@
 #
 # A script to plot for project with Ronen Zaidel-Bar
 #
-# F. Nedelec, Strasbourg, 16.12.2021, 8-13.1.2022
+# F. Nedelec, Strasbourg, 16.12.2021, 8-13.1.2022, 24.2.2022
 
 
 """
@@ -72,7 +72,7 @@ def nice_plot(time, data):
     """
         Plot size as a function of time
     """
-    fig = plt.figure(figsize=(5.12, 3.84))
+    fig = plt.figure(figsize=(3.84, 3.84))
     plt.plot(time, data, 'b-', linewidth=7)
     # add horizontal bar at starting size:
     h = data[0]
@@ -83,7 +83,7 @@ def nice_plot(time, data):
         fit = [ A*math.exp(B*t) for t in time ]
         txt = str(round(A,3)) + " exp("+str(round(B,5))+" t )"
         plt.plot(time, fit, 'w.', markersize=7, label=txt)
-    plt.ylim(0, 7)
+    plt.ylim(0, 10)
     plt.xlabel('Time (s)', fontsize=fts)
     plt.ylabel('Radius (um)', fontsize=fts)
     plt.legend(loc='upper right', fontsize=7)
@@ -187,7 +187,7 @@ def process(dirpath, momfile):
     """
     os.chdir(dirpath)
     if not os.path.isfile(momfile) and os.path.isfile('properties.cmp'):
-        args = ['reportN', 'fiber:moment,couple']
+        args = ['reportN', 'fiber:moment,couple,single']
         subprocess.call(args, stdout=open(momfile, 'w'))
     try:
         f = open(momfile, 'r')
@@ -198,7 +198,7 @@ def process(dirpath, momfile):
     if do_plot:
         nice_plot(time, data)
         plt.title(dirpath, fontsize=fts)
-        plt.savefig('size.png', dpi=100)
+        plt.savefig('size.png', dpi=500)
         #plt.show()
         plt.close()
     if add_fit:
@@ -212,17 +212,16 @@ def process(dirpath, momfile):
     return [dirpath, A, B, C, D, length];
 
 
-def print_results(res, filename=''):
+def print_results(data, filename=''):
     """
         Save numeric data from file
     """
+    f = sys.stdout
     if filename:
         f = open(filename, 'w')
-    else:
-        f = sys.stdout
     f.write("% path fit_size fit_rate size0 type polymer\n")
-    for i in res:
-        f.write("%s %f %f %f %i %.2f\n" % (i[0], i[1], i[2], i[3], i[4], i[5]))
+    for i in data:
+        f.write("%12s %12f %12f %12f  %i %12.2f\n" % (i[0], i[1], i[2], i[3], i[4], i[5]))
     if filename:
         f.close()
 
@@ -234,22 +233,20 @@ def main(args):
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
-        elif arg[0].isalpha():
-            output = arg
         else:
-            sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
-            sys.exit()
+            sys.stderr.write("  Warning: unexpected argument `%s'\n" % arg)
     if not paths:
         sys.stderr.write("Please specify some directory paths\n")
         sys.exit()
     cdir = os.getcwd()
+    output = os.path.join(cdir,output)
     results = []
     for p in paths:
         sys.stdout.write('- '*32+p+"\n")
         res = process(p, 'mom.txt')
         results.append(res)
         os.chdir(cdir)
-    if results and not os.path.isfile(output) or not do_plot:
+    if not os.path.isfile(output):
         print_results(results, output)
 
 

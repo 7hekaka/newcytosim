@@ -34,7 +34,7 @@ def plot(X, Y):
     """
         Make one plot to compare data in conditions X and Y
     """
-    fig = plt.figure(figsize=(5.12, 3.84))
+    fig = plt.figure(figsize=(3.84, 3.84))
     plt.scatter(X, Y, marker='o', s=8, c='blue')
     # add diagonal:
     M = math.ceil(20*max(X))*0.05
@@ -45,11 +45,11 @@ def plot(X, Y):
 
 
 def modifs(mod):
-    keys = ['Reference', 'MoreActin', 'MoreArp23', 'MoreMyosin', 'DeadArp23']
+    keys = ['Reference', ' 2xActin', ' 1.33xArp23', ' 2xMyosin', 'Dead Arp23', '*']
     res = ''
     if not mod:
         return keys[0]
-    for i in { 0, 1, 2, 3 }:
+    for i in { 0, 1, 2, 3, 4 }:
         if int((mod>>i)&1):
             res+=keys[i+1]
     return res
@@ -57,11 +57,11 @@ def modifs(mod):
 
 def one_plot(pool, X, Y):
     fig = plot(pool[X], pool[Y]);
-    plt.xlabel('Contraction (%s)' % modifs(X), fontsize=fts)
-    plt.ylabel('Contraction (%s)' % modifs(Y), fontsize=fts)
-    plt.title('Rate correlation', fontsize=fts)
+    plt.xlabel('%s' % modifs(X), fontsize=fts)
+    plt.ylabel('%s' % modifs(Y), fontsize=fts)
+    plt.title('Contraction rate (um/s)', fontsize=fts)
     fig.tight_layout()
-    plt.savefig('0_contraction%i%i.png' %(X,Y), dpi=100)
+    plt.savefig('0_contraction%i%i.png' %(X,Y), dpi=500)
     plt.close()
 
 
@@ -88,12 +88,12 @@ def many_plots(data):
         if ( b < a ):
             print(a, b)
     # check some pairs:
-    if 7 in pool:
+    if { 5, 7 }.issubset(pool):
         one_plot(pool, 5, 7)
-    if { 1, 4, 7 }.issubset(pool):
-        #check combination of 1 and 4 against 5:
-        pool[21] = [ b * c / a for a, b, c in zip(pool[0], pool[1], pool[4]) ]
-        one_plot(pool, 5, 21)
+    if { 1, 4, 5 }.issubset(pool):
+        # combine effects of 1 and 4 and compare against 5:
+        pool[16+5] = [ b * c / a for a, b, c in zip(pool[0], pool[1], pool[4]) ]
+        one_plot(pool, 5, 16+5)
 
 #-------------------------------------------------------------------------------
 
