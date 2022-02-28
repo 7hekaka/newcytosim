@@ -79,7 +79,7 @@ void check(int N, int ORD, real const* S, real const* AB, real* B, char const st
         for ( size_t u = 0; u < SUB; ++u )
             FUNC(N, AB, B);
     }
-    printf(" %-14s cpu %7.0f\n", str, tock(cnt*SUB));
+    printf(" %-14s cpu %7.0f\n", str, tock());
 }
 
 //------------------------------------------------------------------------------
@@ -543,8 +543,8 @@ void testGETRS(size_t cnt)
 int main(int argc, char* argv[])
 {
     RNG.seed();
-    testISO(1<<9);
-    testPOTRS(1<<7);
-    testTBSV(1<<9);
-    testGETRS(1<<9);
+    testISO(1<<14);
+    testPOTRS(1<<10);
+    testTBSV(1<<12);
+    testGETRS(1<<10);
 }

@@ -25,7 +25,7 @@ void test(int N, real const* Ds, real const* Us, real* D, real* U, char const st
         copy_real(N, Us, U);
         FUNC(N, D, U, &info);
     }
-    printf(" %12s %5.2f\n", str, tock(N*cnt));
+    printf(" %12s cpu %5.0f\n", str, tock());
 }
 
 
@@ -90,7 +90,7 @@ void check(int N, real const* Ds, real const* Us, real const* Bs, real* D, real*
         tick();
         for ( size_t n = 0; n < cnt; ++n )
             SOLVE(N, D, U, B);
-        printf(" %5.2f", tock(N*cnt));
+        printf(" cpu %5.0f", tock());
     }
     printf("\n");
 }
@@ -124,8 +124,8 @@ void testSolve(int NSEG, size_t cnt)
     lapack::xpttrf(NSEG, D, U, &info);
     lapack::xptts2(NSEG, D, U, S);
 
-    check<lapack_xpttrf, lapack_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "clapack", cnt);
     check<lapack::xpttrf, lapack::xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "lapack", cnt);
+    check<lapack_xpttrf, lapack_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "c-lapack", cnt);
     check<italian_factor, italian_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "italian", cnt);
     check<alsatian_xpttrf, alsatian_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "alsatian", cnt);
 
@@ -149,10 +149,10 @@ void verify(int N, real const* Ds, real const* Us, real const* Bs, real* D, real
         copy_real(N, Ds, D);
         copy_real(N, Us, U);
         copy_real(N, Bs, B);
-        alsatian_thomas(N, D, U, B);
+        FUNC(N, D, U, B);
     }
     VecPrint::edges(N, B);
-    printf(" %12s %5.2f\n", str, tock(N*cnt));
+    printf(" %12s cpu %5.0f\n", str, tock());
 }
 
 void solve1(int N, real* D, real* U, real* B)
@@ -222,15 +222,15 @@ void testThomas(int NSEG, size_t cnt)
 int main(int argc, char* argv[])
 {
     int nbs = 117;
-    if ( argc > 1)
+    if ( argc > 1 )
         nbs = std::max(1, atoi(argv[1]));
     
     RNG.seed();
     std::cout << "Tridiagonal positive symmetric matrix --- real " << sizeof(real) << " bytes --- " << __VERSION__ << "\n";
     std::cout << "testPTTRF\n";
-    testFactor(nbs, 1<<10);
+    testFactor(nbs, 1<<20);
     std::cout << "testPTTS\n";
-    testSolve(nbs, 1<<17);
+    testSolve(nbs, 1<<20);
     std::cout << "testThomas\n";
-    testThomas(nbs, 1<<15);
+    testThomas(nbs, 1<<18);
 }

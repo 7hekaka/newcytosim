@@ -54,7 +54,7 @@ inline void tick()
 }
 
 /// return time since last 'tick()', divided by 'arg'
-inline double tock(double arg = 1e3)
+inline double tock(double arg = 1)
 {
     timeval tv;
     gettimeofday(&tv, nullptr);

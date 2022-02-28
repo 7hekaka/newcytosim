@@ -163,7 +163,7 @@ void test(size_t cnt)
         for ( size_t i = 0; i < MAX; ++i )
             vec[i] = vic[i].orthogonal();
     }
-    printf("  orthogonal    %7.3f\n", tock(cnt*MAX));
+    printf("  orthogonal    %7.3f\n", tock(MAX));
     
 #if 1
     tick();
@@ -174,7 +174,7 @@ void test(size_t cnt)
         for ( size_t i = 0; i < MAX; ++i )
             vec[i] = vic[i].orthogonalB();
     }
-    printf("  orthogonalB   %7.3f\n", tock(cnt*MAX));
+    printf("  orthogonalB   %7.3f\n", tock(MAX));
 #endif
 }
 

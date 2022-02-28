@@ -448,7 +448,7 @@ void testRigidity(size_t cnt, char const* str)
         printf(" XXXX %e ", err);
     else
         printf("  --> %e ", err);
-    printf(" %4s %5.2f cycles\n", str, tock(cnt*nbt));
+    printf(" %4s cpu %5.2f\n", str, tock());
 }
 
 

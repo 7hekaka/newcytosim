@@ -932,7 +932,7 @@ void testU(UINT cnt, char const* str)
         FUNC(NSEG, dir_, x, y);
         FUNC(NSEG, dir_, z, y);
     }
-    printf("  %10s %5.2f", str, tock(cnt*NSEG));
+    printf("  %10s %5.0f", str, tock());
     print_fe_exceptions("");
     printf("\n");
     free_reals(x,y,z);
@@ -956,7 +956,7 @@ void testD(UINT cnt, char const* str)
         FUNC(NSEG, dir_, y, lag_, x);
         FUNC(NSEG, dir_, z, lag_, y);
     }
-    printf("  %10s %5.2f", str, tock(cnt*NSEG));
+    printf("  %10s %5.0f", str, tock());
     print_fe_exceptions("");
     printf("\n");
     free_reals(x,y,z);
@@ -981,7 +981,7 @@ void timeProject(UINT cnt, char const* str)
         FUNC(NSEG, y, z);
         FUNC(NSEG, z, x);
     }
-    printf("  %10s %5.2f", str, tock(cnt*NSEG));
+    printf("  %8s %5.0f", str, tock());
     print_fe_exceptions("");
     printf("\n");
     free_reals(x,y,z);
