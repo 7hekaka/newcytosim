@@ -1,8 +1,17 @@
-# pyned.py contains often used python subroutines
-# it is not executable by itself
-# Copyright F. Nedelec, 2017--2019
+#!/usr/bin/env python
+#
+# pyned.py
+#
+# Often used python subroutines
+#
+# Copyright F. Nedelec, 18.08.2017
 
-import os, subprocess, math, copy;
+"""
+    
+    F. Nedelec, 18.08.2017, 8.03.2022
+"""
+
+import os, subprocess, math;
 
 
 def random_color():
@@ -12,7 +21,7 @@ def random_color():
     return (R, G, B)
 
 
-def square(x):
+def sqr(x):
     return x * x;
 
 
@@ -43,6 +52,7 @@ def kizduzs(z):
         return ( a, b )
     else:
         return ( b, a - b )
+
 
 
 def format_line(data):
@@ -121,12 +131,12 @@ def frange(s, e, n):
     return [ s+i*x for x in range(n) ]
 
 
-def simple_linear_fit(arg):
+
+def simple_linear_fit(data):
     """
     Fit an linear law, minimizing squared residual with vertical offset
     This returns (0,B) where the best fit is B * x
     """
-    data = copy.deepcopy(arg)
     s = 0
     sxx = 0
     sxy = 0
@@ -141,12 +151,11 @@ def simple_linear_fit(arg):
         return ()
 
 
-def linear_fit(arg):
+def linear_fit(data):
     """
     Fit an linear law, minimizing squared residual with vertical offset
     This returns (A,B) where the best fit is A + B * x
     """
-    data = copy.deepcopy(arg)
     s = 0
     sx = 0
     sy = 0
@@ -167,13 +176,12 @@ def linear_fit(arg):
         return ()
 
 
-def exponential_fit(arg, ybase = 0):
+def exponential_fit(data, ybase = 0):
     """
     Fit an exponential law, using robust (second) method described in
         http://mathworld.wolfram.com/LeastSquaresFittingExponential.html
     This returns (A,B) where the best fit is A * exp(B*x)
     """
-    data = copy.deepcopy(arg)
     sy = 0
     sxy = 0
     sxxy = 0
@@ -188,42 +196,37 @@ def exponential_fit(arg, ybase = 0):
             syly += y * math.log(yb)
             sxyly += x * y * math.log(yb)
     if sy > 0:
-        a = ( sxxy*syly - sxy*sxyly ) / ( sy*sxxy - sxy*sxy )
-        b = ( sy*sxyly - sxy*syly ) / ( sy*sxxy - sxy*sxy )
+        n = sy*sxxy - sxy*sxy
+        a = ( sxxy*syly - sxy*sxyly ) / n
+        b = ( sy*sxyly - sxy*syly ) / n
         return ( math.exp(a), b )
     else:
         return ()
 
 
-def exponential_model_fit(arg):
+def exponential_model_fit(data):
     """
-    Fit an exponential curve  A*exp(B*x) + C to the data
+    Fit an exponential curve  A*exp(B*x)+C to the data
     This returns (A,B,C)
     """
-    data = copy.deepcopy(arg)
-    mxy = min(data)
-    best_err = math.inf
-    best_fit = ()
-    for m in range(0, 100):
-        C = mxy-m
+    C = 0
+    i = 0
+    while i < 20:
+        i += 1
         A, B = exponential_fit(data, C)
-        data = copy.deepcopy(arg)
-        err = 0
+        off = 0
         for x, y in data:
-            err += abs(y-A*math.exp(B*x)-C)
-            print(C, err)
-        if err < best_err:
-            best_err = err
-            best_fit = (A,B,C)
-    return best_fit
+            off += y - A * math.exp(B*x) - C
+        C += off / len(data)
+        #print(i, A, B, C, off)
+    return (A, B, C)
 
 
-def power_fit(arg, power):
+def power_fit(data, power):
     """
     Fit a powerlaw with given exponent
     This returns (A) where the best fit is A * x^power
     """
-    data = copy.deepcopy(arg)
     sxx = 0
     sxy = 0
     for x, y in data:
@@ -233,14 +236,13 @@ def power_fit(arg, power):
     return scale
 
 
-def powerlaw_fit(arg):
+def powerlaw_fit(data):
     """
     Fit a powerlaw, direct method as described in:
         http://mathworld.wolfram.com/LeastSquaresFittingPowerLaw.html
     This returns (A,B) where the best fit is A * x^B
     """
     from math import log, exp
-    data = copy.deepcopy(arg)
     s = 0
     sx = 0
     sy = 0
@@ -262,31 +264,3 @@ def powerlaw_fit(arg):
         scale = exp(( sy - power * sx ) / s);
         return ( scale, power )
     return ()
-
-
-def quadratic_val(arg, pol):
-    """
-    return value of 2-d order polynomial
-    """
-    return [ pol[0] * x * x + pol[1] * x + pol[2] for x in arg ]
-
-
-def quadratic_fit(data):
-    """
-    fit 2-d order polynomial to data = [ (x, y), ... ]
-    returns parameters [ a, b, c ] of the best fit: a * x^2 + b * x + c
-    """
-    sx = 0; sx2 = 0; sx3 = 0; sx4 = 0;
-    sx2y = 0; sxy = 0; sy = 0
-    for x, y in data:
-        x2 = x * x
-        sx = sx + x
-        sx2 = sx2 + x2
-        sx3 = sx3 + x2 * x
-        sx4 = sx4 + x2 * x2
-        sx2y = sx2y + x2 * y
-        sxy = sxy + x * y
-        sy = sy + y
-    mat = numpy.array([[sx4,sx3,sx2],[sx3,sx2,sx],[sx2,sx,len(data)]])
-    sol = numpy.linalg.inv(mat).dot([sx2y, sxy, sy])
-    return sol

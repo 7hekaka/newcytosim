@@ -2,7 +2,7 @@
 #
 # make_page.py creates a HTML page with links to files in given directories
 #
-# Copyright FJ Nedelec, 14.12.2007 -- 4.2015 & 27.2.2022
+# Copyright FJ Nedelec, 14.12.2007 -- 4.2015 & 7.3.2022
 
 """
 Synopsis:
@@ -23,19 +23,19 @@ Info:
 
 Copyright F.J. Nedelec, Cambridge University
 Created  14.12.2007
-Modified 3.2010, 5.2012, 11.2012, 7.2013, 11.2013, 4.2015, 27.2.2022
+Modified 3.2010, 5.2012, 11.2012, 7.2013, 11.2013, 4.2015, 7.3.2022
 """
 
 import sys, os, subprocess
 import struct, imghdr
 
-output = 'page.html'
-out    = 0
-indx   = 1
-imsize = ''
-tile   = 0
-recurs = 0
+out  = 0
+indx = 1
+iarg = ''
+tile = 0
+curs = 0
 excluded = []
+output = 'page.html'
 
 
 def writeHeader():
@@ -125,12 +125,12 @@ def getMovieSize(file):
 
 
 def writeImageLinks(files):
-    global out, imsize
+    global out, iarg
     for f in sorted(files):
         shot = os.path.basename(f)
         #out.write('<br>%s: ' % shot);
         out.write('<a href="javascript:zoom(\'%s\');">\n' % f);
-        out.write('  <img %s src="%s" alt="%s">\n' % (imsize, f, shot));
+        out.write('  <img %s src="%s" alt="%s">\n' % (iarg, f, shot));
         out.write('</a>\n')
     if files:
         out.write('\n')
@@ -153,7 +153,7 @@ def process(dirpath, subdir, files, images, movies):
     """
     Write HTML code for given directory
     """
-    global out, indx, tile, recurs
+    global out, indx, tile, curs
     if tile > 0:
         out.write('<td>\n')
     out.write('<h3 style="padding:3px;margin:3px"> '+dirpath.lstrip('./'))
@@ -162,7 +162,7 @@ def process(dirpath, subdir, files, images, movies):
     out.write('\n</h3>\n')
     writeImageLinks(images)
     writeMovieLinks(movies)
-    if recurs:
+    if curs:
         for d in subdir:
             process_dir(d)
     if tile > 0:
@@ -200,20 +200,20 @@ def process_dir(dirpath):
 
 def main(args):
     """generates HTML page"""
-    global output, out, imsize, tile, recurs
+    global output, out, iarg, tile, curs
     paths = []
     
     for arg in args:
         [key, equal, val] = arg.partition('=')
         if key and equal=='=' and val:
             if key=='width' or key=='height':
-                imsize = arg
+                iarg = arg
             elif key=='table':
                 tile = int(val)
             elif key=='tile':
                 tile = int(val)
             elif key=='recursive':
-                recurs = int(val)
+                curs = int(val)
             elif key=='exclude':
                 excluded.append(val)
             else:
@@ -233,8 +233,8 @@ def main(args):
     try:
         out = open(output, 'w')
     except Exception as e:
-        sys.stderr.write("Error creating file `%s': %s\n" % (output, repr(e)));
-        out = sys.stdout;
+        sys.stderr.write("Error creating file `%s': %s\n" % (output, repr(e)))
+        out = sys.stdout
     writeHeader()
     
     if tile > 0:
