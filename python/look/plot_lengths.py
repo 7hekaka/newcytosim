@@ -6,15 +6,13 @@
 
 
 """
+Description:
     Plot the histogram of filament length distribution
     This relies on 'reportN' to produce data in 'len.txt'
     
 Syntax:
-    
     plot_lengths.py DIRECTORY_PATH
-    
-Description:
-    
+
 """
 
 #font size:
@@ -89,7 +87,6 @@ def process(dirpath):
     plt.savefig('lengths.png', dpi=150)
     #plt.show()
     plt.close()
-
 
 #------------------------------------------------------------------------
 
