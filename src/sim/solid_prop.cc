@@ -110,7 +110,7 @@ void SolidProp::complete(Simul const& sim)
         }
     }
     
-    if ( confine_stiffness < 0 )
+    if ( confine && confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
     
     if ( sim.primed() && steric && !sim.prop.steric_mode )

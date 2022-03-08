@@ -601,18 +601,19 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
     unsigned cnt[BMAX+1];
 
     real sup = 0;
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
         sup = std::max(sup, fib->length());
 
+    size_t nbin = BMAX;
     real delta = ( sup > 2 ) ? 1 : 0.1;
-    size_t nbin = std::ceil(sup/delta);
-    opt.set(delta, "interval");
-    opt.set(nbin, "interval", 1);
+    opt.set(delta, "interval", "bins");
+    if ( !opt.set(nbin, "interval", 1, "bins", 1) )
+        nbin = std::ceil(sup/delta);
     nbin = std::min(nbin, BMAX);
     
     if ( 1 )
     {
-        out << COM << "fiber length histogram (bin size " << delta <<")";
+        out << COM << "bin " << delta << " count " << fibers.size();
         out << LIN << ljust("scale", 2);
         std::streamsize p = out.precision();
         out.precision(2);
@@ -628,7 +629,7 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
         for ( size_t u = 0; u <= nbin; ++u )
             cnt[u] = 0;
         
-        for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+        for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
         {
             if ( fib->prop == fp )
             {
@@ -661,7 +662,7 @@ void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const*
     size_t cnt[MAX+1] = { 0 };
     size_t sum = 0;
     
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
         if ( !sel || sel == fib->prop )
         {
@@ -1119,7 +1120,7 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel) cons
     
     real sum = 0;
     size_t cnt = 0;
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
         if ( sel && sel != fib->prop )
             continue;
@@ -1166,7 +1167,7 @@ void Simul::reportFiberMoments(std::ostream& out) const
         
         acc.reset();
         
-        for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+        for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
         {
             if ( fib->prop == fp )
             {
@@ -1362,7 +1363,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
     real   rad = 0;
     
 #if ( DIM > 1 )
-    for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
         Space const* spc = findSpace(fib->prop->confine_space);
         const real stiff = fib->prop->confine_stiffness;

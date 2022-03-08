@@ -10,7 +10,7 @@
 Regulator::Regulator(RegulatorProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {
-    throw InvalidParameter("the regulator class in unfinished");
+    //throw InvalidParameter("the regulator class is unfinished");
 }
 
 

@@ -1,8 +1,8 @@
 %{
 @example hand_regulator.cym
-We create a Regulator with `hand:activity=regulate`
+a Regulator with `hand:activity=regulate` acting as a capping protein
 
-F. Nedelec, 13 Oct 2016
+F. Nedelec, 07.03.2022
 }
 
 
@@ -20,17 +20,18 @@ set space cell
 
 new cell
 {
-    length = 80, 40, 2
+    length = 40, 40, 2
 }
 
 set fiber microtubule
 {
     rigidity = 20
     segmentation = 1
+    max_length = 20
 
-    activity        = grow
-    growing_speed   = 0.18
-    growing_force   = 1.7
+    activity = grow
+    growing_speed = 0.18
+    growing_force = 1.7
 
     display = ( lines=4,2; points=4,0; plus_end=8, 2; )
 }
@@ -39,6 +40,7 @@ set hand regulator
 {
     binding = 10, 0.05
     unbinding = 0, inf
+    bind_only_end = plus_end, 0.1
     activity = regulate
 }
 
@@ -53,7 +55,7 @@ new 100 simplex
 new 0 microtubule
 {
     length = 0.05
-    position = rectangle 0 20
+    position = rectangle 0 40
     direction = horizontal
     plus_end = grow
 }
@@ -61,7 +63,7 @@ new 0 microtubule
 new event
 {
     rate = 0.1
-    code = ( new microtubule { position=(rectangle 0 20); length=0.05; direction=X; plus_end=grow; })
+    code = ( new microtubule { position=(rectangle 0 40); length=0.05; direction=X; plus_end=grow; })
 }
 
 run 500000 system

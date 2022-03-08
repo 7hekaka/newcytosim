@@ -528,7 +528,7 @@ void FiberProp::complete(Simul const& sim)
         // this condition occur when the Property is created before the Space
     }
     
-    if ( confine_stiffness < 0 )
+    if ( confine && confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
 
 #if NEW_FIBER_CONFINE2

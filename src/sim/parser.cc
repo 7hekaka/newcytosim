@@ -41,7 +41,7 @@ void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t
     if ( opt.has_warning(war, cnt) )
     {
         size_t L;
-        Cytosim::log << war << " in " << StreamFunc::get_line(is, ipos, L) << " (line " << L << ")\n";
+        Cytosim::log << war << " in `" << StreamFunc::get_line(is, ipos, L) << "' (line " << L << ")\n";
         // also report to standard error:
         print_yellow(std::cerr, war);
         std::cerr << '\n';
@@ -286,7 +286,7 @@ void Parser::parse_change(std::istream& is)
             is.get();
             change_all = true;
         }
-        else if ( simul_.findProperty(name, para) )
+        else if ( para.size() && simul_.findProperty(name, para) )
         {
             //change CLASS NAME { VALUE }
             name = para;

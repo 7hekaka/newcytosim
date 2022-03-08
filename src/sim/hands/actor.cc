@@ -12,7 +12,7 @@
 Actor::Actor(ActorProp const* p, HandMonitor* h)
 : Hand(p,h), prop(p)
 {
-    throw InvalidParameter("the actor class in unfinished");
+    throw InvalidParameter("the actor class is unfinished");
 }
 
 
