@@ -408,11 +408,15 @@ void Outputter::writeEndianess()
 }
 
 
-/// write the null terminating character in binary mode
+void Outputter::write(const std::string& arg)
+{
+    fwrite(arg.c_str(), 1, arg.size(), mFile);
+}
+
+
 void Outputter::writeLine(const std::string& arg)
 {
-    size_t s = arg.size() + size_t(binary_);
-    fwrite(arg.c_str(), 1, s, mFile);
+    fwrite(arg.c_str(), 1, arg.size(), mFile);
     if ( binary_ ) putc('\n', mFile);
 }
 

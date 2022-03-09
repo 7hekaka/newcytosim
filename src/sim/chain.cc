@@ -2164,7 +2164,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( len > 1e6 )
         throw InvalidIO("excessive fiber length");
     
-    if ( seg <= 1e-6 || seg > 1e6 )
+    if ( seg <= 1e-9 || seg > 1e6 )
         throw InvalidIO("invalid fiber segmentation");
 
     if ( nPoints < 2 )

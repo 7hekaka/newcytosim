@@ -194,6 +194,57 @@ int SimThread::extend()
 
 
 //------------------------------------------------------------------------------
+#pragma mark - Loading
+
+int SimThread::loadFrame(size_t f)
+{
+    int r = 7;
+    lock();
+    try {
+        r = reader_.loadFrame(simul_, f);
+    }
+    catch( Exception & e )
+    {
+        print_blue(std::cerr, e.brief());
+        std::cerr << e.info() << " (loading frame)\n";
+    }
+    unlock();
+    return r;
+}
+
+int SimThread::loadNextFrame()
+{
+    int r = 7;
+    lock();
+    try {
+        r = reader_.loadNextFrame(simul_);
+    }
+    catch( Exception & e )
+    {
+        print_blue(std::cerr, e.brief());
+        std::cerr << e.info() << " (loading next frame)\n";
+    }
+    unlock();
+    return r;
+}
+
+int SimThread::loadLastFrame()
+{
+    int r = 7;
+    lock();
+    try {
+        r = reader_.loadLastFrame(simul_);
+    }
+    catch( Exception & e )
+    {
+        print_blue(std::cerr, e.brief());
+        std::cerr << e.info() << " (loading last frame)\n";
+    }
+    unlock();
+    return r;
+}
+
+//------------------------------------------------------------------------------
 #pragma mark - Thread control & termination
 
 

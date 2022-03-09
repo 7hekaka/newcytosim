@@ -174,19 +174,19 @@ public:
     bool goodFile() const { return reader_.good(); }
     
     /// status of file
-    int eof()       const { return reader_.eof(); }
+    int eof() const { return reader_.eof(); }
     
     /// rewind file
-    void rewind()         { lock(); reader_.rewind(); unlock(); }
+    void rewindFile() { lock(); reader_.rewind(); unlock(); }
     
     /// attempt to load specified frame from file (0 = first frame; -1 = last frame)
-    int loadFrame(size_t f) { lock(); int r=reader_.loadFrame(simul_, f); unlock(); return r; }
+    int loadFrame(size_t f);
 
     /// load next frame in file
-    int loadNextFrame()     { lock(); int r=reader_.loadNextFrame(simul_); unlock(); return r; }
+    int loadNextFrame();
     
     /// attempt to load last frame from file
-    int loadLastFrame()     { lock(); int r=reader_.loadLastFrame(simul_); unlock(); return r; }
+    int loadLastFrame();
 
     /// index of current frame (0 is lowest valid value)
     size_t currentFrame() const { return reader_.currentFrame(); }

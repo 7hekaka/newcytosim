@@ -100,8 +100,7 @@ void FileWrapper::close()
 
 
 /**
- This will write a null-terminated C-string to output stream.
- and a new line is added
+ This will write a newline-terminated C-string to output stream.
  */
 void FileWrapper::put_line(const std::string& str)
 {
@@ -118,7 +117,11 @@ std::string FileWrapper::get_line()
     size_t line_len = 0;
     ssize_t read = getline(&line, &line_len, mFile);
     if ( read > 0 )
+    {
+        if ( read > 1 && line[read-1] == '\n' )
+            line[read-1] = 0;
         res.assign(line);
+    }
     free(line);
     return res;
 }
@@ -205,7 +208,7 @@ void FileWrapper::skip_until(const char * str)
             b = (char*)memchr(buf, ccc, nbuf);
             if ( !b )
                 continue;
-            match  = pos;
+            match = pos;
             off = (size_t)(b - buf);
             ++s;
             ++b;
@@ -235,7 +238,7 @@ void FileWrapper::skip_until(const char * str)
                 b = (char*)memchr(b, ccc, nbuf-(size_t)(b - buf));
                 if ( !b )
                     break;
-                match  = pos;
+                match = pos;
                 off = (size_t)(b - buf);
                 ++s;
             }

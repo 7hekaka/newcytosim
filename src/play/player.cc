@@ -56,29 +56,26 @@ void Player::previousFrame()
  */
 void Player::nextFrame()
 {    
-    try
+    int res = thread.loadNextFrame();
+    if ( res == 1 )
     {
-        if ( thread.loadNextFrame() )
+        // this means end of file is reached:
+        if ( prop.auto_exit )
+            exit(EXIT_SUCCESS);
+        if ( prop.loop )
+            thread.loadFrame(0);
+        else
         {
-            // this means end of file is reached:
-            if ( prop.auto_exit )
-                exit(EXIT_SUCCESS);
-            if ( prop.loop )
-                thread.loadFrame(0);
-            else
-            {
-                flashText("end-of-file\n");
-                stop();
-            }
-        }
-        //std::clog << simul.nbObjects() << " objects @ " << std::fixed << simul.time() << "s\n";
-    }
-    catch( Exception & e )
-    {
-        flashText("Error:\n %s", e.what());
-        if ( thread.eof() )
+            flashText("end-of-file\n");
             stop();
+        }
     }
+    else if ( res )
+    {
+        flashText("Error "+std::to_string(res)+" occured while loading frame\n");
+        stop();
+    }
+    //std::clog << simul.nbObjects() << " objects @ " << std::fixed << simul.time() << "s\n";
 }
 
 //------------------------------------------------------------------------------
@@ -90,7 +87,7 @@ void Player::rewind()
     if ( thread.goodFile() )
     {
         stop();
-        thread.rewind();
+        thread.rewindFile();
         thread.loadFrame(0);
         glApp::postRedisplay();
     }
@@ -103,7 +100,7 @@ bool Player::startPlayback()
     {
         //rewind file if its end was reached:
         if ( thread.eof() )
-            thread.rewind();
+            thread.rewindFile();
         prop.play = 1;
         return true;
     }

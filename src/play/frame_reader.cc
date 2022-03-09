@@ -247,7 +247,7 @@ int FrameReader::loadFrame(Simul& sim, size_t frm, const bool reload)
     if ( badFile() )
         return BAD_FILE;
 
-    VLOG("FrameReader: loadFrame(frame="<<frm<<", reload="<<reload<<")\n");
+    VLOG("FrameReader: loadFrame("<<frm<<", reload="<<reload<<")\n");
     
     // what we are looking for might already be in the buffer:
     if ( frm == lastLoaded && ! reload )
@@ -265,13 +265,13 @@ int FrameReader::loadFrame(Simul& sim, size_t frm, const bool reload)
     fpos_t pos;
     bool has_pos = !inputter.get_pos(pos);
     
-    VLOG("FrameReader: reading frame " << frm << " from " << pos << '\n');
-    //VLOG("FrameReader: reading frame " << frm << '\n');
+    VLOG("FrameReader: reading file from "<<pos<<'\n');
     
     // read frame from file:
-    if ( !sim.reloadObjects(inputter) )
+    int res = sim.reloadObjects(inputter);
+    if ( !res )
     {
-        VLOG("FrameReader: loadFrame("<< frm <<") successful\n");
+        VLOG("FrameReader: loadFrame("<<frm<<") successful\n");
         frameIndex = frm;
         lastLoaded = frameIndex;
         if ( has_pos )
@@ -283,8 +283,8 @@ int FrameReader::loadFrame(Simul& sim, size_t frm, const bool reload)
     }
     else
     {
-        VLOG("FrameReader: loadFrame("<< frm <<") EOF at frame " << frm << '\n');
-        return END_OF_FILE;
+        VLOG("FrameReader: loadFrame("<<frm<<") failed: " <<res<< '\n');
+        return res;
     }
 }
 
@@ -300,13 +300,14 @@ int FrameReader::loadNextFrame(Simul& sim)
     fpos_t pos;
     bool has_pos = !inputter.get_pos(pos);
 
-    if ( !sim.reloadObjects(inputter) )
+    int res = sim.reloadObjects(inputter);
+    if ( !res )
     {
         if ( lastLoaded == frameIndex )
             ++frameIndex;
         lastLoaded = frameIndex;
 
-        VLOG("FrameReader: loadNextFrame() has read frame " << currentFrame() << '\n');
+        VLOG("FrameReader: loadNextFrame() read frame "<<currentFrame()<<'\n');
         
         // the position we used was good, to read this frame
         if ( has_pos )
@@ -319,8 +320,8 @@ int FrameReader::loadNextFrame(Simul& sim)
     }
     else
     {
-        VLOG("FrameReader: loadNextFrame() EOF while seeking frame " << currentFrame() << '\n');
-        return END_OF_FILE;
+        VLOG("FrameReader: loadNextFrame() failed at frame "<<currentFrame()<<'\n');
+        return res;
     }
 }
 
@@ -361,7 +362,7 @@ int FrameReader::loadLastFrame(Simul& sim, size_t cnt)
 
         frameIndex = frm;
         lastLoaded = frameIndex;
-        VLOG("FrameReader: loadFrame("<< frm <<") successful\n");
+        VLOG("FrameReader: loadFrame("<<frm<<") successful\n");
     }
     
     return res;

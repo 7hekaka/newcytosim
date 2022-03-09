@@ -50,7 +50,7 @@ public:
     void operator =(FILE *);
     
     /// automatic conversion to a FILE *
-    operator FILE*() { return mFile; }
+    //operator FILE*() { return mFile; }
     
     /// open a file
     int open(const char* name, const char* mode);

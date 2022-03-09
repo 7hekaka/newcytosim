@@ -69,25 +69,25 @@
 void Simul::writeObjects(Outputter& out) const
 {
     // write a line identifying a new frame:
-    fprintf(out, "\n\n#Cytosim  %i  %s", getpid(), TimeDate::date_string());
+    out.write("\n#Cytosim  "+std::to_string(getpid())+"  "+TimeDate::date_string());
     
     // record file format:
-    fprintf(out, "\n#format %i dim %i", currentFormatID, DIM);
+    out.write("\n#format "+std::to_string(currentFormatID)+" dim "+std::to_string(DIM));
     
     // identify the file as binary, with its endianess:
     if ( out.binary() )
     {
-        fprintf(out, "\n#binary ");
+        out.write("\n#binary ");
         out.writeEndianess();
     }
+    
+    out.write("\n#time "+std::to_string(prop.time)+" sec");
     
     /*
      An object should be written after any other objects that it refers to.
      For example, Aster is written after Fiber, Couple after Fiber...
      This makes it easier to reconstruct the state during input.
      */
-    fprintf(out, "\n#time %.6f sec", prop.time);
-
     spaces.write(out);
     fields.write(out);
     fibers.write(out);
@@ -100,7 +100,7 @@ void Simul::writeObjects(Outputter& out) const
     tubules.write(out);
     //events.write(out);
     
-    fprintf(out, "\n#section end\n#end cytosim\n");
+    out.write("\n#section end\n#end cytosim\n");
 }
 
 
@@ -419,6 +419,7 @@ public:
  @returns
  - 0 = success
  - 1 = EOF
+ - 2 and above: ERROR code
  .
  */
 int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
@@ -475,13 +476,13 @@ int Simul::loadObjects(char const* filename)
  @returns
  - 0 : success
  - 1 : EOF
- - 2 : the file does not appear to be a valid cytosim archive
- 
+ - 2 and above: ERROR code
+
   */
 int Simul::readObjects(Inputter& in, ObjectSet* subset)
 {
     ObjectSet * objset = nullptr;
-    std::string section, line;
+    std::string section;
     int has_frame = 0;
     int tag = 0, c = 0;
     int fat = 0;
@@ -491,10 +492,9 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
         do {
             c = in.get_char();
             if ( c == '#' )
-            {
-                line = in.get_line();
                 break;
-            }
+            if ( c == EOF )
+                return 1;
             tag = ( c & LOW_BITS );
             fat = ( c & HIGH_BIT );
 #if BACKWARD_COMPATIBILITY < 50
@@ -505,15 +505,16 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 tag = in.get_char();
             }
 #endif
-            if ( c == EOF )
-                return 1;
         } while ( !isalpha(tag) );
         
         
         //check for meta-data, contained in lines starting with '#'
         if ( c == '#' )
         {
-            //std::clog << "      |#" << line << "|" << '\n';
+            fpos_t pos;
+            bool has_pos = !in.get_pos(pos);
+            std::string line = in.get_line();
+            //std::clog << "      #|" << line << "|" << '\n';
             std::istringstream iss(line);
             std::string tok;
             iss >> tok;
@@ -561,7 +562,11 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )
             {
                 if ( has_frame )
+                {
+                    if ( has_pos )
+                        in.seek(pos);
                     return 2;
+                }
                 has_frame = 1;
             }
             //binary signature
@@ -658,6 +663,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 if ( objset )
                 {
                     in.skip_until("#section ");
+                    if ( in.eof() )
+                        return 3;
                     std::cerr << e.info() << " (skipping section "+section+")\n";
                 }
                 else

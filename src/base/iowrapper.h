@@ -208,7 +208,10 @@ public:
     void writeSoftSpace() { if ( !binary_ ) put_char(' '); }
     
     /// put a C++ string
-    void writeLine(const std::string& arg);
+    void write(const std::string&);
+
+    /// put a C++ string
+    void writeLine(const std::string&);
 
     /// put character
     void writeChar(const int c) { putc_unlocked(c, mFile); }
