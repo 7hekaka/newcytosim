@@ -47,6 +47,15 @@ protected:
     /// read shape string and lengths
     static size_t readShape(Inputter&, size_t n_len, real* len, std::string const&);
     
+    /// bounce Z between boundaries at B and B+W, returning image within [B, B+W]
+    static real bounce1(real Z, real const& B, real W)
+    {
+        Z = ( Z - B ) / W;
+        int i = (int)std::floor(Z);
+        W = std::copysign(W, (i&1)?-1:1);
+        return B + W * ( Z - ((i+1)&~1) );
+    }
+
 public:
     
     /// parameters
@@ -126,15 +135,6 @@ public:
     
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
     real estimateVolume(size_t cnt) const;
-    
-    /// bounce Z between boundaries at B and B+W, returning image within [B, B+W]
-    static real bounce1(real Z, real const& B, real W)
-    {
-        Z = ( Z - B ) / W;
-        int i = (int)floor(Z);
-        W = std::copysign(W, (i&1)?-1:1);
-        return B + W * ( Z - ((i+1)&~1) );
-    }
     
     /// bring a position back inside, as if it bounced off the edges of the Space
     Vector bounceOnEdges(Vector const&) const;
