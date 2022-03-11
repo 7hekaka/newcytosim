@@ -47,12 +47,12 @@ void ChewerProp::complete(Simul const& sim)
         throw InvalidParameter("chewer:diffusion must be >= 0");
 
     /*
-     We want for one degree of freedom to fulfill `var(dx) = 2 D time_step`
-     And we use: dx = diffusion_dt * RNG.sreal()
-     Since `sreal()` is uniformly distributed, its variance is 1/3,
+     This is for unidimensional diffusion along the filaments, and we want:
+     var(dx) = 2 D time_step, given that we use dx = diffusion_dt * RNG.sreal()
+     Since `sreal()` is uniformly distributed in [-1, 1], its variance is 1/3,
      and we need `diffusion_dt^2 = 6 D time_step`
      */
-    diffusion_dt = std::sqrt(6.0 * diffusion * sim.time_step() * POOL_UNATTACHED);
+    diffusion_dt = std::sqrt(6.0 * diffusion * sim.time_step());
     
     // use Einstein's relation to get a mobility:
     mobility_dt = diffusion * sim.time_step() / sim.prop.kT;
