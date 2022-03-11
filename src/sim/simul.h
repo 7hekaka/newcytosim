@@ -46,7 +46,7 @@ public:
     /// current parser object
     Parser * parser_;
     
-#if POOL_HAND_ATTACHMENT > 1
+#if POOL_UNATTACHED > 1
     /// counter for occasional Hand's attachment
     unsigned doAttachCounter;
 #endif

@@ -23,7 +23,7 @@ inline void print_version(std::ostream& os)
 {
     os << "   Dimension " << DIM;
     os << "  Periodic " << GRID_HAS_PERIODIC;
-    os << "  AttachPool " << POOL_HAND_ATTACHMENT;
+    os << "  AttachPool " << POOL_UNATTACHED;
     os << "  Precision " << sizeof(real) << " bytes\n";
 
     os << "   Fiber has lattice " << FIBER_HAS_LATTICE;

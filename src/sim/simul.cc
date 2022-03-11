@@ -69,7 +69,7 @@ couples(*this), organizers(*this), tubules(*this), events(*this)
     pMeca1D = nullptr;
     parser_ = nullptr;
     primed_ = 0;
-#if POOL_HAND_ATTACHMENT > 1
+#if POOL_UNATTACHED > 1
     doAttachCounter = 0;
 #endif
     autoPrecond = 0;

@@ -40,7 +40,7 @@ void BlankParam::read(Glossary& glos)
      Since `sreal()` is uniformly distributed, its variance is 1/3,
      and we need `diffusion_dt^2 = 6 D dt`
      */
-    diffusion_dt = std::sqrt( 6.0 * diffusion * time_step );
+    diffusion_dt = std::sqrt(6.0 * diffusion * time_step);
 }
 
 /// formatted output of one parameter

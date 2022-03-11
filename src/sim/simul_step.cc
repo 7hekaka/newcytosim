@@ -134,20 +134,20 @@ void Simul::step()
     
     //printf("     ::steps    %16llu\n", (timer()-rdt)>>5); rdt = timer();
     
-#if POOL_HAND_ATTACHMENT < 1
-    ABORT_NOW(" POOL_HAND_ATTACHMENT must be >= 1");
-#elif POOL_HAND_ATTACHMENT > 1
-    doAttachCounter = ( doAttachCounter + 1 ) % POOL_HAND_ATTACHMENT;
+#if POOL_UNATTACHED < 1
+    ABORT_NOW(" POOL_UNATTACHED must be >= 1");
+#elif POOL_UNATTACHED > 1
+    doAttachCounter = ( doAttachCounter + 1 ) % POOL_UNATTACHED;
 #endif
 
     // if no Hands are present, we can skip attachment
     if ( singles.size() + couples.size() )
     {
-#if POOL_HAND_ATTACHMENT > 1
+#if POOL_UNATTACHED > 1
         if ( doAttachCounter )
         {
-            couples.stepSkipAttach();
-            singles.stepSkipAttach();
+            couples.stepSkipUnattached();
+            singles.stepSkipUnattached();
             //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
         }
         else

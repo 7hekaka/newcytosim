@@ -109,12 +109,12 @@ void CoupleSet::step()
  either stepHand1(), stepHand2() or stepAA().
  Couple::stepFF() is never called.
  
- This is only used if POOL_HAND_ATTACHMENT > 1
+ This is only used if POOL_UNATTACHED > 1
  */
-void CoupleSet::stepSkipAttach()
+void CoupleSet::stepSkipUnattached()
 {
     /*
-    Cytosim::log("CoupleSet::stepSkipAttach : FF %5i AF %5i FA %5i AA %5i\n",
+    Cytosim::log("CoupleSet::stepSkipUnattached : FF %5i AF %5i FA %5i AA %5i\n",
                  ffList.size(), afList.size(), faList.size(), aaList.size());
     */
     

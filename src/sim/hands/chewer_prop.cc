@@ -52,7 +52,7 @@ void ChewerProp::complete(Simul const& sim)
      Since `sreal()` is uniformly distributed, its variance is 1/3,
      and we need `diffusion_dt^2 = 6 D time_step`
      */
-    diffusion_dt = std::sqrt( 6.0 * diffusion * sim.time_step() );
+    diffusion_dt = std::sqrt(6.0 * diffusion * sim.time_step() * POOL_UNATTACHED);
     
     // use Einstein's relation to get a mobility:
     mobility_dt = diffusion * sim.time_step() / sim.prop.kT;

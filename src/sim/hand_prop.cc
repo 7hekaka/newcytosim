@@ -236,7 +236,7 @@ void HandProp::complete(Simul const& sim)
     
     unbinding_rate_dt = unbinding_rate * sim.time_step();
     //std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
-    binding_prob = -std::expm1(-binding_rate * sim.time_step() * POOL_HAND_ATTACHMENT);
+    binding_prob = -std::expm1(-binding_rate * sim.time_step() * POOL_UNATTACHED);
     
     if ( binding_range < 0 )
         throw InvalidParameter(name()+":binding_range must be >= 0");

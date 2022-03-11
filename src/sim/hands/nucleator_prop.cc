@@ -82,7 +82,7 @@ void NucleatorProp::complete(Simul const& sim)
     if ( track_end && track_end != hold_end )
         throw InvalidParameter("if set, hand:track_end should be equal to hold_end");
     
-    rate_dt = rate * sim.time_step() * POOL_HAND_ATTACHMENT;
+    rate_dt = rate * sim.time_step() * POOL_UNATTACHED;
     
 #if BACKWARD_COMPATIBILITY < 57
     if ( specificity && sim.primed() )

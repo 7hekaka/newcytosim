@@ -68,7 +68,7 @@ void DuoProp::complete(Simul const& sim)
     if ( deactivation_rate < 0 )
         throw InvalidParameter("deactivation_rate should be >= 0");
     
-    deactivation_rate_dt = deactivation_rate * sim.time_step() * POOL_HAND_ATTACHMENT;
+    deactivation_rate_dt = deactivation_rate * sim.time_step() * POOL_UNATTACHED;
 }
 
 

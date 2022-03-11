@@ -90,11 +90,11 @@ void SingleSet::step()
  This version does not simulate the attachment of free Hand, and hence skips
  Single::stepF() that calls Hand::stepUnattached().
 
- This is only used if POOL_HAND_ATTACHMENT > 1
+ This is only used if POOL_UNATTACHED > 1
 */
-void SingleSet::stepSkipAttach()
+void SingleSet::stepSkipUnattached()
 {
-    //Cytosim::log("SingleSet::stepSkipAttach : F %5i A %5i\n", fList.size(), aList.size());
+    //Cytosim::log("SingleSet::stepSkipUnattached : F %5i A %5i\n", fList.size(), aList.size());
     
     Single *const fHead = firstF();
     
