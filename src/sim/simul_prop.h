@@ -187,7 +187,7 @@ public:
      Preconditionning is a technique to speed up convergence of iterative methods,
      that can be used to solve the movements of the Mecables in Cytosim.
      It relies on finding a matrix (the preconditionner) that is approximately
-     equal to the invert of the matrix of the full system.
+     equal to the inverse of the matrix of the system we want to solve.
      Using a good preconditionner should reduce the number of iterations
      needed to converge to a solution, resulting in a potential overall speedup.
      
@@ -198,10 +198,11 @@ public:
      in particular if some objects have many vertices.
      
      The different preconditionners represent different tradeoff:
-     the approximation is improved from 0 to 4, but the CPU cost also increases.
+     the approximation is improved from 0 to 6, but the CPU cost also increases.
      
      If there is only one filament in the system, `precondition=0` should perform best.
      With many filaments, trying `precondition = [0, 1, 2, 3, 4, 6]' is a good strategy.
+     This can be performed automatically by setting 'solve=auto' in the 'run' command.
      <em>default value = 0</em>
      */
     unsigned precondition;
