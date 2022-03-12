@@ -19,13 +19,13 @@ class SpaceMesh : public Space
 private:
 
     /// The 3D mesh object
-    //Mesh              mMesh;
+    //Mesh mesh_;
     
-    /// pre-calculated bounding box derived from mMesh
-    Vector            inf_, sup_;
+    /// pre-calculated bounding box
+    Vector inf_, sup_;
     
-    /// Volume calculated from mMesh
-    real              volume_;
+    /// pre-calculated Volume
+    real volume_;
 
 public:
         
