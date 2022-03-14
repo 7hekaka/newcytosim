@@ -568,19 +568,13 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
         
         if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
+            i.reinterpolate();
             Vector pos = i.pos();
-            Space const* spc = i.fiber()->prop->confine_space_ptr;
 
-            // Only attach if position is within the confining Space:
-            if ( spc && spc->outside(pos) )
-                continue;
-
-            if ( s->prop->fast_diffusion & 8 )
+            if ( s->prop->confine == CONFINE_ON )
             {
-                if ( ! spc )
-                    continue;
                 // Only attach if position is near the edge of the Space:
-                Vector prj = spc->project(pos);
+                Vector prj = s->confineSpace()->project(pos);
                 if ( distanceSqr(pos, prj) >= square(h->prop->binding_range) )
                     continue;
                 // Single will be placed on the edge of the Space:

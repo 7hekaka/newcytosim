@@ -39,7 +39,7 @@ public:
     /// allowing update of the interpolation
     friend void Fiber::updateHands();
 
-private:
+protected:
     
     /// the interpolation on the Fiber's vertices; `bad()` is used to check validity
     mutable Interpolation hTerp;

@@ -90,9 +90,9 @@ void Hand::relocate(Fiber* f, const real a)
     if ( hLattice )
         hLattice = &f->lattice();
 #endif
-    f->addHand(this);
     hAbs = a;
-    reinterpolate();
+    f->addHand(this);
+    hTerp = f->interpolate(a);
 }
 
 
@@ -202,7 +202,7 @@ void Hand::locate(Fiber* f, real a)
     hAbs = a;
     hFiber = f;
     f->addHand(this);
-    reinterpolate();
+    hTerp = f->interpolate(a);
     hMonitor->afterAttachment(this);
     nextDetach = RNG.exponential();
 }
