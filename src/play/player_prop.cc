@@ -93,11 +93,11 @@ static std::string standardReport(unsigned inx)
         case 0: return "";
         case 1: return "fiber:lengths";
         case 2: return "fiber:dynamics";
-        case 3: return "single";
+        case 3: return "single,couple";
         case 4: return "single:force";
-        case 5: return "couple";
-        case 6: return "couple:force";
-        case 7: return "couple:configuration{split=1}";
+        case 5: return "couple:force";
+        case 6: return "couple:configuration{split=1}";
+        case 7: return "simul:inventory";
         case 8: return "platelet";
         case 9: return "space";
         case 10: return "";

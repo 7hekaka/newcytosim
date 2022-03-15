@@ -8,13 +8,12 @@
 #define ENABLE_WRITE 1
 
 
-/// defines the amount added/subtracted to size/width when a key is pressed
-template< typename FLOAT >
-static FLOAT grained(FLOAT x, int inc)
+/// defines the increment for user's modifications (eg. key pressed)
+static float grained(float x, int inc)
 {
-    const FLOAT grain = (FLOAT)0.25;
-    FLOAT dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
-    FLOAT nx = grain * std::round( x / grain + dx );
+    const float grain = 0.25f;
+    float dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
+    float nx = grain * std::round( x / grain + dx );
     return std::max(std::abs(inc)*grain, nx);
 }
 
@@ -506,11 +505,12 @@ static void changeSize(FiberDisp* p, int inc)
     
     if ( s > 0 )
     {
-        real w = p->line_width;
-        p->line_width   = s;
-        p->point_size  *= s / w;
-        p->end_size[0] *= s / w;
-        p->end_size[1] *= s / w;
+        float m = 1.f;
+        float x = s / p->line_width;
+        p->line_width = s;
+        p->point_size = std::max(m, p->point_size * x);
+        p->end_size[0] = std::max(m, p->end_size[0] * x);
+        p->end_size[1] = std::max(m, p->end_size[1] * x);
         flashText("Fibers: line_width %0.2f", s);
     }
 }
@@ -556,8 +556,8 @@ static void changeEndStyle(FiberDisp* p, int val)
 static void changeEndSize(FiberDisp* p, int inc)
 {
     float* size = p->end_size;
-    real s0 = grained(size[0], inc);
-    real s1 = grained(size[1], inc);
+    float s0 = grained(size[0], inc);
+    float s1 = grained(size[1], inc);
     if ( p->end_style[0] )
     {
         size[0] = s0;
