@@ -2,7 +2,7 @@
 #
 # A script to generate lables in PNG files
 #
-# F. Nedelec, Cambridge, 27.2.2022
+# F. Nedelec, Cambridge, 27.2.2022, 14.03.2022
 
 
 """
@@ -51,7 +51,7 @@ def make_caption_file(path):
     file = open('caption.txt', 'w')
     for k, v in res.items():
         if k == 'polymer':
-            file.write("%s: %s µm\n" % (k,v))
+            file.write("%s: %s µm\\n" % (k,v))
         else:
             file.write("%s: %s\n" % (k,v))
     file.close()
@@ -73,15 +73,42 @@ def make_caption(path):
 
 
 def main(args):
-    cwd = os.getcwd()
-    for n in range(0, 50):
-        path = "run%04i" % (7*n+1)
-        try:
-            os.chdir(path)
-            make_caption(path)
-            os.chdir(cwd)
-        except FileNotFoundError as e:
-            print(e)
+    paths = []
+    files = []
+    for arg in args:
+        if os.path.isdir(arg):
+            paths.append(arg)
+        elif os.path.isfile(arg):
+            files.append(arg)
+        else:
+            sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
+            sys.exit()
+    for p in paths:
+        files.append(p+'/config.cym');
+    if not files:
+        files = ['config.cym']
+    
+    if files:
+        res = get_parameters(files[0])
+        print("%", end=' ')
+        for k, v in res.items():
+            print("%10s"%k, end=' ')
+        print()
+        for f in files:
+            res = get_parameters(f)
+            for k, v in res.items():
+                print("%10s"%v, end=' ')
+            print()
+    else:
+        cwd = os.getcwd()
+        for n in range(0, 50):
+            path = "run%04i" % (7*n+1)
+            try:
+                os.chdir(path)
+                make_caption(path)
+                os.chdir(cwd)
+            except FileNotFoundError as e:
+                print(e)
 
 
 if __name__ == "__main__":

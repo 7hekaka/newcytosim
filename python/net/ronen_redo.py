@@ -16,8 +16,7 @@ Description:
     
 """
 
-import sys, os, math
-
+import sys
 
 def get_parameters(filename):
     """
@@ -37,7 +36,7 @@ def get_parameters(filename):
     return res
 
 
-def transform_file(input, output, substitution):
+def transform_file(input, output, modifs):
     try:
         i = open(input, 'r')
         o = open(output, 'w')
@@ -47,36 +46,32 @@ def transform_file(input, output, substitution):
     cnt = 0;
     for line in i:
         cnt += 1
-        if cnt in substitution:
-            o.write(substitution[cnt])
+        if cnt in modifs:
+            o.write(modifs[cnt])
         else:
             o.write(line)
     i.close()
     o.close()
-    
-    
-#-------------------------------------------------------------------------------
+
+
+def process(inx):
+    i = "run%04i/config.cym" % (8*inx)
+    o = "mod%04i.cym" % (8*inx)
+    pam = get_parameters(i)
+    print(i, pam)
+    n = int(pam[126].split()[1])
+    a = int(pam[127].split()[1])
+    print(n, a)
+    mod = {}
+    mod[8] = '%preconfig.mod=32\n'
+    mod[123] = '    fast_diffusion = 2\n}\n'
+    mod[125] = 'new %i simplex\n' % (n+a)
+    transform_file(i, o, mod)
 
 
 def main(args):
-    for n in range(0, 128):
-        fR = "run%04i/config.cym" % (7*n+1)
-        ff = "run%04i/config.cym" % (7*n+5)
-        d1 = "config%04i.cym" % (7*n+2)
-        d2 = "config%04i.cym" % (7*n+4)
-        pam = get_parameters(ff)
-        pam.pop(132)
-        print(ff, pam)
-        mot = pam.pop(131)
-        pam[8] = '%preconfig.mod=1\n'
-        transform_file(fR, d1, pam)
-        pam[131] = mot
-        pam.pop(37)
-        pam.pop(100)
-        pam.pop(107)
-        pam[8] = '%preconfig.mod=4\n'
-        transform_file(fR, d2, pam)
-
+    for n in range(0, 1):
+        process(n)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1].endswith("help"):

@@ -35,7 +35,7 @@ try:
 except:
     do_plot = 0
 try:
-    from pyned import exponential_fit
+    from pyned import exponential_fit, exponential_model_fit
 except:
     add_fit = 0
 
@@ -60,11 +60,13 @@ def prune_values(time, data):
         i-=1
 
 
-def fit_curve(time, data):
+def fit_curve(time, values):
     """
         Fit exponential and save results
     """
-    (A, B) = exponential_fit(zip(time, data))
+    data = list(zip(time, values))
+    (A, B, C) = exponential_model_fit(data)
+    (A, B) = exponential_fit(data)
     return (A, -B)
 
 
@@ -150,7 +152,7 @@ def get_radius(file):
     if not T:
         raise Exception("Could not find time information")
     earliest = min(T)
-    print("length <- %.2f, earliest <- %.2f" % (length, earliest))
+    print("length <- %.2f, earliest <- %.2f" % (length, earliest), end=" ")
     R = [ math.sqrt(2*x) for x in M ]  # radius of disc
     #S = [ math.pi*2*x for x in M ]   # surface of disc
     #R = [ math.sqrt(x) for x in M ]    # radius of circle
@@ -170,7 +172,7 @@ def get_type(confname):
         if s > 0:
             s = s + len('preconfig.')
             [key, equal, val] = line[s:-1].partition('=')
-            print(key, val)
+            print(key, val, end=" ")
             if key == 'type':
                 return int(val)
             elif key == 'mod':
@@ -193,12 +195,12 @@ def process(dirpath, momfile):
         f = open(momfile, 'r')
     except IOError as e:
         sys.stderr.write("Error in `%s`: %s\n"%(dirpath, str(e)))
-        return
+        return [dirpath, 0, 0, 0, 0, 0];
     time, data = get_radius(f)
     if do_plot:
         nice_plot(time, data)
         plt.title(dirpath, fontsize=fts)
-        plt.savefig('size.png', dpi=500)
+        plt.savefig('size.png', dpi=100)
         #plt.show()
         plt.close()
     if add_fit:
@@ -221,7 +223,7 @@ def print_results(data, filename=''):
         f = open(filename, 'w')
     f.write("% path fit_size fit_rate size0 type polymer\n")
     for i in data:
-        f.write("%12s %12f %12f %12f  %i %12.2f\n" % (i[0], i[1], i[2], i[3], i[4], i[5]))
+        f.write("%12s %12.3f %12f %12f  %i %12.2f\n" % (i[0], i[1], i[2], i[3], i[4], i[5]))
     if filename:
         f.close()
 
@@ -242,7 +244,7 @@ def main(args):
     output = os.path.join(cdir,output)
     results = []
     for p in paths:
-        sys.stdout.write('- '*32+p+"\n")
+        sys.stdout.write("\n"+p+": ")
         res = process(p, 'mom.txt')
         results.append(res)
         os.chdir(cdir)
