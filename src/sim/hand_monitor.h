@@ -24,9 +24,8 @@ class FiberSite;
  */
 class HandMonitor
 {
-
 public:
-    
+
     /// Returning `false` prevents the attachment (this is called before every attempt)
     virtual bool permitAttachment(FiberSite const&, Hand const*) const { return true; }
     

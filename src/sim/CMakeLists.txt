@@ -39,7 +39,7 @@ set(SOURCES_SIM
     event.cc event_set.cc
     chain.cc mecafil.cc
     fiber.cc fiber_prop.cc fiber_set.cc
-    hand.cc hand_list.cc hand_prop.cc
+    hand.cc hand_list.cc hand_prop.cc hand_monitor.cc
     single.cc single_prop.cc single_set.cc
     couple.cc couple_prop.cc couple_set.cc
     organizer.cc organizer_set.cc
