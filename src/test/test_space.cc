@@ -78,6 +78,7 @@ Vector axis(1, 0, 0);
 int showInside    = true;
 int showOutside   = true;
 int showProject   = true;
+int showProjected = true;
 int showReproject = true;
 int showNormals   = false;
 int showEdges     = false;
@@ -87,7 +88,7 @@ int timerOn = false;
 int timerDelay = 50;
 
 //display parameter for OpenGL
-GLfloat LW = 0.5f;
+GLfloat LW = 1.0f;
 
 //amount of white added to colors
 const GLfloat COL = 0.8f;
@@ -238,7 +239,7 @@ enum MENUS_ID {
     MENU_QUIT = 102, MENU_RESETVIEW = 103,
     MENU_INSIDE = 104, MENU_OUTSIDE = 105, MENU_PROJECT = 106,
     MENU_XSLICING = 107, MENU_YSLICING = 108, MENU_ZSLICING = 109,
-    MENU_EDGES = 111
+    MENU_PROJECTED = 110, MENU_EDGES = 111
 };
 
 
@@ -276,6 +277,9 @@ void processMenu(int item)
         case MENU_PROJECT:
             showProject = ! showProject;
             break;
+        case MENU_PROJECTED:
+            showProjected = ! showProjected;
+            break;
         case MENU_XSLICING:
             toggleSlicing(1);
             break;
@@ -303,7 +307,8 @@ void initMenus()
     glutAddMenuEntry("Toggle outside (o)",   MENU_OUTSIDE);
     glutAddMenuEntry("Toggle edges   (e)",   MENU_EDGES);
     glutAddMenuEntry("Toggle project (p)",   MENU_PROJECT);
-    
+    glutAddMenuEntry("Toggle projected (s)",   MENU_PROJECTED);
+
     glutAddMenuEntry("Toggle x-slicing (x)", MENU_XSLICING);
     glutAddMenuEntry("Toggle y-slicing (y)", MENU_YSLICING);
     glutAddMenuEntry("Toggle z-slicing (z)", MENU_ZSLICING);
@@ -364,10 +369,6 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             distributePoints();
             break;
             
-        case 'X':
-            glApp::processNormalKey('x',x,y);
-            break;
-            
         case 'x':
             toggleSlicing(1);
             break;
@@ -400,6 +401,10 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             showProject = ! showProject;
             break;
             
+        case 's':
+            showProjected = ! showProjected;
+            break;
+
         case 'e':
             showEdges = ! showEdges;
             break;
@@ -506,6 +511,18 @@ void display(View& view, int)
         glDrawArrays(GL_POINTS, 0, n);
     }
     
+    if ( showProjected )
+    {
+        //use green for points inside, magenta for point outside:
+        flute8* flu = gym::mapBufferC4V4(nbpts);
+        gle_color col(COL, COL, 0.f), lor(COL, 0.f, COL);
+        for ( size_t i=0; i < nbpts; ++i )
+            flu[i] = { inside[i] ? col : lor, project[i] };
+        gym::unmapBufferC4V4();
+        glPointSize(2.0);
+        glDrawArrays(GL_POINTS, 0, nbpts);
+    }
+
     if ( showProject )
     {
         flute8* flu = gym::mapBufferC4V4(2*nbpts);

@@ -202,6 +202,8 @@
 		BB55C21D0A261FC1003333C9 /* solid.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73590305B98DA3006956D5 /* solid.h */; };
 		BB55C2230A261FC8003333C9 /* simul.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358FC05B98DA3006956D5 /* simul.h */; };
 		BB55C2250A261FC9003333C9 /* hand.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358E205B98DA3006956D5 /* hand.h */; };
+		BB55E56027E5120500B8026F /* space_bicylinder.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF32B3B27E3E81300F02AC8 /* space_bicylinder.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BB55E56127E5123500B8026F /* space_bicylinder.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF32B3B27E3E81300F02AC8 /* space_bicylinder.cc */; };
 		BB560C301813DC8800CB1BF5 /* vecprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BB560C2F1813DC8800CB1BF5 /* vecprint.h */; };
 		BB56FA7712D0A0BF008B2260 /* player_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB56FA7512D0A0BF008B2260 /* player_prop.h */; };
 		BB56FA7812D0A0BF008B2260 /* player_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB56FA7612D0A0BF008B2260 /* player_prop.cc */; };
@@ -929,6 +931,8 @@
 		BBF2832B2431EC0F00FADDD8 /* space_dynamic_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF283282431EC0F00FADDD8 /* space_dynamic_prop.cc */; };
 		BBF2832C2431EC0F00FADDD8 /* space_dynamic_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF283292431EC0F00FADDD8 /* space_dynamic_prop.h */; };
 		BBF2832D2431EC0F00FADDD8 /* space_dynamic_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF283292431EC0F00FADDD8 /* space_dynamic_prop.h */; };
+		BBF32B3C27E3E81400F02AC8 /* space_bicylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF32B3A27E3E81300F02AC8 /* space_bicylinder.h */; };
+		BBF32B3D27E3E81400F02AC8 /* space_bicylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF32B3A27E3E81300F02AC8 /* space_bicylinder.h */; };
 		BBF7BB1A10CD44E00089F5B1 /* display2.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF7BB1810CD44E00089F5B1 /* display2.cc */; };
 		BBF7BB1B10CD44E00089F5B1 /* display2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF7BB1910CD44E00089F5B1 /* display2.h */; };
 		BBFAB112116F20CD0009FD97 /* field_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB537E3511131B110059D9AA /* field_set.cc */; };
@@ -1933,6 +1937,8 @@
 		BBF283262430E10100FADDD8 /* meca_math.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_math.cc; sourceTree = "<group>"; };
 		BBF283282431EC0F00FADDD8 /* space_dynamic_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_prop.cc; path = spaces/space_dynamic_prop.cc; sourceTree = "<group>"; };
 		BBF283292431EC0F00FADDD8 /* space_dynamic_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_prop.h; path = spaces/space_dynamic_prop.h; sourceTree = "<group>"; };
+		BBF32B3A27E3E81300F02AC8 /* space_bicylinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = space_bicylinder.h; sourceTree = "<group>"; };
+		BBF32B3B27E3E81300F02AC8 /* space_bicylinder.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = space_bicylinder.cc; sourceTree = "<group>"; };
 		BBF4E88024372DBA00B9D440 /* cytoblas.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cytoblas.h; sourceTree = "<group>"; };
 		BBF4E88124372DFF00B9D440 /* blas.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = blas.h; sourceTree = "<group>"; };
 		BBF4E88224372DFF00B9D440 /* lapack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lapack.h; sourceTree = "<group>"; };
@@ -2903,6 +2909,8 @@
 				BB88394B10B4912A00A4028F /* space_capsule.cc */,
 				BB8838C210B48EF900A4028F /* space_cylinder.h */,
 				BB8838C110B48EF900A4028F /* space_cylinder.cc */,
+				BBF32B3A27E3E81300F02AC8 /* space_bicylinder.h */,
+				BBF32B3B27E3E81300F02AC8 /* space_bicylinder.cc */,
 				E2F6428815D01466009B7C31 /* space_cylinderP.h */,
 				E2F6428715D01466009B7C31 /* space_cylinderP.cc */,
 				BB8838C410B48EF900A4028F /* space_cylinderZ.h */,
@@ -3500,6 +3508,7 @@
 				BB500462126A332E005E925C /* tracker_prop.h in Headers */,
 				BB500464126A332E005E925C /* tracker.h in Headers */,
 				BBD025E11B28DF950002B9FE /* chewer.h in Headers */,
+				BBF32B3C27E3E81400F02AC8 /* space_bicylinder.h in Headers */,
 				BBA61CC1234E891F00D6A81F /* tubule.h in Headers */,
 				BBA10152126CC7E600D28A55 /* walker_prop.h in Headers */,
 				BBA10154126CC7E600D28A55 /* walker.h in Headers */,
@@ -3687,6 +3696,7 @@
 				BB692193233D359F00F528D2 /* regulator.h in Headers */,
 				BB692194233D359F00F528D2 /* crosslink_long.h in Headers */,
 				BB692195233D359F00F528D2 /* duo.h in Headers */,
+				BBF32B3D27E3E81400F02AC8 /* space_bicylinder.h in Headers */,
 				BB692196233D359F00F528D2 /* duo_prop.h in Headers */,
 				BB692197233D359F00F528D2 /* duo_long.h in Headers */,
 				BB692198233D359F00F528D2 /* field.h in Headers */,
@@ -5054,6 +5064,7 @@
 				BB88388F10B48EC400A4028F /* space_prop.cc in Sources */,
 				BB8838DF10B48EF900A4028F /* space_cylinder.cc in Sources */,
 				BB8838E110B48EF900A4028F /* space_cylinderZ.cc in Sources */,
+				BB55E56127E5123500B8026F /* space_bicylinder.cc in Sources */,
 				BB8838E310B48EF900A4028F /* space_dice.cc in Sources */,
 				BB8838E510B48EF900A4028F /* space_ellipse.cc in Sources */,
 				BB8838EB10B48EF900A4028F /* space_polygon.cc in Sources */,
@@ -5095,6 +5106,7 @@
 				BBE82A46233D15EB00BE44DF /* space_prop.cc in Sources */,
 				BBE82A48233D15EB00BE44DF /* space_cylinder.cc in Sources */,
 				BBE82A49233D15EB00BE44DF /* space_cylinderZ.cc in Sources */,
+				BB55E56027E5120500B8026F /* space_bicylinder.cc in Sources */,
 				BBE82A4D233D15EB00BE44DF /* space_dice.cc in Sources */,
 				BBE82A4E233D15EB00BE44DF /* space_ellipse.cc in Sources */,
 				BBE82A50233D15EB00BE44DF /* space_polygon.cc in Sources */,

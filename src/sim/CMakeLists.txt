@@ -12,6 +12,7 @@ set(SOURCES_SPACES
     spaces/space_strip.cc
     spaces/space_periodic.cc
     spaces/space_cylinderP.cc
+    spaces/space_bicylinder.cc
     spaces/space_dynamic_prop.cc
     spaces/space_dynamic_ellipse.cc
     spaces/space_dynamic_sphere.cc

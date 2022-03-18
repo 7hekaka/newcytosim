@@ -488,6 +488,7 @@ void glApp::processNormalKey(unsigned char c, int, int)
         
         
         case 'x':
+        case 'X':
             view.axes = ( view.axes ? 0 : mDIM );
             break;
 

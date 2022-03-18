@@ -11,6 +11,7 @@
 #include "space_cylinder.h"
 #include "space_cylinderZ.h"
 #include "space_cylinderP.h"
+#include "space_bicylinder.h"
 #include "space_dice.h"
 #include "space_disc.h"
 #include "space_ellipse.h"
@@ -70,6 +71,7 @@
  `cylinder`    | SpaceCylinder        | length radius
  `cylinderZ`   | SpaceCylinderZ       | radius bottom top
  `cylinderP`   | SpaceCylinderP       | length radius
+ `bicylinder`  | SpaceBicylinder      | radius
  `ring`        | SpaceRing            | length radius
  `disc`        | SpaceDisc            | radius bottom top
  `tee`         | SpaceTee             | length radius junction arm
@@ -111,6 +113,7 @@ Space * SpaceProp::newSpace() const
     if ( s=="cylinder" )                       return new SpaceCylinder(this);
     if ( s=="cylinderZ" )                      return new SpaceCylinderZ(this);
     if ( s=="cylinderP" )                      return new SpaceCylinderP(this);
+    if ( s=="bicylinder" )                     return new SpaceBicylinder(this);
 #elif ( DIM == 2 )
     if ( s=="cylinder" )                       return new SpaceSquare(this);
     if ( s=="cylinderP" )                      return new SpaceStrip(this);
