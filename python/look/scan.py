@@ -47,7 +47,7 @@ def execute(tool, path):
         sys.stderr.write("Error: %s\n" % repr(e));
 
 
-def queued(queue):
+def worker(queue):
     """
     run executable taking argument from queue
     """
@@ -103,7 +103,7 @@ def main(args):
                 queue.put((tool, p))
             jobs = []
             for n in range(njobs):
-                j = Process(target=queued, args=(queue,))
+                j = Process(target=worker, args=(queue,))
                 jobs.append(j)
                 j.start()
             # wait for completion of all jobs:
