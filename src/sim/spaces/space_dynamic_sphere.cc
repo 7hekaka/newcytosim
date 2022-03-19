@@ -17,24 +17,24 @@ void SpaceDynamicSphere::setInteractions(Meca&) const
 }
 
 
-void SpaceDynamicSphere::setConfinement(Vector const& pos, Mecapoint const& pe,
+void SpaceDynamicSphere::setConfinement(Vector const& pos, Mecapoint const& mp,
                                         Meca& meca, real stiff) const
 {
-    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
+    meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_, stiff);
     force_ += stiff * ( pos.norm() - radius_ );
 }
 
 
-void SpaceDynamicSphere::setConfinement(Vector const& pos, Mecapoint const& pe,
+void SpaceDynamicSphere::setConfinement(Vector const& pos, Mecapoint const& mp,
                                         real rad, Meca& meca, real stiff) const
 {
     if ( radius_ > rad )
     {
-        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);
+        meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_-rad, stiff);
         force_ += stiff * ( rad + pos.norm() - radius_ );
     }
     else {
-        meca.addPointClamp( pe, Vector(0,0,0), stiff );
+        meca.addPointClamp( mp, Vector(0,0,0), stiff );
         std::cerr << "object is too big to fit in SpaceDynamicSphere\n";
         force_ += 2 * stiff * ( rad - radius_ );
     }

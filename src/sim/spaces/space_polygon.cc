@@ -185,7 +185,8 @@ Vector SpacePolygon::project(Vector const& W) const
  
  @todo Also project re-entrant polygon corners on the segments of the Fiber.
  */
-void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                  Meca& meca, real stiff) const
 {    
 #if ( DIM > 1 )
     
@@ -200,7 +201,7 @@ void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& 
 
     if ( abs_real(pos.ZZ) >= height_ )
     {
-        meca.addPlaneClampZ(pe, std::copysign(height_, pos.ZZ), stiff);
+        meca.addPlaneClampZ(mp, std::copysign(height_, pos.ZZ), stiff);
         if ( in ) return;
     }
     else if ( in )
@@ -212,23 +213,24 @@ void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& 
         
         if ( V * V < HH )
         {
-            meca.addPlaneClampZ(pe, std::copysign(height_, pos.ZZ), stiff);
+            meca.addPlaneClampZ(mp, std::copysign(height_, pos.ZZ), stiff);
             return;
         }
     }
 #endif
 
     if ( edg )
-        meca.addPlaneClamp(pe, Vector(pX,pY,0), Vector(nX,nY,0), stiff);
+        meca.addPlaneClamp(mp, Vector(pX,pY,0), Vector(nX,nY,0), stiff);
     else
-        meca.addPointClampXY(pe, Vector(pX,pY,0), stiff);
+        meca.addPointClampXY(mp, Vector(pX,pY,0), stiff);
 #endif
 }
 
 
-void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                  real rad, Meca& meca, real stiff) const
 {
-    //setConfinement(pos, pe, meca, stiff);
+    //setConfinement(pos, mp, meca, stiff);
     std::cerr << "unfinished SpacePolygon::setConfinement(with radius)\n";
 }
 

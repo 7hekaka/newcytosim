@@ -72,17 +72,8 @@ void SpaceDynamicEllipse::setInteractions(Meca&) const
 }
 
 
-/**
- Call the appropriate interaction from \a meca, to confine \a pe, which is at position \a pos.
- 
- The default implementation projects \a pos,
- to calculate the direction of the normal to the edge of the Space,
- and then calls Meca::interPlane, with the approprimate aguments.
- This generates a friction-less potential centered on the edge.
-
- Also update \a Rforces and \a Torques that will be use to evolve the Space
-*/
-void SpaceDynamicEllipse::setConfinement(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceDynamicEllipse::setConfinement(Vector const&pos, Mecapoint const& mp,
+                                         Meca& meca, real stiff) const
 {
     Vector prj;
     prj = project(pos);
@@ -93,7 +84,7 @@ void SpaceDynamicEllipse::setConfinement(Vector const&pos, Mecapoint const& pe, 
         // Register the force to the ellipse
         decompose_force(stiff * dir, prj, dir);
         // And to the meca
-        meca.addPlaneClamp(pe, prj, dir, stiff/n);
+        meca.addPlaneClamp(mp, prj, dir, stiff/n);
     }
 }
 

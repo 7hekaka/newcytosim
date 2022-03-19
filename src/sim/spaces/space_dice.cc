@@ -164,10 +164,11 @@ Vector SpaceDice::project(Vector const& W) const
 /**
  Here 'dim' is the reduced dimension: half_[d] - edge_
  */
-void SpaceDice::setConfinement(Vector const& w, Mecapoint const& pe, Meca& meca, real stiff, const real dim[], real edg)
+void SpaceDice::setConfinement(Vector const& w, Mecapoint const& mp,
+                               Meca& meca, real stiff, const real dim[], real edg)
 {
 #if ( DIM == 1 )
-    meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
+    meca.addPlaneClampX(mp, std::copysign(dim[0], w.XX), stiff);
 #else
     real dX = dim[0] - abs_real(w.XX);
     real dY = dim[1] - abs_real(w.YY);
@@ -186,31 +187,31 @@ void SpaceDice::setConfinement(Vector const& w, Mecapoint const& pe, Meca& meca,
         if ( dZ < dY )
         {
             if ( dZ < dX )
-                meca.addPlaneClampZ(pe, std::copysign(dim[2], w.ZZ), stiff);
+                meca.addPlaneClampZ(mp, std::copysign(dim[2], w.ZZ), stiff);
             else
-                meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
+                meca.addPlaneClampX(mp, std::copysign(dim[0], w.XX), stiff);
         }
         else
 #endif
         {
             if ( dY < dX )
-                meca.addPlaneClampY(pe, std::copysign(dim[1], w.YY), stiff);
+                meca.addPlaneClampY(mp, std::copysign(dim[1], w.YY), stiff);
             else
-                meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
+                meca.addPlaneClampX(mp, std::copysign(dim[0], w.XX), stiff);
         }
     }
 #if ( DIM > 2 )
     else if ( inY && inZ )
     {
-        meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
+        meca.addPlaneClampX(mp, std::copysign(dim[0], w.XX), stiff);
     }
     else if ( inX && inZ )
     {
-        meca.addPlaneClampY(pe, std::copysign(dim[1], w.YY), stiff);
+        meca.addPlaneClampY(mp, std::copysign(dim[1], w.YY), stiff);
     }
     else if ( inX && inY )
     {
-        meca.addPlaneClampZ(pe, std::copysign(dim[2], w.ZZ), stiff);
+        meca.addPlaneClampZ(mp, std::copysign(dim[2], w.ZZ), stiff);
     }
 #endif
     else if ( inX )
@@ -218,9 +219,9 @@ void SpaceDice::setConfinement(Vector const& w, Mecapoint const& pe, Meca& meca,
 #if ( DIM > 2 )
         real cY = std::copysign(dim[1]-edg, w.YY);
         real cZ = std::copysign(dim[2]-edg, w.ZZ);
-        meca.addCylinderClamp(pe, Vector(1, 0, 0), Vector(0, cY, cZ), edg, stiff);
+        meca.addCylinderClamp(mp, Vector(1, 0, 0), Vector(0, cY, cZ), edg, stiff);
 #else
-        meca.addPlaneClampY(pe, std::copysign(dim[1], w.YY), stiff);
+        meca.addPlaneClampY(mp, std::copysign(dim[1], w.YY), stiff);
 #endif
     }
     else if ( inY )
@@ -228,9 +229,9 @@ void SpaceDice::setConfinement(Vector const& w, Mecapoint const& pe, Meca& meca,
 #if ( DIM > 2 )
         real cX = std::copysign(dim[0]-edg, w.XX);
         real cZ = std::copysign(dim[2]-edg, w.ZZ);
-        meca.addCylinderClamp(pe, Vector(0, 1, 0), Vector(cX, 0, cZ), edg, stiff);
+        meca.addCylinderClamp(mp, Vector(0, 1, 0), Vector(cX, 0, cZ), edg, stiff);
 #else
-        meca.addPlaneClampX(pe, std::copysign(dim[0], w.XX), stiff);
+        meca.addPlaneClampX(mp, std::copysign(dim[0], w.XX), stiff);
 #endif
     }
 #if ( DIM > 2 )
@@ -238,7 +239,7 @@ void SpaceDice::setConfinement(Vector const& w, Mecapoint const& pe, Meca& meca,
     {
         real cX = std::copysign(dim[0]-edg, w.XX);
         real cY = std::copysign(dim[1]-edg, w.YY);
-        meca.addCylinderClamp(pe, Vector(0, 0, 1), Vector(cX, cY, 0), edg, stiff);
+        meca.addCylinderClamp(mp, Vector(0, 0, 1), Vector(cX, cY, 0), edg, stiff);
     }
 #endif
     else
@@ -250,19 +251,19 @@ void SpaceDice::setConfinement(Vector const& w, Mecapoint const& pe, Meca& meca,
 #else
         real cZ = 0;
 #endif
-        meca.addSphereClamp(pe, Vector(cX, cY, cZ), edg, stiff);
+        meca.addSphereClamp(mp, Vector(cX, cY, cZ), edg, stiff);
     }
 #endif
 }
 
 
-void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
 {
-    setConfinement(pos, pe, meca, stiff, half_, edge_);
+    setConfinement(pos, mp, meca, stiff, half_, edge_);
 }
 
 
-void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& mp, real rad, Meca& meca, real stiff) const
 {
     real E = max_real(0, edge_-rad);  // remaining edge
 
@@ -270,7 +271,7 @@ void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& pe, real rad,
     for ( unsigned d = 0; d < DIM; ++d )
         dim[d] = max_real(0, half_[d] - rad);
 
-    setConfinement(pos, pe, meca, stiff, dim, E);
+    setConfinement(pos, mp, meca, stiff, dim, E);
 }
 
 //------------------------------------------------------------------------------

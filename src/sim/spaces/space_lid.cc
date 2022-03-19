@@ -175,7 +175,7 @@ Vector SpaceLid::project(Vector const& pos) const
 #pragma mark - setConfinement
 
 
-void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe,
+void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& mp,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
@@ -186,16 +186,16 @@ void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe,
 
     // record force only on top edge:
 #if ( DIM == 2 )
-    meca.addPlaneClampY(pe, sign_select(S, bot_, top_), stiff);
+    meca.addPlaneClampY(mp, sign_select(S, bot_, top_), stiff);
     force_ += ( S > 0 ) * stiff * ( pos.YY - top_ );
 #elif ( DIM > 2 )
-    meca.addPlaneClampZ(pe, sign_select(S, bot_, top_), stiff);
+    meca.addPlaneClampZ(mp, sign_select(S, bot_, top_), stiff);
     force_ += ( S > 0 ) * stiff * ( pos.ZZ - top_ );
 #endif
 }
 
 
-void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe, real rad,
+void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& mp, real rad,
                               Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
@@ -207,11 +207,11 @@ void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& pe, real rad,
     // record force only on top edge:
 #if ( DIM == 2 )
     real Y = sign_select(S, bot_+rad, top_-rad);
-    meca.addPlaneClampY(pe, Y, stiff);
+    meca.addPlaneClampY(mp, Y, stiff);
     force_ += ( S > 0 ) * stiff * ( pos.YY - Y );
 #elif ( DIM > 2 )
     real Z = sign_select(S, bot_+rad, top_-rad);
-    meca.addPlaneClampZ(pe, Z, stiff);
+    meca.addPlaneClampZ(mp, Z, stiff);
     force_ += ( S > 0 ) * stiff * ( pos.ZZ - Z );
 #endif
 }

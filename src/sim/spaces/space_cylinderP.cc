@@ -161,19 +161,21 @@ Vector SpaceCylinderP::bounce(Vector const& pos) const
 /**
  This applies forces towards the cylindrical surface only
  */
-void SpaceCylinderP::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceCylinderP::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                    Meca& meca, real stiff) const
 {
-    meca.addCylinderClampX(pe, radius_, stiff);
+    meca.addCylinderClampX(mp, radius_, stiff);
 }
 
 /**
  This applies forces towards the cylindrical surface only
  */
-void SpaceCylinderP::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceCylinderP::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                    real rad, Meca& meca, real stiff) const
 {
     real R = max_real(0, radius_ - rad);
 
-    meca.addCylinderClampX(pe, R, stiff);
+    meca.addCylinderClampX(mp, R, stiff);
 }
 
 //------------------------------------------------------------------------------

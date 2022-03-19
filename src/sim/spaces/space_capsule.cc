@@ -189,35 +189,38 @@ Vector SpaceCapsule::placeOnEdge(real) const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff, const real len, const real rad)
+void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                  Meca& meca, real stiff, const real len, const real rad)
 {
     if ( abs_real(pos.XX) > len )
     {
         Vector cen(std::copysign(len, pos.XX),0,0);
-        meca.addSphereClamp(pos-cen, pe, cen, rad, stiff);
+        meca.addSphereClamp(pos-cen, mp, cen, rad, stiff);
     }
     else
-        meca.addCylinderClampX(pe, rad, stiff);
+        meca.addCylinderClampX(mp, rad, stiff);
 }
 
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                  Meca& meca, real stiff) const
 {
-    setConfinement(pos, pe, meca, stiff, half_, radius_);
+    setConfinement(pos, mp, meca, stiff, half_, radius_);
 }
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& mp, real rad,
+                                  Meca& meca, real stiff) const
 {
     if ( rad < radius_ )
-        setConfinement(pos, pe, meca, stiff, half_, radius_-rad);
+        setConfinement(pos, mp, meca, stiff, half_, radius_-rad);
     else
-        setConfinement(pos, pe, meca, stiff, half_, 0);
+        setConfinement(pos, mp, meca, stiff, half_, 0);
 }
 
 //------------------------------------------------------------------------------

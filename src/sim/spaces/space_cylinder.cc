@@ -132,7 +132,7 @@ Vector SpaceCylinder::project(Vector const& W) const
 /**
  This applies the correct forces in the cylindrical part and the caps.
  */
-void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca,
+void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca,
                                    real stiff, const real len, const real rad)
 {
     bool cap = ( abs_real(pos.XX) > len );
@@ -161,31 +161,32 @@ void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& pe, Meca&
 #endif
 
     if ( cap )
-        meca.addPlaneClampX(pe, X, stiff);
+        meca.addPlaneClampX(mp, X, stiff);
   
     if ( cyl )
-        meca.addCylinderClampX(pe, rad, stiff);
+        meca.addCylinderClampX(mp, rad, stiff);
 }
 
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                   Meca& meca, real stiff) const
 {
-    setConfinement(pos, pe, meca, stiff, half_, radius_);
+    setConfinement(pos, mp, meca, stiff, half_, radius_);
 }
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& pe,
+void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& mp,
                                    real rad, Meca& meca, real stiff) const
 {
     real R = max_real(0, radius_ - rad);
     real L = max_real(0, half_ - rad);
     
-    setConfinement(pos, pe, meca, stiff, L, R);
+    setConfinement(pos, mp, meca, stiff, L, R);
 }
 
 //------------------------------------------------------------------------------

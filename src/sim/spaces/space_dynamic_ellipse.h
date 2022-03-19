@@ -83,7 +83,7 @@ public:
     void setInteractions(Meca&) const;
 
     /// this also register the forces the ellipse undergoes
-    void setConfinement(Vector const&pos, Mecapoint const& pe, Meca& meca, real stiff) const;
+    void setConfinement(Vector const&pos, Mecapoint const& mp, Meca& meca, real stiff) const;
 
     ///    ContractEllipse has a step function to adjust shape
     void step();

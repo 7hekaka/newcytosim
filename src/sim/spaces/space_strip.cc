@@ -194,26 +194,28 @@ Vector SpaceStrip::project(Vector const& pos) const
 #pragma mark - setConfinement
 
 
-void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
     real Y = sign_select(2 * pos.YY - (bot_+top_), bot_, top_);
-    meca.addPlaneClampY(pe, Y, stiff);
+    meca.addPlaneClampY(mp, Y, stiff);
 #elif ( DIM > 2 )
     real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_, top_);
-    meca.addPlaneClampZ(pe, Z, stiff);
+    meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
 
 
-void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                real rad, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
     real Y = sign_select(2 * pos.YY - (bot_+top_), bot_+rad, top_-rad);
-    meca.addPlaneClampY(pe, Y, stiff);
+    meca.addPlaneClampY(mp, Y, stiff);
 #elif ( DIM > 2 )
     real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_+rad, top_-rad);
-    meca.addPlaneClampZ(pe, Z, stiff);
+    meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
 

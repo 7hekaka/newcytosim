@@ -87,18 +87,20 @@ Vector SpaceSphere::project(Vector const& pos) const
 
 //------------------------------------------------------------------------------
 
-void SpaceSphere::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceSphere::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                 Meca& meca, real stiff) const
 {
-    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
+    meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_, stiff);
 }
 
 
-void SpaceSphere::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceSphere::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                 real rad, Meca& meca, real stiff) const
 {
     if ( radius_ > rad )
-        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);
+        meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_-rad, stiff);
     else {
-        meca.addPointClamp(pe, Vector(0,0,0), stiff);
+        meca.addPointClamp(mp, Vector(0,0,0), stiff);
         std::cerr << "object is too big to fit in SpaceSphere\n";
     }
 }

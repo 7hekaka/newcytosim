@@ -75,7 +75,7 @@ public:
     /// true if the point is inside the Space
     bool inside(Vector const&) const;
     
-    /// true if the bead is inside the Space
+    /// true if the bead of radius `rad` is inside the Space
     bool allInside(Vector const&, real rad) const;
     
     /// a random position inside the volume

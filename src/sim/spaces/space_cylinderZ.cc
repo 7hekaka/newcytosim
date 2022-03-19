@@ -334,7 +334,7 @@ Vector SpaceCylinderZ::project(Vector const& W) const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, 
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, 
                                     real stiff, real R, real B, real T)
 {
 #if ( DIM >= 3 )
@@ -372,15 +372,15 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca
     }
     
     if ( cap )
-        meca.addPlaneClampZ(pe, Z, stiff);
+        meca.addPlaneClampZ(mp, Z, stiff);
     
     if ( cyl )
-        meca.addCylinderClampZ(pe, R, stiff);
+        meca.addCylinderClampZ(mp, R, stiff);
 #endif
 }
 
 
-void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca,
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca,
                                     real stiff, real R, real B, real T, real E)
 {
 #if ( DIM >= 3 )
@@ -397,7 +397,7 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca
             // above top end
             in = false;
             if ( n < R-E ) {
-                meca.addPlaneClampZ(pe, T, stiff);
+                meca.addPlaneClampZ(mp, T, stiff);
                 return;
             }
         }
@@ -410,7 +410,7 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca
         {
             in = false;
             if ( n < R-E ) {
-                meca.addPlaneClampZ(pe, B, stiff);
+                meca.addPlaneClampZ(mp, B, stiff);
                 return;
             }
         }
@@ -419,9 +419,9 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca
     if ( in )
     {
         if ( n > R-E  ||  R-E-n < abs_real(pos.ZZ-Z) )
-            meca.addCylinderClampZ(pe, R, stiff);
+            meca.addCylinderClampZ(mp, R, stiff);
         else
-            meca.addPlaneClampZ(pe, Z, stiff);
+            meca.addPlaneClampZ(mp, Z, stiff);
         return;
     }
     
@@ -432,7 +432,7 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca
     real S = ( R - E ) / n;
     Vector3 rim(S*pos.XX, S*pos.YY, Z);  // on the reduced cylinder rim
     Vector dir = normalize(pos-rim);
-    meca.addPlaneClamp(pe, rim+E*dir, dir, stiff);
+    meca.addPlaneClamp(mp, rim+E*dir, dir, stiff);
 
 #endif
 }
@@ -440,19 +440,19 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
 {
 #if HAS_SMOOTH_EDGES
-    setConfinement(pos, pe, meca, stiff, radius_, bot_, top_, edge_);
+    setConfinement(pos, mp, meca, stiff, radius_, bot_, top_, edge_);
 #else
-    setConfinement(pos, pe, meca, stiff, radius_, bot_, top_);
+    setConfinement(pos, mp, meca, stiff, radius_, bot_, top_);
 #endif
 }
 
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, real rad, Meca& meca, real stiff) const
 {
     real R = max_real(0, radius_ - rad);
     real T = top_ - rad;
@@ -465,9 +465,9 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& pe, real
     }
     
 #if HAS_SMOOTH_EDGES
-    setConfinement(pos, pe, meca, stiff, R, B, T, edge_);
+    setConfinement(pos, mp, meca, stiff, R, B, T, edge_);
 #else
-    setConfinement(pos, pe, meca, stiff, R, B, T);
+    setConfinement(pos, mp, meca, stiff, R, B, T);
 #endif
 }
 

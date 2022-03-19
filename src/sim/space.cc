@@ -353,25 +353,25 @@ real  Space::signedDistanceToEdge(Vector const& pos) const
 #pragma mark - Interactions
 
 /**
- Call the appropriate interaction from `meca`, to force `pe` to be on the edge of the Space.
+ Call the appropriate interaction from `meca`, to force `mp` to be on the edge of the Space.
  
  This implementation uses `pos` to find the local normal to the edge of the Space.
  and then calls Meca::addPlaneClamp, with the approprimate aguments.
  This generates a friction-less potential centered on the edge.
  */
 
-void Space::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void Space::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
 {
     Vector prj = project(pos);
     assert_true(prj.valid());
     Vector dir = pos - prj;
     real n = dir.normSqr();
     if ( n > REAL_EPSILON )
-        meca.addPlaneClamp(pe, prj, dir, stiff/n);
+        meca.addPlaneClamp(mp, prj, dir, stiff/n);
 }
 
 /**
- Call the appropriate interaction from `meca`, to confine `pe`, which is at position `pos`.
+ Call the appropriate interaction from `meca`, to confine `mp`, which is at position `pos`.
  
  The default implementation projects `pos`,
  to calculate the direction of the normal to the edge of the Space,
@@ -379,13 +379,13 @@ void Space::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, r
  This generates a friction-less potential centered on the edge.
  */
 
-void Space::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void Space::setConfinement(Vector const& pos, Mecapoint const& mp, real rad, Meca& meca, real stiff) const
 {
     Vector prj = projectDeflated(pos, rad);
     Vector dir = pos - prj;
     real n = dir.normSqr();
     if ( n > 0 )
-        meca.addPlaneClamp(pe, prj, dir, stiff/n);
+        meca.addPlaneClamp(mp, prj, dir, stiff/n);
 }
 
 #if ( 0 )

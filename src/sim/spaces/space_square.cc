@@ -160,7 +160,8 @@ Vector SpaceSquare::project(Vector const& W) const
 
  */
 
-void SpaceSquare::setConfinement(const real pos[], Mecapoint const& pe, Meca& meca, real stiff, const real dim[])
+void SpaceSquare::setConfinement(const real pos[], Mecapoint const& mp,
+                                 Meca& meca, real stiff, const real dim[])
 {
     bool in = true;
     
@@ -168,7 +169,7 @@ void SpaceSquare::setConfinement(const real pos[], Mecapoint const& pe, Meca& me
     {
         if ( abs_real(pos[d]) > dim[d] )
         {
-            meca.addPlaneClampXYZ(pe, d, std::copysign(dim[d], pos[d]), stiff);
+            meca.addPlaneClampXYZ(mp, d, std::copysign(dim[d], pos[d]), stiff);
             in = false;
         }
     }
@@ -187,24 +188,26 @@ void SpaceSquare::setConfinement(const real pos[], Mecapoint const& pe, Meca& me
         u = dim[2] - abs_real(pos[2]);
         if ( u < l )  dip = 2;
 #endif
-        meca.addPlaneClampXYZ(pe, dip, std::copysign(dim[dip], pos[dip]), stiff);
+        meca.addPlaneClampXYZ(mp, dip, std::copysign(dim[dip], pos[dip]), stiff);
     }
 }
 
 
-void SpaceSquare::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceSquare::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                 Meca& meca, real stiff) const
 {
-    setConfinement(pos, pe, meca, stiff, half_);
+    setConfinement(pos, mp, meca, stiff, half_);
 }
 
 
-void SpaceSquare::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceSquare::setConfinement(Vector const& pos, Mecapoint const& mp,
+                                 real rad, Meca& meca, real stiff) const
 {
     real dim[DIM];
     for ( size_t d = 0; d < DIM; ++d )
         dim[d] = max_real(0, half_[d] - rad);
 
-    setConfinement(pos, pe, meca, stiff, dim);
+    setConfinement(pos, mp, meca, stiff, dim);
 }
 
 //------------------------------------------------------------------------------

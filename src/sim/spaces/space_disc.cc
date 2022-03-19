@@ -146,31 +146,33 @@ Vector SpaceDisc::placeOnEdge(real) const
 }
 
 
-void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& mp,
+                               Meca& meca, real stiff) const
 {
 # if ( DIM <= 2 )
-    meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_, stiff);
+    meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_, stiff);
 #else
     real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_, top_);
-    meca.addPlaneClampZ(pe, Z, stiff);
+    meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
 
 
-void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& pe, real rad, Meca& meca, real stiff) const
+void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& mp,
+                               real rad, Meca& meca, real stiff) const
 {
 # if ( DIM <= 2 )
     if ( radius_ > rad )
     {
-        meca.addSphereClamp(pos, pe, Vector(0,0,0), radius_-rad, stiff);
+        meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_-rad, stiff);
     }
     else {
-        meca.addPointClamp( pe, Vector(0,0,0), stiff );
+        meca.addPointClamp( mp, Vector(0,0,0), stiff );
         std::cerr << "object is too big to fit in SpaceDisc\n";
     }
 #else
     real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_+rad, top_-rad);
-    meca.addPlaneClampZ(pe, Z, stiff);
+    meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
 

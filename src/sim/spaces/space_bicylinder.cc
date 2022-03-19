@@ -137,7 +137,7 @@ Vector SpaceBicylinder::project(Vector const& W) const
 
 //------------------------------------------------------------------------------
 
-void SpaceBicylinder::setConfinement(Vector const& W, Mecapoint const& pe, Meca& meca,
+void SpaceBicylinder::setConfinement(Vector const& W, Mecapoint const& mp, Meca& meca,
                                      real stiff, const real rad)
 {
 #if ( DIM >= 3 )
@@ -152,14 +152,14 @@ void SpaceBicylinder::setConfinement(Vector const& W, Mecapoint const& pe, Meca&
             // projection on cylinder aligned with X:
             Vector pX(W.XX, X*W.YY, X*W.ZZ);
             if ( pX.normXZSqr() < square(rad) )
-                meca.addCylinderClampX(pe, rad, stiff);
+                meca.addCylinderClampX(mp, rad, stiff);
         }
         else
         {
             // projection on cylinder aligned with Y:
             Vector pY(Y*W.XX, W.YY, Y*W.ZZ);
             if ( pY.normYZSqr() < square(rad) )
-                meca.addCylinderClampY(pe, rad, stiff);
+                meca.addCylinderClampY(mp, rad, stiff);
         }
 
         Vector E, T;
@@ -182,33 +182,33 @@ void SpaceBicylinder::setConfinement(Vector const& W, Mecapoint const& pe, Meca&
             real s = 1.0 / sqrt(2*square(Y) + square(X));
             T.set(-s*Y, s*Y, s*X);
         }
-        meca.addLineClamp(pe, E, T, stiff);
-        //meca.addPointClamp(pe, E, stiff);
+        meca.addLineClamp(mp, E, T, stiff);
+        //meca.addPointClamp(mp, E, stiff);
     }
     else if ( abs_real(W.YY) > abs_real(W.XX) )
     {
-        meca.addCylinderClampX(pe, rad, stiff);
+        meca.addCylinderClampX(mp, rad, stiff);
     }
     else
     {
-        meca.addCylinderClampY(pe, rad, stiff);
+        meca.addCylinderClampY(mp, rad, stiff);
     }
 #endif
 }
 
 
-void SpaceBicylinder::setConfinement(Vector const& pos, Mecapoint const& pe, Meca& meca, real stiff) const
+void SpaceBicylinder::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
 {
-    setConfinement(pos, pe, meca, stiff, radius_);
+    setConfinement(pos, mp, meca, stiff, radius_);
 }
 
 
-void SpaceBicylinder::setConfinement(Vector const& pos, Mecapoint const& pe,
+void SpaceBicylinder::setConfinement(Vector const& pos, Mecapoint const& mp,
                                      real rad, Meca& meca, real stiff) const
 {
     real R = max_real(0, radius_ - rad);
     
-    setConfinement(pos, pe, meca, stiff, R);
+    setConfinement(pos, mp, meca, stiff, R);
 }
 
 //------------------------------------------------------------------------------
