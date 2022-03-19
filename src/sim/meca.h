@@ -64,6 +64,9 @@ typedef BlockMatrixType::Block MatrixBlock;
  */
 #define DRAW_MECA_LINKS 0
 
+// this should be defined to use uniform_flow
+#define NEW_CYTOPLASMIC_FLOW 0
+
 
 /// A class to calculate the motion of objects in Cytosim
 /**
@@ -170,6 +173,9 @@ private:
     /// list of Mecable containing points to simulate
     Array<Mecable*> mecables;
 
+#if NEW_CYTOPLASMIC_FLOW
+    Vector uniform_flow_dt_;
+#endif
     //--------------------------------------------------------------------------
     // Vectors of size DIM * nbPoints()
     
@@ -686,7 +692,7 @@ public:
     void setSomeInteractions();
 
     /// Allocate the memory necessary to solve(). This must be called after the last add()
-    void getReady(Simul const& sim);
+    void getReady(Simul const&);
     
     /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver
     size_t solve();

@@ -16,6 +16,8 @@ Cytosim Todo List
 
 - Fiber::read should allow changing 'activity'
 - add units to documentation of parameters
+- Export Cytosim's world to Python (read only).
+- https://github.com/pybind/pybind11 seems better than Boost::Python 
 
 # Improvements
 
@@ -165,7 +167,6 @@ https://github.com/TNG/boost-python-examples
 # New molecular activities:
 
 - implement specialized motor classes: Kinesin, Dynein & Myosin
-- new Hand with capping activity (Request Marko Kaksonen)
 
 - steric between beads and fibers, but not fiber-fiber
 - stabilize the steric interactions of particles: solid.cym

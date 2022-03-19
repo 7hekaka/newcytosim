@@ -400,9 +400,9 @@ void Simul::solve_onlyX()
 void Simul::solve_flux()
 {
 #if OLD_SPINDLE_FLUX
-    if ( prop->flux_speed > 0 )
+    if ( prop.flux_speed > 0 )
         throw InvalidParameter("simul:flux_speed should be <= 0");
-    real shift = prop->flux_speed * prop->time_step;
+    real shift = prop.flux_speed * prop.time_step;
 
     for ( Fiber * fib = fibers.first(); fib ; fib=fib->next() )
     {

@@ -90,6 +90,9 @@ Meca::Meca()
     steric_ = 0;
     precond_ = 0;
     verbose_ = 0;
+#if NEW_CYTOPLASMIC_FLOW
+    uniform_flow_dt_.reset();
+#endif
 
     vPTS = nullptr;
     vSOL = nullptr;
@@ -414,6 +417,9 @@ void Meca::importParameters(SimulProp const& prop)
     tolerance_ = prop.tolerance;
     precond_ = prop.precondition;
     verbose_ = prop.verbose;
+#if NEW_CYTOPLASMIC_FLOW
+    uniform_flow_dt_ = prop.uniform_flow * prop.time_step;
+#endif
 }
 
 
@@ -666,12 +672,11 @@ size_t Meca::solve()
     /**
      Includes a constant fluid flow displacing all the objects along
      */
-    if ( prop->flow.norm() > REAL_EPSILON )
+    if ( uniform_flow_dt_.norm() > REAL_EPSILON )
     {
         LOG_ONCE("NEW_CYTOPLASMIC_FLOW code enabled\n");
-        Vector flow_dt = prop->flow * tau_;
-        for ( int p = 0; p < dimension(); ++p )
-            flow_dt.add_to(vRHS+DIM*p);
+        for ( size_t p = 0; p < nbVertices(); ++p )
+            uniform_flow_dt_.add_to(vRHS+DIM*p);
     }
 #endif
     

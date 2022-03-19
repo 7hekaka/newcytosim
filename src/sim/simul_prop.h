@@ -102,7 +102,7 @@ public:
     
 #if NEW_CYTOPLASMIC_FLOW
     /// uniform and constant fluid flow
-    Vector flow;
+    Vector uniform_flow;
 #endif
 #if OLD_SPINDLE_FLUX
     /// special parameter for Spindle simulation (solve=flux)

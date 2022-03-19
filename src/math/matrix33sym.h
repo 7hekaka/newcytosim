@@ -124,11 +124,7 @@ public:
     /// return modifiable pointer of 'real'
     real* data() { return val; }
     
-#if defined(__SSE3__) && !REAL_IS_DOUBLE
-    vec2f data0() const { return load2f(val); }
-    vec2f data1() const { return load2f(val+2); }
-    vec2f data2() const { return load2f(val+4); }
-#elif defined(__SSE3__)
+#if defined(__SSE3__) && REAL_IS_DOUBLE
     vec2 data0() const { return load2(val); }
     vec2 data1() const { return load2(val+2); }
     vec2 data2() const { return load2(val+4); }
