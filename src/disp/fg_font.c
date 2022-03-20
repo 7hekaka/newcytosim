@@ -30,52 +30,23 @@
  Keeping only the font-rendering capabilities
  */
 
+#include "fg_font.h"
 
-/* The bitmap font structure */
-typedef struct tagSFG_Font SFG_Font;
-struct tagSFG_Font
+
+/// Fonts inherited from GLUT
+enum GLUTFontType
 {
-    int             Quantity;     /* Number of chars in font          */
-    int             Height;       /* Height of the characters         */
-    const GLubyte** Characters;   /* The characters mapping           */
-    float           xorig, yorig; /* Relative origin of the character */
+    STROKE_ROMAN = 0,
+    STROKE_MONO_ROMAN = 1,
+    BITMAP_9_BY_15 = 2,
+    BITMAP_8_BY_13 = 3,
+    BITMAP_TIMES_ROMAN_10 = 4,
+    BITMAP_TIMES_ROMAN_24 = 5,
+    BITMAP_HELVETICA_10 = 6,
+    BITMAP_HELVETICA_12 = 7,
+    BITMAP_HELVETICA_18 = 8
 };
 
-/* The stroke font structures */
-typedef struct tagSFG_StrokeVertex SFG_StrokeVertex;
-struct tagSFG_StrokeVertex
-{
-    GLfloat         X, Y;
-};
-
-typedef struct tagSFG_StrokeStrip SFG_StrokeStrip;
-struct tagSFG_StrokeStrip
-{
-    int             Number;
-    const SFG_StrokeVertex* Vertices;
-};
-
-typedef struct tagSFG_StrokeChar SFG_StrokeChar;
-struct tagSFG_StrokeChar
-{
-    GLfloat         Right;
-    int             Number;
-    const SFG_StrokeStrip* Strips;
-};
-
-typedef struct tagSFG_StrokeFont SFG_StrokeFont;
-struct tagSFG_StrokeFont
-{
-    int             Quantity;                   /* Number of chars in font   */
-    GLfloat         Height;                     /* Height of the characters  */
-    const SFG_StrokeChar** Characters;          /* The characters mapping    */
-};
-
-/*
- * TODO BEFORE THE STABLE RELEASE:
- *
- *  Test things out ...
- */
 
 /* -- IMPORT DECLARATIONS -------------------------------------------------- */
 
@@ -85,7 +56,7 @@ struct tagSFG_StrokeFont
  * Matches a font ID with a SFG_Font structure pointer.
  * This was changed to match the GLUT header style.
  */
-static SFG_Font const* fghFontByID( FontType font )
+SFG_Font const* fghFontByID( int font )
 {
     if( font == BITMAP_8_BY_13        )
         return &fgFontFixed8x13;
@@ -101,33 +72,27 @@ static SFG_Font const* fghFontByID( FontType font )
         return &fgFontTimesRoman10;
     if( font == BITMAP_TIMES_ROMAN_24 )
         return &fgFontTimesRoman24;
-
-    return nullptr;
+    return NULL;
 }
 
 /* -- STROKE FONTS ---------------------------------------------------- */
 
-namespace Roman {
-#include "fg_stroke_roman.c"
-const SFG_StrokeFont fgStrokeFont = {128,152.381f,chars};
-}
 
-namespace MonoRoman {
-#include "fg_stroke_mono_roman.c"
-const SFG_StrokeFont fgStrokeFont = {128,152.381f,chars};
-}
+extern const SFG_StrokeFont fgStrokeRoman;
+
+extern const SFG_StrokeFont fgStrokeMonoRoman;
 
 /*
  * Matches a font ID with a SFG_StrokeFont structure pointer.
  * This was changed to match the GLUT header style.
  */
-static SFG_StrokeFont const* fghStrokeByID( FontType font )
+SFG_StrokeFont const* fghStrokeByID( int font )
 {
     if( font == STROKE_ROMAN      )
-        return &Roman::fgStrokeFont;
+        return &fgStrokeRoman;
     if( font == STROKE_MONO_ROMAN )
-        return &MonoRoman::fgStrokeFont;
-    return nullptr;
+        return &fgStrokeMonoRoman;
+    return NULL;
 }
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
@@ -135,7 +100,7 @@ static SFG_StrokeFont const* fghStrokeByID( FontType font )
 /*
  * Draw a bitmap character
  */
-void fgBitmapCharacter( FontType fontID, int character )
+void fgBitmapCharacter( int fontID, int character )
 {
     const GLubyte* face;
     SFG_Font const* font = fghFontByID( fontID );
@@ -163,7 +128,7 @@ void fgBitmapCharacter( FontType fontID, int character )
     }
 }
 
-void fgBitmapString( FontType fontID, const unsigned char *string, float vshift )
+void fgBitmapString( int fontID, const unsigned char *string, float vshift )
 {
     unsigned char c;
     float x = 0.0f ;
@@ -189,7 +154,7 @@ void fgBitmapString( FontType fontID, const unsigned char *string, float vshift 
         {
             if( c == '\n' )
             {
-                glBitmap ( 0, 0, 0, 0, -x, -vshift, nullptr );
+                glBitmap ( 0, 0, 0, 0, -x, -vshift, NULL );
                 x = 0.0f;
             }
             else  /* Not an EOL, draw the bitmap character */
@@ -213,7 +178,7 @@ void fgBitmapString( FontType fontID, const unsigned char *string, float vshift 
 /*
  * Returns the width in pixels of a font's character
  */
-int fgBitmapWidth( FontType fontID, int character )
+int fgBitmapWidth( int fontID, int character )
 {
     SFG_Font const* font = fghFontByID( fontID );
     if ( font && character > 0 && character < 256 )
@@ -224,7 +189,7 @@ int fgBitmapWidth( FontType fontID, int character )
 /*
  * Return the width of a string drawn using a bitmap font
  */
-int fgBitmapLength( FontType fontID, const unsigned char* string )
+int fgBitmapLength( int fontID, const unsigned char* string )
 {
     unsigned char c;
     int length = 0, this_line_length = 0;
@@ -251,7 +216,7 @@ int fgBitmapLength( FontType fontID, const unsigned char* string )
 /*
  * Returns the height of a bitmap font
  */
-int fgBitmapHeight( FontType fontID )
+int fgBitmapHeight( int fontID )
 {
     SFG_Font const* font = fghFontByID( fontID );
     if ( font )
@@ -262,7 +227,7 @@ int fgBitmapHeight( FontType fontID )
 /*
  * Draw a stroke character
  */
-void fgStrokeCharacter( FontType fontID, int character, bool drawJoinDots )
+void fgStrokeCharacter( int fontID, int character, int drawJoinDots )
 {
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
@@ -295,7 +260,7 @@ void fgStrokeCharacter( FontType fontID, int character, bool drawJoinDots )
     }
 }
 
-void fgStrokeString( FontType fontID, const unsigned char *string )
+void fgStrokeString( int fontID, const unsigned char *string )
 {
     unsigned char c;
     int i, j;
@@ -343,7 +308,7 @@ void fgStrokeString( FontType fontID, const unsigned char *string )
 /*
  * Return the width in pixels of a stroke character
  */
-GLfloat fgStrokeWidthf( FontType fontID, int character )
+GLfloat fgStrokeWidthf( int fontID, int character )
 {
     const SFG_StrokeChar *schar;
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
@@ -356,7 +321,7 @@ GLfloat fgStrokeWidthf( FontType fontID, int character )
     return 0;
 }
 
-int fgStrokeWidth(FontType fontID, int character)
+int fgStrokeWidth( int fontID, int character )
 {
     return ( int )( fgStrokeWidthf(fontID, character) + 0.5f );
 }
@@ -364,7 +329,7 @@ int fgStrokeWidth(FontType fontID, int character)
 /*
  * Return the width of a string drawn using a stroke font
  */
-GLfloat fgStrokeLengthf( FontType fontID, const unsigned char* string )
+GLfloat fgStrokeLengthf( int fontID, const unsigned char* string )
 {
     unsigned char c;
     GLfloat length = 0.0;
@@ -394,7 +359,7 @@ GLfloat fgStrokeLengthf( FontType fontID, const unsigned char* string )
     return length;
 }
 
-int fgStrokeLength( FontType fontID, const unsigned char* string )
+int fgStrokeLength( int fontID, const unsigned char* string )
 {
     return( int )( fgStrokeLengthf(fontID,string) + 0.5f );
 }
@@ -402,7 +367,7 @@ int fgStrokeLength( FontType fontID, const unsigned char* string )
 /*
  * Returns the height of a stroke font
  */
-GLfloat fgStrokeHeight( FontType fontID )
+GLfloat fgStrokeHeight( int fontID )
 {
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
     if ( font )

@@ -876,6 +876,9 @@
 		BBE4B5ED13E04D2400CBE163 /* space_periodic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4B5E913E04D2400CBE163 /* space_periodic.cc */; };
 		BBE4B5EE13E04D2400CBE163 /* space_periodic.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4B5EA13E04D2400CBE163 /* space_periodic.h */; };
 		BBE60B950EE9684000FFAB27 /* field_values.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE60B940EE9684000FFAB27 /* field_values.h */; };
+		BBE6C41F27E7AAFA0071E862 /* fg_font.c in Sources */ = {isa = PBXBuildFile; fileRef = BBD67D3127E7116600474142 /* fg_font.c */; };
+		BBE6C42027E7B1A40071E862 /* fg_stroke_mono_roman.c in Sources */ = {isa = PBXBuildFile; fileRef = BBD67D3527E71D9600474142 /* fg_stroke_mono_roman.c */; };
+		BBE6C42127E7B1A80071E862 /* fg_stroke_roman.c in Sources */ = {isa = PBXBuildFile; fileRef = BBD67D3627E71D9700474142 /* fg_stroke_roman.c */; };
 		BBE82A2B233D15EB00BE44DF /* space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388A10B48EC400A4028F /* space_prop.h */; };
 		BBE82A2D233D15EB00BE44DF /* space_polygonZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */; };
 		BBE82A2E233D15EB00BE44DF /* space_cylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C210B48EF900A4028F /* space_cylinder.h */; };
@@ -1928,6 +1931,7 @@
 		BBE4B5EA13E04D2400CBE163 /* space_periodic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_periodic.h; path = src/sim/spaces/space_periodic.h; sourceTree = SOURCE_ROOT; };
 		BBE60B940EE9684000FFAB27 /* field_values.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = field_values.h; path = src/sim/field_values.h; sourceTree = SOURCE_ROOT; };
 		BBE60C250EE979ED00FFAB27 /* simul_step.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simul_step.cc; path = src/sim/simul_step.cc; sourceTree = SOURCE_ROOT; };
+		BBE6C41C27E7A80A0071E862 /* fg_font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fg_font.h; sourceTree = "<group>"; };
 		BBE82A64233D15EB00BE44DF /* libcytospaceG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospaceG.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE87DFE0DD33655002B3A3C /* movable.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = movable.cc; path = src/sim/movable.cc; sourceTree = SOURCE_ROOT; };
 		BBE87DFF0DD33655002B3A3C /* movable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = movable.h; path = src/sim/movable.h; sourceTree = SOURCE_ROOT; };
@@ -2992,6 +2996,7 @@
 				BB1DCBF31421FE850061547C /* line_disp.h */,
 				BB1DCBF21421FE850061547C /* line_disp.cc */,
 				BB9711651DECDA3600352630 /* GL */,
+				BBE6C41927E7A5DB0071E862 /* deps */,
 				BB9711641DECDA2C00352630 /* GLE */,
 				BB97114D1DECDA1300352630 /* glapp.h */,
 				BB97114C1DECDA1300352630 /* glapp.cc */,
@@ -3009,10 +3014,6 @@
 		BB9711641DECDA2C00352630 /* GLE */ = {
 			isa = PBXGroup;
 			children = (
-				BBD67D3227E7116600474142 /* fg_font_data.c */,
-				BBD67D3527E71D9600474142 /* fg_stroke_mono_roman.c */,
-				BBD67D3627E71D9700474142 /* fg_stroke_roman.c */,
-				BBD67D3127E7116600474142 /* fg_font.c */,
 				BB9711511DECDA1300352630 /* gle.h */,
 				BB9711501DECDA1300352630 /* gle.cc */,
 				BBBFEC4427E7308C0019DAFD /* gym_check.h */,
@@ -3346,6 +3347,18 @@
 				BBE447D22064697D0058ADAC /* SFMT.h */,
 			);
 			name = random;
+			sourceTree = "<group>";
+		};
+		BBE6C41927E7A5DB0071E862 /* deps */ = {
+			isa = PBXGroup;
+			children = (
+				BBE6C41C27E7A80A0071E862 /* fg_font.h */,
+				BBD67D3127E7116600474142 /* fg_font.c */,
+				BBD67D3227E7116600474142 /* fg_font_data.c */,
+				BBD67D3527E71D9600474142 /* fg_stroke_mono_roman.c */,
+				BBD67D3627E71D9700474142 /* fg_stroke_roman.c */,
+			);
+			name = deps;
 			sourceTree = "<group>";
 		};
 		BBEB846112FF338100F9D717 /* Fork */ = {
@@ -4535,10 +4548,13 @@
 				BB109D3823D0788200805F16 /* fiber_disp.cc in Sources */,
 				BB30922C2164BB2B00C6DEE4 /* grid_display.cc in Sources */,
 				BB97116C1DECDBA000352630 /* gle_color.cc in Sources */,
+				BBE6C42127E7B1A80071E862 /* fg_stroke_roman.c in Sources */,
 				BB109D3623D0788200805F16 /* line_disp.cc in Sources */,
 				BB9711691DECDB8500352630 /* view.cc in Sources */,
 				BB97116D1DECDBA300352630 /* gle_color_list.cc in Sources */,
+				BBE6C41F27E7AAFA0071E862 /* fg_font.c in Sources */,
 				BB9711681DECDB8200352630 /* view_prop.cc in Sources */,
+				BBE6C42027E7B1A40071E862 /* fg_stroke_mono_roman.c in Sources */,
 				BB97116E1DECDBE500352630 /* gle.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

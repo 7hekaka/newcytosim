@@ -6,9 +6,8 @@
 #include "vector.h"
 
 
-/* We import the font rendering code from the FreeGLUT project */
 extern "C" {
-#include "fg_font.c"
+#include "fg_font.h"
 }
 
 namespace gym

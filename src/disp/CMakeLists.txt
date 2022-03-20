@@ -2,6 +2,7 @@ set(SOURCES_DISP
     gle.cc
     gym_text.cc
     gym_flute.cc
+    gym_check.cc
     gym_zoo.cc
     gle_color.cc
     gle_color_list.cc
@@ -14,6 +15,9 @@ set(SOURCES_DISP
     fiber_disp.cc
     line_disp.cc
     point_disp.cc
+    fg_font.c
+    fg_stroke_roman.c
+    fg_stroke_mono_roman.c
 )
 
 list(TRANSFORM SOURCES_DISP PREPEND "${SRC_DISP_DIR}/")
