@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 #
 # make_page.py creates a HTML page with links to files in given directories
 #
@@ -178,21 +178,20 @@ def process_dir(dirpath):
     files = []
     images = []
     movies = []
-    with os.scandir(dirpath) as it:
-        for e in it:
-            if e.is_file():
-                path = os.path.join(dirpath, e.name)
-                [name, ext] = os.path.splitext(e.name)
-                if name in excluded:
-                    pass
-                elif ext in ['.png', '.jpg', '.gif', '.tif', '.svg']:
-                    images.append(path)
-                elif ext in ['.mp4', '.mov']:
-                    movies.append(path)
-                if e.name in ['config.cym', 'movie.mp4']:
-                    files.append(e.name)
-            elif e.is_dir():
-                subdir.append(e.name)
+    for f in os.listdir(dirpath):
+        path = os.path.join(dirpath, f)
+        if os.path.isdir(path):
+            subdir.append(f)
+        else:
+            [name, ext] = os.path.splitext(f)
+            if name in excluded:
+                pass
+            elif ext in ['.png', '.jpg', '.gif', '.tif', '.svg']:
+                images.append(path)
+            elif ext in ['.mp4', '.mov']:
+                movies.append(path)
+            elif f in ['config.cym', 'movie.mp4']:
+                files.append(f)
     process(dirpath, subdir, files, images, movies)
 
 
