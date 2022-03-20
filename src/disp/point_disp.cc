@@ -8,6 +8,7 @@
 #include "gle.h"
 #include "gym_zoo.h"
 #include "gym_text.h"
+#include "gym_check.h"
 
 
 /// if this is defined, the pixelmap are stored in graphical memory

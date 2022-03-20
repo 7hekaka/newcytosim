@@ -1819,6 +1819,8 @@
 		BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_simd.cc; path = src/test/test_simd.cc; sourceTree = SOURCE_ROOT; };
 		BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_project.cc; path = src/test/test_project.cc; sourceTree = SOURCE_ROOT; };
 		BBBD34DF1AABA5BE00819326 /* map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = map.h; path = src/math/map.h; sourceTree = SOURCE_ROOT; };
+		BBBFEC4327E7308C0019DAFD /* gym_check.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_check.cc; sourceTree = "<group>"; };
+		BBBFEC4427E7308C0019DAFD /* gym_check.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_check.h; sourceTree = "<group>"; };
 		BBC0E57110CABBBB008139D1 /* point_disp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = point_disp.cc; sourceTree = "<group>"; };
 		BBC0E57210CABBBB008139D1 /* point_disp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point_disp.h; sourceTree = "<group>"; };
 		BBC422F8247342CF007EA070 /* hand_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hand_list.h; sourceTree = "<group>"; };
@@ -3013,6 +3015,8 @@
 				BBD67D3127E7116600474142 /* fg_font.c */,
 				BB9711511DECDA1300352630 /* gle.h */,
 				BB9711501DECDA1300352630 /* gle.cc */,
+				BBBFEC4427E7308C0019DAFD /* gym_check.h */,
+				BBBFEC4327E7308C0019DAFD /* gym_check.cc */,
 				BB9711531DECDA1300352630 /* gle_color.h */,
 				BB9711521DECDA1300352630 /* gle_color.cc */,
 				BB9711551DECDA1300352630 /* gle_color_list.h */,

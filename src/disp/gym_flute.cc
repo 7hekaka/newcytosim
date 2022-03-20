@@ -2,6 +2,7 @@
 
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_check.h"
 #include "gle_color.h"
 
 namespace gym

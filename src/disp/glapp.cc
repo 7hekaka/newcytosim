@@ -9,6 +9,7 @@
 #include "glossary.h"
 #include "time_date.h"
 #include "gle.h"
+#include "gym_check.h"
 
 
 namespace glApp

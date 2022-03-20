@@ -13,6 +13,7 @@
 #include "point_disp.h"
 #include "fiber_disp.h"
 #include "gym_flute.h"
+#include "gym_check.h"
 
 extern Modulo const* modulo;
 

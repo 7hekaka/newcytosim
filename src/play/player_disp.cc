@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include "filepath.h"
 #include "glut.h"
+#include "gym_check.h"
 
 extern void helpKeys(std::ostream&);
 
@@ -321,6 +322,7 @@ void Player::readDisplayString(View& view, std::string const& str)
  */
 void Player::drawScene(View& view)
 {
+    CHECK_GL_ERROR("drawScene");
     view.openDisplay();
     drawCytosim();
     view.closeDisplay();

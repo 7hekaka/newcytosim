@@ -390,29 +390,7 @@ namespace gle
     /// draw a set of 2 or 3 axes, depending on `dim`
     void drawAxes(float size, int dim);
 
-#pragma mark -
-
-    /// convert OpenGL error code to string
-    const char* errorString(GLenum code);
-
-    /// check and print OpenGL error(s)
-    void reportErrors(FILE*, const char* msg);
- 
-    /// print some info for debugging purpose
-    void dump();
-    
-    /// print current color properties of OpenGL context
-    void print_color_materials(std::ostream& os);
 }
-
-#ifdef NDEBUG
-#  define CHECK_GL_ERROR(ARG) ((void) 0)
-#  define assert_enabled(ARG) ((void) 0)
-#else
-#  define CHECK_GL_ERROR(ARG) gle::reportErrors(stderr, ARG)
-#  define assert_enabled(CAP) { if (!glIsEnabled(CAP))\
- { fprintf(stderr, "%s is not enabled in `%s`,  %s:%d\n", #CAP, SFUNC, SFILE, __LINE__); }}
-#endif
 
 
 #endif

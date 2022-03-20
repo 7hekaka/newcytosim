@@ -54,7 +54,6 @@ enum Mode { NORMAL = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
 void drawLive(View& view, int mag)
 {
     //std::clog << " drawLive(" << std::setprecision(3) << simul.time() << "s) " << "\n";
-    CHECK_GL_ERROR("before drawLive");
     if ( 0 == thread.trylock() )
     {
         thread.executePipedCommands(32);

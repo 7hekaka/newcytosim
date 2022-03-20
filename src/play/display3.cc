@@ -7,6 +7,7 @@
 
 #include "gle.h"
 #include "gle_color_list.h"
+#include "gym_check.h"
 #include "glut.h"
 
 #include "fake.h"
