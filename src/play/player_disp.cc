@@ -379,24 +379,13 @@ int Player::saveView(const char* filename, const char* format, int downsample) c
         printf("\r saved %ix%i snapshot %s    ", vp[2]/downsample, vp[3]/downsample, filename);
         fflush(stdout);
     }
-    if ( err )
-        fprintf(stderr, "Cytosim could not save %s    ", filename);
     return err;
 }
 
 
-/**
- Export image from the current OpenGL back buffer,
- in the format specified by 'PlayerProp::image_format',
- in the folder specified in `PlayerProp::image_dir`.
- The name of the file is formed by concatenating 'root' and 'indx'.
- */
-int Player::saveView(size_t indx, int downsample) const
+void setFileName(char str[], size_t len, const char name[], const char format[], size_t indx)
 {
-    char const* format = prop.image_format.c_str();
-    char str[1024] = { 0 };
-
-    strncpy(str, prop.image_name.c_str(), sizeof(str));
+    strncpy(str, name, len);
     // remove file extension:
     char* ptr = strchr(str, '.');
     if ( ptr ) *ptr = 0;
@@ -406,17 +395,32 @@ int Player::saveView(size_t indx, int downsample) const
         ptr = str + strlen(str);
     // add number:
     if ( ptr )
-        ptr += snprintf(ptr, sizeof(str)-(ptr-str), "%04lu", indx);
+        ptr += snprintf(ptr, len-(ptr-str), "%04lu", indx);
     else
         ptr = str + strlen(str);
     // add file extension:
-    if ( ptr - str + strlen(format) < sizeof(str) )
+    if ( ptr - str + strlen(format) < len )
     {
         *ptr++ = '.';
         strncpy(ptr, format, strlen(format));
     }
+}
+    
+/**
+ Export image from the current OpenGL back buffer,
+ in the format specified by 'PlayerProp::image_format',
+ in the folder specified in `PlayerProp::image_dir`.
+ The name of the file is formed by concatenating 'root' and 'indx'.
+ */
+int Player::saveView(size_t indx, int downsample) const
+{
+    char const* name = prop.image_name.c_str();
+    char const* fmt = prop.image_format.c_str();
+    
+    char str[1024] = { 0 };
+    setFileName(str, sizeof(str), name, fmt, indx);
     int cwd = FilePath::change_dir(prop.image_dir, true);
-    int err = saveView(str, format, downsample);
+    int err = saveView(str, fmt, downsample);
     FilePath::change_dir(cwd);
     return err;
 }

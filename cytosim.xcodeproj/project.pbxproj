@@ -879,6 +879,8 @@
 		BBE6C41F27E7AAFA0071E862 /* fg_font.c in Sources */ = {isa = PBXBuildFile; fileRef = BBD67D3127E7116600474142 /* fg_font.c */; };
 		BBE6C42027E7B1A40071E862 /* fg_stroke_mono_roman.c in Sources */ = {isa = PBXBuildFile; fileRef = BBD67D3527E71D9600474142 /* fg_stroke_mono_roman.c */; };
 		BBE6C42127E7B1A80071E862 /* fg_stroke_roman.c in Sources */ = {isa = PBXBuildFile; fileRef = BBD67D3627E71D9700474142 /* fg_stroke_roman.c */; };
+		BBE6C42727E7C88F0071E862 /* spng.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE6C42427E7BB670071E862 /* spng.c */; settings = {COMPILER_FLAGS = "-DSPNG_USE_MINIZ"; }; };
+		BBE6C42A27E7CF6E0071E862 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE6C42827E7CF630071E862 /* miniz.c */; };
 		BBE82A2B233D15EB00BE44DF /* space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388A10B48EC400A4028F /* space_prop.h */; };
 		BBE82A2D233D15EB00BE44DF /* space_polygonZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */; };
 		BBE82A2E233D15EB00BE44DF /* space_cylinder.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C210B48EF900A4028F /* space_cylinder.h */; };
@@ -1932,6 +1934,10 @@
 		BBE60B940EE9684000FFAB27 /* field_values.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = field_values.h; path = src/sim/field_values.h; sourceTree = SOURCE_ROOT; };
 		BBE60C250EE979ED00FFAB27 /* simul_step.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simul_step.cc; path = src/sim/simul_step.cc; sourceTree = SOURCE_ROOT; };
 		BBE6C41C27E7A80A0071E862 /* fg_font.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fg_font.h; sourceTree = "<group>"; };
+		BBE6C42327E7BB660071E862 /* spng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spng.h; sourceTree = "<group>"; };
+		BBE6C42427E7BB670071E862 /* spng.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = spng.c; sourceTree = "<group>"; };
+		BBE6C42827E7CF630071E862 /* miniz.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = miniz.c; sourceTree = "<group>"; };
+		BBE6C42927E7CF640071E862 /* miniz.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = miniz.h; sourceTree = "<group>"; };
 		BBE82A64233D15EB00BE44DF /* libcytospaceG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospaceG.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE87DFE0DD33655002B3A3C /* movable.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = movable.cc; path = src/sim/movable.cc; sourceTree = SOURCE_ROOT; };
 		BBE87DFF0DD33655002B3A3C /* movable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = movable.h; path = src/sim/movable.h; sourceTree = SOURCE_ROOT; };
@@ -3352,6 +3358,10 @@
 		BBE6C41927E7A5DB0071E862 /* deps */ = {
 			isa = PBXGroup;
 			children = (
+				BBE6C42327E7BB660071E862 /* spng.h */,
+				BBE6C42427E7BB670071E862 /* spng.c */,
+				BBE6C42927E7CF640071E862 /* miniz.h */,
+				BBE6C42827E7CF630071E862 /* miniz.c */,
 				BBE6C41C27E7A80A0071E862 /* fg_font.h */,
 				BBD67D3127E7116600474142 /* fg_font.c */,
 				BBD67D3227E7116600474142 /* fg_font_data.c */,
@@ -4542,6 +4552,7 @@
 				BB3CFAA125DBCC350016A7A3 /* gym_flute.cc in Sources */,
 				BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */,
 				BBCC8FFF2722C8550066FF75 /* gym_text.cc in Sources */,
+				BBE6C42727E7C88F0071E862 /* spng.c in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
 				BB97116B1DECDB9500352630 /* offscreen.cc in Sources */,
 				BB97116A1DECDB8F00352630 /* save_image.cc in Sources */,
@@ -4552,6 +4563,7 @@
 				BB109D3623D0788200805F16 /* line_disp.cc in Sources */,
 				BB9711691DECDB8500352630 /* view.cc in Sources */,
 				BB97116D1DECDBA300352630 /* gle_color_list.cc in Sources */,
+				BBE6C42A27E7CF6E0071E862 /* miniz.c in Sources */,
 				BBE6C41F27E7AAFA0071E862 /* fg_font.c in Sources */,
 				BB9711681DECDB8200352630 /* view_prop.cc in Sources */,
 				BBE6C42027E7B1A40071E862 /* fg_stroke_mono_roman.c in Sources */,

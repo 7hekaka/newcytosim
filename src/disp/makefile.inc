@@ -25,7 +25,7 @@ endif
 
 #----------------------------targets--------------------------------------------
 
-cytodisp.a: $(OBJ_DISP) $(OBJ_FONT) save_imageGL.o offscreen.o
+cytodisp.a: $(OBJ_DISP) $(OBJ_FONT) save_imageGL.o offscreen.o libspng.o miniz.o
 	$(MAKELIB)
 	$(DONE)
 
@@ -41,6 +41,12 @@ fg_stroke_roman.o: fg_stroke_roman.c fg_font.h
 fg_stroke_mono_roman.o: fg_stroke_mono_roman.c fg_font.h
 	$(CXX) -DNDEBUG $(FAST) -x c -c $< -o build/$@
 
+
+miniz.o: miniz.c miniz.h
+	$(CXX) $(FAST) -x c -c $< -o build/$@
+
+libspng.o: spng.c spng.h
+	$(CXX) -DSPNG_USE_MINIZ -DNDEBUG $(FAST) -x c -c $< -o build/$@
 
 save_image.o: save_image.cc save_image.h
 	$(COMPILE) $(IMAGES_DEF) -c $< -o build/$@
