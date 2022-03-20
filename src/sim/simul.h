@@ -482,7 +482,10 @@ public:
 
     /// print interection abscissa between fibers
     void reportNetworkBridges(std::ostream&, Glossary&) const;
-    
+ 
+    /// print network surface area
+    void reportNetworkSize(std::ostream&) const;
+
     /// print positions of interection between two fibers
     void reportFiberIntersections(std::ostream&, Glossary&) const;
 

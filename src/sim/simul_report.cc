@@ -506,8 +506,13 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportProfile(out);
         throw InvalidSyntax("I can only report spindle: indices, profile");
     }
-    if ( who == "network" && what == "bridge" )
-        return reportNetworkBridges(out, opt);
+    if ( who == "network" )
+    {
+        if ( what == "bridge" )
+            return reportNetworkBridges(out, opt);
+        if ( what == "size" )
+            return reportNetworkSize(out);
+    }
     if ( who == "ring" )
         return reportRing(out);
     if ( who == "platelet" )
@@ -1185,6 +1190,26 @@ void Simul::reportFiberMoments(std::ostream& out) const
     }
 }
 
+/**
+ Export first and second-order moments of vertices for each class of Fiber
+ */
+void Simul::reportNetworkSize(std::ostream& out) const
+{
+    out << COM << "polymer" << SEP << "surface";
+    out << std::fixed;
+    Accumulator acc;
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+    {
+        const real w = fib->segmentation();
+        acc.add(0.5*w, fib->posEndM());
+        for ( size_t n = 1; n < fib->lastPoint(); ++n )
+            acc.add(w, fib->posPoint(n));
+        acc.add(0.5*w, fib->posEndP());
+    }
+    acc.subtract_mean();
+    real S = 2 * M_PI * acc.total_variance();
+    out << LIN << acc.total_length() << SEP << S;
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Fiber forces
