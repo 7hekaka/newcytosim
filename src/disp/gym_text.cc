@@ -1,31 +1,39 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include "glut.h"
+#include "opengl.h"
 #include "gym_text.h"
 #include "gle_color.h"
 #include "vector.h"
 
+
+/* We import the font rendering code from the FreeGLUT project */
+extern "C" {
+#include "fg_font.c"
+}
+
 namespace gym
 {
-    int fontHeight(void* font)
+    int fontHeight(FontType font)
     {
-        if ( font == GLUT_BITMAP_8_BY_13 )        return 13;
-        if ( font == GLUT_BITMAP_9_BY_15 )        return 15;
-        if ( font == GLUT_BITMAP_TIMES_ROMAN_10 ) return 11;
-        if ( font == GLUT_BITMAP_TIMES_ROMAN_24 ) return 26;
-        if ( font == GLUT_BITMAP_HELVETICA_10 )   return 11;
-        if ( font == GLUT_BITMAP_HELVETICA_12 )   return 15;
-        if ( font == GLUT_BITMAP_HELVETICA_18 )   return 22;
+        if ( font == BITMAP_8_BY_13 )        return 13;
+        if ( font == BITMAP_9_BY_15 )        return 15;
+        if ( font == BITMAP_TIMES_ROMAN_10 ) return 12;
+        if ( font == BITMAP_TIMES_ROMAN_24 ) return 27;
+        if ( font == BITMAP_HELVETICA_10 )   return 13;
+        if ( font == BITMAP_HELVETICA_12 )   return 15;
+        if ( font == BITMAP_HELVETICA_18 )   return 22;
         return 13;
     }
-    
     
     /**
      Compute the max width of all the lines in the given text
      This uses GLUT, which should be initialized.
      */
-    int maxTextWidth(const char text[], void* font, int& lines)
+    int maxTextWidth(FontType fontID, const char text[], int& lines)
     {
+        SFG_Font const* font = fghFontByID(fontID);
+        if ( !font )
+            return 0;
         int res = 0;
         lines = 0;
         int w = 0;
@@ -37,13 +45,9 @@ namespace gym
                 ++lines;
                 w = 0;
             }
-            else if ( isspace(*c))
+            else if ( isprint(*c) )
             {
-                w += glutBitmapWidth(font, ' ');
-            }
-            else if ( isprint(*c))
-            {
-                w += glutBitmapWidth(font, *c);
+                w += font->Characters[(unsigned)*c][0];
             }
         }
         res = std::max(res, w);
@@ -55,18 +59,12 @@ namespace gym
 
     /**
      draw the string character per character using:
-     glutBitmapCharacter()
      */
-    void bitmapString(const char text[], void* font, float vshift)
+    void bitmapString(FontType font, const char text[], float vshift)
     {
-        if ( !font )
-        {
-            font = GLUT_BITMAP_HELVETICA_12;
-            vshift = sign_real(vshift) * fontHeight(font);
-        }
-        if ( vshift == 0 )
-            vshift = -fontHeight(font);
-        
+#if 1
+        fgBitmapString(font, (unsigned char*)text, -vshift);
+#else
         GLfloat ori[4], pos[4];
         glGetFloatv(GL_CURRENT_RASTER_POSITION, ori);
         
@@ -75,35 +73,33 @@ namespace gym
             if ( *p == '\n' )
             {
                 glGetFloatv(GL_CURRENT_RASTER_POSITION, pos);
-                glBitmap(0, 0, 0, 0, ori[0]-pos[0], vshift, nullptr);
-            }
-            else if ( isspace(*p) )
-            {
-                glutBitmapCharacter(font, ' ');
+                GLfloat hshift = ori[0] - pos[0];
+                glBitmap(0, 0, 0, 0, hshift, vshift, nullptr);
             }
             else if ( isprint(*p) )
             {
-                glutBitmapCharacter(font, *p);
+                fgBitmapCharacter(font, *p);
             }
         }
+#endif
     }
     
     
     // draw text at current raster position
-    void drawText(const char text[], void* font, float dx)
+    void drawText(FontType font, const char text[], float dx)
     {
         int L = 1;
         int H = fontHeight(font);
-        int W = maxTextWidth(text, font, L);
+        int W = maxTextWidth(font, text, L);
         // center text:
         glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
-        bitmapString(text, font, H);
+        bitmapString(font, text, H);
     }
     
     /**
      draw text at position `vec`, if this corresponds to a valid raster position
      */
-    void drawText(Vector3 const& vec, const char text[], void* font, float dx)
+    void drawText(Vector3 const& vec, FontType font, const char text[], float dx)
     {
         GLboolean valid = false;
         glRasterPos3f(vec.x(), vec.y(), vec.z());
@@ -117,21 +113,21 @@ namespace gym
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_ALPHA_TEST);
             glDisable(GL_LIGHTING);
-            drawText(text, font, dx);
+            drawText(font, text, dx);
             if ( depth ) glEnable(GL_DEPTH_TEST);
             if ( alpha ) glEnable(GL_ALPHA_TEST);
             if ( light ) glEnable(GL_LIGHTING);
         }
     }
     
-    void drawText(Vector2 const& w, const char text[], void* font, float dx)
+    void drawText(Vector2 const& w, FontType font, const char text[], float dx)
     {
-        drawText(Vector3(w.XX, w.YY, 0), text, font, dx);
+        drawText(Vector3(w.XX, w.YY, 0), font, text, dx);
     }
     
-    void drawText(Vector1 const& w, const char text[], void* font, float dx)
+    void drawText(Vector1 const& w, FontType font, const char text[], float dx)
     {
-        drawText(Vector3(w.XX, 0, 0), text, font, dx);
+        drawText(Vector3(w.XX, 0, 0), font, text, dx);
     }
 
     
@@ -158,7 +154,7 @@ namespace gym
      A background rectangle is displayed only if `bcol` is visible.
      
          glColor3f(1,1,1);
-         drawText(fKeyString, GLUT_BITMAP_8_BY_13, 0x0, 1);
+         drawText(fKeyString, BITMAP_8_BY_13, 0x0, 1);
      
      Possible values for `position`:
      - 0: bottom-left, text going up
@@ -170,18 +166,15 @@ namespace gym
      
      Note: width and height are the current size of the viewport (window)
      */
-    void drawText(const char text[], void* font, const gle_color back,
+    void drawText(FontType font, const char text[], const gle_color back,
                   const int position, int width, int height)
     {
         assert_true( width > 0 );
         assert_true( height > 0 );
         
-        if ( !font )
-            font = GLUT_BITMAP_9_BY_15;
-        
         int n_lines = 1;
         int lineHeight = fontHeight(font);
-        int textWidth = maxTextWidth(text, font, n_lines);
+        int textWidth = maxTextWidth(font, text, n_lines);
         
         GLint px, py;
         switch( position )
@@ -258,7 +251,7 @@ namespace gym
             glColor4fv(col);
         }
         
-        bitmapString(text, font, lineHeight);
+        bitmapString(font, text, lineHeight);
         
         glMatrixMode(GL_PROJECTION);
         glPopMatrix();
@@ -269,5 +262,10 @@ namespace gym
         if ( light ) glEnable(GL_LIGHTING);
     }
     
-    
+    /// stroke character
+    void strokeCharacter(FontType font, int character)
+    {
+        fgStrokeCharacter(font, character, true);
+    }
+
 }

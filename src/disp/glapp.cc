@@ -1200,7 +1200,7 @@ void glApp::displayMain()
         else
         {
             glColor3f(0.6f,0.6f,1.0f);
-            view.drawText(flashString, GLUT_BITMAP_9_BY_15, 0x0, 2);
+            view.drawText(BITMAP_9_BY_15, flashString, 0x0, 2);
         }
     }
     CHECK_GL_ERROR("in glApp::displayMain()");

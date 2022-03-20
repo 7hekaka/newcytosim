@@ -4,6 +4,7 @@
 
 #include "opengl.h"
 #include "view_prop.h"
+#include "gym_text.h"
 
 /// Handles the viewing angle, projection and other aspects of an OpenGL display
 /**
@@ -235,7 +236,7 @@ public:
     //---------------------------------------------------------------------------
     
     /// draw text
-    void drawText(std::string const& str, void* font, gle_color, int pos) const;
+    void drawText(FontType, std::string const& str, gle_color, int pos) const;
 
     /// display a scale bar vertical or horizontal
     void drawScaleH(float, float, float) const;

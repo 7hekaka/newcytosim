@@ -122,7 +122,7 @@ void nameVertices()
         real x, y, z;
         front->putPoint(&x, &y, &z, i);
         snprintf(tmp, sizeof(tmp), "%lu", i);
-        gym::drawText(Vector3(x, y, z), tmp, GLUT_BITMAP_8_BY_13, 0.5);
+        gym::drawText(Vector3(x, y, z), BITMAP_8_BY_13, tmp, 0.5);
     }
 }
 

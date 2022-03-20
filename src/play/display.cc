@@ -13,7 +13,6 @@
 #include "fake.h"
 
 #include "gle.h"
-#include "gym_text.h"
 #include "gle_color.h"
 #include "gle_color_list.h"
 #include "gym_flute.h"
@@ -1249,10 +1248,11 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
 }
 
 
-void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
+void Display::drawFiberLabels(Fiber const& fib, int style) const
 {
+    FontType font = BITMAP_HELVETICA_10;
     char str[32];
-
+    
     glDisable(GL_LIGHTING);
     if ( style & 1 )
     {
@@ -1261,7 +1261,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%lu", i);
-            gym::drawText(fib.posP(i), str, font);
+            gym::drawText(fib.posP(i), font, str);
         }
     } 
     else if ( style & 2 )
@@ -1271,25 +1271,25 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
-            gym::drawText(fib.posP(i), str, font);
+            gym::drawText(fib.posP(i), font, str);
         }
     }
     if ( style & 4 )
     {
         // display integral abscissa along the fiber
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
-        gym::drawText(fib.posEndM(), str, font);
+        gym::drawText(fib.posEndM(), font, str);
         
         int s = (int)std::ceil(fib.abscissaM());
         int e = (int)std::floor(fib.abscissaP());
         for ( int a = s; a <= e; ++a )
         {
             snprintf(str, sizeof(str), "%i", a);
-            gym::drawText(fib.pos(a), str, font);
+            gym::drawText(fib.pos(a), font, str);
         }
         
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
-        gym::drawText(fib.posEndP(), str, font);
+        gym::drawText(fib.posEndP(), font, str);
     }
     if ( style & 8 )
     {
@@ -1299,7 +1299,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, void* font) const
         {
             Vector b = fib.posP(i);
             snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
-            gym::drawText(0.5*(a+b), str, font, 0.5);
+            gym::drawText(0.5*(a+b), font, str, 0.5);
             a = b;
         }
     }
@@ -1663,7 +1663,7 @@ void Display::drawFiber(Fiber const& fib)
         if ( disp->label_style )
         {
             fib.disp->color.load(0.5);
-            drawFiberLabels(fib, disp->label_style, GLUT_BITMAP_HELVETICA_10);
+            drawFiberLabels(fib, disp->label_style);
         }
         
         if ( disp->end_style[1] )
@@ -1793,7 +1793,7 @@ void Display::drawSolid(Solid const& obj)
         char tmp[8];
         bodyColorF(obj).load();
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
-        gym::drawText(obj.posP(0), tmp, GLUT_BITMAP_HELVETICA_10);
+        gym::drawText(obj.posP(0), BITMAP_HELVETICA_10, tmp);
     }
     
     //draw polygon around vertices of Solid

@@ -213,7 +213,7 @@ void display(View& view, int)
             Vector x;
             myGrid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
             snprintf(str, sizeof(str), "%lu", j);
-            gym::drawText(x, str, GLUT_BITMAP_HELVETICA_10);
+            gym::drawText(x, BITMAP_HELVETICA_10, str);
         }
     }
     else

@@ -179,7 +179,7 @@ void drawNames()
         const float* v = ico->vertex_data(i);
         Vector3 pos(v[0], v[1], v[2]);
         snprintf(tmp, sizeof(tmp), "%u", i);
-        gym::drawText(pos, tmp, GLUT_BITMAP_8_BY_13, 0.5);
+        gym::drawText(pos, BITMAP_8_BY_13, tmp, 0.5);
     }
 }
 

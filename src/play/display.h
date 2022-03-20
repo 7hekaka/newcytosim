@@ -233,7 +233,7 @@ public:
     virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real width) const;
 
     /// display Labels for a Fiber
-    void         drawFiberLabels(Fiber const&, int style, void* font) const;
+    void         drawFiberLabels(Fiber const&, int style) const;
     
     /// display forces acting on the fiber vertices
     void         drawFiberForces(Fiber const&, real scale) const;

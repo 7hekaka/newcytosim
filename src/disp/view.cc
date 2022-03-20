@@ -1,9 +1,9 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
+
 #include "assert_macro.h"
 #include "view.h"
 #include "gle.h"
 #include "flute.h"
-#include "gym_text.h"
 #include "offscreen.h"
 #include "glu_unproject.cc"
 #include "glut.h"
@@ -166,7 +166,7 @@ void View::closeDisplay() const
         // display only first line of text:
         std::string msg = full_label.substr(0, full_label.find('\n'));
         front_color.load();
-        drawText(msg, nullptr, 0x0, 0);
+        drawText(BITMAP_9_BY_15, msg, 0x0, 0);
     }
 }
 
@@ -182,19 +182,19 @@ void View::drawInteractiveFeatures() const
     if ( draw_memo && memo.size() )
     {
         glColor3f(1,1,1);
-        drawText(memo, GLUT_BITMAP_8_BY_13, 0x000000CC, 4);
+        drawText(BITMAP_8_BY_13, memo, 0x000000CC, 4);
     }
 
     if ( top_message.size() )
     {
         front_color.load();
-        drawText(top_message, nullptr, back_color.alpha(0.5), 3);
+        drawText(BITMAP_9_BY_15, top_message, back_color.alpha(0.5), 3);
     }
     
     if ( label != "off" )
     {
         front_color.load();
-        drawText(full_label, nullptr, 0x0, 0);
+        drawText(BITMAP_9_BY_15, full_label, 0x0, 0);
     }
     
 #if ( 0 )
@@ -212,7 +212,7 @@ void View::drawInteractiveFeatures() const
         cnt = 0;
     }
     front_color.load();
-    drawText(buf, nullptr, 0x0, 1);
+    drawText(BITMAP_9_BY_15, buf, 0x0, 1);
 #endif
 }
 
@@ -813,9 +813,9 @@ void View::displayMagnifier(GLint Z, Vector3 foc, GLint mX, GLint mY) const
 }
 
 
-void View::drawText(std::string const& str, void* font, gle_color col, int pos) const
+void View::drawText(FontType font, std::string const& str, gle_color col, int pos) const
 {
-    gym::drawText(str.c_str(), font, col, pos, width(), height());
+    gym::drawText(font, str.c_str(), col, pos, width(), height());
 }
 
 //------------------------------------------------------------------------------
@@ -907,7 +907,7 @@ void View::drawScaleH(float s, float a, float b) const
             glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(s-6*pixelSize(), b-12*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gym::bitmapString(str);
+            gym::bitmapString(BITMAP_HELVETICA_12, str, 15);
         }
     } while ( w >= 0.5 );
 }
@@ -949,7 +949,7 @@ void View::drawScaleV(float s, float a, float b) const
             glDrawArrays(GL_LINES, 0, 36);
             glRasterPos2f(b+pixelSize(), s-4*pixelSize());
             snprintf(str, sizeof(str), "%g", s);
-            gym::bitmapString(str);
+            gym::bitmapString(BITMAP_HELVETICA_12, str, 15);
         }
     } while ( w >= 0.5 );
 }

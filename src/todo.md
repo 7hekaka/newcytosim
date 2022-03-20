@@ -46,9 +46,6 @@ Cytosim Todo List
 - use Dear imGUI for rendering text and minimal GUI components (Omar Cornut)
      https://github.com/ocornut/imgui
 
-- new font renderer, eg. FreeType (http://www.freetype.org/index.html)
-will fix problem for off-screen: glutBitmapCharacter() requires GLUT to be initialized.
-
 # To reach v4
 
 - Extend the 'properties' file to be able to store multiple time-points?

@@ -7,6 +7,7 @@
 #include "glut.h"
 #include "gle.h"
 #include "gym_zoo.h"
+#include "gym_text.h"
 
 
 /// if this is defined, the pixelmap are stored in graphical memory
@@ -120,15 +121,14 @@ void PointDisp::strokeA() const
     if ( symbol )
     {
         glScalef(1.0f/80, 1.0f/80, 1);
-        /*  glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, C)
-         character C of width ~104.76 units, and ~150 unit high max
+        /* Character C of width ~104.76 units, and ~150 unit high max
          The translation brings it near the center. */
         if ( islower(symbol) )
             glTranslatef(-52.35f, -35, 0);
         else
             glTranslatef(-52.35f, -50, 0);
         colorS.load();
-        glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, symbol);
+        gym::strokeCharacter(STROKE_MONO_ROMAN, symbol);
     }
 }
 

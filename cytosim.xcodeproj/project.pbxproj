@@ -1854,6 +1854,10 @@
 		BBD4BB3A1007F2D300D00914 /* fiber_disp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = fiber_disp.h; sourceTree = "<group>"; };
 		BBD5DA760FF7956C0010D08D /* organizer_set.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = organizer_set.cc; path = src/sim/organizer_set.cc; sourceTree = SOURCE_ROOT; };
 		BBD5DA770FF7956C0010D08D /* organizer_set.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = organizer_set.h; path = src/sim/organizer_set.h; sourceTree = SOURCE_ROOT; };
+		BBD67D3127E7116600474142 /* fg_font.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fg_font.c; sourceTree = "<group>"; };
+		BBD67D3227E7116600474142 /* fg_font_data.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fg_font_data.c; sourceTree = "<group>"; };
+		BBD67D3527E71D9600474142 /* fg_stroke_mono_roman.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fg_stroke_mono_roman.c; sourceTree = "<group>"; };
+		BBD67D3627E71D9700474142 /* fg_stroke_roman.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = fg_stroke_roman.c; sourceTree = "<group>"; };
 		BBD6F5BD12D9D16400A5F99B /* bundle_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bundle_prop.cc; path = organizers/bundle_prop.cc; sourceTree = "<group>"; };
 		BBD6F5BE12D9D16400A5F99B /* bundle_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bundle_prop.h; path = organizers/bundle_prop.h; sourceTree = "<group>"; };
 		BBD6F5BF12D9D16400A5F99B /* bundle.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bundle.cc; path = organizers/bundle.cc; sourceTree = "<group>"; };
@@ -3003,6 +3007,10 @@
 		BB9711641DECDA2C00352630 /* GLE */ = {
 			isa = PBXGroup;
 			children = (
+				BBD67D3227E7116600474142 /* fg_font_data.c */,
+				BBD67D3527E71D9600474142 /* fg_stroke_mono_roman.c */,
+				BBD67D3627E71D9700474142 /* fg_stroke_roman.c */,
+				BBD67D3127E7116600474142 /* fg_font.c */,
 				BB9711511DECDA1300352630 /* gle.h */,
 				BB9711501DECDA1300352630 /* gle.cc */,
 				BB9711531DECDA1300352630 /* gle_color.h */,
