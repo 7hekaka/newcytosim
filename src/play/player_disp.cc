@@ -72,11 +72,11 @@ std::string Player::buildLabel() const
     oss << std::setw(8) << std::fixed << simul.time() << "s";
     
     //display the force exerted by the mouse-controled Single:
-    Single const* sh = thread.handle();
+    Single const* sh = worker.handle();
     if ( sh && sh->attached() )
         oss << "\nHandle: " << sh->force().norm() << "pN";
 
-    if ( thread.alive() && prop.goLive )
+    if ( worker.alive() && prop.goLive )
     {
         oss << "\nLive";
         //display ratio number-of-time-step / frame
@@ -97,9 +97,9 @@ std::string Player::buildLabel() const
         oss << std::setw(8) << std::fixed << spd << "x ";
 #endif
     }
-    else if ( thread.currentFrame() > 0 )
+    else if ( worker.currentFrame() > 0 )
     {
-        oss << "\nFrame " << thread.currentFrame();
+        oss << "\nFrame " << worker.currentFrame();
     }
 
     return oss.str();
@@ -337,7 +337,7 @@ void Player::drawScene(View& view)
             if ( prop.goLive )
                 saveView(prop.image_index++, prop.downsample);
             else
-                saveView(thread.currentFrame(), prop.downsample);
+                saveView(worker.currentFrame(), prop.downsample);
             // exit if this was the last image requested:
             if ( --prop.save_images == 0 && ( prop.auto_exit & 2 ))
             {
@@ -356,7 +356,7 @@ void Player::drawScene(View& view, int mag)
         readDisplayString(view, simul.prop.display);
         simul.prop.display_fresh = false;
     }
-    //thread.debug("drawScene");
+    //worker.debug("drawScene");
     prepareDisplay(view, mag);
     drawScene(view);
 }
@@ -444,7 +444,7 @@ int Player::saveScene(const int mag, const char* name, const char* format, const
 {
     View & view = glApp::currentView();
     const int W = view.width(), H = view.height();
-    thread.lock();
+    worker.lock();
     
     //std::clog << "saveMagnifiedImage " << W << "x" << H << " mag=" << mag << '\n';
     prepareDisplay(view, mag);
@@ -456,7 +456,7 @@ int Player::saveScene(const int mag, const char* name, const char* format, const
         printf("saved %ix%i snapshot %s\n", mag*W/downsample, mag*H/downsample, name);
     view.closeDisplay();
     
-    thread.unlock();
+    worker.unlock();
     return err;
 }
 

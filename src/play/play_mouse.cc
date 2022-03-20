@@ -10,19 +10,19 @@ void processMouseClick(int, int, const Vector3& pos3, int)
     const real range = pixrad * glApp::currentView().pixelSize();
     Vector pos(pos3);
 
-    thread.lock();
-    if ( thread.selectClosestHandle(pos, range) )
-        thread.moveHandle(pos);
+    worker.lock();
+    if ( worker.selectClosestHandle(pos, range) )
+        worker.moveHandle(pos);
     else
     {
-        if ( thread.handle() )
+        if ( worker.handle() )
         {
-            thread.detachHandle();
-            thread.moveHandle(pos);
+            worker.detachHandle();
+            worker.moveHandle(pos);
         }
         else
         {
-            Single * s = thread.createHandle(pos, range);
+            Single * s = worker.createHandle(pos, range);
             PointDisp *& pd = s->prop->hand_prop->disp;
             pd = static_cast<PointDisp*>(player.dispList.find("hand:display", "user_hand"));
             if ( !pd )
@@ -35,7 +35,7 @@ void processMouseClick(int, int, const Vector3& pos3, int)
             }
         }
     }
-    thread.unlock();
+    worker.unlock();
 }
 
 
@@ -47,15 +47,15 @@ void processMouseDrag(int, int, Vector3& ori3, const Vector3& pos3, int mode)
     Vector pos(pos3);
     Vector ori(ori3);
     
-    thread.lock();
+    worker.lock();
     if ( mode )
     {
-        thread.moveHandles(pos-ori);
+        worker.moveHandles(pos-ori);
         ori3 = pos3;
     }
     else
-        thread.moveHandle(pos);
-    thread.unlock();
+        worker.moveHandle(pos);
+    worker.unlock();
 }
 
 
@@ -68,15 +68,15 @@ void timerCallback(const int value)
     unsigned millisec = prop.delay;
 
     //std::clog << "timerCallback @ " << std::fixed << simul.time() << "s\n";
-    if ( prop.goLive && thread.alive() )
+    if ( prop.goLive && worker.alive() )
     {
-        //thread.debug("timerCallback");
-        thread.signal();
+        //worker.debug("timerCallback");
+        worker.signal();
     }
     else
     {
         // in replay mode, no need to lock the simulation state
-        if ( thread.executePipedCommands(32) )
+        if ( worker.executePipedCommands(32) )
             glApp::postRedisplay();
         
         if ( prop.play > 0 )

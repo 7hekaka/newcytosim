@@ -766,7 +766,7 @@ void processKey(unsigned char key)
             // start player to save all images in file
             if ( prop.save_images == 0 )
             {
-                if ( player.startPlayback() || thread.alive() )
+                if ( player.startPlayback() || worker.alive() )
                     prop.save_images = 9999;
             }
             else
@@ -782,7 +782,7 @@ void processKey(unsigned char key)
         case 'k':
         {
             if ( altKeyDown )
-                thread.writeProperties(std::cout, true);
+                worker.writeProperties(std::cout, true);
             else
             {
                 std::cout << '\n';
@@ -801,7 +801,7 @@ void processKey(unsigned char key)
         case 'l': {
             try {
                 std::string file = simul.prop.config_file;
-                thread.reloadParameters(file);
+                worker.reloadParameters(file);
                 flashText("Reloaded %s", file.c_str());
             }
             catch( Exception & e ) {
@@ -810,14 +810,14 @@ void processKey(unsigned char key)
         } break;
             
         case 'z':
-            if ( thread.goodFile() )
+            if ( worker.goodFile() )
                 player.rewind();
             else
                 player.restart();
             break;
             
         case 'Z':
-            thread.cancel();
+            worker.cancel();
             player.stop();
             break;
             
@@ -831,23 +831,23 @@ void processKey(unsigned char key)
             {
                 player.extendLive();
                 prop.period = 1;
-                thread.period(prop.period);
+                worker.period(prop.period);
                 flashText("period = 1");
             }
             break;
             
         case 'A':
-            if ( thread.alive() )
+            if ( worker.alive() )
             {
                 prop.period = 2 * prop.period;
                 if ( prop.period > 1024 ) prop.period = 1;
-                thread.period(prop.period);
+                worker.period(prop.period);
                 flashText("period = %i", prop.period);
             }
             else
             {
                 // this will initialize the simulation engine without making a step
-                thread.extend_run(0);
+                worker.extend_run(0);
             }
             break;
             
@@ -859,24 +859,24 @@ void processKey(unsigned char key)
             }
             else
             {
-                thread.step();
+                worker.step();
                 player.stop();
             }
             break;
             
         case 'S':
             prop.period = 1;
-            thread.period(prop.period);
+            worker.period(prop.period);
             flashText("period = 1");
             break;
             
         case 'g':
-            thread.deleteHandles();
+            worker.deleteHandles();
             flashText("Deleted mouse-controled handles");
             break;
             
         case 'G':
-            thread.releaseHandle();
+            worker.releaseHandle();
             break;
             
         case 'i':
@@ -1149,7 +1149,7 @@ void processNormalKey(const unsigned char key, const int x, const int y)
         if ( key == prop.magic_key[k] )
         {
             flashText("%s", prop.magic_code[k].c_str());
-            thread.evaluate(prop.magic_code[k]);
+            worker.evaluate(prop.magic_code[k]);
             glApp::postRedisplay();
             return;
         }

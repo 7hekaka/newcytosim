@@ -15,7 +15,7 @@
 
 Player player;
 
-SimThread& thread = player.thread;
+SimThread& worker = player.worker;
 Simul&      simul = player.simul;
 PlayerProp&  prop = player.prop;
 DisplayProp& disp = player.disp;
@@ -54,15 +54,15 @@ enum Mode { NORMAL = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
 void drawLive(View& view, int mag)
 {
     //std::clog << " drawLive(" << std::setprecision(3) << simul.time() << "s) " << "\n";
-    if ( 0 == thread.trylock() )
+    if ( 0 == worker.trylock() )
     {
-        thread.executePipedCommands(32);
+        worker.executePipedCommands(32);
         player.drawScene(view, mag);
-        thread.unlock();
+        worker.unlock();
     }
     else
     {
-        //thread.debug("display: trylock failed");
+        //worker.debug("display: trylock failed");
         //postRedisplay();
     }
 }
@@ -248,16 +248,16 @@ int main(int argc, char* argv[])
             simul.loadProperties();
             
             // open trajectory file:
-            thread.openFile(simul.prop.system_file);
+            worker.openFile(simul.prop.system_file);
             
             // load requested frame:
-            if ( thread.loadFrame(frm) )
+            if ( worker.loadFrame(frm) )
             {
                 // load last frame in file:
-                if ( thread.loadLastFrame() )
-                    std::cerr << "Warning: could only load frame " << thread.currentFrame() << ' ';
+                if ( worker.loadLastFrame() )
+                    std::cerr << "Warning: could only load frame " << worker.currentFrame() << ' ';
             }
-            frm = thread.currentFrame();
+            frm = worker.currentFrame();
         }
         else
         {
@@ -350,16 +350,16 @@ int main(int argc, char* argv[])
                     player.saveView(frm++, prop.downsample);
                     s = 0;
                 }
-            } while ( 0 == thread.loadNextFrame() );
+            } while ( 0 == worker.loadNextFrame() );
         }
         else if ( mode & SAVE_IMAGE )
         {
             size_t inx = 0;
             // it is possible to specify multiple frame indices:
             do {
-                thread.loadFrame(frm);
+                worker.loadFrame(frm);
                 // only save requested frames:
-                if ( thread.currentFrame() == frm )
+                if ( worker.currentFrame() == frm )
                 {
                     player.drawScene(view, magnify);
                     if ( multi )
@@ -424,13 +424,13 @@ int main(int argc, char* argv[])
     
     if ( prop.goLive )
     {
-        thread.period(prop.period);
+        worker.period(prop.period);
         try
         {
             if ( has_frame )
-                thread.extend();
+                worker.extend();
             else
-                thread.start();
+                worker.start();
         }
         catch( Exception & e )
         {

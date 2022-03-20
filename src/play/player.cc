@@ -16,7 +16,7 @@ using glApp::flashText;
 
 
 Player::Player()
-: disp("*"), prop("*"), thread(simul, glApp::postRedisplay), mDisplay(nullptr)
+: disp("*"), prop("*"), worker(simul, glApp::postRedisplay), mDisplay(nullptr)
 {
 }
 
@@ -27,8 +27,8 @@ Player::~Player()
 
 void Player::clear()
 {
-    thread.stop();
-    thread.clear();
+    worker.stop();
+    worker.clear();
     dispList.erase();
     if ( mDisplay )
         delete(mDisplay);
@@ -41,11 +41,11 @@ void Player::clear()
 
 void Player::previousFrame()
 {
-    if ( thread.currentFrame() > 0 )
-        thread.loadFrame(thread.currentFrame()-1);
+    if ( worker.currentFrame() > 0 )
+        worker.loadFrame(worker.currentFrame()-1);
     else {
         if ( prop.loop )
-            thread.loadLastFrame();
+            worker.loadLastFrame();
         else
             stop();
     }
@@ -56,14 +56,14 @@ void Player::previousFrame()
  */
 void Player::nextFrame()
 {    
-    int res = thread.loadNextFrame();
+    int res = worker.loadNextFrame();
     if ( res == 1 )
     {
         // this means end of file is reached:
         if ( prop.auto_exit )
             exit(EXIT_SUCCESS);
         if ( prop.loop )
-            thread.loadFrame(0);
+            worker.loadFrame(0);
         else
         {
             flashText("end-of-file\n");
@@ -84,11 +84,11 @@ void Player::nextFrame()
 
 void Player::rewind()
 {
-    if ( thread.goodFile() )
+    if ( worker.goodFile() )
     {
         stop();
-        thread.rewindFile();
-        thread.loadFrame(0);
+        worker.rewindFile();
+        worker.loadFrame(0);
         glApp::postRedisplay();
     }
 }
@@ -96,11 +96,11 @@ void Player::rewind()
 
 bool Player::startPlayback()
 {
-    if ( thread.goodFile()  &&  prop.play != 1  && !prop.goLive )
+    if ( worker.goodFile()  &&  prop.play != 1  && !prop.goLive )
     {
         //rewind file if its end was reached:
-        if ( thread.eof() )
-            thread.rewindFile();
+        if ( worker.eof() )
+            worker.rewindFile();
         prop.play = 1;
         return true;
     }
@@ -112,8 +112,8 @@ bool Player::startBackward()
 {
     if ( prop.play != -1 )
     {
-        if ( thread.currentFrame() == 0 )
-            thread.loadLastFrame();
+        if ( worker.currentFrame() == 0 )
+            worker.loadLastFrame();
         else
             flashText("Play reverse");
         prop.play = -1;
@@ -152,9 +152,9 @@ void Player::stop()
 
 void Player::startstop()
 {
-    if ( thread.alive() )
+    if ( worker.alive() )
         prop.goLive = !prop.goLive;
-    else if ( thread.goodFile() )
+    else if ( worker.goodFile() )
     {
         if ( !prop.play )
             startPlayback();
@@ -166,7 +166,7 @@ void Player::startstop()
 
 void Player::extendLive()
 {
-    if ( 0 == thread.extend() )
+    if ( 0 == worker.extend() )
         flashText("Extend simulation...");
     prop.goLive = 1;
 }
@@ -176,10 +176,10 @@ void Player::restart()
 {
     try
     {
-        thread.stop();
-        thread.clear();
+        worker.stop();
+        worker.clear();
         dispList.erase();
-        thread.start();
+        worker.start();
     }
     catch( Exception & e ) {
         flashText("Error: %s", e.what());

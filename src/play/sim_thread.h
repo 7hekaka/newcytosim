@@ -29,7 +29,7 @@ private:
     void (*hold_callback)(void);
     
     /// thread used to run the simulation
-    pthread_t worker_;
+    pthread_t child_;
     
     /// a flag reflecting if the child thread is running or not
     volatile bool alone_;
@@ -63,7 +63,7 @@ private:
     ObjectList allHandles(SingleProp const*) const;
 
     /// True if current thread is the worker thread
-    bool isWorker() const { return pthread_equal(pthread_self(), worker_); }
+    bool isWorker() const { return pthread_equal(pthread_self(), child_); }
     
 public:
     

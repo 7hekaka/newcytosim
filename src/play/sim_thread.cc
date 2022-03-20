@@ -136,7 +136,7 @@ void SimThread::start()
     {
         flag_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
-        if ( pthread_create(&worker_, nullptr, run_launcher, this) )
+        if ( pthread_create(&child_, nullptr, run_launcher, this) )
             throw Exception("failed to create thread");
         alone_ = 0;
     }
@@ -184,7 +184,7 @@ int SimThread::extend()
     {
         flag_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
-        if ( pthread_create(&worker_, nullptr, extend_launcher, this) )
+        if ( pthread_create(&child_, nullptr, extend_launcher, this) )
             throw Exception("failed to create thread");
         alone_ = 0;
         return 0;
@@ -272,7 +272,7 @@ void SimThread::stop()
         {
             //debug("join...");
             // wait for termination:
-            pthread_join(worker_, nullptr);
+            pthread_join(child_, nullptr);
             alone_ = 1;
         }
     }
@@ -289,10 +289,10 @@ void SimThread::cancel()
         flag_ = 2;
         //debug("cancel...");
         // force termination:
-        if ( 0 == pthread_cancel(worker_) )
+        if ( 0 == pthread_cancel(child_) )
         {
             // wait for termination:
-            pthread_join(worker_, nullptr);
+            pthread_join(child_, nullptr);
             alone_ = 1;
             unlock();
         }

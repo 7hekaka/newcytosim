@@ -416,9 +416,9 @@ static void processMenuExport(int item)
         
         case 20: player.writePlayParameters(std::cout, true); return;
         case 21: player.writeDisplayParameters(std::cout, true); return;
-        case 22: thread.writeProperties(std::cout, true); return;
-        case 23: thread.exportObjects(false); return;
-        case 24: thread.exportObjects(true); return;
+        case 22: worker.writeProperties(std::cout, true); return;
+        case 23: worker.exportObjects(false); return;
+        case 24: worker.exportObjects(true); return;
             
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';

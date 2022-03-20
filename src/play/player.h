@@ -34,7 +34,7 @@ public:
     PropertyList dispList;
     
     /// SimThread to control the live simulation
-    SimThread    thread;
+    SimThread    worker;
     
     /// the current Display object
     Display  *   mDisplay;
