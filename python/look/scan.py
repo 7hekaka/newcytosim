@@ -10,9 +10,10 @@
  
 Syntax:
 
-    scan.py command [-] directory1 [directory2] [directory3] [...] [jobs=INTEGER]
+    scan.py command [-][+] directory1 [directory2] [directory3] [...] [jobs=INTEGER]
     
-    if '-' is specified, reduce output to the command
+    if '-' is specified, output is limited to what the command does
+    if '+' is specified, the directory path is printed without decoration
     if 'jobs' is set, run in parallel using specified number of threads
 
 Examples:
@@ -21,7 +22,7 @@ Examples:
     scan.py 'play image' run* jobs=2
     
     
-F. Nedelec, 02.2011, 09.2012, 03.2013, 01.2014, 06.2017, 07.2021
+F. Nedelec, 02.2011, 09.2012, 03.2013, 01.2014, 06.2017, 07.2021, 20.03.2022
 S. Dmitreff, 06.2017
 """
 
@@ -31,8 +32,8 @@ except ImportError:
     sys.stderr.write("Error: could not load necessary python modules\n")
     sys.exit()
 
-out = sys.stderr
-verbose = 1
+out = sys.stdout
+verbose = 2
 
 #------------------------------------------------------------------------
 
@@ -56,8 +57,11 @@ def worker(queue):
             t, p = queue.get(True, 1)
         except:
             break;
+        if verbose == 1:
+            out.write(os.path.basename(p)+" ")
+            out.flush()
         execute(t, p)
-        if verbose:
+        if verbose == 2:
             out.write("done "+p+"\n")
 
 
@@ -66,10 +70,19 @@ def main(args):
         read command line arguments and process command
     """
     global verbose
+    inx = 0
+    
+    if args[0] == '-':
+        verbose = 0
+        inx += 1
+    elif args[0] == '+':
+        verbose = 1
+        inx += 1
+    
     try:
-        tool = args[0]
+        tool = args[i]
     except:
-        out.write("Error: you should specify a command to execute\n")
+        out.write("Missing command: scan.py command [-][+] directory1 [directory2]...\n")
         return 1
 
     njobs = 1
@@ -83,13 +96,15 @@ def main(args):
             njobs = int(arg[5:])
         elif arg == '-':
             verbose = 0
+        elif arg == '+':
+            verbose = 1
         else:
             out.write("  Warning: unexpected argument `%s'\n" % arg)
             sys.exit()
 
     if not paths:
-        out.write(" scan.py will execute `%s`\n"%tool)
-        out.write("Error: you must specify directories: scan.py COMMAND PATHS\n")
+        out.write("Missing directories: scan.py command [-][+] directory1 [directory2]...\n")
+        out.write(" (scan.py would execute `%s`)\n"%tool)
         return 2
     
     njobs = min(njobs, len(paths))
@@ -114,15 +129,18 @@ def main(args):
             out.write("Warning: multiprocessing module unavailable\n")
     #process sequentially:
     for p in paths:
-        if verbose:
+        if verbose == 2:
             out.write('-  '*24+p+"\n")
+        elif verbose == 1:
+            out.write(os.path.basename(p)+" ")
+            out.flush()
         execute(tool, p)
     return 0
 
 #------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or sys.argv[1].endswith("help"):
+    if len(sys.argv) < 3 or sys.argv[1].endswith("help"):
         print(__doc__)
     else:
         main(sys.argv[1:])
