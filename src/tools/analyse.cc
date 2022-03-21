@@ -78,8 +78,7 @@ int main(int argc, char* argv[])
             // try to load the specified frame:
             if ( 0 == reader.loadFrame(simul, frm) )
             {
-                std::cout << "% frame   " << frm << '\n';
-                simul.poly_report(std::cout, what, arg, true);
+                simul.poly_report(std::cout, what, arg, frm);
             }
             else
             {
@@ -94,8 +93,7 @@ int main(int argc, char* argv[])
         // process every frame in the file:
         while ( 0 == reader.loadNextFrame(simul) )
         {
-            std::cout << "% frame   " << frm << '\n';
-            simul.poly_report(std::cout, what, arg, true);
+            simul.poly_report(std::cout, what, arg, frm);
         }
     }
 }

@@ -75,10 +75,14 @@ static void remove_plural(std::string & str)
      report fiber:cluster{couple=1},fiber:length
 
  */
-void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, bool wrap) const
+void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int frm) const
 {
-    if ( wrap )
+    int ver = 1;
+    opt.set(ver, "verbose");
+    if ( ver > 0 )
     {
+        if ( frm >= 0 )
+            out << "% frame   " << frm << '\n';
         //out << "% start\n";
         out << "% time " << std::to_string(prop.time);
     }
@@ -91,14 +95,14 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, bool
             if ( blk.empty() )
             {
                 //out << "\nSimul::report(" << arg << ")";
-                mono_report(out, arg, opt, false);
+                mono_report(out, arg, opt, ver);
             }
             else
             {
                 //out << "\nSimul::report(" << arg << ", " << blk << ")";
                 Glossary glos(opt);
                 glos.read(blk, 0);
-                mono_report(out, arg, glos, false);
+                mono_report(out, arg, glos, ver);
                 opt.add_counts(glos);
             }
         }
@@ -111,7 +115,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, bool
             break;
         is.get();
     }
-    if ( wrap )
+    if ( ver > 0 )
     {
         out << '\n';
         out << "% end\n";
@@ -131,20 +135,18 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, bool
 /**
  Surround the report with comments to identify start/end
  */
-void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt, bool wrap) const
+void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt, int ver) const
 {
-    int ver = 1;
     std::streamsize p = 4;
-    opt.set(ver, "verbose");
-    opt.set(p, "precision");
-    opt.set(column_width, "column", "width");
+    opt.peek(p, "precision");
+    opt.peek(column_width, "column") || opt.peek(column_width, "width");
     
     // adjust floating-point notation:
     out.setf(std::ios_base::fixed, std::ios_base::floatfield);
     std::streamsize op = out.precision();
     out.precision(p);
 
-    if ( wrap )
+    if ( ver > 1 )
     {
         //out << "% start\n";
         out << "% time " << std::to_string(prop.time);
@@ -160,7 +162,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
         report_one(ss, arg, opt);
         StreamFunc::skip_lines(out, ss, '%');
     }
-    if ( wrap )
+    if ( ver > 1 )
     {
         out << '\n';
         out << "% end\n";
@@ -445,6 +447,8 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     {
         if ( what.empty() )
             return reportCouple(out, sel);
+        if ( what == "list" )
+            return reportCoupleList(out, sel);
         if ( what == "state" )
             return reportCoupleState(out, sel);
         if ( what == "link" )
@@ -458,7 +462,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "active" )
             return reportCoupleActive(out, sel);
         if ( what == "anatomy" )
-            return reportCoupleHands(out, sel);
+            return reportCoupleAnatomy(out, sel);
         throw InvalidSyntax("I can only report couple: state, link, configuration, active, force, anatomy");
     }
     if ( who == "organizer" )
@@ -2232,6 +2236,20 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
 //------------------------------------------------------------------------------
 #pragma mark - Couple
 
+void Simul::reportCoupleList(std::ostream& out, Property const* sel) const
+{
+    out << COM << "couples" << SEP << "count";
+
+    size_t cnt = couples.collect(match_property, sel).size();
+
+    if ( sel )
+        out << LIN << sel->name();
+    else
+        out << LIN << "all";
+
+    out << SEP << cnt;
+ }
+
 
 void write(std::ostream& out, Couple const* obj)
 {
@@ -2584,7 +2602,7 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
 /**
  Export composition of Couple classes
  */
-void Simul::reportCoupleHands(std::ostream& out, Property const* sel) const
+void Simul::reportCoupleAnatomy(std::ostream& out, Property const* sel) const
 {
     out << COM << "hand_id" << SEP << rjust("hand_name", 2, 1);
     
@@ -2594,10 +2612,10 @@ void Simul::reportCoupleHands(std::ostream& out, Property const* sel) const
         out << LIN << p->number();
         out << SEP << rjust(p->name(), 2);
     }
-    out << '\n';
 
-        out << COM << "class_id" << SEP << rjust("couple_name", 2, 1);
-        out << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
+    out << COM << "couple_id" << SEP << rjust("couple_name", 2, 1);
+    out << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
+    
     for ( Property const* i : properties.find_all("couple") )
     {
         if ( sel && i != sel )

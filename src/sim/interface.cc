@@ -1090,8 +1090,10 @@ void Interface::execute_report(std::string const& name, std::string const& what,
         ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
         out.rdbuf(ofs.rdbuf());
     }
-    
-    simul_.mono_report(out, what, opt, true);
+    int ver = 1;
+    opt.set(ver, "verbose");
+
+    simul_.mono_report(out, what, opt, ver);
 }
 
 

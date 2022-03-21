@@ -16,7 +16,6 @@
 #include "parser.h"
 #include "simul.h"
 
-int verbose = 1;
 int prefix = 0;
 
 
@@ -66,22 +65,19 @@ void report_prefix(Simul const& sim, std::ostream& os, std::string const& what, 
         str_len += snprintf(str+str_len, sizeof(str)-str_len, "%9lu ", frm);
     
     std::stringstream ss;
- 
-    sim.poly_report(ss, what, opt, false);
+    sim.poly_report(ss, what, opt, -1);
     StreamFunc::prefix_lines(os, ss, str, 0, '%');
 }
 
 
 void report(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
 {
-    if ( verbose )
-        os << "% frame " << frm << '\n';
     try
     {
         if ( prefix )
             report_prefix(sim, os, what, frm, opt);
         else
-            sim.poly_report(os, what, opt, verbose);
+            sim.poly_report(os, what, opt, frm);
     }
     catch( Exception & e )
     {
@@ -144,8 +140,7 @@ int main(int argc, char* argv[])
     size_t period = 1;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
-    arg.set(verbose, "verbose");
-    if ( arg.use_key("-") ) verbose = 0;
+    if ( arg.use_key("-") ) arg.define("verbose", 0, 0);
 
     RNG.seed();
 
@@ -230,5 +225,6 @@ int main(int argc, char* argv[])
         }
     }
     
+    out << '\n';
     arg.print_warnings(std::cerr, cnt, "\n");
 }

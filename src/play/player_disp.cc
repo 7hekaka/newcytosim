@@ -117,7 +117,7 @@ std::string Player::buildReport(std::string arg) const
         std::string res;
         try {
             std::stringstream ss;
-            simul.poly_report(ss, arg, glos, false);
+            simul.poly_report(ss, arg, glos, -1);
             res = ss.str();
         }
         catch ( Exception& e )

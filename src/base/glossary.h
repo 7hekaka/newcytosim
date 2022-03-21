@@ -111,6 +111,9 @@ private:
     /// register a new pair into the dictionnary
     void add_entry(pair_type const&, int no_overwrite);
     
+    /// disabled
+    void define(key_type const& key, void*);
+    
     //-------------------------------------------------------------------------------
     
     /// returns first non-space character in null-terminated C-string

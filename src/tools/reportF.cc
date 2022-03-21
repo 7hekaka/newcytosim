@@ -16,7 +16,6 @@
 #include "parser.h"
 #include "simul.h"
 
-int verbose = 1;
 char root[256] = "report";
 
 void help(std::ostream& os)
@@ -57,7 +56,7 @@ void report(Simul const& sim, std::string const& what, Glossary& opt, size_t frm
     char filename[512];
     snprintf(filename, sizeof(filename), "%s%04lu.txt", root, frm);
     std::ofstream os(filename);
-    sim.poly_report(os, what, opt, true);
+    sim.poly_report(os, what, opt, frm);
 }
 
 //------------------------------------------------------------------------------
@@ -92,8 +91,7 @@ int main(int argc, char* argv[])
     size_t period = 1;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
-    arg.set(verbose, "verbose");
-    if ( arg.use_key("-") ) verbose = 0;
+    if ( arg.use_key("-") ) arg.define("verbose", 0, 0);
 
     RNG.seed();
 

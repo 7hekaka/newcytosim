@@ -44,7 +44,7 @@ bool match_mark(Object const* obj, void const* mrk)
  */
 bool match_property(Object const* obj, void const* prop)
 {
-    return ( obj->property() == prop );
+    return ( obj->property() == prop ) || ( prop == nullptr );
 }
 
 

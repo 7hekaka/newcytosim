@@ -372,10 +372,10 @@ public:
     //----------------------------- REPORTING ----------------------------------
     
     /// calls report_one
-    void poly_report(std::ostream&, std::string, Glossary&, bool) const;
+    void poly_report(std::ostream&, std::string, Glossary&, int) const;
     
     /// calls report
-    void mono_report(std::ostream&, std::string const&, Glossary&, bool) const;
+    void mono_report(std::ostream&, std::string const&, Glossary&, int) const;
 
     /// calls report_one
     void report_one(std::ostream&, std::string const&, Glossary&) const;
@@ -513,9 +513,12 @@ public:
 
     /// print state of Couples 
     void reportCouple(std::ostream&, Property const*) const;
-    
+ 
     /// print state of Couples
-    void reportCoupleHands(std::ostream&, Property const*) const;
+    void reportCoupleList(std::ostream&, Property const*) const;
+
+    /// print state of Couples
+    void reportCoupleAnatomy(std::ostream&, Property const*) const;
     
     /// print position of Couples of a certain kind
     void reportCoupleState(std::ostream&, Property const*) const;
