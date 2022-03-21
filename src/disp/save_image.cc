@@ -8,6 +8,11 @@
 #  include "opengl.h"
 #endif
 
+
+/// destination of error messages (set to zero to suppress output)
+static FILE * ERF = stderr;
+
+
 bool SaveImage::supported(const char format[])
 {
     if ( 0 == strcasecmp(format, "png") )
@@ -95,7 +100,6 @@ int SaveImage::saveCompositeImage(const int mag,
     if ( ! supported(format) )
         return UNKNOWN_FORMAT;
     
-    int res = 1;
     int mW = mag * width;
     int mH = mag * height;
     
@@ -111,28 +115,24 @@ int SaveImage::saveCompositeImage(const int mag,
     glPushMatrix();
     glScalef(mag, mag, mag);
     
-    for ( int iy = 0; iy < mag ; ++iy )
+    for ( int iy = 0; iy < mag; ++iy )
+    for ( int ix = 0; ix < mag; ++ix )
     {
-        for ( int ix = 0; ix < mag; ++ix )
+        glPushMatrix();
+        glTranslated((cc-ix)*dx, (cc-iy)*dy, 0);
+        display(mag, arg);
+        glPopMatrix();
+        if ( 0 == readPixels(0, 0, width, height, sub) )
         {
-            glPushMatrix();
-            glTranslated((cc-ix)*dx, (cc-iy)*dy, 0);
-            display(mag, arg);
-            glPopMatrix();
-            if ( 0 == readPixels(0, 0, width, height, sub) )
-            {
-                uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
-                for ( uint32_t u = 0; u < height; ++u )
-                    memcpy(&dst[u*mW*PIX], &sub[u*width*PIX], width*PIX);
-            }
+            uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
+            for ( uint32_t u = 0; u < height; ++u )
+                memcpy(&dst[u*mW*PIX], &sub[u*width*PIX], width*PIX);
         }
     }
     glPopMatrix();
     
-    res = savePixels(filename, format, pixels, mW, mH, downsample);
-    
+    int res = savePixels(filename, format, pixels, mW, mH, downsample);
     free_pixels(pixels);
-
     free_pixels(sub);
     return res;
 }
@@ -154,7 +154,6 @@ int SaveImage::saveMagnifiedImage(const int mag,
     if ( ! supported(format) )
         return UNKNOWN_FORMAT;
     
-    int res = 1;
     int mW = mag * width;
     int mH = mag * height;
     
@@ -162,7 +161,7 @@ int SaveImage::saveMagnifiedImage(const int mag,
     glGetIntegerv(GL_MAX_VIEWPORT_DIMS, dim);
     if ( mW > dim[0] || mH > dim[1] )
     {
-        fprintf(err, "SaveImage:: exceeding maximum supported size (%ix%i)\n", (int)dim[0], (int)dim[1]);
+        fprintf(ERF, "SaveImage:: exceeding maximum supported size (%ix%i)\n", (int)dim[0], (int)dim[1]);
         return FAILED_ALLOCATION;
     }
     
@@ -174,18 +173,18 @@ int SaveImage::saveMagnifiedImage(const int mag,
     GLint svp[4];
     glGetIntegerv(GL_VIEWPORT, svp);
     for ( int iy = 0; iy < mag; ++iy )
-        for ( int ix = 0; ix < mag; ++ix )
+    for ( int ix = 0; ix < mag; ++ix )
+    {
+        glViewport(-ix*width, -iy*height, mW, mH);
+        display(mag, arg);
+        if ( 0 == readPixels(0, 0, width, height, sub) )
         {
-            glViewport(-ix*width, -iy*height, mW, mH);
-            display(mag, arg);
-            if ( 0 == readPixels(0, 0, width, height, sub) )
-            {
-                uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
-                for ( uint32_t h = 0; h < height; ++h )
-                    memcpy(&dst[h*mW*PIX], &sub[h*width*PIX], width*PIX);
-            }
+            uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
+            for ( uint32_t h = 0; h < height; ++h )
+                memcpy(&dst[h*mW*PIX], &sub[h*width*PIX], width*PIX);
         }
-    res = savePixels(filename, format, pixels, mW, mH, downsample);
+    }
+    int res = savePixels(filename, format, pixels, mW, mH, downsample);
     free_pixels(pixels);
     //restore original viewport:
     glViewport(svp[0], svp[1], svp[2], svp[3]);
@@ -198,7 +197,7 @@ int SaveImage::saveMagnifiedImage(const int mag,
 
 int SaveImage::readPixels(int32_t X, int32_t Y, uint32_t W, uint32_t H, GLvoid *pixels)
 {
-    //set the alignment to double-words
+    // set the alignment to double-words
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
     
 #if ( 0 )
@@ -212,11 +211,11 @@ int SaveImage::readPixels(int32_t X, int32_t Y, uint32_t W, uint32_t H, GLvoid *
     glReadPixels(X, Y, W, H, GL_RGB, GL_UNSIGNED_BYTE, pixels);
     //printf(" read OpenGL pixels %ux%u\n", W, H);
 
-    GLenum glError = glGetError();
+    GLenum err = glGetError();
     
-    if ( glError != GL_NO_ERROR )
+    if ( err != GL_NO_ERROR )
     {
-        fprintf(err, "Error: could not read pixels (OpenGL error %u)\n", glError);
+        fprintf(ERF, "OpenGL error: could not read pixels (error %u)\n", err);
         return OPENGL_ERROR;
     }
     return 0;
@@ -340,7 +339,7 @@ int SaveImage::savePixels(const char * filename,
         
         if ( res )
         {
-            fprintf(err, " error %i while saving %s\n", res, filename);
+            fprintf(ERF, " error %i while saving %s\n", res, filename);
             remove(filename);
         }
         
@@ -555,7 +554,7 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
     res = spng_set_png_file(enc, file);
     if (res)
     {
-        printf("spng_set_png_file() error: %s\n", spng_strerror(res));
+        fprintf(ERF, "spng_set_png_file() error: %s\n", spng_strerror(res));
         goto done;
     }
 
@@ -563,7 +562,7 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
     res = spng_set_ihdr(enc, &ihdr);
     if (res)
     {
-        printf("spng_set_ihdr() error: %s\n", spng_strerror(res));
+        fprintf(ERF, "spng_set_ihdr() error: %s\n", spng_strerror(res));
         goto done;
     }
 
@@ -571,7 +570,7 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
        SPNG_ENCODE_FINALIZE will finalize the PNG with the end-of-file marker */
     res = spng_encode_image(enc, pixels, length, SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE);
     if (res)
-        printf("spng_encode_image() error: %s\n", spng_strerror(res));
+        fprintf(ERF, "spng_encode_image() error: %s\n", spng_strerror(res));
 
 done:
     /* Free context memory */

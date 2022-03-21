@@ -383,9 +383,8 @@ int Player::saveView(const char* filename, const char* format, int downsample) c
 }
 
 
-void setFileName(char str[], size_t len, const char name[], const char format[], size_t indx)
+void fixFileName(char str[], size_t len, const char format[], size_t indx)
 {
-    strncpy(str, name, len);
     // remove file extension:
     char* ptr = strchr(str, '.');
     if ( ptr ) *ptr = 0;
@@ -414,13 +413,13 @@ void setFileName(char str[], size_t len, const char name[], const char format[],
  */
 int Player::saveView(size_t indx, int downsample) const
 {
-    char const* name = prop.image_name.c_str();
-    char const* fmt = prop.image_format.c_str();
-    
     char str[1024] = { 0 };
-    setFileName(str, sizeof(str), name, fmt, indx);
+    char const* name = prop.image_name.c_str();
+    char const* format = prop.image_format.c_str();
+    strncpy(str, name, sizeof(str));
+    fixFileName(str, sizeof(str), format, indx);
     int cwd = FilePath::change_dir(prop.image_dir, true);
-    int err = saveView(str, fmt, downsample);
+    int err = saveView(str, format, downsample);
     FilePath::change_dir(cwd);
     return err;
 }

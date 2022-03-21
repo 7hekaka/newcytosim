@@ -151,17 +151,17 @@ public:
     /// draw system calling drawCytosim
     void drawScene(View&, int mag);
     
-    /// export current viewport to a graphic file
-    int  saveView(const char* filename, const char* format, int downsample) const;
+    /// export current viewport to image file 'filename'
+    int saveView(const char* filename, const char* format, int downsample) const;
 
-    /// export current viewport to a graphic file
-    int  saveView(size_t indx, int downsample) const;
+    /// export current viewport to an image file
+    int saveView(size_t indx, int downsample) const;
+    
+    /// save high-resolution image of the current scene to 'filename'
+    int saveScene(int mag, const char* filename, const char* format, int downsample);
     
     /// save high-resolution image of the current scene
-    int  saveScene(int mag, const char* filename, const char* format, int downsample=1);
-    
-    /// save high-resolution image of the current scene
-    int  saveScene(int mag, const char* root, unsigned indx, int downsample=1);
+    int saveScene(int mag, const char* root, unsigned indx, int downsample=1);
 
 };
 

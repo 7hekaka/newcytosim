@@ -27,7 +27,7 @@ void PlayerProp::clear()
         image_format = "ppm";
 
     image_dir    = "";
-    image_name   = "image";
+    image_name   = "image%04i";
     report_index = 0;
     image_index  = 0;
     poster_index = 0;

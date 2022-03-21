@@ -21,9 +21,6 @@ namespace SaveImage
 {
     /// error codes
     enum { NO_ERROR=0, FAILED_ALLOCATION=1, UNKNOWN_FORMAT=2, OPENGL_ERROR=3, FILE_ERROR=4, PNG_ERROR=10 };
-
-    /// destination of error messages (set to zero to suppress output)
-    static FILE * err = stderr;
     
     /// open a file for binary write
     FILE * openFile(const char * name);
@@ -53,7 +50,6 @@ namespace SaveImage
 
     /// save 16-bit grayscale PNG file
     int saveGrayPNG(FILE*, const uint16_t[], uint32_t width, uint32_t height);
-    
     
     
     /// save pixels[] and return error-code
@@ -86,11 +82,11 @@ namespace SaveImage
     /// save a region of the current buffer in a new file called 'name'. Returns error-code
     int saveImage(const char* name, const char format[], const int viewport[], int downsample=1);
 
-     /// save an image with higher resolution (better version)
-    int saveMagnifiedImage(int mag, const char* name, const char format[], uint32_t width, uint32_t height, void (*display)(int, void *), void * arg, int downsample=1);
+     /// save an image with higher resolution (this is better than saveCompositeImage)
+    int saveMagnifiedImage(int mag, const char* name, const char format[], uint32_t width, uint32_t height, void (*display)(int, void *), void* arg, int downsample);
 
     /// save an image with higher resolution
-    int saveCompositeImage(int mag, const char* name, const char format[], uint32_t width, uint32_t height, double pixel_size, void (*display)(int, void *), void * arg, int downsample=1);
+    int saveCompositeImage(int mag, const char* name, const char format[], uint32_t width, uint32_t height, double pixel_size, void (*display)(int, void *), void* arg, int downsample);
 }
 
 
