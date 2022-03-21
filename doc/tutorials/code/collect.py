@@ -57,6 +57,15 @@ import sys, shutil, os, curses.ascii
 
 #------------------------------------------------------------------------
 
+def cannonical_pattern(arg):
+    """check for repeated '%' character, replacing printf syntax: %04i """
+    c = arg.count('%')
+    for n in range(c,0,-1):
+        if arg.find('%'*n) > 0:
+            return arg.replace('%'*n, '%0'+str(n)+'i', 1);
+    return arg
+
+
 def validate_pattern(arg):
     # check validity of the pattern
     if os.path.isfile(arg):
@@ -65,12 +74,7 @@ def validate_pattern(arg):
     try:
         res = ( arg % 0 )
     except:
-        # check for repeated '%' character:
-        c = arg.count('%')
-        for n in range(c,0,-1):
-            if arg.find('%'*n) > 0:
-                arg = arg.replace('%'*n, '%0'+str(n)+'i', 1);
-                break
+        arg = cannonical_pattern(arg)
     try:
         res = ( arg % 0 )
     except:
