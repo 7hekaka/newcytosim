@@ -191,9 +191,9 @@ void Aster::build(ObjectList& objs, Glossary& opt, Simul& sim)
     
     if ( opt.has_value("nb_fibers") )
     {
-        opt.define("fiber", 2, opt.value("fiber", 1));
-        opt.define("fiber", 1, opt.value("fiber", 0));
-        opt.define("fiber", 2, opt.value("nb_fibers", 0));
+        opt.define("fiber", opt.value("fiber", 1), 2);
+        opt.define("fiber", opt.value("fiber", 0), 1);
+        opt.define("fiber", opt.value("nb_fibers", 0), 2);
         throw InvalidParameter("please specify `fibers = NUMBER, CLASS, SPEC`");
     }
 

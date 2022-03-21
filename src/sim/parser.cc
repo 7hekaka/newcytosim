@@ -395,7 +395,7 @@ void Parser::parse_new(std::istream& is)
         opt.read(blok);
     }
     else {
-        opt.define("position", 0, blok);
+        opt.define("position", blok);
     }
     
     if ( name.empty() )

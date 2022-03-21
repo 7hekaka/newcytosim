@@ -301,19 +301,16 @@ public:
     //-------------------------------------------------------------------------------
     #pragma mark -
     
-    /// this adds a new key with value 'val': 'key = val'
-    void define(key_type const& key, std::string const& val);
-    
     /// define one value for the key at specified index: `key[inx] = val`.
-    void define(key_type const& key, size_t inx, std::string const& val);
+    void define(key_type const& key, std::string const& val, size_t inx);
     
     /// define one value from class T, for the key: `key[inx] = to_string(val)`.
     template <typename T>
-    void define(key_type const& key, size_t inx, const T& val)
+    void define(key_type const& key, const T& val, size_t inx = 0)
     {
         std::ostringstream oss;
         oss << val;
-        define(key, inx, oss.str());
+        define(key, oss.str(), inx);
     }
     
     /// add value to key

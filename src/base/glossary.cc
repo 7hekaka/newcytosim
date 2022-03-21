@@ -450,7 +450,7 @@ void Glossary::add_entry(Glossary::pair_type const& pair, int no_overwrite)
 
 
 /// define one value for the key at specified index: `key[inx]=val`.
-void Glossary::define(key_type const& key, size_t inx, const std::string& arg)
+void Glossary::define(key_type const& key, const std::string& arg, size_t inx = 0)
 {
     std::string val = Tokenizer::trim(arg);
     map_type::iterator w = mTerms.find(key);
@@ -493,15 +493,6 @@ void Glossary::add_value(key_type const& key, const std::string& arg)
         mTerms[key].emplace_back(val, true);
     else
         w->second.emplace_back(val, true);
-}
-
-
-/**
- This should be equivalent to read('k = rhs')
- */
-void Glossary::define(key_type const& key, const std::string& rhs)
-{
-    define(key, 0, rhs);
 }
 
 

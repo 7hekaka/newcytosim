@@ -436,7 +436,7 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
         ObjectList objs(4, 4);
         for ( size_t n = 0; n < cnt; ++n )
         {
-            opt.define("position", 0, A + n * dAB);
+            opt.define("position", A + n * dAB);
             execute_new(objs, name, set, opt);
         }
     }
@@ -448,9 +448,9 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
             Vector A, B;
             if ( !opt.set(A, "position_ends") || !opt.set(B, "position_ends", 1) )
                 throw InvalidParameter("two vectors need to be defined by `position_ends'");
-            opt.define("length",    0, (A-B).norm());
-            opt.define("position",  0, (A+B)*0.5);
-            opt.define("direction", 0, (B-A).normalized());
+            opt.define("length",    (A-B).norm());
+            opt.define("position",  (A+B)*0.5);
+            opt.define("direction", (B-A).normalized());
         }
 
         ObjectList objs(4, 4);
