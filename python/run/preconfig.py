@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2022
-# This is PRECONFIG version 1.53, last modified on 21.03.2022
+# This is PRECONFIG version 1.54, last modified on 21.03.2022
 
 """
 # SYNOPSIS

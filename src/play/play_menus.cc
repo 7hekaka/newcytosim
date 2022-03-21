@@ -437,7 +437,7 @@ static int buildMenuExport()
         glApp::clearMenu(menuID);
     
     addMenuEntry("Save Image (y)",            1);
-    addMenuEntry("Save Downsampled Image",    2);
+    addMenuEntry("Save 2x Downsampled Image", 2);
     addMenuEntry("Save Fine Image",           3);
     addMenuEntry("Save 2x Fine Image",        4);
     addMenuEntry("Save 3x Fine Image",        5);
