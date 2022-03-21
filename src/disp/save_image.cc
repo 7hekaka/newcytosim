@@ -537,8 +537,8 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
     /* Specify image dimensions, PNG format */
     struct spng_ihdr ihdr =
     {
-        .height = height,
         .width = width,
+        .height = height,
         .bit_depth = bit_depth,
         .color_type = fmt
     };
@@ -568,7 +568,7 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
 
     /* SPNG_FMT_PNG is a special value that matches the format in ihdr,
        SPNG_ENCODE_FINALIZE will finalize the PNG with the end-of-file marker */
-    res = spng_encode_image(enc, pixels, length, SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE);
+    res = spng_encode_image(enc, pixels, length, SPNG_FMT_PNG, SPNG_ENCODE_FINALIZE|SPNG_ENCODE_FLIP_Y);
     if (res)
         fprintf(ERF, "spng_encode_image() error: %s\n", spng_strerror(res));
 
