@@ -64,6 +64,9 @@ namespace Tokenizer
     /// return next token composed of multiple symbols concatenated with ':'
     std::string get_polysymbol(std::istream&, bool eat_line=false);
     
+    /// split a polysymbol 'symbol:num' or 'work:num' such as 'filament1'
+    bool split_polysymbol(std::string&, long& num);
+
     /// return next token if it looks like a file name
     std::string get_path(std::istream&, bool eat_line=false);
     

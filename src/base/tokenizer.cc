@@ -73,7 +73,28 @@ int Tokenizer::get_character(std::istream& is, bool eat_space, bool eat_line)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-std::string get_stuff(std::istream& is, bool (*valid)(int))
+
+int valid_symbol(int c)
+{
+    return isalnum(c) | ( c == '_' );
+}
+
+int valid_path_start(int c)
+{
+    return isalpha(c) | (c=='/') | (c=='\\') | (c=='.');
+}
+
+int valid_path(int c)
+{
+    return isalnum(c) | (c=='_') | (c=='-') | (c=='/') | (c=='\\') | (c=='.') | (c==':');
+}
+
+int valid_hexadecimal(int c)
+{
+    return isxdigit(c) | ( c=='x' );
+}
+
+std::string get_stuff(std::istream& is, int (*valid)(int))
 {
     std::string res;
     res.reserve(64);
@@ -88,12 +109,8 @@ std::string get_stuff(std::istream& is, bool (*valid)(int))
     return res;
 }
 
-
-bool valid_symbol(int c)
-{
-    return isalnum(c) | ( c == '_' );
-}
-
+//------------------------------------------------------------------------------
+#pragma mark -
 
 /**
  get_symbol() reads consecutive characters:
@@ -148,31 +165,48 @@ bool Tokenizer::has_symbol(std::istream& is, std::string const& arg, bool eat_li
  */
 std::string Tokenizer::get_polysymbol(std::istream& is, bool eat_line)
 {
-    int c = skip_space(is, eat_line);
-    
-    if ( !isalpha(c) )
-        return "";
-    
     std::string res = get_symbol(is, eat_line);
     while ( is.peek() == ':' )
     {
         res += (char)is.get();
         res += get_symbol(is, false);
     }
-    
     return res;
 }
 
 
-bool valid_path_start(int c)
+/**
+ split_polysymbol() separates a word and a number
+ */
+bool Tokenizer::split_polysymbol(std::string& arg, long& num)
 {
-    return isalpha(c) | (c=='/') | (c=='\\') | (c=='.');
+    std::istringstream is(arg);
+    std::string res = get_symbol(is, false);
+    std::streampos isp = is.tellg();
+    if ( is.get() == ':' )
+    {
+        // spliting symbol:number
+        arg.resize(isp);
+        is >> num;
+        return !is.fail();
+    }
+    else
+    {
+        // spliting word+number
+        is.clear();
+        is.seekg(0);
+        get_stuff(is, isalpha);
+        isp = is.tellg();
+        is >> num;
+        if ( !is.fail() )
+        {
+            arg.resize(isp);
+            return true;
+        }
+    }
+    return false;
 }
 
-bool valid_path(int c)
-{
-    return isalnum(c) | (c=='_') | (c=='-') | (c=='/') | (c=='\\') | (c=='.') | (c==':');
-}
 
 /**
  Return next token if it looks likes a path to a file name
@@ -445,12 +479,6 @@ std::string Tokenizer::get_real(std::istream& is)
     
     VLOG("REAL |" << res << "|\n");
     return res;
-}
-
-
-bool valid_hexadecimal(int c)
-{
-    return isxdigit(c) | ( c=='x' );
 }
 
 

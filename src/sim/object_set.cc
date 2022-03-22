@@ -4,6 +4,7 @@
 #include "object_set.h"
 #include "exceptions.h"
 #include "iowrapper.h"
+#include "tokenizer.h"
 #include "glossary.h"
 #include "modulo.h"
 #include "space.h"
@@ -286,25 +287,6 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
 }
 
 
-// split string into a word and a number, without a space, like 'fiber1':
-bool splitObjectSpec(std::string& str, long& num)
-{
-    size_t pos = str.find_first_of("0123456789+-");
-    if ( pos != std::string::npos )
-    {
-        char const* ptr = str.c_str() + pos;
-        char * end = nullptr;
-        errno = 0;
-        num = strtol(ptr, &end, 10);
-        if ( errno || ( *end && !isspace(*end) ))
-            throw InvalidParameter("expected a number in `"+str+"'");
-        str.resize(pos);
-        //std::clog << "splitObjectSpec |" << str << "|" << num << "|\n";
-        return true;
-    }
-    return false;
-}
-
 /*
  There are several ways to designate an object.
  For example, if the class name (title) is 'fiber', one may use:
@@ -321,17 +303,17 @@ bool splitObjectSpec(std::string& str, long& num)
 Object* ObjectSet::findObject(const std::string& cat, std::string spec) const
 {
     //std::clog << "ObjectSet::findObject(" << cat << ", " << spec << ")\n";
-    
+
+    // try to split into a word and a number:
+    long num = 0;
+    if ( Tokenizer::split_polysymbol(spec, num) )
+        return findObject(cat, spec, num);
+       
     if ( spec == "first" )
         return static_cast<Object*>(inventory_.first());
     
     if ( spec == "last" )
         return static_cast<Object*>(inventory_.last());
- 
-    // try to split into a word and a number:
-    long num = 0;
-    if ( splitObjectSpec(spec, num) )
-        return findObject(cat, spec, num);
 
     // check category name, eg. 'fiber':
     if ( spec == cat )
