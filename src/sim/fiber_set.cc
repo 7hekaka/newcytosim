@@ -585,34 +585,30 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
     std::string str;
     if ( opt.set(str, key) )
     {
-        // the first case designates all fibers:
+        // user can designates all fibers:
         if ( str == title() )
             return randomSite();
-        else
+        
+        // check property name, designating all fibers with that name:
+        Property const* p = simul_.findProperty(title(), str);
+        if ( p )
+            return randomSite(static_cast<FiberProp const*>(p));
+        
+        // check if some individual fiber was requested:
+        Fiber* fib = Fiber::toFiber(findObject(title(), str));
+        
+        if ( fib )
         {
-            // check property name, designating all fiber with that name:
-            Property const* p = simul_.findProperty(title(), str);
-            if ( p )
-            {
-                return randomSite(static_cast<FiberProp const*>(p));
-            }
-
-            // check if some individual fiber was requested:
-            Fiber* fib = Fiber::toFiber(findObject("fiber", str));
+            // variables defining an abscissa:
+            int mod = 7;
+            real abs = 0;
+            FiberEnd ref = ORIGIN;
+            if ( opt.set(abs, key, 1) )
+                mod = 0;
+            opt.set(ref, key, 2, {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}, {"center", CENTER}});
+            opt.set(mod, key, 3, {{"off", 0}, {"uniform", 1}, {"exponential", 2}});
             
-            if ( fib )
-            {
-                // variables defining an abscissa:
-                int mod = 7;
-                real abs = 0;
-                FiberEnd ref = ORIGIN;
-                if ( opt.set(abs, key, 1) )
-                    mod = 0;
-                opt.set(ref, key, 2, {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}, {"center", CENTER}});
-                opt.set(mod, key, 3, {{"off", 0}, {"uniform", 1}, {"exponential", 2}});
-
-                return FiberSite(fib, fib->someAbscissa(abs, ref, mod, 1.0));
-            }
+            return FiberSite(fib, fib->someAbscissa(abs, ref, mod, 1.0));
         }
     }
     throw InvalidParameter("could not determine specified attachment `"+str+"'");

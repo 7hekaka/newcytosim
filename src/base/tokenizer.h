@@ -36,7 +36,7 @@ namespace Tokenizer
     /// split string using the given separator.
     std::vector<std::string> split(std::string&, char sep, bool get_empty_fields);
     
-    /// read symbol from string if possible, truncating the string in that case
+    /// read symbol from string if possible, truncating the argument in that case
     std::string split_symbol(std::string&);
 
     /// read integer from string if possible, truncating the string in that case
@@ -44,7 +44,10 @@ namespace Tokenizer
     
     /// read unsigned integer from string if possible, truncating the string in that case
     bool split_integer(unsigned long&, std::string&);
-
+    
+    /// split a polysymbol 'symbol:num' or 'work:num' such as 'filament1'
+    bool split_polysymbol(std::string&, long& num);
+    
     
     /// read multiple forms of integer numbers
     std::string get_integer(std::istream&);
@@ -63,9 +66,6 @@ namespace Tokenizer
 
     /// return next token composed of multiple symbols concatenated with ':'
     std::string get_polysymbol(std::istream&, bool eat_line=false);
-    
-    /// split a polysymbol 'symbol:num' or 'work:num' such as 'filament1'
-    bool split_polysymbol(std::string&, long& num);
 
     /// return next token if it looks like a file name
     std::string get_path(std::istream&, bool eat_line=false);

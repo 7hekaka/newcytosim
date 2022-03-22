@@ -185,20 +185,19 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
     std::streampos isp = is.tellg();
     if ( is.get() == ':' )
     {
-        // spliting symbol:number
+        // spliting as symbol:number
         arg.resize(isp);
         is >> num;
         return !is.fail();
     }
     else
     {
-        // spliting word+number
+        // spliting as word+number
         is.clear();
         is.seekg(0);
         get_stuff(is, isalpha);
         isp = is.tellg();
-        is >> num;
-        if ( !is.fail() )
+        if ( is >> num )
         {
             arg.resize(isp);
             return true;

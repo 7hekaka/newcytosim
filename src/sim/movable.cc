@@ -850,11 +850,10 @@ restart:
 static real get_angle(std::istream& is)
 {
     real a = 0;
-    is >> a;
+    if ( is >> a )
+        return a;
     // if no angle is specified, set it randomly:
-    if ( is.fail() )
-        a = RNG.sreal() * M_PI;
-    return a;
+    return RNG.sreal() * M_PI;
 }
 
 /**

@@ -118,14 +118,17 @@ void read_numbers(std::string const& str)
     char tmp[128] = { 0 };
     is.clear();
     is.readsome(tmp, sizeof(tmp));
-    out << "leftover >" << tmp << '\n';
+    out << "leftover `" << tmp << "'\n";
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
-    //read_numbers("1 2 nnnn .0 aaaaa");
-    
+    if ( argc > 1 )
+    {
+        read_numbers(argv[1]);
+        return 0;
+    }
     if ( signal(SIGFPE, signal_handler) == SIG_ERR )
     {
         out << "Could not register SIGFPE handler\n";

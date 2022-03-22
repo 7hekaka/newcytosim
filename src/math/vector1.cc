@@ -3,7 +3,7 @@
 #include "vector1.h"
 
 /**
- Optinally read two scalar values equal to zero
+ Eat up to two scalar values if they are equal to zero
  */
 static void eatTwoZeros(std::istream& is)
 {
