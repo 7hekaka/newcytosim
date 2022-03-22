@@ -339,6 +339,9 @@ public:
     
     /// export all Properties using default file name
     void writeProperties(bool prune) const;
+    
+    /// load the properties contained in the standard output property file
+    void loadProperties(char const* filename);
 
     /// load the properties contained in the standard output property file
     void loadProperties();

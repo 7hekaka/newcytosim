@@ -29,6 +29,18 @@ private:
     /// perform `cnt` simulation steps also calling Simul::FUNC at each step
     template < SimulFuncPtr FUNC >
     void do_steps(size_t& sss, size_t cnt);
+    
+    /// create 1 object of type `name`, following options in Glossary
+    void new_object(ObjectList&, std::string const& name, ObjectSet*, Glossary&);
+    
+    /// change values in given Property as specified in Glossary
+    void change_property(Property*, Glossary&);
+    
+    /// read the specification of position and orientation of an object
+    Isometry read_placement(Glossary&);
+    
+    /// return position and orientation of an object, with verification of 'placement'
+    Isometry find_placement(Glossary&, int placement, size_t nb_trials);
 
 public:
     
@@ -52,23 +64,14 @@ public:
     /// create a new Property of category `cat` from values specified in Glossary
     Property * execute_set(std::string const& cat, std::string const& name, Glossary&);
 
-    /// change values in given Property as specified in Glossary
-    void execute_change(Property*, Glossary&);
-
     /// change values in Property called `name` as specified in Glossary
     Property * execute_change(std::string const& name, Glossary&, bool strict);
     
     /// change values of all Property of category `cat`
     void execute_change_all(std::string const& cat, Glossary&);
-
-    /// read the specification of position and orientation of an object
-    Isometry read_placement(Glossary&);
     
-    /// return position and orientation of an object, with verification of 'placement'
-    Isometry find_placement(Glossary&, int placement, size_t nb_trials);
-    
-    /// create 1 object of type `name`, following options in Glossary
-    void execute_new(ObjectList&, std::string const& name, ObjectSet*, Glossary&);
+    /// change some value in the Simul's property
+    void change_simul_property(Glossary& opt);
     
     /// create `cnt` objects of type `name`, following options in Glossary
     void execute_new(std::string const& name, Glossary&, size_t cnt);

@@ -1,15 +1,15 @@
-% A branched contractile actin network
-% 16 Jan 2022 - Stage 1 using larger segmentation
+% A branched contractile actin network, with Ronen Zaidel-Bar
+% 22 March 2022 - post production improved syntax!
 [[F0=random.randint(10,2000)]]
 [[A0=random.randint(10,2000)]]
 [[P0=int((F0+A0)*random.uniform(0.5, 3))]]
 [[M0=random.randint(10,14000)]]
-[[C=random.randint(10,7000)]]
+[[X=random.randint(10,7000)]]
 [[mod=[0, 1, 2, 4, 5, 7, 8]]]%preconfig.mod=[[mod]]
-[[mod1=int(mod&1)]] [[P=int((1+mod1)*P0)]] [[F=int((1+mod1)*F0)]]
-[[mod2=int((mod>>1)&1)]] [[A=int((1+0.3333*mod2)*A0)]]
-[[mod4=int((mod>>2)&1)]] [[M=int((1+mod4)*M0)]]
-[[mod8=int((mod>>3)&1)]] [[K=(1-mod8)*250]]
+[[P=int(2*P0) if mod&1 else P0]][[P=int(0.75*P0) if mod&8 else P0]]
+[[F=int(2*F0) if mod&1 else F0]]
+[[A=int(1.3333*A0) if mod&2 else A0]]
+[[M=int(2*M0) if mod&4 else M0]]
 
 set simul system 
 {
@@ -99,7 +99,7 @@ set couple arp23
     hand1 = arp2
     hand2 = arp3
     diffusion = 5
-    stiffness = [[K]]
+    stiffness = 250
     activity = fork
     torque = 0.5, 1.22     % 1.22 radian is 70 degrees
     trans_activated = 1
@@ -131,7 +131,7 @@ change arp3
 }
 
 new [[M]] motor
-new [[C]] xlinker
+new [[X]] xlinker
 
 call equilibrate
 
