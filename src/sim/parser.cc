@@ -515,6 +515,41 @@ void Parser::parse_delete(std::istream& is)
 
 
 /**
+ Move object:
+ 
+     move NAME ( POSITION )
+ 
+ or
+ 
+     move all CLASS ( POSITION )
+
+ NAME can be '*', and 'position' is a Vector.
+ */
+
+void Parser::parse_move(std::istream& is)
+{
+    bool move_all = false;
+    std::streampos ipos = is.tellg();
+
+    std::string name = Tokenizer::get_symbol(is);
+    if ( name == "all" )
+    {
+        move_all = true;
+        name = Tokenizer::get_symbol(is);
+    }
+    std::string blok = Tokenizer::get_block(is, '(');
+    
+    if ( do_run )
+    {
+        Vector vec;
+        std::stringstream ss(blok);
+        if ( is >> vec )
+            execute_move(name, vec);
+    }
+}
+
+
+/**
  Mark objects:
  
      mark [MULTIPLICITY] NAME
@@ -1142,6 +1177,8 @@ int Parser::evaluate_one(std::istream& is)
         parse_new(is);
     else if ( tok == "delete" )
         parse_delete(is);
+    else if ( tok == "move" )
+        parse_move(is);
     else if ( tok == "mark" )
         parse_mark(is);
     else if ( tok == "run" )

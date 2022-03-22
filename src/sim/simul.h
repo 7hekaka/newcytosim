@@ -255,6 +255,9 @@ public:
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
     Mecable * findMecable(const std::string&) const;
     
+    /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
+    Object * findMovable(const std::string&) const;
+
     /// find a Solid by name
     Solid * findSolid(std::string s) { return Solid::toSolid(solids.findObject("solid", s)); }
     

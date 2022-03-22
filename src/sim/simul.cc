@@ -205,6 +205,18 @@ Mecable * Simul::findMecable(const std::string& arg) const
 }
 
 
+Object * Simul::findMovable(const std::string& arg) const
+{
+    Object *  obj = fibers.findObject("fiber", arg);
+    if (!obj) obj = solids.findObject("solid", arg);
+    if (!obj) obj = spheres.findObject("sphere", arg);
+    if (!obj) obj = beads.findObject("bead", arg);
+    if (!obj) obj = couples.findObject("couple", arg);
+    if (!obj) obj = singles.findObject("single", arg);
+    return obj;
+}
+
+
 void Simul::add(Object * w)
 {
     //std::clog << " Simul::add(" << w->reference() << ")" << '\n';

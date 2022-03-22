@@ -82,7 +82,10 @@ public:
     /// delete `cnt` objects of type `name`, following options in Glossary
     void execute_delete(std::string const& name, Glossary&, size_t cnt);
     
-    /// mark `cnt`  objects of type `name`, following options in Glossary
+    /// move object of type `name`, following options in Glossary
+    void execute_move(std::string const& name, Vector const&);
+    
+    /// mark `cnt` objects of type `name`, following options in Glossary
     void execute_mark(std::string const& name, Glossary&, size_t cnt);
 
     /// cut fibers of type `name`, following different options in Glossary

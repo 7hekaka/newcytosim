@@ -662,6 +662,19 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
         Cytosim::warn << "found no `" << name << "' to delete\n";
 }
 
+
+/**
+ This moves one object to position `pos`
+ */
+void Interface::execute_move(std::string const& name, Vector const& pos)
+{
+    
+    Object * obj = simul_.findMovable(name);
+    if ( obj )
+        obj->setPosition(pos);
+}
+
+
 /**
  This can only mark one class of objects
  */

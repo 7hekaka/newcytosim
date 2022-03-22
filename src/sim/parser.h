@@ -49,6 +49,9 @@ private:
     /// parse command `delete`
     void parse_delete(std::istream&);
     
+    /// parse command `move`
+    void parse_move(std::istream&);
+
     /// parse command `mark`
     void parse_mark(std::istream&);
 
