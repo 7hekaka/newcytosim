@@ -242,7 +242,7 @@ def version():
 def cannonical_pattern(arg):
     """check for repeated '%' character, replacing printf syntax: %04i """
     c = arg.count('%')
-    for n in range(c,0,-1):
+    for n in range(c,1,-1):
         if arg.find('%'*n) > 0:
             return arg.replace('%'*n, '%0'+str(n)+'i', 1);
     return arg
