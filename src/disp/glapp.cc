@@ -383,7 +383,7 @@ void glApp::help(std::ostream& os)
     os << " h           Hide/show help\n";
     os << " b x         Show/hide a 10 um scale bar; Show/hide axes\n";
     os << " f ESC       Toggle fullscreen mode; exit full screen mode\n";
-    os << " y           Save PPM/PNG image\n";
+    os << " y           Save PNG image\n";
 }
 
 

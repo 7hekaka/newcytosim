@@ -517,7 +517,7 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
 
 
 //------------------------------------------------------------------------------
-#pragma mark - PNG export using libspng
+#pragma mark - PNG export using libspng (https://libspng.org)
 
 #include "spng.h"
 
