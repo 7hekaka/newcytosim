@@ -557,9 +557,8 @@ std::ostream& operator << (std::ostream& os, Glossary const& arg)
 #pragma mark - Input
 
 /**
-@copydetails Glossary::add_entry
+ @copydetails Glossary::add_entry
  */
-
 void Glossary::read_entry(std::istream& is, int no_overwrite)
 {
     int c = Tokenizer::skip_space(is, true);
@@ -729,21 +728,19 @@ std::istream& operator >> (std::istream& is, Glossary& glos)
  */
 int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t threshold)
 {
-    int code = 0;
+    int code = 4;
     const rec_type& rec = pair.second;
         
     for ( size_t i = 0; i < rec.size(); ++i )
     {
         val_type const& val = rec[i];
         if ( val.read_ > 0 )
-            code |= 4;  // one value used
+            code &= ~4; // one value used
         if ( !val.read_ && val.defined_ )
             code |= 2;  // one value not used
         else if ( val.read_ > threshold )
             code |= 1;  // one value overused
     }
-    
-    code ^= 4;  // invert highest bit
     
     if ( code & 4 )
         msg = "Warning, the parameter `" + pair.first + "' was ignored";

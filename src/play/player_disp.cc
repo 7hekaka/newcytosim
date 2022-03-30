@@ -114,6 +114,7 @@ std::string Player::buildReport(std::string arg) const
     if ( ! arg.empty() )
     {
         Glossary glos;
+        glos.define("verbose", "1");
         std::string res;
         try {
             std::stringstream ss;

@@ -77,9 +77,9 @@ static void remove_plural(std::string & str)
  */
 void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int frm) const
 {
-    int ver = 1;
+    int ver = 2;
     opt.set(ver, "verbose");
-    if ( ver > 0 )
+    if ( ver > 1 )
     {
         if ( frm >= 0 )
             out << "% frame   " << frm << '\n';
@@ -115,7 +115,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
             break;
         is.get();
     }
-    if ( ver > 0 )
+    if ( ver > 1 )
     {
         out << '\n';
         out << "% end\n";
@@ -202,7 +202,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
             opt.peek(com, "verbose");
             // generate a separate report for all classes in this category:
             PropertyList plist = properties.find_all(who);
-            if ( com )
+            if ( com && plist.size() )
             {
                 out << COM << "split:";
                 for ( Property const* sel : plist )
