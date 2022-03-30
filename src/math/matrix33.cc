@@ -4,19 +4,28 @@
 #include "vector2.h"
 #include "random.h"
 
-/// this only works for non-symmetric matrices
+
 Vector3 Matrix33::rotationAxis() const
 {
     real x = value(2,1) - value(1,2);
     real y = value(0,2) - value(2,0);
     real z = value(1,0) - value(0,1);
     real n = std::sqrt(x*x + y*y + z*z);
-    return Vector3(x/n, y/n, z/n);
+    if ( n > REAL_EPSILON )
+        return Vector3(x/n, y/n, z/n);
+    // if 'n==0', the matrix is diagonal, and the rotation angle is 0 or M_PI
+    if ( value(2, 2) > 0 )
+        return Vector3(0, 0, 1);
+    else if ( value(1, 1) > 0 )
+        return Vector3(0, 1, 0);
+    else
+        return Vector3(1, 0, 0);
 }
 
+// trace() = 1 + 2 * cos(angle) =  { 3, -1 }
 real Matrix33::rotationAngle() const
 {
-    return std::acos(0.5-0.5*trace());
+    return std::acos(0.5*trace()-0.5);
 }
 
 

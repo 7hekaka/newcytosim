@@ -61,7 +61,7 @@ public:
         friend class Meca;
 
         Block   dia_;   ///< diagonal block
-        unsigned* inx_;   ///< line index for each element
+        unsigned* inx_; ///< line index for each element
         Block * blk_;   ///< off-diagonal blocks
         size_t allo_;   ///< allocated size of array
         size_t noff_;   ///< number of blocks in column

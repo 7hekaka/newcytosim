@@ -62,7 +62,7 @@ public:
 
         Block* blk_;    ///< all blocks
         unsigned* inx_; ///< line index for each element
-        size_t alo_;   ///< allocated size of array
+        size_t alo_;    ///< allocated size of array
         size_t nbb_;    ///< number of blocks in column
 
     public:

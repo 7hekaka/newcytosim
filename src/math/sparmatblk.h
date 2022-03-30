@@ -69,11 +69,11 @@ public:
         friend class SparMatBlk;
         friend class Meca;
 
-        Block *blk_;  ///< block elements
-        Block *sbk_;  ///< pointer for consolidated elements
-        unsigned *inx_;  ///< column index for each element
-        size_t rlen_;  ///< number of elements in row
-        size_t allo_;  ///< allocated size
+        Block *blk_;    ///< block elements
+        Block *sbk_;    ///< pointer for consolidated elements
+        unsigned *inx_; ///< column index for each element
+        size_t rlen_;   ///< number of elements in row
+        size_t allo_;   ///< allocated size
 
     public:
         

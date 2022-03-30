@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 // FJN, Cambridge 25.02.2022
 
 #ifndef MATRIX33SYM
@@ -10,11 +10,6 @@
 #include <cstdio>
 #include <iostream>
 
-/// BLD is the leading dimension of the matrix
-/**
- The code works with BLD = 3 or 4, and typically memory storage is less with 3,
- but performance might be better with 4, as SIMD-AVX calls handle doubles by 4.
- */
 
 #if defined(__SSE3__) && REAL_IS_DOUBLE
 #  include "simd.h"
@@ -25,6 +20,7 @@
 
 
 /// 3x3 symmetric matrix class with 6 'real' elements stored in column order
+/** This class cannot represent rotations and other non-symmatric operations */
 class alignas(2*sizeof(real)) Matrix33sym final
 {
 public:
