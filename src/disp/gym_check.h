@@ -1,19 +1,23 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
+
+#include <cstdio>
+
+
 namespace gym
 {
     
     /// convert OpenGL error code to string
-    const char* errorString(GLenum code);
+    const char* errorString(unsigned code);
     
     /// check and print OpenGL error(s)
     void reportErrors(FILE*, const char* msg);
     
     /// print current color properties of OpenGL context
-    void print_color_materials(std::ostream& os);
+    void print_color_materials(FILE*);
     
     /// print some info for debugging purpose
-    void dump_cap();
+    void print_caps();
 
 };
 

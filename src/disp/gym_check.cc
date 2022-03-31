@@ -1,12 +1,12 @@
 
 #include "gym_check.h"
+#include "gle_color.h"
+#include "opengl.h"
 
 namespace gym
 {
-//--------------------------------------------------------------------------
-#pragma mark - Debugging
 
-char const* errorString(GLenum code)
+char const* errorString(unsigned code)
 {
     switch ( code )
     {
@@ -36,17 +36,25 @@ void reportErrors(FILE * out, const char* msg)
     }
 }
 
-void print_cap(GLenum cap, const char * str)
+
+//--------------------------------------------------------------------------
+
+static void print_rgba(FILE* f, const char* str, GLfloat rgb[4])
 {
-    GLint i = glIsEnabled(cap);
-    std::clog << str << " " << i << "   ";
+    fprintf(f, "%s ( %4.2f %4.2f %4.2f %4.2f )", str, rgb[0], rgb[1], rgb[2], rgb[3]);
 }
 
-void dump_cap()
+static void print_cap(GLenum cap, const char * str)
+{
+    GLint i = glIsEnabled(cap);
+    fprintf(stderr, "%s %i ", str, i);
+}
+
+void print_caps()
 {
     GLfloat c[4] = { 0 };
     glGetFloatv(GL_CURRENT_COLOR, c);
-    std::clog << "color = " << c[0] << " " << c[1] << " " << c[2] << " " << c[3] << '\n';
+    print_rgba(stderr, "color", c);
     
     print_cap(GL_LIGHTING, "light");
     print_cap(GL_BLEND, "blend");
@@ -65,29 +73,28 @@ void dump_cap()
 #if ( 0 )
     GLint vp[4] = { 0 };
     glGetIntegerv(GL_VIEWPORT, vp);
-    std::clog << "viewport = " << vp[0] << " " << vp[1] << " " << vp[2] << " " << vp[3] << '\n';
+    fprintf(stderr, "viewport ( %4i %4i %4i %4i )", vp[0], vp[1], vp[2], vp[3]);
 #endif
 }
 
+    
 /// print current color properties of OpenGL context
-void print_color_materials(std::ostream& os)
+void print_color_materials(FILE * out)
 {
     GLfloat mat[4] = { 0 };
     glGetMaterialfv(GL_FRONT, GL_AMBIENT, mat);
-    os << "front  amb" << gle_color::components(mat) << '\n';
+    print_rgba(out, "front  amb", mat);
     glGetMaterialfv(GL_FRONT, GL_DIFFUSE, mat);
-    os << "front  dif" << gle_color::components(mat) << '\n';
+    print_rgba(out, "front  dif", mat);
     glGetMaterialfv(GL_FRONT, GL_EMISSION, mat);
-    os << "front  emi" << gle_color::components(mat) << '\n';
-    os << '\n';
+    print_rgba(out, "front  emi", mat);
 
     glGetMaterialfv(GL_BACK, GL_AMBIENT, mat);
-    os << "back  amb" << gle_color::components(mat) << '\n';
+    print_rgba(out, "back  amb", mat);
     glGetMaterialfv(GL_BACK, GL_DIFFUSE, mat);
-    os << "back  dif" << gle_color::components(mat) << '\n';
+    print_rgba(out, "back  dif", mat);
     glGetMaterialfv(GL_BACK, GL_EMISSION, mat);
-    os << "back  emi" << gle_color::components(mat) << '\n';
-    os << '\n';
+    print_rgba(out, "back  emi", mat);
 }
 
 }

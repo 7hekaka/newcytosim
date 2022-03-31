@@ -423,8 +423,6 @@ public:
     /// conversion of color to hexadecimal format
     std::string to_string() const;
     
-    /// print RGBA components in vector format
-    static std::string components(COLOF ptr[4]);
 };
 
 

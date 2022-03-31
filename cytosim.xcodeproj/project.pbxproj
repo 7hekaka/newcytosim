@@ -242,6 +242,7 @@
 		BB669ACC0FE2E9FA00E5AC10 /* single_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669AC80FE2E9FA00E5AC10 /* single_set.h */; };
 		BB669ACD0FE2E9FA00E5AC10 /* single.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB669AC90FE2E9FA00E5AC10 /* single.cc */; };
 		BB669ACE0FE2E9FA00E5AC10 /* single.h in Headers */ = {isa = PBXBuildFile; fileRef = BB669ACA0FE2E9FA00E5AC10 /* single.h */; };
+		BB67498E27F5FDD000165E14 /* gym_check.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBBFEC4327E7308C0019DAFD /* gym_check.cc */; };
 		BB692132233D349E00F528D2 /* random_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0E4BD61002698100A96B34 /* random_vector.h */; };
 		BB692134233D34C300F528D2 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
 		BB692139233D359F00F528D2 /* mecapoint.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCAA27C06B0539000638608 /* mecapoint.h */; };
@@ -4554,6 +4555,7 @@
 				BBCC8FFF2722C8550066FF75 /* gym_text.cc in Sources */,
 				BBE6C42727E7C88F0071E862 /* spng.c in Sources */,
 				BB9711671DECDB7E00352630 /* glapp.cc in Sources */,
+				BB67498E27F5FDD000165E14 /* gym_check.cc in Sources */,
 				BB97116B1DECDB9500352630 /* offscreen.cc in Sources */,
 				BB97116A1DECDB8F00352630 /* save_image.cc in Sources */,
 				BB109D3823D0788200805F16 /* fiber_disp.cc in Sources */,

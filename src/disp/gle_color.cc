@@ -42,14 +42,6 @@ std::string gle_color::to_string() const
 }
 
 
-std::string gle_color::components(COLOF ptr[4])
-{
-    char str[64];
-    snprintf(str, sizeof(str), "( %4.2f %4.2f %4.2f %4.2f )", ptr[0], ptr[1], ptr[2], ptr[3]);
-    return std::string(str);
-}
-
-
 uint8_t hex2byte(int c)
 {
     if ( '0' <= c && c <= '9' )
