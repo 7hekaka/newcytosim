@@ -89,6 +89,8 @@ def main(args):
     for arg in args[1:]:
         if os.path.isdir(arg):
             paths.append(os.path.abspath(arg))
+        elif os.path.isfile(arg):
+            out.write("  Warning: unexpected argument `%s'\n" % arg)
         elif arg.startswith('nproc=') or arg.startswith('njobs='):
             njobs = int(arg[6:])
         elif arg.startswith('jobs='):

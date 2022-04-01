@@ -90,7 +90,7 @@ void Parser::parse_set(std::istream& is)
     std::string name, para, blok;
     
     size_t ido = 0;
-#if BACKWARD_COMPATIBILITY < 48
+#if BACKWARD_COMPATIBILITY < 51
     /* Read ouput config files anterior to 3.11.2017, which included
      a identity number ('set hand 2 kinesin'): */
     Tokenizer::get_integer(is, ido);
