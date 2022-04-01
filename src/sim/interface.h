@@ -27,8 +27,7 @@ private:
     using SimulFuncPtr = void (Simul::*)();
     
     /// perform `cnt` simulation steps also calling Simul::FUNC at each step
-    template < SimulFuncPtr FUNC >
-    void do_steps(size_t& sss, size_t cnt);
+    template <SimulFuncPtr FUNC> void step_simul(size_t& sss, size_t cnt);
     
     /// create 1 object of type `name`, following options in Glossary
     void new_object(ObjectList&, std::string const& name, ObjectSet*, Glossary&);

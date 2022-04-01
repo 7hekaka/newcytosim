@@ -785,7 +785,7 @@ static void reportCPUtime(real t)
 
 
 template < Interface::SimulFuncPtr FUNC >
-inline void Interface::do_steps(size_t& sss, size_t cnt)
+inline void Interface::step_simul(size_t& sss, size_t cnt)
 {
     while ( sss < cnt )
     {
@@ -907,14 +907,14 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     do {
         switch ( solve )
         {
-            case 0: do_steps<&Simul::solve_not>(sss, check); break;
-            case 1: do_steps<&Simul::solve>(sss, check); break;
-            case 2: do_steps<&Simul::solve_auto>(sss, check); break;
-            case 3: do_steps<&Simul::solve_force>(sss, check); break;
-            case 4: do_steps<&Simul::solve_onlyX>(sss, check); break;
-            case 5: do_steps<&Simul::solve_flux>(sss, check); break;
-            case 7: do_steps<&Simul::solve_half>(sss, check); break;
-            case 8: do_steps<&Simul::solve_separate>(sss, check); break;
+            case 0: step_simul<&Simul::solve_not>(sss, check); break;
+            case 1: step_simul<&Simul::solve>(sss, check); break;
+            case 2: step_simul<&Simul::solve_auto>(sss, check); break;
+            case 3: step_simul<&Simul::solve_force>(sss, check); break;
+            case 4: step_simul<&Simul::solve_onlyX>(sss, check); break;
+            case 5: step_simul<&Simul::solve_flux>(sss, check); break;
+            case 7: step_simul<&Simul::solve_half>(sss, check); break;
+            case 8: step_simul<&Simul::solve_separate>(sss, check); break;
         }
         ++frm;
         check = size_t(delta*(frm+1));
