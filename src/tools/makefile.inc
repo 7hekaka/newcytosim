@@ -97,6 +97,12 @@ cymart: cymart.cc frame_reader.o $(TOOL_OBJ) | bin
 vpath cymart bin
 
 
+cymwiz: cymwiz.cc | bin
+	$(TOOL_MAKE)
+	$(DONE)
+vpath cymwiz bin
+
+
 sweet: sweet.cc frame_reader.o $(TOOL_OBJ) | bin
 	$(TOOL_MAKE)
 	$(DONE)

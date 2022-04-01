@@ -5,6 +5,7 @@
  Author: F. Nedelec, 6.03.2018 -- 19.05.2018
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
@@ -138,8 +139,8 @@ int main(int argc, char* argv[])
 
     if ( argc < 2 )
     {
-        printf("Please, invoke 'test_pipe' with executable and arguments, eg:");
-        printf("   test_pipe bin/play live\n");
+        printf("Invoke 'test_pipe' with executable and arguments, eg:");
+        printf("   test_pipe bin/play config.cym\n");
         return 1;
     }
     

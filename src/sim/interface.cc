@@ -689,8 +689,8 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
-    ObjectMark mrk;
-    if ( ! opt.set(mrk, "mark") )
+    ObjectMark mk = 0;
+    if ( ! opt.set(mk, "mark") )
         throw InvalidParameter("mark must be specified for command `mark'");
     opt.clear("mark");
     
@@ -705,7 +705,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
         objs.truncate(cnt);
     }
     
-    simul_.mark(objs, mrk);
+    simul_.mark(objs, mk);
 }
 
 

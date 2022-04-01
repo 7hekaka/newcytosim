@@ -1539,6 +1539,7 @@
 		BB66BF2D09A8DC2600E5C5BE /* sparmatsym1.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym1.cc; path = src/math/sparmatsym1.cc; sourceTree = SOURCE_ROOT; };
 		BB66BF2E09A8DC2600E5C5BE /* sparmatsym1.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym1.h; path = src/math/sparmatsym1.h; sourceTree = SOURCE_ROOT; };
 		BB66EA66068D95AD001934AF /* test_space */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_space; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB67498F27F756E600165E14 /* cymwiz.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cymwiz.cc; sourceTree = "<group>"; };
 		BB692222233D359F00F528D2 /* libcytosimG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytosimG.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB69D0B8209C666100445716 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../../Library/Frameworks/GLUT.framework; sourceTree = "<group>"; };
 		BB6CD587254ED31A00FB7547 /* real_print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = real_print.h; sourceTree = "<group>"; };
@@ -2831,6 +2832,7 @@
 				BB72EA6A2662268200FF7352 /* CMakeLists.txt */,
 				BB9BEB9C1C774BB30085E19F /* analyse.cc */,
 				BB9771601F52D98200EB8C92 /* cymart.cc */,
+				BB67498F27F756E600165E14 /* cymwiz.cc */,
 				BB77D6FB05F12F16001C0596 /* frametool.cc */,
 				BBEEC85B16E5D891006C1C6E /* micimage.cc */,
 				BBAB0D36138FAEC6006DEAF9 /* reader.cc */,
