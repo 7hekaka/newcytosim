@@ -114,7 +114,12 @@ void Parser::parse_set(std::istream& is)
         name = Tokenizer::get_token(is);
         blok = Tokenizer::get_block(is, '{', true);
 
-        if ( do_change )
+        if ( name == "display" | para == "display" )
+        {
+            opt.define("display", blok);
+            change_simul_property(opt);
+        }
+        else if ( do_set )
         {
 #if BACKWARD_COMPATIBILITY < 50
             if ( spec )
@@ -122,16 +127,9 @@ void Parser::parse_set(std::istream& is)
             else
 #endif
             opt.read(blok);
-            change_simul_property(opt);
             simul_.rename(name);
-        }
-#if BACKWARD_COMPATIBILITY < 50
-        else if ( para == "display" )
-        {
-            opt.define(para, blok);
             change_simul_property(opt);
         }
-#endif
     }
     else if ( simul_.isCategory(cat) && !spec )
     {
@@ -170,8 +168,8 @@ void Parser::parse_set(std::istream& is)
     }
     else
     {
-        name = cat;
         // in this form, 'set' changes the value of an existing Property
+        name = cat;
 #if BACKWARD_COMPATIBILITY < 50
         if ( spec )
         {
@@ -699,14 +697,14 @@ void Parser::parse_run(std::istream& is)
         // There can only be one Simul object:
         name = simul_.prop.name();
     }
-    
-    if ( name != "*"  &&  name != simul_.prop.name() )
-        throw InvalidSyntax("unknown simul name `"+name+"'");
 
     std::string blok = Tokenizer::get_block(is, '{');
     
     if ( do_run )
     {
+        if ( name != "*"  &&  name != simul_.prop.name() )
+            throw InvalidSyntax("unknown simul name `"+name+"'");
+
         Glossary opt(blok);
 
         if ( !has_cnt )

@@ -62,7 +62,7 @@ void signal_handler(int sig)
 #pragma mark -
 
 Simul::Simul()
-: prop("system"), spaces(*this), fields(*this), fibers(*this),
+: prop(""), spaces(*this), fields(*this), fibers(*this),
 spheres(*this), beads(*this), solids(*this), singles(*this),
 couples(*this), organizers(*this), tubules(*this), events(*this)
 {
@@ -438,8 +438,12 @@ void Simul::rename(std::string const& arg)
 {
     if ( prop.name() != arg )
     {
+        if ( arg == "display" | isCategory(arg) )
+            throw InvalidSyntax("`"+arg+"' is a reserved keyword");
+        if ( prop.name().size() )
+            throw InvalidSyntax("Simul `"+prop.name()+"' already defined");
         prop.rename(arg);
-        std::clog << "Simul is named `" << arg << "'\n";
+        //std::clog << "Simul renamed `" << arg << "'\n";
     }
 }
 
@@ -556,15 +560,15 @@ Property* Simul::newProperty(const std::string& cat, const std::string& nom, Glo
 {
     if ( cat.empty() || nom.empty() )
         throw InvalidSyntax("unexpected syntax");
+    
+    if ( nom == "display" | isCategory(nom) )
+        throw InvalidSyntax("`"+nom+"' is a reserved keyword");
 
     if ( cat == "simul" )
     {
         rename(nom);
         return &prop;
     }
-    
-    if ( isCategory(nom) )
-        throw InvalidSyntax("`"+nom+"' is a reserved keyword");
     
     Property * p = findProperty(nom);
     
