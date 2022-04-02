@@ -338,13 +338,14 @@ void PointDisp::makePixelmaps(GLfloat unit_value, unsigned sampling)
     glPushMatrix();
     glLoadIdentity();
 
-#ifdef __APPLE__
-    OffScreen::createBuffer(dim, dim, 0);
-    glOrtho(0, dim, 0, dim, 0, 1);
-#else
-    glPushAttrib(GL_PIXEL_MODE_BIT|GL_VIEWPORT_BIT|GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT);
-    glOrtho(0, svp[2], 0, svp[3], 0, 1);
-#endif
+    int buf = OffScreen::createBuffer(dim, dim, 0);
+    if ( buf )
+        glOrtho(0, dim, 0, dim, 0, 1);
+    else
+    {
+        glPushAttrib(GL_PIXEL_MODE_BIT|GL_VIEWPORT_BIT|GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT);
+        glOrtho(0, svp[2], 0, svp[3], 0, 1);
+    }
     
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -403,12 +404,13 @@ void PointDisp::makePixelmaps(GLfloat unit_value, unsigned sampling)
     if ( light ) glEnable(GL_LIGHTING);
     if ( blend ) glEnable(GL_BLEND);
 
-#ifdef __APPLE__
-    OffScreen::releaseBuffer();
-    glViewport(svp[0], svp[1], svp[2], svp[3]);
-#else
-    glPopAttrib();
-#endif
+    if ( buf )
+    {
+        OffScreen::releaseBuffer();
+        glViewport(svp[0], svp[1], svp[2], svp[3]);
+    }
+    else
+        glPopAttrib();
 }
 
 #endif

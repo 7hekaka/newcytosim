@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 /** 
  off-screen rendering using OpenGL Frame Buffer Objects
  
@@ -189,7 +189,7 @@ int OffScreen::openContext()
     if ( offContext && offContext == CGLGetCurrentContext() )
     {
         fprintf(stderr, "Offscreen context is already active\n");
-        return 0;
+        return 1;
     }
     
     preContext = CGLGetCurrentContext();
@@ -208,10 +208,10 @@ int OffScreen::openContext()
         preContext = nullptr;
         offContext = nullptr;
         fprintf(stderr, "Could not switch OpenGL context\n");
-        return 0;
+        return 2;
     }
 
-    return 1;
+    return 0;
 }
 
 

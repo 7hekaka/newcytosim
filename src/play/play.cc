@@ -75,18 +75,6 @@ void drawOffscreen(View & view, int mag)
     player.drawScene(view, mag);
 }
 
-
-/// copy color data from 'back' to 'front'
-void blitBuffers(GLuint back, GLuint front, GLint W, GLint H)
-{
-    //std::clog << "blitting multisample buffer\n";
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, back);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, front);
-    glBlitFramebuffer(0, 0, W, H, 0, 0, W, H, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, front);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, back);
-}
-
 //------------------------------------------------------------------------------
 #pragma mark - main
 
@@ -302,11 +290,6 @@ int main(int argc, char* argv[])
         return 4;
     }
     
-#ifndef __APPLE__
-    // it is necessary under Linux/Windows to initialize GLUT to display fonts
-    glutInit(&argc, argv);
-#endif
-    
     //-------- off-screen (non interactive) rendering -------
     
     if ( mode != NORMAL && style == OFFSCREEN )
@@ -314,7 +297,7 @@ int main(int argc, char* argv[])
         const int W = view.width() * magnify;
         const int H = view.height() * magnify;
         
-        if ( !OffScreen::openContext() )
+        if ( OffScreen::openContext() )
         {
             std::cerr << "Failed to create off-screen context\n";
             return 5;
@@ -344,7 +327,7 @@ int main(int argc, char* argv[])
                 {
                     player.drawScene(view, magnify);
                     if ( multi )
-                        blitBuffers(multi, fbo, W, H);
+                        OffScreen::blitBuffers(multi, fbo, W, H);
                     player.saveView(frm++, prop.downsample);
                     s = 0;
                 }
@@ -361,7 +344,7 @@ int main(int argc, char* argv[])
                 {
                     player.drawScene(view, magnify);
                     if ( multi )
-                        blitBuffers(multi, fbo, W, H);
+                        OffScreen::blitBuffers(multi, fbo, W, H);
                     player.saveView(frm, prop.downsample);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
@@ -378,10 +361,8 @@ int main(int argc, char* argv[])
 #if ( HEADLESS_PLAYER )
     print_green(std::cout, "This player can only do offscreen rendering.\n");
 #else
-#ifdef __APPLE__
+
     glutInit(&argc, argv);
-#endif
-    
     //register all the GLUT callback functions:
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);

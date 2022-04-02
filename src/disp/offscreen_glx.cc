@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 /**
  off-screen rendering on X11, using GL-X
@@ -22,24 +22,24 @@ int OffScreen::openContext()
     
     if ( dpy == 0 )
     {
-        fprintf(stderr, "off-screen rendering aborted: unable to open a connection to the X server\n");
-        return 0;
+        fprintf(stderr, "Unable to open a connection to the X server\n");
+        return 1;
     }
     
     if ( ! glXQueryExtension(dpy, 0, 0) )
     {
-        fprintf(stderr, "off-screen rendering aborted: glX Extension not supported\n");
-        return 0;
+        fprintf(stderr, "glX Extension not supported\n");
+        return 2;
     }
     
 #ifndef GLX_VERSION_1_3
     int minor, major;
     glXQueryVersion( dpy, &major, &minor );
     fprintf(stderr, "GLX version %i.%i detected\n", major, minor );
-    fprintf(stderr, "off-screen rendering aborted: GLX version 1.3 or better is required\n");
-    return 0;
+    fprintf(stderr, "GLX version 1.3 or better is required\n");
+    return 3;
 #endif
-        return 1;
+    return 0;
 }
 
 
@@ -49,13 +49,13 @@ int OffScreen::createBuffer(const int width, const int height, int)
     
     if ( dpy == 0 )
     {
-        fprintf(stderr, "off-screen rendering aborted: unable to open a connection to the X server\n");
+        fprintf(stderr, "Unable to open a connection to the X server\n");
         return 0;
     }
     
     if ( ! glXQueryExtension(dpy, 0, 0) )
     {
-        fprintf(stderr, "off-screen rendering aborted: glX Extension not supported\n");
+        fprintf(stderr, "glX Extension not supported\n");
         return 0;
     }
     
@@ -63,7 +63,7 @@ int OffScreen::createBuffer(const int width, const int height, int)
     int minor, major;
     glXQueryVersion( dpy, &major, &minor );
     fprintf(stderr, "GLX version %i.%i detected\n", major, minor );
-    fprintf(stderr, "off-screen rendering aborted: GLX version 1.3 or better is required\n");
+    fprintf(stderr, "GLX version 1.3 or better is required\n");
     return 0;
 #endif
     
@@ -87,7 +87,7 @@ int OffScreen::createBuffer(const int width, const int height, int)
     
     if ( FBConfig_Count == 0 || FBConfig == 0 )
     {
-        fprintf(stderr, "off-screen rendering aborted: glXChooseFBConfig returned NULL\n");
+        fprintf(stderr, "glXChooseFBConfig returned NULL\n");
         return 0;
     }
     
@@ -106,13 +106,13 @@ int OffScreen::createBuffer(const int width, const int height, int)
     
     if ( glxContext == 0 )
     {
-        fprintf(stderr, "off-screen rendering aborted: glXCreateNewContext returned NULL\n");
+        fprintf(stderr, "glXCreateNewContext returned NULL\n");
         return 0;
     }
     
     if ( 0 == glXMakeCurrent(dpy, pbuf, glxContext) )
     {
-        fprintf(stderr, "off-screen rendering aborted: cannot make the PBuffer current\n");
+        fprintf(stderr, "Cannot make the PBuffer current\n");
         return 0;
     }
     
