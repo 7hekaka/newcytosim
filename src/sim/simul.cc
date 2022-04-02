@@ -469,7 +469,7 @@ Property* Simul::findProperty(const std::string& cat, const std::string& nom) co
 
 Property* Simul::findProperty(const std::string& nom) const
 {
-    if ( nom == prop.name() )
+    if ( nom == "simul" || nom == prop.name() )
         return &prop;
 
     if ( nom.empty() )
