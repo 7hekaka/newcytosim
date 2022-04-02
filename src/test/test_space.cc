@@ -297,7 +297,7 @@ void processMenu(int item)
 void initMenus()
 {
     int gm = glApp::buildMenu();
-    createMenu(processMenu);
+    glutCreateMenu(processMenu);
     glutAddSubMenu("Control", gm);
     
     glutAddMenuEntry("Reset",                MENU_RESETVIEW);

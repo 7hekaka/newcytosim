@@ -61,26 +61,7 @@ namespace gym
      */
     void bitmapString(FontType font, const char text[], float vshift)
     {
-#if 1
         fgBitmapString(font, (unsigned char*)text, -vshift);
-#else
-        GLfloat ori[4], pos[4];
-        glGetFloatv(GL_CURRENT_RASTER_POSITION, ori);
-        
-        for (const char* p = text; *p; ++p)
-        {
-            if ( *p == '\n' )
-            {
-                glGetFloatv(GL_CURRENT_RASTER_POSITION, pos);
-                GLfloat hshift = ori[0] - pos[0];
-                glBitmap(0, 0, 0, 0, hshift, vshift, nullptr);
-            }
-            else if ( isprint(*p) )
-            {
-                fgBitmapCharacter(font, *p);
-            }
-        }
-#endif
     }
     
     

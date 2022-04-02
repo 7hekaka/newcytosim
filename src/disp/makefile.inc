@@ -5,7 +5,7 @@
 
 OBJ_DISP := fiber_disp.o line_disp.o point_disp.o grid_display.o tesselator.o\
             gle.o gle_color.o gle_color_list.o gym_text.o gym_zoo.o gym_check.o\
-            view.o view_prop.o glapp.o
+            gym_flute.o view.o view_prop.o glapp.o
 
 OBJ_FONT := fg_font.o fg_stroke_roman.o fg_stroke_mono_roman.o
 
@@ -32,13 +32,7 @@ cytodisp.a: $(OBJ_DISP) $(OBJ_FONT) save_imageGL.o offscreen.o libspng.o miniz.o
 
 # Attention: FreeGLUT font are coded in C-language (use -x c):
 
-fg_font.o: fg_font.c fg_font.h
-	$(CXX) -DNDEBUG $(FAST) -x c -c $< -o build/$@
-
-fg_stroke_roman.o: fg_stroke_roman.c fg_font.h
-	$(CXX) -DNDEBUG $(FAST) -x c -c $< -o build/$@
-
-fg_stroke_mono_roman.o: fg_stroke_mono_roman.c fg_font.h
+$(OBJ_FONT): %.o: %.c fg_font.h | build
 	$(CXX) -DNDEBUG $(FAST) -x c -c $< -o build/$@
 
 

@@ -1,5 +1,8 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
+#ifndef GYM_TEXT_H
+#define GYM_TEXT_H
+
 class gle_color;
 class Vector1;
 class Vector2;
@@ -47,3 +50,5 @@ namespace gym
     void strokeCharacter(FontType, int character);
 
 }
+
+#endif

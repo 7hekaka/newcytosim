@@ -187,7 +187,7 @@ void processMenu(int item)
 void initMenus()
 {
     // --- one menu with two entries:
-    createMenu(processMenu);
+    glutCreateMenu(processMenu);
     glutAddMenuEntry("Reset", MENU_RESETVIEW);
     glutAddMenuEntry("Quit", MENU_QUIT);
     glutAttachMenu(GLUT_RIGHT_BUTTON);

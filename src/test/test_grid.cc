@@ -12,7 +12,6 @@
 #include "real.h"
 #include "timer.h"
 #include "gle.h"
-#include "gym_text.h"
 #include "gym_flute.h"
 
 #include "grid.h"

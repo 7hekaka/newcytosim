@@ -7,7 +7,6 @@
 #include "glapp.h"
 #include "glut.h"
 #include "gle.h"
-#include "gym_text.h"
 #include "gym_flute.h"
 
 
