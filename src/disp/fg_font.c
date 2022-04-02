@@ -231,7 +231,6 @@ void fgStrokeCharacter( int fontID, int character, int drawJoinDots )
 {
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
-    int i, j;
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
     if ( font && character >= 0 && character < font->Quantity )
     {
@@ -240,34 +239,27 @@ void fgStrokeCharacter( int fontID, int character, int drawJoinDots )
         {
             strip = schar->Strips;
             
-            for( i = 0; i < schar->Number; i++, strip++ )
+            for( int i = 0; i < schar->Number; i++, strip++ )
             {
-                glBegin( GL_LINE_STRIP );
-                for( j = 0; j < strip->Number; j++ )
-                    glVertex2f( strip->Vertices[ j ].X, strip->Vertices[ j ].Y );
-                glEnd( );
-                
+                glVertexPointer(2, GL_FLOAT, 0, strip->Vertices);
+                glDrawArrays(GL_LINE_STRIP, 0, strip->Number);
                 if ( drawJoinDots )
-                {
-                    glBegin( GL_POINTS );
-                    for( j = 0; j < strip->Number; j++ )
-                        glVertex2f( strip->Vertices[ j ].X, strip->Vertices[ j ].Y );
-                    glEnd( );
-                }
+                    glDrawArrays(GL_POINTS, 0, strip->Number);
             }
             glTranslatef( schar->Right, 0.0, 0.0 );
         }
     }
 }
 
-void fgStrokeString( int fontID, const unsigned char *string )
+void fgStrokeString( int fontID, const unsigned char *string, float vshift )
 {
     unsigned char c;
-    int i, j;
     float length = 0.0;
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
     if ( font && string )
     {
+        if ( vshift == 0 )
+            vshift = font->Height;
         /*
          * Step through the string, drawing each character.
          * A newline will simply translate the next character's insertion
@@ -277,7 +269,7 @@ void fgStrokeString( int fontID, const unsigned char *string )
         {
             if( c == '\n' )
             {
-                glTranslatef ( -length, -( float )( font->Height ), 0.0 );
+                glTranslatef ( -length, -vshift, 0.0 );
                 length = 0.0;
             }
             else  /* Not an EOL, draw the bitmap character */
@@ -287,14 +279,10 @@ void fgStrokeString( int fontID, const unsigned char *string )
                 {
                     const SFG_StrokeStrip *strip = schar->Strips;
                     
-                    for( i = 0; i < schar->Number; i++, strip++ )
+                    for( int i = 0; i < schar->Number; i++, strip++ )
                     {
-                        glBegin( GL_LINE_STRIP );
-                        for( j = 0; j < strip->Number; j++ )
-                            glVertex2f( strip->Vertices[ j ].X,
-                                       strip->Vertices[ j ].Y);
-                        
-                        glEnd( );
+                        glVertexPointer(2, GL_FLOAT, 0, strip->Vertices);
+                        glDrawArrays(GL_LINE_STRIP, 0, strip->Number);
                     }
                     
                     length += schar->Right;
@@ -308,7 +296,7 @@ void fgStrokeString( int fontID, const unsigned char *string )
 /*
  * Return the width in pixels of a stroke character
  */
-GLfloat fgStrokeWidthf( int fontID, int character )
+float fgStrokeWidthf( int fontID, int character )
 {
     const SFG_StrokeChar *schar;
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
@@ -329,11 +317,11 @@ int fgStrokeWidth( int fontID, int character )
 /*
  * Return the width of a string drawn using a stroke font
  */
-GLfloat fgStrokeLengthf( int fontID, const unsigned char* string )
+float fgStrokeLengthf( int fontID, const unsigned char* string )
 {
     unsigned char c;
-    GLfloat length = 0.0;
-    GLfloat this_line_length = 0.0;
+    float length = 0.0;
+    float this_line_length = 0.0;
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
     if ( font && string )
     {
@@ -367,7 +355,7 @@ int fgStrokeLength( int fontID, const unsigned char* string )
 /*
  * Returns the height of a stroke font
  */
-GLfloat fgStrokeHeight( int fontID )
+float fgStrokeHeight( int fontID )
 {
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
     if ( font )

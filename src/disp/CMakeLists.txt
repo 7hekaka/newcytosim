@@ -19,6 +19,8 @@ set(SOURCES_DISP
     fg_font.c
     fg_stroke_roman.c
     fg_stroke_mono_roman.c
+    miniz.c
+    spng.c
 )
 
 list(TRANSFORM SOURCES_DISP PREPEND "${SRC_DISP_DIR}/")

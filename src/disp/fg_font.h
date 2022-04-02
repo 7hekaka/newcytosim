@@ -29,7 +29,7 @@ typedef struct tagSFG_Font SFG_Font;
 /* The stroke font structures */
 struct tagSFG_StrokeVertex
 {
-    GLfloat X, Y;
+    float X, Y;
 };
 typedef struct tagSFG_StrokeVertex SFG_StrokeVertex;
 
@@ -42,17 +42,17 @@ typedef struct tagSFG_StrokeStrip SFG_StrokeStrip;
 
 struct tagSFG_StrokeChar
 {
-    GLfloat Right;
-    int     Number;
+    float Right;
+    int Number;
     const SFG_StrokeStrip* Strips;
 };
 typedef struct tagSFG_StrokeChar SFG_StrokeChar;
 
 struct tagSFG_StrokeFont
 {
-    int             Quantity;                   /* Number of chars in font   */
-    GLfloat         Height;                     /* Height of the characters  */
-    const SFG_StrokeChar** Characters;          /* The characters mapping    */
+    int Quantity;                   /* Number of chars in font   */
+    float Height;                     /* Height of the characters  */
+    const SFG_StrokeChar** Characters; /* The characters mapping    */
 };
 typedef struct tagSFG_StrokeFont SFG_StrokeFont;
 
@@ -100,7 +100,7 @@ void fgStrokeCharacter(int font, int character, int drawJoinDots);
 /*
 * Draw a stroke string
 */
-void fgStrokeString(int font, const unsigned char *string);
+void fgStrokeString(int font, const unsigned char *string, float vshift);
 
 /*
  * Return the width in pixels of a stroke character
@@ -115,6 +115,6 @@ int fgStrokeLength(int font, const unsigned char* string);
 /*
  * Returns the height of a stroke font
  */
-GLfloat fgStrokeHeight(int font);
+float fgStrokeHeight(int font);
 
 
