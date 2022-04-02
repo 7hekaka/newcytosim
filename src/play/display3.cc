@@ -656,7 +656,7 @@ void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, re
 
 void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    drawFiberLattice(fib, lat, width, color_by_lattice_striped);
+    drawFiberLattice(fib, lat, width, color_by_lattice_white);
 }
 
 void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real width) const

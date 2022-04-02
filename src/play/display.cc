@@ -1220,14 +1220,14 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
 void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
     drawFiberLattice2(fib, lat, width);
-    drawFiberLatticeEdges(fib, lat, width);
+    drawFiberLatticeEdges(fib, lat, width*0.5);
 }
 
 
 /**
  Indicate the edges between sites with small dots
  */
-void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real) const
+void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real size) const
 {
     const real uni = lat.unit();
     const auto inf = lat.indexM();
@@ -1241,11 +1241,11 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
         flu[i++] = { col, fib.posM(abs) };
     gym::unmapBufferC4VD();
     glDisable(GL_LIGHTING);
-    glDisable(GL_POINT_SMOOTH);
-    pointSize(fib.prop->disp->point_size);
+    //glDisable(GL_POINT_SMOOTH);
+    pointSize(size);
     glDrawArrays(GL_POINTS, 0, i);
     glDisableClientState(GL_COLOR_ARRAY);
-    glEnable(GL_POINT_SMOOTH);
+    //glEnable(GL_POINT_SMOOTH);
 }
 
 
@@ -1586,7 +1586,7 @@ void Display::drawFiber(Fiber const& fib)
         style = 0;
     }
 
-#if FIBER_HAS_LATTICE
+#if FIBER_HAS_LATTICE || FIBER_HAS_MESH
     VisibleLattice const* lat = fib.visibleLattice();
     if ( lat )
     {

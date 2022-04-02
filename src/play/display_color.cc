@@ -140,10 +140,10 @@ LOCAL gle_color color_by_lattice_jet(Fiber const& fib, long ix, real beta)
     return gle_color::jet_color(beta*fib.visibleLattice()->data(ix));
 }
 
-LOCAL gle_color color_by_lattice_striped(Fiber const& fib, long ix, real beta)
+LOCAL gle_color color_by_lattice_white(Fiber const& fib, long ix, real beta)
 {
     real x = beta * fib.visibleLattice()->data(ix);
-    return gle_color::jet_color(x).lighten(0.9375 + ( ix & 1 ) * 0.125);
+    return gle_color(x, x, x);
 }
 
 LOCAL gle_color lattice_color(gle_color const& col, real val)

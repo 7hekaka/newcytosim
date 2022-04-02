@@ -462,7 +462,7 @@ static void changeSpeckleStyle(FiberDisp* p, int)
 
 static void changeLatticeStyle(FiberDisp* p, int)
 {
-#if FIBER_HAS_LATTICE
+#if FIBER_HAS_LATTICE || FIBER_HAS_MESH
     p->lattice_style = ( 1 + p->lattice_style ) % 5;
     flashText("Fibers: lattice_style=%i", p->lattice_style);
 #else
@@ -639,7 +639,7 @@ static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 static void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.empty() )
-        flashText("no relevant object");
+        flashText("no relevant fibers");
     
     if ( plist.size() == 1 )
     {
