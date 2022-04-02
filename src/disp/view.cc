@@ -5,6 +5,7 @@
 #include "gle.h"
 #include "flute.h"
 #include "offscreen.h"
+#include "gym_matrix.h"
 #include "glu_unproject.cc"
 #include "glut.h"
 #include "time_date.h"
@@ -569,32 +570,6 @@ Vector3 View::depthAxis() const
 
 
 /**
- This set a matrix like glOrtho()
- */
-void View::setOrthoMat(GLfloat * mat)
-{
-    GLfloat L =-0.5*visRegion[0];
-    GLfloat R = 0.5*visRegion[0];
-    GLfloat B =-0.5*visRegion[1];
-    GLfloat T = 0.5*visRegion[1];
-    GLfloat N = 0;
-    GLfloat F = visRegion[2];
-
-    for ( int i = 0; i < 16; ++i )
-        mat[i] = 0;
-    
-    mat[ 0] =  2.0 / ( R - L );
-    mat[ 5] =  2.0 / ( T - B );
-    mat[10] = -2.0 / ( F - N );
-    
-    mat[12] = -( R + L ) / ( R - L );
-    mat[13] = -( T + B ) / ( T - B );
-    mat[14] = -( F + N ) / ( F - N );
-    mat[15] = 1.0;
-}
-
-
-/**
  Transforms the given window coordinates into user coordinates.
  
  It uses the matrices obtained at the last call of getMatrices(),
@@ -602,29 +577,15 @@ void View::setOrthoMat(GLfloat * mat)
  
  For more info, try `man gluUnProject`
  */
-Vector3 View::unproject(GLfloat x, GLfloat y, GLfloat z, bool get_matrices)
+Vector3 View::unproject(GLfloat x, GLfloat y, GLfloat z)
 {
-    GLfloat ux = 0, uy = 0, uz = 0;
-    if ( get_matrices )
-    {
-        GLint   vp[4];
-        GLfloat mv[16];
-        GLfloat pj[16];
-        
-        glGetIntegerv(GL_VIEWPORT,        vp);
-        glGetFloatv(GL_PROJECTION_MATRIX, pj);
-        glGetFloatv(GL_MODELVIEW_MATRIX,  mv);
-
-        setOrthoMat(pj);
-        myUnproject(x, y, z, mv, pj, vp, &ux, &uy, &uz);
-    }
-    else if ( hasMatrices )
-        myUnproject(x, y, z, mModelview, mProjection, mViewport, &ux, &uy, &uz);
+    float un[4] = { 0 };
+    if ( hasMatrices )
+        myUnproject(x, y, z, mModelview, mProjection, mViewport, un);
     else
         std::cerr << "warning: View::unproject called without matrices\n";
     
-    //printf("unproject( %.2f, %.2f, %.2f ) = ( %.2f, %.2f, %.2f )\n", x, y, z, ux, uy, uz);
-    return Vector3(ux, uy, uz);
+    return Vector3(un[0], un[1], un[2]);
 }
 
 

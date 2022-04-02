@@ -164,15 +164,12 @@ public:
     int hasClipPlane(int) const;
     
     //---------------------------------------------------------------------------
-    
-    /// set local projection matrix as if it had been set by glOrtho()
-    void setOrthoMat(GLfloat * mat);
 
     /// store the matrices defining the current OpenGL Model-View and Projection
     void getMatrices();
     
     /// transform window coordinates to 3D world-coordinates
-    Vector3 unproject(GLfloat x, GLfloat y, GLfloat z, bool get_matrices = false);
+    Vector3 unproject(GLfloat x, GLfloat y, GLfloat z);
     
     //---------------------------------------------------------------------------
     

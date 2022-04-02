@@ -189,7 +189,7 @@ test_glut: test_glut.cc | bin
 	$(DONE)
 vpath test_glut bin
 
-test_solve: test_solve.cc cytomath.a cytobase.a SFMT.o | bin
+test_solve: test_solve.cc cytomath.a cytobase.a SFMT.o gym_matrix.o | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 vpath test_solve bin

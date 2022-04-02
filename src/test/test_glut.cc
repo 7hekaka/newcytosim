@@ -68,29 +68,6 @@ void setModelView()
     glTranslatef(-focus[0], -focus[1], 0);
 }
 
-
-void setOrtho(GLfloat mat[16],
-              GLfloat const& left,
-              GLfloat const& right,
-              GLfloat const& bottom,
-              GLfloat const& top,
-              GLfloat const& near,
-              GLfloat const& far)
-{
-    for ( int d = 0; d < 16; ++d )
-        mat[d] = 0.f;
-    
-    mat[ 0] = 2.f / ( right - left );
-    mat[ 5] = 2.f / ( top - bottom );
-    mat[10] = 2.f / ( near - far );
-
-    mat[12] = - (right + left) / (right - left);
-    mat[13] = - (top + bottom) / (top - bottom);
-    mat[14] = - (far + near) / (far - near);
-    
-    mat[15] = 1.f;
-}
-
 void unproject(const GLfloat X, const GLfloat Y, GLfloat res[2])
 {
     res[0] = ( X - 0.5f * windowSize[0] ) * pixelSize + focus[0];
@@ -112,25 +89,13 @@ void windowReshaped(int w, int h)
     {
         pixelSize = 2.0f / ( zoom * windowSize[0] );
         GLfloat ratio = h / GLfloat(w);
-#if 0
         glOrtho(-1.0, 1.0, -ratio, ratio, 0, 1 );
-#else
-        GLfloat mat[16];
-        setOrtho(mat, -1.0, 1.0, -ratio, ratio, 0.0, 1.0);
-        glLoadMatrixf(mat);
-#endif
     }
     else
     {
         pixelSize = 2.0f / ( zoom * windowSize[1] );
         GLfloat ratio = w / GLfloat(h);
-#if 0
         glOrtho(-ratio, ratio, -1.0, 1.0, 0, 1 );
-#else
-        GLfloat mat[16];
-        setOrtho(mat, -1.0, 1.0, -ratio, ratio, 0.0, 1.0);
-        glLoadMatrixf(mat);
-#endif
     }
 }
 

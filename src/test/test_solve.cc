@@ -4,15 +4,13 @@
 #include <cstdlib>
 #include <cstdio>
 #include "glut.h"
+#include "gym_matrix.h"
 #include "glu_unproject.cc"
 
 #include "vector2.h"
 #include "matrix22.h"
 #include "random.h"
 
-
-//a point in space:
-float Gx=1, Gy=1, Gz=0;
 
 Vector2 pg(5,0,0), px(1,0,0), pf, pn, pc, pp;
 
@@ -145,9 +143,6 @@ GLint viewport[4];
 
 //----------------matrices to compute the inverse projection of mouse locations
 
-GLfloat mat_model[16];
-GLfloat mat_proj[16];
-
 #define MOUSE_ZOOM    GLUT_RIGHT_BUTTON
 #define MOUSE_SET     GLUT_LEFT_BUTTON
 #define MENU_BUTTON   GLUT_MIDDLE_BUTTON
@@ -234,6 +229,19 @@ void windowReshaped(int w, int h)
 
 //------------------------------------------------------------------------------
 
+void unproject(int x, int y)
+{
+    GLfloat mat_model[16];
+    GLfloat mat_proj[16];
+    float un[4];
+    glGetFloatv(GL_MODELVIEW_MATRIX, mat_model);
+    glGetFloatv(GL_PROJECTION_MATRIX, mat_proj);
+    myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, un);
+    pg.set(un[0], un[1], un[2]);
+    glutPostRedisplay();
+}
+
+
 void processMouse(int button, int state, int x, int y)
 {
     //  printf("button %i %i %i %i\n", button, state, x, y);
@@ -250,11 +258,7 @@ void processMouse(int button, int state, int x, int y)
             break;
             
         case MOUSE_SET:
-            glGetFloatv(GL_MODELVIEW_MATRIX, mat_model);
-            glGetFloatv(GL_PROJECTION_MATRIX, mat_proj);
-            myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, &Gx, &Gy, &Gz);
-            pg.set(Gx, Gy, Gz);
-            glutPostRedisplay();
+            unproject(x, y);
             break;
     }
 }
@@ -273,11 +277,7 @@ void processMotion(int x, int y)
             break;
             
         case MOUSE_SET:
-            glGetFloatv(GL_MODELVIEW_MATRIX, mat_model);
-            glGetFloatv(GL_PROJECTION_MATRIX, mat_proj);
-            myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, &Gx, &Gy, &Gz);
-            pg.set(Gx, Gy, Gz);
-            glutPostRedisplay();
+            unproject(x, y);
             break;
     }
 }

@@ -1,6 +1,7 @@
 set(SOURCES_DISP
     gle.cc
     gym_text.cc
+    gym_matrix.cc
     gym_flute.cc
     gym_check.cc
     gym_zoo.cc
