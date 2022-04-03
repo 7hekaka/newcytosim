@@ -69,12 +69,20 @@ void print_caps()
     print_cap(GL_LINE_STIPPLE, "stipple");
     
     std::clog << '\n';
-    
-#if ( 0 )
-    GLint vp[4] = { 0 };
-    glGetIntegerv(GL_VIEWPORT, vp);
-    fprintf(stderr, "viewport ( %4i %4i %4i %4i )", vp[0], vp[1], vp[2], vp[3]);
-#endif
+}
+
+void print_matrices(FILE * f)
+{
+    GLint V[4] = { 0 };
+    glGetIntegerv(GL_VIEWPORT, V);
+    fprintf(f, "viewport ( %4i %4i %4i %4i )\n", V[0], V[1], V[2], V[3]);
+    GLfloat M[16] = { 0 };
+    glGetFloatv(GL_PROJECTION_MATRIX, M);
+    for ( int i = 0; i < 4; ++i )
+        fprintf(f, "projection ( %8.2f %8.2f %8.2f %8.2f )\n", M[i], M[4+i], M[8+i], M[12+i]);
+    glGetFloatv(GL_MODELVIEW_MATRIX, M);
+    for ( int i = 0; i < 4; ++i )
+        fprintf(f, "model_view ( %8.2f %8.2f %8.2f %8.2f )\n", M[i], M[4+i], M[8+i], M[12+i]);
 }
 
     

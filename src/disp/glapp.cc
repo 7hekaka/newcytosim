@@ -566,10 +566,10 @@ void glApp::processSpecialKey(int key, int modifiers)
         case GLUT_KEY_HOME:      view.reset();            postRedisplay(); return;
         case GLUT_KEY_PAGE_UP:   view.zoom_in(1.4142f);   postRedisplay(); return;
         case GLUT_KEY_PAGE_DOWN: view.zoom_out(1.4142f);  postRedisplay(); return;
-        case GLUT_KEY_LEFT:      dxy.set(-F,0,0);         break;
-        case GLUT_KEY_RIGHT:     dxy.set(+F,0,0);         break;
-        case GLUT_KEY_DOWN:      dxy.set(0,-F,0);         break;
-        case GLUT_KEY_UP:        dxy.set(0,+F,0);         break;
+        case GLUT_KEY_LEFT:      dxy.set(-F,0,0); break;
+        case GLUT_KEY_RIGHT:     dxy.set(+F,0,0); break;
+        case GLUT_KEY_DOWN:      dxy.set(0,-F,0); break;
+        case GLUT_KEY_UP:        dxy.set(0,+F,0); break;
     }
 
     // inverse the rotation of the current view:
@@ -577,7 +577,7 @@ void glApp::processSpecialKey(int key, int modifiers)
     
     if ( modifiers & GLUT_ACTIVE_ALT )
     {
-        // Rotate view
+        // Rotate view around the focus point
         rot.rotateVector(vec, cross(Vector3(0, 0, 1), dxy));
         rot.setFromAxis(vec, F * (M_PI/8));
         view.rotate_by(rot);
@@ -908,8 +908,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     mouseX = mX;
     mouseY = winY-mY;
     
-    savedView = view;
-    savedView.getMatrices();
+    savedView = view; // copy the current Model-View transformation
     mouseDown = savedView.unproject(mouseX, mouseY, nearZ);
     viewFocus = savedView.unproject(winX*0.5, winY*0.5, nearZ);
     

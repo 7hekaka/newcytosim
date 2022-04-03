@@ -1,11 +1,11 @@
-// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "gym_matrix.h"
 #include <stdio.h>
 #include <math.h>
 
 /*
- Some of this is derived from GLFW linmath.h by Camilla Löwy <elmindreda@elmindreda.org>
+ mat4x4_inverse is derived from GLFW linmath.h by Camilla Löwy <elmindreda@elmindreda.org>
  */
 
 
@@ -27,38 +27,35 @@ namespace gym
         }
     }
     
-    /**
-     This set a matrix like glOrtho()
-     */
+
     void mat_ortho(float M[16], float L, float R, float B, float T, float N, float F)
     {
         mat_zero(M);
         
-        M[ 0] =  2.f / ( R - L );
-        M[ 5] =  2.f / ( T - B );
-        M[10] = -2.f / ( F - N );
+        M[ 0] = -2.f / ( L - R );
+        M[ 5] = -2.f / ( B - T );
+        M[10] =  2.f / ( N - F );
         
-        M[12] = -( R + L ) / ( R - L );
-        M[13] = -( T + B ) / ( T - B );
-        M[14] = -( F + N ) / ( F - N );
+        M[12] = ( R + L ) / ( L - R );
+        M[13] = ( T + B ) / ( B - T );
+        M[14] = ( F + N ) / ( N - F );
         M[15] = 1.f;
     }
 
-
-    void mat_frustum(float M[16], float l, float r, float b, float t, float n, float f)
+    void mat_frustum(float M[16], float L, float R, float B, float T, float N, float F)
     {
         mat_zero(M);
 
-        M[ 0] = 2.f*n/(r-l);
-        M[ 5] = 2.f*n/(t-b);
-        M[ 8] = (r+l)/(r-l);
-        M[ 9] = (t+b)/(t-b);
-        M[10] = -(f+n)/(f-n);
+        M[ 0] = 2.f * N / ( R - L );
+        M[ 5] = 2.f * N / ( T - B );
+        M[ 8] = ( R + L ) / ( R - L );
+        M[ 9] = ( T + B ) / ( T - B );
+        M[10] = ( F + N ) / ( N - F );
         M[11] = -1.f;
-        M[14] = -2.f*(f*n)/(f-n);
+        M[14] = ( F * N ) * (2.f / ( N - F ));
     }
 
-    void mat_perspective(float M[16], float y_fov, float aspect, float n, float f)
+    void mat_perspective(float M[16], float y_fov, float aspect, float N, float F)
     {
         float const a = 1.f / tanf(y_fov / 2.f);
 
@@ -66,12 +63,11 @@ namespace gym
 
         M[ 0] = a / aspect;
         M[ 5] = a;
-        M[10] = -((f + n) / (f - n));
+        M[10] = ( F + N ) / ( N - F );
         M[11] = -1.f;
-        M[14] = -((2.f * f * n) / (f - n));
+        M[14] = ( F * N ) * (2.f / ( N - F ));
     }
     
-
 
     void mat_mulvec(float out[4], const float M[16], const float in[4])
     {
@@ -79,13 +75,41 @@ namespace gym
             out[i] = in[0] * M[i] + in[1] * M[4+i] + in[2] * M[8+i] + in[3] * M[12+i];
     }
 
-
+    /** Attention: out = A x B */
     void mat_mul(float out[16], const float A[16], const float B[16])
     {
         for ( int i = 0; i < 4; ++i )
             mat_mulvec(out+4*i, A, B+4*i);
     }
     
+    
+    void mat_scale(float M[16], float X, float Y, float Z)
+    {
+        for ( int i = 0; i < 4; ++i )
+        {
+            M[i  ] *= X;
+            M[i+4] *= Y;
+            M[i+8] *= Z;
+        }
+    }
+    
+    void mat_translate(float M[16], float X, float Y, float Z)
+    {
+        for ( int i = 0; i < 4; ++i )
+            M[12+i] += X * M[i] + Y * M[i+4] + Z * M[i+8];
+    }
+    
+    void mat_transscale(float M[16], float X, float Y, float Z, float S)
+    {
+        for ( int i = 0; i < 4; ++i )
+        {
+            M[12+i] += X * M[i] + Y * M[i+4] + Z * M[i+8];
+            M[i  ] *= S;
+            M[i+4] *= S;
+            M[i+8] *= S;
+        }
+    }
+
 
     int mat4x4_inverse(float T[16], const float M[16])
     {

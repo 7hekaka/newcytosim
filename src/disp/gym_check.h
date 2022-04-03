@@ -18,6 +18,9 @@ namespace gym
     
     /// print some info for debugging purpose
     void print_caps();
+    
+    /// print OpenGL matrices for debugging purpose
+    void print_matrices(FILE*);
 
 };
 

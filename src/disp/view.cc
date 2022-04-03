@@ -5,6 +5,7 @@
 #include "gle.h"
 #include "flute.h"
 #include "offscreen.h"
+#include "gym_check.h"
 #include "gym_matrix.h"
 #include "glu_unproject.cc"
 #include "glut.h"
@@ -27,11 +28,14 @@ View::View(const std::string& n)
     eyePosition[1] = 0;
     eyePosition[2] = -0.5f * view_size;
     
+    viewport_[0] = 0;
+    viewport_[1] = 0;
+    viewport_[2] = 800;
+    viewport_[3] = 800;
+
     hasROI = false;
     mROI[0].reset();
     mROI[1].reset();
-    
-    hasMatrices = false;
 }
 
 
@@ -289,25 +293,15 @@ void View::reshape(int W, int H)
     window_size[0] = W;
     window_size[1] = H;
     glViewport(0, 0, W, H);
+    viewport_[2] = W;
+    viewport_[3] = H;
     load();
-    /*
-    if ( W > H )
-    {
-        GLfloat ratio = H / GLfloat(W);
-        glOrtho(-1.0, 1.0, -ratio, ratio, 0, 1);
-    }
-    else
-    {
-        GLfloat ratio = W / GLfloat(H);
-        glOrtho(-ratio, ratio, -1.0, 1.0, 0, 1);
-    }
-    */
 }
 
 
+/// calculate the visible region in the 3 directions:
 void View::adjust()
 {
-    //calculate the visible region in the 3 directions:
     if ( window_size[0] > window_size[1] )
     {
         GLfloat R = GLfloat(window_size[1]) / GLfloat(window_size[0]);
@@ -329,40 +323,39 @@ void View::adjust()
 
 void View::setProjection()
 {
-    GLfloat X = visRegion[0] * 0.5f;
-    GLfloat Y = visRegion[1] * 0.5f;
-    GLfloat Z = visRegion[2];
-    GLfloat S = view_size;
-
-    //std::clog << "View::setProjection  " << mWindowId << "\n";
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    float X = visRegion[0] * 0.5f;
+    float Y = visRegion[1] * 0.5f;
+    float Z = visRegion[2];
+    float S = view_size;
 
     if ( perspective == 3 )
     {
         // this creates a stronger perspective:
         eyePosition[2] = -1.5f * S;
-        glFrustum(-X, X, -Y, Y, Z, 5.0f*Z);
+        gym::mat_frustum(projection_, -X, X, -Y, Y, Z, 5.0f*Z);
     }
     else if ( perspective == 2 )
     {
         // this creates a strong perspective:
         eyePosition[2] = -2.0f * S;
-        glFrustum(-X, X, -Y, Y, Z, 6.0f*Z);
+        gym::mat_frustum(projection_, -X, X, -Y, Y, Z, 6.0f*Z);
     }
     else if ( perspective )
     {
         // this creates a perspective:
         eyePosition[2] = -2.0f * S;
-        glFrustum(-X, X, -Y, Y, Z, 11.0f*Z);
+        gym::mat_frustum(projection_, -X, X, -Y, Y, Z, 11.0f*Z);
     }
     else
     {
         // The back-plane is set behind to avoid clipping
         eyePosition[2] = -0.5f * S;
-        glOrtho(-X, X, -Y, Y, 0, Z);
+        gym::mat_ortho(projection_,-X, X, -Y, Y, 0, Z);
     }
-    
+
+    //std::clog << "View::setProjection  " << mWindowId << "\n";
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(projection_);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -376,33 +369,22 @@ void View::load()
 }
 
 
-void View::setModelView() const
+void View::setModelView()
 {
-    //std::cerr<<"setModelView win " << window() << '\n';
-
-    // setup the OpenGL transformation matrix
+    rotation.setOpenGLMatrix(modelview_, zoom, eyePosition);
+    Vector3 V = - ( focus + focus_shift );
+    gym::mat_translate(modelview_, V.XX, V.YY, V.ZZ);
     glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(modelview_);
 
-    GLfloat mat[16];
-    rotation.setOpenGLMatrix(mat, eyePosition);
-    glLoadMatrixf(mat);
-    
-    // to be updated with GLM
-    gle::scale(zoom);
-    // point-of-focus:
-    gle::translate(-(focus+focus_shift));
-    
+    //std::cerr<<"setModelView win " << window() << '\n';
 #if ( 0 )
-    std::clog << "View::setModelView eye      " << eyePosition << "\n";
-    std::clog << "View::setModelView rotation " << rotation << "\n";
-    std::clog << "View::setModelView zoom     " << zoom << "\n";
-    std::clog << "View::setModelView focus    " << focus+focus_shift << "\n";
+    std::clog << "View:eye      " << eyePosition << "\n";
+    std::clog << "View:rotation " << rotation << "\n";
+    std::clog << "View:zoom     " << zoom << "\n";
+    std::clog << "View:focus    " << focus+focus_shift << "\n";
 #endif
-#if ( 0 )
-    GLint vp[4] = { 0 };
-    glGetIntegerv(GL_VIEWPORT, vp);
-    std::clog << "viewport = " << vp[0] << " " << vp[1] << " " << vp[2] << " " << vp[3] << '\n';
-#endif
+    //gym::print_matrices(stderr);
 }
 
 
@@ -507,7 +489,6 @@ void View::align_with(const Vector3 & dir)
 
 void View::adjustROI(real Z)
 {
-    getMatrices();
     setROI(unproject(0, 0, Z), unproject(width(), height(), Z));
 }
 
@@ -548,43 +529,23 @@ void View::setROI(Vector3 a, Vector3 b)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void View::getMatrices()
-{
-    //get the transformation matrices, to be used for mouse control
-    glGetIntegerv(GL_VIEWPORT, mViewport);
-    glGetFloatv(GL_PROJECTION_MATRIX, mProjection);
-    glGetFloatv(GL_MODELVIEW_MATRIX, mModelview);
-    hasMatrices = true;
-}
-
 /**
  return axis orthogonal to the display plane, and corresponding to depth
  obtained from the current modelview transformation
  */
 Vector3 View::depthAxis() const
 {
-    GLfloat mat[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-    return normalize(Vector3(mat[2], mat[6], mat[10]));
+    return normalize(Vector3(modelview_[2], modelview_[6], modelview_[10]));
 }
 
 
 /**
  Transforms the given window coordinates into user coordinates.
- 
- It uses the matrices obtained at the last call of getMatrices(),
- or the current matrices if get_matrices == true.
- 
- For more info, try `man gluUnProject`
  */
 Vector3 View::unproject(GLfloat x, GLfloat y, GLfloat z)
 {
     float un[4] = { 0 };
-    if ( hasMatrices )
-        myUnproject(x, y, z, mModelview, mProjection, mViewport, un);
-    else
-        std::cerr << "warning: View::unproject called without matrices\n";
-    
+    myUnproject(x, y, z, modelview_, projection_, viewport_, un);
     return Vector3(un[0], un[1], un[2]);
 }
 

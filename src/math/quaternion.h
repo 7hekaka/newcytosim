@@ -499,72 +499,69 @@ public:
     }
     
     /// generate OpenGL transformation matrix, translation followed by rotation
-    void setOpenGLMatrix(float m[16], const float trans[3]) const
+    void setOpenGLMatrix(float m[16], double S, const float vec[3]) const
     {
         //this code assumes that the quaternion has norm = 1,
-        float rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+        double x2 = S * ( q[1] + q[1] );
+        double y2 = S * ( q[2] + q[2] );
+        double z2 = S * ( q[3] + q[3] );
         
-        x2 = float(q[1]+q[1]);
-        y2 = float(q[2]+q[2]);
-        z2 = float(q[3]+q[3]);
-        
-        rx = float(q[0]*x2); ry = float(q[0]*y2); rz = float(q[0]*z2);
-        xx = float(q[1]*x2); xy = float(q[1]*y2); xz = float(q[1]*z2);
-        yy = float(q[2]*y2); yz = float(q[2]*z2); zz = float(q[3]*z2);
-        
-        m[0+4*0] = 1 - (yy + zz);
-        m[1+4*0] = xy + rz;
-        m[2+4*0] = xz - ry;
-        m[3+4*0] = 0;
+        double rx = q[0] * x2, ry = q[0] * y2, rz = q[0] * z2;
+        double xx = q[1] * x2, xy = q[1] * y2, xz = q[1] * z2;
+        double yy = q[2] * y2, yz = q[2] * z2, zz = q[3] * z2;
 
-        m[0+4*1] = xy - rz;
-        m[1+4*1] = 1 - (xx + zz);
-        m[2+4*1] = yz + rx;
-        m[3+4*1] = 0;
+        m[0+4*0] = float( S - (yy + zz) );
+        m[1+4*0] = float( xy + rz );
+        m[2+4*0] = float( xz - ry );
+        m[3+4*0] = 0.f;
 
-        m[0+4*2] = xz + ry;
-        m[1+4*2] = yz - rx;
-        m[2+4*2] = 1 - (xx + yy);
-        m[3+4*2] = 0;
+        m[0+4*1] = float( xy - rz );
+        m[1+4*1] = float( S - (xx + zz) );
+        m[2+4*1] = float( yz + rx );
+        m[3+4*1] = 0.f;
 
-        m[0+4*3] = trans[0];
-        m[1+4*3] = trans[1];
-        m[2+4*3] = trans[2];
-        m[3+4*3] = 1;
+        m[0+4*2] = float( xz + ry );
+        m[1+4*2] = float( yz - rx );
+        m[2+4*2] = float( S - (xx + yy) );
+        m[3+4*2] = 0.f;
+
+        m[0+4*3] = vec[0];
+        m[1+4*3] = vec[1];
+        m[2+4*3] = vec[2];
+        m[3+4*3] = 1.f;
     }
 
     /// generate OpenGL transformation matrix, translation followed by rotation
-    void setOpenGLMatrix(double m[16], const double trans[3]) const
+    void setOpenGLMatrix(double m[16], double S, const double vec[3]) const
     {
         //this code assumes that the quaternion has norm = 1,
-        double rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
         
-        x2 = q[1] + q[1];
-        y2 = q[2] + q[2];
-        z2 = q[3] + q[3];
+        double x2 = S * ( q[1] + q[1] );
+        double y2 = S * ( q[2] + q[2] );
+        double z2 = S * ( q[3] + q[3] );
         
-        rx = q[0] * x2; ry = q[0] * y2; rz = q[0] * z2;
-        xx = q[1] * x2; xy = q[1] * y2; xz = q[1] * z2;
-        yy = q[2] * y2; yz = q[2] * z2; zz = q[3] * z2;
+        double rx = q[0] * x2, ry = q[0] * y2, rz = q[0] * z2;
+        double xx = q[1] * x2, xy = q[1] * y2, xz = q[1] * z2;
+        double yy = q[2] * y2, yz = q[2] * z2, zz = q[3] * z2;
         
-        m[0+4*0] = 1.0 - (yy + zz);
+        m[0+4*0] = S - (yy + zz);
         m[1+4*0] = xy + rz;
         m[2+4*0] = xz - ry;
         m[3+4*0] = 0.0;
 
         m[0+4*1] = xy - rz;
-        m[1+4*1] = 1.0 - (xx + zz);
+        m[1+4*1] = S - (xx + zz);
         m[2+4*1] = yz + rx;
         m[3+4*1] = 0.0;
 
         m[0+4*2] = xz + ry;
         m[1+4*2] = yz - rx;
-        m[2+4*2] = 1.0 - (xx + yy);
+        m[2+4*2] = S - (xx + yy);
         m[3+4*2] = 0.0;
 
-        m[0+4*3] = trans[0];
-        m[1+4*3] = trans[1];
-        m[2+4*3] = trans[2];
+        m[0+4*3] = vec[0];
+        m[1+4*3] = vec[1];
+        m[2+4*3] = vec[2];
         m[3+4*3] = 1.0;
     }
     

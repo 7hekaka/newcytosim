@@ -15,20 +15,20 @@ class View : public ViewProp
 {
 private:
     
-    /// viewport obtained by getMatrices()
-    GLint mViewport[4];
+    /// OpenGL viewport 
+    GLint viewport_[4];
     
-    /// modelview obtained by getMatrices()
-    GLfloat mModelview[16];
+    /// modelview matrix
+    GLfloat modelview_[16];
     
-    /// projection obtained by getMatrices()
-    GLfloat mProjection[16];
+    /// projection matrix
+    GLfloat projection_[16];
     
     /// half-size of the OpenGL visible region in OpenGL units
-    GLfloat visRegion[4];
+    float visRegion[4];
     
     /// translation between center of volume and camera
-    GLfloat eyePosition[4];
+    float eyePosition[4];
     
     /// window number in GLUT
     int mWindowId;
@@ -38,9 +38,6 @@ private:
     
     /// Region of interest
     Vector3 mROI[2];
-
-    /// used to check that getMatrices() was called
-    bool hasMatrices;
     
     /// text displayed near top right corner of window
     std::string top_message;
@@ -78,7 +75,7 @@ public:
     void setProjection();
     
     /// set OpenGL Model-View matrix
-    void setModelView() const;
+    void setModelView();
     
     /// set OpenGL Projection and ModelView matrices
     void load();
@@ -164,9 +161,6 @@ public:
     int hasClipPlane(int) const;
     
     //---------------------------------------------------------------------------
-
-    /// store the matrices defining the current OpenGL Model-View and Projection
-    void getMatrices();
     
     /// transform window coordinates to 3D world-coordinates
     Vector3 unproject(GLfloat x, GLfloat y, GLfloat z);
