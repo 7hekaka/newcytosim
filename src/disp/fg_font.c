@@ -229,6 +229,7 @@ int fgBitmapHeight( int fontID )
  */
 void fgStrokeCharacter( int fontID, int character, int drawJoinDots )
 {
+    int i;
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
@@ -239,7 +240,7 @@ void fgStrokeCharacter( int fontID, int character, int drawJoinDots )
         {
             strip = schar->Strips;
             
-            for( int i = 0; i < schar->Number; i++, strip++ )
+            for( i = 0; i < schar->Number; i++, strip++ )
             {
                 glVertexPointer(2, GL_FLOAT, 0, strip->Vertices);
                 glDrawArrays(GL_LINE_STRIP, 0, strip->Number);
@@ -253,6 +254,7 @@ void fgStrokeCharacter( int fontID, int character, int drawJoinDots )
 
 void fgStrokeString( int fontID, const unsigned char *string, float vshift )
 {
+    int i;
     unsigned char c;
     float length = 0.0;
     SFG_StrokeFont const* font = fghStrokeByID( fontID );
@@ -279,7 +281,7 @@ void fgStrokeString( int fontID, const unsigned char *string, float vshift )
                 {
                     const SFG_StrokeStrip *strip = schar->Strips;
                     
-                    for( int i = 0; i < schar->Number; i++, strip++ )
+                    for( i = 0; i < schar->Number; i++, strip++ )
                     {
                         glVertexPointer(2, GL_FLOAT, 0, strip->Vertices);
                         glDrawArrays(GL_LINE_STRIP, 0, strip->Number);
