@@ -34,7 +34,6 @@ void helpKeys(std::ostream& os) { os << "This executable has no display capabili
 #  include "fiber_disp.h"
 #  include "point_disp.h"
 using glApp::flashText;
-void buildMenus();
 #  include "play_keys.cc"
 #  include "play_menus.cc"
 #  include "play_mouse.cc"
@@ -361,7 +360,6 @@ int main(int argc, char* argv[])
 #if ( HEADLESS_PLAYER )
     print_green(std::cout, "This player can only do offscreen rendering.\n");
 #else
-
     glutInit(&argc, argv);
     //register all the GLUT callback functions:
     glApp::actionFunc(processMouseClick);
@@ -388,7 +386,7 @@ int main(int argc, char* argv[])
     {
         gle::initialize();
         player.setStyle(disp.style);
-        buildMenus();
+        rebuildMenus();
         glutAttachMenu(GLUT_RIGHT_BUTTON);
         glutMenuStatusFunc(menuCallback);
         if ( glApp::isFullScreen() )
