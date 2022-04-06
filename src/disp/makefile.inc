@@ -5,7 +5,7 @@
 
 OBJ_DISP := fiber_disp.o line_disp.o point_disp.o grid_display.o tesselator.o\
             gle.o gle_color.o gle_color_list.o gym_text.o gym_zoo.o gym_check.o\
-            gym_flute.o gym_matrix.o view.o view_prop.o glapp.o
+            gym_flute.o gym_matrix.o gym_menu.o view.o view_prop.o glapp.o
 
 OBJ_FONT := fg_font.o fg_stroke_roman.o fg_stroke_mono_roman.o
 

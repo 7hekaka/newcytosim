@@ -116,6 +116,8 @@ int main(int argc, char* argv[])
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
     
+    arg.set(gym::has_menus, "menu");
+
     // check for major options:
     if ( arg.use_key("-") )
     {
@@ -386,9 +388,12 @@ int main(int argc, char* argv[])
     {
         gle::initialize();
         player.setStyle(disp.style);
-        rebuildMenus();
-        glutAttachMenu(GLUT_RIGHT_BUTTON);
-        glutMenuStatusFunc(menuCallback);
+        if ( gym::has_menus )
+        {
+            rebuildMenus();
+            glApp::attachMenu();
+            glutMenuStatusFunc(menuCallback);
+        }
         if ( glApp::isFullScreen() )
             glutFullScreen();
         glutTimerFunc(100, timerCallback, 0);

@@ -179,8 +179,6 @@ int main(int argc, char* argv[])
     
     glutInit(&argc, argv);
     glApp::setDimensionality(3);
-    glApp::setScale(2);
-    glApp::attachMenu(GLUT_RIGHT_BUTTON);
     glApp::normalKeyFunc(processNormalKey);
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
@@ -192,6 +190,8 @@ int main(int argc, char* argv[])
     glApp::currentView().read(arg);
     arg.print_warnings(std::cerr, 1, "\n");
     glApp::newWindow(display);
+    glApp::attachMenu();
+    glApp::setScale(2);
     gle::initialize();
     
     file_list = FilePath::list_dir(pam.directory.c_str(), "rec");

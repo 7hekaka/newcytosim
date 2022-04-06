@@ -190,9 +190,9 @@ int main(int argc, char* argv[])
     
     glutInit(&argc, argv);
     glApp::setDimensionality(3);
-    glApp::attachMenu(GLUT_RIGHT_BUTTON);
     glApp::normalKeyFunc(processNormalKey);
     glApp::newWindow(display);
+    glApp::attachMenu();
     glApp::setScale(3);
     gle::initialize();
     glutMainLoop();

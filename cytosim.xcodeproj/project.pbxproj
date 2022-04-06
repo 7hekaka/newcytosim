@@ -145,6 +145,8 @@
 		BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB46A4CA24A48E1900E89FE2 /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
 		BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4737BC2024B39300FE6CEC /* accumulator.h */; };
+		BB47E9D327FDF9B500551A9B /* gym_menu.h in Headers */ = {isa = PBXBuildFile; fileRef = BB47E9D127FDF9B500551A9B /* gym_menu.h */; };
+		BB47E9D427FDF9B500551A9B /* gym_menu.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E9D227FDF9B500551A9B /* gym_menu.cc */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
 		BB4A635E12CCA83C001FD45D /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
@@ -1452,6 +1454,8 @@
 		BB40C87F0CC6044E00EC90F8 /* meca1d.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = meca1d.h; path = src/sim/meca1d.h; sourceTree = SOURCE_ROOT; };
 		BB46A4C424A349F400E89FE2 /* simd_float.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_float.h; sourceTree = "<group>"; };
 		BB4737BC2024B39300FE6CEC /* accumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accumulator.h; path = src/math/accumulator.h; sourceTree = SOURCE_ROOT; };
+		BB47E9D127FDF9B500551A9B /* gym_menu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_menu.h; sourceTree = "<group>"; };
+		BB47E9D227FDF9B500551A9B /* gym_menu.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_menu.cc; sourceTree = "<group>"; };
 		BB48AB001B42BABD008540D1 /* space_banana.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_banana.cc; path = src/sim/spaces/space_banana.cc; sourceTree = SOURCE_ROOT; };
 		BB48AB011B42BABD008540D1 /* space_banana.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_banana.h; path = src/sim/spaces/space_banana.h; sourceTree = SOURCE_ROOT; };
 		BB4CFFDF130539740049C585 /* classic_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = classic_fiber_prop.cc; path = fibers/classic_fiber_prop.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -3039,6 +3043,8 @@
 				BBCC8FFD2722C8550066FF75 /* gym_text.cc */,
 				BB67499527F8CAF800165E14 /* gym_matrix.h */,
 				BB67499727F8D0D400165E14 /* gym_matrix.cc */,
+				BB47E9D127FDF9B500551A9B /* gym_menu.h */,
+				BB47E9D227FDF9B500551A9B /* gym_menu.cc */,
 				BB3CFAA225DBD0E80016A7A3 /* flute.h */,
 				BB3CFA9E25DBCC340016A7A3 /* gym_flute.h */,
 				BB3CFA9F25DBCC350016A7A3 /* gym_flute.cc */,
@@ -3456,6 +3462,7 @@
 				BBCC90002722C8550066FF75 /* gym_text.h in Headers */,
 				BB67499627F8CAF800165E14 /* gym_matrix.h in Headers */,
 				BB3CFAA025DBCC350016A7A3 /* gym_flute.h in Headers */,
+				BB47E9D327FDF9B500551A9B /* gym_menu.h in Headers */,
 				BBFF79CC2670A57400EB5870 /* display_color.cc in Headers */,
 				BB3CFAA325DBD0E90016A7A3 /* flute.h in Headers */,
 				BB7B5A9C241A81BB0063F252 /* tesselator.h in Headers */,
@@ -4571,6 +4578,7 @@
 				BB109D3823D0788200805F16 /* fiber_disp.cc in Sources */,
 				BB30922C2164BB2B00C6DEE4 /* grid_display.cc in Sources */,
 				BB97116C1DECDBA000352630 /* gle_color.cc in Sources */,
+				BB47E9D427FDF9B500551A9B /* gym_menu.cc in Sources */,
 				BBE6C42127E7B1A80071E862 /* fg_stroke_roman.c in Sources */,
 				BB109D3623D0788200805F16 /* line_disp.cc in Sources */,
 				BB9711691DECDB8500352630 /* view.cc in Sources */,

@@ -98,8 +98,8 @@ int main(int argc, char* argv[])
     glApp::setDimensionality(3);
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
-    glApp::attachMenu(GLUT_RIGHT_BUTTON);
     glApp::newWindow(display);
+    glApp::attachMenu();
     glApp::setScale(4);
     gle::initialize();
     glutMainLoop();

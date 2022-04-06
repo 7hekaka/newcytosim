@@ -1,15 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-/// shortcut
-static int createMenu(void (*func)(int)) { return glutCreateMenu(func); }
-
-/// shortcut
-static void addMenuEntry(char const* str, int val) { glutAddMenuEntry(str, val); }
-
-/// shortcut
-static void addSubMenu(char const* str, int val) { glutAddSubMenu(str, val); }
-
-
+#include "gym_menu.h"
 
 static void processMenuFiber(int item)
 {
@@ -59,36 +50,36 @@ static int buildMenuFiber()
 {
     static int menuID = 0;
     if ( menuID == 0 )
-        menuID = createMenu(processMenuFiber);
+        menuID = gym::createMenu(processMenuFiber);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
     FiberDisp * FD = player.firstFiberDisp();
     if ( FD )
     {
-        addMenuEntry(FD->visible        ? "Hide"             :"Show",             10);
-        addMenuEntry(FD->line_style     ? "Hide Lines"       :"Show Lines",        1);
-        addMenuEntry(FD->line_style==2  ? "Hide Tensions"    :"Show Tensions",     2);
-        addMenuEntry(FD->point_style    ? "Hide Points"      :"Show Points",       3);
-        addMenuEntry(FD->point_style==2 ? "Hide Arrows"      :"Show Arrows",       5);
-        addMenuEntry(FD->end_style[1]   ? "Hide Minus-ends"  :"Show Minus-end",    7);
-        addMenuEntry(FD->end_style[0]   ? "Hide Plus-ends"   :"Show Plus-end",     8);
-        addMenuEntry(FD->force_style    ? "Hide Point-forces":"Show Point-Forces", 9);
-        addMenuEntry("No coloring",           20);
-        addMenuEntry("Coloring by number",    21);
-        addMenuEntry("Coloring by mark",      22);
-        addMenuEntry("Coloring by flag",      23);
-        addMenuEntry("Coloring by family",    24);
-        addMenuEntry("Coloring by cluster",   25);
-        addMenuEntry("Coloring by direction", 26);
-        addMenuEntry("Coloring by age",       27);
-        addMenuEntry("Coloring by +end state",28);
-        addMenuEntry("draw_average=0", 30);
-        addMenuEntry("draw_average=1", 31);
-        addMenuEntry("draw_average=2", 32);
+        gym::addMenuEntry(FD->visible        ? "Hide"             :"Show",             10);
+        gym::addMenuEntry(FD->line_style     ? "Hide Lines"       :"Show Lines",        1);
+        gym::addMenuEntry(FD->line_style==2  ? "Hide Tensions"    :"Show Tensions",     2);
+        gym::addMenuEntry(FD->point_style    ? "Hide Points"      :"Show Points",       3);
+        gym::addMenuEntry(FD->point_style==2 ? "Hide Arrows"      :"Show Arrows",       5);
+        gym::addMenuEntry(FD->end_style[1]   ? "Hide Minus-ends"  :"Show Minus-end",    7);
+        gym::addMenuEntry(FD->end_style[0]   ? "Hide Plus-ends"   :"Show Plus-end",     8);
+        gym::addMenuEntry(FD->force_style    ? "Hide Point-forces":"Show Point-Forces", 9);
+        gym::addMenuEntry("No coloring",           20);
+        gym::addMenuEntry("Coloring by number",    21);
+        gym::addMenuEntry("Coloring by mark",      22);
+        gym::addMenuEntry("Coloring by flag",      23);
+        gym::addMenuEntry("Coloring by family",    24);
+        gym::addMenuEntry("Coloring by cluster",   25);
+        gym::addMenuEntry("Coloring by direction", 26);
+        gym::addMenuEntry("Coloring by age",       27);
+        gym::addMenuEntry("Coloring by +end state",28);
+        gym::addMenuEntry("draw_average=0", 30);
+        gym::addMenuEntry("draw_average=1", 31);
+        gym::addMenuEntry("draw_average=2", 32);
     }
     else
-        addMenuEntry("no fiber?", 0);
+        gym::addMenuEntry("no fiber?", 0);
 
     return menuID;
 }
@@ -114,14 +105,14 @@ static int buildMenuCouple()
 {
     static int menuID = 0;
     if ( menuID == 0 )
-        menuID = createMenu(processMenuCouple);
+        menuID = gym::createMenu(processMenuCouple);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
-    addMenuEntry("Hide all",    1);
-    addMenuEntry("Show free",   2);
-    addMenuEntry("Show bound",  3);
-    addMenuEntry("Show links",  4);
+    gym::addMenuEntry("Hide all",    1);
+    gym::addMenuEntry("Show free",   2);
+    gym::addMenuEntry("Show bound",  3);
+    gym::addMenuEntry("Show links",  4);
     return menuID;
 }
 
@@ -154,10 +145,10 @@ static int buildMenuStyle()
     static int menuID = 0;
     if ( menuID == 0 )
     {
-        menuID = createMenu(processMenuDisplay);
-        addMenuEntry("Detailed (style 1)", 101);
-        addMenuEntry("Fastest (style 2)", 102);
-        addMenuEntry("Best Looking (style 3)", 103);
+        menuID = gym::createMenu(processMenuDisplay);
+        gym::addMenuEntry("Detailed (style 1)", 101);
+        gym::addMenuEntry("Fastest (style 2)", 102);
+        gym::addMenuEntry("Best Looking (style 3)", 103);
     }
     return menuID;
 }
@@ -171,19 +162,19 @@ static int buildMenuDisplay()
     int m2 = buildMenuCouple();
     
     if ( menuID == 0 )
-        menuID = createMenu(processMenuDisplay);
+        menuID = gym::createMenu(processMenuDisplay);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
-    addMenuEntry("Reset View",  1);
-    addSubMenu("Style",   m0);
-    addSubMenu("Fibers",  m1);
-    addSubMenu("Couple",  m2);
+    gym::addMenuEntry("Reset View",  1);
+    gym::addSubMenu("Style",   m0);
+    gym::addSubMenu("Fibers",  m1);
+    gym::addSubMenu("Couple",  m2);
     
     View & view = glApp::currentView();
-    addMenuEntry("Toggle fullscreen mode (f)", 4);
-    addMenuEntry(disp.tile?"Non-tiled Display":"Tiled Display", 3);
-    addMenuEntry(view.track_fibers?"stop tracking":"Track Fibers", 6);
+    gym::addMenuEntry("Toggle fullscreen mode (f)", 4);
+    gym::addMenuEntry(disp.tile?"Non-tiled Display":"Tiled Display", 3);
+    gym::addMenuEntry(view.track_fibers?"stop tracking":"Track Fibers", 6);
     
     return menuID;
 }
@@ -215,16 +206,16 @@ static int buildMenuFiberSelect()
 {
     static int menuID = 0;
     if ( menuID == 0 )
-        menuID = createMenu(processMenuFiberSelect);
+        menuID = gym::createMenu(processMenuFiberSelect);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
-    addMenuEntry("Hide All", 1);
+    gym::addMenuEntry("Hide All", 1);
     FiberDisp * FD = player.firstFiberDisp();
     if ( FD )
     {
-        addMenuEntry(FD->hide&1?"Show right pointing":"Hide right pointing", 2);
-        addMenuEntry(FD->hide&2?"Show left pointing":"Hide left pointing", 3);
+        gym::addMenuEntry(FD->hide&1?"Show right pointing":"Hide right pointing", 2);
+        gym::addMenuEntry(FD->hide&2?"Show left pointing":"Hide left pointing", 3);
     }
     return menuID;
 }
@@ -251,14 +242,14 @@ static int buildMenuCoupleSelect()
 {
     static int menuID = 0;
     if ( menuID == 0 )
-        menuID = createMenu(processMenuCoupleSelect);
+        menuID = gym::createMenu(processMenuCoupleSelect);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
-    addMenuEntry("Hide All", 1);
-    addMenuEntry(disp.couple_select&1?"Hide Free":"Show Free",     2);
-    addMenuEntry(disp.couple_select&2?"Hide Bound":"Show Bound",   3);
-    addMenuEntry(disp.couple_select&4?"Hide Links":"Show Links", 4);
+    gym::addMenuEntry("Hide All", 1);
+    gym::addMenuEntry(disp.couple_select&1?"Hide Free":"Show Free",     2);
+    gym::addMenuEntry(disp.couple_select&2?"Hide Bound":"Show Bound",   3);
+    gym::addMenuEntry(disp.couple_select&4?"Hide Links":"Show Links", 4);
     return menuID;
 }
 
@@ -283,13 +274,13 @@ static int buildMenuSingleSelect()
 {
     static int menuID = 0;
     if ( menuID == 0 )
-        menuID = createMenu(processMenuSingleSelect);
+        menuID = gym::createMenu(processMenuSingleSelect);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
-    addMenuEntry("Hide All",     1);
-    addMenuEntry(disp.single_select&1?"Hide Free":"Show Free",     2);
-    addMenuEntry(disp.single_select&2?"Hide Bound":"Show Bounds", 3);
+    gym::addMenuEntry("Hide All",     1);
+    gym::addMenuEntry(disp.single_select&1?"Hide Free":"Show Free",     2);
+    gym::addMenuEntry(disp.single_select&2?"Hide Bound":"Show Bounds", 3);
     return menuID;
 }
 
@@ -304,13 +295,13 @@ static int buildMenuSelect()
     int m3 = buildMenuSingleSelect();
     
     if ( menuID == 0 )
-        menuID = createMenu(nullptr);
+        menuID = gym::createMenu(nullptr);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
 
-    addSubMenu("Fibers",  m1);
-    addSubMenu("Couple",  m2);
-    addSubMenu("Singles", m3);
+    gym::addSubMenu("Fibers",  m1);
+    gym::addSubMenu("Couple",  m2);
+    gym::addSubMenu("Singles", m3);
     
     return menuID;
 }
@@ -341,11 +332,11 @@ static int buildMenuAnimation()
     
     if ( menuID == 0 )
     {
-        menuID = createMenu(processMenuAnimation);
-        addMenuEntry("(z) Reset State",      1);
-        addMenuEntry("(a) Start Live",       2);
-        addMenuEntry("(s) One Step & Stop",  4);
-        addMenuEntry("(r) Read Parameters",  5);
+        menuID = gym::createMenu(processMenuAnimation);
+        gym::addMenuEntry("(z) Reset State",      1);
+        gym::addMenuEntry("(a) Start Live",       2);
+        gym::addMenuEntry("(s) One Step & Stop",  4);
+        gym::addMenuEntry("(r) Read Parameters",  5);
     }
     return menuID;
 }
@@ -379,18 +370,18 @@ static int buildMenuReplay()
     
     if ( menuID == 0 )
     {
-        menuID = createMenu(processMenuReplay);
-        addMenuEntry("(p) Play/Faster",    1);
-        addMenuEntry("(o) Slower",         2);
-        addMenuEntry("(s) Stop",           3);
-        addMenuEntry("-",                  0);
-        addMenuEntry("(z) First Frame",    4);
-        addMenuEntry("(<) Previous Frame", 5);
-        addMenuEntry("(>) Next Frame",     6);
+        menuID = gym::createMenu(processMenuReplay);
+        gym::addMenuEntry("(p) Play/Faster",    1);
+        gym::addMenuEntry("(o) Slower",         2);
+        gym::addMenuEntry("(s) Stop",           3);
+        gym::addMenuEntry("-",                  0);
+        gym::addMenuEntry("(z) First Frame",    4);
+        gym::addMenuEntry("(<) Previous Frame", 5);
+        gym::addMenuEntry("(>) Next Frame",     6);
         if ( prop.loop )
-            addMenuEntry("Do not loop", 7);
+            gym::addMenuEntry("Do not loop", 7);
         else
-            addMenuEntry("Loop movie", 8);
+            gym::addMenuEntry("Loop movie", 8);
     }
     return menuID;
 }
@@ -432,26 +423,26 @@ static int buildMenuExport()
 {
     static int menuID = 0;
     if ( menuID == 0 )
-        menuID = createMenu(processMenuExport);
+        menuID = gym::createMenu(processMenuExport);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
-    addMenuEntry("Save Image (y)",            1);
-    addMenuEntry("Save 2x Downsampled Image", 2);
-    addMenuEntry("Save Fine Image",           3);
-    addMenuEntry("Save 2x Fine Image",        4);
-    addMenuEntry("Save 3x Fine Image",        5);
-    addMenuEntry("Save 4x Poster",            6);
-    addMenuEntry("Save 8x Poster",            7);
-    addMenuEntry("Save 16x Poster",           8);
-    addMenuEntry("Play & Save Images (Y)",    9);
-    addMenuEntry("Reset Image-file Index",   10);
-    addMenuEntry("-",                         0);
-    addMenuEntry("Write Play Parameters",    20);
-    addMenuEntry("Write Display Parameters", 21);
-    addMenuEntry("Write Object Properties",  22);
-    addMenuEntry("Export Objects",           23);
-    addMenuEntry("Export Objects as Binary", 24);
+    gym::addMenuEntry("Save Image (y)",            1);
+    gym::addMenuEntry("Save 2x Downsampled Image", 2);
+    gym::addMenuEntry("Save Fine Image",           3);
+    gym::addMenuEntry("Save 2x Fine Image",        4);
+    gym::addMenuEntry("Save 3x Fine Image",        5);
+    gym::addMenuEntry("Save 4x Poster",            6);
+    gym::addMenuEntry("Save 8x Poster",            7);
+    gym::addMenuEntry("Save 16x Poster",           8);
+    gym::addMenuEntry("Play & Save Images (Y)",    9);
+    gym::addMenuEntry("Reset Image-file Index",   10);
+    gym::addMenuEntry("-",                         0);
+    gym::addMenuEntry("Write Play Parameters",    20);
+    gym::addMenuEntry("Write Display Parameters", 21);
+    gym::addMenuEntry("Write Object Properties",  22);
+    gym::addMenuEntry("Export Objects",           23);
+    gym::addMenuEntry("Export Objects as Binary", 24);
     
     return menuID;
 }
@@ -479,17 +470,17 @@ void rebuildMenus()
     int m6 = glApp::buildMenu();
 
     if ( menuID == 0 )
-        menuID = createMenu(processTopMenu);
+        menuID = gym::createMenu(processTopMenu);
     else
-        glApp::clearMenu(menuID);
+        gym::clearMenu(menuID);
     
-    addSubMenu("Display",           m1);
-    addSubMenu("Object-Selection",  m2);
-    addSubMenu("Live-Simulation",   m3);
-    addSubMenu("File-Replay",       m4);
-    addSubMenu("Export",            m5);
-    addSubMenu("More",              m6);
-    addMenuEntry("Quit",             9);
+    gym::addSubMenu("Display",           m1);
+    gym::addSubMenu("Object-Selection",  m2);
+    gym::addSubMenu("Live-Simulation",   m3);
+    gym::addSubMenu("File-Replay",       m4);
+    gym::addSubMenu("Export",            m5);
+    gym::addSubMenu("More",              m6);
+    gym::addMenuEntry("Quit",             9);
 }
 
 

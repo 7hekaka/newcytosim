@@ -4,6 +4,7 @@ set(SOURCES_DISP
     gym_matrix.cc
     gym_flute.cc
     gym_check.cc
+    gym_menu.cc
     gym_zoo.cc
     gle_color.cc
     gle_color_list.cc

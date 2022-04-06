@@ -349,10 +349,10 @@ int main(int argc, char* argv[])
         rasterizer_draws = true;
         glutInit(&argc, argv);
         glApp::setDimensionality(3);
-        glApp::attachMenu(GLUT_RIGHT_BUTTON);
         glApp::normalKeyFunc(processNormalKey);
         glApp::setScale(2*(SIZE+radius+1));
         glApp::newWindow(display);
+        glApp::attachMenu();
         gle::initialize();
 
         glutMainLoop();

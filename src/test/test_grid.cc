@@ -330,11 +330,11 @@ int main(int argc, char* argv[])
 
     glutInit(&argc, argv);
     glApp::setDimensionality(DIM);
-    glApp::attachMenu(GLUT_RIGHT_BUTTON);
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
     glApp::normalKeyFunc(processNormalKey);
     glApp::newWindow(display);
+    glApp::attachMenu();
     glApp::setScale(2*range+1);
     gle::initialize();
     glutMainLoop();

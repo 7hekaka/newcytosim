@@ -10,7 +10,7 @@
 #include "time_date.h"
 #include "gle.h"
 #include "gym_check.h"
-
+#include "gym_menu.h"
 
 namespace glApp
 {
@@ -256,7 +256,6 @@ int glApp::newWindow(void (*func)(View&, int))
     glutMouseFunc(processMouseClick);
     glutMotionFunc(processMouseDrag);
     glutPassiveMotionFunc(processPassiveMouseMotion);
-    attachMenu(GLUT_RIGHT_BUTTON);
 
     if ( win <= 1 )
         glutDisplayFunc(displayMain);
@@ -607,33 +606,23 @@ void glApp::specialKeyFunc(void (*func)(int, int, int))
 //------------------------------------------------------------------------------
 #pragma mark -
 
-/// shortcut
-static int createMenu(void (*func)(int)) { return glutCreateMenu(func); }
-
-/// shortcut
-static void addMenuEntry(char const* str, int val) { glutAddMenuEntry(str, val); }
-
-/// shortcut
-static void addSubMenu(char const* str, int val) { glutAddSubMenu(str, val); }
-
-
 int buildFogMenu()
 {
     static int menu = 0;
     if ( menu == 0 )
     {
-        menu = createMenu(glApp::processMenuEvent);
-        addMenuEntry("Disable",          100);
-        addMenuEntry("Linear ",          101);
-        addMenuEntry("Exponential 1/16", 102);
-        addMenuEntry("Exponential 1/8",  103);
-        addMenuEntry("Exponential 1/4",  104);
-        addMenuEntry("Exponential 1/2",  105);
-        addMenuEntry("Exponential 1",    106);
-        addMenuEntry("Exponential 2",    107);
-        addMenuEntry("Exponential 4",    108);
-        addMenuEntry("Exponential 8",    109);
-        addMenuEntry("Exponential 16",   110);
+        menu = gym::createMenu(glApp::processMenuEvent);
+        gym::addMenuEntry("Disable",          100);
+        gym::addMenuEntry("Linear ",          101);
+        gym::addMenuEntry("Exponential 1/16", 102);
+        gym::addMenuEntry("Exponential 1/8",  103);
+        gym::addMenuEntry("Exponential 1/4",  104);
+        gym::addMenuEntry("Exponential 1/2",  105);
+        gym::addMenuEntry("Exponential 1",    106);
+        gym::addMenuEntry("Exponential 2",    107);
+        gym::addMenuEntry("Exponential 4",    108);
+        gym::addMenuEntry("Exponential 8",    109);
+        gym::addMenuEntry("Exponential 16",   110);
     }
     return menu;
 }
@@ -643,29 +632,29 @@ int buildWindowSizeMenu()
     static int menu = 0;
     if ( menu == 0 )
     {
-        menu = createMenu(glApp::processMenuEvent);
-        addMenuEntry("256x256",   200);
-        addMenuEntry("384x384",   201);
-        addMenuEntry("512x256",   202);
-        addMenuEntry("512x384",   203);
-        addMenuEntry("512x512",   204);
-        addMenuEntry("768x256",   205);
-        addMenuEntry("768x512",   206);
-        addMenuEntry("768x768",   207);
-        addMenuEntry("1024x128",  208);
-        addMenuEntry("1024x256",  209);
-        addMenuEntry("1024x512",  210);
-        addMenuEntry("1024x768",  211);
-        addMenuEntry("1024x1024", 212);
-        addMenuEntry("1280x640",  213);
-        addMenuEntry("1280x1280", 214);
-        addMenuEntry("-", 0);
-        addMenuEntry("426x240 (240p)",    220);
-        addMenuEntry("640x360 (360p)",    221);
-        addMenuEntry("854x480 (480p)",    222);
-        addMenuEntry("1280x720 (720p)",   223);
-        addMenuEntry("1920x1080 (1080p)", 224);
-        addMenuEntry("2560x1440 (1440p)", 225);
+        menu = gym::createMenu(glApp::processMenuEvent);
+        gym::addMenuEntry("256x256",   200);
+        gym::addMenuEntry("384x384",   201);
+        gym::addMenuEntry("512x256",   202);
+        gym::addMenuEntry("512x384",   203);
+        gym::addMenuEntry("512x512",   204);
+        gym::addMenuEntry("768x256",   205);
+        gym::addMenuEntry("768x512",   206);
+        gym::addMenuEntry("768x768",   207);
+        gym::addMenuEntry("1024x128",  208);
+        gym::addMenuEntry("1024x256",  209);
+        gym::addMenuEntry("1024x512",  210);
+        gym::addMenuEntry("1024x768",  211);
+        gym::addMenuEntry("1024x1024", 212);
+        gym::addMenuEntry("1280x640",  213);
+        gym::addMenuEntry("1280x1280", 214);
+        gym::addMenuEntry("-", 0);
+        gym::addMenuEntry("426x240 (240p)",    220);
+        gym::addMenuEntry("640x360 (360p)",    221);
+        gym::addMenuEntry("854x480 (480p)",    222);
+        gym::addMenuEntry("1280x720 (720p)",   223);
+        gym::addMenuEntry("1920x1080 (1080p)", 224);
+        gym::addMenuEntry("2560x1440 (1440p)", 225);
     }
     return menu;
 }
@@ -676,24 +665,24 @@ int buildClipMenu()
     static int menu = 0;
     if ( menu == 0 )
     {
-        menu = createMenu(glApp::processMenuEvent);
-        addMenuEntry("Disable",    300);
+        menu = gym::createMenu(glApp::processMenuEvent);
+        gym::addMenuEntry("Disable",    300);
         
-        addMenuEntry(" X > 0",     301);
-        addMenuEntry(" X < 0",     302);
-        addMenuEntry("-1 < X < 1", 303);
+        gym::addMenuEntry(" X > 0",     301);
+        gym::addMenuEntry(" X < 0",     302);
+        gym::addMenuEntry("-1 < X < 1", 303);
         
-        addMenuEntry(" Y > 0",     311);
-        addMenuEntry(" Y < 0",     312);
-        addMenuEntry("-1 < Y < 1", 313);
+        gym::addMenuEntry(" Y > 0",     311);
+        gym::addMenuEntry(" Y < 0",     312);
+        gym::addMenuEntry("-1 < Y < 1", 313);
         
-        addMenuEntry(" 0 < Z",     321);
-        addMenuEntry(" Z < 0",     322);
-        addMenuEntry(" 0.25 < Z",  323);
-        addMenuEntry(" Z < 0.25",  324);
-        addMenuEntry("-1 < Z < 1", 325);
-        addMenuEntry("-0.5 < Z < 0.5", 326);
-        addMenuEntry("-0.25 < Z < 0.25", 327);
+        gym::addMenuEntry(" 0 < Z",     321);
+        gym::addMenuEntry(" Z < 0",     322);
+        gym::addMenuEntry(" 0.25 < Z",  323);
+        gym::addMenuEntry(" Z < 0.25",  324);
+        gym::addMenuEntry("-1 < Z < 1", 325);
+        gym::addMenuEntry("-0.5 < Z < 0.5", 326);
+        gym::addMenuEntry("-0.25 < Z < 0.25", 327);
     }
     return menu;
 }
@@ -706,46 +695,39 @@ int glApp::buildMenu()
     
     //std::clog << "buildMenu" << '\n';
     if ( menu )
-        clearMenu(menu);
+        gym::clearMenu(menu);
     else {
         menu1 = buildFogMenu();
         menu2 = buildWindowSizeMenu();
         menu3 = buildClipMenu();
-        menu  = createMenu(processMenuEvent);
+        menu = gym::createMenu(processMenuEvent);
     }
     
-    addSubMenu("Fog",            menu1);
-    addSubMenu("Window Size",    menu2);
-    addSubMenu("Slice",          menu3);
-    addMenuEntry("Reset View",         1);
-    addMenuEntry("Match ROI to View",  2);
-    addMenuEntry("Match View to ROI",  3);
-    addMenuEntry("Show/hide Scalebar", 4);
-    addMenuEntry("Show/hide XYZ-axes", 5);
-    addMenuEntry("Toggle fullscreen mode", 6);
-    addMenuEntry(mDIM==2?"Use 3D Controls":"Use 2D Controls", 7);
-    addMenuEntry("Quit",         20);
+    gym::addSubMenu("Fog",            menu1);
+    gym::addSubMenu("Window Size",    menu2);
+    gym::addSubMenu("Slice",          menu3);
+    gym::addMenuEntry("Reset View",         1);
+    gym::addMenuEntry("Match ROI to View",  2);
+    gym::addMenuEntry("Match View to ROI",  3);
+    gym::addMenuEntry("Show/hide Scalebar", 4);
+    gym::addMenuEntry("Show/hide XYZ-axes", 5);
+    gym::addMenuEntry("Toggle fullscreen mode", 6);
+    gym::addMenuEntry(mDIM==2?"Use 3D Controls":"Use 2D Controls", 7);
+    gym::addMenuEntry("Quit",         20);
     
     return menu;
 }
 
+void glApp::attachMenu()
+{
+    if ( gym::has_menus )
+    {
+        buildMenu();
+        gym::attachMenu(GLUT_RIGHT_BUTTON);
+    }
+}
+
 //------------------------------------------------------------------------------
-
-void glApp::clearMenu(int menu)
-{
-    glutSetMenu(menu);
-    const int mx = glutGet(GLUT_MENU_NUM_ITEMS);
-    for ( int m = mx; m > 0; --m )
-        glutRemoveMenuItem(m);
-    assert_true( glutGet(GLUT_MENU_NUM_ITEMS) == 0 );
-}
-
-void glApp::attachMenu(int b)
-{
-    buildMenu();
-    assert_true( b==GLUT_LEFT_BUTTON || b==GLUT_MIDDLE_BUTTON || b==GLUT_RIGHT_BUTTON );
-    glutAttachMenu(b);
-}
 
 /// shortcut
 static void reshapeWindow(int w, int h) { glutReshapeWindow(w, h); }
@@ -974,6 +956,9 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
         mouseAction = MOUSE_ACTIVE;
         specialKeys ^= GLUT_ACTIVE_SHIFT;
     }
+    
+    if ( button == GLUT_RIGHT_BUTTON )
+        mouseAction = MOUSE_MAGNIFIER;
     
     switch( mouseAction )
     {

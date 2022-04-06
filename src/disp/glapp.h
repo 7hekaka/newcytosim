@@ -66,9 +66,6 @@ namespace glApp
     
     //--------------------------------- MENUS -----------------------------------
     
-    /// create a menu with cnt 'unset' entries, using func for callbacks
-    void clearMenu(int menuID);
-    
     /// build menu, and attach it if argument is a valid button (-1: do not attach)
     int buildMenu();
     
@@ -76,7 +73,7 @@ namespace glApp
     void processMenuEvent(int item);
     
     /// attach default menu to button
-    void attachMenu(int button);
+    void attachMenu();
 
     //-----------------------------------KEYS------------------------------------
 

@@ -228,8 +228,6 @@ int main(int argc, char* argv[])
     
     glutInit(&argc, argv);
     glApp::setDimensionality(2);
-    glApp::setScale(10);
-    glApp::attachMenu(GLUT_RIGHT_BUTTON);
     glApp::normalKeyFunc(processNormalKey);
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
@@ -241,6 +239,8 @@ int main(int argc, char* argv[])
     glApp::currentView().read(arg);
     arg.print_warnings(std::cerr, 1, "\n");
     glApp::newWindow(display);
+    glApp::attachMenu();
+    glApp::setScale(10);
     gle::initialize();
     
     glEnableClientState(GL_VERTEX_ARRAY);
