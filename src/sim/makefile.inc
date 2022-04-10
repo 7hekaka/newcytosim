@@ -174,13 +174,13 @@ $(OBJ_SIM): %.o: %.cc %.h | build
 INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
 
 
-$(OBJ_CYTOLIB1): %D1.o: %.cc %.h | build
+$(OBJ_CYTOLIB1): %D1.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=1 $(INC_SIM) -c $< -o build/$@
 
-$(OBJ_CYTOLIB2): %D2.o: %.cc %.h | build
+$(OBJ_CYTOLIB2): %D2.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=2 $(INC_SIM) -c $< -o build/$@
 
-$(OBJ_CYTOLIB3): %D3.o: %.cc %.h | build
+$(OBJ_CYTOLIB3): %D3.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o build/$@
 
 
@@ -188,15 +188,15 @@ $(OBJ_CYTOLIB3): %D3.o: %.cc %.h | build
 
 INC_BMSD=$(addprefix -Isrc/, base math sim sim/spaces disp)
 
-$(OBJ_GRAFIX:%.o=%G.o): %G.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%G.o): %G.o: %.cc %.h %.o | build
 	$(COMPILE) -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 
-$(OBJ_GRAFIX:%.o=%GD1.o): %GD1.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%GD1.o): %GD1.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 
-$(OBJ_GRAFIX:%.o=%GD2.o): %GD2.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%GD2.o): %GD2.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 
-$(OBJ_GRAFIX:%.o=%GD3.o): %GD3.o: %.cc %.h | build
+$(OBJ_GRAFIX:%.o=%GD3.o): %GD3.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
 
