@@ -4332,7 +4332,7 @@ void Meca::addCylinderClampX(Mecapoint const& pte, const real rad, const real we
     
     //mFUL(inx+1, inx+1) -= weight;
     mFUL.diag_block(inx)(1, 1) -= weight;
-    vBAS[inx+1] += weight * std::copysign(rad, pte.pos().YY);
+    vBAS[DIM*inx+1] += weight * std::copysign(rad, pte.pos().YY);
     
 #elif ( DIM >= 3 )
 
@@ -4407,7 +4407,7 @@ void Meca::addCylinderClampY(Mecapoint const& pte, const real rad, const real we
     
     //mFUL(inx, inx) -= weight;
     mFUL.diag_block(inx)(0, 0) -= weight;
-    vBAS[inx] += weight * std::copysign(rad, pte.pos().XX);
+    vBAS[DIM*inx] += weight * std::copysign(rad, pte.pos().XX);
     
 #elif ( DIM >= 3 )
 
@@ -4797,7 +4797,7 @@ void Meca::addPlaneClamp(Mecapoint const& pte,
     
     const size_t inx = pte.matIndex();
     
-    // vBAS[inx] += dir * ( weigth * dot(pos,dir) );
+    // vBAS[DIM*inx] += dir * ( weigth * dot(pos,dir) );
     add_base(inx, dir, weight*dot(pos, dir));
     
 #if ( DIM == 1 ) && USE_ISO_MATRIX
