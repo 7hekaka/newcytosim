@@ -30,8 +30,23 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
         
         // index to site containing given abscissa:
         lati_t s = lat.index(sit.abscissa());
-
-        if ( lat.outsideMP(s) || occupied(lat, s) )
+        
+        if ( s < lat.first() )
+        {
+            if ( prop->bind_also_end & MINUS_END )
+                s = lat.indexM();
+            else
+                return false;
+        }
+        else if ( lat.fence() <= s )
+        {
+            if ( prop->bind_also_end & PLUS_END )
+                s = lat.indexP();
+            else
+                return false;
+        }
+        
+        if ( occupied(lat, s) )
             return false;
         
         // adjust to match selected lattice site:
@@ -56,6 +71,7 @@ void Digit::attach(FiberSite const& sit)
 
 void Digit::detach()
 {
+    assert_true(hLattice);
     dec();
     Hand::detach();
 }
@@ -65,9 +81,9 @@ void Digit::detach()
 
 void Digit::hop(lati_t s)
 {
-    assert_true( attached() );
+    assert_true(attached());
 #if FIBER_HAS_LATTICE
-    assert_true( lattice() );
+    assert_true(hLattice);
     dec();
     hSite = s;
     inc();

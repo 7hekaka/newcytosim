@@ -170,6 +170,13 @@ void Simul::setAllInteractions(Meca& meca) const
 
 void Simul::solve()
 {
+#if ( 0 )
+    ObjectFlag sup = fibers.inventory_.highest();
+    Object ** table = new Object*[sup+2]{nullptr};
+    ObjectFlag cnt = orderClustersCouple(table, sup);
+    std::clog << "Ordered " << cnt << " clusters (" << sup << ")\n";
+    delete[] table;
+#endif
     sMeca.getReady(*this);
     //auto rdt = timer();
     setAllInteractions(sMeca);
