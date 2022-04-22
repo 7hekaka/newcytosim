@@ -105,7 +105,7 @@ public:
     void jumpToEndM() { jumpTo(lattice()->first()); }
 
     /// relocate without checking intermediate sites
-    void jumpToEndP() { jumpTo(lattice()->fence()-1); }
+    void jumpToEndP() { jumpTo(lattice()->fence()); }
 
     
     /// attempt one step towards the PLUS_END

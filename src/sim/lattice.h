@@ -72,7 +72,7 @@ private:
     /// index of first cell entirely within MINUS_END and PLUS_END
     lati_t   laFirst;
     
-    /// 1 + index of last cell entirely within MINUS_END and PLUS_END
+    /// index of last cell entirely within MINUS_END and PLUS_END
     lati_t   laFence;
 
 #pragma mark - Allocation
@@ -246,7 +246,7 @@ public:
         laIndexP = index_sup(b) - 1;
 
         laFirst = index_sup(a);
-        laFence = index(b);
+        laFence = index(b) - 1;
         
         /* allocate with a safety margin of 8 cells */
         allocate(laIndexM, laIndexP+1, 8);
@@ -262,10 +262,10 @@ public:
     /// index of site containing the PLUS_END
     lati_t  indexP() const { return laIndexP; }
     
-    /// index of first cell that is entirely within both ends
+    /// index of lowest cell that is entirely within minus and plus ends
     lati_t  first()  const { return laFirst; }
     
-    /// one + index of last cell that is entirely within both ends
+    /// index of highest cell that is entirely within minus and plus ends
     lati_t  fence()  const { return laFence; }
 
     /// first valid index
@@ -295,10 +295,10 @@ public:
     bool    invalid(lati_t i)   const { return (( i < laInf ) | ( laSup <= i )); }
     
     /// true if index 'i' corresponds to a site that is completely between Minus and Plus ends
-    bool    betweenMP(lati_t i) const { return (( laFirst <= i ) & ( i < laFence )); }
+    bool    betweenMP(lati_t i) const { return (( laFirst <= i ) & ( i <= laFence )); }
     
     /// true if index 'i' corresponds to a site that is partly or entirely outside the range
-    bool    outsideMP(lati_t i) const { return (( i < laFirst ) | ( laFence <= i )); }
+    bool    outsideMP(lati_t i) const { return (( i < laFirst ) | ( laFence < i )); }
 
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`

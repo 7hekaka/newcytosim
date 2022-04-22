@@ -34,14 +34,14 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
         if ( s < lat.first() )
         {
             if ( prop->bind_also_end & MINUS_END )
-                s = lat.indexM();
+                s = lat.first();
             else
                 return false;
         }
-        else if ( lat.fence() <= s )
+        else if ( lat.fence() < s )
         {
             if ( prop->bind_also_end & PLUS_END )
-                s = lat.indexP();
+                s = lat.fence();
             else
                 return false;
         }
@@ -168,7 +168,7 @@ void Digit::handleDisassemblyP()
     if ( prop->hold_shrinking_end > 0 )
     {
         jumpToEndP();
-        if ( site() >= lattice()->fence() )
+        if ( site() > lattice()->fence() )
             detach();
     }
     else
