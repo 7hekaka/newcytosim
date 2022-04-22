@@ -1,5 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
+#ifndef ACCUMULATOR_H
+#define ACCUMULATOR_H
 
 /// Helper class to calculate moments of a cloud of points
 /**
@@ -117,3 +119,4 @@ public:
     }
 };
 
+#endif

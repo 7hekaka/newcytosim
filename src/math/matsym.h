@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
 #ifndef MATSYM_H
 #define MATSYM_H
@@ -17,13 +17,13 @@ class MatrixSymmetric final
 private:
     
     /// leading dimension of array
-    size_t   msLDD;
+    size_t dimension_;
     
     /// size of matrix
-    size_t   size_;
+    size_t size_;
 
     /// size of memory which has been allocated
-    size_t   allocated_;
+    size_t allocated_;
     
     // full upper triangle:
     real* val;
@@ -51,7 +51,7 @@ public:
     {
         val = nullptr;
         resize(s);
-        msLDD = s;
+        dimension_ = s;
         val = new_real(s*s);
         zero_real(s*s, val);
         in_charge = true;
@@ -62,7 +62,7 @@ public:
     {
         free_real(val);
         size_ = s;
-        msLDD = ldd;
+        dimension_ = ldd;
         val = array;
         in_charge = false;
     }
