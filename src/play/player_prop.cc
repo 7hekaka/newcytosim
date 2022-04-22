@@ -26,7 +26,7 @@ void PlayerProp::clear()
     else
         image_format = "ppm";
 
-    image_dir    = "";
+    image_dir    = ".";
     image_name   = "image%04i";
     report_index = 0;
     image_index  = 0;

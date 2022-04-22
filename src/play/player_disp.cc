@@ -386,12 +386,14 @@ int Player::saveView(const char* filename, const char* format, int downsample) c
 
 void fixFileName(char str[], size_t len, const char format[], size_t indx)
 {
+    static int virgin = true;
     // remove file extension:
     char* ptr = strchr(str, '.');
     if ( ptr ) *ptr = 0;
     // check for an integer printf() pattern:
     ptr = strchr(str, '%');
-    if ( !ptr && indx > 0 )
+    // add a number if a file was already saved:
+    if ( !ptr && !virgin )
         ptr = str + strlen(str);
     // add number:
     if ( ptr )
@@ -404,6 +406,7 @@ void fixFileName(char str[], size_t len, const char format[], size_t indx)
         *ptr++ = '.';
         strncpy(ptr, format, strlen(format));
     }
+    virgin = false;
 }
     
 /**
@@ -414,7 +417,7 @@ void fixFileName(char str[], size_t len, const char format[], size_t indx)
  */
 int Player::saveView(size_t indx, int downsample) const
 {
-    char str[1024] = { 0 };
+    char str[PATH_MAX] = { 0 };
     char const* name = prop.image_name.c_str();
     char const* format = prop.image_format.c_str();
     strncpy(str, name, sizeof(str));

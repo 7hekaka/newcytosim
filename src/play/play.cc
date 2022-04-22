@@ -124,6 +124,10 @@ int main(int argc, char* argv[])
         simul.prop.verbose = 0;
         Cytosim::warn.silent();
     }
+    else if ( arg.use_key("+") )
+    {
+        simul.prop.verbose = 3;
+    }
     
     if ( arg.use_key("help") )
     {
