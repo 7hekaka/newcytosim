@@ -31,10 +31,10 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
         // index to site containing given abscissa:
         lati_t s = lat.index(sit.abscissa());
         
-        if ( s < lat.first() )
+        if ( s < lat.entry() )
         {
             if ( prop->bind_also_end & MINUS_END )
-                s = lat.first();
+                s = lat.entry();
             else
                 return false;
         }
@@ -150,7 +150,7 @@ void Digit::handleDisassemblyM()
     if ( RNG.test(prop->hold_shrinking_end) )
     {
         jumpToEndM();
-        if ( site() < lattice()->first() )
+        if ( site() < lattice()->entry() )
             detach();
     }
     else

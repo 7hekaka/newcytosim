@@ -102,7 +102,7 @@ public:
     void jumpTo(lati_t p) { if ( vacant(p) ) hop(p); }
     
     /// relocate without checking intermediate sites
-    void jumpToEndM() { jumpTo(lattice()->first()); }
+    void jumpToEndM() { jumpTo(lattice()->entry()); }
 
     /// relocate without checking intermediate sites
     void jumpToEndP() { jumpTo(lattice()->fence()); }
