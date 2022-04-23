@@ -53,7 +53,7 @@ void help(std::ostream& os)
 
 //------------------------------------------------------------------------------
 
-void report_prefix(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
+void report_prefix(std::ostream& os, Simul const& sim, std::string const& what, Glossary& opt, size_t frm)
 {
     char str[256] = { 0 };
     size_t str_len = 0;
@@ -70,12 +70,12 @@ void report_prefix(Simul const& sim, std::ostream& os, std::string const& what, 
 }
 
 
-void report(Simul const& sim, std::ostream& os, std::string const& what, size_t frm, Glossary& opt)
+void report(std::ostream& os, Simul const& sim, std::string const& what, Glossary& opt, size_t frm)
 {
     try
     {
         if ( prefix )
-            report_prefix(sim, os, what, frm, opt);
+            report_prefix(os, sim, what, opt, frm);
         else
             sim.poly_report(os, what, opt, frm);
     }
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 #endif
     
     size_t frame = 0;
-    size_t period = 1;
+    size_t period = 0;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
     if ( arg.use_key("-") ) arg.define("verbose", 0);
@@ -149,10 +149,9 @@ int main(int argc, char* argv[])
         simul.loadProperties();
         reader.openFile(input);
         
-        // get arguments:
-        if ( arg.set(frame, "frame") )
-            period = 0;
-        arg.set(period, "period");
+        arg.set(frame, "frame");
+        if ( arg.set(period, "period") )
+            period = std::max(1UL, period);
 
         if ( arg.set(str, "output") )
         {
@@ -187,7 +186,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    report(simul, out, what, frame, arg);
+    report(out, simul, what, arg, frame);
     size_t cnt = 1;
 
     if ( arg.num_values("frame") > 1 )
@@ -199,7 +198,7 @@ int main(int argc, char* argv[])
             // try to load the specified frame:
             if ( 0 == reader.loadFrame(simul, frame) )
             {
-                report(simul, out, what, frame, arg);
+                report(out, simul, what, arg, frame);
                 ++cnt;
             }
             else
@@ -213,15 +212,11 @@ int main(int argc, char* argv[])
     else if ( period > 0 )
     {
         // process every 'period' record:
-        size_t f = frame;
-        while ( 0 == reader.loadNextFrame(simul)  )
+        frame += period;
+        while ( 0 == reader.loadFrame(simul, frame)  )
         {
-            ++f;
-            if ( f % period == frame % period )
-            {
-                report(simul, out, what, f, arg);
-                ++cnt;
-            }
+            report(out, simul, what, arg, frame);
+            ++cnt;
         }
     }
     

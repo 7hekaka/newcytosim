@@ -103,10 +103,9 @@ int main(int argc, char* argv[])
         simul.loadProperties();
         reader.openFile(input);
         
-        // get arguments:
-        if ( arg.set(frame, "frame") )
-            period = 0;
-        arg.set(period, "period");
+        arg.set(frame, "frame");
+        if ( arg.set(period, "period") )
+            period = std::max(1UL, period);
     }
     catch( Exception & e )
     {
@@ -115,8 +114,7 @@ int main(int argc, char* argv[])
     }
     
     Cytosim::silent();
-    size_t f = frame;
-    size_t cnt = 1;
+    size_t cnt = 0;
     
     try
     {
@@ -130,20 +128,12 @@ int main(int argc, char* argv[])
             std::cerr << "Error: dimensionality missmatch between `report` and file\n";
             return EXIT_FAILURE;
         }
-
-        // process first record, at index 'frame':
-        report(simul, what, arg, frame);
         
-        // load other frames in the file:
-        while ( 0 == reader.loadNextFrame(simul) )
-        {
-            ++f;
-            if ( f % period == frame % period )
-            {
-                report(simul, what, arg, f);
-                ++cnt;
-            }
-        }
+        do {
+            report(simul, what, arg, frame);
+            frame += period;
+            ++cnt;
+        } while ( 0 == reader.loadFrame(simul, frame) );
     }
     catch( Exception & e )
     {
