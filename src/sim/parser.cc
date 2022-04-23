@@ -692,8 +692,8 @@ void Parser::parse_run(std::istream& is)
     
     if ( name == "all" )
     {
-        if ( Tokenizer::get_symbol(is) != "simul_" )
-            throw InvalidSyntax("expected `run all simul_ { }')");
+        if ( Tokenizer::get_symbol(is) != "simul" )
+            throw InvalidSyntax("expected `run all simul { }')");
         // There can only be one Simul object:
         name = simul_.prop.name();
     }
