@@ -137,15 +137,15 @@ public:
     //--------------------------------------------------------------------------
     
     /// the position of the anchoring point
-    virtual Vector posFoot()     const { return sPos; }
+    virtual Vector posFoot() const { return sPos; }
     
     /// position on the side of fiber used for sideInteractions
-    virtual Vector sidePos()     const { return sHand->pos(); }
+    virtual Vector sidePos() const { return sHand->pos(); }
     
     /// the Mecable to which this is anchored, or zero
     virtual Mecable const* base() const { return nullptr; }
     
-    /// the Mecable to which this is anchored, or zero
+    /// detach from Mecable to which this is anchored
     virtual void unbase() {}
 
     /// true if Single creates an interaction
@@ -179,7 +179,7 @@ public:
     /// a unique character identifying the class
     static const ObjectTag TAG = 's';
    
-    /// a unique character identifying the class
+    /// a unique character identifying the Wrist derived class
     static const ObjectTag TAG_WRIST = 'w';
 
     /// return unique character identifying the class

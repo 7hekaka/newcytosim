@@ -75,25 +75,28 @@ void timerCallback(const int value)
     }
     else
     {
+        bool draw = false;
         // in replay mode, no need to lock the simulation state
         if ( worker.executePipedCommands(32) )
-            glApp::postRedisplay();
+            draw = true;
         
         if ( prop.play > 0 )
         {
-            // skip prop.period frames, and at least one
-            for ( unsigned s = 1; s < prop.period; ++s )
+            // skip `prop.period` frames, and at least one since prop.period > 0
+            for ( unsigned s = 0; s < prop.period; ++s )
                 player.nextFrame();
-            player.nextFrame();
-            glApp::displayAll();
+            draw = true;
         }
         else if ( prop.play < 0 )
         {
             player.previousFrame();
-            glApp::displayAll();
+            draw = true;
         }
         else
             millisec = 100;
+        
+        if ( draw )
+            glApp::displayAll();
     }
     
     glutTimerFunc(millisec, timerCallback, 2);
