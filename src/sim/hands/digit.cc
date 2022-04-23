@@ -71,7 +71,6 @@ void Digit::attach(FiberSite const& sit)
 
 void Digit::detach()
 {
-    assert_true(hLattice);
     dec();
     Hand::detach();
 }

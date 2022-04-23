@@ -1092,7 +1092,7 @@ void alsatian_xtrsmLUN1I_3D(const int M, const float* A, const int lda, real* B)
 void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double* B)
 {
     assert_true( M <= lda );
-    assert_true( M >= 3 );
+    assert_true( M >= DIM );
     int K = 0;
 #if ( DIM & 1 )
     // process one column to leave an even number
