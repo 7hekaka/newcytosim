@@ -201,7 +201,7 @@ ifeq ($(MACHINE),cluster)
     LINK := ~/lib/liblapack.a ~/lib/libblas.a -lgfortran -lpthread
 
     # linkage options for programs using graphics:
-    GRAFIX :=-L/usr/lib -lglut -lGL -lXt -lX11
+    GRAFIX :=-L/usr/lib -lglut -lGL -lGLEW -lXt -lX11
 
 endif
 
@@ -255,7 +255,7 @@ ifeq ($(MACHINE),linux)
 
     ### linkage options for programs using graphics:
     #   check for correct library libname.so otherwise give full path
-    GRAFIX := -L$(LIBDIR) -lglut -lGL -lGLU -lXt -lX11 -lGLEW
+    GRAFIX := -L$(LIBDIR) -lglut -lGL -lGLU -lGLEW -lXt -lX11
 
     ### Specify here the PNG library
     LIB_PNG := $(LIBDIR)/libpng.a $(LIBDIR)/libz.a

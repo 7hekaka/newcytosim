@@ -55,12 +55,12 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            field.o field_prop.o field_set.o event.o event_set.o\
            tubule_prop.o tubule.o tubule_set.o\
            mecapoint.o interpolation.o interpolation4.o\
-           meca.o fiber_grid.o point_grid.o locus_grid.o\
+           fiber_grid.o point_grid.o locus_grid.o meca.o\
            simul_prop.o simul.o interface.o parser.o
 
 
-OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_SIM) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
-             $(OBJ_SINGLES) $(OBJ_COUPLES) $(OBJ_ORGANIZERS)
+OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
+             $(OBJ_SINGLES) $(OBJ_COUPLES) $(OBJ_ORGANIZERS) $(OBJ_SIM)
 
 OBJ_CYTOLIB1:=$(OBJ_CYTOLIB:%.o=%D1.o)
 OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=%D2.o)
@@ -69,7 +69,7 @@ OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=%D3.o)
 
 # objects containing graphical code under the DISPLAY keyword:
 OBJ_GRAFIX:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
-OBJ_CYTOLIBG:=$(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOLIB)) $(OBJ_GRAFIX:%.o=%G.o)
+OBJ_CYTOLIBG:=$(OBJ_GRAFIX:%.o=%G.o) $(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOLIB))
 
 #----------------------------targets--------------------------------------------
 

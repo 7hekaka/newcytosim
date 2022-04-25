@@ -162,11 +162,9 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
         report_one(ss, arg, opt);
         StreamFunc::skip_lines(out, ss, '%');
     }
+    out << '\n';
     if ( ver > 1 )
-    {
-        out << '\n';
         out << "% end\n";
-    }
     out.precision(op);
 }
 

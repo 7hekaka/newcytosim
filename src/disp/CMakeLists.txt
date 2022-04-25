@@ -20,14 +20,18 @@ set(SOURCES_DISP
     fg_font.c
     fg_stroke_roman.c
     fg_stroke_mono_roman.c
-    miniz.c
     spng.c
+    miniz.c
 )
 
 list(TRANSFORM SOURCES_DISP PREPEND "${SRC_DISP_DIR}/")
 
+
+
 add_library(${DISP_LIB_TARGET} STATIC ${SOURCES_DISP})
-target_compile_definitions(${DISP_LIB_TARGET} PRIVATE DISPLAY)
+
+target_compile_definitions(${DISP_LIB_TARGET} PRIVATE -DDISPLAY)
+set_property(SOURCE spng.c PROPERTY COMPILE_DEFINITIONS SPNG_USE_MINIZ)
 
 target_include_directories(${DISP_LIB_TARGET} PUBLIC
     "${SRC_MATH_DIR}"

@@ -63,14 +63,16 @@ else()
 endif()
 
 # static linking preferred here:
-find_library(BLAS_LIB libblas.a blas REQUIRED)
+find_package(BLAS)
+find_library(BLAS_LIB libblas.a blas BLAS_LIBRARIES PATHS ~/lib REQUIRED)
 if(BLAS_LIB)
     message(">>>>>> BLAS: ${BLAS_LIB}")
 else()
     message(FATAL_ERROR "BLAS library not found")
 endif()
 
-find_library(LAPACK_LIB liblapack.a lapack REQUIRED)
+find_package(LAPACK)
+find_library(LAPACK_LIB liblapack.a lapack LAPACK_LIBRARIES PATHS ~/lib REQUIRED)
 if(LAPACK_LIB)
     message(">>>>>> LAPACK: ${LAPACK_LIB}")
 else()

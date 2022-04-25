@@ -355,8 +355,8 @@ int main(int argc, char* argv[])
             } while ( arg.set(frm, "frame", ++inx) );
         }
         if ( simul.prop.verbose ) printf("\n");
-        OffScreen::closeContext();
         arg.print_warnings(std::cerr, 1, "\n");
+        OffScreen::closeContext();
         return 0;
     }
     
