@@ -51,6 +51,9 @@ public:
     unsigned doAttachCounter;
 #endif
     
+    /// flag to restart a fresh simulation from the current config file
+    unsigned doRestart;
+
 private:
     
     /// signals that Simul is ready to perform a Monte-Carlo step

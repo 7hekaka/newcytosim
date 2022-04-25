@@ -32,8 +32,8 @@ private:
     /// control switch to enable command 'write' (write files)
     bool do_write;
     
-    /// counter for the 'restart' command
-    size_t restart;
+    /// counters for the 'restart' command
+    size_t restart_, restart_max;
     
     //--------------------------------------------------------------------------
     
