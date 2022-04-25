@@ -653,7 +653,7 @@ int buildWindowSizeMenu()
 
 int buildClipMenu()
 {
-    int menu = menu = gym::createMenu(glApp::processMenuEvent);
+    int menu = gym::createMenu(glApp::processMenuEvent);
     gym::addMenuEntry("Disable",    300);
     
     gym::addMenuEntry(" X > 0",     301);

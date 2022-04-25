@@ -179,7 +179,7 @@ ifeq ($(MACHINE),cluster)
     MKLDIR := $(MKLROOT)/lib/intel64
 
     # Beware of AVX2 and other advanced features on heterogeneous clusters:
-    FAST   :=-O2 -fno-tree-vectorize-funroll-loops -mavx -ffp-contract=fast
+    FAST   :=-O2 -mavx -ffp-contract=fast
 
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := $(FAST) $(ALIGN) -O0 -fno-inline -pg
