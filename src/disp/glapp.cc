@@ -530,7 +530,6 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
     
     //if break was used, redisplay is needed:
     postRedisplay();
-    buildMenu();
 }
 
 
@@ -608,82 +607,70 @@ void glApp::specialKeyFunc(void (*func)(int, int, int))
 
 int buildFogMenu()
 {
-    static int menu = 0;
-    if ( menu == 0 )
-    {
-        menu = gym::createMenu(glApp::processMenuEvent);
-        gym::addMenuEntry("Disable",          100);
-        gym::addMenuEntry("Linear ",          101);
-        gym::addMenuEntry("Exponential 1/16", 102);
-        gym::addMenuEntry("Exponential 1/8",  103);
-        gym::addMenuEntry("Exponential 1/4",  104);
-        gym::addMenuEntry("Exponential 1/2",  105);
-        gym::addMenuEntry("Exponential 1",    106);
-        gym::addMenuEntry("Exponential 2",    107);
-        gym::addMenuEntry("Exponential 4",    108);
-        gym::addMenuEntry("Exponential 8",    109);
-        gym::addMenuEntry("Exponential 16",   110);
-    }
+    int menu = gym::createMenu(glApp::processMenuEvent);
+    gym::addMenuEntry("Disable",          100);
+    gym::addMenuEntry("Linear ",          101);
+    gym::addMenuEntry("Exponential 1/16", 102);
+    gym::addMenuEntry("Exponential 1/8",  103);
+    gym::addMenuEntry("Exponential 1/4",  104);
+    gym::addMenuEntry("Exponential 1/2",  105);
+    gym::addMenuEntry("Exponential 1",    106);
+    gym::addMenuEntry("Exponential 2",    107);
+    gym::addMenuEntry("Exponential 4",    108);
+    gym::addMenuEntry("Exponential 8",    109);
+    gym::addMenuEntry("Exponential 16",   110);
     return menu;
 }
 
 int buildWindowSizeMenu()
 {
-    static int menu = 0;
-    if ( menu == 0 )
-    {
-        menu = gym::createMenu(glApp::processMenuEvent);
-        gym::addMenuEntry("256x256",   200);
-        gym::addMenuEntry("384x384",   201);
-        gym::addMenuEntry("512x256",   202);
-        gym::addMenuEntry("512x384",   203);
-        gym::addMenuEntry("512x512",   204);
-        gym::addMenuEntry("768x256",   205);
-        gym::addMenuEntry("768x512",   206);
-        gym::addMenuEntry("768x768",   207);
-        gym::addMenuEntry("1024x128",  208);
-        gym::addMenuEntry("1024x256",  209);
-        gym::addMenuEntry("1024x512",  210);
-        gym::addMenuEntry("1024x768",  211);
-        gym::addMenuEntry("1024x1024", 212);
-        gym::addMenuEntry("1280x640",  213);
-        gym::addMenuEntry("1280x1280", 214);
-        gym::addMenuEntry("-", 0);
-        gym::addMenuEntry("426x240 (240p)",    220);
-        gym::addMenuEntry("640x360 (360p)",    221);
-        gym::addMenuEntry("854x480 (480p)",    222);
-        gym::addMenuEntry("1280x720 (720p)",   223);
-        gym::addMenuEntry("1920x1080 (1080p)", 224);
-        gym::addMenuEntry("2560x1440 (1440p)", 225);
-    }
+    int menu = gym::createMenu(glApp::processMenuEvent);
+    gym::addMenuEntry("256x256",   200);
+    gym::addMenuEntry("384x384",   201);
+    gym::addMenuEntry("512x256",   202);
+    gym::addMenuEntry("512x384",   203);
+    gym::addMenuEntry("512x512",   204);
+    gym::addMenuEntry("768x256",   205);
+    gym::addMenuEntry("768x512",   206);
+    gym::addMenuEntry("768x768",   207);
+    gym::addMenuEntry("1024x128",  208);
+    gym::addMenuEntry("1024x256",  209);
+    gym::addMenuEntry("1024x512",  210);
+    gym::addMenuEntry("1024x768",  211);
+    gym::addMenuEntry("1024x1024", 212);
+    gym::addMenuEntry("1280x640",  213);
+    gym::addMenuEntry("1280x1280", 214);
+    gym::addMenuEntry("-", 0);
+    gym::addMenuEntry("426x240 (240p)",    220);
+    gym::addMenuEntry("640x360 (360p)",    221);
+    gym::addMenuEntry("854x480 (480p)",    222);
+    gym::addMenuEntry("1280x720 (720p)",   223);
+    gym::addMenuEntry("1920x1080 (1080p)", 224);
+    gym::addMenuEntry("2560x1440 (1440p)", 225);
     return menu;
 }
 
 
 int buildClipMenu()
 {
-    static int menu = 0;
-    if ( menu == 0 )
-    {
-        menu = gym::createMenu(glApp::processMenuEvent);
-        gym::addMenuEntry("Disable",    300);
-        
-        gym::addMenuEntry(" X > 0",     301);
-        gym::addMenuEntry(" X < 0",     302);
-        gym::addMenuEntry("-1 < X < 1", 303);
-        
-        gym::addMenuEntry(" Y > 0",     311);
-        gym::addMenuEntry(" Y < 0",     312);
-        gym::addMenuEntry("-1 < Y < 1", 313);
-        
-        gym::addMenuEntry(" 0 < Z",     321);
-        gym::addMenuEntry(" Z < 0",     322);
-        gym::addMenuEntry(" 0.25 < Z",  323);
-        gym::addMenuEntry(" Z < 0.25",  324);
-        gym::addMenuEntry("-1 < Z < 1", 325);
-        gym::addMenuEntry("-0.5 < Z < 0.5", 326);
-        gym::addMenuEntry("-0.25 < Z < 0.25", 327);
-    }
+    int menu = menu = gym::createMenu(glApp::processMenuEvent);
+    gym::addMenuEntry("Disable",    300);
+    
+    gym::addMenuEntry(" X > 0",     301);
+    gym::addMenuEntry(" X < 0",     302);
+    gym::addMenuEntry("-1 < X < 1", 303);
+    
+    gym::addMenuEntry(" Y > 0",     311);
+    gym::addMenuEntry(" Y < 0",     312);
+    gym::addMenuEntry("-1 < Y < 1", 313);
+    
+    gym::addMenuEntry(" 0 < Z",     321);
+    gym::addMenuEntry(" Z < 0",     322);
+    gym::addMenuEntry(" 0.25 < Z",  323);
+    gym::addMenuEntry(" Z < 0.25",  324);
+    gym::addMenuEntry("-1 < Z < 1", 325);
+    gym::addMenuEntry("-0.5 < Z < 0.5", 326);
+    gym::addMenuEntry("-0.25 < Z < 0.25", 327);
     return menu;
 }
 
@@ -694,27 +681,25 @@ int glApp::buildMenu()
     static int menu1, menu2, menu3;
     
     //std::clog << "buildMenu" << '\n';
-    if ( menu )
-        gym::clearMenu(menu);
-    else {
+    if ( !menu )
+    {
         menu1 = buildFogMenu();
         menu2 = buildWindowSizeMenu();
         menu3 = buildClipMenu();
         menu = gym::createMenu(processMenuEvent);
+        gym::addSubMenu("Fog",         menu1);
+        gym::addSubMenu("Window Size", menu2);
+        gym::addSubMenu("Slice",       menu3);
+        gym::addMenuEntry("Reset View",         1);
+        gym::addMenuEntry("Match ROI to View",  2);
+        gym::addMenuEntry("Match View to ROI",  3);
+        gym::addMenuEntry("Show/hide Scalebar", 4);
+        gym::addMenuEntry("Show/hide XYZ-axes", 5);
+        gym::addMenuEntry("Toggle fullscreen mode", 6);
+        gym::addMenuEntry("Use 2D mouse gestures", 8);
+        gym::addMenuEntry("Use 3D mouse gestures", 9);
+        gym::addMenuEntry("Quit", 20);
     }
-    
-    gym::addSubMenu("Fog",            menu1);
-    gym::addSubMenu("Window Size",    menu2);
-    gym::addSubMenu("Slice",          menu3);
-    gym::addMenuEntry("Reset View",         1);
-    gym::addMenuEntry("Match ROI to View",  2);
-    gym::addMenuEntry("Match View to ROI",  3);
-    gym::addMenuEntry("Show/hide Scalebar", 4);
-    gym::addMenuEntry("Show/hide XYZ-axes", 5);
-    gym::addMenuEntry("Toggle fullscreen mode", 6);
-    gym::addMenuEntry(mDIM==2?"Use 3D Controls":"Use 2D Controls", 7);
-    gym::addMenuEntry("Quit",         20);
-    
     return menu;
 }
 
@@ -743,9 +728,10 @@ void glApp::processMenuEvent(int item)
         case 3: view.matchROI(); break;
         case 4: view.scalebar = ! view.scalebar; break;
         case 5: view.axes = (view.axes?0:mDIM ); break;
-        case 6: toggleFullScreen();              break;
-        case 7: setDimensionality(mDIM==2?3:2);  break;
-        
+        case 6: toggleFullScreen(); break;
+        case 8: setDimensionality(2); break;
+        case 9: setDimensionality(3); break;
+
         case 20:  exit(EXIT_SUCCESS); break;
         
         case 100: view.enableFog(0, 0);      break;
@@ -855,7 +841,6 @@ void glApp::processMenuEvent(int item)
         default: ABORT_NOW("unknown menu item");
     }
     postRedisplay();
-    buildMenu();
 }
 
 //------------------------------------------------------------------------------

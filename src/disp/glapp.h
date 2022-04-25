@@ -69,7 +69,7 @@ namespace glApp
     /// build menu, and attach it if argument is a valid button (-1: do not attach)
     int buildMenu();
     
-    /// callback function for the menu build by buildMenu()
+    /// callback function for menu events
     void processMenuEvent(int item);
     
     /// attach default menu to button

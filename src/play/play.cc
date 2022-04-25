@@ -394,9 +394,9 @@ int main(int argc, char* argv[])
         player.setStyle(disp.style);
         if ( gym::has_menus )
         {
+            glutMenuStatusFunc(menuCallback);
             rebuildMenus();
             glApp::attachMenu();
-            glutMenuStatusFunc(menuCallback);
         }
         if ( glApp::isFullScreen() )
             glutFullScreen();
