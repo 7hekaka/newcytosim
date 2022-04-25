@@ -150,16 +150,15 @@ std::vector<std::string> FilePath::list_dir(const char path[], std::string const
 
 std::string FilePath::dir_part(const char path[])
 {
-    char* res, tmp[PATH_MAX] = { 0 };
-    char str[MAXPATHLEN] = { 0 };
-
+    char tmp[PATH_MAX] = { 0 };
+    
     if ( !realpath(path, tmp) )
         return ".";
     
-    res = dirname_r(tmp, str);
+    char* res = dirname(tmp);
     
     if ( !res )
-        throw InvalidIO("FilePath: stdlib::dirname() failed");
+        throw InvalidIO("stdlib::dirname() failed");
     
     return std::string(res);
 }
@@ -168,10 +167,11 @@ std::string FilePath::dir_part(const char path[])
 std::string FilePath::file_part(const char path[])
 {
     char str[MAXPATHLEN] = { 0 };
-    char * res = basename_r(path, str);
+    strncpy(str, path, MAXPATHLEN);
+    char * res = basename(str);
     
     if ( !res )
-        throw InvalidIO("FilePath: stdlib::basename() failed");
+        throw InvalidIO("stdlib::basename() failed");
     
     return std::string(res);
 }
