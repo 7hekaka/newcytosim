@@ -1199,8 +1199,8 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
         for ( auto h = inf+1; h < sup; ++h )
         {
             Vector P = fib.pos(uni*h);
-            c = lattice_color(col, fac*lat.data(h));
             flu[i++] = {c, P};
+            c = lattice_color(col, fac*lat.data(h));
             flu[i++] = {c, P};
         }
         
