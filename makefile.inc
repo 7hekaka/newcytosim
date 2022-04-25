@@ -195,13 +195,13 @@ ifeq ($(MACHINE),cluster)
     # ln -sf /usr/lib64/libblas.so.3 /usr/lib64/libblas.so
     #LINK  := /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3 -L/usr/lib64 -lpthread
     
-    ### SLURM cluster (EMBL, 2017)
-    LINK   := -llapack -lopenblas -lgfortran -lpthread
-    ### SLURM cluster with self-compiled LAPACK/BLAS (EMBL, 2018)
-    LINK   := /g/nedelec/lapack/liblapack.a /g/nedelec/lapack/librefblas.a -lgfortran -lpthread
+    ### Automatic
+    LINK := -llapack -lopenblas -lgfortran -lpthread
+    ### Self-compiled LAPACK/BLAS (2022)
+    LINK := ~/lib/liblapack.a ~/lib/libblas.a -lgfortran -lpthread
 
     # linkage options for programs using graphics:
-    #GRAFIX :=-L/usr/lib -L/usr/lib64 -lglut -lGL -lGLU -lXt -lX11
+    GRAFIX :=-L/usr/lib -lglut -lGL -lXt -lX11
 
 endif
 

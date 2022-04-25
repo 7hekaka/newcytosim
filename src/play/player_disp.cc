@@ -417,7 +417,7 @@ void fixFileName(char str[], size_t len, const char format[], size_t indx)
  */
 int Player::saveView(size_t indx, int downsample) const
 {
-    char str[PATH_MAX] = { 0 };
+    char str[1024] = { 0 };
     char const* name = prop.image_name.c_str();
     char const* format = prop.image_format.c_str();
     strncpy(str, name, sizeof(str));
