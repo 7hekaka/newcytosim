@@ -34,10 +34,9 @@ void dump(size_t len, const float* vec)
     printf(": ");
     for ( size_t n = 0; n < len; ++n )
     {
-        if ( n % 4 == 3 )
-            printf("%+5.2f  ", vec[n]);
-        else
-            printf("%+5.2f ", vec[n]);
+        printf("%+5.2f ", vec[n]);
+        if (( n & 3 ) == 3 )
+            printf(" ");
     }
     printf("\n");
 }
@@ -47,10 +46,9 @@ void dump(size_t len, const double* vec)
     printf(": ");
     for ( size_t n = 0; n < len; ++n )
     {
-        if ( n % 4 == 3 )
-            printf("%+5.2f  ", vec[n]);
-        else
-            printf("%+5.2f ", vec[n]);
+        printf("%+5.2f ", vec[n]);
+        if (( n & 3 ) == 3 )
+            printf(" ");
     }
     printf("\n");
 }
