@@ -1,7 +1,7 @@
-# Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+# This is the master makefile for Cytosim. Copyright 2020 Cambridge University
 
-# THIS FILE SHOULD NOT BE EDITED
-# ONLY EDIT FILE makefile.inc 
+# IN MOST CASES, THIS FILE SHOULD NOT BE EDITED
+# Compilation can be customized by editing `makefile.inc'.
 
 # disable all implicit rules:
 .SUFFIXES:
@@ -12,15 +12,15 @@ include makefile.inc
 #-----------------check the compilers and the compiler-flags--------------------
 
 ifndef CXX
-   $(error No compiler defined for $$(MACHINE)=$(MACHINE))
+   $(error No compiler defined for MACHINE=$(MACHINE))
 endif
 
 ifndef Flags$(MODE)
-   $(warning No compiler options defined for $$(MACHINE)=$(MACHINE) in mode $(MODE))
+   $(warning No compiler options defined for MACHINE=$(MACHINE) in mode $(MODE))
 endif
 
 ifndef LINK
-  $(error No linkage-options defined for $$(MACHINE)=$(MACHINE))
+  $(error No linkage-options defined for MACHINE=$(MACHINE))
 endif
 
 # command to invoke compiler:
@@ -143,6 +143,7 @@ lib:
 	if ! test -d lib; then mkdir lib; fi
 
 clean:
+	if ! test -d dep; then mkdir dep; fi
 	rm -f build/*.o
 	rm -f lib/*.a
 

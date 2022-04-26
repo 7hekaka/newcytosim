@@ -1,4 +1,4 @@
-# Cytosim was created by Francois Nedelec.
+# This file contains variable definitions for make. It is included in makefile
 # Copyright 2007-2017 EMBL; 2019-2020 Sainsbury Laboratory, Cambridge University
 
 
@@ -42,19 +42,22 @@ HAS_PNG := 0
 #-------------------------------------------------------------------------------
 
 ifeq ($(MACHINE), auto)
-    ifeq ($(shell uname), Darwin)
-       MACHINE := mac
-    else ifeq (login-e, $(findstring login-e, $(shell uname -n)))
-       MACHINE := cluster
-    else ifeq ($(shell uname -n), login.cluster)
-       MACHINE := cluster
-    else ifeq ($(shell uname), Linux)
-       MACHINE := linux
-    else ifeq ($(shell uname -o), Cygwin)
-       MACHINE := cygwin
-    else
-       $(error Unknown platform)
-    endif
+   ifeq ($(shell uname), Darwin)
+      MACHINE := mac
+   else ifeq (login-e, $(findstring login-e, $(shell uname -n)))
+      MACHINE := cluster
+   else ifeq ($(shell uname), Linux)
+      UNAME := $(firstword $(subst -, ,$(shell uname -n)))
+      ifeq ($(UNAME), login)
+          MACHINE := cluster
+      else
+          MACHINE := linux
+      endif
+   else ifeq ($(shell uname -o), Cygwin)
+      MACHINE := cygwin
+   else
+      $(error Unknown platform)
+   endif
 endif
 
 #-------------------------------------------------------------------------------
