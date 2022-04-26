@@ -149,12 +149,13 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     if ( ver > 1 )
     {
         //out << "% start\n";
-        out << "% time " << std::to_string(prop.time);
+        out << "\n% time " << std::to_string(prop.time);
     }
     if ( ver > 0 )
     {
         out << "\n% report " << arg << " " << opt.to_string();
         report_one(out, arg, opt);
+        out << "\n";
     }
     else
     {
@@ -162,7 +163,6 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
         report_one(ss, arg, opt);
         StreamFunc::skip_lines(out, ss, '%');
     }
-    out << '\n';
     if ( ver > 1 )
         out << "% end\n";
     out.precision(op);

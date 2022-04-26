@@ -60,12 +60,10 @@ void StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
     while ( is.good() )
     {
         std::getline(is, line);
-        if ( !line.size() || line[0] != skip )
-        {
-            os << line;
-            if ( !is.eof() )
-                os << '\n';
-        }
+        if ( is.fail() )
+            break;
+        if ( line.empty() || line[0] != skip )
+            os << line << '\n';
     }
 }
 
@@ -77,6 +75,8 @@ void StreamFunc::redirect_lines(std::ostream& os, std::ostream& alt, std::istrea
     while ( is.good() )
     {
         std::getline(is, line);
+        if ( is.fail() )
+            break;
         if ( line.size() > 0 && line[0] == sel )
         {
             alt << line;
@@ -101,6 +101,8 @@ void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char pre
     while ( is.good() )
     {
         std::getline(is, line);
+        if ( is.fail() )
+            break;
         if ( line.size() < 1 )
             os << '\n';
         else if ( line[0] == skip )
