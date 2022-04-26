@@ -498,8 +498,8 @@ public:
         }
     }
     
-    /// generate OpenGL transformation matrix, translation followed by rotation
-    void setOpenGLMatrix(float m[16], double S, const float vec[3]) const
+    /// set transformation matrix: translation by T, scaling by S, rotation
+    void setOpenGLMatrix(float m[16], double S, const float T[3]) const
     {
         //this code assumes that the quaternion has norm = 1,
         double x2 = S * ( q[1] + q[1] );
@@ -525,14 +525,14 @@ public:
         m[2+4*2] = float( S - (xx + yy) );
         m[3+4*2] = 0.f;
 
-        m[0+4*3] = vec[0];
-        m[1+4*3] = vec[1];
-        m[2+4*3] = vec[2];
+        m[0+4*3] = T[0];
+        m[1+4*3] = T[1];
+        m[2+4*3] = T[2];
         m[3+4*3] = 1.f;
     }
 
-    /// generate OpenGL transformation matrix, translation followed by rotation
-    void setOpenGLMatrix(double m[16], double S, const double vec[3]) const
+    /// set transformation matrix: translation by T, scaling by S, rotation
+    void setOpenGLMatrix(double m[16], double S, const double T[3]) const
     {
         //this code assumes that the quaternion has norm = 1,
         
@@ -559,9 +559,9 @@ public:
         m[2+4*2] = S - (xx + yy);
         m[3+4*2] = 0.0;
 
-        m[0+4*3] = vec[0];
-        m[1+4*3] = vec[1];
-        m[2+4*3] = vec[2];
+        m[0+4*3] = T[0];
+        m[1+4*3] = T[1];
+        m[2+4*3] = T[2];
         m[3+4*3] = 1.0;
     }
     

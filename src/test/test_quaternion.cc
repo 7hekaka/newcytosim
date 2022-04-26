@@ -45,7 +45,7 @@ void testRotation(Vector3 vec, real angle)
     {
         real vec[3] = { 0 };
         real m16[16];
-        q.setOpenGLMatrix(m16, vec);
+        q.setOpenGLMatrix(m16, 1.0, vec);
         VecPrint::full(4, 4, m16, 4);
     }
     if ( 0 )
