@@ -108,7 +108,7 @@ private:
     void prepareFiberDisp(FiberProp*, PropertyList&, gle_color);
     
     /// set values of fiber's LineDisp
-    void prepareLineDisp(Fiber const*);
+    void prepareLineDisp(Fiber const*, LineDisp*);
     
     template < typename T >
     void preparePointDisp(T * prop, PropertyList&, gle_color);

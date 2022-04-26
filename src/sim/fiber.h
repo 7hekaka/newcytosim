@@ -173,7 +173,7 @@ public:
     FiberProp const * prop;
     
     /// the display parameters
-    LineDisp mutable* disp;
+    LineDisp * disp;
 
     //--------------------------------------------------------------------------
 

@@ -320,7 +320,7 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
 /**
  set LineDisp for given Fiber
  */
-void Display::prepareLineDisp(const Fiber * fib)
+void Display::prepareLineDisp(const Fiber * fib, LineDisp * self)
 {
     assert_true(fib->prop);
     FiberDisp const*const disp = fib->prop->disp;
@@ -365,9 +365,6 @@ void Display::prepareLineDisp(const Fiber * fib)
             break;
     }
     
-    if ( !fib->disp )
-        fib->disp = new LineDisp();
-    LineDisp * self = fib->disp;
     self->color = col;
     self->color_scale = color_scale(fib, disp->line_style);
     //std::cerr << fib->reference() << ":color_scale " << self->color_scale << "\n";
@@ -547,8 +544,12 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
     }
     
     // attribute LineDisp, and set individual display values for all fibers
-    for ( Fiber const* fib = sim.fibers.first(); fib; fib = fib->next() )
-        prepareLineDisp(fib);
+    for ( Fiber * fib = sim.fibers.first(); fib; fib = fib->next() )
+    {
+        if ( !fib->disp )
+            fib->disp = new LineDisp();
+        prepareLineDisp(fib, fib->disp);
+    }
     
     //create a PointDisp for each HandProp:
     for ( Property * i : sim.properties.find_all("hand") )
