@@ -125,22 +125,22 @@ pack: sterile tarsrc
 .PHONY: bin build clean cleaner sterile
 
 bin:
-	if ! test -d bin; then mkdir bin; fi
+	mkdir -p $@
 	
 bin1:
-	if ! test -d bin1; then mkdir bin1; fi
+	mkdir -p $@
 	
 bin2:
-	if ! test -d bin2; then mkdir bin2; fi
+	mkdir -p $@
 	
 bin3:
-	if ! test -d bin3; then mkdir bin3; fi
+	mkdir -p $@
 
 build:
-	if ! test -d build; then mkdir build; fi
+	mkdir -p $@
 
 lib:
-	if ! test -d lib; then mkdir lib; fi
+	mkdir -p $@
 
 clean:
 	if ! test -d dep; then mkdir dep; fi
@@ -168,8 +168,10 @@ sterile:
 #command used to build the dependencies files automatically
 MAKEDEP := g++ -std=gnu++14 -MM $(addprefix -I, $(SRCDIR))
 
-.PHONY: dep
-dep: $(addsuffix .dep, $(addprefix dep/, 0 1 2 3 4 5 6 7))
+depdir:
+	mkdir -p dep
+
+dep: depdir $(addsuffix .dep, $(addprefix dep/, 0 1 2 3 4 5 6 7))
 	$(DONE)
 
 dep/0.dep: src/base/*.cc
