@@ -23,7 +23,7 @@ endif
 
 #----------------------------objects--------------------------------------------
 
-INC_MECHOUI := $(realpath $(addprefix ../../, SFMT base math disp))
+INC_MECHOUI := $(realpath $(addprefix ../../, base math disp))
 
 vpath %.h  . $(INC_MECHOUI)
 vpath %.cc . $(INC_MECHOUI)
@@ -33,13 +33,13 @@ vpath %.a  build
 
 
 OBJ_MECHOUI := mesh.o mechoui_param.o exceptions.o vector3.o glossary.o property.o\
-			backtrace.o tokenizer.o stream_func.o print_color.o time_date.o filepath.o\
+             backtrace.o tokenizer.o stream_func.o print_color.o time_date.o filepath.o\
 
 #----------------------------targets--------------------------------------------
 
 INCLUDE := $(addprefix -I, $(INC_MECHOUI))
 
-mechoui: mechoui.cc $(OBJ_MECHOUI) SFMT.o mechdisp.a
+mechoui: mechoui.cc $(OBJ_MECHOUI:%=build/%) build/SFMT.o build/mechdisp.a
 	$(COMPILE) $(INCLUDE) $^ $(GRAFIX) $(IMAGES) -o $@
 	@printf "\x1B[35m >>>>>> made %s\x1B[0m\n" $@
 vpath mechoui .
@@ -59,16 +59,15 @@ build:
 
 -include ../../disp/makefile.inc
 
-$(OBJ_MECHOUI): %.o: %.cc
-	$(COMPILE) $(addprefix -I, $(INC_MECHOUI)) -c $< -o build/$@
+$(OBJ_MECHOUI:%.o=build/%.o): build/%.o: %.cc
+	$(COMPILE) $(addprefix -I, $(INC_MECHOUI)) -c $< -o $@
 
-# Attention: Mersenne-Twister is coded in C-language,
-# and we must provide this with '-x c' to the compiler:
-SFMT.o: SFMT.c SFMT.h | build
-	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o build/$@
+# Attention: Mersenne-Twister is coded in C-language, hence '-x c':
+build/SFMT.o: SFMT.c SFMT.h | build
+	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o $@
 
-mechdisp.a: $(OBJ_DISP) #save_image.o
-	$(LIBTOOL) build/$@ $^
+build/mechdisp.a: $(addprefix build/, $(OBJ_DISP)) #save_image.o
+	$(LIBTOOL) $@ $^
 vpath mechdisp.a build
 
 #----------------------------makedep--------------------------------------------

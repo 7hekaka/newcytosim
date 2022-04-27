@@ -35,30 +35,30 @@ cytodisp.a: $(OBJ_SIMDISP) $(OBJ_DISP) save_imageGL.o
 
 # Attention: For C-language objects, use '-x c':
 
-miniz.o: miniz.c miniz.h | build
-	$(CXX) $(FAST) -x c -c $< -o build/$@
+build/miniz.o: miniz.c miniz.h | build
+	$(CXX) $(FAST) -x c -c $< -o $@
 
-spng.o: spng.c spng.h | build
-	$(CXX) -DSPNG_USE_MINIZ -DSPNG_STATIC -DSPNG_USE_MINIZ -x c -c $< -o build/$@
+build/spng.o: spng.c spng.h | build
+	$(CXX) -DSPNG_USE_MINIZ -DSPNG_STATIC -DSPNG_USE_MINIZ -x c -c $< -o $@
 
-save_image.o: save_image.cc save_image.h | build
-	$(COMPILE) $(IMAGES_DEF) -c $< -o build/$@
+build/save_image.o: save_image.cc save_image.h | build
+	$(COMPILE) $(IMAGES_DEF) -c $< -o $@
 
-save_imageGL.o: save_image.cc save_image.h | build
-	$(COMPILE) $(IMAGES_DEF) -DDISPLAY -c $< -o build/$@
+build/save_imageGL.o: save_image.cc save_image.h | build
+	$(COMPILE) $(IMAGES_DEF) -DDISPLAY -c $< -o $@
 
-offscreen.o: offscreen.cc offscreen.h offscreen_fbo.cc offscreen_glx.cc | build
-	$(COMPILE) -c $< -o build/$@
+build/offscreen.o: offscreen.cc offscreen.h offscreen_fbo.cc offscreen_glx.cc | build
+	$(COMPILE) -c $< -o $@
 
 
-$(OBJ_SIMDISP): %.o: %.cc %.h | build
-	$(COMPILE) -Isrc/math -Isrc/base -c $< -o build/$@
+$(OBJ_SIMDISP:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) -Isrc/math -Isrc/base -c $< -o $@
 
-$(OBJ_GLE): %.o: %.cc %.h | build
-	$(COMPILE) $(INCLUDE) -Isrc/math -Isrc/base -c $< -o build/$@
+$(OBJ_GLE:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INCLUDE) -Isrc/math -Isrc/base -c $< -o $@
 
-$(OBJ_GYM): %.o: %.cc %.h | build
-	$(COMPILE) $(INCLUDE) -Isrc/math -Isrc/base -c $< -o build/$@
+$(OBJ_GYM:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INCLUDE) -Isrc/math -Isrc/base -c $< -o $@
 
-$(OBJ_FONT): %.o: %.c fg_font.h | build
-	$(CXX) -DNDEBUG $(FAST) -x c -c $< -o build/$@
+$(OBJ_FONT:%.o=build/%.o): build/%.o: %.c fg_font.h | build
+	$(COMPILE) $(INCLUDE) -DNDEBUG $(FAST) -x c -c $< -o $@
