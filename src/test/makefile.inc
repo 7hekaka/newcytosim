@@ -217,9 +217,8 @@ vpath test_tesselator bin
 
 
 # build the rasterizer with graphical debugging enabled:
-rasterizerG.o: rasterizer.cc rasterizer.h | build
-	$(COMPILE) -Isrc/base -Isrc/math -Isrc/disp -DDISPLAY -c $< -o build/$@
-vpath rasterizerG.o build
+build/rasterizerG.o: rasterizer.cc rasterizer.h | build
+	$(COMPILE) -Isrc/base -Isrc/math -Isrc/disp -DDISPLAY -c $< -o $@
 
 test_rasterizer: test_rasterizer.cc rasterizerG.o $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)

@@ -14,11 +14,11 @@ PLAY_DEP = $(addprefix -Isrc/, math base sim disp) $(LINK) $(GRAFIX) $(IMAGES)
 
 ################################ objects with DIM defined in source code:
 
-player.o: $(FILES_PLAYER) | build
-	$(COMPILE) $(PLAY_INC) -c $< -o build/$@
+build/player.o: $(FILES_PLAYER) | build
+	$(COMPILE) $(PLAY_INC) -c $< -o $@
 
-$(OBJ_PLAY): %.o: %.cc %.h | build
-	$(COMPILE) $(PLAY_INC) -c $< -o build/$@
+$(OBJ_PLAY:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(PLAY_INC) -c $< -o $@
 
 play: play.cc player.o $(OBJ_PLAY) cytolibG.a cytodisp.a cytomath.a cytobase.a SFMT.o | bin
 	$(COMPILE) $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin/play
@@ -27,11 +27,11 @@ vpath play bin
 
 ################################ objects with DIM = 1:
 
-playerD1.o: $(FILES_PLAYER) | build
-	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o build/$@
+build/playerD1.o: $(FILES_PLAYER) | build
+	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o $@
 
-$(OBJ_PLAY1D): %D1.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o build/$@
+$(OBJ_PLAY1D:%.o=build/%.o): build/%D1.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o $@
 
 bin1/play: play.cc playerD1.o $(OBJ_PLAY1D) cytolibGD1.a cytodisp.a cytomathD1.a cytobase.a SFMT.o | bin1
 	$(COMPILE) -DDIM=1 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin1/play
@@ -40,11 +40,11 @@ vpath bin1/play bin1
 
 ################################ objects with DIM = 2:
 
-playerD2.o: $(FILES_PLAYER) | build
-	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o build/$@
+build/playerD2.o: $(FILES_PLAYER) | build
+	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o $@
 
-$(OBJ_PLAY2D): %D2.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o build/$@
+$(OBJ_PLAY2D:%.o=build/%.o): build/%D2.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o $@
 
 bin2/play: play.cc playerD2.o $(OBJ_PLAY2D) cytolibGD2.a cytodisp.a cytomathD2.a cytobase.a SFMT.o | bin2
 	$(COMPILE) -DDIM=2 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin2/play
@@ -53,11 +53,11 @@ vpath bin2/play bin2
 
 ################################ objects with DIM = 3:
 
-playerD3.o: $(FILES_PLAYER) | build
-	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o build/$@
+build/playerD3.o: $(FILES_PLAYER) | build
+	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o $@
 
-$(OBJ_PLAY3D): %D3.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o build/$@
+$(OBJ_PLAY3D:%.o=build/%.o): build/%D3.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o $@
 
 bin3/play: play.cc playerD3.o $(OBJ_PLAY3D) cytolibGD3.a cytodisp.a cytomathD3.a cytobase.a SFMT.o | bin3
 	$(COMPILE) -DDIM=3 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin3/play

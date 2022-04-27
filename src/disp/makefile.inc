@@ -61,4 +61,4 @@ $(OBJ_GYM:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INCLUDE) -Isrc/math -Isrc/base -c $< -o $@
 
 $(OBJ_FONT:%.o=build/%.o): build/%.o: %.c fg_font.h | build
-	$(COMPILE) $(INCLUDE) -DNDEBUG $(FAST) -x c -c $< -o $@
+	$(CXX) $(INCLUDE) -DNDEBUG -x c -c $< -o $@

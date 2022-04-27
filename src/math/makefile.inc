@@ -13,48 +13,48 @@ OBJ_SPARMAT := sparmatblk.o sparmatsymblk.o sparmatsymblkdiag.o
 INC_BM:=-Isrc/base -Isrc/math
 
 
-$(OBJ_MATH): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BM) -c $< -o build/$@
+$(OBJ_MATH:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BM) -c $< -o $@
 
 
 
-sparmatsymblk.o: sparmatsymblk.cc sparmatsymblk.h
-	$(COMPILE) $(INC_BM) -c $< -o build/$@
+build/sparmatsymblk.o: sparmatsymblk.cc sparmatsymblk.h
+	$(COMPILE) $(INC_BM) -c $< -o $@
 
-sparmatsymblkD1.o: sparmatsymblk.cc sparmatsymblk.h
-	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o build/$@
+build/sparmatsymblkD1.o: sparmatsymblk.cc sparmatsymblk.h
+	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o $@
 
-sparmatsymblkD2.o: sparmatsymblk.cc sparmatsymblk.h
-	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o build/$@
+build/sparmatsymblkD2.o: sparmatsymblk.cc sparmatsymblk.h
+	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o $@
 
-sparmatsymblkD3.o: sparmatsymblk.cc sparmatsymblk.h
-	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
-
-
-sparmatsymblkdiag.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
-	$(COMPILE) $(INC_BM) -c $< -o build/$@
-
-sparmatsymblkdiagD1.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
-	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o build/$@
-
-sparmatsymblkdiagD2.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
-	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o build/$@
-
-sparmatsymblkdiagD3.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
-	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
+build/sparmatsymblkD3.o: sparmatsymblk.cc sparmatsymblk.h
+	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o $@
 
 
-sparmatblk.o: sparmatblk.cc sparmatblk.h
-	$(COMPILE) $(INC_BM) -c $< -o build/$@
+build/sparmatsymblkdiag.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -c $< -o $@
 
-sparmatblkD1.o: sparmatblk.cc sparmatblk.h
-	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o build/$@
+build/sparmatsymblkdiagD1.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o $@
 
-sparmatblkD2.o: sparmatblk.cc sparmatblk.h
-	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o build/$@
+build/sparmatsymblkdiagD2.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o $@
 
-sparmatblkD3.o: sparmatblk.cc sparmatblk.h
-	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o build/$@
+build/sparmatsymblkdiagD3.o: sparmatsymblkdiag.cc sparmatsymblkdiag.h
+	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o $@
+
+
+build/sparmatblk.o: sparmatblk.cc sparmatblk.h
+	$(COMPILE) $(INC_BM) -c $< -o $@
+
+build/sparmatblkD1.o: sparmatblk.cc sparmatblk.h
+	$(COMPILE) $(INC_BM) -DDIM=1 -c $< -o $@
+
+build/sparmatblkD2.o: sparmatblk.cc sparmatblk.h
+	$(COMPILE) $(INC_BM) -DDIM=2 -c $< -o $@
+
+build/sparmatblkD3.o: sparmatblk.cc sparmatblk.h
+	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o $@
 
 
 cytomath.a: $(OBJ_MATH) $(OBJ_SPARMAT) | lib

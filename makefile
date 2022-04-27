@@ -79,8 +79,8 @@ include src/play/makefile.inc
 
 # Attention: Mersenne-Twister is coded in C-language,
 # and we must tell the compiler with '-x c':
-SFMT.o: SFMT.c SFMT.h
-	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 $(FAST) -x c -c $< -o build/$@
+build/SFMT.o: SFMT.c SFMT.h
+	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 $(FAST) -x c -c $< -o $@
 
 
 .PHONY: all dim1 dim2 dim3 alldim allsim doc

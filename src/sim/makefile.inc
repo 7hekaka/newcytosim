@@ -62,9 +62,9 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
 OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
              $(OBJ_SINGLES) $(OBJ_COUPLES) $(OBJ_ORGANIZERS) $(OBJ_SIM)
 
-OBJ_CYTOLIB1:=$(OBJ_CYTOLIB:%.o=%D1.o)
-OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=%D2.o)
-OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=%D3.o)
+OBJ_CYTOLIB1:=$(OBJ_CYTOLIB:%.o=build/%D1.o)
+OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=build/%D2.o)
+OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=build/%D3.o)
 
 
 # objects containing graphical code under the DISPLAY keyword:
@@ -106,7 +106,7 @@ bin3/sim: sim.cc cytolibD3.a cytomathD3.a cytobase.a SFMT.o | bin3
 
 #--- libraries:
 
-cytolib.a: $(OBJ_CYTOLIB) | lib
+cytolib.a: $(OBJ_CYTOLIB:%.o=build/%.o) | lib
 	$(MAKELIB)
 	$(DONE)
 
@@ -145,58 +145,58 @@ cytolibGD3.a: $(OBJ_CYTOLIBG:%.o=%D3.o) | lib
 INC_BMS=$(addprefix -Isrc/, base math sim)
 
 
-$(OBJ_SPACE): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/spaces -c $< -o build/$@
+$(OBJ_SPACE:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/spaces -c $< -o $@
 
-$(OBJ_HANDS): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o build/$@
+$(OBJ_HANDS:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o $@
 
-$(OBJ_DIGITS): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o build/$@
+$(OBJ_DIGITS:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o $@
 
-$(OBJ_FIBERS): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/fibers -c $< -o build/$@
+$(OBJ_FIBERS:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/fibers -c $< -o $@
 
-$(OBJ_SINGLES): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/singles -c $< -o build/$@
+$(OBJ_SINGLES:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/singles -c $< -o $@
 
-$(OBJ_COUPLES): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/couples -c $< -o build/$@
+$(OBJ_COUPLES:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/couples -c $< -o $@
 
-$(OBJ_ORGANIZERS): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/organizers -c $< -o build/$@
+$(OBJ_ORGANIZERS:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/organizers -c $< -o $@
 
-$(OBJ_SIM): %.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -c $< -o build/$@
+$(OBJ_SIM:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -c $< -o $@
 
 #------------targets with 'DIM' defined in makefile-----------------------------
 
 INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
 
 
-$(OBJ_CYTOLIB1): %D1.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=1 $(INC_SIM) -c $< -o build/$@
+$(OBJ_CYTOLIB1): build/%D1.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=1 $(INC_SIM) -c $< -o $@
 
-$(OBJ_CYTOLIB2): %D2.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=2 $(INC_SIM) -c $< -o build/$@
+$(OBJ_CYTOLIB2): build/%D2.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=2 $(INC_SIM) -c $< -o $@
 
-$(OBJ_CYTOLIB3): %D3.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o build/$@
+$(OBJ_CYTOLIB3): build/%D3.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o $@
 
 
 #---------------------targets with DISPLAY elements-----------------------------
 
 INC_BMSD=$(addprefix -Isrc/, base math sim sim/spaces disp)
 
-$(OBJ_GRAFIX:%.o=%G.o): %G.o: %.cc %.h %.o | build
-	$(COMPILE) -DDISPLAY $(INC_BMSD) -c $< -o build/$@
+$(OBJ_GRAFIX:%.o=build/%G.o): build/%G.o: %.cc %.h %.o | build
+	$(COMPILE) -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_GRAFIX:%.o=%GD1.o): %GD1.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
+$(OBJ_GRAFIX:%.o=build/%GD1.o): build/%GD1.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_GRAFIX:%.o=%GD2.o): %GD2.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
+$(OBJ_GRAFIX:%.o=build/%GD2.o): build/%GD2.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_GRAFIX:%.o=%GD3.o): %GD3.o: %.cc %.h %.o | build
-	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMSD) -c $< -o build/$@
+$(OBJ_GRAFIX:%.o=build/%GD3.o): build/%GD3.o: %.cc %.h %.o | build
+	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMSD) -c $< -o $@
 

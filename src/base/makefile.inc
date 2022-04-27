@@ -7,11 +7,11 @@ OBJ_BASE := messages.o filewrapper.o filepath.o iowrapper.o exceptions.o\
 
 #----------------------------rules----------------------------------------------
 
-$(OBJ_BASE): %.o: %.cc %.h | build
-	$(COMPILE) -Isrc/base -Isrc/math -c $< -o build/$@
+$(OBJ_BASE:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) -Isrc/base -Isrc/math -c $< -o $@
 
-operator_new.o: operator_new.cc
-	$(COMPILE) -Isrc/base -Isrc/math -c $< -o build/$@
+build/operator_new.o: operator_new.cc | build
+	$(COMPILE) -Isrc/base -Isrc/math -c $< -o $@
 
 #----------------------------targets--------------------------------------------
 
