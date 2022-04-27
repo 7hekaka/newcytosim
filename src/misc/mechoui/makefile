@@ -1,5 +1,4 @@
-# Blanksim 0.1 - F. Nedelec, Copyright EMBL 2007-2015
-# makefile  Francois Nedelec 2015.
+# For Cytosim/misc/mechoui. Sainsbury Laboratory; Cambridge University, 2022
 
 #-------------------include compiler-specifications-----------------------------
 
@@ -24,22 +23,24 @@ endif
 
 #----------------------------objects--------------------------------------------
 
-INCDIR=$(addprefix ../../, SFMT base math gl disp)
+INC_MECHOUI := $(realpath $(addprefix ../../, SFMT base math disp))
 
-vpath %.h  $(INCDIR) .
-vpath %.cc $(INCDIR) .
-vpath %.c  $(INCDIR)
+vpath %.h  . $(INC_MECHOUI)
+vpath %.cc . $(INC_MECHOUI)
+vpath %.c  $(INC_MECHOUI)
 vpath %.o  build
+vpath %.a  build
 
-OBJ=exceptions.o vector3.o glossary.o property.o backtrace.o offscreen.o\
-    tokenizer.o stream_func.o print_color.o view.o view_prop.o glapp.o\
-    gle.o gym_text.o gym_flute.o tesselator.o gle_color.o gle_color_list.o\
-	time_date.o filepath.o mesh.o mechoui_param.o mechoui.o
+
+OBJ_MECHOUI := mesh.o mechoui_param.o exceptions.o vector3.o glossary.o property.o\
+			backtrace.o tokenizer.o stream_func.o print_color.o time_date.o filepath.o\
 
 #----------------------------targets--------------------------------------------
 
-mechoui: $(OBJ) SFMT.o save_image.o
-	$(COMPILE) $(addprefix build/, $(notdir $^)) $(GRAFIX) $(IMAGES) -o $@
+INCLUDE := $(addprefix -I, $(INC_MECHOUI))
+
+mechoui: mechoui.cc $(OBJ_MECHOUI) SFMT.o mechdisp.a
+	$(COMPILE) $(INCLUDE) $^ $(GRAFIX) $(IMAGES) -o $@
 	@printf "\x1B[35m >>>>>> made %s\x1B[0m\n" $@
 vpath mechoui .
 
@@ -49,30 +50,35 @@ clean:
 
 .PHONY: tar
 tar: clean
-	tar -cf mechoui.tar --dereference * 
+	tar -cf mechoui.tar --dereference *
+
+build:
+	if ! test -d build; then mkdir build; fi
 
 #----------------------------rules----------------------------------------------
 
-INCLUDE=$(addprefix -I, $(INCDIR))
+-include ../../disp/makefile.inc
 
-$(OBJ): %.o: %.cc
-	$(COMPILE) -c $(INCLUDE) $< -o build/$@
-
-build/save_image.o: save_image.cc save_image.h
-	$(COMPILE) -c $(IMAGES_DEF) $< -o $@
+$(OBJ_MECHOUI): %.o: %.cc
+	$(COMPILE) $(addprefix -I, $(INC_MECHOUI)) -c $< -o build/$@
 
 # Attention: Mersenne-Twister is coded in C-language,
 # and we must provide this with '-x c' to the compiler:
-SFMT.o: SFMT.c SFMT.h
+SFMT.o: SFMT.c SFMT.h | build
 	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o build/$@
+
+mechdisp.a: $(OBJ_DISP) #save_image.o
+	$(LIBTOOL) build/$@ $^
+vpath mechdisp.a build
 
 #----------------------------makedep--------------------------------------------
 
-MAKEDEP=gcc -MM
-SRC=$(patsubst %.o,%.cc, $(OBJ))
-FILES=$(findfile $(SRC), $(INCDIR))
+#command used to build the dependencies files automatically
+MAKEDEP := g++ -std=gnu++14 -MM
 
-build/dependencies: $(SRC)
-	$(MAKEDEP) $(INCLUDE) $(filter %.cc, $^) > $@
+build/dep: $(OBJ_MECHOUI:%.o=%.cc) | build
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
+	printf "> > > > > > > made %s\n" $@;
+vpath dep build
 
--include build/dependencies
+-include build/dep
