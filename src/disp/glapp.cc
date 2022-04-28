@@ -703,13 +703,10 @@ int glApp::buildMenu()
     return menu;
 }
 
-void glApp::attachMenu()
+void glApp::attachMenu(int m)
 {
-    if ( gym::has_menus )
-    {
-        buildMenu();
-        gym::attachMenu(GLUT_RIGHT_BUTTON);
-    }
+    if ( !m ) buildMenu();
+    gym::attachMenu(GLUT_RIGHT_BUTTON);
 }
 
 //------------------------------------------------------------------------------

@@ -27,6 +27,7 @@ void drawLive(View& view, int mag);
 
 #if HEADLESS_PLAYER
 void helpKeys(std::ostream& os) { os << "This executable has no display capability\n"; }
+void buildMenus() { }
 #else
 #  include "glut.h"
 #  include "glapp.h"
@@ -106,6 +107,7 @@ void print_error(Exception const& e)
 int main(int argc, char* argv[])
 {
     Style style = OFFSCREEN;
+    int menu = 1;
     int mode = NORMAL;
     int magnify = 1;
     Glossary arg;
@@ -116,7 +118,7 @@ int main(int argc, char* argv[])
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
     
-    arg.set(gym::has_menus, "menu");
+    arg.set(menu, "menu");
 
     // check for major options:
     if ( arg.use_key("-") )
@@ -392,12 +394,8 @@ int main(int argc, char* argv[])
     {
         gle::initialize();
         player.setStyle(disp.style);
-        if ( gym::has_menus )
-        {
-            glutMenuStatusFunc(menuCallback);
-            rebuildMenus();
-            glApp::attachMenu();
-        }
+        if ( menu )
+            buildMenus();
         if ( glApp::isFullScreen() )
             glutFullScreen();
         glutTimerFunc(100, timerCallback, 0);

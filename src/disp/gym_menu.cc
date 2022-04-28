@@ -4,9 +4,6 @@
 #include "glut.h"
 
 
-bool gym::has_menus = 1;
-
-
 int gym::createMenu(void (*func)(int))
 {
     return glutCreateMenu(func);
@@ -28,13 +25,9 @@ void gym::addSubMenu(char const* str, int val)
 void gym::clearMenu(int menu)
 {
     glutSetMenu(menu);
-    const int mx = glutGet(GLUT_MENU_NUM_ITEMS);
-    for ( int m = mx; m > 0; --m )
+    const int x = glutGet(GLUT_MENU_NUM_ITEMS);
+    for ( int m = x; m > 0; --m )
         glutRemoveMenuItem(m);
-    if ( glutGet(GLUT_MENU_NUM_ITEMS) )
-    {
-        //some error occured
-    }
 }
 
 

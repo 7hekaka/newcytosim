@@ -4,9 +4,6 @@
 namespace gym
 {
     /// shortcut
-    extern bool has_menus;
-    
-    /// shortcut
     int createMenu(void (*func)(int));
     
     /// shortcut

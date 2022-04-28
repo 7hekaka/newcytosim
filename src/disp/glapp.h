@@ -73,7 +73,7 @@ namespace glApp
     void processMenuEvent(int item);
     
     /// attach default menu to button
-    void attachMenu();
+    void attachMenu(int menu = 0);
 
     //-----------------------------------KEYS------------------------------------
 

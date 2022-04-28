@@ -302,7 +302,6 @@ static int buildMenuSelect()
     gym::addSubMenu("Fibers",  m1);
     gym::addSubMenu("Couple",  m2);
     gym::addSubMenu("Singles", m3);
-    
     return menuID;
 }
 
@@ -315,15 +314,14 @@ static void processMenuAnimation(int item)
     switch (item)
     {
         case 0: return;
-        case 1: processKey('z'); break;
-        case 2: processKey('a'); break;
-        case 4: processKey('s'); break;
-        case 5: processKey('r'); break;
+        case 1: processKey('z'); return;
+        case 2: processKey('a'); return;
+        case 4: processKey('s'); return;
+        case 5: processKey('r'); return;
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
-    glApp::postRedisplay();
 }
 
 static int buildMenuAnimation()
@@ -349,14 +347,14 @@ static void processMenuReplay(int item)
     switch (item)
     {
         case 0: return;
-        case 1: processKey('p'); break;
-        case 2: processKey('o'); break;
-        case 3: processKey('s'); break;
-        case 4: processKey('z'); break;
+        case 1: processKey('p'); return;
+        case 2: processKey('o'); return;
+        case 3: processKey('s'); return;
+        case 4: processKey('z'); return;
         case 5: player.previousFrame(); break;
         case 6: player.nextFrame(); break;
-        case 7: prop.loop = 0; break;
-        case 8: prop.loop = 1; break;
+        case 7: prop.loop = 0; return;
+        case 8: prop.loop = 1; return;
         default:
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
@@ -415,7 +413,6 @@ static void processMenuExport(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
-    glApp::postRedisplay();
 }
 
 
@@ -459,7 +456,7 @@ void processTopMenu(int item)
 }
 
 
-void rebuildMenus()
+int rebuildMenus()
 {
     static int menuID = 0;
     int m1 = buildMenuDisplay();
@@ -481,6 +478,7 @@ void rebuildMenus()
     gym::addSubMenu("Export",            m5);
     gym::addSubMenu("More",              m6);
     gym::addMenuEntry("Quit",             9);
+    return menuID;
 }
 
 
@@ -492,3 +490,8 @@ void menuCallback(int status, int x, int y)
         rebuildMenus();
 }
 
+void buildMenus()
+{
+    glutMenuStatusFunc(menuCallback);
+    glApp::attachMenu(rebuildMenus());
+}
