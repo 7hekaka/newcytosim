@@ -328,7 +328,7 @@ unsigned Mesh::pick() const
     GLint n_hits = glRenderMode(GL_RENDER);
     GLuint z_min = buf[1];
     GLuint hit = buf[3];
-    for ( size_t i=0; i < n_hits && 4*i < buf_size; ++i )
+    for ( GLint i=0; i < n_hits && 4*i < buf_size; ++i )
     {
         GLuint z = buf[4*i+1];
         if ( z < z_min )
