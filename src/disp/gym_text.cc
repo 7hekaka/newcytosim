@@ -1,14 +1,9 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include "opengl.h"
+#include "glut.h"
 #include "gym_text.h"
 #include "gle_color.h"
 #include "vector.h"
-
-
-extern "C" {
-#include "fg_font.h"
-}
 
 namespace gym
 {
@@ -24,15 +19,25 @@ namespace gym
         return 13;
     }
     
+    void* glutBitmapFont(FontType font)
+    {
+        if ( font == BITMAP_8_BY_13 )        return GLUT_BITMAP_8_BY_13;
+        if ( font == BITMAP_9_BY_15 )        return GLUT_BITMAP_9_BY_15;
+        if ( font == BITMAP_TIMES_ROMAN_10 ) return GLUT_BITMAP_TIMES_ROMAN_10;
+        if ( font == BITMAP_TIMES_ROMAN_24 ) return GLUT_BITMAP_TIMES_ROMAN_24;
+        if ( font == BITMAP_HELVETICA_10 )   return GLUT_BITMAP_HELVETICA_10;
+        if ( font == BITMAP_HELVETICA_12 )   return GLUT_BITMAP_HELVETICA_12;
+        if ( font == BITMAP_HELVETICA_18 )   return GLUT_BITMAP_HELVETICA_18;
+        return GLUT_BITMAP_8_BY_13;
+    }
+
     /**
      Compute the max width of all the lines in the given text
      This uses GLUT, which should be initialized.
      */
     int maxTextWidth(FontType fontID, const char text[], int& lines)
     {
-        SFG_Font const* font = fghFontByID(fontID);
-        if ( !font )
-            return 0;
+        void* font = glutBitmapFont(fontID);
         int res = 0;
         lines = 0;
         int w = 0;
@@ -44,9 +49,13 @@ namespace gym
                 ++lines;
                 w = 0;
             }
-            else if ( isprint(*c) )
+            else if ( isspace(*c))
             {
-                w += font->Characters[(unsigned)*c][0];
+                w += glutBitmapWidth(font, ' ');
+            }
+            else if ( isprint(*c))
+            {
+                w += glutBitmapWidth(font, *c);
             }
         }
         res = std::max(res, w);
@@ -58,23 +67,40 @@ namespace gym
 
     /**
      draw the string character per character using:
+     glutBitmapCharacter()
      */
-    void bitmapString(FontType font, const char text[], float vshift)
+    void bitmapString(FontType fontID, const char text[], float vshift)
     {
-        fgBitmapString(font, (unsigned char*)text, -vshift);
+        void* font = glutBitmapFont(fontID);
+        if ( !font )
+        {
+            font = GLUT_BITMAP_HELVETICA_12;
+            vshift = sign_real(vshift) * fontHeight(fontID);
+        }
+        if ( vshift == 0 )
+            vshift = -fontHeight(fontID);
+        
+        GLfloat ori[4], pos[4];
+        glGetFloatv(GL_CURRENT_RASTER_POSITION, ori);
+        
+        for (const char* p = text; *p; ++p)
+        {
+            if ( *p == '\n' )
+            {
+                glGetFloatv(GL_CURRENT_RASTER_POSITION, pos);
+                glBitmap(0, 0, 0, 0, ori[0]-pos[0], vshift, nullptr);
+            }
+            else if ( isspace(*p) )
+            {
+                glutBitmapCharacter(font, ' ');
+            }
+            else if ( isprint(*p) )
+            {
+                glutBitmapCharacter(font, *p);
+            }
+        }
     }
     
-    
-    // draw text at current raster position
-    void drawText(FontType font, const char text[], float dx)
-    {
-        int L = 1;
-        int H = fontHeight(font);
-        int W = maxTextWidth(font, text, L);
-        // center text:
-        glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
-        bitmapString(font, text, H);
-    }
     
     /**
      draw text at position `vec`, if this corresponds to a valid raster position
@@ -93,7 +119,12 @@ namespace gym
             glDisable(GL_DEPTH_TEST);
             glDisable(GL_ALPHA_TEST);
             glDisable(GL_LIGHTING);
-            drawText(font, text, dx);
+            int L = 1;
+            int H = fontHeight(font);
+            int W = maxTextWidth(font, text, L);
+            // center text:
+            glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
+            bitmapString(font, text, H);
             if ( depth ) glEnable(GL_DEPTH_TEST);
             if ( alpha ) glEnable(GL_ALPHA_TEST);
             if ( light ) glEnable(GL_LIGHTING);
@@ -242,10 +273,11 @@ namespace gym
         if ( light ) glEnable(GL_LIGHTING);
     }
     
+    
     /// stroke character
-    void strokeCharacter(FontType font, int character)
+    void strokeCharacter(int mono, int c)
     {
-        fgStrokeCharacter(font, character, true);
+        glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, c);
     }
 
 }

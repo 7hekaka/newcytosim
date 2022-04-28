@@ -11,8 +11,6 @@ class Vector3;
 /// Fonts inherited from GLUT
 enum FontType
 {
-    STROKE_ROMAN = 0,
-    STROKE_MONO_ROMAN = 1,
     BITMAP_9_BY_15 = 2,
     BITMAP_8_BY_13 = 3,
     BITMAP_TIMES_ROMAN_10 = 4,
@@ -47,7 +45,7 @@ namespace gym
     void drawText(Vector3 const& pos, FontType, const char text[], float dx=0);
 
     /// stroke character
-    void strokeCharacter(FontType, int character);
+    void strokeCharacter(int mono, int character);
 
 }
 

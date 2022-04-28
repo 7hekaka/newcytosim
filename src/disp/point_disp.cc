@@ -129,7 +129,7 @@ void PointDisp::strokeA() const
         else
             glTranslatef(-52.35f, -50, 0);
         colorS.load();
-        gym::strokeCharacter(STROKE_MONO_ROMAN, symbol);
+        gym::strokeCharacter(1, symbol);
     }
 }
 

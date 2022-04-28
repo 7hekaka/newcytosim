@@ -10,7 +10,7 @@ OBJ_GLE := tesselator.o gle.o gle_color.o gle_color_list.o view.o view_prop.o gl
 OBJ_GYM := gym_menu.o gym_flute.o gym_matrix.o\
            gym_check.o gym_text.o gym_zoo.o
 
-OBJ_FONT := fg_font.o fg_stroke_roman.o fg_stroke_mono_roman.o
+OBJ_FONT := 
 
 OBJ_DISP := $(OBJ_GLE) $(OBJ_GYM) $(OBJ_FONT) offscreen.o spng.o miniz.o
 
