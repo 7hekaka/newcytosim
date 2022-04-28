@@ -175,8 +175,8 @@ public:
 /// function to sort Triangles according to their 'z'
 static int compareTriangle(const void * A, const void * B)
 {
-    real a = static_cast<const Triangle*>(A)->z;
-    real b = static_cast<const Triangle*>(B)->z;
+    float a = static_cast<const Triangle*>(A)->z;
+    float b = static_cast<const Triangle*>(B)->z;
     
     return ( a > b ) - ( b > a );
 }
@@ -186,7 +186,8 @@ static int compareTriangle(const void * A, const void * B)
 void Mesh::draw(MechouiParam const& pam) const
 {
     glEnable(GL_NORMALIZE);
-    
+    glEnableClientState(GL_VERTEX_ARRAY);
+
     //Create one buffer
     if ( buffer == 0 )
         glGenBuffers(1, &buffer);
@@ -305,7 +306,6 @@ unsigned Mesh::pick() const
     const GLsizei buf_size = 1024;
     GLuint buf[buf_size] = { 0 };
 
-    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, points);
 

@@ -3,7 +3,6 @@
 #ifndef MECHOUI_PARAM_H
 #define MECHOUI_PARAM_H
 
-#include "real.h"
 #include <string>
 #include "gle_color.h"
 
@@ -15,28 +14,28 @@ class MechouiParam
 public:
     
     /// color of faces
-    gle_color    face_color;
+    gle_color face_color;
     
     /// color of points
-    gle_color    point_color;
+    gle_color point_color;
     
     /// size of points
-    float        point_size;
+    float point_size;
     
     /// flag to display points
-    int          point_style;
+    int   point_style;
     
     /// selected cell
-    int          selected;
+    int   selected;
     
     /// input file containing mesh
-    std::string  file;
+    std::string file;
     
     /// path for files
-    std::string  directory;
+    std::string directory;
     
     /// parameter
-    std::string  config;
+    std::string config;
     
     /// refresh speed in milliseconds
     unsigned int delay;
