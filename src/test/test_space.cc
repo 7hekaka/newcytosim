@@ -20,7 +20,9 @@
 #include "gle.h"
 #include "gle_color.h"
 #include "gym_flute.h"
-
+#include "gym_draw.h"
+#include "gym_view.h"
+#include "gym_check.h"
 
 // List of options
 Glossary opt;
@@ -30,8 +32,6 @@ SpaceProp prop("test_space");
 
 // Space to be tested:
 Space * spc = nullptr;
-
-bool draw_space = true;
 
 // number of points
 const size_t maxpts = 1<<17;
@@ -82,6 +82,7 @@ int showProjected = true;
 int showReproject = true;
 int showNormals   = false;
 int showEdges     = false;
+int showSpace     = 3;
 
 //use timer function on or off
 int timerOn = false;
@@ -162,7 +163,7 @@ void distributePoints(real len = INFLATION)
         calculateNormals();
     
     char tmp[128];
-    snprintf(tmp, sizeof(tmp), "projection error %.9f", error);
+    snprintf(tmp, sizeof(tmp), "Projection error %.9f", error);
     glApp::setMessage(tmp);
 }
 
@@ -245,7 +246,7 @@ enum MENUS_ID {
 
 void toggleSlicing(int d)
 {
-    slicing = ( slicing == d ? 0 : d % 4 );
+    slicing = ( slicing == d ? 0 : d & 3 );
     switch ( d )
     {
         case 0: break;
@@ -420,7 +421,8 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             break;
             
         case 'd':
-            draw_space = !draw_space;
+            showSpace = ( showSpace + 1 ) & 3;
+            glApp::flashText("showSpace = %i", showSpace);
             break;
 
         case 'f':
@@ -466,35 +468,43 @@ bool visible(size_t i)
 }
 
 
-void display(View& view, int)
+int display(View& view)
 {
+    view.back_color.set(0.3,0.3,0.3,1);
     view.openDisplay();
+    //gym::printCaps();
 
-    if ( spc && draw_space )
+#if ( DIM >= 3 )
+    if ( spc && ( showSpace & 2 ))
+    {
+        // draw flat back side
+        gym::disableLighting();
+        gym::color(0, 0, 0, 1);
+        gym::enableCullFace(GL_FRONT);
+        spc->draw3D();
+        gym::restoreCullFace();
+        gym::restoreLighting();
+    }
+#endif
+    if ( spc && ( showSpace & 1 ))
     {
 #if ( DIM >= 3 )
-        glEnable(GL_LIGHTING);
-        glEnable(GL_CULL_FACE);
-        glDepthMask(GL_FALSE);
-        // draw back side
-        glCullFace(GL_FRONT);
-        gle_color(0.2, 0.2, 0.2, 0.1).load_back();
+        // draw transparent front side
+        gym::enableLighting();
+        gym::color_front(0, 0, 1, 0.2);
+        gym::enableCullFace(GL_BACK);
+        gym::closeDepthMask();
         spc->draw3D();
-        // draw front side
-        glCullFace(GL_BACK);
-        gle_color(1.f, 1.f, 1.f, 0.1).load_front();
-        spc->draw3D();
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_LIGHTING);
-        glDepthMask(GL_TRUE);
+        gym::openDepthMask();
+        gym::restoreCullFace();
+        gym::restoreLighting();
 #else
-        glLineWidth(2);
-        gle_color(0.2, 0.2, 0.2, 0.1).load();
-        glDisable(GL_LIGHTING);
-        spc->draw2D();
+        gym::color(0.2, 0.2, 0.2, 0.1);
+        gym::disableLighting();
+        spc->draw2D(2);
 #endif
     }
-    
+
     if ( 1 )
     {
         //use green for points inside, magenta for point outside:
@@ -507,8 +517,7 @@ void display(View& view, int)
                 flu[n++] = { inside[i] ? col : lor, point[i] };
          }
         gym::unmapBufferC4V4();
-        glPointSize(2.0);
-        glDrawArrays(GL_POINTS, 0, n);
+        gym::drawPoints(2, 0, n);
     }
     
     if ( showProjected )
@@ -519,8 +528,7 @@ void display(View& view, int)
         for ( size_t i=0; i < nbpts; ++i )
             flu[i] = { inside[i] ? col : lor, project[i] };
         gym::unmapBufferC4V4();
-        glPointSize(2.0);
-        glDrawArrays(GL_POINTS, 0, nbpts);
+        gym::drawPoints(2, 0, nbpts);
     }
 
     if ( showProject )
@@ -538,8 +546,7 @@ void display(View& view, int)
             }
         }
         gym::unmapBufferC4V4();
-        glLineWidth(LW);
-        glDrawArrays(GL_LINES, 0, n);
+        gym::drawLines(LW, 0, n);
     }
     
     if ( showNormals )
@@ -553,8 +560,7 @@ void display(View& view, int)
             flu[n++] = { lor, project[i]+normal[i] };
         }
         gym::unmapBufferC4V4();
-        glLineWidth(LW);
-        glDrawArrays(GL_LINES, 0, n);
+        gym::drawLines(LW, 0, n);
     }
     
     if ( showReproject )
@@ -571,8 +577,7 @@ void display(View& view, int)
             }
         }
         gym::unmapBufferC4V4();
-        glLineWidth(2*LW);
-        glDrawArrays(GL_LINES, 0, n);
+        gym::drawLines(2*LW, 0, n);
     }
     
     if ( showEdges )
@@ -589,10 +594,10 @@ void display(View& view, int)
             }
          }
         gym::unmapBufferC4V4();
-        glPointSize(2.0);
-        glDrawArrays(GL_POINTS, 0, n);
+        gym::drawPoints(2, 0, n);
     }
     view.closeDisplay();
+    return 0;
 }
 
 //------------------------------------------------------------------------------

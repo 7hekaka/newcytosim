@@ -104,7 +104,7 @@ uint8_t Inputter::readUInt8()
     if ( ! binary_ )
         return readInt();
     
-    return get_byte();
+    return (uint8_t)get_char();
 }
 
 

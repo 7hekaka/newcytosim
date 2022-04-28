@@ -220,14 +220,18 @@ inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
 void set_arc_SEE(size_t cnt, float ptr[], float rad, float start,
                  float delta, float cX, float cY)
 {
-    const float C = cosf(delta+delta);
-    const float S = sinf(delta+delta);
-
+    const float c0 = cosf(start);
+    const float s0 = sinf(start);
+    const float c1 = cosf(delta);
+    const float s1 = sinf(delta);
+    const float C = c1*c1 - s1*s1;
+    const float S = c1*s1 + c1*s1;
+    
     vec4f CS { C, S,  C, S};
     vec4f SC {-S, C, -S, C};
 
     vec4f cc { cX, cY, cX, cY };
-    vec4f xx { cosf(start), sinf(start), cosf(start+delta), sinf(start+delta) };
+    vec4f xx { c0, s0, c0*c1-s0*s1, s0*c1+s1*c0 };
     xx = mul4f(set4f(rad), xx);
 
     float * const end = ptr + 2 * cnt - 2;

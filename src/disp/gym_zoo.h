@@ -4,9 +4,9 @@ struct flute2;
 
 namespace gym
 {
-    void zoo_init(flute2*, flute2* const);
+    size_t zoo_init(flute2*, flute2* const);
 
-    void zoo_stroke(char);
+    void zoo_stroke(char, float width);
 
     void zoo_paint(char);
 };

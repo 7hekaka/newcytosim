@@ -4,12 +4,11 @@
 #define GLE_H
 
 #include "real.h"
-#include "opengl.h"
 #include "gle_color.h"
-#include "vector1.h"
-#include "vector2.h"
-#include "vector3.h"
-#include "flute.h"
+
+class Vector1;
+class Vector2;
+class Vector3;
 
 /// Simple geometrical objects drawn with OpenGL
 /**
@@ -48,111 +47,19 @@ namespace gle
 
     /// calculate sine and cosine for a circular arc
     void compute_arc(size_t cnt, float CS[], double rad, double start, double angle, float cx, float cy);
-    
-    /// inverse square root
-#if defined(__SSE3__)
-    inline float invsqrt(float x) { return _mm_cvtss_f32(_mm_rsqrt_ss(_mm_set_ss(x))); }
-#else
-    inline float invsqrt(float x) { return x / sqrtf(x); }
-#endif
-    
-    /// initialize the Vertex Buffer Objects
-    flute6* setTubeBuffers(flute6*, flute6* const, GLsizei inx[]);
-    
-    /// initialize more buffer objects
-    flute6* setCubeBuffers(flute6*, flute6* const, GLsizei inx[]);
-
-    /// initialize more buffer objects
-    flute3* setBlobBuffers(flute3*, flute3* const, GLsizei inx[]);
 
     /// initialize more buffer objects
     void setBuffers();
-    
-    void bindBuffer();
-    
-    void unbindBuffer();
-    
-#pragma mark -
-    
-    inline void scale(float x) { glScalef(x,x,x); }
-    
-    inline void scale(float x, float y, float z) { glScalef(x,y,z); }
-
-    inline void translate(float x, float y, float z) { glTranslatef(x, y, z); }
-
-    inline void transScale(float x, float y, float z, float s) { glTranslatef(x, y, z); glScalef(s,s,s); }
-
-#if REAL_IS_DOUBLE
-   
-    inline void translate(Vector1 const& v) { glTranslated(v.XX, 0, 0); }
-    inline void translate(Vector2 const& v) { glTranslated(v.XX, v.YY, 0); }
-    inline void translate(Vector3 const& v) { glTranslated(v.XX, v.YY, v.ZZ); }
-
-    inline void transScale(Vector1 const& v, double s) { glTranslated(v.XX, 0, 0); glScaled(s,s,s); }
-    inline void transScale(Vector2 const& v, double s) { glTranslated(v.XX, v.YY, 0); glScaled(s,s,s); }
-    inline void transScale(Vector3 const& v, double s) { glTranslated(v.XX, v.YY, v.ZZ); glScaled(s,s,s); }
-
-#else
-    
-    inline void translate(Vector1 const& v) { glTranslatef(v.XX, 0, 0); }
-    inline void translate(Vector2 const& v) { glTranslatef(v.XX, v.YY, 0); }
-    inline void translate(Vector3 const& v) { glTranslatef(v.XX, v.YY, v.ZZ); }
-    
-    inline void transScale(Vector1 const& v, float s) { glTranslatef(v.XX, 0, 0); glScalef(s,s,s); }
-    inline void transScale(Vector2 const& v, float s) { glTranslatef(v.XX, v.YY, 0); glScalef(s,s,s); }
-    inline void transScale(Vector3 const& v, float s) { glTranslatef(v.XX, v.YY, v.ZZ); glScalef(s,s,s); }
-
-#endif
-
-    // colors that vary with the direction of a vector:
-    inline gle_color radial_color(const Vector3& d) { return gle_color::radial_color((GLfloat)d.XX, (GLfloat)d.YY, (GLfloat)d.ZZ, 1.0f); }
-    inline gle_color radial_color(const Vector2& d) { return gle_color::radial_color((GLfloat)d.XX, (GLfloat)d.YY, 1.0f); }
-    inline gle_color radial_color(const Vector1& d) { if ( d.XX > 0 ) return gle_color(1,1,1); else return gle_color(0,1,0); }
-
-    //------------------------------------------------------------------------------
-#pragma mark -
-    
-    /// translate by T; rotate to align X with A, Y with B and Z with C
-    void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);
-
-    /// translate by A; rotate to align Z with AB, Z replacing X. Scale in Z to put B at (0,0,1) Scale XY plane by `rad'
-    void stretchAlignZ(Vector1 const& A, Vector1 const& B, float rad);
-    /// translate by A; rotate to align Z with AB, Z replacing X. Scale in Z to put B at (0,0,1) Scale XY plane by `rad'
-    void stretchAlignZ(Vector2 const& A, Vector2 const& B, float rad);
-    /// translate by A; rotate to align Z with AB, Z replacing X. Scale XY plane by `rad'
-    void stretchAlignZ(Vector3 const& A, Vector3 const& B, float rad);
-    
-    /// translate by pos; rotate to align Z with dir, scale XY plane by rad
-    void transAlignZ(Vector1 const& pos, float rad, Vector1 const& dir);
-    void transAlignZ(Vector2 const& pos, float rad, Vector2 const& dir);
-    void transAlignZ(Vector3 const& pos, float rad, Vector3 const& dir);
-
-    /// translate by pos; rotate to align Z with dir, given norm(dir)=1, scale XY by rad and Z by fac
-    void stretchAlignZ1(Vector1 const& pos, float rad, Vector1 const& dir, float fac);
-    void stretchAlignZ1(Vector2 const& pos, float rad, Vector2 const& dir, float fac);
-    void stretchAlignZ1(Vector3 const& pos, float rad, Vector3 const& dir, float fac);
-
-    /// translate by pos; rotate to align X to Z, scale by rad
-    void transAlignZX(float pos, float rad, float dir);
-    /// translate by A; rotate to align X to Z, scale XY by rad and Z by B-A
-    void stretchAlignZX(float A, float B, float rad);
-
-    void setClipPlane(GLenum, Vector1 const& dir, Vector1 const& pos);
-    void setClipPlane(GLenum, Vector2 const& dir, Vector2 const& pos);
-    void setClipPlane(GLenum, Vector3 const& dir, Vector3 const& pos);
-    
-    /// display back faces first, and then front faces
-    void dualPass(void primitive());
 
     //------------------------------------------------------------------------------
 #pragma mark -
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
-    void circle();
+    void circle(float width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, fewer points
-    void circle2();
+    void circle2(float width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
-    void circle_dotted();
+    void circle_dotted(float width);
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
@@ -186,7 +93,7 @@ namespace gle
     /// draw a Cube of side 2
     void cube();
     /// draw a Cube of side 2
-    void wireCube();
+    void wireCube(float);
     /// draw a Cube of side 1
     void cuboid();
     /// draw a stellated octahedron
@@ -256,6 +163,8 @@ namespace gle
     void truncatedCone();
     /// draw a 3-portion cylinder with a larger central section
     void barrel();
+    /// draw a 3-portion cylinder with a larger central section
+    void dualPassBarrel();
     /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1
     void dumbbell();
     /// draw Torus of radius `rad` and thickness `thick`
@@ -265,11 +174,7 @@ namespace gle
     void arrowStrip(float width, size_t inc);
     /// draw 3 Arrowed Bands defining 8 quadrants on the sphere of radius 1
     void threeArrowStrip(float width, size_t inc);
-    
-    /// a rectangle ( rect = [ left, bottom, right, top ] )
-    void drawRectangle(const int rect[4]);
-    void drawRectangle(float L, float B, float R, float T, float Z=0);
-
+ 
     //------------------------------------------------------------------------------
     
     /// draw something
@@ -299,17 +204,17 @@ namespace gle
     void hemisphere4();
 
 #if 1
-    /// primitives to draw the minus ends of fibers:
+    /// primitives to draw the MINUS ends of fibers:
     inline void capedTube1() { halfTube1(); hemisphere1(); }
     inline void capedTube2() { halfTube2(); hemisphere2(); }
     inline void capedTube4() { halfTube4(); hemisphere4(); }
 #else
-    /// primitives to draw the minus ends of fibers:
+    /// primitives to draw the MINUS ends of fibers:
     inline void capedTube1() { halfTube1(); discBottom1(); }
     inline void capedTube2() { halfTube2(); discBottom2(); }
     inline void capedTube4() { halfTube4(); discBottom2(); }
 #endif
-    /// primitives to draw the plus ends of fibers:
+    /// primitives to draw the PLUS ends of fibers:
     inline void endedTube1() { halfTube1(); discBottom1(); }
     inline void endedTube2() { halfTube2(); discBottom2(); }
     inline void endedTube4() { halfTube4(); discBottom2(); }
@@ -331,12 +236,12 @@ namespace gle
     void drawBand(Vector3 const& A, Vector3 const& B, real);
 
     /// draw a band from A to B, with specified radius in A and B
-    void drawBand(Vector1 const& a, GLfloat, Vector1 const& b, GLfloat);
-    void drawBand(Vector2 const& a, GLfloat, Vector2 const& b, GLfloat);
+    void drawBand(Vector1 const& a, float, Vector1 const& b, float);
+    void drawBand(Vector2 const& a, float, Vector2 const& b, float);
     
     /// draw a band from A to B, with specified radius and colors in A and B
-    void drawBand(Vector1 const& a, GLfloat, gle_color, Vector1 const& b, GLfloat, gle_color);
-    void drawBand(Vector2 const& a, GLfloat, gle_color, Vector2 const& b, GLfloat, gle_color);
+    void drawBand(Vector1 const& a, float, gle_color, Vector1 const& b, float, gle_color);
+    void drawBand(Vector2 const& a, float, gle_color, Vector2 const& b, float, gle_color);
 
     /// draw symbol linking A to B
     void drawHourglass(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&);
@@ -375,21 +280,10 @@ namespace gle
     void drawArrow(Vector2 const& A, Vector2 const& B, float rad);
     void drawArrow(Vector3 const& A, Vector3 const& B, float rad);
 
-    //------------------------------------------------------------------------------
-#pragma mark -
-    
-    /// display rectangle specified in pixel-coordinates
-    void drawRectangle(const int rect[4], int window_width, int window_height);
-    
-    /// draw a rectangle to indicate the GLUT window-resize handle
-    void drawResizeBox(int window_width, int window_height);
-    
-    /// draw plane with squares of alternating colors
-    void drawTiledFloor(int R, float T, float Z, gle_color col1, gle_color col2);
-
     /// draw a set of 2 or 3 axes, depending on `dim`
     void drawAxes(float size, int dim);
 
+    void drawCuboid(Vector3 const& A, Vector3 const& B, float w);
 }
 
 

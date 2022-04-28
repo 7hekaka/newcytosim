@@ -307,45 +307,45 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
-#include "flute.h"
+#include "gym_flute.h"
+#include "gym_draw.h"
+#include "gym_text.h"
 
-
-void SpacePolygon::drawPolygon(bool points, bool lines) const
+void SpacePolygon::drawPolygon(float lines, float points) const
 {
     const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
-    flute2 * flt = new flute2[nbp];
-    for ( size_t n = 0; n < nbp; ++n )
-        flt[n] = flute2::cast(pts[n].xx, pts[n].yy);
+    flute2 * flt = gym::mapBufferV2(nbp+1);
+    for ( size_t n = 0; n <= nbp; ++n )
+        flt[n].set(pts[n].xx, pts[n].yy);
+    gym::unmapBufferV2();
     
     glEnable(GL_STENCIL_TEST);
     glClearStencil(1);
     glClear(GL_STENCIL_BUFFER_BIT);
     glStencilFunc(GL_EQUAL, 1, ~0U);
     glStencilOp(GL_KEEP, GL_ZERO, GL_ZERO);
-    glVertexPointer(2, GL_FLOAT, 0, flt);
 
-    if ( points )
+    if ( lines > 0 )
     {
-        glDrawArrays(GL_POINTS, 0, nbp);
+        gym::drawLineStrip(lines, 0, nbp+1);
+    }
+    if ( points > 0 )
+    {
+        gym::drawPoints(points, 0, nbp);
 #if ( 0 )
         // indicate index of each point:
         char tmp[8];
-        for ( size_t n = 0; n < npts; ++n )
+        float col[4] = { 1, 1, 0, 1 };
+        for ( size_t n = 0; n < nbp; ++n )
         {
-            snprintf(tmp, sizeof(tmp), "%i", n);
-            Vector p(pts[n].xx, pts[n].yy, height_);
-            gym::drawText(p, tmp, 0);
+            snprintf(tmp, sizeof(tmp), "%lu", n);
+            gym::drawText(Vector(pts[n].xx, pts[n].yy, height_), BITMAP_9_BY_15, col, tmp);
         }
 #endif
     }
-    if ( lines )
-    {
-        glDrawArrays(GL_LINE_LOOP, 0, nbp);
-    }
     glClear(GL_STENCIL_BUFFER_BIT);
     glDisable(GL_STENCIL_TEST);
-    delete[] flt;
 }
 
 
@@ -354,28 +354,29 @@ void SpacePolygon::draw3D() const
     const float H(-height_);
     const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
-    flute6 * flt = new flute6[nbp+1];
+    flute3 * flt = gym::mapBufferV3(2*nbp+2);
     for ( size_t n = 0; n <= nbp; ++n )
     {
         float X(pts[n].xx), Y(pts[n].yy);
-        flt[n] = {X, Y, -H, X, Y, H};
+        flt[2*n  ] = { X, Y, -H };
+        flt[2*n+1] = { X, Y,  H };
     }
-    glLineWidth(2);
-    // display bottom
-    glVertexPointer(3, GL_FLOAT, 24, flt);
-    glDrawArrays(GL_LINE_LOOP, 0, nbp);
-    // display top
-    glVertexPointer(3, GL_FLOAT, 24, 3+(float*)flt);
-    glDrawArrays(GL_LINE_LOOP, 0, nbp);
+    gym::unmapBufferV3();
     // display sides
-    glVertexPointer(3, GL_FLOAT, 0, flt);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 2*nbp+2);
-    delete[] flt;
+    gym::drawTriangleStrip(0, 2*nbp+2);
+
+    // display bottom
+    gym::rebindBufferV3(2, 0);
+    gym::drawLineStrip(2, 0, nbp+1);
+    // display top
+    gym::rebindBufferV3(2, 1);
+    gym::drawLineStrip(2, 0, nbp+1);
+    gym::cleanup();
 }
 
 #else
 
-void SpacePolygon::drawPolygon(bool, bool) const {}
+void SpacePolygon::drawPolygon(float, float) const {}
 void SpacePolygon::draw3D() const {}
 
 #endif

@@ -3,6 +3,12 @@
 // restrict functions to local scope
 #define LOCAL static inline
 
+
+// colors that vary with the direction of a vector:
+LOCAL gle_color radial_color(const Vector3& d) { return gle_color::radial_color((float)d.XX, (float)d.YY, (float)d.ZZ, 1.0f); }
+LOCAL gle_color radial_color(const Vector2& d) { return gle_color::radial_colorXY((float)d.XX, (float)d.YY, 1.0f); }
+LOCAL gle_color radial_color(const Vector1& d) { if ( d.XX > 0 ) return gle_color(1,1,1); else return gle_color(0,1,0); }
+
 //------------------------------------------------------------------------------
 #pragma mark - Color schemes for Fibers
 
@@ -57,7 +63,7 @@ LOCAL gle_color color_seg_curvature(Fiber const& fib, size_t seg)
 
 LOCAL gle_color color_by_direction(Fiber const& fib, size_t seg)
 {
-    return gle::radial_color(fib.dirSegment(seg));
+    return radial_color(fib.dirSegment(seg));
 }
 
 /// using distance from the minus end to the start of segment `seg`
@@ -197,13 +203,13 @@ void bodyColor(T const& obj)
     {
         size_t i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
         gle_color col = gle::bright_color(i);
-        col.load_load();
-        col.darken(0.5).load_back();
+        gym::color_load(col);
+        gym::color_back(col.darken(0.5));
     }
     else
     {
-        disp->color.load_front(1.0);
-        disp->color2.load_back();
+        gym::color_front(disp->color, 1.0);
+        gym::color_back(disp->color2);
     }
 }
 
@@ -217,13 +223,13 @@ LOCAL void bodyColor(PointDisp const* disp, size_t s)
     if ( disp->coloring )
     {
         gle_color col = gle::bright_color(s);
-        col.load_front();
-        col.darken(0.5).load_back();
+        gym::color_front(col);
+        gym::color_back(col.darken(0.5));
     }
     else
     {
-        disp->color.load_front(1.0);
-        disp->color2.load_back();
+        gym::color_front(disp->color, 1.0);
+        gym::color_back(disp->color2);
     }
 }
 

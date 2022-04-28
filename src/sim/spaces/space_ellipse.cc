@@ -222,24 +222,23 @@ void SpaceEllipse::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 #include "point_disp.h"
+#include "gym_view.h"
 
-void SpaceEllipse::draw2D() const
+
+void SpaceEllipse::draw2D(float width) const
 {
     const float X(radius_[0]);
     const float Y((DIM>1)?radius_[1]:1);
     const float Z((DIM>2)?radius_[2]:1);
 
-    glPushMatrix();
-    gle::scale(X, Y, Z);
-    gle::circle();
+    gym::scale(X, Y, Z);
+    gle::circle(width);
     
     if ( prop->disp->visible & 2 )
     {
-        prop->disp->color2.load_load();
+        gym::color(prop->disp->color2);
         gle::disc1();
     }
-
-    glPopMatrix();
 }
 
 
@@ -250,15 +249,13 @@ void SpaceEllipse::draw3D() const
     const float Y(T+((DIM>1)?radius_[1]:1));
     const float Z(T+((DIM>2)?radius_[2]:1));
 
-    glPushMatrix();
-    gle::scale(X, Y, Z);
+    gym::scale(X, Y, Z);
     gle::sphere8();
-    glPopMatrix();
 }
 
 #else
 
-void SpaceEllipse::draw2D() const {}
+void SpaceEllipse::draw2D(float) const {}
 void SpaceEllipse::draw3D() const {}
 
 #endif

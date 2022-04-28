@@ -14,13 +14,13 @@ namespace gym
     void reportErrors(FILE*, const char* msg);
     
     /// print current color properties of OpenGL context
-    void print_color_materials(FILE*);
+    void printColors(FILE*);
     
     /// print some info for debugging purpose
-    void print_caps();
+    void printCaps();
     
     /// print OpenGL matrices for debugging purpose
-    void print_matrices(FILE*);
+    void printMatrices(FILE*);
 
 };
 

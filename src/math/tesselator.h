@@ -160,6 +160,7 @@ public:
     void buildOctahedron(unsigned div, int make = 1);
     void buildIcosahedron(unsigned div, int make = 1);
     void buildIcosahedronRotated(unsigned div, int make = 1);
+    void buildHemisphereOld(unsigned div, int make = 1);
     void buildHemisphere(unsigned div, int make = 1);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
 

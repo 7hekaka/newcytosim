@@ -78,13 +78,13 @@ protected:
     /// array of transparent objects to be displayed last
     Array<zObject> zObjects;
     
-    /// the pixel size for this particular display
+    /// the size covered by one pixel in natural units (ie. micrometers)
     float pixelSize;
     
-    /// the value of the size & width unit in pixels
+    /// number of pixels corresponding to one unit value of the size & width
     float unitValue;
     
-    /// the value of the size & width unit in natural units (ie. micrometers)
+    /// natural distance corresponding to one unit value of the size & width
     float sizeScale;
     
     /// direction of view
@@ -148,23 +148,14 @@ public:
     /// display for periodic systems
     void drawTiled(Simul const&, int nine);
 
-    /// scale from pixel size / line width to natural units
+    /// scale from size / line width to natural units
     float pixscale(float w) const { return w * sizeScale; }
-    
-    /// set OpenGL line width
-    void lineWidth(float w) const { glLineWidth(std::max(w*unitValue, 0.25f)); }
-
-    /// set OpenGL point size
-    void pointSize(float w) const { glPointSize(std::max(w*unitValue, 0.25f)); }
     
     /// draw primitive `obj` at given position
     void drawObject(Vector const& pos, float rad, void (*obj)()) const;
     
     /// draw primitive `obj` at `pos` with Z-axis oriented toward `dir`
     void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)()) const;
-    
-    /// draw primitive `obj` at `pos` with Z-axis oriented toward `dir`
-    void drawFlat(Vector const& pos, float rad, void (*obj)()) const;
     
     /// draw a fine spherical object
     void drawBallT(Vector const&, real radius, gle_color const&) const;
@@ -178,7 +169,7 @@ public:
     void drawFields(FieldSet const&);
     
     /// draw a Space
-    void drawSpace(Space const*, bool);
+    void drawSpace3D(Space const*, bool);
 
     /// draw all Spaces (in 3D the back side)
     void drawSpaces(SpaceSet const&);
@@ -186,9 +177,6 @@ public:
     /// draw the front-side of Spaces in 3D
     void drawTransparentSpaces(SpaceSet const&);
 
-    
-    /// display string of points
-    static void drawStrip(size_t cnt, real const* pts, GLenum);
 
     /// draw thin lines joining the Fiber vertices
     void drawFiberBackbone(Fiber const&) const;
@@ -233,10 +221,10 @@ public:
     virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real width) const;
 
     /// display Labels for a Fiber
-    void         drawFiberLabels(Fiber const&, int style) const;
+    void         drawFiberLabels(Fiber const&, int style, gle_color const&) const;
     
     /// display forces acting on the fiber vertices
-    void         drawFiberForces(Fiber const&, real scale) const;
+    void         drawFiberForces(Fiber const&, real scale, float width) const;
     
     /// draw all features of Fiber
     virtual void drawFiber(Fiber const&);
@@ -245,13 +233,13 @@ public:
     virtual void drawFibers(FiberSet const&);
     
     /// draw the average fiber for the pool defined by func(obj, val) == true
-    void drawAverageFiber(ObjectList const&);
+    void drawAverageFiber(ObjectList const&, gle_color) const;
     
     /// draw the averaged fiber
-    void drawAverageFiber1(FiberSet const&, void const*);
+    void drawAverageFiber1(FiberSet const&, void const*) const;
     
     /// draw the average for left-pointing and right-pointing fibers
-    void drawAverageFiber2(FiberSet const&, void const*);
+    void drawAverageFiber2(FiberSet const&, void const*) const;
 
     
     /// draw a Bead
@@ -291,14 +279,8 @@ public:
     virtual void drawSinglesA(SingleSet const&) const = 0;
     
     /// draw the free Couples, showing Hand1
-    virtual void drawCouplesF1(CoupleSet const&) const = 0;
-    
-    /// draw the free Couples, showing Hand1 or Hand2
-    virtual void drawCouplesF2(CoupleSet const&) const = 0;
-    
-    /// calls drawCouplesF1 or drawCouplesF2
-    void drawCouplesF(CoupleSet const&) const;
-    
+    virtual void drawCouplesF(CoupleSet const&) const = 0;
+
     /// draw the attached Couples
     virtual void drawCouplesA(CoupleSet const&) const = 0;
     

@@ -16,7 +16,7 @@ using glApp::flashText;
 
 
 Player::Player()
-: disp("*"), prop("*"), worker(&simul, glApp::postRedisplay), mDisplay(nullptr)
+: disp("*"), prop("*"), worker(&simul), mDisplay(nullptr)
 {
 }
 

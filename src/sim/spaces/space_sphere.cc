@@ -139,33 +139,30 @@ void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 #include "point_disp.h"
+#include "gym_view.h"
 
-void SpaceSphere::draw2D() const
+void SpaceSphere::draw2D(float width) const
 {
-    glPushMatrix();
-    gle::scale(radius_);
-    gle::circle();
+    gym::scale(radius_);
+    gle::circle(width);
 
     if ( prop->disp->visible & 2 )
     {
-        prop->disp->color2.load_load();
+        gym::color(prop->disp->color2);
         gle::disc1();
     }
-    glPopMatrix();
 }
 
 void SpaceSphere::draw3D() const
 {
-    glPushMatrix();
-    gle::scale(radius_);
+    gym::scale(radius_);
     gle::sphere8();
     gle::threeArrowStrip(0.5, 1);
-    glPopMatrix();
 }
 
 #else
 
-void SpaceSphere::draw2D() const {}
+void SpaceSphere::draw2D(float) const {}
 void SpaceSphere::draw3D() const {}
 
 #endif

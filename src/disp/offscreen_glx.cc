@@ -16,7 +16,7 @@ GLXPbuffer pbuf;
 GLXContext glxContext;
 
 
-int OffScreen::openContext()
+unsigned OffScreen::openContext()
 {
     dpy = XOpenDisplay(0);
     
@@ -43,7 +43,7 @@ int OffScreen::openContext()
 }
 
 
-int OffScreen::createBuffer(const int width, const int height, int)
+unsigned OffScreen::makeBuffer(const int width, const int height, int)
 {
     dpy = XOpenDisplay(0);
     
@@ -116,10 +116,19 @@ int OffScreen::createBuffer(const int width, const int height, int)
         return 0;
     }
     
-    glViewport(0, 0, width, height);
     return 1;
 }
 
+unsigned OffScreen::openBuffer(const int width, const int height, int)
+{
+    unsigned buf = makeBuffer(width, height, 0);
+    glViewport(0, 0, width, height);
+    return buf;
+}
+    
+void OffScreen::bindBuffer(unsigned id)
+{
+}
 
 void OffScreen::releaseBuffer()
 {

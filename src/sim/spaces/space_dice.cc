@@ -310,13 +310,15 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gym_draw.h"
+#include "gym_view.h"
 #include "gym_flute.h"
 #include "tesselator.h"
 
-void SpaceDice::draw2D() const
+void SpaceDice::draw2D(float width) const
 {
     const size_t CNT = 128;
-    drawSection(2, 0, CNT);
+    drawSection(2, 0, CNT, width);
 }
 
 void SpaceDice::draw3D() const
@@ -328,69 +330,68 @@ void SpaceDice::draw3D() const
     Tesselator mesh;
     mesh.buildDice(X, Y, Z, edge_, gle::finesse, 1, 1);
     
+#if 1
     size_t cnt = mesh.num_vertices();
-#if 0
-    fluteD * flu = gym::mapBufferVD(cnt);
-    mesh.store_vertices((float*)flu);
-    gym::unmapBufferVD();
-#else
-    glBindBuffer(GL_ARRAY_BUFFER, gym::nextStream());
-    glBufferData(GL_ARRAY_BUFFER, 3*cnt*sizeof(float), nullptr, GL_STREAM_DRAW);
-    float * flu = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    mesh.store_vertices(flu);
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    glVertexPointer(3, GL_FLOAT, 0, nullptr);
-    glNormalPointer(GL_FLOAT, 0, nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif
-
-#if 0
-    glDisable(GL_LIGHTING);
-    glPointSize(4);
-    glDrawArrays(GL_POINTS, 0, cnt);
-    glEnable(GL_LIGHTING);
-#endif
-
-    // remove the last 12 triangles, corresponding to the faces
+    flute3 * fl3 = gym::mapBufferV3(cnt);
+    mesh.store_vertices((float*)fl3);
+    gym::unmapBufferV3N0();
+    //gym::drawPoints(4, 0, cnt);
+    // do not copy the last 12 triangles, corresponding to the faces drawn below
     size_t tri = 3 * ( mesh.num_faces() - 12 );
-    unsigned* inx = gym::mapIndexBuffer(tri);
+    unsigned short* inx = gym::mapIndexBuffer(tri);
     memcpy(inx, mesh.face_data(), tri*sizeof(Tesselator::INDEX));
     gym::unmapIndexBuffer();
-    
-    glEnableClientState(GL_NORMAL_ARRAY);
+
     assert_true( sizeof(Tesselator::INDEX) == sizeof(unsigned short) );
     glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_SHORT, nullptr);
     glDisableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    
+#endif
+
 #if 1
     // that is just to get the normals right
-    const GLfloat XR(half_[0]);
-    const GLfloat YR(half_[1]);
-    const GLfloat ZR(half_[2]);
-    
-    GLfloat pts[72] = {
-        +XR, Y,-Z, XR, Y, Z, XR,-Y,-Z, XR,-Y, Z,
-        -XR,-Y,-Z,-XR,-Y, Z,-XR, Y,-Z,-XR, Y, Z,
-        +X, YR,-Z,-X, YR,-Z, X, YR, Z,-X, YR, Z,
-        +X,-YR, Z,-X,-YR, Z, X,-YR,-Z,-X,-YR,-Z,
-        +X, Y, ZR,-X, Y, ZR, X,-Y, ZR,-X,-Y, ZR,
-        +X, Y,-ZR, X,-Y,-ZR,-X, Y,-ZR,-X,-Y,-ZR,
-    };
-    glVertexPointer(3, GL_FLOAT, 0, pts);
-    glNormal3f(+1,0,0); glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glNormal3f(-1,0,0); glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
-    glNormal3f(0,+1,0); glDrawArrays(GL_TRIANGLE_STRIP, 8, 4);
-    glNormal3f(0,-1,0); glDrawArrays(GL_TRIANGLE_STRIP,12, 4);
-    glNormal3f(0,0,+1); glDrawArrays(GL_TRIANGLE_STRIP,16, 4);
-    glNormal3f(0,0,-1); glDrawArrays(GL_TRIANGLE_STRIP,20, 4);
+    const float XR(half_[0]);
+    const float YR(half_[1]);
+    const float ZR(half_[2]);
+    flute6* flu = gym::mapBufferV3N3(6*24);
+    flu[0] = {+XR, Y,-Z, +1,0,0};
+    flu[1] = { XR, Y, Z, +1,0,0};
+    flu[2] = { XR,-Y,-Z, +1,0,0};
+    flu[3] = { XR,-Y, Z, +1,0,0};
+    flu[4] = {-XR,-Y,-Z, -1,0,0};
+    flu[5] = {-XR,-Y, Z, -1,0,0};
+    flu[6] = {-XR, Y,-Z, -1,0,0};
+    flu[7] = {-XR, Y, Z, -1,0,0};
+    flu[8] = { X, YR,-Z, 0,+1,0};
+    flu[9] = {-X, YR,-Z, 0,+1,0};
+    flu[10] = { X, YR, Z, 0,+1,0};
+    flu[11] = {-X, YR, Z, 0,+1,0};
+    flu[12] = {+X,-YR, Z, 0,-1,0};
+    flu[13] = {-X,-YR, Z, 0,-1,0};
+    flu[14] = { X,-YR,-Z, 0,-1,0};
+    flu[15] = {-X,-YR,-Z, 0,-1,0};
+    flu[16] = { X, Y, ZR, 0,0,+1};
+    flu[17] = {-X, Y, ZR, 0,0,+1};
+    flu[18] = { X,-Y, ZR, 0,0,+1};
+    flu[19] = {-X,-Y, ZR, 0,0,+1};
+    flu[20] = { X, Y,-ZR, 0,0,-1};
+    flu[21] = { X,-Y,-ZR, 0,0,-1};
+    flu[22] = {-X, Y,-ZR, 0,0,-1};
+    flu[23] = {-X,-Y,-ZR, 0,0,-1};
+    gym::unmapBufferV3N3();
+    gym::drawTriangleStrip( 0, 4);
+    gym::drawTriangleStrip( 4, 4);
+    gym::drawTriangleStrip( 8, 4);
+    gym::drawTriangleStrip(12, 4);
+    gym::drawTriangleStrip(16, 4);
+    gym::drawTriangleStrip(20, 4);
 #endif
 }
 
 #else
 
-void SpaceDice::draw2D() const {}
+void SpaceDice::draw2D(float) const {}
 void SpaceDice::draw3D() const {}
 
 #endif

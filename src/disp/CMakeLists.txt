@@ -2,10 +2,15 @@ set(SOURCES_DISP
     gle.cc
     gym_text.cc
     gym_matrix.cc
+    gym_view.cc
+    gym_draw.cc
     gym_flute.cc
+    gym_flute_dim.cc
     gym_check.cc
     gym_menu.cc
     gym_zoo.cc
+    gym_flat.cc
+    gym_image.cc
     gle_color.cc
     gle_color_list.cc
     view.cc
@@ -17,9 +22,9 @@ set(SOURCES_DISP
     fiber_disp.cc
     line_disp.cc
     point_disp.cc
-    fg_font.c
-    fg_stroke_roman.c
-    fg_stroke_mono_roman.c
+    fg_font.cc
+    fg_stroke.cc
+    miniz.c
     spng.c
     miniz.c
 )

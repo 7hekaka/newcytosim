@@ -211,28 +211,23 @@ void SpaceCylinderP::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gym_view.h"
 
 void SpaceCylinderP::draw3D() const
 {
     const float L(half_);
     const float R(radius_);
 
-    glPushMatrix();
-    gle::stretchAlignZX(-L, L, R);
+    gym::stretchAlignZX(-L, L, R);
     gle::tube1();
-    glPopMatrix();
-
+    float WIDTH = 1;
     if ( 1 )
     {
         // mark the edge of the periodicity with dotted lines
-        glPushMatrix();
-        gle::transAlignZX(-L, R, -1);
-        gle::circle_dotted();
-        glPopMatrix();
-        glPushMatrix();
-        gle::transAlignZX(L, R, -1);
-        gle::circle_dotted();
-        glPopMatrix();
+        gym::transAlignZX(-L, R, -1);
+        gle::circle_dotted(WIDTH);
+        gym::transAlignZX(L, R, -1);
+        gle::circle_dotted(WIDTH);
     }
 }
 

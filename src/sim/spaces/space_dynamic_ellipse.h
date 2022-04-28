@@ -119,7 +119,7 @@ public:
     void draw3D() const;
     
     /// OpenGL display function
-    void draw2D() const { draw3D(); }
+    void draw2D(float) const { draw3D(); }
 
 };
 

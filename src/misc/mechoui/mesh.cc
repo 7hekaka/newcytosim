@@ -5,6 +5,7 @@
 #include "opengl.h"
 #include "mechoui_param.h"
 #include "gle_color_list.h"
+#include "gym_draw.h"
 
 
 Mesh::Mesh()
@@ -185,7 +186,6 @@ static int compareTriangle(const void * A, const void * B)
 void Mesh::draw(MechouiParam const& pam) const
 {
     glEnable(GL_NORMALIZE);
-    glEnableClientState(GL_VERTEX_ARRAY);
     
     //Create one buffer
     if ( buffer == 0 )
@@ -201,9 +201,8 @@ void Mesh::draw(MechouiParam const& pam) const
 
     if ( pam.point_style )
     {
-        glPointSize(pam.point_size);
-        pam.point_color.load();
-        glDrawArrays(GL_POINTS, 0, n_points);
+        gym::color(pam.point_color);
+        gym::drawPoints(pam.point_size, 0, n_points);
     }
     
     /* extract axis corresponding to vertical direction,
@@ -306,6 +305,7 @@ unsigned Mesh::pick() const
     const GLsizei buf_size = 1024;
     GLuint buf[buf_size] = { 0 };
 
+    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, points);
 

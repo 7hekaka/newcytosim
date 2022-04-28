@@ -178,16 +178,15 @@ void SpaceRing::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gym_view.h"
 
 void SpaceRing::draw3D() const
 {
     const float L(half_);
     const float R(radius_);
 
-    glPushMatrix();
-    gle::stretchAlignZX(-L, L, R);
+    gym::stretchAlignZX(-L, L, R);
     gle::tube1();
-    glPopMatrix();
 }
 
 #else

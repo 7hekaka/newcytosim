@@ -1,9 +1,13 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "gle.h"
+#include "gle_color.h"
 #include "glut.h"
 #include "glapp.h"
+#include "gym_check.h"
 #include "gym_flute.h"
+#include "gym_text.h"
+#include "gym_draw.h"
 #include "tesselator.h"
 #include <cstdio>
 
@@ -19,7 +23,19 @@ bool showFaces = true;
 
 Tesselator * ico = nullptr;
 
+GLint cull_test = true;
+
 GLuint buffers[2] = { 0 };
+
+void flip_cap(GLenum cap)
+{
+    GLint i = glIsEnabled(cap);
+    if ( i )
+        glDisable(cap);
+    else
+        glEnable(cap);
+    gym::printCaps();
+}
 
 //------------------------------------------------------------------------------
 void initVBO();
@@ -80,7 +96,7 @@ void exportSTL()
 //------------------------------------------------------------------------------
 void drawPlane()
 {
-    glColor3f(0.25f, 0.25f, 0.25f);
+    glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
     GLfloat pts[8] = {1, 1,-1, 1, 1,-1,-1,-1};
     glVertexPointer(2, GL_FLOAT, 0, pts);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -89,6 +105,7 @@ void drawPlane()
 
 void drawFacesArray()
 {
+    glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
     glNormalPointer(GL_FLOAT, 0, ico->vertex_data());
@@ -125,6 +142,7 @@ void initVBO()
 void drawFacesVBO()
 {
     glEnableClientState(GL_NORMAL_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
@@ -140,19 +158,11 @@ void drawFacesVBO()
 }
 
 
-void drawFaces()
-{
-    if ( style == 1 )
-        drawFacesArray();
-    else
-        drawFacesVBO();
-}
-
 void drawEdges()
 {
 #if 0
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    drawFaces();
+    drawFacesArray();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #else
     if ( ico->num_edges() == 0 )
@@ -164,40 +174,41 @@ void drawEdges()
 
 void drawNames()
 {
-    char tmp[128];
+    char str[128];
     for ( unsigned i=0; i < ico->num_vertices(); ++i )
     {
         Tesselator::Vertex & dv = ico->vertex(i);
-        if ( dv.weight(2) == 0  &&  dv.weight(1) == 0 )
-            glColor3f(1.f, 1.f, 1.f);
-        else if ( dv.weight(2) == 0 )
-            glColor3f(0.f, 1.f, 0.f);
-        else
-            glColor3f(.5f, .5f, .5f);
+        float col[4] = {1.f, 1.f, 1.f, 1.f};
+        if ( dv.weight(2) == 0 )
+            col[2] = 0;
+        if ( dv.weight(1) == 0 )
+            col[1] = 0;
         
         const float* v = ico->vertex_data(i);
         Vector3 pos(v[0], v[1], v[2]);
-        snprintf(tmp, sizeof(tmp), "%u", i);
-        gym::drawText(pos, BITMAP_8_BY_13, tmp, 0.5);
+        snprintf(str, sizeof(str), "%u", i);
+        gym::drawText(pos, BITMAP_8_BY_13, col, str, 0.5);
     }
 }
 
 void drawPoints()
 {
-    glPointSize(10);
     glColor3f(1, 1, 1);
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glVertexPointer(3, GL_FLOAT, 0, nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDrawArrays(GL_POINTS, 0, ico->num_vertices());
+    gym::drawPoints(10, 0, ico->num_vertices());
 }
 
-void display(View& view, int)
+int display(View& view)
 {
     view.openDisplay();
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    
+    glShadeModel(GL_FLAT);
+    GLfloat blue[4] = { 0, 0, 1, 1 };
+    GLfloat pink[4] = { 1.0, 0.0, 0.7, 1 };
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+    glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, pink);
+
     if ( 0 )
     {
         glLineWidth(1);
@@ -205,27 +216,28 @@ void display(View& view, int)
         //glPolygonMode(GL_FRONT, GL_LINE);
         glColor4f(0, 1, 1, 0.5f);
         glEnable(GL_LIGHTING);
-        //glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
         //gle::sphere1();
         gle::needle();
-        glDisable(GL_CULL_FACE);
         glDisable(GL_LIGHTING);
-        return;
+        return 0;
     }
 
+    glDepthMask(GL_TRUE);
     if ( showPlane )
     {
-        glEnable(GL_LIGHTING);
+        glDisable(GL_LIGHTING);
         drawPlane();
     }
     if ( showFaces )
     {
-        glColor3f(0, 0, 0.75f);
         glEnable(GL_LIGHTING);
-        glEnable(GL_CULL_FACE);
+        if ( cull_test )
+            glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
-        drawFaces();
+        if ( style == 1 )
+            drawFacesArray();
+        else
+            drawFacesVBO();
         glDisable(GL_CULL_FACE);
     }
     if ( showEdges )
@@ -246,6 +258,7 @@ void display(View& view, int)
         drawNames();
     }
     view.closeDisplay();
+    return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -259,6 +272,7 @@ void processNormalKey(unsigned char c, int x, int y)
         case 'i': kind = Tesselator::ICOSAHEDRON; reset(); break;
         case 'o': kind = Tesselator::OCTAHEDRON; reset(); break;
         case 'd': kind = Tesselator::DICE; reset(); break;
+        case 'h': kind = Tesselator::HEMISPHERE; reset(); break;
         case ']': rank += 1; reset(); break;
         case '}': rank += 16; reset(); break;
         case '[': rank = std::max(rank-1, 1); reset(); break;
@@ -270,6 +284,9 @@ void processNormalKey(unsigned char c, int x, int y)
         case 'n': showNames = !showNames; break;
         case 'p': showPoints = !showPoints; break;
         case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
+        case 't': flip_cap(GL_DEPTH_TEST); break;
+        case 'v': showPlane = !showPlane; break;
+        case 'c': cull_test = !cull_test; break;
         default: glApp::processNormalKey(c,x,y); return;
     }
     glApp::postRedisplay();
@@ -287,6 +304,5 @@ int main(int argc, char* argv[])
     glApp::setScale(3);
     gle::initialize();
     reset();
-    glEnableClientState(GL_VERTEX_ARRAY);
     glutMainLoop();
 }

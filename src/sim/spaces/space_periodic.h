@@ -66,10 +66,10 @@ public:
     
     
     /// OpenGL display function
-    void draw3D() const;
-    
+    void draw2D(float) const;
+
     /// OpenGL display function
-    void draw2D() const { draw3D(); }
+    void draw3D() const;
 };
 
 #endif

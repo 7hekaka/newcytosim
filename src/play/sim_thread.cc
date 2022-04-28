@@ -12,12 +12,13 @@
 /**
  This uses a Parser that cannot write to disc.
  */
-SimThread::SimThread(Simul* sim, void (*callback)(void))
-: Parser(sim, 1, 1, 1, 1, 0), hold_callback(callback)
+SimThread::SimThread(Simul* sim)
+: Parser(sim, 1, 1, 1, 1, 0)
 {
     alone_  = 1;
     flag_   = 0;
     hold_   = 0;
+    holding_= 0;
     period_ = 1;
     pthread_mutex_init(&mutex_, nullptr);
     pthread_cond_init(&condition_, nullptr);
@@ -69,11 +70,10 @@ void SimThread::hold()
     if ( ++hold_ >= period_ )
     {
         hold_ = 0;
+        holding_ = 1;
         //debug("holding");
-        hold_callback();
-        if ( flag_ )
-            pthread_exit(nullptr);
         cond_wait();  // this also unlocks and locks the mutex
+        holding_ = 0;
     }
 }
 
@@ -93,7 +93,6 @@ void SimThread::run()
         std::cerr << e.brief() << e.info() << '\n';
         //flashText("Error: the simulation died");
     }
-    hold_callback();
 }
 
 
@@ -154,7 +153,6 @@ void SimThread::extend_run(size_t n_steps)
         //flashText("Error: %s", e.what());
     }
     sim_->parser(nullptr);
-    hold_callback();
 }
 
 

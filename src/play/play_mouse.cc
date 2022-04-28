@@ -71,6 +71,12 @@ void timerCallback(const int value)
     if ( prop.goLive && worker.alive() )
     {
         //worker.debug("timerCallback");
+        if ( worker.holding() )
+        {
+            /* if the worker is on 'hold', the simulation data was renewed,
+             and it should, available to display */
+            glApp::displayMain();
+        }
         worker.signal();
     }
     else

@@ -484,103 +484,96 @@ void Field::step(FiberSet& fibers)
 
 #include "gle.h"
 #include "grid_display.h"
+#include "gym_view.h"
 
-    class FieldDisplayParameters
+class FieldDisplayParameters
+{
+public:
+    FieldDisplayParameters()
     {
-    public:
-        FieldDisplayParameters()
-        {
-            amp = 0;
-            spc = nullptr;
-        }
-        
-        /// amplification for color
-        real amp;
-        
-        /// Space for cropping
-        Space const* spc;
-    };
-    
-    
-    // set color for scalar field
-    static gle_color field_color(FieldDisplayParameters fdp, FieldScalar const& cell, Vector const& pos)
-    {
-        if ( fdp.spc && ! fdp.spc->inside(pos) )
-            return gle_color(0, 0, 0);
-        gle_color::COLOF x(fdp.amp * cell.val);
-        if ( x > 0 )
-            return gle_color::jet_color_dark(x, 1.0);
-        return gle_color(-x, 0, -x);
-    }
-
-
-    /// set color for Vector field
-    template < size_t N >
-    static gle_color field_color(FieldDisplayParameters fdp, FieldVector<N> const& cell, Vector const& pos)
-    {
-        if ( fdp.spc && ! fdp.spc->inside(pos) )
-            return gle_color(0, 0, 0);
-        //this maps val[0] to the red channel, val[1] to green and val[2] to blue
-        gle_color::COLOF rgb[3] = { 0, 0, 0 };
-        const int sup = std::min(3UL, N);
-        for ( int c = 0; c < sup; ++c )
-            rgb[c] = fdp.amp * cell[c];
-        return gle_color(rgb[0], rgb[1], rgb[2]);
+        amp = 0;
+        spc = nullptr;
     }
     
-    /// display all cells
-    void Field::draw() const
-    {
-        FieldDisplayParameters fdp;
-        fdp.amp = 1.0 / ( prop->display_scale * mGrid.cellVolume() );
-        fdp.spc = nullptr;
-        
-        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
-        GLboolean cullf = glIsEnabled(GL_CULL_FACE);
-        GLboolean light = glIsEnabled(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_LIGHTING);
+    /// amplification for color
+    real amp;
+    
+    /// Space for cropping
+    Space const* spc;
+};
+
+
+// set color for scalar field
+static gle_color field_color(FieldDisplayParameters fdp, FieldScalar const& cell, Vector const& pos)
+{
+    if ( fdp.spc && ! fdp.spc->inside(pos) )
+        return gle_color(0, 0, 0);
+    gle_color::COLOF x(fdp.amp * cell.val);
+    if ( x > 0 )
+        return gle_color::jet_color_dark(x, 1.0);
+    return gle_color(-x, 0, -x);
+}
+
+
+/// set color for Vector field
+template < size_t N >
+static gle_color field_color(FieldDisplayParameters fdp, FieldVector<N> const& cell, Vector const& pos)
+{
+    if ( fdp.spc && ! fdp.spc->inside(pos) )
+        return gle_color(0, 0, 0);
+    //this maps val[0] to the red channel, val[1] to green and val[2] to blue
+    gle_color::COLOF rgb[3] = { 0, 0, 0 };
+    const int sup = std::min(3UL, N);
+    for ( int c = 0; c < sup; ++c )
+        rgb[c] = fdp.amp * cell[c];
+    return gle_color(rgb[0], rgb[1], rgb[2]);
+}
+
+
+/// display all cells
+void Field::draw() const
+{
+    FieldDisplayParameters fdp;
+    fdp.amp = 1.0 / ( prop->display_scale * mGrid.cellVolume() );
+    fdp.spc = nullptr;
+    
+    gym::disableDepthTest();
+    gym::disableCullFace();
+    gym::disableLighting();
+    gym::ref_view();
 #if ( DIM <= 3 )
-        drawValues(mGrid, field_color, fdp);
+    drawValues(mGrid, field_color, fdp);
 #endif
 #if ( 0 )
-        // draw edges of cells
-        glColor4f(1, 0, 1, 1);
-        glLineWidth(0.5);
-        drawBoundaries(mGrid);
+    float col[] = {1,0,0,1};
+    drawBoundaries(mGrid, col, 0.5f);
 #endif
-        if ( depth ) glEnable(GL_DEPTH_TEST);
-        if ( cullf ) glEnable(GL_CULL_FACE);
-        if ( light ) glEnable(GL_LIGHTING);
-    }
+    gym::restoreDepthTest();
+    gym::restoreCullFace();
+    gym::restoreLighting();
+}
+
+
+/// display only cells that are inside `spc`
+void Field::draw(Space const* spc, Vector3 const& dir, const real pos) const
+{
+    FieldDisplayParameters fdp;
+    fdp.amp = 1.0 / ( prop->display_scale * mGrid.cellVolume() );
+    fdp.spc = spc;
     
-    
-    /// display only cells that are inside `spc`
-    void Field::draw(Space const* spc, Vector3 const& dir, const real pos) const
-    {
-        FieldDisplayParameters fdp;
-        fdp.amp = 1.0 / ( prop->display_scale * mGrid.cellVolume() );
-        fdp.spc = spc;
-        
-        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
-        GLboolean cullf = glIsEnabled(GL_CULL_FACE);
-        GLboolean light = glIsEnabled(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        glDisable(GL_LIGHTING);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        //glLineWidth(1);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    gym::disableDepthTest();
+    gym::disableCullFace();
+    gym::disableLighting();
+    gym::ref_view();
 #if ( DIM == 3 )
-        drawValues(mGrid, field_color, fdp, dir, pos);
+    drawValues(mGrid, field_color, fdp, dir, pos);
 #elif ( DIM <= 2 )
-        drawValues(mGrid, field_color, fdp);
+    drawValues(mGrid, field_color, fdp);
 #endif
-        if ( depth ) glEnable(GL_DEPTH_TEST);
-        if ( cullf ) glEnable(GL_CULL_FACE);
-        if ( light ) glEnable(GL_LIGHTING);
-    }
+    gym::restoreDepthTest();
+    gym::restoreCullFace();
+    gym::restoreLighting();
+}
 
 #else
 

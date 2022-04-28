@@ -6,9 +6,11 @@
 #include "modulo.h"
 
 #include "gle.h"
+#include "gle_color.h"
 #include "gle_color_list.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 #include "gym_check.h"
-#include "glut.h"
 
 #include "fake.h"
 #include "fiber_disp.h"
@@ -17,7 +19,7 @@
 #include "display_color.cc"
 
 /// Cliping planes permit nice junctions to be made between tubes, but are slow
-#define USE_CLIP_PLANES 0
+#define USE_CLIP_PLANES 1
 
 extern Modulo const* modulo;
 
@@ -38,17 +40,17 @@ Display3::Display3(DisplayProp const* dp) : Display(dp)
 
 void Display3::drawObjects(Simul const& sim)
 {
-    glDepthMask(GL_FALSE);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
+    gym::closeDepthMask();
+    gym::disableLighting();
+    gym::disableCullFace();
     drawFields(sim.fields);
     
-    glEnable(GL_LIGHTING);
-    glEnable(GL_CULL_FACE);
-    glDepthMask(GL_TRUE);
+    gym::enableLighting();
+    gym::enableCullFace(GL_BACK);
+    gym::openDepthMask();
     drawSpaces(sim.spaces);
     
-    glDisable(GL_CULL_FACE);
+    gym::disableCullFace();
 
     if ( stencil_ )
     {
@@ -63,12 +65,11 @@ void Display3::drawObjects(Simul const& sim)
         glStencilFunc(GL_EQUAL, 0, ~0);
         
         // set Stencil to 1 for inner surfaces of fibers:
-        glEnable(GL_CULL_FACE);
+        gym::enableCullFace(GL_FRONT);
         //drawFibers(sim.fibers);
         FiberSet const& set = sim.fibers;
         // display the Fiber always in the same order:
         // set Stencil to 0 for outer surfaces:
-        glCullFace(GL_FRONT);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         GLint val = 0;
         for( Fiber const* fib = set.firstID(); fib; fib=set.nextID(fib) )
@@ -80,7 +81,7 @@ void Display3::drawObjects(Simul const& sim)
             }
         }
         // set Stencil to 0 for outer surfaces:
-        glCullFace(GL_BACK);
+        gym::switchCullFace(GL_BACK);
         glStencilOp(GL_KEEP, GL_KEEP, GL_ZERO);
         val = 0;
         for( Fiber const* fib = set.firstID(); fib; fib=set.nextID(fib) )
@@ -101,21 +102,18 @@ void Display3::drawObjects(Simul const& sim)
          If the display is 'cut', we might see the inner sides,
          but rendering would be faster with Culling enabled
         */
-        //glEnable(GL_CULL_FACE);
-        //glCullFace(GL_BACK);
+        // gym::enableCullFace(GL_BACK);
         drawFibers(sim.fibers);
     }
     
-    glEnable(GL_LIGHTING);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    //gym::bindBuffer();
+    gym::enableLighting();
+    gym::enableCullFace(GL_BACK);
 
     drawBeads(sim.beads);
     drawSolids(sim.solids);
     drawSpheres(sim.spheres);
     
-    glEnable(GL_LIGHTING);
+    gym::enableLighting();
 
     if (( prop->single_select & 1 ) && ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
@@ -132,8 +130,6 @@ void Display3::drawObjects(Simul const& sim)
     if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
 
-    //gle::unbindBuffer();
-
     if ( stencil_ )
     {
         glClearStencil(0);
@@ -141,7 +137,7 @@ void Display3::drawObjects(Simul const& sim)
     }
 
     drawOrganizers(sim.organizers);
-    glDisable(GL_CULL_FACE);
+    gym::disableCullFace();
     drawMisc(sim);
 }
 
@@ -179,7 +175,7 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
     if ( dis->perceptible )
     {
         assert_enabled(GL_LIGHTING);
-        dis->color.load_both();
+        gym::color_both(dis->color);
         drawObject(pos, pixscale(dis->size), gle::blob);
     }
 }
@@ -190,7 +186,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
     if ( dis->perceptible )
     {
         assert_enabled(GL_LIGHTING);
-        dis->color2.load_both();
+        gym::color_both(dis->color2);
         drawObject(pos, pixscale(dis->size), gle::blob);
     }
 }
@@ -199,57 +195,56 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 //------------------------------------------------------------------------------
 #pragma mark - Nicely Joined Fiber Rendering using clipping planes
 
-#if USE_CLIP_PLANES
 /**
 This draws the model-segments, using function `select_color` to set display colors
 */
-void Display3::drawFiberSegments(Fiber const& fib, real rad,
-                                 gle_color (*select_color)(Fiber const&, size_t)) const
+void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
+                                     gle_color (*select_color)(Fiber const&, size_t)) const
 {
     const size_t last = fib.lastSegment();
     Vector old = fib.posPoint(0);
     Vector pos = fib.posPoint(1);
     Vector nxt;
     Vector dir = (pos-old) / fib.segmentation();
-    select_color(fib, 0).load_front();
+    gym::color_front(select_color(fib, 0));
 
     if ( last > 0 )
     {
         nxt = fib.posPoint(2);
-        glEnable(GL_CLIP_PLANE4);
-        gle::setClipPlane(GL_CLIP_PLANE4, -dir, nxt);
-        drawTube(old, rad, pos, gle::capedTube2);
-        gle::setClipPlane(GL_CLIP_PLANE4, dir, pos);
+        gym::enableClipPlane(4);
+        gym::setClipPlane(4, -dir, nxt);
+        gle::drawTube(old, rad, pos, gle::capedTube2);
+        gym::setClipPlane(4, dir, pos);
         
         // draw inner segments
-        glEnable(GL_CLIP_PLANE5);
+        gym::enableClipPlane(5);
         for ( size_t i = 1; i < last; ++i )
         {
             old = pos;
             pos = nxt;
             nxt = fib.posPoint(i+2);
             dir = normalize(nxt-old);
-            select_color(fib, i).load_front();
-            gle::setClipPlane(GL_CLIP_PLANE5, -dir, pos);
-            drawTube(old, rad, pos, gle::longTube2);
-            gle::setClipPlane(GL_CLIP_PLANE4,  dir, pos);
+            gym::color_front(select_color(fib, i));
+            gym::setClipPlane(5, -dir, pos);
+            gle::drawTube(old, rad, pos, gle::longTube2);
+            gym::setClipPlane(4,  dir, pos);
         }
-        glDisable(GL_CLIP_PLANE5);
+        gym::disableClipPlane(5);
     }
     else
     {
         nxt = pos;
         pos = old;
         old = 0.5 * ( nxt + pos );
-        glEnable(GL_CLIP_PLANE4);
-        gle::setClipPlane(GL_CLIP_PLANE4, -dir, old);
-        drawTube(pos, rad, nxt, gle::capedTube2);
-        gle::setClipPlane(GL_CLIP_PLANE4, dir, old);
+        gym::enableClipPlane(4);
+        gym::setClipPlane(4, -dir, old);
+        gle::drawTube(pos, rad, nxt, gle::capedTube2);
+        gym::setClipPlane(4, dir, old);
     }
     // draw last segment:
-    select_color(fib, last).load_front();
-    drawTube(nxt, rad, pos, gle::endedTube2);
-    glDisable(GL_CLIP_PLANE4);
+    gym::color_front(select_color(fib, last));
+    gle::drawTube(nxt, rad, pos, gle::endedTube2);
+    gym::disableClipPlane(4);
 }
 
 
@@ -258,30 +253,30 @@ This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is relative to the MINUS_END.
 The function `set_color` is called to set the color of the segments.
 */
-void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
-                                    long inx, const long last,
-                                    real abs, const real inc,
-                                    gle_color (*select_color)(Fiber const&, long, real),
-                                    real fac, real facM, real facP) const
+void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
+                                     long inx, const long last,
+                                     real abs, const real inc,
+                                     gle_color (*select_color)(Fiber const&, long, real),
+                                     real fac, real facM, real facP) const
 {
     Vector old = fib.displayPosM(abs);
     Vector pos = fib.displayPosM(abs+inc);
     Vector nxt = fib.displayPosM(abs+inc*2);
     Vector dir = normalize(nxt-pos);
     
-    select_color(fib, inx++, facM).load_front();
-    glEnable(GL_CLIP_PLANE4);
-    gle::setClipPlane(GL_CLIP_PLANE4, -dir, pos);
+    gym::color_front(select_color(fib, inx++, facM));
+    gym::enableClipPlane(4);
+    gym::setClipPlane(4, -dir, pos);
     if ( abs <= 0 )
-        drawTube(old, rad, pos, gle::capedTube2);
+        gle::drawTube(old, rad, pos, gle::capedTube2);
     else
-        drawTube(old, rad, pos, gle::halfTube2);
-    gle::setClipPlane(GL_CLIP_PLANE4, dir, pos);
+        gle::drawTube(old, rad, pos, gle::halfTube2);
+    gym::setClipPlane(4, dir, pos);
     
     // keep abs to match to the end of the section already drawn
     abs += inc;
 
-    glEnable(GL_CLIP_PLANE5);
+    gym::enableClipPlane(5);
     // draw segments
     while ( inx < last )
     {
@@ -290,31 +285,28 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         pos = nxt;
         nxt = fib.displayPosM(abs+inc);
         dir = normalize(nxt-old);
-        select_color(fib, inx++, fac).load_front();
-        gle::setClipPlane(GL_CLIP_PLANE5, -dir, pos);
+        gym::color_front(select_color(fib, inx++, fac));
+        gym::setClipPlane(5, -dir, pos);
         // could add a disc to close the tube: gle::endedTube2
-        drawTube(old, rad, pos, gle::longTube2);
-        gle::setClipPlane(GL_CLIP_PLANE4, dir, pos);
+        gle::drawTube(old, rad, pos, gle::longTube2);
+        gym::setClipPlane(4, dir, pos);
     }
-    glDisable(GL_CLIP_PLANE5);
+    gym::disableClipPlane(5);
 
     // draw last segment, which may be truncated:
-    select_color(fib, last, facP).load_front();
+    gym::color_front(select_color(fib, last, facP));
     if ( abs+inc >= fib.length() )
     {
-        glPushMatrix();
-        gle::stretchAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
+        gym::stretchAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
         gle::endedTube2();
-        glPopMatrix();
     }
     else
     {
-        drawTube(nxt, rad, pos, gle::halfTube2);
+        gle::drawTube(nxt, rad, pos, gle::halfTube2);
     }
-    glDisable(GL_CLIP_PLANE4);
+    gym::disableClipPlane(4);
 }
 
-#else
 
 //------------------------------------------------------------------------------
 #pragma mark - draw Fibers using longer tubes to fill the gaps at the junctions
@@ -322,46 +314,39 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
 /**
 This draws the model-segments, using function `select_color` to set display colors
 */
-void Display3::drawFiberSegments(Fiber const& fib, real rad,
-                                 gle_color (*select_color)(Fiber const&, size_t)) const
+void Display3::drawFiberSegmentsJoin(Fiber const& fib, real rad,
+                                     gle_color (*select_color)(Fiber const&, size_t)) const
 {
     const size_t last = fib.lastSegment();
     Vector pos = fib.posPoint(0);
     Vector nxt = fib.posPoint(1);
     
-    select_color(fib, 0).load_front();
-    glPushMatrix();
-    gle::transAlignZ(pos, rad, nxt-pos);
+    gym::color_front(select_color(fib, 0));
+    gym::transAlignZ(pos, rad, nxt-pos);
     gle::hemisphere4();
-    glScalef(1, 1, fib.segmentation()/rad);
+    gym::scale(1, 1, fib.segmentation()/rad);
     if ( last == 0 )
     {
         gle::tube4();
         gle::discTop2();
-        glPopMatrix();
         return;
     }
     gle::tubeS();
-    glPopMatrix();
 
     for ( size_t i = 1; i < last; ++i )
     {
         pos = nxt;
         nxt = fib.posPoint(i+1);
-        select_color(fib, i).load_front();
-        glPushMatrix();
-        gle::stretchAlignZ(pos, nxt, rad);
+        gym::color_front(select_color(fib, i));
+        gym::stretchAlignZ(pos, nxt, rad);
         gle::tubeM();
-        glPopMatrix();
     }
-    glPushMatrix();
     pos = nxt;
     nxt = fib.posPoint(last+1);
-    select_color(fib, last).load_front();
-    gle::stretchAlignZ(pos, nxt, rad);
+    gym::color_front(select_color(fib, last));
+    gym::stretchAlignZ(pos, nxt, rad);
     gle::tubeE();
     gle::discTop2();
-    glPopMatrix();
 }
 
 
@@ -370,38 +355,35 @@ This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is relative to the MINUS_END.
 The function `set_color` is called to set the color of the segments.
 */
-void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
-                                    long inx, const long last,
-                                    real abs, const real inc,
-                                    gle_color (*select_color)(Fiber const&, long, real),
-                                    real fac, real facM, real facP) const
+void Display3::drawFiberSectionsJoin(Fiber const& fib, real rad,
+                                     long inx, const long last,
+                                     real abs, const real inc,
+                                     gle_color (*select_color)(Fiber const&, long, real),
+                                     real fac, real facM, real facP) const
 {
     Vector pos = fib.displayPosM(abs);
     Vector nxt = fib.displayPosM(abs+inc);
     
-    select_color(fib, inx++, facM).load_front();
-    glPushMatrix();
+    gym::color_front(select_color(fib, inx++, facM));
     if ( abs <= 0 )
     {
         real len = (nxt-pos).norm();
-        gle::stretchAlignZ1(pos, rad, (nxt-pos)/len, rad);
+        gym::stretchAlignZ1(pos, rad, (nxt-pos)/len, rad);
         gle::hemisphere4();
-        glScalef(1, 1, len/rad);
+        gym::scale(1, 1, len/rad);
     }
     else
     {
-        gle::stretchAlignZ(pos, nxt, rad);
+        gym::stretchAlignZ(pos, nxt, rad);
     }
     if ( last == inx )
     {
         gle::tube4();
         gle::discTop2();
-        glPopMatrix();
         return;
     }
     gle::tubeS();
-    glPopMatrix();
-    
+
     // keep abs to match to the end of the section already drawn
     abs += inc;
     
@@ -410,32 +392,34 @@ void Display3::drawFiberSubSegments(Fiber const& fib, real rad,
         abs += inc;
         pos = nxt;
         nxt = fib.displayPosM(abs);
-        select_color(fib, inx++, fac).load_front();
-        glPushMatrix();
-        gle::stretchAlignZ(pos, nxt, rad);
+        gym::color_front(select_color(fib, inx++, fac));
+        gym::stretchAlignZ(pos, nxt, rad);
         gle::tubeM();
-        glPopMatrix();
     }
     // draw last segment, which may be truncated:
-    select_color(fib, last, facP).load_front();
-    glPushMatrix();
+    gym::color_front(select_color(fib, last, facP));
     if ( abs+inc >= fib.length() )
     {
-        gle::stretchAlignZ1(nxt, rad, fib.dirEndP(), fib.length()-abs);
+        gym::stretchAlignZ1(nxt, rad, fib.dirEndP(), fib.length()-abs);
         gle::discTop2();
     }
     else
     {
-        gle::stretchAlignZ(nxt, fib.displayPosM(abs+inc), rad);
+        gym::stretchAlignZ(nxt, fib.displayPosM(abs+inc), rad);
     }
     gle::tubeE();
-    glPopMatrix();
 }
-
-#endif
 
 //------------------------------------------------------------------------------
 #pragma mark -
+
+#if USE_CLIP_PLANES
+#  define drawFiberSegments drawFiberSegmentsClip
+#  define drawFiberSections drawFiberSectionsClip
+#else
+#  define drawFiberSegments drawFiberSegmentsJoin
+#  define drawFiberSections drawFiberSectionsJoin
+#endif
 
 void Display3::drawFiberLines(Fiber const& fib, int style) const
 {
@@ -444,10 +428,10 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
 
     // set back color:
     if ( disp->coloring )
-        fib.disp->color.load_back();
+        gym::color_back(fib.disp->color);
     else
-        disp->back_color.load_back();
-    glEnable(GL_LIGHTING);
+        gym::color_back(disp->back_color);
+    gym::enableLighting();
     
     switch ( style )
     {
@@ -469,19 +453,17 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
         case 6: {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
-            GLboolean cull = glIsEnabled(GL_CULL_FACE);
-            glEnable(GL_CULL_FACE);
+            gym::disableCullFace();
             drawFiberSegments(fib, rad, color_by_abscissaM);
-            if ( !cull ) glDisable(GL_CULL_FACE);
+            gym::restoreCullFace();
         } break;
         case 7: {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
-            GLboolean cull = glIsEnabled(GL_CULL_FACE);
-            glEnable(GL_CULL_FACE);
-            glCullFace(GL_BACK);
+            gym::enableCullFace(GL_BACK);
             drawFiberSegments(fib, rad, color_by_abscissaP);
-            if ( !cull ) glDisable(GL_CULL_FACE);
+            gym::restoreCullFace();
+
         } break;
         case 8:
             drawFiberSegments(fib, rad, color_by_height);
@@ -503,22 +485,21 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     Vector A = fib.posP(inx);
     Vector B = fib.posP(inx+1);
 
-    glEnable(GL_LIGHTING);
+    gym::enableLighting();
     /* Either CULL_FACE should be enable to hide the back side,
      or every primitive should be renderred with a double pass*/
-    GLboolean cull = glIsEnabled(GL_CULL_FACE);
-    glEnable(GL_CULL_FACE);
-    
+    gym::enableCullFace(GL_BACK);
+
     if ( disp->line_style == 6 )
-        color_by_abscissaM(fib, inx).load_front();
+        gym::color_front(color_by_abscissaM(fib, inx));
     else if ( disp->line_style == 7 )
-        color_by_abscissaP(fib, inx).load_front();
+        gym::color_front(color_by_abscissaP(fib, inx));
     else if ( disp->line_style == 2 )
-        color_by_tension(fib, inx).load_front();
+        gym::color_front(color_by_tension(fib, inx));
     else if ( disp->line_style == 3 )
-        color_by_tension_jet(fib, inx).load_front();
+        gym::color_front(color_by_tension_jet(fib, inx));
     else
-        fib.disp->color.load_front();
+        gym::color_front(fib.disp->color);
     
     // truncate terminal segment according to length_scale
     if ( inx == 0 && disp->line_style == 6 )
@@ -545,56 +526,54 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 #if USE_CLIP_PLANES
     if ( inx == 0 )
     {
-        glEnable(GL_CLIP_PLANE5);
+        gym::enableClipPlane(5);
         if ( inx == fib.lastSegment() )
         {
-            gle::setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, (A+B)*0.5);
-            drawTube(A, rad, B, gle::capedTube2);
-            gle::setClipPlane(GL_CLIP_PLANE5, (B-A)*iseg, (A+B)*0.5);
-            drawTube(B, rad, A, gle::endedTube2);
+            gym::setClipPlane(5, (A-B)*iseg, (A+B)*0.5);
+            gle::drawTube(A, rad, B, gle::capedTube2);
+            gym::setClipPlane(5, (B-A)*iseg, (A+B)*0.5);
+            gle::drawTube(B, rad, A, gle::endedTube2);
         }
         else
         {
-            gle::setClipPlane(GL_CLIP_PLANE5, (A-B)*iseg, B);
-            drawTube(A, rad, B, gle::capedTube2);
+            gym::setClipPlane(5, (A-B)*iseg, B);
+            gle::drawTube(A, rad, B, gle::capedTube2);
         }
-        glDisable(GL_CLIP_PLANE5);
+        gym::disableClipPlane(5);
         return;
     }
     else
     {
-        gle::setClipPlane(GL_CLIP_PLANE5, normalize(B-fib.posP(inx-1)), A);
+        gym::setClipPlane(5, normalize(B-fib.posP(inx-1)), A);
     }
     
     if ( inx == fib.lastSegment() )
     {
-        glEnable(GL_CLIP_PLANE4);
-        gle::setClipPlane(GL_CLIP_PLANE4, (B-A)*iseg, A);
-        drawTube(B, rad, A, gle::endedTube2);
-        glDisable(GL_CLIP_PLANE4);
+        gym::enableClipPlane(4);
+        gym::setClipPlane(4, (B-A)*iseg, A);
+        gle::drawTube(B, rad, A, gle::endedTube2);
+        gym::disableClipPlane(4);
         return;
     }
     else
     {
-        gle::setClipPlane(GL_CLIP_PLANE4, normalize(A-fib.posP(inx+2)), B);
+        gym::setClipPlane(4, normalize(A-fib.posP(inx+2)), B);
     }
     
-    glEnable(GL_CLIP_PLANE5);
-    glEnable(GL_CLIP_PLANE4);
-    drawTube(A, rad, B, gle::longTube2);
-    glDisable(GL_CLIP_PLANE4);
-    glDisable(GL_CLIP_PLANE5);
+    gym::enableClipPlane(5);
+    gym::enableClipPlane(4);
+    gle::drawTube(A, rad, B, gle::longTube2);
+    gym::disableClipPlane(4);
+    gym::disableClipPlane(5);
 #else
-    glPushMatrix();
-    gle::stretchAlignZ(A, B, rad);
+    gym::stretchAlignZ(A, B, rad);
     gle::tube4();
     if ( inx == 0 )
         gle::hemisphere4();
     if ( inx == fib.lastSegment() )
         gle::discTop2();
-    glPopMatrix();
 #endif
-    if ( !cull ) glDisable(GL_CULL_FACE);
+    gym::restoreCullFace();
 }
 
 
@@ -607,7 +586,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
 {
     FiberDisp const*const disp = fib.prop->disp;
 
-    glEnable(GL_LIGHTING);
+    gym::enableLighting();
     GLfloat blk[] = { 0.f, 0.f, 0.f, 1.f };
     GLfloat bak[] = { 0.f, 0.f, 0.f, 1.f };
     disp->back_color.store(bak);
@@ -640,7 +619,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
         facP = ( lenP > 0.001*uni ? fac*uni/lenP : fac );
     }
 
-    drawFiberSubSegments(fib, rad, inf, sup, abs, uni, select_color, fac, facM, facP);
+    drawFiberSections(fib, rad, inf, sup, abs, uni, select_color, fac, facM, facP);
 }
 
 
@@ -726,6 +705,8 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const float rad = pixscale(disp->speckle_size);
+    gym::color_front(fib.disp->color);
+    gym::color_back(disp->back_color);
 
     // display random speckles:
     if ( disp->speckle_style == 1 )
@@ -793,6 +774,8 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     // diameter of lines and points in space units:
     const float rad = pixscale(disp->point_size);
     int style = disp->point_style & 3;
+    gym::color_front(fib.disp->color);
+    gym::color_back(disp->back_color);
 
     if ( style == 1 )
     {
@@ -802,7 +785,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     }
     else if ( style == 2 )
     {
-        glEnable(GL_LIGHTING);
+        gym::enableLighting();
         // display arrowheads along the fiber:
         const real gap = disp->point_gap;
         real ab = std::ceil(fib.abscissaM()/gap) * gap;
@@ -846,13 +829,11 @@ void Display3::drawOrganizer(Organizer const& obj) const
         {
             bodyColor(*sol);
 #if ( DIM >= 3 )
-            glPushMatrix();
             Vector3 a = 0.5 * (sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5 * (sol->posP(1) + sol->posP(3));
-            gle::stretchAlignZ(a, b, 1);
-            glColor3f(0.6f,0.6f,0.6f);
-            gle::dualPass(gle::barrel);
-            glPopMatrix();
+            gym::stretchAlignZ(a, b, 1);
+            gym::color(0.6f,0.6f,0.6f);
+            gle::dualPassBarrel();
 #else
             const float wid = pixscale(disp->width);
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
@@ -871,7 +852,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
     {
         if ( obj->disp()->perceptible )
         {
-            obj->disp()->color2.load_both();
+            gym::color_both(obj->disp()->color2);
 #if ( 0 )
             if ( obj->disp()->style == 2 )
             {
@@ -897,7 +878,7 @@ void Display3::drawSingleA(Single const* obj) const
 {
     const PointDisp * disp = obj->disp();
     Vector ph = obj->posHand();
-    disp->color.load_both();
+    gym::color_both(disp->color);
     drawHand(ph, disp);
 }
 
@@ -911,7 +892,7 @@ void Display3::drawSingleB(Single const* obj) const
     const float wid = pixscale(disp->width);
     const float rad = pixscale(disp->size);
 
-    disp->color2.load_both();
+    gym::color_both(disp->color2);
 #if ( 0 )
     if ( obj->disp()->style == 2 && obj->confineSpace() )
     {
@@ -921,30 +902,24 @@ void Display3::drawSingleB(Single const* obj) const
     else
 #endif
     {
-        glPushMatrix();
-        gle::transScale(pf, wid);
+        gym::transScale(pf, wid);
         gle::blob(); // the foot
-        glPopMatrix();
     }
-    disp->color.load_both();
+    gym::color_both(disp->color);
 #if ( DIM > 2 )
     Vector diff = pf - ph;
     float L = norm(diff);
-    glPushMatrix();
-    gle::transAlignZ(ph, rad, diff/L);
+    gym::transAlignZ(ph, rad, diff/L);
     gle::blob();
-    gle::scale(wid/rad, wid/rad, L/rad);
+    gym::scale(wid/rad, wid/rad, L/rad);
     gle::hexTube();
-    glPopMatrix();
 #elif ( 0 )
     Vector dir = normalize( pf - ph );
-    glEnable(GL_CLIP_PLANE5);
-    gle::setClipPlane(GL_CLIP_PLANE5, -dir, pf);
-    glPushMatrix();
-    gle::transAlignZ(ph, rad, dir);
+    gym::enableClipPlane(5);
+    gym::setClipPlane(5, -dir, pf);
+    gym::transAlignZ(ph, rad, dir);
     gle::needle();
-    glPopMatrix();
-    glDisable(GL_CLIP_PLANE5);
+    gym::disableClipPlane(5);
 #else
     if ( obj->base() )
         drawObject(ph, rad, gle::octahedron);
@@ -969,7 +944,17 @@ void Display3::drawSinglesA(SingleSet const& set) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Couple
+
+void Display3::drawCouplesF(CoupleSet const& set) const
+{
+    if ( prop->couple_flip )
+        drawCouplesF2(set);
+    else
+        drawCouplesF1(set);
+}
+
+
 /**
  Display always Hand1 of Couple
  */
@@ -1019,7 +1004,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber1()->disp->color.transparent() )
             {
-                disp->color.load_both(cx->fiber1()->disp->color.transparency());
+                gym::color_both(disp->color, cx->fiber1()->disp->color.transparency());
                 drawPoint(h->pos(), disp);
                 continue;
             }
@@ -1039,7 +1024,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber2()->disp->color.transparent() )
             {
-                disp->color.load_both(cx->fiber2()->disp->color.transparency());
+                gym::color_both(disp->color, cx->fiber2()->disp->color.transparency());
                 drawPoint(h->pos(), disp);
                 continue;
             }
@@ -1058,7 +1043,7 @@ void Display3::drawCoupleBplain(Couple const* cx) const
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
 
-    pd1->color.load_both();
+    gym::color_both(pd1->color);
     gle::stretchTube(p1, p2, pixscale(pd1->width), gle::hexTube);
     if ( pd1->visible ) drawHand(p1, pd1);
     if ( pd2->visible ) drawHand(p2, pd2);
@@ -1079,7 +1064,7 @@ void Display3::drawCoupleBside(Couple const* cx) const
     if ( pd1 == pd2 )
     {
         // semi-accurate rendering of Couple's side-side link
-        pd1->color.load_both();
+        gym::color_both(pd1->color);
         Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
         drawPoint(mid, pixscale(pd1->width));
         gle::stretchTube(p2, mid, pixscale(pd2->width), gle::hexTube);
@@ -1094,34 +1079,30 @@ void Display3::drawCoupleBside(Couple const* cx) const
     float Lr = cx->prop->length / rad;
     float iLr = ( pd1->width / pd1->size );
     
-    //if ( cx->cosAngle() > 0 ) gle_color(1, 0.5, 0.25).load_both(); else gle_color(0, 1, 0).load_both();
+    //if ( cx->cosAngle() > 0 ) gym::color_both(1, 0.5, 0.25, 1)); else gym::color_both(0, 1, 0, 1);
     if ( pd1->visible )
     {
         float Z = cx->fiber1()->prop->disp->line_width / pd1->size + 0.4;
-        pd1->color.load_both();
-        glPushMatrix();
-        gle::transAlignZ(p1, rad, pS-p1);
-        glTranslatef(0, 0, Z);
+        gym::color_both(pd1->color);
+        gym::transAlignZ(p1, rad, pS-p1);
+        gym::translate(0, 0, Z);
         gle::blob();
-        glTranslatef(0, 0,Lr-Z);
+        gym::translate(0, 0,Lr-Z);
         gle::cuboid();
-        glTranslatef(0, 0,-Lr);
-        glScalef(iLr, iLr, Lr);
+        gym::translate(0, 0,-Lr);
+        gym::scale(iLr, iLr, Lr);
         gle::hexTube();
-        glPopMatrix();
     }
 
     // draw a link between pS and p2
-    glPushMatrix();
-    gle::transAlignZ(p2, rad, pS-p2);
+    gym::transAlignZ(p2, rad, pS-p2);
     if ( pd2->visible )
     {
-        pd2->color.load_both();
+        gym::color_both(pd2->color);
         gle::blob();
     }
-    glScalef(iLr, iLr, norm(pS-p2) / rad);
+    gym::scale(iLr, iLr, norm(pS-p2) / rad);
     gle::hexTube();
-    glPopMatrix();
 }
 
 
@@ -1142,7 +1123,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     {
 #if !FIBER_HAS_FAMILY
         // moving the 'hands' to the surface of the fiber:
-        dns = pixscale(gle::invsqrt(dns));
+        dns = sizeScale / std::sqrt(dns);
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
         const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
@@ -1157,28 +1138,24 @@ void Display3::drawCoupleB(Couple const* cx) const
 #endif
         Vector mid = 0.5 * ( p1 + p2 );
         Vector dir = normalize( p2 - p1 );
-        glEnable(GL_CLIP_PLANE5);
+        gym::enableClipPlane(5);
         if ( pd1->visible )
         {
-            gle::setClipPlane(GL_CLIP_PLANE5, -dir, mid);
-            pd1->color.load_both();
-            glPushMatrix();
-            gle::transAlignZ(p1, pixscale(pd1->size), dir);
+            gym::setClipPlane(5, -dir, mid);
+            gym::color_both(pd1->color);
+            gym::transAlignZ(p1, pixscale(pd1->size), dir);
             //gle::needle();
             gle::hemisphere2(); gle::cone3();
-            glPopMatrix();
         }
         if ( pd2->visible )
         {
-            gle::setClipPlane(GL_CLIP_PLANE5,  dir, mid);
-            pd2->color.load_both();
-            glPushMatrix();
-            gle::transAlignZ(p2, pixscale(pd2->size), -dir);
+            gym::setClipPlane(5,  dir, mid);
+            gym::color_both(pd2->color);
+            gym::transAlignZ(p2, pixscale(pd2->size), -dir);
             //gle::needle();
             gle::hemisphere2(); gle::cone3();
-            glPopMatrix();
         }
-        glDisable(GL_CLIP_PLANE5);
+        gym::disableClipPlane(5);
     }
     else
     {
@@ -1203,7 +1180,7 @@ void Display3::drawCoupleBalt(Couple const* cx) const
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:
-        dns = pixscale(gle::invsqrt(dns));
+        dns = sizeScale / std::sqrt(dns);
         // position the heads at the surface of the filaments:
         const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
         const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
@@ -1221,10 +1198,10 @@ void Display3::drawCoupleBalt(Couple const* cx) const
 #if ( 0 ) // ENDOCYTOSIS 2015
     if ( cx->fiber1()->disp->color.transparent() )
     {
-        pd1->color.load_both(cx->fiber1()->disp->color.transparency());
-        glDepthMask(GL_FALSE);
+        gym::color_both(pd1->color, cx->fiber1()->disp->color.transparency());
+        gym::closeDepthMask();
         gle::stretchTube(p1, p2, pixscale(pd2->width), gle::hexTube);
-        glDepthMask(GL_TRUE);
+        gym::openDepthMask();
         return;
     }
 #endif
@@ -1233,21 +1210,19 @@ void Display3::drawCoupleBalt(Couple const* cx) const
     float R = pixscale(pd1->size) / wid;
     float Lr = wid / norm( p2 - p1 );
     
-    glPushMatrix();
-    gle::stretchAlignZ(p1, p2, wid);
-    pd1->color.load_both();
+    gym::stretchAlignZ(p1, p2, wid);
+    gym::color_both(pd1->color);
     gle::hexTube();
     if ( pd1->visible )
     {
-        glScalef(R, R, R*Lr);
+        gym::scale(R, R, R*Lr);
         gle::blob();
     }
     if ( pd2->visible )
     {
-        glTranslatef(0, 0, 1/(R*Lr));
-        pd2->color.load_both();
+        gym::translate(0, 0, 1/(R*Lr));
+        gym::color_both(pd2->color);
         gle::blob();
     }
-    glPopMatrix();
 }
 

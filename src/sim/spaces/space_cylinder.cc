@@ -220,18 +220,17 @@ void SpaceCylinder::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gym_view.h"
 
 void SpaceCylinder::draw3D() const
 {
     const float L(half_);
     const float R(radius_);
 
-    glPushMatrix();
-    gle::stretchAlignZX(-L, L, R);
+    gym::stretchAlignZX(-L, L, R);
     gle::tube1();
     gle::discBottom1();
     gle::discTop1();
-    glPopMatrix();
 }
 
 #else

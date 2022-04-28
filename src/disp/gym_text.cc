@@ -1,283 +1,127 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include "glut.h"
-#include "gym_text.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 #include "gle_color.h"
-#include "vector.h"
+#include "gym_flute.h"
+#include "gym_flat.h"
+#include "vector1.h"
+#include "vector2.h"
+#include "vector3.h"
+#include "fg_font.h"
+#include "fg_stroke.h"
+#include "gym_text.h"
 
-namespace gym
+/**
+ draw text at position `vec`
+ */
+void gym::drawText(Vector3 const& vec, FontType font, const float color[4], const char text[], const float offset)
 {
-    int fontHeight(FontType font)
-    {
-        if ( font == BITMAP_8_BY_13 )        return 13;
-        if ( font == BITMAP_9_BY_15 )        return 15;
-        if ( font == BITMAP_TIMES_ROMAN_10 ) return 12;
-        if ( font == BITMAP_TIMES_ROMAN_24 ) return 27;
-        if ( font == BITMAP_HELVETICA_10 )   return 13;
-        if ( font == BITMAP_HELVETICA_12 )   return 15;
-        if ( font == BITMAP_HELVETICA_18 )   return 22;
-        return 13;
-    }
-    
-    void* glutBitmapFont(FontType font)
-    {
-        if ( font == BITMAP_8_BY_13 )        return GLUT_BITMAP_8_BY_13;
-        if ( font == BITMAP_9_BY_15 )        return GLUT_BITMAP_9_BY_15;
-        if ( font == BITMAP_TIMES_ROMAN_10 ) return GLUT_BITMAP_TIMES_ROMAN_10;
-        if ( font == BITMAP_TIMES_ROMAN_24 ) return GLUT_BITMAP_TIMES_ROMAN_24;
-        if ( font == BITMAP_HELVETICA_10 )   return GLUT_BITMAP_HELVETICA_10;
-        if ( font == BITMAP_HELVETICA_12 )   return GLUT_BITMAP_HELVETICA_12;
-        if ( font == BITMAP_HELVETICA_18 )   return GLUT_BITMAP_HELVETICA_18;
-        return GLUT_BITMAP_8_BY_13;
-    }
-
-    /**
-     Compute the max width of all the lines in the given text
-     This uses GLUT, which should be initialized.
-     */
-    int maxTextWidth(FontType fontID, const char text[], int& lines)
-    {
-        void* font = glutBitmapFont(fontID);
-        int res = 0;
-        lines = 0;
-        int w = 0;
-        for (const char* c = text; *c != '\0' ; ++c)
-        {
-            if ( *c == '\n' )
-            {
-                res = std::max(res, w);
-                ++lines;
-                w = 0;
-            }
-            else if ( isspace(*c))
-            {
-                w += glutBitmapWidth(font, ' ');
-            }
-            else if ( isprint(*c))
-            {
-                w += glutBitmapWidth(font, *c);
-            }
-        }
-        res = std::max(res, w);
-        if ( res > 0 )
-            lines = std::max(1, lines);
-        return res;
-    }
-    
-
-    /**
-     draw the string character per character using:
-     glutBitmapCharacter()
-     */
-    void bitmapString(FontType fontID, const char text[], float vshift)
-    {
-        void* font = glutBitmapFont(fontID);
-        if ( !font )
-        {
-            font = GLUT_BITMAP_HELVETICA_12;
-            vshift = sign_real(vshift) * fontHeight(fontID);
-        }
-        if ( vshift == 0 )
-            vshift = -fontHeight(fontID);
-        
-        GLfloat ori[4], pos[4];
-        glGetFloatv(GL_CURRENT_RASTER_POSITION, ori);
-        
-        for (const char* p = text; *p; ++p)
-        {
-            if ( *p == '\n' )
-            {
-                glGetFloatv(GL_CURRENT_RASTER_POSITION, pos);
-                glBitmap(0, 0, 0, 0, ori[0]-pos[0], vshift, nullptr);
-            }
-            else if ( isspace(*p) )
-            {
-                glutBitmapCharacter(font, ' ');
-            }
-            else if ( isprint(*p) )
-            {
-                glutBitmapCharacter(font, *p);
-            }
-        }
-    }
-    
-    
-    /**
-     draw text at position `vec`, if this corresponds to a valid raster position
-     */
-    void drawText(Vector3 const& vec, FontType font, const char text[], float dx)
-    {
-        GLboolean valid = false;
-        glRasterPos3f(vec.x(), vec.y(), vec.z());
-        glGetBooleanv(GL_CURRENT_RASTER_POSITION_VALID, &valid);
-
-        if ( valid == GL_TRUE )
-        {
-            GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
-            GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
-            GLboolean light = glIsEnabled(GL_LIGHTING);
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_ALPHA_TEST);
-            glDisable(GL_LIGHTING);
-            int L = 1;
-            int H = fontHeight(font);
-            int W = maxTextWidth(font, text, L);
-            // center text:
-            glBitmap(0,0,0,0,-W*dx,-H/3,nullptr);
-            bitmapString(font, text, H);
-            if ( depth ) glEnable(GL_DEPTH_TEST);
-            if ( alpha ) glEnable(GL_ALPHA_TEST);
-            if ( light ) glEnable(GL_LIGHTING);
-        }
-    }
-    
-    void drawText(Vector2 const& w, FontType font, const char text[], float dx)
-    {
-        drawText(Vector3(w.XX, w.YY, 0), font, text, dx);
-    }
-    
-    void drawText(Vector1 const& w, FontType font, const char text[], float dx)
-    {
-        drawText(Vector3(w.XX, 0, 0), font, text, dx);
-    }
-
-    
-    void paintOctogon(const int rec[4], const int rad)
-    {
-        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
-        GLfloat D(rad);
-        GLfloat pts[16] = {R,B+D, R,T-D, R-D,B, R-D,T, L+D,B, L+D,T, L,B+D, L,T-D};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
-    }
-    
-    void drawOctogon(const int rec[4], const int rad)
-    {
-        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
-        GLfloat D(rad);
-        GLfloat pts[18] = {L,B+D, L+D,B, R-D,B, R,B+D, R,T-D, R-D,T, L+D,T, L,T-D, L,B+D};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_LINE_STRIP, 0, 9);
-    }
-
-    /**
-     The text is displayed in the current color.
-     A background rectangle is displayed only if `bcol` is visible.
-     
-         glColor3f(1,1,1);
-         drawText(fKeyString, BITMAP_8_BY_13, 0x0, 1);
-     
-     Possible values for `position`:
-     - 0: bottom-left, text going up
-     - 1: bottom-right, text going up
-     - 2: top-right, text going down
-     - 3: top-left, text going down
-     - 4: center, text going down
-     .
-     
-     Note: width and height are the current size of the viewport (window)
-     */
-    void drawText(FontType font, const char text[], const gle_color back,
-                  const int position, int width, int height)
-    {
-        assert_true( width > 0 );
-        assert_true( height > 0 );
-        
-        int n_lines = 1;
-        int lineHeight = fontHeight(font);
-        int textWidth = maxTextWidth(font, text, n_lines);
-        
-        GLint px, py;
-        switch( position )
-        {
-            case 0: {
-                //bottom-left, text going up
-                px = lineHeight/2;
-                py = lineHeight/2;
-            } break;
-            case 1: {
-                //bottom-right, text going up
-                px = width - textWidth - lineHeight/2;
-                if ( px < 0 ) px = 0;
-                py = lineHeight/2;
-            } break;
-            case 2: {
-                //top-right, text going down
-                px = width - textWidth - lineHeight/2;
-                if ( px < 0 ) px = 0;
-                py = height - lineHeight;
-                lineHeight *= -1;
-            } break;
-            default:
-            case 3: {
-                //top-left, text going down
-                px = lineHeight/2;
-                py = height - lineHeight;
-                lineHeight *= -1;
-            } break;
-            case 4: {
-                //center, text going down
-                px = ( width - textWidth ) / 2;
-                if ( px < 0 ) px = 0;
-                py = ( height + n_lines*lineHeight ) / 2;
-                lineHeight *= -1;
-            } break;
-        }
-        
-        //set pixel coordinate system:
-        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
-        GLboolean alpha = glIsEnabled(GL_ALPHA_TEST);
-        GLboolean light = glIsEnabled(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_ALPHA_TEST);
-        glDisable(GL_LIGHTING);
-
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(0, width, 0, height, 0, 1);
-        
-        glRasterPos2i(0, 0);
-        glBitmap(0, 0, 0, 0, px, py, nullptr);
-        
-        if ( back.visible() )
-        {
-            float col[4];
-            glGetFloatv(GL_CURRENT_COLOR, col);
-            int R = abs(lineHeight);
-            int B = std::min(py, py + n_lines * lineHeight);
-            int T = std::max(py, py + n_lines * lineHeight);
-            int rec[4] = { px-R, B, px+textWidth+R, T+R+R/2+R/4 };
-            back.load();
-            paintOctogon(rec, 3);
-            if ( position == 4 )
-            {
-                glLineWidth(0.5);
-                drawOctogon(rec, 3);
-            }
-            glColor4fv(col);
-        }
-        
-        bitmapString(font, text, lineHeight);
-        
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-        if ( depth ) glEnable(GL_DEPTH_TEST);
-        if ( alpha ) glEnable(GL_ALPHA_TEST);
-        if ( light ) glEnable(GL_LIGHTING);
-    }
-    
-    
-    /// stroke character
-    void strokeCharacter(int mono, int c)
-    {
-        glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, c);
-    }
-
+    gym::disableDepthTest();
+    gym::disableAlphaTest();
+    gym::disableLighting();
+#if 1
+    int H = fgFontHeight(font);
+    int L, W = fgTextWidth(font, text, L);
+    gym::translate(vec.XX, vec.YY, vec.ZZ);
+    fgBitmapString(-W*offset, -H/3, 0.0625, font, color, text, H);
+    gym::translate(-vec.XX, -vec.YY, -vec.ZZ);
+#else
+    gym::color(color);
+    fgStrokeString(vec.XX, vec.YY, 0.001, 1, text, 1, 1, 0);
+#endif
+    gym::restoreDepthTest();
+    gym::restoreLighting();
+    gym::restoreAlphaTest();
 }
+
+/// width = text_width; height = text_heigth, (W, H) = window_size
+float gym::textPosition(float& px, float& py, int width, int height, int lines,
+                        int W, int H, const int position)
+{
+    assert_true( W > 0 );
+    assert_true( H > 0 );
+    
+    switch( position )
+    {
+        case 0:
+            //bottom-left, text going up
+            px = height/2;
+            py = height/2;
+            return height;
+        case 1:
+            //bottom-right, text going up
+            px = W - width - height/2;
+            if ( px < 0 ) px = 0;
+            py = height/2;
+            return height;
+        case 2:
+            //top-right, text going down
+            px = W - width - height/2;
+            if ( px < 0 ) px = 0;
+            py = H - height;
+            return -height;
+        default:
+        case 3:
+            //top-left, text going down
+            px = height/2;
+            py = H - height;
+            return -height;
+        case 4:
+            //center, text going down
+            px = ( W - width ) / 2;
+            if ( px < 0 ) px = 0;
+            py = ( H + lines*height ) / 2;
+            return -height;
+    }
+    return height;
+}
+
+    
+/**
+ The text is displayed in the current color.
+ A background rectangle is displayed only if `bcol` is visible.
+ 
+ Possible values for `position`:
+ - 0: bottom-left, text going up
+ - 1: bottom-right, text going up
+ - 2: top-right, text going down
+ - 3: top-left, text going down
+ - 4: center, text going down
+ .
+ 
+ Note: width and height are the current size of the viewport (window)
+ */
+void gym::placeText(int position, FontType font, const float color[4],
+                    const char text[], const float back[4], int W, int H)
+{
+    int lines = 1;
+    int height = fgFontHeight(font);
+    int width = fgTextWidth(font, text, lines);
+    
+    float px, py;
+    float vshift = gym::textPosition(px, py, width, height, lines, W, H, position);
+    
+    if ( back && back[3] > 0 )
+    {
+        float E = height;
+        float T = py + lines * vshift;
+        float B = std::min(py, T) - E/4;
+        T = std::max(py, T) + E + E/4;
+        float R = px + width + E;
+        gym::paintOctagon(px-E, B, R, T, back, 5);
+        if ( position == 4 )
+            gym::drawOctagon(px-E, B, R, T, color, 5, 1);
+    }
+    
+    fgBitmapString(px, py, 1.f, font, color, text, vshift);
+}
+
+
+/// stroke character
+void gym::strokeCharacter(float X, float Y, float S, int mono, const float color[4], unsigned char character, float width)
+{
+    gym::color(color);
+    fgStrokeCharacter(X, Y, S, mono, character, width, width);
+}
+

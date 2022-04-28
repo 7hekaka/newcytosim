@@ -205,15 +205,13 @@ void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 
-#include "opengl.h"
 #include "gle.h"
+#include "gym_view.h"
 
-void SpaceDisc::draw2D() const
+void SpaceDisc::draw2D(float width) const
 {
-    glPushMatrix();
-    gle::scale(radius_);
-    gle::circle();
-    glPopMatrix();
+    gym::scale(radius_);
+    gle::circle(width);
 }
 
 void SpaceDisc::draw3D() const
@@ -221,17 +219,15 @@ void SpaceDisc::draw3D() const
     const float R(radius_);
     const float B(bot_);
 
-    glPushMatrix();
-    gle::transScale(0, 0, -B, R);
+    gym::transScale(0, 0, -B, R);
     //gle::tube1();
     gle::disc1();
     //gle::discTop1();
-    glPopMatrix();
 }
 
 #else
 
-void SpaceDisc::draw2D() const {}
+void SpaceDisc::draw2D(float) const {}
 void SpaceDisc::draw3D() const {}
 
 #endif

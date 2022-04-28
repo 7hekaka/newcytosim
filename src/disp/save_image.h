@@ -60,9 +60,6 @@ namespace SaveImage
 
     /// save pixels[] and return error-code
     int savePixels(const char* name, const char format[], const uint8_t[], uint32_t width, uint32_t height, int downsample);
-    
-    /// downsample `src` to set `dst`
-    void downsampleRGB(uint8_t* dst, uint8_t const* src, uint32_t W, uint32_t H, unsigned bin);
 
     //-------------------- use the functions below: ---------------------
     

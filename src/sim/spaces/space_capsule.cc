@@ -258,18 +258,22 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 
-void SpaceCapsule::draw2D() const
+void SpaceCapsule::draw2D(float width) const
 {
     const float L(half_);
     const float R(radius_);
     constexpr size_t fin = 16 * gle::finesse;
-    float* arc = (float*)gym::mapBufferV2(2*fin+2);
-    float* cra = arc + 2*fin + 2;
+    float* arc = (float*)gym::mapBufferV2(2*fin+4);
+    float* cra = arc + 2*fin;
     gle::compute_arc(fin, arc, R, -M_PI_2, M_PI,  L, 0);
     gle::compute_arc(fin, cra, R,  M_PI_2, M_PI, -L, 0);
+    cra[  2*fin] = arc[0];
+    cra[1+2*fin] = arc[1];
     gym::unmapBufferV2();
-    glDrawArrays(GL_LINE_LOOP, 0, 2*fin+2);
+    gym::drawLineStrip(width, 0, 2*fin+1);
 }
 
 
@@ -279,28 +283,22 @@ void SpaceCapsule::draw3D() const
     const float R(radius_);
 
     //right side:
-    glPushMatrix();
-    gle::transAlignZX(L, R, -1);
+    gym::transAlignZX(L, R, -1);
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
-    glPopMatrix();
 
-    glPushMatrix();
-    gle::stretchAlignZX(-L, L, R);
+    gym::stretchAlignZX(-L, L, R);
     gle::tube1();
-    glPopMatrix();
 
     //left side:
-    glPushMatrix();
-    gle::transAlignZX(-L, R, 1);
+    gym::transAlignZX(-L, R, 1);
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
-    glPopMatrix();
 }
 
 #else
 
-void SpaceCapsule::draw2D() const {}
+void SpaceCapsule::draw2D(float) const {}
 void SpaceCapsule::draw3D() const {}
 
 #endif

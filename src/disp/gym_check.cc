@@ -3,10 +3,8 @@
 #include "gle_color.h"
 #include "opengl.h"
 
-namespace gym
-{
 
-char const* errorString(unsigned code)
+char const* gym::errorString(unsigned code)
 {
     switch ( code )
     {
@@ -23,10 +21,10 @@ char const* errorString(unsigned code)
 }
 
 /**
- This is similar to glutReportError,
- but the additional argument can provide useful feedback for debugging
+ This check for OpenGL errors,
+ the argument 'msg' can be useful to provide feedback for debugging
  */
-void reportErrors(FILE * out, const char* msg)
+void gym::reportErrors(FILE * out, const char* msg)
 {
     GLenum e = glGetError();
     while ( e != GL_NO_ERROR )
@@ -41,7 +39,7 @@ void reportErrors(FILE * out, const char* msg)
 
 static void print_rgba(FILE* f, const char* str, GLfloat rgb[4])
 {
-    fprintf(f, "%s ( %4.2f %4.2f %4.2f %4.2f )", str, rgb[0], rgb[1], rgb[2], rgb[3]);
+    fprintf(f, "%s( %4.2f %4.2f %4.2f %4.2f )", str, rgb[0], rgb[1], rgb[2], rgb[3]);
 }
 
 static void print_cap(GLenum cap, const char * str)
@@ -50,12 +48,8 @@ static void print_cap(GLenum cap, const char * str)
     fprintf(stderr, "%s %i ", str, i);
 }
 
-void print_caps()
+void gym::printCaps()
 {
-    GLfloat c[4] = { 0 };
-    glGetFloatv(GL_CURRENT_COLOR, c);
-    print_rgba(stderr, "color", c);
-    
     print_cap(GL_LIGHTING, "light");
     print_cap(GL_BLEND, "blend");
     print_cap(GL_FOG, "fog");
@@ -68,10 +62,13 @@ void print_caps()
     print_cap(GL_COLOR_MATERIAL, "material");
     print_cap(GL_LINE_STIPPLE, "stipple");
     
+    GLfloat c[4] = { 0 };
+    glGetFloatv(GL_CURRENT_COLOR, c);
+    print_rgba(stderr, "color", c);
     std::clog << '\n';
 }
 
-void print_matrices(FILE * f)
+void gym::printMatrices(FILE * f)
 {
     GLint V[4] = { 0 };
     glGetIntegerv(GL_VIEWPORT, V);
@@ -87,7 +84,7 @@ void print_matrices(FILE * f)
 
     
 /// print current color properties of OpenGL context
-void print_color_materials(FILE * out)
+void gym::printColors(FILE * out)
 {
     GLfloat mat[4] = { 0 };
     glGetMaterialfv(GL_FRONT, GL_AMBIENT, mat);
@@ -105,4 +102,3 @@ void print_color_materials(FILE * out)
     print_rgba(out, "back  emi", mat);
 }
 
-}

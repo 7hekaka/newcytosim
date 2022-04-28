@@ -10,8 +10,9 @@
  and should be defined for compiling test_rasterizer.cc
  */
 #ifdef DISPLAY
-#  include "gle.h"
 #  include "gym_flute.h"
+#  include "gym_view.h"
+#  include "gym_draw.h"
 bool rasterizer_draws = false;
 #endif
 
@@ -124,15 +125,15 @@ static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
 #ifdef DISPLAY
     if ( rasterizer_draws )
     {
-        gle_color col(0, 0, 1);
-        flute8 * flu = gym::mapBufferC4V4(n_pts);
+        gym::ref_view();
+        gym::color(0, 0, 1);
+        flute3 * flu = gym::mapBufferV3(n_pts+1);
         for ( size_t i = 0; i < n_pts; ++i )
-            flu[i] = { col, pts[i].XX, pts[i].YY, float(zz) };
-        gym::unmapBufferC4V4();
-        glLineWidth(1);
-        glDrawArrays(GL_LINE_LOOP, 0, n_pts);
-        glPointSize(7);
-        glDrawArrays(GL_POINTS, 0, 1);
+            flu[i] = { pts[i].XX, pts[i].YY, float(zz) };
+        flu[n_pts] = { pts[0].XX, pts[0].YY, float(zz) };
+        gym::unmapBufferV3();
+        gym::drawLineStrip(1, 0, n_pts+1);
+        gym::drawPoints(7, 0, 1);
     }
 #endif
 
@@ -351,25 +352,26 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
 #ifdef DISPLAY
     if ( rasterizer_draws )
     {
-        gle_color col(0, 1, 1);
-        const size_t n_max = n_pts*(n_pts-1);
-        flute8* flu = gym::mapBufferC4V4(n_max);
-        size_t i = 0;
+        gym::ref_view();
+        gym::color(0, 1, 1);
+        const size_t sup = n_pts * (n_pts-1);
+        flute3* flu = gym::mapBufferV3(sup);
+        flute3* ptr = flu;
         for ( size_t n = 0; n < n_pts; ++n )
         {
             for ( size_t u = n+1; u < n_pts; ++u )
             {
                 if ( pts[n].UU  &  pts[u].UU )
                 {
-                    flu[i++] = { col, pts[n].XX, pts[n].YY, pts[n].ZZ };
-                    flu[i++] = { col, pts[u].XX, pts[u].YY, pts[u].ZZ };
+                    ptr[0] = { pts[n].XX, pts[n].YY, pts[n].ZZ };
+                    ptr[1] = { pts[u].XX, pts[u].YY, pts[u].ZZ };
+                    ptr += 2;
                 }
             }
         }
-        assert_true(i < n_max);
-        gym::unmapBufferC4V4();
-        glLineWidth(0.5);
-        glDrawArrays(GL_LINES, 0, i);
+        assert_true(i < sup);
+        gym::unmapBufferV3();
+        gym::drawLines(0.5, 0, ptr-flu);
     }
 #endif
     

@@ -16,6 +16,13 @@ class PointDisp;
  */
 class Display1 : public Display
 {
+    
+    /// global OpenGL line width
+    float linkWidth;
+
+    /// global OpenGL point size
+    float pointSize;
+
 public:
     
     ///constructor
@@ -43,6 +50,9 @@ public:
     /// draw free Couples, randomizing which Hand is drawn
     void drawCouplesF2(CoupleSet const&) const;
     
+    /// draw free Couple
+    void drawCouplesF(CoupleSet const&) const;
+
     /// draw attached Couples
     void drawCouplesA(CoupleSet const&) const;
     

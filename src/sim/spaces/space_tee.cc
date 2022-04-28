@@ -422,9 +422,11 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 
 
-void SpaceTee::draw2D() const
+void SpaceTee::draw2D(float width) const
 {
     float R(tRadius);
     float L(tLength);
@@ -441,72 +443,55 @@ void SpaceTee::draw2D() const
     top[-1] = R;
     lft[-2] = J-R;
     lft[-1] = R;
-
     gym::unmapBufferV2();
-    glVertexPointer(2, GL_FLOAT, 0, arc);
-    glDrawArrays(GL_LINE_LOOP, 0, 3*fin+2);
+    gym::drawLineStrip(width, 0, 3*fin+3);
 }
 
-
-static void setClipPlane(GLuint p, GLdouble x, GLdouble y)
-{
-    GLdouble plane[] = { x, y, 0, 0 };
-    glClipPlane(p, plane);
-}
 
 void SpaceTee::draw3D() const
 {
-    const GLenum glp1 = GL_CLIP_PLANE4;
-    const GLenum glp2 = GL_CLIP_PLANE5;
+    float R(tRadius);
+    float J(tJunction);
+    float L((tLength-tJunction)/tRadius);
+    float A(tArmLength/tRadius);
 
-    GLfloat R(tRadius);
-    GLfloat J(tJunction);
-    GLfloat L((tLength-tJunction)/tRadius);
-    GLfloat A(tArmLength/tRadius);
-
-    glEnable(glp1);
-    glEnable(glp2);
+    gym::enableClipPlane(4);
+    gym::enableClipPlane(5);
 
     //right side:
-    glPushMatrix();
-    gle::transScale(J, 0, 0, R);
-    setClipPlane(glp1, M_SQRT1_2, -M_SQRT1_2);
-    setClipPlane(glp2, 1, 0);
-    glTranslatef(L, 0, 0);
-    glRotatef(-90, 0, 1, 0);
+    gym::transScale(J, 0, 0, R);
+    gym::setClipPlane(4, M_SQRT1_2, -M_SQRT1_2, 0, 0);
+    gym::setClipPlane(5, 1, 0, 0, 0);
+    gym::translate(L, 0, 0);
+    gym::rotateY(0, -1);
     gle::halfTube1();
     gle::hemisphere4();
-    glPopMatrix();
 
     //left side:
-    glPushMatrix();
-    gle::transScale(J, 0, 0, R);
-    setClipPlane(glp1, -M_SQRT1_2, -M_SQRT1_2);
-    setClipPlane(glp2, -1, 0);
-    glTranslatef(-L, 0, 0);
-    glRotated(90, 0, 1, 0);
+    gym::transScale(J, 0, 0, R);
+    gym::setClipPlane(4, -M_SQRT1_2, -M_SQRT1_2, 0, 0);
+    gym::setClipPlane(5, -1, 0, 0, 0);
+    gym::translate(-L, 0, 0);
+    gym::rotateY(0, 1);
     gle::halfTube1();
     gle::hemisphere4();
-    glPopMatrix();
 
     //the arm:
-    glPushMatrix();
-    gle::transScale(J, 0, 0, R);
-    setClipPlane(glp1, -M_SQRT1_2, M_SQRT1_2);
-    setClipPlane(glp2, M_SQRT1_2, M_SQRT1_2);
-    glTranslatef(0, A, 0);
-    glRotatef(90, 1, 0, 0);
+    gym::transScale(J, 0, 0, R);
+    gym::setClipPlane(4, -M_SQRT1_2, M_SQRT1_2, 0, 0);
+    gym::setClipPlane(5, M_SQRT1_2, M_SQRT1_2, 0, 0);
+    gym::translate(0, A, 0);
+    gym::rotateX(0, 1);
     gle::halfTube1();
     gle::hemisphere4();
-    glPopMatrix();
 
-    glDisable(glp1);
-    glDisable(glp2);
+    gym::disableClipPlane(4);
+    gym::disableClipPlane(5);
 }
 
 #else
 
-void SpaceTee::draw2D() const {}
+void SpaceTee::draw2D(float) const {}
 void SpaceTee::draw3D() const {}
 
 #endif

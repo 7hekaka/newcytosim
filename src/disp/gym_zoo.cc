@@ -5,75 +5,59 @@
 #include "gym_zoo.h"
 #include "vector.h"
 #include "gle_color.h"
+#include "gym_flute.h"
+#include "gym_draw.h"
 #include "flute.h"
 
 /*
- This is a set of 2D shape, which is unfinished
+ This is a set of 2D shapes, which is unfinished
  */
 
-static GLuint buffer_ = 0;
+static GLuint zoo_buffer_ = 0;
 
 static GLsizei zoo_[16] = { 0 };
 
-
-static void zoo_draw(int i)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-    glVertexPointer(2, GL_FLOAT, 0, nullptr);
-    glDrawArrays(GL_LINE_STRIP, 1+zoo_[i], zoo_[i+1]-zoo_[i]-1);
-}
-
-static void zoo_fill(int i)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, buffer_);
-    glVertexPointer(2, GL_FLOAT, 0, nullptr);
-    glDrawArrays(GL_TRIANGLE_FAN, zoo_[i], zoo_[i+1]-zoo_[i]);
-}
-
-void gym::zoo_stroke(char c)
+static inline unsigned zoo_index(char c)
 {
     switch ( c )
     {
-        case 't': zoo_draw(0); break;
-        case 'v': zoo_draw(1); break;
-        case 'q': zoo_draw(2); break;
-        case 'r': zoo_draw(3); break;
-        case '+': zoo_draw(4); break;
-        case 'p': zoo_draw(5); break;
-        case 'h': zoo_draw(6); break;
-        case 's': zoo_draw(7); break;
+        case 't': return 0;
+        case 'v': return 1;
+        case 'q': return 2;
+        case 'r': return 3;
+        case '+': return 4;
+        case 'p': return 5;
+        case 'h': return 6;
+        case 's': return 7;
         default:
-        case 'c': zoo_draw(8); break;
+        case 'c': return 8;
     }
+}
+
+void gym::zoo_stroke(char c, float w)
+{
+    unsigned i = zoo_index(c);
+    gym::bindBufferV2(zoo_buffer_);
+    gym::drawLineStrip(w, 1+zoo_[i], zoo_[i+1]-zoo_[i]-1);
 }
 
 
 void gym::zoo_paint(char c)
 {
-    switch ( c )
-    {
-        case 't': zoo_fill(0); break;
-        case 'v': zoo_fill(1); break;
-        case 'q': zoo_fill(2); break;
-        case 'r': zoo_fill(3); break;
-        case '+': zoo_fill(4); break;
-        case 'p': zoo_fill(5); break;
-        case 'h': zoo_fill(6); break;
-        case 's': zoo_fill(7); break;
-        default:
-        case 'c': zoo_fill(8); break;
-    }
+    unsigned i = zoo_index(c);
+    gym::bindBufferV2(zoo_buffer_);
+    gym::drawArrays(GL_TRIANGLE_FAN, zoo_[i], zoo_[i+1]-zoo_[i]);
 }
 
 
-void gym::zoo_init(flute2* flt, flute2* const ori)
+size_t gym::zoo_init(flute2* flt, flute2* const ori)
 {
     size_t j = 0;
     // triangle
     {
         zoo_[j++] = flt - ori;
-        constexpr GLfloat B(-0.5f); //std::sqrt(3)/2;
-        constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
+        const float B(-0.5f); //std::sqrt(3)/2;
+        const float T(0.8660254037844386f); //std::sqrt(3)/2;
         *flt++ = { 0, 0 };
         *flt++ = { 0, 1 };
         *flt++ = {-T, B };
@@ -83,7 +67,7 @@ void gym::zoo_init(flute2* flt, flute2* const ori)
     // inverted triangle
     {
         zoo_[j++] = flt - ori;
-        constexpr GLfloat T(0.8660254037844386f); //std::sqrt(3)/2;
+        const float T(0.8660254037844386f); //std::sqrt(3)/2;
         *flt++ = { 0, 0 };
         *flt++ = { 0, -1.f };
         *flt++ = { T,  0.5 };
@@ -113,8 +97,8 @@ void gym::zoo_init(flute2* flt, flute2* const ori)
     // plus
     {
         zoo_[j++] = flt - ori;
-        const GLfloat R = 1.1f;
-        const GLfloat C = 0.4f;
+        const float R = 1.1f;
+        const float C = 0.4f;
         *flt++ = { 0, 0 };
         *flt++ = { R,  C};
         *flt++ = { C,  C};
@@ -133,11 +117,11 @@ void gym::zoo_init(flute2* flt, flute2* const ori)
     // pentagon
     {
         zoo_[j++] = flt - ori;
-        const GLfloat A(M_PI * 0.1);
-        const GLfloat B(M_PI * 0.3);
-        const GLfloat R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
-        const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
-        const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
+        const float A(M_PI * 0.1);
+        const float B(M_PI * 0.3);
+        const float R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
+        const float C1 = R * cosf(A), S1 = R * sinf(A);
+        const float C3 = R * cosf(B), S3 = R * sinf(B);
         *flt++ = {  0,  0};
         *flt++ = {  0,  R};
         *flt++ = {-C1,  S1};
@@ -149,9 +133,9 @@ void gym::zoo_init(flute2* flt, flute2* const ori)
     // hexagon
     {
         zoo_[j++] = flt - ori;
-        const GLfloat R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        const GLfloat H = R * 0.8660254037844386f; // sqrtf(3)/2;
-        const GLfloat X = R * 0.5f;
+        const float R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
+        const float H = R * 0.8660254037844386f; // sqrtf(3)/2;
+        const float X = R * 0.5f;
         *flt++ = { 0,  0};
         *flt++ = { R,  0};
         *flt++ = { X,  H};
@@ -164,11 +148,11 @@ void gym::zoo_init(flute2* flt, flute2* const ori)
     // star
     {
         zoo_[j++] = flt - ori;
-        const GLfloat A(M_PI * 0.1);
-        const GLfloat B(M_PI * 0.3);
-        const GLfloat R  = 1.2f, H = -0.6f;
-        const GLfloat C1 = R * cosf(A), S1 = R * sinf(A);
-        const GLfloat C3 = R * cosf(B), S3 = R * sinf(B);
+        const float A(M_PI * 0.1);
+        const float B(M_PI * 0.3);
+        const float R  = 1.2f, H = -0.6f;
+        const float C1 = R * cosf(A), S1 = R * sinf(A);
+        const float C3 = R * cosf(B), S3 = R * sinf(B);
         *flt++ = {    0,     0};
         *flt++ = {    0,     R};
         *flt++ = { H*C3, -H*S3};
@@ -185,12 +169,13 @@ void gym::zoo_init(flute2* flt, flute2* const ori)
     // nearly a circle
     {
         zoo_[j++] = flt - ori;
-        GLfloat a(M_PI/6.0);
+        float a(M_PI/6.0);
         *flt++ = { 1, 0 };
         for ( int u = 1; u < 12; ++u )
             *flt++ = { cosf(u*a),  sinf(u*a) };
         *flt++ = { 1, 0 };
     }
     zoo_[j] = flt - ori;
+    return flt - ori;
 }
 

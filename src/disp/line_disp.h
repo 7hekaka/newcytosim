@@ -34,7 +34,7 @@ public:
     real color_scale;
     
     /// amount of lateral displacement added during display
-    real explode_shift;
+    float explode_shift;
 
     /// visibility flag
     int visible;

@@ -514,6 +514,7 @@ void SpaceCylinderZ::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_draw.h"
 
 void SpaceCylinderZ::draw3D() const
 {
@@ -527,11 +528,11 @@ void SpaceCylinderZ::draw3D() const
     for ( size_t u = 0; u < gle::pi_twice; ++u )
     {
         flute6 * flu = gym::mapBufferV3N3(cnt);
+        flute6 * ptr = flu;
         float CU = gle::cos_(u), CL = gle::cos_(u+1);
         float SU = gle::sin_(u), SL = gle::sin_(u+1);
 
-        size_t i = 0;
-        flu[i++] = {0, 0, T, 0, 0, 1};
+        *ptr++ = {0, 0, T, 0, 0, 1};
         if ( edge_ > 0 )
         {
             //draw top arc
@@ -539,38 +540,37 @@ void SpaceCylinderZ::draw3D() const
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
-                flu[i++] = {CU*RS, SU*RS, TE+E*C, CU*S, SU*S, C};
-                flu[i++] = {CL*RS, SL*RS, TE+E*C, CL*S, SL*S, C};
+                *ptr++ = {CU*RS, SU*RS, TE+E*C, CU*S, SU*S, C};
+                *ptr++ = {CL*RS, SL*RS, TE+E*C, CL*S, SL*S, C};
             }
             /*
             // at pi_half, C = 0 and S = 1
-             flu[i++] = {CU*R, SU*R, TE, CU, SU, 0};
-             flu[i++] = {CL*R, SL*R, TE, CL, SL, 0};
-             flu[i++] = {CU*R, SU*R, BE, CU, SU, 0};
-             flu[i++] = {CL*R, SL*R, BE, CL, SL, 0};
+             *ptr++ = {CU*R, SU*R, TE, CU, SU, 0};
+             *ptr++ = {CL*R, SL*R, TE, CL, SL, 0};
+             *ptr++ = {CU*R, SU*R, BE, CU, SU, 0};
+             *ptr++ = {CL*R, SL*R, BE, CL, SL, 0};
              */
             //draw bottom arc
             for ( size_t j = gle::pi_half; j <= gle::pi_once; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
-                flu[i++] = {CU*RS, SU*RS, BE+E*C, CU*S, SU*S, C};
-                flu[i++] = {CL*RS, SL*RS, BE+E*C, CL*S, SL*S, C};
+                *ptr++ = {CU*RS, SU*RS, BE+E*C, CU*S, SU*S, C};
+                *ptr++ = {CL*RS, SL*RS, BE+E*C, CL*S, SL*S, C};
             }
         }
         else
         {
-            flu[i++] = {CU*R, SU*R, T, CU, SU, 0};
-            flu[i++] = {CL*R, SL*R, T, CL, SL, 0};
-            flu[i++] = {CU*R, SU*R, B, CU, SU, 0};
-            flu[i++] = {CL*R, SL*R, B, CL, SL, 0};
+            *ptr++ = {CU*R, SU*R, T, CU, SU, 0};
+            *ptr++ = {CL*R, SL*R, T, CL, SL, 0};
+            *ptr++ = {CU*R, SU*R, B, CU, SU, 0};
+            *ptr++ = {CL*R, SL*R, B, CL, SL, 0};
         }
-        flu[i++] = {0, 0, B, 0, 0, -1};
+        *ptr++ = {0, 0, B, 0, 0, -1};
         gym::unmapBufferV3N3();
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+        gym::drawTriangleStrip(0, ptr-flu);
     }
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gym::cleanup();
 }
 
 #else

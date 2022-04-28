@@ -5,13 +5,19 @@
 #include <cstdlib>
 #include "assert_macro.h"
 #include "gle.h"
-#include "glut.h"
 #include "tesselator.h"
 #include "simd.h"
 #include "simd_float.h"
 #include "simd_math.h"
 #include "gym_flute.h"
 #include "gym_check.h"
+#include "gym_view.h"
+#include "gym_vect.h"
+#include "gym_draw.h"
+
+#include "vector1.h"
+#include "vector2.h"
+#include "vector3.h"
 
 namespace gle
 {
@@ -25,22 +31,23 @@ namespace gle
     GLuint buf_[4] = { 0 };
 
     /// offset for objects data stored in buffers
-    GLsizei tubes_[24] = { 0 };
+    size_t tubes_[24] = { 0 };
 
     /// offset for objects data stored in buffers
-    GLsizei cubes_[12] = { 0 };
+    size_t cubes_[12] = { 0 };
     
     /// offset for objects data stored in buffers
-    GLsizei blobs_[4] = { 0 };
+    size_t blobs_[4] = { 0 };
     
     /// offset for objects data stored in buffers
-    GLsizei discs_[2] = { 0 };
+    size_t discs_[2] = { 0 };
 
-    /// vertex buffer objects for icosahedrons
-    GLsizei ico_pts_[8] = { 0 };
-    GLsizei ico_idx_[8] = { 0 };
+    /// index of first vertex in buffer object
+    size_t ico_pts_[8] = { 0 };
+    /// index of first vertex index in buffer object
+    size_t ico_idx_[8] = { 0 };
     /// number of faces in icosahedrons
-    GLsizei ico_cnt_[8] = { 0 };
+    size_t ico_cnt_[8] = { 0 };
 
     void initBuffers()
     {
@@ -138,276 +145,6 @@ namespace gle
                      double angle, float cX, float cY)
     {
         set_arc(cnt, ptr, rad, start, angle/(cnt-1), cX, cY);
-    }
-    
-    //-----------------------------------------------------------------------
-    #pragma mark - Rotations
-    
-    /**
-     This works if norm(z[]) == n!
-     Derived from `Building an Orthonormal Basis, Revisited`,
-     Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
-     optimized by Marc B. Reynolds
-    */
-    void orthonormal(const float z[3], float n, float x[3], float y[3])
-    {
-        const float s = std::copysign(1.f, z[2]);
-        const float a = z[1] / ( z[2] + s * n );
-        const float b = z[1] * a;
-        const float c = z[0] * a;
-        x[0] = -z[2] - b;
-        x[1] = c;
-        x[2] = z[0];
-        y[0] = s * c;
-        y[1] = s * b - n;
-        y[2] = s * z[1];
-    }
-    
-    /**
-     `R` is the transverse scaling done in the XY plane after rotation
-     */
-    void stretchAlignZ(Vector1 const& A, Vector1 const& B, float R)
-    {
-        float X = B.XX-A.XX;
-        float Y = std::copysign(R, X);
-        //warning! this matrix appears here transposed
-        float mat[16] = {
-            0, Y, 0, 0,
-            0, 0, R, 0,
-            X, 0, 0, 0,
-            float(A.XX), 0, 0, 1 };
-        glMultMatrixf(mat);
-    }
-
-    /**
-      Translate and rotate to place A in (0,0,0) and B at (0,0,1).
-      Scale XY plane by `rad' and Z axis by 1/|AB|
-     `R` is the transverse scaling done in the XY plane after rotation
-     */
-    void stretchAlignZ(Vector2 const& A, Vector2 const& B, float R)
-    {
-        float X(B.XX-A.XX);
-        float Y(B.YY-A.YY);
-        float r = R * invsqrt(X*X+Y*Y);
-        //warning! this matrix appears here transposed
-        float mat[16] = {
-            -r*Y, r*X, 0, 0,
-            0, 0, R, 0,
-            X, Y, 0, 0,
-            float(A.XX), float(A.YY), 0, 1 };
-        glMultMatrixf(mat);
-    }
-    
-    /**
-     Translate and rotate to place A in (0,0,0) and B at (0,0,1).
-     Scale XY plane by `rad' and Z axis by 1/|AB|
-     */
-    void stretchAlignZ(Vector3 const& A, Vector3 const& B, float R)
-    {
-        float X(B.XX-A.XX);
-        float Y(B.YY-A.YY);
-        float Z(B.ZZ-A.ZZ);
-        float N = R / std::sqrt(X*X+Y*Y+Z*Z);
-        float vec[3] = { N*X, N*Y, N*Z };
-        float mat[16] = {
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            X, Y, Z, 0,
-            float(A.XX), float(A.YY), float(A.ZZ), 1};
-        orthonormal(vec, R, mat, mat+4);
-        glMultMatrixf(mat);
-    }
-
-    
-    void rotate(Vector3 const& A, Vector3 const& B, Vector3 const& C)
-    {
-        float mat[16];
-        for ( int i = 0; i < 3; ++i )
-        {
-            mat[i  ] = A[i];
-            mat[i+4] = B[i];
-            mat[i+8] = C[i];
-            mat[i+12]  = 0;
-            mat[i*4+3] = 0;
-        }
-        mat[15] = 1;
-        glMultMatrixf(mat);
-    }
-    
-    void rotateInverse(Vector3 const& A, Vector3 const& B, Vector3 const& C)
-    {
-        float mat[16];
-        for ( int i = 0; i < 3; ++i )
-        {
-            mat[4*i  ] = A[i];
-            mat[4*i+1] = B[i];
-            mat[4*i+2] = C[i];
-            mat[4*i+3] = 0;
-            mat[i+12]  = 0;
-        }
-        mat[15] = 1;
-        glMultMatrixf(mat);
-    }
-
-    
-    void transRotate(Vector3 const& O, Vector3 const& A,
-                     Vector3 const& B, Vector3 const& C)
-    {
-        //warning! this matrix is displayed here transposed
-        float mat[16] = {
-            (float)A.XX, (float)A.YY, (float)A.ZZ, 0,
-            (float)B.XX, (float)B.YY, (float)B.ZZ, 0,
-            (float)C.XX, (float)C.YY, (float)C.ZZ, 0,
-            (float)O.XX, (float)O.YY, (float)O.ZZ, 1 };
-        glMultMatrixf(mat);
-    }
-    
-    // rotate to align Z with 'D' and translate to center 'P'
-    void transAlignZ(Vector1 const& P, float R, Vector1 const& D)
-    {
-        float X = std::copysign(R, float(D.XX));
-        float mat[16] = {
-            0, -X,  0,  0,
-            0,  0, -R,  0,
-            X,  0,  0,  0,
-            float(P.XX), 0, 0, 1};
-        glMultMatrixf(mat);
-    }
-    
-    // rotate to align Z with 'D' and translate to center 'P'
-    void transAlignZ(Vector2 const& P, float R, Vector2 const& D)
-    {
-        float X(D.XX);
-        float Y(D.YY);
-        float n = R * invsqrt(X*X+Y*Y);
-        X *= n;
-        Y *= n;
-        float mat[16] = {
-            Y, -X,  0,  0,
-            0,  0, -R,  0,
-            X,  Y,  0,  0,
-            float(P.XX), float(P.YY), 0, 1};
-        glMultMatrixf(mat);
-    }
-    
-    // rotate to align Z with 'D' and translate to center 'P', scale uniformly by `R`
-    void transAlignZ(Vector3 const& P, float R, Vector3 const& D)
-    {
-        float X(D.XX);
-        float Y(D.YY);
-        float Z(D.ZZ);
-        float N = R / std::sqrt(X*X+Y*Y+Z*Z);
-        float vec[3] = { N*X, N*Y, N*Z };
-        float mat[16] = {
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            vec[0], vec[1], vec[2], 0,
-            float(P.XX), float(P.YY), float(P.ZZ), 1};
-        orthonormal(vec, R, mat, mat+4);
-        glMultMatrixf(mat);
-    }
-
-    // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
-    void stretchAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
-    {
-        float X = std::copysign(R, float(D.XX));
-        float Z = std::copysign(S, float(D.XX));
-        float mat[16] = {
-            0, -X,  0,  0,
-            0,  0, -R,  0,
-            Z,  0,  0,  0,
-            float(P.XX), 0, 0, 1};
-        glMultMatrixf(mat);
-    }
-    
-    // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
-    void stretchAlignZ1(Vector2 const& P, float R, Vector2 const& D, float S)
-    {
-        float X(D.XX);
-        float Y(D.YY);
-        float mat[16] = {
-            R*Y, -R*X,  0,  0,
-            0,      0, -R,  0,
-            S*X,  S*Y,  0,  0,
-            float(P.XX), float(P.YY), 0, 1};
-        glMultMatrixf(mat);
-    }
-    
-    // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P', scale Z axis by S
-    void stretchAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
-    {
-        float X(D.XX);
-        float Y(D.YY);
-        float Z(D.ZZ);
-        float vec[3] = { R*X, R*Y, R*Z };
-        float mat[16] = {
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            S*X, S*Y, S*Z, 0,
-            float(P.XX), float(P.YY), float(P.ZZ), 1};
-        orthonormal(vec, R, mat, mat+4);
-        glMultMatrixf(mat);
-    }
-
-    // rotate to align Z with X and translate to center 'P'
-    void transAlignZX(float P, float R, float X)
-    {
-        float Y = std::copysign(R, X);
-        float mat[16] = {
-            0, Y, 0, 0,
-            0, 0, R, 0,
-            Y, 0, 0, 0,
-            P, 0, 0, 1};
-        glMultMatrixf(mat);
-    }
-    
-    // rotate to align Z with X and translate to center 'A'
-    void stretchAlignZX(float A, float B, float R)
-    {
-        float X = B - A;
-        float Y = std::copysign(R, X);
-        //warning! this matrix appears here transposed
-        float mat[16] = {
-            0, Y, 0, 0,
-            0, 0, R, 0,
-            X, 0, 0, 0,
-            A, 0, 0, 1 };
-        glMultMatrixf(mat);
-    }
-    
-    
-    void setClipPlane(GLenum glp, Vector1 const& dir, Vector1 const& pos)
-    {
-        GLdouble eq[4] = { dir.XX, 0, 0, -dot(dir, pos) };
-        glClipPlane(glp, eq);
-    }
-    
-    void setClipPlane(GLenum glp, Vector2 const& dir, Vector2 const& pos)
-    {
-        GLdouble eq[4] = { dir.XX, dir.YY, 0, -dot(dir, pos) };
-        glClipPlane(glp, eq);
-    }
-    
-    void setClipPlane(GLenum glp, Vector3 const& dir, Vector3 const& pos)
-    {
-        GLdouble eq[4] = { dir.XX, dir.YY, dir.ZZ, -dot(dir, pos) };
-        glClipPlane(glp, eq);
-    }
-    
-    
-    /**
-     draw back first, and then front of object,
-     GL_CULL_FACE is temporarily enabled for this
-     */
-    void dualPass(void primitive())
-    {
-        GLboolean cull = glIsEnabled(GL_CULL_FACE);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-        primitive();
-        glCullFace(GL_BACK);
-        primitive();
-        if ( !cull ) glDisable(GL_CULL_FACE);
     }
 
     //-----------------------------------------------------------------------
@@ -563,6 +300,28 @@ namespace gle
         return 36;
     }
     
+    /// Cube is made of 4 linestrips of 4 points each
+    size_t setWireCube(flute3* flt, float R)
+    {
+        flt[0] = {-R,-R, R};
+        flt[1] = { R,-R, R};
+        flt[2] = { R,-R,-R};
+        flt[3] = {-R,-R,-R};
+        flt[4] = { R,-R, R};
+        flt[5] = { R, R, R};
+        flt[6] = { R, R,-R};
+        flt[7] = { R,-R,-R};
+        flt[8] = { R, R, R};
+        flt[9] = {-R, R, R};
+        flt[10] = {-R, R,-R};
+        flt[11] = { R, R,-R};
+        flt[12] = {-R, R, R};
+        flt[13] = {-R,-R, R};
+        flt[14] = {-R,-R,-R};
+        flt[15] = {-R, R,-R};
+        return 16;
+    }
+    
     /// Octahedron is make of 8 triangles = 24 vertices
     size_t setOctahedron(flute6* flt, float R=1.46459188756f)
     {
@@ -601,7 +360,7 @@ namespace gle
     // this is used to calculate the vertices of the icosahedron
     void icoFace(float* a, float* b, float* c)
     {
-        float pts[9] = {a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]};
+        gym::ref_view();
         float nx = (a[0]+b[0]+c[0]) / 3.0f;
         float ny = (a[1]+b[1]+c[1]) / 3.0f;
         float nz = (a[2]+b[2]+c[2]) / 3.0f;
@@ -609,10 +368,12 @@ namespace gle
         nx /= n;
         ny /= n;
         nz /= n;
-        float nor[9] = {nx, ny, nz, nx, ny, nz, nx, ny, nz};
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glNormalPointer(GL_FLOAT, 0, nor);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        flute6* pts = gym::mapBufferV3N3(3);
+        pts[0] = {a[0], a[1], a[2], nx, ny, nz};
+        pts[1] = {b[0], b[1], b[2], nx, ny, nz};
+        pts[2] = {c[0], c[1], c[2], nx, ny, nz};
+        gym::unmapBufferV3N3();
+        gym::drawTriangleStrip(0, 3);
         if ( 1 ) {
             printf("%2.0f, %2.0f, %2.0f, %+9.7f, %+9.7f, %+9.7f\n", a[0], a[1], a[2], nx, ny, nz);
             printf("%2.0f, %2.0f, %2.0f, %+9.7f, %+9.7f, %+9.7f\n", b[0], b[1], b[2], nx, ny, nz);
@@ -995,25 +756,24 @@ namespace gle
 
     void thing()
     {
-        flute3 flu[52];
+        gym::ref_view();
+        flute3* flu = gym::mapBufferV3(52);
         setBlob(flu);
         //modifyBlob(flu, 10);
-        glVertexPointer(3, GL_FLOAT, 0, flu);
         glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, flu);
+        glNormalPointer(GL_FLOAT, 0, nullptr);
+        gym::unmapBufferV3();
 
-        gle_color(1,1,1).load_both();
-        glPointSize(8);
+        gym::color_both(1,1,1,1);
         for ( unsigned u : { 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 } )
-            glDrawArrays(GL_POINTS, u, 1);
-        glLineWidth(1);
-        glDrawArrays(GL_LINE_STRIP, 0, 52);
+            gym::drawPoints(8, u, 1);
+        gym::drawLineStrip(1, 0, 52);
 
-        gle_color(0,1,1,0.5).load_both();
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 26);
-        gle_color(1,1,0,0.5).load_both();
-        glDrawArrays(GL_TRIANGLE_STRIP, 26, 26);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        gym::color_both(0,1,1,0.5);
+        gym::drawTriangleStrip(0, 26);
+        gym::color_both(1,1,0,0.5);
+        gym::drawTriangleStrip(26, 26);
+        gym::cleanup();
     }
     
     void nothing()
@@ -1022,22 +782,12 @@ namespace gle
     
     //-----------------------------------------------------------------------
     
-    /// draw triangles with interleaved Vertex + Normal data
-    static void drawVNTriangles(flute6* ptr, GLsizei cnt)
-    {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, 6*sizeof(float), ptr);
-        glNormalPointer(GL_FLOAT, 6*sizeof(float), ptr);
-        glDrawArrays(GL_TRIANGLES, 0, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
-    }
-    
     static size_t sizeCubeBuffers()
     {
-        return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 );
+        return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 + 16 );
     }
     
-    flute6* setCubeBuffers(flute6* ptr, flute6* const ori, GLsizei idx[])
+    flute6* setCubeBuffers(flute6* ptr, flute6* const ori, size_t idx[])
     {
         size_t i = 0, s = ptr - ori;
         idx[0] = i+s; i += setTetrahedron(ptr);
@@ -1049,6 +799,7 @@ namespace gle
         idx[6] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
         idx[7] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
         idx[8] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
+        idx[9] = i+s; i += setWireCube((flute3*)(ptr+i), 0.5773502692f);
         assert_true( i <= sizeCubeBuffers() );
         return ptr + i;
     }
@@ -1058,7 +809,7 @@ namespace gle
         return ( 52 + 52 + 14 + 32 );
     }
 
-    flute3* setBlobBuffers(flute3* ptr, flute3* const ori, GLsizei idx[])
+    flute3* setBlobBuffers(flute3* ptr, flute3* const ori, size_t idx[])
     {
         size_t i = 0, s = ptr - ori;
         idx[0] = i+s; i += setBlob(ptr+i);
@@ -1069,94 +820,94 @@ namespace gle
         return ptr + i;
     }
 
-    void drawVNBuffer(GLenum mode, GLint start, size_t cnt)
+    void doVNTriangles(GLsizei start, GLsizei cnt)
     {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
-        glNormalPointer(GL_FLOAT, sizeof(flute6), (void*)(3*sizeof(float)));
-        glDrawArrays(mode, start, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        gym::bindBufferV3N3(buf_[0]);
+        gym::drawTriangles(start, cnt);
+        gym::cleanup(1);
+    }
+    
+    void wireCube(float width)
+    {
+        gym::bindBufferV3(buf_[0], 6*cubes_[9]);
+        gym::drawLineStrip(width, 0, 4);
+        gym::drawLineStrip(4, 4);
+        gym::drawLineStrip(8, 4);
+        gym::drawLineStrip(12, 4);
+    }
+    
+    void doVNTriangleStrip(GLsizei start, GLsizei cnt)
+    {
+        gym::bindBufferV3N3(buf_[0]);
+        gym::drawTriangleStrip(start, cnt);
+        gym::cleanup(1);
     }
 
-    void drawVNTriangles(GLsizei start, GLsizei cnt)
+    void doTriangleStrip(GLsizei start, GLsizei cnt)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        drawVNBuffer(GL_TRIANGLES, start, cnt);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gym::bindBufferV3N0(buf_[0], 0);
+        gym::drawTriangleStrip(start, cnt);
+        gym::cleanup(1);
     }
     
-    void drawVNLines(GLsizei start, GLsizei cnt)
+    void ICOSAHEDRON()
     {
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        glVertexPointer(3, GL_FLOAT, sizeof(flute6), nullptr);
-        glDrawArrays(GL_LINES, start, cnt);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    
-    void drawVNStrip(GLsizei start, GLsizei cnt)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        drawVNBuffer(GL_TRIANGLE_STRIP, start, cnt);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        flute6* tmp = gym::mapBufferV3N3(60);
+        setIcosahedron(tmp);
+        gym::unmapBufferV3N3();
+        gym::drawTriangles(0, 60);
+        gym::cleanup(1);
     }
 
-    void drawTriangleStrip(GLsizei start, GLsizei cnt)
-    {
-        //glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        glVertexPointer(3, GL_FLOAT, 0, nullptr);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
-        glDrawArrays(GL_TRIANGLE_STRIP, start, cnt);
-        glDisableClientState(GL_NORMAL_ARRAY);
-        //glPointSize(7); glDrawArrays(GL_POINTS, start, cnt);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
+    void tetrahedron() { doVNTriangles(cubes_[0], 12); }
+    void octahedron()  { doVNTriangles(cubes_[2], 24); }
+    void icosahedron() { doVNTriangles(cubes_[3], 60); }
+    
+    void arrowTail() { doVNTriangles(cubes_[4], 45); }
+    void cube()      { doVNTriangles(cubes_[5], 36); }
+    void star()      { doVNTriangles(cubes_[0], 24); }
+    
+    void hexTube()      { doVNTriangleStrip(cubes_[6], 14); }
+    void thinTube()     { doVNTriangleStrip(cubes_[7], 14); }
+    void thinLongTube() { doVNTriangleStrip(cubes_[8], 14); }
 
-    void tetrahedron() { drawVNTriangles(cubes_[0], 12); }
-    void octahedron()  { drawVNTriangles(cubes_[2], 24); }
-    void icosahedron() { drawVNTriangles(cubes_[3], 60); }
-    //void ICOSAHEDRON() { flute6 tmp[60]; setIcosahedron(tmp); drawVNTriangles(tmp, 60); }
-    
-    void arrowTail() { drawVNTriangles(cubes_[4], 45); }
-    void cube()      { drawVNTriangles(cubes_[5], 36); }
-    void star()      { drawVNTriangles(cubes_[0], 24); }
-    
-    void hexTube()      { drawVNStrip(cubes_[6], 14); }
-    void thinTube()     { drawVNStrip(cubes_[7], 14); }
-    void thinLongTube() { drawVNStrip(cubes_[8], 14); }
-
-    void blob()   { drawTriangleStrip(blobs_[0], 52); }
-    void needle() { drawTriangleStrip(blobs_[1], 52); }
-    void cuboid() { drawTriangleStrip(blobs_[2], 14); }
-    void icoid()  { drawTriangleStrip(blobs_[3], 32); }
-    
-    void wireCube() { drawVNLines(cubes_[5], 36); }
+    void blob()   { doTriangleStrip(blobs_[0], 52); }
+    void needle() { doTriangleStrip(blobs_[1], 52); }
+    void cuboid() { doTriangleStrip(blobs_[2], 14); }
+    void icoid()  { doTriangleStrip(blobs_[3], 32); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D Circle
     
-    size_t setCircle(flute2* flu, size_t inc, float Z, float R, float N)
+    size_t setCircle(flute2* flu, size_t inc, float R)
+    {
+        size_t i = 0;
+        for ( size_t n = 0; n <= pi_twice; n += inc )
+            flu[i++] = {R*cos_(n), R*sin_(n)};
+        return i;
+    }
+    
+    size_t setCircle(flute3* flu, size_t inc, float R, float Z, float N)
     {
         size_t i = 0;
         for ( size_t n = 0; n <= pi_twice; n += inc )
         {
             float C = cos_(n), S = sin_(n);
-            flu[i++] = {R*C, R*S};
+            flu[i++] = {R*C, R*S, Z};
         }
         return i;
     }
-    
+
     static size_t sizeCircBuffers()
     {
         return 4 + 2 * pi_twice;
     }
     
-    flute2* setCircBuffers(flute2* ptr, flute2* const ori, GLsizei idx[])
+    flute2* setCircBuffers(flute2* ptr, flute2* const ori, size_t idx[])
     {
         size_t i = 0, s = ptr - ori;
-        idx[0] = i+s; i += setCircle(ptr, 1, 0, 1, 1);
-        idx[1] = i+s; i += setCircle(ptr, 1, 0, 1, 2);
+        idx[0] = i+s; i += setCircle(ptr+i, 1, 1);
+        idx[1] = i+s; i += setCircle(ptr+i, 2, 1);
         assert_true( i <= sizeCircBuffers() );
         return ptr + i;
     }
@@ -1238,7 +989,7 @@ namespace gle
         return 22 * pi_twice;  // this is empirical!
     }
     
-    flute6* setTubeBuffers(flute6* ptr, flute6* const ori, GLsizei idx[])
+    flute6* setTubeBuffers(flute6* ptr, flute6* const ori, size_t idx[])
     {
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const float B = -32.f, T = 256.f, E = 0.03125;
@@ -1274,57 +1025,50 @@ namespace gle
         return 2 * ( 1 + pi_twice / inc );
     }
 
-    inline void drawTubeStrip(GLint start, size_t cnt)
+    inline void doTubeStrip(size_t start, size_t cnt)
     {
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        drawVNBuffer(GL_TRIANGLE_STRIP, start, cnt);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    
-    inline void drawLineStrip(GLint start, size_t cnt, size_t skip, GLenum mode)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        glVertexPointer(2, GL_FLOAT, skip*sizeof(flute2), nullptr);
-        glDrawArrays(mode, start, cnt/skip);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gym::bindBufferV3N3(buf_[0]);
+        gym::drawTriangleStrip(start, cnt);
+        gym::cleanup(1);
     }
     
     // using Vertex Buffer Objects
-    void tube1()         { drawTubeStrip(tubes_[0], nbTrianglesTube(1)); }
-    void tube2()         { drawTubeStrip(tubes_[1], nbTrianglesTube(2)); }
-    void tube4()         { drawTubeStrip(tubes_[2], nbTrianglesTube(4)); }
-    void tubeS()         { drawTubeStrip(tubes_[3], nbTrianglesTube(4)); }
-    void tubeM()         { drawTubeStrip(tubes_[4], nbTrianglesTube(4)); }
-    void tubeE()         { drawTubeStrip(tubes_[5], nbTrianglesTube(4)); }
-    void longTube1()     { drawTubeStrip(tubes_[7], nbTrianglesTube(1)); }
-    void longTube2()     { drawTubeStrip(tubes_[8], nbTrianglesTube(2)); }
-    void longTube4()     { drawTubeStrip(tubes_[9], nbTrianglesTube(4)); }
-    void halfTube1()     { drawTubeStrip(tubes_[10], nbTrianglesTube(1)); }
-    void halfTube2()     { drawTubeStrip(tubes_[11], nbTrianglesTube(2)); }
-    void halfTube4()     { drawTubeStrip(tubes_[12], nbTrianglesTube(4)); }
-    void cone1()         { drawTubeStrip(tubes_[13], nbTrianglesTube(1)); }
-    void cone2()         { drawTubeStrip(tubes_[14], nbTrianglesTube(2)); }
-    void truncatedCone() { drawTubeStrip(tubes_[15], nbTrianglesTube(2)); }
-    void cone3()         { drawTubeStrip(tubes_[16], nbTrianglesTube(2)); }
+    void tube1()         { doTubeStrip(tubes_[0], nbTrianglesTube(1)); }
+    void tube2()         { doTubeStrip(tubes_[1], nbTrianglesTube(2)); }
+    void tube4()         { doTubeStrip(tubes_[2], nbTrianglesTube(4)); }
+    void tubeS()         { doTubeStrip(tubes_[3], nbTrianglesTube(4)); }
+    void tubeM()         { doTubeStrip(tubes_[4], nbTrianglesTube(4)); }
+    void tubeE()         { doTubeStrip(tubes_[5], nbTrianglesTube(4)); }
+    void longTube1()     { doTubeStrip(tubes_[7], nbTrianglesTube(1)); }
+    void longTube2()     { doTubeStrip(tubes_[8], nbTrianglesTube(2)); }
+    void longTube4()     { doTubeStrip(tubes_[9], nbTrianglesTube(4)); }
+    void halfTube1()     { doTubeStrip(tubes_[10], nbTrianglesTube(1)); }
+    void halfTube2()     { doTubeStrip(tubes_[11], nbTrianglesTube(2)); }
+    void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
+    void cone1()         { doTubeStrip(tubes_[13], nbTrianglesTube(1)); }
+    void cone2()         { doTubeStrip(tubes_[14], nbTrianglesTube(2)); }
+    void truncatedCone() { doTubeStrip(tubes_[15], nbTrianglesTube(2)); }
+    void cone3()         { doTubeStrip(tubes_[16], nbTrianglesTube(2)); }
     
-    void disc1()         { drawTubeStrip(tubes_[17], pi_twice); }
-    void disc2()         { drawTubeStrip(tubes_[18], pi_twice/2); }
-    void discTop1()      { drawTubeStrip(tubes_[19], pi_twice); }
-    void discTop2()      { drawTubeStrip(tubes_[20], pi_twice/2); }
-    void discBottom1()   { drawTubeStrip(tubes_[21], pi_twice); }
-    void discBottom2()   { drawTubeStrip(tubes_[22], pi_twice/2); }
+    void disc1()         { doTubeStrip(tubes_[17], pi_twice); }
+    void disc2()         { doTubeStrip(tubes_[18], pi_twice/2); }
+    void discTop1()      { doTubeStrip(tubes_[19], pi_twice); }
+    void discTop2()      { doTubeStrip(tubes_[20], pi_twice/2); }
+    void discBottom1()   { doTubeStrip(tubes_[21], pi_twice); }
+    void discBottom2()   { doTubeStrip(tubes_[22], pi_twice/2); }
     
-    void circle()        { drawLineStrip(discs_[0], 1+pi_twice, 1, GL_LINE_STRIP); }
-    void circle2()       { drawLineStrip(discs_[1], 1+pi_twice, 2, GL_LINE_STRIP); }
-    void circle_dotted() { drawLineStrip(discs_[1], 1+pi_twice, 1, GL_LINES); }
+    void circle(float w)        { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
+    void circle2(float w)       { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
+    void circle_dotted(float w) { gym::bindBufferV2(buf_[0]); gym::drawLines(w, discs_[0], 1+pi_twice); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }
     void cylinder1() { tube2(); discBottom2(); discTop2(); }
+    
     // these primitices do not preserve the modelview transformation
-    void cylinder2() { glTranslatef(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }
-    void longCone() { glTranslatef(0,0,-1); glScalef(1,1,3); cone2(); discBottom2(); }
-    void shortCone() { glTranslatef(0,0,-0.333f); glScalef(1,1,0.5); cone2(); discBottom2(); }
+    void cylinder2() { gym::translate(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }
+    void longCone() { gym::translate(0,0,-1); gym::scale(1,1,3); cone2(); discBottom2(); }
+    void shortCone() { gym::translate(0,0,-0.333f); gym::scale(1,1,0.5); cone2(); discBottom2(); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres made from refined Icosahedrons
@@ -1352,11 +1096,8 @@ namespace gle
     
     void drawIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
     {
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        glVertexPointer(3, GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
         // the normal in each vertex is equal to the vertex!
-        glNormalPointer(GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
+        gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
         assert_true( sizeof(Tesselator::INDEX) == sizeof(GLshort) );
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
@@ -1368,16 +1109,13 @@ namespace gle
     void dualPassIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
     {
         assert_enabled(GL_CULL_FACE);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        glVertexPointer(3, GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
         // the normal in each vertex is equal to the vertex!
-        glNormalPointer(GL_FLOAT, 0, (void*)(pts*sizeof(GLfloat)));
+        gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        glCullFace(GL_FRONT);
+        gym::switchCullFace(GL_FRONT);
         assert_true( sizeof(Tesselator::INDEX) == sizeof(GLshort) );
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
-        glCullFace(GL_BACK);
+        gym::switchCullFace(GL_BACK);
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1479,10 +1217,9 @@ namespace gle
                 flu[i++] = {X1*(R+T*C), Y1*(R+T*C), T*S, X1*C, Y1*C, S};
             }
             gym::unmapBufferV3N3();
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+            gym::drawTriangleStrip(0, i);
         }
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gym::cleanup();
     }
 
     /**
@@ -1519,9 +1256,9 @@ namespace gle
     void threeArrowStrip(float w, const size_t inc)
     {
         arrowStrip(w, inc);
-        glRotated(-90,1,0,0);
+        gym::rotateX(0, -1);
         arrowStrip(w, inc);
-        glRotated(90,0,1,0);
+        gym::rotateY(0, 1);
         arrowStrip(w, inc);
     }
     
@@ -1535,7 +1272,6 @@ namespace gle
         float R = radius(Z);
         while ( Z < T )
         {
-            flute6 * flu = gym::mapBufferV3N3(2+2*pi_twice);
             float Y = Z;
             float Q = R;
             Z += dZ;
@@ -1545,18 +1281,19 @@ namespace gle
             float dN = 1.0f / sqrtf( 1 + dR * dR );
             dR = dR * dN;
             
-            size_t i = 0;
+            flute6 * flu = gym::mapBufferV3N3(2+2*pi_twice);
+            flute6 * ptr = flu;
             for ( size_t n = 0; n <= pi_twice; ++n )
             {
                 float S = sin_(n), C = cos_(n);
-                flu[i++] = {R*C, R*S, Z, dN*C, dN*S,-dR};
-                flu[i++] = {Q*C, Q*S, Y, dN*C, dN*S,-dR};
+                ptr[0] = {R*C, R*S, Z, dN*C, dN*S,-dR};
+                ptr[1] = {Q*C, Q*S, Y, dN*C, dN*S,-dR};
+                ptr += 2;
             }
             gym::unmapBufferV3N3();
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+            gym::drawTriangleStrip(0, ptr-flu);
         }
-        glDisableClientState(GL_NORMAL_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        gym::cleanup();
     }
 
     /// some volume of revolution with axis along Z
@@ -1565,58 +1302,47 @@ namespace gle
     void dumbbell() { drawRevolution(dumbbellRadius, 0, 1, 0.0625); }
     void barrel() { drawRevolution(barrelRadius, 0, 1, 0.0625); }
 
+    void dualPassBarrel() { gym::dualPass(barrel); }
+    
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
     
-    
     void stretchTube(Vector1 const& A, Vector1 const& B, float R, void (*obj)())
     {
-        glPushMatrix();
-        stretchAlignZ(A, B, R);
+        gym::stretchAlignZ(A, B, R);
         obj();
-        glPopMatrix();
     }
     
     void stretchTube(Vector2 const& A, Vector2 const& B, float R, void (*obj)())
     {
-        glPushMatrix();
-        stretchAlignZ(A, B, R);
+        gym::stretchAlignZ(A, B, R);
         obj();
-        glPopMatrix();
     }
     
     void stretchTube(Vector3 const& A, Vector3 const& B, float R, void (*obj)())
     {
-        glPushMatrix();
-        stretchAlignZ(A, B, R);
+        gym::stretchAlignZ(A, B, R);
         obj();
-        glPopMatrix();
     }
     
     //-----------------------------------------------------------------------
 
     void drawTube(Vector1 const& A, float R, Vector1 const& B, void (*obj)())
     {
-        glPushMatrix();
-        transAlignZ(A, R, B-A);
+        gym::transAlignZ(A, R, B-A);
         obj();
-        glPopMatrix();
     }
     
     void drawTube(Vector2 const& A, float R, Vector2 const& B, void (*obj)())
     {
-        glPushMatrix();
-        transAlignZ(A, R, B-A);
+        gym::transAlignZ(A, R, B-A);
         obj();
-        glPopMatrix();
     }
     
     void drawTube(Vector3 const& A, float R, Vector3 const& B, void (*obj)())
     {
-        glPushMatrix();
-        transAlignZ(A, R, B-A);
+        gym::transAlignZ(A, R, B-A);
         obj();
-        glPopMatrix();
     }
 
     //-----------------------------------------------------------------------
@@ -1627,76 +1353,90 @@ namespace gle
         real n = d.norm();
         if ( n > 0 )
         {
+            gym::ref_view();
             rad /= n;
-            flute2 pts[4] = { A+rad*d, A-rad*d, B+rad*d, B-rad*d };
-            glVertexPointer(2, GL_FLOAT, 0, pts);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+            flute2 * pts = gym::mapBufferV2(4);
+            pts[0] = A+rad*d;
+            pts[2] = A-rad*d;
+            pts[4] = B+rad*d;
+            pts[7] = B-rad*d;
+            gym::unmapBufferV2();
+            gym::drawTriangleStrip(0, 4);
         }
     }
     
     
-    void drawBand(Vector1 const& A, GLfloat rA,
-                  Vector1 const& B, GLfloat rB)
+    void drawBand(Vector1 const& A, float rA,
+                  Vector1 const& B, float rB)
     {
-        GLfloat AX(A.XX);
-        GLfloat BX(B.XX);
-        GLfloat pts[8] = { AX, rA, AX, -rA, BX, rB, BX, -rB };
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        gym::ref_view();
+        float AX(A.XX);
+        float BX(B.XX);
+        flute2 * pts = gym::mapBufferV2(4);
+        pts[0] = { AX, rA };
+        pts[2] = { AX,-rA };
+        pts[4] = { BX, rB };
+        pts[7] = { BX,-rB };
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 4);
     }
     
-    void drawBand(Vector2 const& A, GLfloat rA,
-                  Vector2 const& B, GLfloat rB)
+    void drawBand(Vector2 const& A, float rA,
+                  Vector2 const& B, float rB)
     {
         Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
         if ( n > 0 )
         {
-            GLfloat dX(d.XX/n), dY(d.YY/n);
-            GLfloat AX(A.XX), AY(A.YY);
-            GLfloat BX(B.XX), BY(B.YY);
-            GLfloat pts[8] = { AX+rA*dX, AY+rA*dY, AX-rA*dX, AY-rA*dY,
-                               BX+rB*dX, BY+rB*dY, BX-rB*dX, BY-rB*dY };
-            glVertexPointer(2, GL_FLOAT, 0, pts);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            gym::ref_view();
+            float dX(d.XX/n), dY(d.YY/n);
+            float AX(A.XX), AY(A.YY);
+            float BX(B.XX), BY(B.YY);
+            flute2 * pts = gym::mapBufferV2(4);
+            pts[0] = { AX+rA*dX, AY+rA*dY };
+            pts[2] = { AX-rA*dX, AY-rA*dY };
+            pts[4] = { BX+rB*dX, BY+rB*dY };
+            pts[7] = { BX-rB*dX, BY-rB*dY };
+            gym::unmapBufferV2();
+            gym::drawTriangleStrip(0, 4);
         }
     }
     
-    void drawBand(Vector1 const& A, GLfloat rA, gle_color cA,
-                  Vector1 const& B, GLfloat rB, gle_color cB)
+    void drawBand(Vector1 const& A, float rA, gle_color cA,
+                  Vector1 const& B, float rB, gle_color cB)
     {
-        GLfloat AX(A.XX);
-        GLfloat BX(B.XX);
+        gym::ref_view();
+        float AX(A.XX);
+        float BX(B.XX);
         flute6 * flu = gym::mapBufferC4V2(4);
         flu[0] = { cA, AX, -rA };
         flu[1] = { cA, AX,  rA };
         flu[2] = { cB, BX, -rB };
         flu[3] = { cB, BX,  rB };
         gym::unmapBufferC4V2();
-        glEnableClientState(GL_COLOR_ARRAY);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glDisableClientState(GL_COLOR_ARRAY);
+        gym::drawTriangleStrip( 0, 4);
+        gym::cleanup();
     }
     
-    void drawBand(Vector2 const& A, GLfloat rA, gle_color cA,
-                  Vector2 const& B, GLfloat rB, gle_color cB)
+    void drawBand(Vector2 const& A, float rA, gle_color cA,
+                  Vector2 const& B, float rB, gle_color cB)
     {
+        gym::ref_view();
         Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
         if ( n > 0 )
         {
-            GLfloat dX(d.XX/n), dY(d.YY/n);
-            GLfloat AX(A.XX), AY(A.YY);
-            GLfloat BX(B.XX), BY(B.YY);
+            float dX(d.XX/n), dY(d.YY/n);
+            float AX(A.XX), AY(A.YY);
+            float BX(B.XX), BY(B.YY);
             flute6 * flu = gym::mapBufferC4V2(6);
             flu[0] = { cA, AX+rA*dX, AY+rA*dY };
             flu[1] = { cA, AX-rA*dX, AY-rA*dY };
             flu[2] = { cB, BX+rB*dX, BY+rB*dY };
             flu[3] = { cB, BX-rB*dX, BY-rB*dY };
             gym::unmapBufferC4V2();
-            glEnableClientState(GL_COLOR_ARRAY);
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-            glDisableClientState(GL_COLOR_ARRAY);
+            gym::drawTriangleStrip(0, 4);
+            gym::cleanup();
         }
     }
     
@@ -1705,12 +1445,19 @@ namespace gle
      This will displays a rectangle if the connection is parallel,
      and a hourglass if the connection is antiparallel
      */
-    void drawHourglass(Vector2 const& a, Vector2 const& da,
-                       Vector2 const& b, Vector2 const& db)
+    void drawHourglass(Vector2 const& A, Vector2 const& dA,
+                       Vector2 const& B, Vector2 const& dB)
     {
-        flute2 pts[6] = { b-db, b, a-da, a+da, b, b+db };
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+        gym::ref_view();
+        flute2 * pts = gym::mapBufferV2(6);
+        pts[0] = B-dB;
+        pts[1] = B;
+        pts[2] = A-dA;
+        pts[3] = A+dA;
+        pts[4] = B;
+        pts[5] = B+dB;
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 6);
     }
     
     /**
@@ -1728,9 +1475,8 @@ namespace gle
         flu[4] = { cB, b };
         flu[5] = { cB, b+db };
         gym::unmapBufferC4V2();
-        glEnableClientState(GL_COLOR_ARRAY);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
-        glDisableClientState(GL_COLOR_ARRAY);
+        gym::drawTriangleStrip(0, 6);
+        gym::cleanup();
     }
     
     
@@ -1741,29 +1487,50 @@ namespace gle
     void drawCross(Vector2 const& A, Vector2 const& dA,
                    Vector2 const& B, Vector2 const& dB, real rad)
     {
-        glLineWidth(0.5);
-        flute2 pts[8] = { A-rad*dA, A, B, B-rad*dB,
-                          A+rad*dA, A, B, B+rad*dB };
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
+        gym::ref_view();
+        flute2 * pts = gym::mapBufferV2(8);
+        pts[0] = A-rad*dA;
+        pts[1] = A;
+        pts[2] = B;
+        pts[3] = B-rad*dB;
+        pts[4] = A+rad*dA;
+        pts[5] = A;
+        pts[6] = B;
+        pts[7] = B+rad*dB;
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 4);
+        gym::drawTriangleStrip(4, 4);
     }
     
     void drawBar(Vector3 const& A, Vector3 const& dA,
                  Vector3 const& B, Vector3 const& dB, real rad)
     {
+        gym::ref_view();
         Vector3 ab = normalize( A - B );
         Vector3 ea = cross(ab, dA);
         Vector3 eb = cross(ab, dB);
-        flute3 pts[16] = { A-rad*(dA-ea), A-rad*(dA+ea), B-rad*(dB-eb), B-rad*(dB+eb),
-                           A+rad*(dA-ea), A+rad*(dA+ea), B+rad*(dB-eb), B+rad*(dB+eb),
-                           A-rad*dA, A+rad*dA, B-rad*dB, B+rad*dB,
-                           A-rad*dA, A+rad*dA, B-rad*dB, B+rad*dB };
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
-        glDrawArrays(GL_TRIANGLE_STRIP, 8, 4);
-        glDrawArrays(GL_TRIANGLE_STRIP,12, 4);
+        flute3 * pts = gym::mapBufferV3(16);
+        pts[0] = A-rad*(dA-ea);
+        pts[1] = A-rad*(dA+ea);
+        pts[2] = B-rad*(dB-eb);
+        pts[3] = B-rad*(dB+eb);
+        pts[4] = A+rad*(dA-ea);
+        pts[5] = A+rad*(dA+ea);
+        pts[6] = B+rad*(dB-eb);
+        pts[7] = B+rad*(dB+eb);
+        pts[8] = A-rad*dA;
+        pts[9] = A+rad*dA;
+        pts[10] = B-rad*dB;
+        pts[11] = B+rad*dB;
+        pts[12] = A-rad*dA;
+        pts[13] = A+rad*dA;
+        pts[14] = B-rad*dB;
+        pts[15] = B+rad*dB;
+        gym::unmapBufferV3();
+        gym::drawTriangleStrip(0, 4);
+        gym::drawTriangleStrip(4, 4);
+        gym::drawTriangleStrip(8, 4);
+        gym::drawTriangleStrip(12, 4);
     }
     
     
@@ -1771,74 +1538,104 @@ namespace gle
      Two hexagons linked by a rectangle
      hexagons have the same surface as a disc of radius 1.
      */
-    void drawDumbbell(Vector2 const& A, Vector2 const& B, GLfloat diameter)
+    void drawDumbbell(Vector2 const& A, Vector2 const& B, float diameter)
     {
+        gym::ref_view();
         const float S(1.0996361107912678f); //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
         const float R(diameter * S);
         Vector2 x = ( B - A ).normalized(R*0.8660254037844386f);
         Vector2 y = x.orthogonal(R*0.5f);
-        flute2 pts[20] = {
-            A-x-y, A-x+y, A-y-y, A+y+y, A+x-y, A+x+y,
-            B-x-y, B-x+y, B-y-y, B+y+y, B+x-y, B+x+y };
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
+        flute2 * pts = gym::mapBufferV2(12);
+        pts[0] = A-x-y;
+        pts[1] = A-x+y;
+        pts[2] = A-y-y;
+        pts[3] = A+y+y;
+        pts[4] = A+x-y;
+        pts[5] = A+x+y;
+        pts[6] = B-x-y;
+        pts[7] = B-x+y;
+        pts[8] = B-y-y;
+        pts[9] = B+y+y;
+        pts[10] = B+x-y;
+        pts[11] = B+x+y;
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 12);
     }
     
     //-----------------------------------------------------------------------
 #pragma mark - Arrows
     
-    void drawCone(Vector1 const& pos, Vector1 const& dir, const GLfloat rad)
+    void drawCone(Vector1 const& pos, Vector1 const& dir, const float rad)
     {
-        GLfloat dx = rad*dir.XX, cx = pos.XX;
-        GLfloat pts[8] = {cx-dx, dx, cx-dx/2, 0, cx+dx+dx, 0, cx-dx ,-dx };
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        gym::ref_view();
+        float dx = rad*dir.XX, cx = pos.XX;
+        flute2 * pts = gym::mapBufferV2(4);
+        pts[0] = {cx-dx, dx};
+        pts[1] = {cx-dx/2, 0};
+        pts[2] = {cx+dx+dx, 0};
+        pts[3] = {cx-dx,-dx };
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 4);
     }
     
-    void drawCone(Vector2 const& pos, Vector2 const& dir, const GLfloat rad)
+    void drawCone(Vector2 const& pos, Vector2 const& dir, const float rad)
     {
-        GLfloat dx(rad*dir.XX),  cx(pos.XX);
-        GLfloat dy(rad*dir.YY),  cy(pos.YY);
-        GLfloat dxy = dx + dy, dyx = dy - dx;
-        GLfloat pts[8] = {cx-dxy, cy-dyx, cx-dx/2, cy-dy/2, cx+2*dx, cy+2*dy,cx+dyx, cy-dxy};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        gym::ref_view();
+        float dx(rad*dir.XX), cx(pos.XX);
+        float dy(rad*dir.YY), cy(pos.YY);
+        float dxy = dx + dy, dyx = dy - dx;
+        flute2 * pts = gym::mapBufferV2(4);
+        pts[0] = {cx-dxy, cy-dyx};
+        pts[1] = {cx-dx/2, cy-dy/2};
+        pts[2] = {cx+2*dx, cy+2*dy};
+        pts[3] = {cx+dyx, cy-dxy};
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 4);
     }
     
-    void drawCone(Vector3 const& pos, Vector3 const& dir, const GLfloat rad)
+    void drawCone(Vector3 const& pos, Vector3 const& dir, const float rad)
     {
-        glPushMatrix();
-        transAlignZ(pos, rad, dir);
-        longCone();
-        glPopMatrix();
+        gym::transAlignZ(pos, rad, dir);
+        gym::translate(0,0,-1);
+        gym::scale(1,1,3);
+        cone2();
+        discBottom2();
     }
     
     //-----------------------------------------------------------------------
     
     void drawCylinder(Vector1 const& pos, Vector1 const& dir, float rad)
     {
-        GLfloat cx(pos.XX);
-        GLfloat dx(rad * dir.XX * 0.5);
-        GLfloat pts[8] = {cx-dx, -rad, cx-dx, rad, cx+dx, -rad, cx+dx, rad };
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        gym::ref_view();
+        float cx(pos.XX);
+        float dx(rad * dir.XX * 0.5);
+        flute2 * pts = gym::mapBufferV2(4);
+        pts[0] = {cx-dx,-rad};
+        pts[1] = {cx-dx, rad};
+        pts[2] = {cx+dx,-rad};
+        pts[3] = {cx+dx, rad};
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 4);
     }
     
     void drawCylinder(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        GLfloat dx(rad * dir.XX), cx(pos.XX - dx * 0.5);
-        GLfloat dy(rad * dir.YY), cy(pos.YY - dy * 0.5);
-        GLfloat pts[8] = {cx+dy, cy-dx, cx-dy, cy+dx, cx+dx+dy, cy+dy-dx, cx+dx-dy, cy+dy+dx};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        gym::ref_view();
+        float dx(rad * dir.XX), cx(pos.XX - dx * 0.5);
+        float dy(rad * dir.YY), cy(pos.YY - dy * 0.5);
+        flute2 * pts = gym::mapBufferV2(4);
+        pts[0] = {cx+dy, cy-dx};
+        pts[1] = {cx-dy, cy+dx};
+        pts[2] = {cx+dx+dy, cy+dy-dx};
+        pts[3] = {cx+dx-dy, cy+dy+dx};
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 4);
     }
     
     void drawCylinder(Vector3 const& pos, Vector3 const& dir, float rad)
     {
-        glPushMatrix();
-        transAlignZ(pos, rad, dir);
+        gym::transAlignZ(pos, rad, dir);
         cylinder2();
-        glPopMatrix();
     }
     
     
@@ -1846,251 +1643,138 @@ namespace gle
     
     void drawArrowTail(Vector1 const& pos, Vector1 const& dir, float rad)
     {
-        GLfloat dx(rad * dir.XX);
-        GLfloat cx(pos.XX - dx * 0.5 );
-        GLfloat pts[12] = {cx-dx, -dx, cx+dx, -dx, cx, 0,
-                           cx+2*dx, 0, cx-dx, dx, cx+dx, dx};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+        gym::ref_view();
+        float dx(rad * dir.XX);
+        float cx(pos.XX - dx * 0.5 );
+        flute2 * pts = gym::mapBufferV2(6);
+        pts[0] = {cx-dx, -dx};
+        pts[1] = {cx+dx, -dx};
+        pts[2] = {cx, 0};
+        pts[3] = {cx+2*dx, 0};
+        pts[4] = {cx-dx, dx};
+        pts[5] = {cx+dx, dx};
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 6);
     }
     
     void drawArrowTail(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        GLfloat dx(rad * dir.XX);
-        GLfloat dy(rad * dir.YY);
-        GLfloat cx(pos.XX - 1.5f * dx);
-        GLfloat cy(pos.YY - 1.5f * dy);
-        GLfloat ex(cx + 2 * dx);
-        GLfloat ey(cy + 2 * dy);
-        GLfloat pts[12] = {cx+dy, cy-dx, ex+dy, ey-dx, cx+dx, cy+dy,
-                           ex+dx, ey+dy, cx-dy, cy+dx, ex-dy, ey+dx};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+        gym::ref_view();
+        float dx(rad * dir.XX);
+        float dy(rad * dir.YY);
+        float cx(pos.XX - 1.5f * dx);
+        float cy(pos.YY - 1.5f * dy);
+        float ex(cx + 2 * dx);
+        float ey(cy + 2 * dy);
+        flute2 * pts = gym::mapBufferV2(6);
+        pts[0] = {cx+dy, cy-dx};
+        pts[1] = {ex+dy, ey-dx};
+        pts[2] = {cx+dx, cy+dy};
+        pts[3] = {ex+dx, ey+dy};
+        pts[4] = {cx-dy, cy+dx};
+        pts[5] = {ex-dy, ey+dx};
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, 6);
     }
     
     void drawArrowTail(Vector3 const& pos, Vector3 const& dir, float rad)
     {
-        glPushMatrix();
-        transAlignZ(pos, rad, dir);
+        gym::transAlignZ(pos, rad, dir);
         arrowTail();
-        glPopMatrix();
     }
     
     //-----------------------------------------------------------------------
     void drawArrow(Vector1 const& A, Vector1 const& B, float R)
     {
-        glPushMatrix();
-        stretchAlignZ(A, B, R);
+        gym::stretchAlignZ(A, B, R);
         tube1();
-        glTranslatef(0, 0, 1);
-        glScalef(3.0, 3.0, 3*R);
-        longCone();
-        glPopMatrix();
+        gym::translate(0, 0, 3*R-1);
+        gym::scale(3.0, 3.0, 9*R);
+        cone2();
+        discBottom2();
     }
     
     void drawArrow(Vector2 const& A, Vector2 const& B, float R)
     {
-        glPushMatrix();
-        stretchAlignZ(A, B, R);
+        gym::stretchAlignZ(A, B, R);
         tube1();
-        glTranslatef(0, 0, 1);
-        glScalef(3.0, 3.0, 3*R);
-        longCone();
-        glPopMatrix();
+        gym::translate(0, 0, 3*R-1);
+        gym::scale(3.0, 3.0, 9*R);
+        cone2();
+        discBottom2();
     }
     
     void drawArrow(Vector3 const& A, Vector3 const& B, float R)
     {
-        glPushMatrix();
-        stretchAlignZ(A, B, R);
+        gym::stretchAlignZ(A, B, R);
         tube1();
-        glTranslatef(0, 0, 1);
-        glScalef(3.0, 3.0, 3*R);
-        longCone();
-        glPopMatrix();
+        gym::translate(0, 0, 3*R-1);
+        gym::scale(3.0, 3.0, 9*R);
+        cone2();
+        discBottom2();
     }
-
-    //-----------------------------------------------------------------------
-    #pragma mark - Misc
-    
-    /**
-     rectangle should be specified as [ left, bottom, right, top ]
-     The rectangle will be drawn counter-clockwise
-     */
-    void drawRectangle(const int rec[4])
-    {
-        GLfloat L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
-        GLfloat pts[10] = { L, B, R, B, R, T, L, T, L, B };
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_LINE_LOOP, 0, 5);
-    }
-    
-    void drawRectangle(float L, float B, float R, float T, float Z)
-    {
-        GLfloat pts[15] = { L, B, Z, R, B, Z, R, T, Z, L, T, Z, L, B, Z };
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_LINE_LOOP, 0, 5);
-    }
-    
-    void fillRectangle(float L, float B, float R, float T, float Z)
-    {
-        GLfloat pts[15] = { L, B, Z, R, B, Z, L, T, Z, R, T, Z };
-        glVertexPointer(3, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    }
-
-    
-    void drawRectangle(const int rec[4], int width, int height)
-    {
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(0, width, 0, height, 0, 1);
-        
-        //disable advanced features
-        GLboolean depth = glIsEnabled(GL_DEPTH_TEST);
-        GLboolean light = glIsEnabled(GL_LIGHTING);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_LIGHTING);
-        
-        drawRectangle(rec);
-        
-        if ( depth ) glEnable(GL_DEPTH_TEST);
-        if ( light ) glEnable(GL_LIGHTING);
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-    }
-    
-    
-    void drawResizeBox(int width, int height)
-    {
-        //set the matrices
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(width, 0, 0, height, 0, 1 );
-        
-        //draw lines at 45 degrees
-        GLfloat pts[16] = {16, 1, 1, 16, 12, 1, 1, 12, 8, 1, 1, 8, 4, 1, 1, 4};
-        glVertexPointer(2, GL_FLOAT, 0, pts);
-        glDrawArrays(GL_LINES, 0, 8);
-
-        glPopMatrix();
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-    }
-    
-
-    //-----------------------------------------------------------------------
-    
-    int copy_parity(const int a, const int b)
-    {
-        return a + (( std::abs(a) + b ) & 1 );
-    }
-
-    void drawTiledFloor(int R, float T, float Z, gle_color col, gle_color back)
-    {
-        float H = T * 0.5;
-        int Q = std::floor( double(R) * M_SQRT1_2 );
-        
-        if ( back.visible() )
-        {
-            float U = R * T;
-            back.load_load();
-            fillRectangle(-U, -U, U, U, Z);
-        }
-        
-        col.load_load();
-        int x = R;
-        int RX = 2 * x - 3;
-        int RY = 0;
-        for ( int y = 0; y <= x; ++y )
-        {
-            /*
-             using the Midpoint circle algorithm
-             https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-            */
-            if ( RY > RX )
-            {
-                RX += 4 * ( x - 1 );
-                --x;
-            }
-            RY += 4 * y + 8;
-            for ( int i = copy_parity(-x,y); i <= x; i+=2 )
-            {
-                float X = i * T;
-                float Y = y * T;
-                fillRectangle( X-H, Y-H, X+H, Y+H, Z);
-                fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
-            }
-            for ( int i = copy_parity(Q,y); i <= x; i+=2 )
-            {
-                float X = y * T;
-                float Y = i * T;
-                fillRectangle( X-H, Y-H, X+H, Y+H, Z);
-                fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z);
-            }
-            for ( int i = copy_parity(Q,y); i <= x; i+=2 )
-            {
-                float X = y * T;
-                float Y = i * T;
-                fillRectangle(-X-H, Y-H,-X+H, Y+H, Z);
-                fillRectangle( X+H,-Y+H, X-H,-Y-H, Z);
-            }
-        }
-    }
-
     
     //-----------------------------------------------------------------------
-    void drawAxes(const float size, int dim)
+    void drawAxes(const float S, int dim)
     {
-        const GLfloat S(size);
-        const GLfloat R(S * 0.1f);
-        
-        glMatrixMode(GL_MODELVIEW);
-        
+        const float R(S * 0.1f);
+        gym::openDepthMask();
+        gym::enableLighting();
         for (int d = 0; d < dim; ++d)
         {
-            glPushMatrix();
+            gym::pull_ref();
             switch(d)
             {
                 case 0:
-                    gle_color(1, 0, 0, 1).load_load();
-                    glRotatef( 90, 0, 1, 0);
+                    gym::color_front(1, 0, 0);
+                    gym::rotateY(0, 1);
                     break;
                 case 1:
-                    gle_color(0, 1, 0, 1).load_load();
-                    glRotatef(-90, 1, 0, 0);
-                    glRotatef(180, 0, 0, 1);
+                    gym::color_front(0, 1, 0);
+                    gym::rotateX(0, -1);
+                    gym::rotateZ(-1, 0);
                     break;
                 case 2:
-                    gle_color(0, 0, 1, 1).load_load();
-                    glRotatef(-90, 0, 0, 1);
+                    gym::color_front(0, 0, 1);
+                    gym::rotateZ(0, -1);
                     break;
             }
-            glScalef(R/2, R/2, S-R);
+            gym::scale(R/2, R/2, S-R);
             tube1();
-            glTranslatef(0, 0, 1);
-            glScalef(3, 3, R/(S-R));
-            longCone();
-            glPopMatrix();
+            gym::translate(0, 0, 1-R/(S-R));
+            gym::scale(3, 3, 3*R/(S-R));
+            cone2();
+            discBottom2();
         }
         // display a white ball at the origin
-        gle_color(1.0, 1.0, 1.0, 1.0).load_load();
-        glPushMatrix();
-        scale(R);
+        gym::color_front(1, 1, 1);
+        gym::pull_ref();
+        gym::scale(R);
         sphere4();
-        glPopMatrix();
+        gym::restoreLighting();
     }
     
+
+    void drawCuboid(Vector3 const& A, Vector3 const& B, float w)
+    {
+        float AX = A.XX, AY = A.YY, AZ = A.ZZ;
+        float BX = B.XX, BY = B.YY, BZ = B.ZZ;
+        flute3 * flu = gym::mapBufferV3(10);
+        flu[0] = { AX, AY, AZ };
+        flu[1] = { BX, AY, AZ };
+        flu[2] = { BX, BY, AZ };
+        flu[3] = { AX, BY, AZ };
+        flu[4] = { AX, AY, AZ };
+        flu[5] = { AX, AY, BZ };
+        flu[6] = { BX, AY, BZ };
+        flu[7] = { BX, BY, BZ };
+        flu[8] = { AX, BY, BZ };
+        flu[9] = { AX, AY, BZ };
+        gym::unmapBufferV3();
+        gym::drawLineStrip(w, 0, 5);
+        gym::drawLineStrip(w, 5, 5);
+    }
+
+
 }
 

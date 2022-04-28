@@ -93,9 +93,9 @@ public:
     void read(Inputter&, Simul&, ObjectTag);
 
     /// OpenGL display function
-    void drawPolygon(bool, bool) const;
+    void drawPolygon(float, float) const;
     /// OpenGL display function
-    void draw2D() const { drawPolygon(true, true); }
+    void draw2D(float width) const { drawPolygon(width, width); }
     /// OpenGL display function
     void draw3D() const;
 

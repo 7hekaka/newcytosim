@@ -8,12 +8,14 @@
 #include "glut.h"
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_draw.h"
+#include "gym_text.h"
 
 
 SphericalCode S, T;
 SphericalCode * front = &S;
 
-pthread_t       thread;
+pthread_t thread;
 pthread_mutex_t lock;
 
 int n_points = 12;
@@ -102,18 +104,17 @@ void processNormalKey(unsigned char c, int x, int y)
 }
 
 //------------------------------------------------------------------------------
-void drawVertices()
+void drawVertices(const float col[4])
 {
     size_t cnt = front->nbPoints();
-    flute3* flu = gym::mapBufferV3(4*front->nbPoints());
+    flute8* flu = gym::mapBufferC4V4(4*front->nbPoints());
     for ( size_t i = 0; i < cnt; ++i )
-        flu[i] = { Vector3(front->addr(i)) };
-    glPointSize(5);
-    gym::unmapBufferV3();
-    glDrawArrays(GL_POINTS, 0, cnt);
+        flu[i] = { col, Vector3(front->addr(i)) };
+    gym::unmapBufferC4V4();
+    gym::drawPoints(5, 0, cnt);
 }
 
-void nameVertices()
+void nameVertices(const float col[4])
 {
     char tmp[128];
     for ( size_t i=0; i < front->nbPoints(); ++i )
@@ -121,28 +122,14 @@ void nameVertices()
         real x, y, z;
         front->putPoint(&x, &y, &z, i);
         snprintf(tmp, sizeof(tmp), "%lu", i);
-        gym::drawText(Vector3(x, y, z), BITMAP_8_BY_13, tmp, 0.5);
+        gym::drawText(Vector3(x, y, z), BITMAP_8_BY_13, col, tmp, 0.5);
     }
 }
 
-
-void display(View& view, int)
+void drawTangents(const float col[4], const float lor[4])
 {
-    view.openDisplay();
-    glPointSize(7);
-    
-    if ( front == &T )
-        glColor3f(0.f, 0.f, 1.0);
-    else
-        glColor3f(0.f, 0.7, 0.f);
-
-    drawVertices();
-    nameVertices();
-    
-#if ( 1 )
     const real E = 0.1;
     flute8* flu = gym::mapBufferC4V4(4*front->nbPoints());
-    gle_color col(1,1,1), lor(0,0,0);
     size_t n = 0;
     for ( size_t i = 0; i < front->nbPoints(); ++i )
     {
@@ -153,19 +140,24 @@ void display(View& view, int)
         flu[n++] = { col, a };
         flu[n++] = { lor, a+E*c };
     }
-    glLineWidth(3);
     gym::unmapBufferC4V4();
-    glDrawArrays(GL_LINES, 0, n);
-#endif
+    gym::drawLines(3, 0, n);
+}
+
+
+int display(View& view)
+{
+    gle_color col(1,1,1), lor(0,0,0);
+    view.openDisplay();
+    glPointSize(7);
     
-    if ( 0 )
-    {
-        glColor4f(0.3, 0.3, 0.3, 0.5);
-        glDepthMask(GL_FALSE);
-        glutSolidSphere(0.98,30,30);
-        glDepthMask(GL_TRUE);
-    }
+    if ( front == &T )
+        col[1] = 0.5f;
+    drawVertices(col);
+    nameVertices(col);
+    drawTangents(col, lor);
     view.closeDisplay();
+    return 0;
 }
 
 //------------------------------------------------------------------------------

@@ -13,7 +13,6 @@
 #include <unistd.h>
 #include <cstdlib>
 #include "filepath.h"
-#include "glut.h"
 #include "gym_check.h"
 
 extern void helpKeys(std::ostream&);
@@ -51,10 +50,8 @@ void Player::setStyle(const unsigned style)
         View & view = glApp::views[n];
         if ( view.window() > 0 )
         {
-            //std::clog << "initializing GLUT window " << n << '\n';
-            //glutSetWindow(view.window());
             view.initGL();
-            glViewport(0, 0, view.width(), view.height());
+            view.setViewport();
         }
     }
 }
@@ -210,40 +207,57 @@ void Player::autoScale(SpaceSet const& spaces, View& view)
 }
 
 
-void Player::prepareDisplay(View& view, int mag)
-{    
-    CHECK_GL_ERROR("before prepareDisplay");
-    //----------------- automatic adjustment of viewing area:
-
-    if ( view.auto_scale > 0 )
-        autoScale(simul.spaces, view);
-    
-    //----------------- auto-track:
-    
-    if ( view.track_fibers )
-        autoTrack(simul.fibers, view);
-    
-    //----------------- texts:
-    
-    view.setLabel(buildLabel());
-    view.setMemo(buildMemo(view.draw_memo));
-    view.setMessage(buildReport(prop.report));
-
-    //----------------- set pixel size, unit-size and direction:
-
+//set pixel size, unit-size and direction:
+void Player::setPixelSize(View& view)
+{
     float pix = view.pixelSize();
     /*
      if `disp.point_value` is set, line width and point size are to be understood
      in 'real' units, and otherwise, they are understood as number of pixels.
      */
-    float val = (disp.point_value > 0 ? disp.point_value/pix : 1 );
-    //std::clog << " pixel size = " << pix << '\n';
+    float val = view.magnify * ( disp.point_value > 0 ? disp.point_value/pix : 1 );
 
-    mDisplay->setPixelFactors(pix/mag, mag*val);
-    mDisplay->setStencil(view.stencil && ( DIM >= 3 ));
-    /// adjust reference color used by gle::bright_color
-    gle::background_color = view.back_color;
+    mDisplay->setPixelFactors(pix, val);
     
+    //printf(" pixelSize %6.3f unitValue %6.3f : %lu\n", pix, val, dispList.size());
+    for ( Property * p : dispList )
+    {
+        if ( p->category() == "fiber:display" )
+            static_cast<FiberDisp*>(p)->setPixels(pix, val);
+        else
+            static_cast<PointDisp*>(p)->setPixels(pix, val, disp.style==2);
+    }
+}
+
+
+void Player::prepareDisplay(View& view)
+{    
+    CHECK_GL_ERROR("before prepareDisplay");
+    //-------- automatic adjustment of viewing area:
+
+    if ( view.auto_scale > 0 )
+        autoScale(simul.spaces, view);
+    
+    //-------- auto-track:
+    
+    if ( view.track_fibers )
+        autoTrack(simul.fibers, view);
+    
+    //-------- texts:
+    
+    view.setLabel(buildLabel());
+    view.setMemo(buildMemo(view.draw_memo));
+    view.setMessage(buildReport(prop.report));
+
+    //-------- set pixel size, unit-size and direction:
+
+    setPixelSize(view);
+    
+    mDisplay->setStencil(view.stencil && ( DIM >= 3 ));
+    
+    //-------- adjust reference color used by gle::bright_color
+    gle::background_color = view.back_color;
+
     CHECK_GL_ERROR("in prepareDisplay");
 
     try {
@@ -263,7 +277,7 @@ void Player::drawCytosim()
 #if 0
     static double sec = TimeDate::milliseconds();
     double now = TimeDate::milliseconds();
-    std::clog << " drawCytosim(" << std::setprecision(3) << simul.time() << "s) " << now-sec << "\n";
+    std::clog << " drawCytosim(" << std::setprecision(4) << simul.time() << "s) " << now-sec << "\n";
     sec = now;
 #endif
     try {
@@ -276,14 +290,11 @@ void Player::drawCytosim()
 #if DRAW_MECA_LINKS
         if ( disp.draw_links )
         {
-            glLineWidth(6);
-            glPointSize(8);
-            glDisable(GL_LIGHTING);
-            glEnable(GL_LINE_STIPPLE);
-            glEnableClientState(GL_COLOR_ARRAY);
+            gym::disableLighting();
+            gym::enableLineStipple();
             simul.drawLinks();
-            glDisableClientState(GL_COLOR_ARRAY);
-            glDisable(GL_LINE_STIPPLE);
+            gym::cleanup();
+            gym::disableLineStipple();
             CHECK_GL_ERROR("Simul::drawLinks()");
         }
 #endif
@@ -327,8 +338,7 @@ void Player::drawScene(View& view)
     view.openDisplay();
     drawCytosim();
     view.closeDisplay();
-    glFinish();
-    
+
     if ( prop.save_images > 0 )
     {
         double t = simul.time();
@@ -350,18 +360,6 @@ void Player::drawScene(View& view)
 }
 
 
-void Player::drawScene(View& view, int mag)
-{
-    if ( simul.prop.display_fresh )
-    {
-        readDisplayString(view, simul.prop.display);
-        simul.prop.display_fresh = false;
-    }
-    //worker.debug("drawScene");
-    prepareDisplay(view, mag);
-    drawScene(view);
-}
-
 //------------------------------------------------------------------------------
 #pragma mark - Export Image
 
@@ -372,8 +370,9 @@ void Player::drawScene(View& view, int mag)
  */
 int Player::saveView(const char* filename, const char* format, int downsample) const
 {
-    GLint vp[4];
-    glGetIntegerv(GL_VIEWPORT, vp);
+    View& view = glApp::currentView();
+    GLint const* vp = view.viewport();
+    //printf("Player::viewport %ix%i\n", vp[2], vp[3]);
     int err = SaveImage::saveImage(filename, format, vp, downsample);
     if ( err == 0 && simul.prop.verbose > 0 )
     {
@@ -431,11 +430,10 @@ int Player::saveView(size_t indx, int downsample) const
 
 //------------------------------------------------------------------------------
 
-void displayMagnified(int mag, void * arg)
+static void drawFunc(int mag, void * arg)
 {
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     static_cast<Player*>(arg)->drawCytosim();
-    CHECK_GL_ERROR("in displayMagnified");
+    CHECK_GL_ERROR("in drawFunc");
 }
 
 
@@ -448,16 +446,18 @@ int Player::saveScene(const int mag, const char* name, const char* format, const
     View & view = glApp::currentView();
     const int W = view.width(), H = view.height();
     worker.lock();
-    
+    float m = view.magnify;
+    view.magnify = mag;
     //std::clog << "saveMagnifiedImage " << W << "x" << H << " mag=" << mag << '\n';
-    prepareDisplay(view, mag);
+    prepareDisplay(view);
     view.openDisplay();
-    int err = SaveImage::saveMagnifiedImage(mag, name, format, W, H, displayMagnified, this, downsample);
+    int err = SaveImage::saveMagnifiedImage(mag, name, format, W, H, drawFunc, this, downsample);
     if ( err )
-        err = SaveImage::saveCompositeImage(mag, name, format, W, H, view.pixelSize(), displayMagnified, this, downsample);
+        err = SaveImage::saveCompositeImage(mag, name, format, W, H, view.pixelSize(), drawFunc, this, downsample);
     if ( !err )
         printf("saved %ix%i snapshot %s\n", mag*W/downsample, mag*H/downsample, name);
     view.closeDisplay();
+    view.magnify = m;
     
     worker.unlock();
     return err;

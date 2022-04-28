@@ -503,10 +503,13 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
 
 
 #ifdef DISPLAY
-#include "gle.h"
-#include "gym_flute.h"
 
-void Space::drawSection(int dim, real pos, size_t cnt) const
+#include "gym_flute.h"
+#include "gym_draw.h"
+#include "gym_flute_dim.h"
+
+
+void Space::drawSection(int dim, real pos, size_t cnt, float width) const
 {
     Vector inf, sup;
     boundaries(inf, sup);
@@ -545,12 +548,12 @@ void Space::drawSection(int dim, real pos, size_t cnt) const
         pts[i++] = project(ppp);
     }
     gym::unmapBufferVD();
-    glDrawArrays(GL_LINE_STRIP, 0, i);
+    gym::drawLineStrip(width, 0, i);
 }
 
 #else
 
-void Space::drawSection(int, real, size_t) const
+void Space::drawSection(int, real, size_t, float width) const
 {
     //you will get this output if objects for play was not compiled properly:
     //DISPLAY should be defined on the compiler command, with: -DDISPLAY

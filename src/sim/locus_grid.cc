@@ -947,22 +947,24 @@ void LocusGrid::setSterics(size_t pan1, size_t pan2) const
 
 #endif
 
+
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
 #ifdef DISPLAY
 
-#include "opengl.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 
-void drawBoundaries(Map<DIM> const&);
+void drawBoundaries(Map<DIM> const&, float);
 
 void LocusGrid::drawGrid() const
 {
 #if ( DIM <= 3 )
-    glDisable(GL_LIGHTING);
-    glColor3f(1, 0, 0);
-    glLineWidth(0.25);
-    drawBoundaries(pGrid);
+    gym::ref_view();
+    gym::disableLighting();
+    gym::color(1,0,0);
+    drawBoundaries(pGrid, 0.5f);
 #endif
 }
 #endif

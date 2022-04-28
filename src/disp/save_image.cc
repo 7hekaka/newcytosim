@@ -4,6 +4,8 @@
 #include <cstring>
 #include <new>
 
+#include "gym_image.h"
+
 #ifdef DISPLAY
 #  include "opengl.h"
 #endif
@@ -94,12 +96,13 @@ int SaveImage::saveCompositeImage(const int mag,
                                   const char format[],
                                   const uint32_t width, const uint32_t height,
                                   const double pixel_size,
-                                  void (*display)(int, void *), void * arg,
+                                  void (*drawFunc)(int, void *), void * arg,
                                   int downsample)
 {
     if ( ! supported(format) )
         return UNKNOWN_FORMAT;
-    
+    int res = OPENGL_ERROR;
+#ifdef GL_VERSION_2_1
     int mW = mag * width;
     int mH = mag * height;
     
@@ -120,7 +123,8 @@ int SaveImage::saveCompositeImage(const int mag,
     {
         glPushMatrix();
         glTranslated((cc-ix)*dx, (cc-iy)*dy, 0);
-        display(mag, arg);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        drawFunc(mag, arg);
         glPopMatrix();
         if ( 0 == readPixels(0, 0, width, height, sub) )
         {
@@ -131,9 +135,10 @@ int SaveImage::saveCompositeImage(const int mag,
     }
     glPopMatrix();
     
-    int res = savePixels(filename, format, pixels, mW, mH, downsample);
+    res = savePixels(filename, format, pixels, mW, mH, downsample);
     free_pixels(pixels);
     free_pixels(sub);
+#endif
     return res;
 }
 
@@ -142,13 +147,12 @@ int SaveImage::saveCompositeImage(const int mag,
  This adjusts the Viewport to produce an image with higher resolution.
  The result should be better than saveCompositeImage, but uses more
  memory on the graphic card.
- 
  */
 int SaveImage::saveMagnifiedImage(const int mag,
                                   const char * filename,
                                   const char format[],
                                   const uint32_t width, const uint32_t height,
-                                  void (*display)(int, void *), void * arg,
+                                  void (*drawFunc)(int, void *), void * arg,
                                   int downsample)
 {
     if ( ! supported(format) )
@@ -176,7 +180,8 @@ int SaveImage::saveMagnifiedImage(const int mag,
     for ( int ix = 0; ix < mag; ++ix )
     {
         glViewport(-ix*width, -iy*height, mW, mH);
-        display(mag, arg);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        drawFunc(mag, arg);
         if ( 0 == readPixels(0, 0, width, height, sub) )
         {
             uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
@@ -218,54 +223,10 @@ int SaveImage::readPixels(int32_t X, int32_t Y, uint32_t W, uint32_t H, GLvoid *
         fprintf(ERF, "OpenGL error: could not read pixels (error %u)\n", err);
         return OPENGL_ERROR;
     }
-    return 0;
+    return NO_ERROR;
 }
 
 #endif
-
-/**
- This will downsample pixelmap `src` and set destination `dst`. The pixel
- array `src` should be of size `3*W*H` with 3 bytes per pixels: R, G, B,
- while `src` will be `bin*bin` times smaller. Pixels are stored in row order
- from the lowest to the highest row, left to right in each row (as in OpenGL).
- The pixels components of `src` are averaged to produce `dst`.
- */
-void SaveImage::downsampleRGB(uint8_t dst[], const uint8_t src[],
-                              unsigned W, unsigned H, unsigned bin)
-{
-    const size_t s = bin * bin;
-    const size_t sx = W / bin;
-    const size_t sy = H / bin;
-    
-#if ( 0 )
-    //reset destination:
-    for ( size_t u = 0; u < sx*sy; ++u )
-    {
-        dst[3*u  ] = 0xFF;
-        dst[3*u+1] = 0xFF;
-        dst[3*u+2] = 0xFF;
-    }
-#endif
-    
-    for ( size_t x = 0; x < sx; ++x )
-    for ( size_t y = 0; y < sy; ++y )
-    {
-        size_t r = 0, g = 0, b = 0;
-        for ( size_t dx = 0; dx < bin; ++dx )
-        for ( size_t dy = 0; dy < bin; ++dy )
-        {
-            uint8_t const* p = src + 3 * ( dx + bin*x + W*(dy+bin*y) );
-            r += p[0];
-            g += p[1];
-            b += p[2];
-        }
-        
-        dst[3*(x+sx*y)  ] = (uint8_t)( r / s );
-        dst[3*(x+sx*y)+1] = (uint8_t)( g / s );
-        dst[3*(x+sx*y)+2] = (uint8_t)( b / s );
-    }
-}
-
 
 int SaveImage::savePixels(FILE * file,
                           const char format[],
@@ -297,7 +258,7 @@ int SaveImage::savePixels(FILE * file,
         int W = width / downsample;
         int H = height / downsample;
         uint8_t* img = new_pixels(3*W*H);
-        downsampleRGB(img, pixels, width, height, downsample);
+        gym::downsampleRGB(img, W, H, pixels, downsample);
         int res = savePixels(file, format, img, W, H);
         free_pixels(img);
         return res;

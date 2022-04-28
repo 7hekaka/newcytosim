@@ -65,13 +65,13 @@ public:
     void drawFaces() const;
     
     /// OpenGL display function
-    void drawEdges() const;
+    void drawEdges(float) const;
 
     /// OpenGL display function
-    void draw3D() const { drawFaces(); drawEdges(); }
+    void draw3D() const { drawFaces(); drawEdges(1); }
     
     /// OpenGL display function
-    void draw2D() const { drawEdges(); }
+    void draw2D(float) const { drawEdges(5); }
 
 };
 

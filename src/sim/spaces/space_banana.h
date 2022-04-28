@@ -76,7 +76,7 @@ public:
     void read(Inputter&, Simul&, ObjectTag);
 
     /// OpenGL display function
-    void draw2D() const;
+    void draw2D(float) const;
     
     /// OpenGL display function
     void draw3D() const;

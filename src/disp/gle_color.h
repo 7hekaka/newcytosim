@@ -3,7 +3,6 @@
 #ifndef GLE_COLOR_H
 #define GLE_COLOR_H
 
-#include "opengl.h"
 #include <string>
 #include <iostream>
 
@@ -27,7 +26,7 @@ class gle_color
 public:
 
     /// type used to quantify color components
-    typedef GLfloat COLOF;
+    typedef float COLOF;
 
     
     static size_t stride()
@@ -101,7 +100,7 @@ public:
     }
 
     /// specify floating point components
-    void set_float(COLOF r, COLOF g, COLOF b, COLOF a)
+    void set(COLOF r, COLOF g, COLOF b, COLOF a)
     {
         col_[0] = clamp(r);
         col_[1] = clamp(g);
@@ -165,13 +164,13 @@ public:
     /// constructor from RGB values, with Alpha component = 1.0
     gle_color(const COLOF& r, const COLOF& g, const COLOF& b)
     {
-        set_float(r,g,b,1.0f);
+        set(r,g,b,1.0f);
     }
 
     /// constructor from RGBA components
     gle_color(const COLOF& r, const COLOF& g, const COLOF& b, const COLOF& a)
     {
-        set_float(r,g,b,a);
+        set(r,g,b,a);
     }
     
 #pragma mark - Public methods
@@ -186,6 +185,9 @@ public:
     bool operator !=(const gle_color col) const { return rgba_ != col.rgba_; }
     
     COLOF const* colors() const { return col_; }
+
+    // conversion operator to float[4]
+    operator COLOF const*() const { return col_; }
 
     /// access to float components
     COLOF& operator [] (int i) { return col_[i]; }
@@ -279,116 +281,6 @@ public:
     
 #pragma mark -
     
-    /// set current OpenGL color by calling glColor
-    void load() const
-    {
-        //std::clog << "OpenGL load " << col_[0] << " " << col_[1] << " " << col_[2] << " " << col_[3] << "\n";
-        glColor4fv(col_);
-        //glColor4f(col_[0], col_[1], col_[2], col_[3]);
-    }
-    
-    /// set current OpenGL color, but with `a` as alpha component
-    void load(COLOF a) const
-    {
-        glColor4f(col_[0], col_[1], col_[2], clamp(a));
-    }
-    
-    void load_clear() const
-    {
-        glClearColor(col_[0], col_[1], col_[2], col_[3]);
-    }
-    
-    static void no_emission(GLenum face)
-    {
-        COLOF blk[4] = { 0, 0, 0, 1 };
-        glMaterialfv(face, GL_EMISSION, blk);
-    }
-
-    /// set FRONT material property for lighting
-    void load_front() const
-    {
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col_);
-        no_emission(GL_FRONT);
-    }
-    
-    /// set FRONT material property for lighting, and current color
-    void load_load() const
-    {
-        glColor4fv(col_);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col_);
-        no_emission(GL_FRONT);
-    }
-    
-    /// set FRONT material property for lighting, and current color with given alpha-component
-    void load_load(COLOF a) const
-    {
-        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
-        glColor4fv(mat);
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
-        no_emission(GL_FRONT);
-    }
-
-    /// set front OpenGL color, with `a` as alpha component
-    void load_front(COLOF a) const
-    {
-        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
-        no_emission(GL_FRONT);
-    }
-
-    /// set BACK material property for lighting
-    void load_back() const
-    {
-        //glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col_);
-        COLOF blk[4] = { 0, 0, 0, 1 };
-        glMaterialfv(GL_BACK, GL_AMBIENT, col_);
-        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
-        glMaterialfv(GL_BACK, GL_EMISSION, blk);
-    }
-    
-    /// set BACK material property for lighting, but with `a` as alpha component
-    void load_back(COLOF a) const
-    {
-        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
-        glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, mat);
-        no_emission(GL_BACK);
-    }
-    
-    /// set FRONT and BACK material property for lighting
-    void load_both() const
-    {
-#if 0
-        COLOF blk[4] = { 0, 0, 0, 0 };
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col_);
-        glMaterialfv(GL_BACK, GL_AMBIENT, col_);
-        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
-#else
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col_);
-#endif
-        no_emission(GL_FRONT_AND_BACK);
-    }
-    
-    /// set FRONT and BACK material property for lighting
-    void load_both(COLOF a) const
-    {
-        COLOF blk[4] = { 0, 0, 0, 1 };
-        COLOF mat[4] = { col_[0], col_[1], col_[2], clamp(a) };
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
-        glMaterialfv(GL_BACK, GL_AMBIENT, mat);
-        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
-        no_emission(GL_FRONT_AND_BACK);
-    }
-    
-    /// set FRONT and BACK material property for lighting
-    void load_emission() const
-    {
-        COLOF blk[4] = { 0, 0, 0, 1 };
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, blk);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, col_);
-    }
-    
-#pragma mark -
-    
     /// conversion function from RGB to HSV color space
     static void RGB2HSV(COLOF r, COLOF g, COLOF b, COLOF* h, COLOF* s, COLOF* v);
     
@@ -403,7 +295,7 @@ public:
     static gle_color hue_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new saturated color with Hue value `atan2(y, x)`
-    static gle_color radial_color(COLOF x, COLOF y, COLOF alpha);
+    static gle_color radial_colorXY(COLOF x, COLOF y, COLOF alpha);
 
     /// return color build from a normalized 3D vector {x, y, z}
     static gle_color radial_color(COLOF x, COLOF y, COLOF z, COLOF alpha);

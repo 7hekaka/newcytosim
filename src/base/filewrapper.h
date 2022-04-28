@@ -13,7 +13,6 @@
 
 #include "assert_macro.h"
 #include <cstdio>
-#include <sys/types.h>
 #include <string>
 
 
@@ -121,9 +120,6 @@ public:
     
     /// read a character
     int get_char() { return getc_unlocked(mFile); }
-
-    /// read a byte
-    uint8_t get_byte() { return (uint8_t)getc_unlocked(mFile); }
 
     /// unget character from input
     void unget(int c) { ungetc(c, mFile); }

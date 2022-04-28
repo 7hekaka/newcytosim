@@ -37,6 +37,9 @@ public:
     /// draw free Couples, randomizing which Hand is drawn
     void drawCouplesF2(CoupleSet const&) const;
     
+    /// draw free Couple
+    void drawCouplesF(CoupleSet const&) const;
+
     /// draw attached Couples
     void drawCouplesA(CoupleSet const&) const;
     

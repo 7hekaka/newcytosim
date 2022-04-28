@@ -4,9 +4,6 @@
 #define GYM_TEXT_H
 
 class gle_color;
-class Vector1;
-class Vector2;
-class Vector3;
 
 /// Fonts inherited from GLUT
 enum FontType
@@ -22,30 +19,34 @@ enum FontType
 
 namespace gym
 {
-
-    /// return height in pixel of font
-    int fontHeight(FontType font);
     
-    /// compute horizontal size of text
-    int maxTextWidth(FontType, const char text[], int& lines);
-    
-    /// draw text at the current OpenGL raster position and raster color
-    void bitmapString(FontType, const char text[], float vshift);
+    /// set position of text in window
+    float textPosition(float&, float&, int width, int height, int line, int W, int H, const int position);
 
     /// display text on a rectangle of color `bcol`, in a corner of the center of the display window
-    void drawText(FontType, const char text[], gle_color bcol, int position, int width, int height);
+    void placeText(int position, FontType, const float color[4], const char text[], const float back[4], int width, int height);
     
-    /// draw `text` at position `pos`
-    void drawText(Vector1 const& pos, FontType, const char text[], float dx=0);
-    
-    /// draw `text` at position `pos`
-    void drawText(Vector2 const& pos, FontType, const char text[], float dx=0);
-    
-    /// draw `text` at position `pos`
-    void drawText(Vector3 const& pos, FontType, const char text[], float dx=0);
-
     /// stroke character
-    void strokeCharacter(int mono, int character);
+    void strokeCharacter(float X, float Y, float S, int mono, const float color[4], unsigned char character, float width);
+
+#ifdef VECTOR3_H
+    /// draw `text` at position `pos`
+    void drawText(Vector3 const& pos, FontType font, const float color[4], const char text[], float offset=0);
+#endif
+#ifdef VECTOR2_H
+    /// draw `text` at position `pos`
+    inline void drawText(Vector2 const& pos, FontType font, const float color[4], const char text[], float offset=0)
+    {
+        drawText(Vector3(pos.XX, pos.YY, 0), font, color, text, offset);
+    }
+#endif
+#ifdef VECTOR1_H
+    /// draw `text` at position `pos`
+    inline void drawText(Vector1 const& pos, FontType font, const float color[4], const char text[], float offset=0)
+    {
+        drawText(Vector3(pos.XX, 0, 0), font, color, text, offset);
+    }
+#endif
 
 }
 

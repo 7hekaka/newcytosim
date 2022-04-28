@@ -430,7 +430,7 @@ void Tesselator::buildTetrahedron(unsigned div, int make)
             { 0,  0,   1},
         };
         
-        // Faces are ordered for OpenGL's default rule: Counter-Clockwise = facing out
+        // ordered faces: Counter-Clockwise = facing out
         unsigned fac[4][3] = {
             {0, 2, 1},
             {1, 3, 0},
@@ -464,7 +464,7 @@ void Tesselator::buildOctahedron(unsigned div, int make)
             { 0,  1,  0},
         };
         
-        // Faces are ordered for OpenGL's default rule: Counter-Clockwise = facing out
+        // ordered faces: Counter-Clockwise = facing out
         unsigned fac[8][3] = {
             {2, 0, 4},
             {1, 3, 5},
@@ -512,7 +512,7 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
             { 0,  T, -Z}
         };
         
-        // Faces are ordered for OpenGL's default rule: Counter-Clockwise = facing out
+        // ordered faces: Counter-Clockwise = facing out
         unsigned fac[20][3] = {
             {0,  2,  6},
             {1,  7,  3},
@@ -573,7 +573,7 @@ void Tesselator::buildIcosahedronRotated(unsigned div, int make)
             { 0,  0, -1}
         };
         
-        // Faces are ordered for OpenGL's default rule: Counter-Clockwise = facing out
+        // ordered faces: Counter-Clockwise = facing out
         unsigned fac[20][3] = {
             {0,  1,  2},
             {0,  2,  3},
@@ -605,7 +605,7 @@ void Tesselator::buildIcosahedronRotated(unsigned div, int make)
     }
 }
 
-void Tesselator::buildHemisphere(unsigned div, int make)
+void Tesselator::buildHemisphereOld(unsigned div, int make)
 {
     kind_ = HEMISPHERE;
     halfZ_ = 1;
@@ -634,7 +634,7 @@ void Tesselator::buildHemisphere(unsigned div, int make)
         };
         
         /* Remove any face involving vertex 4 or 7 */
-        // Faces are ordered for OpenGL's default rule: Counter-Clockwise = facing out
+        // ordered faces: Counter-Clockwise = facing out
         unsigned fac[12][3] = {
             {0,  3,  6},
             //{1,  7,  2},
@@ -657,7 +657,59 @@ void Tesselator::buildHemisphere(unsigned div, int make)
             {6,  5, 11},
             //{4,  7, 10}
         };
+
+        // we can skip 5 triangles which are entirely in Z > 0
+        allocate();
+        setCorners(vex, div);
+        refineTriangles(12, fac, div);
+        if ( make & 2 ) setVertices();
+        if ( make & 4 ) setEdges();
+    }
+}
+
+
+void Tesselator::buildHemisphere(unsigned div, int make)
+{
+    kind_ = HEMISPHERE;
+    halfZ_ = 1;
+    init(10, 21, 12, div);
+    
+    if ( make )
+    {
+        const FLOAT G = 0.5+0.5*std::sqrt(5.0);
+        const FLOAT Z = 1 / std::sqrt(G*G+1.0);
+        const FLOAT T = G * Z;
         
+        // Twelve vertices of icosahedron on unit sphere
+        FLOAT vex[10][3] = {
+            {-Z,  T,  0},
+            { Z, -T,  0},
+            {-Z, -T,  0},
+            { Z,  T,  0},
+            { 0, -Z, -T}, // 5->4
+            { 0,  Z, -T}, // 6->5
+            {-T,  0,  Z}, // 8->6
+            { T,  0, -Z}, // 9->7
+            { T,  0,  Z}, // 10->8
+            {-T,  0, -Z}  // 11->9
+        };
+
+        // ordered faces: Counter-Clockwise = facing out
+        unsigned fac[12][3] = {
+            {0,  3,  5},
+            {5,  3,  7},
+            {7,  3,  8},
+            {4,  5,  7},
+            {1,  4,  7},
+            {1,  7,  8},
+            {1,  2,  4},
+            {4,  2,  9},
+            {2,  6,  9},
+            {5,  4,  9},
+            {0,  9,  6},
+            {0,  5,  9},
+        };
+
         // we can skip 5 triangles which are entirely in Z > 0
         allocate();
         setCorners(vex, div);

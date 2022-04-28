@@ -10,69 +10,71 @@
 #include "glapp.h"
 #include "glut.h"
 #include "gle.h"
+#include "gym_view.h"
+#include "gym_draw.h"
+#include "gym_vect.h"
+
 
 Vector3 origin(0,0,0), position(0,0,0);
 
 
-void display(View& view, int)
+int display(View& view)
 {
     view.openDisplay();
-    glEnable(GL_LIGHTING);
-    glDepthMask(GL_TRUE);
+    gym::enableDepthTest();
+    gym::enableLighting();
+    gym::openDepthMask();
 
-    // icosahedron:
-    gle_color(1.0, 0.0, 1.0).load_front();
-    gle_color(0.0, 0.0, 0.1).load_back();
-    gle::icosahedron();
-    //gle::ICOSAHEDRON();
-    //gle::icoid();
+    if ( 1 )
+    {
+        // icosahedron:
+        gym::color_front(1, 0, 1, 1);
+        gym::color_back(0, 0, 0.1, 1);
+        gle::icosahedron();
+        //gle::ICOSAHEDRON();
+        //gle::icoid();
+    }
     if ( 0 )
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        gle_color(1, 1, 1).load_both();
+        gym::color_both(1, 1, 1, 1);
         glDisable(GL_DEPTH_TEST);
         glLineWidth(0.5);
         gle::icoid();
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glEnable(GL_DEPTH_TEST);
     }
-    
     if ( 0 )
     {
         const float rad = 0.1f;
-        gle_color(1.0, 1.0, 1.0).load_both();
-        glPushMatrix();
-        gle::transScale(origin, rad);
+        gym::color_both(1, 1, 1, 1);
+        gym::transScale(origin, rad);
         gle::sphere2();
-        glPopMatrix();
 
-        gle_color(0.0, 1.0, 0.0).load_both();
-        glPushMatrix();
-        gle::transScale(position, rad);
+        gym::color_both(0, 1, 0, 1);
+        gym::transScale(position, rad);
         gle::sphere2();
-        glPopMatrix();
         
-        gle_color(1.0, 0.0, 1.0).load_both();
-        glPushMatrix();
-        gle::scale(rad);
+        gym::color_both(1, 0, 1, 1);
+        gym::transScale(0, 0, 0, rad);
         gle::sphere2();
-        glPopMatrix();
     }
-    if ( 1 )
+    if ( 0 )
     {
+        gym::pull_ref();
+        gym::scale(1.732f);
         // transparent cube
-        glDisable(GL_LIGHTING);
-        glDepthMask(GL_FALSE);
-        glLineWidth(1);
-        glPushMatrix();
-        gle::scale(1.732f);
-        gle_color(1.0, 1.0, 1.0, 0.1).load();
+        gym::color_both(1, 1, 1, 0.5);
+        gle::wireCube(1);
+        gym::closeDepthMask();
+        gym::enableLighting();
+        gym::color_both(1, 1, 1, 0.1);
         gle::cube();
-        gle_color(1.0, 1.0, 1.0).load();
-        //gle::wireCube();
-        glPopMatrix();
+        gym::restoreLighting();
+        gym::openDepthMask();
     }
     view.closeDisplay();
+    return 0;
 }
 
 

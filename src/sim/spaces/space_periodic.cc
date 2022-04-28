@@ -120,44 +120,65 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 #pragma mark -
 
 #ifdef DISPLAY
-#include "opengl.h"
 
+#include "gym_flute.h"
+#include "gym_draw.h"
+#include "gym_view.h"
+
+// draw periodic edges of the box
+void SpacePeriodic::draw2D(float width) const
+{
+    const float X(half_[0]);
+    const float T((DIM>1) ? half_[1] : 1);
+    const float B((DIM>1) ?-half_[1] :-1);
+
+    flute2 * flu = gym::mapBufferV2(5);
+    flu[0] = { X, T };
+    flu[1] = { X, B };
+    flu[2] = {-X, B };
+    flu[3] = {-X, T };
+    flu[4] = { X, T };
+    gym::unmapBufferV2();
+    gym::enableLineStipple(0x000F);
+    gym::drawLineStrip(width, 0, 5);
+    gym::disableLineStipple();
+}
+
+
+// draw periodic edges of the box
 void SpacePeriodic::draw3D() const
 {
-    const GLfloat X(half_[0]);
-    const GLfloat Y(( DIM > 1 ) ? half_[1] : 1);
-    const GLfloat T(( DIM > 2 ) ? half_[2] : 0);
-    const GLfloat B(-T);
+    const float WIDTH = 2;
+    const float X(half_[0]);
+    const float Y((DIM>1) ? half_[1] : 1);
+    const float T((DIM>2) ? half_[2] : 0);
+    const float B(-T);
 
-    glLineStipple(1, 0x000F);
-    glEnable(GL_LINE_STIPPLE);
-
-#if ( DIM == 1 )
-    GLfloat lin[8] = { X,-Y, X, Y,-X, Y,-X,-Y };
-    glVertexPointer(2, GL_FLOAT, 0, lin);
-    glDrawArrays(GL_LINES, 0, 4);
-#elif ( DIM > 1 )
-    // draw edges of the box
-    GLfloat lin[48] = {
-        +X, Y, B, X,-Y, B,-X,-Y, B,-X, Y, B,
-        +X, Y, T, X,-Y, T,-X,-Y, T,-X, Y, T,
-        +X, Y, B, X, Y, T, X,-Y, B, X,-Y, T,
-        -X,-Y, B,-X,-Y, T,-X, Y, B,-X, Y, T
-    };
-    glVertexPointer(3, GL_FLOAT, 0, lin);
-    glDisable(GL_LIGHTING);
-    glDrawArrays(GL_LINE_LOOP, 0, 4);
-    if ( DIM > 2 )
-    {
-        glDrawArrays(GL_LINE_LOOP, 4, 4);
-        glDrawArrays(GL_LINES, 8, 8);
-    }
-#endif
-    glDisable(GL_LINE_STIPPLE);
+    flute3 * flu = gym::mapBufferV3(10);
+    flu[0] = { X, Y, B};
+    flu[1] = { X, Y, T};
+    flu[2] = { X,-Y, B};
+    flu[3] = { X,-Y, T};
+    flu[4] = {-X,-Y, B};
+    flu[5] = {-X,-Y, T};
+    flu[6] = {-X, Y, B};
+    flu[7] = {-X, Y, T};
+    flu[8] = { X, Y, B};
+    flu[9] = { X, Y, T};
+    gym::unmapBufferV3();
+    gym::disableLighting();
+    gym::enableLineStipple(0x000F);
+    gym::drawLines(WIDTH, 0, 8);
+    gym::rebindBufferV3(2, 0);
+    gym::drawLineStrip(WIDTH, 0, 5);
+    gym::rebindBufferV3(2, 1);
+    gym::drawLineStrip(WIDTH, 0, 5);
+    gym::disableLineStipple();
 }
 
 #else
 
+void SpacePeriodic::draw2D(float) const {}
 void SpacePeriodic::draw3D() const {}
 
 #endif

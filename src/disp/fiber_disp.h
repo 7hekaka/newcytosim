@@ -291,7 +291,7 @@ public:
     int explode_style;
     
     /// amount of lateral shift to separate fibers when display is exploded (known as `explode[1]`)
-    real explode_range;
+    float explode_range;
     
     
     /// if true, display the average fiber
@@ -303,6 +303,12 @@ public:
     int draw_average;
 
     /// @}
+    
+    /// rescaled line width
+    float line_widthX;
+    
+    /// rescaled point size
+    float point_sizeX;
     
 public:
     
@@ -327,6 +333,9 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
     
+    /// recalculate bitmaps
+    void setPixels(float pixel_size, float unit_value);
+
 };
 
 

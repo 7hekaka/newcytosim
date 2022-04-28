@@ -546,22 +546,24 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
     }
 }
 
-//==============================================================================
+
+//------------------------------------------------------------------------------
 #pragma mark - Display
 
 #ifdef DISPLAY
 
-#include "opengl.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 
-void drawBoundaries(Map<DIM> const&);
+void drawBoundaries(Map<DIM> const&, float);
 
 void FiberGrid::drawGrid() const
 {
 #if ( DIM <= 3 )
-    glDisable(GL_LIGHTING);
-    glColor3f(0, 0, 1);
-    glLineWidth(0.25);
-    drawBoundaries(fGrid);
+    gym::ref_view();
+    gym::disableLighting();
+    gym::color(0,0,1);
+    drawBoundaries(fGrid, 0.5f);
 #endif
 }
 #endif

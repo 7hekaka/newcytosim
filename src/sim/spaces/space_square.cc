@@ -242,59 +242,91 @@ void SpaceSquare::read(Inputter& in, Simul&, ObjectTag)
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
 
-void SpaceSquare::drawEdges() const
+#include "gym_flute.h"
+#include "gym_draw.h"
+#include "gym_view.h"
+
+void SpaceSquare::drawEdges(float width) const
 {
-    const GLfloat X(half_[0]);
-    const GLfloat Y(half_[1]);
-    const GLfloat T(( DIM > 2 ) ? half_[2] : 0);
-    const GLfloat B(-T);
-    
-    GLfloat pts[48] = {
-        +X, Y, B, X,-Y, B,-X,-Y, B,-X, Y, B,
-        +X, Y, T, X,-Y, T,-X,-Y, T,-X, Y, T,
-        +X, Y, B, X, Y, T, X,-Y, B, X,-Y, T,
-        -X,-Y, B,-X,-Y, T,-X, Y, B,-X, Y, T
-    };
-    glVertexPointer(3, GL_FLOAT, 0, pts);
-    glDisable(GL_LIGHTING);
-    glDrawArrays(GL_LINE_LOOP, 0, 4);
+    const float X(half_[0]);
+    const float Y((DIM>1) ? half_[1] : 1);
+    const float T((DIM>2) ? half_[2] : 0);
+    const float B(-T);
+
+    flute3 * flu = gym::mapBufferV3(10);
+    flu[0] = { X, Y, B};
+    flu[1] = { X, Y, T};
+    flu[2] = { X,-Y, B};
+    flu[3] = { X,-Y, T};
+    flu[4] = {-X,-Y, B};
+    flu[5] = {-X,-Y, T};
+    flu[6] = {-X, Y, B};
+    flu[7] = {-X, Y, T};
+    flu[8] = { X, Y, B};
+    flu[9] = { X, Y, T};
+    gym::unmapBufferV3();
 #if ( DIM > 2 )
-    glDrawArrays(GL_LINE_LOOP, 4, 4);
-    glDrawArrays(GL_LINES, 8, 8);
+    gym::disableLighting();
+    gym::drawLines(width, 0, 8);
+    gym::rebindBufferV3(2, 0);
+    gym::drawLineStrip(width, 0, 5);
+    gym::rebindBufferV3(2, 1);
+    gym::drawLineStrip(width, 0, 5);
+    gym::restoreLighting();
+#else
+    gym::rebindBufferV3(2, 0);
+    gym::drawLineStrip(width, 0, 5);
 #endif
 }
 
 void SpaceSquare::drawFaces() const
 {
 #if ( DIM > 2 )
-    const GLfloat X(half_[0]);
-    const GLfloat Y(half_[1]);
-    const GLfloat T(( DIM > 2 ) ? half_[2] : 0);
-    const GLfloat B(-T);
+    const float X(half_[0]);
+    const float Y(half_[1]);
+    const float T((DIM>2) ? half_[2] : 0);
+    const float B(-T);
 
-    GLfloat pts[72] = {
-        +X, Y, B, X, Y, T, X,-Y, B, X,-Y, T,
-        -X,-Y, B,-X,-Y, T,-X, Y, B,-X, Y, T,
-        +X, Y, B,-X, Y, B, X, Y, T,-X, Y, T,
-        +X,-Y, T,-X,-Y, T, X,-Y, B,-X,-Y, B,
-        +X, Y, T,-X, Y, T, X,-Y, T,-X,-Y, T,
-        +X, Y, B, X,-Y, B,-X, Y, B,-X,-Y, B,
-    };
-    glVertexPointer(3, GL_FLOAT, 0, pts);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 8, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP,12, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP,16, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP,20, 4);
+    flute3 * flu = gym::mapBufferV3(24);
+    flu[0] = { X, Y, B};
+    flu[1] = { X, Y, T};
+    flu[2] = { X,-Y, B};
+    flu[3] = { X,-Y, T};
+    flu[4] = {-X,-Y, B};
+    flu[5] = {-X,-Y, T};
+    flu[6] = {-X, Y, B};
+    flu[7] = {-X, Y, T};
+    flu[8] = { X, Y, B};
+    flu[9] = {-X, Y, B};
+    flu[10] = { X, Y, T};
+    flu[11] = {-X, Y, T};
+    flu[12] = { X,-Y, T};
+    flu[13] = {-X,-Y, T};
+    flu[14] = { X,-Y, B};
+    flu[15] = {-X,-Y, B};
+    flu[16] = { X, Y, T};
+    flu[17] = {-X, Y, T};
+    flu[18] = { X,-Y, T};
+    flu[19] = {-X,-Y, T};
+    flu[20] = { X, Y, B};
+    flu[21] = { X,-Y, B};
+    flu[22] = {-X, Y, B};
+    flu[23] = {-X,-Y, B};
+    gym::unmapBufferV3();
+    gym::drawTriangleStrip( 0, 4);
+    gym::drawTriangleStrip( 4, 4);
+    gym::drawTriangleStrip( 8, 4);
+    gym::drawTriangleStrip(12, 4);
+    gym::drawTriangleStrip(16, 4);
+    gym::drawTriangleStrip(20, 4);
+    gym::cleanup();
 #endif
 }
 
 #else
 
-void SpaceSquare::drawEdges() const {}
+void SpaceSquare::drawEdges(float) const {}
 void SpaceSquare::drawFaces() const {}
 
 #endif

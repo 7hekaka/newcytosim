@@ -4,9 +4,14 @@
 #include "../disp/gle.h"
 #include "../disp/gle_color_list.h"
 #include "../disp/gym_flute.h"
+#include "../disp/gym_flute_dim.h"
+#include "../disp/gym_draw.h"
 
 #define DRAW_LINK(PT, ...)\
 { if ( drawLinks ) drawLink(gle::bright_color(PT.mecable()->signature()), PT.pos(), __VA_ARGS__); }
+
+constexpr float LINK_WIDTH = 6;
+constexpr float LINK_SIZE = 8;
 
 
 /// Display link between 2 positions
@@ -16,8 +21,8 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& b)
     flu[0] = { col, a };
     flu[1] = { col, b };
     gym::unmapBufferC4VD();
-    glLineStipple(1, 0xFFFF);
-    glDrawArrays(GL_LINES, 0, 2);
+    gym::enableLineStipple(0xFFFF);
+    gym::drawLines(LINK_WIDTH, 0, 2);
 }
 
 /// Display link between 2 positions, with resting length `len`
@@ -31,13 +36,13 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
     flu[2] = { col, b-dx };
     flu[3] = { col, b };
     gym::unmapBufferC4VD();
-    glLineStipple(1, 0x3333);
-    glDrawArrays(GL_LINES, 1, 2);
-    glLineStipple(1, 0xFFFF);
-    glDrawArrays(GL_LINES, 0, 2);
-    glDrawArrays(GL_LINES, 2, 2);
-    glDrawArrays(GL_POINTS, 0, 1);
-    glDrawArrays(GL_POINTS, 3, 1);
+    gym::enableLineStipple(0x3333);
+    gym::drawLines(LINK_WIDTH, 1, 2);
+    gym::enableLineStipple(0xFFFF);
+    gym::drawLines(LINK_WIDTH, 0, 2);
+    gym::drawLines(LINK_WIDTH, 2, 2);
+    gym::drawPoints(LINK_SIZE, 0, 1);
+    gym::drawPoints(LINK_SIZE, 3, 1);
 }
 
 /// Display link between 3 positions
@@ -51,11 +56,11 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
     flu[1] = { col, b };
     flu[2] = { col, c };
     gym::unmapBufferC4VD();
-    glLineStipple(1, 0x7310);
-    glDrawArrays(GL_LINES, 0, 2);
-    glLineStipple(1, 0x5555);
-    glDrawArrays(GL_LINES, 1, 2);
-    glDrawArrays(GL_POINTS, 1, 1);
+    gym::enableLineStipple(0x7310);
+    gym::drawLines(LINK_WIDTH, 0, 2);
+    gym::enableLineStipple(0x5555);
+    gym::drawLines(LINK_WIDTH, 1, 2);
+    gym::drawPoints(LINK_SIZE, 1, 1);
 }
 
 /// Display link between 4 positions
@@ -69,9 +74,9 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector co
     flu[2] = { col, c };
     flu[3] = { col, d };
     gym::unmapBufferC4VD();
-    glLineStipple(1, 0x7171);
-    glDrawArrays(GL_LINES, 0, 4);
-    glLineStipple(1, 0xFFFF);
-    glDrawArrays(GL_LINES, 1, 2);
-    glDrawArrays(GL_POINTS, 1, 2);
+    gym::enableLineStipple(0x7171);
+    gym::drawLines(LINK_WIDTH, 0, 4);
+    gym::enableLineStipple(0xFFFF);
+    gym::drawLines(LINK_WIDTH, 1, 2);
+    gym::drawPoints(LINK_SIZE, 1, 2);
 }

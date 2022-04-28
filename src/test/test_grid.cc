@@ -13,6 +13,9 @@
 #include "timer.h"
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_flute_dim.h"
+#include "gym_draw.h"
+#include "gym_text.h"
 
 #include "grid.h"
 #include "grid_display.h"
@@ -20,8 +23,8 @@
 //area of the grid
 const int range = 5;
 real     left[] = {  -range,  -range,  0 };
-real    right[] = {   range,   range,  1 };
-size_t n_cell[] = { 2*range,   range,  1 };
+real    right[] = {   range,   range,  0.5 };
+size_t n_cell[] = { 2*range,   range,  2 };
 
 
 typedef Grid<real, DIM> grid_type;
@@ -149,7 +152,7 @@ static gle_color field_color(int, const real& val, Vector2 const&)
 #endif
 
 
-void display(View& view, int)
+int display(View& view)
 {
     view.openDisplay();
 
@@ -160,21 +163,23 @@ void display(View& view, int)
     drawValues(myGrid, field_color, 0);
 #endif
     
+    float gray[4] = {1,1,1,.5f};
+    float white[4] = {1,1,1,1};
+    float yellow[4] = {0,1,1,1};
+
     //--------------draw a grid in gray:
     
-    glColor4f(1,1,1,.6f);
-    glLineWidth(2);
-    drawBoundaries(myGrid);
+    gym::color(gray);
+    drawBoundaries(myGrid, 1);
 
     //--------------draw content of cells
     const real gold = 2.0 / ( 1.0 + sqrt(5) );
     fluteD4 * flu = gym::mapBufferC4VD(16*myGrid.nbCells()+2);
-    size_t i = 0;
+    fluteD4 * ptr = flu;
 
     for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
     {
         int cnt = myGrid.icell(c);
-        gle_color col(0, 1, 1);
         // use Fibonacci's spiral on the sphere:
         if ( cnt > 0 )
         {
@@ -183,21 +188,19 @@ void display(View& view, int)
             myGrid.setPositionFromIndex(y, c, 0.7);
             for ( int u = 0; u < std::min(16, cnt); ++u )
             {
-                Vector off(fmod(u*gold,1.0), float(u)/cnt, 0);
-                flu[i++] = { col, x+(y-x).e_mul(off) };
+                Vector off(fmod(u*gold,1.0), float(u)/cnt, 0.5);
+                *ptr++ = { yellow, x+(y-x).e_mul(off) };
             }
         }
     }
 
     //-------------draw selected-cell
     gle_color lor(1,1,0);
-    flu[i++] = { lor, Vector2(pos) };
-    flu[i++] = { lor, Vector2(nod) };
+    *ptr++ = { lor, Vector2(pos) };
+    *ptr++ = { lor, Vector2(nod) };
     gym::unmapBufferC4VD();
-    glPointSize(12);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glDrawArrays(GL_POINTS, 0, i);
-    glDisableClientState(GL_COLOR_ARRAY);
+    gym::drawPoints(12, 0, ptr-flu);
+    gym::cleanup();
 
     //-------------draw region
     if ( myGrid.hasRegions() )
@@ -206,13 +209,12 @@ void display(View& view, int)
         int * offset = nullptr;
         size_t nb = myGrid.getRegion(offset, cell_indx);
 
-        glColor4f(1,1,1,0.7);
         for ( size_t j = 0; j < nb; ++j )
         {
             Vector x;
             myGrid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
             snprintf(str, sizeof(str), "%lu", j);
-            gym::drawText(x, BITMAP_HELVETICA_10, str);
+            gym::drawText(x, BITMAP_HELVETICA_10, white, str);
         }
     }
     else
@@ -223,6 +225,7 @@ void display(View& view, int)
         glApp::setMessage(str);
     }
     view.closeDisplay();
+    return 0;
 }
 
 

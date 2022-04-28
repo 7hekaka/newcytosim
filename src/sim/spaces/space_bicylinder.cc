@@ -242,19 +242,15 @@ void SpaceBicylinder::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gym_view.h"
 
 void SpaceBicylinder::draw3D() const
 {
     const float R(radius_);
-    glPushMatrix();
-    gle::stretchAlignZX(-R, R, R);
+    gym::stretchAlignZX(-R, R, R);
     gle::tube1();
-    glPopMatrix();
-    glPushMatrix();
-    glRotatef(90, 0, 0, 1);
-    gle::stretchAlignZX(-R, R, R);
+    gym::stretchAlignZY(-R, R, R);
     gle::tube1();
-    glPopMatrix();
 }
 
 #else

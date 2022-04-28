@@ -1,0 +1,213 @@
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
+
+#ifndef GYM_DRAW_H
+#define GYM_DRAW_H
+
+#include <string.h>
+#include <algorithm>
+#include "opengl.h"
+
+namespace gym
+{
+    /// flag for Lighting effects
+    extern GLboolean depth_, cull_, blend_;
+
+    
+    inline void drawPoints(float size, size_t off, size_t cnt)
+    {
+        glPointSize(size);
+        glDrawArrays(GL_POINTS, off, cnt);
+    }
+    
+    inline void drawSquarePoints(float size, size_t off, size_t cnt)
+    {
+        glPointSize(size);
+        glDisable(GL_POINT_SMOOTH);
+        glDrawArrays(GL_POINTS, off, cnt);
+        glEnable(GL_POINT_SMOOTH);
+    }
+    
+    inline void drawLines(float width, size_t off, size_t cnt)
+    {
+        glLineWidth(width);
+        glDrawArrays(GL_LINES, off, cnt);
+    }
+    
+    inline void drawLineStrip(float width, size_t off, size_t cnt)
+    {
+        glLineWidth(width);
+        glDrawArrays(GL_LINE_STRIP, off, cnt);
+    }
+    
+    inline void drawLineStrip(size_t off, size_t cnt)
+    {
+        glDrawArrays(GL_LINE_STRIP, off, cnt);
+    }
+
+    inline void drawTriangles(size_t off, size_t cnt)
+    {
+        glDrawArrays(GL_TRIANGLES, off, cnt);
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
+
+    inline void drawTriangleStrip(size_t off, size_t cnt)
+    {
+        glDrawArrays(GL_TRIANGLE_STRIP, off, cnt);
+        glDisableClientState(GL_COLOR_ARRAY);
+    }
+    
+    inline void drawArrays(GLenum mode, GLint first, GLsizei cnt)
+    {
+        glDrawArrays(mode, first, cnt);
+    }
+    
+    
+#pragma mark - Colors
+    
+    /// make RGBA color current
+    inline void color(const float col[]) { glColor4fv(col); }
+
+    /// make RGB color current
+    inline void color(float R, float G, float B) { glColor3f(R,G,B); }
+
+    /// make RGBA color current
+    inline void color(float R, float G, float B, float A) { glColor4f(R,G,B,A); }
+
+    /// return value clamped to [0, 1]
+    static inline float clamp(float s) { return std::max(float(0), std::min(s, float(1))); }
+
+    inline static void no_emission(GLenum face)
+    {
+        float blk[4] = { 0, 0, 0, 1 };
+        glMaterialfv(face, GL_EMISSION, blk);
+    }
+    
+    /// set FRONT and BACK material property for lighting
+    inline void set_emission(const float col[])
+    {
+        float blk[4] = { 0, 0, 0, 1 };
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, blk);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, col);
+    }
+    
+    /// set FRONT material property for lighting
+    inline void color_front(const float col[])
+    {
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col);
+        no_emission(GL_FRONT);
+    }
+    
+    /// set FRONT material property for lighting, and current color
+    inline void color_load(const float col[])
+    {
+        glColor4fv(col);
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col);
+        no_emission(GL_FRONT);
+    }
+    
+    /// set front OpenGL color, with `a` as alpha component
+    inline void color_front(const float col[], float a)
+    {
+        float mat[4] = { col[0], col[1], col[2], clamp(a) };
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
+        no_emission(GL_FRONT);
+    }
+    
+    inline void color_front(float R, float G, float B, float A=1.0)
+    {
+        float col[4] = { clamp(R), clamp(G), clamp(B), clamp(A) };
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col);
+        no_emission(GL_FRONT);
+    }
+    
+    /// set BACK material property for lighting
+    inline void color_back(const float col[])
+    {
+        //glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col_);
+        float blk[4] = { 0, 0, 0, 1 };
+        glMaterialfv(GL_BACK, GL_AMBIENT, col);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
+        glMaterialfv(GL_BACK, GL_EMISSION, blk);
+    }
+    
+    inline void color_back(float R, float G, float B, float A)
+    {
+        float blk[4] = { 0, 0, 0, 1 };
+        float col[4] = { clamp(R), clamp(G), clamp(B), clamp(A) };
+        glMaterialfv(GL_BACK, GL_AMBIENT, col);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
+        glMaterialfv(GL_BACK, GL_EMISSION, blk);
+    }
+
+    /// set FRONT and BACK material property for lighting
+    inline void color_both(const float col[])
+    {
+#if 0
+        float blk[4] = { 0, 0, 0, 0 };
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col_);
+        glMaterialfv(GL_BACK, GL_AMBIENT, col_);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
+#else
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col);
+#endif
+        no_emission(GL_FRONT_AND_BACK);
+    }
+    
+    /// set FRONT and BACK material property for lighting
+    inline void color_both(const float col[], float a)
+    {
+        float blk[4] = { 0, 0, 0, 1 };
+        float mat[4] = { col[0], col[1], col[2], clamp(a) };
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, mat);
+        glMaterialfv(GL_BACK, GL_AMBIENT, mat);
+        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
+        no_emission(GL_FRONT_AND_BACK);
+    }
+    
+    /// set FRONT and BACK material property for lighting
+    inline void color_both(float R, float G, float B, float A)
+    {
+        float mat[4] = { R, G, B, A };
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, mat);
+        no_emission(GL_FRONT_AND_BACK);
+    }
+
+#pragma mark -
+
+    inline void clear() { glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); }
+    inline void clear(const float c[4]) { glClearColor(c[0],c[1],c[2],c[3]); clear(); }
+    inline void clear(float R, float G, float B, float A) { glClearColor(R,G,B,A); clear(); }
+
+    inline void clearStencil(GLint x) { glClearStencil(x); glClear(GL_STENCIL_BUFFER_BIT); }
+
+    /// enable Blending effects
+    inline void enableBlending() { blend_ = glIsEnabled(GL_BLEND); glEnable(GL_BLEND); }
+    /// disable Blending
+    inline void disableBlending() { blend_ = glIsEnabled(GL_BLEND); glDisable(GL_BLEND); }
+    /// restore previous Blending state
+    inline void restoreBlending() { if ( blend_ ) glEnable(GL_BLEND); else glDisable(GL_BLEND); }
+
+    /// enable depth test
+    inline void enableDepthTest() { depth_ = glIsEnabled(GL_DEPTH_TEST); glEnable(GL_DEPTH_TEST); }
+    /// disable depth test
+    inline void disableDepthTest() { depth_ = glIsEnabled(GL_DEPTH_TEST); glDisable(GL_DEPTH_TEST); }
+    /// restore previous depth test state
+    inline void restoreDepthTest() { if ( depth_ ) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST); }
+    
+    inline void openDepthMask() { glDepthMask(GL_TRUE); }
+    inline void closeDepthMask() { glDepthMask(GL_FALSE); }
+    
+    /// enable  Cull Face
+    inline void enableCullFace(GLenum face) { cull_ = glIsEnabled(GL_CULL_FACE); glEnable(GL_CULL_FACE); glCullFace(face); }
+    /// disable  Cull Face
+    inline void disableCullFace() { cull_ = glIsEnabled(GL_CULL_FACE); glDisable(GL_CULL_FACE); }
+    /// restore previous Cull Face state
+    inline void restoreCullFace() { if ( cull_ ) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE); glCullFace(GL_BACK); }
+    /// change Cull Face parameter
+    inline void switchCullFace(GLenum face) { glCullFace(face); }
+
+    /// display back faces followed by front faces
+    void dualPass(void primitive());
+}
+
+#endif

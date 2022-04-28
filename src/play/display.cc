@@ -15,10 +15,13 @@
 #include "gle.h"
 #include "gle_color.h"
 #include "gle_color_list.h"
+#include "gym_draw.h"
+#include "gym_view.h"
 #include "gym_flute.h"
+#include "gym_flute_dim.h"
 #include "gym_check.h"
+#include "gym_text.h"
 
-#include "glut.h"
 #include "glapp.h"
 
 #include "point_disp.h"
@@ -60,10 +63,8 @@ void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
 {
     if ( rad > pixelSize )
     {
-        glPushMatrix();
-        gle::transScale(pos, rad);
+        gym::transScale(pos, rad);
         obj();
-        glPopMatrix();
     }
 }
 
@@ -72,55 +73,35 @@ void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*
 {
     if ( rad > pixelSize )
     {
-        glPushMatrix();
-        gle::transAlignZ(pos, rad, dir);
+        gym::transAlignZ(pos, rad, dir);
         obj();
-        glPopMatrix();
-    }
-}
-
-
-void Display::drawFlat(Vector const& pos, float rad, void(*obj)()) const
-{
-    if ( rad > pixelSize )
-    {
-        glPushMatrix();
-        gle::transScale(pos, rad);
-        obj();
-        glPopMatrix();
     }
 }
 
 
 void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
 {
-    glPushMatrix();
-    gle::transScale(pos, rad);
-    glEnable(GL_LIGHTING);
-    col.load_both();
+    gym::transScale(pos, rad);
+    gym::enableLighting();
+    gym::color_both(col);
     gle::dualPassSphere2();
-    glPopMatrix();
 }
 
 
 void Display::drawDiscT(Vector const& pos, real rad, gle_color const& col) const
 {
-    glPushMatrix();
-    gle::transScale(pos, rad);
-    glDisable(GL_LIGHTING);
-    col.load();
+    gym::transScale(pos, rad);
+    gym::disableLighting();
+    gym::color(col);
     gle::disc();
-    glPopMatrix();
 }
 
 
 /// used for drawFilament
 inline void drawMonomer(Vector3 const& pos, real rad)
 {
-    glPushMatrix();
-    gle::transScale(pos, rad);
+    gym::transScale(pos, rad);
     gle::sphere2();
-    glPopMatrix();
 }
 
 //------------------------------------------------------------------------------
@@ -129,29 +110,27 @@ inline void drawMonomer(Vector3 const& pos, real rad)
 /** This is only one version of the display function, see display1.cc, etc. */
 void Display::drawObjects(Simul const& sim)
 {
-    glDepthMask(GL_FALSE);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
+    gym::closeDepthMask();
+    gym::disableLighting();
+    gym::disableCullFace();
     drawFields(sim.fields);
     
-    glEnable(GL_LIGHTING);
-    glEnable(GL_CULL_FACE);
-    glDepthMask(GL_TRUE);
+    gym::enableLighting();
+    gym::enableCullFace(GL_BACK);
+    gym::openDepthMask();
     drawSpaces(sim.spaces);
     
-    glDisable(GL_CULL_FACE);
-    
+    gym::disableCullFace();
+
     /**
      If the display is 'cut', we might see the inner sides,
      but rendering would be faster with Culling enabled
      */
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    //gym::enableCullFace(GL_BACK);
     drawFibers(sim.fibers);
     
-    glEnable(GL_LIGHTING);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    gym::enableLighting();
+    gym::enableCullFace(GL_BACK);
 
     drawBeads(sim.beads);
     drawSolids(sim.solids);
@@ -173,13 +152,10 @@ void Display::drawObjects(Simul const& sim)
         drawSinglesA(sim.singles);
     
     if ( stencil_ )
-    {
-        glClearStencil(0);
-        glDisable(GL_STENCIL_TEST);
-    }
+        gym::clearStencil(0);
 
     drawOrganizers(sim.organizers);
-    glDisable(GL_CULL_FACE);
+    gym::disableCullFace();
     drawMisc(sim);
 }
 
@@ -189,20 +165,16 @@ void Display::drawSimul(Simul const& sim)
     // clear list of transparent objects
     zObjects.clear();
     
-    /*
-     Draw opaque objects:
-     - depth buffer is writable
-     - glColor specifies the Front material color
-     */
-
 #if ( DIM >= 3 )
-    glEnable(GL_LIGHTING);
+    gym::enableLighting();
+    // Draw opaque objects with depth buffer is writable
     drawObjects(sim);
-    glDepthMask(GL_FALSE);
+    gym::closeDepthMask();
+    // Draw transparent objects with depth buffer readable
     drawTransparentObjects(sim);
-    glDepthMask(GL_TRUE);
+    gym::openDepthMask();
 #else
-    glDisable(GL_LIGHTING);
+    gym::disableLighting();
     drawObjects(sim);
 #endif
     
@@ -260,13 +232,11 @@ void Display::drawTiled(Simul const& sim, int tile)
     // depth-sort positions:
     qsort(pos, cnt, sizeof(Vector4), &compareVector4);
 
-    glMatrixMode(GL_MODELVIEW);
     for ( int i = 0; i < cnt; ++i )
     {
-        Vector3 T(pos[i]);
-        gle::translate( T);
+        gym::pull_ref();
+        gym::translate(pos[i].XX, pos[i].YY, pos[i].ZZ);
         drawSimul(sim);
-        gle::translate(-T);
     }
 }
 
@@ -291,10 +261,10 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
         disp = new FiberDisp(fp->name());
         alldisp.push_back(disp);
         // set default:
-        disp->color       = col;
-        disp->back_color  = col.darken(0.5);
-        disp->point_size  = prop->point_size;
-        disp->line_width  = prop->line_width;
+        disp->color      = col;
+        disp->back_color = col.darken(0.5);
+        disp->point_size = prop->point_size;
+        disp->line_width = prop->line_width;
     }
     
     // parse user-provided values:
@@ -304,8 +274,6 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
         fp->display_fresh = false;
     }
     
-    prep_flag = 0;
-    
     if ( disp->coloring == FiberDisp::COLORING_CLUSTER )
         prep_flag |= 1;
     
@@ -314,6 +282,8 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
 
     if ( disp->coloring == FiberDisp::COLORING_AGE )
         prep_flag |= 4;
+    
+    disp->setPixels(pixelSize, unitValue);
 }
 
 
@@ -337,7 +307,7 @@ void Display::prepareLineDisp(const Fiber * fib, LineDisp * self)
             col = gle::bright_color(fib->signature()).match_a(disp->color);
             break;
         case FiberDisp::COLORING_DIRECTION:
-            col = gle::radial_color(fib->avgDirection());
+            col = radial_color(fib->avgDirection());
             break;
         case FiberDisp::COLORING_MARK:
             col = gle::nice_color(fib->mark());
@@ -484,7 +454,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
         p->display_fresh = false;
     }
     
-    disp->prepare_pixels(unitValue, sizeScale, prop->style==2);
+    disp->setPixels(pixelSize, unitValue, prop->style==2);
 }
 
 /**
@@ -507,7 +477,8 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
     
     PropertyList plist = sim.properties.find_all("fiber");
     
-    // create a FiberDisp for each FiberProp:
+    prep_flag = 0;
+        // create a FiberDisp for each FiberProp:
     for ( Property* p : plist )
         prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gle::nice_color(idx++));
 
@@ -576,9 +547,9 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
 
 /**
  Draw the back and front sides of Spaces in 3D
- This function is called twice at the start and end of drawSimul
+ This function is called twice: at the start and at the end of drawSimul()
  */
-void Display::drawSpace(Space const* obj, bool back)
+void Display::drawSpace3D(Space const* obj, bool back)
 {
     const PointDisp * disp = obj->prop->disp;
     bool front = back ^ ( disp->color.transparent() );
@@ -588,23 +559,21 @@ void Display::drawSpace(Space const* obj, bool back)
     
     if ( back | front )
     {
-        lineWidth(disp->width);
-        glEnable(GL_LIGHTING);
-        GLboolean cull = glIsEnabled(GL_CULL_FACE);
-        glEnable(GL_CULL_FACE);
+        gym::ref_view();
+        gym::enableLighting();
+        gym::enableCullFace(GL_FRONT);
         if ( back )
         {
-            disp->color2.load_back();
-            glCullFace(GL_FRONT);
+            gym::color_back(disp->color2);
             obj->draw3D();
-            glCullFace(GL_BACK);
         }
         if ( front )
         {
-            disp->color.load_load();
+            gym::switchCullFace(GL_BACK);
+            gym::color_load(disp->color);
             obj->draw3D();
         }
-        if ( !cull ) glDisable(GL_CULL_FACE);
+        gym::restoreCullFace();
     }
 }
 
@@ -617,7 +586,7 @@ void Display::drawSpaces(SpaceSet const& set)
     for ( Space * obj = set.first(); obj; obj=obj->next() )
     {
         if ( obj->prop->disp->visible )
-            drawSpace(obj, true);
+            drawSpace3D(obj, true);
     }
 
 #else
@@ -627,10 +596,10 @@ void Display::drawSpaces(SpaceSet const& set)
         const PointDisp * disp = obj->prop->disp;
         if ( disp->visible )
         {
-            glDisable(GL_LIGHTING);
-            lineWidth(disp->width);
-            disp->color.load();
-            obj->draw2D();
+            gym::disableLighting();
+            gym::color(disp->color);
+            gym::ref_view();
+            obj->draw2D(disp->widthX);
         }
     }
     
@@ -647,7 +616,7 @@ void Display::drawTransparentSpaces(SpaceSet const& set)
     for ( Space * obj = set.first(); obj; obj=obj->next() )
     {
         if ( obj->prop->disp->visible )
-            drawSpace(obj, false);
+            drawSpace3D(obj, false);
     }
 }
 
@@ -655,7 +624,7 @@ void Display::drawTransparentSpaces(SpaceSet const& set)
 /**
  This displays only one Field, specified by DisplayProp:field_number
  
- GL_CULL_FACE and GL_LIGHTING should be disabled
+ CULL_FACE and LIGHTING should be disabled
  */
 void Display::drawFields(FieldSet const& set)
 {
@@ -684,7 +653,7 @@ void Display::drawFields(FieldSet const& set)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Display::drawAverageFiber(ObjectList const& objs)
+void Display::drawAverageFiber(ObjectList const& objs, gle_color col) const
 {
     Vector G, D, M, P;
     real S = FiberSet::infoPosition(objs, M, G, P);
@@ -693,6 +662,19 @@ void Display::drawAverageFiber(ObjectList const& objs)
     {
         Vector MP = normalize( P - M );
         const float rad = pixscale(10);
+        if ( 1 )
+        {
+            // a black outline
+            float blk[4] = { 0, 0, 0, 1 };
+            float RAD = rad * 1.1;
+            gym::color_front(blk);
+            gym::closeDepthMask();
+            gle::drawCylinder(M, MP, RAD);
+            gle::drawCone(P, MP, RAD);
+            drawObject(G, RAD, gle::sphere2);
+            gym::openDepthMask();
+        }
+        gym::color_front(col);
         gle::drawCylinder(M, MP, rad);
         gle::drawCone(P, MP, rad);
         drawObject(G, rad, gle::sphere2);
@@ -712,50 +694,23 @@ bool selectL(Object const* obj, void const* arg)
     return fib->prop==arg  &&  dot(fib->diffPoints(0), Vector(fib->prop->disp->hide_axis)) < 0;
 }
 
-void Display::drawAverageFiber1(FiberSet const& fibers, void const* arg)
+void Display::drawAverageFiber1(FiberSet const& fibers, void const* arg) const
 {
     ObjectList objs = fibers.collect(match_property, arg);
-
-#if ( 1 )
-    // highlight with a black outline
-    glLineWidth(3);
-    glColor3f(0,0,0);
-    glDepthMask(GL_FALSE);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    drawAverageFiber(objs);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glDepthMask(GL_TRUE);
-#endif
-    
-    glColor3f(1,1,1);
-    drawAverageFiber(objs);
+    drawAverageFiber(objs, gle_color(1,1,1));
 }
 
 
-void Display::drawAverageFiber2(FiberSet const& fibers, void const* arg)
+void Display::drawAverageFiber2(FiberSet const& fibers, void const* arg) const
 {
     ObjectList objsR = fibers.collect(selectR, arg);
     ObjectList objsL = fibers.collect(selectL, arg);
-
-#if ( 1 )
-    // highlight with a black outline
-    glLineWidth(3);
-    glColor3f(0,0,0);
-    glDepthMask(GL_FALSE);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    drawAverageFiber(objsR);
-    drawAverageFiber(objsL);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glDepthMask(GL_TRUE);
-#endif
     
     // display right-pointing fibers in Red
-    glColor3f(1,0,0);
-    drawAverageFiber(objsR);
+    drawAverageFiber(objsR, gle_color(1,0,0));
     
     // display left-pointing fibers in Green
-    glColor3f(0,1,0);
-    drawAverageFiber(objsL);
+    drawAverageFiber(objsL, gle_color(0,1,0));
 }    
 
 
@@ -819,6 +774,7 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
  */
 void Display::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
+    gym::ref_view();
     const float rad = pixscale(size);
     if ( rad > 0 ) switch(style)
     {
@@ -834,137 +790,127 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 }
 
 
-// display fiber backbone using GL_LINES
-void Display::drawStrip(size_t cnt, real const* pts, GLenum prim)
-{
-#if ( DIM > 1 )
-    constexpr GLenum TYP = REAL_IS_DOUBLE * ( GL_DOUBLE - GL_FLOAT ) + GL_FLOAT;
-    glVertexPointer(DIM, TYP, 0, pts);
-    glDrawArrays(prim, 0, cnt);
-#else
-    float * flt = new float[2*cnt];
-    for ( size_t i = 0; i < cnt; ++i )
-    {
-        flt[2*i] = (float)pts[i];
-        flt[1+2*i] = 0.f;
-    }
-    glVertexPointer(2, GL_FLOAT, 0, flt);
-    glDrawArrays(prim, 0, cnt);
-    delete[] flt;
-#endif
-}
-
-
 void Display::drawFiberBackbone(Fiber const& fib) const
 {
-    glDisable(GL_LIGHTING);
-    fib.disp->color.load();
-    lineWidth(fib.prop->disp->line_width);
-    drawStrip(fib.nbPoints(), fib.addrPoints(), GL_LINE_STRIP);
+    gym::ref_view();
+    gym::disableLighting();
+    gym::color(fib.disp->color);
+    gym::loadPoints(fib.nbPoints(), fib.addrPoints());
+    gym::drawLineStrip(fib.prop->disp->line_width, 0, fib.nbPoints());
+    gym::cleanup();
 }
 
 
 void Display::drawFiberLines(Fiber const& fib, int style) const
 {
-    if ( style == 1 )
-        return drawFiberBackbone(fib);
-             
-    size_t i = 0, cnt = 2 * fib.nbSegments();
+    gym::ref_view();
+    size_t cnt = 2 * fib.nbSegments();
     fluteD4* flu = gym::mapBufferC4VD(cnt+4);
-    GLenum mode = GL_LINE_STRIP;
+    fluteD4* ptr = flu;
+    bool strip = 1;
     
     switch ( style )
     {
         case 1: { // display plain lines:
             gle_color c = fib.disp->color;
-            for ( i = 0; i < fib.nbPoints(); ++i )
+            for ( size_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {c, fib.posP(i)};
+            ptr = flu + fib.nbPoints();
         } break;
         case 2: // display segments with color indicating internal tension
-            mode = GL_LINES;
+            strip = 0;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_tension(fib, n);
-                flu[i++] = {c, fib.posP(n)};
-                flu[i++] = {c, fib.posP(n+1)};
+                ptr[0] = {c, fib.posP(n)};
+                ptr[1] = {c, fib.posP(n+1)};
+                ptr += 2;
             }
             break;
         case 3: // display segments with color indicating internal tension
-            mode = GL_LINES;
+            strip = 0;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_tension_jet(fib, n);
-                flu[i++] = {c, fib.posP(n)};
-                flu[i++] = {c, fib.posP(n+1)};
+                ptr[0] = {c, fib.posP(n)};
+                ptr[1] = {c, fib.posP(n+1)};
+                ptr += 2;
             }
             break;
         case 4: // display segments with color indicating the curvature
-            for ( i = 0; i < fib.nbPoints(); ++i )
+            for ( size_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {color_by_curvature(fib, i), fib.posP(i)};
+            ptr = flu + fib.nbPoints();
             break;
         case 5: // color according to the angle with respect to the XY-plane:
-            mode = GL_LINES;
+            strip = 0;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gle_color c = color_by_direction(fib, n);
-                flu[i++] = {c, fib.posP(n)};
-                flu[i++] = {c, fib.posP(n+1)};
+                ptr[0] = {c, fib.posP(n)};
+                ptr[1] = {c, fib.posP(n+1)};
+                ptr += 2;
             }
             break;
         case 6: // color according to the distance from the minus end
-            flu[i++] = {color_by_distanceM(fib, 0), fib.posP(0)};
+            *ptr++ = {color_by_distanceM(fib, 0), fib.posP(0)};
             for ( real a = 0.0625; a < 0.6; a *= 2 )
-                flu[i++] = {color_by_distanceM(fib, a), fib.midPoint(0, a)};
+                *ptr++ = {color_by_distanceM(fib, a), fib.midPoint(0, a)};
             for ( size_t n = 1; n < fib.nbPoints(); ++n )
-                flu[i++] = {color_by_distanceM(fib, n), fib.posP(n)};
+                *ptr++ = {color_by_distanceM(fib, n), fib.posP(n)};
             break;
         case 7: { // color according to the distance from the plus end
             const size_t last = fib.lastPoint();
             for ( size_t n = 0; n < last; ++n )
-                flu[i++] = {color_by_distanceP(fib, n), fib.posP(n)};
+                *ptr++ = {color_by_distanceP(fib, n), fib.posP(n)};
             for ( real a = 0.5; a > 0.06; a /= 2 )
-                flu[i++] = {color_by_distanceP(fib, last-a), fib.midPoint(last-1, 1-a)};
-            flu[i++] = {color_by_distanceP(fib, last), fib.posP(last)};
+                *ptr++ = {color_by_distanceP(fib, last-a), fib.midPoint(last-1, 1-a)};
+            *ptr++ = {color_by_distanceP(fib, last), fib.posP(last)};
         } break;
         case 8: // color according to distance to the confining Space
-            for ( i = 0; i < fib.nbPoints(); ++i )
+            for ( size_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {color_by_height(fib, i), fib.posP(i)};
+            ptr = flu + fib.nbPoints();
             break;
     }
     gym::unmapBufferC4VD();
-    lineWidth(fib.prop->disp->line_width);
-    glDrawArrays(mode, 0, i);
-    glDisableClientState(GL_COLOR_ARRAY);
+    if ( strip )
+        gym::drawLineStrip(fib.prop->disp->line_widthX, 0, ptr-flu);
+    else
+        gym::drawLines(fib.prop->disp->line_widthX, 0, ptr-flu);
+    gym::cleanup();
 }
 
 
 void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
+    gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
-    size_t i = 0, cnt = 8;
+    size_t cnt = 8;
     fluteD4* flu = gym::mapBufferC4VD(cnt);
-    
+    fluteD4* ptr = flu;
+
     if ( disp->line_style == 6 )
     {
         // color by distance to Minus end
-        flu[i++] = {color_by_distanceM(fib, inx), fib.posP(inx)};
+        *ptr++ = {color_by_distanceM(fib, inx), fib.posP(inx)};
         if ( inx == 0 )
         {
             for ( real dx = 0.125; dx < 0.6; dx *= 2 )
-                flu[i++] = {color_by_distanceM(fib, dx), fib.midPoint(0, dx)};
+                *ptr++ = {color_by_distanceM(fib, dx), fib.midPoint(0, dx)};
         }
-        flu[i++] = {color_by_distanceM(fib, inx+1), fib.posP(inx+1)};
+        *ptr++ = {color_by_distanceM(fib, inx+1), fib.posP(inx+1)};
     }
     else if ( disp->line_style == 7 )
     {
         // color by distance to Plus end
-        flu[i++] = {color_by_distanceP(fib, inx), fib.posP(inx)};
+        *ptr++ = {color_by_distanceP(fib, inx), fib.posP(inx)};
         if ( inx == fib.lastSegment() )
         {
             for ( real dx = 0.5; dx > 0.12; dx /= 2 )
-                flu[i++] = {color_by_distanceP(fib, inx+1-dx), fib.midPoint(inx, 1-dx)};
+                *ptr++ = {color_by_distanceP(fib, inx+1-dx), fib.midPoint(inx, 1-dx)};
         }
-        flu[i++] = {color_by_distanceP(fib, inx+1), fib.posP(inx+1)};
+        *ptr++ = {color_by_distanceP(fib, inx+1), fib.posP(inx+1)};
     }
     else
     {
@@ -976,14 +922,14 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         else
             c = fib.disp->color;
         // the whole segment is painted with the same color:
-        flu[i++] = {c, fib.posP(inx)};
-        flu[i++] = {c, fib.posP(inx+1)};
+        ptr[0] = {c, fib.posP(inx)};
+        ptr[1] = {c, fib.posP(inx+1)};
+        ptr += 2;
     }
-    glDisable(GL_LIGHTING);
+    gym::disableLighting();
     gym::unmapBufferC4VD();
-    lineWidth(fib.prop->disp->line_width);
-    glDrawArrays(GL_LINE_STRIP, 0, i);
-    glDisableClientState(GL_COLOR_ARRAY);
+    gym::drawLineStrip(fib.prop->disp->line_widthX, 0, ptr-flu);
+    gym::cleanup();
 }
 
 
@@ -991,6 +937,10 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real gap = disp->speckle_gap;
+
+    gym::ref_view();
+    gym::color_load(fib.disp->color);
+    gym::color_back(disp->back_color);
 
     size_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/gap);
     fluteD* pts = gym::mapBufferVD(cnt);
@@ -1052,9 +1002,8 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
     }
     
     gym::unmapBufferVD();
-    glDisable(GL_LIGHTING);
-    pointSize(disp->speckle_size);
-    glDrawArrays(GL_POINTS, 0, i);
+    gym::disableLighting();
+    gym::drawPoints(disp->speckle_size, 0, i);
 }
 
 
@@ -1062,17 +1011,20 @@ void Display::drawFiberPoints(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     int style = disp->point_style & 3;
-    
+
     if ( style == 1 )
     {
         // display vertices:
-        glDisable(GL_POINT_SMOOTH);
-        pointSize(disp->point_size);
-        drawStrip(fib.nbPoints(), fib.addrPoints(), GL_POINTS);
-        glEnable(GL_POINT_SMOOTH);
+        gym::ref_view();
+        gym::disableLighting();
+        gym::color(fib.disp->color);
+        gym::loadPoints(fib.nbPoints(), fib.addrPoints());
+        gym::drawSquarePoints(disp->point_size, 0, fib.nbPoints());
     }
     else if ( style == 2 )
     {
+        gym::color_load(fib.disp->color);
+        gym::color_back(disp->back_color);
         // display arrowheads along the fiber:
         const float rad = pixscale(disp->point_size);
         const real gap = disp->point_gap;
@@ -1082,6 +1034,8 @@ void Display::drawFiberPoints(Fiber const& fib) const
     }
     else if ( style == 3 )
     {
+        gym::color_load(fib.disp->color);
+        gym::color_back(disp->back_color);
         // display only middle of fiber:
         drawObject(fib.posMiddle(), pixscale(2*disp->point_size), gle::sphere2);
     }
@@ -1102,19 +1056,22 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
+    gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
     gle_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
-    size_t i = 0, cnt = 2 * ( sup - inf );
+    size_t cnt = 2 * ( sup - inf );
     fluteD4* flu = gym::mapBufferC4VD(cnt+4);
-
+    fluteD4* ptr = flu;
+    
     if ( inf == sup )
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
         c = lattice_color(col, (fac*lat.data(inf))*(uni/len));
-        flu[i++] = {c, fib.posEndM()};
-        flu[i++] = {c, fib.posEndP()};
+        ptr[0] = {c, fib.posEndM()};
+        ptr[1] = {c, fib.posEndP()};
+        ptr += 2;
     }
     else
     {
@@ -1131,27 +1088,26 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
 
         // the terminal site may be truncated
         c = lattice_color(col, facM*lat.data(inf));
-        flu[i++] = {c, fib.posEndM()};
+        *ptr++ = {c, fib.posEndM()};
         if ( uni*(inf+0.5) > fib.abscissaM() )
-            flu[i++] = {c, fib.pos(uni*(inf+0.5))};
+            *ptr++ = {c, fib.pos(uni*(inf+0.5))};
         
         for ( auto h = inf+1; h < sup; ++h )
         {
             c = lattice_color(col, fac*lat.data(h));
-            flu[i++] = {c, fib.pos(uni*(h+0.5))};
+            *ptr++ = {c, fib.pos(uni*(h+0.5))};
         }
         
         // the terminal site may be truncated
         c = lattice_color(col, facP*lat.data(sup));
         if ( uni*(sup+0.5) < fib.abscissaP() )
-            flu[i++] = {c, fib.pos(uni*(sup+0.5))};
-        flu[i++] = {c, fib.posEndP()};
+            *ptr++ = {c, fib.pos(uni*(sup+0.5))};
+        *ptr++ = {c, fib.posEndP()};
     }
     gym::unmapBufferC4VD();
-    lineWidth(width);
-    glDisable(GL_LIGHTING);
-    glDrawArrays(GL_LINE_STRIP, 0, i);
-    glDisableClientState(GL_COLOR_ARRAY);
+    gym::disableLighting();
+    gym::drawLineStrip(width, 0, ptr-flu);
+    gym::cleanup();
 }
 
 
@@ -1166,19 +1122,22 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
+    gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
     gle_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
-    size_t i = 0, cnt = 2 * ( sup - inf );
+    size_t cnt = 2 * ( sup - inf );
     fluteD4* flu = gym::mapBufferC4VD(cnt+4);
+    fluteD4* ptr = flu;
     
     if ( inf == sup )
     {
         //the Fiber is entirely covered by one site!
         real len = fib.abscissaP() - fib.abscissaM();
         c = lattice_color(col, (fac*lat.data(inf))*(uni/len));
-        flu[i++] = {c, fib.posEndM()};
-        flu[i++] = {c, fib.posEndP()};
+        ptr[0] = {c, fib.posEndM()};
+        ptr[1] = {c, fib.posEndP()};
+        ptr += 2;
     }
     else
     {
@@ -1195,26 +1154,27 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
 
         // the terminal site may be truncated
         c = lattice_color(col, facM*lat.data(inf));
-        flu[i++] = {c, fib.posEndM()};
+        *ptr++ = {c, fib.posEndM()};
 
         for ( auto h = inf+1; h < sup; ++h )
         {
             Vector P = fib.pos(uni*h);
-            flu[i++] = {c, P};
+            ptr[0] = {c, P};
             c = lattice_color(col, fac*lat.data(h));
-            flu[i++] = {c, P};
+            ptr[1] = {c, P};
+            ptr += 2;
         }
         
         // the terminal site may be truncated
         c = lattice_color(col, facP*lat.data(sup));
-        flu[i++] = {c, fib.pos(uni*sup)};
-        flu[i++] = {c, fib.posEndP()};
+        ptr[0] = {c, fib.pos(uni*sup)};
+        ptr[1] = {c, fib.posEndP()};
+        ptr += 2;
     }
     gym::unmapBufferC4VD();
-    lineWidth(width);
-    glDisable(GL_LIGHTING);
-    glDrawArrays(GL_LINE_STRIP, 0, i);
-    glDisableClientState(GL_COLOR_ARRAY);
+    gym::disableLighting();
+    gym::drawLines(width, 0, ptr-flu);
+    gym::cleanup();
 }
 
 
@@ -1234,28 +1194,27 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
     
-    size_t i = 0, cnt = sup - inf + 4;
-    gle_color col = fib.disp->color;
-    fluteD4* flu = gym::mapBufferC4VD(cnt);
+    gym::ref_view();
+    gym::color(fib.disp->color);
+    size_t cnt = sup - inf + 4;
+    fluteD* flu = gym::mapBufferVD(cnt);
+    fluteD* ptr = flu;
     real abs = (inf+1) * uni - fib.abscissaM();
-    for ( auto h = inf+1; h <= sup; ++h, abs+=uni )
-        flu[i++] = { col, fib.posM(abs) };
-    gym::unmapBufferC4VD();
-    glDisable(GL_LIGHTING);
-    //glDisable(GL_POINT_SMOOTH);
-    pointSize(size);
-    glDrawArrays(GL_POINTS, 0, i);
-    glDisableClientState(GL_COLOR_ARRAY);
-    //glEnable(GL_POINT_SMOOTH);
+    for ( auto h = inf+1; h <= sup; ++h, abs += uni )
+        *ptr++ = fib.posM(abs);
+    gym::unmapBufferVD();
+    gym::disableLighting();
+    gym::drawPoints(size, 0, ptr-flu);
+    gym::cleanup();
 }
 
 
-void Display::drawFiberLabels(Fiber const& fib, int style) const
+void Display::drawFiberLabels(Fiber const& fib, int style, gle_color const& col) const
 {
     FontType font = BITMAP_HELVETICA_10;
     char str[32];
     
-    glDisable(GL_LIGHTING);
+    gym::disableLighting();
     if ( style & 1 )
     {
         // draw fiber identity and vertex indices
@@ -1263,7 +1222,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%lu", i);
-            gym::drawText(fib.posP(i), font, str);
+            gym::drawText(fib.posP(i), font, col, str);
         }
     } 
     else if ( style & 2 )
@@ -1273,25 +1232,25 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
-            gym::drawText(fib.posP(i), font, str);
+            gym::drawText(fib.posP(i), font, col, str);
         }
     }
     if ( style & 4 )
     {
         // display integral abscissa along the fiber
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
-        gym::drawText(fib.posEndM(), font, str);
+        gym::drawText(fib.posEndM(), font, col, str);
         
         int s = (int)std::ceil(fib.abscissaM());
         int e = (int)std::floor(fib.abscissaP());
         for ( int a = s; a <= e; ++a )
         {
             snprintf(str, sizeof(str), "%i", a);
-            gym::drawText(fib.pos(a), font, str);
+            gym::drawText(fib.pos(a), font, col, str);
         }
         
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
-        gym::drawText(fib.posEndP(), font, str);
+        gym::drawText(fib.posEndP(), font, col, str);
     }
     if ( style & 8 )
     {
@@ -1301,7 +1260,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
         {
             Vector b = fib.posP(i);
             snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
-            gym::drawText(0.5*(a+b), font, str, 0.5);
+            gym::drawText(0.5*(a+b), font, col, str, 0.5);
             a = b;
         }
     }
@@ -1310,8 +1269,9 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
 
 
 /// display forces acting on the fiber's vertices, using lines scaled by 'mag'
-void Display::drawFiberForces(Fiber const& fib, real mag) const
+void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 {
+    gym::ref_view();
     gle_color col = fib.prop->disp->force_color;
     gle_color lor = col.alpha_scaled(0.5f);
     size_t cnt = 2 * fib.nbPoints();
@@ -1324,9 +1284,9 @@ void Display::drawFiberForces(Fiber const& fib, real mag) const
         flu[1+2*i] = { lor, P+F };
     }
     gym::unmapBufferC4VD();
-    glDisable(GL_LIGHTING);
-    glDrawArrays(GL_LINES, 0, cnt);
-    glDisableClientState(GL_COLOR_ARRAY);
+    gym::disableLighting();
+    gym::drawLines(size, 0, cnt);
+    gym::cleanup();
 }
 
 //------------------------------------------------------------------------------
@@ -1349,7 +1309,7 @@ void Display::drawFilament(Fiber const& fib,
     
     real ab = 0;
     
-    glEnable(GL_CLIP_PLANE4);
+    gym::enableClipPlane(4);
     
     int cnt = 0;
     // increment until we reach the MINUS_END
@@ -1368,29 +1328,28 @@ void Display::drawFilament(Fiber const& fib,
 
         // use different tones to individualize the two strands:
         if ( ++cnt & 1 )
-            color1.load_load();
+            gym::color_load(color1);
         else
-            color2.load_load();
+            gym::color_load(color2);
         
         // change color for the last monomer:
         if ( ab + dab > fib.abscissaP() )
         {
-            colorE.load_load();
-            glDisable(GL_CLIP_PLANE4);
+            gym::color_load(colorE);
+            gym::disableClipPlane(4);
         }
         
         // set clipping plane with the next monomer
-        gle::setClipPlane(GL_CLIP_PLANE4, normalize(q-p), (p+q)*0.5);
+        gym::setClipPlane(4, normalize(q-p), (p+q)*0.5);
         
         drawMonomer(q, rad);
         
         // set cliping plane with the previous:
-        gle::setClipPlane(GL_CLIP_PLANE5, normalize(p-q), (p+q)*0.5);
-        
-        glEnable(GL_CLIP_PLANE5);
+        gym::setClipPlane(5, normalize(p-q), (p+q)*0.5);
+        gym::enableClipPlane(5);
     }
-    glDisable(GL_CLIP_PLANE4);
-    glDisable(GL_CLIP_PLANE5);
+    gym::disableClipPlane(4);
+    gym::disableClipPlane(5);
 }
 
 
@@ -1430,7 +1389,7 @@ void Display::drawActin(Fiber const& fib,
     
     Vector3 p, q;
     
-    glEnable(GL_CLIP_PLANE4);
+    gym::enableClipPlane(4);
     
     int cnt = 0;
     // rotate until we reach the MINUS_END
@@ -1452,29 +1411,29 @@ void Display::drawActin(Fiber const& fib,
         
         // use different tones to individualize the two strands:
         if ( ++cnt & 1 )
-            color1.load_load();
+            gym::color_load(color1);
         else
-            color2.load_load();
+            gym::color_load(color2);
 
         // change color for the last monomer:
         if ( ab + dab > fib.abscissaP() )
         {
-            colorE.load_load();
-            glDisable(GL_CLIP_PLANE4);
+            gym::color_load(colorE);
+            gym::disableClipPlane(4);
         }
         
         // set clipping plane with the next monomer
-        gle::setClipPlane(GL_CLIP_PLANE4, normalize(q-p), (p+q)*0.5);
+        gym::setClipPlane(4, normalize(q-p), (p+q)*0.5);
         
         drawMonomer(q, rad);
         
         // set cliping plane with the previous:
-        gle::setClipPlane(GL_CLIP_PLANE5, normalize(p-q), (p+q)*0.5);
+        gym::setClipPlane(5, normalize(p-q), (p+q)*0.5);
         
-        glEnable(GL_CLIP_PLANE5);
+        gym::enableClipPlane(5);
     }
-    glDisable(GL_CLIP_PLANE4);
-    glDisable(GL_CLIP_PLANE5);
+    gym::disableClipPlane(4);
+    gym::disableClipPlane(5);
 }
 
 
@@ -1519,11 +1478,11 @@ void Display::drawMicrotubule(Fiber const& fib,
         Vector3 e = n * off;
         Vector3 f = cross(d, e);
 
-        colorA.load_load();
+        gym::color_load(colorA);
         for ( int i = 0; i < 13; ++i )
             drawMonomer(p+dx[i]*d+dy[i]*e+dz[i]*f, rad);
 
-        colorB.load_load();
+        gym::color_load(colorB);
         for ( int i = 0; i < 13; ++i )
             drawMonomer(p+(sa+dx[i])*d+dy[i]*e+dz[i]*f, rad);
 
@@ -1544,12 +1503,12 @@ void Display::drawMicrotubule(Fiber const& fib,
         {
             if ( ab+sa+dx[i] < abmax )
             {
-                colorA.load_load();
+                gym::color_load(colorA);
                 drawMonomer(p+dx[i]*d+dy[i]*e+dz[i]*f, rad);
                 if ( ab+5.2*sa+dx[i] < abmax )
-                    colorB.load_load();
+                    gym::color_load(colorB);
                 else
-                    colorE.load_load();
+                    gym::color_load(colorE);
                 drawMonomer(p+(sa+dx[i])*d+dy[i]*e+dz[i]*f, rad);
             }
         }
@@ -1574,9 +1533,9 @@ void Display::drawFiber(Fiber const& fib)
         
         // load backface color:
         if ( fib.prop->disp->coloring )
-            col1.load_back();
+            gym::color_back(col1);
         else
-            fib.prop->disp->back_color.load_back();
+            gym::color_back(fib.prop->disp->back_color);
 
         switch( disp->style )
         {
@@ -1595,19 +1554,19 @@ void Display::drawFiber(Fiber const& fib)
         switch ( disp->lattice_style )
         {
             case 1:
-                drawFiberLattice1(fib, *lat, disp->line_width);
+                drawFiberLattice1(fib, *lat, disp->line_widthX);
                 style = 0;
                 break;
             case 2:
-                drawFiberLattice2(fib, *lat, disp->line_width);
+                drawFiberLattice2(fib, *lat, disp->line_widthX);
                 style = 0;
                 break;
             case 3:
-                drawFiberLattice3(fib, *lat, disp->line_width);
+                drawFiberLattice3(fib, *lat, disp->line_widthX);
                 style = 0;
                 break;
             case 4:
-                drawFiberLatticeEdges(fib, *lat, disp->line_width);
+                drawFiberLatticeEdges(fib, *lat, disp->line_widthX);
                 style = 0;
                 break;
         }
@@ -1646,48 +1605,38 @@ void Display::drawFiber(Fiber const& fib)
         drawFiberLines(fib, style);
 
     if ( disp->point_style > 0 )
-    {
-        fib.disp->color.load_load();
-        disp->back_color.load_back();
         drawFiberPoints(fib);
-    }
     
     if ( disp->speckle_style > 0 )
-    {
-        fib.disp->color.load_load();
-        disp->back_color.load_back();
         drawFiberSpeckles(fib);
-    }
 
     // draw other fiber elements only if fiber is fully visible:
     //if ( fib.disp->visible > 0 )
     {
         if ( disp->label_style )
         {
-            fib.disp->color.load(0.5);
-            drawFiberLabels(fib, disp->label_style);
+            drawFiberLabels(fib, disp->label_style, fib.disp->color);
         }
         
         if ( disp->end_style[1] )
         {
-            fib.disp->end_color[1].load_load();
-            //fib.disp->color.load_load();
-            disp->back_color.load_back();
+            gym::color_load(fib.disp->end_color[1]);
+            //gym::color_load(fib.disp->color);
+            gym::color_back(disp->back_color);
             drawFiberMinusEnd(fib, disp->end_style[1], disp->end_size[1]);
         }
         
         if ( disp->end_style[0] )
         {
-            fib.disp->end_color[0].load_load();
-            //fib.disp->color.load_load();
-            disp->back_color.load_back();
+            gym::color_load(fib.disp->end_color[0]);
+            //gym::color_load(fib.disp->color);
+            gym::color_back(disp->back_color);
             drawFiberPlusEnd(fib, disp->end_style[0], disp->end_size[0]);
         }
         
         if ( disp->force_style )
         {
-            lineWidth(disp->point_size);
-            drawFiberForces(fib, disp->force_scale);
+            drawFiberForces(fib, disp->force_scale, disp->point_sizeX);
         }
     }
 }
@@ -1711,15 +1660,7 @@ void Display::drawFibers(FiberSet const& set)
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
-
-void Display::drawCouplesF(CoupleSet const& set) const
-{
-    if ( prop->couple_flip )
-        drawCouplesF2(set);
-    else
-        drawCouplesF1(set);
-}
+#pragma mark - Couples
 
 
 void Display::drawCouplesB(CoupleSet const& set) const
@@ -1764,27 +1705,27 @@ void Display::drawSolid(Solid const& obj)
     if ( disp->style & 4 )
     {
 #if ( DIM == 2 )
-        glDisable(GL_LIGHTING);
-        lineWidth(disp->width);
-        bodyColorF(obj).load();
+        gym::disableLighting();
+        gym::color(bodyColorF(obj));
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
         {
-            if ( obj.radius(i) > 0 )
-                drawFlat(obj.posP(i), obj.radius(i), gle::circle);
+            if ( obj.radius(i) > pixelSize )
+            {
+                gym::transScale(obj.posP(i), obj.radius(i));
+                gle::circle(disp->width);
+            }
         }
-        glEnable(GL_LIGHTING);
+        gym::enableLighting();
 #elif ( DIM >= 3 )
         //special display for ParM simulations (DYCHE 2006; KINETOCHORES 2019)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
         {
-            glEnable(GL_LIGHTING);
+            gym::enableLighting();
             bodyColor(obj);
             //drawObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
-            glPushMatrix();
             Vector A = obj.posP(0), B = obj.posP(1);
-            gle::transAlignZ(A, obj.radius(0), B-A);
+            gym::transAlignZ(A, obj.radius(0), B-A);
             gle::cylinder1();
-            glPopMatrix();
         }
 #endif
     }
@@ -1793,19 +1734,19 @@ void Display::drawSolid(Solid const& obj)
     if ( disp->style & 8 )
     {
         char tmp[8];
-        bodyColorF(obj).load();
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
-        gym::drawText(obj.posP(0), BITMAP_HELVETICA_10, tmp);
+        gym::drawText(obj.posP(0), BITMAP_HELVETICA_10, bodyColorF(obj), tmp);
     }
     
     //draw polygon around vertices of Solid
     if ( disp->style & 16 )
     {
-        glDisable(GL_LIGHTING);
-        lineWidth(disp->width);
-        bodyColorF(obj).load();
-        drawStrip(obj.nbPoints(), obj.addrPoints(), GL_LINE_LOOP);
-        glEnable(GL_LIGHTING);
+        gym::disableLighting();
+        gym::color(bodyColorF(obj));
+        gym::ref_view();
+        gym::loadPoints(obj.nbPoints(), obj.addrPoints());
+        gym::drawLineStrip(disp->widthX, 0, obj.nbPoints());
+        gym::enableLighting();
     }
 }
 
@@ -1823,21 +1764,20 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         // using cliping planes to cleanup overlapping Spheres
         size_t near[3];
         size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
-        //printf("nearest balls to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
-        // set clipping planes with nearest balls
+        //printf("nearest Spheres to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
+        // set clipping planes with nearest Spheres
         for ( size_t i = 0; i < num; ++i )
         {
             size_t J = near[i];
             Vector P = obj.posP(J);
             real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
-            GLenum glp = GL_CLIP_PLANE5 - i;
-            glEnable(glp);
-            gle::setClipPlane(glp, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
+            gym::enableClipPlane(5-i);
+            gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
         drawBallT(X, obj.radius(inx), bodyColorF(obj));
-        glDisable(GL_CLIP_PLANE3);
-        glDisable(GL_CLIP_PLANE4);
-        glDisable(GL_CLIP_PLANE5);
+        gym::disableClipPlane(3);
+        gym::disableClipPlane(4);
+        gym::disableClipPlane(5);
 #else
         drawDiscT(X, obj.radius(inx), bodyColorF(obj));
 #endif
@@ -1884,13 +1824,13 @@ void Display::drawBead(Bead const& obj)
     
 #if ( DIM == 2 )
     // display outline:
-    if ( disp->style & 4 )
+    if (( disp->style & 4 ) && obj.radius() > pixelSize  )
     {
-        glDisable(GL_LIGHTING);
-        bodyColorF(obj).load();
-        lineWidth(disp->width);
-        drawFlat(obj.position(), obj.radius(), gle::circle);
-        glEnable(GL_LIGHTING);
+        gym::disableLighting();
+        gym::color(bodyColorF(obj));
+        gym::transScale(obj.position(), obj.radius());
+        gle::circle(disp->width);
+        gym::enableLighting();
     }
 #endif
 }
@@ -1966,27 +1906,29 @@ void Display::drawSphereT(Sphere const& obj) const
     {
         const Vector C = obj.posP(0);
 #if ( DIM < 3 )
-        bodyColorF(obj).load();
-        if ( disp->style & 1 )
-            drawFlat(C, obj.radius(), gle::circle);
-        if ( disp->style & 2 )
-            drawFlat(C, obj.radius(), gle::disc);
-        if ( disp->style & 4 )
-            drawDiscT(C, obj.radius(), bodyColorF(obj));
+        if ( obj.radius() > pixelSize )
+        {
+            gym::color(bodyColorF(obj));
+            gym::transScale(C, obj.radius());
+            if ( disp->style & 1 )
+                gle::circle(disp->widthX);
+            if ( disp->style & 2 )
+                gle::disc();
+            if ( disp->style & 4 )
+                drawDiscT(C, obj.radius(), bodyColorF(obj));
+        }
 #else
         /* Note: The rotation matrix for the sphere calculated below from the
          reference points, includes scaling by the radius of the sphere.
          We then use a primitive for a sphere of radius 1.
          */
-        bodyColorF(obj).load_both();
-        glEnable(GL_LIGHTING);
-        glPushMatrix();
-        gle::transRotate(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C);
+        gym::color_both(bodyColorF(obj));
+        gym::enableLighting();
+        gym::transRotate(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C);
         if ( disp->style & 1 )
             gle::dualPassSphere4();
         if ( disp->style & 4 )
             gle::threeArrowStrip(0.5, 1);
-        glPopMatrix();
 #endif
     }
 }
@@ -2021,25 +1963,23 @@ void Display::drawOrganizer(Organizer const& obj) const
 
     if ( disp && ( disp->style & 2 ))
     {
+        gym::ref_view();
         Vector P, Q;
-        gle_color c = bodyColorF(disp, obj.signature());
-        fluteD4* flu = gym::mapBufferC4VD(2*cnt);
+        gym::color(bodyColorF(disp, obj.signature()));
+        fluteD* flu = gym::mapBufferVD(2*cnt);
         while ( obj.getLink(i, P, Q) )
         {
             if ( modulo ) modulo->fold(Q, P);
-            flu[  2*i] = { c, P };
-            flu[1+2*i] = { c, Q };
+            flu[  2*i] = Q;
+            flu[1+2*i] = P;
             if ( ++i >= cnt ) break;
         }
-        gym::unmapBufferC4VD();
-        glDisable(GL_LIGHTING);
-        lineWidth(disp->width);
-        glDrawArrays(GL_LINES, 0, 2*i);
+        gym::unmapBufferVD();
+        gym::disableLighting();
+        gym::drawLines(disp->widthX, 0, 2*i);
 
-        gym::bindBufferC4VD(2);
-        pointSize(disp->size);
-        glDrawArrays(GL_POINTS, 0, i);
-        glDisableClientState(GL_COLOR_ARRAY);
+        gym::rebindBufferVD(2);
+        gym::drawPoints(disp->sizeX, 0, i);
     }
 
     /**
@@ -2052,19 +1992,18 @@ void Display::drawOrganizer(Organizer const& obj) const
         if ( sol && sol->nbPoints() >= 4 )
         {
 #if ( DIM >= 3 )
-            glEnable(GL_LIGHTING);
+            gym::enableLighting();
             bodyColor(*sol);
-            glPushMatrix();
             Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
-            gle::stretchAlignZ(a, b, 1);
-            gle::dualPass(gle::barrel);
-            glPopMatrix();
-            glDisable(GL_LIGHTING);
+            gym::stretchAlignZ(a, b, 1);
+            gle::dualPassBarrel();
 #else
-            glDisable(GL_LIGHTING);
-            bodyColorF(*sol).load();
-            drawStrip(sol->nbPoints(), sol->addrPoints(), GL_LINES);
+            gym::disableLighting();
+            gym::color(bodyColorF(*sol));
+            gym::ref_view();
+            gym::loadPoints(sol->nbPoints(), sol->addrPoints());
+            gym::drawLines(disp->widthX, 0, sol->nbPoints());
 #endif
         }
     }
@@ -2146,7 +2085,7 @@ void Display::drawTransparentObjects(Array<zObject>& list)
  */
 void Display::drawTransparentObjects(Simul const& sim)
 {
-    glEnable(GL_CULL_FACE);
+    gym::enableCullFace(GL_BACK);
 
     if ( zObjects.size() )
     {
@@ -2160,9 +2099,9 @@ void Display::drawTransparentObjects(Simul const& sim)
         glDisable(GL_POLYGON_OFFSET_FILL);
     }
     
-    glEnable(GL_CULL_FACE);
+    gym::enableCullFace(GL_BACK);
     drawTransparentSpaces(sim.spaces);
-    glDisable(GL_CULL_FACE);
+    gym::disableCullFace();
 }
 
 #endif

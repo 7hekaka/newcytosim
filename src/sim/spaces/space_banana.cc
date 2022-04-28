@@ -158,8 +158,11 @@ void SpaceBanana::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 
-void SpaceBanana::draw2D() const
+
+void SpaceBanana::draw2D(float width) const
 {
     float R(bRadius);
     float C(bCurve);
@@ -181,61 +184,46 @@ void SpaceBanana::draw2D() const
     gle::compute_arc(fin, arc+4*fin, C-R, B, A-B-M_PI, cX, cY);
     // left cap
     gle::compute_arc(fin, arc+6*fin, R, A, M_PI, -eX, eY);
-    
+    arc[0+8*fin] = arc[0];
+    arc[1+8*fin] = arc[1];
     gym::unmapBufferV2();
-    glDrawArrays(GL_LINE_LOOP, 0, 4*fin);
+    gym::drawLineStrip(width, 0, 4*fin+1);
 }
 
 void SpaceBanana::draw3D() const
 {
-    glMatrixMode(GL_MODELVIEW);
-
     float U(bCurve);
     float R(bRadius);
     
-    GLdouble C = std::cos(bAngle), S = std::sin(bAngle);
+    double C = std::cos(bAngle), S = std::sin(bAngle);
     
-    GLdouble plane1[] = {-C,-S, 0, 0 };
-    GLdouble plane2[] = { C,-S, 0, 0 };
-    GLdouble plane3[] = { C, S, 0, 0 };
-    GLdouble plane4[] = {-C, S, 0, 0 };
-    
-    const GLenum glp1 = GL_CLIP_PLANE4;
-    const GLenum glp2 = GL_CLIP_PLANE5;
-    
-    glEnable(glp1);
-    glEnable(glp2);
+    gym::enableClipPlane(4);
+    gym::enableClipPlane(5);
     
     //center part:
-    glPushMatrix();
-    gle::transScale(bCenter[0], bCenter[1], 0, R);
-    glClipPlane(glp1, plane1);
-    glClipPlane(glp2, plane2);
+    gym::transScale(bCenter[0], bCenter[1], 0, R);
+    gym::setClipPlane(4, -C, -S, 0, 0);
+    gym::setClipPlane(5,  C, -S, 0, 0);
     gle::torusZ(U, 1);
-    glPopMatrix();
 
-    glDisable(glp2);
+    gym::disableClipPlane(5);
 
     //right cap:
-    glPushMatrix();
-    gle::transScale(bEnd[0], bEnd[1], 0, R);
-    glClipPlane(glp1, plane3);
+    gym::transScale(bEnd[0], bEnd[1], 0, R);
+    gym::setClipPlane(4, C, S, 0, 0);
     gle::sphere8();
-    glPopMatrix();
 
     //left cap:
-    glPushMatrix();
-    gle::transScale(-bEnd[0], bEnd[1], 0, R);
-    glClipPlane(glp1, plane4);
+    gym::transScale(-bEnd[0], bEnd[1], 0, R);
+    gym::setClipPlane(4, -C, S, 0, 0);
     gle::sphere8();
-    glPopMatrix();
-    
-    glDisable(glp1);
+
+    gym::disableClipPlane(4);
 }
 
 #else
 
-void SpaceBanana::draw2D() const {}
+void SpaceBanana::draw2D(float) const {}
 void SpaceBanana::draw3D() const {}
 
 #endif

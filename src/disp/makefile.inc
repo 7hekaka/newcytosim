@@ -7,10 +7,10 @@ OBJ_SIMDISP := fiber_disp.o line_disp.o point_disp.o grid_display.o
 
 OBJ_GLE := tesselator.o gle.o gle_color.o gle_color_list.o view.o view_prop.o glapp.o
 
-OBJ_GYM := gym_menu.o gym_flute.o gym_matrix.o\
-           gym_check.o gym_text.o gym_zoo.o
+OBJ_GYM := gym_menu.o gym_flat.o gym_flute.o gym_flute_dim.o gym_matrix.o gym_view.o\
+           gym_vect.o gym_draw.o gym_check.o gym_image.o gym_text.o gym_zoo.o
 
-OBJ_FONT := 
+OBJ_FONT := fg_font.o fg_stroke.o
 
 OBJ_DISP := $(OBJ_GLE) $(OBJ_GYM) $(OBJ_FONT) offscreen.o spng.o miniz.o
 
@@ -60,5 +60,5 @@ $(OBJ_GLE:%.o=build/%.o): build/%.o: %.cc %.h | build
 $(OBJ_GYM:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INCLUDE) -Isrc/math -Isrc/base -c $< -o $@
 
-$(OBJ_FONT:%.o=build/%.o): build/%.o: %.c fg_font.h | build
-	$(CXX) $(INCLUDE) -DNDEBUG -x c -c $< -o $@
+$(OBJ_FONT:%.o=build/%.o): build/%.o: %.cc fg_font.h | build
+	$(COMPILE) $(INCLUDE) -DNDEBUG -c $< -o $@

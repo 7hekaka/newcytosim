@@ -21,15 +21,24 @@ namespace glApp
     
     /// change dimensionnality (this affects mostly the mouse controls availability)
     void setDimensionality(int d);
+    
+    /// set display function `func`
+    int newWindow();
 
     /// set display function `func`
-    int newWindow(void (*func)(View&, int));
+    int newWindow(int (*func)(View&));
     
+    /// set display function `func`
+    int newWindow(int (*func)(View&), void (*mag)(View&));
+
     /// destroy window
     void deleteWindow(int win);
     
+    /// save current window position and size
+    void saveWindowPosition();
+    
     /// enter full-screen mode
-    void enterFullScreen(bool saveWindowPos);
+    void enterFullScreen();
 
     /// exit full-screen mode
     void exitFullScreen();
@@ -38,13 +47,13 @@ namespace glApp
     void toggleFullScreen();
     
     /// return current mode
-    bool isFullScreen();
+    int isFullScreen();
     
     /// set current mode
-    void setFullScreen(bool);
+    void setFullScreen(int);
 
     /// maximize window size within the current screen
-    void maximizeDisplay();
+    void maximizeWindow();
     
     /// callback function for window resize event
     void resizeWindow(int, int);
@@ -62,7 +71,7 @@ namespace glApp
     void displayAll();
 
     /// save higher resolution image with magnification 'mag'
-    //int saveImage(const char* name, unsigned mag, unsigned downsample);
+    int saveImage(const char* name, unsigned mag, unsigned downsample);
     
     //--------------------------------- MENUS -----------------------------------
     

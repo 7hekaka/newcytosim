@@ -213,10 +213,10 @@ public:
     //------------------------------ DISPLAY -----------------------------------
     
     /// Default 2D display, tracing the outline of a section of the Volume
-    void drawSection(int dim, real pos, size_t cnt) const;
+    void drawSection(int dim, real pos, size_t cnt, float width) const;
 
     /// outline the surface using lines, return true if drawn
-    virtual void draw2D() const {}
+    virtual void draw2D(float) const {}
     
     /// draw surface of the volume, using triangles, return true if drawn
     virtual void draw3D() const {}

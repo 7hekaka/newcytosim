@@ -4,6 +4,7 @@
 
 #include "real.h"
 #include "vector3.h"
+#include "vector4.h"
 #include "quaternion.h"
 #include "property.h"
 #include "gle_color.h"
@@ -25,6 +26,9 @@ public:
     /// zoom factor = ratio between visible area and `view_size`
     float zoom;
     
+    /// pixel magnification
+    unsigned magnify;
+
     /// size of area visible in the window, in sim-units (default=10)
     float view_size;
     
@@ -169,12 +173,8 @@ public:
     int clip_plane_mode[NB_CLIP_PLANES];
 
     /// direction perpendicular to clipping plane (defined as `clip_plane?[1]`)
-    Vector3 clip_plane_vector[NB_CLIP_PLANES];
-    
-    /// scalar offset defining the equation of the clipping plane (defined as `clip_plane?[2]`)
-    real clip_plane_scalar[NB_CLIP_PLANES];
+    Vector4 clip_plane[NB_CLIP_PLANES];
 
-    
     /// characteristics of OpenGL fog (also known as `fog[0]`)
     int fog_type;
     

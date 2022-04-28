@@ -21,7 +21,7 @@ Simul&      simul = player.simul;
 PlayerProp&  prop = player.prop;
 DisplayProp& disp = player.disp;
 
-void drawLive(View& view, int mag);
+int drawLive(View& view);
 
 /// create a player suitable for command-line offscreen rendering only
 #define HEADLESS_PLAYER 0
@@ -49,31 +49,81 @@ enum Mode { NORMAL = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
+
+/// this does not draw
+int drawNot(View& view)
+{
+    //std::clog << " drawNot(" << std::setprecision(3) << simul.time() << "s)\n";
+    //view.clear();
+    player.prepareDisplay(view);
+    return 0;
+}
+
+
+/// minimalistic display function
+void drawMag(View& view)
+{
+    //std::clog << " drawMag(" << std::setprecision(3) << simul.time() << "s)\n";
+    view.clear();
+    view.setProjection();
+    view.setModelView();
+    view.setLights();
+    view.setClipping();
+    player.setPixelSize(view);
+    player.drawCytosim();
+    view.endClipping();
+}
+
+
 /**
  call drawScene() if data can be accessed by current thread
  */
-void drawLive(View& view, int mag)
+int drawLive(View& view)
 {
-    //std::clog << " drawLive(" << std::setprecision(3) << simul.time() << "s) " << "\n";
+    //std::clog << " drawLive(" << std::setprecision(3) << simul.time() << "s)\n";
     if ( 0 == worker.trylock() )
     {
         worker.read_input();
-        player.drawScene(view, mag);
+        if ( simul.prop.display_fresh )
+        {
+            player.readDisplayString(view, simul.prop.display);
+            simul.prop.display_fresh = false;
+        }
+        //worker.debug("drawScene");
+        player.prepareDisplay(view);
+        player.drawScene(view);
         worker.unlock();
+        return 0;
     }
     else
     {
+        //fprintf(stderr, "display: trylock failed\n");
         //worker.debug("display: trylock failed");
         //postRedisplay();
     }
+    return 1;
 }
 
 
 // This must be a plain C-function
-void drawOffscreen(View & view, int mag)
+int drawOffscreen(View& view)
 {
     //std::clog << "drawOffscreen " << glApp::views.size() << '\n';
-    player.drawScene(view, mag);
+    player.prepareDisplay(view);
+    player.drawScene(view);
+    return 0;
+}
+
+
+/// copy color data from 'back' to 'front'
+void blitBuffers(unsigned back, unsigned front, int W, int H)
+{
+    //std::clog << "blitting multisample buffer\n";
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, back);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, front);
+    glBlitFramebuffer(0, 0, W, H, 0, 0, W, H, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, front);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, back);
 }
 
 //------------------------------------------------------------------------------
@@ -110,13 +160,26 @@ int main(int argc, char* argv[])
     Style style = OFFSCREEN;
     int menu = 1;
     int mode = NORMAL;
-    int magnify = 1;
     Glossary arg;
     
     Cytosim::out.silent();
     Cytosim::log.silent();
     register_signal_handlers();
     
+#if HEADLESS_PLAYER
+    View view("*");
+    view.setDisplayFunc(drawOffscreen);
+#else
+    glApp::setDimensionality(DIM);
+    if ( arg.use_key("fullscreen") )
+        glApp::setFullScreen(1);
+    View& view = glApp::views[0];
+#endif
+    if ( DIM == 3 )
+        view.back_color = 0x161616FF;
+    else
+        view.depth_test = 0;
+
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
     
@@ -126,6 +189,8 @@ int main(int argc, char* argv[])
     if ( arg.use_key("-") )
     {
         simul.prop.verbose = 0;
+        Cytosim::out.silent();
+        Cytosim::log.silent();
         Cytosim::warn.silent();
     }
     else if ( arg.use_key("+") )
@@ -160,7 +225,7 @@ int main(int argc, char* argv[])
     {
         prop.image_name = "poster%";
         mode = SAVE_IMAGE;
-        magnify = 3;
+        view.magnify = 3;
     }
     
     if ( arg.use_key("on") )
@@ -197,9 +262,6 @@ int main(int argc, char* argv[])
         mode = SAVE_MOVIE;
     }
 
-    // get image over-sampling:
-    arg.set(magnify, "magnify") || arg.set(magnify, "mag");
-
     // change working directory if specified:
     if ( arg.has_key("directory") )
     {
@@ -221,18 +283,7 @@ int main(int argc, char* argv[])
         print_error(e);
         return 2;
     }
-    
-#if HEADLESS_PLAYER
-    View view("*");
-    view.setDisplayFunc(drawOffscreen);
-#else
-    glApp::setDimensionality(DIM);
-    if ( arg.use_key("fullscreen") )
-        glApp::setFullScreen(1);
-    View& view = glApp::views[0];
-    view.setDisplayFunc(drawLive);
-#endif
-    
+
     //---------Open trajectory file and load simulation world
 
     try
@@ -303,15 +354,15 @@ int main(int argc, char* argv[])
     
     if ( mode != NORMAL && style == OFFSCREEN )
     {
-        const int W = view.width() * magnify;
-        const int H = view.height() * magnify;
+        const int W = view.width() * view.magnify;
+        const int H = view.height() * view.magnify;
         
         if ( OffScreen::openContext() )
         {
             std::cerr << "Failed to create off-screen context\n";
             return 5;
         }
-        int fbo = OffScreen::createBuffer(W, H, 0);
+        int fbo = OffScreen::openBuffer(W, H, 0);
         if ( !fbo )
         {
             std::cerr << "Failed to create off-screen pixels\n";
@@ -320,9 +371,8 @@ int main(int argc, char* argv[])
         int multi = 0;
         if ( view.multisample > 1 )
         {
-            multi = OffScreen::createBuffer(W, H, view.multisample);
+            multi = OffScreen::openBuffer(W, H, view.multisample);
         }
-        
         gle::initialize();
         player.setStyle(disp.style);
         view.initGL();
@@ -334,9 +384,9 @@ int main(int argc, char* argv[])
             do {
                 if ( ++s >= prop.period )
                 {
-                    player.drawScene(view, magnify);
+                    drawOffscreen(view);
                     if ( multi )
-                        OffScreen::blitBuffers(multi, fbo, W, H);
+                        blitBuffers(multi, fbo, W, H);
                     player.saveView(frm++, prop.downsample);
                     s = 0;
                 }
@@ -351,9 +401,9 @@ int main(int argc, char* argv[])
                 // only save requested frames:
                 if ( worker.currentFrame() == frm )
                 {
-                    player.drawScene(view, magnify);
+                    drawOffscreen(view);
                     if ( multi )
-                        OffScreen::blitBuffers(multi, fbo, W, H);
+                        blitBuffers(multi, fbo, W, H);
                     player.saveView(frm, prop.downsample);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
@@ -375,7 +425,7 @@ int main(int argc, char* argv[])
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
     glApp::normalKeyFunc(processNormalKey);
-    glApp::newWindow(drawLive);
+    glApp::newWindow(drawLive, drawMag);
 
     if ( mode & SAVE_MOVIE )
     {

@@ -5,20 +5,22 @@
 #include "glapp.h"
 #include <unistd.h>
 #include "exceptions.h"
-#include "save_image.h"
 #include "glossary.h"
 #include "time_date.h"
 #include "gle.h"
 #include "gym_check.h"
 #include "gym_menu.h"
+#include "gym_draw.h"
+#include "offscreen.h"
+
 
 namespace glApp
 {
     std::vector<View> views;
     
-    int   mDIM        = 3;     ///< current dimensionality
-    bool  mFullScreen = false; ///< flag indicating full-screen mode
-    int   specialKeys = 0;     ///< state of special keys given by GLUT
+    int mDIM        = 3;     ///< current dimensionality mode
+    int mFullScreen = false; ///< flag indicating full-screen mode
+    int specialKeys = 0;     ///< state of special keys given by GLUT
     
     // --------------- MOUSE
     
@@ -40,31 +42,29 @@ namespace glApp
     int actionDimensionality[] = { 3, 1, 1, 3, 2, 1, 1, 4, 4, 4, 0 };
     
     /// the action controlled with the mouse
-    UserMode     userMode = MOUSE_ROTATE;
+    UserMode userMode = MOUSE_ROTATE;
 
     /// change action
-    void         switchUserMode(int dir);
-
-    View         savedView("savedView");
-    UserMode     mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
-    Vector3      mouseDown(0,0,0);               ///< position where mouse button was pressed down
-    GLint        mouseX, mouseY;                 ///< current position of mouse in pixels
-    Vector3      depthAxis(0,0,0);               ///< vector normal to desired rotation
-    Vector3      mouseAxis(0,0,0);               ///< axis of rotation for MOUSE_SPIN
-    Vector3      viewFocus(0,0,0);               ///< unprojected center of screen
+    void switchUserMode(int dir);
     
-    int          savedWindowPos[4] = { 24, 24, 800, 800 };
+    View savedView("savedView");
+    int  savedWindowPos[4] = { 24, 24, 800, 800 };
+
+    UserMode mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
+    int      mouseX, mouseY;                 ///< current position of mouse in pixels
+    Vector3  mouseDown(0,0,0);               ///< position where mouse button was pressed down
+    Vector3  depthAxis(0,0,0);               ///< vector normal to desired rotation
+    Vector3  mouseAxis(0,0,0);               ///< axis of rotation for MOUSE_SPIN
+    Vector3  viewFocus(0,0,0);               ///< unprojected center of screen
     
-    real         nearZ  = 0;       ///< normalized device Z-coordinate of front-plane
-    real         midZ   = 0.5;     ///< normalized device Z-coordinate of middle
-    real         farZ   = 1;       ///< normalized device Z-coordinate of back-plane
+    float nearZ = 0;    ///< normalized device Z-coordinate of front-plane
+    float midZ  = 0.5;  ///< normalized device Z-coordinate of middle
+    float farZ  = 1;    ///< normalized device Z-coordinate of back-plane
 
-    unsigned int imageIndex = 0;   ///< index for image name
-    double       flashFinish;
-    std::string  flashString;
+    unsigned imageIndex = 0;  ///< index for image name
 
-    Vector3      ROIdup[2];
-    bool         moveROI = false;
+    Vector3  ROIdup[2];
+    bool     moveROI = false;
 
     /// function pointer for shift-click actions
     void (*mouseClickCallback)(int, int, const Vector3 &, int) = nullptr;
@@ -112,30 +112,33 @@ void glApp::setDimensionality(const int d)
 
 //------------------------------------------------------------------------------
 
-bool glApp::isFullScreen()
+int glApp::isFullScreen()
 {
     return mFullScreen;
 }
 
-void glApp::setFullScreen(bool s)
+void glApp::setFullScreen(int s)
 {
     mFullScreen = s;
 }
 
 
-void glApp::enterFullScreen(bool saveWindowPos)
+void glApp::saveWindowPosition()
+{
+    //save the current window size and position:
+    savedWindowPos[0] = glutGet(GLUT_WINDOW_X);
+    savedWindowPos[1] = glutGet(GLUT_WINDOW_Y);
+    savedWindowPos[2] = glutGet(GLUT_WINDOW_WIDTH);
+    savedWindowPos[3] = glutGet(GLUT_WINDOW_HEIGHT);
+}
+
+
+void glApp::enterFullScreen()
 {
     if ( ! mFullScreen )
     {
-        mFullScreen = true;
-        if ( saveWindowPos )
-        {
-            //save the current window size and position:
-            savedWindowPos[0] = glutGet(GLUT_WINDOW_X);
-            savedWindowPos[1] = glutGet(GLUT_WINDOW_Y);
-            savedWindowPos[2] = glutGet(GLUT_WINDOW_WIDTH);
-            savedWindowPos[3] = glutGet(GLUT_WINDOW_HEIGHT);
-        }
+        mFullScreen = 1;
+        saveWindowPosition();
         //invoke full screen from GLUT
         glutFullScreen();
         //std::clog << "Fullscreen window " << glutGetWindow() << '\n';
@@ -145,7 +148,7 @@ void glApp::enterFullScreen(bool saveWindowPos)
 
 void glApp::exitFullScreen()
 {
-    mFullScreen = false;
+    mFullScreen = 0;
     // restore window dimensions:
     if ( savedWindowPos[2] > 8 && savedWindowPos[3] > 8 )
     {
@@ -163,7 +166,7 @@ void glApp::toggleFullScreen()
     if ( mFullScreen )
         exitFullScreen();
     else
-        enterFullScreen(1);
+        enterFullScreen();
 }
 
 
@@ -175,11 +178,11 @@ void glApp::toggleFullScreen()
  Adjust the size of window to maximize the vertical or horizontal dimension,
  without changing the aspect ratio of the window.
  */
-void glApp::maximizeDisplay()
+void glApp::maximizeWindow()
 {
     int W = glutGet(GLUT_WINDOW_WIDTH);
     int H = glutGet(GLUT_WINDOW_HEIGHT);
-
+    
     /// using addition by Renaud Blanch to handle Retina display:
     int S = 1; //std::max(1, glutGet(GLUT_WINDOW_SCALE));
     
@@ -203,7 +206,7 @@ void glApp::maximizeDisplay()
  @todo: share OpenGL context between new window and main one,
  which is possible with GLFW
  */
-int glApp::newWindow(void (*func)(View&, int))
+int glApp::newWindow()
 {
     View & view = views[0];
     
@@ -246,9 +249,6 @@ int glApp::newWindow(void (*func)(View&, int))
     // set window position:
     views[win].window_position[0] += 20;
     views[win].window_position[1] += 20;
-    
-    if ( func )
-        views[win].setDisplayFunc(func);
 
     glutReshapeFunc(resizeWindow);
     glutKeyboardFunc(normalKeyCallback);
@@ -261,7 +261,21 @@ int glApp::newWindow(void (*func)(View&, int))
         glutDisplayFunc(displayMain);
     else
         glutDisplayFunc(displayPlain);
-    
+    return win;
+}
+
+int glApp::newWindow(int (*func)(View&))
+{
+    int win = newWindow();
+    views[win].setDisplayFunc(func);
+    return win;
+}
+
+int glApp::newWindow(int (*func)(View&), void (*mag)(View&))
+{
+    int win = newWindow();
+    views[win].setDisplayFunc(func);
+    views[win].setDrawMagFunc(mag);
     return win;
 }
 
@@ -287,9 +301,9 @@ void glApp::deleteWindow(int win)
 void glApp::resizeWindow(int w, int h)
 {
     unsigned win = glutGetWindow();
-    views[win].reshape(w, h);
     flashText("window size %i %i", w, h);
-    glClear(GL_COLOR_BUFFER_BIT);
+    views[win].reshape(w, h);
+    views[win].clear();
     postRedisplay();
 }
 
@@ -304,31 +318,30 @@ void glApp::setScale(float s)
         views[n].view_size = s;
 }
 
-/*
+#if ( 0 )
+#include "save_image.h"
+
 int glApp::saveImage(char const* name, unsigned mag, unsigned downsample)
 {
+    View view = currentView();
+    int W = mag * view.width();
+    int H = mag * view.height();
+    GLint vp[] = { 0, 0, W, H };
     if ( mag > 1 )
     {
-        // copy current view:
-        View view = currentView();
-        int W = mag * view.window_size[0];
-        int H = mag * view.window_size[1];
         view.reshape(W, H);
-        if ( OffScreen::createBuffer(W, H, 0) )
+        if ( OffScreen::openBuffer(W, H, 0) )
         {
             view.initGL();
             displayPlain();
-            GLint vp[] = { 0, 0, W, H };
             int res = SaveImage::saveImage(name, "png", vp, downsample);
             OffScreen::releaseBuffer();
             return res;
         }
     }
-    GLint vp[4];
-    glGetIntegerv(GL_VIEWPORT, vp);
     return SaveImage::saveImage(name, "png", vp, downsample);
 }
-*/
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -427,13 +440,13 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
             break;
         
             
-        case 9:          // ascii 9 is the horizontal tab
-        case 25:         // ascii 25 is shift-tab
+        case 9: // ascii 9 is horizontal TAB
+        case 25: // ascii 25 is SHIFT-TAB
             switchUserMode(c==9 ? 1 : -1);
             break;
         
         
-        case 27:             // ascii 27 is the escape key
+        case 27: // ascii 27 is ESCAPE
             if ( mFullScreen )
                 exitFullScreen();
             else
@@ -446,7 +459,7 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
             break;
         
         case 'F':
-            maximizeDisplay();
+            maximizeWindow();
             break;
 
         case 'z':
@@ -469,7 +482,7 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
             break;
             
         case 'b':
-            view.scalebar = ( view.scalebar + 1 ) % 4;
+            view.scalebar = ( view.scalebar + 1 ) & 3;
             flashText("view:scalebar = %i", view.scalebar);
             break;
         
@@ -771,68 +784,68 @@ void glApp::processMenuEvent(int item)
             break;
             
         case 301:
-            view.enableClipPlane(0, Vector3(+1,0,0), 0);
+            view.enableClipPlane(0,+1,0,0,0);
             view.disableClipPlane(1);
             break;
             
         case 302:
-            view.enableClipPlane(0, Vector3(-1,0,0), 0);
+            view.enableClipPlane(0,-1,0,0,0);
             view.disableClipPlane(1);
             break;
             
         case 303:
-            view.enableClipPlane(0, Vector3(+1,0,0), 1);
-            view.enableClipPlane(1, Vector3(-1,0,0), 1);
+            view.enableClipPlane(0,+1,0,0,1);
+            view.enableClipPlane(1,-1,0,0,1);
             break;
  
         case 311:
-            view.enableClipPlane(0, Vector3(0,+1,0), 0);
+            view.enableClipPlane(0,0,+1,0,0);
             view.disableClipPlane(1);
             break;
             
         case 312:
-            view.enableClipPlane(0, Vector3(0,-1,0), 0);
+            view.enableClipPlane(0,0,-1,0,0);
             view.disableClipPlane(1);
             break;
             
         case 313:
-            view.enableClipPlane(0, Vector3(0,+1,0), 1);
-            view.enableClipPlane(1, Vector3(0,-1,0), 1);
+            view.enableClipPlane(0,0,+1,0,1);
+            view.enableClipPlane(1,0,-1,0,1);
             break;
  
         case 321:
-            view.enableClipPlane(0, Vector3(0,0,+1), 0);
+            view.enableClipPlane(0,0,0,+1,0);
             view.disableClipPlane(1);
             break;
             
         case 322:
-            view.enableClipPlane(0, Vector3(0,0,-1), 0);
+            view.enableClipPlane(0,0,0,-1,0);
             view.disableClipPlane(1);
             break;
  
         case 323:
-            view.enableClipPlane(0, Vector3(0,0,+1), 0.25);
+            view.enableClipPlane(0,0,0,+1,0.25);
             view.disableClipPlane(1);
             break;
             
         case 324:
-            view.enableClipPlane(0, Vector3(0,0,-1), 0.25);
+            view.enableClipPlane(0,0,0,-1,0.25);
             view.disableClipPlane(1);
             break;
             
         case 325:
-            view.enableClipPlane(0, Vector3(0,0,+1), 1);
-            view.enableClipPlane(1, Vector3(0,0,-1), 1);
+            view.enableClipPlane(0,0,0,+1,1);
+            view.enableClipPlane(1,0,0,-1,1);
             break;
 
         case 326:
-            view.enableClipPlane(0, Vector3(0,0,+1), 0.5);
-            view.enableClipPlane(1, Vector3(0,0,-1), 0.5);
+            view.enableClipPlane(0,0,0,+1,0.5);
+            view.enableClipPlane(1,0,0,-1,0.5);
             break;
 
         case 327:
-            view.enableClipPlane(0, Vector3(0,0,+1), 0.25);
-            view.enableClipPlane(1, Vector3(0,0,-1), 0.25);
+            view.enableClipPlane(0,0,0,+1,0.25);
+            view.enableClipPlane(1,0,0,-1,0.25);
             break;
 
         default: ABORT_NOW("unknown menu item");
@@ -864,17 +877,15 @@ void glApp::actionFunc(void (*func)(int, int, Vector3 &, const Vector3 &, int))
 void glApp::processMouseClick(int button, int state, int mX, int mY)
 {
     View & view = glApp::currentView();
-    int winX = view.width();
-    int winY = view.height();
+    float cenX = 0.5 * view.width();
+    float cenY = 0.5 * view.height();
 
     //printf("mouse button %i (%4i %4i) state %i key %i\n", button, mx, my, state, specialKeys);
 
     mouseX = mX;
-    mouseY = winY-mY;
+    mouseY = view.height()-mY;
     
     savedView = view; // copy the current Model-View transformation
-    mouseDown = savedView.unproject(mouseX, mouseY, nearZ);
-    viewFocus = savedView.unproject(winX*0.5, winY*0.5, nearZ);
     
     if ( state == GLUT_UP )
     {
@@ -897,10 +908,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
              in 2D, we do not allow any shift in Z,
              and in 3d, we zoom in on the middle Z-plane
              */
-            if ( mDIM == 3 )
-                mouseDown = savedView.unproject(mouseX, mouseY, midZ);
-            else
-                mouseDown.ZZ = 0;
+            mouseDown = savedView.unproject(mouseX, mouseY, midZ);
             view.zoom_out(wZ);
             view.move_to((1-wZ)*mouseDown+wZ*view.focus);
         }
@@ -931,6 +939,8 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
         }
     }
     //std::clog << "mouseAction " << mouseAction << " modifiers " << specialKeys << "\n";
+    mouseDown = savedView.unproject(mouseX, mouseY, nearZ);
+    viewFocus = savedView.unproject(cenX, cenY, nearZ);
 
     // change the mouse action because the shift key is down:
     if ( specialKeys & GLUT_ACTIVE_SHIFT )
@@ -945,17 +955,14 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     switch( mouseAction )
     {
         case MOUSE_TRANSLATE:
-        {
-        } return;
-            
+            return;
             
         case MOUSE_TRANSLATEZ:
         {
-            depthAxis  = normalize( viewFocus - savedView.focus );
-            Vector3 ud = savedView.unproject(winX*0.5, winY, nearZ);
-            mouseAxis  = normalize( ud - viewFocus );
+            depthAxis = normalize( viewFocus - savedView.focus );
+            Vector3 U = savedView.unproject(cenX, 2*cenY, nearZ);
+            mouseAxis = normalize( U - viewFocus );
         } break;
-            
             
         case MOUSE_ROTATE:
         {
@@ -968,17 +975,16 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
             depthAxis *= amplification / depthAxis.normSqr();
         } break;
             
-            
         case MOUSE_SPIN:
         {
-            mouseAxis  = normalize( viewFocus - savedView.focus );
-            depthAxis  = mouseDown - viewFocus;
+            mouseAxis = normalize( viewFocus - savedView.focus );
+            depthAxis = mouseDown - viewFocus;
         } break;
         
         case MOUSE_MAGNIFIER:
         {
             mouseDown = savedView.unproject(mouseX, mouseY, midZ);
-            if ( mDIM == 2 ) mouseDown.ZZ = 0;
+            viewFocus = savedView.unproject(cenX, cenY, midZ);
             glutSetCursor(GLUT_CURSOR_NONE);
         } break;
             
@@ -1014,10 +1020,9 @@ void glApp::processMouseDrag(int mX, int mY)
 {
     //printf("mouse motion (%i %i) %i\n", mx, my, mouseAction);
     View & view = glApp::currentView();
-    int winY = view.height();
 
     mouseX = mX;
-    mouseY = winY-mY;
+    mouseY = view.height()-mY;
 
     Vector3 mouse = savedView.unproject(mouseX, mouseY, nearZ);
 
@@ -1025,22 +1030,22 @@ void glApp::processMouseDrag(int mX, int mY)
     {
         case MOUSE_ROTATE:
         {
-            /* we should rotate after: Q <- dQ * sQ, however dQ is defined in the 
+            /* we should rotate after: Q <- dQ * sQ, however dQ is defined in the
             reference frame rotated by sQ already, so dQ = sQ * dM * inv(sQ).
             This leads to the multiplication on the right: Q <- sQ * dM. */
-            Quaternion<real> q;
-            q.setFromAxis( cross(depthAxis, mouse-mouseDown) );
-            view.rotate_to( savedView.rotation * q );
+            Quaternion<real> Q;
+            Q.setFromAxis(cross(depthAxis, mouse-mouseDown));
+            view.rotate_to(savedView.rotation * Q);
         } break;
         
         
         case MOUSE_SPIN:
         {
-            real cos = dot(depthAxis, mouse - viewFocus);
-            real sin = dot(mouseAxis, cross(depthAxis, mouse - viewFocus));
-            Quaternion<real> q;
-            q.setFromAxis(mouseAxis, std::atan2( sin, cos ));
-            view.rotate_to(savedView.rotation * q);
+            real C = dot(depthAxis, mouse - viewFocus);
+            real S = dot(mouseAxis, cross(depthAxis, mouse - viewFocus));
+            Quaternion<real> Q;
+            Q.setFromAxis(mouseAxis, std::atan2(S, C));
+            view.rotate_to(savedView.rotation * Q);
             float Z = norm( mouse - viewFocus ) / norm( mouseDown - viewFocus );
             if ( Z > 0.001 ) view.zoom_to(savedView.zoom * Z);
         } break;
@@ -1063,23 +1068,22 @@ void glApp::processMouseDrag(int mX, int mY)
         case MOUSE_MAGNIFIER:
         {
             mouseDown = savedView.unproject(mouseX, mouseY, midZ);
-            if ( mDIM == 2 ) mouseDown.ZZ = 0;
         } break;
 
         
         case MOUSE_EDIT_ROI:
         {
-            Vector3 m = savedView.unproject(mouseX, mouseY, midZ);
+            mouse = savedView.unproject(mouseX, mouseY, midZ);
             if ( moveROI )
             {
-                Vector3 d = m - mouseDown;
+                Vector3 d = mouse - mouseDown;
                 view.setROI(ROIdup[0]+d, ROIdup[1]+d);
                 d = 0.5 * ( view.roi(0) + view.roi(1) );
                 flashText("ROI center %.3f %.3f", d.XX, d.YY);
             }
             else
             {
-                view.setROI(mouseDown, m);
+                view.setROI(mouseDown, mouse);
                 Vector3 d = view.roi(1) - view.roi(0);
                 flashText("ROI %.3fx%.3f diagonal %.3f", d.XX, d.YY, d.norm());
             }
@@ -1117,12 +1121,11 @@ void glApp::processPassiveMouseMotion(int mx, int my)
 
 void glApp::flashText(std::string const& str)
 {
-    if ( str != flashString )
+    if ( views.size() > 1 )
     {
-        //std::clog << " flashText " << str << "\n";
-        flashString = str;
-        flashFinish = TimeDate::seconds_since_1970() + 3.0;
-        if ( views.size() > 1  &&  views[1].window()==1 )
+        View & view = glApp::currentView();
+        view.flashText(str);
+        if ( view.window()==1 )
             glutPostWindowRedisplay(1);
     }
 }
@@ -1133,7 +1136,14 @@ void glApp::displayAll()
 {
     for ( unsigned n = 1; n < views.size(); ++n )
         if ( views[n].window() > 0 )
-            views[n].display();
+        {
+            views[n].callDraw();
+            
+            if ( views[n].buffered )
+                glutSwapBuffers();
+            else
+                glFlush();
+        }
 }
 
 
@@ -1146,7 +1156,7 @@ void glApp::displayPlain()
     CHECK_GL_ERROR("before glApp::displayPlain()");
     View & view = glApp::currentView();
 
-    view.display();
+    view.callDraw();
 
     if ( view.buffered )
         glutSwapBuffers();
@@ -1163,27 +1173,22 @@ void glApp::displayMain()
     CHECK_GL_ERROR("before glApp::displayMain()");
     View & view = views[1];
     
-    view.display();
-    view.drawInteractiveFeatures();
-
-    if ( mouseAction == MOUSE_MAGNIFIER )
-        view.displayMagnifier(6, mouseDown, mouseX, mouseY);
-
-    if ( flashString.size() )
+    if ( 0 == view.callDraw() )
     {
-        /// check time
-        if ( TimeDate::seconds_since_1970() > flashFinish )
-            flashString = "";
-        else
+        view.drawInteractiveFeatures();
+        
+        if ( mouseAction == MOUSE_MAGNIFIER )
         {
-            glColor3f(0.6f,0.6f,1.0f);
-            view.drawText(BITMAP_9_BY_15, flashString, 0x0, 2);
+            //std::cerr << "mag@ " << mouseX << " " << mouseY << "\n";
+            view.drawMagnifier(7, mouseDown, viewFocus, mouseX, mouseY, 256);
+            view.load();
         }
+        
+        CHECK_GL_ERROR("in glApp::displayMain()");
+        glFlush();
+        if ( view.buffered )
+            glutSwapBuffers();
     }
-    CHECK_GL_ERROR("in glApp::displayMain()");
-    glFinish();
-    if ( view.buffered )
-        glutSwapBuffers();
 }
 
 

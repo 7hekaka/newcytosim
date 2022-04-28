@@ -91,8 +91,7 @@ static void setPointDisp(PropertyList const& plist, void(*func)(PointDisp*, int)
 }
 
 
-static void changePointDispSize(PropertyList const& plist, int inc,
-                         bool dos, bool dow)
+static void changePointDispSize(PropertyList const& plist, int inc, bool dos, bool dow)
 {
     for ( Property * i : plist )
     {
@@ -251,7 +250,7 @@ static void changeExclude(FiberDisp* p, int val)
 {
     if ( val )
         p->hide >>= 2;
-    p->hide = ( p->hide + 1 ) % 4;
+    p->hide = ( p->hide + 1 ) & 3;
     if ( val )
         p->hide <<= 2;
     
@@ -377,7 +376,7 @@ static void setMask(FiberDisp* p, int val)
 
 static void changeMask(FiberDisp* p, int val)
 {
-    p->mask = ( p->mask + val ) % 11;
+    p->mask = (( p->mask << val ) & 31 ) + ( p->mask == 0 );
     p->mask_bitfield = RNG.distributed_bits(p->mask);
     flashText("fiber:mask_bitfield=0x%X (%i bits)", p->mask_bitfield, p->mask);
 }
@@ -705,7 +704,7 @@ void helpKeys(std::ostream& os)
     os << "\nFibers\n";
     os << "   `           Address another type of fibers for modifications\n";
     os << "   1           Change display: line / color-coded tension / hide\n";
-    os << "   / §         Toggle vertices; toggle backbone display\n";
+    os << "   / /         Toggle vertices; toggle backbone display\n";
     os << "   2 3         Decrease; increase line width (ALT: point size)\n";
     os << "   !           Change display of tips: off / plus / both / minus\n";
     os << "   @ #         Decrease; increase fiber_end display size\n";
@@ -933,7 +932,7 @@ void processKey(unsigned char key, int modifiers = 0)
         case ' ':
             if ( altKeyDown )
             {
-                glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+                view.clear();
                 view.reset();
                 flashText("");
             }

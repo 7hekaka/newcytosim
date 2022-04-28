@@ -13,6 +13,7 @@
 #include "vector3.h"
 
 #include "gym_flute.h"
+#include "gym_draw.h"
 
 // select between 2D or 3D mode:
 #define FLAT_RASTERIZER 0
@@ -54,8 +55,8 @@ void drawPoints(size_t N, const Vector P[], float size)
         flu[i] = { col, P[i] };
     flu[0] = { gle_color(0, 1, 0), P[0] };
     gym::unmapBufferC4V4();
-    glPointSize(size);
-    glDrawArrays(GL_POINTS, 0, i);
+    gym::drawPoints(size, 0, i);
+    gym::cleanup();
 }
 
 void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
@@ -67,8 +68,7 @@ void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
         flu[i] = { col, P[i].XX, P[i].YY, 0.f };
     flu[0] = { gle_color(0, 1, 0), P[0].XX, P[0].YY, 0.f };
     gym::unmapBufferC4V4();
-    glLineWidth(size);
-    glDrawArrays(GL_LINE_LOOP, 0, i);
+    gym::drawLineStrip(size, 0, i);
 }
 
 void newPoints()
@@ -119,10 +119,8 @@ void paint(int x_inf, int x_sup, int y, int z, void*)
     flu[0] = { col, (float)x_inf, (float)y, (float)z };
     flu[1] = { col, (float)x_sup, (float)y, (float)z };
     gym::unmapBufferC4V4();
-    glLineWidth(1);
-    glDrawArrays(GL_LINES, 0, 2);
-    glPointSize(3);
-    glDrawArrays(GL_POINTS, 0, 1);
+    gym::drawLines(1, 0, 2);
+    gym::drawPoints(3, 0, 1);
 }
 
 void rasterize(Vector P, Vector Q, void (func)(int, int, int, int, void*))
@@ -253,8 +251,7 @@ void drawGridPoints()
     for ( int j = -SIZE; j <= SIZE; j += 1)
         flu[n++] = { col, (float)i, (float)j, 0.f };
     gym::unmapBufferC4V4();
-    glPointSize(1);
-    glDrawArrays(GL_POINTS, 0, n);
+    gym::drawPoints(1, 0, n);
 }
 
 void drawGrid()
@@ -272,12 +269,11 @@ void drawGrid()
         flu[n++] = { col,  S, I, 0.f };
     }
     gym::unmapBufferC4V4();
-    glLineWidth(0.5);
-    glDrawArrays(GL_LINES, 0, n);
+    gym::drawLines(0.5, 0, n);
 }
 
 
-void display(View& view, int)
+int display(View& view)
 {
     view.openDisplay();
 
@@ -309,6 +305,7 @@ void display(View& view, int)
         rasterize(P,Q,paint);
         view.closeDisplay();
     }
+    return 0;
 }
 
 /* 

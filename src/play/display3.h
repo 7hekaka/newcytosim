@@ -35,13 +35,21 @@ private:
     inline void drawHandF(Vector const& pos, PointDisp const* dis) const;
     
     /// draw Fiber model segments
-    void drawFiberSegments(Fiber const&, real rad,
-                           gle_color (*set_color)(Fiber const&, size_t)) const;
+    void drawFiberSegmentsClip(Fiber const&, real rad,
+                               gle_color (*set_color)(Fiber const&, size_t)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
-    void drawFiberSubSegments(Fiber const&, real rad, long inx, long last, real abs, real inc,
-                              gle_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+    void drawFiberSectionsClip(Fiber const&, real rad, long inx, long last, real abs, real inc,
+                               gle_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
     
+    /// draw Fiber model segments
+    void drawFiberSegmentsJoin(Fiber const&, real rad,
+                               gle_color (*set_color)(Fiber const&, size_t)) const;
+    
+    /// draw Fiber segments not necessarily aligned with the vertices
+    void drawFiberSectionsJoin(Fiber const&, real rad, long inx, long last, real abs, real inc,
+                               gle_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+
     /// display lattice subtance using specified color function
     void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, gle_color (*set_color)(Fiber const&, long, real)) const;
 
@@ -103,6 +111,9 @@ public:
 
     /// draw free Couple, randomizing which Hand is drawn
     void drawCouplesF2(CoupleSet const&) const;
+    
+    /// draw free Couple
+    void drawCouplesF(CoupleSet const&) const;
 
     /// draw attached Couple
     void drawCouplesA(CoupleSet const&) const;

@@ -19,9 +19,6 @@ class SimThread : public Parser
     
 private:
     
-    /// callback invoked when the thread is halted, set in constructor
-    void (*hold_callback)(void);
-    
     /// thread used to run the simulation
     pthread_t child_;
     
@@ -45,6 +42,9 @@ private:
     
     /// period for hold()
     unsigned int period_;
+    
+    /// signal for hold()
+    unsigned int holding_;
 
     /// Reader used to access frames in a trajectory file
     FrameReader reader_;
@@ -75,6 +75,9 @@ public:
     /// redefining Interface::hold(), which is called repeatedly at each timestep
     void hold();
     
+    /// return true if new data is available
+    int holding() { return holding_; }
+
     /// print message to identify thread
     void debug(const char *) const;
     
@@ -82,7 +85,7 @@ public:
     void gubed(const char *) const;
 
     /// create a SimThread with given holding function callback
-    SimThread(Simul*, void (*callback)(void));
+    SimThread(Simul*);
     
     /// destructor
     ~SimThread();

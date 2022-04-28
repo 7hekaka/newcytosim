@@ -122,12 +122,13 @@ void timer(int value)
 }
 
 
-void display(View& view, int)
+int display(View& view)
 {
     view.openDisplay();
     pam.face_color = view.front_color;
     mesh.draw(pam);
     view.closeDisplay();
+    return 0;
 }
 
 //------------------------------------------------------------------------------

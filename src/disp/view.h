@@ -4,7 +4,7 @@
 
 #include "opengl.h"
 #include "view_prop.h"
-#include "gym_text.h"
+
 
 /// Handles the viewing angle, projection and other aspects of an OpenGL display
 /**
@@ -15,23 +15,23 @@ class View : public ViewProp
 {
 private:
     
-    /// OpenGL viewport 
-    GLint viewport_[4];
-    
     /// modelview matrix
-    GLfloat modelview_[16];
+    mutable float modelview_[16];
     
     /// projection matrix
-    GLfloat projection_[16];
+    mutable float projection_[16];
     
     /// half-size of the OpenGL visible region in OpenGL units
-    float visRegion[4];
+    mutable float visRegion[4];
     
     /// translation between center of volume and camera
-    float eyePosition[4];
+    mutable float eyePosition[4];
     
+    /// OpenGL viewport
+    GLint viewport_[4];
+
     /// window number in GLUT
-    int mWindowId;
+    int window_;
     
     /// flag for Region of Interest
     bool hasROI;
@@ -44,12 +44,21 @@ private:
     
     /// text displayed near bottom left corner of window
     std::string full_label;
+    
+    /// text display in upper-right corner to provide user feedback
+    mutable std::string flash;
+    
+    /// time beyond which `flash` is not displayed
+    double flash_end;
 
     /// display callback
-    void (*displayCallback)(View&, int);
+    int (*drawCallback)(View&);
     
+    /// display callback
+    void (*drawMagFunc)(View&);
+
     /// set OpenGL Fog, with mode (GL_EXP or GL_LINEAR), intensity and color
-    void setFog(GLint mode, GLfloat density, gle_color) const;
+    void setFog(GLint mode, float density, gle_color) const;
 
 public:
     
@@ -60,25 +69,28 @@ public:
     ~View();
     
     /// return window-id
-    int window() const { return mWindowId; }
+    int window() const { return window_; }
     
     /// set window-id
-    void window(int w) { mWindowId = w; }
+    void window(int w) { window_ = w; }
     
     /// handle window resize events
     void reshape(int, int);
     
-    /// adjust parameters of projections
-    void adjust();
+    /// reset viewport
+    void setViewport() const;
+
+    /// adjust parameters of projections, given window size
+    void adjust(int, int) const;
     
     /// set OpenGL Projection matrix
-    void setProjection();
+    void setProjection() const;
     
     /// set OpenGL Model-View matrix
-    void setModelView();
+    void setModelView() const;
     
     /// set OpenGL Projection and ModelView matrices
-    void load();
+    void load() const;
 
     /// adjust view to only show a slice of the world
     void sliceView(int) const;
@@ -86,22 +98,33 @@ public:
     /// reset the view (no-rotation, zoom=1), and enable auto_scale
     void reset();
     
+    //---------------------------------------------------------------------------
+
     /// width of display area in pixels
     int width() const { return window_size[0]; }
     
     /// height of display area in pixels
     int height() const { return window_size[1]; }
     
+    /// height of display area in pixels
+    GLint const* viewport() const { return viewport_; }
+
     /// size of pixel in drawing units
     float pixelSize() const { return view_size / ( zoom * std::max(width(), height()) ); }
     
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;
+    
+    /// transform window coordinates to 3D world-coordinates
+    Vector3 unproject(float x, float y, float z);
 
     //---------------------------------------------------------------------------
     
     /// set display callback
-    void setDisplayFunc(void (*f)(View&, int)) { displayCallback = f; }
+    void setDisplayFunc(int (*f)(View&)) { if (f) drawCallback = f; }
+
+    /// set second display callback
+    void setDrawMagFunc(void (*f)(View&)) { if (f) drawMagFunc = f; }
 
     /// clear pixels and set clipping planes and fog parameters
     void openDisplay();
@@ -112,20 +135,26 @@ public:
     /// display scale bar, info text, etc.
     void drawInteractiveFeatures() const;
     
-    /// call displayCallback
-    void display() { displayCallback(*this, 1); }
-    
+    /// call drawCallback
+    int callDraw() { return drawCallback(*this); }
+
+    /// clear color and depth buffer
+    void clear();
+
     //---------------------------------------------------------------------------
     
     /// init OpenGL parameters
-    void initGL();
+    void initGL() const;
 
     /// toggle depth clamp GL capability
     void toggleDepthClamp();
     
     /// set OpenGL Lights for lighting effects
-    void setLights(bool local = false) const;
+    void setLights() const;
     
+    /// set OpenGL Lights for lighting effects
+    void setLightsEye() const;
+
     /// set text displayed in center of window
     void setLabel(std::string const& arg) { full_label = label + " " + arg; }
     
@@ -136,34 +165,23 @@ public:
     void setMessage(std::string const& arg) { top_message = arg; }
 
     /// set OpenGL Fog, with mode (GL_EXP or GL_LINEAR), intensity and color
-    void enableFog(GLint mode, GLfloat param, gle_color);
-    void enableFog(GLint mode, GLfloat param);
+    void enableFog(GLint mode, float param, gle_color);
+    void enableFog(GLint mode, float param);
     
-    /// enable cliping plane in OpenGL
-    void setClipPlane(GLenum glp, Vector3 dir, real sca) const;
-
-    /// enable cliping plane in OpenGL
-    void setClipPlaneEye(GLenum glp, Vector3 dir, real sca) const;
-    
-    /// call setClipPlane(int) for all enabled clipping planes
+    /// establish all enabled clipping planes
     void setClipping() const;
     
-    /// disable cliping planes in OpenGL
+    /// disable cliping planes
     void endClipping() const;
     
     /// set equations for a clipping plane, and enable it in View
-    void enableClipPlane(int, Vector3 dir, real scal, bool absolute=true);
+    void enableClipPlane(int, real X, real Y, real Z, real S, bool absolute=true);
     
     /// disable cliping plane in View
     void disableClipPlane(int);
     
     /// return enable/disable state
     int hasClipPlane(int) const;
-    
-    //---------------------------------------------------------------------------
-    
-    /// transform window coordinates to 3D world-coordinates
-    Vector3 unproject(GLfloat x, GLfloat y, GLfloat z);
     
     //---------------------------------------------------------------------------
     
@@ -190,13 +208,13 @@ public:
     //---------------------------------------------------------------------------
 
     /// set absolute zoom
-    void zoom_to(GLfloat z);
+    void zoom_to(float z);
     
     /// increase zoom (multiplicative)
-    void zoom_in(GLfloat z) { zoom_to( zoom * z ); }
+    void zoom_in(float z) { zoom_to( zoom * z ); }
     
     /// decrease zoom (multiplicative)
-    void zoom_out(GLfloat z) { zoom_to( zoom / z ); }
+    void zoom_out(float z) { zoom_to( zoom / z ); }
     
     //---------------------------------------------------------------------------
     
@@ -207,7 +225,7 @@ public:
     void matchROI();
     
     /// set ROI to match the current view
-    void adjustROI(real Z);
+    void adjustROI(float Z);
     
     /// define ROI
     void setROI(Vector3, Vector3);
@@ -215,31 +233,24 @@ public:
     /// return 'true' if point is inside ROI
     bool insideROI(Vector3) const;
     
-    /// draw cuboid
-    static void drawCuboid(Vector3 const&, Vector3 const&);
-
-    /// draw ROI
-    void drawROI() const;
-    
     /// display zoomed in regions around position (mX, mY)
-    void displayMagnifier(GLint factor, Vector3 foc, GLint mX, GLint mY) const;
+    void drawMagnifier(float factor, Vector3 foc, Vector3 cen, int mX, int mY, int R) const;
 
     //---------------------------------------------------------------------------
     
     /// draw text
-    void drawText(FontType, std::string const& str, gle_color, int pos) const;
+    //void drawText(FontType, const float[4], std::string const& str, const float[4], int pos) const;
 
-    /// display a scale bar vertical or horizontal
-    void drawScaleH(float, float, float) const;
+    void flashText(std::string const& str);
     
     /// display a scale bar vertical or horizontal
-    void drawScaleV(float, float, float) const;
+    void drawScaleHV(float, float, float, void (*func)(float*, int cnt, float, float, float)) const;
     
     /// display a scale bar vertical or horizontal
     void drawScaleX(float) const;
 
     /// display a scale bar (mode is vertical, horizontal, centered)
-    void drawScaleBar(int mode, float) const;
+    void drawScaleBar(int mode, float, const float[4]) const;
     
 };
 

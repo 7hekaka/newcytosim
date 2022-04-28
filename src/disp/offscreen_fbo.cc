@@ -7,7 +7,7 @@
  https://developer.apple.com/library/mac/#documentation/graphicsimaging/Conceptual/OpenGL-MacProgGuide/opengl_offscreen/opengl_offscreen.html
 */
 
-#include <stack>
+#include <vector>
 #include <cstdio>
 
 #include <OpenGL/OpenGL.h>
@@ -28,18 +28,18 @@ public:
     GLuint colorBuffer;
     GLuint depthBuffer;
     
-    GLBuffer()
+    GLBuffer(GLuint W, GLuint H)
     {
+        width = W;
+        height = H;
         frameBuffer = 0;
         colorBuffer = 0;
         depthBuffer = 0;
     }
     
     /// allocate graphical memory
-    void create(GLuint W, GLuint H)
+    void create()
     {
-        width = W;
-        height = H;
         glGenFramebuffers(1, &frameBuffer);
         glGenRenderbuffers(1, &colorBuffer);
         glGenRenderbuffers(1, &depthBuffer);
@@ -60,7 +60,7 @@ public:
     }
     
     /// enable buffer for both reading and writing operations
-    void bind()
+    void bind() const
     {
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
         //printf("offscreen- bind framebuffer %u : %ix%i\n", frameBuffer, width, height);
@@ -75,7 +75,7 @@ public:
 };
 
 /// list of known buffers
-std::stack<GLBuffer> opengl_buffers;
+std::vector<GLBuffer> all_buffers;
 
 //------------------------------------------------------------------------------
 char const* glErrorString(GLenum code)
@@ -184,7 +184,7 @@ CGLContextObj createOffscreenContext()
 /**
  Set up an OpenGL context for offscreen rendering.
  */
-int OffScreen::openContext()
+unsigned OffScreen::openContext()
 {
     if ( offContext && offContext == CGLGetCurrentContext() )
     {
@@ -219,10 +219,10 @@ void OffScreen::closeContext()
 {
     if ( offContext == CGLGetCurrentContext() )
     {
-        while ( !opengl_buffers.empty() )
+        while ( !all_buffers.empty() )
         {
-            opengl_buffers.top().release();
-            opengl_buffers.pop();
+            all_buffers.back().release();
+            all_buffers.pop_back();
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         CGLSetCurrentContext(preContext);
@@ -241,7 +241,7 @@ void OffScreen::closeContext()
  Set up a Frame Buffer object with two Render buffers attached,
  for color and depth data.
  */
-int OffScreen::createBuffer(const int width, const int height, int multisample)
+unsigned OffScreen::makeBuffer(const int width, const int height, int multisample)
 {
     GLint s = 0;
     glGetIntegerv(GL_MAX_SAMPLES, &s);
@@ -255,8 +255,8 @@ int OffScreen::createBuffer(const int width, const int height, int multisample)
     //    fprintf(stderr, "OpenGL buffer is multisampled %i\n", multisample);
 
     //Set up a FBO with two renderBuffer attachment
-    GLBuffer buffer;
-    buffer.create(width, height);
+    GLBuffer buffer(width, height);
+    buffer.create();
     
     glBindFramebuffer(GL_FRAMEBUFFER, buffer.frameBuffer);
     //checkError("OffScreen:glBindFramebuffer()");
@@ -294,15 +294,36 @@ int OffScreen::createBuffer(const int width, const int height, int multisample)
     if ( status != GL_FRAMEBUFFER_COMPLETE )
         return 0;
     
-    buffer.bind();
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
     //printf("offscreen- allocated framebuffer %u  %ux%u\n", buffer.frameBuffer, width, height);
-    checkError("OffScreen:createBuffer()");
+    checkError("OffScreen:makeBuffer()");
     
-    opengl_buffers.push(buffer);
+    all_buffers.push_back(buffer);
 
     return buffer.frameBuffer;
+}
+
+
+unsigned OffScreen::openBuffer(const int width, const int height, int multisample)
+{
+    GLuint buf = makeBuffer(width, height, multisample);
+    glBindFramebuffer(GL_FRAMEBUFFER, buf);
+    glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    return buf;
+}
+
+
+void OffScreen::bindBuffer(unsigned id)
+{
+    for ( GLBuffer const& buf : all_buffers )
+    {
+        if ( buf.frameBuffer == id )
+        {
+            buf.bind();
+            glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+            break;
+        }
+    }
 }
 
 
@@ -311,14 +332,16 @@ int OffScreen::createBuffer(const int width, const int height, int multisample)
  */
 void OffScreen::releaseBuffer()
 {
-    if ( !opengl_buffers.empty() )
+    if ( !all_buffers.empty() )
     {
-        opengl_buffers.top().release();
-        opengl_buffers.pop();
-        if ( opengl_buffers.empty() )
+        all_buffers.back().release();
+        all_buffers.pop_back();
+        if ( all_buffers.empty() )
+        {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
         else
-            opengl_buffers.top().bind();
+            all_buffers.back().bind();
     }
     checkError("OffScreen::close()");
 }

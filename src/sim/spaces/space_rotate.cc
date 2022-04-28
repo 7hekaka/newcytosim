@@ -73,13 +73,12 @@ void SpaceRotate::setConfinement(Vector const& pos, Mecapoint const&, real rad, 
 //------------------------------------------------------------------------------
 
 #ifdef DISPLAY
-#include "opengl.h"
+#include "gym_view.h"
 
 void SpaceRotate::draw3D() const
 {
-    glRotated(90, 0,  1, 0);
+    gym::rotateY(0, 1);
     mSpace->draw3D();
-    glRotated(90, 0, -1, 0);
 }
 
 #else

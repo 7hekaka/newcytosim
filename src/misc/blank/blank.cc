@@ -10,6 +10,7 @@
 #include "blank_param.h"
 #include "glossary.h"
 #include "random.h"
+#include "gym_draw.h"
 
 #include "thing.h"
 
@@ -161,7 +162,7 @@ void timerFunction(int value)
 }
 
 //------------------------------------------------------------------------------
-void display(View& view, int)
+int display(View& view)
 {
     pthread_mutex_lock(&mutex);
     view.openDisplay();
@@ -173,11 +174,11 @@ void display(View& view, int)
         flu[i] = { things[i].col, things[i].pos };
     
     gym::unmapBufferC4VD();
-    glPointSize(6);
-    glDrawArrays(GL_POINTS, 0, PAM.max);
+    gym::drawPoints(6, 0, PAM.max);
     
     view.closeDisplay();
     pthread_mutex_unlock(&mutex);
+    return 0;
 }
 
 //------------------------------------------------------------------------------

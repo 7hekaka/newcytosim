@@ -262,62 +262,66 @@ void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
 #pragma mark - Display
 
 #ifdef DISPLAY
-#include "opengl.h"
 
-void SpaceStrip::draw2D() const
+#include "gym_flute.h"
+#include "gym_draw.h"
+#include "gym_view.h"
+
+void SpaceStrip::draw2D(float width) const
 {
-    const GLfloat X(half_[0]);
-    const GLfloat T(top_);
-    const GLfloat B(bot_);
-    
-    GLfloat pts[16] = {
-        -X, T, X, T, X, B,-X, B,
-        +X, T, X, B,-X, T,-X, B };
-    glVertexPointer(2, GL_FLOAT, 0, pts);
-    glDrawArrays(GL_LINES, 0, 4);
-    glLineStipple(1, 0x000F);
-    glEnable(GL_LINE_STIPPLE);
-    glDrawArrays(GL_LINES, 4, 4);
-    glDisable(GL_LINE_STIPPLE);
+    const float X(half_[0]);
+    const float T(top_);
+    const float B(bot_);
+
+    flute2 * flu = gym::mapBufferV2(5);
+    flu[0] = { X, T };
+    flu[1] = { X, B };
+    flu[2] = {-X, B };
+    flu[3] = {-X, T };
+    flu[4] = { X, T };
+    gym::unmapBufferV2();
+    gym::drawLines(width, 1, 4);
+    gym::enableLineStipple(0x000F);
+    gym::drawLines(width, 0, 4);
+    gym::disableLineStipple();
 }
 
 void SpaceStrip::draw3D() const
 {
-    const GLfloat X(half_[0]);
-    const GLfloat Y(half_[1]);
-    const GLfloat T(top_);
-    const GLfloat B(bot_);
+    const float WIDTH = 2;
+    const float X(half_[0]);
+    const float Y((DIM>1) ? half_[1] : 1);
+    const float T(top_);
+    const float B(bot_);
 
+    flute3 * flu = gym::mapBufferV3(8);
+    flu[0] = {-X, Y, B};
+    flu[1] = {-X, Y, T};
+    flu[2] = {-X,-Y, B};
+    flu[3] = {-X,-Y, T};
+    flu[4] = { X, Y, B};
+    flu[5] = { X, Y, T};
+    flu[6] = { X,-Y, B};
+    flu[7] = { X,-Y, T};
+    gym::unmapBufferV3();
     // draw top and bottom faces:
-    GLfloat pts[24] = {
-        -X, Y, B, X, Y, B,-X,-Y, B, X,-Y, B,
-        -X, Y, T,-X,-Y, T, X, Y, T, X,-Y, T };
-    glVertexPointer(3, GL_FLOAT, 0, pts);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glDrawArrays(GL_TRIANGLE_STRIP, 4, 4);
-    
-    // draw outline:
-    GLfloat lin[30] = {
-        -X, Y, B, X, Y, B, X,-Y, B,-X,-Y, B,-X, Y, B,
-        -X, Y, T,-X,-Y, T, X,-Y, T, X, Y, T,-X, Y, T };
-    glVertexPointer(3, GL_FLOAT, 0, lin);
-    glDrawArrays(GL_LINE_STRIP, 0, 5);
-    glDrawArrays(GL_LINE_STRIP, 5, 5);
-    
-    // draw vertical edges in corners of periodic boundaries:
-    GLfloat edg[24] = {
-        +X, Y, T, X, Y, B, X,-Y, T, X,-Y, B,
-        -X, Y, T,-X, Y, B,-X,-Y, T,-X,-Y, B };
-    glVertexPointer(3, GL_FLOAT, 0, edg);
-    glLineStipple(1, 0x000F);
-    glEnable(GL_LINE_STIPPLE);
-    glDrawArrays(GL_LINES, 0, 8);
-    glDisable(GL_LINE_STIPPLE);
+    gym::enableLighting();
+    gym::rebindBufferV3(2, 0);
+    gym::drawTriangleStrip(0, 4);
+    gym::rebindBufferV3(2, 1);
+    gym::drawTriangleStrip(0, 4);
+    // draw vertical edges:
+    gym::disableLighting();
+    gym::enableLineStipple(0x000F);
+    gym::rebindBufferV3(1, 0);
+    gym::drawLines(WIDTH, 0, 8);
+    gym::disableLineStipple();
+    gym::cleanup();
 }
 
 #else
 
-void SpaceStrip::draw2D() const {}
+void SpaceStrip::draw2D(float) const {}
 void SpaceStrip::draw3D() const {}
 
 #endif

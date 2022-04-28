@@ -1,12 +1,12 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 #include "view_prop.h"
 #include "glossary.h"
-#include "dim.h"
 
 //------------------------------------------------------------------------------
 void ViewProp::clear()
 {
     zoom         = 1;
+    magnify      = 1;
     view_size    = 10;
     auto_scale   = 1;
     focus.reset();
@@ -15,11 +15,11 @@ void ViewProp::clear()
     perspective  = 0;
     slice        = 0;
     
-    back_color   = (DIM==3)?0x161616FF:0x000000FF;
+    back_color   = 0x000000FF;
     front_color  = 0xFFFFFFFF;
     
-    buffered     = 0;
-    depth_test   = (DIM==3);
+    buffered     = 1;
+    depth_test   = 1;
     depth_clamp  = 0;
     retina       = 0;
     stencil      = 0;
@@ -46,8 +46,7 @@ void ViewProp::clear()
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         clip_plane_mode[k] = 0;
-        clip_plane_vector[k].set(1,0,0);
-        clip_plane_scalar[k] = 0;
+        clip_plane[k].set(1,0,0,0);
     }
     
     fog_type     = 0;
@@ -73,6 +72,7 @@ void ViewProp::invertColors()
 void ViewProp::read(Glossary& glos)
 {
     glos.set(zoom,        "zoom");
+    glos.set(magnify,     "magnify");
     if ( glos.set(view_size, "view_size") )
         auto_scale = 0;
     glos.set(auto_scale,  "auto_scale");
@@ -135,15 +135,15 @@ void ViewProp::read(Glossary& glos)
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         std::string var = "clip_plane" + std::to_string(k);
-        glos.set(clip_plane_mode[k],   var);
-        glos.set(clip_plane_vector[k], var, 1);
-        glos.set(clip_plane_scalar[k], var, 2);
+        glos.set(clip_plane_mode[k], var);
+        Vector3 V(0,0,1);
+        real S = 0;
+        glos.set(V, var, 1);
+        glos.set(S, var, 2);
+        clip_plane[k].set(V.XX, V.YY, V.ZZ, S);
     }
     
-    Glossary::dict_type<GLint> keys({{"off",          0},
-                                     {"linear",       1},
-                                     {"exponential",  2},
-                                     {"exponential2", 3}});
+    Glossary::dict_type<int> keys({{"off", 0}, {"linear", 1}, {"exponential", 2}, {"exponential2", 3}});
 
     glos.set(fog_type,  "fog_type", keys);
     glos.set(fog_param, "fog_param");
@@ -164,6 +164,7 @@ void ViewProp::read(Glossary& glos)
 void ViewProp::write_values(std::ostream& os) const
 {
     write_value(os, "zoom",          zoom);
+    write_value(os, "magnify",       magnify);
     write_value(os, "view_size",     view_size);
     write_value(os, "auto_scale",    auto_scale);
     write_value(os, "focus",         focus+focus_shift);
@@ -188,7 +189,8 @@ void ViewProp::write_values(std::ostream& os) const
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         std::string var = "clip_plane" + std::to_string(k);
-        write_value(os, var, clip_plane_mode[k], clip_plane_vector[k], clip_plane_scalar[k]);
+        
+        write_value(os, var, clip_plane_mode[k], Vector3(clip_plane[k]), clip_plane[k].ZZ);
     }
 }
 

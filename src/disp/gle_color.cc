@@ -128,7 +128,7 @@ std::istream& operator >> (std::istream& is, gle_color& col)
             {
                 is >> a;
                 is.clear();
-                col.set_float(r,g,b,a);
+                col.set(r,g,b,a);
             }
         }
     }
@@ -247,7 +247,7 @@ gle_color gle_color::radial_color(const COLOF x, const COLOF y, const COLOF z, c
 /**
  set a RGB color as a function of a 2D vector, using the angle in the XY plane
 */
-gle_color gle_color::radial_color(const COLOF x, const COLOF y, const COLOF a)
+gle_color gle_color::radial_colorXY(const COLOF x, const COLOF y, const COLOF a)
 {
     COLOF r, g, b;
     set_hue_components(r, g, b, atan2f(y, x));

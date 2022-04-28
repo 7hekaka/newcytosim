@@ -195,6 +195,7 @@ void SpacePolygonZ::setInteractions(Meca& meca, Simul const&) const
 
 #include "gle.h"
 #include "gym_flute.h"
+#include "gym_draw.h"
 
 void SpacePolygonZ::draw3D() const
 {
@@ -214,24 +215,24 @@ void SpacePolygonZ::draw3D() const
         if (( R1 >= 0 ) & ( R2 >= 0 ))
         {
             flute6 * flu = gym::mapBufferV3N3(2+2*gle::pi_twice);
-            size_t i = 0;
+            flute6 * ptr = flu;
             for ( size_t j = 0; j <= gle::pi_twice; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
-                flu[i++] = {R2*C, R2*S, Z2, nX*C, nX*S, nY};
-                flu[i++] = {R1*C, R1*S, Z1, nX*C, nX*S, nY};
+                ptr[0] = {R2*C, R2*S, Z2, nX*C, nX*S, nY};
+                ptr[1] = {R1*C, R1*S, Z1, nX*C, nX*S, nY};
+                ptr += 2;
             }
             gym::unmapBufferV3N3();
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, i);
+            gym::drawTriangleStrip(0, ptr-flu);
         }
     }
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gym::cleanup();
 }
 
 
 //display rings around:
-void SpacePolygonZ::drawRings() const
+void SpacePolygonZ::drawRings(float width) const
 {
     const size_t npts = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
@@ -245,14 +246,13 @@ void SpacePolygonZ::drawRings() const
         {
             float nX(pts[n].dy), nY(-pts[n].dx);
             flute6 * flu = gym::mapBufferV3N3(2+gle::pi_twice);
-            size_t i = 0;
             for ( size_t j = 0; j <= gle::pi_twice; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
-                flu[i++] = {R*C, R*S, Z, nX*C, nX*S, nY};
+                flu[j] = {R*C, R*S, Z, nX*C, nX*S, nY};
             }
             gym::unmapBufferV3N3();
-            glDrawArrays(GL_LINE_LOOP, 0, i);
+            gym::drawLineStrip(width, 0, gle::pi_twice+1);
         }
     }
 }

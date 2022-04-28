@@ -116,15 +116,15 @@ void SpaceTorus::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gym_view.h"
 
-void SpaceTorus::draw2D() const
+void SpaceTorus::draw2D(float width) const
 {
-    glPushMatrix();
-    gle::scale(bCurve+bRadius);
-    gle::circle();
-    gle::scale((bCurve-bRadius)/(bCurve+bRadius));
-    gle::circle();
-    glPopMatrix();
+    gym::scale(bCurve+bRadius);
+    gle::circle(width);
+    gym::pull_ref();
+    gym::scale(bCurve-bRadius);
+    gle::circle(width);
 }
 
 void SpaceTorus::draw3D() const
@@ -134,7 +134,7 @@ void SpaceTorus::draw3D() const
 
 #else
 
-void SpaceTorus::draw2D() const {}
+void SpaceTorus::draw2D(float) const {}
 void SpaceTorus::draw3D() const {}
 
 #endif

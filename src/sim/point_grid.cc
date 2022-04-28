@@ -753,7 +753,6 @@ void PointGrid::setStericsT(const size_t pan1, const size_t pan2) const
 }
 
 
-
 void PointGrid::setSterics(size_t pan) const
 {
     if ( pGrid.isPeriodic() )
@@ -779,17 +778,18 @@ void PointGrid::setSterics(size_t pan1, size_t pan2) const
 
 #ifdef DISPLAY
 
-#include "opengl.h"
+#include "gym_view.h"
+#include "gym_draw.h"
 
-void drawBoundaries(Map<DIM> const&);
+void drawBoundaries(Map<DIM> const&, float);
 
 void PointGrid::drawGrid() const
 {
 #if ( DIM <= 3 )
-    glDisable(GL_LIGHTING);
-    glColor3f(0, 1, 0);
-    glLineWidth(0.25);
-    drawBoundaries(pGrid);
+    gym::ref_view();
+    gym::disableLighting();
+    gym::color(0,1,0);
+    drawBoundaries(pGrid, 0.5f);
 #endif
 }
 #endif

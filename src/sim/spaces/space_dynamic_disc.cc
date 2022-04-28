@@ -154,25 +154,23 @@ void SpaceDynamicDisc::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 
-#include "opengl.h"
 #include "gle.h"
+#include "gym_view.h"
 
-void SpaceDynamicDisc::draw2D() const
+void SpaceDynamicDisc::draw2D(float width) const
 {
-    glPushMatrix();
-    gle::scale(radius_);
-    gle::circle();
-    glPopMatrix();
+    gym::scale(radius_);
+    gle::circle(width);
 }
 
 void SpaceDynamicDisc::draw3D() const
 {
-    draw2D(); // unfinished
+    draw2D(2); // unfinished
 }
 
 #else
 
-void SpaceDynamicDisc::draw2D() const {}
+void SpaceDynamicDisc::draw2D(float) const {}
 void SpaceDynamicDisc::draw3D() const {}
 
 #endif

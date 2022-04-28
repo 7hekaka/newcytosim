@@ -135,9 +135,12 @@ public:
     
     /// adjust the viewing area
     void autoScale(SpaceSet const&, View&);
+    
+    /// adjust the model view and load frame if asked
+    void setPixelSize(View&);
 
     /// adjust the model view and load frame if asked
-    void prepareDisplay(View&, int mag);
+    void prepareDisplay(View&);
     
     /// read parameters contained in string
     void readDisplayString(View&, std::string const&);
@@ -147,9 +150,6 @@ public:
     
     /// draw system calling drawCytosim
     void drawScene(View&);
-
-    /// draw system calling drawCytosim
-    void drawScene(View&, int mag);
     
     /// export current viewport to image file 'filename'
     int saveView(const char* filename, const char* format, int downsample) const;

@@ -439,33 +439,28 @@ void SpaceDynamicEllipse::report(std::ostream& os) const
 #ifdef DISPLAY
 
 #include "gle.h"
+#include "gym_view.h"
 
 void SpaceDynamicEllipse::draw3D() const
 {
 #if ( 0 )
-    flute2 pts[8] = { 0 };
-    // display principal axes:
+    const float rad = 0.01;
     for ( unsigned n = 0; n < DIM; ++n )
-        pts[2*n] = flute2{length(n)*director(n));
-    glVertexPointer(2, GL_FLOAT, 0, pts);
-    glDrawArrays(GL_LINES, 0, 2*DIM);
+    {
+        gym::transScale(radius_[n]*director(n), rad);
+        gle::sphere2();
+    }
 #endif
 
-    GLfloat MM[16] = { 0 };
+    float MM[16] = { 0 };
     MM[ 5]=1.0f;
     MM[10]=1.0f;
     MM[15]=1.0f;
     for ( unsigned i=0; i<DIM; ++i )
     for ( unsigned j=0; j<DIM; ++j )
         MM[i+4*j] = mat(i,j);
-    glPushMatrix();
-    glMultMatrixf(MM);
-#if ( DIM >= 3 )
+    gym::apply(MM);
     SpaceEllipse::draw3D();
-#else
-    SpaceEllipse::draw2D();
-#endif
-    glPopMatrix();
 }
 
 #else

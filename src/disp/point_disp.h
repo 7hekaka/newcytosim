@@ -6,10 +6,13 @@
 #include "property.h"
 #include "gle.h"
 #include "gym_zoo.h"
+#include "gym_view.h"
+#include "gym_vect.h"
+#include "gym_draw.h"
 
 
 /** \todo: replace PIXELMAPS by a texture, and draw each particle as a textured Square */
-#define POINTDISP_USES_PIXELMAPS 1
+#define POINTDISP_USES_PIXELMAPS 0
 
 
 /// the parameters necessary to display a point-like object
@@ -25,58 +28,55 @@ private:
 
 #if POINTDISP_USES_PIXELMAPS
     
-    /// pointer to 3 square bitmaps with 4*nPix*nPix pixels each
-    uint8_t * bmp_[3];
+    /// pointer to 3 square bitmaps with RGBA components
+    uint8_t * pixels_;
 
     /// index of the Pixel Buffer Objects on GPU
-    GLuint pbo_[3];
+    GLuint pbo_;
     
     /// center of bitmap
-    GLfloat mOffs;
+    GLfloat pixOffset_;
     
-    /// allocated size of bitmap
-    unsigned nPix;
+    /// size of feature in pixels
+    unsigned pixSize;
+
+    /// allocated size for square bitmaps, in pixels
+    unsigned pixAlloc_;
+
+    /// size occupied by bitmap in bytes
+    unsigned pixStride;
 
     /// allocate pixelmap memory
-    void allocatePixelmap();
+    void allocatePixelmap(unsigned);
     
     /// release pixelmap memory
     void releasePixelmap();
     
-    /// scale down pixelmap by factor 'bin'
-    void downsampleRGBA(uint8_t*, unsigned, unsigned, uint8_t const*, unsigned bin);
+    /// create the pixelmaps
+    void makePixelmaps(float, unsigned supersampling, unsigned dim);
     
     /// create the pixelmaps
-    void makePixelmaps(GLfloat, unsigned supersampling);
-    
+    void makePixelmaps(float, unsigned supersampling);
+
     /// create the pixelmaps
-    void createPixelmaps(GLfloat);
+    void createPixelmaps(float);
 
     /// draw pixel map
     void drawPixelmap(size_t) const;
-    
-    /// save pixelmap to file
-    void savePixelmap(uint8_t*, unsigned dim, GLuint) const;
-    
-    /// save pixelmap on server side
-    void storePixelmap(uint8_t*, unsigned dim, GLuint) const;
 
 #endif
 
     /// used to differentiate between different uses of the class
     std::string mKind;
     
-    /// size of feature in pixels
-    unsigned pixSize;
-    
     /// draw outline of shape
-    void strokeShape() const { gle::circle(); /*gle::zoo_stroke(shape);*/ }
+    void strokeShape(float w) const { gle::circle(w); /*gym::zoo_stroke(shape);*/ }
     
     /// draw surface of shape
-    void paintShape() const { gle::disc(); /*gle::zoo_paint(shape);*/ }
+    void paintShape() const { gle::disc(); /*gym::zoo_paint(shape);*/ }
 
     /// draw active state with OpenGL vector primitives
-    void strokeA() const;
+    void strokeA(float) const;
     
     /// draw inactive state with OpenGL vector primitives
     void strokeI() const;
@@ -142,8 +142,14 @@ public:
     bool perceptible;
     
     /// this is the size in real unit
-    float realSize;
+    float sizeR;
     
+    /// rescaled point size
+    float sizeX;
+    
+    /// rescaled line width
+    float widthX;
+
 public:
     
     /// constructor
@@ -174,7 +180,7 @@ public:
     void write_values(std::ostream&) const;
     
     /// recalculate bitmaps
-    void prepare_pixels(GLfloat uf, GLfloat sf, bool make_maps);
+    void setPixels(float ps, float uv, bool make_maps);
     
     /// draw inactive state
     template < typename VECTOR >
@@ -186,11 +192,9 @@ public:
             glRasterPos3f(pos.x(), pos.y(), pos.z());
             drawPixelmap(0);
     #else
-            glPushMatrix();
-            gle::transScale(pos, realSize);
-            color2.load();
+            gym::transScale(pos, sizeR);
+            gym::color(color2);
             gle::disc();
-            glPopMatrix();
     #endif
         }
     }
@@ -205,11 +209,9 @@ public:
             glRasterPos3f(pos.x(), pos.y(), pos.z());
             drawPixelmap(1);
     #else
-            glPushMatrix();
-            gle::transScale(pos, realSize);
-            color2.load();
-            strokeA();
-            glPopMatrix();
+            gym::transScale(pos, sizeR);
+            gym::color(color2);
+            strokeA(widthX);
     #endif
         }
     }
@@ -224,11 +226,9 @@ public:
             glRasterPos3f(pos.x(), pos.y(), pos.z());
             drawPixelmap(2);
     #else
-            glPushMatrix();
-            gle::transScale(pos, realSize);
-            color.load();
-            strokeA();
-            glPopMatrix();
+            gym::transScale(pos, sizeR);
+            gym::color(color);
+            strokeA(widthX);
     #endif
         }
     }

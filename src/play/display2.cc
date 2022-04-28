@@ -7,12 +7,13 @@
 
 #include "gle.h"
 #include "gle_color_list.h"
-#include "glut.h"
 
 #include "line_disp.h"
 #include "point_disp.h"
 #include "fiber_disp.h"
 #include "gym_flute.h"
+#include "gym_flute_dim.h"
+#include "gym_draw.h"
 #include "gym_check.h"
 
 extern Modulo const* modulo;
@@ -26,20 +27,20 @@ Display2::Display2(DisplayProp const* dp) : Display(dp)
 
 void Display2::drawObjects(Simul const& sim)
 {
-    glDepthMask(GL_FALSE);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
+    gym::closeDepthMask();
+    gym::disableLighting();
+    gym::disableCullFace();
     drawFields(sim.fields);
     
-    glEnable(GL_LIGHTING);
+    gym::enableLighting();
 #if ( DIM > 2 )
-    glEnable(GL_CULL_FACE);
-    glDepthMask(GL_TRUE);
+    gym::enableCullFace(GL_BACK);
+    gym::openDepthMask();
 #endif
     drawSpaces(sim.spaces);
     
-    glDisable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
+    gym::disableLighting();
+    gym::disableCullFace();
 
     if (( prop->couple_select & 1 ) && ( sim.couples.sizeFF() > 0 ))
         drawCouplesF(sim.couples);
@@ -55,11 +56,10 @@ void Display2::drawObjects(Simul const& sim)
     drawFibers(sim.fibers);
 
 #if ( DIM >= 3 )
-    glEnable(GL_LIGHTING);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    gym::enableLighting();
+    gym::enableCullFace(GL_BACK);
 #else
-    glDisable(GL_LIGHTING);
+    gym::disableLighting();
 #endif
     
     drawBeads(sim.beads);
@@ -67,8 +67,8 @@ void Display2::drawObjects(Simul const& sim)
     drawSpheres(sim.spheres);
     
 #if ( DIM >= 3 )
-    glDisable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
+    gym::disableLighting();
+    gym::disableCullFace();
 #endif
 
     if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
@@ -79,9 +79,8 @@ void Display2::drawObjects(Simul const& sim)
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 
 #if ( DIM >= 3 )
-    glEnable(GL_LIGHTING);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    gym::enableLighting();
+    gym::enableCullFace(GL_BACK);
 #endif
 
     drawOrganizers(sim.organizers);
@@ -124,7 +123,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
                     modulo->fold(ps, ph);
                 }
                 
-                disp->color.load();
+                gym::color(disp->color);
 #if ( DIM >= 3 )
                 gle::stretchTube(pf, ph, pixscale(disp->width), gle::truncatedCone);
                 //drawCone(pf, ph-pf, pixscale(disp->width));
@@ -139,6 +138,14 @@ void Display2::drawSinglesA(const SingleSet & set) const
 
 //------------------------------------------------------------------------------
 #pragma mark -
+
+void Display2::drawCouplesF(CoupleSet const& set) const
+{
+    if ( prop->couple_flip )
+        drawCouplesF2(set);
+    else
+        drawCouplesF1(set);
+}
 
 /**
  Always display Hand1 of the Couple.
@@ -250,7 +257,7 @@ void Display2::drawCoupleB(Couple const* cx) const
     
     if ( pd1->perceptible || pd2->perceptible )
     {
-        glEnableClientState(GL_COLOR_ARRAY);
+        gym::ref_view();
         fluteD4* flu = gym::mapBufferC4VD(4);
 #if 0
         flu[0] = { pd1->color, p1 };
@@ -273,9 +280,8 @@ void Display2::drawCoupleB(Couple const* cx) const
         flu[3] = { col2, p2 };
 #endif
         gym::unmapBufferC4VD();
-        lineWidth(pd1->width);
-        glDrawArrays(GL_LINES, 0, 4);
-        glDisableClientState(GL_COLOR_ARRAY);
+        gym::drawLines(pd1->widthX, 0, 4);
+        gym::cleanup();
     }
     
     if ( cx->active() )

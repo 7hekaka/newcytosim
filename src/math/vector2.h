@@ -52,10 +52,10 @@ public:
     Vector2() {}
     
     /// construct from 3 values
-    constexpr Vector2(real x, real y, real) : XX(x), YY(y) {}
+    explicit constexpr Vector2(real x, real y, real) : XX(x), YY(y) {}
     
     /// construct from 2 values
-    constexpr Vector2(real x, real y) : XX(x), YY(y) {}
+    explicit constexpr Vector2(real x, real y) : XX(x), YY(y) {}
     
     /// construct from address
     Vector2(const real v[]) : XX(v[0]), YY(v[1]) {}
