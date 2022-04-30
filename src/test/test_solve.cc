@@ -5,7 +5,6 @@
 #include <cstdio>
 #include "glut.h"
 #include "gym_matrix.h"
-#include "glu_unproject.cc"
 
 #include "vector2.h"
 #include "matrix22.h"
@@ -236,7 +235,7 @@ void unproject(int x, int y)
     float un[4];
     glGetFloatv(GL_MODELVIEW_MATRIX, mat_model);
     glGetFloatv(GL_PROJECTION_MATRIX, mat_proj);
-    myUnproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, un);
+    gym::unproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, un);
     pg.set(un[0], un[1], un[2]);
     glutPostRedisplay();
 }

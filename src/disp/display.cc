@@ -7,14 +7,15 @@
 #include "sphere_prop.h"
 #include "fiber_prop.h"
 
+#define DISPLAY 1
+#include "gle_color.h"
+#include "gle_color_list.h"
+
 #include "modulo.h"
 #include "simul.h"
 #include "field.h"
-#include "fake.h"
 
 #include "gle.h"
-#include "gle_color.h"
-#include "gle_color_list.h"
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_flute.h"

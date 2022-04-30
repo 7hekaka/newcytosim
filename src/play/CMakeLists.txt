@@ -1,36 +1,27 @@
 set(SOURCES_PLAY
-    frame_reader.cc
-    display_prop.cc
-    display.cc
-    display1.cc
-    display2.cc
-    display3.cc
-    sim_thread.cc
     player_prop.cc
     player.cc
     play.cc
 )
 
-list(TRANSFORM SOURCES_PLAY PREPEND "${SRC_PLAY_DIR}/")
+list(TRANSFORM SOURCES_PLAY PREPEND "${PROJECT_SOURCE_DIR}/src/play/")
 
 if(MAKE_PLAY)
     add_executable(${PLAY_TARGET} ${SOURCES_PLAY})
 
     target_link_libraries(${PLAY_TARGET} PUBLIC
-        "${SIMG_LIB_TARGET}"
-        "${DISP_LIB_TARGET}"
-        "${MATH_LIB_TARGET}"
-        "${BASE_LIB_TARGET}"
+        "${SIMG_LIBRARY}"
+        "${DISP_LIBRARY}"
+        "${GYM_LIBRARY}"
+        "${MATH_LIBRARY}"
+        "${BASE_LIBRARY}"
         "${OPENGL_LIBS}"
-        "${LAPACK_LIB}"
-        "${BLAS_LIB}"
+        "${LAPACK_BLAS}"
         Threads::Threads
     )
+    
+    set(PLAY_INCLUDES math base sim gym disp)
+    list(TRANSFORM PLAY_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
-    target_include_directories(${PLAY_TARGET} PUBLIC
-        "${SRC_MATH_DIR}"
-        "${SRC_BASE_DIR}"
-        "${SRC_SIM_DIR}"
-        "${SRC_DISP_DIR}"
-    )
+    target_include_directories(${PLAY_TARGET} PUBLIC "${PLAY_INCLUDES}")
 endif(MAKE_PLAY)

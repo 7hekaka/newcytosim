@@ -1,44 +1,25 @@
 set(SOURCES_DISP
-    gle.cc
-    gym_text.cc
-    gym_matrix.cc
-    gym_view.cc
-    gym_draw.cc
-    gym_flute.cc
-    gym_flute_dim.cc
-    gym_check.cc
-    gym_menu.cc
-    gym_zoo.cc
-    gym_flat.cc
-    gym_image.cc
-    gle_color.cc
-    gle_color_list.cc
     view.cc
     view_prop.cc
-    grid_display.cc
     glapp.cc
-    save_image.cc
-    offscreen.cc
     fiber_disp.cc
     line_disp.cc
     point_disp.cc
-    fg_font.cc
-    fg_stroke.cc
-    miniz.c
-    spng.c
-    miniz.c
+    grid_display.cc
+    display_prop.cc
+    display.cc
+    display1.cc
+    display2.cc
+    display3.cc
 )
 
-list(TRANSFORM SOURCES_DISP PREPEND "${SRC_DISP_DIR}/")
+list(TRANSFORM SOURCES_DISP PREPEND "${PROJECT_SOURCE_DIR}/src/disp/")
 
 
+set(DISP_INCLUDES math base sim sim/organizers gym)
+list(TRANSFORM DISP_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
-add_library(${DISP_LIB_TARGET} STATIC ${SOURCES_DISP})
+add_library(${DISP_LIBRARY} STATIC ${SOURCES_DISP})
 
-target_compile_definitions(${DISP_LIB_TARGET} PRIVATE -DDISPLAY)
-set_property(SOURCE spng.c PROPERTY COMPILE_DEFINITIONS SPNG_USE_MINIZ)
-
-target_include_directories(${DISP_LIB_TARGET} PUBLIC
-    "${SRC_MATH_DIR}"
-    "${SRC_BASE_DIR}"
-)
+target_compile_definitions(${DISP_LIBRARY} PRIVATE -DDISPLAY)
+target_include_directories(${DISP_LIBRARY} PUBLIC "${DISP_INCLUDES}" )

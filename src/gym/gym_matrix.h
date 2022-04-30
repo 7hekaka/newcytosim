@@ -74,6 +74,10 @@ namespace gym
     /// inverse matrix
     int mat3x3_inverse(float[9], const float[9]);
 
+    /// unproject a 3D point
+    int unproject(float winx, float winy, float winz, const float modelMatrix[16],
+                  const float projMatrix[16], const int viewport[4], float XYZ[4]);
+
 }
 
 

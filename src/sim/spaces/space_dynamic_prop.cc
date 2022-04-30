@@ -5,8 +5,8 @@
 #include "space_dynamic_prop.h"
 #include "glossary.h"
 #include "simul_prop.h"
-#include "simul.h"
 #include "cymdef.h"
+#include "simul.h"
 
 
 // include spaces that use SpaceDynamicProp

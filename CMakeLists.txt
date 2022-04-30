@@ -11,16 +11,18 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tar)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
-set(SIM_LIB_TARGET "libcytosim")
-set(SIMG_LIB_TARGET "libcytosimG")
-set(BASE_LIB_TARGET "libcytobase")
-set(MATH_LIB_TARGET "libcytomath")
-set(DISP_LIB_TARGET "libcytodisp")
+set(SIM_LIBRARY "cytosim")
+set(SIMG_LIBRARY "cytosimG")
+set(BASE_LIBRARY "cytobase")
+set(MATH_LIBRARY "cytomath")
+set(DISP_LIBRARY "cytodisp")
+set(GYM_LIBRARY "cytogym")
+
 
 if(DEFINED DIMENSION)
     add_compile_definitions(-DDIM=${DIMENSION})
-    set(SIM_LIB_TARGET "cytolibD${DIMENSION}")
-    set(SIMG_LIB_TARGET "cytospaceD${DIMENSION}G")
+    set(SIM_LIBRARY "cytolibD${DIMENSION}")
+    set(SIMG_LIBRARY "cytospaceD${DIMENSION}G")
 endif()
 
 option(MAKE_SIM "build the simulation executable" ON)
@@ -28,25 +30,6 @@ option(MAKE_PLAY "build the graphical OpenGL viewer" ON)
 option(MAKE_TOOLS "build all cytosim/tools executables" ON)
 option(MAKE_TESTS "build all cytosim/test executables" OFF)
 
-
-set(SRC_BASE_DIR "${PROJECT_SOURCE_DIR}/src/base")
-set(SRC_MATH_DIR "${PROJECT_SOURCE_DIR}/src/math")
-set(SRC_SIM_DIR "${PROJECT_SOURCE_DIR}/src/sim")
-set(SRC_DISP_DIR "${PROJECT_SOURCE_DIR}/src/disp")
-set(SRC_PLAY_DIR "${PROJECT_SOURCE_DIR}/src/play")
-set(SRC_TEST_DIR "${PROJECT_SOURCE_DIR}/src/test/")
-set(SRC_TOOLS_DIR "${PROJECT_SOURCE_DIR}/src/tools")
-set(DOC_DIR "${PROJECT_SOURCE_DIR}/src/doc")
-
-set(SRC_SIM_ALL_DIR
-    "${SRC_SIM_DIR}"
-    "${SRC_SIM_DIR}/fibers"
-    "${SRC_SIM_DIR}/hands"
-    "${SRC_SIM_DIR}/singles"
-    "${SRC_SIM_DIR}/couples"
-    "${SRC_SIM_DIR}/organizers"
-    "${SRC_SIM_DIR}/spaces"
-)
 
 set(SIM_TARGET "sim")
 set(PLAY_TARGET "play")
@@ -78,6 +61,8 @@ if(LAPACK_LIB)
 else()
     message(FATAL_ERROR "LAPACK library not found")
 endif()
+
+set(LAPACK_BLAS "${LAPACK_LIB}" "${BLAS_LIB}")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

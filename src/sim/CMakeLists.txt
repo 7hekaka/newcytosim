@@ -1,30 +1,3 @@
-set(SOURCES_SPACES
-    spaces/space_square.cc
-    spaces/space_sphere.cc
-    spaces/space_dice.cc
-    spaces/space_torus.cc
-    spaces/space_polygon.cc
-    spaces/space_banana.cc
-    spaces/space_ellipse.cc
-    spaces/space_cylinder.cc
-    spaces/space_cylinderZ.cc
-    spaces/space_capsule.cc
-    spaces/space_strip.cc
-    spaces/space_periodic.cc
-    spaces/space_cylinderP.cc
-    spaces/space_bicylinder.cc
-    spaces/space_dynamic_prop.cc
-    spaces/space_dynamic_ellipse.cc
-    spaces/space_dynamic_sphere.cc
-    spaces/space_dynamic_disc.cc
-    spaces/space_force.cc
-    spaces/space_polygonZ.cc
-    spaces/space_tee.cc
-    spaces/space_disc.cc
-    spaces/space_lid.cc
-    spaces/space_ring.cc
-    spaces/space_mesh.cc
-)
 
 set(SOURCES_SIM
     modulo.cc movable.cc
@@ -51,60 +24,89 @@ set(SOURCES_SIM
     interface.cc parser.cc
 )
 
-set(SOURCES_HANDS
-    hands/motor.cc hands/motor_prop.cc
-    hands/slider.cc hands/slider_prop.cc
-    hands/actor.cc hands/actor_prop.cc
-    hands/nucleator.cc hands/nucleator_prop.cc
-    hands/tracker.cc hands/tracker_prop.cc
-    hands/cutter.cc hands/cutter_prop.cc
-    hands/rescuer.cc hands/rescuer_prop.cc
-    hands/mighty.cc hands/mighty_prop.cc
-    hands/chewer_prop.cc hands/chewer.cc
-    hands/walker_prop.cc hands/walker.cc
-    hands/regulator_prop.cc hands/regulator.cc
-    hands/digit_prop.cc hands/digit.cc
-    hands/myosin_prop.cc hands/myosin.cc
-    hands/dynein_prop.cc hands/dynein.cc
-    hands/kinesin_prop.cc hands/kinesin.cc
+set(SOURCES_SPACES
+    space_square.cc
+    space_sphere.cc
+    space_dice.cc
+    space_torus.cc
+    space_polygon.cc
+    space_banana.cc
+    space_ellipse.cc
+    space_cylinder.cc
+    space_cylinderZ.cc
+    space_capsule.cc
+    space_strip.cc
+    space_periodic.cc
+    space_cylinderP.cc
+    space_bicylinder.cc
+    space_dynamic_prop.cc
+    space_dynamic_ellipse.cc
+    space_dynamic_sphere.cc
+    space_dynamic_disc.cc
+    space_force.cc
+    space_polygonZ.cc
+    space_tee.cc
+    space_disc.cc
+    space_lid.cc
+    space_ring.cc
+    space_mesh.cc
 )
+list(TRANSFORM SOURCES_SPACES PREPEND "spaces/")
+
+set(SOURCES_HANDS
+    motor.cc motor_prop.cc
+    slider.cc slider_prop.cc
+    actor.cc actor_prop.cc
+    nucleator.cc nucleator_prop.cc
+    tracker.cc tracker_prop.cc
+    cutter.cc cutter_prop.cc
+    rescuer.cc rescuer_prop.cc
+    mighty.cc mighty_prop.cc
+    chewer_prop.cc chewer.cc
+    walker_prop.cc walker.cc
+    regulator_prop.cc regulator.cc
+    digit_prop.cc digit.cc
+    myosin_prop.cc myosin.cc
+    dynein_prop.cc dynein.cc
+    kinesin_prop.cc kinesin.cc
+)
+list(TRANSFORM SOURCES_HANDS PREPEND "hands/")
 
 set(SOURCES_FIBERS
-    fibers/dynamic_fiber.cc fibers/dynamic_fiber_prop.cc
-    fibers/classic_fiber.cc fibers/classic_fiber_prop.cc
-    fibers/treadmilling_fiber.cc fibers/treadmilling_fiber_prop.cc
-    fibers/growing_fiber.cc fibers/growing_fiber_prop.cc
+    dynamic_fiber.cc dynamic_fiber_prop.cc
+    classic_fiber.cc classic_fiber_prop.cc
+    treadmilling_fiber.cc treadmilling_fiber_prop.cc
+    growing_fiber.cc growing_fiber_prop.cc
 )
+list(TRANSFORM SOURCES_FIBERS PREPEND "fibers/")
 
 set(SOURCES_SINGLES
-    singles/picket.cc singles/picket_long.cc
-    singles/wrist.cc singles/wrist_long.cc
+    picket.cc picket_long.cc
+    wrist.cc wrist_long.cc
 )
+list(TRANSFORM SOURCES_SINGLES PREPEND "singles/")
 
 set(SOURCES_COUPLES
-    couples/couple_long.cc
-    couples/crosslink.cc couples/crosslink_long.cc couples/crosslink_prop.cc
-    couples/bridge.cc couples/bridge_prop.cc
-    couples/shackle.cc couples/shackle_long.cc couples/shackle_prop.cc
-    couples/fork.cc couples/fork_prop.cc
-    couples/duo.cc couples/duo_prop.cc couples/duo_long.cc
+    couple_long.cc
+    crosslink.cc crosslink_long.cc crosslink_prop.cc
+    bridge.cc bridge_prop.cc
+    shackle.cc shackle_long.cc shackle_prop.cc
+    fork.cc fork_prop.cc
+    duo.cc duo_prop.cc duo_long.cc
 )
+list(TRANSFORM SOURCES_COUPLES PREPEND "couples/")
 
 set(SOURCES_ORGANIZERS
-    organizers/aster.cc organizers/aster_prop.cc
-    organizers/nucleus.cc organizers/nucleus_prop.cc
-    organizers/fake.cc organizers/fake_prop.cc
-    organizers/bundle.cc organizers/bundle_prop.cc
+    aster.cc aster_prop.cc
+    nucleus.cc nucleus_prop.cc
+    fake.cc fake_prop.cc
+    bundle.cc bundle_prop.cc
 )
+list(TRANSFORM SOURCES_ORGANIZERS PREPEND "organizers/")
 
-set(SOURCES_CYTOSIM
-    "${SOURCES_SPACES}"
-    "${SOURCES_SIM}"
-    "${SOURCES_HANDS}"
-    "${SOURCES_FIBERS}"
-    "${SOURCES_SINGLES}"
-    "${SOURCES_COUPLES}"
-    "${SOURCES_ORGANIZERS}"
+set(SOURCES_READ
+    frame_reader.cc
+    sim_thread.cc
 )
 
 # objects containing graphical code under the DISPLAY keyword:
@@ -116,32 +118,40 @@ set(SOURCES_WITH_DISPLAY
     point_grid.cc
 )
 
-list(TRANSFORM SOURCES_CYTOSIM PREPEND "${SRC_SIM_DIR}/")
-list(TRANSFORM SOURCES_WITH_DISPLAY PREPEND "${SRC_SIM_DIR}/")
+set(SOURCES_CYTOSIM
+    "${SOURCES_SIM}"
+    "${SOURCES_SPACES}"
+    "${SOURCES_HANDS}"
+    "${SOURCES_FIBERS}"
+    "${SOURCES_SINGLES}"
+    "${SOURCES_COUPLES}"
+    "${SOURCES_ORGANIZERS}"
+    "${SOURCES_READ}"
+)
+
+set(ALL_SIM_SRC_DIR sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
+
+
+list(TRANSFORM SOURCES_CYTOSIM PREPEND "${PROJECT_SOURCE_DIR}/src/sim/")
+list(TRANSFORM SOURCES_WITH_DISPLAY PREPEND "${PROJECT_SOURCE_DIR}/src/sim/")
 
 
 if(MAKE_SIM)
 
-    add_library(${SIM_LIB_TARGET} STATIC ${SOURCES_CYTOSIM})
-    target_include_directories(${SIM_LIB_TARGET} PUBLIC
-        "${SRC_MATH_DIR}"
-        "${SRC_BASE_DIR}"
-        "${SRC_SIM_ALL_DIR}"
-    )
+    set(SIM_INCLUDES math base sim "${ALL_SIM_SRC_DIR}")
+    list(TRANSFORM SIM_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
-    add_executable(${SIM_TARGET} "${SRC_SIM_DIR}/sim.cc")
+    add_library(${SIM_LIBRARY} STATIC ${SOURCES_CYTOSIM})
+    target_include_directories(${SIM_LIBRARY} PUBLIC "${SIM_INCLUDES}" )
+
+    add_executable(${SIM_TARGET} "${PROJECT_SOURCE_DIR}/src/sim/sim.cc")
+    include_directories(PUBLIC "${SIM_INCLUDES}" )
     target_link_libraries(${SIM_TARGET} PRIVATE
-        "${SIM_LIB_TARGET}"
-        "${MATH_LIB_TARGET}"
-        "${BASE_LIB_TARGET}"
-        "${LAPACK_LIB}"
-        "${BLAS_LIB}"
+        "${SIM_LIBRARY}"
+        "${MATH_LIBRARY}"
+        "${BASE_LIBRARY}"
+        "${LAPACK_BLAS}"
         Threads::Threads
-    )
-    target_include_directories(${SIM_TARGET} PUBLIC
-        "${SRC_MATH_DIR}"
-        "${SRC_BASE_DIR}"
-        "${SRC_SIM_DIR}"
     )
     
 endif(MAKE_SIM)
@@ -150,29 +160,25 @@ endif(MAKE_SIM)
 
 if(MAKE_PLAY)
 
+    set(SIMG_INCLUDES math base sim sim/organizers gym disp)
+    list(TRANSFORM SIMG_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
+
     #set(SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_CYTOSIM})
     #list(REMOVE_ITEM SOURCES_CYTOSIM_NO_DISPLAY ${SOURCES_WITH_DISPLAY})
 
-    add_library(${SIMG_LIB_TARGET} STATIC ${SOURCES_CYTOSIM})
-
-    target_include_directories(${SIMG_LIB_TARGET} PUBLIC
-        "${SRC_MATH_DIR}"
-        "${SRC_BASE_DIR}"
-        "${SRC_SIM_ALL_DIR}"
-        "${SRC_DISP_DIR}"
-    )
-
+    add_library(${SIMG_LIBRARY} STATIC ${SOURCES_CYTOSIM})
+    target_include_directories(${SIMG_LIBRARY} PUBLIC "${SIMG_INCLUDES}")
 
     # It is only necessary to compile files in ${SOURCES_WITH_DISPLAY} with this flag
     # but I do not know how to specify this with CMake
     # Hence by setting a target_compile_definitions, all source will be compiled with -DDISPLAY
 
-    target_compile_definitions(${SIMG_LIB_TARGET} PRIVATE DISPLAY)
+    target_compile_definitions(${SIMG_LIBRARY} PRIVATE DISPLAY)
 
     # This below does not work, as it sets the compile options for all targets including the files
 
     foreach(FILE ${SOURCES_WITH_DISPLAY})
-        #set_source_files_properties(${FILE} TARGET_DIRECTORY ${SIMG_LIB_TARGET} PROPERTIES COMPILE_DEFINITIONS "DISPLAY")
+        #set_source_files_properties(${FILE} TARGET_DIRECTORY ${SIMG_LIBRARY} PROPERTIES COMPILE_DEFINITIONS "DISPLAY")
         #message(${FILE} "will be compiled with -DDISPLAY")
     endforeach()
 

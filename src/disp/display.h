@@ -33,7 +33,7 @@ class PointDisp;
 
 
 /// defining the DISPLAY keyword enables display code in included files
-#define DISPLAY
+#define DISPLAY 1
 
 /**
  @brief A display element with a depth coordinate

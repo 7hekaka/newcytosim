@@ -219,6 +219,8 @@ void Player::setPixelSize(View& view)
 
     mDisplay->setPixelFactors(pix, val);
     
+    mDisplay->setStencil(view.stencil);
+
     //printf(" pixelSize %6.3f unitValue %6.3f : %lu\n", pix, val, dispList.size());
     for ( Property * p : dispList )
     {
@@ -252,8 +254,6 @@ void Player::prepareDisplay(View& view)
     //-------- set pixel size, unit-size and direction:
 
     setPixelSize(view);
-    
-    mDisplay->setStencil(view.stencil && ( DIM >= 3 ));
     
     //-------- adjust reference color used by gle::bright_color
     gle::background_color = view.back_color;

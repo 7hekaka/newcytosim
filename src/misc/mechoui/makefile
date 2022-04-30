@@ -23,7 +23,7 @@ endif
 
 #----------------------------objects--------------------------------------------
 
-INC_MECHOUI := $(realpath $(addprefix ../../, base math disp))
+INC_MECHOUI := $(realpath $(addprefix ../../, base math gym disp))
 
 vpath %.h  . $(INC_MECHOUI)
 vpath %.cc . $(INC_MECHOUI)
@@ -32,8 +32,8 @@ vpath %.o  build
 vpath %.a  build
 
 
-OBJ_MECHOUI := mesh.o mechoui_param.o exceptions.o vector3.o glossary.o property.o\
-             backtrace.o tokenizer.o stream_func.o print_color.o time_date.o filepath.o\
+OBJ_MECHOUI := mesh.o mechoui_param.o vector3.o glossary.o property.o\
+           backtrace.o tokenizer.o stream_func.o print_color.o time_date.o filepath.o\
 
 #----------------------------targets--------------------------------------------
 
@@ -53,11 +53,17 @@ tar: clean
 	tar -cf mechoui.tar --dereference *
 
 build:
-	if ! test -d build; then mkdir build; fi
+	mkdir -p $@
 
 #----------------------------rules----------------------------------------------
 
+-include ../../gym/makefile.inc
 -include ../../disp/makefile.inc
+
+vpath spng.h ../../gym/deps
+vpath spng.c ../../gym/deps
+vpath miniz.h ../../gym/deps
+vpath miniz.c ../../gym/deps
 
 $(OBJ_MECHOUI:%.o=build/%.o): build/%.o: %.cc
 	$(COMPILE) $(addprefix -I, $(INC_MECHOUI)) -c $< -o $@
@@ -66,7 +72,7 @@ $(OBJ_MECHOUI:%.o=build/%.o): build/%.o: %.cc
 build/SFMT.o: SFMT.c SFMT.h | build
 	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o $@
 
-build/mechdisp.a: $(addprefix build/, $(OBJ_DISP)) #save_image.o
+build/mechdisp.a: $(addprefix build/, $(OBJ_GFX) view.o view_prop.o glapp.o) #save_image.o
 	$(LIBTOOL) $@ $^
 vpath mechdisp.a build
 

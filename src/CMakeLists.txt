@@ -4,6 +4,7 @@ add_subdirectory("math")
 add_subdirectory("sim")
 
 if (MAKE_PLAY)
+    add_subdirectory("gym")
     add_subdirectory("disp")
     add_subdirectory("play")
 endif()

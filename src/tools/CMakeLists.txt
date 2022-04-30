@@ -1,20 +1,12 @@
-set(SOURCES_TOOL
-    "${SRC_PLAY_DIR}/frame_reader.cc"
-)
 
-set(TOOL_INCLUDES
-    "${SRC_MATH_DIR}"
-    "${SRC_BASE_DIR}"
-    "${SRC_SIM_ALL_DIR}"
-    "${SRC_PLAY_DIR}"
-)
+set(TOOL_INCLUDES math base sim play)
+list(TRANSFORM TOOL_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
 set(TOOL_LIBS
-    "${SIM_LIB_TARGET}"
-    "${MATH_LIB_TARGET}"
-    "${BASE_LIB_TARGET}"
-    "${LAPACK_LIB}"
-    "${BLAS_LIB}"
+    "${SIM_LIBRARY}"
+    "${MATH_LIBRARY}"
+    "${BASE_LIBRARY}"
+    "${LAPACK_BLAS}"
     Threads::Threads
 )
 
@@ -30,7 +22,7 @@ set(TOOL_LIST
 
 # Build the Tools
 foreach(TOOL ${TOOL_LIST})
-    add_executable("${TOOL}" ${SOURCES_TOOL} "${SRC_TOOLS_DIR}/${TOOL}.cc")
+    add_executable("${TOOL}" "${PROJECT_SOURCE_DIR}/src/tools/${TOOL}.cc")
     set_source_files_properties(
         PROPERTIES
         EXTERNAL_OBJECT true

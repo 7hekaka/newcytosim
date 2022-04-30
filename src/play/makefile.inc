@@ -1,16 +1,17 @@
-# Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+# Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
-OBJ_PLAY := display_prop.o player_prop.o sim_thread.o frame_reader.o\
-            display.o display1.o display2.o display3.o
+OBJ_PLAY := display_prop.o player_prop.o display.o display1.o display2.o display3.o
 
 FILES_PLAYER := player.cc player.h player_disp.cc
 
-OBJ_PLAY1D := $(OBJ_PLAY:.o=D1.o)
-OBJ_PLAY2D := $(OBJ_PLAY:.o=D2.o)
-OBJ_PLAY3D := $(OBJ_PLAY:.o=D3.o)
+OBJ_PLAY1D := $(OBJ_PLAY:%.o=build/%D1.o)
+OBJ_PLAY2D := $(OBJ_PLAY:%.o=build/%D2.o)
+OBJ_PLAY3D := $(OBJ_PLAY:%.o=build/%D3.o)
 
-PLAY_INC = $(addprefix -Isrc/, math base sim disp sim/organizers sim/singles)
-PLAY_DEP = $(addprefix -Isrc/, math base sim disp) $(LINK) $(GRAFIX) $(IMAGES)
+LIB_PLAYER := cytodisp.a SFMT.o $(OBJ_DISP) cytobase.a
+
+PLAY_INC = $(addprefix -Isrc/, math base sim gym disp sim/organizers)
+PLAY_DEP = $(addprefix -Isrc/, math base sim gym disp) $(LINK) $(GRAFIX) $(IMAGES)
 
 ################################ objects with DIM defined in source code:
 
@@ -20,7 +21,7 @@ build/player.o: $(FILES_PLAYER) | build
 $(OBJ_PLAY:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(PLAY_INC) -c $< -o $@
 
-play: play.cc player.o $(OBJ_PLAY) cytolibG.a cytodisp.a cytomath.a cytobase.a SFMT.o | bin
+play: play.cc player.o $(OBJ_CYTOREAD) $(OBJ_PLAY) cytolibG.a cytomath.a $(LIB_PLAYER) | bin
 	$(COMPILE) $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin/play
 	$(DONE)
 vpath play bin
@@ -30,10 +31,10 @@ vpath play bin
 build/playerD1.o: $(FILES_PLAYER) | build
 	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o $@
 
-$(OBJ_PLAY1D:%.o=build/%.o): build/%D1.o: %.cc %.h %.o | build
+$(OBJ_PLAY1D): build/%D1.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o $@
 
-bin1/play: play.cc playerD1.o $(OBJ_PLAY1D) cytolibGD1.a cytodisp.a cytomathD1.a cytobase.a SFMT.o | bin1
+bin1/play: play.cc playerD1.o $(OBJ_CYTOREAD) $(OBJ_PLAY1D) cytolibGD1.a cytomathD1.a $(LIB_PLAYER) | bin1
 	$(COMPILE) -DDIM=1 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin1/play
 	$(DONE)
 vpath bin1/play bin1
@@ -43,10 +44,10 @@ vpath bin1/play bin1
 build/playerD2.o: $(FILES_PLAYER) | build
 	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o $@
 
-$(OBJ_PLAY2D:%.o=build/%.o): build/%D2.o: %.cc %.h %.o | build
+$(OBJ_PLAY2D): build/%D2.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o $@
 
-bin2/play: play.cc playerD2.o $(OBJ_PLAY2D) cytolibGD2.a cytodisp.a cytomathD2.a cytobase.a SFMT.o | bin2
+bin2/play: play.cc playerD2.o $(OBJ_CYTOREAD) $(OBJ_PLAY2D) cytolibGD2.a cytomathD2.a $(LIB_PLAYER) | bin2
 	$(COMPILE) -DDIM=2 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin2/play
 	$(DONE)
 vpath bin2/play bin2
@@ -56,10 +57,10 @@ vpath bin2/play bin2
 build/playerD3.o: $(FILES_PLAYER) | build
 	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o $@
 
-$(OBJ_PLAY3D:%.o=build/%.o): build/%D3.o: %.cc %.h %.o | build
+$(OBJ_PLAY3D): build/%D3.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o $@
 
-bin3/play: play.cc playerD3.o $(OBJ_PLAY3D) cytolibGD3.a cytodisp.a cytomathD3.a cytobase.a SFMT.o | bin3
+bin3/play: play.cc playerD3.o $(OBJ_CYTOREAD) $(OBJ_PLAY3D) cytolibGD3.a cytomathD3.a $(LIB_PLAYER) | bin3
 	$(COMPILE) -DDIM=3 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin3/play
 	$(DONE)
 vpath bin3/play bin3

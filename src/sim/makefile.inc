@@ -1,14 +1,14 @@
-# Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+# Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 # Copyright 2018-- Francois J. Nedelec.
 
 
-OBJ_SPACE := space.o space_prop.o space_set.o space_square.o space_sphere.o space_disc.o\
+OBJ_SPACE := space.o space_prop.o space_square.o space_sphere.o space_disc.o\
              space_capsule.o space_dice.o space_tee.o space_torus.o space_polygon.o\
              space_ellipse.o space_cylinder.o space_bicylinder.o space_ring.o space_mesh.o\
              space_cylinderZ.o space_polygonZ.o space_strip.o space_periodic.o\
              space_banana.o space_cylinderP.o space_lid.o space_force.o\
              space_dynamic_prop.o space_dynamic_sphere.o space_dynamic_ellipse.o\
-             space_dynamic_disc.o
+             space_dynamic_disc.o space_set.o
 
 OBJ_HANDS := hand.o hand_prop.o hand_monitor.o hand_list.o\
              motor.o motor_prop.o\
@@ -31,23 +31,21 @@ OBJ_DIGITS := digit.o digit_prop.o\
 OBJ_SINGLES := single.o single_prop.o single_set.o\
                picket.o picket_long.o wrist.o wrist_long.o
 
-OBJ_COUPLES := couple.o couple_prop.o couple_set.o couple_long.o\
+OBJ_COUPLES := couple.o couple_prop.o couple_long.o couple_set.o\
                crosslink.o crosslink_long.o crosslink_prop.o\
-               bridge.o bridge_prop.o\
+               bridge.o bridge_prop.o fork.o fork_prop.o\
                duo.o duo_long.o duo_prop.o\
                shackle.o shackle_long.o shackle_prop.o\
-               fork.o fork_prop.o
          
-OBJ_FIBERS := chain.o mecafil.o fiber.o fiber_prop.o fiber_set.o\
+OBJ_FIBERS := chain.o mecafil.o fiber.o fiber_prop.o\
               fiber_segment.o fiber_site.o lattice.o\
               dynamic_fiber.o dynamic_fiber_prop.o\
               classic_fiber.o classic_fiber_prop.o\
               treadmilling_fiber.o treadmilling_fiber_prop.o\
-              growing_fiber.o growing_fiber_prop.o
+              growing_fiber.o growing_fiber_prop.o fiber_set.o
 
-OBJ_ORGANIZERS := organizer.o organizer_set.o \
-                  aster.o aster_prop.o nucleus.o nucleus_prop.o\
-                  fake.o fake_prop.o bundle.o bundle_prop.o
+OBJ_ORGANIZERS := organizer.o aster.o aster_prop.o nucleus.o nucleus_prop.o\
+                  fake.o fake_prop.o bundle.o bundle_prop.o organizer_set.o
 
 OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            sphere_prop.o sphere.o sphere_set.o\
@@ -58,6 +56,7 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            fiber_grid.o point_grid.o locus_grid.o meca.o\
            simul_prop.o simul.o interface.o parser.o
 
+OBJ_CYTOREAD := sim_thread.o frame_reader.o
 
 OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
              $(OBJ_SINGLES) $(OBJ_COUPLES) $(OBJ_ORGANIZERS) $(OBJ_SIM)
@@ -169,6 +168,9 @@ $(OBJ_ORGANIZERS:%.o=build/%.o): build/%.o: %.cc %.h | build
 $(OBJ_SIM:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -c $< -o $@
 
+$(OBJ_CYTOREAD:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -Isrc/sim/singles -c $< -o $@
+
 #------------targets with 'DIM' defined in makefile-----------------------------
 
 INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
@@ -186,7 +188,7 @@ $(OBJ_CYTOLIB3): build/%D3.o: %.cc %.h %.o | build
 
 #---------------------targets with DISPLAY elements-----------------------------
 
-INC_BMSD=$(addprefix -Isrc/, base math sim sim/spaces disp)
+INC_BMSD=$(addprefix -Isrc/, base math sim sim/spaces gym disp)
 
 $(OBJ_GRAFIX:%.o=build/%G.o): build/%G.o: %.cc %.h %.o | build
 	$(COMPILE) -DDISPLAY $(INC_BMSD) -c $< -o $@

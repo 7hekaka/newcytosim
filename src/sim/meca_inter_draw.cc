@@ -1,11 +1,11 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 
-#include "../disp/gle.h"
-#include "../disp/gle_color_list.h"
-#include "../disp/gym_flute.h"
-#include "../disp/gym_flute_dim.h"
-#include "../disp/gym_draw.h"
+#include "../gym/gle_color.h"
+#include "../gym/gle_color_list.h"
+#include "../gym/gym_flute.h"
+#include "../gym/gym_flute_dim.h"
+#include "../gym/gym_draw.h"
 
 #define DRAW_LINK(PT, ...)\
 { if ( drawLinks ) drawLink(gle::bright_color(PT.mecable()->signature()), PT.pos(), __VA_ARGS__); }

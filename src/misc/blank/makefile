@@ -19,7 +19,7 @@ COMPILE := $(CXX) $(Flags$(MODE))
 
 #----------------------------objects--------------------------------------------
 
-INCDIR=import base disp
+INCDIR=import base gym disp
 
 vpath %.h  $(INCDIR)
 vpath %.cc $(INCDIR)

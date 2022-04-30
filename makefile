@@ -36,7 +36,7 @@ OBJECTS = $(filter %.cc, $^) $(addprefix build/, $(notdir $(filter %.o, $^))) $(
 DONE = printf "> > > > > > > made %s\n" $@;
 
 
-SRCDIR1 := $(addprefix src/, math base sim disp play)
+SRCDIR1 := $(addprefix src/, math base sim gym disp play)
 SRCDIR2 := $(addprefix src/sim/, spaces hands fibers singles couples organizers)
 SRCDIR  := $(SRCDIR1) $(SRCDIR2)
 
@@ -50,12 +50,14 @@ INFO = -D'CODE_VERSION="$(CODE_VERSION)"'
 #-------------------------make's search paths-----------------------------------
 
 vpath %.h     $(SRCDIR)
-vpath %.c     $(SRCDIR)
 vpath %.cc    $(SRCDIR)
 vpath %.o     build/
 vpath %.a     lib/
 vpath %.dep   dep/
-vpath SFMT%   src/math/
+
+# local copy of Mersenne Twister:
+vpath SFMT.h src/math/
+vpath SFMT.c src/math/
 
 #----------------------------targets--------------------------------------------
 
@@ -70,6 +72,7 @@ info:
 include src/sim/makefile.inc
 include src/base/makefile.inc
 include src/math/makefile.inc
+include src/gym/makefile.inc
 include src/disp/makefile.inc
 include src/play/makefile.inc
 
@@ -143,7 +146,7 @@ lib:
 	mkdir -p $@
 
 clean:
-	if ! test -d dep; then mkdir dep; fi
+	mkdir -p dep
 	rm -f build/*.o
 	rm -f lib/*.a
 
@@ -171,7 +174,7 @@ MAKEDEP := g++ -std=gnu++14 -MM $(addprefix -I, $(SRCDIR))
 depdir:
 	mkdir -p dep
 
-dep: depdir $(addsuffix .dep, $(addprefix dep/, 0 1 2 3 4 5 6 7))
+dep: depdir $(addsuffix .dep, $(addprefix dep/, 0 1 2 3 4 5 6 7 8))
 	$(DONE)
 
 dep/0.dep: src/base/*.cc
@@ -186,16 +189,19 @@ dep/2.dep: src/sim/*.cc
 dep/3.dep: src/sim/*/*.cc
 	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/4.dep: src/disp/*.cc
+dep/4.dep: src/gym/*.cc
 	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/5.dep: src/play/*.cc
+dep/5.dep: src/disp/*.cc
 	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/6.dep: src/tools/*.cc
+dep/6.dep: src/play/*.cc
 	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
-dep/7.dep: src/test/*.cc
+dep/7.dep: src/tools/*.cc
+	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
+
+dep/8.dep: src/test/*.cc
 	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 
 -include dep/?.dep

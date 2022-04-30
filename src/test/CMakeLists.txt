@@ -1,17 +1,13 @@
-set(TEST_INCLUDES
-    "${SRC_BASE_DIR}"
-    "${SRC_MATH_DIR}"
-    "${SRC_SIM_ALL_DIR}"
-    "${SRC_DISP_DIR}"
-    "${SRC_PLAY_DIR}"
-)
+
+set(TEST_INCLUDES math base sim gym disp)
+list(TRANSFORM TEST_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
+
 
 set(TEST_LIBS
-    "${LAPACK_LIB}"
-    "${BLAS_LIB}"
+    "${LAPACK_BLAS}"
     Threads::Threads
-    "${MATH_LIB_TARGET}"
-    "${BASE_LIB_TARGET}"
+    "${MATH_LIBRARY}"
+    "${BASE_LIBRARY}"
 )
 
 set(TEST_LIST
@@ -29,7 +25,7 @@ set(TEST_LIST
 )
 
 foreach(TEST ${TEST_LIST})
-    add_executable("${TEST}" "${SRC_TEST_DIR}/${TEST}.cc")
+    add_executable("${TEST}" "${PROJECT_SOURCE_DIR}/src/test/${TEST}.cc")
     set_source_files_properties(
         PROPERTIES
         EXTERNAL_OBJECT true
@@ -43,12 +39,11 @@ if(OPENGL_LIBS)
 
 set(TEST_GL_LIBS
     rasterizerGL
-    "${DISP_LIB_TARGET}"
-    "${SIMG_LIB_TARGET}"
-    "${MATH_LIB_TARGET}"
-    "${BASE_LIB_TARGET}"
-    "${LAPACK_LIB}"
-    "${BLAS_LIB}"
+    "${GYM_LIBRARY}"
+    "${SIMG_LIBRARY}"
+    "${MATH_LIBRARY}"
+    "${BASE_LIBRARY}"
+    "${LAPACK_BLAS}"
     Threads::Threads
     "${OPENGL_LIBS}"
 )
@@ -65,7 +60,7 @@ set(GL_TEST_LIST
 )
 
 foreach(TEST ${GL_TEST_LIST})
-    add_executable(${TEST} "${SRC_TEST_DIR}/${TEST}.cc")
+    add_executable(${TEST} "${PROJECT_SOURCE_DIR}/src/test/${TEST}.cc")
     target_include_directories(${TEST} PUBLIC "${TEST_INCLUDES}")
     target_link_libraries(${TEST} PUBLIC "${TEST_GL_LIBS}")
 endforeach()

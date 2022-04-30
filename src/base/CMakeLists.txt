@@ -18,9 +18,13 @@ set(SOURCES_BASE
     print_color.cc
 )
 
-list(TRANSFORM SOURCES_BASE PREPEND "${SRC_BASE_DIR}/")
+list(TRANSFORM SOURCES_BASE PREPEND "${PROJECT_SOURCE_DIR}/src/base/")
 
-add_library(${BASE_LIB_TARGET} STATIC ${SOURCES_BASE})
+set(BASE_INCLUDES math base)
+list(TRANSFORM BASE_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
+
+
+add_library(${BASE_LIBRARY} STATIC ${SOURCES_BASE})
 
 set_source_files_properties(
     PROPERTIES
@@ -28,7 +32,4 @@ set_source_files_properties(
     GENERATED true
 )
 
-target_include_directories(${BASE_LIB_TARGET} PUBLIC
-    "${SRC_BASE_DIR}"
-    "${SRC_MATH_DIR}"
-)
+target_include_directories(${BASE_LIBRARY} PUBLIC "${BASE_INCLUDES}" )

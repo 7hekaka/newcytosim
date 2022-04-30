@@ -17,8 +17,10 @@ static FILE * ERF = stderr;
 
 bool SaveImage::supported(const char format[])
 {
+#if HAS_PNG || HAS_SPNG
     if ( 0 == strcasecmp(format, "png") )
         return true;
+#endif
     if ( 0 == strcasecmp(format, "ppm") )
         return true;
     if ( 0 == strcasecmp(format, "tga") )
@@ -474,8 +476,7 @@ int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
     return res;
 }
 
-#else
-
+#elif HAS_SPNG
 
 //------------------------------------------------------------------------------
 #pragma mark - PNG export using libspng (https://libspng.org)
@@ -537,6 +538,16 @@ done:
     /* Free context memory */
     spng_ctx_free(enc);
     return res;
+}
+
+#else
+
+int SaveImage::savePNG(FILE* file, const uint8_t pixels[],
+                       const uint8_t bit_depth, const uint8_t num_colors,
+                       const uint32_t width, const uint32_t height)
+{
+    fprintf(ERF, "png export not supported\n");
+    return 1;
 }
 
 #endif

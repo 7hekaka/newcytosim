@@ -12,7 +12,7 @@ vpath %.cc src/tools
 
 TOOL_OBJ := cytolib.a cytomath.a sparmatsymblk.o cytobase.a SFMT.o
 
-TOOL_INC  = $(addprefix -Isrc/, math base sim sim/spaces sim/fibers sim/singles sim/organizers disp play)
+TOOL_INC  = $(addprefix -Isrc/, math base sim sim/spaces sim/fibers sim/singles sim/organizers gym disp play)
 
 TOOL_MAKE = $(COMPILE) $(TOOL_INC) $(OBJECTS) $(LINK) -o bin/$@
 
@@ -111,7 +111,7 @@ vpath sweet bin
 
 micimage: micimage.cc save_image.cc glossary.o filepath.o tokenizer.o
 micimage: stream_func.o exceptions.o random.o SFMT.o print_color.o backtrace.o
-	$(COMPILE) -Isrc/math -Isrc/base -Isrc/disp -DHAS_PNG $(OBJECTS) $(LIB_PNG) -o bin/$@
+	$(COMPILE) -Isrc/math -Isrc/base -Isrc/gym -DHAS_PNG $(OBJECTS) $(LIB_PNG) -o bin/$@
 	$(DONE)
 vpath micimage bin
 

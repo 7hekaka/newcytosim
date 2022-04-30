@@ -12,7 +12,7 @@
 #include "gym_draw.h"
 #include "gym_check.h"
 
-#include "fake.h"
+#include "organizer.h"
 #include "fiber_disp.h"
 #include "line_disp.h"
 #include "point_disp.h"

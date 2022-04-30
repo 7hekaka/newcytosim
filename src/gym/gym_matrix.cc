@@ -221,7 +221,7 @@ int gym::mat4x4_inverse(float T[16], const float M[16])
 }
 
 
-// Invert 3x3 matrix.
+/// Invert 3x3 matrix.
 int gym::mat3x3_inverse(float inv[9], const float m[9])
 {
     float det = m[0]*m[4]*m[8] + m[2]*m[3]*m[7] + m[1]*m[5]*m[6]
@@ -243,3 +243,49 @@ int gym::mat3x3_inverse(float inv[9], const float m[9])
     }
     return 1;
 }
+
+
+/*
+ Assuming GLint == int for 'viewport'
+ */
+int gym::unproject(float winx, float winy, float winz,
+                   const float modelMatrix[16],
+                   const float projMatrix[16],
+                   const int viewport[4],
+                   float XYZ[4])
+{
+    float mat[16];
+    float inv[16];
+    float in[4];
+    float out[4];
+    
+    gym::mat_mul(mat, projMatrix, modelMatrix);
+    
+    if ( gym::mat4x4_inverse(inv, mat) )
+        return 1;
+    
+    in[0] = winx;
+    in[1] = winy;
+    in[2] = winz;
+    in[3] = 1;
+    
+    /* Map x and y from window coordinates */
+    in[0] = (in[0] - viewport[0]) / viewport[2];
+    in[1] = (in[1] - viewport[1]) / viewport[3];
+    
+    /* Map to range -1 to 1 */
+    in[0] = in[0] * 2 - 1;
+    in[1] = in[1] * 2 - 1;
+    in[2] = in[2] * 2 - 1;
+    
+    gym::mat_mulvec(out, inv, in);
+
+    if ( out[3] == 0 )
+        return 2;
+
+    XYZ[0] = out[0] / out[3];
+    XYZ[1] = out[1] / out[3];
+    XYZ[2] = out[2] / out[3];
+    return 0;
+}
+

@@ -3,7 +3,10 @@
 #define PLAYER_H
 
 ///this turns on display code in simul.h
-#define  DISPLAY
+#define DISPLAY 1
+
+#include "gle_color.h"
+#include "gle_color_list.h"
 
 #include "simul.h"
 #include "parser.h"

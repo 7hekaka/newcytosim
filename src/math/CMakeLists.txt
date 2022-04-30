@@ -24,20 +24,21 @@ set(SOURCES_MATH
     SFMT.c
 )
 
-list(TRANSFORM SOURCES_MATH PREPEND "${SRC_MATH_DIR}/")
+list(TRANSFORM SOURCES_MATH PREPEND "${PROJECT_SOURCE_DIR}/src/math/")
 
-add_library(${MATH_LIB_TARGET} STATIC ${SOURCES_MATH})
-target_include_directories(${MATH_LIB_TARGET} PUBLIC
-    "${SRC_MATH_DIR}"
-    "${SRC_BASE_DIR}"
-)
+set(MATH_INCLUDES math base)
+list(TRANSFORM MATH_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
+
+add_library(${MATH_LIBRARY} STATIC ${SOURCES_MATH})
+target_include_directories(${MATH_LIBRARY} PUBLIC "${MATH_INCLUDES}" )
+
 
 if(MAKE_TESTS)
-    add_library(rasterizerGL "${SRC_MATH_DIR}/rasterizer.cc")
+
+    set(RASTERIZER_INCLUDES math base gym)
+    list(TRANSFORM RASTERIZER_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
+
+    add_library(rasterizerGL "${PROJECT_SOURCE_DIR}/src/math/rasterizer.cc")
     target_compile_definitions(rasterizerGL PRIVATE -DDISPLAY)
-    target_include_directories(rasterizerGL PUBLIC
-        "${SRC_MATH_DIR}"
-        "${SRC_BASE_DIR}"
-        "${SRC_DISP_DIR}"
-    )
+    target_include_directories(rasterizerGL PUBLIC "${RASTERIZER_INCLUDES}" )
 endif()

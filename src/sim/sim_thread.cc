@@ -1,11 +1,14 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
+#include <sys/stat.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <cstdio>
 #include <time.h>
 #include "sim_thread.h"
 #include "exceptions.h"
 #include "print_color.h"
 #include "picket.h"
-#include "glapp.h"
 
 //------------------------------------------------------------------------------
 
@@ -129,6 +132,8 @@ void SimThread::start()
     if ( alone_ )
     {
         flag_ = 0;
+        holding_ = 0;
+        Parser::restart_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
         if ( pthread_create(&child_, nullptr, run_launcher, this) )
             throw Exception("failed to create thread");
@@ -176,6 +181,7 @@ int SimThread::extend()
     if ( alone_ )
     {
         flag_ = 0;
+        holding_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
         if ( pthread_create(&child_, nullptr, extend_launcher, this) )
             throw Exception("failed to create thread");
@@ -258,6 +264,7 @@ void SimThread::stop()
             // wait for termination:
             pthread_join(child_, nullptr);
             alone_ = 1;
+            holding_ = 0;
         }
     }
 }
@@ -279,6 +286,7 @@ void SimThread::cancel()
             pthread_join(child_, nullptr);
             holding_ = 0;
             alone_ = 1;
+            holding_ = 0;
             unlock();
         }
     }

@@ -12,7 +12,6 @@
 #include "gym_draw.h"
 #include "gym_text.h"
 #include "fg_stroke.h"
-#include "glu_unproject.cc"
 #include "time_date.h"
 
 
@@ -589,7 +588,7 @@ Vector3 View::depthAxis() const
 Vector3 View::unproject(float x, float y, float z)
 {
     float un[4] = { 0 };
-    myUnproject(x, y, z, modelview_, projection_, viewport_, un);
+    gym::unproject(x, y, z, modelview_, projection_, viewport_, un);
     return Vector3(un[0], un[1], un[2]);
 }
 

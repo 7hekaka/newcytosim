@@ -4,8 +4,9 @@
 #define LINE_DISP_H
 
 
-#include "vector.h"
+#include "real.h"
 #include "gle_color.h"
+
 
 /// Display parameters for a Line
 /**
