@@ -20,7 +20,11 @@ class FiberSet;
 
 
 /// the type of Grid contained in a Field
-typedef Grid<FieldScalar, DIM> FieldGrid;
+typedef FieldVector<3> FieldCell;
+//typedef FieldScalar FieldCell;
+
+/// the resulting type of the Field's underlying Grid
+typedef Grid<FieldCell, DIM> FieldGrid;
 
 
 /// value of type VAL defined as a function of position over the simulation Space
@@ -41,12 +45,9 @@ typedef Grid<FieldScalar, DIM> FieldGrid;
 class Field : public Object
 {
 public:
-
-    /// forward the type of value
-    typedef FieldGrid::value_type value_type;
     
     /// Grid data object
-    FieldGrid  mGrid;
+    FieldGrid mGrid;
     
     /// property
     FieldProp const* prop;
@@ -57,10 +58,10 @@ private:
     Field();
     
     /// duplicate field
-    real*    fiTMP;
+    real * fiTMP;
     
     /// allocated size of fiTMP
-    size_t   fiTMPSize;
+    size_t fiTMPSize;
     
     /// matrix for diffusion
     SparMatSym1 fiDiffusionMatrix;
@@ -166,24 +167,24 @@ public:
     real cellVolume() const { return mGrid.cellVolume(); }
     
     /// access to data
-    value_type& cell(const real w[]) const { return mGrid.cell(w); }
+    FieldCell& cell(const real w[]) const { return mGrid.cell(w); }
     
     /// access to data
     size_t nbCells() const { return mGrid.nbCells(); }
 
     /// info
-    void infoValues(value_type& s, value_type& n, value_type& x) const { return mGrid.infoValues(s, n, x); }
+    void infoValues(FieldCell& s, FieldCell& a, FieldCell& n, FieldCell& x) const { return mGrid.infoValues(s, a, n, x); }
     
     //------------------------------ simulation --------------------------------
 #pragma mark -
     
     /// set all cells to value = volume * conc
-    void setConcentration(FieldGrid::value_type conc)
+    void setConcentration(FieldCell conc)
     {
 #if 0
-        mGrid.setValues( conc * mGrid.cellVolume() );
+        mGrid.setValues( mGrid.cellVolume() * conc );
 #else
-        FieldGrid::value_type val = conc * mGrid.cellVolume();
+        FieldCell val = conc * mGrid.cellVolume();
         for ( size_t i = 0; i < mGrid.nbCells(); ++i )
             mGrid[i] = val * RNG.exponential();
 #endif
@@ -191,10 +192,10 @@ public:
     
     
     /// set cells that are inside `spc` to value = volume * conc
-    void setConcentration(Space const* spc, FieldGrid::value_type in, FieldGrid::value_type ou)
+    void setConcentration(Space const* spc, FieldCell val_in, FieldCell val_out)
     {
-        real i = in * mGrid.cellVolume();
-        real o = ou * mGrid.cellVolume();
+        FieldCell i = val_in * mGrid.cellVolume();
+        FieldCell o = val_out * mGrid.cellVolume();
         
         for ( size_t c = 0; c < mGrid.nbCells(); ++c )
         {
@@ -254,15 +255,6 @@ public:
     
     //------------------------------ read/write --------------------------------
 #pragma mark -
-    
-    /// print total, minimum and maximum value
-    void document(std::ostream& out) const
-    {
-        real vol = mGrid.cellVolume();
-        FieldGrid::value_type sum, mn, mx;
-        mGrid.infoValues(sum, mn, mx);
-        out << prop->name() << " sum " << sum << " min " << mn/vol << " max " << mx/vol << std::endl;
-    }
     
     /// write Field to file using VAL::write()
     /** Some of this should be moved to Grid */

@@ -265,8 +265,13 @@ void Sphere::setDragCoefficientPiston()
     real thick = 0.5 * prop->confine_space_ptr->thickness();
     real eps = ( thick - rad ) / rad;
     
-    if ( eps <= 0 || eps > 1 )
+    if ( eps <= 0 )
         throw InvalidParameter("Sphere's mobility piston formula yields invalid value");
+    if ( eps > 1 )
+    {
+        Cytosim::log("Sphere's mobility piston formula inapplicable");
+        return;
+    }
 
     spDrag    = M_PI*M_PI*prop->viscosity*rad * 2.25 * M_SQRT2 * std::pow(eps,-2.5);
     spDragRot = M_PI*M_PI*prop->viscosity*rad * rad * rad * std::sqrt(8/eps);

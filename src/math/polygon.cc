@@ -250,10 +250,7 @@ void Polygon::inflate(real eps)
     }
     
     if ( npts_ > 1 )
-    {
-        pts_[npts_].xx = pts_[0].xx;
-        pts_[npts_].yy = pts_[0].yy;
-    }
+        pts_[npts_] = pts_[0];
 }
 
 
@@ -332,12 +329,7 @@ finish:
             res = 1;
         }
         
-        if ( npts_ > 1 )
-        {
-            pts_[npts_] = pts_[0];
-            pts_[npts_].dx = pts_[0].dx;
-            pts_[npts_].dy = pts_[0].dy;
-        }
+        pts_[npts_] = pts_[0];
     }
 
     return res;

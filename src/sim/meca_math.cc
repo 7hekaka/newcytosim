@@ -200,7 +200,7 @@ inline static double truncate_double(const double& arg)
 }
 
 /// reduce precision of double
-void truncate_double(size_t siz, double* mat)
+static void truncate_double(size_t siz, double* mat)
 {
     for ( size_t i = 0; i < siz*siz; ++i )
     {

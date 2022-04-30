@@ -5,10 +5,8 @@
 
 #include "real.h"
 #include "iowrapper.h"
+#include <iostream>
 
-#ifdef DISPLAY
-#  include "gle_color.h"
-#endif
 
 /// Scalar type (real) for a Field
 /**
@@ -19,7 +17,7 @@ class FieldScalar
 public:
     
     /// single scalar value
-    real  val;
+    real val;
     
 public:
     
@@ -35,22 +33,15 @@ public:
     /// set to zero
     void clear()                      { val = 0; }
     
+    /// comparison
+    bool negative() const { return val < 0; }
+
     /// write
     void write(Outputter& out) const  { out.writeFloat(val); }
     
     /// read
     void read(Inputter& in)           { val = in.readFloat(); }
-    
-#ifdef DISPLAY
-    /// set OpenGL color associated with value
-    gle_color color(const real scale) const
-    {
-        gle_color::COLOF x(scale * val);
-        if ( x > 0 )
-            return gle_color::jet_color_dark(x, 1.0);
-        return gle_color(-x, 0, -x);
-    }
-#endif
+
 };
 
 
@@ -62,38 +53,68 @@ template < size_t N >
 class FieldVector
 {
     /// vector of values
-    real  val[N];
+    real val[N];
     
 public:
     
     /// the dimensionality (given as template argument)
-    static const int nFields = N;
+    static const int dimension_ = N;
     
-    /// access to the vector components
-    real& operator[](size_t n)        { assert_true(n<N); return val[n]; }
+    /// constructor
+    FieldVector<N>() { for (size_t i=0; i<N; ++i) val[i] = 0; }
+
+    /// constructor
+    FieldVector<N>(real x) { for (size_t i=0; i<N; ++i) val[i] = x; }
 
     /// set to zero
-    void clear()                      { for (int n=0; n<N; ++n) val[n] = 0; }
+    void clear() { for (size_t i=0; i<N; ++i) val[i] = 0; }
+
+    /// access to the vector components
+    real const& operator[](size_t i) const { assert_true(i<N); return val[i]; }
+
+    /// access to modifiable vector components
+    real& operator[](size_t i)        { assert_true(i<N); return val[i]; }
+
+    /// multiplication
+    FieldVector<N> operator * (real x) const { FieldVector R; for (size_t i=0; i<N; ++i) R[i] = val[i] * x; return R; }
+    
+    /// addition
+    FieldVector<N> operator + (FieldVector<N> const& X) { FieldVector R; for (size_t i=0; i<N; ++i) R[i] = val[i] + X[i]; return R; }
+    
+    /// substractions
+    FieldVector<N> operator - (FieldVector<N> const& X) { FieldVector R; for (size_t i=0; i<N; ++i) R[i] = val[i] - X[i]; return R; }
+
+    /// comparison
+    bool negative() const { for (size_t i=1; i<N; ++i) if ( val[i] < 0 ) return true; return false; }
+
+    /// assignment
+    void operator = (real x) { for (size_t i=0; i<N; ++i) val[i] = x; }
+    
+    /// accumulation
+    void operator += (FieldVector<N> const& X) { for (size_t i=0; i<N; ++i) val[i] += X[i]; }
+    
+
+    /// minimization
+    void e_min(FieldVector<N> const& X) { for (size_t i=0; i<N; ++i) val[i] = std::min(val[i], X[i]); }
+    
+    /// maximization
+    void e_max(FieldVector<N> const& X) { for (size_t i=0; i<N; ++i) val[i] = std::max(val[i], X[i]); }
+
+    /// read
+    void read(Inputter& in)          { for (size_t i=0; i<N; ++i) val[i] = in.readFloat(); }
     
     /// write
-    void write(Outputter& out) const  { for (int n=0; n<N; ++n) out.writeFloat(val[n]); }
-    
-    /// read
-    void read(Inputter& in)           { for (int n=0; n<N; ++n) val[n] = in.readFloat(); }
+    void write(Outputter& out) const { for (size_t i=0; i<N; ++i) out.writeFloat(val[i]); }
 
-#ifdef DISPLAY
-    /// set OpenGL color associated with value, scaled by 'mag'
-    gle_color color(const real mag) const
-    {
-        //this maps val[0] to the red channel, val[1] to green and val[2] to blue
-        gle_color::COLOF rgb[3] = { 0, 0, 0 };
-        const int sup = std::min(3UL, N);
-        for ( int c = 0; c < sup; ++c )
-           rgb[c] = mag * val[c];
-        return gle_color(rgb[0], rgb[1], rgb[2]);
-    }
-#endif
 };
+
+/// output
+template < size_t N >
+std::ostream& operator << (std::ostream& os, FieldVector<N> const& FV) { for (size_t i=0; i<N; ++i) os << " " << FV[i]; return os; }
+
+/// input
+template < size_t N >
+std::istream& operator >> (std::istream& is, FieldVector<N>& FV) { for (size_t i=0; i<N; ++i) is >> FV[i]; return is; }
 
 
 #endif

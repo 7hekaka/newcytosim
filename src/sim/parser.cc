@@ -42,11 +42,14 @@ void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t
     if ( opt.has_warning(war, cnt) )
     {
         size_t L;
-        Cytosim::log << war << " in `" << StreamFunc::get_line(is, ipos, L) << "' (line " << L << ")\n";
-        // also report to standard error:
-        print_yellow(std::cerr, war);
-        std::cerr << '\n';
-        StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        if ( ! Cytosim::log.is_silent() )
+        {
+            Cytosim::log << war << " in `" << StreamFunc::get_line(is, ipos, L) << "' (line " << L << ")\n";
+            // also report to standard error:
+            print_yellow(std::cerr, war);
+            std::cerr << '\n';
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+        }
     }
 }
 
@@ -528,7 +531,6 @@ void Parser::parse_delete(std::istream& is)
 void Parser::parse_move(std::istream& is)
 {
     bool move_all = false;
-    std::streampos ipos = is.tellg();
 
     std::string name = Tokenizer::get_symbol(is);
     if ( name == "all" )
@@ -542,7 +544,7 @@ void Parser::parse_move(std::istream& is)
     {
         Vector vec;
         std::stringstream ss(blok);
-        if ( is >> vec )
+        if ( ss >> vec )
             execute_move(name, vec);
     }
 }

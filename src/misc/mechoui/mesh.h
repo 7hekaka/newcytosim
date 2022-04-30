@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include "vector3.h"
+#include <cstdio>
 class MechouiParam;
 
 /// something in 3D

@@ -22,7 +22,6 @@
 #include "space_set.h"
 #include "event_set.h"
 #include "property_list.h"
-#include "field_values.h"
 #include "meca.h"
 
 class Meca1D;

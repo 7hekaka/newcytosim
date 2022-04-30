@@ -2032,17 +2032,17 @@ void Simul::reportField(std::ostream& out) const
     out << COM << ljust("class", 2, 2);
     out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max";
     
+    FieldCell s, a, n, x;
     // report total substance in each Field
     for ( Field const* obj=fields.first(); obj; obj=obj->next() )
     {
-        real vol = obj->cellVolume();
-        Field::value_type s, n, x;
-        obj->infoValues(s, n, x);
+        const real alpha = 1.0 / obj->cellVolume();
+        obj->infoValues(s, a, n, x);
         out << LIN << ljust(obj->prop->name(), 2);
         out << SEP << s;
-        out << SEP << s / ( vol * obj->nbCells() );
-        out << SEP << n / vol;
-        out << SEP << x / vol;
+        out << SEP << a * alpha;
+        out << SEP << n * alpha;
+        out << SEP << x * alpha;
     }
 }
 

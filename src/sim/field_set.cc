@@ -89,7 +89,7 @@ void FieldSet::newObjects(ObjectList& res, const std::string& name, Glossary& op
     obj->setField();
         
     // an initial concentration can be specified:
-    Field::value_type val = 0;
+    FieldCell val(0);
     if ( opt.set(val, "value", "initial_value") )
     {
         std::string str;

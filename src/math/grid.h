@@ -363,13 +363,13 @@ public:
         size_t lz = MAP::image(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
         size_t uz = MAP::image(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
 
-        CELL * cul = gCell + (uy+lz), rul = cul[lx] + ax * ( cul[ux] - cul[lx] );
-        CELL * cuu = gCell + (uy+uz), ruu = cuu[lx] + ax * ( cuu[ux] - cuu[lx] );
-        CELL * cll = gCell + (ly+lz), rll = cll[lx] + ax * ( cll[ux] - cll[lx] );
-        CELL * clu = gCell + (ly+uz), rlu = clu[lx] + ax * ( clu[ux] - clu[lx] );
+        CELL * cul = gCell + (uy+lz), rul = cul[lx] + ( cul[ux] - cul[lx] ) * ax;
+        CELL * cuu = gCell + (uy+uz), ruu = cuu[lx] + ( cuu[ux] - cuu[lx] ) * ax;
+        CELL * cll = gCell + (ly+lz), rll = cll[lx] + ( cll[ux] - cll[lx] ) * ax;
+        CELL * clu = gCell + (ly+uz), rlu = clu[lx] + ( clu[ux] - clu[lx] ) * ax;
 
-        CELL x = rll + az * ( rlu - rll );
-        return x + ay * ( rul + az * ( ruu - rul ) - x );
+        CELL x = rll + ( rlu - rll ) * az;
+        return x + ( rul + ( ruu - rul ) * az - x ) * ay;
         //return (1-ay) * ( rll + az * (rlu-rll) ) + ay * ( rul + az * (ruu-rul) );
     }
 
@@ -381,31 +381,32 @@ public:
     void setValues(const CELL val)
     {
         assert_true( MAP::mNbCells <= gAllocated );
-        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
-            gCell[ii] = val;
+        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+            gCell[i] = val;
     }
     
     /// multiply all cells by `val`
     void scaleValues(const CELL val)
     {
         assert_true ( MAP::mNbCells <= gAllocated );
-        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
-            gCell[ii] *= val;
+        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+            gCell[i] *= val;
     }
     
     /// get sum, minimum and maximum value over all cells
-    void infoValues(CELL& sum, CELL& mn, CELL& mx) const
+    void infoValues(CELL& sum, CELL& avg, CELL& mn, CELL& mx) const
     {
         assert_true( MAP::mNbCells <= gAllocated );
         sum = 0;
         mn = gCell[0];
         mx = gCell[0];
-        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
+        for ( size_t i = 0; i < MAP::mNbCells; ++i )
         {
-            if ( gCell[ii] < mn ) mn = gCell[ii];
-            if ( gCell[ii] > mx ) mx = gCell[ii];
-            sum += gCell[ii];
+            mn.e_min(gCell[i]);
+            mx.e_max(gCell[i]);
+            sum += gCell[i];
         }
+        avg = sum * ( 1.0 / MAP::mNbCells );
     }
 
     /// sum of all values, if CELL supports the addition
@@ -413,8 +414,8 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL result = 0;
-        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
-            result += gCell[ii];
+        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+            result += gCell[i];
         return result;
     }
     
@@ -423,11 +424,8 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL res = gCell[0];
-        for ( size_t ii = 1; ii < MAP::mNbCells; ++ii )
-        {
-            if ( res < gCell[ii] )
-                res = gCell[ii];
-        }
+        for ( size_t i = 1; i < MAP::mNbCells; ++i )
+            res.e_min(gCell[i]);
         return res;
     }
     
@@ -436,11 +434,8 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL res = gCell[0];
-        for ( size_t ii = 1; ii < MAP::mNbCells; ++ii )
-        {
-            if ( res > gCell[ii] )
-                res = gCell[ii];
-        }
+        for ( size_t i = 1; i < MAP::mNbCells; ++i )
+            res.e_max(gCell[i]);
         return res;
     }
     
@@ -448,8 +443,8 @@ public:
     bool hasNegativeValue() const
     {
         assert_true( MAP::mNbCells <= gAllocated );
-        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
-            if ( gCell[ii] < 0 )
+        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+            if ( gCell[i].negative() )
                 return true;
         return false;
     }
@@ -501,12 +496,12 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         real w[ORD];
-        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
+        for ( size_t i = 0; i < MAP::mNbCells; ++i )
         {
-            MAP::setPositionFromIndex(w, ii, offset);
+            MAP::setPositionFromIndex(w, i, offset);
             for ( int d=0; d < ORD; ++d )
                 fprintf(file, "%7.2f ", w[d]);
-            fprintf(file,"  %f\n", gCell[ii]);
+            fprintf(file,"  %f\n", gCell[i]);
         }
     }
     
@@ -515,13 +510,13 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         real l[ORD], r[ORD];
-        for ( size_t ii = 0; ii < MAP::mNbCells; ++ii )
+        for ( size_t i = 0; i < MAP::mNbCells; ++i )
         {
-            MAP::setPositionFromIndex(l, ii, 0.0);
-            MAP::setPositionFromIndex(r, ii, 1.0);
+            MAP::setPositionFromIndex(l, i, 0.0);
+            MAP::setPositionFromIndex(r, i, 1.0);
             for ( int d=0; d < ORD; ++d )
                 fprintf(file, "%7.2f %7.2f  ", l[d], r[d]);
-            fprintf(file,"  %f\n", gCell[ii]);
+            fprintf(file,"  %f\n", gCell[i]);
         }
     }
 };

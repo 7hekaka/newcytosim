@@ -1252,6 +1252,8 @@ VisibleLattice const* Fiber::visibleLattice() const
 //------------------------------------------------------------------------------
 #pragma mark - Mesh
 
+#if FIBER_HAS_MESH
+
 /**
  */
 void Fiber::setMeshValues(Lattice<real>& lat, real density) const
@@ -1407,7 +1409,7 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
         for ( auto h = inf; h < sup; ++h )
             site[h] -= fac * ( site[h+1] - site[h] );
         
-        prop->field_ptr->cell(posEndM()) -= fac * s;
+        fld->cell(posEndM()) -= fac * s;
         site[sup] += fac * site[sup];
     }
     else
@@ -1417,7 +1419,7 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
         for ( auto h = sup; h > inf; --h )
             site[h] -= fac * ( site[h] - site[h-1] );
         
-        prop->field_ptr->cell(posEndP()) += fac * s;
+        fld->cell(posEndP()) += fac * s;
         site[inf] -= fac * site[inf];
     }
 }
@@ -1500,6 +1502,7 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
     }
 }
 
+#endif
 
 void Fiber::infoMesh(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
 {

@@ -60,6 +60,12 @@ namespace Cytosim
             return out_;
         }
         
+        /// true if output is /dev/null
+        bool is_silent()
+        {
+            return out_.rdbuf() == nul_.rdbuf();
+        }
+
         /// direct output to /dev/null
         void silent()
         {
