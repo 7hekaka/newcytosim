@@ -1624,8 +1624,8 @@
 		BB74F418231C334D0019D68E /* sparmatblk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sparmatblk.h; sourceTree = "<group>"; };
 		BB74F419231C334D0019D68E /* sparmatblk.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sparmatblk.cc; sourceTree = "<group>"; };
 		BB74F41F232024AB0019D68E /* byteswap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = byteswap.h; sourceTree = "<group>"; };
-		BB7662C310E923A200C93DF6 /* frame_reader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_reader.cc; path = src/play/frame_reader.cc; sourceTree = SOURCE_ROOT; };
-		BB7662C410E923A200C93DF6 /* frame_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_reader.h; path = src/play/frame_reader.h; sourceTree = SOURCE_ROOT; };
+		BB7662C310E923A200C93DF6 /* frame_reader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_reader.cc; path = src/sim/frame_reader.cc; sourceTree = SOURCE_ROOT; };
+		BB7662C410E923A200C93DF6 /* frame_reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_reader.h; path = src/sim/frame_reader.h; sourceTree = SOURCE_ROOT; };
 		BB767DA927A9C2210060D3FA /* bitmap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitmap.cc; sourceTree = "<group>"; };
 		BB767DAB27AD01B40060D3FA /* meca_steric.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_steric.cc; sourceTree = "<group>"; };
 		BB767DAE27AE6D140060D3FA /* meca_util.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = meca_util.cc; sourceTree = "<group>"; };
@@ -2598,6 +2598,8 @@
 				BB6662D315A1A75A0028AA2E /* interface.cc */,
 				BB5D4CA012BCBE2900A1312F /* parser.h */,
 				BB5D4C9F12BCBE2900A1312F /* parser.cc */,
+				BB7662C410E923A200C93DF6 /* frame_reader.h */,
+				BB7662C310E923A200C93DF6 /* frame_reader.cc */,
 			);
 			name = interface;
 			sourceTree = "<group>";
@@ -2729,8 +2731,6 @@
 			children = (
 				BB2BF8D60E085C3C0024546A /* makefile.inc */,
 				BB72EA682662266D00FF7352 /* CMakeLists.txt */,
-				BB7662C410E923A200C93DF6 /* frame_reader.h */,
-				BB7662C310E923A200C93DF6 /* frame_reader.cc */,
 				BB0E885516FBC81400451517 /* sim_thread.h */,
 				BB0E885416FBC81400451517 /* sim_thread.cc */,
 				BB9CED2A07E21B0F00887531 /* player.h */,
