@@ -10,10 +10,6 @@
 #include <sstream>
 
 
-/// This is used to align text in the error messages
-extern const char PREF[];
-
-
 /// A mechanism to handle errors (see C++ manual)
 /**
  The exception carry a 'message' and associated 'info', which are both strings.

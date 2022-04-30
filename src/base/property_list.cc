@@ -3,6 +3,9 @@
 #include "exceptions.h"
 #include <iomanip>
 
+/// This is used to align text in the error messages
+extern const char PREF[];
+
 void PropertyList::erase()
 {
     for ( Property const* i : vec_ )

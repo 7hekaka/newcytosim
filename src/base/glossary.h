@@ -12,6 +12,11 @@
 #include <vector>
 #include <map>
 
+
+/// This is used to align text in the error messages
+extern const char PREF[];
+
+
 /// Glossary holds a list of (key, values) where both key and values are strings
 /** 
  This class is used for reading configuration files:

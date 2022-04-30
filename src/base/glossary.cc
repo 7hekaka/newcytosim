@@ -9,6 +9,9 @@
 #include <cctype>
 #include <iomanip>
 
+/// This is used to align text in error messages
+const char PREF[] = "          : ";
+
 
 // Use the second definition to get some reports:
 #define VLOG0(ARG) ((void) 0)
