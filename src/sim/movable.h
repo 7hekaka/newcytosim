@@ -61,6 +61,8 @@ public:
     /// constructor
     Movable() {}
     
+    /// destructor
+    ~Movable() {}
     
     /// true if object can be translated (default=false)
     /**

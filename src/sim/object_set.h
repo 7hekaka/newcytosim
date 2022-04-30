@@ -7,7 +7,6 @@
 #include "object_pool.h"
 #include "inventory.h"
 #include "property.h"
-#include <vector>
 
 class Outputter;
 class PropertyList;
