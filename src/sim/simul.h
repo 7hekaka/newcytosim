@@ -50,8 +50,8 @@ public:
     unsigned doAttachCounter;
 #endif
     
-    /// flag to restart a fresh simulation from the current config file
-    unsigned doRestart;
+    /// flag to end the 'run' as soon as possible
+    unsigned abortRun;
 
 private:
     

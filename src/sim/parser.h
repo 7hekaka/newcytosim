@@ -33,7 +33,7 @@ private:
     bool do_write;
     
     /// counters for the 'restart' command
-    size_t restart_, restart_max;
+    size_t restart_;
     
     //--------------------------------------------------------------------------
     

@@ -919,14 +919,14 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         ++frm;
         check = size_t(delta*(frm+1));
 
-        if ( do_write || simul_.doRestart )
+        if ( do_write || simul_.abortRun )
         {
             simul_.relax();
             simul_.writeObjects(simul_.prop.system_file, true, binary);
             reportCPUtime(simul_.time());
             simul_.sMeca.doNotify = 2;  // to print convergence parameters
             simul_.unrelax();
-            if ( simul_.doRestart )
+            if ( simul_.abortRun )
                 break;
         }
     } while ( sss < nb_steps );

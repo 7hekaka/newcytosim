@@ -187,7 +187,6 @@ void Simul::step()
             //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
         }
     }
-
     // This will also update all the attached Hands
     fibers.step();
 }

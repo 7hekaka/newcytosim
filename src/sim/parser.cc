@@ -32,7 +32,6 @@ Parser::Parser(Simul& sim, bool c, bool s, bool n, bool r, bool w)
 : Interface(sim), do_change(c), do_set(s), do_new(n), do_run(r), do_write(w)
 {
     restart_ = 0;
-    restart_max = 0;
 }
 
 /// check for unused values in Glossary and issue a warning
@@ -1206,9 +1205,18 @@ int Parser::evaluate_one(std::istream& is)
         parse_connect(is);
     else if ( tok == "restart" )
     {
-        Tokenizer::get_integer(is, restart_max);
-        simul_.doRestart = 1;
-        return 0;
+        size_t cnt = 1;
+        Tokenizer::get_integer(is, cnt);
+        if ( do_run )
+        {
+            if ( ++restart_ > cnt )
+                return 2;
+            // reset simulation and rewind the config file
+            simul_.erase_all(1);
+            is.seekg(0);
+            is.clear();
+            return 0;
+        }
     }
     else if ( tok == "stop" )
         return 2;
@@ -1263,18 +1271,6 @@ void Parser::evaluate(std::istream& is)
             
             if ( evaluate_one(is) )
                 break;
-            
-            if ( simul_.doRestart )
-            {
-                simul_.doRestart = 0;
-                if ( do_run && ++restart_ < restart_max )
-                {
-                    // reset simulation and rewind the config file
-                    simul_.erase_all(1);
-                    is.seekg(0);
-                    is.clear();
-                }
-            }
         }
     }
     catch( Exception & e )
