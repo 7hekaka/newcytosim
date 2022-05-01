@@ -84,8 +84,11 @@ public:
     /// print message to identify thread
     void gubed(const char *) const;
 
-    /// create a SimThread with given holding function callback
+    /// create a SimThread with given Simul
     SimThread(Simul*);
+    
+    /// create a SimThread to be initialized later
+    SimThread() : SimThread(nullptr) {}
     
     /// destructor
     ~SimThread();

@@ -67,7 +67,7 @@ public:
     Simul* simul() const { return sim_; }
     
     /// change Simul pointer
-    void simul(Simul* s) { sim_ = s; }
+    void set_simul(Simul* s) { sim_ = s; }
 
     /// return unmodifiable SimulProp
     SimulProp const& simulProp() const;
