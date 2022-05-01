@@ -51,7 +51,6 @@ namespace gym
 
     float* mapFloatBuffer(size_t cnt)
     {
-        assert_true(!glIsEnabled(GL_COLOR_ARRAY));
         glBindBuffer(GL_ARRAY_BUFFER, nextStream());
         glBufferData(GL_ARRAY_BUFFER, cnt*Q, nullptr, GL_STREAM_DRAW);
         void* ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
