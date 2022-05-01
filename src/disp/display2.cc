@@ -162,24 +162,6 @@ void Display2::drawCouplesF1(CoupleSet const& set) const
 }
 
 
-PointDisp const* Couple::disp12() const
-{
-    if ( disp1()->visible )
-        return disp1();
-    else
-        return disp2();
-}
-
-
-PointDisp const* Couple::disp21() const
-{
-    if ( disp2()->visible )
-        return disp2();
-    else
-        return disp1();
-}
-
-
 /**
  Display either Hand1 or Hand2, exposing both sides with equal chances.
  This gives the impression that Couple flicker randomly between frames,
