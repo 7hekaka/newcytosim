@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
         simul.initialize(arg);
         arg.print_warnings(cerr, 1, " on command line\n");
         time_t sec = TimeDate::seconds_since_1970();
-        Parser(simul, 1, 1, 1, 1, 1).readConfig();
+        Parser(&simul, 1, 1, 1, 1, 1).readConfig();
         Cytosim::out << "% " << TimeDate::date_string() << '\n';
         sec = TimeDate::seconds_since_1970() - sec;
         Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";

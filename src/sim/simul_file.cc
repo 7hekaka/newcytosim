@@ -740,7 +740,7 @@ void Simul::loadProperties(const char file[])
     std::ifstream is(file, std::ifstream::in);
     if ( !is.good() )
         throw InvalidIO("could not find or read `"+std::string(file)+"'");
-    Parser(*this, 1, 1, 0, 0, 0).evaluate(is);
+    Parser(this, 1, 1, 0, 0, 0).evaluate(is);
 }
 
 
@@ -754,5 +754,5 @@ void Simul::loadProperties()
 #endif
     if ( !is.good() )
         throw InvalidIO("could not find or read `"+file+"'");
-    Parser(*this, 1, 1, 0, 0, 0).evaluate(is);
+    Parser(this, 1, 1, 0, 0, 0).evaluate(is);
 }

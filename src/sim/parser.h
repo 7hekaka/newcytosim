@@ -99,8 +99,8 @@ private:
 public:
     
     /// construct a Parser with given permissions
-    Parser(Simul&, bool Change, bool Set, bool New, bool Run, bool Write);
-
+    Parser(Simul*, bool Change, bool Set, bool New, bool Run, bool Write);
+    
     /// Parse next command in stream, advance stream pointer, return 0 if success
     int  evaluate_one(std::istream&);
     

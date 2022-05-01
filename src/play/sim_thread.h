@@ -14,9 +14,6 @@
  */
 class SimThread : private Parser
 {
-    /// disabled default constructor
-    SimThread();
-    
     /// cleanup callback
     friend void child_cleanup(void*);
     
@@ -83,7 +80,7 @@ public:
     void gubed(const char *) const;
 
     /// create a SimThread with given holding function callback
-    SimThread(Simul&, void (*callback)(void));
+    SimThread(Simul*, void (*callback)(void));
     
     /// destructor
     ~SimThread();
@@ -149,7 +146,7 @@ public:
     void restart();
 
     /// clear the simulation world
-    void clear();
+    void erase_simul(bool);
     
     /// execute commands from standard input, return number of lines processed
     size_t executePipedCommands(size_t max_nb_lines);

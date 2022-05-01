@@ -16,7 +16,7 @@ using glApp::flashText;
 
 
 Player::Player()
-: disp("*"), prop("*"), worker(simul, glApp::postRedisplay), mDisplay(nullptr)
+: disp("*"), prop("*"), worker(&simul, glApp::postRedisplay), mDisplay(nullptr)
 {
 }
 
@@ -28,7 +28,7 @@ Player::~Player()
 void Player::clear()
 {
     worker.stop();
-    worker.clear();
+    worker.erase_simul(1);
     dispList.erase();
     if ( mDisplay )
         delete(mDisplay);
@@ -177,7 +177,7 @@ void Player::restart()
     try
     {
         worker.stop();
-        worker.clear();
+        worker.erase_simul(1);
         dispList.erase();
         worker.start();
     }

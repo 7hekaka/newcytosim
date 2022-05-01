@@ -28,7 +28,7 @@
  - do_write: can write to disc
  .
  */
-Parser::Parser(Simul& sim, bool c, bool s, bool n, bool r, bool w)
+Parser::Parser(Simul* sim, bool c, bool s, bool n, bool r, bool w)
 : Interface(sim), do_change(c), do_set(s), do_new(n), do_run(r), do_write(w)
 {
     restart_ = 0;
@@ -51,6 +51,7 @@ void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t
         }
     }
 }
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Parse
@@ -130,11 +131,11 @@ void Parser::parse_set(std::istream& is)
             else
 #endif
             opt.read(blok);
-            simul_.rename(name);
+            sim_->rename(name);
             change_simul_property(opt);
         }
     }
-    else if ( simul_.isCategory(cat) && !spec )
+    else if ( isCategory(cat) && !spec )
     {
         /* in this form:
          set CLASS NAME { PARAMETER = VALUE }
@@ -256,7 +257,7 @@ void Parser::parse_change(std::istream& is)
     {
         change_all = true;
         name = Tokenizer::get_symbol(is);
-        if ( !simul_.isCategory(name) )
+        if ( !isCategory(name) )
             throw InvalidSyntax("`"+name+"' is not a known class of object");
     }
 
@@ -287,7 +288,7 @@ void Parser::parse_change(std::istream& is)
             is.get();
             change_all = true;
         }
-        else if ( para.size() && simul_.findProperty(name, para) )
+        else if ( para.size() && simul().findProperty(name, para) )
         {
             //change CLASS NAME { VALUE }
             name = para;
@@ -379,7 +380,7 @@ void Parser::parse_new(std::istream& is)
     
 #if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
-    if ( simul_.isCategory(name) )
+    if ( isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -489,7 +490,7 @@ void Parser::parse_delete(std::istream& is)
     std::string name = Tokenizer::get_symbol(is);
 #if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
-    if ( simul_.isCategory(name) )
+    if ( isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -578,7 +579,7 @@ void Parser::parse_mark(std::istream& is)
     std::string name = Tokenizer::get_symbol(is);
 #if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
-    if ( simul_.isCategory(name) )
+    if ( isCategory(name) )
     {
         std::string str = Tokenizer::get_symbol(is);
         if ( !str.empty() )
@@ -685,7 +686,7 @@ void Parser::parse_run(std::istream& is)
         if ( is.peek() == '*' )
         {
             is.get();
-            name = simul_.prop.name();
+            name = simulProp().name();
         }
     }
 #endif
@@ -697,14 +698,14 @@ void Parser::parse_run(std::istream& is)
         if ( Tokenizer::get_symbol(is) != "simul" )
             throw InvalidSyntax("expected `run all simul { }')");
         // There can only be one Simul object:
-        name = simul_.prop.name();
+        name = simulProp().name();
     }
 
     std::string blok = Tokenizer::get_block(is, '{');
     
     if ( do_run )
     {
-        if ( name != "*"  &&  name != simul_.prop.name() )
+        if ( name != "*"  &&  name != simulProp().name() )
             throw InvalidSyntax("unknown simul name `"+name+"'");
 
         Glossary opt(blok);
@@ -722,7 +723,7 @@ void Parser::parse_run(std::istream& is)
                 {
                     if ( span <= 0 )
                         throw InvalidParameter("duration must be >= 0'");
-                    cnt = (size_t)std::ceil(span/simul_.time_step());
+                    cnt = (size_t)std::ceil(span/simulProp().time_step);
                     opt.clear("duration");
                     opt.clear("time");
                 }
@@ -1039,7 +1040,7 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( size_t c = 0; c < cnt; ++c )
     {
-        if ( simul_.prop.verbose )
+        if ( simulProp().verbose )
             Cytosim::log("repeat code %lu/%lu\n", c+1, cnt);
         evaluate(code);
     }
@@ -1136,21 +1137,7 @@ void Parser::parse_dump(std::istream& is)
         Glossary opt(blok);
         int mode = 1;
         opt.set(mode, "mode");
-
-        simul_.sMeca.doNotify = 1;
-        simul_.solve_half();
-        
-        int cwd = FilePath::change_dir(str, true);
-        Cytosim::log("Cytosim is dumping a system of size %lu in `%s'...", simul_.sMeca.dimension(), str.c_str());
-
-        if ( mode & 1 ) simul_.sMeca.saveSystem();
-        if ( mode & 2 ) simul_.sMeca.dumpSystem();
-        if ( mode & 4 ) simul_.sMeca.exportSystem();
-        if ( mode & 8 ) simul_.sMeca.saveMatrixBitmaps();
-        if ( mode & 16 ) simul_.sMeca.saveConnectivityBitmap();
-
-        FilePath::change_dir(cwd);
-        Cytosim::log("done\n");
+        execute_dump(str, mode);
     }
 }
 
@@ -1212,7 +1199,7 @@ int Parser::evaluate_one(std::istream& is)
             if ( ++restart_ > cnt )
                 return 2;
             // reset simulation and rewind the config file
-            simul_.erase_all(1);
+            erase_simul(1);
             is.seekg(0);
             is.clear();
             return 0;
@@ -1298,14 +1285,14 @@ void Parser::readConfig(std::string const& filename)
     VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change);
     VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
 
-    simul_.parser_ = this;
+    sim_->parser(this);
     evaluate(is);
-    simul_.parser_ = nullptr;
+    sim_->parser(nullptr);
 }
 
 
 void Parser::readConfig()
 {
-    readConfig(simul_.prop.config_file);
+    readConfig(simulProp().config_file);
 }
 

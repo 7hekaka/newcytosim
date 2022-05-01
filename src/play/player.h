@@ -16,7 +16,7 @@
 class FiberDisp;
 class View;
 
-/// Base of the Graphical User Interface for Cytosim
+/// Player is a base for Cytosim's 'play' executable
 class Player
 {
 public:

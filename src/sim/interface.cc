@@ -13,6 +13,7 @@
 #include "messages.h"
 #include "glossary.h"
 #include "time_date.h"
+#include "filepath.h"
 #include "simul.h"
 #include "event.h"
 
@@ -23,9 +24,26 @@
 
 //------------------------------------------------------------------------------
 
-Interface::Interface(Simul& s)
-: simul_(s)
+Interface::Interface(Simul* s)
+: sim_(s)
 {
+}
+
+
+
+SimulProp& Interface::simulProp() const
+{
+    return sim_->prop;
+}
+
+bool Interface::isCategory(std::string const& name) const
+{
+    return sim_->isCategory(name);
+}
+
+void Interface::erase_simul(bool arg) const
+{
+    return sim_->erase_all(arg);
 }
 
 //------------------------------------------------------------------------------
@@ -48,13 +66,13 @@ Property* Interface::execute_set(std::string const& cat, std::string const& name
     /* We do not allow for using the class name to name a property,
     as this should create confusion in the config file */
     
-    Property* pp = simul_.newProperty(cat, name, def);
+    Property* pp = sim_->newProperty(cat, name, def);
     
     if ( !pp )
         throw InvalidSyntax("failed to create property of class `"+cat+"'");
     
     pp->read(def);
-    pp->complete(simul_);
+    pp->complete(*sim_);
     
     return pp;
 }
@@ -63,7 +81,7 @@ Property* Interface::execute_set(std::string const& cat, std::string const& name
 void Interface::change_property(Property * pp, Glossary& def)
 {
     pp->read(def);
-    pp->complete(simul_);
+    pp->complete(*sim_);
     
     /*
      Specific code to make 'change space:dimension' work.
@@ -72,14 +90,14 @@ void Interface::change_property(Property * pp, Glossary& def)
     if ( pp->category() == "space" )
     {
         // update any Space with this property:
-        for ( Space * s = simul_.spaces.first(); s; s=s->next() )
+        for ( Space * s = sim_->spaces.first(); s; s=s->next() )
         {
             if ( s->prop == pp )
             {
                 s->resize(def);
                 // allow Simul to update periodic:
-                if ( s == simul_.spaces.master() )
-                    simul_.spaces.setMaster(s);
+                if ( s == sim_->spaces.master() )
+                    sim_->spaces.setMaster(s);
             }
         }
     }
@@ -88,14 +106,14 @@ void Interface::change_property(Property * pp, Glossary& def)
 
 void Interface::change_simul_property(Glossary& opt)
 {
-    change_property(&simul_.prop, opt);
+    change_property(&sim_->prop, opt);
 }
 
 
 // in this form, 'name' designates the property name
 Property * Interface::execute_change(std::string const& name, Glossary& def, bool strict)
 {
-    Property * pp = simul_.findProperty(name);
+    Property * pp = sim_->findProperty(name);
     
     if ( pp )
     {
@@ -107,7 +125,7 @@ Property * Interface::execute_change(std::string const& name, Glossary& def, boo
         if ( strict )
         {
             InvalidParameter e("unknown property `"+name+"'");
-            e << simul_.properties.all_names(PREF);
+            e << sim_->properties.all_names(PREF);
             throw e;
         }
         else
@@ -121,7 +139,7 @@ Property * Interface::execute_change(std::string const& name, Glossary& def, boo
 
 void Interface::execute_change_all(std::string const& cat, Glossary& def)
 {
-    PropertyList plist = simul_.findAllProperties(cat);
+    PropertyList plist = sim_->findAllProperties(cat);
     
     for ( Property * i : plist )
     {
@@ -157,11 +175,11 @@ Isometry Interface::read_placement(Glossary& opt)
     Isometry iso;
     std::string str;
     
-    Space const* spc = simul_.spaces.master();
+    Space const* spc = sim_->spaces.master();
     
     // Space specified as second argument to 'position'
     if ( opt.set(str, "position", 1) )
-        spc = simul_.findSpace(str);
+        spc = sim_->findSpace(str);
     
     // Position
     if ( opt.set(str, "position") )
@@ -245,9 +263,9 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
     size_t ouf = 0;
     std::string str;
 
-    Space const* spc = simul_.spaces.master();
+    Space const* spc = sim_->spaces.master();
     if ( opt.set(str, "placement", 1) )
-        spc = simul_.findSpace(str);
+        spc = sim_->findSpace(str);
     
     // define a condition:
     bool has_condition = opt.set(str, "placement", 2);
@@ -353,9 +371,9 @@ void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet*
             if ( placement == PLACE_ALL_INSIDE )
             {
                 std::string str;
-                Space const* spc = simul_.spaces.master();
+                Space const* spc = sim_->spaces.master();
                 if ( opt.set(str, "placement", 1) )
-                    spc = simul_.findSpace(str);
+                    spc = sim_->findSpace(str);
                 for ( Object * i : objs )
                 {
                     Mecable * mec = Simul::toMecable(i);
@@ -389,9 +407,9 @@ void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet*
 
     /* 
      Because the objects in ObjectList are not necessarily all of the same class,
-     we call simul_.add() rather than directly set->add()
+     we call sim_->add() rather than directly set->add()
      */
-    simul_.add(objs);
+    sim_->add(objs);
 }
 
 
@@ -401,12 +419,12 @@ void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet*
 void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
 {
     ObjectSet * set = nullptr;
-    Property * pp = simul_.properties.find(name);
+    Property * pp = sim_->properties.find(name);
     // Allows to make an object without an associated Property
     if ( pp )
-        set = simul_.findSet(pp->category());
+        set = sim_->findSet(pp->category());
     else
-        set = simul_.findSet(name);
+        set = sim_->findSet(name);
     if ( !set )
     {
         if ( pp )
@@ -422,7 +440,7 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
         if ( target < amount )
         {
             ObjectList objs = set->collect();
-            simul_.erase(objs, amount-target);
+            sim_->erase(objs, amount-target);
             return;
         }
         // create enough objects to reach target:
@@ -477,7 +495,7 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
         }
     }
 
-    VLOG("+NEW `" << name << "' made " << set->size()-amount << " objects (total " << simul_.nbObjects() << ")");
+    VLOG("+NEW `" << name << "' made " << set->size()-amount << " objects (total " << sim_->nbObjects() << ")");
 }
 
 
@@ -492,12 +510,12 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
  */
 void Interface::execute_new(std::string const& name, size_t cnt)
 {
-    Property * pp = simul_.properties.find_or_die(name);
-    ObjectSet * set = simul_.findSet(pp->category());
+    Property * pp = sim_->properties.find_or_die(name);
+    ObjectSet * set = sim_->findSet(pp->category());
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
-    Space const* spc = simul_.spaces.master();
+    Space const* spc = sim_->spaces.master();
 
     Glossary opt;
 
@@ -529,9 +547,9 @@ void Interface::execute_new(std::string const& name, size_t cnt)
             }
         }
         
-        /* Call simul_.add() rather than directly set->add(), because the objects
+        /* Call sim_->add() rather than directly set->add(), because the objects
          in ObjectList are not necessarily all of the same class */
-        simul_.add(objs);
+        sim_->add(objs);
         objs.clear();
     }
     
@@ -565,7 +583,7 @@ public:
         ous = nullptr;
     }
     
-    void set(Simul& sim, Property* pp, Glossary& opt)
+    void set(Simul* sim, Property* pp, Glossary& opt)
     {
         prp = pp;
         
@@ -575,9 +593,9 @@ public:
             Space const* spc = nullptr;
             std::string spn;
             if ( opt.set(spn, "position", 1) )
-                spc = sim.findSpace(spn);
+                spc = sim->findSpace(spn);
             else
-                spc = sim.spaces.master();
+                spc = sim->spaces.master();
             if ( !spc )
                 throw InvalidSyntax("unknown Space `"+spn+"'");
             
@@ -636,28 +654,28 @@ bool pass_filter(Object const* obj, void const* val)
 
 void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cnt)
 {
-    Property * pp = simul_.properties.find(name);
+    Property * pp = sim_->properties.find(name);
     ObjectSet * set = nullptr;
     if ( pp )
-        set = simul_.findSet(pp->category());
+        set = sim_->findSet(pp->category());
     else
-        set = simul_.findSet(name);
+        set = sim_->findSet(name);
     if ( !set )
     {
         if ( name == "objects" )
         {
-            simul_.erase_all(0);
+            sim_->erase_all(0);
             return;
         }
         throw InvalidSyntax("could not determine the class of `"+name+"'");
     }
     
     Filter filter;
-    filter.set(simul_, pp, opt);
+    filter.set(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter);
     
     if ( objs.size() > 0 )
-        simul_.erase(objs, cnt);
+        sim_->erase(objs, cnt);
     else
         Cytosim::warn << "found no `" << name << "' to delete\n";
 }
@@ -669,7 +687,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
 void Interface::execute_move(std::string const& name, Vector const& pos)
 {
     
-    Object * obj = simul_.findMovable(name);
+    Object * obj = sim_->findMovable(name);
     if ( obj )
         obj->setPosition(pos);
 }
@@ -680,12 +698,12 @@ void Interface::execute_move(std::string const& name, Vector const& pos)
  */
 void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
 {
-    Property * pp = simul_.properties.find(name);
+    Property * pp = sim_->properties.find(name);
     ObjectSet * set = nullptr;
     if ( pp )
-        set = simul_.findSet(pp->category());
+        set = sim_->findSet(pp->category());
     else
-        set = simul_.findSet(name);
+        set = sim_->findSet(name);
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
@@ -695,7 +713,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
     opt.clear("mark");
     
     Filter filter;
-    filter.set(simul_, pp, opt);
+    filter.set(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter);
     
     // optionally limit the list to a random subset
@@ -705,7 +723,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
         objs.truncate(cnt);
     }
     
-    simul_.mark(objs, mk);
+    sim_->mark(objs, mk);
 }
 
 
@@ -725,21 +743,21 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
 
     if ( name == "all" )
     {
-        objs = simul_.fibers.collect();
+        objs = sim_->fibers.collect();
     }
     else
     {
-        Property * pp = simul_.properties.find_or_die(name);
+        Property * pp = sim_->properties.find_or_die(name);
         if ( pp->category() != "fiber" )
             throw InvalidSyntax("only `cut fiber' is supported");
         
         Filter filter;
-        filter.set(simul_, pp, opt);
-        objs = simul_.fibers.collect(pass_filter, &filter);
+        filter.set(sim_, pp, opt);
+        objs = sim_->fibers.collect(pass_filter, &filter);
     }
     
     VLOG("-CUT PLANE (" << n << ").x = " << -a);
-    simul_.fibers.planarCut(objs, n, a, stateP, stateM);
+     sim_->fibers.planarCut(objs, n, a, stateP, stateM);
 }
 
 
@@ -749,14 +767,14 @@ void Interface::execute_connect(std::string const& name, Glossary& opt)
 
     if ( name == "couple" )
     {
-        simul_.couples.bindToIntersections();
+        sim_->couples.bindToIntersections();
     }
     else
     {
-        Property * pp = simul_.properties.find_or_die(name);
+        Property * pp = sim_->properties.find_or_die(name);
         if ( pp->category() != "couple" )
             throw InvalidSyntax("only `bind couple' or `bind couple_class' is supported");
-        simul_.couples.bindToIntersections(static_cast<CoupleProp*>(pp));
+        sim_->couples.bindToIntersections(static_cast<CoupleProp*>(pp));
     }
     
     VLOG("-CONNECT (" << name << ")");
@@ -791,8 +809,8 @@ inline void Interface::step_simul(size_t& sss, size_t cnt)
     {
         hold();
         //fprintf(stderr, "> step %6zu\n", sss);
-        (simul_.*FUNC)();
-        simul_.step();
+        ( sim_->*FUNC)();
+        sim_->step();
         ++sss;
     }
 }
@@ -868,7 +886,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         opt.set(event->rate, "event");
         opt.set(event->activity, "event", 1);
         event->reload(simul_.time());
-        simul_.events.add(event);
+        sim_->events.add(event);
     }
 #endif
     opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
@@ -882,19 +900,19 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     real   delta = (real)nb_steps;
     size_t check = nb_steps;
     
-    simul_.prepare();
+    sim_->prepare();
 
     if ( do_write )
     {
-        simul_.writeProperties(prune);
+        sim_->writeProperties(prune);
         // write initial state:
-        if ( simul_.prop.clear_trajectory )
+        if ( sim_->prop.clear_trajectory )
         {
-            simul_.prop.clear_trajectory = false;
+             sim_->prop.clear_trajectory = false;
             if ( frames > 1 )
-                simul_.writeObjects(simul_.prop.system_file, false, binary);
+                sim_->writeObjects( sim_->prop.system_file, false, binary);
             else
-                std::remove(simul_.prop.system_file.c_str());
+                std::remove( sim_->prop.system_file.c_str());
         }
         delta = real(nb_steps) / real(frames);
         check = size_t(delta);
@@ -919,29 +937,29 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         ++frm;
         check = size_t(delta*(frm+1));
 
-        if ( do_write || simul_.abortRun )
+        if ( do_write || sim_->abortRun )
         {
-            simul_.relax();
-            simul_.writeObjects(simul_.prop.system_file, true, binary);
-            reportCPUtime(simul_.time());
-            simul_.sMeca.doNotify = 2;  // to print convergence parameters
-            simul_.unrelax();
-            if ( simul_.abortRun )
+            sim_->relax();
+            sim_->writeObjects( sim_->prop.system_file, true, binary);
+            reportCPUtime( sim_->time());
+            sim_->sMeca.doNotify = 2;  // to print convergence parameters
+            sim_->unrelax();
+            if ( sim_->abortRun )
                 break;
         }
     } while ( sss < nb_steps );
     
 #if BACKWARD_COMPATIBILITY < 50
     if ( event )
-        simul_.events.erase(event);
+        sim_->events.erase(event);
 #endif
     
-    simul_.relax();
+    sim_->relax();
     if ( frames )
     {
-        simul_.writeProperties(prune);
+        sim_->writeProperties(prune);
         if ( frames < 0 )
-            simul_.writeObjects(simul_.prop.system_file, true, binary);
+            sim_->writeObjects( sim_->prop.system_file, true, binary);
     }
     
     VLOG("+RUN END");
@@ -954,17 +972,17 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 void Interface::execute_run(size_t nb_steps)
 {
     VLOG("-RUN START " << nb_steps);
-    simul_.prepare();
+    sim_->prepare();
     
     for ( size_t sss = 0; sss < nb_steps; ++sss )
     {
         hold();
         //fprintf(stderr, "> step %6zu\n", sss);
-        simul_.solve();
-        simul_.step();
+        sim_->solve();
+        sim_->step();
     }
     
-    simul_.relax();
+    sim_->relax();
     VLOG("-RUN END");
 }
 
@@ -996,7 +1014,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     
     if ( what != "all" && what != "objects" )
     {
-        subset = simul_.findSet(what);
+        subset = sim_->findSet(what);
         if ( !subset )
             throw InvalidIO("expected class specifier (eg. `import all FILE' or `import fiber FILE')");
     }
@@ -1018,12 +1036,12 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     {
         if ( append )
         {
-            real t = simul_.prop.time;
-            simul_.reloadObjects(in, 0, subset);
-            simul_.prop.time = t;
+            real t = sim_->prop.time;
+            sim_->reloadObjects(in, 0, subset);
+            sim_->prop.time = t;
         }
         else
-            simul_.reloadObjects(in, 1, subset);
+            sim_->reloadObjects(in, 1, subset);
         if ( cnt >= frm )
             break;
         ++cnt;
@@ -1037,14 +1055,14 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     int mrk;
     if ( opt.set(mrk, "mark") )
     {
-         simul_.mark(objs, mrk);
+        sim_->mark(objs, mrk);
     }
 #endif
     
     // set time
     real t;
     if ( opt.set(t, "time") )
-        simul_.prop.time = t;
+        sim_->prop.time = t;
 }
 
 
@@ -1066,12 +1084,12 @@ void Interface::execute_export(std::string const& name, std::string const& what,
         {
             opt.set(append, "append");
             opt.set(binary, "binary");
-            simul_.writeObjects(name, append, binary);
+            sim_->writeObjects(name, append, binary);
         }
         else
         {
             Outputter out(stdout, false);
-            simul_.writeObjects(out);
+            sim_->writeObjects(out);
         }
     }
     else if ( what == "properties" )
@@ -1086,7 +1104,7 @@ void Interface::execute_export(std::string const& name, std::string const& what,
             ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
             out.rdbuf(ofs.rdbuf());
         }
-        simul_.writeProperties(out, prune);
+        sim_->writeProperties(out, prune);
     }
     else
         throw InvalidIO("only `objects' or `properties' can be exported");
@@ -1114,37 +1132,55 @@ void Interface::execute_report(std::string const& name, std::string const& what,
     int ver = 1;
     opt.set(ver, "verbose");
 
-    simul_.mono_report(out, what, opt, ver);
+    sim_->mono_report(out, what, opt, ver);
 }
 
 
 void Interface::execute_call(std::string& str, Glossary& opt)
 {
     if ( str == "equilibrate" )
-        simul_.couples.equilibrate();
+        sim_->couples.equilibrate();
     else if ( str == "connect" )
-        simul_.couples.bindToIntersections();
+        sim_->couples.bindToIntersections();
     else if ( str == "custom0" )
-        simul_.custom0(opt);
+        sim_->custom0(opt);
     else if ( str == "custom1" )
-        simul_.custom1(opt);
+        sim_->custom1(opt);
     else if ( str == "custom2" )
-        simul_.custom2(opt);
+        sim_->custom2(opt);
     else if ( str == "custom3" )
-        simul_.custom3(opt);
+        sim_->custom3(opt);
     else if ( str == "custom4" )
-        simul_.custom4(opt);
+        sim_->custom4(opt);
     else if ( str == "custom5" )
-        simul_.custom5(opt);
+        sim_->custom5(opt);
     else if ( str == "custom6" )
-        simul_.custom6(opt);
+        sim_->custom6(opt);
     else if ( str == "custom7" )
-        simul_.custom7(opt);
+        sim_->custom7(opt);
     else if ( str == "custom8" )
-        simul_.custom8(opt);
+        sim_->custom8(opt);
     else if ( str == "custom9" )
-        simul_.custom9(opt);
+        sim_->custom9(opt);
     else
         throw InvalidSyntax("called unknown command");
 }
 
+
+void Interface::execute_dump(std::string const& path, int mode)
+{
+    Cytosim::log("Cytosim is dumping a system of size %lu in `%s'...", sim_->sMeca.dimension(), path.c_str());
+    sim_->sMeca.doNotify = 1;
+    sim_->solve_half();
+    
+    int cwd = FilePath::change_dir(path, true);
+    
+    if ( mode & 1 ) sim_->sMeca.saveSystem();
+    if ( mode & 2 ) sim_->sMeca.dumpSystem();
+    if ( mode & 4 ) sim_->sMeca.exportSystem();
+    if ( mode & 8 ) sim_->sMeca.saveMatrixBitmaps();
+    if ( mode & 16 ) sim_->sMeca.saveConnectivityBitmap();
+    
+    FilePath::change_dir(cwd);
+    Cytosim::log("done\n");
+}

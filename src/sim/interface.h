@@ -9,6 +9,7 @@
 
 class Glossary;
 class Property;
+class SimulProp;
 class Simul;
 
 /// Cytosim Application Programming Interface
@@ -19,9 +20,6 @@ class Simul;
 class Interface
 {
 private:
-    
-    /// disabled default constructor
-    Interface();
 
     /// Simul member function pointer
     using SimulFuncPtr = void (Simul::*)();
@@ -40,14 +38,16 @@ private:
     
     /// return position and orientation of an object, with verification of 'placement'
     Isometry find_placement(Glossary&, int placement, size_t nb_trials);
+    
+protected:
+    
+    /// associated Simul object
+    Simul * sim_;
 
 public:
     
-    /// associated Simul
-    Simul& simul_;
-    
     /// construct and associates with given Simul
-    Interface(Simul&);
+    Interface(Simul*);
     
     //-------------------------------------------------------------------------------
     
@@ -59,7 +59,24 @@ public:
     virtual void hold() {}
     
     //-------------------------------------------------------------------------------
+
+    /// return Simul object pointer
+    Simul* simul() const { return sim_; }
     
+    /// change Simul pointer
+    void simul(Simul* s) { sim_ = s; }
+
+    /// return SimulProp
+    SimulProp& simulProp() const;
+    
+    /// test if 'name' is a category
+    bool isCategory(std::string const& name) const;
+    
+    /// erase Simulation
+    void erase_simul(bool) const;
+
+    //-------------------------------------------------------------------------------
+
     /// create a new Property of category `cat` from values specified in Glossary
     Property * execute_set(std::string const& cat, std::string const& name, Glossary&);
 
@@ -111,6 +128,8 @@ public:
     /// execute miscellaneous functions
     void execute_call(std::string& func, Glossary&);
 
+    /// dump system and informations
+    void execute_dump(std::string const& path, int mode);
 };
 
 #endif

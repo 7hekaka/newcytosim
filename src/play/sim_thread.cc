@@ -17,7 +17,7 @@
  This uses a Parser that cannot write to disc.
  The function `callback` is called when Parser::hold() is reached.
  */
-SimThread::SimThread(Simul& sim, void (*callback)(void))
+SimThread::SimThread(Simul* sim, void (*callback)(void))
 : Parser(sim, 1, 1, 1, 1, 0), hold_callback(callback)
 {
     alone_  = 1;
@@ -94,7 +94,7 @@ void SimThread::run()
         Parser::readConfig();
     }
     catch( Exception & e ) {
-        simul_.relax();
+        sim_->relax();
         std::cerr << e.brief() << e.info() << '\n';
         //flashText("Error: the simulation died");
     }
@@ -150,15 +150,15 @@ void SimThread::extend_run(size_t n_steps)
 {
     assert_true( isWorker() );
     try {
-        simul_.parser_ = this;
+        sim_->parser(this);
         Parser::execute_run(n_steps);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
-        simul_.relax();
+        sim_->relax();
         //flashText("Error: %s", e.what());
     }
-    simul_.parser_ = nullptr;
+    sim_->parser(nullptr);
     hold_callback();
 }
 
@@ -201,7 +201,7 @@ int SimThread::loadFrame(size_t f)
     int r = 7;
     lock();
     try {
-        r = reader_.loadFrame(simul_, f);
+        r = reader_.loadFrame(*sim_, f);
     }
     catch( Exception & e )
     {
@@ -217,7 +217,7 @@ int SimThread::loadNextFrame()
     int r = 7;
     lock();
     try {
-        r = reader_.loadNextFrame(simul_);
+        r = reader_.loadNextFrame(*sim_);
     }
     catch( Exception & e )
     {
@@ -233,7 +233,7 @@ int SimThread::loadLastFrame()
     int r = 7;
     lock();
     try {
-        r = reader_.loadLastFrame(simul_);
+        r = reader_.loadLastFrame(*sim_);
     }
     catch( Exception & e )
     {
@@ -304,7 +304,7 @@ void SimThread::restart()
 {
     assert_false( isWorker() );
     stop();
-    clear();
+    erase_simul(1);
     start();
 }
 
@@ -314,7 +314,7 @@ void SimThread::restart()
 
 SingleProp * SimThread::getHandleProperty() const
 {
-    Property * p = simul_.properties.find("single", "user_single");
+    Property * p = sim_->properties.find("single", "user_single");
     return static_cast<SingleProp*>(p);
 }
 
@@ -324,17 +324,17 @@ SingleProp * SimThread::makeHandleProperty(real range)
     // Create a Hand that attaches fast and never detach:
     HandProp * hap = new HandProp("user_hand");
     hap->binding_range   = range;
-    hap->binding_rate    = 1 / simul_.time_step();
+    hap->binding_rate    = 1 / sim_->time_step();
     hap->unbinding_rate  = 0;
     hap->unbinding_force = INFINITY;
-    hap->complete(simul_);
-    simul_.properties.deposit(hap);
+    hap->complete(*sim_);
+    sim_->properties.deposit(hap);
 
     SingleProp * sip = new SingleProp("user_single");
     sip->hand = "user_hand";
     sip->stiffness = 2000;
-    sip->complete(simul_);
-    simul_.properties.deposit(sip);
+    sip->complete(*sim_);
+    sim_->properties.deposit(sip);
     
     return sip;
 }
@@ -346,7 +346,7 @@ Single * SimThread::createHandle(Vector const& pos, real range)
     if ( !sip )
         sip = makeHandleProperty(range);
     Single * res = new Picket(sip, pos);
-    simul_.singles.add(res);
+    sim_->singles.add(res);
     handle_ = res;
     return res;
 }
@@ -354,7 +354,7 @@ Single * SimThread::createHandle(Vector const& pos, real range)
 
 ObjectList SimThread::allHandles(SingleProp const* sip) const
 {
-    return simul_.singles.collect(match_property, sip);
+    return sim_->singles.collect(match_property, sip);
 }
 
 
@@ -431,15 +431,15 @@ void SimThread::deleteHandles()
     lock();
     SingleProp * sip = getHandleProperty();
     if ( sip )
-        simul_.erase(allHandles(sip));
+        sim_->erase(allHandles(sip));
     handle_ = nullptr;
     unlock();
 }
 
-void SimThread::clear()
+void SimThread::erase_simul(bool arg)
 {
     assert_false( isWorker() );
-    simul_.erase_all(1);
+    Interface::erase_simul(arg);
     handle_ = nullptr;
 }
 
@@ -518,7 +518,7 @@ void SimThread::reloadParameters(std::string const& file)
 {
     lock();
     // set a parser that can only change properties:
-    Parser(simul_, 1, 0, 0, 0, 0).readConfig(file);
+    Parser(sim_, 1, 0, 0, 0, 0).readConfig(file);
     //std::cerr << "reloaded " << file << '\n';
     unlock();
 }
@@ -555,10 +555,10 @@ void SimThread::exportObjects(bool binary)
         char str[64] = { '\0' };
         
         snprintf(str, sizeof(str), "properties%04li.cmp", reader_.currentFrame());
-        simul_.writeProperties(str, true);
+        sim_->writeProperties(str, true);
         
         snprintf(str, sizeof(str), "objects%04li.cmo", reader_.currentFrame());
-        simul_.writeObjects(str, false, binary);
+        sim_->writeObjects(str, false, binary);
     }
     catch( Exception & e )
     {
@@ -573,7 +573,7 @@ void SimThread::writeProperties(std::ostream& os, bool prune)
 {
     lock();
     try {
-        simul_.writeProperties(os, prune);
+        sim_->writeProperties(os, prune);
     }
     catch( Exception & e )
     {

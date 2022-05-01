@@ -41,9 +41,6 @@ public:
 
     /// Meca used to solve the system with option 'solve=horizontal'
     Meca1D * pMeca1D;
-
-    /// current parser object
-    Parser * parser_;
     
 #if POOL_UNATTACHED > 1
     /// counter for occasional Hand's attachment
@@ -55,6 +52,9 @@ public:
 
 private:
     
+    /// current parser object
+    Parser * parser_;
+
     /// signals that Simul is ready to perform a Monte-Carlo step
     int      primed_;
 
@@ -277,7 +277,12 @@ public:
     
     /// first Field with this Property
     Field * pickField(const Property * p) const;
+    
+    //---------------------------- PROPERTIES ----------------------------------
 
+    /// set Parser used in' evaluate'
+    void parser(Parser* p) { parser_ = p; }
+    
     /// Parse a text containing cytosim commands
     void evaluate(std::string const&);
 
