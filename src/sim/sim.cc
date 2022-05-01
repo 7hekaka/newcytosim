@@ -128,22 +128,12 @@ int main(int argc, char* argv[])
     Simul simul;
     try {
         simul.initialize(arg);
-    }
-    catch( Exception & e ) {
-        print_magenta(cerr, e.brief());
-        cerr << e.info() << '\n';
-        return 2;
-    }
-    catch(...) {
-        print_red(cerr, "Error: an exception occurred during initialization\n");
-        return 3;
-    }
-    
-    arg.print_warnings(cerr, 1, " on command line\n");
-    time_t sec = TimeDate::seconds_since_1970();
-    
-    try {
+        arg.print_warnings(cerr, 1, " on command line\n");
+        time_t sec = TimeDate::seconds_since_1970();
         Parser(simul, 1, 1, 1, 1, 1).readConfig();
+        Cytosim::out << "% " << TimeDate::date_string() << '\n';
+        sec = TimeDate::seconds_since_1970() - sec;
+        Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";
     }
     catch( Exception & e ) {
         print_magenta(cerr, e.brief());
@@ -155,8 +145,5 @@ int main(int argc, char* argv[])
         return 5;
     }
     
-    Cytosim::out << "% " << TimeDate::date_string() << '\n';
-    sec = TimeDate::seconds_since_1970() - sec;
-    Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";
     Cytosim::out.close();
 }
