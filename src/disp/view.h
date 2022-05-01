@@ -78,7 +78,10 @@ public:
     void reshape(int, int);
     
     /// reset viewport
-    void setViewport() const;
+    void loadViewport() const;
+    
+    /// reset viewport
+    void setViewport(int, int, size_t, size_t) const;
 
     /// adjust parameters of projections, given window size
     void adjust(int, int) const;

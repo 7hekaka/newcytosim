@@ -319,9 +319,14 @@ void View::setLightsEye() const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void View::setViewport() const
+void View::loadViewport() const
 {
     glViewport(viewport_[0], viewport_[1], viewport_[2], viewport_[3]);
+}
+
+void View::setViewport(int x, int y, size_t w, size_t h) const
+{
+    glViewport(x, y, w, h);
 }
 
 
@@ -332,7 +337,7 @@ void View::reshape(int W, int H)
     window_size[1] = H;
     viewport_[2] = W;
     viewport_[3] = H;
-    setViewport();
+    loadViewport();
     load();
 }
 

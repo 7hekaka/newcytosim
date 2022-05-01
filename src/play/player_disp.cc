@@ -51,7 +51,7 @@ void Player::setStyle(const unsigned style)
         if ( view.window() > 0 )
         {
             view.initGL();
-            view.setViewport();
+            view.loadViewport();
         }
     }
 }
