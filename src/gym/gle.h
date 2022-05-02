@@ -24,17 +24,18 @@ namespace gle
     
     /// number of circle points stored in buffer
     constexpr size_t pi_twice = finesse * 12;
+    constexpr size_t pi_3half = finesse * 9;
     constexpr size_t pi_once = finesse * 6;
     constexpr size_t pi_half = finesse * 3;
     
     /// values of cosine, sine over a full circle
-    extern const float* circle_;
+    extern float circle_[4*pi_twice+8];
 
     /// access to precomputed cosine
-    inline float cos_(size_t n) { return circle_[4+2*n]; }
+    inline float cos_(size_t n) { return circle_[2*n]; }
     
     /// access to precomputed sine
-    inline float sin_(size_t n) { return circle_[5+2*n]; }
+    inline float sin_(size_t n) { return circle_[1+2*n]; }
 
     /// initialize the arrays
     void initialize();
@@ -43,7 +44,7 @@ namespace gle
     void quit();
 
     /// calculate sine and cosine
-    void compute_circle(size_t cnt, float CS[], double rad, double start = 0);
+    void set_arc(size_t cnt, float CS[], double rad, double start, double delta, float cx, float cy);
 
     /// calculate sine and cosine for a circular arc
     void compute_arc(size_t cnt, float CS[], double rad, double start, double angle, float cx, float cy);

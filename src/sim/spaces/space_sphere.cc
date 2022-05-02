@@ -143,14 +143,15 @@ void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceSphere::draw2D(float width) const
 {
-    gym::scale(radius_);
-    gle::circle(width);
-
     if ( prop->disp->visible & 2 )
     {
         gym::color(prop->disp->color2);
         gle::disc1();
     }
+
+    gym::scale(radius_);
+    gym::color(prop->disp->color);
+    gle::circle(width);
 }
 
 void SpaceSphere::draw3D() const

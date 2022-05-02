@@ -260,20 +260,53 @@ void SpaceCapsule::read(Inputter& in, Simul&, ObjectTag)
 #include "gym_flute.h"
 #include "gym_view.h"
 #include "gym_draw.h"
+#include "point_disp.h"
 
 void SpaceCapsule::draw2D(float width) const
 {
     const float L(half_);
     const float R(radius_);
-    constexpr size_t fin = 16 * gle::finesse;
-    float* arc = (float*)gym::mapBufferV2(2*fin+4);
-    float* cra = arc + 2*fin;
-    gle::compute_arc(fin, arc, R, -M_PI_2, M_PI,  L, 0);
-    gle::compute_arc(fin, cra, R,  M_PI_2, M_PI, -L, 0);
-    cra[  2*fin] = arc[0];
-    cra[1+2*fin] = arc[1];
+    
+    if ( prop->disp->visible & 2 )
+    {
+        gym::color(prop->disp->color2);
+        flute2 *buf = gym::mapBufferV2(gle::pi_twice+4);
+        flute2 *ptr = buf;
+        *ptr++ = { R+L, 0 };
+        for ( size_t j = 1; j <= gle::pi_half; ++j )
+        {
+            float C = gle::cos_(j), S = gle::sin_(j);
+            ptr[0] = { R*C + L,  R*S };
+            ptr[1] = { R*C + L, -R*S };
+            ptr += 2;
+        }
+        for ( size_t j = gle::pi_half; j < gle::pi_once; ++j )
+        {
+            float C = gle::cos_(j), S = gle::sin_(j);
+            ptr[0] = { R*C - L,  R*S };
+            ptr[1] = { R*C - L, -R*S };
+            ptr += 2;
+        }
+        *ptr++ = { -R-L, 0 };
+        gym::unmapBufferV2();
+        assert_true( ptr-buf <= gle::pi_twice+4 );
+        gym::drawTriangleStrip(0, ptr-buf);
+        //gym::drawPoints(width, 0, ptr-buf);
+    }
+
+    // draw contour:
+    gym::color(prop->disp->color);
+    flute2 *buf = gym::mapBufferV2(gle::pi_twice+4);
+    flute2 *ptr = buf;
+    for ( size_t j = gle::pi_half; j <= gle::pi_3half; ++j )
+        *ptr++ = { R*gle::cos_(j) - L, R*gle::sin_(j) };
+    for ( size_t j = gle::pi_3half; j <= gle::pi_3half+gle::pi_once; ++j )
+        *ptr++ = { R*gle::cos_(j) + L, R*gle::sin_(j) };
+    *ptr++ = *buf;
     gym::unmapBufferV2();
-    gym::drawLineStrip(width, 0, 2*fin+1);
+    assert_true( ptr-buf <= gle::pi_twice+4 );
+    gym::drawLineStrip(width, 0, ptr-buf);
+    //gym::drawPoints(width, 0, ptr-buf);
 }
 
 

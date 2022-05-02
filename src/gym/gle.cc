@@ -21,11 +21,8 @@
 
 namespace gle
 {
-    /// values of cosine, sine over a full circle
-    float cir_[2*pi_twice+8] = { 0 };
-    
-    /// non modifiable values of cosine, sine
-    const float* circle_ = const_cast<float*>(cir_);
+    /// values of cosine, sine over two full revolution
+    float circle_[4*pi_twice+8] = { 0 };
         
     /// vertex buffer objects for static draw
     GLuint buf_[4] = { 0 };
@@ -72,9 +69,9 @@ namespace gle
             exit(1);
         }
 #endif
-        // circle starts at index 4
-        compute_circle(pi_twice, cir_+4, 1, 0);
-        
+        // circle starts at index 4, and covers 2 revolutions
+        set_arc(2*pi_twice, circle_, 1, 0, 2*M_PI/pi_twice, 0, 0);
+
         if ( !glIsBuffer(buf_[0]) )
         {
             initBuffers();
@@ -129,8 +126,8 @@ namespace gle
             y = s * t + c * y;
             //std::clog << n << " " << x << " " << y << "\n";
         }
-        ptr[  2*cnt] = float(x);
-        ptr[1+2*cnt] = float(y);
+        ptr[  2*cnt] = float(x) + cX;
+        ptr[1+2*cnt] = float(y) + cY;
 #endif
     }
     
@@ -986,7 +983,7 @@ namespace gle
     
     static size_t sizeTubeBuffers()
     {
-        return 22 * pi_twice;  // this is empirical!
+        return 25 * pi_twice;  // this is empirical!
     }
     
     flute6* setTubeBuffers(flute6* ptr, flute6* const ori, size_t idx[])
