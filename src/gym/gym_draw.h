@@ -174,9 +174,9 @@ namespace gym
 
 #pragma mark -
 
-    inline void clear() { glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); }
-    inline void clear(const float c[4]) { glClearColor(c[0],c[1],c[2],c[3]); clear(); }
-    inline void clear(float R, float G, float B, float A) { glClearColor(R,G,B,A); clear(); }
+    inline void clearPixels() { glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); }
+    inline void clearPixels(const float c[4]) { glClearColor(c[0],c[1],c[2],c[3]); clearPixels(); }
+    inline void clearPixels(float R, float G, float B, float A) { glClearColor(R,G,B,A); clearPixels(); }
 
     inline void clearStencil(GLint x) { glClearStencil(x); glClear(GL_STENCIL_BUFFER_BIT); }
 

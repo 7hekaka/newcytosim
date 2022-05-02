@@ -222,7 +222,7 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
     {
         uint8_t * pix = pixels_ + i * pixStride;
         // we use a transparent background, because points will overlap
-        gym::clear(0,0,0,0);
+        gym::clearPixels(0,0,0,0);
         switch ( i )
         {
             case 0:

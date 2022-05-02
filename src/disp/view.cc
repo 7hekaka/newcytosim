@@ -139,7 +139,7 @@ void View::toggleDepthClamp()
 
 void View::clear()
 {
-    gym::clear(back_color);
+    gym::clearPixels(back_color);
 }
 
 
@@ -147,7 +147,7 @@ void View::openDisplay()
 {
     load();
     gym::openDepthMask();
-    gym::clear(back_color);
+    gym::clearPixels(back_color);
     setFog(fog_type, fog_param, fog_color);
     setLights();
     setClipping();
