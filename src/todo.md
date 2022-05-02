@@ -153,7 +153,7 @@ https://github.com/TNG/boost-python-examples
 - Steric using analytical formula for potential, integrated over segment length
 - a Space to represent a lamellipodium: like a capsule in Y&Z, periodic in X
 - extensions of fast_diffusion:
-   - dirichlet boundary conditions: set concentration of molecules at edges of Space
+   - Dirichlet boundary conditions: set concentration of molecules at edges of Space
 
 - option to pull on beads with mouse
 - use sidePos() for display more systematically

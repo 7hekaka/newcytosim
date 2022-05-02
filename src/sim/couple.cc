@@ -165,7 +165,7 @@ void Couple::diffuse()
     if ( prop->confine == CONFINE_INSIDE )
     {
         /**
-         @todo dirichlet boundary conditions
+         @todo Dirichlet boundary conditions
          Set concentration of molecules at edges of Space by letting molecules
          out, and put some back at a constant rate
          */

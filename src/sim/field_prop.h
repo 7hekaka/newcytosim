@@ -53,7 +53,7 @@ public:
      */
     int           boundary_condition;
     
-    /// value of dirichlet boundary conditions:
+    /// value of Dirichlet boundary conditions:
     real          boundary_value;
     
     /// decay rate per unit time

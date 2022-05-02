@@ -131,6 +131,7 @@ void Simul::erase_all(bool erase_properties)
  
     prop.time = 0;
     modulo = nullptr;
+    abortRun = 0;
     
     if ( erase_properties )
         properties.erase();

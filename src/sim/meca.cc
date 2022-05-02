@@ -921,7 +921,7 @@ void Meca::apply()
                     b = has_nan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
                     fprintf(stderr, "Mecable %s isnan %i\n", mec->reference().c_str(), b);
                 }
-                abort();
+                return;
             }
         }
 
