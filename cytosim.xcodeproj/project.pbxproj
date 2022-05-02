@@ -809,6 +809,8 @@
 		BBD025E11B28DF950002B9FE /* chewer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DD1B28DF950002B9FE /* chewer.h */; };
 		BBD096E624D0767400084292 /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; };
 		BBD096E724D0767400084292 /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BBD14D462820826C00B55817 /* signal_handlers.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD14D442820826C00B55817 /* signal_handlers.h */; };
+		BBD14D472820826C00B55817 /* signal_handlers.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD14D452820826C00B55817 /* signal_handlers.cc */; };
 		BBD1B1EE18FFD5DA00E5D80A /* project_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */; };
 		BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */; };
 		BBD49F292781C4DA00F31EB2 /* rasterizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589F05B98DA3006956D5 /* rasterizer.h */; };
@@ -1861,6 +1863,8 @@
 		BBD025DB1B28DF950002B9FE /* chewer_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chewer_prop.h; path = hands/chewer_prop.h; sourceTree = "<group>"; };
 		BBD025DC1B28DF950002B9FE /* chewer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chewer.cc; path = hands/chewer.cc; sourceTree = "<group>"; };
 		BBD025DD1B28DF950002B9FE /* chewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chewer.h; path = hands/chewer.h; sourceTree = "<group>"; };
+		BBD14D442820826C00B55817 /* signal_handlers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = signal_handlers.h; sourceTree = "<group>"; };
+		BBD14D452820826C00B55817 /* signal_handlers.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = signal_handlers.cc; sourceTree = "<group>"; };
 		BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = project_ellipse.cc; path = src/math/project_ellipse.cc; sourceTree = SOURCE_ROOT; };
 		BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = project_ellipse.h; path = src/math/project_ellipse.h; sourceTree = SOURCE_ROOT; };
 		BBD3030225798FC600C6D61A /* test_ortho.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_ortho.cc; sourceTree = "<group>"; };
@@ -2668,6 +2672,8 @@
 		BB7190A40EF1C9AE00CED9E2 /* misc */ = {
 			isa = PBXGroup;
 			children = (
+				BBD14D452820826C00B55817 /* signal_handlers.cc */,
+				BBD14D442820826C00B55817 /* signal_handlers.h */,
 				BBEF3A85118318AE000F2EED /* backtrace.h */,
 				BBEF3A86118318AE000F2EED /* backtrace.cc */,
 				BB73587505B98DA3006956D5 /* exceptions.h */,
@@ -3810,6 +3816,7 @@
 				BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */,
 				BB0E4BD81002698100A96B34 /* random_vector.h in Headers */,
 				BB74F41A231C334D0019D68E /* sparmatblk.h in Headers */,
+				BBD14D462820826C00B55817 /* signal_handlers.h in Headers */,
 				BB89999420CECB5C00498F48 /* matrix44.h in Headers */,
 				BBC422FA247342CF007EA070 /* hand_list.h in Headers */,
 				BB10378310B8032E00CEC5C6 /* assert_macro.h in Headers */,
@@ -4922,6 +4929,7 @@
 				BB7191A90EF1CD9900CED9E2 /* spherical_code.cc in Sources */,
 				BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */,
 				BB9D87B01E76BBB800DD0F00 /* sparmatsym2.cc in Sources */,
+				BBD14D472820826C00B55817 /* signal_handlers.cc in Sources */,
 				BB9EC398209235CC00EF00E7 /* SFMT.c in Sources */,
 				BB089A0C2228A26D00C070E7 /* matrix33.cc in Sources */,
 				BB089A0B2228A26D00C070E7 /* matrix22.cc in Sources */,

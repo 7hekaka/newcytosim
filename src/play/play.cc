@@ -8,6 +8,7 @@
 #include "filepath.h"
 #include "splash.h"
 #include "print_color.h"
+#include "signal_handlers.h"
 
 #include "gle.h"
 #include "player.h"
@@ -114,7 +115,8 @@ int main(int argc, char* argv[])
     
     Cytosim::out.silent();
     Cytosim::log.silent();
-
+    register_signal_handlers();
+    
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
     

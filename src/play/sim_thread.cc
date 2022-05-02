@@ -78,7 +78,7 @@ void SimThread::hold()
         hold_callback();
         if ( flag_ )
             pthread_exit(nullptr);
-        wait();  // this also unlocks and locks the mutex
+        cond_wait();  // this also unlocks and locks the mutex
     }
 }
 

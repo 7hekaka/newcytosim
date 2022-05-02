@@ -1,5 +1,6 @@
 set(SOURCES_BASE
     operator_new.cc
+    signal_handlers.cc
     messages.cc
     filewrapper.cc
     filepath.cc

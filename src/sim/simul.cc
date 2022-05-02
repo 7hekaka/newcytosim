@@ -27,37 +27,6 @@ const char Simul::TRAJECTORY[] = "objects.cmo";
 #include "simul_report.cc"
 #include "simul_solve.cc"
 
-#include <csignal>
-
-//---------------------------  global variables/functions ---------------------
-
-void out_of_memory_handler()
-{
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
-    (void) write(STDERR_FILENO, "Cytosim: memory allocation failed", 33);
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
-    print_backtrace();
-    _exit(1);
-}
-
-void termination_handler()
-{
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
-    (void) write(STDERR_FILENO, "Cytosim: uncaught exception", 27);
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
-    print_backtrace();
-    abort();
-}
-
-void signal_handler(int sig)
-{
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
-    psignal((unsigned)sig, "Cytosim");
-    (void) write(STDERR_FILENO, "* * * * *\n", 10);
-    print_backtrace();
-    _exit(sig);
-}
-
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -97,16 +66,6 @@ Simul::~Simul()
  */
 void Simul::initialize(Glossary & glos)
 {
-    // Register a function to be called if operator new fails:
-    std::set_new_handler(out_of_memory_handler);
-    
-    // Register a function to be called upon abortion:
-    std::set_terminate(termination_handler);
-    
-    // Register a function to be called for Floating point exceptions:
-    if ( signal(SIGFPE, signal_handler) == SIG_ERR )
-        std::cerr << "Could not register SIGFPE handler\n";
-    
     // read parameters
     prop.read(glos);
 }

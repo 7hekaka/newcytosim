@@ -97,7 +97,7 @@ public:
     int trylock() { return pthread_mutex_trylock(&mutex_); }
 
     /// unlock access to data and wait for the condition
-    int wait()    { return pthread_cond_wait(&condition_, &mutex_); }
+    int cond_wait() { return pthread_cond_wait(&condition_, &mutex_); }
     
     /// send signal to other threads
     void signal() { if ( !alone_ ) pthread_cond_signal(&condition_); }
@@ -114,7 +114,7 @@ public:
     int trylock() { int R=pthread_mutex_trylock(&mutex_); debug(R?"  failed trylock":"  trylock"); return R; }
     
     /// wait for the condition
-    int wait()    { debug("unlock, wait"); int R=pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); return R; }
+    int cond_wait() { debug("unlock, wait"); int R=pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); return R; }
     
     /// signal other thread to continue
     void signal() { debug("signal"); pthread_cond_signal(&condition_); }

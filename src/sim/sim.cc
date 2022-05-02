@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include <csignal>
+#include <unistd.h>
 
 #include "simul.h"
 #include "parser.h"
@@ -12,7 +13,7 @@
 #include "filepath.h"
 #include "splash.h"
 #include "time_date.h"
-#include "unistd.h"
+#include "signal_handlers.h"
 
 
 void help(std::ostream& os)
@@ -66,19 +67,12 @@ using std::cerr;
 
 int main(int argc, char* argv[])
 {
+    register_signal_handlers();
     // register callback to catch interrupting signals:
     if ( signal(SIGINT, handle_interrupt) )
         cerr << "Could not register SIGINT handler\n";
     if ( signal(SIGTERM, handle_interrupt) )
         cerr << "Could not register SIGTERM handler\n";
-#if 0
-    if ( signal(SIGSEGV, handle_signal) )
-        cerr << "Could not register SIGSEGV handler\n";
-    if ( signal(SIGILL,  handle_signal) )
-        cerr << "Could not register SIGILL handler\n";
-    if ( signal(SIGABRT, handle_abort) )
-        cerr << "Could not register SIGABRT handler\n";
-#endif
     // catch division by zero and Nan
     //feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 
