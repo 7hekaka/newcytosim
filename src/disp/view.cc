@@ -24,15 +24,9 @@ View::View(const std::string& n)
     drawCallback = nullptr;
     drawMagFunc = nullptr;
     
-    visRegion[0] = view_scale;
-    visRegion[1] = view_scale;
-    visRegion[2] = view_scale;
-    visRegion[3] = 0;
-
-    eyePosition[0] = 0;
-    eyePosition[1] = 0;
-    eyePosition[2] = -0.5f * view_scale;
-    eyePosition[3] = 0;
+    visRange[0] = view_scale;
+    visRange[1] = view_scale;
+    eyeDistance = -0.25f * view_scale;
 
     viewport_[0] = 0;
     viewport_[1] = 0;
@@ -350,48 +344,46 @@ void View::adjust(int W, int H) const
 {
     if ( W > H )
     {
-        visRegion[0] = view_scale;
-        visRegion[1] = H * view_scale / W;
+        visRange[0] = view_scale;
+        visRange[1] = H * view_scale / W;
     }
     else
     {
-        visRegion[0] = W * view_scale / H;
-        visRegion[1] = view_scale;
+        visRange[0] = W * view_scale / H;
+        visRange[1] = view_scale;
     }
-    visRegion[2] = view_scale;
 }
 
 
 void View::setProjection() const
 {
-    float X = visRegion[0] * 0.5f;
-    float Y = visRegion[1] * 0.5f;
-    float Z = visRegion[2];
+    float X = visRange[0] * 0.5f;
+    float Y = visRange[1] * 0.5f;
     float S = view_scale;
 
     if ( perspective == 3 )
     {
         // this creates a stronger perspective:
-        eyePosition[2] = -1.5f * S;
-        gym::mat_frustum(projection_, -X, X, -Y, Y, Z, 5.0f*Z);
+        eyeDistance = -1.5f * S;
+        gym::mat_frustum(projection_, -X, X, -Y, Y, S, 5.0f*S);
     }
     else if ( perspective == 2 )
     {
         // this creates a strong perspective:
-        eyePosition[2] = -2.0f * S;
-        gym::mat_frustum(projection_, -X, X, -Y, Y, Z, 6.0f*Z);
+        eyeDistance = -2.0f * S;
+        gym::mat_frustum(projection_, -X, X, -Y, Y, S, 6.0f*S);
     }
     else if ( perspective )
     {
         // this creates a perspective:
-        eyePosition[2] = -2.0f * S;
-        gym::mat_frustum(projection_, -X, X, -Y, Y, Z, 11.0f*Z);
+        eyeDistance = -2.0f * S;
+        gym::mat_frustum(projection_, -X, X, -Y, Y, S, 11.0f*S);
     }
     else
     {
         // The back-plane is set behind to avoid clipping
-        eyePosition[2] = -0.5f * S;
-        gym::mat_ortho(projection_,-X, X, -Y, Y, 0, Z);
+        eyeDistance = -0.25f * S;
+        gym::mat_ortho(projection_,-X, X, -Y, Y, 0.25f*S, 2*S);
     }
 
     //std::clog << "View::setProjection  " << window_ << "\n";
@@ -403,14 +395,15 @@ void View::setModelView() const
 {
     //GLint e; glGetIntegerv(GL_MATRIX_MODE, &e); assert_true(e==GL_MODELVIEW);
 
-    rotation.setOpenGLMatrix(modelview_, zoom, eyePosition);
+    float T[4] = { 0, 0, eyeDistance, 0 };
+    rotation.setOpenGLMatrix(modelview_, zoom, T);
     Vector3 V = - ( focus + focus_shift );
     gym::mat_translate(modelview_, V.XX, V.YY, V.ZZ);
     gym::set_view(modelview_);
     
     //std::cerr<<"setModelView win " << window() << '\n';
 #if ( 0 )
-    std::clog << "View:eye      " << eyePosition << "\n";
+    std::clog << "View:eye      " << eyeDistance << "\n";
     std::clog << "View:rotation " << rotation << "\n";
     std::clog << "View:zoom     " << zoom << "\n";
     std::clog << "View:focus    " << focus+focus_shift << "\n";
@@ -421,8 +414,8 @@ void View::setModelView() const
 float View::pixelSize() const
 {
     //float a = view_scale / ( zoom * std::max(width(), height()) );
-    float b = visRegion[0] / ( zoom * viewport_[2] );
-    //float c = visRegion[1] / ( zoom * viewport_[3] );
+    float b = visRange[0] / ( zoom * viewport_[2] );
+    //float c = visRange[1] / ( zoom * viewport_[3] );
     return b;
 }
 
@@ -631,12 +624,12 @@ void View::setFog(GLint type, float param, gle_color color) const
     
     if ( gl_type == GL_LINEAR )
     {
-        glFogf(GL_FOG_START, param*visRegion[2]);
-        glFogf(GL_FOG_END, (param*2+1)*visRegion[2]);
+        glFogf(GL_FOG_START, param*view_scale);
+        glFogf(GL_FOG_END, (param*2+1)*view_scale);
     }
     else
     {
-        glFogf(GL_FOG_DENSITY, param/visRegion[2]);
+        glFogf(GL_FOG_DENSITY, param/view_scale);
     }
     
     glFogfv(GL_FOG_COLOR, color.colors());
@@ -876,11 +869,11 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
         case 0:
             break;
         case 1:
-            gym::abs_view(0, shift-0.5*visRegion[1], 0, zoom);
+            gym::abs_view(0, shift-0.5*visRange[1], 0, zoom);
             drawScaleHV(S, S/10, 0, setLadderH);
             break;
         case 2:
-            gym::abs_view(0.5*visRegion[0]-shift, 0, 0, zoom);
+            gym::abs_view(0.5*visRange[0]-shift, 0, 0, zoom);
             drawScaleHV(S, -S/10, 0, setLadderV);
             break;
         case 3: {

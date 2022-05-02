@@ -107,7 +107,7 @@ void ViewProp::read(Glossary& glos)
     
     glos.set(track_fibers,        "track_fibers");
     glos.set(window_position, 2,  "window_position");
-    
+#if 0
     // A square window is made if only one value is given.
     if ( glos.set(window_size, 2, "window_size") == 1 )
         window_size[1] = window_size[0];
@@ -115,7 +115,7 @@ void ViewProp::read(Glossary& glos)
     // A square window is made if only one value is given.
     if ( glos.set(window_size, 2, "image_size") == 1 )
         window_size[1] = window_size[0];
-
+#endif
     // 'size' is an alias to set the size of the window.
     if ( glos.set(window_size, 2, "size") == 1 )
         window_size[1] = window_size[0];

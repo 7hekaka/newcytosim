@@ -22,10 +22,10 @@ private:
     mutable float projection_[16];
     
     /// half-size of the OpenGL visible region in OpenGL units
-    mutable float visRegion[4];
+    mutable float visRange[2];
     
     /// translation between center of volume and camera
-    mutable float eyePosition[4];
+    mutable float eyeDistance;
     
     /// OpenGL viewport
     GLint viewport_[4];
