@@ -30,10 +30,10 @@ namespace gym
 
 #pragma mark - Modifying the reference view
 
-    /// set reference
+    /// get current reference modelview matrix
     inline void get_view(float mat[16]) { gym::mat_copy(mat, ref_); }
     
-    /// export reference matrix
+    /// replace reference modelview matrix
     inline void set_view(const float mat[16]) { gym::mat_copy(ref_, mat); load_ref(); }
     
     /// make reference matrix current and load

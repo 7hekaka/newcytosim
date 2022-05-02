@@ -134,10 +134,10 @@ public:
 
     
     /// set View::focus and quat to match the center of gravity of the Fibers
-    void autoTrack(FiberSet const&, View&);
+    void autoTrack(FiberSet const&, View&) const;
     
     /// adjust the viewing area
-    void autoScale(SpaceSet const&, View&);
+    void autoScale(SpaceSet const&, View&) const;
     
     /// adjust the model view and load frame if asked
     void setPixelSize(View&);

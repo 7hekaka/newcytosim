@@ -315,7 +315,7 @@ void glApp::setScale(float s)
     
     // update all window-associated views:
     for ( size_t n = 0; n < views.size(); ++n )
-        views[n].view_size = s;
+        views[n].view_scale = s;
 }
 
 #if ( 0 )

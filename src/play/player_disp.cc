@@ -151,7 +151,7 @@ std::string Player::buildMemo(int type) const
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
-void Player::autoTrack(FiberSet const& fibers, View& view)
+void Player::autoTrack(FiberSet const& fibers, View& view) const
 {
     real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     
@@ -192,18 +192,13 @@ void Player::autoTrack(FiberSet const& fibers, View& view)
 /**
  Adjust to see the biggest Space in simul
  */
-void Player::autoScale(SpaceSet const& spaces, View& view)
+void Player::autoScale(SpaceSet const& spaces, View& view) const
 {
     real rad = 0;
     for ( Space const* spc = spaces.first(); spc; spc=spc->next() )
         rad = std::max(rad, spc->max_extension());
     if ( rad > 0 )
-    {
-        //std::clog << "auto_scale " << rad << '\n';
-        view.view_size = float(2*rad);
-        view.zoom_in(0.933033);
-        --view.auto_scale;
-    }
+        view.set_scale(2*rad);
 }
 
 

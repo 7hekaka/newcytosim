@@ -93,7 +93,10 @@ public:
     void setModelView() const;
     
     /// set OpenGL Projection and ModelView matrices
-    void load() const;
+    void load(int, int) const;
+
+    /// set OpenGL Projection and ModelView matrices
+    void load() const { load(window_size[0], window_size[1]); }
 
     /// adjust view to only show a slice of the world
     void sliceView(int) const;
@@ -113,7 +116,7 @@ public:
     GLint const* viewport() const { return viewport_; }
 
     /// size of pixel in drawing units
-    float pixelSize() const { return view_size / ( zoom * std::max(width(), height()) ); }
+    float pixelSize() const { return view_scale / ( zoom * std::max(width(), height()) ); }
     
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;
@@ -210,6 +213,9 @@ public:
     
     //---------------------------------------------------------------------------
 
+    /// adjust view_scale
+    void set_scale(float);
+    
     /// set absolute zoom
     void zoom_to(float z);
     

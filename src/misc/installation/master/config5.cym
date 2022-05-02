@@ -14,7 +14,7 @@ set system display
 {
     delay        = 20;
     period       = 2;
-    view_size    = 2;
+    view_scale   = 2;
     auto_scale   = 0;
     %rotation     = 0.88764 -0.460538 0 0;
     rotation     = 0.870087 -0.492897 0 0;

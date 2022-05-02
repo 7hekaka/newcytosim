@@ -680,9 +680,9 @@ Please, [check this](making_movies.md).
 </summary>
 By default, Cytosim adjusts the `zoom` factor to fit the entire simulation space, but you can disable this and define the dimension covered by the window like this:
 
-    bin/play live auto_scale=0 view_size=5
+    bin/play live auto_scale=0 view_scale=5
 
-Hence I would recommend you keep the `view_size` and the number of pixels the same to make all your movies. The image with the small cell will be small in the middle of a black image, but the pixels per micrometer ratio will be the same for all the movies.
+Hence I would recommend you keep the `view_scale` and the number of pixels the same to make all your movies. The image with the small cell will be small in the middle of a black image, but the pixels per micrometer ratio will be the same for all the movies.
 Alternatively, you could also scale the movie size with the cell size.
 </details>
 

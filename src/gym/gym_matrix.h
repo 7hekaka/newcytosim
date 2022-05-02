@@ -6,12 +6,14 @@
 
 namespace gym
 {
+    /// M <- zero
     inline void mat_zero(float M[16])
     {
         for ( int d = 0; d < 16; ++d )
             M[d] = 0.f;
     }
     
+    // M <- Identity * diag
     inline void mat_diagonal(float M[16], float diag)
     {
         mat_zero(M);
@@ -21,6 +23,7 @@ namespace gym
         M[15] = diag;
     }
 
+    /// M <- Q
     inline void mat_copy(float M[16], const float Q[16])
     {
         for ( int d = 0; d < 16; ++d )

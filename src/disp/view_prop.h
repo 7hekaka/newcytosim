@@ -23,18 +23,18 @@ public:
      @{
      */
     
-    /// zoom factor = ratio between visible area and `view_size`
+    /// zoom factor = ratio between visible area and `view_scale`
     float zoom;
     
     /// pixel magnification
     unsigned magnify;
 
-    /// size of area visible in the window, in sim-units (default=10)
-    float view_size;
+    /// range that is visible with zoom=1, in sim-units (default=10)
+    float view_scale;
     
     /// enables the display area to be set from the size of the simulation space
     /**
-     If ( `auto_scale` > 0 ), `view_size` is set automatically to match the simulation space.
+     If ( `auto_scale` > 0 ), `view_scale` is set automatically to match the simulation space.
      This is on by default.
      */
     unsigned auto_scale;

@@ -24,13 +24,13 @@ View::View(const std::string& n)
     drawCallback = nullptr;
     drawMagFunc = nullptr;
     
-    visRegion[0] = view_size;
-    visRegion[1] = view_size;
-    visRegion[2] = view_size;
+    visRegion[0] = view_scale;
+    visRegion[1] = view_scale;
+    visRegion[2] = view_scale;
     
     eyePosition[0] = 0;
     eyePosition[1] = 0;
-    eyePosition[2] = -0.5f * view_size;
+    eyePosition[2] = -0.5f * view_scale;
     eyePosition[3] = 0;
 
     viewport_[0] = 0;
@@ -174,7 +174,8 @@ void View::closeDisplay() const
     if ( scalebar )
         drawScaleBar(scalebar, scalebar_length, scalebar_color);
     
-    if ( 0 && label != "off" )
+#if 0
+    if ( label != "off" )
     {
         // display only first line of text:
         char str[256];
@@ -191,6 +192,7 @@ void View::closeDisplay() const
         gym::restoreAlphaTest();
         gym::restoreLighting();
     }
+#endif
 }
 
 
@@ -348,16 +350,16 @@ void View::adjust(int W, int H) const
     if ( W > H )
     {
         float R = float(H) / float(W);
-        visRegion[0] = view_size;
-        visRegion[1] = view_size * R;
+        visRegion[0] = view_scale;
+        visRegion[1] = view_scale * R;
     }
     else
     {
         float R = float(W) / float(H);
-        visRegion[0] = view_size * R;
-        visRegion[1] = view_size;
+        visRegion[0] = view_scale * R;
+        visRegion[1] = view_scale;
     }
-    visRegion[2] = view_size;
+    visRegion[2] = view_scale;
     
     //std::clog << this << " View::adjust  " << visRegion[0] << " " << visRegion[1] << " " << visRegion[2] << "\n";
     //std::clog << " pixel_size = " << zoom * visRegion[0]/window_size[0] << '\n';
@@ -369,7 +371,7 @@ void View::setProjection() const
     float X = visRegion[0] * 0.5f;
     float Y = visRegion[1] * 0.5f;
     float Z = visRegion[2];
-    float S = view_size;
+    float S = view_scale;
 
     if ( perspective == 3 )
     {
@@ -401,10 +403,10 @@ void View::setProjection() const
 }
 
 
-void View::load() const
+void View::load(int W, int H) const
 {
     //std::clog << "View::load() win " << window() << "\n";
-    adjust(window_size[0], window_size[1]);
+    adjust(W, H);
     setProjection();
     setModelView();
 }
@@ -437,13 +439,13 @@ void View::setModelView() const
  - 0 : disabled
  - 1 : show ( Z > 0 ) with fog
  - 2 : show ( Z < 0 ) with fog
- - 3 : show slice ( -a < Z < a ) where a = 5% of view_size
+ - 3 : show slice ( -a < Z < a ) where a = 5% of view_scale
  .
  
  */
 void View::sliceView(int mode) const
 {
-    real off = view_size * 0.5;
+    real off = view_scale * 0.5;
     switch ( mode )
     {
         case 1: {
@@ -458,7 +460,7 @@ void View::sliceView(int mode) const
             setFog(1, 1, fog_color);
         } break;
         case 3: {
-            real thk = view_size * 0.05;
+            real thk = view_scale * 0.05;
             gym::eye_view();
             gym::enableClipPlane(1, 0, 0, -1, thk-off);
             gym::enableClipPlane(2, 0, 0, +1, thk+off);
@@ -484,6 +486,15 @@ void View::reset()
     focus_shift.reset();
     rotation.set(1,0,0,0);
     setModelView();
+}
+
+
+void View::set_scale(float s)
+{
+    //std::clog << "auto_scale " << rad << '\n';
+    view_scale = s;
+    zoom_in(0.933033);
+    --auto_scale;
 }
 
 
@@ -546,11 +557,11 @@ void View::matchROI()
     if ( hasROI )
     {
         focus = 0.5 * ( mROI[0] + mROI[1] );
-        real r = 0.5 * ( mROI[0] - mROI[1] ).norm_inf();
+        float R = 0.5 * ( mROI[0] - mROI[1] ).norm_inf();
         
         // zoom only if region is 7 pixels wide:
-        if ( r > 7 * pixelSize() )
-            zoom = view_size / (GLfloat)r;
+        if ( R > 7 * pixelSize() )
+            zoom = view_scale / R;
         
         setModelView();
     }

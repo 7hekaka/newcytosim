@@ -7,7 +7,7 @@ void ViewProp::clear()
 {
     zoom         = 1;
     magnify      = 1;
-    view_size    = 10;
+    view_scale   = 10;
     auto_scale   = 1;
     focus.reset();
     focus_shift.reset();
@@ -73,7 +73,7 @@ void ViewProp::read(Glossary& glos)
 {
     glos.set(zoom,        "zoom");
     glos.set(magnify,     "magnify");
-    if ( glos.set(view_size, "view_size") )
+    if ( glos.set(view_scale, "view_scale") )
         auto_scale = 0;
     glos.set(auto_scale,  "auto_scale");
     glos.set(auto_scale,  "autoscale");
@@ -165,7 +165,7 @@ void ViewProp::write_values(std::ostream& os) const
 {
     write_value(os, "zoom",          zoom);
     write_value(os, "magnify",       magnify);
-    write_value(os, "view_size",     view_size);
+    write_value(os, "view_scale",     view_scale);
     write_value(os, "auto_scale",    auto_scale);
     write_value(os, "focus",         focus+focus_shift);
     write_value(os, "rotation",      rotation);
