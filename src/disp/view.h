@@ -116,7 +116,7 @@ public:
     GLint const* viewport() const { return viewport_; }
 
     /// size of pixel in drawing units
-    float pixelSize() const { return view_scale / ( zoom * std::max(width(), height()) ); }
+    float pixelSize() const;
     
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;

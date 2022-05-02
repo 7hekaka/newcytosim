@@ -27,7 +27,8 @@ View::View(const std::string& n)
     visRegion[0] = view_scale;
     visRegion[1] = view_scale;
     visRegion[2] = view_scale;
-    
+    visRegion[3] = 0;
+
     eyePosition[0] = 0;
     eyePosition[1] = 0;
     eyePosition[2] = -0.5f * view_scale;
@@ -349,20 +350,15 @@ void View::adjust(int W, int H) const
 {
     if ( W > H )
     {
-        float R = float(H) / float(W);
         visRegion[0] = view_scale;
-        visRegion[1] = view_scale * R;
+        visRegion[1] = H * view_scale / W;
     }
     else
     {
-        float R = float(W) / float(H);
-        visRegion[0] = view_scale * R;
+        visRegion[0] = W * view_scale / H;
         visRegion[1] = view_scale;
     }
     visRegion[2] = view_scale;
-    
-    //std::clog << this << " View::adjust  " << visRegion[0] << " " << visRegion[1] << " " << visRegion[2] << "\n";
-    //std::clog << " pixel_size = " << zoom * visRegion[0]/window_size[0] << '\n';
 }
 
 
@@ -403,15 +399,6 @@ void View::setProjection() const
 }
 
 
-void View::load(int W, int H) const
-{
-    //std::clog << "View::load() win " << window() << "\n";
-    adjust(W, H);
-    setProjection();
-    setModelView();
-}
-
-
 void View::setModelView() const
 {
     //GLint e; glGetIntegerv(GL_MATRIX_MODE, &e); assert_true(e==GL_MODELVIEW);
@@ -429,6 +416,22 @@ void View::setModelView() const
     std::clog << "View:focus    " << focus+focus_shift << "\n";
 #endif
     //gym::printMatrices(stderr);
+}
+
+float View::pixelSize() const
+{
+    //float a = view_scale / ( zoom * std::max(width(), height()) );
+    float b = visRegion[0] / ( zoom * viewport_[2] );
+    //float c = visRegion[1] / ( zoom * viewport_[3] );
+    return b;
+}
+
+void View::load(int W, int H) const
+{
+    //std::clog << "View::load() win " << window() << "\n";
+    adjust(W, H);
+    setProjection();
+    setModelView();
 }
 
 
