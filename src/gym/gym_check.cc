@@ -48,19 +48,35 @@ static void print_cap(GLenum cap, const char * str)
     fprintf(stderr, "%s %i ", str, i);
 }
 
-void gym::printCaps()
+static void print_get(GLenum cap, const char * str)
 {
-    print_cap(GL_LIGHTING, "light");
+    GLint i[4];
+    glGetIntegerv(cap, i);
+    fprintf(stderr, "%s %i ", str, i[0]);
+}
+
+void gym::printCaps(const char str[])
+{
+    fprintf(stderr, "%s :", str);
+    print_cap(GL_NORMALIZE, "normalize");
     print_cap(GL_BLEND, "blend");
-    print_cap(GL_FOG, "fog");
-    print_cap(GL_DEPTH_TEST, "depth");
     print_cap(GL_ALPHA_TEST, "alpha");
+    print_cap(GL_DEPTH_TEST, "depth");
+    print_get(GL_DEPTH_WRITEMASK, "mask");
+    print_cap(GL_LIGHTING, "light");
+    print_cap(GL_LIGHT0, "");
+    print_cap(GL_LIGHT1, "");
+    print_cap(GL_LIGHT2, "");
+    print_cap(GL_FOG, "fog");
     print_cap(GL_STENCIL_TEST, "stencil");
     print_cap(GL_CULL_FACE, "cull");
+    print_cap(GL_SCISSOR_TEST, "scissor");
     print_cap(GL_COLOR_LOGIC_OP, "logic");
     print_cap(GL_COLOR_ARRAY, "array");
     print_cap(GL_COLOR_MATERIAL, "material");
     print_cap(GL_LINE_STIPPLE, "stipple");
+    print_cap(GL_TEXTURE_2D, "texture");
+
     
     GLfloat c[4] = { 0 };
     glGetFloatv(GL_CURRENT_COLOR, c);

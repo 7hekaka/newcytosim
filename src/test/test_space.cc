@@ -472,7 +472,7 @@ int display(View& view)
 {
     view.back_color.set(0.3,0.3,0.3,1);
     view.openDisplay();
-    //gym::printCaps();
+    //gym::printCaps("space");
 
 #if ( DIM >= 3 )
     if ( spc && ( showSpace & 2 ))

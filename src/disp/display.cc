@@ -2107,23 +2107,21 @@ void Display::drawTransparentObjects(Array<zObject>& list)
  */
 void Display::drawTransparentObjects(Simul const& sim)
 {
-    gym::enableCullFace(GL_BACK);
-
     if ( zObjects.size() )
     {
         /*
          Enable polygon offset to avoid artifacts with objects of same size,
          particularly the ends of filaments with their tubular shaft.
          */
+        gym::enableCullFace(GL_BACK);
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0, 1.0);
         drawTransparentObjects(zObjects);
         glDisable(GL_POLYGON_OFFSET_FILL);
+        gym::restoreCullFace();
     }
     
-    gym::enableCullFace(GL_BACK);
     drawTransparentSpaces(sim.spaces);
-    gym::disableCullFace();
 }
 
 #endif

@@ -40,11 +40,9 @@ void Display1::drawObjects(Simul const& sim)
     
     gym::enableLighting();
 #if ( DIM > 2 )
-    gym::enableCullFace(GL_BACK);
     gym::openDepthMask();
 #endif
     drawSpaces(sim.spaces);
-    
     gym::disableLighting();
     gym::disableCullFace();
 
@@ -154,15 +152,17 @@ void Display1::drawSinglesF(const SingleSet & set) const
     if ( prop->point_size > 0 )
     {
         gym::ref_view();
-        size_t i = 0, cnt = set.sizeF();
+        size_t cnt = set.sizeF();
         fluteD4* flu = gym::mapBufferC4VD(cnt);
+        fluteD4* ptr = flu;
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
-                flu[i++] = {obj->disp()->color2, setVertex(obj->posFoot(), obj)};
+                *ptr++ = {obj->disp()->color2, setVertex(obj->posFoot(), obj)};
         }
         gym::unmapBufferC4VD();
-        gym::drawPoints(pointSize, 0, i);
+        assert_true( ptr-flu <= cnt );
+        gym::drawPoints(pointSize, 0, ptr-flu);
     }
     gym::cleanup();
 }
@@ -172,8 +172,9 @@ void Display1::drawSinglesA(const SingleSet & set) const
 {
     gym::ref_view();
     gle_color air(0,0,0,0);
-    size_t i = 0, cnt = 2*set.sizeA();
+    size_t cnt = 2 * set.sizeA();
     fluteD4* flu = gym::mapBufferC4VD(cnt);
+    fluteD4* ptr = flu;
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
         Fiber const* fib = obj->fiber();
@@ -189,21 +190,23 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 Q = P;
                 d = air;
             }
-            flu[i++] = {c, setVertex(P, fib)};
-            flu[i++] = {d, setVertex(Q, obj)};
+            ptr[0] = {c, setVertex(P, fib)};
+            ptr[1] = {d, setVertex(Q, obj)};
+            ptr += 2;
         }
     }
     gym::unmapBufferC4VD();
 
     if ( prop->link_width > 0 )
     {
-        gym::drawLines(linkWidth, 0, i);
+        assert_true( ptr-flu <= cnt );
+        gym::drawLines(linkWidth, 0, ptr-flu);
     }
     
     if ( prop->point_size > 0 )
     {
         gym::rebindBufferC4VD(2);
-        gym::drawPoints(pointSize, 0, i/2);
+        gym::drawPoints(pointSize, 0, (ptr-flu)/2);
     }
     gym::cleanup();
 }
@@ -230,27 +233,30 @@ Always display Hand1 of Couple
 void Display1::drawCouplesF1(CoupleSet const& set) const
 {
     gym::ref_view();
-    size_t i = 0, cnt = set.sizeFF();
+    size_t cnt = set.sizeFF();
     fluteD4* flu = gym::mapBufferC4VD(cnt);
+    fluteD4* ptr = flu;
     for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
     {
         if ( obj->active() && obj->disp1()->perceptible )
-            flu[i++] = {obj->disp1()->color2, setVertex(obj->posFree(), obj)};
+            *ptr++ = {obj->disp1()->color2, setVertex(obj->posFree(), obj)};
     }
     gym::unmapBufferC4VD();
-    gym::drawPoints(pointSize, 0, i);
+    assert_true( ptr-flu <= cnt );
+    gym::drawPoints(pointSize, 0, ptr-flu);
     
 #if ( DIM > 1 )
     // display inactive Couples with square dots:
-    i = 0;
     flu = gym::mapBufferC4VD(cnt);
+    ptr = flu;
     for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
     {
         if ( !obj->active() && obj->disp1()->perceptible )
-            flu[i++] = {obj->disp1()->color2, obj->posFree()};
+            *ptr++ = {obj->disp1()->color2, obj->posFree()};
     }
     gym::unmapBufferC4VD();
-    gym::drawSquarePoints(M_SQRT1_2*pointSize, 0, i);
+    assert_true( ptr-flu <= cnt );
+    gym::drawSquarePoints(M_SQRT1_2*pointSize, 0, ptr-flu);
 #endif
     gym::cleanup();
 }
@@ -264,29 +270,31 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
 void Display1::drawCouplesF2(CoupleSet const& set) const
 {
     gym::ref_view();
-    size_t i = 0, cnt = set.sizeFF();
+    size_t cnt = set.sizeFF();
     fluteD4* flu = gym::mapBufferC4VD(cnt);
+    fluteD4* ptr = flu;
+    
     Couple * nxt;
     Couple * obj = set.firstFF();
-    
     if ( set.sizeFF() & 1 )
     {
         nxt = obj->next();
         if ( obj->disp12()->perceptible )
-            flu[i++] = { obj->disp12()->color2, setVertex(obj->posFree(), obj) };
+            *ptr++ = { obj->disp12()->color2, setVertex(obj->posFree(), obj) };
         obj = nxt;
     }
     while ( obj )
     {
         nxt = obj->next();
         if ( obj->disp21()->perceptible )
-            flu[i++] = { obj->disp21()->color2, setVertex(obj->posFree(), obj) };
+            *ptr++ = { obj->disp21()->color2, setVertex(obj->posFree(), obj) };
         obj = nxt->next();
         if ( nxt->disp12()->perceptible )
-            flu[i++] = { nxt->disp12()->color2, setVertex(nxt->posFree(), nxt) };
+            *ptr++ = { nxt->disp12()->color2, setVertex(nxt->posFree(), nxt) };
     }
     gym::unmapBufferC4VD();
-    gym::drawPoints(pointSize, 0, i);
+    assert_true( ptr-flu <= cnt );
+    gym::drawPoints(pointSize, 0, ptr-flu);
     gym::cleanup();
 }
 
@@ -296,22 +304,24 @@ void Display1::drawCouplesA(CoupleSet const& set) const
     if ( prop->point_size > 0 )
     {
         gym::ref_view();
-        size_t i = 0, cnt = set.sizeA();
+        size_t cnt = set.sizeA();
         fluteD4* flu = gym::mapBufferC4VD(cnt);
+        fluteD4* ptr = flu;
         for ( Couple * obj=set.firstAF(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber1();
             if ( obj->disp1()->perceptible & fib->disp->visible )
-                flu[i++] = { obj->disp1()->color2, setVertex(obj->posHand1(), fib) };
+                *ptr++ = { obj->disp1()->color2, setVertex(obj->posHand1(), fib) };
         }
         for ( Couple * obj=set.firstFA(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber2();
             if ( obj->disp2()->perceptible & fib->disp->visible )
-                flu[i++] = { obj->disp2()->color2, setVertex(obj->posHand2(), fib) };
+                *ptr++ = { obj->disp2()->color2, setVertex(obj->posHand2(), fib) };
         }
         gym::unmapBufferC4VD();
-        gym::drawPoints(pointSize, 0, i);
+        assert_true( ptr-flu <= cnt );
+        gym::drawPoints(pointSize, 0, ptr-flu);
         gym::cleanup();
     }
 }
@@ -321,8 +331,9 @@ void Display1::drawCouplesB(CoupleSet const& set) const
 {
     gym::ref_view();
     gle_color air(0,0,0,0);
-    size_t i = 0, cnt = 2 * set.sizeAA() * (1+ENABLE_EXPLODED_DISPLAY);
+    size_t cnt = 2 * set.sizeAA() * (1+ENABLE_EXPLODED_DISPLAY);
     fluteD4* flu = gym::mapBufferC4VD(cnt);
+    fluteD4* ptr = flu;
     for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
     {
 #if ( 0 )
@@ -344,14 +355,16 @@ void Display1::drawCouplesB(CoupleSet const& set) const
         if ( modulo ) modulo->fold(Q, P);
         if ( vis1 | vis2 )
         {
-            flu[i++] = { col1, setVertex(P, fib1) };
-            flu[i++] = { col2, setVertex(Q, fib1) };
+            ptr[0] = { col1, setVertex(P, fib1) };
+            ptr[1] = { col2, setVertex(Q, fib1) };
+            ptr += 2;
         }
 #if ENABLE_EXPLODED_DISPLAY
         if ( vis2 )
         {
-            flu[i++] = { col2, setVertex(Q, fib2) };
-            flu[i++] = { col1, setVertex(P, fib2) };
+            ptr[0] = { col2, setVertex(Q, fib2) };
+            ptr[1] = { col1, setVertex(P, fib2) };
+            ptr += 2;
         }
 #endif
     }
@@ -359,16 +372,18 @@ void Display1::drawCouplesB(CoupleSet const& set) const
     
     if ( prop->link_width > 0 )
     {
-        gym::drawLines(linkWidth, 0, i);
+        assert_true( ptr-flu <= cnt );
+        gym::drawLines(linkWidth, 0, ptr-flu);
     }
 
     if ( prop->point_size > 0 )
     {
 #if ENABLE_EXPLODED_DISPLAY
         gym::rebindBufferC4VD(2);
-        gym::drawPoints(pointSize, 0, i/2);
+        gym::drawPoints(pointSize, 0, (ptr-flu)/2);
 #else
-        gym::drawPoints(pointSize, 0, i);
+        assert_true( ptr-flu <= cnt );
+        gym::drawPoints(pointSize, 0, ptr-flu);
 #endif
     }
     gym::cleanup();

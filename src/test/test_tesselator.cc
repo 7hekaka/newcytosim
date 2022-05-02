@@ -34,7 +34,7 @@ void flip_cap(GLenum cap)
         glDisable(cap);
     else
         glEnable(cap);
-    gym::printCaps();
+    gym::printCaps("flip");
 }
 
 //------------------------------------------------------------------------------

@@ -34,11 +34,9 @@ void Display2::drawObjects(Simul const& sim)
     
     gym::enableLighting();
 #if ( DIM > 2 )
-    gym::enableCullFace(GL_BACK);
     gym::openDepthMask();
 #endif
     drawSpaces(sim.spaces);
-    
     gym::disableLighting();
     gym::disableCullFace();
 

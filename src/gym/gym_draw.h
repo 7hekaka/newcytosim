@@ -202,7 +202,7 @@ namespace gym
     /// disable  Cull Face
     inline void disableCullFace() { cull_ = glIsEnabled(GL_CULL_FACE); glDisable(GL_CULL_FACE); }
     /// restore previous Cull Face state
-    inline void restoreCullFace() { if ( cull_ ) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE); glCullFace(GL_BACK); }
+    inline void restoreCullFace() { if ( cull_ ) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE); }
     /// change Cull Face parameter
     inline void switchCullFace(GLenum face) { glCullFace(face); }
 

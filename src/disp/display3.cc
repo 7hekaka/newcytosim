@@ -46,10 +46,8 @@ void Display3::drawObjects(Simul const& sim)
     drawFields(sim.fields);
     
     gym::enableLighting();
-    gym::enableCullFace(GL_BACK);
     gym::openDepthMask();
     drawSpaces(sim.spaces);
-    
     gym::disableCullFace();
 
     if ( stencil_ )

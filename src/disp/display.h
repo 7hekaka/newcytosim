@@ -169,7 +169,7 @@ public:
     void drawFields(FieldSet const&);
     
     /// draw a Space
-    void drawSpace3D(Space const*, bool);
+    void drawSpace3D(Space const*, bool back);
 
     /// draw all Spaces (in 3D the back side)
     void drawSpaces(SpaceSet const&);

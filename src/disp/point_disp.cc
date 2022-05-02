@@ -279,7 +279,7 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling)
     gym::disableLighting();
     gym::disableBlending();
     gym::disableAlphaTest();
-    //gym::printCaps();
+    //gym::printCaps("P");
     makePixelmaps(unit_value, sampling, dim);
     gym::restoreAlphaTest();
     gym::restoreBlending();

@@ -17,7 +17,7 @@ namespace gym
     void printColors(FILE*);
     
     /// print some info for debugging purpose
-    void printCaps();
+    void printCaps(const char[]);
     
     /// print OpenGL matrices for debugging purpose
     void printMatrices(FILE*);
