@@ -1,8 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <unistd.h>
 #include <cstdio>
 #include <time.h>
 #include "sim_thread.h"
@@ -90,6 +87,7 @@ void SimThread::run()
     assert_true( isWorker() );
     try {
         Parser::readConfig();
+        hold();
     }
     catch( Exception & e ) {
         sim_->relax();
