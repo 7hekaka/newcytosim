@@ -17,7 +17,7 @@ constexpr float LINK_SIZE = 8;
 /// Display link between 2 positions
 void drawLink(gle_color const& col, Vector const& a, Vector const& b)
 {
-    fluteD4* flu = gym::mapBufferC4VD(2);
+    flute4D* flu = gym::mapBufferC4VD(2);
     flu[0] = { col, a };
     flu[1] = { col, b };
     gym::unmapBufferC4VD();
@@ -30,7 +30,7 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
 {
     Vector b = a + ab;
     Vector dx = ab * (( 1 - len / ab.norm() ) / 2);
-    fluteD4* flu = gym::mapBufferC4VD(4);
+    flute4D* flu = gym::mapBufferC4VD(4);
     flu[0] = { col, a };
     flu[1] = { col, a+dx };
     flu[2] = { col, b-dx };
@@ -51,7 +51,7 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
     if ( modulo )
         modulo->fold(c, a);
     Vector b = a + ab;
-    fluteD4* flu = gym::mapBufferC4VD(4);
+    flute4D* flu = gym::mapBufferC4VD(4);
     flu[0] = { col, a };
     flu[1] = { col, b };
     flu[2] = { col, c };
@@ -68,7 +68,7 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector co
 {
     Vector b = a + ab;
     Vector c = d + dc;
-    fluteD4* flu = gym::mapBufferC4VD(4);
+    flute4D* flu = gym::mapBufferC4VD(4);
     flu[0] = { col, a };
     flu[1] = { col, b };
     flu[2] = { col, c };

@@ -238,7 +238,7 @@ void Display2::drawCoupleB(Couple const* cx) const
     if ( pd1->perceptible || pd2->perceptible )
     {
         gym::ref_view();
-        fluteD4* flu = gym::mapBufferC4VD(4);
+        flute4D* flu = gym::mapBufferC4VD(4);
 #if 0
         flu[0] = { pd1->color, p1 };
         flu[1] = { pd2->color, p2 };

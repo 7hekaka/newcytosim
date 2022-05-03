@@ -168,7 +168,7 @@ int display(View& view)
     view.openDisplay();
     view.setLabel(std::to_string(sTime));
 
-    fluteD4 * flu = gym::mapBufferC4VD(PAM.max);
+    flute4D * flu = gym::mapBufferC4VD(PAM.max);
     
     for (size_t i = 0; i < PAM.max; ++i)
         flu[i] = { things[i].col, things[i].pos };

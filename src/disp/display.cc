@@ -741,7 +741,7 @@ void Display::drawMisc(Simul const& sim)
     sim.sMeca.locusGrid.drawGrid();
     sim.sMeca.pointGrid.drawGrid();
 #endif
-    
+#if ( 0 )
     for ( Property const* i : sim.properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
@@ -750,6 +750,7 @@ void Display::drawMisc(Simul const& sim)
         else if ( fp->disp->draw_average == 2 )
             drawAverageFiber2(sim.fibers, fp);
     }
+#endif
 }
 
 
@@ -824,8 +825,8 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
 {
     gym::ref_view();
     size_t cnt = 2 * fib.nbSegments();
-    fluteD4* flu = gym::mapBufferC4VD(cnt+4);
-    fluteD4* ptr = flu;
+    flute4D* flu = gym::mapBufferC4VD(cnt+4);
+    flute4D* ptr = flu;
     bool strip = 1;
     
     switch ( style )
@@ -906,8 +907,8 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
     size_t cnt = 8;
-    fluteD4* flu = gym::mapBufferC4VD(cnt);
-    fluteD4* ptr = flu;
+    flute4D* flu = gym::mapBufferC4VD(cnt);
+    flute4D* ptr = flu;
 
     if ( disp->line_style == 6 )
     {
@@ -1080,8 +1081,8 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     gle_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
     size_t cnt = 2 * ( sup - inf );
-    fluteD4* flu = gym::mapBufferC4VD(cnt+4);
-    fluteD4* ptr = flu;
+    flute4D* flu = gym::mapBufferC4VD(cnt+4);
+    flute4D* ptr = flu;
     
     if ( inf == sup )
     {
@@ -1146,8 +1147,8 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     gle_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
     size_t cnt = 2 * ( sup - inf );
-    fluteD4* flu = gym::mapBufferC4VD(cnt+4);
-    fluteD4* ptr = flu;
+    flute4D* flu = gym::mapBufferC4VD(cnt+4);
+    flute4D* ptr = flu;
     
     if ( inf == sup )
     {
@@ -1294,7 +1295,7 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
     gle_color col = fib.prop->disp->force_color;
     gle_color lor = col.alpha_scaled(0.5f);
     size_t cnt = 2 * fib.nbPoints();
-    fluteD4* flu = gym::mapBufferC4VD(cnt);
+    flute4D* flu = gym::mapBufferC4VD(cnt);
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {
         Vector P = fib.posP(i);

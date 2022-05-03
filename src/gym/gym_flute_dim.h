@@ -14,10 +14,10 @@
 
 #if ( DIM >= 3 )
 typedef flute3 fluteD;
-typedef flute8 fluteD4;
+typedef flute8 flute4D;
 #else
 typedef flute2 fluteD;
-typedef flute6 fluteD4;
+typedef flute6 flute4D;
 #endif
 
 namespace gym
@@ -35,7 +35,7 @@ namespace gym
     inline void rebindBufferVD(size_t gap) { rebind(); setBufferV((DIM>2?3:2), gap); }
 
     /// map / unmap GPU buffer for color data + vertex
-    inline fluteD4* mapBufferC4VD(size_t n) { return (fluteD4*)mapFloatBuffer((DIM>2?8:6)*n); }
+    inline flute4D* mapBufferC4VD(size_t n) { return (flute4D*)mapFloatBuffer((DIM>2?8:6)*n); }
     inline void   unmapBufferC4VD() { unmap(); setBufferCV(4, (DIM>2?4:2)); }
     inline void  rebindBufferC4VD(size_t gap) { rebind(); setBufferCV(4, (DIM>2?4:2), gap); }
 };
