@@ -73,7 +73,6 @@ void SimThread::hold()
         holding_ = 1;
         //debug("holding");
         cond_wait();  // this also unlocks and locks the mutex
-        holding_ = 0;
     }
 }
 
@@ -262,7 +261,6 @@ void SimThread::stop()
             // wait for termination:
             pthread_join(child_, nullptr);
             alone_ = 1;
-            holding_ = 0;
         }
     }
 }
@@ -284,7 +282,6 @@ void SimThread::cancel()
             pthread_join(child_, nullptr);
             holding_ = 0;
             alone_ = 1;
-            holding_ = 0;
             unlock();
         }
     }

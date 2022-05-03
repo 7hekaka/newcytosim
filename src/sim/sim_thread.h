@@ -42,9 +42,6 @@ private:
     
     /// period for hold()
     unsigned int period_;
-    
-    /// signal for hold()
-    unsigned int holding_;
 
     /// Reader used to access frames in a trajectory file
     FrameReader reader_;

@@ -858,10 +858,9 @@ void processKey(unsigned char key, int modifiers = 0)
             }
             else
             {
-                if ( worker.trylock() )
+                if ( worker.holding() )
                 {
                     glApp::displayAll();
-                    worker.unlock();
                     worker.signal();
                 }
                 player.stop();

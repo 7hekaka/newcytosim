@@ -174,8 +174,8 @@ int display(View& view)
 
     //--------------draw content of cells
     const real gold = 2.0 / ( 1.0 + sqrt(5) );
-    fluteD4 * flu = gym::mapBufferC4VD(16*myGrid.nbCells()+2);
-    fluteD4 * ptr = flu;
+    flute4D * flu = gym::mapBufferC4VD(16*myGrid.nbCells()+2);
+    flute4D * ptr = flu;
 
     for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
     {
