@@ -364,26 +364,26 @@ void View::setProjection() const
     if ( perspective == 3 )
     {
         // this creates a stronger perspective:
-        eyeDistance = -1.5f * S;
+        eyeDistance = -1.5f;
         gym::mat_frustum(projection_, -X, X, -Y, Y, S, 5.0f*S);
     }
     else if ( perspective == 2 )
     {
         // this creates a strong perspective:
-        eyeDistance = -2.0f * S;
+        eyeDistance = -2.0f;
         gym::mat_frustum(projection_, -X, X, -Y, Y, S, 6.0f*S);
     }
     else if ( perspective )
     {
         // this creates a perspective:
-        eyeDistance = -2.0f * S;
+        eyeDistance = -2.0f;
         gym::mat_frustum(projection_, -X, X, -Y, Y, S, 11.0f*S);
     }
     else
     {
         // The back-plane is set behind to avoid clipping
-        eyeDistance = -0.25f * S;
-        gym::mat_ortho(projection_,-X, X, -Y, Y, 0.25f*S, 2*S);
+        eyeDistance = -0.5f;
+        gym::mat_ortho(projection_,-X, X, -Y, Y, 0.25f*S, 2.25f*S);
     }
 
     //std::clog << "View::setProjection  " << window_ << "\n";

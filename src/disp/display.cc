@@ -188,15 +188,13 @@ void Display::drawSimul(Simul const& sim)
     zObjects.clear();
     
 #if ( DIM >= 3 )
-    gym::enableLighting();
     // Draw opaque objects with depth buffer is writable
     drawObjects(sim);
-    gym::closeDepthMask();
     // Draw transparent objects with depth buffer readable
+    gym::closeDepthMask();
     drawTransparentObjects(sim);
     gym::openDepthMask();
 #else
-    gym::disableLighting();
     drawObjects(sim);
 #endif
     
@@ -444,29 +442,28 @@ void Display::prepareLineDisp(const Fiber * fib, LineDisp * self)
 template < typename T >
 void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
 {
-    assert_true(p);
-        
     PointDisp *& disp = p->disp;
-    
-    // search for matching property:
-    if ( !disp )
-        disp = static_cast<PointDisp*>(alldisp.find(p->category()+":display", p->name()));
     
     // create new property:
     if ( !disp )
     {
-        //std::clog <<" new " << p->category() << ":display " << p->name() << "\n";
-        disp = new PointDisp(p->category()+":display", p->name());
-        disp->clear();
-        alldisp.push_back(disp);
-        // set default:
-        disp->color  = col;
-        disp->color2 = col.alpha_scaled(0.25f);
-        disp->size   = prop->point_size;
-        if ( p->category() == "hand" )
-            disp->width = prop->link_width;
-        else
-            disp->width = prop->line_width;
+        // search for matching property:
+        disp = static_cast<PointDisp*>(alldisp.find(p->category()+":display", p->name()));
+        if ( !disp )
+        {
+            //std::clog <<" new " << p->category() << ":display " << p->name() << "\n";
+            disp = new PointDisp(p->category()+":display", p->name());
+            disp->clear();
+            alldisp.push_back(disp);
+            // set default:
+            disp->color  = col;
+            disp->color2 = col.alpha_scaled(0.25f);
+            disp->size   = prop->point_size;
+            if ( p->category() == "hand" )
+                disp->width = prop->link_width;
+            else
+                disp->width = prop->line_width;
+        }
     }
     
     // parse display string once:
