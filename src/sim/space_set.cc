@@ -16,10 +16,6 @@
  */
 Modulo const* modulo = nullptr;
 
-
-/// static variable of SpaceSet:
-Space const* SpaceSet::master_ = nullptr;
-
 /**
  set current Space to `spc`. (spc==NULL is a valid argument).
  */

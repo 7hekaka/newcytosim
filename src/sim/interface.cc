@@ -963,6 +963,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     }
     
     VLOG("+RUN END");
+    hold();
 }
 
 
@@ -984,6 +985,7 @@ void Interface::execute_run(size_t nb_steps)
     
     sim_->relax();
     VLOG("-RUN END");
+    hold();
 }
 
 

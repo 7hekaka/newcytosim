@@ -58,6 +58,9 @@ public:
      */
     virtual void hold() {}
     
+    /// erase Simulation
+    virtual void erase_simul(bool) const;
+
     //-------------------------------------------------------------------------------
 
     /// return Simul object pointer
@@ -71,9 +74,6 @@ public:
     
     /// test if 'name' is a category
     bool isCategory(std::string const& name) const;
-    
-    /// erase Simulation
-    void erase_simul(bool) const;
 
     //-------------------------------------------------------------------------------
 

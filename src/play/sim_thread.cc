@@ -11,7 +11,6 @@
 
 /**
  This uses a Parser that cannot write to disc.
- The function `callback` is called when Parser::hold() is reached.
  */
 SimThread::SimThread(Simul* sim, void (*callback)(void))
 : Parser(sim, 1, 1, 1, 1, 0), hold_callback(callback)

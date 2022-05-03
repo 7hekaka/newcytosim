@@ -10,12 +10,12 @@ class Simul;
 class SpaceSet : public ObjectSet
 {
     /// the master space
-    static Space const* master_;
+    Space const* master_;
 
 public:
 
     /// return master
-    static Space const* master() { return master_; }
+    Space const* master() const { return master_; }
 
     /// change master
     void setMaster(Space const* s);
