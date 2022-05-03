@@ -285,7 +285,15 @@ void SingleSet::shuffle()
 
 void SingleSet::erase()
 {
-    relax();
+    for ( SingleReserve & reserve : uniReserves )
+    {
+        for ( Single * s : reserve.second )
+        {
+            s->objset(nullptr);
+            delete(s);
+        }
+        reserve.second.clear();
+    }
     ObjectSet::erasePool(fList);
     ObjectSet::erasePool(aList);
     inventory_.clear();

@@ -18,9 +18,6 @@ class SimThread : public Parser
     friend void child_cleanup(void*);
     
 private:
-
-    /// Reader used to access frames in a trajectory file
-    FrameReader reader_;
     
     /// callback invoked when the thread is halted, set in constructor
     void (*hold_callback)(void);
@@ -28,25 +25,30 @@ private:
     /// thread used to run the simulation
     pthread_t child_;
     
-    /// a flag reflecting if the child thread is running or not
-    volatile bool alone_;
-    
-    /// a flag to indicate that child thread should terminate or restart
-    volatile int flag_;
-    
     /// mutex protecting write access to simulation state
     pthread_mutex_t mutex_;
 
     /// condition variable used to control the thread execution
     pthread_cond_t condition_;
     
+    /// signal for hold()
+    bool holding_;
+
+    /// a flag reflecting if the child thread is running or not
+    bool alone_;
+    
+    /// a flag to indicate that child thread should terminate or restart
+    int flag_;
+
     /// counter for hold()
     unsigned int hold_;
     
     /// period for hold()
     unsigned int period_;
 
-    
+    /// Reader used to access frames in a trajectory file
+    FrameReader reader_;
+
     /// the current Single being controlled with the mouse
     mutable Single * handle_;
     
@@ -99,8 +101,8 @@ public:
     /// unlock access to data and wait for the condition
     int cond_wait() { return pthread_cond_wait(&condition_, &mutex_); }
     
-    /// send signal to other threads
-    void signal() { if ( !alone_ ) pthread_cond_signal(&condition_); }
+    /// send signal to child thread
+    void signal() { holding_ = 0; if ( !alone_ ) pthread_cond_signal(&condition_); }
 
 #else
     
@@ -116,8 +118,8 @@ public:
     /// wait for the condition
     int cond_wait() { debug("unlock, wait"); int R=pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); return R; }
     
-    /// signal other thread to continue
-    void signal() { debug("signal"); pthread_cond_signal(&condition_); }
+    /// signal child thread to continue
+    void signal() { debug("signal"); holding_ = 0; pthread_cond_signal(&condition_); }
     
 #endif
     
@@ -136,9 +138,6 @@ public:
     /// continue to run the simulation after its normal termination
     int extend();
     
-    /// perform one simulation step
-    void step();
-    
     /// gently stop the simulation
     void stop();
 
@@ -149,7 +148,7 @@ public:
     void restart();
 
     /// clear the simulation world
-    void erase_simul(bool);
+    void erase_simul(bool) const;
     
     /// halt the live simulation, read the config file and change the object parameters
     void reloadParameters(std::string const& file);

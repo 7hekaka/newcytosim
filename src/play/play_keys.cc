@@ -859,7 +859,12 @@ void processKey(unsigned char key, int modifiers = 0)
             }
             else
             {
-                worker.step();
+                if ( worker.trylock() )
+                {
+                    glApp::displayAll();
+                    worker.unlock();
+                    worker.signal();
+                }
                 player.stop();
             }
             break;

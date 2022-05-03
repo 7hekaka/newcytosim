@@ -68,6 +68,7 @@ void Simul::setFiberGrid(Space const* spc, real& grid_step) const
  */
 void Simul::prepare()
 {
+    //fprintf(stderr, "Simul:%p:prepare()\n", this);
     if ( !spaces.master() )
         throw InvalidSyntax("A space must be defined first!");
 

@@ -178,7 +178,7 @@ public:
     /// number of Couples attached by cHand2 only
     size_t sizeFA()  const{ return faList.size(); }
     /// number of Couples attached by one hand
-    size_t sizeA()   const{ return faList.size()+afList.size(); }
+    size_t sizeA()   const{ return faList.size() + afList.size(); }
     /// number of Couples attached by both hands
     size_t sizeAA()  const{ return aaList.size(); }
     /// total number of elements

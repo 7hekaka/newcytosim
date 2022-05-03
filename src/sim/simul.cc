@@ -75,12 +75,11 @@ void Simul::initialize(Glossary & glos)
 void Simul::erase_all(bool erase_properties)
 {
     //fprintf(stderr, "Simul:%p:erase()\n", this);
-    relax();
+    singles.erase();
+    couples.erase();
     tubules.erase();
     organizers.erase();
     fibers.erase();
-    singles.erase();
-    couples.erase();
     spheres.erase();
     beads.erase();
     solids.erase();

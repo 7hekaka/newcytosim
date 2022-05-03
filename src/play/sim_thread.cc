@@ -242,15 +242,6 @@ int SimThread::loadLastFrame()
 //------------------------------------------------------------------------------
 #pragma mark - Thread control & termination
 
-
-void SimThread::step()
-{
-    assert_false( isWorker() );
-    if ( !alone_ )
-        signal();
-}
-
-
 /**
  ask the slave thread to exit at the next spontaneous halt
 */ 
@@ -288,6 +279,7 @@ void SimThread::cancel()
         {
             // wait for termination:
             pthread_join(child_, nullptr);
+            holding_ = 0;
             alone_ = 1;
             unlock();
         }
@@ -431,7 +423,7 @@ void SimThread::deleteHandles()
     unlock();
 }
 
-void SimThread::erase_simul(bool arg)
+void SimThread::erase_simul(bool arg) const
 {
     assert_false( isWorker() );
     Interface::erase_simul(arg);

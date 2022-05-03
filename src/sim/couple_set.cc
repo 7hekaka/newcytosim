@@ -406,7 +406,15 @@ void CoupleSet::shuffle()
 
 void CoupleSet::erase()
 {
-    relax();
+    for ( CoupleReserve & reserve : uniReserves )
+    {
+        for ( Couple * c : reserve.second )
+        {
+            c->objset(nullptr);
+            delete(c);
+        }
+        reserve.second.clear();
+    }
     ObjectSet::erasePool(aaList);
     ObjectSet::erasePool(faList);
     ObjectSet::erasePool(afList);
