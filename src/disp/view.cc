@@ -191,6 +191,26 @@ void View::closeDisplay() const
 }
 
 
+// display FPS = frames per seconds
+void View::drawFPS() const
+{
+    static char str[16];
+    static size_t cnt = 0;
+    static double sec = TimeDate::seconds_today();
+    ++cnt;
+    double now = TimeDate::seconds_today();
+    if ( now > sec + 1.0 )
+    {
+        double fps = cnt / ( now - sec );
+        snprintf(str, sizeof(str), "%6.2f", fps);
+        sec = now;
+        cnt = 0;
+    }
+    gym::one_view(viewport_[2], viewport_[3]);
+    gym::color(front_color);
+    fgStrokeString(0, 4, 0.1, 1, str, 1, 0, 0);
+}
+
 /**
  add over-the-window features for the interactive display
 */
@@ -233,23 +253,6 @@ void View::drawInteractiveFeatures() const
         if ( TimeDate::seconds_since_1970() > flash_end )
             flash = "";
     }
-
-#if ( 0 )
-    // display FPS = frames per seconds
-    static char buf[16];
-    static size_t cnt = 0;
-    static double sec = TimeDate::seconds_today();
-    ++cnt;
-    double now = TimeDate::seconds_today();
-    if ( now > sec + 1.0 )
-    {
-        double fps = cnt / ( now - sec );
-        snprintf(buf, sizeof(buf), "%6.2f fps", fps);
-        sec = now;
-        cnt = 0;
-    }
-    gym::placeText(1, BITMAP_9_BY_15, front_color, buf, nullptr, W, H);
-#endif
     
     gym::restoreDepthTest();
     gym::restoreAlphaTest();

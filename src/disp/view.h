@@ -138,6 +138,9 @@ public:
     /// unset clipping planes and fog parameters, display axes and scale bar
     void closeDisplay() const;
     
+    /// display frame-per-seconds
+    void drawFPS() const;
+
     /// display scale bar, info text, etc.
     void drawInteractiveFeatures() const;
     
