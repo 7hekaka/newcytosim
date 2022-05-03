@@ -125,6 +125,9 @@ public:
     void period(unsigned int c) { period_ = c; }
     
     /// true if child thread is running
+    bool alone() const { return alone_; }
+
+    /// true if child thread is running
     bool alive() const { return !alone_; }
     
     /// start the thread that will run a simulation
