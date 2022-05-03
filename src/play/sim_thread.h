@@ -12,7 +12,7 @@
 /**
  The SimThread needs to derive from Parser, for overwritting 'hold()'
  */
-class SimThread : private Parser
+class SimThread : public Parser
 {
     /// cleanup callback
     friend void child_cleanup(void*);
@@ -150,9 +150,6 @@ public:
 
     /// clear the simulation world
     void erase_simul(bool);
-    
-    /// execute commands from standard input, return number of lines processed
-    size_t executePipedCommands(size_t max_nb_lines);
     
     /// halt the live simulation, read the config file and change the object parameters
     void reloadParameters(std::string const& file);

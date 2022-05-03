@@ -115,6 +115,9 @@ public:
 
     /// Parse the default config file (SimulProp::config)
     void readConfig();
+    
+    /// execute commands from standard input, return number of lines processed
+    size_t parse_stdinput(size_t max_nb_lines);
 
 };
 

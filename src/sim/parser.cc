@@ -1,16 +1,18 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
+#include <unistd.h>
+#include <fstream>
+
 #include "cymdef.h"
 #include "parser.h"
 #include "messages.h"
 #include "tokenizer.h"
+#include "print_color.h"
 #include "glossary.h"
 #include "filepath.h"
 #include "stream_func.h"
 #include "simul_prop.h"
 #include "simul.h"
-#include "print_color.h"
-#include <fstream>
 
 
 // Use the second definition to get some reports:
@@ -1296,3 +1298,67 @@ void Parser::readConfig()
     readConfig(simulProp().config_file);
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Pipe
+
+#if ( 0 )
+
+#include <fcntl.h>
+
+/// set file to not block on read() even if data is not available:
+void set_nonblocking(int fd)
+{
+    fcntl(fd, F_SETFL, O_NONBLOCK);
+}
+
+#endif
+
+
+/// check if file has data for input
+inline int has_input(int fd)
+{
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(fd, &fds);
+    struct timeval tv = {0, 10};   // seconds, microseconds
+    return select(1, &fds, nullptr, nullptr, &tv);
+}
+
+
+/**
+ Read standard input and executes incoming commands.
+ This should be executed by a process who already owns the lock on the data
+ */
+size_t Parser::parse_stdinput(size_t max_nb_lines)
+{
+    const size_t LINESIZE = 2048;
+    clearerr(stdin);
+    
+    if ( has_input(STDIN_FILENO) > 0 )
+    {
+        size_t cnt = 0;
+        // some input is available, process line-by-line:
+        char str[LINESIZE];
+        
+        // read one line from standard input (including terminating \n):
+        while ( fgets(str, LINESIZE, stdin) )
+        {
+            //write(STDOUT_FILENO, ">>>> ", 5); write(STDOUT_FILENO, str, strlen(str));
+            try {
+                Parser::evaluate(str);
+            }
+            catch ( Exception & e ) {
+                print_green(std::cerr, e.brief());
+                std::cerr << " in: " << str;
+            }
+            if ( ++cnt >= max_nb_lines )
+                break;
+            // check if more input is available:
+            if ( has_input(STDIN_FILENO) < 1 )
+                break;
+        }
+        //printf("executed %lu lines from standard input\n", cnt);
+        return cnt;
+    }
+    return 0;
+}

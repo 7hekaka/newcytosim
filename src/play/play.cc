@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include "simul_prop.h"
+#include "simul.h"
 #include "glossary.h"
 #include "messages.h"
 #include "offscreen.h"
@@ -57,7 +57,7 @@ void drawLive(View& view, int mag)
     //std::clog << " drawLive(" << std::setprecision(3) << simul.time() << "s) " << "\n";
     if ( 0 == worker.trylock() )
     {
-        worker.executePipedCommands(32);
+        worker.parse_stdinput(32);
         player.drawScene(view, mag);
         worker.unlock();
     }

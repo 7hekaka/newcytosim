@@ -77,7 +77,7 @@ void timerCallback(const int value)
     {
         bool draw = false;
         // in replay mode, no need to lock the simulation state
-        if ( worker.executePipedCommands(32) )
+        if ( worker.parse_stdinput(32) )
             draw = true;
         
         if ( prop.play > 0 )

@@ -1,9 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <cstdio>
 #include <time.h>
 #include "sim_thread.h"
 #include "exceptions.h"
@@ -135,8 +131,6 @@ void SimThread::start()
     if ( alone_ )
     {
         flag_ = 0;
-        holding_ = 0;
-        Parser::restart_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
         if ( pthread_create(&child_, nullptr, run_launcher, this) )
             throw Exception("failed to create thread");
@@ -185,7 +179,6 @@ int SimThread::extend()
     if ( alone_ )
     {
         flag_ = 0;
-        holding_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
         if ( pthread_create(&child_, nullptr, extend_launcher, this) )
             throw Exception("failed to create thread");
@@ -277,7 +270,6 @@ void SimThread::stop()
             // wait for termination:
             pthread_join(child_, nullptr);
             alone_ = 1;
-            holding_ = 0;
         }
     }
 }
@@ -298,7 +290,6 @@ void SimThread::cancel()
             // wait for termination:
             pthread_join(child_, nullptr);
             alone_ = 1;
-            holding_ = 0;
             unlock();
         }
     }
@@ -450,69 +441,6 @@ void SimThread::erase_simul(bool arg)
 
 //------------------------------------------------------------------------------
 #pragma mark - Parameter modifications
-
-#if ( 0 )
-
-#include <fcntl.h>
-
-/// set file to not block on read() even if data is not available:
-void set_nonblocking(int fd)
-{
-    fcntl(fd, F_SETFL, O_NONBLOCK);
-}
-
-#endif
-
-
-/// check if file has data for input
-inline int has_input(int fd)
-{
-    fd_set fds;
-    FD_ZERO(&fds);
-    FD_SET(fd, &fds);
-    struct timeval tv = {0, 10};   // seconds, microseconds
-    return select(1, &fds, nullptr, nullptr, &tv);
-}
-
-
-/**
- Read standard input and executes incoming commands.
- This should be executed by a process who already owns the lock on the data
- */
-size_t SimThread::executePipedCommands(size_t max_nb_lines)
-{
-    const size_t LINESIZE = 2048;
-    clearerr(stdin);
-    
-    if ( has_input(STDIN_FILENO) > 0 )
-    {
-        size_t cnt = 0;
-        // some input is available, process line-by-line:
-        char str[LINESIZE];
-        
-        // read one line from standard input (including terminating \n):
-        while ( fgets(str, LINESIZE, stdin) )
-        {
-            //write(STDOUT_FILENO, ">>>> ", 5); write(STDOUT_FILENO, str, strlen(str));
-            try {
-                Parser::evaluate(str);
-            }
-            catch ( Exception & e ) {
-                print_green(std::cerr, e.brief());
-                std::cerr << " in: " << str;
-            }
-            if ( ++cnt >= max_nb_lines )
-                break;
-            // check if more input is available:
-            if ( has_input(STDIN_FILENO) < 1 )
-                break;
-        }
-        glApp::flashText(str);
-        //printf("executed %lu lines from standard input\n", cnt);
-        return cnt;
-    }
-    return 0;
-}
 
 /**
  Read config file from the start, allowing parameters to be changed, while 
