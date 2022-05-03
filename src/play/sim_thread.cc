@@ -425,7 +425,6 @@ void SimThread::deleteHandles()
 
 void SimThread::erase_simul(bool arg) const
 {
-    assert_false( isWorker() );
     Interface::erase_simul(arg);
     handle_ = nullptr;
 }
