@@ -809,7 +809,7 @@ inline void Interface::step_simul(size_t& sss, size_t cnt)
     {
         hold();
         //fprintf(stderr, "> step %6zu\n", sss);
-        ( sim_->*FUNC)();
+        (sim_->*FUNC)();
         sim_->step();
         ++sss;
     }

@@ -32,11 +32,11 @@ private:
     /// control switch to enable command 'write' (write files)
     bool do_write;
     
+protected:
+    
     /// counters for the 'restart' command
     size_t restart_;
-    
-    //--------------------------------------------------------------------------
-    
+
     /// parse command `set`
     void parse_set(std::istream&);
     

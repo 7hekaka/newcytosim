@@ -915,13 +915,15 @@ void Meca::apply()
             //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
             if ( a | b )
             {
-                fprintf(stderr, "Meca::solve failed (not-a-number %i %i):\n", a, b);
+                fprintf(stderr, "Meca::%p failed (not-a-number %i %i):\n", this, a, b);
+#if ( 0 )
                 for ( Mecable * mec : mecables )
                 {
                     b = has_nan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
                     fprintf(stderr, "Mecable %s isnan %i\n", mec->reference().c_str(), b);
                 }
-                return;
+#endif
+                ready_ = 0;
             }
         }
 
