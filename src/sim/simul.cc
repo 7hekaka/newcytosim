@@ -74,7 +74,7 @@ void Simul::initialize(Glossary & glos)
 
 void Simul::erase_all(bool erase_properties)
 {
-    //std::cerr << "Simul::erase()\n";
+    //fprintf(stderr, "Simul:%p:erase()\n", this);
     relax();
     tubules.erase();
     organizers.erase();

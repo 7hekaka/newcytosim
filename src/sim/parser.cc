@@ -1201,6 +1201,7 @@ int Parser::evaluate_one(std::istream& is)
             if ( ++restart_ > cnt )
                 return 2;
             // reset simulation and rewind the config file
+            //fprintf(stderr, "Parser:%p:restart\n", sim_);
             erase_simul(1);
             is.seekg(0);
             is.clear();

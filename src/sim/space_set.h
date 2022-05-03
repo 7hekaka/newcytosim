@@ -21,7 +21,7 @@ public:
     void setMaster(Space const* s);
 
     /// constructor
-    SpaceSet(Simul& s) : ObjectSet(s) {}
+    SpaceSet(Simul& s) : ObjectSet(s), master_(nullptr) {}
     
     //--------------------------
     
