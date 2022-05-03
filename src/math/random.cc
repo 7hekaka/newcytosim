@@ -11,7 +11,7 @@
 #include <random>
 
 /// static object
-Random RNG;
+thread_local Random RNG;
 
 
 /// switch for using SIMD to generate Gaussians faster (requires AVX)
@@ -66,6 +66,7 @@ Random::~Random()
 
 void Random::seed(const uint32_t s)
 {
+    //printf("Random:%p:seed(%i) %p\n", this, s, pthread_self());
     sfmt_init_gen_rand(&twister_, s);
     refill();
 }

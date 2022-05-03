@@ -3,6 +3,7 @@
 #define RANDOM_H
 
 #include <stdint.h>
+//#include <pthread.h>
 
 #ifndef REAL_H
 #  include "real.h"
@@ -67,6 +68,7 @@ protected:
         memcpy(integers_, twister_.state, 4*SFMT_N32);
         start_ = integers_;
         finish_ = start_ + SFMT_N32;
+        //printf("Random:%p:refill %p\n", this, pthread_self());
         sfmt_gen_rand_all(&twister_);
     }
 
@@ -357,8 +359,8 @@ public:
 };
 
 
-/// declaring a global Random Number Generator
-extern Random RNG;
+/// The Random Number Generator is thread local to avoid data corruption
+extern thread_local Random RNG;
 
 /**
  Linear congruential random number generator
