@@ -45,7 +45,7 @@ public:
     /// apply a force directed towards the edge of the Space
     void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
-    ///    the step function can change the radius
+    /// the step function can change the radius
     void step();
 
 };

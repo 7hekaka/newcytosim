@@ -3,7 +3,6 @@
 #define RANDOM_H
 
 #include <stdint.h>
-//#include <pthread.h>
 
 #ifndef REAL_H
 #  include "real.h"

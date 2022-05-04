@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <csignal>
 #include <unistd.h>
+#include <exception>
 #include <new>
 
 #include "signal_handlers.h"
