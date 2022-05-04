@@ -85,7 +85,7 @@ void Interface::change_property(Property * pp, Glossary& def)
     
     /*
      Specific code to make 'change space:dimension' work.
-     This is needed as dimensions are specified in Space hold, and not SpaceProp
+     This is needed as dimensions belong to Space, and not to SpaceProp
      */
     if ( pp->category() == "space" )
     {

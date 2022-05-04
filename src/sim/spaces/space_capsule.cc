@@ -24,6 +24,8 @@ void SpaceCapsule::resize(Glossary& opt)
     
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
+    else if ( opt.set(rad, "width") )
+        rad *= 0.5;
     else opt.set(rad, "radius");
     // total length is specified:
     if ( opt.set(len, "length") )

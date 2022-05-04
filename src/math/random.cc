@@ -66,7 +66,7 @@ Random::~Random()
 
 void Random::seed(const uint32_t s)
 {
-    //printf("Random:%p:seed(%i) %p\n", this, s, pthread_self());
+    //printf("Random:%p:seed(%i)\n", this, s);
     sfmt_init_gen_rand(&twister_, s);
     refill();
 }
