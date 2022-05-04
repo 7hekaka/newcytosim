@@ -270,43 +270,12 @@ void SpaceCapsule::draw2D(float width) const
     if ( prop->disp->visible & 2 )
     {
         gym::color(prop->disp->color2);
-        flute2 *buf = gym::mapBufferV2(gle::pi_twice+4);
-        flute2 *ptr = buf;
-        *ptr++ = { R+L, 0 };
-        for ( size_t j = 1; j <= gle::pi_half; ++j )
-        {
-            float C = gle::cos_(j), S = gle::sin_(j);
-            ptr[0] = { R*C + L,  R*S };
-            ptr[1] = { R*C + L, -R*S };
-            ptr += 2;
-        }
-        for ( size_t j = gle::pi_half; j < gle::pi_once; ++j )
-        {
-            float C = gle::cos_(j), S = gle::sin_(j);
-            ptr[0] = { R*C - L,  R*S };
-            ptr[1] = { R*C - L, -R*S };
-            ptr += 2;
-        }
-        *ptr++ = { -R-L, 0 };
-        gym::unmapBufferV2();
-        assert_true( ptr-buf <= gle::pi_twice+4 );
-        gym::drawTriangleStrip(0, ptr-buf);
-        //gym::drawPoints(width, 0, ptr-buf);
+        gle::paint_capsule(-L, L, R);
     }
 
     // draw contour:
     gym::color(prop->disp->color);
-    flute2 *buf = gym::mapBufferV2(gle::pi_twice+4);
-    flute2 *ptr = buf;
-    for ( size_t j = gle::pi_half; j <= gle::pi_3half; ++j )
-        *ptr++ = { R*gle::cos_(j) - L, R*gle::sin_(j) };
-    for ( size_t j = gle::pi_3half; j <= gle::pi_3half+gle::pi_once; ++j )
-        *ptr++ = { R*gle::cos_(j) + L, R*gle::sin_(j) };
-    *ptr++ = *buf;
-    gym::unmapBufferV2();
-    assert_true( ptr-buf <= gle::pi_twice+4 );
-    gym::drawLineStrip(width, 0, ptr-buf);
-    //gym::drawPoints(width, 0, ptr-buf);
+    gle::stroke_capsule(-L, L, R, width);
 }
 
 

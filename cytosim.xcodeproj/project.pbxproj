@@ -1846,6 +1846,7 @@
 		BBA61CC5234E8DC800D6A81F /* tubule_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tubule_set.cc; sourceTree = "<group>"; };
 		BBA61CCA234F158300D6A81F /* tubule_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tubule_prop.h; sourceTree = "<group>"; };
 		BBA61CCB234F158300D6A81F /* tubule_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tubule_prop.cc; sourceTree = "<group>"; };
+		BBA70813282255D6004C76E5 /* glfw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glfw.h; sourceTree = "<group>"; };
 		BBA721BB1462C3B900ACF26D /* report.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = report.cc; sourceTree = "<group>"; };
 		BBA8BD720E1FBDE8009C7F93 /* object_set.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = object_set.h; path = src/sim/object_set.h; sourceTree = SOURCE_ROOT; };
 		BBA8BD730E1FBDE8009C7F93 /* object_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object_set.cc; path = src/sim/object_set.cc; sourceTree = SOURCE_ROOT; };
@@ -2253,8 +2254,7 @@
 				BB0864B0281D6DD3005A6D72 /* fonts */,
 				BB0864B1281D6DFF005A6D72 /* offscreen_save */,
 				BBCE25DA281E74AB004F6955 /* deps */,
-				BB086426281D4CE8005A6D72 /* glut.h */,
-				BB086430281D4CE8005A6D72 /* opengl.h */,
+				BBA70815282255E5004C76E5 /* opengl */,
 				BB086428281D4CE8005A6D72 /* flute.h */,
 				BB086431281D4CE8005A6D72 /* gle.h */,
 				BB086437281D4CE8005A6D72 /* gle.cc */,
@@ -3226,6 +3226,16 @@
 				BBA61CCB234F158300D6A81F /* tubule_prop.cc */,
 			);
 			name = Tubule;
+			sourceTree = "<group>";
+		};
+		BBA70815282255E5004C76E5 /* opengl */ = {
+			isa = PBXGroup;
+			children = (
+				BB086426281D4CE8005A6D72 /* glut.h */,
+				BBA70813282255D6004C76E5 /* glfw.h */,
+				BB086430281D4CE8005A6D72 /* opengl.h */,
+			);
+			name = opengl;
 			sourceTree = "<group>";
 		};
 		BBA8C0BD0E20CA8A009C7F93 /* Objects */ = {

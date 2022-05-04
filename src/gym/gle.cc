@@ -909,6 +909,47 @@ namespace gle
         return ptr + i;
     }
 
+    void paint_capsule(float L, float R, float rad)
+    {
+        flute2 *buf = gym::mapBufferV2(pi_twice+4);
+        flute2 *ptr = buf;
+        *ptr++ = { R+rad, 0 };
+        for ( size_t j = 1; j <= pi_half; ++j )
+        {
+            float C = cos_(j), S = sin_(j);
+            ptr[0] = { rad*C + R,  rad*S };
+            ptr[1] = { rad*C + R, -rad*S };
+            ptr += 2;
+        }
+        for ( size_t j = pi_half; j < pi_once; ++j )
+        {
+            float C = cos_(j), S = sin_(j);
+            ptr[0] = { rad*C + L,  rad*S };
+            ptr[1] = { rad*C + L, -rad*S };
+            ptr += 2;
+        }
+        *ptr++ = { L-rad, 0 };
+        gym::unmapBufferV2();
+        assert_true( ptr-buf <= pi_twice+4 );
+        gym::drawTriangleStrip(0, ptr-buf);
+        //gym::drawPoints(width, 0, ptr-buf);
+    }
+
+    void stroke_capsule(float L, float R, float rad, float width)
+    {
+        flute2 *buf = gym::mapBufferV2(pi_twice+4);
+        flute2 *ptr = buf;
+        for ( size_t j = pi_half; j <= pi_3half; ++j )
+            *ptr++ = { rad*cos_(j) + L, rad*sin_(j) };
+        for ( size_t j = pi_3half; j <= pi_3half+pi_once; ++j )
+            *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
+        *ptr++ = *buf;
+        gym::unmapBufferV2();
+        assert_true( ptr-buf <= pi_twice+4 );
+        gym::drawLineStrip(width, 0, ptr-buf);
+        //gym::drawPoints(width, 0, ptr-buf);
+    }
+
     //-----------------------------------------------------------------------
     #pragma mark - Tubes
 
@@ -1137,13 +1178,13 @@ namespace gle
     void setBuffers()
     {
         Tesselator ico[7];
-        ico[0].buildIcosahedron(std::max(1UL, gle::finesse/2));
-        ico[1].buildIcosahedron(gle::finesse);
-        ico[2].buildIcosahedron(gle::finesse*2);
-        ico[3].buildIcosahedron(gle::finesse*4);
-        ico[4].buildHemisphere(std::max(1UL, gle::finesse/2));
-        ico[5].buildHemisphere(gle::finesse);
-        ico[6].buildHemisphere(gle::finesse*2);
+        ico[0].buildIcosahedron(std::max(1UL, finesse/2));
+        ico[1].buildIcosahedron(finesse);
+        ico[2].buildIcosahedron(finesse*2);
+        ico[3].buildIcosahedron(finesse*4);
+        ico[4].buildHemisphere(std::max(1UL, finesse/2));
+        ico[5].buildHemisphere(finesse);
+        ico[6].buildHemisphere(finesse*2);
 
         size_t f = 0;
         size_t s = 0;

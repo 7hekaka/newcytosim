@@ -56,11 +56,11 @@ namespace gle
 #pragma mark -
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
-    void circle(float width);
+    void circle(float line_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, fewer points
-    void circle2(float width);
+    void circle2(float line_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
-    void circle_dotted(float width);
+    void circle_dotted(float line_width);
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
@@ -76,6 +76,11 @@ namespace gle
     /// nicer 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom2();
 
+    /// paint spherocylinder in 2D, using current color
+    void paint_capsule(float left, float right, float rad);
+    /// draw spherocylinder contour in 2D
+    void stroke_capsule(float left, float right, float rad, float line_width);
+    
     /// draw a tetrahedron of radius 1
     void tetrahedron();
     /// draw a octahedron of radius 1
