@@ -457,7 +457,10 @@ public:
     
     /// Link of stiffness `weight` from fixed position
     void addPointClamp(Interpolation const&, Vector, real weight);
-    
+
+    /// Link of stiffness `weight` from fixed position, in the X plane only
+    void addPointClampX(Mecapoint const&, real x_pos, real weight);
+
     /// Link of stiffness `weight` from fixed position, in the XY plane
     void addPointClampXY(Mecapoint const&, Vector, real weight);
 

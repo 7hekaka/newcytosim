@@ -4162,6 +4162,22 @@ void Meca::addPointClamp(Interpolation const& pti,
 }
 
 /**
+ This creates a Hookean link only in the X dimension
+ */
+void Meca::addPointClampX(Mecapoint const& ptA,
+                          real x_pos,
+                          const real weight)
+{
+    const size_t inx = ptA.matIndex();
+
+    MatrixBlock B(0, 0);
+    B(0, 0) = weight;
+    sub_block_diag(inx, B);
+
+    add_base(inx, Vector(x_pos, 0, 0), weight);
+}
+
+/**
  This creates Hookean links only in the X and Y dimension
  in 2D this is equivalent to addPointClamp()
  in 3D there is no force in the Z, if pos.ZZ = 0
