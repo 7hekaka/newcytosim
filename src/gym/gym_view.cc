@@ -34,9 +34,9 @@ void gym::one_view(int W, int H)
 
 
 // rotate to align Z with X and translate to center 'P'
-void gym::transAlignZX(float P, float R, float X)
+void gym::transAlignZX(float P, float R, float Y)
 {
-    float Y = std::copysign(R, X);
+    //float Y = std::copysign(R, X);
     float mat[16] = {
         0, Y, 0, 0,
         0, 0, R, 0,

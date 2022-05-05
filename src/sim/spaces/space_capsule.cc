@@ -287,7 +287,7 @@ void SpaceCapsule::draw3D() const
     const float R(radius_);
 
     //right side:
-    gym::transAlignZX(L, R, -1);
+    gym::transAlignZX(L, R, -R);
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
 
@@ -295,7 +295,7 @@ void SpaceCapsule::draw3D() const
     gle::tube1();
 
     //left side:
-    gym::transAlignZX(-L, R, 1);
+    gym::transAlignZX(-L, R, R);
     gle::hemisphere4();
     gle::arrowStrip(0.5, 2);
 }

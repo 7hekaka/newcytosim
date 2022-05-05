@@ -224,9 +224,9 @@ void SpaceCylinderP::draw3D() const
     if ( 1 )
     {
         // mark the edge of the periodicity with dotted lines
-        gym::transAlignZX(-L, R, -1);
+        gym::transAlignZX(-L, R, -R);
         gle::circle_dotted(WIDTH);
-        gym::transAlignZX(L, R, -1);
+        gym::transAlignZX(L, R, -R);
         gle::circle_dotted(WIDTH);
     }
 }

@@ -312,6 +312,7 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
  */
 void Display::prepareLineDisp(const Fiber * fib, LineDisp * self)
 {
+    bool hide = false;
     assert_true(fib->prop);
     FiberDisp const*const disp = fib->prop->disp;
     gle_color col = disp->color;
@@ -376,7 +377,6 @@ void Display::prepareLineDisp(const Fiber * fib, LineDisp * self)
     if ( fib->endStateM() > 0 )
         self->end_color[1] = disp->end_colors[std::min(fib->endStateM(),5U)];
 
-    bool hide = false;
     // hide right or left-pointing fibers:
     if (( disp->hide & 1 )  &&  dot(fib->diffPoints(0), Vector(disp->hide_axis)) < 0 )
         hide = true;
@@ -1844,7 +1844,7 @@ void Display::drawBead(Bead const& obj)
     
 #if ( DIM == 2 )
     // display outline:
-    if (( disp->style & 4 ) && obj.radius() > pixelSize  )
+    if (( disp->style & 4 ) && obj.radius() > pixelSize )
     {
         gym::disableLighting();
         gym::color(bodyColorF(obj));
