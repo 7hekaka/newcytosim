@@ -11,6 +11,8 @@
 SpaceCapsule::SpaceCapsule(SpaceProp const* p)
 : Space(p)
 {
+    half_ = 0;
+    radius_ = 0;
     if ( DIM == 1 )
         throw InvalidParameter("capsule is only defined for DIM = 2 and 3");
 }

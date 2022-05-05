@@ -15,6 +15,10 @@ SpaceCylinderZ::SpaceCylinderZ(SpaceProp const* p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("cylinderZ is only valid in 3D");
+    radius_ = 0;
+    bot_ = 0;
+    top_ = 0;
+    edge_ = 0;
     update();
 }
 
