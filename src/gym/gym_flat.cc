@@ -90,6 +90,41 @@ void gym::paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const u
     CHECK_GL_ERROR("paintBitmap");
 }
 
+
+/** This is drawing squares of dimension WxH for every '1' in str[] */
+void gym::paintSequence(float X, float Y, float W, float H, const char str[])
+{
+    size_t n = strlen(str);
+    X -= n * W * 0.5;
+    Y -= H * 0.5;
+    float T = Y + H;
+    flute2* flu = gym::mapBufferV2(3*n+2);
+    flute2* ptr = flu;
+    char d = '0';
+    for ( char const* c = str; *c; ++c )
+    {
+        X += W;
+        if ( *c != d )
+        {
+            d = *c;
+            ptr[0] = { X, T };
+            ptr[1] = { X, (d=='0'?Y:T) };
+            ptr[2] = { X, Y };
+            ptr += 3;
+        }
+    }
+    if ( d != '0' )
+    {
+        ptr[0] = { X, T };
+        ptr[1] = { X, Y };
+        ptr += 2;
+    }
+    gym::unmapBufferV2();
+    //assert_true( ptr-flu <= 3*n+2 );
+    gym::drawTriangleStrip(0, ptr-flu);
+    CHECK_GL_ERROR("paintSequence");
+}
+
 /**
  rectangle should be specified as [ left, bottom, right, top ]
  The rectangle will be drawn counter-clockwise

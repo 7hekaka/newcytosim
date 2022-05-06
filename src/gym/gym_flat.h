@@ -11,6 +11,9 @@ namespace gym
     
     /// draw all pixels of the bitmap
     void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4]);
+    
+    /// draw all pixels of the bitmap
+    void paintSequence(float X, float Y, float W, float H, const char str[]);
 
     /// draw rectangle ( rect = [ left, bottom, right, top ] )
     void drawRectangle(const int rect[4], float width);
