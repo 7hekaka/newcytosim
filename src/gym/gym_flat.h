@@ -7,10 +7,10 @@ namespace gym
     void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
 
     /// draw Bitmap using a texture over a rectangle
-    void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4]);
+    void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
     
     /// draw all pixels of the bitmap
-    void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4]);
+    void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
     
     /// draw all pixels of the bitmap
     void paintSequence(float X, float Y, float W, float H, const char str[]);

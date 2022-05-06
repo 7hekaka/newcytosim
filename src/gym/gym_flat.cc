@@ -12,7 +12,8 @@
 /// global function accessible from C
 void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4])
 {
-    gym::drawBitmap(W, H, X, Y, S, bits, color);
+    gym::color(color);
+    gym::drawBitmap(W, H, X, Y, S, bits);
 }
 
 ///\todo: we should unpack the whole font data only once!
@@ -47,44 +48,52 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
 
 ///\todo: we should unpack the whole font data only once!
 /** This is drawing `bits` by using a texture over a square */
-void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4])
+void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits)
 {
     static GLuint tex = 0;
     if ( ! tex ) glGenTextures(1, &tex);
     
     unsigned char pixels[W*H+8];
     gym::unpackBitmap(pixels, W, H, bits);
-    gym::color(color);
     drawPixels(W, H, X, Y, S, pixels);
 }
 
 
 /** This is drawing every pixels of `bits` with triangle strips */
-void gym::paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float col[4])
+void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bytes)
 {
-    const unsigned Wb = ( ( W + 7 ) & ~7 ) / 8;
-    float air[4] = { col[0], col[1], col[2], 0.0 };
+    const size_t Wb = ( ( W + 7 ) & ~7 ) / 8;
     for ( size_t i = 0; i < H; ++i )
     {
-        float y = Y + S * i;
-        const unsigned char* row = bits + i * Wb;
-        flute6* flu = gym::mapBufferC4V2(32*Wb);
-        flute6* ptr = flu;
+        float X = X0;
+        float Y = Y0 + S * i, T = Y + S;
+        const unsigned char* row = bytes + i * Wb;
+        flute2* flu = gym::mapBufferV2(24*Wb+2);
+        flute2* ptr = flu;
+        unsigned char old = 0;
         for ( size_t j = 0; j < Wb; ++j )
         {
-            unsigned char b = row[j];
             for ( size_t k = 0; k < 8; ++k )
             {
-                float x = X + S * ( 8 * j + k );
-                float const * mat = b & (1<<(7-k)) ? col : air;
-                ptr[0] = { mat, x,   y+S };
-                ptr[1] = { mat, x,   y   };
-                ptr[2] = { mat, x+S, y+S };
-                ptr[3] = { mat, x+S, y   };
-                ptr += 4;
+                X += S;
+                unsigned char bit = !( ( row[j] >> (7-k) ) & 1 );
+                if ( bit != old )
+                {
+                    old = bit;
+                    ptr[0] = { X, T };
+                    ptr[1] = { X, (bit?Y:T) };
+                    ptr[2] = { X, Y };
+                    ptr += 3;
+                }
             }
         }
-        gym::unmapBufferC4V2();
+        if ( old )
+        {
+            ptr[0] = { X, T };
+            ptr[1] = { X, Y };
+            ptr += 2;
+        }
+        gym::unmapBufferV2();
         gym::drawTriangleStrip(0, ptr-flu);
     }
     CHECK_GL_ERROR("paintBitmap");

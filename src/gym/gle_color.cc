@@ -20,23 +20,21 @@ static const char hexadecimal_digit[] = "0123456789ABCDEF";
 void gle_color::hexadecimal(char * str) const
 {
     uint32_t n = rgba_;
-    str[0] = '0';
-    str[1] = 'x';
-    int c = 2;
-    while ( c < 10 )
+    *str++ = '0';
+    *str++ = 'x';
+    while ( n )
     {
         uint32_t d = ( n >> 28 );
+        *str++ = hexadecimal_digit[d];
         n <<= 4;
-        str[c] = hexadecimal_digit[d];
-        ++c;
     }
-    str[c] = '\0';
+    *str = 0;
 }
 
 
 std::string gle_color::to_string() const
 {
-    char str[12] = { 0 };
+    char str[16] = { 0 };
     hexadecimal(str);
     return std::string(str);
 }

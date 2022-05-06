@@ -392,6 +392,7 @@ void PointDisp::write_values(std::ostream& os) const
     write_value(os, "width", width);
     write_value(os, "shape", shape);
     write_value(os, "style", style);
-    write_value(os, "symbol", symbol, colorS);
+    if ( isprint(symbol) )
+        write_value(os, "symbol", symbol, colorS);
 }
 
