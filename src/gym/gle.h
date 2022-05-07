@@ -76,6 +76,8 @@ namespace gle
     /// nicer 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom2();
 
+    /// paint a disc in XY plane, covering all points at distance to origin [ R0, R1 ]
+    void paint_halo(float R0, float R1);
     /// paint spherocylinder in 2D, using current color
     void paint_capsule(float left, float right, float rad);
     /// draw spherocylinder contour in 2D

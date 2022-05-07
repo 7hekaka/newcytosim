@@ -908,6 +908,23 @@ namespace gle
         assert_true( i <= sizeCircBuffers() );
         return ptr + i;
     }
+    
+    void paint_halo(float R0, float R1)
+    {
+        flute2 *buf = gym::mapBufferV2(2*pi_twice+2);
+        flute2 *ptr = buf;
+        for ( size_t j = 0; j <= pi_twice; ++j )
+        {
+            float C = cos_(j), S = sin_(j);
+            ptr[0] = { R0*C, R0*S };
+            ptr[1] = { R1*C, R1*S };
+            ptr += 2;
+        }
+        gym::unmapBufferV2();
+        assert_true( ptr-buf <= 2*pi_twice+2 );
+        gym::drawTriangleStrip(0, ptr-buf);
+        //gym::drawPoints(width, 0, ptr-buf);
+    }
 
     void paint_capsule(float L, float R, float rad)
     {
