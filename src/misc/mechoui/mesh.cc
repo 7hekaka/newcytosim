@@ -4,18 +4,19 @@
 #include <stdlib.h>
 #include "opengl.h"
 #include "mechoui_param.h"
+#include "gym_flute.h"
 #include "gle_color_list.h"
 #include "gym_draw.h"
+#include "gym_view.h"
 
 
 Mesh::Mesh()
 {
     n_points = 0;
     n_faces = 0;
-    points = 0;
-    faces = 0;
-    labels = 0;
-    buffer = 0;
+    points = nullptr;
+    faces = nullptr;
+    labels = nullptr;
 }
 
 
@@ -27,14 +28,12 @@ Mesh::~Mesh()
 
 void Mesh::release()
 {
-    if ( points ) delete(points);
-    if ( faces ) delete(faces);
-    if ( labels ) delete(labels);
-    points = 0;
-    faces = 0;
-    labels = 0;
-    if ( buffer )
-        glDeleteBuffers(1, &buffer);
+    delete(points);
+    delete(faces);
+    delete(labels);
+    points = nullptr;
+    faces = nullptr;
+    labels = nullptr;
 }
 
 
@@ -45,14 +44,14 @@ int Mesh::read_ascii(FILE * file)
     release();
     
     // read vertices:
-    if ( 0 == fgets(str, sizeof(str), file) )
+    if ( !fgets(str, sizeof(str), file) )
         return 1;
-    n_points = strtol(str, 0, 10);
-    points = new float[3*n_points];
+    n_points = strtol(str, nullptr, 10);
+    points = new real[3*n_points];
     
     for ( size_t n = 0; n < n_points; ++n )
     {
-        if ( 0 == fgets(str, sizeof(str), file) )
+        if ( !fgets(str, sizeof(str), file) )
             return 1;
         points[3*n  ] = strtof(str, &ptr);
         points[3*n+1] = strtof(ptr, &ptr);
@@ -60,15 +59,15 @@ int Mesh::read_ascii(FILE * file)
     }
     
     // read faces:
-    if ( 0 == fgets(str, sizeof(str), file) )
+    if ( !fgets(str, sizeof(str), file) )
         return 1;
-    n_faces = strtol(str, 0, 10);
+    n_faces = strtol(str, nullptr, 10);
     faces = new unsigned[3*n_faces];
     labels = new int[2*n_faces];
 
     for ( size_t n = 0; n < n_faces; ++n )
     {
-        if ( 0 == fgets(str, sizeof(str), file) )
+        if ( !fgets(str, sizeof(str), file) )
             return 1;
         faces[3*n  ] = strtol(str, &ptr, 10);
         faces[3*n+1] = strtol(ptr, &ptr, 10);
@@ -94,7 +93,7 @@ int Mesh::read_binary(FILE * file)
         return 1;
     
     n_points = s[0];
-    points = new float[3*n_points];
+    points = new real[3*n_points];
     
     for ( size_t n = 0; n < n_points; ++n )
     {
@@ -163,166 +162,189 @@ int Mesh::read(char const* filename)
 }
 
 
-/// structure to depth-sort triangles
-struct Triangle
+/// OpenGL display function
+void Mesh::drawPoints(float point_size) const
 {
-public:
-    unsigned a, b, c;
-    float z;
-};
+    float * flu = gym::mapFloatBuffer(3*n_points);
+    // Upload vertex data to the video device
+    for ( size_t i = 0; i < 3*n_points; ++i )
+        flu[i] = points[i];
+    gym::unmapBufferV3();
+    gym::disableLighting();
+    gym::drawPoints(point_size, 0, n_points);
+    gym::enableLighting();
+}
+
+
+/// simple OpenGL display function
+void Mesh::drawFaces(int selected) const
+{
+    flute6 * flu = gym::mapBufferV3N3(3*n_faces);
+    flute6 * ptr = flu;
+    // Upload vertex data to the video device, and calculate normals
+    for ( size_t i = 0; i < n_faces; ++i )
+    {
+        int cell = labels[2*i];
+        int boundary = labels[2*i+1];
+        bool transparent = ( boundary > 0 );
+        // if one cell is selected, all the other ones are transparent:
+        if ( selected )
+        {
+            transparent = ( cell != selected && boundary != selected );
+            cell = selected;
+        }
+        real * ap = points + 3 * faces[3*i  ];
+        real * bp = points + 3 * faces[3*i+1];
+        real * cp = points + 3 * faces[3*i+2];
+        flute3 a(ap), b(bp), c(cp);
+        // calculate the normal to the triangle:
+        flute3 ab = b - a, ac = c - a;
+        flute3 nor = cross(ab, ac);
+        *ptr++ = { a, nor };
+        *ptr++ = { b, nor };
+        *ptr++ = { c, nor };
+    }
+    gym::unmapBufferV3N3();
+    gym::enableLighting();
+    gym::disableCullFace();
+    gym::openDepthMask();
+    float black[4] = { 0, 0, 0, 1 };
+    float color[4] = { 1, 1, 0, 1 };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 64);
+    gym::drawTriangles(0, ptr-flu);
+}
+
 
 
 /// function to sort Triangles according to their 'z'
-static int compareTriangle(const void * A, const void * B)
+static int compareFluteTriangles(const void * A, const void * B)
 {
-    float a = static_cast<const Triangle*>(A)->z;
-    float b = static_cast<const Triangle*>(B)->z;
+    float a = static_cast<const float*>(A)[3];
+    float b = static_cast<const float*>(B)[3];
     
     return ( a > b ) - ( b > a );
 }
 
-
-/// OpenGL display function
-void Mesh::draw(MechouiParam const& pam) const
+/// OpenGL display function with depth-sorted transparent faces
+void Mesh::drawFaces(const float dir[3], int selected) const
 {
-    glEnable(GL_NORMALIZE);
-    glEnableClientState(GL_VERTEX_ARRAY);
-
-    //Create one buffer
-    if ( buffer == 0 )
-        glGenBuffers(1, &buffer);
+    flute6 * flu = gym::mapBufferV3N3(3*n_faces);
+    flute6 * ptr = flu;
+    flute6 * end = flu + 3 * n_faces;
     
-    //Make the new VBO active
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    
-    //Upload vertex data to the video device
-    glBufferData(GL_ARRAY_BUFFER, 3*n_points*sizeof(float), points, GL_STREAM_DRAW);
-
-    glVertexPointer(3, GL_FLOAT, 0, nullptr);
-
-    if ( pam.point_style )
+    // process all faces making separate triangles
+    for ( size_t i = 0; i < n_faces; ++i )
     {
-        gym::color(pam.point_color);
-        gym::drawPoints(pam.point_size, 0, n_points);
-    }
-    
-    /* extract axis corresponding to vertical direction,
-     from the current modelview transformation: */
-    GLfloat mat[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, mat);
-    GLfloat dir[] = { mat[2], mat[6], mat[10] };
-
-    glEnable(GL_LIGHTING);
-    glDisable(GL_CULL_FACE);
-    glDepthMask(GL_TRUE);
-    glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 64);
-
-    Triangle * tris = new Triangle[n_faces];
-    unsigned n_tris = 0;
-    
-    for ( size_t n = 0; n < n_faces; ++n )
-    {
-        float * a = points+3*faces[3*n  ];
-        float * b = points+3*faces[3*n+1];
-        float * c = points+3*faces[3*n+2];
-        
-        int cell = labels[2*n];
-        int boundary = labels[2*n+1];
-        
-        bool transparent = boundary > 0;
-        
+        int cell = labels[2*i];
+        int boundary = labels[2*i+1];
+        bool transparent = ( boundary > 0 );
         // if one cell is selected, all the other ones are transparent:
-        if ( pam.selected )
+        if ( selected )
         {
-            transparent = ( cell != pam.selected && boundary != pam.selected );
-            cell = pam.selected;
+            transparent = ( cell != selected && boundary != selected );
+            cell = selected;
         }
-       
+        real * ap = points + 3 * faces[3*i  ];
+        real * bp = points + 3 * faces[3*i+1];
+        real * cp = points + 3 * faces[3*i+2];
+
+        flute3 a(ap), b(bp), c(cp);
         if ( transparent )
         {
-            // this is an internal triangle, store in 'tris'
-            GLfloat g[] = { a[0]+b[0]+c[0], a[1]+b[1]+c[1], a[2]+b[2]+c[2] };
-            tris[n_tris].a = faces[3*n  ];
-            tris[n_tris].b = faces[3*n+1];
-            tris[n_tris].c = faces[3*n+2];
-            tris[n_tris].z = g[0] * dir[0] + g[1] * dir[1] + g[2] * dir[2];
-            ++n_tris;
+            end -= 3;
+            float Z = dot(a + b + c, dir);
+            end[0] = { a, Z, 0, 0 };
+            end[1] = { b, 0, 0, 0 };
+            end[2] = { c, 0, 0, 0 };
         }
         else
         {
-            // set identical back and front material properties
-            gle_color col = gle::bright_color(cell);
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col.colors());
-            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, col.colors());
-
-            // calculate the normal to the triangle:
-            GLfloat ab[] = { b[0]-a[0], b[1]-a[1], b[2]-a[2] };
-            GLfloat ac[] = { c[0]-a[0], c[1]-a[1], c[2]-a[2] };
-            GLfloat ns[] = { ab[1]*ac[2]-ab[2]*ac[1], ab[2]*ac[0]-ab[0]*ac[2], ab[0]*ac[1]-ab[1]*ac[0] };
-            
-            glNormal3fv(ns);
-            glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, faces+3*n);
+            ptr[0] = { a, 0, 0, 0 };
+            ptr[1] = { b, 0, 0, 0 };
+            ptr[2] = { c, 0, 0, 0 };
+            ptr += 3;
         }
     }
+    assert(end == ptr);
     
-    gle_color col = pam.face_color;
-    // prepare for transparency
-    if ( col.transparent() )
-        glDepthMask(GL_FALSE);
+    // number of opaque triangles:
+    size_t n_tri = ( ptr - flu ) / 3;
+    // depth-sort transparent triangles:
+    qsort(ptr, n_faces-n_tri, 3*sizeof(flute6), &compareFluteTriangles);
+    //printf("n_faces %lu  n_tri %lu\n", n_faces, n_tri);
+    
+    // calculate normals for all triangles
+    end = flu + 3 * n_faces;
+    for ( ptr = flu; ptr < end; ptr += 3 )
+    {
+        flute3& a(reinterpret_cast<flute3&>(ptr[0]));
+        flute3& b(reinterpret_cast<flute3&>(ptr[1]));
+        flute3& c(reinterpret_cast<flute3&>(ptr[2]));
+        // calculate a normal vector to the triangle:
+        flute3 ab = b - a, ac = c - a;
+        flute3 nor = cross(ab, ac);
+        ptr[0] = { a, nor };
+        ptr[1] = { b, nor };
+        ptr[2] = { c, nor };
+    }
+
+    gym::unmapBufferV3N3();
+    gym::enableLighting();
+    gym::enableCullFace(GL_BACK);
+    gym::openDepthMask();
 
     // set identical back and front material properties
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col.colors());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, col.colors());
-    glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 64);
-    
-    // depth-sort triangles:
-    qsort(tris, n_tris, sizeof(Triangle), &compareTriangle);
+    //gle_color col = gle::bright_color(cell);
+    float black[4] = { 0, 0, 0, 1 };
+    float color[4] = { 1, 1, 0, 1 };
+    float glass[4] = { 1, 1, 1, 0.3 };
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 64);
+
+    gym::drawTriangles(0, 3*n_tri);
     
     // render transparent triangles
-    for ( size_t i = 0; i < n_tris; ++i )
-    {
-        float * a = points + 3*tris[i].a;
-        float * b = points + 3*tris[i].b;
-        float * c = points + 3*tris[i].c;
-        
-        GLfloat ab[] = { b[0]-a[0], b[1]-a[1], b[2]-a[2] };
-        GLfloat ac[] = { c[0]-a[0], c[1]-a[1], c[2]-a[2] };
-        GLfloat ns[] = { ab[1]*ac[2]-ab[2]*ac[1], ab[2]*ac[0]-ab[0]*ac[2], ab[0]*ac[1]-ab[1]*ac[0] };
-        
-        glNormal3fv(ns);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, tris+i);
-    }
-    
-    delete[] tris;
-    glDepthMask(GL_TRUE);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDisableClientState(GL_VERTEX_ARRAY);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, glass);
+    gym::disableCullFace();
+    gym::closeDepthMask();
+    gym::drawTriangles(3*n_tri, 3*(n_faces-n_tri));
+    gym::openDepthMask();
 }
+
 
 
 /// return index of cell on which the mouse-click occurred
 unsigned Mesh::pick() const
 {
+    float * flu = gym::mapFloatBuffer(3*n_points);
+    // Upload vertex data to the video device
+    for ( size_t i = 0; i < 3*n_points; ++i )
+        flu[i] = points[i];
+    gym::unmapBufferV3();
+#if 0
+    gym::clearPixels(0,0,0.25,1);
+    gym::color(1,1,0);
+    gym::enableCullFace(GL_BACK);
+    for ( size_t n = 0; n < n_faces; ++n )
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, faces+3*n);
+    gym::disableLighting();
+    glFlush();
+    return 0;
+#endif
     const GLsizei buf_size = 1024;
     GLuint buf[buf_size] = { 0 };
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_FLOAT, 0, points);
-
-    glDisable(GL_CULL_FACE);
-
     glSelectBuffer(buf_size, buf);
     glRenderMode(GL_SELECT);
     glInitNames();
     glPushName(0);
-    
     for ( size_t n = 0; n < n_faces; ++n )
     {
         glLoadName(labels[2*n]);
         glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, faces+3*n);
     }
-    
-    glDisableClientState(GL_VERTEX_ARRAY);
     glPopName();
     
     GLint n_hits = glRenderMode(GL_RENDER);

@@ -65,6 +65,8 @@ struct flute3
     friend flute3 operator *(float const& a, flute3 const& b) { return flute3{a*b[0], a*b[1], a*b[2]}; }
     friend float normSqr(flute3 const& b) { return b[0]*b[0] + b[1]*b[1] + b[2]*b[2]; }
     friend flute3 normalize(flute3 const& b) { return (1/sqrt(normSqr(b))) * b; }
+    friend flute3 cross(flute3 const& a, flute3 const& b) { return flute3{a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]}; }
+    friend float dot(flute3 const& a, flute3 const& b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; }
     //{ float a = 0.5; return flute3{a*b[0], a*b[1], a*b[2]}; }
 };
 
@@ -93,7 +95,8 @@ struct flute6
     flute6(float const c[4], const double d[2]) : xyz{c[0], c[1], c[2], c[3], float(d[0]), float(d[1])} {}
     flute6(const float c[4], flute2 const& v) : xyz{c[0], c[1], c[2], c[3], v.xy[0], v.xy[1]} {}
     flute6(flute3 const& a, flute3 const& b) : xyz{a.xyz[0], a.xyz[1], a.xyz[2], b.xyz[0], b.xyz[1], b.xyz[2]} {}
-    
+    flute6(flute3 const& a, float x, float y, float z) : xyz{a.xyz[0], a.xyz[1], a.xyz[2], x, y, z} {}
+
 #if 0
     flute6(const float c[4], Vector1 const& v) : xyz{c[0], c[1], c[2], c[3], float(v.XX), 0.f, } {}
     flute6(const float c[4], Vector2 const& v) : xyz{c[0], c[1], c[2], c[3], float(v.XX), float(v.YY)} {}

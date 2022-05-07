@@ -23,16 +23,13 @@ public:
     float point_size;
     
     /// flag to display points
-    int   point_style;
+    int point_style;
     
     /// selected cell
-    int   selected;
-    
-    /// input file containing mesh
-    std::string file;
+    int selected;
     
     /// path for files
-    std::string directory;
+    std::string path;
     
     /// parameter
     std::string config;

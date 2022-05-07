@@ -103,6 +103,17 @@
 		BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB089A072228A26D00C070E7 /* matrix11.cc */; };
 		BB089A0B2228A26D00C070E7 /* matrix22.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB089A082228A26D00C070E7 /* matrix22.cc */; };
 		BB089A0C2228A26D00C070E7 /* matrix33.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB089A092228A26D00C070E7 /* matrix33.cc */; };
+		BB0A754A282650E00062EDC5 /* operator_new.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6E174B223E5B2F00AF850D /* operator_new.cc */; };
+		BB0A754D282650E00062EDC5 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BB0A754E282650E00062EDC5 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
+		BB0A754F282650E00062EDC5 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
+		BB0A7550282650E00062EDC5 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
+		BB0A7551282650E00062EDC5 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
+		BB0A756C28265F790062EDC5 /* mechoui.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0A756728265F790062EDC5 /* mechoui.cc */; };
+		BB0A756D28265F790062EDC5 /* mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0A756828265F790062EDC5 /* mesh.h */; };
+		BB0A756E28265F790062EDC5 /* mechoui_param.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0A756928265F790062EDC5 /* mechoui_param.h */; };
+		BB0A756F28265F790062EDC5 /* mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0A756A28265F790062EDC5 /* mesh.cc */; };
+		BB0A757028265F790062EDC5 /* mechoui_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0A756B28265F790062EDC5 /* mechoui_param.cc */; };
 		BB0CB11B20C170C10016D73D /* qmr.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0CB11A20C170C10016D73D /* qmr.h */; };
 		BB0DF4810D93F11F006CB71A /* lattice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1749A407D798E600BC7BDC /* lattice.cc */; };
 		BB0E4BD81002698100A96B34 /* random_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0E4BD61002698100A96B34 /* random_vector.h */; };
@@ -1021,6 +1032,27 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
+		BB0A7543282650E00062EDC5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB51BC5B05FA559800D4869F;
+			remoteInfo = libcytobase;
+		};
+		BB0A7545282650E00062EDC5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB4DB5940C69D5A2001E5E4F;
+			remoteInfo = glapp;
+		};
+		BB0A7547282650E00062EDC5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
+			remoteInfo = cytomath;
+		};
 		BB1707120F30F76000E5DE24 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
@@ -1462,6 +1494,12 @@
 		BB089A072228A26D00C070E7 /* matrix11.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix11.cc; sourceTree = "<group>"; };
 		BB089A082228A26D00C070E7 /* matrix22.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix22.cc; sourceTree = "<group>"; };
 		BB089A092228A26D00C070E7 /* matrix33.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix33.cc; sourceTree = "<group>"; };
+		BB0A7556282650E00062EDC5 /* mechoui */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mechoui; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB0A756728265F790062EDC5 /* mechoui.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui.cc; path = src/misc/mechoui/mechoui.cc; sourceTree = SOURCE_ROOT; };
+		BB0A756828265F790062EDC5 /* mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mesh.h; path = src/misc/mechoui/mesh.h; sourceTree = SOURCE_ROOT; };
+		BB0A756928265F790062EDC5 /* mechoui_param.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mechoui_param.h; path = src/misc/mechoui/mechoui_param.h; sourceTree = SOURCE_ROOT; };
+		BB0A756A28265F790062EDC5 /* mesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mesh.cc; path = src/misc/mechoui/mesh.cc; sourceTree = SOURCE_ROOT; };
+		BB0A756B28265F790062EDC5 /* mechoui_param.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui_param.cc; path = src/misc/mechoui/mechoui_param.cc; sourceTree = SOURCE_ROOT; };
 		BB0AB41E201BBA41004739CE /* doc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = doc; sourceTree = "<group>"; };
 		BB0C409E069A043600CF45A8 /* sparmatsym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym.cc; path = src/math/sparmatsym.cc; sourceTree = SOURCE_ROOT; };
 		BB0C409F069A043600CF45A8 /* sparmatsym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym.h; path = src/math/sparmatsym.h; sourceTree = SOURCE_ROOT; };
@@ -2043,6 +2081,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		BB0A754C282650E00062EDC5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB0A754D282650E00062EDC5 /* libcytodisp.a in Frameworks */,
+				BB0A754E282650E00062EDC5 /* OpenGL.framework in Frameworks */,
+				BB0A754F282650E00062EDC5 /* libcytobase.a in Frameworks */,
+				BB0A7550282650E00062EDC5 /* GLUT.framework in Frameworks */,
+				BB0A7551282650E00062EDC5 /* libcytomath.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB18BBB41DFD78F600567023 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2318,6 +2368,19 @@
 			name = offscreen_save;
 			sourceTree = "<group>";
 		};
+		BB0A756628265F360062EDC5 /* mesh */ = {
+			isa = PBXGroup;
+			children = (
+				BB0A756B28265F790062EDC5 /* mechoui_param.cc */,
+				BB0A756928265F790062EDC5 /* mechoui_param.h */,
+				BB0A756728265F790062EDC5 /* mechoui.cc */,
+				BB0A756A28265F790062EDC5 /* mesh.cc */,
+				BB0A756828265F790062EDC5 /* mesh.h */,
+			);
+			name = mesh;
+			path = tools;
+			sourceTree = "<group>";
+		};
 		BB1B0F5323D3068B00C2608A /* grid */ = {
 			isa = PBXGroup;
 			children = (
@@ -2352,6 +2415,7 @@
 				BB201E1E24ABDCD900A8CA82 /* test_xtbsv */,
 				BB8EE1DC2542DE2100E15C40 /* test_tesselator */,
 				BBE2FB8E25680D5800EB88EA /* cympack */,
+				BB0A7556282650E00062EDC5 /* mechoui */,
 			);
 			name = build;
 			sourceTree = SOURCE_ROOT;
@@ -2827,6 +2891,7 @@
 				BB7358D205B98DA3006956D5 /* sim */,
 				BB086425281D4CE8005A6D72 /* gym */,
 				BB97114B1DECDA1300352630 /* disp */,
+				BB0A756628265F360062EDC5 /* mesh */,
 				BB7358BF05B98DA3006956D5 /* play */,
 				BB73590605B98DA3006956D5 /* tests */,
 				BB73591805B98DA3006956D5 /* tools */,
@@ -3531,6 +3596,15 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		BB0A7548282650E00062EDC5 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB0A756D28265F790062EDC5 /* mesh.h in Headers */,
+				BB0A756E28265F790062EDC5 /* mechoui_param.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB4DB5910C69D5A2001E5E4F /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -4051,6 +4125,26 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		BB0A7541282650E00062EDC5 /* mechoui */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB0A7552282650E00062EDC5 /* Build configuration list for PBXNativeTarget "mechoui" */;
+			buildPhases = (
+				BB0A7548282650E00062EDC5 /* Headers */,
+				BB0A7549282650E00062EDC5 /* Sources */,
+				BB0A754C282650E00062EDC5 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BB0A7542282650E00062EDC5 /* PBXTargetDependency */,
+				BB0A7544282650E00062EDC5 /* PBXTargetDependency */,
+				BB0A7546282650E00062EDC5 /* PBXTargetDependency */,
+			);
+			name = mechoui;
+			productName = test_glapp;
+			productReference = BB0A7556282650E00062EDC5 /* mechoui */;
+			productType = "com.apple.product-type.tool";
+		};
 		BB18BBB61DFD78F600567023 /* test_simd */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = BB18BBBB1DFD78F600567023 /* Build configuration list for PBXNativeTarget "test_simd" */;
@@ -4607,11 +4701,23 @@
 				BB8EE1DB2542DE2100E15C40 /* test_tesselator */,
 				BB7086392449CBE900C73273 /* test_xpttrs */,
 				BB201E0F24ABDCD900A8CA82 /* test_xtbsv */,
+				BB0A7541282650E00062EDC5 /* mechoui */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		BB0A7549282650E00062EDC5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB0A756F28265F790062EDC5 /* mesh.cc in Sources */,
+				BB0A756C28265F790062EDC5 /* mechoui.cc in Sources */,
+				BB0A757028265F790062EDC5 /* mechoui_param.cc in Sources */,
+				BB0A754A282650E00062EDC5 /* operator_new.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB18BBB31DFD78F600567023 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -5297,6 +5403,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		BB0A7542282650E00062EDC5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB51BC5B05FA559800D4869F /* cytobase */;
+			targetProxy = BB0A7543282650E00062EDC5 /* PBXContainerItemProxy */;
+		};
+		BB0A7544282650E00062EDC5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB4DB5940C69D5A2001E5E4F /* cytodisp */;
+			targetProxy = BB0A7545282650E00062EDC5 /* PBXContainerItemProxy */;
+		};
+		BB0A7546282650E00062EDC5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
+			targetProxy = BB0A7547282650E00062EDC5 /* PBXContainerItemProxy */;
+		};
 		BB1707130F30F76000E5DE24 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BBE0993D0869D87F005FF210 /* cytospace */;
@@ -5495,6 +5616,60 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		BB0A7553282650E00062EDC5 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
+		};
+		BB0A7554282650E00062EDC5 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Deployment;
+		};
+		BB0A7555282650E00062EDC5 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Default;
+		};
 		BB18BBBC1DFD78F600567023 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -7845,6 +8020,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		BB0A7552282650E00062EDC5 /* Build configuration list for PBXNativeTarget "mechoui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB0A7553282650E00062EDC5 /* Development */,
+				BB0A7554282650E00062EDC5 /* Deployment */,
+				BB0A7555282650E00062EDC5 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
 		BB18BBBB1DFD78F600567023 /* Build configuration list for PBXNativeTarget "test_simd" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

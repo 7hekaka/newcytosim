@@ -9,6 +9,7 @@
 #include "glossary.h"
 #include "filepath.h"
 #include "mechoui_param.h"
+#include "gym_draw.h"
 #include "mesh.h"
 
 
@@ -22,17 +23,15 @@ std::vector<std::string> file_list;
 
 //------------------------------------------------------------------------------
 
-void load(unsigned index)
+void load(size_t index)
 {
+    //printf("%lu / %lu:\n", index, file_list.size());
     if ( index < file_list.size() )
     {
         file_index = index;
-        if ( pam.directory != "." )
-            pam.file = pam.directory + "/" + file_list[index];
-        else
-            pam.file = file_list[index];
-        mesh.read(pam.file.c_str());
-        glApp::flashText("%s: %i points", pam.file.c_str(), mesh.nbPoints());
+        std::string file = file_list[index];
+        mesh.read(file.c_str());
+        glApp::flashText("%s: %lu points", file.c_str(), mesh.nbPoints());
         glApp::postRedisplay();
     }
     else
@@ -45,6 +44,10 @@ void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c)
     {
+        case 9: //TAB
+            pam.selected = ( pam.selected + 1 ) & 7;
+            glApp::flashText("selected %i", pam.selected);
+            break;
         case ' ':
             animate = ! animate;
             break;
@@ -83,6 +86,7 @@ void processNormalKey(unsigned char c, int x, int y)
             break;
         case 'P':
             pam.point_style = ! pam.point_style;
+            break;
         default:
             glApp::processNormalKey(c,x,y);
             return;
@@ -91,23 +95,17 @@ void processNormalKey(unsigned char c, int x, int y)
 }
 
 /// callback for shift-click, with unprojected mouse position
-void  processMouseClick(int mx, int my, const Vector3 & a, int)
+void processMouseClick(int mx, int my, const Vector3 & a, int)
 {
-    glApp::flashText("click %i %i", mx, my);
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
     View& view = glApp::currentView();
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPickMatrix(mx, my, 2, 2, viewport);
-    view.setProjection();
+    view.load();
+    view.setPickProjection(mx, my, 16, 16);
     pam.selected = mesh.pick();
-    glMatrixMode(GL_MODELVIEW);
+    printf("click %i %i: selected %i", mx, my, pam.selected);
 }
 
 /// callback for shift-drag, with unprojected mouse positions
-void  processMouseDrag(int, int, Vector3 & a, const Vector3 & b, int)
+void processMouseDrag(int, int, Vector3 & a, const Vector3 & b, int)
 {
     glApp::flashText("drag %.1f %.1f %.1f", b.XX, b.YY, b.ZZ);
     glApp::postRedisplay();
@@ -125,8 +123,15 @@ void timer(int value)
 int display(View& view)
 {
     view.openDisplay();
-    pam.face_color = view.front_color;
-    mesh.draw(pam);
+    if ( pam.point_style )
+    {
+        gym::color(pam.point_color);
+        mesh.drawPoints(pam.point_size);
+    }
+    gym::color(view.front_color);
+    Vector3 V = view.depthAxis();
+    float axis[4] = { float(V.XX), float(V.YY), float(V.ZZ), 0 };
+    mesh.drawFaces(axis, pam.selected);
     view.closeDisplay();
     return 0;
 }
@@ -154,23 +159,8 @@ void help_keys()
 int main(int argc, char* argv[])
 {
     Glossary arg;
-    int ax = 1;
-    
-    if ( argc > 1 && FilePath::is_dir(argv[1]) )
-    {
-        FilePath::change_dir(argv[1]);
-        ++ax;
-    }
-    
-    if ( arg.read_strings(argc-ax, argv+ax) )
+    if ( arg.read_strings(argc, argv) )
         return EXIT_FAILURE;
-
-    if ( arg.use_key("help") )
-    {
-        help();
-        help_keys();
-        return EXIT_SUCCESS;
-    }
     
     if ( arg.use_key("parameters") )
     {
@@ -178,26 +168,43 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
     
+    if ( arg.use_key("help") )
+    {
+        help();
+        help_keys();
+        return EXIT_SUCCESS;
+    }
+    
+    if ( pam.config.size() )
+        arg.read_file(pam.config);
+    
+    pam.read(arg);
+
+    if ( arg.has_key("directory") )
+        pam.path = arg.value("directory");
+    
+    file_list = FilePath::list_dir(pam.path.c_str(), "rec");
+
+#if 0
+    printf("%s:\n", pam.path.c_str());
+    for ( std::string& f : file_list )
+        printf("    %s\n", f.c_str());
+#endif
+    
+    glApp::initialize();
+    glApp::views[0].read(arg);
+    arg.print_warnings(std::cerr, 1, "\n");
+    load(file_index);
+
     glutInit(&argc, argv);
     glApp::setDimensionality(3);
     glApp::normalKeyFunc(processNormalKey);
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
-
-    if ( pam.config.size() )
-        arg.read_file(pam.config);
-    
-    pam.read(arg);
-    glApp::currentView().read(arg);
-    arg.print_warnings(std::cerr, 1, "\n");
     glApp::newWindow(display);
     glApp::attachMenu();
-    glApp::setScale(2);
+    glApp::setScale(3);
     gle::initialize();
-    
-    file_list = FilePath::list_dir(pam.directory.c_str(), "rec");
-    load(file_index);
     timer(0);
-    
     glutMainLoop();
 }

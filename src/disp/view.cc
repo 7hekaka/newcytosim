@@ -53,7 +53,6 @@ View::~View()
 void View::initGL() const
 {
     glEnableClientState(GL_VERTEX_ARRAY);
-    // let GL normalize the normals:
     glEnable(GL_NORMALIZE);
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_DITHER);

@@ -72,7 +72,7 @@ public:
         constexpr size_t MAX = 1024;
         char str[MAX], * ptr;
         do {
-            if ( nullptr == fgets(str, MAX, file) ) return 1;
+            if ( !fgets(str, MAX, file) ) return 1;
             // skip comments:
         } while ( str[0] == '%' );
         // parse dimension line:
@@ -84,7 +84,7 @@ public:
         allocate(lin);
         for ( size_t i = 0; i < cnt; ++i )
         {
-            if ( nullptr == fgets(str, MAX, file) ) return 3;
+            if ( !fgets(str, MAX, file) ) return 3;
             lin = strtoul(str, &ptr, 10);
             col = strtoul(ptr, &ptr, 10);
             real val = strtof(ptr, &ptr);
@@ -122,14 +122,14 @@ int readVector(FILE * file, size_t dim, real * vec)
     constexpr size_t MAX = 1024;
     char str[MAX];
     do {
-        if ( nullptr == fgets(str, MAX, file) ) return 1;
+        if ( !fgets(str, MAX, file) ) return 1;
         // skip comments:
     } while ( str[0] == '%' );
     // parse dimension line:
     unsigned long cnt = strtoul(str, nullptr, 10);
     for ( size_t i = 0; i < cnt; ++i )
     {
-        if ( nullptr == fgets(str, MAX, file) ) return 3;
+        if ( !fgets(str, MAX, file) ) return 3;
         real val = strtof(str, nullptr);
         if ( i < dim ) vec[i] = val;
     }

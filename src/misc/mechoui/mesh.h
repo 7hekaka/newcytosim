@@ -1,15 +1,13 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include <cstdio>
+#include "real.h"
+
 class MechouiParam;
 
 /// something in 3D
 class Mesh
-{
-    
-    /// name of OpenGL buffer
-    mutable unsigned buffer;
-    
+{    
 private:
 
     /// number of points
@@ -19,7 +17,7 @@ private:
     size_t n_faces;
     
     /// coordinates of points
-    float * points;
+    real * points;
     
     /// indices of points in the faces
     unsigned * faces;
@@ -54,6 +52,12 @@ public:
     unsigned pick() const;
     
     /// display using OpenGL
-    void draw(MechouiParam const&) const;
+    void drawPoints(float) const;
+    
+    /// display using OpenGL
+    void drawFaces(int selected) const;
+    
+    /// display using OpenGL
+    void drawFaces(const float dir[3], int selected) const;
 
 };

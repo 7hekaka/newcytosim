@@ -99,22 +99,22 @@ void gym::placeText(int position, FontType font, const float color[4],
     int height = fgFontHeight(font);
     int width = fgTextWidth(font, text, lines);
     
-    float px, py;
-    float vshift = gym::textPosition(px, py, width, height, lines, W, H, position);
+    float X, Y;
+    float vshift = gym::textPosition(X, Y, width, height, lines, W, H, position);
     
     if ( back && back[3] > 0 )
     {
         float E = height;
-        float T = py + lines * vshift;
-        float B = std::min(py, T) - E/4;
-        T = std::max(py, T) + E + E/4;
-        float R = px + width + E;
-        gym::paintOctagon(px-E, B, R, T, back, 5);
+        float T = Y + lines * vshift;
+        float B = std::min(Y, T) - E/4;
+        T = std::max(Y, T) + E + E/4;
+        float R = X + width + E;
+        gym::paintOctagon(X-E, B, R, T, back, 5);
         if ( position == 4 )
-            gym::drawOctagon(px-E, B, R, T, color, 5, 1);
+            gym::drawOctagon(X-E, B, R, T, color, 5, 1);
     }
     
-    fgBitmapString(px, py, 1.f, font, color, text, vshift);
+    fgBitmapString(X, Y, 1.f, font, color, text, vshift);
 }
 
 
