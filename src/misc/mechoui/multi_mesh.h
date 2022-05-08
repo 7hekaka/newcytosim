@@ -3,10 +3,9 @@
 #include <cstdio>
 #include "real.h"
 
-class MechouiParam;
 
-/// something in 3D
-class Mesh
+/// MultiMesh structure from Christopher Betty's Multitrack
+class MultiMesh
 {    
 private:
 
@@ -28,10 +27,10 @@ private:
 public:
     
     /// constructor
-    Mesh();
+    MultiMesh();
     
     /// desctructor
-    ~Mesh();
+    ~MultiMesh();
     
     /// number of points
     size_t nbPoints() { return n_points; }

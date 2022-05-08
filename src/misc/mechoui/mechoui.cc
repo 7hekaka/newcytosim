@@ -10,12 +10,12 @@
 #include "filepath.h"
 #include "mechoui_param.h"
 #include "gym_draw.h"
-#include "mesh.h"
+#include "multi_mesh.h"
 
 
 MechouiParam pam;
 
-Mesh mesh;
+MultiMesh mesh;
 
 bool animate = false;
 unsigned file_index = 0;
@@ -101,7 +101,7 @@ void processMouseClick(int mx, int my, const Vector3 & a, int)
     view.load();
     view.setPickProjection(mx, my, 16, 16);
     pam.selected = mesh.pick();
-    printf("click %i %i: selected %i", mx, my, pam.selected);
+    glApp::flashText("selected %i", pam.selected);
 }
 
 /// callback for shift-drag, with unprojected mouse positions

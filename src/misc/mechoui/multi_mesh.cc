@@ -1,16 +1,15 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include "mesh.h"
-#include <stdlib.h>
+#include "multi_mesh.h"
+
 #include "opengl.h"
-#include "mechoui_param.h"
 #include "gym_flute.h"
 #include "gle_color_list.h"
 #include "gym_draw.h"
 #include "gym_view.h"
 
 
-Mesh::Mesh()
+MultiMesh::MultiMesh()
 {
     n_points = 0;
     n_faces = 0;
@@ -20,13 +19,13 @@ Mesh::Mesh()
 }
 
 
-Mesh::~Mesh()
+MultiMesh::~MultiMesh()
 {
     release();
 }
 
 
-void Mesh::release()
+void MultiMesh::release()
 {
     delete(points);
     delete(faces);
@@ -37,7 +36,7 @@ void Mesh::release()
 }
 
 
-int Mesh::read_ascii(FILE * file)
+int MultiMesh::read_ascii(FILE * file)
 {
     char str[1024], * ptr;
     
@@ -80,7 +79,7 @@ int Mesh::read_ascii(FILE * file)
 }
 
 
-int Mesh::read_binary(FILE * file)
+int MultiMesh::read_binary(FILE * file)
 {
     double d[3];
     size_t s[3];
@@ -128,7 +127,7 @@ int Mesh::read_binary(FILE * file)
 }
 
 
-int Mesh::read(char const* filename)
+int MultiMesh::read(char const* filename)
 {
     FILE * f = fopen(filename, "r");
     if ( f )
@@ -163,7 +162,7 @@ int Mesh::read(char const* filename)
 
 
 /// OpenGL display function
-void Mesh::drawPoints(float point_size) const
+void MultiMesh::drawPoints(float point_size) const
 {
     float * flu = gym::mapFloatBuffer(3*n_points);
     // Upload vertex data to the video device
@@ -177,7 +176,7 @@ void Mesh::drawPoints(float point_size) const
 
 
 /// simple OpenGL display function
-void Mesh::drawFaces(int selected) const
+void MultiMesh::drawFaces(int selected) const
 {
     flute6 * flu = gym::mapBufferV3N3(3*n_faces);
     flute6 * ptr = flu;
@@ -228,7 +227,7 @@ static int compareFluteTriangles(const void * A, const void * B)
 }
 
 /// OpenGL display function with depth-sorted transparent faces
-void Mesh::drawFaces(const float dir[3], int selected) const
+void MultiMesh::drawFaces(const float dir[3], int selected) const
 {
     flute6 * flu = gym::mapBufferV3N3(3*n_faces);
     flute6 * ptr = flu;
@@ -317,7 +316,7 @@ void Mesh::drawFaces(const float dir[3], int selected) const
 
 
 /// return index of cell on which the mouse-click occurred
-unsigned Mesh::pick() const
+unsigned MultiMesh::pick() const
 {
     float * flu = gym::mapFloatBuffer(3*n_points);
     // Upload vertex data to the video device

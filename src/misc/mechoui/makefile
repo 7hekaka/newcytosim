@@ -32,7 +32,7 @@ vpath %.o  build
 vpath %.a  build
 
 
-OBJ_MECHOUI := mesh.o mechoui_param.o vector3.o glossary.o property.o\
+OBJ_MECHOUI := multi_mesh.o mechoui_param.o vector3.o glossary.o property.o\
            backtrace.o tokenizer.o stream_func.o print_color.o time_date.o filepath.o\
 
 #----------------------------targets--------------------------------------------
