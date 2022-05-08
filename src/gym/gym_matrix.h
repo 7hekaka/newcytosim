@@ -6,6 +6,9 @@
 
 namespace gym
 {
+    // FILE <- M
+    //void mat_print(FILE*, const float M[16]);
+
     /// M <- zero
     inline void mat_zero(float M[16])
     {
@@ -51,6 +54,9 @@ namespace gym
     /// glPerspective()
     void mat_perspective(float [16], float y_fov, float aspect, float n, float f);
     
+    /// gluPickMatrix()
+    void mat_pick(float [16], float X, float Y, float W, float H, const int[4]);
+
     
     /// multiply Matrix Vector
     void mat_mulvec(float[4], const float[16], const float[4]);
@@ -58,7 +64,7 @@ namespace gym
     /// multiply matrices
     void mat_mul(float[16], const float[16], const float[16]);
     
-    /// multiply matrices
+    /// multiply matrices: out = out x B */
     void mat_mul(float[16], const float[16]);
 
     /// scale matrix, like glScale()

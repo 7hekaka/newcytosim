@@ -394,6 +394,15 @@ void View::setProjection() const
 }
 
 
+void View::setPickProjection(float X, float Y, float W, float H) const
+{
+    float mat[16];
+    gym::mat_pick(mat, X, Y, W, H, viewport_);
+    gym::mat_mul(mat, projection_);
+    gym::set_projection(mat);
+}
+
+
 void View::setModelView() const
 {
     //GLint e; glGetIntegerv(GL_MATRIX_MODE, &e); assert_true(e==GL_MODELVIEW);

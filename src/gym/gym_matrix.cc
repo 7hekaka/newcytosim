@@ -8,8 +8,7 @@
 mat4x4_inverse is derived from GLFW linmath.h by Camilla Löwy <elmindreda@elmindreda.org>
 */
 
-
-static void mat_print(FILE * f, float M[16])
+static void mat_print(FILE * f, const float M[16])
 {
     for ( int i = 0; i < 4; ++i )
     {
@@ -83,6 +82,15 @@ void gym::mat_perspective(float M[16], float y_fov, float aspect, float N, float
     M[10] = ( F + N ) / ( N - F );
     M[11] = -1.f;
     M[14] = ( F * N ) * (2.f / ( N - F ));
+}
+
+void gym::mat_pick(float M[16], float cx, float cy, float dx, float dy, const int vp[4])
+{
+    mat_diagonal(M, 1);
+    float tx = ( vp[2] - 2.f * ( cx - vp[0] )) / dx;
+    float ty = ( vp[3] - 2.f * ( cy - vp[1] )) / dy;
+    mat_translate(M, tx, ty, 0.f);
+    mat_scale(M, vp[2]/dx, vp[3]/dy, 1.f);
 }
 
 

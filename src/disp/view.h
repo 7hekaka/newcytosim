@@ -89,6 +89,9 @@ public:
     /// set OpenGL Projection matrix
     void setProjection() const;
     
+    /// set OpenGL Projection matrix
+    void setPickProjection(float X, float Y, float W, float H) const;
+
     /// set OpenGL Model-View matrix
     void setModelView() const;
     
