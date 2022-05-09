@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
                 simul.writeObjects(output, true, binary);
                 break;
             case 'e':
-                simul.erase_all(1);
+                simul.eraseObjects(1);
                 break;
             case 'b':
                 binary = !binary;
