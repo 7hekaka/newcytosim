@@ -676,7 +676,7 @@ namespace gle
     size_t setBlob(flute3* flu)
     {
         constexpr float R = 1.f, U = -1.f, H(M_SQRT2);
-        /* start from a centerred cube, rotated appropriately
+        /* start from a centered cube, rotated appropriately
          with vertices ordered to draw all surfaces of the cube
          with a single triangle strip. */
         const float pts[] = {
@@ -703,6 +703,9 @@ namespace gle
         a = {pts[3*n+3], pts[3*n+4], pts[3*n+5]};
         flu[i++] = normalize(c+c);
         flu[i++] = normalize(a+c);
+        flu[i++] = normalize(a+c);
+        a = {pts[3*13], pts[3*13+1], pts[3*13+2]};
+        flu[i++] = normalize(a+a);
         for ( n = 13; n > 2; n -= 2 )
         {
             a = {pts[3*n  ], pts[3*n+1], pts[3*n+2]};
@@ -716,8 +719,8 @@ namespace gle
         a = {pts[0], pts[1], pts[2]};
         flu[i++] = normalize(c+c);
         flu[i++] = normalize(a+c);
-        assert_true(i==52);
-        return i;
+        assert_true(i==54);
+        return 56;
     }
     
     /* This moves some vertices to smoothen the blob */
@@ -734,14 +737,14 @@ namespace gle
         const float Z = 0.6f;
         //{ 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 }
         // pull some vertices far away in Z
-        for ( int u : { 42, 44, 46, 48, 50 } ) flu[u] = { 0, 0, F };
+        for ( int u : { 44, 46, 48, 50, 52 } ) flu[u] = { 0, 0, F };
         // set the 6 vertex of an hexagon:
-        for ( int u : { 3, 49 } ) flu[u] = { R, 0, Z};
-        for ( int u : { 5, 47 } ) flu[u] = { X,-Y, Z};
-        for ( int u : { 7, 45 } ) flu[u] = {-X,-Y, Z};
-        for ( int u : { 9, 43 } ) flu[u] = {-R, 0, Z};
-        for ( int u : {11, 41 } ) flu[u] = {-X, Y, Z};
-        for ( int u : {1,40,51} ) flu[u] = { X, Y, Z};
+        for ( int u : { 3, 51 } ) flu[u] = { R, 0, Z};
+        for ( int u : { 5, 49 } ) flu[u] = { X,-Y, Z};
+        for ( int u : { 7, 47 } ) flu[u] = {-X,-Y, Z};
+        for ( int u : { 9, 45 } ) flu[u] = {-R, 0, Z};
+        for ( int u : {11, 43 } ) flu[u] = {-X, Y, Z};
+        for ( int u : {1,42,53} ) flu[u] = { X, Y, Z};
     }
     
     size_t setPin(flute3* flu)
@@ -754,7 +757,7 @@ namespace gle
     void thing()
     {
         gym::ref_view();
-        flute3* flu = gym::mapBufferV3(52);
+        flute3* flu = gym::mapBufferV3(64);
         setBlob(flu);
         //modifyBlob(flu, 10);
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -762,14 +765,18 @@ namespace gle
         gym::unmapBufferV3();
 
         gym::color_both(1,1,1,1);
-        for ( unsigned u : { 1, 3, 5, 7, 9, 11, 40, 41, 43, 45, 47, 49, 51 } )
+        for ( unsigned u : { 1, 3, 5, 7, 9, 11 } )
             gym::drawPoints(8, u, 1);
-        gym::drawLineStrip(1, 0, 52);
-
-        gym::color_both(0,1,1,0.5);
+        gym::color_both(1,0,1,1);
+        for ( unsigned u : { 44, 46, 48, 50, 52 } )
+            gym::drawPoints(8, u, 1);
+        gym::drawLineStrip(1, 0, 54);
+        
+        gym::enableCullFace(GL_BACK);
+        gym::color_both(0,1,1,0.75);
         gym::drawTriangleStrip(0, 26);
-        gym::color_both(1,1,0,0.5);
-        gym::drawTriangleStrip(26, 26);
+        gym::color_both(1,1,0,0.75);
+        gym::drawTriangleStrip(28, 26);
         gym::cleanup();
     }
     
@@ -803,7 +810,7 @@ namespace gle
     
     static size_t sizeBlobBuffers()
     {
-        return ( 52 + 52 + 14 + 32 );
+        return ( 56 + 56 + 16 + 32 );
     }
 
     flute3* setBlobBuffers(flute3* ptr, flute3* const ori, size_t idx[])
@@ -868,8 +875,8 @@ namespace gle
     void thinTube()     { doVNTriangleStrip(cubes_[7], 14); }
     void thinLongTube() { doVNTriangleStrip(cubes_[8], 14); }
 
-    void blob()   { doTriangleStrip(blobs_[0], 52); }
-    void needle() { doTriangleStrip(blobs_[1], 52); }
+    void blob()   { doTriangleStrip(blobs_[0], 54); }
+    void needle() { doTriangleStrip(blobs_[1], 54); }
     void cuboid() { doTriangleStrip(blobs_[2], 14); }
     void icoid()  { doTriangleStrip(blobs_[3], 32); }
 
