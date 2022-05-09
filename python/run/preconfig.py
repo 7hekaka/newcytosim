@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2022
-# This is PRECONFIG version 1.54, last modified on 21.03.2022
+# This is PRECONFIG version 1.55, last modified on 9.05.2022
 
 """
 # SYNOPSIS
@@ -62,6 +62,9 @@
 
    - if the path to an existing directory is specified, files will be created
    in this directory, for example: `preconfig dir config.cym.tpl`
+   
+   - if 'out=FILENAME' is specified, Preconfig will use this name for the first
+   file that it generates. If this file already exists, it will be overwritten.
 
    - if a negative integer is specified, this will set the width of the integer
    that is used to build the file namess.
@@ -380,9 +383,8 @@ class Preconfig:
         """
         k = ''
         v = code
-        #print("Preconfig:try_assignment %s" % code);
         res = re.match(r" *([a-zA-Z]\w*) *= *(.*)", code)
-        #print(res.groups())
+        #print(" preconfig:try_assignment(%s): %s" % (code, res.groups()));
         if res and len(res.groups()) > 1:
             k = res.group(1)
             v = res.group(2).strip()
@@ -583,6 +585,8 @@ class Preconfig:
             #print("Preconfig argument `%s'" % arg)
             if os.path.isdir(arg):
                 path = arg
+            elif arg.startswith("out="):
+                path = arg[4:]
             elif arg.startswith("path="):
                 path = arg[5:]
             elif os.path.isfile(arg):
@@ -603,17 +607,14 @@ class Preconfig:
             elif arg == '++' or arg == 'log':
                 self.verbose = 2
                 self.log = open('log.csv', 'w')
-            elif arg[0] == '-' and arg[1:].isdigit():
+            elif arg.startswith('-') and arg[1:].isdigit():
                 self.nb_digits = int(arg[1:])
-            else:
-                try:
-                    k, v = self.try_assignment(arg, 0)
-                    if k:
-                        values[k] = v
-                        continue
-                except:
-                    sys.stderr.write("Preconfig does not understand argument `%s'\n" % arg)
-                    sys.exit(4)
+            elif arg.find('=', 1) > 0:
+                k, v = self.try_assignment(arg, 0)
+                values[k] = v
+            elif arg:
+                sys.stderr.write("Preconfig does not understand argument `%s'\n" % arg)
+                sys.exit(4)
 
         if not inputs:
             sys.stderr.write("Preconfig expects an input template file\n")
