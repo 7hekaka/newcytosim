@@ -38,10 +38,10 @@ void Display1::drawObjects(Simul const& sim)
     gym::disableCullFace();
     drawFields(sim.fields);
     
-    gym::enableLighting();
 #if ( DIM > 2 )
     gym::openDepthMask();
 #endif
+    gym::enableLighting();
     drawSpaces(sim.spaces);
     gym::disableLighting();
     gym::disableCullFace();
@@ -53,15 +53,14 @@ void Display1::drawObjects(Simul const& sim)
         drawSinglesF(sim.singles);
     
     drawFibers(sim.fibers);
+    gym::disableLighting();
 
     if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
         drawCouplesA(sim.couples);
 
 #if ( DIM >= 3 )
-    
-    gym::enableLighting();
     gym::enableCullFace(GL_BACK);
-
+    gym::enableLighting();
 #endif
     
     drawBeads(sim.beads);
@@ -69,12 +68,10 @@ void Display1::drawObjects(Simul const& sim)
     drawSpheres(sim.spheres);
     
 #if ( DIM >= 3 )
-    
     gym::disableLighting();
     gym::disableCullFace();
-
 #endif
-    
+
     if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
         drawCouplesB(sim.couples);
     
@@ -82,10 +79,8 @@ void Display1::drawObjects(Simul const& sim)
         drawSinglesA(sim.singles);
 
 #if ( DIM >= 3 )
-    
     gym::enableLighting();
     gym::enableCullFace(GL_BACK);
-
 #endif
 
     drawOrganizers(sim.organizers);

@@ -1850,7 +1850,6 @@ void Display::drawBead(Bead const& obj)
         gym::color(bodyColorF(obj));
         gym::transScale(obj.position(), obj.radius());
         gle::circle(disp->width);
-        gym::enableLighting();
     }
 #endif
 }
