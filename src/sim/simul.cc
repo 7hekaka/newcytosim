@@ -62,11 +62,10 @@ Simul::~Simul()
 
 /**
  This will initialize the simulation by registering callbacks.
- You should still call Simul::prepare() before calling step()
+ Simul::prepare() must still be called before any Simul::step()
  */
 void Simul::initialize(Glossary & glos)
 {
-    // read parameters
     prop.read(glos);
 }
 

@@ -51,7 +51,7 @@ void start(const char* path, char *const command[])
         // run executable (this should not return, except if error occurred)
         execv(path, command);
         // the command failed, and error is indicated by 'errno':
-        perror("execl");
+        perror("execv");
         (void) write(STDERR_FILENO, "while executing command:", 24);
         for ( int i = 0; command[i]; ++i )
         {

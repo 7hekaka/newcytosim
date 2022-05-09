@@ -1215,7 +1215,7 @@ int Parser::evaluate_one(std::istream& is)
     else if ( tok == "dump" )
         parse_dump(is);
     else {
-        throw InvalidSyntax("unexpected command `"+tok+"'");
+        throw InvalidSyntax("syntax error: unexpected `"+tok+"'");
     }
     return 0;
 }
