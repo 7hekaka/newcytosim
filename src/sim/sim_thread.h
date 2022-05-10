@@ -29,13 +29,13 @@ private:
     pthread_cond_t condition_;
     
     /// signal for hold()
-    bool holding_;
+    int holding_;
 
-    /// a flag reflecting if the child thread is running or not
-    bool alone_;
+    /// error state of the child thread: 0 = running
+    int status_;
     
-    /// a flag to indicate that child thread should terminate or restart
-    int flag_;
+    /// a flag to indicate if child thread should terminate or restart
+    int order_;
 
     /// counter for hold()
     unsigned int hold_;
@@ -104,8 +104,8 @@ public:
     /// unlock access to data and wait for the condition
     int cond_wait() { return pthread_cond_wait(&condition_, &mutex_); }
     
-    /// send signal to child thread
-    void signal() { holding_ = 0; if ( !alone_ ) pthread_cond_signal(&condition_); }
+    /// send signal to child thread. Will reset holding state if successful
+    void signal() { holding_=0; pthread_cond_signal(&condition_); }
 
 #else
     
@@ -119,10 +119,10 @@ public:
     int trylock() { int R=pthread_mutex_trylock(&mutex_); debug(R?"  failed trylock":"  trylock"); return R; }
     
     /// wait for the condition
-    int cond_wait() { debug("unlock, wait"); int R=pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); return R; }
+    void cond_wait() { debug("unlock, wait"); pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); }
     
     /// signal child thread to continue
-    void signal() { debug("signal"); holding_ = 0; pthread_cond_signal(&condition_); }
+    void signal() { debug("signal"); holding_=0; pthread_cond_signal(&condition_); }
     
 #endif
     
@@ -130,11 +130,14 @@ public:
     void period(unsigned int c) { period_ = c; }
     
     /// true if child thread is running
-    bool alone() const { return alone_; }
+    bool alone() const { return status_; }
 
     /// true if child thread is running
-    bool alive() const { return !alone_; }
+    bool alive() const { return status_ == 0; }
     
+    /// return status of child process, which is 0 if alive and healthy
+    int dead() { return status_; }
+
     /// start the thread that will run a simulation
     void start();
     
@@ -144,11 +147,14 @@ public:
     /// gently stop the simulation
     void stop();
 
-    /// stop the simulation
-    void cancel();
+    /// ask the simulation to stop
+    void cancel() { pthread_cancel(child_); }
+
+    /// stop the simulation and wait for cleaning operations
+    void cancel_join();
     
     /// restart engine
-    void restart();
+    void restart() { order_ = 1; };
 
     /// clear the simulation world
     void erase_simul(bool) const;

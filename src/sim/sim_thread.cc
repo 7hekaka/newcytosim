@@ -2,6 +2,8 @@
 
 #include <cstdio>
 #include <time.h>
+#include <unistd.h>
+
 #include "sim_thread.h"
 #include "exceptions.h"
 #include "print_color.h"
@@ -15,8 +17,8 @@
 SimThread::SimThread(Simul* sim)
 : Parser(sim, 1, 1, 1, 1, 0)
 {
-    alone_  = 1;
-    flag_   = 0;
+    status_ = -2;
+    order_  = 0;
     hold_   = 0;
     holding_= 0;
     period_ = 1;
@@ -64,14 +66,14 @@ void SimThread::hold()
 {
     assert_true( isWorker() );
 
-    if ( flag_ )
+    if ( order_ < 0 )
         pthread_exit(nullptr);
     
     if ( ++hold_ >= period_ )
     {
         hold_ = 0;
-        holding_ = 1;
         //debug("holding");
+        holding_ = 1;
         cond_wait();  // this also unlocks and locks the mutex
     }
 }
@@ -85,11 +87,18 @@ void SimThread::run()
 {
     assert_true( isWorker() );
     try {
-        Parser::readConfig();
-        hold();
+        do {
+            order_ = 0;
+            Parser::readConfig();
+            do {
+                usleep(25000);
+                holding_ = 2;
+                cond_wait();  // this also unlocks and locks the mutex
+            } while ( !order_ );
+            erase_simul(1);
+        } while ( order_ >= 0 );
     }
     catch( Exception & e ) {
-        sim_->relax();
         std::cerr << e.brief() << e.info() << '\n';
         //flashText("Error: the simulation died");
     }
@@ -100,7 +109,9 @@ void SimThread::run()
 void child_cleanup(void * arg)
 {
     SimThread * st = static_cast<SimThread*>(arg);
-    st->alone_ = 1;
+    assert_true( st->isWorker() );
+    st->status_ = -1;
+    st->holding_ = 0;
     st->unlock();
     //st->debug("ended");
 }
@@ -112,6 +123,7 @@ void* run_launcher(void * arg)
     //std::clog << "slave  " << pthread_self() << '\n';
     SimThread * st = static_cast<SimThread*>(arg);
     st->lock();
+    // let the system cleanup upon normal termination:
     pthread_cleanup_push(child_cleanup, arg);
     st->run();
     pthread_cleanup_pop(1);
@@ -126,21 +138,22 @@ void* run_launcher(void * arg)
 void SimThread::start()
 {
     assert_false( isWorker() );
-    if ( alone_ )
+    if ( status_ )
     {
-        flag_ = 0;
-        holding_ = 0;
+        order_ = 0;
+        assert_true(holding_ == 0);
         Parser::restart_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
-        if ( pthread_create(&child_, nullptr, run_launcher, this) )
-            throw Exception("failed to create thread");
-        alone_ = 0;
+        status_ = pthread_create(&child_, nullptr, run_launcher, this);
+        // let the system cleanup upon normal child termination:
+        if ( status_ == 0 )
+            pthread_detach(child_);
+        else
+            printf("%p failed to create thread", this);
     }
 }
 
-
 //------------------------------------------------------------------------------
-
 
 void SimThread::extend_run(size_t n_steps)
 {
@@ -151,7 +164,6 @@ void SimThread::extend_run(size_t n_steps)
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
-        sim_->relax();
         //flashText("Error: %s", e.what());
     }
     sim_->parser(nullptr);
@@ -175,17 +187,56 @@ void* extend_launcher(void * arg)
 int SimThread::extend()
 {
     assert_false( isWorker() );
-    if ( alone_ )
+    if ( status_ )
     {
-        flag_ = 0;
+        order_ = 0;
         holding_ = 0;
         //std::clog << "master " << pthread_self() << '\n';
-        if ( pthread_create(&child_, nullptr, extend_launcher, this) )
-            throw Exception("failed to create thread");
-        alone_ = 0;
-        return 0;
+        status_ = pthread_create(&child_, nullptr, extend_launcher, this);
     }
-    return 1;
+    return status_;
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Thread control & termination
+
+/**
+ ask the slave thread to exit at the next spontaneous halt
+*/
+void SimThread::stop()
+{
+    assert_false( isWorker() );
+    if ( status_ == 0 )
+    {
+        // request clean termination:
+        order_ = -1;
+        signal();
+        // wait for termination:
+        //debug("join...");
+        if ( 0 == pthread_join(child_, nullptr) )
+            status_ = -2;
+    }
+}
+
+/**
+ kill the slave thread immediately
+ */
+void SimThread::cancel_join()
+{
+    assert_false( isWorker() );
+    if ( status_ == 0 )
+    {
+        //debug("cancel...");
+        // force termination:
+        if ( 0 == pthread_cancel(child_) )
+        {
+            // wait for termination to reclaim resources:
+            if ( 0 == pthread_join(child_, nullptr) )
+                status_ = -2;
+            else
+                status_ = -1;
+        }
+    }
 }
 
 
@@ -238,62 +289,6 @@ int SimThread::loadLastFrame()
     }
     unlock();
     return r;
-}
-
-//------------------------------------------------------------------------------
-#pragma mark - Thread control & termination
-
-/**
- ask the slave thread to exit at the next spontaneous halt
-*/ 
-void SimThread::stop()
-{
-    assert_false( isWorker() );
-    if ( !alone_ )
-    {
-        // request clean termination:
-        flag_ = 1;
-        signal();
-        // wait for termination:
-        if ( !alone_ )
-        {
-            //debug("join...");
-            // wait for termination:
-            pthread_join(child_, nullptr);
-            alone_ = 1;
-        }
-    }
-}
-
-/**
- kill the slave thread immediately
- */
-void SimThread::cancel()
-{
-    assert_false( isWorker() );
-    if ( !alone_ )
-    {
-        flag_ = 2;
-        //debug("cancel...");
-        // force termination:
-        if ( 0 == pthread_cancel(child_) )
-        {
-            // wait for termination:
-            pthread_join(child_, nullptr);
-            holding_ = 0;
-            alone_ = 1;
-            unlock();
-        }
-    }
-}
-
-
-void SimThread::restart()
-{
-    assert_false( isWorker() );
-    stop();
-    erase_simul(1);
-    start();
 }
 
 //------------------------------------------------------------------------------
