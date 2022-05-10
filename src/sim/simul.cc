@@ -73,7 +73,7 @@ void Simul::initialize(Glossary & glos)
 
 void Simul::eraseObjects(bool erase_properties)
 {
-    //fprintf(stderr, "Simul:%p:erase()\n", this);
+    //fprintf(stderr, "Simul:%p:eraseObjects()\n", this);
     singles.erase();
     couples.erase();
     tubules.erase();

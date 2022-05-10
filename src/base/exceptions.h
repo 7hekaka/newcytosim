@@ -28,6 +28,9 @@ protected:
     /// background information
     std::string info_;
     
+    /// file in which the exception occurred
+    std::string file_;
+
 public:
     
     /// Creator with empty message
@@ -45,7 +48,10 @@ public:
     /// return the message
     std::string brief() const
     {
-        return "Error, " + msg_;
+        if ( file_.empty() )
+            return "Error, " + msg_;
+        else
+            return "Error in `" + file_ + "' : " + msg_;
     }
     
     /// return supplementary message
@@ -108,6 +114,12 @@ public:
         std::ostringstream oss;
         oss << s << a << b << c << d;
         msg_ = oss.str();
+    }
+    
+    /// append string to info
+    void file(const std::string& f)
+    {
+        file_ = f;
     }
 
     /// append string to info

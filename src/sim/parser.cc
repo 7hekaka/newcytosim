@@ -1221,10 +1221,8 @@ int Parser::evaluate_one(std::istream& is)
 }
 
 
-void Parser::evaluate(std::istream& is)
+void Parser::evaluate(std::istream& is, std::streampos& ipos)
 {
-    std::streampos ipos(0);
-    try {
         while ( is.good() )
         {
             int c = Tokenizer::skip_space(is, true);
@@ -1262,19 +1260,14 @@ void Parser::evaluate(std::istream& is)
             if ( evaluate_one(is) )
                 break;
         }
-    }
-    catch( Exception & e )
-    {
-        e << "\n" + StreamFunc::get_lines(is, ipos, is.tellg());
-        throw;
-    }
 }
 
 
 void Parser::evaluate(std::string const& code)
 {
     std::istringstream is(code);
-    evaluate(is);
+    std::streampos ipos(0);
+    evaluate(is, ipos);
 }
 
 
@@ -1289,8 +1282,18 @@ void Parser::readConfig(std::string const& filename)
     VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
 
     sim_->parser(this);
-    evaluate(is);
+    std::streampos ipos(0);
+    try {
+        evaluate(is, ipos);
+    }
+    catch( Exception & e )
+    {
+        e.file(filename);
+        e << "\n" + StreamFunc::get_lines(is, ipos, is.tellg());
+        throw;
+    }
     sim_->parser(nullptr);
+    is.close();
 }
 
 

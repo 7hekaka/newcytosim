@@ -105,7 +105,7 @@ public:
     int  evaluate_one(std::istream&);
     
     /// Parse all commands in stream
-    void evaluate(std::istream&);
+    void evaluate(std::istream&, std::streampos&);
 
     /// Parse code in string, and report errors
     void evaluate(std::string const&);

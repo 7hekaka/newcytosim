@@ -31,8 +31,8 @@ private:
     {
     public:
         fpos_t position_; ///< starting position in the file
-        int status_;      ///< indicates if `position` is valid
-        file_pos() { status_ = 0; }
+        int validity_;    ///< indicates if `position` is valid
+        file_pos() { validity_ = 0; }
     };
     
     /// type for list of positions
