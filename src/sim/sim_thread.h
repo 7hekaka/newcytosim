@@ -150,6 +150,9 @@ public:
     /// ask the simulation to stop
     void cancel() { pthread_cancel(child_); }
 
+    /// wait for child to terminate
+    void join() { if ( 0 == pthread_join(child_, nullptr) ) status_ = -2; }
+    
     /// stop the simulation and wait for cleaning operations
     void cancel_join();
     

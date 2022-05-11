@@ -233,8 +233,6 @@ void SimThread::cancel_join()
             // wait for termination to reclaim resources:
             if ( 0 == pthread_join(child_, nullptr) )
                 status_ = -2;
-            else
-                status_ = -1;
         }
     }
 }

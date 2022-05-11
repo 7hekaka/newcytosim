@@ -816,7 +816,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case 'Z':
-            worker.cancel();
+            worker.cancel_join();
             player.stop();
             break;
             

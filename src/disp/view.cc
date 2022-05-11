@@ -498,7 +498,7 @@ void View::reset()
 
 void View::set_scale(float s)
 {
-    //std::clog << "auto_scale " << rad << '\n';
+    //std::clog << "set_scale " << s << '\n';
     view_scale = s;
     zoom_in(0.933033);
     --auto_scale;

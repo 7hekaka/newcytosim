@@ -219,16 +219,16 @@ public:
     
     //---------------------------------------------------------------------------
 
-    /// adjust view_scale
+    /// adjust the size of the visible area with zoom==1.
     void set_scale(float);
     
-    /// set absolute zoom
+    /// set absolute zoom (zoom <- z)
     void zoom_to(float z);
     
-    /// increase zoom (multiplicative)
+    /// increase zoom (zoom <- zoom * z)
     void zoom_in(float z) { zoom_to( zoom * z ); }
     
-    /// decrease zoom (multiplicative)
+    /// decrease zoom (zoom <- zoom / z)
     void zoom_out(float z) { zoom_to( zoom / z ); }
     
     //---------------------------------------------------------------------------

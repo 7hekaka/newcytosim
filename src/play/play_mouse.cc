@@ -74,7 +74,7 @@ void timerCallback(const int value)
         if ( worker.holding() )
         {
             /* if the worker is on 'hold', the simulation data was renewed,
-             and it should, available to display */
+             and it should be accessible for this thread to display */
             glApp::displayMain();
             worker.signal();
         }
