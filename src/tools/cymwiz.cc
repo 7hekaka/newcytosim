@@ -35,6 +35,7 @@ int start(const char* path, char *const command[])
     if ( pipe(fds) < 0 )
     {
         perror("pipe");
+        errno = 0;
         return 1;
     }
     
@@ -44,6 +45,7 @@ int start(const char* path, char *const command[])
     if ( child == -1 )
     {
         perror("fork");
+        errno = 0;
         return 1;
     }
     

@@ -29,6 +29,7 @@ void start(const char* path, char *const command[])
     if ( pipe(fds) < 0 )
     {
         perror("pipe");
+        errno = 0;
         exit(1);
     }
     
@@ -38,6 +39,7 @@ void start(const char* path, char *const command[])
     if ( child == -1 )
     {
         perror("fork");
+        errno = 0;
         exit(1);
     }
     
@@ -59,6 +61,7 @@ void start(const char* path, char *const command[])
             (void) write(STDERR_FILENO, command[i], strlen(command[i]));
         }
         (void) write(STDERR_FILENO, "\n", 1);
+        errno = 0;
         _exit(1);
     }
     
