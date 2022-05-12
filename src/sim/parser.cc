@@ -117,7 +117,9 @@ void Parser::parse_set(std::istream& is)
             para = Tokenizer::get_symbol(is);
         }
 #endif
-        name = Tokenizer::get_token(is);
+        name = Tokenizer::get_symbol(is);
+        if ( name.empty() )
+            throw InvalidParameter("unexpected syntax");
         blok = Tokenizer::get_block(is, '{', true);
 
         if ( name == "display" | para == "display" )
@@ -182,7 +184,7 @@ void Parser::parse_set(std::istream& is)
             //set CLASS:PARAMETER NAME { VALUE }
             is.get(); // skip ':'
             para = Tokenizer::get_symbol(is);
-            name = Tokenizer::get_token(is);
+            name = Tokenizer::get_symbol(is);
         }
         else
 #endif
@@ -604,7 +606,7 @@ void Parser::parse_mark(std::istream& is)
 /**
  Cut all fibers that intersect a given plane.
  
-     cut fiber NAME
+     cut FIBER_NAME
      {
         plane = VECTOR, REAL
      }
@@ -621,17 +623,19 @@ void Parser::parse_mark(std::istream& is)
 void Parser::parse_cut(std::istream& is)
 {    
     std::streampos ipos = is.tellg();
-    std::string str = Tokenizer::get_token(is);
+    std::string str = Tokenizer::get_symbol(is);
  
     if ( str == "all" )
     {
         if ( Tokenizer::get_symbol(is) != "fiber" )
             throw InvalidParameter("only 'fiber' can be cut");
     }
+#if BACKWARD_COMPATIBILITY <= 50
     else if ( str == "fiber" )
     {
         str = Tokenizer::get_symbol(is);
     }
+#endif
     
     std::string blok = Tokenizer::get_block(is, '{', true);
     
@@ -656,13 +660,13 @@ void Parser::parse_cut(std::istream& is)
 void Parser::parse_connect(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    std::string str = Tokenizer::get_token(is);
+    std::string name = Tokenizer::get_symbol(is);
     std::string blok = Tokenizer::get_block(is, '{');
     
     if ( do_run )
     {
         Glossary opt(blok);
-        execute_connect(str, opt);
+        execute_connect(name, opt);
         check_warnings(opt, is, ipos);
     }
 }
@@ -823,7 +827,7 @@ void Parser::parse_read(std::istream& is)
 void Parser::parse_import(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    std::string what = Tokenizer::get_token(is);
+    std::string what = Tokenizer::get_symbol(is);
     std::string file = Tokenizer::get_path(is);
     
     if ( what.empty() )
@@ -871,7 +875,7 @@ void Parser::parse_import(std::istream& is)
 void Parser::parse_export(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    std::string what = Tokenizer::get_token(is);
+    std::string what = Tokenizer::get_symbol(is);
     std::string file = Tokenizer::get_path(is);
     
     if ( what.empty() )
@@ -1071,15 +1075,15 @@ void Parser::parse_for(std::istream& is)
     
     std::string var = Tokenizer::get_symbol(is);
     
-    std::string s = Tokenizer::get_token(is);
-    if ( s != "=" )
+    int s = Tokenizer::get_character(is, 1, 0);
+    if ( s != '=' )
         throw InvalidSyntax("missing '=' in command 'for'");
     
     if ( ! Tokenizer::get_integer(is, start) )
         throw InvalidSyntax("missing number after 'repeat'");
 
-    s = Tokenizer::get_token(is);
-    if ( s != ":" )
+    s = Tokenizer::get_character(is, 1, 0);
+    if ( s != ':' )
         throw InvalidSyntax("missing ':' in command 'for'");
     
     if ( ! Tokenizer::get_integer(is, end) )
@@ -1129,8 +1133,8 @@ void Parser::parse_end(std::istream& is)
  */
 void Parser::parse_dump(std::istream& is)
 {
-    const std::string str = Tokenizer::get_token(is);
-    if ( str.empty() )
+    const std::string str = Tokenizer::get_path(is);
+    if ( str.empty() || str == "*" )
         throw InvalidSyntax("missing directory name after 'dump'");
     std::string blok = Tokenizer::get_block(is, '{');
 
@@ -1156,7 +1160,7 @@ void Parser::parse_dump(std::istream& is)
  */
 int Parser::evaluate_one(std::istream& is)
 {
-    std::string tok = Tokenizer::get_token(is);
+    std::string tok = Tokenizer::get_symbol(is);
     
     if ( tok == "set" )
         parse_set(is);
