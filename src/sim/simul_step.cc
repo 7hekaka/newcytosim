@@ -1,12 +1,12 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 /**
- return the maximum segmentation of all existing FiberProp,
- multiplied by 0.5
+ @returns the largest segmentation of all existing FiberProp, multiplied by 0.5
+ @returns -1.0 if no FiberProp is defined
  */
 real Simul::estimateFiberGridStep() const
 {
-    real res = 0.0;
+    real res = -2.0;
     
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -24,29 +24,26 @@ real Simul::estimateFiberGridStep() const
  1. if `binding_grid_step` is not set, attempt to find a suitable value for it,
  2. if the number of cells is superior to 1e5, double the step size,
  3. initialize the grid with the estimated step size.
+ 
+ Note: if no FiberProp is defined, there cannot be any fiber,
+ and the grid is not needed. In this case, the grid is initialized with step=1
  */
 void Simul::setFiberGrid(Space const* spc, real& grid_step) const
 {
     assert_true(spc);
     real res = grid_step;
-    
+
     // try to find cell size from the filaments characteristics
     if ( res <= 0 )
         res = estimateFiberGridStep();
 
-    /// otherwise, try to get it from the space
-    if ( res <= 0 )
-        res = spc->max_extension() / 128.0;
-    
-    if ( res <= 0 )
-         throw InvalidParameter("simul:binding_grid_step must be > 0");
-
-    // increase the cell size until we get acceptable memory requirements:
+    /* initialize the Grid to cover 'spc' entirely, increasing the
+     cell size until we get acceptable memory requirements */
     const size_t sup = 1 << 17;
-    while ( fiberGrid.setGrid(spc, res) > sup )
+    while ( fiberGrid.setGrid(spc, abs_real(res)) > sup )
         res *= M_SQRT2;
 
-    if ( res != grid_step )
+    if ( res > 0 && res != grid_step )
     {
         Cytosim::log("simul:binding_grid_step <-- %.3f\n", res);
         grid_step = res;
@@ -188,6 +185,7 @@ void Simul::step()
             //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
         }
     }
+    
     // This will also update all the attached Hands
     fibers.step();
 }

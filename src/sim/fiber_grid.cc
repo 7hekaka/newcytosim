@@ -199,7 +199,6 @@ paintGrid(first_fiber, last_fiber) links all segments found in 'fiber' and its
 
 void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 {
-    assert_true(hasGrid());
     assert_true(range >= 0);
     
     fGrid.clear();
