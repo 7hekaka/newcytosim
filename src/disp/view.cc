@@ -731,6 +731,8 @@ void View::drawMagnifier(float mag, Vector3 foc, Vector3 cen, int mX, int mY, in
         view.zoom *= mag;
         view.focus = foc;
         view.focus_shift = ( cen - foc ) / mag;
+        view.focus.ZZ = 0;
+        view.focus_shift.ZZ = 0;
         glEnable(GL_SCISSOR_TEST);
         glScissor(mX-R, mY-R, 2*R, 2*R);
         drawMagFunc(view);
