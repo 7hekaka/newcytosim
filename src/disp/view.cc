@@ -187,7 +187,7 @@ void View::strokeString(const char str[]) const
 {
     gym::one_view(viewport_[2], viewport_[3]);
     gym::color(front_color);
-    fgStrokeString(0, 4, 0.1, 1, str, 1, 0, 0);
+    fgStrokeString(8, 4, 0.125, 1, str, 1, 0, -0.25);
     loadView();
 }
 
