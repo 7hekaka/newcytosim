@@ -65,8 +65,7 @@ void drawMag(View& view)
 {
     //std::clog << " drawMag(" << std::setprecision(3) << simul.time() << "s)\n";
     view.clear();
-    view.setProjection();
-    view.setModelView();
+    view.loadView();
     view.setLights();
     view.setClipping();
     player.setPixelSize(view);
@@ -124,6 +123,12 @@ void blitBuffers(unsigned back, unsigned front, int W, int H)
     glBlitFramebuffer(0, 0, W, H, 0, 0, W, H, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, front);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, back);
+}
+
+
+void byebye()
+{
+    worker.cancel_join();
 }
 
 //------------------------------------------------------------------------------
@@ -475,6 +480,7 @@ int main(int argc, char* argv[])
         }
     }
 
+    std::atexit(byebye);
     //start the GLUT event handler:
     glutMainLoop();
 #endif
