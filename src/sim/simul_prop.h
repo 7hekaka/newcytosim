@@ -271,8 +271,11 @@ public:
      */
     real binding_grid_step;
     
-    /// level of verbosity
+    /// level of verbosity in output
     unsigned verbose;
+    
+    /// a flag for custom purpose
+    unsigned flag;
 
     /// Name of configuration file (<em>default = config.cym</em>)
     std::string config_file;

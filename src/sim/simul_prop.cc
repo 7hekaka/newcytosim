@@ -39,6 +39,7 @@ void SimulProp::clear()
     binding_grid_step = -1;
     
     verbose = 0;
+    flag = 0;
 
     config_file   = "config.cym";
     property_file = "properties.cmp";
@@ -96,7 +97,8 @@ void SimulProp::read(Glossary& glos)
     
     // these parameters are not written:
     glos.set(verbose, "verbose");
-    
+    glos.set(flag, "flag");
+
     // names of files and path:
     glos.set(config_file, "config");
     glos.set(config_file, ".cytosim"); // fullname extension
