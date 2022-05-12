@@ -86,20 +86,20 @@ public:
     /// adjust parameters of projections, given window size
     void adjust(int, int) const;
     
-    /// set OpenGL Projection matrix
+    /// set OpenGL Projection and ModelView matrices
+    void adjust() const { adjust(window_size[0], window_size[1]); }
+
+    /// upload OpenGL Projection matrix
     void setProjection() const;
     
     /// set OpenGL Projection matrix
     void setPickProjection(float X, float Y, float W, float H) const;
 
-    /// set OpenGL Model-View matrix
+    /// upload Model-View matrix
     void setModelView() const;
     
-    /// set OpenGL Projection and ModelView matrices
-    void load(int, int) const;
-
-    /// set OpenGL Projection and ModelView matrices
-    void load() const { load(window_size[0], window_size[1]); }
+    /// upload Projection and ModelView matrices to OpenGL
+    void loadView() const;
 
     /// adjust view to only show a slice of the world
     void sliceView(int) const;
@@ -141,6 +141,9 @@ public:
     /// unset clipping planes and fog parameters, display axes and scale bar
     void closeDisplay() const;
     
+    /// display text in bottom-left corner
+    void strokeString(const char[]) const;
+
     /// display frame-per-seconds
     void drawFPS() const;
 

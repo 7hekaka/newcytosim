@@ -98,7 +98,7 @@ void processNormalKey(unsigned char c, int x, int y)
 void processMouseClick(int mx, int my, const Vector3 & a, int)
 {
     View& view = glApp::currentView();
-    view.load();
+    view.loadView();
     view.setPickProjection(mx, my, 16, 16);
     pam.selected = mesh.pick();
     glApp::flashText("selected %i", pam.selected);

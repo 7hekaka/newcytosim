@@ -139,7 +139,8 @@ void View::clear()
 
 void View::openDisplay()
 {
-    load();
+    adjust();
+    loadView();
     gym::openDepthMask();
     gym::clearPixels(back_color);
     setFog(fog_type, fog_param, fog_color);
@@ -176,17 +177,18 @@ void View::closeDisplay() const
         size_t n = full_label.find('\n');
         full_label.copy(str, sizeof(str), n);
         str[n] = '\0';
-        int W = width(), H = height();
-        gym::disableLighting();
-        gym::disableDepthTest();
-        gym::disableAlphaTest();
-        gym::one_view(W, H);
-        gym::placeText(0, BITMAP_9_BY_15, front_color, str, nullptr, W, H);
-        gym::restoreDepthTest();
-        gym::restoreAlphaTest();
-        gym::restoreLighting();
+        strokeString(str);
     }
 #endif
+}
+
+
+void View::strokeString(const char str[]) const
+{
+    gym::one_view(viewport_[2], viewport_[3]);
+    gym::color(front_color);
+    fgStrokeString(0, 4, 0.1, 1, str, 1, 0, 0);
+    loadView();
 }
 
 
@@ -205,9 +207,7 @@ void View::drawFPS() const
         sec = now;
         cnt = 0;
     }
-    gym::one_view(viewport_[2], viewport_[3]);
-    gym::color(front_color);
-    fgStrokeString(0, 4, 0.1, 1, str, 1, 0, 0);
+    strokeString(str);
 }
 
 /**
@@ -336,8 +336,9 @@ void View::reshape(int W, int H)
     window_size[1] = H;
     viewport_[2] = W;
     viewport_[3] = H;
+    adjust(W, H);
+    loadView();
     loadViewport();
-    load();
 }
 
 
@@ -430,10 +431,9 @@ float View::pixelSize() const
     return b;
 }
 
-void View::load(int W, int H) const
+void View::loadView() const
 {
-    //std::clog << "View::load() win " << window() << "\n";
-    adjust(W, H);
+    //std::clog << "View::loadView() win " << window() << "\n";
     setProjection();
     setModelView();
 }
@@ -502,6 +502,7 @@ void View::set_scale(float s)
     view_scale = s;
     zoom_in(0.933033);
     --auto_scale;
+    adjust();
 }
 
 
@@ -732,7 +733,6 @@ void View::drawMagnifier(float mag, Vector3 foc, Vector3 cen, int mX, int mY, in
         view.focus_shift = ( cen - foc ) / mag;
         glEnable(GL_SCISSOR_TEST);
         glScissor(mX-R, mY-R, 2*R, 2*R);
-        //view.reshape(2*R, 2*R);
         drawMagFunc(view);
         glDisable(GL_SCISSOR_TEST);
     }

@@ -1181,7 +1181,6 @@ void glApp::displayMain()
         {
             //std::cerr << "mag@ " << mouseX << " " << mouseY << "\n";
             view.drawMagnifier(7, mouseDown, viewFocus, mouseX, mouseY, 256);
-            view.load();
         }
         
         CHECK_GL_ERROR("in glApp::displayMain()");
