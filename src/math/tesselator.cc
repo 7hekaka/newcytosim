@@ -337,6 +337,7 @@ void Tesselator::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
 }
 
 
+/*
 /// unfinished
 void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
 {
@@ -357,7 +358,7 @@ void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
     }
     delete[] line;
 }
-
+*/
 
 void Tesselator::setCorners(FLOAT vex[][3], unsigned div)
 {

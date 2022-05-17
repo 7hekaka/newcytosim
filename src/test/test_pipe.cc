@@ -25,7 +25,7 @@ int fds[2];
 
 void start(const char* path, char *const command[])
 {
-    // create a unidirectional pipe:
+    // create communication pipe:
     if ( pipe(fds) < 0 )
     {
         perror("pipe");
@@ -48,7 +48,7 @@ void start(const char* path, char *const command[])
         close(fds[1]);
         // map the standard-input to the pipe exit:
         while ((dup2(fds[0], STDIN_FILENO) == -1) && (errno == EINTR)) {}
-        // run executable (this should not return, except if error occurred)
+        // execv() should not return, except if error occurred
         execv(path, command);
         // the command failed, and error is indicated by 'errno':
         perror("execv");

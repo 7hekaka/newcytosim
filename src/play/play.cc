@@ -57,7 +57,7 @@ void drawLive(View& view, int mag)
     //std::clog << " drawLive(" << std::setprecision(3) << simul.time() << "s) " << "\n";
     if ( 0 == worker.trylock() )
     {
-        worker.parse_stdinput(32);
+        worker.read_input();
         player.drawScene(view, mag);
         worker.unlock();
     }

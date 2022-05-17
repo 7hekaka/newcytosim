@@ -21,6 +21,14 @@ pid_t child = 0;
 int fds[2];
 
 
+void signal_handler(int sig)
+{
+    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
+    psignal((unsigned)sig, "CYMWIZ");
+    (void) write(STDERR_FILENO, "* * * * *\n", 10);
+}
+
+
 int start(const char* path, char *const command[])
 {
     // create a unidirectional pipe:
@@ -45,10 +53,10 @@ int start(const char* path, char *const command[])
         close(fds[1]);  // close pipe exit
         // map the standard-input to the pipe exit:
         while ((dup2(fds[0], STDIN_FILENO) == -1) && (errno == EINTR)) {}
-        // run executable (this should not return, except if error occurred)
+        // execv() should not return, except if error occurred
         execv(path, command);
         // the command failed, and error is indicated by 'errno':
-        perror("execl");
+        perror("execv");
         (void) write(STDERR_FILENO, "while executing command:", 24);
         for ( int i = 0; command[i]; ++i )
         {
@@ -104,6 +112,9 @@ int main(int argc, char* argv[])
         return 1;
     }
     
+    if ( signal(SIGPIPE, signal_handler) )
+        write(STDERR_FILENO, "no SIGPIPE handler\n", 19);
+
     if ( 0 == start(path, argv+1) )
     {
         sleep(1);
@@ -115,9 +126,7 @@ int main(int argc, char* argv[])
             
             if ( len > 0 )
             {
-                //write(STDOUT_FILENO, "SENDING ", 8);
-                //write(STDOUT_FILENO, cmd, sizeof(cmd));
-                
+                //printf(">>> %s", cmd);
                 // send string through pipe entry:
                 ssize_t s = write(fds[1], cmd, len);
                 if ( s != len )

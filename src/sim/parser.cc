@@ -1329,44 +1329,63 @@ inline int has_input(int fd)
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
     struct timeval tv = {0, 10};   // seconds, microseconds
-    return select(1, &fds, nullptr, nullptr, &tv);
+    return select(fd+1, &fds, nullptr, nullptr, &tv);
 }
 
 
 /**
- Read standard input and executes incoming commands.
+ Read data from file description, and executes incoming commands.
  This should be executed by a process who already owns the lock on the data
  */
-size_t Parser::parse_stdinput(size_t max_nb_lines)
+size_t Parser::read_input(int fd)
 {
-    const size_t LINESIZE = 2048;
-    clearerr(stdin);
-    
-    if ( has_input(STDIN_FILENO) > 0 )
+    size_t cnt = 0;
+    if ( has_input(fd) )
     {
-        size_t cnt = 0;
-        // some input is available, process line-by-line:
-        char str[LINESIZE];
-        
-        // read one line from standard input (including terminating \n):
-        while ( fgets(str, LINESIZE, stdin) )
-        {
-            //write(STDOUT_FILENO, ">>>> ", 5); write(STDOUT_FILENO, str, strlen(str));
-            try {
-                Parser::evaluate(str);
+        char buf[1024];
+        constexpr ssize_t chunk = 16;
+        char *ptr = buf, *nxt = ptr;
+        char const*end = buf + sizeof(buf) - 1;
+        ssize_t s = 0;
+        do {
+            if ( ptr == nxt )
+            {
+                // read data chunk:
+                s = read(fd, nxt, std::min(end-nxt, chunk));
+                if ( s < 0 )
+                {
+                    perror("read");
+                    errno = 0;
+                    break;
+                }
+                //fprintf(stderr, "+%li", s);
+                nxt += s;
             }
-            catch ( Exception & e ) {
-                print_green(std::cerr, e.brief());
-                std::cerr << " in: " << str;
+            *nxt = 0;
+            while ( isprint(*ptr) )
+                ++ptr;
+            if ( ptr < nxt )
+            {
+                ++cnt;
+                *ptr++ = 0;
+                try {
+                    //fprintf(stderr, "[%s] %li: ", buf, nxt-ptr);
+                    Parser::evaluate(buf);
+                }
+                catch ( Exception & e ) {
+                    print_green(std::cerr, e.brief());
+                    std::cerr << " in: " << buf;
+                }
+                // move remaining data at the start of 'buf':
+                memmove(buf, ptr, nxt-ptr);
+                nxt = buf + (nxt-ptr);
+                ptr = buf;
+                //fprintf(stderr, "{%s}", buf);
             }
-            if ( ++cnt >= max_nb_lines )
-                break;
-            // check if more input is available:
-            if ( has_input(STDIN_FILENO) < 1 )
-                break;
-        }
-        //printf("executed %lu lines from standard input\n", cnt);
-        return cnt;
+        } while ( s > 0 );
+        if ( nxt > buf )
+            fprintf(stderr, "Warning: unterminated piped data {%s}\n", buf);
     }
-    return 0;
+    //printf("executed %lu lines from standard input\n", cnt);
+    return cnt;
 }
