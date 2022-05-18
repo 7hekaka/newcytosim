@@ -142,7 +142,7 @@ public:
     void closeDisplay() const;
     
     /// display text in bottom-left corner
-    void strokeString(const char[]) const;
+    void strokeString(const char[], float width) const;
 
     /// display frame-per-seconds
     void drawFPS() const;

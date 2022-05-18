@@ -47,12 +47,14 @@ typedef struct tagSFG_StrokeFont SFG_StrokeFont;
 /*
  * Draw a stroke character
  */
-void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char character, float width, float size);
+void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char character,
+                       float line_width, float point_size);
 
 /*
 * Draw a stroke string
 */
-void fgStrokeString(float x, float y, float S, int mono, const char *string, float width, float size, float vshift);
+void fgStrokeString(float x, float y, float S, int mono, const char *string,
+                    float line_width, float point_size, float vshift);
 
 /*
  * Return the width in pixels of a stroke character

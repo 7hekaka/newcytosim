@@ -66,7 +66,8 @@ SFG_StrokeFont const* fghStrokeByID( int mono )
 /*
  * Draw a stroke character
  */
-void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char arg, float width, float size)
+void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char arg,
+                       float line_width, float point_size)
 {
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
@@ -85,16 +86,17 @@ void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char arg, f
                 for ( size_t j = 0; j < num; ++j )
                     flu[j] = { X+S*ptr[j].X, Y+S*ptr[j].Y };
                 gym::unmapBufferV2();
-                gym::drawLineStrip(width, 0, num);
-                if ( size > 0 )
-                    gym::drawPoints(size, 0, num);
+                gym::drawLineStrip(line_width, 0, num);
+                if ( point_size > 0 )
+                    gym::drawPoints(point_size, 0, num);
             }
         }
     }
 }
 
 
-void fgStrokeString(float X, float Y, float S, int mono, const char *string, float width, float size, float vshift)
+void fgStrokeString(float X, float Y, float S, int mono, const char *string,
+                    float line_width, float point_size, float vshift)
 {
     unsigned char c;
     float X0 = X;
@@ -130,9 +132,9 @@ void fgStrokeString(float X, float Y, float S, int mono, const char *string, flo
                         for ( size_t j = 0; j < num; ++j )
                             flu[j] = { X+S*ptr[j].X, Y+S*ptr[j].Y };
                         gym::unmapBufferV2();
-                        gym::drawLineStrip(width, 0, num);
-                        if ( size > 0 )
-                            gym::drawPoints(size, 0, num);
+                        gym::drawLineStrip(line_width, 0, num);
+                        if ( point_size > 0 )
+                            gym::drawPoints(point_size, 0, num);
                     }
                     X += S * schar->Advance;
                 }
