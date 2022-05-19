@@ -27,6 +27,8 @@ Bead::Bead(BeadProp const* p, Vector pos, real rad)
 
 Bead::~Bead()
 {
+    if ( objset() )
+        simul().singles.deleteWrists(this);
     prop = nullptr;
 }
 

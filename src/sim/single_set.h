@@ -122,7 +122,7 @@ public:
     SingleList collectWrists(Object const*) const;
     
     /// remove all Wrists anchored on `obj`
-    void removeWrists(Object const*);
+    void deleteWrists(Object const*);
     
     
     ///returns the first free Single

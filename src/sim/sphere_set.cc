@@ -9,7 +9,7 @@
 void SphereSet::remove(Object * obj)
 {
     ObjectSet::remove(obj);
-    simul_.singles.removeWrists(obj);
+    simul_.singles.deleteWrists(obj);
 }
 
 

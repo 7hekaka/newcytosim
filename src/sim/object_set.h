@@ -135,12 +135,12 @@ public:
     
     /// link the object last in the list
     virtual void unlink(Object *);
-
-    /// register Object, and add it at the end of the list
-    void add(Object *);
     
     /// remove Object
-    void remove(Object *);
+    virtual void remove(Object *);
+
+    /// register Object, adding it at the end of the list
+    void add(Object *);
     
     /// remove Object, and delete it
     void erase(Object *);

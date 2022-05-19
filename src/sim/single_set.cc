@@ -516,7 +516,7 @@ SingleList SingleSet::collectWrists(Object const* arg) const
 }
 
 
-void SingleSet::removeWrists(Object const* arg)
+void SingleSet::deleteWrists(Object const* arg)
 {
     Single *nxt, *obj;
     

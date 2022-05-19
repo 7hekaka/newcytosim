@@ -181,6 +181,8 @@ Solid & Solid::operator =(const Solid & o)
 
 Solid::~Solid()
 {
+    if ( objset() )
+        simul().singles.deleteWrists(this);
     release();
     prop = nullptr;
 }

@@ -73,6 +73,8 @@ Sphere & Sphere::operator =(const Sphere & o)
 
 Sphere::~Sphere()
 {
+    if ( objset() )
+        simul().singles.deleteWrists(this);
     release();
     prop = nullptr;
 }
