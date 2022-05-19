@@ -959,13 +959,13 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void stroke_capsule(float L, float R, float rad, float width)
+    void stroke_capsule(float L, float R, float rad, float width, size_t inc)
     {
         flute2 *buf = gym::mapBufferV2(pi_twice+4);
         flute2 *ptr = buf;
-        for ( size_t j = pi_half; j <= pi_3half; ++j )
+        for ( size_t j = pi_half; j <= pi_3half; j += inc )
             *ptr++ = { rad*cos_(j) + L, rad*sin_(j) };
-        for ( size_t j = pi_3half; j <= pi_3half+pi_once; ++j )
+        for ( size_t j = pi_3half; j <= pi_3half+pi_once; j += inc )
             *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
         *ptr++ = *buf;
         gym::unmapBufferV2();
