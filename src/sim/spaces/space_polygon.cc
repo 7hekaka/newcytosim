@@ -237,7 +237,7 @@ void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& mp,
 #include "fiber_segment.h"
 #include "fiber_set.h"
 
-void SpacePolygon::setInteractions(Meca& meca) const
+void SpacePolygon::setInteractions(Meca& meca, Simul const&) const
 {
 #if ( 0 )
     /// WORK IN PROGRESS

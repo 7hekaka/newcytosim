@@ -37,7 +37,7 @@ public:
     const SpaceDynamicProp* prop;
     
     /// add interactions to a Meca
-    void setInteractions(Meca&) const;
+    void setInteractions(Meca&, Simul const&) const;
 
     /// apply a force directed towards the edge of the Space
     void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;

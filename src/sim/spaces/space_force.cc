@@ -54,7 +54,7 @@ void SpaceForce::setConfinement(Vector const& pos, Mecapoint const&, real rad, M
 }
 
 
-void SpaceForce::setInteractions(Meca& meca) const
+void SpaceForce::setInteractions(Meca& meca, Simul const&) const
 {
     if ( stiffness > 0 )
         meca.addPointClampToAll(center, stiffness);

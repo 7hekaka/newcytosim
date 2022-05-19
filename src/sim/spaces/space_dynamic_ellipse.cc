@@ -66,7 +66,7 @@ void SpaceDynamicEllipse::dump(std::ostream& out) const
 //        Set interactions and update forces felt by ellipse.
 //-------------------------------------------------------------------------------------
 
-void SpaceDynamicEllipse::setInteractions(Meca&) const
+void SpaceDynamicEllipse::setInteractions(Meca&, Simul const&) const
 {
     reset_forces();
 }

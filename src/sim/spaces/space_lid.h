@@ -92,7 +92,7 @@ public:
     void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions to a Meca
-    void setInteractions(Meca&) const;
+    void setInteractions(Meca&, Simul const&) const;
     
     /// one Monte-Carlo simulation step
     void step();

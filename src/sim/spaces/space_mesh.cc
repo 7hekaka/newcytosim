@@ -78,7 +78,7 @@ Vector SpaceMesh::project(Vector const& W) const
  */
 void SpaceMesh::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
 {    
-      std::cerr << "unfinished SpaceMesh::setConfinement\n";
+    std::cerr << "unfinished SpaceMesh::setConfinement\n";
 }
 
 
@@ -88,7 +88,7 @@ void SpaceMesh::setConfinement(Vector const& pos, Mecapoint const& mp, real rad,
 }
 
 
-void SpaceMesh::setInteractions(Meca& meca) const
+void SpaceMesh::setInteractions(Meca& meca, Simul const&) const
 {
 }
 

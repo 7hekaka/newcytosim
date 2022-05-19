@@ -216,7 +216,7 @@ void SpaceLid::setConfinement(Vector const& pos, Mecapoint const& mp, real rad,
 #endif
 }
 
-void SpaceLid::setInteractions(Meca& meca) const
+void SpaceLid::setInteractions(Meca& meca, Simul const&) const
 {
     force_ = 0;
 }

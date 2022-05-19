@@ -80,7 +80,7 @@ public:
     void resize(Glossary& opt);
 
     /// add interactions to a Meca
-    void setInteractions(Meca&) const;
+    void setInteractions(Meca&, Simul const&) const;
 
     /// this also register the forces the ellipse undergoes
     void setConfinement(Vector const&pos, Mecapoint const& mp, Meca& meca, real stiff) const;

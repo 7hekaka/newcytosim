@@ -66,7 +66,7 @@ public:
     void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
     
     /// add interactions between fibers and reentrant corners
-    void setInteractions(Meca&) const;
+    void setInteractions(Meca&, Simul const&) const;
 
     /// estimate Volume using a crude Monte-Carlo method with `cnt` calls to Space::inside()
     real estimateVolumeZ(size_t cnt) const;

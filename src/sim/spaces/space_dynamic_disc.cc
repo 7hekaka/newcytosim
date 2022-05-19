@@ -90,7 +90,7 @@ Vector SpaceDynamicDisc::project(Vector const& pos) const
 //------------------------------------------------------------------------------
 
 /// add interactions to a Meca
-void SpaceDynamicDisc::setInteractions(Meca&) const
+void SpaceDynamicDisc::setInteractions(Meca&, Simul const&) const
 {
     force_ = 0;
 }

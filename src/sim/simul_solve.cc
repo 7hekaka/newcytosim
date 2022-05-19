@@ -100,7 +100,7 @@ void Simul::setAllInteractions(Meca& meca) const
 #endif
 
     for ( Space const* s=spaces.first(); s; s=s->next() )
-        s->setInteractions(meca);
+        s->setInteractions(meca, *this);
 
     for ( Single const* i=singles.firstA(); i ; i=i->next() )
         i->setInteractions(meca);

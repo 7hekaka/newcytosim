@@ -164,11 +164,11 @@ void SpacePolygonZ::setConfinement(Vector const& pos, Mecapoint const& mp,
                                    real rad, Meca& meca, real stiff) const
 {
     //setConfinement(pos, mp, meca, stiff);
-    std::cerr << "unfinished SpacePolygonZ::setInteractions(with radius)\n";
+    std::cerr << "unfinished SpacePolygonZ::setConfinement(with radius)\n";
 }
 
 
-void SpacePolygonZ::setInteractions(Meca& meca) const
+void SpacePolygonZ::setInteractions(Meca& meca, Simul const&) const
 {
     /// @todo add interactions between fibers and reentrant corners!
 #if ( 0 )

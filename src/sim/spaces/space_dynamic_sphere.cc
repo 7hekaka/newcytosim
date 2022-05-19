@@ -11,7 +11,7 @@ SpaceDynamicSphere::SpaceDynamicSphere(SpaceDynamicProp const* p)
 }
 
 
-void SpaceDynamicSphere::setInteractions(Meca&) const
+void SpaceDynamicSphere::setInteractions(Meca&, Simul const&) const
 {
     force_ = 0;
 }

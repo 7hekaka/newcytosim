@@ -62,7 +62,7 @@ public:
     void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
     /// apply force to all objects in Meca
-    void setInteractions(Meca&) const;
+    void setInteractions(Meca&, Simul const&) const;
     
     /// OpenGL display function
     void draw3D() const;
