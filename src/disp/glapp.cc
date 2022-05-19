@@ -47,7 +47,7 @@ namespace glApp
     /// change action
     void switchUserMode(int dir);
     
-    View savedView("savedView");
+    View savedView("savedView", 0);
     int  savedWindowPos[4] = { 24, 24, 800, 800 };
 
     UserMode mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
@@ -90,7 +90,7 @@ namespace glApp
 void glApp::initialize()
 {
     views.clear();
-    views.push_back(View("*"));
+    views.push_back(View("*", mDIM==3));
 }
 
 

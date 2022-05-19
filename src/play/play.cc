@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
     register_signal_handlers();
     
 #if HEADLESS_PLAYER
-    View view("*");
+    View view("*", DIM==3);
     view.setDisplayFunc(drawOffscreen);
 #else
     glApp::setDimensionality(DIM);

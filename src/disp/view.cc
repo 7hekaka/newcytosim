@@ -17,12 +17,13 @@
 
 //------------------------------------------------------------------------------
 
-View::View(const std::string& n)
+View::View(const std::string& n, int depth)
 : ViewProp(n)
 {
     window_ = 0;
     drawCallback = nullptr;
     drawMagFunc = nullptr;
+    depth_test = depth;
     
     visRange[0] = view_scale;
     visRange[1] = view_scale;
@@ -97,6 +98,7 @@ void View::initGL() const
     
     if ( depth_test )
     {
+        glClearDepth(1);
         glEnable(GL_DEPTH_TEST);
         //glDepthFunc(GL_LESS);
         glDepthFunc(GL_LEQUAL);

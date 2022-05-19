@@ -63,7 +63,7 @@ private:
 public:
     
     /// constructor
-    explicit View(const std::string& n);
+    explicit View(const std::string& n, int depth);
     
     /// destructor
     ~View();
