@@ -1784,6 +1784,7 @@ namespace gle
         const float R(S * 0.1f);
         gym::openDepthMask();
         gym::enableLighting();
+        gym::enableCullFace(GL_BACK);
         for (int d = 0; d < dim; ++d)
         {
             gym::pull_ref();
@@ -1815,6 +1816,7 @@ namespace gle
         gym::pull_ref();
         gym::scale(R);
         sphere4();
+        gym::restoreCullFace();
         gym::restoreLighting();
     }
     

@@ -385,7 +385,7 @@ void View::setProjection() const
     else
     {
         // The back-plane is set behind to avoid clipping
-        eyeDistance = -0.5f * S;
+        eyeDistance = -1.25f * S;
         gym::mat_ortho(projection_,-X, X, -Y, Y, 0.25f*S, 2.25f*S);
     }
 

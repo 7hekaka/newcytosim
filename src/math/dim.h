@@ -2,7 +2,8 @@
 /**
  @file
  @brief  Dimensionality of the simulation
- Note that the setting in this file can be overruled at compilation
+ Note that the setting in this file can be overruled
+ by providing -DDIM=3 to the compiler command.
  */
 
 #ifndef DIM
