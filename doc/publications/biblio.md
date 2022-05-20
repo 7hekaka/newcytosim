@@ -7,7 +7,13 @@
 
 # Cytosim used in other groups
 
-*Please, let us know of any citation we could add*
+*Please, let us know of any citation we could add. This is important for our funders!*
+
+2022
+
+- [Thermodynamic Control of Activity Patterns in Cytoskeletal Networks](https://arxiv.org/abs/2111.08677)
+- [Marco Pensalfini's strechable filaments](https://gitlab.com/f-nedelec/cytosim/-/merge_requests/27)
+
 
 2021
 
@@ -29,13 +35,12 @@
 - [Mechanosensitive single molecule dynamics of myosin II](http://hdl.handle.net/2445/171220)
 - [Reverse-engineering forces responsible for dynamic clustering and spreading of multiple nuclei in developing muscle cells](https://doi.org/10.1091/mbc.E19-12-0711)
 - [Wrinkling instability in 3D active nematics](https://pubs.acs.org/doi/abs/10.1021/acs.nanolett.0c01546)
-- [Deep learning the assembly parameters of growing cytoskeletal networks](https://pure.tue.nl/ws/portalfiles/portal/148470406/Kros_M.F._0875844_BEP_verslag.pdf) Kros, Maury F, Eindhoven University.
 - [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/abs/1804.11044)
 - [Chromosomes function as a barrier to mitotic spindle bipolarity in polyploid cells](https://doi.org/10.1083/jcb.201908006)   
 
 2019
 
-- [Deep learning the assembly parameters of growing cytoskeletal networks](https://pure.tue.nl/ws/portalfiles/portal/148470406/Kros_M.F._0875844_BEP_verslag.pdf)
+- [Deep learning the assembly parameters of growing cytoskeletal networks](https://pure.tue.nl/ws/portalfiles/portal/148470406/Kros_M.F._0875844_BEP_verslag.pdf) by Kros, Maury F, Eindhoven University.
 - [PP2A-B55/SUR-6 collaborates with the nuclear lamina for centrosome separation during mitotic entry](https://doi.org/10.1091/mbc.E18-10-0631)
 - [Spherical spindle shape promotes perpendicular cortical orientation by preventing isometric cortical pulling on both spindle poles during C. elegans female meiosis](http://dx.doi.org/10.1242/dev.178863)[preprin](https://www.biorxiv.org/content/10.1101/596510v1)  
 - [Collective effects of yeast cytoplasmic dynein based microtubule transport](http://dx.doi.org/10.1039/c8sm01434e)  
