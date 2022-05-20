@@ -8,7 +8,17 @@
 
 /*
  Created on 20.03.2022 by FJ. Nedelec, to expose only the font-rendering capabilities
- from the FreeGLUT project
+ from the FreeGLUT project, itself derived from GLUT
+ 
+
+ NON_MONO FONT:
+     A  proportionally  spaced  Roman  Simplex  font  for ASCII characters 32 through 127. The maximum top character in the font is 119.05 units; the bottom descends 33.33
+     units.
+
+ MONO FONT:
+     A mono-spaced spaced Roman Simplex font (same characters as GLUT_STROKE_ROMAN) for ASCII characters 32 through 127. The maximum top character in the  font  is  119.05
+     units; the bottom descends 33.33 units. Each character is 104.76 units wide.
+
  */
 
 
