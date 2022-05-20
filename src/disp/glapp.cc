@@ -225,7 +225,8 @@ int glApp::newWindow()
     glutInitDisplayString(mode.c_str());
 
     // set window size:
-    glutInitWindowSize(view.width(), view.height());
+    //printf("Window: %i %i\n", view.window_size[0], view.window_size[1]);
+    glutInitWindowSize(view.window_size[0], view.window_size[1]);
     glutInitWindowPosition(view.window_position[0], view.window_position[1]);
     
     // create window with title containing current working directory:

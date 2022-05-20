@@ -127,7 +127,7 @@ void Parser::parse_set(std::istream& is)
             opt.define("display", blok);
             change_simul_property(opt);
         }
-        else if ( do_set )
+        else
         {
 #if BACKWARD_COMPATIBILITY < 50
             if ( spec )
@@ -135,8 +135,16 @@ void Parser::parse_set(std::istream& is)
             else
 #endif
             opt.read(blok);
-            sim_->rename(name);
-            change_simul_property(opt);
+            if ( do_change )
+            {
+                sim_->rename(name);
+                change_simul_property(opt);
+            }
+            else
+            {
+                if ( opt.set(sim_->prop.display, "display") )
+                    sim_->prop.display_fresh = true;
+            }
         }
     }
     else if ( isCategory(cat) && !spec )
@@ -1331,6 +1339,7 @@ void Parser::readConfigBuffered(std::string const& filename)
 
 void Parser::readConfig()
 {
+    //std::clog << "readConfig(" << simulProp().config_file << ")\n";
     readConfig(simulProp().config_file);
 }
 

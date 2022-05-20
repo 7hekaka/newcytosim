@@ -340,6 +340,7 @@ int main(int argc, char* argv[])
         // read settings, but keep anything set on the command-line:
         arg.read(simul.prop.display, 1);
         simul.prop.display_fresh = false;
+        //arg.write(std::cout);
         
         if ( !arg.empty() )
         {

@@ -87,7 +87,7 @@ public:
     void adjust(int, int) const;
     
     /// set OpenGL Projection and ModelView matrices
-    void adjust() const { adjust(window_size[0], window_size[1]); }
+    void adjust() const { adjust(viewport_[2], viewport_[3]); }
 
     /// upload OpenGL Projection matrix
     void setProjection() const;
@@ -110,10 +110,10 @@ public:
     //---------------------------------------------------------------------------
 
     /// width of display area in pixels
-    int width() const { return window_size[0]; }
+    int width() const { return viewport_[2]; }
     
     /// height of display area in pixels
-    int height() const { return window_size[1]; }
+    int height() const { return viewport_[3]; }
     
     /// height of display area in pixels
     GLint const* viewport() const { return viewport_; }
