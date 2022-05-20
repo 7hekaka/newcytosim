@@ -133,7 +133,7 @@ void View::toggleDepthClamp()
 }
 
 
-void View::clear()
+void View::clearPixels()
 {
     gym::clearPixels(back_color);
 }

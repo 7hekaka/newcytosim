@@ -931,7 +931,7 @@ void processKey(unsigned char key, int modifiers = 0)
         case ' ':
             if ( altKeyDown )
             {
-                view.clear();
+                view.clearPixels();
                 view.reset();
                 flashText("");
             }

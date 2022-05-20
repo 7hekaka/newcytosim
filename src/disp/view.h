@@ -154,7 +154,7 @@ public:
     int callDraw() { return drawCallback(*this); }
 
     /// clear color and depth buffer
-    void clear();
+    void clearPixels();
 
     //---------------------------------------------------------------------------
     

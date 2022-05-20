@@ -303,7 +303,7 @@ void glApp::resizeWindow(int w, int h)
     unsigned win = glutGetWindow();
     flashText("window size %i %i", w, h);
     views[win].reshape(w, h);
-    views[win].clear();
+    views[win].clearPixels();
     postRedisplay();
 }
 

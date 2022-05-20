@@ -54,7 +54,7 @@ enum Mode { NORMAL = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
 int drawNot(View& view)
 {
     //std::clog << " drawNot(" << std::setprecision(3) << simul.time() << "s)\n";
-    //view.clear();
+    //view.clearPixels();
     player.prepareDisplay(view);
     return 0;
 }
@@ -64,7 +64,7 @@ int drawNot(View& view)
 void drawMag(View& view)
 {
     //std::clog << " drawMag(" << std::setprecision(3) << simul.time() << "s)\n";
-    view.clear();
+    view.clearPixels();
     view.loadView();
     view.setLights();
     view.setClipping();
