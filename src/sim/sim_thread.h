@@ -61,6 +61,9 @@ private:
     /// True if current thread is the worker thread
     bool isWorker() const { return pthread_equal(pthread_self(), child_); }
     
+    /// reset state variable before starting
+    void cleanup();
+    
 public:
     
     /// run the simulation live

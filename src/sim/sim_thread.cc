@@ -36,6 +36,8 @@ SimThread::~SimThread()
 {
     //std::cerr << "~SimThread()\n";
     stop();
+    if ( status_ == -1 )
+        pthread_join(child_, nullptr);
     pthread_cond_destroy(&condition_);
     pthread_mutex_destroy(&mutex_);
 }
@@ -105,7 +107,18 @@ void SimThread::run()
 }
 
 
-/** C-style function to cleanup after thread has terminated */
+/** called before thread is started */
+void SimThread::cleanup()
+{
+    order_ = 0;
+    Parser::restart_ = 0;
+    assert_true(holding_ == 0);
+    if ( status_ == -1 )
+        pthread_join(child_, nullptr);
+}
+
+
+/** C-style function called automatically after thread has terminated */
 void child_cleanup(void * arg)
 {
     SimThread * st = static_cast<SimThread*>(arg);
@@ -140,15 +153,11 @@ void SimThread::start()
     assert_false( isWorker() );
     if ( status_ )
     {
-        order_ = 0;
-        assert_true(holding_ == 0);
-        Parser::restart_ = 0;
+        cleanup();
         //std::clog << "master " << pthread_self() << '\n';
         status_ = pthread_create(&child_, nullptr, run_launcher, this);
         // let the system cleanup upon normal child termination:
-        if ( status_ == 0 )
-            pthread_detach(child_);
-        else
+        if ( status_ )
             printf("%p failed to create thread", this);
     }
 }
@@ -189,8 +198,7 @@ int SimThread::extend()
     assert_false( isWorker() );
     if ( status_ )
     {
-        order_ = 0;
-        holding_ = 0;
+        cleanup();
         //std::clog << "master " << pthread_self() << '\n';
         status_ = pthread_create(&child_, nullptr, extend_launcher, this);
     }
