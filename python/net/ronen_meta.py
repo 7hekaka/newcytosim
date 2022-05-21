@@ -123,7 +123,7 @@ def one_plot(params, i, j, values):
     #print(params, i, j)
     X = params[i]
     Y = params[j]
-    fig = plot(X, Y, values);
+    fig = plot(X, Y, values)
     plt.xlabel(i, fontsize=fts)
     plt.ylabel(j, fontsize=fts)
     if plot_ratio:
@@ -214,7 +214,7 @@ def main(args):
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     for p in paths:
-        files.append(p+'/rates.txt');
+        files.append(p+'/rates.txt')
     if not files:
         files = ['rates.txt']
     for f in files:

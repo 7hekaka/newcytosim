@@ -136,7 +136,7 @@ def main(args):
             try:
                 parse(p)
             except Exception as e:
-                out.write("Error: %s\n" % repr(e));
+                out.write("Error: %s\n" % repr(e))
             os.chdir(cdir)
 
 #------------------------------------------------------------------------

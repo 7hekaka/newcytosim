@@ -11,5 +11,5 @@ def remove_objects(name):
         if obj.name.startswith(name):
             bld.objects.remove(obj)
 
-remove_objects("actin");
-remove_objects("link");
+remove_objects("actin")
+remove_objects("link")

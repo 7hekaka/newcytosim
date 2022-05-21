@@ -37,7 +37,7 @@ def read(path):
     """
     format = 'HHIfff'
     nbytes = struct.calcsize(format) # should be 20 bytes
-    #print('sweet format with %i bytes\n' % nbytes);
+    #print('sweet format with %i bytes\n' % nbytes)
     with open(path, "rb") as f:
         bytes = f.read(nbytes)
         while bytes:

@@ -91,8 +91,8 @@ def plot_scatter(size, cord):
     """
         Make a scatter-plot with data provided as arguments
     """
-    xdata = np.array(size);
-    ydata = np.array(cord);
+    xdata = np.array(size)
+    ydata = np.array(cord)
     fig = plt.figure(figsize=(4, 4))
     ax = fig.add_axes([0.25, 0.17, 0.7, 0.7])
     plt.scatter(xdata, ydata)
@@ -100,8 +100,8 @@ def plot_scatter(size, cord):
     plt.plot([-scale, scale], [scale, -scale], 'g', linestyle='dotted')
     plt.xlim(-scale, scale)
     plt.ylim(-scale, scale)
-    ax.set_xticks([-scale, 0, scale]);
-    ax.set_yticks([-scale, 0, scale]);
+    ax.set_xticks([-scale, 0, scale])
+    ax.set_yticks([-scale, 0, scale])
     plt.title('Scatter plot', fontsize=fts)
     #fig.tight_layout()
 
@@ -369,7 +369,7 @@ def get_cords(filename):
                     #print(f, g, h, a, b)
                     try:
                         oa = past[szudzik(f, h)] - past[szudzik(f, g)]
-                        acum.append(da);
+                        acum.append(da)
                         dcum.append(da-oa)
                     #print(f, g, h, round(oa,6), round(da,6))
                     except:
@@ -536,7 +536,7 @@ def main(args):
             try:
                 parse(p)
             except Exception as e:
-                sys.stderr.write("Error: %s\n" % repr(e));
+                sys.stderr.write("Error: %s\n" % repr(e))
             os.chdir(cdir)
 
 

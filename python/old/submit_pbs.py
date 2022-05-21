@@ -70,7 +70,7 @@ def writeJobScript(id, conf, preconf='', cnt=1):
     name = sdir + ( '/R%i' % id )
     file = open(name, 'w')
     file.write("#!/bin/bash\n")
-    file.write("#PBS -l select=ncpus=1:mem=%s\n" % mem);
+    file.write("#PBS -l select=ncpus=1:mem=%s\n" % mem)
     file.write("cd %s;\n" % base)
     file.write("./go_sim.py run%04i %i %s %s;\n" % (id, cnt, preconf, conf))
     file.write("mv %s done/.;\n" % name)
@@ -94,7 +94,7 @@ def writeJobArrayScript(first, last):
     """create an executable file 'cytosim.pbs' that will run a PBS array-job"""
     name = sdir + '/cytosim.pbs'
     file = open(name, 'w')
-    file.write("#PBS -l select=mem=%s\n" % mem);
+    file.write("#PBS -l select=mem=%s\n" % mem)
     file.write("#PBS -N cytosim\n")
     file.write("#PBS -M %s@embl.de\n" % os.environ['USER'])
     file.write("#PBS -m abe\n")
@@ -158,7 +158,7 @@ def main(args):
         print("submit.py created %i scripts in %s" % (id, sdir))
         submitJobArray(0, id-1)
     elif not name == '':
-        submitJob(name);
+        submitJob(name)
     else:
         print("no job submitted")
 

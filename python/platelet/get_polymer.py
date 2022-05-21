@@ -33,7 +33,7 @@ from pyned import find_differences, uncode
 def get_parameters(path):
     res = []
     pile = read_config.parse(path)
-    cmd = read_config.get_command(pile, ['set', 'fiber', 'microtubule']);
+    cmd = read_config.get_command(pile, ['set', 'fiber', 'microtubule'])
     pam = cmd.values()
     try:
         val = pam['hydrolysis_rate']
@@ -43,7 +43,7 @@ def get_parameters(path):
 
 
 def get_values(path):
-    cdir = os.getcwd();
+    cdir = os.getcwd()
     os.chdir(path)
     sub = subprocess.Popen(['report3', 'fiber:length'], stdout=subprocess.PIPE)
     # Get results from standard output:
@@ -65,7 +65,7 @@ def get_values(path):
             res += float(line[6])
             cnt += 1
     sub.stdout.close()
-    os.chdir(cdir);
+    os.chdir(cdir)
     return (mts/cnt, res/cnt)
 
 

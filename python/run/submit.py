@@ -246,7 +246,7 @@ def main(args):
         # make command to submit this script:
         cmd = (submit, jame)
     else:
-        cmd = sub(jame);
+        cmd = sub(jame)
     execute(cmd)
 
 

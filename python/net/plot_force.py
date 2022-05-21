@@ -64,8 +64,8 @@ def plot_force(scale, data):
     #plt.xlim(0, 100)
     #plt.ylim(0, ymax)
     #plt.ylim(15, 30)
-    #ax.set_xticks([]);
-    #ax.set_yticks([]);
+    #ax.set_xticks([])
+    #ax.set_yticks([])
     plt.xlabel('Force (pN)', fontsize=fts)
     plt.ylabel('Count', fontsize=fts)
     plt.title('Force distribution', fontsize=fts)
@@ -134,7 +134,7 @@ def main(args):
             try:
                 parse(p)
             except Exception as e:
-                out.write("Error: %s\n" % repr(e));
+                out.write("Error: %s\n" % repr(e))
             os.chdir(cdir)
 
 

@@ -37,7 +37,7 @@ def get_parameters(path):
     res = {}
     for name in ['motor', 'complex', 'crosslinker']:
         try:
-            cmd = read_config.get_command(pile, ['new', 'couple', name]);
+            cmd = read_config.get_command(pile, ['new', 'couple', name])
             res[name] = cmd.cnt
         except:
             res[name] = 0

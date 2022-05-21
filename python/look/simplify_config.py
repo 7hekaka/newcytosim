@@ -87,7 +87,7 @@ def process(filename):
     print('  fiber_rigidity = %.5f;' % fiber_rigidity)
     com = read_config.get_command(pile, ['set', '*', 'plus_motor'])
     if com:
-        stall_force = com.value("stall_force");
+        stall_force = com.value("stall_force")
     else:
         stall_force = 6;
     print('  stall_force = %.2f;' % stall_force)

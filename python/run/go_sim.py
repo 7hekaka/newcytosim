@@ -125,7 +125,7 @@ def process(conf, script, name, queue):
         import tempfile
         tmp = tempfile.mkdtemp('', '_'+name+'-', '.')
         template = tmp + '/config.cym.tpl'
-        shutil.copy(conf, template);
+        shutil.copy(conf, template)
         files = go_sim_lib.make_config(template, repeat, script, tmp)
     else:
         files = go_sim_lib.copy_config(conf, repeat)

@@ -62,7 +62,7 @@ def cannonical_pattern(arg):
     c = arg.count('%')
     for n in range(c,1,-1):
         if arg.find('%'*n) > 0:
-            return arg.replace('%'*n, '%0'+str(n)+'i', 1);
+            return arg.replace('%'*n, '%0'+str(n)+'i', 1)
     return arg
 
 
@@ -94,7 +94,7 @@ def main(args):
     # check if 'copy' specified before pattern
     if arg=='-c' or arg=='--copy' or arg=='copy=1':
         do_copy = True
-        args.pop(0);
+        args.pop(0)
     # get pattern for moving files:
     pattern = validate_pattern(args.pop(0))
     # parse arguments:

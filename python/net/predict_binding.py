@@ -53,7 +53,7 @@ def get_connectors(path, filename):
     sM = [0, 0, 0]
     sC = [0, 0, 0]
     # Get result from file:
-    f = open(filename, "r");
+    f = open(filename, "r")
     for line in f:
         spl = uncode(line).split()
         if len(spl) < 2:
@@ -115,7 +115,7 @@ def predict_couple(binding_rate, binding_range, unbinding_rate):
     GsF = ratio_cros * bind;
     BsG = bind / 2;
     #print("AsF %f GsF %f BsG %f " % ( AsF, GsF, BsG ))
-    popF = 1.0 / ( 1 + AsF + GsF + BsG * GsF );
+    popF = 1.0 / ( 1 + AsF + GsF + BsG * GsF )
     popA = AsF * popF;
     popG = GsF * popF;
     popB = BsG * popG;
@@ -146,7 +146,7 @@ def predict_binding(pile, name):
         unbinding_rate = com.value("unbinding", 0)
     except:
         unbinding_rate = com.value("unbinding_rate")
-    #print(name+": ", cnt, binding_rate, binding_range, unbinding_rate);
+    #print(name+": ", cnt, binding_rate, binding_range, unbinding_rate)
     if mode == 'couple':
         [popF, popA, popB] = predict_couple(binding_rate, binding_range, unbinding_rate)
         return cnt, [ cnt * i for i in [popF, popA, popB] ]

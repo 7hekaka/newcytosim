@@ -84,7 +84,7 @@ def main(args):
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     for p in paths:
-        files.append(p+'/config.cym');
+        files.append(p+'/config.cym')
     if not files:
         files = ['config.cym']
     

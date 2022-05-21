@@ -239,7 +239,7 @@ def main(args):
         print("    submit.py created %i scripts in `%s'" % (id, todo))
         cmd = subArray(1, id, todo+'/R')
     else:
-        cmd = sub(file);
+        cmd = sub(file)
     # request nodes with support for Intel AVX technology:
     if avx:
         cmd += ['-m', 'intelavx']

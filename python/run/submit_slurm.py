@@ -249,7 +249,7 @@ def main(args):
         # make command to submit this script:
         cmd = (subcmd, name)
     else:
-        cmd = sub(jname);
+        cmd = sub(jname)
     execute(cmd)
 
 

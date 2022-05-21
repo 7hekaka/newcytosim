@@ -48,7 +48,7 @@ def read(filename):
     with open(filename, 'r') as f:
         for line in f:
             if line and line[0]!='%':
-                s=(float(x) for x in line.split());
+                s=(float(x) for x in line.split())
                 data.append(s)
     return data
 

@@ -118,7 +118,7 @@ def get_column(file, jj):
     for line in file:
         if not line or line[0] == '%':
             continue
-        s = line.split();
+        s = line.split()
         try:
             res += s[jj].rjust(7) + ' '
         except IndexError:
@@ -261,7 +261,7 @@ def powerlaw_fit(data):
         n = s * sxy - sx * sy;
         d = s * sxx - sx * sx;
         power = n / d;
-        scale = exp(( sy - power * sx ) / s);
+        scale = exp(( sy - power * sx ) / s)
         return ( scale, power )
     return ()
 

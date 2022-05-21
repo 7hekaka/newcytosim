@@ -366,7 +366,7 @@ def parse_config(fid):
         elif tok[0] == '{' or tok[0] == '(':
             if cur.words_[0] == 'repeat':
                 sfid = io.StringIO(tok[1:-1])
-                cur.code_ = parse_config(sfid);
+                cur.code_ = parse_config(sfid)
             else:
                 pam = read_list(file_object(tok[1:-1]))
                 #print("VALUES  : ", pam)

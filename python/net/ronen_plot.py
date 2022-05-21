@@ -165,7 +165,7 @@ def main(args):
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
     for p in paths:
-        files.append(p+'/rates.txt');
+        files.append(p+'/rates.txt')
     if not files:
         files = ['rates.txt']
     for f in files:

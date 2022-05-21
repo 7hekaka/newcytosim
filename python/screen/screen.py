@@ -47,7 +47,7 @@ def run_one(simex, conf):
             error("Subprocess failed in %s: %s\n" %(os.getcwd(), err))
         return out.decode()
     except Exception as e:
-        err.write("Failed: %s\n" % repr(e));
+        err.write("Failed: %s\n" % repr(e))
     return ''
 
 
@@ -57,7 +57,7 @@ def extract_data(text):
     for line in text.split('\n'):
         s = line.split()
         if len(s) == 7 and s[0] == 'filament':
-            val.append(float(s[2]));
+            val.append(float(s[2]))
     # return mean of the length:
     if val:
         return sum(val)/len(val)

@@ -52,7 +52,7 @@ def rename(files, pattern):
 def main(args):
     """rename files"""
     files = []
-    pattern = args.pop(0);
+    pattern = args.pop(0)
     
     for arg in args:
         if os.path.isfile(arg) or os.path.isdir(arg):

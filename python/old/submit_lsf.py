@@ -183,7 +183,7 @@ def main(args):
         print("submit_lsf.py created %i scripts in %s" % (id, sdir))
         submitJobArray(1, id-1, mem)
     elif not name == '':
-        submitJob(name, mem);
+        submitJob(name, mem)
     else:
         print("no job submitted")
 

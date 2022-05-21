@@ -70,7 +70,7 @@ def execute(tool, path, verb):
             lines.append(s.decode())
         sub.stdout.close()
     except Exception as e:
-        err.write("Error: %s\n" % repr(e));
+        err.write("Error: %s\n" % repr(e))
     res = assemble(path, lines, verb)
     out.write(res)
     out.flush()

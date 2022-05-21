@@ -136,7 +136,7 @@ def get_parameters(path):
     pile = read_config.parse(path)
     res = {}
     try:
-        cmd = read_config.get_command(pile, ['set', 'fiber', 'microtubule']);
+        cmd = read_config.get_command(pile, ['set', 'fiber', 'microtubule'])
         res = cmd.value('total_polymer')
     except:
         res = find_differences('config.cym', path+'/config.cym')

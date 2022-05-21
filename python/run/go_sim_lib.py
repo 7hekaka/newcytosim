@@ -97,7 +97,7 @@ def copy_recursive(src, dst):
 def park_directory(path, park, name):
     """Copy directory 'path' to park, under a similar name"""
     src = os.path.abspath(path)
-    dst = os.path.join(park,name);
+    dst = os.path.join(park,name)
     if src == os.path.abspath(park):
         return src
     try:
@@ -124,7 +124,7 @@ def copy_config(name, repeat):
     """
     res = []
     for x in range(repeat):
-        res.extend([name]);
+        res.extend([name])
     return res
 
 
@@ -225,7 +225,7 @@ def start(exe, conf, name, args=[]):
     cdir = os.getcwd()
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
-    conf = os.path.abspath(conf);
+    conf = os.path.abspath(conf)
     wdir = make_directory(name)
     os.chdir(wdir)
     shutil.copyfile(conf, config_name)

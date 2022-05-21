@@ -66,8 +66,8 @@ def import_frame(frame_id, frame_data):
         position = ( pos1 + pos2 ) * 0.5
         length = ( pos1 - pos2 ).length
         diff = ( pos1 - pos2 ) / length       
-        ang1 = math.atan2(math.sqrt(diff.x*diff.x+diff.y*diff.y), diff.z);
-        ang2 = math.atan2(diff.y, diff.x);
+        ang1 = math.atan2(math.sqrt(diff.x*diff.x+diff.y*diff.y), diff.z)
+        ang2 = math.atan2(diff.y, diff.x)
  
         obj = None
         obj_name = root_name + "%04d" % obj_id
@@ -127,7 +127,7 @@ def import_file(f):
         print("file " + frame_file + " not found")
 
 
-remove_objects(root_name);
+remove_objects(root_name)
 
 if 0:
     import_file(100)

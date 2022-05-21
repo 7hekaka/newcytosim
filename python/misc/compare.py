@@ -38,7 +38,7 @@ def compareFiles(fileL, fileR):
     comp.close()
     if not empty:
         if exe == 'diff':
-            file = os.path.basename(fileL);
+            file = os.path.basename(fileL)
             print_spacer(file)
             comp = os.popen(diff+" "+fileL+" "+fileR)
             for line in comp:
@@ -56,7 +56,7 @@ def compareFiles(fileL, fileR):
             elif ans == "swap":
                 fid, file = tempfile.mkstemp('.txt', 'temp', '', True)
                 print(os.getcwd(), os.path.isfile(file))
-                os.close(fid);
+                os.close(fid)
                 os.rename(fileL, file)
                 os.rename(fileR, fileL)
                 os.rename(file, fileR)

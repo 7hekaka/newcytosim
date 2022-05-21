@@ -142,7 +142,7 @@ def get_contraction(file):
         line = uncode(line)
         if len(line) < 4 or line[0] == '%':
             continue
-        s = line.split();
+        s = line.split()
         T = float(s[0])
         #Z = math.pi*2*float(s[-1])
         Z = math.sqrt(2*float(s[-1]))

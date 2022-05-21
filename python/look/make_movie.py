@@ -142,9 +142,9 @@ def getImages(path, format):
     else:
         # search for images already made:
         import glob
-        images = sorted(glob.glob('m*[0-9].'+format));
+        images = sorted(glob.glob('m*[0-9].'+format))
         if not images:
-            images = sorted(glob.glob('i*[0-9].'+format));
+            images = sorted(glob.glob('i*[0-9].'+format))
         err.write(prefix+" using %i images found in `%s'\n" % (len(images), path))
     if not images:
         raise IOError("could not produce images!")
@@ -212,11 +212,11 @@ def process(cwd, filenames):
         tmp_dir = tempfile.mkdtemp('', 'imgs-', '.')
         #err.write(prefix+"created directory %s\n" % tmp_dir)
     except Exception as e:
-        err.write(prefix+"could not make temporary directory %s\n" % repr(e));
+        err.write(prefix+"could not make temporary directory %s\n" % repr(e))
     try:
         makeMovie(cwd, res)
     except Exception as e:
-        err.write(prefix+" %s\n" % str(e));
+        err.write(prefix+" %s\n" % str(e))
         return ''
     if cleanup:
         shutil.rmtree(tmp_dir)
@@ -256,7 +256,7 @@ def main(args):
         if os.path.isdir(arg):
             paths.append(arg)
         else:
-            tool = arg.split();
+            tool = arg.split()
             tool[0] = os.path.abspath(arg0)
     else:
         err.write(prefix+"You must specify an executable or a directory containing images\n")
@@ -299,9 +299,9 @@ def main(args):
         if res and len(paths) == 1 and not os.path.isfile(res):
             # copy to parent directory if only one path specified
             os.rename(p+'/'+res, os.path.basename(res))
-            err.write(prefix+"created %s\n" % res);
+            err.write(prefix+"created %s\n" % res)
         elif res:
-            err.write(prefix+"created %s/%s\n" % (p, res));
+            err.write(prefix+"created %s/%s\n" % (p, res))
 
 
 #-------------------------------------------------------------------------------

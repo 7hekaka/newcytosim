@@ -120,7 +120,7 @@ def main(args):
             else:
                 archive(path)
         except Exception as e:
-            sys.stderr.write("Error in `%s': %s\n" % (path, repr(e)));
+            sys.stderr.write("Error in `%s': %s\n" % (path, repr(e)))
 
 
 #------------------------------------------------------------------------

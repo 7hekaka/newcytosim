@@ -227,7 +227,7 @@ def main(args):
             try:
                 parse(p)
             except Exception as e:
-                sys.stderr.write("Error: %s\n" % repr(e));
+                sys.stderr.write("Error: %s\n" % repr(e))
             os.chdir(cdir)
 
 

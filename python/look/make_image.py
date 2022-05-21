@@ -102,7 +102,7 @@ def process(dirpath, filenames):
             os.rename(image[0], output)
             print(image[0] + ' -> ' + output)
     except Exception as e:
-        err.write("Error in `%s': %s\n" % (dirpath, repr(e)));
+        err.write("Error in `%s': %s\n" % (dirpath, repr(e)))
 
 
 def process_dir(dirpath):

@@ -348,7 +348,7 @@ class Preconfig:
         """
         k = ''
         v = arg
-        #print("preconfig:try_assignment %s" % arg);
+        #print("preconfig:try_assignment %s" % arg)
         res = re.match(r" *([a-zA-Z]\w*) *= *(.*)", arg)
         #print(res.groups())
         if res and len(res.groups()) > 1:
@@ -394,8 +394,8 @@ class Preconfig:
             output += pre
             if eof:
                 if blok:
-                    sys.stderr.write("Error: unclosed bracketted block in:\n");
-                    sys.stderr.write("    "+blok.split('\n', 1)[0]+'\n');
+                    sys.stderr.write("Error: unclosed bracketted block in:\n")
+                    sys.stderr.write("    "+blok.split('\n', 1)[0]+'\n')
                     sys.exit(1)
                 # having exhausted the input, we generate a file:
                 self.make_file(output)
@@ -526,7 +526,7 @@ class Preconfig:
                 self.out.write("|%50s <-- %s\n" % (key, str(v)) )
                 #print("|%50s <-- %s\n" % (key, str(v)) )
                 self.expand(values, file, text)
-                file.seek(ipos);
+                file.seek(ipos)
             # restore all values on upward recursion
             values[key] = vals
         else:

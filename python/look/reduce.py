@@ -58,7 +58,7 @@ def process(path):
                 os.rename('reduced.cmo', 'objects.cmo')
                 subprocess.call(['touch', 'reduced'])
                 if 'messagesR.cmo' in files:
-                    os.rename('messagesR.cmo', 'messages.cmo');
+                    os.rename('messagesR.cmo', 'messages.cmo')
                 print('reduced.cmo > objects.cmo')
     else:
         if 'objects.cmo' in files:
@@ -67,7 +67,7 @@ def process(path):
                 subprocess.call(['frametool', 'objects.cmo', '0:10:', 'reduced.cmo'])
                 if 'messages.cmo' in files:
                     out = open('messagesR.cmo', 'w')
-                    subprocess.call(['grep', '-v', '^F[0-9]*[123456789] ', 'messages.cmo'], stdout=out);
+                    subprocess.call(['grep', '-v', '^F[0-9]*[123456789] ', 'messages.cmo'], stdout=out)
             else:
                 print(' skip (objects.cmo has %i frames)' % cnt)
 

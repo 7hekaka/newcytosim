@@ -128,9 +128,9 @@ def writeImageLinks(files):
     global out, iarg
     for f in sorted(files):
         shot = os.path.basename(f)
-        #out.write('<br>%s: ' % shot);
-        out.write('<a href="javascript:zoom(\'%s\');">\n' % f);
-        out.write('  <img %s src="%s" alt="%s">\n' % (iarg, f, shot));
+        #out.write('<br>%s: ' % shot)
+        out.write('<a href="javascript:zoom(\'%s\');">\n' % f)
+        out.write('  <img %s src="%s" alt="%s">\n' % (iarg, f, shot))
         out.write('</a>\n')
     if files:
         out.write('\n')
@@ -141,10 +141,10 @@ def writeMovieLinks(files):
     for f in sorted(files):
         W, H = getMovieSize(f)
         shot = os.path.basename(f)
-        out.write('<video controls="controls" width="%s" height="%s" loop="true" alt="%s">\n' % (W, H, shot));
-        out.write('  <source src="%s" type="video/mp4">\n' % f);
-        out.write('  This is a HTML5 VIDEO element\n');
-        out.write('</video>\n');
+        out.write('<video controls="controls" width="%s" height="%s" loop="true" alt="%s">\n' % (W, H, shot))
+        out.write('  <source src="%s" type="video/mp4">\n' % f)
+        out.write('  This is a HTML5 VIDEO element\n')
+        out.write('</video>\n')
     if files:
         out.write('\n')
 
@@ -158,7 +158,7 @@ def process(dirpath, subdir, files, images, movies):
         out.write('<td>\n')
     out.write('<h3 style="padding:3px;margin:3px"> '+dirpath.lstrip('./'))
     for f in files:
-        out.write('\n  &mdash; <a href="%s/%s">%s</a>' % (dirpath, f, f));
+        out.write('\n  &mdash; <a href="%s/%s">%s</a>' % (dirpath, f, f))
     out.write('\n</h3>\n')
     writeImageLinks(images)
     writeMovieLinks(movies)

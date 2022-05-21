@@ -137,7 +137,7 @@ def main(args):
             live(tool, f)
     else:
         for f in files:
-            os.chdir(home);
+            os.chdir(home)
             execute(tool, f, 1)
 
 

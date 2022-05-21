@@ -44,7 +44,7 @@ def execute(tool, path):
     try:
         subprocess.call(tool, shell=True)
     except Exception as e:
-        sys.stderr.write("Error: %s\n" % repr(e));
+        sys.stderr.write("Error: %s\n" % repr(e))
 
 
 def worker(queue):

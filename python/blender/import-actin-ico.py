@@ -129,7 +129,7 @@ def import_file(f):
         print("file " + file_name + " not found")
 
 
-remove_objects(root_name);
+remove_objects(root_name)
 
 # Specify the frames to import here [FIRST, LAST+1]:
 for f in range(0, 256):

@@ -43,7 +43,7 @@ def get_data(filename):
             if str[0] == "F":
                 F += 1
             else:
-                x = str.find(" count ");
+                x = str.find(" count ")
                 if x > 0:
                     C = int(str[x+8:].split()[0])
                     #sys.stderr.write("count %i\n" % C)
