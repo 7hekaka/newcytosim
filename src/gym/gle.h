@@ -62,6 +62,11 @@ namespace gle
     void circle2(float line_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
     void circle_dotted(float line_width);
+    /// draw 2D oval within -1 to 1
+    void capsule(float line_width);
+    /// paint 2D within -1 to 1
+    void capsule();
+
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
@@ -80,7 +85,7 @@ namespace gle
     /// paint a disc in XY plane, covering all points at distance to origin [ R0, R1 ]
     void paint_halo(float R0, float R1);
     /// paint spherocylinder in 2D, using current color
-    void paint_capsule(float left, float right, float rad);
+    void paint_capsule(float left, float right, float rad, size_t inc=1);
     /// draw spherocylinder contour in 2D
     void stroke_capsule(float left, float right, float rad, float line_width, size_t inc=1);
     /// draw spherocylinder contour in 2D

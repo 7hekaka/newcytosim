@@ -37,7 +37,7 @@ namespace gle
     size_t blobs_[4] = { 0 };
     
     /// offset for objects data stored in buffers
-    size_t discs_[2] = { 0 };
+    size_t discs_[4] = { 0 };
 
     /// index of first vertex in buffer object
     size_t ico_pts_[8] = { 0 };
@@ -891,7 +891,7 @@ namespace gle
         return i;
     }
     
-    size_t setCircle(flute3* flu, size_t inc, float R, float Z, float N)
+    size_t setCircleZ(flute3* flu, size_t inc, float R, float Z, float N)
     {
         size_t i = 0;
         for ( size_t n = 0; n <= pi_twice; n += inc )
@@ -901,10 +901,54 @@ namespace gle
         }
         return i;
     }
+    
+    size_t setCapsuleStroke(flute2* flu, float R)
+    {
+        float Y = R * 0.5 * M_SQRT3;
+        float H = R * 0.5;
+        flu[0] = { 1+R, 0 };
+        flu[1] = { 1+Y, H };
+        flu[2] = { 1+H, Y };
+        flu[3] = { 1, R };
+        flu[4] = { -1, R };
+        flu[5] = { -1-H, Y };
+        flu[6] = { -1-Y, H };
+        flu[7] = { -1-R, 0 };
+        flu[8] = { -1-Y, -H };
+        flu[9] = { -1-H, -Y };
+        flu[10] = { -1, -R };
+        flu[11] = { 1, -R };
+        flu[12] = { 1+H, -Y };
+        flu[13] = { 1+Y, -H };
+        flu[14] = { 1+R, 0 };
+        return 15;
+    }
+    
+    size_t setCapsulePaint(flute2* flu, float R)
+    {
+        float Y = R * 0.5 * M_SQRT3;
+        float H = R * 0.5;
+        flu[0] = { 1+R, 0 };
+        flu[1] = { 1+Y, H };
+        flu[2] = { 1+Y, -H };
+        flu[3] = { 1+H, Y };
+        flu[4] = { 1+H, -Y };
+        flu[5] = { 1, R };
+        flu[6] = { 1, -R };
+        flu[7] = { -1, R };
+        flu[8] = { -1, -R };
+        flu[9] = { -1-H, Y };
+        flu[10] = { -1-H, -Y };
+        flu[11] = { -1-Y, H };
+        flu[12] = { -1-Y, -H };
+        flu[13] = { -1-R, 0 };
+        flu[14] = { 1+R, 0 };
+        return 15;
+    }
 
     static size_t sizeCircBuffers()
     {
-        return 4 + 2 * pi_twice;
+        return 8 + 4 * pi_twice;
     }
     
     flute2* setCircBuffers(flute2* ptr, flute2* const ori, size_t idx[])
@@ -912,6 +956,8 @@ namespace gle
         size_t i = 0, s = ptr - ori;
         idx[0] = i+s; i += setCircle(ptr+i, 1, 1);
         idx[1] = i+s; i += setCircle(ptr+i, 2, 1);
+        idx[2] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
+        idx[3] = i+s; i += setCapsulePaint(ptr+i, 0.75);
         assert_true( i <= sizeCircBuffers() );
         return ptr + i;
     }
@@ -933,19 +979,19 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void paint_capsule(float L, float R, float rad)
+    void paint_capsule(float L, float R, float rad, size_t inc)
     {
         flute2 *buf = gym::mapBufferV2(pi_twice+4);
         flute2 *ptr = buf;
         *ptr++ = { R+rad, 0 };
-        for ( size_t j = 1; j <= pi_half; ++j )
+        for ( size_t j = 1; j <= pi_half; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + R,  rad*S };
             ptr[1] = { rad*C + R, -rad*S };
             ptr += 2;
         }
-        for ( size_t j = pi_half; j < pi_once; ++j )
+        for ( size_t j = pi_half; j < pi_once; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + L,  rad*S };
@@ -1143,9 +1189,12 @@ namespace gle
     void discBottom1()   { doTubeStrip(tubes_[21], pi_twice); }
     void discBottom2()   { doTubeStrip(tubes_[22], pi_twice/2); }
     
-    void circle(float w)        { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
-    void circle2(float w)       { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
+    void circle(float w)  { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
+    void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
     void circle_dotted(float w) { gym::bindBufferV2(buf_[0]); gym::drawLines(w, discs_[0], 1+pi_twice); }
+
+    void capsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }
+    void capsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }
