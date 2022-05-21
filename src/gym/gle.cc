@@ -69,7 +69,7 @@ namespace gle
             exit(1);
         }
 #endif
-        // circle starts at index 4, and covers 2 revolutions
+        // circle covers 2 revolutions
         set_arc(2*pi_twice, circle_, 1, 0, 2*M_PI/pi_twice, 0, 0);
 
         if ( !glIsBuffer(buf_[0]) )
@@ -965,11 +965,35 @@ namespace gle
         flute2 *ptr = buf;
         for ( size_t j = pi_half; j <= pi_3half; j += inc )
             *ptr++ = { rad*cos_(j) + L, rad*sin_(j) };
-        for ( size_t j = pi_3half; j <= pi_3half+pi_once; j += inc )
+        for ( size_t j = pi_3half; j <= pi_5half; j += inc )
             *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
-        *ptr++ = *buf;
+        *ptr++ = { L, rad };
         gym::unmapBufferV2();
         assert_true( ptr-buf <= pi_twice+4 );
+        gym::drawLineStrip(width, 0, ptr-buf);
+        //gym::drawPoints(width, 0, ptr-buf);
+    }
+    
+    void stroke_bicapsule(float L, float R, float rad, float G, float width, size_t inc)
+    {
+        float C = rad - G;
+        flute2 *buf = gym::mapBufferV2(2*pi_twice+8);
+        flute2 *ptr = buf;
+        for ( size_t j = pi_half; j <= pi_3half; j += inc )
+            *ptr++ = { rad*cos_(j) + L, rad*sin_(j) };
+        for ( size_t j = pi_3half; j <= pi_twice; j += inc )
+            *ptr++ = { C*cos_(j) - C, C*sin_(j) - G };
+        for ( size_t j = pi_once; j <= pi_3half; j += inc )
+            *ptr++ = { C*cos_(j) + C, C*sin_(j) - G };
+        for ( size_t j = pi_3half; j <= pi_5half; j += inc )
+            *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
+        for ( size_t j = pi_half; j <= pi_once; j += inc )
+            *ptr++ = { C*cos_(j) + C, C*sin_(j) + G };
+        for ( size_t j = 2; j <= pi_half; j += inc )
+            *ptr++ = { C*cos_(j) - C, C*sin_(j) + G };
+        *ptr++ = { L, rad };
+        gym::unmapBufferV2();
+        assert_true( ptr-buf <= 2*pi_twice+8 );
         gym::drawLineStrip(width, 0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }

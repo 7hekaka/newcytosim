@@ -23,11 +23,12 @@ namespace gle
     constexpr size_t finesse = 8;
     
     /// number of circle points stored in buffer
+    constexpr size_t pi_5half = finesse * 15;;
     constexpr size_t pi_twice = finesse * 12;
     constexpr size_t pi_3half = finesse * 9;
     constexpr size_t pi_once = finesse * 6;
     constexpr size_t pi_half = finesse * 3;
-    
+
     /// values of cosine, sine over a full circle
     extern float circle_[4*pi_twice+8];
 
@@ -82,7 +83,9 @@ namespace gle
     void paint_capsule(float left, float right, float rad);
     /// draw spherocylinder contour in 2D
     void stroke_capsule(float left, float right, float rad, float line_width, size_t inc=1);
-    
+    /// draw spherocylinder contour in 2D
+    void stroke_bicapsule(float left, float right, float rad, float clos, float line_width, size_t inc=1);
+
     /// draw a tetrahedron of radius 1
     void tetrahedron();
     /// draw a octahedron of radius 1
