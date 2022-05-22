@@ -1214,8 +1214,11 @@ int Parser::evaluate_one(std::istream& is)
     }
     else if ( tok == "stop" )
         return 2;
-    else if ( tok == ";" )
+    else if ( is.peek() == ';' )
+    {
+        is.get();
         return 0;
+    }
     else if ( tok == "dump" )
         parse_dump(is);
     else {

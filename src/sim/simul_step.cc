@@ -6,7 +6,7 @@
  */
 real Simul::estimateFiberGridStep() const
 {
-    real res = -2.0;
+    real res = -1.0;
     
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -14,7 +14,7 @@ real Simul::estimateFiberGridStep() const
         res = std::max(res, fp->segmentation);
     }
     
-    return res * 0.5;
+    return res;
 }
 
 
