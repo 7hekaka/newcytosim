@@ -70,6 +70,7 @@ int FilePath::change_dir(const char path[])
         if ( chdir(path) )
         {
             perror("Could not change directory");
+            errno = 0;
             return -1;
         }
     }
@@ -86,7 +87,10 @@ int FilePath::change_dir(const char path[], bool make)
         if ( make )
             (void)mkdir(path, 0777);
         if ( chdir(path) )
+        {
             perror("Could not change directory");
+            errno = 0;
+        }
     }
     return cwd;
 }
