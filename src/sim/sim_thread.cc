@@ -24,6 +24,8 @@ SimThread::SimThread(Simul* sim)
     period_ = 1;
     pthread_mutex_init(&mutex_, nullptr);
     pthread_cond_init(&condition_, nullptr);
+    config_code = nullptr;
+    code_size = 0;
 }
 
 /**
@@ -40,6 +42,7 @@ SimThread::~SimThread()
         pthread_join(child_, nullptr);
     pthread_cond_destroy(&condition_);
     pthread_mutex_destroy(&mutex_);
+    free(config_code);
 }
 
 //------------------------------------------------------------------------------
@@ -91,7 +94,13 @@ void SimThread::run()
     try {
         do {
             order_ = 0;
-            Parser::readConfigBuffered(simulProp().config_file);
+            if ( config_code )
+            {
+                std::stringstream is(config_code);
+                readConfig(is, simulProp().config_file);
+            }
+            else
+                Parser::readConfig();
             do {
                 usleep(25000);
                 holding_ = 2;

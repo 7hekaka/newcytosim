@@ -42,7 +42,7 @@ private:
     
     /// period for hold()
     unsigned int period_;
-
+    
     /// Reader used to access frames in a trajectory file
     FrameReader reader_;
 
@@ -66,6 +66,12 @@ private:
     
 public:
     
+    /// the size allocated for `code`
+    size_t code_size;
+    
+    /// the text of the config file
+    char * config_code;
+
     /// run the simulation live
     void run();
     
