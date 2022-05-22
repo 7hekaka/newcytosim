@@ -89,15 +89,18 @@ void FiberDisp::read(Glossary& glos)
     glos.set(hide_color, "hide_color");
     glos.set(coloring, "coloring");
     
+    glos.set(line_width, "line_width", 0, "width", 0);
     std::string key = glos.has_key("line") ? "line" : "lines";
-    glos.set(line_width, "line_width", 0, key, 0) || glos.set(line_width, "width");
-    glos.set(line_style, "line_style", 0, key, 1,  {{"off", 0}, {"line", 1}, {"tension", 2},
+    glos.set(line_width, key);
+    glos.set(line_style, "line_style", 0, key, 1, {{"off", 0}, {"line", 1}, {"tension", 2},
                                         {"rainbow_tension", 3}, {"curvature", 4}, {"orientation", 5},
                                         {"minus_end", 6}, {"plus_end", 7}, {"height", 8}, {"grid", 9}});
     glos.set(line_caps, "line_caps", 0, key, 2);
     
+    glos.set(point_size, "point_size", 0, "size", 0);
     key = glos.has_key("point") ? "point" : "points";
-    glos.set(point_size,  "point_size", 0, key, 0) || glos.set(point_size, "size");
+    if ( glos.set(point_size, key, 0) && !point_style )
+        point_style = 1;
     glos.set(point_style, "point_style", 0, key, 1, {{"off", 0}, {"point", 1}, {"arrow", 2}, {"center", 3}});
     glos.set(point_gap, "point_gap", 0, key, 2);
 

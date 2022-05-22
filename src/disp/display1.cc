@@ -384,3 +384,27 @@ void Display1::drawCouplesB(CoupleSet const& set) const
 }
 
 
+void Display1::drawCouplesB0(CoupleSet const& set) const
+{
+    gym::ref_view();
+    size_t cnt = 2 * set.sizeAA();
+    flute4D* flu = gym::mapBufferC4VD(cnt);
+    flute4D* ptr = flu;
+    for ( Couple * obj=set.firstAA(); obj ; obj=obj->next() )
+    {
+        Vector P = obj->posHand1();
+        Vector Q = obj->posHand2();
+        if ( modulo ) modulo->fold(Q, P);
+        ptr[0] = { obj->disp1()->color, P };
+        ptr[1] = { obj->disp2()->color, Q };
+        ptr += 2;
+    }
+    assert_true( ptr-flu <= cnt );
+    gym::unmapBufferC4VD();
+    if ( prop->link_width > 0 )
+        gym::drawLines(linkWidth, 0, ptr-flu);
+    if ( prop->point_size > 0 )
+        gym::drawPoints(pointSize, 0, ptr-flu);
+    gym::cleanup();
+}
+
