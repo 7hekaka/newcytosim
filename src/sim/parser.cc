@@ -1281,10 +1281,12 @@ void Parser::evaluate(std::string const& code)
 void Parser::readConfig(std::string const& filename)
 {
     std::ifstream is(filename.c_str(), std::ifstream::in);
-    if ( !is.is_open() )
-        throw InvalidIO("could not open `"+filename+"'");
     if ( !is.good() )
+    {
+        if ( !is.is_open() )
+            throw InvalidIO("could not open `"+filename+"'");
         throw InvalidIO("could not find or read `"+filename+"'");
+    }
     VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change);
     VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
 
