@@ -91,7 +91,7 @@ void SimThread::run()
     try {
         do {
             order_ = 0;
-            Parser::readConfig();
+            Parser::readConfigBuffered(simulProp().config_file);
             do {
                 usleep(25000);
                 holding_ = 2;
