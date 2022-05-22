@@ -110,13 +110,13 @@ public:
     /// Parse code in string, and report errors
     void evaluate(std::string const&);
     
-    /// Open and parse the config file with the given name
+    /// Parse the stream. filename is used for error reporting
     void readConfig(std::istream&, std::string const& filename);
 
     /// Open and parse the config file with the given name
     void readConfig(std::string const& filename);
     
-    /// Open and parse the config file with the given name
+    /// Read the config file, close the file and parse its data
     void readConfigBuffered(std::string const& filename);
 
     /// Parse the default config file (SimulProp::config)
