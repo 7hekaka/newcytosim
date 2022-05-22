@@ -109,9 +109,15 @@ public:
 
     /// Parse code in string, and report errors
     void evaluate(std::string const&);
+    
+    /// Open and parse the config file with the given name
+    void readConfig(std::istream&, std::string const& filename);
 
     /// Open and parse the config file with the given name
-    void readConfig(std::string const& name);
+    void readConfig(std::string const& filename);
+    
+    /// Open and parse the config file with the given name
+    void readConfigBuffered(std::string const& filename);
 
     /// Parse the default config file (SimulProp::config)
     void readConfig();

@@ -69,8 +69,8 @@ public:
     /// change Simul pointer
     void simul(Simul* s) { sim_ = s; }
 
-    /// return SimulProp
-    SimulProp& simulProp() const;
+    /// return unmodifiable SimulProp
+    SimulProp const& simulProp() const;
     
     /// test if 'name' is a category
     bool isCategory(std::string const& name) const;

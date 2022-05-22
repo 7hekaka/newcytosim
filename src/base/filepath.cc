@@ -194,3 +194,48 @@ std::string FilePath::full_name(std::string const& dir, std::string const& file)
     return file;
 }
 
+
+/*
+ This will read the content of the file into buf[]
+ size is the amount to which buf was allocated (can be zero) using malloc()
+ If more memory is required, the value of buf[] and size will be updated accordingly
+ As `buf` is allocated with 'malloc', it should be eventually released by `free(buf)`
+ @returns null pointer in case file cannot be openned.
+ */
+char* FilePath::read_file(const char filename[], char*& buf, size_t& size)
+{
+    const size_t chunk = 128;
+    FILE * f = fopen(filename, "r");
+    if ( !f )
+    {
+        perror("FilePath::read_file: ");
+        errno = 0;
+        return nullptr;
+    }
+    if ( !buf || !size )
+    {
+        size = 8192;
+        buf = (char*) malloc(size);
+    }
+    char * ptr = buf;
+    while ( !ferror(f) )
+    {
+        while ( ptr + chunk >= buf + size )
+        {
+            ssize_t off = ptr - buf;
+            buf = (char*) realloc(buf, 2*size);
+            ptr = buf + off;
+            size = 2 * size;
+        }
+        size_t s = fread(ptr, 1, chunk, f);
+        ptr += s;
+        if ( s < chunk )
+            break;
+    }
+    if ( ferror(f) )
+        fprintf(stderr, "Error reading from `%s'\n", filename);
+    memset(ptr, 0, size-(ptr-buf));
+    fclose(f);
+    return buf;
+}
+

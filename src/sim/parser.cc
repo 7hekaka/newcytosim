@@ -1278,15 +1278,8 @@ void Parser::evaluate(std::string const& code)
 }
 
 
-void Parser::readConfig(std::string const& filename)
+void Parser::readConfig(std::istream& is, std::string const& filename)
 {
-    std::ifstream is(filename.c_str(), std::ifstream::in);
-    if ( !is.good() )
-    {
-        if ( !is.is_open() )
-            throw InvalidIO("could not open `"+filename+"'");
-        throw InvalidIO("could not find or read `"+filename+"'");
-    }
     VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change);
     VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
 
@@ -1302,7 +1295,37 @@ void Parser::readConfig(std::string const& filename)
         throw;
     }
     sim_->parser(nullptr);
+}
+
+
+void Parser::readConfig(std::string const& filename)
+{
+    std::ifstream is(filename.c_str(), std::ifstream::in);
+    if ( !is.good() )
+    {
+        if ( !is.is_open() )
+            throw InvalidIO("could not open `"+filename+"'");
+        throw InvalidIO("could not find or read `"+filename+"'");
+    }
+    readConfig(is, filename);
     is.close();
+}
+
+
+/**
+ This read the entire file in memory and is useful when file-descriptors are limited
+ */
+void Parser::readConfigBuffered(std::string const& filename)
+{
+    size_t size = 0;
+    char * data = nullptr;
+    char * ptr = FilePath::read_file(filename.c_str(), data, size);
+    if ( !ptr )
+        throw InvalidIO("could not find or read `"+filename+"'");
+    //std::clog << "readConfigBuffered() read " << strlen(data) << " chars\n";
+    std::stringstream is(data);
+    free(data);
+    readConfig(is, filename);
 }
 
 

@@ -31,7 +31,7 @@ Interface::Interface(Simul* s)
 
 
 
-SimulProp& Interface::simulProp() const
+SimulProp const& Interface::simulProp() const
 {
     return sim_->prop;
 }
