@@ -67,10 +67,10 @@ vpath bin3/play bin3
 
 ################################ multiplay
 
-INC_GLFW = $(addprefix -Isrc/, math base sim gym disp) -Ideps
+INC_GLFW = $(addprefix -Isrc/, math base sim gym disp) -Iext
 
 ifeq ($(MACHINE),mac)
-    LIB_GLFW := deps/libglfw3.a -framework Cocoa -framework OpenGL -framework IOKit
+    LIB_GLFW := ext/libglfw3.a -framework Cocoa -framework OpenGL -framework IOKit
 else
     LIB_GLFW := -lglfw
 endif
