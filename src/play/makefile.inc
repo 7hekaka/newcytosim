@@ -65,3 +65,17 @@ bin3/play: play.cc playerD3.o $(OBJ_CYTOREAD) $(OBJ_PLAY3D) cytolibGD3.a cytomat
 	$(DONE)
 vpath bin3/play bin3
 
+################################ multiplay
+
+INC_GLFW = $(addprefix -Isrc/, math base sim gym disp) -Ideps
+
+ifeq ($(MACHINE),mac)
+    LIB_GLFW := deps/libglfw3.a -framework Cocoa -framework OpenGL -framework IOKit
+else
+    LIB_GLFW := -lglfw
+endif
+
+multiplay: src/play/multiplay.cc $(OBJ_CYTOREAD) $(OBJ_PLAY:%.o=build/%.o) cytolibG.a $(LIB_PLAYER) cytomath.a | bin
+	$(COMPILE) $(INFO) $(INC_GLFW) $(OBJECTS) $(LIB_GLFW) $(LINK) $(GRAFIX) $(IMAGES) -o bin/multiplay
+	$(DONE)
+vpath multiplay bin
