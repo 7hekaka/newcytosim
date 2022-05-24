@@ -82,7 +82,7 @@ public:
     void hold();
     
     /// return true if new data is available
-    int holding() { return holding_; }
+    int holding() const { return holding_; }
 
     /// print message to identify thread
     void debug(const char *) const;
@@ -158,6 +158,9 @@ public:
 
     /// ask the simulation to stop
     void cancel() { pthread_cancel(child_); }
+
+    /// ask the simulation to stop
+    void terminate() { pthread_kill(child_, SIGTERM); }
 
     /// wait for child to terminate
     void join() { if ( 0 == pthread_join(child_, nullptr) ) status_ = -2; }

@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <time.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "sim_thread.h"
 #include "exceptions.h"
@@ -71,7 +72,7 @@ void SimThread::hold()
 {
     assert_true( isWorker() );
 
-    if ( order_ < 0 )
+    if ( order_ == -1 )
         pthread_exit(nullptr);
     
     if ( ++hold_ >= period_ )
@@ -101,10 +102,13 @@ void SimThread::run()
             }
             else
                 Parser::readConfig();
-            do {
-                usleep(25000);
+            do
+            {
+                // the simulation is now terminated, we shall wait for a signal
                 holding_ = 2;
-                cond_wait();  // this also unlocks and locks the mutex
+                //fprintf(stderr, "Completed simulation %i\n", sim_->prop.flag);
+                if ( cond_wait() ) break;  // this also unlocks and locks the mutex
+                usleep(1000000);
             } while ( !order_ );
             erase_simul(1);
         } while ( order_ >= 0 );
