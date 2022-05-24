@@ -212,7 +212,7 @@ char* FilePath::read_file(const char filename[], char*& buf, size_t& size)
     FILE * f = fopen(filename, "r");
     if ( !f )
     {
-        perror("FilePath::read_file: ");
+        perror(filename);
         errno = 0;
         return nullptr;
     }

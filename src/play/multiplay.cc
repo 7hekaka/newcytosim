@@ -288,10 +288,12 @@ int main(int argc, char *argv[])
         view.read(arg);
         disp.read(arg);
         arg.set(config_file, ".cym");
+        arg.print_warnings(std::cerr, 1, "\n");
     }
     
     RNG.seed();
-    FilePath::read_file(config_file.c_str(), config_code, code_size);
+    if ( !FilePath::read_file(config_file.c_str(), config_code, code_size) )
+        exit(1);
     GLFWwindow* win = initWindow(bugW*TILEX, bugH*TILEY);
     Cytosim::silent();
 
