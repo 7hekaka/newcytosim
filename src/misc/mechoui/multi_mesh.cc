@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "multi_mesh.h"
+#include "assert_macro.h"
 
 #include "opengl.h"
 #include "gym_flute.h"
@@ -266,7 +267,7 @@ void MultiMesh::drawFaces(const float dir[3], int selected) const
             ptr += 3;
         }
     }
-    assert(end == ptr);
+    assert_true(end == ptr);
     
     // number of opaque triangles:
     size_t n_tri = ( ptr - flu ) / 3;

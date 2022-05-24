@@ -194,7 +194,6 @@ int main(int argc, char* argv[])
     glApp::initialize();
     glApp::views[0].read(arg);
     arg.print_warnings(std::cerr, 1, "\n");
-    load(file_index);
 
     glutInit(&argc, argv);
     glApp::setDimensionality(3);
@@ -205,6 +204,8 @@ int main(int argc, char* argv[])
     glApp::attachMenu();
     glApp::setScale(3);
     gle::initialize();
+
     timer(0);
+    load(file_index);
     glutMainLoop();
 }

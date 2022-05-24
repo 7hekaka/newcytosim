@@ -162,7 +162,7 @@ test_solve: test_solve.cc cytomath.a cytobase.a SFMT.o gym_matrix.o | bin
 
 #----------------------------Targets using GLAPP--------------------------------
 
-OBJ_GLAP := $(OBJ_DISP) $(OBJ_GFX) save_imageGL.o cytobase.a cytomath.a SFMT.o
+OBJ_GLAP := $(OBJ_DISP:%.o=build/%.o) $(OBJ_GFX) save_imageGL.o cytobase.a cytomath.a SFMT.o
 
 test_glapp: test_glapp.cc $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)

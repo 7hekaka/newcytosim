@@ -8,7 +8,7 @@ OBJ_PLAY1D := $(OBJ_PLAY:%.o=build/%D1.o)
 OBJ_PLAY2D := $(OBJ_PLAY:%.o=build/%D2.o)
 OBJ_PLAY3D := $(OBJ_PLAY:%.o=build/%D3.o)
 
-LIB_PLAYER := cytodisp.a SFMT.o $(OBJ_DISP) cytobase.a
+LIB_PLAYER := cytodisp.a SFMT.o $(OBJ_DISP:%.o=build/%.o) cytobase.a
 
 PLAY_INC = $(addprefix -Isrc/, math base sim gym disp sim/organizers)
 PLAY_DEP = $(addprefix -Isrc/, math base sim gym disp) $(LINK) $(GRAFIX) $(IMAGES)
