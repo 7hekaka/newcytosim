@@ -1,11 +1,12 @@
 /*
  * Multiplay runs simulations in child threads in parallel and display them live
  * This is the second GLFW-based Cytosim player
- * Francois J Nedelec, Cambridge University, 1--23 May 2022
+ * Francois J Nedelec, Cambridge University, 1--24 May 2022
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 #include "simul.h"
 #include "glossary.h"
@@ -22,9 +23,9 @@
 #include "gle.h"
 #include "glfw.h"
 
-constexpr int TILEX = 5;
-constexpr int TILEY = 6;
-constexpr int TOP = TILEX * TILEY;
+int tileX = 2;
+int tileY = 2;
+constexpr int TOP = 128;
 constexpr int RENEW_DELAY = TOP;
 constexpr int PERIOD = 16;
 
@@ -33,8 +34,8 @@ int bugW = 320;
 int bugH = 128;
 
 // size of window (updated if window is resized)
-int winW = bugW * TILEX;
-int winH = bugH * TILEY;
+int winW = bugW * tileX;
+int winH = bugH * tileY;
 
 //------------------------------------------------------------------------------
 
@@ -45,8 +46,6 @@ PropertyList dispList;
 
 int selected = 0;
 int fate[TOP] = { 0 };
-
-std::string config_file = "config.cym";
 
 // pointers to hold the Config text:
 char *config_code = nullptr;
@@ -60,18 +59,20 @@ int whichBug(double mx, double my)
 {
     mx = std::max(mx, 0.0);
     my = std::max(my, 0.0);
-    int x = std::min(TILEX, int(TILEX * mx));
-    int y = std::min(TILEY, int(TILEY * my));
-    return y + TILEY * x;
+    int x = std::min(tileX, int(tileX * mx));
+    int y = std::min(tileY, int(tileY * my));
+    return y + tileY * x;
 }
 
 /* respond to mouse cursor movements */
 void mouseMotionCallback(GLFWwindow* win, double mx, double my)
 {
-    int state = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT);
+    int state = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_RIGHT);
     //printf("mouse @ %8.2f %8.2f (%i)\n", mx, my, state);
     if ( state == GLFW_PRESS )
     {
+        int i = whichBug(mx/winW, 1.0-my/winH);
+        fate[i] = 1;
     }
 }
 
@@ -180,8 +181,8 @@ void reshape(GLFWwindow* win, int W, int H)
 {
     glfwGetWindowSize(win, &winW, &winH);
     glfwGetFramebufferSize(win, &bugW, &bugH);
-    bugW /= TILEX;
-    bugH /= TILEY;
+    bugW /= tileX;
+    bugH /= tileY;
     view.reshape(bugW, bugH);
     //printf("Window %ix%i : tile %ix%i\n", winW, winH, bugW, bugH);
 }
@@ -280,28 +281,49 @@ int main(int argc, char *argv[])
     SimThread worker[TOP];
 
     //parse the command line:
+    if ( argc > 1 && isdigit(*argv[1]) )
+    {
+        char* c = strchr(argv[1], 'x');
+        if ( c )
+        {
+            tileX = atoi(argv[1]);
+            tileY = atoi(c+1);
+        }
+        if ( tileX * tileY > TOP )
+        {
+            printf("Error: limited to %i simulations max\n", TOP);
+            exit(1);
+        }
+        *argv[1] = 0;
+    }
     Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
+    
+    int n = arg.num_values(".cym");
+    for ( int i = 0; i < std::min(tileX*tileY, n); ++i )
+        arg.set(simul[i].prop.config_file, ".cym", i);
+    if ( n < 2 )
+    {
+        const char * str = simul[0].prop.config_file.c_str();
+        if ( !FilePath::read_file(str, config_code, code_size) )
+            exit(1);
+    }
+    arg.clear(".cym");
     if ( !arg.empty() )
     {
         view.read(arg);
         disp.read(arg);
-        arg.set(config_file, ".cym");
         arg.print_warnings(std::cerr, 1, "\n");
     }
     
     RNG.seed();
-    if ( !FilePath::read_file(config_file.c_str(), config_code, code_size) )
-        exit(1);
-    GLFWwindow* win = initWindow(bugW*TILEX, bugH*TILEY);
+    GLFWwindow* win = initWindow(bugW*tileX, bugH*tileY);
     Cytosim::silent();
 
-    for ( int i = 0; i < TOP; ++i )
+    for ( int i = 0; i < tileX*tileY; ++i )
     {
-        //usleep(100000);
         simul[i].initialize(arg);
-        simul[i].prop.config_file = config_file;
         simul[i].prop.random_seed = RNG.pint32();
         worker[i].config_code = config_code;
         worker[i].set_simul(simul+i);
@@ -315,10 +337,10 @@ int main(int argc, char *argv[])
     {
         //usleep(100000);
         int refresh = 0;
-        for (int x = 0; x < TILEX; ++x )
-        for (int y = 0; y < TILEY; ++y )
+        for (int x = 0; x < tileX; ++x )
+        for (int y = 0; y < tileY; ++y )
         {
-            int i = y + TILEY * x;
+            int i = y + tileY * x;
             if ( worker[i].holding() && 0 == worker[i].trylock() )
             {
                 ++refresh;
@@ -327,9 +349,10 @@ int main(int argc, char *argv[])
                 if ( worker[i].holding() > 1 )
                     worker[i].restart();
                 worker[i].unlock();
-                worker[i].signal();
                 if ( fate[i] > 0 )
                     worker[i].cancel();
+                else
+                    worker[i].signal();
             }
             else if ( worker[i].dead() )
             {
@@ -361,12 +384,12 @@ int main(int argc, char *argv[])
     }
     //stopPreconfig();
     glDisable(GL_SCISSOR_TEST);
-    for ( int i = 0; i < TOP; ++i )
+    for ( int i = 0; i < tileX*tileY; ++i )
     {
         worker[i].cancel();
         worker[i].config_code = nullptr;
     }
-    for ( int i = 0; i < TOP; ++i )
+    for ( int i = 0; i < tileX*tileY; ++i )
         worker[i].join();
     glfwDestroyWindow(win);
     glfwTerminate();

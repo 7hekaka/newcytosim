@@ -767,6 +767,8 @@ int Glossary::has_warning(std::string& str, size_t threshold) const
     std::string war;
     for ( auto const& i : mTerms )
     {
+        if ( i.first.empty() )
+            continue;
         int val = warning(i, war, threshold);
         if ( val )
         {
