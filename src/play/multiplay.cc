@@ -144,23 +144,16 @@ void keysCallback(GLFWwindow* win, int k, int s, int action, int mods)
             else
                 glfwSetWindowShouldClose(win, GLFW_TRUE);
             break;
+        case 'F': toggleFullScreen(win); break;
         case '-': view.zoom_in(0.91700404320); break;
         case '=': view.zoom_in(1.09050773266); break;
-        case 'F': toggleFullScreen(win); break;
-#if ( 0 )
-        case GLFW_KEY_UP:
-            view.eyeDistance += 0.1; printf("eye %.2f\n", view.eyeDistance); break;
-        case GLFW_KEY_DOWN:
-            view.eyeDistance -= 0.1; printf("eye %.2f\n", view.eyeDistance); break;
-#endif
 #if ( DIM > 1 )
-        case GLFW_KEY_LEFT:
-            view.rotate_by(Quaternion<real>(0.99,0,-.1,0)); break;
-        case GLFW_KEY_RIGHT:
-            view.rotate_by(Quaternion<real>(0.99,0,0.1,0)); break;
-        default:
+        case GLFW_KEY_UP:    view.rotate_by(Quaternion<real>(0.99,-.1,0,0)); break;
+        case GLFW_KEY_DOWN:  view.rotate_by(Quaternion<real>(0.99,0.1,0,0)); break;
+        case GLFW_KEY_LEFT:  view.rotate_by(Quaternion<real>(0.99,0,-.1,0)); break;
+        case GLFW_KEY_RIGHT: view.rotate_by(Quaternion<real>(0.99,0,0.1,0)); break;
 #endif
-            return;
+        default: return;
     }
 }
 
