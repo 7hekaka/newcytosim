@@ -10,12 +10,11 @@
 #include "filepath.h"
 #include "mechoui_param.h"
 #include "gym_draw.h"
+#include "gym_view.h"
 #include "multi_mesh.h"
 
-
-MechouiParam pam;
-
 MultiMesh mesh;
+MechouiParam pam;
 
 bool animate = false;
 unsigned file_index = 0;
@@ -123,15 +122,12 @@ void timer(int value)
 int display(View& view)
 {
     view.openDisplay();
+    gym::color(pam.point_color);
     if ( pam.point_style )
-    {
-        gym::color(pam.point_color);
-        mesh.drawPoints(pam.point_size);
-    }
-    gym::color(view.front_color);
+        mesh.drawNodes(pam.point_size, pam.point_color);
     Vector3 V = view.depthAxis();
     float axis[4] = { float(V.XX), float(V.YY), float(V.ZZ), 0 };
-    mesh.drawFaces(axis, pam.selected);
+    mesh.drawFaces(axis, pam.face_color, pam.selected);
     view.closeDisplay();
     return 0;
 }
@@ -159,7 +155,7 @@ void help_keys()
 int main(int argc, char* argv[])
 {
     Glossary arg;
-    if ( arg.read_strings(argc, argv) )
+    if ( arg.read_strings(argc-1, argv+1) )
         return EXIT_FAILURE;
     
     if ( arg.use_key("parameters") )

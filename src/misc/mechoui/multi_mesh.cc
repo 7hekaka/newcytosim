@@ -163,13 +163,14 @@ int MultiMesh::read(char const* filename)
 
 
 /// OpenGL display function
-void MultiMesh::drawPoints(float point_size) const
+void MultiMesh::drawNodes(float point_size, const float color[4]) const
 {
     float * flu = gym::mapFloatBuffer(3*n_points);
     // Upload vertex data to the video device
     for ( size_t i = 0; i < 3*n_points; ++i )
         flu[i] = points[i];
     gym::unmapBufferV3();
+    gym::color(color);
     gym::disableLighting();
     gym::drawPoints(point_size, 0, n_points);
     gym::enableLighting();
@@ -177,7 +178,7 @@ void MultiMesh::drawPoints(float point_size) const
 
 
 /// simple OpenGL display function
-void MultiMesh::drawFaces(int selected) const
+void MultiMesh::drawFaces(const float color[4], int selected) const
 {
     flute6 * flu = gym::mapBufferV3N3(3*n_faces);
     flute6 * ptr = flu;
@@ -209,7 +210,6 @@ void MultiMesh::drawFaces(int selected) const
     gym::disableCullFace();
     gym::openDepthMask();
     float black[4] = { 0, 0, 0, 1 };
-    float color[4] = { 1, 1, 0, 1 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 64);
@@ -228,7 +228,7 @@ static int compareFluteTriangles(const void * A, const void * B)
 }
 
 /// OpenGL display function with depth-sorted transparent faces
-void MultiMesh::drawFaces(const float dir[3], int selected) const
+void MultiMesh::drawFaces(const float dir[3], const float color[4], int selected) const
 {
     flute6 * flu = gym::mapBufferV3N3(3*n_faces);
     flute6 * ptr = flu;
@@ -298,7 +298,6 @@ void MultiMesh::drawFaces(const float dir[3], int selected) const
     // set identical back and front material properties
     //gle_color col = gle::bright_color(cell);
     float black[4] = { 0, 0, 0, 1 };
-    float color[4] = { 1, 1, 0, 1 };
     float glass[4] = { 1, 1, 1, 0.3 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);

@@ -50,13 +50,13 @@ public:
     /// OpenGL picking function
     unsigned pick() const;
     
-    /// display using OpenGL
-    void drawPoints(float) const;
+    /// draw vertex points using OpenGL
+    void drawNodes(float size, const float color[4]) const;
     
-    /// display using OpenGL
-    void drawFaces(int selected) const;
+    /// display triangles using OpenGL
+    void drawFaces(const float color[4], int selected) const;
     
-    /// display using OpenGL
-    void drawFaces(const float dir[3], int selected) const;
+    /// display triangles using OpenGL
+    void drawFaces(const float dir[3], const float color[4], int selected) const;
 
 };
