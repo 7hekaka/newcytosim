@@ -19,7 +19,7 @@ SimThread::SimThread(Simul* sim)
 : Parser(sim, 1, 1, 1, 1, 0)
 {
     status_ = -2;
-    order_  = 0;
+    demand_ = 0;
     hold_   = 0;
     holding_= 0;
     period_ = 1;
@@ -72,7 +72,7 @@ void SimThread::hold()
 {
     assert_true( isWorker() );
 
-    if ( order_ == -1 )
+    if ( demand_ == -1 )
         pthread_exit(nullptr);
     
     if ( ++hold_ >= period_ )
@@ -94,7 +94,7 @@ void SimThread::run()
     assert_true( isWorker() );
     try {
         do {
-            order_ = 0;
+            demand_ = 0;
             if ( config_code )
             {
                 std::stringstream is(config_code);
@@ -109,9 +109,9 @@ void SimThread::run()
                 //fprintf(stderr, "Completed simulation %i\n", sim_->prop.flag);
                 if ( cond_wait() ) break;  // this also unlocks and locks the mutex
                 usleep(1000000);
-            } while ( !order_ );
+            } while ( !demand_ );
             erase_simul(1);
-        } while ( order_ >= 0 );
+        } while ( demand_ >= 0 );
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
@@ -123,7 +123,7 @@ void SimThread::run()
 /** called before thread is started */
 void SimThread::cleanup()
 {
-    order_ = 0;
+    demand_ = 0;
     Parser::restart_ = 0;
     assert_true(holding_ == 0);
     if ( status_ == -1 )
@@ -230,7 +230,7 @@ void SimThread::stop()
     if ( status_ == 0 )
     {
         // request clean termination:
-        order_ = -1;
+        demand_ = -1;
         signal();
         // wait for termination:
         //debug("join...");

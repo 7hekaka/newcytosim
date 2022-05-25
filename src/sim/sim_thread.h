@@ -35,7 +35,7 @@ private:
     int status_;
     
     /// a flag to indicate if child thread should terminate or restart
-    int order_;
+    int demand_;
 
     /// counter for hold()
     unsigned int hold_;
@@ -169,7 +169,7 @@ public:
     void cancel_join();
     
     /// restart engine
-    void restart() { order_ = 1; };
+    void restart() { demand_ = 1; };
 
     /// clear the simulation world
     void erase_simul(bool) const;
