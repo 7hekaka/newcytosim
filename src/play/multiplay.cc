@@ -26,8 +26,6 @@
 int tileX = 2;
 int tileY = 2;
 constexpr int TOP = 128;
-constexpr int RENEW_DELAY = TOP;
-constexpr int PERIOD = 16;
 
 // size of each cell (updated if window is resized)
 int bugW = 320;
@@ -39,6 +37,7 @@ int winH = bugH * tileY;
 
 //------------------------------------------------------------------------------
 
+unsigned period = 16;
 View view("multiplay", DIM==3);
 DisplayProp disp("multiplay");
 Display1 display(&disp);
@@ -314,6 +313,7 @@ int main(int argc, char *argv[])
     {
         view.read(arg);
         disp.read(arg);
+        arg.set(period, "period");
         arg.print_warnings(std::cerr, 1, "\n");
     }
     
@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
         simul[i].prop.random_seed = RNG.pint32();
         worker[i].config_code = config_code;
         worker[i].set_simul(simul+i);
-        worker[i].period(PERIOD);
+        worker[i].period(period);
         worker[i].start();
     }
 
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
                     ++refresh;
                     selectPanel(x, y);
                     gym::clearPixels(0.5f, 0.5f, 0.5f, 1.0f);
-                    fate[i] = -1-RNG.pint32(RENEW_DELAY);
+                    fate[i] = -1-RNG.pint32(tileX*tileY);
                 }
                 else if ( fate[i] < 0 )
                 {
