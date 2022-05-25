@@ -871,7 +871,7 @@ inline void Interface::step_simul(size_t& sss, size_t cnt)
  */
 void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 {
-    int  frames = 0;
+    int frames = 0;
     int  solve = 1;
     bool prune = true;
     bool binary = true;
@@ -910,9 +910,9 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         {
              sim_->prop.clear_trajectory = false;
             if ( frames > 1 )
-                sim_->writeObjects( sim_->prop.system_file, false, binary);
+                sim_->writeObjects(sim_->prop.system_file, false, binary);
             else
-                std::remove( sim_->prop.system_file.c_str());
+                std::remove(sim_->prop.system_file.c_str());
         }
         delta = real(nb_steps) / real(frames);
         check = size_t(delta);
@@ -940,8 +940,8 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         if ( do_write || sim_->abortRun )
         {
             sim_->relax();
-            sim_->writeObjects( sim_->prop.system_file, true, binary);
-            reportCPUtime( sim_->time());
+            sim_->writeObjects(sim_->prop.system_file, true, binary);
+            reportCPUtime(sim_->time());
             sim_->sMeca.doNotify = 2;  // to print convergence parameters
             sim_->unrelax();
             if ( sim_->abortRun )
@@ -959,7 +959,10 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     {
         sim_->writeProperties(prune);
         if ( frames < 0 )
-            sim_->writeObjects( sim_->prop.system_file, true, binary);
+        {
+            sim_->relax();
+            sim_->writeObjects(sim_->prop.system_file, true, binary);
+        }
     }
     
     VLOG("+RUN END");

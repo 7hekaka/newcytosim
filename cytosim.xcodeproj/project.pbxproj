@@ -972,7 +972,6 @@
 		BBE8E70310C19D1B006527D4 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
 		BBE9D38D158500BA00FF944A /* space_ring.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE9D38B158500BA00FF944A /* space_ring.cc */; };
 		BBE9D38E158500BA00FF944A /* space_ring.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE9D38C158500BA00FF944A /* space_ring.h */; };
-		BBEAA3F0283B63480091DFA9 /* multiplay.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEAA3EF283B633B0091DFA9 /* multiplay.cc */; };
 		BBEB846412FF339500F9D717 /* fork.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEB846212FF339500F9D717 /* fork.cc */; };
 		BBEB846512FF339500F9D717 /* fork.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEB846312FF339500F9D717 /* fork.h */; };
 		BBEF3A87118318AE000F2EED /* backtrace.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEF3A85118318AE000F2EED /* backtrace.h */; };
@@ -5275,7 +5274,6 @@
 				BB7662C510E923A200C93DF6 /* frame_reader.cc in Sources */,
 				BB56FA7812D0A0BF008B2260 /* player_prop.cc in Sources */,
 				BB8BBD0621537DD50033BC7A /* player.cc in Sources */,
-				BBEAA3F0283B63480091DFA9 /* multiplay.cc in Sources */,
 				BB0E885616FBC81400451517 /* sim_thread.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
