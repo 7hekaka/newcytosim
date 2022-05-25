@@ -51,12 +51,6 @@ void Display1::drawObjects(Simul const& sim)
 
     if (( prop->single_select & 1 ) && ( sim.singles.sizeF() > 0 ))
         drawSinglesF(sim.singles);
-    
-    drawFibers(sim.fibers);
-    gym::disableLighting();
-
-    if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
-        drawCouplesA(sim.couples);
 
 #if ( DIM >= 3 )
     gym::enableCullFace(GL_BACK);
@@ -71,6 +65,12 @@ void Display1::drawObjects(Simul const& sim)
     gym::disableLighting();
     gym::disableCullFace();
 #endif
+    
+    drawFibers(sim.fibers);
+    gym::disableLighting();
+
+    if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
+        drawCouplesA(sim.couples);
 
     if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
         drawCouplesB(sim.couples);
