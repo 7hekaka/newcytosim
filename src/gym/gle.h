@@ -88,7 +88,9 @@ namespace gle
     void paint_capsule(float left, float right, float rad, size_t inc=1);
     /// draw spherocylinder contour in 2D
     void stroke_capsule(float left, float right, float rad, float line_width, size_t inc=1);
-    /// draw spherocylinder contour in 2D
+    /// paint two joined spherocylinder contour in 2D
+    void paint_bicapsule(float left, float right, float rad, float clos, size_t inc=1);
+    /// draw two joined spherocylinder contour in 2D
     void stroke_bicapsule(float left, float right, float rad, float clos, float line_width, size_t inc=1);
 
     /// draw a tetrahedron of radius 1
