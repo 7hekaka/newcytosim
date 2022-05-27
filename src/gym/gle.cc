@@ -984,7 +984,7 @@ namespace gle
         flute2 *buf = gym::mapBufferV2(pi_twice+4);
         flute2 *ptr = buf;
         *ptr++ = { R+rad, 0 };
-        for ( size_t j = 1; j <= pi_half; j += inc )
+        for ( size_t j = inc; j <= pi_half; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + R,  rad*S };
@@ -1020,13 +1020,14 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
         
-    void paint_bicapsule(float L, float R, float rad, float G, size_t inc)
+    void paint_bicapsule(float L, float R, float rad, float G, float H, size_t inc)
     {
-        float F = rad - G;
-        flute2 *buf = gym::mapBufferV2(pi_twice+4);
+        const float F = std::max(rad - G, 0.f);
+        const float X = F + H;
+        flute2 *buf = gym::mapBufferV2(2*pi_twice+4);
         flute2 *ptr = buf;
         *ptr++ = { R+rad, 0 };
-        for ( size_t j = 1; j <= pi_half; j += inc )
+        for ( size_t j = inc; j <= pi_half; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + R,  rad*S };
@@ -1036,15 +1037,15 @@ namespace gle
         for ( size_t j = pi_half; j <= pi_once; j += inc )
         {
             float C = cos_(j), S = sin_(j);
-            ptr[0] = { F*C + F,  G+F*S };
-            ptr[1] = { F*C + F, -G-F*S };
+            ptr[0] = { F*C + X, +F*S + G };
+            ptr[1] = { F*C + X, -F*S - G };
             ptr += 2;
         }
-        for ( size_t j = 1; j < pi_half; j += inc )
+        for ( size_t j = 0; j < pi_half; j += inc )
         {
             float C = cos_(j), S = sin_(j);
-            ptr[0] = { F*C - F,  G+F*S };
-            ptr[1] = { F*C - F, -G-F*S };
+            ptr[0] = { F*C - X, +F*S + G };
+            ptr[1] = { F*C - X, -F*S - G };
             ptr += 2;
         }
         for ( size_t j = pi_half; j < pi_once; j += inc )
@@ -1056,28 +1057,29 @@ namespace gle
         }
         *ptr++ = { L-rad, 0 };
         gym::unmapBufferV2();
-        assert_true( ptr-buf <= pi_twice+4 );
+        assert_true( ptr-buf <= 2*pi_twice+4 );
         gym::drawTriangleStrip(0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void stroke_bicapsule(float L, float R, float rad, float G, float width, size_t inc)
+    void stroke_bicapsule(float L, float R, float rad, float G, float H, float width, size_t inc)
     {
-        float F = rad - G;
+        const float F = std::max(rad - G, 0.f);
+        const float X = F + H;
         flute2 *buf = gym::mapBufferV2(2*pi_twice+8);
         flute2 *ptr = buf;
         for ( size_t j = pi_half; j <= pi_3half; j += inc )
             *ptr++ = { rad*cos_(j) + L, rad*sin_(j) };
         for ( size_t j = pi_3half; j <= pi_twice; j += inc )
-            *ptr++ = { F*cos_(j) - F, F*sin_(j) - G };
+            *ptr++ = { F*cos_(j) - X, F*sin_(j) - G };
         for ( size_t j = pi_once; j <= pi_3half; j += inc )
-            *ptr++ = { F*cos_(j) + F, F*sin_(j) - G };
+            *ptr++ = { F*cos_(j) + X, F*sin_(j) - G };
         for ( size_t j = pi_3half; j <= pi_5half; j += inc )
             *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
         for ( size_t j = pi_half; j <= pi_once; j += inc )
-            *ptr++ = { F*cos_(j) + F, F*sin_(j) + G };
-        for ( size_t j = 2; j <= pi_half; j += inc )
-            *ptr++ = { F*cos_(j) - F, F*sin_(j) + G };
+            *ptr++ = { F*cos_(j) + X, F*sin_(j) + G };
+        for ( size_t j = 0; j <= pi_half; j += inc )
+            *ptr++ = { F*cos_(j) - X, F*sin_(j) + G };
         *ptr++ = { L, rad };
         gym::unmapBufferV2();
         assert_true( ptr-buf <= 2*pi_twice+8 );
