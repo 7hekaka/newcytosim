@@ -1318,15 +1318,16 @@ namespace gle
     void setBuffers()
     {
         Tesselator ico[7];
-        ico[0].buildIcosahedron(std::max(1UL, finesse/2));
-        ico[1].buildIcosahedron(finesse);
-        ico[2].buildIcosahedron(finesse*2);
-        ico[3].buildIcosahedron(finesse*4);
-        ico[4].buildHemisphere(std::max(1UL, finesse/2));
+        size_t f = std::max(1UL, finesse/2);
+        ico[0].buildIcosahedronZ(f);
+        ico[1].buildIcosahedronZ(finesse);
+        ico[2].buildIcosahedronZ(finesse*2);
+        ico[3].buildIcosahedronZ(finesse*4);
+        ico[4].buildHemisphere(f);
         ico[5].buildHemisphere(finesse);
         ico[6].buildHemisphere(finesse*2);
 
-        size_t f = 0;
+        f = 0;
         size_t s = 0;
         for ( int i = 0; i < 7; ++i )
         {
@@ -1895,12 +1896,17 @@ namespace gle
     }
     
     //-----------------------------------------------------------------------
-    void drawAxes(const float S, int dim)
+    void drawAxes(const float L, int dim)
     {
-        const float R(S * 0.1f);
+        const float R(L*0.1f);
         gym::openDepthMask();
         gym::enableLighting();
         gym::enableCullFace(GL_BACK);
+        // display a white ball at the origin
+        gym::color_front(1, 1, 1);
+        gym::pull_ref();
+        gym::scale(R);
+        sphere2();
         for (int d = 0; d < dim; ++d)
         {
             gym::pull_ref();
@@ -1920,18 +1926,14 @@ namespace gle
                     gym::rotateZ(0, -1);
                     break;
             }
-            gym::scale(R/2, R/2, S-R);
-            tube1();
-            gym::translate(0, 0, 1-R/(S-R));
-            gym::scale(3, 3, 3*R/(S-R));
+            gym::scale(1.5*R, 1.5*R, 3*R);
+            gym::translate(0, 0, 2.6666);
             cone2();
             discBottom2();
+            gym::translate(0, 0, -2.4);
+            gym::scale(0.26, 0.26, 2.4);
+            tube1();
         }
-        // display a white ball at the origin
-        gym::color_front(1, 1, 1);
-        gym::pull_ref();
-        gym::scale(R);
-        sphere4();
         gym::restoreCullFace();
         gym::restoreLighting();
     }

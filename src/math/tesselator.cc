@@ -404,7 +404,7 @@ void Tesselator::build(Tesselator::Polyhedra kind, unsigned div, int make)
         case UNSET: break;
         case TETRAHEDRON: buildTetrahedron(div, make); break;
         case OCTAHEDRON: buildOctahedron(div, make); break;
-        case ICOSAHEDRON: buildIcosahedron(div, make); break;
+        case ICOSAHEDRON: buildIcosahedronZ(div, make); break;
         case HEMISPHERE: buildHemisphere(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
     }
@@ -544,7 +544,8 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
     }
 }
 
-void Tesselator::buildIcosahedronRotated(unsigned div, int make)
+/** The faces are draw in order of increasing Z */
+void Tesselator::buildIcosahedronZ(unsigned div, int make)
 {
     kind_ = ICOSAHEDRON;
     init(12, 30, 20, div);
@@ -552,25 +553,25 @@ void Tesselator::buildIcosahedronRotated(unsigned div, int make)
     if ( make )
     {
         const FLOAT Z = std::sqrt(0.2);
-        const FLOAT C = std::cos(5*M_PI_2);
-        const FLOAT S = std::sin(5*M_PI_2);
+        const FLOAT C = std::cos(M_PI/2.5);
+        const FLOAT S = std::sin(M_PI/2.5);
         const FLOAT D = C*C - S*S;
         const FLOAT T = C*S*2;
         
         // Twelve vertices of icosahedron on unit sphere
         FLOAT vex[12][3] = {
-            { 0,  0,  1},
-            { 1,  0,  Z},
-            { C,  S,  Z},
-            { D,  T,  Z},
-            { D, -T,  Z},
-            { C, -S,  Z},
-            {-D,  T, -Z},
-            {-C,  S, -Z},
-            {-1,  0, -Z},
-            {-C, -S, -Z},
-            {-D, -S, -Z},
-            { 0,  0, -1}
+            { 0,  0, -1},
+            { 1,  0, -Z},
+            { C, -S, -Z},
+            { D, -T, -Z},
+            { D,  T, -Z},
+            { C,  S, -Z},
+            {-D, -T,  Z},
+            {-C, -S,  Z},
+            {-1,  0,  Z},
+            {-C,  S,  Z},
+            {-D,  S,  Z},
+            { 0,  0,  1}
         };
         
         // ordered faces: Counter-Clockwise = facing out

@@ -23,7 +23,7 @@ namespace gle
     constexpr size_t finesse = 8;
     
     /// number of circle points stored in buffer
-    constexpr size_t pi_5half = finesse * 15;;
+    constexpr size_t pi_5half = finesse * 15;
     constexpr size_t pi_twice = finesse * 12;
     constexpr size_t pi_3half = finesse * 9;
     constexpr size_t pi_once = finesse * 6;
