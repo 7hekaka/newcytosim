@@ -1138,7 +1138,7 @@ void processKey(unsigned char key, int modifiers = 0)
     }
     
     // if break was called, redraw the scene:
-    glApp::postRedisplay();
+    glApp::displayMain();
 }
 
 
