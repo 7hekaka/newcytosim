@@ -18,6 +18,16 @@ FiberSite::FiberSite(Fiber* f, real a)
 }
 
 
+void FiberSite::clear()
+{
+    hAbs = 0;
+    hTerp.clear();
+    hFiber = nullptr;
+#if FIBER_HAS_LATTICE
+    hLattice = nullptr;
+#endif
+}
+
 void FiberSite::relocateM()
 {
     assert_true(hFiber);

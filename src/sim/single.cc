@@ -68,6 +68,7 @@ void Single::beforeDetachment(Hand const* h)
     SingleSet * set = static_cast<SingleSet*>(objset());
     if ( set )
     {
+        sHand->reinterpolate();
         sPos = h->posSide();
         
         // link into correct SingleSet sublist:

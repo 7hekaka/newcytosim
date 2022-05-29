@@ -75,6 +75,9 @@ public:
     /// make destructor non-virtual
     ~FiberSite() {}
     
+    /// clear pointer (used in debug mode)
+    void clear();
+    
 #if FIBER_HAS_LATTICE
     
     /// return Lattice if engaged

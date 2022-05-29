@@ -423,14 +423,20 @@ void Couple::beforeDetachment(Hand const* h)
             // cHand1 will detach
             set->relinkD1(this);
             if ( cHand2->unattached() )
+            {
+                cHand1->reinterpolate();
                 cPos = cHand1->posSide();
+            }
         }
         else
         {
             // cHand2 will detach
             set->relinkD2(this);
             if ( cHand1->unattached() )
+            {
+                cHand2->reinterpolate();
                 cPos = cHand2->posSide();
+            }
         }
     }
 }
