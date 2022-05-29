@@ -127,6 +127,40 @@ bool Random::seeded()
     return false;
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark - Vectors
+
+void Random::add_srand1(real dst[1], const real ptr[1], real mag)
+{
+    mag *= TWO_POWER_MINUS_31;
+    if ( finish_ <= start_ )
+        refill();
+    --finish_;
+    dst[0] = ptr[0] + mag * static_cast<real>(finish_[0]);
+}
+
+void Random::add_srand2(real dst[2], const real ptr[2], real mag)
+{
+    mag *= TWO_POWER_MINUS_31;
+    if ( finish_ <= 1 + start_ )
+        refill();
+    finish_ -= 2;
+    dst[0] = ptr[0] + mag * static_cast<real>(finish_[0]);
+    dst[1] = ptr[1] + mag * static_cast<real>(finish_[1]);
+}
+
+void Random::add_srand3(real dst[2], const real ptr[2], real mag)
+{
+    mag *= TWO_POWER_MINUS_31;
+    if ( finish_ <= 2 + start_ )
+        refill();
+    finish_ -= 3;
+    dst[0] = ptr[0] + mag * static_cast<real>(finish_[0]);
+    dst[1] = ptr[1] + mag * static_cast<real>(finish_[1]);
+    dst[2] = ptr[2] + mag * static_cast<real>(finish_[2]);
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Floating points
 

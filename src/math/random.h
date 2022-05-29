@@ -278,7 +278,14 @@ public:
     /// real number uniformly distributed in [a,b[
     real real_uniform(real a, real b) { return a + preal() * ( b - a ); }
     
+    /// add random number in ]-mag, mag[ to each component of 2D vec[]
+    void add_srand1(real dst[1], const real vec[1], real mag);
     
+    /// add random number in ]-mag, mag[ to each component of 2D vec[]
+    void add_srand2(real dst[2], const real vec[2], real mag);
+    
+    /// add random number in ]-mag, mag[ to each component of 3D vec[]
+    void add_srand3(real dst[3], const real vec[2], real mag);
     
     /// refill array `gaussians_[]`, resetting `next_gaussian_`
     void refill_gaussians();

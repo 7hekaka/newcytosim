@@ -159,6 +159,7 @@ void Couple::setInteractionsFA(Meca& meca) const
 
 void Couple::diffuse()
 {
+    //RNG.add_srand3(pos, cPos, prop->diffusion_dt);
     Vector pos = cPos + Vector::randS(prop->diffusion_dt);
     
     // confinement:
