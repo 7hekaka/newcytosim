@@ -190,7 +190,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
 #endif
 #if FIBER_HAS_LATTICE
             hSite = in.readInt32();
-            hLattice = &hFiber->lattice();
+            hLattice = hFiber->lattice();
             // put in the middle of the site:
             // the abscissa will be adjusted in Fiber::resetLattice()
             hAbs = ( hSite + 0.5 ) * hLattice->unit();

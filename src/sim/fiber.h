@@ -300,10 +300,10 @@ public:
     //--------------------------------------------------------------------------
 #if FIBER_HAS_LATTICE
     /// modifiable reference to Fiber's Lattice
-    FiberLattice&  lattice() { return fLattice; }
+    FiberLattice * lattice() { return &fLattice; }
     
     /// const reference to Fiber's Lattice
-    FiberLattice const& lattice() const { return fLattice; }
+    FiberLattice const* lattice() const { return &fLattice; }
     
     /// recalculate occupancy lattice from bound Digits
     void resetLattice();

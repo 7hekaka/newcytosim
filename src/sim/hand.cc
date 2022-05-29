@@ -92,7 +92,7 @@ void Hand::relocate(Fiber* f, const real a)
     hFiber = f;
 #if FIBER_HAS_LATTICE
     if ( hLattice )
-        hLattice = &f->lattice();
+        hLattice = f->lattice();
 #endif
     hAbs = a;
     f->addHand(this);
@@ -341,23 +341,6 @@ void Hand::read(Inputter& in, Simul& sim)
         if ( hFiber )
             hFiber->addHand(this);
     }
-    
-#if FIBER_HAS_LATTICE
-    if ( hFiber && !hLattice && isDigit() )
-    {
-        /* Promote a Digit class that is not bound to the lattice */
-        FiberSite sit(*this);
-        // attach Hand to Lattice if possible, and detach otherwise
-        if ( attachmentAllowed(sit) )
-        {
-            hLattice = sit.lattice();
-            hSite = sit.site();
-            static_cast<Digit*>(this)->inc();
-        }
-        else
-            detachHand();
-    }
-#endif
 }
 
 

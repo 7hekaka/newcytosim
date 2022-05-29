@@ -35,9 +35,6 @@ public:
     /// constructor
     Digit(DigitProp const*, HandMonitor*);
     
-    /// identify as Digital class
-    bool isDigit() const { return true; }
-    
     //--------------------------------------------------------------------------
 
 #if FIBER_HAS_LATTICE > 0
@@ -46,7 +43,7 @@ public:
     bool outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
 
     /// true if given Lattice's site has this footprint's bits set
-    bool occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) & prop->footprint; }
+    bool occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop->footprint; }
 
     /// true if given Lattice's site is unoccupied (check all footprint bits equal to 1)
     bool vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop->footprint); }
@@ -78,7 +75,7 @@ public:
 
     lati_t site() const { return (lati_t)std::round(hAbs/prop->step_size); }
     bool outsideMP(lati_t s) const { return fiber()->outsideMP((s+0.5)*prop->step_size); }
-    bool occupied(FiberLattice& lat, lati_t s) const { return false; }
+    bool occupied(FiberLattice* lat, lati_t s) const { return false; }
     bool vacant(lati_t) const { return true; }
     void inc() const {}
     void dec() const {}
@@ -142,6 +139,8 @@ public:
     /// this is called when the attachment point is below the MINUS_END
     void handleDisassemblyP();
     
+    /// Promote a Digit class that is not bound to the lattice
+    void promote();
 };
 
 /// output operator

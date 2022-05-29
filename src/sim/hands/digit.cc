@@ -23,25 +23,25 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
     if ( Hand::attachmentAllowed(sit) )
     {
 #if FIBER_HAS_LATTICE
-        FiberLattice& lat = sit.fiber()->lattice();
+        FiberLattice* lat = sit.fiber()->lattice();
         
-        if ( !lat.ready() )
+        if ( !lat->ready() )
             throw InvalidParameter("a lattice was not defined for `"+sit.fiber()->prop->name()+"'");
         
         // index to site containing given abscissa:
-        lati_t s = lat.index(sit.abscissa());
+        lati_t s = lat->index(sit.abscissa());
         
-        if ( s < lat.entry() )
+        if ( s < lat->entry() )
         {
             if ( prop->bind_also_end & MINUS_END )
-                s = lat.entry();
+                s = lat->entry();
             else
                 return false;
         }
-        else if ( lat.fence() < s )
+        else if ( lat->fence() < s )
         {
             if ( prop->bind_also_end & PLUS_END )
-                s = lat.fence();
+                s = lat->fence();
             else
                 return false;
         }
@@ -50,7 +50,7 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
             return false;
         
         // adjust to match selected lattice site:
-        sit.engageLattice(&lat, s, prop->site_shift);
+        sit.engageLattice(lat, s, prop->site_shift);
 #endif
         return true;
     }
@@ -195,6 +195,26 @@ void Digit::stepLoaded(Vector const& force)
 //------------------------------------------------------------------------------
 #pragma mark -
 
+void Digit::promote()
+{
+#if FIBER_HAS_LATTICE
+    if ( hFiber && !hLattice )
+    {
+        FiberSite sit(*this);
+        // attach Hand to Lattice if possible, and detach otherwise
+        if ( attachmentAllowed(sit) )
+        {
+            hLattice = sit.lattice();
+            hSite = sit.site();
+            static_cast<Digit*>(this)->inc();
+        }
+        else
+            detachHand();
+    }
+#endif
+}
+
+
 std::ostream& operator << (std::ostream& os, Digit const& arg)
 {
     os << arg.property()->name() << "(" << arg.fiber()->reference() << ", " << arg.abscissa();
@@ -212,11 +232,11 @@ void Fiber::resetLattice()
         
         for ( Hand * ha = fHands.front(); ha; ha = ha->next() )
         {
-            if ( ha->isDigit() && ha->lattice() == &fLattice )
+            if ( ha->lattice() == lattice() )
             {
                 Digit* i = static_cast<Digit*>(ha);
                 i->inc();
-                i->moveTo(fLattice.unit() * i->site()+ i->prop->site_shift);
+                i->moveTo(fLattice.unit() * i->site() + i->prop->site_shift);
             }
         }
     }

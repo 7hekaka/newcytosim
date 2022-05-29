@@ -124,9 +124,6 @@ public:
     HandMonitor const* monitor() const { return hMonitor; }
     
     
-    /// identify as Digital class
-    virtual bool isDigit() const { return false; }
-    
     /// tell if attachment at given site is permitted
     virtual bool attachmentAllowed(FiberSite&) const;
     
