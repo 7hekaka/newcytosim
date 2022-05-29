@@ -79,7 +79,6 @@
 		BB086483281D4CE9005A6D72 /* gym_menu.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB08644C281D4CE8005A6D72 /* gym_menu.cc */; };
 		BB086484281D4CE9005A6D72 /* gym_zoo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB08644D281D4CE8005A6D72 /* gym_zoo.h */; };
 		BB086485281D4CE9005A6D72 /* gle_color_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB08644E281D4CE8005A6D72 /* gle_color_list.cc */; };
-		BB086486281D4CE9005A6D72 /* makefile.inc in Sources */ = {isa = PBXBuildFile; fileRef = BB08644F281D4CE8005A6D72 /* makefile.inc */; };
 		BB086488281D4CE9005A6D72 /* save_image.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086451281D4CE8005A6D72 /* save_image.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB086489281D4CE9005A6D72 /* gym_draw.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086452281D4CE8005A6D72 /* gym_draw.cc */; };
 		BB08648B281D4CE9005A6D72 /* gym_vect.h in Headers */ = {isa = PBXBuildFile; fileRef = BB086454281D4CE8005A6D72 /* gym_vect.h */; };
@@ -4795,7 +4794,6 @@
 				BB08646E281D4CE9005A6D72 /* gle.cc in Sources */,
 				BB0864AA281D51DF005A6D72 /* display.cc in Sources */,
 				BB086488281D4CE9005A6D72 /* save_image.cc in Sources */,
-				BB086486281D4CE9005A6D72 /* makefile.inc in Sources */,
 				BB086490281D4CE9005A6D72 /* fg_font.cc in Sources */,
 				BB08647D281D4CE9005A6D72 /* fg_stroke.cc in Sources */,
 				BB086470281D4CE9005A6D72 /* gym_flat.cc in Sources */,
