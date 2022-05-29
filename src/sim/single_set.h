@@ -48,8 +48,8 @@ private:
     /// initialize `fast_diffusion` attachment algorithm
     bool uniPrepare(PropertyList const& properties);
     
-    /// gather all Single with `fast_diffusion` in reserve lists
-    Single* uniCollect(Single*);
+    /// gather all Couple with `fast_diffusion` in reserve lists
+    template <void (Single::*FUNC)()> void step_collect(Single*);
 
     /// ensures that `can` holds `cnt` Singles, creating them of specified SingleProp
     void uniRefill(SingleList& can, size_t cnt, SingleProp const*);

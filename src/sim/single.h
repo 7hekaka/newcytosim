@@ -163,6 +163,9 @@ public:
     /// Monte-Carlo step if the Hand is attached
     virtual void stepA();
     
+    /// this does nothing
+    void stepBlank() { }
+
     /// add interactions to a Meca
     virtual void setInteractions(Meca&) const;
     

@@ -50,6 +50,30 @@ static inline void step_couples(Couple * obj, bool odd)
 
 
 /**
+ Transfer free Couple with `fast_diffusion` to the reserves, starting from `obj`,
+ and execute FUNC for all other Couples
+*/
+template < void (Couple::*FUNC)() >
+void CoupleSet::step_collect(Couple * obj)
+{
+    Couple * nxt;
+    while ( obj )
+    {
+        nxt = obj->next();
+        CoupleProp const* p = static_cast<CoupleProp const*>(obj->property());
+        if ( p->fast_diffusion )
+        {
+            ffList.pop(obj);
+            uniReserves[p->number()-1].second.push_back(obj);
+        }
+        else
+            (obj->*FUNC)();
+        obj = nxt;
+    }
+}
+
+
+/**
  CoupleSet::step() must call the appropriate Couple::step() exactly once
  for each Couple: either stepFF(), stepFA(), stepAF() or stepAA().
  
@@ -76,21 +100,22 @@ void CoupleSet::step()
     bool const ffOdd = ffList.size() & 1;
     
     step_couples<&Couple::stepAA>(firstAA(), aaOdd);
-    step_couples<&Couple::stepFA>(faHead, faOdd);
-    step_couples<&Couple::stepAF>(afHead, afOdd);
+    if ( RNG.flip() )
+    {
+        step_couples<&Couple::stepFA>(faHead, faOdd);
+        step_couples<&Couple::stepAF>(afHead, afOdd);
+    }
+    else
+    {
+        step_couples<&Couple::stepAF>(afHead, afOdd);
+        step_couples<&Couple::stepFA>(faHead, faOdd);
+    }
     
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        Couple * obj = uniCollect(ffHead);
+        step_collect<&Couple::stepFF>(ffHead);
         uniAttach(simul_.fibers);
-        // handle Couples for which 'fast_diffusion = false':
-        while ( obj )
-        {
-            Couple * nxt = obj->next();
-            obj->stepFF();
-            obj = nxt;
-        }
     }
     else
     {
@@ -133,7 +158,7 @@ void CoupleSet::stepSkipUnattached()
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        uniCollect(ffHead);
+        step_collect<&Couple::stepBlank>(ffHead);
         uniAttach(simul_.fibers);
     }
 }
@@ -896,32 +921,7 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
 
 
 /**
- Transfer free Couple with `fast_diffusion` to the reserves, starting from `obj`.
- Return first Couple that was not transferred. All followers also escape UniAttach
-*/
-Couple* CoupleSet::uniCollect(Couple * obj)
-{
-    Couple * res = nullptr;
-    Couple * nxt;
-    while ( obj )
-    {
-        nxt = obj->next();
-        CoupleProp const* p = static_cast<CoupleProp const*>(obj->property());
-        if ( p->fast_diffusion )
-        {
-            ffList.pop(obj);
-            uniReserves[p->number()-1].second.push_back(obj);
-        }
-        else if ( !res )
-            res = obj;
-        obj = nxt;
-    }
-    return res;
-}
-
-
-/**
- Release all Couples from the reserves
+ Move all Couples from the reserves to the list of unbound Couples
  */
 void CoupleSet::uniRelax()
 {

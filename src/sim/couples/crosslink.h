@@ -10,9 +10,9 @@ class CrosslinkProp;
 /**
  The Crosslink is a simpler kind of Couple, which does not support `trans_activated`
  
- It has a zero resting length, and uses it uses Meca::addLink()
+ It has a zero resting length, using Meca::addLink()
  
- CrosslinkLong has a non-zero resting length, and is selected automatically 
+ The related class CrosslinkLong with a non-zero resting length is selected automatically
  @ingroup CoupleGroup
  */
 class Crosslink : public Couple

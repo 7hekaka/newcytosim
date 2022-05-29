@@ -46,6 +46,30 @@ static inline void step_singles(Single * obj, bool odd)
 }
 
 /**
+ Transfer free Single with `fast_diffusion` to the reserves, starting from `obj`.
+ Return first Single that was not transferred
+*/
+template <void (Single::*FUNC)()>
+void SingleSet::step_collect(Single * obj)
+{
+    Single * nxt;
+    while ( obj )
+    {
+        nxt = obj->next();
+        SingleProp const* p = obj->prop;
+        if ( p->fast_diffusion )
+        {
+            fList.pop(obj);
+            uniReserves[p->number()-1].second.push_back(obj);
+        }
+        else
+            (obj->*FUNC)();
+        obj = nxt;
+    }
+}
+
+
+/**
 SingleSet::step() must call the appropriate Single::step() exactly once
 for each Single: either stepF() or stepAA().
 
@@ -67,17 +91,8 @@ void SingleSet::step()
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        Single * obj = uniCollect(fHead);
+        step_collect<&Single::stepF>(fHead);
         uniAttach(simul_.fibers);
-        // handle Single for which 'fast_diffusion = false':
-        {
-            while ( obj )
-            {
-                Single * nxt = obj->next();
-                obj->stepF();
-                obj = nxt;
-            }
-        }
     }
     else
     {
@@ -103,7 +118,7 @@ void SingleSet::stepSkipUnattached()
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        uniCollect(fHead);
+        step_collect<&Single::stepBlank>(fHead);
         uniAttach(simul_.fibers);
     }
 }
@@ -709,31 +724,6 @@ bool SingleSet::uniPrepare(PropertyList const& properties)
         }
     }
     
-    return res;
-}
-
-
-/**
- Transfer free Single with `fast_diffusion` to the reserves, starting from `obj`.
- Return first Single that was not transferred
-*/
-Single* SingleSet::uniCollect(Single * obj)
-{
-    Single * res = nullptr;
-    Single * nxt;
-    while ( obj )
-    {
-        nxt = obj->next();
-        SingleProp const* p = obj->prop;
-        if ( p->fast_diffusion )
-        {
-            fList.pop(obj);
-            uniReserves[p->number()-1].second.push_back(obj);
-        }
-        else if ( !res )
-            res = obj;
-        obj = nxt;
-    }
     return res;
 }
 

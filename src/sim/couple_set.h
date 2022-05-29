@@ -70,7 +70,7 @@ private:
     bool uniPrepare(PropertyList const& properties);
     
     /// gather all Couple with `fast_diffusion` in reserve lists
-    Couple* uniCollect(Couple*);
+    template <void (Couple::*FUNC)()> void step_collect(Couple*);
 
     /// ensures that `can` holds `cnt` Couple, creating them of specified CoupleProp
     void uniRefill(CoupleList& can, size_t cnt, CoupleProp const*);

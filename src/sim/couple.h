@@ -32,9 +32,11 @@ class Meca;
  .
  
  The default Couple has:
- - a zero resting length (it uses it uses Meca::addLink())
+ - a zero resting length, using Meca::addLink()
  - no specificity
  .
+
+ The related class CoupleLong with a non-zero resting length is selected automatically
 
  @ingroup CoupleGroup
  */
@@ -168,12 +170,15 @@ public:
     
     /// simulation step for a doubly-attached Couple
     virtual void stepAA();
-    
+
     /// simulate movement of Hand1, skipping attachment
     void stepHand1();
     
     /// simulate movement of Hand2, skipping attachment
     void stepHand2();
+    
+    /// this does nothing
+    void stepBlank() { }
 
     //--------------------------------------------------------------------------
 
