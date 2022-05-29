@@ -23,7 +23,7 @@ namespace gym
         M[ 0] = diag;
         M[ 5] = diag;
         M[10] = diag;
-        M[15] = diag;
+        M[15] = 1.0;
     }
 
     /// M <- Q

@@ -912,11 +912,11 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
             mouseDown = savedView.unproject(mouseX, mouseY, midZ);
             view.zoom_out(wZ);
             view.move_to((1-wZ)*mouseDown+wZ*view.focus);
+            postRedisplay();
         }
 
         glutSetCursor(GLUT_CURSOR_INHERIT);
         mouseAction = MOUSE_PASSIVE;
-        postRedisplay();
         return;
     }
 
@@ -1176,6 +1176,11 @@ void glApp::displayMain()
     
     if ( 0 == view.callDraw() )
     {
+#if 0
+        static double millsec = 0;
+        std::clog << "--- display " << TimeDate::milliseconds() - millsec << "\n";
+        millsec = TimeDate::milliseconds();
+#endif
         view.drawInteractiveFeatures();
         
         if ( mouseAction == MOUSE_MAGNIFIER )
