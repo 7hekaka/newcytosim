@@ -56,8 +56,6 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            fiber_grid.o point_grid.o locus_grid.o meca.o\
            simul_prop.o simul.o interface.o parser.o
 
-OBJ_CYTOREAD := sim_thread.o frame_reader.o
-
 OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
              $(OBJ_SINGLES) $(OBJ_COUPLES) $(OBJ_ORGANIZERS) $(OBJ_SIM)
 
@@ -65,6 +63,8 @@ OBJ_CYTOLIB1:=$(OBJ_CYTOLIB:%.o=build/%D1.o)
 OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=build/%D2.o)
 OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=build/%D3.o)
 
+# objects needed to load/run Cytosim
+OBJ_CYTOREAD := build/sim_thread.o build/frame_reader.o
 
 # objects containing graphical code under the DISPLAY keyword:
 OBJ_GRAFIX:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
@@ -168,7 +168,7 @@ $(OBJ_ORGANIZERS:%.o=build/%.o): build/%.o: %.cc %.h | build
 $(OBJ_SIM:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -c $< -o $@
 
-$(OBJ_CYTOREAD:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_CYTOREAD): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/singles -c $< -o $@
 
 #------------targets with 'DIM' defined in makefile-----------------------------
