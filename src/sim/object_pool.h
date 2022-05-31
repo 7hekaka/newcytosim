@@ -14,9 +14,9 @@ class Object;
  
  The ObjectPool holds pointers to the first and last elements of the list,
  and it keeps track of the number of objects linked.
- Functions are given to link and unlink Nodes in constant time.\n
+ Functions are given to link and unlink Objects in constant time.\n
  
- A function mix() randomize the order of the Nodes in the list, which is
+ A function mix() randomize the order of the Objects in the list, which is
  necessary in a simulation to avoid any bias which could derive from fixed ordering.
  
  The list is zero-terminated on both sides, and it can be traversed in either ways:
