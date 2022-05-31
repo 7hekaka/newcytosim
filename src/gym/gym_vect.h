@@ -3,6 +3,7 @@
 #ifndef GYM_VECT_H
 #define GYM_VECT_H
 
+#include "gym_cap.h"
 #include "gym_view.h"
 #include "vector1.h"
 #include "vector2.h"

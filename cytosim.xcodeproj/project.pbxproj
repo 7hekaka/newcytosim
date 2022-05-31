@@ -606,6 +606,8 @@
 		BB770C0612FF44D100D018A0 /* shackle_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB770C0212FF44D100D018A0 /* shackle_prop.h */; };
 		BB770C0712FF44D100D018A0 /* shackle.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB770C0312FF44D100D018A0 /* shackle.cc */; };
 		BB770C0812FF44D100D018A0 /* shackle.h in Headers */ = {isa = PBXBuildFile; fileRef = BB770C0412FF44D100D018A0 /* shackle.h */; };
+		BB77C9442846018D00A05C9D /* gym_cap.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB77C9422846018C00A05C9D /* gym_cap.cc */; };
+		BB77C9452846018D00A05C9D /* gym_cap.h in Headers */ = {isa = PBXBuildFile; fileRef = BB77C9432846018D00A05C9D /* gym_cap.h */; };
 		BB786AF20AF62C8B005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
 		BB786AF30AF62C90005AF9A2 /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BB786B1C0AF62D28005AF9A2 /* libcytospace.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE0993E0869D87F005FF210 /* libcytospace.a */; };
@@ -1753,6 +1755,8 @@
 		BB770C0212FF44D100D018A0 /* shackle_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shackle_prop.h; path = couples/shackle_prop.h; sourceTree = "<group>"; };
 		BB770C0312FF44D100D018A0 /* shackle.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shackle.cc; path = couples/shackle.cc; sourceTree = "<group>"; };
 		BB770C0412FF44D100D018A0 /* shackle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shackle.h; path = couples/shackle.h; sourceTree = "<group>"; };
+		BB77C9422846018C00A05C9D /* gym_cap.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_cap.cc; sourceTree = "<group>"; };
+		BB77C9432846018D00A05C9D /* gym_cap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_cap.h; sourceTree = "<group>"; };
 		BB77D6FB05F12F16001C0596 /* frametool.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = frametool.cc; path = src/tools/frametool.cc; sourceTree = SOURCE_ROOT; };
 		BB7B89A927C965C50094532C /* matrix33sym.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = matrix33sym.h; sourceTree = "<group>"; };
 		BB7C2B7F05F93FB9002C69A9 /* test_rasterizer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_rasterizer; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2311,30 +2315,32 @@
 				BB086447281D4CE8005A6D72 /* gle_color.cc */,
 				BB086455281D4CE8005A6D72 /* gle_color_list.h */,
 				BB08644E281D4CE8005A6D72 /* gle_color_list.cc */,
+				BB77C9432846018D00A05C9D /* gym_cap.h */,
+				BB77C9422846018C00A05C9D /* gym_cap.cc */,
+				BB086435281D4CE8005A6D72 /* gym_check.h */,
+				BB086433281D4CE8005A6D72 /* gym_check.cc */,
+				BB08642C281D4CE8005A6D72 /* gym_draw.h */,
+				BB086452281D4CE8005A6D72 /* gym_draw.cc */,
 				BB086458281D4CE8005A6D72 /* gym_flute.h */,
 				BB086429281D4CE8005A6D72 /* gym_flute.cc */,
 				BB086444281D4CE8005A6D72 /* gym_flute_dim.h */,
 				BB086438281D4CE8005A6D72 /* gym_flute_dim.cc */,
 				BB08643B281D4CE8005A6D72 /* gym_flat.h */,
 				BB086439281D4CE8005A6D72 /* gym_flat.cc */,
-				BB08643E281D4CE8005A6D72 /* gym_menu.h */,
-				BB08644C281D4CE8005A6D72 /* gym_menu.cc */,
-				BB086454281D4CE8005A6D72 /* gym_vect.h */,
-				BB086440281D4CE8005A6D72 /* gym_vect.cc */,
-				BB08645C281D4CE8005A6D72 /* gym_text.h */,
-				BB086445281D4CE8005A6D72 /* gym_text.cc */,
+				BB086427281D4CE8005A6D72 /* gym_image.h */,
+				BB08645D281D4CE8005A6D72 /* gym_image.cc */,
 				BB086449281D4CE8005A6D72 /* gym_matrix.h */,
 				BB086432281D4CE8005A6D72 /* gym_matrix.cc */,
+				BB08643E281D4CE8005A6D72 /* gym_menu.h */,
+				BB08644C281D4CE8005A6D72 /* gym_menu.cc */,
+				BB08645C281D4CE8005A6D72 /* gym_text.h */,
+				BB086445281D4CE8005A6D72 /* gym_text.cc */,
+				BB086454281D4CE8005A6D72 /* gym_vect.h */,
+				BB086440281D4CE8005A6D72 /* gym_vect.cc */,
 				BB08644A281D4CE8005A6D72 /* gym_view.h */,
 				BB08644B281D4CE8005A6D72 /* gym_view.cc */,
 				BB08644D281D4CE8005A6D72 /* gym_zoo.h */,
 				BB086436281D4CE8005A6D72 /* gym_zoo.cc */,
-				BB08642C281D4CE8005A6D72 /* gym_draw.h */,
-				BB086452281D4CE8005A6D72 /* gym_draw.cc */,
-				BB086427281D4CE8005A6D72 /* gym_image.h */,
-				BB08645D281D4CE8005A6D72 /* gym_image.cc */,
-				BB086435281D4CE8005A6D72 /* gym_check.h */,
-				BB086433281D4CE8005A6D72 /* gym_check.cc */,
 			);
 			name = gym;
 			path = src/gym;
@@ -3635,6 +3641,7 @@
 				BB08645E281D4CE9005A6D72 /* glut.h in Headers */,
 				BB086472281D4CE9005A6D72 /* gym_flat.h in Headers */,
 				BB086467281D4CE9005A6D72 /* opengl.h in Headers */,
+				BB77C9452846018D00A05C9D /* gym_cap.h in Headers */,
 				BB08645F281D4CE9005A6D72 /* gym_image.h in Headers */,
 				BB7B5A9C241A81BB0063F252 /* tesselator.h in Headers */,
 			);
@@ -4766,6 +4773,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB77C9442846018D00A05C9D /* gym_cap.cc in Sources */,
 				BB086483281D4CE9005A6D72 /* gym_menu.cc in Sources */,
 				BB08646D281D4CE9005A6D72 /* gym_zoo.cc in Sources */,
 				BB0864A3281D51DF005A6D72 /* display3.cc in Sources */,

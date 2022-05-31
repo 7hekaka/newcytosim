@@ -5,6 +5,7 @@ set(SOURCES_GYM
     gle.cc
     gym_text.cc
     gym_matrix.cc
+    gym_cap.cc
     gym_view.cc
     gym_vect.cc
     gym_draw.cc

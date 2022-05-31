@@ -11,6 +11,7 @@
 #include "gym_view.h"
 #include "gym_draw.h"
 #include "gym_text.h"
+#include "gym_cap.h"
 #include "fg_stroke.h"
 #include "time_date.h"
 

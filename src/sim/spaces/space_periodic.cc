@@ -124,6 +124,7 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 #include "gym_flute.h"
 #include "gym_draw.h"
 #include "gym_view.h"
+#include "gym_cap.h"
 
 // draw periodic edges of the box
 void SpacePeriodic::draw2D(float width) const

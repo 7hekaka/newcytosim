@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
+#include "gym_cap.h"
 #include "gym_view.h"
 #include "gym_draw.h"
 #include "gle_color.h"

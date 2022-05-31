@@ -8,6 +8,7 @@
 #include "gle_color_list.h"
 #include "gym_draw.h"
 #include "gym_view.h"
+#include "gym_cap.h"
 
 
 MultiMesh::MultiMesh()

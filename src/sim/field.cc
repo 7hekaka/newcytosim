@@ -485,6 +485,7 @@ void Field::step(FiberSet& fibers)
 #include "gle.h"
 #include "grid_display.h"
 #include "gym_view.h"
+#include "gym_cap.h"
 
 class FieldDisplayParameters
 {

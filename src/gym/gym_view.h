@@ -11,11 +11,8 @@ namespace gym
     /// current modelview matrix
     extern GLfloat mvp_[16];
     
-    /// modelview matrix of the current View
+    /// modelview matrix of the reference View
     extern GLfloat ref_[16];
-
-    /// flag for Lighting effects
-    extern GLboolean light_, alpha_;
     
 #pragma mark -
 
@@ -90,45 +87,6 @@ namespace gym
     void stretchAlignZX(float A, float B, float rad);
     /// translate by A; rotate to align X to Z, scale XY by rad and Z by B-A
     void stretchAlignZY(float A, float B, float rad);
-
-#pragma makr - deprecated features
-    
-    /// enable Lighting effects
-    inline void enableLighting() { light_ = glIsEnabled(GL_LIGHTING); glEnable(GL_LIGHTING); }
-    /// disable Lighting
-    inline void disableLighting() { light_ = glIsEnabled(GL_LIGHTING); glDisable(GL_LIGHTING); }
-    /// restore previous Lighting state
-    inline void restoreLighting() { if ( light_ ) glEnable(GL_LIGHTING); else glDisable(GL_LIGHTING);  }
-               
-    /// enable Lighting effects
-    inline void enableAlphaTest() { alpha_ = glIsEnabled(GL_ALPHA_TEST); glEnable(GL_ALPHA_TEST); }
-    /// disable Lighting
-    inline void disableAlphaTest() { alpha_ = glIsEnabled(GL_ALPHA_TEST); glDisable(GL_ALPHA_TEST); }
-    /// restore previous Lighting state
-    inline void restoreAlphaTest() { if ( alpha_ ) glEnable(GL_ALPHA_TEST); else glDisable(GL_ALPHA_TEST); }
-
-    /// enable Line Stipple
-    void enableLineStipple(short);
-    
-    /// disable Line Stipple
-    void disableLineStipple();
-    
-#pragma mark - Clip Planes
-    
-    /// enable
-    inline void enableClipPlane(unsigned i) { glEnable(GL_CLIP_PLANE0+i); }
-    
-    /// disable clip plane
-    inline void disableClipPlane(unsigned i) { glDisable(GL_CLIP_PLANE0+i); }
-
-    /// define cliping equation
-    void setClipPlane(unsigned, double, double, double, double);
-
-    inline void enableClipPlane(unsigned i, double X, double Y, double Z, double S)
-    {
-        setClipPlane(i, X, Y, Z, S);
-        enableClipPlane(i);
-    }
 
 }
 

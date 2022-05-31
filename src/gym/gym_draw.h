@@ -9,10 +9,6 @@
 
 namespace gym
 {
-    /// flag for Lighting effects
-    extern GLboolean depth_, cull_, blend_;
-
-    
     inline void drawPoints(float size, size_t off, size_t cnt)
     {
         glPointSize(size);
@@ -179,32 +175,6 @@ namespace gym
     inline void clearPixels(float R, float G, float B, float A) { glClearColor(R,G,B,A); clearPixels(); }
 
     inline void clearStencil(GLint x) { glClearStencil(x); glClear(GL_STENCIL_BUFFER_BIT); }
-
-    /// enable Blending effects
-    inline void enableBlending() { blend_ = glIsEnabled(GL_BLEND); glEnable(GL_BLEND); }
-    /// disable Blending
-    inline void disableBlending() { blend_ = glIsEnabled(GL_BLEND); glDisable(GL_BLEND); }
-    /// restore previous Blending state
-    inline void restoreBlending() { if ( blend_ ) glEnable(GL_BLEND); else glDisable(GL_BLEND); }
-
-    /// enable depth test
-    inline void enableDepthTest() { depth_ = glIsEnabled(GL_DEPTH_TEST); glEnable(GL_DEPTH_TEST); }
-    /// disable depth test
-    inline void disableDepthTest() { depth_ = glIsEnabled(GL_DEPTH_TEST); glDisable(GL_DEPTH_TEST); }
-    /// restore previous depth test state
-    inline void restoreDepthTest() { if ( depth_ ) glEnable(GL_DEPTH_TEST); else glDisable(GL_DEPTH_TEST); }
-    
-    inline void openDepthMask() { glDepthMask(GL_TRUE); }
-    inline void closeDepthMask() { glDepthMask(GL_FALSE); }
-    
-    /// enable  Cull Face
-    inline void enableCullFace(GLenum face) { cull_ = glIsEnabled(GL_CULL_FACE); glEnable(GL_CULL_FACE); glCullFace(face); }
-    /// disable  Cull Face
-    inline void disableCullFace() { cull_ = glIsEnabled(GL_CULL_FACE); glDisable(GL_CULL_FACE); }
-    /// restore previous Cull Face state
-    inline void restoreCullFace() { if ( cull_ ) glEnable(GL_CULL_FACE); else glDisable(GL_CULL_FACE); }
-    /// change Cull Face parameter
-    inline void switchCullFace(GLenum face) { glCullFace(face); }
 
     /// display back faces followed by front faces
     void dualPass(void primitive());

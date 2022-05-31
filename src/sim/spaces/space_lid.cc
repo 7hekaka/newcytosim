@@ -275,6 +275,7 @@ void SpaceLid::read(Inputter& in, Simul&, ObjectTag)
 #include "gym_flute.h"
 #include "gym_draw.h"
 #include "gym_view.h"
+#include "gym_cap.h"
 
 
 void SpaceLid::draw2D(float width) const

@@ -780,6 +780,7 @@ void PointGrid::setSterics(size_t pan1, size_t pan2) const
 
 #include "gym_view.h"
 #include "gym_draw.h"
+#include "gym_cap.h"
 
 void drawBoundaries(Map<DIM> const&, float);
 

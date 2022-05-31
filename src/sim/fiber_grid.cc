@@ -554,6 +554,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
 
 #include "gym_view.h"
 #include "gym_draw.h"
+#include "gym_cap.h"
 
 void drawBoundaries(Map<DIM> const&, float);
 
