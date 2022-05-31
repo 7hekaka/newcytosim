@@ -3,6 +3,8 @@
 #define SIM_THREAD_H
 
 #include <pthread.h>
+#include <csignal>
+
 #include "simul.h"
 #include "parser.h"
 #include "frame_reader.h"
