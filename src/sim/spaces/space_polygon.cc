@@ -309,7 +309,6 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 #include "gle.h"
 #include "gym_flute.h"
 #include "gym_draw.h"
-#include "gym_text.h"
 
 void SpacePolygon::drawPolygon(float lines, float points) const
 {
@@ -336,11 +335,12 @@ void SpacePolygon::drawPolygon(float lines, float points) const
 #if ( 0 )
         // indicate index of each point:
         char tmp[8];
-        float col[4] = { 1, 1, 0, 1 };
+        gym::color(1, 1, 0);
         for ( size_t n = 0; n < nbp; ++n )
         {
             snprintf(tmp, sizeof(tmp), "%lu", n);
-            gym::drawText(Vector(pts[n].xx, pts[n].yy, height_), BITMAP_9_BY_15, col, tmp);
+            gym::face_view(pts[n].xx, pts[n].yy, height_);
+            fgStrokeString(0, 0, pixelSize/10, 1, tmp, 1);
         }
 #endif
     }

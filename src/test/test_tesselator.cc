@@ -4,10 +4,12 @@
 #include "gle_color.h"
 #include "glut.h"
 #include "glapp.h"
+#include "gym_cap.h"
 #include "gym_check.h"
 #include "gym_flute.h"
-#include "gym_text.h"
 #include "gym_draw.h"
+#include "gym_view.h"
+#include "fg_stroke.h"
 #include "tesselator.h"
 #include <cstdio>
 
@@ -172,9 +174,11 @@ void drawEdges()
 #endif
 }
 
-void drawNames()
+void namePoints(float S)
 {
-    char str[128];
+    gym::disableAlphaTest();
+    gym::disableLighting();
+    char tmp[128];
     for ( unsigned i=0; i < ico->num_vertices(); ++i )
     {
         Tesselator::Vertex & dv = ico->vertex(i);
@@ -184,11 +188,15 @@ void drawNames()
         if ( dv.weight(1) == 0 )
             col[1] = 0;
         
-        const float* v = ico->vertex_data(i);
-        Vector3 pos(v[0], v[1], v[2]);
-        snprintf(str, sizeof(str), "%u", i);
-        gym::drawText(pos, BITMAP_8_BY_13, col, str, 0.5);
+        gym::color(col);
+        const float* ptr = ico->vertex_data(i);
+        snprintf(tmp, sizeof(tmp), "%u", i);
+        gym::face_view(ptr[0], ptr[1], ptr[2]);
+        fgStrokeString(0, 0, S, 1, tmp, 1);
     }
+    gym::restoreLighting();
+    gym::restoreAlphaTest();
+    gym::load_ref();
 }
 
 void drawPoints()
@@ -255,7 +263,8 @@ int display(View& view)
     if ( showNames )
     {
         glDisable(GL_LIGHTING);
-        drawNames();
+        gym::color(1, 1, 1);
+        namePoints(0.1*view.pixelSize());
     }
     view.closeDisplay();
     return 0;

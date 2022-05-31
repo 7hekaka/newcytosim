@@ -48,10 +48,10 @@ public:
     virtual void allocate(size_t alc) = 0;
         
     /// returns the address of element at (x, y), no allocation is done
-    virtual real*  addr(size_t x, size_t y) const = 0;
+    virtual real* addr(size_t x, size_t y) const = 0;
     
     /// returns the address of element at (x, y), allocating if necessary
-    virtual real&  operator()(size_t x, size_t y) = 0;
+    virtual real& operator()(size_t x, size_t y) = 0;
     
     /// returns the value of element at (x, y) or zero if not allocated
     real value(size_t x, size_t y) const;

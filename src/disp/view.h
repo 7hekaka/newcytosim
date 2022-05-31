@@ -3,6 +3,8 @@
 #define VIEW_H
 
 #include "opengl.h"
+#include "vector1.h"
+#include "vector2.h"
 #include "view_prop.h"
 
 
@@ -124,8 +126,11 @@ public:
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;
     
+    /// calculate projection of {X, Y, Z} onto screen
+    void project(float& H, float& V, const real XYZ[3]) const;
+
     /// transform window coordinates to 3D world-coordinates
-    Vector3 unproject(float x, float y, float z);
+    Vector3 unproject(float x, float y, float z) const;
 
     //---------------------------------------------------------------------------
     
@@ -253,13 +258,44 @@ public:
     
     /// display zoomed in regions around position (mX, mY)
     void drawMagnifier(float factor, Vector3 foc, Vector3 cen, int mX, int mY, int R) const;
+    
+    /// draw text for a brief moment near top-right corner
+    void flashText(std::string const& str);
 
     //---------------------------------------------------------------------------
-    
-    /// draw text
-    //void drawText(FontType, const float[4], std::string const& str, const float[4], int pos) const;
 
-    void flashText(std::string const& str);
+    /// Fonts inherited from GLUT
+    enum FontType
+    {
+        BITMAP_9_BY_15 = 2,
+        BITMAP_8_BY_13 = 3,
+        BITMAP_TIMES_ROMAN_10 = 4,
+        BITMAP_TIMES_ROMAN_24 = 5,
+        BITMAP_HELVETICA_10 = 6,
+        BITMAP_HELVETICA_12 = 7,
+        BITMAP_HELVETICA_18 = 8
+    };
+
+    /// set position of text in window
+    float textPosition(float&, float&, int width, int height, int line, int W, int H, const int position) const;
+
+    /// display text on a rectangle of color `bcol`, in a corner of the center of the display window
+    void placeText(int position, FontType, const float color[4], const char text[], const float back[4], int width, int height) const;
+    
+    /// draw `text` at position `pos`
+    void drawText(Vector3 const& pos, const float color[4], const char text[], float offset=0.5, FontType = BITMAP_9_BY_15) const;
+    
+    /// draw `text` at position `pos`
+    void drawText(Vector2 const& pos, const float color[4], const char text[], float offset=0.5, FontType font = BITMAP_9_BY_15) const
+    {
+        drawText(Vector3(pos.XX, pos.YY, 0), color, text, offset, font);
+    }
+    
+    /// draw `text` at position `pos`
+    void drawText(Vector1 const& pos, const float color[4], const char text[], float offset=0.5, FontType font = BITMAP_9_BY_15) const
+    {
+        drawText(Vector3(pos.XX, 0, 0), color, text, offset, font);
+    }
     
     /// display a scale bar vertical or horizontal
     void drawScaleHV(float, float, float, void (*func)(float*, int cnt, float, float, float)) const;

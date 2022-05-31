@@ -864,6 +864,7 @@ namespace gle
     }
 
     void tetrahedron() { doVNTriangles(cubes_[0], 12); }
+    void upsideTetra() { doVNTriangles(cubes_[1], 12); }
     void octahedron()  { doVNTriangles(cubes_[2], 24); }
     void icosahedron() { doVNTriangles(cubes_[3], 60); }
     

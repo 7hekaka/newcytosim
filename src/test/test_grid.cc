@@ -15,7 +15,6 @@
 #include "gym_flute.h"
 #include "gym_flute_dim.h"
 #include "gym_draw.h"
-#include "gym_text.h"
 
 #include "grid.h"
 #include "grid_display.h"
@@ -208,13 +207,12 @@ int display(View& view)
         char str[16];
         int * offset = nullptr;
         size_t nb = myGrid.getRegion(offset, cell_indx);
-
         for ( size_t j = 0; j < nb; ++j )
         {
             Vector x;
             myGrid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
             snprintf(str, sizeof(str), "%lu", j);
-            gym::drawText(x, BITMAP_HELVETICA_10, white, str);
+            view.drawText(x, white, str, 0);
         }
     }
     else

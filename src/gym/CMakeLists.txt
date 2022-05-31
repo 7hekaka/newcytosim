@@ -3,7 +3,6 @@ add_subdirectory("deps")
 
 set(SOURCES_GYM
     gle.cc
-    gym_text.cc
     gym_matrix.cc
     gym_cap.cc
     gym_view.cc

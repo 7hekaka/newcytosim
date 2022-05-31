@@ -11,6 +11,12 @@
 
 namespace gym
 {
+    /// translate by V and then scale by S
+    inline void translate(Vector1 const& V) { translate(V.XX, 0, 0); }
+    /// translate by V and then scale by S
+    inline void translate(Vector2 const& V) { translate(V.XX, V.YY, 0); }
+    /// translate by V and then scale by S
+    inline void translate(Vector3 const& V) { translate(V.XX, V.YY, V.ZZ); }
 
     /// translate by V and then scale by S
     inline void transScale(Vector1 const& V, float S) { transScale(V.XX, 0, 0, S); }

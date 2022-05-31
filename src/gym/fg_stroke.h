@@ -64,7 +64,7 @@ void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char charac
 * Draw a stroke string
 */
 void fgStrokeString(float x, float y, float S, int mono, const char *string,
-                    float line_width, float point_size, float vshift);
+                    float line_width, float point_size = 0, float vshift = 0.);
 
 /*
  * Return the width in pixels of a stroke character

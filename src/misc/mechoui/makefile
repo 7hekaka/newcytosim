@@ -72,7 +72,7 @@ $(OBJ_MECHOUI:%.o=build/%.o): build/%.o: %.cc
 build/SFMT.o: SFMT.c SFMT.h | build
 	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o $@
 
-build/mechdisp.a: $(addprefix build/, $(OBJ_GFX) build/view.o build/view_prop.o build/glapp.o) #save_image.o
+build/mechdisp.a: $(addprefix build/, $(OBJ_GFX) view.o view_prop.o glapp.o) #save_image.o
 	$(LIBTOOL) $@ $^
 vpath mechdisp.a build
 

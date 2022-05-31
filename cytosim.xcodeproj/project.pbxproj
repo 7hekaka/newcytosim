@@ -70,7 +70,6 @@
 		BB086477281D4CE9005A6D72 /* gym_vect.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086440281D4CE8005A6D72 /* gym_vect.cc */; };
 		BB08647A281D4CE9005A6D72 /* gle_color.h in Headers */ = {isa = PBXBuildFile; fileRef = BB086443281D4CE8005A6D72 /* gle_color.h */; };
 		BB08647B281D4CE9005A6D72 /* gym_flute_dim.h in Headers */ = {isa = PBXBuildFile; fileRef = BB086444281D4CE8005A6D72 /* gym_flute_dim.h */; };
-		BB08647C281D4CE9005A6D72 /* gym_text.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086445281D4CE8005A6D72 /* gym_text.cc */; };
 		BB08647D281D4CE9005A6D72 /* fg_stroke.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086446281D4CE8005A6D72 /* fg_stroke.cc */; settings = {COMPILER_FLAGS = "-Wno-zero-as-null-pointer-constant"; }; };
 		BB08647E281D4CE9005A6D72 /* gle_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086447281D4CE8005A6D72 /* gle_color.cc */; };
 		BB086480281D4CE9005A6D72 /* gym_matrix.h in Headers */ = {isa = PBXBuildFile; fileRef = BB086449281D4CE8005A6D72 /* gym_matrix.h */; };
@@ -87,7 +86,6 @@
 		BB08648E281D4CE9005A6D72 /* fg_font.h in Headers */ = {isa = PBXBuildFile; fileRef = BB086457281D4CE8005A6D72 /* fg_font.h */; };
 		BB08648F281D4CE9005A6D72 /* gym_flute.h in Headers */ = {isa = PBXBuildFile; fileRef = BB086458281D4CE8005A6D72 /* gym_flute.h */; };
 		BB086490281D4CE9005A6D72 /* fg_font.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086459281D4CE8005A6D72 /* fg_font.cc */; settings = {COMPILER_FLAGS = "-Wno-zero-as-null-pointer-constant"; }; };
-		BB086493281D4CE9005A6D72 /* gym_text.h in Headers */ = {isa = PBXBuildFile; fileRef = BB08645C281D4CE8005A6D72 /* gym_text.h */; };
 		BB086494281D4CE9005A6D72 /* gym_image.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB08645D281D4CE8005A6D72 /* gym_image.cc */; };
 		BB0864A2281D51DF005A6D72 /* display_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB086497281D51DE005A6D72 /* display_prop.h */; };
 		BB0864A3281D51DF005A6D72 /* display3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086498281D51DE005A6D72 /* display3.cc */; };
@@ -1458,7 +1456,6 @@
 		BB086441281D4CE8005A6D72 /* fg_font_data.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fg_font_data.cc; sourceTree = "<group>"; };
 		BB086443281D4CE8005A6D72 /* gle_color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gle_color.h; sourceTree = "<group>"; };
 		BB086444281D4CE8005A6D72 /* gym_flute_dim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_flute_dim.h; sourceTree = "<group>"; };
-		BB086445281D4CE8005A6D72 /* gym_text.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_text.cc; sourceTree = "<group>"; };
 		BB086446281D4CE8005A6D72 /* fg_stroke.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fg_stroke.cc; sourceTree = "<group>"; };
 		BB086447281D4CE8005A6D72 /* gle_color.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gle_color.cc; sourceTree = "<group>"; };
 		BB086448281D4CE8005A6D72 /* fg_stroke_roman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fg_stroke_roman.c; sourceTree = "<group>"; };
@@ -1479,7 +1476,6 @@
 		BB086458281D4CE8005A6D72 /* gym_flute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_flute.h; sourceTree = "<group>"; };
 		BB086459281D4CE8005A6D72 /* fg_font.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fg_font.cc; sourceTree = "<group>"; };
 		BB08645A281D4CE8005A6D72 /* fg_stroke_mono_roman.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fg_stroke_mono_roman.c; sourceTree = "<group>"; };
-		BB08645C281D4CE8005A6D72 /* gym_text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gym_text.h; sourceTree = "<group>"; };
 		BB08645D281D4CE8005A6D72 /* gym_image.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gym_image.cc; sourceTree = "<group>"; };
 		BB086497281D51DE005A6D72 /* display_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = display_prop.h; sourceTree = "<group>"; };
 		BB086498281D51DE005A6D72 /* display3.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = display3.cc; sourceTree = "<group>"; };
@@ -2333,8 +2329,6 @@
 				BB086432281D4CE8005A6D72 /* gym_matrix.cc */,
 				BB08643E281D4CE8005A6D72 /* gym_menu.h */,
 				BB08644C281D4CE8005A6D72 /* gym_menu.cc */,
-				BB08645C281D4CE8005A6D72 /* gym_text.h */,
-				BB086445281D4CE8005A6D72 /* gym_text.cc */,
 				BB086454281D4CE8005A6D72 /* gym_vect.h */,
 				BB086440281D4CE8005A6D72 /* gym_vect.cc */,
 				BB08644A281D4CE8005A6D72 /* gym_view.h */,
@@ -3635,7 +3629,6 @@
 				BB08647A281D4CE9005A6D72 /* gle_color.h in Headers */,
 				BB086476281D4CE9005A6D72 /* offscreen.h in Headers */,
 				BB086465281D4CE9005A6D72 /* glapp.h in Headers */,
-				BB086493281D4CE9005A6D72 /* gym_text.h in Headers */,
 				BB08648F281D4CE9005A6D72 /* gym_flute.h in Headers */,
 				BB086464281D4CE9005A6D72 /* gym_draw.h in Headers */,
 				BB08645E281D4CE9005A6D72 /* glut.h in Headers */,
@@ -4779,7 +4772,6 @@
 				BB0864A3281D51DF005A6D72 /* display3.cc in Sources */,
 				BBCE25E5281E74BF004F6955 /* miniz.c in Sources */,
 				BB109D3723D0788200805F16 /* point_disp.cc in Sources */,
-				BB08647C281D4CE9005A6D72 /* gym_text.cc in Sources */,
 				BB0864A5281D51DF005A6D72 /* display1.cc in Sources */,
 				BB086469281D4CE9005A6D72 /* gym_matrix.cc in Sources */,
 				BB086482281D4CE9005A6D72 /* gym_view.cc in Sources */,

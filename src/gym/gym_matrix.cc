@@ -176,6 +176,22 @@ void gym::mat_transscale(float M[16], float X, float Y, float Z, float S)
     }
 }
 
+/** This works if the scaling is isotropic */
+void gym::mat_unrotate(float T[16], const float M[16])
+{
+    float X = M[0] * M[0] + M[1] * M[1] + M[2] * M[2];
+    float Y = M[4] * M[4] + M[5] * M[5] + M[6] * M[6];
+    float Z = M[8] * M[8] + M[9] * M[9] + M[10] * M[10];
+    float S = sqrtf(( X + Y + Z ) / 3.0);
+    X = M[12];
+    Y = M[13];
+    Z = M[14];
+    mat_diagonal(T, S);
+    T[12] = X;
+    T[13] = Y;
+    T[14] = Z;
+}
+
 
 int gym::mat4x4_inverse(float T[16], const float M[16])
 {

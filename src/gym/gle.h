@@ -95,6 +95,8 @@ namespace gle
 
     /// draw a tetrahedron of radius 1
     void tetrahedron();
+    /// upside-down tetrahedron of radius 1
+    void upsideTetra();
     /// draw a octahedron of radius 1
     void octahedron();
     /// draw a icosahedron of radius 1

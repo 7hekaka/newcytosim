@@ -21,7 +21,7 @@
 #include "gym_flute.h"
 #include "gym_flute_dim.h"
 #include "gym_check.h"
-#include "gym_text.h"
+#include "fg_stroke.h"
 
 #include "glapp.h"
 
@@ -55,6 +55,19 @@ void Display::setPixelFactors(float ps, float uv)
 
 Display::~Display()
 {
+}
+
+
+void Display::drawText(Vector const& vec, const char str[]) const
+{
+#if ( DIM == 3 )
+    gym::face_view(vec.XX, vec.YY, vec.ZZ);
+#elif ( DIM == 2 )
+    gym::face_view(vec.XX, vec.YY, 0.f);
+#else
+    gym::face_view(vec.XX, 0.f, 0.f);
+#endif
+    fgStrokeString(0, 0, pixelSize/10, 1, str, 1);
 }
 
 //------------------------------------------------------------------------------
@@ -1231,10 +1244,12 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
 
 void Display::drawFiberLabels(Fiber const& fib, int style, gle_color const& col) const
 {
-    FontType font = BITMAP_HELVETICA_10;
     char str[32];
     
+    gym::ref_view();
+    gym::color(col);
     gym::disableLighting();
+    gym::disableAlphaTest();
     if ( style & 1 )
     {
         // draw fiber identity and vertex indices
@@ -1242,7 +1257,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, gle_color const& col)
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%lu", i);
-            gym::drawText(fib.posP(i), font, col, str);
+            drawText(fib.posP(i), str);
         }
     } 
     else if ( style & 2 )
@@ -1252,25 +1267,25 @@ void Display::drawFiberLabels(Fiber const& fib, int style, gle_color const& col)
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
-            gym::drawText(fib.posP(i), font, col, str);
+            drawText(fib.posP(i), str);
         }
     }
     if ( style & 4 )
     {
         // display integral abscissa along the fiber
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
-        gym::drawText(fib.posEndM(), font, col, str);
+        drawText(fib.posEndM(), str);
         
         int s = (int)std::ceil(fib.abscissaM());
         int e = (int)std::floor(fib.abscissaP());
         for ( int a = s; a <= e; ++a )
         {
             snprintf(str, sizeof(str), "%i", a);
-            gym::drawText(fib.pos(a), font, col, str);
+            drawText(fib.pos(a), str);
         }
         
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
-        gym::drawText(fib.posEndP(), font, col, str);
+        drawText(fib.posEndP(), str);
     }
     if ( style & 8 )
     {
@@ -1280,10 +1295,11 @@ void Display::drawFiberLabels(Fiber const& fib, int style, gle_color const& col)
         {
             Vector b = fib.posP(i);
             snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
-            gym::drawText(0.5*(a+b), font, col, str, 0.5);
+            drawText(0.5*(a+b), str);
             a = b;
         }
     }
+    gym::restoreAlphaTest();
     CHECK_GL_ERROR("in Display::drawFiberLabels()");
 }
 
@@ -1755,7 +1771,8 @@ void Display::drawSolid(Solid const& obj)
     {
         char tmp[8];
         snprintf(tmp, sizeof(tmp), "%u", obj.identity());
-        gym::drawText(obj.posP(0), BITMAP_HELVETICA_10, bodyColorF(obj), tmp);
+        gym::color(bodyColorF(obj));
+        drawText(obj.posP(0), tmp);
     }
     
     //draw polygon around vertices of Solid

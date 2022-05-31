@@ -5,7 +5,7 @@
 #include "offscreen.h"
 #include "glossary.h"
 #include "gle.h"
-#include "gym_text.h"
+#include "fg_stroke.h"
 #include "gym_check.h"
 #include "gym_view.h"
 #include "gym_draw.h"
@@ -113,9 +113,10 @@ void PointDisp::strokeA(float w) const
             /* Character C of width ~104.76 units, and ~150 unit high max
              The translation brings it near the center. */
             const float G = 0.0125;
-            const float x = -52.35 * G;
-            const float y = ( islower(symbol) ? -35 : -50 ) * G;
-            gym::strokeCharacter(x, y, G, 1, colorS, symbol, w);
+            const float X = -52.35 * G;
+            const float Y = ( islower(symbol) ? -35 : -50 ) * G;
+            gym::color(colorS);
+            fgStrokeCharacter(X, Y, G, 1, symbol, w, w);
         }
     }
 }

@@ -49,6 +49,12 @@ namespace gym
     
     /// make one-to-one correspondance between pixel and model coordinates
     void one_view(int W, int H);
+    
+    /// keep scale and translation, but remove rotation component
+    inline void cancel_rotation() { gym::mat_unrotate(mvp_, mvp_); load(); }
+    
+    /// translate to {x, y, z}, keep scale and translation, but remove rotation component
+    inline void face_view(float x, float y, float z) { pull_ref(); gym::mat_translate(mvp_, x, y, z); cancel_rotation(); }
 
 #pragma mark - Modifying the current view
 
@@ -83,8 +89,10 @@ namespace gym
 
     /// translate by pos; rotate to align X to Z, scale by rad in Z and trans in the other directions
     void transAlignZX(float pos, float rad, float trans);
+    
     /// translate by A; rotate to align X to Z, scale XY by rad and Z by B-A
     void stretchAlignZX(float A, float B, float rad);
+    
     /// translate by A; rotate to align X to Z, scale XY by rad and Z by B-A
     void stretchAlignZY(float A, float B, float rad);
 

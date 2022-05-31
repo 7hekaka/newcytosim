@@ -9,7 +9,9 @@
 #include "gle.h"
 #include "gym_flute.h"
 #include "gym_draw.h"
-#include "gym_text.h"
+#include "gym_view.h"
+#include "gym_cap.h"
+#include "fg_stroke.h"
 
 
 SphericalCode S, T;
@@ -104,26 +106,34 @@ void processNormalKey(unsigned char c, int x, int y)
 }
 
 //------------------------------------------------------------------------------
-void drawVertices(const float col[4])
+void drawVertices()
 {
     size_t cnt = front->nbPoints();
-    flute8* flu = gym::mapBufferC4V4(4*front->nbPoints());
+    flute3* flu = gym::mapBufferV3(4*front->nbPoints());
     for ( size_t i = 0; i < cnt; ++i )
-        flu[i] = { col, Vector3(front->addr(i)) };
-    gym::unmapBufferC4V4();
+    {
+        real const* ptr = front->addr(i);
+        flu[i] = { ptr[0], ptr[1], ptr[2] };
+    }
+    gym::unmapBufferV3();
     gym::drawPoints(5, 0, cnt);
 }
 
-void nameVertices(const float col[4])
+void nameVertices(float S)
 {
+    gym::disableAlphaTest();
+    gym::disableLighting();
     char tmp[128];
     for ( size_t i=0; i < front->nbPoints(); ++i )
     {
-        real x, y, z;
-        front->putPoint(&x, &y, &z, i);
         snprintf(tmp, sizeof(tmp), "%lu", i);
-        gym::drawText(Vector3(x, y, z), BITMAP_8_BY_13, col, tmp, 0.5);
+        real const* ptr = front->addr(i);
+        gym::face_view(ptr[0], ptr[1], ptr[2]);
+        fgStrokeString(0, 0, S, 1, tmp, 1);
     }
+    gym::restoreLighting();
+    gym::restoreAlphaTest();
+    gym::load_ref();
 }
 
 void drawTangents(const float col[4], const float lor[4])
@@ -153,8 +163,9 @@ int display(View& view)
     
     if ( front == &T )
         col[1] = 0.5f;
-    drawVertices(col);
-    nameVertices(col);
+    gym::color(col);
+    drawVertices();
+    nameVertices(0.1*view.pixelSize());
     drawTangents(col, lor);
     view.closeDisplay();
     return 0;

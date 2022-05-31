@@ -10,8 +10,9 @@
 #include "gym_matrix.h"
 #include "gym_view.h"
 #include "gym_draw.h"
-#include "gym_text.h"
 #include "gym_cap.h"
+#include "gym_vect.h"
+#include "fg_font.h"
 #include "fg_stroke.h"
 #include "time_date.h"
 
@@ -185,6 +186,9 @@ void View::closeDisplay() const
 #endif
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Text
+
 
 void View::strokeString(const char str[], float width) const
 {
@@ -194,6 +198,113 @@ void View::strokeString(const char str[], float width) const
     loadView();
 }
 
+
+/// width = text_width; height = text_heigth, (W, H) = window_size
+float View::textPosition(float& px, float& py, int width, int height, int lines,
+                        int W, int H, const int position) const
+{
+    assert_true( W > 0 );
+    assert_true( H > 0 );
+    
+    switch( position )
+    {
+        case 0:
+            //bottom-left, text going up
+            px = height/2;
+            py = height/2;
+            return height;
+        case 1:
+            //bottom-right, text going up
+            px = W - width - height/2;
+            if ( px < 0 ) px = 0;
+            py = height/2;
+            return height;
+        case 2:
+            //top-right, text going down
+            px = W - width - height/2;
+            if ( px < 0 ) px = 0;
+            py = H - height;
+            return -height;
+        default:
+        case 3:
+            //top-left, text going down
+            px = height/2;
+            py = H - height;
+            return -height;
+        case 4:
+            //center, text going down
+            px = ( W - width ) / 2;
+            if ( px < 0 ) px = 0;
+            py = ( H + lines*height ) / 2;
+            return -height;
+    }
+    return height;
+}
+
+    
+/**
+ The text is displayed in the current color.
+ A background rectangle is displayed only if `bcol` is visible.
+ 
+ Possible values for `position`:
+ - 0: bottom-left, text going up
+ - 1: bottom-right, text going up
+ - 2: top-right, text going down
+ - 3: top-left, text going down
+ - 4: center, text going down
+ .
+ 
+ Note: width and height are the current size of the viewport (window)
+ */
+void View::placeText(int position, FontType font, const float color[4],
+                    const char text[], const float back[4], int W, int H) const
+{
+    int lines = 1;
+    int height = fgFontHeight(font);
+    int width = fgTextWidth(font, text, lines);
+    
+    float X, Y;
+    float vshift = textPosition(X, Y, width, height, lines, W, H, position);
+    
+    if ( back && back[3] > 0 )
+    {
+        float E = height;
+        float T = Y + lines * vshift;
+        float B = std::min(Y, T) - E/4;
+        T = std::max(Y, T) + E + E/4;
+        float R = X + width + E;
+        gym::paintOctagon(X-E, B, R, T, back, 5);
+        if ( position == 4 )
+            gym::drawOctagon(X-E, B, R, T, color, 5, 1);
+    }
+    
+    fgBitmapString(X, Y, 1.f, font, color, text, vshift);
+}
+
+/**
+ draw text at position `vec`
+ */
+void View::drawText(Vector3 const& vec, const float color[4], const char text[], const float offset, FontType font) const
+{
+    gym::disableDepthTest();
+    gym::disableAlphaTest();
+    gym::disableLighting();
+    gym::face_view(vec.XX, vec.YY, vec.ZZ);
+#if 0
+    int H = fgFontHeight(font);
+    int L, W = fgTextWidth(font, text, L);
+    fgBitmapString(-W*offset, -H/3, pixelSize(), font, color, text, H);
+#else
+    gym::color(color);
+    fgStrokeString(0, 0, 0.1*pixelSize(), 1, text, 1);
+#endif
+    gym::restoreLighting();
+    gym::restoreAlphaTest();
+    gym::restoreDepthTest();
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 // display FPS = frames per seconds
 void View::drawFPS() const
@@ -235,23 +346,23 @@ void View::drawInteractiveFeatures() const
     {
         float white[4] = {1,1,1,1};
         float black[4] = {0,0,0,0.9};
-        gym::placeText(4, BITMAP_8_BY_13, white, memo.c_str(), black, W, H);
+        placeText(4, BITMAP_8_BY_13, white, memo.c_str(), black, W, H);
     }
 
     if ( top_message.size() )
     {
-        gym::placeText(3, BITMAP_9_BY_15, front_color, top_message.c_str(), nullptr, W, H);
+        placeText(3, BITMAP_9_BY_15, front_color, top_message.c_str(), nullptr, W, H);
     }
     
     if ( label != "off" )
     {
-        gym::placeText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
+        placeText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
     }
     
     if ( flash.size() )
     {
         float yellow[4] = { 0.6f, 0.6f, 1.f, 1.f };
-        gym::placeText(2, BITMAP_9_BY_15, yellow, flash.c_str(), nullptr, W, H);
+        placeText(2, BITMAP_9_BY_15, yellow, flash.c_str(), nullptr, W, H);
         if ( TimeDate::seconds_since_1970() > flash_end )
             flash = "";
     }
@@ -609,10 +720,20 @@ Vector3 View::depthAxis() const
 }
 
 
+void View::project(float& H, float& V, const real XYZ[3]) const
+{
+    float vec[4] = { float(XYZ[0]), float(XYZ[1]), float(XYZ[2]), 1.0f };
+    float out[4] = { 0 };
+    gym::mat_mulvec(out, modelview_, vec);
+    gym::mat_mulvec(vec, projection_, out);
+    H = vec[0];
+    V = vec[1];
+}
+
 /**
  Transforms the given window coordinates into user coordinates.
  */
-Vector3 View::unproject(float x, float y, float z)
+Vector3 View::unproject(float x, float y, float z) const
 {
     float un[4] = { 0 };
     gym::unproject(x, y, z, modelview_, projection_, viewport_, un);
@@ -820,8 +941,7 @@ void View::drawScaleHV(float s, float a, float b, void (*func)(float*, int cnt, 
             gym::unmapBufferV2();
             gym::drawLines(W, 2, 36);
             snprintf(str, sizeof(str), "%g", s);
-            fgStrokeString(s-Z, b+s+Z, Z*0.01, 1, str, 1, 1, 0);
-            //gym::drawText(Vector2(s-Z, b+2*Z), BITMAP_HELVETICA_12, col, str);
+            fgStrokeString(s-Z, b+s+Z, Z*0.01, 1, str, 1);
         }
     } while ( W >= 0.5 );
 }

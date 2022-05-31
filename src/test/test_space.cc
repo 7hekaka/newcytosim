@@ -23,6 +23,7 @@
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_check.h"
+#include "gym_cap.h"
 
 // List of options
 Glossary opt;
