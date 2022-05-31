@@ -5,10 +5,10 @@
 #include <unistd.h>
 #include <signal.h>
 
+#include "vector.h"
 #include "sim_thread.h"
 #include "exceptions.h"
 #include "print_color.h"
-#include "picket.h"
 
 //------------------------------------------------------------------------------
 
@@ -311,7 +311,7 @@ int SimThread::loadLastFrame()
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Mouse-controlled Single
+#pragma mark - User-controlled Single
 
 
 SingleProp * SimThread::getHandleProperty() const
@@ -334,6 +334,7 @@ SingleProp * SimThread::makeHandleProperty(real range)
 
     SingleProp * sip = new SingleProp("user_single");
     sip->hand = "user_hand";
+    sip->activity = "fixed";
     sip->stiffness = 2000;
     sip->complete(*sim_);
     sim_->properties.deposit(sip);
@@ -342,15 +343,15 @@ SingleProp * SimThread::makeHandleProperty(real range)
 }
 
 
-Single * SimThread::createHandle(Vector const& pos, real range)
+Single * SimThread::createHandle(Vector3 const& pos3, real range)
 {
     SingleProp * sip = getHandleProperty();
     if ( !sip )
         sip = makeHandleProperty(range);
-    Single * res = new Picket(sip, pos);
-    sim_->singles.add(res);
-    handle_ = res;
-    return res;
+    handle_ = sip->newSingle();
+    handle_->translate(Vector(pos3));
+    sim_->singles.add(handle_);
+    return handle_;
 }
 
 
@@ -360,13 +361,14 @@ ObjectList SimThread::allHandles(SingleProp const* sip) const
 }
 
 
-bool SimThread::selectClosestHandle(Vector const& pos, real range)
+bool SimThread::selectClosestHandle(Vector3 const& pos3, real range)
 {
     SingleProp * sip = getHandleProperty();
     
     if ( sip )
     {
         real dsm = 0;
+        Vector pos(pos3);
         Single * res = nullptr;
         for ( Object * i : allHandles(sip) )
         {
@@ -411,20 +413,20 @@ void SimThread::detachHandle()
     }
 }
 
-void SimThread::moveHandle(Vector const& pos)
+void SimThread::moveHandle(Vector3 const& vec)
 {
     if ( handle_ )
     {
-        handle_->setPosition(pos);
+        handle_->setPosition(Vector(vec));
     }
 }
 
 
-void SimThread::moveHandles(Vector const& vec)
+void SimThread::moveHandles(Vector3 const& vec)
 {
     SingleProp * sip = getHandleProperty();
     if ( sip )
-        ObjectSet::translateObjects(allHandles(sip), vec);
+        ObjectSet::translateObjects(allHandles(sip), Vector(vec));
 }
 
 

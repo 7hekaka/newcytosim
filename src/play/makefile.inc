@@ -21,7 +21,7 @@ build/player.o: $(FILES_PLAYER) | build
 $(OBJ_PLAY:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(PLAY_INC) -c $< -o $@
 
-play: play.cc build/player.o $(OBJ_CYTOREAD) $(OBJ_PLAY) cytolibG.a cytomath.a $(LIB_PLAYER) | bin
+play: play.cc build/player.o $(OBJ_PLAY) cytolibG.a cytomath.a $(LIB_PLAYER) | bin
 	$(COMPILE) $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin/play
 	$(DONE)
 vpath play bin
@@ -34,10 +34,9 @@ build/playerD1.o: $(FILES_PLAYER) | build
 $(OBJ_PLAY1D): build/%D1.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=1 $(PLAY_INC) -c $< -o $@
 
-bin1/play: play.cc build/playerD1.o $(OBJ_CYTOREAD) $(OBJ_PLAY1D) cytolibGD1.a cytomathD1.a $(LIB_PLAYER) | bin1
+bin1/play: play.cc build/playerD1.o $(OBJ_PLAY1D) cytolibGD1.a cytomathD1.a $(LIB_PLAYER) | bin1
 	$(COMPILE) -DDIM=1 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin1/play
 	$(DONE)
-vpath bin1/play bin1
 
 ################################ objects with DIM = 2:
 
@@ -47,10 +46,9 @@ build/playerD2.o: $(FILES_PLAYER) | build
 $(OBJ_PLAY2D): build/%D2.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=2 $(PLAY_INC) -c $< -o $@
 
-bin2/play: play.cc build/playerD2.o $(OBJ_CYTOREAD) $(OBJ_PLAY2D) cytolibGD2.a cytomathD2.a $(LIB_PLAYER) | bin2
+bin2/play: play.cc build/playerD2.o $(OBJ_PLAY2D) cytolibGD2.a cytomathD2.a $(LIB_PLAYER) | bin2
 	$(COMPILE) -DDIM=2 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin2/play
 	$(DONE)
-vpath bin2/play bin2
 
 ################################ objects with DIM = 3:
 
@@ -60,10 +58,9 @@ build/playerD3.o: $(FILES_PLAYER) | build
 $(OBJ_PLAY3D): build/%D3.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=3 $(PLAY_INC) -c $< -o $@
 
-bin3/play: play.cc build/playerD3.o $(OBJ_CYTOREAD) $(OBJ_PLAY3D) cytolibGD3.a cytomathD3.a $(LIB_PLAYER) | bin3
+bin3/play: play.cc build/playerD3.o $(OBJ_PLAY3D) cytolibGD3.a cytomathD3.a $(LIB_PLAYER) | bin3
 	$(COMPILE) -DDIM=3 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin3/play
 	$(DONE)
-vpath bin3/play bin3
 
 ################################ multiplay
 
@@ -75,7 +72,7 @@ else
     LIB_GLFW := -lglfw
 endif
 
-multiplay: src/play/multiplay.cc $(OBJ_CYTOREAD) $(OBJ_PLAY:%.o=build/%.o) cytolibG.a $(LIB_PLAYER) cytomath.a | bin
+multiplay: src/play/multiplay.cc $(OBJ_PLAY:%.o=build/%.o) cytolibG.a $(LIB_PLAYER) cytomath.a | bin
 	$(COMPILE) $(INFO) $(INC_GLFW) $(OBJECTS) $(LIB_GLFW) $(LINK) $(GRAFIX) $(IMAGES) -o bin/multiplay
 	$(DONE)
 vpath multiplay bin

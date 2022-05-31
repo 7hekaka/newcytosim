@@ -216,19 +216,19 @@ public:
     Single const* handle() const;
 
     /// make a new Single that can be controlled by the user
-    Single * createHandle(Vector const&, real range);
+    Single * createHandle(Vector3 const&, real range);
     
     /// switch current handle
-    bool selectClosestHandle(Vector const&, real range);
+    bool selectClosestHandle(Vector3 const&, real range);
     
     /// detach current handle
     void detachHandle();
     
     /// move the current handle
-    void moveHandle(Vector const&);
+    void moveHandle(Vector3 const&);
     
     /// move all handles
-    void moveHandles(Vector const&);
+    void moveHandles(Vector3 const&);
     
     /// delete all handles
     void deleteHandles();

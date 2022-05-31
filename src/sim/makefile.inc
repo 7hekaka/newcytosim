@@ -10,42 +10,42 @@ OBJ_SPACE := space.o space_prop.o space_square.o space_sphere.o space_disc.o\
              space_dynamic_prop.o space_dynamic_sphere.o space_dynamic_ellipse.o\
              space_dynamic_disc.o space_set.o
 
-OBJ_HANDS := hand.o hand_prop.o hand_monitor.o hand_list.o\
-             motor.o motor_prop.o\
-             slider.o slider_prop.o\
-             actor.o actor_prop.o\
-             nucleator.o nucleator_prop.o\
-             tracker.o tracker_prop.o\
-             cutter.o cutter_prop.o\
-             chewer.o chewer_prop.o\
-             rescuer.o rescuer_prop.o\
-             regulator.o regulator_prop.o\
-             mighty.o mighty_prop.o
+OBJ_HAND := hand.o hand_prop.o hand_monitor.o hand_list.o\
+            motor.o motor_prop.o\
+            slider.o slider_prop.o\
+            actor.o actor_prop.o\
+            nucleator.o nucleator_prop.o\
+            tracker.o tracker_prop.o\
+            cutter.o cutter_prop.o\
+            chewer.o chewer_prop.o\
+            rescuer.o rescuer_prop.o\
+            regulator.o regulator_prop.o\
+            mighty.o mighty_prop.o
 
-OBJ_DIGITS := digit.o digit_prop.o\
-              walker.o walker_prop.o\
-              myosin.o myosin_prop.o\
-              dynein.o dynein_prop.o\
-              kinesin.o kinesin_prop.o
+OBJ_DIGIT := digit.o digit_prop.o\
+             walker.o walker_prop.o\
+             myosin.o myosin_prop.o\
+             dynein.o dynein_prop.o\
+             kinesin.o kinesin_prop.o
 
-OBJ_SINGLES := single.o single_prop.o single_set.o\
-               picket.o picket_long.o wrist.o wrist_long.o
+OBJ_SINGLE := single.o single_prop.o single_set.o\
+              picket.o picket_long.o wrist.o wrist_long.o
 
-OBJ_COUPLES := couple.o couple_prop.o couple_long.o couple_set.o\
-               crosslink.o crosslink_long.o crosslink_prop.o\
-               bridge.o bridge_prop.o fork.o fork_prop.o\
-               duo.o duo_long.o duo_prop.o\
-               shackle.o shackle_long.o shackle_prop.o\
+OBJ_COUPLE := couple.o couple_prop.o couple_long.o couple_set.o\
+              crosslink.o crosslink_long.o crosslink_prop.o\
+              bridge.o bridge_prop.o fork.o fork_prop.o\
+              duo.o duo_long.o duo_prop.o\
+              shackle.o shackle_long.o shackle_prop.o\
          
-OBJ_FIBERS := chain.o mecafil.o fiber.o fiber_prop.o\
-              fiber_segment.o fiber_site.o lattice.o\
-              dynamic_fiber.o dynamic_fiber_prop.o\
-              classic_fiber.o classic_fiber_prop.o\
-              treadmilling_fiber.o treadmilling_fiber_prop.o\
-              growing_fiber.o growing_fiber_prop.o fiber_set.o
+OBJ_FIBER := chain.o mecafil.o fiber.o fiber_prop.o\
+             fiber_segment.o fiber_site.o lattice.o\
+             dynamic_fiber.o dynamic_fiber_prop.o\
+             classic_fiber.o classic_fiber_prop.o\
+             treadmilling_fiber.o treadmilling_fiber_prop.o\
+             growing_fiber.o growing_fiber_prop.o fiber_set.o
 
-OBJ_ORGANIZERS := organizer.o aster.o aster_prop.o nucleus.o nucleus_prop.o\
-                  fake.o fake_prop.o bundle.o bundle_prop.o organizer_set.o
+OBJ_ASTER := organizer.o aster.o aster_prop.o nucleus.o nucleus_prop.o\
+             fake.o fake_prop.o bundle.o bundle_prop.o organizer_set.o
 
 OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            sphere_prop.o sphere.o sphere_set.o\
@@ -56,15 +56,15 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            fiber_grid.o point_grid.o locus_grid.o meca.o\
            simul_prop.o simul.o interface.o parser.o
 
-OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HANDS) $(OBJ_DIGITS) $(OBJ_FIBERS)\
-             $(OBJ_SINGLES) $(OBJ_COUPLES) $(OBJ_ORGANIZERS) $(OBJ_SIM)
+# objects needed to load/run Cytosim
+OBJ_RUN := sim_thread.o frame_reader.o
+
+OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HAND) $(OBJ_DIGIT) $(OBJ_FIBER)\
+             $(OBJ_SINGLE) $(OBJ_COUPLE) $(OBJ_ASTER) $(OBJ_SIM) $(OBJ_RUN)
 
 OBJ_CYTOLIB1:=$(OBJ_CYTOLIB:%.o=build/%D1.o)
 OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=build/%D2.o)
 OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=build/%D3.o)
-
-# objects needed to load/run Cytosim
-OBJ_CYTOREAD := build/sim_thread.o build/frame_reader.o
 
 # objects containing graphical code under the DISPLAY keyword:
 OBJ_GRAFIX:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
@@ -147,29 +147,29 @@ INC_BMS=$(addprefix -Isrc/, base math sim)
 $(OBJ_SPACE:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/spaces -c $< -o $@
 
-$(OBJ_HANDS:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_HAND:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o $@
 
-$(OBJ_DIGITS:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_DIGIT:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/hands -c $< -o $@
 
-$(OBJ_FIBERS:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_FIBER:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/fibers -c $< -o $@
 
-$(OBJ_SINGLES:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_SINGLE:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/singles -c $< -o $@
 
-$(OBJ_COUPLES:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_COUPLE:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/couples -c $< -o $@
 
-$(OBJ_ORGANIZERS:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_ASTER:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -Isrc/sim/organizers -c $< -o $@
 
 $(OBJ_SIM:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -c $< -o $@
 
-$(OBJ_CYTOREAD): build/%.o: %.cc %.h | build
-	$(COMPILE) $(INC_BMS) -Isrc/sim/singles -c $< -o $@
+$(OBJ_RUN:%.o=build/%.o): build/%.o: %.cc %.h | build
+	$(COMPILE) $(INC_BMS) -c $< -o $@
 
 #------------targets with 'DIM' defined in makefile-----------------------------
 

@@ -3,12 +3,11 @@
 /**
  Callback for mouse clicks
  */
-void processMouseClick(int, int, const Vector3& pos3, int)
+void processMouseClick(int, int, const Vector3& pos, int)
 {
     // distance in pixels where mouse-Hand binds:
     const real pixrad = 6;
     const real range = pixrad * glApp::currentView().pixelSize();
-    Vector pos(pos3);
 
     worker.lock();
     if ( worker.selectClosestHandle(pos, range) )
@@ -42,16 +41,13 @@ void processMouseClick(int, int, const Vector3& pos3, int)
 /**
  Processes mouse motion
  */
-void processMouseDrag(int, int, Vector3& ori3, const Vector3& pos3, int mode)
+void processMouseDrag(int, int, Vector3& ori, const Vector3& pos, int mode)
 {
-    Vector pos(pos3);
-    Vector ori(ori3);
-    
     worker.lock();
     if ( mode )
     {
         worker.moveHandles(pos-ori);
-        ori3 = pos3;
+        ori = pos;
     }
     else
         worker.moveHandle(pos);
