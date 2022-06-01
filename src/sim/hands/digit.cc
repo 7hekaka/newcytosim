@@ -83,6 +83,7 @@ void Digit::hop(lati_t s)
     assert_true(attached());
 #if FIBER_HAS_LATTICE
     assert_true(hLattice);
+    //std::clog << this << ":hop " << hSite << " ---> " << s << "\n";
     dec();
     hSite = s;
     inc();
@@ -229,14 +230,15 @@ void Fiber::resetLattice()
     if ( fLattice.data() )
     {
         fLattice.clear();
-        
+        real unit = fLattice.unit();
+    
         for ( Hand * ha = fHands.front(); ha; ha = ha->next() )
         {
             if ( ha->lattice() == lattice() )
             {
                 Digit* i = static_cast<Digit*>(ha);
                 i->inc();
-                i->moveTo(fLattice.unit() * i->site() + i->prop->site_shift);
+                i->moveTo(unit * i->site() + i->prop->site_shift);
             }
         }
     }

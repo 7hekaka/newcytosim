@@ -300,7 +300,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
                     targets.emplace(sit, abs);
                     //std::clog << "   target " << sit << " at " << dis << " nm\n";
                 }
-                //else std::clog << "   verbot " << sit << " at " << dis << " nm\n";
+                //else std::clog << "   forbid " << sit << " at " << dis << " nm\n";
             }
             //else std::clog << "   beyond " << seg << " at " << dis << " nm\n";
         }

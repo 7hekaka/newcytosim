@@ -152,9 +152,17 @@ void CoupleSet::stepSkipUnattached()
     bool const afOdd = afList.size() & 1;
     
     step_couples<&Couple::stepAA>(firstAA(), aaOdd);
-    step_couples<&Couple::stepHand2>(faHead, faOdd);
-    step_couples<&Couple::stepHand1>(afHead, afOdd);
-    
+    if ( RNG.flip() )
+    {
+        step_couples<&Couple::stepHand2>(faHead, faOdd);
+        step_couples<&Couple::stepHand1>(afHead, afOdd);
+    }
+    else
+    {
+        step_couples<&Couple::stepHand1>(afHead, afOdd);
+        step_couples<&Couple::stepHand2>(faHead, faOdd);
+    }
+
     // use alternative attachment strategy:
     if ( uniEnabled )
     {

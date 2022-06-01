@@ -221,6 +221,15 @@ void Hand::attach(FiberSite const& s)
 #if FIBER_HAS_LATTICE
     hLattice = s.lattice();
     hSite = s.site();
+    //std::clog << "offset " << s.abscissa() -  hLattice->unit() * hSite << "\n";
+#endif
+#if 0
+    Hand const* h = hMonitor->otherHand(this);
+    if ( h && h->attached() )
+    {
+        real x = dot( h->pos() - s.pos(), s.dirFiber());
+        std::clog << "attach " << s << " dis " << x << "\n";
+    }
 #endif
 }
 

@@ -83,7 +83,7 @@ void Kinesin::stepLoaded(Vector const& force)
         if ( outsideMP(s) )
         {
             if ( RNG.test_not(prop->hold_growing_end) )
-            return detach();
+                return detach();
         }
         else if ( vacant(s) )
             hop(s);
