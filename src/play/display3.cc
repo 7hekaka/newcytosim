@@ -344,7 +344,7 @@ void Display3::drawFiberSegments(Fiber const& fib, real rad,
     gle::tubeS();
     glPopMatrix();
 
-    for ( size_t i = 0; i < last; ++i )
+    for ( size_t i = 1; i < last; ++i )
     {
         pos = nxt;
         nxt = fib.posPoint(i+1);
