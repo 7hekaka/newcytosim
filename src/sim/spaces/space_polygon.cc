@@ -365,12 +365,16 @@ void SpacePolygon::draw3D() const
     // display sides
     gym::drawTriangleStrip(0, 2*nbp+2);
 
-    // display bottom
-    gym::rebindBufferV3(2, 0);
-    gym::drawLineStrip(2, 0, nbp+1);
-    // display top
-    gym::rebindBufferV3(2, 1);
-    gym::drawLineStrip(2, 0, nbp+1);
+    float lines = 2;
+    if ( lines )
+    {
+        // display bottom
+        gym::rebindBufferV3(2, 0);
+        gym::drawLineStrip(lines, 0, nbp+1);
+        // display top
+        gym::rebindBufferV3(2, 1);
+        gym::drawLineStrip(lines, 0, nbp+1);
+    }
     gym::cleanup();
 }
 

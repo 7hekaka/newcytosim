@@ -70,7 +70,7 @@ namespace gym
     /// map / unmap GPU buffer for 3D vertex
     inline flute3* mapBufferV3(size_t n) { return (flute3*)mapFloatBuffer(3*n); }
     inline void  unmapBufferV3() { unmap(); setBufferV(3); }
-    inline void rebindBufferV3(size_t gap, size_t off) { rebind(); setBufferV(3, gap, off); }
+    inline void rebindBufferV3(size_t gap, size_t off) { rebind(); setBufferV(3, gap, 3*off); }
 
     inline void unmapBufferV3N0() { unmap(); setBufferV3N0(0); }
     
