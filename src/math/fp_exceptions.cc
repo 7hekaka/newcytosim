@@ -1,7 +1,7 @@
 
 #include <fenv.h>
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) && defined(__x86_64__)
 
 /*
  OSX implementation adapted from the Corsika project
