@@ -1084,6 +1084,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
  */
 void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
+    const real rad = std::max(width * unitValue, real(0.25));
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1139,7 +1140,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     }
     gym::unmapBufferC4VD();
     gym::disableLighting();
-    gym::drawLineStrip(width, 0, ptr-flu);
+    gym::drawLineStrip(rad, 0, ptr-flu);
     gym::cleanup();
 }
 
@@ -1150,6 +1151,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
  */
 void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
+    const real rad = std::max(width * unitValue, real(0.25));
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1206,15 +1208,16 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     }
     gym::unmapBufferC4VD();
     gym::disableLighting();
-    gym::drawLines(width, 0, ptr-flu);
+    gym::drawLines(rad, 0, ptr-flu);
     gym::cleanup();
 }
 
 
 void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
 {
-    drawFiberLattice2(fib, lat, width);
-    drawFiberLatticeEdges(fib, lat, width*0.5);
+    real rad = std::max(width * unitValue, real(0.25));
+    drawFiberLattice2(fib, lat, rad);
+    drawFiberLatticeEdges(fib, lat, rad*0.5);
 }
 
 
@@ -1223,6 +1226,7 @@ void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, rea
  */
 void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real size) const
 {
+    real rad = std::max(size * unitValue, real(0.25));
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1237,7 +1241,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
         *ptr++ = fib.posM(abs);
     gym::unmapBufferVD();
     gym::disableLighting();
-    gym::drawPoints(size, 0, ptr-flu);
+    gym::drawPoints(rad, 0, ptr-flu);
     gym::cleanup();
 }
 
@@ -1590,19 +1594,19 @@ void Display::drawFiber(Fiber const& fib)
         switch ( disp->lattice_style )
         {
             case 1:
-                drawFiberLattice1(fib, *lat, disp->line_widthX);
+                drawFiberLattice1(fib, *lat, disp->line_width);
                 style = 0;
                 break;
             case 2:
-                drawFiberLattice2(fib, *lat, disp->line_widthX);
+                drawFiberLattice2(fib, *lat, disp->line_width);
                 style = 0;
                 break;
             case 3:
-                drawFiberLattice3(fib, *lat, disp->line_widthX);
+                drawFiberLattice3(fib, *lat, disp->line_width);
                 style = 0;
                 break;
             case 4:
-                drawFiberLatticeEdges(fib, *lat, disp->line_widthX);
+                drawFiberLatticeEdges(fib, *lat, disp->line_width);
                 style = 0;
                 break;
         }

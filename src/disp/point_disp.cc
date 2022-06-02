@@ -324,8 +324,8 @@ void PointDisp::setPixels(float ps, float uv, bool make_maps)
     perceptible = visible && ( uv*sw > 0.5 );
     
     sizeR = size * uv * ps * 0.5f;
-    sizeX = std::max(size * uv, 0.25f);;
-    widthX = std::max(width * uv, 0.25f);;
+    sizeX = std::max(size * uv, 0.25f);
+    widthX = std::max(width * uv, 0.25f);
     //printf("widthX %6.3f sizeX %6.3f\n", widthX, sizeX);
 
 #if POINTDISP_USES_PIXELMAPS
