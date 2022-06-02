@@ -202,15 +202,15 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
     const size_t last = fib.lastSegment();
     Vector old = fib.posPoint(0);
     Vector pos = fib.posPoint(1);
-    Vector nxt;
-    Vector dir = (pos-old) / fib.segmentation();
+    Vector nxt, dir;
     gym::color_front(select_color(fib, 0));
 
     if ( last > 0 )
     {
         nxt = fib.posPoint(2);
+        dir = normalize(nxt-old);
         gym::enableClipPlane(4);
-        gym::setClipPlane(4, -dir, nxt);
+        gym::setClipPlane(4, -dir, pos);
         gle::drawTube(old, rad, pos, gle::capedTube2);
         gym::setClipPlane(4, dir, pos);
         
@@ -231,6 +231,7 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
     }
     else
     {
+        dir = (pos-old) / fib.segmentation();
         nxt = pos;
         pos = old;
         old = 0.5 * ( nxt + pos );

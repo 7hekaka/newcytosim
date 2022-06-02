@@ -34,6 +34,14 @@ LOCAL gle_color color_fiber(Fiber const& fib, size_t)
     return fib.disp->color;
 }
 
+LOCAL gle_color color_alternate(Fiber const& fib, size_t seg)
+{
+    if ( seg & 1 )
+        return fib.disp->color;
+    else
+        return fib.disp->color.darken(0.75);
+}
+
 LOCAL gle_color color_by_tension(Fiber const& fib, size_t seg)
 {
     real x = fib.disp->color_scale * fib.tension(seg);
