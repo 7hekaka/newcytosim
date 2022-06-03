@@ -282,6 +282,7 @@ void processNormalKey(unsigned char c, int x, int y)
         case 'o': kind = Tesselator::OCTAHEDRON; reset(); break;
         case 'd': kind = Tesselator::DICE; reset(); break;
         case 'h': kind = Tesselator::HEMISPHERE; reset(); break;
+        case 'a': kind = Tesselator::OPENSPHERE; reset(); break;
         case ']': rank += 1; reset(); break;
         case '}': rank += 16; reset(); break;
         case '[': rank = std::max(rank-1, 1); reset(); break;

@@ -756,10 +756,9 @@ namespace gle
 
     void thing()
     {
-        gym::ref_view();
         flute3* flu = gym::mapBufferV3(64);
         setBlob(flu);
-        //modifyBlob(flu, 10);
+        modifyBlob(flu, 10);
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 0, nullptr);
         gym::unmapBufferV3();
@@ -1128,7 +1127,7 @@ namespace gle
     }
 
     /// set triangle strip for a cone of radius rB at Z=B, and rT at Z=T
-    size_t setCone(flute6* flu, size_t inc, float B, float T, float rB, float rT)
+    size_t setCone(flute6* flu, size_t inc, float B, float rB, float T, float rT)
     {
         assert_true( B <= T );
         const float H(T-B), R(rT-rB);
@@ -1182,10 +1181,10 @@ namespace gle
         idx[10] = i+s; i += setTube(ptr+i, 1, 0, T);
         idx[11] = i+s; i += setTube(ptr+i, 2, 0, T);
         idx[12] = i+s; i += setTube(ptr+i, 4, 0, T);
-        idx[13] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0);
-        idx[14] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0);
-        idx[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.25);
-        idx[16] = i+s; i += setCone(ptr+i, 2, 0,21, 1, 0);
+        idx[13] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone1
+        idx[14] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0); // cone2
+        idx[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
+        idx[16] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone3
         idx[17] = i+s; i += setDisc(ptr+i, 1, 0, 1);
         idx[18] = i+s; i += setDisc(ptr+i, 2, 0, 1);
         idx[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);
@@ -1221,8 +1220,8 @@ namespace gle
     void halfTube1()     { doTubeStrip(tubes_[10], nbTrianglesTube(1)); }
     void halfTube2()     { doTubeStrip(tubes_[11], nbTrianglesTube(2)); }
     void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
-    void cone1()         { doTubeStrip(tubes_[13], nbTrianglesTube(1)); }
-    void cone2()         { doTubeStrip(tubes_[14], nbTrianglesTube(2)); }
+    void cone1()         { doTubeStrip(tubes_[13], nbTrianglesTube(2)); }
+    void cone2()         { doTubeStrip(tubes_[14], nbTrianglesTube(1)); }
     void truncatedCone() { doTubeStrip(tubes_[15], nbTrianglesTube(2)); }
     void cone3()         { doTubeStrip(tubes_[16], nbTrianglesTube(2)); }
     
@@ -1310,7 +1309,8 @@ namespace gle
     void hemisphere1() { drawIcoBuffer(ico_pts_[4], ico_idx_[4], ico_cnt_[4]); }
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
-    
+    void opensphere()  { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
+
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
@@ -1318,7 +1318,7 @@ namespace gle
     
     void setBuffers()
     {
-        Tesselator ico[7];
+        Tesselator ico[8];
         size_t f = std::max(1UL, finesse/2);
         ico[0].buildIcosahedronZ(f);
         ico[1].buildIcosahedronZ(finesse);
@@ -1327,10 +1327,11 @@ namespace gle
         ico[4].buildHemisphere(f);
         ico[5].buildHemisphere(finesse);
         ico[6].buildHemisphere(finesse*2);
+        ico[7].buildOpensphere(finesse);
 
         f = 0;
         size_t s = 0;
-        for ( int i = 0; i < 7; ++i )
+        for ( int i = 0; i < 8; ++i )
         {
             f += 3 * ico[i].max_faces();
             s += 3 * ico[i].max_vertices();
@@ -1359,7 +1360,7 @@ namespace gle
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
         assert_true( ptr < ptr0 + c + t );
 
-        for ( int i = 0; i < 7; ++i )
+        for ( int i = 0; i < 8; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
         //fprintf(stderr, "setIcosBuffers : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
         assert_true( ptr < ptr0 + s + c + t );

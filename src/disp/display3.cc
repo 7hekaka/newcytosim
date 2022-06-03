@@ -1135,26 +1135,25 @@ void Display3::drawCoupleB(Couple const* cx) const
         p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
         p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
 #endif
-        Vector mid = 0.5 * ( p1 + p2 );
-        Vector dir = normalize( p2 - p1 );
-        gym::enableClipPlane(5);
+        real L = ( p2 - p1 ).norm();
         if ( pd1->visible )
         {
-            gym::setClipPlane(5, -dir, mid);
+            real R1 = pixscale(pd1->size);
             gym::color_both(pd1->color);
-            gym::transAlignZ(p1, pixscale(pd1->size), dir);
-            //gle::needle();
-            gle::hemisphere2(); gle::cone3();
+            gym::transAlignZ(p1, R1, p2-p1);
+            gle::hemisphere2();
+            gym::scale(1, 1, L/R1);
+            gle::cone2();
         }
         if ( pd2->visible )
         {
-            gym::setClipPlane(5,  dir, mid);
+            real R2 = pixscale(pd2->size);
             gym::color_both(pd2->color);
-            gym::transAlignZ(p2, pixscale(pd2->size), -dir);
-            //gle::needle();
-            gle::hemisphere2(); gle::cone3();
+            gym::transAlignZ(p2, R2, p1-p2);
+            gle::hemisphere2();
+            gym::scale(1, 1, L/R2);
+            gle::cone2();
         }
-        gym::disableClipPlane(5);
     }
     else
     {

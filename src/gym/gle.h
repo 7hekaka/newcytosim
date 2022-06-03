@@ -222,6 +222,8 @@ namespace gle
     void hemisphere2();
     /// draw a very nice half-sphere of radius 1 in Z < 0
     void hemisphere4();
+    /// draw a sphere of radius 1 that has an openning at Z > 0.5
+    void opensphere();
 
 #if 1
     /// primitives to draw the MINUS ends of fibers:

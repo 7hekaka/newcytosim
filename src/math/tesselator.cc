@@ -406,6 +406,7 @@ void Tesselator::build(Tesselator::Polyhedra kind, unsigned div, int make)
         case OCTAHEDRON: buildOctahedron(div, make); break;
         case ICOSAHEDRON: buildIcosahedronZ(div, make); break;
         case HEMISPHERE: buildHemisphere(div, make); break;
+        case OPENSPHERE: buildOpensphere(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
     }
 }
@@ -606,68 +607,61 @@ void Tesselator::buildIcosahedronZ(unsigned div, int make)
     }
 }
 
-void Tesselator::buildHemisphereOld(unsigned div, int make)
+/** The faces are draw in order of increasing Z */
+void Tesselator::buildOpensphere(unsigned div, int make)
 {
-    kind_ = HEMISPHERE;
-    halfZ_ = 1;
-    init(12, 21, 12, div);
+    kind_ = OPENSPHERE;
+    init(11, 25, 15, div);
     
     if ( make )
     {
-        const FLOAT G = 0.5+0.5*std::sqrt(5.0);
-        const FLOAT Z = 1 / std::sqrt(G*G+1.0);
-        const FLOAT T = G * Z;
+        const FLOAT Z = std::sqrt(0.2);
+        const FLOAT C = std::cos(M_PI/2.5);
+        const FLOAT S = std::sin(M_PI/2.5);
+        const FLOAT D = C*C - S*S;
+        const FLOAT T = C*S*2;
         
         // Twelve vertices of icosahedron on unit sphere
-        FLOAT vex[12][3] = {
-            {-Z,  T,  0},
-            { Z, -T,  0},
-            {-Z, -T,  0},
-            { Z,  T,  0},
-            { 0,  Z,  T}, // 4
-            { 0, -Z, -T},
-            { 0,  Z, -T},
-            { 0, -Z,  T}, // 7
-            {-T,  0,  Z},
-            { T,  0, -Z},
-            { T,  0,  Z},
-            {-T,  0, -Z}
+        FLOAT vex[11][3] = {
+            { 0,  0, -1},
+            { 1,  0, -Z},
+            { C, -S, -Z},
+            { D, -T, -Z},
+            { D,  T, -Z},
+            { C,  S, -Z},
+            {-D, -T,  Z},
+            {-C, -S,  Z},
+            {-1,  0,  Z},
+            {-C,  S,  Z},
+            {-D,  S,  Z},
         };
         
-        /* Remove any face involving vertex 4 or 7 */
         // ordered faces: Counter-Clockwise = facing out
-        unsigned fac[12][3] = {
-            {0,  3,  6},
-            //{1,  7,  2},
-            //{0,  4,  3},
-            {1,  2,  5},
-            //{0,  8,  4},
-            {1,  5,  9},
-            {0, 11,  8},
-            {1,  9, 10},
-            {0,  6, 11},
-            //{1, 10,  7},
-            //{4,  8,  7},
-            {5,  6,  9},
-            //{2,  7,  8},
-            {6,  3,  9},
-            {2,  8, 11},
-            {9,  3, 10},
-            {5,  2, 11},
-            //{3,  4, 10},
-            {6,  5, 11},
-            //{4,  7, 10}
+        unsigned fac[15][3] = {
+            {0,  1,  2},
+            {0,  2,  3},
+            {0,  3,  4},
+            {0,  4,  5},
+            {0,  5,  1} ,
+            {1,  6,  2},
+            {2,  7,  3},
+            {3,  8,  4},
+            {4,  9,  5},
+            {5, 10,  1} ,
+            {6,  7,  2},
+            {7,  8,  3},
+            {8,  9,  4},
+            {9, 10,  5},
+            {10, 6,  1}
         };
-
-        // we can skip 5 triangles which are entirely in Z > 0
+        
         allocate();
         setCorners(vex, div);
-        refineTriangles(12, fac, div);
+        refineTriangles(15, fac, div);
         if ( make & 2 ) setVertices();
         if ( make & 4 ) setEdges();
     }
 }
-
 
 void Tesselator::buildHemisphere(unsigned div, int make)
 {

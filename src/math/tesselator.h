@@ -31,7 +31,7 @@ public:
     typedef unsigned short INDEX;
 
     /// starting shapes
-    enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3, HEMISPHERE=4, DICE=5 };
+    enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3, HEMISPHERE=4, OPENSPHERE=5, DICE=6 };
     
     /// One of the vertex of the template model
     struct Corner
@@ -160,7 +160,7 @@ public:
     void buildOctahedron(unsigned div, int make = 1);
     void buildIcosahedron(unsigned div, int make = 1);
     void buildIcosahedronZ(unsigned div, int make = 1);
-    void buildHemisphereOld(unsigned div, int make = 1);
+    void buildOpensphere(unsigned div, int make = 1);
     void buildHemisphere(unsigned div, int make = 1);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
 
