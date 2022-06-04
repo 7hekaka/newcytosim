@@ -266,6 +266,44 @@ void drawBug(Simul const& sim)
 
 //------------------------------------------------------------------------------
 
+/// read 'x:y' where ':' is specified as the character 'sep'
+int readTileDimensions(int& X, int& Y, const char str[], char sep)
+{
+    char const* c = strchr(str, sep);
+    if ( c && isdigit(str[0]) )
+    {
+        int x = X, y = Y;
+        char* ptr = nullptr;
+        errno = 0;
+        x = (int)strtol(str, &ptr, 10);
+        if ( x <= 0 )
+        {
+            if ( errno ) perror(str);
+            return 2;
+        }
+        if ( ptr != c )
+            return 3;
+        y = (int)strtol(c+1, &ptr, 10);
+        if ( y <= 0 )
+        {
+            if ( errno ) perror(str);
+            return 4;
+        }
+        if ( *ptr && !isspace(*ptr) )
+            return 5;
+        if ( x * y > TOP )
+        {
+            printf("Error: tile is limited to %i cells max\n", TOP);
+            exit(1);
+        }
+        X = x;
+        Y = y;
+        return 0;
+    }
+    return 1;
+}
+
+
 /* program entry */
 int main(int argc, char *argv[])
 {
@@ -273,21 +311,8 @@ int main(int argc, char *argv[])
     SimThread worker[TOP];
 
     //parse the command line:
-    if ( argc > 1 && isdigit(*argv[1]) )
-    {
-        char* c = strchr(argv[1], 'x');
-        if ( c )
-        {
-            tileX = atoi(argv[1]);
-            tileY = atoi(c+1);
-        }
-        if ( tileX * tileY > TOP )
-        {
-            printf("Error: limited to %i simulations max\n", TOP);
-            exit(1);
-        }
+    if ( argc > 1 && 0 == readTileDimensions(tileX, tileY, argv[1], ':') )
         *argv[1] = 0;
-    }
     Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
@@ -300,6 +325,8 @@ int main(int argc, char *argv[])
         const char * str = simul[0].prop.config_file.c_str();
         if ( !FilePath::read_file(str, config_code, code_size) )
             exit(1);
+        for ( int i = 0; i < tileX*tileY; ++i )
+            worker[i].config_code = config_code;
     }
     arg.clear(".cym");
     if ( !arg.empty() )
@@ -318,7 +345,6 @@ int main(int argc, char *argv[])
     {
         simul[i].initialize(arg);
         simul[i].prop.random_seed = RNG.pint32();
-        worker[i].config_code = config_code;
         worker[i].set_simul(simul+i);
         worker[i].period(period);
         worker[i].start();
@@ -378,10 +404,7 @@ int main(int argc, char *argv[])
     //stopPreconfig();
     glDisable(GL_SCISSOR_TEST);
     for ( int i = 0; i < tileX*tileY; ++i )
-    {
         worker[i].cancel();
-        worker[i].config_code = nullptr;
-    }
     for ( int i = 0; i < tileX*tileY; ++i )
         worker[i].join();
     glfwDestroyWindow(win);

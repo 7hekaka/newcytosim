@@ -28,19 +28,31 @@ If possible, use a precompiled library, which is possible on most platforms:
 
 Apple's veclib is preinstalled on Mac OSX, and [Intel's MKL](https://en.wikipedia.org/wiki/Math_Kernel_Library) is available free of charge, but is optimal only on Intel processors.
 
-### Graphical libraries
+### Interactive player
  
-Cytosim's ***play*** relies on [OpenGL](http://www.opengl.org/) for display 
-and uses [POSIX threads](http://en.wikipedia.org/wiki/POSIX_Threads) for multithreading.
- 
-Interactivity is provided by [GLUT](http://www.opengl.org/resources/libraries/glut/),
-which can be replaced by [freeGLUT](http://freeglut.sourceforge.net/).
- 
-GLUT and OpenGL are included in Mac OSX:
+Cytosim's ***play*** is built on:
 
-	-framework GLUT -framework OpenGL 
+- [OpenGL](http://www.opengl.org/) 
+- [POSIX threads](http://en.wikipedia.org/wiki/POSIX_Threads)
+- [libspng](https://libspng.org/) to export images
+- [GLUT](http://www.opengl.org/resources/libraries/glut/) for windowing.
 
-Cytosim program `play` will be able to export images only if it is linked with the PNG graphical libraries, but everything else works fine. See the [compile options](options.md).
+Note that GLUT can be replaced by [freeGLUT](http://freeglut.sourceforge.net/).  
+GLUT and OpenGL are included in Mac OSX.
+
+Cytosim's `play` can export PNG images, because its code include a copy of [libspng](https://libspng.org/), but it can be linked against [libPNG]() instead. See the [compile options](options.md).
+
+### Multi player
+ 
+Cytosim's ***multiplay*** is built on:
+
+- [OpenGL](http://www.opengl.org/) 
+- [POSIX threads](http://en.wikipedia.org/wiki/POSIX_Threads)
+- [libspng](https://libspng.org/) to export images
+- [GLFW](https://www.glfw.org/) for windowing.
+ 
+GLFW must be installed.
+One option is to [compile](https://www.glfw.org/docs/latest/compile_guide.html) from the [source code](https://www.glfw.org/download.html), which requires [cmake](https://cmake.org/).
 
 # Getting Ready 
 
@@ -194,3 +206,4 @@ Please, write to `feedbackATcytosimDOTorg`.
 Please, describe what fails and what you have tried.
 Attach your 'makefile.inc' and tell us the platform on which you compiled.
 
+FJN, 4.6.2022

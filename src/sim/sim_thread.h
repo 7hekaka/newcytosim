@@ -71,7 +71,7 @@ public:
     /// the size allocated for `code`
     size_t code_size;
     
-    /// the text of the config file
+    /// the text of the config file, allocated externally
     char * config_code;
 
     /// run the simulation live

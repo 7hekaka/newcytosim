@@ -48,10 +48,37 @@ After editing, recompile everything:
 
 Always compare the results with double precision as a benchmark.
 
+# OpenGL Window Toolkits
+
+A cross-platform toolkit is used by all graphical programs (`play`, `multiplay`), to create a window on which to draw with OpenGL.  
+Cytosim is migrating from GLUT/FreeGLUT to GLFW:
+
+- [GLUT](http://www.opengl.org/resources/libraries/glut/)
+- [GLFW](https://www.glfw.org/) for windowing.
+
+### GLUT/FreeGLUT
+
+GLUT and OpenGL are included in Mac OSX, adjust linkage to include:
+
+	-framework GLUT -framework OpenGL 
+
+On other platforms, install [freeGLUT](http://freeglut.sourceforge.net/).  
+
+### GLFW
+
+GLFW must be installed.  
+One option is to [compile](https://www.glfw.org/docs/latest/compile_guide.html) from the [source code](https://www.glfw.org/download.html), which requires [cmake](https://cmake.org/).
+
+The GLFW library and header file should be copied in folder 'ext' in the base directory:
+
+	- ext/glfw3.a
+	- ext/GLFW/glfw3.h
 
 # PNG image support
- 
-You can install the PNG library (libpng) on your mac with [Homebrew](https://brew.sh):
+
+Cytosim's source includes a copy of [libspng](https://libspng.org/), which is used to export PNG images.
+To use the PNG library [http://www.libpng.org](libpng), you must install it. 
+On macOS, use [Homebrew](https://brew.sh):
 
 	brew install libpng
  

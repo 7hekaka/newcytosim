@@ -43,7 +43,6 @@ SimThread::~SimThread()
         pthread_join(child_, nullptr);
     pthread_cond_destroy(&condition_);
     pthread_mutex_destroy(&mutex_);
-    free(config_code);
 }
 
 //------------------------------------------------------------------------------
