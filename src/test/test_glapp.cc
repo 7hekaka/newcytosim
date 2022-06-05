@@ -28,11 +28,12 @@ int display(View& view)
     if ( 1 )
     {
         // icosahedron:
-        gym::color_front(1, 0, 1, 1);
-        gym::color_back(0, 0, 0.1, 1);
+        gym::color_front(1, 0, 1, 0.5);
+        gym::color_back(0, 0, 0.1, 0.5);
         gle::icosahedron();
         //gle::ICOSAHEDRON();
         //gle::icoid();
+        //gle::blob();
     }
     if ( 0 )
     {

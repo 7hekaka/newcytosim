@@ -162,6 +162,13 @@
 		BB227D4E2568156600A42E98 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BB2A470314F3D4AD008434C6 /* bead_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2A470114F3D4AD008434C6 /* bead_prop.h */; };
 		BB2A470414F3D4AD008434C6 /* bead_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2A470214F3D4AD008434C6 /* bead_prop.cc */; };
+		BB2B25DD284CB48D003A5864 /* operator_new.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6E174B223E5B2F00AF850D /* operator_new.cc */; };
+		BB2B25E0284CB48D003A5864 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
+		BB2B25E1284CB48D003A5864 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
+		BB2B25E2284CB48D003A5864 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
+		BB2B25E3284CB48D003A5864 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
+		BB2B25E4284CB48D003A5864 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
+		BB2B25EA284CB49E003A5864 /* test_sphere.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591705B98DA3006956D5 /* test_sphere.cc */; };
 		BB2BFFDE184640D800EBE4EC /* space_polygonZ.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2BFFDC184640D800EBE4EC /* space_polygonZ.cc */; };
 		BB2BFFE0184640D800EBE4EC /* space_polygonZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */; };
 		BB2D09FB243DBC5E00C1C0AB /* test_solver.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB2EFCAD230AAF7100073B5A /* test_solver.cc */; };
@@ -589,7 +596,7 @@
 		BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
 		BB71926B0EF1D10600CED9E2 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BB738A6420C51E620039C670 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
-		BB746D51283783AE001688B5 /* glfw3.h in Headers */ = {isa = PBXBuildFile; fileRef = BB746D50283783AE001688B5 /* glfw3.h */; };
+		BB746D51283783AE001688B5 /* (null) in Headers */ = {isa = PBXBuildFile; };
 		BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB749D6017935DAC00B43298 /* quartic_solver.cc */; };
 		BB749D661793645D00B43298 /* polygon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB749D641793645C00B43298 /* polygon.cc */; };
 		BB749D671793645D00B43298 /* polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = BB749D651793645D00B43298 /* polygon.h */; };
@@ -1110,6 +1117,27 @@
 			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
 			remoteInfo = cytomath;
 		};
+		BB2B25D6284CB48D003A5864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB51BC5B05FA559800D4869F;
+			remoteInfo = libcytobase;
+		};
+		BB2B25D8284CB48D003A5864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB4DB5940C69D5A2001E5E4F;
+			remoteInfo = glapp;
+		};
+		BB2B25DA284CB48D003A5864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BB7191630EF1CD9900CED9E2;
+			remoteInfo = cytomath;
+		};
 		BB3417590C3294350016CF18 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BB73574F05B98A51006956D5 /* Project object */;
@@ -1604,6 +1632,7 @@
 		BB2185620B4084CC00B75436 /* linear_solvers.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = linear_solvers.cc; path = src/math/linear_solvers.cc; sourceTree = SOURCE_ROOT; };
 		BB2A470114F3D4AD008434C6 /* bead_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bead_prop.h; sourceTree = "<group>"; };
 		BB2A470214F3D4AD008434C6 /* bead_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bead_prop.cc; sourceTree = "<group>"; };
+		BB2B25E9284CB48D003A5864 /* test_sphere */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_sphere; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB2B25FD09FEAE6D008730C8 /* cymdef.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = cymdef.h; path = src/sim/cymdef.h; sourceTree = SOURCE_ROOT; };
 		BB2BF8CD0E085BF30024546A /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; path = makefile.inc; sourceTree = SOURCE_ROOT; };
 		BB2BF8D40E085C110024546A /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; name = makefile.inc; path = src/tools/makefile.inc; sourceTree = SOURCE_ROOT; };
@@ -2183,6 +2212,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BB2B25DF284CB48D003A5864 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB2B25E0284CB48D003A5864 /* libcytodisp.a in Frameworks */,
+				BB2B25E1284CB48D003A5864 /* OpenGL.framework in Frameworks */,
+				BB2B25E2284CB48D003A5864 /* libcytobase.a in Frameworks */,
+				BB2B25E3284CB48D003A5864 /* GLUT.framework in Frameworks */,
+				BB2B25E4284CB48D003A5864 /* libcytomath.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		BB2D09F0243DBC3400C1C0AB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2503,6 +2544,7 @@
 				BBE2FB8E25680D5800EB88EA /* cympack */,
 				BB0A7556282650E00062EDC5 /* mechoui */,
 				BBCE260C281EAAE1004F6955 /* multiplay */,
+				BB2B25E9284CB48D003A5864 /* test_sphere */,
 			);
 			name = build;
 			sourceTree = SOURCE_ROOT;
@@ -3630,7 +3672,6 @@
 		BBE5132B283782B50090979B /* GLFW */ = {
 			isa = PBXGroup;
 			children = (
-				BB746D50283783AE001688B5 /* glfw3.h */,
 			);
 			name = GLFW;
 			path = ext/GLFW;
@@ -3711,6 +3752,13 @@
 			files = (
 				BB0A756D28265F790062EDC5 /* multi_mesh.h in Headers */,
 				BB0A756E28265F790062EDC5 /* mechoui_param.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB2B25DB284CB48D003A5864 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4171,7 +4219,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB746D51283783AE001688B5 /* glfw3.h in Headers */,
+				BB746D51283783AE001688B5 /* (null) in Headers */,
 				BBCE25F2281EAAE1004F6955 /* frame_reader.h in Headers */,
 				BBCE25F3281EAAE1004F6955 /* player_prop.h in Headers */,
 				BBCE25F4281EAAE1004F6955 /* sim_thread.h in Headers */,
@@ -4315,6 +4363,26 @@
 			name = test_xtbsv;
 			productName = test_code;
 			productReference = BB201E1E24ABDCD900A8CA82 /* test_xtbsv */;
+			productType = "com.apple.product-type.tool";
+		};
+		BB2B25D4284CB48D003A5864 /* test_sphere */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BB2B25E5284CB48D003A5864 /* Build configuration list for PBXNativeTarget "test_sphere" */;
+			buildPhases = (
+				BB2B25DB284CB48D003A5864 /* Headers */,
+				BB2B25DC284CB48D003A5864 /* Sources */,
+				BB2B25DF284CB48D003A5864 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BB2B25D5284CB48D003A5864 /* PBXTargetDependency */,
+				BB2B25D7284CB48D003A5864 /* PBXTargetDependency */,
+				BB2B25D9284CB48D003A5864 /* PBXTargetDependency */,
+			);
+			name = test_sphere;
+			productName = test_glapp;
+			productReference = BB2B25E9284CB48D003A5864 /* test_sphere */;
 			productType = "com.apple.product-type.tool";
 		};
 		BB2D09F2243DBC3400C1C0AB /* test_solver */ = {
@@ -4847,6 +4915,7 @@
 				BB7086392449CBE900C73273 /* test_xpttrs */,
 				BB201E0F24ABDCD900A8CA82 /* test_xtbsv */,
 				BB0A7541282650E00062EDC5 /* mechoui */,
+				BB2B25D4284CB48D003A5864 /* test_sphere */,
 			);
 		};
 /* End PBXProject section */
@@ -4896,6 +4965,15 @@
 				BB201E1424ABDCD900A8CA82 /* random.cc in Sources */,
 				BB201E1524ABDCD900A8CA82 /* random_vector.cc in Sources */,
 				BB201E1624ABDCD900A8CA82 /* time_date.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB2B25DC284CB48D003A5864 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB2B25EA284CB49E003A5864 /* test_sphere.cc in Sources */,
+				BB2B25DD284CB48D003A5864 /* operator_new.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5593,6 +5671,21 @@
 			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
 			targetProxy = BB1707180F30F76C00E5DE24 /* PBXContainerItemProxy */;
 		};
+		BB2B25D5284CB48D003A5864 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB51BC5B05FA559800D4869F /* cytobase */;
+			targetProxy = BB2B25D6284CB48D003A5864 /* PBXContainerItemProxy */;
+		};
+		BB2B25D7284CB48D003A5864 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB4DB5940C69D5A2001E5E4F /* cytodisp */;
+			targetProxy = BB2B25D8284CB48D003A5864 /* PBXContainerItemProxy */;
+		};
+		BB2B25D9284CB48D003A5864 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BB7191630EF1CD9900CED9E2 /* cytomath */;
+			targetProxy = BB2B25DA284CB48D003A5864 /* PBXContainerItemProxy */;
+		};
 		BB34175A0C3294350016CF18 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = BB51BC5B05FA559800D4869F /* cytobase */;
@@ -6204,6 +6297,60 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+			};
+			name = Default;
+		};
+		BB2B25E6284CB48D003A5864 /* Development */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
+		};
+		BB2B25E7284CB48D003A5864 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Deployment;
+		};
+		BB2B25E8284CB48D003A5864 /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Default;
 		};
@@ -8307,6 +8454,16 @@
 				BB201E1B24ABDCD900A8CA82 /* Development */,
 				BB201E1C24ABDCD900A8CA82 /* Deployment */,
 				BB201E1D24ABDCD900A8CA82 /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		BB2B25E5284CB48D003A5864 /* Build configuration list for PBXNativeTarget "test_sphere" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB2B25E6284CB48D003A5864 /* Development */,
+				BB2B25E7284CB48D003A5864 /* Deployment */,
+				BB2B25E8284CB48D003A5864 /* Default */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;

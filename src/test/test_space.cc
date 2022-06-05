@@ -519,6 +519,7 @@ int display(View& view)
          }
         gym::unmapBufferC4V4();
         gym::drawPoints(2, 0, n);
+        gym::cleanup();
     }
     
     if ( showProjected )
@@ -530,6 +531,7 @@ int display(View& view)
             flu[i] = { inside[i] ? col : lor, project[i] };
         gym::unmapBufferC4V4();
         gym::drawPoints(2, 0, nbpts);
+        gym::cleanup();
     }
 
     if ( showProject )
@@ -548,6 +550,7 @@ int display(View& view)
         }
         gym::unmapBufferC4V4();
         gym::drawLines(LW, 0, n);
+        gym::cleanup();
     }
     
     if ( showNormals )
@@ -562,6 +565,7 @@ int display(View& view)
         }
         gym::unmapBufferC4V4();
         gym::drawLines(LW, 0, n);
+        gym::cleanup();
     }
     
     if ( showReproject )
@@ -579,6 +583,7 @@ int display(View& view)
         }
         gym::unmapBufferC4V4();
         gym::drawLines(2*LW, 0, n);
+        gym::cleanup();
     }
     
     if ( showEdges )
@@ -596,6 +601,7 @@ int display(View& view)
          }
         gym::unmapBufferC4V4();
         gym::drawPoints(2, 0, n);
+        gym::cleanup();
     }
     view.closeDisplay();
     return 0;

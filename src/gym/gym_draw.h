@@ -11,28 +11,40 @@ namespace gym
 {
     inline void drawPoints(float size, size_t off, size_t cnt)
     {
-        glPointSize(size);
-        glDrawArrays(GL_POINTS, off, cnt);
+        if ( size > 0 )
+        {
+            glPointSize(size);
+            glDrawArrays(GL_POINTS, off, cnt);
+        }
     }
     
     inline void drawSquarePoints(float size, size_t off, size_t cnt)
     {
-        glPointSize(size);
-        glDisable(GL_POINT_SMOOTH);
-        glDrawArrays(GL_POINTS, off, cnt);
-        glEnable(GL_POINT_SMOOTH);
+        if ( size > 0 )
+        {
+            glPointSize(size);
+            glDisable(GL_POINT_SMOOTH);
+            glDrawArrays(GL_POINTS, off, cnt);
+            glEnable(GL_POINT_SMOOTH);
+        }
     }
     
     inline void drawLines(float width, size_t off, size_t cnt)
     {
-        glLineWidth(width);
-        glDrawArrays(GL_LINES, off, cnt);
+        if ( width > 0 )
+        {
+            glLineWidth(width);
+            glDrawArrays(GL_LINES, off, cnt);
+        }
     }
     
     inline void drawLineStrip(float width, size_t off, size_t cnt)
     {
-        glLineWidth(width);
-        glDrawArrays(GL_LINE_STRIP, off, cnt);
+        if ( width > 0 )
+        {
+            glLineWidth(width);
+            glDrawArrays(GL_LINE_STRIP, off, cnt);
+        }
     }
     
     inline void drawLineStrip(size_t off, size_t cnt)

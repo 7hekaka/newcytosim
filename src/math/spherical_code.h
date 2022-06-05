@@ -57,6 +57,9 @@ public:
     /// constructor that also calls distributePoints(), 
     SphericalCode(size_t nbp, real precision, size_t mx_nb_iterations);
     
+    /// move point from old to new coordinates
+    size_t refinePoints(real precision, size_t mx_nb_iterations);
+
     /// distribute the nbp points on the sphere and store their coordinates
     size_t distributePoints(size_t nbp, real precision, size_t mx_nb_iterations);
 
@@ -93,6 +96,8 @@ public:
     /// write points coordinates
     void printAllPositions(FILE* file = stdout);
     
+    /// set
+    void initBlob();
     
 private:
 
@@ -114,8 +119,8 @@ private:
     /// Coulomb energy of current configuration
     real energy_;
     
-    /// project point on the sphere
-    bool project(const real W[3], real P[3]);
+    /// project W on the sphere
+    bool project(real P[3], const real W[3]);
     
     /// set coordinates point P randomly on the sphere
     void randomize(real P[3]);
@@ -133,7 +138,13 @@ private:
     void setForces(real forces[], real threshold);
     
     /// move point from old to new coordinates
-    void refinePoints(real Pnew[], const real Pold[], real forces[], real S);
+    void movePoints(real Pnew[], const real Pold[], real forces[], real S);
+
+    /// allocated memory
+    void allocate(size_t);
+    
+    /// distribute point randomly
+    void initializePoints();
 
 };
 

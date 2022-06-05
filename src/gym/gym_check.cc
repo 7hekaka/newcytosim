@@ -62,7 +62,7 @@ void gym::printCaps(const char str[])
     print_cap(GL_BLEND, "blend");
     print_cap(GL_ALPHA_TEST, "alpha");
     print_cap(GL_DEPTH_TEST, "depth");
-    print_get(GL_DEPTH_WRITEMASK, "mask");
+    print_get(GL_DEPTH_WRITEMASK, "depthmask");
     print_cap(GL_LIGHTING, "light");
     print_cap(GL_LIGHT0, "");
     print_cap(GL_LIGHT1, "");

@@ -83,20 +83,13 @@ int fgFontHeight(int font)
  */
 static SFG_Font const* fghFont( int font )
 {
-    if( font == BITMAP_8_BY_13        )
-        return &fgFontFixed8x13;
-    if( font == BITMAP_9_BY_15        )
-        return &fgFontFixed9x15;
-    if( font == BITMAP_HELVETICA_10   )
-        return &fgFontHelvetica10;
-    if( font == BITMAP_HELVETICA_12   )
-        return &fgFontHelvetica12;
-    if( font == BITMAP_HELVETICA_18   )
-        return &fgFontHelvetica18;
-    if( font == BITMAP_TIMES_ROMAN_10 )
-        return &fgFontTimesRoman10;
-    if( font == BITMAP_TIMES_ROMAN_24 )
-        return &fgFontTimesRoman24;
+    if( font == BITMAP_8_BY_13        ) return &fgFontFixed8x13;
+    if( font == BITMAP_9_BY_15        ) return &fgFontFixed9x15;
+    if( font == BITMAP_HELVETICA_10   ) return &fgFontHelvetica10;
+    if( font == BITMAP_HELVETICA_12   ) return &fgFontHelvetica12;
+    if( font == BITMAP_HELVETICA_18   ) return &fgFontHelvetica18;
+    if( font == BITMAP_TIMES_ROMAN_10 ) return &fgFontTimesRoman10;
+    if( font == BITMAP_TIMES_ROMAN_24 ) return &fgFontTimesRoman24;
     return NULL;
 }
 
@@ -149,8 +142,9 @@ void fgBitmapString(float x0, float y, float scale, int fontID, const float colo
             else  /* Not an EOL, draw the bitmap character */
             {
                 const uByte* face = font->Characters[c];
-                drawBitmap(face[0], font->Height, x, y, scale, face+1, color);
-                x += scale * face[0];
+                float dx = (float)face[0];
+                drawBitmap(dx, font->Height, x, y, scale, face+1, color);
+                x += scale * dx;
             }
         }
     }

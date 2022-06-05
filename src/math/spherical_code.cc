@@ -23,8 +23,50 @@ SphericalCode::SphericalCode(size_t nbp)
 }
 
 
-SphericalCode::~SphericalCode( )
+SphericalCode::~SphericalCode()
 {
+    free_real(coord_);
+    coord_ = nullptr;
+}
+
+
+void SphericalCode::initBlob()
+{
+    real H = 0.5;
+    real S = M_SQRT1_2;
+    real O = std::sqrt(1/3.0); //0.57735
+    real T = std::sqrt(2/3.0); //0.816497
+    
+    real src[54][3] = {{ T, O, 0}, {H, S, H}, {1., 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
+        {0, -1., 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-1., 0, 0}, {-H, S, H},
+        {-T, O, 0}, {0, 1., 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
+        {0, 0, -1.}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {0, 0, -1.}, {-S, 0, -S},
+        {0, O, -T},   {-H, S, -H}, {-H, S, -H}, {-T, O, 0}, {-T, O, 0},   {-H, S, -H},
+        {-1., 0, 0}, {-S, 0, -S}, {-T, -O, 0}, {-H, -S, -H}, {0, -1., 0}, {H, -S, -H},
+        {T, -O, 0}, {S, 0, -S}, {1., 0, 0}, {H, S, -H}, {T, O, 0}, {0, 1., 0},
+        {H, S, H}, {-H, S, H}, {0, O, T}, {-S, 0, S}, {0, 0, 1.}, {-H, -S, H},
+        {0, -O, T}, {H, -S, H}, {0, 0, 1.}, {S, 0, S}, {0, O, T}, {H, S, H}};
+   
+    allocate(54);
+    size_t k = 0;
+    for ( size_t i = 0; i < 54; ++i )
+    {
+        bool uniq = true;
+        real const* A = (real*)(src+i);
+        for ( size_t j = 0; j < k; ++j )
+        {
+            real const* B = coord_ + 3*j;
+            real d = square(A[0]-B[0]) + square(A[1]-B[1]) + square(A[2]-B[2]);
+            if ( d < 0.1 )
+            {
+                uniq = false;
+                break;
+            }
+        }
+        if ( uniq )
+            memcpy(coord_+3*k++, (real*)(src+i), 3*sizeof(real));
+    }
+    num_points_ = k;
 }
 
 //------------------------------------------------------------------------------
@@ -97,15 +139,15 @@ real SphericalCode::distance3Sqr( const real P[], const real Q[] )
 //------------------------------------------------------------------------------
 
 
-bool SphericalCode::project(const real S[3], real P[3])
+bool SphericalCode::project(real P[3], const real S[3])
 {
     real n = S[0]*S[0] + S[1]*S[1] + S[2]*S[2];
     if ( n > 0 )
     {
-        n = std::sqrt(n);
-        P[0] = S[0] / n;
-        P[1] = S[1] / n;
-        P[2] = S[2] / n;
+        n = 1.0 / std::sqrt(n);
+        P[0] = S[0] * n;
+        P[1] = S[1] * n;
+        P[2] = S[2] * n;
         return false;
     }
     return true;
@@ -258,7 +300,7 @@ void SphericalCode::setForces( real forces[], real threshold )
  
  where F(x) = energy of configuration
  */
-void SphericalCode::refinePoints( real Pnew[], const real Pold[], real forces[], real S )
+void SphericalCode::movePoints(real Pnew[], const real Pold[], real forces[], real S)
 {
     for ( size_t ii = 0; ii < num_points_; ++ii )
     {
@@ -268,17 +310,13 @@ void SphericalCode::refinePoints( real Pnew[], const real Pold[], real forces[],
         W[1] = Pold[3*ii+1] + S * forces[3*ii+1];
         W[2] = Pold[3*ii+2] + S * forces[3*ii+2];
         
-        if ( project(W, Pnew+3*ii) )
+        if ( project(Pnew+3*ii, W) )
             randomize(Pnew+3*ii);
     }
 }
 
 
-/**
- create a relatively even distribution of nbp points on the sphere
- the coordinates are stored in real array coord_[]
- */
-size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_nb_iterations)
+void SphericalCode::allocate(size_t nbp)
 {
     //reallocate the array if needed:
     if ( num_points_ != nbp || ! coord_ )
@@ -287,18 +325,11 @@ size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_nb_
         coord_ = new_real(3*nbp);
         num_points_ = nbp;
     }
-    
-    // the precision is rescaled with the expected distance:
-    real len = expectedDistance(nbp);
-    
-    /* 
-     Threshold cut-off for repulsive force:
-     The best results are obtained for threshold > 2
-     */
-    real threshold = 10 * len;
-    real mag = 0.1 * len * len * len * len / (real)num_points_;
-    precision *= mag;
+}
 
+
+void SphericalCode::initializePoints()
+{
 #if 0
     // distribute the points randomly on the sphere:
     for ( size_t i = 0; i < num_points_; ++i )
@@ -316,16 +347,43 @@ size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_nb_
         coord_[2+i*3] = cos(p);
     }
 #endif
+}
+
+
+/**
+ create a relatively even distribution of nbp points on the sphere
+ the coordinates are stored in real array coord_[]
+ */
+size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_iterations)
+{
+    allocate(nbp);
+    initializePoints();
 
     //--------- for one point only, we return:
-    if ( num_points_ < 2 )
-    {
-        energy_ = 0;
-        return 0;
-    }
-    
+    if ( nbp > 1 )
+        return refinePoints(precision, mx_iterations);
+    return 0;
+}
+
+
+/**
+ create a relatively even distribution of nbp points on the sphere
+ the coordinates are stored in real array coord_[]
+ */
+size_t SphericalCode::refinePoints(real precision, size_t mx_iterations)
+{
+    // the precision is rescaled with the expected distance:
+    real len = expectedDistance(num_points_);
+
+    /* 
+     Threshold cut-off for repulsive force:
+     The best results are obtained for threshold > 2
+     */
+    real threshold = 10 * len;
+    real mag = 0.1 * len * len * len * len / (real)num_points_;
+    precision *= mag;
+
     //------------ calculate the initial energy:
-    energy_ = coulombEnergy(coord_);
     
     // allocate forces and new coordinates:
     real * coord = new_real(3*num_points_);
@@ -333,21 +391,21 @@ size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_nb_
     
     //make an initial guess for the step size:
     unsigned history = 0;
-    
+    energy_ = coulombEnergy(coord_);
+
     size_t step = 0;
-    for ( step = 0; step < mx_nb_iterations; ++step )
+    for ( step = 0; step < mx_iterations; ++step )
     {
         setForces(force, threshold);
         
         while ( 1 ) 
         {
-            refinePoints(coord, coord_, force, mag);
+            movePoints(coord, coord_, force, mag);
             
             // energy of new configuration:
             real energy = coulombEnergy(coord);
             
-            //printf("%3i : step %5i : energy_ = %18.8f   mag = %8.5f %s\n",
-            //     nbp, step, energy_, mag, (energy_new<energy_?"yes":"no"));
+            //printf("%3lu   %5lu : energy %18.10f   %18.10f\n", num_points_, step, energy, energy-energy_);
 
             if ( energy < energy_ )
             {

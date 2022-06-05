@@ -86,7 +86,8 @@ void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char arg,
                 for ( size_t j = 0; j < num; ++j )
                     flu[j] = { X+S*ptr[j].X, Y+S*ptr[j].Y };
                 gym::unmapBufferV2();
-                gym::drawLineStrip(line_width, 0, num);
+                if ( line_width > 0 )
+                    gym::drawLineStrip(line_width, 0, num);
                 if ( point_size > 0 )
                     gym::drawPoints(point_size, 0, num);
             }
@@ -132,7 +133,8 @@ void fgStrokeString(float X, float Y, float S, int mono, const char *string,
                         for ( size_t j = 0; j < num; ++j )
                             flu[j] = { X+S*ptr[j].X, Y+S*ptr[j].Y };
                         gym::unmapBufferV2();
-                        gym::drawLineStrip(line_width, 0, num);
+                        if ( line_width > 0 )
+                            gym::drawLineStrip(line_width, 0, num);
                         if ( point_size > 0 )
                             gym::drawPoints(point_size, 0, num);
                     }

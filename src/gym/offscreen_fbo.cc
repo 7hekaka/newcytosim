@@ -95,7 +95,7 @@ char const* glErrorString(GLenum code)
 }
 
 
-static void checkError(const char msg[])
+static void checkGLError(const char msg[])
 {
     GLenum e = glGetError();
     while ( e != GL_NO_ERROR )
@@ -176,7 +176,7 @@ CGLContextObj createOffscreenContext()
         return nullptr;
     }
     
-    checkError("createOffscreenContext()");
+    checkGLError("createOffscreenContext()");
     return newContext;
 }
 
@@ -231,7 +231,7 @@ void OffScreen::closeContext()
         preContext = nullptr;
         offContext = nullptr;
     }
-    checkError("OffScreen::closeContext()");
+    checkGLError("OffScreen::closeContext()");
 }
 
 
@@ -259,7 +259,7 @@ unsigned OffScreen::makeBuffer(const int width, const int height, int multisampl
     buffer.create();
     
     glBindFramebuffer(GL_FRAMEBUFFER, buffer.frameBuffer);
-    //checkError("OffScreen:glBindFramebuffer()");
+    //checkGLError("OffScreen:glBindFramebuffer()");
     
     glBindRenderbuffer(GL_RENDERBUFFER, buffer.colorBuffer);
     if ( multisample > 1 )
@@ -285,7 +285,7 @@ unsigned OffScreen::makeBuffer(const int width, const int height, int multisampl
     
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, buffer.colorBuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer.depthBuffer);
-    //checkError("OffScreen::glFramebufferRenderbuffer()");
+    //checkGLError("OffScreen::glFramebufferRenderbuffer()");
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     
@@ -295,7 +295,7 @@ unsigned OffScreen::makeBuffer(const int width, const int height, int multisampl
         return 0;
     
     //printf("offscreen- allocated framebuffer %u  %ux%u\n", buffer.frameBuffer, width, height);
-    checkError("OffScreen:makeBuffer()");
+    checkGLError("OffScreen:makeBuffer()");
     
     all_buffers.push_back(buffer);
 
@@ -343,6 +343,6 @@ void OffScreen::releaseBuffer()
         else
             all_buffers.back().bind();
     }
-    checkError("OffScreen::close()");
+    checkGLError("OffScreen::close()");
 }
 

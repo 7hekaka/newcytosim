@@ -437,7 +437,7 @@ namespace gle
     }
 #endif
     
-    /// Icosahedrong with 20 triangles = 60 vertices
+    /// Icosahedrong with 20 triangles = 60 vertices, using true face-normals
     size_t setIcosahedron(flute6* flt, float R=1.0f)
     {
         const float T = R * 0.8506508084f;      // (1 + sqrt(5))/2
@@ -673,7 +673,7 @@ namespace gle
         return 14;
     }
 
-    size_t setBlob(flute3* flu)
+    size_t makeBlob(flute3* flu)
     {
         constexpr float R = 1.f, U = -1.f, H(M_SQRT2);
         /* start from a centered cube, rotated appropriately
@@ -695,37 +695,62 @@ namespace gle
             a = {pts[3*n  ], pts[3*n+1], pts[3*n+2]};
             b = {pts[3*n+3], pts[3*n+4], pts[3*n+5]};
             c = {pts[3*n+6], pts[3*n+7], pts[3*n+8]};
-            flu[i++] = normalize(a+a);
-            flu[i++] = normalize(a+b);
-            flu[i++] = normalize(a+c);
-            flu[i++] = normalize(b+c);
+            flu[i++] = (a+a);
+            flu[i++] = (a+b);
+            flu[i++] = (a+c);
+            flu[i++] = (b+c);
         }
         a = {pts[3*n+3], pts[3*n+4], pts[3*n+5]};
-        flu[i++] = normalize(c+c);
-        flu[i++] = normalize(a+c);
-        flu[i++] = normalize(a+c);
+        flu[i++] = (c+c);
+        flu[i++] = (a+c);
+        flu[i++] = (a+c);
         a = {pts[3*13], pts[3*13+1], pts[3*13+2]};
-        flu[i++] = normalize(a+a);
+        flu[i++] = (a+a);
         for ( n = 13; n > 2; n -= 2 )
         {
             a = {pts[3*n  ], pts[3*n+1], pts[3*n+2]};
             b = {pts[3*n-3], pts[3*n-2], pts[3*n-1]};
             c = {pts[3*n-6], pts[3*n-5], pts[3*n-4]};
-            flu[i++] = normalize(a+a);
-            flu[i++] = normalize(a+b);
-            flu[i++] = normalize(a+c);
-            flu[i++] = normalize(b+c);
+            flu[i++] = (a+a);
+            flu[i++] = (a+b);
+            flu[i++] = (a+c);
+            flu[i++] = (b+c);
         }
         a = {pts[0], pts[1], pts[2]};
-        flu[i++] = normalize(c+c);
-        flu[i++] = normalize(a+c);
+        flu[i++] = (c+c);
+        flu[i++] = (a+c);
         assert_true(i==54);
-        return 56;
+        return 54;
+    }
+    
+    size_t setBlob(flute3* flu)
+    {
+        float H = 0.5;
+        float S = M_SQRT1_2;
+        float O = std::sqrt(1/3.0); //0.57735
+        float T = std::sqrt(2/3.0); //0.816497
+        
+        flute3 src[54] = {{T, O, 0}, {H, S, H}, {1., 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
+            {0, -1., 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-1., 0, 0}, {-H, S, H},
+            {-T, O, 0}, {0, 1., 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
+            {0, 0, -1.}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {0, 0, -1.}, {-S, 0, -S},
+            {0, O, -T},   {-H, S, -H}, {-H, S, -H}, {-T, O, 0}, {-T, O, 0},   {-H, S, -H},
+            {-1., 0, 0}, {-S, 0, -S}, {-T, -O, 0}, {-H, -S, -H}, {0, -1., 0}, {H, -S, -H},
+            {T, -O, 0}, {S, 0, -S}, {1., 0, 0}, {H, S, -H}, {T, O, 0}, {0, 1., 0},
+            {H, S, H}, {-H, S, H}, {0, O, T}, {-S, 0, S}, {0, 0, 1.}, {-H, -S, H},
+            {0, -O, T}, {H, -S, H}, {0, 0, 1.}, {S, 0, S}, {0, O, T}, {H, S, H}};
+        
+        for ( size_t i = 0; i < 54; ++i )
+            flu[i] = normalize(src[i]);
+
+        return 54;
     }
     
     /* This moves some vertices to smoothen the blob */
-    void refineBlob(flute3 * flu, size_t cnt)
+    void normalizePoints(flute3 * flu, size_t cnt)
     {
+        for ( size_t i = 0; i < cnt; ++i )
+            flu[i] = normalize(flu[i]);
     }
 
     /* This moves some vertices to add an hexagonal needle to the blob */

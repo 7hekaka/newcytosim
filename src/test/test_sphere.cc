@@ -11,6 +11,7 @@
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_cap.h"
+#include "gym_check.h"
 #include "fg_stroke.h"
 
 
@@ -20,7 +21,7 @@ SphericalCode * front = &S;
 pthread_t thread;
 pthread_mutex_t lock;
 
-int n_points = 12;
+int n_points = 26;
 
 //------------------------------------------------------------------------------
 
@@ -71,7 +72,7 @@ void* calculateSphere(void * arg)
     glApp::postRedisplay();
         
     pthread_mutex_unlock(&lock);
-    pthread_exit(0);
+    pthread_exit(nullptr);
 }
 
 //------------------------------------------------------------------------------
@@ -79,6 +80,7 @@ void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c)
     {
+        case 'q' : exit(1);
         case 'r': n_points-=256;  break;
         case 't': n_points-=32;   break;
         case 'y': n_points+=1;    break;
@@ -86,18 +88,15 @@ void processNormalKey(unsigned char c, int x, int y)
         case 'i': n_points+=16;   break;
         case 'o': n_points+=128;  break;
         case 'p': n_points+=1024; break;
-        case 'q' : exit(1);
-            
-        default:
-            glApp::processNormalKey(c,x,y);
-            return;
+        case 's': front = (front==&S?&T:&S); return;
+        default: glApp::processNormalKey(c,x,y); return;
     }
     if ( n_points < 1 )
         n_points = 1;
     
     if ( 0 == pthread_mutex_trylock(&lock) )
     {
-        pthread_create(&thread, 0, &calculateSphere, (void *)1);
+        pthread_create(&thread, nullptr, &calculateSphere, (void *)1);
     }
     else
     {
@@ -119,17 +118,17 @@ void drawVertices()
     gym::drawPoints(5, 0, cnt);
 }
 
-void nameVertices(float S)
+void nameVertices(float size)
 {
     gym::disableAlphaTest();
     gym::disableLighting();
-    char tmp[128];
+    char tmp[128] = { 0 };
     for ( size_t i=0; i < front->nbPoints(); ++i )
     {
         snprintf(tmp, sizeof(tmp), "%lu", i);
         real const* ptr = front->addr(i);
         gym::face_view(ptr[0], ptr[1], ptr[2]);
-        fgStrokeString(0, 0, S, 1, tmp, 1);
+        fgStrokeString(0, 0, size, 1, tmp, 1);
     }
     gym::restoreLighting();
     gym::restoreAlphaTest();
@@ -152,6 +151,7 @@ void drawTangents(const float col[4], const float lor[4])
     }
     gym::unmapBufferC4V4();
     gym::drawLines(3, 0, n);
+    gym::cleanup();
 }
 
 
@@ -165,8 +165,9 @@ int display(View& view)
         col[1] = 0.5f;
     gym::color(col);
     drawVertices();
+    gym::color(0,1,1);
     nameVertices(0.1*view.pixelSize());
-    drawTangents(col, lor);
+    //drawTangents(col, lor);
     view.closeDisplay();
     return 0;
 }
@@ -178,18 +179,20 @@ int main(int argc, char* argv[])
     
     if ( argc == 3 ) 
     {
-        size_t min = strtoul(argv[1], 0, 10);
-        size_t max = strtoul(argv[2], 0, 10);
+        size_t min = strtoul(argv[1], nullptr, 10);
+        size_t max = strtoul(argv[2], nullptr, 10);
         for ( size_t nbp = min; nbp < max; nbp += 7)
             batch(nbp, 16);
         return EXIT_SUCCESS;
     }
     
     if ( argc == 2 ) 
-        n_points = strtoul(argv[1], 0, 10);
+        n_points = strtoul(argv[1], nullptr, 10);
     
-    pthread_mutex_init(&lock, 0);
+    pthread_mutex_init(&lock, nullptr);
     front->distributePoints(n_points, 1e-4, 1<<14);
+    front->initBlob();
+    front->refinePoints(0.001, 200);
     
     glutInit(&argc, argv);
     glApp::setDimensionality(3);
