@@ -45,6 +45,13 @@ namespace gle
     size_t ico_idx_[8] = { 0 };
     /// number of faces in icosahedrons
     size_t ico_cnt_[8] = { 0 };
+    
+    /// index of first vertex in buffer object
+    size_t icoid_pts_ = 0;
+    /// index of first vertex index in buffer object
+    size_t icoid_idx_ = 0;
+    /// number of faces in icosahedrons
+    size_t icoid_cnt_ = 0;
 
     void initBuffers()
     {
@@ -605,49 +612,35 @@ namespace gle
     }
     
     /// this only sets vertices, skipping normals
-    size_t setIcoid(flute3* flu, float R)
-    {
-        const float G = 0.5 + 0.5 * std::sqrt(5.0);
-        const float Z = R / std::sqrt(G*G+1.0);
-        const float T = R * G * Z;
-        size_t i = 0;
-        flu[i++] = { T,  0, 0 };//0+2
-        flu[i++] = { T, -Z,  0};//2
-        flu[i++] = { Z,  0, -T};// 6
-        flu[i++] = { 0, -T, -Z};//9
-        flu[i++] = {-Z,  0, -T};//5
-        //flu[i++] = { 0, -T/3, -(2*T+Z)/3};//5+6+9
-        flu[i++] = {-Z,  0, -T};//5
-        flu[i++] = { 0,  0, -T};//5+6
-        flu[i++] = { 0,  T, -Z};//11
-        flu[i++] = { Z,  0, -T};// 6
-        flu[i++] = { T,  Z,  0};// 0
-        flu[i++] = { T,  0, 0 };//0+2
+    size_t setIcoidBuffer(flute3* flu, GLshort* idx)
 
-        flu[i++] = { Z,  0,  T};// 4
-        flu[i++] = { T, -Z,  0};// 2
-        flu[i++] = { 0, -T,  Z};// 10
-        flu[i++] = { 0, -T, -Z};// 9
-        flu[i++] = {-T, -Z,  0};// 1
-        flu[i++] = {-Z,  0, -T};// 5
-        flu[i++] = {-T,  Z,  0};// 3
-        flu[i++] = { 0,  T, -Z};// 11
-        flu[i++] = { 0,  T,  Z};// 8
-        flu[i++] = { T,  Z,  0};//0
+    {
+        const float U = 1.0;
+        const float Z = std::sqrt(0.2);
+        const float C = std::cos(M_PI/2.5);
+        const float S = std::sin(M_PI/2.5);
+        const float D = C*C - S*S;
+        const float T = C*S + S*C;
         
-        flu[i++] = { Z/2, T/2, (Z+T)/2};//4+8
-        flu[i++] = { Z,  0,  T};//4
-        flu[i++] = {-Z,  0,  T};// 7
-        flu[i++] = { 0, -T,  Z};//10
-        flu[i++] = {-(T+Z)/2, -Z/2, T/2};//1+7
-        flu[i++] = {-T, -Z,  0};//1
-        flu[i++] = {-T, -Z,  0};//1
-        //flu[i++] = {-(2*T+Z)/3, 0, T/3};//1+3+7
-        flu[i++] = {-T,  Z,  0};//3
-        flu[i++] = {-Z,  0,  T};//7
-        flu[i++] = { 0,  T,  Z};//8
-        flu[i++] = { Z/2, T/2, (Z+T)/2};//4+8
-        return i;
+        size_t i = 0;
+        // Twelve vertices of icosahedron on unit sphere
+        flu[i++] = { 0,  0, -U};
+        flu[i++] = { U,  0, -Z};
+        flu[i++] = { C, -S, -Z};
+        flu[i++] = { D, -T, -Z};
+        flu[i++] = { D,  T, -Z};
+        flu[i++] = { C,  S, -Z};
+        flu[i++] = {-D, -T,  Z};
+        flu[i++] = {-C, -S,  Z};
+        flu[i++] = {-U,  0,  Z};
+        flu[i++] = {-C,  S,  Z};
+        flu[i++] = {-D,  T,  Z};
+        flu[i++] = { 0,  0,  U};
+
+        const size_t n_faces = 30;
+        GLshort strip[n_faces] = {5,1,0,2,3, 3,0,4,5, 5,9,4,8,3,7,2,6,1,10,5,9, 9,10,11,6,7, 7,11,8,9};
+        memcpy(idx, strip, n_faces*sizeof(GLshort));
+        return n_faces;
     }
 
     //-----------------------------------------------------------------------
@@ -725,20 +718,21 @@ namespace gle
     
     size_t setBlob(flute3* flu)
     {
+        float U = 1.0;
         float H = 0.5;
         float S = M_SQRT1_2;
         float O = std::sqrt(1/3.0); //0.57735
         float T = std::sqrt(2/3.0); //0.816497
         
-        flute3 src[54] = {{T, O, 0}, {H, S, H}, {1., 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
-            {0, -1., 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-1., 0, 0}, {-H, S, H},
-            {-T, O, 0}, {0, 1., 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
-            {0, 0, -1.}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {0, 0, -1.}, {-S, 0, -S},
-            {0, O, -T},   {-H, S, -H}, {-H, S, -H}, {-T, O, 0}, {-T, O, 0},   {-H, S, -H},
-            {-1., 0, 0}, {-S, 0, -S}, {-T, -O, 0}, {-H, -S, -H}, {0, -1., 0}, {H, -S, -H},
-            {T, -O, 0}, {S, 0, -S}, {1., 0, 0}, {H, S, -H}, {T, O, 0}, {0, 1., 0},
-            {H, S, H}, {-H, S, H}, {0, O, T}, {-S, 0, S}, {0, 0, 1.}, {-H, -S, H},
-            {0, -O, T}, {H, -S, H}, {0, 0, 1.}, {S, 0, S}, {0, O, T}, {H, S, H}};
+        flute3 src[54] = {{T, O, 0}, {H, S, H}, {U, 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
+            {0, -U, 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-U, 0, 0}, {-H, S, H},
+            {-T, O, 0}, {0, U, 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
+            {0, 0, -U}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {0, 0, -U}, {-S, 0, -S},
+            {0, O, -T}, {-H, S, -H},   {-H, S, -H}, {-T, O, 0},   {-T, O, 0}, {-H, S, -H},
+            {-U, 0, 0}, {-S, 0, -S}, {-T, -O, 0}, {-H, -S, -H}, {0, -U, 0}, {H, -S, -H},
+            {T, -O, 0}, {S, 0, -S}, {U, 0, 0}, {H, S, -H}, {T, O, 0}, {0, U, 0},
+            {H, S, H}, {-H, S, H}, {0, O, T}, {-S, 0, S}, {0, 0, U}, {-H, -S, H},
+            {0, -O, T}, {H, -S, H}, {0, 0, U}, {S, 0, S}, {0, O, T}, {H, S, H}};
         
         for ( size_t i = 0; i < 54; ++i )
             flu[i] = normalize(src[i]);
@@ -834,7 +828,7 @@ namespace gle
     
     static size_t sizeBlobBuffers()
     {
-        return ( 56 + 56 + 16 + 32 );
+        return ( 54 + 54 + 16 );
     }
 
     flute3* setBlobBuffers(flute3* ptr, flute3* const ori, size_t idx[])
@@ -843,7 +837,6 @@ namespace gle
         idx[0] = i+s; i += setBlob(ptr+i);
         idx[1] = i+s; i += setPin(ptr+i);
         idx[2] = i+s; i += setCuboid(ptr+i, 1.0);
-        idx[3] = i+s; i += setIcoid(ptr+i, 1.0);
         assert_true( i <= sizeBlobBuffers() );
         return ptr + i;
     }
@@ -903,7 +896,7 @@ namespace gle
     void blob()   { doTriangleStrip(blobs_[0], 54); }
     void needle() { doTriangleStrip(blobs_[1], 54); }
     void cuboid() { doTriangleStrip(blobs_[2], 14); }
-    void icoid()  { doTriangleStrip(blobs_[3], 32); }
+    //void icoidS() { doTriangleStrip(blobs_[3], 32); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D Circle
@@ -1335,11 +1328,29 @@ namespace gle
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
     void opensphere()  { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
-
+    
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
     void dualPassSphere8() { dualPassIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
+    
+    void drawTriangleStripBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
+    {
+        assert_true(buf_[0]); assert_true(buf_[1]);
+        // the normal in each vertex is equal to the vertex!
+        //glPointSize(7); glColor3f(1,1,1);
+        gym::bindBufferV3N0(buf_[0], pts);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+        glDrawElements(GL_TRIANGLE_STRIP, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+
+    void icoid() { drawTriangleStripBuffer(icoid_pts_, icoid_idx_, icoid_idx_); }
+    
+    // this draws without loading/initializing the buffer
+    void icoidF() { glDrawElements(GL_TRIANGLE_STRIP, icoid_cnt_, GL_UNSIGNED_SHORT, (void*)(icoid_idx_*sizeof(GLshort))); }
     
     void setBuffers()
     {
@@ -1354,8 +1365,8 @@ namespace gle
         ico[6].buildHemisphere(finesse*2);
         ico[7].buildOpensphere(finesse);
 
-        f = 0;
-        size_t s = 0;
+        f = 32; // for setIcoidBuffer
+        size_t s = 12;
         for ( int i = 0; i < 8; ++i )
         {
             f += 3 * ico[i].max_faces();
@@ -1387,7 +1398,14 @@ namespace gle
 
         for ( int i = 0; i < 8; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
-        //fprintf(stderr, "setIcosBuffers : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
+        
+        icoid_pts_ = ptr - ptr0;
+        icoid_idx_ = idx - idx0;
+        icoid_cnt_ = setIcoidBuffer((flute3*)ptr, (GLshort*)idx);
+        ptr += 3*12;
+        idx += icoid_cnt_;
+
+        //fprintf(stderr, "setIcoBuffer : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
         assert_true( ptr < ptr0 + s + c + t );
         assert_true( idx < idx0 + f );
 

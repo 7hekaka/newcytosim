@@ -96,9 +96,6 @@ public:
     /// write points coordinates
     void printAllPositions(FILE* file = stdout);
     
-    /// set
-    void initBlob();
-    
 private:
 
     /// This number affects convergence speed but not the result

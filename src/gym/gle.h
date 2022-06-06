@@ -106,8 +106,6 @@ namespace gle
 
     /// draw a roughly spherical shape made of few triangles
     void blob();
-    /// draw a icosahedron without normals
-    void icoid();
     /// draw a centered blob of radius 1 with a cone extending up in Z
     void needle();
     /// draw a Cube of side 2
@@ -119,6 +117,11 @@ namespace gle
     /// draw a stellated octahedron
     void star();
     
+    /// draw a icosahedron without normals, as the first approximation of a sphere
+    void icoid();
+    /// draw a icosahedron without normals, as the first approximation of a sphere
+    void icoidF();
+
     /// returns tetrahedron or octahedron
     inline void (*hedron(bool x))() { return x ? tetrahedron : cube; }
 

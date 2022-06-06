@@ -557,7 +557,7 @@ void Tesselator::buildIcosahedronZ(unsigned div, int make)
         const FLOAT C = std::cos(M_PI/2.5);
         const FLOAT S = std::sin(M_PI/2.5);
         const FLOAT D = C*C - S*S;
-        const FLOAT T = C*S*2;
+        const FLOAT T = C*S + C*S;
         
         // Twelve vertices of icosahedron on unit sphere
         FLOAT vex[12][3] = {
@@ -571,7 +571,7 @@ void Tesselator::buildIcosahedronZ(unsigned div, int make)
             {-C, -S,  Z},
             {-1,  0,  Z},
             {-C,  S,  Z},
-            {-D,  S,  Z},
+            {-D,  T,  Z},
             { 0,  0,  1}
         };
         
@@ -619,7 +619,7 @@ void Tesselator::buildOpensphere(unsigned div, int make)
         const FLOAT C = std::cos(M_PI/2.5);
         const FLOAT S = std::sin(M_PI/2.5);
         const FLOAT D = C*C - S*S;
-        const FLOAT T = C*S*2;
+        const FLOAT T = C*S + C*S;
         
         // Twelve vertices of icosahedron on unit sphere
         FLOAT vex[11][3] = {
@@ -633,7 +633,7 @@ void Tesselator::buildOpensphere(unsigned div, int make)
             {-C, -S,  Z},
             {-1,  0,  Z},
             {-C,  S,  Z},
-            {-D,  S,  Z},
+            {-D,  T,  Z},
         };
         
         // ordered faces: Counter-Clockwise = facing out

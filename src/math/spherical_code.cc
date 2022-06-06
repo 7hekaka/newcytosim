@@ -29,46 +29,6 @@ SphericalCode::~SphericalCode()
     coord_ = nullptr;
 }
 
-
-void SphericalCode::initBlob()
-{
-    real H = 0.5;
-    real S = M_SQRT1_2;
-    real O = std::sqrt(1/3.0); //0.57735
-    real T = std::sqrt(2/3.0); //0.816497
-    
-    real src[54][3] = {{ T, O, 0}, {H, S, H}, {1., 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
-        {0, -1., 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-1., 0, 0}, {-H, S, H},
-        {-T, O, 0}, {0, 1., 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
-        {0, 0, -1.}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {0, 0, -1.}, {-S, 0, -S},
-        {0, O, -T},   {-H, S, -H}, {-H, S, -H}, {-T, O, 0}, {-T, O, 0},   {-H, S, -H},
-        {-1., 0, 0}, {-S, 0, -S}, {-T, -O, 0}, {-H, -S, -H}, {0, -1., 0}, {H, -S, -H},
-        {T, -O, 0}, {S, 0, -S}, {1., 0, 0}, {H, S, -H}, {T, O, 0}, {0, 1., 0},
-        {H, S, H}, {-H, S, H}, {0, O, T}, {-S, 0, S}, {0, 0, 1.}, {-H, -S, H},
-        {0, -O, T}, {H, -S, H}, {0, 0, 1.}, {S, 0, S}, {0, O, T}, {H, S, H}};
-   
-    allocate(54);
-    size_t k = 0;
-    for ( size_t i = 0; i < 54; ++i )
-    {
-        bool uniq = true;
-        real const* A = (real*)(src+i);
-        for ( size_t j = 0; j < k; ++j )
-        {
-            real const* B = coord_ + 3*j;
-            real d = square(A[0]-B[0]) + square(A[1]-B[1]) + square(A[2]-B[2]);
-            if ( d < 0.1 )
-            {
-                uniq = false;
-                break;
-            }
-        }
-        if ( uniq )
-            memcpy(coord_+3*k++, (real*)(src+i), 3*sizeof(real));
-    }
-    num_points_ = k;
-}
-
 //------------------------------------------------------------------------------
 
 void SphericalCode::putPoint(real ptr[3], const size_t i)

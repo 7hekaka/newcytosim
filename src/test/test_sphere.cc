@@ -191,8 +191,6 @@ int main(int argc, char* argv[])
     
     pthread_mutex_init(&lock, nullptr);
     front->distributePoints(n_points, 1e-4, 1<<14);
-    front->initBlob();
-    front->refinePoints(0.001, 200);
     
     glutInit(&argc, argv);
     glApp::setDimensionality(3);
