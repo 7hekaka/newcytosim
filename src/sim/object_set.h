@@ -168,15 +168,15 @@ public:
     
     /// find Object of given serial-number (see Inventory)
     Object * findID(ObjectID n) const { return static_cast<Object*>(inventory_.get(n)); }
-    
-    /// return an Object which has this property
-    Object * pickObject(Property const*) const;
 
     /// return Object corresponding to specifications
     Object * findObject(const std::string& cat, std::string spec, long identity) const;
     
+    /// return an Object which has this property
+    Object * pickObject(Property const*) const;
+
     /// return Object corresponding to a certain criteria (eg. 'first' or 'last')
-    Object * findObject(const std::string& cat, std::string spec) const;
+    Object * pickObject(const std::string& cat, std::string spec) const;
     
     //--------------------------
     

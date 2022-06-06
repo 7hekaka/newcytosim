@@ -125,7 +125,7 @@ Fiber * FiberSet::newFiber(ObjectList& res, const std::string& name, Glossary& o
 #if FIBER_HAS_FAMILY
     std::string str;
     if ( opt.set(str, "family") )
-        fib->family_ = simul_.findFiber(str);
+        fib->family_ = simul_.pickFiber(str);
 #endif
  
     size_t inp = 1;
@@ -595,7 +595,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
             return randomSite(static_cast<FiberProp const*>(p));
         
         // check if some individual fiber was requested:
-        Fiber* fib = Fiber::toFiber(findObject(title(), str));
+        Fiber* fib = Fiber::toFiber(pickObject(title(), str));
         
         if ( fib )
         {

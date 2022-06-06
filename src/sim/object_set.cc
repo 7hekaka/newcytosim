@@ -300,7 +300,7 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
  - `fiber-1` the penultimate fiber, etc.
  .
  */
-Object* ObjectSet::findObject(const std::string& cat, std::string spec) const
+Object* ObjectSet::pickObject(const std::string& cat, std::string spec) const
 {
     //std::clog << "ObjectSet::findObject(" << cat << ", " << spec << ")\n";
 

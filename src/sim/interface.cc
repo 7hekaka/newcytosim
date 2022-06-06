@@ -687,7 +687,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
 void Interface::execute_move(std::string const& name, Vector const& pos)
 {
     
-    Object * obj = sim_->findMovable(name);
+    Object * obj = sim_->pickMovable(name);
     if ( obj )
         obj->setPosition(pos);
 }

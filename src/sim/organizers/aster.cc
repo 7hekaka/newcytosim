@@ -293,7 +293,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
         }
         else
         {
-            sol = sim.findSolid(spec);
+            sol = sim.pickSolid(spec);
             if ( sol )
             {
                 // prevent Aster from being moved, so that its position match the Solid

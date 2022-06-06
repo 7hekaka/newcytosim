@@ -255,19 +255,19 @@ public:
     static Mecable * toMecable(Object *);
 
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
-    Mecable * findMecable(const std::string&) const;
+    Mecable * pickMecable(const std::string&) const;
     
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
-    Object * findMovable(const std::string&) const;
+    Object * pickMovable(const std::string&) const;
 
     /// find a Solid by name
-    Solid * findSolid(std::string s) { return Solid::toSolid(solids.findObject("solid", s)); }
+    Solid * pickSolid(std::string s) { return Solid::toSolid(solids.pickObject("solid", s)); }
     
     /// find a Fiber by name
-    Fiber * findFiber(std::string s) { return Fiber::toFiber(fibers.findObject("fiber", s)); }
+    Fiber * pickFiber(std::string s) { return Fiber::toFiber(fibers.pickObject("fiber", s)); }
     
     /// find a Sphere by name
-    Sphere * findSphere(std::string s) { return Sphere::toSphere(spheres.findObject("sphere", s)); }
+    Sphere * pickSphere(std::string s) { return Sphere::toSphere(spheres.pickObject("sphere", s)); }
     
     /// first Space with this Property
     Space * pickSpace(const Property * p) const { return static_cast<Space*>(spaces.pickObject(p)); }

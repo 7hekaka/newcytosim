@@ -40,14 +40,14 @@ void Fake::build(ObjectList& res, Glossary& opt, Simul& sim)
     // find the Aster specified:
     if ( opt.set(str, "aster1") )
     {
-        Aster * a = Aster::toAster(sim.organizers.findObject("aster", str));
+        Aster * a = Aster::toAster(sim.organizers.pickObject("aster", str));
         if ( !a)
             throw InvalidParameter("could not find Aster `"+str+"'");
         as = a->solid();
     }
     else if ( opt.set(str, "solid1") )
     {
-        as = sim.findSolid(str);
+        as = sim.pickSolid(str);
         if ( !as )
             throw InvalidParameter("could not find Solid `"+str+"'");
     }
@@ -57,14 +57,14 @@ void Fake::build(ObjectList& res, Glossary& opt, Simul& sim)
     // find the Aster specified:
     if ( opt.set(str, "aster2") )
     {
-        Aster * a = Aster::toAster(sim.organizers.findObject("aster", str));
+        Aster * a = Aster::toAster(sim.organizers.pickObject("aster", str));
         if ( !a )
             throw InvalidParameter("could not find Aster `"+str+"'");
         bs = a->solid();
     }
     else if ( opt.set(str, "solid2") )
     {
-        bs = sim.findSolid(str);
+        bs = sim.pickSolid(str);
         if ( !bs )
             throw InvalidParameter("could not find Solid `"+str+"'");
     }

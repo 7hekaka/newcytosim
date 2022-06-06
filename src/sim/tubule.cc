@@ -384,7 +384,7 @@ void Tubule::setInteractionsD(Meca& meca) const
     const real stiffL = prop->stiffness[0];
     const real stiffR = prop->stiffness[1];
     const real C = std::sin(ang), S = std::cos(ang); // rotation of angle PI/2 - ang
-    Rotation mat;
+    Rotation mat(0, 1);
 
     for ( size_t n = 0; n < NFIL; ++n )
     {

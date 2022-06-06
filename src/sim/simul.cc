@@ -154,24 +154,24 @@ Mecable* Simul::toMecable(Object * obj)
  fiber1
  single1
  */
-Mecable * Simul::findMecable(const std::string& arg) const
+Mecable * Simul::pickMecable(const std::string& arg) const
 {
-    Object  * obj = fibers.findObject("fiber", arg);
-    if (!obj) obj = solids.findObject("solid", arg);
-    if (!obj) obj = spheres.findObject("sphere", arg);
-    if (!obj) obj = beads.findObject("bead", arg);
+    Object  * obj = fibers.pickObject("fiber", arg);
+    if (!obj) obj = solids.pickObject("solid", arg);
+    if (!obj) obj = spheres.pickObject("sphere", arg);
+    if (!obj) obj = beads.pickObject("bead", arg);
     return static_cast<Mecable*>(obj);
 }
 
 
-Object * Simul::findMovable(const std::string& arg) const
+Object * Simul::pickMovable(const std::string& arg) const
 {
-    Object *  obj = fibers.findObject("fiber", arg);
-    if (!obj) obj = solids.findObject("solid", arg);
-    if (!obj) obj = spheres.findObject("sphere", arg);
-    if (!obj) obj = beads.findObject("bead", arg);
-    if (!obj) obj = couples.findObject("couple", arg);
-    if (!obj) obj = singles.findObject("single", arg);
+    Object *  obj = fibers.pickObject("fiber", arg);
+    if (!obj) obj = solids.pickObject("solid", arg);
+    if (!obj) obj = spheres.pickObject("sphere", arg);
+    if (!obj) obj = beads.pickObject("bead", arg);
+    if (!obj) obj = couples.pickObject("couple", arg);
+    if (!obj) obj = singles.pickObject("single", arg);
     return obj;
 }
 

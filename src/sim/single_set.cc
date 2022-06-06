@@ -206,7 +206,7 @@ void SingleSet::newObjects(ObjectList& res, const std::string& name, Glossary& o
     std::string str;
     if ( opt.set(str, "base") )
     {
-        Mecable * mec = simul_.findMecable(str);
+        Mecable * mec = simul_.pickMecable(str);
         if ( !mec )
             throw InvalidParameter("could not find Mecable specified in single:base `"+str+"'");
         // get index of point in second argument
