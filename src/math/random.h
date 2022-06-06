@@ -33,7 +33,7 @@
  
  F. Nedelec, reclassified on 13.09.2018
 */
-class alignas(16) Random
+class alignas(32) Random
 {
     /// reserve of random integers
     uint32_t integers_[SFMT_N32];

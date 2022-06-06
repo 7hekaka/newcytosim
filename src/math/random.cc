@@ -42,7 +42,9 @@ Random::Random()
         fprintf(stderr, "Random can only work if sizeof(uint32_t) == 4\n");
         exit(1);
     }
-    
+    uintptr_t a = ((uintptr_t)this & 31);
+    if ( a ) fprintf(stderr, "Random missaligned on 32 + %lu\n", a);
+
     //fprintf(stderr, "Random with SFMT_N32 = %i\n", SFMT_N32);
     
     // clear state (not necessary):
