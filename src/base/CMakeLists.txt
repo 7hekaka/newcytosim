@@ -7,7 +7,6 @@ set(SOURCES_BASE
     iowrapper.cc
     exceptions.cc
     time_date.cc
-    node.cc
     inventory.cc
     stream_func.cc
     tokenizer.cc
