@@ -307,12 +307,12 @@ void View::drawText(Vector3 const& vec, const float color[4], const char text[],
 #pragma mark -
 
 // display FPS = frames per seconds
-void View::drawFPS() const
+void View::drawFPS(size_t arg) const
 {
     static char str[16];
     static size_t cnt = 0;
     static double sec = TimeDate::seconds_today();
-    ++cnt;
+    cnt += arg;
     double now = TimeDate::seconds_today();
     if ( now > sec + 1.0 )
     {

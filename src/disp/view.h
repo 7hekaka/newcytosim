@@ -153,7 +153,7 @@ public:
     void strokeString(const char[], float width) const;
 
     /// display frame-per-seconds
-    void drawFPS() const;
+    void drawFPS(size_t) const;
 
     /// display scale bar, info text, etc.
     void drawInteractiveFeatures() const;
