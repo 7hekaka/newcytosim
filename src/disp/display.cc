@@ -323,11 +323,10 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color c
 /**
  set LineDisp for given Fiber
  */
-void Display::prepareLineDisp(const Fiber * fib, LineDisp * self)
+void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * self)
 {
     bool hide = false;
     assert_true(fib->prop);
-    FiberDisp const*const disp = fib->prop->disp;
     gle_color col = disp->color;
     
     // change body color depending on coloring mode:
@@ -489,6 +488,19 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
     disp->setPixels(pixelSize, unitValue, prop->style==2);
 }
 
+
+/// attribute a LineDisp, and set individual display values for all fibers
+void Display::attributeLineDisp(FiberSet const& fibers)
+{
+    for ( Fiber * fib = fibers.first(); fib; fib = fib->next() )
+    {
+        if ( !fib->disp )
+            fib->disp = new LineDisp();
+        prepareLineDisp(fib, fib->prop->disp, fib->disp);
+    }
+}
+
+
 /**
  Perform the operations that are necessary to display the simulation:
  - create FiberDisp, HandDisp, SphereDisp, etc. (one per Property)
@@ -506,15 +518,18 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
     
     // counter to give different colors to the objects
     size_t idx = 0;
-    
+
     PropertyList plist = sim.properties.find_all("fiber");
     
     prep_flag = 0;
-        // create a FiberDisp for each FiberProp:
+    // create a FiberDisp for each FiberProp:
     for ( Property* p : plist )
         prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gle::nice_color(idx++));
 
-    if ( prep_time != sim.time() )
+    // create a LineDisp for each Fiber:
+    attributeLineDisp(sim.fibers);
+
+    if ( prep_flag && prep_time != sim.time() )
     {
         // the analysis only needs to be done once per state:
         prep_time = sim.time();
@@ -544,14 +559,6 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
                 age_scale = 1;
             }
         }
-    }
-    
-    // attribute LineDisp, and set individual display values for all fibers
-    for ( Fiber * fib = sim.fibers.first(); fib; fib = fib->next() )
-    {
-        if ( !fib->disp )
-            fib->disp = new LineDisp();
-        prepareLineDisp(fib, fib->disp);
     }
     
     //create a PointDisp for each HandProp:

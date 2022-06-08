@@ -108,7 +108,7 @@ private:
     void prepareFiberDisp(FiberProp*, PropertyList&, gle_color);
     
     /// set values of fiber's LineDisp
-    void prepareLineDisp(Fiber const*, LineDisp*);
+    void prepareLineDisp(Fiber const*, FiberDisp const*, LineDisp*);
     
     template < typename T >
     void preparePointDisp(T * prop, PropertyList&, gle_color);
@@ -141,7 +141,10 @@ public:
 
     /// set current pixel-size and the value of the point in pixels
     void setPixelFactors(float pixel_size, float unit_value);
-    
+
+    /// attribute a LineDisp, and set individual display values for all fibers
+    void attributeLineDisp(FiberSet const&);
+
     /// get ready to display
     void prepareForDisplay(Simul const&, PropertyList&, Vector3 const&);
 
