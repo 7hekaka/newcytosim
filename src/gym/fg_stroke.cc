@@ -66,9 +66,10 @@ SFG_StrokeFont const* fghStrokeByID( int mono )
 /*
  * Draw a stroke character
  */
-void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char arg,
+void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char arg,
                        float line_width, float point_size)
 {
+    scale *= 0.125;
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
     SFG_StrokeFont const* font = fghStrokeByID( mono );
@@ -84,7 +85,7 @@ void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char arg,
                 const SFG_StrokeVertex* ptr = strip->Vertices;
                 flute2* flu = gym::mapBufferV2(num);
                 for ( size_t j = 0; j < num; ++j )
-                    flu[j] = { X+S*ptr[j].X, Y+S*ptr[j].Y };
+                    flu[j] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
                 gym::unmapBufferV2();
                 if ( line_width > 0 )
                     gym::drawLineStrip(line_width, 0, num);
@@ -96,9 +97,10 @@ void fgStrokeCharacter(float X, float Y, float S, int mono, unsigned char arg,
 }
 
 
-void fgStrokeString(float X, float Y, float S, int mono, const char *string,
+void fgStrokeString(float X, float Y, float scale, int mono, const char *string,
                     float line_width, float point_size, float vshift)
 {
+    scale *= 0.125;
     unsigned char c;
     float X0 = X;
     SFG_StrokeFont const* font = fghStrokeByID( mono );
@@ -116,7 +118,7 @@ void fgStrokeString(float X, float Y, float S, int mono, const char *string,
             if ( c == '\n' )
             {
                 X = X0;
-                Y -= S * vshift;
+                Y -= scale * vshift;
             }
             else  /* Not an EOL, draw the bitmap character */
             {
@@ -131,14 +133,14 @@ void fgStrokeString(float X, float Y, float S, int mono, const char *string,
                         const SFG_StrokeVertex* ptr = strip->Vertices;
                         flute2* flu = gym::mapBufferV2(num);
                         for ( size_t j = 0; j < num; ++j )
-                            flu[j] = { X+S*ptr[j].X, Y+S*ptr[j].Y };
+                            flu[j] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
                         gym::unmapBufferV2();
                         if ( line_width > 0 )
                             gym::drawLineStrip(line_width, 0, num);
                         if ( point_size > 0 )
                             gym::drawPoints(point_size, 0, num);
                     }
-                    X += S * schar->Advance;
+                    X += scale * schar->Advance;
                 }
             }
         }

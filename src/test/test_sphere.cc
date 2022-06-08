@@ -118,7 +118,7 @@ void drawVertices()
     gym::drawPoints(5, 0, cnt);
 }
 
-void nameVertices(float size)
+void nameVertices(float scale)
 {
     gym::disableAlphaTest();
     gym::disableLighting();
@@ -128,7 +128,7 @@ void nameVertices(float size)
         snprintf(tmp, sizeof(tmp), "%lu", i);
         real const* ptr = front->addr(i);
         gym::face_view(ptr[0], ptr[1], ptr[2]);
-        fgStrokeString(0, 0, size, 1, tmp, 1);
+        fgStrokeString(0, 0, scale, 1, tmp, 1);
     }
     gym::restoreLighting();
     gym::restoreAlphaTest();

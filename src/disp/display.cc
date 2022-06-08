@@ -67,7 +67,7 @@ void Display::drawText(Vector const& vec, const char str[]) const
 #else
     gym::face_view(vec.XX, 0.f, 0.f);
 #endif
-    fgStrokeString(0, 0, pixelSize/10, 1, str, 1);
+    fgStrokeString(0, 0, pixelSize, 1, str, 1);
 }
 
 //------------------------------------------------------------------------------

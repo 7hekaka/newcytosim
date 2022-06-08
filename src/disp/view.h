@@ -123,6 +123,9 @@ public:
     /// size of pixel in drawing units
     float pixelSize() const;
     
+    /// half visible range in X or Y
+    float range(int i) const { return 0.5f * visRange[i] / zoom; }
+    
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;
     

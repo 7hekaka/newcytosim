@@ -174,7 +174,7 @@ void drawEdges()
 #endif
 }
 
-void namePoints(float S)
+void namePoints(float scale)
 {
     gym::disableAlphaTest();
     gym::disableLighting();
@@ -192,7 +192,7 @@ void namePoints(float S)
         const float* ptr = ico->vertex_data(i);
         snprintf(tmp, sizeof(tmp), "%u", i);
         gym::face_view(ptr[0], ptr[1], ptr[2]);
-        fgStrokeString(0, 0, S, 1, tmp, 1);
+        fgStrokeString(0, 0, scale, 1, tmp, 1);
     }
     gym::restoreLighting();
     gym::restoreAlphaTest();

@@ -340,7 +340,7 @@ void SpacePolygon::drawPolygon(float lines, float points) const
         {
             snprintf(tmp, sizeof(tmp), "%lu", n);
             gym::face_view(pts[n].xx, pts[n].yy, height_);
-            fgStrokeString(0, 0, pixelSize/10, 1, tmp, 1);
+            fgStrokeString(0, 0, pixelSize, 1, tmp, 1);
         }
 #endif
     }

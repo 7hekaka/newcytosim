@@ -194,7 +194,7 @@ void View::strokeString(const char str[], float width) const
 {
     gym::one_view(viewport_[2], viewport_[3]);
     gym::color(front_color);
-    fgStrokeString(8, 4, 0.125, 1, str, width, 0, -0.25);
+    fgStrokeString(8, 4, 1.0, 1, str, width, 0, -0.25);
     loadView();
 }
 
@@ -296,7 +296,7 @@ void View::drawText(Vector3 const& vec, const float color[4], const char text[],
     fgBitmapString(-W*offset, -H/3, pixelSize(), font, color, text, H);
 #else
     gym::color(color);
-    fgStrokeString(0, 0, 0.1*pixelSize(), 1, text, 1);
+    fgStrokeString(0, 0, pixelSize(), 1, text, 1);
 #endif
     gym::restoreLighting();
     gym::restoreAlphaTest();
@@ -456,7 +456,7 @@ void View::reshape(int W, int H)
 }
 
 
-/// calculate the visible region in the 3 directions:
+/// calculate the window size in real units
 void View::adjust(int W, int H) const
 {
     if ( W > H )
@@ -542,6 +542,7 @@ float View::pixelSize() const
     //float a = view_scale / ( zoom * std::max(width(), height()) );
     float b = visRange[0] / ( zoom * viewport_[2] );
     //float c = visRange[1] / ( zoom * viewport_[3] );
+    assert_small(b - visRange[1] / ( zoom * viewport_[3] ));
     return b;
 }
 
@@ -941,7 +942,7 @@ void View::drawScaleHV(float s, float a, float b, void (*func)(float*, int cnt, 
             gym::unmapBufferV2();
             gym::drawLines(W, 2, 36);
             snprintf(str, sizeof(str), "%g", s);
-            fgStrokeString(s-Z, b+s+Z, Z*0.01, 1, str, 1);
+            fgStrokeString(s-Z, b+s+Z, pixelSize(), 1, str, 1);
         }
     } while ( W >= 0.5 );
 }
