@@ -37,7 +37,7 @@ namespace gle
     size_t blobs_[4] = { 0 };
     
     /// offset for objects data stored in buffers
-    size_t discs_[4] = { 0 };
+    size_t discs_[6] = { 0 };
 
     /// index of first vertex in buffer object
     size_t ico_pts_[8] = { 0 };
@@ -963,6 +963,26 @@ namespace gle
         flu[14] = { 1+R, 0 };
         return 15;
     }
+    
+    size_t setCrossPaint(flute2* flu)
+    {
+        float W = 0.2;
+        float L = 0.75;
+        float R = 0.75;
+        flu[0] = { -L, R+W };
+        flu[1] = { -L, R-W };
+        flu[2] = { -W, R+W };
+        flu[3] = { -W, R-W };
+        flu[4] = { -W, R+L };
+        flu[5] = { -W, -L };
+        flu[6] = { W, R+L };
+        flu[7] = { W, -L };
+        flu[8] = { W, R+W };
+        flu[9] = { W, R-W };
+        flu[10] = { L, R+W };
+        flu[11] = { L, R-W };
+        return 12;
+    }
 
     static size_t sizeCircBuffers()
     {
@@ -976,6 +996,7 @@ namespace gle
         idx[1] = i+s; i += setCircle(ptr+i, 2, 1);
         idx[2] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
         idx[3] = i+s; i += setCapsulePaint(ptr+i, 0.75);
+        idx[4] = i+s; i += setCrossPaint(ptr+i);
         assert_true( i <= sizeCircBuffers() );
         return ptr + i;
     }
@@ -1256,6 +1277,7 @@ namespace gle
 
     void capsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }
     void capsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
+    void cross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[4], 12); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }

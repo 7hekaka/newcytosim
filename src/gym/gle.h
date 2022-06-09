@@ -64,8 +64,10 @@ namespace gle
     void circle_dotted(float line_width);
     /// draw 2D oval within -1 to 1
     void capsule(float line_width);
-    /// paint 2D within -1 to 1
+    /// 2D oval within -1 to 1
     void capsule();
+    /// 2D cross within -1.5 to 1.5
+    void cross();
 
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
