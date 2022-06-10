@@ -10,6 +10,12 @@
 #include "exceptions.h"
 #include "print_color.h"
 
+void signal_handler(int sig)
+{
+    psignal((unsigned)sig, "SimThread");
+    _exit(sig);
+}
+
 //------------------------------------------------------------------------------
 
 /**
@@ -120,10 +126,12 @@ void SimThread::run()
 
 
 /** called before thread is started */
-void SimThread::cleanup()
+void SimThread::ready()
 {
+    assert_false( isWorker() );
     demand_ = 0;
     Parser::restart_ = 0;
+    //fprintf(stderr, "ready %i\n", sim_->prop.flag);
     assert_true(holding_ == 0);
     if ( status_ == -1 )
         pthread_join(child_, nullptr);
@@ -135,6 +143,7 @@ void child_cleanup(void * arg)
 {
     SimThread * st = static_cast<SimThread*>(arg);
     assert_true( st->isWorker() );
+    //fprintf(stderr, "cleanup dead %i\n", st->sim_->prop.flag);
     st->status_ = -1;
     st->holding_ = 0;
     st->unlock();
@@ -143,9 +152,9 @@ void child_cleanup(void * arg)
 
 
 /** C-style function to start a new thread */
-void* run_launcher(void * arg)
+void* child_entry(void * arg)
 {
-    //std::clog << "slave  " << pthread_self() << '\n';
+    //std::clog << "slave  " << pthread_self() << '\n';sign
     SimThread * st = static_cast<SimThread*>(arg);
     st->lock();
     // let the system cleanup upon normal termination:
@@ -165,9 +174,9 @@ void SimThread::start()
     assert_false( isWorker() );
     if ( status_ )
     {
-        cleanup();
+        ready();
         //std::clog << "master " << pthread_self() << '\n';
-        status_ = pthread_create(&child_, nullptr, run_launcher, this);
+        status_ = pthread_create(&child_, nullptr, child_entry, this);
         // let the system cleanup upon normal child termination:
         if ( status_ )
             printf("%p failed to create thread", this);
@@ -210,7 +219,7 @@ int SimThread::extend()
     assert_false( isWorker() );
     if ( status_ )
     {
-        cleanup();
+        ready();
         //std::clog << "master " << pthread_self() << '\n';
         status_ = pthread_create(&child_, nullptr, extend_launcher, this);
     }

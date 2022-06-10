@@ -64,7 +64,7 @@ private:
     bool isWorker() const { return pthread_equal(pthread_self(), child_); }
     
     /// reset state variable before starting
-    void cleanup();
+    void ready();
     
 public:
     

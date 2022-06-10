@@ -1346,18 +1346,7 @@ void Parser::readConfig()
 //------------------------------------------------------------------------------
 #pragma mark - Pipe
 
-#if ( 0 )
-
 #include <fcntl.h>
-
-/// set file to not block on read() even if data is not available:
-void set_nonblocking(int fd)
-{
-    fcntl(fd, F_SETFL, O_NONBLOCK);
-}
-
-#endif
-
 
 /// check if file has data for input
 inline int has_input(int fd)
@@ -1366,7 +1355,13 @@ inline int has_input(int fd)
     FD_ZERO(&fds);
     FD_SET(fd, &fds);
     struct timeval tv = {0, 10};   // seconds, microseconds
-    return select(fd+1, &fds, nullptr, nullptr, &tv);
+    int s = select(fd+1, &fds, nullptr, nullptr, &tv);
+    if ( s < 0 )
+    {
+        perror("has_input:select");
+        return 0;
+    }
+    return FD_ISSET(fd, &fds);
 }
 
 
@@ -1383,6 +1378,7 @@ size_t Parser::read_input(int fd)
         constexpr ssize_t chunk = 16;
         char *ptr = buf, *nxt = ptr;
         char const*end = buf + sizeof(buf) - 1;
+        fcntl(fd, F_SETFL, fcntl(fd, F_GETFL)|O_NONBLOCK);
         ssize_t s = 0;
         do {
             if ( ptr == nxt )
@@ -1391,7 +1387,8 @@ size_t Parser::read_input(int fd)
                 s = read(fd, nxt, std::min(end-nxt, chunk));
                 if ( s < 0 )
                 {
-                    perror("read");
+                    if ( errno != EAGAIN )
+                        perror("read_input:read");
                     errno = 0;
                     break;
                 }
