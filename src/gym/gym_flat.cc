@@ -84,17 +84,17 @@ void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const
                 if ( bit != old )
                 {
                     old = bit;
-                    ptr[0] = { X, T };
-                    ptr[1] = { X, (bit?Y:T) };
-                    ptr[2] = { X, Y };
+                    ptr[0] = { X, Y };
+                    ptr[1] = { X, (bit?T:Y) };
+                    ptr[2] = { X, T };
                     ptr += 3;
                 }
             }
         }
         if ( old )
         {
-            ptr[0] = { X, T };
-            ptr[1] = { X, Y };
+            ptr[0] = { X, Y };
+            ptr[1] = { X, T };
             ptr += 2;
         }
         gym::unmapBufferV2();
@@ -120,16 +120,16 @@ void gym::paintSequence(float X, float Y, float W, float H, const char str[])
         if ( *c != d )
         {
             d = *c;
-            ptr[0] = { X, T };
-            ptr[1] = { X, (d=='0'?Y:T) };
-            ptr[2] = { X, Y };
+            ptr[0] = { X, Y };
+            ptr[1] = { X, (d=='0'?T:Y) };
+            ptr[2] = { X, T };
             ptr += 3;
         }
     }
     if ( d != '0' )
     {
-        ptr[0] = { X, T };
-        ptr[1] = { X, Y };
+        ptr[0] = { X, Y };
+        ptr[1] = { X, T };
         ptr += 2;
     }
     gym::unmapBufferV2();
