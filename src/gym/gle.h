@@ -63,12 +63,14 @@ namespace gle
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
     void circle_dotted(float line_width);
     /// draw 2D oval within -1 to 1
-    void capsule(float line_width);
+    void stroke_capsule(float line_width);
     /// 2D oval within -1 to 1
-    void capsule();
+    void paint_capsule();
     /// 2D cross within -1.5 to 1.5
-    void cross();
-
+    void paint_cross();
+    /// 2D cross within -1.5 to 1.5
+    void stroke_cross();
+    
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal

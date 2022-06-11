@@ -964,6 +964,27 @@ namespace gle
         return 15;
     }
     
+    size_t setCrossStroke(flute2* flu)
+    {
+        float W = 0.2;
+        float L = 0.75;
+        float R = 0.75;
+        flu[0] = { -W, -L };
+        flu[1] = { W, -L };
+        flu[2] = { W, R-W };
+        flu[3] = { L, R-W };
+        flu[4] = { L, R+W };
+        flu[5] = { W, R+W };
+        flu[6] = { W, R+L };
+        flu[7] = { -W, R+L };
+        flu[8] = { -W, R+W };
+        flu[9] = { -L, R+W };
+        flu[10] = { -L, R-W };
+        flu[11] = { -W, R-W };
+        flu[12] = { -W, -L };
+        return 13;
+    }
+
     size_t setCrossPaint(flute2* flu)
     {
         float W = 0.2;
@@ -986,7 +1007,7 @@ namespace gle
 
     static size_t sizeCircBuffers()
     {
-        return 8 + 4 * pi_twice;
+        return 56 + 4 * pi_twice;
     }
     
     flute2* setCircBuffers(flute2* ptr, flute2* const ori, size_t idx[])
@@ -996,7 +1017,8 @@ namespace gle
         idx[1] = i+s; i += setCircle(ptr+i, 2, 1);
         idx[2] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
         idx[3] = i+s; i += setCapsulePaint(ptr+i, 0.75);
-        idx[4] = i+s; i += setCrossPaint(ptr+i);
+        idx[4] = i+s; i += setCrossStroke(ptr+i);
+        idx[5] = i+s; i += setCrossPaint(ptr+i);
         assert_true( i <= sizeCircBuffers() );
         return ptr + i;
     }
@@ -1275,9 +1297,10 @@ namespace gle
     void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
     void circle_dotted(float w) { gym::bindBufferV2(buf_[0]); gym::drawLines(w, discs_[0], 1+pi_twice); }
 
-    void capsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }
-    void capsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
-    void cross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[4], 12); }
+    void stroke_capsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }
+    void paint_capsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
+    void stroke_cross(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[4], 12); }
+    void paint_cross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[5], 12); }
 
     void disc() { disc1(); }
     void cone() { cone2(); discBottom2(); }
