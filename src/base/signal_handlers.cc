@@ -11,7 +11,7 @@
 
 //---------------------------  global variables/functions ---------------------
 
-void out_of_memory_handler()
+static void out_of_memory_handler()
 {
     (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
     (void) write(STDERR_FILENO, "Cytosim: memory allocation failed", 33);
@@ -20,7 +20,7 @@ void out_of_memory_handler()
     _exit(1);
 }
 
-void termination_handler()
+static void termination_handler()
 {
     (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
     (void) write(STDERR_FILENO, "Cytosim: uncaught exception", 27);
@@ -29,7 +29,7 @@ void termination_handler()
     abort();
 }
 
-void signal_handler(int sig)
+static void signal_handler(int sig)
 {
     (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
     psignal((unsigned)sig, "Cytosim");

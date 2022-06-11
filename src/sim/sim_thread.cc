@@ -10,7 +10,7 @@
 #include "exceptions.h"
 #include "print_color.h"
 
-void signal_handler(int sig)
+static void thread_signal_handler(int sig)
 {
     psignal((unsigned)sig, "SimThread");
     _exit(sig);
