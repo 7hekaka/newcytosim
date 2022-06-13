@@ -125,7 +125,8 @@ public:
      - 0 : show nothing,
      - 1 : show vertices,
      - 2 : show arrowheads separated by `point_gap`,
-     - 3 : show middle point of each fiber
+     - 3 : draw chevrons separated by `point_gap`,
+     - 4 : show middle point of each fiber
      .
      */
     int point_style;
@@ -145,7 +146,7 @@ public:
      - 2 : display a cone,
      - 3 : display a disc,
      - 4 : draw arrowhead,
-     - 5 : draw arrowhead in the inverted direction (for actin)
+     - 5 : draw arrowhead in the reversed direction
      .
      */
     int end_style[2];

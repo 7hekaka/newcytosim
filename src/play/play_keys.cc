@@ -307,6 +307,11 @@ static void changeScale(FiberDisp* p, int d)
         changeScale(p->speckle_gap, d);
         flashText("fiber:speckle_gap = %.5f", p->speckle_gap);
     }
+    else if ( p->point_style == 3 )
+    {
+        changeScale(p->point_gap, d);
+        flashText("fiber:point_gap = %.5f", p->point_gap);
+    }
     else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 || p->line_style == 8 )
     {
         changeScale(p->length_scale, d);
@@ -389,7 +394,8 @@ static void changePointStyle(FiberDisp* p, int arg)
         case 0: flashText("Fibers: no points"); break;
         case 1: flashText("Fibers: vertices"); break;
         case 2: flashText("Fibers: arrowheads"); break;
-        case 3: flashText("Fibers: center point"); break;
+        case 3: flashText("Fibers: chevrons"); break;
+        case 4: flashText("Fibers: center points"); break;
         default: flashText("unknown fiber:point_style"); break;
     }
 }
@@ -1021,7 +1027,7 @@ void processKey(unsigned char key, int modifiers = 0)
 
         case '1':
             if ( altKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 4);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 5);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeLineStyle, 1);
             break;

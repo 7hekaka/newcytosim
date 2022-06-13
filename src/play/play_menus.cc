@@ -16,7 +16,8 @@ static void processMenuFiber(int item)
                 
             case 3: FD->point_style = !FD->point_style; break;
             case 5: FD->point_style = FD->point_style==2?0:2; break;
-                
+            case 6: FD->point_style = FD->point_style==3?0:3; break;
+
             case 7: FD->end_style[1] = 3*!FD->end_style[1]; break;
             case 8: FD->end_style[0] = 2*!FD->end_style[0]; break;
                 
@@ -62,6 +63,7 @@ static int buildMenuFiber()
         gym::addMenuEntry(FD->line_style==2  ? "Hide Tensions"    :"Show Tensions",     2);
         gym::addMenuEntry(FD->point_style    ? "Hide Points"      :"Show Points",       3);
         gym::addMenuEntry(FD->point_style==2 ? "Hide Arrows"      :"Show Arrows",       5);
+        gym::addMenuEntry(FD->point_style==3 ? "Hide Chevrons"    :"Show Chevrons",     6);
         gym::addMenuEntry(FD->end_style[1]   ? "Hide Minus-ends"  :"Show Minus-end",    7);
         gym::addMenuEntry(FD->end_style[0]   ? "Hide Plus-ends"   :"Show Plus-end",     8);
         gym::addMenuEntry(FD->force_style    ? "Hide Point-forces":"Show Point-Forces", 9);

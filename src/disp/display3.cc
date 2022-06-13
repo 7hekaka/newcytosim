@@ -772,7 +772,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     FiberDisp const*const disp = fib.prop->disp;
     // diameter of lines and points in space units:
     const float rad = pixscale(disp->point_size);
-    int style = disp->point_style & 3;
+    int style = disp->point_style;
     gym::color_front(fib.disp->color);
     gym::color_back(disp->back_color);
 
@@ -792,6 +792,15 @@ void Display3::drawFiberPoints(Fiber const& fib) const
             gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
     else if ( style == 3 )
+    {
+        gym::enableLighting();
+        // display chevrons along the fiber:
+        const real gap = disp->point_gap;
+        real ab = std::ceil(fib.abscissaM()/gap) * gap;
+        for ( ; ab <= fib.abscissaP(); ab += gap )
+            gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
+    }
+    else if ( style == 4 )
     {
         // display middle of fiber:
         drawPoint(fib.posMiddle(), 2*rad);

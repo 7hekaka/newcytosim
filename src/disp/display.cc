@@ -968,7 +968,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     gym::disableLighting();
     gym::unmapBufferC4VD();
-    gym::drawLineStrip(fib.prop->disp->line_widthX, 0, ptr-flu);
+    gym::drawLineStrip(disp->line_widthX, 0, ptr-flu);
     gym::cleanup();
 }
 
@@ -977,10 +977,6 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const real gap = disp->speckle_gap;
-
-    gym::ref_view();
-    gym::color_load(fib.disp->color);
-    gym::color_back(disp->back_color);
 
     size_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/gap);
     fluteD* pts = gym::mapBufferVD(cnt);
@@ -1040,9 +1036,10 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
             a += gap;
         }
     }
-    
     gym::unmapBufferVD();
+    gym::ref_view();
     gym::disableLighting();
+    gym::color_load(fib.disp->color);
     gym::drawPoints(disp->speckle_size, 0, i);
 }
 
@@ -1050,7 +1047,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
 void Display::drawFiberPoints(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    int style = disp->point_style & 3;
+    int style = disp->point_style;
 
     if ( style == 1 )
     {
@@ -1073,6 +1070,33 @@ void Display::drawFiberPoints(Fiber const& fib) const
             gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
     }
     else if ( style == 3 )
+    {
+        // display chevrons along the fiber:
+        const real gap = disp->point_gap;
+        size_t cnt = 4 * fib.length() / gap + 8;
+        fluteD* flu = gym::mapBufferVD(cnt);
+        fluteD* ptr = flu;
+        const float rad = pixscale(disp->point_size);
+        real a = std::ceil(fib.abscissaM()/gap) * gap - fib.abscissaM();
+        for ( ; a <= fib.length(); a += gap )
+        {
+            Vector pos = fib.posM(a);
+            Vector dir = fib.dirM(a) * rad;
+            Vector nor = dir.orthogonal(rad);
+            ptr[0] = pos - dir - nor;
+            ptr[1] = pos + dir;
+            ptr[2] = pos + dir;
+            ptr[3] = pos - dir + nor;
+            ptr += 4;
+        }
+        assert_true(ptr-flu < cnt);
+        gym::unmapBufferVD();
+        gym::ref_view();
+        gym::disableLighting();
+        gym::color(fib.disp->color);
+        gym::drawLines(disp->line_widthX, 0, ptr-flu);
+    }
+    else if ( style == 4 )
     {
         gym::color_load(fib.disp->color);
         gym::color_back(disp->back_color);
@@ -1238,8 +1262,6 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
     
-    gym::ref_view();
-    gym::color(fib.disp->color);
     size_t cnt = sup - inf + 4;
     fluteD* flu = gym::mapBufferVD(cnt);
     fluteD* ptr = flu;
@@ -1247,7 +1269,9 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     for ( auto h = inf+1; h <= sup; ++h, abs += uni )
         *ptr++ = fib.posM(abs);
     gym::unmapBufferVD();
+    gym::ref_view();
     gym::disableLighting();
+    gym::color(fib.disp->color);
     gym::drawPoints(rad, 0, ptr-flu);
     gym::cleanup();
 }
@@ -2010,9 +2034,7 @@ void Display::drawOrganizer(Organizer const& obj) const
 
     if ( disp && ( disp->style & 2 ))
     {
-        gym::ref_view();
         Vector P, Q;
-        gym::color(bodyColorF(disp, obj.signature()));
         fluteD* flu = gym::mapBufferVD(2*cnt);
         while ( obj.getLink(i, P, Q) )
         {
@@ -2022,9 +2044,10 @@ void Display::drawOrganizer(Organizer const& obj) const
             if ( ++i >= cnt ) break;
         }
         gym::unmapBufferVD();
+        gym::ref_view();
         gym::disableLighting();
+        gym::color(bodyColorF(disp, obj.signature()));
         gym::drawLines(disp->widthX, 0, 2*i);
-
         gym::rebindBufferVD(2);
         gym::drawPoints(disp->sizeX, 0, i);
     }

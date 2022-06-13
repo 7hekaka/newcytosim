@@ -101,7 +101,7 @@ void FiberDisp::read(Glossary& glos)
     key = glos.has_key("point") ? "point" : "points";
     if ( glos.set(point_size, key, 0) && !point_style )
         point_style = 1;
-    glos.set(point_style, "point_style", 0, key, 1, {{"off", 0}, {"point", 1}, {"arrow", 2}, {"center", 3}});
+    glos.set(point_style, "point_style", 0, key, 1, {{"off", 0}, {"point", 1}, {"arrow", 2}, {"chevron", 3}, {"center", 4}});
     glos.set(point_gap, "point_gap", 0, key, 2);
 
     if ( point_gap <= 0 )
