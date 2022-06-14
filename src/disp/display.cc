@@ -199,7 +199,8 @@ void Display::drawSimul(Simul const& sim)
 {
     // clear list of transparent objects
     zObjects.clear();
-    
+    CHECK_GL_ERROR("at drawSimul()");
+
 #if ( DIM >= 3 )
     // Draw opaque objects with depth buffer is writable
     drawObjects(sim);
@@ -686,6 +687,7 @@ void Display::drawFields(FieldSet const& set)
         else if ( obj->prop->visible == 2 )
             obj->draw();
     }
+    CHECK_GL_ERROR("at Display::drawFields()");
 }
 
 

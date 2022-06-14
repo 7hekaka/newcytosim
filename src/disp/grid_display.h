@@ -45,10 +45,11 @@ void drawValues(Grid<CELL, 1> const& grid,
         float x = grid.position(0, ix);
         gle_color col = color(arg, grid.icell1D(ix), Vector1(x+cx));
         // use a full quad to achieve uniform color within
-        *ptr++ = { col, x+dx, dy };
-        *ptr++ = { col, x, 0 };
-        *ptr++ = { col, x, dy };
-        *ptr++ = { col, x+dx, 0 };
+        ptr[0] = { col, x+dx, dy };
+        ptr[1] = { col, x, 0 };
+        ptr[2] = { col, x, dy };
+        ptr[3] = { col, x+dx, 0 };
+        ptr += 4;
     }
     gym::unmapBufferC4V2();
     gym::drawTriangleStrip(0, ptr-flu);
@@ -80,13 +81,14 @@ void drawValues(Grid<CELL, 2> const& grid,
             float y = grid.position(1, iy);
             gle_color col = color(arg, grid.icell2D(ix, iy), Vector2(x+cx, y+cy));
             // use a full quad to achieve uniform color within
-            *ptr++ = { col, x, y+dy };
-            *ptr++ = { col, x, y };
-            *ptr++ = { col, x+dx, y+dy };
-            *ptr++ = { col, x+dx, y };
+            ptr[0] = { col, x, y+dy };
+            ptr[1] = { col, x, y };
+            ptr[2] = { col, x+dx, y+dy };
+            ptr[3] = { col, x+dx, y };
+            ptr += 4;
         }
         gym::unmapBufferC4V2();
-        gym::drawTriangleStrip(0, flu-ptr);
+        gym::drawTriangleStrip(0, ptr-flu);
     }
     gym::cleanup();
 }
@@ -119,10 +121,11 @@ void drawValues(Grid<CELL, 3> const& grid,
             float y = grid.position(1, iy);
             gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, y+cy, zzz));
             // use a full quad to achieve uniform color within
-            *ptr++ = { col, x, y+dy, z };
-            *ptr++ = { col, x, y, z };
-            *ptr++ = { col, x+dx, y+dy, z };
-            *ptr++ = { col, x+dx, y, z };
+            ptr[0] = { col, x, y+dy, z };
+            ptr[1] = { col, x, y, z };
+            ptr[2] = { col, x+dx, y+dy, z };
+            ptr[3] = { col, x+dx, y, z };
+            ptr += 4;
         }
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
@@ -158,10 +161,11 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
             float x = grid.position(0, ix);
             float z = grid.position(2, iz);
             gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, yyy, z+cz));
-            *ptr++ = { col, x, y, z+dz };
-            *ptr++ = { col, x, y, z };
-            *ptr++ = { col, x+dx, y, z+dz };
-            *ptr++ = { col, x+dx, y, z };
+            ptr[0] = { col, x, y, z+dz };
+            ptr[1] = { col, x, y, z };
+            ptr[2] = { col, x+dx, y, z+dz };
+            ptr[3] = { col, x+dx, y, z };
+            ptr += 4;
         }
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
@@ -197,10 +201,11 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
             float y = grid.position(1, iy);
             float z = grid.position(2, iz);
             gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(xxx, y+cy, z+cz));
-            *ptr++ = { col, x, y, z+dz };
-            *ptr++ = { col, x, y, z };
-            *ptr++ = { col, x, y+dy, z+dz };
-            *ptr++ = { col, x, y+dy, z };
+            ptr[0] = { col, x, y, z+dz };
+            ptr[1] = { col, x, y, z };
+            ptr[2] = { col, x, y+dy, z+dz };
+            ptr[3] = { col, x, y+dy, z };
+            ptr += 4;
         }
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
@@ -241,8 +246,9 @@ void drawValues(Grid<CELL, 3> const& grid,
         {
             Vector3 V = A + n * dx;
             Vector3 W = B + n * dx;
-            *ptr++ = { color(arg, grid.interpolate3D(V), V), V };
-            *ptr++ = { color(arg, grid.interpolate3D(W), W), W };
+            ptr[0] = { color(arg, grid.interpolate3D(V), V), V };
+            ptr[1] = { color(arg, grid.interpolate3D(W), W), W };
+            ptr += 2;
         }
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
@@ -253,9 +259,10 @@ void drawValues(Grid<CELL, 3> const& grid,
         {
             Vector3 V = A + n * dx;
             Vector3 W = B + n * dx;
-            *ptr++ = { color(arg, grid.interpolate3D(V), V), V };
-            *ptr++ = { color(arg, grid.interpolate3D(W), W), W };
-        }
+            ptr[0] = { color(arg, grid.interpolate3D(V), V), V };
+            ptr[1] = { color(arg, grid.interpolate3D(W), W), W };
+            ptr += 2;
+       }
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
     }

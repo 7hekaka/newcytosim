@@ -402,8 +402,8 @@ public:
         mx = gCell[0];
         for ( size_t i = 0; i < MAP::mNbCells; ++i )
         {
-            mn.e_min(gCell[i]);
-            mx.e_max(gCell[i]);
+            //mn = std::min(mn, gCell[i]);
+            //mx = std::max(mx, gCell[i]);
             sum += gCell[i];
         }
         avg = sum * ( 1.0 / MAP::mNbCells );
