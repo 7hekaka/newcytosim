@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2022
-# This is PRECONFIG version 1.56, last modified on 12.05.2022
+# This is PRECONFIG version 1.57, last modified on 15.06.2022
 
 """
 # SYNOPSIS
@@ -226,9 +226,9 @@ except ImportError as e:
 
 #-------------------------------------------------------------------------------
 
-__VERSION__="1.56"
+__VERSION__="1.57"
 
-__DATE__ ="12.05.2022"
+__DATE__ ="15.06.2022"
 
 # code snippets are surrounded by double square brackets:
 CODE = '['
@@ -574,6 +574,11 @@ class Preconfig:
         inputs = []
         values = {}
         path = ''
+        
+        # first argument may define the pattern:
+        if args[0].find('%') >= 0 and not os.path.isfile(args[0]):
+            self.pattern = cannonical_pattern(args[0])
+            args = args[1 :]
         
         # parse arguments:
         for arg in args:
