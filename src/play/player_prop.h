@@ -24,7 +24,7 @@ public:
      */
     
     /// direction of replay: 1: forward and -1: reverse
-    int play;
+    int replay;
     
     /// if true, jump to first frame after last frame
     unsigned loop;
@@ -124,7 +124,7 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
     
-    /// change `report` that is display onscreen
+    /// change `report` that is displayed onscreen
     void toggleReport(int alt);
 };
 

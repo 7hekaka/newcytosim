@@ -7,10 +7,10 @@
 
 void PlayerProp::clear()
 {
-    play      = 0;
-    loop      = 0;
-    period    = 1;
-    delay     = 32;
+    replay = 0;
+    loop = 0;
+    period = 1;
+    delay = 32;
     auto_exit = 0;
 
     for ( int k = 0; k < NB_MAGIC_KEYS; ++k )
@@ -37,7 +37,7 @@ void PlayerProp::clear()
 
 void PlayerProp::read(Glossary& glos)
 {
-    glos.set(play, "play");
+    glos.set(replay, "play");
     glos.set(loop, "loop");
     if ( glos.set(period, "period") )
         period = std::max(1u, period);
@@ -66,7 +66,7 @@ void PlayerProp::read(Glossary& glos)
 
 void PlayerProp::write_values(std::ostream& os) const
 {
-    write_value(os, "play",   play);
+    write_value(os, "play", replay);
     write_value(os, "loop",   loop);
     write_value(os, "period", period);
     write_value(os, "delay",  delay);

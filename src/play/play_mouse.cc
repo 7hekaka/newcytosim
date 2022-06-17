@@ -82,14 +82,14 @@ void timerCallback(const int value)
         if ( worker.read_input() )
             draw = true;
         
-        if ( prop.play > 0 )
+        if ( prop.replay > 0 )
         {
             // skip `prop.period` frames, and at least one since prop.period > 0
             for ( unsigned s = 0; s < prop.period; ++s )
                 player.nextFrame();
             draw = true;
         }
-        else if ( prop.play < 0 )
+        else if ( prop.replay < 0 )
         {
             player.previousFrame();
             draw = true;

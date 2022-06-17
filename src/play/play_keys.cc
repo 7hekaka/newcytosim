@@ -904,7 +904,7 @@ void processKey(unsigned char key, int modifiers = 0)
             
         case '<':
         case ',':
-            if ( prop.play == 1 )
+            if ( prop.replay == 1 )
                 player.stop();
             else
                 player.previousFrame();
@@ -912,7 +912,7 @@ void processKey(unsigned char key, int modifiers = 0)
             
         case '>':
         case '.':
-            if ( prop.play == -1 )
+            if ( prop.replay == -1 )
                 player.stop();
             else
                 player.nextFrame();

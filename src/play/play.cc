@@ -437,13 +437,13 @@ int main(int argc, char* argv[])
     {
         prop.auto_exit = 1;
         prop.save_images = 9999;
-        prop.play = 1;
+        prop.replay = 1;
     }
     else if ( mode & SAVE_IMAGE )
     {
         prop.auto_exit = 2;
         prop.save_images = 1;
-        prop.play = 1;
+        prop.replay = 1;
     }
     
     //-------- initialize graphical user interface and graphics

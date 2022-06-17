@@ -95,12 +95,12 @@ void Player::rewind()
 
 bool Player::startPlayback()
 {
-    if ( worker.goodFile()  &&  prop.play != 1  && !goLive )
+    if ( worker.goodFile()  &&  prop.replay != 1  && !goLive )
     {
         //rewind file if its end was reached:
         if ( worker.eof() )
             worker.rewindFile();
-        prop.play = 1;
+        prop.replay = 1;
         return true;
     }
     return false;
@@ -109,13 +109,13 @@ bool Player::startPlayback()
 
 bool Player::startBackward()
 {
-    if ( prop.play != -1 )
+    if ( prop.replay != -1 )
     {
         if ( worker.currentFrame() == 0 )
             worker.loadLastFrame();
         else
             flashText("Play reverse");
-        prop.play = -1;
+        prop.replay = -1;
         return true;
     }
     return false;
@@ -144,7 +144,7 @@ void Player::accelerate()
 void Player::stop()
 {
     goLive = 0;
-    prop.play = 0;
+    prop.replay = 0;
     prop.save_images = 0;
 }
 
@@ -155,7 +155,7 @@ void Player::startstop()
         goLive = !goLive;
     else if ( worker.goodFile() )
     {
-        if ( !prop.play )
+        if ( !prop.replay )
             startPlayback();
         else
             stop();
