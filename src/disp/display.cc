@@ -1075,20 +1075,22 @@ void Display::drawFiberPoints(Fiber const& fib) const
     {
         // display chevrons along the fiber:
         const real gap = disp->point_gap;
+        const real rad = pixscale(disp->point_size);
+        real beta = fib.segmentationInv() * rad;
         size_t cnt = 4 * fib.length() / gap + 8;
         fluteD* flu = gym::mapBufferVD(cnt);
         fluteD* ptr = flu;
-        const float rad = pixscale(disp->point_size);
         real a = std::ceil(fib.abscissaM()/gap) * gap - fib.abscissaM();
         for ( ; a <= fib.length(); a += gap )
         {
-            Vector pos = fib.posM(a);
-            Vector dir = fib.dirM(a) * rad;
+            Interpolation i = fib.interpolateM(a);
+            Vector pos = i.pos();
+            Vector dir = i.diff() * beta;
             Vector nor = dir.orthogonal(rad);
-            ptr[0] = pos - dir - nor;
-            ptr[1] = pos + dir;
-            ptr[2] = pos + dir;
-            ptr[3] = pos - dir + nor;
+            ptr[0] = pos + dir - nor;
+            ptr[1] = pos - dir;
+            ptr[2] = pos - dir;
+            ptr[3] = pos + dir + nor;
             ptr += 4;
         }
         assert_true(ptr-flu < cnt);

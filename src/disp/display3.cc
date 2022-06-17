@@ -798,7 +798,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         const real gap = disp->point_gap;
         real ab = std::ceil(fib.abscissaM()/gap) * gap;
         for ( ; ab <= fib.abscissaP(); ab += gap )
-            gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
+            gle::drawCone(fib.pos(ab), -fib.dir(ab), rad);
     }
     else if ( style == 4 )
     {
