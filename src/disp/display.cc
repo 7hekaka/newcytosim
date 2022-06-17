@@ -1078,12 +1078,17 @@ void Display::drawFiberPoints(Fiber const& fib) const
         fluteD* flu = gym::mapBufferVD(cnt);
         fluteD* ptr = flu;
         real a = std::ceil(fib.abscissaM()/gap) * gap - fib.abscissaM();
+        Vector axis(depthAxis);
         for ( ; a <= fib.length(); a += gap )
         {
             Interpolation i = fib.interpolateM(a);
             Vector pos = i.pos();
             Vector dir = i.diff() * beta;
+#if ( DIM == 3 )
+            Vector nor = cross(axis, dir).normalized(rad);
+#else
             Vector nor = dir.orthogonal(rad);
+#endif
             ptr[0] = pos + dir - nor;
             ptr[1] = pos - dir;
             ptr[2] = pos - dir;
