@@ -885,7 +885,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
         event = new Event();
         opt.set(event->rate, "event");
         opt.set(event->activity, "event", 1);
-        event->reload(simul_.time());
+        event->reload(sim_->time());
         sim_->events.add(event);
     }
 #endif

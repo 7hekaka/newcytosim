@@ -300,7 +300,7 @@ void Parser::parse_change(std::istream& is)
             is.get();
             change_all = true;
         }
-        else if ( para.size() && simul().findProperty(name, para) )
+        else if ( para.size() && sim_->findProperty(name, para) )
         {
             //change CLASS NAME { VALUE }
             name = para;

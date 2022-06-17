@@ -26,7 +26,7 @@ class Interpolation final
 private:
     
     /// Mecable from which the points are interpolated 
-    Mecable const*  mec_;
+    Mecable const * mec_;
     
     /// interpolation coefficient: pos = (1-coef) * pt1_ + coef * pt2_
     real coef_;
@@ -55,13 +55,13 @@ public:
     /// Reset member variables
     void clear()
     {
-        mec_ = nullptr;  pt1_ = 0;  pt2_ = 0;  coef_ = 0;
+        mec_ = nullptr; pt1_ = 0; pt2_ = 0; coef_ = 0;
     }
     
     /// Set to interpolate p1 and p2 on ps, with coefficient c, on the same Mecable
     void setPoints(Mecable::SIZE_T p, Mecable::SIZE_T q, const real c)
     {
-        pt1_ = p;  pt2_ = q;  coef_ = c;
+        pt1_ = p; pt2_ = q; coef_ = c;
     }
     
     /// Index of point 1 in the matrix of dynamics (Meca::mISO)
@@ -89,10 +89,10 @@ public:
     size_t point2() const { return pt2_; }
 
     /// interpolation coefficient on first point
-    real coef0()    const { return 1 - coef_; }
+    real coef0() const { return 1 - coef_; }
 
     /// interpolation coefficient on second point
-    real coef1()    const { return coef_; }
+    real coef1() const { return coef_; }
 
     /// interpolation coefficient on first point (historical function)
     //real coef2()  const { return 1 - coef_; }
@@ -101,28 +101,28 @@ public:
     void coef(real c) { coef_ = c; }
     
     /// Interpolated position in space
-    Vector pos()    const { return mec_->interpolatePoints(pt1_, pt2_, coef_); }
+    Vector pos()  const { return mec_->interpolatePoints(pt1_, pt2_, coef_); }
     
     /// position of first point
-    Vector pos1()   const { return mec_->posP(pt1_); }
+    Vector pos1() const { return mec_->posP(pt1_); }
     
     /// position of second point 
-    Vector pos2()   const { return mec_->posP(pt2_); }
+    Vector pos2() const { return mec_->posP(pt2_); }
     
     /// that is pos2() - pos1()
-    Vector diff()   const { return mec_->diffPoints(pt1_, pt2_); }
+    Vector diff() const { return mec_->diffPoints(pt1_, pt2_); }
     
     /// distance between point1 and point2
-    real len()      const { return diff().norm(); }
+    real len()    const { return diff().norm(); }
 
     /// squared distance between point1 and point2
-    real lenSqr()   const { return diff().normSqr(); }
+    real lenSqr() const { return diff().normSqr(); }
 
     /// normalize(pos2() - pos1())
-    Vector dir()    const { return normalize(diff()); }
+    Vector dir()  const { return normalize(diff()); }
 
     /// true if the coefficient is in [0, 1]
-    bool inside()   const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }
+    bool inside() const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }
 
     /// test if `this` has a common point with argument
     bool overlapping(Mecapoint const&) const;
