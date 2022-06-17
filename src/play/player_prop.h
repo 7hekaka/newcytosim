@@ -82,9 +82,6 @@ public:
     char magic_key[NB_MAGIC_KEYS];
 
     /** @} */
-    
-    /// a flag for live simulation
-    bool goLive;
 
     /// if true, program will quit when end-of-file is reached
     unsigned auto_exit;

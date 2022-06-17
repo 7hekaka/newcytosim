@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
     }
     
     if ( arg.use_key("live") || arg.has_key(".cym") )
-        prop.goLive = true;
+        player.goLive = true;
 
     if ( arg.use_key("image") )
     {
@@ -293,7 +293,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        if ( ! prop.goLive || has_frame )
+        if ( ! player.goLive || has_frame )
         {
             // read the `properties` file to import properties
             simul.loadProperties();
@@ -464,7 +464,7 @@ int main(int argc, char* argv[])
         return 7;
     }
     
-    if ( prop.goLive )
+    if ( player.goLive )
     {
         worker.period(prop.period);
         try

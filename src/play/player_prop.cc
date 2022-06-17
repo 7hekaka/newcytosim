@@ -9,9 +9,9 @@ void PlayerProp::clear()
 {
     play      = 0;
     loop      = 0;
-    auto_exit = 0;
     period    = 1;
     delay     = 32;
+    auto_exit = 0;
 
     for ( int k = 0; k < NB_MAGIC_KEYS; ++k )
     {
@@ -32,17 +32,16 @@ void PlayerProp::clear()
     image_index  = 0;
     poster_index = 0;
     saved_image_time = -1;
-    goLive = 0;
 }
 
 
 void PlayerProp::read(Glossary& glos)
 {
-    glos.set(play,         "play");
-    glos.set(loop,         "loop");
-    if ( glos.set(period,  "period") )
+    glos.set(play, "play");
+    glos.set(loop, "loop");
+    if ( glos.set(period, "period") )
         period = std::max(1u, period);
-    if ( glos.set(delay,   "delay") )
+    if ( glos.set(delay, "delay") )
         delay = std::max(2u, delay);
     glos.set(save_images,  "save_images", "save_image");
     glos.set(image_format, "image_format");

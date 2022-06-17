@@ -73,7 +73,7 @@ std::string Player::buildLabel() const
     if ( sh && sh->attached() )
         oss << "\nHandle: " << sh->force().norm() << "pN";
 
-    if ( prop.goLive && worker.alive() )
+    if ( goLive && worker.alive() )
     {
         oss << "\nLive";
         //display ratio number-of-time-step / frame
@@ -256,6 +256,10 @@ void Player::prepareDisplay(View& view)
     CHECK_GL_ERROR("in prepareDisplay");
 
     try {
+        
+        if ( mDisplay->prop->fold )
+            simul.foldPositions();
+
         mDisplay->prepareForDisplay(simul, dispList, view.depthAxis());
         //std::clog << " dispList.size() = " << dispList.size() << '\n';
     }
@@ -336,7 +340,7 @@ void Player::drawScene(View& view)
         if ( prop.saved_image_time != t )
         {
             prop.saved_image_time = t;
-            if ( prop.goLive )
+            if ( goLive )
                 saveView(prop.image_index++, prop.downsample);
             else
                 saveView(worker.currentFrame(), prop.downsample);

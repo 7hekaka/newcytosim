@@ -514,9 +514,6 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
 {
     depthAxis = axis;
     
-    if ( prop->fold )
-        sim.foldPositions();
-    
     // counter to give different colors to the objects
     size_t idx = 0;
 

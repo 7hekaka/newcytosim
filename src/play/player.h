@@ -42,6 +42,9 @@ public:
     /// the current Display object
     Display  *   mDisplay;
     
+    /// a flag for live simulation
+    bool goLive;
+
     //---------------------------------COMMANDS---------------------------------
     
     /// constructor

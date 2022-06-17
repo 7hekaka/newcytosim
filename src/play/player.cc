@@ -16,6 +16,7 @@ using glApp::flashText;
 Player::Player()
 : disp("*"), prop("*"), worker(&simul), mDisplay(nullptr)
 {
+    goLive = 0;
 }
 
 Player::~Player()
@@ -94,7 +95,7 @@ void Player::rewind()
 
 bool Player::startPlayback()
 {
-    if ( worker.goodFile()  &&  prop.play != 1  && !prop.goLive )
+    if ( worker.goodFile()  &&  prop.play != 1  && !goLive )
     {
         //rewind file if its end was reached:
         if ( worker.eof() )
@@ -129,7 +130,7 @@ void Player::accelerate()
     if ( prop.delay < min_delay )
     {
         prop.delay = min_delay;
-        if ( prop.goLive )
+        if ( goLive )
             flashText("Delay is %i ms! use 'A' to jump frames", prop.delay);
         else
             flashText("Delay is %i ms!", prop.delay);
@@ -142,7 +143,7 @@ void Player::accelerate()
 
 void Player::stop()
 {
-    prop.goLive = 0;
+    goLive = 0;
     prop.play = 0;
     prop.save_images = 0;
 }
@@ -151,7 +152,7 @@ void Player::stop()
 void Player::startstop()
 {
     if ( worker.alive() )
-        prop.goLive = !prop.goLive;
+        goLive = !goLive;
     else if ( worker.goodFile() )
     {
         if ( !prop.play )
@@ -166,7 +167,7 @@ void Player::extendLive()
 {
     if ( 0 == worker.extend() )
         flashText("Extend simulation...");
-    prop.goLive = 1;
+    goLive = 1;
 }
 
 
