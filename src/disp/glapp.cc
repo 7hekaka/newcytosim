@@ -51,11 +51,11 @@ namespace glApp
     int  savedWindowPos[4] = { 24, 24, 800, 800 };
 
     UserMode mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
-    int      mouseX, mouseY;                 ///< current position of mouse in pixels
-    Vector3  mouseDown(0,0,0);               ///< position where mouse button was pressed down
-    Vector3  depthAxis(0,0,0);               ///< vector normal to desired rotation
-    Vector3  mouseAxis(0,0,0);               ///< axis of rotation for MOUSE_SPIN
-    Vector3  viewFocus(0,0,0);               ///< unprojected center of screen
+    int      mouseX, mouseY;    ///< current position of mouse in pixels
+    Vector3  mouseDown(0,0,0);  ///< position where mouse button was pressed down
+    Vector3  axle(0,0,0);       ///< vector normal to desired rotation
+    Vector3  pole(0,0,0);       ///< axis of rotation for MOUSE_SPIN
+    Vector3  viewFocus(0,0,0);  ///< unprojected center of screen
     
     float nearZ = 0;    ///< normalized device Z-coordinate of front-plane
     float midZ  = 0.5;  ///< normalized device Z-coordinate of middle
@@ -960,9 +960,9 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
             
         case MOUSE_TRANSLATEZ:
         {
-            depthAxis = normalize( viewFocus - savedView.focus );
+            axle = normalize(viewFocus - savedView.focus);
             Vector3 U = savedView.unproject(cenX, 2*cenY, nearZ);
-            mouseAxis = normalize( U - viewFocus );
+            pole = normalize(U - viewFocus);
         } break;
             
         case MOUSE_ROTATE:
@@ -972,14 +972,14 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
             for a value of one, the rotation exactly follows the mouse pointer 
             */
             const real amplification = 3.0;
-            depthAxis  = mouseDown - savedView.focus;
-            depthAxis *= amplification / depthAxis.normSqr();
+            axle  = mouseDown - savedView.focus;
+            axle *= amplification / axle.normSqr();
         } break;
             
         case MOUSE_SPIN:
         {
-            mouseAxis = normalize( viewFocus - savedView.focus );
-            depthAxis = mouseDown - viewFocus;
+            pole = normalize(viewFocus - savedView.focus);
+            axle = mouseDown - viewFocus;
         } break;
         
         case MOUSE_MAGNIFIER:
@@ -1035,17 +1035,17 @@ void glApp::processMouseDrag(int mX, int mY)
             reference frame rotated by sQ already, so dQ = sQ * dM * inv(sQ).
             This leads to the multiplication on the right: Q <- sQ * dM. */
             Quaternion<real> Q;
-            Q.setFromAxis(cross(depthAxis, mouse-mouseDown));
+            Q.setFromAxis(cross(axle, mouse-mouseDown));
             view.rotate_to(savedView.rotation * Q);
         } break;
         
         
         case MOUSE_SPIN:
         {
-            real C = dot(depthAxis, mouse - viewFocus);
-            real S = dot(mouseAxis, cross(depthAxis, mouse - viewFocus));
+            real C = dot(axle, mouse - viewFocus);
+            real S = dot(pole, cross(axle, mouse - viewFocus));
             Quaternion<real> Q;
-            Q.setFromAxis(mouseAxis, std::atan2(S, C));
+            Q.setFromAxis(pole, std::atan2(S, C));
             view.rotate_to(savedView.rotation * Q);
             float Z = norm( mouse - viewFocus ) / norm( mouseDown - viewFocus );
             if ( Z > 0.001 ) view.zoom_to(savedView.zoom * Z);
@@ -1054,14 +1054,14 @@ void glApp::processMouseDrag(int mX, int mY)
         
         case MOUSE_TRANSLATE:
         {
-            view.move_to( savedView.focus - ( mouse - mouseDown ) );
+            view.move_to(savedView.focus - ( mouse - mouseDown ));
         } break;
         
         
         case MOUSE_TRANSLATEZ:
         {
-            real S = dot(mouse - mouseDown, mouseAxis);
-            Vector3 move = mouse - mouseDown - S * ( depthAxis + mouseAxis );
+            real S = dot(mouse - mouseDown, pole);
+            Vector3 move = mouse - mouseDown - S * ( axle + pole );
             view.move_to( savedView.focus - move );
         } break;
         
