@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
+// Cytosim was created by Francois Nedelec.  Copyright 2022 Cambridge University.
 
 #include <sys/time.h>
 #include <fstream>
@@ -8,6 +8,7 @@
 #include "vecprint.h"
 #include "random.h"
 #include "timer.h"
+#include "real.h"
 #include "dim.h"
 
 #include "matrix33.h"
@@ -27,11 +28,8 @@ typedef SparMatSymBlkDiag SparMatD;
 // number of multiplication in sequence
 constexpr size_t N_MUL = 89;
 
-// number of repeat of ( 1 prepare + N_MUL multiplications)
+// number of repeat of ( 1 prepare + N_MUL multiplications )
 constexpr size_t N_RUN = 8;
-
-
-constexpr size_t CNT = N_RUN * N_MUL;
 
 // extra for allocation
 #define PAD 4
@@ -41,9 +39,11 @@ unsigned * inx_ = nullptr;
 unsigned * iny_ = nullptr;
 
 real alpha = 2.0;
-real beta = -1.0;
 real kappa = 0.7;
+real beta = -1.0;
 real iota = -0.3;
+
+constexpr size_t CNT = N_RUN * N_MUL;
 
 //------------------------------------------------------------------------------
 #pragma mark - Functions
@@ -63,17 +63,8 @@ real checksum(size_t size, real const* vec)
     return s;
 }
 
-
-real diff(size_t size, real const* a, real const* b)
-{
-    real s = 0;
-    for ( size_t i=0; i<size; ++i )
-        s += abs_real( a[i] - b[i] );
-    return s;
-}
-
 ///set indices within [0, sup] that are multiples of 'dim'
-void setIndices(size_t cnt, size_t sup)
+void setIndices(size_t cnt, unsigned sup)
 {
     delete[] inx_;
     delete[] iny_;
@@ -86,8 +77,8 @@ void setIndices(size_t cnt, size_t sup)
         iny_ = new unsigned[icnt_];
         for ( size_t n = 0; n < cnt; ++n )
         {
-            size_t i = RNG.pint32(sup);
-            size_t j = RNG.pint32(sup);
+            unsigned i = RNG.pint32(sup);
+            unsigned j = RNG.pint32(sup);
             inx_[n] = std::min(i,j);
             iny_[n] = std::max(i,j);
         }
@@ -128,7 +119,7 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
 
 
 template <typename MATRIX, typename MATROX>
-void compareMatrix(size_t S, MATRIX & mat1, MATROX& mat2, size_t fill)
+void compareMatrices(unsigned S, MATRIX & mat1, MATROX& mat2, size_t fill)
 {
     size_t nume = S * S;
     real * tmp1 = new_real(nume);
@@ -143,12 +134,12 @@ void compareMatrix(size_t S, MATRIX & mat1, MATROX& mat2, size_t fill)
     for ( size_t n = 0; n < fill; ++n )
     {
         real a = 0.1; //RNG.preal();
-        size_t ii = RNG.pint32(S);
-        size_t jj = RNG.pint32(S);
+        unsigned ii = RNG.pint32(S);
+        unsigned jj = RNG.pint32(S);
         if ( ii != jj )
         {
-            size_t i = std::max(ii, jj);
-            size_t j = std::min(ii, jj);
+            unsigned i = std::max(ii, jj);
+            unsigned j = std::min(ii, jj);
             
             mat1(i, i) += a;
             mat1(i, j) -= a;
@@ -311,22 +302,86 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Test Parallel Matrix
+#pragma mark - Multithreaded test with libdispatch
+
+#if defined(__APPLE__)
+
+#include <dispatch/dispatch.h>
+
+struct Job
+{
+    real const* src;
+    SparMatBlk const* mat;
+    real * dst;
+    size_t mul;
+};
+
+void work(void* context, size_t i)
+{
+    Job * job = (Job*)context;
+    job->mat->vecMulAdd(job->src, job->dst, job->mul*i, job->mul*(i+1));
+    //fprintf(stderr, "%lX ", i&15);
+}
+
+void testMatrixDispatch(SparMatBlk& mat, real const* x, real const* y, real * z)
+{
+    size_t S = mat.size() / DIM;
+    mat.reset();
+    fillMatrix(mat);
+    mat.prepareForMultiply(1);
+    
+    const size_t sup = 32;
+    double t[sup] = { 0 };
+
+    tick();
+    zero_real(DIM*S, z);
+    for ( size_t j=0; j < CNT; ++j )
+        mat.vecMulAdd(x, z);
+    t[0] = tock(N_RUN);
+    zero_real(DIM*S, z);
+    mat.vecMulAdd(x, z);
+    printf("\n %s: muladd %9.0f check %+16.6f ", mat.what().c_str(), t[0], checksum(DIM*S, z));
+    
+    dispatch_queue_t queue = dispatch_queue_create("QUEUE", DISPATCH_QUEUE_CONCURRENT);
+    for ( unsigned u : { 1, 2, 4, 8, 16, 32 } )
+    {
+        Job job { x, &mat, z, u };
+        zero_real(DIM*S, z);
+        tick();
+        for ( size_t j=0; j < CNT; ++j )
+            dispatch_apply_f(S/u, queue, &job, work);
+        t[u] = tock(N_RUN);
+        zero_real(DIM*S, z);
+        dispatch_apply_f(S/u, queue, &job, work);
+        printf("\n%2u libdispatch %+16.6f", u, checksum(DIM*S, z));
+    }
+    dispatch_release(queue);
+
+    //printf("\n%-29s", mat.what().c_str());
+    printf("\n--> Threaded muladd ");
+    for ( unsigned u : { 1, 2, 4, 8, 16, 32 } )
+        printf(" %uD %-6.1f", u, t[u]);
+    fflush(stdout);
+}
+#endif
+
+//------------------------------------------------------------------------------
+#pragma mark - Multithreaded test with OpenMP
 
 #ifdef _OPENMP
 #include <omp.h>
 
-
 template <typename MATRIX>
-void checkMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
+void checkMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
 {
     size_t S = mat.size() / DIM;
     zero_real(DIM*S, z);
     // check processing columns one-by-one:
     for ( size_t i = 0; i < S; ++i )
         mat.vecMulAdd(x, z, i, i+1);
-    printf(" check %+16.6f", checksum(DIM*S, z));
+    printf(" %s check %+16.6f", mat.what(), checksum(DIM*S, z));
 
+    // change number of parallel threads:
     for ( int i = 0; i < 4; ++i )
     {
         zero_real(DIM*S, z);
@@ -340,7 +395,7 @@ void checkMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, s
 
 
 template <typename MATRIX>
-void testMatrixParallel(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
+void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
 {
     size_t S = mat.size() / DIM;
     mat.reset();
@@ -495,18 +550,22 @@ void testIsoMatrices(const size_t S, real const* x, real const* y, real * z)
 
 void testMatrices(const size_t S, real const* x, real const* y, real * z)
 {
+#if ( 0 )
     SparMat1 mat1; mat1.resize(S); testMatrix<SparMat1, fillMatrix>(mat1, x, y, z);
     SparMat2 mat2; mat2.resize(S); testMatrix<SparMat2, fillMatrix>(mat2, x, y, z);
 
     SparMatB mat3; mat3.resize(S); testMatrix<SparMatB, fillMatrix>(mat3, x, y, z);
     SparMatD mat4; mat4.resize(S); testMatrix<SparMatD, fillMatrix>(mat4, x, y, z);
+#endif
     SparMatA mat5; mat5.resize(S); testMatrix<SparMatA, fillMatrix>(mat5, x, y, z);
+    
 #ifdef _OPENMP
     size_t chunk = S / 16;
-    testMatrixParallel(mat5, x, y, z, chunk);
-    checkMatrixParallel(mat5, x, y, z, chunk);
+    testMatrixOMP(mat5, x, y, z, chunk);
+    checkMatrixOMP(mat5, x, y, z, chunk);
 #endif
-    
+    testMatrixDispatch(mat5, x, y, z);
+
 #if ( 0 )
     std::ofstream os1("mat1.txt");
     std::ofstream os3("mat3.txt");
@@ -516,7 +575,7 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
 }
 
 
-void testMatrices(const size_t S, const size_t F)
+void testMatrices(const unsigned S, const unsigned F)
 {
     real * x = nullptr;
     real * y = nullptr;
@@ -526,14 +585,14 @@ void testMatrices(const size_t S, const size_t F)
 
     if ( 0 )
     {
-        printf("------ iso %iD x %lu  filled %.2f %%", DIM, S, F*100.0/S/S);
+        printf("------ iso %iD x %i  filled %.2f %%", DIM, S, F*100.0/S/S);
         setIndices(F, S);
         testIsoMatrices(S, x, y, z);
         printf("\n");
     }
     if ( 1 )
     {
-        printf("------ %i x %lu  filled %.2f %%:", DIM, S, F*100.0/S/S);
+        printf("------ %i x %i  filled %.2f %%:", DIM, S, F*100.0/S/S);
         setIndices(F, S);
         testMatrices(DIM*S, x, y, z);
         printf("\n");
@@ -571,7 +630,7 @@ void fillBlockMatrix(MATRIX& mat)
 }
 
 
-void testBlockMatrix(const size_t S, const size_t F)
+void testBlockMatrix(const unsigned S, const unsigned F)
 {
     real * x = nullptr;
     real * y = nullptr;
@@ -579,7 +638,7 @@ void testBlockMatrix(const size_t S, const size_t F)
     setVectors(DIM*S, x, y, z);
     setIndices(F, S);
     
-    printf("------ %i x %lu with %lu blocks:", DIM, S, F);
+    printf("------ %i x %u with %u blocks:", DIM, S, F);
     SparMatB B; B.resize(DIM*S); testMatrix<SparMatB, fillBlockMatrix>(B, x, y, z);
     SparMatD D; D.resize(DIM*S); testMatrix<SparMatD, fillBlockMatrix>(D, x, y, z);
     SparMatA A; A.resize(DIM*S); testMatrix<SparMatA, fillBlockMatrix>(A, x, y, z);
@@ -607,17 +666,17 @@ int main( int argc, char* argv[] )
     SparMatD mat4;
     
     // check correctness:
-    compareMatrix(4*3, mat1, mat2, 1<<4);
-    compareMatrix(4*5, mat1, mat3, 1<<4);
-    compareMatrix(4*7, mat2, mat3, 1<<5);
+    compareMatrices(4*3, mat1, mat2, 1<<4);
+    compareMatrices(4*5, mat1, mat3, 1<<4);
+    compareMatrices(4*7, mat2, mat3, 1<<5);
 #endif
 #if ( 0 )
-    compareMatrix(4*11, mat1, mat3, 1<<6);
-    compareMatrix(4*33, mat1, mat3, 1<<16);
-    compareMatrix(4*3, mat1, mat4, 1<<16);
-    compareMatrix(4*7, mat1, mat4, 1<<16);
-    compareMatrix(4*11, mat1, mat4, 1<<16);
-    compareMatrix(4*33, mat1, mat4, 1<<16);
+    compareMatrices(4*11, mat1, mat3, 1<<6);
+    compareMatrices(4*33, mat1, mat3, 1<<16);
+    compareMatrices(4*3, mat1, mat4, 1<<16);
+    compareMatrices(4*7, mat1, mat4, 1<<16);
+    compareMatrices(4*11, mat1, mat4, 1<<16);
+    compareMatrices(4*33, mat1, mat4, 1<<16);
 #endif
 #if ( 0 )
     testMatrices(1, 1);
@@ -655,7 +714,7 @@ int main( int argc, char* argv[] )
     testBlockMatrix(2311, 231111);
     //testBlockMatrix(DIM*3217, 671234);
 #endif
-    testBlockMatrix(15494, 25123);
+    //testBlockMatrix(15494, 25123);
 #if ( 0 )
     //testMatrices(7, 23);
     //testMatrices(17, 23);

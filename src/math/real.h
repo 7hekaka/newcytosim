@@ -212,6 +212,15 @@ inline static real fold_real(const real x, const real p)
     return std::remainder(x, p);
 }
 
+/// return max absolute difference of `a[i] - b[i]` for i in [0, cnt]
+inline static real norm_inf(size_t cnt, real const* a, real const* b)
+{
+    real s = 0;
+    for ( size_t u = 0; u < cnt; ++u )
+        std::max(s, std::fabs( a[u] - b[u] ));
+    return s;
+}
+
 //----------------------------------- DEBUG ------------------------------------
 
 inline static bool has_nan(size_t cnt, real const* ptr)

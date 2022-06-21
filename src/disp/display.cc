@@ -202,9 +202,9 @@ void Display::drawSimul(Simul const& sim)
     CHECK_GL_ERROR("at drawSimul()");
 
 #if ( DIM >= 3 )
-    // Draw opaque objects with depth buffer is writable
+    // Draw opaque objects with writable depth buffer
     drawObjects(sim);
-    // Draw transparent objects with depth buffer readable
+    // Draw transparent objects with read-only depth buffer
     gym::closeDepthMask();
     drawTransparentObjects(sim);
     gym::openDepthMask();
