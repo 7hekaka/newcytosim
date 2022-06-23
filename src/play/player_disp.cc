@@ -276,7 +276,7 @@ void Player::drawCytosim()
 #if 0
     static double sec = TimeDate::milliseconds();
     double now = TimeDate::milliseconds();
-    std::clog << " drawCytosim(" << std::setprecision(4) << simul.time() << "s) " << now-sec << "\n";
+    fprintf(stderr, "drawCytosim(%8.3f) %.0f\n", simul.time(), now-sec);
     sec = now;
 #endif
     try {

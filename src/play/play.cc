@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
+#include "time_date.h"
 #include "simul.h"
 #include "glossary.h"
 #include "messages.h"
@@ -96,7 +97,12 @@ int drawLive(View& view)
     }
     else
     {
-        //fprintf(stderr, "display: trylock failed\n");
+#if 0
+        static double sec = TimeDate::milliseconds();
+        double now = TimeDate::milliseconds();
+        fprintf(stderr, "drawLive(failed) %.0f\n", now-sec);
+        sec = now;
+#endif
         //worker.debug("display: trylock failed");
         //postRedisplay();
     }

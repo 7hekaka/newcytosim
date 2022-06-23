@@ -171,6 +171,7 @@ void Player::startstop()
 
 void Player::extendLive()
 {
+    worker.stop();
     if ( 0 == worker.extend() )
         flashText("Extend simulation...");
     goLive = 1;

@@ -121,16 +121,16 @@ public:
 #else
     
     /// lock access to the Simulation data
-    void lock()   {  debug("  lock..."); pthread_mutex_lock(&mutex_); debug("  locked!"); }
+    void lock()   { debug("  lock..."); pthread_mutex_lock(&mutex_); debug("  locked!"); }
     
     /// unlock access to the Simulation data
-    void unlock() { pthread_mutex_unlock(&mutex_); gubed("  unlock"); }
+    void unlock() { pthread_mutex_unlock(&mutex_); gubed("unlock"); }
     
     /// try to lock access to the Simulation data
     int trylock() { int R=pthread_mutex_trylock(&mutex_); debug(R?"  failed trylock":"  trylock"); return R; }
     
     /// wait for the condition
-    void cond_wait() { debug("unlock, wait"); pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); }
+    int cond_wait() { debug("unlock, wait"); int R=pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); return R; }
     
     /// signal child thread to continue
     void signal() { debug("signal"); holding_=0; pthread_cond_signal(&condition_); }

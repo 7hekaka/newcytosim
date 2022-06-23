@@ -2063,7 +2063,7 @@ void Chain::briefdoc(std::ostream& os, real len, real con, real mn, real mx) con
 {
     std::streamsize p = os.precision();
     os.precision(3);
-    os << "chain " << reference();
+    os << " " << reference();
     os << "( seg " << segmentation() << ": " << mn << " +" << mx-mn;
     os << " len " << len << " " << std::showpos << con-len << std::noshowpos << " )";
     os.precision(p);

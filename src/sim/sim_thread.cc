@@ -60,18 +60,18 @@ SimThread::~SimThread()
 void SimThread::debug(const char* msg) const
 {
     if ( isWorker() )
-        fprintf(stdout, "\n- - -  %-16s", msg);
+        fprintf(stdout, "\n- - - %-16s", msg);
     else
-        fprintf(stdout, "\n* * *  %-16s", msg);
+        fprintf(stdout, "\n* * * %-16s", msg);
 }
 
 
 void SimThread::gubed(const char* msg) const
 {
     if ( isWorker() )
-        fprintf(stdout, "  - - %12s ", msg);
+        fprintf(stdout, "  - - %-16s ", msg);
     else
-        fprintf(stdout, "  * * %12s ", msg);
+        fprintf(stdout, "  * * %-16s ", msg);
 }
 
 
@@ -100,7 +100,8 @@ void SimThread::run()
 {
     assert_true( isWorker() );
     try {
-        do {
+        while ( 1 )
+        {
             demand_ = 0;
             if ( config_code )
             {
@@ -109,16 +110,19 @@ void SimThread::run()
             }
             else
                 Parser::readConfig();
-            do
+            // the simulation is now terminated, we shall wait for a signal
+            //fprintf(stderr, "Completed simulation %i\n", sim_->prop.flag);
+            unlock();
+            while ( !demand_ )
             {
-                // the simulation is now terminated, we shall wait for a signal
                 holding_ = 2;
-                //fprintf(stderr, "Completed simulation %i\n", sim_->prop.flag);
-                if ( cond_wait() ) break;  // this also unlocks and locks the mutex
                 usleep(1000000);
-            } while ( !demand_ );
+            }
+            if ( demand_ < 0 )
+                break;
+            lock();
             erase_simul(1);
-        } while ( demand_ >= 0 );
+        }
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
