@@ -189,7 +189,7 @@ void DynamicFiber::initP()
 {
     unitP[0] = 1;
     unitP[1] = 1;
-    mStateP  = calculateStateP();
+    mStateP = calculateStateP();
     
     nextGrowthP = RNG.exponential();
     nextHydrolP = RNG.exponential();

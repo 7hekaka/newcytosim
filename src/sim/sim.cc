@@ -3,18 +3,17 @@
 #include <csignal>
 #include <unistd.h>
 
+#include "backtrace.h"
+#include "signal_handlers.h"
+#include "print_color.h"
+#include "exceptions.h"
+#include "time_date.h"
+#include "filepath.h"
+#include "glossary.h"
+#include "messages.h"
 #include "simul.h"
 #include "parser.h"
-#include "messages.h"
-#include "glossary.h"
-#include "exceptions.h"
-#include "print_color.h"
-#include "backtrace.h"
-#include "filepath.h"
 #include "splash.h"
-#include "time_date.h"
-#include "signal_handlers.h"
-
 
 void help(std::ostream& os)
 {
@@ -25,7 +24,6 @@ void help(std::ostream& os)
     os << "  info    print build options\n";
     os << "  help    print this message\n";
 }
-
 
 void handle_signal(int sig)
 {
@@ -57,8 +55,6 @@ void handle_interrupt(int sig)
 }
 
 //------------------------------------------------------------------------------
-//=================================  MAIN  =====================================
-//------------------------------------------------------------------------------
 
 /// for normal output:
 using std::cout;
@@ -76,9 +72,8 @@ int main(int argc, char* argv[])
     // catch division by zero and Nan
     //feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 
-    Glossary arg;
-
     //parse the command line:
+    Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
 
@@ -124,6 +119,7 @@ int main(int argc, char* argv[])
         simul.initialize(arg);
         arg.print_warnings(cerr, 1, " on command line\n");
         time_t sec = TimeDate::seconds_since_1970();
+        // read and execute default config file:
         Parser(&simul, 1, 1, 1, 1, 1).readConfig();
         Cytosim::out << "% " << TimeDate::date_string() << '\n';
         sec = TimeDate::seconds_since_1970() - sec;

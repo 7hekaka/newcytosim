@@ -237,7 +237,6 @@ void SpacePolygonZ::drawRings(float width) const
     const size_t npts = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     
-    glLineWidth(0.5);
     for ( size_t n = 0; n < npts; n++ )
     {
         float R(pts[n].xx);

@@ -14,8 +14,8 @@
 
 ClassicFiber::ClassicFiber(ClassicFiberProp const* p) : Fiber(p), prop(p)
 {
-    mStateM  = STATE_WHITE;
-    mStateP  = STATE_WHITE;
+    mStateM = STATE_WHITE;
+    mStateP = STATE_WHITE;
 }
 
 
