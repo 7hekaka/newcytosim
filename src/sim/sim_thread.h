@@ -192,10 +192,10 @@ public:
     /// open trajectory file for input
     void openFile(std::string const& name) { reader_.openFile(name); }
     
-    /// true if ready to read from file
-    bool goodFile() const { return reader_.good(); }
+    /// returns true if ready to read from file
+    bool goodFile() { return reader_.good(); }
     
-    /// status of file
+    /// end-of-file flag of input file
     int eof() const { return reader_.eof(); }
     
     /// rewind file

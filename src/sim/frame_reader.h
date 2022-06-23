@@ -55,12 +55,6 @@ private:
 
     /// remember position `pos` as the place where frame `frm` should start
     void savePos(size_t frm, const fpos_t& pos, int status);
-    
-    /// check file validity
-    void checkFile();
-    
-    /// return 0 if file is good for input
-    int badFile();
 
 public:
     
@@ -76,17 +70,17 @@ public:
     /// last frame seen in the file
     size_t lastKnownFrame() const;
 
-    /// return state of file object
-    bool hasFile() { return inputter.file(); }
+    /// true when end of file is reached
+    bool eof() const { return inputter.eof();  }
     
     /// true when end of file is reached
-    bool eof() const  { return inputter.eof();  }
+    bool good() const { return inputter.good();  }
     
+    /// return 0 if file is good for input
+    int badFile();
+
     /// rewind file
     void rewind() { inputter.rewind(); frameIndex=0; }
-
-    /// true if everything looks correct for input
-    bool good() const { return inputter.good(); }
     
     /// dimensionality of vectors
     unsigned vectorSize() const { return inputter.vectorSize(); }

@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
     arg.set(input, ".cmo") || arg.set(input, "input");
     reader.openFile(input);
     
-    if ( !reader.good() )
+    if ( reader.badFile() )
     {
         fprintf(stderr, "could not open input file\n");
         return EXIT_FAILURE;

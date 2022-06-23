@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
 
     reader.openFile(input);
     
-    if ( !reader.good() )
+    if ( reader.badFile() )
     {
         fprintf(stderr, "could not open input file\n");
         return EXIT_FAILURE;

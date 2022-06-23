@@ -66,23 +66,10 @@ int FrameReader::badFile()
     if ( inputter.eof() )
         inputter.clear();
     
-    if ( ! inputter.good() )
+    if ( !inputter.good() )
         return 7;
     
     return 0;
-}
-
-
-void FrameReader::checkFile()
-{
-    if ( !inputter.file() )
-        throw InvalidIO("No open file");
-    
-    if ( inputter.eof() )
-        inputter.clear();
-    
-    if ( ! inputter.good() )
-        throw InvalidIO("File has errors");
 }
 
 //------------------------------------------------------------------------------

@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    if ( !reader.good() )
+    if ( reader.badFile() )
     {
         printf("File could not be oppened\n");
         return EXIT_FAILURE;

@@ -54,7 +54,13 @@ void Player::previousFrame()
  Reads the next frame from the current file position.
  */
 void Player::nextFrame()
-{    
+{
+    if ( !worker.goodFile() )
+    {
+        flashText("Error cannot read from `"+simul.prop.system_file+"'\n");
+        stop();
+        return;
+    }
     int res = worker.loadNextFrame();
     if ( res == 1 )
     {
