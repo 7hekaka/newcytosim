@@ -2774,9 +2774,11 @@
 				BBF283242430C7E600FADDD8 /* meca_rigidity.cc */,
 				BB767DAB27AD01B40060D3FA /* meca_steric.cc */,
 				BBF283262430E10100FADDD8 /* meca_math.cc */,
-				BB7358FC05B98DA3006956D5 /* simul.h */,
+				BBFDB9D70FF35FD200C9541B /* simul_prop.h */,
+				BBFDB9D80FF35FD200C9541B /* simul_prop.cc */,
 				BB845E002864411D003254EF /* simul_part.h */,
 				BB11D2FD28645D91002B5869 /* simul_part.cc */,
+				BB7358FC05B98DA3006956D5 /* simul.h */,
 				BB7358FB05B98DA3006956D5 /* simul.cc */,
 				BB7358FD05B98DA3006956D5 /* simul_file.cc */,
 				BB19DAA206964B9900093FA2 /* simul_solve.cc */,
@@ -2784,8 +2786,6 @@
 				BB3D8E1615F490D0001851E1 /* simul_report.cc */,
 				BB5921D2112612EF00E0DDA0 /* simul_custom.cc */,
 				BBE60C250EE979ED00FFAB27 /* simul_step.cc */,
-				BBFDB9D70FF35FD200C9541B /* simul_prop.h */,
-				BBFDB9D80FF35FD200C9541B /* simul_prop.cc */,
 			);
 			name = Simul;
 			sourceTree = "<group>";
