@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "field_prop.h"
 #include "messages.h"
@@ -18,7 +18,6 @@ void FieldProp::clear()
     boundary_condition    = 0;
     boundary_value        = 0;
     decay_rate            = 0;
-    decay_frac            = 1;
     transport_strength    = 0;
     transport_length      = 0;
     cut_fibers            = 0;
@@ -27,7 +26,6 @@ void FieldProp::clear()
     save                  = true;
     display_scale         = 1;
     visible               = 1;
-    time_step             = 0;
 }
 
 
@@ -71,13 +69,11 @@ void FieldProp::read(Glossary& glos)
 //------------------------------------------------------------------------------
 void FieldProp::complete(Simul const& sim)
 {
-    time_step = sim.time_step();
-    
     field_space_ptr = sim.findSpace(field_space);
     
     if ( field_space_ptr )
         field_space = field_space_ptr->name();
-    else if ( sim.primed() )
+    else if ( primed(sim) )
         throw InvalidParameter("field::space must be created before the field");
 
     if ( step < REAL_EPSILON )
@@ -86,22 +82,19 @@ void FieldProp::complete(Simul const& sim)
     if ( slow_diffusion < 0 )
         throw InvalidParameter("field:diffusion must be >= 0");
     
-    real theta = 2 * DIM * time_step * (slow_diffusion+full_diffusion) / ( step * step );
-    //std::clog << "The CFL condition for `" << name() << "' is " << theta << '\n';
+    real CFL = 2 * DIM * time_step(sim) * (slow_diffusion+full_diffusion) / ( step * step );
+    //std::clog << "The diffusion CFL condition for `" << name() << "' is " << CFL << '\n';
     
-    if ( sim.primed()  &&  theta > 0.5 )
+    if ( primed(sim)  &&  CFL > 0.5 )
     {
         InvalidParameter e("field:diffusion is too fast");
         e << "The CFL condition ( diffusion * time_step / step^2 ) must be below 1/2,";
-        e << "\n  but it is " + std::to_string(theta) + "\n";
+        e << "\n  but it is " + std::to_string(CFL) + "\n";
         throw e;
     }
 
     if ( decay_rate < 0 )
         throw InvalidParameter("field:decay_rate must be >= 0");
-    
-    // calculate decay coefficient during interval `time-step`
-    decay_frac = std::exp( -time_step * decay_rate );
 }
 
 

@@ -5,7 +5,7 @@
 #include "glossary.h"
 #include "mighty_prop.h"
 #include "mighty.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Hand * MightyProp::newHand(HandMonitor* m) const
@@ -48,13 +48,15 @@ void MightyProp::complete(Simul const& sim)
 {
     HandProp::complete(sim);
     
-    if ( sim.primed() && stall_force <= 0 )
+    if ( primed(sim) && stall_force <= 0 )
         throw InvalidParameter("mighty:stall_force must be > 0");
     
+    const real tau = time_step(sim);
+
     if ( unbinding_density * abs_real(unloaded_speed) + unbinding_rate < 0 )
         throw InvalidParameter("mighty:unbinding_density must be >= 0");
 
-    set_speed_dt = sim.time_step() * unloaded_speed;
+    set_speed_dt = tau * unloaded_speed;
     var_speed_dt = abs_real(set_speed_dt) / stall_force;
 
     
@@ -62,11 +64,11 @@ void MightyProp::complete(Simul const& sim)
     if ( unloaded_speed > 0 )
     {
         min_dab = 0;
-        max_dab = 2 * sim.time_step() * unloaded_speed;
+        max_dab = 2 * tau * unloaded_speed;
     }
     else
     {
-        min_dab = 2 * sim.time_step() * unloaded_speed;
+        min_dab = 2 * tau * unloaded_speed;
         max_dab = 0;
     }
 }

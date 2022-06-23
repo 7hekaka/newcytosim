@@ -83,7 +83,7 @@ void SphereProp::complete(Simul const& sim)
             confine_space = confine_space_ptr->name();
         else
         {
-            if ( sim.primed() )
+            if ( primed(sim) )
                 throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
             // this condition occur when the Property is created before the Space
         }
@@ -92,7 +92,7 @@ void SphereProp::complete(Simul const& sim)
     if ( confine && confine_stiffness < 0 )
         throw InvalidParameter(name()+":confine_stiffness must be >= 0");
     
-    if ( sim.primed() && steric && !sim.prop.steric_mode )
+    if ( primed(sim) && steric && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( point_mobility < 0 )

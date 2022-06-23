@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 #include "picket_long.h"
-#include "simul.h"
+#include "simul_part.h"
 #include "meca.h"
 #include "modulo.h"
 

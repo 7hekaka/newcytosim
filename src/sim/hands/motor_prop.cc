@@ -6,7 +6,7 @@
 #include "glossary.h"
 #include "motor_prop.h"
 #include "motor.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Hand * MotorProp::newHand(HandMonitor* m) const
@@ -58,36 +58,38 @@ void MotorProp::complete(Simul const& sim)
 {
     HandProp::complete(sim);
     
-    if ( sim.primed() && stall_force <= 0 )
+    if ( primed(sim) && stall_force <= 0 )
         throw InvalidParameter("motor:stall_force must be > 0");
     
+    const real tau = time_step(sim);
+
 #if NEW_VARIABLE_SPEED
-    variable_speed_dt = variable_speed * sim.time_step();
+    variable_speed_dt = variable_speed * tau;
 #endif
 
 #if NEW_UNBINDING_DENSITY
     if ( unbinding_density * abs_real(unloaded_speed) + unbinding_rate < 0 )
         throw InvalidParameter("motor:unbinding_density must be > 0");
 
-    if ( sim.primed() && unbinding_density > 0 )
+    if ( primed(sim) && unbinding_density > 0 )
     {
         real rate = unbinding_rate + unbinding_density * unloaded_speed;
         std::clog << name() + " unbinding rate: unloaded " << rate << " stalled " << unbinding_rate << '\n';
     }
 #endif
 
-    set_speed_dt = sim.time_step() * unloaded_speed;
+    set_speed_dt = tau * unloaded_speed;
     var_speed_dt = abs_real(set_speed_dt) / stall_force;
     
     // The limits for a displacement in one time step apply if ( limit_speed = true )
     if ( unloaded_speed > 0 )
     {
         min_dab = 0;
-        max_dab = 2 * sim.time_step() * unloaded_speed;
+        max_dab = 2 * tau * unloaded_speed;
     }
     else
     {
-        min_dab = 2 * sim.time_step() * unloaded_speed;
+        min_dab = 2 * tau * unloaded_speed;
         max_dab = 0;
     }
 }

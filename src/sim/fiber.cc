@@ -73,11 +73,12 @@ void Fiber::step()
     
     //std::clog << reference() << " mesh " << std::fixed << fMesh->data(0) << '\n';
     //std::clog << reference() << " mesh sum = " << fMesh->sum() << "     ";
+    const real tau = time_step(simul());
     
     if ( prop->mesh_binding_rate > 0 || prop->mesh_unbinding_rate > 0 )
     {
-        real on  = prop->mesh_binding_rate * simul().time_step();
-        real off = -std::expm1( -prop->mesh_unbinding_rate * simul().time_step() );
+        real on  = prop->mesh_binding_rate * tau;
+        real off = -std::expm1( -prop->mesh_unbinding_rate * tau );
         equilibrateMesh(fMesh, prop->field_ptr, on, off);
     }
     
@@ -94,7 +95,7 @@ void Fiber::step()
          starting from a value of 0, and reached for a value of 1,
          with a time-scale given by 'mesh_aging_rate'.
          */
-        real cst = prop->mesh_aging_rate * simul().time_step();
+        real cst = prop->mesh_aging_rate * tau;
         evolveMeshValues(fMesh, cst, 1 - cst);
         //std::clog << reference() << " lattice avg = " << fMesh->sum()*fMesh->unit()/length() << '\n';
     }
@@ -1314,7 +1315,7 @@ void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real bind_rate) const
     const real rate = bind_rate * spread / fld->cellVolume();
     
     // fraction of the cell content that will bind in one time step:
-    const real frac = -std::expm1( -rate * simul().time_step() );
+    const real frac = -std::expm1( -rate * time_step(simul()) );
     
     real abs = spread * RNG.exponential();
     const real len = length();
@@ -1397,7 +1398,7 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
     assert_true( inf <= sup );
     auto * site = lat.data();
 
-    const real fac = speed * simul().time_step() / lat.unit();
+    const real fac = speed * time_step(simul()) / lat.unit();
     
     if ( abs_real(fac) > 1 )
         throw InvalidParameter("mesh_flux_speed * time_step / lattice_unit is too high");
@@ -1457,7 +1458,7 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
     assert_true( inf <= sup );
     auto * site = lat.data();
 
-    const real fac = 1.0 / simul().time_step();
+    const real fac = 1.0 / time_step(simul());
     
     assert_true( inf >= lat.inf() );
     assert_true( sup <  lat.sup() );

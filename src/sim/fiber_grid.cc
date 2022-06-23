@@ -9,7 +9,6 @@
 #include "space.h"
 #include "hand.h"
 #include "hand_prop.h"
-#include "simul.h"
 #include "cymdef.h"
 
 
@@ -446,7 +445,8 @@ FiberSegment FiberGrid::closestSegment(Vector const& place) const
 #pragma mark - Test
 
 #include <map>
-#include "simul.h"
+#include "hand_monitor.h"
+#include "fiber_set.h"
 
 
 /// used for debugging

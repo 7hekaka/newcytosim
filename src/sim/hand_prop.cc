@@ -231,12 +231,12 @@ void HandProp::read(Glossary& glos)
 
 void HandProp::complete(Simul const& sim)
 {    
-    if ( sim.time_step() < REAL_EPSILON )
+    if ( time_step(sim) < REAL_EPSILON )
         throw InvalidParameter("simul:time_step is not defined");
     
-    unbinding_rate_dt = unbinding_rate * sim.time_step();
+    unbinding_rate_dt = unbinding_rate * time_step(sim);
     //std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
-    binding_prob = -std::expm1(-binding_rate * sim.time_step() * POOL_UNATTACHED);
+    binding_prob = -std::expm1(-binding_rate * time_step(sim) * POOL_UNATTACHED);
     
     if ( binding_range < 0 )
         throw InvalidParameter(name()+":binding_range must be >= 0");
@@ -253,7 +253,7 @@ void HandProp::complete(Simul const& sim)
     if ( hold_shrinking_end < 0 )
         throw InvalidParameter(name()+":hold_shrinking_end must be >= 0");
 
-    if ( sim.primed() )
+    if ( primed(sim) )
     {
         if ( binding_prob > sim.prop.acceptable_prob )
             Cytosim::warn << name() << ":binding_rate is too high: decrease time_step\n";

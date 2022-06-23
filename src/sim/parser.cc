@@ -1270,6 +1270,7 @@ void Parser::evaluate(std::istream& is, std::streampos& ipos)
         }
 #endif
         ipos = is.tellg();
+        // this is useful to trace execution:
         //StreamFunc::print_lines(std::clog, is, ipos, ipos);
         
         if ( evaluate_one(is) )

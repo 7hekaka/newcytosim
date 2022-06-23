@@ -29,6 +29,7 @@
 #include "bicgstab.h"
 #include "gmres.h"
 #include "timer.h"
+#include "simul.h"
 
 /**
 Set SEPARATE_RIGIDITY_TERMS to chose how Rigidity term are calculated:

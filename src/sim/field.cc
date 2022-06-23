@@ -1,7 +1,8 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 // Created by Francois Nedelec on 18/12/07.
 
 #include "field.h"
+#include "simul_part.h"
 #include "fiber_site.h"
 #include "fiber_set.h"
 #include "blas.h"
@@ -99,7 +100,8 @@ void Field::prepare()
 
     if ( prop->slow_diffusion > 0 )
     {
-        real theta = prop->slow_diffusion * prop->time_step / ( prop->step * prop->step );
+        const real tau = time_step(simul());
+        real theta = prop->slow_diffusion * tau / ( prop->step * prop->step );
 
         if ( DIM == 1 || prop->field_periodic )
             prepareDiffusion(theta);
@@ -360,7 +362,8 @@ void Field::setEdgesZ(real * field, real val)
 void Field::step(FiberSet& fibers)
 {
     assert_true( prop );
-    
+    const real tau = time_step(simul());
+
     // we cast FieldScalar to floating-point type :
     static_assert(sizeof(FieldScalar) == sizeof(real), "unexpected FieldScalar type");
     real * field = reinterpret_cast<real*>(mGrid.data());
@@ -371,14 +374,16 @@ void Field::step(FiberSet& fibers)
     // decay:
     if ( prop->decay_rate > 0 )
     {
-        // field = field * exp( - decay_rate * time_step ):
-        blas::xscal(nbc, prop->decay_frac, field, 1);
+        // calculate decay coefficient during interval `time-step`
+        real frac = std::exp( -tau * prop->decay_rate );
+        // field = field * frac:
+        blas::xscal(nbc, frac, field, 1);
     }
 
     // full grid diffusion:
     if ( prop->full_diffusion > 0 )
     {
-        real c = prop->full_diffusion * prop->time_step / ( prop->step * prop->step );
+        real c = prop->full_diffusion * tau / ( prop->step * prop->step );
 
 #if ( DIM > 1 )
         laplacian(field, dup);
@@ -425,7 +430,7 @@ void Field::step(FiberSet& fibers)
     {
         const real spread = 0.5 * cellWidth();
         const real rate = prop->transport_strength * spread / cellVolume();
-        const real frac = -std::expm1( -rate * prop->time_step );
+        const real frac = -std::expm1( -rate * tau );
         
         if ( frac >= 0.5 )
             throw InvalidParameter("field:transport_strength is too high");
@@ -453,8 +458,8 @@ void Field::step(FiberSet& fibers)
     if ( prop->cut_fibers )
     {
         LOG_ONCE("!!!! Field severs fibers\n");
-        const real spread = 0.5 / prop->time_step;
-        const real fac = spread * prop->time_step / cellVolume();
+        const real spread = 0.5 / tau;
+        const real fac = spread * tau / cellVolume();
         
         fibers.uniFiberSites(loc, spread);
         for ( FiberSite & i : loc )
@@ -470,7 +475,7 @@ void Field::step(FiberSet& fibers)
     if ( prop->chew_fibers )
     {
         LOG_ONCE("!!!! Field chews PLUS_END\n");
-        const real fac = -prop->time_step / cellVolume();
+        const real fac = -tau / cellVolume();
         for ( Fiber * fib = fibers.first(); fib ; fib = fib->next() )
             fib->growP(fac*cell(fib->posEndP()));
     }

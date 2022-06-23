@@ -113,7 +113,7 @@ void CoupleProp::complete(Simul const& sim)
             confine_space = confine_space_ptr->name();
         else
         {
-            if ( sim.primed() )
+            if ( primed(sim) )
                 throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
             // this condition occur when the Property is created before the Space
         }
@@ -133,7 +133,7 @@ void CoupleProp::complete(Simul const& sim)
      Since `sreal()` is uniformly distributed, its variance is 1/3,
      and we need `diffusion_dt^2 = 6 D time_step`
      */
-    diffusion_dt = std::sqrt(6.0 * diffusion * sim.time_step() * POOL_UNATTACHED);
+    diffusion_dt = std::sqrt(6.0 * diffusion * time_step(sim) * POOL_UNATTACHED);
 
     if ( stiffness < 0 )
         throw InvalidParameter(name()+":stiffness must be specified and >= 0");
@@ -146,9 +146,9 @@ void CoupleProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":hand2 must be defined");
     hand2_prop = sim.findProperty<HandProp>("hand", hand2);
     
-    if ( sim.primed() )
+    if ( primed(sim) )
     {
-        hand1_prop->checkStiffness(stiffness, length, 2, sim.prop.kT);
+        hand1_prop->checkStiffness(stiffness, length, 2, boltzmann(sim));
         /*
          If the length of a Couple (L) is longer than the attachment range of its hands,
          a Couple would place a pair of Fibers at a distance L, thus preventing further
@@ -160,7 +160,7 @@ void CoupleProp::complete(Simul const& sim)
 
         if ( hand2_prop != hand1_prop )
         {
-            hand2_prop->checkStiffness(stiffness, length, 2, sim.prop.kT);
+            hand2_prop->checkStiffness(stiffness, length, 2, boltzmann(sim));
         
             if ( length > hand2_prop->binding_range )
                 Cytosim::warn << hand2_prop->name() << ":binding_range should be >= " << name() << ":length\n";

@@ -135,15 +135,15 @@ void DynamicFiberProp::complete(Simul const& sim)
 
         if ( growing_speed[i] < 0 )
             throw InvalidParameter("fiber:growing_speed should be >= 0");
-        growing_rate_dt[i] = sim.time_step() * abs_real(growing_speed[i]) / unit_length;
+        growing_rate_dt[i] = time_step(sim) * abs_real(growing_speed[i]) / unit_length;
 
         if ( growing_off_speed[i] > 0 )
             throw InvalidParameter("growing_off_speed should be <= 0");
-        growing_off_rate_dt[i] = -sim.time_step() * growing_off_speed[i] / unit_length;
+        growing_off_rate_dt[i] = -time_step(sim) * growing_off_speed[i] / unit_length;
 
         if ( hydrolysis_rate[i] < 0 )
             throw InvalidParameter("fiber:hydrolysis_rate should be >= 0");
-        hydrolysis_rate_2dt[i] = 2 * sim.time_step() * hydrolysis_rate[i];
+        hydrolysis_rate_2dt[i] = 2 * time_step(sim) * hydrolysis_rate[i];
         
 #if OLD_DYNAMIC_ZONE
         zone_space_ptr = sim.findSpace(zone_space);
@@ -151,18 +151,18 @@ void DynamicFiberProp::complete(Simul const& sim)
             throw InvalidParameter("fiber:zone_radius should be >= 0");
         if ( zone_hydrolysis_rate[i] < 0 )
             throw InvalidParameter("fiber:zone_hydrolysis_rate should be >= 0");
-        zone_hydrolysis_rate_2dt[i] = 2 * sim.time_step() * zone_hydrolysis_rate[i];
+        zone_hydrolysis_rate_2dt[i] = 2 * time_step(sim) * zone_hydrolysis_rate[i];
 
         zone_radius_sqr = square(zone_radius);
 #endif
 
         if ( shrinking_speed[i] > 0 )
             throw InvalidParameter("fiber:shrinking_speed should be <= 0");
-        shrinking_rate_dt[i] = sim.time_step() * abs_real(shrinking_speed[i]) / unit_length;
+        shrinking_rate_dt[i] = time_step(sim) * abs_real(shrinking_speed[i]) / unit_length;
         
         if ( rebirth_rate[i] < 0 )
             throw InvalidParameter("fiber:rebirth_rate should be >= 0");
-        rebirth_prob[i] = -std::expm1( -rebirth_rate[i] * sim.time_step() );
+        rebirth_prob[i] = -std::expm1( -rebirth_rate[i] * time_step(sim) );
 
         if ( unhydrolyzed_prob[i] < 0 || unhydrolyzed_prob[i] > 1 )
 			throw InvalidParameter("fiber:unhydrolyzed_prob should be in [0, 1]");
@@ -172,7 +172,7 @@ void DynamicFiberProp::complete(Simul const& sim)
         min_length = unit_length;
      
     /// print predicted average length in verbose mode:
-    if ( sim.primed() && sim.prop.verbose )
+    if ( primed(sim) && sim.prop.verbose )
     {
         if ( 0 == growing_off_speed[0] )
         splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);

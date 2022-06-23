@@ -140,7 +140,7 @@ void SingleProp::complete(Simul const& sim)
             confine_space = confine_space_ptr->name();
         else
         {
-            if ( sim.primed() )
+            if ( primed(sim) )
                 throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
             // this condition occur when the Property is created before the Space
         }
@@ -164,9 +164,9 @@ void SingleProp::complete(Simul const& sim)
      Since `sreal()` is uniformly distributed, its variance is 1/3,
      and we need `diffusion_dt^2 = 6 D time_step`
      */
-    diffusion_dt = std::sqrt(6.0 * diffusion * sim.time_step() * POOL_UNATTACHED);
+    diffusion_dt = std::sqrt(6.0 * diffusion * time_step(sim) * POOL_UNATTACHED);
 #if NEW_MOBILE_SINGLE
-    speed_dt = speed * sim.time_step();
+    speed_dt = speed * time_step(sim);
 #endif
     
     if ( stiffness < 0 )
@@ -175,9 +175,9 @@ void SingleProp::complete(Simul const& sim)
     if ( length < 0 )
         throw InvalidParameter(name()+":length must be >= 0");
 
-    if ( sim.primed() && stiffness > 0 )
+    if ( primed(sim) && stiffness > 0 )
     {
-        hand_prop->checkStiffness(stiffness, length, 1, sim.prop.kT);
+        hand_prop->checkStiffness(stiffness, length, 1, boltzmann(sim));
         
         /*
          If the length of a Single (L) is longer than the attachment range of its hands,

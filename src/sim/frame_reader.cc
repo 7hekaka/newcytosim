@@ -4,8 +4,9 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "filepath.h"
+#include "messages.h"
 #include "simul.h"
-
+#include "dim.h"
 
 // Use the second definition to get some reports:
 #define VLOG(ARG) ((void) 0)

@@ -54,7 +54,7 @@ OBJ_SIM := modulo.o movable.o mecable.o object.o object_pool.o object_set.o\
            tubule_prop.o tubule.o tubule_set.o\
            mecapoint.o interpolation.o interpolation4.o\
            fiber_grid.o point_grid.o locus_grid.o meca.o\
-           simul_prop.o simul.o interface.o parser.o
+           simul_prop.o simul.o simul_part.o interface.o parser.o
 
 # objects needed to load/run Cytosim
 OBJ_RUN := sim_thread.o frame_reader.o

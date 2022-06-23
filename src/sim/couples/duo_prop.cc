@@ -62,13 +62,13 @@ void DuoProp::complete(Simul const& sim)
     
     activation_space_ptr = sim.findSpace(activation_space);
     
-    if ( sim.primed()  &&  !activation_space_ptr )
+    if ( primed(sim)  &&  !activation_space_ptr )
         throw InvalidParameter("duo:activation_space not found!");
 
     if ( deactivation_rate < 0 )
         throw InvalidParameter("deactivation_rate should be >= 0");
     
-    deactivation_rate_dt = deactivation_rate * sim.time_step() * POOL_UNATTACHED;
+    deactivation_rate_dt = deactivation_rate * time_step(sim) * POOL_UNATTACHED;
 }
 
 

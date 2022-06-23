@@ -4,7 +4,7 @@
 #include "glossary.h"
 #include "exceptions.h"
 #include "iowrapper.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Regulator::Regulator(RegulatorProp const* p, HandMonitor* h)

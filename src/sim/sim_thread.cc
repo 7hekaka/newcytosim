@@ -6,6 +6,8 @@
 #include <signal.h>
 
 #include "vector.h"
+#include "simul_prop.h"
+#include "simul.h"
 #include "sim_thread.h"
 #include "exceptions.h"
 #include "print_color.h"
@@ -334,7 +336,7 @@ SingleProp * SimThread::makeHandleProperty(real range)
     // Create a Hand that attaches fast and never detach:
     HandProp * hap = new HandProp("user_hand");
     hap->binding_range   = range;
-    hap->binding_rate    = 1 / sim_->time_step();
+    hap->binding_rate    = 1 / time_step(*sim_);
     hap->unbinding_rate  = 0;
     hap->unbinding_force = INFINITY;
     hap->complete(*sim_);

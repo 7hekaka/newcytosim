@@ -3,7 +3,7 @@
 #include "kinesin_prop.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Hand * KinesinProp::newHand(HandMonitor* m) const
@@ -45,23 +45,23 @@ void KinesinProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( sim.primed() && force <= 0 )
+    if ( primed(sim) && force <= 0 )
         throw InvalidParameter("kinesin:force must be > 0");
     force_inv = 1.0 / force;
     
     if ( forward_rate < 0 )
         throw InvalidParameter("kinesin:forward_rate must be >= 0");
-    forward_rate_dt = forward_rate * sim.time_step();
+    forward_rate_dt = forward_rate * time_step(sim);
     
     if ( backward_rate < 0 )
         throw InvalidParameter("kinesin:backward_rate must be >= 0");
-    backward_rate_dt = backward_rate * sim.time_step();
+    backward_rate_dt = backward_rate * time_step(sim);
 
     directionality = sign_real(stride);
     if ( abs_real(directionality) != 1 )
         throw InvalidParameter("kinesin:directionality must be +/- 1");
     
-    if ( sim.primed() )
+    if ( primed(sim) )
     {
         real stall = log(forward_rate/backward_rate)*0.5/force_inv;
         printf("Kinesin's stall force is %.4f pN\n", stall);

@@ -6,7 +6,7 @@
 #include "glossary.h"
 #include "walker_prop.h"
 #include "walker.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Hand * WalkerProp::newHand(HandMonitor* m) const
@@ -61,7 +61,7 @@ void WalkerProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( sim.primed() && stall_force <= 0 )
+    if ( primed(sim) && stall_force <= 0 )
         throw InvalidParameter("walker:stall_force must be > 0");
     
     if ( unbinding_chance < 0 )
@@ -70,12 +70,12 @@ void WalkerProp::complete(Simul const& sim)
     if ( unbinding_chance > 1 )
         throw InvalidParameter("walker:unbinding_chance must be <= 1");
     
-    walking_rate_dt = sim.time_step() * abs_real(unloaded_speed) / step_size;
-    var_rate_dt     = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
+    walking_rate_dt = time_step(sim) * abs_real(unloaded_speed) / step_size;
+    var_rate_dt = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
     
 #if NEW_VARIABLE_WALK
     real S = sign_real(unloaded_speed * variable_speed);
-    variable_walking_rate_dt = S * sim.time_step() * abs_real(variable_speed) / step_size;
+    variable_walking_rate_dt = S * time_step(sim) * abs_real(variable_speed) / step_size;
     if ( ( unloaded_speed + variable_speed ) * unloaded_speed < 0 )
         throw InvalidParameter("walker:unloaded_speed and (unloaded_speed+variable_speed) must have the same sign");
 #endif

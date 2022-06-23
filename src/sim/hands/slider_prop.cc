@@ -6,7 +6,7 @@
 #include "cymdef.h"
 #include <cmath>
 #include "slider.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Hand * SliderProp::newHand(HandMonitor* m) const
@@ -40,14 +40,14 @@ void SliderProp::complete(Simul const& sim)
     if ( mobility < 0 )
         throw InvalidParameter("slider:mobility must be >= 0");
     
-    if ( sim.primed() && mobility <= 0 )
+    if ( primed(sim) && mobility <= 0 )
         std::clog << "WARNING: slider `" << name() << "' will not slide because mobility=0\n";
 
     /*
      Explicit
      */
     
-    mobility_dt = sim.time_step() * mobility;
+    mobility_dt = time_step(sim) * mobility;
     
     if ( stiffness > 0 )
     {

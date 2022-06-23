@@ -3,7 +3,6 @@
 #include "dim.h"
 #include "cymdef.h"
 #include "space.h"
-#include "simul.h"
 #include "modulo.h"
 #include "mecapoint.h"
 #include "interpolation.h"

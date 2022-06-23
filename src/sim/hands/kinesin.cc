@@ -6,7 +6,7 @@
 #include "glossary.h"
 #include "messages.h"
 #include "lattice.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Kinesin::Kinesin(KinesinProp const* p, HandMonitor* h)

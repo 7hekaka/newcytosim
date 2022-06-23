@@ -2,6 +2,7 @@
 
 #include "hand.h"
 #include "hand_prop.h"
+#include "hand_monitor.h"
 #include "glossary.h"
 #include "exceptions.h"
 #include "iowrapper.h"

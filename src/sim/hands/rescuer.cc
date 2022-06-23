@@ -4,7 +4,7 @@
 #include "glossary.h"
 #include "exceptions.h"
 #include "iowrapper.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Rescuer::Rescuer(RescuerProp const* p, HandMonitor* h)

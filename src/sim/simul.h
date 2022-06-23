@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 #ifndef SIMUL_H
 #define SIMUL_H
 
@@ -8,6 +8,7 @@
 #include <stack>
 #include <map>
 
+#include "simul_part.h"
 #include "simul_prop.h"
 #include "single_set.h"
 #include "couple_set.h"
@@ -168,9 +169,6 @@ public:
 
     /// time in the simulated world (shortcut to `SimulProp::time`)
     double time() const { return prop.time; }
-    
-    /// shortcut to prop->time_step;
-    real time_step() const { return prop.time_step; }
 
     /// this is called after a sequence of `step()` have been done
     void relax();

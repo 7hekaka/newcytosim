@@ -4,11 +4,11 @@
 #include "assert_macro.h"
 #include "space_prop.h"
 #include "space_set.h"
-#include "simul.h"
 #include "exceptions.h"
 #include "messages.h"
 #include "glossary.h"
 #include "random.h"
+#include "simul.h"
 
 
 void SimulProp::clear()
@@ -144,7 +144,7 @@ void SimulProp::complete(Simul const& sim)
     if ( time_step < 0 )
         throw InvalidParameter("simul:time_step must be > 0");
 
-    if ( sim.primed() )
+    if ( primed(sim) )
     {
         if ( viscosity <= 0 )
             throw InvalidParameter("simul:viscosity must be > 0");

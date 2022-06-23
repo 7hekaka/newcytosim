@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include <csignal>
 
-#include "simul.h"
+#include "single.h"
 #include "parser.h"
 #include "frame_reader.h"
 

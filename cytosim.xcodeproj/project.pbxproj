@@ -124,6 +124,8 @@
 		BB109D3823D0788200805F16 /* fiber_disp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD4BB391007F2D300D00914 /* fiber_disp.cc */; };
 		BB1121841549B72B0031CC48 /* shackle_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1121821549B72B0031CC48 /* shackle_long.cc */; };
 		BB1121851549B72B0031CC48 /* shackle_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1121831549B72B0031CC48 /* shackle_long.h */; };
+		BB11D2FE28645D91002B5869 /* simul_part.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB11D2FD28645D91002B5869 /* simul_part.cc */; };
+		BB11D2FF28645D91002B5869 /* simul_part.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB11D2FD28645D91002B5869 /* simul_part.cc */; };
 		BB151D64270C85F2003ECD4E /* space_dynamic_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */; };
 		BB151D65270C85F2003ECD4E /* space_dynamic_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */; };
 		BB171C330B3DEBE700CFFC3B /* fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB171C310B3DEBE700CFFC3B /* fiber.h */; };
@@ -644,6 +646,8 @@
 		BB805D74241A5A6000B62699 /* space_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BB805D6C241A5A5F00B62699 /* space_disc.h */; };
 		BB805D75241A5A6000B62699 /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6D241A5A5F00B62699 /* space_disc.cc */; };
 		BB805D76241A5A6000B62699 /* space_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB805D6D241A5A5F00B62699 /* space_disc.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
+		BB845E012864411E003254EF /* simul_part.h in Headers */ = {isa = PBXBuildFile; fileRef = BB845E002864411D003254EF /* simul_part.h */; };
+		BB845E022864411E003254EF /* simul_part.h in Headers */ = {isa = PBXBuildFile; fileRef = BB845E002864411D003254EF /* simul_part.h */; };
 		BB846BE4116FDEB400A0CD0E /* space_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB955C4B116FBF4C000E70A6 /* space_set.cc */; };
 		BB846BE5116FDEB900A0CD0E /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
 		BB8481B2158348E80076C8C2 /* couple_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8481B0158348E80076C8C2 /* couple_long.cc */; };
@@ -1602,6 +1606,7 @@
 		BB0E885516FBC81400451517 /* sim_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sim_thread.h; sourceTree = "<group>"; };
 		BB1121821549B72B0031CC48 /* shackle_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shackle_long.cc; path = couples/shackle_long.cc; sourceTree = "<group>"; };
 		BB1121831549B72B0031CC48 /* shackle_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shackle_long.h; path = couples/shackle_long.h; sourceTree = "<group>"; };
+		BB11D2FD28645D91002B5869 /* simul_part.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simul_part.cc; sourceTree = "<group>"; };
 		BB1227AE114FB8640042589A /* test_blas.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_blas.cc; path = src/test/test_blas.cc; sourceTree = SOURCE_ROOT; };
 		BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_disc.h; path = spaces/space_dynamic_disc.h; sourceTree = "<group>"; };
 		BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_disc.cc; path = spaces/space_dynamic_disc.cc; sourceTree = "<group>"; };
@@ -1863,6 +1868,7 @@
 		BB805D6D241A5A5F00B62699 /* space_disc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = space_disc.cc; sourceTree = "<group>"; };
 		BB81B868219EE37D009CA402 /* play_mouse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = play_mouse.cc; sourceTree = "<group>"; };
 		BB81B86A219EE55F009CA402 /* play_keys.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = play_keys.cc; sourceTree = "<group>"; };
+		BB845E002864411D003254EF /* simul_part.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simul_part.h; sourceTree = "<group>"; };
 		BB8481B0158348E80076C8C2 /* couple_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = couple_long.cc; path = couples/couple_long.cc; sourceTree = "<group>"; };
 		BB8481B1158348E80076C8C2 /* couple_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = couple_long.h; path = couples/couple_long.h; sourceTree = "<group>"; };
 		BB855B752667D2C700621C09 /* cympack.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cympack.cc; sourceTree = "<group>"; };
@@ -2769,6 +2775,8 @@
 				BB767DAB27AD01B40060D3FA /* meca_steric.cc */,
 				BBF283262430E10100FADDD8 /* meca_math.cc */,
 				BB7358FC05B98DA3006956D5 /* simul.h */,
+				BB845E002864411D003254EF /* simul_part.h */,
+				BB11D2FD28645D91002B5869 /* simul_part.cc */,
 				BB7358FB05B98DA3006956D5 /* simul.cc */,
 				BB7358FD05B98DA3006956D5 /* simul_file.cc */,
 				BB19DAA206964B9900093FA2 /* simul_solve.cc */,
@@ -3885,6 +3893,7 @@
 				BB5001E71269FCE1005E925C /* mighty_prop.h in Headers */,
 				BB5001E91269FCE1005E925C /* mighty.h in Headers */,
 				BB500211126A066B005E925C /* slider_prop.h in Headers */,
+				BB845E012864411E003254EF /* simul_part.h in Headers */,
 				BB500213126A066B005E925C /* slider.h in Headers */,
 				BB500462126A332E005E925C /* tracker_prop.h in Headers */,
 				BB500464126A332E005E925C /* tracker.h in Headers */,
@@ -4030,6 +4039,7 @@
 				BB692168233D359F00F528D2 /* mighty_prop.h in Headers */,
 				BB692169233D359F00F528D2 /* mighty.h in Headers */,
 				BB69216A233D359F00F528D2 /* slider_prop.h in Headers */,
+				BB845E022864411E003254EF /* simul_part.h in Headers */,
 				BB69216B233D359F00F528D2 /* slider.h in Headers */,
 				BB69216C233D359F00F528D2 /* tracker_prop.h in Headers */,
 				BB69216D233D359F00F528D2 /* tracker.h in Headers */,
@@ -5158,6 +5168,7 @@
 				BBDE7FFE14E260B400A23E0C /* wrist_long.cc in Sources */,
 				BB2A470414F3D4AD008434C6 /* bead_prop.cc in Sources */,
 				BB5A0CB021C38BF7000DBC0E /* interpolation4.cc in Sources */,
+				BB11D2FE28645D91002B5869 /* simul_part.cc in Sources */,
 				BB06D6BD152F0A5300AD8355 /* crosslink_long.cc in Sources */,
 				BBD7A90315373A390056A06B /* duo.cc in Sources */,
 				BBD7A90715373A7A0056A06B /* duo_prop.cc in Sources */,
@@ -5311,6 +5322,7 @@
 				BB692205233D359F00F528D2 /* wrist_long.cc in Sources */,
 				BB692206233D359F00F528D2 /* bead_prop.cc in Sources */,
 				BB692207233D359F00F528D2 /* interpolation4.cc in Sources */,
+				BB11D2FF28645D91002B5869 /* simul_part.cc in Sources */,
 				BB692208233D359F00F528D2 /* crosslink_long.cc in Sources */,
 				BB692209233D359F00F528D2 /* duo.cc in Sources */,
 				BB69220A233D359F00F528D2 /* duo_prop.cc in Sources */,

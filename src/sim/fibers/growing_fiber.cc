@@ -5,7 +5,7 @@
 #include "growing_fiber_prop.h"
 #include "exceptions.h"
 #include "iowrapper.h"
-#include "simul.h"
+#include "simul_part.h"
 #include "space.h"
 
 

@@ -4,7 +4,7 @@
 #include "glossary.h"
 #include "regulator_prop.h"
 #include "regulator.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Hand * RegulatorProp::newHand(HandMonitor* m) const
@@ -36,7 +36,7 @@ void RegulatorProp::complete(Simul const& sim)
     if ( rate < 0 )
         throw InvalidParameter("regulator:rate must be >= 0");
     
-    rate_dt = rate * sim.time_step();
+    rate_dt = rate * time_step(sim);
 }
 
 

@@ -5,7 +5,7 @@
 #include "iowrapper.h"
 #include "glossary.h"
 #include "lattice.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Dynein::Dynein(DyneinProp const* p, HandMonitor* h)

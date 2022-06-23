@@ -6,7 +6,7 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "messages.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Motor::Motor(MotorProp const* p, HandMonitor* h)

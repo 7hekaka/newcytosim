@@ -7,7 +7,7 @@
 #include "messages.h"
 #include "glossary.h"
 #include "lattice.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Digit::Digit(DigitProp const* p, HandMonitor* h)

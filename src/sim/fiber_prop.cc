@@ -523,7 +523,7 @@ void FiberProp::complete(Simul const& sim)
         confine_space = confine_space_ptr->name();
     else
     {
-        if ( confine != CONFINE_OFF && sim.primed() )
+        if ( confine != CONFINE_OFF && primed(sim) )
             throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
         // this condition occur when the Property is created before the Space
     }
@@ -539,7 +539,7 @@ void FiberProp::complete(Simul const& sim)
             confine2_space = confine2_space_ptr->name();
         else
         {
-            if ( sim.primed() )
+            if ( primed(sim) )
                 throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
             // this condition occur when the Property is created before the Space
         }
@@ -551,7 +551,7 @@ void FiberProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":confine2_stiffness must be specified and >= 0");
 #endif
     
-    if ( sim.primed() && steric && !sim.prop.steric_mode )
+    if ( primed(sim) && steric && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( min_length < 0 )
@@ -569,7 +569,7 @@ void FiberProp::complete(Simul const& sim)
 
     if ( glue )
     {
-        if ( sim.primed() )
+        if ( primed(sim) )
             glue_prop = sim.findProperty<SingleProp>("single", glue_single);
     }
     
@@ -579,7 +579,7 @@ void FiberProp::complete(Simul const& sim)
         field_ptr = sim.pickField(p);
     }
     
-    if ( lattice && sim.primed() )
+    if ( lattice && primed(sim) )
     {
 #if FIBER_HAS_LATTICE
         if ( lattice_unit <= 0 )
@@ -589,7 +589,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     }
 
-    if ( mesh && sim.primed() )
+    if ( mesh && primed(sim) )
     {
 #if FIBER_HAS_MESH
         if ( mesh_unit <= 0 )
@@ -611,7 +611,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     }
     
-    if ( mesh_aging_rate > 0 && !mesh && sim.primed() )
+    if ( mesh_aging_rate > 0 && !mesh && primed(sim) )
         throw InvalidParameter("for `mesh_aging_rate', the mesh must be defined");
 
     if ( rigidity < 0 )
@@ -620,7 +620,7 @@ void FiberProp::complete(Simul const& sim)
     if ( segmentation <= 0 )
         throw InvalidParameter("fiber:segmentation must be > 0");
 
-    if ( sim.primed() )
+    if ( primed(sim) )
     {
         // Adjust the segmentation of all Fibers having this FiberProp
         for ( Fiber* fib = sim.fibers.first(); fib; fib=fib->next() )
@@ -640,7 +640,7 @@ void FiberProp::complete(Simul const& sim)
 #if NEW_FIBER_CHEW
     if ( max_chewing_speed < 0 )
         throw InvalidParameter("fiber:max_chewing_speed must be >= 0");
-    max_chewing_speed_dt = max_chewing_speed * sim.time_step();
+    max_chewing_speed_dt = max_chewing_speed * time_step(sim);
 #endif
     
 #if ( 0 )
@@ -649,7 +649,7 @@ void FiberProp::complete(Simul const& sim)
     fib.setStraight(Vector(-5,0,0), Vector(1,0,0), 10);
     
     fib.setDragCoefficient();
-    real mob_dt = sim.time_step() * fib.pointMobility();
+    real mob_dt = time_step(sim) * fib.pointMobility();
     
     real stiffness = 100;
     real coef1 = mob_dt * stiffness;

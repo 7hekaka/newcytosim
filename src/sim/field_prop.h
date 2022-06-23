@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef FIELD_PROP_H
 #define FIELD_PROP_H
@@ -25,20 +25,20 @@ public:
      @{
      */
     
-    /// size of square unit cell
-    real          step;
-    
     /// name of confining Space
-    std::string   field_space;
+    std::string field_space;
+
+    /// size of square unit cell
+    real step;
     
     /// use periodic boundary conditions for diffusion
-    bool          field_periodic;
+    bool field_periodic;
     
     /// diffusion constant
-    real          slow_diffusion;
+    real slow_diffusion;
     
     /// diffusion constant
-    real          full_diffusion;
+    real full_diffusion;
     
     /// type of boundary condition
     /*
@@ -51,48 +51,42 @@ public:
      - `edgeXY` fixed values on XY-edges
      .
      */
-    int           boundary_condition;
+    int boundary_condition;
     
     /// value of Dirichlet boundary conditions:
-    real          boundary_value;
+    real boundary_value;
     
     /// decay rate per unit time
-    real          decay_rate;
+    real decay_rate;
     
     /// coefficient for transport along Fiber (experimental)
-    real          transport_strength;
+    real transport_strength;
     
     /// length of average transport event (experimental)
-    real          transport_length;
+    real transport_length;
     
     /// flag for cutting of Fiber
-    int           cut_fibers;
+    int cut_fibers;
     
     /// flag for depolymerization at Fiber tips (experimental)
-    int           chew_fibers;
+    int chew_fibers;
     
     /// if > 0, the simulation is stopped in any cell becomes negative
     /** The test is done just after writing the field to file */
-    int           positive;
+    int positive;
     
     /// if false, the field is not recorded in the trajectory file
-    bool          save;
+    bool save;
     
     
     /// a scale used to display the field
-    real          display_scale;
+    real display_scale;
     
     /// a display flag
-    int           visible;
+    int visible;
     /// @}
     
 public:
-
-    /// local copy of time step
-    real          time_step;
-    
-    /// derived variable
-    real          decay_frac;
     
     /// pointer to actual confinement Space, derived from `field_space`
     Space const*  field_space_ptr;

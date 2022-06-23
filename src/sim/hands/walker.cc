@@ -5,7 +5,7 @@
 #include "glossary.h"
 #include "messages.h"
 #include "lattice.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Walker::Walker(WalkerProp const* p, HandMonitor* h)

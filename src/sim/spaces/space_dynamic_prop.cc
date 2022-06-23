@@ -6,7 +6,7 @@
 #include "glossary.h"
 #include "simul_prop.h"
 #include "cymdef.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 // include spaces that use SpaceDynamicProp
@@ -104,15 +104,16 @@ void SpaceDynamicProp::read(Glossary& glos)
 void SpaceDynamicProp::complete(Simul const& sim)
 {
     SpaceProp::complete(sim);
-    
+    const real tau = time_step(sim);
+
     if ( viscosity > 0 )
-        mobility_dt = sim.time_step() / viscosity;
-    else if ( sim.primed() )
+        mobility_dt = tau / viscosity;
+    else if ( primed(sim) )
         throw InvalidParameter("space:viscosity must be > 0");
     
     if ( viscosity_rot > 0 )
-        mobility_rot_dt = sim.time_step() / viscosity_rot;
-    else if ( sim.primed() )
+        mobility_rot_dt = tau / viscosity_rot;
+    else if ( primed(sim) )
         throw InvalidParameter("space:viscosity[1] (rotational viscosity) must be > 0");
 
     if ( tension < 0 )

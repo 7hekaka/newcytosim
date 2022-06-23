@@ -5,7 +5,7 @@
 #include "growing_fiber.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Fiber* GrowingFiberProp::newFiber() const
@@ -45,6 +45,7 @@ void GrowingFiberProp::complete(Simul const& sim)
 {
     FiberProp::complete(sim);
 
+    std::cerr << name() << ": time_step(sim) = " << time_step(sim) << "\n";
     for ( int i = 0; i < 2; ++i )
     {
         if ( growing_force[i] <= 0 )
@@ -55,11 +56,10 @@ void GrowingFiberProp::complete(Simul const& sim)
         
         if ( shrinking_speed[i] > 0 )
             throw InvalidParameter("fiber:shrinking_speed should be <= 0");
-
-        growing_speed_dt[i] = growing_speed[i] * sim.time_step();
-        growing_off_speed_dt[i] = growing_off_speed[i] * sim.time_step();
+        growing_speed_dt[i] = growing_speed[i] * time_step(sim);
+        growing_off_speed_dt[i] = growing_off_speed[i] * time_step(sim);
         growing_force_inv[i] = 1.0 / growing_force[i];
-        shrinking_speed_dt[i] = shrinking_speed[i] * sim.time_step();
+        shrinking_speed_dt[i] = shrinking_speed[i] * time_step(sim);
     }
 }
 

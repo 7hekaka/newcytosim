@@ -8,7 +8,7 @@
 #include "crosslink_prop.h"
 #include "crosslink_long.h"
 #include "crosslink.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 /**
@@ -42,7 +42,7 @@ void CrosslinkProp::complete(Simul const& sim)
     CoupleProp::complete(sim);
     
     // check for unsupported features:
-    if ( sim.primed() && trans_activated )
+    if ( primed(sim) && trans_activated )
         throw InvalidParameter("couple:activity=crosslink and trans_activated are incompatible");
 }
 

@@ -5,7 +5,7 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "messages.h"
-#include "simul.h"
+#include "simul_part.h"
 
 
 Hand * MyosinProp::newHand(HandMonitor* m) const
@@ -42,14 +42,14 @@ void MyosinProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( sim.primed() && stall_force <= 0 )
+    if ( primed(sim) && stall_force <= 0 )
         throw InvalidParameter("myosin:stall_force must be > 0");
     
     if ( unloaded_speed < 0 )
         throw InvalidParameter("myosin:unloaded_speed must be >= 0");
 
-    walking_rate_dt = sim.time_step() * abs_real(unloaded_speed) / step_size;
-    var_rate_dt     = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
+    walking_rate_dt = time_step(sim) * abs_real(unloaded_speed) / step_size;
+    var_rate_dt = std::copysign(walking_rate_dt/stall_force, unloaded_speed);
 }
 
 

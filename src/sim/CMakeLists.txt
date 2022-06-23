@@ -20,7 +20,7 @@ set(SOURCES_SIM
     tubule_prop.cc tubule.cc tubule_set.cc
     fiber_grid.cc point_grid.cc locus_grid.cc
     space.cc space_prop.cc space_set.cc
-    simul.cc simul_prop.cc
+    simul.cc simul_prop.cc simul_part.cc
     interface.cc parser.cc
 )
 
