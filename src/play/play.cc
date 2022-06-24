@@ -476,7 +476,7 @@ int main(int argc, char* argv[])
         try
         {
             if ( has_frame )
-                worker.extend();
+                worker.prolong();
             else
                 worker.start();
         }

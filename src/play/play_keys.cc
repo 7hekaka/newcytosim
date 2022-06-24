@@ -852,7 +852,7 @@ void processKey(unsigned char key, int modifiers = 0)
             else
             {
                 // this will initialize the simulation engine without making a step
-                worker.extend_run(0);
+                worker.prolong_run(0);
             }
             break;
             

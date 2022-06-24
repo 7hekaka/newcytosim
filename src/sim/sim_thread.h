@@ -5,10 +5,11 @@
 #include <pthread.h>
 #include <csignal>
 
-#include "single.h"
 #include "parser.h"
 #include "frame_reader.h"
 
+class SingleProp;
+class Single;
 
 /// SimThread is used to run a simulation in a dedicated thread
 /**
@@ -37,7 +38,7 @@ private:
     int status_;
     
     /// a flag to indicate if child thread should terminate or restart
-    int demand_;
+    int repeat_;
 
     /// counter for hold()
     unsigned int hold_;
@@ -64,7 +65,7 @@ private:
     bool isWorker() const { return pthread_equal(pthread_self(), child_); }
     
     /// reset state variable before starting
-    void ready();
+    void getReady();
     
 public:
     
@@ -78,7 +79,7 @@ public:
     void run();
     
     /// continue to run a simulation beyond its normal termination
-    void extend_run(size_t n_steps);
+    void prolong_run(size_t n_steps);
 
     /// redefining Interface::hold(), which is called repeatedly at each timestep
     void hold();
@@ -153,7 +154,7 @@ public:
     void start();
     
     /// continue to run the simulation after its normal termination
-    int extend();
+    int prolong();
     
     /// gently stop the simulation
     void stop();
@@ -171,7 +172,7 @@ public:
     void cancel_join();
     
     /// restart engine
-    void restart() { demand_ = 1; };
+    void restart() { repeat_ = 1; signal(); };
 
     /// clear the simulation world
     void erase_simul(bool) const;

@@ -6,6 +6,7 @@
 #include <signal.h>
 
 #include "vector.h"
+#include "single.h"
 #include "simul_prop.h"
 #include "simul.h"
 #include "sim_thread.h"
@@ -27,7 +28,7 @@ SimThread::SimThread(Simul* sim)
 : Parser(sim, 1, 1, 1, 1, 0)
 {
     status_ = -2;
-    demand_ = 0;
+    repeat_ = 0;
     hold_   = 0;
     holding_= 0;
     period_ = 1;
@@ -79,7 +80,7 @@ void SimThread::hold()
 {
     assert_true( isWorker() );
 
-    if ( demand_ == -1 )
+    if ( repeat_ == -1 )
         pthread_exit(nullptr);
     
     if ( ++hold_ >= period_ )
@@ -93,54 +94,45 @@ void SimThread::hold()
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Lauching threads
-
-
-void SimThread::run()
-{
-    assert_true( isWorker() );
-    try {
-        while ( 1 )
-        {
-            demand_ = 0;
-            if ( config_code )
-            {
-                std::stringstream is(config_code);
-                readConfig(is, simulProp().config_file);
-            }
-            else
-                Parser::readConfig();
-            // the simulation is now terminated, we shall wait for a signal
-            //fprintf(stderr, "Completed simulation %i\n", sim_->prop.flag);
-            unlock();
-            while ( !demand_ )
-            {
-                holding_ = 2;
-                usleep(1000000);
-            }
-            if ( demand_ < 0 )
-                break;
-            lock();
-            erase_simul(1);
-        }
-    }
-    catch( Exception & e ) {
-        std::cerr << e.brief() << e.info() << '\n';
-        //flashText("Error: the simulation died");
-    }
-}
+#pragma mark - Launching threads
 
 
 /** called before thread is started */
-void SimThread::ready()
+void SimThread::getReady()
 {
     assert_false( isWorker() );
-    demand_ = 0;
+    repeat_ = 0;
     Parser::restart_ = 0;
     //fprintf(stderr, "ready %i\n", sim_->prop.flag);
     assert_true(holding_ == 0);
     if ( status_ == -1 )
         pthread_join(child_, nullptr);
+}
+
+
+void SimThread::run()
+{
+    assert_true( isWorker() );
+    while ( 1 )
+    {
+        if ( config_code )
+        {
+            std::stringstream is(config_code);
+            readConfig(is, simulProp().config_file);
+        }
+        else
+            Parser::readConfig();
+        // the simulation is now terminated, we shall wait for `repeat_`
+        //fprintf(stderr, "Completed simulation %i\n", sim_->prop.flag);
+        while ( !repeat_ )
+        {
+            holding_ = 2;
+            cond_wait();
+        }
+        if ( --repeat_ < 0 )
+            break;
+        erase_simul(1);
+    }
 }
 
 
@@ -165,7 +157,13 @@ void* child_entry(void * arg)
     st->lock();
     // let the system cleanup upon normal termination:
     pthread_cleanup_push(child_cleanup, arg);
-    st->run();
+    try {
+        st->run();
+    }
+    catch( Exception & e ) {
+        std::cerr << e.brief() << e.info() << '\n';
+        //flashText("Error: the simulation died");
+    }
     pthread_cleanup_pop(1);
     return nullptr;
 }
@@ -180,7 +178,7 @@ void SimThread::start()
     assert_false( isWorker() );
     if ( status_ )
     {
-        ready();
+        getReady();
         //std::clog << "master " << pthread_self() << '\n';
         status_ = pthread_create(&child_, nullptr, child_entry, this);
         // let the system cleanup upon normal child termination:
@@ -191,7 +189,7 @@ void SimThread::start()
 
 //------------------------------------------------------------------------------
 
-void SimThread::extend_run(size_t n_steps)
+void SimThread::prolong_run(size_t n_steps)
 {
     assert_true( isWorker() );
     try {
@@ -207,27 +205,27 @@ void SimThread::extend_run(size_t n_steps)
 
 
 /** C-style function to start a new thread */
-void* extend_launcher(void * arg)
+void* prolong_launcher(void * arg)
 {
     //std::clog << "slave  " << pthread_self() << '\n';
     SimThread * st = static_cast<SimThread*>(arg);
     st->lock();
     pthread_cleanup_push(child_cleanup, arg);
-    st->extend_run(1<<20);
+    st->prolong_run(1<<20);
     pthread_cleanup_pop(1);
     return nullptr;
 }
 
 
-/// call `extend_run()` in a slave thread
-int SimThread::extend()
+/// call `prolong_run()` in a slave thread
+int SimThread::prolong()
 {
     assert_false( isWorker() );
     if ( status_ )
     {
-        ready();
+        getReady();
         //std::clog << "master " << pthread_self() << '\n';
-        status_ = pthread_create(&child_, nullptr, extend_launcher, this);
+        status_ = pthread_create(&child_, nullptr, prolong_launcher, this);
     }
     return status_;
 }
@@ -244,7 +242,7 @@ void SimThread::stop()
     if ( status_ == 0 )
     {
         // request clean termination:
-        demand_ = -1;
+        repeat_ = -1;
         signal();
         // wait for termination:
         //debug("join...");
