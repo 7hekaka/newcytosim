@@ -158,7 +158,8 @@ void SpaceSphere::draw3D() const
 {
     gym::scale(radius_);
     gle::sphere8();
-    gle::threeArrowStrip(0.5, 1);
+    if ( prop->disp->visible & 4 )
+        gle::threeArrowStrip(0.5, 1);
 }
 
 #else

@@ -467,7 +467,7 @@ void Field::step(FiberSet& fibers)
             real val = field[mGrid.index(i.pos())];
             if ( prop->cut_fibers == 2 )
                 val = val * val / cellVolume();
-            if ( RNG.test_not( std::exp(-fac*val) ) )
+            if ( RNG.test(-std::expm1(-fac*val)) )
                 i.fiber()->sever(i.abscissa(), STATE_RED, STATE_GREEN);
         }
     }

@@ -211,7 +211,7 @@ public:
     Fiber * severM(real abs);
 
     /// cut fiber at abscissa `abs`; returns section `[ abs - PLUS_END ]`
-    Fiber * severNow(real abs) { return severM(abs-abscissaM()); }
+    Fiber * severNow(real abs);
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
     void sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }
