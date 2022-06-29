@@ -69,14 +69,14 @@ new back
 
 
 % Letter C
-new text { placement=off; shape = -0.8 3.5, -2.6 4, -2.2 6.8, -0.8 7.3; }
-new pinch { position = -0.6 3.8; attach = last, 0; }
-new pinch { position = -0.6 7.1; attach = last, 6; }
+new text { placement=off; shape = -0.8 7, -2.3 6.7, -3 5, -2 4, -0.7 4; }
+new pinch { position = -0.6 7.1; attach = last, 0; }
+new pinch { position = -0.6 3.8; attach = last, 6; }
 
 % Letter Y
-new text { length = 2.5; position = 0.7 5.3; direction = -1 1;}
-new text { length = 4.2; position = 1.7 4.5; direction = 1 1.6;}
-new joint { attach1 = last-1, 0; attach2 = last, 2 }
+new text { length = 2.5; position = 0.7 5.3; direction = 1 -1;}
+new text { length = 4.2; position = 1.7 4.5; direction = -1 -1.6;}
+new joint { attach1 = last-1, 2.5; attach2 = last, 2.5 }
 
 % Letter T
 new text { length = 2.6; position = -1.4 2.5; direction = 1 0;}
@@ -88,10 +88,10 @@ new text { placement=off; shape = 2.9 -0.1, 2.5 1.2, 1.4 2, 0.1 1.5, -0.4 0, 0.5
 new joint { attach1 = last, 0; attach2 = last, 10 }
 new joint { attach1 = last, 0.5; attach2 = last, 10.5 }
 new pinch { position = 1.1  1.8; attach = last, 3; }
-new pinch { position = 1.1 -1.5; attach = last, 8; }
+new pinch { position = 1.2 -1.5; attach = last, 8; }
 
 % Letter S
-new text { placement=off; shape = -1.7 -2, -3.1 -2.5, -3.2 -3.5, -1.4 -4.5, -1.5 -5.5, -2.9 -6; }
+new text { placement=off; shape = -1.7 -2, -3.1 -2.5, -3.2 -3.5, -1.5 -4.5, -1.6 -5.5, -3.1 -6; }
 new pinch { position = -3.2 -6; attach = last, 7; }
 new pinch { position = -2.3 -4; attach = last, 3.5; }
 new pinch { position = -1.6 -2; attach = last, 0; }

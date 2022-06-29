@@ -139,6 +139,7 @@ Space * SpaceProp::newSpace(Glossary& opt) const
     
     if ( spc )
     {
+        //std::clog << "new Space `"+spc->prop->shape+"'\n";
 #if BACKWARD_COMPATIBILITY < 50
         std::string str = dimensions;
         if ( str.size() || opt.set(str, "dimensions") )

@@ -10,7 +10,7 @@ LOCAL gle_color radial_color(const Vector2& d) { return gle_color::radial_colorX
 LOCAL gle_color radial_color(const Vector1& d) { if ( d.XX > 0 ) return gle_color(1,1,1); else return gle_color(0,1,0); }
 
 //------------------------------------------------------------------------------
-#pragma mark - Color schemes for Fibers
+#pragma mark - Color schemes to draw Fibers
 
 LOCAL real color_scale(Fiber const* fib, int style)
 {
@@ -23,7 +23,7 @@ LOCAL real color_scale(Fiber const* fib, int style)
         case 5: return 1; // color_by_direction
         case 6: // color_by_distanceP
         case 7: return fib->segmentation() / fib->prop->disp->length_scale;
-        case 8: return 1; // color_by_height
+        case 8: return 1 / fib->prop->disp->length_scale; // color_by_height
         case 9: return 1; // color_by_grid
     }
     return 1;
@@ -58,13 +58,13 @@ LOCAL gle_color color_by_tension_jet(Fiber const& fib, size_t seg)
 
 LOCAL gle_color color_by_curvature(Fiber const& fib, size_t pti)
 {
-    real beta = fib.disp->color_scale;
+    const real beta = fib.disp->color_scale;
     return gle_color::jet_color(beta*fib.curvature(pti));
 }
 
 LOCAL gle_color color_seg_curvature(Fiber const& fib, size_t seg)
 {
-    real beta = fib.disp->color_scale;
+    const real beta = fib.disp->color_scale;
     real c = 0.5 * (fib.curvature(seg) + fib.curvature(seg+1));
     return gle_color::jet_color(beta*c);
 }
@@ -77,7 +77,7 @@ LOCAL gle_color color_by_direction(Fiber const& fib, size_t seg)
 /// using distance from the minus end to the start of segment `seg`
 LOCAL gle_color color_by_distanceM(Fiber const& fib, real pti)
 {
-    real beta = fib.disp->color_scale;
+    const real beta = fib.disp->color_scale;
     real x = std::min(pti*beta, (real)32.0);
     return fib.disp->color.alpha(std::exp(-x));
 }
@@ -85,7 +85,7 @@ LOCAL gle_color color_by_distanceM(Fiber const& fib, real pti)
 /// using the distance from the plus end to vertex `pti`
 LOCAL gle_color color_by_distanceP(Fiber const& fib, real pti)
 {
-    real beta = fib.disp->color_scale;
+    const real beta = fib.disp->color_scale;
     // using the distance at the vertex
     real x = std::min((fib.lastPoint()-pti)*beta, (real)32.0);
     return fib.disp->color.alpha(std::exp(-x));
@@ -94,7 +94,7 @@ LOCAL gle_color color_by_distanceP(Fiber const& fib, real pti)
 /// using distance from the plus end to the end of segment `seg`
 LOCAL gle_color color_by_abscissaM(Fiber const& fib, size_t seg)
 {
-    real beta = fib.disp->color_scale;
+    const real beta = fib.disp->color_scale;
     real x = std::min(seg*beta, (real)32.0);
     return fib.disp->color.alpha(std::exp(-x));
 }
@@ -102,7 +102,7 @@ LOCAL gle_color color_by_abscissaM(Fiber const& fib, size_t seg)
 /// using distance from the plus end to the end of segment `seg`
 LOCAL gle_color color_by_abscissaP(Fiber const& fib, size_t seg)
 {
-    real beta = fib.disp->color_scale;
+    const real beta = fib.disp->color_scale;
     real x = std::min((fib.lastSegment()-seg)*beta, (real)32.0);
     return fib.disp->color.alpha(std::exp(-x));
 }
@@ -110,7 +110,7 @@ LOCAL gle_color color_by_abscissaP(Fiber const& fib, size_t seg)
 /// color set according to distance to the confining Space
 LOCAL gle_color color_by_height(Fiber const& fib, size_t pti)
 {
-    real beta = fib.disp->color_scale;
+    const real beta = fib.disp->color_scale;
     real Z = 0;
     Space const* spc = fib.prop->confine_space_ptr;
     if ( spc && fib.prop->confine )
