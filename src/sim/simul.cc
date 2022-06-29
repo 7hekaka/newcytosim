@@ -89,7 +89,8 @@ void Simul::eraseObjects(bool erase_properties)
     prop.time = 0;
     modulo = nullptr;
     abortRun = 0;
-    
+    primed_ = 0;
+
     if ( erase_properties )
         properties.erase();
 }
