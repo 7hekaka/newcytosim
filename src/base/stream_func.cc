@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "stream_func.h"
 #include <fstream>
@@ -126,15 +126,7 @@ void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char pre
 /**
  The alignment of the vertical bar should match the one in PREF
  */
-void print_line(std::ostream& os, size_t num, std::string const& line)
-{
-    os << std::setw(9) << num << " | " << line << '\n';
-}
-
-/**
- The alignment of the vertical bar should match the one in PREF
- */
-void print_first_line(std::ostream& os, size_t num, std::string const& line)
+static void print_first_line(std::ostream& os, size_t num, std::string const& line)
 {
     os << " in" << std::setw(6) << num << " | " << line << '\n';
 }
@@ -142,7 +134,15 @@ void print_first_line(std::ostream& os, size_t num, std::string const& line)
 /**
  The alignment of the vertical bar should match the one in PREF
  */
-void print_line(std::ostream& os, const char prefix[], std::string const& line)
+static void print_other_line(std::ostream& os, size_t num, std::string const& line)
+{
+    os << std::setw(9) << num << " | " << line << '\n';
+}
+
+/**
+ The alignment of the vertical bar should match the one in PREF
+ */
+static void print_other_line(std::ostream& os, const char prefix[], std::string const& line)
 {
     if ( prefix && *prefix )
         os << prefix << " " << line << '\n';
@@ -231,7 +231,7 @@ void StreamFunc::print_lines(std::ostream& os, std::istream& is,
         std::getline(is, line);
         ++cnt;
         if ( !std::all_of(line.begin(),line.end(),isspace) )
-            print_line(os, cnt, line);
+            print_other_line(os, cnt, line);
     }
 
     is.clear();
@@ -239,7 +239,7 @@ void StreamFunc::print_lines(std::ostream& os, std::istream& is,
 }
 
 
-std::string StreamFunc::get_lines(std::istream& is, std::streampos s, std::streampos e)
+std::string StreamFunc::extract_lines(std::istream& is, std::streampos s, std::streampos e)
 {
     std::ostringstream oss;
     print_lines(oss, is, s, e);
@@ -247,7 +247,7 @@ std::string StreamFunc::get_lines(std::istream& is, std::streampos s, std::strea
 }
 
 
-std::string StreamFunc::get_line(std::istream& is, std::streampos pos, size_t& cnt)
+std::string StreamFunc::extract_line(std::istream& is, std::streampos pos, size_t& cnt)
 {
     if ( !is.good() )
         is.clear();
@@ -269,10 +269,18 @@ std::string StreamFunc::get_line(std::istream& is, std::streampos pos, size_t& c
 }
 
 
-std::string StreamFunc::get_line(std::istream& is, std::streampos pos)
+std::string StreamFunc::extract_line(std::istream& is, std::streampos pos)
 {
     size_t cnt;
-    return get_line(is, pos, cnt);
+    return extract_line(is, pos, cnt);
+}
+
+
+void StreamFunc::print_line(std::ostream& os, std::istream& is, std::streampos pos)
+{
+    size_t cnt;
+    std::string line = extract_line(is, pos, cnt);
+    os << "line" << std::setw(6) << cnt << " | " << line << '\n';
 }
 
 

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include <iostream>
 
@@ -33,16 +33,19 @@ namespace StreamFunc
     
     
     /// extract line containing given `pos'
-    std::string get_line(std::istream&, std::streampos pos, size_t&);
+    std::string extract_line(std::istream&, std::streampos pos, size_t&);
     
     /// extract line containing given `pos'
-    std::string get_line(std::istream&, std::streampos pos);
-
+    std::string extract_line(std::istream&, std::streampos pos);
+    
+    /// print line located at `pos`, with a line number
+    void print_line(std::ostream&, std::istream&, std::streampos pos);
+    
     /// extract the lines located between `start` and `end`, with line numbers
     void print_lines(std::ostream&, std::istream&, std::streampos start, std::streampos end);
     
     /// same as print_lines(), but output is returned as a string
-    std::string get_lines(std::istream&, std::streampos start, std::streampos end);
+    std::string extract_lines(std::istream&, std::streampos start, std::streampos end);
     
     /// return number of lines in stream
     size_t number_lines(std::istream&);

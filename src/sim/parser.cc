@@ -45,7 +45,7 @@ void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t
         size_t L;
         if ( ! Cytosim::log.is_silent() )
         {
-            Cytosim::log << war << " in `" << StreamFunc::get_line(is, ipos, L) << "' (line " << L << ")\n";
+            Cytosim::log << war << " in `" << StreamFunc::extract_line(is, ipos, L) << "' (line " << L << ")\n";
             // also report to standard error:
             print_yellow(std::cerr, war);
             std::cerr << '\n';
@@ -1271,7 +1271,7 @@ void Parser::evaluate(std::istream& is, std::streampos& ipos)
 #endif
         ipos = is.tellg();
         // this is useful to trace execution:
-        //StreamFunc::print_lines(std::clog, is, ipos, ipos);
+        //StreamFunc::print_line(std::clog, is, ipos);
         
         if ( evaluate_one(is) )
             break;
@@ -1300,7 +1300,7 @@ void Parser::readConfig(std::istream& is, std::string const& filename)
     catch( Exception & e )
     {
         e.file(filename);
-        e << "\n" + StreamFunc::get_lines(is, ipos, is.tellg());
+        e << "\n" + StreamFunc::extract_lines(is, ipos, is.tellg());
         throw;
     }
     sim_->parser(nullptr);

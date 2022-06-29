@@ -164,7 +164,7 @@ void warn_trail(std::istream& is)
     std::string str;
     std::streampos pos = is.tellg();
     std::getline(is, str);
-    throw InvalidSyntax("unexpected `"+str+"' in `"+StreamFunc::get_line(is, pos)+"'");
+    throw InvalidSyntax("unexpected `"+str+"' in `"+StreamFunc::extract_line(is, pos)+"'");
 }
 
 /**
