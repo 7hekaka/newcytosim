@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "bundle_prop.h"
 #include "glossary.h"
@@ -9,7 +9,7 @@ void BundleProp::clear()
 {
     stiffness  = -1;
     overlap    = -1;
-    focus      = MINUS_END;
+    joint      = MINUS_END;
     fiber_rate = 0.0;
     fiber_type = "";
     fiber_spec = "";
@@ -18,12 +18,13 @@ void BundleProp::clear()
 
 void BundleProp::read(Glossary& glos)
 {
-    glos.set(stiffness,    "stiffness");
-    glos.set(overlap,      "overlap");
-    glos.set(focus, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
-    glos.set(fiber_rate,   "nucleate");
-    glos.set(fiber_type,   "nucleate", 1);
-    glos.set(fiber_spec,   "nucleate", 2);
+    glos.set(stiffness, "stiffness");
+    glos.set(overlap, "overlap");
+    glos.set(joint, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(joint, "joint", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(fiber_rate, "nucleate");
+    glos.set(fiber_type, "nucleate", 1);
+    glos.set(fiber_spec, "nucleate", 2);
 }
 
 
@@ -55,7 +56,7 @@ void BundleProp::write_values(std::ostream& os) const
 {
     write_value(os, "stiffness", stiffness);
     write_value(os, "overlap",   overlap);
-    write_value(os, "focus",     focus);
+    write_value(os, "joint",     joint);
     write_value(os, "nucleate",  fiber_rate, fiber_type, "("+fiber_spec+")");
 }
 

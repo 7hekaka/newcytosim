@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef BUNDLE_PROP_H
 #define BUNDLE_PROP_H
@@ -27,27 +27,27 @@ public:
      */
  
     /// stiffness of the links that connect the overlapping fibers
-    real          stiffness;
+    real stiffness;
     
     /// length of the zone where fibers overlap
-    real          overlap;
+    real overlap;
     
     /// designates which end of the fiber is towards the center
-    FiberEnd      focus;
+    FiberEnd joint;
     
     /// rate for creating fiber in empty slots
-    real          fiber_rate;
+    real fiber_rate;
     
     /// name of Fiber in the Bundle
-    std::string   fiber_type;
+    std::string fiber_type;
     
     /// name of Fiber in the Bundle
-    std::string   fiber_spec;
+    std::string fiber_spec;
 
     /// @}
     
     /// probability of nucleation
-    real          fiber_prob;
+    real fiber_prob;
 
 public:
  

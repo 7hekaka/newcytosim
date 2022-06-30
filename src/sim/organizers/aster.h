@@ -210,7 +210,7 @@ private:
     Vector posSolid2(size_t n) const;
 
     /// position of Fiber's end involved in first link
-    Vector posFiber1(size_t n) const { return fiber(n)->posEnd(prop->focus); }
+    Vector posFiber1(size_t n) const { return fiber(n)->posEnd(prop->joint); }
     
     /// position of Fiber's point involved in second link
     Vector posFiber2(size_t n) const;

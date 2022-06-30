@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "aster_prop.h"
 #include "solid_prop.h"
@@ -9,19 +9,20 @@
 
 void AsterProp::clear()
 {
-    stiffness[0]    = -1;
-    stiffness[1]    = -1;
-    focus           = MINUS_END;
-    fiber_rate      = 0;
-    fiber_type      = "";
-    fiber_spec      = "";
+    stiffness[0] = -1;
+    stiffness[1] = -1;
+    joint = MINUS_END;
+    fiber_rate = 0;
+    fiber_type = "";
+    fiber_spec = "";
 }
 
 
 void AsterProp::read(Glossary& glos)
 {
     glos.set(stiffness, 2, "stiffness");
-    glos.set(focus, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(joint, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(joint, "joint", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
 
     glos.set(fiber_rate, "nucleate", 0);
     glos.set(fiber_type, "nucleate", 1);
@@ -61,8 +62,8 @@ void AsterProp::complete(Simul const& sim)
 
 void AsterProp::write_values(std::ostream& os) const
 {
-    write_value(os, "nucleate",  fiber_rate, fiber_type, "("+fiber_spec+")");
+    write_value(os, "nucleate", fiber_rate, fiber_type, "("+fiber_spec+")");
     write_value(os, "stiffness", stiffness[0], stiffness[1]);
-    write_value(os, "focus",     focus);
+    write_value(os, "joint", joint);
 }
 

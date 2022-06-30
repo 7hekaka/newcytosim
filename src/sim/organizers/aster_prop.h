@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef ASTER_PROP_H
 #define ASTER_PROP_H
@@ -36,19 +36,19 @@ public:
        intermediate point of the Fiber. This holds the Fiber in direction.
      .
     */
-    real          stiffness[2];
+    real stiffness[2];
     
     /// designates which end of the fiber is towards the center
-    FiberEnd      focus;
+    FiberEnd joint;
     
     /// rate at which a new fiber is created at an unoccupied site (known as nucleate)
-    real          fiber_rate;
+    real fiber_rate;
     
     /// name of Fiber that make up the Aster (know as `nucleate[1]`)
-    std::string   fiber_type;
+    std::string fiber_type;
     
     /// specifications for initial fibers (also known as `nucleate[2]`)
-    std::string   fiber_spec;
+    std::string fiber_spec;
 
     /// @}
     
@@ -56,7 +56,7 @@ public:
 private:
     
     /// probability of nucleation
-    real         fiber_prob;
+    real fiber_prob;
 
 public:
     
