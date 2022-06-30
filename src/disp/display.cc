@@ -51,6 +51,7 @@ void Display::setPixelFactors(float ps, float uv)
      while most gle::primitives have a radius of 1
      */
     sizeScale = 0.5f * uv * ps;
+    //printf(" pixelSize %6.3f unitValue %6.3f : %6.3f\n", ps, uv, sizeScale);
 }
 
 Display::~Display()

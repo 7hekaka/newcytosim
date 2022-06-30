@@ -397,7 +397,7 @@ static void processMenuExport(int item)
         case 2: player.saveView(prop.image_index++, 2); return;
         case 3: player.saveScene(3, "image", prop.image_index++, 3); return;
         case 4: player.saveScene(6, "image", prop.image_index++, 3); return;
-        case 5: player.saveScene(9, "image", prop.image_index++, 3); return;
+        case 5: player.saveScene(6, "image", prop.image_index++, 2); return;
         case 6: player.saveScene(4, "poster", prop.poster_index++); return;
         case 7: player.saveScene(8, "poster", prop.poster_index++); return;
         case 8: player.saveScene(16, "poster", prop.poster_index++); return;

@@ -205,24 +205,25 @@ void Player::autoScale(SpaceSet const& spaces, View& view) const
 //set pixel size, unit-size and direction:
 void Player::setPixelSize(View& view)
 {
-    float pix = view.pixelSize();
+    float mag = view.magnify;
+    float pix = view.pixelSize() / mag;
     /*
-     if `disp.point_value` is set, line width and point size are to be understood
-     in 'real' units, and otherwise, they are understood as number of pixels.
+     if `disp.point_value` is set, line widths and point sizes are to be understood
+     in 'real' units, and by default, they are understood as number of pixels.
      */
-    float val = view.magnify * ( disp.point_value > 0 ? disp.point_value/pix : 1 );
-
-    mDisplay->setPixelFactors(pix, val);
+    if ( disp.point_value > 0 )
+        mag = disp.point_value / pix;
+    
+    mDisplay->setPixelFactors(pix, mag);
     
     mDisplay->setStencil(view.stencil);
 
-    //printf(" pixelSize %6.3f unitValue %6.3f : %lu\n", pix, val, dispList.size());
     for ( Property * p : dispList )
     {
         if ( p->category() == "fiber:display" )
-            static_cast<FiberDisp*>(p)->setPixels(pix, val);
+            static_cast<FiberDisp*>(p)->setPixels(pix, mag);
         else
-            static_cast<PointDisp*>(p)->setPixels(pix, val, disp.style==2);
+            static_cast<PointDisp*>(p)->setPixels(pix, mag, disp.style==2);
     }
 }
 
