@@ -90,7 +90,7 @@ public:
     void change_simul_property(Glossary& opt);
     
     /// create `cnt` objects of type `name`, following options in Glossary
-    void execute_new(std::string const& name, Glossary&, size_t cnt);
+    void execute_new(std::string const& cat, std::string const& name, Glossary&, size_t cnt);
 
     /// create `cnt` objects of type `name`, randomly placed in space (no option)
     void execute_new(std::string const& name, size_t cnt);

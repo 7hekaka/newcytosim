@@ -388,18 +388,17 @@ void Parser::parse_new(std::istream& is)
     Glossary opt;
     size_t cnt = 1;
     Tokenizer::get_integer(is, cnt);
-    std::string name = Tokenizer::get_symbol(is);
+    std::string name, cat = Tokenizer::get_symbol(is);
     
-#if BACKWARD_COMPATIBILITY < 50
-    // Read formats anterior to 3.11.2017
-    if ( isCategory(name) )
+    // Read 'category + name' or just 'name'
+    if ( isCategory(cat) )
+        name = Tokenizer::get_symbol(is);
+    else
     {
-        std::string str = Tokenizer::get_symbol(is);
-        if ( !str.empty() )
-            name = str;
+        name = cat;
+        cat = "";
     }
-#endif
-
+    
     // Syntax sugar: () specify only position
     std::string blok = Tokenizer::get_block(is, '(');
     
@@ -412,9 +411,6 @@ void Parser::parse_new(std::istream& is)
         opt.define("position", blok);
     }
     
-    if ( name.empty() )
-        throw InvalidParameter("unexpected syntax");
-
     if ( do_new & ( cnt > 0 ))
     {
         if ( opt.num_keys() == 0 )
@@ -424,7 +420,7 @@ void Parser::parse_new(std::istream& is)
         else
         {
             // place each object independently from the others:
-            execute_new(name, opt, cnt);
+            execute_new(cat, name, opt, cnt);
             
             if ( opt.has_key("display") )
                 throw InvalidParameter("display parameters should be specified within `set'");

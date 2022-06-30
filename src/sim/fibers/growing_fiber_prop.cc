@@ -45,7 +45,6 @@ void GrowingFiberProp::complete(Simul const& sim)
 {
     FiberProp::complete(sim);
 
-    std::cerr << name() << ": time_step(sim) = " << time_step(sim) << "\n";
     for ( int i = 0; i < 2; ++i )
     {
         if ( growing_force[i] <= 0 )

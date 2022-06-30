@@ -607,7 +607,7 @@ std::string Tokenizer::get_block(std::istream& is, char c_in, bool or_die)
     }
 
     if ( or_die )
-        throw InvalidSyntax("syntax error (expected `{...}')");
+        throw InvalidSyntax("expected {}-delimited block `{...}'");
 
     return "";
 }

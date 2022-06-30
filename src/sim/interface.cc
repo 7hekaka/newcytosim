@@ -415,21 +415,25 @@ void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet*
 
 /**
  Create `cnt` objects of type 'name', according to specifications.
+ It is possible to make an object without an associated Property
  */
-void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
+void Interface::execute_new(std::string const& cat, std::string const& name, Glossary& opt, size_t cnt)
 {
     ObjectSet * set = nullptr;
-    Property * pp = sim_->properties.find(name);
-    // Allows to make an object without an associated Property
-    if ( pp )
-        set = sim_->findSet(pp->category());
-    else
-        set = sim_->findSet(name);
-    if ( !set )
+    
+    if ( cat.empty() )
     {
+        Property * pp = sim_->properties.find(name);
         if ( pp )
+            set = sim_->findSet(pp->category());
+        if ( !set )
             throw InvalidSyntax("could not determine the class of `"+name+"'");
-        throw InvalidSyntax("undefined class `"+name+"'");
+    }
+    else
+    {
+        set = sim_->findSet(cat);
+        if ( !set )
+            throw InvalidSyntax("undefined class `"+cat+"'");
     }
     size_t amount = set->size();
     
@@ -502,10 +506,9 @@ void Interface::execute_new(std::string const& name, Glossary& opt, size_t cnt)
 //------------------------------------------------------------------------------
 /**
  Creates `cnt` objects of class `name`.
- The objects are distributed uniformly within the current Space, also with
- random orientations.
+ The objects are distributed uniformly within the current Space, withrandom orientations.
  
- This is meant to replace execute_new(name, opt, cnt), when no option was given
+ This is meant to replace execute_new(cat, name, opt, cnt), when no option were specified
  to the command.
  */
 void Interface::execute_new(std::string const& name, size_t cnt)
