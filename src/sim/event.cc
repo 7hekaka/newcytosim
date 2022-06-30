@@ -110,7 +110,12 @@ void Event::step(Simul& sim)
         sim.relax();
         // if 'multiplexed', the event can fire multiple time within a time step
         do {
-            sim.evaluate(activity);
+            try {
+                sim.evaluate(activity);
+            }
+            catch( Exception & e ) {
+                std::cerr << "Error in `" + activity + "' : " + e.message();
+            }
             reload(nextTime);
         } while ( multiplexed && sim.time() >= nextTime );
         sim.unrelax();
