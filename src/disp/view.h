@@ -117,6 +117,9 @@ public:
     /// height of display area in pixels
     int height() const { return viewport_[3]; }
     
+    /// distance between origin and camera plate
+    float depth() const { return eyeDistance; }
+    
     /// height of display area in pixels
     GLint const* viewport() const { return viewport_; }
 
@@ -209,13 +212,13 @@ public:
     //---------------------------------------------------------------------------
     
     /// position 'pos' in the center of the display
-    void move_to(const Vector3 & pos);
+    void move_to(const Vector3&);
     
     /// set additional translation of focal point
-    void move_shift(const Vector3 & pos);
+    void move_shift(const Vector3&);
     
     /// translate view
-    void move_by(const Vector3 & trans) { move_to( focus - trans ); }
+    void move_by(const Vector3& trans) { move_to( focus - trans ); }
 
     //---------------------------------------------------------------------------
     
@@ -226,7 +229,7 @@ public:
     void align_with(const Vector3& dir);
 
     /// rotate view
-    void rotate_by(const Quaternion<real> &q) { rotate_to( rotation * q ); }
+    void rotate_by(const Quaternion<real>& Q) { rotate_to( rotation * Q ); }
     
     //---------------------------------------------------------------------------
 

@@ -589,16 +589,18 @@ void glApp::processSpecialKey(int key, int modifiers)
     
     if ( modifiers & GLUT_ACTIVE_ALT )
     {
-        // Rotate view around the focus point
         rot.rotateVector(vec, cross(Vector3(0, 0, 1), dxy));
+        view.rotation.rotateVector(dxy, view.focus);
         rot.setFromAxis(vec, F * (M_PI/8));
         view.rotate_by(rot);
+        view.rotation.conjugated().rotateVector(vec, dxy);
+        view.focus = vec;
     }
     else
     {
         // Translate view
         if ( (modifiers & GLUT_ACTIVE_CTRL) ^ (userMode == MOUSE_TRANSLATEZ) )
-            dxy.set(0.5*dxy.XX, 0, 0.5*dxy.YY);
+            dxy.set(0.5*dxy.XX, 0, -0.5*dxy.YY);
         rot.rotateVector(vec, dxy);
         //std::clog << "vec " << dxy << " >>> " << vec << "\n";
         view.move_by((128*view.pixelSize())*vec);

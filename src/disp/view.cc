@@ -521,7 +521,7 @@ void View::setModelView() const
 {
     //GLint e; glGetIntegerv(GL_MATRIX_MODE, &e); assert_true(e==GL_MODELVIEW);
 
-    float T[4] = { 0, 0, eyeDistance, 0 };
+    float T[4] = { 0, 0, eyeDistance, 1 };
     rotation.setOpenGLMatrix(modelview_, zoom, T);
     Vector3 V = - ( focus + focus_shift );
     gym::mat_translate(modelview_, V.XX, V.YY, V.ZZ);
