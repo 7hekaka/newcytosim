@@ -20,6 +20,9 @@ namespace gle
     /// a set of ~150 standard named html colors
     gle_color std_color(const std::string& name);
 
+    /// number of colors from the XKCD project
+    size_t nb_alt_color();
+
     /// one of People's 949 popular colors, from the XKCD project
     gle_color alt_color(size_t indx);
     

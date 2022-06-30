@@ -4,6 +4,7 @@
 #include "gle_color_list.h"
 #include "stream_func.h"
 #include "exceptions.h"
+#include "random.h"
 #include <iomanip>
 #include <cctype>
 #include <cmath>
@@ -80,6 +81,12 @@ std::istream& operator >> (std::istream& is, gle_color& col)
             is.unget();
             std::string name;
             is >> name;
+            if ( name == "random" )
+            {
+                c = RNG.pint32(gle::nb_alt_color());
+                col = gle::alt_color(c);
+                return is;
+            }
             try {
                 col = gle::std_color(name);
             }

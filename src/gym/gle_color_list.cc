@@ -1533,6 +1533,12 @@ void gle::print_std_colors(std::ostream& os)
 }
 
 
+size_t gle::nb_alt_color()
+{
+    return sizeof(xkcd_colors) / sizeof(named_color);
+}
+
+
 gle_color gle::alt_color(size_t indx)
 {
     const size_t max = sizeof(xkcd_colors) / sizeof(named_color);
