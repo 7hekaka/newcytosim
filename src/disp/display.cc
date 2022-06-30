@@ -267,10 +267,13 @@ void Display::drawTiled(Simul const& sim, int tile)
     // depth-sort positions:
     qsort(pos, cnt, sizeof(Vector4), &compareVector4);
 
+    float ref[16], mat[16];
+    gym::get_view(ref);
     for ( int i = 0; i < cnt; ++i )
     {
-        gym::pull_ref();
-        gym::translate(pos[i].XX, pos[i].YY, pos[i].ZZ);
+        gym::mat_copy(mat, ref);
+        gym::mat_translate(mat, pos[i].XX, pos[i].YY, pos[i].ZZ);
+        gym::set_view(mat);
         drawSimul(sim);
     }
 }
