@@ -18,15 +18,19 @@ GLboolean gym::alpha_ = 0;
 void gym::enableLineStipple(short pattern)
 {
 #ifdef GL_VERSION_2_1
+#ifndef __aarch64__
     glLineStipple(1, pattern);
     glEnable(GL_LINE_STIPPLE);
+#endif
 #endif
 }
 
 void gym::disableLineStipple()
 {
 #ifdef GL_VERSION_2_1
+#ifndef __aarch64__
     glDisable(GL_LINE_STIPPLE);
+#endif
 #endif
 }
 
