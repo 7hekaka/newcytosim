@@ -1959,8 +1959,8 @@ namespace gle
     {
         gym::stretchAlignZ(A, B, R);
         tube1();
-        gym::translate(0, 0, 3*R-1);
-        gym::scale(3.0, 3.0, 9*R);
+        gym::translate(0, 0, 1-3*R);
+        gym::scale(3.0, 3.0, 6*R);
         cone2();
         discBottom2();
     }
@@ -1969,8 +1969,8 @@ namespace gle
     {
         gym::stretchAlignZ(A, B, R);
         tube1();
-        gym::translate(0, 0, 3*R-1);
-        gym::scale(3.0, 3.0, 9*R);
+        gym::translate(0, 0, 1-3*R);
+        gym::scale(3.0, 3.0, 6*R);
         cone2();
         discBottom2();
     }
@@ -1979,8 +1979,8 @@ namespace gle
     {
         gym::stretchAlignZ(A, B, R);
         tube1();
-        gym::translate(0, 0, 3*R-1);
-        gym::scale(3.0, 3.0, 9*R);
+        gym::translate(0, 0, 1-3*R);
+        gym::scale(3.0, 3.0, 6*R);
         cone2();
         discBottom2();
     }
@@ -2016,8 +2016,8 @@ namespace gle
                     gym::rotateZ(0, -1);
                     break;
             }
+            gym::translate(0, 0, 8*R);
             gym::scale(1.5*R, 1.5*R, 3*R);
-            gym::translate(0, 0, 2.6666);
             cone2();
             discBottom2();
             gym::translate(0, 0, -2.4);

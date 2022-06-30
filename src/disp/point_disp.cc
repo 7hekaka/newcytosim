@@ -214,8 +214,7 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
 {
     float s = size * unit_value * 0.5f;
     float w = width * unit_value * 0.5f;
-    gym::translate(dim*0.5, dim*0.5, 0);
-    gym::scale(s);
+    gym::transScale(dim*0.5, dim*0.5, 0, s);
 
     if ( width > 0 ) glLineWidth(w);
 
