@@ -102,7 +102,7 @@ public:
     void write(Outputter&) const;
     
     /// read from Inputter
-    void readEndState(Inputter&);
+    void readEndStates(Inputter&);
 
     /// read from Inputter
     void read(Inputter&, Simul&, ObjectTag);

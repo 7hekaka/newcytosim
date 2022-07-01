@@ -395,7 +395,7 @@ void DynamicFiber::write(Outputter& out) const
 }
 
 
-void DynamicFiber::readEndState(Inputter& in)
+void DynamicFiber::readEndStates(Inputter& in)
 {
 #if BACKWARD_COMPATIBILITY < 54
     if ( in.formatID() < 54 )
@@ -423,12 +423,12 @@ void DynamicFiber::readEndState(Inputter& in)
 void DynamicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     if ( tag == TAG_DYNAMIC )
-        readEndState(in);
+        readEndStates(in);
     else
     {
 #if BACKWARD_COMPATIBILITY < 44
         if ( tag == TAG && in.formatID() < 44 )
-            readEndState(in);
+            readEndStates(in);
 #endif
         Fiber::read(in, sim, tag);
     }

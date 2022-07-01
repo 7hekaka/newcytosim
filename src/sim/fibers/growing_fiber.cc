@@ -106,12 +106,18 @@ void GrowingFiber::write(Outputter& out) const
 
     // since states are constant, we write growth rates:
     writeHeader(out, TAG_DYNAMIC);
-    out.writeFloat(cDeltaM);
-    out.writeFloat(cDeltaP);
+    if ( mStateM == STATE_GREEN )
+        out.writeFloat(cDeltaM);
+    else
+        out.writeFloat(-0.0);
+    if ( mStateP == STATE_GREEN )
+        out.writeFloat(cDeltaP);
+    else
+        out.writeFloat(-0.0);
 }
 
 
-void GrowingFiber::readEndState(Inputter& in)
+void GrowingFiber::readEndStates(Inputter& in)
 {
 #if BACKWARD_COMPATIBILITY < 54
     if ( in.formatID() < 54 )
@@ -132,6 +138,9 @@ void GrowingFiber::readEndState(Inputter& in)
     {
         cDeltaM = in.readFloat();
         cDeltaP = in.readFloat();
+        // the state are derived from the sign bit:
+        mStateM = std::signbit(cDeltaM) ? STATE_WHITE : STATE_GREEN;
+        mStateP = std::signbit(cDeltaP) ? STATE_WHITE : STATE_GREEN;
     }
 }
 
@@ -139,12 +148,12 @@ void GrowingFiber::readEndState(Inputter& in)
 void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     if ( tag == TAG_DYNAMIC )
-        readEndState(in);
+        readEndStates(in);
     else
     {
 #if BACKWARD_COMPATIBILITY < 44
         if ( tag == TAG && in.formatID() < 44 )
-            readEndState(in);
+            readEndStates(in);
         const real len = length();
 #endif
         
