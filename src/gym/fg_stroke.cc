@@ -67,7 +67,7 @@ SFG_StrokeFont const* fghStrokeByID( int mono )
  * Draw a stroke character
  */
 void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char arg,
-                       float line_width, float point_size)
+                       float stroke_width, float stroke_size)
 {
     scale *= 0.125;
     const SFG_StrokeChar *schar;
@@ -87,10 +87,10 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
                 for ( size_t j = 0; j < num; ++j )
                     flu[j] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
                 gym::unmapBufferV2();
-                if ( line_width > 0 )
-                    gym::drawLineStrip(line_width, 0, num);
-                if ( point_size > 0 )
-                    gym::drawPoints(point_size, 0, num);
+                if ( stroke_width > 0 )
+                    gym::drawLineStrip(stroke_width, 0, num);
+                if ( stroke_size > 0 )
+                    gym::drawPoints(stroke_size, 0, num);
             }
         }
     }
@@ -98,7 +98,7 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
 
 
 void fgStrokeString(float X, float Y, float scale, int mono, const char *string,
-                    float line_width, float point_size, float vshift)
+                    float stroke_width, float stroke_size, float vshift)
 {
     scale *= 0.125;
     unsigned char c;
@@ -135,10 +135,10 @@ void fgStrokeString(float X, float Y, float scale, int mono, const char *string,
                         for ( size_t j = 0; j < num; ++j )
                             flu[j] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
                         gym::unmapBufferV2();
-                        if ( line_width > 0 )
-                            gym::drawLineStrip(line_width, 0, num);
-                        if ( point_size > 0 )
-                            gym::drawPoints(point_size, 0, num);
+                        if ( stroke_width > 0 )
+                            gym::drawLineStrip(stroke_width, 0, num);
+                        if ( stroke_size > 0 )
+                            gym::drawPoints(stroke_size, 0, num);
                     }
                     X += scale * schar->Advance;
                 }

@@ -57,13 +57,13 @@ namespace gle
 #pragma mark -
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
-    void circle(float line_width);
+    void circle(float stroke_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, fewer points
-    void circle2(float line_width);
+    void circle2(float stroke_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
-    void circle_dotted(float line_width);
+    void circle_dotted(float stroke_width);
     /// draw 2D oval within -1 to 1
-    void stroke_capsule(float line_width);
+    void stroke_capsule(float stroke_width);
     /// 2D oval within -1 to 1
     void paint_capsule();
     /// 2D cross within -1.5 to 1.5
@@ -91,11 +91,11 @@ namespace gle
     /// paint spherocylinder in 2D, using current color
     void paint_capsule(float left, float right, float rad, size_t inc=1);
     /// draw spherocylinder contour in 2D
-    void stroke_capsule(float left, float right, float rad, float line_width, size_t inc=1);
+    void stroke_capsule(float left, float right, float rad, float stroke_width, size_t inc=1);
     /// paint two spherocylinder in 2D, joined by a cylinder of size tube x clos
     void paint_bicapsule(float left, float right, float rad, float clos, float tube, size_t inc=1);
     /// draw two spherocylinder contours in 2D, joined by a cylinder of size tube x clos
-    void stroke_bicapsule(float left, float right, float rad, float clos, float tube, float line_width, size_t inc=1);
+    void stroke_bicapsule(float left, float right, float rad, float clos, float tube, float stroke_width, size_t inc=1);
 
     /// draw a tetrahedron of radius 1
     void tetrahedron();
