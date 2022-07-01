@@ -28,12 +28,6 @@ public:
     /// type used to quantify color components
     typedef float COLOF;
 
-    
-    static size_t stride()
-    {
-        return sizeof(gle_color) - 4 * sizeof(COLOF);
-    }
-
 private:
 
     /// concatenate 4 bytes into an int
@@ -52,21 +46,18 @@ private:
     /// return value clamped to [0, 1]
     static COLOF clamp(COLOF s) { return std::max(COLOF(0), std::min(s, COLOF(1))); }
     
-    /// array of 4 COLOF components, matching the `rgba_` integer
+    /// COLOF components: Red, Green, Blue, Alpha
     COLOF col_[4];
-    
-    /// 32-bits integer containing 4 one-byte components: red, green, blue, alpha
-    uint32_t rgba_;
 
 #pragma mark - Private methods
 
-    /// update 'rgba_' to match values in 'col_'
-    void update_rgba()
+    /// return integer representation of color ('col_')
+    uint32_t rgba() const
     {
-        rgba_ = combine(col_[0], col_[1], col_[2], col_[3]);
+        return combine(col_[0], col_[1], col_[2], col_[3]);
     }
     
-    /// update 'col_' to match values in 'rgba_'
+    /// update 'col_' to match RGBA values encoded in integer argument
     void update_float(uint32_t arg)
     {
         col_[0] = COLOF( 0xFF & ( arg >> 24 ) ) / 255;
@@ -82,7 +73,6 @@ public:
     /// set to white
     void set_white()
     {
-        rgba_ = 0xFFFFFFFF;
         col_[0] = 1;
         col_[1] = 1;
         col_[2] = 1;
@@ -92,7 +82,6 @@ public:
     /// set to black
     void set_black()
     {
-        rgba_ = 0x000000FF;
         col_[0] = 0;
         col_[1] = 0;
         col_[2] = 0;
@@ -106,7 +95,6 @@ public:
         col_[1] = clamp(g);
         col_[2] = clamp(b);
         col_[3] = clamp(a);
-        update_rgba();
     }
     
     /// export floating point components
@@ -130,23 +118,26 @@ public:
     /// specify components with bytes
     void set_bytes(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     {
-        rgba_ = combine(uint32_t(r), uint32_t(g), uint32_t(b), uint32_t(a));
-        update_float(rgba_);
+        col_[0] = COLOF(r) / 255;
+        col_[1] = COLOF(g) / 255;
+        col_[2] = COLOF(b) / 255;
+        col_[3] = COLOF(a) / 255;
     }
 
     /// export components as bytes
     void put_bytes(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
     {
-        r = 0xFF & (uint8_t)( rgba_ >> 24 );
-        g = 0xFF & (uint8_t)( rgba_ >> 16 );
-        b = 0xFF & (uint8_t)( rgba_ >> 8 );
-        a = 0xFF & (uint8_t)( rgba_ );
+        uint32_t col = rgba();
+        r = 0xFF & (uint8_t)( col >> 24 );
+        g = 0xFF & (uint8_t)( col >> 16 );
+        b = 0xFF & (uint8_t)( col >> 8 );
+        a = 0xFF & (uint8_t)( col );
     }
     
 #pragma mark - Constructors
 
     /// default constructor
-    gle_color() : rgba_(0)
+    gle_color()
     {
         col_[0] = 0;
         col_[1] = 0;
@@ -157,7 +148,6 @@ public:
     /// constructor
     gle_color(const uint32_t& u)
     {
-        rgba_ = u;
         update_float(u);
     }
     
@@ -177,12 +167,14 @@ public:
 
     void operator = (const uint32_t& arg)
     {
-        rgba_ = arg;
         update_float(arg);
     }
     
-    bool operator ==(const gle_color col) const { return rgba_ == col.rgba_; }
-    bool operator !=(const gle_color col) const { return rgba_ != col.rgba_; }
+    /// true if colors are roughly equal
+    bool operator ==(const gle_color col) const { return rgba() == col.rgba(); }
+    
+    /// true if colors are significantly different
+    bool operator !=(const gle_color col) const { return rgba() != col.rgba(); }
     
     COLOF const* colors() const { return col_; }
 
@@ -197,15 +189,17 @@ public:
     COLOF b() const { return col_[2]; }
     COLOF a() const { return col_[3]; }
     
+    uint8_t alpha_() const { return uint8_t(255*col_[3]); }
+
     COLOF red()   const { return col_[0]; }
     COLOF green() const { return col_[1]; }
     COLOF blue()  const { return col_[2]; }
     COLOF alpha() const { return col_[3]; }
 
-    void set_red  (COLOF s) { col_[0] = clamp(s); update_rgba(); }
-    void set_green(COLOF s) { col_[1] = clamp(s); update_rgba(); }
-    void set_blue (COLOF s) { col_[2] = clamp(s); update_rgba(); }
-    void set_alpha(COLOF s) { col_[3] = clamp(s); update_rgba(); }
+    void set_red  (COLOF s) { col_[0] = clamp(s); }
+    void set_green(COLOF s) { col_[1] = clamp(s); }
+    void set_blue (COLOF s) { col_[2] = clamp(s); }
+    void set_alpha(COLOF s) { col_[3] = clamp(s); }
 
     gle_color red  (COLOF s) const { return gle_color(clamp(s), col_[1], col_[2], col_[3]); }
     gle_color green(COLOF s) const { return gle_color(col_[0], clamp(s), col_[2], col_[3]); }
@@ -218,16 +212,16 @@ public:
     gle_color match_a(gle_color c) const { return gle_color(col_[0], col_[1], col_[2], c.col_[3]); }
     
 #pragma mark -
-
-    bool  visible()      const { return ( rgba_ & 0xFF ); }
-    bool  invisible()    const { return ( rgba_ & 0xFF ) == 0; }
+    
+    bool  visible()      const { return ( alpha_() > 0 ); }
+    bool  invisible()    const { return ( alpha_() == 0 ); }
+    bool  opaque()       const { return ( alpha_() == 255 ); }
+    bool  transparent()  const { return ( alpha_() < 255 ); }
+    
+    COLOF transparency() const { return col_[3]; }
     COLOF normSqr()      const { return col_[0]*col_[0] + col_[1]*col_[1] + col_[2]*col_[2]; }
     COLOF brightness()   const { return normSqr() * col_[3]; }
-    
-    bool  opaque()       const { return ( (rgba_ & 0xFF) == 0xFF ); }
-    bool  transparent()  const { return ( (rgba_ & 0xFF) != 0xFF ); }
-    COLOF transparency() const { return col_[3]; }
-    
+
     COLOF difference(gle_color back) const
     {
         COLOF x = col_[0] - back.col_[0];

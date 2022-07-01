@@ -20,7 +20,7 @@ static const char hexadecimal_digit[] = "0123456789ABCDEF";
  */
 void gle_color::hexadecimal(char * str) const
 {
-    uint32_t n = rgba_;
+    uint32_t n = rgba();
     *str++ = '0';
     *str++ = 'x';
     while ( n )
