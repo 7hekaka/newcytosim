@@ -259,16 +259,6 @@ Fiber::~Fiber()
     delete(fGlue);
     fGlue = nullptr;
 #endif
-    if ( disp )
-    {
-        /*
-         Note: the destructor will not be called here, which is OK
-         if LineDisp is a trivial type that does not allocate resources
-         */
-        free(disp);
-        disp = nullptr;
-    }
-    
     prop = nullptr;
 }
 

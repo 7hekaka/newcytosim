@@ -40,6 +40,8 @@ Display::Display(DisplayProp const* dp)
     prep_time = -1;
     age_start = 0;
     age_scale = 1.0;
+    allLineDisp = nullptr;
+    numLineDisp = 0;
 }
 
 void Display::setPixelFactors(float ps, float uv)
@@ -56,6 +58,7 @@ void Display::setPixelFactors(float ps, float uv)
 
 Display::~Display()
 {
+    delete[] allLineDisp;
 }
 
 
@@ -497,12 +500,25 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
 /// attribute a LineDisp, and set individual display values for all fibers
 void Display::attributeLineDisp(FiberSet const& fibers)
 {
+    if ( numLineDisp < fibers.size() )
+    {
+        constexpr size_t chunk = 32;
+        numLineDisp = ( fibers.size() + chunk ) & ~ ( chunk - 1 );
+        delete[] allLineDisp;
+        allLineDisp = new LineDisp[numLineDisp];
+#if 0
+        printf("sizeof gle_color %lu bytes\n", sizeof(gle_color));
+        printf("sizeof LineDisp  %lu bytes\n", sizeof(LineDisp));
+        std::clog << " new allLineDisp(" << numLineDisp << ")\n";
+#endif
+    }
+    size_t i = 0;
     for ( Fiber * fib = fibers.first(); fib; fib = fib->next() )
     {
-        if ( !fib->disp )
-            fib->disp = new LineDisp();
+        fib->disp = &allLineDisp[i++];
         prepareLineDisp(fib, fib->prop->disp, fib->disp);
     }
+    assert_true( i < numLineDisp );
 }
 
 

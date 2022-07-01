@@ -102,6 +102,12 @@ protected:
     /// use OpenGL stencil test:
     bool stencil_;
     
+    /// pointer to array of LineDisp
+    LineDisp * allLineDisp;
+    
+    /// number  of allocated LineDisp
+    size_t numLineDisp;
+    
 private:
     
     /// set default value of FiberProp

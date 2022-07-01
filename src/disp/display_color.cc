@@ -21,7 +21,7 @@ LOCAL real color_scale(Fiber const* fib, int style)
         case 3: return 1 / fib->prop->disp->tension_scale;
         case 4: return fib->prop->disp->length_scale; // color_by_curvature
         case 5: return 1; // color_by_direction
-        case 6: // color_by_distanceP
+        case 6: // 6 and 7: color_by_distanceP
         case 7: return fib->segmentation() / fib->prop->disp->length_scale;
         case 8: return 1 / fib->prop->disp->length_scale; // color_by_height
         case 9: return 1; // color_by_grid
