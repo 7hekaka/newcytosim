@@ -3,8 +3,7 @@
 #define REGULATOR_H
 
 #include "hand.h"
-
-class RegulatorProp;
+#include "regulator_prop.h"
 
 /// A Hand that may induce a catastrophe.
 /**
@@ -25,8 +24,8 @@ private:
 public:
     
     /// Property
-    RegulatorProp const* prop;
-    
+    RegulatorProp const* prop() const { return static_cast<RegulatorProp const*>(Hand::prop); }
+
     /// constructor
     Regulator(RegulatorProp const*, HandMonitor*);
     

@@ -9,7 +9,7 @@
 
 
 Walker::Walker(WalkerProp const* p, HandMonitor* h)
-: Digit(p,h), prop(p)
+: Digit(p,h)
 {
 }
 
@@ -21,13 +21,13 @@ void Walker::attach(FiberSite const& s)
     
 #if ( 0 )
     // this allows for step size being a multiple of lattice site
-    unsigned n = std::round( prop->step_size / lattice()->unit() );
-    prop->stride = std::copysign(n, prop->unloaded_speed);
+    unsigned n = std::round( prop()->step_size / lattice()->unit() );
+    prop()->stride = std::copysign(n, prop()->unloaded_speed);
 #else
     // here digit::step_size must be equal to fiber:step_size
-    if ( lattice() && lattice()->unit() != prop->step_size  )
+    if ( lattice() && lattice()->unit() != prop()->step_size  )
         throw InvalidParameter("walker:step_size must be equal to fiber:lattice_unit");
-    prop->stride = (int)sign_real(prop->unloaded_speed);
+    prop()->stride = (int)sign_real(prop()->unloaded_speed);
 #endif
 }
 
@@ -40,11 +40,11 @@ void Walker::stepUnloaded()
 {
     assert_true( attached() );
     
-    real R = prop->walking_rate_dt;
+    real R = prop()->walking_rate_dt;
 
 #if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
-    R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
+    R += prop()->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
     
     nextAct -= max_real(0, R);
@@ -52,14 +52,14 @@ void Walker::stepUnloaded()
     while ( nextAct <= 0 )
     {
         // test detachment due to stepping
-        if ( RNG.test(prop->unbinding_chance) )
+        if ( RNG.test(prop()->unbinding_chance) )
             return detach();
         
-        lati_t s = site() + prop->stride;
+        lati_t s = site() + prop()->stride;
         
         if ( outsideMP(s) )
         {
-            if ( RNG.test_not(prop->hold_growing_end) )
+            if ( RNG.test_not(prop()->hold_growing_end) )
                 return detach();
         }
         else if ( vacant(s) )
@@ -80,11 +80,11 @@ void Walker::stepLoaded(Vector const& force)
     assert_true( attached() );
     
     // evaluate displacement, given the load parallel to filament:
-    real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
+    real R = prop()->walking_rate_dt + dot(force, dirFiber()) * prop()->var_rate_dt;
 
 #if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
-    R += prop->variable_walking_rate_dt * fiber()->meshValue(abscissa());
+    R += prop()->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
 
     nextAct -= max_real(0, R);
@@ -92,14 +92,14 @@ void Walker::stepLoaded(Vector const& force)
     while ( nextAct <= 0 )
     {
         // test detachment due to stepping
-        if ( RNG.test(prop->unbinding_chance) )
+        if ( RNG.test(prop()->unbinding_chance) )
             return detach();
 
-        lati_t s = site() + prop->stride;
+        lati_t s = site() + prop()->stride;
 
         if ( outsideMP(s) )
         {
-            if ( RNG.test_not(prop->hold_growing_end) )
+            if ( RNG.test_not(prop()->hold_growing_end) )
                 return detach();
         }
         else if ( vacant(s) )

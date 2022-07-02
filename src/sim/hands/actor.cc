@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 Actor::Actor(ActorProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
     throw InvalidParameter("the actor class is unfinished");
 }

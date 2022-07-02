@@ -10,10 +10,9 @@
 
 
 Motor::Motor(MotorProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
 }
-
 
 void Motor::stepUnloaded()
 {
@@ -22,21 +21,21 @@ void Motor::stepUnloaded()
 #if NEW_VARIABLE_SPEED
     LOG_ONCE("Motor speed is affected by Fiber's Lattice\n");
     real C = fiber()->meshValue(abscissa());
-    real a = hAbs + prop->set_speed_dt + prop->variable_speed_dt * C;
+    real a = hAbs + prop()->set_speed_dt + prop()->variable_speed_dt * C;
 #else
-    real a = hAbs + prop->set_speed_dt;
+    real a = hAbs + prop()->set_speed_dt;
 #endif
 
     if ( a < hFiber->abscissaM() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaP();
     }
@@ -44,7 +43,7 @@ void Motor::stepUnloaded()
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
+    nextDetach -= prop()->unbinding_density * abs_real(a-hAbs);
     if ( nextDetach <= 0 )
         return detach();
 #endif
@@ -64,31 +63,31 @@ void Motor::stepLoaded(Vector const& force)
 #if NEW_VARIABLE_SPEED
     LOG_ONCE("Motor speed is affected by Fiber's Lattice\n");
     real C = fiber()->meshValue(abscissa());
-    real s = prop->set_speed_dt + prop->variable_speed_dt * C;
-    real dab = s * ( 1.0 + load / prop->stall_force );
+    real s = prop()->set_speed_dt + prop()->variable_speed_dt * C;
+    real dab = s * ( 1.0 + load / prop()->stall_force );
 #else
-    real dab = prop->set_speed_dt + load * prop->var_speed_dt;
+    real dab = prop()->set_speed_dt + load * prop()->var_speed_dt;
 #endif
 
     // possibly limit the range of the speed:
-    if ( prop->limit_speed )
+    if ( prop()->limit_speed )
     {
-        dab = std::max(dab, prop->min_dab);
-        dab = std::min(dab, prop->max_dab);
+        dab = std::max(dab, prop()->min_dab);
+        dab = std::min(dab, prop()->max_dab);
     }
     
     real a = hAbs + dab;
     
     if ( a < hFiber->abscissaM() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaP();
     }
@@ -96,7 +95,7 @@ void Motor::stepLoaded(Vector const& force)
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
+    nextDetach -= prop()->unbinding_density * abs_real(a-hAbs);
     if ( nextDetach <= 0 )
         return detach();
 #endif

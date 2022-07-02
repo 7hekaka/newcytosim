@@ -11,7 +11,7 @@
 
 
 Digit::Digit(DigitProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
 }
 
@@ -87,9 +87,9 @@ void Digit::hop(lati_t s)
     dec();
     hSite = s;
     inc();
-    hAbs = s * lattice()->unit() + prop->site_shift;
+    hAbs = s * lattice()->unit() + prop()->site_shift;
 #else
-    hAbs = s * prop->step_size + prop->site_shift;
+    hAbs = s * prop()->step_size + prop()->site_shift;
 #endif
 }
 
@@ -147,7 +147,7 @@ void Digit::handleDisassemblyM()
 {
     assert_true( attached() );
     
-    if ( RNG.test(prop->hold_shrinking_end) )
+    if ( RNG.test(prop()->hold_shrinking_end) )
     {
         jumpToEndM();
         if ( site() < lattice()->entry() )
@@ -165,7 +165,7 @@ void Digit::handleDisassemblyP()
 {
     assert_true( attached() );
     
-    if ( prop->hold_shrinking_end > 0 )
+    if ( prop()->hold_shrinking_end > 0 )
     {
         jumpToEndP();
         if ( site() > lattice()->fence() )
@@ -238,7 +238,7 @@ void Fiber::resetLattice()
             {
                 Digit* i = static_cast<Digit*>(ha);
                 i->inc();
-                i->moveTo(unit * i->site() + i->prop->site_shift);
+                i->moveTo(unit * i->site() + i->prop()->site_shift);
             }
         }
     }

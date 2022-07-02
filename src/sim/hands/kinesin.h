@@ -4,7 +4,7 @@
 #define KINESIN_H
 
 #include "digit.h"
-class KinesinProp;
+#include "kinesin_prop.h"
 
 
 /// A model of the kinesin motor with discrete stepping
@@ -38,8 +38,8 @@ private:
 public:
     
     /// Property
-    KinesinProp const* prop;
-    
+    KinesinProp const* prop() const { return static_cast<KinesinProp const*>(Hand::prop); }
+
     /// constructor
     Kinesin(KinesinProp const*, HandMonitor*);
     

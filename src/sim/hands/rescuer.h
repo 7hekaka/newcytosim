@@ -3,7 +3,7 @@
 #define RESCUER_H
 
 #include "hand.h"
-class RescuerProp;
+#include "rescuer_prop.h"
 
 /// A Hand that may rescue a shrinking fiber.
 /**
@@ -35,8 +35,8 @@ private:
 public:
     
     /// Property
-    RescuerProp const* prop;
-    
+    RescuerProp const* prop() const { return static_cast<RescuerProp const*>(Hand::prop); }
+
     /// constructor
     Rescuer(RescuerProp const*, HandMonitor*);
 

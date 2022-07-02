@@ -8,7 +8,7 @@
 
 
 Tracker::Tracker(TrackerProp const* p, HandMonitor* h)
-: Hand(p, h), prop(p)
+: Hand(p, h)
 {
 }
 
@@ -19,7 +19,7 @@ bool Tracker::attachmentAllowed(FiberSite& sit) const
         return false;
 
     // check if fiber end in growing:
-    if ( prop->bind_only_growing_end && !sit.fiber()->isGrowing(sit.nearestEnd()) )
+    if ( prop()->bind_only_growing_end && !sit.fiber()->isGrowing(sit.nearestEnd()) )
         return false;
     
     return true;
@@ -33,7 +33,7 @@ void Tracker::stepUnloaded()
 {
     assert_true( attached() );
     
-    switch ( prop->track_end )
+    switch ( prop()->track_end )
     {
         case NO_END:
             break;
@@ -60,7 +60,7 @@ void Tracker::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
 
-    switch ( prop->track_end )
+    switch ( prop()->track_end )
     {
         case NO_END:
             break;

@@ -8,7 +8,7 @@
 
 
 Rescuer::Rescuer(RescuerProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
 }
 
@@ -32,7 +32,7 @@ void Rescuer::handleDisassemblyM()
 
     if ( hAbs < fib->abscissaM() && fib->freshAssemblyM() < 0 )
     {
-        if ( RNG.test(prop->rescue_prob) )
+        if ( RNG.test(prop()->rescue_prob) )
         {
             //revert the last disassembly step:
             fib->undoGrowM();
@@ -66,7 +66,7 @@ void Rescuer::handleDisassemblyP()
     would be positive, since another Hand might have done the same job already. */
     if ( hAbs > fib->abscissaP() && fib->freshAssemblyP() < 0 )
     {
-        if ( RNG.test(prop->rescue_prob) )
+        if ( RNG.test(prop()->rescue_prob) )
         {
             //revert the last disassembly step:
             fib->undoGrowP();

@@ -3,7 +3,7 @@
 #define WALKER_H
 
 #include "digit.h"
-class WalkerProp;
+#include "walker_prop.h"
 
 
 /// A Hand that move with discrete steps of fixed size along a Fiber
@@ -44,8 +44,8 @@ private:
 public:
     
     /// Property
-    WalkerProp const* prop;
-    
+    WalkerProp const* prop() const { return static_cast<WalkerProp const*>(Hand::prop); }
+
     /// constructor
     Walker(WalkerProp const*, HandMonitor*);
     

@@ -9,7 +9,7 @@
 
 
 Chewer::Chewer(ChewerProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
     engaged = NO_END;
 }
@@ -37,7 +37,7 @@ void Chewer::stepUnloaded()
         return;
     }
 
-    real a = hAbs + prop->diffusion_dt * RNG.sreal();
+    real a = hAbs + prop()->diffusion_dt * RNG.sreal();
     
     if ( a <= hFiber->abscissaM() )
     {
@@ -51,7 +51,7 @@ void Chewer::stepUnloaded()
         engaged = PLUS_END;
     }
     
-    if ( engaged && RNG.test_not(prop->hold_growing_end) )
+    if ( engaged && RNG.test_not(prop()->hold_growing_end) )
         return detach();
 
     moveTo(a);
@@ -75,7 +75,7 @@ void Chewer::stepLoaded(Vector const& force)
     
     // the load is the projection of the force on the local direction of Fiber
     real load = dot(force, dirFiber());
-    real a = hAbs + prop->diffusion_dt * RNG.sreal() + prop->mobility_dt * load;
+    real a = hAbs + prop()->diffusion_dt * RNG.sreal() + prop()->mobility_dt * load;
     
     const real m = hFiber->abscissaM();
     const real p = hFiber->abscissaP();
@@ -92,7 +92,7 @@ void Chewer::stepLoaded(Vector const& force)
         engaged = PLUS_END;
     }
     
-    if ( engaged && RNG.test_not(prop->hold_growing_end) )
+    if ( engaged && RNG.test_not(prop()->hold_growing_end) )
         return detach();
 
     moveTo(a);

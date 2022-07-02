@@ -30,8 +30,8 @@ class Digit : public Hand
 public:
     
     /// Property
-    DigitProp const* prop;
-    
+    DigitProp const* prop() const { return static_cast<DigitProp const*>(Hand::prop); }
+
     /// constructor
     Digit(DigitProp const*, HandMonitor*);
     
@@ -73,8 +73,8 @@ public:
     
 #else
 
-    lati_t site() const { return (lati_t)std::round(hAbs/prop->step_size); }
-    bool outsideMP(lati_t s) const { return fiber()->outsideMP((s+0.5)*prop->step_size); }
+    lati_t site() const { return (lati_t)std::round(hAbs/prop()->step_size); }
+    bool outsideMP(lati_t s) const { return fiber()->outsideMP((s+0.5)*prop()->step_size); }
     bool occupied(FiberLattice* lat, lati_t s) const { return false; }
     bool vacant(lati_t) const { return true; }
     void inc() const {}

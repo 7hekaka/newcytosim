@@ -4,7 +4,7 @@
 #define MIGHTY_H
 
 #include "hand.h"
-class MightyProp;
+#include "mighty_prop.h"
 
 /// A Hand that can move and do other things to a Fiber
 /**
@@ -26,8 +26,8 @@ private:
 public:
     
     /// Property
-    MightyProp const* prop;
-   
+    MightyProp const* prop() const { return static_cast<MightyProp const*>(Hand::prop); }
+
     /// constructor
     Mighty(MightyProp const*, HandMonitor* h);
 

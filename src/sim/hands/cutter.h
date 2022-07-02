@@ -4,7 +4,7 @@
 #define CUTTER_H
 
 #include "hand.h"
-class CutterProp;
+#include "cutter_prop.h"
 
 /// A Hand that can cut a Fiber
 /**
@@ -29,8 +29,8 @@ private:
 public:
     
     /// Property
-    CutterProp const* prop;
-    
+    CutterProp const* prop() const { return static_cast<CutterProp const*>(Hand::prop); }
+
     /// constructor
     Cutter(CutterProp const*, HandMonitor*);
     

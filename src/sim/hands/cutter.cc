@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 Cutter::Cutter(CutterProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
     nextAct = RNG.exponential();
 }
@@ -28,7 +28,7 @@ void Cutter::cut()
      This is why the call sever() here only register the position of the cut,
      that will be performed later.
      */
-    fiber()->sever(abscissa(), prop->new_end_state[0], prop->new_end_state[1]);
+    fiber()->sever(abscissa(), prop()->new_end_state[0], prop()->new_end_state[1]);
     detach();
 }
 
@@ -38,7 +38,7 @@ void Cutter::stepUnloaded()
 {
     assert_true( attached() );
 
-    nextAct -= prop->cutting_rate_dt;
+    nextAct -= prop()->cutting_rate_dt;
     
     if ( nextAct < 0 )
     {
@@ -52,7 +52,7 @@ void Cutter::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
-    nextAct -= prop->cutting_rate_dt;
+    nextAct -= prop()->cutting_rate_dt;
     
     if ( nextAct < 0 )
     {

@@ -9,7 +9,7 @@
 
 
 Dynein::Dynein(DyneinProp const* p, HandMonitor* h)
-: Digit(p,h), prop(p)
+: Digit(p,h)
 {
     ABORT_NOW("unfinished class");
 }
@@ -29,7 +29,7 @@ void Dynein::stepUnloaded()
 {
     assert_true( attached() );
     
-    nextAct -= prop->walking_rate_dt;
+    nextAct -= prop()->walking_rate_dt;
     
     while ( nextAct <= 0 )
     {
@@ -54,7 +54,7 @@ void Dynein::stepLoaded(Vector const& force)
     assert_true( attached() );
     
     // calculate displacement, dependent on the load along the desired direction of displacement
-    real R = prop->walking_rate_dt + dot(force, dirFiber()) * prop->var_rate_dt;
+    real R = prop()->walking_rate_dt + dot(force, dirFiber()) * prop()->var_rate_dt;
 
     nextAct -= max_real(0, R);
 

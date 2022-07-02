@@ -4,7 +4,7 @@
 #define CHEWER_H
 
 #include "hand.h"
-class ChewerProp;
+#include "chewer_prop.h"
 
 /// A Hand that can eat Fibers at their ends
 /**
@@ -40,8 +40,8 @@ private:
 public:
     
     /// Property
-    ChewerProp const* prop;
-    
+    ChewerProp const* prop() const { return static_cast<ChewerProp const*>(Hand::prop); }
+
     /// constructor
     Chewer(ChewerProp const*, HandMonitor*);
     

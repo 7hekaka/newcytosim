@@ -37,10 +37,10 @@ private:
     Motor();
 
 public:
-    
+
     /// Property
-    MotorProp const* prop;
-    
+    MotorProp const* prop() const { return static_cast<MotorProp const*>(Hand::prop); }
+
     /// constructor
     Motor(MotorProp const*, HandMonitor*);
     

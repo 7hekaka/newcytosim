@@ -4,7 +4,7 @@
 #define NUCLEATOR_H
 
 #include "hand.h"
-class NucleatorProp;
+#include "nucleator_prop.h"
 
 /// A Hand that can nucleate a Fiber
 /**
@@ -40,8 +40,8 @@ private:
 public:
     
     /// Property
-    NucleatorProp const* prop;
-    
+    NucleatorProp const* prop() const { return static_cast<NucleatorProp const*>(Hand::prop); }
+
     /// constructor
     Nucleator(NucleatorProp const*, HandMonitor*);
     

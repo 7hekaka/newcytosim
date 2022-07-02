@@ -3,7 +3,7 @@
 #define SLIDER_H
 
 #include "hand.h"
-class SliderProp;
+#include "slider_prop.h"
 
 /// A Hand that will move on a Fiber passively with viscous resistance
 /**
@@ -30,8 +30,8 @@ private:
 public:
     
     /// Property
-    SliderProp const* prop;
-    
+    SliderProp const* prop() const { return static_cast<SliderProp const*>(Hand::prop); }
+
     /// constructor
     Slider(SliderProp const*, HandMonitor*);
 

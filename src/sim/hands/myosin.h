@@ -4,7 +4,7 @@
 #define MYOSIN_H
 
 #include "digit.h"
-class MyosinProp;
+#include "myosin_prop.h"
 
 
 /// A model of the myosin motor with discrete stepping
@@ -30,8 +30,8 @@ private:
 public:
     
     /// Property
-    MyosinProp const* prop;
-    
+    MyosinProp const* prop() const { return static_cast<MyosinProp const*>(Hand::prop); }
+
     /// constructor
     Myosin(MyosinProp const*, HandMonitor*);
     

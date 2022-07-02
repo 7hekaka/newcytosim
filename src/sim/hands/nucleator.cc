@@ -13,7 +13,7 @@
 //------------------------------------------------------------------------------
 
 Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
     nextAct = RNG.exponential();
 }
@@ -34,7 +34,7 @@ void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string 
         Vector dir = h->dirFiber();
         // select rotation to align with direction of 'mother' fiber:
         rot = Rotation::randomRotationToVector(dir);
-        real A = prop->nucleation_angle;
+        real A = prop()->nucleation_angle;
         // add deviation 'nucleation_angle' in branching
         real L = hMonitor->linkRestingLength();
 #if ( DIM == 2 )
@@ -78,14 +78,14 @@ void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string 
     ObjectSet::rotateObjects(objs, rot);
     /*
      We translate Fiber to match the Nucleator's position,
-     and if prop->hold_end, the Hand is attached to the new fiber
+     and if prop()->hold_end, the Hand is attached to the new fiber
      */
-    if ( prop->hold_end == MINUS_END )
+    if ( prop()->hold_end == MINUS_END )
     {
         attachEnd(fib, MINUS_END);
         pos -= fib->posEndM();
     }
-    else if ( prop->hold_end == PLUS_END )
+    else if ( prop()->hold_end == PLUS_END )
     {
         attachEnd(fib, PLUS_END);
         pos -= fib->posEndP();
@@ -109,15 +109,15 @@ void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
 {
     assert_false( attached() );
     
-    nextAct -= prop->rate_dt;
+    nextAct -= prop()->rate_dt;
     
     if ( nextAct < 0 )
     {
         nextAct = RNG.exponential();
         try {
             ObjectList objs;
-            Glossary opt(prop->fiber_spec);
-            makeFiber(objs, sim, pos, prop->fiber_type, opt);
+            Glossary opt(prop()->fiber_spec);
+            makeFiber(objs, sim, pos, prop()->fiber_type, opt);
             sim.add(objs);
         }
         catch( Exception & e )
@@ -134,16 +134,16 @@ void Nucleator::stepUnloaded()
     assert_true( attached() );
     
     /// OPTION 1: delete entire fiber
-    if ( prop->addictive == 2 )
+    if ( prop()->addictive == 2 )
     {
         delete(fiber());
         return;
     }
     
     // may track the end of the Fiber:
-    if ( prop->track_end == MINUS_END )
+    if ( prop()->track_end == MINUS_END )
         relocateM();
-    else if ( prop->track_end == PLUS_END )
+    else if ( prop()->track_end == PLUS_END )
         relocateP();
 }
 
@@ -153,9 +153,9 @@ void Nucleator::stepLoaded(Vector const& force)
     assert_true( attached() );
     
     // may track the end of the Fiber:
-    if ( prop->track_end == MINUS_END )
+    if ( prop()->track_end == MINUS_END )
         relocateM();
-    else if ( prop->track_end == PLUS_END )
+    else if ( prop()->track_end == PLUS_END )
         relocateP();
 }
 
@@ -163,7 +163,7 @@ void Nucleator::stepLoaded(Vector const& force)
 void Nucleator::detach()
 {
     // if `addictive`, give a poisonous goodbye-kiss to the fiber
-    if ( prop->addictive )
+    if ( prop()->addictive )
         fiber()->setEndState(nearestEnd(), STATE_RED);
     
     Hand::detach();

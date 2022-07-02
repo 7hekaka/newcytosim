@@ -4,7 +4,7 @@
 #define DYNEIN_H
 
 #include "digit.h"
-class DyneinProp;
+#include "dynein_prop.h"
 
 
 /// A model of the dynein motor with discrete stepping
@@ -30,7 +30,7 @@ private:
 public:
     
     /// Property
-    DyneinProp const* prop;
+    DyneinProp const* prop() const { return static_cast<DyneinProp const*>(Hand::prop); }
     
     /// constructor
     Dynein(DyneinProp const*, HandMonitor*);

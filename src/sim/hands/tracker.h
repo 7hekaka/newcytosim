@@ -3,7 +3,7 @@
 #define TRACKER_H
 
 #include "hand.h"
-class TrackerProp;
+#include "tracker_prop.h"
 
 /// A Hand that only binds near the end of a Fiber
 /**
@@ -29,8 +29,8 @@ private:
 public:
     
     /// Property
-    TrackerProp const* prop;
-   
+    TrackerProp const* prop() const { return static_cast<TrackerProp const*>(Hand::prop); }
+
     /// constructor
     Tracker(TrackerProp const*, HandMonitor* h);
     

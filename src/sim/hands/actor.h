@@ -4,7 +4,7 @@
 #define ACTOR_H
 
 #include "hand.h"
-class ActorProp;
+#include "actor_prop.h"
 
 /// A Hand that can act on a Fiber
 /**
@@ -26,8 +26,8 @@ private:
 public:
     
     /// Property
-    ActorProp const* prop;
-    
+    ActorProp const* prop() const { return static_cast<ActorProp const*>(Hand::prop); }
+
     /// constructor
     Actor(ActorProp const*, HandMonitor*);
     

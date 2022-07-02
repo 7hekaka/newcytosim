@@ -8,7 +8,7 @@
 
 
 Mighty::Mighty(MightyProp const* p, HandMonitor* h)
-: Hand(p, h), prop(p)
+: Hand(p, h)
 {
 }
 
@@ -26,25 +26,25 @@ void Mighty::stepUnloaded()
 {
     assert_true( attached() );
     
-    real a = hAbs + prop->set_speed_dt;
+    real a = hAbs + prop()->set_speed_dt;
     
     if ( a < hFiber->abscissaM() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaP();
     }
     
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
+    nextDetach -= prop()->unbinding_density * abs_real(a-hAbs);
     if ( nextDetach <= 0 )
         return detach();
 
@@ -60,34 +60,34 @@ void Mighty::stepLoaded(Vector const& force)
     real load = dot(force, dirFiber());
     
     // calculate load-dependent displacement:
-    real dab = prop->set_speed_dt + load * prop->var_speed_dt;
+    real dab = prop()->set_speed_dt + load * prop()->var_speed_dt;
     
     // possibly limit the range of the speed:
-    if ( prop->limit_speed )
+    if ( prop()->limit_speed )
     {
-        dab = std::max(dab, prop->min_dab);
-        dab = std::min(dab, prop->max_dab);
+        dab = std::max(dab, prop()->min_dab);
+        dab = std::min(dab, prop()->max_dab);
     }
     
     real a = hAbs + dab;
     
     if ( a < hFiber->abscissaM() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaP();
     }
     
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
-    nextDetach -= prop->unbinding_density * abs_real(a-hAbs);
+    nextDetach -= prop()->unbinding_density * abs_real(a-hAbs);
     
     if ( nextDetach <= 0 )
         return detach();

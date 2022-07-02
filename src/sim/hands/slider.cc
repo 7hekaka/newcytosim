@@ -8,7 +8,7 @@
 
 
 Slider::Slider(SliderProp const* p, HandMonitor* h)
-: Hand(p,h), prop(p)
+: Hand(p,h)
 {
 }
 
@@ -25,18 +25,18 @@ void Slider::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
-    real a = hAbs + dot(force, dirFiber()) * prop->mobility_dt;
+    real a = hAbs + dot(force, dirFiber()) * prop()->mobility_dt;
     
     if ( a < hFiber->abscissaM() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
-        if ( RNG.test_not(prop->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
         a = hFiber->abscissaP();
     }
