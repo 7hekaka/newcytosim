@@ -6,6 +6,9 @@
 #include "event.h"
 #include "hands/digit.h"
 #include "hands/walker.h"
+#include "hands/cutter.h"
+#include "hands/motor.h"
+#include "hands/mighty.h"
 #include "singles/picket.h"
 #include "singles/picket_long.h"
 #include "singles/wrist.h"
@@ -77,9 +80,12 @@ int main(int argc, char* argv[])
         PRINT(Space);
                 
         PRINT(Hand);
+        PRINT(Motor);
+        PRINT(Cutter);
         PRINT(Digit);
         PRINT(Walker);
-        
+        PRINT(Mighty);
+
         PRINT(Single);
         PRINT(Picket);
         PRINT(PicketLong);
