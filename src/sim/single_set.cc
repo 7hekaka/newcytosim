@@ -198,9 +198,9 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
    This defines from which position the abscissa is measured.
  .
  */
-void SingleSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void SingleSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
-    SingleProp * p = simul_.findProperty<SingleProp>("single", name);
+    SingleProp const* pp = static_cast<SingleProp const*>(p);
     
     Single * obj = nullptr;
     std::string str;
@@ -214,10 +214,10 @@ void SingleSet::newObjects(ObjectList& res, const std::string& name, Glossary& o
         if ( opt.set(str, "base", 1) )
             ip = mec->point_index(str);
          
-        obj = p->newWrist(mec, ip);
+        obj = pp->newWrist(mec, ip);
     }
     else
-        obj = p->newSingle();
+        obj = pp->newSingle();
 
     // Allow user to attach Hand to an existing fiber
     if ( opt.has_key("attach") )

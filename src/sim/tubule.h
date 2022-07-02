@@ -45,7 +45,7 @@ public:
     Tubule() : prop(nullptr) { reset(); }
     
     /// constructor
-    Tubule(TubuleProp * p);
+    Tubule(TubuleProp const*);
 
     /// destructor
     ~Tubule();

@@ -61,8 +61,9 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
 
  */
 
-void BeadSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void BeadSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
+    BeadProp const* pp = static_cast<BeadProp const*>(p);
     real rad = -1;
     size_t inx = 2;
 
@@ -94,8 +95,7 @@ void BeadSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt
     if ( rad <= 0 )
         throw InvalidParameter("bead:radius must be specified and > 0");
 
-    BeadProp * p = simul_.findProperty<BeadProp>("bead", name);
-    Bead * obj = new Bead(p, Vector(0,0,0), rad);
+    Bead * obj = new Bead(pp, Vector(0,0,0), rad);
     
     res.push_back(obj);
     

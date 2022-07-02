@@ -80,19 +80,18 @@ Object * OrganizerSet::newObject(const ObjectTag tag, PropertyID pid)
 }
 
 
-void OrganizerSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void OrganizerSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
     Organizer * obj = nullptr;
-    Property * p = simul_.properties.find_or_die(name);
     
     if ( p->category() == "aster" )
-        obj = new Aster(static_cast<AsterProp*>(p));
+        obj = new Aster(static_cast<AsterProp const*>(p));
     else if ( p->category() == "bundle" )
-        obj = new Bundle(static_cast<BundleProp*>(p));
+        obj = new Bundle(static_cast<BundleProp const*>(p));
     else if ( p->category() == "nucleus" )
-        obj = new Nucleus(static_cast<NucleusProp*>(p));
+        obj = new Nucleus(static_cast<NucleusProp const*>(p));
     else if ( p->category() == "fake" )
-        obj = new Fake(static_cast<FakeProp*>(p));
+        obj = new Fake(static_cast<FakeProp const*>(p));
 
     if ( obj )
     {

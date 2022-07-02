@@ -278,13 +278,13 @@ Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
  .
  
  */
-void CoupleSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void CoupleSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
-    CoupleProp * p = simul_.findProperty<CoupleProp>("couple", name);
-    Couple * obj = p->newCouple(&opt);
+    CoupleProp const* pp = static_cast<CoupleProp const*>(p);
+    Couple * obj = pp->newCouple(&opt);
     
     res.push_back(obj);
-        
+    
     // Allow user to attach hand1:
     if ( opt.has_key("attach1") )
         obj->attach1(simul_.fibers.someSite("attach1", opt));

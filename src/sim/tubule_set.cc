@@ -58,11 +58,11 @@ Object * TubuleSet::newObject(const ObjectTag tag, PropertyID pid)
      {
      }
  */
-void TubuleSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void TubuleSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
-    TubuleProp * p = simul_.findProperty<TubuleProp>("tubule", name);
-    Tubule * o = new Tubule(p);
-    o->build(res, p->radius, opt, simul_);
+    TubuleProp const* pp = static_cast<TubuleProp const*>(p);
+    Tubule * o = new Tubule(pp);
+    o->build(res, pp->radius, opt, simul_);
     res.push_back(o);
 }
 

@@ -81,10 +81,10 @@ Object * SolidSet::newObject(const ObjectTag tag, PropertyID pid)
 /**
 @ref Solid::build
  */
-void SolidSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void SolidSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
-    SolidProp * p = simul_.findProperty<SolidProp>("solid", name);
-    Solid * obj = new Solid(p);
+    SolidProp const* pp = static_cast<SolidProp const*>(p);
+    Solid * obj = new Solid(pp);
     
     obj->build(res, opt, simul_);
     res.push_back(obj);

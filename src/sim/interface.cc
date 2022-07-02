@@ -329,12 +329,13 @@ void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet*
 {
     size_t ouf = 0, nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
+    Property const* pp = sim_->properties.find_or_die(name);
 
     objs.clear();
     do {
         
         // create the objects:
-        set->newObjects(objs, name, opt);
+        set->newObjects(objs, pp, opt);
         
 #if ( 0 )
         // check for `nullptr` in list, which should not happen:
@@ -513,7 +514,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
  */
 void Interface::execute_new(std::string const& name, size_t cnt)
 {
-    Property * pp = sim_->properties.find_or_die(name);
+    Property const* pp = sim_->properties.find_or_die(name);
     ObjectSet * set = sim_->findSet(pp->category());
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
@@ -525,7 +526,7 @@ void Interface::execute_new(std::string const& name, size_t cnt)
     ObjectList objs(4, 4);
     for ( size_t n = 0; n < cnt; ++n )
     {
-        set->newObjects(objs, name, opt);
+        set->newObjects(objs, pp, opt);
         
         if ( objs.empty() )
             throw InvalidSyntax("could not create object class of `"+name+"'");

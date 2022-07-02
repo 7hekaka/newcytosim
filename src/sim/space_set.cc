@@ -145,14 +145,14 @@ Object * SpaceSet::newObject(const ObjectTag tag, PropertyID pid)
      }
  
  */
-void SpaceSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void SpaceSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
-    SpaceProp * p = simul_.findProperty<SpaceProp>("space", name);
-    Space * obj = p->newSpace(opt);
+    SpaceProp const* pp = static_cast<SpaceProp const*>(p);
+    Space * obj = pp->newSpace(opt);
 
     if ( !obj )
     {
-        throw InvalidParameter("unknown space:shape `"+p->shape+"'");
+        throw InvalidParameter("unknown space:shape `"+pp->shape+"'");
         //std::cerr << "Warning: substituting unbounded Space for unknown `"+p->shape+"'\n";
         //obj = new Space(p);
     }

@@ -115,10 +115,10 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
 
  @}
  */
-Fiber * FiberSet::newFiber(ObjectList& res, const std::string& name, Glossary& opt)
+Fiber * FiberSet::newFiber(ObjectList& res, const Property* p, Glossary& opt)
 {
-    FiberProp * fp = simul_.findProperty<FiberProp>("fiber", name);
-    Fiber * fib = fp->newFiber(opt);
+    FiberProp const* pp = static_cast<FiberProp const*>(p);
+    Fiber * fib = pp->newFiber(opt);
     fib->birthTime(simul_.time());
     res.push_back(fib);
     
@@ -198,6 +198,13 @@ Fiber * FiberSet::newFiber(ObjectList& res, const std::string& name, Glossary& o
         var = "attach" + std::to_string(++inp);
     }
     return fib;
+}
+
+
+Fiber * FiberSet::newFiber(ObjectList& res, const std::string& name, Glossary& opt)
+{
+    FiberProp * pp = simul_.findProperty<FiberProp>("fiber", name);
+    return newFiber(res, pp, opt);
 }
 
 /**

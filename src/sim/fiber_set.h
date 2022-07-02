@@ -38,10 +38,13 @@ public:
     Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
+    Fiber * newFiber(ObjectList&, const Property* p, Glossary& opt);
+    
+    /// create objects of class `name`, given the options provided in `opt`
     Fiber * newFiber(ObjectList&, const std::string& name, Glossary& opt);
 
     /// create objects of class `name`, given the options provided in `opt`
-    void newObjects(ObjectList& list, const std::string& name, Glossary& opt) { newFiber(list, name, opt); }
+    void newObjects(ObjectList& list, const Property* p, Glossary& opt) { newFiber(list, p, opt); }
 
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);

@@ -28,7 +28,7 @@ public:
     Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
     /// create objects of class `name`, given the options provided in `opt`
-    void newObjects(ObjectList&, const std::string& name, Glossary& opt);
+    void newObjects(ObjectList&, const Property*, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);

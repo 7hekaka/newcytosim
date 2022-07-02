@@ -16,7 +16,7 @@ void Tubule::step()
 }
 
 
-Tubule::Tubule(TubuleProp * p) : prop(p)
+Tubule::Tubule(TubuleProp const* p) : prop(p)
 {
     reset();
 }

@@ -123,7 +123,7 @@ public:
     virtual Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const = 0;
     
     /// create Objects of class `name`, given the options provided in `opt`
-    virtual void newObjects(ObjectList&, const std::string& name, Glossary& opt) = 0;
+    virtual void newObjects(ObjectList&, const Property*, Glossary& opt) = 0;
     
     /// create Object with given Tag and PropertyID (used for reading trajectory file)
     virtual Object * newObject(ObjectTag, PropertyID) = 0;

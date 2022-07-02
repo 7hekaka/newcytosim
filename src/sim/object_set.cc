@@ -560,7 +560,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     if ( !obj )
     {
         assert_true(isprint(tag));
-        // create new object of required class
+        // create new object of required class, indentified by property-id
         obj = newObject(tag, pid);
         assert_true(obj);
         update = true;

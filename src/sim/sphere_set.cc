@@ -35,10 +35,9 @@ Object * SphereSet::newObject(const ObjectTag tag, PropertyID pid)
 /**
  @copydetails Sphere::build
  */
-void SphereSet::newObjects(ObjectList& res, const std::string& name, Glossary& opt)
+void SphereSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 {
-    SphereProp * p = simul_.findProperty<SphereProp>("sphere", name);
-        
+    SphereProp const* pp = static_cast<SphereProp const*>(p);
     // set radius if provided as argument
     real rad = -1;
     if ( !opt.set(rad, "radius" ) || rad <= 0 )
@@ -55,7 +54,7 @@ void SphereSet::newObjects(ObjectList& res, const std::string& name, Glossary& o
         rad = r;
     }
     
-    Sphere * obj = new Sphere(p, rad);
+    Sphere * obj = new Sphere(pp, rad);
     obj->build(res, opt, simul_);
     res.push_back(obj);
 }
