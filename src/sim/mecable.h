@@ -236,9 +236,12 @@ public:
     Vector interpolatePoints(size_t ref, real const coef[], size_t rank) const;
 
     //--------------------------------------------------------------------------
-    
+
     /// Allocate memory to store given number of vertices
-    virtual size_t allocateMecable(size_t);
+    real * allocateMemory(size_t, size_t, size_t);
+
+    /// Allocate memory to store given number of vertices
+    virtual void allocateMecable(size_t n) { allocateMemory(n, 0, 0); }
     
     /// free allocated memory
     void release();

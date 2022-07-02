@@ -66,7 +66,7 @@ private:
     real * soShape;
     
     /// the number of points when fixShape() was last called, used for verifications.
-    size_t soShapeSize;
+    size_t soAmount;
     
     /// the reduced total (all points summed) drag coefficient for translation
     real soDrag;
@@ -74,8 +74,8 @@ private:
     /// the reduced total drag coefficient for rotation
     real soDragRot;
 
-    /// second momentum of the reference shape
-    real soShapeSqr;
+    /// second moment of the reference shape
+    real soVariance;
     
     /// a counter used in reshape()
     unsigned int soReshapeTimer;
@@ -118,7 +118,7 @@ public:
     //------------------------------- Mecable ----------------------------------
     
     /// allocate memory
-    size_t allocateMecable(size_t);
+    void allocateMecable(size_t);
     
     /// free allocated memory
     void release();

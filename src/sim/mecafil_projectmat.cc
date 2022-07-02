@@ -19,9 +19,9 @@ void Mecafil::initProjection()
 }
 
 
-void Mecafil::allocateProjection(const size_t ms)
+void Mecafil::allocateProjection(const size_t ms, real*)
 {
-    //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
+    //std::clog << reference() << "allocateProjection(" << ms << ")\n";
     free_real(iProj);
     free_real(iDProj);
     free_real(iJJtiJ);

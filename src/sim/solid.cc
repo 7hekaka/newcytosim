@@ -129,10 +129,10 @@ void Solid::setInteractions(Meca& meca) const
 
 void Solid::reset()
 {
-    soRadius    = nullptr;
-    soShape     = nullptr;
-    soShapeSize = 0;
-    soDrag      = 0;
+    soRadius = nullptr;
+    soShape  = nullptr;
+    soAmount = 0;
+    soDrag   = 0;
 #if ( DIM > 2 )
     soMomentum = Matrix33(0, 1);
 #endif
@@ -191,49 +191,23 @@ Solid::~Solid()
 /**
  This extends Mecable::allocateMecable().
  */
-size_t Solid::allocateMecable(const size_t nbp)
+void Solid::allocateMecable(const size_t nbp)
 {
-    //If Mecable::allocatePoints() allocated memory, it will return the
-    //size of the new array, and in that case, the same size is allocated for other arrays.
-    size_t ms = Mecable::allocateMecable(nbp);
-    if ( ms )
+    real * ptr = Mecable::allocateMemory(nbp, 1, DIM);
+    if ( ptr )
     {
-        //std::clog << "Solid::allocatePoints " << ms << '\n';
-        
-        // allocate a new array of the right size:
-        real  *  shp = new_real(DIM*ms);
-        real  *  rad = new_real(ms);
-        
-        //set the radii to zero (no drag) by default:
-        for ( size_t p = 0; p < ms; ++p )
-            rad[p] = 0;
-        
-        // copy the current values in the new array:
-        if ( soShape )
-        {
-            for ( size_t p = 0; p < nPoints; ++p )
-            {
-                rad[p] = soRadius[p];
-                for ( size_t d = 0; d < DIM; ++d )
-                    shp[DIM*p+d] = soShape[DIM*p+d];
-            }
-            // delete the 'current' array:
-            free_real(soShape);
-            free_real(soRadius);
-        }
-        // the 'new' array becomes the 'current' one:
-        soShape = shp;
-        soRadius = rad;
+        size_t all = allocated();
+        //std::clog << "Solid::allocateMecable " << all << '\n';
+        soRadius = ptr;
+        soShape = ptr + all;
+        //print(std::clog, 0);
     }
-    return ms;
 }
 
 
 void Solid::release()
 {
-    free_real(soRadius);
     soRadius = nullptr;
-    free_real(soShape);
     soShape = nullptr;
 }
 
@@ -751,12 +725,12 @@ void Solid::fixShape()
     calculateMomentum(avg, dev);
     
     // store momentum of the current shape:
-    soShapeSqr = dev.e_sum();
+    soVariance = dev.e_sum();
     
     //we store the current points:
-    soShapeSize = nPoints;
+    soAmount = nPoints;
     // set reference to current shape translated to be centered:
-    for ( size_t p = 0; p < soShapeSize; ++p )
+    for ( size_t p = 0; p < soAmount; ++p )
     {
         ( Vector(pPos+DIM*p) - avg ).store(soShape+DIM*p);
         //for ( size_t d = 0; d < DIM; ++d )
@@ -773,16 +747,16 @@ void Solid::fixShape()
 void Solid::scaleShape(const real mag[DIM])
 {
     //scale in only in the specified dimension
-    for ( size_t p = 0; p < soShapeSize; ++p )
+    for ( size_t p = 0; p < soAmount; ++p )
     {
         for ( size_t d = 0; d < DIM; ++d )
             soShape[DIM*p+d] *= mag[d];
     }
     
     //recalculate the momentum needed in rescale():
-    soShapeSqr = 0;
-    for ( size_t i = 0; i < DIM * soShapeSize; ++i )
-        soShapeSqr += soShape[i] * soShape[i];
+    soVariance = 0;
+    for ( size_t i = 0; i < DIM * soAmount; ++i )
+        soVariance += soShape[i] * soShape[i];
 }
 
 
@@ -801,8 +775,8 @@ void Solid::rescale()
     
     if ( M > 0 )
     {
-        // calculate the scaling factor to restore the size to 'soShapeSqr':
-        real mag = std::sqrt( soShapeSqr / M );
+        // calculate the scaling factor to restore the size to 'soVariance':
+        real mag = std::sqrt( soVariance / M );
     
         // scale the shape around the center of gravity:
         for ( size_t p = 0; p < nPoints; ++p )
@@ -833,8 +807,8 @@ void Solid::rescale()
 void Solid::reshape()
 {    
     //we check that the number of points is the same as when fixShape() was called.
-    if ( soShapeSize != nPoints )
-        ABORT_NOW("mismatch with current number of points: forgot to call fixShape()?");
+    if ( soAmount != nPoints )
+        ABORT_NOW("mismatch with current number of points: fixShape() not called?");
          
     real cc = 0, a = 0;
     for ( size_t i = 0; i < nPoints; ++i )
@@ -855,8 +829,8 @@ void Solid::reshape()
 void Solid::reshape()
 {    
     // the number of points should be the same as when fixShape() was called.
-    if ( soShapeSize != nPoints )
-        ABORT_NOW("mismatch with current number of points: forgot to call fixShape()?");
+    if ( soAmount != nPoints )
+        ABORT_NOW("mismatch with current number of points: fixShape() not called?");
     
     Vector avg = Mecable::position();
     
@@ -898,8 +872,8 @@ void Solid::reshape()
 void Solid::reshape()
 {
     // the number of points should be the same as when fixShape() was called.
-    if ( soShapeSize != nPoints )
-        ABORT_NOW("mismatch with current number of points: fixShape() was not called?");
+    if ( soAmount != nPoints )
+        ABORT_NOW("mismatch with current number of points: fixShape() not called?");
     
     /*
      We follow the procedure described by Berthold K.P. Horn in

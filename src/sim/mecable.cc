@@ -77,34 +77,39 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
 
 
 /**
- allocateMecable(size) ensures that the set can hold `size` points
- returns: size of new memory allocated, or 0
+ allocateMecable(N) ensures that the object can hold `N` vertices
+ returns: pointer to new memory allocated, or zero if no allocation was necessary
  some extra space is allowed in 3D to allow for AVX overspill
  */
-size_t Mecable::allocateMecable(const size_t nbp)
+real* Mecable::allocateMemory(const size_t nbp, size_t add, size_t top)
 {
     pForce = nullptr;
-    if ( pAllocated < nbp )
+    if ( pAllocated < nbp + (DIM==3) )
     {
         size_t all = chunk_real(nbp+(DIM==3));
         // std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
         
-        // allocate memory:
-        real * mem = new_real(DIM*all);
+        // allocate memory for vertices + requested extra:
+        real * mem = new_real(all*(DIM+add+top));
+        // reset the point for a clean start:
+        zero_real(all*(DIM+add+top), mem);
 
-        // retain existing data:
+        // transfer existing data:
         if ( pPos )
         {
             assert_true(nPoints < all);
-            copy_real(DIM*nPoints, pPos, mem);
+            // copy vertex coordinates:
+            copy_real(nPoints*DIM, pPos, mem);
+            // copy additional chunks of data:
+            copy_real(nPoints*add, pPos+pAllocated*DIM, mem+all*DIM);
+            copy_real(nPoints*top, pPos+pAllocated*(DIM+add), mem+all*(DIM+add));
             free_real(pPos);
         }
         pPos = mem;
-        pAllocated = all-(DIM==3);
-        return all;
+        pAllocated = all;
+        return mem + all * DIM;
     }
-    
-    return 0;
+    return nullptr;
 }
 
 
@@ -370,8 +375,7 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
     try
     {
         size_t nb = in.readUInt16();
-        if ( allocateMecable(nb) )
-            resetPoints();    //we reset the point for a clean start
+        allocateMecable(nb);
         nPoints = nb;
 #if !REAL_IS_DOUBLE
         in.readFloats(nb, pPos, DIM);

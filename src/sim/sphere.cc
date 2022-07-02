@@ -22,7 +22,7 @@
  The Sphere is made with no point
  */
 Sphere::Sphere(SphereProp const* p)
-: spRadius(0), spDrag(0), spDragRot(0), sRad(nullptr), prop(p)
+: spRadius(0), spDrag(0), spDragRot(0), sDir(nullptr), prop(p)
 {
 }
 
@@ -31,7 +31,7 @@ Sphere::Sphere(SphereProp const* p)
  This will initialize with a center point and references
  */
 Sphere::Sphere(SphereProp const* p, real rad)
-: spRadius(rad), spDrag(0), spDragRot(0), sRad(nullptr), prop(p)
+: spRadius(rad), spDrag(0), spDragRot(0), sDir(nullptr), prop(p)
 {
     if ( !prop )
         throw InvalidParameter("Sphere:prop should be specified");
@@ -56,7 +56,7 @@ Sphere::Sphere(SphereProp const* p, real rad)
 
 
 Sphere::Sphere(const Sphere & o)
-: Mecable(o), sRad(nullptr)
+: Mecable(o), sDir(nullptr)
 {
     prop     = o.prop;
     spRadius = o.spRadius;
@@ -300,22 +300,16 @@ void Sphere::setDragCoefficient()
 //------------------------------------------------------------------------------
 #pragma mark - Mecable
 
-size_t Sphere::allocateMecable(size_t nbp)
+void Sphere::allocateMecable(size_t nbp)
 {
-    size_t ms = Mecable::allocateMecable(nbp);
-    if ( ms )
-    {
-        free_real(sRad);
-        sRad = new_real(DIM*ms);
-    }
-    return ms;
+    real * ptr = Mecable::allocateMemory(nbp, 1, 0);
+    if ( ptr )
+        sDir = ptr;
 }
 
 
 void Sphere::release()
 {
-    free_real(sRad);
-    sRad = nullptr;
 }
 
 
@@ -523,10 +517,10 @@ void Sphere::makeProjection()
     real curv = 1.0 / spRadius;
     for ( size_t p = nbRefPoints; p < nPoints; ++p )
     {
-        real * ppp = sRad + DIM * p;
+        real * dir = sDir + DIM * p;
         real * pos = pPos + DIM * p;
         for ( size_t d = 0; d < DIM; ++d )
-            ppp[d] = curv * ( pos[d] - pPos[d] );
+            dir[d] = curv * ( pos[d] - pPos[d] );
     }
 }
 
@@ -590,7 +584,7 @@ void Sphere::projectForces(const real* X, real* Y) const
     {
         real * yyy = Y + DIM * p;
         real * pos = pPos + DIM * p;
-        real * rad = sRad + DIM * p;
+        real * rad = sDir + DIM * p;
         real const* xxx = X + DIM * p;
 #if   ( DIM == 2 )
         real a = rad[0] * xxx[0] + rad[1] * xxx[1];

@@ -28,7 +28,6 @@ Mecafil::Mecafil()
 void Mecafil::release()
 {
     destroyProjection();
-    free_real(iDir);
     iDir = nullptr;
     iLag = nullptr;
     iLLG = nullptr;
@@ -57,39 +56,38 @@ Mecafil& Mecafil::operator=(Mecafil const&)
 
 
 //------------------------------------------------------------------------------
-size_t Mecafil::allocateMecable(const size_t nbp)
+void Mecafil::allocateMecable(const size_t nbp)
 {
-    size_t ms = Mecable::allocateMecable(nbp);
+    size_t add = ADD_PROJECTION_DIFF ? 3 : 2;
+    size_t top = NEW_ANISOTROPIC_FIBER_DRAG ? 3*DIM+1 : DIM+2;
+    real* ptr = Mecable::allocateMemory(nbp, add, top);
     /*
      if Mecable::allocateMecable() allocated memory, it will return the 
      size of the new array, and we allocate the same size for other arrays.
      */
-    if ( ms )
+    if ( ptr )
     {
-        //std::clog << "Mecafil::allocatePoints " << ms << '\n';
-        allocateProjection(ms);
-        
-        // allocate memory:
-        free_real(iDir);
+        size_t all = allocated();
+        //std::clog << "Mecafil::allocateMecable " << ms << '\n';
+        allocateProjection(all, ptr);
         
 #if NEW_ANISOTROPIC_FIBER_DRAG
         // allocations: iDir=DIM*N  iLag=N  iLLG=DIM*N  iAni=DIM*N
-        iDir = new_real(ms*(3*DIM+1));
-        iLag = iDir + ms*DIM;
-        iLLG = iLag + ms;
-        iAni = iLLG + ms*DIM;
+        iDir = ptr + all*add;
+        iLag = iDir + all*DIM;
+        iLLG = iLag + all;
+        iAni = iLLG + all*DIM;
 #else
         // allocations: iDir=DIM*N  iLag=N  iLLG=N
-        iDir = new_real(ms*(DIM+2));
-        iLag = iDir + ms*DIM;
-        iLLG = iLag + ms;
+        iDir = ptr + all*add;
+        iLag = iDir + all*DIM;
+        iLLG = iLag + all;
 #endif
         
         // reset Lagrange multipliers
-        zero_real(ms, iLag);
-        zero_real(ms, iLLG); // generally not needed
+        zero_real(all, iLag);
+        zero_real(all, iLLG); // generally not needed
     }
-    return ms;
 }
 
 
@@ -176,7 +174,7 @@ void Mecafil::storeDirections()
 void Mecafil::initProjection() {}  //DIM == 1
 void Mecafil::makeProjection() {}  //DIM == 1
 void Mecafil::destroyProjection() {}  //DIM == 1
-void Mecafil::allocateProjection(size_t) {}  //DIM == 1
+void Mecafil::allocateProjection(size_t, real*) {}  //DIM == 1
 
 void Mecafil::projectForces(const real* X, real* Y) const
 {

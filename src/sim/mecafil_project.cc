@@ -69,18 +69,15 @@ void Mecafil::initProjection()
 }
 
 
-void Mecafil::allocateProjection(const size_t ms)
+void Mecafil::allocateProjection(const size_t ms, real* mem)
 {
     //std::clog << reference() << "allocateProjection(" << nbp << ")\n";
-    free_real(iJJt);
 #if ADD_PROJECTION_DIFF
-    real * mem = new_real(3*ms);
     //zero_real(3*ms, mem);
     iJJt   = mem;
     iJJtU  = mem + ms;
     iJJtJF = mem + ms * 2;
 #else
-    real * mem = new_real(2*ms);
     //zero_real(2*ms, mem);
     iJJt   = mem;
     iJJtU  = mem + ms;
@@ -91,7 +88,6 @@ void Mecafil::allocateProjection(const size_t ms)
 void Mecafil::destroyProjection()
 {
     //std::clog << reference() << "destroyProjection\n";
-    free_real(iJJt);
     iJJt   = nullptr;
     iJJtU  = nullptr;
 #if ADD_PROJECTION_DIFF

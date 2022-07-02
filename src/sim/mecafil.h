@@ -107,7 +107,7 @@ private:
     void initProjection();
     
     /// allocate memory for the projection
-    void allocateProjection(size_t);
+    void allocateProjection(size_t, real*);
     
     /// free the memory for the projection
     void destroyProjection();
@@ -129,7 +129,7 @@ public:
     //------------------------------- Mecable ----------------------------------
 
     /// allocate memory
-    size_t allocateMecable(size_t);
+    void allocateMecable(size_t);
     
     /// free allocated memory
     void release();

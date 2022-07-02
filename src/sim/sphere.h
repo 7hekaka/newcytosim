@@ -50,7 +50,7 @@ private:
     //--------------------------------------------------------------------------
     
     /// used for projecting forces
-    real * sRad;
+    real * sDir;
 
 public:
     
@@ -77,7 +77,7 @@ public:
     //-------------------------------- info ------------------------------------
 
     /// allocate memory
-    size_t allocateMecable(size_t);
+    void allocateMecable(size_t);
     
     /// free allocated memory
     void release();
