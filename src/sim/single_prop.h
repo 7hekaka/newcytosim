@@ -75,7 +75,7 @@ public:
     int          fast_diffusion;
     
     /// if > 0, the number of candidates for binding considered for `fast_diffusion`
-    size_t       fast_diffusion_nb;
+    size_t       fast_reservoir;
 
 #if NEW_MOBILE_SINGLE
     /// constant drift

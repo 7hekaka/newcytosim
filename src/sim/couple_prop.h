@@ -100,7 +100,7 @@ public:
     int          fast_diffusion;
 
     /// if > 0, the number of candidates for binding considered for `fast_diffusion`
-    size_t       fast_diffusion_nb;
+    size_t       fast_reservoir;
 
     /// if ( trans_activated == 1 ), Hand2 is active only if Hand1 is bound
     /**

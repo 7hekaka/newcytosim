@@ -78,20 +78,20 @@ Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
 
 void SingleProp::clear()
 {
-    hand              = "";
-    hand_prop         = nullptr;
-    stiffness         = 0;
-    length            = 0;
-    diffusion         = 0;
-    fast_diffusion    = false;
-    fast_diffusion_nb = 0;
+    hand           = "";
+    hand_prop      = nullptr;
+    stiffness      = 0;
+    length         = 0;
+    diffusion      = 0;
+    fast_diffusion = false;
+    fast_reservoir = 0;
 #if NEW_MOBILE_SINGLE
     speed.reset();
 #endif
-    activity          = "diffuse";
-    confine           = CONFINE_INSIDE;
+    activity      = "diffuse";
+    confine       = CONFINE_INSIDE;
     //confine_stiffness = 0;
-    confine_space     = "first";
+    confine_space = "first";
     confine_space_ptr = nullptr;
 }
 
@@ -106,7 +106,7 @@ void SingleProp::read(Glossary& glos)
     else
         glos.set(diffusion,  "diffusion");
     glos.set(fast_diffusion, "fast_diffusion");
-    glos.set(fast_diffusion_nb, "fast_diffusion", 1);
+    glos.set(fast_reservoir, "fast_diffusion", 1);
 #if NEW_MOBILE_SINGLE
     glos.set(speed,          "speed");
 #endif
@@ -200,7 +200,7 @@ void SingleProp::write_values(std::ostream& os) const
     write_value(os, "stiffness",      stiffness);
     write_value(os, "length",         length);
     write_value(os, "diffusion",      diffusion);
-    write_value(os, "fast_diffusion", fast_diffusion, fast_diffusion_nb);
+    write_value(os, "fast_diffusion", fast_diffusion, fast_reservoir);
 #if NEW_MOBILE_SINGLE
     write_value(os, "speed",          speed);
 #endif

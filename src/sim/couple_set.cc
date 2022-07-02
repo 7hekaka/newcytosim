@@ -842,8 +842,8 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
         CoupleList& can = reserve.second;
         
         // assuming (or not) a fixed number of diffusing molecules
-        bool fixed = ( p->fast_diffusion_nb > 0 );
-        size_t cnt = ( fixed ? p->fast_diffusion_nb : can.size());
+        bool fixed = ( p->fast_reservoir > 0 );
+        size_t cnt = ( fixed ? p->fast_reservoir : can.size());
 
         if ( cnt > 0 )
         {

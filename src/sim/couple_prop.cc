@@ -30,23 +30,23 @@ Couple * CoupleProp::newCouple(Glossary*) const
 
 void CoupleProp::clear()
 {
-    hand1             = "";
-    hand2             = "";
-    hand1_prop        = nullptr;
-    hand2_prop        = nullptr;
-    stiffness         = -1;
-    length            = 0;
-    diffusion         = 0;
-    fast_diffusion    = false;
-    fast_diffusion_nb = 0;
-    trans_activated   = 0;
-    min_loop          = 1;
-    specificity       = BIND_ALWAYS;
-    activity          = "diffuse";
+    hand1          = "";
+    hand2          = "";
+    hand1_prop     = nullptr;
+    hand2_prop     = nullptr;
+    stiffness      = -1;
+    length         = 0;
+    diffusion      = 0;
+    fast_diffusion = false;
+    fast_reservoir = 0;
+    trans_activated = 0;
+    min_loop       = 1;
+    specificity    = BIND_ALWAYS;
+    activity       = "diffuse";
     
-    confine           = CONFINE_INSIDE;
+    confine = CONFINE_INSIDE;
     //confine_stiffness = 0;
-    confine_space     = "first";
+    confine_space = "first";
     confine_space_ptr = nullptr;
 }
 
@@ -63,7 +63,7 @@ void CoupleProp::read(Glossary& glos)
     else
         glos.set(diffusion,   "diffusion");
     glos.set(fast_diffusion,  "fast_diffusion");
-    glos.set(fast_diffusion_nb, "fast_diffusion", 1);
+    glos.set(fast_reservoir, "fast_diffusion", 1);
     
     glos.set(trans_activated, "trans_activated");
     // changed 'stiff' to 'min_loop' on 26.04.2020
@@ -176,7 +176,7 @@ void CoupleProp::write_values(std::ostream& os) const
     write_value(os, "stiffness",       stiffness);
     write_value(os, "length",          length);
     write_value(os, "diffusion",       diffusion);
-    write_value(os, "fast_diffusion",  fast_diffusion, fast_diffusion_nb);
+    write_value(os, "fast_diffusion",  fast_diffusion, fast_reservoir);
     write_value(os, "trans_activated", trans_activated);
     write_value(os, "min_loop",        min_loop);
     write_value(os, "specificity",     specificity);
