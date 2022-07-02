@@ -65,7 +65,7 @@ public:
 
 #if FIBER_HAS_LATTICE
     /// default constructor
-    FiberSite() : hFiber(nullptr), hLattice(nullptr), hSite(0), hAbs(0) {}
+    FiberSite() : hFiber(nullptr), hAbs(0), hSite(0), hLattice(nullptr) {}
 #else
     FiberSite() : hFiber(nullptr), hAbs(0) {}
 #endif

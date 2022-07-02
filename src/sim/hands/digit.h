@@ -43,16 +43,16 @@ public:
     bool outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
 
     /// true if given Lattice's site has this footprint's bits set
-    bool occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop->footprint; }
+    bool occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop()->footprint; }
 
     /// true if given Lattice's site is unoccupied (check all footprint bits equal to 1)
-    bool vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop->footprint); }
+    bool vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop()->footprint); }
 
     /// flip footprint bits on current site
-    void inc() const { assert_true(vacant(hSite)); hLattice->data(hSite) ^= prop->footprint; }
+    void inc() const { assert_true(vacant(hSite)); hLattice->data(hSite) ^= prop()->footprint; }
 
     /// flip footprint bits on current site
-    void dec() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacant(hSite)); }
+    void dec() const { hLattice->data(hSite) ^= prop()->footprint; assert_true(vacant(hSite)); }
     
 #elif FIBER_HAS_LATTICE < 0
 

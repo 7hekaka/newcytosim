@@ -33,14 +33,14 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
         
         if ( s < lat->entry() )
         {
-            if ( prop->bind_also_end & MINUS_END )
+            if ( prop()->bind_also_end & MINUS_END )
                 s = lat->entry();
             else
                 return false;
         }
         else if ( lat->fence() < s )
         {
-            if ( prop->bind_also_end & PLUS_END )
+            if ( prop()->bind_also_end & PLUS_END )
                 s = lat->fence();
             else
                 return false;
@@ -50,7 +50,7 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
             return false;
         
         // adjust to match selected lattice site:
-        sit.engageLattice(lat, s, prop->site_shift);
+        sit.engageLattice(lat, s, prop()->site_shift);
 #endif
         return true;
     }
