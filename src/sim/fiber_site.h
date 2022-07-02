@@ -111,7 +111,7 @@ public:
     void reinterpolate() const { Interpolation i = hFiber->interpolate(hAbs); coef_ = i.coef1(); pti_ = i.point1(); }
     
     /// update the Interpolation
-    void reinterpolate(Interpolation const& i) const { coef_ = i.coef1(); pti_ = i.point1();  }
+    void reinterpolate(Interpolation const& i) const { assert_true(i.mecable()==hFiber); coef_ = i.coef1(); pti_ = i.point1();  }
 
     /// move to a different abscissa on the current fiber
     void moveTo(real a) { hAbs = a; reinterpolate(); }
