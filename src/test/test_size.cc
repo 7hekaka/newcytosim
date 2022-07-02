@@ -1,9 +1,22 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "simul.h"
+#include "single_prop.h"
+#include "couple_prop.h"
 #include "event.h"
 #include "hands/digit.h"
 #include "hands/walker.h"
+#include "singles/picket.h"
+#include "singles/picket_long.h"
+#include "singles/wrist.h"
+#include "singles/wrist_long.h"
+#include "couples/couple_long.h"
+#include "couples/shackle.h"
+#include "couples/shackle_long.h"
+#include "couples/bridge.h"
+#include "couples/duo.h"
+#include "couples/duo_long.h"
+#include "couples/fork.h"
 
 #include "matrix11.h"
 #include "matrix22.h"
@@ -43,32 +56,45 @@ int main(int argc, char* argv[])
         PRINT(Rasterizer::Vertex2);
         PRINT(Rasterizer::Vertex2d);
         PRINT(Rasterizer::Vertex3);
-    }
-    else if ( x == 1 )
-    {
+        
         PRINT(Mecapoint);
         PRINT(FiberSegment);
         PRINT(Interpolation);
         PRINT(HandMonitor);
         PRINT(FiberSite);
-        PRINT(Hand);
-        PRINT(Digit);
-        PRINT(Walker);
 
         PRINT(Inventoried);
         PRINT(Movable);
         PRINT(Buddy);
-        
+     }
+    else if ( x == 1 )
+    {
         PRINT(Object);
         PRINT(Mecable);
         PRINT(Chain);
         PRINT(Mecafil);
         PRINT(Fiber);
-        
         PRINT(Space);
-        PRINT(Single);
-        PRINT(Couple);
+                
+        PRINT(Hand);
+        PRINT(Digit);
+        PRINT(Walker);
         
+        PRINT(Single);
+        PRINT(Picket);
+        PRINT(PicketLong);
+        PRINT(Wrist);
+        PRINT(WristLong);
+
+        PRINT(Couple);
+        PRINT(CoupleLong);
+        PRINT(Shackle);
+        PRINT(ShackleLong);
+        PRINT(Bridge);
+        PRINT(Duo);
+        PRINT(DuoLong);
+        PRINT(Fork);
+
         PRINT(Solid);
         PRINT(Bead);
         PRINT(Sphere);
