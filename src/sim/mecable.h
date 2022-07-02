@@ -215,7 +215,7 @@ public:
     }
     
     /// intermediate position between P and Q=P+1 = P + A * ( Q - P )
-    /** with A = 0.5, this returns the middle of segment P */
+    /** A=0 returns P; A=1 returns P+1, and A = 0.5, returns middle of segment P */
     Vector midPoint(const size_t P, const real A) const
     {
         assert_true( P+1 < nPoints );

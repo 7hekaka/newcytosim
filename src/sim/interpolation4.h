@@ -25,10 +25,10 @@ public:
     real coef_[4];
 
     /// index of first interpolated point
-    Mecable::SIZE_T prime_;
+    unsigned prime_;
     
     /// number of interpolated points (order)
-    Mecable::SIZE_T rank_;
+    unsigned rank_;
     
     /// set coefficients
     void set_coef(real a, real b, real c) { coef_[1]=a; coef_[2]=b; coef_[3]=c; polish(); }

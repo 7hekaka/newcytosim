@@ -1172,7 +1172,7 @@ void Fiber::updateHands()
         Hand * x = h->next();
         assert_true(h->fiber()==this);
         // this is equivalent to h->reinterpolate():
-        h->hTerp = interpolateM(h->abscissa() - M);
+        h->reinterpolate(interpolateM(h->abscissa() - M));
         // must iterate ahead, because `checkFiberRange` may lead to detachment:
         h->checkFiberRange(M, P);
         h = x;

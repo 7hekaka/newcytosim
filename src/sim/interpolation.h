@@ -32,10 +32,10 @@ private:
     real coef_;
 
     /// index of vertex 1 in mec_
-    Mecable::SIZE_T pt1_;
+    unsigned pt1_;
 
     /// index of vertex 2 in mec_
-    Mecable::SIZE_T pt2_;
+    unsigned pt2_;
     
 public:
 
@@ -45,7 +45,7 @@ public:
     Interpolation() : mec_(nullptr), coef_(0), pt1_(0), pt2_(0) { }
     
     /// set to interpolate p1 and p2 on ps, with coefficient `c`
-    Interpolation(const Mecable * m, Mecable::SIZE_T p, Mecable::SIZE_T q, real c)
+    Interpolation(const Mecable * m, unsigned p, unsigned q, real c)
     : mec_(m), coef_(c), pt1_(p), pt2_(q) { }
 
     /// set to interpolate given fiber segment, with abscissa `c` 
@@ -59,7 +59,7 @@ public:
     }
     
     /// Set to interpolate p1 and p2 on ps, with coefficient c, on the same Mecable
-    void setPoints(Mecable::SIZE_T p, Mecable::SIZE_T q, const real c)
+    void setPoints(unsigned p, unsigned q, const real c)
     {
         pt1_ = p; pt2_ = q; coef_ = c;
     }

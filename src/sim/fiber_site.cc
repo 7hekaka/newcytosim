@@ -21,7 +21,8 @@ FiberSite::FiberSite(Fiber* f, real a)
 void FiberSite::clear()
 {
     hAbs = 0;
-    hTerp.clear();
+    coef_ = 0;
+    pti_ = 0;
     hFiber = nullptr;
 #if FIBER_HAS_LATTICE
     hLattice = nullptr;
@@ -32,7 +33,7 @@ void FiberSite::relocateM()
 {
     assert_true(hFiber);
     hAbs = hFiber->abscissaM();
-    hTerp = hFiber->interpolateEndM();
+    reinterpolate(hFiber->interpolateEndM());
 #if FIBER_HAS_LATTICE
     assert_true(!hLattice);
 #endif
@@ -43,7 +44,7 @@ void FiberSite::relocateP()
 {
     assert_true(hFiber);
     hAbs = hFiber->abscissaP();
-    hTerp = hFiber->interpolateEndP();
+    reinterpolate(hFiber->interpolateEndP());
 #if FIBER_HAS_LATTICE
     assert_true(!hLattice);
 #endif
@@ -74,7 +75,7 @@ Vector FiberSite::outerPos() const
 #endif
         //return 2 * pos - hFiber->family_->posM(ab);
     }
-    return hTerp.pos();
+    return pos();
 }
 #endif
 
@@ -265,21 +266,10 @@ int FiberSite::checkAbscissa() const
 
 int FiberSite::bad() const
 {
-    if ( hFiber != hTerp.mecable() )
-    {
-        if ( !hTerp.mecable() )
-        {
-            std::cerr << "Interpolation unset " << hFiber << '\n';
-            return 6;
-        }
-        std::cerr << "Interpolation mismatch " << hFiber << " " << hTerp.mecable() << '\n';
-        return 7;
-    }
-    
     if ( hFiber->betweenMP(hAbs) )
     {
         // the abscissa of the interpolated point:
-        real a = hFiber->abscissaPoint(real(hTerp.point1())+hTerp.coef1());
+        real a = hFiber->abscissaPoint(real(pti_)+coef_);
 
         constexpr real MAG = 1000;
         const real e = MAG * ( hAbs - a );

@@ -1938,7 +1938,7 @@ Interpolation Chain::interpolateM(const real ab) const
     real a = std::max(ab*iCut, real(0));
     // beyond the last point, we interpolate the PLUS_END
     real s = std::min(std::floor(a), real(nPoints-2));
-    SIZE_T i = static_cast<SIZE_T>(s);
+    unsigned i = static_cast<unsigned>(s);
     assert_true( std::abs(i-s) < 1 );
     a = a - s;
     return Interpolation(this, i, i+1, std::min(a, real(1)));

@@ -18,7 +18,7 @@ private:
     Mecable const* mec_;
     
     /// Index of the point-of-interest in the Mecable
-    Mecable::SIZE_T pti_;
+    unsigned pti_;
     
 public:
         
@@ -29,10 +29,10 @@ public:
     Mecapoint() : mec_(nullptr), pti_(0) { }
 
     /// Build to refer to point p in ps
-    Mecapoint(const Mecable * m, Mecable::SIZE_T p) : mec_(m), pti_(p) { }
+    Mecapoint(const Mecable * m, unsigned p) : mec_(m), pti_(p) { }
     
     /// Set to refer to point p in ps
-    void set(const Mecable * m, Mecable::SIZE_T p) { mec_ = m; pti_ = p; }
+    void set(const Mecable * m, unsigned p) { mec_ = m; pti_ = p; }
     
     /// Constant pointer to the Mecable 
     Mecable const* mecable() const { return mec_; }
