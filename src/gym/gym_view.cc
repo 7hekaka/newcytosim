@@ -2,6 +2,7 @@
 
 #include "gym_view.h"
 #include <cmath>
+#include <cstdio>
 
 /// current modelview matrix
 GLfloat gym::mvp_[16] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
@@ -66,4 +67,18 @@ void gym::stretchAlignZY(float A, float B, float R)
         0, X, 0, 0,
         0, A, 0, 1 };
     apply(mat);
+}
+
+
+void gym::print_view()
+{
+    FILE * f = stdout;
+    char se[] = "/||\\";
+    for ( int i = 0; i < 4; ++i )
+    {
+        fprintf(f, "%c", se[i]);
+        for ( int j = 0; j < 4; ++j )
+            fprintf(f, "%6.2f ", mvp_[i+4*j]);
+        fprintf(f, "%c\n", se[3-i]);
+    }
 }

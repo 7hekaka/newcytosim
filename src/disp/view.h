@@ -197,13 +197,13 @@ public:
     /// establish all enabled clipping planes
     void setClipping() const;
     
-    /// disable cliping planes
+    /// disable clipping planes
     void endClipping() const;
     
     /// set equations for a clipping plane, and enable it in View
     void enableClipPlane(int, real X, real Y, real Z, real S, bool absolute=true);
     
-    /// disable cliping plane in View
+    /// disable clipping plane in View
     void disableClipPlane(int);
     
     /// return enable/disable state

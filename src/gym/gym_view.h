@@ -42,10 +42,10 @@ namespace gym
 #pragma mark - Set the current view
 
     /// set Identity transformation and load (reference view is not changed)
-    inline void eye_view() { gym::mat_diagonal(mvp_, 1); load(); }
+    inline void eye_view(float Z, float S) { gym::mat_diagonal(mvp_, S, Z); load(); }
     
     /// center view on (X, Y, Z) and scale by S (reference view is not changed)
-    inline void abs_view(float X, float Y, float Z, float S) { gym::mat_diagonal(mvp_, S); gym::mat_translate(mvp_, X/S, Y/S, Z/S); load(); }
+    inline void eye_view(float X, float Y, float Z, float S) { gym::mat_diagonal(mvp_, S); gym::mat_translate(mvp_, X/S, Y/S, Z/S); load(); }
     
     /// make one-to-one correspondance between pixel and model coordinates
     void one_view(int W, int H);
@@ -96,6 +96,8 @@ namespace gym
     /// translate by A; rotate to align X to Z, scale XY by rad and Z by B-A
     void stretchAlignZY(float A, float B, float rad);
 
+    
+    void print_view();
 }
 
 #endif

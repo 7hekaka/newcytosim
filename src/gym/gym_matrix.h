@@ -17,12 +17,13 @@ namespace gym
     }
     
     // M <- Identity * diag
-    inline void mat_diagonal(float M[16], float diag)
+    inline void mat_diagonal(float M[16], float diag, float depth = 0)
     {
         mat_zero(M);
         M[ 0] = diag;
         M[ 5] = diag;
         M[10] = diag;
+        M[14] = depth;
         M[15] = 1.0;
     }
 

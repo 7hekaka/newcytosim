@@ -425,7 +425,7 @@ void View::setLights() const
 
 void View::setLightsEye() const
 {
-    gym::eye_view();
+    gym::eye_view(eyeDistance, zoom);
     setLights();
 }
 
@@ -563,34 +563,33 @@ void View::loadView() const
  - 2 : show ( Z < 0 ) with fog
  - 3 : show slice ( -a < Z < a ) where a = 5% of view_scale
  .
- 
  */
 void View::sliceView(int mode) const
 {
-    real off = view_scale * 0.5;
+    real off = 0;//view_scale * 0.5;
     switch ( mode )
     {
         case 1: {
-            gym::eye_view();
-            gym::enableClipPlane(1, 0, 0, 1, off);
+            gym::eye_view(eyeDistance, zoom);
+            gym::enableClipPlane(2, 0, 0, 1, off);
             if ( !depth_clamp )
                 setFog(1, 0, fog_color);
         } break;
         case 2: {
-            gym::eye_view();
-            gym::enableClipPlane(1, 0, 0, -1, -off);
+            gym::eye_view(eyeDistance, zoom);
+            gym::enableClipPlane(2, 0, 0, -1, -off);
             setFog(1, 1, fog_color);
         } break;
         case 3: {
             real thk = view_scale * 0.05;
-            gym::eye_view();
-            gym::enableClipPlane(1, 0, 0, -1, thk-off);
-            gym::enableClipPlane(2, 0, 0, +1, thk+off);
+            gym::eye_view(eyeDistance, zoom);
+            gym::enableClipPlane(2, 0, 0, -1, thk-off);
+            gym::enableClipPlane(3, 0, 0, +1, thk+off);
         } break;
         case 4: {
             Vector3 V = -depthAxis();
             gym::ref_view();
-            gym::enableClipPlane(1, V.XX, V.YY, V.ZZ, 0);
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
         } break;
     }
     gym::ref_view();
@@ -797,7 +796,7 @@ void View::setClipping() const
         {
             // can make the plane relative the viewing 'eye'
             if ( clip_plane_mode[i] == 2 )
-                gym::eye_view();
+                gym::eye_view(eyeDistance, zoom);
             Vector4 const& V = clip_plane[i];
             gym::setClipPlane(i, V.XX, V.YY, V.ZZ, V.TT);
         }
@@ -815,7 +814,7 @@ void View::setClipping() const
 void View::endClipping() const
 {
     for ( int ix = 0; ix < NB_CLIP_PLANES; ++ix )
-        gym::disableClipPlane(0+ix);
+        gym::disableClipPlane(ix);
 }
 
 void View::enableClipPlane(int ix, real X, real Y, real Z, real S, bool mode)
@@ -832,7 +831,7 @@ void View::disableClipPlane(int ix)
     if ( ix < NB_CLIP_PLANES )
     {
         clip_plane_mode[ix] = 0;
-        gym::disableClipPlane(0+ix);
+        gym::disableClipPlane(ix);
     }
 }
 
@@ -1006,15 +1005,15 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
         case 0:
             break;
         case 1:
-            gym::abs_view(0, shift-0.5*visRange[1], eyeDistance, zoom);
+            gym::eye_view(0, shift-0.5*visRange[1], eyeDistance, zoom);
             drawScaleHV(S, S/10, 0, setLadderH);
             break;
         case 2:
-            gym::abs_view(0.5*visRange[0]-shift, 0, eyeDistance, zoom);
+            gym::eye_view(0.5*visRange[0]-shift, 0, eyeDistance, zoom);
             drawScaleHV(S, -S/10, 0, setLadderV);
             break;
         case 3: {
-            gym::abs_view(0, 0, eyeDistance, zoom);
+            gym::eye_view(0, 0, eyeDistance, zoom);
             drawScaleX(S);
         } break;
     }

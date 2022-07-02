@@ -75,7 +75,7 @@ namespace gym
     /// disable clip plane
     inline void disableClipPlane(unsigned i) { glDisable(GL_CLIP_PLANE0+i); }
     
-    /// define cliping equation
+    /// define clipping equation
     void setClipPlane(unsigned, double, double, double, double);
     
     inline void enableClipPlane(unsigned i, double X, double Y, double Z, double S)

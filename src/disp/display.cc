@@ -1441,7 +1441,7 @@ void Display::drawFilament(Fiber const& fib,
         
         drawMonomer(q, rad);
         
-        // set cliping plane with the previous:
+        // set clipping plane with the previous:
         gym::setClipPlane(5, normalize(p-q), (p+q)*0.5);
         gym::enableClipPlane(5);
     }
@@ -1524,7 +1524,7 @@ void Display::drawActin(Fiber const& fib,
         
         drawMonomer(q, rad);
         
-        // set cliping plane with the previous:
+        // set clipping plane with the previous:
         gym::setClipPlane(5, normalize(p-q), (p+q)*0.5);
         
         gym::enableClipPlane(5);
@@ -1859,7 +1859,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
     {
         Vector X = obj.posP(inx);
 #if ( DIM > 2 )
-        // using cliping planes to cleanup overlapping Spheres
+        // using clipping planes to cleanup overlapping Spheres
         size_t near[3];
         size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
         //printf("nearest Spheres to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
@@ -1873,9 +1873,8 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
             gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
         }
         drawBallT(X, obj.radius(inx), bodyColorF(obj));
-        gym::disableClipPlane(3);
-        gym::disableClipPlane(4);
-        gym::disableClipPlane(5);
+        for ( size_t i = 0; i < num; ++i )
+            gym::disableClipPlane(5-i);
 #else
         drawDiscT(X, obj.radius(inx), bodyColorF(obj));
 #endif

@@ -8,13 +8,15 @@
 mat4x4_inverse is derived from GLFW linmath.h by Camilla Löwy <elmindreda@elmindreda.org>
 */
 
-static void mat_print(FILE * f, const float M[16])
+void mat_print(FILE * f, const float mat[16])
 {
+    char se[] = "/||\\";
     for ( int i = 0; i < 4; ++i )
     {
+        fprintf(f, "%c", se[i]);
         for ( int j = 0; j < 4; ++j )
-            fprintf(f, "%5.2f ", M[i+4*j]);
-        fprintf(f, "\n");
+            fprintf(f, "%6.2f ", mat[i+4*j]);
+        fprintf(f, "%c\n", se[3-i]);
     }
 }
 
