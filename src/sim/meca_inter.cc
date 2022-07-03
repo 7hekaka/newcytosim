@@ -2928,9 +2928,9 @@ void Meca::testSideLink(Interpolation const& ptA,
     mFUL.reset();
     size_t P = ptB.point();
     if ( P > 0 )
-        addSideLink3D(ptA, Interpolation(ptB.mecable(), P-1, P, 1), arm, weight);
+        addSideLink3D(ptA, Interpolation(ptB.mecable(), 1.0, P-1, P), arm, weight);
     else
-        addSideLink3D(ptA, Interpolation(ptB.mecable(), P, P+1, 0), arm, weight);
+        addSideLink3D(ptA, Interpolation(ptB.mecable(), 0.0, P, P+1), arm, weight);
     
     {
         std::ofstream o("y");

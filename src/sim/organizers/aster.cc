@@ -83,7 +83,7 @@ void Aster::setInteractions(Meca& meca) const
                     FiberEnd tip = ( prop->joint == PLUS_END ? MINUS_END : PLUS_END );
                     // link the opposite end to an interpolation of the two solid-points:
                     real c = fib->length() / link.len_;
-                    meca.addLink(fib->exactEnd(tip), Interpolation(sol, link.prime_, link.alt_, c), prop->stiffness[1]);
+                    meca.addLink(fib->exactEnd(tip), Interpolation(sol, c, link.prime_, link.alt_), prop->stiffness[1]);
                 }
                 continue;
             }

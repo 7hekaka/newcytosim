@@ -1904,9 +1904,9 @@ Interpolation Chain::interpolateEnd(const FiberEnd end) const
     switch( end )
     {
         case MINUS_END:
-            return Interpolation(this,0, 1, 0);
+            return Interpolation(this, 0.0, 0, 1);
         case PLUS_END:
-            return Interpolation(this, nPoints-2, nPoints-1, 1);
+            return Interpolation(this, 1.0, nPoints-2, nPoints-1);
         case CENTER:
             return interpolateCenter();
         default:
@@ -1918,7 +1918,7 @@ Interpolation Chain::interpolateEnd(const FiberEnd end) const
 Interpolation Chain::interpolateCenter() const
 {
     size_t n = lastPoint() / 2;
-    return Interpolation(this, n, n+1, 0.5 * ( lastPoint() - 2*n ));
+    return Interpolation(this, 0.5*(lastPoint()-2*n), n, n+1);
 }
 
 
@@ -1940,8 +1940,7 @@ Interpolation Chain::interpolateM(const real ab) const
     real s = std::min(std::floor(a), real(nPoints-2));
     unsigned i = static_cast<unsigned>(s);
     assert_true( std::abs(i-s) < 1 );
-    a = a - s;
-    return Interpolation(this, i, i+1, std::min(a, real(1)));
+    return Interpolation(this, std::min(a-s, real(1)), i, i+1);
 }
 
 

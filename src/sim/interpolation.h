@@ -44,11 +44,14 @@ public:
     /// reset member variables
     Interpolation() : mec_(nullptr), coef_(0), pt1_(0), pt2_(0) { }
     
-    /// set to interpolate p1 and p2 on ps, with coefficient `c`
-    Interpolation(const Mecable * m, unsigned p, unsigned q, real c)
-    : mec_(m), coef_(c), pt1_(p), pt2_(q) { }
+    /// set to interpolate P and Q on `m`, with coefficient `c`
+    Interpolation(const Mecable * m, real c, unsigned P, unsigned Q)
+    : mec_(m), coef_(c), pt1_(P), pt2_(Q) { }
+    
+    /// disabled old-style constructor
+    Interpolation(const Mecable*, unsigned, unsigned, real) = delete;
 
-    /// set to interpolate given fiber segment, with abscissa `c` 
+    /// set to interpolate given fiber segment, at abscissa `abs` in [0,1]
     Interpolation(FiberSegment const&, real abs);
     
     
