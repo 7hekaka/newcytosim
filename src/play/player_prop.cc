@@ -92,23 +92,21 @@ static std::string standardReport(unsigned inx)
         case 0: return "";
         case 1: return "fiber:lengths";
         case 2: return "fiber:dynamics";
-        case 3: return "single,couple";
-        case 4: return "single:force";
-        case 5: return "couple:force";
+        case 3: return "fiber:segment";
+        case 4: return "single,couple";
+        case 5: return "single:force,couple:force";
         case 6: return "couple:configuration{split=1}";
-        case 7: return "simul:inventory";
-        case 8: return "platelet";
-        case 9: return "space";
-        case 10: return "";
-        case 11: return "simul:inventory";
-        case 12: return "simul";
-        case 13: return "fiber:energy";
-        case 14: return "fiber:mesh,field";
-        case 15: return "fiber:lattice";
-        case 16: return "fiber:segment";
-        case 17: return "fiber:cluster{couple=1}";
-        case 18: return "fiber:age";
-        case 19: return "fiber:distribution";
+        case 7: return "simul";
+        case 8: return "simul:inventory";
+        case 9: return "platelet";
+        case 10: return "space";
+        case 11: return "fiber:energy";
+        case 12: return "fiber:mesh,field";
+        case 13: return "fiber:lattice";
+        case 14: return "fiber:segment";
+        case 15: return "fiber:cluster{couple=1}";
+        case 16: return "fiber:age";
+        case 17: return "fiber:distribution";
     }
     return "";
 }
@@ -116,15 +114,14 @@ static std::string standardReport(unsigned inx)
 
 void PlayerProp::toggleReport(int alt)
 {
-    if ( alt < 0 )
+    if ( alt == 0 )
     {
         report_index = 0;
         report = "";
     }
     else
     {
-        if ( alt && !report_index ) report_index = 10;
-        report_index = ( report_index + 1 ) % 20;
+        report_index = ( report_index + alt + 18 ) % 18;
         report = standardReport(report_index);
     }
 }

@@ -893,11 +893,11 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
 
         case 'r':
-            prop.toggleReport(altKeyDown);
+            prop.toggleReport(altKeyDown?-1:1);
             break;
             
         case 'R':
-            prop.toggleReport(-1);
+            prop.toggleReport(0);
             break;
 
         //------------------------- play / stop / reverse ----------------------

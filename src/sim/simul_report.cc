@@ -2751,7 +2751,7 @@ Order Clusters from 1 to max, in order of decreasing size,
 and set fiber:flag() to the corresponding cluster index.
 @return number of clusters
 */
-size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, int details)
+size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, unsigned details)
 {
     typedef std::vector<Fiber*> list_t;
     typedef std::map<ObjectFlag, list_t> map_t;
@@ -2801,7 +2801,7 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
         {
             out << LIN << c.flg << SEP << c.cnt;
             
-            if ( details > 1 )
+            if ( list.size() < details )
             {
                 out << " :";
                 for ( Fiber * i : list )
@@ -2819,7 +2819,7 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
  */
 void Simul::reportClusters(std::ostream& out, Glossary& opt) const
 {
-    int details = 2;
+    unsigned details = 128;
     bool C = false, S = false, M = false;
 
     opt.set(details, "details");
@@ -3013,6 +3013,14 @@ void Simul::reportPlatelet(std::ostream& out) const
     real pol, var, mn, mx;
     fibers.infoLength(fibers.collect(), nfib, pol, var, mn, mx);
     pol *= nfib;
+    
+    if ( nfib > 1024 )
+    {
+        // the calculation can take too much time with lots of fibers, so we cut it here:
+        out << COM << "nb_fiber" << SEP << "polymer";
+        out << LIN << nfib << SEP << std::fixed << pol;
+        return;
+    }
     
     computeForces();
 
