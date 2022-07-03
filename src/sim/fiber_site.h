@@ -105,7 +105,7 @@ public:
     //--------------------------------------------------------------------------
 
     /// return the interpolation
-    Interpolation interpolation() const { assert_false(bad()); return Interpolation(hFiber, coef_, pti_, 1+pti_); }
+    Interpolation interpolation() const { assert_false(bad()); return Interpolation(hFiber, coef_, pti_); }
     
     /// update the Interpolation
     void reinterpolate() const { Interpolation i = hFiber->interpolate(hAbs); coef_ = i.coef1(); pti_ = i.point1(); }

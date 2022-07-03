@@ -38,16 +38,18 @@ private:
     unsigned pt2_;
     
 public:
-
-    Interpolation(Interpolation const&) { }
     
     /// reset member variables
-    Interpolation() : mec_(nullptr), coef_(0), pt1_(0), pt2_(0) { }
+    Interpolation() : mec_(nullptr) { }
+    
+    /// set to interpolate P and P+1 on `m`, with coefficient `c`
+    Interpolation(const Mecable * m, real c, unsigned P)
+    : mec_(m), coef_(c), pt1_(P), pt2_(P+1) { }
     
     /// set to interpolate P and Q on `m`, with coefficient `c`
     Interpolation(const Mecable * m, real c, unsigned P, unsigned Q)
     : mec_(m), coef_(c), pt1_(P), pt2_(Q) { }
-    
+
     /// disabled old-style constructor
     Interpolation(const Mecable*, unsigned, unsigned, real) = delete;
 
