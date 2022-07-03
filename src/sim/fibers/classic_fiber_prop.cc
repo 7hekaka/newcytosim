@@ -7,7 +7,7 @@
 #include "classic_fiber.h"
 #include "exceptions.h"
 #include "glossary.h"
-#include "simul_part.h"
+#include "simul.h"
 
 
 Fiber* ClassicFiberProp::newFiber() const
