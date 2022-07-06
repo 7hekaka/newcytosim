@@ -337,6 +337,11 @@ static void invertScale(FiberDisp* p, int)
         else
             flashText("fiber:tension_scale: pushing");
     }
+    else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 || p->line_style == 8 )
+    {
+        p->length_scale = -p->length_scale;
+        flashText("fiber:length_scale = %.5f", p->length_scale);
+    }
 }
 
 
