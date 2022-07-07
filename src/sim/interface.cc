@@ -325,11 +325,10 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
 /**
  This would usually create ONE object of type 'name', placed according to `opt`
  */
-void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet* set, Glossary& opt)
+void Interface::new_object(ObjectList& objs, ObjectSet* set, Property const* pp, Glossary& opt)
 {
     size_t ouf = 0, nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
-    Property const* pp = sim_->properties.find_or_die(name);
 
     objs.clear();
     do {
@@ -388,6 +387,7 @@ void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet*
         }
         if ( ++ouf > nb_trials )
         {
+            std::string name = pp ? pp->name() : "object";
             Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
             break;
         }
@@ -421,12 +421,12 @@ void Interface::new_object(ObjectList& objs, std::string const& name, ObjectSet*
 void Interface::execute_new(std::string const& cat, std::string const& name, Glossary& opt, size_t cnt)
 {
     ObjectSet * set = nullptr;
-    
-    if ( cat.empty() )
+    Property const* pp = sim_->properties.find(name);
+    //Property const* pp = sim_->properties.find_or_die(name);
+
+    if ( cat.empty() && pp )
     {
-        Property * pp = sim_->properties.find(name);
-        if ( pp )
-            set = sim_->findSet(pp->category());
+        set = sim_->findSet(pp->category());
         if ( !set )
             throw InvalidSyntax("could not determine the class of `"+name+"'");
     }
@@ -466,7 +466,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
         for ( size_t n = 0; n < cnt; ++n )
         {
             opt.define("position", A + n * dAB);
-            new_object(objs, name, set, opt);
+            new_object(objs, set, pp, opt);
         }
     }
     else
@@ -484,7 +484,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
 
         ObjectList objs(4, 4);
         for ( size_t n = 0; n < cnt; ++n )
-            new_object(objs, name, set, opt);
+            new_object(objs, set, pp, opt);
     }
     //hold();
     
