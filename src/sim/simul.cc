@@ -74,8 +74,6 @@ void Simul::initialize(Glossary & glos)
 void Simul::eraseObjects(bool erase_properties)
 {
     //fprintf(stderr, "Simul:%p:eraseObjects()\n", this);
-    singles.erase();
-    couples.erase();
     tubules.erase();
     organizers.erase();
     fibers.erase();
@@ -85,7 +83,9 @@ void Simul::eraseObjects(bool erase_properties)
     fields.erase();
     spaces.erase();
     events.erase();
- 
+    singles.erase();
+    couples.erase();
+
     prop.time = 0;
     modulo = nullptr;
     abortRun = 0;
