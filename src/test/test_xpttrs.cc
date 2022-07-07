@@ -60,8 +60,8 @@ void testFactor(int NSEG, size_t cnt)
     }
     
     test<divide>(NSEG, Ds, Us, D, U, "divide", cnt);
-    test<lapack_xpttrf>(NSEG, Ds, Us, D, U, "clapack", cnt);
     test<lapack::xpttrf>(NSEG, Ds, Us, D, U, "lapack", cnt);
+    test<lapack_xpttrf>(NSEG, Ds, Us, D, U, "c-lapack", cnt);
     test<italian_factor>(NSEG, Ds, Us, D, U, "italian", cnt);
     test<alsatian_xpttrf>(NSEG, Ds, Us, D, U, "alsatian", cnt);
 
@@ -155,31 +155,38 @@ void verify(int N, real const* Ds, real const* Us, real const* Bs, real* D, real
     printf(" %12s cpu %5.0f\n", str, tock());
 }
 
-void solve1(int N, real* D, real* U, real* B)
+void solveL(int N, real* D, real* U, real* B)
 {
     int info;
     lapack::xpttrf(N, D, U, &info);
     lapack::xptts2(N, D, U, B);
 }
 
-void solve2(int N, real* D, real* U, real* B)
+void solveC(int N, real* D, real* U, real* B)
+{
+    int info;
+    lapack_xpttrf(N, D, U, &info);
+    lapack_xptts2(N, D, U, B);
+}
+
+void solveI(int N, real* D, real* U, real* B)
 {
     italian_thomas(N, U, D, U, B);
 }
 
-void solve3(int N, real* D, real* U, real* B)
+void solveA(int N, real* D, real* U, real* B)
 {
     int info;
     alsatian_xpttrf(N, D, U, &info);
     alsatian_xptts2(N, D, U, B);
 }
 
-void solve4(int N, real* D, real* U, real* B)
+void solveB(int N, real* D, real* U, real* B)
 {
     alsatian_thomas(N, D, U, B);
 }
 
-void solve5(int N, real* D, real* U, real* B)
+void solveT(int N, real* D, real* U, real* B)
 {
     tridiagonal_solve(N, U, D, U, B);
 }
@@ -205,11 +212,12 @@ void testThomas(int NSEG, size_t cnt)
         Bs[i] = RNG.sreal();
     }
     
-    verify<solve1>(NSEG, Ds, Us, Bs, D, U, B, "lapack", cnt);
-    verify<solve2>(NSEG, Ds, Us, Bs, D, U, B, "italian", cnt);
-    verify<solve3>(NSEG, Ds, Us, Bs, D, U, B, "alsatian2", cnt);
-    verify<solve4>(NSEG, Ds, Us, Bs, D, U, B, "alsatian", cnt);
-    verify<solve5>(NSEG, Ds, Us, Bs, D, U, B, "tridiag", cnt);
+    verify<solveL>(NSEG, Ds, Us, Bs, D, U, B, "lapack", cnt);
+    verify<solveC>(NSEG, Ds, Us, Bs, D, U, B, "c-lapack", cnt);
+    verify<solveI>(NSEG, Ds, Us, Bs, D, U, B, "italian", cnt);
+    verify<solveA>(NSEG, Ds, Us, Bs, D, U, B, "alsatian2", cnt);
+    verify<solveB>(NSEG, Ds, Us, Bs, D, U, B, "alsatian", cnt);
+    verify<solveT>(NSEG, Ds, Us, Bs, D, U, B, "tridiag", cnt);
 
     free_real(D);
     free_real(U);
