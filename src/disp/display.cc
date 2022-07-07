@@ -497,7 +497,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
 }
 
 
-/// attribute a LineDisp, and set individual display values for all fibers
+/// attribute LineDisp to all fibers, and set individual display values
 void Display::attributeLineDisp(FiberSet const& fibers)
 {
     if ( numLineDisp < fibers.size() )
@@ -518,7 +518,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
         fib->disp = &allLineDisp[i++];
         prepareLineDisp(fib, fib->prop->disp, fib->disp);
     }
-    assert_true( i < numLineDisp );
+    assert_true( i <= numLineDisp );
 }
 
 

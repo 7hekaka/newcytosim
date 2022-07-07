@@ -16,12 +16,11 @@ Cytosim Todo List
 
 - Fiber::read should allow changing 'activity'
 - add units to documentation of parameters
-- Export Cytosim's world to Python (read only).
+- Export Cytosim's world to Python (pybind, Serge).
 - https://github.com/pybind/pybind11 seems better than Boost::Python 
 
 # Improvements
 
-- implement new [bicylinder](https://en.wikipedia.org/wiki/Steinmetz_solid) Space
 - fiber:max_length could trigger switch to a different Dynamic state
 - Could add color of Hands for summary obtained with 'I'
 - Implement two confinements for Mecables. That's easier than constructive geometry on Spaces
@@ -33,7 +32,6 @@ Cytosim Todo List
   - saturation of chewing from the fiber tips
   - non-linear cutting from lattice?
   - saturating transport on lattice: convection stalls above a certain concentration
-
 
 # v2022
 
@@ -83,6 +81,9 @@ test write / read systematically on all cym files
 - Represents an actin filament with two strands... a microtubule with 13.
      the strands can be in register, such that vertices describe circles in 3D, 
      while the abscissaM() can be shifted appropriately
+
+- Use placement new to create thousands of Couple / Single
+	This should avoid scattering of memory, and the slow execution of thousands of tiny allocate
 
 # Performance:
 
@@ -137,6 +138,9 @@ https://github.com/TNG/boost-python-examples
 
 # Input/Output:
 
+- save all float/double to a different file 'vectors.cmo'
+  objects in 'objects.cmo' will have a index to the array of vectors
+  this should be much faster to read!
 - reorganize the Input classes IOWrapper
 - include error reporting inside Input class
    - collect errors in local string

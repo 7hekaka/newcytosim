@@ -302,7 +302,7 @@ void Sphere::setDragCoefficient()
 
 void Sphere::allocateMecable(size_t nbp)
 {
-    real * ptr = Mecable::allocateMemory(nbp, 1, 0);
+    real * ptr = Mecable::allocateMemory(nbp, DIM, 0);
     if ( ptr )
         sDir = ptr;
 }
@@ -511,16 +511,18 @@ void Sphere::projectForces(const real* X, real* Y) const {}
  */
 void Sphere::makeProjection()
 {
-    assert_true( nPoints >= nbRefPoints );
-    
-    // calculate radial vectors from center:
+    real cen[DIM];
     real curv = 1.0 / spRadius;
+    assert_true( nPoints >= nbRefPoints );
+    for ( size_t d = 0; d < DIM; ++d )
+        cen[d] = curv * pPos[d];
+    // calculate radial vectors from center:
     for ( size_t p = nbRefPoints; p < nPoints; ++p )
     {
         real * dir = sDir + DIM * p;
         real * pos = pPos + DIM * p;
-        for ( size_t d = 0; d < DIM; ++d )
-            dir[d] = curv * ( pos[d] - pPos[d] );
+         for ( size_t d = 0; d < DIM; ++d )
+             dir[d] = curv * pos[d] - cen[d];
     }
 }
 

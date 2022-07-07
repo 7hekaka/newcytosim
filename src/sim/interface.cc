@@ -975,7 +975,7 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 
 
 /**
- Perform simulation steps, without any option, by alternating step() and solve()
+ Advance simulation, without any option, by alternating step() and solve()
 */
 void Interface::execute_run(size_t nb_steps)
 {

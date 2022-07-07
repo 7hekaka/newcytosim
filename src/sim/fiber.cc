@@ -493,7 +493,7 @@ Fiber* Fiber::severM(real abs)
 
 Fiber* Fiber::severNow(const real abs)
 {
-    std::clog << "sever " << reference() << " at " << abs << '\n';
+    //std::clog << "sever " << reference() << " at " << abs << '\n';
     if ( abscissaM() < abs && abs < abscissaP() )
         return severM(abs-abscissaM());
     return nullptr;
