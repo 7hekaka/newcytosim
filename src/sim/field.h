@@ -19,11 +19,11 @@
 class FiberSet;
 
 
-/// the type of Grid contained in a Field
+/// the type of data contained in a Field
 //typedef FieldVector<3> FieldCell;
 typedef FieldScalar FieldCell;
 
-/// the resulting type of the Field's underlying Grid
+/// the type of the Field's underlying Grid
 typedef Grid<FieldCell, DIM> FieldGrid;
 
 

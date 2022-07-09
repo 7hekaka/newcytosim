@@ -422,8 +422,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
 {
     ObjectSet * set = nullptr;
     Property const* pp = sim_->properties.find(name);
-    //Property const* pp = sim_->properties.find_or_die(name);
-
+    
     if ( cat.empty() && pp )
     {
         set = sim_->findSet(pp->category());

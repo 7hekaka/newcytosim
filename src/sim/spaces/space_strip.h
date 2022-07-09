@@ -10,7 +10,7 @@
 /**
  SpaceStrip implements periodic boundary conditions in all dimensions except the
  last one: Y in 2D and Z in 3D. The volume is a cuboid, with edges in the last
- dimension, while other dimensions (X and Y in 2D) wraps on itself periodically.
+ dimension, while other dimensions (X and Y in 3D) wrap periodically.
  
  Parameters:
  

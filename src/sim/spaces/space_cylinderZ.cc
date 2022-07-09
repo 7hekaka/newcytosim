@@ -533,6 +533,7 @@ void SpaceCylinderZ::draw3D() const
         float SU = gle::sin_(u), SL = gle::sin_(u+1);
 
         *ptr++ = {0, 0, T, 0, 0, 1};
+#if HAS_SMOOTH_EDGES
         if ( edge_ > 0 )
         {
             //draw top arc
@@ -540,31 +541,37 @@ void SpaceCylinderZ::draw3D() const
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
-                *ptr++ = {CU*RS, SU*RS, TE+E*C, CU*S, SU*S, C};
-                *ptr++ = {CL*RS, SL*RS, TE+E*C, CL*S, SL*S, C};
+                ptr[0] = {CU*RS, SU*RS, TE+E*C, CU*S, SU*S, C};
+                ptr[1] = {CL*RS, SL*RS, TE+E*C, CL*S, SL*S, C};
+                ptr += 2;
             }
-            /*
-            // at pi_half, C = 0 and S = 1
-             *ptr++ = {CU*R, SU*R, TE, CU, SU, 0};
-             *ptr++ = {CL*R, SL*R, TE, CL, SL, 0};
-             *ptr++ = {CU*R, SU*R, BE, CU, SU, 0};
-             *ptr++ = {CL*R, SL*R, BE, CL, SL, 0};
-             */
+            if ( 0 )
+            {
+                // at pi_half, C = 0 and S = 1
+                ptr[0] = {CU*R, SU*R, TE, CU, SU, 0};
+                ptr[1] = {CL*R, SL*R, TE, CL, SL, 0};
+                ptr[2] = {CU*R, SU*R, BE, CU, SU, 0};
+                ptr[3] = {CL*R, SL*R, BE, CL, SL, 0};
+                ptr += 4;
+            }
             //draw bottom arc
             for ( size_t j = gle::pi_half; j <= gle::pi_once; ++j )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
-                *ptr++ = {CU*RS, SU*RS, BE+E*C, CU*S, SU*S, C};
-                *ptr++ = {CL*RS, SL*RS, BE+E*C, CL*S, SL*S, C};
+                ptr[0] = {CU*RS, SU*RS, BE+E*C, CU*S, SU*S, C};
+                ptr[1] = {CL*RS, SL*RS, BE+E*C, CL*S, SL*S, C};
+                ptr += 2;
             }
         }
         else
+#endif
         {
-            *ptr++ = {CU*R, SU*R, T, CU, SU, 0};
-            *ptr++ = {CL*R, SL*R, T, CL, SL, 0};
-            *ptr++ = {CU*R, SU*R, B, CU, SU, 0};
-            *ptr++ = {CL*R, SL*R, B, CL, SL, 0};
+            ptr[0] = {CU*R, SU*R, T, CU, SU, 0};
+            ptr[1] = {CL*R, SL*R, T, CL, SL, 0};
+            ptr[2] = {CU*R, SU*R, B, CU, SU, 0};
+            ptr[3] = {CL*R, SL*R, B, CL, SL, 0};
+            ptr += 4;
         }
         *ptr++ = {0, 0, B, 0, 0, -1};
         gym::unmapBufferV3N3();
