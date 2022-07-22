@@ -38,12 +38,12 @@ public:
 
     /// allowing update of the interpolation
     friend void Fiber::updateHands();
+
+protected:
     
     /// the Fiber of interest, or NULL
     Fiber * hFiber;
 
-protected:
-    
     /// the abscissa from the origin of the Fiber
     real hAbs;
     
@@ -107,11 +107,11 @@ public:
     /// return the interpolation
     Interpolation interpolation() const { assert_false(bad()); return Interpolation(hFiber, coef_, pti_); }
     
+    /// set Interpolation to argument
+    void reinterpolate(Interpolation const& i) const { assert_true(i.mecable()==hFiber); coef_=i.coef1(); pti_=i.point1(); }
+
     /// update the Interpolation
-    void reinterpolate() const { Interpolation i = hFiber->interpolate(hAbs); coef_ = i.coef1(); pti_ = i.point1(); }
-    
-    /// update the Interpolation
-    void reinterpolate(Interpolation const& i) const { assert_true(i.mecable()==hFiber); coef_ = i.coef1(); pti_ = i.point1();  }
+    void reinterpolate() const { reinterpolate(hFiber->interpolate(hAbs)); }
 
     /// move to a different abscissa on the current fiber
     void moveTo(real a) { hAbs = a; reinterpolate(); }
