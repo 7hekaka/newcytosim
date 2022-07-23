@@ -196,7 +196,7 @@ def info_end(filename, val):
         f.write("stop      %s\n" % time.asctime())
 
 
-def run(exe, conf, name, args=[]):
+def run(exe, conf, name, args=[], config = None):
     """
     Run one simulation in a new sub directory and wait for completion.
     The config file 'conf' is copied to the subdirectory.
@@ -209,7 +209,11 @@ def run(exe, conf, name, args=[]):
     wdir = make_run_directory('z')
     os.chmod(wdir, 504)
     os.chdir(wdir)
-    shutil.copyfile(conf, config_name)
+
+    if config is None:
+        config = config_name
+
+    shutil.copyfile(conf, config)
     info_start(logfile_name, exe, args, conf, os.getpid())
     val = run_sim(exe, args)
     info_end(logfile_name, val)
