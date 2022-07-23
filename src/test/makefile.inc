@@ -114,7 +114,7 @@ test_sizeof: test_sizeof.cc | bin
 	$(COMPILE) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_pipe: test_pipe.cc gle_color.cc gle_color_list.cc | bin
+test_pipe: test_pipe.cc gle_color.cc gle_color_list.cc random.o SFMT.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math -Isrc/gym $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
