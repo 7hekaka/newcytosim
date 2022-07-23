@@ -12,7 +12,8 @@ Synopsis:
 
 Syntax:
 
-    go_sim.py [executable] [repeat] [preconfig=PYTHON] [park=directory] config_file [config_file]
+    go_sim.py [[exe=]executable] [repeat] [preconfig=PYTHON] [park=directory] config_file [config_file]
+        [config=CONFIGNAME] [argument=ARG] [argmuments=ARGS]
     
     Bracketted arguments are optional.
     If working_directory is not specified, the current directory is used.
@@ -24,7 +25,18 @@ Syntax:
     
     Any number of config file can be provided (at least one).
 
+    Any program, even non-binary, can be run using exe=...
+
+    The name of the config file can be specified using config=...
+
+    Additional arguments can be passed as arg=... or args=[...]
+
+    Examples :
+        go_sim.py sim config*.cym njobs=4
+        go_sim.py exe=python3.9 arg=../run_cytosim.py config*.cym
+
 F. Nedelec, 03.2010, 10.2011, 05.2012, 04.2013, 12.2017
+S. Dmitrieff 07.2022
 """
 
 # Loading modules on the compute-cluster may fail for unexpected reasons.
@@ -42,6 +54,13 @@ except ImportError:
 # if the child executable is killed on the same occasion.
 # This way 'CTRL-C' will kill the executable, but not this controlling script.
 
+
+try:
+    import go_sim_lib
+except ImportError:
+    sys.stderr.write("go_sim.py could not load go_sim_lib.py\n")
+    sys.exit()
+
 def handle_signal(sig, frame):
     sys.stderr.write("go_sim.py escaped signal %i\n" % sig)
 
@@ -56,173 +75,178 @@ except ImportError:
     sys.stderr.write("go_sim.py could not load `signal` on %s\n" % host)
     pass
 
-
-#define output for error messages:
-err = sys.stderr
-out = sys.stdout
-
-njobs  = 1
-repeat = 1
-park   = ''
-exe    = os.path.abspath('sim')
-
-try:
-    import go_sim_lib
-except ImportError:
-    err.write("go_sim.py could not load go_sim_lib.py\n")
-    sys.exit()
-
-
-#------------------------------------------------------------------------
-
 def executable(arg):
     return os.path.isfile(arg) and os.access(arg, os.X_OK)
 
+class Gosimer:
+    def __init__(self):
+        #define output for error messages:
+        self.err = sys.stderr
+        self.out = sys.stdout
 
-def run(conf, name):
-    """
-        run executable 'exe' with config 'conf' in a directory of name 'name'
-    """
-    try:
-        (val, res) = go_sim_lib.run(exe, conf, name)
-        if val == 0:
-            out.write("Completed run `%s` in %s; " % (conf, res))
-        else:
-            out.write("Failed run `%s` in %s with value %i\n" % (conf, res, val))
-    except KeyboardInterrupt:
-        err.write("go_sim.py `%s` was interrupted\n" % conf)
-    # move run directory to `park` if specified:
-    if os.path.isdir(park):
+        self.njobs  = 1
+        self.repeat = 1
+        self.park   = ''
+        self.exe    = os.path.abspath('sim')
+        self.script = None
+        self.queue = ()
+        self.arguments = []
+        self.trust_exe = False
+        self.config = "config.cym"
+
+    #------------------------------------------------------------------------
+
+
+
+    def run(self, conf, name):
+        """
+            run executable 'exe' with config 'conf' in a directory of name 'name'
+        """
         try:
-            res = go_sim_lib.park_directory(res, park, name)
-            with open(res+"/log.txt", "a") as f:
-                f.write("parked    %s\n" % time.asctime())
-        except Exception as e:
-            err.write("go_sim.py cannot move directory: %s\n" % repr(e))
-
-
-def run_queue(queue):
-    """
-    run items in the queue
-    """
-    while True:
-        try:
-            arg = queue.get(True, 1)
-            run(*arg)
-        except:
-            break;
-
-
-def process(conf, script, name, queue):
-    """
-        run configurations files generated from 'conf'
-    """
-    if not os.path.isfile(conf):
-        err.write("go_sim.py could not find file '%s'\n" % conf)
-        sys.exit()
-    # generate config file(s):
-    if script:
-        import tempfile
-        tmp = tempfile.mkdtemp('', '_'+name+'-', '.')
-        template = tmp + '/config.cym.tpl'
-        shutil.copy(conf, template)
-        files = go_sim_lib.make_config(template, repeat, script, tmp)
-    else:
-        files = go_sim_lib.copy_config(conf, repeat)
-    if not files:
-        err.write("go_sim.py could not generate config files\n")
-        sys.exit()
-    # process all files created:
-    for i, f in enumerate(files):
-        if len(files) > 1:
-            n = name + '-%04i' % i
-        else:
-            n = name
-        if njobs > 1:
-            queue.put((f, n))
-            #print('Queued ' + f + ' ' + n)
-        else:
-            run(f, n)
-
-
-#------------------------------------------------------------------------
-
-def main(args):
-    global njobs, repeat, park, exe, queue
-    script = ''
-    name   = 'run0000'
-    files  = []
-    njobs  = 1
-    
-    # parse arguments list:
-    for arg in args:
-        if arg.isdigit():
-            repeat = int(arg)
-        elif executable(arg):
-            exe = os.path.abspath(arg)
-        elif os.path.isfile(arg):
-            files.append(arg)
-        elif arg.startswith('preconfig'):
-            script = arg
-        else:
-            [key, equal, val] = arg.partition('=')
-            if key == 'nproc' or key == 'njobs' or key == 'jobs':
-                njobs = val
-            elif key == 'preconfig' or key == 'script':
-                script = val
-            elif key == 'name':
-                name = val
-            elif key == 'park':
-                park = val
+            (val, res) = go_sim_lib.run(self.exe, conf, name, config = self.config, args=self.arguments)
+            if val == 0:
+                self.out.write("Completed run `%s` in %s; " % (conf, res))
             else:
-                out.write("go_sim.py does not understand argument `%s'\n" % arg)
-                sys.exit()
-    
-    if not files:
-        err.write("go_sim.py expects a config file on the command line\n")
-        sys.exit()
-
-    if not executable(exe):
-        err.write("go_sim.py could not find executable '%s'\n" % exe)
-        sys.exit()
-
-    # prepare for multiprocessing
-    queue = ()
-    if njobs > 1:
-        try:
-            from multiprocessing import Process, Queue
-            queue = Queue()
-        except ImportError:
-            out.write("Warning: multiprocessing unavailable\n")
-            njobs = 1
-
-    # process all given files:
-    cnt = 0
-    for conf in files:
-        process(conf, script, name, queue)
-        cnt += 1
-        name = 'run%04i' % cnt
-
-    # process jobs:
-    if njobs > 1:
-        jobs = []
-        for n in range(njobs):
-            j = Process(target=run_queue, args=(queue,))
-            jobs.append(j)
-            j.start()
-        # wait for completion of all jobs:
-        for j in jobs:
-            j.join()
-    return 0
+                self.out.write("Failed run `%s` in %s with value %i\n" % (conf, res, val))
+        except KeyboardInterrupt:
+            self.err.write("go_sim.py `%s` was interrupted\n" % conf)
+        # move run directory to `park` if specified:
+        if os.path.isdir(self.park):
+            try:
+                res = go_sim_lib.park_directory(res, self.park, name)
+                with open(res+"/log.txt", "a") as f:
+                    f.write("parked    %s\n" % time.asctime())
+            except Exception as e:
+                self.err.write("go_sim.py cannot move directory: %s\n" % repr(e))
 
 
-#------------------------------------------------------------------------
+    def run_queue(self):
+        """
+        run items in the queue
+        """
+        while True:
+            try:
+                arg = self.queue.get(True, 1)
+                self.run(*arg)
+            except:
+                break;
+
+
+    def process(self, conf, name):
+        """
+            run configurations files generated from 'conf'
+        """
+        if not os.path.isfile(conf):
+            self.err.write("go_sim.py could not find file '%s'\n" % conf)
+            sys.exit()
+        # generate config file(s):
+        if self.script is not None:
+            import tempfile
+            tmp = tempfile.mkdtemp('', '_'+name+'-', '.')
+            template = tmp + '/config.cym.tpl'
+            shutil.copy(conf, template)
+            files = go_sim_lib.make_config(template, self.repeat, self.script, tmp)
+        else:
+            files = go_sim_lib.copy_config(conf, self.repeat)
+        if not files:
+            self.err.write("go_sim.py could not generate config files\n")
+            sys.exit()
+        # process all files created:
+        for i, f in enumerate(files):
+            if len(files) > 1:
+                n = name + '-%04i' % i
+            else:
+                n = name
+            if self.njobs > 1:
+                self.queue.put((f, n))
+                #print('Queued ' + f + ' ' + n)
+            else:
+                self.run(f, n)
+
+
+    #------------------------------------------------------------------------
+
+    def main(self, args):
+        name   = 'run0000'
+        files = []
+        # parse arguments list:
+        for arg in args:
+            if arg.isdigit():
+                self.repeat = int(arg)
+            elif executable(arg):
+                self.exe = os.path.abspath(arg)
+            elif os.path.isfile(arg):
+                files.append(arg)
+            elif arg.startswith('preconfig'):
+                self.script = arg
+            else:
+                [key, equal, val] = arg.partition('=')
+                if key == 'nproc' or key == 'njobs' or key == 'jobs':
+                    self.njobs = val
+                elif key == 'preconfig' or key == 'script':
+                    self.script = val
+                elif key == 'name':
+                    name = val
+                elif key == 'park':
+                    self.park = val
+                elif key == 'exe':
+                    self.trust_exe = True
+                    self.exe = val
+                elif key == "args" or key == "arguments":
+                    self.arguments += val
+                elif key == "arg" or key == "argument":
+                    self.arguments.append(val)
+                elif key == "config" or key == "conf":
+                    self.config = val
+                else:
+                    self.out.write("go_sim.py does not understand argument `%s'\n" % arg)
+                    sys.exit()
+
+        if not len(files):
+            self.err.write("go_sim.py expects a config file on the command line\n")
+            sys.exit()
+
+        if not executable(self.exe) and not self.trust_exe:
+            self.err.write("go_sim.py could not find executable '%s'\n" % exe)
+            sys.exit()
+
+        # prepare for multiprocessing
+        if self.njobs > 1:
+            try:
+                from multiprocessing import Process, Queue
+                self.queue = Queue()
+            except ImportError:
+                self.out.write("Warning: multiprocessing unavailable\n")
+                njobs = 1
+
+        # process all given files:
+        cnt = 0
+        for conf in files:
+            self.process(conf, name)
+            cnt += 1
+            name = 'run%04i' % cnt
+
+        # process jobs:
+        if self.njobs > 1:
+            jobs = []
+            for n in range(self.njobs):
+                j = Process(target=self.run_queue, args=(self.queue,))
+                jobs.append(j)
+                j.start()
+            # wait for completion of all jobs:
+            for j in jobs:
+                j.join()
+        return 0
+
+
+    #------------------------------------------------------------------------
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1].endswith("help"):
         print(__doc__)
     else:
-        main(sys.argv[1:])
+        gosim = Gosimer()
+        gosim.main(sys.argv[1:])
 
 
