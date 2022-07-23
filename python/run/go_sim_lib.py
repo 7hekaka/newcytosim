@@ -45,7 +45,11 @@ def make_directory(root, n=0):
     Create a new directory `root####`, using a 4-digit number >= n
     """
     if root[-1].isdigit():
-        root = root + '-'
+        try:
+            os.mkdir(root)
+            return root
+        except OSError:
+            root = root + '-'
     while n < 10000:
         res = root + '%04i' % n
         try:
@@ -205,8 +209,8 @@ def run(exe, conf, name, args=[], config = None):
     cdir = os.getcwd()
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
-    conf = os.path.abspath(conf);    
-    wdir = make_run_directory('z')
+    conf = os.path.abspath(conf);
+    wdir = make_run_directory(name)
     os.chmod(wdir, 504)
     os.chdir(wdir)
 
@@ -221,7 +225,7 @@ def run(exe, conf, name, args=[], config = None):
     return (val, wdir)
 
 
-def start(exe, conf, name, args=[]):
+def start(exe, conf, root, args=[]):
     """
     Start simulation in a new sub directory, and return immediately.
     The config file `conf` is copied to the sub-directory.
@@ -230,7 +234,7 @@ def start(exe, conf, name, args=[]):
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf)
-    wdir = make_directory(name)
+    wdir = make_directory(root)
     os.chdir(wdir)
     shutil.copyfile(conf, config_name)
     if exe != 'none':

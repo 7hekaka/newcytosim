@@ -23,7 +23,7 @@ Syntax:
     If a python script is specified, it should provide a function parse(input)
        You may use: preconfig.py
     
-    Any number of config file can be provided (at least one).
+    One (or more) config files can be provided.
 
     Any program, even non-binary, can be run using exe=...
 
@@ -47,13 +47,12 @@ try:
 except ImportError:
     host = os.getenv('HOSTNAME', 'unknown')
     sys.stderr.write("go_sim.py could not load necessary python modules on %s\n" % host)
-    time.sleep(10000)
+    time.sleep(3600)
     sys.exit()
 
-# go_sim.py ignores interupting SIGNALS, to make sure that it can perform cleaning-up operations
-# if the child executable is killed on the same occasion.
-# This way 'CTRL-C' will kill the executable, but not this controlling script.
-
+# go_sim.py ignores interupting SIGNALS, to make sure that it can properly clean-up
+# if the child executable is killed on the same occasion. In this way 'CTRL-C'
+# will kill the executable, but not this controlling script.
 
 try:
     import go_sim_lib
@@ -78,6 +77,8 @@ except ImportError:
 def executable(arg):
     return os.path.isfile(arg) and os.access(arg, os.X_OK)
 
+#-------------------------------------------------------------------------------
+
 class Gosimer:
     def __init__(self):
         #define output for error messages:
@@ -94,20 +95,16 @@ class Gosimer:
         self.trust_exe = False
         self.config = "config.cym"
 
-    #------------------------------------------------------------------------
-
-
-
     def run(self, conf, name):
         """
-            run executable 'exe' with config 'conf' in a directory of name 'name'
+            run executable 'exe' with config 'conf' in a directory starting as 'name'
         """
         try:
             (val, res) = go_sim_lib.run(self.exe, conf, name, config = self.config, args=self.arguments)
             if val == 0:
-                self.out.write("Completed run `%s` in %s; " % (conf, res))
+                self.out.write("Completed `%s` in %s; " % (conf, res))
             else:
-                self.out.write("Failed run `%s` in %s with value %i\n" % (conf, res, val))
+                self.out.write("Failed `%s` in %s with value %i\n" % (conf, res, val))
         except KeyboardInterrupt:
             self.err.write("go_sim.py `%s` was interrupted\n" % conf)
         # move run directory to `park` if specified:
@@ -118,7 +115,6 @@ class Gosimer:
                     f.write("parked    %s\n" % time.asctime())
             except Exception as e:
                 self.err.write("go_sim.py cannot move directory: %s\n" % repr(e))
-
 
     def run_queue(self):
         """
@@ -131,7 +127,6 @@ class Gosimer:
             except:
                 break;
 
-
     def process(self, conf, name):
         """
             run configurations files generated from 'conf'
@@ -140,7 +135,7 @@ class Gosimer:
             self.err.write("go_sim.py could not find file '%s'\n" % conf)
             sys.exit()
         # generate config file(s):
-        if self.script is not None:
+        if self.script:
             import tempfile
             tmp = tempfile.mkdtemp('', '_'+name+'-', '.')
             template = tmp + '/config.cym.tpl'
@@ -154,7 +149,10 @@ class Gosimer:
         # process all files created:
         for i, f in enumerate(files):
             if len(files) > 1:
-                n = name + '-%04i' % i
+                if name[-1].isdigit():
+                    n = name + '-%04i' % i
+                else:
+                    n = name + '%04i' % i
             else:
                 n = name
             if self.njobs > 1:
@@ -163,11 +161,8 @@ class Gosimer:
             else:
                 self.run(f, n)
 
-
-    #------------------------------------------------------------------------
-
     def main(self, args):
-        name   = 'run0000'
+        root = 'run'
         files = []
         # parse arguments list:
         for arg in args:
@@ -186,7 +181,7 @@ class Gosimer:
                 elif key == 'preconfig' or key == 'script':
                     self.script = val
                 elif key == 'name':
-                    name = val
+                    root = val
                 elif key == 'park':
                     self.park = val
                 elif key == 'exe':
@@ -219,12 +214,12 @@ class Gosimer:
                 self.out.write("Warning: multiprocessing unavailable\n")
                 njobs = 1
 
-        # process all given files:
-        cnt = 0
-        for conf in files:
-            self.process(conf, name)
-            cnt += 1
-            name = 'run%04i' % cnt
+        # process given files:
+        if len(files) > 1:
+            for i, f in enumerate(files):
+                self.process(f, root+'%04i'%i)
+        else:
+            self.process(files[0], root)
 
         # process jobs:
         if self.njobs > 1:
@@ -238,15 +233,13 @@ class Gosimer:
                 j.join()
         return 0
 
-
-    #------------------------------------------------------------------------
-
+#-------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or sys.argv[1].endswith("help"):
         print(__doc__)
     else:
-        gosim = Gosimer()
-        gosim.main(sys.argv[1:])
+        object = Gosimer()
+        object.main(sys.argv[1:])
 
 
