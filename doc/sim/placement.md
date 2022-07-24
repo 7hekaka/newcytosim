@@ -150,11 +150,13 @@ Syntax:
      }
  
 PLACEMENT can be:
- 
-- `inside` (default), it tries to find a place inside the Space
-- `anywhere`, the position is returned
-- `outside`, the object is created only if it is outside the Space
+
+- `inside` (default), the object is created with a majority of vertices inside the Space
+- `all_inside`: the object is created only if all its vertices are inside
+- `outside`, the object is created only if it is placed outside the Space
 - `surface`, the position is projected on the edge of current Space
+- `anywhere`, the object is placed in a random position with random orientation
+- `off`: translation/rotation are not applied
 .
  
 By default, these specifications are relative to the first Space to be defined,

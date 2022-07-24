@@ -237,10 +237,12 @@ enum PlacementType { PLACE_NOT = 0, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
      }
  
  PLACEMENT can be:
- - if placement = `inside` (default), it tries to find a place inside the Space
- - if placement = `anywhere`, the position is returned
- - if placement = `outside`, the object is created only if it is outside the Space
- - if placement = `surface`, the position is projected on the edge of current Space
+ - `inside` (default), the object is created with a majority of vertices inside the Space
+ - `all_inside`: the object is created only if all its vertices are inside
+ - `outside`, the object is created only if it is placed outside the Space
+ - `surface`, the position is projected on the edge of current Space
+ - `anywhere`, the object is placed in a random position with random orientation
+ - `off`: translation/rotation are not applied
  .
  
  By default, the specifications are relative to the first Space to be defined,
@@ -568,12 +570,12 @@ class Filter
 {
 public:
 
-    ObjectMark      mrk;
-    unsigned        st1;
-    unsigned        st2;
-    Space    const* ins;
-    Space    const* ous;
+    Space const* ins;
+    Space const* ous;
     Property const* prp;
+    ObjectMark mrk;
+    unsigned st1;
+    unsigned st2;
 
     /// initialize
     Filter()
@@ -593,15 +595,14 @@ public:
         std::string str;
         if ( opt.set(str, "position") )
         {
-            Space const* spc = nullptr;
+            Space const* spc = sim->spaces.master();
             std::string spn;
             if ( opt.set(spn, "position", 1) )
+            {
                 spc = sim->findSpace(spn);
-            else
-                spc = sim->spaces.master();
-            if ( !spc )
-                throw InvalidSyntax("unknown Space `"+spn+"'");
-            
+                if ( !spc )
+                    throw InvalidSyntax("unknown Space `"+spn+"'");
+            }
             if ( str == "inside" )
                 ins = spc;
             else if ( str == "outside" )
