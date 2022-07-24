@@ -621,7 +621,7 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
 #endif
         asLinks[i].read(in, asRadius);
-        if ( asLinks[i].prime_ + DIM >= sol->nbPoints() )
+        if ( asLinks[i].prime_ + in.vectorSize() >= sol->nbPoints() )
             throw InvalidIO("out-of-range AsterLink index");
     }
     
