@@ -174,82 +174,67 @@ inline void italian_xptts2(int size, int nrhs, real const* D, real const* E, rea
  
  This works even if 'L == U'
  
- This code was not tested for L != U!!!
+ WARNING: This code was not tested for L != U
  Modified from:
  https://en.wikibooks.org/wiki/Algorithm_Implementation/Linear_Algebra/Tridiagonal_matrix_algorithm
  */
-void italian_thomas(int size, real* L, real* D, real* U, real* B)
+void italian_solve(int size, real* L, real* D, real* U, real* X)
 {
-#if 0
+#if 1
     D[0] = real(1) / D[0];
-    B[0] = D[0] * B[0];
+    X[0] = D[0] * X[0];
     if ( size > 1 )
     {
-        // upward recursion on B[]
+        // upward recursion
         for ( int n = 1; n < size; ++n )
         {
             D[n] = real(1) / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
-            B[n] = D[n] * ( B[n] - U[n-1] * B[n-1] );
+            X[n] = D[n] * ( X[n] - U[n-1] * X[n-1] );
         }
-        // downward recursion on B[]
+        // downward recursion
         for ( int i = size-2; i > 0; --i )
-            B[i] = B[i] - ( D[i] * U[i] ) * B[i+1];
-        B[0] = B[0] - ( D[0] * U[0] ) * B[1];
+            X[i] = X[i] - ( D[i] * U[i] ) * X[i+1];
+        X[0] = X[0] - ( D[0] * U[0] ) * X[1];
     }
 #else
     real l = L[0];
     real e = U[0] * L[0];
     real d = 1 / D[0];
     U[0] = U[0] / D[0];
-    B[0] = B[0] / D[0];
+    X[0] = X[0] / D[0];
     if ( size > 1 )
     {
-        // upward recursion on B[]
+        // upward recursion
         for ( int n = 1; n < size; ++n )
         {
             //D[n] = real(1) / ( D[n] - ( L[n-1] * U[n-1] ) * D[n-1] );
             d = real(1) / ( D[n] - e * d );
-            //B[n] = D[n] * ( B[n] - U[n-1] * B[n-1] );
-            B[n] = d * ( B[n] - l * B[n-1] );
+            //X[n] = D[n] * ( X[n] - U[n-1] * X[n-1] );
+            X[n] = d * ( X[n] - l * X[n-1] );
             l = L[n];
             e = l * U[n];
             U[n] = U[n] * d;
         }
-        // downward recursion on B[]
+        // downward recursion
         for ( int n = size-2; n > 0; --n )
-            B[n] = B[n] - U[n] * B[n+1];
-        B[0] = B[0] - U[0] * B[1];
+            X[n] = X[n] - U[n] * X[n+1];
+        X[0] = X[0] - U[0] * X[1];
     }
 #endif
 }
 
 
 /**
- Adapted from
+ Translated from pseudo code to C
  https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
- 
- A is the sub diagonal of size N-1
- B is the diagonal of size N
- C is the upper diagonal of size N-1
- 
+     A is the sub diagonal of size N-1
+     B is the diagonal of size N
+     C is the upper diagonal of size N-1
  B is modified in this version!
+ ATTENTION: Wikipedia version has A starting at index 2
  */
-void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
+void wikipedia_solve(int N, real const* A, real* B, real const* C, real* X)
 {
-#if 1
-    // revised version without divisions in the downward recursion
-    X[0] = X[0] / B[0];
-    B[0] = C[0] / B[0];
-    for ( size_t i = 1; i < N; ++i )
-    {
-        real W = real(1) / ( B[i] - B[i-1] * A[i-1] );
-        X[i] = W * ( X[i] - A[i-1] * X[i-1] );
-        B[i] = W * C[i];
-    }
-    for ( size_t i = N-1; i-- > 0; )  // look at this 'i-- > 0'!
-        X[i] = X[i] - B[i] * X[i+1];
-#else
-    // wikipedia's version translated to C
     for ( int i = 1; i < N; ++i )
     {
         real W = A[i-1] / B[i-1];
@@ -259,7 +244,30 @@ void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
     X[N-1] = X[N-1] / B[N-1];
     for ( int i = N-2; i >= 0; --i )
         X[i] = ( X[i] - C[i] * X[i+1] ) / B[i];
-#endif
+}
+
+/**
+ Adapted to remove divisions in the downward recursion, from
+ https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+     A is the sub diagonal of size N-1
+     B is the diagonal of size N
+     C is the upper diagonal of size N-1
+ B is modified in this version!
+ ATTENTION: Wikipedia version has A starting at index 2
+ */
+void tridiagonal_solve(int N, real const* A, real* B, real* C, real* X)
+{
+    X[0] = X[0] / B[0];
+    B[0] = C[0] / B[0];
+    real W = B[1] - B[0] * A[0];
+    for ( int i = 1; i < N; ++i )
+    {
+        B[i] = C[i] / W;
+        X[i] = ( X[i] - X[i-1] * A[i-1] ) / W;
+        W = B[i+1] - B[i] * A[i];
+    }
+    for ( int i = N-1; i >= 0; --i )
+        X[i] = X[i] - B[i] * X[i+1];
 }
 
 //------------------------------------------------------------------------------
@@ -274,7 +282,7 @@ void tridiagonal_solve(size_t N, real const* A, real* B, real const* C, real* X)
  E[] is addressed withing [0, size-2]
  Improved on 02.04.2020: reduced memory use
  */
-int alsatian_xpttrf(int size, real* D, real* E)
+int alsatian_xpttrf(const int size, real* D, real* E)
 {
     if ( size < 1 || D[0] < 0 )
         return 1;
@@ -337,7 +345,7 @@ void alsatian_xptts2(int size, real const* D, real const* DE, real* B)
 
 
 /// offering LAPACK's standard arguments
-inline void alsatian_xptts2(int size, size_t nrhs, real const* D, real const* DE, real* B, size_t LDB)
+inline void alsatian_xptts2(int size, int nrhs, real const* D, real const* DE, real* B, int LDB)
 {
     assert_true(nrhs == 1); // in this case, the last argument is ignored
     return alsatian_xptts2(size, D, DE, B);
@@ -347,7 +355,7 @@ inline void alsatian_xptts2(int size, size_t nrhs, real const* D, real const* DE
 This implements Thomas's algorithm to solve a linear system
 with a tridiagonal symmetric matrix {E, D, E} and right-hand side 'B'
 */
-void alsatian_thomas(size_t size, real* D, real* E, real* B)
+void alsatian_solve(int size, real* D, real* E, real* B)
 {
     assert_true(size > 0);
     real w = real(1) / D[0];
@@ -359,7 +367,7 @@ void alsatian_thomas(size_t size, real* D, real* E, real* B)
     B[0] = y * w;
 
     // upward recursion
-    for ( size_t n = 1; n < size; ++n )
+    for ( int n = 1; n < size; ++n )
     {
         w = real(1) / ( D[n] - w * e );
         e = E[n] * E[n];
@@ -374,7 +382,7 @@ void alsatian_thomas(size_t size, real* D, real* E, real* B)
     {
         y = B[size-1];
         // downward recursion on B[]
-        for ( size_t n = size-2; n > 0; --n )
+        for ( int n = size-2; n > 0; --n )
         {
             y = B[n] - E[n] * y;
             B[n] = y;

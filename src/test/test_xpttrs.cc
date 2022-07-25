@@ -15,15 +15,15 @@
 //------------------------------------------------------------------------------
 
 template < void (*FUNC)(int, real*, real*, int*) >
-void test(int N, real const* Ds, real const* Us, real* D, real* U, char const str[], size_t cnt)
+void test(int N, real const* D, real const* U, real* d, real* u, char const str[], size_t cnt)
 {
     int info;
     tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(N, Ds, D);
-        copy_real(N, Us, U);
-        FUNC(N, D, U, &info);
+        copy_real(N, D, d);
+        copy_real(N, U, u);
+        FUNC(N, d, u, &info);
     }
     printf(" %12s cpu %5.0f\n", str, tock());
 }
@@ -48,48 +48,48 @@ void italian_factor(int size, real* D, real* E, int* info)
  */
 void testFactor(int NSEG, size_t cnt)
 {
+    real * d = new_real(NSEG);
+    real * u = new_real(NSEG);
     real * D = new_real(NSEG);
     real * U = new_real(NSEG);
-    real * Ds = new_real(NSEG);
-    real * Us = new_real(NSEG);
 
     for ( int i = 0; i < NSEG; ++i )
     {
-        Ds[i] = 2.0;
-        Us[i] = -0.5 * RNG.preal();
+        D[i] = 2.0;
+        U[i] = -0.5 * RNG.preal();
     }
     
-    test<divide>(NSEG, Ds, Us, D, U, "divide", cnt);
-    test<lapack::xpttrf>(NSEG, Ds, Us, D, U, "lapack", cnt);
-    test<lapack_xpttrf>(NSEG, Ds, Us, D, U, "c-lapack", cnt);
-    test<italian_factor>(NSEG, Ds, Us, D, U, "italian", cnt);
-    test<alsatian_xpttrf>(NSEG, Ds, Us, D, U, "alsatian", cnt);
+    test<divide>(NSEG, D, U, d, u, "divide", cnt);
+    test<lapack::xpttrf>(NSEG, D, U, d, u, "lapack", cnt);
+    test<lapack_xpttrf>(NSEG, D, U, d, u, "c-lapack", cnt);
+    test<italian_factor>(NSEG, D, U, d, u, "italian", cnt);
+    test<alsatian_xpttrf>(NSEG, D, U, d, u, "alsatian", cnt);
 
+    free_real(d);
+    free_real(u);
     free_real(D);
     free_real(U);
-    free_real(Ds);
-    free_real(Us);
 }
 
 //------------------------------------------------------------------------------
 
 template < void (*FACTOR)(int, real*, real*, int*), void (*SOLVE)(int, real const*, real const*, real*) >
-void check(int N, real const* Ds, real const* Us, real const* Bs, real* D, real* U, real* B, real* S, char const str[], size_t cnt)
+void check(int N, real const* D, real const* U, real const* B, real* d, real* u, real* b, real* S, char const str[], size_t cnt)
 {
     int info;
-    copy_real(N, Ds, D);
-    copy_real(N, Us, U);
-    copy_real(N, Bs, B);
-    FACTOR(N, D, U, &info);
-    SOLVE(N, D, U, B);
-    VecPrint::edges(N, B);
-    real err = blas::difference(N, S, B);
+    copy_real(N, D, d);
+    copy_real(N, U, u);
+    copy_real(N, B, b);
+    FACTOR(N, d, u, &info);
+    SOLVE(N, d, u, b);
+    VecPrint::edges(N, b);
+    real err = blas::difference(N, S, b);
     printf(" err %f %12s", err, str);
     if ( err < 0.001 )
     {
         tick();
         for ( size_t n = 0; n < cnt; ++n )
-            SOLVE(N, D, U, B);
+            SOLVE(N, d, u, b);
         printf(" cpu %5.0f", tock());
     }
     printf("\n");
@@ -101,57 +101,57 @@ void check(int N, real const* Ds, real const* Us, real const* Bs, real* D, real*
  */
 void testSolve(int NSEG, size_t cnt)
 {
+    real * d = new_real(NSEG);
+    real * u = new_real(NSEG);
+    real * b = new_real(NSEG);
     real * D = new_real(NSEG);
     real * U = new_real(NSEG);
     real * B = new_real(NSEG);
-    real * Ds = new_real(NSEG);
-    real * Us = new_real(NSEG);
-    real * Bs = new_real(NSEG);
     real * S = new_real(NSEG);
 
     for ( int i = 0; i < NSEG; ++i )
     {
-        Ds[i] = 2.0;
-        Us[i] = -RNG.preal();
-        Bs[i] = RNG.sreal();
+        D[i] = 2.0;
+        U[i] = -RNG.preal();
+        B[i] = RNG.sreal();
     }
 
     // calculate reference result:
     int info;
-    copy_real(NSEG, Ds, D);
-    copy_real(NSEG, Us, U);
-    copy_real(NSEG, Bs, S);
-    lapack::xpttrf(NSEG, D, U, &info);
-    lapack::xptts2(NSEG, D, U, S);
+    copy_real(NSEG, D, d);
+    copy_real(NSEG, U, u);
+    copy_real(NSEG, B, S);
+    lapack::xpttrf(NSEG, d, u, &info);
+    lapack::xptts2(NSEG, d, u, S);
 
-    check<lapack::xpttrf, lapack::xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "lapack", cnt);
-    check<lapack_xpttrf, lapack_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "c-lapack", cnt);
-    check<italian_factor, italian_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "italian", cnt);
-    check<alsatian_xpttrf, alsatian_xptts2>(NSEG, Ds, Us, Bs, D, U, B, S, "alsatian", cnt);
+    check<lapack::xpttrf, lapack::xptts2>(NSEG, D, U, B, d, u, b, S, "lapack", cnt);
+    check<lapack_xpttrf, lapack_xptts2>(NSEG, D, U, B, d, u, b, S, "c-lapack", cnt);
+    check<italian_factor, italian_xptts2>(NSEG, D, U, B, d, u, b, S, "italian", cnt);
+    check<alsatian_xpttrf, alsatian_xptts2>(NSEG, D, U, B, d, u, b, S, "alsatian", cnt);
 
+    free_real(d);
+    free_real(u);
+    free_real(b);
     free_real(D);
     free_real(U);
     free_real(B);
-    free_real(Ds);
-    free_real(Us);
-    free_real(Bs);
     free_real(S);
 }
 
 //------------------------------------------------------------------------------
 
 template < void (*FUNC)(int, real*, real*, real*) >
-void verify(int N, real const* Ds, real const* Us, real const* Bs, real* D, real* U, real* B, char const str[], size_t cnt)
+void verify(int N, real const* D, real const* U, real const* B, real* d, real* u, real* b, char const str[], size_t cnt)
 {
     tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
-        copy_real(N, Ds, D);
-        copy_real(N, Us, U);
-        copy_real(N, Bs, B);
-        FUNC(N, D, U, B);
+        copy_real(N, D, d);
+        copy_real(N, U, u);
+        copy_real(N, B, b);
+        FUNC(N, d, u, b);
     }
-    VecPrint::edges(N, B);
+    VecPrint::edges(N, b, 3);
     printf(" %12s cpu %5.0f\n", str, tock());
 }
 
@@ -171,7 +171,7 @@ void solveC(int N, real* D, real* U, real* B)
 
 void solveI(int N, real* D, real* U, real* B)
 {
-    italian_thomas(N, U, D, U, B);
+    italian_solve(N, U, D, U, B);
 }
 
 void solveA(int N, real* D, real* U, real* B)
@@ -181,9 +181,14 @@ void solveA(int N, real* D, real* U, real* B)
     alsatian_xptts2(N, D, U, B);
 }
 
-void solveB(int N, real* D, real* U, real* B)
+void solveF(int N, real* D, real* U, real* B)
 {
-    alsatian_thomas(N, D, U, B);
+    alsatian_solve(N, D, U, B);
+}
+
+void solveW(int N, real* D, real* U, real* B)
+{
+    wikipedia_solve(N, U, D, U, B);
 }
 
 void solveT(int N, real* D, real* U, real* B)
@@ -196,35 +201,36 @@ void solveT(int N, real* D, real* U, real* B)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testThomas(int NSEG, size_t cnt)
+void testFused(int NSEG, size_t cnt)
 {
+    real * d = new_real(NSEG);
+    real * u = new_real(NSEG);
+    real * b = new_real(NSEG);
     real * D = new_real(NSEG);
     real * U = new_real(NSEG);
     real * B = new_real(NSEG);
-    real * Ds = new_real(NSEG);
-    real * Us = new_real(NSEG);
-    real * Bs = new_real(NSEG);
 
     for ( int i = 0; i < NSEG; ++i )
     {
-        Ds[i] = 2.0;
-        Us[i] = -RNG.preal();
-        Bs[i] = RNG.sreal();
+        D[i] = 4.0 - RNG.preal();
+        U[i] = -RNG.preal();
+        B[i] = RNG.sreal();
     }
     
-    verify<solveL>(NSEG, Ds, Us, Bs, D, U, B, "lapack", cnt);
-    verify<solveC>(NSEG, Ds, Us, Bs, D, U, B, "c-lapack", cnt);
-    verify<solveI>(NSEG, Ds, Us, Bs, D, U, B, "italian", cnt);
-    verify<solveA>(NSEG, Ds, Us, Bs, D, U, B, "alsatian2", cnt);
-    verify<solveB>(NSEG, Ds, Us, Bs, D, U, B, "alsatian", cnt);
-    verify<solveT>(NSEG, Ds, Us, Bs, D, U, B, "tridiag", cnt);
+    verify<solveL>(NSEG, D, U, B, d, u, b, "lapack", cnt);
+    verify<solveC>(NSEG, D, U, B, d, u, b, "c-lapack", cnt);
+    verify<solveI>(NSEG, D, U, B, d, u, b, "italian", cnt);
+    verify<solveA>(NSEG, D, U, B, d, u, b, "alsatian", cnt);
+    verify<solveF>(NSEG, D, U, B, d, u, b, "alsafused", cnt);
+    verify<solveW>(NSEG, D, U, B, d, u, b, "wikipedia", cnt);
+    verify<solveT>(NSEG, D, U, B, d, u, b, "tridiagonal", cnt);
 
+    free_real(d);
+    free_real(u);
+    free_real(b);
     free_real(D);
     free_real(U);
     free_real(B);
-    free_real(Ds);
-    free_real(Us);
-    free_real(Bs);
 }
 
 int main(int argc, char* argv[])
@@ -235,10 +241,10 @@ int main(int argc, char* argv[])
     
     RNG.seed();
     std::cout << "Tridiagonal positive symmetric matrix --- real " << sizeof(real) << " bytes --- " << __VERSION__ << "\n";
-    std::cout << "testPTTRF\n";
+    std::cout << "Factorize\n";
     testFactor(nbs, 1<<20);
-    std::cout << "testPTTS\n";
+    std::cout << "Solve\n";
     testSolve(nbs, 1<<20);
-    std::cout << "testThomas\n";
-    testThomas(nbs, 1<<18);
+    std::cout << "Factorize & Solve\n";
+    testFused(nbs, 1<<18);
 }
