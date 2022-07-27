@@ -217,6 +217,7 @@ int main(int argc, char* argv[])
         {
             report(out, simul, what, arg, frame);
             ++cnt;
+            frame += period;
         }
     }
     
