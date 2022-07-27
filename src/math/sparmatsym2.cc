@@ -92,8 +92,8 @@ void SparMatSym2::allocate(size_t alc)
 #endif
 #if SPARMAT2_USES_COLNEXT
         delete[] colidx_;
-        colidx_ = new unsigned[alc+1];
-        for ( size_t n = 0; n <= alc; ++n )
+        colidx_ = new unsigned[alc+2];
+        for ( unsigned n = 0; n <= alc; ++n )
             colidx_[n] = n;
 #endif
     }

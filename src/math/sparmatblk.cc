@@ -44,8 +44,8 @@ void SparMatBlk::allocate(size_t alc)
         alloc_ = alc;
         
         delete[] colidx_;
-        colidx_ = new unsigned[alc+1];
-        for ( size_t n = 0; n <= alc; ++n )
+        colidx_ = new unsigned[alc+2];
+        for ( unsigned n = 0; n <= alc; ++n )
             colidx_[n] = n;
     }
 }
@@ -972,6 +972,7 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
 // multiplication of a vector: Y = Y + M * X
 void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
+    assert_true( start <= size_ );
     assert_true( start <= stop );
     stop = std::min(stop, size_);
     for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )

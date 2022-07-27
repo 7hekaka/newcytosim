@@ -2,6 +2,7 @@
 
 #include <sys/time.h>
 #include <fstream>
+#include <map>
 
 #include "assert_macro.h"
 #include "exceptions.h"
@@ -310,57 +311,49 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 
 struct Job
 {
-    real const* src;
     SparMatBlk const* mat;
+    real const* src;
     real * dst;
     size_t mul;
 };
 
-void work(void* context, size_t i)
+void worker(void* context, size_t i)
 {
     Job * job = (Job*)context;
-    job->mat->vecMulAdd(job->src, job->dst, job->mul*i, job->mul*(i+1));
     //fprintf(stderr, "%lX ", i&15);
+    job->mat->vecMulAdd(job->src, job->dst, job->mul*i, job->mul*(i+1));
 }
 
 void testMatrixDispatch(SparMatBlk& mat, real const* x, real const* y, real * z)
 {
+    std::map<int, double> rec;
     size_t S = mat.size() / DIM;
     mat.reset();
     fillMatrix(mat);
     mat.prepareForMultiply(1);
     
-    const size_t sup = 32;
-    double t[sup] = { 0 };
-
-    tick();
-    zero_real(DIM*S, z);
-    for ( size_t j=0; j < CNT; ++j )
-        mat.vecMulAdd(x, z);
-    t[0] = tock(N_RUN);
     zero_real(DIM*S, z);
     mat.vecMulAdd(x, z);
-    printf("\n %s: muladd %9.0f check %+16.6f ", mat.what().c_str(), t[0], checksum(DIM*S, z));
-    
+    printf("\nsequential     %+16.6f  %s", checksum(DIM*S, z), mat.what().c_str());
+
     dispatch_queue_t queue = dispatch_queue_create("QUEUE", DISPATCH_QUEUE_CONCURRENT);
-    for ( unsigned u : { 1, 2, 4, 8, 16, 32 } )
+    for ( unsigned u : { 1, 2, 4, 8, 10, 12, 16, 32 } )
     {
-        Job job { x, &mat, z, u };
+        Job job { &mat, x, z, u };
         zero_real(DIM*S, z);
-        tick();
-        for ( size_t j=0; j < CNT; ++j )
-            dispatch_apply_f(S/u, queue, &job, work);
-        t[u] = tock(N_RUN);
-        zero_real(DIM*S, z);
-        dispatch_apply_f(S/u, queue, &job, work);
+        dispatch_apply_f((S+u-1)/u, queue, &job, worker);
         printf("\n%2u libdispatch %+16.6f", u, checksum(DIM*S, z));
+        tick();
+        for ( size_t j = 0; j < CNT; ++j )
+            dispatch_apply_f((S+u-1)/u, queue, &job, worker);
+        rec[u] = tock(N_RUN);
     }
     dispatch_release(queue);
 
     //printf("\n%-29s", mat.what().c_str());
-    printf("\n--> Threaded muladd ");
-    for ( unsigned u : { 1, 2, 4, 8, 16, 32 } )
-        printf(" %uD %-6.1f", u, t[u]);
+    printf("\n--> Dispatched muladd ");
+    for ( auto u : rec )
+        printf(" %uT %-6.1f", u.first, u.second);
     fflush(stdout);
 }
 #endif
@@ -397,13 +390,11 @@ void checkMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t
 template <typename MATRIX>
 void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
 {
+    std::map<int, double> rec;
     size_t S = mat.size() / DIM;
     mat.reset();
     fillMatrix(mat);
     mat.prepareForMultiply(1);
-
-    const size_t sup = 32;
-    double t[sup] = { 0 };
     
     for ( int u : { 1, 2, 3, 4, 6, 8, 10, 16 } )
     {
@@ -419,13 +410,13 @@ void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t 
             for ( size_t i = 0; i < S; i += chunk )
                 mat.vecMulAdd(x, z, i, i+chunk);
         }
-        t[u] = tock(N_RUN);
+        rec[u] = tock(N_RUN);
     }
 
     //printf("\n%-29s", mat.what().c_str());
     printf("\n--> Threaded ");
-    for ( int u : { 1, 2, 3, 4, 6, 8, 10, 16 } )
-        printf(" %luT %-6.1f", u, t[u]);
+    for ( u : rec )
+        printf(" %luT %-6.1f", u.first, u.second);
     fflush(stdout);
 }
 
@@ -558,14 +549,14 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
     SparMatD mat4; mat4.resize(S); testMatrix<SparMatD, fillMatrix>(mat4, x, y, z);
 #endif
     SparMatA mat5; mat5.resize(S); testMatrix<SparMatA, fillMatrix>(mat5, x, y, z);
-    
 #ifdef _OPENMP
     size_t chunk = S / 16;
     testMatrixOMP(mat5, x, y, z, chunk);
     checkMatrixOMP(mat5, x, y, z, chunk);
 #endif
+#if defined(__APPLE__)
     testMatrixDispatch(mat5, x, y, z);
-
+#endif
 #if ( 0 )
     std::ofstream os1("mat1.txt");
     std::ofstream os3("mat3.txt");
@@ -725,7 +716,7 @@ int main( int argc, char* argv[] )
     //testMatrices(8*56, 1<<17);
     testMatrices(8*110, 1<<18);
 #endif
-    //testMatrices(8*37, 1<<17);
+    //testMatrices(37, 1<<17);
     testMatrices(15464, 27676);
 #if ( 0 )
     size_t dim[5] = { 0 };

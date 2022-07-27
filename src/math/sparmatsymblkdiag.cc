@@ -58,8 +58,8 @@ void SparMatSymBlkDiag::allocate(size_t alc)
         alloc_ = alc;
         
         delete[] colix_;
-        colix_ = new unsigned[alc+1];
-        for ( size_t n = 0; n <= alc; ++n )
+        colix_ = new unsigned[alc+2];
+        for ( unsigned n = 0; n <= alc; ++n )
             colix_[n] = n;
     }
 }
