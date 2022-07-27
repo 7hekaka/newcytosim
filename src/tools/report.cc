@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 /**
  This is a program to analyse simulation results:
  it reads a trajectory-file, and print some data from it.
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 #endif
     
     size_t frame = 0;
-    size_t period = 0;
+    size_t period = 1;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
     if ( arg.use_key("-") ) arg.define("verbose", 0);
@@ -216,6 +216,7 @@ int main(int argc, char* argv[])
         while ( 0 == reader.loadFrame(simul, frame)  )
         {
             report(out, simul, what, arg, frame);
+            frame += period;
             ++cnt;
         }
     }
