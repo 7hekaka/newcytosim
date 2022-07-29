@@ -397,7 +397,9 @@ void Interface::new_object(ObjectList& objs, ObjectSet* set, Property const* pp,
     
     // optionally mark the objects:
     ObjectMark mk = 0;
-    if ( opt.set(mk, "mark") )
+    if ( opt.value("mark") == "random" )
+        mk = RNG.pint32();
+    if ( mk || opt.set(mk, "mark") )
     {
         for ( Object * i : objs )
             i->mark(mk);
