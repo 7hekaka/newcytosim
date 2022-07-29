@@ -21,44 +21,45 @@ vpath %.cc src/test
 
 GLTEST_MAKE = $(COMPILE) $(addprefix -Isrc/, math base sim gym disp) $(OBJECTS) $(LINK) $(GRAFIX) $(IMAGES) -o bin/$@
 
+TEST_OBJ = $(addprefix build/, random_vector.o random.o SFMT.o backtrace.o exceptions.o)
 
 #----------------------------Targets--------------------------------------------
 
 vpath test_% bin
 
-test_code: test_code.cc random.o SFMT.o backtrace.o | bin
+test_code: test_code.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_bits: test_bits.cc random.o SFMT.o backtrace.o | bin
+test_bits: test_bits.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_ortho: test_ortho.cc random.o SFMT.o backtrace.o | bin
+test_ortho: test_ortho.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_array: test_array.cc random.o SFMT.o backtrace.o | bin
+test_array: test_array.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_blas: test_blas.cc random.o SFMT.o backtrace.o | bin
+test_blas: test_blas.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_project: test_project.cc random.o random_vector.o SFMT.o | bin
+test_project: test_project.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_xpttrs: xpttrf.h test_xpttrs.cc random.o SFMT.o | bin
+test_xpttrs: xpttrf.h test_xpttrs.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_xtbsv: xtbsv.h test_xtbsv.cc random.o SFMT.o | bin
+test_xtbsv: xtbsv.h test_xtbsv.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_rigidity: test_rigidity.cc random.o random_vector.o SFMT.o | bin
+test_rigidity: test_rigidity.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
@@ -66,11 +67,11 @@ test_size: test_size.cc cytolib.a cytomath.a cytobase.a | bin
 	$(COMPILE) -Isrc/math -Isrc/base -Isrc/sim $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_block: test_block.cc matrix33.o matrix34.o vector3.o vector4.o matfull.o random_vector.o random.o SFMT.o backtrace.o | bin
+test_block: test_block.cc matrix33.o matrix34.o vector3.o vector4.o matfull.o $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
 	$(DONE)
 
-test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o sparmatsym.o sparmatsym1.o sparmatsym2.o matrix.o random.o SFMT.o backtrace.o operator_new.o | bin
+test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o sparmatsym.o sparmatsym1.o sparmatsym2.o matrix.o $(TEST_OBJ) operator_new.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
 	$(DONE)
 
@@ -78,19 +79,19 @@ test_glossary: test_glossary.cc glossary.o filepath.o tokenizer.o stream_func.o 
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_quartic: test_quartic.cc quartic_solver.o random.o SFMT.o backtrace.o | bin
+test_quartic: test_quartic.cc quartic_solver.o $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_quaternion: test_quaternion.cc matrix33.o random_vector.o random.o SFMT.o | bin
+test_quaternion: test_quaternion.cc matrix33.o $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_random: test_random.cc random.o SFMT.o exceptions.o filewrapper.o messages.o backtrace.o | bin
+test_random: test_random.cc $(TEST_OBJ) filewrapper.o messages.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_variablerate: test_variablerate.cc random.o SFMT.o exceptions.o | bin
+test_variablerate: test_variablerate.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
@@ -98,7 +99,7 @@ test_asm: test_asm.cc | bin
 	$(COMPILE) -restrict -S -c -m64 $^ -o build/test_asm.s
 	$(DONE)
 
-test_simd: test_simd.cc random.o SFMT.o | bin
+test_simd: test_simd.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) -o bin/$@
 	$(DONE)
 
@@ -114,7 +115,7 @@ test_sizeof: test_sizeof.cc | bin
 	$(COMPILE) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_pipe: test_pipe.cc gle_color.cc gle_color_list.cc random.o SFMT.o | bin
+test_pipe: test_pipe.cc gle_color.cc gle_color_list.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math -Isrc/gym $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
@@ -134,7 +135,7 @@ test_string: test_string.cc | bin
 	$(COMPILE) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_gillespie: test_gillespie.cc random.o SFMT.o backtrace.o | bin
+test_gillespie: test_gillespie.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) -o bin/$@
 	$(DONE)
 
@@ -162,7 +163,7 @@ test_solve: test_solve.cc cytomath.a cytobase.a SFMT.o gym_matrix.o | bin
 
 #----------------------------Targets using GLAPP--------------------------------
 
-OBJ_GLAP := $(OBJ_DISP:%.o=build/%.o) $(OBJ_GFX) save_imageGL.o cytobase.a cytomath.a SFMT.o
+OBJ_GLAP := $(OBJ_DISP:%.o=build/%.o) $(OBJ_GFX) save_imageGL.o cytobase.a cytomath.a build/SFMT.o
 
 test_glapp: test_glapp.cc $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
