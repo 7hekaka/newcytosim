@@ -200,8 +200,8 @@ public:
     /// number of elements in j-th column
     size_t column_size(size_t j) const { assert_true(j<size_); return row_[j].rlen_; }
     
-    /// line index of n-th element in j-th column
-    size_t column_index(size_t j, size_t n) const { return row_[j].inx_[n]; }
+    /// reduced line index of n-th element in j-th column (not multiplied by BLOCK_SIZE)
+    size_t column_index(size_t j, size_t n) const { assert_true(j<size_); return row_[j].inx_[n]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)

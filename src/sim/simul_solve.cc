@@ -181,6 +181,13 @@ void Simul::solve()
     //auto rdt = timer();
     setAllInteractions(sMeca);
     //printf("     ::set      %16llu\n", (timer()-rdt)>>5); rdt = timer();
+#if 0
+    // experimental RCM ordering (29.7.2022):
+    sMeca.reorderMecables();
+    setAllInteractions(sMeca);
+    sMeca.saveMatrixBitmaps();
+#endif
+    //printf("     ::order    %16llu\n", (timer()-rdt)>>5); rdt = timer();
     sMeca.solve();
     //printf("     ::solve    %16llu\n", (timer()-rdt)>>5); rdt = timer()
     sMeca.apply();
@@ -322,7 +329,7 @@ void Simul::solve_separate()
 #else
     Object ** table = new Object*[cnt+2]{nullptr};
     size_t sup = orderClustersCouple(table, cnt);
-    std::clog << "Ordered " << sup << " clusters\n";
+    std::clog << "Ordered " << sup << " clusters:\n";
     delete[] table;
 #endif
     
@@ -429,7 +436,6 @@ void Simul::solve_flux()
 //------------------------------------------------------------------------------
 #pragma mark - Analysis
 
-
 void Simul::flagClustersMeca() const
 {
     prop.complete(*this);
@@ -443,6 +449,7 @@ void Simul::flagClustersMeca() const
 static void join(Object ** table, ObjectFlag f, ObjectFlag g)
 {
     assert_true( f < g );
+    assert_true( table[g] );
     Object * F = nullptr;
     Object * G = table[g];
     do {
@@ -471,8 +478,8 @@ static size_t depth(Object * ptr)
 
 ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
 {
+    // attribute unique flag to all Fibers:
     Object * F = fibers.first();
-    Object * G;
     ObjectFlag flg = 0;
     while ( F )
     {
@@ -494,8 +501,8 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
             join(table, g, f);
     }
 #if 1
+    // pool smaller clusters together to reach 'target'
     const size_t target = 256;
-    // pool smaller clusters together
     ObjectFlag s = 1;
     size_t cnt = depth(table[s]);
     for ( ObjectFlag f = s+1; f <= sup; ++f )
@@ -517,15 +524,15 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
     }
 #endif
     // put all objects back in list
-    G = nullptr;
-    ObjectFlag num = 0;
+    Object * G = nullptr;
+    flg = 0;
     for ( ObjectFlag f = 0; f <= sup; ++f )
     {
         F = table[f];
         if ( F )
         {
-            ++num;
-            F->flag(num);
+            ++flg;
+            F->flag(flg);
             F->prev(G);
             if ( G )
                 G->next(F);
@@ -535,7 +542,7 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
             F = F->next();
             while ( F )
             {
-                F->flag(num);
+                F->flag(flg);
                 F->prev(G);
                 G->next(F);
                 G = F;
@@ -544,7 +551,7 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
         }
     }
     fibers.pool_.back(G);
-    return num;
+    return flg;
 }
 
 //==============================================================================

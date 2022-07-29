@@ -379,12 +379,11 @@ void Meca::readyMecables()
     // allocate extra to allow some SIMD instruction burr
     allocate(cnt+1);
     
+    // allocate sparse matrices:
 #if USE_ISO_MATRIX
-    //allocate the sparse matrices:
     mISO.resize(cnt);
     mISO.reset();
 #endif
-    
     mFUL.resize(DIM*cnt);
     mFUL.reset();
     

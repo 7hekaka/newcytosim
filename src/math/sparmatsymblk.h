@@ -181,8 +181,8 @@ public:
     /// number of elements in j-th column
     size_t column_size(size_t j) const { assert_true(j<size_); return column_[j].nbb_; }
     
-    /// line index of n-th element in j-th column
-    size_t column_index(size_t j, size_t n) const { return column_[j].inx_[n]; }
+    /// line index of n-th element in j-th column (not multiplied by BLOCK_SIZE)
+    size_t column_index(size_t j, size_t n) const { assert_true(j<size_); return column_[j].inx_[n]; }
 
     /// returns element at (i, i)
     Block& diag_block(size_t i);

@@ -235,8 +235,22 @@ public:
         return val_[0];
     }
     
+    /// return element at index 0
+    VAL & front()
+    {
+        assert_true( 0 < nbo_ );
+        return val_[0];
+    }
+
     /// return last element
     VAL const& back() const
+    {
+        assert_true( 0 < nbo_ );
+        return val_[nbo_-1];
+    }
+    
+    /// return last element
+    VAL & back()
     {
         assert_true( 0 < nbo_ );
         return val_[nbo_-1];
@@ -269,6 +283,12 @@ public:
             return s;
         }
         return 0;
+    }
+    
+    /// Allocate to hold at least `s` objects: valid indices are 0 <= indx < max
+    void reserve(const size_t s)
+    {
+        allocate(s);
     }
     
     /// Allocate and set new values to `zero`

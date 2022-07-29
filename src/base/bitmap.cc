@@ -4,7 +4,7 @@
   
   The bitmap format BMP allows to write files with 1 or 2 bits per pixels,
   and include a color palette to translate the pixel values to RGB colors.
-  This type of bitmap has a minimal file size.
+  This format minimizes the file size, allowing to save very large images.
   
   based on program bmpsuite.c by Jason Summers
   http://entropymine.com/jason/bmpsuite/
@@ -166,11 +166,16 @@ class BitMap
 
 public:
     
+    static bool valid_depth(uint16_t d)
+    {
+        return ( d == 1 || d == 4 || d == 8 || d == 24 );
+    }
+    
     void resize(unsigned W, unsigned H)
     {
         width = W;
         height = H;
-        if ( depth != 1 && depth != 4 && depth != 8 && depth != 24 )
+        if ( !valid_depth(depth) )
             printf("invalid BitMap depth\n");
         BPR = bytes_per_row(width, depth);
         bytes = (uint8_t*)calloc(height*BPR, 1);

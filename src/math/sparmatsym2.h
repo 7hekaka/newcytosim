@@ -3,6 +3,7 @@
 #ifndef SPARMATSYM2_H
 #define SPARMATSYM2_H
 
+#include "assert_macro.h"
 #include "real.h"
 #include <cstdio>
 #include <string>
@@ -140,13 +141,13 @@ public:
     void reset();
 
     /// return column at index j
-    Element const* column(size_t j) const { return column_[j]; }
+    Element const* column(size_t j) const { assert_true(j<size_); return column_[j]; }
     
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { return colsiz_[j]; }
+    size_t column_size(size_t j) const { assert_true(j<size_); return colsiz_[j]; }
     
     /// line index of n-th element in j-th column
-    size_t column_index(size_t j, size_t n) const { return column_[j][n].inx; }
+    size_t column_index(size_t j, size_t n) const { assert_true(j<size_); return column_[j][n].inx; }
 
     /// returns the address of element at (x, y), no allocation is done
     real* addr(size_t x, size_t y) const;

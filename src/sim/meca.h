@@ -706,6 +706,15 @@ public:
     /// calculate Forces on Mecables and Lagrange multipliers for Fiber, without thermal motion
     void calculateForces();
     
+    /// set connectivity matrix according to mFUL and mISO
+    void setAdjacencyMatrix(int[], size_t) const;
+    
+    /// compute permutation of Mecables following Reverse Cuthill–McKee algorithm
+    void computeOrder(Mecable*[]) const;
+
+    /// reorder Mecables according to connectivity
+    void reorderMecables();
+
     //----------------------- EXPORT/DEBUG FUNCTIONS ---------------------------
 
     /// Count number of non-zero entries in the full system matrix
@@ -751,7 +760,6 @@ public:
     /// Output vectors and matrices in various files (for debugging)
     void exportSystem() const;
 
-    
     /// set Mecable:flag() according to connectivity defined by matrix elements
     void flagClusters() const;
     

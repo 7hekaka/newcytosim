@@ -1,5 +1,201 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
+#include "../base/bitmap.cc"
+
+//------------------------------------------------------------------------------
+#pragma mark - Mecable ordering
+
+
+template < typename MatrixClass >
+void setAdjacency(int mat[], size_t lld, unsigned table[], size_t nbv, MatrixClass const& MAT)
+{
+    nbv = std::min(nbv, MAT.size());
+    // process all matrix columns:
+    for ( size_t j = 0; j < nbv; ++j )
+    {
+        unsigned a = table[j];
+        // consider all blocks in column
+        for ( size_t n = 0; n < MAT.column_size(j); ++n )
+        {
+            size_t i = MAT.column_index(j, n);
+            assert_true( i < nbv );
+            unsigned b = table[i];
+            mat[b+lld*a] = 1;
+        }
+    }
+}
+
+/**
+ Calculates the Adjacency matrix defined by the force matrices mFUL and mISO
+ mat[i+lld*j] is set to 1 if i-th and j-th Mecables interact, ie. if some
+ element of the matrices is not null.
+ */
+void Meca::setAdjacencyMatrix(int mat[], size_t lld) const
+{
+    const size_t sup = nbMecables();
+    const size_t nbv = nbVertices();
+    assert_true(nbv > 0);
+    // maps matrix index to Mecable
+    unsigned * table = new unsigned[nbv]{0};
+    
+    unsigned u = 0, f = 0;
+    for ( Mecable * mec : mecables )
+    {
+        unsigned e = u + mec->nbPoints();
+        while ( u < e )
+            table[u++] = f;
+        ++f;
+    }
+    assert_true(u == nbv);
+
+#if USE_MATRIX_BLOCK
+    setAdjacency(mat, sup, table, nbv, mFUL);
+#endif
+#if USE_ISO_MATRIX
+    setAdjacency(mat, sup, table, nbv, mISO);
+#endif
+#if 0
+    printf("Adjacency:\n");
+    for ( size_t i = 0; i < sup; ++i )
+    {
+        for ( size_t j = 0; j < sup; ++j )
+            printf("%i ", mat[i+j*sup]);
+        printf("\n");
+    }
+#endif
+    delete[] table;
+}
+
+
+
+/// COmbines node index and order
+class IndexOrder
+{
+public:
+    unsigned inx;  ///< index
+    unsigned ord;  ///< order
+    
+    /// constructor, set to zero
+    IndexOrder() { inx=0; ord=0; }
+
+    /// constructor
+    IndexOrder(unsigned i, unsigned o) { inx=i; ord=o; }
+    
+    /// sort function used by std::set
+    bool operator < (IndexOrder const&b) const { return ord < b.ord; }
+};
+
+
+/// compare function for qsort()
+static int compareOrder(const void * A, const void * B)
+{
+    unsigned a = static_cast<IndexOrder const*>(A)->ord;
+    unsigned b = static_cast<IndexOrder const*>(B)->ord;
+    return ( a > b ) - ( a < b );
+}
+
+
+/**
+ Calculate permutation of the Mecable,
+ according to the Reverse CutHill McKee algorithm
+ https://en.wikipedia.org/wiki/Cuthill%E2%80%93McKee_algorithm
+ */
+void Meca::computeOrder(Mecable* order[]) const
+{
+    const size_t sup = nbMecables();
+    int * mat = new int[sup*sup]{0};
+    
+    setAdjacencyMatrix(mat, sup);
+    
+    Array<IndexOrder> obj;
+    obj.resize(sup);
+    // calculate the order of each node:
+    {
+        unsigned low = 0, low_ord = sup;
+        for ( unsigned f = 0; f < sup; ++f )
+        {
+            unsigned u = 0;
+            for ( unsigned i = 0; i < f; ++i )
+                u += mat[f+i*sup];
+            for ( unsigned i = f+1; i < sup; ++i )
+                u += mat[i+f*sup];
+            obj[f] = IndexOrder(f, u);
+            if ( u < low_ord )
+            {
+                low = f;
+                low_ord = u;
+            }
+        }
+        std::swap(obj[0], obj[low]);
+        //printf("\nRank: "); for ( auto x : obj ) printf("%u:%u ", x.inx, x.ord);
+    }
+    IndexOrder * cap = obj.begin();
+    IndexOrder * far = cap+1;
+    unsigned u = sup-1;
+    while ( 1 )
+    {
+        unsigned f = cap->inx;
+        order[u--] = mecables[f]; // reverse order!
+        if ( ++cap == obj.end() )
+            break;
+        IndexOrder * red = far;
+        // collect adjacent nodes:
+        for ( IndexOrder * ptr = far; ptr < obj.end(); ++ptr )
+        {
+            unsigned g = ptr->inx;
+            if ( mat[std::max(f,g)+std::min(f,g)*sup] )
+                std::swap(*ptr, *far++);
+        }
+        if ( far > red )
+            qsort(red, far-red, sizeof(IndexOrder), compareOrder);
+        else if ( far == cap )
+        {
+            qsort(cap, obj.end()-cap, sizeof(IndexOrder), compareOrder);
+            ++far;
+#if 0
+            printf("\n: ");
+            for ( unsigned i = 0; i < sup; ++i )
+            {
+                Mecable const* m = mecables[obj[i].inx];
+                printf("%c%i ", m->tag(), m->identity());
+            }
+#endif
+        }
+    }
+    delete[] mat;
+}
+
+
+void Meca::reorderMecables()
+{
+    const size_t sup = nbMecables();
+    Mecable ** order = new Mecable*[sup]{nullptr};
+    computeOrder(order);
+#if 0
+    printf("\nOrder: ");
+    for ( size_t i = 0; i < sup; ++i )
+        printf("%c%i ", order[i]->tag(), order[i]->identity());
+#endif
+    size_t cnt = 0;
+    for ( unsigned i = 0; i < sup; ++i )
+    {
+        Mecable * mec = order[i];
+        mecables[i] = mec;
+        mec->setIndex(cnt);
+        mec->putPoints(vPTS+DIM*cnt);
+        cnt += mec->nbPoints();
+    }
+    assert_true(nPoints_ == cnt);
+    delete[] order;
+    
+    // reset system:
+#if USE_ISO_MATRIX
+    mISO.reset();
+#endif
+    mFUL.reset();
+    zero_real(DIM*cnt, vBAS);
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Connectivity Analysis
@@ -7,27 +203,29 @@
 
 /// equalize flags for any existing matrix element between Mecables
 template < typename MatrixClass >
-void computeClusters(Array<Mecable*> const mecables, const size_t sup, Mecable** table,
+void flagConnectedMecables(Array<Mecable*> const mecables, const size_t sup, Mecable** table,
                      MatrixClass const& MAT)
 {
+    // process all matrix columns:
     for ( size_t j = 0; j < sup; ++j )
     {
         Mecable const* A = table[j];
         for ( size_t n = 0; n < MAT.column_size(j); ++n )
         {
-            // we do not check the value here, but just having a block
+            /* we do not check the value of the elements here, but just
+             the fact of having a block at these indices */
             size_t i = MAT.column_index(j, n);
             assert_true( i < sup );
             Mecable const* B = table[i];
             if ( A->flag() != B->flag() )
             {
-                ObjectFlag a = std::min(A->flag(), B->flag());
-                ObjectFlag b = std::max(A->flag(), B->flag());
-                // replace b -> a everywhere:
+                ObjectFlag f = std::min(A->flag(), B->flag());
+                ObjectFlag g = std::max(A->flag(), B->flag());
+                // replace g -> f everywhere:
                 for ( Mecable * mec : mecables )
                 {
-                    if ( mec->flag() == b )
-                        mec->flag(a);
+                    if ( mec->flag() == g )
+                        mec->flag(f);
                 }
             }
         }
@@ -51,10 +249,10 @@ void Meca::flagClusters() const
     }
     
 #if USE_MATRIX_BLOCK
-    computeClusters(mecables, MAX, table, mFUL);
+    flagConnectedMecables(mecables, MAX, table, mFUL);
 #endif
 #if USE_ISO_MATRIX
-    computeClusters(mecables, MAX, table, mISO);
+    flagConnectedMecables(mecables, MAX, table, mISO);
 #endif
     delete[] table;
 }
@@ -542,16 +740,14 @@ void Meca::dumpSystem(bool nat) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Matrix Bitmap Export
-
-#include "../base/bitmap.cc"
+#pragma mark - Bitmap Export
 
 
 // Just considering Couple between Fibers here:
-void setConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecables)
+void markConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecables)
 {
     bmap.clear();
-    unsigned i = 0;
+    ObjectFlag i = 0;
     for ( Mecable * mec : mecables )
         mec->flag(i++);
     
@@ -566,8 +762,8 @@ void setConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecables)
             Hand const* oh = m->otherHand(h);
             if ( oh > h  &&  oh->attached() )
             {
-                unsigned j = oh->fiber()->flag();
-                bmap.set(i, j, 15);
+                ObjectFlag j = oh->fiber()->flag();
+                bmap.set(i, j, 1);
             }
             else if ( oh )
             {
@@ -589,7 +785,7 @@ void Meca::saveConnectivityBitmap() const
     FILE * f = fopen(str, "w");
     if ( f ) {
         if ( !ferror(f) ) {
-            setConnectivity(bmap, mecables);
+            markConnectivity(bmap, mecables);
             bmap.save(f);
         }
         fclose(f);
@@ -598,9 +794,8 @@ void Meca::saveConnectivityBitmap() const
 
 
 template < typename MatrixClass >
-static void setMatrixBitmap(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT)
+static void markMatrix(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT)
 {
-    bmap.clear();
     for ( size_t j = 0; j < sup; ++j )
     {
         for ( size_t n = 0; n < MAT.column_size(j); ++n )
@@ -637,13 +832,15 @@ void Meca::saveMatrixBitmaps() const
     const size_t nbv = nbVertices();
     BitMap<1> bmap(nbv, nbv);
     char str[32] = { 0 };
+    FILE * f;
     
 #if USE_ISO_MATRIX
     snprintf(str, sizeof(str), "iso%08lu.bmp", cnt);
-    FILE * f = fopen(str, "w");
+    f = fopen(str, "w");
     if ( f ) {
         if ( !ferror(f) ) {
-            setMatrixBitmap(bmap, nbv, mISO);
+            bmap.clear();
+            markMatrix(bmap, nbv, mISO);
             markMecables(bmap, mecables);
             bmap.save(f);
         }
@@ -652,14 +849,15 @@ void Meca::saveMatrixBitmaps() const
 #endif
 #if USE_MATRIX_BLOCK
     snprintf(str, sizeof(str), "ful%08lu.bmp", cnt++);
-    FILE * g = fopen(str, "w");
-    if ( g ) {
-        if ( !ferror(g) ) {
-            setMatrixBitmap(bmap, nbv, mFUL);
+    f = fopen(str, "w");
+    if ( f ) {
+        if ( !ferror(f) ) {
+            bmap.clear();
+            markMatrix(bmap, nbv, mFUL);
             markMecables(bmap, mecables);
-            bmap.save(g);
+            bmap.save(f);
         }
-        fclose(g);
+        fclose(f);
     }
 #endif
 }
