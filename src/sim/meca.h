@@ -708,9 +708,6 @@ public:
     
     /// set connectivity matrix according to mFUL and mISO
     void setAdjacencyMatrix(int[], size_t) const;
-    
-    /// compute permutation of Mecables following Reverse Cuthill–McKee algorithm
-    void computeOrder(Mecable*[]) const;
 
     /// reorder Mecables according to connectivity
     void reorderMecables();

@@ -7,9 +7,9 @@
 
 
 template < typename MatrixClass >
-void setAdjacency(int mat[], size_t lld, unsigned table[], size_t nbv, MatrixClass const& MAT)
+static void setAdjacency(int mat[], const size_t lld, unsigned table[],
+                         const size_t nbv, MatrixClass const& MAT)
 {
-    nbv = std::min(nbv, MAT.size());
     // process all matrix columns:
     for ( size_t j = 0; j < nbv; ++j )
     {
@@ -30,7 +30,7 @@ void setAdjacency(int mat[], size_t lld, unsigned table[], size_t nbv, MatrixCla
  mat[i+lld*j] is set to 1 if i-th and j-th Mecables interact, ie. if some
  element of the matrices is not null.
  */
-void Meca::setAdjacencyMatrix(int mat[], size_t lld) const
+void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
 {
     const size_t sup = nbMecables();
     const size_t nbv = nbVertices();
@@ -68,7 +68,7 @@ void Meca::setAdjacencyMatrix(int mat[], size_t lld) const
 
 
 
-/// COmbines node index and order
+/// Combines node index and node order
 class IndexOrder
 {
 public:
@@ -81,7 +81,7 @@ public:
     /// constructor
     IndexOrder(unsigned i, unsigned o) { inx=i; ord=o; }
     
-    /// sort function used by std::set
+    /// ordering function used by std::set
     bool operator < (IndexOrder const&b) const { return ord < b.ord; }
 };
 
@@ -95,52 +95,52 @@ static int compareOrder(const void * A, const void * B)
 }
 
 
+/// calculate the order of each node, and place lowest order first
+static void calculateOrder(IndexOrder res[], const size_t sup, int mat[])
+{
+    unsigned inx = 0, val = sup;
+    for ( unsigned f = 0; f < sup; ++f )
+    {
+        unsigned u = 0;
+        for ( unsigned i = 0; i < f; ++i )
+            u += mat[f+i*sup];
+        for ( unsigned i = f+1; i < sup; ++i )
+            u += mat[i+f*sup];
+        res[f] = IndexOrder(f, u);
+        // get index of lowest order:
+        if ( u < val )
+        {
+            inx = f;
+            val = u;
+        }
+    }
+    std::swap(res[0], res[inx]);
+    //printf("\nRank: "); for ( auto x : obj ) printf("%u:%u ", x.inx, x.ord);
+}
+
+
 /**
- Calculate permutation of the Mecable,
+ Calculate permutation of the indices to minimize matrix bandwidth,
  according to the Reverse CutHill McKee algorithm
  https://en.wikipedia.org/wiki/Cuthill%E2%80%93McKee_algorithm
  */
-void Meca::computeOrder(Mecable* order[]) const
+static void reverseCutHillMcKee(Mecable* order[], const size_t sup, int mat[], Mecable* mecables[])
 {
-    const size_t sup = nbMecables();
-    int * mat = new int[sup*sup]{0};
-    
-    setAdjacencyMatrix(mat, sup);
-    
-    Array<IndexOrder> obj;
-    obj.resize(sup);
-    // calculate the order of each node:
-    {
-        unsigned low = 0, low_ord = sup;
-        for ( unsigned f = 0; f < sup; ++f )
-        {
-            unsigned u = 0;
-            for ( unsigned i = 0; i < f; ++i )
-                u += mat[f+i*sup];
-            for ( unsigned i = f+1; i < sup; ++i )
-                u += mat[i+f*sup];
-            obj[f] = IndexOrder(f, u);
-            if ( u < low_ord )
-            {
-                low = f;
-                low_ord = u;
-            }
-        }
-        std::swap(obj[0], obj[low]);
-        //printf("\nRank: "); for ( auto x : obj ) printf("%u:%u ", x.inx, x.ord);
-    }
-    IndexOrder * cap = obj.begin();
+    IndexOrder *obj = new IndexOrder[sup];
+    calculateOrder(obj, sup, mat);
+    IndexOrder * cap = obj;
     IndexOrder * far = cap+1;
+    IndexOrder const* end = obj+sup;
     unsigned u = sup-1;
     while ( 1 )
     {
         unsigned f = cap->inx;
         order[u--] = mecables[f]; // reverse order!
-        if ( ++cap == obj.end() )
+        if ( ++cap == end )
             break;
         IndexOrder * red = far;
         // collect adjacent nodes:
-        for ( IndexOrder * ptr = far; ptr < obj.end(); ++ptr )
+        for ( IndexOrder * ptr = far; ptr < end; ++ptr )
         {
             unsigned g = ptr->inx;
             if ( mat[std::max(f,g)+std::min(f,g)*sup] )
@@ -150,19 +150,16 @@ void Meca::computeOrder(Mecable* order[]) const
             qsort(red, far-red, sizeof(IndexOrder), compareOrder);
         else if ( far == cap )
         {
-            qsort(cap, obj.end()-cap, sizeof(IndexOrder), compareOrder);
+            qsort(cap, end-cap, sizeof(IndexOrder), compareOrder);
             ++far;
 #if 0
             printf("\n: ");
-            for ( unsigned i = 0; i < sup; ++i )
-            {
-                Mecable const* m = mecables[obj[i].inx];
-                printf("%c%i ", m->tag(), m->identity());
-            }
+            for ( IndexOrder * ptr = obj; ptr < cap; ++ptr )
+                printf("%i:%i ", ptr->inx, ptr->ord);
 #endif
         }
     }
-    delete[] mat;
+    delete[] obj;
 }
 
 
@@ -170,14 +167,14 @@ void Meca::reorderMecables()
 {
     const size_t sup = nbMecables();
     Mecable ** order = new Mecable*[sup]{nullptr};
-    computeOrder(order);
-#if 0
-    printf("\nOrder: ");
-    for ( size_t i = 0; i < sup; ++i )
-        printf("%c%i ", order[i]->tag(), order[i]->identity());
-#endif
+    
+    int * mat = new int[sup*sup]{0};
+    setAdjacencyMatrix(mat, sup);
+    reverseCutHillMcKee(order, sup, mat, mecables.data());
+    delete[] mat;
+
     size_t cnt = 0;
-    for ( unsigned i = 0; i < sup; ++i )
+    for ( size_t i = 0; i < sup; ++i )
     {
         Mecable * mec = order[i];
         mecables[i] = mec;
@@ -187,7 +184,12 @@ void Meca::reorderMecables()
     }
     assert_true(nPoints_ == cnt);
     delete[] order;
-    
+#if 0
+    printf("\nOrder: ");
+    for ( size_t i = 0; i < sup; ++i )
+        printf("%c%i ", mecables[i]->tag(), mecables[i]->identity());
+#endif
+
     // reset system:
 #if USE_ISO_MATRIX
     mISO.reset();
@@ -203,8 +205,8 @@ void Meca::reorderMecables()
 
 /// equalize flags for any existing matrix element between Mecables
 template < typename MatrixClass >
-void flagConnectedMecables(Array<Mecable*> const mecables, const size_t sup, Mecable** table,
-                     MatrixClass const& MAT)
+static void flagConnectedMecables(Array<Mecable*> const mecables, const size_t sup,
+                                  Mecable** table, MatrixClass const& MAT)
 {
     // process all matrix columns:
     for ( size_t j = 0; j < sup; ++j )
