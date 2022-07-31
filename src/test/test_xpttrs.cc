@@ -11,8 +11,17 @@
 #include "assert_macro.h"
 #include "xpttrf.h"
 #include "cytoblas.h"
+#include "../math/xptsl.cc"
 
 //------------------------------------------------------------------------------
+
+/// reference code
+void solveL(int N, real* D, real* U, real* B)
+{
+    int info;
+    lapack::xpttrf(N, D, U, &info);
+    lapack::xptts2(N, D, U, B);
+}
 
 template < void (*FUNC)(int, real*, real*, int*) >
 void test(int N, real const* D, real const* U, real* d, real* u, char const str[], size_t cnt)
@@ -46,24 +55,25 @@ void italian_factor(int size, real* D, real* E, int* info)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testFactor(int NSEG, size_t cnt)
+void testFactor(int seg, size_t cnt)
 {
-    real * d = new_real(NSEG);
-    real * u = new_real(NSEG);
-    real * D = new_real(NSEG);
-    real * U = new_real(NSEG);
+    real * d = new_real(seg);
+    real * u = new_real(seg);
+    real * D = new_real(seg);
+    real * U = new_real(seg);
 
-    for ( int i = 0; i < NSEG; ++i )
+    for ( int i = 0; i < seg; ++i )
     {
         D[i] = 2.0;
         U[i] = -0.5 * RNG.preal();
     }
     
-    test<divide>(NSEG, D, U, d, u, "divide", cnt);
-    test<lapack::xpttrf>(NSEG, D, U, d, u, "lapack", cnt);
-    test<lapack_xpttrf>(NSEG, D, U, d, u, "c-lapack", cnt);
-    test<italian_factor>(NSEG, D, U, d, u, "italian", cnt);
-    test<alsatian_xpttrf>(NSEG, D, U, d, u, "alsatian", cnt);
+    test<divide>(seg, D, U, d, u, "divide", cnt);
+    test<lapack::xpttrf>(seg, D, U, d, u, "lapack", cnt);
+    test<lapack_xpttrf>(seg, D, U, d, u, "c-lapack", cnt);
+    test<italian_factor>(seg, D, U, d, u, "italian", cnt);
+    test<alsatian_xpttrf>(seg, D, U, d, u, "alsatian", cnt);
+    test<alsadual_xpttrf>(seg, D, U, d, u, "alsadual", cnt);
 
     free_real(d);
     free_real(u);
@@ -84,8 +94,8 @@ void check(int N, real const* D, real const* U, real const* B, real* d, real* u,
     SOLVE(N, d, u, b);
     VecPrint::edges(N, b);
     real err = blas::difference(N, S, b);
-    printf(" err %f %12s", err, str);
-    if ( err < 0.001 )
+    printf("  Err %f %12s", err, str);
+    if ( 1 )
     {
         tick();
         for ( size_t n = 0; n < cnt; ++n )
@@ -99,17 +109,17 @@ void check(int N, real const* D, real const* U, real const* B, real* d, real* u,
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testSolve(int NSEG, size_t cnt)
+void testSolve(int seg, size_t cnt)
 {
-    real * d = new_real(NSEG);
-    real * u = new_real(NSEG);
-    real * b = new_real(NSEG);
-    real * D = new_real(NSEG);
-    real * U = new_real(NSEG);
-    real * B = new_real(NSEG);
-    real * S = new_real(NSEG);
+    real * d = new_real(seg);
+    real * u = new_real(seg);
+    real * b = new_real(seg);
+    real * D = new_real(seg);
+    real * U = new_real(seg);
+    real * B = new_real(seg);
+    real * S = new_real(seg);
 
-    for ( int i = 0; i < NSEG; ++i )
+    for ( int i = 0; i < seg; ++i )
     {
         D[i] = 2.0;
         U[i] = -RNG.preal();
@@ -117,17 +127,16 @@ void testSolve(int NSEG, size_t cnt)
     }
 
     // calculate reference result:
-    int info;
-    copy_real(NSEG, D, d);
-    copy_real(NSEG, U, u);
-    copy_real(NSEG, B, S);
-    lapack::xpttrf(NSEG, d, u, &info);
-    lapack::xptts2(NSEG, d, u, S);
+    copy_real(seg, D, d);
+    copy_real(seg, U, u);
+    copy_real(seg, B, S);
+    solveL(seg, d, u, S);
 
-    check<lapack::xpttrf, lapack::xptts2>(NSEG, D, U, B, d, u, b, S, "lapack", cnt);
-    check<lapack_xpttrf, lapack_xptts2>(NSEG, D, U, B, d, u, b, S, "c-lapack", cnt);
-    check<italian_factor, italian_xptts2>(NSEG, D, U, B, d, u, b, S, "italian", cnt);
-    check<alsatian_xpttrf, alsatian_xptts2>(NSEG, D, U, B, d, u, b, S, "alsatian", cnt);
+    check<lapack::xpttrf, lapack::xptts2>(seg, D, U, B, d, u, b, S, "lapack", cnt);
+    check<lapack_xpttrf, lapack_xptts2>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
+    check<italian_factor, italian_xptts2>(seg, D, U, B, d, u, b, S, "italian", cnt);
+    check<alsatian_xpttrf, alsatian_xptts2>(seg, D, U, B, d, u, b, S, "alsatian", cnt);
+    check<alsadual_xpttrf, alsadual_xptts2>(seg, D, U, B, d, u, b, S, "alsadual", cnt);
 
     free_real(d);
     free_real(u);
@@ -141,7 +150,7 @@ void testSolve(int NSEG, size_t cnt)
 //------------------------------------------------------------------------------
 
 template < void (*FUNC)(int, real*, real*, real*) >
-void verify(int N, real const* D, real const* U, real const* B, real* d, real* u, real* b, char const str[], size_t cnt)
+void verify(int N, real const* D, real const* U, real const* B, real* d, real* u, real* b, real* S, char const str[], size_t cnt)
 {
     tick();
     for ( size_t n = 0; n < cnt; ++n )
@@ -151,15 +160,10 @@ void verify(int N, real const* D, real const* U, real const* B, real* d, real* u
         copy_real(N, B, b);
         FUNC(N, d, u, b);
     }
-    VecPrint::edges(N, b, 3);
-    printf(" %12s cpu %5.0f\n", str, tock());
-}
-
-void solveL(int N, real* D, real* U, real* B)
-{
-    int info;
-    lapack::xpttrf(N, D, U, &info);
-    lapack::xptts2(N, D, U, B);
+    double cpu = tock();
+    VecPrint::edges(N, b, 2);
+    real err = blas::difference(N, S, b);
+    printf("  Err %f %12s cpu %5.0f\n", err, str, cpu);
 }
 
 void solveC(int N, real* D, real* U, real* B)
@@ -191,39 +195,52 @@ void solveW(int N, real* D, real* U, real* B)
     wikipedia_solve(N, U, D, U, B);
 }
 
-void solveT(int N, real* D, real* U, real* B)
+void solveJ(int N, real* D, real* U, real* B)
 {
-    tridiagonal_solve(N, U, D, U, B);
+    linpack_xptsl(N, D, U, B);
 }
 
+void solveX(int N, real* D, real* U, real* B)
+{
+    alsatian_xptsl(N, D, U, B);
+}
 
 /**
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testFused(int NSEG, size_t cnt)
+void testFused(int seg, size_t cnt)
 {
-    real * d = new_real(NSEG);
-    real * u = new_real(NSEG);
-    real * b = new_real(NSEG);
-    real * D = new_real(NSEG);
-    real * U = new_real(NSEG);
-    real * B = new_real(NSEG);
+    real * d = new_real(seg);
+    real * u = new_real(seg);
+    real * b = new_real(seg);
+    real * D = new_real(seg);
+    real * U = new_real(seg);
+    real * B = new_real(seg);
+    real * S = new_real(seg);
 
-    for ( int i = 0; i < NSEG; ++i )
+    for ( int i = 0; i < seg; ++i )
     {
         D[i] = 4.0 - RNG.preal();
         U[i] = -RNG.preal();
         B[i] = RNG.sreal();
     }
-    
-    verify<solveL>(NSEG, D, U, B, d, u, b, "lapack", cnt);
-    verify<solveC>(NSEG, D, U, B, d, u, b, "c-lapack", cnt);
-    verify<solveI>(NSEG, D, U, B, d, u, b, "italian", cnt);
-    verify<solveA>(NSEG, D, U, B, d, u, b, "alsatian", cnt);
-    verify<solveF>(NSEG, D, U, B, d, u, b, "alsafused", cnt);
-    verify<solveW>(NSEG, D, U, B, d, u, b, "wikipedia", cnt);
-    verify<solveT>(NSEG, D, U, B, d, u, b, "tridiagonal", cnt);
+    // calculate reference result:
+    copy_real(seg, D, d);
+    copy_real(seg, U, u);
+    copy_real(seg, B, S);
+    solveL(seg, d, u, S);
+
+#if 1
+    verify<solveC>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
+    verify<solveI>(seg, D, U, B, d, u, b, S, "italian", cnt);
+    verify<solveL>(seg, D, U, B, d, u, b, S, "lapack", cnt);
+    verify<solveA>(seg, D, U, B, d, u, b, S, "alsatian", cnt);
+    verify<solveW>(seg, D, U, B, d, u, b, S, "wikipedia", cnt);
+#endif
+    verify<solveJ>(seg, D, U, B, d, u, b, S, "linpack", cnt);
+    verify<solveF>(seg, D, U, B, d, u, b, S, "alsafused", cnt);
+    verify<solveX>(seg, D, U, B, d, u, b, S, "alsadual", cnt);
 
     free_real(d);
     free_real(u);
@@ -245,6 +262,8 @@ int main(int argc, char* argv[])
     testFactor(nbs, 1<<20);
     std::cout << "Solve\n";
     testSolve(nbs, 1<<20);
-    std::cout << "Factorize & Solve\n";
+    std::cout << nbs << " Factorize & Solve\n";
     testFused(nbs, 1<<18);
+    std::cout << nbs+1 << " Factorize & Solve\n";
+    testFused(nbs+1, 1<<18);
 }

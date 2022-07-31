@@ -1779,6 +1779,7 @@
 		BB7086562449CBF300C73273 /* test_rigidity */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_rigidity; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB7191C50EF1CD9900CED9E2 /* libcytomath.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytomath.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB7192360EF1CEEA00CED9E2 /* makefile.inc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.pascal; name = makefile.inc; path = src/math/makefile.inc; sourceTree = SOURCE_ROOT; };
+		BB7234EF28967AF100570AEA /* xptsl.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = xptsl.cc; sourceTree = "<group>"; };
 		BB72EA632662262A00FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		BB72EA642662263600FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		BB72EA652662264400FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -2561,6 +2562,7 @@
 				BBF4E88124372DFF00B9D440 /* blas.h */,
 				BBF4E88224372DFF00B9D440 /* lapack.h */,
 				BBF4E88024372DBA00B9D440 /* cytoblas.h */,
+				BB7234EF28967AF100570AEA /* xptsl.cc */,
 				BBDF9AA3228BFBD3005018BD /* xpttrf.h */,
 				BB5F2B7D245F5D90007DDD06 /* xtrsm.h */,
 				BB6E5EF4245C27E000CEE184 /* xtbsv.h */,
