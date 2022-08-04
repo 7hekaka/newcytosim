@@ -98,6 +98,86 @@ inline void lapack_xptts2(int size, int nrhs, real const* D, real const* E, real
     return lapack_xptts2(size, D, E, B);
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
+/**
+ Translated from pseudo code to C
+ https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
+     A is the sub diagonal of size N-1
+     B is the diagonal of size N
+     C is the upper diagonal of size N-1
+ B is modified in this version!
+ ATTENTION: Wikipedia version has A starting at index 2.
+ This code has all arrays starting at index 0.
+ */
+void wikipedia_solve(int N, real const* A, real* B, real const* C, real* X)
+{
+    for ( int i = 1; i < N; ++i )
+    {
+        real W = A[i-1] / B[i-1];
+        B[i] = B[i] - W * C[i-1];
+        X[i] = X[i] - W * X[i-1];
+    }
+    X[N-1] = X[N-1] / B[N-1];
+    for ( int i = N-2; i >= 0; --i )
+        X[i] = ( X[i] - C[i] * X[i+1] ) / B[i];
+}
+
+/**
+ From Numerical Recipee, 3rd Ed, page 56
+ 2.4 Tridiagonal and Band-Diagonal Systems of Equations
+
+ Solves for a vector u[0..n-1] the tridiagonal linear set given by equation (2.4.1).
+ a[0..n-2], b[0..n-1], c[0..n-2], and r[0..n-1] are input vectors and are not modified.
+ */
+void nr_tridag(const int size, const real a[], real b[], const real c[], const real r[], real u[])
+{
+    real * gam = new real[size];
+    real bet = b[0];
+    if (bet == 0.0) throw("Error 1 in tridag");
+    u[0] = r[0] / bet;
+    for ( int j = 1; j < size; ++j )
+    {
+        gam[j] = c[j-1] / bet;
+        bet = b[j] - a[j-1] * gam[j];
+        if (bet == 0.0) throw("Error 2 in tridag");
+        u[j] = ( r[j] - a[j-1] * u[j-1] ) / bet;
+    }
+    for ( int j = size-2; j >= 0; --j )
+        u[j] -= gam[j+1] * u[j+1];
+    delete[] gam;
+}
+
+/**
+ From Numerical Recipee, 3rd Ed, page 56
+ 2.4 Tridiagonal and Band-Diagonal Systems of Equations
+
+ Modified FJN 4.8.2022 to follow LAPACK's interface.
+ Solves for a vector u[0..n-1] the tridiagonal linear set given by equation (2.4.1).
+ a[1..n-1] and c[0..n-2] are input vectors and are not modified.
+ b[0..n-1], is input and modified.
+ x[0..n-1] is both input (right-hand side) and output (result)
+ */
+
+void nr_tridag(const int size, const real a[], real b[], const real c[], real x[])
+{
+    real bet = b[0];
+    //if (bet == 0.0) throw("Error 1 in tridag");
+    x[0] = x[0] / bet;
+    for ( int j = 1; j < size; ++j )
+    {
+        real gam = c[j-1] / bet;
+        bet = b[j] - a[j-1] * gam;
+        b[j] = gam;
+        //if (bet == 0.0) throw("Error 2 in tridag");
+        x[j] = ( x[j] - a[j-1] * x[j-1] ) / bet;
+    }
+    for ( int j = size-2; j >= 0; --j )
+        x[j] -= b[j+1] * x[j+1];
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -226,30 +306,6 @@ void italian2_solve(int size, real* L, real* D, real* U, real* X)
         X[0] = X[0] - D[0] * X[1];
     }
 }
-
-/**
- Translated from pseudo code to C
- https://en.wikipedia.org/wiki/Tridiagonal_matrix_algorithm
-     A is the sub diagonal of size N-1
-     B is the diagonal of size N
-     C is the upper diagonal of size N-1
- B is modified in this version!
- ATTENTION: Wikipedia version has A starting at index 2.
- This code has all arrays starting at index 0.
- */
-void wikipedia_solve(int N, real const* A, real* B, real const* C, real* X)
-{
-    for ( int i = 1; i < N; ++i )
-    {
-        real W = A[i-1] / B[i-1];
-        B[i] = B[i] - W * C[i-1];
-        X[i] = X[i] - W * X[i-1];
-    }
-    X[N-1] = X[N-1] / B[N-1];
-    for ( int i = N-2; i >= 0; --i )
-        X[i] = ( X[i] - C[i] * X[i+1] ) / B[i];
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -413,16 +469,12 @@ void alsatian_solve(int size, real* D, real* E, real* B)
         B[n] = y * w;
     }
 
-    if ( size > 1 )
+    y = B[size-1];
+    // downward recursion on B[]
+    for ( int n = size-2; n >= 0; --n )
     {
-        y = B[size-1];
-        // downward recursion on B[]
-        for ( int n = size-2; n > 0; --n )
-        {
-            y = B[n] - E[n] * y;
-            B[n] = y;
-        }
-        B[0] = B[0] - E[0] * y;
+        y = B[n] - E[n] * y;
+        B[n] = y;
     }
 }
 

@@ -82,6 +82,7 @@ void testFactor(int seg, size_t cnt)
 }
 
 //------------------------------------------------------------------------------
+#pragma mark -
 
 template < void (*FACTOR)(int, real*, real*, int*), void (*SOLVE)(int, real const*, real const*, real*) >
 void check(int N, real const* D, real const* U, real const* B, real* d, real* u, real* b, real* S, char const str[], size_t cnt)
@@ -95,7 +96,7 @@ void check(int N, real const* D, real const* U, real const* B, real* d, real* u,
     VecPrint::edges(N, b);
     real err = blas::difference(N, S, b);
     printf("  Err %f %12s", err, str);
-    if ( 1 )
+    if ( err < 0.001 )
     {
         tick();
         for ( size_t n = 0; n < cnt; ++n )
@@ -103,6 +104,15 @@ void check(int N, real const* D, real const* U, real const* B, real* d, real* u,
         printf(" cpu %5.0f", tock());
     }
     printf("\n");
+#if 0
+    for ( int i = 0; i < N; ++i )
+    {
+        zero_real(N, b);
+        b[i] = 1;
+        SOLVE(N, d, u, b);
+        VecPrint::print("t", N, b, 3);
+    }
+#endif
 }
 
 /**
@@ -122,7 +132,7 @@ void testSolve(int seg, size_t cnt)
     for ( int i = 0; i < seg; ++i )
     {
         D[i] = 2.0;
-        U[i] = -RNG.preal();
+        U[i] = -1;
         B[i] = RNG.sreal();
     }
 
@@ -131,10 +141,11 @@ void testSolve(int seg, size_t cnt)
     copy_real(seg, U, u);
     copy_real(seg, B, S);
     solveL(seg, d, u, S);
-
-    check<lapack::xpttrf, lapack::xptts2>(seg, D, U, B, d, u, b, S, "lapack", cnt);
     check<lapack_xpttrf, lapack_xptts2>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
+#if 0
+    check<lapack::xpttrf, lapack::xptts2>(seg, D, U, B, d, u, b, S, "lapack", cnt);
     check<italian_factor, italian_xptts2>(seg, D, U, B, d, u, b, S, "italian", cnt);
+#endif
     check<alsatian_xpttrf, alsatian_xptts2>(seg, D, U, B, d, u, b, S, "alsatian", cnt);
     check<alsadual_xpttrf, alsadual_xptts2>(seg, D, U, B, d, u, b, S, "alsadual", cnt);
 
@@ -148,6 +159,7 @@ void testSolve(int seg, size_t cnt)
 }
 
 //------------------------------------------------------------------------------
+#pragma mark -
 
 template < void (*FUNC)(int, real*, real*, real*) >
 void verify(int N, real const* D, real const* U, real const* B, real* d, real* u, real* b, real* S, char const str[], size_t cnt)
@@ -195,6 +207,11 @@ void solveW(int N, real* D, real* U, real* B)
     wikipedia_solve(N, U, D, U, B);
 }
 
+void solveN(int N, real* D, real* U, real* B)
+{
+    nr_tridag(N, U, D, U, B);
+}
+
 void solveJ(int N, real* D, real* U, real* B)
 {
     linpack_xptsl(N, D, U, B);
@@ -231,13 +248,14 @@ void testFused(int seg, size_t cnt)
     copy_real(seg, B, S);
     solveL(seg, d, u, S);
 
-#if 1
     verify<solveC>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
-    verify<solveI>(seg, D, U, B, d, u, b, S, "italian", cnt);
+#if 1
     verify<solveL>(seg, D, U, B, d, u, b, S, "lapack", cnt);
+    verify<solveI>(seg, D, U, B, d, u, b, S, "italian", cnt);
     verify<solveA>(seg, D, U, B, d, u, b, S, "alsatian", cnt);
     verify<solveW>(seg, D, U, B, d, u, b, S, "wikipedia", cnt);
 #endif
+    verify<solveN>(seg, D, U, B, d, u, b, S, "n_recipee", cnt);
     verify<solveJ>(seg, D, U, B, d, u, b, S, "linpack", cnt);
     verify<solveF>(seg, D, U, B, d, u, b, S, "alsafused", cnt);
     verify<solveX>(seg, D, U, B, d, u, b, S, "alsadual", cnt);
@@ -262,6 +280,7 @@ int main(int argc, char* argv[])
     testFactor(nbs, 1<<20);
     std::cout << "Solve\n";
     testSolve(nbs, 1<<20);
+    testSolve(nbs+1, 1<<20);
     std::cout << nbs << " Factorize & Solve\n";
     testFused(nbs, 1<<18);
     std::cout << nbs+1 << " Factorize & Solve\n";
