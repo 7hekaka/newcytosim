@@ -86,22 +86,24 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
     // zero top half of subdiagonal and bottom half of superdiagonal
     real t2 = 0;
     real xk = X[0];
-    real xi = X[inx+1];
+    real xi = X[N-1];
+    real dk = D[0];
+    real di = D[N-1];
     for( int k = 0; k < mid; ++k, --inx )
     {
-        real idk = inverse(D[k]);
-        D[k] = idk;
-        real t1 = idk * E[k];
-        D[k+1] -= t1 * E[k];
-        X[k] = idk * xk;
+        dk = inverse(dk);
+        D[k] = dk;
+        real t1 = dk * E[k];
+        X[k] = dk * xk;
+        dk = D[k+1] - t1 * E[k];
         xk = X[k+1] - t1 * xk;
         E[k] = t1;
 
-        real idi = inverse(D[inx+1]);
-        D[inx+1] = idi;
-        t2 = idi * E[inx];
-        D[inx] -= t2 * E[inx];
-        X[inx+1] = idi * xi;
+        di = inverse(di);
+        D[inx+1] = di;
+        t2 = di * E[inx];
+        X[inx+1] = di * xi;
+        di = D[inx] - t2 * E[inx];
         xi = X[inx] - t2 * xi;
         E[inx] = t2;
     }
@@ -109,12 +111,13 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
     if ( ( N & 1 ) == 0 )
     {
         // clean up for possible 2 x 2 block at center
-        real idm = inverse(D[mid]);
-        D[mid] = idm;
-        xk = xk * idm;
-        t2 = E[mid] * idm;
-        D[mid+1] = inverse(D[mid+1] - t2 * E[mid]);
-        xi = ( xi - E[mid] * xk ) * D[mid+1];
+        dk = inverse(dk);
+        D[mid] = dk;
+        xk = xk * dk;
+        t2 = E[mid] * dk;
+        di = inverse(di - t2 * E[mid]);
+        D[mid+1] = di;
+        xi = ( xi - E[mid] * xk ) * di;
         xk = xk - t2 * xi;
         X[mid] = xk;
         ++mid;
@@ -122,9 +125,9 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
     }
     else // N is odd
     {
-        real idm = inverse(D[mid]);
-        D[mid] = idm;
-        xi = ( xk + xi - X[mid] ) * idm;
+        di = inverse(dk+di-D[mid]);
+        D[mid] = di;
+        xi = ( xk + xi - X[mid] ) * di;
         xk = xi;
     }
     X[mid] = xi;
@@ -152,34 +155,36 @@ void alsadual_factor(int N, real D[], real E[])
     int inx = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
     real t2 = 0;
+    real dk = D[0];
+    real di = D[N-1];
     for( int k = 0; k < mid; ++k, --inx )
     {
-        real idk = inverse(D[k]);
-        D[k] = idk;
-        real t1 = idk * E[k];
-        D[k+1] -= t1 * E[k];
+        dk = inverse(dk);
+        D[k] = dk;
+        real t1 = dk * E[k];
+        dk = D[k+1] - t1 * E[k];
         E[k] = t1;
 
-        real idi = inverse(D[inx+1]);
-        D[inx+1] = idi;
-        t2 = idi * E[inx];
-        D[inx] -= t2 * E[inx];
+        // Attention: for odd N, k+1==inx at the last iteration:
+        di = inverse(di);
+        D[inx+1] = di;
+        t2 = di * E[inx];
+        di = D[inx] - t2 * E[inx];
         E[inx] = t2;
     }
     // special code for even N
     if ( ( N & 1 ) == 0 )
     {
         // clean up for possible 2 x 2 block at center
-        real idm = inverse(D[mid]);
-        D[mid] = idm;
-        t2 = E[mid] * idm;
-        D[mid+1] = inverse(D[mid+1] - t2 * E[mid]);
+        dk = inverse(dk);
+        D[mid] = dk;
+        D[mid+1] = inverse(di - dk * E[mid] * E[mid]);
         ++mid;
         --inx;
     }
     else // N is odd
     {
-        D[mid] = inverse(D[mid]);
+        D[mid] = inverse(dk+di-D[mid]);
     }
 }
 

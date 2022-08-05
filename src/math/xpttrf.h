@@ -4,6 +4,9 @@
 #ifndef XPTTRF_H
 #define XPTTRF_H
 
+/// returns 1/x
+static inline real inverse(real x) { return real(1) / x; }
+
 
 /**
  This is a C-translation of the LAPACK reference implementation of dpttrf()
@@ -180,8 +183,6 @@ void nr_tridag(const int size, const real a[], real b[], const real c[], real x[
 
 //------------------------------------------------------------------------------
 #pragma mark -
-
-static inline real inverse(real x) { return real(1) / x; }
 
 /**
  Italian factorization that uses different operations
