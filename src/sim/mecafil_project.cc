@@ -108,20 +108,18 @@ void Mecafil::makeProjection()
     {
         const real* X = iDir + DIM * jj;
 #if ( DIM == 2 )
-        real xn = X[0]*X[2] + X[1]*X[3];
+        iJJtU[jj] = -( X[0]*X[2] + X[1]*X[3] );
 #else
-        real xn = X[0]*X[3] + X[1]*X[4] + X[2]*X[5];
+        iJJtU[jj] = -( X[0]*X[3] + X[1]*X[4] + X[2]*X[5] );
 #endif
         
-        // this term should be 2.0, since iDir[] vectors are normalized:
+        // the diagonal term should be 2.0, since iDir[] vectors are normalized:
 #if ( DIM == 2 )
         iJJt[jj] = 2 * ( X[0]*X[0] + X[1]*X[1] );
 #else
         iJJt[jj] = 2 * ( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
 #endif
         // iJJt[jj]  = 2.0;
-        
-        iJJtU[jj] = -xn;
     }
     
     const real* X = iDir + DIM*nbu;
@@ -138,8 +136,8 @@ void Mecafil::makeProjection()
 
     if ( 0 )
     {
-        VecPrint::print("D", nbu+1, iJJt, 2);
-        VecPrint::print("U", nbu, iJJtU, 2);
+        VecPrint::print(" D", nbu+1, iJJt, 2);
+        VecPrint::print("_U", nbu, iJJtU, 2);
         //VecPrint::print("X", DIM*(nbu+2), pPos, 2);
     }
 

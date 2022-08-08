@@ -182,10 +182,13 @@ void Simul::solve()
     setAllInteractions(sMeca);
     //printf("     ::set      %16llu\n", (timer()-rdt)>>5); rdt = timer();
 #if 0
-    // experimental RCM ordering (29.7.2022):
-    sMeca.reorderMecables();
-    setAllInteractions(sMeca);
-    sMeca.saveMatrixBitmaps();
+    if ( sMeca.nbMecables() > 2 )
+    {
+        // experimental RCM ordering (29.7.2022):
+        sMeca.reorderMecables();
+        setAllInteractions(sMeca);
+        sMeca.saveMatrixBitmaps();
+    }
 #endif
     //printf("     ::order    %16llu\n", (timer()-rdt)>>5); rdt = timer();
     sMeca.solve();

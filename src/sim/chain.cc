@@ -357,10 +357,9 @@ int Chain::reshape_calculate(const size_t ns, real target,
     
     real err, err0 = 0;
     /*
-     Perform here the first iteration of Newton's method
-     the formula is the same as below, with all `mul` equal to zero,
-     and thus 'vec == dif'
-     The system is symmetric, and we can use a faster factorization
+     Perform here the first iteration of Newton's method:
+     the formula is the same as below, with all `mul` equal to zero, and thus 'vec == dif'
+     The system is symmetric definite positive, and we can use a faster factorization
      */
     for ( size_t i = 0; i < ns; ++i )
     {
@@ -445,7 +444,7 @@ int Chain::reshape_calculate(const size_t ns, real target,
         printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
         printf("\n L"); VecPrint::head(ns-1, low+1, 3);
         printf("\n D"); VecPrint::head(ns  , dia, 3);
-        printf("\n U"); VecPrint::head(ns-1, upe, 3);
+        printf("\n_U"); VecPrint::head(ns-1, upe, 3);
         //printf("\n rhs "); VecPrint::head(ns, rhs, 6);
 #endif
 #if ( 0 )
@@ -559,7 +558,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
         printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
         printf("\n L"); VecPrint::head(ns-1, low+1, 3);
         printf("\n D"); VecPrint::head(ns  , dia, 3);
-        printf("\n U"); VecPrint::head(ns-1, upe, 3);
+        printf("\n_U"); VecPrint::head(ns-1, upe, 3);
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
@@ -649,7 +648,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
         printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
         printf("\n L"); VecPrint::head(ns-1, low+1, 3);
         printf("\n D"); VecPrint::head(ns  , dia, 3);
-        printf("\n U"); VecPrint::head(ns-1, upe, 3);
+        printf("\n_U"); VecPrint::head(ns-1, upe, 3);
 #endif
         int info = 0;
         lapack::xgtsv(ns, 1, low+1, dia, upe, val, ns, &info);

@@ -10,7 +10,7 @@
 
 Couple * ForkProp::newCouple(Glossary*) const
 {
-    //std::clog << "ForkProp::newHand" << '\n';
+    //std::clog << "ForkProp::newCouple" << '\n';
     return new Fork(this);
 }
 
