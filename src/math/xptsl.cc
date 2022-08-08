@@ -76,11 +76,6 @@ void linpack_xptsl(int N, real D[], const real E[], real X[])
 
 void alsatian_xptsl(int N, real D[], real E[], real X[])
 {
-    if ( N == 1 )
-    {
-        X[0] = X[0] / D[0];
-        return;
-    }
     int mid = ( N - 1 ) / 2;
     int inx = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
@@ -146,11 +141,6 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
 
 void alsadual_factor(int N, real D[], real E[])
 {
-    if ( N == 1 )
-    {
-        D[0] = inverse(D[0]);
-        return;
-    }
     int mid = ( N - 1 ) / 2;
     int inx = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
@@ -198,16 +188,11 @@ void alsadual_xpttrf(int size, real* D, real* E, int* INFO)
 
 void alsadual_xptts2(int N, const real D[], const real E[], real X[])
 {
-    if ( N == 1 )
-    {
-        X[0] = X[0] * D[0];
-        return;
-    }
     int mid = ( N - 1 ) / 2;
     int inx = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
     real xk = X[0];
-    real xi = X[inx+1];
+    real xi = X[N-1];
     for( int k = 0; k < mid; ++k, --inx )
     {
         // k going up from 0 to mid-1
