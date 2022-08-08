@@ -99,13 +99,13 @@ public:
     void execute_delete(std::string const& name, Glossary&, size_t cnt);
     
     /// move object of type `name`, following options in Glossary
-    void execute_move(std::string const& name, Vector const&);
+    void execute_move(std::string const& name, Glossary&, size_t cnt);
     
     /// mark `cnt` objects of type `name`, following options in Glossary
     void execute_mark(std::string const& name, Glossary&, size_t cnt);
 
     /// cut fibers of type `name`, following different options in Glossary
-    void execute_cut(std::string const& name, Glossary&);
+    void execute_cut(std::string const& name, Glossary&, size_t cnt);
     
     /// cut fibers of type `name`, following different options in Glossary
     void execute_connect(std::string const& name, Glossary&);

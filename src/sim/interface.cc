@@ -609,8 +609,6 @@ public:
                 ins = spc;
             else if ( str == "outside" )
                 ous = spc;
-            else
-                throw InvalidSyntax("unknown specification `"+str+"'");
         }
         
         opt.set(mrk, "mark");
@@ -690,12 +688,39 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
 /**
  This moves one object to position `pos`
  */
-void Interface::execute_move(std::string const& name, Vector const& pos)
+void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
 {
+    Property * pp = sim_->properties.find(name);
+    ObjectSet * set = nullptr;
+    if ( pp )
+        set = sim_->findSet(pp->category());
+    else
+        set = sim_->findSet(name);
+    if ( !set )
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
     
-    Object * obj = sim_->pickMovable(name);
-    if ( obj )
-        obj->setPosition(pos);
+    Filter filter;
+    filter.set(sim_, pp, opt);
+    ObjectList objs = set->collect(pass_filter, &filter);
+    
+    // optionally limit the list to a random subset
+    if ( cnt < objs.size() )
+    {
+        objs.shuffle();
+        objs.truncate(cnt);
+    }
+    
+    Vector pos;
+    if ( opt.set(pos, "position") )
+    {
+        for ( Object * obj : objs )
+            obj->setPosition(pos);
+    }
+    else if ( opt.set(pos, "translation") )
+    {
+        for ( Object * obj : objs )
+            obj->translate(pos);
+    }
 }
 
 
@@ -733,7 +758,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
 }
 
 
-void Interface::execute_cut(std::string const& name, Glossary& opt)
+void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
 {
     Vector n(1,0,0);
     real a = 0;
@@ -745,25 +770,32 @@ void Interface::execute_cut(std::string const& name, Glossary& opt)
     opt.set(stateP, "new_end_state");
     opt.set(stateM, "new_end_state", 1);
     
-    ObjectList objs;
-
-    if ( name == "all" )
-    {
-        objs = sim_->fibers.collect();
-    }
+    Property * pp = sim_->properties.find(name);
+    ObjectSet * set = nullptr;
+    if ( pp )
+        set = sim_->findSet(pp->category());
     else
+        set = sim_->findSet(name);
+    if ( !set )
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
+
+    if ( set != &sim_->fibers )
+        throw InvalidSyntax("only `cut fiber' is supported");
+
+    ObjectList objs;
+    Filter filter;
+    filter.set(sim_, pp, opt);
+    objs = set->collect(pass_filter, &filter);
+    
+    // optionally limit the list to a random subset
+    if ( cnt < objs.size() )
     {
-        Property * pp = sim_->properties.find_or_die(name);
-        if ( pp->category() != "fiber" )
-            throw InvalidSyntax("only `cut fiber' is supported");
-        
-        Filter filter;
-        filter.set(sim_, pp, opt);
-        objs = sim_->fibers.collect(pass_filter, &filter);
+        objs.shuffle();
+        objs.truncate(cnt);
     }
     
     VLOG("-CUT PLANE (" << n << ").x = " << -a);
-     sim_->fibers.planarCut(objs, n, a, stateP, stateM);
+    sim_->fibers.planarCut(objs, n, a, stateP, stateM);
 }
 
 

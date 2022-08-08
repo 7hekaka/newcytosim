@@ -493,8 +493,8 @@ void Parser::parse_new(std::istream& is)
 void Parser::parse_delete(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    size_t cnt = 1;
-    bool has_cnt = Tokenizer::get_integer(is, cnt);
+    size_t cnt = ~0UL;
+    Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
 #if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
@@ -505,10 +505,11 @@ void Parser::parse_delete(std::istream& is)
             name = str;
     }
 #endif
-    if ( !has_cnt  &&  name == "all" )
+    if ( name == "all" )
     {
-        cnt = ~0UL; // this is very large
         name = Tokenizer::get_symbol(is);
+        if ( !isCategory(name) )
+            throw InvalidSyntax("`"+name+"' is not a known class of object");
     }
     std::string blok = Tokenizer::get_block(is, '{');
     
@@ -527,7 +528,7 @@ void Parser::parse_delete(std::istream& is)
 /**
  Move object:
  
-     move NAME ( POSITION )
+     move [INTEGER] NAME ( POSITION )
  
  or
  
@@ -538,22 +539,35 @@ void Parser::parse_delete(std::istream& is)
 
 void Parser::parse_move(std::istream& is)
 {
-    bool move_all = false;
-
+    std::streampos ipos = is.tellg();
+    size_t cnt = ~0UL;
+    Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
+
     if ( name == "all" )
     {
-        move_all = true;
         name = Tokenizer::get_symbol(is);
+        if ( !isCategory(name) )
+            throw InvalidSyntax("`"+name+"' is not a known class of object");
     }
+    
+    Glossary opt;
+    // Syntax sugar: () specify only position
     std::string blok = Tokenizer::get_block(is, '(');
     
+    if ( blok.empty() )
+    {
+        blok = Tokenizer::get_block(is, '{');
+        opt.read(blok);
+    }
+    else {
+        opt.define("position", blok);
+    }
+
     if ( do_run )
     {
-        Vector vec;
-        std::stringstream ss(blok);
-        if ( ss >> vec )
-            execute_move(name, vec);
+        execute_move(name, opt, cnt);
+        check_warnings(opt, is, ipos);
     }
 }
 
@@ -582,8 +596,8 @@ void Parser::parse_move(std::istream& is)
 void Parser::parse_mark(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    size_t cnt = 0;
-    bool has_cnt = Tokenizer::get_integer(is, cnt);
+    size_t cnt = ~0UL;
+    Tokenizer::get_integer(is, cnt);
     std::string name = Tokenizer::get_symbol(is);
 #if BACKWARD_COMPATIBILITY < 50
     // Read formats anterior to 3.11.2017
@@ -594,8 +608,12 @@ void Parser::parse_mark(std::istream& is)
             name = str;
     }
 #endif
-    if ( !has_cnt  &&  name == "all" )
+    if ( name == "all" )
+    {
         name = Tokenizer::get_symbol(is);
+        if ( !isCategory(name) )
+            throw InvalidSyntax("`"+name+"' is not a known class of object");
+    }
     std::string blok = Tokenizer::get_block(is, '{');
     
     if ( do_new )
@@ -627,6 +645,8 @@ void Parser::parse_mark(std::istream& is)
 void Parser::parse_cut(std::istream& is)
 {    
     std::streampos ipos = is.tellg();
+    size_t cnt = ~0UL;
+    Tokenizer::get_integer(is, cnt);
     std::string str = Tokenizer::get_symbol(is);
  
     if ( str == "all" )
@@ -646,7 +666,7 @@ void Parser::parse_cut(std::istream& is)
     if ( do_run )
     {
         Glossary opt(blok);
-        execute_cut(str, opt);
+        execute_cut(str, opt, cnt);
         check_warnings(opt, is, ipos);
     }
 }
