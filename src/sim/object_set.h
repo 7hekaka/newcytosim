@@ -186,8 +186,14 @@ public:
     /// collect all objects
     virtual ObjectList collect() const;
  
-    /// collect objects for which ( func(obj, val) == true )
+    /// collect `cnt` objects selected randomly
+    virtual ObjectList collect(size_t cnt) const;
+
+    /// collect all objects for which ( func(obj, val) == true )
     virtual ObjectList collect(bool (*func)(Object const*, void const*), void const*) const;
+
+    /// collect `cnt` objects for which ( func(obj, val) == true )
+    virtual ObjectList collect(bool (*func)(Object const*, void const*), void const*, size_t cnt) const;
 
     /// collect objects that have given Property
     ObjectList collect(Property const*) const;

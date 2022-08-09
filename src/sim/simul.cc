@@ -231,27 +231,6 @@ void Simul::erase(ObjectList const& objs)
         }
 }
 
-
-void Simul::erase(ObjectList& objs, size_t cnt)
-{
-    if ( cnt == 1 )
-    {
-        erase(objs.pick_one());
-    }
-    else
-    {
-        if ( cnt < objs.size() )
-        {
-            // limit the list to a random subset
-            objs.shuffle();
-            objs.truncate(cnt);
-        }
-        
-        //std::clog << "simul:deleting " << objs.size() << " " << set->title() << '\n';
-        erase(objs);
-    }
-}
-
 //------------------------------------------------------------------------------
 #pragma mark -
 

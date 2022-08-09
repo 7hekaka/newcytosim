@@ -447,8 +447,8 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
     {
         if ( target < amount )
         {
-            ObjectList objs = set->collect();
-            sim_->erase(objs, amount-target);
+            ObjectList objs = set->collect(amount-target);
+            sim_->erase(objs);
             return;
         }
         // create enough objects to reach target:
@@ -676,10 +676,10 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     
     Filter filter;
     filter.set(sim_, pp, opt);
-    ObjectList objs = set->collect(pass_filter, &filter);
+    ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     if ( objs.size() > 0 )
-        sim_->erase(objs, cnt);
+        sim_->erase(objs);
     else
         Cytosim::warn << "found no `" << name << "' to delete\n";
 }
@@ -701,14 +701,7 @@ void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
     
     Filter filter;
     filter.set(sim_, pp, opt);
-    ObjectList objs = set->collect(pass_filter, &filter);
-    
-    // optionally limit the list to a random subset
-    if ( cnt < objs.size() )
-    {
-        objs.shuffle();
-        objs.truncate(cnt);
-    }
+    ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     Vector pos;
     if ( opt.set(pos, "position") )
@@ -745,14 +738,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
     
     Filter filter;
     filter.set(sim_, pp, opt);
-    ObjectList objs = set->collect(pass_filter, &filter);
-    
-    // optionally limit the list to a random subset
-    if ( cnt < objs.size() )
-    {
-        objs.shuffle();
-        objs.truncate(cnt);
-    }
+    ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     sim_->mark(objs, mk);
 }
@@ -782,17 +768,9 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     if ( set != &sim_->fibers )
         throw InvalidSyntax("only `cut fiber' is supported");
 
-    ObjectList objs;
     Filter filter;
     filter.set(sim_, pp, opt);
-    objs = set->collect(pass_filter, &filter);
-    
-    // optionally limit the list to a random subset
-    if ( cnt < objs.size() )
-    {
-        objs.shuffle();
-        objs.truncate(cnt);
-    }
+    ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     VLOG("-CUT PLANE (" << n << ").x = " << -a);
     sim_->fibers.planarCut(objs, n, a, stateP, stateM);
