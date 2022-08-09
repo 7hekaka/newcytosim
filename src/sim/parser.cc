@@ -1383,7 +1383,7 @@ inline int has_input(int fd)
 
 
 /**
- Read data from file description, and executes incoming commands.
+ Read data from file specified as descriptor `fd`, and executes incoming commands.
  This should be executed by a process who already owns the lock on the data
  */
 size_t Parser::read_input(int fd)

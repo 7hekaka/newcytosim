@@ -429,7 +429,7 @@ The Fiber is cut at distance `abs` from its MINUS_END:
  - current Fiber is truncated to keep only the section [ MINUS_END , abs ],
  - A new Fiber is created representing the other section [ abs , PLUS_END ],
  - Hands are transferred to the new Fiber if appropriate,
- - lattice substances are also transferred,
+ - Lattice substances are also transferred,
  .
  A pointer to the new Fiber is returned (containing the PLUS_END), but this
  pointer may be zero, if `abs` was not within the valid range of abscissa.

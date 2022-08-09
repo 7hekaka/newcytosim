@@ -47,11 +47,11 @@ protected:
     /// the abscissa from the origin of the Fiber
     real hAbs;
     
-    /// interpolation coefficient: pos = (1-coef) * Vertex(pti) + coef * Vertex(pti+1)
-    mutable real coef_;
+    /// interpolation coefficient: pos = (1-inter_) * Vertex(segix_) + inter_ * Vertex(segix_+1)
+    mutable real inter_;
 
     /// index of segment where site is located
-    mutable unsigned pti_;
+    mutable unsigned segix_;
 
 #if FIBER_HAS_LATTICE
     /// index in the Fiber's Lattice (a signed integer)
@@ -105,10 +105,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// return the interpolation
-    Interpolation interpolation() const { assert_false(bad()); return Interpolation(hFiber, coef_, pti_); }
+    Interpolation interpolation() const { assert_false(bad()); return Interpolation(hFiber, inter_, segix_); }
     
     /// set Interpolation to argument
-    void reinterpolate(Interpolation const& i) const { assert_true(i.mecable()==hFiber); coef_=i.coef1(); pti_=i.point1(); }
+    void reinterpolate(Interpolation const& i) const { assert_true(i.mecable()==hFiber); inter_=i.coef1(); segix_=i.point1(); }
 
     /// update the Interpolation
     void reinterpolate() const { reinterpolate(hFiber->interpolate(hAbs)); }
@@ -134,24 +134,24 @@ public:
     Fiber* fiber() const { return hFiber; }
     
     /// position in space (using current interpolation)
-    Vector pos() const { assert_false(bad()); return hFiber->midPoint(pti_, coef_); }
+    Vector pos() const { assert_false(bad()); return hFiber->midPoint(segix_, inter_); }
     
 #if FIBER_HAS_FAMILY
     /// the position around which attachment is seeked
     Vector outerPos() const;
 #else
     /// the position around which attachment is seeked
-    Vector outerPos() const { assert_false(bad()); return hFiber->midPoint(pti_, coef_); }
+    Vector outerPos() const { assert_false(bad()); return hFiber->midPoint(segix_, inter_); }
 #endif
     
     /// position at abscissa shifted by 'x'
     Vector posHand(real x) const { return hFiber->pos(hAbs+x); }
 
     /// direction of Fiber obtained by normalization
-    Vector dir() const { assert_false(bad()); return hFiber->dirSegment(pti_); }
+    Vector dir() const { assert_false(bad()); return hFiber->dirSegment(segix_); }
     
     /// the direction of the Fiber at the point of attachment
-    Vector dirFiber() const { assert_false(bad()); return hFiber->dirSegment(pti_); }
+    Vector dirFiber() const { assert_false(bad()); return hFiber->dirSegment(segix_); }
     
     /// the abscissa, from the origin of the Fiber
     real abscissa() const { return hAbs; }

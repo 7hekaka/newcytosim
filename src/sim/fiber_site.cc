@@ -14,6 +14,8 @@ FiberSite::FiberSite(Fiber* f, real a)
     hLattice = nullptr;
     hSite = 0;
 #endif
+    inter_ = 0;
+    segix_ = 0;
     //reinterpolate();
 }
 
@@ -21,8 +23,8 @@ FiberSite::FiberSite(Fiber* f, real a)
 void FiberSite::clear()
 {
     hAbs = 0;
-    coef_ = 0;
-    pti_ = 0;
+    inter_ = 0;
+    segix_ = 0;
     hFiber = nullptr;
 #if FIBER_HAS_LATTICE
     hLattice = nullptr;
@@ -269,7 +271,7 @@ int FiberSite::bad() const
     if ( hFiber->betweenMP(hAbs) )
     {
         // the abscissa of the interpolated point:
-        real a = hFiber->abscissaPoint(real(pti_)+coef_);
+        real a = hFiber->abscissaPoint(real(segix_)+inter_);
 
         constexpr real MAG = 1000;
         const real e = MAG * ( hAbs - a );
