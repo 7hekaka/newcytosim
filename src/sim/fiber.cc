@@ -1010,10 +1010,10 @@ void Fiber::setInteractions(Meca& meca) const
                 // forces is capped to a maximum magnitude 'f':
 #if ( DIM == 3 )
                 Vector n = Vector(0, -P.YY, -P.ZZ).normalized(f);
-                meca.addForce(Mecapoint(this, i), n);
+                meca.addForce(this, i, n);
 #elif ( DIM == 2 )
                 Vector n(0, std::copysign(f, -P.YY), 0);
-                meca.addForce(Mecapoint(this, i), n);
+                meca.addForce(this, i, n);
 #endif
             }
         }
@@ -1023,21 +1023,21 @@ void Fiber::setInteractions(Meca& meca) const
     switch( prop->end_force_mode )
     {
         case MINUS_END:
-            meca.addForce(Mecapoint(this, 0), prop->end_force);
+            meca.addForce(this, 0, prop->end_force);
             break;
         case PLUS_END:
-            meca.addForce(Mecapoint(this, lastPoint()), prop->end_force);
+            meca.addForce(this, lastPoint(), prop->end_force);
             break;
         case BOTH_ENDS:
-            meca.addForce(Mecapoint(this, 0), prop->end_force);
-            meca.addForce(Mecapoint(this, lastPoint()), prop->end_force);
+            meca.addForce(this, 0, prop->end_force);
+            meca.addForce(this, lastPoint(), prop->end_force);
             break;
         case CENTER:
             meca.addForce(interpolateCenter(), prop->end_force);
             break;
         case ORIGIN: //this adds a bending torque where the sum of force is zero
-            meca.addForce(Mecapoint(this, 0), prop->end_force);
-            meca.addForce(Mecapoint(this, lastPoint()), prop->end_force);
+            meca.addForce(this, 0, prop->end_force);
+            meca.addForce(this, lastPoint(), prop->end_force);
             meca.addForce(interpolateCenter(), -2.0 * prop->end_force);
         default:
         break;
@@ -1056,8 +1056,8 @@ void Fiber::setInteractions(Meca& meca) const
         for ( size_t i = 0; i < nbSegments(); ++i )
         {
             Vector f = s * dirSegment(i);
-            meca.addForce(Mecapoint(this, i  ), f);
-            meca.addForce(Mecapoint(this, i+1), f);
+            meca.addForce(this, i  , f);
+            meca.addForce(this, i+1, f);
         }
     }
 #endif

@@ -30,7 +30,7 @@ class Glossary;
  
     abs_real( length() / number_of_points - FiberProp::segmentation )
  
- where segmentation is a parameter of the fiber class.
+ where FiberProp::segmentation is a parameter of the Fiber class.
  All the segments in a fiber all have the same length
 
     Chain::segmentation() = length() / ( number_of_points - 1 )
@@ -77,7 +77,7 @@ private:
     /// actual section length: distance between consecutive points
     real fnCut, iCut;
     
-    /// target segmentation length (equal to parameter 'fiber:segmentation')
+    /// target segmentation (copy of 'FiberProp::segmentation')
     real fnSegmentation;
     
     /// abscissa of the minus-end (equal to zero initially)

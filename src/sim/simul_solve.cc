@@ -632,8 +632,8 @@ void Simul::addExperimentalInteractions(Meca& meca) const
     Vector force(0,1,0);
     for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
-        meca.addForce(Mecapoint(O, 1), -force);
-        meca.addForce(Mecapoint(O, 2), +force);
+        meca.addForce(O, 1, -force);
+        meca.addForce(O, 2, +force);
     }
 #endif
 }

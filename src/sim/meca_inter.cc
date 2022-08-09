@@ -363,6 +363,14 @@ void Meca::addForce(Mecapoint const& pte, Vector const& force)
     add_base(pte.matIndex(), force);
 }
 
+/**
+ Add constant force to a vertex
+ */
+void Meca::addForce(Mecable const* mec, const size_t inx, Vector const& force)
+{
+    add_base(mec->matIndex() + inx, force);
+}
+
 
 /**
 Add constant force to an interpolated position

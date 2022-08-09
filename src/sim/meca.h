@@ -405,6 +405,9 @@ public:
     /// Add a constant force on Mecapoint
     void addForce(Mecapoint const&, Vector const& force);
     
+    /// Add a constant force on Mecapoint
+    void addForce(Mecable const*, size_t inx, Vector const& force);
+    
     /// Add a constant force on Interpolated point
     void addForce(Interpolation const&, Vector const& force);
     
