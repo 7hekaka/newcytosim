@@ -594,17 +594,17 @@ public:
     {
         prp = pp;
         
-        std::string str;
-        if ( opt.set(str, "position") )
+        if ( opt.value_is("position", 0, "inside") || opt.value_is("position", 0, "outside") )
         {
+            std::string str;
             Space const* spc = sim->spaces.master();
-            std::string spn;
-            if ( opt.set(spn, "position", 1) )
+            if ( opt.set(str, "position", 1) )
             {
-                spc = sim->findSpace(spn);
+                spc = sim->findSpace(str);
                 if ( !spc )
-                    throw InvalidSyntax("unknown Space `"+spn+"'");
+                    throw InvalidSyntax("unknown Space `"+str+"'");
             }
+            opt.set(str, "position");
             if ( str == "inside" )
                 ins = spc;
             else if ( str == "outside" )
@@ -686,7 +686,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
 
 
 /**
- This moves one object to position `pos`
+ This moves objects to position `pos`
  */
 void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
 {

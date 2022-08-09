@@ -39,12 +39,12 @@ Parser::Parser(Simul* sim, bool c, bool s, bool n, bool r, bool w)
 /// check for unused values in Glossary and issue a warning
 void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t cnt = 1)
 {
-    std::string war;
-    if ( opt.has_warning(war, cnt) )
+    if ( ! Cytosim::log.is_silent() )
     {
-        size_t L;
-        if ( ! Cytosim::log.is_silent() )
+        std::string war;
+        if ( opt.has_warning(war, cnt) )
         {
+            size_t L;
             Cytosim::log << war << " in `" << StreamFunc::extract_line(is, ipos, L) << "' (line " << L << ")\n";
             // also report to standard error:
             print_yellow(std::cerr, war);
