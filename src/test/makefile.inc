@@ -3,7 +3,7 @@
 
 TESTS:=test_bits test_gillespie test_random test_math test_glossary\
        test_xpttrs test_xtbsv test_quaternion test_rigidity test_project\
-       test_ortho test_matrix test_thread test_blas test_solver test_simd
+       test_ortho test_matrix test_thread test_blas test_solver test_dot test_simd
 
 TESTS_GL:=test_solve test_opengl test_vbo test_glut test_glapp test_tesselator\
           test_rasterizer test_space test_grid test_sphere test_pipe
@@ -97,6 +97,10 @@ test_variablerate: test_variablerate.cc $(TEST_OBJ) | bin
 
 test_asm: test_asm.cc | bin
 	$(COMPILE) -restrict -S -c -m64 $^ -o build/test_asm.s
+	$(DONE)
+
+test_dot: test_dot.cc $(TEST_OBJ) | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) -o bin/$@
 	$(DONE)
 
 test_simd: test_simd.cc $(TEST_OBJ) | bin

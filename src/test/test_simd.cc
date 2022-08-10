@@ -15,19 +15,6 @@
 #include "simd_float.h"
 #include "simd_print.h"
 
-typedef double real;
-
-const size_t SIZ = 1<<14;
-real vX[SIZ], vY[SIZ];
-
-void init()
-{
-    for ( size_t ii=0; ii<SIZ; ++ii )
-    {
-        vX[ii] = 1/real(SIZ-ii);
-        vY[ii] = real(SIZ-ii);
-    }
-}
 
 void dump(size_t len, const float* vec)
 {
@@ -51,83 +38,6 @@ void dump(size_t len, const double* vec)
             printf(" ");
     }
     printf("\n");
-}
-
-real scalar()
-{
-    real d = 0;
-    for ( size_t ii=0; ii<SIZ; ++ii )
-        d += vX[ii] * vY[ii];
-    return d;
-}
-
-real vector2()
-{
-    vec2 s = setzero2();
-    for ( size_t ii=0; ii<SIZ; ii+=2 )
-        s = add2(s, mul2( load2(vX+ii), load2(vY+ii) ));
-    _mm_empty();
-    
-    return esum2(s)[0];
-}
-
-#ifdef __AVX__
-
-real vector4()
-{
-    vec4 s = setzero4();
-    for ( size_t ii=0; ii<SIZ; ii+=4 )
-        s = add4(s, mul4( load4(vX+ii), load4(vY+ii) ));
-    _mm_empty();
-    
-    return esum4(s)[0];
-}
-
-
-real vectorU()
-{
-    vec4 v0 = setzero4();
-    vec4 v1 = setzero4();
-    vec4 v2 = setzero4();
-    vec4 v3 = setzero4();
-    
-    for ( size_t ii=0; ii<SIZ; ii+=16 )
-    {
-        v0 = add4(v0, mul4( load4(vX+ii   ), load4(vY+ii   ) ));
-        v1 = add4(v1, mul4( load4(vX+ii+4 ), load4(vY+ii+4 ) ));
-        v2 = add4(v2, mul4( load4(vX+ii+8 ), load4(vY+ii+8 ) ));
-        v3 = add4(v3, mul4( load4(vX+ii+12), load4(vY+ii+12) ));
-    }
-    
-    vec4 s = add4(add4(v0, v1), add4(v2, v3));
-    _mm_empty();
-    
-    return esum4(s)[0];
-}
-
-#endif
-
-void run(real (*func)(), const char name[], const size_t REP)
-{
-    real a = 0, b = 0, c = 0, d = 0;
-    real e = 0, f = 0, g = 0, h = 0;
-    fprintf(stderr, "%10s:  ", name);
-    tick();
-    
-    for ( size_t i=0; i<REP; ++i )
-    {
-        a = (*func)();
-        b = (*func)();
-        c = (*func)();
-        d = (*func)();
-        e = (*func)();
-        f = (*func)();
-        g = (*func)();
-        h = (*func)();
-    }
-    
-    real s = ((a + b) + (c + d)) + ((e + f) + (g + h));
-    fprintf(stderr, " %16f :  %8.0f ms\n", s, tock(REP));
 }
 
 
@@ -1001,13 +911,6 @@ int main(int argc, char * argv[])
     switch ( i )
     {
         case 0:
-            init();
-            run(scalar,  "scalar ", 1<<16);
-            run(vector2, "vector2", 1<<16);
-#ifdef __AVX__
-            run(vector4, "vector4", 1<<16);
-            run(vectorU, "vectorU", 1<<16);
-#endif
             break;
 #ifdef __AVX__
         case 1:

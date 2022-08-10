@@ -1610,6 +1610,7 @@
 		BB1227AE114FB8640042589A /* test_blas.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_blas.cc; path = src/test/test_blas.cc; sourceTree = SOURCE_ROOT; };
 		BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_disc.h; path = spaces/space_dynamic_disc.h; sourceTree = "<group>"; };
 		BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_disc.cc; path = spaces/space_dynamic_disc.cc; sourceTree = "<group>"; };
+		BB158A8028A3E823008AFB22 /* test_dot.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_dot.cc; sourceTree = "<group>"; };
 		BB171C310B3DEBE700CFFC3B /* fiber.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = fiber.h; path = src/sim/fiber.h; sourceTree = SOURCE_ROOT; };
 		BB171C320B3DEBE700CFFC3B /* fiber.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fiber.cc; path = src/sim/fiber.cc; sourceTree = SOURCE_ROOT; };
 		BB1749A407D798E600BC7BDC /* lattice.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = lattice.cc; path = src/sim/lattice.cc; sourceTree = SOURCE_ROOT; };
@@ -3143,6 +3144,7 @@
 				BB73591105B98DA3006956D5 /* test_rasterizer.cc */,
 				BB7086372449C83100C73273 /* test_rigidity.cc */,
 				BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */,
+				BB158A8028A3E823008AFB22 /* test_dot.cc */,
 				BB5783DB23EB3A250022878E /* test_size.cc */,
 				BBCD0E910C5E84CC00B463EB /* test_sizeof.cc */,
 				BB73591405B98DA3006956D5 /* test_solve.cc */,
