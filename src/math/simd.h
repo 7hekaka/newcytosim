@@ -34,6 +34,9 @@ LOCAL vec2 loaddup2(double const* a)        { return _mm_loaddup_pd(a); }
 LOCAL vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
 LOCAL vec2 loadlo2(vec2 a, double const* b) { return _mm_loadl_pd(a,b); }
 
+// convert two single-precision floats in lower registers, to double precision
+LOCAL vec2 cvtsd2(__m128 a) { return _mm_cvtps_pd(a); }
+
 // load 1 float and convert to double and zero
 LOCAL vec2 load1d(float const* a) { return _mm_cvtps_pd(_mm_load_ss(a)); }
 // load 2 floats and convert to double

@@ -1344,8 +1344,8 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
         vec2 t0, t1, t2;
         {
             vec4f f = loadu4f(pA+2*lda); // last value not used
-            vec2 a0 = _mm_cvtps_pd(f);
-            vec2 a1 = _mm_cvtps_pd(broadcastZf(f));
+            vec2 a0 = cvtsd2(f);
+            vec2 a1 = cvtsd2(broadcastZf(f));
             t2 = mul2(loaddup2(pB+2), a1); // { T2, T2 }
             a1 = load2d(pA+lda);
             t0 = fnmadd2(t2, a0, loadu2(pB)); // { preT0, T1/A }

@@ -203,8 +203,7 @@ void alsadual_xptts2(int N, const real D[], const real E[], real X[])
         X[inx+1] = D[inx+1] * xi;
         xi = X[inx] - E[inx] * xi;
     }
-    // special code for even N
-    if ( ( N & 1 ) == 0 )
+    if ( mid == inx ) // N is even
     {
         // clean up for possible 2 x 2 block at center
         xk = xk * D[mid];

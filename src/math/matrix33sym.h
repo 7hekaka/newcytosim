@@ -447,7 +447,6 @@ public:
         return clear4th(zzzz);
          */
     }
-    static inline vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_add_pd(_mm_mul_pd(a,b), c); }
 
     /// multiplication by a vector: this * V
     const vec4 vecmul3_sse(double const* V) const
