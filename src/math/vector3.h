@@ -899,7 +899,7 @@ public:
         vec2 axy = load2(&a.XX), bxy = load2(&b.XX);
         vec2 az = load1(&a.ZZ), bz = load1(&b.ZZ);
         vec2 d = fmadd2(az, bz, mul2(axy, bxy));
-        return add2(d, permute2(d, 0x01))[0];
+        return add2(d, permute2(d))[0];
 #else
         return a.XX * b.XX + a.YY * b.YY + a.ZZ * b.ZZ;
 #endif

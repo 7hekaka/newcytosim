@@ -491,7 +491,7 @@ void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, doub
     if ( mul < end+3 )
     {
         vec2 a = mul2(sub2(load2(src+2), load2(src)), load2(dir));
-        store1(mul, add2(a, permute2(a,1)));
+        store1(mul, add2(a, permute2(a)));
     }
 }
 
@@ -1053,7 +1053,7 @@ void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, doub
     {
         vec2 x = mul2(load2(dir), sub2(loadu2(src+3), loadu2(src)));
         vec2 z = mul1(load2(dir+2), sub1(load1(src+5), load1(src+2)));
-        vec2 y = permute2(x, 0b1);
+        vec2 y = permute2(x);
         
         store1(mul, add1(add1(x, y), z));
         

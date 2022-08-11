@@ -152,7 +152,7 @@ void run(real (*func)(const real*, const real*), const char name[], const size_t
 
 int main(int argc, char * argv[])
 {
-    const size_t REP = 1<<16;
+    const size_t REP = 1<<12;
     init();
     run(dot,  "scalar", REP);
 #ifdef __SSE3__

@@ -102,8 +102,7 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
         xi = X[inx] - t2 * xi;
         E[inx] = t2;
     }
-    // special code for even N
-    if ( ( N & 1 ) == 0 )
+    if ( mid == inx ) // N is even
     {
         // clean up for possible 2 x 2 block at center
         dk = inverse(dk);
@@ -162,8 +161,7 @@ void alsadual_factor(int N, real D[], real E[])
         di = D[inx] - t2 * E[inx];
         E[inx] = t2;
     }
-    // special code for even N
-    if ( ( N & 1 ) == 0 )
+    if ( mid == inx ) // N is even
     {
         // clean up for possible 2 x 2 block at center
         dk = inverse(dk);

@@ -84,8 +84,10 @@ LOCAL vec2 swap2(vec2 a)             { return _mm_shuffle_pd(a, a, 0b01); }
 /// concatenate and shift left, returning { BC } from a={ AB } b={ CD }
 LOCAL vec2 catshift(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b01); }
 
-#define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
-#define cmp2(a,b,k)       _mm_cmp_pd(a,b,k)
+/// blend to return { low = a[0], high = b[1] }
+LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
+
+#define cmp2(a,b,k) _mm_cmp_pd(a,b,k)
 
 /// returns the sum of the elements, broadcasted
 LOCAL vec2 esum2(vec2 v)
@@ -127,18 +129,8 @@ LOCAL vec2 normalize2(vec2 vec, double n)
 
 #if defined(__SSE4_1__)
 
-#define blend2(a,b,k) _mm_blend_pd(a,b,k)
-
-/// blend to return { low = a[0], high = b[1] }
-LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_blend_pd(a, b, 0b10); }
-
 /// return `neg` if `val < 0` and `pos` otherwise
 LOCAL vec2 sign_select2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(pos, neg, val); }
-
-#elif defined(__SSE3__)
-
-/// return { a[0], b[1] }
-LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
 
 #endif
 
@@ -249,6 +241,8 @@ LOCAL vec4 duphi2f128(vec4 a) { return _mm256_permute2f128_pd(a, a, 0x31); }
 LOCAL vec4 unpacklo2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x20); }
 /// extract the higher 128 bit lanes, return { a[2], a[3], b[2], b[3] }
 LOCAL vec4 unpackhi2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0x31); }
+
+LOCAL vec2 permute2(vec2 a) { return _mm_permute_pd(a,1); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,k)       _mm256_permute_pd(a,k)

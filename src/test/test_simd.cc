@@ -15,6 +15,7 @@
 #include "simd_float.h"
 #include "simd_print.h"
 
+#define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
 
 void dump(size_t len, const float* vec)
 {
@@ -49,10 +50,10 @@ void test_swapSSE()
     dump(b, "b");
     
 #ifdef __AVX__
-    dump(permute2(b,0b00), "permute 0b00");
-    dump(permute2(b,0b01), "permute 0b01");
-    dump(permute2(b,0b10), "permute 0b10");
-    dump(permute2(b,0b11), "permute 0b11");
+    dump(_mm_permute_pd(b,0b00), "permute 0b00");
+    dump(_mm_permute_pd(b,0b01), "permute 0b01");
+    dump(_mm_permute_pd(b,0b10), "permute 0b10");
+    dump(_mm_permute_pd(b,0b11), "permute 0b11");
 #endif
     
     dump(shuffle2(a,b,0b00), "0b00");
