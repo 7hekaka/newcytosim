@@ -103,7 +103,7 @@ real dot_avu(const double* X, const double* Y)
 #endif
 
 #ifdef __ARM_NEON__
-#include "arm_neon.h"
+#include <arm_neon.h>
 
 real dot_neon(const float* X, const float* Y)
 {

@@ -15,13 +15,13 @@
 #ifdef __SSE3__
 
 /// print SIMD vector of 2 doubles
-LOCAL void dump(__m128d v, char const* s)
+LOCAL void dump(vec2 v, char const* s)
 {
     printf("%16s d( %5.2f %5.2f )\n", s, v[1], v[0]);
 }
 
 /// print two SIMD vector
-LOCAL void dump(__m128d v, vec2 w, char const* s)
+LOCAL void dump(vec2 v, vec2 w, char const* s)
 {
     printf("%16s d( %5.2f %5.2f )( %5.2f %5.2f )\n", s, v[1], v[0], w[1], w[0]);
 }
@@ -67,13 +67,13 @@ LOCAL void dump32(__m128i v, char const* s)
 #ifdef __AVX__
 
 /// print SIMD vector of 4 doubles
-LOCAL void dump(__m256d v, char const* s)
+LOCAL void dump(vec4 v, char const* s)
 {
     printf("%16s d( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
 
 /// print two SIMD vector of 4 doubles
-LOCAL void dump(__m256d v, __m256d w, char const* s)
+LOCAL void dump(vec4 v, vec4 w, char const* s)
 {
     printf("%16s d( %5.2f %5.2f %5.2f %5.2f )( %5.2f %5.2f %5.2f %5.2f )\n",
            s, v[3], v[2], v[1], v[0], w[3], w[2], w[1], w[0]);

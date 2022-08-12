@@ -128,6 +128,9 @@
 		BB11D2FF28645D91002B5869 /* simul_part.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB11D2FD28645D91002B5869 /* simul_part.cc */; };
 		BB151D64270C85F2003ECD4E /* space_dynamic_disc.h in Headers */ = {isa = PBXBuildFile; fileRef = BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */; };
 		BB151D65270C85F2003ECD4E /* space_dynamic_disc.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */; };
+		BB158A8428A65244008AFB22 /* simd_neon.h in Headers */ = {isa = PBXBuildFile; fileRef = BB158A8128A65244008AFB22 /* simd_neon.h */; };
+		BB158A8528A65244008AFB22 /* simd_avx.h in Headers */ = {isa = PBXBuildFile; fileRef = BB158A8228A65244008AFB22 /* simd_avx.h */; };
+		BB158A8628A65244008AFB22 /* simd_sse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB158A8328A65244008AFB22 /* simd_sse.h */; };
 		BB171C330B3DEBE700CFFC3B /* fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BB171C310B3DEBE700CFFC3B /* fiber.h */; };
 		BB171C340B3DEBE700CFFC3B /* fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB171C320B3DEBE700CFFC3B /* fiber.cc */; };
 		BB1749A707D798E600BC7BDC /* lattice.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1749A507D798E600BC7BDC /* lattice.h */; };
@@ -1611,6 +1614,9 @@
 		BB151D62270C85F2003ECD4E /* space_dynamic_disc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_disc.h; path = spaces/space_dynamic_disc.h; sourceTree = "<group>"; };
 		BB151D63270C85F2003ECD4E /* space_dynamic_disc.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_disc.cc; path = spaces/space_dynamic_disc.cc; sourceTree = "<group>"; };
 		BB158A8028A3E823008AFB22 /* test_dot.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_dot.cc; sourceTree = "<group>"; };
+		BB158A8128A65244008AFB22 /* simd_neon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_neon.h; sourceTree = "<group>"; };
+		BB158A8228A65244008AFB22 /* simd_avx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_avx.h; sourceTree = "<group>"; };
+		BB158A8328A65244008AFB22 /* simd_sse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_sse.h; sourceTree = "<group>"; };
 		BB171C310B3DEBE700CFFC3B /* fiber.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = fiber.h; path = src/sim/fiber.h; sourceTree = SOURCE_ROOT; };
 		BB171C320B3DEBE700CFFC3B /* fiber.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = fiber.cc; path = src/sim/fiber.cc; sourceTree = SOURCE_ROOT; };
 		BB1749A407D798E600BC7BDC /* lattice.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = lattice.cc; path = src/sim/lattice.cc; sourceTree = SOURCE_ROOT; };
@@ -2981,6 +2987,9 @@
 				BBFC66B209C0C3D30031048A /* real.h */,
 				BB6CD587254ED31A00FB7547 /* real_print.h */,
 				BB9D224520C5D30200CBB0B1 /* simd.h */,
+				BB158A8328A65244008AFB22 /* simd_sse.h */,
+				BB158A8228A65244008AFB22 /* simd_avx.h */,
+				BB158A8128A65244008AFB22 /* simd_neon.h */,
 				BB46A4C424A349F400E89FE2 /* simd_float.h */,
 				BBC6A56D25AF9BCB00C1EAE2 /* simd_math.h */,
 				BB18BB8523CDC20400B3605E /* simd_print.h */,
@@ -4138,6 +4147,7 @@
 				BB0CB11B20C170C10016D73D /* qmr.h in Headers */,
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
+				BB158A8628A65244008AFB22 /* simd_sse.h in Headers */,
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
 				BBDF9AA4228BFBD3005018BD /* xpttrf.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
@@ -4146,6 +4156,7 @@
 				BB6485EC2057FD1B005F2CD1 /* allocator.h in Headers */,
 				BB7191830EF1CD9900CED9E2 /* grid.h in Headers */,
 				BB7191850EF1CD9900CED9E2 /* matsym.h in Headers */,
+				BB158A8428A65244008AFB22 /* simd_neon.h in Headers */,
 				BB7191860EF1CD9900CED9E2 /* isometry.h in Headers */,
 				BB6485F2205803BB005F2CD1 /* gmres.h in Headers */,
 				BB7191870EF1CD9900CED9E2 /* matrix.h in Headers */,
@@ -4179,6 +4190,7 @@
 				BB560C301813DC8800CB1BF5 /* vecprint.h in Headers */,
 				BB6E5EF5245C27E000CEE184 /* xtbsv.h in Headers */,
 				BB6485F02057FDD5005F2CD1 /* monitor.h in Headers */,
+				BB158A8528A65244008AFB22 /* simd_avx.h in Headers */,
 				BBBD34E01AABA5BE00819326 /* map.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
