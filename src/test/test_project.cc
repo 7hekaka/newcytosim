@@ -537,7 +537,7 @@ void projectForcesD_FMA(UINT nbs, const real* dir, const real* X, const real* mu
      Y[B] = X[B] + dir[B] * mul[3] - dir[8] * mul[2];
  */
 
-#if ( DIM == 3 ) && defined(__SSE3__)
+#if ( DIM == 3 ) && USE_SIMD
 // SSE version using FMA
 void projectForcesD3D_sse(size_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
@@ -692,7 +692,7 @@ void projectForcesD3D_sse(size_t nbs, const double* dir,
 //------------------------------------------------------------------------------
 #pragma mark - Fiber::scaleTangentially()
 
-void scaleTangentiallyINX(size_t nbp, const real* src, const real* dir, real* dst)
+void scaleTANGENTIALLY(size_t nbp, const real* src, const real* dir, real* dst)
 {
     for ( size_t i = 0; i < nbp; ++i )
     {
@@ -760,8 +760,8 @@ void projectForces(UINT nbs, const real* X, real* Y)
 }
 
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
-void projectForces_SSE(UINT nbs, const real* X, real* Y)
+#if REAL_IS_DOUBLE && USE_SIMD
+void projectForces_SSE(UINT nbs, const double* X, real* Y)
 {
 #if ( DIM == 2 )
     projectForcesU2D_SSE(nbs, dir_, X, lag_);
@@ -776,7 +776,7 @@ void projectForces_SSE(UINT nbs, const real* X, real* Y)
 #endif
 }
 #elif defined(__SSE3__)
-void projectForces_SSE(UINT nbs, const real* X, real* Y)
+void projectForces_SSE(UINT nbs, const float* X, real* Y)
 {
     projectForcesU_(nbs, dir_, X, lag_);
     DPTTS2(nbs, lag_);
@@ -784,8 +784,8 @@ void projectForces_SSE(UINT nbs, const real* X, real* Y)
 }
 #endif
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
-void projectForcesFused(UINT nbs, const real* X, real* Y)
+#if REAL_IS_DOUBLE && USE_SIMD
+void projectForcesFused(UINT nbs, const double* X, real* Y)
 {
 #if ( DIM == 3 )
     projectForces3D_SSE(nbs, dir_, X, lag_, diag_, upper_, Y);
@@ -796,7 +796,7 @@ void projectForcesFused(UINT nbs, const real* X, real* Y)
 #endif
 
 #if REAL_IS_DOUBLE && defined(__AVX__)
-void projectForces_AVX(UINT nbs, const real* X, real* Y)
+void projectForces_AVX(UINT nbs, const double* X, real* Y)
 {
 #if ( DIM == 2 )
     projectForcesU2D_AVX(nbs, dir_, X, lag_);
@@ -862,10 +862,10 @@ void onlyScale(UINT nbs, const real* X, real* Y)
     scaleTangentially(nbs+1, Y, ani_, Y);
 }
 
-void onlyScaleINX(UINT nbs, const real* X, real* Y)
+void onlySCALE(UINT nbs, const real* X, real* Y)
 {
-    scaleTangentiallyINX(nbs+1, X, ani_, Y);
-    scaleTangentiallyINX(nbs+1, Y, ani_, Y);
+    scaleTANGENTIALLY(nbs+1, X, ani_, Y);
+    scaleTANGENTIALLY(nbs+1, Y, ani_, Y);
 }
 
 void anisoProject(UINT nbs, const real* X, real* Y)
@@ -894,7 +894,7 @@ void projectDiff_F(UINT nbs, const real* X, real* Y)
     addProjectionDiff_F(nbs, lag_, X, Y);
 }
 
-#if defined(__SSE3__)
+#if USE_SIMD
 void projectDiff_SSE(UINT nbs, const real* X, real* Y)
 {
 #if ( DIM == 2 )
@@ -996,14 +996,14 @@ void testProjectionU(UINT cnt)
     testU<projectForcesU_>(cnt,    "U_   ");
     testU<projectForcesU_PTR>(cnt, "U_PTR");
     testU<projectForcesU_TWO>(cnt, "U_TWO");
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && USE_SIMD
     testU<projectForcesU2D_SSE>(cnt, "U_SSE");
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testU<projectForcesU2D_AVX>(cnt, "U_AVX");
     testU<projectForcesU2D_AVY>(cnt, "U_AVY");
 #endif
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && USE_SIMD
     testU<projectForcesU3D_SSE>(cnt, "U_SSE");
     testU<projectForcesU3D_SSE1>(cnt, "U_SSE1");
 #endif
@@ -1022,20 +1022,20 @@ void testProjectionD(UINT cnt)
     testD<projectForcesD_RIV>(cnt, "D_RIV");
     testD<projectForcesD_FMA>(cnt, "D_FMA");
     testD<projectForcesD_PTR>(cnt, "D_PTR");
-#if ( DIM == 3 ) && defined(__SSE3__)
+#if ( DIM == 3 ) && USE_SIMD
     testD<projectForcesD3D_SSE>(cnt, "D_SSE");
 #endif
-#if REAL_IS_DOUBLE && ( DIM == 3 ) && defined(__SSE3__)
+#if REAL_IS_DOUBLE && ( DIM == 3 ) && USE_SIMD
     testD<projectForcesD3D_SSE1>(cnt, "D_SSE1");
 #endif
 #if REAL_IS_DOUBLE
-#if ( DIM == 3 ) && defined(__SSE3__)
+#if ( DIM == 3 ) && USE_SIMD
     testD<projectForcesD3D_sse>(cnt, "D_sse");
 #endif
 #if ( DIM == 3 ) && defined(__AVX__)
     testD<projectForcesD3D_AVX>(cnt, "D_AVX");
 #endif
-#if ( DIM == 2 ) && defined(__SSE3__)
+#if ( DIM == 2 ) && USE_SIMD
     testD<projectForcesD2D_SSE>(cnt, "D_SSE");
 #endif
 #if ( DIM == 2 ) && defined(__AVX__)
@@ -1050,10 +1050,10 @@ void testProjection(UINT cnt)
     setProjection(NSEG);
     setAnisotropy(NSEG);
     timeProject<projectForces>(cnt,    "projF");
-#if defined(__SSE3__)
+#if USE_SIMD
     timeProject<projectForces_SSE>(cnt, "prSSE");
 #endif
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
     timeProject<projectForcesFused>(cnt, "fused");
 #endif
 #if REAL_IS_DOUBLE && defined(__AVX__)
@@ -1061,7 +1061,7 @@ void testProjection(UINT cnt)
 #endif
     timeProject<onlyDPTTS>(cnt, "dptts");
     timeProject<onlyScale>(cnt, "scale");
-    timeProject<onlyScaleINX>(cnt, "scale");
+    timeProject<onlySCALE>(cnt, "SCALE");
     timeProject<anisoProject>(cnt, "aniso");
 }
 
@@ -1073,7 +1073,7 @@ void testProjectionDiff(UINT cnt)
     timeProject<projectDiff_>(cnt, "pdiff");
     timeProject<projectDiff_R>(cnt, "pdifR");
     timeProject<projectDiff_F>(cnt, "pdifF");
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
     timeProject<projectDiff_SSE>(cnt, "pdSSE");
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
@@ -1086,7 +1086,7 @@ void testProjectionDiff(UINT cnt)
 
 int main(int argc, char* argv[])
 {
-    const UINT CNT = 1<<20;
+    const UINT REP = 1<<20;
     RNG.seed();
     std::cout << "DIM=" << DIM << "  real " << sizeof(real) << " bytes   " << __VERSION__ << "\n";
     if ( 0 )
@@ -1095,11 +1095,11 @@ int main(int argc, char* argv[])
         for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
             checkProject<projectForces_AVX>(nbs, "AVX");
 #endif
-#if defined(__SSE3__)
+#if USE_SIMD
         for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
             checkProject<projectForces_SSE>(nbs, "SSE");
 #endif
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
         for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
             checkProject<projectForcesFused>(nbs, "Fus");
 #endif
@@ -1107,18 +1107,18 @@ int main(int argc, char* argv[])
     if ( 0 )
     {
         setFilament(NSEG, 0.2, 20.0, 1.0);
-        testProjectionU(CNT);
-        testProjectionD(CNT);
+        testProjectionU(REP);
+        testProjectionD(REP);
     }
     if ( 1 )
     {
         setFilament(NSEG, 0.2, 20.0, 1.0);
-        testProjection(CNT);
+        testProjection(REP);
     }
     if ( 1 )
     {
         setFilament(NSEG, 0.2, 20.0, 1.0);
-        testProjectionDiff(CNT);
+        testProjectionDiff(REP);
     }
 
     free_reals(tmp_, lag_, force_, pos_);

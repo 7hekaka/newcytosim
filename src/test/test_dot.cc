@@ -37,7 +37,7 @@ real dot(const real* X, const real* Y)
     return d;
 }
 
-#ifdef __SSE3__
+#if defined(__SSE3__)
 real dot_sse(const float* X, const float* Y)
 {
     vec4f s = setzero4f();
@@ -47,7 +47,9 @@ real dot_sse(const float* X, const float* Y)
     
     return s[0] + s[1] + s[2] + s[3];
 }
+#endif
 
+#if USE_SIMD
 real dot_sse(const double* X, const double* Y)
 {
     vec2 s = setzero2();
@@ -155,7 +157,7 @@ int main(int argc, char * argv[])
     const size_t REP = 1<<12;
     init();
     run(dot,  "scalar", REP);
-#ifdef __SSE3__
+#if USE_SIMD
     run(dot_sse, "SSE", REP);
 #endif
 #ifdef __AVX__

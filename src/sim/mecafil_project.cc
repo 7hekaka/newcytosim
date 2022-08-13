@@ -36,7 +36,7 @@ Selection of projectForces() routines optimized for some architectures
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
 #  define projectForcesU projectForcesU3D_AVX
 #  define projectForcesD projectForcesD3D_AVX
-#elif ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#elif ( DIM == 3 ) && REAL_IS_DOUBLE && USE_SIMD
 #  define projectForcesU projectForcesU3D_SSE
 #  define projectForcesD projectForcesD3D_SSE
 #elif ( DIM == 3 ) && defined(__SSE3__)
@@ -45,7 +45,7 @@ Selection of projectForces() routines optimized for some architectures
 #elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
 #  define projectForcesU projectForcesU2D_AVX
 #  define projectForcesD projectForcesD2D_AVX
-#elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#elif ( DIM == 2 ) && REAL_IS_DOUBLE && USE_SIMD
 #  define projectForcesU projectForcesU2D_SSE
 #  define projectForcesD projectForcesD2D_SSE
 #else
@@ -317,7 +317,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
     //VecPrint::print("X", DIM*nbPoints(), X);
 
 // using the fused projectForces if possible, since this is fastest
-#if REAL_IS_DOUBLE && defined(__SSE3__) && !NEW_ANISOTROPIC_FIBER_DRAG
+#if REAL_IS_DOUBLE && USE_SIMD && !NEW_ANISOTROPIC_FIBER_DRAG
 #  if ( DIM == 3 )
     return projectForces3D_SSE(nbs, iDir, X, iLLG, iJJt, iJJtU, Y);
 #  elif ( DIM == 2 )

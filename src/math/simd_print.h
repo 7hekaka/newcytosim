@@ -12,7 +12,7 @@
 
 //---------------------------------- SSE ---------------------------------------
 
-#ifdef __SSE3__
+#if USE_SIMD
 
 /// print SIMD vector of 2 doubles
 LOCAL void dump(vec2 v, char const* s)
@@ -27,7 +27,7 @@ LOCAL void dump(vec2 v, vec2 w, char const* s)
 }
 
 /// print SIMD vector of 4 floats
-LOCAL void dump(__m128 v, char const* s)
+LOCAL void dump(vec4f v, char const* s)
 {
     printf("%16s f( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }

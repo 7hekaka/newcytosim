@@ -321,7 +321,7 @@ void uniLN3(int N, real const* AB, real* B)
     alsatian_xtbsvLNN6(N, AB, BLDD, B);
 }
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
 void uniLN4(int N, real const* AB, real* B)
 {
     U::alsatian_xtbsvLNN6SSE(N, AB, BLDD, B);
@@ -364,7 +364,7 @@ void uniLT3(int N, real const* AB, real* B)
     alsatian_xtbsvLTN6(N, AB, BLDD, B);
 }
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
 void uniLT4(int N, real const* AB, real* B)
 {
     U::alsatian_xtbsvLTN6SSE(N, AB, BLDD, B);
@@ -425,7 +425,7 @@ void testTBSV(size_t cnt)
     check<uniLN2>(NVAL, 1, S, AB, B, "LNNK<KD>", cnt);
     check<uniLN3>(NVAL, 1, S, AB, B, "LLN6", cnt);
 #endif
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
     check<uniLN4>(NVAL, 1, S, AB, B, "LNN6SSE_U", cnt);
     check<uniLN5>(NVAL, 1, S, AB, B, "LNN6SSE", cnt);
 #endif
@@ -437,7 +437,7 @@ void testTBSV(size_t cnt)
     check<uniLT1>(NVAL, 1, S, AB, B, "xtbsvLTN", cnt);
     check<uniLT2>(NVAL, 1, S, AB, B, "LTNK<KD>", cnt);
     check<uniLT3>(NVAL, 1, S, AB, B, "LTN6", cnt);
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
     check<uniLT4>(NVAL, 1, S, AB, B, "LTN6SSE_U", cnt);
     check<uniLT5>(NVAL, 1, S, AB, B, "LTN6SSE", cnt);
 #endif

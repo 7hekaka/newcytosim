@@ -201,7 +201,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 #endif
 }
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
 
 void add_rigidity2D_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
@@ -462,7 +462,7 @@ void test(size_t cnt)
     testRigidity<add_rigidityF>(cnt, "F  ");
     testRigidity<add_rigidityG>(cnt, "G  ");
     testRigidity<add_rigidity4>(cnt, "4  ");
-#if defined(__SSE3__) & ( DIM == 2 ) & REAL_IS_DOUBLE
+#if USE_SIMD & ( DIM == 2 ) & REAL_IS_DOUBLE
     testRigidity<add_rigidity2D_SSO>(cnt, "SSO");
     testRigidity<add_rigidity2D_SSE>(cnt, "SSE");
 #endif

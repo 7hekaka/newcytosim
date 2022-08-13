@@ -1948,8 +1948,8 @@ void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 
 /// version of xgetrs('N', ...) for NRHS==1 and inverted diagonal terms
 /**
- This is used to apply the full block preconditionner and we could use
- Non-temporal loads for the matrix A, since it will not fit in the cache,
+ This is used to apply the full block preconditionner, stored in single precision.
+ We could use non-temporal loads for the matrix A, since it will not fit in the cache,
  but the vector B should be cached!
  */
 void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
@@ -1964,6 +1964,7 @@ void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
 
 
 #if defined(__SSE3__)
+/// This is used to apply the full block preconditionner, stored in single precision.
 void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* B)
 {
 #if 0

@@ -44,8 +44,8 @@ void dump(size_t len, const double* vec)
 
 void test_swapSSE()
 {
-    vec2 a = setr2(1, 0);
-    vec2 b = setr2(3, 2);
+    vec2 a = setr2(1, 2);
+    vec2 b = setr2(3, 4);
     dump(a, "a");
     dump(b, "b");
     
@@ -55,15 +55,19 @@ void test_swapSSE()
     dump(_mm_permute_pd(b,0b10), "permute 0b10");
     dump(_mm_permute_pd(b,0b11), "permute 0b11");
 #endif
-    
+#if defined(__SSE3__)
     dump(shuffle2(a,b,0b00), "0b00");
     dump(shuffle2(a,b,0b01), "0b01");
     dump(shuffle2(a,b,0b10), "0b10");
     dump(shuffle2(a,b,0b11), "0b11");
+#endif
     dump(unpacklo2(a,b), "unpacklo");
     dump(unpackhi2(a,b), "unpackhi");
-    dump(duplo2(a),  "duplo2(a)");
-    dump(duphi2(a),  "duphi2(a)");
+    dump(duplo2(a), "duplo2(a)");
+    dump(duphi2(a), "duphi2(a)");
+    dump(blend11(a,b), "blend11(a,b)");
+    dump(catshift(a,b), "catshift(a,b)");
+    dump(swap2(a), "swap2(a)");
 }
 
 
@@ -76,6 +80,7 @@ void test_shuffle()
     dump(a, "a  ");
     dump(b, "b  ");
 
+#if defined(__SSE3__)
     dump(_mm_movehl_ps(a, b), "_mm_movehl_ps(a, b)");
     dump(_mm_movelh_ps(a, b), "_mm_movelh_ps(a, b)");
     dump(_mm_movehl_ps(b, a), "_mm_movehl_ps(b, a)");
@@ -94,14 +99,13 @@ void test_shuffle()
     dump(_mm_shuffle_ps(a, b, 0xE4), "blend22");
     vec4f y = _mm_shuffle_ps(a, b, 0x44);
     dump(_mm_shuffle_ps(y, b, 0xEC), "blend31");
+#endif
 }
 
 //------------------------------------------------------------------------------
 #pragma mark -
 
 #ifdef __AVX__
-
-
 
 /**
  make dst = { XYZ XYZ XYZ XYZ }
@@ -912,6 +916,7 @@ int main(int argc, char * argv[])
     switch ( i )
     {
         case 0:
+            test_swapSSE();
             break;
 #ifdef __AVX__
         case 1:
@@ -943,7 +948,6 @@ int main(int argc, char * argv[])
             test_transpose16();
             break;
         case 6:
-            test_swapSSE();
             test_shuffle();
             test_swap7();
             break;

@@ -676,7 +676,7 @@ void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* X)
 //------------------------------------------------------------------------------
 #pragma mark - Optimized SSE versions for KD==6
 
-#if defined(__SSE3__)
+#if USE_SIMD
 /**
  Optmized version for KD == 6
  Beware: this works assuming that N >= KD, and it will in particular write
@@ -1327,7 +1327,7 @@ void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 #endif
 
 
-#if defined(__SSE3__)
+#if USE_SIMD
 /// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX)
 {

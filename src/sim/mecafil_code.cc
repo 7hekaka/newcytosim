@@ -548,7 +548,7 @@ void projectForcesD2D_AVX(size_t nbs, const double* dir,
 #pragma mark - SIMD Fused Up and Down stages!
 
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
 void projectForcesU3D_SSE1(size_t nbs, const double* dir, const double* src, double* mul)
 {
     const double *const end = mul + nbs;
@@ -795,7 +795,7 @@ void projectForces2D_SSE(size_t nbs, const double* dir, const double* src,
 //------------------------------------------------------------------------------
 #pragma mark - 3D SIMD
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
 
 void projectForcesU3D_SSE(size_t nbs, const double* dir, const double* src, double* mul)
 {
@@ -859,7 +859,7 @@ void projectForcesU3D_SSE(size_t nbs, const double* dir, const double* src, doub
          + dir[2] * ( src[DIM+2] - src[2] );
          */
         vec2 s0 = mul2(load2(dir  ), sub2(loadu2(src+3), loadu2(src)));
-        vec2 s1 = mul1(load2(dir+2), sub1(load1(src+5), load1(src+2)));
+        vec2 s1 = mul1(load1(dir+2), sub1(load1(src+5), load1(src+2)));
         vec2 ss = unpackhi2(s0, setzero2());
         
         store1(mul, add1(s0, add1(s1, ss)));
@@ -1448,7 +1448,7 @@ void addProjectionDiff_AVX(const size_t nbs, const double* mul, const double* X,
 
 #endif
 
-#if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( DIM == 3 ) && REAL_IS_DOUBLE && USE_SIMD
 
 /**
  Idea of the calculation:

@@ -355,6 +355,7 @@ void testMatrixDispatch(SparMatBlk& mat, real const* x, real const* y, real * z)
     for ( auto u : rec )
         printf(" %uT %-6.1f", u.first, u.second);
     fflush(stdout);
+    printf("\n");
 }
 #endif
 
@@ -421,6 +422,33 @@ void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t 
 }
 
 #endif
+
+
+void testParallelVecmul(const size_t S, const unsigned F)
+{
+    real * x = nullptr;
+    real * y = nullptr;
+    real * z = nullptr;
+    setVectors(DIM*S, x, y, z);
+    setIndices(F, S);
+
+    SparMatA mat;
+    mat.resize(S);
+    fillMatrix(mat);
+#ifdef _OPENMP
+    size_t chunk = S / 16;
+    testMatrixOMP(mat, x, y, z, chunk);
+    checkMatrixOMP(mat, x, y, z, chunk);
+#endif
+#if defined(__APPLE__)
+    testMatrixDispatch(mat, x, y, z);
+#endif
+    setIndices(0, 0);
+    free_real(x);
+    free_real(y);
+    free_real(z);
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark - Test Iso Matrix
@@ -541,7 +569,7 @@ void testIsoMatrices(const size_t S, real const* x, real const* y, real * z)
 
 void testMatrices(const size_t S, real const* x, real const* y, real * z)
 {
-#if ( 0 )
+#if ( 1 )
     SparMat1 mat1; mat1.resize(S); testMatrix<SparMat1, fillMatrix>(mat1, x, y, z);
     SparMat2 mat2; mat2.resize(S); testMatrix<SparMat2, fillMatrix>(mat2, x, y, z);
 
@@ -549,14 +577,6 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
     SparMatD mat4; mat4.resize(S); testMatrix<SparMatD, fillMatrix>(mat4, x, y, z);
 #endif
     SparMatA mat5; mat5.resize(S); testMatrix<SparMatA, fillMatrix>(mat5, x, y, z);
-#ifdef _OPENMP
-    size_t chunk = S / 16;
-    testMatrixOMP(mat5, x, y, z, chunk);
-    checkMatrixOMP(mat5, x, y, z, chunk);
-#endif
-#if defined(__APPLE__)
-    testMatrixDispatch(mat5, x, y, z);
-#endif
 #if ( 0 )
     std::ofstream os1("mat1.txt");
     std::ofstream os3("mat3.txt");
@@ -564,7 +584,6 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
     mat3.printSparse(os3, 0);
 #endif
 }
-
 
 void testMatrices(const unsigned S, const unsigned F)
 {
@@ -574,7 +593,7 @@ void testMatrices(const unsigned S, const unsigned F)
     setVectors(DIM*S, x, y, z);
     //beta = -RNG.preal();
 
-    if ( 0 )
+    if ( 1 )
     {
         printf("------ iso %iD x %i  filled %.2f %%", DIM, S, F*100.0/S/S);
         setIndices(F, S);
@@ -588,7 +607,7 @@ void testMatrices(const unsigned S, const unsigned F)
         testMatrices(DIM*S, x, y, z);
         printf("\n");
     }
-    setIndices(0, S);
+    setIndices(0, 0);
     free_real(x);
     free_real(y);
     free_real(z);
@@ -635,7 +654,7 @@ void testBlockMatrix(const unsigned S, const unsigned F)
     SparMatA A; A.resize(DIM*S); testMatrix<SparMatA, fillBlockMatrix>(A, x, y, z);
     printf("\n");
 
-    setIndices(0, S);
+    setIndices(0, 0);
     free_real(x);
     free_real(y);
     free_real(z);
@@ -718,6 +737,7 @@ int main( int argc, char* argv[] )
 #endif
     //testMatrices(37, 1<<17);
     testMatrices(15464, 27676);
+    testParallelVecmul(15464, 27676);
 #if ( 0 )
     size_t dim[5] = { 0 };
     for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));
