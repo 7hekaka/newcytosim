@@ -10,16 +10,19 @@
 #if defined(__SSE3__)
 #include <immintrin.h>
 #include "simd_sse.h"
+#define USE_SIMD 1
 #endif
 
 #if defined(__AVX__)
 #include <immintrin.h>
 #include "simd_avx.h"
+#define USE_SIMD 1
 #endif
 
 #if defined(__ARM_NEON__)
 #include <arm_neon.h>
-//#include "simd_neon.h"
+#include "simd_neon.h"
+#define USE_SIMD 1
 #endif
 
 #undef LOCAL

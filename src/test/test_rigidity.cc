@@ -285,10 +285,10 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
         X += 8;
         vec4 ppp = catshift2(eee, ddd);
         vec4 jjj = catshift2(nnn, xxx);
-        store4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), load4(Y)));
+        store4(Y, fnmadd4(R, fnmadd4(two, ppp, add4(eee, ddd)), load4(Y)));
         eee = sub4(sub4(xxx, jjj), sub4(jjj, nnn));
         ppp = catshift2(ddd, eee);
-        store4(Y+4, fmadd4(R, fmsub4(two, ppp, add4(ddd, eee)), load4(Y+4)));
+        store4(Y+4, fnmadd4(R, fnmadd4(two, ppp, add4(ddd, eee)), load4(Y+4)));
         Y += 8;
     }
 #endif
@@ -301,7 +301,7 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
         xxx = nnn;
         X += 4;
         vec4 ppp = catshift2(eee, ddd);
-        store4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), load4(Y)));
+        store4(Y, fnmadd4(R, fnmadd4(two, ppp, add4(eee, ddd)), load4(Y)));
         eee = ddd;
         Y += 4;
     }
@@ -309,7 +309,7 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
     vec2 nn = gethi(xxx);
     vec2 oo = sub2(nn, getlo(xxx));
     vec2 ee = gethi(eee);
-    vec2 yy = fmsub2(getlo(two), ee, getlo(eee));
+    vec2 yy = fnmadd2(getlo(two), ee, getlo(eee));
     while ( Y < end+8 )
     {
         vec2 mm = load2(X+4);
@@ -318,12 +318,12 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
         vec2 dd = sub2(ff, oo);
         nn = mm;
         oo = ff;
-        store2(Y, fmadd2(getlo(R), sub2(yy, dd), load2(Y)));
-        yy = fmsub2(getlo(two), dd, ee);
+        store2(Y, fmadd2(getlo(R), add2(yy, dd), load2(Y)));
+        yy = fnmadd2(getlo(two), dd, ee);
         ee = dd;
         Y += 2;
     }
-    store2(Y  ,  fmadd2(getlo(R), yy, load2(Y  )));
+    store2(Y  , fnmadd2(getlo(R), yy, load2(Y  )));
     store2(Y+2, fnmadd2(getlo(R), ee, load2(Y+2)));
 }
 

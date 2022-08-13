@@ -44,8 +44,8 @@ void dump(size_t len, const double* vec)
 
 void test_swapSSE()
 {
-    vec2 a = set2(0, 1);
-    vec2 b = set2(2, 3);
+    vec2 a = setr2(1, 0);
+    vec2 b = setr2(3, 2);
     dump(a, "a");
     dump(b, "b");
     

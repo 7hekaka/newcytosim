@@ -82,12 +82,12 @@ real dot_avx(const double* X, const double* Y)
 
 real dot_avu(const double* X, const double* Y)
 {
-    vec4 v0 = setzero4();
-    vec4 v1 = setzero4();
-    vec4 v2 = setzero4();
-    vec4 v3 = setzero4();
+    vec4 v0 = mul4(load4(X), load4(Y));
+    vec4 v1 = mul4(load4(X+4), load4(Y+4));
+    vec4 v2 = mul4(load4(X+8), load4(Y+8));
+    vec4 v3 = mul4(load4(X+12), load4(Y+12));
     
-    for ( size_t i = 0; i < CNT; i += 16 )
+    for ( size_t i = 16; i < CNT; i += 16 )
     {
         v0 = add4(v0, mul4( load4(X+i   ), load4(Y+i   ) ));
         v1 = add4(v1, mul4( load4(X+i+4 ), load4(Y+i+4 ) ));

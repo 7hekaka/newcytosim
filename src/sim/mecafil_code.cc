@@ -206,14 +206,14 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
         vec4 ppp = catshift2(eee, ddd);
         vec4 jjj = catshift2(nnn, xxx);
 #if defined(__FMA__)
-        storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
+        storeu4(Y, fnmadd4(R, fnmadd4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
         storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
 #endif
         eee = sub4(sub4(xxx, jjj), sub4(jjj, nnn));
         ppp = catshift2(ddd, eee);
 #if defined(__FMA__)
-        storeu4(Y+4, fmadd4(R, fmsub4(two, ppp, add4(ddd, eee)), loadu4(Y+4)));
+        storeu4(Y+4, fnmadd4(R, fnmadd4(two, ppp, add4(ddd, eee)), loadu4(Y+4)));
 #else
         storeu4(Y+4, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y+4)));
 #endif
@@ -230,7 +230,7 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
         xxx = nnn;
         vec4 ppp = catshift2(eee, ddd);
 #if defined(__FMA__)
-        storeu4(Y, fmadd4(R, fmsub4(two, ppp, add4(eee, ddd)), loadu4(Y)));
+        storeu4(Y, fnmadd4(R, fnmadd4(two, ppp, add4(eee, ddd)), loadu4(Y)));
 #else
         storeu4(Y, add4(mul4(R, sub4(add4(ppp, ppp), add4(eee, ddd))), loadu4(Y)));
 #endif
@@ -242,7 +242,7 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
     vec2 nn = gethi(xxx);
     vec2 oo = sub2(nn, getlo(xxx));
     vec2 ee = gethi(eee);
-    vec2 yy = fmsub2(getlo(two), ee, getlo(eee));
+    vec2 yy = fnmadd2(getlo(two), ee, getlo(eee));
     while ( Y < end+8 )
     {
         vec2 mm = loadu2(X+4);
@@ -251,16 +251,16 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
         vec2 dd = sub2(ff, oo);
         nn = mm;
         oo = ff;
-        storeu2(Y, fmadd2(getlo(R), sub2(yy, dd), loadu2(Y)));
+        storeu2(Y, fmadd2(getlo(R), add2(ee, yy), loadu2(Y)));
 #if defined(__FMA__)
-        yy = fmsub2(getlo(two), dd, ee);
+        yy = fnmadd2(getlo(two), dd, ee);
 #else
-        yy = sub2(add2(dd, dd), ee);
+        yy = sub2(ee, add2(dd, dd));
 #endif
         ee = dd;
         Y += 2;
     }
-    storeu2(Y  ,  fmadd2(getlo(R), yy, loadu2(Y  )));
+    storeu2(Y  , fnmadd2(getlo(R), yy, loadu2(Y  )));
     storeu2(Y+2, fnmadd2(getlo(R), ee, loadu2(Y+2)));
 }
 #endif
@@ -416,7 +416,6 @@ void projectForcesU2D_SSE(size_t nbs, const double* dir, const double* src, doub
         x = load2(src);
         vec2 b = mul2(sub2(x, y), load2(dir+2));
         dir += 4;
-        //storeu2(mul, hadd2(a, b));
         storeu2(mul, add2(unpacklo2(a, b), unpackhi2(a, b)));
         mul += 2;
     }
@@ -425,7 +424,6 @@ void projectForcesU2D_SSE(size_t nbs, const double* dir, const double* src, doub
     {
         y = load2(src+2);
         vec2 a = mul2(sub2(y, x), load2(dir));
-        //store1(mul, hadd2(a, a));
         store1(mul, add2(a, unpackhi2(a, a)));
     }
 }

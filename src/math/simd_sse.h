@@ -58,9 +58,9 @@ LOCAL vec2 andnot2(vec2 a, vec2 b)   { return _mm_andnot_pd(a,b); }
 LOCAL vec2 abs2(vec2 a)              { return _mm_andnot_pd(sgn11, a); }
 LOCAL vec2 flipsign2(vec2 a)         { return _mm_xor_pd(a, sgn11); }
 
-LOCAL vec2 setr2(double a, double b) { return _mm_setr_pd(a,b); }
 LOCAL vec2 set2(double a, double b)  { return _mm_set_pd(a, b); }
 LOCAL vec2 set2(double a)            { return _mm_set1_pd(a); }
+LOCAL vec2 setr2(double a, double b) { return _mm_setr_pd(a,b); }
 LOCAL vec2 setzero2()                { return _mm_setzero_pd(); }
 
 /// return { a[0], b[0] }
@@ -73,7 +73,8 @@ LOCAL vec2 swap2(vec2 a)             { return _mm_shuffle_pd(a, a, 0b01); }
 LOCAL vec2 catshift(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b01); }
 
 /// blend to return { low = a[0], high = b[1] }
-LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
+//LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_shuffle_pd(a, b, 0b10); }
+LOCAL vec2 blend11(vec2 a, vec2 b) { return _mm_move_sd(b, a); }
 
 #define cmp2(a,b,k) _mm_cmp_pd(a,b,k)
 
