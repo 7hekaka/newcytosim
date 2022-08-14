@@ -10,7 +10,7 @@
 
 SparMatBlk::SparMatBlk()
 {
-    size_   = 0;
+    rsize_  = 0;
     alloc_  = 0;
     row_    = nullptr;
     blocks_ = nullptr;
@@ -29,18 +29,18 @@ void SparMatBlk::allocate(size_t alc)
         constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
-        //fprintf(stderr, "SMB allocates %u\n", alc);
-        Line * row_new = new Line[alc];
+        fprintf(stderr, "SMB allocates %lu\n", alc);
+        Line * ptr = new Line[alc];
        
         if ( row_ )
         {
             // using the specialy defined '=' for a Line object
             for ( size_t n = 0; n < alloc_; ++n )
-                row_new[n] = row_[n];
+                ptr[n] = row_[n];
             delete[] row_;
         }
         
-        row_   = row_new;
+        row_ = ptr;
         alloc_ = alc;
         
         delete[] colidx_;
@@ -138,9 +138,9 @@ void SparMatBlk::Line::operator =(SparMatBlk::Line & row)
 }
 
 
-/* This is a silly search that could be optimized */
 SparMatBlk::Block* SparMatBlk::Line::find_block(size_t jj) const
 {
+    /* This is a silly search that could be optimized */
     for ( size_t n = 0; n < rlen_; ++n )
         if ( inx_[n] == jj )
             return blk_ + n;
@@ -180,6 +180,7 @@ real& SparMatBlk::element(size_t ii, size_t jj)
 #else
     size_t i = ii / BLOCK_SIZE;
     size_t j = jj / BLOCK_SIZE;
+    assert_true( i < rsize_ );
     return row_[i].block(j)(ii%BLOCK_SIZE, jj%BLOCK_SIZE);
 #endif
 }
@@ -207,7 +208,7 @@ real* SparMatBlk::addr(size_t ii, size_t jj) const
 void SparMatBlk::reset()
 {
     already_symmetric = false;
-    for ( size_t n = 0; n < size_; ++n )
+    for ( size_t n = 0; n < rsize_; ++n )
         row_[n].reset();
 }
 
@@ -215,7 +216,7 @@ void SparMatBlk::reset()
 bool SparMatBlk::notZero() const
 {
     //check for any non-zero sparse term:
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < rsize_; ++jj )
     {
         Line & row = row_[jj];
         for ( size_t n = 0 ; n < row.rlen_ ; ++n )
@@ -229,7 +230,7 @@ bool SparMatBlk::notZero() const
 
 void SparMatBlk::scale(const real alpha)
 {
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( size_t jj = 0; jj < rsize_; ++jj )
     {
         Line & row = row_[jj];
         for ( size_t n = 0 ; n < row.rlen_ ; ++n )
@@ -242,7 +243,7 @@ void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, con
 {
     assert_true( mul == Block::dimension() );
     size_t end = start + cnt;
-    assert_true( end <= size_ );
+    assert_true( end <= rsize_ );
     size_t off = start + ldd * start;
 
     for ( size_t ii = start; ii < end; ++ii )
@@ -267,7 +268,7 @@ void SparMatBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start, s
     assert_true( mul == Block::dimension() );
     start *= mul;
     cnt = start + mul * cnt;
-    assert_true( cnt <= size_ );
+    assert_true( cnt <= rsize_ );
     size_t off = start + ldd * start;
     
     for ( size_t ii = start; ii < cnt; ++ii )
@@ -293,7 +294,7 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 {
     assert_true( mul == Block::dimension() );
     size_t end = start + cnt;
-    assert_true( end <= size_ );
+    assert_true( end <= rsize_ );
 
     for ( size_t ii = start; ii < end; ++ii )
     {
@@ -318,13 +319,13 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 
 int SparMatBlk::bad() const
 {
-    if ( size_ <= 0 ) return 1;
-    for ( size_t jj = 0; jj < size_; ++jj )
+    if ( rsize_ <= 0 ) return 1;
+    for ( size_t jj = 0; jj < rsize_; ++jj )
     {
         Line & row = row_[jj];
         for ( size_t n = 0 ; n < row.rlen_ ; ++n )
         {
-            if ( row.inx_[n] >= size_ ) return 2;
+            if ( row.inx_[n] >= rsize_ ) return 2;
             if ( row.inx_[n] <= jj )    return 3;
         }
     }
@@ -335,7 +336,7 @@ int SparMatBlk::bad() const
 size_t SparMatBlk::nbElements(size_t start, size_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
-    stop = std::min(stop, size_);
+    stop = std::min(stop, rsize_);
     alc = 0;
     size_t cnt = 0;
     for ( size_t i = start; i < stop; ++i )
@@ -354,7 +355,7 @@ size_t SparMatBlk::nbElements(size_t start, size_t stop, size_t& alc) const
 std::string SparMatBlk::what() const
 {
     size_t alc = 0;
-    size_t cnt = nbElements(0, size_, alc);
+    size_t cnt = nbElements(0, rsize_, alc);
     std::ostringstream msg;
 #if SPARMATBLK_USES_AVX
     msg << "SMBx ";
@@ -380,8 +381,8 @@ static void printSparseBlock(std::ostream& os, real inf, SparMatBlk::Block const
 
 void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
 {
-    os << "% SparMatBlk size " << size_ << ":\n";
-    stop = std::min(stop, size_);
+    os << "% SparMatBlk size " << rsize_ << ":\n";
+    stop = std::min(stop, rsize_);
     std::streamsize p = os.precision();
     os.precision(8);
     if ( ! row_ )
@@ -401,8 +402,8 @@ void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t st
 
 void SparMatBlk::printSummary(std::ostream& os)
 {
-    os << "SMB size " << size_ << ":";
-    for ( size_t i = 0; i < size_; ++i )
+    os << "SMB size " << rsize_ << ":";
+    for ( size_t i = 0; i < rsize_; ++i )
         if ( row_[i].notEmpty() )
         {
             os << "\n   " << i << "   " << row_[i].rlen_;
@@ -421,7 +422,7 @@ void SparMatBlk::Line::printBlocks(std::ostream& os) const
 
 void SparMatBlk::printBlocks(std::ostream& os) const
 {
-    for ( size_t j = 0; j < size_; ++j )
+    for ( size_t j = 0; j < rsize_; ++j )
     {
         os << "\nSMB  col " << j;
         row_[j].printBlocks(os);
@@ -501,9 +502,9 @@ void SparMatBlk::sortElements()
     size_t tmp_size = 0;
     Element * tmp = nullptr;
     
-    for ( size_t i = colidx_[0]; i < size_; i = colidx_[i+1] )
+    for ( size_t i = colidx_[0]; i < rsize_; i = colidx_[i+1] )
     {
-        assert_true( i < size_ );
+        assert_true( i < rsize_ );
         Line & row = row_[i];
         assert_true( row.rlen_ > 0 );
         //std::clog << "SMB line " << jj << " has " << row.rlen_ << " elements\n";
@@ -520,7 +521,7 @@ void SparMatBlk::sortElements()
     }
     
     free(tmp);
-    //std::clog << "SparMatBlk " << size_ << " with " << cnt << " non-empty lines\n";
+    //std::clog << "SparMatBlk " << rsize_ << " with " << cnt << " non-empty lines\n";
 }
 
 
@@ -530,7 +531,7 @@ void SparMatBlk::sortElements()
 void SparMatBlk::consolidate()
 {
     size_t cnt = 0;
-    for ( size_t i = colidx_[0]; i < size_; i = colidx_[i+1] )
+    for ( size_t i = colidx_[0]; i < rsize_; i = colidx_[i+1] )
     {
         cnt += row_[i].rlen_;
         //std::cerr << "\nMatrixSparseBlock line " << i << "  " << row.rlen_ << "  " << row.blk_ << "";
@@ -543,7 +544,7 @@ void SparMatBlk::consolidate()
     blocks_ = new(ptr) Block[cnt];
     
     Block * B = blocks_;
-    for ( size_t i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < rsize_; ++i )
     {
         Line & row = row_[i];
         row.sbk_ = B;
@@ -563,7 +564,7 @@ void SparMatBlk::consolidate()
  */
 void SparMatBlk::symmetrize()
 {
-    for ( size_t i = colidx_[0]; i < size_; i = colidx_[i+1] )
+    for ( size_t i = colidx_[0]; i < rsize_; i = colidx_[i+1] )
     {
         Line & row = row_[i];
         //std::clog << "SMB line " << i << " has " << row.rlen_ << " elements\n";
@@ -586,7 +587,7 @@ void SparMatBlk::symmetrize()
     
 #if 0
     /// check that indices are in ascending order:
-    for ( size_t i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < rsize_; ++i )
     {
         Line & row = row_[i];
         //std::clog << "SMB line " << i << " has " << row.rlen_ << " elements\n";
@@ -604,11 +605,11 @@ void SparMatBlk::symmetrize()
 
 bool SparMatBlk::prepareForMultiply(int)
 {
-    colidx_[size_] = size_;
-    if ( size_ > 0 )
+    colidx_[rsize_] = rsize_;
+    if ( rsize_ > 0 )
     {
-        size_t inx = size_;
-        size_t nxt = size_;
+        size_t inx = rsize_;
+        size_t nxt = rsize_;
         while ( inx-- > 0 )
         {
             if ( row_[inx].notEmpty() )
@@ -620,7 +621,7 @@ bool SparMatBlk::prepareForMultiply(int)
     }
 
     // check if matrix is empty:
-    if ( colidx_[0] == size_ )
+    if ( colidx_[0] == rsize_ )
         return false;
 
     sortElements();
@@ -635,7 +636,7 @@ bool SparMatBlk::prepareForMultiply(int)
 #if 0
     consolidate();
 #else
-    for ( size_t i = 0; i < size_; ++i )
+    for ( size_t i = 0; i < rsize_; ++i )
         row_[i].sbk_ = row_[i].blk_;
 #endif
     return true;
@@ -963,7 +964,7 @@ vec4 SparMatBlk::Line::vecMul4D(const double* X) const
 void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    stop = std::min(stop, size_);
+    stop = std::min(stop, rsize_);
     for ( size_t i = start; i < stop; ++i )
         row_[i].vecMulCol(X, Y+BLOCK_SIZE*i);
 }
@@ -972,9 +973,9 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
 // multiplication of a vector: Y = Y + M * X
 void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
 {
-    assert_true( start <= size_ );
+    assert_true( start <= rsize_ );
     assert_true( start <= stop );
-    stop = std::min(stop, size_);
+    stop = std::min(stop, rsize_);
     for ( size_t i = colidx_[start]; i < stop; i = colidx_[i+1] )
     {
 #if ( BLOCK_SIZE == 1 )
@@ -995,7 +996,7 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
 void SparMatBlk::vecMul(const real* X, real* Y, size_t start, size_t stop) const
 {
     assert_true( start <= stop );
-    stop = std::min(stop, size_);
+    stop = std::min(stop, rsize_);
     //printf("msb %6i %6i : %p\n", start, stop, pthread_self());
     
     /** All values need to be reset since as the matrix is sparse,

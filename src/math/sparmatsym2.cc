@@ -15,7 +15,7 @@
 #  define SPARMAT2_USES_SSE 1
 #  include "simd.h"
 #  include "simd_float.h"
-#elif defined(__SSE3__)
+#elif USE_SIMD
 #  define SPARMAT2_USES_AVX 0
 #  define SPARMAT2_USES_SSE 1
 #  include "simd.h"
@@ -806,10 +806,10 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y,
 //------------------------------------------------------------------------------
 #pragma mark - 2D SIMD
 
-#if defined(__SSE3__) && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && USE_SIMD
 
 static inline void multiply2(const double* X, double* Y, size_t ii,
-                      const double* val, vec2 const& xx, vec2& ss)
+                             const double* val, vec2 const& xx, vec2& ss)
 {
     vec2 aa = loaddup2(val);
     ss = fmadd2(load2(X+ii), aa, ss);

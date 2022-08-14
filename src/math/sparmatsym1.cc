@@ -14,7 +14,7 @@
 #  define SPARMAT1_USES_AVX REAL_IS_DOUBLE
 #  define SPARMAT1_USES_SSE REAL_IS_DOUBLE
 #  include "simd.h"
-#elif defined(__SSE3__)
+#elif USE_SIMD
 #  define SPARMAT1_USES_AVX 0
 #  define SPARMAT1_USES_SSE REAL_IS_DOUBLE
 #  include "simd.h"

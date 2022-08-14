@@ -159,14 +159,14 @@ private:
     
 private:
     
-    /// number of lines in the matrix
-    size_t  size_;
+    /// number of lines in the matrix, divided by block size
+    size_t rsize_;
     
     /// amount of memory which has been allocated
-    size_t  alloc_;
+    size_t alloc_;
     
     /// array col_[c][] holds Elements of column 'c'
-    Line *  row_;
+    Line * row_;
     
     /// colidx_[i] is the index of the first non-empty row of index >= i
     unsigned* colidx_;
@@ -177,10 +177,10 @@ private:
 public:
     
     /// return the size of the matrix
-    size_t size() const { return size_ * BLOCK_SIZE; }
+    size_t size() const { return rsize_ * BLOCK_SIZE; }
     
     /// change the size of the matrix
-    void resize(size_t s) { size_ = s / BLOCK_SIZE; allocate(size_); }
+    void resize(size_t s) { rsize_ = s / BLOCK_SIZE; allocate(rsize_); }
 
     /// base for destructor
     void deallocate();
@@ -198,24 +198,24 @@ public:
     void allocate(size_t alc);
     
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { assert_true(j<size_); return row_[j].rlen_; }
+    size_t column_size(size_t j) const { assert_true(j<rsize_); return row_[j].rlen_; }
     
     /// reduced line index of n-th element in j-th column (not multiplied by BLOCK_SIZE)
-    size_t column_index(size_t j, size_t n) const { assert_true(j<size_); return row_[j].inx_[n]; }
+    size_t column_index(size_t j, size_t n) const { assert_true(j<rsize_); return row_[j].inx_[n]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
     {
         assert_true( ii >= jj );
-        assert_true( ii < size_ );
-        assert_true( jj < size_ );
+        assert_true( ii < rsize_ );
+        assert_true( jj < rsize_ );
         return row_[ii].block(jj);
     }
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& diag_block(const size_t ii)
     {
-        assert_true( ii < size_ );
+        assert_true( ii < rsize_ );
         return row_[ii].block(ii);
     }
 
@@ -268,10 +268,10 @@ public:
 
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, size_); }
+    void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, rsize_); }
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y) const { vecMulAdd_ALT(X, Y, 0, size_); }
+    void vecMulAdd_ALT(const real* X, real* Y) const { vecMulAdd_ALT(X, Y, 0, rsize_); }
 
     /// 2D isotropic multiplication (not implemented)
     void vecMulAddIso2D(const real* X, real* Y) const {};
@@ -280,7 +280,7 @@ public:
     void vecMulAddIso3D(const real*, real*) const {};
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
-    void vecMul(const real* X, real* Y) const { vecMul(X, Y, 0, size_); }
+    void vecMul(const real* X, real* Y) const { vecMul(X, Y, 0, rsize_); }
 
     /// true if matrix is non-zero
     bool notZero() const;
@@ -289,7 +289,7 @@ public:
     size_t nbElements(size_t start, size_t stop, size_t& alc) const;
     
     /// total number of blocks currently in use
-    size_t nbElements() const { size_t alc=0; return nbElements(0, size_, alc); }
+    size_t nbElements() const { size_t alc=0; return nbElements(0, rsize_, alc); }
 
     /// returns a string which a description of the type of matrix
     std::string what() const;
@@ -298,7 +298,7 @@ public:
     void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
     
     /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
-    void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
+    void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, rsize_); }
 
     /// print content of one column
     void printSummary(std::ostream&);
