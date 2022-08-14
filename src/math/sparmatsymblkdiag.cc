@@ -1097,52 +1097,46 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
 #if ( SD_BLOCK_SIZE == 2 ) && SMSBD_USES_SSE && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
-    vec2 x0, x1;
-    vec2 yy = load2(Y+jj);
-    {
-        //const real X0 = X[jj  ];
-        //const real X1 = X[jj+1];
-        vec2 xx = load2(X+jj);
-        x0 = unpacklo2(xx, xx);
-        x1 = unpackhi2(xx, xx);
-        
-        // load 2x2 matrix element into 2 vectors:
-        double const* M = dia_.data();
-        //assume the block is already symmetrized:
-        // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
-        // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
-        xx = add2(mul2(load2(M  ), x0), yy);
-        yy = add2(mul2(load2(M+2), x1), xx);
-    }
+    vec2 x0 = loaddup2(X+jj);
+    vec2 x1 = loaddup2(X+jj+1);
+    //const real X0 = X[jj  ];
+    //const real X1 = X[jj+1];
+
+    // load 2x2 matrix element into 2 vectors:
+    double const* D = dia_.data();
+    //assume the block is already symmetrized:
+    // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
+    // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
+    vec2 yy = fmadd2(load2(D), x0, load2(Y+jj));
+    yy = fmadd2(load2(D+2), x1, yy);
+    vec2 zz = setzero2();
     
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < noff_; ++n )
     {
         const size_t ii = 2 * inx_[n];
-        vec2 xx = load2(X+ii);
-        
         // load 2x2 matrix element into 2 vectors:
         double const* M = blk_[n].data();
         vec2 m01 = load2(M);
         vec2 m23 = load2(M+2);
-        
+        vec2 xx = load2(X+ii);
+        vec2 xx0 = unpacklo2(xx, xx); //loaddup2(X+ii);
+        vec2 xx1 = unpackhi2(xx, xx); //loaddup2(X+ii+1);
+
         // multiply with the full block:
         //Y[ii  ] += M[0] * X0 + M[2] * X1;
         //Y[ii+1] += M[1] * X0 + M[3] * X1;
-        vec2 mx0 = add2(mul2(m01, x0), load2(Y+ii));
-        mx0 = add2(mul2(m23, x1), mx0);
-        store2(Y+ii, mx0);
+        store2(Y+ii, fmadd2(m23, x1, fmadd2(m01, x0, load2(Y+ii))));
 
         // multiply with the transposed block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
         //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        vec2 mxx = mul2(m01, xx);
-        vec2 myy = mul2(m23, xx);
-        yy = add2(add2(unpacklo2(mxx, myy), unpackhi2(mxx, myy)), yy);
+        yy = fmadd2(unpacklo2(m01, m23), xx0, yy);
+        zz = fmadd2(unpackhi2(m01, m23), xx1, zz);
     }
     //Y[jj  ] = Y0;
     //Y[jj+1] = Y1;
-    store2(Y+jj, yy);
+    store2(Y+jj, add2(yy, zz));
 }
 #endif
 

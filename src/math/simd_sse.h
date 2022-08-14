@@ -16,7 +16,7 @@ LOCAL vec2 load2(double const* a)           { return _mm_load_pd(a); }
 // unaligned load
 LOCAL vec2 loadu2(double const* a)          { return _mm_loadu_pd(a); }
 
-// load 1 double and duplicate
+// load 1 double and duplicate into both positions
 LOCAL vec2 loaddup2(double const* a)        { return _mm_loaddup_pd(a); }
 
 LOCAL vec2 loadhi2(vec2 a, double const* b) { return _mm_loadh_pd(a,b); }
