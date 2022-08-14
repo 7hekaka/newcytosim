@@ -324,38 +324,29 @@ void worker(void* context, size_t i)
     job->mat->vecMulAdd(job->src, job->dst, job->mul*i, job->mul*(i+1));
 }
 
-void testMatrixDispatch(SparMatBlk& mat, real const* x, real const* y, real * z)
+void testMatrixDispatch(SparMatBlk& mat, real const* x, real const* y, real * z, std::map<int, double>& rec)
 {
-    std::map<int, double> rec;
     size_t S = mat.size() / DIM;
-    mat.reset();
-    fillMatrix(mat);
-    mat.prepareForMultiply(1);
-    
-    zero_real(DIM*S, z);
-    mat.vecMulAdd(x, z);
-    printf("\nsequential     %+16.6f  %s", checksum(DIM*S, z), mat.what().c_str());
 
     dispatch_queue_t queue = dispatch_queue_create("QUEUE", DISPATCH_QUEUE_CONCURRENT);
     for ( unsigned u : { 1, 2, 4, 8, 10, 12, 16, 32 } )
     {
-        Job job { &mat, x, z, u };
+        size_t cnt = (S+u-1)/u;
+        Job job1 { &mat, x, z, u };
+        Job job2 { &mat, y, z, u };
         zero_real(DIM*S, z);
-        dispatch_apply_f((S+u-1)/u, queue, &job, worker);
+        dispatch_apply_f(cnt, queue, &job1, worker);
+        dispatch_apply_f(cnt, queue, &job2, worker);
         printf("\n%2u libdispatch %+16.6f", u, checksum(DIM*S, z));
         tick();
-        for ( size_t j = 0; j < REP; ++j )
-            dispatch_apply_f((S+u-1)/u, queue, &job, worker);
+        for ( size_t j = 1; j < REP; ++j )
+        {
+            dispatch_apply_f(cnt, queue, &job1, worker);
+            dispatch_apply_f(cnt, queue, &job2, worker);
+        }
         rec[u] = tock(N_RUN);
     }
     dispatch_release(queue);
-
-    //printf("\n%-29s", mat.what().c_str());
-    printf("\n--> Dispatched muladd ");
-    for ( auto u : rec )
-        printf(" %uT %-6.1f", u.first, u.second);
-    fflush(stdout);
-    printf("\n");
 }
 #endif
 
@@ -382,20 +373,19 @@ void checkMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t
         omp_set_num_threads(1<<i);
         #pragma omp parallel for
         for ( size_t u = 0; u < S; u += chunk )
+        {
             mat.vecMulAdd(x, z, u, u+chunk);
+            mat.vecMulAdd(y, z, u, u+chunk);
+        }
         printf(" %+16.6f", checksum(DIM*S, z));
     }
 }
 
 
 template <typename MATRIX>
-void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk)
+void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t chunk, std::map<int, double>& rec)
 {
-    std::map<int, double> rec;
     size_t S = mat.size() / DIM;
-    mat.reset();
-    fillMatrix(mat);
-    mat.prepareForMultiply(1);
     
     for ( int u : { 1, 2, 3, 4, 6, 8, 10, 16 } )
     {
@@ -406,19 +396,13 @@ void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t 
         {
             #pragma omp parallel for
             for ( size_t i = 0; i < S; i += chunk )
-                mat.vecMulAdd(y, z, i, i+chunk);
-            #pragma omp parallel for
-            for ( size_t i = 0; i < S; i += chunk )
+            {
                 mat.vecMulAdd(x, z, i, i+chunk);
+                mat.vecMulAdd(y, z, i, i+chunk);
+            }
         }
         rec[u] = tock(N_RUN);
     }
-
-    //printf("\n%-29s", mat.what().c_str());
-    printf("\n--> Threaded ");
-    for ( u : rec )
-        printf(" %luT %-6.1f", u.first, u.second);
-    fflush(stdout);
 }
 
 #endif
@@ -439,14 +423,37 @@ void testParallelVecmul(const unsigned S, const size_t F)
     mat.prepareForMultiply(1);
 
     printf("------ %i x %i  filled %.2f %%: %s", DIM, S, F*100.0/S/S, mat.what().c_str());
+    
+    zero_real(DIM*S, z);
+    mat.vecMulAdd(x, z);
+    mat.vecMulAdd(y, z);
+    printf("\nsequential     %+16.6f ", checksum(DIM*S, z));
+    tick();
+    for ( size_t j = 1; j < REP; ++j )
+    {
+        mat.vecMulAdd(x, z);
+        mat.vecMulAdd(y, z);
+    }
+    
+    std::map<int, double> rec;
+    rec[0] = tock(N_RUN);
+    printf(" %-6.1f", rec[0]);
+
 #ifdef _OPENMP
     size_t chunk = S / 16;
-    testMatrixOMP(mat, x, y, z, chunk);
+    testMatrixOMP(mat, x, y, z, chunk, rec);
     checkMatrixOMP(mat, x, y, z, chunk);
 #endif
 #if defined(__APPLE__)
-    testMatrixDispatch(mat, x, y, z);
+    testMatrixDispatch(mat, x, y, z, rec);
 #endif
+    
+    printf("\n--> Threaded ");
+    for ( auto u : rec )
+        printf(" %uT %-6.1f", u.first, u.second);
+    fflush(stdout);
+    printf("\n");
+
     setIndices(0, 0);
     free_real(x);
     free_real(y);
