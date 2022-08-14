@@ -456,10 +456,10 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
     addProjectionDiff_(nbSegments(), iJJtJF, X, vec);
 #endif
 
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && USE_SIMD
     addProjectionDiff2D_SSE(nbSegments(), iJJtJF, X, Y);
     //addProjectionDiff_AVX(nbSegments(), iJJtJF, X, Y);
-#elif ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#elif ( DIM == 3 ) && REAL_IS_DOUBLE && USE_SIMD
     addProjectionDiff3D_SSE(nbSegments(), iJJtJF, X, Y);
 #else
     addProjectionDiff_F(nbSegments(), iJJtJF, X, Y);

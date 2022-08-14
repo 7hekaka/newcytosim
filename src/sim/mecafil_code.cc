@@ -145,7 +145,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE
 
-#if defined(__SSE3__)
+#if USE_SIMD
 /**
  2D implemention using SSE 128bit vector instructions with double precision
  */
@@ -398,7 +398,7 @@ void projectForcesD_PTR(size_t nbs, const real* dir,
 #pragma mark - 2D SIMD
 
 
-#if defined(__SSE3__) && REAL_IS_DOUBLE
+#if REAL_IS_DOUBLE && USE_SIMD
 
 /**
  Perform first calculation needed by projectForces:
@@ -720,7 +720,7 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
 }
 #endif
 
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
 /**
  In this version, the up and down stages of projectForces are merged
  with the up and down stages of the tridiagonal solve (DPTTS2).
@@ -1187,7 +1187,7 @@ void projectForcesD3D_AVX(size_t nbs, const double* dir,
 
 #if defined(__SSE3__)
 /*
- Ugly piece of code to harvest AVX power...
+ Ugly piece of code to harvest SSE power for single precision
  FJN @ Strasbourg, 23.08.2021
  */
 void projectForcesD3D_SSE(size_t nbs, const float* dir,
@@ -1383,7 +1383,7 @@ void addProjectionDiff_F(const size_t nbs, const real* mul, const real* X, real*
 #endif
 }
 
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( DIM == 2 ) && REAL_IS_DOUBLE && USE_SIMD
 
 void addProjectionDiff2D_SSE(const size_t nbs, const double* mul, const double* src, double* dst)
 {
