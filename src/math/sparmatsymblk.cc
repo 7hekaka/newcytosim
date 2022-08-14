@@ -1,20 +1,20 @@
 // Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
 
 #include <cmath>
+#include <sstream>
+
 #include "sparmatsymblk.h"
 #include "assert_macro.h"
 #include "vector2.h"
 #include "vector3.h"
-#include <sstream>
+#include "simd.h"
 
 // Flags to enable SIMD implementation
 #if defined(__AVX__)
-#  include "simd.h"
 #  include "simd_float.h"
 #  define SMSB_USES_AVX 1
 #  define SMSB_USES_SSE 1
 #elif USE_SIMD
-#  include "simd.h"
 #  include "simd_float.h"
 #  define SMSB_USES_AVX 0
 #  define SMSB_USES_SSE 1
@@ -911,7 +911,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
 //------------------------------------------------------------------------------
 #pragma mark - Manually Optimized Vector Multiplication
 
-#if ( S_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && USE_SIMD
+#if ( S_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSB_USES_SSE
 void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
     assert_true(nbb_ > 0);

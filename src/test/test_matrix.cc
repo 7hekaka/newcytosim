@@ -44,7 +44,7 @@ real kappa = 0.7;
 real beta = -1.0;
 real iota = -0.3;
 
-constexpr size_t CNT = N_RUN * N_MUL;
+constexpr size_t REP = N_RUN * N_MUL;
 
 //------------------------------------------------------------------------------
 #pragma mark - Functions
@@ -65,7 +65,7 @@ real checksum(size_t size, real const* vec)
 }
 
 ///set indices within [0, sup] that are multiples of 'dim'
-void setIndices(size_t cnt, unsigned sup)
+void setIndices(unsigned sup, size_t cnt)
 {
     delete[] inx_;
     delete[] iny_;
@@ -273,7 +273,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
     double ts = tock(N_RUN);
 
     tick();
-    for ( size_t n=0; n<CNT; ++n )
+    for ( size_t n=0; n<REP; ++n )
     {
         mat.vecMulAdd(y, z);
         mat.vecMulAdd(x, z);
@@ -281,7 +281,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
     double t1 = tock(N_RUN);
     
     tick();
-    for ( size_t n=0; n<CNT; ++n )
+    for ( size_t n=0; n<REP; ++n )
     {
         mat.vecMulAdd_ALT(x, z);
         mat.vecMulAdd_ALT(y, z);
@@ -289,7 +289,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
     double t2 = tock(N_RUN);
 
     tick();
-    for ( size_t n=0; n<CNT; ++n )
+    for ( size_t n=0; n<REP; ++n )
     {
         mat.vecMul(y, z);
         mat.vecMul(x, z);
@@ -344,7 +344,7 @@ void testMatrixDispatch(SparMatBlk& mat, real const* x, real const* y, real * z)
         dispatch_apply_f((S+u-1)/u, queue, &job, worker);
         printf("\n%2u libdispatch %+16.6f", u, checksum(DIM*S, z));
         tick();
-        for ( size_t j = 0; j < CNT; ++j )
+        for ( size_t j = 0; j < REP; ++j )
             dispatch_apply_f((S+u-1)/u, queue, &job, worker);
         rec[u] = tock(N_RUN);
     }
@@ -402,7 +402,7 @@ void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t 
         zero_real(DIM*S, z);
         omp_set_num_threads(u);
         tick();
-        for ( size_t j=0; j < CNT; ++j )
+        for ( size_t j=0; j < REP; ++j )
         {
             #pragma omp parallel for
             for ( size_t i = 0; i < S; i += chunk )
@@ -424,17 +424,21 @@ void testMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t 
 #endif
 
 
-void testParallelVecmul(const size_t S, const unsigned F)
+void testParallelVecmul(const unsigned S, const size_t F)
 {
     real * x = nullptr;
     real * y = nullptr;
     real * z = nullptr;
     setVectors(DIM*S, x, y, z);
-    setIndices(F, S);
+    setIndices(S, F);
 
     SparMatA mat;
-    mat.resize(S);
+    mat.resize(DIM*S);
+    mat.reset();
     fillMatrix(mat);
+    mat.prepareForMultiply(1);
+
+    printf("------ %i x %i  filled %.2f %%: %s", DIM, S, F*100.0/S/S, mat.what().c_str());
 #ifdef _OPENMP
     size_t chunk = S / 16;
     testMatrixOMP(mat, x, y, z, chunk);
@@ -585,7 +589,7 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
 #endif
 }
 
-void testMatrices(const unsigned S, const unsigned F)
+void testMatrices(const unsigned S, const size_t F)
 {
     real * x = nullptr;
     real * y = nullptr;
@@ -596,14 +600,14 @@ void testMatrices(const unsigned S, const unsigned F)
     if ( 1 )
     {
         printf("------ iso %iD x %i  filled %.2f %%", DIM, S, F*100.0/S/S);
-        setIndices(F, S);
+        setIndices(S, F);
         testIsoMatrices(S, x, y, z);
         printf("\n");
     }
     if ( 1 )
     {
         printf("------ %i x %i  filled %.2f %%:", DIM, S, F*100.0/S/S);
-        setIndices(F, S);
+        setIndices(S, F);
         testMatrices(DIM*S, x, y, z);
         printf("\n");
     }
@@ -640,15 +644,15 @@ void fillBlockMatrix(MATRIX& mat)
 }
 
 
-void testBlockMatrix(const unsigned S, const unsigned F)
+void testBlockMatrix(const unsigned S, const size_t F)
 {
     real * x = nullptr;
     real * y = nullptr;
     real * z = nullptr;
     setVectors(DIM*S, x, y, z);
-    setIndices(F, S);
+    setIndices(S, F);
     
-    printf("------ %i x %u with %u blocks:", DIM, S, F);
+    printf("------ %i x %u with %lu blocks:", DIM, S, F);
     SparMatB B; B.resize(DIM*S); testMatrix<SparMatB, fillBlockMatrix>(B, x, y, z);
     SparMatD D; D.resize(DIM*S); testMatrix<SparMatD, fillBlockMatrix>(D, x, y, z);
     SparMatA A; A.resize(DIM*S); testMatrix<SparMatA, fillBlockMatrix>(A, x, y, z);

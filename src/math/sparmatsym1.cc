@@ -1,23 +1,21 @@
 // Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
 
 #include <cmath>
-#include "sparmatsym1.h"
-#include "assert_macro.h"
-#include "blas.h"
-
 #include <iomanip>
 #include <sstream>
 #include <iostream>
 
+#include "sparmatsym1.h"
+#include "assert_macro.h"
+#include "blas.h"
+#include "simd.h"
 
 #ifdef __AVX__
 #  define SPARMAT1_USES_AVX REAL_IS_DOUBLE
 #  define SPARMAT1_USES_SSE REAL_IS_DOUBLE
-#  include "simd.h"
 #elif USE_SIMD
 #  define SPARMAT1_USES_AVX 0
 #  define SPARMAT1_USES_SSE REAL_IS_DOUBLE
-#  include "simd.h"
 #else
 #  define SPARMAT1_USES_AVX 0
 #  define SPARMAT1_USES_SSE 0

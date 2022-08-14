@@ -1,24 +1,22 @@
 // Cytosim was created by Francois Nedelec.  Copyright 2020 Cambridge University.
 
 #include <cmath>
-#include "sparmatsym2.h"
-#include "assert_macro.h"
-#include "blas.h"
-
 #include <iomanip>
 #include <sstream>
 #include <iostream>
 
+#include "sparmatsym2.h"
+#include "assert_macro.h"
+#include "blas.h"
+#include "simd.h"
 
 #ifdef __AVX__
 #  define SPARMAT2_USES_AVX 1
 #  define SPARMAT2_USES_SSE 1
-#  include "simd.h"
 #  include "simd_float.h"
 #elif USE_SIMD
 #  define SPARMAT2_USES_AVX 0
 #  define SPARMAT2_USES_SSE 1
-#  include "simd.h"
 #  include "simd_float.h"
 #else
 #  define SPARMAT2_USES_AVX 0
@@ -806,7 +804,7 @@ void SparMatSym2::vecMulAddColIso3D(const real* X, real* Y,
 //------------------------------------------------------------------------------
 #pragma mark - 2D SIMD
 
-#if REAL_IS_DOUBLE && USE_SIMD
+#if REAL_IS_DOUBLE && SPARMAT2_USES_SSE
 
 static inline void multiply2(const double* X, double* Y, size_t ii,
                              const double* val, vec2 const& xx, vec2& ss)

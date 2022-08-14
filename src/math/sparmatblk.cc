@@ -29,7 +29,7 @@ void SparMatBlk::allocate(size_t alc)
         constexpr size_t chunk = 16;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
-        fprintf(stderr, "SMB allocates %lu\n", alc);
+        //fprintf(stderr, "SMB allocates %lu\n", alc);
         Line * ptr = new Line[alc];
        
         if ( row_ )
