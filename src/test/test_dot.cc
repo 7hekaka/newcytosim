@@ -50,19 +50,51 @@ real dot_sse(const float* X, const float* Y)
 #endif
 
 #if USE_SIMD
-real dot_sse(const double* X, const double* Y)
+real dot_SSE(const double* X, const double* Y)
 {
-    vec2 s = setzero2();
-    for ( size_t i = 0; i < CNT; i += 2 )
-        s = add2(s, mul2( load2(X+i), load2(Y+i) ));
+    vec2 s = mul2(load2(X), load2(Y));
+    for ( size_t i = 2; i < CNT; i += 2 )
+        s = fmadd2(load2(X+i), load2(Y+i), s);
     _mm_empty();
     
+    return s[0] + s[1];
+}
+
+real dot_SSEU(const double* X, const double* Y)
+{
+    vec2 s = mul2(load2(X), load2(Y));
+    vec2 t = mul2(load2(X+2), load2(Y+2));
+    for ( size_t i = 4; i < CNT; i += 4 )
+    {
+        s = fmadd2(load2(X+i), load2(Y+i), s);
+        t = fmadd2(load2(X+i+2), load2(Y+i+2), t);
+    }
+    s = add2(s, t);
+    _mm_empty();
+    return s[0] + s[1];
+}
+
+real dot_SSEUU(const double* X, const double* Y)
+{
+    vec2 s = mul2(load2(X), load2(Y));
+    vec2 t = mul2(load2(X+2), load2(Y+2));
+    vec2 u = mul2(load2(X+4), load2(Y+4));
+    vec2 v = mul2(load2(X+6), load2(Y+6));
+    for ( size_t i = 8; i < CNT; i += 8 )
+    {
+        s = fmadd2(load2(X+i), load2(Y+i), s);
+        t = fmadd2(load2(X+i+2), load2(Y+i+2), t);
+        u = fmadd2(load2(X+i+4), load2(Y+i+4), u);
+        v = fmadd2(load2(X+i+6), load2(Y+i+6), v);
+    }
+    s = add2(add2(s, t), add2(u, v));
+    _mm_empty();
     return s[0] + s[1];
 }
 #endif
 
 #ifdef __AVX__
-real dot_avx(const float* X, const float* Y)
+real dot_AVX(const float* X, const float* Y)
 {
     vec8f s = setzero8f();
     for ( size_t i = 0; i < CNT; i += 8 )
@@ -72,17 +104,17 @@ real dot_avx(const float* X, const float* Y)
     return s[0] + s[1] + s[2] + s[3];
 }
 
-real dot_avx(const double* X, const double* Y)
+real dot_AVX(const double* X, const double* Y)
 {
-    vec4 s = setzero4();
-    for ( size_t i = 0; i < CNT; i += 4 )
-        s = add4(s, mul4( load4(X+i), load4(Y+i) ));
+    vec4 s = mul4(load4(X), load4(Y);
+    for ( size_t i = 4; i < CNT; i += 4 )
+        s = fmadd4(load4(X+i), load4(Y+i), s);
     _mm_empty();
     
     return s[0] + s[1] + s[2] + s[3];
 }
 
-real dot_avu(const double* X, const double* Y)
+real dot_AVXU(const double* X, const double* Y)
 {
     vec4 v0 = mul4(load4(X), load4(Y));
     vec4 v1 = mul4(load4(X+4), load4(Y+4));
@@ -91,10 +123,10 @@ real dot_avu(const double* X, const double* Y)
     
     for ( size_t i = 16; i < CNT; i += 16 )
     {
-        v0 = add4(v0, mul4( load4(X+i   ), load4(Y+i   ) ));
-        v1 = add4(v1, mul4( load4(X+i+4 ), load4(Y+i+4 ) ));
-        v2 = add4(v2, mul4( load4(X+i+8 ), load4(Y+i+8 ) ));
-        v3 = add4(v3, mul4( load4(X+i+12), load4(Y+i+12) ));
+        v0 = fmadd4(load4(X+i   ), load4(Y+i   ), v0);
+        v1 = fmadd4(load4(X+i+4 ), load4(Y+i+4 ), v1);
+        v2 = fmadd4(load4(X+i+8 ), load4(Y+i+8 ), v2);
+        v3 = fmadd4(load4(X+i+12), load4(Y+i+12), v3);
     }
     
     vec4 s = add4(add4(v0, v1), add4(v2, v3));
@@ -158,11 +190,13 @@ int main(int argc, char * argv[])
     init();
     run(dot,  "scalar", REP);
 #if USE_SIMD
-    run(dot_sse, "SSE", REP);
+    run(dot_SSE, "SSE", REP);
+    run(dot_SSEU, "SSEU", REP);
+    run(dot_SSEUU, "SSEUU", REP);
 #endif
 #ifdef __AVX__
-    run(dot_avx, "AVX", REP);
-    run(dot_avu, "AVU", REP);
+    run(dot_AVX, "AVX", REP);
+    run(dot_AVXU, "AVXU", REP);
 #endif
 #ifdef __ARM_NEON__
     run(dot_neon, "neon", REP);
