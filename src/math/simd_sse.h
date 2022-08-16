@@ -122,3 +122,17 @@ LOCAL vec2 sign_select2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(po
 
 #endif
 
+#if defined(__FMA__)
+LOCAL vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_sd(a,b,c); }  // a * b + c
+LOCAL vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_sd(a,b,c); } // c - a * b
+
+LOCAL vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_fmadd_pd(a,b,c); }
+LOCAL vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_fnmadd_pd(a,b,c); }
+#else
+/// Erzatz Fused Multiply-Add functions
+LOCAL vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return _mm_add_sd(_mm_mul_sd(a,b), c); }
+LOCAL vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return _mm_sub_sd(c, _mm_mul_sd(a,b)); }
+
+LOCAL vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return _mm_add_pd(_mm_mul_pd(a,b), c); }
+LOCAL vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return _mm_sub_pd(c, _mm_mul_pd(a,b)); }
+#endif
