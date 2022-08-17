@@ -1097,8 +1097,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
 #if ( SD_BLOCK_SIZE == 2 ) && SMSBD_USES_SSE && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
-    vec2 x0 = loaddup2(X+jj);
-    vec2 x1 = loaddup2(X+jj+1);
+    vec2 zz = load2(X+jj);
+    vec2 x0 = unpacklo2(zz, zz);
+    vec2 x1 = unpackhi2(zz, zz);
     //const real X0 = X[jj  ];
     //const real X1 = X[jj+1];
 
@@ -1108,20 +1109,53 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
     // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
     vec2 yy = fmadd2(load2(D), x0, load2(Y+jj));
-    yy = fmadd2(load2(D+2), x1, yy);
-    vec2 zz = setzero2();
+    zz = mul2(load2(D+2), x1);
     
+    Block const* blk = blk_;
+    auto const* inx = inx_;
+
+#if ( 1 )
+    Block const* end = blk_ + ( noff_ & ~1 );
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
-    for ( size_t n = 0; n < noff_; ++n )
+    for ( ; blk < end; inx += 2, blk += 2 )
     {
-        const size_t ii = 2 * inx_[n];
+        const auto i0 = 2 * inx[0];
+        const auto i1 = 2 * inx[1];
         // load 2x2 matrix element into 2 vectors:
-        double const* M = blk_[n].data();
+        double const* M = blk[0].data();
+        double const* P = blk[1].data();
+        vec2 m01 = load2(M);
+        vec2 m23 = load2(M+2);
+        vec2 p01 = load2(P);
+        vec2 p23 = load2(P+2);
+        vec2 xx = load2(X+i0);
+        vec2 tt = load2(X+i1);
+        // multiply with the full block:
+        //Y[ii  ] += M[0] * X0 + M[2] * X1;
+        //Y[ii+1] += M[1] * X0 + M[3] * X1;
+        yy = fmadd2(m01, xx, yy);
+        zz = fmadd2(m23, xx, zz);
+        vec2 t = fmadd2(m01, x0, load2(Y+i0));
+        vec2 u = fmadd2(p01, x0, load2(Y+i1));
+        // multiply with the transposed block:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
+        //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
+        yy = fmadd2(p01, tt, yy);
+        zz = fmadd2(p23, tt, zz);
+        store2(Y+i0, fmadd2(m23, x1, t));
+        store2(Y+i1, fmadd2(p23, x1, u));
+    }
+#endif
+    end = blk_ + noff_;
+    // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
+    for ( ; blk < end; ++inx, ++blk )
+    {
+        const auto ii = 2 * inx[0];
+        // load 2x2 matrix element into 2 vectors:
+        double const* M = blk[0].data();
         vec2 m01 = load2(M);
         vec2 m23 = load2(M+2);
         vec2 xx = load2(X+ii);
-        vec2 xx0 = unpacklo2(xx, xx); //loaddup2(X+ii);
-        vec2 xx1 = unpackhi2(xx, xx); //loaddup2(X+ii+1);
 
         // multiply with the full block:
         //Y[ii  ] += M[0] * X0 + M[2] * X1;
@@ -1131,12 +1165,14 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
         // multiply with the transposed block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
         //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        yy = fmadd2(unpacklo2(m01, m23), xx0, yy);
-        zz = fmadd2(unpackhi2(m01, m23), xx1, zz);
+        yy = fmadd2(m01, xx, yy);
+        zz = fmadd2(m23, xx, zz);
     }
     //Y[jj  ] = Y0;
     //Y[jj+1] = Y1;
-    store2(Y+jj, add2(yy, zz));
+    vec2 tt = unpacklo2(yy, zz);
+    vec2 uu = unpackhi2(yy, zz);
+    store2(Y+jj, add2(tt, uu));
 }
 #endif
 
@@ -1227,8 +1263,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size
         /* we remove here the apparent dependency on the values of Y[],
          which are read and written, but at different indices.
          The compiler can reorder instructions to avoid lattencies */
-        const size_t i0 = 2 * inx[0];
-        const size_t i1 = 2 * inx[1];
+        const auto i0 = 2 * inx[0];
+        const auto i1 = 2 * inx[1];
         assert_true( i0 < i1 );
         vec4 mat0 = blk[0].data0();
         vec4 mat1 = blk[1].data0();
@@ -1292,10 +1328,10 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
         vec4 mat1 = blk[1].data0();
         vec4 mat2 = blk[2].data0();
         vec4 mat3 = blk[3].data0();
-        const size_t i0 = 2 * inx[0];
-        const size_t i1 = 2 * inx[1];
-        const size_t i2 = 2 * inx[2];
-        const size_t i3 = 2 * inx[3];
+        const auto i0 = 2 * inx[0];
+        const auto i1 = 2 * inx[1];
+        const auto i2 = 2 * inx[2];
+        const auto i3 = 2 * inx[3];
         assert_true( i0 < i1 );
         assert_true( i1 < i2 );
         assert_true( i2 < i3 );
