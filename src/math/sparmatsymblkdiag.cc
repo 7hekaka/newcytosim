@@ -1193,7 +1193,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVX(const double* X, double* Y, size_
     //const real X0 = X[jj  ];
     //const real X1 = X[jj+1];
     // xxyy = { X0 X0 X1 X1 }
-    const vec4 xxyy = permute4(xy, 0b1100);
+    const vec4 xxyy = duplohi4(xy);
 
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < noff_; ++n )
@@ -1240,7 +1240,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size
 {
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(dia_.data0(), xyxy);
-    const vec4 xxyy = permute4(xyxy, 0b1100);
+    const vec4 xxyy = duplohi4(xyxy);
     vec4 s1 = setzero4();
     
     Block const* blk = blk_;
@@ -1296,7 +1296,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
 {
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(dia_.data0(), xyxy);
-    const vec4 xxyy = permute4(xyxy, 0b1100);
+    const vec4 xxyy = duplohi4(xyxy);
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();

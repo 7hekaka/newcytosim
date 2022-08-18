@@ -1010,7 +1010,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
     //const real X0 = X[jj  ];
     //const real X1 = X[jj+1];
     // xxyy = { X0 X0 X1 X1 }
-    const vec4 xxyy = permute4(xy, 0b1100);
+    const vec4 xxyy = duplohi4(xy);
 
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 1; n < nbb_; ++n )
@@ -1059,7 +1059,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
     assert_true(2*inx_[0] == jj);
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(blk_[0].data0(), xyxy);
-    const vec4 xxyy = permute4(xyxy, 0b1100);
+    const vec4 xxyy = duplohi4(xyxy);
     vec4 s1 = setzero4();
 
     Block const* blk = blk_ + 1;
@@ -1117,7 +1117,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
     assert_true(2*inx_[0] == jj);
     vec4 xyxy = broadcast2(X+jj);
     vec4 ss = mul4(blk_[0].data0(), xyxy);
-    const vec4 xxyy = permute4(xyxy, 0b1100);
+    const vec4 xxyy = duplohi4(xyxy);
     vec4 s1 = setzero4();
     vec4 s2 = setzero4();
     vec4 s3 = setzero4();

@@ -419,7 +419,7 @@ public:
 #if defined(__AVX2__)
         return permute4x64(mat, 0xD8);
 #else
-        return blend0110(mat, permute4(swap2f128(mat),0b1100));
+        return blend0110(mat, duplohi4(swap2f128(mat)));
 #endif
     }
 

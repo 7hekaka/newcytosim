@@ -690,7 +690,7 @@ vec2 SparMatBlk::Line::vecMul2D(const double* X) const
         //ss[1] += M[1] * xy[0];
         //ss[2] += M[2] * xy[1];
         //ss[3] += M[3] * xy[1];
-        ss = fmadd4(blk->data0(), permute4(xy, 0b1100), ss);
+        ss = fmadd4(blk->data0(), duplohi4(xy), ss);
     }
     // collapse result:
     return add2(getlo(ss), gethi(ss));
@@ -728,10 +728,10 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
 #else
         //SX += M[0] * X + M[2] * Y;
         //SY += M[1] * X + M[3] * Y;
-        ss = fmadd4(blk[0].data0(), permute4(xy0, 0b1100), ss);
-        tt = fmadd4(blk[1].data0(), permute4(xy1, 0b1100), tt);
-        uu = fmadd4(blk[2].data0(), permute4(xy2, 0b1100), uu);
-        vv = fmadd4(blk[3].data0(), permute4(xy3, 0b1100), vv);
+        ss = fmadd4(blk[0].data0(), duplohi4(xy0), ss);
+        tt = fmadd4(blk[1].data0(), duplohi4(xy1), tt);
+        uu = fmadd4(blk[2].data0(), duplohi4(xy2), uu);
+        vv = fmadd4(blk[3].data0(), duplohi4(xy3), vv);
 #endif
     }
     ss = add4(add4(ss, tt), add4(uu, vv));
@@ -743,7 +743,7 @@ vec2 SparMatBlk::Line::vecMul2DU(const double* X) const
 #if TRANSPOSE_2D_BLOCKS
         ss = fmadd4(blk[0].data0(), xy, ss);
 #else
-        ss = fmadd4(blk[0].data0(), permute4(xy, 0b1100), ss);
+        ss = fmadd4(blk[0].data0(), duplohi4(xy), ss);
 #endif
     }
     // collapse result:

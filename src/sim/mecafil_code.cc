@@ -513,7 +513,7 @@ void projectForcesD2D_AVX(size_t nbs, const double* dir,
         vec4 t = broadcast2(mul);
         vec4 x = loadu4(src);
         mul += 2;
-        vec4 m = permute4(t, 0b1100);
+        vec4 m = duplohi4(t);
         vec4 d = mul4(m, load4(dir));
         dir += 4;
         vec4 n = catshift2(cc,d);
@@ -1432,7 +1432,7 @@ void addProjectionDiff_AVX(const size_t nbs, const double* mul, const double* X,
     while ( pM < end )
     {
         vec4 a = broadcast2(pM);
-        vec4 m = permute4(a, 0b1100);
+        vec4 m = duplohi4(a);
 
         pM += DIM;
         vec4 s = mul4(m, sub4(loadu4(pX+2), loadu4(pX)));
