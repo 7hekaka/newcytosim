@@ -19,6 +19,8 @@ typedef __m128 vec4f;
 LOCAL vec4f setzero4f()                   { return _mm_setzero_ps(); }
 LOCAL vec4f set4f(float a)                { return _mm_set1_ps(a); }
 LOCAL vec4f set4fi(int a)                 { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
+
+/// _mm_load_ss loads a single element and zero the upper three:
 LOCAL vec4f load1f(float const* a)        { return _mm_load_ss(a); }
 LOCAL vec4f load2f(float const* a)        { return _mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a)); }
 LOCAL vec4f load4f(float const* a)        { return _mm_load_ps(a); }
@@ -33,9 +35,10 @@ LOCAL void storeu4f(float* a, vec4f b)    { _mm_storeu_ps(a,b); }
 LOCAL vec4f add4f(vec4f a, vec4f b)       { return _mm_add_ps(a,b); }
 LOCAL vec4f sub4f(vec4f a, vec4f b)       { return _mm_sub_ps(a,b); }
 LOCAL vec4f mul4f(vec4f a, vec4f b)       { return _mm_mul_ps(a,b); }
+LOCAL vec4f div4f(vec4f a, vec4f b)       { return _mm_div_ps(a,b); }
 
-LOCAL vec4f max4f(vec4f a, vec4f b)       { return _mm_max_ps(a,b); }
 LOCAL vec4f min4f(vec4f a, vec4f b)       { return _mm_min_ps(a,b); }
+LOCAL vec4f max4f(vec4f a, vec4f b)       { return _mm_max_ps(a,b); }
 
 LOCAL vec4f or4f(vec4f a, vec4f b)        { return _mm_or_ps(a,b); }
 LOCAL vec4f and4f(vec4f a, vec4f b)       { return _mm_and_ps(a,b); }
@@ -90,8 +93,11 @@ LOCAL vec4f rsqrt4f(vec4f a) { return _mm_rsqrt_ps(a); }
 
 #if defined(__SSE4_1__)
 
+/// return { a[0], a[1], a[2], b[3] }
 LOCAL vec4f blend31f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1000); }
+/// return { a[0], a[1], b[2], b[3] }
 LOCAL vec4f blend22f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1100); }
+/// return { a[0], b[1], b[2], b[3] }
 LOCAL vec4f blend13f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b1110); }
 
 LOCAL vec4f clear4th(vec4f a) { return _mm_blend_ps(a,_mm_setzero_ps(),0b1000); }
@@ -129,18 +135,21 @@ LOCAL vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 LOCAL vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
 
 // copy a[0] into all elements of destination
-LOCAL vec4f broadcastXf(vec4f a)          { return _mm_permute_ps(a,0x00); }
-LOCAL vec4f broadcastYf(vec4f a)          { return _mm_permute_ps(a,0x55); }
-LOCAL vec4f broadcastZf(vec4f a)          { return _mm_permute_ps(a,0xAA); }
-LOCAL vec4f broadcastTf(vec4f a)          { return _mm_permute_ps(a,0xFF); }
+LOCAL vec4f broadcastXf(vec4f a) { return _mm_permute_ps(a,0x00); }
+// copy a[1] into all elements of destination
+LOCAL vec4f broadcastYf(vec4f a) { return _mm_permute_ps(a,0x55); }
+// copy a[2] into all elements of destination
+LOCAL vec4f broadcastZf(vec4f a) { return _mm_permute_ps(a,0xAA); }
+// copy a[3] into all elements of destination
+LOCAL vec4f broadcastTf(vec4f a) { return _mm_permute_ps(a,0xFF); }
 
 // non-temporal load
 LOCAL vec4f streamload4f(float const* a)  { return _mm_castsi128_ps(_mm_stream_load_si128((__m128i*)a)); }
 
 #define permute4f(a,k) _mm_permute_ps(a,k)
 // Convert between single and double types
-LOCAL vec4f cvt4ds(__m256d a)             { return _mm256_cvtpd_ps(a); }
-LOCAL __m256d cvt4sd(vec4f a)             { return _mm256_cvtps_pd(a); }
+LOCAL vec4f cvt4ds(__m256d a) { return _mm256_cvtpd_ps(a); }
+LOCAL __m256d cvt4sd(vec4f a) { return _mm256_cvtps_pd(a); }
 
 /// convert double and store them in single precision
 LOCAL void store4df(float* a, __m256d b)  { _mm_storeu_ps(a, _mm256_cvtpd_ps(b)); }
@@ -150,10 +159,10 @@ LOCAL void store4df(float* a, __m256d b)  { _mm_storeu_ps(a, _mm256_cvtpd_ps(b))
 LOCAL vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }
 LOCAL vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
 
-LOCAL vec4f broadcastXf(vec4f a)          { return _mm_shuffle_ps(a,a,0x00); }
-LOCAL vec4f broadcastYf(vec4f a)          { return _mm_shuffle_ps(a,a,0x55); }
-LOCAL vec4f broadcastZf(vec4f a)          { return _mm_shuffle_ps(a,a,0xAA); }
-LOCAL vec4f broadcastTf(vec4f a)          { return _mm_shuffle_ps(a,a,0xFF); }
+LOCAL vec4f broadcastXf(vec4f a) { return _mm_shuffle_ps(a,a,0x00); }
+LOCAL vec4f broadcastYf(vec4f a) { return _mm_shuffle_ps(a,a,0x55); }
+LOCAL vec4f broadcastZf(vec4f a) { return _mm_shuffle_ps(a,a,0xAA); }
+LOCAL vec4f broadcastTf(vec4f a) { return _mm_shuffle_ps(a,a,0xFF); }
 
 #define permute4f(a,k) _mm_shuffle_ps(a,a,k)
 
@@ -163,12 +172,10 @@ LOCAL vec4f broadcastTf(vec4f a)          { return _mm_shuffle_ps(a,a,0xFF); }
 
 #if defined(__FMA__)
 LOCAL vec4f fmadd4f (vec4f a, vec4f b, vec4f c) { return _mm_fmadd_ps(a,b,c); }
-LOCAL vec4f fmsub4f (vec4f a, vec4f b, vec4f c) { return _mm_fmsub_ps(a,b,c); }
 LOCAL vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_fnmadd_ps(a,b,c); }
 #elif defined(__SSE3__)
 // erzatz functions
 LOCAL vec4f fmadd4f (vec4f a, vec4f b, vec4f c) { return _mm_add_ps(_mm_mul_ps(a,b), c); }  // a * b + c
-LOCAL vec4f fmsub4f (vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(_mm_mul_ps(a,b), c); }
 LOCAL vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _mm_mul_ps(a,b)); }
 #endif
 

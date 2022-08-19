@@ -119,7 +119,7 @@ static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 static inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     const int bks = mec->blockSize();
-#if CHOUCROUTE && defined(__SSE3__)
+#if CHOUCROUTE && USE_SIMD
     // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xgetrsN_SSE(bks, mec->pblock(), bks, mec->pivot(), Y);
 #elif CHOUCROUTE

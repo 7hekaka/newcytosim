@@ -452,7 +452,7 @@ void testTBSV(size_t cnt)
 
 int* pivot = nullptr;
 
-#if defined(__SSE3__)
+#if USE_SIMD
 void getrs1(int N, real const* B, real* Y)
 {
     alsatian_xgetrsN_SSE(N, B, N, pivot, Y);
@@ -528,7 +528,7 @@ void testGETRS(size_t cnt)
     if ( info == 0 )
     {
         check<getrs2>(NVAL, 1, S, A, Y, "alsa_getrsN", cnt);
-#if defined(__SSE3__)
+#if USE_SIMD
         check<getrs1>(NVAL, 1, S, A, Y, "alsa_getrsNSSE", cnt);
 #endif
     }

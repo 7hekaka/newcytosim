@@ -61,13 +61,14 @@ LOCAL vec2 gethi(vec4 a)                { return _mm256_extractf128_pd(a,1); }
 /// concatenate two vec2 into a vec4: { l[0], l[0], h[0], h[1] }
 LOCAL vec4 cat22(vec2 h, vec2 l) { return _mm256_insertf128_pd(_mm256_castpd128_pd256(l), h, 1); }
 
-LOCAL vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }
-LOCAL vec4 div4(vec4 a, vec4 b)         { return _mm256_div_pd(a,b); }
 LOCAL vec4 add4(vec4 a, vec4 b)         { return _mm256_add_pd(a,b); }
 LOCAL vec4 sub4(vec4 a, vec4 b)         { return _mm256_sub_pd(a,b); }
+LOCAL vec4 mul4(vec4 a, vec4 b)         { return _mm256_mul_pd(a,b); }
+LOCAL vec4 div4(vec4 a, vec4 b)         { return _mm256_div_pd(a,b); }
+LOCAL vec4 sqrt4(vec4 a)                { return _mm256_sqrt_pd(a); }
+
 LOCAL vec4 hadd4(vec4 a, vec4 b)        { return _mm256_hadd_pd(a,b); }
 
-LOCAL vec4 sqrt4(vec4 a)                { return _mm256_sqrt_pd(a); }
 LOCAL vec4 max4(vec4 a, vec4 b)         { return _mm256_max_pd(a,b); }
 LOCAL vec4 min4(vec4 a, vec4 b)         { return _mm256_min_pd(a,b); }
 LOCAL vec4 and4(vec4 a, vec4 b)         { return _mm256_and_pd(a,b); }

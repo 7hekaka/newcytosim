@@ -39,20 +39,21 @@ LOCAL void storeu2(double* a, vec2 b)  { _mm_storeu_pd(a, b); }
 LOCAL vec2 duplo2(vec2 a)            { return _mm_movedup_pd(a); }
 LOCAL vec2 duphi2(vec2 a)            { return _mm_shuffle_pd(a, a, 0b11); }
 
-LOCAL vec2 mul1(vec2 a, vec2 b)      { return _mm_mul_sd(a,b); }
-LOCAL vec2 div1(vec2 a, vec2 b)      { return _mm_div_sd(a,b); }
 LOCAL vec2 add1(vec2 a, vec2 b)      { return _mm_add_sd(a,b); }
 LOCAL vec2 sub1(vec2 a, vec2 b)      { return _mm_sub_sd(a,b); }
+LOCAL vec2 mul1(vec2 a, vec2 b)      { return _mm_mul_sd(a,b); }
+LOCAL vec2 div1(vec2 a, vec2 b)      { return _mm_div_sd(a,b); }
 
-LOCAL vec2 mul2(vec2 a, vec2 b)      { return _mm_mul_pd(a,b); }
-LOCAL vec2 div2(vec2 a, vec2 b)      { return _mm_div_pd(a,b); }
 LOCAL vec2 add2(vec2 a, vec2 b)      { return _mm_add_pd(a,b); }
 LOCAL vec2 sub2(vec2 a, vec2 b)      { return _mm_sub_pd(a,b); }
-LOCAL vec2 hadd2(vec2 a, vec2 b)     { return _mm_hadd_pd(a,b); }
+LOCAL vec2 mul2(vec2 a, vec2 b)      { return _mm_mul_pd(a,b); }
+LOCAL vec2 div2(vec2 a, vec2 b)      { return _mm_div_pd(a,b); }
 
 LOCAL vec2 sqrt2(vec2 a)             { return _mm_sqrt_pd(a); }
-LOCAL vec2 max2(vec2 a, vec2 b)      { return _mm_max_pd(a,b); }
+LOCAL vec2 hadd2(vec2 a, vec2 b)     { return _mm_hadd_pd(a,b); }
+
 LOCAL vec2 min2(vec2 a, vec2 b)      { return _mm_min_pd(a,b); }
+LOCAL vec2 max2(vec2 a, vec2 b)      { return _mm_max_pd(a,b); }
 LOCAL vec2 and2(vec2 a, vec2 b)      { return _mm_and_pd(a,b); }
 LOCAL vec2 andnot2(vec2 a, vec2 b)   { return _mm_andnot_pd(a,b); }
 LOCAL vec2 abs2(vec2 a)              { return _mm_andnot_pd(sgn11, a); }
