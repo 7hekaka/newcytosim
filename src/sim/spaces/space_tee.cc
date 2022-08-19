@@ -207,9 +207,8 @@ real SpaceTee::projectOnArm(const Vector& W, Vector& P) const
 void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
 {
     const real xRel = (W.XX - tJunction);
-    real pX, pY;
-
 #if ( DIM == 2 )
+    real pX, pY;
     //Points in the intersection area are projected to the corners or to the bottom.
     //The parameterisation of the line of equal distance between a line and a point
     //given by    xl(t) = t       xp(t) = xp         with parameter t
@@ -243,10 +242,9 @@ void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
             pY = -tRadius;
         }
     }
-#endif
-    
-#if ( DIM >= 3 )
-    real pZ;
+    P.set(pX,pY);
+#elif ( DIM >= 3 )
+    real pX, pY, pZ;
     //w is in the intersection area and projected on the intersection line,
     //which is an ellipse in 3D. The two halfaxis of the ellipse are given
     //by    a = tRadius * std::sqrt(2)
