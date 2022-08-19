@@ -76,7 +76,9 @@ LOCAL vec4 andnot4(vec4 a, vec4 b)      { return _mm256_andnot_pd(a,b); }
 LOCAL vec4 abs4(vec4 a)                 { return _mm256_andnot_pd(sgn1111, a); }
 LOCAL vec4 flipsign4(vec4 a)            { return _mm256_xor_pd(a, sgn1111); }
 
+/// returns { a[0], b[0], a[2], b[2] }
 LOCAL vec4 unpacklo4(vec4 a, vec4 b)    { return _mm256_unpacklo_pd(a,b); }
+/// returns { a[1], b[1], a[3], b[3] }
 LOCAL vec4 unpackhi4(vec4 a, vec4 b)    { return _mm256_unpackhi_pd(a,b); }
 
 /// returns { a[0], a[0], a[2], a[2] }
@@ -110,7 +112,7 @@ LOCAL vec4 unpackhi2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0
 LOCAL vec2 permute2(vec2 a) { return _mm_permute_pd(a,1); }
 
 /// return { a[0], a[0], a[3], b[3] }
-LOCAL vec4 duplohi4(vec4 a) { return _mm_permute_pd(a,0b1100); }
+LOCAL vec4 duplohi4(vec4 a) { return _mm256_permute_pd(a,0b1100); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,k)       _mm256_permute_pd(a,k)

@@ -13,6 +13,47 @@
 
 #include <immintrin.h>
 
+// use the 4-vector since there is no penalty for using larger size:
+typedef __m128 vec2f;
+
+LOCAL vec2f setzero2f() { return _mm_setzero_ps(); }
+
+LOCAL vec2f load1f(float const* a) { return _mm_load_ss(a); }
+LOCAL vec2f load2f(float const* a) { return _mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a)); }
+LOCAL vec2f loaddupf(float const* a) { return _mm_load1_ps(a); }
+
+LOCAL void store1f(float* a, vec2f b) { _mm_store_ss(a, b); }
+LOCAL void store2f(float* a, vec2f b) { _mm_storel_pi((__m64*)a, b); }
+
+LOCAL vec2f add2f(vec2f a, vec2f b) { return _mm_add_ps(a,b); }
+LOCAL vec2f sub2f(vec2f a, vec2f b) { return _mm_sub_ps(a,b); }
+LOCAL vec2f mul2f(vec2f a, vec2f b) { return _mm_mul_ps(a,b); }
+
+/// return { a[0], b[1] }
+LOCAL vec2f blend11f(vec2f a, vec2f b) { return _mm_blend_ps(a,b,0b1010); }
+
+// returns { a[0], a[0] }
+LOCAL vec2f duplo2f(vec2f a) { return _mm_moveldup_ps(a); }
+// returns { a[1], a[1] }
+LOCAL vec2f duphi2f(vec2f a) { return _mm_movehdup_ps(a); }
+
+// returns { a[0], b[0] }
+LOCAL vec2f unpacklo2f(vec2f a, vec2f b) { return _mm_movelh_ps(a, b); }
+// returns { b[1], a[1] }
+LOCAL vec2f unpackhi2f(vec2f a, vec2f b) { return _mm_movehl_ps(a, b); }
+
+#if defined(__FMA__)
+/// a * b + c
+LOCAL vec2f fmadd2f(vec2f a, vec2f b, vec2f c)  { return _mm_fmadd_ps(c,a,b); }
+/// c - a * b
+LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return _mm_fnmadd_ps(c,a,b); }
+#else
+LOCAL vec2f fmadd2f(vec2f a, vec2f b, vec2f c)  { return _mm_add_ps(_mm_mul_ps(a,b), c); }
+LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return _mm_sub_ps(c, _mm_mul_ps(a,b)); }
+#endif
+
+//----------------------------- 4-floats Vectors -------------------------------
+
 /// Vector of 4 floats
 typedef __m128 vec4f;
 
@@ -21,13 +62,9 @@ LOCAL vec4f set4f(float a)                { return _mm_set1_ps(a); }
 LOCAL vec4f set4fi(int a)                 { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
 
 /// _mm_load_ss loads a single element and zero the upper three:
-LOCAL vec4f load1f(float const* a)        { return _mm_load_ss(a); }
-LOCAL vec4f load2f(float const* a)        { return _mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a)); }
 LOCAL vec4f load4f(float const* a)        { return _mm_load_ps(a); }
 LOCAL vec4f loadu4f(float const* a)       { return _mm_loadu_ps(a); }
 
-LOCAL void store1f(float* a, vec4f b)     { _mm_store_ss(a,b); }
-LOCAL void store2f(float* a, vec4f b)     { _mm_storel_pi((__m64*)a, b); }
 LOCAL void store3f(float* a, vec4f b)     { a[0]=b[0]; a[1]=b[1]; a[2]=b[2]; }
 LOCAL void store4f(float* a, vec4f b)     { _mm_store_ps(a,b); }
 LOCAL void storeu4f(float* a, vec4f b)    { _mm_storeu_ps(a,b); }
@@ -45,15 +82,15 @@ LOCAL vec4f and4f(vec4f a, vec4f b)       { return _mm_and_ps(a,b); }
 LOCAL vec4f andnot4f(vec4f a, vec4f b)    { return _mm_andnot_ps(a,b); }
 LOCAL vec4f abs4f(vec4f a)                { return _mm_andnot_ps(_mm_set1_ps(-0.0f), a); }
 
-// returns { a[0], b[0], a[2], b[2] }
+// returns { a[0], b[0], a[1], b[1] }
 LOCAL vec4f unpacklo4f(vec4f a, vec4f b) { return _mm_unpacklo_ps(a,b); }
-// returns { a[1], b[1], a[3], b[3] }
+// returns { a[2], b[2], a[3], b[3] }
 LOCAL vec4f unpackhi4f(vec4f a, vec4f b) { return _mm_unpackhi_ps(a,b); }
 
 // returns { a[0], a[0], a[2], a[2] }
-LOCAL vec4f duplo4f(vec4f a) { return _mm_shuffle_ps(a, a, 0xA0); }
+LOCAL vec4f duplo4f(vec4f a) { return _mm_moveldup_ps(a); }
 // returns { a[1], a[1], a[3], a[3] }
-LOCAL vec4f duphi4f(vec4f a) { return _mm_movehdup_ps(a); } //_mm_shuffle_ps(a, a, 0xF5); }
+LOCAL vec4f duphi4f(vec4f a) { return _mm_movehdup_ps(a); }
 
 // return { B1, A1 } from a = { A0, A1 } and b = { B0, B1 }
 LOCAL vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }

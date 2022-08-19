@@ -229,9 +229,9 @@ LOCAL vec4f duplo4f(vec4f a) { return vzip1q_f32(a, a); }
 // returns { a[1], a[1], a[3], a[3] }
 LOCAL vec4f duphi4f(vec4f a) { return vzip2q_f32(a, a); }
 
-// returns { a[0], a[0], a[2], a[2] }
+// returns { a[0], b[0], a[1], b[1] }
 LOCAL vec4f unpacklo4f(vec4f a, vec4f b) { return vzip1q_f32(a, b); }
-// returns { a[1], a[1], a[3], a[3] }
+// returns { a[2], b[2], a[3], b[3] }
 LOCAL vec4f unpackhi4f(vec4f a, vec4f b) { return vzip2q_f32(a, b); }
 
 // copy a[0] into all elements of destination
