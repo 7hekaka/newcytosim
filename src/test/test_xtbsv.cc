@@ -40,11 +40,11 @@ constexpr size_t BLDD = 2*DIM+1;
 /// print only 16 scalars from given vector
 inline void print(size_t num, real const* vec)
 {
-    if ( num > 16 )
+    if ( num > 12 )
     {
-        VecPrint::print(8, vec, 3);
+        VecPrint::print(6, vec, 3);
         fprintf(stdout, "...");
-        VecPrint::print(8, vec+num-8, 3);
+        VecPrint::print(6, vec+num-8, 3);
         fprintf(stdout, " |");
         VecPrint::print(2, vec+num, 1);
     }
@@ -54,7 +54,7 @@ inline void print(size_t num, real const* vec)
         fprintf(stdout, " |");
         VecPrint::print(2, vec+num, 1);
     }
-    printf("  nrm %7.3f ", blas::nrm8(num, vec));
+    printf("  nrm %7.6f ", blas::nrm2(num, vec));
 }
 
 void nan_spill(real * dst)
@@ -67,6 +67,7 @@ void nan_spill(real * dst)
 template < void (*FUNC)(int, real const*, real*) >
 void check(int N, int ORD, real const* S, real const* AB, real* B, char const str[], size_t cnt)
 {
+    printf("\n");
     copy_real(ORD*N, S, B);
     nan_spill(B+ORD*N);
     FUNC(N, AB, B);
@@ -79,7 +80,7 @@ void check(int N, int ORD, real const* S, real const* AB, real* B, char const st
         for ( size_t u = 0; u < SUB; ++u )
             FUNC(N, AB, B);
     }
-    printf(" %-14s cpu %7.0f\n", str, tock());
+    printf(" %-14s cpu %7.0f", str, tock());
 }
 
 //------------------------------------------------------------------------------
@@ -122,7 +123,19 @@ void iso4(int N, real const* AB, real* B)
     alsatian_xpbtrsL<DIM>(N, AB, LDAB, B);
 }
 
-void isoLN(int N, real const* AB, real* B)
+void iso5(int N, real const* AB, real* B)
+{
+#if USE_SIMD && ( DIM == 3 )
+    alsatian_xtbsvLNN3(N, AB, LDAB, B);
+    //alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
+    alsatian_xtbsvLTN3(N, AB, LDAB, B);
+    //alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
+#else
+    zero_real(N, B);
+#endif
+}
+
+void isoLNN(int N, real const* AB, real* B)
 {
 #ifdef __AVX__
 #if ( DIM == 1 )
@@ -132,12 +145,15 @@ void isoLN(int N, real const* AB, real* B)
 #elif ( DIM == 3 )
     alsatian_xtbsvLNN3(N, AB, LDAB, B);
 #endif
+#elif USE_SIMD && ( DIM == 3 )
+    //alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
+    alsatian_xtbsvLNN3(N, AB, LDAB, B);
 #else
     zero_real(N, B);
 #endif
 }
 
-void isoLT(int N, real const* AB, real* B)
+void isoLTN(int N, real const* AB, real* B)
 {
 #ifdef __AVX__
 #if ( DIM == 1 )
@@ -147,6 +163,9 @@ void isoLT(int N, real const* AB, real* B)
 #elif ( DIM == 3 )
     alsatian_xtbsvLTN3(N, AB, LDAB, B);
 #endif
+#elif USE_SIMD && ( DIM == 3 )
+    //alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
+    alsatian_xtbsvLTN3(N, AB, LDAB, B);
 #else
     zero_real(N, B);
 #endif
@@ -160,7 +179,7 @@ void isoLT(int N, real const* AB, real* B)
 void testISO(size_t cnt)
 {
     std::cout << DIM << "D isoTBSV " << NPTS << " points --- real " << sizeof(real);
-    std::cout << " --- " << __VERSION__ << "\n";
+    std::cout << " --- " << __VERSION__;
 
     real * AB = new_real(NPTS*LDAB+4);
     real * S = new_real(NVAL);
@@ -172,10 +191,9 @@ void testISO(size_t cnt)
         S[i] = 1.0 + RNG.sreal();
     for ( size_t i = 0; i < NPTS; ++i )
     {
-        real r = 0.0625 * RNG.sreal();
-        AB[  LDAB*i] = 1.5;
-        AB[1+LDAB*i] = -0.125 + r;
-        AB[2+LDAB*i] = -0.125 - r;
+        AB[  LDAB*i] = 2 + 0.25 * RNG.sreal();
+        AB[1+LDAB*i] = -0.125 + 0.25 * RNG.preal();
+        AB[2+LDAB*i] = -0.125 + 0.25 * RNG.preal();
     }
     int info;
     alsatian_xpbtf2L<2>(NPTS, AB, LDAB, &info);
@@ -185,10 +203,11 @@ void testISO(size_t cnt)
     check<iso2>(NPTS, DIM, S, AB, B, "alsa_pbtrsL<D>", cnt);
     check<iso3>(NPTS, DIM, S, AB, B, "alsa_pbtrs_U", cnt);
     check<iso4>(NPTS, DIM, S, AB, B, "alsa_pbtrs", cnt);
+    check<iso5>(NPTS, DIM, S, AB, B, "alsa_pbtrs_SSE", cnt);
 
 #if 0 && REAL_IS_DOUBLE
-    check<isoLN>(NPTS, DIM, S, AB, B, "tbsvLNN3", cnt);
-    check<isoLT>(NPTS, DIM, S, AB, B, "tbsvLTN3", cnt);
+    check<isoLNN>(NPTS, DIM, S, AB, B, "tbsvLNN3", cnt);
+    check<isoLTN>(NPTS, DIM, S, AB, B, "tbsvLTN3", cnt);
 #endif
 
     free_real(B);
@@ -228,8 +247,8 @@ void pot3(int N, real const* AB, real* B)
 
 void testPOTRS(size_t cnt)
 {
-    std::cout << DIM << "D xTBSVLN " << NPTS << " points --- real " << sizeof(real);
-    std::cout << " --- " << __VERSION__ << "\n";
+    std::cout << "\n" << DIM << "D xTBSVLN " << NPTS << " points --- real " << sizeof(real);
+    std::cout << " --- " << __VERSION__;
 
     real * AB = new_real(NPTS*NPTS+4);
     real * S = new_real(NVAL);
@@ -262,6 +281,7 @@ void testPOTRS(size_t cnt)
 //------------------------------------------------------------------------------
 #pragma mark -
 
+// this gives wrong results as the diagonal terms are not inverted
 void uni0(int N, real const* AB, real* B)
 {
     blas::xtbsv('L', 'N', 'N', N, RANK, AB, BLDD, B, 1);
@@ -382,8 +402,8 @@ void uniLT5(int N, real const* AB, real* B)
  */
 void testTBSV(size_t cnt)
 {
-    std::cout << DIM << "D xTBSV " << NPTS << " points --- real " << sizeof(real);
-    std::cout << " --- "  << __VERSION__ << "\n";
+    std::cout << "\n" << DIM << "D xTBSV " << NPTS << " points --- real " << sizeof(real);
+    std::cout << " --- "  << __VERSION__;
 
     real * AB = new_real(NVAL*std::max(NVAL, BLDD)+4);
     real * S = new_real(NVAL);
@@ -410,14 +430,14 @@ void testTBSV(size_t cnt)
     alsatian_xpbtf2L<RANK>(NVAL, AB, BLDD, &info);
     
 #if 1
-    check<uni0>(NVAL, 1, S, AB, B, "blas::tbsv", cnt);
+    check<uni0>(NVAL, 1, S, AB, B, "blas::tbsv", cnt); printf(" <FAIL");
     check<uni1>(NVAL, 1, S, AB, B, "blas_tbsv", cnt);
     check<uni2>(NVAL, 1, S, AB, B, "tbsvLxN", cnt);
     check<uni3>(NVAL, 1, S, AB, B, "tbsvLxNK<KD>", cnt);
     check<uni4>(NVAL, 1, S, AB, B, "alsa_xpbtrsLK", cnt);
 #endif
 #if 1
-    std::cout << "xTBSVLN ---\n";
+    std::cout << "\nxTBSVLN ---";
     
     //check<uniLNB>(NVAL, S, AB, B, "blas::xtbsv", cnt);
     check<uniLN0>(NVAL, 1, S, AB, B, "blas_xtbsvLN", cnt);
@@ -430,7 +450,7 @@ void testTBSV(size_t cnt)
     check<uniLN5>(NVAL, 1, S, AB, B, "LNN6SSE", cnt);
 #endif
     
-    std::cout << "xTBSVLT ---\n";
+    std::cout << "\nxTBSVLT ---";
 
     //check<uniLTB>(NVAL, S, AB, B, "blas::tbsv", cnt);
     check<uniLT0>(NVAL, 1, S, AB, B, "blas_xtbsvLT", cnt);
@@ -492,8 +512,8 @@ void convert_to_floats(size_t cnt, double const* src, float* dst)
 
 void testGETRS(size_t cnt)
 {
-    std::cout << DIM << "D xGETRS " << NPTS << " points --- real " << sizeof(real);
-    std::cout << " --- "  << __VERSION__ << "\n";
+    std::cout << "\n" << DIM << "D xGETRS " << NPTS << " points --- real " << sizeof(real);
+    std::cout << " --- "  << __VERSION__;
 
     real * A = new_real(NVAL*NVAL+4);
     real * M = new_real(NVAL*NVAL+4);
@@ -547,4 +567,5 @@ int main(int argc, char* argv[])
     testPOTRS(1<<10);
     testTBSV(1<<12);
     testGETRS(1<<10);
+    printf("\n");
 }

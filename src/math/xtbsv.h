@@ -257,7 +257,7 @@ void blas_xtbsv(char Uplo, char Trans, char Diag, const int N, const int KD, con
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Alsatian factorization xPBTF2 that inverse the diagonal terms
+#pragma mark - Alsatian factorization xPBTF2 with inversed diagonal terms
 
 /*
   SUBROUTINE DSYR(UPLO,N,ALPHA,X,INCX,A,LDA)
@@ -411,7 +411,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Alsatian DTBSV with various KD (inverted diagonal terms)
+#pragma mark - Alsatian DTBSV with KD as argument (inverted diagonal terms)
 
 #if 0
 //The original LAPACK implementation load and store X at every operation
@@ -493,6 +493,9 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
     }
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark - Alsatian, KD as template argument, using C-array as buffer
 
 template < int KD >
 void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* X)
@@ -580,9 +583,10 @@ void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
          */
         real tmp = X[0] - A[KD] * buf[KD-1];
         for ( int i = KD-1; i > 0; --i )
+        {
+            tmp -= A[i] * buf[i-1];
             buf[i] = buf[i-1];
-        for ( int i = 1; i < KD; ++i )
-            tmp -= A[i] * buf[i];
+        }
         buf[0] = A[0] * tmp;
         X[0] = buf[0];
         A -= lda;
@@ -972,7 +976,7 @@ void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* 
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark - Isotropic Alsatian Solve xTBSV with KD==2
+#pragma mark - Isotropic Alsatian Solve xTBSV, using C-array buffer
 
 
 #if ( 1 )
@@ -1084,7 +1088,7 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark - Isotropic Dimension-specific Solve xTBSV for KD==2
+#pragma mark - 3D-Isotropic Symmetric Banded Solve xTBSV for KD==2
 
 #if defined(__AVX__)
 /// specialized version for KD==2 and ORD==3
@@ -1092,37 +1096,89 @@ void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX
 {
     constexpr int ORD = 3;
     const double*const end = pA + (N-2) * lda;
-    vec4 a1 = loadu4(pX); //may load garbage
-    vec4 a2 = loadu4(pX+ORD); //may load garbage @ pX+7
+    vec4 x1 = loadu4(pX); //may load garbage
+    vec4 x2 = loadu4(pX+ORD); //may load garbage @ pX+7
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
 #if DEVELOP_XTBSV
-        vec4 a0 = a1;
+        vec4 x0 = x1;
         vec4 aa = broadcast1(pA);
-        a1 = fnmadd4(mul4(aa, broadcast1(pA+1)), a0, a2);
-        a2 = fnmadd4(mul4(aa, broadcast1(pA+2)), a0, loadu4(pX+2*ORD));
-        storeu4(pX, mul4(aa, a0));
+        x1 = fnmadd4(mul4(aa, broadcast1(pA+1)), x0, x2);
+        x2 = fnmadd4(mul4(aa, broadcast1(pA+2)), x0, loadu4(pX+2*ORD));
+        storeu4(pX, mul4(aa, x0));
 #else
-        vec4 a0 = mul4(broadcast1(pA), a1);      // a1 = loadu4(pX);
-        a1 = fnmadd4(broadcast1(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        a2 = fnmadd4(broadcast1(pA+2), a0, loadu4(pX+2*ORD));
-        storeu4(pX, a0);
+        vec4 x0 = mul4(broadcast1(pA), x1);      // x1 = loadu4(pX);
+        x1 = fnmadd4(broadcast1(pA+1), x0, x2);  // x2 = loadu4(pX+ORD);
+        x2 = fnmadd4(broadcast1(pA+2), x0, loadu4(pX+2*ORD));
+        storeu4(pX, x0); //only 3 values saved: last one will be overwritten
 #endif
         pA += lda;
         pX += ORD;
     }
     if ( N >= 2 ) // j = N-2
     {
-        vec4 a0 = mul4(broadcast1(pA), a1);
-        a1 = fnmadd4(broadcast1(pA+1), a0, a2);
-        storeu4(pX, a0);
+        vec4 x0 = mul4(broadcast1(pA), x1);
+        x1 = fnmadd4(broadcast1(pA+1), x0, x2);
+        storeu4(pX, x0);
         pA += lda;
         pX += ORD;
     }
     if ( N >= 1 ) // j = N-1
     {
-        vec4 a0 = mul4(broadcast1(pA), a1);
-        store3(pX, a0);
+        vec4 x0 = mul4(broadcast1(pA), x1);
+        store3(pX, x0);
+        //pA += lda;
+        //pX += ORD;
+    }
+}
+#elif USE_SIMD
+/// specialized SSE & ARM's NEON version for KD==2 and ORD==3 (21.08.2022)
+void alsatian_xtbsvLNN3(const int N, const double* pA, const int lda, double* pX)
+{
+    constexpr int ORD = 3;
+    const double*const end = pA + (N-2) * lda;
+    vec2 x1 = load2(pX);
+    vec2 z1 = load1(pX+2);
+    vec2 x2 = load2(pX+ORD);
+    vec2 z2 = load1(pX+ORD+2);
+    while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
+    {
+        vec2 a0 = loaddup2(pA);
+        vec2 a1 = mul2(a0, loaddup2(pA+1));
+        vec2 a2 = mul2(a0, loaddup2(pA+2));
+        vec2 x0 = x1;
+        vec2 z0 = z1;
+        x1 = fnmadd2(x1, a1, x2);
+        z1 = fnmadd1(z1, a1, z2);
+        x2 = fnmadd2(x0, a2, load2(pX+2*ORD));
+        z2 = fnmadd1(z0, a2, load1(pX+2*ORD+2));
+        store2(pX, mul2(a0, x0));
+        store1(pX+2, mul1(a0, z0));
+        pA += lda;
+        pX += ORD;
+    }
+    if ( N >= 2 ) // j = N-2
+    {
+        vec2 a0 = loaddup2(pA);
+        vec2 a1 = loaddup2(pA+1);
+        vec2 x0 = mul2(x1, a0);
+        vec2 z0 = mul1(z1, a0);
+        x1 = fnmadd2(x0, a1, x2);
+        z1 = fnmadd1(z0, a1, z2);
+        store2(pX, x0);
+        store1(pX+2, z0);
+        //pA += lda;
+        //pX += ORD;
+        // j = N-1:
+        a0 = loaddup2(pA+lda);
+        store2(pX+ORD, mul2(x1, a0));
+        store1(pX+ORD+2, mul1(z1, a0));
+    }
+    else if ( N >= 1 ) // j = N-1
+    {
+        vec2 a0 = loaddup2(pA);
+        store2(pX, mul2(x1, a0));
+        store1(pX+2, mul1(z1, a0));
         //pA += lda;
         //pX += ORD;
     }
@@ -1137,114 +1193,197 @@ void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX
     const double*const end = pA + lda;
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
-    vec4 a0, a1, a2;
+    vec4 x0, x1, x2;
     if ( N <= 2 )
     {
-        a1 = setzero4();
+        x1 = setzero4();
         if ( N > 0 ) // j = N-1
         {
-            a0 = load3(pX);   // would load garbage in 4th position
-            a1 = mul4(broadcast1(pA), a0);
-            store3(pX, a1); //storeu4(pX, blend31(a1, a0));
+            x0 = load3(pX);   // would load garbage in 4th position
+            x1 = mul4(broadcast1(pA), x0);
+            store3(pX, x1); //storeu4(pX, blend31(x1, x0));
             pA -= lda;
             pX -= ORD;
         }
-        a2 = a1;
+        x2 = x1;
         if ( N > 1 ) // j = N-2
         {
-            a0 = loadu4(pX);
-            a0 = fnmadd4(broadcast1(pA+1), a1, a0);
-            a1 = mul4(broadcast1(pA), a0);
-            storeu4(pX, blend31(a1, a0));
+            x0 = loadu4(pX);
+            x0 = fnmadd4(broadcast1(pA+1), x1, x0);
+            x1 = mul4(broadcast1(pA), x0);
+            storeu4(pX, blend31(x1, x0));
             pA -= lda;
             pX -= ORD;
         }
         return;
     }
     // j = N-1
-    a0 = load3(pX);   // would load garbage in 4th position
-    a1 = mul4(broadcast1(pA), a0);
-    store3(pX, a1); //storeu4(pX, blend31(a1, a0));
+    x0 = load3(pX);   // would load garbage in 4th position
+    x1 = mul4(broadcast1(pA), x0);
+    store3(pX, x1); //storeu4(pX, blend31(x1, x0));
     pA -= lda;
     pX -= ORD;
-    a2 = a1;
+    x2 = x1;
     // j = N-2
-    a0 = loadu4(pX);
-    a0 = fnmadd4(broadcast1(pA+1), a1, a0);
-    a1 = mul4(broadcast1(pA), a0);
-    storeu4(pX, blend31(a1, a0));
+    x0 = loadu4(pX);
+    x0 = fnmadd4(broadcast1(pA+1), x1, x0);
+    x1 = mul4(broadcast1(pA), x0);
+    storeu4(pX, blend31(x1, x0));
     pA -= lda;
     pX -= ORD;
-    vec4 tt = broadcastX(a1);
+    vec4 tt = broadcastX(x1);
     vec4 af = loadu4(pX);
     while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
     {
 #if DEVELOP_XTBSV
         vec4 aa = broadcast1(pA);
-        a0 = fnmadd4(mul4(aa, broadcast1(pA+2)), a2, mul4(aa, af));
+        x0 = fnmadd4(mul4(aa, broadcast1(pA+2)), x2, mul4(aa, af));
         af = loadu4(pX-ORD);
-        a2 = a1;
-        a1 = fnmadd4(mul4(aa, broadcast1(pA+1)), a1, a0);
+        x2 = x1;
+        x1 = fnmadd4(mul4(aa, broadcast1(pA+1)), x1, x0);
 #else
-        a0 = fnmadd4(broadcast1(pA+2), a2, af);
+        x0 = fnmadd4(broadcast1(pA+2), x2, af);
         af = loadu4(pX-ORD);
-        a2 = a1;
-        a0 = fnmadd4(broadcast1(pA+1), a1, a0);
-        a1 = mul4(broadcast1(pA), a0);
+        x2 = x1;
+        x0 = fnmadd4(broadcast1(pA+1), x1, x0);
+        x1 = mul4(broadcast1(pA), x0);
 #endif
         // restore 4th position that was saved in 'tt'
-        storeu4(pX, blend31(a1, tt));
-        tt = broadcastX(a1); // save 4th position for next round
+        storeu4(pX, blend31(x1, tt));
+        tt = broadcastX(x1); // save 4th position for next round
         pA -= lda;
         pX -= ORD;
     }
     // j = 0
-    a0 = fnmadd4(broadcast1(pA+2), a2, af);
-    a0 = fnmadd4(broadcast1(pA+1), a1, a0);
+    x0 = fnmadd4(broadcast1(pA+2), x2, af);
+    x0 = fnmadd4(broadcast1(pA+1), x1, x0);
     // restore 4th position that was saved in 'tt'
-    a0 = blend31(mul4(broadcast1(pA), a0), tt);
-    storeu4(pX, a0);
+    x0 = blend31(mul4(broadcast1(pA), x0), tt);
+    storeu4(pX, x0);
+}
+#elif USE_SIMD
+/// specialized version for KD==2 and ORD==3, using SSE or ARM's NEON (21.08.2022)
+void alsatian_xtbsvLTN3(const int N, const double* pA, const int lda, double* pX)
+{
+    constexpr int ORD = 3;
+    const double*const end = pA + lda;
+    pX += ( N - 1 ) * ORD;
+    pA += ( N - 1 ) * lda;
+    vec2 a1, x1, z1;
+    vec2 a2, x2, z2;
+    if ( N <= 2 )
+    {
+        if ( N > 0 ) // j = N-1
+        {
+            vec2 a0 = loaddup2(pA);
+            x2 = mul2(a0, load2(pX));
+            z2 = mul1(a0, load1(pX+2));
+            store2(pX, x2);
+            store1(pX+2, z2);
+            pA -= lda;
+            pX -= ORD;
+        }
+        if ( N > 1 ) // j = N-2
+        {
+            vec2 a0 = loaddup2(pA);
+            a1 = mul2(a0, loaddup2(pA+1));
+            x1 = fnmadd2(a1, x2, mul2(a0, load2(pX)));
+            z1 = fnmadd2(a1, z2, mul1(a0, load1(pX+2)));
+            store2(pX, x1);
+            store1(pX+2, z1);
+            //pA -= lda;
+            //pX -= ORD;
+        }
+        return;
+    }
+    // j = N-1
+    vec2 a0 = loaddup2(pA);
+    x1 = mul2(a0, load2(pX));
+    z1 = mul1(a0, load1(pX+2));
+    store2(pX, x1);
+    store1(pX+2, z1);
+    pA -= lda;
+    pX -= ORD;
+    x2 = x1;
+    z2 = z1;
+    // j = N-2
+    a0 = loaddup2(pA);
+    a1 = mul2(a0, loaddup2(pA+1));
+    x1 = fnmadd2(a1, x1, mul2(a0, load2(pX)));
+    z1 = fnmadd1(a1, z1, mul1(a0, load1(pX+2)));
+    store2(pX, x1);
+    store1(pX+2, z1);
+    pA -= lda;
+    pX -= ORD;
+    while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
+    {
+        a0 = loaddup2(pA);
+        a1 = mul2(a0, loaddup2(pA+1));
+        a2 = mul2(a0, loaddup2(pA+2));
+        vec2 x0 = fnmadd2(a2, x2, mul2(a0, load2(pX)));
+        vec2 z0 = fnmadd1(a2, z2, mul2(a0, load1(pX+2)));
+        x2 = x1;
+        z2 = z1;
+        x1 = fnmadd2(a1, x1, x0);
+        z1 = fnmadd1(a1, z1, z0);
+        store2(pX, x1);
+        store1(pX+2, z1);
+        pA -= lda;
+        pX -= ORD;
+    }
+    // j = 0
+    a0 = loaddup2(pA);
+    a1 = mul2(a0, loaddup2(pA+1));
+    a2 = mul2(a0, loaddup2(pA+2));
+    x2 = fnmadd2(a2, x2, mul2(a0, load2(pX)));
+    z2 = fnmadd1(a2, z2, mul2(a0, load1(pX+2)));
+    x1 = fnmadd2(a1, x1, x2);
+    z1 = fnmadd1(a1, z1, z2);
+    store2(pX, x1);
+    store1(pX+2, z1);
 }
 #endif
 
+//------------------------------------------------------------------------------
+#pragma mark - Single precision 3D-Isotropic Symmetric Banded Solve xTBSV for KD==2
 
 #if defined(__SSE3__)
-/// specialized version for single precision, KD==2 and ORD==3
+/// single precision 3D-specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
 {
     constexpr int ORD = 3;
     const float*const end = pA + (N-2) * lda;
-    vec4f a1 = loadu4f(pX);     //may load garbage
-    vec4f a2 = loadu4f(pX+ORD); //may load garbage @ pX+7
+    vec4f x1 = loadu4f(pX);     //may load garbage
+    vec4f x2 = loadu4f(pX+ORD); //may load garbage @ pX+7
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
 #if DEVELOP_XTBSV
-        vec4f a0 = a1;
+        vec4f x0 = x1;
         vec4f aa = broadcast1f(pA);
-        a1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), a0, a2);
-        a2 = fnmadd4f(mul4f(aa, broadcast1f(pA+2)), a0, loadu4f(pX+2*ORD));
-        storeu4f(pX, mul4f(aa, a0));
+        x1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), x0, x2);
+        x2 = fnmadd4f(mul4f(aa, broadcast1f(pA+2)), x0, loadu4f(pX+2*ORD));
+        storeu4f(pX, mul4f(aa, x0));
 #else
-        vec4f a0 = mul4f(broadcast1f(pA), a1);      // a1 = loadu4(pX);
-        a1 = fnmadd4f(broadcast1f(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        a2 = fnmadd4f(broadcast1f(pA+2), a0, loadu4f(pX+2*ORD));
-        storeu4f(pX, a0);
+        vec4f x0 = mul4f(broadcast1f(pA), x1);      // x1 = loadu4(pX);
+        x1 = fnmadd4f(broadcast1f(pA+1), x0, x2);  // x2 = loadu4(pX+ORD);
+        x2 = fnmadd4f(broadcast1f(pA+2), x0, loadu4f(pX+2*ORD));
+        storeu4f(pX, x0);
 #endif
         pA += lda;
         pX += ORD;
     }
     if ( N >= 2 ) // j = N-2
     {
-        vec4f a0 = mul4f(broadcast1f(pA), a1);
-        a1 = fnmadd4f(broadcast1f(pA+1), a0, a2);
-        storeu4f(pX, a0);
+        vec4f x0 = mul4f(broadcast1f(pA), x1);
+        x1 = fnmadd4f(broadcast1f(pA+1), x0, x2);
+        storeu4f(pX, x0);
         pA += lda;
         pX += ORD;
     }
     if ( N >= 1 ) // j = N-1
     {
-        vec4f a0 = mul4f(broadcast1f(pA), a1);
-        store3f(pX, a0);
+        vec4f x0 = mul4f(broadcast1f(pA), x1);
+        store3f(pX, x0);
         //pA += lda;
         //pX += ORD;
     }
@@ -1252,118 +1391,120 @@ void alsatian_xtbsvLNN3(const int N, const float* pA, const int lda, float* pX)
 #endif
 
 #if defined(__SSE3__)
-/// specialized version for single precision, KD==2 and ORD==3
+/// single precision 3D-specialized version for KD==2 and ORD==3
 void alsatian_xtbsvLTN3(const int N, const float* pA, const int lda, float* pX)
 {
     constexpr int ORD = 3;
     const float*const end = pA + lda;
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
-    vec4f a0, a1, a2;
+    vec4f x0, x1, x2;
     if ( N <= 2 )
     {
-        a1 = setzero4f();
+        x1 = setzero4f();
         if ( N > 0 ) // j = N-1
         {
-            a0 = load3f(pX);   // would load garbage in 4th position
-            a1 = mul4f(broadcast1f(pA), a0);
-            store3f(pX, a1); // storeu4f(pX, blend31f(a1, a0));
+            x0 = load3f(pX);   // would load garbage in 4th position
+            x1 = mul4f(broadcast1f(pA), x0);
+            store3f(pX, x1); // storeu4f(pX, blend31f(x1, x0));
             pA -= lda;
             pX -= ORD;
         }
         if ( N > 1 ) // j = N-2
         {
-            a0 = loadu4f(pX);
-            a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
-            a1 = mul4f(broadcast1f(pA), a0);
-            storeu4f(pX, blend31f(a1, a0));
+            x0 = loadu4f(pX);
+            x0 = fnmadd4f(broadcast1f(pA+1), x1, x0);
+            x1 = mul4f(broadcast1f(pA), x0);
+            storeu4f(pX, blend31f(x1, x0));
         }
         return;
     }
     // j = N-1
-    a0 = load3f(pX);   // would load garbage in 4th position
-    a1 = mul4f(broadcast1f(pA), a0);
-    store3f(pX, a1); // storeu4f(pX, blend31f(a1, a0));
+    x0 = load3f(pX);   // would load garbage in 4th position
+    x1 = mul4f(broadcast1f(pA), x0);
+    store3f(pX, x1); // storeu4f(pX, blend31f(x1, x0));
     pA -= lda;
     pX -= ORD;
-    a2 = a1;
+    x2 = x1;
     // j = N-2
-    a0 = loadu4f(pX);
-    a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
-    a1 = mul4f(broadcast1f(pA), a0);
-    storeu4f(pX, blend31f(a1, a0));
+    x0 = loadu4f(pX);
+    x0 = fnmadd4f(broadcast1f(pA+1), x1, x0);
+    x1 = mul4f(broadcast1f(pA), x0);
+    storeu4f(pX, blend31f(x1, x0));
     pA -= lda;
     pX -= ORD;
-    vec4f tt = broadcastXf(a1);
+    vec4f tt = broadcastXf(x1);
     vec4f af = loadu4f(pX);
     while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
     {
 #if DEVELOP_XTBSV
         vec4f aa = broadcast1f(pA);
-        a0 = fnmadd4f(mul4f(aa, broadcast1f(pA+2)), a2, mul4f(aa, af));
+        x0 = fnmadd4f(mul4f(aa, broadcast1f(pA+2)), x2, mul4f(aa, af));
         af = loadu4f(pX-ORD);
-        a2 = a1;
-        a1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), a1, a0);
+        x2 = x1;
+        x1 = fnmadd4f(mul4f(aa, broadcast1f(pA+1)), x1, x0);
 #else
-        a0 = fnmadd4f(broadcast1f(pA+2), a2, af);
+        x0 = fnmadd4f(broadcast1f(pA+2), x2, af);
         af = loadu4f(pX-ORD);
-        a2 = a1;
-        a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
-        a1 = mul4f(broadcast1f(pA), a0);
+        x2 = x1;
+        x0 = fnmadd4f(broadcast1f(pA+1), x1, x0);
+        x1 = mul4f(broadcast1f(pA), x0);
 #endif
         // restore 4th position that was saved in 'tt'
-        storeu4f(pX, blend31f(a1, tt));
-        tt = broadcastXf(a1); // save 4th position for next round
+        storeu4f(pX, blend31f(x1, tt));
+        tt = broadcastXf(x1); // save 4th position for next round
         pA -= lda;
         pX -= ORD;
     }
     // j = 0
-    a0 = fnmadd4f(broadcast1f(pA+2), a2, af);
-    a0 = fnmadd4f(broadcast1f(pA+1), a1, a0);
+    x0 = fnmadd4f(broadcast1f(pA+2), x2, af);
+    x0 = fnmadd4f(broadcast1f(pA+1), x1, x0);
     // restore 4th position that was saved in 'tt'
-    a0 = blend31f(mul4f(broadcast1f(pA), a0), tt);
-    storeu4f(pX, a0);
+    x0 = blend31f(mul4f(broadcast1f(pA), x0), tt);
+    storeu4f(pX, x0);
 }
 #endif
 
+//------------------------------------------------------------------------------
+#pragma mark - 2D-Isotropic Symmetric Banded Solve xTBSV for KD==2
 
 #if USE_SIMD
 /// specialized version for KD==2 and ORD==2
 void alsatian_xtbsvLNN2(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 2;
-    vec2 a1 = load2(pX);     //may load garbage if N == 0
-    vec2 a2 = load2(pX+ORD); //may load garbage if N < 1
+    vec2 x1 = load2(pX);     //may load garbage if N == 0
+    vec2 x2 = load2(pX+ORD); //may load garbage if N < 1
     for ( int j = 0; j < N-2; ++j )
     {
 #if DEVELOP_XTBSV
         // this reduces the dependency path
         vec2 aa = loaddup2(pA);
-        vec2 a0 = a1;
-        store2(pX, mul2(aa, a1));
-        a1 = fnmadd2(mul2(aa, loaddup2(pA+1)), a0, a2);
-        a2 = fnmadd2(mul2(aa, loaddup2(pA+2)), a0, load2(pX+2*ORD));
+        vec2 x0 = x1;
+        store2(pX, mul2(aa, x1));
+        x1 = fnmadd2(mul2(aa, loaddup2(pA+1)), x0, x2);
+        x2 = fnmadd2(mul2(aa, loaddup2(pA+2)), x0, load2(pX+2*ORD));
 #else
-        vec2 a0 = mul2(loaddup2(pA), a1);      // a1 = loadu4(pX);
-        a1 = fnmadd2(loaddup2(pA+1), a0, a2);  // a2 = loadu4(pX+ORD);
-        a2 = fnmadd2(loaddup2(pA+2), a0, load2(pX+2*ORD));
-        store2(pX, a0);
+        vec2 x0 = mul2(loaddup2(pA), x1);      // x1 = loadu4(pX);
+        x1 = fnmadd2(loaddup2(pA+1), x0, x2);  // x2 = loadu4(pX+ORD);
+        x2 = fnmadd2(loaddup2(pA+2), x0, load2(pX+2*ORD));
+        store2(pX, x0);
 #endif
         pA += lda;
         pX += ORD;
     }
     if ( N >= 2 ) // j = N-2
     {
-        vec2 a0 = mul2(loaddup2(pA), a1);
-        a1 = fnmadd2(loaddup2(pA+1), a0, a2);
-        store2(pX, a0);
+        vec2 x0 = mul2(loaddup2(pA), x1);
+        x1 = fnmadd2(loaddup2(pA+1), x0, x2);
+        store2(pX, x0);
         pA += lda;
         pX += ORD;
     }
     if ( N >= 1 ) // j = N-1
     {
-        vec2 a0 = mul2(loaddup2(pA), a1);
-        store2(pX, a0);
+        vec2 x0 = mul2(loaddup2(pA), x1);
+        store2(pX, x0);
         //pA += lda;
         //pX += ORD;
     }
@@ -1376,20 +1517,20 @@ void alsatian_xtbsvLTN2(const int N, const double* pA, const int lda, double* pX
     constexpr int ORD = 2;
     pX += ( N - 1 ) * ORD;
     pA += ( N - 1 ) * lda;
-    vec2 a1 = setzero2();
+    vec2 x1 = setzero2();
     if ( N >= 1 ) // j = N-1
     {
-        a1 = mul2(loaddup2(pA), load2(pX));
-        store2(pX, a1);
+        x1 = mul2(loaddup2(pA), load2(pX));
+        store2(pX, x1);
         pA -= lda;
         pX -= ORD;
     }
-    vec2 a2 = a1;
+    vec2 x2 = x1;
     if ( N >= 2 ) // j = N-2
     {
-        vec2 a0 = fnmadd2(loaddup2(pA+1), a1, load2(pX));
-        a1 = mul2(loaddup2(pA), a0);
-        store2(pX, a1);
+        vec2 x0 = fnmadd2(loaddup2(pA+1), x1, load2(pX));
+        x1 = mul2(loaddup2(pA), x0);
+        store2(pX, x1);
         pA -= lda;
         pX -= ORD;
     }
@@ -1398,65 +1539,67 @@ void alsatian_xtbsvLTN2(const int N, const double* pA, const int lda, double* pX
 #if DEVELOP_XTBSV
         // this reduces the dependency path
         vec2 aa = loaddup2(pA);
-        vec2 a0 = fnmadd2(mul2(aa, loaddup2(pA+2)), a2, mul2(aa, load2(pX)));
-        a2 = a1;
-        a1 = fnmadd2(mul2(aa, loaddup2(pA+1)), a1, a0);
+        vec2 x0 = fnmadd2(mul2(aa, loaddup2(pA+2)), x2, mul2(aa, load2(pX)));
+        x2 = x1;
+        x1 = fnmadd2(mul2(aa, loaddup2(pA+1)), x1, x0);
 #else
-        vec2 a0 = fnmadd2(loaddup2(pA+2), a2, load2(pX));
-        a0 = fnmadd2(loaddup2(pA+1), a1, a0);
-        a2 = a1;
-        a1 = mul2(loaddup2(pA), a0);
+        vec2 x0 = fnmadd2(loaddup2(pA+2), x2, load2(pX));
+        x0 = fnmadd2(loaddup2(pA+1), x1, x0);
+        x2 = x1;
+        x1 = mul2(loaddup2(pA), x0);
 #endif
-        store2(pX, a1);
+        store2(pX, x1);
         pA -= lda;
         pX -= ORD;
     }
     if ( N >= 3 ) // j = 0
     {
-        vec2 a0 = fnmadd2(loaddup2(pA+2), a2, load2(pX));
-        a0 = fnmadd2(loaddup2(pA+1), a1, a0);
-        store2(pX, mul2(loaddup2(pA), a0));
+        vec2 x0 = fnmadd2(loaddup2(pA+2), x2, load2(pX));
+        x0 = fnmadd2(loaddup2(pA+1), x1, x0);
+        store2(pX, mul2(loaddup2(pA), x0));
     }
 }
 
 #endif
 
+//------------------------------------------------------------------------------
+#pragma mark - 1D-Isotropic Symmetric Banded Solve xTBSV for KD==2
 
 /// specialized version for KD==2 and ORD==1
 void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
 {
-    real a1 = pX[0]; //may load garbage
-    real a2 = pX[1]; //may load garbage
+    real x1 = pX[0]; //may load garbage
+    real x2 = pX[1]; //may load garbage
     for ( int j = 0; j < N-2; ++j )
     {
 #if DEVELOP_XTBSV
         // this reduces the dependency path
         real aa = pA[0];
-        real a0 = a1;
-        a1 = a2 - ( aa * pA[1] ) * a0;
-        a2 = pX[2] - ( aa * pA[2] ) * a0;
-        pX[0] = aa * a0;
+        real x0 = x1;
+        x1 = x2 - ( aa * pA[1] ) * x0;
+        x2 = pX[2] - ( aa * pA[2] ) * x0;
+        pX[0] = aa * x0;
 #else
-        real a0 = pA[0] * a1;
-        a1 = a2 - pA[1] * a0;
-        a2 = pX[2] - pA[2] * a0;
-        pX[0] = a0;
+        real x0 = pA[0] * x1;
+        x1 = x2 - pA[1] * x0;
+        x2 = pX[2] - pA[2] * x0;
+        pX[0] = x0;
 #endif
         pA += lda;
         pX += 1;
     }
     if ( N >= 2 ) // j = N-2
     {
-        real a0 = pA[0] * a1;
-        a1 = a2 - pA[1] * a0;
-        pX[0] = a0;
+        real x0 = pA[0] * x1;
+        x1 = x2 - pA[1] * x0;
+        pX[0] = x0;
         pA += lda;
         pX += 1;
     }
     if ( N >= 1 ) // j = N-1
     {
-        real a0 = pA[0] * a1;
-        pX[0] = a0;
+        real x0 = pA[0] * x1;
+        pX[0] = x0;
         //pA += lda;
         //pX += 1;
     }
@@ -1468,21 +1611,21 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;
-    real a1 = 0;
+    real x1 = 0;
     if ( N >= 1 ) // j = N-1
     {
-        real a0 = pX[0];
-        a1 = pA[0] * a0;
-        pX[0] = a1;
+        real x0 = pX[0];
+        x1 = pA[0] * x0;
+        pX[0] = x1;
         pA -= lda;
         pX -= 1;
     }
-    real a2 = a1;
+    real x2 = x1;
     if ( N >= 2 ) // j = N-2
     {
-        real a0 = pX[0] - pA[1] * a1;
-        a1 = pA[0] * a0;
-        pX[0] = a1;
+        real x0 = pX[0] - pA[1] * x1;
+        x1 = pA[0] * x0;
+        pX[0] = x1;
         pA -= lda;
         pX -= 1;
     }
@@ -1491,24 +1634,24 @@ void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
 #if DEVELOP_XTBSV
         // this reduces the dependency path
         real aa = pA[0];
-        real a0 = aa * pX[0] - ( aa * pA[2] ) * a2;
-        a2 = a1;
-        a1 = a0 - ( aa * pA[1] ) * a1;
+        real x0 = aa * pX[0] - ( aa * pA[2] ) * x2;
+        x2 = x1;
+        x1 = x0 - ( aa * pA[1] ) * x1;
 #else
-        real a0 = pX[0] - pA[2] * a2;
-        a0 = a0 - pA[1] * a1;
-        a2 = a1;
-        a1 = pA[0] * a0;
+        real x0 = pX[0] - pA[2] * x2;
+        x0 = x0 - pA[1] * x1;
+        x2 = x1;
+        x1 = pA[0] * x0;
 #endif
-        pX[0] = a1;
+        pX[0] = x1;
         pA -= lda;
         pX -= 1;
     }
     if ( N >= 3 ) // j = 0
     {
-        real a0 = pX[0] - pA[2] * a2;
-        a0 = a0 - pA[1] * a1;
-        pX[0] = pA[0] * a0;
+        real x0 = pX[0] - pA[2] * x2;
+        x0 = x0 - pA[1] * x1;
+        pX[0] = pA[0] * x0;
     }
 }
 
@@ -1607,21 +1750,23 @@ void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
     }
     else
         ABORT_NOW("unexpected dimension!");
+#elif USE_SIMD && REAL_IS_DOUBLE
+    if ( ORD == 3 )
+    {
+        alsatian_xtbsvLNN3(N, AB, LDAB, B);
+        alsatian_xtbsvLTN3(N, AB, LDAB, B);
+        return;
+    }
 #elif defined(__SSE3__) && !REAL_IS_DOUBLE
     if ( ORD == 3 )
     {
         alsatian_xtbsvLNN3(N, AB, LDAB, B);
         alsatian_xtbsvLTN3(N, AB, LDAB, B);
+        return;
     }
-    else
-    {
-        alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
-        alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);
-    }
-#else
+#endif
     alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
     alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);
-#endif
 }
 
 #include "vecprint.h"
