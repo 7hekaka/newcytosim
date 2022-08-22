@@ -145,7 +145,7 @@ typedef float32x2_t vec2f;
 
 LOCAL vec2f setzero2f() { return vdup_n_f32(0); }
 
-LOCAL vec2f load1f(float const* a) { return vset_lane_f64(a[0], setzero2f(), 0); }
+LOCAL vec2f load1f(float const* a) { return vset_lane_f32(a[0], setzero2f(), 0); }
 LOCAL vec2f load2f(float const* a) { return vld1_f32(a); }
 LOCAL vec2f loaddupf(float const* a) { return vld1_dup_f32(a); }
 
@@ -192,6 +192,7 @@ LOCAL vec4f set4f(float a) { return vdupq_n_f32(a); }
 LOCAL vec4f load4f(float const* a) { return vld1q_f32(a); }
 LOCAL vec4f loadu4f(float const* a) { return vld1q_f32(a); }
 LOCAL void store4f(float* a, vec4f b) { vst1q_f32(a, b); }
+LOCAL void storeu4f(float* a, vec4f b) { vst1q_f32(a, b); }
 
 
 LOCAL vec4f add4f(vec4f a, vec4f b) { return vaddq_f32(a,b); }
@@ -207,7 +208,7 @@ LOCAL vec4f hadd4f(vec4f a, vec4f b) { return vpaddq_f32(a, b); }
 
 LOCAL vec4f and4f(vec4f a, vec4f b) { return vandq_s32(a, b); }
 LOCAL vec4f andnot4f(vec4f a, vec4f b) { return vbicq_s32(a, b); }
-LOCAL vec4f abs4f(vec4f a)          { return vbicq_s32(float64x2_t{-0.,-0.}, a); }
+LOCAL vec4f abs4f(vec4f a)          { return vbicq_s32(float32x4_t{-0.,-0.,-0.,-0.}, a); }
 LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}); }
 
 /// return { a[0], a[1], b[2], b[3] }

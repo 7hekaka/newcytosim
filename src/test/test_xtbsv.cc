@@ -125,49 +125,55 @@ void iso4(int N, real const* AB, real* B)
 
 void iso5(int N, real const* AB, real* B)
 {
-#if USE_SIMD && ( DIM == 3 )
-    alsatian_xtbsvLNN3(N, AB, LDAB, B);
-    //alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
-    alsatian_xtbsvLTN3(N, AB, LDAB, B);
-    //alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
+#if ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
+    alsatian_xtbsvLNN3_SIMD(N, AB, LDAB, B);
+    alsatian_xtbsvLTN3_SIMD(N, AB, LDAB, B);
+#elif ( DIM == 3 ) && defined(__SSE3__) && !REAL_IS_DOUBLE
+    alsatian_xtbsvLNN3_SSE(N, AB, LDAB, B);
+    alsatian_xtbsvLTN3_SSE(N, AB, LDAB, B);
+#elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
+    alsatian_xtbsvLNN2_SIMD(N, AB, LDAB, B);
+    alsatian_xtbsvLTN2_SIMD(N, AB, LDAB, B);
+#elif ( DIM == 1 )
+    alsatian_xtbsvLNN1(N, AB, LDAB, B);
+    alsatian_xtbsvLTN1(N, AB, LDAB, B);
 #else
-    zero_real(N, B);
+    alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
+    alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
 #endif
 }
 
 void isoLNN(int N, real const* AB, real* B)
 {
-#ifdef __AVX__
 #if ( DIM == 1 )
     alsatian_xtbsvLNN1(N, AB, LDAB, B);
+#elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
+    alsatian_xtbsvLNN2_SIMD(N, AB, LDAB, B);
 #elif ( DIM == 2 )
     alsatian_xtbsvLNN2(N, AB, LDAB, B);
-#elif ( DIM == 3 )
-    alsatian_xtbsvLNN3(N, AB, LDAB, B);
-#endif
-#elif USE_SIMD && ( DIM == 3 )
-    //alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
-    alsatian_xtbsvLNN3(N, AB, LDAB, B);
+#elif ( DIM == 3 ) && defined(__AVX__)
+    alsatian_xtbsvLNN3_AVX(N, AB, LDAB, B);
+#elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
+    alsatian_xtbsvLNN3_SIMD(N, AB, LDAB, B);
 #else
-    zero_real(N, B);
+    alsatian_xtbsvLNN<DIM>(N, 2, AB, LDAB, B);
 #endif
 }
 
 void isoLTN(int N, real const* AB, real* B)
 {
-#ifdef __AVX__
 #if ( DIM == 1 )
     alsatian_xtbsvLTN1(N, AB, LDAB, B);
+#elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
+    alsatian_xtbsvLTN2_SIMD(N, AB, LDAB, B);
 #elif ( DIM == 2 )
     alsatian_xtbsvLTN2(N, AB, LDAB, B);
-#elif ( DIM == 3 )
-    alsatian_xtbsvLTN3(N, AB, LDAB, B);
-#endif
-#elif USE_SIMD && ( DIM == 3 )
-    //alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
-    alsatian_xtbsvLTN3(N, AB, LDAB, B);
+#elif ( DIM == 3 ) && defined(__AVX__)
+    alsatian_xtbsvLTN3_AVX(N, AB, LDAB, B);
+#elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
+    alsatian_xtbsvLTN3_SIMD(N, AB, LDAB, B);
 #else
-    zero_real(N, B);
+    alsatian_xtbsvLTN<DIM>(N, 2, AB, LDAB, B);
 #endif
 }
 
@@ -198,7 +204,7 @@ void testISO(size_t cnt)
     int info;
     alsatian_xpbtf2L<2>(NPTS, AB, LDAB, &info);
     
-    //check<iso0>(NPTS, DIM, S, AB, B, "buggy BLAS", cnt);
+    //check<iso0>(NPTS, DIM, S, AB, B, "fail BLAS", cnt);
     check<iso1>(NPTS, DIM, S, AB, B, "blas_pbtrsL", cnt);
     check<iso2>(NPTS, DIM, S, AB, B, "alsa_pbtrsL<D>", cnt);
     check<iso3>(NPTS, DIM, S, AB, B, "alsa_pbtrs_U", cnt);
@@ -430,7 +436,7 @@ void testTBSV(size_t cnt)
     alsatian_xpbtf2L<RANK>(NVAL, AB, BLDD, &info);
     
 #if 1
-    check<uni0>(NVAL, 1, S, AB, B, "blas::tbsv", cnt); printf(" <FAIL");
+    check<uni0>(NVAL, 1, S, AB, B, "fail blas::tbsv", cnt);
     check<uni1>(NVAL, 1, S, AB, B, "blas_tbsv", cnt);
     check<uni2>(NVAL, 1, S, AB, B, "tbsvLxN", cnt);
     check<uni3>(NVAL, 1, S, AB, B, "tbsvLxNK<KD>", cnt);
@@ -438,7 +444,6 @@ void testTBSV(size_t cnt)
 #endif
 #if 1
     std::cout << "\nxTBSVLN ---";
-    
     //check<uniLNB>(NVAL, S, AB, B, "blas::xtbsv", cnt);
     check<uniLN0>(NVAL, 1, S, AB, B, "blas_xtbsvLN", cnt);
     check<uniLN1>(NVAL, 1, S, AB, B, "xtbsvLNN", cnt);
@@ -472,14 +477,19 @@ void testTBSV(size_t cnt)
 
 int* pivot = nullptr;
 
-#if USE_SIMD
 void getrs1(int N, real const* B, real* Y)
 {
-    alsatian_xgetrsN_SSE(N, B, N, pivot, Y);
+    int info = 0;
+    lapack::xgetrs('N', N, 1, B, N, pivot, Y, N, &info);
+    assert_true(info==0);
 }
-#endif
 
 void getrs2(int N, real const* B, real* Y)
+{
+    lapack_xgetrsN(N, B, N, pivot, Y);
+}
+
+void getrs3(int N, real const* B, real* Y)
 {
     //alsatian_xgetrsN(N, B, N, pivot, Y);
     // Apply row interchanges to the right hand side.
@@ -490,17 +500,29 @@ void getrs2(int N, real const* B, real* Y)
     alsatian_xtrsmLUN1I(N, (float*)B, N, Y);
 }
 
-void getrs3(int N, real const* B, real* Y)
-{
-    lapack_xgetrsN(N, B, N, pivot, Y);
-}
-
 void getrs4(int N, real const* B, real* Y)
 {
-    int info = 0;
-    lapack::xgetrs('N', N, 1, B, N, pivot, Y, N, &info);
-    assert_true(info==0);
+#if USE_SIMD
+    // Apply row interchanges to the right hand side.
+    xlaswp1(Y, 1, N, pivot);
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1U_SSE(N, (float*)B, N, Y);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1I_SSE(N, (float*)B, N, Y);
+#else
+    zero_real(N, Y);
+#endif
 }
+
+void getrs5(int N, real const* B, real* Y)
+{
+#if USE_SIMD
+    alsatian_xgetrsN_SSE(N, B, N, pivot, Y);
+#else
+    zero_real(N, Y);
+#endif
+}
+
 
 /// convert doubles to floats
 void convert_to_floats(size_t cnt, double const* src, float* dst)
@@ -538,8 +560,8 @@ void testGETRS(size_t cnt)
     lapack::xgetf2(NVAL, NVAL, M, NVAL, pivot, &info);
     if ( info == 0 )
     {
-        check<getrs4>(NVAL, 1, S, M, Y, "lapack::xgetrs", cnt);
-        check<getrs3>(NVAL, 1, S, M, Y, "lapack_xgetrsN", cnt);
+        check<getrs1>(NVAL, 1, S, M, Y, "lapack::xgetrs", cnt);
+        check<getrs2>(NVAL, 1, S, M, Y, "lapack_xgetrsN", cnt);
     }
     alsatian_xgetf2(NVAL, A, NVAL, pivot, &info);
 #if REAL_IS_DOUBLE
@@ -547,10 +569,9 @@ void testGETRS(size_t cnt)
 #endif
     if ( info == 0 )
     {
-        check<getrs2>(NVAL, 1, S, A, Y, "alsa_getrsN", cnt);
-#if USE_SIMD
-        check<getrs1>(NVAL, 1, S, A, Y, "alsa_getrsNSSE", cnt);
-#endif
+        check<getrs3>(NVAL, 1, S, A, Y, "alsa_getrsN", cnt);
+        check<getrs4>(NVAL, 1, S, A, Y, "xtrsmLLN1U_SSE", cnt);
+        check<getrs5>(NVAL, 1, S, A, Y, "alsa_getrsNSSE", cnt);
     }
     free_real(Y);
     free_real(S);
@@ -562,10 +583,11 @@ void testGETRS(size_t cnt)
 
 int main(int argc, char* argv[])
 {
+    const size_t REP = 1<<10;
     RNG.seed();
-    testISO(1<<14);
-    testPOTRS(1<<10);
-    testTBSV(1<<12);
-    testGETRS(1<<10);
+    testISO(REP);
+    testPOTRS(REP);
+    testTBSV(REP);
+    testGETRS(REP);
     printf("\n");
 }

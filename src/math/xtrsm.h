@@ -1087,7 +1087,7 @@ void alsatian_xtrsmLUN1I_3D(const int M, const float* A, const int lda, real* B)
 //------------------------------------------------------------------------------
 #pragma mark - SIMD ALSATIAN DTRSM for mixed double/single-precision matrix argument
 
-#if ( DIM < 3 ) && USE_SIMD
+#if USE_SIMD
 /// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double* B)
 {
@@ -1147,9 +1147,9 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double*
 }
 #endif
 
-#if ( DIM == 3 ) && USE_SIMD
+#if USE_SIMD
 /// version for M = multiple of 3
-void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double* B)
+void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, double* B)
 {
     assert_true( M <= lda );
     assert_true( M >= 3 );
@@ -1216,8 +1216,8 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
             while ( pB < end )
             {
                 vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
-                x = fnmadd2(t1, load2d(pA+lda), x);
-                x = fnmadd2(t2, load2d(pA+lda*2), x);
+                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load2d(pA+lda*2), x); // column K+2
                 storeu2(pB, x);
                 pA += 2;
                 pB += 2;
@@ -1230,7 +1230,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, double
 #endif
 
 
-#if ( DIM < 3 ) && USE_SIMD
+#if USE_SIMD
 /// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double* B)
 {
@@ -1308,9 +1308,9 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
 }
 #endif
 
-#if ( DIM == 3 ) && USE_SIMD
+#if USE_SIMD
 /// this version works for M multiple of 3
-void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double* B)
+void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, double* B)
 {
     assert_true( M <= lda );
     assert_true( M >= 3 );
@@ -1364,8 +1364,8 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
                 --pA;
                 --pB;
                 vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
-                x = fnmadd1(t1, load1d(pA+lda), x);
-                x = fnmadd1(t2, load1d(pA+lda*2), x);
+                x = fnmadd1(t1, load1d(pA+lda), x); // column K+1
+                x = fnmadd1(t2, load1d(pA+lda*2), x); // column K+2
                 store1(pB, x);
             }
 #if defined(__AVX__)
@@ -1396,8 +1396,8 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
                 pA -= 2;
                 pB -= 2;
                 vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
-                x = fnmadd2(t1, load2d(pA+lda), x);
-                x = fnmadd2(t2, load2d(pA+lda*2), x);
+                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load2d(pA+lda*2), x); // column K+2
                 storeu2(pB, x);
             }
 #endif
@@ -1409,7 +1409,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
 //------------------------------------------------------------------------------
 #pragma mark - SIMD ALSATIAN DTRSM for single-precision matrix argument
 
-#if ( DIM < 3 ) && USE_SIMD
+#if USE_SIMD
 /// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* B)
 {
@@ -1446,8 +1446,8 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
         vec2f t1 = load2f(pA); // will use upper value
         t1 = fnmadd2f(unpacklo2f(setzero2f(), t0), t1, t0);
         store2f(pB, t1);
-        t0 = duplo2f(t0);
-        t1 = duphi2f(t1);
+        t0 = unpacklo2f(t0, t0);
+        t1 = unpackhi2f(t1, t1);
         pB += 2;
         pA += 2;
         # pragma ivdep
@@ -1464,9 +1464,9 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
 }
 #endif
 
-#if ( DIM == 3 ) && USE_SIMD
+#if USE_SIMD
 /// version for M = multiple of 3
-void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float* B)
+void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, float* B)
 {
     assert_true( M <= lda );
     assert_true( M >= 3 );
@@ -1482,8 +1482,8 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float*
         vec2f t1 = load2f(pA+1+lda);  // using upper value
         t2 = fnmadd2f(unpacklo2f(setzero2f(), t2), t1, t2);  // { T1 T2 }
         store2f(pB+1, t2);
-        t1 = duplo2f(t2);  // { T1 T1 }
-        t2 = duphi2f(t2);  // { T2 T2 }
+        t1 = unpacklo2f(t2, t2);  // { T1 T1 }
+        t2 = unpackhi2f(t2, t2);  // { T2 T2 }
         pA += 3;
         pB += 3;
         if ( pB < end )
@@ -1491,8 +1491,8 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float*
             if ( ( end - pB ) & 1 )
             {
                 vec2f x = fnmadd2f(t0, load1f(pA), load1f(pB));
-                x = fnmadd2f(t1, load1f(pA+lda), x);
-                x = fnmadd2f(t2, load1f(pA+lda*2), x);
+                x = fnmadd2f(t1, load1f(pA+lda), x); // column K+1
+                x = fnmadd2f(t2, load1f(pA+lda*2), x); // column K+2
                 store1f(pB, x);
                 pA += 1;
                 pB += 1;
@@ -1501,8 +1501,8 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float*
             while ( pB < end )
             {
                 vec2f x = fnmadd2f(t0, load2f(pA), load2f(pB));
-                x = fnmadd2f(t1, load2f(pA+lda), x);
-                x = fnmadd2f(t2, load2f(pA+lda*2), x);
+                x = fnmadd2f(t1, load2f(pA+lda), x); // column K+1
+                x = fnmadd2f(t2, load2f(pA+lda*2), x); // column K+2
                 store2f(pB, x);
                 pA += 2;
                 pB += 2;
@@ -1514,7 +1514,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* pA, const int lda, float*
 #endif
 
 
-#if ( DIM < 3 ) && USE_SIMD
+#if USE_SIMD
 /// this version works for any M, but there is another version for dimension 3 below
 void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* B)
 {
@@ -1554,10 +1554,10 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
         vec2f t0 = load2f(end);
         vec2f z = load2f(pA+lda+K);
         vec2f t1 = mul2f(z, t0); // { --, T1 }
-        t1 = duphi2f(t1); // { T1, T1 }
+        t1 = unpackhi2f(t1, t1); // { T1, T1 }
         t0 = mul2f(fnmadd2f(t1, z, t0), load2f(pA+K)); // { T0, ? }
         store2f(end, blend11f(t0, t1));
-        t0 = duplo2f(t0); // { T0, T0 }
+        t0 = unpacklo2f(t0, t0); // { T0, T0 }
         # pragma ivdep
         while ( pB < end )
         {
@@ -1571,9 +1571,9 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
 }
 #endif
 
-#if ( DIM == 3 ) && USE_SIMD
+#if USE_SIMD
 /// this version works for M multiple of 3
-void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* B)
+void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, float* B)
 {
     assert_true( M <= lda );
     assert_true( M >= 3 );
@@ -1599,8 +1599,8 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
                 --pA;
                 --pB;
                 vec2f x = fnmadd2f(t0, load1f(pA), load1f(pB));
-                x = fnmadd2f(t1, load1f(pA+lda), x);
-                x = fnmadd2f(t2, load1f(pA+lda*2), x);
+                x = fnmadd2f(t1, load1f(pA+lda), x); // column K+1
+                x = fnmadd2f(t2, load1f(pA+lda*2), x); // column K+2
                 store1f(pB, x);
             }
             # pragma ivdep
@@ -1609,8 +1609,8 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
                 pA -= 2;
                 pB -= 2;
                 vec2f x = fnmadd2f(t0, load2f(pA), load2f(pB));
-                x = fnmadd2f(t1, load2f(pA+lda), x);
-                x = fnmadd2f(t2, load2f(pA+lda*2), x);
+                x = fnmadd2f(t1, load2f(pA+lda), x); // column K+1
+                x = fnmadd2f(t2, load2f(pA+lda*2), x); // column K+2
                 store2f(pB, x);
             }
         }
@@ -1973,10 +1973,17 @@ void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* 
 #endif
     // Apply row interchanges to the right hand side.
     xlaswp1(B, 1, N, IPIV);
+#if ( DIM < 3 )
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_SSE(N, (float*)A, LDA, B);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1I_SSE(N, (float*)A, LDA, B);
+#else
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1U_3D_SSE(N, (float*)A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1I_3D_SSE(N, (float*)A, LDA, B);
+#endif
 #if 0
     // checking result against other routine:
     alsatian_xgetrsN(N, A, LDA, IPIV, T);

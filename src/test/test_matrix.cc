@@ -27,7 +27,7 @@ typedef SparMatSymBlk     SparMatB;
 typedef SparMatSymBlkDiag SparMatD;
 
 // number of multiplication in sequence
-constexpr size_t N_MUL = 89;
+constexpr size_t N_MUL = 191;
 
 // number of repeat of ( 1 prepare + N_MUL multiplications )
 constexpr size_t N_RUN = 8;
@@ -580,13 +580,12 @@ void testIsoMatrices(const size_t S, real const* x, real const* y, real * z)
 
 void testMatrices(const size_t S, real const* x, real const* y, real * z)
 {
-#if ( 1 )
+#if ( 0 )
     SparMat1 mat1; mat1.resize(S); testMatrix<SparMat1, fillMatrix>(mat1, x, y, z);
     SparMat2 mat2; mat2.resize(S); testMatrix<SparMat2, fillMatrix>(mat2, x, y, z);
-
+#endif
     SparMatB mat3; mat3.resize(S); testMatrix<SparMatB, fillMatrix>(mat3, x, y, z);
     SparMatD mat4; mat4.resize(S); testMatrix<SparMatD, fillMatrix>(mat4, x, y, z);
-#endif
     SparMatA mat5; mat5.resize(S); testMatrix<SparMatA, fillMatrix>(mat5, x, y, z);
 #if ( 0 )
     std::ofstream os1("mat1.txt");
@@ -604,7 +603,7 @@ void testMatrices(const unsigned S, const size_t F)
     setVectors(DIM*S, x, y, z);
     //beta = -RNG.preal();
 
-    if ( 1 )
+    if ( 0 )
     {
         printf("------ iso %iD x %i  filled %.2f %%", DIM, S, F*100.0/S/S);
         setIndices(S, F);
@@ -747,8 +746,8 @@ int main( int argc, char* argv[] )
     testMatrices(8*110, 1<<18);
 #endif
     //testMatrices(37, 1<<17);
-    testMatrices(15464, 27676);
-    testParallelVecmul(15464, 27676);
+    testMatrices(15494, 131836);
+    //testParallelVecmul(15464, 27676);
 #if ( 0 )
     size_t dim[5] = { 0 };
     for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));
