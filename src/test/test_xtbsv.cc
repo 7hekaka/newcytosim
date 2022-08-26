@@ -125,7 +125,10 @@ void iso4(int N, real const* AB, real* B)
 
 void iso5(int N, real const* AB, real* B)
 {
-#if ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
+#if ( DIM == 3 ) && defined(__AVX__) && REAL_IS_DOUBLE
+    alsatian_xtbsvLNN2K3_AVX(N, AB, LDAB, B);
+    alsatian_xtbsvLTN2K3_AVX(N, AB, LDAB, B);
+#elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
     alsatian_xtbsvLNN2K3_SIMD(N, AB, LDAB, B);
     alsatian_xtbsvLTN2K3_SIMD(N, AB, LDAB, B);
 #elif ( DIM == 3 ) && defined(__SSE3__) && !REAL_IS_DOUBLE
