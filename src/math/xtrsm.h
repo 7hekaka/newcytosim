@@ -1093,15 +1093,15 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double*
 {
     assert_true( M <= lda );
     assert_true( M >= DIM );
+    double *const end = B + M;
     int K = 0;
 #if ( DIM & 1 )
     // process one column to leave an even number
     if ( M & 1 )
     {
-        vec2 t = loaddup2(B);
         double * pB = B + 1;
-        double * end = B + M;
         float const* pA = A + 1;
+        vec2 t = loaddup2(B);
         // there is an even number of scalars, fitting perfectly:
         # pragma ivdep
         while ( pB < end )
@@ -1114,11 +1114,10 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double*
         ++K;
     }
 #endif
-    // process columns 2 by 2
+    // process remaining columns 2 by 2
     for ( ; K < M; K += 2 )
     {
         double * pB = B + K;
-        double * end = B + M;
         float const* pA = A + K;
         /*
         const real tmp = B[K];
@@ -1129,10 +1128,10 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, double*
         vec2 c = load2d(pA); // will use upper value
         c = fnmadd2(unpacklo2(setzero2(), b), c, b);
         storeu2(pB, c);
-        b = unpacklo2(b, b);
-        c = unpackhi2(c, c);
         pB += 2;
         pA += 2;
+        b = unpacklo2(b, b);
+        c = unpackhi2(c, c);
         # pragma ivdep
         while ( pB < end )
         {
@@ -1154,34 +1153,40 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, dou
     assert_true( M <= lda );
     assert_true( M >= 3 );
     assert_true( M%3 == 0 );
+    double *const end = B + M;
     //process columns 3 by 3
     for ( int K = 0; K < M; K += 3 )
     {
         double * pB = B + K;
-        double * end = B + M;
         pA += K;
         /*
         const real tmp = B[K];
         for ( int I = K + 1; I < M; ++I )
             B[I] -= tmp * A[I];
          */
-        /*
-         real T0 = B[K];
-         real T1 = B[K+1] - T0 * A[K+1];
-         real T2 = B[K+2] - T0 * A[K+2] - T1 * A[lda+K+2];
-        */
-        const vec2 t0 = loaddup2(pB);  // { T0 T0 }
-        vec2 t2 = fnmadd2(t0, load2d(pA+1), loadu2(pB+1));  // { T1 B2-T0*A[2] }
-        vec2 t1 = load2d(pA+1+lda);  // using upper value
-        t2 = fnmadd2(unpacklo2(setzero2(), t2), t1, t2);  // { T1 T2 }
+#if 0
+        real T0 = B[K];
+        real T1 = B[K+1] - T0 * pA[1];
+        real T2 = B[K+2] - T0 * pA[2] - T1 * pA[lda+2];
+        B[K+1] = T1;
+        B[K+2] = T2;
+        vec2 t0{T0, T0};
+        vec2 t1{T1, T1};
+        vec2 t2{T2, T2};
+#else
+        vec2 t0 = loaddup2(pB);  // { T0 T0 }
+        vec2 t1 = fnmadd2(t0, load2d(pA+1), loadu2(pB+1));  // { T1 B2-T0*A[2] }
+        vec2 t2 = load2d(pA+1+lda);  // using upper value
+        t2 = fnmadd2(unpacklo2(setzero2(), t1), t2, t1);  // { T1 T2 }
         storeu2(pB+1, t2);
-        t1 = unpacklo2(t2, t2);  // { T1 T1 }
+        t1 = unpacklo2(t1, t1);  // { T1 T1 }
         t2 = unpackhi2(t2, t2);  // { T2 T2 }
+#endif
         pA += 3;
         pB += 3;
         if ( pB < end )
         {
-            if ( ( end - pB ) & 1 )
+            if (( end - pB ) & 1 )
             {
                 vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
                 x = fnmadd1(t1, load1d(pA+lda), x);
@@ -1191,14 +1196,6 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, dou
                 pB += 1;
             }
 #if defined(__AVX__)
-            if ( ( end - pB ) & 2 )
-            {
-                vec2 x = sub2(loadu2(pB), mul2(t0, load2d(pA)));
-                vec2 y = add2(mul2(t1, load2d(pA+lda)), mul2(t2, load2d(pA+lda*2)));
-                storeu2(pB, sub2(x, y));
-                pA += 2;
-                pB += 2;
-            }
             vec4 tt0 = duplo2f128(cast4(t0));
             vec4 tt1 = duplo2f128(cast4(t1));
             vec4 tt2 = duplo2f128(cast4(t2));
@@ -1211,7 +1208,7 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, dou
                 pA += 4;
                 pB += 4;
             }
-#else
+#endif
             # pragma ivdep
             while ( pB < end )
             {
@@ -1222,13 +1219,121 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, dou
                 pA += 2;
                 pB += 2;
             }
-#endif
         }
         pA += lda*2;
     }
 }
 #endif
 
+
+#if USE_SIMD
+/// this version works for any M
+void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* pA, const int lda, double* B)
+{
+    assert_true( M <= lda );
+    double *const end = B + M - 1;
+    //process columns 4 by 4
+    int K = 0;
+    for ( ; K < M-3; K += 4 )
+    {
+        pA += K;
+        double * pB = B + K;
+#if 0
+        real T0 = pB[0];
+        real T1 = pB[1] - T0 * pA[1];
+        real T2 = pB[2] - T0 * pA[2] - T1 * pA[lda+2];
+        real T3 = pB[3] - T0 * pA[3] - T1 * pA[lda+3] - T2 * pA[2*lda+3];
+        pB[1] = T1;
+        pB[2] = T2;
+        pB[3] = T3;
+        vec2 t0{T0, T0}, t1{T1, T1}, t2{T2, T2}, t3{T3, T3};
+#else
+        vec2 tt = loadu2(pB);
+        vec2 t0 = duplo2(tt);
+        vec2 t1 = duphi2(fnmadd2(t0, load2d(pA), tt));
+        store1(pB+1, t1);
+        tt = fnmadd2(t1, load2d(pA+lda+2), fnmadd2(t0, load2d(pA+2), loadu2(pB+2)));
+        vec2 t2 = duplo2(tt);
+        store1(pB+2, t2);
+        vec2 t3 = duphi2(fnmadd2(t2, load2d(pA+2*lda+2), tt));
+        store1(pB+3, t3);
+#endif
+        pA += 4;
+        pB += 4;
+        if ( pB <= end )
+        {
+            if (( M - K ) & 1)
+            {
+                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+                x = fnmadd1(t1, load1d(pA+lda), x);
+                x = fnmadd1(t2, load1d(pA+2*lda), x);
+                x = fnmadd1(t3, load1d(pA+3*lda), x); // column K+3
+                store1(pB, x);
+                pA += 1;
+                pB += 1;
+            }
+#if defined(__AVX__)
+            vec4 tt0 = duplo2f128(cast4(t0));
+            vec4 tt1 = duplo2f128(cast4(t1));
+            vec4 tt2 = duplo2f128(cast4(t2));
+            vec4 tt3 = duplo2f128(cast4(t3));
+            while ( pB < end-3 )
+            {
+                vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
+                aa = fnmadd4(tt1, load4d(pA+lda), aa);
+                aa = fnmadd4(tt2, load4d(pA+2*lda), aa);
+                aa = fnmadd4(tt3, load4d(pA+3*lda), aa); // column K+3
+                storeu4(pB, aa);
+                pA += 4;
+                pB += 4;
+            }
+#endif
+            # pragma ivdep
+            while ( pB < end )
+            {
+                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load2d(pA+2*lda), x); // column K+2
+                x = fnmadd2(t3, load2d(pA+3*lda), x); // column K+3
+                storeu2(pB, x);
+                pA += 2;
+                pB += 2;
+            }
+        }
+        pA += 3*lda;
+    }
+    /*
+    for ( ; K < M; ++K )
+    {
+        const real tmp = B[K];
+        # pragma ivdep
+        for ( int I = K + 1; I < M; ++I )
+            B[I] -= tmp * pA[I];
+        pA += lda;
+    }
+     */
+    // process remaining columns
+    for ( ; K < M; ++K )
+    {
+        pA += K + 1;
+        double * pB = B + K + 1;
+        vec2 t = loaddup2(B+K);
+        # pragma ivdep
+        while ( pB < end )
+        {
+            storeu2(pB, fnmadd2(t, load2d(pA), loadu2(pB)));
+            pA += 2;
+            pB += 2;
+        }
+        if ( pB <= end )
+        {
+            store1(pB, fnmadd1(t, load1d(pA), load1(pB)));
+            ++pA;
+            ++pB;
+        }
+    }
+}
+#endif
 
 #if USE_SIMD
 /// this version works for any M, but there is another version for dimension 3 below
@@ -1245,12 +1350,6 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
         double * pB = B;
         double * end = B + K;
         float const* pA = A;
-        /*
-         const real tmp = B[K] * A[K];
-         B[K] = tmp;
-         for ( int I = 0; I < K; ++I )
-             B[I] -= tmp * A[I];
-         */
         vec2 t = mul1(load1(end), load1d(pA+K));
         t = unpacklo2(t, t); // { T0, T0 }
         // there is an even number of scalars remaining, fitting perfectly:
@@ -1270,21 +1369,6 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, double*
     for ( ; K >= 0; K -= 2 )
     {
         A -= 2*lda;
-        /*
-         const real tmp = B[K] * A[K];
-         B[K] = tmp;
-         for ( int I = 0; I < K; ++I )
-             B[I] -= tmp * A[I];
-         */
-#if 0
-        real T1 = A[lda+K+1] * B[K+1];
-        real T0 = A[    K  ] * ( B[K  ] - T1 * A[lda+K] );
-        B[K  ] = T0;
-        B[K+1] = T1;
-        for ( int I = 0; I < K; ++I )
-            B[I] -= T0 * pA[I] + T1 * pA[I+lda];
-        continue;
-#endif
         double * pB = B;
         double * end = B + K;
         float const* pA = A;
@@ -1369,15 +1453,6 @@ void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, doub
                 store1(pB, x);
             }
 #if defined(__AVX__)
-            if ( ( pB - B ) & 2 )
-            {
-                pA -= 2;
-                pB -= 2;
-                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
-                x = fnmadd2(t1, load2d(pA+lda), x);
-                x = fnmadd2(t2, load2d(pA+lda*2), x);
-                storeu2(pB, x);
-            }
             vec4 tt0 = duplo2f128(cast4(t0));
             vec4 tt1 = duplo2f128(cast4(t1));
             vec4 tt2 = duplo2f128(cast4(t2));
@@ -1390,7 +1465,7 @@ void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, doub
                 aa = fnmadd4(tt2, load4d(pA+lda*2), aa);
                 storeu4(pB, aa);
             }
-#else
+#endif
             while ( pB > B )
             {
                 pA -= 2;
@@ -1400,7 +1475,117 @@ void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, doub
                 x = fnmadd2(t2, load2d(pA+lda*2), x); // column K+2
                 storeu2(pB, x);
             }
+        }
+    }
+}
 #endif
+
+
+#if USE_SIMD
+/// this version works for any M
+void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, double* B)
+{
+    assert_true( M <= lda );
+    A += M * lda;
+    //process columns 4 by 4
+    int K = M;
+    while ( K > 3 )
+    {
+        K -= 4;
+        A -= 4*lda;
+        double * pB = B + K;
+        float const* pA = A + K;
+#if 0
+        real T3 = pA[3*lda+3] * pB[3];
+        real T2 = pA[2*lda+2] * ( pB[2] - T3 * pA[3*lda+2] );
+        real T1 = pA[1*lda+1] * ( pB[1] - T3 * pA[3*lda+1] - T2 * pA[2*lda+1] );
+        real T0 = pA[      0] * ( pB[0] - T3 * pA[3*lda  ] - T2 * pA[2*lda] - T1 * pA[lda] );
+        vec2 t0{T0, T0}, t1{T1, T1}, t2{T2, T2}, t3{T3, T3};
+#else
+        vec2 b2 = loadu2(pB+2);
+        vec2 a30 = load2d(pA+3*lda);
+        vec2 a32 = load2d(pA+3*lda+2);
+        vec2 t3 = duphi2(mul2(a32, b2));
+        vec2 t2 = duplo2(mul1(load1d(pA+2*lda+2), fnmadd1(t3, load1d(pA+3*lda+2), b2)));
+        vec2 tt = fnmadd2(t2, load2d(pA+2*lda), fnmadd2(t3, a30, loadu2(pB)));
+        vec2 t1 = duphi2(mul2(load2d(pA+lda), tt));
+        tt = mul1(load1d(pA), fnmadd1(t1, load1d(pA+lda), tt));
+        vec2 t0 = duplo2(tt);
+#endif
+        storeu2(pB, blend11(t0, t1));
+        storeu2(pB+2, blend11(t2, t3));
+        if ( pB > B )
+        {
+            // there could be a odd number of scalar remaining:
+            if ( ( pB - B ) & 1 )
+            {
+                --pA;
+                --pB;
+                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+                x = fnmadd1(t1, load1d(pA+lda), x); // column K+1
+                x = fnmadd1(t2, load1d(pA+2*lda), x); // column K+2
+                x = fnmadd1(t3, load1d(pA+3*lda), x); // column K+2
+                store1(pB, x);
+            }
+#if defined(__AVX__)
+            vec4 tt0 = duplo2f128(cast4(t0));
+            vec4 tt1 = duplo2f128(cast4(t1));
+            vec4 tt2 = duplo2f128(cast4(t2));
+            vec4 tt3 = duplo2f128(cast4(t3));
+            while ( pB > B+3 )
+            {
+                pA -= 4;
+                pB -= 4;
+                vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
+                aa = fnmadd4(tt1, load4d(pA+lda), aa);
+                aa = fnmadd4(tt2, load4d(pA+2*lda), aa);
+                aa = fnmadd4(tt3, load4d(pA+3*lda), aa);
+                storeu4(pB, aa);
+            }
+#endif
+            while ( pB > B )
+            {
+                pA -= 2;
+                pB -= 2;
+                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load2d(pA+2*lda), x); // column K+2
+                x = fnmadd2(t3, load2d(pA+3*lda), x); // column K+3
+                storeu2(pB, x);
+            }
+        }
+    }
+    /*
+    while ( K > 0 ) {
+        K -= 1;
+        const real tmp = B[K] * A[K];
+        B[K] = tmp;
+        for ( int I = 0; I < K; ++I )
+            B[I] -= tmp * A[I];
+    }
+    */
+    // process remaining columns:
+    while ( K > 0 )
+    {
+        K -= 1;
+        A -= lda;
+        double * pB = B + K;
+        float const* pA = A + K;
+        vec2 t = mul1(load1(pB), load1d(pA));
+        t = unpacklo2(t, t); // { T0, T0 }
+        store1(pB, t);
+        if (( pB - B ) & 1 )
+        {
+            pA -= 1;
+            pB -= 1;
+            store1(pB, fnmadd1(t, load1d(pA), load1(pB)));
+        }
+        # pragma ivdep
+        while ( pB > B+1 )
+        {
+            pA -= 2;
+            pB -= 2;
+            store2(pB, fnmadd2(t, load2d(pA), load2(pB)));
         }
     }
 }
@@ -1415,6 +1600,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
 {
     assert_true( M <= lda );
     assert_true( M >= DIM );
+    float *const end = B + M;
     int K = 0;
 #if ( DIM & 1 )
     // process one column to leave an even number
@@ -1422,7 +1608,6 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
     {
         vec2f t = loaddupf(B);
         float * pB = B + 1;
-        float * end = B + M;
         float const* pA = A + 1;
         // there is an even number of scalars, fitting perfectly:
         # pragma ivdep
@@ -1440,7 +1625,6 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
     for ( ; K < M; K += 2 )
     {
         float * pB = B + K;
-        float * end = B + M;
         float const* pA = A + K;
         vec2f t0 = load2f(pB);
         vec2f t1 = load2f(pA); // will use upper value
@@ -1471,11 +1655,11 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, flo
     assert_true( M <= lda );
     assert_true( M >= 3 );
     assert_true( M%3 == 0 );
+    float *const end = B + M;
     //process columns 3 by 3
     for ( int K = 0; K < M; K += 3 )
     {
         float * pB = B + K;
-        float * end = B + M;
         pA += K;
         const vec2f t0 = loaddupf(pB);  // { T0 T0 }
         vec2f t2 = fnmadd2f(t0, load2f(pA+1), load2f(pB+1));  // { T1 B2-T0*A[2] }
@@ -1863,7 +2047,7 @@ void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)
 
 
 //------------------------------------------------------------------------------
-#pragma mark - LAPACK-STYLE ROUTINES for General LU factorization
+#pragma mark - LAPACK-STYLE ROUTINES for General Matrix LU factorization
 
 /**
  Call lapack::xgetf2() to compute the LU factorization, and inverts diagonal terms
@@ -1879,7 +2063,7 @@ void alsatian_xgetf2(const int N, real* A, const int LDA, int* IPIV, int* INFO)
     }
 }
 
-/// factorize a single-precision matrix
+/// factorize a single-precision matrix, with inverted diagonal terms
 void alsatian_sgetf2(const int N, float* A, const int LDA, int* IPIV, int* INFO)
 {
     lapack::sgetf2(N, N, A, LDA, IPIV, INFO);
@@ -1891,7 +2075,7 @@ void alsatian_sgetf2(const int N, float* A, const int LDA, int* IPIV, int* INFO)
     }
 }
 
-
+/// Following LAPACK's interface
 inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, const int* IPIV, real* B, int LDB, int* INFO)
 {
     *INFO = 0;
@@ -1916,7 +2100,7 @@ inline void lapack_xgetrs(char TRANS, int N, int NRHS, const real* A, int LDA, c
 }
 
 
-/// following the standard LAPACK interface
+/// departing from the standard LAPACK interface, specialized for TRANS='N'
 template < typename REAL >
 void lapack_xgetrsN(int N, int NRHS, const REAL* A, int LDA, const int* IPIV, REAL* B, int LDB, int* INFO)
 {
@@ -1933,7 +2117,7 @@ void lapack_xgetrsN(int N, int NRHS, const REAL* A, int LDA, const int* IPIV, RE
     }
 }
 
-/// version of xgetrs('N', ...) for NRHS==1
+/// simplified calling interface equivalent to xgetrs(TRANS='N', N, NRHS==1, ...)
 template < typename REAL >
 void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 {
@@ -1946,7 +2130,8 @@ void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
 }
 
 
-/// version of xgetrs('N', ...) for NRHS==1 and inverted diagonal terms
+/// simplified calling interface equivalent to xgetrs(TRANS='N', N, NRHS==1, ...)
+/// this version assumes that diagonal terms have been inverted, and that A is single precision array
 /**
  This is used to apply the full block preconditionner, stored in single precision.
  We could use non-temporal loads for the matrix A, since it will not fit in the cache,
@@ -1967,25 +2152,22 @@ void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
 /// This is used to apply the full block preconditionner, stored in single precision.
 void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* B)
 {
-#if 0
-    // checking result against other routine:
-    real * T = new_real(N); copy_real(N, B, T);
-#endif
     // Apply row interchanges to the right hand side.
     xlaswp1(B, 1, N, IPIV);
-#if ( DIM < 3 )
     // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1U_SSE(N, (float*)A, LDA, B);
+    alsatian_xtrsmLLN1U_4U_SSE(N, (float*)A, LDA, B);
     // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1I_SSE(N, (float*)A, LDA, B);
-#else
-    // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1U_3D_SSE(N, (float*)A, LDA, B);
-    // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1I_3D_SSE(N, (float*)A, LDA, B);
-#endif
-#if 0
-    // checking result against other routine:
+    alsatian_xtrsmLUN1I_4U_SSE(N, (float*)A, LDA, B);
+}
+
+/// This compares results obtained by standard and optimized routines
+void alsatian_xgetrsN_SSE_CHECK(int N, const real* A, int LDA, const int* IPIV, real* B)
+{
+    real * T = new_real(N);
+    copy_real(N, B, T);
+
+    alsatian_xgetrsN_SSE(N, A, LDA, IPIV, B);
+
     alsatian_xgetrsN(N, A, LDA, IPIV, T);
     real err = blas::difference(N, B, T);
     if ( std::isnan(err) || err > 0.01 )
@@ -1994,8 +2176,8 @@ void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* 
         VecPrint::edges("ref---", N, T, 3);
     }// else printf("\n xgetrs %3i okay!", N);
     free_real(T);
-#endif
 }
+
 #endif
 
 /// version of xgetrs('N', ...) for ORD interleaved vectors in right-hand-side B
