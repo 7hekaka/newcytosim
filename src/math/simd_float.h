@@ -92,9 +92,9 @@ LOCAL vec4f duplo4f(vec4f a) { return _mm_moveldup_ps(a); }
 // returns { a[1], a[1], a[3], a[3] }
 LOCAL vec4f duphi4f(vec4f a) { return _mm_movehdup_ps(a); }
 
-// return { B1, A1 } from a = { A0, A1 } and b = { B0, B1 }
+// return { b[2], b[3], a[2], a[2] }
 LOCAL vec4f movehl4f(vec4f a, vec4f b) { return _mm_movehl_ps(a, b); }
-// return { A0, B0 } from a = { A0, A1 } and b = { B0, B1 }
+// return { a[0], a[1], b[0], b[1] }
 LOCAL vec4f movelh4f(vec4f a, vec4f b) { return _mm_movelh_ps(a, b); }
 
 // return { A0, A1, A0, A1 }

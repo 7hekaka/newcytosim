@@ -235,6 +235,11 @@ LOCAL vec4f unpacklo4f(vec4f a, vec4f b) { return vzip1q_f32(a, b); }
 // returns { a[2], b[2], a[3], b[3] }
 LOCAL vec4f unpackhi4f(vec4f a, vec4f b) { return vzip2q_f32(a, b); }
 
+// return { b[2], b[3], a[2], a[2] }
+LOCAL vec4f movehl4f(vec4f a, vec4f b) { return vcombine_f32(vget_high_f32(b), vget_high_f32(a)); }
+// return { a[0], a[1], b[0], b[1] }
+LOCAL vec4f movelh4f(vec4f a, vec4f b) { return vcombine_f32(vget_low_f32(a), vget_low_f32(b)); }
+
 // copy a[0] into all elements of destination
 LOCAL vec4f broadcastXf(vec4f a) { return vdupq_laneq_f32(a,0); }
 // copy a[1] into all elements of destination
@@ -248,3 +253,11 @@ LOCAL vec4f broadcastTf(vec4f a) { return vdupq_laneq_f32(a,3); }
 LOCAL vec4f fmadd4f(vec4f a, vec4f b, vec4f c)  { return vfmaq_f32(c,a,b); }
 /// c - a * b
 LOCAL vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return vfmsq_f32(c,a,b); }
+
+LOCAL int lower_mask4f(vec4f a, vec4f b)
+{
+    uint32x4_t input = vcltq_f32(a, b);
+    static const int32x4_t shift = {0, 1, 2, 3};
+    uint32x4_t tmp = vshrq_n_u32(input, 31);
+    return vaddvq_u32(vshlq_u32(tmp, shift));
+}
