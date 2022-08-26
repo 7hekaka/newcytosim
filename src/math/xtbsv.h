@@ -1133,7 +1133,7 @@ void alsatian_xtbsvLNN2K3_SIMD(const int N, const double* pA, const int lda, dou
     const double*const end = pA + (N-2) * lda;
     vec2 x1 = load2(pX);
     vec2 z1 = load1(pX+2);
-    vec2 x2 = load2(pX+ORD);
+    vec2 x2 = loadu2(pX+ORD);
     vec2 z2 = load1(pX+ORD+2);
     while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
     {
@@ -1144,9 +1144,9 @@ void alsatian_xtbsvLNN2K3_SIMD(const int N, const double* pA, const int lda, dou
         vec2 z0 = z1;
         x1 = fnmadd2(x1, a1, x2);
         z1 = fnmadd1(z1, a1, z2);
-        x2 = fnmadd2(x0, a2, load2(pX+2*ORD));
+        x2 = fnmadd2(x0, a2, loadu2(pX+2*ORD));
         z2 = fnmadd1(z0, a2, load1(pX+2*ORD+2));
-        store2(pX, mul2(a0, x0));
+        storeu2(pX, mul2(a0, x0));
         store1(pX+2, mul1(a0, z0));
         pA += lda;
         pX += ORD;
@@ -1159,19 +1159,19 @@ void alsatian_xtbsvLNN2K3_SIMD(const int N, const double* pA, const int lda, dou
         vec2 z0 = mul1(z1, a0);
         x1 = fnmadd2(x0, a1, x2);
         z1 = fnmadd1(z0, a1, z2);
-        store2(pX, x0);
+        storeu2(pX, x0);
         store1(pX+2, z0);
         //pA += lda;
         //pX += ORD;
         // j = N-1:
         a0 = loaddup2(pA+lda);
-        store2(pX+ORD, mul2(x1, a0));
+        storeu2(pX+ORD, mul2(x1, a0));
         store1(pX+ORD+2, mul1(z1, a0));
     }
     else if ( N >= 1 ) // j = N-1
     {
         vec2 a0 = loaddup2(pA);
-        store2(pX, mul2(x1, a0));
+        storeu2(pX, mul2(x1, a0));
         store1(pX+2, mul1(z1, a0));
         //pA += lda;
         //pX += ORD;
@@ -1270,7 +1270,7 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
         if ( N > 0 ) // j = N-1
         {
             vec2 a0 = loaddup2(pA);
-            x2 = mul2(a0, load2(pX));
+            x2 = mul2(a0, loadu2(pX));
             z2 = mul1(a0, load1(pX+2));
             store2(pX, x2);
             store1(pX+2, z2);
@@ -1281,8 +1281,8 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
         {
             vec2 a0 = loaddup2(pA);
             a1 = mul2(a0, loaddup2(pA+1));
-            x1 = fnmadd2(a1, x2, mul2(a0, load2(pX)));
-            z1 = fnmadd2(a1, z2, mul1(a0, load1(pX+2)));
+            x1 = fnmadd2(a1, x2, mul2(a0, loadu2(pX)));
+            z1 = fnmadd1(a1, z2, mul1(a0, load1(pX+2)));
             store2(pX, x1);
             store1(pX+2, z1);
             //pA -= lda;
@@ -1294,7 +1294,7 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
     vec2 a0 = loaddup2(pA);
     x1 = mul2(a0, load2(pX));
     z1 = mul1(a0, load1(pX+2));
-    store2(pX, x1);
+    storeu2(pX, x1);
     store1(pX+2, z1);
     pA -= lda;
     pX -= ORD;
@@ -1303,9 +1303,9 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
     // j = N-2
     a0 = loaddup2(pA);
     a1 = mul2(a0, loaddup2(pA+1));
-    x1 = fnmadd2(a1, x1, mul2(a0, load2(pX)));
+    x1 = fnmadd2(a1, x1, mul2(a0, loadu2(pX)));
     z1 = fnmadd1(a1, z1, mul1(a0, load1(pX+2)));
-    store2(pX, x1);
+    storeu2(pX, x1);
     store1(pX+2, z1);
     pA -= lda;
     pX -= ORD;
@@ -1314,13 +1314,13 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
         a0 = loaddup2(pA);
         a1 = mul2(a0, loaddup2(pA+1));
         a2 = mul2(a0, loaddup2(pA+2));
-        vec2 x0 = fnmadd2(a2, x2, mul2(a0, load2(pX)));
+        vec2 x0 = fnmadd2(a2, x2, mul2(a0, loadu2(pX)));
         vec2 z0 = fnmadd1(a2, z2, mul2(a0, load1(pX+2)));
         x2 = x1;
         z2 = z1;
         x1 = fnmadd2(a1, x1, x0);
         z1 = fnmadd1(a1, z1, z0);
-        store2(pX, x1);
+        storeu2(pX, x1);
         store1(pX+2, z1);
         pA -= lda;
         pX -= ORD;
@@ -1329,11 +1329,11 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
     a0 = loaddup2(pA);
     a1 = mul2(a0, loaddup2(pA+1));
     a2 = mul2(a0, loaddup2(pA+2));
-    x2 = fnmadd2(a2, x2, mul2(a0, load2(pX)));
+    x2 = fnmadd2(a2, x2, mul2(a0, loadu2(pX)));
     z2 = fnmadd1(a2, z2, mul2(a0, load1(pX+2)));
     x1 = fnmadd2(a1, x1, x2);
     z1 = fnmadd1(a1, z1, z2);
-    store2(pX, x1);
+    storeu2(pX, x1);
     store1(pX+2, z1);
 }
 #endif

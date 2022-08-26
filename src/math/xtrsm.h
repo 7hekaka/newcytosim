@@ -1277,6 +1277,7 @@ void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* pA, const int lda, dou
             vec4 tt1 = duplo2f128(cast4(t1));
             vec4 tt2 = duplo2f128(cast4(t2));
             vec4 tt3 = duplo2f128(cast4(t3));
+            # pragma ivdep
             while ( pB < end-3 )
             {
                 vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
@@ -1442,7 +1443,7 @@ void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, doub
         store1(pB, t0);
         if ( pB > B )
         {
-            // there could be a odd number of scalar remaining:
+            // there could be an odd number of scalar remaining:
             if ( ( pB - B ) & 1 )
             {
                 --pA;
@@ -1516,7 +1517,7 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
         storeu2(pB+2, blend11(t2, t3));
         if ( pB > B )
         {
-            // there could be a odd number of scalar remaining:
+            // there could be an odd number of scalar remaining:
             if ( ( pB - B ) & 1 )
             {
                 --pA;
@@ -1532,6 +1533,7 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
             vec4 tt1 = duplo2f128(cast4(t1));
             vec4 tt2 = duplo2f128(cast4(t2));
             vec4 tt3 = duplo2f128(cast4(t3));
+            # pragma ivdep
             while ( pB > B+3 )
             {
                 pA -= 4;
@@ -1543,6 +1545,7 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
                 storeu4(pB, aa);
             }
 #endif
+            # pragma ivdep
             while ( pB > B )
             {
                 pA -= 2;

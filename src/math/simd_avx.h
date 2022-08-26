@@ -116,7 +116,6 @@ LOCAL vec4 duplohi4(vec4 a) { return _mm256_permute_pd(a,0b1100); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)
 #define permute4(a,k)       _mm256_permute_pd(a,k)
-#define permute2(a,k)       _mm_permute_pd(a,k)       // same as shuffle2(a,a,k)
 #define shuffle4(a,b,k)     _mm256_shuffle_pd(a,b,k)
 #define cmp4(a,b,k)         _mm256_cmp_pd(a,b,k)
 

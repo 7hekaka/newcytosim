@@ -30,7 +30,8 @@ LOCAL vec2f sub2f(vec2f a, vec2f b) { return _mm_sub_ps(a,b); }
 LOCAL vec2f mul2f(vec2f a, vec2f b) { return _mm_mul_ps(a,b); }
 
 /// return { a[0], b[1] }
-LOCAL vec2f blend11f(vec2f a, vec2f b) { return _mm_blend_ps(a,b,0b1010); }
+//LOCAL vec2f blend11f(vec2f a, vec2f b) { return _mm_blend_ps(a,b,0b1010); }
+LOCAL vec2f blend11f(vec2f a, vec2f b) { return _mm_shuffle_ps(_mm_shuffle_ps(a, b, 0x44), b, 0xEC); }
 
 // returns { a[0], a[0] }
 LOCAL vec2f duplo2f(vec2f a) { return _mm_moveldup_ps(a); }
