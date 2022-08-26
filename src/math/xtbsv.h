@@ -600,7 +600,7 @@ void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
 
 
 /// Specialized version for KD==6
-void alsatian_xtbsvLNN6(const int N, const real* A, const int lda, real* X)
+void alsatian_xtbsvLNN6K(const int N, const real* A, const int lda, real* X)
 {
     const real * end = X + N - 6;
     //constexpr int KD = 6;
@@ -647,7 +647,7 @@ void alsatian_xtbsvLNN6(const int N, const real* A, const int lda, real* X)
 
 
 /// Specialized version for KD==6
-void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* X)
+void alsatian_xtbsvLTN6K(const int N, const real* A, const int lda, real* X)
 {
     const real * end = X;
     //constexpr int KD = 6;
@@ -686,7 +686,7 @@ void alsatian_xtbsvLTN6(const int N, const real* A, const int lda, real* X)
  Beware: this works assuming that N >= KD, and it will in particular write
  to X[i] for i = 0 ... 6 for any value of N.
 */
-void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* X)
+void alsatian_xtbsvLNN6K_SSE(const int N, const double* A, const int lda, double* X)
 {
     constexpr int KD = 6;
     assert_true( lda > KD );
@@ -804,7 +804,7 @@ void alsatian_xtbsvLNN6SSE(const int N, const double* A, const int lda, double* 
  Beware: this works assuming that N >= KD, and it will in particular write
  to X[i] for i = 0 ... 6 for any value of N.
 */
-void alsatian_xtbsvLTN6SSE(const int N, const double* A, const int lda, double* X)
+void alsatian_xtbsvLTN6K_SSE(const int N, const double* A, const int lda, double* X)
 {
     const double * end = X;
     //constexpr int KD = 6;
@@ -1086,7 +1086,7 @@ void alsatian_xtbsvLTN_BUF(const int N, const int KD, const real* A, const int l
 
 #if defined(__AVX__)
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLNN3_AVX(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLNN2K3_AVX(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 3;
     const double*const end = pA + (N-2) * lda;
@@ -1127,7 +1127,7 @@ void alsatian_xtbsvLNN3_AVX(const int N, const double* pA, const int lda, double
 }
 #elif USE_SIMD
 /// specialized SSE & ARM's NEON version for KD==2 and ORD==3 (21.08.2022)
-void alsatian_xtbsvLNN3_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLNN2K3_SIMD(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 3;
     const double*const end = pA + (N-2) * lda;
@@ -1181,7 +1181,7 @@ void alsatian_xtbsvLNN3_SIMD(const int N, const double* pA, const int lda, doubl
 
 #if defined(__AVX__)
 /// specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLTN3_AVX(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLTN2K3_AVX(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 3;
     const double*const end = pA + lda;
@@ -1257,7 +1257,7 @@ void alsatian_xtbsvLTN3_AVX(const int N, const double* pA, const int lda, double
 }
 #elif USE_SIMD
 /// specialized version for KD==2 and ORD==3, using SSE or ARM's NEON (21.08.2022)
-void alsatian_xtbsvLTN3_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 3;
     const double*const end = pA + lda;
@@ -1343,7 +1343,7 @@ void alsatian_xtbsvLTN3_SIMD(const int N, const double* pA, const int lda, doubl
 
 #if defined(__SSE3__)
 /// single precision 3D-specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLNN3_SSE(const int N, const float* pA, const int lda, float* pX)
+void alsatian_xtbsvLNN2K3_SSE(const int N, const float* pA, const int lda, float* pX)
 {
     constexpr int ORD = 3;
     const float*const end = pA + (N-2) * lda;
@@ -1386,7 +1386,7 @@ void alsatian_xtbsvLNN3_SSE(const int N, const float* pA, const int lda, float* 
 
 #if defined(__SSE3__)
 /// single precision 3D-specialized version for KD==2 and ORD==3
-void alsatian_xtbsvLTN3_SSE(const int N, const float* pA, const int lda, float* pX)
+void alsatian_xtbsvLTN2K3_SSE(const int N, const float* pA, const int lda, float* pX)
 {
     constexpr int ORD = 3;
     const float*const end = pA + lda;
@@ -1464,7 +1464,7 @@ void alsatian_xtbsvLTN3_SSE(const int N, const float* pA, const int lda, float* 
 
 #if USE_SIMD
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLNN2_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLNN2K2_SIMD(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 2;
     vec2 x1 = load2(pX);     //may load garbage if N == 0
@@ -1511,7 +1511,7 @@ void alsatian_xtbsvLNN2_SIMD(const int N, const double* pA, const int lda, doubl
 
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_xtbsvLTN2_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_xtbsvLTN2K2_SIMD(const int N, const double* pA, const int lda, double* pX)
 {
     constexpr int ORD = 2;
     pX += ( N - 1 ) * ORD;
@@ -1561,7 +1561,7 @@ void alsatian_xtbsvLTN2_SIMD(const int N, const double* pA, const int lda, doubl
 #pragma mark - 1D-Isotropic Symmetric Banded Solve xTBSV for KD==2
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLNN2K1(const int N, const real* pA, const int lda, real* pX)
 {
     real x1 = pX[0]; //may load garbage
     real x2 = pX[1]; //may load garbage
@@ -1602,7 +1602,7 @@ void alsatian_xtbsvLNN1(const int N, const real* pA, const int lda, real* pX)
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLTN1(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLTN2K1(const int N, const real* pA, const int lda, real* pX)
 {
     pX += ( N - 1 );
     pA += ( N - 1 ) * lda;
@@ -1724,14 +1724,14 @@ void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
     if ( ORD == 3 )
     {
 #if defined(__AVX__) && REAL_IS_DOUBLE
-        alsatian_xtbsvLNN3_AVX(N, AB, LDAB, B);
-        alsatian_xtbsvLTN3_AVX(N, AB, LDAB, B);
+        alsatian_xtbsvLNN2K3_AVX(N, AB, LDAB, B);
+        alsatian_xtbsvLTN2K3_AVX(N, AB, LDAB, B);
 #elif USE_SIMD && REAL_IS_DOUBLE
-        alsatian_xtbsvLNN3_SIMD(N, AB, LDAB, B);
-        alsatian_xtbsvLTN3_SIMD(N, AB, LDAB, B);
+        alsatian_xtbsvLNN2K3_SIMD(N, AB, LDAB, B);
+        alsatian_xtbsvLTN2K3_SIMD(N, AB, LDAB, B);
 #elif defined(__SSE3__) && !REAL_IS_DOUBLE
-        alsatian_xtbsvLNN3_SSE(N, AB, LDAB, B);
-        alsatian_xtbsvLTN3_SSE(N, AB, LDAB, B);
+        alsatian_xtbsvLNN2K3_SSE(N, AB, LDAB, B);
+        alsatian_xtbsvLTN2K3_SSE(N, AB, LDAB, B);
 #else
         alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
         alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);
@@ -1740,8 +1740,8 @@ void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
     else if ( ORD == 2 )
     {
 #if USE_SIMD && REAL_IS_DOUBLE
-        alsatian_xtbsvLNN2_SIMD(N, AB, LDAB, B);
-        alsatian_xtbsvLTN2_SIMD(N, AB, LDAB, B);
+        alsatian_xtbsvLNN2K2_SIMD(N, AB, LDAB, B);
+        alsatian_xtbsvLTN2K2_SIMD(N, AB, LDAB, B);
 #else
         alsatian_xtbsvLNN<ORD>(N, 2, AB, LDAB, B);
         alsatian_xtbsvLTN<ORD>(N, 2, AB, LDAB, B);
@@ -1749,8 +1749,8 @@ void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
     }
     else if ( ORD == 1 )
     {
-        alsatian_xtbsvLNN1(N, AB, LDAB, B);
-        alsatian_xtbsvLTN1(N, AB, LDAB, B);
+        alsatian_xtbsvLNN2K1(N, AB, LDAB, B);
+        alsatian_xtbsvLTN2K1(N, AB, LDAB, B);
     }
     else
         ABORT_NOW("unexpected dimension!");
@@ -1780,11 +1780,11 @@ void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
     if ( KD == 6 )
     {
 #if REAL_IS_DOUBLE && defined(__SSE3__)
-        alsatian_xtbsvLNN6SSE(N, AB, LDAB, B);
-        alsatian_xtbsvLTN6SSE(N, AB, LDAB, B);
+        alsatian_xtbsvLNN6K_SSE(N, AB, LDAB, B);
+        alsatian_xtbsvLTN6K_SSE(N, AB, LDAB, B);
 #else
-        alsatian_xtbsvLNN6(N, AB, LDAB, B);
-        alsatian_xtbsvLTN6(N, AB, LDAB, B);
+        alsatian_xtbsvLNN6K(N, AB, LDAB, B);
+        alsatian_xtbsvLTN6K(N, AB, LDAB, B);
 #endif
     }
     else
