@@ -29,16 +29,13 @@ namespace U
 }
 
 
-/// number of segments:
-constexpr size_t NPTS = 113;
-constexpr size_t NVAL = DIM * NPTS;
-
-constexpr size_t RANK = 2*DIM;
-constexpr size_t BLDD = 2*DIM+1;
+/// rank of diagonal matrices:
+const int RANK = 2*DIM;
+const int BLDD = 2*DIM+1;
 
 
 /// print only 16 scalars from given vector
-inline void print(size_t num, real const* vec)
+inline void print(unsigned num, real const* vec)
 {
     if ( num > 12 )
     {
@@ -65,7 +62,7 @@ void nan_spill(real * dst)
 }
 
 template < void (*FUNC)(int, real const*, real*) >
-void check(int N, int ORD, real const* S, real const* AB, real* B, char const str[], size_t cnt)
+void check(int N, int ORD, real const* S, real const* AB, real* B, char const str[], size_t cnt, size_t sub=128)
 {
     printf("\n");
     copy_real(ORD*N, S, B);
@@ -73,14 +70,29 @@ void check(int N, int ORD, real const* S, real const* AB, real* B, char const st
     FUNC(N, AB, B);
     print(ORD*N, B);
     tick();
-    const size_t SUB = 128;
     for ( size_t n = 0; n < cnt; ++n )
     {
         copy_real(ORD*N, S, B);
-        for ( size_t u = 0; u < SUB; ++u )
+        for ( size_t u = 0; u < sub; ++u )
             FUNC(N, AB, B);
     }
     printf(" %-14s cpu %7.0f", str, tock());
+}
+
+template < void (*FUNC)(int, real const*, real*) >
+void multi(int N, int ORD, real const* S, real const* AB, real* B, char const str[], size_t cnt, size_t sub)
+{
+    size_t BLK = N * N + 4;
+    copy_real(ORD*N, S, B);
+    nan_spill(B+ORD*N);
+    tick();
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        copy_real(ORD*N, S, B);
+        for ( size_t u = 0; u < sub; ++u )
+            FUNC(N, AB+u*BLK, B);
+    }
+    printf("\n uncached %-14s cpu %7.0f", str, tock());
 }
 
 //------------------------------------------------------------------------------
@@ -185,38 +197,38 @@ void isoLTN(int N, real const* AB, real* B)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testISO(size_t cnt)
+void testISO(int N, size_t cnt)
 {
-    std::cout << DIM << "D isoTBSV " << NPTS << " points --- real " << sizeof(real);
+    std::cout << DIM << "D rank 2 Cholesky factorization & iso solve " << N << " points --- real " << sizeof(real);
     std::cout << " --- " << __VERSION__;
 
-    real * AB = new_real(NPTS*LDAB+4);
-    real * S = new_real(NVAL);
-    real * B = new_real(NVAL+4);
+    real * AB = new_real(N*LDAB+4);
+    real * S = new_real(N*DIM);
+    real * B = new_real(N*DIM+4);
 
-    zero_real(NPTS*LDAB, AB);
-    nan_spill(AB+NPTS*LDAB);
-    for ( size_t i = 0; i < NVAL; ++i )
+    zero_real(N*LDAB, AB);
+    nan_spill(AB+N*LDAB);
+    for ( int i = 0; i < N*DIM; ++i )
         S[i] = 1.0 + RNG.sreal();
-    for ( size_t i = 0; i < NPTS; ++i )
+    for ( int i = 0; i < N; ++i )
     {
         AB[  LDAB*i] = 2 + 0.25 * RNG.sreal();
         AB[1+LDAB*i] = -0.125 + 0.25 * RNG.preal();
         AB[2+LDAB*i] = -0.125 + 0.25 * RNG.preal();
     }
     int info;
-    alsatian_xpbtf2L<2>(NPTS, AB, LDAB, &info);
+    alsatian_xpbtf2L<2>(N, AB, LDAB, &info);
     
     //check<iso0>(NPTS, DIM, S, AB, B, "fail BLAS", cnt);
-    check<iso1>(NPTS, DIM, S, AB, B, "blas_pbtrsL", cnt);
-    check<iso2>(NPTS, DIM, S, AB, B, "alsa_pbtrsL<D>", cnt);
-    check<iso3>(NPTS, DIM, S, AB, B, "alsa_pbtrs_U", cnt);
-    check<iso4>(NPTS, DIM, S, AB, B, "alsa_pbtrs", cnt);
-    check<iso5>(NPTS, DIM, S, AB, B, "alsa_pbtrs_SSE", cnt);
+    check<iso1>(N, DIM, S, AB, B, "blas_pbtrsL", cnt);
+    check<iso2>(N, DIM, S, AB, B, "alsa_pbtrsL<D>", cnt);
+    check<iso3>(N, DIM, S, AB, B, "alsa_pbtrs_U", cnt);
+    check<iso4>(N, DIM, S, AB, B, "alsa_pbtrs", cnt);
+    check<iso5>(N, DIM, S, AB, B, "alsa_pbtrs_SSE", cnt);
 
 #if 0 && REAL_IS_DOUBLE
-    check<isoLNN>(NPTS, DIM, S, AB, B, "tbsvLNN3", cnt);
-    check<isoLTN>(NPTS, DIM, S, AB, B, "tbsvLTN3", cnt);
+    check<isoLNN>(N, DIM, S, AB, B, "tbsvLNN3", cnt);
+    check<isoLTN>(N, DIM, S, AB, B, "tbsvLTN3", cnt);
 #endif
 
     free_real(B);
@@ -225,7 +237,7 @@ void testISO(size_t cnt)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Cholesky factorization
 
 void pot1(int N, real const* AB, real* B)
 {
@@ -254,33 +266,33 @@ void pot3(int N, real const* AB, real* B)
 }
 #endif
 
-void testPOTRS(size_t cnt)
+void testPOTRS(int N, size_t cnt)
 {
-    std::cout << "\n" << DIM << "D xTBSVLN " << NPTS << " points --- real " << sizeof(real);
+    std::cout << "\n Cholesky factorization of full matrix & iso solve " << N << " points --- real " << sizeof(real);
     std::cout << " --- " << __VERSION__;
 
-    real * AB = new_real(NPTS*NPTS+4);
-    real * S = new_real(NVAL);
-    real * B = new_real(NVAL+4);
+    real * AB = new_real(N*N+4);
+    real * S = new_real(N*DIM);
+    real * B = new_real(N*DIM+4);
 
-    for ( size_t i = 0; i < NVAL; ++i )
+    for ( size_t i = 0; i < N*DIM; ++i )
         S[i] = RNG.sreal();
-    zero_real(NPTS*NPTS, AB);
-    nan_spill(AB+NPTS*NPTS);
-    for ( size_t i = 0; i < NPTS; ++i )
+    zero_real(N*N, AB);
+    nan_spill(AB+N*N);
+    for ( size_t i = 0; i < N; ++i )
     {
         real r = 0.0625 * RNG.sreal();
-        AB[i+NPTS*i] = 1.5;
-        AB[i+1+NPTS*i] = -0.125 + r;
-        AB[i+2+NPTS*i] = -0.125 - r;
+        AB[i+N*i] = 1.5;
+        AB[i+1+N*i] = -0.125 + r;
+        AB[i+2+N*i] = -0.125 - r;
     }
     int info;
-    alsatian_xpotf2L(NPTS, AB, NPTS, &info);
+    alsatian_xpotf2L(N, AB, N, &info);
 
-    check<pot1>(NPTS, DIM, S, AB, B, "alsa_potrsLref", cnt);
-    check<pot2>(NPTS, DIM, S, AB, B, "iso_trsmLLN<D>", cnt);
+    check<pot1>(N, DIM, S, AB, B, "alsa_potrsLref", cnt);
+    check<pot2>(N, DIM, S, AB, B, "iso_trsmLLN<D>", cnt);
 #if defined(__AVX__) && REAL_IS_DOUBLE
-    check<pot3>(NPTS, DIM, S, AB, B, "alsa_trsmLLND", cnt);
+    check<pot3>(N, DIM, S, AB, B, "alsa_trsmLLND", cnt);
 #endif
     free_real(B);
     free_real(S);
@@ -409,20 +421,20 @@ void uniLT5(int N, real const* AB, real* B)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testTBSV(size_t cnt)
+void testTBSV(int N, size_t cnt)
 {
-    std::cout << "\n" << DIM << "D xTBSV " << NPTS << " points --- real " << sizeof(real);
+    std::cout << "\n rank " << RANK << " banded matrix Cholesky factorization " << N << " points --- real " << sizeof(real);
     std::cout << " --- "  << __VERSION__;
 
-    real * AB = new_real(NVAL*std::max(NVAL, BLDD)+4);
-    real * S = new_real(NVAL);
-    real * B = new_real(NVAL+4);
+    real * AB = new_real(N*std::max(N, BLDD)+4);
+    real * S = new_real(N);
+    real * B = new_real(N+4);
 
-    for ( size_t i = 0; i < NVAL; ++i )
+    for ( int i = 0; i < N; ++i )
         S[i] = RNG.sreal();
-    zero_real(NVAL*BLDD, AB);
-    nan_spill(AB+NPTS*BLDD);
-    for ( size_t i = 0; i < NVAL; ++i )
+    zero_real(N*BLDD, AB);
+    nan_spill(AB+N*BLDD);
+    for ( int i = 0; i < N; ++i )
     {
         real s = 0, r = 0.0625 * RNG.sreal();
         for ( size_t j = 1; j < BLDD; ++j )
@@ -436,40 +448,41 @@ void testTBSV(size_t cnt)
         AB[2+BLDD*i] -= r;
     }
     int info;
-    alsatian_xpbtf2L<RANK>(NVAL, AB, BLDD, &info);
+    alsatian_xpbtf2L<RANK>(N, AB, BLDD, &info);
     
 #if 1
-    check<uni0>(NVAL, 1, S, AB, B, "fail blas:tbsv", cnt);
-    check<uni1>(NVAL, 1, S, AB, B, "blas_tbsv", cnt);
-    check<uni2>(NVAL, 1, S, AB, B, "tbsvLxN", cnt);
-    check<uni3>(NVAL, 1, S, AB, B, "tbsvLxNK<KD>", cnt);
-    check<uni4>(NVAL, 1, S, AB, B, "alsa_xpbtrsLK", cnt);
+    check<uni0>(N, 1, S, AB, B, "fail blas:tbsv", cnt);
+    check<uni1>(N, 1, S, AB, B, "blas_tbsv", cnt);
+    check<uni2>(N, 1, S, AB, B, "tbsvLxN", cnt);
+    check<uni3>(N, 1, S, AB, B, "tbsvLxNK<KD>", cnt);
+    check<uni4>(N, 1, S, AB, B, "alsa_xpbtrsLK", cnt);
 #endif
-#if 1
-    std::cout << "\nxTBSVLN ---";
-    //check<uniLNB>(NVAL, S, AB, B, "blas::xtbsv", cnt);
-    check<uniLN0>(NVAL, 1, S, AB, B, "blas_xtbsvLN", cnt);
-    check<uniLN1>(NVAL, 1, S, AB, B, "xtbsvLNN", cnt);
-    check<uniLN2>(NVAL, 1, S, AB, B, "LNNK<KD>", cnt);
-    check<uniLN3>(NVAL, 1, S, AB, B, "LLN6", cnt);
-#endif
+    if ( 1 )
+    {
+        std::cout << "\n rank" << RANK << " TBSVLN --- triangular band matrix forward solve";
+        //check<uniLNB>(N, S, AB, B, "blas::xtbsv", cnt);
+        check<uniLN0>(N, 1, S, AB, B, "blas_xtbsvLN", cnt);
+        check<uniLN1>(N, 1, S, AB, B, "xtbsvLNN", cnt);
+        check<uniLN2>(N, 1, S, AB, B, "LNNK<KD>", cnt);
+        check<uniLN3>(N, 1, S, AB, B, "LLN6", cnt);
 #if REAL_IS_DOUBLE && USE_SIMD
-    check<uniLN4>(NVAL, 1, S, AB, B, "LNN6SSE_U", cnt);
-    check<uniLN5>(NVAL, 1, S, AB, B, "LNN6SSE", cnt);
+        check<uniLN4>(N, 1, S, AB, B, "LNN6SSE_U", cnt);
+        check<uniLN5>(N, 1, S, AB, B, "LNN6SSE", cnt);
 #endif
-    
-    std::cout << "\nxTBSVLT ---";
-
-    //check<uniLTB>(NVAL, S, AB, B, "blas::tbsv", cnt);
-    check<uniLT0>(NVAL, 1, S, AB, B, "blas_xtbsvLT", cnt);
-    check<uniLT1>(NVAL, 1, S, AB, B, "xtbsvLTN", cnt);
-    check<uniLT2>(NVAL, 1, S, AB, B, "LTNK<KD>", cnt);
-    check<uniLT3>(NVAL, 1, S, AB, B, "LTN6", cnt);
+    }
+    if ( 1 )
+    {
+        std::cout << "\n rank" << RANK << " TBSVLT --- triangular band matrix backward solve";
+        //check<uniLTB>(N, S, AB, B, "blas::tbsv", cnt);
+        check<uniLT0>(N, 1, S, AB, B, "blas_xtbsvLT", cnt);
+        check<uniLT1>(N, 1, S, AB, B, "xtbsvLTN", cnt);
+        check<uniLT2>(N, 1, S, AB, B, "LTNK<KD>", cnt);
+        check<uniLT3>(N, 1, S, AB, B, "LTN6", cnt);
 #if REAL_IS_DOUBLE && USE_SIMD
-    check<uniLT4>(NVAL, 1, S, AB, B, "LTN6SSE_U", cnt);
-    check<uniLT5>(NVAL, 1, S, AB, B, "LTN6SSE", cnt);
+        check<uniLT4>(N, 1, S, AB, B, "LTN6SSE_U", cnt);
+        check<uniLT5>(N, 1, S, AB, B, "LTN6SSE", cnt);
 #endif
-
+    }
     free_real(B);
     free_real(S);
     free_real(AB);
@@ -535,62 +548,94 @@ void convert_to_floats(size_t cnt, double const* src, float* dst)
         dst[i] = (float)src[i];
 }
 
-void testGETRS(size_t cnt)
+void setMatrix(size_t N, real* A)
 {
-    std::cout << "\n" << DIM << "D xGETRS " << NPTS << " points --- real " << sizeof(real);
+    zero_real(N*N, A);
+    nan_spill(A+N*N);
+    for ( size_t i = 0; i < N; ++i )
+    {
+        for ( size_t j = 0; j < N; ++j )
+            A[j+N*i] = 0.01 * RNG.sreal();
+        A[i+N*i] = 1.0; //dominant diagonal term
+    }
+}
+
+void testGETRS(int N, size_t cnt)
+{
+    std::cout << "\n" << DIM << "D xGETRS " << N << "x" << N << " --- real " << sizeof(real);
     std::cout << " --- "  << __VERSION__;
 
-    real * A = new_real(NVAL*NVAL+4);
-    real * M = new_real(NVAL*NVAL+4);
-    real * Y = new_real(NVAL+4);
-    real * S = new_real(NVAL);
-    pivot = new int[NVAL+4];
+    int info = 0;
+    const size_t MULTI = 128;
+    size_t BLK = N * N + 4;
     
-    for ( size_t i = 0; i < NVAL; ++i )
+    real * A = new_real(BLK*MULTI);
+    real * M = A + BLK;
+    real * Y = new_real(N+4);
+    real * S = new_real(N);
+    pivot = new int[N+4];
+    
+    for ( int i = 0; i < N; ++i )
         S[i] = RNG.sreal();
     
-    zero_real(NVAL*NVAL, A);
-    nan_spill(A+NVAL*NVAL);
-    for ( size_t i = 0; i < NVAL; ++i )
-    {
-        for ( size_t j = 0; j < NVAL; ++j )
-            A[j+NVAL*i] = 0.0125 * RNG.sreal();
-        A[i+NVAL*i] = 2.0; //diagonal term
-    }
-    copy_real(NVAL*NVAL, A, M);
-
-    int info = 0;
-    lapack::xgetf2(NVAL, NVAL, M, NVAL, pivot, &info);
+    setMatrix(N, A);
+    copy_real(BLK, A, M);
+    lapack::xgetf2(N, N, M, N, pivot, &info);
     if ( info == 0 )
     {
-        check<getrs1>(NVAL, 1, S, M, Y, "lapack::xgetrs", cnt);
-        check<getrs2>(NVAL, 1, S, M, Y, "lapack_xgetrsN", cnt);
+        check<getrs1>(N, 1, S, M, Y, "lapack::xgetrs", cnt);
+        check<getrs2>(N, 1, S, M, Y, "lapack_xgetrsN", cnt);
     }
-    alsatian_xgetf2(NVAL, A, NVAL, pivot, &info);
+    alsatian_xgetf2(N, A, N, pivot, &info);
 #if REAL_IS_DOUBLE
-    convert_to_floats(NVAL*NVAL, A, (float*)A);
+    convert_to_floats(N*N, A, (float*)A);
 #endif
     if ( info == 0 )
     {
-        check<getrs3>(NVAL, 1, S, A, Y, "alsa_getrsN", cnt);
-        check<getrs4>(NVAL, 1, S, A, Y, "xtrsmLLN1U_SSE", cnt);
-        check<getrs5>(NVAL, 1, S, A, Y, "alsa_getrsNSSE", cnt);
+        check<getrs3>(N, 1, S, A, Y, "alsa_getrsN", cnt);
+        check<getrs4>(N, 1, S, A, Y, "xtrsmLLN1U_SSE", cnt);
+        check<getrs5>(N, 1, S, A, Y, "alsa_getrsNSSE", cnt);
     }
+    
+    std::cout << "\n" << DIM << "D xGETRS--- " << MULTI << " matrices";
+    for ( size_t u = 0; u < MULTI; ++u )
+    {
+        real* mat = A + u * BLK;
+        setMatrix(N, mat);
+        lapack::xgetf2(N, N, mat, N, pivot, &info);
+    }
+    multi<getrs1>(N, 1, S, A, Y, "lapack::xgetrs", cnt, MULTI);
+    multi<getrs2>(N, 1, S, A, Y, "lapack_xgetrsN", cnt, MULTI);
+
+    for ( size_t u = 0; u < MULTI; ++u )
+    {
+        real* mat = A + u * BLK;
+        setMatrix(N, mat);
+        alsatian_xgetf2(N, mat, N, pivot, &info);
+#if REAL_IS_DOUBLE
+        convert_to_floats(N*N, mat, (float*)mat);
+#endif
+    }
+    multi<getrs3>(N, 1, S, A, Y, "alsa_getrsN", cnt, MULTI);
+    multi<getrs5>(N, 1, S, A, Y, "alsa_getrsNSSE", cnt, MULTI);
+
     free_real(Y);
     free_real(S);
     free_real(A);
-    free_real(M);
     delete[] pivot;
 }
 
 
 int main(int argc, char* argv[])
 {
-    const size_t REP = 1<<10;
+    int CNT = 113;
+    if ( argc > 1 )
+        CNT = std::max(1, atoi(argv[1]));
+    size_t REP = 1<<10;
     RNG.seed();
-    testISO(REP);
-    testPOTRS(REP);
-    testTBSV(REP);
-    testGETRS(REP);
+    testISO(CNT, REP);
+    testPOTRS(CNT, REP);
+    testTBSV(CNT, REP);
+    testGETRS(CNT, REP);
     printf("\n");
 }

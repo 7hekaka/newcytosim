@@ -140,11 +140,9 @@ void testSolve(int seg, size_t cnt)
     copy_real(seg, U, u);
     copy_real(seg, B, S);
     solveL(seg, d, u, S);
-    solve<lapack_xpttrf, lapack_xptts2>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
-#if 0
     solve<lapack::xpttrf, lapack::xptts2>(seg, D, U, B, d, u, b, S, "lapack", cnt);
+    solve<lapack_xpttrf, lapack_xptts2>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
     solve<italian_factor, italian_xptts2>(seg, D, U, B, d, u, b, S, "italian", cnt);
-#endif
     solve<alsatian_xpttrf, alsatian_xptts2>(seg, D, U, B, d, u, b, S, "alsatian", cnt);
     solve<alsadual_xpttrf, alsadual_xptts2>(seg, D, U, B, d, u, b, S, "alsadual", cnt);
 
