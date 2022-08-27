@@ -1260,46 +1260,43 @@ void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* pA, const int lda, dou
 #endif
         pA += 4;
         pB += 4;
+#if defined(__AVX__)
+        vec4 tt0 = duplo2f128(cast4(t0));
+        vec4 tt1 = duplo2f128(cast4(t1));
+        vec4 tt2 = duplo2f128(cast4(t2));
+        vec4 tt3 = duplo2f128(cast4(t3));
+        # pragma ivdep
+        while ( pB < end-2 )
+        {
+            vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
+            aa = fnmadd4(tt1, load4d(pA+lda), aa);
+            aa = fnmadd4(tt2, load4d(pA+2*lda), aa);
+            aa = fnmadd4(tt3, load4d(pA+3*lda), aa); // column K+3
+            storeu4(pB, aa);
+            pA += 4;
+            pB += 4;
+        }
+#endif
+        # pragma ivdep
+        while ( pB < end )
+        {
+            vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+            x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+            x = fnmadd2(t2, load2d(pA+2*lda), x); // column K+2
+            x = fnmadd2(t3, load2d(pA+3*lda), x); // column K+3
+            storeu2(pB, x);
+            pA += 2;
+            pB += 2;
+        }
         if ( pB <= end )
         {
-            if (( M - K ) & 1)
-            {
-                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
-                x = fnmadd1(t1, load1d(pA+lda), x);
-                x = fnmadd1(t2, load1d(pA+2*lda), x);
-                x = fnmadd1(t3, load1d(pA+3*lda), x); // column K+3
-                store1(pB, x);
-                pA += 1;
-                pB += 1;
-            }
-#if defined(__AVX__)
-            vec4 tt0 = duplo2f128(cast4(t0));
-            vec4 tt1 = duplo2f128(cast4(t1));
-            vec4 tt2 = duplo2f128(cast4(t2));
-            vec4 tt3 = duplo2f128(cast4(t3));
-            # pragma ivdep
-            while ( pB < end-3 )
-            {
-                vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
-                aa = fnmadd4(tt1, load4d(pA+lda), aa);
-                aa = fnmadd4(tt2, load4d(pA+2*lda), aa);
-                aa = fnmadd4(tt3, load4d(pA+3*lda), aa); // column K+3
-                storeu4(pB, aa);
-                pA += 4;
-                pB += 4;
-            }
-#endif
-            # pragma ivdep
-            while ( pB < end )
-            {
-                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
-                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
-                x = fnmadd2(t2, load2d(pA+2*lda), x); // column K+2
-                x = fnmadd2(t3, load2d(pA+3*lda), x); // column K+3
-                storeu2(pB, x);
-                pA += 2;
-                pB += 2;
-            }
+            vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+            x = fnmadd1(t1, load1d(pA+lda), x);
+            x = fnmadd1(t2, load1d(pA+2*lda), x);
+            x = fnmadd1(t3, load1d(pA+3*lda), x); // column K+3
+            store1(pB, x);
+            pA += 1;
+            pB += 1;
         }
         pA += 3*lda;
     }
@@ -1515,47 +1512,43 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
 #endif
         storeu2(pB, blend11(t0, t1));
         storeu2(pB+2, blend11(t2, t3));
+#if defined(__AVX__)
+        vec4 tt0 = duplo2f128(cast4(t0));
+        vec4 tt1 = duplo2f128(cast4(t1));
+        vec4 tt2 = duplo2f128(cast4(t2));
+        vec4 tt3 = duplo2f128(cast4(t3));
+# pragma ivdep
+        while ( pB > B+3 )
+        {
+            pA -= 4;
+            pB -= 4;
+            vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
+            aa = fnmadd4(tt1, load4d(pA+lda), aa);
+            aa = fnmadd4(tt2, load4d(pA+2*lda), aa);
+            aa = fnmadd4(tt3, load4d(pA+3*lda), aa);
+            storeu4(pB, aa);
+        }
+#endif
+# pragma ivdep
+        while ( pB > B+1 )
+        {
+            pA -= 2;
+            pB -= 2;
+            vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
+            x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+            x = fnmadd2(t2, load2d(pA+2*lda), x); // column K+2
+            x = fnmadd2(t3, load2d(pA+3*lda), x); // column K+3
+            storeu2(pB, x);
+        }
         if ( pB > B )
         {
-            // there could be an odd number of scalar remaining:
-            if ( ( pB - B ) & 1 )
-            {
-                --pA;
-                --pB;
-                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
-                x = fnmadd1(t1, load1d(pA+lda), x); // column K+1
-                x = fnmadd1(t2, load1d(pA+2*lda), x); // column K+2
-                x = fnmadd1(t3, load1d(pA+3*lda), x); // column K+2
-                store1(pB, x);
-            }
-#if defined(__AVX__)
-            vec4 tt0 = duplo2f128(cast4(t0));
-            vec4 tt1 = duplo2f128(cast4(t1));
-            vec4 tt2 = duplo2f128(cast4(t2));
-            vec4 tt3 = duplo2f128(cast4(t3));
-            # pragma ivdep
-            while ( pB > B+3 )
-            {
-                pA -= 4;
-                pB -= 4;
-                vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
-                aa = fnmadd4(tt1, load4d(pA+lda), aa);
-                aa = fnmadd4(tt2, load4d(pA+2*lda), aa);
-                aa = fnmadd4(tt3, load4d(pA+3*lda), aa);
-                storeu4(pB, aa);
-            }
-#endif
-            # pragma ivdep
-            while ( pB > B )
-            {
-                pA -= 2;
-                pB -= 2;
-                vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
-                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
-                x = fnmadd2(t2, load2d(pA+2*lda), x); // column K+2
-                x = fnmadd2(t3, load2d(pA+3*lda), x); // column K+3
-                storeu2(pB, x);
-            }
+            --pA;
+            --pB;
+            vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+            x = fnmadd1(t1, load1d(pA+lda), x); // column K+1
+            x = fnmadd1(t2, load1d(pA+2*lda), x); // column K+2
+            x = fnmadd1(t3, load1d(pA+3*lda), x); // column K+2
+            store1(pB, x);
         }
     }
     /*
@@ -1577,18 +1570,18 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
         vec2 t = mul1(load1(pB), load1d(pA));
         t = unpacklo2(t, t); // { T0, T0 }
         store1(pB, t);
-        if (( pB - B ) & 1 )
-        {
-            pA -= 1;
-            pB -= 1;
-            store1(pB, fnmadd1(t, load1d(pA), load1(pB)));
-        }
         # pragma ivdep
         while ( pB > B+1 )
         {
             pA -= 2;
             pB -= 2;
             store2(pB, fnmadd2(t, load2d(pA), load2(pB)));
+        }
+        if ( pB > B )
+        {
+            pA -= 1;
+            pB -= 1;
+            store1(pB, fnmadd1(t, load1d(pA), load1(pB)));
         }
     }
 }
