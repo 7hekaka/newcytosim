@@ -837,39 +837,39 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         s2 = fmadd1(load1(mat+8), z0, s2);
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
-#pragma clang loop unroll_count(2)
     for ( size_t n = 0; n < noff_; ++n )
     {
         const size_t ii = 3 * inx_[n];
         double const* mat = blk_[n].data();
-        vec2 mat0 = loadu2(mat);
-        vec2 mat2 = load1(mat+2);
-        vec2 mat3 = loadu2(mat+3);
-        vec2 mat5 = load1(mat+5);
-        vec2 mat6 = loadu2(mat+6);
-        vec2 mat8 = load1(mat+8);
-
-        // multiply with the transposed block:
-        //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
-        //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
-        //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
-        vec2 xyi = loadu2(X+ii);
-        s0 = fmadd2(mat0, xyi, s0);
-        s1 = fmadd2(mat3, xyi, s1);
-        s2 = fmadd2(mat6, xyi, s2);
-
-        // multiply with the full block:
+        // multiply with the full block in vectors { XY, Z0 }:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
         //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
-        vec2 XY = loadu2(Y+ii), Z0 = load1(Y+ii+2);
-        XY = fmadd2(mat0, xx, XY); Z0 = fmadd1(mat2, xx, Z0);
-        XY = fmadd2(mat3, yy, XY); Z0 = fmadd1(mat5, yy, Z0);
-        XY = fmadd2(mat6, zz, XY); Z0 = fmadd1(mat8, zz, Z0);
-        storeu2(Y+ii, XY); store1(Y+ii+2, Z0);
+        vec2 mat0 = loadu2(mat);
+        vec2 XY = fmadd2(mat0, xx, loadu2(Y+ii));
+        vec2 mat2 = load1(mat+2);
+        vec2 Z0 = fmadd1(mat2, xx, load1(Y+ii+2));
+        vec2 xyi = loadu2(X+ii);
+        s0 = fmadd2(mat0, xyi, s0);
 
-        // finish multiplication with the transposed block:
+        // multiply with the transposed block in lines { s0, s1, s2 }:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
+        //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
+        //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
+
+        vec2 mat3 = loadu2(mat+3);
+        s1 = fmadd2(mat3, xyi, s1);
+        XY = fmadd2(mat3, yy, XY);
+        vec2 mat5 = load1(mat+5);
+        Z0 = fmadd1(mat5, yy, Z0);
+        vec2 mat6 = loadu2(mat+6);
+        s2 = fmadd2(mat6, xyi, s2);
+        XY = fmadd2(mat6, zz, XY);
+        vec2 mat8 = load1(mat+8);
+        Z0 = fmadd1(mat8, zz, Z0);
         vec2 z0i = load1(X+ii+2);
+        storeu2(Y+ii, XY); store1(Y+ii+2, Z0);
+        // finish multiplication with the transposed block:
         s0 = fmadd1(mat2, z0i, s0);
         s1 = fmadd1(mat5, z0i, s1);
         s2 = fmadd1(mat8, z0i, s2);
