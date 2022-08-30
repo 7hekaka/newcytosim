@@ -1139,7 +1139,7 @@ void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* A, const int lda, doub
             pB += 4;
         }
 #endif
-        # pragma ivdep
+#pragma clang loop unroll_count(2)
         while ( pB < end )
         {
             vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
@@ -1284,8 +1284,8 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
         double * pB = B + K;
         float const* pA = A + K;
         vec2 t = mul1(load1(pB), load1d(pA));
-        t = unpacklo2(t, t); // { T0, T0 }
         store1(pB, t);
+        t = unpacklo2(t, t); // { T0, T0 }
         # pragma ivdep
         while ( pB > B+1 )
         {

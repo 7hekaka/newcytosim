@@ -133,6 +133,8 @@ public:
         void vecMulAdd2D_AVXU(const double* X, double* Y, size_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
         void vecMulAdd2D_AVXUU(const double* X, double* Y, size_t j) const;
+        /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
+        void vecMulAdd3D_SIMD(const double* X, double* Y, size_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
         void vecMulAdd3D_SSE(const float* X, float* Y, size_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3

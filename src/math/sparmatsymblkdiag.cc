@@ -811,6 +811,77 @@ void SparMatSymBlkDiag::vecMulDiagonal4D(const real* X, real* Y) const
 //------------------------------------------------------------------------------
 #pragma mark - Single Precision 3D Optimized Vector Multiplication
 
+#if ( SD_BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE && SMSBD_USES_SSE
+void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size_t jj) const
+{
+    /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    vec2 s0, s1, s2;
+    vec2 xx, yy, zz;
+    {
+        vec2 xy = load2(X+jj), z0 = load1(X+jj+2);
+        //multiply with the symmetrized block, assuming it has been symmetrized:
+        // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
+        // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
+        // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
+        double const* mat = dia_.data();
+        s0 = mul2(loadu2(mat  ), xy);
+        s1 = mul2(loadu2(mat+3), xy);
+        s2 = mul2(loadu2(mat+6), xy);
+        // prepare broadcasted vectors:
+        xx = duplo2(xy);
+        yy = duphi2(xy);
+        zz = duplo2(z0);
+        // add last column:
+        s0 = fmadd1(load1(mat+2), z0, s0);
+        s1 = fmadd1(load1(mat+5), z0, s1);
+        s2 = fmadd1(load1(mat+8), z0, s2);
+    }
+    // There is a dependency in the loop for 's0', 's1' and 's2'.
+#pragma clang loop unroll_count(2)
+    for ( size_t n = 0; n < noff_; ++n )
+    {
+        const size_t ii = 3 * inx_[n];
+        double const* mat = blk_[n].data();
+        vec2 mat0 = loadu2(mat);
+        vec2 mat2 = load1(mat+2);
+        vec2 mat3 = loadu2(mat+3);
+        vec2 mat5 = load1(mat+5);
+        vec2 mat6 = loadu2(mat+6);
+        vec2 mat8 = load1(mat+8);
+
+        // multiply with the transposed block:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
+        //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
+        //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
+        vec2 xyi = loadu2(X+ii);
+        s0 = fmadd2(mat0, xyi, s0);
+        s1 = fmadd2(mat3, xyi, s1);
+        s2 = fmadd2(mat6, xyi, s2);
+
+        // multiply with the full block:
+        //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
+        //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
+        //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
+        vec2 XY = loadu2(Y+ii), Z0 = load1(Y+ii+2);
+        XY = fmadd2(mat0, xx, XY); Z0 = fmadd1(mat2, xx, Z0);
+        XY = fmadd2(mat3, yy, XY); Z0 = fmadd1(mat5, yy, Z0);
+        XY = fmadd2(mat6, zz, XY); Z0 = fmadd1(mat8, zz, Z0);
+        storeu2(Y+ii, XY); store1(Y+ii+2, Z0);
+
+        // finish multiplication with the transposed block:
+        vec2 z0i = load1(X+ii+2);
+        s0 = fmadd1(mat2, z0i, s0);
+        s1 = fmadd1(mat5, z0i, s1);
+        s2 = fmadd1(mat8, z0i, s2);
+    }
+    // finally sum s0 = { Y0 Y0 }, s1 = { Y1 Y1 }, s2 = { Y2 Y2 }
+    s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
+    s2 = add2(unpacklo2(s2, s2), unpackhi2(s2, s2));
+    storeu2(Y+jj, add2(s0, load2(Y+jj)));
+    store1(Y+jj+2, add1(s2, load1(Y+jj+2)));
+}
+#endif
+
 #if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
 {
@@ -1763,7 +1834,7 @@ void SparMatSymBlkDiag::vecMulAdd_ALT(const real* X, real* Y, size_t start, size
 #   define VECMULADD4D vecMulAdd4D_AVX
 #elif SMSBD_USES_SSE && REAL_IS_DOUBLE
 #   define VECMULADD2D vecMulAdd2D_SSE
-#   define VECMULADD3D vecMulAdd3D
+#   define VECMULADD3D vecMulAdd3D_SIMD
 #   define VECMULADD4D vecMulAdd4D
 #elif SMSBD_USES_SSE
 #   define VECMULADD2D vecMulAdd2D

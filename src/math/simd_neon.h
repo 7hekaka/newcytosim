@@ -1,7 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 // Started on Monday 5 June 2018, which was a very nice day in Strasbourg
 
-/* Unfinished work: needs to be converted to ARM's NEON intrinsics */
 
 /// Vector holding 2 double precision floats
 typedef float64x1_t vec1;
@@ -35,6 +34,7 @@ LOCAL vec2 load1d(float const* a) { return vcvt_f64_f32(vset_lane_f32(*a, vdup_n
 LOCAL vec2 load2d(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
 
 //LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
+LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
 LOCAL void store1(double* a, vec2 b)   { vst1_f64(a, vget_low_f64(b)); }
 LOCAL void store2(double* a, vec2 b)   { vst1q_f64(a, b); }
 
