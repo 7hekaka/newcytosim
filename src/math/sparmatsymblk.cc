@@ -926,7 +926,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t j
     //assume the block is already symmetrized:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
     // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
-    vec2 s0 = fmadd2(load2(D), x0, load2(Y+jj));
+    vec2 s0 = mul2(load2(D), x0);
     s1 = mul2(load2(D+2), x1);
     
     Block const* blk = blk_ + 1;
@@ -989,7 +989,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t j
     //Y[jj  ] = Y0;
     //Y[jj+1] = Y1;
     s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
-    store2(Y+jj, s0);
+    store2(Y+jj, add2(s0, load2(Y+jj)));
 }
 #endif
 

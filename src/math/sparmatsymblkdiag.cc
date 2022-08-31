@@ -1169,24 +1169,25 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
 void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
     vec2 s1 = load2(X+jj);
-    vec2 x0 = unpacklo2(s1, s1);
-    vec2 x1 = unpackhi2(s1, s1);
     //const real X0 = X[jj  ];
     //const real X1 = X[jj+1];
+    vec2 x0 = unpacklo2(s1, s1);
+    vec2 x1 = unpackhi2(s1, s1);
 
+    assert_small(dia_.asymmetry());
     // load 2x2 matrix element into 2 vectors:
     double const* D = dia_.data();
     //assume the block is already symmetrized:
-    // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
-    // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
-    vec2 s0 = fmadd2(load2(D), x0, load2(Y+jj));
-    s1 = mul2(load2(D+2), x1);
+    //real Y0 = Y[jj  ] + D[0] * X0 + D[1] * X1;
+    //real Y1 = Y[jj+1] + D[1] * X0 + D[3] * X1;
+    vec2 s0 = mul2(load2(D), s1);
+    s1 = mul2(load2(D+2), s1);
     
     Block const* blk = blk_;
     auto const* inx = inx_;
 
-#if ( 1 )
     Block const* end = blk_ + ( noff_ & ~1 );
+#if ( 1 )
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( ; blk < end; inx += 2, blk += 2 )
     {
@@ -1224,25 +1225,25 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
         const auto ii = 2 * inx[0];
         // load 2x2 matrix element into 2 vectors:
         double const* M = blk[0].data();
-        vec2 m01 = load2(M);
-        vec2 m23 = load2(M+2);
+        vec2 m0 = load2(M);
+        vec2 m2 = load2(M+2);
         vec2 xx = load2(X+ii);
 
         // multiply with the full block:
         //Y[ii  ] += M[0] * X0 + M[2] * X1;
         //Y[ii+1] += M[1] * X0 + M[3] * X1;
-        store2(Y+ii, fmadd2(m23, x1, fmadd2(m01, x0, load2(Y+ii))));
+        store2(Y+ii, fmadd2(m2, x1, fmadd2(m0, x0, load2(Y+ii))));
 
         // multiply with the transposed block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
         //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        s0 = fmadd2(m01, xx, s0);
-        s1 = fmadd2(m23, xx, s1);
+        s0 = fmadd2(m0, xx, s0); // s0 += m0 * xx;
+        s1 = fmadd2(m2, xx, s1); // s1 += m2 * xx;
     }
     //Y[jj  ] = Y0;
     //Y[jj+1] = Y1;
     s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
-    store2(Y+jj, s0);
+    store2(Y+jj, add2(s0, load2(Y+jj)));
 }
 #endif
 

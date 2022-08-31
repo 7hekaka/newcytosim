@@ -104,7 +104,7 @@ void setVectors(size_t size, real*& x, real*& y, real*& z)
         {
             x[n] = RNG.sreal();
             y[n] = RNG.preal();
-            z[n] = 0;
+            z[n] = RNG.preal();
         }
         for ( size_t n = size; n < size+PAD; ++n )
         {
@@ -240,21 +240,22 @@ void fillMatrix(MATRIX& mat)
     }
 }
 
-
+// check the results of Z = Mat * X + Y with different methods
 template <typename MATRIX>
-void checkMatrix(MATRIX & mat, real const* x, real * z)
+void checkMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 {
-    size_t S = mat.size();
-    zero_real(S, z);
+    size_t N = mat.size();
+    copy_real(N, y, z);
     mat.vecMulAdd(x, z);
-    real sum1 = checksum(S, z);
+    real sum1 = checksum(N, z);
     
-    zero_real(S, z);
+    copy_real(N, y, z);
     mat.vecMulAdd_ALT(x, z);
-    real sum2 = checksum(S, z);
+    real sum2 = checksum(N, z);
     
     mat.vecMul(x, z);
-    real sum3 = checksum(S, z);
+    for ( size_t i = 0; i < N; ++i ) z[i] += y[i];
+    real sum3 = checksum(N, z);
     
     printf("  check %+16.6f %+16.6f %+16.6f ", sum1, sum2, sum3);
 }
@@ -298,7 +299,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 
     printf("\n%-32s ", mat.what().c_str());
     printf("set %9.0f  muladd %9.0f  alt %9.0f  mul %9.0f", ts, t1, t2, t3);
-    checkMatrix(mat, x, z);
+    checkMatrix(mat, x, y, z);
     fflush(stdout);
 }
 

@@ -4800,12 +4800,12 @@ void Meca::addPlaneClampXYZ(Mecapoint const& P, size_t xyz, real off, real weigh
 
 
 /**
- Link `ptA` (X) and the plane defined one of its point `G` and the normal `dir`.
+ Link `ptA` (X) and the plane defined one of its point `pos` and the normal `dir`.
  The force is linear and the components parallel to the plane are removed,
  corresponding to an interaction with a frictionless plane:
  
-     matrix M = dir (x) dir'
-     force_X = weight * M * ( G - X )
+     projection matrix M = dir (x) dir'
+     force_X = weight * M * ( pos - X )
  
  The vector `dir` should be of norm = 1, or alternatively
  `weight` can be the true weigth divided by |dir|^2.
@@ -4834,11 +4834,11 @@ void Meca::addPlaneClamp(Mecapoint const& pte,
 
 
 /**
- Link `ptA` (X) and the plane defined by `pos` (G) and the normal `dir`.
+ Link `ptA` (X) and the plane defined by `pos` and the normal `dir`.
  The force is linear and the perpendicular forces are removed, to create a frictionless plane:
  
-     M = dir (x) dir'
-     force = weight * M * ( G - X )
+     projection matrix M = dir (x) dir'
+     force = weight * M * ( pos - X )
  
  The vector `dir` should be of norm = 1, or alternatively 
  `weight` can be the true weigth divided by |dir|^2.

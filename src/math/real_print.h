@@ -5,15 +5,15 @@
 
 
 /// print 'cnt' components of 'ptr' on a line
-static inline void print_real(FILE* out, size_t cnt, real const* ptr, const char end[])
+static inline void print_real(FILE* out, size_t cnt, real const* ptr, const char prefix[])
 {
     if ( !ptr || cnt == 0 )
         fprintf(out, "void");
     else
     {
+        fprintf(out, "%s", prefix);
         for ( size_t i = 0; i < cnt; ++i )
             fprintf(out, " %9.4f", ptr[i]);
-        fprintf(out, "%s", end);
     }
 }
 
