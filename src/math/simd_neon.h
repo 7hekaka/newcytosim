@@ -8,7 +8,7 @@ typedef float64x2_t vec2;
 
 LOCAL void _mm_empty() {};
 
-LOCAL vec2 setr2(double a, double b) { double u[2] = { a, b }; return vld1q_f64(u); }
+LOCAL vec2 setr2(double a, double b) { return vec2{a, b}; }
 LOCAL vec2 set2(double a)            { return vdupq_n_f64(a); }
 LOCAL vec2 setzero2()                { return vdupq_n_f64(0); }
 
@@ -248,6 +248,13 @@ LOCAL vec4f broadcastYf(vec4f a) { return vdupq_laneq_f32(a,1); }
 LOCAL vec4f broadcastZf(vec4f a) { return vdupq_laneq_f32(a,2); }
 // copy a[3] into all elements of destination
 LOCAL vec4f broadcastTf(vec4f a) { return vdupq_laneq_f32(a,3); }
+
+// returns { a[0], a[1], a[2], 0 }
+LOCAL vec4f clear4th(vec4f a) { return vsetq_lane_f32(0, a, 3); }
+// loading 3 elements
+LOCAL vec4f load3f(float const* a) { return vec4f{a[0], a[1], a[2], 0}; }
+// loading 4 and clearing one
+LOCAL vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 
 /// a * b + c
 LOCAL vec4f fmadd4f(vec4f a, vec4f b, vec4f c)  { return vfmaq_f32(c,a,b); }

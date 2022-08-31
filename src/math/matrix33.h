@@ -15,9 +15,9 @@
  The code works with BLD = 3 or 4, and typically memory storage is less with 3,
  but performance might be better with 4, as SIMD-AVX calls handle doubles by 4.
  */
+#include "simd.h"
 
 #if defined(__AVX__) && REAL_IS_DOUBLE
-#  include "simd.h"
 #  define MATRIX33_USES_AVX 1
 #  define BLD 3
 #elif defined(__SSE3__) && !REAL_IS_DOUBLE
@@ -161,7 +161,7 @@ public:
     vec4 data1() const { return loadu4(val+BLD); }
     vec4 data2() const { return load3Z(val+BLD*2); } // last value may be garbage
 #  endif
-#elif defined(__SSE3__) && !REAL_IS_DOUBLE
+#elif USE_SIMD && !REAL_IS_DOUBLE
 #  if ( BLD == 4 )
     vec4f data0() const { return streamload4f(val  ); }
     vec4f data1() const { return streamload4f(val+4); }

@@ -252,7 +252,7 @@ Vector Space::bounceOnEdges(Vector const& pos) const
         do {
             Q = project(P);
             P = 2*Q - P;
-            std::cerr << cnt << "  " << P << " proj " << Q << '\n';
+            std::cerr << pos << " :  " << cnt << "  " << P << " --proj--> " << Q << '\n';
             if ( inside(P) )
                 return P;
         } while ( ++cnt < 24 );

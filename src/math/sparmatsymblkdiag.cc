@@ -882,7 +882,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
 }
 #endif
 
-#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
 {
     //multiply with the symmetrized block, assuming it has been symmetrized:
@@ -945,7 +945,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t 
 #endif
 
 
-#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj) const
 {
     assert_small(dia_.asymmetry());
@@ -1063,7 +1063,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
 /**
  Only process off-diagonal terms!
  */
-#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y, size_t jj) const
 {
     assert_true(noff_ > 0);
@@ -1163,14 +1163,14 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark - Double Precision Optimized Vector Multiplication
+#pragma mark - 2D Double Precision Optimized Vector Multiplication
 
 #if ( SD_BLOCK_SIZE == 2 ) && SMSBD_USES_SSE && REAL_IS_DOUBLE
 void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
-    vec2 zz = load2(X+jj);
-    vec2 x0 = unpacklo2(zz, zz);
-    vec2 x1 = unpackhi2(zz, zz);
+    vec2 s1 = load2(X+jj);
+    vec2 x0 = unpacklo2(s1, s1);
+    vec2 x1 = unpackhi2(s1, s1);
     //const real X0 = X[jj  ];
     //const real X1 = X[jj+1];
 
@@ -1179,8 +1179,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
     //assume the block is already symmetrized:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1;
     // Y1 = Y[jj+1] + M[1] * X0 + M[3] * X1;
-    vec2 yy = fmadd2(load2(D), x0, load2(Y+jj));
-    zz = mul2(load2(D+2), x1);
+    vec2 s0 = fmadd2(load2(D), x0, load2(Y+jj));
+    s1 = mul2(load2(D+2), x1);
     
     Block const* blk = blk_;
     auto const* inx = inx_;
@@ -1204,15 +1204,15 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
         // multiply with the full block:
         //Y[ii  ] += M[0] * X0 + M[2] * X1;
         //Y[ii+1] += M[1] * X0 + M[3] * X1;
-        yy = fmadd2(m01, xx, yy);
-        zz = fmadd2(m23, xx, zz);
+        s0 = fmadd2(m01, xx, s0);
+        s1 = fmadd2(m23, xx, s1);
         vec2 t = fmadd2(m01, x0, load2(Y+i0));
         vec2 u = fmadd2(p01, x0, load2(Y+i1));
         // multiply with the transposed block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
         //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        yy = fmadd2(p01, tt, yy);
-        zz = fmadd2(p23, tt, zz);
+        s0 = fmadd2(p01, tt, s0);
+        s1 = fmadd2(p23, tt, s1);
         store2(Y+i0, fmadd2(m23, x1, t));
         store2(Y+i1, fmadd2(p23, x1, u));
     }
@@ -1236,14 +1236,13 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_
         // multiply with the transposed block:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
         //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        yy = fmadd2(m01, xx, yy);
-        zz = fmadd2(m23, xx, zz);
+        s0 = fmadd2(m01, xx, s0);
+        s1 = fmadd2(m23, xx, s1);
     }
     //Y[jj  ] = Y0;
     //Y[jj+1] = Y1;
-    vec2 tt = unpacklo2(yy, zz);
-    vec2 uu = unpackhi2(yy, zz);
-    store2(Y+jj, add2(tt, uu));
+    s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
+    store2(Y+jj, s0);
 }
 #endif
 
@@ -1434,6 +1433,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
 }
 #endif
 
+
+//------------------------------------------------------------------------------
+#pragma mark - 3D Double Precision Optimized Vector Multiplication
 
 #if ( SD_BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVX(const double* X, double* Y, size_t jj) const
@@ -1973,7 +1975,7 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
 #endif
 
 
-#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && defined(__SSE3__)
+#if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && SMSBD_USES_SSE
 void SparMatSymBlkDiag::vecMulDiagonal3D_SSE(const float* X, float* Y) const
 {
     #pragma unroll (4)

@@ -1866,10 +1866,17 @@ void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* 
 {
     // Apply row interchanges to the right hand side.
     xlaswp1(B, 1, N, IPIV);
+#if REAL_IS_DOUBLE
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_4U_SSE(N, (float*)A, LDA, B);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1I_4U_SSE(N, (float*)A, LDA, B);
+#else
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1U_SSE(N, (float*)A, LDA, B);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1I_SSE(N, (float*)A, LDA, B);
+#endif
 }
 
 /// This compares results obtained by standard and optimized routines
