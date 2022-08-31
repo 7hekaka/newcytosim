@@ -269,7 +269,7 @@ void SpaceCapsule::draw2D(float width) const
     const float L(half_);
     const float R(radius_);
     
-    if ( prop->disp->visible & 2 )
+    if ( prop->disp && prop->disp->visible & 2 )
     {
         gym::color(prop->disp->color2);
         gle::paint_capsule(-L, L, R);
@@ -289,7 +289,7 @@ void SpaceCapsule::draw3D() const
     //right side:
     gym::transAlignZX(L, R, -R);
     gle::hemisphere4();
-    if ( prop->disp->visible & 4 )
+    if ( prop->disp && prop->disp->visible & 4 )
         gle::arrowStrip(0.5, 2);
 
     gym::stretchAlignZX(-L, L, R);
@@ -298,7 +298,7 @@ void SpaceCapsule::draw3D() const
     //left side:
     gym::transAlignZX(-L, R, R);
     gle::hemisphere4();
-    if ( prop->disp->visible & 4 )
+    if ( prop->disp && prop->disp->visible & 4 )
         gle::arrowStrip(0.5, 2);
 }
 

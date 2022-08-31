@@ -234,7 +234,7 @@ void SpaceEllipse::draw2D(float width) const
     gym::scale(X, Y, Z);
     gle::circle(width);
     
-    if ( prop->disp->visible & 2 )
+    if ( prop->disp && prop->disp->visible & 2 )
     {
         gym::color(prop->disp->color2);
         gle::disc1();

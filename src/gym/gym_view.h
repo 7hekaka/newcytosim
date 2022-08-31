@@ -31,7 +31,7 @@ namespace gym
     inline void get_view(float mat[16]) { gym::mat_copy(mat, ref_); }
     
     /// replace reference modelview matrix
-    inline void set_view(const float mat[16]) { gym::mat_copy(ref_, mat); load_ref(); }
+    inline void set_view(const float mat[16]) { gym::mat_copy(ref_, mat); gym::mat_copy(mvp_, mat); load_ref(); }
     
     /// make reference matrix current and load
     inline void ref_view() { pull_ref(); load_ref(); }

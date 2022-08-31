@@ -24,6 +24,7 @@
 #include "gym_view.h"
 #include "gym_check.h"
 #include "gym_cap.h"
+#include "point_disp.h"
 
 // List of options
 Glossary opt;
@@ -182,6 +183,8 @@ void timerFunction(int)
 //------------------------------------------------------------------------------
 void setGeometry()
 {
+    if ( ! prop.disp )
+        prop.disp = new PointDisp("space:display", "test_space");
     prop.read(opt);
     
     try {
@@ -471,7 +474,7 @@ bool visible(size_t i)
 
 int display(View& view)
 {
-    view.back_color.set(0.3,0.3,0.3,1);
+    view.back_color.set(0,0,0,1);
     view.openDisplay();
     //gym::printCaps("space");
 
@@ -489,6 +492,7 @@ int display(View& view)
 #endif
     if ( spc && ( showSpace & 1 ))
     {
+        gym::ref_view();
 #if ( DIM >= 3 )
         // draw transparent front side
         gym::enableLighting();
@@ -500,12 +504,12 @@ int display(View& view)
         gym::restoreCullFace();
         gym::restoreLighting();
 #else
-        gym::color(0.2, 0.2, 0.2, 0.1);
+        gym::color(1, 1, 1, 1);
         gym::disableLighting();
-        spc->draw2D(2);
+        spc->draw2D(1);
 #endif
     }
-
+    gym::ref_view();
     if ( 1 )
     {
         //use green for points inside, magenta for point outside:

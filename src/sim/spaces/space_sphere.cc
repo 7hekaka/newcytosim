@@ -143,7 +143,7 @@ void SpaceSphere::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceSphere::draw2D(float width) const
 {
-    if ( prop->disp->visible & 2 )
+    if ( prop->disp && prop->disp->visible & 2 )
     {
         gym::color(prop->disp->color2);
         gle::disc1();
@@ -158,7 +158,7 @@ void SpaceSphere::draw3D() const
 {
     gym::scale(radius_);
     gle::sphere8();
-    if ( prop->disp->visible & 4 )
+    if ( prop->disp && prop->disp->visible & 4 )
         gle::threeArrowStrip(0.5, 1);
 }
 
