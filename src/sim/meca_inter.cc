@@ -2387,8 +2387,8 @@ void Meca::addLongLink(Interpolation const& ptA,
     else
     {
         add_block(ii0, ii2, cc2*cc0, wT);
-        add_block(ii0, ii3, cc3*cc0, wT);
         add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
         add_block(ii1, ii3, cc3*cc1, wT);
     }
     add_block(ii3, ii2, cc3*cc2, wT);
@@ -2477,12 +2477,12 @@ void Meca::addLongLink4(Interpolation const& ptA,
     else
     {
         add_block(ii0, ii2, cc2*cc0, wT);
-        add_block(ii0, ii3, cc3*cc0, wT);
-        add_block(ii0, ii4, cc4*cc0, wT);
-        add_block(ii0, ii5, cc5*cc0, wT);
         add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
         add_block(ii1, ii3, cc3*cc1, wT);
+        add_block(ii0, ii4, cc4*cc0, wT);
         add_block(ii1, ii4, cc4*cc1, wT);
+        add_block(ii0, ii5, cc5*cc0, wT);
         add_block(ii1, ii5, cc5*cc1, wT);
     }
     add_block(ii3, ii2, cc3*cc2, wT);
@@ -2891,8 +2891,8 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     else
     {
         add_block(ii0, ii2, cc2, wAt);
-        add_block(ii0, ii3, cc3, wAt);
         add_block(ii1, ii2, cc2, wBt);
+        add_block(ii0, ii3, cc3, wAt);
         add_block(ii1, ii3, cc3, wBt);
     }
     add_block_diag(ii2, MatrixBlock(0, wcc2*cc2));
@@ -3479,8 +3479,8 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     else
     {
         add_block(ii0, ii2, cc2*cc0, wT);
-        add_block(ii0, ii3, cc3*cc0, wT);
         add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
         add_block(ii1, ii3, cc3*cc1, wT);
     }
     add_block_diag(ii2, cc2*cc2, wT);
@@ -3868,8 +3868,8 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     else
     {
         add_block(ii0, ii2, cc2*cc0, wT);
-        add_block(ii0, ii3, cc3*cc0, wT);
         add_block(ii1, ii2, cc2*cc1, wT);
+        add_block(ii0, ii3, cc3*cc0, wT);
         add_block(ii1, ii3, cc3*cc1, wT);
     }
     add_block(ii3, ii2, cc3*cc2, wT);
@@ -3941,8 +3941,8 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     else
     {
         add_block(ii0, ii2, cc2, aTwP);
-        add_block(ii0, ii3, cc3, aTwP);
         add_block(ii1, ii2, cc2, bTwP);
+        add_block(ii0, ii3, cc3, aTwP);
         add_block(ii1, ii3, cc3, bTwP);
     }
     add_block_diag(ii2, cc2*cc2, wP);
@@ -4031,8 +4031,8 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     else
     {
         add_block(ii0, ii2, cc2, aTwP);
-        add_block(ii0, ii3, cc3, aTwP);
         add_block(ii1, ii2, cc2, bTwP);
+        add_block(ii0, ii3, cc3, aTwP);
         add_block(ii1, ii3, cc3, bTwP);
     }
     add_block_diag(ii2, cc2*cc2, wP);
