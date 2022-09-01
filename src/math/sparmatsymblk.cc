@@ -735,7 +735,7 @@ void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Manually Optimized Vector Multiplication
+#pragma mark - Single precision Optimized Vector Multiplication
 
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_SSE && !REAL_IS_DOUBLE
 void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
@@ -909,7 +909,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Manually Optimized Vector Multiplication
+#pragma mark - Double precision Optimized Vector Multiplication
 
 #if ( S_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSB_USES_SSE
 void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const

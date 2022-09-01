@@ -631,7 +631,7 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Column Vector Multiplication, reference implementation
+#pragma mark - Column Vector Multiplication, reference implementations
 
 
 #if ( SD_BLOCK_SIZE == 1 )
@@ -807,80 +807,281 @@ void SparMatSymBlkDiag::vecMulDiagonal4D(const real* X, real* Y) const
 }
 #endif
 
-
 //------------------------------------------------------------------------------
-#pragma mark - Single Precision 3D Optimized Vector Multiplication
+#pragma mark - 2D Double Precision Optimized Vector Multiplication
 
-#if ( SD_BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE && SMSBD_USES_SSE
-void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size_t jj) const
+#if ( SD_BLOCK_SIZE == 2 ) && SMSBD_USES_SSE && REAL_IS_DOUBLE
+void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
 {
-    /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
-    vec2 s0, s1, s2;
-    vec2 xx, yy, zz;
-    {
-        vec2 xy = load2(X+jj), z0 = load1(X+jj+2);
-        //multiply with the symmetrized block, assuming it has been symmetrized:
-        // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
-        // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
-        // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
-        double const* mat = dia_.data();
-        s0 = mul2(loadu2(mat  ), xy);
-        s1 = mul2(loadu2(mat+3), xy);
-        s2 = mul2(loadu2(mat+6), xy);
-        // prepare broadcasted vectors:
-        xx = duplo2(xy);
-        yy = duphi2(xy);
-        zz = duplo2(z0);
-        // add last column:
-        s0 = fmadd1(load1(mat+2), z0, s0);
-        s1 = fmadd1(load1(mat+5), z0, s1);
-        s2 = fmadd1(load1(mat+8), z0, s2);
-    }
-    // There is a dependency in the loop for 's0', 's1' and 's2'.
-    for ( size_t n = 0; n < noff_; ++n )
-    {
-        const size_t ii = 3 * inx_[n];
-        double const* mat = blk_[n].data();
-        // multiply with the full block in vectors { XY, Z0 }:
-        //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
-        //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
-        //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
-        vec2 mat0 = loadu2(mat);
-        vec2 XY = fmadd2(mat0, xx, loadu2(Y+ii));
-        vec2 mat2 = load1(mat+2);
-        vec2 Z0 = fmadd1(mat2, xx, load1(Y+ii+2));
-        vec2 xyi = loadu2(X+ii);
-        s0 = fmadd2(mat0, xyi, s0);
+    vec2 s1 = load2(X+jj);
+    //const real X0 = X[jj  ];
+    //const real X1 = X[jj+1];
+    vec2 x0 = unpacklo2(s1, s1);
+    vec2 x1 = unpackhi2(s1, s1);
 
-        // multiply with the transposed block in lines { s0, s1, s2 }:
-        //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
-        //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
-        //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
+    assert_small(dia_.asymmetry());
+    // load 2x2 matrix element into 2 vectors:
+    double const* D = dia_.data();
+    //assume the block is already symmetrized:
+    //real Y0 = Y[jj  ] + D[0] * X0 + D[1] * X1;
+    //real Y1 = Y[jj+1] + D[1] * X0 + D[3] * X1;
+    vec2 s0 = mul2(load2(D), s1);
+    s1 = mul2(load2(D+2), s1);
+    
+    Block const* blk = blk_;
+    auto const* inx = inx_;
 
-        vec2 mat3 = loadu2(mat+3);
-        s1 = fmadd2(mat3, xyi, s1);
-        XY = fmadd2(mat3, yy, XY);
-        vec2 mat5 = load1(mat+5);
-        Z0 = fmadd1(mat5, yy, Z0);
-        vec2 mat6 = loadu2(mat+6);
-        s2 = fmadd2(mat6, xyi, s2);
-        XY = fmadd2(mat6, zz, XY);
-        vec2 mat8 = load1(mat+8);
-        Z0 = fmadd1(mat8, zz, Z0);
-        vec2 z0i = load1(X+ii+2);
-        storeu2(Y+ii, XY); store1(Y+ii+2, Z0);
-        // finish multiplication with the transposed block:
-        s0 = fmadd1(mat2, z0i, s0);
-        s1 = fmadd1(mat5, z0i, s1);
-        s2 = fmadd1(mat8, z0i, s2);
+    Block const* end = blk_ + ( noff_ & ~1 );
+#if ( 1 )
+    // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
+    for ( ; blk < end; inx += 2, blk += 2 )
+    {
+        const auto i0 = 2 * inx[0];
+        const auto i1 = 2 * inx[1];
+        // load 2x2 matrix element into 2 vectors:
+        double const* M = blk[0].data();
+        double const* P = blk[1].data();
+        vec2 m01 = load2(M);
+        vec2 m23 = load2(M+2);
+        vec2 p01 = load2(P);
+        vec2 p23 = load2(P+2);
+        vec2 xx = load2(X+i0);
+        vec2 tt = load2(X+i1);
+        // multiply with the full block:
+        //Y[ii  ] += M[0] * X0 + M[2] * X1;
+        //Y[ii+1] += M[1] * X0 + M[3] * X1;
+        s0 = fmadd2(m01, xx, s0);
+        s1 = fmadd2(m23, xx, s1);
+        vec2 t = fmadd2(m01, x0, load2(Y+i0));
+        vec2 u = fmadd2(p01, x0, load2(Y+i1));
+        // multiply with the transposed block:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
+        //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
+        s0 = fmadd2(p01, tt, s0);
+        s1 = fmadd2(p23, tt, s1);
+        store2(Y+i0, fmadd2(m23, x1, t));
+        store2(Y+i1, fmadd2(p23, x1, u));
     }
-    // finally sum s0 = { Y0 Y0 }, s1 = { Y1 Y1 }, s2 = { Y2 Y2 }
+#endif
+    end = blk_ + noff_;
+    // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
+    for ( ; blk < end; ++inx, ++blk )
+    {
+        const auto ii = 2 * inx[0];
+        // load 2x2 matrix element into 2 vectors:
+        double const* M = blk[0].data();
+        vec2 m0 = load2(M);
+        vec2 m2 = load2(M+2);
+        vec2 xx = load2(X+ii);
+
+        // multiply with the full block:
+        //Y[ii  ] += M[0] * X0 + M[2] * X1;
+        //Y[ii+1] += M[1] * X0 + M[3] * X1;
+        store2(Y+ii, fmadd2(m2, x1, fmadd2(m0, x0, load2(Y+ii))));
+
+        // multiply with the transposed block:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
+        //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
+        s0 = fmadd2(m0, xx, s0); // s0 += m0 * xx;
+        s1 = fmadd2(m2, xx, s1); // s1 += m2 * xx;
+    }
+    //Y[jj  ] = Y0;
+    //Y[jj+1] = Y1;
     s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
-    s2 = add2(unpacklo2(s2, s2), unpackhi2(s2, s2));
-    storeu2(Y+jj, add2(s0, load2(Y+jj)));
-    store1(Y+jj+2, add1(s2, load1(Y+jj+2)));
+    store2(Y+jj, add2(s0, load2(Y+jj)));
 }
 #endif
+
+
+#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
+void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVX(const double* X, double* Y, size_t jj) const
+{
+    // xy = { X0 X1 X0 X1 }
+    vec4 xy = broadcast2(X+jj);
+    //multiply with full block, assuming it is symmetric:
+    // Y0 = M[0] * X0 + M[1] * X1;
+    // Y1 = M[1] * X0 + M[3] * X1;
+    
+    // yyyy = { Y0 Y0 Y1 Y1 }
+    // load 2x2 matrix element into 2 vectors:
+    vec4 ss = mul4(dia_.data0(), xy);
+
+    //const real X0 = X[jj  ];
+    //const real X1 = X[jj+1];
+    // xxyy = { X0 X0 X1 X1 }
+    const vec4 xxyy = duplohi4(xy);
+
+    // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
+    for ( size_t n = 0; n < noff_; ++n )
+    {
+        const size_t ii = 2 * inx_[n];
+        vec4 mat = blk_[n].data0(); // load 2x2 matrix
+        vec4 yy = load2Z(Y+ii);          // yy = { Y0 Y1 0 0 }
+        vec4 xx = broadcast2(X+ii);      // xx = { X0 X1 X0 X1 }
+
+        // multiply with the full block:
+        //Y[ii  ] += M[0] * X0 + M[2] * X1;
+        //Y[ii+1] += M[1] * X0 + M[3] * X1;
+        vec4 u = fmadd4(mat, xxyy, yy);
+        store2(Y+ii, add2(getlo(u), gethi(u)));
+        
+        // multiply with the transposed block:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
+        //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
+        ss = fmadd4(mat, xx, ss);
+    }
+    // need to collapse yyyy = { S0 S0 S1 S1 }
+    // Y[jj  ] += yyyy[0] + yyyy[1];
+    // Y[jj+1] += yyyy[2] + yyyy[3];
+    vec2 yy = load2(Y+jj);
+    vec2 h = gethi(ss);
+    store2(Y+jj, add2(yy, add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h))));
+}
+#endif
+
+
+#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
+static inline void multiply2D(double const* X, double* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
+{
+    vec4 xx = broadcast2(X+ii);
+    vec4 u = fmadd4(mat, xxxx, load2Z(Y+ii));
+    store2(Y+ii, add2(getlo(u), gethi(u)));
+    ss = fmadd4(mat, xx, ss);
+}
+#endif
+
+
+#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
+void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size_t jj) const
+{
+    vec4 xyxy = broadcast2(X+jj);
+    vec4 ss = mul4(dia_.data0(), xyxy);
+    const vec4 xxyy = duplohi4(xyxy);
+    vec4 s1 = setzero4();
+    
+    Block const* blk = blk_;
+    Block const* end = blk_ + ( noff_ & ~1 );
+    auto const* inx = inx_;
+    // process 2 by 2:
+    #pragma nounroll
+    for ( ; blk < end; blk += 2, inx += 2 )
+    {
+#if ( 0 )
+        /*
+         Since all the indices are different, the blocks can be processed in
+         parallel, and micro-operations can be interleaved to avoid latency.
+         The compiler however cannot assume this, because the indices of the
+         blocks are not known at compile time.
+         */
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
+#else
+        /* we remove here the apparent dependency on the values of Y[],
+         which are read and written, but at different indices.
+         The compiler can reorder instructions to avoid lattencies */
+        const auto i0 = 2 * inx[0];
+        const auto i1 = 2 * inx[1];
+        assert_true( i0 < i1 );
+        vec4 mat0 = blk[0].data0();
+        vec4 mat1 = blk[1].data0();
+        vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
+        vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
+        ss = fmadd4(mat0, broadcast2(X+i0), ss);
+        s1 = fmadd4(mat1, broadcast2(X+i1), s1);
+        store2(Y+i0, add2(getlo(u0), gethi(u0)));
+        store2(Y+i1, add2(getlo(u1), gethi(u1)));
+#endif
+    }
+    // collapse 'ss'
+    ss = add4(ss, s1);
+    // process remaining blocks:
+    end = blk_ + noff_;
+    //#pragma nounroll
+    if ( blk < end ) // for ( ; blk < end; ++blk, ++inx )
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+    /* finally horizontally sum ss = { SX SX SY SY } */
+    vec2 h = gethi(ss);
+    h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
+    store2(Y+jj, add2(load2(Y+jj), h));
+}
+#endif
+
+
+#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
+void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t jj) const
+{
+    vec4 xyxy = broadcast2(X+jj);
+    vec4 ss = mul4(dia_.data0(), xyxy);
+    const vec4 xxyy = duplohi4(xyxy);
+    vec4 s1 = setzero4();
+    vec4 s2 = setzero4();
+    vec4 s3 = setzero4();
+
+    Block  const* blk = blk_;
+    Block const* end = blk_ + ( noff_ & ~3 );
+    auto const* inx = inx_;
+
+    // process 4 by 4:
+    #pragma nounroll
+    for ( ; blk < end; blk += 4, inx += 4 )
+    {
+#if ( 0 )
+        /*
+         Since all the indices are different, the blocks can be processed in
+         parallel, and micro-operations can be interleaved to avoid latency.
+         The compiler however cannot assume this, because the indices of the
+         blocks are not known at compile time.
+         */
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
+        multiply2D(X, Y, 2*inx[2], blk[2].data0(), xxyy, s2);
+        multiply2D(X, Y, 2*inx[3], blk[3].data0(), xxyy, s3);
+#else
+        /* we remove here the apparent dependency on the values of Y[],
+         which are read and written, but at different indices.
+         The compiler can reorder instructions to avoid lattencies */
+        vec4 mat0 = blk[0].data0();
+        vec4 mat1 = blk[1].data0();
+        vec4 mat2 = blk[2].data0();
+        vec4 mat3 = blk[3].data0();
+        const auto i0 = 2 * inx[0];
+        const auto i1 = 2 * inx[1];
+        const auto i2 = 2 * inx[2];
+        const auto i3 = 2 * inx[3];
+        assert_true( i0 < i1 );
+        assert_true( i1 < i2 );
+        assert_true( i2 < i3 );
+        vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
+        vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
+        vec4 u2 = fmadd4(mat2, xxyy, load2Z(Y+i2));
+        vec4 u3 = fmadd4(mat3, xxyy, load2Z(Y+i3));
+        ss = fmadd4(mat0, broadcast2(X+i0), ss);
+        s1 = fmadd4(mat1, broadcast2(X+i1), s1);
+        s2 = fmadd4(mat2, broadcast2(X+i2), s2);
+        s3 = fmadd4(mat3, broadcast2(X+i3), s3);
+        store2(Y+i0, add2(getlo(u0), gethi(u0)));
+        store2(Y+i1, add2(getlo(u1), gethi(u1)));
+        store2(Y+i2, add2(getlo(u2), gethi(u2)));
+        store2(Y+i3, add2(getlo(u3), gethi(u3)));
+#endif
+    }
+    // collapse 'ss'
+    ss = add4(add4(ss,s1), add4(s2,s3));
+    // process remaining blocks:
+    end = blk_ + noff_;
+    //#pragma nounroll
+    if ( blk < end ) // for ( ; blk < end; ++blk, ++inx )
+        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
+    /* finally sum ss = { S0 S0 S1 S1 } */
+    vec2 h = gethi(ss);
+    h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
+    store2(Y+jj, add2(load2(Y+jj), h));
+}
+#endif
+
+
+//------------------------------------------------------------------------------
+#pragma mark - 3D Single Precision Optimized Vector Multiplication
 
 #if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
@@ -1163,280 +1364,78 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark - 2D Double Precision Optimized Vector Multiplication
+#pragma mark - 3D Double Precision Optimized Vector Multiplication
 
-#if ( SD_BLOCK_SIZE == 2 ) && SMSBD_USES_SSE && REAL_IS_DOUBLE
-void SparMatSymBlkDiag::Pilar::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
+#if ( SD_BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE && SMSBD_USES_SSE
+void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size_t jj) const
 {
-    vec2 s1 = load2(X+jj);
-    //const real X0 = X[jj  ];
-    //const real X1 = X[jj+1];
-    vec2 x0 = unpacklo2(s1, s1);
-    vec2 x1 = unpackhi2(s1, s1);
-
-    assert_small(dia_.asymmetry());
-    // load 2x2 matrix element into 2 vectors:
-    double const* D = dia_.data();
-    //assume the block is already symmetrized:
-    //real Y0 = Y[jj  ] + D[0] * X0 + D[1] * X1;
-    //real Y1 = Y[jj+1] + D[1] * X0 + D[3] * X1;
-    vec2 s0 = mul2(load2(D), s1);
-    s1 = mul2(load2(D+2), s1);
-    
-    Block const* blk = blk_;
-    auto const* inx = inx_;
-
-    Block const* end = blk_ + ( noff_ & ~1 );
-#if ( 1 )
-    // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
-    for ( ; blk < end; inx += 2, blk += 2 )
+    /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
+    vec2 s0, s1, s2;
+    vec2 xx, yy, zz;
     {
-        const auto i0 = 2 * inx[0];
-        const auto i1 = 2 * inx[1];
-        // load 2x2 matrix element into 2 vectors:
-        double const* M = blk[0].data();
-        double const* P = blk[1].data();
-        vec2 m01 = load2(M);
-        vec2 m23 = load2(M+2);
-        vec2 p01 = load2(P);
-        vec2 p23 = load2(P+2);
-        vec2 xx = load2(X+i0);
-        vec2 tt = load2(X+i1);
-        // multiply with the full block:
-        //Y[ii  ] += M[0] * X0 + M[2] * X1;
-        //Y[ii+1] += M[1] * X0 + M[3] * X1;
-        s0 = fmadd2(m01, xx, s0);
-        s1 = fmadd2(m23, xx, s1);
-        vec2 t = fmadd2(m01, x0, load2(Y+i0));
-        vec2 u = fmadd2(p01, x0, load2(Y+i1));
-        // multiply with the transposed block:
-        //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
-        //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        s0 = fmadd2(p01, tt, s0);
-        s1 = fmadd2(p23, tt, s1);
-        store2(Y+i0, fmadd2(m23, x1, t));
-        store2(Y+i1, fmadd2(p23, x1, u));
+        vec2 xy = load2(X+jj), z0 = load1(X+jj+2);
+        //multiply with the symmetrized block, assuming it has been symmetrized:
+        // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
+        // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
+        // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
+        double const* mat = dia_.data();
+        s0 = mul2(loadu2(mat  ), xy);
+        s1 = mul2(loadu2(mat+3), xy);
+        s2 = mul2(loadu2(mat+6), xy);
+        // prepare broadcasted vectors:
+        xx = duplo2(xy);
+        yy = duphi2(xy);
+        zz = duplo2(z0);
+        // add last column:
+        s0 = fmadd1(load1(mat+2), z0, s0);
+        s1 = fmadd1(load1(mat+5), z0, s1);
+        s2 = fmadd1(load1(mat+8), z0, s2);
     }
-#endif
-    end = blk_ + noff_;
-    // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
-    for ( ; blk < end; ++inx, ++blk )
-    {
-        const auto ii = 2 * inx[0];
-        // load 2x2 matrix element into 2 vectors:
-        double const* M = blk[0].data();
-        vec2 m0 = load2(M);
-        vec2 m2 = load2(M+2);
-        vec2 xx = load2(X+ii);
-
-        // multiply with the full block:
-        //Y[ii  ] += M[0] * X0 + M[2] * X1;
-        //Y[ii+1] += M[1] * X0 + M[3] * X1;
-        store2(Y+ii, fmadd2(m2, x1, fmadd2(m0, x0, load2(Y+ii))));
-
-        // multiply with the transposed block:
-        //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
-        //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        s0 = fmadd2(m0, xx, s0); // s0 += m0 * xx;
-        s1 = fmadd2(m2, xx, s1); // s1 += m2 * xx;
-    }
-    //Y[jj  ] = Y0;
-    //Y[jj+1] = Y1;
-    s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
-    store2(Y+jj, add2(s0, load2(Y+jj)));
-}
-#endif
-
-
-#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
-void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVX(const double* X, double* Y, size_t jj) const
-{
-    // xy = { X0 X1 X0 X1 }
-    vec4 xy = broadcast2(X+jj);
-    //multiply with full block, assuming it is symmetric:
-    // Y0 = M[0] * X0 + M[1] * X1;
-    // Y1 = M[1] * X0 + M[3] * X1;
-    
-    // yyyy = { Y0 Y0 Y1 Y1 }
-    // load 2x2 matrix element into 2 vectors:
-    vec4 ss = mul4(dia_.data0(), xy);
-
-    //const real X0 = X[jj  ];
-    //const real X1 = X[jj+1];
-    // xxyy = { X0 X0 X1 X1 }
-    const vec4 xxyy = duplohi4(xy);
-
-    // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
+    // There is a dependency in the loop for 's0', 's1' and 's2'.
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 2 * inx_[n];
-        vec4 mat = blk_[n].data0(); // load 2x2 matrix
-        vec4 yy = load2Z(Y+ii);          // yy = { Y0 Y1 0 0 }
-        vec4 xx = broadcast2(X+ii);      // xx = { X0 X1 X0 X1 }
+        const size_t ii = 3 * inx_[n];
+        double const* mat = blk_[n].data();
+        // multiply with the full block in vectors { XY, Z0 }:
+        //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
+        //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
+        //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
+        vec2 mat0 = loadu2(mat);
+        vec2 XY = fmadd2(mat0, xx, loadu2(Y+ii));
+        vec2 mat2 = load1(mat+2);
+        vec2 Z0 = fmadd1(mat2, xx, load1(Y+ii+2));
+        vec2 xyi = loadu2(X+ii);
+        s0 = fmadd2(mat0, xyi, s0);
 
-        // multiply with the full block:
-        //Y[ii  ] += M[0] * X0 + M[2] * X1;
-        //Y[ii+1] += M[1] * X0 + M[3] * X1;
-        vec4 u = fmadd4(mat, xxyy, yy);
-        store2(Y+ii, add2(getlo(u), gethi(u)));
-        
-        // multiply with the transposed block:
-        //Y0 += M[0] * X[ii] + M[1] * X[ii+1];
-        //Y1 += M[2] * X[ii] + M[3] * X[ii+1];
-        ss = fmadd4(mat, xx, ss);
+        // multiply with the transposed block in lines { s0, s1, s2 }:
+        //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
+        //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
+        //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
+
+        vec2 mat3 = loadu2(mat+3);
+        s1 = fmadd2(mat3, xyi, s1);
+        XY = fmadd2(mat3, yy, XY);
+        vec2 mat5 = load1(mat+5);
+        Z0 = fmadd1(mat5, yy, Z0);
+        vec2 mat6 = loadu2(mat+6);
+        s2 = fmadd2(mat6, xyi, s2);
+        XY = fmadd2(mat6, zz, XY);
+        vec2 mat8 = load1(mat+8);
+        Z0 = fmadd1(mat8, zz, Z0);
+        vec2 z0i = load1(X+ii+2);
+        storeu2(Y+ii, XY); store1(Y+ii+2, Z0);
+        // finish multiplication with the transposed block:
+        s0 = fmadd1(mat2, z0i, s0);
+        s1 = fmadd1(mat5, z0i, s1);
+        s2 = fmadd1(mat8, z0i, s2);
     }
-    // need to collapse yyyy = { S0 S0 S1 S1 }
-    // Y[jj  ] += yyyy[0] + yyyy[1];
-    // Y[jj+1] += yyyy[2] + yyyy[3];
-    vec2 yy = load2(Y+jj);
-    vec2 h = gethi(ss);
-    store2(Y+jj, add2(yy, add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h))));
+    // finally sum s0 = { Y0 Y0 }, s1 = { Y1 Y1 }, s2 = { Y2 Y2 }
+    s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
+    s2 = add2(unpacklo2(s2, s2), unpackhi2(s2, s2));
+    storeu2(Y+jj, add2(s0, load2(Y+jj)));
+    store1(Y+jj+2, add1(s2, load1(Y+jj+2)));
 }
 #endif
-
-
-#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
-static inline void multiply2D(double const* X, double* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
-{
-    vec4 xx = broadcast2(X+ii);
-    vec4 u = fmadd4(mat, xxxx, load2Z(Y+ii));
-    store2(Y+ii, add2(getlo(u), gethi(u)));
-    ss = fmadd4(mat, xx, ss);
-}
-#endif
-
-
-#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
-void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXU(const double* X, double* Y, size_t jj) const
-{
-    vec4 xyxy = broadcast2(X+jj);
-    vec4 ss = mul4(dia_.data0(), xyxy);
-    const vec4 xxyy = duplohi4(xyxy);
-    vec4 s1 = setzero4();
-    
-    Block const* blk = blk_;
-    Block const* end = blk_ + ( noff_ & ~1 );
-    auto const* inx = inx_;
-    // process 2 by 2:
-    #pragma nounroll
-    for ( ; blk < end; blk += 2, inx += 2 )
-    {
-#if ( 0 )
-        /*
-         Since all the indices are different, the blocks can be processed in
-         parallel, and micro-operations can be interleaved to avoid latency.
-         The compiler however cannot assume this, because the indices of the
-         blocks are not known at compile time.
-         */
-        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
-        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
-#else
-        /* we remove here the apparent dependency on the values of Y[],
-         which are read and written, but at different indices.
-         The compiler can reorder instructions to avoid lattencies */
-        const auto i0 = 2 * inx[0];
-        const auto i1 = 2 * inx[1];
-        assert_true( i0 < i1 );
-        vec4 mat0 = blk[0].data0();
-        vec4 mat1 = blk[1].data0();
-        vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
-        vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
-        ss = fmadd4(mat0, broadcast2(X+i0), ss);
-        s1 = fmadd4(mat1, broadcast2(X+i1), s1);
-        store2(Y+i0, add2(getlo(u0), gethi(u0)));
-        store2(Y+i1, add2(getlo(u1), gethi(u1)));
-#endif
-    }
-    // collapse 'ss'
-    ss = add4(ss, s1);
-    // process remaining blocks:
-    end = blk_ + noff_;
-    //#pragma nounroll
-    if ( blk < end ) // for ( ; blk < end; ++blk, ++inx )
-        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
-    /* finally horizontally sum ss = { SX SX SY SY } */
-    vec2 h = gethi(ss);
-    h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
-    store2(Y+jj, add2(load2(Y+jj), h));
-}
-#endif
-
-
-#if ( SD_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
-void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t jj) const
-{
-    vec4 xyxy = broadcast2(X+jj);
-    vec4 ss = mul4(dia_.data0(), xyxy);
-    const vec4 xxyy = duplohi4(xyxy);
-    vec4 s1 = setzero4();
-    vec4 s2 = setzero4();
-    vec4 s3 = setzero4();
-
-    Block  const* blk = blk_;
-    Block const* end = blk_ + ( noff_ & ~3 );
-    auto const* inx = inx_;
-
-    // process 4 by 4:
-    #pragma nounroll
-    for ( ; blk < end; blk += 4, inx += 4 )
-    {
-#if ( 0 )
-        /*
-         Since all the indices are different, the blocks can be processed in
-         parallel, and micro-operations can be interleaved to avoid latency.
-         The compiler however cannot assume this, because the indices of the
-         blocks are not known at compile time.
-         */
-        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
-        multiply2D(X, Y, 2*inx[1], blk[1].data0(), xxyy, s1);
-        multiply2D(X, Y, 2*inx[2], blk[2].data0(), xxyy, s2);
-        multiply2D(X, Y, 2*inx[3], blk[3].data0(), xxyy, s3);
-#else
-        /* we remove here the apparent dependency on the values of Y[],
-         which are read and written, but at different indices.
-         The compiler can reorder instructions to avoid lattencies */
-        vec4 mat0 = blk[0].data0();
-        vec4 mat1 = blk[1].data0();
-        vec4 mat2 = blk[2].data0();
-        vec4 mat3 = blk[3].data0();
-        const auto i0 = 2 * inx[0];
-        const auto i1 = 2 * inx[1];
-        const auto i2 = 2 * inx[2];
-        const auto i3 = 2 * inx[3];
-        assert_true( i0 < i1 );
-        assert_true( i1 < i2 );
-        assert_true( i2 < i3 );
-        vec4 u0 = fmadd4(mat0, xxyy, load2Z(Y+i0));
-        vec4 u1 = fmadd4(mat1, xxyy, load2Z(Y+i1));
-        vec4 u2 = fmadd4(mat2, xxyy, load2Z(Y+i2));
-        vec4 u3 = fmadd4(mat3, xxyy, load2Z(Y+i3));
-        ss = fmadd4(mat0, broadcast2(X+i0), ss);
-        s1 = fmadd4(mat1, broadcast2(X+i1), s1);
-        s2 = fmadd4(mat2, broadcast2(X+i2), s2);
-        s3 = fmadd4(mat3, broadcast2(X+i3), s3);
-        store2(Y+i0, add2(getlo(u0), gethi(u0)));
-        store2(Y+i1, add2(getlo(u1), gethi(u1)));
-        store2(Y+i2, add2(getlo(u2), gethi(u2)));
-        store2(Y+i3, add2(getlo(u3), gethi(u3)));
-#endif
-    }
-    // collapse 'ss'
-    ss = add4(add4(ss,s1), add4(s2,s3));
-    // process remaining blocks:
-    end = blk_ + noff_;
-    //#pragma nounroll
-    if ( blk < end ) // for ( ; blk < end; ++blk, ++inx )
-        multiply2D(X, Y, 2*inx[0], blk[0].data0(), xxyy, ss);
-    /* finally sum ss = { S0 S0 S1 S1 } */
-    vec2 h = gethi(ss);
-    h = add2(unpacklo2(getlo(ss), h), unpackhi2(getlo(ss), h));
-    store2(Y+jj, add2(load2(Y+jj), h));
-}
-#endif
-
-
-//------------------------------------------------------------------------------
-#pragma mark - 3D Double Precision Optimized Vector Multiplication
 
 #if ( SD_BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVX(const double* X, double* Y, size_t jj) const
