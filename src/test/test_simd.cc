@@ -906,6 +906,23 @@ void test_swap7()
 
 #endif
 
+#pragma mark - ARM NEON loads
+
+
+void test_loads()
+{
+    double src[] = { 1, 2, 3, 4, 5, 6 };
+    
+#if defined(__ARM_NEON__)
+    float64x2x3_t tmp = vld3q_f64(src);
+    dump(tmp.val[0], "vld3[0] ");
+    dump(tmp.val[1], "vld3[1] ");
+    dump(tmp.val[2], "vld3[2] ");
+#endif
+}
+
+
+    
 
 int main(int argc, char * argv[])
 {
@@ -917,6 +934,7 @@ int main(int argc, char * argv[])
     {
         case 0:
             test_swapSSE();
+            test_loads();
             break;
 #ifdef __AVX__
         case 1:

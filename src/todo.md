@@ -87,6 +87,13 @@ test write / read systematically on all cym files
 
 # Performance:
 
+- SparMatSymStruct Matrices can be structured as blocks corresponding to each Mecable (1.9.2022).
+	+ this would speed up block addressing: 
+	+ Need to create a tuple of indices {mecaindex, pointindex}, to use as argument of add_block()
+	+ block reordering by increasing index would only be needed within each Mecablock,
+	+ this will also permit esaier vecMul parallelization per block
+- new Matrix33x2 two implement two consecutive blocks:
+    consecutive 3x3 blocks can be handled simultaneously with SIMD vec2 operations
 - Store Mecable vertices as XXXXXXYYYYYYZZZZZZ to improve vectorization
 - use VAS = Vector Array Stride; MVL = Meca Vector Length
 - implement IDRS to replace BICGSTAB - convergence in matlab seems better
