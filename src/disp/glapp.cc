@@ -12,6 +12,7 @@
 #include "gym_menu.h"
 #include "gym_draw.h"
 #include "offscreen.h"
+#include "save_image.h"
 
 
 namespace glApp
@@ -319,9 +320,7 @@ void glApp::setScale(float s)
         views[n].view_scale = s;
 }
 
-#if ( 0 )
-#include "save_image.h"
-
+#ifdef SAVE_IMAGE_H
 int glApp::saveImage(char const* name, unsigned mag, unsigned downsample)
 {
     View view = currentView();
@@ -506,8 +505,17 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
             view.axes = ( view.axes ? 0 : mDIM );
             break;
 
-#if ( 0 )
-        case 'y': {
+#ifdef SAVE_IMAGE_H
+        case 'y':
+        if ( modifiers )
+        {
+            char name[1024] = { 0 };
+            GLint vp[] = { 0, 0, view.width(), view.height() };
+            snprintf(name, sizeof(name), "image%04i.png", imageIndex++);
+            SaveImage::saveDepthBuffer(name, vp);
+        }
+        else
+        {
             char name[1024] = { 0 };
             snprintf(name, sizeof(name), "image%04i.png", imageIndex++);
             saveImage(name, 1, 1);

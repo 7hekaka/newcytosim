@@ -12,7 +12,7 @@ OBJ_GFX := $(OBJ_GLE) $(OBJ_GYM) $(OBJ_FONT) offscreen.o spng.o miniz.o
 #-----------------------LIB & DEF for PNG support-------------------------------
 
 IMAGES=
-IMAGES_DEF=-DHAS_SPNG
+IMAGES_DEF=
 
 ifneq ($(HAS_PNG), 0)
 
