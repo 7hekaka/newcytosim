@@ -90,6 +90,7 @@ test write / read systematically on all cym files
 - SparMatSymStruct Matrices can be structured as blocks corresponding to each Mecable (1.9.2022).
 	+ this would speed up block addressing: 
 	+ Need to create a tuple of indices {mecaindex, pointindex}, to use as argument of add_block()
+	+ Updating the matrix can be done in parallel if Mecablocks are independent
 	+ block reordering by increasing index would only be needed within each Mecablock,
 	+ this will also permit esaier vecMul parallelization per block
 - new Matrix33x2 two implement two consecutive blocks:

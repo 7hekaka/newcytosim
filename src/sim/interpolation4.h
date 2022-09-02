@@ -66,7 +66,7 @@ public:
     Mecapoint vertex0() const { return Mecapoint(mec_, prime_); }
     
     /// index of first interpolated point in matrix
-    size_t matIndex() const { return mec_->matIndex() + (size_t)prime_; }
+    size_t matIndex0() const { return mec_->matIndex() + (size_t)prime_; }
 
     /// interpolation coefficients
     const real* coef() const { return coef_; }

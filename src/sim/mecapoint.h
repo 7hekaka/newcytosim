@@ -47,7 +47,7 @@ public:
     Vector pos() const { return mec_->posPoint(pti_); }
     
     /// Index of the point-of-interest in the isotropic matrix (Meca::mISO)
-    size_t matIndex() const { return mec_->matIndex() + (size_t)pti_; }
+    size_t matIndex0() const { return mec_->matIndex() + (size_t)pti_; }
     
     /// Write to file
     void write(Outputter&) const;
