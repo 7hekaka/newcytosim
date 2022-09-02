@@ -364,8 +364,11 @@ void checkMatrixOMP(MATRIX & mat, real const* x, real const* y, real * z, size_t
     zero_real(DIM*S, z);
     // check processing columns one-by-one:
     for ( size_t i = 0; i < S; ++i )
+    {
         mat.vecMulAdd(x, z, i, i+1);
-    printf(" %s check %+16.6f", mat.what(), checksum(DIM*S, z));
+        mat.vecMulAdd(y, z, i, i+1);
+    }
+    printf("\n%s OpenMP check %+16.6f", mat.what().c_str(), checksum(DIM*S, z));
 
     // change number of parallel threads:
     for ( int i = 0; i < 4; ++i )
@@ -442,16 +445,18 @@ void testParallelVecmul(const unsigned S, const size_t F)
 
 #ifdef _OPENMP
     size_t chunk = S / 16;
-    testMatrixOMP(mat, x, y, z, chunk, rec);
     checkMatrixOMP(mat, x, y, z, chunk);
+    testMatrixOMP(mat, x, y, z, chunk, rec);
+    printf("\n-->  OpenMP  ");
+    for ( auto u : rec )
+        printf(" %uT %-6.1f", u.first, u.second);
 #endif
 #if defined(__APPLE__)
     testMatrixDispatch(mat, x, y, z, rec);
-#endif
-    
-    printf("\n--> Threaded ");
+    printf("\n--> dispatch ");
     for ( auto u : rec )
         printf(" %uT %-6.1f", u.first, u.second);
+#endif
     fflush(stdout);
     printf("\n");
 
@@ -587,7 +592,7 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
 #endif
     SparMatB mat3; mat3.resize(S); testMatrix<SparMatB, fillMatrix>(mat3, x, y, z);
     SparMatD mat4; mat4.resize(S); testMatrix<SparMatD, fillMatrix>(mat4, x, y, z);
-    SparMatA mat5; mat5.resize(S); testMatrix<SparMatA, fillMatrix>(mat5, x, y, z);
+    //SparMatA mat5; mat5.resize(S); testMatrix<SparMatA, fillMatrix>(mat5, x, y, z);
 #if ( 0 )
     std::ofstream os1("mat1.txt");
     std::ofstream os3("mat3.txt");
@@ -662,7 +667,7 @@ void testBlockMatrix(const unsigned S, const size_t F)
     printf("------ %i x %u with %lu blocks:", DIM, S, F);
     SparMatB B; B.resize(DIM*S); testMatrix<SparMatB, fillBlockMatrix>(B, x, y, z);
     SparMatD D; D.resize(DIM*S); testMatrix<SparMatD, fillBlockMatrix>(D, x, y, z);
-    SparMatA A; A.resize(DIM*S); testMatrix<SparMatA, fillBlockMatrix>(A, x, y, z);
+    //SparMatA A; A.resize(DIM*S); testMatrix<SparMatA, fillBlockMatrix>(A, x, y, z);
     printf("\n");
 
     setIndices(0, 0);
@@ -677,7 +682,6 @@ void testBlockMatrix(const unsigned S, const size_t F)
 int main( int argc, char* argv[] )
 {
     printf("Matrix test and timing code --- real %lu bytes --- %s\n", sizeof(real), __VERSION__);
-
     RNG.seed();
 #if ( 0 )
     SparMat1 mat1;
@@ -735,7 +739,6 @@ int main( int argc, char* argv[] )
     testBlockMatrix(2311, 231111);
     //testBlockMatrix(DIM*3217, 671234);
 #endif
-    //testBlockMatrix(15494, 25123);
 #if ( 0 )
     //testMatrices(7, 23);
     //testMatrices(17, 23);
@@ -748,7 +751,8 @@ int main( int argc, char* argv[] )
 #endif
     //testMatrices(37, 1<<17);
     testMatrices(15494, 131836);
-    //testParallelVecmul(15464, 27676);
+    testBlockMatrix(15494, 131836);
+    testParallelVecmul(15464, 131836);
 #if ( 0 )
     size_t dim[5] = { 0 };
     for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));

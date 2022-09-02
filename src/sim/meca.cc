@@ -899,38 +899,26 @@ void Meca::apply()
          */
         calculateForces(vPTS, vBAS, vFOR);
         
-        // add Brownian terms:
-        for ( Mecable * mec : mecables )
-        {
-            const size_t inx = DIM * mec->matIndex();
-            mec->addBrownianForces(vRND+inx, alpha_, vFOR+inx);
-            //fprintf(stderr, "\n  "); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+inx, 2, DIM);
-        }
-        
-        if ( 1 )
-        {
-            //check validity of the data:
-            bool a = has_nan(dimension(), vPTS);
-            bool b = has_nan(dimension(), vFOR);
-            //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
-            if ( a | b )
-            {
-                fprintf(stderr, "Meca::%p failed (not-a-number %i %i):\n", this, a, b);
-#if ( 0 )
-                for ( Mecable * mec : mecables )
-                {
-                    b = has_nan(DIM*mec->nbPoints(), vPTS+DIM*mec->matIndex());
-                    fprintf(stderr, "Mecable %s isnan %i\n", mec->reference().c_str(), b);
-                }
-#endif
-                ready_ = 0;
-            }
-        }
-
         #pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
-            size_t off = DIM * mec->matIndex();
+            const size_t off = DIM * mec->matIndex();
+            mec->addBrownianForces(vRND+off, alpha_, vFOR+off);
+            //fprintf(stderr, "\n  "); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+off, 2, DIM);
+            if ( 1 )
+            {
+                // check validity of results:
+                const size_t dim = DIM * mec->nbPoints();
+                bool a = has_nan(dim, vPTS+off);
+                bool b = has_nan(dim, vFOR+off);
+                //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
+                if ( a | b )
+                {
+                    fprintf(stderr, "invalid results for Mecable %s isnan %i %i\n", mec->reference().c_str(), a, b);
+                    continue;
+                }
+            }
+            // transfer new coordinates to Mecable:
             mec->getForces(vFOR+off);
             mec->getPoints(vPTS+off);
         }

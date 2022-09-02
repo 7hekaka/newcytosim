@@ -100,7 +100,7 @@ namespace LinearSolvers
             return ( residual_ < margin * target_ ) | ( count_ > limit_ );
         }
         
-        /// calculate residual from `x` and set flag to `f`
+        /// calculate residual from `vec` and set flag to `f`
         void finish(unsigned f, size_t size, const real* vec) { flag_ = f; finished(size, vec); }
     };
 }

@@ -61,12 +61,25 @@ ifeq ($(MACHINE), auto)
 endif
 
 #-------------------------------------------------------------------------------
+#----------------------------  Intels' OpenMP  ---------------------------------
+#-------------------------------------------------------------------------------
+
+ifeq ($(MACHINE),mac)
+    # using libomp installed via Homebrew (http://brew.sh)
+    OpenMP := -Xclang -fopenmp -I/opt/homebrew/include/
+    OMPLIB := /opt/homebrew/lib/libomp.a
+else
+    OpenMP := -fopenmp
+    OMPLIB :=
+endif
+
+#-------------------------------------------------------------------------------
 #------------------------  Compiler Specifications  ----------------------------
 #-------------------------------------------------------------------------------
 
 # common options for all C++ objects: use '-fopenmp' to enable OpenMP
 CXXFLG := -std=gnu++14 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
-CXXFLG := -std=gnu++14 -fno-rtti -fopenmp #-g -fno-inline
+CXXFLG := -std=gnu++14 -fno-rtti $(OpenMP) #-g -fno-inline
 CXXFLG := -std=gnu++14 -fno-rtti
 
 # option concerning memory alignment:
@@ -95,8 +108,8 @@ ifeq ($(COMPILER),gcc)
 # export CPATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
 
     CXX := g++ -Wfatal-errors -Wno-deprecated-declarations
-    FAST := -O2 -fno-trapping-math -funroll-loops #-floop-optimize2 -ftree-vectorize -mavx2 -mfma
-    FAST := -O2 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native # -mavx2 -mfma
+    FAST := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native
+    FAST := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast # -mcpu=apple-m1 # -mavx2 -mfma
 
     DEBUG := -g3 -ggdb # -Wconversion
     COVER := -fprofile-arcs -ftest-coverage

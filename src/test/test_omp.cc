@@ -2,11 +2,11 @@
 // F. Nedelec, 22.04.2018
 
 #include <cstdio>
-#include <omp.h>
+#include "omp.h"
 
 typedef double real;
 
-const int max = 1000;
+const int max = 1024;
 const int num = 4;
 
 void process(int val)

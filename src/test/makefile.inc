@@ -72,7 +72,7 @@ test_block: test_block.cc matrix33.o matrix34.o vector3.o vector4.o matfull.o $(
 	$(DONE)
 
 test_matrix: test_matrix.cc sparmatsymblkdiag.o sparmatsymblk.o sparmatblk.o sparmatsym.o sparmatsym1.o sparmatsym2.o matrix.o $(TEST_OBJ) operator_new.o | bin
-	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) $(INFO) -o bin/$@
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(OMPLIB) $(LINK) $(INFO) -o bin/$@
 	$(DONE)
 
 test_glossary: test_glossary.cc glossary.o filepath.o tokenizer.o stream_func.o exceptions.o backtrace.o print_color.o | bin
@@ -108,7 +108,7 @@ test_simd: test_simd.cc $(TEST_OBJ) | bin
 	$(DONE)
 
 test_omp: test_omp.cc | bin
-	$(COMPILE) -fopenmp $^ -o bin/test_omp
+	$(COMPILE) $(OMPLIB) $^ -o bin/test_omp
 	$(DONE)
 
 test_dispatch: test_dispatch.cc | bin
