@@ -273,6 +273,14 @@ public:
     /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
     void vecMulDiagonal3D_AVX(const double* X, double* Y) const;
 
+    // process only off-diagonal elements with columns [start, stop[
+    void vecMulAddTriangle(const real* X, real* Y, size_t start, size_t stop) const
+    {
+        stop = std::min(stop, rsize_);
+        for ( size_t j = colix_[start]; j < stop; j = colix_[j+1] )
+            pilar_[j].vecMulAddTriangle3D(X, Y, 3*j);
+    }
+
     /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
     void vecMul(const real* X, real* Y) const;
 

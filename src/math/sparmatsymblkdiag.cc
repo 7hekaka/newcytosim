@@ -2019,6 +2019,24 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
     for ( size_t j = colix_[0]; j < rsize_; j = colix_[j+1] )
         pilar_[j].vecMulAddTriangle3D_SSE(X, Y, 3*j);
     
+#elif ( SD_BLOCK_SIZE == 3 )
+    
+    // process diagonal:
+    vecMulDiagonal3D(X, Y);
+    
+    // process off-diagonal elements:
+    for ( size_t j = colix_[0]; j < rsize_; j = colix_[j+1] )
+        pilar_[j].vecMulAddTriangle3D(X, Y, 3*j);
+    
+#elif ( SD_BLOCK_SIZE == 2 )
+    
+    // process diagonal:
+    vecMulDiagonal2D(X, Y);
+    
+    // process off-diagonal elements:
+    for ( size_t j = colix_[0]; j < rsize_; j = colix_[j+1] )
+        pilar_[j].vecMulAddTriangle2D(X, Y, 3*j);
+    
 #else
     zero_real(SD_BLOCK_SIZE*rsize_, Y);
     vecMulAdd(X, Y, 0, rsize_);
