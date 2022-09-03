@@ -100,8 +100,16 @@ void FilePath::change_dir(int file)
 {
     if ( file >= 0 )
     {
-        (void)fchdir(file);
-        (void)close(file);
+        if ( fchdir(file) )
+        {
+            perror("Could not change directory");
+            errno = 0;
+        };
+        if ( close(file) )
+        {
+            perror("Could not close file");
+            errno = 0;
+        };
     }
 }
 

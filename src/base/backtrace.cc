@@ -34,7 +34,8 @@ void print_backtrace(int out)
     char** buf = backtrace_symbols(buffer, size);
     char * ptr = (char*)malloc(n_ptr);
 
-    (void) write(out, "Cytosim execution stack:\n", 25);
+    ssize_t __attribute__((unused)) u;
+    u = write(out, "Cytosim execution stack:\n", 25);
     for ( int i = 1; i < size; ++i )
     {
         int status = -1;
@@ -59,13 +60,13 @@ void print_backtrace(int out)
         }
         if ( status == 0 )
         {
-            (void) write(out, buf[i], str-buf[i]);
-            (void) write(out, ptr, strlen(ptr));
-            (void) write(out, end, strlen(end));
+            u = write(out, buf[i], str-buf[i]);
+            u = write(out, ptr, strlen(ptr));
+            u = write(out, end, strlen(end));
         }
         else
-            (void) write(out, buf[i], strlen(buf[i]));
-        (void) write(out, "\n", 1);
+            u = write(out, buf[i], strlen(buf[i]));
+        u = write(out, "\n", 1);
     }
     free(ptr);
     free(buf);

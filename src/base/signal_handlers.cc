@@ -13,27 +13,30 @@
 
 static void out_of_memory_handler()
 {
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
-    (void) write(STDERR_FILENO, "Cytosim: memory allocation failed", 33);
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
+    ssize_t __attribute__((unused)) u;
+    u = write(STDERR_FILENO, "\n* * * * *\n", 11);
+    u = write(STDERR_FILENO, "Cytosim: memory allocation failed", 33);
+    u = write(STDERR_FILENO, "\n* * * * *\n", 11);
     print_backtrace();
     _exit(1);
 }
 
 static void termination_handler()
 {
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
-    (void) write(STDERR_FILENO, "Cytosim: uncaught exception", 27);
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
+    ssize_t __attribute__((unused)) u;
+    u = write(STDERR_FILENO, "\n* * * * *\n", 11);
+    u = write(STDERR_FILENO, "Cytosim: uncaught exception", 27);
+    u = write(STDERR_FILENO, "\n* * * * *\n", 11);
     print_backtrace();
     abort();
 }
 
 static void signal_handler(int sig)
 {
-    (void) write(STDERR_FILENO, "\n* * * * *\n", 11);
+    ssize_t __attribute__((unused)) u;
+    u = write(STDERR_FILENO, "\n* * * * *\n", 11);
     psignal((unsigned)sig, "Cytosim");
-    (void) write(STDERR_FILENO, "* * * * *\n", 10);
+    u = write(STDERR_FILENO, "* * * * *\n", 10);
     print_backtrace();
     _exit(sig);
 }

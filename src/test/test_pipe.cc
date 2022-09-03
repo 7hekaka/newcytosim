@@ -54,13 +54,14 @@ void start(const char* path, char *const command[])
         execv(path, command);
         // the command failed, and error is indicated by 'errno':
         perror("execv");
-        (void) write(STDERR_FILENO, "while executing command:", 24);
+        ssize_t __attribute__((unused)) u;
+        u = write(STDERR_FILENO, "while executing command:", 24);
         for ( int i = 0; command[i]; ++i )
         {
-            (void) write(STDERR_FILENO, " ", 1);
-            (void) write(STDERR_FILENO, command[i], strlen(command[i]));
+            u = write(STDERR_FILENO, " ", 1);
+            u = write(STDERR_FILENO, command[i], strlen(command[i]));
         }
-        (void) write(STDERR_FILENO, "\n", 1);
+        u = write(STDERR_FILENO, "\n", 1);
         errno = 0;
         _exit(1);
     }
