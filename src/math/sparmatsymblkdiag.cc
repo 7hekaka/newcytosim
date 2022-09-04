@@ -1373,7 +1373,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
     vec2 s0, s1, s2;
     vec2 xx, yy, zz;
     {
-        vec2 xy = load2(X+jj), z0 = load1(X+jj+2);
+        vec2 xy = loadu2(X+jj), z0 = load1(X+jj+2);
         //multiply with the symmetrized block, assuming it has been symmetrized:
         // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
         // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
@@ -1432,7 +1432,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
     // finally sum s0 = { Y0 Y0 }, s1 = { Y1 Y1 }, s2 = { Y2 Y2 }
     s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
     s2 = add2(unpacklo2(s2, s2), unpackhi2(s2, s2));
-    storeu2(Y+jj, add2(s0, load2(Y+jj)));
+    storeu2(Y+jj, add2(s0, loadu2(Y+jj)));
     store1(Y+jj+2, add1(s2, load1(Y+jj+2)));
 }
 #endif

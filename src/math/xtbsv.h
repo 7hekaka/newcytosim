@@ -1131,7 +1131,7 @@ void alsatian_xtbsvLNN2K3_SIMD(const int N, const double* pA, const int lda, dou
 {
     constexpr int ORD = 3;
     const double*const end = pA + (N-2) * lda;
-    vec2 x1 = load2(pX);
+    vec2 x1 = loadu2(pX);
     vec2 z1 = load1(pX+2);
     vec2 x2 = loadu2(pX+ORD);
     vec2 z2 = load1(pX+ORD+2);
@@ -1272,7 +1272,7 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
             vec2 a0 = loaddup2(pA);
             x2 = mul2(a0, loadu2(pX));
             z2 = mul1(a0, load1(pX+2));
-            store2(pX, x2);
+            storeu2(pX, x2);
             store1(pX+2, z2);
             pA -= lda;
             pX -= ORD;
@@ -1283,7 +1283,7 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
             a1 = mul2(a0, loaddup2(pA+1));
             x1 = fnmadd2(a1, x2, mul2(a0, loadu2(pX)));
             z1 = fnmadd1(a1, z2, mul1(a0, load1(pX+2)));
-            store2(pX, x1);
+            storeu2(pX, x1);
             store1(pX+2, z1);
             //pA -= lda;
             //pX -= ORD;
@@ -1292,7 +1292,7 @@ void alsatian_xtbsvLTN2K3_SIMD(const int N, const double* pA, const int lda, dou
     }
     // j = N-1
     vec2 a0 = loaddup2(pA);
-    x1 = mul2(a0, load2(pX));
+    x1 = mul2(a0, loadu2(pX));
     z1 = mul1(a0, load1(pX+2));
     storeu2(pX, x1);
     store1(pX+2, z1);
