@@ -21,6 +21,9 @@ namespace gym
     
     /// print OpenGL matrices for debugging purpose
     void printMatrices(FILE*);
+    
+    /// print depth-buffer range
+    void printDepthRange(int X, int Y, int W, int H);
 
 };
 

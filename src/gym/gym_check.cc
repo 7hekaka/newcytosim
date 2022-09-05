@@ -118,3 +118,23 @@ void gym::printColors(FILE * out)
     print_rgba(out, "back  emi", mat);
 }
 
+
+void gym::printDepthRange(int X, int Y, int W, int H)
+{
+    size_t S = W * H;
+    float * pixels = new float[S];
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(X, Y, W, H, GL_DEPTH_COMPONENT, GL_FLOAT, pixels);
+    
+    if ( glGetError() == GL_NO_ERROR )
+    {
+        float i = 2, s = -1;
+        for ( size_t u = 0; u < S; ++u )
+        {
+            i = std::min(i, pixels[u]);
+            if ( pixels[u] < 1 ) s = std::max(s, pixels[u]);
+        }
+        printf("OpenGL depth buffer range [ %8.6f %8.6f ]\n", i, s);
+    }
+    delete[] pixels;
+}
