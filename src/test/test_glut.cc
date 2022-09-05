@@ -32,10 +32,10 @@ int pointSize = 1;
 
 //------------- size of the display window:
 
-GLint windowSize[2] = { 800, 800 };
+int winW = 800;
+int winH = 800;
 
 GLfloat pixelSize = 1;
-
 
 //------------- delay for the Timer function in milli-seconds:
 
@@ -61,8 +61,6 @@ GLfloat pointer[] = { 0.f, 0.f, 0.f };
 void setModelView()
 {
     glMatrixMode(GL_MODELVIEW);
-    
-    //set the matrix with a simple zoom:
     glLoadIdentity();
     glScalef(zoom, zoom, zoom);
     glTranslatef(-focus[0], -focus[1], 0);
@@ -70,16 +68,16 @@ void setModelView()
 
 void unproject(const GLfloat X, const GLfloat Y, GLfloat res[2])
 {
-    res[0] = ( X - 0.5f * windowSize[0] ) * pixelSize + focus[0];
-    res[1] = ( 0.5f * windowSize[1] - Y ) * pixelSize + focus[1];
+    res[0] = ( X - 0.5f * winW ) * pixelSize + focus[0];
+    res[1] = ( 0.5f * winH - Y ) * pixelSize + focus[1];
     //printf("unproject (%+9.3f %+9.3f) --> (%+9.3f %+9.3f)\n", X, Y, res[0], res[2]);
 }
 
 void windowReshaped(int w, int h)
 {
     glViewport(0, 0, w, h);
-    windowSize[0] = w;
-    windowSize[1] = h;
+    winW = w;
+    winH = h;
         
     // --- set-up the projection matrix:
     glMatrixMode(GL_PROJECTION);
@@ -87,13 +85,13 @@ void windowReshaped(int w, int h)
     
     if ( w > h )
     {
-        pixelSize = 2.0f / ( zoom * windowSize[0] );
+        pixelSize = 2.0f / ( zoom * winW );
         GLfloat ratio = h / GLfloat(w);
         glOrtho(-1.0, 1.0, -ratio, ratio, 0, 1 );
     }
     else
     {
-        pixelSize = 2.0f / ( zoom * windowSize[1] );
+        pixelSize = 2.0f / ( zoom * winH );
         GLfloat ratio = w / GLfloat(h);
         glOrtho(-ratio, ratio, -1.0, 1.0, 0, 1 );
     }
@@ -213,8 +211,8 @@ void processMouse(int button, int state, int x, int y)
             
         case MOUSE_ZOOM:
         {
-            GLfloat xx = x - 0.5*windowSize[0];
-            GLfloat yy = y - 0.5*windowSize[1];
+            GLfloat xx = x - 0.5*winW;
+            GLfloat yy = y - 0.5*winH;
             zoomFactor = std::sqrt( xx*xx + yy*yy );
             if ( zoomFactor > 0 )
                 zoomFactor = 1 / zoomFactor;
@@ -249,8 +247,8 @@ void processMotion(int x, int y)
         case MOUSE_ZOOM:
         {
             // --- we set the zoom from how far the mouse is from the window center
-            GLfloat X = x - 0.5*windowSize[0];
-            GLfloat Y = y - 0.5*windowSize[1];
+            GLfloat X = x - 0.5*winW;
+            GLfloat Y = y - 0.5*winH;
             GLfloat Z = zoomFactor * std::sqrt(X*X+Y*Y);
             if ( Z <= 0 ) return;
             zoom = zoomSave * Z;
@@ -268,12 +266,32 @@ void processMotion(int x, int y)
     glutPostRedisplay();
 }
 
+//----------------------------- INIT GL --------------------------------
+void initGL()
+{
+    // --- choose the clearing color: black
+    glClearColor(0.f, 0.f, 0.f, 0.f);
+    
+    //--- hints for OpenGL rendering:
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glEnable(GL_POINT_SMOOTH);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    
+    initMenus();
+    setModelView();
+}
+
 //----------------------------- DISPLAY --------------------------------
 
 void display()
 {
     // --- clear window to the current clearing color:
-    glClear( GL_COLOR_BUFFER_BIT );
+    glClear(GL_COLOR_BUFFER_BIT);
     
     // --- set line width to 1 and color to white:
     glColor3f(1.f, 1.f, 1.f);
@@ -307,42 +325,19 @@ void timerFunction(int value)
     //This is a very basic simulation!
     pointSize = 1 + ( pointSize + 1 ) % 16;
     
-    
     glutPostRedisplay();
     //register another automatic timer call back (timerDelay is in milli-sec):
     glutTimerFunc(timerDelay, timerFunction, 1);
 }
 
 
-//----------------------------- INIT GL --------------------------------
-void initGL()
-{
-    // --- choose the clearing color: black
-    glClearColor(0.f, 0.f, 0.f, 0.f);
-    
-    //--- hints for OpenGL rendering:
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    glEnable(GL_POINT_SMOOTH);
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    
-    initMenus();
-    setModelView();
-}
-
-
 //-----------------------------   MAIN  --------------------------------
 int main(int argc, char* argv[])
 {
-    
     // --- initialization of GLUT:
     glutInit(&argc, argv);
-    glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE );
-    glutInitWindowSize(windowSize[0], windowSize[1]);
+    glutInitDisplayMode(GLUT_RGBA|GLUT_DOUBLE);
+    glutInitWindowSize(winW, winH);
     glutInitWindowPosition(50, 50);
     glutCreateWindow(argv[0]);
     
