@@ -49,7 +49,6 @@ namespace glApp
     void switchUserMode(int dir);
     
     View savedView("savedView", 0);
-    int  savedWindowPos[4] = { 24, 24, 800, 800 };
 
     UserMode mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
     int      mouseX, mouseY;    ///< current position of mouse in pixels
@@ -113,63 +112,34 @@ void glApp::setDimensionality(const int d)
 
 //------------------------------------------------------------------------------
 
-int glApp::isFullScreen()
+void glApp::toggleFullScreen()
 {
-    return mFullScreen;
-}
-
-void glApp::setFullScreen(int s)
-{
-    mFullScreen = s;
-}
-
-
-void glApp::saveWindowPosition()
-{
-    //save the current window size and position:
-    savedWindowPos[0] = glutGet(GLUT_WINDOW_X);
-    savedWindowPos[1] = glutGet(GLUT_WINDOW_Y);
-    savedWindowPos[2] = glutGet(GLUT_WINDOW_WIDTH);
-    savedWindowPos[3] = glutGet(GLUT_WINDOW_HEIGHT);
-}
-
-
-void glApp::enterFullScreen()
-{
-    if ( ! mFullScreen )
+    static int  savedPos[4] = { 24, 24, 800, 800 };
+    if ( mFullScreen )
+    {
+        mFullScreen = 0;
+        // restore window dimensions:
+        if ( savedPos[2] > 8 && savedPos[3] > 8 )
+        {
+            //std::clog << "saveWindow " << savedPos[2] << " " << savedPos[3] << '\n';
+            glutReshapeWindow(savedPos[2], savedPos[3]);
+            glutPositionWindow(savedPos[0], savedPos[1]);
+        }
+        else
+            glutReshapeWindow(800, 800);
+    }
+    else
     {
         mFullScreen = 1;
-        saveWindowPosition();
+        savedPos[0] = glutGet(GLUT_WINDOW_X);
+        savedPos[1] = glutGet(GLUT_WINDOW_Y);
+        savedPos[2] = glutGet(GLUT_WINDOW_WIDTH);
+        savedPos[3] = glutGet(GLUT_WINDOW_HEIGHT);
         //invoke full screen from GLUT
         glutFullScreen();
         //std::clog << "Fullscreen window " << glutGetWindow() << '\n';
     }
 }
-
-
-void glApp::exitFullScreen()
-{
-    mFullScreen = 0;
-    // restore window dimensions:
-    if ( savedWindowPos[2] > 8 && savedWindowPos[3] > 8 )
-    {
-        //std::clog << "saveWindow " << savedWindowPos[2] << " " << savedWindowPos[3] << '\n';
-        glutReshapeWindow(savedWindowPos[2], savedWindowPos[3]);
-        glutPositionWindow(savedWindowPos[0], savedWindowPos[1]);
-    }
-    else
-        glutReshapeWindow(800, 800);
-}
-
-
-void glApp::toggleFullScreen()
-{
-    if ( mFullScreen )
-        exitFullScreen();
-    else
-        enterFullScreen();
-}
-
 
 #if !defined(GLUT_WINDOW_SCALE)
 #    define GLUT_WINDOW_SCALE 199
@@ -448,7 +418,7 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
         
         case 27: // ascii 27 is ESCAPE
             if ( mFullScreen )
-                exitFullScreen();
+                toggleFullScreen();
             else
                 deleteWindow(glutGetWindow());
             break;

@@ -171,6 +171,7 @@ int main(int argc, char* argv[])
     Style style = OFFSCREEN;
     int menu = 1;
     int mode = NORMAL;
+    int fullscreen = 0;
     Glossary arg;
     
     Cytosim::out.silent();
@@ -183,7 +184,7 @@ int main(int argc, char* argv[])
 #else
     glApp::setDimensionality(DIM);
     if ( arg.use_key("fullscreen") )
-        glApp::setFullScreen(1);
+        fullscreen = 1;
     View& view = glApp::views[0];
 #endif
     if ( DIM == 3 )
@@ -460,7 +461,7 @@ int main(int argc, char* argv[])
         player.setStyle(disp.style);
         if ( menu )
             buildMenus();
-        if ( glApp::isFullScreen() )
+        if ( fullscreen )
             glutFullScreen();
         glutTimerFunc(100, timerCallback, 0);
     }

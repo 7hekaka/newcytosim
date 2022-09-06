@@ -22,35 +22,20 @@ namespace glApp
     /// change dimensionnality (this affects mostly the mouse controls availability)
     void setDimensionality(int d);
     
-    /// set display function `func`
+    /// create new window
     int newWindow();
 
-    /// set display function `func`
+    /// create new window with display function `func`
     int newWindow(int (*func)(View&));
     
-    /// set display function `func`
+    /// create new window with display functions `func` and `mag`
     int newWindow(int (*func)(View&), void (*mag)(View&));
 
     /// destroy window
     void deleteWindow(int win);
     
-    /// save current window position and size
-    void saveWindowPosition();
-    
-    /// enter full-screen mode
-    void enterFullScreen();
-
-    /// exit full-screen mode
-    void exitFullScreen();
-    
     /// enter or exit full-screen mode
     void toggleFullScreen();
-    
-    /// return current mode
-    int isFullScreen();
-    
-    /// set current mode
-    void setFullScreen(int);
 
     /// maximize window size within the current screen
     void maximizeWindow();
