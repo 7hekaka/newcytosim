@@ -8,8 +8,8 @@
 #include "fiber_prop.h"
 
 #define DISPLAY 1
-#include "gle_color.h"
-#include "gle_color_list.h"
+#include "gym_color.h"
+#include "gym_color_list.h"
 
 #include "modulo.h"
 #include "simul.h"
@@ -118,7 +118,7 @@ void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*
 }
 
 
-void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
+void Display::drawBallT(Vector const& pos, real rad, gym_color const& col) const
 {
     gym::transScale(pos, rad);
     gym::enableLighting();
@@ -127,7 +127,7 @@ void Display::drawBallT(Vector const& pos, real rad, gle_color const& col) const
 }
 
 
-void Display::drawDiscT(Vector const& pos, real rad, gle_color const& col) const
+void Display::drawDiscT(Vector const& pos, real rad, gym_color const& col) const
 {
     gym::transScale(pos, rad);
     gym::disableLighting();
@@ -288,7 +288,7 @@ void Display::drawTiled(Simul const& sim, int tile)
 /**
  Create a FiberDisp for this Property if necessary
  */
-void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gle_color col)
+void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gym_color col)
 {
     FiberDisp *& disp = fp->disp;
     
@@ -335,7 +335,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
 {
     bool hide = false;
     assert_true(fib->prop);
-    gle_color col = disp->color;
+    gym_color col = disp->color;
     
     // change body color depending on coloring mode:
     switch ( disp->coloring )
@@ -345,30 +345,30 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
             col = disp->color;
             break;
         case FiberDisp::COLORING_RANDOM:
-            col = gle::bright_color(fib->signature()).match_a(disp->color);
+            col = gym::bright_color(fib->signature()).match_a(disp->color);
             break;
         case FiberDisp::COLORING_DIRECTION:
             col = radial_color(fib->avgDirection());
             break;
         case FiberDisp::COLORING_MARK:
-            col = gle::nice_color(fib->mark());
+            col = gym::nice_color(fib->mark());
             break;
         case FiberDisp::COLORING_FLAG:
-            col = gle::std_color(fib->flag());
+            col = gym::std_color(fib->flag());
             break;
 #if FIBER_HAS_FAMILY
         case FiberDisp::COLORING_FAMILY:
             if ( fib->family_ )
-                col = gle::nice_color(fib->family_->signature());
+                col = gym::nice_color(fib->family_->signature());
             else
                 col = disp->color;
             break;
 #endif
         case FiberDisp::COLORING_CLUSTER:
-            col = gle::alt_color(fib->flag());
+            col = gym::alt_color(fib->flag());
             break;
         case FiberDisp::COLORING_AGE:
-            col = gle_color::jet_color((fib->age()-age_start)*age_scale, 1.0);
+            col = gym_color::jet_color((fib->age()-age_start)*age_scale, 1.0);
             break;
         case FiberDisp::COLORING_PSTATE:
             if ( fib->endStateP() > 0 )
@@ -460,7 +460,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
  Create a PointDisp for this Property if necessary
  */
 template < typename T >
-void Display::preparePointDisp(T * p, PropertyList& alldisp, gle_color col)
+void Display::preparePointDisp(T * p, PropertyList& alldisp, gym_color col)
 {
     PointDisp *& disp = p->disp;
     
@@ -507,7 +507,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
         delete[] allLineDisp;
         allLineDisp = new LineDisp[numLineDisp];
 #if 0
-        printf("sizeof gle_color %lu bytes\n", sizeof(gle_color));
+        printf("sizeof gym_color %lu bytes\n", sizeof(gym_color));
         printf("sizeof LineDisp  %lu bytes\n", sizeof(LineDisp));
         std::clog << " new allLineDisp(" << numLineDisp << ")\n";
 #endif
@@ -542,7 +542,7 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
     prep_flag = 0;
     // create a FiberDisp for each FiberProp:
     for ( Property* p : plist )
-        prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gle::nice_color(idx++));
+        prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gym::nice_color(idx++));
 
     // create a LineDisp for each Fiber:
     attributeLineDisp(sim.fibers);
@@ -581,18 +581,18 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
     
     //create a PointDisp for each HandProp:
     for ( Property * i : sim.properties.find_all("hand") )
-        preparePointDisp(static_cast<HandProp*>(i), alldisp, gle::nice_color(idx++));
+        preparePointDisp(static_cast<HandProp*>(i), alldisp, gym::nice_color(idx++));
     
     //create a PointDisp for each SphereProp:
     for ( Property * i : sim.properties.find_all("sphere") )
-        preparePointDisp(static_cast<SphereProp*>(i), alldisp, gle::bright_color(idx++));
+        preparePointDisp(static_cast<SphereProp*>(i), alldisp, gym::bright_color(idx++));
     
     //create a PointDisp for each SolidProp:
     for ( Property * i : sim.properties.find_all("solid", "bead") )
-        preparePointDisp(static_cast<SolidProp*>(i), alldisp, gle::bright_color(idx++));
+        preparePointDisp(static_cast<SolidProp*>(i), alldisp, gym::bright_color(idx++));
     
     //create a PointDisp for each SpaceProp:
-    gle_color col(DIM==3?0x00000044:0xAAAAAAFF);
+    gym_color col(DIM==3?0x00000044:0xAAAAAAFF);
     for ( Property * i : sim.properties.find_all("space") )
         preparePointDisp(static_cast<SpaceProp*>(i), alldisp, col);
 }
@@ -711,7 +711,7 @@ void Display::drawFields(FieldSet const& set)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void Display::drawAverageFiber(ObjectList const& objs, gle_color col) const
+void Display::drawAverageFiber(ObjectList const& objs, gym_color col) const
 {
     Vector G, D, M, P;
     real S = FiberSet::infoPosition(objs, M, G, P);
@@ -755,7 +755,7 @@ bool selectL(Object const* obj, void const* arg)
 void Display::drawAverageFiber1(FiberSet const& fibers, void const* arg) const
 {
     ObjectList objs = fibers.collect(match_property, arg);
-    drawAverageFiber(objs, gle_color(1,1,1));
+    drawAverageFiber(objs, gym_color(1,1,1));
 }
 
 
@@ -765,10 +765,10 @@ void Display::drawAverageFiber2(FiberSet const& fibers, void const* arg) const
     ObjectList objsL = fibers.collect(selectL, arg);
     
     // display right-pointing fibers in Red
-    drawAverageFiber(objsR, gle_color(1,0,0));
+    drawAverageFiber(objsR, gym_color(1,0,0));
     
     // display left-pointing fibers in Green
-    drawAverageFiber(objsL, gle_color(0,1,0));
+    drawAverageFiber(objsL, gym_color(0,1,0));
 }    
 
 
@@ -871,7 +871,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
     switch ( style )
     {
         case 1: { // display plain lines:
-            gle_color c = fib.disp->color;
+            gym_color c = fib.disp->color;
             for ( size_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {c, fib.posP(i)};
             ptr = flu + fib.nbPoints();
@@ -880,7 +880,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             strip = 0;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
-                gle_color c = color_by_tension(fib, n);
+                gym_color c = color_by_tension(fib, n);
                 ptr[0] = {c, fib.posP(n)};
                 ptr[1] = {c, fib.posP(n+1)};
                 ptr += 2;
@@ -890,7 +890,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             strip = 0;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
-                gle_color c = color_by_tension_jet(fib, n);
+                gym_color c = color_by_tension_jet(fib, n);
                 ptr[0] = {c, fib.posP(n)};
                 ptr[1] = {c, fib.posP(n+1)};
                 ptr += 2;
@@ -905,7 +905,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             strip = 0;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
-                gle_color c = color_by_direction(fib, n);
+                gym_color c = color_by_direction(fib, n);
                 ptr[0] = {c, fib.posP(n)};
                 ptr[1] = {c, fib.posP(n+1)};
                 ptr += 2;
@@ -973,7 +973,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     else
     {
-        gle_color c;
+        gym_color c;
         if ( disp->line_style == 2 )
             c = color_by_tension(fib, inx);
         else if ( disp->line_style == 3 )
@@ -1149,7 +1149,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
     
     gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
-    gle_color c, col = disp->color;
+    gym_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
     size_t cnt = 2 * ( sup - inf );
     flute4D* flu = gym::mapBufferC4VD(cnt+4);
@@ -1216,7 +1216,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
     
     gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
-    gle_color c, col = disp->color;
+    gym_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
     size_t cnt = 2 * ( sup - inf );
     flute4D* flu = gym::mapBufferC4VD(cnt+4);
@@ -1303,7 +1303,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
 }
 
 
-void Display::drawFiberLabels(Fiber const& fib, int style, gle_color const& col) const
+void Display::drawFiberLabels(Fiber const& fib, int style, gym_color const& col) const
 {
     char str[32];
     
@@ -1369,8 +1369,8 @@ void Display::drawFiberLabels(Fiber const& fib, int style, gle_color const& col)
 void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 {
     gym::ref_view();
-    gle_color col = fib.prop->disp->force_color;
-    gle_color lor = col.alpha_scaled(0.5f);
+    gym_color col = fib.prop->disp->force_color;
+    gym_color lor = col.alpha_scaled(0.5f);
     size_t cnt = 2 * fib.nbPoints();
     flute4D* flu = gym::mapBufferC4VD(cnt);
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
@@ -1395,9 +1395,9 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
  along the backbone of the `Fiber` at distance 4nm from each other.
  */
 void Display::drawFilament(Fiber const& fib,
-                           gle_color const& color1,
-                           gle_color const& color2,
-                           gle_color const& colorE) const
+                           gym_color const& color1,
+                           gym_color const& color2,
+                           gym_color const& colorE) const
 {
     // axial translation between two sucessive monomers:
     const real dab = 0.004;
@@ -1458,9 +1458,9 @@ void Display::drawFilament(Fiber const& fib,
  which shows half a turn in 37nm containing 13 monomers.
  */
 void Display::drawActin(Fiber const& fib,
-                        gle_color const& color1,
-                        gle_color const& color2,
-                        gle_color const& colorE) const
+                        gym_color const& color1,
+                        gym_color const& color2,
+                        gym_color const& colorE) const
 {    
     // axial translation between two sucessive monomers:
     const real dab = 0.00275;
@@ -1540,9 +1540,9 @@ void Display::drawActin(Fiber const& fib,
  colorB for beta-tubulin
  */
 void Display::drawMicrotubule(Fiber const& fib,
-                              gle_color const& colorA,
-                              gle_color const& colorB,
-                              gle_color const& colorE) const
+                              gym_color const& colorA,
+                              gym_color const& colorB,
+                              gym_color const& colorE) const
 {
     // precalculated 3-start helical trajectory, for 13 monomers:
     //real dx[] = {0,0.000923,0.001846,0.002769,0.003692,0.004615,0.005538,0.006461,0.007384,0.008308,0.009231,0.010154,0.011077};
@@ -1624,9 +1624,9 @@ void Display::drawFiber(Fiber const& fib)
         if ( disp->style & 4 )
             return drawFiberBackbone(fib);
 
-        gle_color col1 = fib.disp->color;
-        gle_color col2 = fib.disp->color.darken(0.75);
-        gle_color colE = fib.disp->end_color[0];
+        gym_color col1 = fib.disp->color;
+        gym_color col2 = fib.disp->color.darken(0.75);
+        gym_color colE = fib.disp->end_color[0];
         
         // load backface color:
         if ( fib.prop->disp->coloring )

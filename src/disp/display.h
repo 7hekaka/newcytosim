@@ -7,7 +7,7 @@
 #include "fiber.h"
 #include "mecable.h"
 #include "mecapoint.h"
-#include "gle_color.h"
+#include "gym_color.h"
 #include "display_prop.h"
 
 class Simul;
@@ -111,13 +111,13 @@ protected:
 private:
     
     /// set default value of FiberProp
-    void prepareFiberDisp(FiberProp*, PropertyList&, gle_color);
+    void prepareFiberDisp(FiberProp*, PropertyList&, gym_color);
     
     /// set values of fiber's LineDisp
     void prepareLineDisp(Fiber const*, FiberDisp const*, LineDisp*);
     
     template < typename T >
-    void preparePointDisp(T * prop, PropertyList&, gle_color);
+    void preparePointDisp(T * prop, PropertyList&, gym_color);
     
     /// draw translucent objects after depth-sorting
     void drawTransparentObjects(Array<zObject>&);
@@ -170,10 +170,10 @@ public:
     void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)()) const;
     
     /// draw a fine spherical object
-    void drawBallT(Vector const&, real radius, gle_color const&) const;
+    void drawBallT(Vector const&, real radius, gym_color const&) const;
     
     /// draw a fine spherical object
-    void drawDiscT(Vector const&, real radius, gle_color const&) const;
+    void drawDiscT(Vector const&, real radius, gym_color const&) const;
 
 
     
@@ -206,13 +206,13 @@ public:
     virtual void drawFiberSegmentT(Fiber const&, size_t) const;
 
     /// actin-like rendering using a sphere to represent each monomer
-    void         drawFilament(Fiber const& fib, gle_color const&, gle_color const&, gle_color const&) const;
+    void         drawFilament(Fiber const& fib, gym_color const&, gym_color const&, gym_color const&) const;
 
     /// actin-like rendering using a sphere to represent each monomer
-    void         drawActin(Fiber const& fib, gle_color const&, gle_color const&, gle_color const&) const;
+    void         drawActin(Fiber const& fib, gym_color const&, gym_color const&, gym_color const&) const;
     
     /// microtubule-like rendering using a sphere to represent each monomer
-    void         drawMicrotubule(Fiber const& fib, gle_color const&, gle_color const&, gle_color const&) const;
+    void         drawMicrotubule(Fiber const& fib, gym_color const&, gym_color const&, gym_color const&) const;
     
     /// draw Fiber point-like features
     virtual void drawFiberPoints(Fiber const&) const;
@@ -233,7 +233,7 @@ public:
     virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real width) const;
 
     /// display Labels for a Fiber
-    void         drawFiberLabels(Fiber const&, int style, gle_color const&) const;
+    void         drawFiberLabels(Fiber const&, int style, gym_color const&) const;
     
     /// display forces acting on the fiber vertices
     void         drawFiberForces(Fiber const&, real scale, float width) const;
@@ -245,7 +245,7 @@ public:
     virtual void drawFibers(FiberSet const&);
     
     /// draw the average fiber for the pool defined by func(obj, val) == true
-    void drawAverageFiber(ObjectList const&, gle_color) const;
+    void drawAverageFiber(ObjectList const&, gym_color) const;
     
     /// draw the averaged fiber
     void drawAverageFiber1(FiberSet const&, void const*) const;

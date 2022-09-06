@@ -2,7 +2,7 @@
 #ifndef POINT_DISP_H
 #define POINT_DISP_H
 
-#include "gle_color.h"
+#include "gym_color.h"
 #include "property.h"
 #include "gle.h"
 #include "gym_zoo.h"
@@ -105,7 +105,7 @@ public:
     int visible;
     
     /// color of object (in 3D display, the color of outer surfaces)
-    gle_color color;
+    gym_color color;
     
     /// second color (set as color[1])
     /**
@@ -113,7 +113,7 @@ public:
      and the inner surfaces of objects such as Sphere, Solid, Bead and Space.
      If it is not defined, `color2` is set to be a darker tone of `color`.
      */
-    gle_color color2;
+    gym_color color2;
 
     /// if true, attribute random colors to individual objects
     int coloring;
@@ -134,7 +134,7 @@ public:
     char symbol;
     
     /// color of symbol (set as symbol[1])
-    gle_color colorS;
+    gym_color colorS;
     
     /// @}
     

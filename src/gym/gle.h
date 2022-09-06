@@ -4,7 +4,7 @@
 #define GLE_H
 
 #include "real.h"
-#include "gle_color.h"
+#include "gym_color.h"
 
 class Vector1;
 class Vector2;
@@ -269,13 +269,13 @@ namespace gle
     void drawBand(Vector2 const& a, float, Vector2 const& b, float);
     
     /// draw a band from A to B, with specified radius and colors in A and B
-    void drawBand(Vector1 const& a, float, gle_color, Vector1 const& b, float, gle_color);
-    void drawBand(Vector2 const& a, float, gle_color, Vector2 const& b, float, gle_color);
+    void drawBand(Vector1 const& a, float, gym_color, Vector1 const& b, float, gym_color);
+    void drawBand(Vector2 const& a, float, gym_color, Vector2 const& b, float, gym_color);
 
     /// draw symbol linking A to B
     void drawHourglass(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&);
-    void drawHourglass(Vector2 const&, Vector2 const&, gle_color,
-                Vector2 const&, Vector2 const&, gle_color);
+    void drawHourglass(Vector2 const&, Vector2 const&, gym_color,
+                Vector2 const&, Vector2 const&, gym_color);
     /// draw symbol linking A to B
     void drawCross(Vector2 const& a, Vector2 const&, Vector2 const& b, Vector2 const&, real);
     void drawBar(Vector3 const& a, Vector3 const& da, Vector3 const& b, Vector3 const& db, real);

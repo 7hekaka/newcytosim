@@ -6,7 +6,7 @@
 #include "modulo.h"
 
 #include "gle.h"
-#include "gle_color_list.h"
+#include "gym_color_list.h"
 
 #include "fiber_disp.h"
 #include "line_disp.h"
@@ -166,7 +166,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
 void Display1::drawSinglesA(const SingleSet & set) const
 {
     gym::ref_view();
-    gle_color air(0,0,0,0);
+    gym_color air(0,0,0,0);
     size_t cnt = 2 * set.sizeA();
     flute4D* flu = gym::mapBufferC4VD(cnt);
     flute4D* ptr = flu;
@@ -175,7 +175,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
         Fiber const* fib = obj->fiber();
         if ( obj->disp()->perceptible & fib->disp->visible )
         {
-            gle_color d, c = obj->disp()->color;
+            gym_color d, c = obj->disp()->color;
             Vector Q, P = obj->posHand();
             if ( obj->hasLink() ) {
                 d = c;
@@ -325,7 +325,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
 void Display1::drawCouplesB(CoupleSet const& set) const
 {
     gym::ref_view();
-    gle_color air(0,0,0,0);
+    gym_color air(0,0,0,0);
     size_t cnt = 2 * set.sizeAA() * (1+ENABLE_EXPLODED_DISPLAY);
     flute4D* flu = gym::mapBufferC4VD(cnt);
     flute4D* ptr = flu;
@@ -343,8 +343,8 @@ void Display1::drawCouplesB(CoupleSet const& set) const
         Fiber const* fib2 = obj->fiber2();
         bool vis1 = obj->disp1()->perceptible & fib1->disp->visible;
         bool vis2 = obj->disp2()->perceptible & fib2->disp->visible;
-        gle_color col1 = vis1 ? obj->disp1()->color : air;
-        gle_color col2 = vis2 ? obj->disp2()->color : air;
+        gym_color col1 = vis1 ? obj->disp1()->color : air;
+        gym_color col2 = vis2 ? obj->disp2()->color : air;
         Vector P = obj->posHand1();
         Vector Q = obj->posHand2();
         if ( modulo ) modulo->fold(Q, P);

@@ -14,7 +14,7 @@
 #include <cmath>
 #include <sys/param.h>
 
-#include "gle_color.h"
+#include "gym_color.h"
 
 /// child process id:
 pid_t child = 0;
@@ -102,7 +102,7 @@ int command(char cmd[], size_t len, int num)
     {
         case 0:
         {
-            gle_color col = gle_color::hue_color(angle);
+            gym_color col = gym_color::hue_color(angle);
             std::string str = col.to_string();
             return snprintf(cmd, len, "change all simul display {back_color=%s}\n", str.c_str());
         }
@@ -115,7 +115,7 @@ int command(char cmd[], size_t len, int num)
         }
         case 3:
         {
-            gle_color col = gle_color::hue_color(M_PI+angle);
+            gym_color col = gym_color::hue_color(M_PI+angle);
             std::string str = col.to_string();
             return snprintf(cmd, len, "change all fiber display { color=%s }\n", str.c_str());
         }

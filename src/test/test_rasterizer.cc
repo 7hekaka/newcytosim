@@ -48,12 +48,12 @@ extern bool rasterizer_draws;
 
 void drawPoints(size_t N, const Vector P[], float size)
 {
-    gle_color col(1, 0, 1);
+    gym_color col(1, 0, 1);
     flute8 * flu = gym::mapBufferC4V4(N);
     size_t i = 0;
     for ( ; i < N; ++i )
         flu[i] = { col, P[i] };
-    flu[0] = { gle_color(0, 1, 0), P[0] };
+    flu[0] = { gym_color(0, 1, 0), P[0] };
     gym::unmapBufferC4V4();
     gym::drawPoints(size, 0, i);
     gym::cleanup();
@@ -61,12 +61,12 @@ void drawPoints(size_t N, const Vector P[], float size)
 
 void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
 {
-    gle_color col(1, 0, 1);
+    gym_color col(1, 0, 1);
     flute8 * flu = gym::mapBufferC4V4(N);
     size_t i = 0;
     for ( ; i < N; ++i )
         flu[i] = { col, P[i].XX, P[i].YY, 0.f };
-    flu[0] = { gle_color(0, 1, 0), P[0].XX, P[0].YY, 0.f };
+    flu[0] = { gym_color(0, 1, 0), P[0].XX, P[0].YY, 0.f };
     gym::unmapBufferC4V4();
     gym::drawLineStrip(size, 0, i);
     gym::cleanup();
@@ -115,7 +115,7 @@ void punch(int x_inf, int x_sup, int y, int z, void*)
 
 void paint(int x_inf, int x_sup, int y, int z, void*)
 {
-    gle_color col(0, 1, 0, 0.5);
+    gym_color col(0, 1, 0, 0.5);
     flute8 * flu = gym::mapBufferC4V4(2);
     flu[0] = { col, (float)x_inf, (float)y, (float)z };
     flu[1] = { col, (float)x_sup, (float)y, (float)z };
@@ -246,7 +246,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
 void drawGridPoints()
 {
     size_t S = 2 * SIZE + 1;
-    gle_color col(.5f, .5f, .5f);
+    gym_color col(.5f, .5f, .5f);
     flute8 * flu = gym::mapBufferC4V4(S*S);
     size_t n = 0;
     for ( int i = -SIZE; i <= SIZE; i += 1)
@@ -260,7 +260,7 @@ void drawGridPoints()
 void drawGrid()
 {
     float S = (float)SIZE;
-    gle_color col(.5f, .5f, .5f);
+    gym_color col(.5f, .5f, .5f);
     flute8 * flu = gym::mapBufferC4V4(2*SIZE+1);
     size_t n = 0;
     for ( int i = -SIZE; i <= SIZE; i += 5 )

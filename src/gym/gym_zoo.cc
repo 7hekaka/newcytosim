@@ -4,7 +4,7 @@
 #include "opengl.h"
 #include "gym_zoo.h"
 #include "vector.h"
-#include "gle_color.h"
+#include "gym_color.h"
 #include "gym_flute.h"
 #include "gym_draw.h"
 #include "flute.h"

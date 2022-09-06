@@ -1,21 +1,21 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 
-#include "../gym/gle_color.h"
-#include "../gym/gle_color_list.h"
+#include "../gym/gym_color.h"
+#include "../gym/gym_color_list.h"
 #include "../gym/gym_flute.h"
 #include "../gym/gym_flute_dim.h"
 #include "../gym/gym_draw.h"
 
 #define DRAW_LINK(PT, ...)\
-{ if ( drawLinks ) drawLink(gle::bright_color(PT.mecable()->signature()), PT.pos(), __VA_ARGS__); }
+{ if ( drawLinks ) drawLink(gym::bright_color(PT.mecable()->signature()), PT.pos(), __VA_ARGS__); }
 
 constexpr float LINK_WIDTH = 6;
 constexpr float LINK_SIZE = 8;
 
 
 /// Display link between 2 positions
-void drawLink(gle_color const& col, Vector const& a, Vector const& b)
+void drawLink(gym_color const& col, Vector const& a, Vector const& b)
 {
     flute4D* flu = gym::mapBufferC4VD(2);
     flu[0] = { col, a };
@@ -26,7 +26,7 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& b)
 }
 
 /// Display link between 2 positions, with resting length `len`
-void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
+void drawLink(gym_color const& col, Vector const& a, Vector const& ab, real len)
 {
     Vector b = a + ab;
     Vector dx = ab * (( 1 - len / ab.norm() ) / 2);
@@ -46,7 +46,7 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, real len)
 }
 
 /// Display link between 3 positions
-void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
+void drawLink(gym_color const& col, Vector const& a, Vector const& ab, Vector c)
 {
     if ( modulo )
         modulo->fold(c, a);
@@ -64,7 +64,7 @@ void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector c)
 }
 
 /// Display link between 4 positions
-void drawLink(gle_color const& col, Vector const& a, Vector const& ab, Vector const& dc, Vector const& d)
+void drawLink(gym_color const& col, Vector const& a, Vector const& ab, Vector const& dc, Vector const& d)
 {
     Vector b = a + ab;
     Vector c = d + dc;

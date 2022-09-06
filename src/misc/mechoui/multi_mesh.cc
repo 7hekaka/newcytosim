@@ -5,7 +5,7 @@
 
 #include "opengl.h"
 #include "gym_flute.h"
-#include "gle_color_list.h"
+#include "gym_color_list.h"
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_cap.h"
@@ -297,7 +297,7 @@ void MultiMesh::drawFaces(const float dir[3], const float color[4], int selected
     gym::openDepthMask();
 
     // set identical back and front material properties
-    //gle_color col = gle::bright_color(cell);
+    //gym_color col = gym::bright_color(cell);
     float black[4] = { 0, 0, 0, 1 };
     float glass[4] = { 1, 1, 1, 0.3 };
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, color);

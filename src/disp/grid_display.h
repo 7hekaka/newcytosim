@@ -32,7 +32,7 @@ void drawBoundaries(Map<3> const&, float);
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 1> const& grid,
-                gle_color color(TYPE, CELL const&, Vector1 const&),
+                gym_color color(TYPE, CELL const&, Vector1 const&),
                 TYPE arg)
 {
     float dx = grid.cellWidth(0), cx = 0.5f * dx;
@@ -43,7 +43,7 @@ void drawValues(Grid<CELL, 1> const& grid,
     for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
     {
         float x = grid.position(0, ix);
-        gle_color col = color(arg, grid.icell1D(ix), Vector1(x+cx));
+        gym_color col = color(arg, grid.icell1D(ix), Vector1(x+cx));
         // use a full quad to achieve uniform color within
         ptr[0] = { col, x+dx, dy };
         ptr[1] = { col, x, 0 };
@@ -65,7 +65,7 @@ void drawValues(Grid<CELL, 1> const& grid,
 */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 2> const& grid,
-                gle_color color(TYPE, CELL const&, Vector2 const&),
+                gym_color color(TYPE, CELL const&, Vector2 const&),
                 TYPE arg)
 {
     float dx = grid.cellWidth(0), cx = 0.5f * dx;
@@ -79,7 +79,7 @@ void drawValues(Grid<CELL, 2> const& grid,
         {
             float x = grid.position(0, ix);
             float y = grid.position(1, iy);
-            gle_color col = color(arg, grid.icell2D(ix, iy), Vector2(x+cx, y+cy));
+            gym_color col = color(arg, grid.icell2D(ix, iy), Vector2(x+cx, y+cy));
             // use a full quad to achieve uniform color within
             ptr[0] = { col, x, y+dy };
             ptr[1] = { col, x, y };
@@ -101,7 +101,7 @@ void drawValues(Grid<CELL, 2> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
-                gle_color color(TYPE, CELL const&, Vector3 const&),
+                gym_color color(TYPE, CELL const&, Vector3 const&),
                 TYPE arg,
                 real zzz = 0)
 {
@@ -119,7 +119,7 @@ void drawValues(Grid<CELL, 3> const& grid,
         {
             float x = grid.position(0, ix);
             float y = grid.position(1, iy);
-            gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, y+cy, zzz));
+            gym_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, y+cy, zzz));
             // use a full quad to achieve uniform color within
             ptr[0] = { col, x, y+dy, z };
             ptr[1] = { col, x, y, z };
@@ -142,7 +142,7 @@ void drawValues(Grid<CELL, 3> const& grid,
 */
 template <typename CELL, typename TYPE>
 void drawValuesXZ(Grid<CELL, 3> const& grid,
-                  gle_color color(TYPE, CELL const&, Vector3 const&),
+                  gym_color color(TYPE, CELL const&, Vector3 const&),
                   TYPE arg,
                   real yyy)
 {
@@ -160,7 +160,7 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
         {
             float x = grid.position(0, ix);
             float z = grid.position(2, iz);
-            gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, yyy, z+cz));
+            gym_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(x+cx, yyy, z+cz));
             ptr[0] = { col, x, y, z+dz };
             ptr[1] = { col, x, y, z };
             ptr[2] = { col, x+dx, y, z+dz };
@@ -182,7 +182,7 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValuesYZ(Grid<CELL, 3> const& grid,
-                  gle_color color(TYPE, CELL const&, Vector3 const&),
+                  gym_color color(TYPE, CELL const&, Vector3 const&),
                   TYPE arg,
                   real xxx)
 {
@@ -200,7 +200,7 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
         {
             float y = grid.position(1, iy);
             float z = grid.position(2, iz);
-            gle_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(xxx, y+cy, z+cz));
+            gym_color col = color(arg, grid.icell3D(ix, iy, iz), Vector3(xxx, y+cy, z+cz));
             ptr[0] = { col, x, y, z+dz };
             ptr[1] = { col, x, y, z };
             ptr[2] = { col, x, y+dy, z+dz };
@@ -221,7 +221,7 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
-                gle_color color(TYPE, CELL const&, Vector3 const&),
+                gym_color color(TYPE, CELL const&, Vector3 const&),
                 TYPE arg,
                 Vector3 const& dir,
                 real alpha)

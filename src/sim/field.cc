@@ -510,29 +510,29 @@ public:
 
 
 // set color for scalar field
-static gle_color field_color(FieldDisplayParameters fdp, FieldScalar const& cell, Vector const& pos)
+static gym_color field_color(FieldDisplayParameters fdp, FieldScalar const& cell, Vector const& pos)
 {
     if ( fdp.spc && ! fdp.spc->inside(pos) )
-        return gle_color(0, 0, 0);
-    gle_color::COLOF x(fdp.amp * cell.val);
+        return gym_color(0, 0, 0);
+    gym_color::COLOF x(fdp.amp * cell.val);
     if ( x > 0 )
-        return gle_color::jet_color_dark(x, 1.0);
-    return gle_color(-x, 0, -x);
+        return gym_color::jet_color_dark(x, 1.0);
+    return gym_color(-x, 0, -x);
 }
 
 
 /// set color for Vector field
 template < size_t N >
-static gle_color field_color(FieldDisplayParameters fdp, FieldVector<N> const& cell, Vector const& pos)
+static gym_color field_color(FieldDisplayParameters fdp, FieldVector<N> const& cell, Vector const& pos)
 {
     if ( fdp.spc && ! fdp.spc->inside(pos) )
-        return gle_color(0, 0, 0);
+        return gym_color(0, 0, 0);
     //this maps val[0] to the red channel, val[1] to green and val[2] to blue
-    gle_color::COLOF rgb[3] = { 0, 0, 0 };
+    gym_color::COLOF rgb[3] = { 0, 0, 0 };
     const int sup = std::min(3UL, N);
     for ( int c = 0; c < sup; ++c )
         rgb[c] = fdp.amp * cell[c];
-    return gle_color(rgb[0], rgb[1], rgb[2]);
+    return gym_color(rgb[0], rgb[1], rgb[2]);
 }
 
 

@@ -15,8 +15,8 @@ set(SOURCES_GYM
     gym_zoo.cc
     gym_flat.cc
     gym_image.cc
-    gle_color.cc
-    gle_color_list.cc
+    gym_color.cc
+    gym_color_list.cc
     save_image.cc
     offscreen.cc
     fg_font.cc

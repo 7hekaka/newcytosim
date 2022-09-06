@@ -6,8 +6,8 @@
 #include "modulo.h"
 
 #include "gle.h"
-#include "gle_color.h"
-#include "gle_color_list.h"
+#include "gym_color.h"
+#include "gym_color_list.h"
 #include "gym_view.h"
 #include "gym_draw.h"
 #include "gym_check.h"
@@ -197,7 +197,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 This draws the model-segments, using function `select_color` to set display colors
 */
 void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
-                                     gle_color (*select_color)(Fiber const&, size_t)) const
+                                     gym_color (*select_color)(Fiber const&, size_t)) const
 {
     const size_t last = fib.lastSegment();
     Vector old = fib.posPoint(0);
@@ -255,7 +255,7 @@ The function `set_color` is called to set the color of the segments.
 void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
                                      long inx, const long last,
                                      real abs, const real inc,
-                                     gle_color (*select_color)(Fiber const&, long, real),
+                                     gym_color (*select_color)(Fiber const&, long, real),
                                      real fac, real facM, real facP) const
 {
     Vector old = fib.displayPosM(abs);
@@ -314,7 +314,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
 This draws the model-segments, using function `select_color` to set display colors
 */
 void Display3::drawFiberSegmentsJoin(Fiber const& fib, real rad,
-                                     gle_color (*select_color)(Fiber const&, size_t)) const
+                                     gym_color (*select_color)(Fiber const&, size_t)) const
 {
     const size_t last = fib.lastSegment();
     Vector pos = fib.posPoint(0);
@@ -357,7 +357,7 @@ The function `set_color` is called to set the color of the segments.
 void Display3::drawFiberSectionsJoin(Fiber const& fib, real rad,
                                      long inx, const long last,
                                      real abs, const real inc,
-                                     gle_color (*select_color)(Fiber const&, long, real),
+                                     gym_color (*select_color)(Fiber const&, long, real),
                                      real fac, real facM, real facP) const
 {
     Vector pos = fib.displayPosM(abs);
@@ -581,7 +581,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 
 
 void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, real width,
-                                gle_color (*select_color)(Fiber const&, long, real)) const
+                                gym_color (*select_color)(Fiber const&, long, real)) const
 {
     FiberDisp const*const disp = fib.prop->disp;
 

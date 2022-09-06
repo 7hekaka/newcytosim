@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
-#include "gle_color.h"
-#include "gle_color_list.h"
+#include "gym_color.h"
+#include "gym_color_list.h"
 #include "stream_func.h"
 #include "exceptions.h"
 #include "random.h"
@@ -18,7 +18,7 @@ static const char hexadecimal_digit[] = "0123456789ABCDEF";
 /**
  Write '0xRRGGBBAA' to 'str[]'
  */
-void gle_color::hexadecimal(char * str) const
+void gym_color::hexadecimal(char * str) const
 {
     uint32_t n = rgba();
     *str++ = '0';
@@ -33,7 +33,7 @@ void gle_color::hexadecimal(char * str) const
 }
 
 
-std::string gle_color::to_string() const
+std::string gym_color::to_string() const
 {
     char str[16] = { 0 };
     hexadecimal(str);
@@ -66,7 +66,7 @@ uint8_t hex2byte(int a, int b)
  -# with a number: #1
  .
 */
-std::istream& operator >> (std::istream& is, gle_color& col)
+std::istream& operator >> (std::istream& is, gym_color& col)
 {
     col.set_white();
 
@@ -83,18 +83,18 @@ std::istream& operator >> (std::istream& is, gle_color& col)
             is >> name;
             if ( name == "random" )
             {
-                c = RNG.pint32(gle::nb_alt_color());
-                col = gle::alt_color(c);
+                c = RNG.pint32(gym::nb_alt_color());
+                col = gym::alt_color(c);
                 return is;
             }
             try {
-                col = gle::std_color(name);
+                col = gym::std_color(name);
             }
             catch ( InvalidSyntax & e )
             {
                 is.setstate(std::istream::failbit);
                 std::cerr << e.brief() << " using white\n";
-                gle::print_std_colors(std::cerr);
+                gym::print_std_colors(std::cerr);
                 col = 0xFFFFFFFF;
             }
         }
@@ -102,7 +102,7 @@ std::istream& operator >> (std::istream& is, gle_color& col)
         {
             unsigned int nb;
             is >> nb;
-            col = gle::alt_color(nb);
+            col = gym::alt_color(nb);
         }
         else if ( '0'==c  &&  'x'==d )
         {
@@ -127,7 +127,7 @@ std::istream& operator >> (std::istream& is, gle_color& col)
         else if ( isdigit(c) )
         {
             is.unget();
-            gle_color::COLOF r, g, b, a=1;
+            gym_color::COLOF r, g, b, a=1;
             is >> r >> g >> b;
             if ( ! is.fail() )
             {
@@ -141,7 +141,7 @@ std::istream& operator >> (std::istream& is, gle_color& col)
 }
 
 
-std::ostream& operator << (std::ostream& os, gle_color const& arg)
+std::ostream& operator << (std::ostream& os, gym_color const& arg)
 {
     char str[12] = { 0 };
     arg.hexadecimal(str);
@@ -160,7 +160,7 @@ std::ostream& operator << (std::ostream& os, gle_color const& arg)
  if s == 0, then h = -1 (undefined)
 */
 
-void gle_color::RGB2HSV(const COLOF r, const COLOF g, const COLOF b, COLOF* h, COLOF* s, COLOF* v)
+void gym_color::RGB2HSV(const COLOF r, const COLOF g, const COLOF b, COLOF* h, COLOF* s, COLOF* v)
 {
     COLOF mn, mx, delta;
     mn = std::min(r, std::min(g, b));
@@ -186,7 +186,7 @@ void gle_color::RGB2HSV(const COLOF r, const COLOF g, const COLOF b, COLOF* h, C
 }
 
 
-void gle_color::HSV2RGB(const COLOF h, const COLOF s, const COLOF v, COLOF* r, COLOF* g, COLOF* b)
+void gym_color::HSV2RGB(const COLOF h, const COLOF s, const COLOF v, COLOF* r, COLOF* g, COLOF* b)
 {
     int i;
     COLOF f, p, q, t;
@@ -218,7 +218,7 @@ void gle_color::HSV2RGB(const COLOF h, const COLOF s, const COLOF v, COLOF* r, C
  set a RGB color as a function of a Hue value `a` in [-PI, PI].
  The colors follow in this order: red, green, blue, red ...
 */
-void gle_color::set_hue_components(COLOF& r, COLOF& g, COLOF& b, const COLOF h)
+void gym_color::set_hue_components(COLOF& r, COLOF& g, COLOF& b, const COLOF h)
 {
     COLOF x = 3 * COLOF( h * M_1_PI + 1 );
     int i = (int)std::floor(x);
@@ -241,22 +241,22 @@ void gle_color::set_hue_components(COLOF& r, COLOF& g, COLOF& b, const COLOF h)
  with alpha-component equal to `a`.
  Two opposite vectors gives approximately complementary colors.
  */
-gle_color gle_color::radial_color(const COLOF x, const COLOF y, const COLOF z, const COLOF a)
+gym_color gym_color::radial_color(const COLOF x, const COLOF y, const COLOF z, const COLOF a)
 {
     COLOF pX = std::max(0.0f, x), nX = -0.5f * std::min(0.0f, x);
     COLOF pY = std::max(0.0f, y), nY = -0.5f * std::min(0.0f, y);
     COLOF pZ = std::max(0.0f, z), nZ = -0.5f * std::min(0.0f, z);
-    return gle_color(pX+nY+nZ, nX+pY+nZ, nX+nY+pZ, a);
+    return gym_color(pX+nY+nZ, nX+pY+nZ, nX+nY+pZ, a);
 }
 
 /**
  set a RGB color as a function of a 2D vector, using the angle in the XY plane
 */
-gle_color gle_color::radial_colorXY(const COLOF x, const COLOF y, const COLOF a)
+gym_color gym_color::radial_colorXY(const COLOF x, const COLOF y, const COLOF a)
 {
     COLOF r, g, b;
     set_hue_components(r, g, b, atan2f(y, x));
-    return gle_color(r, g, b, a);
+    return gym_color(r, g, b, a);
 }
 
 /**
@@ -264,11 +264,11 @@ gle_color gle_color::radial_colorXY(const COLOF x, const COLOF y, const COLOF a)
  with alpha-component equal to `a`.
  The colors follow in this order: red, green, blue, red ...
  */
-gle_color gle_color::hue_color(const COLOF h, const COLOF a)
+gym_color gym_color::hue_color(const COLOF h, const COLOF a)
 {
     COLOF r, g, b;
     set_hue_components(r, g, b, h);
-    return gle_color(r, g, b, a);
+    return gym_color(r, g, b, a);
 }
 
 /**
@@ -280,7 +280,7 @@ The result vary from dark-blue, blue, cyan, yellow, orange to red:
 - 3 : red
 - 4 : full red
 */
-gle_color gle_color::jet_color(const COLOF h, const COLOF a)
+gym_color gym_color::jet_color(const COLOF h, const COLOF a)
 {
     COLOF r, g, b;
     if ( h <= 0.4 )
@@ -308,7 +308,7 @@ gle_color gle_color::jet_color(const COLOF h, const COLOF a)
         g = 0;
         b = 0;
     }
-    return gle_color(r, g, b, a);
+    return gym_color(r, g, b, a);
 }
 
 /**
@@ -321,7 +321,7 @@ The result vary from black, blue, cyan, yellow, orange to red:
 - 4 : yellow
 - 5 : white
 */
-gle_color gle_color::jet_color_dark(const COLOF h, const COLOF a)
+gym_color gym_color::jet_color_dark(const COLOF h, const COLOF a)
 {
     COLOF r, g, b;
     if ( h <= 0.1 )
@@ -350,7 +350,7 @@ gle_color gle_color::jet_color_dark(const COLOF h, const COLOF a)
         g = 1;
         b = 1;
     }
-    return gle_color(r, g, b, a);
+    return gym_color(r, g, b, a);
 }
 
 
@@ -364,7 +364,7 @@ The result vary from black, blue, cyan, yellow, orange to red:
 - 4 : yellow
 - 5 : white
 */
-gle_color gle_color::jet_color_alpha(const COLOF h)
+gym_color gym_color::jet_color_alpha(const COLOF h)
 {
     COLOF r, g, b, a;
     if ( h <= 0 )
@@ -395,6 +395,6 @@ gle_color gle_color::jet_color_alpha(const COLOF h)
         b = 1;
         a = 1;
     }
-    return gle_color(r, g, b, a);
+    return gym_color(r, g, b, a);
 }
 

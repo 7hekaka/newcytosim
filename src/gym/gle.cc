@@ -1673,8 +1673,8 @@ namespace gle
         }
     }
     
-    void drawBand(Vector1 const& A, float rA, gle_color cA,
-                  Vector1 const& B, float rB, gle_color cB)
+    void drawBand(Vector1 const& A, float rA, gym_color cA,
+                  Vector1 const& B, float rB, gym_color cB)
     {
         gym::ref_view();
         float AX(A.XX);
@@ -1689,8 +1689,8 @@ namespace gle
         gym::cleanup();
     }
     
-    void drawBand(Vector2 const& A, float rA, gle_color cA,
-                  Vector2 const& B, float rB, gle_color cB)
+    void drawBand(Vector2 const& A, float rA, gym_color cA,
+                  Vector2 const& B, float rB, gym_color cB)
     {
         gym::ref_view();
         Vector2 d = ( B - A ).orthogonal();
@@ -1735,8 +1735,8 @@ namespace gle
      This will displays a rectangle if the connection is parallel,
      and a hourglass if the connection is antiparallel
      */
-    void drawHourglass(Vector2 const& a, Vector2 const& da, gle_color cA,
-                       Vector2 const& b, Vector2 const& db, gle_color cB)
+    void drawHourglass(Vector2 const& a, Vector2 const& da, gym_color cA,
+                       Vector2 const& b, Vector2 const& db, gym_color cB)
     {
         flute6 * flu = gym::mapBufferC4V2(6);
         flu[0] = { cB, b-db };

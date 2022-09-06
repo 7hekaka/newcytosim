@@ -60,7 +60,7 @@ private:
     void (*drawMagFunc)(View&);
 
     /// set OpenGL Fog, with mode (GL_EXP or GL_LINEAR), intensity and color
-    void setFog(GLint mode, float density, gle_color) const;
+    void setFog(GLint mode, float density, gym_color) const;
 
 public:
     
@@ -191,7 +191,7 @@ public:
     void setMessage(std::string const& arg) { top_message = arg; }
 
     /// set OpenGL Fog, with mode (GL_EXP or GL_LINEAR), intensity and color
-    void enableFog(GLint mode, float param, gle_color);
+    void enableFog(GLint mode, float param, gym_color);
     void enableFog(GLint mode, float param);
     
     /// establish all enabled clipping planes

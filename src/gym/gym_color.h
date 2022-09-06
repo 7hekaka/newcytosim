@@ -1,13 +1,13 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
-#ifndef GLE_COLOR_H
-#define GLE_COLOR_H
+#ifndef GYM_COLOR_H
+#define GYM_COLOR_H
 
 #include <string>
 #include <iostream>
 
 /**
- gle_color implements colors with 4-components:
+ gym_color implements colors with 4-components:
  - Red
  - Green
  - Blue
@@ -20,7 +20,7 @@
  F. Nedelec -- Merged two older color classes on 23.08.2015
  */
 /// Color with 4 components: red, green, blue, alpha (RGBA)
-class gle_color
+class gym_color
 {
 #pragma mark - Static methods
 public:
@@ -137,7 +137,7 @@ public:
 #pragma mark - Constructors
 
     /// default constructor
-    gle_color()
+    gym_color()
     {
         col_[0] = 0;
         col_[1] = 0;
@@ -146,19 +146,19 @@ public:
     }
     
     /// constructor
-    gle_color(const uint32_t& u)
+    gym_color(const uint32_t& u)
     {
         update_float(u);
     }
     
     /// constructor from RGB values, with Alpha component = 1.0
-    gle_color(const COLOF& r, const COLOF& g, const COLOF& b)
+    gym_color(const COLOF& r, const COLOF& g, const COLOF& b)
     {
         set(r,g,b,1.0f);
     }
 
     /// constructor from RGBA components
-    gle_color(const COLOF& r, const COLOF& g, const COLOF& b, const COLOF& a)
+    gym_color(const COLOF& r, const COLOF& g, const COLOF& b, const COLOF& a)
     {
         set(r,g,b,a);
     }
@@ -171,10 +171,10 @@ public:
     }
     
     /// true if colors are roughly equal
-    bool operator ==(const gle_color col) const { return rgba() == col.rgba(); }
+    bool operator ==(const gym_color col) const { return rgba() == col.rgba(); }
     
     /// true if colors are significantly different
-    bool operator !=(const gle_color col) const { return rgba() != col.rgba(); }
+    bool operator !=(const gym_color col) const { return rgba() != col.rgba(); }
     
     COLOF const* colors() const { return col_; }
 
@@ -201,15 +201,15 @@ public:
     void set_blue (COLOF s) { col_[2] = clamp(s); }
     void set_alpha(COLOF s) { col_[3] = clamp(s); }
 
-    gle_color red  (COLOF s) const { return gle_color(clamp(s), col_[1], col_[2], col_[3]); }
-    gle_color green(COLOF s) const { return gle_color(col_[0], clamp(s), col_[2], col_[3]); }
-    gle_color blue (COLOF s) const { return gle_color(col_[0], col_[1], clamp(s), col_[3]); }
-    gle_color alpha(COLOF s) const { return gle_color(col_[0], col_[1], col_[2], clamp(s)); }
+    gym_color red  (COLOF s) const { return gym_color(clamp(s), col_[1], col_[2], col_[3]); }
+    gym_color green(COLOF s) const { return gym_color(col_[0], clamp(s), col_[2], col_[3]); }
+    gym_color blue (COLOF s) const { return gym_color(col_[0], col_[1], clamp(s), col_[3]); }
+    gym_color alpha(COLOF s) const { return gym_color(col_[0], col_[1], col_[2], clamp(s)); }
 
-    gle_color match_r(gle_color c) const { return gle_color(c.col_[0], col_[1], col_[2], col_[3]); }
-    gle_color match_g(gle_color c) const { return gle_color(col_[0], c.col_[1], col_[2], col_[3]); }
-    gle_color match_b(gle_color c) const { return gle_color(col_[0], col_[1], c.col_[2], col_[3]); }
-    gle_color match_a(gle_color c) const { return gle_color(col_[0], col_[1], col_[2], c.col_[3]); }
+    gym_color match_r(gym_color c) const { return gym_color(c.col_[0], col_[1], col_[2], col_[3]); }
+    gym_color match_g(gym_color c) const { return gym_color(col_[0], c.col_[1], col_[2], col_[3]); }
+    gym_color match_b(gym_color c) const { return gym_color(col_[0], col_[1], c.col_[2], col_[3]); }
+    gym_color match_a(gym_color c) const { return gym_color(col_[0], col_[1], col_[2], c.col_[3]); }
     
 #pragma mark -
     
@@ -222,7 +222,7 @@ public:
     COLOF normSqr()      const { return col_[0]*col_[0] + col_[1]*col_[1] + col_[2]*col_[2]; }
     COLOF brightness()   const { return normSqr() * col_[3]; }
 
-    COLOF difference(gle_color back) const
+    COLOF difference(gym_color back) const
     {
         COLOF x = col_[0] - back.col_[0];
         COLOF y = col_[1] - back.col_[1];
@@ -232,45 +232,45 @@ public:
 
 #pragma mark -
 
-    gle_color darken(COLOF s) const
+    gym_color darken(COLOF s) const
     {
         COLOF x = clamp(s);
-        return gle_color(x*col_[0], x*col_[1], x*col_[2], col_[3]);
+        return gym_color(x*col_[0], x*col_[1], x*col_[2], col_[3]);
     }
     
-    gle_color lighten(COLOF s) const
+    gym_color lighten(COLOF s) const
     {
-        return gle_color(s*col_[0], s*col_[1], s*col_[2], col_[3]);
+        return gym_color(s*col_[0], s*col_[1], s*col_[2], col_[3]);
     }
     
-    gle_color alpha_scaled(COLOF s) const
+    gym_color alpha_scaled(COLOF s) const
     {
-        return gle_color(col_[0], col_[1], col_[2], clamp(s*col_[3]));
+        return gym_color(col_[0], col_[1], col_[2], clamp(s*col_[3]));
     }
     
-    gle_color blend(gle_color C) const
+    gym_color blend(gym_color C) const
     {
         COLOF s = a() + C.a();
         COLOF h = a()   / s;
         COLOF g = C.a() / s;
-        return gle_color(h*col_[0]+g*C[0], h*col_[1]+g*C[1], h*col_[2]+g*C[2], 0.5*(h+g));
+        return gym_color(h*col_[0]+g*C[0], h*col_[1]+g*C[1], h*col_[2]+g*C[2], 0.5*(h+g));
     }
     
-    gle_color blend(COLOF g, gle_color B, COLOF h)
+    gym_color blend(COLOF g, gym_color B, COLOF h)
     {
-        return gle_color(g*col_[0]+h*B[0], g*col_[1]+h*B[1], g*col_[2]+h*B[2], g*col_[3]+h*B[3]);
+        return gym_color(g*col_[0]+h*B[0], g*col_[1]+h*B[1], g*col_[2]+h*B[2], g*col_[3]+h*B[3]);
     }
 
-    gle_color inverted() const
+    gym_color inverted() const
     {
-        return gle_color(1-col_[0], 1-col_[1], 1-col_[2], col_[3]);
+        return gym_color(1-col_[0], 1-col_[1], 1-col_[2], col_[3]);
     }
     
-    gle_color tweak(uint32_t arg) const
+    gym_color tweak(uint32_t arg) const
     {
-        gle_color C(arg);
+        gym_color C(arg);
         constexpr COLOF A = 0.5, B = 0.5;
-        return gle_color(col_[0]*A+C[0]*B, col_[1]*A+C[1]*B, col_[2]*A+C[2]*B, col_[3]);
+        return gym_color(col_[0]*A+C[0]*B, col_[1]*A+C[1]*B, col_[2]*A+C[2]*B, col_[3]);
     }
     
 #pragma mark -
@@ -286,22 +286,22 @@ public:
     static void set_hue_components(COLOF& r, COLOF& g, COLOF& b, COLOF h);
 
     /// return new saturated color with given Hue value `h` in [-PI, PI]
-    static gle_color hue_color(COLOF h, COLOF alpha = 1.0f);
+    static gym_color hue_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new saturated color with Hue value `atan2(y, x)`
-    static gle_color radial_colorXY(COLOF x, COLOF y, COLOF alpha);
+    static gym_color radial_colorXY(COLOF x, COLOF y, COLOF alpha);
 
     /// return color build from a normalized 3D vector {x, y, z}
-    static gle_color radial_color(COLOF x, COLOF y, COLOF z, COLOF alpha);
+    static gym_color radial_color(COLOF x, COLOF y, COLOF z, COLOF alpha);
 
     /// return new jet color for h in [0, 5] with specified alpha component
-    static gle_color jet_color(COLOF h, COLOF alpha = 1.0f);
+    static gym_color jet_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new jet color extended
-    static gle_color jet_color_dark(COLOF h, COLOF alpha = 1.0f);
+    static gym_color jet_color_dark(COLOF h, COLOF alpha = 1.0f);
     
     /// return new jet color extended
-    static gle_color jet_color_alpha(COLOF h);
+    static gym_color jet_color_alpha(COLOF h);
 
     /// print color in hexadecimal format (str must be of size 12)
     void hexadecimal(char* str) const;
@@ -311,12 +311,12 @@ public:
     
 };
 
+/// input operator
+std::istream& operator >> (std::istream&, gym_color&);
 
-/// input operator:
-std::istream& operator >> (std::istream&, gle_color&);
+/// output operator
+std::ostream& operator << (std::ostream&, const gym_color&);
 
-/// output operator:
-std::ostream& operator << (std::ostream&, const gle_color&);
-
+    
 
 #endif

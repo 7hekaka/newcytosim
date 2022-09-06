@@ -40,7 +40,7 @@ Cytosim Todo List
 - Update OpenGL code to use Shaders and eliminate immediate rendering
 
 - Replace GLUT by GLFW:  http://www.glfw.org/index.html
-- Rename gle->gym;  gle_color->gym::color and glApp->gympad
+- Rename gle->gym and glApp->gympad
 - use Dear imGUI for rendering text and minimal GUI components (Omar Cornut)
      https://github.com/ocornut/imgui
 

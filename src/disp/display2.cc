@@ -6,7 +6,7 @@
 #include "modulo.h"
 
 #include "gle.h"
-#include "gle_color_list.h"
+#include "gym_color_list.h"
 
 #include "line_disp.h"
 #include "point_disp.h"
@@ -225,7 +225,7 @@ void Display2::drawCouplesA(CoupleSet const& set) const
 
 void Display2::drawCoupleB(Couple const* cx) const
 {
-    gle_color air(0,0,0,0);
+    gym_color air(0,0,0,0);
     const PointDisp * pd1 = cx->disp1();
     const PointDisp * pd2 = cx->disp2();
     
@@ -252,8 +252,8 @@ void Display2::drawCoupleB(Couple const* cx) const
         Vector d1 = cx->dirFiber1();
         Vector d2 = cx->dirFiber2();
         Vector pp = 0.5*(p1+p2) + (0.25*cx->prop->length)*(d1+d2);
-        gle_color col1 = pd1->visible ? pd1->color : air;
-        gle_color col2 = pd2->visible ? pd2->color : air;
+        gym_color col1 = pd1->visible ? pd1->color : air;
+        gym_color col2 = pd2->visible ? pd2->color : air;
         flu[0] = { col1, p1 };
         flu[1] = { col1, pp };
         flu[2] = { col2, pp };

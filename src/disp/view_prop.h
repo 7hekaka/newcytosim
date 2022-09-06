@@ -7,7 +7,7 @@
 #include "vector4.h"
 #include "quaternion.h"
 #include "property.h"
-#include "gle_color.h"
+#include "gym_color.h"
 
 ///properties needed to define a view
 class ViewProp : public Property
@@ -68,10 +68,10 @@ public:
     unsigned int slice;
 
     /// color of background
-    gle_color back_color;
+    gym_color back_color;
     
     /// color used to highlight objects
-    gle_color front_color;
+    gym_color front_color;
 
     /// flag to use a double buffer for smoother rendering (default=1)
     /**
@@ -140,7 +140,7 @@ public:
     real scalebar_length;
     
     /// color of scale-bar (set as `scalebar[2]`)
-    gle_color scalebar_color;
+    gym_color scalebar_color;
 
     /// display flag for displaying X-Y-Z axes
     unsigned axes;
@@ -182,7 +182,7 @@ public:
     float fog_param;
     
     /// color of fog (also known as `fog[2]`)
-    gle_color fog_color;
+    gym_color fog_color;
 
     /// draw 'tiled' floor
     int floor_radius;
@@ -191,7 +191,7 @@ public:
     float floor_tile, floor_height;
     
     /// color of floor
-    gle_color floor_color;
+    gym_color floor_color;
 
     /// @}
     

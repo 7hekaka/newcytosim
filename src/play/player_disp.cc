@@ -252,7 +252,7 @@ void Player::prepareDisplay(View& view)
     setPixelSize(view);
     
     //-------- adjust reference color used by gle::bright_color
-    gle::background_color = view.back_color;
+    gym::background_color = view.back_color;
 
     CHECK_GL_ERROR("in prepareDisplay");
 

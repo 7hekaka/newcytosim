@@ -157,7 +157,7 @@ void drawTangents(const float col[4], const float lor[4])
 
 int display(View& view)
 {
-    gle_color col(1,1,1), lor(0,0,0);
+    gym_color col(1,1,1), lor(0,0,0);
     view.openDisplay();
     glPointSize(7);
     

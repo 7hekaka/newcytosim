@@ -1,6 +1,6 @@
 
 #include "gym_check.h"
-#include "gle_color.h"
+#include "gym_color.h"
 #include "opengl.h"
 
 

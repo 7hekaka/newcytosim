@@ -6,7 +6,7 @@
 #include "display.h"
 #include "real.h"
 #include "vector.h"
-#include "gle_color.h"
+#include "gym_color.h"
 #include "point_disp.h"
 
 
@@ -36,22 +36,22 @@ private:
     
     /// draw Fiber model segments
     void drawFiberSegmentsClip(Fiber const&, real rad,
-                               gle_color (*set_color)(Fiber const&, size_t)) const;
+                               gym_color (*set_color)(Fiber const&, size_t)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
     void drawFiberSectionsClip(Fiber const&, real rad, long inx, long last, real abs, real inc,
-                               gle_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+                               gym_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
     
     /// draw Fiber model segments
     void drawFiberSegmentsJoin(Fiber const&, real rad,
-                               gle_color (*set_color)(Fiber const&, size_t)) const;
+                               gym_color (*set_color)(Fiber const&, size_t)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
     void drawFiberSectionsJoin(Fiber const&, real rad, long inx, long last, real abs, real inc,
-                               gle_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+                               gym_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
 
     /// display lattice subtance using specified color function
-    void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, gle_color (*set_color)(Fiber const&, long, real)) const;
+    void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, gym_color (*set_color)(Fiber const&, long, real)) const;
 
 public:
         

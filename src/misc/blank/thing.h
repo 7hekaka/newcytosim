@@ -2,7 +2,7 @@
 
 #include "vector3.h"
 #include "quaternion.h"
-#include "gle_color.h"
+#include "gym_color.h"
 #include "iowrapper.h"
 
 /// something
@@ -12,7 +12,7 @@ class Thing
 private:
     
     /// display color
-    gle_color color;
+    gym_color color;
     
     /// position
     Vector3 pos;

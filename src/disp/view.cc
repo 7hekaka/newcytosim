@@ -744,7 +744,7 @@ Vector3 View::unproject(float x, float y, float z) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void View::setFog(GLint type, float param, gle_color color) const
+void View::setFog(GLint type, float param, gym_color color) const
 {
     GLint gl_type = 0;
     switch( type )
@@ -771,7 +771,7 @@ void View::setFog(GLint type, float param, gle_color color) const
     glFogfv(GL_FOG_COLOR, color.colors());
 }
 
-void View::enableFog(const GLint type, const float param, gle_color color)
+void View::enableFog(const GLint type, const float param, gym_color color)
 {
     fog_type = type;
     fog_param = param;

@@ -4,7 +4,7 @@
 
 #include "real.h"
 #include "assert_macro.h"
-#include "gle_color.h"
+#include "gym_color.h"
 #include "property.h"
 #include "vector3.h"
 
@@ -54,13 +54,13 @@ public:
     int visible;
     
     /// color of fiber
-    gle_color color;
+    gym_color color;
     
     /// color of inner surfaces of cylinder in 3D display (set as color[1])
-    gle_color back_color;
+    gym_color back_color;
     
     /// color for unselected objects, default=invisible (set as color[2])
-    gle_color hide_color;
+    gym_color hide_color;
 
     /// if true, vary the colors used to display the fibers
     /**
@@ -172,7 +172,7 @@ public:
      .
      The default colors are: white, green, yellow, orange, red
      */
-    gle_color end_colors[6];
+    gym_color end_colors[6];
     
     
     /// if true, specify the style for displaying lattice content (also known as `lattice[0]`)
@@ -281,7 +281,7 @@ public:
     real force_scale;
     
     /// this color is specified as forces[2]
-    gle_color force_color;
+    gym_color force_color;
 
     
     /// the 'explosion' effect shift the fibers in space

@@ -4,7 +4,7 @@
 #define MECHOUI_PARAM_H
 
 #include <string>
-#include "gle_color.h"
+#include "gym_color.h"
 
 class Glossary;
 
@@ -14,10 +14,10 @@ class MechouiParam
 public:
     
     /// color of faces
-    gle_color face_color;
+    gym_color face_color;
     
     /// color of points
-    gle_color point_color;
+    gym_color point_color;
     
     /// size of points
     float point_size;

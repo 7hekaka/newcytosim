@@ -5,8 +5,8 @@
 ///this turns on display code in simul.h
 #define DISPLAY 1
 
-#include "gle_color.h"
-#include "gle_color_list.h"
+#include "gym_color.h"
+#include "gym_color_list.h"
 
 #include "simul.h"
 #include "parser.h"

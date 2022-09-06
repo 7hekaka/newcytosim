@@ -5,7 +5,7 @@
 
 
 #include "real.h"
-#include "gle_color.h"
+#include "gym_color.h"
 
 
 /// Display parameters for a Line
@@ -26,10 +26,10 @@ class LineDisp
 public:
     
     /// color of body
-    gle_color color;
+    gym_color color;
     
     /// colors of PLUS_END and MINUS_END
-    gle_color end_color[2];
+    gym_color end_color[2];
     
     /// scale to convert to color to display lines
     real color_scale;

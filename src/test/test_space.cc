@@ -18,7 +18,7 @@
 #include "glapp.h"
 #include "glut.h"
 #include "gle.h"
-#include "gle_color.h"
+#include "gym_color.h"
 #include "gym_flute.h"
 #include "gym_draw.h"
 #include "gym_view.h"
@@ -514,7 +514,7 @@ int display(View& view)
     {
         //use green for points inside, magenta for point outside:
         flute8* flu = gym::mapBufferC4V4(nbpts);
-        gle_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
+        gym_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
         size_t n = 0;
         for ( size_t i=0; i < nbpts; ++i )
         {
@@ -530,7 +530,7 @@ int display(View& view)
     {
         //use green for points inside, magenta for point outside:
         flute8* flu = gym::mapBufferC4V4(nbpts);
-        gle_color col(COL, COL, 0.f), lor(COL, 0.f, COL);
+        gym_color col(COL, COL, 0.f), lor(COL, 0.f, COL);
         for ( size_t i=0; i < nbpts; ++i )
             flu[i] = { inside[i] ? col : lor, project[i] };
         gym::unmapBufferC4V4();
@@ -541,13 +541,13 @@ int display(View& view)
     if ( showProject )
     {
         flute8* flu = gym::mapBufferC4V4(2*nbpts);
-        gle_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
+        gym_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {
             if ( visible(i) )
             {
-                gle_color c = inside[i] ? col : lor;
+                gym_color c = inside[i] ? col : lor;
                 flu[n++] = { c, point[i] };
                 flu[n++] = { c, project[i] };
             }
@@ -560,7 +560,7 @@ int display(View& view)
     if ( showNormals )
     {
         flute8* flu = gym::mapBufferC4V4(2*nbpts);
-        gle_color col(1.f, 1.f, 1.f), lor(1.f, 1.f, 1.f, 0.f);
+        gym_color col(1.f, 1.f, 1.f), lor(1.f, 1.f, 1.f, 0.f);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {
@@ -575,7 +575,7 @@ int display(View& view)
     if ( showReproject )
     {
         flute8* flu = gym::mapBufferC4V4(2*nbpts);
-        gle_color col(COL, 0.f, 0.f), lor(COL, 0.f, 0.f, 0.5f);
+        gym_color col(COL, 0.f, 0.f), lor(COL, 0.f, 0.f, 0.5f);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {
@@ -593,7 +593,7 @@ int display(View& view)
     if ( showEdges )
     {
         flute8* flu = gym::mapBufferC4V4(2*nbpts);
-        gle_color col(0.f, COL, COL), lor(0.f, COL, 0.f);
+        gym_color col(0.f, COL, COL), lor(0.f, COL, 0.f);
         size_t n = 0;
         for ( size_t i = 0; i < nbpts; ++i )
         {

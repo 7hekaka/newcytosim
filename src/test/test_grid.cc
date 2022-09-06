@@ -139,14 +139,14 @@ void processMouseDrag(int mx, int my, Vector3 & a, const Vector3 & b, int m)
 
 //------------------------------------------------------------------------------
 #if ( DIM >= 3 )
-static gle_color field_color(int, const real& val, Vector3 const&)
+static gym_color field_color(int, const real& val, Vector3 const&)
 {
-    return gle_color(val/5.0, 0, 0);
+    return gym_color(val/5.0, 0, 0);
 }
 #else
-static gle_color field_color(int, const real& val, Vector2 const&)
+static gym_color field_color(int, const real& val, Vector2 const&)
 {
-    return gle_color(val/5.0, 0, 0);
+    return gym_color(val/5.0, 0, 0);
 }
 #endif
 
@@ -194,7 +194,7 @@ int display(View& view)
     }
 
     //-------------draw selected-cell
-    gle_color lor(1,1,0);
+    gym_color lor(1,1,0);
     *ptr++ = { lor, Vector2(pos) };
     *ptr++ = { lor, Vector2(nod) };
     gym::unmapBufferC4VD();
