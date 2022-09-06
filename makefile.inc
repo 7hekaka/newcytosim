@@ -64,13 +64,20 @@ endif
 #----------------------------  Intels' OpenMP  ---------------------------------
 #-------------------------------------------------------------------------------
 
+# enable or not OpenMP:
+#OpenMP := -fopenmp
+OpenMP :=
+OMPLIB :=
+
+# redirect OpenMP on Mac OS with Apple silicon:
+ifneq ($(OpenMP),)
 ifeq ($(MACHINE),mac)
+ifeq ($(shell uname -m), arm64)
     # using libomp installed via Homebrew (http://brew.sh)
     OpenMP := -Xclang -fopenmp -I/opt/homebrew/include/
     OMPLIB := /opt/homebrew/lib/libomp.a
-else
-    OpenMP := -fopenmp
-    OMPLIB :=
+endif
+endif
 endif
 
 #-------------------------------------------------------------------------------
@@ -103,13 +110,14 @@ endif
 ifeq ($(COMPILER),gcc)
 
 # Intel SIMD: -march=core2 (SSE3); -march=sandybridge (AVX); -march=haswell (AVX2); -march=native
+# Apple Silicon: -mcpu=apple-m1
 # You may use g++-10 to support Intel OMP directives
 # To use GCC on OSX, you need to specify the path to header files:
 # export CPATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
 
     CXX := g++ -Wfatal-errors -Wno-deprecated-declarations
-    FAST := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native
-    FAST := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast # -mcpu=apple-m1 # -mavx2 -mfma
+    FAST := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast -march=native # -mavx2 -mfma
+    FAST := -O3 -fno-trapping-math -funroll-loops -ffp-contract=fast # -mcpu=apple-m1
 
     DEBUG := -g3 -ggdb # -Wconversion
     COVER := -fprofile-arcs -ftest-coverage
