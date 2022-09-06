@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
         
         // print content of Glossary:
         printf("%lu keys:\n", arg.num_keys());
-        arg.write(std::cout, "    > ");
+        arg.print(std::cout, "    > ");
         
         // extract values from Glossary:
         if ( arg.set(i, "integer") )  printf("integer : %i\n", i);

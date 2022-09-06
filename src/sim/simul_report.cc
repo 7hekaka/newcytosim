@@ -127,7 +127,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
         if ( str.size() > 0 )
             throw InvalidParameter("unexpected `" + str + "' in report string");
     }
-    //opt.write_counts(std::cerr);
+    //opt.print_counts(std::cerr);
 }
 
 

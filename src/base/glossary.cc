@@ -79,7 +79,7 @@ std::string format(Glossary::pair_type const& pair)
 
 /**
  Write the usage-counter for each value.
- The width of each record will match what is printed by Glossary::write()
+ The width of each record will match what is printed by Glossary::print()
  */
 std::string format_counts(Glossary::pair_type const& pair)
 {
@@ -502,7 +502,7 @@ void Glossary::add_value(key_type const& key, const std::string& arg)
 //------------------------------------------------------------------------------
 #pragma mark - Output
 
-void Glossary::write_counts(std::ostream& os, std::string const& prefix) const
+void Glossary::print_counts(std::ostream& os, std::string const& prefix) const
 {
     for ( auto const& i : mTerms )
     {
@@ -512,7 +512,7 @@ void Glossary::write_counts(std::ostream& os, std::string const& prefix) const
 }
 
 
-void Glossary::write(std::ostream& os, std::string const& prefix) const
+void Glossary::print(std::ostream& os, std::string const& prefix) const
 {
     for ( auto const& i : mTerms )
     {
@@ -552,7 +552,7 @@ std::ostream& operator << (std::ostream& os, Glossary::pair_type const& arg)
 
 std::ostream& operator << (std::ostream& os, Glossary const& arg)
 {
-    arg.write(os, "  ");
+    arg.print(os, "  ");
     return os;
 }
 

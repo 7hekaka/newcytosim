@@ -343,10 +343,10 @@ public:
     int read_strings(int argc, char* argv[], int no_overwrite = 2);
 
     /// write all [key, values]
-    void write(std::ostream&, std::string const& prefix = "") const;
+    void print(std::ostream&, std::string const& prefix = "") const;
     
-    /// write all [key, values]
-    void write_counts(std::ostream&, std::string const& prefix = "") const;
+    /// write all [key, values] with number of access times
+    void print_counts(std::ostream&, std::string const& prefix = "") const;
     
     /// write all [key, values] on a single line
     std::string to_string() const;
