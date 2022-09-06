@@ -162,7 +162,7 @@ public:
     /// ask the simulation to stop
     void cancel() { pthread_cancel(child_); }
 
-    /// ask the simulation to stop
+    /// kill the simulation
     void terminate() { pthread_kill(child_, SIGTERM); }
 
     /// wait for child to terminate

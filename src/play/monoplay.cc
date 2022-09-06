@@ -1,7 +1,6 @@
 /*
- * Multiplay runs simulations in child threads in parallel and display them live
- * This is the second GLFW-based Cytosim player
- * Francois J Nedelec, Cambridge University, 1--24 May 2022
+ * Multiplay runs one simulation in a child thread and displays it live
+ * Francois J Nedelec, Cambridge University, 6 Sep. 2022
  */
 
 #include <stdio.h>
@@ -10,8 +9,6 @@
 
 #include "simul.h"
 #include "glossary.h"
-#include "messages.h"
-#include "filepath.h"
 #include "sim_thread.h"
 
 #include "view.h"
@@ -23,45 +20,23 @@
 #include "gle.h"
 #include "glfw.h"
 
-int tileX = 2;
-int tileY = 2;
-constexpr int TOP = 128;
-
-// size of each cell (updated if window is resized)
-int bugW = 320;
-int bugH = 128;
-
 // size of window (updated if window is resized)
-int winW = bugW * tileX;
-int winH = bugH * tileY;
+int winW = 1024;
+int winH = 1024;
+
+// size of framebuffer (updated if window is resized)
+int bugW = 1024;
+int bugH = 1024;
 
 //------------------------------------------------------------------------------
 
-unsigned period = 16;
-View view("multiplay", DIM==3);
-DisplayProp disp("multiplay");
+View view("monoplay", DIM==3);
+DisplayProp disp("monoplay");
 Display1 display(&disp);
 PropertyList dispList;
 
-int selected = 0;
-int fate[TOP] = { 0 };
-
-// pointers to hold the Config text:
-char *config_code = nullptr;
-size_t code_size = 0;
-
 //------------------------------------------------------------------------------
 #pragma mark -
-
-/* returns cell index corresponding to mouse position (mx, my) */
-int whichBug(double mx, double my)
-{
-    mx = std::max(mx, 0.0);
-    my = std::max(my, 0.0);
-    int x = std::min(tileX, int(tileX * mx));
-    int y = std::min(tileY, int(tileY * my));
-    return y + tileY * x;
-}
 
 /* respond to mouse cursor movements */
 void mouseMotionCallback(GLFWwindow* win, double mx, double my)
@@ -70,8 +45,6 @@ void mouseMotionCallback(GLFWwindow* win, double mx, double my)
     //printf("mouse @ %8.2f %8.2f (%i)\n", mx, my, state);
     if ( state == GLFW_PRESS )
     {
-        int i = whichBug(mx/winW, 1.0-my/winH);
-        fate[i] = 1;
     }
 }
 
@@ -83,14 +56,6 @@ void mouseButtoncallback(GLFWwindow* win, int button, int action, int mods)
     //printf("click @ %8.2f %8.2f (%i %i)\n", mx, my, button, action);
     if ( button == GLFW_MOUSE_BUTTON_LEFT )
     {
-        int i = whichBug(mx/winW, 1.0-my/winH);
-        if ( action == GLFW_PRESS )
-            selected = i;
-        else if ( action == GLFW_RELEASE )
-        {
-            if ( i == selected )
-                fate[i] = 1;
-        }
     }
 }
 
@@ -130,7 +95,7 @@ void toggleFullScreen(GLFWwindow* win)
     }
 }
 
-/* respond to keyboard events based on keyboard layout */
+/* respond to keyboard events based on keyboard layout: 'k' is capitalized */
 void keysCallback(GLFWwindow* win, int k, int s, int action, int mods)
 {
     if ( action != GLFW_PRESS )
@@ -147,13 +112,14 @@ void keysCallback(GLFWwindow* win, int k, int s, int action, int mods)
         case 'F': toggleFullScreen(win); break;
         case '-': view.zoom_in(0.91700404320); break;
         case '=': view.zoom_in(1.09050773266); break;
+        case 'X': view.axes = ( view.axes ? 0 : 3 ); break;
 #if ( DIM > 1 )
         case GLFW_KEY_UP:    view.rotate_by(Quaternion<real>(0.99,-.1,0,0)); break;
         case GLFW_KEY_DOWN:  view.rotate_by(Quaternion<real>(0.99,0.1,0,0)); break;
         case GLFW_KEY_LEFT:  view.rotate_by(Quaternion<real>(0.99,0,-.1,0)); break;
         case GLFW_KEY_RIGHT: view.rotate_by(Quaternion<real>(0.99,0,0.1,0)); break;
 #endif
-        default: return;
+        default: printf("keysCallback %c (%i)\n", k, mods); return;
     }
 }
 
@@ -173,10 +139,8 @@ void reshape(GLFWwindow* win, int W, int H)
 {
     glfwGetWindowSize(win, &winW, &winH);
     glfwGetFramebufferSize(win, &bugW, &bugH);
-    bugW /= tileX;
-    bugH /= tileY;
     view.reshape(bugW, bugH);
-    //printf("Window %ix%i : tile %ix%i\n", winW, winH, bugW, bugH);
+    //printf("Window %ix%i : framebuffer %ix%i\n", winW, winH, bugW, bugH);
 }
 
 
@@ -197,7 +161,7 @@ GLFWwindow * initWindow(int W, int H)
 
     glfwDefaultWindowHints();
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
 
@@ -233,182 +197,73 @@ GLFWwindow * initWindow(int W, int H)
     return win;
 }
 
-//------------------------------------------------------------------------------
-#pragma mark -
-
-/* get ready to draw System */
-void prepareDraw()
-{
-    view.setLights();
-    view.adjust(bugW, bugH);
-    view.loadView();
-    //printf("dispList: %lu\n", dispList.size());
-}
-
-
-/* prepare for drawing bug at (x,y) */
-inline void selectPanel(int x, int y)
-{
-    glScissor(bugW*x, bugH*y, bugW, bugH);
-    view.setViewport(bugW*x, bugH*y, bugW, bugH);
-}
-
 
 /* draw System */
 void drawBug(Simul const& sim)
 {
+    view.openDisplay();
     display.setPixelFactors(view.pixelSize(), 1);
     display.prepareForDisplay(sim, dispList, view.depthAxis());
-    gym::clearPixels(view.back_color);
     display.drawSimul(sim);
-    //gym::enableLighting(); gym::scale(0.2); gle::star();
+    view.closeDisplay();
 }
 
 //------------------------------------------------------------------------------
 
-/// read 'x:y' where ':' is specified as the character 'sep'
-int readTileDimensions(int& X, int& Y, const char str[], char sep)
-{
-    char const* c = strchr(str, sep);
-    if ( c && isdigit(str[0]) )
-    {
-        int x = X, y = Y;
-        char* ptr = nullptr;
-        errno = 0;
-        x = (int)strtol(str, &ptr, 10);
-        if ( x <= 0 )
-        {
-            if ( errno ) perror(str);
-            return 2;
-        }
-        if ( ptr != c )
-            return 3;
-        y = (int)strtol(c+1, &ptr, 10);
-        if ( y <= 0 )
-        {
-            if ( errno ) perror(str);
-            return 4;
-        }
-        if ( *ptr && !isspace(*ptr) )
-            return 5;
-        if ( x * y > TOP )
-        {
-            printf("Error: tile is limited to %i cells max\n", TOP);
-            exit(1);
-        }
-        X = x;
-        Y = y;
-        return 0;
-    }
-    return 1;
-}
-
-
 /* program entry */
 int main(int argc, char *argv[])
 {
-    Simul simul[TOP];
-    SimThread worker[TOP];
+    Simul simul;
+    SimThread worker;
 
     //parse the command line:
-    if ( argc > 1 && 0 == readTileDimensions(tileX, tileY, argv[1], ':') )
-        *argv[1] = 0;
     Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
-    
-    int n = arg.num_values(".cym");
-    for ( int i = 0; i < std::min(tileX*tileY, n); ++i )
-        arg.set(simul[i].prop.config_file, ".cym", i);
-    if ( n < 2 )
-    {
-        const char * str = simul[0].prop.config_file.c_str();
-        if ( !FilePath::read_file(str, config_code, code_size) )
-            exit(1);
-        for ( int i = 0; i < tileX*tileY; ++i )
-            worker[i].config_code = config_code;
-    }
-    arg.clear(".cym");
     if ( !arg.empty() )
     {
         view.read(arg);
         disp.read(arg);
-        arg.set(period, "period");
+        unsigned P = 1;
+        arg.set(P, "period");
+        worker.period(P);
+        simul.initialize(arg);
         arg.print_warnings(std::cerr, 1, "\n");
     }
     
-    RNG.seed();
-    GLFWwindow* win = initWindow(bugW*tileX, bugH*tileY);
-    Cytosim::silent();
+    GLFWwindow* win = initWindow(winW, winH);
+    worker.set_simul(&simul);
+    worker.start();
 
-    for ( int i = 0; i < tileX*tileY; ++i )
-    {
-        simul[i].initialize(arg);
-        simul[i].prop.random_seed = RNG.pint32();
-        worker[i].set_simul(simul+i);
-        worker[i].period(period);
-        worker[i].start();
-    }
-
-    prepareDraw();
-    glEnable(GL_SCISSOR_TEST);
     while( !glfwWindowShouldClose(win) )
     {
         //usleep(100000);
         int refresh = 0;
-        for (int x = 0; x < tileX; ++x )
-        for (int y = 0; y < tileY; ++y )
+        if ( worker.holding() && 0 == worker.trylock() )
         {
-            int i = y + tileY * x;
-            if ( worker[i].holding() && 0 == worker[i].trylock() )
-            {
-                ++refresh;
-                selectPanel(x, y);
-                drawBug(simul[i]);
-                if ( worker[i].holding() > 1 )
-                    worker[i].restart();
-                worker[i].unlock();
-                if ( fate[i] > 0 )
-                    worker[i].cancel();
-                else
-                    worker[i].signal();
-            }
-            else if ( worker[i].dead() )
-            {
-                //fprintf(stderr, "%2i: dead %i\n", i, worker[i].dead() );
-                if ( fate[i] > 0 )
-                {
-                    ++refresh;
-                    selectPanel(x, y);
-                    gym::clearPixels(0.5f, 0.5f, 0.5f, 1.0f);
-                    fate[i] = -1-RNG.pint32(tileX*tileY);
-                }
-                else if ( fate[i] < 0 )
-                {
-                    if ( ++fate[i] == 0 )
-                    {
-                        //fprintf(stderr, "%2i: start\n", i);
-                        worker[i].erase_simul(1);
-                        worker[i].start();
-                    }
-                }
-            }
+            ++refresh;
+            drawBug(simul);
+            if ( worker.holding() > 1 )
+                worker.restart();
+            worker.unlock();
+            worker.signal();
+        }
+        else if ( worker.dead() )
+        {
+            //fprintf(stderr, "%2i: dead %i\n", i, worker[i].dead() );
+            worker.erase_simul(1);
+            worker.start();
         }
         if ( refresh )
         {
             glFlush();
-            //glfwSwapBuffers(win);
+            glfwSwapBuffers(win);
         }
         glfwPollEvents();
     }
-    //stopPreconfig();
-    glDisable(GL_SCISSOR_TEST);
-    for ( int i = 0; i < tileX*tileY; ++i )
-        worker[i].cancel();
-    for ( int i = 0; i < tileX*tileY; ++i )
-        worker[i].join();
+    worker.cancel();
+    worker.join();
     glfwDestroyWindow(win);
     glfwTerminate();
-    free(config_code);
 }
 

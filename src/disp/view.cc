@@ -527,7 +527,7 @@ void View::setModelView() const
     gym::mat_translate(modelview_, V.XX, V.YY, V.ZZ);
     gym::set_view(modelview_);
     
-    //std::cerr<<"setModelView win " << window() << '\n';
+    //std::clog << "setModelView win " << window() << '\n';
 #if ( 0 )
     std::clog << "View:eye      " << eyeDistance << "\n";
     std::clog << "View:rotation " << rotation << "\n";

@@ -62,7 +62,7 @@ bin3/play: play.cc build/playerD3.o $(OBJ_PLAY3D) cytolibGD3.a cytomathD3.a $(LI
 	$(COMPILE) -DDIM=3 $(INFO) $(OBJECTS) $(PLAY_DEP) -o bin3/play
 	$(DONE)
 
-################################ multiplay
+################################ monoplay & multiplay
 
 INC_GLFW = $(addprefix -Isrc/, math base sim gym disp) -Iext
 
@@ -71,6 +71,11 @@ ifeq ($(MACHINE),mac)
 else
     LIB_GLFW := -lglfw
 endif
+
+monoplay: src/play/monoplay.cc $(OBJ_PLAY:%.o=build/%.o) cytolibG.a $(LIB_PLAYER) cytomath.a | bin
+	$(COMPILE) $(INFO) $(INC_GLFW) $(OBJECTS) $(LIB_GLFW) $(LINK) $(GRAFIX) $(IMAGES) -o bin/monoplay
+	$(DONE)
+vpath monoplay bin
 
 multiplay: src/play/multiplay.cc $(OBJ_PLAY:%.o=build/%.o) cytolibG.a $(LIB_PLAYER) cytomath.a | bin
 	$(COMPILE) $(INFO) $(INC_GLFW) $(OBJECTS) $(LIB_GLFW) $(LINK) $(GRAFIX) $(IMAGES) -o bin/multiplay

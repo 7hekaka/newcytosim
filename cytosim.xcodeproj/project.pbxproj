@@ -1642,6 +1642,7 @@
 		BB20484B0AF203A0004EDA21 /* filewrapper.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = filewrapper.h; path = src/base/filewrapper.h; sourceTree = SOURCE_ROOT; };
 		BB21854D0B40836900B75436 /* linear_solvers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = linear_solvers.h; path = src/math/linear_solvers.h; sourceTree = SOURCE_ROOT; };
 		BB2185620B4084CC00B75436 /* linear_solvers.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = linear_solvers.cc; path = src/math/linear_solvers.cc; sourceTree = SOURCE_ROOT; };
+		BB29615728C71FFA00525067 /* monoplay.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = monoplay.cc; sourceTree = "<group>"; };
 		BB2A470114F3D4AD008434C6 /* bead_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bead_prop.h; sourceTree = "<group>"; };
 		BB2A470214F3D4AD008434C6 /* bead_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bead_prop.cc; sourceTree = "<group>"; };
 		BB2B25E9284CB48D003A5864 /* test_sphere */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_sphere; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3086,6 +3087,7 @@
 				BB81B868219EE37D009CA402 /* play_mouse.cc */,
 				BB81B86A219EE55F009CA402 /* play_keys.cc */,
 				BB7358C305B98DA3006956D5 /* play.cc */,
+				BB29615728C71FFA00525067 /* monoplay.cc */,
 				BBEAA3EF283B633B0091DFA9 /* multiplay.cc */,
 			);
 			name = play;
