@@ -381,32 +381,6 @@ void alsatian_xpttrf(int size, real* D, real* E, int* INFO)
     *INFO = 0;
 }
 
-/**
- Based on the 'Italian' version, using precalculated constant terms
- 
- Improved on 02.04.2020: removed one multiplication, now only using FMAs
- */
-void alsatian2_xptts2(int size, real const* D, real const* DE, real* B)
-{
-    assert_true(size > 0);
-    real x = B[0];
-    B[0] = x * D[0];
-    // upward recursion on B[]
-    #pragma nounroll
-    for ( int n = 1; n < size; ++n )
-    {
-        x = B[n] - x * DE[n-1];
-        B[n] = x * D[n];
-    }
-    // downward recursion on B[]
-    x = B[size-1];
-    #pragma nounroll
-    for ( int n = size-2; n >= 0; --n )
-    {
-        x = B[n] - x * DE[n];
-        B[n] = x;
-    }
-}
 
 /**
  Based on the 'Italian' version, using precalculated constant terms

@@ -19,6 +19,7 @@
 #include "simd.h"
 #include "simd_float.h"
 
+#include "../math/fp_exceptions.cc"
 #include "../sim/mecafil_code.cc"
 
 
@@ -26,10 +27,11 @@
 typedef size_t UINT;
 
 /// number of segments:
-const UINT NSEG = 127;
+const UINT NSEG = 117;
 /// number of vertex coordinates
 const UINT NVAL = DIM * ( NSEG + 1 );
 const UINT ALOC = NVAL + 8;
+const UINT SUB = 64;
 
 /// vectors for one filament
 real *pos_=nullptr, *dir_=nullptr, *ani_=nullptr;
@@ -88,26 +90,7 @@ void free_reals(real*& x, real*& y, real*& z, real*& t)
 }
 
 
-#pragma STDC_FENV_ACCESS on
-void print_fe_exceptions(const char* str, FILE * out = stdout)
-{
-    int n = std::fetestexcept(FE_ALL_EXCEPT);
-    n &= ~FE_INEXACT;
-    if ( n )
-    {
-        fprintf(out, " %s(", str);
-        if (n&FE_DIVBYZERO)  fprintf(out, "DIVBYZERO ");
-        if (n&FE_INEXACT)    fprintf(out, "INEXACT ");
-        if (n&FE_INVALID)    fprintf(out, "INVALID ");
-        if (n&FE_OVERFLOW)   fprintf(out, "OVERFLOW ");
-        if (n&FE_UNDERFLOW)  fprintf(out, "UNDERFLOW ");
-        if (n&FE_ALL_EXCEPT) fprintf(out, "UNKNOWN ");
-        if ( std::feclearexcept(FE_ALL_EXCEPT) )
-            fprintf(out, "unclear ");
-        fprintf(out, "\b)");
-    }
-}
-
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 
@@ -134,9 +117,9 @@ inline void DPTTRF(UINT nbs)
     alsatian_xpttrf(nbs, diag_, upper_, &info);
 }
 
-inline void DPTTS2(UINT nbs, real* lag)
+inline void DPTTS2(UINT nbs, real* Y)
 {
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag, 0);
+    alsatian_xptts2(nbs, 1, diag_, upper_, Y, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -167,12 +150,12 @@ void setFilament(UINT nbs, real seg, real persistence_length, real mag)
         dir = std::cos(a) * dir + dir.randOrthoU(std::sin(a));
     }
     pos.store(pos_+DIM*nbs);
-    print_fe_exceptions("setFilament");
+    print_floating_point_exceptions("setFilament");
 
     for ( UINT i = 0 ; i < nbv; ++i )
         force_[i] = mag * RNG.sreal();
     
-    print_fe_exceptions("setForce");
+    print_floating_point_exceptions("setForce");
 }
 
 
@@ -193,14 +176,15 @@ void setProjection(UINT nbs)
         diag_[j] = 2.0;
     }
     diag_[j] = 2.0;
-    print_fe_exceptions("setProjection");
+    upper_[j] = 0.0;
+    print_floating_point_exceptions("setProjection");
 
     DPTTRF(nbs);
-    print_fe_exceptions("DPTTRF");
+    print_floating_point_exceptions("DPTTRF");
     
     projectForcesU_(nbs, dir_, force_, lag_);
     DPTTS2(nbs, lag_);
-    print_fe_exceptions("DPTTS2");
+    print_floating_point_exceptions("DPTTS2");
 
 #if ( 0 )
     VecPrint::edges("D", nbs, diag_, 3);
@@ -226,7 +210,7 @@ void setAnisotropy(UINT nbs)
     for ( UINT p = DIM ; p < sup; ++p )
         ani_[p] = 0.5 * ( dir_[p-DIM] + dir_[p] );
     
-    print_fe_exceptions("setAnisotropy");
+    print_floating_point_exceptions("setAnisotropy");
 }
 
 
@@ -778,14 +762,14 @@ void projectForces_SSE(UINT nbs, const double* X, real* Y)
 #elif defined(__SSE3__)
 void projectForces_SSE(UINT nbs, const float* X, real* Y)
 {
-    projectForcesU_(nbs, dir_, X, lag_);
+    projectForcesU3D_SSE(nbs, dir_, X, lag_);
     DPTTS2(nbs, lag_);
     projectForcesD3D_SSE(nbs, dir_, X, lag_, Y);
 }
 #endif
 
 #if REAL_IS_DOUBLE && USE_SIMD
-void projectForcesFused(UINT nbs, const double* X, real* Y)
+void projectForcesFused_SSE(UINT nbs, const double* X, real* Y)
 {
 #if ( DIM == 3 )
     projectForces3D_SSE(nbs, dir_, X, lag_, diag_, upper_, Y);
@@ -794,6 +778,11 @@ void projectForcesFused(UINT nbs, const double* X, real* Y)
 #endif
 }
 #endif
+
+void projectForcesFused(UINT nbs, const double* X, real* Y)
+{
+    projectForces(nbs, dir_, X, lag_, diag_, upper_, Y);
+}
 
 #if REAL_IS_DOUBLE && defined(__AVX__)
 void projectForces_AVX(UINT nbs, const double* X, real* Y)
@@ -829,11 +818,11 @@ void checkProject(UINT nbs, const char msg[])
     
     nan_fill(nbs, lag_);
     projectForces(nbs, x, y);
-    print_fe_exceptions("SCA");
+    print_floating_point_exceptions("SCA");
     
     nan_fill(nbs, lag_);
     FUNC(nbs, x, z);
-    print_fe_exceptions(msg);
+    print_floating_point_exceptions(msg);
     
     real err = blas::difference(nbv, y, z);
     if ( std::isnan(err) || abs_real(err) > 64*REAL_EPSILON )
@@ -853,7 +842,7 @@ void checkProject(UINT nbs, const char msg[])
 
 void onlyDPTTS(UINT nbs, const real* X, real* Y)
 {
-    alsatian_xptts2(nbs, 1, diag_, upper_, lag_, NSEG);
+    alsatian_xptts2(nbs, 1, diag_, upper_, Y, NSEG);
 }
 
 void onlyScale(UINT nbs, const real* X, real* Y)
@@ -925,15 +914,21 @@ void testU(UINT cnt, char const* str)
 
     FUNC(NSEG, dir_, force_, lag_);
     VecPrint::edges(NSEG, lag_);
+    print_floating_point_exceptions("");
+    
     tick();
     for ( UINT i=0; i<cnt; ++i )
     {
-        FUNC(NSEG, dir_, y, z);
-        FUNC(NSEG, dir_, x, y);
-        FUNC(NSEG, dir_, z, y);
+        randomize(NVAL, x, y, z, 1.0);
+        for ( UINT j=0; j<SUB; ++j )
+        {
+            FUNC(NSEG, dir_, y, z);
+            FUNC(NSEG, dir_, x, y);
+            FUNC(NSEG, dir_, z, y);
+        }
     }
-    printf("  %10s %5.0f", str, tock());
-    print_fe_exceptions("");
+    printf("  %8s %5.0f", str, tock());
+    print_floating_point_exceptions("");
     printf("\n");
     free_reals(x,y,z);
 }
@@ -949,15 +944,21 @@ void testD(UINT cnt, char const* str)
     
     FUNC(NSEG, dir_, pos_, lag_, x);
     VecPrint::edges(NVAL, x);
+    print_floating_point_exceptions("");
+    
     tick();
     for ( UINT i=0; i<cnt; ++i )
     {
-        FUNC(NSEG, dir_, x, lag_, z);
-        FUNC(NSEG, dir_, y, lag_, x);
-        FUNC(NSEG, dir_, z, lag_, y);
+        randomize(NVAL, x, y, z, 1.0);
+        for ( UINT j=0; j<SUB; ++j )
+        {
+            FUNC(NSEG, dir_, x, lag_, z);
+            FUNC(NSEG, dir_, y, lag_, x);
+            FUNC(NSEG, dir_, z, lag_, y);
+        }
     }
-    printf("  %10s %5.0f", str, tock());
-    print_fe_exceptions("");
+    printf("  %8s %5.0f", str, tock());
+    print_floating_point_exceptions("");
     printf("\n");
     free_reals(x,y,z);
 }
@@ -970,19 +971,23 @@ void timeProject(UINT cnt, char const* str)
     new_nans(ALOC, x, y, z);
     randomize(NVAL, x, y, z, 1.0);
 
-    zero_real(ALOC, x);
     FUNC(NSEG, force_, x);
-    print_fe_exceptions("P");
     VecPrint::edges(NVAL+2, x);
+    print_floating_point_exceptions("");
+
     tick();
     for ( UINT i=0; i<cnt; ++i )
     {
-        FUNC(NSEG, x, y);
-        FUNC(NSEG, y, z);
-        FUNC(NSEG, z, x);
+        randomize(NVAL, x, y, z, 1.0);
+        for ( UINT j=0; j<SUB; ++j )
+        {
+            FUNC(NSEG, x, y);
+            FUNC(NSEG, y, z);
+            FUNC(NSEG, z, x);
+        }
     }
     printf("  %8s %5.0f", str, tock());
-    print_fe_exceptions("");
+    print_floating_point_exceptions("");
     printf("\n");
     free_reals(x,y,z);
 }
@@ -1053,8 +1058,9 @@ void testProjection(UINT cnt)
 #if USE_SIMD
     timeProject<projectForces_SSE>(cnt, "prSSE");
 #endif
-#if REAL_IS_DOUBLE && USE_SIMD
     timeProject<projectForcesFused>(cnt, "fused");
+#if REAL_IS_DOUBLE && USE_SIMD
+    timeProject<projectForcesFused_SSE>(cnt, "fusedSSE");
 #endif
 #if REAL_IS_DOUBLE && defined(__AVX__)
     timeProject<projectForces_AVX>(cnt, "prAVX");
@@ -1086,9 +1092,10 @@ void testProjectionDiff(UINT cnt)
 
 int main(int argc, char* argv[])
 {
-    const UINT REP = 1<<20;
+    const UINT REP = 4096;
     RNG.seed();
     std::cout << "DIM=" << DIM << "  real " << sizeof(real) << " bytes   " << __VERSION__ << "\n";
+    //enable_floating_point_exceptions();
     if ( 0 )
     {
 #if REAL_IS_DOUBLE && defined(__AVX__)

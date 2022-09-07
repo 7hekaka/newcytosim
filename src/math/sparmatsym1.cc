@@ -669,8 +669,8 @@ bool SparMatSym1::prepareForMultiply(int)
 
 
 /**
- Create the Compressed Sparse Row format described in
-     "SPARSKIT: a basic to ol kit for sparse matrix computations"
+ Create the Compressed Sparse Row (CSR) format described in
+     "SPARSKIT: a basic tool kit for sparse matrix computations"
  Youcef Saad, Version 2, 1994
  
  Attention: indices start here at zero, and many things are thus shifted by one,
