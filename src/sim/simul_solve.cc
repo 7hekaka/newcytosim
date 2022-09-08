@@ -129,9 +129,9 @@ void Simul::setAllInteractions(Meca& meca) const
     
     // add steric interactions
     if ( meca.steric_ == 2 )
-        meca.addStericInteractions2(*this);
+        meca.addStericInteractionsL(*this);
     else if ( meca.steric_ == 1 )
-        meca.addStericInteractions1(*this);
+        meca.addStericInteractionsP(*this);
 
     //addExperimentalInteractions(meca);
 

@@ -80,7 +80,7 @@ void Meca::selectStericEngine(Simul const& sim)
  This can be extended if necessary, but the steric_stiffness[]
  properties should be extended as well.
  */
-void Meca::addStericInteractions1(Simul const& sim)
+void Meca::addStericInteractionsP(Simul const& sim)
 {
     // clear grid
     pointGrid.clear();
@@ -185,7 +185,7 @@ void Meca::addStericInteractions1(Simul const& sim)
  This can be extended if necessary, but the steric_stiffness[]
  properties should be extended as well.
  */
-void Meca::addStericInteractions2(Simul const& sim)
+void Meca::addStericInteractionsL(Simul const& sim)
 {
     // clear grid
     locusGrid.clear();
