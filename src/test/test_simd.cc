@@ -17,7 +17,8 @@
 
 #define shuffle2(a,b,k)   _mm_shuffle_pd(a,b,k)
 
-void dump(size_t len, const float* vec)
+template <typename FLOAT>
+void dump(size_t len, const FLOAT* vec)
 {
     printf(": ");
     for ( size_t n = 0; n < len; ++n )
@@ -29,16 +30,16 @@ void dump(size_t len, const float* vec)
     printf("\n");
 }
 
-void dump(size_t len, const double* vec)
+template <typename FLOAT>
+void dump(size_t lin, size_t col, const FLOAT* vec)
 {
-    printf(": ");
-    for ( size_t n = 0; n < len; ++n )
+    for ( size_t i = 0; i < lin; ++i )
     {
-        printf("%+5.2f ", vec[n]);
-        if (( n & 3 ) == 3 )
-            printf(" ");
+        printf("%lu: ", i);
+        for ( size_t j = 0; j < col; ++j )
+            printf("%+5.2f ", vec[i+j*col]);
+        printf("\n");
     }
-    printf("\n");
 }
 
 
@@ -811,7 +812,7 @@ void test_transpose4()
 make dst = { XXXX YYYY ZZZZ TTTT }
 from src = { XYZT XYZT XYZT XYZT }
 */
-void transpose16(double const* src, double* dst)
+void transpose4x4(double const* src, double* dst)
 {
     vec4 u0 = loadu4(src);
     vec4 u1 = loadu4(src+4);
@@ -827,49 +828,6 @@ void transpose16(double const* src, double* dst)
     storeu4(dst+4 , blend22(v1, v3));
     storeu4(dst+8 , blend22(v2, u0));
     storeu4(dst+12, blend22(v3, u1));
-}
-
-/* return transposed matrix
-make dst = { XXXX YYYY ZZZZ TTTT }
-from src = { XYZT XYZT XYZT XYZT }
-*/
-void transpose16(float const* src, float* dst)
-{
-    vec4f v0 = loadu4f(src);
-    vec4f v1 = loadu4f(src+4);
-    vec4f u2 = loadu4f(src+8);
-    vec4f u3 = loadu4f(src+12);
-    vec4f u0 = unpacklo4f(v0, v1);
-    vec4f u1 = unpackhi4f(v0, v1);
-    v0 = unpacklo4f(u2, u3);
-    v1 = unpackhi4f(u2, u3);
-    storeu4f(dst   , movelh4f(u0, v0));
-    storeu4f(dst+4 , movehl4f(v0, u0));
-    storeu4f(dst+8 , movelh4f(u1, v1));
-    storeu4f(dst+12, movehl4f(v1, u1));
-}
-
-void test_transpose16()
-{
-    vec4f x { 0, 1, 2, 3 };
-    vec4f y { 4, 5, 6, 7 };
-    printf("------ test_transpose16\n");
-    {
-        float dst[16] = { 0 };
-        //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
-        const float src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
-        transpose16(src, dst);
-        printf("float     "); dump(16, src);
-        printf("transpose "); dump(16, dst);
-    }
-    {
-        double dst[16] = { 0 };
-        //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
-        const double src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
-        transpose16(src, dst);
-        printf("double    "); dump(16, src);
-        printf("transpose "); dump(16, dst);
-    }
 }
 
 
@@ -906,6 +864,68 @@ void test_swap7()
 
 #endif
 
+/* return transposed matrix
+make dst = { XXXX YYYY ZZZZ TTTT }
+from src = { XYZT XYZT XYZT XYZT }
+*/
+void transpose4x4(float const* src, float* dst)
+{
+    vec4f v0 = loadu4f(src);
+    vec4f v1 = loadu4f(src+4);
+    vec4f u2 = loadu4f(src+8);
+    vec4f u3 = loadu4f(src+12);
+    vec4f u0 = unpacklo4f(v0, v1);
+    vec4f u1 = unpackhi4f(v0, v1);
+    v0 = unpacklo4f(u2, u3);
+    v1 = unpackhi4f(u2, u3);
+    storeu4f(dst   , movelh4f(u0, v0));
+    storeu4f(dst+4 , movehl4f(v0, u0));
+    storeu4f(dst+8 , movelh4f(u1, v1));
+    storeu4f(dst+12, movehl4f(v1, u1));
+}
+
+#if defined(__ARM_NEON__)
+void transpose4x4neon(float const* src, float* dst)
+{
+    float32x4_t v0 = loadu4f(src);
+    float32x4_t v1 = loadu4f(src+4);
+    float32x4_t v2 = loadu4f(src+8);
+    float32x4_t v3 = loadu4f(src+12);
+    float32x4x2_t xx = vtrnq_f32(v0, v1);
+    float32x4x2_t yy = vtrnq_f32(v2, v3);
+    vst1q_f32(dst   , movehl4f(yy.val[0], xx.val[0]));
+    vst1q_f32(dst+4 , movehl4f(yy.val[1], xx.val[1]));
+    vst1q_f32(dst+8 , movelh4f(xx.val[0], yy.val[0]));
+    vst1q_f32(dst+12, movelh4f(xx.val[1], yy.val[1]));
+}
+#endif
+
+void test_transpose4x4()
+{
+    printf("------ test_transpose4x4\n");
+    {
+        float dst[16] = { 0 };
+        //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
+        const float src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
+        transpose4x4(src, dst);
+        printf("float\n"); dump(4, 4, src);
+        printf("transpose\n"); dump(4, 4, dst);
+#if defined(__ARM_NEON__)
+        transpose4x4neon(src, dst);
+        printf("transpose\n"); dump(4, 4, dst);
+
+#endif
+    }
+#if defined(__AVX__)
+    double dst[16] = { 0 };
+    //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
+    const double src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
+    transpose4x4(src, dst);
+    printf("double\n"); dump(4, 4, src);
+    printf("transposen\"); dump(4, 4, dst);
+#endif
+}
+
 #pragma mark - ARM NEON loads
 
 
@@ -935,6 +955,7 @@ int main(int argc, char * argv[])
         case 0:
             test_swapSSE();
             test_loads();
+            test_transpose4x4();
             break;
 #ifdef __AVX__
         case 1:
@@ -963,7 +984,6 @@ int main(int argc, char * argv[])
             test_transpose2();
             test_transpose3();
             test_transpose4();
-            test_transpose16();
             break;
         case 6:
             test_shuffle();
