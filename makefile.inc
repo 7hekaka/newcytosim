@@ -169,7 +169,7 @@ ifeq ($(MACHINE),mac)
     FlagsP := -O2 $(ALIGN) -fno-inline
     FlagsF := $(FAST) $(ALIGN)
 
-    LINK   := -framework Accelerate
+    LINK   := -framework Accelerate $(OMPLIB)
 
     GRAFIX := -framework GLUT -framework OpenGL -framework AGL
     # Using brew's freeGLUT:
@@ -256,17 +256,17 @@ ifeq ($(MACHINE),linux)
     # trying to automatically detect BLAS library:
     BLASLIB := $(wildcard /usr/lib/libblas.*) $(wildcard /usr/lib/*/libblas.*)
     # extracting path for libraries:
-    BLADIR := $(word 1, $(dir $(BLASLIB)))
-    ifndef BLADIR
-       $(error Error: the path for the BLAS/LAPACK library `BLADIR` is undefined)
+    BLASDIR := $(word 1, $(dir $(BLASLIB)))
+    ifndef BLASDIR
+       $(error Error: the path for the BLAS/LAPACK library `BLASDIR` is undefined)
     else
-       $(warning Using BLAS library in $(BLADIR))
+       $(warning Using BLAS library in $(BLASDIR))
     endif
 
     #### For dynamic linking:
-    LINK := -L$(BLADIR) -llapack -lblas -lpthread
+    LINK := -L$(BLASDIR) -llapack -lblas -lpthread
     #### For static linking specify the objects directly:
-    #LINK := -L$(BLADIR) $(BLADIR)/liblapack.so $(BLADIR)/libblas.so -lpthread
+    #LINK := -L$(BLASDIR) $(BLASDIR)/liblapack.so $(BLASDIR)/libblas.so -lpthread
 
     ########### Install libraries needed for graphics ############
     # Centos freglut: yum install freeglut-devel
