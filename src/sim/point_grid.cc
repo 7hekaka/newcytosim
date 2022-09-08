@@ -393,7 +393,7 @@ void PointGrid::checkLL(FatLocus const& aa, FatLocus const& bb) const
 
 /*
  In general, these test will only exclude relatively rare pairs from interacting,
- and thus are less stringent than BigVector::near(): they should be tested after.
+ and thus are less stringent than FatVector::near(): they should be tested after.
  */
 
 /// excluding two spheres when they are from the same Solid
@@ -492,7 +492,7 @@ void PointGrid::setSterics0(FatPointList & pots1, FatLocusList & locs1,
 /**
  This will consider once all pairs of objects from the given lists.
  Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on BigVector::near()
+ objects that are too far appart to interact, based on FatVector::near()
  */
 void PointGrid::setStericsT(FatPointList & pots, FatLocusList & locs) const
 {
@@ -525,7 +525,7 @@ void PointGrid::setStericsT(FatPointList & pots, FatLocusList & locs) const
  assuming that the list are different and no object is repeated.
 
  Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on BigVector::near()
+ objects that are too far appart to interact, based on FatVector::near()
  */
 void PointGrid::setStericsT(FatPointList & pots1, FatLocusList & locs1,
                             FatPointList & pots2, FatLocusList & locs2) const
@@ -576,7 +576,7 @@ void PointGrid::setSterics0() const
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -601,7 +601,7 @@ void PointGrid::setStericsT() const
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -639,7 +639,7 @@ void PointGrid::setSterics0(const size_t pan) const
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -663,7 +663,7 @@ void PointGrid::setStericsT(const size_t pan) const
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -693,7 +693,7 @@ void PointGrid::setSterics0(const size_t pan1, const size_t pan2) const
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -726,7 +726,7 @@ void PointGrid::setStericsT(const size_t pan1, const size_t pan2) const
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         

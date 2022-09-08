@@ -10,6 +10,7 @@
 #include "modulo.h"
 #include "space.h"
 #include "meca.h"
+#include "simd.h"
 
 extern Modulo const* modulo;
 
@@ -550,7 +551,6 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
     }
 }
 
-#include "simd.h"
 #if ( DIM == 3 ) && USE_SIMD
 
 /**
@@ -787,7 +787,7 @@ void LocusGrid::setSterics0() const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -805,7 +805,7 @@ void LocusGrid::setStericsT() const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -848,7 +848,7 @@ void LocusGrid::setSterics0(size_t pan) const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
        
@@ -865,7 +865,7 @@ void LocusGrid::setStericsT(size_t pan) const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-         int * region;
+         int const* region;
          int nr = pGrid.getRegion(region, inx);
          assert_true(region[0] == 0);
         
@@ -887,7 +887,7 @@ void LocusGrid::setSterics0(size_t pan, size_t bim) const
     assert_true(pan != bim);
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         
@@ -910,7 +910,7 @@ void LocusGrid::setStericsT(size_t pan, size_t bim) const
     assert_true(pan != bim);
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
-        int * region;
+        int const* region;
         int nr = pGrid.getRegion(region, inx);
         assert_true(region[0] == 0);
         

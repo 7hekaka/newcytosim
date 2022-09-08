@@ -20,7 +20,7 @@ class Fiber;
 #define NUM_STERIC_PANES 1
 
 
-/// Used for early exclusing of potential pairs, representing { position, interaction radius }
+/// Used for early exclusion of potential pairs, representing { position, interaction radius }
 /** This uses single precision arithmetics, hopefully sufficient for exclusion tests */
 class FatVector
 {
@@ -257,13 +257,13 @@ public:
 
 /// PointGrid implements a Cell Lists approach to steric interactions
 /**
- This implements a divide-and-conquer method to find particles that are within a
- certain cutoff distance from each other. In brief:
+ This implements a divide-and-conquer method to find particles that are within
+ a certain cutoff distance from each other. In brief:
  - It covers the space with a Grid `pGrid`, initialized by `setGrid()`
- - A list of class `PointGridCell` is associated with each cell of `pGrid`.
- - `PointGrid::add()` links `BigLocus` or `BigLocus` to the appropriate cell of the grid.
- - `PointGrid::setSterics()` checks all pairs of particles that may overlap,
-    calculating their actual distance, and calling Meca::addLink() as necessary
+ - A list of class `PointGridCell` is associated with each cell of this grid.
+ - `PointGrid::add()` links a `FatPoint` or a `FatLocus` to the appropriate cell of the grid.
+ - `PointGrid::setSterics()` checks all pairs of Point/Locus that may overlap,
+    calculating their distance, and calling Meca::addLink() if they are interacting
  .
  The related class `LocusGrid`, is a simpler, streamline version of this class.
  For periodic boundary conditions, this follows the [Periodic wrapping] method.

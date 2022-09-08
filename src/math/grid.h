@@ -455,7 +455,7 @@ public:
     CELL sumValuesInRegion(const size_t inx) const
     {
         CELL result = 0;
-        int * offsets = nullptr;
+        int const* offsets = nullptr;
         const CELL * ce = gCell + inx;
         int nb = MAP::getRegion(offsets, inx);
         for ( int c = 0; c < nb; ++c )
@@ -467,7 +467,7 @@ public:
     CELL avgValueInRegion(const size_t inx) const
     {
         CELL result = 0;
-        int * offsets = nullptr;
+        int const* offsets = nullptr;
         const CELL * ce = gCell + inx;
         int nb = MAP::getRegion(offsets, inx);
         for ( int c = 0; c < nb; ++c )
@@ -480,7 +480,7 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL result = gCell[inx];
-        int * offsets = nullptr;
+        int const* offsets = nullptr;
         const CELL * ce = gCell + inx;
         int nb = MAP::getRegion(offsets, inx);
         for ( int c = 0; c < nb; ++c )

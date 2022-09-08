@@ -828,7 +828,7 @@ public:
      
      Note: createRegions() must be called first
     */
-    int getRegion(int*& offsets, const size_t indx) const
+    int getRegion(int const*& offsets, const size_t indx) const
     {
         assert_true( hasRegions() );
         offsets = regions[indx]+1;

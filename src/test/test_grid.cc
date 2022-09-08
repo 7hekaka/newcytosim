@@ -205,7 +205,7 @@ int display(View& view)
     if ( myGrid.hasRegions() )
     {
         char str[16];
-        int * offset = nullptr;
+        int const* offset = nullptr;
         size_t nb = myGrid.getRegion(offset, cell_indx);
         for ( size_t j = 0; j < nb; ++j )
         {
