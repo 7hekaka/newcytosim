@@ -393,23 +393,47 @@ public:
 #if ( MAX_STERIC_PANES == 1 )
     
     /// place Mecable vertex on the grid
-    void add(Mecable const* m, size_t i, real rad)
+    void add(Mecable const* mec, size_t inx, real rad)
     {
-        Vector w = m->posPoint(i);
+        Vector w = mec->posPoint(inx);
 #if GRID_HAS_PERIODIC
-        if ( modulo ) modulo->fold(w);
+        if ( modulo )
+        {
+            modulo->fold(w);
+#if ( DIM == 3 )
+            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
+#elif ( DIM == 2 )
+            size_t c = pGrid.direct_index2D(w.XX, w.YY);
+#else
+            size_t c = pGrid.index(w)
 #endif
-        cell_list(w).pane.emplace(m, i, rad, rad, w);
+            assert_true( c == pGrid.index(w) );
+            return pGrid[c].pane.emplace(mec, inx, rad, rad, w);
+        }
+#endif
+        cell_list(w).pane.emplace(mec, inx, rad, rad, w);
     }
     
     // link in the cell containing the middle of the segment:
-    void add(Fiber const* f, size_t i, real rad, real rge)
+    void add(Fiber const* fib, size_t inx, real rad, real rge)
     {
-        Vector w = f->midPoint(i, 0.5);
+        Vector w = fib->midPoint(inx, 0.5);
 #if GRID_HAS_PERIODIC
-        if ( modulo ) modulo->fold(w);
+        if ( modulo )
+        {
+            modulo->fold(w);
+#if ( DIM == 3 )
+            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
+#elif ( DIM == 2 )
+            size_t c = pGrid.direct_index2D(w.XX, w.YY);
+#else
+            size_t c = pGrid.index(w)
 #endif
-        cell_list(w).pane.emplace(f, i, rad, rge, w);
+            assert_true( c == pGrid.index(w) );
+            return pGrid[c].pane.emplace(fib, inx, rad, rge, w);
+        }
+#endif
+        cell_list(w).pane.emplace(fib, inx, rad, rge, w);
     }
     
     /// enter interactions into Meca
@@ -424,7 +448,19 @@ public:
             throw InvalidParameter("point:steric is out-of-range");
         Vector w = mec->posPoint(inx);
 #if GRID_HAS_PERIODIC
-        if ( modulo ) modulo->fold(w);
+        if ( modulo )
+        {
+            modulo->fold(w);
+#if ( DIM == 3 )
+            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
+#elif ( DIM == 2 )
+            size_t c = pGrid.direct_index2D(w.XX, w.YY);
+#else
+            size_t c = pGrid.index(w)
+#endif
+            assert_true( c == pGrid.index(w) );
+            return pGrid[c].panes[pan].pane.emplace(mec, inx, rad, rad, w);
+        }
 #endif
         cell_list(w, pan).pane.emplace(mec, inx, rad, rad, w);
     }
@@ -436,7 +472,19 @@ public:
             throw InvalidParameter("line:steric is out-of-range");
         Vector w = fib->midPoint(inx, 0.5);
 #if GRID_HAS_PERIODIC
-        if ( modulo ) modulo->fold(w);
+        if ( modulo )
+        {
+            modulo->fold(w);
+#if ( DIM == 3 )
+            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
+#elif ( DIM == 2 )
+            size_t c = pGrid.direct_index2D(w.XX, w.YY);
+#else
+            size_t c = pGrid.index(w)
+#endif
+            assert_true( c == pGrid.index(w) );
+            return pGrid[c].panes[pan].pane.emplace(fib, inx, rad, rad, w);
+        }
 #endif
         cell_list(w, pan).pane.emplace(fib, inx, rad, sup, w);
     }

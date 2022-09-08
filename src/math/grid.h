@@ -242,8 +242,8 @@ public:
             real a = MAP::map(d, w[d]) + 0.5;
             int ia = (int)std::floor(a);
             a     -= ia;
-            int  l = MAP::image(d, ia-1);
-            int  u = MAP::image(d, ia  );
+            int  l = MAP::imagei(d, ia-1);
+            int  u = MAP::imagei(d, ia  );
             
             if ( nb == 0 )
             {
@@ -291,8 +291,8 @@ public:
         
         ax -= ix;
         
-        size_t lx = MAP::image(0, ix-1);
-        size_t ux = MAP::image(0, ix  );
+        size_t lx = MAP::imagei(0, ix-1);
+        size_t ux = MAP::imagei(0, ix  );
         
         return gCell[lx] + ax * ( gCell[ux] - gCell[lx] );
     }
@@ -317,11 +317,11 @@ public:
         ax -= ix;
         ay -= iy;
         
-        size_t lx = MAP::image(0, ix-1);
-        size_t ux = MAP::image(0, ix  );
+        size_t lx = MAP::imagei(0, ix-1);
+        size_t ux = MAP::imagei(0, ix  );
         
-        size_t ly = MAP::image(1, iy-1) * MAP::breadth(0);
-        size_t uy = MAP::image(1, iy  ) * MAP::breadth(0);
+        size_t ly = MAP::imagei(1, iy-1) * MAP::breadth(0);
+        size_t uy = MAP::imagei(1, iy  ) * MAP::breadth(0);
         
         //sum weighted cells to get interpolation
         CELL  rl = gCell[lx+ly] + ay * ( gCell[lx+uy] - gCell[lx+ly] );
@@ -354,14 +354,14 @@ public:
         ay -= iy;
         az -= iz;
 
-        size_t lx = MAP::image(0, ix-1);
-        size_t ux = MAP::image(0, ix  );
+        size_t lx = MAP::imagei(0, ix-1);
+        size_t ux = MAP::imagei(0, ix  );
         
-        size_t ly = MAP::image(1, iy-1) * MAP::breadth(0);
-        size_t uy = MAP::image(1, iy  ) * MAP::breadth(0);
+        size_t ly = MAP::imagei(1, iy-1) * MAP::breadth(0);
+        size_t uy = MAP::imagei(1, iy  ) * MAP::breadth(0);
         
-        size_t lz = MAP::image(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
-        size_t uz = MAP::image(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
+        size_t lz = MAP::imagei(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
+        size_t uz = MAP::imagei(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
 
         CELL * cul = gCell + (uy+lz), rul = cul[lx] + ( cul[ux] - cul[lx] ) * ax;
         CELL * cuu = gCell + (uy+uz), ruu = cuu[lx] + ( cuu[ux] - cuu[lx] ) * ax;

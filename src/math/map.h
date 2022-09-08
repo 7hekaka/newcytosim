@@ -164,7 +164,7 @@ protected:
     }
     
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
-    inline size_t image(const int d, long c) const
+    inline size_t imagei(const int d, long c) const
     {
 #if GRID_HAS_PERIODIC
         if ( mPeriodic[d] )
@@ -421,7 +421,7 @@ public:
     void bringInside(int coord[ORD]) const
     {
         for ( int d = 0; d < ORD; ++d )
-            coord[d] = image(d, coord[d]);
+            coord[d] = imagei(d, coord[d]);
     }
     
     /// conversion from index to coordinates
@@ -461,10 +461,10 @@ public:
     /// conversion from coordinates to index
     size_t pack(const int coord[ORD]) const
     {
-        size_t inx = image(ORD-1, coord[ORD-1]);
+        size_t inx = imagei(ORD-1, coord[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = mDim[d] * inx + image(d, coord[d]);
+            inx = mDim[d] * inx + imagei(d, coord[d]);
         
         return inx;
     }
@@ -504,7 +504,7 @@ public:
             c   /= mDim[d];
         }
 
-        s[dim] = image(dim, s[dim]+1);
+        s[dim] = imagei(dim, s[dim]+1);
 
         c = s[ORD-1];
         for ( int d = ORD-2; d >= 0; --d )
@@ -515,41 +515,58 @@ public:
     /// convert coordinate to array index, if ORD==1
     size_t pack1D(const int x) const
     {
-        return image(0, x);
+        return imagei(0, x);
     }
     
     /// convert coordinate to array index, if ORD==2
     size_t pack2D(const int x, const int y) const
     {
-        return image(0, x) + mDim[0]*image(1, y);
+        return imagei(0, x) + mDim[0]*imagei(1, y);
     }
     
     /// convert coordinate to array index, if ORD==3
     size_t pack3D(const int x, const int y, const int z) const
     {
-        return image(0, x) + mDim[0]*( image(1, y) + mDim[1]*image(2, z) );
+        return imagei(0, x) + mDim[0]*( imagei(1, y) + mDim[1]*imagei(2, z) );
     }
 
     
     /// return index of cell corresponding to position (x), if ORD==1
     size_t index1D(const real x) const
     {
-        return image(0, map(0, x));
+        return imagei(0, map(0, x));
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
     size_t index2D(const real x, const real y) const
     {
-        return image(0, map(0, x))
-               + mDim[0] * image(1, map(1, y));
+        return imagei(0, map(0, x))
+               + mDim[0] * imagei(1, map(1, y));
     }
     
     /// return index of cell corresponding to position (x, y, z), if ORD==3
     size_t index3D(const real x, const real y, const real z) const
     {
-        return image(0, map(0, x))
-               + mDim[0]*( image(1, map(1, y))
-               + mDim[1]*  image(2, map(2, z)) );
+        return imagei(0, map(0, x))
+               + mDim[0]*( imagei(1, map(1, y))
+               + mDim[1]*  imagei(2, map(2, z)) );
+    }
+    
+    /// return index of cell corresponding to position (x, y), if ORD==2
+    size_t direct_index2D(const real x, const real y) const
+    {
+        assert_true( map(0, x) < mDim[0] );
+        assert_true( map(1, y) < mDim[1] );
+        return (size_t)map(0, x) + mDim[0]*(size_t)map(1, y);
+    }
+
+    /// return index of cell corresponding to position (x, y, z), if ORD==3
+    size_t direct_index3D(const real x, const real y, const real z) const
+    {
+        assert_true( map(0, x) < mDim[0] );
+        assert_true( map(1, y) < mDim[1] );
+        assert_true( map(2, z) < mDim[2] );
+        return (size_t)map(0, x) + mDim[0]*(size_t)map(1, y) + mDim[1]*(size_t)map(2, z);
     }
 
     //--------------------------------------------------------------------------

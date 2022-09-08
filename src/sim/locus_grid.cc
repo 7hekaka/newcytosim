@@ -829,19 +829,25 @@ void LocusGrid::setSterics() const
         assert_true(region[0] == 0);
         
         BigLocusList& base = cell_list(inx);
-        setStericsT(base);
-        
-        for ( int reg = 1; reg < nr; ++reg )
+        if ( base.size() > 0 )
         {
-            BigLocusList& side = cell_list(inx+region[reg]);
+            setStericsT(base);
+            
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                BigLocusList& side = cell_list(inx+region[reg]);
 #if ( DIM == 3 ) && USE_SIMD
-            if ( base.size() < side.size() )
-                setStericsX(base, side);
-            else
-                setStericsX(side, base);
+                if ( base.size() < side.size() )
+                    setStericsX(base, side);
+                else
+                {
+                    if ( side.size() > 0 )
+                        setStericsX(side, base);
+                }
 #else
-            setStericsT(base, side);
+                setStericsT(base, side);
 #endif
+            }
         }
     }
 }
