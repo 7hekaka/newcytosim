@@ -75,6 +75,9 @@ public:
     /// if true, set the Dynamic State of the nearest filament end to STATE_RED upon detachment
     int addictive;
     
+    /// the dynamic state of the fiber tip after detachment
+    state_t detached_end_state;
+    
     /// @}
 
 #if BACKWARD_COMPATIBILITY < 57

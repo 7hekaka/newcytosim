@@ -218,7 +218,7 @@ state_t DynamicFiber::endStateP() const
 void DynamicFiber::setEndStateP(state_t s)
 {
     if ( s < 0 || 4 < s )
-        throw InvalidParameter("invalid AssemblyState for DynamicFiber PLUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for DynamicFiber PLUS_END");
     
     if ( s != mStateP )
     {

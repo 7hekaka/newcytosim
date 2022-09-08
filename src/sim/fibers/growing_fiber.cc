@@ -33,7 +33,7 @@ void GrowingFiber::setEndStateM(state_t s)
     if ( s == STATE_WHITE || s == STATE_GREEN )
         mStateM = s;
     else
-        throw InvalidParameter("invalid AssemblyState for a GrowingFiber");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for GrowingFiber MINUS end");
 }
 
 
@@ -42,7 +42,7 @@ void GrowingFiber::setEndStateP(state_t s)
     if ( s == STATE_WHITE || s == STATE_GREEN )
         mStateP = s;
     else
-        throw InvalidParameter("invalid AssemblyState for a GrowingFiber");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for GrowingFiber PLUS end");
 }
 
 //------------------------------------------------------------------------------

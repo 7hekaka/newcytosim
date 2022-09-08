@@ -30,7 +30,7 @@ void ClassicFiber::setEndStateM(state_t s)
     if (( s==STATE_WHITE ) | ( s==STATE_GREEN ) | ( s==STATE_RED ))
         mStateM = s;
     else
-        throw InvalidParameter("invalid AssemblyState for ClassicFiber MINUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for ClassicFiber MINUS_END");
 }
 
 
@@ -39,7 +39,7 @@ void ClassicFiber::setEndStateP(state_t s)
     if (( s==STATE_WHITE ) | ( s==STATE_GREEN ) | ( s==STATE_RED ))
         mStateP = s;
     else
-        throw InvalidParameter("invalid AssemblyState for ClassicFiber PLUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for ClassicFiber PLUS_END");
 }
 
 

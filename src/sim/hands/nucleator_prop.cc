@@ -25,6 +25,7 @@ void NucleatorProp::clear()
     track_end    = NO_END;
     hold_end     = MINUS_END;
     addictive    = false;
+    detached_end_state = STATE_BLACK;
     nucleation_angle = 0;
 #if BACKWARD_COMPATIBILITY < 57
     specificity = 0;
@@ -52,6 +53,7 @@ void NucleatorProp::read(Glossary& glos)
 #endif
     
     glos.set(addictive, "addictive");
+    glos.set(detached_end_state, "detached_end_state");
 
     if ( glos.set(track_end, "track_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}}) )
