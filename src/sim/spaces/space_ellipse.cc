@@ -232,7 +232,7 @@ void SpaceEllipse::draw2D(float width) const
     const float Z((DIM>2)?radius_[2]:1);
 
     gym::scale(X, Y, Z);
-    gle::circle(width);
+    gle::circle1(width);
     
     if ( prop->disp && prop->disp->visible & 2 )
     {

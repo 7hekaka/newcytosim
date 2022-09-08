@@ -57,11 +57,14 @@ namespace gle
 #pragma mark -
 
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
-    void circle(float stroke_width);
+    void circle1(float stroke_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, fewer points
     void circle2(float stroke_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
     void circle_dotted(float stroke_width);
+    /// draw 2D circle of radius 1 in XY plane, with +Z as normal
+    void circle(float radius, float stroke_width);
+
     /// draw 2D oval within -1 to 1
     void stroke_capsule(float stroke_width);
     /// 2D oval within -1 to 1

@@ -149,9 +149,8 @@ void SpaceSphere::draw2D(float width) const
         gle::disc1();
     }
 
-    gym::scale(radius_);
     gym::color(prop->disp->color);
-    gle::circle(width);
+    gle::circle(radius_, width);
 }
 
 void SpaceSphere::draw3D() const

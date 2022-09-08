@@ -1809,7 +1809,7 @@ void Display::drawSolid(Solid const& obj)
             if ( obj.radius(i) > pixelSize )
             {
                 gym::transScale(obj.posP(i), obj.radius(i));
-                gle::circle(disp->width);
+                gle::circle1(disp->width);
             }
         }
         gym::enableLighting();
@@ -1926,7 +1926,7 @@ void Display::drawBead(Bead const& obj)
         gym::disableLighting();
         gym::color(bodyColorF(obj));
         gym::transScale(obj.position(), obj.radius());
-        gle::circle(disp->width);
+        gle::circle1(disp->width);
     }
 #endif
 }
@@ -2007,7 +2007,7 @@ void Display::drawSphereT(Sphere const& obj) const
             gym::color(bodyColorF(obj));
             gym::transScale(C, obj.radius());
             if ( disp->style & 1 )
-                gle::circle(disp->widthX);
+                gle::circle1(disp->widthX);
             if ( disp->style & 2 )
                 gle::disc();
             if ( disp->style & 4 )

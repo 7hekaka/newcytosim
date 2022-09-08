@@ -120,11 +120,8 @@ void SpaceTorus::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceTorus::draw2D(float width) const
 {
-    gym::scale(bCurve+bRadius);
-    gle::circle(width);
-    gym::pull_ref();
-    gym::scale(bCurve-bRadius);
-    gle::circle(width);
+    gle::circle(bCurve+bRadius, width);
+    gle::circle(bCurve-bRadius, width);
 }
 
 void SpaceTorus::draw3D() const

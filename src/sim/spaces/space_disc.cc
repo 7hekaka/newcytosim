@@ -210,8 +210,7 @@ void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceDisc::draw2D(float width) const
 {
-    gym::scale(radius_);
-    gle::circle(width);
+    gle::circle(radius_, width);
 }
 
 void SpaceDisc::draw3D() const
