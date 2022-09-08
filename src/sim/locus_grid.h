@@ -6,6 +6,7 @@
 #include "grid.h"
 #include "dim.h"
 #include "vector.h"
+#include "modulo.h"
 #include "mecapoint.h"
 #include "fiber.h"
 #include "fiber_segment.h"
@@ -17,6 +18,7 @@ class Simul;
 class Mecable;
 class FiberSegment;
 
+extern Modulo const* modulo;
 
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
@@ -394,6 +396,9 @@ public:
     void add(Mecable const* m, size_t i, real rad)
     {
         Vector w = m->posPoint(i);
+#if GRID_HAS_PERIODIC
+        if ( modulo ) modulo->fold(w);
+#endif
         cell_list(w).pane.emplace(m, i, rad, rad, w);
     }
     
@@ -401,6 +406,9 @@ public:
     void add(Fiber const* f, size_t i, real rad, real rge)
     {
         Vector w = f->midPoint(i, 0.5);
+#if GRID_HAS_PERIODIC
+        if ( modulo ) modulo->fold(w);
+#endif
         cell_list(w).pane.emplace(f, i, rad, rge, w);
     }
     
@@ -415,6 +423,9 @@ public:
         if ( pan == 0 || pan > MAX_STERIC_PANES )
             throw InvalidParameter("point:steric is out-of-range");
         Vector w = mec->posPoint(inx);
+#if GRID_HAS_PERIODIC
+        if ( modulo ) modulo->fold(w);
+#endif
         cell_list(w, pan).pane.emplace(mec, inx, rad, rad, w);
     }
     
@@ -424,6 +435,9 @@ public:
         if ( pan == 0 || pan > MAX_STERIC_PANES )
             throw InvalidParameter("line:steric is out-of-range");
         Vector w = fib->midPoint(inx, 0.5);
+#if GRID_HAS_PERIODIC
+        if ( modulo ) modulo->fold(w);
+#endif
         cell_list(w, pan).pane.emplace(fib, inx, rad, sup, w);
     }
     

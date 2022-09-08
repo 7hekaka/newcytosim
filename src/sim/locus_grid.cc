@@ -526,8 +526,11 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
      */
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
-        const BigVector pos = ii->pos_;
-        
+        BigVector pos = ii->pos_;
+#if GRID_HAS_PERIODIC
+        if ( modulo )
+            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+#endif
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj)  )
                 checkLL(*ii, *jj);
@@ -539,8 +542,11 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
 
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
     {
-        const BigVector pos = ii->pos_;
-
+        BigVector pos = ii->pos_;
+#if GRID_HAS_PERIODIC
+        if ( modulo )
+            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+#endif
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPL(*ii, *jj) )
                 checkPL(*ii, *jj);
@@ -553,11 +559,14 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
 
 #if ( DIM == 3 ) && USE_SIMD
 
+/// BitField must be a 64 bit integer type
+typedef uint64_t BitField;
+
 /**
  Evaluate 4 pos.near(jj->pos_) using SIMD instructions
  @return a 4-bit integer where each bit represents the result of one test
  */
-inline int four_near(vec4f const& xyzr, BigLocus const* src)
+inline int four_near_bits(vec4f const& xyzr, BigLocus const* src)
 {
     vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_.data()));
     vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_.data()));
@@ -580,13 +589,11 @@ inline int four_near(vec4f const& xyzr, BigLocus const* src)
     return lower_mask4f(uu, tt);  // x*x + y*y < r*r - z*z
 }
 
-typedef unsigned long BitField;
-
 /**
 Evaluate `cnt` pos.near(jj->pos_) using SIMD instructions
 @return a bitfield representing the result of all tests
 */
-BitField near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
+BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
 {
     BitField res = 0;
     unsigned shift = 0;
@@ -595,16 +602,16 @@ BitField near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
 #if 0
     end = start + ( cnt & ~15UL );
     /*
-     Unrolling can help since all four_near() are independent,
+     Unrolling can help since all four_near_bits() are independent,
      and the calculations can be executed out-of-order efficiently,
      but this is effective only for list size > 32
      */
     while ( ptr < end )
     {
-        BitField t = four_near(xyzr, ptr);
-        BitField u = four_near(xyzr, ptr+4) << 4;
-        BitField v = four_near(xyzr, ptr+8) << 8;
-        BitField w = four_near(xyzr, ptr+12) << 12;
+        BitField t = four_near_bits(xyzr, ptr);
+        BitField u = four_near_bits(xyzr, ptr+4) << 4;
+        BitField v = four_near_bits(xyzr, ptr+8) << 8;
+        BitField w = four_near_bits(xyzr, ptr+12) << 12;
         res |= (( t | u )|( v | w )) << shift;
         shift += 16;
         ptr += 16;
@@ -613,8 +620,8 @@ BitField near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
     end = start + ( cnt & ~7UL );
     while ( ptr < end )
     {
-        BitField t = four_near(xyzr, ptr);
-        BitField u = four_near(xyzr, ptr+4) << 4;
+        BitField t = four_near_bits(xyzr, ptr);
+        BitField u = four_near_bits(xyzr, ptr+4) << 4;
         res |= ( t | u ) << shift;
         shift += 8;
         ptr += 8;
@@ -623,7 +630,7 @@ BitField near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
     end = start + cnt;
     while ( ptr < end )
     {
-        BitField t = four_near(xyzr, ptr);
+        BitField t = four_near_bits(xyzr, ptr);
         unsigned i = end - ptr;
         assert_true( i < 8 );
         // a mask to clear the bits past the end:
@@ -642,17 +649,17 @@ BitField near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
  Set bitL corresponding to BigLocus in first part of list,
  and bitP corresponding to BigPoints in second part of list
 */
-void near_bits(BitField& bitL, BitField& bitP, vec4f const& xyzr, BigLocusList const& list, int start)
+void compute_near_bits(BitField& bitL, BitField& bitP, vec4f const& xyzr, BigLocusList const& list, int start)
 {
     int cnt = std::min((int)list.size()-start, 64);
-    BitField bits = near_bits(xyzr, list.begin()+start, cnt);
+    BitField bits = compute_near_bits(xyzr, list.begin()+start, cnt);
     int nloc = list.num_locus();
     int shift = nloc - std::min(start, nloc);
     if ( shift < 64 )
     {
         BitField mask = ~0UL << shift;
-        bitP = bits & mask;
         bitL = bits & ~mask;
+        bitP = bits & mask;
     } else {
         bitL = bits;
         bitP = 0;
@@ -686,7 +693,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     {
         size_t l1 = list1.num_locus(), p1 = list1.num_points();
         size_t l2 = list2.num_locus(), p2 = list2.num_points();
-        printf(" stericsU: %2lu+%2lu  :  %2lu+%2lu\n", l1, p1, l2, p2);
+        printf(" stericsX: %2lu+%2lu  :  %2lu+%2lu\n", l1, p1, l2, p2);
     }
 #endif
     BigLocus const* mid1 = list1.middle();
@@ -697,12 +704,16 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
         BigVector pos = ii->pos_;
+#if GRID_HAS_PERIODIC
+        if ( modulo )
+            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+#endif
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( int offset = 0; offset < (int)list2.size(); offset += 64 )
         {
-            near_bits(bitL, bitP, xyzr, list2, offset);
+            compute_near_bits(bitL, bitP, xyzr, list2, offset);
             //printf(" L%lX:%lX\n", bitP, bitL);
             BigLocus const* jj = list2.begin();
 #if 0
@@ -710,12 +721,16 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
             for ( b = 0; b < std::min(64, (int)list2.size()-offset); ++b )
             {
                 BigVector vec = (jj+b+offset)->pos_;
+                if ( modulo ) modulo->fold_float(&vec.XX, &pos.XX);
                 bool n = pos.near(vec);
                 bool p = (bitL+bitP) & ( 1UL << b );
-                float x = square(pos.XX-vec.XX) + square(pos.YY-vec.YY);
-                float y = square(pos.ZZ-vec.ZZ) - square(pos.RR+vec.RR);
+                float d = square(pos.XX-vec.XX) + square(pos.YY-vec.YY) + square(pos.ZZ-vec.ZZ);
                 // SIMD and scalar results can differ, near the edges (x+y ~ 0) :
-                if ( n != p ) printf("!near %i+%i: %u%u %f\n", offset, b, n, p, x+y);
+                if ( n != p )
+                {
+                    printf("%8.2f |  %8.2f %8.2f | ", list2[0].pos_.XX, pos.XX, (jj+b+offset)->pos_.XX);
+                    printf("!near %2i+%2i: %u%u (%f)\n", offset, b, n, p, d);
+                }
             }
 #endif
             while ( bitL )
@@ -742,12 +757,16 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
     {
         BigVector pos = ii->pos_;
+#if GRID_HAS_PERIODIC
+        if ( modulo )
+            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+#endif
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( int offset = 0; offset < (int)list2.size(); offset += 64 )
         {
-            near_bits(bitL, bitP, xyzr, list2, offset);
+            compute_near_bits(bitL, bitP, xyzr, list2, offset);
             //printf(" P%lX:%lX\n", bitP, bitL);
             BigLocus const* jj = list2.begin();
             while ( bitL )
@@ -801,7 +820,7 @@ void LocusGrid::setSterics0() const
 
 
 /** This calls setStericsT() */
-void LocusGrid::setStericsT() const
+void LocusGrid::setSterics() const
 {
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -814,21 +833,21 @@ void LocusGrid::setStericsT() const
         
         for ( int reg = 1; reg < nr; ++reg )
         {
-#if ( DIM == 3 ) && USE_SIMD
             BigLocusList& side = cell_list(inx+region[reg]);
+#if ( DIM == 3 ) && USE_SIMD
             if ( base.size() < side.size() )
                 setStericsX(base, side);
             else
                 setStericsX(side, base);
 #else
-            setStericsT(base, cell_list(inx+region[reg]));
+            setStericsT(base, side);
 #endif
         }
     }
 }
 
 
-void LocusGrid::setSterics() const
+void LocusGrid::setStericsT() const
 {
     //std::clog << "----" << '\n';
     if ( pGrid.isPeriodic() )
