@@ -560,8 +560,8 @@ void projectForcesD2D_AVX(size_t nbs, const double* dir,
  and the second sweep of DPTTS2 by projectForcesD(),
  it reduces the number of sweeps to only two
  */
-void projectForces(size_t nbs, const double* dir, const double* src,
-                   double* mul, double const* D, double const* DE, double* dst)
+void projectForces(size_t nbs, const real* dir, const real* src,
+                   real* mul, const real* D, const real* DE, real* dst)
 {
     assert_true( nbs > 0 );
     const real *const last = mul;
