@@ -331,7 +331,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
 
 
 /**
- This is used to check two FiberSegment, that each represent a segment of a Fiber.
+ This is used to check two FiberSegment, each representing a segment of a Fiber.
  The segments are tested for intersection in 3D.
  */
 void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
@@ -348,13 +348,19 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     FiberSegment as = aa.segment();
     FiberSegment bs = bb.segment();
     real a, b;
-    /* We do not need to calculate `a` and `b` if the distance 'dis'
-     is greater than 'ran' since nothing will be done in that case... */
     real dis2 = as.shortestDistanceSqr(bs, a, b);
     
-    if ( below(dis2, ran) & as.within(a) & bs.within(b) )
-        meca.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push);
-    
+    if ( dis2 < ran*ran )
+    {
+        if ( as.within(a) & bs.within(b) )
+            meca.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push);
+    }
+    else
+    {
+        /* If the shortest distance between the lines is greater than 'ran', then
+          the vertices associated with this segment will also be too far to interact */
+        return;
+    }
 #endif
 
     //std::clog << "   LL " << aa.obj_ << " " << bb.obj_ << '\n';

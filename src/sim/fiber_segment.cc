@@ -212,9 +212,9 @@ real FiberSegment::shortestDistanceSqr(FiberSegment const& seg, real& abs1, real
         real DD = square( dot(off, N) ) * iS;
 #endif
         /*
-         We do not necessarily need to calculate the projections `abs1 , abs2`
+         We do not necessarily need to calculate the positions `abs1 , abs2`
          if the distance is greater than the threshold above which nothing
-         is do be done with these results...
+         is to be done with these results...
          */
         real C = dot(d11, d22);  // cosine of angle
         real d1off = dot(d11, off);

@@ -332,15 +332,22 @@ void PointGrid::checkLL(FatLocus const& aa, FatLocus const& bb) const
     /* in 3D, check the shortest distance between two segments, and if close
      enough, use the result to build an interaction */
     real a, b;
-    /* We do not need to calculate `a` and `b` if the distance 'dis'
-     is greater than 'ran' since nothing will be done in that case... */
     real dis2 = aa.seg_.shortestDistanceSqr(bb.seg_, a, b);
     
-    if ( below(dis2, ran) & aa.seg_.within(a) & bb.seg_.within(b) )
+    if ( dis2 < ran * ran )
     {
-        const real len = aa.rad_ + bb.rad_;
-        real stiff = sign_select(dis2-len*len, push, pull);
-        meca.addSideSlidingLink(aa.seg_, a, Interpolation(bb.seg_, b), len, stiff);
+        if ( aa.seg_.within(a) & bb.seg_.within(b) )
+        {
+            const real len = aa.rad_ + bb.rad_;
+            real stiff = sign_select(dis2-len*len, push, pull);
+            meca.addSideSlidingLink(aa.seg_, a, Interpolation(bb.seg_, b), len, stiff);
+        }
+    }
+    else
+    {
+        /* If the shortest distance between the lines is greater than 'ran', then
+         the vertices associated with this segment will also be too far to interact */
+        return;
     }
 #endif
     
