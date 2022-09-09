@@ -2146,7 +2146,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( s ) signature(s);
     
     float len = in.readFloat();
-    float seg = in.readFloat(); // this is the target value for segmentation
+    float seg = in.readFloat(); // saved target value for segmentation
     float abs = in.readFloat();
     
 #if BACKWARD_COMPATIBILITY < 50
@@ -2171,8 +2171,14 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     fnAbscissaM = abs;
     fnAbscissaP = abs + len;
     setSegmentation(len/nbSegments());  // set segments' length
-    //targetSegmentation(seg); // keep value
     //Mecable::write(std::cerr);
+    
+    if ( seg != targetSegmentation() )
+    {
+        //std::clog << reference() << " segmentation " << seg << " -> " << targetSegmentation() << "\n";
+        //targetSegmentation(seg); // keep value saved in file
+        adjustSegmentation(); // resegment the fiber
+    }
     
 #ifndef NDEBUG
     // verify the length and segmentation:
