@@ -11,7 +11,7 @@
  It assumes that Fiber::adjustSegmentation() is used, such that at any time:
      actual_segmentation <  4/3 * FiberProp::segmentation
  */
-real Simul::estimateStericRange() const
+real Simul::minimumStericRange() const
 {
     real ran = 0;
     real len = 0;
@@ -41,10 +41,9 @@ real Simul::estimateStericRange() const
      The interaction can be aligned with the fiber, and we must add the distances:
      2 * range if two fibers of radius 'range' interact.
      + 2 * ( len / 2 ) since len/2 is the distance between the center of the segment
-     and its most distal point.
+     and its most distal points.
      */
     ran = len + 2 * ran;
-    
     
     for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {

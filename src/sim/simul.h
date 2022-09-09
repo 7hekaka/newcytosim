@@ -229,7 +229,7 @@ public:
     Map<DIM> const& visibleMap() const { return sMeca.locusGrid.map(); }
     
     /// return estimate for the cell size of the PointGrid used for steric interactions
-    real estimateStericRange() const;
+    real minimumStericRange() const;
 
 private:
     

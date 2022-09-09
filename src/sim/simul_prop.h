@@ -245,7 +245,7 @@ public:
      
      The maximum distance at which an object may interact with a sibling is its
      diameter. Generally, `steric_max_range` should be greater or equal to the
-     sum of the radiuses, of any two object that may interact.
+     sum of the radiuses, of any two objects that may interact.
      In the case of fiber, the `interaction-radius` is a combination of the
      segmentation, and the radius: std::sqrt( (4/3*segmentation)^2 + 4*radius^2 )
 
