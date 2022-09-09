@@ -579,14 +579,36 @@ inline int four_near_bits(vec4f const& xyzr, BigLocus const* src)
     rr = unpackhi4f(uu, rr);
     yy = movelh4f(xx, zz);
     xx = movehl4f(zz, xx);
-    uu = mul4f(yy, yy);
-    zz = movelh4f(tt, rr);  // yy, rr
+    uu = fmadd4f(yy, yy, mul4f(xx, xx)); // x*x + y*y
+    zz = movelh4f(tt, rr);  // zz, rr
     rr = movehl4f(rr, tt);
-    tt = mul4f(zz, zz);
     // calculate test:
-    uu = add4f(mul4f(xx, xx), uu); // x*x + y*y
-    tt = sub4f(mul4f(rr, rr), tt); // r*r - z*z
+    tt = fnmadd4f(zz, zz, mul4f(rr, rr)); // r*r - z*z
     return lower_mask4f(uu, tt);  // x*x + y*y < r*r - z*z
+}
+
+inline int two_near_bits(vec4f const& xyzr, BigLocus const* src)
+{
+    vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_.data()));
+    vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_.data()));
+    // transpose 4x4 data matrix:
+    vec4f xx = unpacklo4f(tt, yy);
+    tt = unpackhi4f(tt, yy);
+    yy = movelh4f(xx, setzero4f());
+    xx = movehl4f(setzero4f(), xx);
+    xx = fmadd4f(yy, yy, mul4f(xx, xx)); // x*x + y*y
+    yy = movelh4f(tt, setzero4f());  // zz, rr
+    vec4f rr = movehl4f(setzero4f(), tt);
+    // calculate test:
+    tt = fnmadd4f(yy, yy, mul4f(rr, rr)); // r*r - z*z
+    return lower_mask4f(xx, tt);  // x*x + y*y < r*r - z*z
+}
+
+inline int one_near_bit(vec4f const& xyzr, BigLocus const* src)
+{
+    vec4f xx = sub4f(xyzr, loadu4f(src[0].pos_.data()));
+    xx = mul4f(xx, xx);
+    return xx[0] + xx[1] < xx[3] - xx[2];  // x*x + y*y < r*r - z*z
 }
 
 /**
@@ -600,12 +622,12 @@ BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
     BigLocus const* ptr = start;
     BigLocus const* end;
 #if 0
-    end = start + ( cnt & ~15UL );
     /*
      Unrolling can help since all four_near_bits() are independent,
      and the calculations can be executed out-of-order efficiently,
      but this is effective only for list size > 32
      */
+    end = start + ( cnt & ~15UL );
     while ( ptr < end )
     {
         BitField t = four_near_bits(xyzr, ptr);
@@ -627,10 +649,34 @@ BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
         ptr += 8;
     }
     
+    end = start + ( cnt & ~3UL );
+    if ( ptr < end )
+    {
+        BitField t = four_near_bits(xyzr, ptr);
+#if 1
+        BitField a = two_near_bits(xyzr, ptr) + (two_near_bits(xyzr, ptr+2)<<2);
+        if ( t != a ) printf("[%llX %llX]", t, a);
+#endif
+        res |= t << shift;
+        shift += 4;
+        ptr += 4;
+    }
+    
+    end = start + ( cnt & ~1UL );
+    if ( ptr < end )
+    {
+        BitField t = two_near_bits(xyzr, ptr);
+        res |= t << shift;
+        shift += 2;
+        ptr += 2;
+    }
+
     end = start + cnt;
     while ( ptr < end )
     {
-        BitField t = four_near_bits(xyzr, ptr);
+        //printf("at %lu remaining %lu\n", ptr-start, end-ptr);
+#if 0
+        BitField t = four_near_bits(xyzr, ptr); // we may load invalid data
         unsigned i = end - ptr;
         assert_true( i < 8 );
         // a mask to clear the bits past the end:
@@ -638,8 +684,14 @@ BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
         res |= ( t & k ) << shift;
         shift += 4;
         ptr += 4;
+#else
+        BitField t = one_near_bit(xyzr, ptr); // we may load invalid data
+        res |= t << shift;
+        ++shift;
+        ++ptr;
+#endif
     }
-    
+
     //printf(" near_bits %2lu : %lu\n", cnt, res);
     return res;
 }
@@ -666,6 +718,74 @@ void compute_near_bits(BitField& bitL, BitField& bitP, vec4f const& xyzr, BigLoc
     }
 }
 
+
+void LocusGrid::setStericsX(BigLocusList const& list) const
+{
+    //printf(" stericsX: %2lu+%2lu (%lu)\n", list.num_locus(), list.num_points(), list.capacity());
+    BigLocus const* mid = list.middle();
+    constexpr BitField mask(~1UL);
+    BitField bitP, bitL;
+    
+    for ( BigLocus const* ii = list.begin(); ii < mid; ++ii )
+    {
+        BigVector pos = ii->pos_;
+        /* The radius is negated, such that it gets added by compute_near_bits() */
+        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        /* In most situations, the list size would be < 64 and one round would
+         be sufficient, but in all generality we must handle larger list size */
+        for ( int offset = 0; offset < (int)list.size(); offset += 64 )
+        {
+            int start = offset + ( ii - list.begin() );
+            compute_near_bits(bitL, bitP, xyzr, list, start);
+            //printf(" LL ");
+            BigLocus const* blp = list.begin() + start;
+            while ( bitL )
+            {
+                //printf(" %llX", bitL);
+                int b = __builtin_ctzl(bitL);
+                if ( not_adjacentLL(*ii, blp[b]) )
+                    checkLL(*ii, blp[b]);
+                bitL &= mask << b;
+            }
+            //printf(" LP ");
+            while ( bitP )
+            {
+                //printf(" %llX", bitP);
+                int b = __builtin_ctzl(bitP);
+                if ( not_adjacentPL(blp[b], *ii) )
+                    checkPL(blp[b], *ii);
+                bitP &= mask << b;
+            }
+            //printf("\n");
+        }
+    }
+    
+    for ( BigPoint const* ii = mid; ii < list.end(); ++ii )
+    {
+        BigVector pos = ii->pos_;
+        /* The radius is negated, such that it gets added by compute_near_bits() */
+        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        /* In most situations, the list size would be < 64 and one round would
+         be sufficient, but in all generality we must handle larger list size */
+        for ( int offset = 0; offset < (int)list.size(); offset += 64 )
+        {
+            int start = offset + ( ii - list.begin() );
+            int cnt = std::min((int)list.size()-start, 64);
+            bitP = compute_near_bits(xyzr, list.begin()+start, cnt);
+            //printf(" PP ");
+            BigLocus const* blp = list.begin() + start;
+            while ( bitP )
+            {
+                //printf(" %llX", bitP);
+                int b = __builtin_ctzl(bitP);
+                if ( not_adjacentPP(*ii, blp[b]) )
+                    checkPP(*ii, blp[b]);
+                bitP &= mask << b;
+            }
+            //printf("\n");
+        }
+    }
+}
 
 /**
  This will consider once all pairs of objects from the given lists,
@@ -699,7 +819,6 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     BigLocus const* mid1 = list1.middle();
     constexpr BitField mask(~1UL);
     BitField bitP, bitL;
-    int b, u;
     
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
@@ -708,14 +827,15 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         if ( modulo )
             modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
 #endif
+        /* The radius is negated, such that it gets added by compute_near_bits() */
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( int offset = 0; offset < (int)list2.size(); offset += 64 )
         {
             compute_near_bits(bitL, bitP, xyzr, list2, offset);
-            //printf(" L%lX:%lX\n", bitP, bitL);
-            BigLocus const* jj = list2.begin();
+            //printf(" LL");
+            BigLocus const* blp = list2.begin() + offset;
 #if 0
             // verify all tests:
             for ( b = 0; b < std::min(64, (int)list2.size()-offset); ++b )
@@ -735,22 +855,22 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
 #endif
             while ( bitL )
             {
-                //printf(" LL%lX\n", bits);
-                b = __builtin_ctzl(bitL);
-                u = b + offset;
-                if ( not_adjacentLL(*ii, *(jj+u)) )
-                    checkLL(*ii, *(jj+u));
+                //printf(" %lX", bitL);
+                int b = __builtin_ctzl(bitL);
+                if ( not_adjacentLL(*ii, blp[b]) )
+                    checkLL(*ii, blp[b]);
                 bitL &= mask << b;
             }
+            //printf(" LP ");
             while ( bitP )
             {
-                //printf(" PL%lX\n", bits);
-                b = __builtin_ctzl(bitP);
-                u = b + offset;
-                if ( not_adjacentPL(*(jj+u), *ii) )
-                    checkPL(*(jj+u), *ii);
+                //printf(" %lX", bitP);
+                int b = __builtin_ctzl(bitP);
+                if ( not_adjacentPL(blp[b], *ii) )
+                    checkPL(blp[b], *ii);
                 bitP &= mask << b;
             }
+            //printf("\n");
         }
     }
     
@@ -761,32 +881,33 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         if ( modulo )
             modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
 #endif
+        /* The radius is negated, such that it gets added by compute_near_bits() */
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( int offset = 0; offset < (int)list2.size(); offset += 64 )
         {
             compute_near_bits(bitL, bitP, xyzr, list2, offset);
-            //printf(" P%lX:%lX\n", bitP, bitL);
-            BigLocus const* jj = list2.begin();
+            //printf(" PL ");
+            BigLocus const* blp = list2.begin() + offset;
             while ( bitL )
             {
-                //printf(" LP%lX\n", bitL);
-                b = __builtin_ctzl(bitL);
-                u = b + offset;
-                if ( not_adjacentPL(*ii, *(jj+u)) )
-                    checkPL(*ii, *(jj+u));
+                //printf(" %lX", bitL);
+                int b = __builtin_ctzl(bitL);
+                if ( not_adjacentPL(*ii, blp[b]) )
+                    checkPL(*ii, blp[b]);
                 bitL &= mask << b;
             }
+            //printf(" PP ");
             while ( bitP )
             {
-                //printf(" PP%lX\n", bitP);
-                b = __builtin_ctzl(bitP);
-                u = b + offset;
-                if ( not_adjacentPP(*ii, *(jj+u)) )
-                    checkPP(*ii, *(jj+u));
+                //printf(" %lX", bitP);
+                int b = __builtin_ctzl(bitP);
+                if ( not_adjacentPP(*ii, blp[b]) )
+                    checkPP(*ii, blp[b]);
                 bitP &= mask << b;
             }
+            //printf("\n");
         }
     }
 }
@@ -831,12 +952,11 @@ void LocusGrid::setSterics() const
         BigLocusList& base = cell_list(inx);
         if ( base.size() > 0 )
         {
-            setStericsT(base);
-            
+#if ( DIM == 3 ) && USE_SIMD
+            setStericsX(base);
             for ( int reg = 1; reg < nr; ++reg )
             {
                 BigLocusList& side = cell_list(inx+region[reg]);
-#if ( DIM == 3 ) && USE_SIMD
                 if ( base.size() < side.size() )
                     setStericsX(base, side);
                 else
@@ -844,10 +964,16 @@ void LocusGrid::setSterics() const
                     if ( side.size() > 0 )
                         setStericsX(side, base);
                 }
-#else
-                setStericsT(base, side);
-#endif
             }
+#else
+            setStericsT(base);
+            for ( int reg = 1; reg < nr; ++reg )
+            {
+                BigLocusList& side = cell_list(inx+region[reg]);
+                if ( side.size() > 0 )
+                    setStericsT(base, side);
+            }
+#endif
         }
     }
 }

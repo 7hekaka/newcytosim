@@ -315,6 +315,9 @@ private:
     void setStericsT(BigLocusList const&, BigLocusList const&) const;
     
     /// check all pairs between the two lists, checking center-to-center distance
+    void setStericsX(BigLocusList const&) const;
+
+    /// check all pairs between the two lists, checking center-to-center distance
     void setStericsX(BigLocusList const&, BigLocusList const&) const;
 
     inline size_t direct_index(Vector const& w)

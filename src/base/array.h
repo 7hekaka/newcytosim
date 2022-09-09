@@ -69,6 +69,9 @@ private:
 #pragma mark -
 private:
     
+    /// additional size allocated at the end of the array
+    static constexpr size_t EXTRA = 0;
+
     /// the integer above s that is a multiple of chk_
     size_t chunked(size_t s)
     {
@@ -119,7 +122,7 @@ public:
         chk_ = std::max(next_power(k), 4UL);
         alc_ = chunked(a);
         if ( alc_ > 0 )
-            val_ = new VAL[alc_];
+            val_ = new VAL[alc_+EXTRA];
         else
             val_ = nullptr;
     }
@@ -261,7 +264,7 @@ public:
     /// Allocate to hold `s` objects: valid indices are 0 <= indx < max
     void reallocate(const size_t alc_new)
     {
-        VAL * val_new = new VAL[alc_new];
+        VAL * val_new = new VAL[alc_new+EXTRA];
         if ( val_ )
         {
             // copy over valid data
