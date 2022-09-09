@@ -415,34 +415,41 @@ public:
 
     /// clear the grid
     void clear() { pGrid.clear(); }
-    
-#if ( NUM_STERIC_PANES == 1 )
-    
-    /// place Mecapoint on the grid
-    void add(Mecable const* m, size_t i, real rad, real rge) const
-    {
-        Vector w = m->posPoint(i);
-        point_list(w).emplace(Mecapoint(m, i), rad, rge, w);
-    }
-    
+        
     /// place FiberSegment on the grid
-    void add(Fiber const* f, size_t i, real rad, real rge, real sup) const
+    void add(Fiber const* fib, size_t inx, real rad, real rge, real sup) const
     {
         // link in cell containing the middle of the segment
-        Vector w = f->midPoint(i, 0.5);
-        locus_list(w).emplace(FiberSegment(f, i), rad, rge, sup, w);
+        Vector w = fib->midPoint(inx, 0.5);
+#if ( NUM_STERIC_PANES <= 1 )
+        locus_list(w).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
+#else
+        size_t pan = fib->prop->steric;
+        if ( pan == 0 || pan > NUM_STERIC_PANES )
+            throw InvalidParameter(fib->prop->name()+":steric is out-of-range");
+        locus_list(w, pan).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
+#endif
     }
     
+    /// place Mecapoint on the grid
+    template <typename MECABLE>
+    void add(MECABLE const* mec, size_t inx, real rad, real rge) const
+    {
+        Vector w = mec->posPoint(inx);
+#if ( NUM_STERIC_PANES <= 1 )
+        point_list(w).emplace(Mecapoint(mec, inx), rad, rge, w);
+#else
+        size_t pan = mec->prop->steric;
+        if ( pan == 0 || pan > NUM_STERIC_PANES )
+            throw InvalidParameter(mec->prop->name()+":steric is out-of-range");
+        point_list(w, pan).emplace(Mecapoint(mec, inx), rad, rge, w);
+#endif
+    }
+
     /// enter interactions into Meca
     void setSterics() const;
     
-#else
-    
-    /// place Mecapoint on the grid
-    void add(size_t pane, Mecable const*, size_t, real rad, real rge) const;
-    
-    /// place FiberSegment on the grid
-    void add(size_t pane, Fiber const*, size_t, real rad, real rge, real sup) const;
+#if ( NUM_STERIC_PANES > 1 )
     
     /// enter interactions into Meca in one pane
     void setSterics(size_t pan) const;

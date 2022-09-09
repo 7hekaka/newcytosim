@@ -96,11 +96,7 @@ void Meca::addStericInteractionsP(Simul const& sim)
 
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
-#if ( NUM_STERIC_PANES == 1 )
                 pointGrid.add(F, i, rad, rge, sup);
-#else
-                pointGrid.add(F->prop->steric, F, i, rad, rge, sup);
-#endif
         }
     }
     
@@ -108,25 +104,17 @@ void Meca::addStericInteractionsP(Simul const& sim)
     for ( Sphere const* O=sim.spheres.first(); O; O=O->next() )
     {
         if ( O->prop->steric )
-#if ( NUM_STERIC_PANES == 1 )
             pointGrid.add(O, 0, O->radius(), O->radius()+O->prop->steric_range);
-#else
-            pointGrid.add(O->prop->steric, O, 0, O->radius(), O->radius()+O->prop->steric_range);
-#endif
     }
     
     // include Beads
     for ( Bead const* B=sim.beads.first(); B; B=B->next() )
     {
         if ( B->prop->steric )
-#if ( NUM_STERIC_PANES == 1 )
             pointGrid.add(B, 0, B->radius(), B->radius()+B->prop->steric_range);
-#else
-            pointGrid.add(B->prop->steric, B, 0, B->radius(), B->radius()+B->prop->steric_range);
-#endif
     }
         
-    // include Points that have a radius from Solids
+    // from Solids, include Points with radius > 0
     for ( Solid const* S=sim.solids.first(); S; S=S->next() )
     {
         if ( S->prop->steric )
@@ -134,11 +122,7 @@ void Meca::addStericInteractionsP(Simul const& sim)
             for ( size_t i = 0; i < S->nbPoints(); ++i )
             {
                 if ( S->radius(i) > REAL_EPSILON )
-#if ( NUM_STERIC_PANES == 1 )
                     pointGrid.add(S, i, S->radius(i), S->radius(i)+S->prop->steric_range);
-#else
-                    pointGrid.add(S->prop->steric, S, i, S->radius(i), S->radius(i)+S->prop->steric_range);
-#endif
             }
         }
     }
@@ -166,6 +150,103 @@ void Meca::addStericInteractionsP(Simul const& sim)
 
 
 
+
+/// add Mecables with steric enabled to the steric grid
+static void addStericMecables(LocusGrid& grid, Simul const& sim)
+{
+    // distribute Fiber-points on the grid
+    for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
+    {
+        if ( F->prop->steric )
+        {
+            const real rad = F->prop->steric_radius;
+            const real rge = rad + 0.5 * F->segmentation();
+            // include segments, in the cell associated with their center
+            for ( size_t i = 0; i < F->nbSegments(); ++i )
+                grid.add(F, i, rad, rge);
+        }
+    }
+    
+    // mark edge between Fiber segments and other type of elements
+    grid.delimit();
+    
+    // include Spheres
+    for ( Sphere const* O=sim.spheres.first(); O; O=O->next() )
+    {
+        if ( O->prop->steric )
+            grid.add(O, 0, O->radius());
+    }
+    
+    // include Beads
+    for ( Bead const* B=sim.beads.first(); B; B=B->next() )
+    {
+        if ( B->prop->steric )
+            grid.add(B, 0, B->radius());
+    }
+        
+    // from Solids, include Points with radius > 0
+    for ( Solid const* S=sim.solids.first(); S; S=S->next() )
+    {
+        if ( S->prop->steric )
+        {
+            for ( size_t i = 0; i < S->nbPoints(); ++i )
+            {
+                if ( S->radius(i) > REAL_EPSILON )
+                    grid.add(S, i, S->radius(i));
+            }
+        }
+    }
+}
+
+#if GRID_HAS_PERIODIC
+/// add Mecables with steric enabled to the steric grid, for periodic boundary conditions
+static void addStericMecablesModulo(LocusGrid& grid, Simul const& sim)
+{
+    // distribute Fiber-points on the grid
+    for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
+    {
+        if ( F->prop->steric )
+        {
+            const real rad = F->prop->steric_radius;
+            const real rge = rad + 0.5 * F->segmentation();
+            // include segments, in the cell associated with their center
+            for ( size_t i = 0; i < F->nbSegments(); ++i )
+                grid.add_modulo(F, i, rad, rge);
+        }
+    }
+    
+    // mark edge between Fiber segments and other type of elements
+    grid.delimit();
+    
+    // include Spheres
+    for ( Sphere const* O=sim.spheres.first(); O; O=O->next() )
+    {
+        if ( O->prop->steric )
+            grid.add_modulo(O, 0, O->radius());
+    }
+    
+    // include Beads
+    for ( Bead const* B=sim.beads.first(); B; B=B->next() )
+    {
+        if ( B->prop->steric )
+            grid.add_modulo(B, 0, B->radius());
+    }
+        
+    // from Solids, include Points with radius > 0
+    for ( Solid const* S=sim.solids.first(); S; S=S->next() )
+    {
+        if ( S->prop->steric )
+        {
+            for ( size_t i = 0; i < S->nbPoints(); ++i )
+            {
+                if ( S->radius(i) > REAL_EPSILON )
+                    grid.add_modulo(S, i, S->radius(i));
+            }
+        }
+    }
+}
+#endif
+
 /**
  The prop->steric of each object is a bit-field that
  specify one or more 'pane' where the object is present.
@@ -189,66 +270,14 @@ void Meca::addStericInteractionsL(Simul const& sim)
 {
     // clear grid
     locusGrid.clear();
-    
-    // distribute Fiber-points on the grid
-    for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
-    {
-        if ( F->prop->steric )
-        {
-            const real rad = F->prop->steric_radius;
-            const real rge = rad + 0.5 * F->segmentation();
-            // include segments, in the cell associated with their center
-            for ( size_t i = 0; i < F->nbSegments(); ++i )
-#if ( MAX_STERIC_PANES == 1 )
-                locusGrid.add(F, i, rad, rge);
-#else
-                locusGrid.add(F->prop->steric, F, i, rad, rge);
-#endif
-        }
-    }
-    
-    // mark edge between Fiber segments and other type of elements
-    locusGrid.delimit();
-    
-    // include Spheres
-    for ( Sphere const* O=sim.spheres.first(); O; O=O->next() )
-    {
-        if ( O->prop->steric )
-#if ( MAX_STERIC_PANES == 1 )
-            locusGrid.add(O, 0, O->radius());
-#else
-            locusGrid.add(O->prop->steric, O, 0, O->radius());
-#endif
-    }
-    
-    // include Beads
-    for ( Bead const* B=sim.beads.first(); B; B=B->next() )
-    {
-        if ( B->prop->steric )
-#if ( MAX_STERIC_PANES == 1 )
-            locusGrid.add(B, 0, B->radius());
-#else
-            locusGrid.add(B->prop->steric, B, 0, B->radius());
-#endif
-    }
-        
-    // include Points that have a radius from Solids
-    for ( Solid const* S=sim.solids.first(); S; S=S->next() )
-    {
-        if ( S->prop->steric )
-        {
-            for ( size_t i = 0; i < S->nbPoints(); ++i )
-            {
-                if ( S->radius(i) > REAL_EPSILON )
-#if ( MAX_STERIC_PANES == 1 )
-                    locusGrid.add(S, i, S->radius(i));
-#else
-                    locusGrid.add(S->prop->steric, S, i, S->radius(i));
-#endif
-            }
-        }
-    }
 
+#if GRID_HAS_PERIODIC
+    if ( modulo )
+        addStericMecablesModulo(locusGrid, sim);
+    else
+#endif
+        addStericMecables(locusGrid, sim);
+    
 #if ( MAX_STERIC_PANES == 1 )
         
     locusGrid.setSterics();
@@ -286,11 +315,7 @@ void Meca::addSomeStericInteractions()
             const real rge = rad + 0.5 * F->segmentation();
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
-#if ( MAX_STERIC_PANES == 1 )
                 locusGrid.add(F, i, rad, rge);
-#else
-                locusGrid.add(F->prop->steric, F, i, rad, rge);
-#endif
         }
     }
     

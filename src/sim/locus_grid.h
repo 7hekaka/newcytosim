@@ -136,6 +136,9 @@ typedef BigLocus BigPoint;
 
 //------------------------------------------------------------------------------
 
+/// type for holding a lit of BioLocus
+typedef Array<BigLocus> BigLocusPane;
+
 /// a list containing BigLocus and BigPoint
 /**
  The Fiber segments are contained in the first part of the list, index in [0, border[
@@ -146,7 +149,7 @@ class BigLocusList
     friend class LocusGrid;
 
     /// the list containing objects
-    Array<BigLocus> pane;
+    BigLocusPane pane;
     
     /// index of first non Fiber element in list
     size_t border;
@@ -314,12 +317,29 @@ private:
     /// check all pairs between the two lists, checking center-to-center distance
     void setStericsX(BigLocusList const&, BigLocusList const&) const;
 
+    inline size_t direct_index(Vector const& w)
+    {
+#if ( DIM == 3 )
+        return pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
+#elif ( DIM == 2 )
+        return pGrid.direct_index2D(w.XX, w.YY);
+#else
+        return pGrid.index(w);
+#endif
+    }
+    
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`
-    BigLocusList& cell_list(Vector const& w) const
+    BigLocusPane& cell_pane(Vector const& w) const
     {
-        return pGrid.cell(w);
+        return pGrid.cell(w).pane;
+    }
+    
+    /// cell corresponding to index `w`
+    BigLocusPane& cell_pane(const size_t c) const
+    {
+        return pGrid.icell(c).pane;
     }
     
     /// cell corresponding to index `w`
@@ -337,10 +357,17 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    BigLocusList& cell_list(Vector const& w, const size_t p) const
+    BigLocusPane& cell_pane(Vector const& w, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return pGrid.cell(w).panes[p];
+        return pGrid.cell(w).panes[p].pane;
+    }
+    
+    /// cell corresponding to index `c`, and pane `p`
+    BigLocusPane& cell_pane(const size_t c, const size_t p) const
+    {
+        assert_true( 0 < p && p <= MAX_STERIC_PANES );
+        return pGrid.icell(c).panes[p].pane;
     }
     
     /// cell corresponding to index `c`, and pane `p`
@@ -390,105 +417,75 @@ public:
     /// clear the grid
     void clear() { pGrid.clear(); }
     
-#if ( MAX_STERIC_PANES == 1 )
-    
-    /// place Mecable vertex on the grid
-    void add(Mecable const* mec, size_t inx, real rad)
-    {
-        Vector w = mec->posPoint(inx);
-#if GRID_HAS_PERIODIC
-        if ( modulo )
-        {
-            modulo->fold(w);
-#if ( DIM == 3 )
-            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
-#elif ( DIM == 2 )
-            size_t c = pGrid.direct_index2D(w.XX, w.YY);
-#else
-            size_t c = pGrid.index(w)
-#endif
-            assert_true( c == pGrid.index(w) );
-            return pGrid[c].pane.emplace(mec, inx, rad, rad, w);
-        }
-#endif
-        cell_list(w).pane.emplace(mec, inx, rad, rad, w);
-    }
-    
-    // link in the cell containing the middle of the segment:
+    /// link in the cell containing the middle of the segment
     void add(Fiber const* fib, size_t inx, real rad, real rge)
     {
         Vector w = fib->midPoint(inx, 0.5);
-#if GRID_HAS_PERIODIC
-        if ( modulo )
-        {
-            modulo->fold(w);
-#if ( DIM == 3 )
-            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
-#elif ( DIM == 2 )
-            size_t c = pGrid.direct_index2D(w.XX, w.YY);
+#if ( MAX_STERIC_PANES <= 1 )
+        cell_pane(w).emplace(fib, inx, rad, rge, w);
 #else
-            size_t c = pGrid.index(w)
+        size_t pan = fib->prop->steric;
+        if ( pan == 0 || pan > MAX_STERIC_PANES )
+            throw InvalidParameter(fib->prop->name()+":steric is out-of-range");
+        cell_pane(w, pan).emplace(fib, inx, rad, rad, w);
 #endif
-            assert_true( c == pGrid.index(w) );
-            return pGrid[c].pane.emplace(fib, inx, rad, rge, w);
-        }
-#endif
-        cell_list(w).pane.emplace(fib, inx, rad, rge, w);
     }
+    
+    /// place Mecable vertex on the grid
+    template <typename MECABLE>
+    void add(MECABLE const* mec, size_t inx, real rad)
+    {
+        Vector w = mec->posPoint(inx);
+#if ( MAX_STERIC_PANES <= 1 )
+        cell_pane(w).emplace(mec, inx, rad, rad, w);
+#else
+        size_t pan = mec->prop->steric;
+        if ( pan == 0 || pan > MAX_STERIC_PANES )
+            throw InvalidParameter(mec->prop->name()+":steric is out-of-range");
+        cell_pane(w, pan).emplace(mec, inx, rad, rad, w);
+#endif
+    }
+    
+#if GRID_HAS_PERIODIC
+    /// link in the cell containing the middle of the segment:
+    void add_modulo(Fiber const* fib, size_t inx, real rad, real rge)
+    {
+        Vector w = fib->midPoint(inx, 0.5);
+        modulo->fold(w);
+        size_t c = direct_index(w);
+#if ( MAX_STERIC_PANES <= 1 )
+        cell_pane(c).emplace(fib, inx, rad, rge, w);
+#else
+        size_t pan = fib->prop->steric;
+        if ( pan == 0 || pan > MAX_STERIC_PANES )
+            throw InvalidParameter(fib->prop->name()+":steric is out-of-range");
+        cell_pane(c, pan).emplace(fib, inx, rad, rad, w);
+#endif
+    }
+
+    /// place Mecable vertex on the grid
+    template <typename MECABLE>
+    void add_modulo(MECABLE const* mec, size_t inx, real rad)
+    {
+        Vector w = mec->posPoint(inx);
+        modulo->fold(w);
+        size_t c = direct_index(w);
+#if ( MAX_STERIC_PANES <= 1 )
+        cell_pane(c).emplace(mec, inx, rad, rad, w);
+#else
+        size_t pan = mec->prop->steric;
+        if ( pan == 0 || pan > MAX_STERIC_PANES )
+            throw InvalidParameter(mec->prop->name()+":steric is out-of-range");
+        cell_pane(c, pan).emplace(mec, inx, rad, rad, w);
+#endif
+    }
+#endif
     
     /// enter interactions into Meca
     void setSterics() const;
     
-#else
+#if ( MAX_STERIC_PANES > 1 )
 
-    /// place Mecable vertex on the grid
-    void add(size_t pan, Mecable const* mec, size_t inx, real rad)
-    {
-        if ( pan == 0 || pan > MAX_STERIC_PANES )
-            throw InvalidParameter("point:steric is out-of-range");
-        Vector w = mec->posPoint(inx);
-#if GRID_HAS_PERIODIC
-        if ( modulo )
-        {
-            modulo->fold(w);
-#if ( DIM == 3 )
-            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
-#elif ( DIM == 2 )
-            size_t c = pGrid.direct_index2D(w.XX, w.YY);
-#else
-            size_t c = pGrid.index(w)
-#endif
-            assert_true( c == pGrid.index(w) );
-            return pGrid[c].panes[pan].pane.emplace(mec, inx, rad, rad, w);
-        }
-#endif
-        cell_list(w, pan).pane.emplace(mec, inx, rad, rad, w);
-    }
-    
-    // link in the cell containing the middle of the segment:
-    void add(size_t pan, Fiber const* fib, size_t inx, real rad, real sup)
-    {
-        if ( pan == 0 || pan > MAX_STERIC_PANES )
-            throw InvalidParameter("line:steric is out-of-range");
-        Vector w = fib->midPoint(inx, 0.5);
-#if GRID_HAS_PERIODIC
-        if ( modulo )
-        {
-            modulo->fold(w);
-#if ( DIM == 3 )
-            size_t c = pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
-#elif ( DIM == 2 )
-            size_t c = pGrid.direct_index2D(w.XX, w.YY);
-#else
-            size_t c = pGrid.index(w)
-#endif
-            assert_true( c == pGrid.index(w) );
-            return pGrid[c].panes[pan].pane.emplace(fib, inx, rad, rad, w);
-        }
-#endif
-        cell_list(w, pan).pane.emplace(fib, inx, rad, sup, w);
-    }
-    
     /// enter interactions into Meca in one pane
     void setSterics(size_t pan) const;
     

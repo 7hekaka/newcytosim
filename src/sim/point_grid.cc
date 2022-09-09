@@ -73,37 +73,6 @@ size_t PointGrid::capacity() const
     return res;
 }
 
-
-//------------------------------------------------------------------------------
-#pragma mark -
-
-
-#if ( NUM_STERIC_PANES != 1 )
-
-void PointGrid::add(size_t pan, Mecable const* mec, size_t inx, real rad, real rge) const
-{
-    if ( pan == 0 || pan > NUM_STERIC_PANES )
-        throw InvalidParameter("point:steric is out-of-range");
-    
-    Vector w = mec->posPoint(inx);
-    point_list(w, pan).emplace(Mecapoint(mec, inx), rad, rge, w);
-}
-
-
-void PointGrid::add(size_t pan, Fiber const* fib, size_t inx, real rad, real rge, real sup) const
-{
-    if ( pan == 0 || pan > NUM_STERIC_PANES )
-        throw InvalidParameter("line:steric is out-of-range");
-    
-    // link in the cell containing the middle of the segment:
-    Vector w = fib->midPoint(inx, 0.5);
-    locus_list(w, pan).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
-}
-
-
-#endif
-
-
 //------------------------------------------------------------------------------
 #pragma mark - Check two Objects: P = Point; L = Line segment
 
