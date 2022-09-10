@@ -67,8 +67,8 @@ OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=build/%D2.o)
 OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=build/%D3.o)
 
 # objects containing graphical code under the DISPLAY keyword:
-OBJ_GRAFIX:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
-OBJ_CYTOLIBG:=$(OBJ_GRAFIX:%.o=%G.o) $(filter-out $(OBJ_GRAFIX),$(OBJ_CYTOLIB))
+OBJ_SIMDISP:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
+OBJ_CYTOLIBG:=$(OBJ_SIMDISP:%.o=%G.o) $(filter-out $(OBJ_SIMDISP),$(OBJ_CYTOLIB))
 
 #----------------------------targets--------------------------------------------
 
@@ -190,15 +190,15 @@ $(OBJ_CYTOLIB3): build/%D3.o: %.cc %.h %.o | build
 
 INC_BMSD=$(addprefix -Isrc/, base math sim sim/spaces gym disp)
 
-$(OBJ_GRAFIX:%.o=build/%G.o): build/%G.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%G.o): build/%G.o: %.cc %.h %.o | build
 	$(COMPILE) -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_GRAFIX:%.o=build/%GD1.o): build/%GD1.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%GD1.o): build/%GD1.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_GRAFIX:%.o=build/%GD2.o): build/%GD2.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%GD2.o): build/%GD2.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_GRAFIX:%.o=build/%GD3.o): build/%GD3.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%GD3.o): build/%GD3.o: %.cc %.h %.o | build
 	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMSD) -c $< -o $@
 
