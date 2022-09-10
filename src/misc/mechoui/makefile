@@ -21,32 +21,34 @@ ifneq ($(HAS_PNG), 0)
     IMAGES = $(LIB_PNG)
 endif
 
-#----------------------------objects--------------------------------------------
+#------------------------------files--------------------------------------------
 
-INC_MECHOUI := $(realpath $(addprefix ../../, base math gym disp))
+SRC_MECHOUI := multimesh.cc mechoui_param.cc vector3.cc glossary.cc\
+			   property.cc backtrace.cc tokenizer.cc stream_func.cc\
+               time_date.cc filepath.cc random.cc print_color.cc
 
-vpath %.h  . $(INC_MECHOUI)
-vpath %.cc . $(INC_MECHOUI)
-vpath %.c  $(INC_MECHOUI)
+OBJ_MECHOUI := $(SRC_MECHOUI:%.cc=build/%.o) build/SFMT.o build/mechdisp.a
+
+DIR_MECHOUI := src/base src/math src/gym src/disp src/gym/deps
+
+vpath %.h  src $(DIR_MECHOUI)
+vpath %.cc src $(DIR_MECHOUI)
+vpath %.c  $(DIR_MECHOUI)
 vpath %.o  build
 vpath %.a  build
 
-
-OBJ_MECHOUI := multi_mesh.o mechoui_param.o vector3.o glossary.o property.o\
-           backtrace.o tokenizer.o stream_func.o print_color.o time_date.o filepath.o\
-
 #----------------------------targets--------------------------------------------
 
-INCLUDE := $(addprefix -I, $(INC_MECHOUI))
+INC_MECHOUI := $(addprefix -I, $(DIR_MECHOUI))
 
-mechoui: mechoui.cc $(OBJ_MECHOUI:%=build/%) build/SFMT.o build/mechdisp.a
-	$(COMPILE) $(INCLUDE) $^ $(GRAFIX) $(IMAGES) -o $@
+mechoui: mechoui.cc $(OBJ_MECHOUI)
+	$(COMPILE) $(INC_MECHOUI) $^ $(GRAFIX) $(IMAGES) -o $@
 	@printf "\x1B[35m >>>>>> made %s\x1B[0m\n" $@
 vpath mechoui .
 
 .PHONY: clean
 clean:
-	rm -f mechoui build/*
+	rm -f mechoui build/* src/gym src/disp src/base src/math
 
 .PHONY: tar
 tar: clean
@@ -55,33 +57,34 @@ tar: clean
 build:
 	mkdir -p $@
 
+symlinks:
+	if test ! -e src/gym; then ln -s ../../../gym src/gym; fi
+	if test ! -e src/disp; then ln -s ../../../disp src/disp; fi
+	if test ! -e src/base; then ln -s ../../../base src/base; fi
+	if test ! -e src/math; then ln -s ../../../math src/math; fi
+
 #----------------------------rules----------------------------------------------
 
--include ../../gym/makefile.inc
--include ../../disp/makefile.inc
+-include src/gym/makefile.inc
+-include src/disp/makefile.inc
 
-vpath spng.h ../../gym/deps
-vpath spng.c ../../gym/deps
-vpath miniz.h ../../gym/deps
-vpath miniz.c ../../gym/deps
+$(SRC_MECHOUI:%.cc=build/%.o): build/%.o : %.cc | build symlinks
+	$(COMPILE) $(INC_MECHOUI) -c $< -o $@
 
-$(OBJ_MECHOUI:%.o=build/%.o): build/%.o: %.cc
-	$(COMPILE) $(addprefix -I, $(INC_MECHOUI)) -c $< -o $@
-
-# Attention: Mersenne-Twister is coded in C-language, hence '-x c':
-build/SFMT.o: SFMT.c SFMT.h | build
-	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o $@
-
-build/mechdisp.a: $(addprefix build/, $(OBJ_GFX) view.o view_prop.o glapp.o) #save_image.o
+build/mechdisp.a: $(addprefix build/, $(OBJ_GRFX) view.o view_prop.o glapp.o)
 	$(LIBTOOL) $@ $^
 vpath mechdisp.a build
+
+# Attention: Mersenne-Twister is coded in C-language, hence '-x c':
+build/SFMT.o: SFMT.c SFMT.h | build symlinks
+	$(CXX) -DNDEBUG -DSFMT_MEXP=19937 -O2 -x c -c $< -o $@
 
 #----------------------------makedep--------------------------------------------
 
 #command used to build the dependencies files automatically
 MAKEDEP := g++ -std=gnu++14 -MM
 
-build/dep: $(OBJ_MECHOUI:%.o=%.cc) | build
+build/dep: $(SRC_MECHOUI) | build
 	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
 	printf "> > > > > > > made %s\n" $@;
 vpath dep build

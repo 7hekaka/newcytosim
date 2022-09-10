@@ -11,7 +11,7 @@
 #include "mechoui_param.h"
 #include "gym_draw.h"
 #include "gym_view.h"
-#include "multi_mesh.h"
+#include "multimesh.h"
 
 MultiMesh mesh;
 MechouiParam pam;

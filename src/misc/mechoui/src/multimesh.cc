@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
-#include "multi_mesh.h"
 #include "assert_macro.h"
+#include "multimesh.h"
 
 #include "opengl.h"
 #include "gym_flute.h"
