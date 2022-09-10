@@ -343,10 +343,11 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     
     const real ran = aa.rad_ + bb.rad_;
     
-    /* in 3D, check the shortest distance between two segments, and if close
-     enough, use the result to build an interaction */
     FiberSegment as = aa.segment();
     FiberSegment bs = bb.segment();
+
+    /* in 3D, check the shortest distance between two segments, and if close
+     enough, use the result to build an interaction */
     real a, b;
     real dis2 = as.shortestDistanceSqr(bs, a, b);
     
@@ -535,7 +536,7 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
         BigVector pos = ii->pos_;
 #if GRID_HAS_PERIODIC
         if ( modulo )
-            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+            modulo->fold_float(pos, list2[0].pos_);
 #endif
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj)  )
@@ -551,7 +552,7 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
         BigVector pos = ii->pos_;
 #if GRID_HAS_PERIODIC
         if ( modulo )
-            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+            modulo->fold_float(pos, list2[0].pos_);
 #endif
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPL(*ii, *jj) )
@@ -574,10 +575,10 @@ typedef uint64_t BitField;
  */
 inline int four_near_bits(vec4f const& xyzr, BigLocus const* src)
 {
-    vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_.data()));
-    vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_.data()));
-    vec4f uu = sub4f(xyzr, loadu4f(src[2].pos_.data()));
-    vec4f rr = sub4f(xyzr, loadu4f(src[3].pos_.data()));
+    vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_));
+    vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_));
+    vec4f uu = sub4f(xyzr, loadu4f(src[2].pos_));
+    vec4f rr = sub4f(xyzr, loadu4f(src[3].pos_));
     // transpose 4x4 data matrix:
     vec4f xx = unpacklo4f(tt, yy);
     tt = unpackhi4f(tt, yy);
@@ -595,8 +596,8 @@ inline int four_near_bits(vec4f const& xyzr, BigLocus const* src)
 
 inline int two_near_bits(vec4f const& xyzr, BigLocus const* src)
 {
-    vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_.data()));
-    vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_.data()));
+    vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_));
+    vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_));
     // transpose 4x4 data matrix:
     vec4f xx = unpacklo4f(tt, yy);
     tt = unpackhi4f(tt, yy);
@@ -612,7 +613,7 @@ inline int two_near_bits(vec4f const& xyzr, BigLocus const* src)
 
 inline int one_near_bit(vec4f const& xyzr, BigLocus const* src)
 {
-    vec4f xx = sub4f(xyzr, loadu4f(src[0].pos_.data()));
+    vec4f xx = sub4f(xyzr, loadu4f(src[0].pos_));
     xx = mul4f(xx, xx);
     return xx[0] + xx[1] < xx[3] - xx[2];  // x*x + y*y < r*r - z*z
 }
@@ -729,7 +730,6 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
 {
     //printf(" stericsX: %2lu+%2lu (%lu)\n", list.num_locus(), list.num_points(), list.capacity());
     BigLocus const* mid = list.middle();
-    constexpr BitField mask(~1UL);
     BitField bitP, bitL;
     
     for ( BigLocus const* ii = list.begin(); ii < mid; ++ii )
@@ -751,7 +751,8 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
                 int b = __builtin_ctzl(bitL);
                 if ( not_adjacentLL(*ii, blp[b]) )
                     checkLL(*ii, blp[b]);
-                bitL &= mask << b;
+                // flip bit in position 'b':
+                bitL ^= 1UL << b;
             }
             //printf(" LP ");
             while ( bitP )
@@ -760,7 +761,8 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
                 int b = __builtin_ctzl(bitP);
                 if ( not_adjacentPL(blp[b], *ii) )
                     checkPL(blp[b], *ii);
-                bitP &= mask << b;
+                // flip bit in position 'b':
+                bitP ^= 1UL << b;
             }
             //printf("\n");
         }
@@ -786,7 +788,7 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
                 int b = __builtin_ctzl(bitP);
                 if ( not_adjacentPP(*ii, blp[b]) )
                     checkPP(*ii, blp[b]);
-                bitP &= mask << b;
+                bitP ^= 1UL << b;
             }
             //printf("\n");
         }
@@ -823,7 +825,6 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     }
 #endif
     BigLocus const* mid1 = list1.middle();
-    constexpr BitField mask(~1UL);
     BitField bitP, bitL;
     
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
@@ -831,7 +832,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         BigVector pos = ii->pos_;
 #if GRID_HAS_PERIODIC
         if ( modulo )
-            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+            modulo->fold_float(pos, list2[0].pos_);
 #endif
         /* The radius is negated, such that it gets added by compute_near_bits() */
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
@@ -847,7 +848,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
             for ( b = 0; b < std::min(64, (int)list2.size()-offset); ++b )
             {
                 BigVector vec = (jj+b+offset)->pos_;
-                if ( modulo ) modulo->fold_float(&vec.XX, &pos.XX);
+                if ( modulo ) modulo->fold_float(vec, pos);
                 bool n = pos.near(vec);
                 bool p = (bitL+bitP) & ( 1UL << b );
                 float d = square(pos.XX-vec.XX) + square(pos.YY-vec.YY) + square(pos.ZZ-vec.ZZ);
@@ -865,7 +866,8 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
                 int b = __builtin_ctzl(bitL);
                 if ( not_adjacentLL(*ii, blp[b]) )
                     checkLL(*ii, blp[b]);
-                bitL &= mask << b;
+                // flip bit in position 'b':
+                bitL ^= 1UL << b;
             }
             //printf(" LP ");
             while ( bitP )
@@ -874,7 +876,8 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
                 int b = __builtin_ctzl(bitP);
                 if ( not_adjacentPL(blp[b], *ii) )
                     checkPL(blp[b], *ii);
-                bitP &= mask << b;
+                // flip bit in position 'b':
+                bitP ^= 1UL << b;
             }
             //printf("\n");
         }
@@ -885,7 +888,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         BigVector pos = ii->pos_;
 #if GRID_HAS_PERIODIC
         if ( modulo )
-            modulo->fold_float(&pos.XX, &list2[0].pos_.XX);
+            modulo->fold_float(pos, list2[0].pos_);
 #endif
         /* The radius is negated, such that it gets added by compute_near_bits() */
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
@@ -902,7 +905,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
                 int b = __builtin_ctzl(bitL);
                 if ( not_adjacentPL(*ii, blp[b]) )
                     checkPL(*ii, blp[b]);
-                bitL &= mask << b;
+                bitL ^= 1UL << b;
             }
             //printf(" PP ");
             while ( bitP )
@@ -911,7 +914,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
                 int b = __builtin_ctzl(bitP);
                 if ( not_adjacentPP(*ii, blp[b]) )
                     checkPP(*ii, blp[b]);
-                bitP &= mask << b;
+                bitP ^= 1UL << b;
             }
             //printf("\n");
         }

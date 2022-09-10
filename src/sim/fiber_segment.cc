@@ -188,57 +188,56 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
 
 real FiberSegment::shortestDistanceSqr(FiberSegment const& seg, real& abs1, real& abs2) const
 {
-    Vector off = seg.pos1() - pos1();
-    Vector d11 = dir();
-    Vector d22 = seg.dir();
-    
+    Vector a1 = pos1();
+    Vector a2 = seg.pos1();
+
+    Vector d11 = ( pos2() - a1 ) * lenInv();
+    Vector d22 = ( a2 - seg.pos2() ) * seg.lenInv(); // inverted on purpose
+    Vector off = a2 - a1;
+
 #if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(off);
 #endif
     
-#if ( DIM > 2 )
-    Torque N = cross(d11, d22);
-    real S = N.normSqr();  // sine^2
-#else
-    real S = square(cross(d11, d22));  // sine^2
-#endif
+    real C = dot(d11, d22);  // cosine of angle
+    real m1 = dot(off, d11);
+    real m2 = dot(off, d22);
     
-    if ( abs_real(S) > 128 * REAL_EPSILON )
+#if ( DIM > 2 )
+    Vector N = cross(d11, d22);
+    real iS = N.normSqr();  // sine^2
+    // direction N of the shortest path is orthogonal to both lines, thus
+    // distance between lines = dot(off, N) / N.norm()
+    real DD = dot(off, N);
+#else
+    real iS = square(cross(d11, d22));  // sine^2
+#endif
+
+    if ( abs_real(iS) > 128 * REAL_EPSILON )
     {
         // This deals with the general case of non-parallel lines
-        real iS = 1 / S;    // 1.0 / sine^2
-#if ( DIM > 2 )
-        real DD = square( dot(off, N) ) * iS;
-#endif
+        iS = 1 / iS;    // 1.0 / sine^2
         /*
          We do not necessarily need to calculate the positions `abs1 , abs2`
          if the distance is greater than the threshold above which nothing
          is to be done with these results...
          */
-        real C = dot(d11, d22);  // cosine of angle
-        real d1off = dot(d11, off);
-        real d2off = dot(d22, off);
-
-        abs1 = ( d1off - C * d2off ) * iS;
-        abs2 = ( C * d1off - d2off ) * iS;
+        abs1 = ( m1 - C * m2 ) * iS;
+        abs2 = ( m2 - C * m1 ) * iS;
 #if 0
         // check that identified line path is orthogonal to both segments:
-        Vector p1 = pos1() + abs1 * d11;
-        Vector p2 = seg.pos1() + abs2 * d22;
-        real n1 = dot(d11, p2-p1);
-        real n2 = dot(d22, p2-p1);
-        printf("belowDistance %+9.6f %+9.6f :", n1, n2);
+        off = off - abs2 * d22 - abs1 * d11;
+        real n1 = dot(off, d11);
+        real n2 = dot(off, d22);
+        printf("shortestDistanceSqr %+9.6f %+9.6f :", n1, n2);
         // check different formula for distance betwen lines:
-        real res0 = ( off + abs2 * d22 - abs1 * d11 ).norm();
-        real res1 = sqrt( D * iS );  // 1.0 / N.normSqr() == iS
-        real res2 = ( p2 - p1 ).norm();
-        printf("%6.4f  %6.4f  %6.4f\n", res0, res1, res2);
+        real dis0 = norm( off );
+        real dis1 = DD * sqrt( iS );
+        printf("%6.4f  %6.4f\n", dis0, dis1);
 #endif
 #if ( DIM > 2 )
-        // direction N of the shortest path is orthogonal to both lines, thus
-        // distance between lines = dot(off, N) / N.norm()
-        return DD;
+        return ( DD * DD ) * iS;
 #endif
         return 0;
     }
@@ -249,18 +248,11 @@ real FiberSegment::shortestDistanceSqr(FiberSegment const& seg, real& abs1, real
      m1 = projection of seg.pos1() on this segment
      p1 = projection of seg.pos2()
      */
-    const real d1off = dot(d11, off);
-    const real len1 = len(), len2 = seg.len();
-    
-    // the distance between lines
-    real DD = off.normSqr() - d1off * d1off;
-    //real E = ( off + abs2 * d22 - abs1 * d11 ).normSqr();
+    const real len1 = len();
+    const real len2 = seg.len();
 
-    real C = dot(d11, d22);  // cosine of angle
-    real m1 = d1off;
-    real p1 = d1off + C * len2;
-    real m2 = -dot(d22, off);
-    real p2 = m2 + C * len1;
+    real p1 = m1 - C * len2;
+    real p2 = m2 - C * len1;
 
     // clamp inside segment and use mid-point
     abs1 = 0.5 * ( min_real(len1, max_real(m1, p1)) + max_real(0, min_real(m1, p1)));
@@ -269,7 +261,7 @@ real FiberSegment::shortestDistanceSqr(FiberSegment const& seg, real& abs1, real
     abs2 = 0.5 * ( min_real(len2, max_real(m2, p2)) + max_real(0, min_real(m2, p2)));
     
     // return distance between lines
-    return DD;
+    return off.normSqr() - m1 * m1;
 }
 
 

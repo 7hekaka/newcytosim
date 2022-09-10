@@ -40,8 +40,10 @@ public:
     BigVector(Vector2 v, real r) { XX = v.XX; YY = v.YY; ZZ = 0; RR = r; }
     BigVector(Vector3 v, real r) { XX = v.XX; YY = v.YY; ZZ = v.ZZ; RR = r; }
 
-    float const* data() const { return &XX; }
-    
+    //float const* data() const { return &XX; }
+    operator float*() { return &XX; }
+    operator const float*() const { return &XX; }
+
     /// @return result of test `distance(this, arg) < sum_of_ranges`
     bool near(BigVector const& arg) const
     {
@@ -77,7 +79,7 @@ public:
     Mecable const* obj_;
     
     /// equilibrium radius of the interaction (distance where force is zero)
-    real     rad_;
+    float    rad_;
 
     /// index of segment's first point
     unsigned vix_;
