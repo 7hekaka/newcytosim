@@ -1324,6 +1324,7 @@ void Solid::projectForces(const real* X, real* Y) const
 
 void Solid::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     out.writeUInt16(nPoints);
     for ( size_t p = 0; p < nPoints ; ++p )
     {

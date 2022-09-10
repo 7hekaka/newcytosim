@@ -486,6 +486,7 @@ size_t Space::readShape(Inputter& in, size_t n_len, real len[], std::string cons
 
 void Space::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, prop->shape);
     out.writeUInt16(0);
 }

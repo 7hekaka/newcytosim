@@ -131,6 +131,7 @@ void SpaceDynamicDisc::step()
 
 void SpaceDynamicDisc::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "RF");
     out.writeUInt16(2);
     out.writeFloat(radius_);

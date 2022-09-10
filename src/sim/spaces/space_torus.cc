@@ -88,6 +88,7 @@ Vector SpaceTorus::project(Vector const& pos) const
 
 void SpaceTorus::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "RRad");
     out.writeUInt16(2);
     out.writeFloat(bCurve);

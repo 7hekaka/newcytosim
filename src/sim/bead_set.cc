@@ -106,11 +106,11 @@ void BeadSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 }
 
 
-void BeadSet::write(Outputter& out) const
+void BeadSet::writeSet(Outputter& out) const
 {
     if ( size() > 0 )
     {
-        out.writeLine("\n#section "+title());
+        out.write("\n#section "+title());
         writeObjects(out, pool_);
     }
 }

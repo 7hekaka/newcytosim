@@ -50,7 +50,7 @@ public:
     Object * newObject(ObjectTag, PropertyID);
     
     /// write all Objects to file
-    void write(Outputter&) const;
+    void writeSet(Outputter&) const;
         
     /// print a summary of the content (nb of objects, class)
     void report(std::ostream&) const;

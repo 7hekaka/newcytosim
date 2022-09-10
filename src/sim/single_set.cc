@@ -363,21 +363,21 @@ void SingleSet::prune()
 }
 
 
-void SingleSet::write(Outputter& out) const
+void SingleSet::writeSet(Outputter& out) const
 {
     if ( sizeA() > 0 )
     {
-        out.writeLine("\n#section single A");
+        out.write("\n#section single A");
         writeObjects(out, aList);
     }
     if ( sizeF() > 0 )
     {
         int skip = simul_.prop.skip_free_single || prune_mode;
         if ( skip & skip_now )
-            out.writeLine("\n#section single F 1");
+            out.write("\n#section single F 1");
         else
         {
-            out.writeLine("\n#section single F 0");
+            out.write("\n#section single F 0");
             writeObjects(out, fList);
             skip_now = skip;
         }

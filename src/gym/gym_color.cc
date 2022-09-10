@@ -128,8 +128,7 @@ std::istream& operator >> (std::istream& is, gym_color& col)
         {
             is.unget();
             gym_color::COLOF r, g, b, a=1;
-            is >> r >> g >> b;
-            if ( ! is.fail() )
+            if ( is >> r >> g >> b )
             {
                 is >> a;
                 is.clear();

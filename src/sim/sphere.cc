@@ -609,6 +609,7 @@ void Sphere::projectForces(const real* X, real* Y) const
 
 void Sphere::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     out.writeFloat(radius());
     Mecable::write(out);
 }

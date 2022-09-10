@@ -62,11 +62,11 @@ void EventSet::newObjects(ObjectList& res, const Property*, Glossary& opt)
 }
 
 
-void EventSet::write(Outputter& out) const
+void EventSet::writeSet(Outputter& out) const
 {
     if ( size() > 0 )
     {
-        out.writeLine("\n#section "+title());
+        out.write("\n#section "+title());
         writeObjects(out, pool_);
     }
 }

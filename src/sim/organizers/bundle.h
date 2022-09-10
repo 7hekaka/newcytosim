@@ -67,6 +67,8 @@ public:
     /// return associated Property
     Property const* property() const { return prop; }
     
+    /// write
+    void write(Outputter&) const;
  };
 
 

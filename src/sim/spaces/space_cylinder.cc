@@ -193,6 +193,7 @@ void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceCylinder::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "LR");
     out.writeUInt16(2);
     out.writeFloat(half_);

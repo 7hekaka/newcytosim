@@ -174,6 +174,7 @@ void Single::setInteractions(Meca& meca) const
 
 void Single::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     sHand->write(out);
     out.writeFloats(sPos, DIM);
 }

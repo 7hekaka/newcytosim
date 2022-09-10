@@ -224,16 +224,12 @@ Object * FiberSet::newObject(const ObjectTag tag, PropertyID pid)
 }
 
 
-void FiberSet::write(Outputter& out) const
+void FiberSet::writeSet(Outputter& out) const
 {
     if ( size() > 0 )
     {
-        out.writeLine("\n#section "+title());
-        for ( Object const* n=pool_.front(); n; n=n->next() )
-        {
-            //std::clog << "writeFiber " << n->reference() << '\n';
-            n->write(out);
-        }
+        out.write("\n#section "+title());
+        writeObjects(out, pool_);
     }
 }
 

@@ -122,7 +122,7 @@ real Organizer::sumDragCoefficient() const
 //------------------------------------------------------------------------------
 #pragma mark - I/O
 
-void Organizer::write(Outputter& out) const
+void Organizer::writeOrganized(Outputter& out) const
 {
     out.writeUInt16(mObjects.size());
     for ( Mecable const* i : mObjects )

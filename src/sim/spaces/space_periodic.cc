@@ -89,6 +89,7 @@ Vector SpacePeriodic::project(Vector const&) const
 
 void SpacePeriodic::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "LLL");
     out.writeUInt16(4);
     out.writeFloat(half_[0]);

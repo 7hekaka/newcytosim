@@ -190,6 +190,7 @@ Vector3 SpaceEllipse::project3D(Vector3 const& W) const
 
 void SpaceEllipse::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "LLLE");
     out.writeUInt16(4);
     out.writeFloat(radius_[0]);

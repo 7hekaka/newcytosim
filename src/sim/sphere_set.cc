@@ -60,11 +60,11 @@ void SphereSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 }
 
 
-void SphereSet::write(Outputter& out) const
+void SphereSet::writeSet(Outputter& out) const
 {
     if ( size() > 0 )
     {
-        out.writeLine("\n#section "+title());
+        out.write("\n#section "+title());
         writeObjects(out, pool_);
     }
 }

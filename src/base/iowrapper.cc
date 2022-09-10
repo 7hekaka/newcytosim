@@ -414,13 +414,6 @@ void Outputter::write(const std::string& arg)
 }
 
 
-void Outputter::writeLine(const std::string& arg)
-{
-    fwrite(arg.c_str(), 1, arg.size(), mFile);
-    if ( binary_ ) putc('\n', mFile);
-}
-
-
 void Outputter::writeInt(const int n, char before)
 {
     if ( 2 > fprintf(mFile, "%c%i", before, n) )

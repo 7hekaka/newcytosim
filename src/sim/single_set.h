@@ -96,7 +96,7 @@ public:
     void report(std::ostream&) const;
 
     /// write objects
-    void write(Outputter&) const;
+    void writeSet(Outputter&) const;
 
     //--------------------------
 

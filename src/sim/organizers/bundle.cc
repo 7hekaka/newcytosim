@@ -32,6 +32,12 @@ void Bundle::step()
 }
 
 
+Bundle::~Bundle()
+{
+    prop = nullptr;
+}
+
+
 /*
  Parallel connection near the 'prop->joint' end of the fibers
 */
@@ -155,10 +161,9 @@ void Bundle::build(ObjectList& objs, Glossary& opt, Simul& sim)
     }
 }
 
-
-Bundle::~Bundle()
+void Bundle::write(Outputter& out) const
 {
-    prop = nullptr;
+    writeHeader(out, Organizer::TAG_BUNDLE);
+    writeOrganized(out);
 }
-
 

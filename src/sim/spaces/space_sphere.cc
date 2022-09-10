@@ -110,6 +110,7 @@ void SpaceSphere::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceSphere::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "R");
     out.writeUInt16(2);
     out.writeFloat(radius_);

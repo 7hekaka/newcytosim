@@ -527,6 +527,7 @@ void Interface::execute_new(std::string const& name, size_t cnt)
     Glossary opt;
 
     ObjectList objs(4, 4);
+    set->reserve(cnt);
     for ( size_t n = 0; n < cnt; ++n )
     {
         set->newObjects(objs, pp, opt);

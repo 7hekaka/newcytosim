@@ -122,14 +122,14 @@ public:
     
     //--------------------------------------------------------------------------
     
+    /// write list of Mecables
+    void writeOrganized(Outputter&) const;
+
     /// read list of Mecables
     void readOrganized(Inputter&, Simul&, size_t);
 
     /// read
     void read(Inputter&, Simul&, ObjectTag);
-    
-    /// write
-    void write(Outputter&) const;
 };
 
 

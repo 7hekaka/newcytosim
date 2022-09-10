@@ -69,7 +69,7 @@ protected:
     static ObjectList collect(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
 
     /// write Object in ObjectPool to file
-    static void writeObjects(Outputter&, ObjectPool const&);
+    void writeObjects(Outputter&, ObjectPool const&) const;
     
     /// print a list of the content (nb of objects, class)
     void writeReport(std::ostream&, const std::string& title) const;
@@ -139,6 +139,9 @@ public:
     /// remove Object
     virtual void remove(Object *);
 
+    /// allocate to be ready to handle `cnt` objects
+    void reserve(size_t cnt) { inventory_.reserve(cnt); }
+    
     /// register Object, adding it at the end of the list
     void add(Object *);
     
@@ -202,7 +205,7 @@ public:
     void loadObject(Inputter&, ObjectTag tag, bool fat, bool update);
     
     /// write all Objects to file
-    virtual void write(Outputter&) const = 0;
+    virtual void writeSet(Outputter&) const = 0;
     
     /// print a summary of the content (nb of objects, class)
     virtual void report(std::ostream&) const = 0;

@@ -75,7 +75,7 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
         in.getline(str, sizeof(str));
         //std::clog << "polygone file " << in.gcount() << " " << str << "\n";
 
-        if ( in.fail() & in.gcount() )
+        if ( in.fail() && in.gcount() )
             throw InvalidIO("Could not read polygon coordinate files");
        
         char const* ptr = str;

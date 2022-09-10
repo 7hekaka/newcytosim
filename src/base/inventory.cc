@@ -8,49 +8,50 @@
 
 Inventory::Inventory()
 {
-    allocated_ = 31;
-    byNames    = new Inventoried*[1+allocated_];
-    lowest_    = ~0;
-    highest_   = 0;
+    alloca_ = 31;
+    record_ = new Inventoried*[1+alloca_];
+    lowest_ = ~0;
+    highest_ = 0;
 
-    for ( ObjectID n = 0; n <= allocated_; ++n )
-        byNames[n] = nullptr;
+    for ( ObjectID n = 0; n <= alloca_; ++n )
+        record_[n] = nullptr;
 }
 
 
 void Inventory::allocate(size_t sz)
 {
-    constexpr size_t chunk = 32;
+    constexpr size_t chunk = 1024;
     sz = ( sz + chunk ) & ~( chunk -1 );
     
     Inventoried ** ptr = new Inventoried*[sz];
     
     ObjectID n = 0;
-    for ( ; n <= allocated_; ++n )
-        ptr[n] = byNames[n];
+    for ( ; n <= alloca_; ++n )
+        ptr[n] = record_[n];
     for ( ; n < sz; ++n )
         ptr[n] = nullptr;
     
-    delete[] byNames;
-    byNames    = ptr;
-    allocated_ = sz-1;
+    delete[] record_;
+    record_ = ptr;
+    alloca_ = sz-1;
+    //std::clog << "Inventory::allocated(" << sz << ")\n";
 }
 
 
 void Inventory::release()
 {
-    delete[] byNames;
-    byNames = nullptr;
-    allocated_ = 0;
-    lowest_    = ~0;
-    highest_   = 0;
+    delete[] record_;
+    record_ = nullptr;
+    alloca_ = 0;
+    lowest_ = ~0;
+    highest_ = 0;
 }
 
 
 void Inventory::clear()
 {
     for ( ObjectID n = lowest_; n <= highest_; ++n )
-        byNames[n] = nullptr;
+        record_[n] = nullptr;
     lowest_ = ~0;
     highest_ = 0;
 }
@@ -70,17 +71,17 @@ void Inventory::assign(Inventoried * obj)
     else
     {
         // already allocated and registered
-        if ( n < allocated_ && byNames[n] == obj )
+        if ( n < alloca_ && record_[n] == obj )
             return;
 
         highest_ = std::max(highest_, n);
     }
     
-    if ( n >= allocated_ )
+    if ( n >= alloca_ )
         allocate(n+1);
     
-    assert_true(!byNames[n]);
-    byNames[n] = obj;
+    assert_true(!record_[n]);
+    record_[n] = obj;
     
     lowest_ = std::min(lowest_, n);
     //std::clog << "Inventory::store() assigned " << n << " to " << obj << "\n";
@@ -91,15 +92,15 @@ void Inventory::unassign(const Inventoried * obj)
 {
     ObjectID n = obj->identity();
     assert_true( n <= highest_ );
-    assert_true( byNames[n] == obj );
-    byNames[n] = nullptr;
+    assert_true( record_[n] == obj );
+    record_[n] = nullptr;
     
     if ( n == lowest_ )
     {
         if ( ++lowest_ <= highest_ )
         {
-            assert_true(byNames[highest_]);
-            while ( !byNames[lowest_] )
+            assert_true(record_[highest_]);
+            while ( !record_[lowest_] )
                 ++lowest_;
         }
         else
@@ -113,8 +114,8 @@ void Inventory::unassign(const Inventoried * obj)
     {
         --highest_;
         assert_true(lowest_ <= highest_);
-        assert_true(byNames[lowest_]);
-        while ( !byNames[highest_] )
+        assert_true(record_[lowest_]);
+        while ( !record_[highest_] )
             --highest_;
     }
 }
@@ -129,18 +130,18 @@ void Inventory::reassign()
     ObjectID nxt = first_unassigned();
     ObjectID inf = nxt;
     ObjectID sup = highest_;
-    assert_true(!byNames[inf]);
+    assert_true(!record_[inf]);
     
     while ( inf <= sup )
     {
-        assert_true(byNames[sup]);
-        while ( !byNames[inf] )
+        assert_true(record_[sup]);
+        while ( !record_[inf] )
             ++inf;
         //swap:
-        assert_true(!byNames[nxt]);
-        byNames[nxt] = byNames[inf];
-        byNames[nxt]->identity(nxt);
-        byNames[inf] = nullptr;
+        assert_true(!record_[nxt]);
+        record_[nxt] = record_[inf];
+        record_[nxt]->identity(nxt);
+        record_[inf] = nullptr;
         ++nxt;
         ++inf;
     }
@@ -155,23 +156,23 @@ void Inventory::reassign()
 
 ObjectID Inventory::first_unassigned() const
 {
-    assert_true(!byNames[allocated_]);
+    assert_true(!record_[alloca_]);
     ObjectID n = 1;
-    while ( byNames[n] )
+    while ( record_[n] )
         ++n;
-    assert_true(n <= allocated_);
+    assert_true(n <= alloca_);
     return n;
 }
 
 
 ObjectID Inventory::next_identity(ObjectID n) const
 {
-    assert_true(n < allocated_);
-    if ( byNames[++n] )
+    assert_true(n < alloca_);
+    if ( record_[++n] )
         return n;
     if ( ++n <= highest_ )
     {
-        while ( !byNames[n] )
+        while ( !record_[n] )
             ++n;
         return n;
     }
@@ -183,8 +184,8 @@ Inventoried * Inventory::get(const size_t n) const
 {
     if ( n <= highest_ )
     {
-        assert_true(!byNames[n] || byNames[n]->identity()==n );
-        return byNames[n];
+        assert_true(!record_[n] || record_[n]->identity()==n );
+        return record_[n];
     }
     return nullptr;
 }
@@ -192,32 +193,32 @@ Inventoried * Inventory::get(const size_t n) const
 
 Inventoried* Inventory::first() const
 {
-    if ( lowest_ < allocated_ )
-        return byNames[lowest_];
+    if ( lowest_ < alloca_ )
+        return record_[lowest_];
     return nullptr;
 }
 
 
 Inventoried* Inventory::last() const
 {
-    assert_true(highest_ < allocated_);
-    assert_true(0==highest_ || byNames[highest_]);
-    return byNames[highest_];
+    assert_true(highest_ < alloca_);
+    assert_true(0==highest_ || record_[highest_]);
+    return record_[highest_];
 }
 
 
 Inventoried* Inventory::next(Inventoried const* i) const
 {
     ObjectID n = i->identity() + 1;
-    assert_true(n <= allocated_);
-    if ( byNames[n] )
-        return byNames[n];
+    assert_true(n <= alloca_);
+    if ( record_[n] )
+        return record_[n];
     if ( ++n <= highest_ )
     {
-        while ( !byNames[n] )
+        while ( !record_[n] )
             ++n;
-        assert_true(n < allocated_);
-        return byNames[n];
+        assert_true(n < alloca_);
+        return record_[n];
     }
     return nullptr;
 }
@@ -228,10 +229,10 @@ Inventoried* Inventory::previous(Inventoried const* i) const
     ObjectID n = i->identity() - 1;
     if ( lowest_ <= n )
     {
-        assert_true(byNames[lowest_]);
-        while ( !byNames[n] )
+        assert_true(record_[lowest_]);
+        while ( !record_[n] )
             --n;
-        return byNames[n];
+        return record_[n];
     }
     return nullptr;
 }
@@ -245,7 +246,7 @@ size_t Inventory::count() const
 {
     size_t cnt = 0;
     for ( ObjectID n = 0; n <= highest_; ++n )
-        if ( byNames[n] ) ++cnt;
+        if ( record_[n] ) ++cnt;
     return cnt;
 }
 
@@ -254,7 +255,7 @@ void Inventory::print(std::ostream& os) const
 {
     os << "Inventory " << this << "\n";
     for ( ObjectID n = lowest_; n <= highest_; ++n )
-        os << n << " -> " << byNames[n] << "\n";
+        os << n << " -> " << record_[n] << "\n";
 }
 
 

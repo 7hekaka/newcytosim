@@ -20,22 +20,21 @@ class Inventory
 {
 private:
     
-    /// array of objects, stored at the index corresponding to their ID
+    /// array of objects, stored at the index corresponding to their ObjectID
     /**
      This stores pointers to the objects, at index 'i' such that
-         byNames[i]->identity() == i
-     Valid ID are > 0.
+         record_[i]->identity() == i
+     Valid ObjectID are > 0, starting at 1
      */
-    Inventoried ** byNames;
-    
+    Inventoried ** record_;
     
     /// size of memory allocated
-    size_t allocated_;
+    size_t alloca_;
     
-    /// lowest i > 0 for which `byNames[i] != 0`
+    /// lowest i > 0 for which `record_[i] != 0`
     ObjectID lowest_;
     
-    /// highest i > 0 for which `byNames[i] != 0`
+    /// highest i > 0 for which `record_[i] != 0`
     ObjectID highest_;
     
     /// memory allocation function
@@ -71,7 +70,10 @@ public:
     ObjectID first_unassigned() const;
 
     /// current size of array
-    size_t capacity() const { return allocated_; }
+    size_t capacity() const { return alloca_; }
+
+    /// allocate to be ready to handle `cnt` references
+    void reserve(const size_t cnt) { if ( cnt > alloca_ ) allocate(cnt); }
     
     /// remember `obj`, assign a new ObjectID if necessary
     void assign(Inventoried * obj);
@@ -92,7 +94,7 @@ public:
     Inventoried * get(size_t number) const;
     
     /// return object with given serial number
-    Inventoried * operator[](ObjectID n) const { assert_true(n<allocated_); return byNames[n]; }
+    Inventoried * operator[](ObjectID n) const { assert_true(n<alloca_); return record_[n]; }
 
     /// object with the smallest inventory number
     Inventoried * first() const;

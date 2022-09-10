@@ -275,6 +275,7 @@ void SpacePolygon::setInteractions(Meca& meca, Simul const&) const
 
 void SpacePolygon::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "L");
     out.writeUInt16(2);
     out.writeFloat(height_);

@@ -515,29 +515,29 @@ void CoupleSet::prune()
 
 void CoupleSet::writeAA(Outputter& out) const
 {
-    out.writeLine("\n#section couple AA");
+    out.write("\n#section couple AA");
     writeObjects(out, aaList);
 }
 
 void CoupleSet::writeAF(Outputter& out) const
 {
-    out.writeLine("\n#section couple AF");
+    out.write("\n#section couple AF");
     writeObjects(out, afList);
 }
 
 void CoupleSet::writeFA(Outputter& out) const
 {
-    out.writeLine("\n#section couple FA");
+    out.write("\n#section couple FA");
     writeObjects(out, faList);
 }
 
 void CoupleSet::writeFF(Outputter& out) const
 {
-    out.writeLine("\n#section couple FF 0");
+    out.write("\n#section couple FF 0");
     writeObjects(out, ffList);
 }
 
-void CoupleSet::write(Outputter& out) const
+void CoupleSet::writeSet(Outputter& out) const
 {
     if ( sizeAA() > 0 )
         writeAA(out);
@@ -549,7 +549,7 @@ void CoupleSet::write(Outputter& out) const
     {
         int skip = simul_.prop.skip_free_couple || prune_mode;
         if ( skip & skip_now )
-            out.writeLine("\n#section couple FF 1");
+            out.write("\n#section couple FF 1");
         else
         {
             writeFF(out);

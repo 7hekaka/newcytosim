@@ -491,12 +491,18 @@ void ObjectSet::thaw()
 /**
  Write Reference and Object's data, for all Objects in `list`
  */
-void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list)
+void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list) const
 {
+    // record number of objects:
+    size_t cnt = list.size();
+    size_t sup = inventory_.highest();
+    out.write("\n#record "+std::to_string(cnt)+" "+std::to_string(sup));
+    if ( out.binary() ) out.put_char('\n');
+    
+    // record objects:
     for ( Object const* n=list.front(); n; n=n->next() )
     {
-        //std::clog << "writeObject " << n->reference() << '\n';
-        n->writeHeader(out, n->tag());
+        //std::clog << "write " << n->reference() << '\n';
         n->write(out);
     }
 }

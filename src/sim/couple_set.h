@@ -131,7 +131,7 @@ public:
     void writeAA(Outputter&) const;
 
     /// save objects
-    void write(Outputter&) const;
+    void writeSet(Outputter&) const;
 
     //--------------------------
 

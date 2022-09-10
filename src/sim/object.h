@@ -151,17 +151,17 @@ public:
     //--------------------------
 
     /// get mark
-    ObjectMark  mark() const { return mark_; }
+    ObjectMark mark() const { return mark_; }
     
     /// set mark
-    void mark(ObjectMark m)  { mark_ = m; }
+    void mark(ObjectMark m) { mark_ = m; }
     
     
     /// retrieve flag value
-    ObjectFlag  flag() const { return flag_; }
+    ObjectFlag flag() const { return flag_; }
     
     /// set flag (this value is not stored in trajectory files)
-    void flag(ObjectFlag f)  { flag_ = f; }
+    void flag(ObjectFlag f) { flag_ = f; }
     
     /// a random number that makes objects unique
     ObjectSignature signature() const { return signature_; }

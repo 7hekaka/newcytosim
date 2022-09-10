@@ -237,6 +237,7 @@ void SpaceLid::step()
 
 void SpaceLid::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     writeShape(out, "LLBT");
     out.writeUInt16(6);
     out.writeFloat(half_[0]);

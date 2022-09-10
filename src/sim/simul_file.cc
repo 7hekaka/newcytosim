@@ -88,16 +88,16 @@ void Simul::writeObjects(Outputter& out) const
      For example, Aster is written after Fiber, Couple after Fiber...
      This makes it easier to reconstruct the state during input.
      */
-    spaces.write(out);
-    fields.write(out);
-    fibers.write(out);
-    solids.write(out);
-    beads.write(out);
-    spheres.write(out);
-    singles.write(out);
-    couples.write(out);
-    organizers.write(out);
-    tubules.write(out);
+    spaces.writeSet(out);
+    fields.writeSet(out);
+    fibers.writeSet(out);
+    solids.writeSet(out);
+    beads.writeSet(out);
+    spheres.writeSet(out);
+    singles.writeSet(out);
+    couples.writeSet(out);
+    organizers.writeSet(out);
+    tubules.writeSet(out);
     //events.write(out);
     
     out.write("\n#section end\n#end cytosim\n");
@@ -555,9 +555,16 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 }
                 objset = findSet(section);
                 if ( !objset )
-                    std::clog << " warning: unknown section |" << section << "|\n";
+                    throw InvalidIO("unknown section |"+section+"|");
                 if ( subset && objset != subset )
                     in.skip_until("#section ");
+            }
+            // optional indication giving the number of objects in the section
+            if ( tok == "record" && objset )
+            {
+                size_t cnt = 0, sup_id = 0;
+                if ( iss >> cnt >> sup_id )
+                    objset->reserve(sup_id);
             }
             // frame start
             else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )

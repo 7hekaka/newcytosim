@@ -108,11 +108,11 @@ void FieldSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
 }
 
 
-void FieldSet::write(Outputter& out) const
+void FieldSet::writeSet(Outputter& out) const
 {
     if ( size() > 0 )
     {
-        out.writeLine("\n#section "+title());
+        out.write("\n#section "+title());
         writeObjects(out, pool_);
     }
 }

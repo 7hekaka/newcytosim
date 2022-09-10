@@ -284,7 +284,7 @@ int SimThread::loadFrame(size_t f)
     catch( Exception & e )
     {
         print_blue(std::cerr, e.brief());
-        std::cerr << e.info() << " (loading frame)\n";
+        std::cerr << e.info() << " (loading frame " << f << ")\n";
     }
     unlock();
     return r;

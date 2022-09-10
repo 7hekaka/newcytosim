@@ -77,6 +77,7 @@ void Wrist::setInteractions(Meca& meca) const
 
 void Wrist::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     sHand->write(out);
     base_.write(out);
 }

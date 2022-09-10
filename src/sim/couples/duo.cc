@@ -151,6 +151,7 @@ void Duo::stepAA()
 
 void Duo::write(Outputter& out) const
 {
+    writeHeader(out, TAG);
     out.writeUInt8(active_);
     Couple::write(out);
 }
