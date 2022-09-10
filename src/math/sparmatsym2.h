@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <string>
 
-#define SPARMAT2_COMPACTED 0
+#define SPARMAT2_COMPACTED 1
 #define SPARMAT2_USES_COLNEXT 1
 
 ///real symmetric sparse Matrix, with optimized multiplication
