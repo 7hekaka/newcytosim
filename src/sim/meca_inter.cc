@@ -3764,23 +3764,25 @@ void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
     
 #elif ( DIM == 2 )
     
+    Vector dir = segA.dir();
     Vector ab = ptB.pos() - segA.pos1();
     if ( modulo )
         modulo->fold(ab);
-    real leg = std::copysign(len*segA.lenInv(), cross(segA.diff(), ab));
-    addSideSlidingLink2D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
+    real leg = std::copysign(len*segA.lenInv(), cross(dir, ab));
+    addSideSlidingLink2D(Interpolation(segA, abs), leg, ptB, dir, weight);
     
 #else
     
+    Vector dir = segA.dir();
     Vector leg = ptB.pos() - segA.pos1();
     if ( modulo )
         modulo->fold(leg);
-    leg = cross(segA.diff(), leg);
+    leg = cross(dir, leg);
     real n = leg.norm();
     if ( n > REAL_EPSILON )
     {
         leg *= ( len * segA.lenInv() ) / n;
-        addSideSlidingLink3D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
+        addSideSlidingLink3D(Interpolation(segA, abs), leg, ptB, dir, weight);
     }
     
 #endif
@@ -4069,7 +4071,6 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
      force_B = weight * ( 1 - T T' ) ( B - S )
  
  */
-
 void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
                               Interpolation const& ptB,
                               const real len,
@@ -4081,20 +4082,25 @@ void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
     
 #elif ( DIM == 2 )
     
-    real leg = std::copysign(len*segA.lenInv(), cross(segA.diff(), ptB.pos()-segA.pos1()));
-    addSideSlidingLink2D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
+    Vector dir = segA.dir();
+    Vector ab = ptB.pos() - segA.pos1();
+    if ( modulo )
+        modulo->fold(ab);
+    real leg = std::copysign(len*segA.lenInv(), cross(dir, ab));
+    addSideSlidingLink2D(Interpolation(segA, abs), leg, ptB, dir, weight);
     
 #else
 
+    Vector dir = segA.dir();
     Vector leg = ptB.pos() - segA.pos1();
     if ( modulo )
         modulo->fold(leg);
-    leg = cross(segA.diff(), leg);
+    leg = cross(dir, leg);
     real n = leg.norm();
     if ( n > REAL_EPSILON )
     {
         leg *= ( len * segA.lenInv() ) / n;
-        addSideSlidingLink3D(Interpolation(segA, abs), leg, ptB, segA.dir(), weight);
+        addSideSlidingLink3D(Interpolation(segA, abs), leg, ptB, dir, weight);
     }
     
 #endif

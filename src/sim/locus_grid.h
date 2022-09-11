@@ -116,6 +116,9 @@ public:
     /// length of segment
     real len() const { return static_cast<Fiber const*>(obj_)->segmentation(); }
 
+    /// should return 1.0 / len()
+    real lenInv() const { return static_cast<Fiber const*>(obj_)->segmentationInv(); }
+
     /// true if the segment is the first of the Fiber
     bool isFirst() const { return ( vix_ == 0 ); }
     
@@ -296,6 +299,9 @@ private:
     
     /// check Line segment against Sphere
     void checkLL1(BigLocus const&, BigLocus const&) const;
+
+    /// check Line segment against Sphere
+    void checkLL1(BigLocus const&, BigLocus const&, float, real, real, Vector const&) const;
     
     /// check Line segment against the terminal Sphere of a Fiber
     void checkLL2(BigLocus const&, BigLocus const&) const;
@@ -458,6 +464,7 @@ public:
         Vector w = fib->midPoint(inx, 0.5);
         modulo->fold(w);
         size_t c = direct_index(w);
+        //assert_true( c == pGrid.index(w) );
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(c).emplace(fib, inx, rad, rge, w);
 #else
@@ -475,6 +482,7 @@ public:
         Vector w = mec->posPoint(inx);
         modulo->fold(w);
         size_t c = direct_index(w);
+        //assert_true( c == pGrid.index(w) );
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(c).emplace(mec, inx, rad, rad, w);
 #else

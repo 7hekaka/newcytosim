@@ -106,7 +106,7 @@ void LocusGrid::checkPP(BigPoint const& aa, BigPoint const& bb) const
     assert_true( bb.obj_->tag() != Fiber::TAG );
 
     Vector vab = bb.cen() - aa.cen();
-    const real ran = aa.rad_ + bb.rad_;
+    const float ran = aa.rad_ + bb.rad_;
 
 #if GRID_HAS_PERIODIC
     if ( modulo )
@@ -132,7 +132,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
     assert_true( aa.obj_->tag() != Fiber::TAG );
     assert_true( bb.obj_->tag() == Fiber::TAG );
 
-    const real ran = aa.rad_ + bb.rad_;
+    const float ran = aa.rad_ + bb.rad_;
     
     // determine projection of `aa` on segment `bb`:
     real ab2 = INFINITY;
@@ -188,25 +188,25 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
+void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb, float ran, real abs, real dis2, Vector const& vab) const
 {
     //std::clog << "   LL1 " << aa.obj_ << " " << bb.vertex1() << '\n';
-    assert_true( aa.obj_->tag() == Fiber::TAG );
-    assert_true( bb.obj_->tag() == Fiber::TAG );
 
-    const real ran = aa.rad_ + bb.rad_;
-    
+    //const float ran = aa.rad_ + bb.rad_;
+#if 0
     // get position of bb.vertex1() with respect to segment 'aa'
-    real dis2 = INFINITY;
+    real DIS2 = INFINITY;
     FiberSegment seg = aa.segment();
-    real abs = seg.projectPoint0(bb.pos1(), dis2);
-    
+    real ABS = seg.projectPoint0(bb.pos1(), DIS2);
+    if ( std::abs(ABS-abs) > 0.0001 )
+        printf("checkLL1  %4.2f %4.2f  %4.2f %4.2f\n", abs, ABS, dis2, DIS2);
+#endif
     if ( below(dis2, ran) &&  ((0 <= abs) & (abs <= aa.len())) )
     {
         /*
          bb.vertex1() projects inside segment 'aa'
          */
-        meca.addSideSlidingLink(seg, abs, bb.vertex1(), ran, push);
+        meca.addSideSlidingLink(aa.segment(), abs, bb.vertex1(), ran, push);
     }
     else if ( abs < 0 )
     {
@@ -218,12 +218,6 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
              */
             if ( &bb < &aa  &&  bb.isFirst() )
             {
-                Vector vab = bb.pos1() - aa.pos1();
-                
-#if GRID_HAS_PERIODIC
-                if ( modulo )
-                    modulo->fold(vab);
-#endif
                 real ab2 = vab.normSqr();
                 if ( below(ab2, ran)  &&  dot(vab, bb.diff()) >= 0 )
                     meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
@@ -235,12 +229,6 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
              Check the projection to the segment located before 'aa',
              and interact if 'bb.vertex1()' falls on the right side of it
              */
-            Vector vab = bb.pos1() - aa.pos1();
-            
-#if GRID_HAS_PERIODIC
-            if ( modulo )
-                modulo->fold(vab);
-#endif
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
                 real ab2 = vab.normSqr();
@@ -249,6 +237,27 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
             }
         }
     }
+}
+
+/** Older version */
+void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
+{
+    //std::clog << "   LL1 " << aa.obj_ << " " << bb.vertex1() << '\n';
+
+    const float ran = aa.rad_ + bb.rad_;
+
+    // get position of bb.vertex1() with respect to segment 'aa'
+    real dis2 = INFINITY;
+    FiberSegment seg = aa.segment();
+    real abs = seg.projectPoint0(bb.pos1(), dis2);
+    
+    Vector vab = bb.pos1() - aa.pos1();
+#if GRID_HAS_PERIODIC
+    if ( modulo )
+        modulo->fold(vab);
+#endif
+
+    checkLL1(aa, bb, ran, abs, dis2, vab);
 }
 
 
@@ -260,8 +269,6 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
 void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
 {
     //std::clog << "   LL2 " << aa.obj_ << " " << bb.vertex2() << '\n';
-    assert_true( aa.obj_->tag() == Fiber::TAG );
-    assert_true( bb.obj_->tag() == Fiber::TAG );
 
     const real ran = aa.rad_ + bb.rad_;
     
@@ -330,9 +337,146 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
 }
 
 
+#if ( DIM >= 3 )
 /**
  This is used to check two FiberSegment, each representing a segment of a Fiber.
  The segments are tested for intersection in 3D.
+ */
+void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
+{
+    //std::clog << aa.segment().to_string() << " " << bb.segment().to_string() << "\n";
+    assert_true( aa.obj_->tag() == Fiber::TAG );
+    assert_true( bb.obj_->tag() == Fiber::TAG );
+
+    const float ran = aa.rad_ + bb.rad_;
+
+    /*
+     in 3D, check the shortest distance between two segments, and if close
+     enough, use the result to build an interaction.
+     The code below is from FiberSegment::shortestDistanceSqr(),
+     but having it here inline allows to use the results also for checkLL1()
+     The operations could be done in single precision, or 2x2 using SIMD
+     */
+    real a, b;
+
+    //std::clog << to_string() << " " << seg.to_string() << "\n";
+    Vector a1 = aa.pos1();
+    Vector b1 = bb.pos1();
+
+    Vector daa = ( aa.pos2() - a1 ) * aa.lenInv();
+    Vector dbb = ( b1 - bb.pos2() ) * bb.lenInv(); // sign inverted on purpose
+    Vector off = b1 - a1;
+    if ( modulo )
+        modulo->fold(off);
+    // direction N of the shortest path is orthogonal to both lines
+    Vector N = cross(daa, dbb);
+    real C = dot(daa, dbb);  // cosine of angle
+
+    real iS = dot(N, N);  // sine^2
+    real D = dot(off, N);
+    real m1 = dot(off, daa);
+    real m2 = dot(off, dbb);
+    real dis2;
+    
+    if ( abs_real(iS) > 128 * REAL_EPSILON )
+    {
+        // This deals with the general case of non-parallel lines
+        iS = 1 / iS;    // 1.0 / sine^2
+        a = ( m1 - C * m2 ) * iS;
+        b = ( m2 - C * m1 ) * iS;
+        dis2 = ( D * D ) * iS;
+    }
+    else
+    {
+        // nearly parallel lines, which is unlikely in practice
+        const real len1 = aa.len();
+        const real len2 = bb.len();
+        real p1 = m1 - C * len2;
+        real p2 = m2 - C * len1;
+        // clamp inside segment and use mid-point
+        a = 0.5 * ( min_real(len1, max_real(m1, p1)) + max_real(0, min_real(m1, p1)));
+        // clamp inside segment and use mid-point
+        b = 0.5 * ( min_real(len2, max_real(m2, p2)) + max_real(0, min_real(m2, p2)));
+        dis2 = off.normSqrSub(m1);
+    }
+    
+    if ( dis2 < ran*ran )
+    {
+        FiberSegment as = aa.segment();
+        FiberSegment bs = bb.segment();
+
+        if ( as.within(a) & bs.within(b) )
+        {
+            // Since N is orthogonal to daa, we know the norm of the cross-product:
+            Vector leg = cross(daa, N) * ( copysign(ran, D) * aa.lenInv() * sqrt(iS) );
+            meca.addSideSlidingLink3D(Interpolation(as, a), leg, Interpolation(bs, b), daa, push);
+            /*
+            Vector lll = meca.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push);
+            if ( norm(leg-lll) > 0.001 )
+                std::clog << norm(leg-lll) << "   " << leg << "   " << lll << "\n";
+             */
+        }
+        
+        /* If the shortest distance between the lines is greater than 'ran', then
+          the vertices associated with this segment will also be too far to interact */
+
+        //std::clog << "   LL " << aa.obj_ << " " << bb.obj_ << '\n';
+        checkLL1(aa, bb, ran, m1, off.normSqrSub(m1), off);
+        
+        if ( aa.isLast() )
+            checkLL2(bb, aa);
+        
+        checkLL1(bb, aa, ran, m2, off.normSqrSub(m2), -off);
+        
+        if ( bb.isLast() )
+            checkLL2(aa, bb);
+    }
+}
+
+#elif 1
+
+/**
+ This is used to check two FiberSegment, each representing a segment of a Fiber.
+ This is the 2D implementation.
+ */
+void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
+{
+    assert_true( aa.obj_->tag() == Fiber::TAG );
+    assert_true( bb.obj_->tag() == Fiber::TAG );
+
+    const float ran = aa.rad_ + bb.rad_;
+    // get position of bb.vertex1() with respect to segment 'aa'
+    Vector a1 = aa.pos1();
+    Vector b1 = bb.pos1();
+
+    Vector daa = ( aa.pos2() - a1 ) * aa.lenInv();
+    Vector dbb = ( b1 - bb.pos2() ) * bb.lenInv(); // sign inverted on purpose
+    Vector off = b1 - a1;
+#if GRID_HAS_PERIODIC
+    if ( modulo )
+        modulo->fold(off);
+#endif
+    real m1 = dot(off, daa);
+    real m2 = dot(off, dbb);
+
+    //std::clog << "   LL " << aa.obj_ << " " << bb.obj_ << '\n';
+    checkLL1(aa, bb, ran, m1, off.normSqr()-m1*m1, off);
+    
+    if ( aa.isLast() )
+        checkLL2(bb, aa);
+    
+    checkLL1(bb, aa, ran, m2, off.normSqr()-m2*m2, -off);
+
+    if ( bb.isLast() )
+        checkLL2(aa, bb);
+}
+
+#else
+
+/**
+ This is a clearer version, but some calculations are duplicated in 3D:
+ checkLL1() will project point1 of segment 1 on segment 2,
+ but this calculation is already done in shortestDistanceSqr()
  */
 void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
 {
@@ -375,6 +519,8 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     if ( bb.isLast() )
         checkLL2(aa, bb);
 }
+
+#endif
 
 //------------------------------------------------------------------------------
 #pragma mark - Selections of pairs excluded from Sterics
@@ -743,7 +889,7 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
         {
             int start = offset + ( ii - list.begin() );
             compute_near_bits(bitL, bitP, xyzr, list, start);
-            //printf(" LL ");
+            //printf(" LL %i : ", __builtin_popcount(bitL));
             BigLocus const* blp = list.begin() + start;
             while ( bitL )
             {
@@ -961,8 +1107,8 @@ void LocusGrid::setSterics() const
         BigLocusList& base = cell_list(inx);
         if ( base.size() > 0 )
         {
+            setSterics0(base);
 #if ( DIM == 3 ) && USE_SIMD
-            setStericsX(base);
             for ( int reg = 1; reg < nr; ++reg )
             {
                 BigLocusList& side = cell_list(inx+region[reg]);
@@ -975,7 +1121,6 @@ void LocusGrid::setSterics() const
                 }
             }
 #else
-            setStericsT(base);
             for ( int reg = 1; reg < nr; ++reg )
             {
                 BigLocusList& side = cell_list(inx+region[reg]);
