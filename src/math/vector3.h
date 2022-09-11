@@ -330,6 +330,12 @@ public:
         return XX*XX + YY*YY + ZZ*ZZ;
     }
     
+    /// the square of the standard norm, minus TT*TT
+    real normSqrSub(const real& TT) const
+    {
+        return ( XX*XX + YY*YY ) + ( ZZ*ZZ - TT*TT );
+    }
+
     /// the square of the norm
     friend real normSqr(Vector3 const& V)
     {

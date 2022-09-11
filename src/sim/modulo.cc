@@ -93,6 +93,43 @@ void Modulo::foldOffset(Vector& pos, Vector& off) const
 }
 
 
+void Modulo::fold_float(float* vec) const
+{
+#if ( DIM > 2 )
+    if ( mMode == PERIODIC_XYZ )
+    {
+        vec[0] = std::remainderf(vec[0], period_[0]);
+        vec[1] = std::remainderf(vec[1], period_[1]);
+        vec[2] = std::remainderf(vec[2], period_[2]);
+        return;
+    }
+#endif
+#if ( DIM > 1 )
+    if ( mMode == PERIODIC_XY )
+    {
+        //printf("fold(%6.2f %6.2f / %6.2f", vec[0], ref[0], period_[0]);
+        vec[0] = std::remainderf(vec[0], period_[0]);
+        vec[1] = std::remainderf(vec[1], period_[1]);
+        //printf(" : %6.2f)\n", vec[0]);
+        return;
+    }
+#endif
+    if ( mMode == PERIODIC_X )
+    {
+        vec[0] = std::remainderf(vec[0], period_[0]);
+        return;
+    }
+
+    if ( mMode & 1 ) vec[0] = std::remainderf(vec[0], period_[0]);
+#if ( DIM > 1 )
+    if ( mMode & 2 ) vec[1] = std::remainderf(vec[1], period_[1]);
+#endif
+#if ( DIM > 2 )
+    if ( mMode & 4 ) vec[2] = std::remainderf(vec[2], period_[2]);
+#endif
+}
+
+
 void Modulo::fold_float(float* vec, float const* ref) const
 {
 #if ( DIM > 2 )

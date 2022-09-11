@@ -2064,7 +2064,7 @@ void Meca::addLink4(Interpolation const& pti,
 
 void Meca::addLongLink1(Mecapoint const& ptA,
                         Mecapoint const& ptB,
-                        Vector& axi,
+                        Vector const& axi,
                         const real ab2,
                         const real len,
                         const real weight)
@@ -2083,9 +2083,9 @@ void Meca::addLongLink1(Mecapoint const& ptA,
     const real wab = -weight / ab2;
     MatrixBlock wT = MatrixBlock::outerProduct(axi, wab);
     
-    axi *= ( wab * len ) * abn;
-    add_base(aa, axi);
-    sub_base(bb, axi);
+    Vector tmp = axi * (( wab * len ) * abn);
+    add_base(aa, tmp);
+    sub_base(bb, tmp);
     
     if ( modulo )
     {
@@ -2118,7 +2118,7 @@ This streamlined version of addLongLink() is used for Steric interaction, with:
 */
 void Meca::addLongLink2(Mecapoint const& ptA,
                         Mecapoint const& ptB,
-                        Vector& axi,
+                        Vector const& axi,
                         const real ab2,
                         const real len,
                         const real weight)
@@ -2146,9 +2146,9 @@ void Meca::addLongLink2(Mecapoint const& ptA,
     else
         wT = MatrixBlock::offsetOuterProduct(wla-weight, axi, -wla*iab);
     
-    axi *= wla;
-    sub_base(aa, axi);
-    add_base(bb, axi);
+    Vector tmp = axi * wla;
+    sub_base(aa, tmp);
+    add_base(bb, tmp);
     
     if ( modulo )
     {

@@ -34,9 +34,9 @@ static void termination_handler()
 static void signal_handler(int sig)
 {
     ssize_t __attribute__((unused)) u;
-    u = write(STDERR_FILENO, "\n* * * * *\n", 11);
+    u = write(STDERR_FILENO, "\n*  *  *  *  *\n", 15);
     psignal((unsigned)sig, "Cytosim");
-    u = write(STDERR_FILENO, "* * * * *\n", 10);
+    u = write(STDERR_FILENO, "*  *  *  *  *\n", 14);
     print_backtrace();
     _exit(sig);
 }

@@ -556,8 +556,9 @@ public:
     size_t direct_index2D(const real x, const real y) const
     {
         assert_true( map(0, x) < mDim[0] );
-        assert_true( map(1, y) < mDim[1] );
-        return (size_t)map(0, x) + mDim[0]*(size_t)map(1, y);
+        // clamping is necessary for semi-periodic condition
+        size_t Y = imagei_clamped(mDim[1], map(1, y));
+        return (size_t)map(0, x) + mDim[0]*Y;
     }
 
     /// return index of cell corresponding to position (x, y, z), if ORD==3
@@ -565,8 +566,9 @@ public:
     {
         assert_true( map(0, x) < mDim[0] );
         assert_true( map(1, y) < mDim[1] );
-        assert_true( map(2, z) < mDim[2] );
-        return (size_t)map(0, x) + mDim[0]*(size_t)map(1, y) + mDim[1]*(size_t)map(2, z);
+        // clamping is necessary for semi-periodic condition
+        size_t Z = imagei_clamped(mDim[2], map(2, z));
+        return (size_t)map(0, x) + mDim[0]*((size_t)map(1, y) + mDim[1]*Z);
     }
 
     //--------------------------------------------------------------------------

@@ -288,6 +288,12 @@ public:
         return XX*XX + YY*YY;
     }
     
+    /// the square of the standard norm, minus TT*TT
+    real normSqrSub(const real& TT) const
+    {
+        return ( XX*XX + YY*YY ) - TT*TT;
+    }
+
     /// the square of the norm
     friend real normSqr(Vector2 const& V)
     {

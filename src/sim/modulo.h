@@ -66,6 +66,9 @@ public:
     /// set `pos` to its canonical image, and return offset = pos - fold(pos)
     void foldOffset(Vector& pos, Vector& off) const;
     
+    /// shift `pos` to its canonical image
+    void fold_float(float* pos) const;
+
     /// shift `pos` to its image which is closest to `ref`
     void fold_float(float* pos, float const* ref) const;
 
