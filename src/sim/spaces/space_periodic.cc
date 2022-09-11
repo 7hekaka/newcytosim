@@ -46,14 +46,14 @@ void SpacePeriodic::boundaries(Vector& inf, Vector& sup) const
 
 Vector SpacePeriodic::bounce(Vector const& pos) const
 {
-    real X = fold_real(pos.XX, modulo_.period_[0]);
+    real X = modulo_.fold_(pos.XX, 0);
 #if ( DIM == 2 )
-    real Y = fold_real(pos.YY, modulo_.period_[1]);
+    real Y = modulo_.fold_(pos.YY, 1);
     return Vector(X, Y);
 #endif
 #if ( DIM > 2 )
-    real Y = fold_real(pos.YY, modulo_.period_[1]);
-    real Z = fold_real(pos.ZZ, modulo_.period_[2]);
+    real Y = modulo_.fold_(pos.YY, 1);
+    real Z = modulo_.fold_(pos.ZZ, 2);
     return Vector(X, Y, Z);
 #endif
     return Vector(X, 0, 0);

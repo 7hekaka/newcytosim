@@ -31,7 +31,7 @@ SimThread::SimThread(Simul* sim)
     repeat_ = 0;
     hold_   = 0;
     holding_= 0;
-    period_ = 1;
+    cycle_ = 1;
     pthread_mutex_init(&mutex_, nullptr);
     pthread_cond_init(&condition_, nullptr);
     config_code = nullptr;
@@ -83,7 +83,7 @@ void SimThread::hold()
     if ( repeat_ == -1 )
         pthread_exit(nullptr);
     
-    if ( ++hold_ >= period_ )
+    if ( ++hold_ >= cycle_ )
     {
         hold_ = 0;
         //debug("holding");

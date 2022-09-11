@@ -92,12 +92,12 @@ void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 Vector SpaceStrip::bounce(Vector const& pos) const
 {
 #if ( DIM >= 3 )
-    real X = fold_real(pos.XX, modulo_.period_[0]);
-    real Y = fold_real(pos.YY, modulo_.period_[1]);
+    real X = modulo_.fold_(pos.XX, 0);
+    real Y = modulo_.fold_(pos.YY, 1);
     real Z = bounce1(pos.ZZ, bot_, top_-bot_);
     return Vector(X, Y, Z);
 #elif ( DIM > 1 )
-    real X = fold_real(pos.XX, modulo_.period_[0]);
+    real X = modulo_.fold_(pos.XX, 0);
     real Y = bounce1(pos.YY, bot_, top_-bot_);
     return Vector(X, Y);
 #endif

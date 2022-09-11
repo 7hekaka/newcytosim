@@ -44,7 +44,7 @@ private:
     unsigned int hold_;
     
     /// period for hold()
-    unsigned int period_;
+    unsigned int cycle_;
     
     /// Reader used to access frames in a trajectory file
     FrameReader reader_;
@@ -139,7 +139,7 @@ public:
 #endif
     
     /// set how many 'hold()' are necessary to halt the thread
-    void period(unsigned int c) { period_ = c; }
+    void period(unsigned int c) { cycle_ = c; }
     
     /// true if child thread is running
     bool alone() const { return status_; }

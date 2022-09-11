@@ -152,7 +152,7 @@ Vector SpaceCylinderP::bounce(Vector const& pos) const
         return bounceOnEdges(pos);
     
     Vector P = pos;
-    P.XX = fold_real(pos.XX, modulo_.period_[0]);
+    P.XX = modulo_.fold_(pos.XX, 0);
     return P;
 }
 

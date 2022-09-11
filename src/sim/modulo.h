@@ -23,10 +23,37 @@ class Modulo
 public:
     
     /// the period in each dimension
-    real  period_[4];
+    real period_[4];
     
+    /// inverse of the period in each dimension
+    real inv_period_[4];
+
     /// bitfield indicating the dimensions that are periodic
     int   mMode;
+
+    
+    /// adjust 'x' to canonical image in dimension i
+    inline real fold_(const real x, int i) const
+    {
+        const real P = period_[i];
+        //return std::remainder(x, P);
+        int Q = std::round(x * inv_period_[i]);
+        /*
+        real y = std::remainder(x, P);
+        if ( std::abs(y-x+Q*P) > 0.001 )
+            std::clog << "   " << x-Q*P << "   " << y << "\n";
+         */
+        return x - Q * P;
+    }
+    
+    /// adjust 'x' to canonical image in dimension i
+    inline float foldf(const float x, int i) const
+    {
+        const float P = period_[i];
+        //return std::remainderf(x, P);
+        int Q = std::roundf(x * inv_period_[i]);
+        return x - Q * P;
+    }
 
 public:
     
