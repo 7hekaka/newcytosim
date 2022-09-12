@@ -1233,12 +1233,16 @@ namespace gle
         idx[0] = i+s; i += setTube(ptr+i, 1, 0, 1);
         idx[1] = i+s; i += setTube(ptr+i, 2, 0, 1);
         idx[2] = i+s; i += setTube(ptr+i, 4, 0, 1);
-        idx[3] = i+s; i += setTube(ptr+i, 4, 0, 1+E);
-        idx[4] = i+s; i += setTube(ptr+i, 4,-E, 1+E);
-        idx[5] = i+s; i += setTube(ptr+i, 4,-E, 1);
-        idx[6] = i+s; i += setTube(ptr+i, 1, B, T);
+        idx[3] = i+s; i += setTube(ptr+i, 8, 0, 1);
+
+        idx[4] = i+s; i += setTube(ptr+i, 4, 0, 1+E); // tubeS
+        idx[5] = i+s; i += setTube(ptr+i, 4,-E, 1+E); // tubeM
+        idx[6] = i+s; i += setTube(ptr+i, 4,-E, 1);   // tubeE
+        
+        idx[7] = i+s; i += setTube(ptr+i, 1, B, T);
         idx[8] = i+s; i += setTube(ptr+i, 2, B, T);
         idx[9] = i+s; i += setTube(ptr+i, 4, B, T);
+        
         idx[10] = i+s; i += setTube(ptr+i, 1, 0, T);
         idx[11] = i+s; i += setTube(ptr+i, 2, 0, T);
         idx[12] = i+s; i += setTube(ptr+i, 4, 0, T);
@@ -1256,6 +1260,7 @@ namespace gle
         return ptr + i;
     }
 
+    /// return essentially finesse * 24 / inc
     inline size_t nbTrianglesTube(size_t inc)
     {
         return 2 * ( 1 + pi_twice / inc );
@@ -1272,15 +1277,20 @@ namespace gle
     void tube1()         { doTubeStrip(tubes_[0], nbTrianglesTube(1)); }
     void tube2()         { doTubeStrip(tubes_[1], nbTrianglesTube(2)); }
     void tube4()         { doTubeStrip(tubes_[2], nbTrianglesTube(4)); }
-    void tubeS()         { doTubeStrip(tubes_[3], nbTrianglesTube(4)); }
-    void tubeM()         { doTubeStrip(tubes_[4], nbTrianglesTube(4)); }
-    void tubeE()         { doTubeStrip(tubes_[5], nbTrianglesTube(4)); }
+    void tube8()         { doTubeStrip(tubes_[3], nbTrianglesTube(8)); }
+
+    void tubeS()         { doTubeStrip(tubes_[4], nbTrianglesTube(4)); }
+    void tubeM()         { doTubeStrip(tubes_[5], nbTrianglesTube(4)); }
+    void tubeE()         { doTubeStrip(tubes_[6], nbTrianglesTube(4)); }
+    
     void longTube1()     { doTubeStrip(tubes_[7], nbTrianglesTube(1)); }
     void longTube2()     { doTubeStrip(tubes_[8], nbTrianglesTube(2)); }
     void longTube4()     { doTubeStrip(tubes_[9], nbTrianglesTube(4)); }
+    
     void halfTube1()     { doTubeStrip(tubes_[10], nbTrianglesTube(1)); }
     void halfTube2()     { doTubeStrip(tubes_[11], nbTrianglesTube(2)); }
     void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
+    
     void cone1()         { doTubeStrip(tubes_[13], nbTrianglesTube(2)); }
     void cone2()         { doTubeStrip(tubes_[14], nbTrianglesTube(1)); }
     void truncatedCone() { doTubeStrip(tubes_[15], nbTrianglesTube(2)); }

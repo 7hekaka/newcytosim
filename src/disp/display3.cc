@@ -211,7 +211,7 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
         dir = normalize(nxt-old);
         gym::enableClipPlane(4);
         gym::setClipPlane(4, -dir, pos);
-        gle::drawTube(old, rad, pos, gle::capedTube2);
+        gle::drawTube(old, rad, pos, gle::capedTube);
         gym::setClipPlane(4, dir, pos);
         
         // draw inner segments
@@ -224,7 +224,7 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
             dir = normalize(nxt-old);
             gym::color_front(select_color(fib, i));
             gym::setClipPlane(5, -dir, pos);
-            gle::drawTube(old, rad, pos, gle::longTube2);
+            gle::drawTube(old, rad, pos, gle::centralTube);
             gym::setClipPlane(4,  dir, pos);
         }
         gym::disableClipPlane(5);
@@ -237,12 +237,12 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
         old = 0.5 * ( nxt + pos );
         gym::enableClipPlane(4);
         gym::setClipPlane(4, -dir, old);
-        gle::drawTube(pos, rad, nxt, gle::capedTube2);
+        gle::drawTube(pos, rad, nxt, gle::capedTube);
         gym::setClipPlane(4, dir, old);
     }
     // draw last segment:
     gym::color_front(select_color(fib, last));
-    gle::drawTube(nxt, rad, pos, gle::endedTube2);
+    gle::drawTube(nxt, rad, pos, gle::endedTube);
     gym::disableClipPlane(4);
 }
 
@@ -267,7 +267,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
     gym::enableClipPlane(4);
     gym::setClipPlane(4, -dir, pos);
     if ( abs <= 0 )
-        gle::drawTube(old, rad, pos, gle::capedTube2);
+        gle::drawTube(old, rad, pos, gle::capedTube);
     else
         gle::drawTube(old, rad, pos, gle::halfTube2);
     gym::setClipPlane(4, dir, pos);
@@ -286,8 +286,8 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
         dir = normalize(nxt-old);
         gym::color_front(select_color(fib, inx++, fac));
         gym::setClipPlane(5, -dir, pos);
-        // could add a disc to close the tube: gle::endedTube2
-        gle::drawTube(old, rad, pos, gle::longTube2);
+        // could add a disc to close the tube: gle::endedTube
+        gle::drawTube(old, rad, pos, gle::centralTube);
         gym::setClipPlane(4, dir, pos);
     }
     gym::disableClipPlane(5);
@@ -297,7 +297,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
     if ( abs+inc >= fib.length() )
     {
         gym::stretchAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
-        gle::endedTube2();
+        gle::endedTube();
     }
     else
     {
@@ -529,14 +529,14 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         if ( inx == fib.lastSegment() )
         {
             gym::setClipPlane(5, (A-B)*iseg, (A+B)*0.5);
-            gle::drawTube(A, rad, B, gle::capedTube2);
+            gle::drawTube(A, rad, B, gle::capedTube);
             gym::setClipPlane(5, (B-A)*iseg, (A+B)*0.5);
-            gle::drawTube(B, rad, A, gle::endedTube2);
+            gle::drawTube(B, rad, A, gle::endedTube);
         }
         else
         {
             gym::setClipPlane(5, (A-B)*iseg, B);
-            gle::drawTube(A, rad, B, gle::capedTube2);
+            gle::drawTube(A, rad, B, gle::capedTube);
         }
         gym::disableClipPlane(5);
         return;
@@ -550,7 +550,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     {
         gym::enableClipPlane(4);
         gym::setClipPlane(4, (B-A)*iseg, A);
-        gle::drawTube(B, rad, A, gle::endedTube2);
+        gle::drawTube(B, rad, A, gle::endedTube);
         gym::disableClipPlane(4);
         return;
     }
@@ -561,7 +561,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     
     gym::enableClipPlane(5);
     gym::enableClipPlane(4);
-    gle::drawTube(A, rad, B, gle::longTube2);
+    gle::drawTube(A, rad, B, gle::centralTube);
     gym::disableClipPlane(4);
     gym::disableClipPlane(5);
 #else

@@ -135,24 +135,22 @@ namespace gle
     /// display 3 arrow fins aligned with the Z axis, or radius 1, lenth 2, Z=[-0.5, 1.5]
     void arrowTail();
 
-    /// draw an open tube along Z, of diameter 1 and length 1
+    /// draw an very nice open tube along Z, of diameter 1 and length 1
     void tube1();
-    /// draw an open tube along Z, of diameter 1 and length 1
+    /// draw a nice open tube along Z, of diameter 1 and length 1
     void tube2();
+    /// draw an open tube along Z, of radius 1 and length 1
+    void tube4();
+    /// draw a rough open tube along Z, of radius 1 and length 1
+    void tube8();
+
     /// draw an open tube along Z, of radius 1 covering Z [0, 1+epsilon]
     void tubeS();
     /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1+epsilon]
     void tubeM();
     /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1]
     void tubeE();
-    /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1+epsilon]
-    void doubleTubeE();
-    /// draw an open tube along Z, of radius 1 covering Z [0, 1+epsilon]
-    void doubleTubeF();
-    /// draw a nice open tube along Z, of radius 1 and length 1
-    void tube4();
-    /// draw a nicer open tube along Z, of radius 1 and length 1
-    void tube8();
+    
     /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube1();
     /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
@@ -235,21 +233,13 @@ namespace gle
     /// draw a sphere of radius 1 that has an openning at Z > 0.5
     void opensphere();
 
-#if 1
-    /// primitives to draw the MINUS ends of fibers:
-    inline void capedTube1() { halfTube1(); hemisphere1(); }
-    inline void capedTube2() { halfTube2(); hemisphere2(); }
-    inline void capedTube4() { halfTube4(); hemisphere4(); }
-#else
-    /// primitives to draw the MINUS ends of fibers:
-    inline void capedTube1() { halfTube1(); discBottom1(); }
-    inline void capedTube2() { halfTube2(); discBottom2(); }
-    inline void capedTube4() { halfTube4(); discBottom2(); }
-#endif
-    /// primitives to draw the PLUS ends of fibers:
-    inline void endedTube1() { halfTube1(); discBottom1(); }
-    inline void endedTube2() { halfTube2(); discBottom2(); }
-    inline void endedTube4() { halfTube4(); discBottom2(); }
+    /// primitive used to draw the central segments of fibers
+    inline void centralTube() { longTube4(); }
+    /// primitive used to draw the MINUS ends of fibers
+    inline void capedTube() { halfTube4(); hemisphere4(); }
+    //inline void capedTube() { halfTube2(); discBottom2(); }
+    /// primitive used to draw the PLUS ends of fibers
+    inline void endedTube() { halfTube4(); discBottom2(); }
 
     //------------------------------------------------------------------------------
     #pragma mark -
