@@ -74,7 +74,7 @@ void Couple::changeProperty(CoupleProp * p)
 }
 
 /**
- Returns the configuration of a crosslink, in discrete categories
+ Returns the configuration of a crosslink, in discrete categories within [0, 6]
      Links on the side of the filaments:
          0 - Parallel if cos(filament1, filament2) > 0.5
          1 - Antiparallel if cos(filament1, filament2) < -0.5
@@ -84,7 +84,7 @@ void Couple::changeProperty(CoupleProp * p)
          4 - V-plus
          5 - T-minus
          6 - V-minus
- by Jamie Li Rickman, ~2017
+ by Jamie Li Rickman, Francis Crick Institute, London ~2017
  */
 int Couple::configuration(real len, real max_cos) const
 {
@@ -92,16 +92,16 @@ int Couple::configuration(real len, real max_cos) const
     int m = (cHand1->abscissaFrom(MINUS_END) < len) + (cHand2->abscissaFrom(MINUS_END) < len);
     
     if ( p > 0 )
-        return 2+p;  // T-plus and V-plus
+        return 2+p; // T-plus and V-plus
     
     if ( m > 0 )
-        return 4+m;  // T-minus and V-minus
+        return 4+m; // T-minus and V-minus
 
     real c = cosAngle();
     if ( c > max_cos ) // angle < PI/3
-        return 0; // P
+        return 0; // P = parallel
     if ( c < -max_cos ) // angle > 2PI/3
-        return 1; // A
+        return 1; // A = anti-parallel
     
     return 2; // X
 }

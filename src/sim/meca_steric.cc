@@ -49,7 +49,8 @@ void Meca::selectStericEngine(Simul const& sim)
                 real est = sim.minimumStericRange();
                 setStericGrid(pointGrid, spc, sim.prop.steric_max_range, est);
             }
-
+            break;
+            
         case 2:
             locusGrid.stiffness(sim.prop.steric_stiff_push[0]);
             if ( !locusGrid.hasGrid() )
@@ -57,6 +58,7 @@ void Meca::selectStericEngine(Simul const& sim)
                 real est = sim.minimumStericRange();
                 setStericGrid(locusGrid, spc, sim.prop.steric_max_range, est);
             }
+            break;
     }
 }
 

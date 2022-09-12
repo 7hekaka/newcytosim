@@ -61,7 +61,7 @@ void PointGrid::createCells()
     pGrid.createSideRegions(1);
     
     //report the grid size used
-    pGrid.printSummary(Cytosim::log, "   StericGrid");
+    pGrid.printSummary(Cytosim::log, "   PointGrid");
 }
 
 
