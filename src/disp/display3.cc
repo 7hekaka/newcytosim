@@ -568,7 +568,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     gym::stretchAlignZ(A, B, rad);
     gle::tube4();
     if ( inx == 0 )
-        gle::hemisphere4();
+        gle::hemisphere();
     if ( inx == fib.lastSegment() )
         gle::discTop2();
 #endif

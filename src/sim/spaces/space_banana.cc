@@ -213,12 +213,12 @@ void SpaceBanana::draw3D() const
     //right cap:
     gym::transScale(bEnd[0], bEnd[1], 0, R);
     gym::setClipPlane(4, C, S, 0, 0);
-    gle::sphere8();
+    gle::sphere();
 
     //left cap:
     gym::transScale(-bEnd[0], bEnd[1], 0, R);
     gym::setClipPlane(4, -C, S, 0, 0);
-    gle::sphere8();
+    gle::sphere();
 
     gym::disableClipPlane(4);
 }

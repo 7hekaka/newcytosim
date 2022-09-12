@@ -210,28 +210,33 @@ namespace gle
     /// do not draw
     void nothing();
     
+    /// draw a rough sphere of radius 1 at the origin
+    void sphere8();
     /// draw a sphere of radius 1 at the origin
-    void sphere1();
+    void sphere4();
     /// draw a nice sphere of radius 1 at the origin
     void sphere2();
     /// draw a very nice sphere of radius 1 at the origin
-    void sphere4();
-    /// draw a refined sphere of radius 1 at the origin
-    void sphere8();
+    void sphere1();
     
     void dualPassSphere1();
     void dualPassSphere2();
     void dualPassSphere4();
     void dualPassSphere8();
 
-    /// draw half a sphere of radius 1 in Z < 0
+    /// draw a very nice half-sphere of radius 1 in Z < 0
     void hemisphere1();
     /// draw a nice half-sphere of radius 1 in Z < 0
     void hemisphere2();
-    /// draw a very nice half-sphere of radius 1 in Z < 0
+    /// draw half a sphere of radius 1 in Z < 0
     void hemisphere4();
+    
     /// draw a sphere of radius 1 that has an openning at Z > 0.5
     void opensphere();
+    /// draw nicest sphere available
+    inline void sphere() { sphere1(); }
+    /// draw nicest hemisphere available
+    inline void hemisphere() { hemisphere1(); }
 
     /// primitive used to draw the central segments of fibers
     inline void centralTube() { longTube4(); }

@@ -123,7 +123,7 @@ void Display::drawBallT(Vector const& pos, real rad, gym_color const& col) const
     gym::transScale(pos, rad);
     gym::enableLighting();
     gym::color_both(col);
-    gle::dualPassSphere2();
+    gle::dualPassSphere4();
 }
 
 
@@ -2022,7 +2022,7 @@ void Display::drawSphereT(Sphere const& obj) const
         gym::enableLighting();
         gym::transRotate(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C);
         if ( disp->style & 1 )
-            gle::dualPassSphere4();
+            gle::dualPassSphere2();
         if ( disp->style & 4 )
             gle::threeArrowStrip(0.5, 1);
 #endif

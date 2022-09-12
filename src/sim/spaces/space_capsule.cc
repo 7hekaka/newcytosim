@@ -289,7 +289,7 @@ void SpaceCapsule::draw3D() const
 
     //right side:
     gym::transAlignZX(L, R, -R);
-    gle::hemisphere4();
+    gle::hemisphere();
     if ( prop->disp && prop->disp->visible & 4 )
         gle::arrowStrip(0.5, 2);
 
@@ -298,7 +298,7 @@ void SpaceCapsule::draw3D() const
 
     //left side:
     gym::transAlignZX(-L, R, R);
-    gle::hemisphere4();
+    gle::hemisphere();
     if ( prop->disp && prop->disp->visible & 4 )
         gle::arrowStrip(0.5, 2);
 }

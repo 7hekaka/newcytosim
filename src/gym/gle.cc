@@ -1376,15 +1376,17 @@ namespace gle
         glDisableClientState(GL_NORMAL_ARRAY);
     }
 
-    void sphere1()     { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
-    void sphere2()     { drawIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
-    void sphere4()     { drawIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
-    void sphere8()     { drawIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
+    void sphere1() { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
+    void sphere2() { drawIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
+    void sphere4() { drawIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
+    void sphere8() { drawIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
+    
     void hemisphere1() { drawIcoBuffer(ico_pts_[4], ico_idx_[4], ico_cnt_[4]); }
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
+
     void opensphere()  { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
-    
+
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
@@ -1410,15 +1412,16 @@ namespace gle
     
     void setBuffers()
     {
-        Tesselator ico[8];
+        Tesselator ico[10];
         size_t f = std::max(1UL, finesse/2);
-        ico[0].buildIcosahedronZ(f);
-        ico[1].buildIcosahedronZ(finesse);
-        ico[2].buildIcosahedronZ(finesse*2);
-        ico[3].buildIcosahedronZ(finesse*4);
-        ico[4].buildHemisphere(f);
+        ico[0].buildIcosahedronZ(finesse*4);
+        ico[1].buildIcosahedronZ(finesse*2);
+        ico[2].buildIcosahedronZ(finesse);
+        ico[3].buildIcosahedronZ(f);
+
+        ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
-        ico[6].buildHemisphere(finesse*2);
+        ico[6].buildHemisphere(f);
         ico[7].buildOpensphere(finesse);
 
         f = 32; // for setIcoidBuffer

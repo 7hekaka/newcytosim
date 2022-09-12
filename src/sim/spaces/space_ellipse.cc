@@ -251,7 +251,7 @@ void SpaceEllipse::draw3D() const
     const float Z(T+((DIM>2)?radius_[2]:1));
 
     gym::scale(X, Y, Z);
-    gle::sphere8();
+    gle::sphere();
 }
 
 #else

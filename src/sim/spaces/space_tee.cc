@@ -465,7 +465,7 @@ void SpaceTee::draw3D() const
     gym::translate(L, 0, 0);
     gym::rotateY(0, -1);
     gle::halfTube1();
-    gle::hemisphere4();
+    gle::hemisphere();
 
     //left side:
     gym::transScale(J, 0, 0, R);
@@ -474,7 +474,7 @@ void SpaceTee::draw3D() const
     gym::translate(-L, 0, 0);
     gym::rotateY(0, 1);
     gle::halfTube1();
-    gle::hemisphere4();
+    gle::hemisphere();
 
     //the arm:
     gym::transScale(J, 0, 0, R);
@@ -483,7 +483,7 @@ void SpaceTee::draw3D() const
     gym::translate(0, A, 0);
     gym::rotateX(0, 1);
     gle::halfTube1();
-    gle::hemisphere4();
+    gle::hemisphere();
 
     gym::disableClipPlane(4);
     gym::disableClipPlane(5);
