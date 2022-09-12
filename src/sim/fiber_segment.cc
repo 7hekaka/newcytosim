@@ -205,11 +205,11 @@ real FiberSegment::shortestDistanceSqr(FiberSegment const& seg, real& abs1, real
     real m2 = dot(off, d22);
     
 #if ( DIM > 2 )
-    Vector N = cross(d11, d22);
-    real iS = N.normSqr();  // sine^2
-    // direction N of the shortest path is orthogonal to both lines, thus
-    // distance between lines = dot(off, N) / N.norm()
-    real DD = dot(off, N);
+    Vector axis = cross(d11, d22);
+    real iS = axis.normSqr();  // sine^2
+    // direction axis of the shortest path is orthogonal to both lines, thus
+    // distance between lines = dot(off, axis) / axis.norm()
+    real DD = dot(off, axis);
 #else
     real iS = square(cross(d11, d22));  // sine^2
 #endif

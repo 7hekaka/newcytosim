@@ -113,11 +113,17 @@ public:
     /// offset = point1 - point0
     Vector prevDiff() const { return obj_->diffPoints(vix_-1); }
     
+    ///
+    Fiber const* fiber() const { return static_cast<Fiber const*>(obj_); }
+    
     /// length of segment
-    real len() const { return static_cast<Fiber const*>(obj_)->segmentation(); }
+    real len() const { return fiber()->segmentation(); }
 
     /// should return 1.0 / len()
-    real lenInv() const { return static_cast<Fiber const*>(obj_)->segmentationInv(); }
+    real lenInv() const { return fiber()->segmentationInv(); }
+    
+    /// true if abscissa 'a', counted from point 0 is within the segment
+    bool within(real a) const { return ( 0 <= a ) & ( a <= fiber()->segmentation() ); }
 
     /// true if the segment is the first of the Fiber
     bool isFirst() const { return ( vix_ == 0 ); }
@@ -132,7 +138,7 @@ public:
     Mecapoint vertex2() const { return Mecapoint(obj_, vix_+1); }
     
     /// FiberSegment
-    FiberSegment segment() const { return FiberSegment(static_cast<Fiber const*>(obj_), vix_); }
+    FiberSegment segment() const { return FiberSegment(fiber(), vix_); }
 
 };
 
@@ -301,7 +307,7 @@ private:
     void checkLL1(BigLocus const&, BigLocus const&) const;
 
     /// check Line segment against Sphere
-    void checkLL1(BigLocus const&, BigLocus const&, float, real, real, Vector const&) const;
+    void checkLL1H(BigLocus const&, BigLocus const&, float, real, Vector const&) const;
     
     /// check Line segment against the terminal Sphere of a Fiber
     void checkLL2(BigLocus const&, BigLocus const&) const;
