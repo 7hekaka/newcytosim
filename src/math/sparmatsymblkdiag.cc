@@ -2035,7 +2035,7 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
     
     // process off-diagonal elements:
     for ( size_t j = colix_[0]; j < rsize_; j = colix_[j+1] )
-        pilar_[j].vecMulAddTriangle2D(X, Y, 3*j);
+        pilar_[j].vecMulAddTriangle2D(X, Y, 2*j);
     
 #else
     zero_real(SD_BLOCK_SIZE*rsize_, Y);
