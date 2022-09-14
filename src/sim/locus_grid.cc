@@ -183,14 +183,13 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
 
 
 /**
- This is used to check a segment of a fiber against another segment of fiber,
- not including the terminal vertex of fibers.
+ This is used to check vertex 1 of segment 'aa' against vertex 1 of segment 'bb'
  
  The interaction is applied only if the vertex projects 'inside' the segment.
  */
-void LocusGrid::checkLL1H(BigLocus const& aa, BigLocus const& bb, float ran, real abs, Vector const& vab) const
+void LocusGrid::checkLLP1(BigLocus const& aa, BigLocus const& bb, float ran, real abs, Vector const& vab) const
 {
-    //std::clog << "   LL1 " << aa.obj_ << " " << bb.vertex1() << '\n';
+    //std::clog << "   LLP1 " << aa.obj_ << " " << bb.vertex1() << '\n';
 
     //const float ran = aa.rad_ + bb.rad_;
     if ( aa.isFirst() )
@@ -218,6 +217,58 @@ void LocusGrid::checkLL1H(BigLocus const& aa, BigLocus const& bb, float ran, rea
             if ( below(ab2, ran) )
                 meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
         }
+    }
+}
+
+/**
+ This is used to check vertex 1 of segment 'aa' against vertex 2 of segment 'bb'
+ and vertex 2 of segment 'aa' against vertex 2 of segment 'bb'
+
+ The interaction is applied only if the vertex projects 'inside' the segment.
+ */
+void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, real abs, Vector const& vab) const
+{
+    //std::clog << "   LLP2 " << aa.obj_ << " " << bb.vertex2() << '\n';
+    
+    //const real ran = aa.rad_ + bb.rad_;
+    if ( abs < 0 )
+    {
+        if ( aa.isFirst() )
+        {
+            assert_true(bb.isLast());
+            real ab2 = vab.normSqr();
+
+            if ( below(ab2, ran)  && dot(vab, bb.diff()) <= 0 )
+                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
+        }
+        else
+        {
+            if ( dot(vab, aa.prevDiff()) >= 0 )
+            {
+                real ab2 = vab.normSqr();
+                if ( below(ab2, ran) )
+                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
+            }
+        }
+    }
+    else if (( &bb < &aa ) & aa.isLast() )
+    {
+        /*
+         Check the projection of aa.vertex2(),
+         on the segment represented by 'bb'
+         */
+        assert_true(abs > aa.len());
+        assert_true(bb.isLast());
+        
+        Vector dab = bb.pos2() - aa.pos2();
+#if GRID_HAS_PERIODIC
+        if ( modulo )
+            modulo->fold(dab);
+#endif
+        real ab2 = dab.normSqr();
+        
+        if ( below(ab2, ran)  &&  dot(dab, bb.diff()) <= 0 )
+            meca.addLongLink1(aa.vertex2(), bb.vertex2(), dab, ab2, ran, push);
     }
 }
 
@@ -444,11 +495,26 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
             meca.addSideSlidingLink3D(aa.interpolation(m1), leg, bb.vertex1(), daa, push);
         }
         else if ( m1 < 0 )
-            checkLL1H(aa, bb, ran, m1, off);
-        
-        if ( aa.isLast() )
-            checkLL2(bb, aa);
-        
+            checkLLP1(aa, bb, ran, m1, off);
+
+        if ( bb.isLast() )
+        {
+            // consider bb.vertex2() against segment 'aa'
+            Vector a1b2 = bb.pos2() - a1;
+            real mm = dot(daa, a1b2); // projection of b2 on segment 'aa'
+            if ( aa.within(mm) )
+            {
+                // the distance between b2 and segment `aa` is a1b2.normSqr()-mm*mm:
+                if ( below(a1b2.normSqr()-mm*mm, ran) )
+                {
+                    Vector leg = cross(daa, a1b2).normalized( ran * aa.lenInv() );
+                    meca.addSideSlidingLink3D(aa.interpolation(mm), leg, bb.vertex2(), daa, push);
+                }
+            }
+            else
+                checkLLP2(aa, bb, ran, mm, a1b2);
+        }
+
         // the distance between aa.pos1() and segment `bb` is dis2-m2*m2:
         if ( below(dis2-m2*m2, ran) && bb.within(m2) )
         {
@@ -456,10 +522,24 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
             meca.addSideSlidingLink3D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push);
         }
         else if ( m2 < 0 )
-            checkLL1H(bb, aa, ran, m2, -off);
-        
-        if ( bb.isLast() )
-            checkLL2(aa, bb);
+            checkLLP1(bb, aa, ran, m2, -off);
+
+        if ( aa.isLast() )
+        {
+            // consider aa.vertex2() against segment 'bb'
+            Vector a2b1 = b1 - aa.pos2(); // sign inverted on purpose
+            real mm = dot(dbb, a2b1); // projection of a2 on segment 'bb'
+            if ( bb.within(mm) )
+            {
+                if ( below(a2b1.normSqr()-mm*mm, ran) )
+                {
+                    Vector leg = cross(dbb, a2b1).normalized( ran * bb.lenInv() ); // two minus sign cancel out
+                    meca.addSideSlidingLink3D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push);
+                }
+            }
+            else
+                checkLLP2(bb, aa, ran, mm, -a2b1);
+        }
     }
 }
 
@@ -498,10 +578,25 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         meca.addSideSlidingLink2D(aa.interpolation(m1), leg, bb.vertex1(), daa, push);
     }
     else if ( m1 < 0 )
-        checkLL1H(aa, bb, ran, m1, off);
+        checkLLP1(aa, bb, ran, m1, off);
     
-    if ( aa.isLast() )
-        checkLL2(bb, aa);
+    if ( bb.isLast() )
+    {
+        // consider bb.vertex2() against segment 'aa'
+        Vector a1b2 = bb.pos2() - a1;
+        real mm = dot(daa, a1b2); // projection of b2 on segment 'aa'
+        if ( aa.within(mm) )
+        {
+            // the distance between b2 and segment `aa` is a1b2.normSqr()-mm*mm:
+            if ( below(a1b2.normSqr()-mm*mm, ran) )
+            {
+                real leg = std::copysign(ran*aa.lenInv(), cross(daa, a1b2));
+                meca.addSideSlidingLink2D(aa.interpolation(mm), leg, bb.vertex2(), daa, push);
+            }
+        }
+        else
+            checkLLP2(aa, bb, ran, mm, a1b2);
+    }
     
     // the distance between aa.pos1() and segment `bb` is dis2-m2*m2:
     if ( below(dis2-m2*m2, ran) && bb.within(m2) )
@@ -510,10 +605,24 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         meca.addSideSlidingLink2D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push);
     }
     else if ( m2 < 0 )
-        checkLL1H(bb, aa, ran, m2, -off);
+        checkLLP1(bb, aa, ran, m2, -off);
 
-    if ( bb.isLast() )
-        checkLL2(aa, bb);
+    if ( aa.isLast() )
+    {
+        // consider aa.vertex2() against segment 'bb'
+        Vector a2b1 = b1 - aa.pos2(); // sign inverted on purpose
+        real mm = dot(dbb, a2b1); // projection of a2 on segment 'bb'
+        if ( bb.within(mm) )
+        {
+            if ( below(a2b1.normSqr()-mm*mm, ran) )
+            {
+                real leg = std::copysign(ran*bb.lenInv(), cross(dbb, a2b1)); // two minus sign cancel out
+                meca.addSideSlidingLink2D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push);
+            }
+        }
+        else
+            checkLLP2(bb, aa, ran, mm, -a2b1);
+    }
 }
 
 #elif ( DIM == 1 )

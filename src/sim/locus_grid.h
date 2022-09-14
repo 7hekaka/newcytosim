@@ -306,17 +306,17 @@ private:
     /// check Sphere against Line segment
     void checkPL(BigPoint const&, BigLocus const&) const;
     
-    /// check Line segment against Sphere
+    /// check Line segment against vertex1 of other segment
     void checkLL1(BigLocus const&, BigLocus const&) const;
 
-    /// check Line segment against point1 of Segment
-    void checkLL1H(BigLocus const&, BigLocus const&, float, real, Vector const&) const;
-    
-    /// check Line segment against point2 of Segment
-    void checkLL2H(BigLocus const&, BigLocus const&, float, real, Vector const&) const;
-
-    /// check Line segment against the terminal Sphere of a Fiber
+    /// check Line segment against the vertex2 of other segment
     void checkLL2(BigLocus const&, BigLocus const&) const;
+
+    /// check vertex1 of segment against vertex1 of Segment
+    void checkLLP1(BigLocus const&, BigLocus const&, float, real, Vector const&) const;
+    
+    /// check vertex1 and vertex2 of segment against vertex2 of Segment
+    void checkLLP2(BigLocus const&, BigLocus const&, float, real, Vector const&) const;
     
     /// check two Line segments
     void checkLL(BigLocus const&, BigLocus const&) const;
