@@ -139,6 +139,9 @@ public:
     
     /// FiberSegment
     FiberSegment segment() const { return FiberSegment(fiber(), vix_); }
+    
+    /// return interpolation at distance 'a' from point 1
+    Interpolation interpolation(real abs) const { return Interpolation(obj_, abs*lenInv(), vix_); }
 
 };
 
@@ -306,9 +309,12 @@ private:
     /// check Line segment against Sphere
     void checkLL1(BigLocus const&, BigLocus const&) const;
 
-    /// check Line segment against Sphere
+    /// check Line segment against point1 of Segment
     void checkLL1H(BigLocus const&, BigLocus const&, float, real, Vector const&) const;
     
+    /// check Line segment against point2 of Segment
+    void checkLL2H(BigLocus const&, BigLocus const&, float, real, Vector const&) const;
+
     /// check Line segment against the terminal Sphere of a Fiber
     void checkLL2(BigLocus const&, BigLocus const&) const;
     

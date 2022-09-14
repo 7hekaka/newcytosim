@@ -5,12 +5,14 @@
 #include "mecapoint.h"
 
 
+/** This converts the dimensionfull abs into an interpolation coefficient in [0,1] */
 Interpolation::Interpolation(FiberSegment const& loc, real abs)
 {
     mec_  = loc.fiber();
     pt1_  = loc.point();
     pt2_  = loc.point()+1;
-    coef_ = abs * loc.lenInv(); /// loc.len();
+    // convert abscissa to coefficient:
+    coef_ = abs * loc.lenInv();
     assert_true( 0 <= coef_ && coef_ <= 1 );
     //coef_ = std::max((real)0, std::min((real)1, coef_));
 }
