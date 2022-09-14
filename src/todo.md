@@ -91,8 +91,10 @@ test write / read systematically on all cym files
 	+ this would speed up block addressing: 
 	+ Need to create a tuple of indices {mecaindex, pointindex}, to use as argument of add_block()
 	+ Updating the matrix can be done in parallel if Mecablocks are independent
-	+ block reordering by increasing index would only be needed within each Mecablock,
-	+ this will also permit esaier vecMul parallelization per block
+	+ column reordering by increasing index would only be needed within each Mecablock,
+	+ this will also permit vecMul parallelization per diagonal, using two output vectors:
+        each diagonal of blocks can be treated in parallel using multiple threads
+	+ todo: vecMul() takes two output vectors; SparmatSymBlock becomes rectangular
 - new Matrix33x2 two implement two consecutive blocks:
     consecutive 3x3 blocks can be handled simultaneously with SIMD vec2 operations
 - Store Mecable vertices as XXXXXXYYYYYYZZZZZZ to improve vectorization

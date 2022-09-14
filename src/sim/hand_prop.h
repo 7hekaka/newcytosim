@@ -22,7 +22,7 @@
 
  Define POOL_UNATTACHED as 1 to disable, or 4, 8 or 16 to enable.
  */
-#define POOL_UNATTACHED 4
+#define POOL_UNATTACHED 1
 
 class Hand;
 class HandMonitor;
