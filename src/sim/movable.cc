@@ -945,7 +945,7 @@ Rotation Movable::readRotation(std::istream& is)
         return Rotation::rotationAroundZ(get_angle(is));
 #else
     else if ( tok == "X" )
-        return Rotation::identity();
+        return Rotation(0, RNG.sflip());
     else if ( tok == "Z" )
         return Rotation::rotation(get_angle(is));
 #endif

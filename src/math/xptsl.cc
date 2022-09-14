@@ -1,3 +1,17 @@
+/**
+ This implements our previous idea of replacing divisions by Fused multiply-add,
+ in the tridiagonal symmetric matrix factorization codes,
+ which is implemented in alsatian_xpttrs(), combining with code from the LINPACK
+ project where reduction is bidirectional (routine dptsl).
+ 
+ LINPACK documentation has a note:
+    Because of the two-way nature of the algorithm, systems can be solved up to
+    25% faster than convention alalgorithms. Although the techniques used here
+    were independently discovered, they have been known for some time.
+    (private communications, J. H. Wilkinson).
+ 
+ Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022.
+ */
 
 /**
      sptsl given a positive definite tridiagonal matrix and a right
@@ -74,6 +88,7 @@ void linpack_xptsl(int N, real D[], const real E[], real X[])
 }
 
 
+/** Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022. */
 void alsatian_xptsl(int N, real D[], real E[], real X[])
 {
     int mid = ( N - 1 ) / 2;
@@ -138,6 +153,7 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
 }
 
 
+/** Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022. */
 void alsadual_factor(int N, real D[], real E[])
 {
     int mid = ( N - 1 ) / 2;
@@ -183,7 +199,7 @@ void alsadual_xpttrf(int size, real* D, real* E, int* INFO)
     alsadual_factor(size, D, E);
 }
 
-
+/** Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022. */
 void alsadual_xptts2(int N, const real D[], const real E[], real X[])
 {
     int mid = ( N - 1 ) / 2;

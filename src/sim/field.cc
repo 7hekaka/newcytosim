@@ -139,61 +139,112 @@ void Field::prepare()
 //------------------------------------------------------------------------------
 #pragma mark - Diffusion
 
-
-void Field::diffuseX(real * field, real c)
+/**
+ For non-periodic conditions, B is the value at the boundary,
+ which is the same on the left and right edges.
+ This uses a temporary vectors to cover just one line
+ */
+void Field::diffuseX(real * field, real D, real B)
 {
-    const auto nbc = mGrid.nbCells();
+    assert_true( mGrid.stride(0) == 1 );
+    const size_t nc = mGrid.breadth(0);
+    const size_t nyz = mGrid.nbCells() / nc;
+    const size_t off = mGrid.stride(1);
+    const size_t E = nc + 1;
 
-    size_t nx = mGrid.breadth(0);
-    size_t nyz = nbc / nx;
-    size_t ide = mGrid.stride(1);
-    
-    real * a = new_real(nyz);
-    real * b = new_real(nyz);
-    
-    // diffusion in X-direction:
-    zero_real(nyz, a);
-    for ( size_t x = 1; x < nx; ++x )
+    real * a = new_real(nc+2);
+    a[0] = B;
+    a[E] = B;
+    for ( size_t yz = 0; yz < nyz; ++yz )
     {
-        real * h = field + x - 1;
-        real * n = field + x;
-        // b = n - h
-        blas::xcopy(nyz,  n, ide, b, 1);
-        blas::xaxpy(nyz, -1, h, ide, b, 1);
-        // a = a - b
-        blas::xaxpy(nyz, -1, b, 1, a, 1);
-        // h = h - c * a
-        blas::xaxpy(nyz, -c, a, 1, h, ide);
-        // swap a and b
-        real * t = a;
-        a = b;
-        b = t;
+        real * f = field + yz * off;
+        blas::xcopy(nc, f, 1, a+1, 1);
+        if ( prop->field_periodic )
+        {
+            a[0] = f[nc-1];
+            a[E] = f[0];
+        }
+        blas::xscal(nc, 1-2*D, f, 1);
+        blas::xaxpy(nc, D, a+2, 1, f, 1);
+        blas::xaxpy(nc, D, a, 1, f, 1);
     }
-    real * h = field + nx - 1;
-    blas::xaxpy(nyz, -c, a, 1, h, ide);
-    
-    if ( prop->field_periodic )
-    {
-        real * n = field;
-        blas::xcopy(nyz,  n, ide, b, 1);
-        blas::xaxpy(nyz, -1, h, ide, b, 1);
-        blas::xaxpy(nyz,  c, b, 1, h, ide);
-        blas::xaxpy(nyz, -c, b, 1, n, ide);
-    }
-    
     free_real(a);
-    free_real(b);
 }
+
+/**
+ For non-periodic conditions, B is the value at the boundary,
+ which is the same on the left and right edges
+ */
+void Field::diffuseY(real * field, real D, real B)
+{
+    assert_true( mGrid.stride(0) == 1 );
+    const size_t nx = mGrid.breadth(0);
+    const size_t nc = mGrid.breadth(1);
+    const size_t nz = mGrid.breadth(2) + ( DIM == 2 );
+    const size_t off = mGrid.stride(1);
+    const size_t dif = mGrid.stride(2);
+    const size_t E = nc + 1;
+
+    real * a = new_real(nc+2);
+    a[0] = B;
+    a[E] = B;
+    for ( size_t x = 0; x < nx; ++x )
+    for ( size_t z = 0; z < nz; ++z )
+    {
+        real * f = field + x + dif * z;
+        blas::xcopy(nc, f, off, a+1, 1);
+        if ( prop->field_periodic )
+        {
+            a[0] = f[nc-1];
+            a[E] = f[0];
+        }
+        blas::xscal(nc, 1-2*D, f, off);
+        blas::xaxpy(nc, D, a+2, 1, f, off);
+        blas::xaxpy(nc, D, a, 1, f, off);
+    }
+    free_real(a);
+}
+
+
+void Field::diffuseZ(real * field, real D, real B)
+{
+    assert_true( mGrid.stride(0) == 1 );
+    const size_t nc = mGrid.breadth(2);
+    const size_t nxy = mGrid.breadth(0) * mGrid.breadth(1);
+    const size_t off = mGrid.stride(2);
+    assert_true( off == nxy );
+    const size_t E = nc + 1;
+
+    real * a = new_real(nc+2);
+    a[0] = B;
+    a[E] = B;
+    for ( size_t xy = 0; xy < nxy; ++xy )
+    {
+        real * f = field + xy;
+        blas::xcopy(nc, f, off, a+1, 1);
+        if ( prop->field_periodic )
+        {
+            a[0] = f[nc-1];
+            a[E] = f[0];
+        }
+        blas::xscal(nc, 1-2*D, f, off);
+        blas::xaxpy(nc, D, a+2, 1, f, off);
+        blas::xaxpy(nc, D, a, 1, f, off);
+    }
+    free_real(a);
+}
+
 
 
 void Field::laplacian(const real* field, real * mat) const
 {
     const size_t nbc = mGrid.nbCells();
-    const real sc = 2 * DIM;
-
-    for ( size_t c = 0; c < nbc; ++c )
-        mat[c] = sc * field[c];
     
+    const real diag = 2 * DIM;
+    for ( size_t c = 0; c < nbc; ++c )
+        mat[c] = diag * field[c];
+    
+    assert_true(1 == mGrid.stride(0));
     const size_t nx = mGrid.breadth(0);
 #if ( 1 )
     // derivative in the X-direction:
@@ -219,6 +270,7 @@ void Field::laplacian(const real* field, real * mat) const
 #endif
     
 #if ( DIM == 2 )
+    assert_true(nx == mGrid.stride(1));
     // derivative in the Y-direction:
     blas::xaxpy(nbc-nx, -1, field,    1, mat+nx, 1);
     blas::xaxpy(nbc-nx, -1, field+nx, 1, mat,    1);
@@ -268,7 +320,7 @@ void Field::laplacian(const real* field, real * mat) const
 #if ( DIM >= 3 )
     // derivative in the Z-direction:
     const size_t nxy = nbc / mGrid.breadth(2);
-    assert_true( nxy == ss );
+    assert_true( nxy == mGrid.stride(2) );
     blas::xaxpy(nbc-nxy, -1, field,     1, mat+nxy, 1);
     blas::xaxpy(nbc-nxy, -1, field+nxy, 1, mat,     1);
     size_t zz = mGrid.breadth(2) - 1;
@@ -383,13 +435,13 @@ void Field::step(FiberSet& fibers)
     // full grid diffusion:
     if ( prop->full_diffusion > 0 )
     {
-        real c = prop->full_diffusion * tau / ( prop->step * prop->step );
-
+        real D = prop->full_diffusion * tau / ( prop->step * prop->step );
+        real B = prop->boundary_value * cellVolume();
 #if ( DIM > 1 )
         laplacian(field, dup);
-        blas::xaxpy(nbc, -c, dup, 1, field, 1);
+        blas::xaxpy(nbc, -D, dup, 1, field, 1);
 #else
-        diffuseX(field, c);
+        diffuseX(field, D, B);
 #endif
     }
 
@@ -407,19 +459,23 @@ void Field::step(FiberSet& fibers)
         fiDiffusionMatrix.vecMulAdd(dup, field);
     }
 
-    if ( prop->boundary_condition & 1 )
-        setEdgesX(field, prop->boundary_value * cellVolume());
-    
+    if ( prop->boundary_condition )
+    {
+        real B = prop->boundary_value * cellVolume();
+        
+        if ( prop->boundary_condition & 1 )
+            setEdgesX(field, B);
+        
 #if ( DIM > 1 )
-    if ( prop->boundary_condition & 2 )
-        setEdgesY(field, prop->boundary_value * cellVolume());
+        if ( prop->boundary_condition & 2 )
+            setEdgesY(field, B);
 #endif
-    
+        
 #if ( DIM >= 3 )
-    if ( prop->boundary_condition & 4 )
-        setEdgesZ(field, prop->boundary_value * cellVolume());
+        if ( prop->boundary_condition & 4 )
+            setEdgesZ(field, B);
 #endif
-    
+    }
     
 #if ( 0 ) // disabled features below
 

@@ -53,6 +53,9 @@ public:
     /// disabled old-style constructor
     Interpolation(const Mecable*, unsigned, unsigned, real) = delete;
 
+    /// disabled constructor avoid conversions from int to real
+    Interpolation(const Mecable*, unsigned, real) = delete;
+
     /// set to interpolate given fiber segment, at abscissa `abs` in [0,1]
     Interpolation(FiberSegment const&, real abs);
     

@@ -2751,7 +2751,7 @@ Order Clusters from 1 to max, in order of decreasing size,
 and set fiber:flag() to the corresponding cluster index.
 @return number of clusters
 */
-size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, unsigned details)
+size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, size_t details)
 {
     typedef std::vector<Fiber*> list_t;
     typedef std::map<ObjectFlag, list_t> map_t;
@@ -2780,12 +2780,12 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
     {
         out << COM << "cluster_id" << SEP << "nb_fibers :" << SEP << "fiber_id";
         out << LIN << clusters.size() << " clusters:";
-    } else if ( details > 0 )
+    }
+    else if ( details > 0 )
     {
         out << COM << "cluster_id" << SEP << "nb_fibers";
         out << LIN << clusters.size() << " clusters:";
     }
-
     
     // consider clusters by decreasing size:
     size_t idx = 0;
@@ -2799,14 +2799,10 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
 
         if ( details > 0 )
         {
-            out << LIN << c.flg << SEP << c.cnt;
-            
-            if ( list.size() < details )
-            {
-                out << " :";
-                for ( Fiber * i : list )
-                    out << " " << i->identity();
-            }
+            out << LIN << c.flg << SEP << c.cnt << ":";
+            size_t cnt = std::min(list.size(), details);
+            for ( size_t i = 0; i < cnt; ++i )
+                out << " " << list[i]->identity();
         }
     }
     return idx;
@@ -2819,7 +2815,7 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
  */
 void Simul::reportClusters(std::ostream& out, Glossary& opt) const
 {
-    unsigned details = 128;
+    size_t details = 128;
     bool C = false, S = false, M = false;
 
     opt.set(details, "details");
@@ -3213,7 +3209,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         finished = 1;
 
     if ( print || finished )
-        out<<LIN<<ang<<SEP<<dis<<SEP<<K<<SEP<<X<<SEP<<Z<<SEP<<T<<SEP<<cat;
+        out<<std::setprecision(4)<<ang<<SEP<<std::setprecision(4)<<dis<<SEP<<K<<SEP<<X<<SEP<<Z<<SEP<<T<<SEP<<cat;
 }
 
 /**

@@ -119,7 +119,7 @@ protected:
     size_t  mNbCells;
     
     /// The number of cells in each dimension
-    size_t  mDim[ORD];
+    size_t  mDim[4];
     
     /// Offset between two consecutive cells along each dimension
     size_t  mStride[ORD];
@@ -233,10 +233,10 @@ public:
     /// constructor
     Map() : mDim{0}, mInf{0}, mSup{0}, cWidth{0}, cDelta{0}, mStart{0}, mPeriodic{false}
     {
-        mNbCells    = 0;
-        regionsEdge = nullptr;
-        regions     = nullptr;
-        cVolume     = 0;
+        mNbCells = 0;
+        eRegion = nullptr;
+        regions = nullptr;
+        cVolume = 0;
     }
     
     /// Free memory
@@ -430,7 +430,7 @@ public:
         for ( int d = 0; d < ORD; ++d )
         {
             coord[d] = indx % mDim[d];
-            indx    /= mDim[d];
+            indx /= mDim[d];
         }
     }
     
@@ -582,9 +582,9 @@ public:
 private:
     
     /// array of index offset to neighbors, for each edge type
-    int  * regionsEdge;
+    int  * eRegion;
     
-    /// pointers to regionsEdge[], as a function of cell index
+    /// pointers to eRegion[], as a function of cell index
     int ** regions;
     
 private:
@@ -698,10 +698,10 @@ private:
         //allocate and reset arrays:
         deleteRegions();
         
-        regions     = new int*[mNbCells];
-        regionsEdge = new int[edgeMax*(regMax+1)];
+        regions = new int*[mNbCells];
+        eRegion = new int[edgeMax*(regMax+1)];
         for ( size_t e = 0; e < edgeMax*(regMax+1); ++e )
-            regionsEdge[e] = 0;
+            eRegion[e] = 0;
         
         int ori[ORD];
         for ( size_t indx = 0; indx < mNbCells; ++indx )
@@ -709,7 +709,7 @@ private:
             setCoordinatesFromIndex(ori, indx);
             size_t e = edgeFromCoordinates(ori, range);
             assert_true( e < edgeMax );
-            int * reg = regionsEdge + e * ( regMax + 1 );
+            int * reg = eRegion + e * ( regMax + 1 );
             if ( reg[0] == 0 )
             {
                 // calculate the region for this new edge-characteristic
@@ -827,7 +827,7 @@ public:
     /// true if createRegions() or createRoundRegions() was called
     bool hasRegions() const
     {
-        return ( regions && regionsEdge );
+        return ( regions && eRegion );
     }
     
     /// set region array 'offsets' for given cell index
@@ -861,8 +861,8 @@ public:
         delete[] regions;
         regions = nullptr;
         
-        delete[] regionsEdge;
-        regionsEdge = nullptr;
+        delete[] eRegion;
+        eRegion = nullptr;
     }
 
 #pragma mark -

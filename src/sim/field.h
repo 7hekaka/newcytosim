@@ -217,9 +217,13 @@ public:
     /// calculate second derivative of field
     void laplacian(const real*, real*) const;
     
-    /// calculate second derivative of field
-    void diffuseX(real*, real);
-    
+    /// implements diffusion of the whole field in direction X
+    void diffuseX(real*, real, real);
+    /// implements diffusion of the whole field in direction Y
+    void diffuseY(real*, real, real);
+    /// implements diffusion of the whole field in direction Y
+    void diffuseZ(real*, real, real);
+
     /// set values of field on its edges
     void setEdgesX(real*, real);
     
