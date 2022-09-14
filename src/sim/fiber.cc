@@ -1793,11 +1793,11 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         Chain::read(in, sim, tag);
 #if FIBER_HAS_LATTICE
-        if ( fLattice.data() )
+        if ( fLattice.ready() )
             fLattice.setRange(abscissaM(), abscissaP());
 #endif
 #if FIBER_HAS_MESH
-        if ( fMesh.data() )
+        if ( fMesh.ready() )
             fMesh.setRange(abscissaM(), abscissaP());
 #endif
 #if BACKWARD_COMPATIBILITY < 50
