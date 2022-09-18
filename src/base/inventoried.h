@@ -34,7 +34,7 @@ public:
     
     
     /// change the identity of this object
-    void identity(ObjectID n) { ID_ = n; }
+    void setIdentity(ObjectID n) { ID_ = n; }
     
     /// returns identity (strictly positive integer, unique within each class)
     ObjectID  identity() const { return ID_; }

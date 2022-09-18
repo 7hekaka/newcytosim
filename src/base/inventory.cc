@@ -140,7 +140,7 @@ void Inventory::reassign()
         //swap:
         assert_true(!record_[nxt]);
         record_[nxt] = record_[inf];
-        record_[nxt]->identity(nxt);
+        record_[nxt]->setIdentity(nxt);
         record_[inf] = nullptr;
         ++nxt;
         ++inf;

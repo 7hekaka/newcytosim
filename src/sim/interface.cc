@@ -409,7 +409,16 @@ void Interface::new_object(ObjectList& objs, ObjectSet* set, Property const* pp,
     Vector vec;
     if ( opt.set(vec, "translation") )
         ObjectSet::translateObjects(objs, vec);
-
+    
+    // set identity if specified
+    ObjectID id = 0;
+    if ( opt.set(id, "identity") )
+    {
+        if ( set->findID(id) )
+            throw InvalidParameter("identity "+std::to_string(id)+" is already assigned");
+        objs.front()->setIdentity(id);
+    }
+    
     /* 
      Because the objects in ObjectList are not necessarily all of the same class,
      we call sim_->add() rather than directly set->add()

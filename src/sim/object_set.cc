@@ -602,7 +602,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         obj = newObject(tag, pid);
         assert_true(obj);
         update = true;
-        obj->identity(id);
+        obj->setIdentity(id);
         obj->objset(this);
         inventory_.assign(obj);
         //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
