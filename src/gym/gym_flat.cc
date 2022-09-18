@@ -173,8 +173,8 @@ void gym::fillRectangle(float L, float B, float R, float T, float Z, const float
     flute3 * flu = gym::mapBufferV3(4);
     flu[0] = {L, B, Z};
     flu[1] = {R, B, Z};
-    flu[3] = {L, T, Z};
-    flu[2] = {R, T, Z};
+    flu[2] = {L, T, Z};
+    flu[3] = {R, T, Z};
     gym::unmapBufferV3();
     gym::drawTriangleStrip(0, 4);
 }

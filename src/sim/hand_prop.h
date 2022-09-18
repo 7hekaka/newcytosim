@@ -15,12 +15,12 @@
 #define NEW_BIND_ONLY_FREE_END 0
 
 /**
- Set POOL_UNATTACHED = N to pool N successive Hand::stepF(). This will increase
- the effective diffusion and binding rates to compensate.
+ Set below POOL_UNATTACHED = N to pool N successive Hand::stepUnattached().
+ The effective diffusion coefficient and binding rates are increased to compensate.
  This can be advantageous since FiberGrid::paintGrid() is spared for N-1 steps
  as the attachment algorithm runs only once every N steps.
 
- Define POOL_UNATTACHED as 1 to disable, or 4, 8 or 16 to enable.
+ Define POOL_UNATTACHED as 1 to disable the feature, and 4, 8 or 16 to enable it.
  */
 #define POOL_UNATTACHED 1
 
