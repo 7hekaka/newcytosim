@@ -215,23 +215,21 @@ public:
     void step(FiberSet&);
     
     /// calculate second derivative of field
-    void laplacian(const real*, real*) const;
+    static void laplacian(FieldGrid const&, const real*, real*, bool);
     
     /// implements diffusion of the whole field in direction X
-    void diffuseX(real*, real, real);
+    static void diffuseX(FieldGrid const&, real*, real, real, bool);
     /// implements diffusion of the whole field in direction Y
-    void diffuseY(real*, real, real);
+    static void diffuseY(FieldGrid const&, real*, real, real, bool);
     /// implements diffusion of the whole field in direction Y
-    void diffuseZ(real*, real, real);
+    static void diffuseZ(FieldGrid const&, real*, real, real, bool);
 
     /// set values of field on its edges
-    void setEdgesX(real*, real);
-    
+    static void setEdgesX(FieldGrid const&, real*, real);
     /// set values of field on its edges
-    void setEdgesY(real*, real);
-    
+    static void setEdgesY(FieldGrid const&, real*, real);
     /// set values of field on its edges
-    void setEdgesZ(real*, real);
+    static void setEdgesZ(FieldGrid const&, real*, real);
     
     /// initialize diffusion matrix (only for FieldScalar)
     void prepareDiffusion(real);
