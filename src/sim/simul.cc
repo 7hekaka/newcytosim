@@ -287,15 +287,24 @@ void Simul::changeFlag(ObjectFlag f, ObjectFlag g) const
 #pragma mark -
 
 /** This should be equivalent to ObjectSet::findObject() */
-Space const* Simul::findSpace(std::string const& str) const
+Space const* Simul::findSpace(std::string spec) const
 {
-    if ( str == "first" )
+    if ( spec == "first" )
         return static_cast<Space*>(spaces.inventory_.first());
 
-    if ( str == "last" )
+    if ( spec == "last" )
         return static_cast<Space*>(spaces.inventory_.last());
     
-    Property * sp = properties.find("space", str);
+    // get a Space if specified:
+    long num = 0;
+    if ( Tokenizer::split_polysymbol(spec, num) )
+    {
+        Object* obj = spaces.findObject(spaces.title(), spec, num);
+        return static_cast<Space const*>(obj);
+    }
+
+    // pick a random Space if only name is specified:
+    Property * sp = properties.find("space", spec);
     
     if ( sp )
         return pickSpace(sp);

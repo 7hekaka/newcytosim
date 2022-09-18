@@ -176,7 +176,8 @@ std::string Tokenizer::get_polysymbol(std::istream& is, bool eat_line)
 
 
 /**
- split_polysymbol() separates a word and a number
+ Separates a word and a number, eg. 'cell1' into 'cell' and '1'
+ It also splits 'cell:1' into 'cell' and '1'
  */
 bool Tokenizer::split_polysymbol(std::string& arg, long& num)
 {

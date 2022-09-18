@@ -303,18 +303,18 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
 Object* ObjectSet::pickObject(const std::string& cat, std::string spec) const
 {
     //std::clog << "ObjectSet::findObject(" << cat << ", " << spec << ")\n";
-
-    // try to split into a word and a number:
-    long num = 0;
-    if ( Tokenizer::split_polysymbol(spec, num) )
-        return findObject(cat, spec, num);
-       
+    
     if ( spec == "first" )
         return static_cast<Object*>(inventory_.first());
     
     if ( spec == "last" )
         return static_cast<Object*>(inventory_.last());
 
+    // try to split into a word and a number:
+    long num = 0;
+    if ( Tokenizer::split_polysymbol(spec, num) )
+        return findObject(cat, spec, num);
+    
     // check category name, eg. 'fiber':
     if ( spec == cat )
     {

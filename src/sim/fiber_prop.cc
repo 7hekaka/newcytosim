@@ -520,7 +520,10 @@ void FiberProp::complete(Simul const& sim)
      and needs to be set here */
     confine_space_ptr = sim.findSpace(confine_space);
     if ( confine_space_ptr )
-        confine_space = confine_space_ptr->name();
+    {
+        if ( confine_space.empty() )
+            confine_space = confine_space_ptr->name();
+    }
     else
     {
         if ( confine != CONFINE_OFF && primed(sim) )

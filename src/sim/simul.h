@@ -268,7 +268,7 @@ public:
     Space * pickSpace(const Property * p) const { return static_cast<Space*>(spaces.pickObject(p)); }
 
     /// return first Space with given name, or return nullptr
-    Space const* findSpace(std::string const&) const;
+    Space const* findSpace(std::string) const;
     
     /// first Field with this Property
     Field * pickField(const Property * p) const;
