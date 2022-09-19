@@ -63,6 +63,12 @@ public:
     /// last Space
     Space * last() const
     { return static_cast<Space*>(pool_.back());}
+    
+    /// first Fiber in inventory
+    Space * firstID() const { return static_cast<Space*>(inventory_.first()); }
+
+    /// returns Fiber immediately following 'obj' in inventory
+    Space * nextID(Space const* obj) const { return static_cast<Space*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found
     Space * findID(ObjectID n) const { return static_cast<Space*>(inventory_.get(n)); }

@@ -638,7 +638,8 @@ void Display::drawSpaces(SpaceSet const& set)
 #if ( DIM >= 3 )
     
     // draw non-transparent Spaces first:
-    for ( Space * obj = set.first(); obj; obj=obj->next() )
+    //for ( Space const* obj = set.first(); obj; obj=obj->next() )
+    for ( Space const* obj = set.firstID(); obj; obj = set.nextID(obj) )
     {
         if ( obj->prop->disp->visible )
             drawSpace3D(obj, true);
