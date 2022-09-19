@@ -23,8 +23,6 @@
 #include "gym_check.h"
 #include "fg_stroke.h"
 
-#include "glapp.h"
-
 #include "point_disp.h"
 #include "fiber_disp.h"
 #include "line_disp.h"
