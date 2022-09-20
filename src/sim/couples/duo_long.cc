@@ -81,7 +81,7 @@ Vector DuoLong::force() const
     if ( modulo )
         modulo->fold(d);
     
-    return prop->stiffness * d;
+    return prop()->stiffness * d;
 }
 
 
@@ -102,16 +102,16 @@ void DuoLong::setInteractions(Meca& meca) const
     
 #if ( DIM == 2 )
     
-    mArm = calcArm(pt1, pt2.pos(), prop->length);
-    meca.addSideLink2D(pt1, pt2, mArm, prop->stiffness);
+    mArm = calcArm(pt1, pt2.pos(), prop()->length);
+    meca.addSideLink2D(pt1, pt2, mArm, prop()->stiffness);
     
 #elif ( DIM >= 3 )
 
-    mArm = calcArm(pt1, pt2.pos(), prop->length);
-    meca.addSideLink3D(pt1, pt2, mArm, prop->stiffness);
+    mArm = calcArm(pt1, pt2.pos(), prop()->length);
+    meca.addSideLink3D(pt1, pt2, mArm, prop()->stiffness);
     
 #endif
     
-    //meca.addSideSideLink(cHand1->interpolation(), cHand2->interpolation(), prop->length, prop->stiffness);
+    //meca.addSideSideLink(cHand1->interpolation(), cHand2->interpolation(), prop()->length, prop()->stiffness);
 }
 

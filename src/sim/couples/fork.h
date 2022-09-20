@@ -4,7 +4,7 @@
 #define FORK_H
 
 #include "couple.h"
-class ForkProp;
+#include "fork_prop.h"
 
 /// A specialized kind of Couple
 /**
@@ -24,11 +24,11 @@ class Fork : public Couple
 #endif
 public:
     
-    /// property
-    ForkProp const* prop;
-    
     /// constructor
     Fork(ForkProp const*, Vector const& w = Vector(0,0,0));
+    
+    /// Property
+    ForkProp const* prop() const { return static_cast<ForkProp const*>(Couple::prop); }
 
     /// destructor
     virtual ~Fork();

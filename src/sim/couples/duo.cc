@@ -13,13 +13,12 @@ extern Modulo const* modulo;
 //------------------------------------------------------------------------------
 
 Duo::Duo(DuoProp const* p, Vector const& w)
-: Couple(p, w), active_(0), prop(p)
+: Couple(p, w), active_(0)
 {
 }
 
 Duo::~Duo()
 {
-    prop = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -43,26 +42,26 @@ void Duo::stepFF()
     
     // check activity
     ///@todo better Duo::activation criteria
-    if ( prop->activation_space_ptr->inside(cPos) )
+    if ( prop()->activation_space_ptr->inside(cPos) )
         activate();
     
     // activity
     if ( active_ )
     {
         // spontaneous de-activation:
-        countdown_ -= prop->deactivation_rate_dt;
+        countdown_ -= prop()->deactivation_rate_dt;
         if ( countdown_ <= 0 )
         {
             deactivate();
             // test fraction of time when it is inactive:
-            if ( RNG.test(-countdown_/prop->deactivation_rate_dt) )
+            if ( RNG.test(-countdown_/prop()->deactivation_rate_dt) )
                 return;
         }
     
         // hands may bind:
         if ( RNG.flip() )
             cHand1->stepUnattached(simul(), cPos);
-        else if ( !prop->trans_activated )
+        else if ( !prop()->trans_activated )
             cHand2->stepUnattached(simul(), cPos);
     }
 }
@@ -73,7 +72,7 @@ void Duo::stepFF()
  */
 void Duo::tryDeactivate()
 {
-    countdown_ -= prop->deactivation_rate_dt;
+    countdown_ -= prop()->deactivation_rate_dt;
     if ( countdown_ <= 0 )
         deactivate();
 }
@@ -87,7 +86,7 @@ void Duo::tryDeactivate()
  */
 void Duo::stepAF()
 {
-    if ( active_ && prop->vulnerable )
+    if ( active_ && prop()->vulnerable )
         tryDeactivate();
     
     //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
@@ -108,7 +107,7 @@ void Duo::stepAF()
  */
 void Duo::stepFA()
 {
-    if ( active_ && prop->vulnerable )
+    if ( active_ && prop()->vulnerable )
         tryDeactivate();
     
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
@@ -129,7 +128,7 @@ void Duo::stepFA()
  */
 void Duo::stepAA()
 {
-    if ( active_ && prop->vulnerable )
+    if ( active_ && prop()->vulnerable )
         tryDeactivate();
 
     Vector f = Couple::force();

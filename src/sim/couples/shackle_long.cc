@@ -72,7 +72,7 @@ Vector ShackleLong::force() const
     if ( modulo )
         modulo->fold(d);
     
-    return prop->stiffness * d;
+    return prop()->stiffness * d;
 }
 
 
@@ -87,13 +87,13 @@ void ShackleLong::setInteractions(Meca& meca) const
 
 #if ( DIM == 2 )
     
-    mArm = calcArm(pt1, pt2.pos(), prop->length);
-    meca.addSideSlidingLink2D(pt1, mArm*iseg, pt2, cHand1->dirFiber(), prop->stiffness);
+    mArm = calcArm(pt1, pt2.pos(), prop()->length);
+    meca.addSideSlidingLink2D(pt1, mArm*iseg, pt2, cHand1->dirFiber(), prop()->stiffness);
     
 #elif ( DIM >= 3 )
     
-    mArm = calcArm(pt1, pt2.pos(), prop->length);
-    meca.addSideSlidingLink3D(pt1, mArm*iseg, pt2, cHand1->dirFiber(), prop->stiffness);
+    mArm = calcArm(pt1, pt2.pos(), prop()->length);
+    meca.addSideSlidingLink3D(pt1, mArm*iseg, pt2, cHand1->dirFiber(), prop()->stiffness);
     
 #endif
 }

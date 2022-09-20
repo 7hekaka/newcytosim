@@ -5,14 +5,13 @@
 
 
 Shackle::Shackle(ShackleProp const* p, Vector const& w)
-: Couple(p, w), prop(p)
+: Couple(p, w)
 {
 }
 
 
 Shackle::~Shackle()
 {
-    prop = nullptr;
 }
 
 
@@ -24,7 +23,7 @@ void Shackle::setInteractions(Meca& meca) const
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
 
-    meca.addSlidingLink(pt1, pt2, prop->stiffness);
+    meca.addSlidingLink(pt1, pt2, prop()->stiffness);
 }
 
 

@@ -4,7 +4,7 @@
 #define DUO_H
 
 #include "couple.h"
-class DuoProp;
+#include "duo_prop.h"
 
 /// A specialized kind of Couple
 /**
@@ -40,11 +40,11 @@ protected:
     
 public:
     
-    /// property
-    DuoProp const* prop;
-    
     /// constructor
     Duo(DuoProp const*, Vector const& w = Vector(0,0,0));
+    
+    /// Property
+    DuoProp const* prop() const { return static_cast<DuoProp const*>(Couple::prop); }
 
     /// destructor
     virtual ~Duo();

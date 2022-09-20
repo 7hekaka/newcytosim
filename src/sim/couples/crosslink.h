@@ -4,7 +4,7 @@
 #define CROSSLINK_H
 
 #include "couple.h"
-class CrosslinkProp;
+#include "crosslink_prop.h"
 
 /// A specialized kind of Couple
 /**
@@ -18,12 +18,12 @@ class CrosslinkProp;
 class Crosslink : public Couple
 {
 public:
-    
-    /// property
-    CrosslinkProp const* prop;
-    
+
     /// constructor
     Crosslink(CrosslinkProp const*, Vector const& w = Vector(0,0,0));
+    
+    /// Property
+    CrosslinkProp const* prop() const { return static_cast<CrosslinkProp const*>(Couple::prop); }
 
     /// destructor
     virtual ~Crosslink();

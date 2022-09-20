@@ -18,11 +18,11 @@ class Shackle : public Couple
     
 public:
     
-    /// property
-    ShackleProp const* prop;
-    
     /// constructor
     Shackle(ShackleProp const* p, Vector const& w = Vector(0,0,0));
+    
+    /// Property
+    ShackleProp const* prop() const { return static_cast<ShackleProp const*>(Couple::prop); }
 
     /// destructor
     virtual ~Shackle();

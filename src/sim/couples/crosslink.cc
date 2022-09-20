@@ -13,14 +13,13 @@ extern Modulo const* modulo;
 
 //------------------------------------------------------------------------------
 Crosslink::Crosslink(CrosslinkProp const* p, Vector const& w)
-: Couple(p, w), prop(p)
+: Couple(p, w)
 {
 }
 
 
 Crosslink::~Crosslink()
 {
-    prop = nullptr;
 }
 
 
@@ -49,6 +48,6 @@ void Crosslink::setInteractions(Meca& meca) const
 {
     assert_true( attached1() && attached2() );
     
-    meca.addLink(cHand1->interpolation(), cHand2->interpolation(), prop->stiffness);
+    meca.addLink(cHand1->interpolation(), cHand2->interpolation(), prop()->stiffness);
 }
 

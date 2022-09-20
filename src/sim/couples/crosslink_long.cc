@@ -78,7 +78,7 @@ Vector CrosslinkLong::force() const
     if ( modulo )
         modulo->fold(d);
     
-    return prop->stiffness * d;
+    return prop()->stiffness * d;
 }
 
 
@@ -93,14 +93,14 @@ void CrosslinkLong::setInteractions(Meca& meca) const
      The 'arm' is recalculated each time, but in 2D at least,
      this maybe not necessary, as switching should be rare.
      */
-    real len = 0.5 * prop->length;
+    real len = 0.5 * prop()->length;
 
 #if ( DIM == 2 )
     
     Vector dir = pt2.pos() - pt1.pos();
     mArm1 = std::copysign(len, cross(pt1.diff(), dir));
     mArm2 = std::copysign(len, cross(dir, pt2.diff()));
-    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop->stiffness);
+    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop()->stiffness);
 
 #elif ( DIM >= 3 ) && FIBER_HAS_FAMILY
     
@@ -109,7 +109,7 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     mArm1 = fiber1()->orthoRadial(abscissa1()).normalized(len);
     mArm2 = fiber2()->orthoRadial(abscissa2()).normalized(len);
     // this can be improved, since this still allows the MTs to rotate around
-    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop->stiffness);
+    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop()->stiffness);
     
 #elif ( DIM >= 3 )
     
@@ -133,7 +133,7 @@ void CrosslinkLong::setInteractions(Meca& meca) const
 
     //mArm1 = cross(pt1.diff(), dir).normalized(len);
     //mArm2 = cross(dir, pt2.diff()).normalized(len);
-    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop->stiffness);
+    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop()->stiffness);
     
 #endif
 }

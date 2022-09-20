@@ -6,17 +6,16 @@
 
 
 Fork::Fork(ForkProp const* p, Vector const& w)
-: Couple(p, w), prop(p)
+: Couple(p, w)
 {
 #if ( DIM == 2 )
-    sine = prop->angle_dir.YY;
+    sine = prop()->angle_dir.YY;
 #endif
 }
 
 
 Fork::~Fork()
 {
-    prop = nullptr;
 }
 
 
@@ -25,24 +24,24 @@ void Fork::setInteractions(Meca& meca) const
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
     
-    meca.addLink(pt1, pt2, prop->stiffness);
+    meca.addLink(pt1, pt2, prop()->stiffness);
     
 #if ( DIM == 2 )
-    if ( prop->flip )
+    if ( prop()->flip )
     {
-        Vector2 dir = prop->angle_dir;
+        Vector2 dir = prop()->angle_dir;
         // flip the angle to match the current configuration of the bond
         sine = std::copysign(dir.YY, cross(pt1.diff(), pt2.diff()));
         dir.YY = sine;
-        meca.addTorque(pt1, pt2, dir, prop->angular_stiffness);
+        meca.addTorque(pt1, pt2, dir, prop()->angular_stiffness);
     }
     else
     {
-        meca.addTorque(pt1, pt2, prop->angle_dir, prop->angular_stiffness);
+        meca.addTorque(pt1, pt2, prop()->angle_dir, prop()->angular_stiffness);
     }
-    //meca.addTorquePoliti(pt1, pt2, dir, prop->angular_stiffness);
+    //meca.addTorquePoliti(pt1, pt2, dir, prop()->angular_stiffness);
 #elif ( DIM == 3 )
-    meca.addTorque(pt1, pt2, prop->angle_dir, prop->angular_stiffness);
+    meca.addTorque(pt1, pt2, prop()->angle_dir, prop()->angular_stiffness);
 #endif
 }
 

@@ -12,14 +12,13 @@ extern Modulo const* modulo;
 //------------------------------------------------------------------------------
 
 Bridge::Bridge(BridgeProp const* p, Vector const& w)
-: Couple(p, w), prop(p)
+: Couple(p, w)
 {
 }
 
 
 Bridge::~Bridge()
 {
-    prop = nullptr;
 }
 
 
@@ -54,7 +53,7 @@ Vector Bridge::force() const
     
     real dn = d.norm();
     // the norm of the force vector is always known, even if 'd' is nearly zero:
-    real f = prop->stiffness * ( dn - prop->length );
+    real f = prop()->stiffness * ( dn - prop()->length );
     
     if ( dn > REAL_EPSILON )
         return d * ( f / dn );
@@ -68,5 +67,5 @@ Vector Bridge::force() const
  */
 void Bridge::setInteractions(Meca& meca) const
 {
-    meca.addLongLink(cHand1->interpolation(), cHand2->interpolation(), prop->length, prop->stiffness);
+    meca.addLongLink(cHand1->interpolation(), cHand2->interpolation(), prop()->length, prop()->stiffness);
 }

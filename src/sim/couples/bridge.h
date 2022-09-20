@@ -4,7 +4,7 @@
 #define BRIDGE_H
 
 #include "couple.h"
-class BridgeProp;
+#include "bridge_prop.h"
 
 /// A Couple with a different mechanical link
 /**
@@ -29,11 +29,11 @@ class Bridge : public Couple
 {
 public:
     
-    /// property
-    BridgeProp const* prop;
-    
     /// constructor
     Bridge(BridgeProp const*, Vector const& w = Vector(0,0,0));
+    
+    /// Property
+    BridgeProp const* prop() const { return static_cast<BridgeProp const*>(Couple::prop); }
 
     /// destructor
     virtual ~Bridge();
