@@ -32,10 +32,10 @@ public:
     
     /// constructor
     SpaceDynamicSphere(SpaceDynamicProp const*);
-    
-    /// properties
-    const SpaceDynamicProp* prop;
-    
+
+    /// Property
+    SpaceDynamicProp const* prop() const { return static_cast<SpaceDynamicProp const*>(Space::prop); }
+
     /// add interactions to a Meca
     void setInteractions(Meca&, Simul const&) const;
 

@@ -11,7 +11,7 @@
 
 
 SpaceLid::SpaceLid(SpaceDynamicProp const* p)
-: Space(p), prop(p)
+: Space(p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("lid  is not usable in 1D");
@@ -223,7 +223,7 @@ void SpaceLid::setInteractions(Meca& meca, Simul const&) const
 
 void SpaceLid::step()
 {
-    real dc = prop->mobility_dt * force_;
+    real dc = prop()->mobility_dt * force_;
     
     if ( abs_real(dc) < 1 )
         top_ += dc;

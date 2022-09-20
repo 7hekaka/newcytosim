@@ -35,9 +35,9 @@ public:
     
     /// constructor
     SpaceDynamicDisc(SpaceDynamicProp const*);
-    
-    /// properties
-    const SpaceDynamicProp* prop;
+
+    /// Property
+    SpaceDynamicProp const* prop() const { return static_cast<SpaceDynamicProp const*>(Space::prop); }
 
     /// change dimensions
     void resize(Glossary& opt);

@@ -5,7 +5,7 @@
 
 
 SpaceDynamicSphere::SpaceDynamicSphere(SpaceDynamicProp const* p)
-: SpaceSphere(p),prop(p)
+: SpaceSphere(p)
 {
     force_ = 0;
 }
@@ -43,7 +43,7 @@ void SpaceDynamicSphere::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceDynamicSphere::step()
 {
-    real dr = prop->mobility_dt * force_;
+    real dr = prop()->mobility_dt * force_;
     std::clog << "SpaceDynamicSphere:  radius " << std::setw(12) << radius_;
     std::clog << " force " << force_ << " delta_radius " << dr << "\n";
     radius_ += dr;

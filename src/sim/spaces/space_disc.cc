@@ -10,7 +10,7 @@
 
 
 SpaceDisc::SpaceDisc(SpaceProp const* p)
-: Space(p), prop(p)
+: Space(p)
 {
     if ( DIM != 3 )
         throw InvalidParameter("disc is only usable in 3D");

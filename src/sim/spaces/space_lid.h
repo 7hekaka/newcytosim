@@ -42,15 +42,15 @@ private:
     
     /// force applied on top boundary in last time step
     mutable real force_;
-    
-    /// properties
-    const SpaceDynamicProp* prop;
 
 public:
     
     /// creator
     SpaceLid(SpaceDynamicProp const*);
     
+    /// Property
+    SpaceDynamicProp const* prop() const { return static_cast<SpaceDynamicProp const*>(Space::prop); }
+
     /// change dimensions
     void resize(Glossary& opt);
     

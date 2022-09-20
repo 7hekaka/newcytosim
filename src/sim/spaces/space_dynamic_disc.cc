@@ -10,7 +10,7 @@
 
 
 SpaceDynamicDisc::SpaceDynamicDisc(SpaceDynamicProp const* p)
-: Space(p),prop(p)
+: Space(p)
 {
     if ( DIM != 2 )
         throw InvalidParameter("dymamic_disc is only usable in 2D");
@@ -122,7 +122,7 @@ void SpaceDynamicDisc::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceDynamicDisc::step()
 {
-    real dr = prop->mobility_dt * force_;
+    real dr = prop()->mobility_dt * force_;
     //std::clog << "SpaceDynamicDisc:  radius " << std::setw(12) << radius_ << " force " << force_ << " delta_radius " << dr << "\n";
     radius_ += dr;
 }

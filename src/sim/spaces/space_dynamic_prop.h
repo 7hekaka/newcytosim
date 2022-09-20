@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef SPACE_DYNAMIC_PROP_H
 #define SPACE_DYNAMIC_PROP_H
@@ -21,13 +21,13 @@ public:
     */
 
     /// Viscosity
-    real         viscosity;
+    real viscosity;
 
     /// Viscosity for rotation
-    real         viscosity_rot;
+    real viscosity_rot;
     
     // tension of the ellipse
-    real         tension;
+    real tension;
     
     // volume of the ellipse (mutable because changed by const method)
     mutable real volume;
@@ -35,7 +35,7 @@ public:
     /// @}
 
     /// derived values equal to timestep / viscosity
-    real         mobility_dt, mobility_rot_dt;
+    real mobility_dt, mobility_rot_dt;
 
 public:
 

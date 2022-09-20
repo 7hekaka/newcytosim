@@ -38,9 +38,6 @@ public:
     
     /// constructor
     SpaceDisc(SpaceProp const*);
-    
-    /// properties
-    const SpaceProp* prop;
 
     /// change dimensions
     void resize(Glossary& opt);

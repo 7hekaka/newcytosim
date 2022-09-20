@@ -28,7 +28,7 @@ inline real surf_block(const real a, const real b, const real c)
 
 
 SpaceDynamicEllipse::SpaceDynamicEllipse(SpaceDynamicProp const* p)
-: SpaceEllipse(p), prop(p)
+: SpaceEllipse(p)
 {
     if ( DIM == 1 )
         throw InvalidParameter("dynamic_ellipse is not usable in 1D");
@@ -158,7 +158,7 @@ Vector SpaceDynamicEllipse::pressure_forces(const real P) const
  Pressure is a Lagrange multiplier associated with volume conservation
  We follow Newtons's method to minimize:
  
-     F = Volume(next_time_step) - prop->volume
+     F = Volume(next_time_step) - prop()->volume
  
  Hence we iterate:
  
@@ -171,7 +171,7 @@ real SpaceDynamicEllipse::compute_pressure(Vector const& sizes, Vector const& ra
     real P = pressure;
     real err = INFINITY, last_err;
     
-    if ( prop->mobility_dt <= 0 )
+    if ( prop()->mobility_dt <= 0 )
         return 0;
     
     size_t cnt = 0;
@@ -179,9 +179,9 @@ real SpaceDynamicEllipse::compute_pressure(Vector const& sizes, Vector const& ra
         last_err = err;
         
         // the objective is to reach desired volume at the next time-step:
-        Vector dim = sizes + ( radif + pressure_forces(P) ) * prop->mobility_dt;
+        Vector dim = sizes + ( radif + pressure_forces(P) ) * prop()->mobility_dt;
         
-        real der = VPREF * VPREF * prop->mobility_dt;
+        real der = VPREF * VPREF * prop()->mobility_dt;
         
         real r0 = dim.XX;
 #if ( DIM == 2 )
@@ -190,7 +190,7 @@ real SpaceDynamicEllipse::compute_pressure(Vector const& sizes, Vector const& ra
         // vol = VPREF * ( A0 + P * B0 ) * ( A1 + P * B1 );
         // der = VPREF * ( B0 * r1 + r0 * B1 )
         real r1 = dim.YY;
-        err = VPREF * r0 * r1 - prop->volume;
+        err = VPREF * r0 * r1 - prop()->volume;
         der *= square(r0) + square(r1);
 #elif ( DIM > 2 )
         // r0 = A0 + P * B0;   B0 = VPREF * r1 * r2 * mobility_dt
@@ -200,7 +200,7 @@ real SpaceDynamicEllipse::compute_pressure(Vector const& sizes, Vector const& ra
         // der = VPREF * ( B0 * r1 * r2 + r0 * B1 * r2 + r0 * r1 * B2 )
         real r1 = dim.YY;
         real r2 = dim.ZZ;
-        err = VPREF * r0 * r1 * r2 - prop->volume;
+        err = VPREF * r0 * r1 * r2 - prop()->volume;
         der *= square(r0*r1) + square(r0*r2) + square(r1*r2);
 #endif
 
@@ -230,7 +230,7 @@ Vector SpaceDynamicEllipse::tension_forces() const
 
 #if ( DIM == 2 )
 
-    real S = -prop->tension * M_PI;
+    real S = -prop()->tension * M_PI;
     real N = std::sqrt( (3.0*radius_[0]+radius_[1])*(radius_[0]+3.0*radius_[1]) );
 
     res.XX = S * (3.0 - ( 3.0*radius_[0] + 5.0*radius_[1] ) / N );
@@ -238,7 +238,7 @@ Vector SpaceDynamicEllipse::tension_forces() const
     
 #elif ( DIM > 2 )
     
-    real S = -prop->tension * surfaceEllipse(radius_);
+    real S = -prop()->tension * surfaceEllipse(radius_);
     
     real pXY = surf_block(radius_[0], radius_[1]);
     real pXZ = surf_block(radius_[0], radius_[2]);
@@ -260,7 +260,7 @@ Vector SpaceDynamicEllipse::tension_forces() const
 
 void SpaceDynamicEllipse::step()
 {
-    if ( prop->volume > 0 )
+    if ( prop()->volume > 0 )
     {
         rad_forces = Rforces;
         
@@ -270,9 +270,9 @@ void SpaceDynamicEllipse::step()
         Rforces += pressure_forces(pressure);
 
         // implement changes in shape:
-        if ( prop->mobility_dt > 0 )
+        if ( prop()->mobility_dt > 0 )
         {
-            Vector delta = prop->mobility_dt * Rforces;
+            Vector delta = prop()->mobility_dt * Rforces;
             for ( int i=0; i<DIM; ++i )
             {
                 assert_true(delta[i] == delta[i]);
@@ -283,11 +283,11 @@ void SpaceDynamicEllipse::step()
         }
         
         // implement rotation:
-        if ( prop->mobility_rot_dt > 0 )
+        if ( prop()->mobility_rot_dt > 0 )
         {
             //std::clog << "% DynamicEllipse torque " << Torques << "\n";
 #if ( DIM == 2 )
-            real theta = prop->mobility_rot_dt * Torques;
+            real theta = prop()->mobility_rot_dt * Torques;
             if ( theta > REAL_EPSILON )
             {
                 real c = std::cos(theta);
@@ -296,7 +296,7 @@ void SpaceDynamicEllipse::step()
             }
 #elif ( DIM > 2 )
             real n = Torques.norm();
-            real theta = prop->mobility_rot_dt * n;
+            real theta = prop()->mobility_rot_dt * n;
             if ( theta > REAL_EPSILON )
             {
                 MatrixD rot = MatrixD::rotationAroundAxis(Torques/n, std::cos(theta), std::sin(theta));
@@ -318,10 +318,10 @@ void SpaceDynamicEllipse::step()
 void SpaceDynamicEllipse::resize(Glossary& opt)
 {
     SpaceEllipse::resize(opt);
-    if ( prop->volume <= 0 )
+    if ( prop()->volume <= 0 )
     {
-        prop->volume = volume();
-        //std::clog << "DynamicEllipse:volume <- " << prop->volume << '\n';
+        prop()->volume = volume();
+        //std::clog << "DynamicEllipse:volume <- " << prop()->volume << '\n';
     }
 }
 
@@ -375,7 +375,7 @@ void SpaceDynamicEllipse::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( n != 10 )
         throw InvalidIO("unexpected data in SpaceDynamicEllipse");
     // desired volume
-    prop->volume = in.readFloat();
+    prop()->volume = in.readFloat();
 #if ( DIM > 2 )
     // read 3x3 orientation matrix:
     for ( unsigned j = 0; j < 3; ++j )
@@ -400,7 +400,7 @@ void SpaceDynamicEllipse::write(Outputter& out) const
 {
     SpaceEllipse::write(out);
     out.writeUInt16(10);
-    out.writeFloat(prop->volume);
+    out.writeFloat(prop()->volume);
 #if ( DIM > 2 )
     // write matrix in column-major format
     for ( unsigned j = 0; j < 3; ++j )

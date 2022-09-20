@@ -6,9 +6,9 @@
 #include "dim.h"
 #include "space.h"
 #include "space_ellipse.h"
+#include "space_dynamic_prop.h"
 #include "meca.h"
 
-class SpaceDynamicProp;
 
 /// deformable ellipse in 2D, ellipsoid or spheroid in 3D
 /**
@@ -73,9 +73,9 @@ public:
     /// constructor
     SpaceDynamicEllipse(SpaceDynamicProp const*);
     
-    /// properties
-    const SpaceDynamicProp* prop;
-    
+    /// Property
+    SpaceDynamicProp const* prop() const { return static_cast<SpaceDynamicProp const*>(Space::prop); }
+
     /// change dimensions
     void resize(Glossary& opt);
 
