@@ -13,7 +13,7 @@
 /**
  By default, the plus end is growing and the minus end is shrinking
  */
-DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p), prop(p)
+DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p)
 {
     initM();
     initP();
@@ -22,7 +22,6 @@ DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p), prop(p)
 
 DynamicFiber::~DynamicFiber()
 {
-    prop = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -84,8 +83,8 @@ int DynamicFiber::stepMinusEnd()
 #if NEW_FIBER_CHEW
     ///@todo implement smooth saturation using logistic function
     // convert chewing rate to stochastic off rate:
-    real chewed = std::min(fChewM, prop->max_chewing_speed_dt) / prop->unit_length;
-    //std::clog << " chewing rate M " << chewing_rate / prop->time_step << '\n';
+    real chewed = std::min(fChewM, prop()->max_chewing_speed_dt) / prop()->unit_length;
+    //std::clog << " chewing rate M " << chewing_rate / prop()->time_step << '\n';
     fChewM = 0;
 #else
     constexpr real chewed(0);
@@ -93,12 +92,12 @@ int DynamicFiber::stepMinusEnd()
     
     if ( mStateM == STATE_RED )
 	{
-		nextShrinkM -= prop->shrinking_rate_dt[M] + chewed;
+		nextShrinkM -= prop()->shrinking_rate_dt[M] + chewed;
 		while ( nextShrinkM <= 0 )
 		{
             // remove last unit, while penultimate position can be a GTP survivor
 			unitM[0] = unitM[1];
-			unitM[1] = RNG.test(prop->unhydrolyzed_prob[M]);
+			unitM[1] = RNG.test(prop()->unhydrolyzed_prob[M]);
 			--res;
 			nextShrinkM += RNG.exponential();
 			mStateM = calculateStateM();
@@ -110,25 +109,25 @@ int DynamicFiber::stepMinusEnd()
 		real forceM = projectedForceEndM();
 
 		// growth is reduced if free monomers are scarce:
-		real growth = prop->growing_rate_dt[M] * prop->free_polymer;
+		real growth = prop()->growing_rate_dt[M] * prop()->free_polymer;
 
 		// antagonistic force (< 0) decreases assembly rate exponentially
 		if (( forceM < 0 ) & ( growth > 0 ))
-			growth *= std::exp(forceM*prop->growing_force_inv[M]);
+			growth *= std::exp(forceM*prop()->growing_force_inv[M]);
 
-		real hydrol = prop->hydrolysis_rate_2dt[M];
+		real hydrol = prop()->hydrolysis_rate_2dt[M];
 
 #if OLD_DYNAMIC_ZONE
         // change Hydrolysis rate if PLUS_END is far from origin:
-        if ( posEndM().normSqr() > prop->zone_radius_sqr )
-            hydrol = prop->zone_hydrolysis_rate_2dt[M];
+        if ( posEndM().normSqr() > prop()->zone_radius_sqr )
+            hydrol = prop()->zone_hydrolysis_rate_2dt[M];
 
-        if ( prop->zone_space_ptr && !prop->zone_space_ptr->inside(posEndM()) )
-            hydrol = prop->zone_hydrolysis_rate_2dt[M];
+        if ( prop()->zone_space_ptr && !prop()->zone_space_ptr->inside(posEndM()) )
+            hydrol = prop()->zone_hydrolysis_rate_2dt[M];
 #endif
 
 		// @todo detach_rate should depend on the state of the subunit
-		real shrink = prop->growing_off_rate_dt[M] + chewed;
+		real shrink = prop()->growing_off_rate_dt[M] + chewed;
 
 		nextGrowthM -= growth;
 		nextShrinkM -= shrink;
@@ -167,7 +166,7 @@ int DynamicFiber::stepMinusEnd()
 				case 2:
 					// remove last unit, while penultimate position can be a GTP survivor
 					unitM[0] = unitM[1];
-					unitM[1] = RNG.test(prop->unhydrolyzed_prob[M]);
+					unitM[1] = RNG.test(prop()->unhydrolyzed_prob[M]);
 					--res;
                     assert_true(nextShrinkM < 0);
 					nextShrinkM += RNG.exponential();
@@ -248,8 +247,8 @@ int DynamicFiber::stepPlusEnd()
 #if NEW_FIBER_CHEW
     ///@todo implement smooth saturation using logistic function
     // convert chewing rate to stochastic off rate:
-    real chewed = std::min(fChewP, prop->max_chewing_speed_dt) / prop->unit_length;
-    //std::clog << " chewing rate P " << chewing / prop->time_step << '\n';
+    real chewed = std::min(fChewP, prop()->max_chewing_speed_dt) / prop()->unit_length;
+    //std::clog << " chewing rate P " << chewing / prop()->time_step << '\n';
     fChewP = 0;
 #else
     constexpr real chewed(0);
@@ -257,12 +256,12 @@ int DynamicFiber::stepPlusEnd()
     
     if ( mStateP == STATE_RED )
     {
-        nextShrinkP -= prop->shrinking_rate_dt[P] + chewed;
+        nextShrinkP -= prop()->shrinking_rate_dt[P] + chewed;
         while ( nextShrinkP <= 0 )
         {
             // remove last unit, while penultimate position can be a GTP survivor
 			unitP[0] = unitP[1];
-            unitP[1] = RNG.test(prop->unhydrolyzed_prob[P]);
+            unitP[1] = RNG.test(prop()->unhydrolyzed_prob[P]);
 			--res;
             nextShrinkP += RNG.exponential();
             mStateP = calculateStateP();
@@ -275,25 +274,25 @@ int DynamicFiber::stepPlusEnd()
         real forceP = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        real growth = prop->growing_rate_dt[P] * prop->free_polymer;
+        real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if (( forceP < 0 ) & ( growth > 0 ))
-            growth *= std::exp(forceP*prop->growing_force_inv[P]);
+            growth *= std::exp(forceP*prop()->growing_force_inv[P]);
 
-        real hydrol = prop->hydrolysis_rate_2dt[P];
+        real hydrol = prop()->hydrolysis_rate_2dt[P];
         
 #if OLD_DYNAMIC_ZONE
         // change Hydrolysis rate if PLUS_END is far from origin:
-        if ( posEndP().normSqr() > prop->zone_radius_sqr )
-            hydrol = prop->zone_hydrolysis_rate_2dt[P];
+        if ( posEndP().normSqr() > prop()->zone_radius_sqr )
+            hydrol = prop()->zone_hydrolysis_rate_2dt[P];
         
-        if ( prop->zone_space_ptr && !prop->zone_space_ptr->inside(posEndP()) )
-            hydrol = prop->zone_hydrolysis_rate_2dt[P];
+        if ( prop()->zone_space_ptr && !prop()->zone_space_ptr->inside(posEndP()) )
+            hydrol = prop()->zone_hydrolysis_rate_2dt[P];
 #endif
         
         // @todo detach_rate should depend on the state of the subunit
-        real shrink = prop->growing_off_rate_dt[P] + chewed;
+        real shrink = prop()->growing_off_rate_dt[P] + chewed;
 
         nextGrowthP -= growth;
         nextShrinkP -= shrink;
@@ -332,7 +331,7 @@ int DynamicFiber::stepPlusEnd()
                 case 2:
                     // remove last unit, while penultimate position can be a GTP survivor
                     unitP[0] = unitP[1];
-                    unitP[1] = RNG.test(prop->unhydrolyzed_prob[P]);
+                    unitP[1] = RNG.test(prop()->unhydrolyzed_prob[P]);
                     --res;
                     assert_true(nextShrinkP < 0);
                     nextShrinkP += RNG.exponential();
@@ -355,22 +354,22 @@ void DynamicFiber::step()
     // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
     if ( mStateM == STATE_WHITE )
     {
-        if ( RNG.test(prop->rebirth_prob[M]) )
+        if ( RNG.test(prop()->rebirth_prob[M]) )
             setEndStateM(STATE_GREEN);
     }
     else
-        addM = stepMinusEnd() * prop->unit_length;
+        addM = stepMinusEnd() * prop()->unit_length;
     
     real addP = 0;
     constexpr size_t P = 0;
     // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
     if ( mStateP == STATE_WHITE )
     {
-        if ( RNG.test(prop->rebirth_prob[P]) )
+        if ( RNG.test(prop()->rebirth_prob[P]) )
             setEndStateP(STATE_GREEN);
     }
     else
-        addP = stepPlusEnd() * prop->unit_length;
+        addP = stepPlusEnd() * prop()->unit_length;
 
     Fiber::step(addM, addP, false);
 }

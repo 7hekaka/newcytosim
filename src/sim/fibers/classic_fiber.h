@@ -6,9 +6,7 @@
 #include "cymdef.h"
 #include "vector.h"
 #include "fiber.h"
-
-
-class ClassicFiberProp;
+#include "classic_fiber_prop.h"
 
 
 /// A Fiber with a standard two-state model of dynamic instability at the PLUS_END
@@ -59,12 +57,12 @@ private:
     state_t mStateP;
      
 public:
-    
-    /// the Property of this object
-    ClassicFiberProp const* prop;
   
     /// constructor
     ClassicFiber(ClassicFiberProp const*);
+    
+    /// Property
+    ClassicFiberProp const* prop() const { return static_cast<ClassicFiberProp const*>(Fiber::prop); }
 
     /// destructor
     virtual ~ClassicFiber();

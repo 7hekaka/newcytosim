@@ -6,8 +6,7 @@
 #include "cymdef.h"
 #include "vector.h"
 #include "fiber.h"
-
-class DynamicFiberProp;
+#include "dynamic_fiber_prop.h"
 
 
 /// A Fiber with discrete growth and dynamic instability at the PLUS_END
@@ -104,12 +103,12 @@ private:
     state_t calculateStateM() const;
    
 public:
-    
-    /// the Property of this object
-    DynamicFiberProp const* prop;
   
     /// constructor
     DynamicFiber(DynamicFiberProp const*);
+    
+    /// Property
+    DynamicFiberProp const* prop() const { return static_cast<DynamicFiberProp const*>(Fiber::prop); }
 
     /// destructor
     virtual ~DynamicFiber();

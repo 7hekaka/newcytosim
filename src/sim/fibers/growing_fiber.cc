@@ -11,7 +11,7 @@
 
 //------------------------------------------------------------------------------
 
-GrowingFiber::GrowingFiber(GrowingFiberProp const* p) : Fiber(p), prop(p)
+GrowingFiber::GrowingFiber(GrowingFiberProp const* p) : Fiber(p)
 {
     mStateM = STATE_GREEN;
     mStateP = STATE_GREEN;
@@ -20,7 +20,6 @@ GrowingFiber::GrowingFiber(GrowingFiberProp const* p) : Fiber(p), prop(p)
 
 GrowingFiber::~GrowingFiber()
 {
-    prop = nullptr;
 }
 
 
@@ -53,9 +52,9 @@ void GrowingFiber::step()
     real addP = 0, addM = 0;
     
     // PLUS_END
-    if ( prop->shrink_outside[P] && prop->confine_space_ptr->outside(posEndP()) )
+    if ( prop()->shrink_outside[P] && prop()->confine_space_ptr->outside(posEndP()) )
     {
-        addP = prop->shrinking_speed_dt[P];
+        addP = prop()->shrinking_speed_dt[P];
     }
     else if ( mStateP == STATE_GREEN )
     {
@@ -63,19 +62,19 @@ void GrowingFiber::step()
         real forceP = projectedForceEndP();
         
         // growth is reduced if free monomers are scarce:
-        addP = prop->growing_speed_dt[P] * prop->free_polymer;
+        addP = prop()->growing_speed_dt[P] * prop()->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if (( forceP < 0 ) & ( addP > 0 ))
-            addP *= std::exp(forceP*prop->growing_force_inv[P]);
+            addP *= std::exp(forceP*prop()->growing_force_inv[P]);
         
-        addP += prop->growing_off_speed_dt[P];
+        addP += prop()->growing_off_speed_dt[P];
     }
     
     // MINUS_END
-    if ( prop->shrink_outside[M] && prop->confine_space_ptr->outside(posEndM()) )
+    if ( prop()->shrink_outside[M] && prop()->confine_space_ptr->outside(posEndM()) )
     {
-        addM = prop->shrinking_speed_dt[M];
+        addM = prop()->shrinking_speed_dt[M];
     }
     else if ( mStateM == STATE_GREEN )
     {
@@ -83,13 +82,13 @@ void GrowingFiber::step()
         real forceM = projectedForceEndM();
         
         // growth is reduced if free monomers are scarce:
-        addM = prop->growing_speed_dt[M] * prop->free_polymer;
+        addM = prop()->growing_speed_dt[M] * prop()->free_polymer;
         
         // antagonistic force (< 0) decreases assembly rate exponentially
         if (( forceM < 0 ) & ( addM > 0 ))
-            addM *= std::exp(forceM*prop->growing_force_inv[M]);
+            addM *= std::exp(forceM*prop()->growing_force_inv[M]);
 
-        addM += prop->growing_off_speed_dt[M];
+        addM += prop()->growing_off_speed_dt[M];
     }
 
     Fiber::step(addM, addP);

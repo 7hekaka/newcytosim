@@ -5,8 +5,7 @@
 #include "cymdef.h"
 #include "vector.h"
 #include "fiber.h"
-
-class TreadmillingFiberProp;
+#include "treadmilling_fiber_prop.h"
 
 
 /// A Fiber with assembly at both ends 
@@ -55,13 +54,13 @@ private:
     state_t mStateM;
     
 public:
-    
-    /// the Property of this object
-    TreadmillingFiberProp const* prop;
   
     /// constructor
     TreadmillingFiber(TreadmillingFiberProp const*);
-
+    
+    /// Property
+    TreadmillingFiberProp const* prop() const { return static_cast<TreadmillingFiberProp const*>(Fiber::prop); }
+    
     /// destructor
     virtual ~TreadmillingFiber();
         

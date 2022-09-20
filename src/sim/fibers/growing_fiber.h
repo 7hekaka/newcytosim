@@ -5,8 +5,7 @@
 #include "cymdef.h"
 #include "vector.h"
 #include "fiber.h"
-
-class GrowingFiberProp;
+#include "growing_fiber_prop.h"
 
 
 /// A Fiber with independent assembly/disassembly at both ends
@@ -56,12 +55,12 @@ private:
     
 public:
     
-    /// the Property of this object
-    GrowingFiberProp const* prop;
-    
     /// constructor
     GrowingFiber(GrowingFiberProp const*);
     
+    /// Property
+    GrowingFiberProp const* prop() const { return static_cast<GrowingFiberProp const*>(Fiber::prop); }
+
     /// destructor
     virtual ~GrowingFiber();
     
