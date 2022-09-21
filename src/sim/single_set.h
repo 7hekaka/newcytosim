@@ -2,6 +2,8 @@
 #ifndef SINGLE_SET_H
 #define SINGLE_SET_H
 
+#include <vector>
+
 #include "object_set.h"
 #include "single.h"
 class PropertyList;

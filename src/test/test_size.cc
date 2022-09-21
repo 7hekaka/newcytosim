@@ -40,7 +40,7 @@
 int main(int argc, char* argv[])
 {
     int x = ( argc>1 ? atoi(argv[1]) : 0 );
-    if ( x == 2 )
+    if ( x == 4 )
     {
         PRINT(Random);
         PRINT(Array<int>);
@@ -59,39 +59,14 @@ int main(int argc, char* argv[])
         PRINT(Rasterizer::Vertex2);
         PRINT(Rasterizer::Vertex2d);
         PRINT(Rasterizer::Vertex3);
-        
-        PRINT(Mecapoint);
-        PRINT(FiberSegment);
-        PRINT(Interpolation);
-        PRINT(HandMonitor);
-        PRINT(FiberSite);
-
-        PRINT(Inventoried);
-        PRINT(Movable);
-        PRINT(Buddy);
-     }
-    else if ( x == 1 )
+    }
+    else if ( x == 3 )
     {
-        PRINT(Object);
-        PRINT(Mecable);
-        PRINT(Chain);
-        PRINT(Mecafil);
-        PRINT(Fiber);
-        PRINT(Space);
-                
-        PRINT(Hand);
-        PRINT(Motor);
-        PRINT(Cutter);
-        PRINT(Digit);
-        PRINT(Walker);
-        PRINT(Mighty);
-
         PRINT(Single);
         PRINT(Picket);
         PRINT(PicketLong);
         PRINT(Wrist);
         PRINT(WristLong);
-
         PRINT(Couple);
         PRINT(CoupleLong);
         PRINT(Shackle);
@@ -100,7 +75,32 @@ int main(int argc, char* argv[])
         PRINT(Duo);
         PRINT(DuoLong);
         PRINT(Fork);
-
+    }
+    else if ( x == 2 )
+    {
+        PRINT(Mecapoint);
+        PRINT(FiberSegment);
+        PRINT(Interpolation);
+        PRINT(HandMonitor);
+        PRINT(FiberSite);
+        PRINT(Hand);
+        PRINT(Motor);
+        PRINT(Cutter);
+        PRINT(Digit);
+        PRINT(Walker);
+        PRINT(Mighty);
+    }
+    else if ( x == 1 )
+    {
+        PRINT(Inventoried);
+        PRINT(Movable);
+        PRINT(Buddy);
+        PRINT(Object);
+        PRINT(Mecable);
+        PRINT(Chain);
+        PRINT(Mecafil);
+        PRINT(Fiber);
+        PRINT(Space);
         PRINT(Solid);
         PRINT(Bead);
         PRINT(Sphere);

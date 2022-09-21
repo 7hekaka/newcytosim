@@ -79,10 +79,10 @@ public:
          if ( mobile() & 2 ):
              rotate() should be implemented
      */
-    virtual int mobile()  const { return 0; }
+    virtual int mobile() const { return 0; }
     
     /// return the spatial position of the Object
-    virtual Vector position()  const { return Vector(0.0,0.0,0.0); }
+    virtual Vector position() const { return Vector(0.0,0.0,0.0); }
     
     /// move Object ( position += given vector )
     virtual void translate(Vector const&);

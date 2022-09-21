@@ -1,109 +1,123 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef BUDDY_H
 #define BUDDY_H
 
-#include <vector>
-#include <algorithm>
 
+#define MAKE_NO_FRIENDS 0
 
-/// Maintains a list of mutual relationship between objects.
+/// Establishes `circles of friends' within objects.
 /**
  Buddy implements mutual relationship between objects.
  
- The class keeps track of a list of `buddies`.
+ The class is used to keep track of a circle of `buddies` using a single-linked list.
  Relationship is established with connect().
  When an object is destroyed, it calls goodbye() for all its buddies.
  
- This class can be used when an object needs to know if another object is destroyed,
- and vice-versa.
+ This class is used when an object needs to know if another object is destroyed.
+ It also implements a virtual 'salute()' function that can be used
+ to implement some basic form of communication between objects of the same circle.
  
- F. Nedelec 11.08.2012 -- 16.04.2020
+ F. Nedelec 11.08.2012 -- 16.04.2020.
+ 21.09.2022: implemented circular list using one pointer.
  */
 class Buddy
 {
 
 private:
     
-    /// type for a list of buddies
-    typedef std::vector<Buddy *> BuddyList;
+    /// next buddy, making a circular single-linked list
+    Buddy * buddy_;
     
-    /// list of buddies
-    BuddyList buddies_;
+public:
     
-private:
-    
-    /// replace the buddy that may have been at index `ix`
-    void enlist(Buddy * b, size_t ix)
+    /// search for 'guy' in circle of buddies, returning buddy anterior to `guy` if found
+    Buddy * find(Buddy * guy)
     {
-        if ( ix < buddies_.size() )
+        Buddy * a = this;
+        Buddy * b = buddy_;
+        while ( b != this )
         {
-            if ( buddies_[ix]  &&  buddies_[ix] != b )
-            {
-                goodbye(buddies_[ix]);
-                buddies_[ix]->goodbye(this);
-                buddies_[ix]->unlist(this);
-            }
+            if ( b == guy )
+                return a;
+            a = b;
+            b = b->buddy_;
         }
-        else
-            buddies_.resize(ix+1, nullptr);
-        
-        buddies_[ix] = b;
+        return nullptr;
     }
     
-    /// add `b` into the list of buddies, or complain if already present
-    void enlist(Buddy * b)
+    /// return number of buddies, in circle of friends
+    size_t nbBuddies()
     {
+        size_t cnt = 0;
+        Buddy * b = buddy_;
+        while ( b != this )
+        {
+            ++cnt;
+            b = b->buddy_;
+        }
+        return cnt;
+    }
+
+    /// add `b` into the list of buddies, or complain if already present
+    void enlist(Buddy * guy)
+    {
+        assert_true( guy != this );
 #if ( 1 )
         // complain if buddy is known already:
-        BuddyList::iterator i = std::find(buddies_.begin(), buddies_.end(), b);
-        if ( i != buddies_.end() )
+        if ( find(guy) )
         {
             std::clog << " Warning: duplicate Buddy::enlist()\n";
             return;
         }
 #endif
-        
-        // find an empty slot:
-        i = std::find(buddies_.begin(), buddies_.end(), nullptr);
-        if ( i != buddies_.end() )
-            *i = b;
-        else
-            buddies_.push_back(b);
-        //std::clog << this << " has " << buddies_.size() << " buddies\n";
+        // assume new buddy is not linked in any other circle:
+        assert_true( guy.buddy_ == guy );
+        Buddy * b = buddy_;
+        buddy_ = guy;
+        guy->buddy_ = b;
+        //std::clog << this << " has " << nbBuddies() << " buddies\n";
     }
     
-    /// removes `b` from the list of known buddy, do not call goodbye()
-    Buddy * unlist(Buddy * b)
+    /// remove `b` from the list of known buddy, do not call goodbye()
+    void unlist(Buddy * guy)
     {
-        BuddyList::iterator i = std::find(buddies_.begin(), buddies_.end(), b);
-        if ( i != buddies_.end() )
+        Buddy * b = find(guy);
+        if ( b )
         {
-            *i = nullptr;
-            return b;
+            assert_true( b->buddy_ == guy );
+            b->buddy_ = guy->buddy_;
         }
         else
             std::clog << " Warning: Buddy::unlist(unlisted)\n";
-        return nullptr;
+    }
+    
+    /// removes `self` from the list of known buddy, do not call goodbye()
+    void unlist()
+    {
+        Buddy * b = buddy_;
+        while ( b->buddy_ != this )
+            b = b->buddy_;
+        b->buddy_ = buddy_;
+        buddy_ = this;
     }
 
 public:
     
     /// constructor
-    Buddy() {}
+    Buddy() { buddy_ = this; }
     
     /// upon destruction, invoke `goodbye` for all buddies
     virtual ~Buddy()
     {
-        //std::clog << this << " ::~Buddy()\n";
-        for ( Buddy * b : buddies_ )
+        // std::clog << this << " ::~Buddy()\n";
+        Buddy * b = buddy_;
+        while ( b != this )
         {
-            if ( b )
-            {
-                b->goodbye(this);
-                b->unlist(this);
-            }
+            b->goodbye(this);
+            b = b->buddy_;
         }
+        unlist();
     }
     
     /// this is called everytime a known buddy is destroyed
@@ -112,7 +126,7 @@ public:
         //std::clog << "Buddy " << this << "::goodbye(" << b << ")\n";
     }
     
-    /// used as a signal from a buddy
+    /// used as a signal between buddies
     virtual void salute(Buddy const*)
     {
     }
@@ -120,66 +134,46 @@ public:
     /// invoke `salute(this)` for all buddies
     void salute()
     {
-        for ( Buddy * b : buddies_ )
+        Buddy * b = buddy_;
+        while ( b != this )
+        {
             b->salute(this);
+            b = b->buddy_;
+        }
     }
     
     /// will make `this` and `guy` mutual buddies
     void connect(Buddy * guy)
     {
         if ( guy )
-        {
             enlist(guy);
-            guy->enlist(this);
-        }
     }
     
     /// remove `this` and `guy` from each other lists, without calling goodbye()
     void disconnect(Buddy * guy)
     {
         if ( guy )
-        {
             unlist(guy);
-            guy->unlist(this);
-        }
-    }
-
-    /// returns the number of registered buddies
-    size_t nbBuddies() const
-    {
-        return buddies_.size();
     }
     
     /// return first buddy or *this
     Buddy const* buddy() const
     {
-        if ( buddies_.size() )
-            return buddies_[0];
-        return this;
-    }
-
-    /// return buddy at index `ix`
-    Buddy const* buddy(const size_t ix) const
-    {
-        if ( ix < buddies_.size() )
-            return buddies_[ix];
+        if ( buddy_ != this )
+            return buddy_;
         return nullptr;
-    }
-    
-    /// returns true if `guy` is a buddy
-    bool check(Buddy const* guy) const
-    {
-        BuddyList::const_iterator i = std::find(buddies_.begin(), buddies_.end(), guy);
-        
-        return ( i != buddies_.end() );
     }
     
     /// print list of buddies
     void print(std::ostream& os) const
     {
-        os << "object " << this << " buddies are: ";
-        for ( Buddy * b : buddies_ )
+        os << "Object " << this << " buddies are: ";
+        Buddy * b = buddy_;
+        while ( b != this )
+        {
             os << "   " << b;
+            b = b->buddy_;
+        }
         os << "\n";
     }
 };

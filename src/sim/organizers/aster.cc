@@ -320,7 +320,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
     sol->fixShape();
     asSolid = sol;
     //asSolid->write(std::clog);
-    if ( !Buddy::check(asSolid) )
+    if ( !Buddy::find(asSolid) )
         Buddy::connect(asSolid);
     return ref;
 }
@@ -596,7 +596,7 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
         Organizer::read(in, sim, tag);
     }
     
-    if ( !Buddy::check(solid()) )
+    if ( !Buddy::find(solid()) )
         Buddy::connect(solid());
     Solid const* sol = solid();
     if ( sol->nbPoints() > 1 )

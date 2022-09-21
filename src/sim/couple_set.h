@@ -3,6 +3,8 @@
 #ifndef COUPLE_SET_H
 #define COUPLE_SET_H
 
+#include <vector>
+
 #include "object_set.h"
 #include "couple.h"
 #include "couple_prop.h"

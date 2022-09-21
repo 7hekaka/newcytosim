@@ -1,6 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
-
 #ifndef MECABLE_H
 #define MECABLE_H
 

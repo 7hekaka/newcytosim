@@ -3,6 +3,8 @@
 #ifndef ORGANIZER_H
 #define ORGANIZER_H
 
+#include <vector>
+
 #include "assert_macro.h"
 #include "object.h"
 #include "buddy.h"

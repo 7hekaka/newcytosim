@@ -332,8 +332,8 @@ bool Couple::permitAttachment(FiberSite const& sit, Hand const* h) const
      i.e. a link between two Fibers from the same aster, very close to the center
      of this aster. Such links would be improductive, and would trap the Couples.
      */
-    const Buddy * bud = fib->buddy(0);
-    if ( bud  &&  bud == fox->buddy(0) )
+    const Buddy * bud = fib->buddy();
+    if ( bud  &&  bud == fox->buddy() )
     {
         real a = that->abscissa();
         real b = sit.abscissa();

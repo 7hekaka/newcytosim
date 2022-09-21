@@ -42,7 +42,7 @@ bool Organizer::check(Mecable const* m) const
 
 void Organizer::goodbye(Buddy const* b)
 {
-    //std::clog << this << " organizer lost " << b << "\n";
+    //std::clog << reference() << " lost " << b << "\n";
     MecableList::iterator i = std::find(mObjects.begin(), mObjects.end(), b);
     if ( i != mObjects.end() )
         *i = nullptr;

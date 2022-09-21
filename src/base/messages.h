@@ -4,6 +4,7 @@
 #define  MESSAGES_H
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 
 
@@ -15,7 +16,7 @@ namespace Cytosim
     class Output
     {
         /// prefix to all messages
-        std::string  pref_;
+        std::string pref_;
 
         /// pointer to the current destination of output
         std::ostream out_;
@@ -26,7 +27,7 @@ namespace Cytosim
         /// alias to /dev/null
         std::ofstream nul_;
 
-        /// remaining number of output that will be performed
+        /// number of output events still permitted
         size_t cnt_;
 
     public:
@@ -85,7 +86,9 @@ namespace Cytosim
             if ( out_.good() && cnt_ )
             {
                 --cnt_;
-                out_ << pref_ << x;
+                if ( pref_.size() > 0 )
+                    out_.write(pref_.data(), pref_.size());
+                out_ << x;
                 return out_;
             }
             return nul_;
