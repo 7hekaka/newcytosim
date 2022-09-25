@@ -3144,7 +3144,13 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     if ( !fib || !fox )
     {
         if ( print )
-            out<<LIN<<ang<<SEP<<0<<SEP<<1<<SEP<<0<<SEP<<0<<SEP<<0<<SEP<<cat;
+        {
+            out << ang << SEP << 0;
+            out << SEP << 1 << SEP << 0 << SEP << 0 << SEP << 0 << SEP << cat;
+            cat = 'U';
+            abs = 0;
+            ang = -1;
+        }
         return;
     }
     const real sup = 3 * fib->prop->steric_radius;
@@ -3210,7 +3216,13 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         finished = 1;
 
     if ( print || finished )
-        out<<std::setprecision(4)<<ang<<SEP<<std::setprecision(4)<<dis<<SEP<<K<<SEP<<X<<SEP<<Z<<SEP<<T<<SEP<<cat;
+    {
+        out << std::setprecision(4) << ang << SEP << std::setprecision(4) << dis;
+        out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << cat;
+        cat = 'U';
+        abs = 0;
+        ang = -1;
+    }
 }
 
 /**
