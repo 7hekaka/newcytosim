@@ -1116,6 +1116,7 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
 /**
  Export Mean Squared Displacement of fiber's MINUS_ENDs since the last call
  to this function.
+ \todo: it would be simpler to add a 'Vector oldPos;' directly in class Fiber.
  */
 void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel) const
 {
@@ -1570,7 +1571,6 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
     
     // used to calculate the size of the network from the position of connectors
     Accumulator acc;
-    
     typedef std::vector<Connector> clist_t;
     typedef std::map<ObjectID, clist_t> map_t;
     
@@ -2639,7 +2639,7 @@ void Simul::flagClustersCouples() const
         ObjectFlag f = X->fiber1()->flag();
         ObjectFlag g = X->fiber2()->flag();
         if ( f != g )
-            changeFlag(std::max(f, g), std::min(f, g));
+            changeFlags(std::max(f, g), std::min(f, g));
     }
 }
 
@@ -2655,7 +2655,7 @@ void Simul::flagClustersCouples(Property const* sel) const
             ObjectFlag f = X->fiber1()->flag();
             ObjectFlag g = X->fiber2()->flag();
             if ( f != g )
-                changeFlag(std::max(f, g), std::min(f, g));
+                changeFlags(std::max(f, g), std::min(f, g));
         }
     }
 }
@@ -2673,7 +2673,7 @@ void Simul::flagClustersSingles() const
             ObjectFlag f = X->fiber()->flag();
             ObjectFlag g = B->flag();
             if ( f != g )
-                changeFlag(std::max(f, g), std::min(f, g));
+                changeFlags(std::max(f, g), std::min(f, g));
         }
     }
 }
@@ -2698,7 +2698,7 @@ struct Cluster
     size_t     cnt;
     ObjectFlag flg;
 
-    Cluster(ObjectFlag f, size_t n) { flg = f; cnt = n; }
+    Cluster(ObjectFlag f, size_t n) : cnt(n), flg(f) {}
         
     /// Compare function
     bool operator < (Cluster const&b) const
@@ -2714,16 +2714,17 @@ Set Mecable::flag() to 'f' for Mecables in the largest cluster
 */
 void Simul::flagLargestCluster(ObjectFlag f) const
 {
+    // for large systems, it would be better to use a std:unordered_map here:
     typedef std::map<ObjectFlag, size_t> map_t;
     map_t map;
 
-    // extract clusters in 'map' and reset fiber's flag:
+    // collect number of fibers with same 'flag' value:
     for ( Fiber* fib = fibers.first(); fib; fib = fib->next() )
         ++map[fib->flag()];
     
     size_t size = 0;
     ObjectFlag largest = 0;
-    // insert clusters with size information to get them sorted:
+    // find largest clusters in 'map':
     for ( map_t::value_type const& i : map )
     {
         if ( i.second > size )

@@ -508,43 +508,45 @@ void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list) const
 }
 
 
-/** This should match Object::writeHeader() */
+/**  read header in binary format. This should match Object::writeHeader() */
 static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
 {
-    if ( in.binary() )
+    if ( fat )
     {
-        // read header in binary format
-        if ( fat )
-        {
-            ix = in.readUInt16();
-            id = in.readUInt32();
-            mk = in.readUInt32();
-        }
-        else
-        {
-            ix = in.readUInt8();
-            id = in.readUInt16();
-        }
+        ix = in.readUInt16();
+        id = in.readUInt32();
+        mk = in.readUInt32();
     }
     else
     {
-        // read header in text format
-        FILE * f = in.file();
-        if ( 1 != fscanf(f, "%u", &ix) )
-            throw InvalidIO("invalid Object header");
-        if ( in.get_char() != ':' )
-            throw InvalidIO("invalid Object header");
-        if ( 1 != fscanf(f, "%u", &id) )
-            throw InvalidIO("invalid Object header");
-        int c = in.get_char();
-        if ( c == ':' )
-        {
-            if ( 1 != fscanf(f, "%u", &mk) )
-            throw InvalidIO("invalid Object header");
-        }
-        else
-            in.unget(c);
+        ix = in.readUInt8();
+        id = in.readUInt16();
     }
+}
+
+
+/**  read header in text format. This should match Object::writeHeader() */
+static void readObjectHeaderASCII(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+{
+    FILE * f = in.file();
+    if ( 1 != fscanf(f, "%u", &ix) )
+        throw InvalidIO("invalid Object header");
+    if ( in.get_char() != ':' )
+        throw InvalidIO("invalid Object header");
+    if ( 1 != fscanf(f, "%u", &id) )
+        throw InvalidIO("invalid Object header");
+    int c = in.get_char();
+    if ( c == ':' )
+    {
+        unsigned u = 0;
+        if ( 1 != fscanf(f, "%u", &u) )
+            throw InvalidIO("invalid Object header");
+        mk = (ObjectMark)u;
+        if ( (unsigned)mk != u )
+            throw InvalidIO("overflow ObjectMark");
+    }
+    else
+        in.unget(c);
 }
 
 
@@ -561,8 +563,11 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     ObjectMark mk = 0;
     Object * obj = nullptr;
     
-    readObjectHeader(in, fat, pid, id, mk);
-    
+    if ( in.binary() )
+        readObjectHeader(in, fat, pid, id, mk);
+    else
+        readObjectHeaderASCII(in, fat, pid, id, mk);
+
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");
     //std::clog << "- load " << Object::reference(tag, pid, id) << '\n';

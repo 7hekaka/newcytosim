@@ -582,7 +582,7 @@ public:
     void setFlags(ObjectFlag f) const;
     
     /// replace all occurence of flag `f` by `g`
-    void changeFlag(ObjectFlag f, ObjectFlag g) const;
+    void changeFlags(ObjectFlag f, ObjectFlag g) const;
 
     /// calculate clusters of Mecable derived from all interactions
     void flagClustersMeca() const;

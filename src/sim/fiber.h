@@ -225,7 +225,7 @@ public:
 #endif
 
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
-    virtual void join(Fiber * fib);
+    virtual void join(Fiber *);
     
     /// simulation step
     virtual void step();

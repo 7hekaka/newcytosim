@@ -254,6 +254,9 @@ ObjectFlag Simul::setUniqueFlags() const
         B->flag(f++);
     for ( Sphere* O = spheres.firstID(); O; O = spheres.nextID(O) )
         O->flag(f++);
+    size_t cnt = fibers.size() + solids.size() + beads.size() + spheres.size();
+    if ( (size_t)f != cnt+1 )
+        throw InvalidParameter("ObjectFlag overflow in setUniqueFlags()");
     return f;
 }
 
@@ -271,7 +274,7 @@ void Simul::setFlags(ObjectFlag f) const
 }
 
 
-void Simul::changeFlag(ObjectFlag f, ObjectFlag g) const
+void Simul::changeFlags(ObjectFlag f, ObjectFlag g) const
 {
     for ( Fiber * F=fibers.first(); F; F=F->next() )
         if ( F->flag() == f ) F->flag(g);

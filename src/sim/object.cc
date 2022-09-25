@@ -192,7 +192,16 @@ Writes the info that is common to all objects to file
  */
 void Object::writeHeader(Outputter& out, ObjectTag g) const
 {
-    if ( out.binary() )
+    if ( !out.binary() )
+    {
+        out.writeChar('\n');
+        out.writeChar(g);
+        out.writeUInt(property()->number());
+        out.writeUInt(identity(), ':');
+        if ( mark() )
+            out.writeUInt(mark(), ':');
+    }
+    else
     {
         if ( identity() > 16777216 )
             throw InvalidIO("binary file data format overflow");
@@ -210,15 +219,6 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
             out.writeUInt8(property()->number());
             out.writeUInt16(identity());
         }
-    }
-    else
-    {
-        out.writeChar('\n');
-        out.writeChar(g);
-        out.writeUInt(property()->number());
-        out.writeUInt(identity(), ':');
-        if ( mark() )
-            out.writeUInt(mark(), ':');
     }
 }
 

@@ -752,7 +752,9 @@ void markConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecables)
     ObjectFlag i = 0;
     for ( Mecable * mec : mecables )
         mec->flag(i++);
-    
+    if ( (size_t)i != mecables.size() )
+        throw InvalidParameter("ObjectFlag overflow in markConnectivity()");
+
     for ( Mecable const* mec : mecables )
     {
         i = mec->flag();
