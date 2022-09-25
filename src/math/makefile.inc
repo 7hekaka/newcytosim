@@ -1,10 +1,10 @@
-# Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+# Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
-
-OBJ_MATH := vector1.o vector2.o vector3.o vector4.o matrix11.o matrix22.o matrix33.o\
-    	rasterizer.o matrix.o sparmat.o sparmatsym.o project_ellipse.o\
-    	sparmatsym1.o sparmatsym2.o matrix34.o matfull.o polygon.o\
-        spherical_code.o random.o random_vector.o quartic_solver.o
+OBJ_MATH := vector1.o vector2.o vector3.o vector4.o random_vector.o\
+    	matrix11.o matrix22.o matrix33.o matrix.o sparmat.o sparmatsym.o\
+    	sparmatsym1.o sparmatsym2.o matrix34.o matfull.o\
+        project_ellipse.o polygon.o quartic_solver.o\
+        rasterizer.o spherical_code.o random.o
 
 OBJ_SPARMAT := sparmatblk.o sparmatsymblk.o sparmatsymblkdiag.o
 
@@ -57,19 +57,19 @@ build/sparmatblkD3.o: sparmatblk.cc sparmatblk.h
 	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o $@
 
 
-cytomath.a: $(OBJ_MATH) $(OBJ_SPARMAT) | lib
-	$(MAKELIB)
+cytomath.a: $(addprefix build/, $(OBJ_MATH) $(OBJ_SPARMAT) SFMT.o ) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytomathD1.a: $(OBJ_MATH) $(OBJ_SPARMAT:%.o=%D1.o) | lib
-	$(MAKELIB)
+cytomathD1.a: $(addprefix build/, $(OBJ_MATH) SFMT.o) $(OBJ_SPARMAT:%.o=build/%D1.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytomathD2.a: $(OBJ_MATH) $(OBJ_SPARMAT:%.o=%D2.o) | lib
-	$(MAKELIB)
+cytomathD2.a: $(addprefix build/, $(OBJ_MATH) SFMT.o) $(OBJ_SPARMAT:%.o=build/%D2.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytomathD3.a: $(OBJ_MATH) $(OBJ_SPARMAT:%.o=%D3.o) | lib
-	$(MAKELIB)
+cytomathD3.a: $(addprefix build/, $(OBJ_MATH) SFMT.o) $(OBJ_SPARMAT:%.o=build/%D3.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 

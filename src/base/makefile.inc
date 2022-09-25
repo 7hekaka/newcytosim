@@ -15,7 +15,7 @@ build/operator_new.o: operator_new.cc | build
 
 #----------------------------targets--------------------------------------------
 
-cytobase.a: $(OBJ_BASE) operator_new.o | lib
-	$(MAKELIB)
+cytobase.a: $(OBJ_BASE:%.o=build/%.o) build/operator_new.o | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 

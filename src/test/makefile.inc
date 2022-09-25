@@ -161,7 +161,7 @@ test_glut: test_glut.cc | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 
-test_solve: test_solve.cc cytomath.a cytobase.a SFMT.o gym_matrix.o | bin
+test_solve: test_solve.cc cytomath.a cytobase.a gym_matrix.o | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 

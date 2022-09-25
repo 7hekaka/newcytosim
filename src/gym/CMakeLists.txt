@@ -1,6 +1,8 @@
 
 add_subdirectory("deps")
 
+set(GYM_DIR "${PROJECT_SOURCE_DIR}/src/gym/")
+
 set(SOURCES_GYM
     gle.cc
     gym_matrix.cc
@@ -21,20 +23,18 @@ set(SOURCES_GYM
     offscreen.cc
     fg_font.cc
     fg_stroke.cc
+    deps/spng.c
+    deps/miniz.c
 )
 
-list(TRANSFORM SOURCES_GYM PREPEND "${PROJECT_SOURCE_DIR}/src/gym/")
+list(TRANSFORM SOURCES_GYM PREPEND "${GYM_DIR}")
+
+set_property(SOURCE ${GYM_DIR}/deps/spng.c PROPERTY COMPILE_DEFINITIONS SPNG_STATIC SPNG_USE_MINIZ)
+set_property(SOURCE ${GYM_DIR}/save_image.cc PROPERTY INCLUDE_DIRECTORIES "${GYM_DIR}/deps")
 
 set(GYM_INCLUDES base math)
 list(TRANSFORM GYM_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
-set(SOURCES_GYM_DEPS spng.c miniz.c)
-list(TRANSFORM SOURCES_GYM_DEPS PREPEND "${PROJECT_SOURCE_DIR}/src/gym/deps/")
-set_property(SOURCE spng.c PROPERTY COMPILE_DEFINITIONS SPNG_STATIC SPNG_USE_MINIZ)
-
 add_library(${GYM_LIBRARY} STATIC ${SOURCES_GYM} ${SOURCES_GYM_DEPS})
-
 target_compile_definitions(${GYM_LIBRARY} PRIVATE -DDISPLAY)
 target_include_directories(${GYM_LIBRARY} PUBLIC "${GYM_INCLUDES}")
-
-set_property(SOURCE save_image.cc PROPERTY INCLUDE_DIRECTORIES "${PROJECT_SOURCE_DIR}/src/gym/deps")

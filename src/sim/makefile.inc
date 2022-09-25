@@ -62,10 +62,6 @@ OBJ_RUN := sim_thread.o frame_reader.o
 OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HAND) $(OBJ_DIGIT) $(OBJ_FIBER)\
              $(OBJ_SINGLE) $(OBJ_COUPLE) $(OBJ_ASTER) $(OBJ_SIM) $(OBJ_RUN)
 
-OBJ_CYTOLIB1:=$(OBJ_CYTOLIB:%.o=build/%D1.o)
-OBJ_CYTOLIB2:=$(OBJ_CYTOLIB:%.o=build/%D2.o)
-OBJ_CYTOLIB3:=$(OBJ_CYTOLIB:%.o=build/%D3.o)
-
 # objects containing graphical code under the DISPLAY keyword:
 OBJ_SIMDISP:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
 OBJ_CYTOLIBG:=$(OBJ_SIMDISP:%.o=%G.o) $(filter-out $(OBJ_SIMDISP),$(OBJ_CYTOLIB))
@@ -76,29 +72,29 @@ INC_BM:=-Isrc/base -Isrc/math
 
 #--- normal build:
 
-sim: sim.cc cytolib.a cytomath.a cytobase.a SFMT.o | bin
+sim: sim.cc cytolib.a cytomath.a cytobase.a | bin
 	$(COMPILE) $(INC_BM) $(INFO) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath sim  bin
 
 #--- build for debuging:
 
-simd: sim.cc cytolib.a cytomath.a cytobase.a SFMT.o | bin
+simd: sim.cc cytolib.a cytomath.a cytobase.a | bin
 	$(CXX) $(FlagsD) $(INC_BM) $(INFO) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 vpath simd  bin
 
 #--- builds with specific dimension:
 
-bin1/sim: sim.cc cytolibD1.a cytomathD1.a cytobase.a SFMT.o | bin1
+bin1/sim: sim.cc cytolibD1.a cytomathD1.a cytobase.a | bin1
 	$(COMPILE) $(INC_BM) $(INFO) -DDIM=1 $(OBJECTS) $(LINK) -o bin1/sim
 	$(DONE)
 
-bin2/sim: sim.cc cytolibD2.a cytomathD2.a cytobase.a SFMT.o | bin2
+bin2/sim: sim.cc cytolibD2.a cytomathD2.a cytobase.a | bin2
 	$(COMPILE) $(INC_BM) $(INFO) -DDIM=2 $(OBJECTS) $(LINK) -o bin2/sim
 	$(DONE)
 
-bin3/sim: sim.cc cytolibD3.a cytomathD3.a cytobase.a SFMT.o | bin3
+bin3/sim: sim.cc cytolibD3.a cytomathD3.a cytobase.a | bin3
 	$(COMPILE) $(INC_BM) $(INFO) -DDIM=3 $(OBJECTS) $(LINK) -o bin3/sim
 	$(DONE)
 
@@ -106,37 +102,37 @@ bin3/sim: sim.cc cytolibD3.a cytomathD3.a cytobase.a SFMT.o | bin3
 #--- libraries:
 
 cytolib.a: $(OBJ_CYTOLIB:%.o=build/%.o) | lib
-	$(MAKELIB)
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibD1.a: $(OBJ_CYTOLIB1) | lib
-	$(MAKELIB)
+cytolibD1.a: $(OBJ_CYTOLIB:%.o=build/%D1.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibD2.a: $(OBJ_CYTOLIB2) | lib
-	$(MAKELIB)
+cytolibD2.a: $(OBJ_CYTOLIB:%.o=build/%D2.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibD3.a: $(OBJ_CYTOLIB3) | lib
-	$(MAKELIB)
+cytolibD3.a: $(OBJ_CYTOLIB:%.o=build/%D3.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
 #--- libraries with graphical code enabled
 
-cytolibG.a: $(OBJ_CYTOLIBG) | lib
-	$(MAKELIB)
+cytolibG.a: $(OBJ_CYTOLIBG:%.o=build/%.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibGD1.a: $(OBJ_CYTOLIBG:%.o=%D1.o) | lib
-	$(MAKELIB)
+cytolibGD1.a: $(OBJ_CYTOLIBG:%.o=build/%D1.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibGD2.a: $(OBJ_CYTOLIBG:%.o=%D2.o) | lib
-	$(MAKELIB)
+cytolibGD2.a: $(OBJ_CYTOLIBG:%.o=build/%D2.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibGD3.a: $(OBJ_CYTOLIBG:%.o=%D3.o) | lib
-	$(MAKELIB)
+cytolibGD3.a: $(OBJ_CYTOLIBG:%.o=build/%D3.o) | lib
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
 #-----------minimal include directories, DIM defined in 'dim.h'-----------------
@@ -176,13 +172,13 @@ $(OBJ_RUN:%.o=build/%.o): build/%.o: %.cc %.h | build
 INC_SIM=$(addprefix -Isrc/, base math sim sim/fibers sim/hands sim/singles sim/couples sim/organizers sim/spaces)
 
 
-$(OBJ_CYTOLIB1): build/%D1.o: %.cc %.h %.o | build
+$(OBJ_CYTOLIB:%.o=build/%D1.o): build/%D1.o: %.cc %.h | build
 	$(COMPILE) -DDIM=1 $(INC_SIM) -c $< -o $@
 
-$(OBJ_CYTOLIB2): build/%D2.o: %.cc %.h %.o | build
+$(OBJ_CYTOLIB:%.o=build/%D2.o): build/%D2.o: %.cc %.h | build
 	$(COMPILE) -DDIM=2 $(INC_SIM) -c $< -o $@
 
-$(OBJ_CYTOLIB3): build/%D3.o: %.cc %.h %.o | build
+$(OBJ_CYTOLIB:%.o=build/%D3.o): build/%D3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 $(INC_SIM) -c $< -o $@
 
 
@@ -190,15 +186,15 @@ $(OBJ_CYTOLIB3): build/%D3.o: %.cc %.h %.o | build
 
 INC_BMSD=$(addprefix -Isrc/, base math sim sim/spaces gym disp)
 
-$(OBJ_SIMDISP:%.o=build/%G.o): build/%G.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%G.o): build/%G.o: %.cc %.h | build
 	$(COMPILE) -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_SIMDISP:%.o=build/%GD1.o): build/%GD1.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%GD1.o): build/%GD1.o: %.cc %.h | build
 	$(COMPILE) -DDIM=1 -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_SIMDISP:%.o=build/%GD2.o): build/%GD2.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%GD2.o): build/%GD2.o: %.cc %.h | build
 	$(COMPILE) -DDIM=2 -DDISPLAY $(INC_BMSD) -c $< -o $@
 
-$(OBJ_SIMDISP:%.o=build/%GD3.o): build/%GD3.o: %.cc %.h %.o | build
+$(OBJ_SIMDISP:%.o=build/%GD3.o): build/%GD3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMSD) -c $< -o $@
 

@@ -26,9 +26,6 @@ endif
 # command to invoke compiler:
 COMPILE := $(CXX) $(CXXFLG) $(Flags$(MODE))
 
-# macro to make a library:
-MAKELIB = $(LIBTOOL) lib/$@ $(addprefix build/, $(notdir $^))
-
 # macro to fix the paths of objects:
 OBJECTS = $(filter %.cc, $^) $(addprefix build/, $(notdir $(filter %.o, $^))) $(addprefix lib/, $(notdir $(filter %.a, $^)))
 
@@ -63,8 +60,8 @@ vpath SFMT.c src/math/
 
 # calling 'make' without arguments will make sim, play and report:
 
-.PHONY: simplay
-simplay: sim report play
+.PHONY: cytosim
+cytosim: sim report play
 
 info:
 	@echo $(MACHINE)
@@ -125,7 +122,6 @@ tarsrc:
 pack: sterile tarsrc
 
 #---------------------------- maintenance --------------------------------------
-.PHONY: bin build clean cleaner sterile
 
 bin:
 	mkdir -p $@
@@ -144,6 +140,8 @@ build:
 
 lib:
 	mkdir -p $@
+
+.PHONY: clean cleaner sterile
 
 clean:
 	mkdir -p dep

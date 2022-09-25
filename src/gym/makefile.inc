@@ -23,8 +23,8 @@ endif
 
 #----------------------------targets--------------------------------------------
 
-cytodisp.a: $(OBJ_GRFX)
-	$(MAKELIB)
+cytodisp.a: $(OBJ_GRFX:%.o=build/%.o)
+	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
 
