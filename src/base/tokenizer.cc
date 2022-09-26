@@ -311,9 +311,9 @@ bool Tokenizer::get_integer(std::istream& is, unsigned long& var)
         is.seekg(isp);
         return false;
     }
-    if ( !isspace(is.peek()) && is.peek()!=EOF )
+    if ( is.peek() == '.' )
     {
-        // declare error, if there is no spacing character:
+        // declare error, if a 'dot' sign follows
         is.seekg(isp);
         throw InvalidParameter("an integer is expected");
     }
@@ -338,9 +338,9 @@ bool Tokenizer::get_integer(std::istream& is, long& var)
         is.seekg(isp);
         return false;
     }
-    if ( !isspace(is.peek()) && is.peek()!=EOF )
+    if ( is.peek() == '.' )
     {
-        // declare error, if there is no spacing character:
+        // declare error, if a 'dot' sign follows
         is.seekg(isp);
         throw InvalidParameter("an integer is expected");
     }

@@ -8,6 +8,7 @@
 #include "messages.h"
 #include "tokenizer.h"
 #include "print_color.h"
+#include "evaluator.h"
 #include "glossary.h"
 #include "filepath.h"
 #include "stream_func.h"
@@ -1088,7 +1089,7 @@ void Parser::parse_repeat(std::istream& is)
  Example:
  
      for CNT=1:10 {
-       new 10 filament { length = CNT }
+       new 10 filament { length = [CNT+2] }
      }
  
  NOTE: This code is a hack, and can be improved vastly!
@@ -1104,24 +1105,38 @@ void Parser::parse_for(std::istream& is)
         throw InvalidSyntax("missing '=' in command 'for'");
     
     if ( ! Tokenizer::get_integer(is, start) )
-        throw InvalidSyntax("missing number after 'repeat'");
+        throw InvalidSyntax("missing number in command 'for'");
 
     s = Tokenizer::get_character(is, 1, 0);
     if ( s != ':' )
         throw InvalidSyntax("missing ':' in command 'for'");
     
     if ( ! Tokenizer::get_integer(is, end) )
-        throw InvalidSyntax("missing number after 'repeat'");
+        throw InvalidSyntax("missing number in command 'for'");
     
     std::string code = Tokenizer::get_block(is, '{');
     
     for ( size_t c = start; c < end; ++c )
     {
-        std::string sub = code;
         // substitute Variable name for this iteration:
-        StreamFunc::find_and_replace(sub, var, std::to_string(c));
-        // execute code:
-        evaluate(sub);
+        std::string res;
+        std::string::size_type P = code.find('[', 0);
+        res.append(code, 0, P);
+        while ( P != std::string::npos )
+        {
+            ++P;
+            std::string::size_type Q = code.find(']', P);
+            if ( Q != std::string::npos )
+            {
+                std::string S = code.substr(P, Q-P);
+                ++Q;
+                res.append(std::to_string(c));
+                P = code.find('[', Q);
+                res.append(code, Q, P-Q);
+            }
+        }
+        //std::clog << res << "\n";
+        evaluate(res);
     }
 }
 

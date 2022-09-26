@@ -333,21 +333,23 @@ size_t StreamFunc::line_number(std::istream& is, std::streampos pos)
 }
 
 
-size_t StreamFunc::find_and_replace(std::string & src,
-                                 std::string const& fnd, std::string const& rep)
+std::string StreamFunc::replace_string(std::string const& src, std::string const& fnd,
+                                       std::string const& sub, size_t& cnt)
 {
-    size_t num = 0;
-    std::string::size_type fLen = fnd.size();
-    std::string::size_type rLen = rep.size();
-    std::string::size_type pos = src.find(fnd, 0);
-    while ( pos != std::string::npos )
+    cnt = 0;
+    std::string res;
+    std::string::size_type P = 0;
+    std::string::size_type Q = src.find(fnd, 0);
+    res.append(src, 0, Q);
+    while ( Q != std::string::npos )
     {
-        num++;
-        src.replace(pos, fLen, rep);
-        pos += rLen;
-        pos = src.find(fnd, pos);
+        ++cnt;
+        res.append(sub);
+        P = Q + fnd.size();
+        Q = src.find(fnd, P);
+        res.append(src, P, Q-P);
     }
-    return num;
+    return res;
 }
 
 

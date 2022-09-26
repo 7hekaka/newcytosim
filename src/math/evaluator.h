@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <vector>
+#include "exceptions.h"
 
 /// a minimal math expression evaluator
 /**
