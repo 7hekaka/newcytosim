@@ -1096,28 +1096,37 @@ void Parser::parse_repeat(std::istream& is)
  */
 void Parser::parse_for(std::istream& is)
 {
-    size_t start = 0, end = 1;
+    long start = 0, end = 1, inc = 1;
     
     std::string var = Tokenizer::get_symbol(is);
     
-    int s = Tokenizer::get_character(is, 1, 0);
+    int s = Tokenizer::get_character(is);
     if ( s != '=' )
         throw InvalidSyntax("missing '=' in command 'for'");
     
     if ( ! Tokenizer::get_integer(is, start) )
         throw InvalidSyntax("missing number in command 'for'");
 
-    s = Tokenizer::get_character(is, 1, 0);
+    s = Tokenizer::get_character(is);
     if ( s != ':' )
         throw InvalidSyntax("missing ':' in command 'for'");
     
     if ( ! Tokenizer::get_integer(is, end) )
         throw InvalidSyntax("missing number in command 'for'");
     
+    if ( is.peek() == ':' )
+    {
+        is.get();
+        inc = end;
+        if ( ! Tokenizer::get_integer(is, end) )
+            throw InvalidSyntax("missing number in command 'for'");
+    }
+    
     std::string code = Tokenizer::get_block(is, '{');
     
-    for ( size_t c = start; c < end; ++c )
+    for ( long v = start; v < end; v += inc )
     {
+        Evaluator evaluator{{var, v}};
         // substitute Variable name for this iteration:
         std::string res;
         std::string::size_type P = code.find('[', 0);
@@ -1130,7 +1139,7 @@ void Parser::parse_for(std::istream& is)
             {
                 std::string S = code.substr(P, Q-P);
                 ++Q;
-                res.append(std::to_string(c));
+                res.append(evaluator.eval_repr(S));
                 P = code.find('[', Q);
                 res.append(code, Q, P-Q);
             }

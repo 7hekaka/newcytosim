@@ -541,9 +541,9 @@ restart:
         else if ( tok == "if" )
         {
             tok = Tokenizer::get_token(is);
-            Evaluator evaluator{{'X', pos.x()}, {'Y', pos.y()}, {'Z', pos.z()}};
+            Evaluator evaluator{{"X", pos.x()}, {"Y", pos.y()}, {"Z", pos.z()}};
             try {
-                if ( 0 == evaluator.eval(tok.c_str()) )
+                if ( 0 == evaluator.eval(tok) )
                 {
                     if ( ++ouf < max_trials )
                     {
@@ -817,9 +817,9 @@ restart:
         else if ( tok == "if" )
         {
             tok = Tokenizer::get_token(is);
-            Evaluator evaluator{{'X', dir.x()}, {'Y', dir.y()}, {'Z', dir.z()}};
+            Evaluator evaluator{{"X", dir.x()}, {"Y", dir.y()}, {"Z", dir.z()}};
             try {
-                if ( 0 == evaluator.eval(tok.c_str()) )
+                if ( 0 == evaluator.eval(tok) )
                 {
                     if ( ++ouf < max_trials )
                     {

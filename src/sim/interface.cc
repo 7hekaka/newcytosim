@@ -283,10 +283,10 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
         bool condition = true;
         if ( has_condition )
         {
-            Evaluator evaluator{{'X', iso.mov.x()}, {'Y', iso.mov.y()}, {'Z', iso.mov.z()},
-                                {'R', iso.mov.norm()}, {'P', RNG.preal()}};
+            Evaluator evaluator{{"X", iso.mov.x()}, {"Y", iso.mov.y()}, {"Z", iso.mov.z()},
+                                {"R", iso.mov.norm()}, {"P", RNG.preal()}};
             try {
-                condition = ( 0 != evaluator.eval(str.c_str()) );
+                condition = ( 0 != evaluator.eval(str) );
             }
             catch( Exception& e ) {
                 e.message(e.message()+" in `"+str+"'");
