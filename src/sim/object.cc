@@ -24,7 +24,7 @@ Object::~Object()
 
 
 /**
- This is an accessory function used in ObjectSet::collect()
+ This is a selection function used in ObjectSet::collect()
  */
 bool match_all(Object const*, void const*)
 {
@@ -32,7 +32,7 @@ bool match_all(Object const*, void const*)
 }
 
 /**
- This is an accessory function used in ObjectSet::collect()
+ This is a selection function used in ObjectSet::collect()
  */
 bool match_mark(Object const* obj, void const* mrk)
 {
@@ -40,7 +40,7 @@ bool match_mark(Object const* obj, void const* mrk)
 }
 
 /**
- This is an accessory function used in ObjectSet::collect()
+ This is a selection function used in ObjectSet::collect()
  */
 bool match_property(Object const* obj, void const* prop)
 {

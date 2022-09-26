@@ -420,7 +420,7 @@ ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void con
 
 ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void const* arg, const size_t cnt) const
 {
-    ObjectList objs = collect(pool_, func, arg);
+    ObjectList objs = collect(func, arg);
     if ( cnt < objs.size() )
     {
         // limit the list to a random subset

@@ -508,7 +508,7 @@ void Parser::parse_delete(std::istream& is)
     if ( name == "all" )
     {
         name = Tokenizer::get_symbol(is);
-        if ( !isCategory(name) )
+        if ( do_new && !isCategory(name) && !sim_->properties.find(name) )
             throw InvalidSyntax("`"+name+"' is not a known class of object");
     }
     std::string blok = Tokenizer::get_block(is, '{');
