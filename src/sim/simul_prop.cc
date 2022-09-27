@@ -83,7 +83,7 @@ void SimulProp::read(Glossary& glos)
 
     glos.set(tolerance, "tolerance");
     glos.set(acceptable_prob, "acceptable_prob");
-    glos.set(precondition, "precondition");
+    glos.set(precondition, "precondition", "precond");
     glos.set(precond_span, "precondition", 1);
     
     glos.set(steric_mode,          "steric", {{"off", 0}, {"on", 1}});

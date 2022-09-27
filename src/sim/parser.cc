@@ -220,7 +220,7 @@ void Parser::parse_set(std::istream& is)
         }
     }
 
-    if ( pp )
+    if ( do_set || do_change )
         check_warnings(opt, is, ipos);
 }
 
