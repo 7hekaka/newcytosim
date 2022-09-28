@@ -360,12 +360,14 @@ void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     opt.set(dis, "radius", 1);
     dis *= 0.5;
     opt.set(sep, "seed_diameter");
-    size_t ouf = 0;
+    size_t ouf = 0, nb_trials = 1024;
     size_t cnt = 0;
     std::vector<Vector2> pts(nbf, Vector2(0,0));
     do {
         cnt = tossPointsDisc(pts, sep/asRadius, 1024);
-    } while ( cnt < nbf && ++ouf < 1024 );
+        if ( ++ouf > nb_trials )
+            break;
+    } while ( cnt < nbf );
     if ( cnt < nbf )
     {
         std::clog << "warning: aster could only fit " << cnt << " seeds ";
@@ -534,12 +536,14 @@ void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     opt.set(dis, "radius", 1);
     opt.set(sep, "seed_diameter");
     dis /= asRadius;
-    size_t ouf = 0;
+    size_t ouf = 0, nb_trials = 1024;
     size_t cnt = 0;
     std::vector<Vector> pts(nbf, Vector(0,0,0));
     do {
         cnt = tossPointsSphere(pts, sep/asRadius, 1024);
-    } while ( cnt < nbf && ++ouf < 1024 );
+        if ( ++ouf > nb_trials )
+            break;
+    } while ( cnt < nbf );
     if ( cnt < nbf )
     {
         std::clog << "warning: aster could only fit " << cnt << " seeds ";

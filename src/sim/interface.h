@@ -34,10 +34,10 @@ private:
     void change_property(Property*, Glossary&);
     
     /// read the specification of position and orientation of an object
-    Isometry read_placement(Glossary&);
+    void read_placement(Isometry&, Glossary&);
     
     /// return position and orientation of an object, with verification of 'placement'
-    Isometry find_placement(Glossary&, int placement, size_t nb_trials);
+    bool find_placement(Isometry&, Glossary&, int placement, size_t& nb_trials);
     
 protected:
     

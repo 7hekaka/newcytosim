@@ -3188,7 +3188,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
             // 'zippering' implies 'being tangent' and 'moving along' the obstacle
             T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
             // distanced zipped is measured along the obstacle, with abscissa:
-            Z = ( abs_real(aaa-abs) > 1 ); // distance zipped sufficient
+            Z = ( abs_real(aaa-abs) > 2 ); // distance zipped sufficient
         }
         if ( cat == 'U' )
         {
@@ -3200,7 +3200,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         if ( X && !K ) cat = 'X';
         
         // since these states are final, we can terminate the simulation
-        if ( cat == 'K' || cat == 'X' )
+        if ( cat == 'K' || cat == 'X' || cat == 'Z' )
             abort_time();
     }
     else

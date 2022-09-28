@@ -170,9 +170,8 @@ void warn_trail(std::istream& is)
 /**
  Define a placement = ( position, orientation ) from the parameters set in `opt'
  */
-Isometry Interface::read_placement(Glossary& opt)
+void Interface::read_placement(Isometry& iso, Glossary& opt)
 {
-    Isometry iso;
     std::string str;
     
     Space const* spc = sim_->spaces.master();
@@ -218,8 +217,6 @@ Isometry Interface::read_placement(Glossary& opt)
         if ( has_trail(iss) ) warn_trail(iss);
         iso.rotate(rot);
     }
-
-    return iso;
 }
 
 
@@ -260,9 +257,8 @@ enum PlacementType { PLACE_NOT = 0, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
  inside the Space, and the density will thus be exactly what is specified from the
  `position` range (here 100/10*10 = 1 object per squared micrometer).
  */
-Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trials)
+bool Interface::find_placement(Isometry& iso, Glossary& opt, int placement, size_t& nb_trials)
 {
-    size_t ouf = 0;
     std::string str;
 
     Space const* spc = sim_->spaces.master();
@@ -271,13 +267,12 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
     
     // define a condition:
     bool has_condition = opt.set(str, "placement", 2);
-    
-    Isometry iso;
 
-    while ( ++ouf < nb_trials )
+    while ( nb_trials > 0 )
     {
+        --nb_trials;
         // generate a new position:
-        iso = read_placement(opt);
+        read_placement(iso, opt);
 
         // check all conditions:
         bool condition = true;
@@ -297,44 +292,55 @@ Isometry Interface::find_placement(Glossary& opt, int placement, size_t nb_trial
         if ( condition )
         {
             if ( !spc || placement == PLACE_ANYWHERE )
-                return iso;
+                return 0;
             
             if ( placement == PLACE_EDGE )
             {
                 iso.mov = spc->project(iso.mov);
-                return iso;
+                return 0;
             }
             
             if ( spc->inside(iso.mov) )
             {
                 if ( placement == PLACE_INSIDE || placement == PLACE_ALL_INSIDE )
-                    return iso;
+                    return 0;
             }
             else
             {
                 if ( placement == PLACE_OUTSIDE )
-                    return iso;
+                    return 0;
             }
         }
     }
     
     //Cytosim::warn << "could not fulfill position=`" + opt.value("position") + "'\n";
-    throw InvalidParameter("could not fulfill position=`" + opt.value("position") + "'");
-    return iso;
+    //throw InvalidParameter("could not fulfill position=`" + opt.value("position") + "'");
+    return 1;
 }
 
+
+bool all_objects_inside(ObjectList const& objs, Space const* spc)
+{
+    for ( Object * i : objs )
+    {
+        Mecable * mec = Simul::toMecable(i);
+        if ( mec && ! mec->allInside(spc) )
+            return false;
+    }
+    return true;
+}
 
 /**
  This would usually create ONE object of type 'name', placed according to `opt`
  */
 void Interface::new_object(ObjectList& objs, ObjectSet* set, Property const* pp, Glossary& opt)
 {
-    size_t ouf = 0, nb_trials = 1<<14;
+    size_t nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
 
     objs.clear();
-    do {
-        
+    while ( nb_trials > 0 )
+    {
         // create the objects:
         set->newObjects(objs, pp, opt);
         
@@ -366,35 +372,37 @@ void Interface::new_object(ObjectList& objs, ObjectSet* set, Property const* pp,
         if ( placement != PLACE_NOT )
         {
             // find a position:
-            Isometry iso = find_placement(opt, placement, nb_trials);
-            // place object at this position:
-            ObjectSet::moveObjects(objs, iso);
-            // special case for which we check all vertices:
-            if ( placement == PLACE_ALL_INSIDE )
+            Isometry iso;
+            bool err = find_placement(iso, opt, placement, nb_trials);
+            if ( !err )
             {
-                std::string str;
-                Space const* spc = sim_->spaces.master();
-                if ( opt.set(str, "placement", 1) )
-                    spc = sim_->findSpace(str);
-                for ( Object * i : objs )
+                // place object at this position:
+                ObjectSet::moveObjects(objs, iso);
+                // special case for which we check all vertices:
+                if ( placement == PLACE_ALL_INSIDE )
                 {
-                    Mecable * mec = Simul::toMecable(i);
-                    if ( mec && ! mec->allInside(spc) )
+                    std::string str;
+                    Space const* spc = sim_->spaces.master();
+                    if ( opt.set(str, "placement", 1) )
+                        spc = sim_->findSpace(str);
+                    if ( ! all_objects_inside(objs, spc) )
                     {
                         objs.destroy();
-                        break;
+                        continue;
                     }
                 }
+                break;
             }
         }
-        if ( ++ouf > nb_trials )
-        {
-            std::string name = pp ? pp->name() : "object";
-            Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
-            break;
-        }
-    } while ( objs.empty() );
+    }
     
+    if ( objs.empty() )
+    {
+        std::string name = pp ? pp->name() : "object";
+        Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
+        return;
+    }
+
     // optionally mark the objects:
     ObjectMark mk = 0;
     if ( opt.value("mark") == "random" )

@@ -193,13 +193,13 @@ bool testFatLine(Vector P, Vector Q)
 
 void manyTest()
 {
-    size_t ouf = 0;
+    size_t nb_trials = 1<<10;
     do {
         pts[0] = (SIZE-1) * Vector::randS();
         pts[1] = (SIZE-1) * Vector::randS();
         if ( testFatLine(pts[0], pts[1]) )
             break;
-    } while ( ++ouf < 1<<10 );
+    } while ( nb_trials-- > 0 );
 }
 
 //------------------------------------------------------------------------------
