@@ -1010,6 +1010,8 @@ void Interface::execute_run(size_t nb_steps)
         //fprintf(stderr, "> step %6zu\n", sss);
         sim_->solve();
         sim_->step();
+        if ( sim_->abortRun )
+            break;
     }
     
     sim_->relax();

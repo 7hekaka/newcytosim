@@ -49,7 +49,7 @@ public:
 #endif
     
     /// flag to end the 'run' as soon as possible
-    unsigned abortRun;
+    mutable bool abortRun;
 
 private:
     

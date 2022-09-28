@@ -3118,9 +3118,6 @@ void Simul::reportAshbya(std::ostream& out) const
  */
 void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
 {
-    static bool finished = 0;
-    if ( finished )
-        std::exit(EXIT_SUCCESS);
 #if ( DIM == 1 )
 	throw InvalidParameter("fiber:collision meaningless in 1D");
 #endif
@@ -3130,8 +3127,8 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     bool print = 0;
     opt.set(print, "print");
     static char cat = 'U'; // category
+    static real ang = NAN; // angle at first contact
     static real abs = 0;   // abscissa of contact point
-    static real ang = -1;  // angle at first contact
 
     Fiber const * fib = nullptr, *fox = nullptr;
     for ( Fiber const* f = fibers.first(); f; f = f->next() )
@@ -3141,87 +3138,81 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         else
             fox = f;
     }
-    if ( !fib || !fox )
-    {
-        if ( print )
-        {
-            out << ang << SEP << 0;
-            out << SEP << 1 << SEP << 0 << SEP << 0 << SEP << 0 << SEP << cat;
-            cat = 'U';
-            abs = 0;
-            ang = -1;
-        }
-        return;
-    }
-    const real sup = 3 * fib->prop->steric_radius;
-
-    // state at plus-end
-    bool K = ( fib->endStateP() == 4 );
-    
-    // check if tip of 'fib' is close to 'fox':
-    Vector tip = fib->posEndP();
     real dis = INFINITY;
-    real aaa = fox->projectPoint(tip, dis);
-    Vector dir = fox->dir(aaa);
-    dis = sqrt(dis);
-    bool D = ( dis < sup );
-    
-    bool X = 0;
-    if ( fib->length() > 1 )
-    {
-        // we consider a point 1um back from the plus-end:
-        Vector bak = fib->posFrom(1, PLUS_END);
-        real ddd, bbb = fox->projectPoint(bak, ddd);
-        bbb = 0.5 * ( aaa + bbb );
-        Vector mid = fox->pos(bbb);
-        Vector axs = fox->dir(bbb);
-        Torque TP = cross(axs, tip-mid);
-        Torque TM = cross(axs, bak-mid);
-#if ( DIM == 3 )
-        X = ( dot(TP, TM) < 0 );
-#else
-        X = ( TP * TM < 0 );
-#endif
-    }
-    
-    // check direction of fib's tip to fox at closest point:
-    real C = dot(fib->dirEndP(), dir);
-    real A = acos(abs_real(C));
-    
-    bool T = 0, Z = 0;
-    if ( D ) // tip is in contact:
-    {
-        // the angle is set at first contact:
-        if ( ang < 0 )
-        {
-            ang = A;
-            abs = aaa;
-        }
-        // 'zippering' implies 'being tangent' and 'moving along' the obstacle
-        T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
-        // distanced zipped is measured along the obstacle, with abscissa:
-        Z = ( abs_real(aaa-abs) > 1 ); // distance zipped sufficient
-    }
-    if ( cat == 'U' )
-    {
-        // catastrophes must be at contact
-        if ( K && D ) cat = 'K';
-        else if ( Z ) cat = 'Z';
-    }
-    // The 'X' may superseed the Z and U category
-    if ( X && !K ) cat = 'X';
-    
-    // since these states are final, we can terminate the simulation
-    if ( cat == 'K' || cat == 'X' )
-        finished = 1;
+    bool K = 1, X = 0, T = 0, Z = 0;
 
-    if ( print || finished )
+    if ( fib && fox )
     {
-        out << std::setprecision(4) << ang << SEP << std::setprecision(4) << dis;
+        const real sup = 3 * fib->prop->steric_radius;
+        
+        // K = state at plus-end
+        K = ( fib->endStateP() == 4 );
+        
+        // check if tip of 'fib' is close to 'fox':
+        Vector tip = fib->posEndP();
+        real aaa = fox->projectPoint(tip, dis);
+        Vector dir = fox->dir(aaa);
+        dis = sqrt(dis);
+        bool D = ( dis < sup );
+        
+        // X = if plus-tip has crossed the other filament
+        if ( fib->length() > 1 )
+        {
+            // we consider a point 1um back from the plus-end:
+            Vector bak = fib->posFrom(1, PLUS_END);
+            real ddd, bbb = fox->projectPoint(bak, ddd);
+            bbb = 0.5 * ( aaa + bbb );
+            Vector mid = fox->pos(bbb);
+            Vector axs = fox->dir(bbb);
+            Torque TP = cross(axs, tip-mid);
+            Torque TM = cross(axs, bak-mid);
+#if ( DIM == 3 )
+            X = ( dot(TP, TM) < 0 );
+#else
+            X = ( TP * TM < 0 );
+#endif
+        }
+        
+        // check direction of fib's tip to fox at closest point:
+        real C = dot(fib->dirEndP(), dir);
+        real A = acos(C);
+        
+        if ( D ) // tip is in contact:
+        {
+            // the angle is set at first contact:
+            if ( std::isnan(ang) )
+            {
+                ang = A;
+                abs = aaa;
+            }
+            // 'zippering' implies 'being tangent' and 'moving along' the obstacle
+            T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
+            // distanced zipped is measured along the obstacle, with abscissa:
+            Z = ( abs_real(aaa-abs) > 1 ); // distance zipped sufficient
+        }
+        if ( cat == 'U' )
+        {
+            // catastrophes must be at contact
+            if ( K && D ) cat = 'K';
+            else if ( Z ) cat = 'Z';
+        }
+        // The 'X' may superseed the Z and U category
+        if ( X && !K ) cat = 'X';
+        
+        // since these states are final, we can terminate the simulation
+        abortRun = ( cat == 'K' || cat == 'X' );
+    }
+    else
+        abortRun = 1;
+    if ( print || abortRun )
+    {
+        out << std::fixed << std::setprecision(5) << ang;
+        out << SEP << std::fixed << std::setprecision(5) << dis;
         out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << cat;
+        // reset static variables for next round:
         cat = 'U';
+        ang = NAN;
         abs = 0;
-        ang = -1;
     }
 }
 
