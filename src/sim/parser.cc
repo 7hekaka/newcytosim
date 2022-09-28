@@ -741,32 +741,32 @@ void Parser::parse_run(std::istream& is)
 
         Glossary opt(blok);
 
-        if ( !has_cnt )
+        // read `nb_steps' from the option block:
+        if ( opt.set(cnt, "nb_steps") )
         {
-            // read `nb_steps' from the option block:
-            if ( opt.set(cnt, "nb_steps") )
-                opt.clear("nb_steps");
-            else
-            {
-                // instead of `nb_steps', user can specify a duration in seconds:
-                real span = 0;
-                if ( opt.set(span, "duration", "time") )
-                {
-                    if ( span <= 0 )
-                        throw InvalidParameter("duration must be >= 0'");
-                    cnt = (size_t)std::ceil(span/simulProp().time_step);
-                    opt.clear("duration");
-                    opt.clear("time");
-                }
-            }
+            opt.clear("nb_steps");
+            if ( has_cnt )
+                throw InvalidSyntax("the number of steps was specified twice");
+            has_cnt = true;
         }
-        else if ( opt.has_key("nb_steps") )
-            throw InvalidSyntax("the number of steps was specified twice");
-        
+        sim_->extend_time(cnt * sim_->time_step());
+        // instead of `nb_steps', user can specify a duration in seconds:
+        real span = 0;
+        if ( opt.set(span, "duration", "time") )
+        {
+            if ( span <= 0 )
+                throw InvalidParameter("duration must be >= 0'");
+            opt.clear("duration");
+            opt.clear("time");
+            if ( has_cnt )
+                throw InvalidSyntax("number of steps and duration cannot both be specified");
+            sim_->extend_time(span);
+        }
+
         if ( opt.empty() )
-            execute_run(cnt);
+            execute_run();
         else
-            execute_run(cnt, opt, do_write);
+            execute_run(opt, do_write);
 
         check_warnings(opt, is, ipos);
     }

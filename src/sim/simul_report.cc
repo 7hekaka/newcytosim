@@ -84,7 +84,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
         if ( frm >= 0 )
             out << "% frame   " << frm << '\n';
         //out << "% start\n";
-        out << "% time " << std::to_string(prop.time);
+        out << "% time " << std::to_string(time());
     }
     std::stringstream is(what);
     while ( is.good() )
@@ -149,7 +149,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     if ( ver > 1 )
     {
         //out << "% start\n";
-        out << "\n% time " << std::to_string(prop.time);
+        out << "\n% time " << std::to_string(time());
     }
     if ( ver > 0 )
     {
@@ -538,7 +538,7 @@ void Simul::reportFiberAge(std::ostream& out) const
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
     out << SEP << "var_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
     
-    const real now = prop.time;
+    const real now = time();
 
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -1758,7 +1758,7 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
 
 void Simul::reportTime(std::ostream& out) const
 {
-    out << LIN << prop.time;
+    out << LIN << time();
 }
 
 
@@ -3200,11 +3200,12 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         if ( X && !K ) cat = 'X';
         
         // since these states are final, we can terminate the simulation
-        abortRun = ( cat == 'K' || cat == 'X' );
+        if ( cat == 'K' || cat == 'X' )
+            abort_time();
     }
     else
-        abortRun = 1;
-    if ( print || abortRun )
+        abort_time();
+    if ( print )
     {
         out << std::fixed << std::setprecision(5) << ang;
         out << SEP << std::fixed << std::setprecision(5) << dis;

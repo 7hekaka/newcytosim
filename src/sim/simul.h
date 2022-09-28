@@ -47,9 +47,6 @@ public:
     /// counter for occasional Hand's attachment
     unsigned doAttachCounter;
 #endif
-    
-    /// flag to end the 'run' as soon as possible
-    mutable bool abortRun;
 
 private:
     
@@ -166,6 +163,21 @@ public:
 
     /// time in the simulated world (shortcut to `SimulProp::time`)
     double time() const { return prop.time; }
+
+    /// change time in the simulated world
+    void time(double t) { prop.time = t; }
+
+    /// change end-time
+    void extend_time(double t) const { prop.end_time = prop.time + t; }
+
+    /// true if `SimulProp::time > SimulProp::end_time`)
+    bool incomplete() const { return prop.time < prop.end_time; }
+
+    /// jump directly to `end_time` to abort current run
+    void abort_time() const { prop.time = prop.end_time; }
+
+    /// time step (shortcut to `SimulProp::time_step`)
+    double time_step() const { return prop.time_step; }
 
     /// this is called after a sequence of `step()` have been done
     void relax();

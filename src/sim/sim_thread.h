@@ -78,8 +78,8 @@ public:
     /// run the simulation live
     void run();
     
-    /// continue to run a simulation beyond its normal termination
-    void prolong_run(size_t n_steps);
+    /// continue to run for specified time beyond its normal termination
+    void prolong_run(double time);
 
     /// redefining Interface::hold(), which is called repeatedly at each timestep
     void hold();

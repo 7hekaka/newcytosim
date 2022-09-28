@@ -25,7 +25,7 @@ private:
     using SimulFuncPtr = void (Simul::*)();
     
     /// perform `cnt` simulation steps also calling Simul::FUNC at each step
-    template <SimulFuncPtr FUNC> void step_simul(size_t& sss, size_t cnt);
+    template <SimulFuncPtr FUNC> void step_simul();
     
     /// create 1 object of type `name` in ObjectList, following options in Glossary
     void new_object(ObjectList&, ObjectSet*, Property const*, Glossary&);
@@ -120,10 +120,10 @@ public:
     void execute_report(std::string const& filename, std::string const& what, Glossary&);
     
     /// perform `cnt` simulation steps, following options specified in Glossary
-    void execute_run(size_t cnt, Glossary&, bool write_permission);
+    void execute_run(Glossary&, bool write_permission);
     
     /// perform `cnt` simulation steps
-    void execute_run(size_t cnt);
+    void execute_run();
 
     /// execute miscellaneous functions
     void execute_call(std::string& func, Glossary&);

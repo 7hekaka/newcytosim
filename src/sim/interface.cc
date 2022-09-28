@@ -829,15 +829,14 @@ static void reportCPUtime(real t)
 
 
 template < Interface::SimulFuncPtr FUNC >
-inline void Interface::step_simul(size_t& sss, size_t cnt)
+inline void Interface::step_simul()
 {
-    while ( sss < cnt )
+    while ( sim_->incomplete() )
     {
         hold();
         //fprintf(stderr, "> step %6zu\n", sss);
         (sim_->*FUNC)();
         sim_->step();
-        ++sss;
     }
 }
 
@@ -895,10 +894,10 @@ inline void Interface::step_simul(size_t& sss, size_t cnt)
  `flux`       | Fibers are translated at `flux_speed` according to their orientation.
  
  */
-void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
+void Interface::execute_run(Glossary& opt, bool do_write)
 {
+    int solve = 1;
     int frames = 0;
-    int  solve = 1;
     bool prune = true;
     bool binary = true;
     
@@ -922,58 +921,50 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
     opt.set(frames, "nb_frames");
     
     do_write &= ( frames > 0 );
-
-    real   delta = (real)nb_steps;
-    size_t check = nb_steps;
-    
+    double start = sim_->time();
+    double delta = sim_->prop.end_time - start;
     sim_->prepare();
 
     if ( do_write )
     {
         sim_->writeProperties(prune);
-        // write initial state:
         if ( sim_->prop.clear_trajectory )
         {
              sim_->prop.clear_trajectory = false;
+            // write initial state:
             if ( frames > 1 )
                 sim_->writeObjects(sim_->prop.system_file, false, binary);
             else
                 std::remove(sim_->prop.system_file.c_str());
         }
-        delta = real(nb_steps) / real(frames);
-        check = size_t(delta);
     }
     
     VLOG("+RUN START " << nb_steps);
-    
-    size_t frm = 0;
-    size_t sss = 0;
-    do {
+    frames = std::max(frames, 1);
+    for ( int frm = 1; frm <= frames; ++frm )
+    {
+        sim_->prop.end_time = start + delta * frm;
         switch ( solve )
         {
-            case 0: step_simul<&Simul::solve_not>(sss, check); break;
-            case 1: step_simul<&Simul::solve>(sss, check); break;
-            case 2: step_simul<&Simul::solve_auto>(sss, check); break;
-            case 3: step_simul<&Simul::solve_force>(sss, check); break;
-            case 4: step_simul<&Simul::solve_onlyX>(sss, check); break;
-            case 5: step_simul<&Simul::solve_flux>(sss, check); break;
-            case 7: step_simul<&Simul::solve_half>(sss, check); break;
-            case 8: step_simul<&Simul::solve_separate>(sss, check); break;
+            case 0: step_simul<&Simul::solve_not>(); break;
+            case 1: step_simul<&Simul::solve>(); break;
+            case 2: step_simul<&Simul::solve_auto>(); break;
+            case 3: step_simul<&Simul::solve_force>(); break;
+            case 4: step_simul<&Simul::solve_onlyX>(); break;
+            case 5: step_simul<&Simul::solve_flux>(); break;
+            case 7: step_simul<&Simul::solve_half>(); break;
+            case 8: step_simul<&Simul::solve_separate>(); break;
         }
-        ++frm;
-        check = size_t(delta*(frm+1));
 
-        if ( do_write || sim_->abortRun )
+        if ( do_write )
         {
             sim_->relax();
             sim_->writeObjects(sim_->prop.system_file, true, binary);
             reportCPUtime(sim_->time());
             sim_->sMeca.doNotify = 2;  // to print convergence parameters
             sim_->unrelax();
-            if ( sim_->abortRun )
-                break;
         }
-    } while ( sss < nb_steps );
+    }
     
 #if BACKWARD_COMPATIBILITY < 50
     if ( event )
@@ -999,19 +990,16 @@ void Interface::execute_run(size_t nb_steps, Glossary& opt, bool do_write)
 /**
  Advance simulation, without any option, by alternating step() and solve()
 */
-void Interface::execute_run(size_t nb_steps)
+void Interface::execute_run()
 {
-    VLOG("-RUN START " << nb_steps);
+    VLOG("-RUN START " << sim_->time());
     sim_->prepare();
     
-    for ( size_t sss = 0; sss < nb_steps; ++sss )
+    while ( sim_->incomplete() )
     {
         hold();
-        //fprintf(stderr, "> step %6zu\n", sss);
         sim_->solve();
         sim_->step();
-        if ( sim_->abortRun )
-            break;
     }
     
     sim_->relax();
@@ -1069,9 +1057,9 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     {
         if ( append )
         {
-            real t = sim_->prop.time;
+            double t = sim_->time();
             sim_->reloadObjects(in, 0, subset);
-            sim_->prop.time = t;
+            sim_->time(t);
         }
         else
             sim_->reloadObjects(in, 1, subset);
@@ -1093,9 +1081,9 @@ void Interface::execute_import(std::string const& file, std::string const& what,
 #endif
     
     // set time
-    real t;
+    double t;
     if ( opt.set(t, "time") )
-        sim_->prop.time = t;
+        sim_->time(t);
 }
 
 

@@ -78,8 +78,10 @@ public:
      should be such that <em>time_step * R << 1</em>. In practice `time_step * R` should not be higher than 0.2.
      .
      */
-    real time_step;
+    double time_step;
     
+    /// the time at which the simulation can stop
+    double end_time;
     
     /// Ambient viscosity
     /**
