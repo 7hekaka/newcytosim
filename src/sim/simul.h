@@ -173,8 +173,8 @@ public:
     /// true if `SimulProp::time > SimulProp::end_time`)
     bool incomplete() const { return prop.time < prop.end_time; }
 
-    /// jump directly to `end_time` to abort current run
-    void abort_time() const { prop.time = prop.end_time; }
+    /// set `SimulProp::end_time` to current time, to stop simulation
+    void abort_time() const { prop.end_time = prop.time; }
 
     /// time step (shortcut to `SimulProp::time_step`)
     double time_step() const { return prop.time_step; }
