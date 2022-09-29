@@ -80,7 +80,7 @@ Object * OrganizerSet::newObject(const ObjectTag tag, PropertyID pid)
 }
 
 
-void OrganizerSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
+ObjectList OrganizerSet::newObjects(const Property* p, Glossary& opt)
 {
     Organizer * obj = nullptr;
     
@@ -93,11 +93,13 @@ void OrganizerSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
     else if ( p->category() == "fake" )
         obj = new Fake(static_cast<FakeProp const*>(p));
 
+    ObjectList res(4,4);
     if ( obj )
     {
         obj->build(res, opt, simul_);
         res.push_back(obj);
     }
+    return res;
 }
 
 

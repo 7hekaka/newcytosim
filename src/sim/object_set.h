@@ -100,13 +100,13 @@ public:
     /// set flag of all Objects to `f`
     static void flagObjects(ObjectList const&, ObjectFlag f);
 
-    /// apply translation to unflagged Objects in list
+    /// apply translation to Objects with `flag() != f`
     static void translateObjects(ObjectList const&, Vector const&, ObjectFlag f);
     
-    /// apply rotation to unflagged Objects in list
+    /// apply rotation to Objects with `flag() != f`
     static void rotateObjects(ObjectList const&, Rotation const&, ObjectFlag f);
 
-    /// apply Isometry to unflagged Objects in list
+    /// apply Isometry to Objects with `flag() != f`
     static void moveObjects(ObjectList const&, Isometry const&, ObjectFlag f);
 
 public:
@@ -123,7 +123,7 @@ public:
     virtual Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const = 0;
     
     /// create Objects of class `name`, given the options provided in `opt`
-    virtual void newObjects(ObjectList&, const Property*, Glossary& opt) = 0;
+    virtual ObjectList newObjects(const Property*, Glossary& opt) = 0;
     
     /// create Object with given Tag and PropertyID (used for reading trajectory file)
     virtual Object * newObject(ObjectTag, PropertyID) = 0;
@@ -158,16 +158,16 @@ public:
     virtual void erase();
     
     /// number of elements
-    virtual size_t size()       const { return pool_.size(); }
+    virtual size_t size() const { return pool_.size(); }
 
     /// mix the order of elements in the doubly linked list pool
-    virtual void shuffle()            { pool_.shuffle(); }
+    virtual void shuffle() { pool_.shuffle(); }
     
     /// first Object in the list
-    Object * first()            const { return static_cast<Object*>(pool_.front()); }
+    Object * first() const { return static_cast<Object*>(pool_.front()); }
     
     /// last Object
-    Object * last()             const { return static_cast<Object*>(pool_.back()); }
+    Object * last() const { return static_cast<Object*>(pool_.back()); }
     
     /// find Object of given serial-number (see Inventory)
     Object * findID(ObjectID n) const { return static_cast<Object*>(inventory_.get(n)); }

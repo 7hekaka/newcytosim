@@ -81,14 +81,16 @@ Object * SolidSet::newObject(const ObjectTag tag, PropertyID pid)
 /**
 @ref Solid::build
  */
-void SolidSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
+ObjectList SolidSet::newObjects(const Property* p, Glossary& opt)
 {
     SolidProp const* pp = static_cast<SolidProp const*>(p);
     Solid * obj = new Solid(pp);
     
+    ObjectList res(4,4);
     obj->build(res, opt, simul_);
     res.push_back(obj);
     obj->fixShape();
+    return res;
 }
 
 

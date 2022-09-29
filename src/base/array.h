@@ -110,7 +110,7 @@ private:
 #pragma mark -
 public:
         
-    /// Default creator without allocation
+    /// Default creator does not allocate
     Array() : val_(nullptr), alc_(0), nbo_(0), chk_(16)
     {
     }
@@ -127,6 +127,14 @@ public:
             val_ = nullptr;
     }
     
+    /// create list with only one entry
+    Array(VAL arg) : alc_(1), nbo_(1), chk_(1)
+    {
+        //printf("Array %p constructor(obj)\n", this);
+        val_ = new VAL[1+EXTRA];
+        val_[0] = arg;
+    }
+
     /// Copy constructor
     Array(const Array<VAL>& o)
     : val_(nullptr), alc_(0), nbo_(o.nbo_), chk_(o.chk_)

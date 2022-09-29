@@ -198,7 +198,7 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
    This defines from which position the abscissa is measured.
  .
  */
-void SingleSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
+ObjectList SingleSet::newObjects(const Property* p, Glossary& opt)
 {
     SingleProp const* pp = static_cast<SingleProp const*>(p);
     
@@ -227,7 +227,7 @@ void SingleSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
     if ( opt.has_key("site") )
         obj->attach(simul_.fibers.someSite("site", opt));
 
-    res.push_back(obj);
+    return ObjectList(obj);
 }
 
 

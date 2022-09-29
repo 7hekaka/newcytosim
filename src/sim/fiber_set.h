@@ -44,7 +44,7 @@ public:
     Fiber * newFiber(ObjectList&, const std::string& name, Glossary& opt);
 
     /// create objects of class `name`, given the options provided in `opt`
-    void newObjects(ObjectList& list, const Property* p, Glossary& opt) { newFiber(list, p, opt); }
+    ObjectList newObjects(const Property* p, Glossary& opt) { ObjectList res(4, 4); newFiber(res, p, opt); return res; }
 
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);

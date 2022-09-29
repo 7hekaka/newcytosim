@@ -78,7 +78,7 @@ Object * FieldSet::newObject(const ObjectTag tag, PropertyID pid)
  
  \todo: read the value of the field from a file, at initialization
  */
-void FieldSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
+ObjectList FieldSet::newObjects(const Property* p, Glossary& opt)
 {
     FieldProp const* pp = static_cast<FieldProp const*>(p);
     Field * obj = new Field(pp);
@@ -104,7 +104,7 @@ void FieldSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
         }
     }
 
-    res.push_back(obj);
+    return ObjectList(obj);
 }
 
 

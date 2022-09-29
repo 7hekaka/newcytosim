@@ -337,18 +337,17 @@ void Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
 {
     size_t nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
-    ObjectList objs(4, 4);
-
+    ObjectList objs;
+    
     while ( nb_trials > 0 )
     {
-        // create the objects:
-        set->newObjects(objs, pp, opt);
+        objs = set->newObjects(pp, opt);
         
-#if ( 0 )
+#ifndef NDEBUG
         // check for `nullptr` in list, which should not happen:
         if ( objs.count(nullptr) )
         {
-            std::clog << "cytosim found empty slots in newObjects(" << name << ")\n";
+            std::clog << "Cytosim void slots in newObjects(" << pp->name() << ")\n";
             objs.remove_pack(nullptr);
         }
 #endif
@@ -541,11 +540,11 @@ void Interface::execute_new(std::string const& name, size_t cnt)
 
     Glossary opt;
 
-    ObjectList objs(4, 4);
+    ObjectList objs;
     set->reserve(cnt);
     for ( size_t n = 0; n < cnt; ++n )
     {
-        set->newObjects(objs, pp, opt);
+        objs = set->newObjects(pp, opt);
         
         if ( objs.empty() )
             throw InvalidSyntax("could not create object class of `"+name+"'");

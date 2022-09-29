@@ -145,7 +145,7 @@ Object * SpaceSet::newObject(const ObjectTag tag, PropertyID pid)
      }
  
  */
-void SpaceSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
+ObjectList SpaceSet::newObjects(const Property* p, Glossary& opt)
 {
     SpaceProp const* pp = static_cast<SpaceProp const*>(p);
     Space * obj = pp->newSpace(opt);
@@ -157,7 +157,7 @@ void SpaceSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
         //obj = new Space(p);
     }
     
-    res.push_back(obj);
+    return ObjectList(obj);
 }
 
 

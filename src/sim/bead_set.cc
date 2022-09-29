@@ -61,8 +61,9 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
 
  */
 
-void BeadSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
+ObjectList BeadSet::newObjects(const Property* p, Glossary& opt)
 {
+    ObjectList res(4, 4);
     BeadProp const* pp = static_cast<BeadProp const*>(p);
     real rad = -1;
     size_t inx = 2;
@@ -103,6 +104,7 @@ void BeadSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
     // attach anchored Singles:
     while ( opt.set(str, var, inx++) )
         res.append(simul_.singles.makeWrists(obj, 0, 1, str));
+    return res;
 }
 
 

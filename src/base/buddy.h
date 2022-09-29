@@ -72,7 +72,7 @@ public:
         }
 #endif
         // assume new buddy is not linked in any other circle:
-        assert_true( guy.buddy_ == guy );
+        assert_true( guy->buddy_ == guy );
         Buddy * b = buddy_;
         buddy_ = guy;
         guy->buddy_ = b;

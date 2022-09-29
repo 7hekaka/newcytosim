@@ -58,12 +58,14 @@ Object * TubuleSet::newObject(const ObjectTag tag, PropertyID pid)
      {
      }
  */
-void TubuleSet::newObjects(ObjectList& res, const Property* p, Glossary& opt)
+ObjectList TubuleSet::newObjects(const Property* p, Glossary& opt)
 {
     TubuleProp const* pp = static_cast<TubuleProp const*>(p);
-    Tubule * o = new Tubule(pp);
-    o->build(res, pp->radius, opt, simul_);
-    res.push_back(o);
+    Tubule * obj = new Tubule(pp);
+    ObjectList res(4, 4);
+    obj->build(res, pp->radius, opt, simul_);
+    res.push_back(obj);
+    return res;
 }
 
 
