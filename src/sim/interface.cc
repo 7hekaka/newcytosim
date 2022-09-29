@@ -333,12 +333,12 @@ bool all_objects_inside(ObjectList const& objs, Space const* spc)
 /**
  This would usually create ONE object of type 'name', placed according to `opt`
  */
-void Interface::new_object(ObjectList& objs, ObjectSet* set, Property const* pp, Glossary& opt)
+void Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
 {
     size_t nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
+    ObjectList objs(4, 4);
 
-    objs.clear();
     while ( nb_trials > 0 )
     {
         // create the objects:
@@ -482,11 +482,10 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
             throw InvalidParameter("cannot specify `position' if `range' is defined");
         Vector dAB = ( B - A ) / std::max(1UL, cnt-1);
         
-        ObjectList objs(4, 4);
         for ( size_t n = 0; n < cnt; ++n )
         {
             opt.define("position", A + n * dAB);
-            new_object(objs, set, pp, opt);
+            new_object(set, pp, opt);
         }
     }
     else
@@ -502,9 +501,8 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
             opt.define("direction", (B-A).normalized());
         }
 
-        ObjectList objs(4, 4);
         for ( size_t n = 0; n < cnt; ++n )
-            new_object(objs, set, pp, opt);
+            new_object(set, pp, opt);
     }
     //hold();
     
