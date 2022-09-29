@@ -59,24 +59,21 @@ public:
         return cnt;
     }
 
-    /// add `b` into the list of buddies, or complain if already present
+    /// add `b` into the list of buddies, joining circles if needed
     void enlist(Buddy * guy)
     {
         assert_true( guy != this );
-#if ( 1 )
-        // complain if buddy is known already:
-        if ( find(guy) )
+        if ( !find(guy) )
         {
-            std::clog << " Warning: duplicate Buddy::enlist()\n";
-            return;
+            // join the two circles:
+            Buddy * e = guy;
+            while ( e->buddy_ != guy )
+                e = e->buddy_;
+            Buddy * b = buddy_;
+            buddy_ = guy;
+            e->buddy_ = b;
+            //std::clog << this << " has " << nbBuddies() << " buddies\n";
         }
-#endif
-        // assume new buddy is not linked in any other circle:
-        assert_true( guy->buddy_ == guy );
-        Buddy * b = buddy_;
-        buddy_ = guy;
-        guy->buddy_ = b;
-        //std::clog << this << " has " << nbBuddies() << " buddies\n";
     }
     
     /// remove `b` from the list of known buddy, do not call goodbye()
