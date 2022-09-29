@@ -333,7 +333,7 @@ bool all_objects_inside(ObjectList const& objs, Space const* spc)
 /**
  This would usually create ONE object of type 'name', placed according to `opt`
  */
-void Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
+ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
 {
     size_t nb_trials = 1<<14;
     opt.set(nb_trials, "nb_trials");
@@ -399,7 +399,7 @@ void Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
     {
         std::string name = pp ? pp->name() : "object";
         Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
-        return;
+        return objs;
     }
 
     // optionally mark the objects:
@@ -431,6 +431,7 @@ void Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
      we call sim_->add() rather than directly set->add()
      */
     sim_->add(objs);
+    return objs;
 }
 
 
@@ -438,8 +439,9 @@ void Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
  Create `cnt` objects of type 'name', according to specifications.
  It is possible to make an object without an associated Property
  */
-void Interface::execute_new(std::string const& cat, std::string const& name, Glossary& opt, size_t cnt)
+ObjectList Interface::execute_new(std::string const& cat, std::string const& name, Glossary& opt, size_t cnt)
 {
+    ObjectList res;
     ObjectSet * set = nullptr;
     Property const* pp = sim_->properties.find(name);
     
@@ -465,7 +467,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
         {
             ObjectList objs = set->collect(amount-target);
             sim_->erase(objs);
-            return;
+            return res;
         }
         // create enough objects to reach target:
         cnt = target - amount;
@@ -484,7 +486,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
         for ( size_t n = 0; n < cnt; ++n )
         {
             opt.define("position", A + n * dAB);
-            new_object(set, pp, opt);
+            res.append(new_object(set, pp, opt));
         }
     }
     else
@@ -501,7 +503,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
         }
 
         for ( size_t n = 0; n < cnt; ++n )
-            new_object(set, pp, opt);
+            res.append(new_object(set, pp, opt));
     }
     //hold();
     
@@ -518,6 +520,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
     }
 
     VLOG("+NEW `" << name << "' made " << set->size()-amount << " objects (total " << sim_->nbObjects() << ")");
+    return res;
 }
 
 
@@ -529,7 +532,7 @@ void Interface::execute_new(std::string const& cat, std::string const& name, Glo
  This is meant to replace execute_new(cat, name, opt, cnt), when no option were specified
  to the command.
  */
-void Interface::execute_new(std::string const& name, size_t cnt)
+ObjectList Interface::execute_new(std::string const& name, size_t cnt)
 {
     Property const* pp = sim_->properties.find_or_die(name);
     ObjectSet * set = sim_->findSet(pp->category());
@@ -539,12 +542,11 @@ void Interface::execute_new(std::string const& name, size_t cnt)
     Space const* spc = sim_->spaces.master();
 
     Glossary opt;
-
-    ObjectList objs;
+    ObjectList res;
     set->reserve(cnt);
     for ( size_t n = 0; n < cnt; ++n )
     {
-        objs = set->newObjects(pp, opt);
+        ObjectList objs = set->newObjects(pp, opt);
         
         if ( objs.empty() )
             throw InvalidSyntax("could not create object class of `"+name+"'");
@@ -572,11 +574,13 @@ void Interface::execute_new(std::string const& name, size_t cnt)
         /* Call sim_->add() rather than directly set->add(), because the objects
          in ObjectList are not necessarily all of the same class */
         sim_->add(objs);
+        res.append(objs);
         objs.clear();
     }
     
     VLOG("-NEW " << cnt << "`" << name << "' objects");
     //hold();
+    return res;
 }
 
 //------------------------------------------------------------------------------

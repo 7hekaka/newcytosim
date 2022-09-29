@@ -28,7 +28,7 @@ private:
     template <SimulFuncPtr FUNC> void step_simul();
     
     /// create 1 object of type `name`, following options in Glossary
-    void new_object(ObjectSet*, Property const*, Glossary&);
+    ObjectList new_object(ObjectSet*, Property const*, Glossary&);
     
     /// change values in given Property as specified in Glossary
     void change_property(Property*, Glossary&);
@@ -90,10 +90,10 @@ public:
     void change_simul_property(Glossary& opt);
     
     /// create `cnt` objects of type `name`, following options in Glossary
-    void execute_new(std::string const& cat, std::string const& name, Glossary&, size_t cnt);
+    ObjectList execute_new(std::string const& cat, std::string const& name, Glossary&, size_t cnt);
 
     /// create `cnt` objects of type `name`, randomly placed in space (no option)
-    void execute_new(std::string const& name, size_t cnt);
+    ObjectList execute_new(std::string const& name, size_t cnt);
     
     /// delete `cnt` objects of type `name`, following options in Glossary
     void execute_delete(std::string const& name, Glossary&, size_t cnt);
