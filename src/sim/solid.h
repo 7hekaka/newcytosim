@@ -84,13 +84,13 @@ private:
     void reset();
     
     /// part of build()
-    ObjectList makePoint(Glossary&, std::string const&, Simul&);
+    void makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    ObjectList makeSphere(Glossary&, std::string const&, Simul&);
+    void makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    ObjectList makeWrist(Glossary&, std::string const&, Simul&);
+    void makeWrist(ObjectList&, Glossary&, std::string const&, Simul&);
 
 public:
     

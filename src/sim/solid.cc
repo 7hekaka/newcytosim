@@ -216,9 +216,8 @@ void Solid::release()
 #pragma mark - Build
 
 
-ObjectList Solid::makePoint(Glossary& opt, std::string const& var, Simul& sim)
+void Solid::makePoint(ObjectList& res, Glossary& opt, std::string const& var, Simul& sim)
 {
-    ObjectList res;
     std::string str;
     size_t inx = 0;
     size_t nbp = 1;
@@ -247,15 +246,13 @@ ObjectList Solid::makePoint(Glossary& opt, std::string const& var, Simul& sim)
         // attach Single to this set of points:
         ++inx;
         while ( opt.set(str, var, ++inx) )
-            res.append(sim.singles.makeWrists(this, fip, nbp, str));
+            sim.singles.makeWrists(res, this, fip, nbp, str);
     }
-    return res;
 }
 
 
-ObjectList Solid::makeSphere(Glossary& opt, std::string const& var, Simul& sim)
+void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, Simul& sim)
 {
-    ObjectList res;
     std::string str;
     size_t inx;
 
@@ -351,13 +348,11 @@ ObjectList Solid::makeSphere(Glossary& opt, std::string const& var, Simul& sim)
             }
         }
     }
-    return res;
 }
 
 
-ObjectList Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
+void Solid::makeWrist(ObjectList& res, Glossary& opt, std::string const& var, Simul& sim)
 {
-    ObjectList res;
     std::string str;
     size_t a = 0, b = 0;
     real c = 0.0;
@@ -382,7 +377,6 @@ ObjectList Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
     Wrist * w = sip->newWrist(this, 0);
     w->rebase(this, a, b, c);
     res.push_back(w);
-    return res;
 }
 
 /**
@@ -481,7 +475,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     var = "point1";
     while ( opt.has_key(var) )
     {
-        res.append(makePoint(opt, var, sim));
+        makePoint(res, opt, var, sim);
         var = "point" + std::to_string(++inp);
     }
 
@@ -490,7 +484,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     var = "sphere1";
     while ( opt.has_key(var) )
     {
-        res.append(makeSphere(opt, var, sim));
+        makeSphere(res, opt, var, sim);
         var = "sphere" + std::to_string(++inp);
     }
     
@@ -502,7 +496,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
      */
     inx = 0;
     while ( opt.set(str, "anchor", inx++) )
-        res.append(sim.singles.makeWrists(this, 0, nPoints, str));
+        sim.singles.makeWrists(res, this, 0, nPoints, str);
 #endif
     
     /*
@@ -512,7 +506,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     var = "anchor1";
     while ( opt.has_key(var) )
     {
-        makeWrist(opt, var, sim);
+        makeWrist(res, opt, var, sim);
         var = "anchor" + std::to_string(++inp);
     }
     

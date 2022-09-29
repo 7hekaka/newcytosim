@@ -103,7 +103,7 @@ ObjectList BeadSet::newObjects(const Property* p, Glossary& opt)
     std::string str;
     // attach anchored Singles:
     while ( opt.set(str, var, inx++) )
-        res.append(simul_.singles.makeWrists(obj, 0, 1, str));
+        simul_.singles.makeWrists(res, obj, 0, 1, str);
     return res;
 }
 

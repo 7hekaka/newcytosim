@@ -177,13 +177,13 @@ void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
             
             // attach Single to this set of points:
             while ( opt.set(str, var, ++inx) )
-                res.append(sim.singles.makeWrists(this, fip, nbp, str));
+                sim.singles.makeWrists(res, this, fip, nbp, str);
             
             // attach Single to this set of points:
             inx = 0;
             var = "attach" + std::to_string(inp);
             while ( opt.set(str, var, inx++) )
-                res.append(sim.singles.makeWrists(this, fip, nbp, str));
+                sim.singles.makeWrists(res, this, fip, nbp, str);
         }
         
         // set next keyword:
@@ -194,7 +194,7 @@ void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
     // attach Singles distributed over the surface points:
     inx = 0;
     while ( opt.set(str, "attach", inx++) )
-        res.append(sim.singles.makeWrists(this, nbRefPoints, nbSurfacePoints(), str));
+        sim.singles.makeWrists(res, this, nbRefPoints, nbSurfacePoints(), str);
 
     
     // final verification of the number of points:
