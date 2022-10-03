@@ -3152,8 +3152,8 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         Vector tip = fib->posEndP();
         real aaa = fox->projectPoint(tip, dis);
         Vector dir = fox->dir(aaa);
-        dis = sqrt(dis);
-        bool D = ( dis < sup );
+        dis = std::sqrt(dis);
+        bool contact = ( dis < sup );
         
         // X = if plus-tip has crossed the other filament
         if ( fib->length() > 1 )
@@ -3175,9 +3175,9 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         
         // check direction of fib's tip to fox at closest point:
         real C = dot(fib->dirEndP(), dir);
-        real A = acos(C);
+        real A = std::acos(C);
         
-        if ( D ) // tip is in contact:
+        if ( contact ) // tip is in contact:
         {
             // the angle is set at first contact:
             if ( std::isnan(ang) )
@@ -3193,7 +3193,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         if ( cat == 'U' )
         {
             // catastrophes must be at contact
-            if ( K && D ) cat = 'K';
+            if ( K && contact ) cat = 'K';
             else if ( Z ) cat = 'Z';
         }
         // The 'X' may superseed the Z and U category
