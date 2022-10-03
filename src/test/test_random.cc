@@ -613,7 +613,7 @@ void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
 {
     real *end, vec[SFMT_N32];
     for ( int i = 0; i < SFMT_N32; ++i )
-        vec[i] = NAN;
+        vec[i] = 0;
     tick();
     for ( int i = 0; i < cnt; ++i )
     {
@@ -651,7 +651,7 @@ void test_gaussian(int cnt)
     if ( 0 )
     {
         printf("Approximate logarithm:\n");
-        real vec[SFMT_N32] = { NAN };
+        real vec[SFMT_N32] = { 0 };
         check_log(vec, SFMT_N256, (__m256i*)sfmt.state);
         print_gaussian(std::min(SFMT_N256, 32), vec);
     }

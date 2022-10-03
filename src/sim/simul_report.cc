@@ -3127,7 +3127,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     bool print = 0;
     opt.set(print, "print");
     static char cat = 'U'; // category
-    static real ang = NAN; // angle at first contact
+    static real ang = 777; // angle at first contact
     static real abs = 0;   // abscissa of contact point
 
     Fiber const * fib = nullptr, *fox = nullptr;
@@ -3173,14 +3173,13 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
 #endif
         }
         
-        // check direction of fib's tip to fox at closest point:
-        real C = dot(fib->dirEndP(), dir);
-        real A = std::acos(C);
-        
         if ( contact ) // tip is in contact:
         {
+            // check direction of fib's tip to fox at closest point:
+            real C = dot(fib->dirEndP(), dir);
+            real A = std::acos(C);
             // the angle is set at first contact:
-            if ( std::isnan(ang) )
+            if ( ang > 700 )
             {
                 ang = A;
                 abs = aaa;
@@ -3212,7 +3211,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << cat;
         // reset static variables for next round:
         cat = 'U';
-        ang = NAN;
+        ang = -777;
         abs = 0;
     }
 }
