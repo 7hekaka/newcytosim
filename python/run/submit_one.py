@@ -31,7 +31,7 @@ import sys, os, subprocess, tempfile
 # default parameters for submission:
 submit  = 'sbatch'
 queue   = 'icelake'
-runtime = '1:00:00'   # 1 hour
+runtime = '12:00:00'  # 12 hour
 memory  = '4096'      # in MB
 ncpu    = 1           # nb of threads per job
 
