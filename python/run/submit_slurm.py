@@ -213,7 +213,7 @@ def main(args):
             if key == 'mem' or key == 'memory':
                 memory = val
             elif key == 'cpu' or key == 'ncpu':
-                ncpu = val
+                ncpu = int(val)
             elif key == 'day' or key == 'days':
                 runtime = val+'-00:00:00'
             elif key == 'hour' or key == 'hours':

@@ -94,7 +94,7 @@ def main(args):
     else:
         submit = proc.stdout.readline().strip()
 
-    # first argument is used for go_sim.py:
+    # first argument is the command to be executed
     cmd = args.pop(0)
 
     # create job script file:
@@ -111,7 +111,7 @@ def main(args):
             if key == 'mem' or key == 'memory':
                 memory = val
             elif key == 'cpu' or key == 'ncpu':
-                ncpu = val
+                ncpu = int(val)
             elif key == 'day' or key == 'days':
                 runtime = val+'-00:00:00'
             elif key == 'hour' or key == 'hours':
