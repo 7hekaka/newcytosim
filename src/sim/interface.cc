@@ -939,7 +939,7 @@ void Interface::execute_run(Glossary& opt, bool do_write)
         sim_->writeProperties(prune);
         if ( sim_->prop.clear_trajectory )
         {
-             sim_->prop.clear_trajectory = false;
+            sim_->prop.clear_trajectory = false;
             // write initial state:
             if ( frames > 1 )
                 sim_->writeObjects(sim_->prop.system_file, false, binary);
@@ -949,8 +949,10 @@ void Interface::execute_run(Glossary& opt, bool do_write)
     }
     
     VLOG("+RUN START " << nb_steps);
-    frames = std::max(frames, 1);
-    for ( int frm = 1; frm <= frames; ++frm )
+    int max = std::max(frames, 1);
+    delta /= real(max);
+    
+    for ( int frm = 1; frm <= max; ++frm )
     {
         sim_->prop.end_time = start + delta * frm;
         switch ( solve )
@@ -985,10 +987,7 @@ void Interface::execute_run(Glossary& opt, bool do_write)
     {
         sim_->writeProperties(prune);
         if ( frames < 0 )
-        {
-            sim_->relax();
             sim_->writeObjects(sim_->prop.system_file, true, binary);
-        }
     }
     
     VLOG("+RUN END");
