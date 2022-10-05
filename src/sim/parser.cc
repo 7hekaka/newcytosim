@@ -749,9 +749,8 @@ void Parser::parse_run(std::istream& is)
                 throw InvalidSyntax("the number of steps was specified twice");
             has_cnt = true;
         }
-        sim_->extend_time(cnt * sim_->time_step());
+        real sec = cnt * sim_->time_step();
         // instead of `nb_steps', user can specify a duration in seconds:
-        real sec = 0;
         if ( opt.set(sec, "duration", "time") )
         {
             if ( sec <= 0 )
@@ -760,13 +759,12 @@ void Parser::parse_run(std::istream& is)
             opt.clear("time");
             if ( has_cnt )
                 throw InvalidSyntax("number of steps and duration cannot both be specified");
-            sim_->extend_time(sec);
         }
-
+        
         if ( opt.empty() )
-            execute_run();
+            execute_run(sec);
         else
-            execute_run(opt, do_write);
+            execute_run(sec, opt, do_write);
 
         check_warnings(opt, is, ipos);
     }

@@ -119,11 +119,11 @@ public:
     /// write information (specified in `what`) to a file
     void execute_report(std::string const& filename, std::string const& what, Glossary&);
     
-    /// perform `cnt` simulation steps, following options specified in Glossary
-    void execute_run(Glossary&, bool write_permission);
+    /// simulate for `sec` seconds, following options specified in Glossary
+    void execute_run(real sec, Glossary&, bool write_permission);
     
-    /// perform `cnt` simulation steps
-    void execute_run();
+    /// perform simulation steps to increment time by `sec` seconds
+    void execute_run(real sec);
 
     /// execute miscellaneous functions
     void execute_call(std::string& func, Glossary&);

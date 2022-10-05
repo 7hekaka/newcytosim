@@ -903,7 +903,7 @@ inline void Interface::step_simul()
  `flux`       | Fibers are translated at `flux_speed` according to their orientation.
  
  */
-void Interface::execute_run(Glossary& opt, bool do_write)
+void Interface::execute_run(real sec, Glossary& opt, bool do_write)
 {
     int solve = 1;
     int frames = 0;
@@ -930,8 +930,6 @@ void Interface::execute_run(Glossary& opt, bool do_write)
     opt.set(frames, "nb_frames");
     
     do_write &= ( frames > 0 );
-    double start = sim_->time();
-    double delta = sim_->end_time() - start;
     sim_->prepare();
 
     if ( do_write )
@@ -950,9 +948,9 @@ void Interface::execute_run(Glossary& opt, bool do_write)
     
     VLOG("+RUN START " << nb_steps);
     int max = std::max(frames, 1);
-    delta /= double(max);
     // subtract half a time_step, to ensure we finish exactly on time!
-    start -= 0.5 * sim_->time_step();
+    double start = sim_->time() - 0.5 * sim_->time_step();
+    double delta = sec / double(max);
     
     for ( int frm = 1; frm <= max; ++frm )
     {
@@ -1000,11 +998,13 @@ void Interface::execute_run(Glossary& opt, bool do_write)
 /**
  Advance simulation, without any option, by alternating step() and solve()
 */
-void Interface::execute_run()
+void Interface::execute_run(real sec)
 {
     VLOG("-RUN START " << sim_->time());
     sim_->prepare();
-    
+    // subtract half a time_step, to ensure we finish exactly on time!
+    sim_->prop.end_time = sim_->time() + sec - 0.5 * sim_->time_step();
+
     while ( sim_->incomplete() )
     {
         hold();

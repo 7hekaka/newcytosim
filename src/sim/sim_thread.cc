@@ -194,8 +194,7 @@ void SimThread::prolong_run(double sec)
     assert_true( isWorker() );
     try {
         sim_->parser(this);
-        sim_->extend_time(sec);
-        Parser::execute_run();
+        Parser::execute_run(sec);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
