@@ -843,7 +843,7 @@ inline void Interface::step_simul()
     while ( sim_->incomplete() )
     {
         hold();
-        //fprintf(stderr, "> step %6zu\n", sss);
+        //fprintf(stderr, "> step @%.12e\n", sim_->time());
         (sim_->*FUNC)();
         sim_->step();
     }
@@ -931,7 +931,7 @@ void Interface::execute_run(Glossary& opt, bool do_write)
     
     do_write &= ( frames > 0 );
     double start = sim_->time();
-    double delta = sim_->prop.end_time - start;
+    double delta = sim_->end_time() - start;
     sim_->prepare();
 
     if ( do_write )
@@ -950,7 +950,9 @@ void Interface::execute_run(Glossary& opt, bool do_write)
     
     VLOG("+RUN START " << nb_steps);
     int max = std::max(frames, 1);
-    delta /= real(max);
+    delta /= double(max);
+    // subtract half a time_step, to ensure we finish exactly on time!
+    start -= 0.5 * sim_->time_step();
     
     for ( int frm = 1; frm <= max; ++frm )
     {

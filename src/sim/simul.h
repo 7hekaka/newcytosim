@@ -167,10 +167,10 @@ public:
     /// change time in the simulated world
     void time(double t) { prop.time = t; }
 
-    /// change end-time
+    /// change `SimulProp::end_time` to extend simulation by `t`
     void extend_time(double t) const { prop.end_time = prop.time + t; }
 
-    /// true if `SimulProp::time > SimulProp::end_time`)
+    /// true if `SimulProp::time < SimulProp::end_time`
     bool incomplete() const { return prop.time < prop.end_time; }
 
     /// set `SimulProp::end_time` to current time, to stop simulation
@@ -178,6 +178,9 @@ public:
 
     /// time step (shortcut to `SimulProp::time_step`)
     double time_step() const { return prop.time_step; }
+
+    /// change end-time
+    double end_time() const { return prop.end_time; }
 
     /// this is called after a sequence of `step()` have been done
     void relax();

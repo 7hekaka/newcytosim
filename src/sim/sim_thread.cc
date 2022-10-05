@@ -189,12 +189,12 @@ void SimThread::start()
 
 //------------------------------------------------------------------------------
 
-void SimThread::prolong_run(double time)
+void SimThread::prolong_run(double sec)
 {
     assert_true( isWorker() );
     try {
         sim_->parser(this);
-        sim_->extend_time(time);
+        sim_->extend_time(sec);
         Parser::execute_run();
     }
     catch( Exception & e ) {
@@ -212,7 +212,7 @@ void* prolong_launcher(void * arg)
     SimThread * st = static_cast<SimThread*>(arg);
     st->lock();
     pthread_cleanup_push(child_cleanup, arg);
-    st->prolong_run(7777);
+    st->prolong_run(3600);
     pthread_cleanup_pop(1);
     return nullptr;
 }

@@ -751,16 +751,16 @@ void Parser::parse_run(std::istream& is)
         }
         sim_->extend_time(cnt * sim_->time_step());
         // instead of `nb_steps', user can specify a duration in seconds:
-        real span = 0;
-        if ( opt.set(span, "duration", "time") )
+        real sec = 0;
+        if ( opt.set(sec, "duration", "time") )
         {
-            if ( span <= 0 )
+            if ( sec <= 0 )
                 throw InvalidParameter("duration must be >= 0'");
             opt.clear("duration");
             opt.clear("time");
             if ( has_cnt )
                 throw InvalidSyntax("number of steps and duration cannot both be specified");
-            sim_->extend_time(span);
+            sim_->extend_time(sec);
         }
 
         if ( opt.empty() )

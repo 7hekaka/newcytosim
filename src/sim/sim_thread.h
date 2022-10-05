@@ -79,7 +79,7 @@ public:
     void run();
     
     /// continue to run for specified time beyond its normal termination
-    void prolong_run(double time);
+    void prolong_run(double);
 
     /// redefining Interface::hold(), which is called repeatedly at each timestep
     void hold();
