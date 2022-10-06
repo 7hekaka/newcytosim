@@ -339,7 +339,7 @@ private:
     
 public:
     
-    /// flag all objects with FLAG
+    /// move objects on ice buckets
     InputLock(Simul * s)
     : sim(s)
     {
@@ -357,7 +357,7 @@ public:
         //sim->events.freeze();
     }
     
-    /// erase objects flagged with FLAG
+    /// erase objects in ice buckets
     void prune_all()
     {
         //sim->events.prune();
@@ -374,6 +374,7 @@ public:
         sim = nullptr;
     }
     
+    /// move objects from ice buckets back to normal lists
     void thaw_all()
     {
         /*

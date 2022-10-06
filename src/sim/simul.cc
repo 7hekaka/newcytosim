@@ -324,7 +324,7 @@ Field * Simul::pickField(const Property * p) const
  */
 ObjectSet * Simul::findSet(const std::string& cat)
 {
-    //std::clog << "findSet("<<kind<<")\n";
+    //std::clog << "findSet("<<cat<<")\n";
     if ( cat == spaces.title() )     return &spaces;
     if ( cat == fields.title() )     return &fields;
     if ( cat == fibers.title() )     return &fibers;
