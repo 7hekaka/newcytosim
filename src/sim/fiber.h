@@ -142,7 +142,7 @@ protected:
     static real dragCoefficientSurface(real len, FiberProp const*);
     
     /// add confinement interactions to a Meca
-    void setConfinement(Meca&, Confinement, Space const*, real stiff) const;
+    void setFiberConfinement(Meca&, Confinement, Space const*, real stiff, real stiff2) const;
 
 public:
     

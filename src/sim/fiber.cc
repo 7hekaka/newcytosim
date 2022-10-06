@@ -926,7 +926,7 @@ void Fiber::prepareMecable()
 //------------------------------------------------------------------------------
 
 /** Add interactions between vertices and Space */
-void Fiber::setConfinement(Meca& meca, Confinement mode, Space const* spc, real stiff) const
+void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, real stiff, real stiff2) const
 {
     switch ( mode )
     {
@@ -950,7 +950,11 @@ void Fiber::setConfinement(Meca& meca, Confinement mode, Space const* spc, real 
             
         case CONFINE_ON:
             for ( size_t i = 0; i < nPoints; ++i )
-                spc->setConfinement(posP(i), Mecapoint(this, i), meca, stiff);
+            {
+                Vector pos = posP(i);
+                real S = ( spc->inside(pos) ? stiff2 : stiff );
+                spc->setConfinement(pos, Mecapoint(this, i), meca, S);
+            }
             break;
             
         case CONFINE_MINUS_END:
@@ -1063,12 +1067,12 @@ void Fiber::setInteractions(Meca& meca) const
 #endif
     
     if ( prop->confine != CONFINE_OFF )
-        setConfinement(meca, prop->confine, prop->confine_space_ptr, prop->confine_stiffness);
+        setFiberConfinement(meca, prop->confine, prop->confine_space_ptr, prop->confine_stiff[0], prop->confine_stiff[1]);
     
 #if NEW_FIBER_CONFINE2
     /// add another confinement force
     if ( prop->confine2 != CONFINE_OFF )
-        setConfinement(meca, prop->confine2, prop->confine2_space_ptr, prop->confine2_stiffness);
+        setFiberConfinement(meca, prop->confine2, prop->confine2_space_ptr, prop->confine2_stiffness, prop->confine2_stiffness);
 #endif
 }
 
