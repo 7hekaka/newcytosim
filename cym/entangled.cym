@@ -9,6 +9,7 @@ set simul system
     steric = 1, 500
     kT = 0.00428
     viscosity = 0.001
+    dim = 3
 }
 
 set space cell

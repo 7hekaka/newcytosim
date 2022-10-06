@@ -68,7 +68,7 @@ new 100 actin
 {
     length = 5
     position = circle 5 0
-    placement = inside, cell, ( x > -1 )
+    placement = inside, cell, ( X > -1 )
 }
 
 run 5 system
