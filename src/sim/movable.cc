@@ -593,7 +593,7 @@ Vector Movable::readPosition(std::string const& arg, Space const* spc)
         std::string str;
         std::streampos pos = iss.tellg();
         std::getline(iss, str);
-        throw InvalidSyntax("unexpected `"+str+"' in position `"+arg+"'");
+        throw InvalidSyntax("unexpected trailing `"+str+"' in position `"+arg+"'");
     }
     return vec;
 }

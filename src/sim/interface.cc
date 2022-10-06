@@ -613,21 +613,18 @@ public:
     {
         prp = pp;
         
-        if ( opt.value_is("position", 0, "inside") || opt.value_is("position", 0, "outside") )
+        std::string str;
+        if ( opt.set(str, "position", 1) )
         {
-            std::string str;
-            Space const* spc = sim->spaces.master();
-            if ( opt.set(str, "position", 1) )
-            {
-                spc = sim->findSpace(str);
-                if ( !spc )
-                    throw InvalidSyntax("unknown Space `"+str+"'");
-            }
+            Space const* ptr = sim->spaces.master();
+            ptr = sim->findSpace(str);
+            if ( !ptr )
+                throw InvalidSyntax("unknown Space `"+str+"'");
             opt.set(str, "position");
             if ( str == "inside" )
-                ins = spc;
+                ins = ptr;
             else if ( str == "outside" )
-                ous = spc;
+                ous = ptr;
         }
         
         opt.set(mrk, "mark");
