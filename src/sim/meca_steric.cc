@@ -3,12 +3,10 @@
 
 
 template < typename GRID >
-static void setStericGrid(GRID& grid, Space const* spc, real& range, real inf)
+static void setStericGrid(GRID& grid, Space const* spc, real& range)
 {
     assert_true(spc);
     real res = range;
-    
-    res = std::max(res, inf);
 
     if ( res <= 0 )
         throw InvalidParameter("simul:steric_max_range must be defined");
@@ -40,24 +38,23 @@ void Meca::selectStericEngine(Simul const& sim)
     // without pulling, use `locusGrid` which is simpler:
     steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
     
+    /** If the Space size is not expected to change, then we would only need
+     to allocate the Grid once, but this is not garanteed in general */
+    if ( sim.prop.steric_max_range <= REAL_EPSILON )
+        sim.prop.steric_max_range = sim.minimumStericRange();
+
     switch ( steric_ )
     {
         case 1:
             pointGrid.stiffness(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
-            if ( !pointGrid.hasGrid() )
-            {
-                real est = sim.minimumStericRange();
-                setStericGrid(pointGrid, spc, sim.prop.steric_max_range, est);
-            }
+            //if ( !pointGrid.hasGrid() )
+                setStericGrid(pointGrid, spc, sim.prop.steric_max_range);
             break;
             
         case 2:
             locusGrid.stiffness(sim.prop.steric_stiff_push[0]);
-            if ( !locusGrid.hasGrid() )
-            {
-                real est = sim.minimumStericRange();
-                setStericGrid(locusGrid, spc, sim.prop.steric_max_range, est);
-            }
+            //if ( !locusGrid.hasGrid() )
+                setStericGrid(locusGrid, spc, sim.prop.steric_max_range);
             break;
     }
 }

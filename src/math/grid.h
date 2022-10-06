@@ -70,8 +70,9 @@ public:
         if ( MAP::mNbCells > gAllocated )
         {
             delete[] gCell;
-            gCell = new CELL[MAP::mNbCells];
-            gAllocated = MAP::mNbCells;
+            gAllocated = ( MAP::mNbCells + 31 ) & ~31;
+            //printf("Grid allocates %lu cells\n", gAllocated);
+            gCell = new CELL[gAllocated];
             return true;
         }
         return false;
