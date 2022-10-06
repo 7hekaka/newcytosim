@@ -59,13 +59,11 @@ size_t LocusGrid::setGrid(Space const* spc, real min_width)
 
 void LocusGrid::createCells()
 {
-    pGrid.createCells();
-    
+    if ( pGrid.createCells() )
+        pGrid.printSummary(Cytosim::log, "   LocusGrid");
+
     //Create side regions suitable for pairwise interactions:
     pGrid.createSideRegions(1);
-    
-    //report the grid size used
-    pGrid.printSummary(Cytosim::log, "   LocusGrid");
 }
 
 

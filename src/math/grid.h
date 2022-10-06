@@ -62,7 +62,7 @@ public:
     }
     
     /// allocate the array of cells
-    bool createCells()
+    size_t createCells()
     {
         if ( MAP::mNbCells == 0 )
             printf("Map has no cells: call Map::setDimensions() first\n");
@@ -73,9 +73,9 @@ public:
             gAllocated = ( MAP::mNbCells + 31 ) & ~31;
             //printf("Grid allocates %lu cells\n", gAllocated);
             gCell = new CELL[gAllocated];
-            return true;
+            return gAllocated;
         }
-        return false;
+        return 0;
     }
     
     /// returns true if cells have been allocated
