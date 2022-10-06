@@ -21,7 +21,7 @@ void Walker::attach(FiberSite const& s)
     
 #if ( 0 )
     // this allows for step size being a multiple of lattice site
-    unsigned n = std::round( prop()->step_size / lattice()->unit() );
+    unsigned n = std::nearbyint( prop()->step_size / lattice()->unit() );
     prop()->stride = std::copysign(n, prop()->unloaded_speed);
 #else
     // here digit::step_size must be equal to fiber:step_size

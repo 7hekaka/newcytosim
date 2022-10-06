@@ -37,13 +37,13 @@ public:
     {
         const real P = period_[i];
         //return std::remainder(x, P);
-        int Q = std::round(x * inv_period_[i]);
+        int q = std::nearbyint(x * inv_period_[i]);
         /*
         real y = std::remainder(x, P);
-        if ( std::abs(y-x+Q*P) > 0.001 )
-            std::clog << "   " << x-Q*P << "   " << y << "\n";
+        if ( std::abs(y-x+w*P) > 0.001 )
+            std::clog << "   " << x-q*P << "   " << y << "\n";
          */
-        return x - Q * P;
+        return x - q * P;
     }
     
     /// adjust 'x' to canonical image in dimension i
@@ -51,8 +51,8 @@ public:
     {
         const float P = period_[i];
         //return std::remainderf(x, P);
-        int Q = std::roundf(x * inv_period_[i]);
-        return x - Q * P;
+        int q = std::nearbyintf(x * inv_period_[i]);
+        return x - q * P;
     }
 
 public:

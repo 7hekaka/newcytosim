@@ -13,7 +13,7 @@ static float grained(float x, int inc)
 {
     const float grain = 0.25f;
     float dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
-    float nx = grain * std::round( x / grain + dx );
+    float nx = grain * std::nearbyint( x / grain + dx );
     return std::max(std::abs(inc)*grain, nx);
 }
 
