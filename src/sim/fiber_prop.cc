@@ -438,8 +438,11 @@ void FiberProp::read(Glossary& glos)
     
     if ( glos.set(confine_stiff[0], "confine", 1) )
         confine_stiff[1] = confine_stiff[0];
-    if ( glos.set(confine_stiff[1], "confine", 2) )
+    if ( glos.is_number("confine", 2) )
+    {
+        glos.set(confine_stiff[1], "confine", 2);
         glos.set(confine_space, "confine", 3);
+    }
     else
         glos.set(confine_space, "confine", 2);
     glos.set(confine_stiff, 2, "confine_stiffness");
