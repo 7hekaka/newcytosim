@@ -72,15 +72,16 @@ enum Confinement
     CONFINE_INSIDE        = 1,   ///< confine vertices inside the Space
     CONFINE_OUTSIDE       = 2,   ///< confine vertices outside the Space
     CONFINE_ON            = 3,   ///< confine all vertices to the surface of the Space (always apply force)
-    CONFINE_ALL_INSIDE    = 4,   ///< confine the entire sphere inside the Space
-    CONFINE_ALL_OUTSIDE   = 5,   ///< confine the entire sphere outside the Space
-    CONFINE_PLUS_END      = 10,  ///< confine PLUS_END of fibers to the surface of the Space
-    CONFINE_MINUS_END     = 11,  ///< confine MINUS_END of fibers to the surface of the Space
-    CONFINE_BOTH_ENDS     = 12,  ///< confine both ends of fibers to the surface of the Space
-    CONFINE_PLUS_OUT      = 13,  ///< confine the PLUS_END outside the Space
-    CONFINE_POINT         = 14,  ///< confine first vertex of a Solid to the surface of the Space
-    CONFINE_POINT_INSIDE  = 15,  ///< confine first vertex of a Solid, inside the Space
-    CONFINE_RANGE         = 17   ///< confine vertices within a range of abscissa to the surface
+    CONFINE_IN_OUT        = 5,   ///< confine vertices with different stiffness inside/outside
+    CONFINE_ALL_INSIDE    = 8,   ///< confine entire sphere inside the Space
+    CONFINE_ALL_OUTSIDE   = 9,   ///< confine entire sphere outside the Space
+    CONFINE_PLUS_END      = 16,  ///< confine PLUS_END of fibers to the surface of the Space
+    CONFINE_MINUS_END     = 17,  ///< confine MINUS_END of fibers to the surface of the Space
+    CONFINE_BOTH_ENDS     = 18,  ///< confine both ends of fibers to the surface of the Space
+    CONFINE_PLUS_OUT      = 19,  ///< confine the PLUS_END outside the Space
+    CONFINE_POINT         = 24,  ///< confine first vertex of a Solid to the surface of the Space
+    CONFINE_POINT_INSIDE  = 25,  ///< confine first vertex of a Solid, inside the Space
+    CONFINE_RANGE         = 26   ///< confine vertices within a range of abscissa to the surface
 };
 
 

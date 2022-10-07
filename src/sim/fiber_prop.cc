@@ -367,12 +367,12 @@ void FiberProp::clear()
 //------------------------------------------------------------------------------
 void FiberProp::read(Glossary& glos)
 {
-    glos.set(rigidity,          "rigidity");
-    glos.set(segmentation,      "segmentation");
-    glos.set(min_length,        "min_length");
-    glos.set(max_length,        "max_length");
-    glos.set(total_polymer,     "total_polymer");
-    glos.set(persistent,        "persistent");
+    glos.set(rigidity,      "rigidity");
+    glos.set(segmentation,  "segmentation");
+    glos.set(min_length,    "min_length");
+    glos.set(max_length,    "max_length");
+    glos.set(total_polymer, "total_polymer");
+    glos.set(persistent,    "persistent");
 #if BACKWARD_COMPATIBILITY < 50
     bool ds;
     if ( glos.set(ds, "delete_stub") )
@@ -421,19 +421,20 @@ void FiberProp::read(Glossary& glos)
 #  endif
 #endif
 
-    glos.set(confine,           "confine", {{"off",       CONFINE_OFF},
-                                            {"on",        CONFINE_ON},
-                                            {"inside",    CONFINE_INSIDE},
-                                            {"outside",   CONFINE_OUTSIDE},
-                                            {"none",      CONFINE_OFF},
-                                            {"surface",   CONFINE_ON},
-                                            {"plus_end",  CONFINE_PLUS_END},
-                                            {"minus_end", CONFINE_MINUS_END},
-                                            {"both_ends", CONFINE_BOTH_ENDS},
+    glos.set(confine, "confine", {{"off",       CONFINE_OFF},
+                                  {"on",        CONFINE_ON},
+                                  {"inside",    CONFINE_INSIDE},
+                                  {"outside",   CONFINE_OUTSIDE},
+                                  {"in_out",    CONFINE_IN_OUT},
+                                  {"none",      CONFINE_OFF},
+                                  {"surface",   CONFINE_ON},
+                                  {"plus_end",  CONFINE_PLUS_END},
+                                  {"minus_end", CONFINE_MINUS_END},
+                                  {"both_ends", CONFINE_BOTH_ENDS},
 #if NEW_FIBER_CONFINE_RANGE
-                                            {"range",     CONFINE_RANGE},
+                                  {"range",     CONFINE_RANGE},
 #endif
-                                            {"plus_out",  CONFINE_PLUS_OUT}});
+                                  {"plus_out",  CONFINE_PLUS_OUT}});
     
     if ( glos.set(confine_stiff[0], "confine", 1) )
         confine_stiff[1] = confine_stiff[0];
@@ -445,10 +446,10 @@ void FiberProp::read(Glossary& glos)
     glos.set(confine_space, "confine_space");
 
 #if NEW_FIBER_CONFINE2
-    glos.set(confine2,           "confine2", {{"off",     CONFINE_OFF},
-                                              {"on",      CONFINE_ON},
-                                              {"inside",  CONFINE_INSIDE},
-                                              {"outside", CONFINE_OUTSIDE}}, 1);
+    glos.set(confine2, "confine2", {{"off",    CONFINE_OFF},
+                                   {"on",      CONFINE_ON},
+                                   {"inside",  CONFINE_INSIDE},
+                                   {"outside", CONFINE_OUTSIDE}}, 1);
     
     glos.set(confine2_stiffness, "confine2", 1);
     glos.set(confine2_space,     "confine2", 2);
@@ -464,45 +465,45 @@ void FiberProp::read(Glossary& glos)
     if ( confine_space == "current" )
         confine_space = "last";
 
-    glos.set(confine,           "confined", {{"none",      CONFINE_OFF},
-                                             {"inside",    CONFINE_INSIDE},
-                                             {"outside",   CONFINE_OUTSIDE},
-                                             {"surface",   CONFINE_ON},
-                                             {"minus_end", CONFINE_MINUS_END},
-                                             {"plus_end",  CONFINE_PLUS_END}});
+    glos.set(confine, "confined", {{"none",     CONFINE_OFF},
+                                  {"inside",    CONFINE_INSIDE},
+                                  {"outside",   CONFINE_OUTSIDE},
+                                  {"surface",   CONFINE_ON},
+                                  {"minus_end", CONFINE_MINUS_END},
+                                  {"plus_end",  CONFINE_PLUS_END}});
     
     glos.set(confine_stiffness, "confined", 1);
 #endif
 
 #if OLD_SQUEEZE_FORCE
-    glos.set(squeeze,           "squeeze");
-    glos.set(squeeze_force,     "squeeze", 1);
-    glos.set(squeeze_range,     "squeeze", 2);
+    glos.set(squeeze,       "squeeze");
+    glos.set(squeeze_force, "squeeze", 1);
+    glos.set(squeeze_range, "squeeze", 2);
 #endif
 #if NEW_END_FORCE
-    glos.set(end_force,         "end_force");
-    glos.set(end_force_mode,    "end_force", 1, {{"off", NO_END}, {"plus_end", PLUS_END},
+    glos.set(end_force, "end_force");
+    glos.set(end_force_mode, "end_force", 1, {{"off", NO_END}, {"plus_end", PLUS_END},
         {"minus_end", MINUS_END}, {"center", CENTER}, {"both_ends", BOTH_ENDS}, {"torque", ORIGIN}});
 #endif
 
-    glos.set(steric,            "steric");
-    glos.set(steric_radius,     "steric", 1);
-    glos.set(steric_range,      "steric", 2);
-    glos.set(steric_radius,     "steric_radius");
-    glos.set(steric_range,      "steric_range");
+    glos.set(steric,        "steric");
+    glos.set(steric_radius, "steric", 1);
+    glos.set(steric_range,  "steric", 2);
+    glos.set(steric_radius, "steric_radius");
+    glos.set(steric_range,  "steric_range");
 #if FIBER_HAS_GLUE
-    glos.set(field,             "field");
-    glos.set(glue,              "glue");
-    glos.set(glue_single,       "glue", 1);
+    glos.set(field,       "field");
+    glos.set(glue,        "glue");
+    glos.set(glue_single, "glue", 1);
 #endif
 #if NEW_COLINEAR_FORCE
-    glos.set(colinear_force,    "colinear_force");
+    glos.set(colinear_force, "colinear_force");
 #endif
 #if NEW_FIBER_CHEW
     glos.set(max_chewing_speed, "max_chewing_speed");
 #endif
 #if NEW_FIBER_LOOP
-    glos.set(loop,              "loop");
+    glos.set(loop, "loop");
 #endif
 #if NEW_UNCONSTRAINED_LENGTH
     glos.set(constrain_length, "constrain_length");

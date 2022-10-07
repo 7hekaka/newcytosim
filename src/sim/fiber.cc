@@ -950,6 +950,11 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             
         case CONFINE_ON:
             for ( size_t i = 0; i < nPoints; ++i )
+                spc->setConfinement(posP(i), Mecapoint(this, i), meca, stiff);
+            break;
+        
+        case CONFINE_IN_OUT:
+            for ( size_t i = 0; i < nPoints; ++i )
             {
                 Vector pos = posP(i);
                 real S = ( spc->inside(pos) ? stiff2 : stiff );
