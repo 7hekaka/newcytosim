@@ -940,7 +940,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
         if ( fib )
         {
             const size_t N = fib->nbSegments();
-            const real w = fib->segmentationInv();
+            const real w = square(fib->segmentationInv());
             real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
             for ( size_t n = 0; n < N; ++n )
             {
@@ -963,18 +963,19 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
             M[4] += w * YY;
             M[5] += w * YZ;
             M[8] += w * ZZ;
-            sum += w * N;
+            sum += N;
         }
     }
     
     if ( sum == 0 )
         return 0;
-    // rescale matrix: 2D: ( DIM * M - 1 ),  3D: 1/2 * ( DIM * M - 1 )
-    real beta = ( DIM >= 3 ) ? 0.5 : 1.0;
-    sum = beta * DIM / sum;
+    // rescale matrix:
+    sum = 1.0 / sum;
     for ( size_t d = 0; d < 9; ++d )
         M[d] = sum * M[d];
+    //std::clog << "trace = " << M[0] + M[4] + M[8] << "\n";
     // subtract trace:
+    real beta = 1.0 / DIM;
     M[0] -= beta;
     if ( DIM > 1 ) M[4] -= beta;
     if ( DIM > 2 ) M[8] -= beta;
