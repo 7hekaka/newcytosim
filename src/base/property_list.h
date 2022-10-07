@@ -66,10 +66,10 @@ public:
     /// iterator pointing to a position past the last element
     const_iterator end() const { return vec_.end(); }
     
-    /// iterator pointing to first element
+    /// pointer to first element
     Property * front() const { return vec_.front(); }
     
-    /// iterator pointing to last element
+    /// pointer to last element
     Property * back() const { return vec_.back(); }
 
     //-------------------------------------------------------------------------------

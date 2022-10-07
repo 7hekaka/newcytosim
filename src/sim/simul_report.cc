@@ -7,6 +7,7 @@
 #include "tokenizer.h"
 #include "stream_func.h"
 #include "organizer.h"
+#include "matrix22.h"
 
 
 /// width of columns in formatted output, in number of characters
@@ -95,14 +96,14 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
             if ( blk.empty() )
             {
                 //out << "\nSimul::report(" << arg << ")";
-                mono_report(out, arg, opt, ver);
+                mono_report(out, arg, opt, 0);
             }
             else
             {
                 //out << "\nSimul::report(" << arg << ", " << blk << ")";
                 Glossary glos(opt);
                 glos.read(blk, 0);
-                mono_report(out, arg, glos, ver);
+                mono_report(out, arg, glos, 0);
                 opt.add_counts(glos);
             }
         }
@@ -117,8 +118,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
     }
     if ( ver > 1 )
     {
-        out << '\n';
-        out << "% end\n";
+        out << "% end report\n\n";
     }
     {
         // check for unused characters in instruction stream
@@ -330,6 +330,8 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportFiberPoints(out, sel);
         if ( what == "displacement" )
             return reportFiberDisplacement(out, sel);
+        if ( what == "direction" )
+            return reportFiberDirections(out, sel);
         if ( what == "moment" )
             return reportFiberMoments(out);
         if ( what == "speckle" )
@@ -1154,6 +1156,68 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel) cons
         out << LIN << time() - past << SEP << 0 << SEP << 0;
     
     past = time();
+}
+
+
+void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
+{
+    Vector eZ(0, 0, 1);
+    if ( !sel )
+    {
+        PropertyList plist = properties.find_all("fiber");
+        if ( plist.size() == 1 )
+            sel = plist.front();
+        else
+            throw InvalidParameter("need to specify a class of fiber");
+    }
+    Space const* spc = static_cast<FiberProp const*>(sel)->confine_space_ptr;
+    
+    real sum = 0;
+    Vector2 avg(0, 0);
+    Matrix22 mat(0, 0);
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+    {
+        if ( sel != fib->prop )
+            continue;
+        for ( size_t p = 0; p < fib->nbSegments(); ++p )
+        {
+            Vector pos = fib->midPoint(p, 0.5);
+            Vector dir = fib->dirSegment(p);
+            Vector nor = spc->normalToEdge(pos);
+            Vector tan = cross(eZ, nor);
+            real n = normSqr(tan);
+            if ( n > 0.5 )
+            {
+                real X = dot(dir, tan/sqrt(n));
+                real Z = dir.ZZ;
+                real S = 1.0 / ( X * X + Z * Z );
+                mat(0,0) += X * X * S;
+                mat(1,0) += X * Z * S;
+                mat(1,1) += Z * Z * S;
+                avg += Vector2(X, Z);
+                ++sum;
+            }
+        }
+    }
+    real S = 0;
+    if ( sum > 0 )
+    {
+        avg /= sum;
+        mat *= 1 / sum;
+        Vector2 vec(1, 0);
+        // subtract trace:
+        mat(0,0) -= 0.5;
+        mat(1,1) -= 0.5;
+        // find largest eigenvector:
+        for ( int i = 0; i < 16; ++i )
+            vec = normalize(mat*vec);
+        // nematic order parameter:
+        S = norm(mat*vec);
+    }
+    // polar order parameter
+    real M = norm(avg);
+    out << COM << "nb_seg nematic polar orthoradial vertical";
+    out << LIN << sum << SEP << S << SEP << M << SEP << avg.XX << SEP << avg.YY;
 }
 
 

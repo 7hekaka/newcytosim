@@ -7,7 +7,7 @@
 #include "meca.h"
 
 /// keyword to allow smooth edges on the Cylinder
-#define HAS_SMOOTH_EDGES 1
+#define SMOOTH_CYLINDER 1
 
 
 SpaceCylinderZ::SpaceCylinderZ(SpaceProp const* p)
@@ -49,7 +49,7 @@ void SpaceCylinderZ::resize(Glossary& opt)
     if ( top < bot )
         throw InvalidParameter("cylinderZ:bottom must be <= top");
     
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     if ( opt.set(edg, "edge") )
     {
         if ( edg < 0 )
@@ -78,7 +78,7 @@ void SpaceCylinderZ::boundaries(Vector& inf, Vector& sup) const
 
 Vector SpaceCylinderZ::place() const
 {
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     Vector W;
     do {
         const Vector2 V = Vector2::randB(radius_);
@@ -95,13 +95,14 @@ Vector SpaceCylinderZ::place() const
 Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 {
 #if ( DIM > 2 )
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
     const real n = min_real(R, radius_-edge_) / R;
     // projection on the inner cylinder:
     const real X = n * pos.XX;
     const real Y = n * pos.YY;
     const real Z = max_real(min_real(pos.ZZ, top_-edge_), bot_+edge_);
+    // this will fail if 'pos' is already inside the inner cylinder:
     return normalize(pos-Vector(X,Y,Z));
 #else
     const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
@@ -118,7 +119,7 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 
 real SpaceCylinderZ::surface() const
 {
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     const real RE = radius_ - edge_;
     const real LE = top_ - bot_ - 2 * edge_;
     const real GC = RE + edge_ * ( 2.0 / M_PI );
@@ -146,7 +147,7 @@ https://en.wikipedia.org/wiki/Pappus%27s_centroid_theorem
 Vector SpaceCylinderZ::placeOnEdge(real) const
 {
 #if ( DIM > 2 )
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     const real RE = radius_ - edge_;
     const real LE = top_ - bot_ - 2 * edge_;
     const real GC = RE + edge_ * ( 2.0 / M_PI );
@@ -221,7 +222,7 @@ Vector SpaceCylinderZ::placeOnEdge(real) const
  */
 real SpaceCylinderZ::volume() const
 {
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     const real RE = radius_ - edge_;
     const real LE = top_ - bot_ - 2 * edge_;
     const real GC = RE + 4 / 3.0 * edge_ / M_PI;
@@ -238,7 +239,7 @@ bool SpaceCylinderZ::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
     const real RT = W.normXYSqr();
-# if HAS_SMOOTH_EDGES
+# if SMOOTH_CYLINDER
     const real R = max_real(0, std::sqrt(RT)-radius_+edge_);
     const real Z = max_real(0, std::max(bot_+edge_-W.ZZ, W.ZZ-top_+edge_));
     return ( R*R + Z*Z <= edgeSqr_ );
@@ -257,7 +258,7 @@ bool SpaceCylinderZ::allInside(Vector const& W, const real rad) const
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
     const real RT = W.normXYSqr();
-# if HAS_SMOOTH_EDGES
+# if SMOOTH_CYLINDER
     const real E = edge_ + rad;
     const real R = max_real(0, std::sqrt(RT)-E);
     const real Z = max_real(0, max_real(bot_+E-W.ZZ, W.ZZ-top_+E));
@@ -277,7 +278,7 @@ Vector SpaceCylinderZ::project(Vector const& W) const
 {
     Vector P(W);
 #if ( DIM > 2 )
-# if HAS_SMOOTH_EDGES
+# if SMOOTH_CYLINDER
     const real T = top_ - edge_;
     const real B = bot_ + edge_;
     const real R = radius_ - edge_;
@@ -324,7 +325,7 @@ Vector SpaceCylinderZ::project(Vector const& W) const
             P.ZZ = bot_;
         return P;
     }
-# if HAS_SMOOTH_EDGES
+# if SMOOTH_CYLINDER
     //normalize to radius(), and add to p to get the projection
     real dis = edge_ / norm(W-P);
     return dis * ( W - P ) + P;
@@ -446,7 +447,7 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, Meca
  */
 void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
 {
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     setConfinement(pos, mp, meca, stiff, radius_, bot_, top_, edge_);
 #else
     setConfinement(pos, mp, meca, stiff, radius_, bot_, top_);
@@ -468,7 +469,7 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, real
         T = B;
     }
     
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
     setConfinement(pos, mp, meca, stiff, R, B, T, edge_);
 #else
     setConfinement(pos, mp, meca, stiff, R, B, T);
@@ -534,7 +535,7 @@ void SpaceCylinderZ::draw3D() const
         float SU = gle::sin_(u), SL = gle::sin_(u+1);
 
         *ptr++ = {0, 0, T, 0, 0, 1};
-#if HAS_SMOOTH_EDGES
+#if SMOOTH_CYLINDER
         if ( edge_ > 0 )
         {
             //draw top arc

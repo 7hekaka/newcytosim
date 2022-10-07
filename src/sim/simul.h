@@ -424,6 +424,9 @@ public:
     
     /// print the coordinates of the vertices of each fiber
     void reportFiberDisplacement(std::ostream&, Property const*) const;
+    
+    /// print the coordinates of the vertices of each fiber
+    void reportFiberDirections(std::ostream&, Property const*) const;
 
     /// print the positions and the states of ends `end` of all fibers
     void reportFiberEnds(std::ostream&, FiberEnd end, Property const*) const;
