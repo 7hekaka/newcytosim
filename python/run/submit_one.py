@@ -3,7 +3,7 @@
 # A script to submit analysis jobs to the SLURM queuing system
 #
 # Derived from submit_slurm.py
-# F. Nedelec, 4.11.2020
+# F. Nedelec, 4.11.2020, 8.10.2022
 
 """
     Submit a job to the SLURM system to be called in multiple directories
@@ -33,7 +33,7 @@ submit  = 'sbatch'
 queue   = 'icelake'
 runtime = '12:00:00'  # 12 hour
 memory  = '4096'      # in MB
-ncpu    = 1           # nb of threads per job
+ncpu    = 64          # nb of threads per job
 
 # where output is sent:
 out = sys.stderr
@@ -61,14 +61,14 @@ def write_script(fd, cmd):
 
 
 def sub(file):
-    """return command that will submit one job"""
+    """return script that will submit one job"""
     # specify memory, shell, minimum number of cores and queue
     cmd  = [submit, '--nodes=1', '--ntasks=1']
     # specify number of threads if executable is threaded:
     if ncpu > 1:
         cmd += ['--cpus-per-task=%i' % ncpu]
     cmd += ['--partition='+queue]
-    cmd += ['--time='+runtime] 
+    cmd += ['--time='+runtime]
     cmd += ['--mem='+memory]
     # define signals sent if time is exceeded:
     cmd += ['--signal=15@120']
@@ -94,7 +94,7 @@ def main(args):
     else:
         submit = proc.stdout.readline().strip()
 
-    # first argument is the command to be executed
+    # first argument is used for go_sim.py:
     cmd = args.pop(0)
 
     # create job script file:
@@ -103,9 +103,11 @@ def main(args):
 
     job = []
     cwd = os.getcwd()
+    path = 'log'
     for arg in args:
         if os.path.isdir(arg) and os.access(arg, os.X_OK):
-            job += ['cd '+os.path.abspath(arg)+' && '+cmd+';']
+            path = os.path.abspath(arg)
+            job += ['cd '+path+' && '+cmd+';']
         else:
             [key, equal, val] = arg.partition('=')
             if key == 'mem' or key == 'memory':
@@ -133,9 +135,12 @@ def main(args):
     if ncpu < 1:
         out.write("Error: number of cpu/job must be >= 1\n")
         sys.exit()
+    if ncpu > 128:
+        out.write("Error: number of cpu/job is excessive?\n")
+        sys.exit()
 
     if job:
-        fd, file = tempfile.mkstemp('', '', 'log', True)
+        fd, file = tempfile.mkstemp('', '', path, True)
         out.write("script %s : " % file)
         write_script(fd, job)
         os.chmod(file, 0700)
