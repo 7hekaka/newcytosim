@@ -49,6 +49,9 @@ int winH = 800;
 
 //------------------------------------------------------------------------------
 
+/**
+ Print range of the depth buffer values for pixels within [X, Y, X+W, Y+W]
+ */
 void printDepthRange(int X, int Y, int W, int H)
 {
     size_t S = W * H;

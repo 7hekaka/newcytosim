@@ -33,7 +33,7 @@ namespace gym
     /// replace reference modelview matrix
     inline void set_view(const float mat[16]) { gym::mat_copy(ref_, mat); gym::mat_copy(mvp_, mat); load_ref(); }
     
-    /// make reference matrix current and load
+    /// make reference matrix current and loaded
     inline void ref_view() { pull_ref(); load_ref(); }
     
     /// change projection matrix

@@ -559,9 +559,12 @@ void View::loadView() const
  from the observer, using clipping planes and fog.
  A a function of `mode`:
  - 0 : disabled
- - 1 : show ( Z > 0 ) with fog
- - 2 : show ( Z < 0 ) with fog
- - 3 : show slice ( -a < Z < a ) where a = 5% of view_scale
+ - 1 : show ( Z > 0 )
+ - 2 : show ( Z > 0 ) with fog
+ - 3 : show ( Z < 0 ) with fog
+ - 4 : show slice ( -a < Z < a ) where a = 5% of view_scale
+ - 5 : show ( H < 0 ), where H is depth relative to camera
+ - 6 : show ( H > 0 ), where H is depth relative to camera
  .
  */
 void View::sliceView(int mode) const
@@ -570,29 +573,41 @@ void View::sliceView(int mode) const
     switch ( mode )
     {
         case 1: {
-            gym::eye_view(eyeDistance, zoom);
-            gym::enableClipPlane(2, 0, 0, 1, off);
+            gym::ref_view();
+            Vector3 V = depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
+        } break;
+        case 2: {
+            gym::ref_view();
+            Vector3 V = depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
             if ( !depth_clamp )
                 setFog(1, 0, fog_color);
         } break;
-        case 2: {
-            gym::eye_view(eyeDistance, zoom);
-            gym::enableClipPlane(2, 0, 0, -1, -off);
+        case 3: {
+            gym::ref_view();
+            Vector3 V = -depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
             setFog(1, 1, fog_color);
         } break;
-        case 3: {
-            real thk = view_scale * 0.05;
-            gym::eye_view(eyeDistance, zoom);
-            gym::enableClipPlane(2, 0, 0, -1, thk-off);
-            gym::enableClipPlane(3, 0, 0, +1, thk+off);
-        } break;
         case 4: {
-            Vector3 V = -depthAxis();
+            real thk = view_scale * 0.05;
             gym::ref_view();
+            Vector3 V = -depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk-off);
+            gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk+off);
+        } break;
+        case 5: {  // this is equivalent to mode 1
+            gym::ref_view();
+            Vector3 V = -depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
+        } break;
+        case 6: {
+            gym::ref_view();
+            Vector3 V = depthAxis();
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
         } break;
     }
-    gym::ref_view();
 }
 
 
@@ -750,8 +765,9 @@ void View::setFog(GLint type, float param, gym_color color) const
     switch( type )
     {
         case 1: gl_type = GL_LINEAR; break;
-        case 2: gl_type = GL_EXP;    break;
-        case 3: gl_type = GL_EXP2;   break;
+        case 2: gl_type = GL_LINEAR; break;
+        case 3: gl_type = GL_EXP;    break;
+        case 4: gl_type = GL_EXP2;   break;
         default: glDisable(GL_FOG); return;
     }
    
@@ -760,7 +776,7 @@ void View::setFog(GLint type, float param, gym_color color) const
     
     if ( gl_type == GL_LINEAR )
     {
-        glFogf(GL_FOG_START, param*view_scale);
+        glFogf(GL_FOG_START, (param)*view_scale);
         glFogf(GL_FOG_END, (param*2+1)*view_scale);
     }
     else
