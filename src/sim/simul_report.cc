@@ -80,13 +80,8 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
 {
     int ver = 2;
     opt.set(ver, "verbose");
-    if ( ver > 1 )
-    {
-        if ( frm >= 0 )
-            out << "% frame   " << frm << '\n';
-        //out << "% start\n";
-        out << "% time " << std::to_string(time());
-    }
+    if (( ver & 2 ) && frm >= 0 )
+        out << "% frame   " << frm << '\n';
     std::stringstream is(what);
     while ( is.good() )
     {
@@ -96,14 +91,14 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
             if ( blk.empty() )
             {
                 //out << "\nSimul::report(" << arg << ")";
-                mono_report(out, arg, opt, 0);
+                mono_report(out, arg, opt, ver);
             }
             else
             {
                 //out << "\nSimul::report(" << arg << ", " << blk << ")";
                 Glossary glos(opt);
                 glos.read(blk, 0);
-                mono_report(out, arg, glos, 0);
+                mono_report(out, arg, glos, ver);
                 opt.add_counts(glos);
             }
         }
@@ -116,7 +111,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
             break;
         is.get();
     }
-    if ( ver > 1 )
+    if ( ver & 2 )
     {
         out << "% end report\n\n";
     }
@@ -146,14 +141,14 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     std::streamsize op = out.precision();
     out.precision(p);
 
-    if ( ver > 1 )
+    if ( ver & 1 )
     {
         //out << "% start\n";
-        out << "\n% time " << std::to_string(time());
+        out << "% time " << std::to_string(time()) << '\n';
     }
     if ( ver > 0 )
     {
-        out << "\n% report " << arg << " " << opt.to_string();
+        out << "% report " << arg << " " << opt.to_string();
         report_one(out, arg, opt);
         out << "\n";
     }
@@ -163,7 +158,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
         report_one(ss, arg, opt);
         StreamFunc::skip_lines(out, ss, '%');
     }
-    if ( ver > 1 )
+    if ( ver & 1 )
         out << "% end\n";
     out.precision(op);
 }
@@ -185,7 +180,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
         what = arg.substr(pos+1);
     }
     
-    // allow for approximate spelling (missing 's'):
+    // allow for 's' or not at the ends of words:
     remove_plural(who);
     remove_plural(what);
     
@@ -1159,25 +1154,33 @@ void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel) cons
 }
 
 
+/** This is a hack to maintain some credibility */
+static bool isSymmetricAroundAxisZ(std::string const& shape)
+{
+    if ( shape == "sphere" ) return true;
+    if ( shape == "cylinderZ" ) return true;
+    if ( shape == "ellipse" ) return true;
+    if ( shape == "torus" ) return true;
+    if ( shape == "ring" ) return true;
+    if ( shape == "disc" ) return true;
+    return false;
+}
+
 void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
 {
-    Vector eZ(0, 0, 1);
-    if ( !sel )
-    {
-        PropertyList plist = properties.find_all("fiber");
-        if ( plist.size() == 1 )
-            sel = plist.front();
-        else
-            throw InvalidParameter("need to specify a class of fiber");
-    }
-    Space const* spc = static_cast<FiberProp const*>(sel)->confine_space_ptr;
-    
+    Space const* spc = spaces.master();
+    if ( sel )
+        spc = static_cast<FiberProp const*>(sel)->confine_space_ptr;
+    if ( !isSymmetricAroundAxisZ(spc->prop->shape) )
+        throw InvalidParameter("reportFiberDirections() cannot handle non symmetric Space");
+
     real sum = 0;
+    Vector eZ(0, 0, 1);
     Vector2 avg(0, 0);
     Matrix22 mat(0, 0);
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
-        if ( sel != fib->prop )
+        if ( sel && sel != fib->prop )
             continue;
         for ( size_t p = 0; p < fib->nbSegments(); ++p )
         {
@@ -1204,17 +1207,17 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
     {
         avg /= sum;
         mat *= 1 / sum;
-        Vector2 vec(1, 0);
         // subtract trace:
         mat(0,0) -= 0.5;
         mat(1,1) -= 0.5;
-        // find largest eigenvector:
+        // find largest eigenvector by iteration:
+        Vector2 vec(1, 0);
         for ( int i = 0; i < 16; ++i )
             vec = normalize(mat*vec);
-        // nematic order parameter:
+        // nematic order parameter is the eigenvalue:
         S = norm(mat*vec);
     }
-    // polar order parameter
+    // polar order parameter:
     real M = norm(avg);
     out << COM << "nb_seg nematic polar orthoradial vertical";
     out << LIN << sum << SEP << S << SEP << M << SEP << avg.XX << SEP << avg.YY;
@@ -1430,18 +1433,6 @@ void Simul::reportFiberConfineForce(std::ostream& out) const
      }
 }
 
-/** This is a hack to maintain some credibility */
-static bool isSymmetricAroundZ(std::string const& shape)
-{
-    if ( shape == "sphere" ) return true;
-    if ( shape == "cylinderZ" ) return true;
-    if ( shape == "ellipse" ) return true;
-    if ( shape == "torus" ) return true;
-    if ( shape == "ring" ) return true;
-    if ( shape == "disc" ) return true;
-    return false;
-}
-
 /**
  Export total magnitude of force exerted by Fiber on the confinement.
  The radial components of the forces are summed up, which is only meaningful
@@ -1461,7 +1452,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
         const real stiff = fib->prop->confine_stiff[0];
         const Confinement mode = fib->prop->confine;
 
-        if ( !isSymmetricAroundZ(spc->prop->shape) )
+        if ( !isSymmetricAroundAxisZ(spc->prop->shape) )
             throw InvalidParameter("reportFiberConfinement() cannot handle non symmetric Space");
         
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
