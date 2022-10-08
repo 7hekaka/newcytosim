@@ -1177,6 +1177,7 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
     Vector eZ(0, 0, 1);
     Vector2 avg(0, 0);
     Matrix22 mat(0, 0);
+#if ( DIM == 3 )
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
         if ( sel && sel != fib->prop )
@@ -1190,17 +1191,17 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
             real n = normSqr(tan);
             if ( n > 0.5 )
             {
-                real X = dot(dir, tan/sqrt(n));
-                real Z = dir.ZZ;
-                real S = 1.0 / ( X * X + Z * Z );
-                mat(0,0) += X * X * S;
-                mat(1,0) += X * Z * S;
-                mat(1,1) += Z * Z * S;
-                avg += Vector2(X, Z);
+                Vector2 V(dot(dir, tan/sqrt(n)), dir.ZZ);
+                V.normalize();
+                mat(0,0) += V.XX * V.XX;
+                mat(1,0) += V.XX * V.YY;
+                mat(1,1) += V.YY * V.YY;
+                avg += V;
                 ++sum;
             }
         }
     }
+#endif
     real S = 0;
     if ( sum > 0 )
     {
