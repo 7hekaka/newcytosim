@@ -561,7 +561,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     in.skip_until("#section ");
             }
             // optional indication giving the number of objects in the section
-            if ( tok == "record" && objset )
+            if (( tok == "record" ) && objset )
             {
                 size_t cnt = 0, sup_id = 0;
                 if ( iss >> cnt >> sup_id )

@@ -126,7 +126,6 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
 }
 
 
-
 /**
  Surround the report with comments to identify start/end
  */
@@ -184,7 +183,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
     remove_plural(who);
     remove_plural(what);
     
-    //std::clog << "report("<< what << "|" << who << ")\n";
+    //std::clog << "report("<< who << "|" << what << ")\n";
     if ( isCategory(who) )
     {
         int split = false;
