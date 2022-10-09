@@ -1209,8 +1209,8 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
         avg /= sum;
         mat *= 2.0 / sum;
         mat(0,1) = mat(1,0);
-        X2 = mat(0,0);
-        Y2 = mat(1,1);
+        X2 = mat(0,0) * 0.5;
+        Y2 = mat(1,1) * 0.5;
         // subtract trace:
         mat(0,0) -= 1.0;
         mat(1,1) -= 1.0;
