@@ -473,10 +473,13 @@ void testTBSV(int N, size_t cnt)
         check<uniLN0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLN", cnt);
         check<uniLN1>(N, 1, S, AB, BLDD, B, "xtbsvLNN", cnt);
         check<uniLN2>(N, 1, S, AB, BLDD, B, "LNNK<KD>", cnt);
+    }
+    if ( DIM == 3 )
+    {
         check<uniLN3>(N, 1, S, AB, BLDD, B, "LLN6K", cnt);
 #if REAL_IS_DOUBLE && USE_SIMD
-        check<uniLN4>(N, 1, S, AB, BLDD, B, "U:LNN6SSE", cnt);
-        check<uniLN5>(N, 1, S, AB, BLDD, B, "LNN6SSE", cnt);
+        check<uniLN4>(N, 1, S, AB, BLDD, B, "U:LNN6K_SSE", cnt);
+        check<uniLN5>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", cnt);
 #endif
     }
     if ( 1 )
@@ -486,10 +489,13 @@ void testTBSV(int N, size_t cnt)
         check<uniLT0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLT", cnt);
         check<uniLT1>(N, 1, S, AB, BLDD, B, "xtbsvLTN", cnt);
         check<uniLT2>(N, 1, S, AB, BLDD, B, "LTNK<KD>", cnt);
+    }
+    if ( DIM == 3 )
+    {
         check<uniLT3>(N, 1, S, AB, BLDD, B, "LTN6K", cnt);
 #if REAL_IS_DOUBLE && USE_SIMD
-        check<uniLT4>(N, 1, S, AB, BLDD, B, "LTN6SSE_U", cnt);
-        check<uniLT5>(N, 1, S, AB, BLDD, B, "LTN6SSE", cnt);
+        check<uniLT4>(N, 1, S, AB, BLDD, B, "U:LTN6K_SSE", cnt);
+        check<uniLT5>(N, 1, S, AB, BLDD, B, "LTN6K_SSE", cnt);
 #endif
     }
     free_real(B);
