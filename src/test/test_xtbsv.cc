@@ -268,29 +268,34 @@ void testPOTRS(int N, size_t cnt)
     std::cout << " --- " << __VERSION__;
     int LDA = ( N + 3 ) & ~3;
     
-    real * AB = new_real(N*N+4);
-    real * S = new_real(N*DIM);
+    real * AB = new_real(N*LDA+4);
     real * B = new_real(N*DIM+4);
+    real * S = new_real(N*DIM);
 
-    for ( size_t i = 0; i < N*DIM; ++i )
+    for ( int i = 0; i < N*DIM; ++i )
         S[i] = RNG.sreal();
     zero_real(N*LDA, AB);
-    nan_spill(AB+N*LDA);
-    for ( size_t i = 0; i < N; ++i )
+    for ( int i = 0; i < N; ++i )
     {
-        real r = 0.0625 * RNG.sreal();
-        AB[i+LDA*i] = 1.5;
-        AB[i+1+LDA*i] = -0.125 + r;
-        AB[i+2+LDA*i] = -0.125 - r;
+        real r = 0.03125 * RNG.sreal();
+        AB[LDA*i+i] = 1.5;
+        if ( i < N-1 ) AB[LDA*i+i+1] = -0.0625 + r;
+        if ( i < N-2 ) AB[LDA*i+i+2] = -0.0625 - r;
     }
-    int info;
+    nan_spill(AB+N*LDA);
+    VecPrint::full("AB", N, N, AB, LDA);
+    int info = 0;
     alsatian_xpotf2L(N, AB, N, &info);
-
-    check<pot1>(N, DIM, S, AB, LDA, B, "alsa_potrsLref", cnt);
-    check<pot2>(N, DIM, S, AB, LDA, B, "iso_trsmLLN<D>", cnt);
+    if ( info == 0 )
+    {
+        check<pot1>(N, DIM, S, AB, LDA, B, "alsa_potrsLref", cnt);
+        check<pot2>(N, DIM, S, AB, LDA, B, "iso_trsmLLN<D>", cnt);
 #if defined(__AVX__) && REAL_IS_DOUBLE
-    check<pot3>(N, DIM, S, AB, LDA, B, "alsa_trsmLLND", cnt);
+        check<pot3>(N, DIM, S, AB, LDA, B, "alsa_trsmLLND", cnt);
 #endif
+    }
+    else
+        std::cout << "\nfailed factorization (" << info << ")";
     free_real(B);
     free_real(S);
     free_real(AB);
