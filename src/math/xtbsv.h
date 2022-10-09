@@ -1779,7 +1779,7 @@ void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
 #else
     if ( KD == 6 )
     {
-#if REAL_IS_DOUBLE && defined(__SSE3__)
+#if REAL_IS_DOUBLE && USE_SIMD
         alsatian_xtbsvLNN6K_SSE(N, AB, LDAB, B);
         alsatian_xtbsvLTN6K_SSE(N, AB, LDAB, B);
 #else
