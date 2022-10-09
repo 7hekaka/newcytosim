@@ -969,13 +969,13 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
     
     if ( sum == 0 )
         return 0;
-    // rescale matrix:
-    sum = 1.0 / sum;
+    // rescale matrix, to ensure eigenvalue = 1 in perfect order
+    real beta = ( DIM >= 3 ) ? 0.5 : 1.0;
+    sum = beta * DIM / sum;
     for ( size_t d = 0; d < 9; ++d )
         M[d] = sum * M[d];
     //std::clog << "trace = " << M[0] + M[4] + M[8] << "\n";
     // subtract trace:
-    real beta = 1.0 / DIM;
     M[0] -= beta;
     if ( DIM > 1 ) M[4] -= beta;
     if ( DIM > 2 ) M[8] -= beta;
