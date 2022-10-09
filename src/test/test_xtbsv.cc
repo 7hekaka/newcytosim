@@ -266,8 +266,8 @@ void testPOTRS(int N, size_t cnt)
 {
     std::cout << "\n Cholesky factorization of full matrix & iso solve " << N << " points --- real " << sizeof(real);
     std::cout << " --- " << __VERSION__;
-    int LDA = ( N + 3 ) & ~3;
     
+    const int LDA = ( N + 3 ) & ~3;
     real * AB = new_real(N*LDA+4);
     real * B = new_real(N*DIM+4);
     real * S = new_real(N*DIM);
@@ -279,13 +279,13 @@ void testPOTRS(int N, size_t cnt)
     {
         real r = 0.03125 * RNG.sreal();
         AB[LDA*i+i] = 1.5;
-        if ( i < N-1 ) AB[LDA*i+i+1] = -0.0625 + r;
-        if ( i < N-2 ) AB[LDA*i+i+2] = -0.0625 - r;
+        if ( i < N-1 ) AB[LDA*i+i+1] = 0.0625 + r;
+        if ( i < N-2 ) AB[LDA*i+i+2] = 0.0625 - r;
     }
     nan_spill(AB+N*LDA);
-    VecPrint::full("AB", N, N, AB, LDA);
+    //VecPrint::full("AB", N, N, AB, LDA);
     int info = 0;
-    alsatian_xpotf2L(N, AB, N, &info);
+    alsatian_xpotf2L(N, AB, LDA, &info);
     if ( info == 0 )
     {
         check<pot1>(N, DIM, S, AB, LDA, B, "alsa_potrsLref", cnt);
@@ -295,7 +295,10 @@ void testPOTRS(int N, size_t cnt)
 #endif
     }
     else
-        std::cout << "\nfailed factorization (" << info << ")";
+    {
+        std::cout << "\n ERROR: failed factorization (" << info << ")   ";
+        //VecPrint::full("AB", N, N, AB, LDA);
+    }
     free_real(B);
     free_real(S);
     free_real(AB);
@@ -470,9 +473,9 @@ void testTBSV(int N, size_t cnt)
         check<uniLN0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLN", cnt);
         check<uniLN1>(N, 1, S, AB, BLDD, B, "xtbsvLNN", cnt);
         check<uniLN2>(N, 1, S, AB, BLDD, B, "LNNK<KD>", cnt);
-        check<uniLN3>(N, 1, S, AB, BLDD, B, "LLN6", cnt);
+        check<uniLN3>(N, 1, S, AB, BLDD, B, "LLN6K", cnt);
 #if REAL_IS_DOUBLE && USE_SIMD
-        check<uniLN4>(N, 1, S, AB, BLDD, B, "LNN6SSE_U", cnt);
+        check<uniLN4>(N, 1, S, AB, BLDD, B, "U:LNN6SSE", cnt);
         check<uniLN5>(N, 1, S, AB, BLDD, B, "LNN6SSE", cnt);
 #endif
     }
@@ -483,7 +486,7 @@ void testTBSV(int N, size_t cnt)
         check<uniLT0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLT", cnt);
         check<uniLT1>(N, 1, S, AB, BLDD, B, "xtbsvLTN", cnt);
         check<uniLT2>(N, 1, S, AB, BLDD, B, "LTNK<KD>", cnt);
-        check<uniLT3>(N, 1, S, AB, BLDD, B, "LTN6", cnt);
+        check<uniLT3>(N, 1, S, AB, BLDD, B, "LTN6K", cnt);
 #if REAL_IS_DOUBLE && USE_SIMD
         check<uniLT4>(N, 1, S, AB, BLDD, B, "LTN6SSE_U", cnt);
         check<uniLT5>(N, 1, S, AB, BLDD, B, "LTN6SSE", cnt);
