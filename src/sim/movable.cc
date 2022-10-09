@@ -729,19 +729,33 @@ Vector Movable::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
         {
             if ( tok == "tangent" )
                 return spc->normalToEdge(pos).randOrthoU(1.0);
-           
-#if ( DIM >= 3 )
-            Vector dir(0,0,1);
-#elif ( DIM == 2 )
-            real dir = 1;
-#endif
             
-#if ( DIM > 1 )
+#if ( DIM >= 3 )
             if ( tok == "clockwise" )
-                return cross(dir, spc->normalToEdge(pos));
+            {
+                Vector vec = spc->normalToEdge(pos);
+                Vector dir = cross(Vector(0,0,1), vec);
+                real n = dir.norm();
+                if ( n > REAL_EPSILON )
+                    return dir.normalized();
+                return vec.randOrthoU(1.0);
+            }
             
             if ( tok == "anticlockwise" )
-                return -cross(dir, spc->normalToEdge(pos));
+            {
+                Vector vec = spc->normalToEdge(pos);
+                Vector dir = cross(Vector(0,0,-1), vec);
+                real n = dir.norm();
+                if ( n > REAL_EPSILON )
+                    return dir.normalized();
+                return vec.randOrthoU(1.0);
+            }
+#elif ( DIM == 2 )
+            if ( tok == "clockwise" )
+                return cross(+1, spc->normalToEdge(pos));
+            
+            if ( tok == "anticlockwise" )
+                return cross(-1, spc->normalToEdge(pos));
 #endif
             
             if ( tok == "normal" )
