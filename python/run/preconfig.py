@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # PRECONFIG, a versatile configuration file generator for varying parameters
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2022
-# This is PRECONFIG version 1.57, last modified on 15.06.2022
+# This is PRECONFIG version 1.58, last modified on 29.09.2022
 
 """
 # SYNOPSIS
@@ -226,9 +226,9 @@ except ImportError as e:
 
 #-------------------------------------------------------------------------------
 
-__VERSION__="1.57"
+__VERSION__="1.58"
 
-__DATE__ ="15.06.2022"
+__DATE__ ="29.09.2022"
 
 # code snippets are surrounded by double square brackets:
 CODE = '['
@@ -547,7 +547,7 @@ class Preconfig:
             values.pop('n', 0)
             self.process(file, text)
 
-    def parse(self, name, values, repeat=1, path=''):
+    def parse(self, name, file, values, repeat=1, path=''):
         """
             process one file, and return the list of files generated
         """
@@ -558,9 +558,7 @@ class Preconfig:
             self.file_name = path
         for x in range(repeat):
             try:
-                f = open(name, 'r')
-                self.expand(values, f, '')
-                f.close()
+                self.expand(values, file, '')
             except IOError:
                 sys.stderr.write("Preconfig could not load `%s`\n"%name)
                 break
@@ -627,7 +625,8 @@ class Preconfig:
 
         for i in inputs:
             #out.write("Reading %s\n" % i)
-            res = self.parse(i, values, repeat, path)
+            with open(i, 'r') as f:
+                res = self.parse(i, f, values, repeat, path)
             if self.verbose > 0:
                 if len(res) == 1:
                     print("generated %s" % res[0])
@@ -641,7 +640,12 @@ def parse(name, values, repeat=1, path=''):
     """
     Process one file, and return the list of files generated
     """
-    return Preconfig().parse(name, values, repeat, path)
+    try:
+        with open(name, 'r') as file:
+            return Preconfig().parse(name, file, values, repeat, path)
+    except FileNotFoundError:
+        print("No such file `%s`" % name)
+    return []
 
 
 if __name__ == "__main__":
