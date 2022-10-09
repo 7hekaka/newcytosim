@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 #include "space_cylinderZ.h"
 #include "exceptions.h"
 #include "iowrapper.h"
@@ -6,8 +6,32 @@
 #include "glossary.h"
 #include "meca.h"
 
+
 /// keyword to allow smooth edges on the Cylinder
 #define SMOOTH_CYLINDER 1
+
+
+/// surface of a cylinder of given radius, length
+static real surface_cylinder(real rad, real len)
+{
+    // surface elements divided by 2 * M_PI:
+    real S0 = rad * len;
+    real S1 = square(rad);
+    return ( 2 * M_PI ) * ( S0 + S1 );
+}
+
+/// surface of a cylinder of given radius, length, with rounded edges
+static real surface_cylinder(real rad, real len, real edg)
+{
+    real RE = rad - edg;
+    real LE = len - 2 * edg;
+    real GC = RE + edg * ( 2.0 / M_PI );
+    // surface elements divided by 2 * M_PI:
+    real S0 = rad * LE;        // cylindrical surface
+    real S1 = square(RE);      // top/bottom discs
+    real S2 = M_PI * GC * edg; // rounded edges
+    return ( 2 * M_PI ) * ( S0 + S1 + S2 );
+}
 
 
 SpaceCylinderZ::SpaceCylinderZ(SpaceProp const* p)
@@ -31,11 +55,35 @@ void SpaceCylinderZ::resize(Glossary& opt)
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
     else opt.set(rad, "radius");
+
+#if SMOOTH_CYLINDER
+    if ( opt.set(edg, "edge") )
+    {
+        if ( edg < 0 )
+            throw InvalidParameter("cylinderZ:edge must be >= 0");
+        if ( rad < edg )
+            throw InvalidParameter("cylinderZ:edge must be <= radius");
+    }
+#endif
     
     if ( rad < 0 )
         throw InvalidParameter("cylinderZ:radius must be >= 0");
-
-    if ( opt.set(top, "length") )
+    
+    real suf = 0;
+    if ( opt.set(suf, "surface") )
+    {
+        // The surface is affine with 'len' = S + ( len - 2*edg ) * L;
+        real S = surface_cylinder(rad, 2*edg, edg);
+        real L = ( 2 * M_PI ) * rad;
+        if ( suf < S )
+            throw InvalidParameter("cylinderZ:surface must be > "+std::to_string(S));
+        // back calculate length to match the given surface:
+        real len = 2 * edg + ( suf - S ) / L;
+        //std::clog << "CylinderZ surface " << surface_cylinder(rad, len, edg) << " " << suf << '\n';
+        bot = -0.5 * len;
+        top =  0.5 * len;
+    }
+    else if ( opt.set(top, "length") )
     {
         bot = -0.5 * top;
         top =  0.5 * top;
@@ -48,19 +96,9 @@ void SpaceCylinderZ::resize(Glossary& opt)
 
     if ( top < bot )
         throw InvalidParameter("cylinderZ:bottom must be <= top");
-    
-#if SMOOTH_CYLINDER
-    if ( opt.set(edg, "edge") )
-    {
-        if ( edg < 0 )
-            throw InvalidParameter("cylinderZ:edge must be >= 0");
-        if ( rad < edg )
-            throw InvalidParameter("cylinderZ:edge must be <= radius");
-        if ( top - bot < 2 * edg )
-            throw InvalidParameter("cylinderZ:edge must be <= length / 2");
-    }
-#endif
-    
+    if ( top - bot < 2 * edg )
+        throw InvalidParameter("cylinderZ:edge must be <= length / 2");
+
     radius_ = rad;
     bot_ = bot;
     top_ = top;
@@ -120,19 +158,9 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 real SpaceCylinderZ::surface() const
 {
 #if SMOOTH_CYLINDER
-    const real RE = radius_ - edge_;
-    const real LE = top_ - bot_ - 2 * edge_;
-    const real GC = RE + edge_ * ( 2.0 / M_PI );
-    // surface elements divided by 2 * M_PI:
-    const real S0 = radius_ * LE;      // cylindrical surface
-    const real S1 = square(RE);        // top/bottom discs
-    const real S2 = M_PI * GC * edge_; // rounded edges
-    return ( 2 * M_PI ) * ( S0 + S1 + S2 );
+    return surface_cylinder(radius_, top_-bot_, edge_);
 #else
-    // surface elements divided by 2 * M_PI:
-    const real S0 = radius_ * ( top_ - bot_ );
-    const real S1 = square(radius_);
-    return ( 2 * M_PI ) * ( S0 + S1 );
+    return surface_cylinder(radius_, top_-bot_);
 #endif
 }
 
