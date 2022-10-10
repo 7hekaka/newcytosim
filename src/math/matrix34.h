@@ -480,7 +480,7 @@ public:
     /** This methods uses a L*D*L^t factorization with:
      L = ( 1 0 0; a 1 0; b c 1 )
      D = ( u 0 0; 0 v 0; 0 0 w )
-     The result is a symetric matrix and all terms are set
+     The result is a symmetric matrix and all terms are set
      */
     int symmetricInverse()
     {
