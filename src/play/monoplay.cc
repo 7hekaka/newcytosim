@@ -138,9 +138,10 @@ void charCallback(GLFWwindow* win, unsigned int k, int mods)
 void reshape(GLFWwindow* win, int W, int H)
 {
     glfwGetWindowSize(win, &winW, &winH);
-    glfwGetFramebufferSize(win, &bugW, &bugH);
-    view.reshape(bugW, bugH);
-    //printf("Window %ix%i : framebuffer %ix%i\n", winW, winH, bugW, bugH);
+    bugW = W;
+    bugH = H;
+    view.reshape(W, H);
+    //printf("reshape window %ix%i : framebuffer %ix%i\n", winW, winH, W, H);
 }
 
 
@@ -189,9 +190,9 @@ GLFWwindow * initWindow(int W, int H)
     GLFWcursor * cursor = glfwCreateCursor(&image, 0, 0);
     glfwSetCursor(win, cursor);
 
+    gle::initialize();
     // canvas size in pixels is not necessarily the window size (in screen coordinates)
     glfwGetFramebufferSize(win, &W, &H);
-    gle::initialize();
     reshape(win, W, H);
     view.initGL();
     return win;

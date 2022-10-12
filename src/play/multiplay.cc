@@ -172,11 +172,10 @@ void charCallback(GLFWwindow* win, unsigned int k, int mods)
 void reshape(GLFWwindow* win, int W, int H)
 {
     glfwGetWindowSize(win, &winW, &winH);
-    glfwGetFramebufferSize(win, &bugW, &bugH);
-    bugW /= tileX;
-    bugH /= tileY;
+    bugW = W / tileX;
+    bugH = H / tileY;
     view.reshape(bugW, bugH);
-    //printf("Window %ix%i : tile %ix%i\n", winW, winH, bugW, bugH);
+    //printf("reshape window %ix%i : tile %ix%i\n", winW, winH, bugW, bugH);
 }
 
 
