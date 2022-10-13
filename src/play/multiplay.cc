@@ -97,7 +97,7 @@ void mouseButtoncallback(GLFWwindow* win, int button, int action, int mods)
 /* enter/exit full screen mode */
 void toggleFullScreen(GLFWwindow* win)
 {
-    static int x, y, w, h;
+    static int x = 0, y = 0, w = winW, h = winH;
     GLFWmonitor* moni = glfwGetWindowMonitor(win);
     if ( moni )
     {
@@ -124,8 +124,8 @@ void toggleFullScreen(GLFWwindow* win)
         }
         if ( moni )
         {
-            glfwGetMonitorWorkarea(moni, &mx, &my, &mw, &mh);
-            glfwSetWindowMonitor(win, moni, mx, my, mw, mh, GLFW_DONT_CARE);
+            const GLFWvidmode* mode = glfwGetVideoMode(moni);
+            glfwSetWindowMonitor(win, moni, 0, 0, mode->width, mode->height, mode->refreshRate);
         }
     }
 }

@@ -62,10 +62,11 @@ void mouseButtoncallback(GLFWwindow* win, int button, int action, int mods)
 /* enter/exit full screen mode */
 void toggleFullScreen(GLFWwindow* win)
 {
-    static int x, y, w, h;
+    static int x = 0, y = 0, w = winW, h = winH;
     GLFWmonitor* moni = glfwGetWindowMonitor(win);
     if ( moni )
     {
+        //printf("exit fullscreen\n");
         glfwSetWindowMonitor(win, nullptr, x, y, w, h, GLFW_DONT_CARE);
     }
     else
@@ -80,6 +81,7 @@ void toggleFullScreen(GLFWwindow* win)
         for ( int u = 0; u < cnt; ++u )
         {
             glfwGetMonitorWorkarea(list[u], &mx, &my, &mw, &mh);
+            //printf("monitor %i:  %ix%i\n", u, mw, mh);
             size_t a = mw * mh;
             if ( a > area )
             {
@@ -89,8 +91,8 @@ void toggleFullScreen(GLFWwindow* win)
         }
         if ( moni )
         {
-            glfwGetMonitorWorkarea(moni, &mx, &my, &mw, &mh);
-            glfwSetWindowMonitor(win, moni, mx, my, mw, mh, GLFW_DONT_CARE);
+            const GLFWvidmode* mode = glfwGetVideoMode(moni);
+            glfwSetWindowMonitor(win, moni, 0, 0, mode->width, mode->height, mode->refreshRate);
         }
     }
 }
@@ -141,7 +143,7 @@ void reshape(GLFWwindow* win, int W, int H)
     bugW = W;
     bugH = H;
     view.reshape(W, H);
-    //printf("reshape window %ix%i : framebuffer %ix%i\n", winW, winH, W, H);
+    printf("reshape window %ix%i : framebuffer %ix%i\n", winW, winH, W, H);
 }
 
 
