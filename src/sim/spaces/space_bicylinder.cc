@@ -249,51 +249,44 @@ void SpaceBicylinder::read(Inputter& in, Simul&, ObjectTag)
 #ifdef DISPLAY
 
 #include "gle.h"
-#include "gym_view.h"
-#include "gym_flute_dim.h"
+#include "gym_flute.h"
 #include "gym_draw.h"
 
 
 void SpaceBicylinder::draw3D() const
 {
     const float R(radius_);
-    /*
-    gym::stretchAlignZX(-R, R, R);
-    gle::tube1();
-    gym::stretchAlignZY(-R, R, R);
-    gle::tube1();
-    */
     size_t i = 0;
-    fluteD* flu = gym::mapBufferVD(2*gle::pi_twice+4);
+    flute6* flu = gym::mapBufferV3N3(2*gle::pi_twice+4);
     for ( size_t n = gle::pi_half; n < gle::pi_3half; n += 1 )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
-        flu[i++] = {R*C, +R*C, R*S};
-        flu[i++] = {R*C, -R*C, R*S};
+        flu[i++] = {R*C, +R*C, R*S, C, 0, S };
+        flu[i++] = {R*C, -R*C, R*S, C, 0, S };
     }
     for ( size_t n = gle::pi_3half; n <= gle::pi_5half; n += 1 )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
-        flu[i++] = {R*C, -R*C, R*S};
-        flu[i++] = {R*C, +R*C, R*S};
+        flu[i++] = {R*C, -R*C, R*S, C, 0, S };
+        flu[i++] = {R*C, +R*C, R*S, C, 0, S };
     }
-    gym::unmapBufferVD();
+    gym::unmapBufferV3N3();
     gym::drawTriangleStrip(0, i);
     i = 0;
-    flu = gym::mapBufferVD(2*gle::pi_twice+4);
+    flu = gym::mapBufferV3N3(2*gle::pi_twice+4);
     for ( size_t n = gle::pi_half; n < gle::pi_3half; n += 1 )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
-        flu[i++] = {-R*C, R*C, R*S};
-        flu[i++] = {+R*C, R*C, R*S};
+        flu[i++] = {-R*C, R*C, R*S, 0, C, S };
+        flu[i++] = {+R*C, R*C, R*S, 0, C, S };
     }
     for ( size_t n = gle::pi_3half; n <= gle::pi_5half; n += 1 )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
-        flu[i++] = {+R*C, R*C, R*S};
-        flu[i++] = {-R*C, R*C, R*S};
+        flu[i++] = {+R*C, R*C, R*S, 0, C, S };
+        flu[i++] = {-R*C, R*C, R*S, 0, C, S };
     }
-    gym::unmapBufferVD();
+    gym::unmapBufferV3N3();
     gym::drawTriangleStrip(0, i);
 }
 
