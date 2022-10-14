@@ -324,7 +324,7 @@ Vector Space::normalToEdge(Vector const& pos) const
         }
     }
     
-    printf("warning: normalToEdge() failed\n");
+    printf("warning: Space::normalToEdge(%9.3f %9.3f %9.3f) failed\n", pos.x(), pos.y(), pos.z());
     printf("         error = %e at height = %e\n", distance(P, prj), H);
     if ( inside(prj+res) )
         return -normalize(res);

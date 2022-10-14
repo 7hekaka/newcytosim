@@ -728,7 +728,20 @@ Vector Movable::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
         if ( spc )
         {
             if ( tok == "tangent" )
-                return spc->normalToEdge(pos).randOrthoU(1.0);
+            {
+                size_t cnt = 0;
+                Vector dir;
+                do {
+                    dir = Vector::randU();
+                    dir = spc->project(pos+dir) - spc->project(pos);
+                    if ( ++cnt > 128 )
+                    {
+                        printf("warning: tangent placement(%9.3f %9.3f %9.3f) failed\n", pos.x(), pos.y(), pos.z());
+                        return Vector::randU();
+                    }
+                } while ( dir.normSqr() < REAL_EPSILON );
+                return dir.normalized();
+            }
             
 #if ( DIM >= 3 )
             if ( tok == "clockwise" )
