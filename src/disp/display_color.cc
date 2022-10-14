@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
-// protect local definitions into anonymous namespace
+// hide definitions in anonymous namespace
 namespace {
     
     // colors that vary with the direction of a vector:

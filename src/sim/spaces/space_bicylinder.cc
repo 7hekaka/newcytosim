@@ -44,6 +44,12 @@ real SpaceBicylinder::volume() const
 }
 
 
+real SpaceBicylinder::surface() const
+{
+    return 16 * square(radius_);
+}
+
+
 bool SpaceBicylinder::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
@@ -244,14 +250,51 @@ void SpaceBicylinder::read(Inputter& in, Simul&, ObjectTag)
 
 #include "gle.h"
 #include "gym_view.h"
+#include "gym_flute_dim.h"
+#include "gym_draw.h"
+
 
 void SpaceBicylinder::draw3D() const
 {
     const float R(radius_);
+    /*
     gym::stretchAlignZX(-R, R, R);
     gle::tube1();
     gym::stretchAlignZY(-R, R, R);
     gle::tube1();
+    */
+    size_t i = 0;
+    fluteD* flu = gym::mapBufferVD(2*gle::pi_twice+4);
+    for ( size_t n = gle::pi_half; n < gle::pi_3half; n += 1 )
+    {
+        float C = gle::cos_(n), S = gle::sin_(n);
+        flu[i++] = {R*C, +R*C, R*S};
+        flu[i++] = {R*C, -R*C, R*S};
+    }
+    for ( size_t n = gle::pi_3half; n <= gle::pi_5half; n += 1 )
+    {
+        float C = gle::cos_(n), S = gle::sin_(n);
+        flu[i++] = {R*C, -R*C, R*S};
+        flu[i++] = {R*C, +R*C, R*S};
+    }
+    gym::unmapBufferVD();
+    gym::drawTriangleStrip(0, i);
+    i = 0;
+    flu = gym::mapBufferVD(2*gle::pi_twice+4);
+    for ( size_t n = gle::pi_half; n < gle::pi_3half; n += 1 )
+    {
+        float C = gle::cos_(n), S = gle::sin_(n);
+        flu[i++] = {-R*C, R*C, R*S};
+        flu[i++] = {+R*C, R*C, R*S};
+    }
+    for ( size_t n = gle::pi_3half; n <= gle::pi_5half; n += 1 )
+    {
+        float C = gle::cos_(n), S = gle::sin_(n);
+        flu[i++] = {+R*C, R*C, R*S};
+        flu[i++] = {-R*C, R*C, R*S};
+    }
+    gym::unmapBufferVD();
+    gym::drawTriangleStrip(0, i);
 }
 
 #else
