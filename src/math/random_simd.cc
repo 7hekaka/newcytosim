@@ -51,6 +51,72 @@ static inline real * remove_nan_pairs(real * s, real * e)
 }
 
 
+#if USE_SIMD
+
+/**
+ This folds the corners of [-1, 1] x [-1, 1] that are outside the unit circle,
+ to map these points back onto the original square. For randomly distributed points,
+ this increases the number of points within the unit circle by a factor 3-2*sqrt(2)
+ without changing the property of being equidistributed within the unit circle.
+ */
+static inline void fold_corners(vec4f& x, vec4f& y)
+{
+    // test if point is close to corner, separated by line |x|+|y| > sqrt(2)
+    vec4f mut = greaterequal4f(add4f(abs4f(x), abs4f(y)), set4f(M_SQRT2));
+    // coordinates of nearest corner, scaled: copysign(S, x)
+    constexpr float S = M_SQRT2 + 1.0f;
+    const vec4f ss = set4f(S), mm = set4f(-S);
+    vec4f cx = blendv4f(ss, mm, signmask4f(x)); //use the sign of 'x'
+    vec4f cy = blendv4f(ss, mm, signmask4f(y)); //use the sign of 'y'
+    // subtract corner to recover a square of side 1, covering the circle
+    cx = sub4f(mul4f(ss, x), cx);
+    cy = sub4f(mul4f(ss, y), cy);
+    // apply mutation, if selected:
+    x = blendv4f(x, cx, mut);
+    y = blendv4f(y, cy, mut);
+}
+
+
+static real * makeGaussians_SIMD(real dst[], size_t cnt, const int32_t src[])
+{
+    const vec4f fac = set4f(TWO_POWER_MINUS_31);
+    const vec4f half = set4f(-0.5f);
+
+    real * d = dst;
+    int32_t const* end = src + cnt;
+    while ( src < end )
+    {
+        vec4f x = mul4f(fac, cvt4if(load4i(src)));
+        vec4f y = mul4f(fac, cvt4if(load4i(src+4)));
+        fold_corners(x, y); // increases from 490 to 574 expected!
+        vec4f n = add4f(mul4f(x,x), mul4f(y,y));
+        n = sqrt4f(div4f(logapprox4f(n), mul4f(half, n)));
+        x = mul4f(n, x);
+        y = mul4f(n, y);
+        // place corresponding X and Y values next to each other:
+        n = unpacklo4f(x, y);
+        y = unpackhi4f(x, y);
+#if REAL_IS_DOUBLE
+        // convert 8 single-precision values
+        store2d(d  , getlo2f(n));
+        store2d(d+2, getlo2f(y));
+        store2d(d+4, gethi2f(n));
+        store2d(d+6, gethi2f(y));
+#else
+        // store 8 single-precision values
+        store4f(d  , n);
+        store4f(d+4, y);
+#endif
+        src += 8;
+        d += 8;
+    }
+    return remove_nan_pairs(dst, d);
+    return d;
+}
+
+#endif
+
+
 #if defined(__AVX__)
 
 
@@ -62,14 +128,13 @@ static inline real * remove_nan_pairs(real * s, real * e)
  */
 static inline void fold_corners(vec8f& x, vec8f& y)
 {
-    // fold the corners of the square, which is ~17% of the surface...
     // test if point is close to corner, separated by line |x|+|y| > sqrt(2)
     vec8f mut = cmp8f(add8f(abs8f(x), abs8f(y)), set8f(M_SQRT2), _CMP_GE_OQ);
     // coordinates of nearest corner, scaled: copysign(S, x)
     constexpr float S = M_SQRT2 + 1.0f;
     const vec8f ss = set8f(S), mm = set8f(-S);
-    vec8f cx = blendv8f(ss, mm, x);
-    vec8f cy = blendv8f(ss, mm, y);
+    vec8f cx = blendv8f(ss, mm, x); //use the sign of 'x'
+    vec8f cy = blendv8f(ss, mm, y); //use the sign of 'y'
     // subtract corner to recover a square of side 1, covering the circle
     cx = sub8f(mul8f(ss, x), cx);
     cy = sub8f(mul8f(ss, y), cy);
@@ -92,9 +157,9 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const __m256i src[])
     while ( src < end )
     {
         // generate norm in ]0, 1]: 1 - eps * float(uint32)
-        vec8f n = sub8f(one, mul8f(eps, abs8f(cvt8if(load8si(src++)))));
+        vec8f n = sub8f(one, mul8f(eps, abs8f(cvt8if(load8i(src++)))));
         // generate angle in ]-PI, PI[:
-        vec8f t = mul8f(PI, cvt8if(load8si(src++)));
+        vec8f t = mul8f(PI, cvt8if(load8i(src++)));
         // transform norm:
         n = sqrt8f(mul8f(logapprox8f(n), two));
         vec8f x, y;
@@ -127,8 +192,8 @@ static real * makeGaussians_AVX1(real dst[], size_t cnt, const __m256i src[])
     __m256i const* end = src + cnt;
     while ( src < end )
     {
-        vec8f x = mul8f(fac, cvt8if(load8si(src++)));
-        vec8f y = mul8f(fac, cvt8if(load8si(src++)));
+        vec8f x = mul8f(fac, cvt8if(load8i(src++)));
+        vec8f y = mul8f(fac, cvt8if(load8i(src++)));
         fold_corners(x, y); // increases from 490 to 574 expected!
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
         //w = std::sqrt( -2 * std::log(n) / n );
@@ -136,17 +201,17 @@ static real * makeGaussians_AVX1(real dst[], size_t cnt, const __m256i src[])
         x = mul8f(n, x);
         y = mul8f(n, y);
         // place corresponding X and Y values next to each other:
-        vec8f z = unpacklo8f(x, y);
+        n = unpacklo8f(x, y);
         y = unpackhi8f(x, y);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
-        store4d(d   , getlo4f(z));
+        store4d(d   , getlo4f(n));
         store4d(d+4 , getlo4f(y));
-        store4d(d+8 , gethi4f(z));
+        store4d(d+8 , gethi4f(n));
         store4d(d+12, gethi4f(y));
 #else
         // store 16 single-precision values
-        store8f(d  , z);
+        store8f(d  , n);
         store8f(d+8, y);
 #endif
         d += 16;
@@ -190,8 +255,8 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const __m256i src[])
     while ( src < end )
     {
         // generate 16 random floats in [-1, 1]:
-        vec8f x = mul8f(eps, cvt8if(load8si(src++)));
-        vec8f y = mul8f(eps, cvt8if(load8si(src++)));
+        vec8f x = mul8f(eps, cvt8if(load8i(src++)));
+        vec8f y = mul8f(eps, cvt8if(load8i(src++)));
         fold_corners(x, y);
         // calculate norm:
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
@@ -210,8 +275,8 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const __m256i src[])
         y = blendv8f(y, n, k);
 #if 1
         // generate 16 random floats in [-1, 1]:
-        vec8f z = mul8f(eps, cvt8if(load8si(src++)));
-        vec8f t = mul8f(eps, cvt8if(load8si(src++)));
+        vec8f z = mul8f(eps, cvt8if(load8i(src++)));
+        vec8f t = mul8f(eps, cvt8if(load8i(src++)));
         fold_corners(z, t);
         vec8f p = add8f(mul8f(z,z), mul8f(t,t));
         p = sqrt8f(div8f(logapprox8f(p), mul8f(half, p)));
@@ -286,7 +351,7 @@ static real* makeExponentialsAVX(real dst[], size_t cnt, const __m256i src[])
     while ( src < end )
     {
         // generate random floats in ]0, 1]:
-        vec8f x = sub8f(one, mul8f(eps, abs8f(cvt8if(load8si(src)))));
+        vec8f x = sub8f(one, mul8f(eps, abs8f(cvt8if(load8i(src)))));
         x = abs8f(logapprox8f(x));
 #if REAL_IS_DOUBLE
         // convert 8 single-precision values

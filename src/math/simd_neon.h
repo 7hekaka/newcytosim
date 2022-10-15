@@ -82,8 +82,6 @@ LOCAL vec2 catshift(vec2 a, vec2 b) { return vextq_f64(a, b, 1); }
 //LOCAL vec2 blend11(vec2 a, vec2 b) { return vcombine_f64(vget_low_f64(a), vget_high_f64(b)); }
 LOCAL vec2 blend11(vec2 a, vec2 b) { return vbslq_f64(int64x2_t{~0,0},a,b); }
 
-#define cmp2(a,b,k) _mm_cmp_pd(a,b,k)
-
 /// returns the sum of the elements, broadcasted
 LOCAL vec2 esum2(vec2 v)
 {
@@ -188,12 +186,25 @@ LOCAL void store1f(float* a, vec4f b) { *a = b[0]; }
 LOCAL void store2f(float* a, vec4f b) { vst1_f32(a, vget_low_f32(b)); }
 
 LOCAL vec4f set4f(float a) { return vdupq_n_f32(a); }
+LOCAL vec4f set4fi(int a) { return vdupq_n_u32(a); }
 
 LOCAL vec4f load4f(float const* a) { return vld1q_f32(a); }
 LOCAL vec4f loadu4f(float const* a) { return vld1q_f32(a); }
 LOCAL void store4f(float* a, vec4f b) { vst1q_f32(a, b); }
 LOCAL void storeu4f(float* a, vec4f b) { vst1q_f32(a, b); }
 
+/// convert single and store them in double precision
+LOCAL void store2d(double* a, vec2f b) { vst1q_f64(a, vcvt_f64_f32(b)); }
+
+LOCAL vec4f shift23(vec4f x) { return vshrq_n_u32((int32x4_t)x, 23); }
+
+/// load integers
+LOCAL int32x4_t load4i(int32_t const* a) { return vld1q_s32(a); }
+/// convert integer to float:
+LOCAL vec4f cvt4if(int32x4_t a) { return vcvtq_f32_s32(a); }
+
+LOCAL vec4f notpositive4f(vec4f a) { return vcleq_f32(a, setzero4f()); }
+LOCAL vec4f greaterequal4f(vec4f a, vec4f b) { return vcgeq_f32(a,b); }
 
 LOCAL vec4f add4f(vec4f a, vec4f b) { return vaddq_f32(a,b); }
 LOCAL vec4f sub4f(vec4f a, vec4f b) { return vsubq_f32(a,b); }
@@ -206,10 +217,15 @@ LOCAL vec4f max4f(vec4f a, vec4f b) { return vmaxq_f32(a,b); }
 
 LOCAL vec4f hadd4f(vec4f a, vec4f b) { return vpaddq_f32(a, b); }
 
+LOCAL vec4f or4f(vec4f a, vec4f b) { return vorrq_s32(a, b); }
 LOCAL vec4f and4f(vec4f a, vec4f b) { return vandq_s32(a, b); }
 LOCAL vec4f andnot4f(vec4f a, vec4f b) { return vbicq_s32(a, b); }
-LOCAL vec4f abs4f(vec4f a)          { return vbicq_s32(float32x4_t{-0.,-0.,-0.,-0.}, a); }
+LOCAL vec4f abs4f(vec4f a)          { return vabsq_f32(a); }
 LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}); }
+
+/// propagate sign bit into every other bit:
+LOCAL vec4f signmask4f(vec4f a) { return vshrq_n_s32(a, 31); }
+LOCAL vec4f blendv4f(vec4f a, vec4f b, vec4f k) { return vbslq_f32(k,b,a); }
 
 /// return { a[0], a[1], b[2], b[3] }
 LOCAL vec4f blend31f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,0,0,0},a,b); }
@@ -229,6 +245,9 @@ LOCAL vec4f catshift3f(vec4f a, vec4f b) { return vextq_f32(a, b, 3); }
 LOCAL vec4f duplo4f(vec4f a) { return vzip1q_f32(a, a); }
 // returns { a[1], a[1], a[3], a[3] }
 LOCAL vec4f duphi4f(vec4f a) { return vzip2q_f32(a, a); }
+
+LOCAL vec2f getlo2f(vec4f a) { return vget_low_f32(a); }
+LOCAL vec2f gethi2f(vec4f a) { return vget_high_f32(a); }
 
 // returns { a[0], b[0], a[1], b[1] }
 LOCAL vec4f unpacklo4f(vec4f a, vec4f b) { return vzip1q_f32(a, b); }

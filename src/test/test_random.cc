@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
+#include "real.h"
 #include "random.h"
 #include <cstdio>
 #include <bitset>
@@ -15,7 +16,7 @@ void print_bits(FILE* f, const T& val, char spc)
     for ( int i = sizeof(T)-1; i >= 0; --i)
     {
         unsigned char byte = ptr[i];
-        for ( int i = 0; i < CHAR_BIT; ++i )
+        for ( int j = 0; j < CHAR_BIT; ++j )
         {
             putc('0' + (1 & (byte>>(CHAR_BIT-1))), f);
             byte <<= 1;
@@ -315,27 +316,26 @@ void test_poisson(size_t sup)
  the size of `vec` should be a multiple of 2, and sufficient to hold `end-src` values
  @Return the number of values that were stored in `vec`
  */
-template < typename REAL >
-REAL * makeGaussians_(REAL dst[], size_t cnt, const int32_t src[])
+real * makeGaussians_(real dst[], size_t cnt, const int32_t src[])
 {
     int32_t const*const end = src + cnt;
     while ( src < end )
     {
-        REAL x = REAL(src[0]) * TWO_POWER_MINUS_31;
-        REAL y = REAL(src[1]) * TWO_POWER_MINUS_31;
+        real x = src[0] * TWO_POWER_MINUS_31;
+        real y = src[1] * TWO_POWER_MINUS_31;
 #if 1
         if ( std::abs(x) + std::abs(y) >= M_SQRT2 )
         {
-            constexpr REAL S = M_SQRT1_2 + 1;
+            constexpr real S = M_SQRT1_2 + 1;
             // subtract corner and scale to recover a square of size sqrt(1/2)
-            REAL cx = S * x - std::copysign(S, x);
-            REAL cy = S * y - std::copysign(S, y);
+            real cx = S * x - std::copysign(S, x);
+            real cy = S * y - std::copysign(S, y);
             // apply rotation, scaling by sqrt(2): x' = y + x;  y' = y - x
             x = cy + cx;
             y = cy - cx;
         }
 #endif
-        REAL w = x * x + y * y;
+        real w = x * x + y * y;
         if (( w <= 1 ) & ( 0 < w ))
         {
             w = std::sqrt( std::log(w) / ( -0.5 * w ) );
@@ -348,12 +348,11 @@ REAL * makeGaussians_(REAL dst[], size_t cnt, const int32_t src[])
     return dst;
 }
 
-template < typename REAL >
-REAL * makeExponentials_(REAL dst[], size_t cnt, const int32_t src[])
+real * makeExponentials_(real dst[], size_t cnt, const int32_t src[])
 {
     for ( size_t i = 0; i < cnt; ++i )
     {
-        REAL x = std::fabs(static_cast<REAL>(src[i]));
+        real x = std::fabs(src[i]);
         dst[i] = -std::log(1 - x * TWO_POWER_MINUS_31);
     }
     return dst + cnt;
@@ -408,11 +407,14 @@ void check_gaussian(size_t cnt, REAL* vec)
 
 //------------------------------------------------------------------------------
 #pragma mark -
+#include "random.h"
 
+#include "simd.h"
+#include "simd_math.h"
+#include "../math/random_simd.cc"
 
 #if defined(__AVX__)
 
-#include "simd.h"
 #include "simd_float.h"
 #include "simd_math.h"
 
@@ -478,11 +480,11 @@ inline vec8f log_approx8f(__m256 xxx)
     __m256 invalid = _mm256_cmp_ps(xxx, _mm256_setzero_ps(), _CMP_NGT_UQ);
     // extract exponent:
 #if defined(__AVX2__)
-    __m256 cst = _mm256_cvtepi32_ps(_mm256_srli_epi32(_mm256_castps_si256(xxx), 23));
+    vec8f a0 = cvt8if(shift23(x));
 #else
-    vec4f h = cvt4if(_mm_srli_epi32(_mm_castps_si128(gethi4f(xxx)), 23));
-    vec4f l = cvt4if(_mm_srli_epi32(_mm_castps_si128(getlo4f(xxx)), 23));
-    vec8f cst = cat44f(l, h);
+    vec4f h = cvt4if(shift23(gethi4f(x)));
+    vec4f l = cvt4if(shift23(getlo4f(x)));
+    vec8f a0 = cat44f(l, h);
 #endif
     cst = _mm256_add_ps(_mm256_mul_ps(cst, g), f);
     // clear exponents:
@@ -565,8 +567,8 @@ static real* check_log(real dst[], size_t cnt, const __m256i src[])
     while ( src < end )
     {
         // generate random floats in ]0, 1]:
-        vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(cvt8if(load8si(src++)))));
-        ++src; //vec8f j = mul8f(eps, cvt8if(load8si(src++)));
+        vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(cvt8if(load8i(src++)))));
+        ++src; //vec8f j = mul8f(eps, cvt8if(load8i(src++)));
         vec8f x = n;
         vec8f y = logapprox8f(n);
 #if REAL_IS_DOUBLE
@@ -585,8 +587,6 @@ static real* check_log(real dst[], size_t cnt, const __m256i src[])
     return dst+8*cnt;
 }
 
-#include "random_simd.cc"
-
 #endif
 
 
@@ -601,30 +601,26 @@ void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
         FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
     }
     float* end = FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
-    printf("%-12s %5.2f :", str, tock(cnt));
+    printf("%-12s %5.2f :", str, tock(cnt>>10));
     check_gaussian(end-flt, flt);
     print_gaussian(std::min(end-flt, 16l), flt);
 }
 
-
-#if defined(__AVX__)
-template < real* (*FUNC)(real*, size_t, const __m256i*) >
+template < double* (*FUNC)(double*, size_t, const int32_t*) >
 void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
 {
-    real *end, vec[SFMT_N32];
-    for ( int i = 0; i < SFMT_N32; ++i )
-        vec[i] = 0;
+    double flt[SFMT_N32] = { 0 };
     tick();
     for ( int i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
-        end = FUNC(vec, SFMT_N256, (__m256i*)sfmt.state);
+        FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
     }
-    printf("%-12s %5.2f :", str, tock(cnt));
-    check_gaussian(end-vec, vec);
-    print_gaussian(std::min(end-vec, 16l), vec);
+    double* end = FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
+    printf("%-12s %5.2f :", str, tock(cnt>>10));
+    check_gaussian(end-flt, flt);
+    print_gaussian(std::min(end-flt, 16l), flt);
 }
-#endif
 
 /**
  Tests different implementation for speed
@@ -638,12 +634,15 @@ void test_gaussian(int cnt)
     tick();
     for ( int i = 0; i < cnt; ++i )
         sfmt_gen_rand_all(&sfmt);
-    printf("RNG.refill   %5.2f\n", tock(cnt));
+    printf("RNG.refill   %5.2f\n", tock(cnt>>10));
     //print(vec, end);
     
     runGaussian<makeGaussians_>(sfmt, "Gauss_", cnt);
+#if USE_SIMD
+    runGaussian<makeGaussians_SIMD>(sfmt, "GaussSSE", cnt);
+#endif
+
 #if defined(__AVX__)
-    real *end, vec[SFMT_N32] = { 0 };
     runGaussian<makeGaussians_AVXBM>(sfmt, "GaussAVXBM", cnt);
     runGaussian<makeGaussians_AVX1>(sfmt, "GaussAVX1", cnt);
     runGaussian<makeGaussians_AVX2>(sfmt, "GaussAVX2", cnt);

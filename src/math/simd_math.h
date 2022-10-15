@@ -2,6 +2,57 @@
 
 /** Approximate versions of log() and 1/sqrt() for SIMD vectors */
 
+#if USE_SIMD
+
+#if defined(__INTEL_COMPILER)
+
+/// natural logarithm, part of Intel's SVML library
+inline vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
+
+#endif
+
+/// Approximate natural logarithm by Jacques-Henri Jourdan
+/**
+ Absolute error bounded by 1e-5 for normalized inputs
+ Returns a finite number for +inf input
+ Returns -inf for nan and <= 0 inputs.
+ Continuous error.
+ SIMD by FJN 12.01.2021 derived from:
+ http://gallium.inria.fr/blog/fast-vectorizable-math-approx/
+ */
+inline vec4f logapprox4f(vec4f x)
+{
+    // masks:
+    const vec4f mant = set4fi(0x007FFFFF);
+    const vec4f expo = set4fi(0x3F800000);
+    // polynomial coefficients
+    const vec4f a = set4f(+3.529304993f);
+    const vec4f b = set4f(-2.461222105f);
+    const vec4f c = set4f(+1.130626167f);
+    const vec4f d = set4f(-0.288739945f);
+    const vec4f e = set4f(+3.110401639e-2f);
+    const vec4f f = set4f(-89.970756366f);
+    const vec4f g = set4f(0.6931471805f);
+    // used to clear negative / NaN arguments:
+    vec4f invalid = notpositive4f(x);
+    // extract exponent:
+    vec4f cst = cvt4if(shift23(x));
+    cst = add4f(mul4f(cst, g), f);
+    // clear exponents:
+    x = or4f(expo, and4f(mant, x));
+    // evaluate polynom:
+    vec4f tmp = add4f(mul4f(x, e), d);
+    tmp = add4f(mul4f(x, tmp), c);
+    tmp = add4f(mul4f(x, tmp), b);
+    tmp = add4f(mul4f(x, tmp), a);
+    tmp = add4f(mul4f(x, tmp), cst);
+    // set invalid arguments to all 1s which is not-a-number:
+    return or4f(tmp, invalid);
+}
+
+#endif
+
+
 #if defined(__AVX__)
 
 /// approximate reciprocal square root : 1 / sqrt(x) for 4 doubles
@@ -39,54 +90,10 @@ inline vec8f rsqrt8fi(vec8f x)
 #if defined(__INTEL_COMPILER)
 
 /// natural logarithm, part of Intel's SVML library
-inline vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
-/// natural logarithm, part of Intel's SVML library
 inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
 
 #endif
 
-
-/// Approximate natural logarithm by Jacques-Henri Jourdan
-/**
- Absolute error bounded by 1e-5 for normalized inputs
- Returns a finite number for +inf input
- Returns -inf for nan and <= 0 inputs.
- Continuous error.
- SIMD by FJN 12.01.2021 derived from:
- http://gallium.inria.fr/blog/fast-vectorizable-math-approx/
- */
-inline vec4f logapprox4f(vec4f x)
-{
-    // masks:
-    const vec4f mant = set4fi(0x007FFFFF);
-    const vec4f expo = set4fi(0x3F800000);
-    // polynomial coefficients
-    const vec4f a = set4f(+3.529304993f);
-    const vec4f b = set4f(-2.461222105f);
-    const vec4f c = set4f(+1.130626167f);
-    const vec4f d = set4f(-0.288739945f);
-    const vec4f e = set4f(+3.110401639e-2f);
-    const vec4f f = set4f(-89.970756366f);
-    const vec4f g = set4f(0.6931471805f);
-    // used to clear negative / NaN arguments:
-    vec4f invalid = cmp4f(x, setzero4f(), _CMP_NGT_UQ);
-    // extract exponent:
-    vec4f cst = cvt4if(_mm_srli_epi32(_mm_castps_si128(x), 23));
-    cst = add4f(mul4f(cst, g), f);
-    // clear exponents:
-    x = or4f(expo, and4f(mant, x));
-    // evaluate polynom:
-    vec4f tmp = add4f(mul4f(x, e), d);
-    tmp = add4f(mul4f(x, tmp), c);
-    tmp = add4f(mul4f(x, tmp), b);
-    tmp = add4f(mul4f(x, tmp), a);
-    tmp = add4f(mul4f(x, tmp), cst);
-    // clear negative arguments:
-    return or4f(tmp, invalid);
-}
-
-
-#define USE_HORNER_RULE 1
 
 /// Approximate natural logarithm by Jacques-Henri Jourdan
 /**
@@ -113,10 +120,10 @@ inline vec8f logapprox8f(vec8f x)
     vec8f invalid = cmp8f(x, setzero8f(), _CMP_NGT_UQ);
     // extract exponent:
 #if defined(__AVX2__)
-    vec8f a0 = cvt8if(_mm256_srli_epi32(_mm256_castps_si256(x), 23));
+    vec8f a0 = cvt8if(shift23(x));
 #else
-    vec4f h = cvt4if(_mm_srli_epi32(_mm_castps_si128(gethi4f(x)), 23));
-    vec4f l = cvt4if(_mm_srli_epi32(_mm_castps_si128(getlo4f(x)), 23));
+    vec4f h = cvt4if(shift23(gethi4f(x)));
+    vec4f l = cvt4if(shift23(getlo4f(x)));
     vec8f a0 = cat44f(l, h);
 #endif
     a0 = add8f(mul8f(a0, G), F);
@@ -127,22 +134,12 @@ inline vec8f logapprox8f(vec8f x)
      a0 + x*(a1 + x*(a2 + x*(a3 + x*(a4 + x*a5))))
      [a0 + a1*x] + xx*([a2 + a3*x] + xx*[a4 + a5*x]))
      */
-#if USE_HORNER_RULE
     vec8f tmp = add8f(mul8f(x, a5), a4);
     tmp = add8f(mul8f(x, tmp), a3);
     tmp = add8f(mul8f(x, tmp), a2);
     tmp = add8f(mul8f(x, tmp), a1);
     tmp = add8f(mul8f(x, tmp), a0);
-#else
-    // could reduce latency, at the cost of one additional multiplication
-    vec8f xx = mul8f(x, x);
-    vec8f t01 = add8f(mul8f(x, a1), a0);
-    vec8f t23 = add8f(mul8f(x, a3), a2);
-    vec8f tmp = add8f(mul8f(x, a5), a4);
-    tmp = add8f(mul8f(xx, tmp), t23);
-    tmp = add8f(mul8f(xx, tmp), t01);
-#endif
-    // clear negative arguments:
+    // set invalid arguments to all 1s which is not-a-number:
     return or8f(tmp, invalid);
 }
 

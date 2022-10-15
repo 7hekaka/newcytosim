@@ -37,7 +37,7 @@ LOCAL vec4 load2crap(double const* a)   { return _mm256_castpd128_pd256(_mm_load
 LOCAL void store4(double* a, vec4 b)    { _mm256_store_pd(a,b); }
 LOCAL void storeu4(double* a, vec4 b)   { _mm256_storeu_pd(a,b); }
 
-/// convert single and store them in double precision
+/// convert 4 singles and store them in double precision
 LOCAL void store4d(double* a, __m128 b)  { _mm256_store_pd(a, _mm256_cvtps_pd(b)); }
 
 LOCAL __m256i makemask(long i)
@@ -242,6 +242,8 @@ LOCAL vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 LOCAL vec4 interleave2(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
 /// return { X X Y Y } from { X Y - - }
 LOCAL vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
+
+LOCAL vec8f shift23(vec8f x) { return _mm256_srli_epi32(_mm256_castps_si256(x), 23); }
 
 #endif
 
