@@ -6,7 +6,7 @@ set simul system
 {
     time_step = 0.001
     viscosity = 0.5
-    steric = 1, 100
+    steric = 1, 100, 40
     display = ( window_size = 1024,512; delay = 5; )
 }
 
@@ -19,7 +19,8 @@ set fiber microtubule
 {
     rigidity = 90
     segmentation = 0.2
-    steric = 1, 0.1, 0.25   
+    % use 'attractive' sterics between filaments:
+    steric = 1, 0.1, 0.25
     confine = 1, 100
     display = ( color=gray; line_width=2 )
 }
