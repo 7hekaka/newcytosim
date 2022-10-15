@@ -58,8 +58,8 @@ int whichBug(double mx, double my)
 {
     mx = std::max(mx, 0.0);
     my = std::max(my, 0.0);
-    int x = std::min(tileX, int(tileX * mx));
-    int y = std::min(tileY, int(tileY * my));
+    int x = std::min(tileX-1, int(tileX * mx));
+    int y = std::min(tileY-1, int(tileY * my));
     return y + tileY * x;
 }
 
