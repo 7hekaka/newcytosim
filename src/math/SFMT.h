@@ -42,6 +42,9 @@
 #if defined(__AVX2__)
 #define HAVE_AVX2 1
 #endif
+#if defined(__ARM_NEON__)
+#define HAVE_NEON 1
+#endif
 /* F. Nedelec */
 
 
