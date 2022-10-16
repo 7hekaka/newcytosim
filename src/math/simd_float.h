@@ -57,6 +57,7 @@ LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return _mm_sub_ps(c, _mm_mul_p
 
 /// Vector of 4 floats
 typedef __m128 vec4f;
+typedef __m128i vec4i;
 
 LOCAL vec4f setzero4f()                   { return _mm_setzero_ps(); }
 LOCAL vec4f set4f(float a)                { return _mm_set1_ps(a); }
@@ -128,8 +129,9 @@ LOCAL vec4f cmpge4f(vec4f a, vec4f b) { return _mm_cmpge_ps(a, b); }
 LOCAL int lower_mask4f(vec4f a, vec4f b) { return _mm_movemask_ps(_mm_cmplt_ps(a,b)); }
 LOCAL int any_true4f(vec4f a) { return !_mm_test_all_zeros((__m128i)a, (__m128i{-1l, -1l})); }
 
-LOCAL vec4f shift23(vec4f x) { return _mm_srli_epi32(_mm_castps_si128(x), 23); }
-
+LOCAL vec4f shiftbitsR4(vec4f a, int b) { return _mm_srli_epi32(_mm_castps_si128(x), b); }
+LOCAL vec4f shiftbitsL4(vec4f a, int b) { return _mm_slli_epi32(_mm_castps_si128(x), b); }
+LOCAL int32_t getlane4i(vec4i a, int b) { return _mm_extract_epi32(a, b); }
 
 /// load integers
 LOCAL vec2f load4i(int32_t const* a) { return _mm_load_si128(a); }
@@ -187,6 +189,7 @@ LOCAL vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 
 LOCAL vec4f notpositive4f(vec4f a) { return _mm_cmp_ps(a, setzero4f(), _CMP_NGT_UQ); }
 LOCAL vec4f greaterequal4f(vec4f a, vec4f b) { return _mm_cmp_ps(a, b, _CMP_GE_OQ); }
+LOCAL vec4f lowerthan4f(vec4f a, vec4f b) { return _mm_cmp_ps(a, b, _CMP_LT_OQ); }
 
 LOCAL vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
 
@@ -303,6 +306,8 @@ LOCAL vec8f load8i(int32_t * a) { return _mm256_load_si256(a); }
 
 #define cmp8f(a,b,c)         _mm256_cmp_ps(a,b,c)
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
+
+LOCAL vec8f shiftbitsR8(vec8f a, int b) { return _mm256_srli_epi32(_mm256_castps_si256(x), b); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
 LOCAL vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv_ps(pos, neg, val); }

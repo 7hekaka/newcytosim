@@ -175,6 +175,7 @@ LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return vfms_f32(c,a,b); }
 
 //----------------------------- Single Precision -------------------------------
 typedef float32x4_t vec4f;
+typedef int32x4_t vec4i;
 
 LOCAL vec4f setzero4f() { return vdupq_n_f32(0); }
 
@@ -196,7 +197,13 @@ LOCAL void storeu4f(float* a, vec4f b) { vst1q_f32(a, b); }
 /// convert single and store them in double precision
 LOCAL void store2d(double* a, vec2f b) { vst1q_f64(a, vcvt_f64_f32(b)); }
 
-LOCAL vec4f shift23(vec4f x) { return vshrq_n_u32((int32x4_t)x, 23); }
+//LOCAL vec4f shiftbitsR4(vec4f a, int b) { return vshrq_n_u32((int32x4_t)a, b); }
+//LOCAL vec4f shiftbitsL4(vec4f a, int b) { return vshlq_n_u32((int32x4_t)a, b); }
+//LOCAL int32_t getlane4i(vec4i a, int b) { return vgetq_lane_u32(a, b); }
+
+#define shiftbitsR4(a,b) vshrq_n_u32((int32x4_t)a,b)
+#define shiftbitsL4(a,b) vshlq_n_u32((int32x4_t)a,b)
+#define getlane4i(a, b) vgetq_lane_u32(a, b);
 
 /// load integers
 LOCAL int32x4_t load4i(int32_t const* a) { return vld1q_s32(a); }
@@ -205,6 +212,7 @@ LOCAL vec4f cvt4if(int32x4_t a) { return vcvtq_f32_s32(a); }
 
 LOCAL vec4f notpositive4f(vec4f a) { return vcleq_f32(a, setzero4f()); }
 LOCAL vec4f greaterequal4f(vec4f a, vec4f b) { return vcgeq_f32(a,b); }
+LOCAL vec4f lowerthan4f(vec4f a, vec4f b) { return vcltq_f32(a,b); }
 
 LOCAL vec4f add4f(vec4f a, vec4f b) { return vaddq_f32(a,b); }
 LOCAL vec4f sub4f(vec4f a, vec4f b) { return vsubq_f32(a,b); }

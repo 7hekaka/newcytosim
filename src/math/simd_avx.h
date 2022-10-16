@@ -5,7 +5,7 @@
 /// Vector holding 4 double precision floats
 typedef __m256d vec4;
 
-#define set64x(a,b,c,d)     _mm256_setr_epi64x(a,b,c,d)
+#define set64x(a,b,c,d) _mm256_setr_epi64x(a,b,c,d)
 
 constexpr vec4 sgn1111 = {-0.0, -0.0, -0.0, -0.0};
 
@@ -242,8 +242,6 @@ LOCAL vec4 streamload4(double const* a) { return _mm256_loadu_pd(a); }
 LOCAL vec4 interleave2(vec2 a) { return permute4(permute2f128(cast4(a), cast4(a), 0x00), 0b1100); }
 /// return { X X Y Y } from { X Y - - }
 LOCAL vec4 interleave4(vec4 a) { return permute4(permute2f128(a, a, 0x00), 0b1100); }
-
-LOCAL vec8f shift23(vec8f x) { return _mm256_srli_epi32(_mm256_castps_si256(x), 23); }
 
 #endif
 

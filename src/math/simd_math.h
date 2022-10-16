@@ -36,18 +36,19 @@ inline vec4f logapprox4f(vec4f x)
     // used to clear negative / NaN arguments:
     vec4f invalid = notpositive4f(x);
     // extract exponent:
-    vec4f cst = cvt4if(shift23(x));
-    cst = add4f(mul4f(cst, g), f);
-    // clear exponents:
+    vec4f cst = cvt4if(shiftbitsR4(x, 23));
+    cst = fmadd4f(cst, g, f);
+    // reset exponents to '127':
     x = or4f(expo, and4f(mant, x));
     // evaluate polynom:
-    vec4f tmp = add4f(mul4f(x, e), d);
-    tmp = add4f(mul4f(x, tmp), c);
-    tmp = add4f(mul4f(x, tmp), b);
-    tmp = add4f(mul4f(x, tmp), a);
-    tmp = add4f(mul4f(x, tmp), cst);
+    vec4f tmp = fmadd4f(x, e, d);
+    tmp = fmadd4f(x, tmp, c);
+    tmp = fmadd4f(x, tmp, b);
+    tmp = fmadd4f(x, tmp, a);
+    tmp = fmadd4f(x, tmp, cst);
     // set invalid arguments to all 1s which is not-a-number:
     return or4f(tmp, invalid);
+    return tmp;
 }
 
 #endif
@@ -120,10 +121,10 @@ inline vec8f logapprox8f(vec8f x)
     vec8f invalid = cmp8f(x, setzero8f(), _CMP_NGT_UQ);
     // extract exponent:
 #if defined(__AVX2__)
-    vec8f a0 = cvt8if(shift23(x));
+    vec8f a0 = cvt8if(shiftbitsR8(x, 23));
 #else
-    vec4f h = cvt4if(shift23(gethi4f(x)));
-    vec4f l = cvt4if(shift23(getlo4f(x)));
+    vec4f h = cvt4if(shiftbitsR4(gethi4f(x), 23));
+    vec4f l = cvt4if(shiftbitsR4(getlo4f(x), 23));
     vec8f a0 = cat44f(l, h);
 #endif
     a0 = add8f(mul8f(a0, G), F);

@@ -80,9 +80,9 @@ static inline void fold_corners(vec4f& x, vec4f& y)
 static real * makeGaussians_SIMD(real dst[], size_t cnt, const int32_t src[])
 {
     const vec4f fac = set4f(TWO_POWER_MINUS_31);
+    const vec4f one = set4f(1.0f);
     const vec4f half = set4f(-0.5f);
 
-    real * d = dst;
     int32_t const* end = src + cnt;
     while ( src < end )
     {
@@ -90,6 +90,8 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const int32_t src[])
         vec4f y = mul4f(fac, cvt4if(load4i(src+4)));
         fold_corners(x, y); // increases from 490 to 574 expected!
         vec4f n = add4f(mul4f(x,x), mul4f(y,y));
+        // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
+        vec4i valid = shiftbitsL4(shiftbitsR4(lowerthan4f(n, one), 31), 1);
         n = sqrt4f(div4f(logapprox4f(n), mul4f(half, n)));
         x = mul4f(n, x);
         y = mul4f(n, y);
@@ -98,20 +100,28 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const int32_t src[])
         y = unpackhi4f(x, y);
 #if REAL_IS_DOUBLE
         // convert 8 single-precision values
-        store2d(d  , getlo2f(n));
-        store2d(d+2, getlo2f(y));
-        store2d(d+4, gethi2f(n));
-        store2d(d+6, gethi2f(y));
+        store2d(dst, getlo2f(n));
+        dst += getlane4i(valid, 0);
+        store2d(dst, gethi2f(n));
+        dst += getlane4i(valid, 1);
+        store2d(dst, getlo2f(y));
+        dst += getlane4i(valid, 2);
+        store2d(dst, gethi2f(y));
+        dst += getlane4i(valid, 3);
 #else
-        // store 8 single-precision values
-        store4f(d  , n);
-        store4f(d+4, y);
+        // convert 8 single-precision values
+        store2f(dst, getlo2f(n));
+        dst += getlane4i(valid, 0);
+        store2f(dst, gethi2f(n));
+        dst += getlane4i(valid, 1);
+        store2f(dst, getlo2f(y));
+        dst += getlane4i(valid, 2);
+        store2f(dst, gethi2f(y));
+        dst += getlane4i(valid, 3);
 #endif
         src += 8;
-        d += 8;
     }
-    return remove_nan_pairs(dst, d);
-    return d;
+    return dst;
 }
 
 #endif

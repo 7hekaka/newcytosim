@@ -480,10 +480,10 @@ inline vec8f log_approx8f(__m256 xxx)
     __m256 invalid = _mm256_cmp_ps(xxx, _mm256_setzero_ps(), _CMP_NGT_UQ);
     // extract exponent:
 #if defined(__AVX2__)
-    vec8f a0 = cvt8if(shift23(x));
+    vec8f a0 = cvt8if(shiftbitsR8(x, 23));
 #else
-    vec4f h = cvt4if(shift23(gethi4f(x)));
-    vec4f l = cvt4if(shift23(getlo4f(x)));
+    vec4f h = cvt4if(shiftbitsR4(gethi4f(x), 23));
+    vec4f l = cvt4if(shiftbitsR4(getlo4f(x), 23));
     vec8f a0 = cat44f(l, h);
 #endif
     cst = _mm256_add_ps(_mm256_mul_ps(cst, g), f);
@@ -593,33 +593,33 @@ static real* check_log(real dst[], size_t cnt, const __m256i src[])
 template < float* (*FUNC)(float*, size_t, const int32_t*) >
 void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
 {
-    float flt[SFMT_N32] = { 0 };
+    float vec[SFMT_N32] = { 0 };
     tick();
     for ( int i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
-        FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
+        FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
     }
-    float* end = FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
+    float* end = FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
     printf("%-12s %5.2f :", str, tock(cnt>>10));
-    check_gaussian(end-flt, flt);
-    print_gaussian(std::min(end-flt, 16l), flt);
+    check_gaussian(end-vec, vec);
+    print_gaussian(std::min(end-vec, 16l), vec);
 }
 
 template < double* (*FUNC)(double*, size_t, const int32_t*) >
 void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
 {
-    double flt[SFMT_N32] = { 0 };
+    double vec[SFMT_N32] = { 0 };
     tick();
     for ( int i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
-        FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
+        FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
     }
-    double* end = FUNC(flt, SFMT_N32, (int32_t*)sfmt.state);
+    double* end = FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
     printf("%-12s %5.2f :", str, tock(cnt>>10));
-    check_gaussian(end-flt, flt);
-    print_gaussian(std::min(end-flt, 16l), flt);
+    check_gaussian(end-vec, vec);
+    print_gaussian(std::min(end-vec, 16l), vec);
 }
 
 /**
