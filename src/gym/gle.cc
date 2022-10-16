@@ -114,7 +114,7 @@ namespace gle
                  double start, double delta, float cX, float cY)
     {
 #ifdef __SSE3__
-        return set_arc_SEE(cnt, ptr, rad, start, delta, cX, cY);
+        return set_arc_SSE(cnt, ptr, rad, start, delta, cX, cY);
 #else
         const double c = std::cos(delta);
         const double s = std::sin(delta);

@@ -190,8 +190,8 @@ inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
      ptr[2*i  ] = rad * cos(start+i*theta) + cX
      ptr[2*i+1] = rad * sin(start+i*theta) + cY
  */
-void set_arc_SEE(size_t cnt, float ptr[], float rad, float start,
-                 float delta, float cX, float cY)
+inline void set_arc_SSE(size_t cnt, float ptr[], float rad, float start,
+                        float delta, float cX, float cY)
 {
     const float c0 = cosf(start);
     const float s0 = sinf(start);
