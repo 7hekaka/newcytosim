@@ -209,8 +209,10 @@ LOCAL void store2d(double* a, vec2f b) { vst1q_f64(a, vcvt_f64_f32(b)); }
 LOCAL int32x4_t load4i(int32_t const* a) { return vld1q_s32(a); }
 /// convert integer to float:
 LOCAL vec4f cvt4if(int32x4_t a) { return vcvtq_f32_s32(a); }
+
 /// load integers and convert to float:
-LOCAL vec4f load4if(vec4i const* a) { return vcvtq_f32_s32(vld1q_s32(a)); }
+LOCAL vec4f load4if(int32_t const* a) { return vcvtq_f32_s32(vld1q_s32(a)); }
+LOCAL vec4f load4uf(uint32_t const* a) { return vcvtq_f32_u32(vld1q_u32(a)); }
 
 LOCAL vec4f notpositive4f(vec4f a) { return vcleq_f32(a, setzero4f()); }
 LOCAL vec4f greaterequal4f(vec4f a, vec4f b) { return vcgeq_f32(a,b); }
@@ -236,7 +238,7 @@ LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}
 /// select 'b' if 'k==1' and 'a' otherwise
 LOCAL vec4f blendv4f(vec4f a, vec4f b, vec4f k) { return vbslq_f32(k,b,a); }
 /// return `neg` if `val < 0` and `pos` otherwise
-LOCAL vec4f signselect4f(vec4f val, vec4f neg, vec4f pos) { return vbslq_f32(neg, pos, vcleq_f32(a, setzero4f())); }
+LOCAL vec4f signselect4f(vec4f val, vec4f neg, vec4f pos) { return vbslq_f32(neg, pos, vcleq_f32(val, setzero4f())); }
 
 /// return { a[0], a[1], b[2], b[3] }
 LOCAL vec4f blend31f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,0,0,0},a,b); }

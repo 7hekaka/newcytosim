@@ -1,56 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 
-/// pack array by removing all 'not-a-number's in arrray [s, e[
-/** Attention: this may not work with option `-ffast-math` */
-static inline real * remove_nan_pairs(real * s, real * e)
-{
-    //real * start = s;
-    e -= 2;
-    if ( s < e )
-    {
-        // find the next `nan` going upward:
-        while ( s[0] == s[0] )
-        {
-            s += 2;
-            if ( s >= e )
-                break;
-        }
-        // skip `nan` values going downward:
-        while ( e[0] != e[0] )
-        {
-            e -= 2;
-            if ( e <= s )
-                break;
-        }
-        //printf("- %4lu  %4lu\n", s-start, e-start);
-        // swap numbers over, putting NaNs toward the end of array
-        std::swap(s[0], e[0]);
-        std::swap(s[1], e[1]);
-        s += 2;
-        e -= 2;
-    }
-    while ( s < e )
-    {
-        // find the next `nan` going upward:
-        while ( s[0] == s[0] )
-            s += 2;
-        // skip `nan` values going downward:
-        while ( e[0] != e[0] )
-            e -= 2;
-        if ( s >= e )
-            break;
-        //printf("  %4lu  %4lu\n", s-start, e-start);
-        // copy numbers over:
-        s[0] = e[0];
-        s[1] = e[1];
-        s += 2;
-        e -= 2;
-    }
-    return s;
-}
-
-
 #if USE_SIMD
 
 /**
@@ -79,17 +29,17 @@ static inline void fold_corners4f(vec4f& x, vec4f& y)
 
 static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
 {
-    const vec4i * src = reinterpret_cast<const vec4i*>(arg);
+    const int32_t * src = (int32_t*)arg;
+    const int32_t * end = src + cnt;
     const vec4f fac = set4f(0x1p-31);
     const vec4f one = set4f(1.0f);
     const vec4f half = set4f(-0.5f);
 
-    vec4i const* end = src + cnt / 4;
     while ( src < end )
     {
         vec4f x = mul4f(fac, load4if(src));
-        vec4f y = mul4f(fac, load4if(src+1));
-        src += 2;
+        vec4f y = mul4f(fac, load4if(src+4));
+        src += 8;
         fold_corners4f(x, y); // increases from 490 to 574 expected!
         vec4f n = add4f(mul4f(x,x), mul4f(y,y));
         // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
@@ -124,6 +74,36 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
     }
     return dst;
 }
+
+
+
+/// compute exponential derivates
+static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
+{
+    const int32_t * src = (int32_t*)arg;
+    const int32_t * end = src + cnt;
+
+    const vec4f off = set4f(21.487562597358305f); // log(2^31)
+    
+    while ( src < end )
+    {
+        // dst = -log(real(src) * TWO_POWER_MINUS_31 );
+        vec4f z = abs4f(cvt4if(load4i(src)));
+        vec4f x = sub4f(off, logapprox4f(z));
+        src += 4;
+#if REAL_IS_DOUBLE
+        // convert 4 single-precision values
+        store2d(dst  , getlo2f(x));
+        store2d(dst+2, gethi2f(x));
+#else
+        // store 4 single-precision values
+        store4f(dst, x);
+#endif
+        dst += 4;
+    }
+    return dst;
+}
+
 
 #endif
 
@@ -196,6 +176,55 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
     return dst;
 }
 
+
+/// pack array by removing all 'not-a-number's in arrray [s, e[
+/** Attention: this may not work with option `-ffast-math` */
+static inline real * remove_nan_pairs(real * s, real * e)
+{
+    //real * start = s;
+    e -= 2;
+    if ( s < e )
+    {
+        // find the next `nan` going upward:
+        while ( s[0] == s[0] )
+        {
+            s += 2;
+            if ( s >= e )
+                break;
+        }
+        // skip `nan` values going downward:
+        while ( e[0] != e[0] )
+        {
+            e -= 2;
+            if ( e <= s )
+                break;
+        }
+        //printf("- %4lu  %4lu\n", s-start, e-start);
+        // swap numbers over, putting NaNs toward the end of array
+        std::swap(s[0], e[0]);
+        std::swap(s[1], e[1]);
+        s += 2;
+        e -= 2;
+    }
+    while ( s < e )
+    {
+        // find the next `nan` going upward:
+        while ( s[0] == s[0] )
+            s += 2;
+        // skip `nan` values going downward:
+        while ( e[0] != e[0] )
+            e -= 2;
+        if ( s >= e )
+            break;
+        //printf("  %4lu  %4lu\n", s-start, e-start);
+        // copy numbers over:
+        s[0] = e[0];
+        s[1] = e[1];
+        s += 2;
+        e -= 2;
+    }
+    return s;
+}
 
 static real * makeGaussians_AVX1(real dst[], size_t cnt, const uint32_t* arg)
 {
@@ -355,35 +384,6 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const uint32_t* arg)
     }
     return remove_nan_pairs(dst, f);
     return dst+8*cnt;
-}
-
-
-/// compute exponential derivates
-static real* makeExponentials_AVX(real dst[], size_t cnt, const uint32_t* arg)
-{
-    const vec8i * src = (vec8i*)arg;
-    const vec8i * end = src + cnt / 8;
-
-    const vec8f eps = set8f(0x1p-31f);
-    const vec8f one = set8f(1.0f);
-    
-    while ( src < end )
-    {
-        // generate random floats in ]0, 1]:
-        vec8f x = sub8f(one, mul8f(eps, abs8f(cvt8if(load8i(src)))));
-        x = abs8f(logapprox8f(x));
-#if REAL_IS_DOUBLE
-        // convert 8 single-precision values
-        store4d(dst  , getlo4f(x));
-        store4d(dst+4, gethi4f(x));
-#else
-        // store 8 single-precision values
-        store8f(dst, x);
-#endif
-        dst += 8;
-        ++src;
-    }
-    return dst;
 }
 
 

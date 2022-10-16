@@ -48,7 +48,6 @@ inline vec4f logapprox4f(vec4f x)
     tmp = fmadd4f(x, tmp, cst);
     // set invalid arguments to all 1s which is not-a-number:
     return or4f(tmp, invalid);
-    return tmp;
 }
 
 #endif

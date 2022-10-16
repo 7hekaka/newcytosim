@@ -14,8 +14,8 @@
 thread_local Random RNG;
 
 
-/// switch for using SIMD to generate Gaussians faster (requires AVX)
-#define RANDOM_USES_AVX 0
+/// use SIMD to generate Gaussians faster (requires NEON/SSE3)
+#define RANDOM_USES_SIMD 1
 
 
 /// the most significant bit in a 32-bits integer
@@ -276,7 +276,7 @@ void Random::gauss_set(real & a, real & b, real v)
     b = w * y;
 }
 
-#if ( !RANDOM_USES_AVX )
+#if ( !RANDOM_USES_SIMD )
 
 /**
  Fill array `vec[]` with Gaussian values ~ N(0,1).
@@ -351,7 +351,7 @@ void Random::refill_gaussians()
  */
 void Random::refill_gaussians()
 {
-    next_gaussian_ = makeGaussians_AVXBM(gaussians_, SFMT_N256, (int32_t*)twister_.state);
+    next_gaussian_ = makeGaussians_SIMD(gaussians_, SFMT_N256, (uint32_t*)twister_.state);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
     sfmt_gen_rand_all(&twister_);
 }
@@ -442,8 +442,8 @@ void makeExponentials(real dst[], size_t cnt, const uint32_t src[])
 
 void Random::refill_exponentials()
 {
-#if ( RANDOM_USES_AVX )
-    makeExponentials_AVX(exponentials_, SFMT_N256, (uint32_t*)twister_.state);
+#if ( RANDOM_USES_SIMD )
+    makeExponentials_SIMD(exponentials_, SFMT_N256, (uint32_t*)twister_.state);
 #else
     makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #endif

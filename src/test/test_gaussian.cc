@@ -16,6 +16,8 @@
 #include "simd_math.h"
 #include "../math/random_simd.cc"
 
+std::random_device device;
+
 #define TWO_POWER_MINUS_31 0x1p-31
 #define TWO_POWER_MINUS_32 0x1p-32
 /**
@@ -59,8 +61,7 @@ real * makeGaussians_(real dst[], size_t cnt, const uint32_t arg[])
 
 real * makeGaussians_std(real dst[], size_t cnt, const uint32_t[])
 {
-    std::random_device rd{};
-    std::mt19937 gen{rd()};
+    std::mt19937 gen{device()};
     
     std::normal_distribution<> distribution{0,1};
     for ( size_t i = 0; i < cnt; ++i )
@@ -72,7 +73,7 @@ real * makeGaussians_std(real dst[], size_t cnt, const uint32_t[])
 real * makeExponentials_(real dst[], size_t cnt, const uint32_t src[])
 {
     for ( size_t i = 0; i < cnt; ++i )
-        dst[i] = -std::log(1 - real(src[i]) * TWO_POWER_MINUS_32);
+        dst[i] = -std::log(real(1) - real(src[i]) * TWO_POWER_MINUS_32);
     return dst + cnt;
 }
 
@@ -224,7 +225,7 @@ int main(int argc, char* argv[])
     size_t cnt = 1<<18;
     printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
     sfmt_t sfmt;
-    sfmt_init_gen_rand(&sfmt, time(nullptr));
+    sfmt_init_gen_rand(&sfmt, device());
 
     tick();
     for ( size_t i = 0; i < cnt; ++i )
@@ -245,15 +246,15 @@ int main(int argc, char* argv[])
 #endif
     
     run<makeExponentials_>(sfmt, "Exponential", cnt);
-#if defined(__AVX__)
-    run<makeExponentials_AVX>(sfmt, "Expon.AVX", cnt);
-    if ( 0 )
-    {
-        printf("Approximate logarithm:\n");
-        real * vec = new_real(SFMT_N32);
-        check_log(vec, SFMT_N256, (uint32_t*)sfmt.state);
-        print_gaussian(std::min(SFMT_N256, 32), vec);
-    }
+#if USE_SIMD
+    run<makeExponentials_SIMD>(sfmt, "Expon.SIMD", cnt);
+#endif
+#if defined(__AVX__) && 0
+    printf("Approximate logarithm:\n");
+    real * vec = new_real(SFMT_N32);
+    check_log(vec, SFMT_N256, (uint32_t*)sfmt.state);
+    print_gaussian(std::min(SFMT_N256, 32), vec);
+    free_real(vec);
 #endif
 }
 

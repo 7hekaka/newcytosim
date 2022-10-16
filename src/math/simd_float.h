@@ -140,7 +140,7 @@ LOCAL vec4i load4i(int32_t const* a) { return _mm_load_si128((__m128i*)a); }
 /// convert integers to floats:
 LOCAL vec4f cvt4if(__m128i a) { return _mm_cvtepi32_ps(a); }
 /// load integers and convert to float:
-LOCAL vec4f load4if(vec4i const* a) { return _mm_cvtepi32_ps(_mm_load_si128(a)); }
+LOCAL vec4f load4if(int32_t const* a) { return _mm_cvtepi32_ps(_mm_load_si128((__m128i const*)a)); }
 
 /// square root
 LOCAL vec4f sqrt4f(vec4f a) { return _mm_sqrt_ps(a); }
