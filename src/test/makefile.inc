@@ -91,6 +91,10 @@ test_random: test_random.cc $(TEST_OBJ) filewrapper.o messages.o | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
+test_gaussian: test_gaussian.cc $(TEST_OBJ) filewrapper.o messages.o | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+
 test_variablerate: test_variablerate.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
