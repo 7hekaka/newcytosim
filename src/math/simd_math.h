@@ -1,16 +1,16 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
-/** Approximate versions of log() and 1/sqrt() for SIMD vectors */
-
-#if USE_SIMD
-
 #if defined(__INTEL_COMPILER)
 
 /// natural logarithm, part of Intel's SVML library
 inline vec4f log4f(vec4f const x) { return _mm_log_ps(x); }
+/// natural logarithm, part of Intel's SVML library
+inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
 
 #endif
 
+
+#if USE_SIMD
 /// Approximate natural logarithm by Jacques-Henri Jourdan
 /**
  Absolute error bounded by 1e-5 for normalized inputs
@@ -88,14 +88,6 @@ inline vec8f rsqrt8fi(vec8f x)
 }
 
 
-#if defined(__INTEL_COMPILER)
-
-/// natural logarithm, part of Intel's SVML library
-inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
-
-#endif
-
-
 /// Approximate natural logarithm by Jacques-Henri Jourdan
 /**
  Absolute error bounded by 1e-5 for normalized inputs
@@ -153,14 +145,20 @@ inline vec8f logapprox8f(vec8f x)
  */
 inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
 {
-    vec8f xx = mul8f(x, x);
-    
     const vec8f c4 = set8f(1.8929864824e-5f);
     const vec8f c3 = set8f(-1.3422947025e-3f);
     const vec8f c2 = set8f(4.1518035216e-2f);
     const vec8f c1 = set8f(-0.4998515820f);
     const vec8f c0 = set8f(1.f);
     
+    const vec8f s4 = set8f(2.1478401777e-6f);
+    const vec8f s3 = set8f(-1.9264918228e-4f);
+    const vec8f s2 = set8f(8.3089787513e-3f);
+    const vec8f s1 = set8f(-0.1666243672f);
+    const vec8f s0 = set8f(0.9999793767f);
+
+    vec8f xx = mul8f(x, x);
+
     /* Mathematically equivalent polynomial evaluations:
      a0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4
      a0 + x*(a1 + x*(a2 + x*(a3 + x*a4)))
@@ -170,37 +168,15 @@ inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
      a0 + x*(a1 + x*(a2 + x*(a3 + x*(a4 + x*(a5 + a6*x)))))
      ([a0 + a1*x] + xx*[a2 + a3*x]) + [xx*xx]*([a4 + a5*x] + a6*x)
      */
-#if USE_HORNER_RULE
-    // Horner's rule for 4th order polynom
-    C = add8f(mul8f(xx, c4), c3);
-    C = add8f(mul8f(xx, C), c2);
-    C = add8f(mul8f(xx, C), c1);
-    C = add8f(mul8f(xx, C), c0);
-#else
-    vec8f x4 = mul8f(xx, xx);
-    vec8f c01 = add8f(mul8f(xx, c1), c0);
-    vec8f c23 = add8f(mul8f(xx, c3), c2);
-    C = add8f(mul8f(x4, c4), c23);
-    C = add8f(mul8f(x4, C), c01);
-#endif
-    
-    const vec8f s4 = set8f(2.1478401777e-6f);
-    const vec8f s3 = set8f(-1.9264918228e-4f);
-    const vec8f s2 = set8f(8.3089787513e-3f);
-    const vec8f s1 = set8f(-0.1666243672f);
-    const vec8f s0 = set8f(0.9999793767f);
-
-#if USE_HORNER_RULE
+    // Horner's rule for 4th order polynoms
     S = add8f(mul8f(xx, s4), s3);
+    C = add8f(mul8f(xx, c4), c3);
     S = add8f(mul8f(xx, S), s2);
+    C = add8f(mul8f(xx, C), c2);
     S = add8f(mul8f(xx, S), s1);
+    C = add8f(mul8f(xx, C), c1);
     S = add8f(mul8f(xx, S), s0);
-#else
-    vec8f s01 = add8f(mul8f(xx, s1), s0);
-    vec8f s23 = add8f(mul8f(xx, s3), s2);
-    S = add8f(mul8f(x4, s4), s23);
-    S = add8f(mul8f(x4, S), s01);
-#endif
+    C = add8f(mul8f(xx, C), c0);
     S = mul8f(x, S);
 }
 

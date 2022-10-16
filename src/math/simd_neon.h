@@ -209,6 +209,8 @@ LOCAL void store2d(double* a, vec2f b) { vst1q_f64(a, vcvt_f64_f32(b)); }
 LOCAL int32x4_t load4i(int32_t const* a) { return vld1q_s32(a); }
 /// convert integer to float:
 LOCAL vec4f cvt4if(int32x4_t a) { return vcvtq_f32_s32(a); }
+/// load integers and convert to float:
+LOCAL vec4f load4if(vec4i const* a) { return vcvtq_f32_s32(vld1q_s32(a)); }
 
 LOCAL vec4f notpositive4f(vec4f a) { return vcleq_f32(a, setzero4f()); }
 LOCAL vec4f greaterequal4f(vec4f a, vec4f b) { return vcgeq_f32(a,b); }
@@ -231,9 +233,10 @@ LOCAL vec4f andnot4f(vec4f a, vec4f b) { return vbicq_s32(a, b); }
 LOCAL vec4f abs4f(vec4f a)          { return vabsq_f32(a); }
 LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}); }
 
-/// propagate sign bit into every other bit:
-LOCAL vec4f signmask4f(vec4f a) { return vshrq_n_s32(a, 31); }
+/// select 'b' if 'k==1' and 'a' otherwise
 LOCAL vec4f blendv4f(vec4f a, vec4f b, vec4f k) { return vbslq_f32(k,b,a); }
+/// return `neg` if `val < 0` and `pos` otherwise
+LOCAL vec4f signselect4f(vec4f val, vec4f neg, vec4f pos) { return vbslq_f32(neg, pos, vcleq_f32(a, setzero4f())); }
 
 /// return { a[0], a[1], b[2], b[3] }
 LOCAL vec4f blend31f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,0,0,0},a,b); }
@@ -262,10 +265,10 @@ LOCAL vec4f unpacklo4f(vec4f a, vec4f b) { return vzip1q_f32(a, b); }
 // returns { a[2], b[2], a[3], b[3] }
 LOCAL vec4f unpackhi4f(vec4f a, vec4f b) { return vzip2q_f32(a, b); }
 
-// return { b[2], b[3], a[2], a[2] }
-LOCAL vec4f movehl4f(vec4f a, vec4f b) { return vcombine_f32(vget_high_f32(b), vget_high_f32(a)); }
 // return { a[0], a[1], b[0], b[1] }
 LOCAL vec4f movelh4f(vec4f a, vec4f b) { return vcombine_f32(vget_low_f32(a), vget_low_f32(b)); }
+// return { b[2], b[3], a[2], a[2] }
+LOCAL vec4f movehl4f(vec4f a, vec4f b) { return vcombine_f32(vget_high_f32(b), vget_high_f32(a)); }
 
 // copy a[0] into all elements of destination
 LOCAL vec4f broadcastXf(vec4f a) { return vdupq_laneq_f32(a,0); }

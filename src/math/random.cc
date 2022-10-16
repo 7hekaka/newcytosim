@@ -351,7 +351,7 @@ void Random::refill_gaussians()
  */
 void Random::refill_gaussians()
 {
-    next_gaussian_ = makeGaussians_AVXBM(gaussians_, SFMT_N256, (__m256i*)twister_.state);
+    next_gaussian_ = makeGaussians_AVXBM(gaussians_, SFMT_N256, (int32_t*)twister_.state);
     //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
     sfmt_gen_rand_all(&twister_);
 }
@@ -431,7 +431,7 @@ void Random::gauss_boxmuller(real& x, real& y)
 /**
 Could use here the SIMD approximate Logarithm function
  */
-void makeExponentials(real dst[], size_t cnt, const int32_t src[])
+void makeExponentials(real dst[], size_t cnt, const uint32_t src[])
 {
     for ( size_t i = 0; i < cnt; ++i )
     {
@@ -443,9 +443,9 @@ void makeExponentials(real dst[], size_t cnt, const int32_t src[])
 void Random::refill_exponentials()
 {
 #if ( RANDOM_USES_AVX )
-    makeExponentialsAVX(exponentials_, SFMT_N256, (__m256i*)twister_.state);
+    makeExponentials_AVX(exponentials_, SFMT_N256, (uint32_t*)twister_.state);
 #else
-    makeExponentials(exponentials_, SFMT_N32, (int32_t*)twister_.state);
+    makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #endif
     next_exponential_ = exponentials_ + SFMT_N32;
     //printf("refill_exponentials\n");

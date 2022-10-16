@@ -152,7 +152,7 @@ LOCAL vec4 clear4th(vec4 a) { return _mm256_blend_pd(a,_mm256_setzero_pd(),0b100
 LOCAL vec4 load4d(float const* a) { return _mm256_cvtps_pd(_mm_loadu_ps(a)); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
-LOCAL vec4 sign_select4(vec4 val, vec4 neg, vec4 pos) { return _mm256_blendv_pd(pos, neg, val); }
+LOCAL vec4 signselect4(vec4 val, vec4 neg, vec4 pos) { return _mm256_blendv_pd(pos, neg, val); }
 
 #if 0
   LOCAL vec4  load3(double const* a)    { return blend0010(load2Z(a)), broadcast1(a+2)); }

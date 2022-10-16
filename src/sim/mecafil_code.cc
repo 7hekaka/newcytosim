@@ -1373,7 +1373,7 @@ void projectForcesD3D_SSE(size_t nbs, const float* dir,
             vec4f a1 = fmadd4f(p1, blend22f(d1, setzero4f()), loadu4f(src+4));
             storeu4f(dst  , fnmadd4f(m0, catshift1f(d2, d0), a0));
             storeu4f(dst+4, fnmadd4f(m1, catshift1f(d0, d1), a1));
-             store1f(dst+8, fnmadd4f(m2, catshift1f(d1, d1), load1f(src+8)));
+             store1f(dst+8, fnmadd2f(m2, catshift1f(d1, d1), load1f(src+8)));
             //dir += 9; dst += 9; src += 9;
         } break;
         case 2: {
@@ -1385,7 +1385,7 @@ void projectForcesD3D_SSE(size_t nbs, const float* dir,
             vec4f d0 = clear4th(load4f(dir));  // loading crap; load3(dir);
             vec4f a0 = fmadd4f(p0, d0, loadu4f(src));
             storeu4f(dst, fnmadd4f(m0, catshift1f(d2, d0), a0));
-            store2f(dst+4, fnmadd4f(m1, catshift1f(d0, d0), load2f(src+4)));
+            store2f(dst+4, fnmadd2f(m1, catshift1f(d0, d0), load2f(src+4)));
             //dir += 6; dst += 6; src += 6;
         } break;
         case 3: {
@@ -1393,8 +1393,8 @@ void projectForcesD3D_SSE(size_t nbs, const float* dir,
             // 1 vector remaining
             vec4f aa = catshift1f(d2, setzero4f());
             //store3(dst, fnmadd4(mm, aa, load3(src)));
-            store2f(dst, fnmadd4f(m3, aa, load2f(src)));
-            store1f(dst+2, fnmadd4f(m3, gethif(aa), load1f(src+2)));
+            store2f(dst, fnmadd2f(m3, aa, load2f(src)));
+            store1f(dst+2, fnmadd2f(m3, gethi2f(aa), load1f(src+2)));
             //dir += 3; dst += 3; src += 3;
         } break;
         default:

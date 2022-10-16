@@ -1,22 +1,31 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #include "real.h"
-#include "random.h"
 #include <cstdio>
 #include <bitset>
 #include <cstring>
 #include <iostream>
 #include <climits>
-#include "timer.h"
 #include <random>
 
+#include "timer.h"
+#include "SFMT.h"
+
+#include "simd.h"
+#include "simd_float.h"
+#include "simd_math.h"
+#include "../math/random_simd.cc"
+
+#define TWO_POWER_MINUS_31 0x1p-31
+#define TWO_POWER_MINUS_32 0x1p-32
 /**
  Fill array `vec[]` with Gaussian values ~ N(0,1).
  the size of `vec` should be a multiple of 2, and sufficient to hold `end-src` values
  @Return the number of values that were stored in `vec`
  */
-real * makeGaussians_(real dst[], size_t cnt, const int32_t src[])
+real * makeGaussians_(real dst[], size_t cnt, const uint32_t arg[])
 {
+    int32_t const* src = reinterpret_cast<const int32_t*>(arg);
     int32_t const*const end = src + cnt;
     while ( src < end )
     {
@@ -48,7 +57,7 @@ real * makeGaussians_(real dst[], size_t cnt, const int32_t src[])
 }
 
 
-real * makeGaussians_std(real dst[], size_t cnt, const int32_t src[])
+real * makeGaussians_std(real dst[], size_t cnt, const uint32_t[])
 {
     std::random_device rd{};
     std::mt19937 gen{rd()};
@@ -60,13 +69,10 @@ real * makeGaussians_std(real dst[], size_t cnt, const int32_t src[])
 }
 
 
-real * makeExponentials_(real dst[], size_t cnt, const int32_t src[])
+real * makeExponentials_(real dst[], size_t cnt, const uint32_t src[])
 {
     for ( size_t i = 0; i < cnt; ++i )
-    {
-        real x = std::fabs(src[i]);
-        dst[i] = -std::log(1 - x * TWO_POWER_MINUS_31);
-    }
+        dst[i] = -std::log(1 - real(src[i]) * TWO_POWER_MINUS_32);
     return dst + cnt;
 }
 
@@ -87,17 +93,19 @@ void print_gaussian(size_t cnt, T const* vec)
 }
 
 template < typename REAL >
-void check_gaussian(size_t cnt, REAL* vec)
+void check_gaussian(size_t num, REAL* vec)
 {
+    size_t cnt = 0;
     size_t nan = 0;
-    double off = 1; // assumed mean
+    const double off = 0; // assumed mean
     double avg = 0, var = 0;
-    for ( size_t i = 0; i < cnt; ++i )
+    for ( size_t i = 0; i < num; ++i )
     {
         if ( std::isnan(vec[i]) )
             ++nan;
         else
         {
+            ++cnt;
             avg += vec[i];
             var += ( vec[i] - off ) * ( vec[i] - off );
         }
@@ -106,12 +114,11 @@ void check_gaussian(size_t cnt, REAL* vec)
     var = ( var - square( avg - off ) * cnt ) / ( cnt - 1 );
     // covariance of odd and even numbers:
     double cov = 0;
-    for ( size_t i = 1; i < cnt; i += 2 )
+    for ( size_t i = 1; i < num; i += 2 )
     {
         if ( !std::isnan(vec[i]) )
             cov += ( vec[i-1] - avg ) * ( vec[i] - avg );
     }
-    cnt -= nan;
     cov /= ( cnt / 2 );
     printf("%6lu + %6lu NaNs: avg %7.4f var %7.4f cov %7.4f ", cnt, nan, avg, var, cov);
 }
@@ -119,17 +126,8 @@ void check_gaussian(size_t cnt, REAL* vec)
 
 //------------------------------------------------------------------------------
 #pragma mark -
-#include "random.h"
-
-#include "simd.h"
-#include "simd_math.h"
-#include "../math/random_simd.cc"
 
 #if defined(__AVX__)
-
-#include "simd_float.h"
-#include "simd_math.h"
-
 
 /* Absolute error bounded by 1e-5 for normalized inputs
    Returns a finite number for +inf input
@@ -169,17 +167,19 @@ inline float logapprox(float val)
 }
 
 
-/// use this to check the log()
-static real* check_log(real dst[], size_t cnt, const __m256i src[])
+/// use this to check the approximate log() function
+static real* check_log(real dst[], size_t cnt, const uint32_t arg[])
 {
+    const vec8i * src = (vec8i*)arg;
+    const vec8i * end = src + cnt / 8;
+
     const vec8f eps = set8f(0x1p-31f); //TWO_POWER_MINUS_31
-    __m256i const* end = src + cnt;
     real * d = dst;
     while ( src < end )
     {
         // generate random floats in ]0, 1]:
-        vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(cvt8if(load8i(src++)))));
-        ++src; //vec8f j = mul8f(eps, cvt8if(load8i(src++)));
+        vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(load8if(src++))));
+        ++src; //vec8f j = mul8f(eps, load8if(src++));
         vec8f x = n;
         vec8f y = logapprox8f(n);
 #if REAL_IS_DOUBLE
@@ -201,96 +201,59 @@ static real* check_log(real dst[], size_t cnt, const __m256i src[])
 #endif
 
 
-template < float* (*FUNC)(float*, size_t, const int32_t*) >
-void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
+template < real* (*FUNC)(real*, size_t, const uint32_t*) >
+void run(sfmt_t& sfmt, const char str[], size_t cnt)
 {
-    float vec[SFMT_N32] = { 0 };
+    real * vec = new_real(SFMT_N32);
     tick();
-    for ( int i = 0; i < cnt; ++i )
+    for ( size_t i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
-        FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
+        FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
     }
-    float* end = FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
+    real* end = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
     printf("%-12s %5.2f :", str, tock(cnt>>10));
     check_gaussian(end-vec, vec);
     print_gaussian(std::min(end-vec, 16l), vec);
-}
-
-template < double* (*FUNC)(double*, size_t, const int32_t*) >
-void runGaussian(sfmt_t& sfmt, const char str[], int cnt)
-{
-    double vec[SFMT_N32] = { 0 };
-    tick();
-    for ( int i = 0; i < cnt; ++i )
-    {
-        sfmt_gen_rand_all(&sfmt);
-        FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
-    }
-    double* end = FUNC(vec, SFMT_N32, (int32_t*)sfmt.state);
-    printf("%-12s %5.2f :", str, tock(cnt>>10));
-    check_gaussian(end-vec, vec);
-    print_gaussian(std::min(end-vec, 16l), vec);
-}
-
-/**
- Tests different implementation for speed
- */
-void test_gaussian(int cnt)
-{
-    printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
-    sfmt_t sfmt;
-    sfmt_init_gen_rand(&sfmt, time(nullptr));
-
-    tick();
-    for ( int i = 0; i < cnt; ++i )
-        sfmt_gen_rand_all(&sfmt);
-    printf("RNG.refill   %5.2f\n", tock(cnt>>10));
-    //print(vec, end);
-    
-    runGaussian<makeGaussians_std>(sfmt, "GaussSTD", cnt);
-    runGaussian<makeGaussians_>(sfmt, "Gauss", cnt);
-#if USE_SIMD
-    runGaussian<makeGaussians_SIMD>(sfmt, "GaussSSE", cnt);
-#endif
-
-#if defined(__AVX__)
-    runGaussian<makeGaussians_AVXBM>(sfmt, "GaussAVXBM", cnt);
-    runGaussian<makeGaussians_AVX1>(sfmt, "GaussAVX1", cnt);
-    runGaussian<makeGaussians_AVX2>(sfmt, "GaussAVX2", cnt);
-    runGaussian<makeExponentialsAVX>(sfmt, "Expon.AVX", cnt);
-    if ( 0 )
-    {
-        printf("Approximate logarithm:\n");
-        real vec[SFMT_N32] = { 0 };
-        check_log(vec, SFMT_N256, (__m256i*)sfmt.state);
-        print_gaussian(std::min(SFMT_N256, 32), vec);
-    }
-#endif
-    runGaussian<makeExponentials_>(sfmt, "Exponential", cnt);
-}
-
-/**
- Prints many Gaussian distributecd random numbers
- */
-void print_gaussian(int cnt)
-{
-    for ( int i = 0; i < cnt; ++i )
-        printf("%10.5f\n", RNG.gauss());
+    free_real(vec);
 }
 
 
 int main(int argc, char* argv[])
 {
-    int mode = 0;
-    RNG.seed();
+    size_t cnt = 1<<18;
+    printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
+    sfmt_t sfmt;
+    sfmt_init_gen_rand(&sfmt, time(nullptr));
 
-    if ( argc > 1 )
-        mode = atoi(argv[1]);
+    tick();
+    for ( size_t i = 0; i < cnt; ++i )
+        sfmt_gen_rand_all(&sfmt);
+    printf("sfmt.refill  %5.2f\n", tock(cnt>>10));
+    //print(vec, end);
+    
+    //run<makeGaussians_std>(sfmt, "Gauss.STD", cnt);
+    run<makeGaussians_>(sfmt, "Gauss", cnt);
+#if USE_SIMD
+    run<makeGaussians_SIMD>(sfmt, "Gauss.SIMD", cnt);
+#endif
 
-    if ( mode )
-        print_gaussian(1<<14);
-    else
-        test_gaussian(1<<18);
+#if defined(__AVX__)
+    run<makeGaussians_AVXBM>(sfmt, "Gauss.AVXBM", cnt);
+    run<makeGaussians_AVX1>(sfmt, "Gauss.AVX1", cnt);
+    run<makeGaussians_AVX2>(sfmt, "Gauss.AVX2", cnt);
+#endif
+    
+    run<makeExponentials_>(sfmt, "Exponential", cnt);
+#if defined(__AVX__)
+    run<makeExponentials_AVX>(sfmt, "Expon.AVX", cnt);
+    if ( 0 )
+    {
+        printf("Approximate logarithm:\n");
+        real * vec = new_real(SFMT_N32);
+        check_log(vec, SFMT_N256, (uint32_t*)sfmt.state);
+        print_gaussian(std::min(SFMT_N256, 32), vec);
+    }
+#endif
 }
 
