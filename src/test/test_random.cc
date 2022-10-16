@@ -8,6 +8,7 @@
 #include <iostream>
 #include <climits>
 #include "timer.h"
+#include <random>
 
 template < typename T >
 void print_bits(FILE* f, const T& val, char spc)
@@ -348,6 +349,19 @@ real * makeGaussians_(real dst[], size_t cnt, const int32_t src[])
     return dst;
 }
 
+
+real * makeGaussians_std(real dst[], size_t cnt, const int32_t src[])
+{
+    std::random_device rd{};
+    std::mt19937 gen{rd()};
+    
+    std::normal_distribution<> distribution{0,1};
+    for ( size_t i = 0; i < cnt; ++i )
+        dst[i] = distribution(gen);
+    return dst + cnt;
+}
+
+
 real * makeExponentials_(real dst[], size_t cnt, const int32_t src[])
 {
     for ( size_t i = 0; i < cnt; ++i )
@@ -637,7 +651,8 @@ void test_gaussian(int cnt)
     printf("RNG.refill   %5.2f\n", tock(cnt>>10));
     //print(vec, end);
     
-    runGaussian<makeGaussians_>(sfmt, "Gauss_", cnt);
+    runGaussian<makeGaussians_std>(sfmt, "GaussSTD", cnt);
+    runGaussian<makeGaussians_>(sfmt, "Gauss", cnt);
 #if USE_SIMD
     runGaussian<makeGaussians_SIMD>(sfmt, "GaussSSE", cnt);
 #endif
