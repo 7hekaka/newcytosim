@@ -85,8 +85,9 @@ void print_gaussian(size_t cnt, T const* vec)
     {
         for ( int k = 0; k < 4; ++k )
         {
+            if ( i >= cnt ) break;
             printf(" :");
-            for ( int j = 0; j < 8 && i < cnt; ++j )
+            for ( int j = 0; j < 4; ++j )
                 printf(" %8.4f", vec[i++]);
         }
         printf("\n");
@@ -215,7 +216,7 @@ void run(sfmt_t& sfmt, const char str[], size_t cnt)
     real* end = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
     printf("%-12s %5.2f :", str, tock(cnt>>10));
     check_gaussian(end-vec, vec);
-    print_gaussian(std::min(end-vec, 16l), vec);
+    print_gaussian(std::min(end-vec, 8L), vec);
     free_real(vec);
 }
 

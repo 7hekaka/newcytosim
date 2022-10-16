@@ -33,6 +33,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
     const int32_t * end = src + cnt;
     const vec4f fac = set4f(0x1p-31);
     const vec4f one = set4f(1.0f);
+    const vec4f two = set4fi(2);
     const vec4f half = set4f(-0.5f);
 
     while ( src < end )
@@ -43,7 +44,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         fold_corners4f(x, y); // increases from 490 to 574 expected!
         vec4f n = add4f(mul4f(x,x), mul4f(y,y));
         // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
-        vec4f valid = and4f(lowerthan4f(n, one), set4fi(2));
+        vec4f valid = and4f(lowerthan4f(n, one), two);
         n = sqrt4f(div4f(logapprox4f(n), mul4f(half, n)));
         x = mul4f(n, x);
         y = mul4f(n, y);
@@ -222,6 +223,7 @@ static real * makeGaussians_AVX(real dst[], size_t cnt, const uint32_t* arg)
     const vec8i * end = src + cnt / 8;
 
     const vec8f one = set8f(1.0f);
+    const vec8f two = set8fi(2);
     const vec8f fac = set8f(0x1p-31);
     const vec8f half = set8f(-0.5f);
 
@@ -232,7 +234,7 @@ static real * makeGaussians_AVX(real dst[], size_t cnt, const uint32_t* arg)
         fold_corners8f(x, y); // increases from 490 to 574 expected!
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
         // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
-        vec8i valid = _mm256_castps_si256(and8f(lowerthan8f(n, one), set8fi(2)));
+        vec8i valid = _mm256_castps_si256(and8f(lowerthan8f(n, one), two));
         //w = std::sqrt( -2 * std::log(n) / n );
         n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
         y = mul8f(n, y);

@@ -258,12 +258,12 @@ LOCAL vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return _mm_sub_ps(c, _mm_mul_p
 typedef __m256 vec8f;
 typedef __m256i vec8i;
 
-LOCAL vec8f setzero8f()                  { return _mm256_setzero_ps(); }
-LOCAL vec8f set8f(float a)               { return _mm256_set1_ps(a); }
-LOCAL vec8i set8i(int a)                 { return _mm256_set1_epi32(a); }
-LOCAL vec8f set8fi(int a)                { return _mm256_castsi256_ps(_mm256_set1_epi32(a)); }
-LOCAL vec8f load8f(float const* a)       { return _mm256_load_ps(a); }
-LOCAL vec8f loadu8f(float const* a)      { return _mm256_loadu_ps(a); }
+LOCAL vec8f setzero8f()            { return _mm256_setzero_ps(); }
+LOCAL vec8f set8f(float a)         { return _mm256_set1_ps(a); }
+LOCAL vec8i set8i(int a)           { return _mm256_set1_epi32(a); }
+LOCAL vec8f set8fi(int a)          { return _mm256_castsi256_ps(_mm256_set1_epi32(a)); }
+LOCAL vec8f load8f(float const* a) { return _mm256_load_ps(a); }
+LOCAL vec8f loadu8f(float const* a) { return _mm256_loadu_ps(a); }
 
 LOCAL void storelof(float* a, vec8f b)   { _mm_store_ss(a,_mm256_castps256_ps128(b)); }
 LOCAL void store8f(float* a, vec8f b)    { _mm256_store_ps(a, b); }
