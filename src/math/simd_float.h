@@ -59,9 +59,10 @@ LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return _mm_sub_ps(c, _mm_mul_p
 typedef __m128 vec4f;
 typedef __m128i vec4i;
 
-LOCAL vec4f setzero4f()                { return _mm_setzero_ps(); }
-LOCAL vec4f set4f(float a)             { return _mm_set1_ps(a); }
-LOCAL vec4f set4fi(int a)              { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
+LOCAL vec4f setzero4f()    { return _mm_setzero_ps(); }
+LOCAL vec4f set4f(float a) { return _mm_set1_ps(a); }
+LOCAL vec4i set4i(int a)   { return _mm_set1_epi32(a); }
+LOCAL vec4f set4fi(int a)  { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
 
 /// _mm_load_ss loads a single element and zero the upper three:
 LOCAL vec4f load4f(float const* a)     { return _mm_load_ps(a); }
@@ -87,6 +88,7 @@ LOCAL vec4f max4f(vec4f a, vec4f b)    { return _mm_max_ps(a,b); }
 LOCAL vec4f or4f(vec4f a, vec4f b)     { return _mm_or_ps(a,b); }
 LOCAL vec4f and4f(vec4f a, vec4f b)    { return _mm_and_ps(a,b); }
 LOCAL vec4f andnot4f(vec4f a, vec4f b) { return _mm_andnot_ps(a,b); }
+
 LOCAL vec4f abs4f(vec4f a)             { return _mm_andnot_ps(_mm_set1_ps(-0.0f), a); }
 
 
@@ -193,12 +195,15 @@ LOCAL vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 
 #endif
 
+#if defined(__AVX2__)
+LOCAL vec4i and4i(vec4i a, vec4i b) { return (vec4i)_mm_and_ps((vec4f)a,(vec4f)b); }
+#endif
 
 #if defined(__AVX__)
 // comparison
 #define cmp4f(a,b,c) _mm_cmp_ps(a,b,c)
 
-LOCAL vec4f broadcast1f(float const* a)   { return _mm_broadcast_ss(a); }
+LOCAL vec4f broadcast1f(float const* a) { return _mm_broadcast_ss(a); }
 
 // copy a[0] into all elements of destination
 LOCAL vec4f broadcastXf(vec4f a) { return _mm_permute_ps(a,0x00); }
@@ -210,7 +215,7 @@ LOCAL vec4f broadcastZf(vec4f a) { return _mm_permute_ps(a,0xAA); }
 LOCAL vec4f broadcastTf(vec4f a) { return _mm_permute_ps(a,0xFF); }
 
 // non-temporal load
-LOCAL vec4f streamload4f(float const* a)  { return _mm_castsi128_ps(_mm_stream_load_si128((__m128i*)a)); }
+LOCAL vec4f streamload4f(float const* a) { return _mm_castsi128_ps(_mm_stream_load_si128((__m128i*)a)); }
 
 #define permute4f(a,k) _mm_permute_ps(a,k)
 // Convert between single and double types
@@ -222,8 +227,8 @@ LOCAL void store4df(float* a, __m256d b) { _mm_storeu_ps(a, _mm256_cvtpd_ps(b));
 
 #elif defined(__SSE3__)
 
-LOCAL vec4f broadcast1f(float const* a)   { return _mm_load1_ps(a); }
-LOCAL vec4f streamload4f(float const* a)  { return _mm_load_ps(a); }
+LOCAL vec4f broadcast1f(float const* a) { return _mm_load1_ps(a); }
+LOCAL vec4f streamload4f(float const* a) { return _mm_load_ps(a); }
 
 LOCAL vec4f broadcastXf(vec4f a) { return _mm_shuffle_ps(a,a,0x00); }
 LOCAL vec4f broadcastYf(vec4f a) { return _mm_shuffle_ps(a,a,0x55); }
@@ -255,6 +260,7 @@ typedef __m256i vec8i;
 
 LOCAL vec8f setzero8f()                  { return _mm256_setzero_ps(); }
 LOCAL vec8f set8f(float a)               { return _mm256_set1_ps(a); }
+LOCAL vec8i set8i(int a)                 { return _mm256_set1_epi32(a); }
 LOCAL vec8f set8fi(int a)                { return _mm256_castsi256_ps(_mm256_set1_epi32(a)); }
 LOCAL vec8f load8f(float const* a)       { return _mm256_load_ps(a); }
 LOCAL vec8f loadu8f(float const* a)      { return _mm256_loadu_ps(a); }
@@ -274,8 +280,10 @@ LOCAL vec8f min8f(vec8f a, vec8f b)      { return _mm256_min_ps(a,b); }
 LOCAL vec8f or8f(vec8f a, vec8f b)       { return _mm256_or_ps(a,b); }
 LOCAL vec8f and8f(vec8f a, vec8f b)      { return _mm256_and_ps(a,b); }
 LOCAL vec8f andnot8f(vec8f a, vec8f b)   { return _mm256_andnot_ps(a,b); }
+
 LOCAL vec8f abs8f(vec8f a)               { return _mm256_andnot_ps(_mm256_set1_ps(-0.0), a); }
 LOCAL vec8f flipsign8f(vec8f a)          { return _mm256_xor_ps(a, _mm256_set1_ps(-0.0)); }
+LOCAL vec8f lowerthan8f(vec8f a, vec8f b) { return _mm256_cmp_ps(a, b, _CMP_LT_OQ); }
 
 LOCAL vec8f unpacklo8f(vec8f a, vec8f b) { return _mm256_unpacklo_ps(a,b); }
 LOCAL vec8f unpackhi8f(vec8f a, vec8f b) { return _mm256_unpackhi_ps(a,b); }
@@ -291,6 +299,7 @@ LOCAL vec8f permute44f(vec8f a) { return _mm256_permute_ps(a, 0x4E); }
 
 
 #define permute8f128(a,b,c)  _mm256_permute4f128_ps(a,b,c)
+#define getlane8i(a, b) _mm256_extract_epi32(a, b);
 
 
 /// approximate inverse: 1/a
@@ -314,8 +323,6 @@ LOCAL vec8f load8if(vec8i const* a) { return _mm256_cvtepi32_ps(_mm256_load_si25
 
 #define cmp8f(a,b,c)         _mm256_cmp_ps(a,b,c)
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
-
-LOCAL vec8f shiftbitsR8(vec8f a, int b) { return _mm256_srli_epi32(_mm256_castps_si256(a), b); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
 LOCAL vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv_ps(pos, neg, val); }

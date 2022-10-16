@@ -241,7 +241,7 @@ int main(int argc, char* argv[])
 
 #if defined(__AVX__)
     run<makeGaussians_AVXBM>(sfmt, "Gauss.AVXBM", cnt);
-    run<makeGaussians_AVX1>(sfmt, "Gauss.AVX1", cnt);
+    run<makeGaussians_AVX>(sfmt, "Gauss.AVX", cnt);
     run<makeGaussians_AVX2>(sfmt, "Gauss.AVX2", cnt);
 #endif
     

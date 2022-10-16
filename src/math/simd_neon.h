@@ -187,6 +187,7 @@ LOCAL void store1f(float* a, vec4f b) { *a = b[0]; }
 LOCAL void store2f(float* a, vec4f b) { vst1_f32(a, vget_low_f32(b)); }
 
 LOCAL vec4f set4f(float a) { return vdupq_n_f32(a); }
+LOCAL vec4i set4i(int a)   { return vdupq_n_u32(a); }
 LOCAL vec4f set4fi(int a) { return vdupq_n_u32(a); }
 
 LOCAL vec4f load4f(float const* a) { return vld1q_f32(a); }
@@ -232,6 +233,8 @@ LOCAL vec4f hadd4f(vec4f a, vec4f b) { return vpaddq_f32(a, b); }
 LOCAL vec4f or4f(vec4f a, vec4f b) { return vorrq_s32(a, b); }
 LOCAL vec4f and4f(vec4f a, vec4f b) { return vandq_s32(a, b); }
 LOCAL vec4f andnot4f(vec4f a, vec4f b) { return vbicq_s32(a, b); }
+LOCAL vec4i and4i(vec4i a, vec4i b) { return vandq_u32(a,b); }
+
 LOCAL vec4f abs4f(vec4f a)          { return vabsq_f32(a); }
 LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}); }
 

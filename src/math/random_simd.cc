@@ -43,7 +43,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         fold_corners4f(x, y); // increases from 490 to 574 expected!
         vec4f n = add4f(mul4f(x,x), mul4f(y,y));
         // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
-        vec4i valid = shiftbitsL4(shiftbitsR4(lowerthan4f(n, one), 31), 1);
+        vec4f valid = and4f(lowerthan4f(n, one), set4fi(2));
         n = sqrt4f(div4f(logapprox4f(n), mul4f(half, n)));
         x = mul4f(n, x);
         y = mul4f(n, y);
@@ -52,24 +52,16 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         y = unpackhi4f(x, y);
 #if REAL_IS_DOUBLE
         // convert 8 single-precision values
-        store2d(dst, getlo2f(n));
-        dst += getlane4i(valid, 0);
-        store2d(dst, gethi2f(n));
-        dst += getlane4i(valid, 1);
-        store2d(dst, getlo2f(y));
-        dst += getlane4i(valid, 2);
-        store2d(dst, gethi2f(y));
-        dst += getlane4i(valid, 3);
+        store2d(dst, getlo2f(n)); dst += getlane4i(valid, 0);
+        store2d(dst, gethi2f(n)); dst += getlane4i(valid, 1);
+        store2d(dst, getlo2f(y)); dst += getlane4i(valid, 2);
+        store2d(dst, gethi2f(y)); dst += getlane4i(valid, 3);
 #else
         // convert 8 single-precision values
-        store2f(dst, getlo2f(n));
-        dst += getlane4i(valid, 0);
-        store2f(dst, gethi2f(n));
-        dst += getlane4i(valid, 1);
-        store2f(dst, getlo2f(y));
-        dst += getlane4i(valid, 2);
-        store2f(dst, gethi2f(y));
-        dst += getlane4i(valid, 3);
+        store2f(dst, getlo2f(n)); dst += getlane4i(valid, 0);
+        store2f(dst, gethi2f(n)); dst += getlane4i(valid, 1);
+        store2f(dst, getlo2f(y)); dst += getlane4i(valid, 2);
+        store2f(dst, gethi2f(y)); dst += getlane4i(valid, 3);
 #endif
     }
     return dst;
@@ -146,11 +138,10 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
     const vec8f two = set8f(-2.0f);
     const vec8f PI = set8f(M_PI*0x1p-31);
 
-    size_t i = 0;
     while ( src < end )
     {
-        // generate norm in ]0, 1]: 1 - eps * float(uint32)
-        vec8f n = sub8f(one, mul8f(eps, abs8f(load8if(src++))));
+        // generate norm in ]0, 1]: eps * float(uint32)
+        vec8f n = mul8f(eps, abs8f(load8if(src++)));
         // generate angle in ]-PI, PI[:
         vec8f t = mul8f(PI, load8if(src++));
         // transform norm:
@@ -171,7 +162,6 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
         store8f(dst+8, y);
 #endif
         dst += 16;
-        i += 16;
     }
     return dst;
 }
@@ -226,43 +216,57 @@ static inline real * remove_nan_pairs(real * s, real * e)
     return s;
 }
 
-static real * makeGaussians_AVX1(real dst[], size_t cnt, const uint32_t* arg)
+static real * makeGaussians_AVX(real dst[], size_t cnt, const uint32_t* arg)
 {
     const vec8i * src = (vec8i*)arg;
     const vec8i * end = src + cnt / 8;
 
+    const vec8f one = set8f(1.0f);
     const vec8f fac = set8f(0x1p-31);
     const vec8f half = set8f(-0.5f);
 
-    real * d = dst;
     while ( src < end )
     {
         vec8f x = mul8f(fac, load8if(src++));
         vec8f y = mul8f(fac, load8if(src++));
         fold_corners8f(x, y); // increases from 490 to 574 expected!
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
+        // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
+        vec8i valid = _mm256_castps_si256(and8f(lowerthan8f(n, one), set8fi(2)));
         //w = std::sqrt( -2 * std::log(n) / n );
         n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
-        x = mul8f(n, x);
         y = mul8f(n, y);
+        n = mul8f(n, x);
         // place corresponding X and Y values next to each other:
-        n = unpacklo8f(x, y);
-        y = unpackhi8f(x, y);
+        x = unpacklo8f(n, y);
+        y = unpackhi8f(n, y);
+        vec4f a = getlo4f(x);
+        vec4f b = getlo4f(y);
+        vec4f c = gethi4f(x);
+        vec4f d = gethi4f(y);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
-        store4d(d   , getlo4f(n));
-        store4d(d+4 , getlo4f(y));
-        store4d(d+8 , gethi4f(n));
-        store4d(d+12, gethi4f(y));
+        store2d(dst, getlo2f(a)); dst += getlane8i(valid, 0);
+        store2d(dst, gethi2f(a)); dst += getlane8i(valid, 1);
+        store2d(dst, getlo2f(b)); dst += getlane8i(valid, 2);
+        store2d(dst, gethi2f(b)); dst += getlane8i(valid, 3);
+        store2d(dst, getlo2f(c)); dst += getlane8i(valid, 4);
+        store2d(dst, gethi2f(c)); dst += getlane8i(valid, 5);
+        store2d(dst, getlo2f(d)); dst += getlane8i(valid, 6);
+        store2d(dst, gethi2f(d)); dst += getlane8i(valid, 7);
 #else
         // store 16 single-precision values
-        store8f(d  , n);
-        store8f(d+8, y);
+        store2f(dst, getlo2f(a)); dst += getlane8i(valid, 0);
+        store2f(dst, gethi2f(a)); dst += getlane8i(valid, 1);
+        store2f(dst, getlo2f(b)); dst += getlane8i(valid, 2);
+        store2f(dst, gethi2f(b)); dst += getlane8i(valid, 3);
+        store2f(dst, getlo2f(c)); dst += getlane8i(valid, 4);
+        store2f(dst, gethi2f(c)); dst += getlane8i(valid, 5);
+        store2f(dst, getlo2f(d)); dst += getlane8i(valid, 6);
+        store2f(dst, gethi2f(d)); dst += getlane8i(valid, 7);
 #endif
-        d += 16;
     }
-    return remove_nan_pairs(dst, d);
-    return d;
+    return dst;
 }
 
 
@@ -296,8 +300,8 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const uint32_t* arg)
     const vec8f half = set8f(-0.5f);
 
     real * d = dst;  //cnt=78=39*2 // cnt*8 = 640
-    real * e = dst+4*(cnt-2);
-    real * f = dst+6*(cnt-2);
+    real * e = dst+4*(cnt/8-2);
+    real * f = dst+6*(cnt/8-2);
     while ( src < end )
     {
         // generate 16 random floats in [-1, 1]:
@@ -383,7 +387,6 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const uint32_t* arg)
         f += 8;
     }
     return remove_nan_pairs(dst, f);
-    return dst+8*cnt;
 }
 
 
