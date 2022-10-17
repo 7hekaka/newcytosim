@@ -223,11 +223,11 @@ inline static real norm_inf(size_t cnt, real const* a, real const* b)
 
 //----------------------------------- DEBUG ------------------------------------
 
-inline static bool has_nan(size_t cnt, real const* ptr)
+inline static size_t has_nan(size_t cnt, real const* ptr)
 {
-    bool res = false;
+    size_t res = 0;
     for ( size_t i = 0; i < cnt; ++i )
-        res |= std::isnan(ptr[i]);
+        res += std::isnan(ptr[i]);
     return res;
 }
 

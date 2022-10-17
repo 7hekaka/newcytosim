@@ -406,7 +406,7 @@ void Meca::readyMecables()
         }
 #endif
     }
-    //fprintf(stderr, "Meca::prepare() isnan %i\n", has_nan(dimension(), vPTS));
+    //fprintf(stderr, "Meca::prepare() isnan %lu\n", has_nan(dimension(), vPTS));
 }
 
 
@@ -909,13 +909,13 @@ void Meca::apply()
             {
                 // check validity of results:
                 const size_t dim = DIM * mec->nbPoints();
-                bool a = has_nan(dim, vPTS+off);
-                bool b = has_nan(dim, vFOR+off);
+                size_t a = has_nan(dim, vPTS+off);
+                size_t b = has_nan(dim, vFOR+off);
                 //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
                 if ( a | b )
                 {
-                    bool c = has_nan(dim, vRND+off);
-                    fprintf(stderr, "invalid results for Mecable %s isnan %i %i %i\n", mec->reference().c_str(), a, b, c);
+                    size_t c = has_nan(dim, vRND+off);
+                    fprintf(stderr, "invalid results for Mecable %s isnan %lu %lu %lu\n", mec->reference().c_str(), a, b, c);
                     continue;
                 }
             }

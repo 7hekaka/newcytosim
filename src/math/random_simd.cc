@@ -34,7 +34,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
     const vec4f fac = set4f(0x1p-31);
     const vec4f one = set4f(1.0f);
     const vec4f two = set4fi(2);
-    const vec4f half = set4f(-0.5f);
+    const vec4f half = set4f(0.5f);
 
     while ( src < end )
     {
@@ -47,22 +47,23 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         vec4i valid = cast4fi(and4f(lowerthan4f(n, one), two));
         // if 'n==0' the log() and div() will give NaNs
         // n = sqrt( log(n) / ( -0.5 * n ) );
-        n = sqrt4f(div4f(logapprox4f(n), mul4f(half, n)));
-        x = mul4f(n, x);
+        n = sqrt4f(div4f(abs4f(logapprox4f(n)), mul4f(half, n)));
+        vec4f z;
+        z = mul4f(n, x);
         y = mul4f(n, y);
         // place corresponding X and Y values next to each other:
-        n = unpacklo4f(x, y);
-        y = unpackhi4f(x, y);
+        x = unpacklo4f(z, y);
+        y = unpackhi4f(z, y);
 #if REAL_IS_DOUBLE
         // convert 8 single-precision values
-        store2d(dst, getlo2f(n)); dst += getlane4i(valid, 0);
-        store2d(dst, gethi2f(n)); dst += getlane4i(valid, 1);
+        store2d(dst, getlo2f(x)); dst += getlane4i(valid, 0);
+        store2d(dst, gethi2f(x)); dst += getlane4i(valid, 1);
         store2d(dst, getlo2f(y)); dst += getlane4i(valid, 2);
         store2d(dst, gethi2f(y)); dst += getlane4i(valid, 3);
 #else
         // convert 8 single-precision values
-        store2f(dst, getlo2f(n)); dst += getlane4i(valid, 0);
-        store2f(dst, gethi2f(n)); dst += getlane4i(valid, 1);
+        store2f(dst, getlo2f(x)); dst += getlane4i(valid, 0);
+        store2f(dst, gethi2f(x)); dst += getlane4i(valid, 1);
         store2f(dst, getlo2f(y)); dst += getlane4i(valid, 2);
         store2f(dst, gethi2f(y)); dst += getlane4i(valid, 3);
 #endif
@@ -140,7 +141,7 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
 
     const vec8f eps = set8f(0x1p-31);
     const vec8f one = set8f(1.0f);
-    const vec8f two = set8f(-2.0f);
+    const vec8f two = set8f(2.0f);
     const vec8f PI = set8f(M_PI*0x1p-31);
 
     while ( src < end )
@@ -150,7 +151,7 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
         // generate angle in ]-PI, PI[:
         vec8f t = mul8f(PI, load8if(src++));
         // transform norm:
-        n = sqrt8f(mul8f(logapprox8f(n), two));
+        n = sqrt8f(mul8f(abs8f(logapprox8f(n)), two));
         vec8f x, y;
         sincosapprox8f(x, y, t);
         x = mul8f(n, x);

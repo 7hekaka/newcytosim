@@ -343,8 +343,8 @@ void Random::refill_gaussians()
 #else
     next_gaussian_ = makeGaussians(gaussians_, SFMT_N32, (int32_t*)twister_.state);
 #endif
-    //bool i = has_nan(next_gaussian_-gaussians_, gaussians_);
-    //printf("refill_gaussians %lu nan %i\n", next_gaussian_ - gaussians_, i);
+    //size_t i = has_nan(next_gaussian_-gaussians_, gaussians_);
+    //printf("refill_gaussians %lu nan %lu\n", next_gaussian_ - gaussians_, i);
     sfmt_gen_rand_all(&twister_);
 }
 
