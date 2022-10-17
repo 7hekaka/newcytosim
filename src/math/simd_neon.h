@@ -245,7 +245,7 @@ LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}
 /// select 'b' if 'k==1' and 'a' otherwise
 LOCAL vec4f blendv4f(vec4f a, vec4f b, vec4f k) { return vbslq_f32(k,b,a); }
 /// return `neg` if `val < 0` and `pos` otherwise
-LOCAL vec4f signselect4f(vec4f val, vec4f neg, vec4f pos) { return vbslq_f32(neg, pos, vcleq_f32(val, setzero4f())); }
+LOCAL vec4f signselect4f(vec4f val, vec4f neg, vec4f pos) { return vbslq_f32(vcleq_f32(val, setzero4f()), neg, pos); }
 
 /// return { a[0], a[1], b[2], b[3] }
 LOCAL vec4f blend31f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,0,0,0},a,b); }

@@ -914,7 +914,8 @@ void Meca::apply()
                 //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
                 if ( a | b )
                 {
-                    fprintf(stderr, "invalid results for Mecable %s isnan %i %i\n", mec->reference().c_str(), a, b);
+                    bool c = has_nan(dim, vRND+off);
+                    fprintf(stderr, "invalid results for Mecable %s isnan %i %i %i\n", mec->reference().c_str(), a, b, c);
                     continue;
                 }
             }

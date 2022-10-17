@@ -16,7 +16,11 @@ thread_local Random RNG;
 
 /// use Vectorized makeGaussians(), if available (requires NEON/SSE3)
 #if  defined(__ARM_NEON__) || defined(__SSE3__)
-#  define RANDOM_USES_SIMD 1
+#  define RANDOM_USES_SIMD 0
+#  include "simd.h"
+#  include "simd_float.h"
+#  include "simd_math.h"
+#  include "random_simd.cc"
 #else
 #  define RANDOM_USES_SIMD 0
 #endif
@@ -280,7 +284,6 @@ void Random::gauss_set(real & a, real & b, real v)
     b = w * y;
 }
 
-#if ( !RANDOM_USES_SIMD )
 
 /**
  Fill array `vec[]` with Gaussian values ~ N(0,1).
@@ -290,11 +293,13 @@ void Random::gauss_set(real & a, real & b, real v)
  */
 real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
 {
+    const real alpha(TWO_POWER_MINUS_31);
     int32_t const*const end = src + cnt;
     while ( src < end )
     {
-        real x = src[0] * TWO_POWER_MINUS_31;
-        real y = src[1] * TWO_POWER_MINUS_31;
+        real x = real(src[0]) * alpha;
+        real y = real(src[1]) * alpha;
+        src += 2;
 #if 1
         /**
         This folds the corners of [-1, 1] x [-1, 1] that are outside the unit circle,
@@ -314,14 +319,13 @@ real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
         }
 #endif
         real w = x * x + y * y;
-        if (( w <= 1 ) & ( 0 < w ))
+        if (( 0 < w ) & ( w <= 1 ))
         {
             w = std::sqrt( -2 * std::log(w) / w );
             dst[0] = w * x;
             dst[1] = w * y;
             dst += 2;
         }
-        src += 2;
     }
     return dst;
 }
@@ -334,32 +338,15 @@ real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
  */
 void Random::refill_gaussians()
 {
-    next_gaussian_ = makeGaussians(gaussians_, SFMT_N32, (int32_t*)twister_.state);
-    //printf("refill_gaussians %lu\n", next_gaussian_ - gaussians_);
-    sfmt_gen_rand_all(&twister_);
-}
-
+#if ( RANDOM_USES_SIMD )
+    next_gaussian_ = makeGaussians_SIMD(gaussians_, SFMT_N32, (uint32_t*)twister_.state);
 #else
-
-#include "simd.h"
-#include "simd_float.h"
-#include "simd_math.h"
-#include "random_simd.cc"
-
-/**
- Fill array `gaussians_` with approximately 500 Gaussian values ~ N(0,1).
- Set `next_gaussian` past the last position containing a valid number.
- The number of gaussian values set by this function is random,
- and it may even be zero.
- */
-void Random::refill_gaussians()
-{
-    next_gaussian_ = makeGaussians_SIMD(gaussians_, SFMT_N256, (uint32_t*)twister_.state);
-    //printf("refill_gaussians_simd %lu\n", next_gaussian_ - gaussians_);
+    next_gaussian_ = makeGaussians(gaussians_, SFMT_N32, (int32_t*)twister_.state);
+#endif
+    //bool i = has_nan(next_gaussian_-gaussians_, gaussians_);
+    //printf("refill_gaussians %lu nan %i\n", next_gaussian_ - gaussians_, i);
     sfmt_gen_rand_all(&twister_);
 }
-
-#endif
 
 
 #if ( 0 )
@@ -431,26 +418,29 @@ void Random::gauss_boxmuller(real& x, real& y)
 //------------------------------------------------------------------------------
 #pragma mark - Exponential derivates
 
-/**
-Could use here the SIMD approximate Logarithm function
- */
-void makeExponentials(real dst[], size_t cnt, const uint32_t src[])
+/// this is the default implementation
+real * makeExponentials(real dst[], size_t cnt, const uint32_t src[])
 {
+    const real alpha(TWO_POWER_MINUS_32);
     for ( size_t i = 0; i < cnt; ++i )
     {
-        real x = std::fabs(static_cast<real>(src[i]));
-        dst[i] = -std::log(1 - x * TWO_POWER_MINUS_31);
+        real x = static_cast<real>(src[i]);
+        // since x < 2^32, the argument to log should be > 0:
+        dst[i] = -std::log( 1 - alpha * x );
     }
+    return dst + cnt;
 }
+
 
 void Random::refill_exponentials()
 {
 #if ( RANDOM_USES_SIMD )
-    makeExponentials_SIMD(exponentials_, SFMT_N256, (uint32_t*)twister_.state);
+    real * ptr = makeExponentials_SIMD(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #else
-    makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
+    real * ptr = makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #endif
-    next_exponential_ = exponentials_ + SFMT_N32;
+    //assert_true( ptr == exponentials_ + SFMT_N32 );
+    next_exponential_ = ptr;
     //printf("refill_exponentials\n");
     sfmt_gen_rand_all(&twister_);
 }

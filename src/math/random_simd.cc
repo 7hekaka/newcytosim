@@ -11,9 +11,9 @@
  */
 static inline void fold_corners4f(vec4f& x, vec4f& y)
 {
-    // test if point is close to corner, separated by line |x|+|y| > sqrt(2)
+    // test if point is close to a corner, crossing lines |x|+|y| > sqrt(2)
     vec4f mut = greaterequal4f(add4f(abs4f(x), abs4f(y)), set4f(M_SQRT2));
-    // coordinates of nearest corner, scaled: copysign(S, x)
+    // coordinates of nearest corner, scaled by S: copysign(S, x)
     constexpr float S = M_SQRT2 + 1.0f;
     const vec4f pos = set4f(S), neg = set4f(-S);
     vec4f cx = signselect4f(x, neg, pos);
@@ -120,12 +120,12 @@ static inline void fold_corners8f(vec8f& x, vec8f& y)
     vec8f mut = cmp8f(add8f(abs8f(x), abs8f(y)), set8f(M_SQRT2), _CMP_GE_OQ);
     // coordinates of nearest corner, scaled: copysign(S, x)
     constexpr float S = M_SQRT2 + 1.0f;
-    const vec8f ss = set8f(S), mm = set8f(-S);
-    vec8f cx = blendv8f(ss, mm, x); //use the sign of 'x'
-    vec8f cy = blendv8f(ss, mm, y); //use the sign of 'y'
+    const vec8f pos = set8f(S), neg = set8f(-S);
+    vec8f cx = blendv8f(pos, neg, x); //use the sign of 'x'
+    vec8f cy = blendv8f(pos, neg, y); //use the sign of 'y'
     // subtract corner to recover a square of side 2, covering the circle
-    cx = sub8f(mul8f(ss, x), cx);
-    cy = sub8f(mul8f(ss, y), cy);
+    cx = sub8f(mul8f(pos, x), cx);
+    cy = sub8f(mul8f(pos, y), cy);
     // apply mutation, if selected:
     x = blendv8f(x, cx, mut);
     y = blendv8f(y, cy, mut);
