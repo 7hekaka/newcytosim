@@ -177,6 +177,9 @@ LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return vfms_f32(c,a,b); }
 typedef float32x4_t vec4f;
 typedef int32x4_t vec4i;
 
+LOCAL vec4i cast4fi(vec4f a) { return vreinterpretq_s32_f32(a); }
+LOCAL vec4f cast4if(vec4i a) { return vreinterpretq_f32_s32(a); }
+
 LOCAL vec4f setzero4f() { return vdupq_n_f32(0); }
 
 LOCAL vec4f broadcast1f(float const* a) { return vld1q_dup_f32(a); }

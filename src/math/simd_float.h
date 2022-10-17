@@ -59,10 +59,13 @@ LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return _mm_sub_ps(c, _mm_mul_p
 typedef __m128 vec4f;
 typedef __m128i vec4i;
 
+LOCAL vec4i cast4fi(vec4f a) { return _mm_castps_si128(a); }
+LOCAL vec4f cast4if(vec4i a) { return _mm_castsi128_ps(a); }
+
 LOCAL vec4f setzero4f()    { return _mm_setzero_ps(); }
 LOCAL vec4f set4f(float a) { return _mm_set1_ps(a); }
 LOCAL vec4i set4i(int a)   { return _mm_set1_epi32(a); }
-LOCAL vec4f set4fi(int a)  { return _mm_castsi128_ps(_mm_set1_epi32(a)); }
+LOCAL vec4f set4fi(int a)  { return cast4if(_mm_set1_epi32(a)); }
 
 /// _mm_load_ss loads a single element and zero the upper three:
 LOCAL vec4f load4f(float const* a)     { return _mm_load_ps(a); }
@@ -113,11 +116,11 @@ LOCAL vec2f getlo2f(vec4f a) { return (vec2f)a; }
 LOCAL vec2f gethi2f(vec4f a) { return (vec2f)_mm_movehl_ps(a, a); }
 
 // return { A1, A2, A3, B0 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-LOCAL vec4f catshift1f(vec4f a, vec4f b) { return _mm_castsi128_ps(_mm_alignr_epi8(_mm_castps_si128(b), _mm_castps_si128(a), 4)); }
+LOCAL vec4f catshift1f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4fi(b), cast4fi(a), 4)); }
 // return { A2, A3, B0, B1 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
 LOCAL vec4f catshift2f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
 // return { A3, B0, B1, B2 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-LOCAL vec4f catshift3f(vec4f a, vec4f b) { return _mm_castsi128_ps(_mm_alignr_epi8(_mm_castps_si128(b), _mm_castps_si128(a), 12)); }
+LOCAL vec4f catshift3f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4fi(b), cast4fi(a), 12)); }
 
 LOCAL vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
 LOCAL vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }
@@ -129,8 +132,8 @@ LOCAL vec4f cmpge4f(vec4f a, vec4f b) { return _mm_cmpge_ps(a, b); }
 LOCAL int lower_mask4f(vec4f a, vec4f b) { return _mm_movemask_ps(_mm_cmplt_ps(a,b)); }
 LOCAL int any_true4f(vec4f a) { return !_mm_test_all_zeros((__m128i)a, (__m128i{-1l, -1l})); }
 
-LOCAL vec4f shiftbitsR4(vec4f a, int b) { return _mm_srli_epi32(_mm_castps_si128(a), b); }
-LOCAL vec4f shiftbitsL4(vec4f a, int b) { return _mm_slli_epi32(_mm_castps_si128(a), b); }
+LOCAL vec4i shiftbitsR4(vec4f a, int b) { return _mm_srli_epi32(cast4fi(a), b); }
+LOCAL vec4i shiftbitsL4(vec4f a, int b) { return _mm_slli_epi32(cast4fi(a), b); }
 
 /// extract component
 //LOCAL int32_t getlane4i(vec4i a, int b) { return _mm_extract_epi32(a, b); }
@@ -196,10 +199,6 @@ LOCAL vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
 
 #endif
 
-#if defined(__AVX2__)
-LOCAL vec4i and4i(vec4i a, vec4i b) { return (vec4i)_mm_and_ps((vec4f)a,(vec4f)b); }
-#endif
-
 #if defined(__AVX__)
 // comparison
 #define cmp4f(a,b,c) _mm_cmp_ps(a,b,c)
@@ -216,7 +215,7 @@ LOCAL vec4f broadcastZf(vec4f a) { return _mm_permute_ps(a,0xAA); }
 LOCAL vec4f broadcastTf(vec4f a) { return _mm_permute_ps(a,0xFF); }
 
 // non-temporal load
-LOCAL vec4f streamload4f(float const* a) { return _mm_castsi128_ps(_mm_stream_load_si128((__m128i*)a)); }
+LOCAL vec4f streamload4f(float const* a) { return cast4if(_mm_stream_load_si128((__m128i*)a)); }
 
 #define permute4f(a,k) _mm_permute_ps(a,k)
 // Convert between single and double types
@@ -318,7 +317,7 @@ LOCAL vec8f cat44f(vec4f l, vec4f h) { return _mm256_insertf128_ps(_mm256_castps
 LOCAL vec8f cvt8if(vec8i a) { return _mm256_cvtepi32_ps(a); }
 LOCAL vec8f cast8f(vec8i a) { return _mm256_castsi256_ps(a); }
 
-LOCAL vec8f load8i(vec8i const* a) { return _mm256_load_si256(a); }
+LOCAL vec8i load8i(vec8i const* a) { return _mm256_load_si256(a); }
 /// load integers and convert to float:
 LOCAL vec8f load8if(vec8i const* a) { return _mm256_cvtepi32_ps(_mm256_load_si256(a)); }
 
@@ -329,6 +328,14 @@ LOCAL vec8f load8if(vec8i const* a) { return _mm256_cvtepi32_ps(_mm256_load_si25
 LOCAL vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv_ps(pos, neg, val); }
 
 #endif // AVX
+
+#if defined(__AVX2__)
+
+LOCAL vec4i and4i(vec4i a, vec4i b) { return (vec4i)_mm_and_ps((vec4f)a,(vec4f)b); }
+LOCAL vec8i shiftbitsR8(vec8f a, int b) { return _mm256_srli_epi32(_mm256_castps_si256(a), b); }
+LOCAL vec8i shiftbitsL8(vec8f a, int b) { return _mm256_slli_epi32(_mm256_castps_si256(a), b); }
+
+#endif
 
 #if 0
 
