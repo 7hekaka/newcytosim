@@ -218,6 +218,7 @@ LOCAL vec4f cvt4if(int32x4_t a) { return vcvtq_f32_s32(a); }
 LOCAL vec4f load4if(int32_t const* a) { return vcvtq_f32_s32(vld1q_s32(a)); }
 LOCAL vec4f load4uf(uint32_t const* a) { return vcvtq_f32_u32(vld1q_u32(a)); }
 
+LOCAL vec4i negative4f(vec4f a) { return vcltq_f32(a, setzero4f()); }
 LOCAL vec4i positive4f(vec4f a) { return vcgtq_f32(a, setzero4f()); }
 LOCAL vec4i notpositive4f(vec4f a) { return vcleq_f32(a, setzero4f()); }
 LOCAL vec4i greaterequal4f(vec4f a, vec4f b) { return vcgeq_f32(a,b); }

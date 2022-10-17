@@ -152,6 +152,7 @@ LOCAL vec4f sqrt4f(vec4f a) { return _mm_sqrt_ps(a); }
 /// approximate reciprocal square root: 1 / sqrt(a)
 LOCAL vec4f rsqrt4f(vec4f a) { return _mm_rsqrt_ps(a); }
 
+LOCAL vec4f negative4f(vec4f a) { return _mm_cmplt_ps(a, setzero4f()); }
 LOCAL vec4f positive4f(vec4f a) { return _mm_cmpgt_ps(a, setzero4f()); }
 LOCAL vec4f notpositive4f(vec4f a) { return _mm_cmpngt_ps(a, setzero4f()); }
 LOCAL vec4f greaterequal4f(vec4f a, vec4f b) { return _mm_cmpge_ps(a, b); }

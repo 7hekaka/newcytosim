@@ -34,7 +34,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
     const vec4f fac = set4f(0x1p-31);
     const vec4f one = set4f(1.0f);
     const vec4f two = set4fi(2);
-    const vec4f half = set4f(0.5f);
+    const vec4f half = set4f(-0.5f);
 
     while ( src < end )
     {
@@ -43,11 +43,12 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         src += 8;
         fold_corners4f(x, y); // increases from 490 to 574 expected!
         vec4f n = add4f(mul4f(x,x), mul4f(y,y));
-        // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
-        vec4i valid = cast4fi(and4f(lowerthan4f(n, one), two));
-        // if 'n==0' the log() and div() will give NaNs
+        // the log() will be negative if `n < 1`, returning 0 if n == 0:
+        vec4f l = logapprox4f(n);
+        // set valid[i] to 2 whenever `l[i] < 0`, and 0 otherwise:
+        vec4i valid = cast4fi(and4f(negative4f(l), two));
         // n = sqrt( log(n) / ( -0.5 * n ) );
-        n = sqrt4f(div4f(abs4f(logapprox4f(n)), mul4f(half, n)));
+        n = sqrt4f(div4f(l, mul4f(half, n)));
         vec4f z;
         z = mul4f(n, x);
         y = mul4f(n, y);
