@@ -14,8 +14,12 @@
 thread_local Random RNG;
 
 
-/// use SIMD to generate Gaussians faster (requires NEON/SSE3)
-#define RANDOM_USES_SIMD 1
+/// use Vectorized makeGaussians(), if available (requires NEON/SSE3)
+#if  defined(__ARM_NEON__) || defined(__SSE3__)
+#  define RANDOM_USES_SIMD 1
+#else
+#  define RANDOM_USES_SIMD 0
+#endif
 
 
 /// the most significant bit in a 32-bits integer
@@ -341,7 +345,6 @@ void Random::refill_gaussians()
 #include "simd_float.h"
 #include "simd_math.h"
 #include "random_simd.cc"
-
 
 /**
  Fill array `gaussians_` with approximately 500 Gaussian values ~ N(0,1).
