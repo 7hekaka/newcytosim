@@ -45,6 +45,8 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         vec4f n = add4f(mul4f(x,x), mul4f(y,y));
         // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
         vec4f valid = and4f(lowerthan4f(n, one), two);
+        // if 'n==0' the log() and div() will give NaNs
+        // n = sqrt( log(n) / ( -0.5 * n ) );
         n = sqrt4f(div4f(logapprox4f(n), mul4f(half, n)));
         x = mul4f(n, x);
         y = mul4f(n, y);
@@ -70,7 +72,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
 
 
 
-/// compute exponential derivates
+/// compute approximate exponential derivates
 static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
 {
     const int32_t * src = (int32_t*)arg;
@@ -80,8 +82,10 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
     
     while ( src < end )
     {
-        // dst = -log(real(src) * TWO_POWER_MINUS_31 );
+        // dst = -log( float(src) * TWO_POWER_MINUS_31 );
         vec4f z = abs4f(cvt4if(load4i(src)));
+        // there is small chance that 'z==0' and in this case log(z) == -inf
+        // however, the logapprox4f(z) will return 0, so we are safe
         vec4f x = sub4f(off, logapprox4f(z));
         src += 4;
 #if REAL_IS_DOUBLE

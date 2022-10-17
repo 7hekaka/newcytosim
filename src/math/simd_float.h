@@ -149,6 +149,7 @@ LOCAL vec4f sqrt4f(vec4f a) { return _mm_sqrt_ps(a); }
 /// approximate reciprocal square root: 1 / sqrt(a)
 LOCAL vec4f rsqrt4f(vec4f a) { return _mm_rsqrt_ps(a); }
 
+LOCAL vec4f positive4f(vec4f a) { return _mm_cmpgt_ps(a, setzero4f()); }
 LOCAL vec4f notpositive4f(vec4f a) { return _mm_cmpngt_ps(a, setzero4f()); }
 LOCAL vec4f greaterequal4f(vec4f a, vec4f b) { return _mm_cmpge_ps(a, b); }
 LOCAL vec4f lowerthan4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
@@ -169,7 +170,7 @@ LOCAL vec4f clear4th(vec4f a) { return _mm_blend_ps(a,_mm_setzero_ps(),0b1000); 
 /// return { a[0], a[1], b[2], a[3] }
 LOCAL vec4f blend0010f(vec4f a, vec4f b) { return _mm_blend_ps(a,b,0b0100); }
 
-/// blend `a` and `b` based on mask `k`: select 'b' if 'k==1' and 'a' otherwise
+/// blend `a` and `b` based on mask `k`: select 'b' if 'topmost bit of k == 1' and 'a' otherwise
 LOCAL vec4f blendv4f(vec4f a, vec4f b, vec4f k) { return _mm_blendv_ps(a,b,k); }
 
 /// return `neg` if `val < 0` and `pos` otherwise

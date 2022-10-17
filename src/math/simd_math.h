@@ -15,7 +15,7 @@ inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
 /**
  Absolute error bounded by 1e-5 for normalized inputs
  Returns a finite number for +inf input
- Returns -inf for nan and <= 0 inputs.
+ MODIFIED: Returns 0 for nan and negative inputs.
  Continuous error.
  SIMD by FJN 12.01.2021 derived from:
  http://gallium.inria.fr/blog/fast-vectorizable-math-approx/
@@ -33,8 +33,9 @@ inline vec4f logapprox4f(vec4f x)
     const vec4f e = set4f(+3.110401639e-2f);
     const vec4f f = set4f(-89.970756366f);
     const vec4f g = set4f(0.6931471805f);
-    // used to clear negative / NaN arguments:
-    vec4f invalid = notpositive4f(x);
+    // used to clear invalid results:
+    //vec4f invalid = notpositive4f(x);
+    vec4f valid = positive4f(x);
     // extract exponent:
     vec4f cst = cvt4if(shiftbitsR4(x, 23));
     cst = fmadd4f(cst, g, f);
@@ -46,8 +47,12 @@ inline vec4f logapprox4f(vec4f x)
     tmp = fmadd4f(x, tmp, b);
     tmp = fmadd4f(x, tmp, a);
     tmp = fmadd4f(x, tmp, cst);
-    // set invalid arguments to all 1s which is not-a-number:
-    return or4f(tmp, invalid);
+    //set invalid arguments to all 1s which is not-a-number:
+    // return or4f(tmp, invalid);
+    //return -infinity for zero or not-a-number arguments:
+    // return blendv4f(tmp, set4f(-INFINITY), invalid);
+    //return zero for zero or not-a-number arguments:
+    return and4f(tmp, valid);
 }
 
 #endif
