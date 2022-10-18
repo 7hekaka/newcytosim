@@ -146,6 +146,7 @@ def main(args):
             # wait for completion of all jobs:
             for j in jobs:
                 j.join()
+                j.close()
             return 0
         except ImportError:
             err.write("Warning: multiprocessing module unavailable\n")

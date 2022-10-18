@@ -231,6 +231,7 @@ class Gosimer:
             # wait for completion of all jobs:
             for j in jobs:
                 j.join()
+                j.close()
         return 0
 
 #-------------------------------------------------------------------------------
