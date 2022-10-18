@@ -794,11 +794,13 @@ void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
         }
     }
     
-    if ( cnt )
+    if ( cnt > 0 )
     {
         avg /= cnt;
-        var = ( var - square(avg)*cnt ) / real(cnt-1);
+        var -= square(avg)*cnt;
     }
+    if ( cnt > 1 )
+        var /= real(cnt-1);
 }
 
 
@@ -825,11 +827,13 @@ void FiberSet::infoBirthtime(ObjectList const& objs, size_t& cnt,
         }
     }
     
-    if ( cnt )
+    if ( cnt > 0 )
     {
         avg /= cnt;
-        var = ( var - square(avg)*cnt ) / real(cnt-1);
+        var -= square(avg)*cnt;
     }
+    if ( cnt > 1 )
+        var /= real(cnt-1);
 }
 
 
@@ -1268,11 +1272,13 @@ void FiberSet::infoBendingEnergy(ObjectList const& objs, size_t& cnt,
         }
     }
     
-    if ( cnt )
+    if ( cnt > 0 )
     {
         avg /= cnt;
-        var = ( var - square(avg)*cnt ) / real(cnt-1);
+        var -= square(avg)*cnt;
     }
+    if ( cnt > 1 )
+        var /= real(cnt-1);
 }
 
 /**

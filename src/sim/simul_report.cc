@@ -760,8 +760,10 @@ void Simul::reportFiberExtension(std::ostream& out) const
         }
         if ( cnt > 0 )
         {
-            avg /= real(cnt);
-            var = ( var - square(avg) * cnt ) / real(cnt-1);
+            avg /= cnt;
+            var -= square(avg)*cnt;
+            if ( cnt > 1 )
+                var /= real(cnt-1);
             out << LIN << ljust(p->name(), 2);
             out << SEP << cnt;
             out << SEP << avg;
