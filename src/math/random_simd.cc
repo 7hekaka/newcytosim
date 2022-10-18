@@ -32,7 +32,6 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
     const int32_t * src = (int32_t*)arg;
     const int32_t * end = src + cnt;
     const vec4f fac = set4f(0x1p-31);
-    const vec4f one = set4f(1.0f);
     const vec4f two = set4fi(2);
     const vec4f half = set4f(-0.5f);
 
@@ -141,7 +140,6 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
     const vec8i * end = src + cnt / 8;
 
     const vec8f eps = set8f(0x1p-31);
-    const vec8f one = set8f(1.0f);
     const vec8f two = set8f(2.0f);
     const vec8f PI = set8f(M_PI*0x1p-31);
 
