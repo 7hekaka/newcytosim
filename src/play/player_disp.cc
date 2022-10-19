@@ -379,6 +379,9 @@ int Player::saveView(const char* filename, const char* format, int downsample) c
 }
 
 
+/**
+ Attempts to build an image file name from the elements
+ */
 void fixFileName(char str[], size_t len, const char format[], size_t indx)
 {
     static int virgin = true;
@@ -390,7 +393,7 @@ void fixFileName(char str[], size_t len, const char format[], size_t indx)
     // add a number if a file was already saved:
     if ( !ptr && !virgin )
         ptr = str + strlen(str);
-    // add number:
+    // insert number:
     if ( ptr )
         ptr += snprintf(ptr, len-(ptr-str), "%04lu", indx);
     else
@@ -399,16 +402,16 @@ void fixFileName(char str[], size_t len, const char format[], size_t indx)
     if ( ptr - str + strlen(format) < len )
     {
         *ptr++ = '.';
-        strncpy(ptr, format, strlen(format));
+        strcpy(ptr, format);
     }
     virgin = false;
 }
     
 /**
- Export image from the current OpenGL back buffer,
+ Save image from the current OpenGL back buffer,
  in the format specified by 'PlayerProp::image_format',
  in the folder specified in `PlayerProp::image_dir`.
- The name of the file is formed by concatenating 'root' and 'indx'.
+ The file name is derived from `PlayerProp::image_name` by including 'indx'.
  */
 int Player::saveView(size_t indx, int downsample) const
 {
