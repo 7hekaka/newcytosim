@@ -1375,9 +1375,9 @@ void Chain::segmentationVariance(real const* ptr, real& mean, real& variance) co
         var += r*r;
     }
     avg /= cnt;
-    var -= square(avg)*cnt;
+    variance = var - square(avg)*cnt;
     if ( cnt > 1 )
-        var /= real(cnt-1);
+        variance /= real(cnt-1);
     mean = avg + off;
 }
 
