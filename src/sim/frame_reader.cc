@@ -8,7 +8,7 @@
 #include "simul.h"
 #include "dim.h"
 
-// Use the second definition to get some reports:
+// Use second definition to trace execution
 #define VLOG(ARG) ((void) 0)
 //#define VLOG(ARG) std::clog << ARG;
 

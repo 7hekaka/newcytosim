@@ -6,7 +6,7 @@
 #include "exceptions.h"
 #include <errno.h>
 
-// Use the second definition to get some reports:
+// Use second definition to trace execution
 #define VLOG(ARG) ((void) 0)
 //#define VLOG(ARG) std::clog << ARG;
 
@@ -127,7 +127,7 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
     
     std::string res = get_stuff(is, valid_symbol);
     
-    VLOG("SYMBOL |" << res << "|\n");
+    VLOG("Tokenizer: SYMBOL |" << res << "|\n");
 
     return res;
 }
@@ -226,7 +226,7 @@ std::string Tokenizer::get_path(std::istream& is, bool eat_line)
     
     std::string res = get_stuff(is, valid_path);
     
-    VLOG(" FILENAME |" << res << "|\n");
+    VLOG("Tokenizer: FILENAME |" << res << "|\n");
     
     return res;
 }
@@ -288,7 +288,7 @@ std::string Tokenizer::get_integer(std::istream& is)
     if ( c != EOF )
         is.unget();
     
-    VLOG("INTEGER |" << res << "|\n");
+    VLOG("Tokenizer: INTEGER |" << res << "|\n");
     return res;
 }
 
@@ -477,7 +477,7 @@ std::string Tokenizer::get_real(std::istream& is)
     if ( c != EOF )
         is.unget();
     
-    VLOG("REAL |" << res << "|\n");
+    VLOG("Tokenizer: REAL |" << res << "|\n");
     return res;
 }
 
@@ -530,7 +530,7 @@ std::string Tokenizer::get_token(std::istream& is)
     }
     
     // anything else is one character long:
-    VLOG(" ASCII |" << c << "|\n");
+    VLOG("Tokenizer: ASCII |" << c << "|\n");
     return std::string(1,(char)c);
 }
 
@@ -603,7 +603,7 @@ std::string Tokenizer::get_block(std::istream& is, char c_in, bool or_die)
     {
         is.get();
         std::string res = get_block_text(is, 0, block_delimiter(c_in));
-        VLOG("BLOCK |" << res << "|\n");
+        VLOG("Tokenizer:BLOCK |" << res << "|\n");
         return res;
     }
 

@@ -722,7 +722,7 @@ size_t Meca::solve()
     {
         // tolerance will be understood as an absolute quantity
         if ( alpha_ > 0 )
-            Cytosim::log << "Warning: all Brownian terms are zero\n";
+            Cytosim::log << "Warning: all Brownian terms are zero?\n";
     }
     
     /*

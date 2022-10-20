@@ -16,7 +16,7 @@
 #include "simul.h"
 
 
-// Use the second definition to get some reports:
+// Use second definition to trace execution
 #define VLOG(ARG) ((void) 0)
 //#define VLOG(ARG) std::clog << ARG;
 
@@ -1069,8 +1069,7 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( size_t c = 0; c < cnt; ++c )
     {
-        if ( simulProp().verbose )
-            Cytosim::log("repeat code %lu/%lu\n", c+1, cnt);
+        VLOG("--repeat code " << c+1 << "/" << cnt << "\n");
         evaluate(code);
     }
 }

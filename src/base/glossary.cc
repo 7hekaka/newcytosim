@@ -313,11 +313,11 @@ int Glossary::read_key(Glossary::pair_type& res, std::istream& is)
 
     if ( op == '=' )
     {
-        VLOG2("Glossary::KEY     |" << res.first << "| = \n");
+        VLOG2("Glossary:KEY     |" << res.first << "| = \n");
         return 0;
     }
     
-    VLOG2("Glossary::KEY     |" << res.first << "|\n");
+    VLOG2("Glossary:KEY     |" << res.first << "|\n");
     return 2;
 }
 
@@ -330,7 +330,7 @@ void Glossary::add_value(Glossary::pair_type& res, std::string& str, bool def)
     //remove any space at the end of the string:
     std::string val = Tokenizer::trim(str);
     
-    VLOG2("Glossary::SET" << std::setw(20) << res.first << "[" << res.second.size() << "] = |" << val << "|\n");
+    VLOG2("Glossary:SET" << std::setw(20) << res.first << "[" << res.second.size() << "] = |" << val << "|\n");
 
     res.second.emplace_back(val, def);
 }
@@ -422,7 +422,7 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
  */
 void Glossary::add_entry(Glossary::pair_type const& pair, int no_overwrite)
 {
-    VLOG0("Glossary::ENTRY" << pair.second.size() << "   " << pair << '\n');
+    VLOG0("Glossary:ENTRY" << pair.second.size() << "   " << pair << '\n');
     
     map_type::iterator w = mTerms.find(pair.first);
     
@@ -465,7 +465,7 @@ void Glossary::define(key_type const& key, const std::string& arg, size_t inx = 
         // add new key and its value at index 0:
         mTerms[key].emplace_back(val, true);
 
-        VLOG1("Glossary::DEFINE    " << key << " = |" << val << "|\n");
+        VLOG1("Glossary:DEFINE    " << key << " = |" << val << "|\n");
     }
     else
     {
@@ -479,7 +479,7 @@ void Glossary::define(key_type const& key, const std::string& arg, size_t inx = 
         else
             throw InvalidSyntax("index out of range in Glossary::define");
         
-        VLOG1("Glossary::DEFINE    " << key << "[" << inx << "] = |" << val << "|\n");
+        VLOG1("Glossary:DEFINE    " << key << "[" << inx << "] = |" << val << "|\n");
     }
 }
 
@@ -613,7 +613,7 @@ void Glossary::read(std::istream& is, int no_overwrite)
 
 void Glossary::read(std::string const& str, int no_overwrite)
 {
-    VLOG2("Glossary::READ STR |" << str << "|\n");
+    VLOG2("Glossary:READ STR |" << str << "|\n");
     std::istringstream iss(str);
     read(iss, no_overwrite);
 }
@@ -642,7 +642,7 @@ void Glossary::read_file(const char path[], int no_overwrite)
 void Glossary::read_string(const char arg[], int no_overwrite)
 {
     pair_type pair;
-    VLOG0("Glossary::ARG      |" << arg << "|\n");
+    VLOG0("Glossary:ARG      |" << arg << "|\n");
     if ( strchr(arg, '=') )
     {
         /*
@@ -801,7 +801,7 @@ void Glossary::set_value(std::string& var, key_type const& key, std::string cons
 {
     //var = Tokenizer::trim(val);
     var = val;
-    VLOG2("Glossary::SET STR   " << key << " = |" << var << "|\n");
+    VLOG2("Glossary:SET STR   " << key << " = |" << var << "|\n");
 }
 
 

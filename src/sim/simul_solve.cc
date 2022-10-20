@@ -88,8 +88,8 @@ void Simul::setAllInteractions(Meca& meca) const
     for ( Fiber const* f=fibers.first(); f ; f=f->next() )
         f->setInteractions(meca);
     
-    for ( Solid const* s=solids.first(); s ; s=s->next() )
-        s->setInteractions(meca);
+    for ( Solid const* d=solids.first(); d ; d=d->next() )
+        d->setInteractions(meca);
     
     for ( Sphere const* o=spheres.first(); o ; o=o->next() )
         o->setInteractions(meca);
@@ -98,11 +98,11 @@ void Simul::setAllInteractions(Meca& meca) const
         b->setInteractions(meca);
 #endif
 
-    for ( Space const* s=spaces.first(); s; s=s->next() )
-        s->setInteractions(meca, *this);
+    for ( Space const* e=spaces.first(); e; e=e->next() )
+        e->setInteractions(meca, *this);
 
-    for ( Single const* i=singles.firstA(); i ; i=i->next() )
-        i->setInteractions(meca);
+    for ( Single const* s=singles.firstA(); s ; s=s->next() )
+        s->setInteractions(meca);
 
     for ( Couple const* c=couples.firstAA(); c ; c=c->next() )
         c->setInteractions(meca);

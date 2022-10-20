@@ -206,7 +206,7 @@ private:
 
 public:
     
-    /// used for recording CPU cycles
+    /// record of time (CPU cycles)
     mutable unsigned long long cycles_;
 
     /// verbose level
