@@ -189,14 +189,15 @@ void Aster::build(ObjectList& objs, Glossary& opt, Simul& sim)
     if ( asRadius <= 0 )
         throw InvalidParameter("aster:radius must be specified and > 0");
     
+#if BACKWARD_COMPATIBILITY < 50
     if ( opt.has_value("nb_fibers") )
     {
-        opt.define("fiber", opt.value("fiber", 1), 2);
-        opt.define("fiber", opt.value("fiber", 0), 1);
-        opt.define("fiber", opt.value("nb_fibers", 0), 2);
-        throw InvalidParameter("please specify `fibers = NUMBER, CLASS, SPEC`");
+        opt.define("fibers", opt.value("nb_fibers", 0), 0);
+        opt.define("fibers", opt.value("fiber", 0), 1);
+        opt.define("fibers", opt.value("fiber", 1), 2);
+        throw InvalidParameter("please specify `fibers = COUNT, CLASS, SPEC`");
     }
-
+#endif
     size_t origin = makeSolid(objs, sim, opt);
     
     unsigned type = 7 * opt.has_key("fiber1");
@@ -330,8 +331,8 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
 void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
 {
     std::string tif, fos;
-    opt.set(tif, "fibers");
-    opt.set(fos, "fibers", 1);
+    opt.set(tif, "fibers", 1);
+    opt.set(fos, "fibers", 2);
 
     Vector A, B;
     size_t cnt = 1;
