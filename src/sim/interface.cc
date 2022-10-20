@@ -18,7 +18,7 @@
 #include "event.h"
 
 
-// Use the second definition to get some verbose reports:
+// Use second definition to trace execution
 #define VLOG(ARG) ((void) 0)
 //#define VLOG(ARG) std::clog << ARG << '\n';
 
@@ -335,7 +335,7 @@ bool all_objects_inside(ObjectList const& objs, Space const* spc)
  */
 ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
 {
-    size_t nb_trials = 1<<14;
+    size_t nb_trials = 1000;
     opt.set(nb_trials, "nb_trials");
     ObjectList objs;
     
@@ -368,30 +368,30 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
                                        {"outside",    PLACE_OUTSIDE},
                                        {"surface",    PLACE_EDGE}});
         
-        if ( placement != PLACE_NOT )
+        if ( placement == PLACE_NOT )
+            break;
+        
+        // find possible position & rotation:
+        Isometry iso;
+        bool err = find_placement(iso, opt, placement, nb_trials);
+        if ( !err )
         {
-            // find a position:
-            Isometry iso;
-            bool err = find_placement(iso, opt, placement, nb_trials);
-            if ( !err )
+            // place object at this position:
+            ObjectSet::moveObjects(objs, iso);
+            // special case for which we check all vertices:
+            if ( placement == PLACE_ALL_INSIDE )
             {
-                // place object at this position:
-                ObjectSet::moveObjects(objs, iso);
-                // special case for which we check all vertices:
-                if ( placement == PLACE_ALL_INSIDE )
+                std::string str;
+                Space const* spc = sim_->spaces.master();
+                if ( opt.set(str, "placement", 1) )
+                    spc = sim_->findSpace(str);
+                if ( ! all_objects_inside(objs, spc) )
                 {
-                    std::string str;
-                    Space const* spc = sim_->spaces.master();
-                    if ( opt.set(str, "placement", 1) )
-                        spc = sim_->findSpace(str);
-                    if ( ! all_objects_inside(objs, spc) )
-                    {
-                        objs.destroy();
-                        continue;
-                    }
+                    objs.destroy();
+                    continue;
                 }
-                break;
             }
+            break;
         }
     }
     
@@ -943,7 +943,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
         }
     }
     
-    VLOG("+RUN START " << nb_steps);
+    VLOG("+RUN START " << sec);
     int max = std::max(frames, 1);
     // subtract half a time_step, to ensure we finish exactly on time!
     double start = sim_->time() - 0.5 * sim_->time_step();
@@ -997,7 +997,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
 */
 void Interface::execute_run(real sec)
 {
-    VLOG("-RUN START " << sim_->time());
+    VLOG("-RUN START " << sec);
     sim_->prepare();
     // subtract half a time_step, to ensure we finish exactly on time!
     sim_->prop.end_time = sim_->time() + sec - 0.5 * sim_->time_step();
