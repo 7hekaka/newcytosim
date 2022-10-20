@@ -143,19 +143,19 @@ void byebye()
 void help(std::ostream& os)
 {
     os << "play [OPTIONS] [PATH] [FILE]\n"
-          "     live                     enter live simulation mode directly\n"
-          "     PATH                     change working directory as specified\n"
-          "     FILE.cym                 specify input configuration file\n"
-          "     FILE.cmo                 specify trajectory file\n"
-          "     FILE.cyp                 specify display configuration file\n"
-          "     PARAMETER=value          set parameter value (example size=512)\n"
-          "     image frame=INT          render specified frame offscreen\n"
-          "     image frame=INT,INT,...  render several frames offscreen\n"
-          "     image magnify=INT        render frames at higher resolution\n"
-          "     movie                    render all frames offscreen\n"
-          "     'movie on', 'image on'   use on-screen rendering\n"
-          "     movie period=INT         render one frame every INT frames\n"
-          " (there should be no whitespace around the equal sign)\n";
+          "   live                     enter live simulation mode directly\n"
+          "   PATH                     change working directory as specified\n"
+          "   FILE.cym                 enter live mode with specified config file\n"
+          "   FILE.cmo                 specify trajectory file in replay mode\n"
+          "   FILE.cyp                 specify display configuration file\n"
+          "   PARAMETER=value          set parameter value (example size=512)\n"
+          "   image frame=INT          render specified frame offscreen\n"
+          "   image frame=INT,INT,...  render several frames offscreen\n"
+          "   image magnify=INT        render frames at higher resolution\n"
+          "   movie                    render all frames in trajectory file\n"
+          "   'movie on', 'image on'   use on-screen rendering\n"
+          "   movie period=INT         render one frame every INT frames\n"
+          " (there should be no whitespace on either side of the equal sign)\n";
 }
 
 
