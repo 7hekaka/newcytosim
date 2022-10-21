@@ -215,6 +215,9 @@
 		BB47E593290291A500DB6357 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BB47E5AF2902AE8500DB6357 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB47E5A42902AD9600DB6357 /* libglfw3.a */; };
 		BB47E5B02902AE9700DB6357 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB47E5A42902AD9600DB6357 /* libglfw3.a */; };
+		BB47E5B12902AF6100DB6357 /* mechoui.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E5982902AD5700DB6357 /* mechoui.cc */; };
+		BB47E5B22902AF7000DB6357 /* multimesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E5962902AD5700DB6357 /* multimesh.cc */; };
+		BB47E5B32902AF7700DB6357 /* mechoui_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E5992902AD5700DB6357 /* mechoui_param.cc */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
 		BB4A635E12CCA83C001FD45D /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
@@ -5137,6 +5140,7 @@
 				BB6403D705FBC28C00DF7BFF /* sieve */,
 				BBCA9EEA06AFCB4600638608 /* report */,
 				BB64041405FBC58500DF7BFF /* frametool */,
+				BB0A7541282650E00062EDC5 /* mechoui */,
 				BB6403B505FBC0E200DF7BFF /* tests */,
 				BBB1C6C70CB2CAA300679ADC /* blank */,
 				BBE2FB8D25680D5800EB88EA /* cympack */,
@@ -5153,7 +5157,6 @@
 				BB8EE1DB2542DE2100E15C40 /* test_tesselator */,
 				BB7086392449CBE900C73273 /* test_xpttrs */,
 				BB201E0F24ABDCD900A8CA82 /* test_xtbsv */,
-				BB0A7541282650E00062EDC5 /* mechoui */,
 				BB2B25D4284CB48D003A5864 /* test_sphere */,
 				BB584FCF28F9F45B006D6349 /* test_random */,
 				BB1575B428FC0E0A00D92D4E /* test_gaussian */,
@@ -5168,6 +5171,9 @@
 			files = (
 				BB47E593290291A500DB6357 /* glapp.cc in Sources */,
 				BB0A754A282650E00062EDC5 /* operator_new.cc in Sources */,
+				BB47E5B12902AF6100DB6357 /* mechoui.cc in Sources */,
+				BB47E5B22902AF7000DB6357 /* multimesh.cc in Sources */,
+				BB47E5B32902AF7700DB6357 /* mechoui_param.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
