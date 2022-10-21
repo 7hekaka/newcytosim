@@ -123,11 +123,14 @@ int display(View& view)
 {
     view.openDisplay();
     gym::color(pam.point_color);
-    if ( pam.point_style )
-        mesh.drawNodes(pam.point_size, pam.point_color);
-    Vector3 V = view.depthAxis();
-    float axis[4] = { float(V.XX), float(V.YY), float(V.ZZ), 0 };
-    mesh.drawFaces(axis, pam.face_color, pam.selected);
+    if ( pam.point_style && mesh.nbPoints() > 0 )
+        mesh.drawPoints(pam.point_size, pam.point_color);
+    if ( mesh.nbFaces() > 0 )
+    {
+        Vector3 V = view.depthAxis();
+        float axis[4] = { float(V.XX), float(V.YY), float(V.ZZ), 0 };
+        mesh.drawFaces(axis, pam.face_color, pam.selected);
+    }
     view.closeDisplay();
     return 0;
 }

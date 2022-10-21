@@ -164,7 +164,7 @@ int MultiMesh::read(char const* filename)
 
 
 /// OpenGL display function
-void MultiMesh::drawNodes(float point_size, const float color[4]) const
+void MultiMesh::drawPoints(float point_size, const float color[4]) const
 {
     float * flu = gym::mapFloatBuffer(3*n_points);
     // Upload vertex data to the video device
@@ -175,6 +175,7 @@ void MultiMesh::drawNodes(float point_size, const float color[4]) const
     gym::disableLighting();
     gym::drawPoints(point_size, 0, n_points);
     gym::enableLighting();
+    gym::cleanup();
 }
 
 
@@ -215,6 +216,7 @@ void MultiMesh::drawFaces(const float color[4], int selected) const
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 64);
     gym::drawTriangles(0, ptr-flu);
+    gym::cleanup();
 }
 
 
@@ -312,6 +314,7 @@ void MultiMesh::drawFaces(const float dir[3], const float color[4], int selected
     gym::closeDepthMask();
     gym::drawTriangles(3*n_tri, 3*(n_faces-n_tri));
     gym::openDepthMask();
+    gym::cleanup();
 }
 
 

@@ -35,6 +35,9 @@ public:
     /// number of points
     size_t nbPoints() { return n_points; }
     
+    /// number of points
+    size_t nbFaces() { return n_faces; }
+
     /// release memory
     void release();
     
@@ -51,7 +54,7 @@ public:
     unsigned pick() const;
     
     /// draw vertex points using OpenGL
-    void drawNodes(float size, const float color[4]) const;
+    void drawPoints(float size, const float color[4]) const;
     
     /// display triangles using OpenGL
     void drawFaces(const float color[4], int selected) const;
