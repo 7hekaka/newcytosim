@@ -57,9 +57,9 @@ void processNormalKey(unsigned char c, int x, int y)
             pam.point_style = ! pam.point_style;
             glApp::flashText("point_style %i", pam.point_style);
             break;
-        case 'o':
-            pam.delay = ( pam.delay < 1024 ) ? 2*pam.delay : 2048;
-            glApp::flashText("delay %i ms", pam.delay);
+        case 'f':
+            pam.point_style = ! pam.point_style;
+            glApp::flashText("point_style %i", pam.point_style);
             break;
         case ',':
         case '<':
@@ -78,9 +78,6 @@ void processNormalKey(unsigned char c, int x, int y)
             break;
         case 'R':
             pam.write(std::cout);
-            break;
-        case 'P':
-            pam.point_style = ! pam.point_style;
             break;
         default:
             glApp::processNormalKey(c,x,y);
@@ -122,7 +119,7 @@ int display(View& view)
     {
         mesh.drawPoints(pam.point_size, pam.point_color);
     }
-    if ( mesh.nbFaces() > 0 )
+    if ( pam.face_style && mesh.nbFaces() > 0 )
     {
         Vector3 V = view.depthAxis();
         float axis[4] = { float(V.XX), float(V.YY), float(V.ZZ), 0 };

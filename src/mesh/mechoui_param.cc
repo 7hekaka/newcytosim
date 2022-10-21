@@ -12,6 +12,7 @@ void MechouiParam::clear()
     point_color = 0x0000FFFF;
     point_size  = 3;
     point_style = 0;
+    face_style = 1;
     path     = ".";
     config   = "";
     delay    = 250;
@@ -25,7 +26,8 @@ void MechouiParam::read(Glossary& glos)
     glos.set(face_color,  "face_color");
     glos.set(point_color, "point_color");
     glos.set(point_style, "point_style");
-
+    glos.set(face_style, "face_style");
+    
     glos.set(path,   "path");
     glos.set(config, "config");
     glos.set(delay,  "delay");
@@ -46,6 +48,7 @@ void MechouiParam::write(std::ostream& os) const
     write_param(os, "point_size",  point_size);
     write_param(os, "point_color", point_color);
     write_param(os, "point_style", point_style);
+    write_param(os, "face_style", face_style);
     write_param(os, "config",      config);
     write_param(os, "delay",       delay);
     os.flush();

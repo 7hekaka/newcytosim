@@ -58,6 +58,7 @@ build:
 	mkdir -p $@
 
 symlinks:
+	mkdir -p src;
 	if test ! -e src/gym; then ln -s ../../../gym src/gym; fi
 	if test ! -e src/disp; then ln -s ../../../disp src/disp; fi
 	if test ! -e src/base; then ln -s ../../../base src/base; fi

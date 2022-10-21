@@ -25,6 +25,9 @@ public:
     /// flag to display points
     int point_style;
     
+    /// flag to display points
+    int face_style;
+
     /// selected cell
     int selected;
     
