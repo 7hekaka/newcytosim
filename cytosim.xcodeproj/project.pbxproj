@@ -212,12 +212,9 @@
 		BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB46A4CA24A48E1900E89FE2 /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
 		BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4737BC2024B39300FE6CEC /* accumulator.h */; };
-		BB47E58D290290FA00DB6357 /* multimesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E58B290290A400DB6357 /* multimesh.cc */; };
-		BB47E58E290290FA00DB6357 /* multimesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BB47E58C290290A400DB6357 /* multimesh.h */; };
-		BB47E5902902912000DB6357 /* mechoui_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E589290290A400DB6357 /* mechoui_param.cc */; };
-		BB47E5912902912000DB6357 /* mechoui_param.h in Headers */ = {isa = PBXBuildFile; fileRef = BB47E58A290290A400DB6357 /* mechoui_param.h */; };
-		BB47E5922902912000DB6357 /* mechoui.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E588290290A400DB6357 /* mechoui.cc */; };
 		BB47E593290291A500DB6357 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
+		BB47E5AF2902AE8500DB6357 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB47E5A42902AD9600DB6357 /* libglfw3.a */; };
+		BB47E5B02902AE9700DB6357 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB47E5A42902AD9600DB6357 /* libglfw3.a */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
 		BB4A635E12CCA83C001FD45D /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
@@ -304,7 +301,6 @@
 		BB5CD2EF28D8C94E004F34D5 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB7ED2906933C6700E2B49B /* AGL.framework */; };
 		BB5CD2F028D8C94E004F34D5 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBCE2619281EAFC1004F6955 /* Cocoa.framework */; };
 		BB5CD2F128D8C94E004F34D5 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBCE261B281EAFC8004F6955 /* IOKit.framework */; };
-		BB5CD2F228D8C94E004F34D5 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE51327283781440090979B /* libglfw3.a */; };
 		BB5CD2F928D8C968004F34D5 /* monoplay.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB29615728C71FFA00525067 /* monoplay.cc */; };
 		BB5CDDCA06AC4C4B008296B1 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB5CF1F916DD2D5A00EF0FE3 /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; };
@@ -985,7 +981,6 @@
 		BBE447DB2064ED200058ADAC /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
 		BBE4B5ED13E04D2400CBE163 /* space_periodic.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE4B5E913E04D2400CBE163 /* space_periodic.cc */; };
 		BBE4B5EE13E04D2400CBE163 /* space_periodic.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE4B5EA13E04D2400CBE163 /* space_periodic.h */; };
-		BBE51328283781440090979B /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE51327283781440090979B /* libglfw3.a */; };
 		BBE60B950EE9684000FFAB27 /* field_values.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE60B940EE9684000FFAB27 /* field_values.h */; };
 		BBE82A2B233D15EB00BE44DF /* space_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388A10B48EC400A4028F /* space_prop.h */; };
 		BBE82A2D233D15EB00BE44DF /* space_polygonZ.h in Headers */ = {isa = PBXBuildFile; fileRef = BB2BFFDD184640D800EBE4EC /* space_polygonZ.h */; };
@@ -1768,11 +1763,17 @@
 		BB40C87F0CC6044E00EC90F8 /* meca1d.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = meca1d.h; path = src/sim/meca1d.h; sourceTree = SOURCE_ROOT; };
 		BB46A4C424A349F400E89FE2 /* simd_float.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_float.h; sourceTree = "<group>"; };
 		BB4737BC2024B39300FE6CEC /* accumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accumulator.h; path = src/math/accumulator.h; sourceTree = SOURCE_ROOT; };
-		BB47E588290290A400DB6357 /* mechoui.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui.cc; path = src/mesh/mechoui.cc; sourceTree = SOURCE_ROOT; };
-		BB47E589290290A400DB6357 /* mechoui_param.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui_param.cc; path = src/mesh/mechoui_param.cc; sourceTree = SOURCE_ROOT; };
-		BB47E58A290290A400DB6357 /* mechoui_param.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = mechoui_param.h; path = src/mesh/mechoui_param.h; sourceTree = SOURCE_ROOT; };
-		BB47E58B290290A400DB6357 /* multimesh.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = multimesh.cc; path = src/mesh/multimesh.cc; sourceTree = SOURCE_ROOT; };
-		BB47E58C290290A400DB6357 /* multimesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = multimesh.h; path = src/mesh/multimesh.h; sourceTree = SOURCE_ROOT; };
+		BB47E5952902AD5700DB6357 /* multimesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = multimesh.h; sourceTree = "<group>"; };
+		BB47E5962902AD5700DB6357 /* multimesh.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = multimesh.cc; sourceTree = "<group>"; };
+		BB47E5972902AD5700DB6357 /* mechoui_param.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = mechoui_param.h; sourceTree = "<group>"; };
+		BB47E5982902AD5700DB6357 /* mechoui.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mechoui.cc; sourceTree = "<group>"; };
+		BB47E5992902AD5700DB6357 /* mechoui_param.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = mechoui_param.cc; sourceTree = "<group>"; };
+		BB47E5A42902AD9600DB6357 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libglfw3.a; sourceTree = "<group>"; };
+		BB47E5A82902AD9600DB6357 /* vulkan.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vulkan.h; sourceTree = "<group>"; };
+		BB47E5A92902AD9600DB6357 /* gl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gl.h; sourceTree = "<group>"; };
+		BB47E5AA2902AD9600DB6357 /* gles2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gles2.h; sourceTree = "<group>"; };
+		BB47E5AC2902AD9600DB6357 /* glfw3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glfw3.h; sourceTree = "<group>"; };
+		BB47E5AD2902AD9600DB6357 /* glfw3native.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glfw3native.h; sourceTree = "<group>"; };
 		BB48AB001B42BABD008540D1 /* space_banana.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_banana.cc; path = src/sim/spaces/space_banana.cc; sourceTree = SOURCE_ROOT; };
 		BB48AB011B42BABD008540D1 /* space_banana.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_banana.h; path = src/sim/spaces/space_banana.h; sourceTree = SOURCE_ROOT; };
 		BB4CFFDF130539740049C585 /* classic_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = classic_fiber_prop.cc; path = fibers/classic_fiber_prop.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -2240,7 +2241,6 @@
 		BBE447D920646A420058ADAC /* SFMT-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SFMT-common.h"; path = "src/math/SFMT-common.h"; sourceTree = SOURCE_ROOT; };
 		BBE4B5E913E04D2400CBE163 /* space_periodic.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_periodic.cc; path = src/sim/spaces/space_periodic.cc; sourceTree = SOURCE_ROOT; };
 		BBE4B5EA13E04D2400CBE163 /* space_periodic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_periodic.h; path = src/sim/spaces/space_periodic.h; sourceTree = SOURCE_ROOT; };
-		BBE51327283781440090979B /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglfw3.a; path = ext/libglfw3.a; sourceTree = SOURCE_ROOT; };
 		BBE60B940EE9684000FFAB27 /* field_values.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = field_values.h; path = src/sim/field_values.h; sourceTree = SOURCE_ROOT; };
 		BBE60C250EE979ED00FFAB27 /* simul_step.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simul_step.cc; path = src/sim/simul_step.cc; sourceTree = SOURCE_ROOT; };
 		BBE82A64233D15EB00BE44DF /* libcytospaceG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospaceG.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2396,12 +2396,12 @@
 				BB5CD2EA28D8C94E004F34D5 /* libcytodisp.a in Frameworks */,
 				BB5CD2EB28D8C94E004F34D5 /* libcytobase.a in Frameworks */,
 				BB5CD2EC28D8C94E004F34D5 /* libcytomath.a in Frameworks */,
+				BB47E5AF2902AE8500DB6357 /* libglfw3.a in Frameworks */,
 				BB5CD2ED28D8C94E004F34D5 /* Accelerate.framework in Frameworks */,
 				BB5CD2EE28D8C94E004F34D5 /* OpenGL.framework in Frameworks */,
 				BB5CD2EF28D8C94E004F34D5 /* AGL.framework in Frameworks */,
 				BB5CD2F028D8C94E004F34D5 /* Cocoa.framework in Frameworks */,
 				BB5CD2F128D8C94E004F34D5 /* IOKit.framework in Frameworks */,
-				BB5CD2F228D8C94E004F34D5 /* libglfw3.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2543,12 +2543,12 @@
 				BBCE2600281EAAE1004F6955 /* libcytodisp.a in Frameworks */,
 				BBCE2601281EAAE1004F6955 /* libcytobase.a in Frameworks */,
 				BBCE2602281EAAE1004F6955 /* libcytomath.a in Frameworks */,
+				BB47E5B02902AE9700DB6357 /* libglfw3.a in Frameworks */,
 				BBCE2603281EAAE1004F6955 /* Accelerate.framework in Frameworks */,
 				BBCE2605281EAAE1004F6955 /* OpenGL.framework in Frameworks */,
 				BBCE2606281EAAE1004F6955 /* AGL.framework in Frameworks */,
 				BBCE261A281EAFC1004F6955 /* Cocoa.framework in Frameworks */,
 				BBCE261C281EAFC8004F6955 /* IOKit.framework in Frameworks */,
-				BBE51328283781440090979B /* libglfw3.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2637,19 +2637,6 @@
 				BB086453281D4CE8005A6D72 /* offscreen_fbo.cc */,
 			);
 			name = offscreen_save;
-			sourceTree = "<group>";
-		};
-		BB0A756628265F360062EDC5 /* mesh */ = {
-			isa = PBXGroup;
-			children = (
-				BB47E589290290A400DB6357 /* mechoui_param.cc */,
-				BB47E58A290290A400DB6357 /* mechoui_param.h */,
-				BB47E588290290A400DB6357 /* mechoui.cc */,
-				BB47E58B290290A400DB6357 /* multimesh.cc */,
-				BB47E58C290290A400DB6357 /* multimesh.h */,
-			);
-			name = mesh;
-			path = tools;
 			sourceTree = "<group>";
 		};
 		BB1B0F5323D3068B00C2608A /* grid */ = {
@@ -2745,6 +2732,48 @@
 				BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */,
 			);
 			name = SparseMatrices;
+			sourceTree = "<group>";
+		};
+		BB47E5942902AD5700DB6357 /* mesh */ = {
+			isa = PBXGroup;
+			children = (
+				BB47E5952902AD5700DB6357 /* multimesh.h */,
+				BB47E5962902AD5700DB6357 /* multimesh.cc */,
+				BB47E5972902AD5700DB6357 /* mechoui_param.h */,
+				BB47E5982902AD5700DB6357 /* mechoui.cc */,
+				BB47E5992902AD5700DB6357 /* mechoui_param.cc */,
+			);
+			name = mesh;
+			path = src/mesh;
+			sourceTree = "<group>";
+		};
+		BB47E5A22902AD9600DB6357 /* ext */ = {
+			isa = PBXGroup;
+			children = (
+				BB47E5A42902AD9600DB6357 /* libglfw3.a */,
+				BB47E5A72902AD9600DB6357 /* glad */,
+				BB47E5AB2902AD9600DB6357 /* GLFW */,
+			);
+			path = ext;
+			sourceTree = "<group>";
+		};
+		BB47E5A72902AD9600DB6357 /* glad */ = {
+			isa = PBXGroup;
+			children = (
+				BB47E5A82902AD9600DB6357 /* vulkan.h */,
+				BB47E5A92902AD9600DB6357 /* gl.h */,
+				BB47E5AA2902AD9600DB6357 /* gles2.h */,
+			);
+			path = glad;
+			sourceTree = "<group>";
+		};
+		BB47E5AB2902AD9600DB6357 /* GLFW */ = {
+			isa = PBXGroup;
+			children = (
+				BB47E5AC2902AD9600DB6357 /* glfw3.h */,
+				BB47E5AD2902AD9600DB6357 /* glfw3native.h */,
+			);
+			path = GLFW;
 			sourceTree = "<group>";
 		};
 		BB4ADEC10D47459400C2B1C9 /* Grids */ = {
@@ -3173,8 +3202,8 @@
 				BB7358D205B98DA3006956D5 /* sim */,
 				BB086425281D4CE8005A6D72 /* gym */,
 				BB97114B1DECDA1300352630 /* disp */,
-				BBE513262837812A0090979B /* dep */,
-				BB0A756628265F360062EDC5 /* mesh */,
+				BB47E5A22902AD9600DB6357 /* ext */,
+				BB47E5942902AD5700DB6357 /* mesh */,
 				BB7358BF05B98DA3006956D5 /* play */,
 				BB73590605B98DA3006956D5 /* tests */,
 				BB73591805B98DA3006956D5 /* tools */,
@@ -3815,24 +3844,6 @@
 			name = random;
 			sourceTree = "<group>";
 		};
-		BBE513262837812A0090979B /* dep */ = {
-			isa = PBXGroup;
-			children = (
-				BBE5132B283782B50090979B /* GLFW */,
-				BBE51327283781440090979B /* libglfw3.a */,
-			);
-			name = dep;
-			path = deps;
-			sourceTree = SOURCE_ROOT;
-		};
-		BBE5132B283782B50090979B /* GLFW */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = GLFW;
-			path = ext/GLFW;
-			sourceTree = "<group>";
-		};
 		BBEB846112FF338100F9D717 /* Fork */ = {
 			isa = PBXGroup;
 			children = (
@@ -3906,8 +3917,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB47E58E290290FA00DB6357 /* multimesh.h in Headers */,
-				BB47E5912902912000DB6357 /* mechoui_param.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5158,9 +5167,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB47E593290291A500DB6357 /* glapp.cc in Sources */,
-				BB47E5902902912000DB6357 /* mechoui_param.cc in Sources */,
-				BB47E5922902912000DB6357 /* mechoui.cc in Sources */,
-				BB47E58D290290FA00DB6357 /* multimesh.cc in Sources */,
 				BB0A754A282650E00062EDC5 /* operator_new.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
