@@ -104,11 +104,6 @@
 		BB0A754F282650E00062EDC5 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB0A7550282650E00062EDC5 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB0A7551282650E00062EDC5 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
-		BB0A756C28265F790062EDC5 /* mechoui.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0A756728265F790062EDC5 /* mechoui.cc */; };
-		BB0A756D28265F790062EDC5 /* multi_mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0A756828265F790062EDC5 /* multi_mesh.h */; };
-		BB0A756E28265F790062EDC5 /* mechoui_param.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0A756928265F790062EDC5 /* mechoui_param.h */; };
-		BB0A756F28265F790062EDC5 /* multi_mesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0A756A28265F790062EDC5 /* multi_mesh.cc */; };
-		BB0A757028265F790062EDC5 /* mechoui_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0A756B28265F790062EDC5 /* mechoui_param.cc */; };
 		BB0CB11B20C170C10016D73D /* qmr.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0CB11A20C170C10016D73D /* qmr.h */; };
 		BB0DF4810D93F11F006CB71A /* lattice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1749A407D798E600BC7BDC /* lattice.cc */; };
 		BB0E4BD81002698100A96B34 /* random_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0E4BD61002698100A96B34 /* random_vector.h */; };
@@ -217,6 +212,12 @@
 		BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB46A4CA24A48E1900E89FE2 /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
 		BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4737BC2024B39300FE6CEC /* accumulator.h */; };
+		BB47E58D290290FA00DB6357 /* multimesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E58B290290A400DB6357 /* multimesh.cc */; };
+		BB47E58E290290FA00DB6357 /* multimesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BB47E58C290290A400DB6357 /* multimesh.h */; };
+		BB47E5902902912000DB6357 /* mechoui_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E589290290A400DB6357 /* mechoui_param.cc */; };
+		BB47E5912902912000DB6357 /* mechoui_param.h in Headers */ = {isa = PBXBuildFile; fileRef = BB47E58A290290A400DB6357 /* mechoui_param.h */; };
+		BB47E5922902912000DB6357 /* mechoui.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E588290290A400DB6357 /* mechoui.cc */; };
+		BB47E593290291A500DB6357 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
 		BB4A635E12CCA83C001FD45D /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
@@ -1684,11 +1685,6 @@
 		BB089A082228A26D00C070E7 /* matrix22.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix22.cc; sourceTree = "<group>"; };
 		BB089A092228A26D00C070E7 /* matrix33.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix33.cc; sourceTree = "<group>"; };
 		BB0A7556282650E00062EDC5 /* mechoui */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mechoui; sourceTree = BUILT_PRODUCTS_DIR; };
-		BB0A756728265F790062EDC5 /* mechoui.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui.cc; path = src/misc/mechoui/mechoui.cc; sourceTree = SOURCE_ROOT; };
-		BB0A756828265F790062EDC5 /* multi_mesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multi_mesh.h; path = src/misc/mechoui/multi_mesh.h; sourceTree = SOURCE_ROOT; };
-		BB0A756928265F790062EDC5 /* mechoui_param.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mechoui_param.h; path = src/misc/mechoui/mechoui_param.h; sourceTree = SOURCE_ROOT; };
-		BB0A756A28265F790062EDC5 /* multi_mesh.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = multi_mesh.cc; path = src/misc/mechoui/multi_mesh.cc; sourceTree = SOURCE_ROOT; };
-		BB0A756B28265F790062EDC5 /* mechoui_param.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui_param.cc; path = src/misc/mechoui/mechoui_param.cc; sourceTree = SOURCE_ROOT; };
 		BB0AB41E201BBA41004739CE /* doc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = doc; sourceTree = "<group>"; };
 		BB0C409E069A043600CF45A8 /* sparmatsym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym.cc; path = src/math/sparmatsym.cc; sourceTree = SOURCE_ROOT; };
 		BB0C409F069A043600CF45A8 /* sparmatsym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym.h; path = src/math/sparmatsym.h; sourceTree = SOURCE_ROOT; };
@@ -1772,6 +1768,11 @@
 		BB40C87F0CC6044E00EC90F8 /* meca1d.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = meca1d.h; path = src/sim/meca1d.h; sourceTree = SOURCE_ROOT; };
 		BB46A4C424A349F400E89FE2 /* simd_float.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simd_float.h; sourceTree = "<group>"; };
 		BB4737BC2024B39300FE6CEC /* accumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accumulator.h; path = src/math/accumulator.h; sourceTree = SOURCE_ROOT; };
+		BB47E588290290A400DB6357 /* mechoui.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui.cc; path = src/mesh/mechoui.cc; sourceTree = SOURCE_ROOT; };
+		BB47E589290290A400DB6357 /* mechoui_param.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = mechoui_param.cc; path = src/mesh/mechoui_param.cc; sourceTree = SOURCE_ROOT; };
+		BB47E58A290290A400DB6357 /* mechoui_param.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = mechoui_param.h; path = src/mesh/mechoui_param.h; sourceTree = SOURCE_ROOT; };
+		BB47E58B290290A400DB6357 /* multimesh.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = multimesh.cc; path = src/mesh/multimesh.cc; sourceTree = SOURCE_ROOT; };
+		BB47E58C290290A400DB6357 /* multimesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = multimesh.h; path = src/mesh/multimesh.h; sourceTree = SOURCE_ROOT; };
 		BB48AB001B42BABD008540D1 /* space_banana.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_banana.cc; path = src/sim/spaces/space_banana.cc; sourceTree = SOURCE_ROOT; };
 		BB48AB011B42BABD008540D1 /* space_banana.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_banana.h; path = src/sim/spaces/space_banana.h; sourceTree = SOURCE_ROOT; };
 		BB4CFFDF130539740049C585 /* classic_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = classic_fiber_prop.cc; path = fibers/classic_fiber_prop.cc; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -2641,11 +2642,11 @@
 		BB0A756628265F360062EDC5 /* mesh */ = {
 			isa = PBXGroup;
 			children = (
-				BB0A756B28265F790062EDC5 /* mechoui_param.cc */,
-				BB0A756928265F790062EDC5 /* mechoui_param.h */,
-				BB0A756728265F790062EDC5 /* mechoui.cc */,
-				BB0A756A28265F790062EDC5 /* multi_mesh.cc */,
-				BB0A756828265F790062EDC5 /* multi_mesh.h */,
+				BB47E589290290A400DB6357 /* mechoui_param.cc */,
+				BB47E58A290290A400DB6357 /* mechoui_param.h */,
+				BB47E588290290A400DB6357 /* mechoui.cc */,
+				BB47E58B290290A400DB6357 /* multimesh.cc */,
+				BB47E58C290290A400DB6357 /* multimesh.h */,
 			);
 			name = mesh;
 			path = tools;
@@ -3172,7 +3173,7 @@
 				BB7358D205B98DA3006956D5 /* sim */,
 				BB086425281D4CE8005A6D72 /* gym */,
 				BB97114B1DECDA1300352630 /* disp */,
-				BBE513262837812A0090979B /* ext */,
+				BBE513262837812A0090979B /* dep */,
 				BB0A756628265F360062EDC5 /* mesh */,
 				BB7358BF05B98DA3006956D5 /* play */,
 				BB73590605B98DA3006956D5 /* tests */,
@@ -3814,13 +3815,13 @@
 			name = random;
 			sourceTree = "<group>";
 		};
-		BBE513262837812A0090979B /* ext */ = {
+		BBE513262837812A0090979B /* dep */ = {
 			isa = PBXGroup;
 			children = (
 				BBE5132B283782B50090979B /* GLFW */,
 				BBE51327283781440090979B /* libglfw3.a */,
 			);
-			name = ext;
+			name = dep;
 			path = deps;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -3905,8 +3906,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB0A756D28265F790062EDC5 /* multi_mesh.h in Headers */,
-				BB0A756E28265F790062EDC5 /* mechoui_param.h in Headers */,
+				BB47E58E290290FA00DB6357 /* multimesh.h in Headers */,
+				BB47E5912902912000DB6357 /* mechoui_param.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5156,9 +5157,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB0A756F28265F790062EDC5 /* multi_mesh.cc in Sources */,
-				BB0A756C28265F790062EDC5 /* mechoui.cc in Sources */,
-				BB0A757028265F790062EDC5 /* mechoui_param.cc in Sources */,
+				BB47E593290291A500DB6357 /* glapp.cc in Sources */,
+				BB47E5902902912000DB6357 /* mechoui_param.cc in Sources */,
+				BB47E5922902912000DB6357 /* mechoui.cc in Sources */,
+				BB47E58D290290FA00DB6357 /* multimesh.cc in Sources */,
 				BB0A754A282650E00062EDC5 /* operator_new.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8100,7 +8102,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				FP_TRAP = "-fp-trap-all=divzero,invalid";
@@ -8182,7 +8184,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = NO;
 				FP_TRAP = "-fp-trap-all=divzero,invalid";
@@ -8261,7 +8263,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CLANG_X86_VECTOR_INSTRUCTIONS = avx2;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = NO;
 				FP_TRAP = "-fp-trap-all=divzero,invalid";

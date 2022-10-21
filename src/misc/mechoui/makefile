@@ -29,7 +29,7 @@ SRC_MECHOUI := multimesh.cc mechoui_param.cc vector3.cc glossary.cc\
 
 OBJ_MECHOUI := $(SRC_MECHOUI:%.cc=build/%.o) build/SFMT.o build/mechdisp.a
 
-DIR_MECHOUI := src/base src/math src/gym src/disp src/gym/deps
+DIR_MECHOUI := src/mesh src/base src/math src/gym src/disp src/gym/deps
 
 vpath %.h  src $(DIR_MECHOUI)
 vpath %.cc src $(DIR_MECHOUI)
@@ -62,6 +62,7 @@ symlinks:
 	if test ! -e src/disp; then ln -s ../../../disp src/disp; fi
 	if test ! -e src/base; then ln -s ../../../base src/base; fi
 	if test ! -e src/math; then ln -s ../../../math src/math; fi
+	if test ! -e src/mesh; then ln -s ../../../mesh src/mesh; fi
 
 #----------------------------rules----------------------------------------------
 
