@@ -54,13 +54,9 @@ void processNormalKey(unsigned char c, int x, int y)
             pam.selected = ( pam.selected + 1 ) % 17;
             break;
         case 'p':
-        {
-            if ( pam.delay < 6 )
-                pam.delay = 3;
-            else
-                pam.delay /= 2;
-            glApp::flashText("delay %i ms", pam.delay);
-        } break;
+            pam.point_style = ! pam.point_style;
+            glApp::flashText("point_style %i", pam.point_style);
+            break;
         case 'o':
             pam.delay = ( pam.delay < 1024 ) ? 2*pam.delay : 2048;
             glApp::flashText("delay %i ms", pam.delay);
@@ -122,9 +118,10 @@ void timer(int value)
 int display(View& view)
 {
     view.openDisplay();
-    gym::color(pam.point_color);
     if ( pam.point_style && mesh.nbPoints() > 0 )
+    {
         mesh.drawPoints(pam.point_size, pam.point_color);
+    }
     if ( mesh.nbFaces() > 0 )
     {
         Vector3 V = view.depthAxis();
