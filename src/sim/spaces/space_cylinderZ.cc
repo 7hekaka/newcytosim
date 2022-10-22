@@ -135,13 +135,14 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 {
 #if ( DIM > 2 )
     const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
-    real dZ = pos.ZZ - edge_;
-    dZ = min_real(abs_real(dZ-top_), abs_real(bot_-dZ));
+    real tZ = top_ - pos.ZZ;
+    real bZ = pos.ZZ - bot_;
+    real dZ = min_real(abs_real(tZ-edge_), abs_real(bZ+edge_));
 #if SMOOTH_CYLINDER
-    if ( edge_ > 0 )
+    if (( bZ < edge_ ) | ( tZ < edge_ ))
     {
-        if (( bot_+edge_ < pos.ZZ ) & ( pos.ZZ < top_-edge_ ))
-            return Vector(pos.XX/R, pos.YY/R, 0);
+        if ( R < radius_-edge_ )
+            return Vector(0, 0, std::copysign(1, bZ-tZ));
         // project on the inner cylinder:
         const real n = min_real(R, radius_-edge_) / R;
         const real X = n * pos.XX;
@@ -154,7 +155,7 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
     if ( abs_real(R-radius_) < dZ )
         return Vector(pos.XX/R, pos.YY/R, 0);
     else
-        return Vector(0, 0, std::copysign(1, 2*pos.ZZ-top_-bot_));
+        return Vector(0, 0, std::copysign(1, bZ-tZ));
 #endif
     return Vector(0, 0, 0);  // intentionally invalid!
 }
