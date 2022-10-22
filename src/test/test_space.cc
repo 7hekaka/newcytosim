@@ -181,6 +181,30 @@ void timerFunction(int)
 }
 
 //------------------------------------------------------------------------------
+void checkVolume(size_t CNT)
+{
+    real vol = spc->volume();
+    double avg = 0, dev = 0;
+    
+    for ( size_t i = 0; i < CNT; ++i )
+    {
+        real e = spc->estimateVolume(1<<21) - vol;
+        //printf("Monte-Carlo estimated volume %.6f\n", e+vol);
+        avg += e;
+        dev += e * e;
+    }
+    avg /= CNT;
+    dev = ( dev - avg * avg * CNT ) / (CNT-1);
+    dev = std::sqrt(max_real(0, dev));
+    
+    printf("Monte-Carlo estimated volume of `%s` is", spc->prop->shape.c_str());
+    printf("  %.3f +/- %.3f;  given volume is %.3f", avg+vol, dev, vol);
+    
+    if ( abs_real(avg) > 3*dev )
+         printf("WARNING: POSSIBLE VOLUME MISMATCH!!!!\n");
+}
+
+
 void setGeometry()
 {
     if ( ! prop.disp )
@@ -192,7 +216,7 @@ void setGeometry()
         spc = prop.newSpace(opt);
         if ( spc )
         {
-            fprintf(stdout, " >>> ");
+            checkVolume(8);
             Outputter out(stdout, false);
             spc->write(out);
             fprintf(stdout, "\n");
@@ -213,30 +237,6 @@ void setGeometry()
     }
 
     glApp::postRedisplay();
-}
-
-
-void checkVolume(size_t CNT)
-{
-    real vol = spc->volume();
-    double avg = 0, dev = 0;
-    
-    for ( size_t i = 0; i < CNT; ++i )
-    {
-        real e = spc->estimateVolume(1<<21) - vol;
-        //printf("Monte-Carlo estimated volume %.6f\n", e+vol);
-        avg += e;
-        dev += e * e;
-    }
-    avg /= CNT;
-    dev = ( dev - avg * avg * CNT ) / (CNT-1);
-    dev = std::sqrt(max_real(0, dev));
-    
-    printf("Monte-Carlo estimated volume of `%s` is", spc->prop->shape.c_str());
-    printf("  %.3f +/- %.3f;  given volume is %.3f\n", avg+vol, dev, vol);
-    
-    if ( abs_real(avg) > 3*dev )
-         printf("WARNING: POSSIBLE VOLUME MISMATCH!!!!\n");
 }
 
 //------------------------------------------------------------------------------
@@ -639,7 +639,6 @@ int main(int argc, char* argv[])
         exit(EXIT_SUCCESS);
     }
 
-    checkVolume(8);
     glutMainLoop();
 }
 

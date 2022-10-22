@@ -746,8 +746,12 @@ Vector Movable::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
 #if ( DIM >= 3 )
             if ( tok == "clockwise" )
             {
+                real ang = 0;
+                is >> ang;
                 Vector vec = spc->normalToEdge(pos);
-                Vector dir = cross(Vector(0,0,1), vec);
+                Vector tan = cross(Vector(0,0,1), vec);
+                real C = std::cos(ang), S = std::sin(ang);
+                Vector dir(C*tan.XX, C*tan.YY, S);
                 real n = dir.norm();
                 if ( n > REAL_EPSILON )
                     return dir.normalized();
@@ -756,8 +760,12 @@ Vector Movable::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
             
             if ( tok == "anticlockwise" )
             {
+                real ang = 0;
+                is >> ang;
                 Vector vec = spc->normalToEdge(pos);
-                Vector dir = cross(Vector(0,0,-1), vec);
+                Vector tan = cross(Vector(0,0,-1), vec);
+                real C = std::cos(ang), S = std::sin(ang);
+                Vector dir(C*tan.XX, C*tan.YY, S);
                 real n = dir.norm();
                 if ( n > REAL_EPSILON )
                     return dir.normalized();

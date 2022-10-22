@@ -80,6 +80,7 @@ void SpaceCylinderZ::resize(Glossary& opt)
         // back calculate length to match the given surface:
         real len = 2 * edg + ( suf - S ) / L;
         //std::clog << "CylinderZ surface " << surface_cylinder(rad, len, edg) << " " << suf << '\n';
+        std::clog << "CylinderZ:length=" << len << '\n';
         bot = -0.5 * len;
         top =  0.5 * len;
     }
@@ -133,23 +134,27 @@ Vector SpaceCylinderZ::place() const
 Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 {
 #if ( DIM > 2 )
+    const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
+    real dZ = pos.ZZ - edge_;
+    dZ = min_real(abs_real(dZ-top_), abs_real(bot_-dZ));
 #if SMOOTH_CYLINDER
-    const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
-    const real n = min_real(R, radius_-edge_) / R;
-    // projection on the inner cylinder:
-    const real X = n * pos.XX;
-    const real Y = n * pos.YY;
-    const real Z = max_real(min_real(pos.ZZ, top_-edge_), bot_+edge_);
-    // this will fail if 'pos' is already inside the inner cylinder:
-    return normalize(pos-Vector(X,Y,Z));
-#else
-    const real R = std::sqrt(pos.XX * pos.XX + pos.YY * pos.YY);
-    const real dZ = min_real(abs_real(pos.ZZ-top_), abs_real(bot_-pos.ZZ));
+    if ( edge_ > 0 )
+    {
+        if (( bot_+edge_ < pos.ZZ ) & ( pos.ZZ < top_-edge_ ))
+            return Vector(pos.XX/R, pos.YY/R, 0);
+        // project on the inner cylinder:
+        const real n = min_real(R, radius_-edge_) / R;
+        const real X = n * pos.XX;
+        const real Y = n * pos.YY;
+        const real Z = max_real(min_real(pos.ZZ, top_-edge_), bot_+edge_);
+        // this will fail if 'pos' is already inside the inner cylinder:
+        return normalize(pos-Vector(X,Y,Z));
+    }
+#endif
     if ( abs_real(R-radius_) < dZ )
         return Vector(pos.XX/R, pos.YY/R, 0);
     else
         return Vector(0, 0, std::copysign(1, 2*pos.ZZ-top_-bot_));
-#endif
 #endif
     return Vector(0, 0, 0);  // intentionally invalid!
 }
@@ -606,8 +611,8 @@ void SpaceCylinderZ::draw3D() const
         *ptr++ = {0, 0, B, 0, 0, -1};
         gym::unmapBufferV3N3();
         gym::drawTriangleStrip(0, ptr-flu);
+        gym::cleanup(1);
     }
-    gym::cleanup();
 }
 
 #else

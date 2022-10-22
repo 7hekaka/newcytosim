@@ -284,52 +284,48 @@ Vector Space::bounce(Vector const& pos) const
  */
 Vector Space::normalToEdge(Vector const& pos) const
 {
-    const real goal = square(100*REAL_EPSILON);
-    
-    Vector P, M, res;
+    Vector dir;
     Vector prj = project(pos);
 
-    real H = 1;
-    for ( unsigned i = 0; i < 12; ++i )
+    if ( distanceSqr(pos, prj) > 0.1 )
+        dir = pos - prj;
+    else
     {
-        H /= 2;
-        for ( unsigned j = 0; j < 16; ++j )
+        const real goal = square(1000*REAL_EPSILON);
+        Vector P, M;
+        real H = 0.5;
+        for ( unsigned i = 0; i < 8; ++i )
         {
-            //start from a random vector:
-            res = Vector::randU(H);
-            
-            for ( unsigned n = 0; n < 32; ++n )
+            H /= 2;
+            for ( unsigned j = 0; j < 256; ++j )
             {
-                P = project(prj+res);
-                M = project(prj-res);
+                dir = Vector::randU(H);
+                if ( inside(prj+dir) != inside(prj-dir) )
+                    break;
+            }
+            for ( unsigned j = 0; j < 32; ++j )
+            {
+                P = project(prj+dir);
+                M = project(prj-dir);
                 
                 // refine the estimate:
                 Vector ref = 0.5 * ( M - P );
-                res += ref;
+                dir = ( dir + ref ).normalized(H);
                 
                 // check convergence:
                 if ( ref.normSqr() < goal )
-                {
-                    if ( 2 * res.norm() < H )
-                        res.normalize(H);
-                    else
-                    {
-                        if ( inside(prj+res) )
-                            return -normalize(res);
-                        else
-                            return normalize(res);
-                    }
-                }
+                    goto finish;
             }
         }
+        printf("warning: Space::normalToEdge(%9.3f %9.3f %9.3f) failed\n", pos.x(), pos.y(), pos.z());
+        printf("         error = %e at height = %8.4f\n", distance(P, M), H);
     }
-    
-    printf("warning: Space::normalToEdge(%9.3f %9.3f %9.3f) failed\n", pos.x(), pos.y(), pos.z());
-    printf("         error = %e at height = %e\n", distance(P, prj), H);
-    if ( inside(prj+res) )
-        return -normalize(res);
+
+finish:
+    if ( inside(prj+dir) )
+        return -normalize(dir);
     else
-        return normalize(res);
+        return normalize(dir);
 }
 
 
