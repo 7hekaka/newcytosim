@@ -130,7 +130,7 @@ public:
     /// constructor
     Outputter();
     
-    /// constructor which opens a file
+    /// constructor which opens a file, in binary mode if 'b==true'
     Outputter(FILE* f, bool b) : FileWrapper(f, nullptr), binary_(b) {};
 
     /// constructor which opens a file where `a` specifies append and `b` binary mode.

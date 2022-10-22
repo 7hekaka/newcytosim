@@ -778,9 +778,7 @@ namespace gle
         flute3* flu = gym::mapBufferV3(64);
         setBlob(flu);
         modifyBlob(flu, 10);
-        glEnableClientState(GL_NORMAL_ARRAY);
-        glNormalPointer(GL_FLOAT, 0, nullptr);
-        gym::unmapBufferV3();
+        gym::unmapBufferV3N0();
 
         gym::color_both(1,1,1,1);
         for ( unsigned u : { 1, 3, 5, 7, 9, 11 } )
@@ -1356,7 +1354,7 @@ namespace gle
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        gym::cleanup(1);
     }
     
     void dualPassIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
@@ -1373,7 +1371,7 @@ namespace gle
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        gym::cleanup(1);
     }
 
     void sphere1() { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
@@ -1402,7 +1400,7 @@ namespace gle
         glDrawElements(GL_TRIANGLE_STRIP, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        gym::cleanup(1);
     }
 
     void icoid() { drawTriangleStripBuffer(icoid_pts_, icoid_idx_, icoid_idx_); }
@@ -1533,7 +1531,7 @@ namespace gle
         flu[i++] = {R, 0, 0, 1, 0, 0};
         gym::unmapBufferV3N3();
         glDrawArrays(GL_TRIANGLES, 0, i);
-        glDisableClientState(GL_NORMAL_ARRAY);
+        gym::cleanup(1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     

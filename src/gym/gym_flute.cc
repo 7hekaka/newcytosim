@@ -105,7 +105,7 @@ namespace gym
         setBufferVN(3, 3);
     }
     
-    // normal = position
+    /// use same data for position and normal
     void setBufferV3N0(GLsizei first)
     {
         assert_enabled(GL_VERTEX_ARRAY);
@@ -115,7 +115,7 @@ namespace gym
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    // normal = position
+    /// use same data for position and normal
     void bindBufferV3N0(GLuint buf, GLsizei first)
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf);

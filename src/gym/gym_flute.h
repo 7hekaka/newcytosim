@@ -30,10 +30,10 @@ namespace gym
     /// bind buffer with 3-position coordinates, 3 normal coordinates
     void bindBufferV3N3(GLuint);
     
-    /// define buffer layout for a Device buffer
+    /// define buffer layout for a Device buffer, with position == normal
     void setBufferV3N0(GLsizei first);
     
-    /// define buffer layout for a Device buffer
+    /// define buffer layout for a Device buffer, with position == normal
     void bindBufferV3N0(GLuint, GLsizei first);
 
     

@@ -345,9 +345,9 @@ void SpaceDice::draw3D() const
 
     assert_true( sizeof(Tesselator::INDEX) == sizeof(unsigned short) );
     glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_SHORT, nullptr);
-    glDisableClientState(GL_NORMAL_ARRAY);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gym::cleanup(1);
 #endif
 
 #if 1
@@ -388,6 +388,7 @@ void SpaceDice::draw3D() const
     gym::drawTriangleStrip(16, 4);
     gym::drawTriangleStrip(20, 4);
 #endif
+    gym::cleanup(1);
 }
 
 #else

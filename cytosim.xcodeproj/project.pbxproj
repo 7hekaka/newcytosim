@@ -218,6 +218,8 @@
 		BB47E5B12902AF6100DB6357 /* mechoui.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E5982902AD5700DB6357 /* mechoui.cc */; };
 		BB47E5B22902AF7000DB6357 /* multimesh.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E5962902AD5700DB6357 /* multimesh.cc */; };
 		BB47E5B32902AF7700DB6357 /* mechoui_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E5992902AD5700DB6357 /* mechoui_param.cc */; };
+		BB47E5B42903EDE500DB6357 /* glapp.h in Headers */ = {isa = PBXBuildFile; fileRef = BB08642E281D4CE8005A6D72 /* glapp.h */; };
+		BB47E5B52903EDE500DB6357 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
 		BB4A635E12CCA83C001FD45D /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
@@ -4152,6 +4154,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB47E5B42903EDE500DB6357 /* glapp.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5483,6 +5486,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB47E5B52903EDE500DB6357 /* glapp.cc in Sources */,
 				BB31698824A0F3F4008DFDB3 /* operator_new.cc in Sources */,
 				BB64060605FBD9EA00DF7BFF /* test_space.cc in Sources */,
 			);
