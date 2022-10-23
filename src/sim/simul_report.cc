@@ -1179,7 +1179,6 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
     Vector eZ(0, 0, 1);
     Vector2 avg(0, 0);
     Matrix22 mat(0, 0);
-    real X2 = 0, Y2 = 0;
 #if ( DIM == 3 )
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
@@ -1205,14 +1204,14 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
         }
     }
 #endif
-    real S = 0;
+    real X = 0, Y = 0, S = 0;
     if ( sum > 0 )
     {
         avg /= sum;
         mat *= 2.0 / sum;
         mat(0,1) = mat(1,0);
-        X2 = mat(0,0) * 0.5;
-        Y2 = mat(1,1) * 0.5;
+        X = std::sqrt(mat(0,0) * 0.5);
+        Y = std::sqrt(mat(1,1) * 0.5);
         // subtract trace:
         mat(0,0) -= 1.0;
         mat(1,1) -= 1.0;
@@ -1222,8 +1221,8 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
     }
     // polar order parameter:
     real M = norm(avg);
-    out << COM << "n_seg" << SEP << "nematic" << SEP << "polar" << SEP << "avg_t" << SEP << "avg_z" << SEP << "sqr_t" << SEP << "sqr_z";
-    out << LIN << sum << SEP << S << SEP << M << SEP << avg.XX << SEP << avg.YY << SEP << X2 << SEP << Y2;
+    out << COM << "n_seg" << SEP << "nematic" << SEP << "polar" << SEP << "avg_t" << SEP << "avg_z" << SEP << "mom_t" << SEP << "mom_z";
+    out << LIN << sum << SEP << S << SEP << M << SEP << avg.XX << SEP << avg.YY << SEP << X << SEP << Y;
 }
 
 
