@@ -184,8 +184,8 @@ Vector3 Vector3::randU()
         y = RNG.sreal();
         d = 1.0 - x*x - y*y;
     } while ( d <= 0 );
-    real h = 2 * std::sqrt(d);
-    return Vector3(x*h, y*h, 2.0*d-1.0);
+    real h = 2.0 * std::sqrt(d);
+    return Vector3(x*h, y*h, 1.0-2.0*d);
 }
 
 Vector3 Vector3::randU(const real n)
@@ -197,7 +197,7 @@ Vector3 Vector3::randU(const real n)
         d = 1.0 - x*x - y*y;
     } while ( d <= 0 );
     real h = ( n + n ) * std::sqrt(d);
-    return Vector3(x*h, y*h, n*(2.0*d-1.0));
+    return Vector3(x*h, y*h, n-2.0*d*n);
 }
 
 #else
@@ -212,26 +212,20 @@ Vector3 Vector3::randU()
 {
     real x, y, z, t, d;
     do {
-        x = RNG.sreal();
-        y = RNG.sreal();
-        z = RNG.sreal();
-        t = RNG.sreal();
-        d = x*x + y*y + z*z + t*t;
+        RNG.sreal4(x, y, z, t);
+        d = ( x*x + y*y ) + ( z*z + t*t );
     } while ( d > 1.0 );
-    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), x*x+t*t-y*y-z*z) / d;
+    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), x*x-y*y-z*z+t*t) / d;
 }
 
 Vector3 Vector3::randU(const real n)
 {
     real x, y, z, t, d;
     do {
-        x = RNG.sreal();
-        y = RNG.sreal();
-        z = RNG.sreal();
-        t = RNG.sreal();
-        d = x*x + y*y + z*z + t*t;
+        RNG.sreal4(x, y, z, t);
+        d = ( x*x + y*y ) + ( z*z + t*t );
     } while ( d > 1.0 );
-    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), x*x+t*t-y*y-z*z) * (n/d);
+    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), x*x-y*y-z*z+t*t) * (n/d);
 }
 
 #endif

@@ -220,6 +220,7 @@
 		BB47E5B32902AF7700DB6357 /* mechoui_param.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB47E5992902AD5700DB6357 /* mechoui_param.cc */; };
 		BB47E5B42903EDE500DB6357 /* glapp.h in Headers */ = {isa = PBXBuildFile; fileRef = BB08642E281D4CE8005A6D72 /* glapp.h */; };
 		BB47E5B52903EDE500DB6357 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
+		BB47E5B62906871A00DB6357 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
 		BB48AB021B42BABD008540D1 /* space_banana.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB48AB001B42BABD008540D1 /* space_banana.cc */; };
 		BB48AB041B42BABD008540D1 /* space_banana.h in Headers */ = {isa = PBXBuildFile; fileRef = BB48AB011B42BABD008540D1 /* space_banana.h */; };
 		BB4A635E12CCA83C001FD45D /* stream_func.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7085E71285A2CA00D8D79A /* stream_func.cc */; };
@@ -5446,6 +5447,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB47E5B62906871A00DB6357 /* random_vector.cc in Sources */,
 				BB584FDD28F9F53C006D6349 /* SFMT.c in Sources */,
 				BB584FDC28F9F52C006D6349 /* random.cc in Sources */,
 				BB584FDB28F9F520006D6349 /* test_random.cc in Sources */,

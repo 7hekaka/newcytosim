@@ -16,7 +16,7 @@ thread_local Random RNG;
 
 /// use Vectorized makeGaussians(), if available (requires NEON/SSE3)
 #if  defined(__ARM_NEON__) || defined(__SSE3__)
-#  define RANDOM_USES_SIMD 0
+#  define RANDOM_USES_SIMD 1
 #  include "simd.h"
 #  include "simd_float.h"
 #  include "simd_math.h"
@@ -169,6 +169,28 @@ void Random::add_srand3(real dst[2], const real ptr[2], real mag)
     dst[0] = ptr[0] + mag * static_cast<real>(finish_[0]);
     dst[1] = ptr[1] + mag * static_cast<real>(finish_[1]);
     dst[2] = ptr[2] + mag * static_cast<real>(finish_[2]);
+}
+
+void Random::sreal2(real& a, real& b)
+{
+    if ( finish_ <= 1 + start_ )
+        refill();
+    finish_ -= 2;
+    int32_t const * ptr = reinterpret_cast<int32_t const *>(finish_);
+    a = TWO_POWER_MINUS_31 * static_cast<real>(ptr[0]);
+    b = TWO_POWER_MINUS_31 * static_cast<real>(ptr[1]);
+}
+
+void Random::sreal4(real& a, real& b, real& c, real& d)
+{
+    if ( finish_ <= 3 + start_ )
+        refill();
+    finish_ -= 3;
+    int32_t const * ptr = reinterpret_cast<int32_t const *>(finish_);
+    a = TWO_POWER_MINUS_31 * static_cast<real>(ptr[0]);
+    b = TWO_POWER_MINUS_31 * static_cast<real>(ptr[1]);
+    c = TWO_POWER_MINUS_31 * static_cast<real>(ptr[2]);
+    d = TWO_POWER_MINUS_31 * static_cast<real>(ptr[3]);
 }
 
 //------------------------------------------------------------------------------

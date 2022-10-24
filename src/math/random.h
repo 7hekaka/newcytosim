@@ -275,6 +275,12 @@ public:
     /// non-zero real number in ]0,n]
     real preal_exc(real n) { return preal_exc() * n; }
     
+    /// set 2 random number in [-1, 1]
+    void sreal2(real&, real&);
+    
+    /// set 4 random number in [-1, 1]
+    void sreal4(real&, real&, real&, real&);
+
     /// real number uniformly distributed in [a,b[
     real real_uniform(real a, real b) { return a + preal() * ( b - a ); }
     

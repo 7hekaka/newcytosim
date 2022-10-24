@@ -8,6 +8,9 @@
 #include <iostream>
 #include <climits>
 #include "timer.h"
+#include "vector.h"
+#include "random_vector.h"
+
 #include <random>
 
 template < typename T >
@@ -25,20 +28,6 @@ void print_bits(FILE* f, const T& val, char spc)
         if ( spc ) putc(spc, f);
     }
     putc('\n', f);
-}
-
-
-void speed_test()
-{
-    const size_t cnt = 1 << 30;
-    tick();
-    uint32_t u = 10;
-    for (size_t j=0; j<cnt; ++j)
-    {
-        u = RNG.pint32(1024);
-        RNG.pint32(u);
-    }
-    printf("int %5.2f\n", tock(cnt));
 }
 
 
@@ -223,7 +212,7 @@ void test_real()
     printf("\n");
 }
 
-//==========================================================================
+//==============================================================================
 
 void test_uniform(size_t cnt)
 {
@@ -323,7 +312,48 @@ void test_poisson(size_t sup)
     }
 }
 
-//==========================================================================
+//==============================================================================
+
+void speed_test(size_t cnt)
+{
+    tick();
+    size_t c = 0;
+    uint32_t u = 10;
+    for ( size_t j = 0; j < cnt; ++j )
+    {
+        u = RNG.pint32(1024);
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+    }
+    printf("int %5.2f\n", tock(cnt>>17));
+}
+
+
+void speed_test_vector(size_t cnt)
+{
+    tick();
+    Vector3 sum(0,0,0);
+    for ( size_t j = 0; j < cnt; ++j )
+    {
+        sum += Vector3::randU();
+        sum += Vector3::randU();
+        sum += Vector3::randU();
+        sum += Vector3::randU();
+        sum += Vector3::randU();
+        sum += Vector3::randU();
+        sum += Vector3::randU();
+        sum += Vector3::randU();
+    }
+    printf("Unit vector %5.2f  ", tock(cnt>>17));
+    printf("( %5.2f %5.2f %5.2f )\n", sum.XX, sum.YY, sum.ZZ);
+}
+
+
 int main(int argc, char* argv[])
 {
     int mode = 4;
@@ -348,22 +378,23 @@ int main(int argc, char* argv[])
             test_gauss(0x1p20);
             break;
 
-        case 3:
+        case 2:
             for ( int kk=0; kk < 11; ++kk )
                 test_test(rate*kk, 5000000);
             break;
             
-        case 4:
+        case 3:
             printf("sizeof(uint32_t) = %lu\n", sizeof(uint32_t));
             test_int();
             test_real();
             break;
             
-        case 5:
-            speed_test();
+        case 4:
+            speed_test(1048576);
+            speed_test_vector(1048576);
             break;
             
-        case 6:
+        case 5:
             silly_test();
             break;
     }
