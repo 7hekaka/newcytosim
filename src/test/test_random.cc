@@ -324,13 +324,20 @@ void speed_test(size_t cnt)
         u = RNG.pint32(1024);
         c += RNG.pint32(u);
         c += RNG.pint32(u);
+        
         c += RNG.pint32(u);
         c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        c += RNG.pint32(u);
+        
         c += RNG.pint32(u);
         c += RNG.pint32(u);
         c += RNG.pint32(u);
     }
-    printf("int %5.2f\n", tock(cnt>>17));
+    printf("3x integers %5.2f\n", tock(cnt>>17));
 }
 
 
@@ -340,10 +347,6 @@ void speed_test_vector(size_t cnt)
     Vector3 sum(0,0,0);
     for ( size_t j = 0; j < cnt; ++j )
     {
-        sum += Vector3::randU();
-        sum += Vector3::randU();
-        sum += Vector3::randU();
-        sum += Vector3::randU();
         sum += Vector3::randU();
         sum += Vector3::randU();
         sum += Vector3::randU();

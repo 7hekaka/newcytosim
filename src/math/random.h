@@ -161,8 +161,19 @@ public:
     uint64_t pint64(const uint64_t& n) { return uint64_t(ZERO2ONE()*n); }
 #else
     /// unsigned integer in [0,n-1] for n < 2^32, Daniel Lemire's method
+    /** Fast Random Integer Generation in an Interval, 2019 https://doi.org/10.1145/3230636 */
     uint32_t pint32(const uint32_t& n) { return (uint32_t)(((uint64_t)URAND32() * (uint64_t)n) >> 32); }
-
+    
+    /// unsigned integer in [0,n-1] for n < 2^64, Daniel Lemire's method
+    uint64_t pint64(const uint64_t& p) {
+#ifdef __SIZEOF_INT128__ // then we know we have 128-bit integers
+        return (uint64_t)(((__uint128_t)URAND64() * (__uint128_t)p) >> 64);
+#else
+        return URAND64() % p; // fallback
+#endif
+    }
+#endif
+ 
     /// unsigned integer in [0,n-1] for n < 2^32, Daniel Lemire's fair method
     uint32_t pint32_fair(const uint32_t& range)
     {
@@ -179,17 +190,7 @@ public:
         }
         return (uint32_t)(multiresult >> 32);
     }
-    
-    /// unsigned integer in [0,n-1] for n < 2^64, Daniel Lemire's method
-    uint64_t pint64(const uint64_t& p) {
-#ifdef __SIZEOF_INT128__ // then we know we have 128-bit integers
-        return (uint64_t)(((__uint128_t)URAND64() * (__uint128_t)p) >> 64);
-#else
-        return URAND64() % p; // fallback
-#endif
-    }
-#endif
- 
+
     /// integer in [0,n] for n < 2^32, (slow) bitwise algorithm
     uint32_t pint32_slow(uint32_t n);
     
