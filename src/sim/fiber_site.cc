@@ -206,7 +206,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
         }
         else
         {
-            ///\todo: we should allow binder to refer to any Mecable
+            ///\todo: we could allow binder to refer to any Mecable
             throw InvalidIO("unexpected class in FiberSite");
         }
 

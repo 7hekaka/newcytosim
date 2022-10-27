@@ -525,7 +525,6 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
 }
 
 
-///\todo flexible key assignment map to accomodate different keyboard layouts
 void glApp::processNormalKey(unsigned char c, int, int)
 {
     processNormalKey(c, glutGetModifiers());

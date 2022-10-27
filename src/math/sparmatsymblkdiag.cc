@@ -89,7 +89,6 @@ SparMatSymBlkDiag::Pilar::Pilar()
 
 
 /*
-\todo Columns should use partitions of a single memory pool allocated by Matrix
 This may require some smart allocation scheme.
 */
 void SparMatSymBlkDiag::Pilar::allocate(size_t alc)

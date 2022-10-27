@@ -18,7 +18,6 @@ void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigne
     CHECK_GL_ERROR("drawBitmap1");
 }
 
-///\todo: we should unpack the whole font data only once!
 /** This is drawing `bits` by using a texture over a square. S is the dimension of each pixel */
 void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* pixels)
 {
