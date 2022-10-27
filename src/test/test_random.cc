@@ -337,7 +337,7 @@ void speed_test(size_t cnt)
         c += RNG.pint32(u);
         c += RNG.pint32(u);
     }
-    printf("3x integers %5.2f\n", tock(cnt>>17));
+    printf("3x integers %5.2f  ( %lu )\n", tock(cnt>>17), c);
 }
 
 
