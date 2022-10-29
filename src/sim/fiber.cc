@@ -272,12 +272,12 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
     // try all segments
     for ( size_t s = 0; s < nbSegments(); ++s )
     {
-        //check the segment:
+        //project on the segment:
         real d = INFINITY;
         real a = FiberSegment(this, s).projectPoint0(w, d);
         if ( len < a )
         {
-            // test exact point
+            // projection is past the plus end, test vertex:
             real e = distanceSqr(w, posP(s+1));
             if ( e < dis ) {
                 abs = abscissaPoint(s+1);
@@ -286,7 +286,7 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
         }
         else if (( 0 <= a ) & ( d < dis ))
         {
-            //the projection is the best found so far
+            // projection falls within the segment, and is the best found so far
             abs = abscissaPoint(s) + a;
             dis = d;
         }

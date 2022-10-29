@@ -248,7 +248,9 @@ public:
     
     /// return index of 'prop' in corresponding PropertyList
     Property const* property() const { return prop; }
-    
+
+    //--------------------------------------------------------------------------
+
     /// a static_cast<> of Object::next()
     Field* next() const { return static_cast<Field*>(nextO); }
     

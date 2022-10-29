@@ -84,13 +84,16 @@ public:
     /// the one that is used
     void setInteractions(Meca&) const;
 
-    
+    //--------------------------------------------------------------------------
+
     /// a static_cast<> of Object::next()
-    Tubule *  next() const { return static_cast<Tubule*>(nextO); }
+    Tubule * next() const { return static_cast<Tubule*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    Tubule *  prev() const { return static_cast<Tubule*>(prevO); }
+    Tubule * prev() const { return static_cast<Tubule*>(prevO); }
     
+    //--------------------------------------------------------------------------
+
     /// a unique character identifying the class
     static const ObjectTag TAG = 't';
 

@@ -170,7 +170,7 @@ public:
     virtual void setInteractions(Meca&) const;
     
     //--------------------------------------------------------------------------
-    
+
     /// a static_cast<> of Object::next()
     Single * next() const { return static_cast<Single*>(nextO); }
     

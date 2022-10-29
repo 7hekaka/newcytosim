@@ -115,6 +115,8 @@ public:
     static const ObjectTag TAG_BUNDLE = 'u';
     static const ObjectTag TAG_NUCLEUS = 'n';
     static const ObjectTag TAG_FAKE = 'k';
+    
+    //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
     Organizer * next() const { return static_cast<Organizer*>(nextO); }

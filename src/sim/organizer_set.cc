@@ -11,19 +11,6 @@
 #include "solid.h"
 #include "simul.h"
 
-
-// first Organizer
-Organizer * OrganizerSet::first() const
-{
-    return static_cast<Organizer*>(pool_.front());
-}
-
-// find object with given ID
-Organizer * OrganizerSet::findID(ObjectID n) const
-{
-    return static_cast<Organizer*>(inventory_.get(n));
-}
-
 //------------------------------------------------------------------------------
 
 void OrganizerSet::step()

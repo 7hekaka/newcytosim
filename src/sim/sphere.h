@@ -148,7 +148,7 @@ public:
     size_t nbConstraints() const { return DIM * nbRefPoints - ( DIM + DIM - 1 ) + nPoints - nbRefPoints; }
 
     //--------------------------------------------------------------------------
-    
+
     /// a static_cast<> of Object::next()
     Sphere * next() const { return static_cast<Sphere*>(nextO); }
     

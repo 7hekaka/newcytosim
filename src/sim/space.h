@@ -195,12 +195,16 @@ public:
     /// return the name of the Property, with the identity number, eg. 'cell1'
     std::string name() const { return prop->name() + std::to_string(identity()); }
     
+    //--------------------------------------------------------------------------
+
     /// a static_cast<> of Object::next()
     Space * next() const { return static_cast<Space*>(nextO); }
     
     /// a static_cast<> of Object::prev()
     Space * prev() const { return static_cast<Space*>(prevO); }
     
+    //--------------------------------------------------------------------------
+
     /// write dimensions to file
     virtual void write(Outputter&) const;
 

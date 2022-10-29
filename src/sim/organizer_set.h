@@ -4,11 +4,7 @@
 #define ORGANIZER_SET_H
 
 #include "object_set.h"
-
-class Mecable;
-class Organizer;
-class Aster;
-class Simul;
+#include "organizer.h"
 
 /// a list of Organizer (Aster, Nucleus, Bundle)
 class OrganizerSet : public ObjectSet
@@ -41,10 +37,10 @@ public:
     //--------------------------
     
     /// first Organizer
-    Organizer * first() const;
+    Organizer * first() const { return static_cast<Organizer*>(pool_.front()); }
     
     /// find object with given ID
-    Organizer * findID(ObjectID n) const;
+    Organizer * findID(ObjectID n) const { return static_cast<Organizer*>(inventory_.get(n)); }
     
     /// find highest ObjectID among Organizers containing given Mecable
     ObjectID findOrganizerID(Mecable const*) const;

@@ -101,12 +101,15 @@ public:
     void setInteractions(Meca&) const {}
     
     
+    //--------------------------------------------------------------------------
+
     /// a static_cast<> of Object::next()
     Event * next() const { return static_cast<Event*>(nextO); }
     
     /// a static_cast<> of Object::prev()
     Event * prev() const { return static_cast<Event*>(prevO); }
     
+    //--------------------------------------------------------------------------
 
     /// read
     void read(Inputter&, Simul&, ObjectTag);

@@ -61,8 +61,7 @@ public:
     Space * first() const { return static_cast<Space*>(pool_.front()); }
     
     /// last Space
-    Space * last() const
-    { return static_cast<Space*>(pool_.back());}
+    Space * last() const { return static_cast<Space*>(pool_.back()); }
     
     /// first Fiber in inventory
     Space * firstID() const { return static_cast<Space*>(inventory_.first()); }

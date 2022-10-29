@@ -382,10 +382,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Fiber *  next() const { return static_cast<Fiber*>(nextO); }
+    Fiber * next() const { return static_cast<Fiber*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    Fiber *  prev() const { return static_cast<Fiber*>(prevO); }
+    Fiber * prev() const { return static_cast<Fiber*>(prevO); }
 
     //--------------------------------------------------------------------------
     

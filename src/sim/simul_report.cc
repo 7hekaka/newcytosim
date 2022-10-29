@@ -3183,9 +3183,10 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     
     bool print = 0;
     opt.set(print, "print");
-    static char cat = 'U'; // category
+    static real abs = -77; // abscissa of contact point
     static real ang = 777; // angle at first contact
-    static real abs = 0;   // abscissa of contact point
+    static real dis = INFINITY; // minimum distance reached
+    static char cat = 'U'; // category
 
     Fiber const * fib = nullptr, *fox = nullptr;
     for ( Fiber const* f = fibers.first(); f; f = f->next() )
@@ -3195,7 +3196,6 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         else
             fox = f;
     }
-    real dis = INFINITY;
     bool K = 1, X = 0, T = 0, Z = 0;
 
     if ( fib && fox )
@@ -3207,15 +3207,32 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         
         // check if tip of 'fib' is close to 'fox':
         Vector tip = fib->posEndP();
-        real aaa = fox->projectPoint(tip, dis);
+        real d, aaa = fox->projectPoint(tip, d);
         Vector dir = fox->dir(aaa);
-        dis = std::sqrt(dis);
-        bool contact = ( dis < sup );
+        dis = std::min(dis, d);
         
-        // X = if plus-tip has crossed the other filament
-        if ( fib->length() > 1 )
+        // plus-tip of 'fil' is in contact with 'fox':
+        bool contact = ( d < sup*sup );
+        if ( contact )
         {
-            // we consider a point 1um back from the plus-end:
+            // check direction of fib's tip to fox at closest point:
+            real C = dot(fib->dirEndP(), dir);
+            real A = std::acos(C);
+            // the angle and abscissa are set at first contact:
+            if ( ang > 700 )
+            {
+                ang = A;
+                abs = aaa;
+            }
+            // 'zippering' implies 'being tangent' and 'moving along' the obstacle
+            T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
+            // distanced zipped is measured along the obstacle, with abscissa:
+            Z = ( abs_real(aaa-abs) > 2 ); // distance zipped sufficient
+        }
+        else if ( fib->length() > 1 )
+        {
+            // the plus-tip may have crossed the other filament if it is not in contact
+            // consider a point 1um back, and check if it is on opposite side of 'fox'
             Vector bak = fib->posFrom(1, PLUS_END);
             real ddd, bbb = fox->projectPoint(bak, ddd);
             bbb = 0.5 * ( aaa + bbb );
@@ -3229,23 +3246,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
             X = ( TP * TM < 0 );
 #endif
         }
-        
-        if ( contact ) // tip is in contact:
-        {
-            // check direction of fib's tip to fox at closest point:
-            real C = dot(fib->dirEndP(), dir);
-            real A = std::acos(C);
-            // the angle is set at first contact:
-            if ( ang > 700 )
-            {
-                ang = A;
-                abs = aaa;
-            }
-            // 'zippering' implies 'being tangent' and 'moving along' the obstacle
-            T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
-            // distanced zipped is measured along the obstacle, with abscissa:
-            Z = ( abs_real(aaa-abs) > 2 ); // distance zipped sufficient
-        }
+
         if ( cat == 'U' )
         {
             // catastrophes must be at contact
@@ -3264,12 +3265,13 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     if ( print )
     {
         out << std::fixed << std::setprecision(5) << ang;
-        out << SEP << std::fixed << std::setprecision(5) << dis;
+        out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
         out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << cat;
         // reset static variables for next round:
+        abs = -77;
+        ang = 777;
+        dis = INFINITY;
         cat = 'U';
-        ang = -777;
-        abs = 0;
     }
 }
 

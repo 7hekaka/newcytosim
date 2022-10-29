@@ -247,10 +247,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    inline Couple * next() const { return static_cast<Couple*>(nextO); }
+    Couple * next() const { return static_cast<Couple*>(nextO); }
     
     /// a static_cast<> of Object::prev()
-    inline Couple * prev() const { return static_cast<Couple*>(prevO); }
+    Couple * prev() const { return static_cast<Couple*>(prevO); }
     
     //------------------------------ read/write --------------------------------
 
