@@ -37,9 +37,7 @@ set fiber microtubule
     hydrolysis_rate = 0.215
     max_length= 8
     min_length = 0.5
-    confine = inside, 2000 
-    confine2 = on, 4.2353
-    confine3 = on, 42
+    confine = in_out, 4.2353, 2000 
 }
 
 set fiber obstacle
