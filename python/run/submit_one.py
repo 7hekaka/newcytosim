@@ -3,14 +3,14 @@
 # A script to submit analysis jobs to the SLURM queuing system
 #
 # Derived from submit_slurm.py
-# F. Nedelec, 4.11.2020, 8.10.2022
+# F. Nedelec, 4.11.2020, 28.10.2022
 
 """
     Submit a job to the SLURM system to be called in multiple directories
     
 Syntax:
     
-    submit_one.py ARG [mem=????] [queue=????] [hours=INT] [days=INT] dir1 [dir2] [dir3] [...]
+    submit_one.py ARG [mem=????] [queue=????] [ncpu=INT] [hours=INT] [days=INT] dir [dir2] [...]
     
     The amount of requested memory (default=2G) should be specified in MB:
        mem=1024 (for 1 GB)
@@ -140,7 +140,7 @@ def main(args):
         sys.exit()
 
     if job:
-        fd, file = tempfile.mkstemp('', '', path, True)
+        fd, file = tempfile.mkstemp('', 'j', path, True)
         out.write("script %s : " % file)
         write_script(fd, job)
         os.chmod(file, 0700)
