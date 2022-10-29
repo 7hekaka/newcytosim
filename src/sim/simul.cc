@@ -243,7 +243,7 @@ void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 
 ObjectFlag Simul::setUniqueFlags() const
 {
-    ObjectFlag f = 1;
+    size_t f = 1;
     for ( Fiber * F = fibers.firstID(); F; F = fibers.nextID(F) )
         F->flag(f++);
     for ( Solid * S = solids.firstID(); S; S = solids.nextID(S) )
@@ -252,8 +252,7 @@ ObjectFlag Simul::setUniqueFlags() const
         B->flag(f++);
     for ( Sphere* O = spheres.firstID(); O; O = spheres.nextID(O) )
         O->flag(f++);
-    size_t cnt = fibers.size() + solids.size() + beads.size() + spheres.size();
-    if ( (size_t)f != cnt+1 )
+    if ( f != (ObjectFlag)f )
         throw InvalidParameter("ObjectFlag overflow in setUniqueFlags()");
     return f;
 }

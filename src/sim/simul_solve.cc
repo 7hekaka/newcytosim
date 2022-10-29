@@ -326,11 +326,11 @@ void Simul::solve_separate()
 {
     size_t cnt = fibers.size();
 #if 0
-    size_t sup = setUniqueFlags();
+    ObjectFlag sup = setUniqueFlags();
     flagClustersCouples();
 #else
     Object ** table = new Object*[cnt+2]{nullptr};
-    size_t sup = orderClustersCouple(table, cnt);
+    ObjectFlag sup = orderClustersCouple(table, cnt);
     std::clog << "Ordered " << sup << " clusters:\n";
     delete[] table;
 #endif
