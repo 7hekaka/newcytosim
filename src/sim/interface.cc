@@ -599,7 +599,7 @@ public:
     unsigned st2;
 
     /// initialize
-    Filter()
+    void reset()
     {
         mrk = 0;
         st1 = ~0U;
@@ -612,26 +612,38 @@ public:
     void set(Simul* sim, Property* pp, Glossary& opt)
     {
         prp = pp;
-        
         std::string str;
         if ( opt.set(str, "position", 1) )
         {
-            Space const* ptr = sim->spaces.master();
-            ptr = sim->findSpace(str);
-            if ( !ptr )
+            Space const* spc = sim->spaces.master();
+            spc = sim->findSpace(str);
+            if ( !spc )
                 throw InvalidSyntax("unknown Space `"+str+"'");
             opt.set(str, "position");
             if ( str == "inside" )
-                ins = ptr;
+                ins = spc;
             else if ( str == "outside" )
-                ous = ptr;
+                ous = spc;
         }
         
         opt.set(mrk, "mark");
         opt.set(st1, "state1", "stateP") || opt.set(st1, "state");
         opt.set(st2, "state2", "stateM") || opt.set(st1, "state", 1);
     }
+
+    /// initialize: will pass anything
+    Filter()
+    {
+        reset();
+    }
     
+    /// initialize
+    Filter(Simul* sim, Property* pp, Glossary& opt)
+    {
+        reset();
+        set(sim, pp, opt);
+    }
+
     /// return `true` if given object fulfills all the conditions specified
     bool pass(Object const* obj) const
     {
@@ -690,8 +702,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
         throw InvalidSyntax("could not determine the class of `"+name+"'");
     }
     
-    Filter filter;
-    filter.set(sim_, pp, opt);
+    Filter filter(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     if ( objs.size() > 0 )
@@ -715,8 +726,7 @@ void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
     
-    Filter filter;
-    filter.set(sim_, pp, opt);
+    Filter filter(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     Vector pos;
@@ -752,8 +762,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
         throw InvalidParameter("mark must be specified for command `mark'");
     opt.clear("mark");
     
-    Filter filter;
-    filter.set(sim_, pp, opt);
+    Filter filter(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     sim_->mark(objs, mk);
@@ -784,8 +793,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     if ( set != &sim_->fibers )
         throw InvalidSyntax("only `cut fiber' is supported");
 
-    Filter filter;
-    filter.set(sim_, pp, opt);
+    Filter filter(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
     VLOG("-CUT PLANE (" << n << ").x = " << -a);
