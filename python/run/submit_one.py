@@ -97,13 +97,9 @@ def main(args):
     # first argument is used for go_sim.py:
     cmd = args.pop(0)
 
-    # create job script file:
-    if not os.path.isdir('log'):
-        os.mkdir('log')
-
     job = []
     cwd = os.getcwd()
-    path = 'log'
+    path = cwd
     for arg in args:
         if os.path.isdir(arg) and os.access(arg, os.X_OK):
             path = os.path.abspath(arg)
