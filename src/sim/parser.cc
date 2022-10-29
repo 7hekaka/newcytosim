@@ -1075,18 +1075,41 @@ void Parser::parse_repeat(std::istream& is)
 }
 
 
+/// evaluate snippets found within [] in `code`
+static std::string replace_bracketed_code(std::string const& code, Evaluator const& evaluator)
+{
+    std::string res;
+    std::string::size_type P = code.find('[', 0);
+    res.append(code, 0, P);
+    while ( P != std::string::npos )
+    {
+        ++P;
+        std::string::size_type Q = code.find(']', P);
+        if ( Q != std::string::npos )
+        {
+            std::string S = code.substr(P, Q-P);
+            ++Q;
+            res.append(evaluator.eval_as_string(S));
+            P = code.find('[', Q);
+            res.append(code, Q, P-Q);
+        }
+    }
+    return res;
+}
+
+
 /**
  Repeat specified code, with variable substitution
  
      for VAR=INTEGER:INTEGER { CODE }
  
  The two integers are the first and last iterations counters.
- Any occurence of VAR is replaced before the code is executed.
+ Any occurence of VAR within brackets is replaced before the code is executed.
  
  Example:
  
      for CNT=1:10 {
-       new 10 filament { length = [CNT+2] }
+       new 10 filament { length = [0.5*CNT+2] }
      }
  
  NOTE: This code is a hack, and can be improved vastly!
@@ -1123,24 +1146,7 @@ void Parser::parse_for(std::istream& is)
     
     for ( long v = start; v < end; v += inc )
     {
-        Evaluator evaluator{{var, v}};
-        // substitute Variable name for this iteration:
-        std::string res;
-        std::string::size_type P = code.find('[', 0);
-        res.append(code, 0, P);
-        while ( P != std::string::npos )
-        {
-            ++P;
-            std::string::size_type Q = code.find(']', P);
-            if ( Q != std::string::npos )
-            {
-                std::string S = code.substr(P, Q-P);
-                ++Q;
-                res.append(evaluator.eval_repr(S));
-                P = code.find('[', Q);
-                res.append(code, Q, P-Q);
-            }
-        }
+        std::string res = replace_bracketed_code(code, Evaluator{{var, v}});
         //std::clog << res << "\n";
         evaluate(res);
     }

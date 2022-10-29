@@ -30,7 +30,7 @@ class Evaluator
 private:
 
     /// pointer
-    char const* ptr;
+    mutable char const* ptr;
     
     /// list of variables
     const variable_list variables_;
@@ -93,13 +93,13 @@ private:
         return x;
     }
     
-    void skip_space()
+    void skip_space() const
     {
         while ( isspace(*ptr) )
             ++ptr;
     }
 
-    std::string token_()
+    std::string token_() const
     {
         char const* s = ptr++;
         while ( isalnum(*ptr) )
@@ -110,7 +110,7 @@ private:
         return tok;
     }
     
-    real value_(std::string var)
+    real value_(std::string var) const
     {
         for ( variable const& v : variables_ )
         {
@@ -124,7 +124,7 @@ private:
         return 0;
     }
     
-    real number_()
+    real number_() const
     {
         errno = 0;
         char * end = nullptr;
@@ -136,7 +136,7 @@ private:
         return d;
     }
     
-    real factor_()
+    real factor_() const
     {
         //std::clog << "factor: " << ptr << "\n";
         skip_space();
@@ -177,7 +177,7 @@ private:
         throw InvalidSyntax("unexpected syntax");
     }
     
-    real term_()
+    real term_() const
     {
         //std::clog << "term: " << ptr << "\n";
         real result = factor_();
@@ -205,7 +205,7 @@ private:
         }
     }
     
-    real expression_()
+    real expression_() const
     {
         //std::clog << "expression: " << ptr << "\n";
         real result = term_();
@@ -258,7 +258,7 @@ public:
     }
     
     /// evaluate expression in string argument
-    real eval(char const* str)
+    real eval(char const* str) const
     {
         ptr = str;
         real res = expression_();
@@ -267,13 +267,13 @@ public:
     }
     
     /// evaluate expression in string argument
-    real eval(std::string const& str)
+    real eval(std::string const& str) const
     {
         return eval(str.c_str());
     }
     
     /// return string-representation of evaluated expression
-    std::string eval_repr(std::string const& str)
+    std::string eval_as_string(std::string const& str) const
     {
         real x = eval(str.c_str());
         int i = (int) x;
