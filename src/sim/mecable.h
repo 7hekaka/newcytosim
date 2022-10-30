@@ -62,8 +62,8 @@ private:
     /// Matrix block used for preconditionning in Meca::solve()
     real * pBlock;
     
-    /// array of pivot indices for LAPACK
-    int  * pPivot;
+    /// array of pivot indices used by LAPACK to factorize the preconditionner
+    int * pPivot;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
     unsigned pIndex;

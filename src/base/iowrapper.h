@@ -190,6 +190,9 @@ public:
     void writeFloat(float);
     /// Write value on 4 bytes
     void writeFloat(double x) { writeFloat((float)x); }
+    /// disable any implicit conversion
+    template <typename T> void writeFloat(T x) = delete;
+    
     /// Write multiple values using 4 bytes per value, and possibly a character before
     void writeFloats(const float*, size_t, char before=0);
     /// Write multiple values using 4 bytes per value, and possibly a character before

@@ -17,6 +17,9 @@ class Glossary;
 /// include a normal used for fancy display of fibers as helices
 #define FIBER_HAS_NORMAL 0
 
+/// record birth time of fibers, used for display mostly
+#define FIBER_HAS_BIRTHTIME 0
+
 
 /// Mecable with linear geometry
 /**
@@ -74,7 +77,7 @@ class Chain : public Mecable
     
 private:
         
-    /// actual section length: distance between consecutive points
+    /// actual section length: distance between consecutive points, and inverse
     real fnCut, iCut;
     
     /// target segmentation (copy of 'FiberProp::segmentation')
@@ -83,12 +86,13 @@ private:
     /// abscissa of the minus-end (equal to zero initially)
     real fnAbscissaM;
     
-    /// abscissa of the plus-end
+    /// abscissa of the plus-end (equal to length initially)
     real fnAbscissaP;
-
-    /// time at birth
+    
+#if FIBER_HAS_BIRTHTIME
+    /// simulation time when initialized
     real fnBirthTime;
-
+#endif
 #if CURVATURE_DEPENDENT_SEGMENTATION
 
     /// error due to the cutting at different steps
@@ -207,15 +211,29 @@ public:
 
     //---------------------
 
+#if FIBER_HAS_BIRTHTIME
+    
     /// returns simulation time at which Fiber was created
     real birthTime() const { return fnBirthTime; }
 
     /// set birth time
     void birthTime(double t) { fnBirthTime = t; }
-    
+
     /// returns current age of the fiber
     double age() const;
+#else
+    
+    /// set birth time
+    void birthTime(double) {}
 
+    /// returns simulation time at which Fiber was created
+    real birthTime() const { return 0; }
+
+    /// returns current age of the fiber
+    double age() const { return 0; }
+
+#endif
+    
     //---------------------
     
     /// return Mecapoint of given end
