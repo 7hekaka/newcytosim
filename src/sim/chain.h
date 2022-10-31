@@ -240,10 +240,10 @@ public:
     Mecapoint exactEnd(FiberEnd) const;
 
     /// interpolation of MINUS_END
-    Interpolation interpolateEndM() const { return Interpolation(this, 0.0, 0); }
+    Interpolation interpolateEndM() const { return Interpolation(this, real(0.0), 0); }
 
     /// interpolation of PLUS_END
-    Interpolation interpolateEndP() const { return Interpolation(this, 1.0, nPoints-2); }
+    Interpolation interpolateEndP() const { return Interpolation(this, real(1.0), nPoints-2); }
 
     /// interpolation of given end
     Interpolation interpolateEnd(FiberEnd) const;
