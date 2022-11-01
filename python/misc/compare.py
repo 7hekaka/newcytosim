@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # compare.py
 #
@@ -38,16 +38,16 @@ def compareFiles(fileL, fileR):
     comp.close()
     if not empty:
         if exe == 'diff':
-            file = os.path.basename(fileL)
+            file = os.path.basename(fileL);
             print_spacer(file)
             comp = os.popen(diff+" "+fileL+" "+fileR)
             for line in comp:
                 print(line, end='')
             comp.close()
             
-            sys.stdout.write(chr(27)+"[32;2m")
-            print("This was %40s" % file)
-            ans = raw_input('Action (return/left/right/open/q)? >'+chr(27)+'[0m')
+            sys.stdout.write(chr(27)+"[33;1m")
+            print("This was `%20s`" % file, end='')
+            ans = input('Action? (return/left/right/open/q) >'+chr(27)+'[0m')
             
             if ans == "left" or ans == "l":
                 shutil.copyfile(fileL, fileR)
@@ -56,7 +56,7 @@ def compareFiles(fileL, fileR):
             elif ans == "swap":
                 fid, file = tempfile.mkstemp('.txt', 'temp', '', True)
                 print(os.getcwd(), os.path.isfile(file))
-                os.close(fid)
+                os.close(fid);
                 os.rename(fileL, file)
                 os.rename(fileR, fileL)
                 os.rename(file, fileR)
@@ -132,6 +132,8 @@ def main(args):
     #print("Comparing %s and %s" % (rootL, rootR))
     for path, dirs, files in os.walk(rootL, topdown=False):
         process_dir([rootL, rootR], path, files)
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3 or sys.argv[1]=='help':

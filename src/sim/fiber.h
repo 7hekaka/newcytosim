@@ -40,10 +40,10 @@ class LineDisp;
  The type of Lattice associated with each Fiber is defined here:
  */
 #if FIBER_HAS_LATTICE > 0
-// Lattice composed of integers, appropriate for discrete occupancy
+/// Lattice cells contain integers, appropriate for discrete occupancy
 typedef Lattice<uint8_t> FiberLattice;
 #else
-// Lattice composed of floating point values, for continuous values
+/// Lattice cells contain continuous values
 typedef Lattice<real> FiberLattice;
 #endif
 

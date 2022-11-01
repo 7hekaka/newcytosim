@@ -39,7 +39,7 @@ inline double tock(double arg = 1) { return double((__rdtsc()-rdt_) >> 20) / arg
 // using real time
 struct timeval tic_t;
 
-/// return current timer value in milliseconds
+/// return current time in milliseconds
 inline unsigned long timer()
 {
     timeval tv;

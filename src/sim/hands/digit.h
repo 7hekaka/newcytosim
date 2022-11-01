@@ -75,7 +75,6 @@ public:
 
     lati_t site() const { return (lati_t)std::nearbyint(hAbs/prop()->step_size); }
     bool outsideMP(lati_t s) const { return fiber()->outsideMP((s+0.5)*prop()->step_size); }
-    bool occupied(FiberLattice* lat, lati_t s) const { return false; }
     bool vacant(lati_t) const { return true; }
     void inc() const {}
     void dec() const {}
