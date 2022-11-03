@@ -31,17 +31,17 @@ void CutterProp::read(Glossary& glos)
     glos.set(cutting_rate,  "cutting_rate");
     
     // possible dynamic states of the ends
-    Glossary::dict_type<state_t> keys({{"white",     STATE_WHITE},
-                                       {"green",     STATE_GREEN},
-                                       {"yellow",    STATE_YELLOW},
-                                       {"orange",    STATE_ORANGE},
-                                       {"red",       STATE_RED},
-                                       {"static",    STATE_WHITE},
-                                       {"grow",      STATE_GREEN},
-                                       {"growing",   STATE_GREEN},
-                                       {"shrink",    STATE_RED},
-                                       {"shrinking", STATE_RED},
-                                       {"delete",    STATE_BLACK}});
+    Glossary::dict_type<state_t> keys{{"white",     STATE_WHITE},
+                                      {"green",     STATE_GREEN},
+                                      {"yellow",    STATE_YELLOW},
+                                      {"orange",    STATE_ORANGE},
+                                      {"red",       STATE_RED},
+                                      {"static",    STATE_WHITE},
+                                      {"grow",      STATE_GREEN},
+                                      {"growing",   STATE_GREEN},
+                                      {"shrink",    STATE_RED},
+                                      {"shrinking", STATE_RED},
+                                      {"delete",    STATE_BLACK}};
     
     glos.set(new_end_state[0], "new_end_state", keys);
     glos.set(new_end_state[1], "new_end_state", 1, keys);

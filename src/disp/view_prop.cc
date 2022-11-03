@@ -143,7 +143,7 @@ void ViewProp::read(Glossary& glos)
         clip_plane[k].set(V.XX, V.YY, V.ZZ, S);
     }
     
-    Glossary::dict_type<int> keys({{"off", 0}, {"linear", 1}, {"exponential", 2}, {"exponential2", 3}});
+    Glossary::dict_type<int> keys{{"off", 0}, {"linear", 1}, {"exponential", 2}, {"exponential2", 3}};
 
     glos.set(fog_type,  "fog_type", keys);
     glos.set(fog_param, "fog_param");
