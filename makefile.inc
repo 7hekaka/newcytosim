@@ -64,8 +64,8 @@ endif
 #----------------------------  Intels' OpenMP  ---------------------------------
 #-------------------------------------------------------------------------------
 
-# enable or not OpenMP:
-#OpenMP := -fopenmp
+# enable or not OpenMP (http://openmp.org):
+OpenMP := -fopenmp
 OpenMP :=
 OMPLIB :=
 
