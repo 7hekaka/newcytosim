@@ -128,8 +128,9 @@ LOCAL vec4f cmple4f(vec4f a, vec4f b) { return _mm_cmple_ps(a, b); }
 LOCAL vec4f cmpge4f(vec4f a, vec4f b) { return _mm_cmpge_ps(a, b); }
 
 
-// set i-th bit in returned value if a[i] < b[i], for i = {0, 1, 2, 3}
+/// set i-th bit in returned value to ( a[i] < b[i] ), for i = {0, 1, 2, 3}
 LOCAL int lower_mask4f(vec4f a, vec4f b) { return _mm_movemask_ps(_mm_cmplt_ps(a,b)); }
+/// true if any float component is non-zero
 LOCAL int any_true4f(vec4f a) { return !_mm_test_all_zeros((__m128i)a, (__m128i{-1l, -1l})); }
 
 LOCAL vec4i shiftbitsR4(vec4f a, int b) { return _mm_srli_epi32(cast4fi(a), b); }

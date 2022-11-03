@@ -301,10 +301,11 @@ LOCAL vec4f fmadd4f(vec4f a, vec4f b, vec4f c)  { return vfmaq_f32(c,a,b); }
 /// c - a * b
 LOCAL vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return vfmsq_f32(c,a,b); }
 
+/// set i-th bit in returned value to ( a[i] < b[i] ), for i = {0, 1, 2, 3}
 LOCAL int lower_mask4f(vec4f a, vec4f b)
 {
-    uint32x4_t input = vcltq_f32(a, b);
-    static const int32x4_t shift = {0, 1, 2, 3};
-    uint32x4_t tmp = vshrq_n_u32(input, 31);
-    return vaddvq_u32(vshlq_u32(tmp, shift));
+    uint32x4_t lowerthan = vcltq_f32(a, b); // all bits set in each component
+    constexpr int32x4_t mask = { 1, 2, 4, 8 };
+    int res = vaddvq_u32(vandq_u32(lowerthan, mask));
+    return res;
 }

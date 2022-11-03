@@ -946,11 +946,11 @@ BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
     end = start + ( cnt & ~15UL );
     while ( ptr < end )
     {
-        BitField t = four_near_bits(xyzr, ptr);
-        BitField u = four_near_bits(xyzr, ptr+4) << 4;
-        BitField v = four_near_bits(xyzr, ptr+8) << 8;
-        BitField w = four_near_bits(xyzr, ptr+12) << 12;
-        res |= (( t | u )|( v | w )) << shift;
+        BitField t = four_near_bits(xyzr, ptr) << shift;
+        BitField u = four_near_bits(xyzr, ptr+4) << (shift+4);
+        BitField v = four_near_bits(xyzr, ptr+8) << (shift+8);
+        BitField w = four_near_bits(xyzr, ptr+12) << (shift+12);
+        res |= (( t | u ) | ( v | w ));
         shift += 16;
         ptr += 16;
     }
@@ -958,9 +958,9 @@ BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
     end = start + ( cnt & ~7UL );
     while ( ptr < end )
     {
-        BitField t = four_near_bits(xyzr, ptr);
-        BitField u = four_near_bits(xyzr, ptr+4) << 4;
-        res |= ( t | u ) << shift;
+        BitField t = four_near_bits(xyzr, ptr) << shift;
+        BitField u = four_near_bits(xyzr, ptr+4) << (shift+4);
+        res |= ( t | u );
         shift += 8;
         ptr += 8;
     }
