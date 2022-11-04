@@ -3171,7 +3171,7 @@ void Simul::reportAshbya(std::ostream& out) const
 /**
  categorize the configuration of two microtubules, with respect to collisions
  This calculated 3 boolean values: K = catastrophe, X = crossing, Z = zippered
- 1.10.2021
+ 1.10.2021 -- 11.2022
  */
 void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
 {
@@ -3255,13 +3255,21 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         }
         // The 'X' may superseed the Z and U category
         if ( X && !K ) cat = 'X';
-        
+                
+        // check if MT has reached its max_length:
+        if ( fib->length() >= fib->prop->max_length - 0.01 )
+        {
+            cat = 'U';
+            abort_time();
+        }
+
         // since these states are final, we can terminate the simulation
         if ( cat == 'K' || cat == 'X' || cat == 'Z' )
             abort_time();
     }
     else
         abort_time();
+    
     if ( print )
     {
         out << std::fixed << std::setprecision(5) << ang;
