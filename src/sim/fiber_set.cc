@@ -588,15 +588,17 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
     std::string str;
     if ( opt.set(str, key) )
     {
-        // user can designates all fibers:
-        if ( str == title() )
-            return randomSite();
-        
-        // check property name, designating all fibers with that name:
-        Property const* p = simul_.findProperty(title(), str);
-        if ( p )
-            return randomSite(static_cast<FiberProp const*>(p));
-        
+        if ( opt.num_values(key) == 1 )
+        {
+            // just 'fiber' will designate all fibers:
+            if ( str == title() )
+                return randomSite();
+            
+            // check property name, designating all fibers with that name:
+            Property const* p = simul_.findProperty(title(), str);
+            if ( p )
+                return randomSite(static_cast<FiberProp const*>(p));
+        }
         // check if some individual fiber was requested:
         Fiber* fib = Fiber::toFiber(pickObject(title(), str));
         
