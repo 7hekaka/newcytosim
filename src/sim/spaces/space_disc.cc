@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "dim.h"
 #include "space_disc.h"
@@ -17,6 +17,7 @@ SpaceDisc::SpaceDisc(SpaceProp const* p)
     radius_ = 0;
     bot_ = 0;
     top_ = 0;
+    mid_ = 0;
 }
 
 
@@ -49,6 +50,7 @@ void SpaceDisc::resize(Glossary& opt)
     radius_ = rad;
     bot_ = bot;
     top_ = top;
+    mid_ = ( top_ + bot_ ) * 0.5;
 }
 
 
@@ -152,7 +154,7 @@ void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& mp,
 # if ( DIM <= 2 )
     meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_, stiff);
 #else
-    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_, top_);
+    real Z = sign_select(pos.ZZ - mid_, bot_, top_);
     meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
@@ -167,11 +169,11 @@ void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& mp,
         meca.addSphereClamp(pos, mp, Vector(0,0,0), radius_-rad, stiff);
     }
     else {
-        meca.addPointClamp( mp, Vector(0,0,0), stiff );
+        meca.addPointClamp(mp, Vector(0,0,0), stiff);
         std::cerr << "object is too big to fit in SpaceDisc\n";
     }
 #else
-    real Z = sign_select(2 * pos.ZZ - (bot_+top_), bot_+rad, top_-rad);
+    real Z = sign_select(pos.ZZ - mid_, bot_+rad, top_-rad);
     meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
@@ -185,7 +187,7 @@ void SpaceDisc::write(Outputter& out) const
     out.writeFloat(radius_);
     out.writeFloat(bot_);
     out.writeFloat(top_);
-    out.writeFloat(0.0);
+    out.writeFloat(mid_);
 }
 
 
@@ -194,6 +196,7 @@ void SpaceDisc::setLengths(const real len[])
     radius_ = len[0];
     bot_    = len[1];
     top_    = len[2];
+    mid_ = ( top_ + bot_ ) * 0.5;
 }
 
 void SpaceDisc::read(Inputter& in, Simul&, ObjectTag)

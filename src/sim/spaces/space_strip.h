@@ -34,6 +34,9 @@ private:
     /// upper position of the top limit: Y in 2D and Z in 3D
     real top_;
     
+    /// derived quantity: mid_ = ( top_ + bot_ ) / 2
+    real mid_;
+
     /// Object to handle periodic boundary conditions
     Modulo modulo_;
 

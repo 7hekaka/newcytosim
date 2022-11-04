@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef SPACE_DISC_H
 #define SPACE_DISC_H
@@ -34,6 +34,9 @@ private:
     /// position in Z of the top limit
     real top_;
 
+    /// derived quantity: mid_ = ( top_ + bot_ ) / 2
+    real mid_;
+    
 public:
     
     /// constructor
