@@ -14,7 +14,7 @@ namespace StreamFunc
     
     
     /// copy lines that do not start with character `skip`
-    int skip_lines(std::ostream&, std::istream&, char skip);
+    void skip_lines(std::ostream&, std::istream&, char skip, bool verbatim = true);
 
     /// send lines starting with character `skip` to second stream
     void redirect_lines(std::ostream&, std::ostream&, std::istream&, char sel);

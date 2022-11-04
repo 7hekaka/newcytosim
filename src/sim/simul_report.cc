@@ -155,8 +155,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     {
         std::stringstream ss;
         report_one(ss, arg, opt);
-        if ( StreamFunc::skip_lines(out, ss, '%') )
-            out << '\n';
+        StreamFunc::skip_lines(out, ss, '%', false);
     }
     if ( ver & 1 )
         out << "% end\n";
@@ -3250,8 +3249,14 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
 
         if ( cat == 'U' )
         {
-            // catastrophes must be at contact
-            if ( K && contact ) cat = 'K';
+            if ( K )
+            {
+                // recorded catastrophes must be at contact
+                if ( contact )
+                    cat = 'K';
+                // but in any case, we can stop the simulation
+                abort_time();
+            }
             else if ( Z ) cat = 'Z';
         }
         // The 'X' may superseed the Z and U category
