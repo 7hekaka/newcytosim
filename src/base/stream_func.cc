@@ -62,8 +62,14 @@ void StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
         std::getline(is, line);
         if ( is.fail() )
             break;
-        if ( line.empty() || line[0] != skip )
-            os << line << '\n';
+        if ( line.empty() )
+            os.put('\n');
+        else if ( line[0] != skip )
+        {
+            os << line;
+            if ( !is.eof() )
+                os.put('\n');
+        }
     }
 }
 

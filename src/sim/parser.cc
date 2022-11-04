@@ -1273,6 +1273,8 @@ int Parser::evaluate_one(std::istream& is)
     else if ( tok == "dump" )
         parse_dump(is);
     else {
+        if ( tok.empty() )
+            tok = Tokenizer::get_token(is);
         throw InvalidSyntax("syntax error: unexpected `"+tok+"'");
     }
     return 0;
