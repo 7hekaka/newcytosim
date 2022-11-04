@@ -1087,9 +1087,11 @@ static std::string replace_bracketed_code(std::string const& code, Evaluator con
         std::string::size_type Q = code.find(']', P);
         if ( Q != std::string::npos )
         {
-            std::string S = code.substr(P, Q-P);
+            std::string C = code.substr(P, Q-P);
             ++Q;
-            res.append(evaluator.eval_as_string(S));
+            std::string S = evaluator.eval_as_string(C);
+            //std::clog << "evaluator |" << C << "| -> |" << S << "|\n";
+            res.append(S);
             P = code.find('[', Q);
             res.append(code, Q, P-Q);
         }

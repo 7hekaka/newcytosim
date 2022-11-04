@@ -54,8 +54,9 @@ void StreamFunc::diff_stream(std::ostream& os, std::istream& val, std::istream& 
 }
 
 
-void StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
+int StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
 {
+    int res = 0;
     std::string line;
     while ( is.good() )
     {
@@ -66,11 +67,13 @@ void StreamFunc::skip_lines(std::ostream& os, std::istream& is, char skip)
             os.put('\n');
         else if ( line[0] != skip )
         {
+            ++res;
             os << line;
             if ( !is.eof() )
                 os.put('\n');
         }
     }
+    return res;
 }
 
 

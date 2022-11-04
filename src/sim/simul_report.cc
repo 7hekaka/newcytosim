@@ -155,7 +155,8 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     {
         std::stringstream ss;
         report_one(ss, arg, opt);
-        StreamFunc::skip_lines(out, ss, '%');
+        if ( StreamFunc::skip_lines(out, ss, '%') )
+            out << '\n';
     }
     if ( ver & 1 )
         out << "% end\n";
@@ -3272,7 +3273,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     
     if ( print )
     {
-        out << std::fixed << std::setprecision(5) << ang;
+        out << LIN << std::fixed << std::setprecision(5) << ang;
         out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
         out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << cat;
         // reset static variables for next round:
