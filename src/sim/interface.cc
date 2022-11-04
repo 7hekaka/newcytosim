@@ -170,10 +170,9 @@ void warn_trail(std::istream& is)
 /**
  Define a placement = ( position, orientation ) from the parameters set in `opt'
  */
-void Interface::read_placement(Isometry& iso, Glossary& opt)
+Isometry Interface::read_placement(Glossary& opt)
 {
     std::string str;
-    
     Space const* spc = sim_->spaces.master();
     
     // Space specified as second argument to 'position'
@@ -181,42 +180,48 @@ void Interface::read_placement(Isometry& iso, Glossary& opt)
         spc = sim_->findSpace(str);
     
     // Position
+    Vector vec;
     if ( opt.set(str, "position") )
-        iso.mov = Movable::readPosition(str, spc);
+        vec = Movable::readPosition(str, spc);
     else if ( spc )
-        iso.mov = spc->place();
+        vec = spc->place();
     
-    // Rotation applied before the translation
-    if ( opt.set(str, "direction") )
+    Isometry iso(vec);
+    if ( iso.valid() )
     {
-        std::istringstream iss(str);
-        Vector vec = Movable::readDirection(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss);
-        iso.rot = Rotation::randomRotationToVector(vec);
+        // Rotation applied before the translation
+        if ( opt.set(str, "direction") )
+        {
+            std::istringstream iss(str);
+            vec = Movable::readDirection(iss, iso.mov, spc);
+            if ( has_trail(iss) ) warn_trail(iss);
+            iso.rot = Rotation::randomRotationToVector(vec);
+        }
+        else if ( opt.set(str, "rotation") )
+        {
+            std::istringstream iss(str);
+            iso.rot = Movable::readRotation(iss);
+            if ( has_trail(iss) ) warn_trail(iss);
+        }
+        else if ( opt.set(str, "orientation") )
+        {
+            std::istringstream iss(str);
+            iso.rot = Movable::readOrientation(iss, iso.mov, spc);
+            if ( has_trail(iss) ) warn_trail(iss);
+        }
+        else
+            iso.rot = Rotation::randomRotation();
+        
+        // Second rotation applied after the translation
+        if ( opt.set(str, "orientation", 1) )
+        {
+            std::istringstream iss(str);
+            Rotation rot = Movable::readOrientation(iss, iso.mov, spc);
+            if ( has_trail(iss) ) warn_trail(iss);
+            iso.rotate(rot);
+        }
     }
-    else if ( opt.set(str, "rotation") )
-    {
-        std::istringstream iss(str);
-        iso.rot = Movable::readRotation(iss);
-        if ( has_trail(iss) ) warn_trail(iss);
-    }
-    else if ( opt.set(str, "orientation") )
-    {
-        std::istringstream iss(str);
-        iso.rot = Movable::readOrientation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss);
-    }
-    else
-        iso.rot = Rotation::randomRotation();
-    
-    // Second rotation applied after the translation
-    if ( opt.set(str, "orientation", 1) )
-    {
-        std::istringstream iss(str);
-        Rotation rot = Movable::readOrientation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss);
-        iso.rotate(rot);
-    }
+    return iso;
 }
 
 
@@ -257,74 +262,65 @@ enum PlacementType { PLACE_NOT = 0, PLACE_ANYWHERE, PLACE_INSIDE, PLACE_EDGE,
  inside the Space, and the density will thus be exactly what is specified from the
  `position` range (here 100/10*10 = 1 object per squared micrometer).
  */
-bool Interface::find_placement(Isometry& iso, Glossary& opt, int placement, size_t& nb_trials)
+bool Interface::find_placement(Isometry& iso, Glossary& opt, int placement)
 {
     std::string str;
-
     Space const* spc = sim_->spaces.master();
     if ( opt.set(str, "placement", 1) )
         spc = sim_->findSpace(str);
+
+    // generate a new position:
+    iso = read_placement(opt);
     
-    // define a condition:
+    if ( !iso.valid() )
+        return 0;
+    
+    // check any conditions to the position:
     bool has_condition = opt.set(str, "placement", 2);
-
-    while ( nb_trials > 0 )
+    if ( has_condition )
     {
-        --nb_trials;
-        // generate a new position:
-        read_placement(iso, opt);
-
-        // check all conditions:
-        bool condition = true;
-        if ( has_condition )
-        {
-            Evaluator evaluator{{"X", iso.mov.x()}, {"Y", iso.mov.y()}, {"Z", iso.mov.z()},
-                                {"R", iso.mov.norm()}, {"P", RNG.preal()}};
-            try {
-                condition = ( 0 != evaluator.eval(str) );
-            }
-            catch( Exception& e ) {
-                e.message(e.message()+" in `"+str+"'");
-                throw;
-            }
+        Evaluator evaluator{{"X", iso.mov.x()}, {"Y", iso.mov.y()}, {"Z", iso.mov.z()},
+            {"R", iso.mov.norm()}, {"P", RNG.preal()}};
+        try {
+            if ( 0 == evaluator.eval(str) )
+                return 0;
         }
-        
-        if ( condition )
-        {
-            if ( !spc || placement == PLACE_ANYWHERE )
-                return 0;
-            
-            if ( placement == PLACE_EDGE )
-            {
-                iso.mov = spc->project(iso.mov);
-                return 0;
-            }
-            
-            if ( spc->inside(iso.mov) )
-            {
-                if ( placement == PLACE_INSIDE || placement == PLACE_ALL_INSIDE )
-                    return 0;
-            }
-            else
-            {
-                if ( placement == PLACE_OUTSIDE )
-                    return 0;
-            }
+        catch( Exception& e ) {
+            e.message(e.message()+" in `"+str+"'");
+            throw;
         }
     }
     
-    //Cytosim::warn << "could not fulfill position=`" + opt.value("position") + "'\n";
-    //throw InvalidParameter("could not fulfill position=`" + opt.value("position") + "'");
-    return 1;
+    if ( !spc || placement == PLACE_ANYWHERE )
+        return 1;
+    
+    if ( placement == PLACE_EDGE )
+    {
+        iso.mov = spc->project(iso.mov);
+        return 1;
+    }
+    
+    if ( spc->inside(iso.mov) )
+    {
+        if ( placement == PLACE_INSIDE || placement == PLACE_ALL_INSIDE )
+            return 1;
+    }
+    else
+    {
+        if ( placement == PLACE_OUTSIDE )
+            return 1;
+    }
+    
+    return 0;
 }
 
 
-bool all_objects_inside(ObjectList const& objs, Space const* spc)
+bool all_points_inside(ObjectList const& objs, Space const* spc)
 {
     for ( Object * i : objs )
     {
         Mecable * mec = Simul::toMecable(i);
-        if ( mec && ! mec->allInside(spc) )
+        if ( mec && ! mec->allPointsInside(spc) )
             return false;
     }
     return true;
@@ -335,11 +331,11 @@ bool all_objects_inside(ObjectList const& objs, Space const* spc)
  */
 ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
 {
-    size_t nb_trials = 1000;
+    long nb_trials = 1024;
     opt.set(nb_trials, "nb_trials");
     ObjectList objs;
     
-    while ( nb_trials > 0 )
+    while ( --nb_trials >= 0 )
     {
         objs = set->newObjects(pp, opt);
         
@@ -373,8 +369,9 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
         
         // find possible position & rotation:
         Isometry iso;
-        bool err = find_placement(iso, opt, placement, nb_trials);
-        if ( !err )
+        bool okay = find_placement(iso, opt, placement);
+
+        if ( okay )
         {
             // place object at this position:
             ObjectSet::moveObjects(objs, iso);
@@ -385,13 +382,13 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
                 Space const* spc = sim_->spaces.master();
                 if ( opt.set(str, "placement", 1) )
                     spc = sim_->findSpace(str);
-                if ( ! all_objects_inside(objs, spc) )
-                {
-                    objs.destroy();
-                    continue;
-                }
+                okay = all_points_inside(objs, spc);
             }
-            break;
+        }
+        if ( ! okay )
+        {
+            objs.destroy();
+            continue;
         }
     }
     

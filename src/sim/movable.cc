@@ -468,15 +468,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
  */ 
 Vector Movable::readPosition(std::istream& is, Space const* spc)
 {
-    size_t ouf = 0, max_trials = 1<<14;
     std::string tok;
-    Vector pos(0,0,0);
-    std::streampos isp, start = is.tellg();
+    std::streampos isp;
     
-restart:
-    if ( is.fail() )
-        return pos;
-    pos = readPositionPrimitive(is, spc);
+    Vector pos = readPositionPrimitive(is, spc);
     assert_true(pos==pos);
     is.clear();
     
@@ -544,14 +539,7 @@ restart:
             Evaluator evaluator{{"X", pos.x()}, {"Y", pos.y()}, {"Z", pos.z()}};
             try {
                 if ( 0 == evaluator.eval(tok) )
-                {
-                    if ( ++ouf < max_trials )
-                    {
-                        is.seekg(start);
-                        goto restart;
-                    }
-                    break;
-                }
+                    return Vector(nan(""), nan(""), nan(""));
             }
             catch( Exception& e ) {
                 e.message(e.message()+" in `"+tok+"'");
@@ -591,11 +579,26 @@ Vector Movable::readPosition(std::string const& arg, Space const* spc)
     if ( StreamFunc::has_trail(iss) )
     {
         std::string str;
-        std::streampos pos = iss.tellg();
         std::getline(iss, str);
         throw InvalidSyntax("unexpected trailing `"+str+"' in position `"+arg+"'");
     }
     return vec;
+}
+
+
+/// convert string to a position
+Vector Movable::readPosition(std::string const& arg)
+{
+    long max_trials = 1 << 14;
+    std::istringstream iss(arg);
+    while ( --max_trials >= 0 )
+    {
+        Vector vec = Movable::readPosition(iss, nullptr);
+        if ( vec.valid() )
+            return vec;
+    }
+    throw InvalidParameter("could not read Vector from `"+arg+"'");
+    return Vector(0,0,0);
 }
 
 
@@ -861,6 +864,7 @@ restart:
                         is.seekg(start);
                         goto restart;
                     }
+                    throw InvalidParameter("condition `"+tok+"' could not be fulfilled");
                     break;
                 }
             }

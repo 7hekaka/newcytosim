@@ -154,10 +154,10 @@ public:
     real signedDistanceToEdge(Vector const&) const;
     
     /// return a random position located inside and at most at distance `rad` from the edge
-    Vector placeNearEdge(real rad, size_t nb_trials) const;
+    Vector placeNearEdge(real rad, size_t max_trials) const;
     
     /// a crude method returning a random position located on the surface
-    Vector onSurface(real rad, size_t nb_trials) const;
+    Vector onSurface(real rad, size_t max_trials) const;
 
     //------------- DERIVED FUNCTIONS THAT CAN BE OVERWRITTEN ------------------
 

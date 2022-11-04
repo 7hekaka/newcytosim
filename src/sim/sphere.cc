@@ -168,7 +168,7 @@ void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
                     vec = Vector::randU(radius());
                 else
                 {
-                    vec = Movable::readPosition(str, nullptr);
+                    vec = Movable::readPosition(str);
                     if ( 8 * vec.norm() < spRadius )
                         throw InvalidParameter(var+" cannot be brought to the Sphere surface");
                 }

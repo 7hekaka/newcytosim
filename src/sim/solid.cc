@@ -239,7 +239,7 @@ void Solid::makePoint(ObjectList& res, Glossary& opt, std::string const& var, Si
         // add 'nbp' points:
         for ( size_t n = 0; n < nbp; ++n )
         {
-            Vector vec = Movable::readPosition(str, nullptr);
+            Vector vec = Movable::readPosition(str);
             addSphere(vec, rad);
         }
         
@@ -264,7 +264,7 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
         throw InvalidParameter("radius of sphere specified in solid must be > 0");
     
     // get position of center:
-    Vector cen = Movable::readPosition(opt.value(var, 0), nullptr);
+    Vector cen = Movable::readPosition(opt.value(var, 0));
     
     // add a bead with a local coordinate system
     size_t ref = addSphere(cen, rad);
@@ -339,7 +339,7 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
             for ( size_t i = 0; i < num; ++i )
             {
                 if ( str.size() )
-                    vec = Movable::readPosition(str, nullptr);
+                    vec = Movable::readPosition(str);
                 else
                     vec = Vector::randU();
                 Wrist * w = sip->newWrist(this, 0);

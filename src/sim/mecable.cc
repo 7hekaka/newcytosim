@@ -348,7 +348,7 @@ void Mecable::foldPosition(Modulo const* m)
 }
 
 
-bool Mecable::allInside(Space const* spc) const
+bool Mecable::allPointsInside(Space const* spc) const
 {
     for ( size_t i = 0; i < nPoints; ++i )
     {

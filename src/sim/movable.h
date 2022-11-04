@@ -40,12 +40,14 @@ class Movable
     static Vector readDirectionPrimitive(std::istream&, Vector const&, Space const*);
 
 public:
-    
     /// read a position in space
     static Vector readPosition(std::istream&, Space const*);
 
     /// convert string to a position
     static Vector readPosition(std::string const&, Space const*);
+    
+    /// read a position in space
+    static Vector readPosition(std::string const&);
 
     /// read an orientation, and return a normalized vector
     static Vector readDirection(std::istream&, Vector const&, Space const*);

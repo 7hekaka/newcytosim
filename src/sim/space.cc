@@ -58,14 +58,14 @@ Vector Space::place() const
  - inside(point) = true
  - inside(point, radius) = false
  */
-Vector Space::placeNearEdge(real rad, size_t nb_trials) const
+Vector Space::placeNearEdge(real rad, size_t max_trials) const
 {
     size_t ouf = 0;
     Vector res;
     do {
         res = place();
         assert_true( inside(res) );
-        if ( ++ouf > nb_trials )
+        if ( ++ouf > max_trials )
             throw InvalidParameter("edge placement failed for space `"+prop->name()+"'");
     } while ( allInside(res, rad) );
     return res;

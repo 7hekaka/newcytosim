@@ -398,7 +398,7 @@ public:
     virtual void foldPosition(Modulo const*);
     
     /// true if all points are inside Space
-    bool allInside(Space const*) const;
+    bool allPointsInside(Space const*) const;
     
     //--------------------------------------------------------------------------
     

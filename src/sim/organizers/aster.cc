@@ -361,12 +361,12 @@ void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     opt.set(dis, "radius", 1);
     dis *= 0.5;
     opt.set(sep, "seed_diameter");
-    size_t ouf = 0, nb_trials = 1024;
+    size_t ouf = 0, max_trials = 1024;
     size_t cnt = 0;
     std::vector<Vector2> pts(nbf, Vector2(0,0));
     do {
         cnt = tossPointsDisc(pts, sep/asRadius, 1024);
-        if ( ++ouf > nb_trials )
+        if ( ++ouf > max_trials )
             break;
     } while ( cnt < nbf );
     if ( cnt < nbf )
@@ -433,14 +433,14 @@ void Aster::build3(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     }
 #else
     // distribute points randomly over a portion of the unit sphere:
-    size_t ouf = 0;
+    size_t ouf = 0, max_trials = 1024;
     real sep, sep0 = std::sqrt( 2 * M_PI * cap / nbf );
     do {
         // we decrease gradually the separation, to reach a good solution...
         sep = 512 * sep0 / real(ouf+512);
         cnt = tossPointsCap(pts, cap, sep, 1024);
         //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
-    } while ( cnt < nbf && ++ouf < 1024 );
+    } while ( cnt < nbf && ++ouf < max_trials );
     if ( cnt < nbf )
         std::clog << "warning: aster could only fit " << cnt << " seeds\n";
     //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
@@ -537,12 +537,12 @@ void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     opt.set(dis, "radius", 1);
     opt.set(sep, "seed_diameter");
     dis /= asRadius;
-    size_t ouf = 0, nb_trials = 1024;
+    size_t ouf = 0, max_trials = 1024;
     size_t cnt = 0;
     std::vector<Vector> pts(nbf, Vector(0,0,0));
     do {
         cnt = tossPointsSphere(pts, sep/asRadius, 1024);
-        if ( ++ouf > nb_trials )
+        if ( ++ouf > max_trials )
             break;
     } while ( cnt < nbf );
     if ( cnt < nbf )

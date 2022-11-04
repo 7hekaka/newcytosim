@@ -71,6 +71,11 @@ public:
         rot = r;
     }
 
+    bool valid()
+    {
+        return mov.valid();
+    }
+
     void reset()
     {
         mov.reset();
