@@ -32,7 +32,7 @@
 
 #include "fg_font.h"
 #include <ctype.h>
-#define NULL 0
+#include <stdio.h>
 
 typedef unsigned char uByte;
 
@@ -115,8 +115,12 @@ void fgBitmapCharacter(float x, float y, float S, int fontID, const float color[
     }
 }
 
+
 void fgBitmapString(float x0, float y, float scale, int fontID, const float color[4], const char *string, float vshift)
 {
+    float gray[4] = { 0.6, 0.6, 0.6, 1 };
+    const float* col = color;
+    if ( string[0] == '%' ) col = gray;
     unsigned char c;
     SFG_Font const* font = fghFont( fontID );
     if ( font && string && *string )
@@ -138,12 +142,17 @@ void fgBitmapString(float x0, float y, float scale, int fontID, const float colo
             {
                 y += scale * vshift;
                 x = x0;
+                if ( string[0] == '%' )
+                    col = gray;
+                else
+                    col = color;
             }
             else  /* Not an EOL, draw the bitmap character */
             {
                 const uByte* face = font->Characters[c];
                 float dx = (float)face[0];
-                drawBitmap(dx, font->Height, x, y, scale, face+1, color);
+                //printf("color %3.1f %3.1f %3.1f %3.1f : %c\n", col[0], col[1], col[2], col[3], c);
+                drawBitmap(dx, font->Height, x, y, scale, face+1, col);
                 x += scale * dx;
             }
         }

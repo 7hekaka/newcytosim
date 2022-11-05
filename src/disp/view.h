@@ -181,13 +181,13 @@ public:
     /// set OpenGL Lights for lighting effects
     void setLightsEye() const;
 
-    /// set text displayed in center of window
+    /// set text displayed in bottom-left corner of window
     void setLabel(std::string const& arg) { full_label = label + " " + arg; }
     
-    /// set message displayed on current window
+    /// set message displayed in center of window
     void setMemo(std::string const& arg) { memo = arg; };
 
-    /// set text displayed near top of window
+    /// set text displayed in top left corner of window
     void setMessage(std::string const& arg) { top_message = arg; }
 
     /// set OpenGL Fog, with mode (GL_EXP or GL_LINEAR), intensity and color

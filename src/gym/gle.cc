@@ -918,6 +918,7 @@ namespace gle
         return i;
     }
     
+    /// set buffer for stroke_capsule
     size_t setCapsuleStroke(flute2* flu, float R)
     {
         float Y = R * 0.5 * M_SQRT3;
@@ -940,6 +941,7 @@ namespace gle
         return 15;
     }
     
+    /// set buffer for paint_capsule
     size_t setCapsulePaint(flute2* flu, float R)
     {
         float Y = R * 0.5 * M_SQRT3;
@@ -962,6 +964,7 @@ namespace gle
         return 15;
     }
     
+    /// set buffer for stroke_cross
     size_t setCrossStroke(flute2* flu)
     {
         float W = 0.2;
@@ -983,6 +986,7 @@ namespace gle
         return 13;
     }
 
+    /// set buffer for paint_cross
     size_t setCrossPaint(flute2* flu)
     {
         float W = 0.2;

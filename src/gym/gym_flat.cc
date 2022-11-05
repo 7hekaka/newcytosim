@@ -8,26 +8,36 @@
 #include "gym_draw.h"
 #include "gym_image.h"
 
+/// name of OpenGL texture buffer
+GLuint gym_texture_ = 0;
 
 /// global function accessible from C
 void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4])
 {
-    CHECK_GL_ERROR("drawBitmap0");
     gym::color(color);
     gym::drawBitmap(W, H, X, Y, S, bits);
-    CHECK_GL_ERROR("drawBitmap1");
 }
 
-/** This is drawing `bits` by using a texture over a square. S is the dimension of each pixel */
+
+///\todo: we should unpack the whole font data only once!
+/** This is drawing `bits` by using a texture over a square */
+void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits)
+{
+    if ( ! gym_texture_ )
+        glGenTextures(1, &gym_texture_);
+    unsigned char pixels[W*H+8];
+    gym::unpackBitmap(pixels, W, H, bits);
+    drawPixels(W, H, X, Y, S, pixels);
+}
+
+
+/** This is drawing `bits` by using a texture over [X, X+S*W]x[Y, Y+S*H]. S is the pixel dimension */
 void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* pixels)
 {
-    static GLuint tex = 0;
-    if ( ! tex ) glGenTextures(1, &tex);
     CHECK_GL_ERROR("drawBitmap0");
-    
     glEnable(GL_TEXTURE_2D);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glBindTexture(GL_TEXTURE_2D, gym_texture_);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, W, H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pixels);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -49,20 +59,7 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
 }
 
 
-///\todo: we should unpack the whole font data only once!
-/** This is drawing `bits` by using a texture over a square */
-void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits)
-{
-    static GLuint tex = 0;
-    if ( ! tex ) glGenTextures(1, &tex);
-    
-    unsigned char pixels[W*H+8];
-    gym::unpackBitmap(pixels, W, H, bits);
-    drawPixels(W, H, X, Y, S, pixels);
-}
-
-
-/** This is drawing every pixels of `bits` with triangle strips */
+/** This is drawing every pixels of `bits` using triangle strips */
 void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bytes)
 {
     const size_t Wb = ( ( W + 7 ) & ~7 ) / 8;
