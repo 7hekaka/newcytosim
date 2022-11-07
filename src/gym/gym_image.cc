@@ -3,27 +3,40 @@
 #include "gym_image.h"
 #include <string.h>
 
+/// sign-extension: copying the sign bit of `arg` to all bits
+inline static int8_t sex(const int8_t& arg)
+{
+    union {
+        int16_t i;
+        struct { int8_t l, h; };
+    } u { arg };
+    return u.h;
+}
+
+
 /// promote 0/1 bits values to 1 byte per bit
-void gym::unpackBitmap(unsigned char * data, unsigned W, unsigned H, const unsigned char* bits)
+void gym::unpackBitmap(unsigned char * input, unsigned W, unsigned H, const unsigned char* bits)
 {
     const unsigned Wb = ( ( W + 7 ) & ~7 ) / 8;
-    unsigned char *ptr = data;
-    unsigned char const* row;
-    for ( size_t i = 0; i < H; ++i )
+    // sign-extension is only possible on signed types:
+    int8_t * data = (int8_t*)input;
+    // each row is independent:
+    for ( unsigned i = 0; i < H; ++i )
     {
-        ptr = data + i * W;
-        row = bits + i * Wb;
-        for ( size_t j = 0; j < Wb; ++j )
+        int8_t * ptr = data + i * W;
+        int8_t const* row = (int8_t*)bits + i * Wb;
+        // the operation should be vectorized, processing 16 bytes at a time
+        for ( unsigned j = 0; j < Wb; ++j )
         {
-            unsigned char b = row[j];
-            ptr[0] = 255 * ( b & 1 );
-            ptr[1] = 255 * (( b >> 1 ) & 1 );
-            ptr[2] = 255 * (( b >> 2 ) & 1 );
-            ptr[3] = 255 * (( b >> 3 ) & 1 );
-            ptr[4] = 255 * (( b >> 4 ) & 1 );
-            ptr[5] = 255 * (( b >> 5 ) & 1 );
-            ptr[6] = 255 * (( b >> 6 ) & 1 );
-            ptr[7] = 255 * (( b >> 7 ) & 1 );
+            int8_t b = row[j];
+            ptr[0] = sex( b << 7 );
+            ptr[1] = sex( b << 6 );
+            ptr[2] = sex( b << 5 );
+            ptr[3] = sex( b << 4 );
+            ptr[4] = sex( b << 3 );
+            ptr[5] = sex( b << 2 );
+            ptr[6] = sex( b << 1 );
+            ptr[7] = sex( b << 0 );
             ptr += 8;
         }
     }

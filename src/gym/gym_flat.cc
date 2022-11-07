@@ -9,7 +9,7 @@
 #include "gym_image.h"
 
 /// name of OpenGL texture buffer
-GLuint gym_texture_ = 0;
+GLuint gym_font_texture_ = 0;
 
 /// global function accessible from C
 void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4])
@@ -20,11 +20,11 @@ void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigne
 
 
 ///\todo: we should unpack the whole font data only once!
-/** This is drawing `bits` by using a texture over a square */
+/** This is drawing `bits` by using a texture over a square, calling drawPixels() */
 void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits)
 {
-    if ( ! gym_texture_ )
-        glGenTextures(1, &gym_texture_);
+    if ( ! gym_font_texture_ )
+        glGenTextures(1, &gym_font_texture_);
     unsigned char pixels[W*H+8];
     gym::unpackBitmap(pixels, W, H, bits);
     drawPixels(W, H, X, Y, S, pixels);
@@ -37,7 +37,7 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     CHECK_GL_ERROR("drawBitmap0");
     glEnable(GL_TEXTURE_2D);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glBindTexture(GL_TEXTURE_2D, gym_texture_);
+    glBindTexture(GL_TEXTURE_2D, gym_font_texture_);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, W, H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pixels);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

@@ -64,6 +64,17 @@ inline int sex(const int16_t& arg)
 }
 
 /// implements sign-extension, copying the sign bit of `arg` to all bits
+inline int8_t sex(const int8_t& arg)
+{
+    union
+    {
+        int16_t i;
+        struct { int8_t l, h; };
+    } u { arg };
+    return u.h;
+}
+
+/// implements sign-extension, copying the sign bit of `arg` to all bits
 inline uint32_t sex(const float& arg)
 {
     union { float d; int32_t i; } udi { arg };
@@ -98,6 +109,7 @@ int main(int argc, char* argv[])
     std::cout << "false " << to_bits(false, ' ') << '\n';
     
     std::cout << " 0        " << to_bits(0, ' ') << '\n';
+    std::cout << "-1        " << to_bits(-1, ' ') << '\n';
     std::cout << " 7        " << to_bits( 7, ' ') << '\n';
     std::cout << "-7        " << to_bits(-7, ' ') << '\n';
     std::cout << "-255      " << to_bits(-255, ' ') << '\n';
@@ -106,7 +118,6 @@ int main(int argc, char* argv[])
     std::cout << "sox(7)    " << to_bits(sox(7), ' ') << '\n';
     std::cout << "sox(-7)   " << to_bits(sox(-7), ' ') << '\n';
     std::cout << "sox(-255) " << to_bits(sox(-255), ' ') << '\n';
-
 
     std::cout << "-1.0f     " << to_bits(-1.f, ' ') << '\n';
     std::cout << "-0.0f     " << to_bits(-0.f, ' ') << '\n';
@@ -118,7 +129,6 @@ int main(int argc, char* argv[])
     std::cout << "sex(+0.f) " << to_bits(sex( 0.f), ' ') << '\n';
     std::cout << "sex(+1.f) " << to_bits(sex( 1.f), ' ') << '\n';
 
-    
     std::cout << "-1.0      " << to_bits(-1.0, ' ') << '\n';
     std::cout << "-0.0      " << to_bits(-0.0, ' ') << '\n';
     std::cout << " 0.0      " << to_bits( 0.0, ' ') << '\n';
