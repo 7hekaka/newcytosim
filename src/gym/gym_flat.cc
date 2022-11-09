@@ -89,8 +89,8 @@ void paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsi
 /** This is drawing every pixels of `bits` using triangle strips */
 void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
 {
-    const size_t Wb = ( ( W + 7 ) & ~7 ) / 8;
-    for ( size_t i = 0; i < H; ++i )
+    const unsigned Wb = ( ( W + 7 ) & ~7 ) / 8;
+    for ( unsigned i = 0; i < H; ++i )
     {
         float X = X0;
         float Y = Y0 + S * i, T = Y + S;
@@ -102,17 +102,17 @@ void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const
         ptr[1] = { X, T };
         ptr += 2;
         unsigned char old = 0;
-        for ( size_t j = 0; j < Wb; ++j )
+        for ( unsigned j = 0; j < Wb; ++j )
         {
-            for ( size_t k = 0; k < 8; ++k )
+            for ( int k = 7; k >= 0; --k )
             {
                 unsigned char bit = ( row[j] >> k ) & 1;
                 if ( bit != old )
                 {
                     old = bit;
-                    ptr[0] = { X, T };
-                    ptr[1] = { X, (bit?T:Y) };
-                    ptr[2] = { X, Y };
+                    ptr[0] = { X, Y };
+                    ptr[1] = { X, (bit?Y:T) };
+                    ptr[2] = { X, T };
                     ptr += 3;
                 }
                 X += S;

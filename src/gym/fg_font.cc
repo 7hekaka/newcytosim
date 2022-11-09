@@ -156,6 +156,7 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
         for ( char * c = token; *c; ++c )
             L += font->Characters[*c][0];
         pixels = (unsigned char*)realloc(pixels, L*H);
+        memset(pixels, 0, L*H);
         unsigned W = 0;
         for ( char * c = token; *c; ++c )
         {
