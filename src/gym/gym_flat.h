@@ -3,6 +3,9 @@
 
 namespace gym
 {
+    /// a debug function using printf() for ASCII art...
+    void printPixels(unsigned W, unsigned H, const unsigned char* pixels, unsigned lda);
+
     /// draw Bitmap using a texture over a rectangle
     void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
 

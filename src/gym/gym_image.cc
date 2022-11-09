@@ -1,42 +1,30 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "gym_image.h"
-#include <string.h>
 
-/// sign-extension: copying the sign bit of `arg` to all bits
-inline static int8_t sex(const int8_t& arg)
+
+/// promote 0/1 bits values to 1 byte per bit, either full 1 or full 0
+void unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsigned char* bits, unsigned lda)
 {
-    union {
-        int16_t i;
-        struct { int8_t l, h; };
-    } u { arg };
-    return u.h;
-}
-
-
-/// promote 0/1 bits values to 1 byte per bit
-void gym::unpackBitmap(unsigned char * input, unsigned W, unsigned H, const unsigned char* bits)
-{
+    // number of bytes in a row of 'input'
     const unsigned Wb = ( ( W + 7 ) & ~7 ) / 8;
-    // sign-extension is only possible on signed types:
-    int8_t * data = (int8_t*)input;
-    // each row is independent:
+    // each line is independent:
     for ( unsigned i = 0; i < H; ++i )
     {
-        int8_t * ptr = data + i * W;
-        int8_t const* row = (int8_t*)bits + i * Wb;
-        // the operation should be vectorized, processing 16 bytes at a time
+        unsigned char * ptr = bytes + ( H-1 - i ) * lda;
+        unsigned char const* row = bits + i * Wb;
+        // the operation could be vectorized, processing 16 bytes at a time
         for ( unsigned j = 0; j < Wb; ++j )
         {
-            int8_t b = row[j];
-            ptr[0] = sex( b << 7 );
-            ptr[1] = sex( b << 6 );
-            ptr[2] = sex( b << 5 );
-            ptr[3] = sex( b << 4 );
-            ptr[4] = sex( b << 3 );
-            ptr[5] = sex( b << 2 );
-            ptr[6] = sex( b << 1 );
-            ptr[7] = sex( b << 0 );
+            unsigned char b = row[j];
+            ptr[0] = ( b & 128 ) ? ~0 : 0;
+            ptr[1] = ( b & 64  ) ? ~0 : 0;
+            ptr[2] = ( b & 32  ) ? ~0 : 0;
+            ptr[3] = ( b & 16  ) ? ~0 : 0;
+            ptr[4] = ( b & 8   ) ? ~0 : 0;
+            ptr[5] = ( b & 4   ) ? ~0 : 0;
+            ptr[6] = ( b & 2   ) ? ~0 : 0;
+            ptr[7] = ( b & 1   ) ? ~0 : 0;
             ptr += 8;
         }
     }

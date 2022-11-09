@@ -5,9 +5,6 @@
 
 namespace gym
 {
-    
-    /// convert binary image into one byte per pixel
-    void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[]);
 
     /// downsample
     void downsampleRGB(uint8_t dst[], unsigned W, unsigned H, uint8_t const src[], unsigned bin);
@@ -19,3 +16,6 @@ namespace gym
     void printPixels(FILE*, uint8_t const* pix, unsigned W, unsigned H);
     
 }
+
+/// convert binary image into one byte per pixel
+void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[], unsigned);

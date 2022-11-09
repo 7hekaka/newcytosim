@@ -12,6 +12,13 @@
 GLuint gym_font_texture_ = 0;
 
 /// global function accessible from C
+void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bytes, const float color[4])
+{
+    gym::color(color);
+    gym::drawPixels(W, H, X, Y, S, bytes);
+}
+
+/// global function accessible from C
 void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4])
 {
     gym::color(color);
@@ -26,14 +33,30 @@ void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const un
     if ( ! gym_font_texture_ )
         glGenTextures(1, &gym_font_texture_);
     unsigned char pixels[W*H+8];
-    gym::unpackBitmap(pixels, W, H, bits);
+    unpackBitmap(pixels, W, H, bits, W);
     drawPixels(W, H, X, Y, S, pixels);
 }
 
 
-/** This is drawing `bits` by using a texture over [X, X+S*W]x[Y, Y+S*H]. S is the pixel dimension */
+void gym::printPixels(unsigned W, unsigned H, const unsigned char* pixels, unsigned lda)
+{
+    static const char LOOKUP[17] = " 123456789ABCDEF";
+
+    for ( unsigned i = 0; i < H; ++i )
+    {
+        const unsigned char * row = pixels + i * lda;
+        for ( unsigned j = 0; j < W; ++j )
+            putchar(LOOKUP[row[j]&15]);
+        putchar('\n');
+    }
+}
+
+
+/** This is drawing `bits` by using a texture over [X, X+S*W]x[Y, Y+S*H].
+ S is the pixel dimension */
 void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* pixels)
 {
+    //printPixels(W, H, pixels, W);
     CHECK_GL_ERROR("drawBitmap0");
     glEnable(GL_TEXTURE_2D);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -44,10 +67,10 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     flute4* flu = gym::mapBufferV2T2(4);
-    flu[0] = { X,     Y+S*H, 1, 1 };
-    flu[1] = { X,     Y,     1, 0 };
-    flu[2] = { X+S*W, Y+S*H, 0, 1 };
-    flu[3] = { X+S*W, Y,     0, 0 };
+    flu[0] = { X,     Y+S*H, 0, 0 };
+    flu[1] = { X,     Y,     0, 1 };
+    flu[2] = { X+S*W, Y+S*H, 1, 0 };
+    flu[3] = { X+S*W, Y,     1, 1 };
     gym::unmapBufferV2T2();
     CHECK_GL_ERROR("drawBitmap1");
 
@@ -58,33 +81,41 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     CHECK_GL_ERROR("drawBitmap2");
 }
 
+void paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
+{
+    gym::paintBitmap(W, H, X0, Y0, S, bits);
+}
 
 /** This is drawing every pixels of `bits` using triangle strips */
-void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bytes)
+void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
 {
     const size_t Wb = ( ( W + 7 ) & ~7 ) / 8;
     for ( size_t i = 0; i < H; ++i )
     {
         float X = X0;
         float Y = Y0 + S * i, T = Y + S;
-        const unsigned char* row = bytes + i * Wb;
+        const unsigned char* row = bits + i * Wb;
+        gym::color(1,1,1);
         flute2* flu = gym::mapBufferV2(24*Wb+2);
         flute2* ptr = flu;
+        ptr[0] = { X, Y };
+        ptr[1] = { X, T };
+        ptr += 2;
         unsigned char old = 0;
         for ( size_t j = 0; j < Wb; ++j )
         {
             for ( size_t k = 0; k < 8; ++k )
             {
-                X += S;
-                unsigned char bit = !( ( row[j] >> (7-k) ) & 1 );
+                unsigned char bit = ( row[j] >> k ) & 1;
                 if ( bit != old )
                 {
                     old = bit;
-                    ptr[0] = { X, Y };
+                    ptr[0] = { X, T };
                     ptr[1] = { X, (bit?T:Y) };
-                    ptr[2] = { X, T };
+                    ptr[2] = { X, Y };
                     ptr += 3;
                 }
+                X += S;
             }
         }
         if ( old )

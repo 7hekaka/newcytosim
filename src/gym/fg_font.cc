@@ -31,8 +31,10 @@
  */
 
 #include "fg_font.h"
+#include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef unsigned char uByte;
 
@@ -97,6 +99,12 @@ static SFG_Font const* fghFont( int font )
 
 void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data, const float color[4]);
 
+/// convert binary image into one byte per pixel
+void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[], unsigned lda);
+
+void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data, const float color[4]);
+void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data);
+
 
 /*
  * Draw a bitmap character
@@ -116,47 +124,52 @@ void fgBitmapCharacter(float x, float y, float S, int fontID, const float color[
 }
 
 
-void fgBitmapString(float x0, float y, float scale, int fontID, const float color[4], const char *string, float vshift)
+void fgBitmapString(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
 {
     float gray[4] = { 0.6, 0.6, 0.6, 1 };
     const float* col = color;
-    if ( string[0] == '%' ) col = gray;
-    unsigned char c;
+    char * str = strdup(string);
+    char * token = NULL;
+    
     SFG_Font const* font = fghFont( fontID );
-    if ( font && string && *string )
-    {
-        x0 = scale * ( x0 - font->xorig );
-        y = scale * ( y - font->yorig );
-        float x = x0;
+    if ( !font )
+        return;
+    
+    if ( vshift == 0 )
+        vshift = font->Height;
 
-        if ( vshift == 0 )
-            vshift = font->Height;
-        /*
-         * Step through the string, drawing each character.
-         * A newline will simply translate the next character's insertion
-         * point back to the start of the line and down one line.
-         */
-        while( ( c = *string++) )
+    X = scale * ( X - font->xorig );
+    Y = scale * ( Y - font->yorig );
+
+    unsigned char * pixels = NULL;
+    while ((token = strsep(&str, "\n")) != NULL)
+    {
+        //printf("%s\n", token);
+        if ( token[0] == '%' )
+            col = gray;
+        else
+            col = color;
+        //printf("color %3.1f %3.1f %3.1f %3.1f : %c\n", col[0], col[1], col[2], col[3], c);
+        const unsigned H = font->Height;
+        // calculate total string length in pixels:
+        unsigned L = 7;
+        for ( char * c = token; *c; ++c )
+            L += font->Characters[*c][0];
+        pixels = (unsigned char*)realloc(pixels, L*H);
+        unsigned W = 0;
+        for ( char * c = token; *c; ++c )
         {
-            if ( c == '\n' )
-            {
-                y += scale * vshift;
-                x = x0;
-                if ( string[0] == '%' )
-                    col = gray;
-                else
-                    col = color;
-            }
-            else  /* Not an EOL, draw the bitmap character */
-            {
-                const uByte* face = font->Characters[c];
-                float dx = (float)face[0];
-                //printf("color %3.1f %3.1f %3.1f %3.1f : %c\n", col[0], col[1], col[2], col[3], c);
-                drawBitmap(dx, font->Height, x, y, scale, face+1, col);
-                x += scale * dx;
-            }
+            const uByte* face = font->Characters[*c];
+            unpackBitmap(pixels+W, face[0], H, 1+face, L);
+            //paintBitmap(face[0], H, X+scale*W, Y, scale, 1+face);
+            W += face[0];
         }
+        drawPixels(L, H, X, Y, scale, pixels, col);
+        // move down one line.
+        Y += scale * vshift;
     }
+    free(pixels);
+    free(str);
 }
 
 #ifdef GL_VERSION_2_1
