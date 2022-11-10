@@ -883,7 +883,7 @@ typedef uint64_t BitField;
  Evaluate 4 pos.near(jj->pos_) using SIMD instructions
  @return a 4-bit integer where each bit represents the result of one test
  */
-inline int four_near_bits(vec4f const& xyzr, BigLocus const* src)
+inline BitField four_near_bits(vec4f const& xyzr, BigLocus const* src)
 {
     vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_));
     vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_));
@@ -904,7 +904,7 @@ inline int four_near_bits(vec4f const& xyzr, BigLocus const* src)
     return lower_mask4f(uu, tt);  // x*x + y*y < r*r - z*z
 }
 
-inline int two_near_bits(vec4f const& xyzr, BigLocus const* src)
+inline BitField two_near_bits(vec4f const& xyzr, BigLocus const* src)
 {
     vec4f tt = sub4f(xyzr, loadu4f(src[0].pos_));
     vec4f yy = sub4f(xyzr, loadu4f(src[1].pos_));
@@ -921,7 +921,7 @@ inline int two_near_bits(vec4f const& xyzr, BigLocus const* src)
     return lower_mask4f(xx, tt);  // x*x + y*y < r*r - z*z
 }
 
-inline int one_near_bit(vec4f const& xyzr, BigLocus const* src)
+inline BitField one_near_bit(vec4f const& xyzr, BigLocus const* src)
 {
     vec4f xx = sub4f(xyzr, loadu4f(src[0].pos_));
     xx = mul4f(xx, xx);
