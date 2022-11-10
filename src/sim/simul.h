@@ -145,7 +145,10 @@ public:
     static void mark(ObjectList const&, ObjectMark);
 
     /// reset simulation world (clear all sub-lists and variables)
-    void eraseObjects(bool erase_properties);
+    void eraseObjects();
+
+    /// reset simulation world (clear all sub-lists and variables)
+    void eraseProperties();
 
     /// total number of objects in the Simulation
     size_t nbObjects() const;

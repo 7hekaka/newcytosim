@@ -43,7 +43,9 @@ bool Interface::isCategory(std::string const& name) const
 
 void Interface::erase_simul(bool arg) const
 {
-    return sim_->eraseObjects(arg);
+    if ( arg )
+        sim_->eraseProperties();
+    sim_->eraseObjects();
 }
 
 //------------------------------------------------------------------------------
@@ -692,7 +694,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     {
         if ( name == "objects" )
         {
-            sim_->eraseObjects(0);
+            sim_->eraseObjects();
             return;
         }
         throw InvalidSyntax("could not determine the class of `"+name+"'");

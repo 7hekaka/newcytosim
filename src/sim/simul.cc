@@ -52,7 +52,8 @@ couples(*this), organizers(*this), tubules(*this), events(*this)
 
 Simul::~Simul()
 {
-    eraseObjects(1);
+    eraseObjects();
+    eraseProperties();
     delete(pMeca1D);
 }
 
@@ -70,7 +71,7 @@ void Simul::initialize(Glossary & glos)
 
 //------------------------------------------------------------------------------
 
-void Simul::eraseObjects(bool erase_properties)
+void Simul::eraseObjects()
 {
     //fprintf(stderr, "Simul:%p:eraseObjects()\n", this);
     tubules.erase();
@@ -84,13 +85,16 @@ void Simul::eraseObjects(bool erase_properties)
     events.erase();
     singles.erase();
     couples.erase();
-
+    
     prop.time = 0;
     modulo = nullptr;
     primed_ = 0;
+}
 
-    if ( erase_properties )
-        properties.erase();
+void Simul::eraseProperties()
+{
+    properties.erase();
+    prop.clear();
 }
 
 

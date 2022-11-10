@@ -58,8 +58,8 @@ public:
      */
     virtual void hold() {}
     
-    /// erase Simulation
-    virtual void erase_simul(bool) const;
+    /// erase all simulation objects, and all properties if 'clear_properties==true'
+    virtual void erase_simul(bool clear_properties) const;
 
     //-------------------------------------------------------------------------------
 
