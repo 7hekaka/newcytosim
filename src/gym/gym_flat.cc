@@ -30,8 +30,6 @@ void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigne
 /** This is drawing `bits` by using a texture over a square, calling drawPixels() */
 void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits)
 {
-    if ( ! gym_font_texture_ )
-        glGenTextures(1, &gym_font_texture_);
     unsigned char pixels[W*H+8];
     unpackBitmap(pixels, W, H, bits, W);
     drawPixels(W, H, X, Y, S, pixels);
@@ -59,12 +57,15 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     //printPixels(W, H, pixels, W);
     CHECK_GL_ERROR("drawBitmap0");
     glEnable(GL_TEXTURE_2D);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glBindTexture(GL_TEXTURE_2D, gym_font_texture_);
-
+    if ( ! gym_font_texture_ )
+    {
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glGenTextures(1, &gym_font_texture_);
+        glBindTexture(GL_TEXTURE_2D, gym_font_texture_);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, W, H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     flute4* flu = gym::mapBufferV2T2(4);
     flu[0] = { X,     Y+S*H, 0, 0 };
@@ -76,7 +77,6 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
 
     gym::drawTriangleStrip(0, 4);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    //glDeleteTextures(1, &tex);
     glDisable(GL_TEXTURE_2D);
     CHECK_GL_ERROR("drawBitmap2");
 }
