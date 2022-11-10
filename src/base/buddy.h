@@ -31,8 +31,8 @@ private:
     
 public:
     
-    /// search for 'guy' in circle of buddies, returning buddy anterior to `guy` if found
-    Buddy * find(Buddy * guy)
+    /// search for 'guy' in circle of buddies, returning Buddy anterior to `guy` if found
+    Buddy* findBuddy(Buddy const* guy)
     {
         Buddy * a = this;
         Buddy * b = buddy_;
@@ -44,6 +44,12 @@ public:
             b = b->buddy_;
         }
         return nullptr;
+    }
+    
+    /// true if 'guy' belongs to the circle of buddies
+    bool notBuddy(Buddy const* guy) const
+    {
+        return ! const_cast<Buddy*>(this)->findBuddy(guy);
     }
     
     /// return number of buddies, in circle of friends
@@ -63,7 +69,7 @@ public:
     void enlist(Buddy * guy)
     {
         assert_true( guy != this );
-        if ( !find(guy) )
+        if ( !findBuddy(guy) )
         {
             // join the two circles:
             Buddy * e = guy;
@@ -79,7 +85,7 @@ public:
     /// remove `b` from the list of known buddy, do not call goodbye()
     void unlist(Buddy * guy)
     {
-        Buddy * b = find(guy);
+        Buddy * b = findBuddy(guy);
         if ( b )
         {
             assert_true( b->buddy_ == guy );
@@ -153,18 +159,10 @@ public:
             unlist(guy);
     }
     
-    /// return first buddy or *this
-    Buddy const* buddy() const
-    {
-        if ( buddy_ != this )
-            return buddy_;
-        return nullptr;
-    }
-    
     /// print list of buddies
-    void print(std::ostream& os) const
+    void printBuddies(std::ostream& os) const
     {
-        os << "Object " << this << " buddies are: ";
+        os << "Buddies of Object " << this << " are: ";
         Buddy * b = buddy_;
         while ( b != this )
         {

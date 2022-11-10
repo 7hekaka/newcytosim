@@ -705,7 +705,7 @@ static inline bool not_adjacentPL(BigPoint const& a, BigLocus const& b)
 {
     //a->mec_->Buddy::print(std::clog);
     //b->obj_->Buddy::print(std::clog);
-    return b.obj_->buddy() != a.obj_->buddy();
+    return b.obj_->notBuddy(a.obj_);
 }
 
 
@@ -733,6 +733,7 @@ static inline bool not_adjacentLL(BigLocus const& a, BigLocus const& b)
 void LocusGrid::setSterics0(BigLocusList const& list) const
 {
     BigLocus const* mid = list.middle();
+    //printf("LG:setSterics0  %lu:%lu\n", mid-list.begin(), list.end()-mid);
     
     for ( BigLocus const* ii = list.begin(); ii < mid; ++ii )
     {

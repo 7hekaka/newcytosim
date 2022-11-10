@@ -382,7 +382,7 @@ static inline bool not_adjacentPL(FatPoint const* a, FatLocus const* b)
 {
     //a->pnt_.mecable()->Buddy::print(std::clog);
     //b->seg_.fiber()->Buddy::print(std::clog);
-    return b->seg_.fiber()->buddy() != a->pnt_.mecable()->buddy();
+    return b->seg_.fiber()->notBuddy(a->pnt_.mecable());
 }
 
 
