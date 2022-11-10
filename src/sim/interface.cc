@@ -385,11 +385,10 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
                 okay = all_points_inside(objs, spc);
             }
         }
-        if ( ! okay )
-        {
+        if ( okay )
+            break;
+        else
             objs.destroy();
-            continue;
-        }
     }
     
     if ( objs.empty() )
