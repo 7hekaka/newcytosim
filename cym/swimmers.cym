@@ -1,5 +1,5 @@
 % Swimmers made of a bead and a filament,
-% uses fibers' colinear force
+% uses fiber:colinear_force
 % F. Nedelec, April 2010
 
 set simul system

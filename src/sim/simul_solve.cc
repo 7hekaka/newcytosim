@@ -317,7 +317,7 @@ void Simul::computeForces() const
 }
 
 
-
+#if NEW_SOLVE_SEPARATE
 /**
  This is attempting to separate the system into subclusters
  that can be solved independently -- should lead to parallelization
@@ -359,7 +359,7 @@ void Simul::solve_separate()
     }
     assert_true(cnt == 0);
 }
-
+#endif
 
 //==============================================================================
 //                              SOLVE-X 1D

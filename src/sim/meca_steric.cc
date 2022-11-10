@@ -300,6 +300,7 @@ void Meca::addStericInteractionsL(Simul const& sim)
 }
 
 
+#if NEW_SOLVE_SEPARATE
 void Meca::addSomeStericInteractions()
 {
     locusGrid.clear();
@@ -342,4 +343,4 @@ void Meca::addSomeStericInteractions()
 #endif
     //std::clog << "LocusGrid has capacity " << locusGrid.capacity() << "\n";
 }
-
+#endif

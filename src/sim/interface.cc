@@ -965,7 +965,9 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
             case 4: step_simul<&Simul::solve_onlyX>(); break;
             case 5: step_simul<&Simul::solve_flux>(); break;
             case 7: step_simul<&Simul::solve_half>(); break;
+#if NEW_SOLVE_SEPARATE
             case 8: step_simul<&Simul::solve_separate>(); break;
+#endif
         }
 
         if ( do_write )
