@@ -398,6 +398,9 @@ public:
     /// creator
     PointGrid(Meca& m) : meca(m) { push = 0; pull = 0; }
     
+    /// number of panes
+    int nbPanes() const { return NUM_STERIC_PANES; }
+
     /// set stiffness
     void stiffness(real h, real l) { push = h; pull = l; }
 
@@ -424,10 +427,7 @@ public:
 #if ( NUM_STERIC_PANES <= 1 )
         locus_list(w).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
 #else
-        size_t pan = fib->prop->steric;
-        if ( pan == 0 || pan > NUM_STERIC_PANES )
-            throw InvalidParameter(fib->prop->name()+":steric is out-of-range");
-        locus_list(w, pan).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
+        locus_list(w, fib->prop->steric).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
 #endif
     }
     
@@ -439,10 +439,7 @@ public:
 #if ( NUM_STERIC_PANES <= 1 )
         point_list(w).emplace(Mecapoint(mec, inx), rad, rge, w);
 #else
-        size_t pan = mec->prop->steric;
-        if ( pan == 0 || pan > NUM_STERIC_PANES )
-            throw InvalidParameter(mec->prop->name()+":steric is out-of-range");
-        point_list(w, pan).emplace(Mecapoint(mec, inx), rad, rge, w);
+        point_list(w, mec->prop->steric).emplace(Mecapoint(mec, inx), rad, rge, w);
 #endif
     }
 

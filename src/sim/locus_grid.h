@@ -411,13 +411,16 @@ private:
     
     /// enter interactions into Meca between two panes
     void setStericsT(size_t pan1, size_t pan2) const;
-
+    
 #endif
     
 public:
     
     /// creator
     LocusGrid(Meca& m) : meca(m) { push = 0; }
+    
+    /// number of panes
+    int nbPanes() const { return MAX_STERIC_PANES; }
     
     /// set stiffness
     void stiffness(real s) { push = s; }
@@ -447,10 +450,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(w).emplace(fib, inx, rad, rge, w);
 #else
-        size_t pan = fib->prop->steric;
-        if ( pan == 0 || pan > MAX_STERIC_PANES )
-            throw InvalidParameter(fib->prop->name()+":steric is out-of-range");
-        cell_pane(w, pan).emplace(fib, inx, rad, rad, w);
+        cell_pane(w, fib->prop->steric).emplace(fib, inx, rad, rad, w);
 #endif
     }
     
@@ -462,10 +462,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(w).emplace(mec, inx, rad, rad, w);
 #else
-        size_t pan = mec->prop->steric;
-        if ( pan == 0 || pan > MAX_STERIC_PANES )
-            throw InvalidParameter(mec->prop->name()+":steric is out-of-range");
-        cell_pane(w, pan).emplace(mec, inx, rad, rad, w);
+        cell_pane(w, mec->prop->steric).emplace(mec, inx, rad, rad, w);
 #endif
     }
     
@@ -480,10 +477,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(c).emplace(fib, inx, rad, rge, w);
 #else
-        size_t pan = fib->prop->steric;
-        if ( pan == 0 || pan > MAX_STERIC_PANES )
-            throw InvalidParameter(fib->prop->name()+":steric is out-of-range");
-        cell_pane(c, pan).emplace(fib, inx, rad, rad, w);
+        cell_pane(c, fib->prop->steric).emplace(fib, inx, rad, rad, w);
 #endif
     }
 
@@ -498,10 +492,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(c).emplace(mec, inx, rad, rad, w);
 #else
-        size_t pan = mec->prop->steric;
-        if ( pan == 0 || pan > MAX_STERIC_PANES )
-            throw InvalidParameter(mec->prop->name()+":steric is out-of-range");
-        cell_pane(c, pan).emplace(mec, inx, rad, rad, w);
+        cell_pane(c, mec->prop->steric).emplace(mec, inx, rad, rad, w);
 #endif
     }
 #endif

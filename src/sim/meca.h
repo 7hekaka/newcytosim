@@ -683,13 +683,13 @@ public:
     void selectStericEngine(Simul const&);
 
     /// add steric interactions between spheres, solids and fibers to Meca
-    void addStericInteractionsP(Simul const&);
+    static void addStericInteractions(PointGrid&, Simul const&);
 
     /// add steric interactions between spheres, solids and fibers to Meca
-    void addStericInteractionsL(Simul const&);
+    static void addStericInteractions(LocusGrid&, Simul const&);
     
     /// add steric interactions between spheres, solids and fibers to Meca
-    void addSomeStericInteractions();
+    void addSomeStericInteractions(LocusGrid&);
 
     //-------------------------- COMPUTING METHODS -----------------------------
     

@@ -356,7 +356,7 @@ void Meca::setSomeInteractions()
     }
     
     if ( steric_ == 2 )
-        addSomeStericInteractions();
+        addSomeStericInteractions(locusGrid);
 }
 #endif
 
