@@ -5,14 +5,13 @@
 #include "glossary.h"
 #include "exceptions.h"
 #include "iowrapper.h"
-#include "messages.h"
-#include "simul_part.h"
 
 
 Motor::Motor(MotorProp const* p, HandMonitor* h)
-: Hand(p,h)
+: Hand(p, h)
 {
 }
+
 
 void Motor::stepUnloaded()
 {
@@ -39,7 +38,7 @@ void Motor::stepUnloaded()
             return detach();
         a = hFiber->abscissaP();
     }
-
+    
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
@@ -68,7 +67,7 @@ void Motor::stepLoaded(Vector const& force)
 #else
     real dab = prop()->set_speed_dt + load * prop()->var_speed_dt;
 #endif
-
+    
     // possibly limit the range of the speed:
     if ( prop()->limit_speed )
     {
@@ -91,7 +90,7 @@ void Motor::stepLoaded(Vector const& force)
             return detach();
         a = hFiber->abscissaP();
     }
-        
+    
 #if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );

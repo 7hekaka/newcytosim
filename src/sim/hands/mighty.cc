@@ -13,15 +13,6 @@ Mighty::Mighty(MightyProp const* p, HandMonitor* h)
 }
 
 
-bool Mighty::attachmentAllowed(FiberSite& sit) const
-{
-    if ( !Hand::attachmentAllowed(sit) )
-        return false;
-    
-    return true;
-}
-
-
 void Mighty::stepUnloaded()
 {
     assert_true( attached() );
@@ -42,11 +33,13 @@ void Mighty::stepUnloaded()
         a = hFiber->abscissaP();
     }
     
+#if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
     nextDetach -= prop()->unbinding_density * abs_real(a-hAbs);
     if ( nextDetach <= 0 )
         return detach();
+#endif
 
     moveTo(a);
 }
@@ -85,12 +78,13 @@ void Mighty::stepLoaded(Vector const& force)
         a = hFiber->abscissaP();
     }
     
+#if NEW_UNBINDING_DENSITY
     // detachment is also induced by displacement:
     assert_true( nextDetach >= 0 );
     nextDetach -= prop()->unbinding_density * abs_real(a-hAbs);
-    
     if ( nextDetach <= 0 )
         return detach();
+#endif
     
     moveTo(a);
 }

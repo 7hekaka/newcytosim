@@ -10,7 +10,7 @@
 /**
  The Mighty is a Hand, and can thus bind and unbind from Fiber.
  
- Mighty is currently is a copy of Motor.
+ Mighty is currently a copy of Motor.
  It can be used to implement custom advanced functionalities.
  
  See Examples and the @ref MightyPar.
@@ -29,11 +29,8 @@ public:
     MightyProp const* prop() const { return static_cast<MightyProp const*>(Hand::prop); }
 
     /// constructor
-    Mighty(MightyProp const*, HandMonitor* h);
+    Mighty(MightyProp const*, HandMonitor*);
 
-    
-    /// check if attachement is possible according to properties
-    bool attachmentAllowed(FiberSite&) const;
 
     /// simulate when `this` is attached but not under load
     void stepUnloaded();
