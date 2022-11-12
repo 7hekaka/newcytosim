@@ -20,6 +20,11 @@ class Glossary;
 /// record birth time of fibers, used for display mostly
 #define FIBER_HAS_BIRTHTIME 0
 
+// enable compact storage of filaments based on Euler angle (23/06/2021)
+/** This makes the trajectory files smaller, at the expense of precision
+ This option is normally not desired, expect to compress old simulations files */
+#define NEW_COMPACT_STORAGE 0
+
 
 /// Mecable with linear geometry
 /**

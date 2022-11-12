@@ -211,14 +211,14 @@ void Inputter::readEulerAngles(float& a, float& b)
     assert_true( binary_ );
     uint16_t i[2];
     if ( 2 != fread(&i, 2, 2, mFile) )
-        throw InvalidIO("readPositiveAngle() failed");
+        throw InvalidIO("readEulerAngles() failed");
     if ( binary_ == 2 )
     {
         i[0] = byteswap16(i[0]);
         i[1] = byteswap16(i[1]);
     }
-    a = float(*((int16_t*)i)) * 1024.f;
-    b = float(i[1]) * 2048.f;
+    a = float(*((int16_t*)i)) * 0x1p-10;
+    b = float(i[1]) * 0x1p-11;
 }
 
 
@@ -676,8 +676,6 @@ void Outputter::writeFloatsBinary(const double* a, const size_t n)
         f[i] = a[i];
     if ( n != fwrite(f, 4, n, mFile) )
         throw InvalidIO("writeFloat() failed");
-    for ( size_t d = 0; d < n; ++d )
-        writeFloat(a[d]);
 }
 
 

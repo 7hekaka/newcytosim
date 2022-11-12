@@ -2206,10 +2206,11 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
  */
 void Chain::writeAngles(Outputter& out) const
 {
+#if 0
     real e = length1() - length();
     if ( abs_real(e) > 0.1 )
         fprintf(stderr, "inaccurate length %f in f%x\n", e, identity());
-
+#endif
     //out.writeUInt32(signature());
     out.writeFloatBinary(length());
     //out.writeFloat(fnSegmentation);
@@ -2225,13 +2226,13 @@ void Chain::writeAngles(Outputter& out) const
         real x = pPos[i  ] - pPos[i-DIM  ];
 #if ( DIM > 1 )
         real y = pPos[i+1] - pPos[i-DIM+1];
-#else
-        real y = 0;
-#endif
         real a = std::atan2(y, x);
-#if ( DIM == 3 )
+#else
+        real a = 0;
+#endif
+#if ( DIM >= 3 )
         real z = pPos[i+2] - pPos[i-DIM+2];
-        // the second angle is always in [0, PI]
+        // the second angle is always positive, in [0, PI]
         real b = std::atan2(std::sqrt(x*x+y*y), z);
         out.writeEulerAngles(a, b);
 #else
@@ -2248,10 +2249,7 @@ void Chain::writeAngles(Outputter& out) const
 void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
 {
     //Cytosim::log << "  reading Chain at " << in.pos() << '\n';
-    
-    float len   = in.readFloatBinary();
-    fnAbscissaM = in.readFloatBinary();
-    fnAbscissaP = fnAbscissaM + len;
+    float len = in.readFloatBinary();
 
     if ( len <= 0 )
         throw InvalidIO("invalid (negative) fiber length");
@@ -2259,44 +2257,49 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
     if ( len > 1e6 )
         throw InvalidIO("excessive fiber length");
 
+    fnAbscissaM = in.readFloatBinary();
+    fnAbscissaP = fnAbscissaM + len;
     size_t cnt = in.readUInt16();
-    if ( cnt < 1 )
-        throw InvalidIO("invalid fiber with 0 or 1 point");
     
+    if ( cnt < 1 )
+        throw InvalidIO("invalid fiber with no segment?");
+    
+    const float L = len / float(cnt);
+
     setNbPoints(cnt+1);
-    //resetPoints();
-    /** in binary mode, we should read all the data in one go */
-    in.readFloats(pPos, DIM);   // read first point
-    const float S = len / float(cnt);
+    // read first point:
+    float pos[4] = { 0 };
+    in.readFloats(pos, DIM);
+    for ( int d = 0; d < DIM; ++d )
+        pPos[d] = pos[d];
     if ( in.vectorSize() > 2 )
     {
-        // 3D case, two angles per segment
-        for ( size_t i = 0; i < DIM*cnt; i += DIM )
+        // 3D data with two angles per segment
+        for ( size_t i = 1; i <= cnt; ++i )
         {
             float a, b;
             in.readEulerAngles(a, b);
-            pPos[i+DIM  ] = pPos[i  ] + S * std::cos(a) * std::sin(b);
-#if ( DIM > 1 )
-            pPos[i+DIM+1] = pPos[i+1] + S * std::sin(a) * std::sin(b);
-#endif
-#if ( DIM > 2 )
-            pPos[i+DIM+2] = pPos[i+2] + S * std::cos(b);
-#endif
+            pos[0] += L * std::cos(a) * std::sin(b);
+            pos[1] += L * std::sin(a) * std::sin(b);
+            pos[2] += L * std::cos(b);
+            for ( int d = 0; d < DIM; ++d )
+                pPos[DIM*i+d] = pos[d];
         }
     }
     else
     {
         // 2D case, one angle per segment
-        for ( size_t i = 0; i < DIM*cnt; i += DIM )
+        for ( size_t i = 1; i <= cnt; ++i )
         {
             float a = in.readAngle();
-            pPos[i+DIM  ] = pPos[i  ] + S * std::cos(a);
-#if ( DIM > 1 )
-            pPos[i+DIM+1] = pPos[i+1] + S * std::sin(a);
-#endif
+            pos[0] += L * std::cos(a);
+            pos[1] += L * std::sin(a);
+            for ( int d = 0; d < DIM; ++d )
+                pPos[DIM*i+d] = pos[d];
         }
     }
-    setSegmentation(S);
+    setSegmentation(L);
     //checkLength(pPos, std::clog, len);
 }
+
 

@@ -90,7 +90,7 @@ public:
     float readFixed();
     /// Read angle on 2 bytes
     float readAngle();
-    /// Read angle on 2 bytes
+    /// Read two angles on 4 bytes
     void readEulerAngles(float&, float&);
     /// Reads one float on 4 bytes
     float readFloatBinary();
