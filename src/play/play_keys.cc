@@ -1164,9 +1164,8 @@ void processNormalKey(const unsigned char key, const int x, const int y)
     {
         if ( key == prop.magic_key[k] )
         {
-            flashText("%s", prop.magic_code[k].c_str());
             worker.evaluate(prop.magic_code[k]);
-            glApp::postRedisplay();
+            flashText("%s", prop.magic_code[k].c_str());
             return;
         }
     }

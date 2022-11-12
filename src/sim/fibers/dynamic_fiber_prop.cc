@@ -57,9 +57,9 @@ static void splash(std::ostream& os, real g, real h, real unit)
     //const real ctime = g / ( 3*h*h );  // that is only true if g >> h
     std::streamsize p = os.precision();
     os.precision(5);
-    os << "  DynamicFiber h " << h << " g " << g << " :";
-    os << " catastrophe_time " << ctime << "  rate " << 1/ctime;
-    os << " length " << len << "\n";
+    os << "  hydrolysis " << h << " growth " << g;
+    os << "  catastrophe_time " << ctime << "  rate " << 1/ctime;
+    os << "  length " << len << "\n";
     os.precision(p);
 }
 
@@ -174,13 +174,13 @@ void DynamicFiberProp::complete(Simul const& sim)
     /// print predicted average length in verbose mode:
     if ( primed(sim) && sim.prop.verbose )
     {
-        if ( 0 == growing_off_speed[0] )
-        splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
-        
         // calculate stall force, from:
         // 0 = growing_speed * std::exp(force/growing_force) + growing_off_speed;
         real f = -growing_force[0] * std::log(-growing_off_speed[0]/growing_speed[0]);
-        std::clog << name() << ":stall_force = " << f << "\n";
+        std::clog << name() << ":stall_force = " << f;
+
+        if ( 0 == growing_off_speed[0] )
+        splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
     }
 }
 

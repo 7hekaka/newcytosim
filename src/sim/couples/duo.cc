@@ -152,7 +152,10 @@ void Duo::write(Outputter& out) const
 {
     writeHeader(out, TAG);
     out.writeUInt8(active_);
-    Couple::write(out);
+    cHand1->write(out);
+    cHand2->write(out);
+    if ( !attached1() && !attached2() )
+        out.writeFloats(cPos, DIM);
 }
 
 

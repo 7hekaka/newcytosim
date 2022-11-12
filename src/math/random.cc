@@ -29,14 +29,8 @@ thread_local Random RNG;
 /// the most significant bit in a 32-bits integer
 constexpr uint32_t BIT31 = 1U << 31;
 
-//constexpr uint32_t FRAC32 = 0x7FFFFFU;
-/// bit mask for exponent in single precision (float)
-constexpr uint32_t EXPON32 = 127U << 23;
-
 /// sign bit in double precision (double)
 constexpr uint64_t BIT63 = 1ULL << 63;
-
-// constexpr uint64_t EXPON64 = 1023ULL << 52;
 
 
 /**
@@ -233,7 +227,7 @@ float Random::pfloat23()
     //by setting random bits for the fraction-bits of a float IEEE 754,
     //we get a random number between 1 and 2. We substract 1.0,
     //but that drops the lower bits, reducing the precision
-    uint32_t i = EXPON32 | ( URAND32() >> 9 );
+    uint32_t i = 0x3f800000 | ( URAND32() >> 9 );
     return reinterpret_cast<float&>(i) - 1.f;
 }
 

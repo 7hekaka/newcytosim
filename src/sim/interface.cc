@@ -927,7 +927,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     }
 #endif
     opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
-        {"horizontal",4}, {"flux",5}, {"half",7}, {"separate", 8} });
+        {"uniaxial",4}, {"flux",5}, {"half",7}, {"separate", 8} });
     opt.set(prune,  "prune");
     opt.set(binary, "binary");
     opt.set(frames, "nb_frames");
