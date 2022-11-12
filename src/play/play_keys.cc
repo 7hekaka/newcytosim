@@ -1107,7 +1107,11 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case 'u':
-            shufflePointDispVisible(player.allSpaceDisp(), 3-altKeyDown);
+            shufflePointDispVisible(player.allSpaceDisp(), 3);
+            break;
+
+        case 'U':
+            shufflePointDispVisible(player.allSpaceDisp(), 1);
             break;
 
         case '7':

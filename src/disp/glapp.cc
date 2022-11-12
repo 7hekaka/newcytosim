@@ -631,8 +631,6 @@ int buildWindowSizeMenu()
     gym::addMenuEntry("1024x512",  210);
     gym::addMenuEntry("1024x768",  211);
     gym::addMenuEntry("1024x1024", 212);
-    gym::addMenuEntry("1280x640",  213);
-    gym::addMenuEntry("1280x1280", 214);
     gym::addMenuEntry("-", 0);
     gym::addMenuEntry("426x240 (240p)",    220);
     gym::addMenuEntry("640x360 (360p)",    221);
