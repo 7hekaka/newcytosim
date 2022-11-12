@@ -83,7 +83,7 @@ namespace gym
         {"darkest_purple",0x200020FF},
         {"darkest_red",   0x200000FF},
         {"darkest_yellow",0x202000FF},
-        {"darker_orange", 0x714900FF},
+        {"darkest_orange",0x503000FF},
         {"dull_blue",     0x006699FF},
         {"fire_brick",    0x800517FF},
         {"forest_green",  0x808000FF},
