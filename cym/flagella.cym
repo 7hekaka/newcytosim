@@ -5,7 +5,7 @@ set simul system
 {
     time_step = 0.005
     viscosity = 0.1
-    steric = 1, 100
+    steric = 1, 1000
 }
 
 set space cell
@@ -45,7 +45,7 @@ new 100 filament
     direction = inward
     position = surface
     reference = minus_end
-    length = 6
+    length = 7
     attach1 = pivot,   0, minus_end
     attach2 = pivot, 0.2, minus_end
 }
@@ -57,9 +57,9 @@ set bead dirt
     display = ( coloring=1; color=0xFFFFFF22; )
 }
 
-new 5000 dirt
+new 0 dirt
 {
-    point1 = center, 0.2
+    point1 = center, 0.1
 }
 
 run system
