@@ -120,7 +120,7 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
     {
         Cytosim::warn << name() << ":stall_force is too small:\n"\
         << PREF << "DIM * kT * stiffness > stall_force\n"\
-        << PREF << "-> reduce stiffness or increase stall_forc\n";
+        << PREF << "-> reduce stiffness or increase stall_force\n";
     }
     
     /*
@@ -128,7 +128,7 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
      and compare to stall_force. This is limit the efficiency of the motor.
      */
     ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
-    if ( unbinding_rate != 0 && unloaded_speed != 0  &&  ef < 1 )
+    if ( unbinding_rate != 0  &&  unloaded_speed != 0  &&  ef < 1 )
     {
         Cytosim::warn << "The efficiency of `" << name() << "' is low because\n"\
         << PREF << "stiffness * unloaded_speed / unbinding_rate << stall_force\n"\

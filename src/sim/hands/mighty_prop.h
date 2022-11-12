@@ -5,6 +5,9 @@
 
 #include "hand_prop.h"
 
+/// enable movement-dependent detachment of motors
+#define NEW_UNBINDING_DENSITY 0
+
 /// additional Property for Mighty
 /**
  @ingroup Properties
@@ -53,14 +56,15 @@ public:
      */
     bool limit_speed;
     
-    
+#if NEW_UNBINDING_DENSITY
     /// movement-induced probability of detaching
     /**
      This is a positive number specifying the probability of detaching
      per unit-length of movement
      */
     real unbinding_density;
-
+#endif
+    
     /// @}
     
 private:
@@ -70,21 +74,21 @@ private:
     
     /// variables derived from `unloaded_speed`
     real set_speed_dt, var_speed_dt;
-
+    
 public:
-        
+
     /// constructor
     MightyProp(const std::string& n) : HandProp(n)  { clear(); }
-   
+    
     /// destructor
     ~MightyProp() { }
     
     /// return a Hand with this property
     virtual Hand * newHand(HandMonitor*) const;
-
+    
     /// set default values
     void clear();
-        
+    
     /// set from a Glossary
     void read(Glossary&);
     
