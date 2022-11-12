@@ -86,7 +86,7 @@ void SimulProp::read(Glossary& glos)
     glos.set(precondition, "precondition", "precond");
     glos.set(precond_span, "precondition", 1);
     
-    glos.set(steric_mode,          "steric", {{"off", 0}, {"on", 1}});
+    glos.set(steric_mode, "steric", {{"off", 0}, {"on", 1}, {"duo", 2}});
     glos.set(steric_stiff_push[0], "steric", 1);
     glos.set(steric_stiff_pull[0], "steric", 2);
     glos.set(steric_stiff_push, 2, "steric_stiff_push");

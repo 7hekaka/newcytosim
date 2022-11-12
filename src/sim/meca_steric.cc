@@ -35,35 +35,38 @@ static void setStericGrid(GRID& grid, Space const* spc, real& range)
 
 void Meca::selectStericEngine(Simul const& sim)
 {
-    Space const* spc = sim.spaces.master();
+    if ( sim.prop.steric_mode )
+    {
+        Space const* spc = sim.spaces.master();
+        if ( ! spc )
+            throw InvalidParameter("simul:steric could not find a Space");
 
-    if ( !spc || !sim.prop.steric_mode )
+        // without pulling, use `locusGrid` which is simpler:
+        steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
+        
+        /** If the Space size is not expected to change, then we would only need
+         to allocate the Grid once, but this is not garanteed in general */
+        if ( sim.prop.steric_max_range <= REAL_EPSILON )
+            sim.prop.steric_max_range = sim.minimumStericRange();
+        
+        switch ( steric_ )
+        {
+            case 1:
+                pointGrid.stiffness(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
+                //if ( !pointGrid.hasGrid() )
+                setStericGrid(pointGrid, spc, sim.prop.steric_max_range);
+                break;
+                
+            case 2:
+                locusGrid.stiffness(sim.prop.steric_stiff_push[0]);
+                //if ( !locusGrid.hasGrid() )
+                setStericGrid(locusGrid, spc, sim.prop.steric_max_range);
+                break;
+        }
+    }
+    else
     {
         steric_ = 0;
-        return;
-    }
-    
-    // without pulling, use `locusGrid` which is simpler:
-    steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
-    
-    /** If the Space size is not expected to change, then we would only need
-     to allocate the Grid once, but this is not garanteed in general */
-    if ( sim.prop.steric_max_range <= REAL_EPSILON )
-        sim.prop.steric_max_range = sim.minimumStericRange();
-
-    switch ( steric_ )
-    {
-        case 1:
-            pointGrid.stiffness(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
-            //if ( !pointGrid.hasGrid() )
-                setStericGrid(pointGrid, spc, sim.prop.steric_max_range);
-            break;
-            
-        case 2:
-            locusGrid.stiffness(sim.prop.steric_stiff_push[0]);
-            //if ( !locusGrid.hasGrid() )
-                setStericGrid(locusGrid, spc, sim.prop.steric_max_range);
-            break;
     }
 }
 
@@ -137,20 +140,21 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
     
     grid.setSterics();
 
-#elif ( NUM_STERIC_PANES == 2 )
-    
-    // add steric interactions inside pane 1:
-    grid.setSterics(1);
-    // add steric interactions between panes 1 and 2:
-    grid.setSterics(1, 2);
-    //pointGrid.setSterics(*this, pam, 2, 1);
-
 #else
-    
-    // add steric interactions within each pane:
-    for ( size_t p = 1; p <= NUM_STERIC_PANES; ++p )
-        grid.setSterics(p);
-
+    if ( sim.prop.steric_mode == 1 )
+    {
+        // add steric interactions inside pane 1:
+        grid.setSterics(1);
+        // add steric interactions between panes 1 and 2:
+        grid.setSterics(1, 2);
+        // add steric interactions in pane 2:
+    }
+    else
+    {
+        // add steric interactions within each pane:
+        for ( size_t p = 1; p <= NUM_STERIC_PANES; ++p )
+            grid.setSterics(p);
+    }
 #endif
 }
 
@@ -287,20 +291,21 @@ void Meca::addStericInteractions(LocusGrid& grid, Simul const& sim)
     
     grid.setSterics();
 
-#elif ( MAX_STERIC_PANES == 2 )
-    
-    // add steric interactions inside pane 1:
-    grid.setSterics(1);
-    // add steric interactions between panes 1 and 2:
-    grid.setSterics(1, 2);
-    //pointGrid.setSterics(*this, pam, 2, 1);
-
 #else
-    
-    // add steric interactions within each pane:
-    for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-        grid.setSterics(p);
-
+    if ( sim.prop.steric_mode == 1 )
+    {
+        // add steric interactions inside pane 1:
+        grid.setSterics(1);
+        // add steric interactions between panes 1 and 2:
+        grid.setSterics(1, 2);
+        //pointGrid.setSterics(*this, pam, 2, 1);
+    }
+    else
+    {
+        // add steric interactions within each pane:
+        for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
+            grid.setSterics(p);
+    }
 #endif
     //std::clog << "LocusGrid has capacity " << locusGrid.capacity() << "\n";
 }

@@ -47,8 +47,8 @@ set hand dynein
     binding = 10, 0.15
     unbinding = 0.2, 6
     
-    activity    = move
-    unloaded_speed   = -1
+    activity = move
+    unloaded_speed = -1
     stall_force = 5
 
     display = ( color=green )
@@ -67,8 +67,8 @@ set hand kinesin
     binding = 10, 0.02
     unbinding = 0.2, 6
     
-    activity    = move
-    unloaded_speed   = 0.1
+    activity = move
+    unloaded_speed = 0.1
     stall_force = 6
 
     display = ( color=orange )
