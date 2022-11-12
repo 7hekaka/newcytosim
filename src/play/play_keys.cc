@@ -874,6 +874,8 @@ void processKey(unsigned char key, int modifiers = 0)
                     glApp::displayAll();
                     worker.signal();
                 }
+                else if ( worker.alone() )
+                    player.nextFrame();
                 player.stop();
             }
             break;

@@ -141,8 +141,8 @@ public:
     /// set how many 'hold()' are necessary to halt the thread
     void period(unsigned int c) { cycle_ = c; }
     
-    /// true if child thread is running
-    bool alone() const { return status_; }
+    /// true if child thread is not running
+    bool alone() const { return status_ != 0; }
 
     /// true if child thread is running
     bool alive() const { return status_ == 0; }
