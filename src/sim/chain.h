@@ -489,9 +489,10 @@ public:
     /// Keep vertices [ 0, P ] and discard the others
     virtual void truncateP(size_t P);
 
-    /// the length of freshly assembled polymer at the MINUS_END
+    /// length of polymer made in last timestep, at the MINUS_END (negative for shrinking)
     real freshAssemblyM() const { return cDeltaM; }
-    /// the length of freshly assembled polymer at the PLUS_END
+    
+    /// length of polymer made in last timestep, at the PLUS_END (negative for shrinking)
     real freshAssemblyP() const { return cDeltaP; }
     
     /// undo last length change at minus end

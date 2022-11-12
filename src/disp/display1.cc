@@ -244,7 +244,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
     gym::unmapBufferC4VD();
     gym::drawPoints(pointSize, 0, ptr-flu);
     // display inactive Couples with square dots:
-    gym::drawSquarePoints(0.5*pointSize, end-flu, cnt-(end-flu));
+    gym::drawSquarePoints(0.25*pointSize, end-flu, cnt-(end-flu));
     gym::cleanup();
 }
 
