@@ -33,6 +33,8 @@ void SpaceSquare::resize(Glossary& opt)
         real rad = 0;
         if ( opt.set(rad, "radius") )
             half_[1] = rad;
+        else if ( opt.set(rad, "diameter") )
+            half_[1] = rad * 0.5;
     }
 #endif
 }
