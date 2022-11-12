@@ -65,6 +65,17 @@ public:
     real unbinding_density;
 #endif
     
+    /// probability of rescuing a Fiber
+    /**
+     This parameter is used when the shrinking end of the fiber is reaching the position of the Rescuer.
+     
+     The parameter determines between two possible outcome:
+     - the fiber nearest end state is set to STATE_GREEN.
+     - the fiber continues to shrink, and the Rescuer detaches
+     .
+     */
+    real rescue_chance;
+
     /// @}
     
 private:

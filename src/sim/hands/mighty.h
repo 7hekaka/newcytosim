@@ -10,7 +10,7 @@
 /**
  The Mighty is a Hand, and can thus bind and unbind from Fiber.
  
- Mighty is currently a copy of Motor.
+ Mighty is currently a copy of Motor, with the addition of 'rescue_chance'.
  It can be used to implement custom advanced functionalities.
  
  See Examples and the @ref MightyPar.
@@ -32,6 +32,13 @@ public:
     Mighty(MightyProp const*, HandMonitor*);
 
 
+    /// this is called when the attachment point is beyond the PLUS_END
+    void handleDisassemblyM();
+    
+    /// this is called when the attachment point is below the MINUS_END
+    void handleDisassemblyP();
+
+    
     /// simulate when `this` is attached but not under load
     void stepUnloaded();
     

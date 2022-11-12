@@ -27,6 +27,7 @@ void MightyProp::clear()
 #endif
     var_speed_dt = 0;
     set_speed_dt = 0;
+    rescue_chance = 0;
 }
 
 
@@ -44,6 +45,7 @@ void MightyProp::read(Glossary& glos)
 #if NEW_UNBINDING_DENSITY
     glos.set(unbinding_density, "unbinding_density");
 #endif
+    glos.set(rescue_chance, "rescue_chance");
 }
 
 
@@ -81,6 +83,9 @@ void MightyProp::complete(Simul const& sim)
         min_dab = 2 * tau * unloaded_speed;
         max_dab = 0;
     }
+    
+    if ( rescue_chance < 0 )
+        throw InvalidParameter("rescuer:rescue_chance must be >= 0");
 }
 
 
@@ -141,5 +146,6 @@ void MightyProp::write_values(std::ostream& os) const
 #if NEW_UNBINDING_DENSITY
     write_value(os, "unbinding_density", unbinding_density);
 #endif
+    write_value(os, "rescue_chance", rescue_chance);
 }
 

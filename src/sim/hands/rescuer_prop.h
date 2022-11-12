@@ -26,7 +26,7 @@ public:
     /**
      This parameter is used when the shrinking end of the fiber is reaching the position of the Rescuer.
      
-     The parameter determines the probability of the two possible outcome:
+     The parameter determines between two possible outcome:
      - the fiber nearest end state is set to STATE_GREEN.
      - the fiber continues to shrink, and the Rescuer detaches
      .
