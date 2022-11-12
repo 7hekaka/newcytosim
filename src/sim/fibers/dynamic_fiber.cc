@@ -60,10 +60,10 @@ void DynamicFiber::setEndStateM(state_t s)
     if ( s != mStateM )
     {
         mStateM = s;
+        unitM[1] = ( 4 - s ) / 2;
+        unitM[0] = ( 4 - s ) & 1;
         if ( s != STATE_WHITE )
         {
-            unitM[1] = ( 4 - s ) / 2;
-            unitM[0] = ( 4 - s ) & 1;
             assert_true( 0==unitM[0] || 1==unitM[0] );
             assert_true( 0==unitM[1] || 1==unitM[1] );
             assert_true( mStateM == calculateStateM() );
@@ -222,10 +222,10 @@ void DynamicFiber::setEndStateP(state_t s)
     if ( s != mStateP )
     {
         mStateP = s;
+        unitP[1] = ( 4 - s ) / 2;
+        unitP[0] = ( 4 - s ) & 1;
         if ( s != STATE_WHITE )
         {
-            unitP[1] = ( 4 - s ) / 2;
-            unitP[0] = ( 4 - s ) & 1;
             assert_true( 0==unitP[0] || 1==unitP[0] );
             assert_true( 0==unitP[1] || 1==unitP[1] );
             assert_true( mStateP == calculateStateP() );
