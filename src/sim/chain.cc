@@ -2211,17 +2211,16 @@ void Chain::writeAngles(Outputter& out) const
         fprintf(stderr, "inaccurate length %f in f%x\n", e, identity());
 
     //out.writeUInt32(signature());
-    out.writeFloat(length());
+    out.writeFloatBinary(length());
     //out.writeFloat(fnSegmentation);
-    out.writeFloat(fnAbscissaM);
+    out.writeFloatBinary(fnAbscissaM);
     //out.writeFloat(fnBirthTime);
-    out.writeUInt16(nPoints-1);
+    out.writeUInt16Binary(nPoints-1);
     // first point:
-    out.writeFloats(pPos, DIM, '\n');
+    out.writeFloatsBinary(pPos, DIM);
     // angles:
     for ( size_t i = DIM; i < DIM*nPoints; i += DIM )
     {
-        out.writeSoftNewline();
         // in 2D, there is only one angle:
         real x = pPos[i  ] - pPos[i-DIM  ];
 #if ( DIM > 1 )
@@ -2230,12 +2229,13 @@ void Chain::writeAngles(Outputter& out) const
         real y = 0;
 #endif
         real a = std::atan2(y, x);
-        out.writeAngle(a);
 #if ( DIM == 3 )
         real z = pPos[i+2] - pPos[i-DIM+2];
-        real b = std::atan2(std::sqrt(x*x+y*y), z);
         // the second angle is always in [0, PI]
-        out.writePositiveAngle(b);
+        real b = std::atan2(std::sqrt(x*x+y*y), z);
+        out.writeEulerAngles(a, b);
+#else
+        out.writeAngle(a);
 #endif
     }
 }
@@ -2249,8 +2249,8 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
 {
     //Cytosim::log << "  reading Chain at " << in.pos() << '\n';
     
-    float len   = in.readFloat();
-    fnAbscissaM = in.readFloat();
+    float len   = in.readFloatBinary();
+    fnAbscissaM = in.readFloatBinary();
     fnAbscissaP = fnAbscissaM + len;
 
     if ( len <= 0 )
@@ -2273,8 +2273,8 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
         // 3D case, two angles per segment
         for ( size_t i = 0; i < DIM*cnt; i += DIM )
         {
-            float a = in.readAngle();
-            float b = in.readPositiveAngle();
+            float a, b;
+            in.readEulerAngles(a, b);
             pPos[i+DIM  ] = pPos[i  ] + S * std::cos(a) * std::sin(b);
 #if ( DIM > 1 )
             pPos[i+DIM+1] = pPos[i+1] + S * std::sin(a) * std::sin(b);

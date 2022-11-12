@@ -167,10 +167,10 @@ void writeObject(uint32_t a, uint32_t b, size_t s, size_t p)
     uint32_t d = (uint32_t)(p-DIM);
     if ( c != (size_t)s )
         fprintf(stderr, "unint32 index overflow!\n");
-    fwrite(&a, 1, 4, fileS);
-    fwrite(&b, 1, 4, fileS);
-    fwrite(&c, 1, 4, fileS);
-    fwrite(&d, 1, 4, fileS);
+    fwrite(&a, 4, 1, fileS);
+    fwrite(&b, 4, 1, fileS);
+    fwrite(&c, 4, 1, fileS);
+    fwrite(&d, 4, 1, fileS);
 }
 
 //------------------------------------------------------------------------------

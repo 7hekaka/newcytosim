@@ -196,43 +196,41 @@ float Inputter::readFixed()
 
 float Inputter::readAngle()
 {
-    if ( binary_ )
-    {
-        int16_t i;
-        if ( 1 != fread(&i, 2, 1, mFile) )
-            throw InvalidIO("readAngle() failed");
-        if ( binary_ == 2 )
-            i = byteswap16(i);
-        return float(i) * 0x1p-10;
-    }
-    else
-    {
-        float v;
-        if ( 1 != fscanf(mFile, " %f", &v) )
-            throw InvalidIO("readAngle failed");
-        return v;
-    }
+    assert_true( binary_ );
+    int16_t i;
+    if ( 1 != fread(&i, 2, 1, mFile) )
+        throw InvalidIO("readAngle() failed");
+    if ( binary_ == 2 )
+        i = byteswap16(i);
+    return float(i) * 0x1p-10;
 }
 
 
-float Inputter::readPositiveAngle()
+void Inputter::readEulerAngles(float& a, float& b)
 {
-    if ( binary_ )
+    assert_true( binary_ );
+    uint16_t i[2];
+    if ( 2 != fread(&i, 2, 2, mFile) )
+        throw InvalidIO("readPositiveAngle() failed");
+    if ( binary_ == 2 )
     {
-        uint16_t i;
-        if ( 1 != fread(&i, 2, 1, mFile) )
-            throw InvalidIO("readPositiveAngle() failed");
-        if ( binary_ == 2 )
-            i = byteswap16(i);
-        return float(i) * 0x1p-11;
+        i[0] = byteswap16(i[0]);
+        i[1] = byteswap16(i[1]);
     }
-    else
-    {
-        float v;
-        if ( 1 != fscanf(mFile, " %f", &v) )
-            throw InvalidIO("readPositiveAngle failed");
-        return v;
-    }
+    a = float(*((int16_t*)i)) * 1024.f;
+    b = float(i[1]) * 2048.f;
+}
+
+
+float Inputter::readFloatBinary()
+{
+    assert_true( binary_ );
+    float v;
+    if ( 1 != fread(&v, 4, 1, mFile) )
+        throw InvalidIO("readFloat() failed");
+    if ( binary_ == 2 )
+        v = byteswap32(v);
+    return v;
 }
 
 
@@ -403,7 +401,7 @@ void Outputter::writeEndianess()
 {
     //the value corresponds to the ASCII code of "01"
     uint16_t x = 12592U;
-    if ( 2 != fwrite(&x, 1, 2, mFile) )
+    if ( 1 != fwrite(&x, 2, 1, mFile) )
         throw InvalidIO("writeEndianess failed");
 }
 
@@ -459,7 +457,7 @@ void Outputter::writeInt16(const int n)
     if ( n != v )
         throw InvalidIO("value out of range for writeInt16()");
 
-    if ( 2 != fwrite(&v, 1, 2, mFile) )
+    if ( 1 != fwrite(&v, 2, 1, mFile) )
         throw InvalidIO("writeInt16() failed");
 }
 
@@ -474,7 +472,7 @@ void Outputter::writeInt32(const int n)
     if ( n != v )
         throw InvalidIO("value out of range for writeInt32()");
     
-    if ( 4 != fwrite(&v, 1, 4, mFile) )
+    if ( 1 != fwrite(&v, 4, 1, mFile) )
         throw InvalidIO("writeInt32() failed");
 }
 
@@ -494,6 +492,18 @@ void Outputter::writeUInt8(const unsigned n)
 }
 
 
+void Outputter::writeUInt16Binary(const unsigned n)
+{
+    assert_true( binary_ );
+    uint16_t v = (uint16_t)n;
+    
+    if ( n != v )
+        throw InvalidIO("value out of range for writeUInt16()");
+
+    if ( 1 != fwrite(&v, 2, 1, mFile) )
+        throw InvalidIO("writeUInt16() failed");
+}
+
 void Outputter::writeUInt16(const unsigned n)
 {
     if ( !binary_ )
@@ -504,7 +514,7 @@ void Outputter::writeUInt16(const unsigned n)
     if ( n != v )
         throw InvalidIO("value out of range for writeUInt16()");
 
-    if ( 2 != fwrite(&v, 1, 2, mFile) )
+    if ( 1 != fwrite(&v, 2, 1, mFile) )
         throw InvalidIO("writeUInt16() failed");
 }
 
@@ -519,7 +529,7 @@ void Outputter::writeUInt32(const unsigned n)
     if ( n != v )
         throw InvalidIO("value out of range for writeUInt32()");
     
-    if ( 4 != fwrite(&v, 1, 4, mFile) )
+    if ( 1 != fwrite(&v, 4, 1, mFile) )
         throw InvalidIO("writeUInt32() failed");
 }
 
@@ -534,7 +544,7 @@ void Outputter::writeUInt64(const unsigned long n)
     if ( n != v )
         throw InvalidIO("value out of range for writeUInt64()");
     
-    if ( 8 != fwrite(&v, 1, 8, mFile) )
+    if ( 1 != fwrite(&v, 8, 1, mFile) )
         throw InvalidIO("writeUInt64() failed");
 }
 
@@ -549,7 +559,7 @@ void Outputter::writeUInt16(const unsigned n, char before)
     if ( n != v )
         throw InvalidIO("value out of range for writeUInt16()");
 
-    if ( 2 != fwrite(&v, 1, 2, mFile) )
+    if ( 1 != fwrite(&v, 2, 1, mFile) )
         throw InvalidIO("writeUInt16() failed");
 }
 
@@ -564,7 +574,7 @@ void Outputter::writeUInt32(const unsigned n, char before)
     if ( n != v )
         throw InvalidIO("value out of range for writeUInt32()");
     
-    if ( 4 != fwrite(&v, 1, 4, mFile) )
+    if ( 1 != fwrite(&v, 4, 1, mFile) )
         throw InvalidIO("writeUInt32() failed");
 }
 
@@ -575,7 +585,7 @@ void Outputter::writeFixed(const float x)
     {
         bool out = ( x < 0 || x > 1 );
         uint16_t i = uint16_t(x * 65535.f);
-        if ( out || 2 != fwrite(&i, 1, 2, mFile) )
+        if ( out || 1 != fwrite(&i, 2, 1, mFile) )
             throw InvalidIO("writeFixed() failed");
     }
     else
@@ -587,40 +597,41 @@ void Outputter::writeFixed(const float x)
 
 /*
  Since the angle is within [-PI, PI], we can use 2 bytes and scale by 1024,
- which covers the range [-3.2, 3.2]. The precision is about ~ 10-3
+ which covers the range [-3.2, 3.2]. The delta is about ~ 10-3 radian
  */
 void Outputter::writeAngle(const float x)
 {
-    if ( binary_ )
-    {
-        int16_t i = int16_t(x * 1024.f);
-        if ( 2 != fwrite(&i, 1, 2, mFile) )
-            throw InvalidIO("writeAngle() failed");
-    }
-    else
-    {
-        if ( 6 > fprintf(mFile, " %.6f", x) )
-            throw InvalidIO("writeAngle failed");
-    }
+    assert_true( binary_ );
+    int16_t i = int16_t(x * 1024.f);
+    if ( 1 != fwrite(&i, 2, 1, mFile) )
+        throw InvalidIO("writeAngle() failed");
 }
 
 /*
- Since the angle is within [0, PI], we can use 2 bytes and scale by 2048,
- which covers the range [0, 3.2]. The precision is about ~ 5.10-4
+ Store `a` in [-PI, PI], using 2 bytes, by scaling by 1024,
+ which covers the range [-3.2, 3.2]. The delta is about ~ 10-3 radian
+
+ Store `b` in [0, PI] using 2 bytes, by scaling by 2048,
+ which covers the range [0, 3.2]. The delta is about ~ 5.10-4 radian
  */
-void Outputter::writePositiveAngle(const float x)
+void Outputter::writeEulerAngles(const float a, const float b)
 {
-    if ( binary_ )
-    {
-        uint16_t i = uint16_t(x * 2048.f);
-        if ( x < 0 || 2 != fwrite(&i, 1, 2, mFile) )
-            throw InvalidIO("writePositiveAngle() failed");
-    }
-    else
-    {
-        if ( 6 > fprintf(mFile, " %.6f", x) )
-            throw InvalidIO("writePositiveAngle failed");
-    }
+    assert_true( binary_ );
+    constexpr float sup = 3.1999f;
+    bool valid = ( std::abs(a) < sup ) & ( 0 <= b ) & ( b < sup );
+    uint16_t u[2];
+    *((int16_t*)u) = int16_t(a * 1024.f);
+    u[1] = uint16_t(b * 2048.f);
+    if ( !valid || 2 != fwrite(u, 2, 2, mFile) )
+        throw InvalidIO("writeEulerAngles() failed");
+}
+
+
+void Outputter::writeFloatBinary(const float x)
+{
+    assert_true( binary_ );
+    if ( 1 != fwrite(&x, 4, 1, mFile) )
+        throw InvalidIO("writeFloat() failed");
 }
 
 
@@ -628,7 +639,7 @@ void Outputter::writeFloat(const float x)
 {
     if ( binary_ )
     {
-        if ( 4 != fwrite(&x, 1, 4, mFile) )
+        if ( 1 != fwrite(&x, 4, 1, mFile) )
             throw InvalidIO("writeFloat() failed");
     }
     else
@@ -648,6 +659,27 @@ void Outputter::writeFloats(const float* a, const size_t n, char before)
         writeFloat(a[d]);
 }
 
+void Outputter::writeFloatsBinary(const float* a, const size_t n)
+{
+    assert_true( binary_ );
+    if ( n != fwrite(a, 4, n, mFile) )
+        throw InvalidIO("writeFloat() failed");
+    for ( size_t d = 0; d < n; ++d )
+        writeFloat(a[d]);
+}
+
+void Outputter::writeFloatsBinary(const double* a, const size_t n)
+{
+    assert_true( binary_ );
+    float f[n];
+    for ( size_t i = 0; i < n; ++i )
+        f[i] = a[i];
+    if ( n != fwrite(f, 4, n, mFile) )
+        throw InvalidIO("writeFloat() failed");
+    for ( size_t d = 0; d < n; ++d )
+        writeFloat(a[d]);
+}
+
 
 void Outputter::writeFloats(const double* a, const size_t n, char before)
 {
@@ -663,7 +695,7 @@ void Outputter::writeDouble(const double x)
 {
     if ( binary_ )
     {
-        if ( 8 != fwrite(&x, 1, 8, mFile) )
+        if ( 8 != fwrite(&x, 8, 1, mFile) )
             throw InvalidIO("writeDouble() failed");
     }
     else

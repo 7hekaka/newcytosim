@@ -540,7 +540,7 @@ public:
     /// write to Outputter
     void writeAngles(Outputter&) const;
 
-    /// read from Inputter
+    /// read from Inputter, using compact binary mode
     void readAngles(Inputter&, Simul&, ObjectTag);
 
 };

@@ -78,9 +78,9 @@ FILE * openFile(const char base[], unsigned inx, bool binary)
 
 void writeBinary(FILE* file, uint16_t a, uint16_t b, uint32_t c, Vector const& pos)
 {
-    fwrite(&a, 1, 2, file);
-    fwrite(&b, 1, 2, file);
-    fwrite(&c, 1, 4, file);
+    fwrite(&a, 2, 1, file);
+    fwrite(&b, 2, 1, file);
+    fwrite(&c, 4, 1, file);
     float vec[3] = { 0 };
     pos.store(vec);
     fwrite(vec, 3, sizeof(float), file);

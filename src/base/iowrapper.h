@@ -91,7 +91,9 @@ public:
     /// Read angle on 2 bytes
     float readAngle();
     /// Read angle on 2 bytes
-    float readPositiveAngle();
+    void readEulerAngles(float&, float&);
+    /// Reads one float on 4 bytes
+    float readFloatBinary();
     /// Reads one float on 4 bytes
     float readFloat();
     /// Reads one double on 8 bytes
@@ -175,16 +177,16 @@ public:
     void writeUInt16(unsigned, char before);
     /// Write unsigned integer on 2 bytes
     void writeUInt32(unsigned, char before);
+    /// Write unsigned integer on 2 bytes
+    void writeUInt16Binary(unsigned);
 
-    /// check if x would overflow the fixed format
-    static bool overflowFixed(float x) { int16_t i=int16_t(x*2048.f); return i != int16_t(i); }
     /// store float in [0, 1] using 2 bytes
     void writeFixed(float);
     
     /// store an angle in [-PI, PI] using 2 bytes
     void writeAngle(float);
-    /// store an angle in [0, PI] using 2 bytes
-    void writePositiveAngle(float);
+    /// store `a` in [-PI, PI] and `b` in [0, PI], using 2 bytes for each
+    void writeEulerAngles(float a, float b);
 
     /// Write value on 4 bytes
     void writeFloat(float);
@@ -193,6 +195,13 @@ public:
     /// disable any implicit conversion
     template <typename T> void writeFloat(T x) = delete;
     
+    /// Write value on 4 bytes
+    void writeFloatBinary(float);
+    /// Write multiple values using 4 bytes per value, and possibly a character before
+    void writeFloatsBinary(const float*, size_t);
+    /// Write multiple values using 4 bytes per value, and possibly a character before
+    void writeFloatsBinary(const double*, size_t);
+
     /// Write multiple values using 4 bytes per value, and possibly a character before
     void writeFloats(const float*, size_t, char before=0);
     /// Write multiple values using 4 bytes per value, and possibly a character before
