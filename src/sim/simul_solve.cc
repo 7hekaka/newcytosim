@@ -367,7 +367,7 @@ void Simul::solve_separate()
 
 #include "meca1d.h"
 
-void Simul::solve_onlyX()
+void Simul::solve_uniaxial()
 {
     if ( !pMeca1D )
         pMeca1D = new Meca1D();

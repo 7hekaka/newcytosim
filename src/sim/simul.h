@@ -220,7 +220,7 @@ public:
     void solve_not() {};
 
     /// calculate the motion of objects, but only in the X-direction
-    void solve_onlyX();
+    void solve_uniaxial();
     
     /// move every Fiber backward by `shift` (this is an extremely crude model)
     void solve_flux();

@@ -34,12 +34,11 @@ void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string 
         Vector dir = h->dirFiber();
         // select rotation to align with direction of 'mother' fiber:
         rot = Rotation::randomRotationToVector(dir);
-        real A = prop()->nucleation_angle;
-        // add deviation 'nucleation_angle' in branching
-        real L = hMonitor->linkRestingLength();
+        const real A = prop()->nucleation_angle;
+        const real L = hMonitor->linkRestingLength();
 #if ( DIM == 2 )
-        real F = RNG.sflip();
         // shift position by the length of the interaction:
+        real F = RNG.sflip();
         pos += rot * Vector(0, L*F, 0);
         rot = rot * Rotation::rotation(std::cos(A), std::sin(A)*F);
 #elif ( DIM == 3 )
