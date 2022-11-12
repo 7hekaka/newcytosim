@@ -63,6 +63,7 @@ static void splash(std::ostream& os, real g, real h, real unit)
     os.precision(p);
 }
 
+/** Calculate the Hydrolysis rate resulting in a lifetime == t, given the growth */
 static real back_calculate(real g, real t)
 {
     const real g2 = g * g;
