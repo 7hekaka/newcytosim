@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 #ifndef RESCUER_H
 #define RESCUER_H
 
@@ -11,12 +11,12 @@
  
  A bound rescuer has the ability to switch a shrinking fiber to a growing state.
  This may occur if the shrinking end of the fiber is reaching the position of the Rescuer.
- A this time, the probability @ref WalkerPar "rescue_prob" is tested and:
+ A this time, the probability @ref WalkerPar "rescue_chance" is tested and:
  - if the test passes, the fiber nearest end state is set to STATE_GREEN.
  - otherwise the Rescuer detaches.
  .
  
- The parameter @ref WalkerPar "rescue_prob" is a one-shot probability and 
+ The parameter @ref RescuerPar "rescue_chance" is a one-shot probability and
  is not dependent on `time_step`.
 
  Note: While inducing a rescue, the Rescuer may be pushed a bit toward the MINUS_END,

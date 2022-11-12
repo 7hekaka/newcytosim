@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 #ifndef RESCUER_PROP_H
 #define RESCUER_PROP_H
 
@@ -31,7 +31,7 @@ public:
      - the fiber continues to shrink, and the Rescuer detaches
      .
      */    
-    real rescue_prob;
+    real rescue_chance;
     
     /// @}
     
