@@ -181,7 +181,7 @@ std::string FileWrapper::get_word()
  This will search for the string and position the stream
  at the first character of the match.
  If the `str` is not found, the stream will be positionned
- at the end of the file, with a eof() state.
+ at the end of the file, triggering a eof() signal.
  
  The search may fail if `str` contains repeated sequences
  */

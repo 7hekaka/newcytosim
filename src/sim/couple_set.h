@@ -91,20 +91,14 @@ private:
     
     /// release Couples from reserve lists
     void uniRelax();
-    
-    /// detach objects that were not updated during import
-    void pruneDelete();
-    
-    /// detach objects that were not updated during import
-    void pruneDetach();
 
 public:
         
     /// flags to skip unattached Couple in trajectory file
-    mutable int skip_now, prune_mode;
+    mutable int skip_now;
 
     ///creator
-    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(0), skip_now(0), prune_mode(0) {}
+    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(0), skip_now(0) {}
     
     //--------------------------
     
@@ -123,6 +117,9 @@ public:
     /// save free Couples
     void writeFF(Outputter&) const;
     
+    /// save free Couples
+    void writeFF_skip(Outputter&) const;
+
     /// save attached Couples
     void writeAF(Outputter&) const;
     
@@ -263,6 +260,9 @@ public:
     /// delete objects that were not updated during import
     void prune();
     
+    /// detach objects that were not updated during import
+    void reheat();
+
     ///debug function
     int bad() const;
 };

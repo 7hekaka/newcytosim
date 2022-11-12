@@ -65,20 +65,16 @@ private:
     /// release Single from reserve lists
     void uniRelax();
 
+    /// save free Single
+    void writeF_skip(Outputter&) const;
     
-    /// detach objects that were not updated during import
-    void pruneDetach();
-    
-    /// delete objects that were not updated during import
-    void pruneDelete();
-
 public:
         
     /// flags to skip unattached Single in trajectory file
-    mutable int skip_now, prune_mode;
+    mutable int skip_now;
     
-    ///creator
-    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(0), skip_now(0), prune_mode(0) {}
+    /// creator
+    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(0), skip_now(0) {}
     
     //--------------------------
 
@@ -188,6 +184,9 @@ public:
 
     /// delete objects that were not updated during import
     void prune();
+    
+    /// detach objects that were not updated during import
+    void reheat();
 
     /// check internal consistency, returns 0 if everything is OK
     int bad() const;

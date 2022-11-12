@@ -530,28 +530,30 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     continue;
                 else if ( section == "single" )
                 {
-                    int mod = 0;
-                    iss >> tok >> mod;
-                    // skip unattached Singles
+                    iss >> tok;
                     if ( tok == "F" )
                     {
+                        // may skip unattached Singles
                         if ( prop.skip_free_single > 1 )
                             in.skip_until("#section ");
-                        else
-                            singles.prune_mode = mod;
+                    }
+                    else if ( tok == "reheat" )
+                    {
+                        singles.reheat();
                     }
                 }
                 else if ( section == "couple" )
                 {
-                    int mod = 0;
-                    iss >> tok >> mod;
-                    // skip unattached Couples
+                    iss >> tok;
                     if ( tok == "FF" )
                     {
+                        // may skip unattached Couples
                         if ( prop.skip_free_couple > 1 )
                             in.skip_until("#section ");
-                        else
-                            couples.prune_mode = mod;
+                    }
+                    else if ( tok == "reheat" )
+                    {
+                        couples.reheat();
                     }
                 }
                 objset = findSet(section);
@@ -561,11 +563,14 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     in.skip_until("#section ");
             }
             // optional indication giving the number of objects in the section
-            if (( tok == "record" ) && objset )
+            else if ( tok == "record" )
             {
-                size_t cnt = 0, sup_id = 0;
-                if ( iss >> cnt >> sup_id )
-                    objset->reserve(sup_id);
+                if ( objset )
+                {
+                    size_t cnt = 0, sup_id = 0;
+                    if ( iss >> cnt >> sup_id )
+                        objset->reserve(sup_id);
+                }
             }
             // frame start
             else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )

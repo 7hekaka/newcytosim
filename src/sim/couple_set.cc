@@ -467,7 +467,7 @@ void CoupleSet::freeze()
 }
 
 
-void CoupleSet::pruneDetach()
+void CoupleSet::reheat()
 {
     Object * i = ice_.pop_front();
     while ( i )
@@ -484,7 +484,7 @@ void CoupleSet::pruneDetach()
 
 /* After reading from file, the Hands should not
  update any Fiber, Single or Couple as they will be deleted */
-void CoupleSet::pruneDelete()
+void CoupleSet::prune()
 {
     Object * i = ice_.pop_front();
     while ( i )
@@ -495,15 +495,6 @@ void CoupleSet::pruneDelete()
         o->objset(nullptr);
         delete(o);
     }
-}
-
-
-void CoupleSet::prune()
-{
-    if ( prune_mode )
-        pruneDetach();
-    else
-        pruneDelete();
 }
 
 
@@ -531,8 +522,26 @@ void CoupleSet::writeFA(Outputter& out) const
 
 void CoupleSet::writeFF(Outputter& out) const
 {
-    out.write("\n#section couple FF 0");
+    out.write("\n#section couple FF");
     writeObjects(out, ffList);
+}
+
+void CoupleSet::writeFF_skip(Outputter& out) const
+{
+    out.write("\n#section couple FF");
+    // record number of objects:
+    size_t cnt = ffList.size();
+    size_t sup = inventory_.highest();
+    out.write("\n#record "+std::to_string(cnt)+" "+std::to_string(sup));
+    if ( out.binary() ) out.put_char('\n');
+    
+    // record objects:
+    for ( Object const* n=ffList.front(); n; n=n->next() )
+    {
+        //std::clog << "write " << n->reference() << '\n';
+        n->write(out);
+    }
+    out.write("\n#section couple reheat");
 }
 
 void CoupleSet::writeSet(Outputter& out) const
@@ -545,13 +554,12 @@ void CoupleSet::writeSet(Outputter& out) const
         writeFA(out);
     if ( sizeFF() > 0 )
     {
-        int skip = simul_.prop.skip_free_couple || prune_mode;
-        if ( skip & skip_now )
-            out.write("\n#section couple FF 1");
+        if ( simul_.prop.skip_free_couple && skip_now )
+            writeFF_skip(out);
         else
         {
             writeFF(out);
-            skip_now = skip;
+            skip_now = 1;
         }
     }
 }

@@ -324,7 +324,7 @@ void SingleSet::freeze()
 }
 
 
-void SingleSet::pruneDetach()
+void SingleSet::reheat()
 {
     Object * i = ice_.pop_front();
     while ( i )
@@ -339,7 +339,7 @@ void SingleSet::pruneDetach()
 
 /** After reading from file, the Hands should not update
  any Fiber, Single or Couple as they will be deleted */
-void SingleSet::pruneDelete()
+void SingleSet::prune()
 {
     Object * i = ice_.pop_front();
     while ( i )
@@ -352,12 +352,19 @@ void SingleSet::pruneDelete()
     }
 }
 
-void SingleSet::prune()
+void SingleSet::writeF_skip(Outputter& out) const
 {
-    if ( prune_mode )
-        pruneDetach();
-    else
-        pruneDelete();
+    // record number of objects:
+    size_t cnt = fList.size();
+    size_t sup = inventory_.highest();
+    out.write("\n#record "+std::to_string(cnt)+" "+std::to_string(sup));
+    if ( out.binary() ) out.put_char('\n');
+    
+    for ( Object const* n=fList.front(); n; n=n->next() )
+    {
+        n->write(out);
+    }
+    out.write("\n#section single reheat");
 }
 
 
@@ -370,14 +377,13 @@ void SingleSet::writeSet(Outputter& out) const
     }
     if ( sizeF() > 0 )
     {
-        int skip = simul_.prop.skip_free_single || prune_mode;
-        if ( skip & skip_now )
-            out.write("\n#section single F 1");
+        out.write("\n#section single F");
+        if ( simul_.prop.skip_free_single && skip_now )
+            writeF_skip(out);
         else
         {
-            out.write("\n#section single F 0");
             writeObjects(out, fList);
-            skip_now = skip;
+            skip_now = 1;
         }
     }
 }
