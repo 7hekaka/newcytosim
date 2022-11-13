@@ -26,8 +26,7 @@ static void setVisible(T* p, int val)
     flashText("%s:visible = %i", p->name_str(), val);
 }
 
-template< typename T >
-static void flipVisible(T* p, int val)
+static void flipVisible(PointDisp* p, int val)
 {
     p->visible = ( p->visible != val ) * val;
     flashText("%s:visible = %i", p->name_str(), p->visible);
@@ -649,6 +648,29 @@ static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 }
 
 
+static void shuffleVisible(FiberDisp* p)
+{
+    if ( p->visible && p->line_style )
+    {
+        p->visible = 0;
+        flashText("%s:visible = %i", p->name_str(), p->visible);
+    }
+    else if ( p->visible )
+    {
+        p->line_style = 1;
+        p->speckle_style = 0;
+        flashText("%s:line_style = %i", p->name_str(), p->line_style);
+    }
+    else
+    {
+        p->visible = 1;
+        p->line_style = 0;
+        p->speckle_style = 1;
+        flashText("%s:speckle_style = %i", p->name_str(), p->speckle_style);
+    }
+}
+
+
 static void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.empty() )
@@ -656,7 +678,7 @@ static void shuffleFiberDispVisible(const PropertyList& plist, int val)
     
     if ( plist.size() == 1 )
     {
-        flipVisible(toFiberDisp(plist.front()), val);
+        shuffleVisible(toFiberDisp(plist.front()));
     }
     else
     {
@@ -961,6 +983,10 @@ void processKey(unsigned char key, int modifiers = 0)
             shuffleFiberDispVisible(player.allFiberDisp(), 1);
             break;
             
+        case '~':
+            shuffleFiberDispVisible(player.allFiberDisp(), 1);
+            break;
+
         case 't':
             view.track_fibers ^= 1;
             flashText("view.track_fibers = %i (translation)", view.track_fibers);
