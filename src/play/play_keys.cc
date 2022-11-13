@@ -578,11 +578,14 @@ static void changeEndSize(FiberDisp* p, int inc)
         }
         else
             flashText((p->name()+":plus_end %.2f").c_str(), s0);
-    } else if ( p->end_style[1] )
+    }
+    else if ( p->end_style[1] )
     {
         size[1] = s1;
         flashText((p->name()+":minus_end %.2f").c_str(), s1);
     }
+    else
+        changePointSize(p, inc);
 }
 
 //---------------------------------------------------------------------

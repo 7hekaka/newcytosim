@@ -8,6 +8,7 @@
 #include "stream_func.h"
 #include "organizer.h"
 #include "matrix22.h"
+#include "random_pcg.h"
 
 
 /// width of columns in formatted output, in number of characters
@@ -1045,35 +1046,29 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
         // generate speckles below the origin of abscissa
         if ( fib->abscissaM() < 0 )
         {
-            uint32_t z = fib->signature();
-            real a = spread * std::log(z*TINY);
+            uint64_t Z = pcg32_init(fib->signature());
+            real a = spread * std::log(pcg32(Z)*TINY);
             while ( a > fib->abscissaP() )
             {
-                z = lcrng2(z);
-                a += spread * std::log(z*TINY);
+                a += spread * std::log(pcg32(Z)*TINY);
             }
             while ( a >= fib->abscissaM() )
             {
                 out << '\n' << fib->pos(a);
-                z = lcrng2(z);
-                a += spread * std::log(z*TINY);
+                a += spread * std::log(pcg32(Z)*TINY);
             }
         }
         // generate speckles above the origin of abscissa
         if ( fib->abscissaP() > 0 )
         {
-            uint32_t z = ~fib->signature();
-            real a = -spread * std::log(z*TINY);
+            uint64_t Z = pcg32_init(~fib->signature());
+            real a = -spread * std::log(pcg32(Z)*TINY);
             while ( a < fib->abscissaM() )
-            {
-                z = lcrng1(z);
-                a -= spread * std::log(z*TINY);
-            }
+                a -= spread * std::log(pcg32(Z)*TINY);
             while ( a <= fib->abscissaP() )
             {
                 out << '\n' << fib->pos(a);
-                z = lcrng1(z);
-                a -= spread * std::log(z*TINY);
+                a -= spread * std::log(pcg32(Z)*TINY);
             }
         }
         

@@ -6,6 +6,7 @@
 #include "hand_prop.h"
 #include "sphere_prop.h"
 #include "fiber_prop.h"
+#include "random_pcg.h"
 
 #define DISPLAY 1
 #include "gym_color.h"
@@ -1008,39 +1009,30 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
          with respect to the lattice of each fiber.
          */
         constexpr real TINY = 0x1p-32;
-
         // draw speckles below the origin of abscissa
         if ( fib.abscissaM() < 0 )
         {
-            uint32_t z = fib.signature();
-            real a = gap * std::log(z*TINY);
+            uint64_t Z = pcg32_init(fib.signature());
+            real a = gap * std::log(pcg32(Z)*TINY);
             while ( a > fib.abscissaP() )
-            {
-                z = lcrng2(z);
-                a += gap * std::log(z*TINY);
-            }
+                a += gap * std::log(pcg32(Z)*TINY);
             while ( a >= fib.abscissaM() )
             {
                 if ( i < cnt ) pts[i++] = fib.pos(a);
-                z = lcrng2(z);
-                a += gap * std::log(z*TINY);
+                a += gap * std::log(pcg32(Z)*TINY);
             }
         }
         // draw speckles above the origin of abscissa
         if ( fib.abscissaP() > 0 )
         {
-            uint32_t z = ~fib.signature();
-            real a = -gap * std::log(z*TINY);
+            uint64_t Z = pcg32_init(~fib.signature());
+            real a = -gap * std::log(pcg32(Z)*TINY);
             while ( a < fib.abscissaM() )
-            {
-                z = lcrng1(z);
-                a -= gap * std::log(z*TINY);
-            }
+                a -= gap * std::log(pcg32(Z)*TINY);
             while ( a <= fib.abscissaP() )
             {
                 if ( i < cnt ) pts[i++] = fib.pos(a);
-                z = lcrng1(z);
-                a -= gap * std::log(z*TINY);
+                a -= gap * std::log(pcg32(Z)*TINY);
             }
         }
     }

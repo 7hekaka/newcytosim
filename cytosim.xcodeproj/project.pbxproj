@@ -795,6 +795,7 @@
 		BBA49EFC12FF5331008A7D33 /* dynamic_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA49EFA12FF5331008A7D33 /* dynamic_fiber.h */; };
 		BBA49F1E12FF5589008A7D33 /* dynamic_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA49F1C12FF5589008A7D33 /* dynamic_fiber_prop.cc */; };
 		BBA49F1F12FF5589008A7D33 /* dynamic_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA49F1D12FF5589008A7D33 /* dynamic_fiber_prop.h */; };
+		BBA4C2182920EFC90069A220 /* random_pcg.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA4C2172920EFC90069A220 /* random_pcg.h */; };
 		BBA5788D05FA60B0009AE66E /* hand.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7358E105B98DA3006956D5 /* hand.cc */; };
 		BBA578BD05FA60C4009AE66E /* simul.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7358FB05B98DA3006956D5 /* simul.cc */; };
 		BBA578C305FA60C9009AE66E /* solid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73590205B98DA3006956D5 /* solid.cc */; };
@@ -2085,6 +2086,7 @@
 		BBA49EFA12FF5331008A7D33 /* dynamic_fiber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamic_fiber.h; path = fibers/dynamic_fiber.h; sourceTree = "<group>"; };
 		BBA49F1C12FF5589008A7D33 /* dynamic_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynamic_fiber_prop.cc; path = fibers/dynamic_fiber_prop.cc; sourceTree = "<group>"; };
 		BBA49F1D12FF5589008A7D33 /* dynamic_fiber_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynamic_fiber_prop.h; path = fibers/dynamic_fiber_prop.h; sourceTree = "<group>"; };
+		BBA4C2172920EFC90069A220 /* random_pcg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random_pcg.h; sourceTree = "<group>"; };
 		BBA578F005FA61DE009AE66E /* sim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sim; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBA5793405FA64A3009AE66E /* play */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = play; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBA5E4E00E8EB4A60009F6D0 /* test_matrix.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_matrix.cc; path = src/test/test_matrix.cc; sourceTree = SOURCE_ROOT; };
@@ -3839,6 +3841,7 @@
 				BB73589D05B98DA3006956D5 /* random.h */,
 				BB73589C05B98DA3006956D5 /* random.cc */,
 				BB901AD925B02E3B005FB57F /* random_simd.cc */,
+				BBA4C2172920EFC90069A220 /* random_pcg.h */,
 				BBE447D920646A420058ADAC /* SFMT-common.h */,
 				BBE447CE2064697D0058ADAC /* SFMT-params.h */,
 				BBE447CF2064697D0058ADAC /* SFMT-params19937.h */,
@@ -4330,6 +4333,7 @@
 				BB71918C0EF1CD9900CED9E2 /* vector2.h in Headers */,
 				BB5F2B7E245F5D90007DDD06 /* xtrsm.h in Headers */,
 				BB6D309A20CABF96009C5C7C /* matrix11.h in Headers */,
+				BBA4C2182920EFC90069A220 /* random_pcg.h in Headers */,
 				BB19DA9E231BF792001488A5 /* matrix34.h in Headers */,
 				BBC96C5724A8A9CD00864F9B /* sparmatsymblkdiag.h in Headers */,
 				BB71918D0EF1CD9900CED9E2 /* vector3.h in Headers */,
