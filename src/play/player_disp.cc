@@ -328,9 +328,9 @@ void Player::readDisplayString(View& view, std::string const& str)
 /**
  Display the full Scene for export, skipping some features
  */
-void Player::drawScene(View& view)
+void Player::drawSystem(View& view)
 {
-    CHECK_GL_ERROR("drawScene");
+    CHECK_GL_ERROR("drawSystem");
     view.openDisplay();
     drawCytosim();
     view.closeDisplay();

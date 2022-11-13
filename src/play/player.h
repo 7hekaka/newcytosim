@@ -155,7 +155,7 @@ public:
     void drawCytosim();
     
     /// draw system calling drawCytosim
-    void drawScene(View&);
+    void drawSystem(View&);
     
     /// export current viewport to image file 'filename'
     int saveView(const char* filename, const char* format, int downsample) const;

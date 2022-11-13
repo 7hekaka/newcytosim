@@ -1110,18 +1110,21 @@ void glApp::flashText(std::string const& str)
 
 
 
-void glApp::displayAll()
+void glApp::displayAll(void (*drawFunc)(View&))
 {
-    for ( unsigned n = 1; n < views.size(); ++n )
+    for ( size_t n = 1; n < views.size(); ++n )
+    {
         if ( views[n].window() > 0 )
         {
-            views[n].callDraw();
-            
+            drawFunc(views[n]);
+            if ( n == 1 )
+                views[n].drawInteractiveFeatures();
             if ( views[n].buffered )
                 glutSwapBuffers();
             else
                 glFlush();
         }
+    }
 }
 
 

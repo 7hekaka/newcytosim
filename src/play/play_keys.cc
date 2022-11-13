@@ -770,14 +770,14 @@ void processKey(unsigned char key, int modifiers = 0)
         
         case 'N':
             /**Need to share OpenGL context with the main window */
-            //glApp::newWindow(drawLive);
+            //glApp::newWindow(drawSimul);
             break;
 
 #if ENABLE_WRITE
             
         case 'y':
             // save current image, without decorations
-            player.drawScene(glApp::currentView());
+            player.drawSystem(glApp::currentView());
             player.saveView(prop.image_index++, 1);
             // with over sampling and downsampling to get super-resolution:
             //player.saveScene(3, "image", prop.image_index++, 3);
@@ -882,7 +882,7 @@ void processKey(unsigned char key, int modifiers = 0)
             {
                 if ( worker.holding() )
                 {
-                    glApp::displayAll();
+                    glApp::displayAll(drawSimul);
                     worker.signal();
                 }
                 else if ( worker.alone() )
