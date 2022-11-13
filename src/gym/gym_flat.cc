@@ -58,13 +58,12 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     CHECK_GL_ERROR("drawBitmap0");
     glEnable(GL_TEXTURE_2D);
     if ( ! gym_font_texture_ )
-    {
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         glGenTextures(1, &gym_font_texture_);
-        glBindTexture(GL_TEXTURE_2D, gym_font_texture_);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    }
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glBindTexture(GL_TEXTURE_2D, gym_font_texture_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, W, H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pixels);
 
     flute4* flu = gym::mapBufferV2T2(4);
