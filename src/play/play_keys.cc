@@ -13,8 +13,9 @@ static float grained(float x, int inc)
 {
     const float grain = 0.25f;
     float dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
-    float nx = grain * std::nearbyint( x / grain + dx );
-    return std::max(std::abs(inc)*grain, nx);
+    float nx = std::nearbyint( x / grain + dx );
+    float ii = std::abs(inc);
+    return grain * std::max(ii, nx);
 }
 
 //------------------------------------------------------------------------------
@@ -113,8 +114,8 @@ static void changePointDispSize(PropertyList const& plist, int inc, bool dos, bo
     else if ( plist.size() == 1 )
     {
         PointDisp * p = toPointDisp(plist.front());
-        if ( dow ) flashText((p->name()+":width %.2f").c_str(), p->width);
-        if ( dos ) flashText((p->name()+":size %.2f").c_str(), p->size);
+        if ( dow ) flashText("%s:width %.2f", p->name_str(), p->width);
+        if ( dos ) flashText("%s:size %.2f", p->name_str(), p->size);
     }
 }
 
@@ -469,6 +470,13 @@ static void changeSpeckleStyle(FiberDisp* p, int)
 }
 
 
+static void changeSpeckleSize(FiberDisp* p, int inc)
+{
+    p->speckle_size = grained(p->speckle_size, inc);
+    flashText("%s:speckle_size=%0.2f", p->name_str(), p->speckle_size);
+}
+
+
 static void changeLatticeStyle(FiberDisp* p, int)
 {
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
@@ -482,46 +490,16 @@ static void changeLatticeStyle(FiberDisp* p, int)
 
 static void changePointSize(FiberDisp* p, int inc)
 {
-    bool alt = p->speckle_style && !p->point_style;
-    float& size = alt ? p->speckle_size : p->point_size;
-    
-    float s = grained(size, inc);
-    
-    if ( s > 0 )
-    {
-        size = s;
-        if ( alt )
-            flashText("%s:speckle_size=%0.2f", p->name_str(), s);
-        else
-            flashText("%s:point_size=%0.2f", p->name_str(), s);
-    }
+    if ( p->speckle_style ) changeSpeckleSize(p, inc);
+    p->point_style = grained(p->point_style, inc);
+    flashText("%s:point_size=%0.2f", p->name_str(), p->point_style);
 }
+
 
 static void changeLineWidth(FiberDisp* p, int inc)
 {
-    float s = grained(p->line_width, inc);
-    
-    if ( s > 0 )
-    {
-        p->line_width = s;
-        flashText("%s:line_width=%0.2f", p->name_str(), s);
-    }
-}
-
-static void changeSize(FiberDisp* p, int inc)
-{
-    float s = grained(p->line_width, inc);
-    
-    if ( s > 0 )
-    {
-        float m = 1.f;
-        float x = s / p->line_width;
-        p->line_width = s;
-        p->point_size = std::max(m, p->point_size * x);
-        p->end_size[0] = std::max(m, p->end_size[0] * x);
-        p->end_size[1] = std::max(m, p->end_size[1] * x);
-        flashText("Fibers: line_width %0.2f", s);
-    }
+    p->line_width = grained(p->line_width, inc);
+    flashText("%s:line_width=%0.2f", p->name_str(), p->line_width);
 }
 
 
@@ -565,26 +543,34 @@ static void changeEndStyle(FiberDisp* p, int val)
 static void changeEndSize(FiberDisp* p, int inc)
 {
     float* size = p->end_size;
-    float s0 = grained(size[0], inc);
-    float s1 = grained(size[1], inc);
-    if ( p->end_style[0] )
+    if ( p->end_style[0] && p->end_style[1] )
     {
-        size[0] = s0;
-        if ( p->end_style[1] )
-        {
-            size[1] = s1;
-            flashText((p->name()+":end_size %.2f %.2f").c_str(), s0, s1);
-        }
-        else
-            flashText((p->name()+":plus_end %.2f").c_str(), s0);
+        size[0] = grained(size[0], inc);
+        size[1] = grained(size[1], inc);
+        flashText("%s:end_size %.2f %.2f", p->name_str(), size[0], size[1]);
+    }
+    else if ( p->end_style[0] )
+    {
+        size[0] = grained(size[0], inc);
+        flashText("%s::plus_end %.2f", p->name_str(), size[0]);
     }
     else if ( p->end_style[1] )
     {
-        size[1] = s1;
-        flashText((p->name()+":minus_end %.2f").c_str(), s1);
+        size[1] = grained(size[1], inc);
+        flashText("%s::minus_end %.2f", p->name_str(), size[1]);
     }
     else
         changePointSize(p, inc);
+}
+
+
+/// change the size of all features that are visible
+static void changeSize(FiberDisp* p, int inc)
+{
+    if ( p->line_style ) changeLineWidth(p, inc);
+    if ( p->point_style ) changePointSize(p, inc);
+    if ( p->speckle_style ) changeSpeckleSize(p, inc);
+    changeEndSize(p, inc);
 }
 
 //---------------------------------------------------------------------
@@ -853,7 +839,7 @@ void processKey(unsigned char key, int modifiers = 0)
             
         case 'Z':
             worker.cancel_join();
-            player.stop();
+            player.restart();
             break;
             
         case 'a':
@@ -864,10 +850,10 @@ void processKey(unsigned char key, int modifiers = 0)
             }
             else
             {
-                player.extendLive();
                 prop.period = 1;
                 worker.period(prop.period);
                 flashText("period = 1");
+                player.extendLive();
             }
             break;
             
