@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 #ifndef SINGLE_PROP_H
 #define SINGLE_PROP_H
 
@@ -34,16 +34,16 @@ public:
     
     
     /// name of Hand
-    std::string  hand;
+    std::string hand;
     
     /// stiffness of link (pN/um)
-    real         stiffness;
+    real stiffness;
     
     /// resting length of link (um)
-    real         length;
+    real length;
     
     /// diffusion coefficient
-    real         diffusion;
+    real diffusion;
 
     /// if set > 0, assumes uniform concentration of diffusing Single
     /**
@@ -72,49 +72,49 @@ public:
      .
 
      */
-    int          fast_diffusion;
+    int fast_diffusion;
     
     /// if > 0, the number of candidates for binding considered for `fast_diffusion`
-    size_t       fast_reservoir;
+    size_t fast_reservoir;
 
 #if NEW_MOBILE_SINGLE
     /// constant drift
-    Vector       speed;
+    Vector speed;
 #endif
     
     /// Confinement can be `none`, `inside` (default) or `surface`
-    Confinement  confine;
+    Confinement confine;
     
     /// Unused Parameter: confinement stiffness (also known as `confine[1]`)
-    real         confine_stiffness;
+    real confine_stiffness;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string  confine_space;
+    std::string confine_space;
     
     /// specialization
     /**
      @copydetails SingleGroup
      */
-    std::string  activity;
+    std::string activity;
     
     /// @}
     
     /// derived variable: Property of associated Hand
-    HandProp *     hand_prop;
+    HandProp * hand_prop;
 
 protected:
     
     /// pointer to actual confinement Space, derived from `confine_space`
-    Space const*   confine_space_ptr;
+    Space const* confine_space_ptr;
+
+    /// displacement in one time step
+    real diffusion_dt;
     
 #if NEW_MOBILE_SINGLE
     /// movement in one time step
-    Vector         speed_dt;
+    Vector speed_dt;
 #endif
 
-    /// displacement in one time step
-    real           diffusion_dt;
-    
 public:
     
     /// constructor
