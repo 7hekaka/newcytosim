@@ -46,10 +46,11 @@ void instructions(std::ostream& os = std::cout)
 
 void inventory(Simul& simul, size_t frame)
 {
-    printf("loaded frame %li @ time %.3f:\n", frame, simul.time());
+    printf("loaded frame %li @ %.3f:", frame, simul.time());
     std::stringstream ss;
     simul.reportInventory(ss);
     StreamFunc::prefix_lines(std::cout, ss, "    ", 0, 0);
+    printf("\n");
 }
 
 //------------------------------------------------------------------------------

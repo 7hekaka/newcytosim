@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "simul_prop.h"
 #include "couple_set.h"
@@ -469,6 +469,7 @@ void CoupleSet::freeze()
 
 void CoupleSet::reheat()
 {
+    //std::clog << "Couple::reheat " << ice_.size() << "\n";
     Object * i = ice_.pop_front();
     while ( i )
     {
@@ -535,11 +536,10 @@ void CoupleSet::writeFF_skip(Outputter& out) const
     out.write("\n#record "+std::to_string(cnt)+" "+std::to_string(sup));
     if ( out.binary() ) out.put_char('\n');
     
-    // record objects:
-    for ( Object const* n=ffList.front(); n; n=n->next() )
+    for ( Couple const* n=firstFF(); n; n=n->next() )
     {
-        //std::clog << "write " << n->reference() << '\n';
-        n->write(out);
+        if ( n->prop->save_unattached )
+            n->write(out);
     }
     out.write("\n#section couple reheat");
 }

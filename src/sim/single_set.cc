@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 #include "single_set.h"
 #include "single_prop.h"
 #include "glossary.h"
@@ -326,6 +326,7 @@ void SingleSet::freeze()
 
 void SingleSet::reheat()
 {
+    //std::clog << "Single::reheat " << ice_.size() << "\n";
     Object * i = ice_.pop_front();
     while ( i )
     {

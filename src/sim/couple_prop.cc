@@ -48,21 +48,22 @@ void CoupleProp::clear()
     //confine_stiffness = 0;
     confine_space = "first";
     confine_space_ptr = nullptr;
+    save_unattached = 1;
 }
 
 
 void CoupleProp::read(Glossary& glos)
 {
-    glos.set(hand1,           "hand1");
-    glos.set(hand2,           "hand2");
-    glos.set(stiffness,       "stiffness");
-    glos.set(length,          "length");
+    glos.set(hand1, "hand1");
+    glos.set(hand2, "hand2");
+    glos.set(stiffness, "stiffness");
+    glos.set(length, "length");
     
     if ( glos.value_is("diffusion", 0, "fast") )
         fast_diffusion = 1;
     else
-        glos.set(diffusion,   "diffusion");
-    glos.set(fast_diffusion,  "fast_diffusion");
+        glos.set(diffusion, "diffusion");
+    glos.set(fast_diffusion, "fast_diffusion");
     glos.set(fast_reservoir, "fast_diffusion", 1);
     
     glos.set(trans_activated, "trans_activated");
@@ -92,15 +93,16 @@ void CoupleProp::read(Glossary& glos)
         throw InvalidParameter(name()+":confine[1] is ignored");
 
     //glos.set(confine_stiffness, "confine", 1);
-    glos.set(confine_space,   "confine", 2);
+    glos.set(confine_space, "confine", 2);
 
     //glos.set(confine_stiffness, "confine_stiffness");
-    glos.set(confine_space,  "confine_space");
+    glos.set(confine_space, "confine_space");
 
 #if BACKWARD_COMPATIBILITY < 50
     if ( confine_space == "current" )
         confine_space = "last";
 #endif
+    glos.set(save_unattached, "save_unattached");
 }
 
 
@@ -185,6 +187,7 @@ void CoupleProp::write_values(std::ostream& os) const
     write_value(os, "specificity",     specificity);
     write_value(os, "confine",         confine, 0, confine_space);
     write_value(os, "activity",        activity);
+    write_value(os, "save_unattached", save_unattached);
 }
 
 

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 #include "dim.h"
 #include "cymdef.h"
 #include <fstream>
@@ -530,12 +530,15 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     continue;
                 else if ( section == "single" )
                 {
-                    iss >> tok;
+                    int mod = 0;
+                    iss >> tok >> mod;
                     if ( tok == "F" )
                     {
                         // may skip unattached Singles
                         if ( prop.skip_free_single > 1 )
                             in.skip_until("#section ");
+                        if ( iss.good() && mod == 1 )
+                            singles.reheat();
                     }
                     else if ( tok == "reheat" )
                     {
@@ -544,12 +547,15 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 }
                 else if ( section == "couple" )
                 {
-                    iss >> tok;
+                    int mod = 0;
+                    iss >> tok >> mod;
                     if ( tok == "FF" )
                     {
                         // may skip unattached Couples
                         if ( prop.skip_free_couple > 1 )
                             in.skip_until("#section ");
+                        if ( iss.good() && mod == 1 )
+                            couples.reheat();
                     }
                     else if ( tok == "reheat" )
                     {

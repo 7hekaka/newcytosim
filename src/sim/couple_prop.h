@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 #ifndef COUPLE_PROP_H
 #define COUPLE_PROP_H
 
@@ -45,21 +45,20 @@ public:
      @{
      */
     
-    
     /// name of first Hand in Couple
-    std::string  hand1;
+    std::string hand1;
     
     /// name of second Hand in Couple
-    std::string  hand2;
+    std::string hand2;
     
     /// stiffness of link between the two Hands while linking (pN/um)
-    real         stiffness;
+    real stiffness;
     
     /// resting length of the link (um)
-    real         length;
+    real length;
     
     /// diffusion coefficient while unattached (um^2/s)
-    real         diffusion;
+    real diffusion;
     
     /// if set > 0, assumes uniform concentration of diffusing Couple
     /**
@@ -97,10 +96,10 @@ public:
      
      `fast_diffusion` does not affect Couples in the attached state.
      */
-    int          fast_diffusion;
+    int fast_diffusion;
 
     /// if > 0, the number of candidates for binding considered for `fast_diffusion`
-    size_t       fast_reservoir;
+    size_t fast_reservoir;
 
     /// if ( trans_activated == 1 ), Hand2 is active only if Hand1 is bound
     /**
@@ -110,7 +109,7 @@ public:
      This is very useful for example to make a nucleator that nucleates only after
      it has docked on an existing filament.
      */
-    bool         trans_activated;
+    bool trans_activated;
 
     /// prevents both Hands from binding at the same position on a Fiber (default=true)
     /**
@@ -134,7 +133,7 @@ public:
      is unproductive as it cannot produce force, but the feature may be useful
      to combine activities such as cutting and motors.
      */
-    real         min_loop;
+    real min_loop;
     
     /// Specificity of binding to a pair a Fiber
     /**
@@ -150,29 +149,32 @@ public:
      as a function of the angle that is defined by the already bound filament,
      and the potential new one. The first attachment of any Hand is unrestricted.
      */
-    Specificity  specificity;
+    Specificity specificity;
 
     /// Confinement can be `off`, `inside` (default) or `surface`
-    Confinement  confine;
+    Confinement confine;
     
     /// Unused Parameter: confinement stiffness (also known as `confine[1]`)
     //real         confine_stiffness;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string  confine_space;
+    std::string confine_space;
     
     /// specialization
     /**
      @copydetails CoupleGroup
      */
-    std::string  activity;
+    std::string activity;
+    
+    /// do not save if in the unattached state
+    bool save_unattached;
     
     /// @}
     
     /// pointer to Property of Hand 1
-    HandProp *    hand1_prop;
+    HandProp * hand1_prop;
     /// pointer to Property of Hand 2
-    HandProp *    hand2_prop;
+    HandProp * hand2_prop;
 
 protected:
     
