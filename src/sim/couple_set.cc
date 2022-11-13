@@ -538,7 +538,7 @@ void CoupleSet::writeFF_skip(Outputter& out) const
     
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
-        if ( n->prop->save_unattached )
+        if ( ! n->prop->fast_diffusion )
             n->write(out);
     }
     out.write("\n#section couple reheat");

@@ -48,7 +48,6 @@ void CoupleProp::clear()
     //confine_stiffness = 0;
     confine_space = "first";
     confine_space_ptr = nullptr;
-    save_unattached = 1;
 }
 
 
@@ -102,7 +101,6 @@ void CoupleProp::read(Glossary& glos)
     if ( confine_space == "current" )
         confine_space = "last";
 #endif
-    glos.set(save_unattached, "save_unattached");
 }
 
 
@@ -187,7 +185,6 @@ void CoupleProp::write_values(std::ostream& os) const
     write_value(os, "specificity",     specificity);
     write_value(os, "confine",         confine, 0, confine_space);
     write_value(os, "activity",        activity);
-    write_value(os, "save_unattached", save_unattached);
 }
 
 

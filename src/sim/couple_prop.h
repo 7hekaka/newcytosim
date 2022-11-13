@@ -166,9 +166,6 @@ public:
      */
     std::string activity;
     
-    /// do not save if in the unattached state
-    bool save_unattached;
-    
     /// @}
     
     /// pointer to Property of Hand 1

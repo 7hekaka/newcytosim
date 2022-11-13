@@ -361,9 +361,10 @@ void SingleSet::writeF_skip(Outputter& out) const
     out.write("\n#record "+std::to_string(cnt)+" "+std::to_string(sup));
     if ( out.binary() ) out.put_char('\n');
     
-    for ( Object const* n=fList.front(); n; n=n->next() )
+    for ( Single const* n=firstF(); n; n=n->next() )
     {
-        n->write(out);
+        if ( ! n->prop->fast_diffusion )
+            n->write(out);
     }
     out.write("\n#section single reheat");
 }
