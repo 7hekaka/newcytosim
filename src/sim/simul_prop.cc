@@ -13,9 +13,9 @@
 
 void SimulProp::clear()
 {
-    time         = 0;
-    time_step    = 0;
-    viscosity    = 1;
+    time      = 0;
+    time_step = 0;
+    viscosity = 1;
 #if NEW_CYTOPLASMIC_FLOW
     uniform_flow.reset();
 #endif
@@ -29,7 +29,7 @@ void SimulProp::clear()
     precondition = 0;
     precond_span = 2;
     
-    steric_mode  = 0;
+    steric_mode = 0;
     steric_stiff_push[0] = 0;
     steric_stiff_pull[0] = 0;
     steric_stiff_push[1] = 0;
@@ -41,7 +41,6 @@ void SimulProp::clear()
     verbose = 0;
     flag = 0;
 
-    config_file   = "config.cym";
     property_file = "properties.cmp";
     system_file   = Simul::TRAJECTORY;
     clear_trajectory = true;

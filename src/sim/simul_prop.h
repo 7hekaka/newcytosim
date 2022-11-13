@@ -308,10 +308,10 @@ public:
 public:
     
     /// constructor
-    SimulProp(const std::string& n) : Property(n) { clear(); }
+    SimulProp(const std::string& n) : Property(n), config_file("config.cym") { clear(); }
     
     /// destructor
-    ~SimulProp()  { }
+    ~SimulProp() { }
     
     /// identifies the property
     std::string category() const { return "simul"; }
