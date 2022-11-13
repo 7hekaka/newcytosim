@@ -11,7 +11,7 @@ void Event::clear()
 {
     activity = "";
     rate = 0;
-    delay = 0;
+    delay = INFINITY;
     recurrent = true;
     multiplexed = true;
     nextTime = 0;
@@ -32,7 +32,7 @@ void Event::fire_always_after(double time)
     nextTime = time;
     recurrent = true;
     multiplexed = false;
-    delay = 0;
+    delay = INFINITY;
 }
 
 
@@ -64,7 +64,7 @@ Event::Event(double now, Glossary& opt)
     }
     else if ( opt.set(rate, "rate") )
     {
-        if ( rate <= 0 )
+        if ( rate < 0 )
             throw InvalidParameter("event:rate must be > 0");
         opt.set(multiplexed, "multiplexed");
         opt.set(t, "start");
@@ -108,7 +108,7 @@ void Event::step(Simul& sim)
             return;
         }
         sim.relax();
-        // if 'multiplexed', the event can fire multiple time within a time step
+        // if 'multiplexed', the event can fire multiple times within a time step
         do {
             try {
                 sim.evaluate(activity);
