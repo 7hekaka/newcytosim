@@ -155,15 +155,14 @@ int main(int argc, char* argv[])
 
         if ( arg.set(str, "output") )
         {
-            try {
-                ofs.open(str.c_str());
-            }
-            catch( ... )
+            ofs.open(str.c_str());
+            if ( ofs.is_open() )
+                out.rdbuf(ofs.rdbuf());
+            else
             {
                 std::clog << "Cannot open output file\n";
                 return EXIT_FAILURE;
             }
-            out.rdbuf(ofs.rdbuf());
         }
     }
     catch( Exception & e )

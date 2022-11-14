@@ -1107,10 +1107,6 @@ void Interface::execute_import(std::string const& file, std::string const& what,
  */
 void Interface::execute_export(std::string const& name, std::string const& what, Glossary& opt)
 {
-    bool append = true;
-    bool binary = true;
-    bool prune = true;
-
     VLOG("-EXPORT " << what << " to " << name);
 
     // here '*' designates the standard output:
@@ -1118,6 +1114,8 @@ void Interface::execute_export(std::string const& name, std::string const& what,
     {
         if ( name != "*" )
         {
+            bool append = true;
+            bool binary = true;
             opt.set(append, "append");
             opt.set(binary, "binary");
             sim_->writeObjects(name, append, binary);
@@ -1130,15 +1128,20 @@ void Interface::execute_export(std::string const& name, std::string const& what,
     }
     else if ( what == "properties" )
     {
+        bool prune = true;
         opt.set(prune, "prune");
         std::ofstream ofs;
         std::ostream out(std::cout.rdbuf());
         // a STAR designates the standard output:
         if ( name != "*" )
         {
-            opt.set(append, "append");
-            ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
-            out.rdbuf(ofs.rdbuf());
+            std::ios_base::openmode mode = std::ios_base::app;
+            opt.set(mode, "append", {{"0", std::ios_base::out}, {"1", std::ios_base::app}});
+            ofs.open(name.c_str(), mode);
+            if ( ofs.is_open() )
+                out.rdbuf(ofs.rdbuf());
+            else
+                throw InvalidIO("cannot open `"+name+"' for export");
         }
         sim_->writeProperties(out, prune);
     }
@@ -1160,10 +1163,11 @@ void Interface::execute_report(std::string const& name, std::string const& what,
     // a STAR designates the standard output:
     if ( name != "*" )
     {
-        bool append = true;
-        opt.set(append, "append");
-        ofs.open(name.c_str(), append ? std::ios_base::app : std::ios_base::out);
-        out.rdbuf(ofs.rdbuf());
+        std::ios_base::openmode mode = std::ios_base::app;
+        opt.set(mode, "append", {{"0", std::ios_base::out}, {"1", std::ios_base::app}});
+        ofs.open(name.c_str(), mode);
+        if ( ofs.is_open() )
+            out.rdbuf(ofs.rdbuf());
     }
     int ver = 1;
     opt.set(ver, "verbose");
