@@ -169,10 +169,11 @@ public:
     void setEdges();
     /// calculate coordinates of vertices used in vertex_data()
     void setVertices();
-    /// scale vertex data
-    void scaleVertices(float X, float Y, float Z);
-    /// scale vertex data to transform into a pin-like surface
-    void pinify(float Z);
+    
+    /// scale vertex {X, Y, Z} data
+    static void scale(size_t, float*, float X, float Y, float Z);
+    /// scale vertex {X, Y, Z} data to transform into a pin-like surface
+    static void pinify(size_t, float *, float Z);
 
     /// reference to derived vertex `ii`
     Vertex& vertex(int i) const { return vertices_[i]; }

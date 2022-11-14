@@ -170,28 +170,28 @@ void Tesselator::setVertices()
 }
 
 
-void Tesselator::scaleVertices(float X, float Y, float Z)
+void Tesselator::scale(size_t num, float* ptr, float X, float Y, float Z)
 {
-    for ( unsigned n = 0; n < num_vertices_; ++n )
+    for ( unsigned n = 0; n < num; ++n )
     {
-        vex_[3*n  ] *= X;
-        vex_[3*n+1] *= Y;
-        vex_[3*n+2] *= Z;
+        ptr[3*n  ] *= X;
+        ptr[3*n+1] *= Y;
+        ptr[3*n+2] *= Z;
     }
 }
 
 
-/** This transforms the sphere into a 'pin' like smooth surface */
-void Tesselator::pinify(float Z)
+/** This transforms the sphere into a 'pin'-like smooth surface */
+void Tesselator::pinify(size_t num, float* ptr, float Z)
 {
     const float m = 1.4142f;
-    for ( unsigned n = 0; n < num_vertices_; ++n )
+    for ( unsigned n = 0; n < num; ++n )
     {
-        float H = vex_[3*n+2];
-        float W = 0.5f * ( 1.f + std::tanh(m*H) );
-        vex_[3*n  ] *= W;
-        vex_[3*n+1] *= W;
-        vex_[3*n+2] *= ( H < 0 ) ? Z : 1;
+        float H = ptr[3*n+2];
+        float W = 0.5f * ( 1.f + std::tanh(-m*H) );
+        ptr[3*n  ] *= W;
+        ptr[3*n+1] *= W;
+        ptr[3*n+2] *= ( H > 0 ) ? Z : 1;
     }
 }
 
@@ -808,7 +808,7 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
 #pragma mark - Solid vertices
 
 template < typename REAL >
-void scale(REAL& X, REAL& Y, REAL& Z, REAL n)
+static void scale_(REAL& X, REAL& Y, REAL& Z, REAL n)
 {
     X *= n;
     Y *= n;
@@ -817,7 +817,7 @@ void scale(REAL& X, REAL& Y, REAL& Z, REAL n)
 
 
 template < typename REAL >
-void project(REAL* X)
+static void project_(REAL* X)
 {
     REAL n = 1.0 / std::sqrt(X[0]*X[0] + X[1]*X[1] + X[2]*X[2]);
     X[0] *= n;
@@ -827,7 +827,7 @@ void project(REAL* X)
 
 
 template < typename REAL >
-void projectDice(REAL* X, const REAL len[4])
+static void projectDice(REAL* X, const REAL len[4])
 {
     REAL px = std::min(len[0], std::max(-len[0], X[0]));
     REAL py = std::min(len[1], std::max(-len[1], X[1]));
@@ -864,7 +864,7 @@ void Tesselator::interpolate(Vertex const& vex, double ptr[3], int half) const
     if ( half * Z > 0 )
         Z = 0;
     
-    scale(X, Y, Z, 1.0/S);
+    scale_(X, Y, Z, 1.0/S);
     ptr[0] = X;
     ptr[1] = Y;
     ptr[2] = Z;
@@ -891,7 +891,7 @@ void Tesselator::interpolate(Vertex const& vex, float ptr[3], int half) const
     if ( half * Z > 0 )
         Z = 0;
     
-    scale(X, Y, Z, 1.f/S);
+    scale_(X, Y, Z, 1.f/S);
     ptr[0] = X;
     ptr[1] = Y;
     ptr[2] = Z;
@@ -911,7 +911,7 @@ void Tesselator::store_vertices(float * vec) const
     else
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
-            project(vec+3*n);
+            project_(vec+3*n);
     }
 }
 
@@ -930,7 +930,7 @@ void Tesselator::store_vertices(double * vec) const
     else
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
-            project(vec+3*n);
+            project_(vec+3*n);
     }
 }
 

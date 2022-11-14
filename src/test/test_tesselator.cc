@@ -49,7 +49,6 @@ void reset()
     ico = new Tesselator();
     ico->construct((Tesselator::Polyhedra)kind, rank);
     ico->setVertices();
-    //ico->pinify(4);
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points, %i faces",

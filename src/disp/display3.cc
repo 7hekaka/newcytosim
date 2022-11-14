@@ -1144,18 +1144,14 @@ void Display3::drawCoupleB(Couple const* cx) const
             real R1 = pixscale(pd1->size);
             gym::color_both(pd1->color);
             gym::transAlignZ(p1, R1, p2-p1);
-            gle::hemisphere2();
-            gym::scale(1, 1, L/R1);
-            gle::cone2();
+            gle::nail();
         }
         if ( pd2->visible )
         {
             real R2 = pixscale(pd2->size);
             gym::color_both(pd2->color);
             gym::transAlignZ(p2, R2, p1-p2);
-            gle::hemisphere2();
-            gym::scale(1, 1, L/R2);
-            gle::cone2();
+            gle::nail();
         }
     }
     else

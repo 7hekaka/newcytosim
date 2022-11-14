@@ -231,8 +231,8 @@ namespace gle
     /// draw half a sphere of radius 1 in Z < 0
     void hemisphere4();
     
-    /// draw a sphere of radius 1 that has an openning at Z > 0.5
-    void opensphere();
+    /// draw a blob with a pointy ends up in Z
+    void nail();
     /// draw nicest sphere available
     inline void sphere() { sphere1(); }
     /// draw nicest hemisphere available

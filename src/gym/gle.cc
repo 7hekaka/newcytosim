@@ -1387,7 +1387,7 @@ namespace gle
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
 
-    void opensphere()  { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
+    void nail() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
 
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
@@ -1414,7 +1414,7 @@ namespace gle
     
     void setBuffers()
     {
-        Tesselator ico[10];
+        Tesselator ico[8];
         size_t f = std::max(1UL, finesse/2);
         ico[0].buildIcosahedronZ(finesse*4);
         ico[1].buildIcosahedronZ(finesse*2);
@@ -1424,8 +1424,8 @@ namespace gle
         ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
         ico[6].buildHemisphere(f);
-        ico[7].buildOpensphere(finesse);
-
+        ico[7].buildIcosahedronZ(finesse);
+        
         f = 32; // for setIcoidBuffer
         size_t s = 12;
         for ( int i = 0; i < 8; ++i )
@@ -1459,7 +1459,9 @@ namespace gle
 
         for ( int i = 0; i < 8; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
-        
+        // transform the last sphere into a needle-like object:
+        Tesselator::pinify(ico[7].num_vertices(), ptr0+ico_pts_[7], 2);
+
         icoid_pts_ = ptr - ptr0;
         icoid_idx_ = idx - idx0;
         icoid_cnt_ = setIcoidBuffer((flute3*)ptr, (GLshort*)idx);
