@@ -170,6 +170,16 @@ void Tesselator::setVertices()
 }
 
 
+void Tesselator::scaleVertices(float X, float Y, float Z)
+{
+    for ( unsigned n = 0; n < num_vertices_; ++n )
+    {
+        vex_[3*n  ] *= X;
+        vex_[3*n+1] *= Y;
+        vex_[3*n+2] *= ( vex_[3*n+2] < 0 ) ? Z : 1;
+    }
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -871,7 +881,6 @@ void Tesselator::interpolate(Vertex const& vex, float ptr[3], int half) const
     ptr[1] = Y;
     ptr[2] = Z;
 }
-
 
 void Tesselator::store_vertices(float * vec) const
 {

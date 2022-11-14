@@ -49,7 +49,8 @@ void reset()
     ico = new Tesselator();
     ico->construct((Tesselator::Polyhedra)kind, rank);
     ico->setVertices();
-    
+    //ico->scaleVertices(1, 1, 4);
+
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points, %i faces",
              rank, ico->num_vertices(), ico->num_faces());
@@ -132,7 +133,7 @@ void initVBO()
     glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), ico->vertex_data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #else
-    // calculate vertex data into device memory
+    // calculate vertex data directly into device memory
     glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
     glBufferData(GL_ARRAY_BUFFER, 3*ico->num_vertices()*sizeof(float), nullptr, GL_STATIC_DRAW);
     void * glb = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);

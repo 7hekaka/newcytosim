@@ -169,7 +169,9 @@ public:
     void setEdges();
     /// calculate coordinates of vertices used in vertex_data()
     void setVertices();
-    
+    /// scale vertex data
+    void scaleVertices(float X, float Y, float Z);
+
     /// reference to derived vertex `ii`
     Vertex& vertex(int i) const { return vertices_[i]; }
     
