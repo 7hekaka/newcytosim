@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef TESSELATOR_H
 #define TESSELATOR_H
@@ -31,7 +31,8 @@ public:
     typedef unsigned short INDEX;
 
     /// starting shapes
-    enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3, HEMISPHERE=4, OPENSPHERE=5, DICE=6 };
+    enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3,
+        ICOSAHEDRONX=4, HEMISPHERE=5, OPENSPHERE=6, DICE=7 };
     
     /// One of the vertex of the template model
     struct Corner
@@ -86,10 +87,10 @@ public:
     
 private:
     /// dimensions
-    FLOAT    length_[4];
+    FLOAT dim_[4];
     
     /// Array of coordinates of all vertices
-    float  * vex_;
+    float * vex_;
     
     /// Array of primary vertices of the geometry
     Corner * corners_;
@@ -140,7 +141,7 @@ private:
     
     void allocate();
     void destroy();
-    void init(unsigned nv, unsigned ne, unsigned nf, unsigned div);
+    void setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned div);
 
     void interpolate(Vertex const&, float vec[3], int half) const;
     void interpolate(Vertex const&, double vec[3], int half) const;
@@ -154,7 +155,7 @@ public:
     ~Tesselator() { destroy(); }
     
     /// build as polyhedra refined by order `div`
-    void build(Polyhedra, unsigned div, int make = 0);
+    void construct(Polyhedra, unsigned div, int make = 0);
 
     void buildTetrahedron(unsigned div, int make = 1);
     void buildOctahedron(unsigned div, int make = 1);

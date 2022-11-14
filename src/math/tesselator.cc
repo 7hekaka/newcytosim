@@ -103,7 +103,7 @@ Tesselator::Tesselator()
     vertices_     = nullptr;
     max_vertices_ = 0;
     num_vertices_ = 0;
-
+    
     faces_     = nullptr;
     max_faces_ = 0;
     num_faces_ = 0;
@@ -117,15 +117,16 @@ Tesselator::Tesselator()
     kind_ = 0;
     halfZ_ = 0;
     
-    length_[0] = 0;
-    length_[1] = 0;
-    length_[2] = 0;
-    length_[3] = 1;
+    dim_[0] = 0;
+    dim_[1] = 0;
+    dim_[2] = 0;
+    dim_[3] = 1;
 }
 
 
-void Tesselator::init(unsigned V, unsigned E, unsigned F, unsigned N)
+void Tesselator::setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned N)
 {
+    kind_ = K;
     num_corners_ = V;
     max_vertices_ = V + E * (N-1) + F * ((N-1)*(N-2)/2);
     max_edges_ = E * N + F * 3 * ((N-1)*N/2);
@@ -306,7 +307,7 @@ void Tesselator::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
     unsigned B = quad[1];
     unsigned C = quad[2];
     unsigned D = quad[3];
-
+    
     for ( unsigned u = 0; u <= div; ++u )
         line[u] = getEdgeVertex(A, div-u, B, u);
     
@@ -338,27 +339,27 @@ void Tesselator::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
 
 
 /*
-/// unfinished
-void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
-{
-    unsigned* line = new unsigned[cnt*(div+1)];
-
-    for ( unsigned c = 0; c < cnt; ++c )
-    {
-        unsigned A = inx[0];
-        unsigned B = inx[1];
-        unsigned C = inx[2];
-
-        for ( unsigned u = 0; u <= div; ++u )
-            line[div*c+u] = getEdgeVertex(A, div-u, C, u);
-    }
-    
-    for ( unsigned ii = 1; ii <= div; ++ii )
-    {
-    }
-    delete[] line;
-}
-*/
+ /// unfinished
+ void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
+ {
+ unsigned* line = new unsigned[cnt*(div+1)];
+ 
+ for ( unsigned c = 0; c < cnt; ++c )
+ {
+ unsigned A = inx[0];
+ unsigned B = inx[1];
+ unsigned C = inx[2];
+ 
+ for ( unsigned u = 0; u <= div; ++u )
+ line[div*c+u] = getEdgeVertex(A, div-u, C, u);
+ }
+ 
+ for ( unsigned ii = 1; ii <= div; ++ii )
+ {
+ }
+ delete[] line;
+ }
+ */
 
 void Tesselator::setCorners(FLOAT vex[][3], unsigned div)
 {
@@ -397,7 +398,7 @@ void Tesselator::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div
 #pragma mark -
 
 
-void Tesselator::build(Tesselator::Polyhedra kind, unsigned div, int make)
+void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
 {
     switch( kind )
     {
@@ -405,6 +406,7 @@ void Tesselator::build(Tesselator::Polyhedra kind, unsigned div, int make)
         case TETRAHEDRON: buildTetrahedron(div, make); break;
         case OCTAHEDRON: buildOctahedron(div, make); break;
         case ICOSAHEDRON: buildIcosahedronZ(div, make); break;
+        case ICOSAHEDRONX: buildIcosahedron(div, make); break;
         case HEMISPHERE: buildHemisphere(div, make); break;
         case OPENSPHERE: buildOpensphere(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
@@ -414,304 +416,280 @@ void Tesselator::build(Tesselator::Polyhedra kind, unsigned div, int make)
 
 void Tesselator::buildTetrahedron(unsigned div, int make)
 {
-    kind_ = TETRAHEDRON;
-    init(4, 6, 4, div);
-
-    if ( make )
-    {
-        constexpr FLOAT a = 1.0/3.0;
-        constexpr FLOAT b = M_SQRT2/3.0;
-        constexpr FLOAT c = M_SQRT2/1.7320508075688772935274463415059; //that is SQRT3
-        
-        // Four vertices on unit sphere
-        FLOAT vex[4][3] = {
-            { 0, 2*b, -a},
-            {-c,  -b, -a},
-            { c,  -b, -a},
-            { 0,  0,   1},
-        };
-        
-        // ordered faces: Counter-Clockwise = facing out
-        unsigned fac[4][3] = {
-            {0, 2, 1},
-            {1, 3, 0},
-            {0, 3, 2},
-            {1, 2, 3}
-        };
-        
-        allocate();
-        setCorners(vex, div);
-        refineTriangles(4, fac, div);
-        if ( make & 2 ) setVertices();
-        if ( make & 4 ) setEdges();
-    }
+    setGeometry(TETRAHEDRON, 4, 6, 4, div);
+    
+    constexpr FLOAT a = 1.0/3.0;
+    constexpr FLOAT b = M_SQRT2/3.0;
+    constexpr FLOAT c = M_SQRT2/1.7320508075688772935274463415059; //that is SQRT3
+    
+    // Four vertices on unit sphere
+    FLOAT vex[4][3] = {
+        { 0, 2*b, -a},
+        {-c,  -b, -a},
+        { c,  -b, -a},
+        { 0,  0,   1},
+    };
+    
+    // ordered faces: Counter-Clockwise = facing out
+    unsigned fac[4][3] = {
+        {0, 2, 1},
+        {1, 3, 0},
+        {0, 3, 2},
+        {1, 2, 3}
+    };
+    
+    allocate();
+    setCorners(vex, div);
+    refineTriangles(4, fac, div);
+    if ( make & 2 ) setVertices();
+    if ( make & 4 ) setEdges();
 }
 
 
 void Tesselator::buildOctahedron(unsigned div, int make)
 {
-    kind_ = OCTAHEDRON;
-    init(6, 12, 8, div);
+    setGeometry(OCTAHEDRON, 6, 12, 8, div);
     
-    if ( make )
-    {
-        // Eight vertices on unit sphere
-        FLOAT vex[6][3] = {
-            { 0,  0,  1},
-            { 0,  0, -1},
-            { 1,  0,  0},
-            {-1,  0,  0},
-            { 0, -1,  0},
-            { 0,  1,  0},
-        };
-        
-        // ordered faces: Counter-Clockwise = facing out
-        unsigned fac[8][3] = {
-            {2, 0, 4},
-            {1, 3, 5},
-            {0, 3, 4},
-            {1, 5, 2},
-            {3, 0, 5},
-            {1, 2, 4},
-            {0, 2, 5},
-            {1, 4, 3}
-        };
-        
-        allocate();
-        setCorners(vex, div);
-        refineTriangles(8, fac, div);
-        if ( make & 2 ) setVertices();
-        if ( make & 4 ) setEdges();
-    }
+    // Eight vertices on unit sphere
+    FLOAT vex[6][3] = {
+        { 0,  0,  1},
+        { 0,  0, -1},
+        { 1,  0,  0},
+        {-1,  0,  0},
+        { 0, -1,  0},
+        { 0,  1,  0},
+    };
+    
+    // ordered faces: Counter-Clockwise = facing out
+    unsigned fac[8][3] = {
+        {2, 0, 4},
+        {1, 3, 5},
+        {0, 3, 4},
+        {1, 5, 2},
+        {3, 0, 5},
+        {1, 2, 4},
+        {0, 2, 5},
+        {1, 4, 3}
+    };
+    
+    allocate();
+    setCorners(vex, div);
+    refineTriangles(8, fac, div);
+    if ( make & 2 ) setVertices();
+    if ( make & 4 ) setEdges();
 }
 
 
 void Tesselator::buildIcosahedron(unsigned div, int make)
 {
-    kind_ = ICOSAHEDRON;
-    init(12, 30, 20, div);
-
-    if ( make )
-    {
-        const FLOAT G = 0.5+0.5*std::sqrt(5.0);
-        const FLOAT Z = 1 / std::sqrt(G*G+1.0);
-        const FLOAT T = G * Z;
-        
-        // Twelve vertices of icosahedron on unit sphere
-        FLOAT vex[12][3] = {
-            { T,  Z,  0},
-            {-T, -Z,  0},
-            { T, -Z,  0},
-            {-T,  Z,  0},
-            { Z,  0,  T},
-            {-Z,  0, -T},
-            { Z,  0, -T},
-            {-Z,  0,  T},
-            { 0,  T,  Z},
-            { 0, -T, -Z},
-            { 0, -T,  Z},
-            { 0,  T, -Z}
-        };
-        
-        // ordered faces: Counter-Clockwise = facing out
-        unsigned fac[20][3] = {
-            {0,  2,  6},
-            {1,  7,  3},
-            {0,  4,  2},
-            {1,  3,  5},
-            {0,  8,  4},
-            {1,  5,  9},
-            {0, 11,  8},
-            {1,  9, 10},
-            {0,  6, 11},
-            {1, 10,  7},
-            {4,  8,  7},
-            {5,  6,  9},
-            {3,  7,  8},
-            {6,  2,  9},
-            {3,  8, 11},
-            {9,  2, 10},
-            {5,  3, 11},
-            {2,  4, 10},
-            {6,  5, 11},
-            {4,  7, 10},
-        };
-        
-        allocate();
-        setCorners(vex, div);
-        refineTriangles(20, fac, div);
-        if ( make & 2 ) setVertices();
-        if ( make & 4 ) setEdges();
-    }
+    setGeometry(ICOSAHEDRON, 12, 30, 20, div);
+    
+    const FLOAT G = 0.5+0.5*std::sqrt(5.0);
+    const FLOAT Z = 1 / std::sqrt(G*G+1.0);
+    const FLOAT T = G * Z;
+    
+    // Twelve vertices of icosahedron on unit sphere
+    FLOAT vex[12][3] = {
+        { T,  Z,  0},
+        {-T, -Z,  0},
+        { T, -Z,  0},
+        {-T,  Z,  0},
+        { Z,  0,  T},
+        {-Z,  0, -T},
+        { Z,  0, -T},
+        {-Z,  0,  T},
+        { 0,  T,  Z},
+        { 0, -T, -Z},
+        { 0, -T,  Z},
+        { 0,  T, -Z}
+    };
+    
+    // ordered faces: Counter-Clockwise = facing out
+    unsigned fac[20][3] = {
+        {0,  2,  6},
+        {1,  7,  3},
+        {0,  4,  2},
+        {1,  3,  5},
+        {0,  8,  4},
+        {1,  5,  9},
+        {0, 11,  8},
+        {1,  9, 10},
+        {0,  6, 11},
+        {1, 10,  7},
+        {4,  8,  7},
+        {5,  6,  9},
+        {3,  7,  8},
+        {6,  2,  9},
+        {3,  8, 11},
+        {9,  2, 10},
+        {5,  3, 11},
+        {2,  4, 10},
+        {6,  5, 11},
+        {4,  7, 10},
+    };
+    
+    allocate();
+    setCorners(vex, div);
+    refineTriangles(20, fac, div);
+    if ( make & 2 ) setVertices();
+    if ( make & 4 ) setEdges();
 }
 
 /** The faces are draw in order of increasing Z */
 void Tesselator::buildIcosahedronZ(unsigned div, int make)
 {
-    kind_ = ICOSAHEDRON;
-    init(12, 30, 20, div);
+    setGeometry(ICOSAHEDRON, 12, 30, 20, div);
     
-    if ( make )
-    {
-        const FLOAT Z = std::sqrt(0.2);
-        const FLOAT C = std::cos(M_PI/2.5);
-        const FLOAT S = std::sin(M_PI/2.5);
-        const FLOAT D = C*C - S*S;
-        const FLOAT T = C*S + C*S;
-        
-        // Twelve vertices of icosahedron on unit sphere
-        FLOAT vex[12][3] = {
-            { 0,  0, -1},
-            { 1,  0, -Z},
-            { C, -S, -Z},
-            { D, -T, -Z},
-            { D,  T, -Z},
-            { C,  S, -Z},
-            {-D, -T,  Z},
-            {-C, -S,  Z},
-            {-1,  0,  Z},
-            {-C,  S,  Z},
-            {-D,  T,  Z},
-            { 0,  0,  1}
-        };
-        
-        // ordered faces: Counter-Clockwise = facing out
-        unsigned fac[20][3] = {
-            {0,  1,  2},
-            {0,  2,  3},
-            {0,  3,  4},
-            {0,  4,  5},
-            {0,  5,  1} ,
-            {1,  6,  2},
-            {2,  7,  3},
-            {3,  8,  4},
-            {4,  9,  5},
-            {5, 10,  1} ,
-            {6,  7,  2},
-            {7,  8,  3},
-            {8,  9,  4},
-            {9, 10,  5},
-            {10, 6,  1} ,
-            {11, 7,  6},
-            {11, 8,  7},
-            {11, 9,  8},
-            {11, 10, 9},
-            {11, 6, 10}
-        };
-        
-        allocate();
-        setCorners(vex, div);
-        refineTriangles(20, fac, div);
-        if ( make & 2 ) setVertices();
-        if ( make & 4 ) setEdges();
-    }
+    const FLOAT Z = std::sqrt(0.2);
+    const FLOAT C = std::cos(M_PI/2.5);
+    const FLOAT S = std::sin(M_PI/2.5);
+    const FLOAT D = C*C - S*S;
+    const FLOAT T = C*S + C*S;
+    
+    // Twelve vertices of icosahedron on unit sphere
+    FLOAT vex[12][3] = {
+        { 0,  0, -1},
+        { 1,  0, -Z},
+        { C, -S, -Z},
+        { D, -T, -Z},
+        { D,  T, -Z},
+        { C,  S, -Z},
+        {-D, -T,  Z},
+        {-C, -S,  Z},
+        {-1,  0,  Z},
+        {-C,  S,  Z},
+        {-D,  T,  Z},
+        { 0,  0,  1}
+    };
+    
+    // ordered faces: Counter-Clockwise = facing out
+    unsigned fac[20][3] = {
+        {0,  1,  2},
+        {0,  2,  3},
+        {0,  3,  4},
+        {0,  4,  5},
+        {0,  5,  1} ,
+        {1,  6,  2},
+        {2,  7,  3},
+        {3,  8,  4},
+        {4,  9,  5},
+        {5, 10,  1} ,
+        {6,  7,  2},
+        {7,  8,  3},
+        {8,  9,  4},
+        {9, 10,  5},
+        {10, 6,  1} ,
+        {11, 7,  6},
+        {11, 8,  7},
+        {11, 9,  8},
+        {11, 10, 9},
+        {11, 6, 10}
+    };
+    
+    allocate();
+    setCorners(vex, div);
+    refineTriangles(20, fac, div);
+    if ( make & 2 ) setVertices();
+    if ( make & 4 ) setEdges();
 }
 
 /** The faces are draw in order of increasing Z */
 void Tesselator::buildOpensphere(unsigned div, int make)
 {
-    kind_ = OPENSPHERE;
-    init(11, 25, 15, div);
+    setGeometry(OPENSPHERE, 11, 25, 15, div);
     
-    if ( make )
-    {
-        const FLOAT Z = std::sqrt(0.2);
-        const FLOAT C = std::cos(M_PI/2.5);
-        const FLOAT S = std::sin(M_PI/2.5);
-        const FLOAT D = C*C - S*S;
-        const FLOAT T = C*S + C*S;
-        
-        // Twelve vertices of icosahedron on unit sphere
-        FLOAT vex[11][3] = {
-            { 0,  0, -1},
-            { 1,  0, -Z},
-            { C, -S, -Z},
-            { D, -T, -Z},
-            { D,  T, -Z},
-            { C,  S, -Z},
-            {-D, -T,  Z},
-            {-C, -S,  Z},
-            {-1,  0,  Z},
-            {-C,  S,  Z},
-            {-D,  T,  Z},
-        };
-        
-        // ordered faces: Counter-Clockwise = facing out
-        unsigned fac[15][3] = {
-            {0,  1,  2},
-            {0,  2,  3},
-            {0,  3,  4},
-            {0,  4,  5},
-            {0,  5,  1} ,
-            {1,  6,  2},
-            {2,  7,  3},
-            {3,  8,  4},
-            {4,  9,  5},
-            {5, 10,  1} ,
-            {6,  7,  2},
-            {7,  8,  3},
-            {8,  9,  4},
-            {9, 10,  5},
-            {10, 6,  1}
-        };
-        
-        allocate();
-        setCorners(vex, div);
-        refineTriangles(15, fac, div);
-        if ( make & 2 ) setVertices();
-        if ( make & 4 ) setEdges();
-    }
+    const FLOAT Z = std::sqrt(0.2);
+    const FLOAT C = std::cos(M_PI/2.5);
+    const FLOAT S = std::sin(M_PI/2.5);
+    const FLOAT D = C*C - S*S;
+    const FLOAT T = C*S + C*S;
+    
+    // Twelve vertices of icosahedron on unit sphere
+    FLOAT vex[11][3] = {
+        { 0,  0, -1},
+        { 1,  0, -Z},
+        { C, -S, -Z},
+        { D, -T, -Z},
+        { D,  T, -Z},
+        { C,  S, -Z},
+        {-D, -T,  Z},
+        {-C, -S,  Z},
+        {-1,  0,  Z},
+        {-C,  S,  Z},
+        {-D,  T,  Z},
+    };
+    
+    // ordered faces: Counter-Clockwise = facing out
+    unsigned fac[15][3] = {
+        {0,  1,  2},
+        {0,  2,  3},
+        {0,  3,  4},
+        {0,  4,  5},
+        {0,  5,  1} ,
+        {1,  6,  2},
+        {2,  7,  3},
+        {3,  8,  4},
+        {4,  9,  5},
+        {5, 10,  1} ,
+        {6,  7,  2},
+        {7,  8,  3},
+        {8,  9,  4},
+        {9, 10,  5},
+        {10, 6,  1}
+    };
+    
+    allocate();
+    setCorners(vex, div);
+    refineTriangles(15, fac, div);
+    if ( make & 2 ) setVertices();
+    if ( make & 4 ) setEdges();
 }
 
 void Tesselator::buildHemisphere(unsigned div, int make)
 {
-    kind_ = HEMISPHERE;
     halfZ_ = 1;
-    init(10, 21, 12, div);
+    setGeometry(HEMISPHERE, 10, 21, 12, div);
     
-    if ( make )
-    {
-        const FLOAT G = 0.5+0.5*std::sqrt(5.0);
-        const FLOAT Z = 1 / std::sqrt(G*G+1.0);
-        const FLOAT T = G * Z;
-        
-        // Twelve vertices of icosahedron on unit sphere
-        FLOAT vex[10][3] = {
-            {-Z,  T,  0},
-            { Z, -T,  0},
-            {-Z, -T,  0},
-            { Z,  T,  0},
-            { 0, -Z, -T}, // 5->4
-            { 0,  Z, -T}, // 6->5
-            {-T,  0,  Z}, // 8->6
-            { T,  0, -Z}, // 9->7
-            { T,  0,  Z}, // 10->8
-            {-T,  0, -Z}  // 11->9
-        };
-
-        // ordered faces: Counter-Clockwise = facing out
-        unsigned fac[12][3] = {
-            {0,  3,  5},
-            {5,  3,  7},
-            {7,  3,  8},
-            {4,  5,  7},
-            {1,  4,  7},
-            {1,  7,  8},
-            {1,  2,  4},
-            {4,  2,  9},
-            {2,  6,  9},
-            {5,  4,  9},
-            {0,  9,  6},
-            {0,  5,  9},
-        };
-
-        // we can skip 5 triangles which are entirely in Z > 0
-        allocate();
-        setCorners(vex, div);
-        refineTriangles(12, fac, div);
-        if ( make & 2 ) setVertices();
-        if ( make & 4 ) setEdges();
-    }
+    const FLOAT G = 0.5+0.5*std::sqrt(5.0);
+    const FLOAT Z = 1 / std::sqrt(G*G+1.0);
+    const FLOAT T = G * Z;
+    
+    // Twelve vertices of icosahedron on unit sphere
+    FLOAT vex[10][3] = {
+        {-Z,  T,  0},
+        { Z, -T,  0},
+        {-Z, -T,  0},
+        { Z,  T,  0},
+        { 0, -Z, -T}, // 5->4
+        { 0,  Z, -T}, // 6->5
+        {-T,  0,  Z}, // 8->6
+        { T,  0, -Z}, // 9->7
+        { T,  0,  Z}, // 10->8
+        {-T,  0, -Z}  // 11->9
+    };
+    
+    // ordered faces: Counter-Clockwise = facing out
+    unsigned fac[12][3] = {
+        {0,  3,  5},
+        {5,  3,  7},
+        {7,  3,  8},
+        {4,  5,  7},
+        {1,  4,  7},
+        {1,  7,  8},
+        {1,  2,  4},
+        {4,  2,  9},
+        {2,  6,  9},
+        {5,  4,  9},
+        {0,  9,  6},
+        {0,  5,  9},
+    };
+    
+    // we can skip 5 triangles which are entirely in Z > 0
+    allocate();
+    setCorners(vex, div);
+    refineTriangles(12, fac, div);
+    if ( make & 2 ) setVertices();
+    if ( make & 4 ) setEdges();
 }
 
 
@@ -720,88 +698,84 @@ void Tesselator::buildHemisphere(unsigned div, int make)
  */
 void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make)
 {
-    kind_ = DICE;
-    init(24, 90, 44, div);
-
-    if ( make )
+    setGeometry(DICE, 24, 90, 44, div);
+    
+    dim_[0] = X;
+    dim_[1] = Y;
+    dim_[2] = Z;
+    dim_[3] = R;
+    
+    const FLOAT Xr = X + R;
+    const FLOAT Yr = Y + R;
+    const FLOAT Zr = Z + R;
+    
+    FLOAT vex[24][3] = {
+        {+Xr, Y,-Z}, { Xr, Y, Z}, { Xr,-Y,-Z}, { Xr,-Y, Z},
+        {-Xr,-Y,-Z}, {-Xr,-Y, Z}, {-Xr, Y,-Z}, {-Xr, Y, Z},
+        {+X, Yr,-Z}, {-X, Yr,-Z}, { X, Yr, Z}, {-X, Yr, Z},
+        {+X,-Yr, Z}, {-X,-Yr, Z}, { X,-Yr,-Z}, {-X,-Yr,-Z},
+        {+X, Y, Zr}, {-X, Y, Zr}, { X,-Y, Zr}, {-X,-Y, Zr},
+        {+X, Y,-Zr}, { X,-Y,-Zr}, {-X, Y,-Zr}, {-X,-Y,-Zr}
+    };
+    
+    unsigned quad[18][4] = {
+        { 0, 1, 2, 3 }, { 4, 5, 6, 7 },         // faces at +X and -X
+        { 8, 9, 10, 11 }, { 12, 13, 14, 15 },   // faces at +Y and -Y
+        { 16, 17, 18, 19 }, { 20, 21, 22, 23 }, // faces at +Z and -Z
+        // parallel to the Z axis
+        { 8, 10, 0, 1 }, { 2, 3, 14, 12 },
+        { 15, 13, 4, 5 }, { 6, 7, 9, 11 },
+        // parallel to the Y axis
+        { 0, 2, 20, 21 }, { 22, 23, 6, 4 },
+        { 7, 5, 17, 19 }, { 16, 18, 1, 3 },
+        // parallel to the X axis
+        { 10, 11, 16, 17 }, { 18, 19, 12, 13 },
+        { 14, 15, 21, 23 }, { 20, 22, 8, 9 }
+    };
+    
+    unsigned fac[12][3] = {
+        { 0, 20, 8 }, { 1, 10, 16 },
+        { 2, 14, 21 }, { 3, 18, 12 },
+        { 4, 23, 15 }, { 5, 13, 19 },
+        { 7, 17, 11 }, { 6, 9, 22 }
+    };
+    
+    allocate();
+    setCorners(vex, div);
+    for ( unsigned q = 0; q < 18; ++q )
     {
-        length_[0] = X;
-        length_[1] = Y;
-        length_[2] = Z;
-        length_[3] = R;
-        
-        const FLOAT Xr = X + R;
-        const FLOAT Yr = Y + R;
-        const FLOAT Zr = Z + R;
-        
-        FLOAT vex[24][3] = {
-            {+Xr, Y,-Z}, { Xr, Y, Z}, { Xr,-Y,-Z}, { Xr,-Y, Z},
-            {-Xr,-Y,-Z}, {-Xr,-Y, Z}, {-Xr, Y,-Z}, {-Xr, Y, Z},
-            {+X, Yr,-Z}, {-X, Yr,-Z}, { X, Yr, Z}, {-X, Yr, Z},
-            {+X,-Yr, Z}, {-X,-Yr, Z}, { X,-Yr,-Z}, {-X,-Yr,-Z},
-            {+X, Y, Zr}, {-X, Y, Zr}, { X,-Y, Zr}, {-X,-Y, Zr},
-            {+X, Y,-Zr}, { X,-Y,-Zr}, {-X, Y,-Zr}, {-X,-Y,-Zr}
-        };
-        
-        unsigned quad[18][4] = {
-            { 0, 1, 2, 3 }, { 4, 5, 6, 7 },         // faces at +X and -X
-            { 8, 9, 10, 11 }, { 12, 13, 14, 15 },   // faces at +Y and -Y
-            { 16, 17, 18, 19 }, { 20, 21, 22, 23 }, // faces at +Z and -Z
-            // parallel to the Z axis
-            { 8, 10, 0, 1 }, { 2, 3, 14, 12 },
-            { 15, 13, 4, 5 }, { 6, 7, 9, 11 },
-            // parallel to the Y axis
-            { 0, 2, 20, 21 }, { 22, 23, 6, 4 },
-            { 7, 5, 17, 19 }, { 16, 18, 1, 3 },
-            // parallel to the X axis
-            { 10, 11, 16, 17 }, { 18, 19, 12, 13 },
-            { 14, 15, 21, 23 }, { 20, 22, 8, 9 }
-        };
-        
-        unsigned fac[12][3] = {
-            { 0, 20, 8 }, { 1, 10, 16 },
-            { 2, 14, 21 }, { 3, 18, 12 },
-            { 4, 23, 15 }, { 5, 13, 19 },
-            { 7, 17, 11 }, { 6, 9, 22 }
-        };
-        
-        allocate();
-        setCorners(vex, div);
-        for ( unsigned q = 0; q < 18; ++q )
-        {
-            unsigned a = quad[q][0];
-            unsigned b = quad[q][1];
-            unsigned c = quad[q][2];
-            unsigned d = quad[q][3];
-            refineEdge(a, b, div);
-            refineEdge(b, c, div);
-            refineEdge(c, a, div);
-            refineEdge(b, d, div);
-            refineEdge(c, d, div);
-        }
-        refineTriangles(8, fac, div);
-        
-        unsigned* line = new unsigned[div+1];
-        // 4 edges parallel to the Z axis
-        for ( int n = 6; n < 10; ++n )
-            refineQuad(line, quad[n], div);
-        
-        // 4 edges parallel to the Y axis
-        for ( int n = 10; n < 14; ++n )
-            refineQuad(line, quad[n], div);
-        
-        // 4 edges parallel to the X axis
-        for ( int n = 14; n < 18; ++n )
-            refineQuad(line, quad[n], div);
-        
-        // faces
-        for ( int n = 0; n < 6; ++n )
-            refineQuad(line, quad[n], vid);
-        
-        delete[] line;
-        if ( make & 2 ) setVertices();
-        if ( make & 4 ) setEdges();
+        unsigned a = quad[q][0];
+        unsigned b = quad[q][1];
+        unsigned c = quad[q][2];
+        unsigned d = quad[q][3];
+        refineEdge(a, b, div);
+        refineEdge(b, c, div);
+        refineEdge(c, a, div);
+        refineEdge(b, d, div);
+        refineEdge(c, d, div);
     }
+    refineTriangles(8, fac, div);
+    
+    unsigned* line = new unsigned[div+1];
+    // 4 edges parallel to the Z axis
+    for ( int n = 6; n < 10; ++n )
+        refineQuad(line, quad[n], div);
+    
+    // 4 edges parallel to the Y axis
+    for ( int n = 10; n < 14; ++n )
+        refineQuad(line, quad[n], div);
+    
+    // 4 edges parallel to the X axis
+    for ( int n = 14; n < 18; ++n )
+        refineQuad(line, quad[n], div);
+    
+    // faces
+    for ( int n = 0; n < 6; ++n )
+        refineQuad(line, quad[n], vid);
+    
+    delete[] line;
+    if ( make & 2 ) setVertices();
+    if ( make & 4 ) setEdges();
 }
 
 
@@ -833,7 +807,7 @@ void projectDice(REAL* X, const REAL len[4])
     REAL px = std::min(len[0], std::max(-len[0], X[0]));
     REAL py = std::min(len[1], std::max(-len[1], X[1]));
     REAL pz = std::min(len[2], std::max(-len[2], X[2]));
-
+    
     REAL n = 0;
     n += ( X[0] - px ) * ( X[0] - px );
     n += ( X[1] - py ) * ( X[1] - py );
@@ -861,10 +835,10 @@ void Tesselator::interpolate(Vertex const& vex, double ptr[3], int half) const
         }
     }
     assert_true( S > 0 );
-
+    
     if ( half * Z > 0 )
         Z = 0;
-
+    
     scale(X, Y, Z, 1.0/S);
     ptr[0] = X;
     ptr[1] = Y;
@@ -888,7 +862,7 @@ void Tesselator::interpolate(Vertex const& vex, float ptr[3], int half) const
         }
     }
     assert_true( S > 0 );
-
+    
     if ( half * Z > 0 )
         Z = 0;
     
@@ -906,7 +880,7 @@ void Tesselator::store_vertices(float * vec) const
     
     if ( kind_ == DICE )
     {
-        float len[4] = { (float)length_[0], (float)length_[1], (float)length_[2], (float)length_[3] };
+        float len[4] = { (float)dim_[0], (float)dim_[1], (float)dim_[2], (float)dim_[3] };
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectDice(vec+3*n, len);
     }
@@ -925,7 +899,7 @@ void Tesselator::store_vertices(double * vec) const
     
     if ( kind_ == DICE )
     {
-        double len[4] = { length_[0], length_[1], length_[2], length_[3] };
+        double len[4] = { dim_[0], dim_[1], dim_[2], dim_[3] };
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectDice(vec+3*n, len);
     }
@@ -985,9 +959,9 @@ void Tesselator::exportPLY(FILE* f) const
     fprintf(f, "property float z\n");
     fprintf(f, "element face %u\n", num_faces_);
     fprintf(f, "property list uchar int vertex_index\n");
-//    fprintf(f, "property uint vertex0\n");
-//    fprintf(f, "property uint vertex1\n");
-//    fprintf(f, "property uint vertex2\n");
+    //    fprintf(f, "property uint vertex0\n");
+    //    fprintf(f, "property uint vertex1\n");
+    //    fprintf(f, "property uint vertex2\n");
     fprintf(f, "end_header\n");
     
     for ( unsigned u = 0; u < num_vertices_; ++u )
@@ -1007,7 +981,7 @@ void Tesselator::exportSTL(FILE* f) const
     char buf[128] = { 0 };
     fwrite(buf, 80, 1, f); // 80 bytes header
     fwrite(&num_faces_, 1, 4, f); // 4 bytes
-   
+    
     for ( unsigned u = 0; u < num_faces_; ++u )
     {
         float const* a = face_vertex0(u);
@@ -1017,7 +991,7 @@ void Tesselator::exportSTL(FILE* f) const
         n[0] = ( b[1] - a[1] ) * ( b[2] - a[2] ) - ( c[2] - a[2] ) * ( b[1] - a[1] );
         n[1] = ( b[2] - a[2] ) * ( b[0] - a[0] ) - ( c[0] - a[0] ) * ( b[2] - a[2] );
         n[2] = ( b[0] - a[0] ) * ( b[1] - a[1] ) - ( c[1] - a[1] ) * ( b[0] - a[0] );
-
+        
         fwrite(n, 3, 4, f); // normal
         fwrite(a, 3, 4, f);
         fwrite(b, 3, 4, f);

@@ -733,6 +733,9 @@
 		BB8EE1F62542DF7800E15C40 /* filepath.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB65DBE911AD53AC005DD116 /* filepath.cc */; };
 		BB8EE1F92542DF9C00E15C40 /* vector3.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB89ED70BE3DED10054838A /* vector3.cc */; };
 		BB8EE1FA2542E01B00E15C40 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
+		BB90811629223394008BEBD8 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
+		BB908117292233A6008BEBD8 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
+		BB908118292233BF008BEBD8 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB90E7EE12CA635C000DF711 /* wrist.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB90E7EC12CA635C000DF711 /* wrist.cc */; };
 		BB90E7EF12CA635C000DF711 /* wrist.h in Headers */ = {isa = PBXBuildFile; fileRef = BB90E7ED12CA635C000DF711 /* wrist.h */; };
 		BB92D7D4110E0D0500727008 /* property_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD8A4B70FF253B8005A6615 /* property_list.cc */; };
@@ -5731,6 +5734,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB908118292233BF008BEBD8 /* random.cc in Sources */,
+				BB90811629223394008BEBD8 /* glapp.cc in Sources */,
+				BB908117292233A6008BEBD8 /* SFMT.c in Sources */,
 				BBB22115267B260400B7DE26 /* print_color.cc in Sources */,
 				BB8EE1FA2542E01B00E15C40 /* exceptions.cc in Sources */,
 				BB8EE1F92542DF9C00E15C40 /* vector3.cc in Sources */,

@@ -47,7 +47,7 @@ void reset()
     if ( ico )
         delete ico;
     ico = new Tesselator();
-    ico->build((Tesselator::Polyhedra)kind, rank, 1);
+    ico->construct((Tesselator::Polyhedra)kind, rank);
     ico->setVertices();
     
     char tmp[128];
@@ -279,6 +279,7 @@ void processNormalKey(unsigned char c, int x, int y)
         case ' ': break; // update the Platonic
         case 'k': kind = ( kind + 1 ) % 6; reset(); break;
         case 'i': kind = Tesselator::ICOSAHEDRON; reset(); break;
+        case 'I': kind = Tesselator::ICOSAHEDRONX; reset(); break;
         case 'o': kind = Tesselator::OCTAHEDRON; reset(); break;
         case 'd': kind = Tesselator::DICE; reset(); break;
         case 'h': kind = Tesselator::HEMISPHERE; reset(); break;
