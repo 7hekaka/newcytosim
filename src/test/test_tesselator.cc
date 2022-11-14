@@ -57,6 +57,12 @@ void reset()
     initVBO();
 }
 
+void reset(int K)
+{
+    kind = K;
+    reset();
+}
+
 FILE * openFile(const char name[])
 {
     FILE * f = fopen(name, "w");
@@ -277,13 +283,13 @@ void processNormalKey(unsigned char c, int x, int y)
     switch (c)
     {
         case ' ': break; // update the Platonic
-        case 'k': kind = ( kind + 1 ) % 6; reset(); break;
-        case 'i': kind = Tesselator::ICOSAHEDRON; reset(); break;
-        case 'I': kind = Tesselator::ICOSAHEDRONX; reset(); break;
-        case 'o': kind = Tesselator::OCTAHEDRON; reset(); break;
-        case 'd': kind = Tesselator::DICE; reset(); break;
-        case 'h': kind = Tesselator::HEMISPHERE; reset(); break;
-        case 'a': kind = Tesselator::OPENSPHERE; reset(); break;
+        case 'k': reset( ( kind + 1 ) % 6 ); break;
+        case 'i': reset( Tesselator::ICOSAHEDRON ); break;
+        case 'I': reset( Tesselator::ICOSAHEDRONX ); break;
+        case 'o': reset( Tesselator::OCTAHEDRON ); break;
+        case 'd': reset( Tesselator::DICE ); break;
+        case 'h': reset( Tesselator::HEMISPHERE ); break;
+        case 'a': reset( Tesselator::OPENSPHERE ); break;
         case ']': rank += 1; reset(); break;
         case '}': rank += 16; reset(); break;
         case '[': rank = std::max(rank-1, 1); reset(); break;
