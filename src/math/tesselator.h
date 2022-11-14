@@ -171,6 +171,8 @@ public:
     void setVertices();
     /// scale vertex data
     void scaleVertices(float X, float Y, float Z);
+    /// scale vertex data to transform into a pin-like surface
+    void pinify(float Z);
 
     /// reference to derived vertex `ii`
     Vertex& vertex(int i) const { return vertices_[i]; }

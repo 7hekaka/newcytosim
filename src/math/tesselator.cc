@@ -176,7 +176,22 @@ void Tesselator::scaleVertices(float X, float Y, float Z)
     {
         vex_[3*n  ] *= X;
         vex_[3*n+1] *= Y;
-        vex_[3*n+2] *= ( vex_[3*n+2] < 0 ) ? Z : 1;
+        vex_[3*n+2] *= Z;
+    }
+}
+
+
+/** This transforms the sphere into a 'pin' like smooth surface */
+void Tesselator::pinify(float Z)
+{
+    const float m = 1.4142f;
+    for ( unsigned n = 0; n < num_vertices_; ++n )
+    {
+        float H = vex_[3*n+2];
+        float W = 0.5f * ( 1.f + std::tanh(m*H) );
+        vex_[3*n  ] *= W;
+        vex_[3*n+1] *= W;
+        vex_[3*n+2] *= ( H < 0 ) ? Z : 1;
     }
 }
 
