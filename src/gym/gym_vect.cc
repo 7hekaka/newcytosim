@@ -40,7 +40,7 @@ void gym::stretchAlignZ(Vector1 const& A, Vector1 const& B, float R)
 
 /**
  Translate and rotate to place A in (0,0,0) and B at (0,0,1).
- Scale XY plane by `rad' and Z axis by 1/|AB|
+ Scale XY plane by `R' and Z axis by 1/|AB|
  `R` is the transverse scaling done in the XY plane after rotation
  */
 void gym::stretchAlignZ(Vector2 const& A, Vector2 const& B, float R)
@@ -59,7 +59,7 @@ void gym::stretchAlignZ(Vector2 const& A, Vector2 const& B, float R)
 
 /**
  Translate and rotate to place A in (0,0,0) and B at (0,0,1).
- Scale XY plane by `rad' and Z axis by 1/|AB|
+ Scale XY plane by `R' and Z axis by 1/|AB|
  */
 void gym::stretchAlignZ(Vector3 const& A, Vector3 const& B, float R)
 {
@@ -109,6 +109,7 @@ void gym::rotateInverse(Vector3 const& A, Vector3 const& B, Vector3 const& C)
 }
 
 
+// translate to center O and rotate
 void gym::transRotate(Vector3 const& O, Vector3 const& A,
                  Vector3 const& B, Vector3 const& C)
 {

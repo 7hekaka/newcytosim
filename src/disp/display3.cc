@@ -1138,20 +1138,21 @@ void Display3::drawCoupleB(Couple const* cx) const
         p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
         p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
 #endif
-        real L = ( p2 - p1 ).norm();
         if ( pd1->visible )
         {
             real R1 = pixscale(pd1->size);
             gym::color_both(pd1->color);
+            //gym::stretchAlignZ(p1, p2, R1);
             gym::transAlignZ(p1, R1, p2-p1);
-            gle::nail();
+            gle::droplet();
         }
         if ( pd2->visible )
         {
             real R2 = pixscale(pd2->size);
             gym::color_both(pd2->color);
+            //gym::stretchAlignZ(p2, p1, R2);
             gym::transAlignZ(p2, R2, p1-p2);
-            gle::nail();
+            gle::droplet();
         }
     }
     else

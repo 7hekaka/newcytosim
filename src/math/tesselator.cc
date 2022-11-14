@@ -182,8 +182,9 @@ void Tesselator::scale(size_t num, float* ptr, float X, float Y, float Z)
 
 
 /** This transforms the sphere into a 'pin'-like smooth surface */
-void Tesselator::pinify(size_t num, float* ptr, float Z)
+void Tesselator::dropletify(size_t num, float* ptr, float Z)
 {
+    const float t = 0.2;
     const float m = 1.4142f;
     for ( unsigned n = 0; n < num; ++n )
     {
@@ -191,7 +192,7 @@ void Tesselator::pinify(size_t num, float* ptr, float Z)
         float W = 0.5f * ( 1.f + std::tanh(-m*H) );
         ptr[3*n  ] *= W;
         ptr[3*n+1] *= W;
-        ptr[3*n+2] *= ( H > 0 ) ? Z : 1;
+        ptr[3*n+2] = t + (( H > 0 ) ? H*Z : H);
     }
 }
 

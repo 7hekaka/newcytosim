@@ -1387,7 +1387,7 @@ namespace gle
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
 
-    void nail() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
+    void droplet() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
 
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
@@ -1460,7 +1460,7 @@ namespace gle
         for ( int i = 0; i < 8; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
         // transform the last sphere into a needle-like object:
-        Tesselator::pinify(ico[7].num_vertices(), ptr0+ico_pts_[7], 2);
+        Tesselator::dropletify(ico[7].num_vertices(), ptr0+ico_pts_[7], 2);
 
         icoid_pts_ = ptr - ptr0;
         icoid_idx_ = idx - idx0;

@@ -232,7 +232,7 @@ namespace gle
     void hemisphere4();
     
     /// draw a blob with a pointy ends up in Z
-    void nail();
+    void droplet();
     /// draw nicest sphere available
     inline void sphere() { sphere1(); }
     /// draw nicest hemisphere available
