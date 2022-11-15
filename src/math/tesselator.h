@@ -118,9 +118,6 @@ private:
     /// number of edges
     unsigned num_edges_, max_edges_;
     
-    /// defining which Z half space for hemisphere
-    FLOAT halfZ_;
-    
     ///
     int kind_;
     
@@ -143,8 +140,8 @@ private:
     void destroy();
     void setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned div);
 
-    void interpolate(Vertex const&, float vec[3], int half) const;
-    void interpolate(Vertex const&, double vec[3], int half) const;
+    void interpolate(Vertex const&, float vec[3]) const;
+    void interpolate(Vertex const&, double vec[3]) const;
     
 public:
 

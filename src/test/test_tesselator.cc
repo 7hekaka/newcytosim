@@ -17,7 +17,7 @@ int style = 0;
 int kind = 2;
 int rank = 1;
 
-bool showPlane = true;
+bool showPlane = false;
 bool showNames = false;
 bool showPoints = false;
 bool showEdges = false;
@@ -186,16 +186,16 @@ void namePoints(float scale)
     {
         Tesselator::Vertex & dv = ico->vertex(i);
         float col[4] = {1.f, 1.f, 1.f, 1.f};
-        if ( dv.weight(2) == 0 )
+        if ( dv.weight(0) == 0 )
             col[2] = 0;
-        if ( dv.weight(1) == 0 )
+        if ( dv.weight(2) == 0 )
             col[1] = 0;
         
         gym::color(col);
         const float* ptr = ico->vertex_data(i);
         snprintf(tmp, sizeof(tmp), "%u", i);
         gym::face_view(ptr[0], ptr[1], ptr[2]);
-        fgStrokeString(0, 0, scale, 1, tmp, 1);
+        fgStrokeString(0, 0, scale, 1, tmp, 2);
     }
     gym::restoreLighting();
     gym::restoreAlphaTest();

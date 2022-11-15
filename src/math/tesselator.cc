@@ -115,7 +115,6 @@ Tesselator::Tesselator()
     vex_ = nullptr;
     
     kind_ = 0;
-    halfZ_ = 0;
     
     dim_[0] = 0;
     dim_[1] = 0;
@@ -290,17 +289,6 @@ void Tesselator::addFace(unsigned a, unsigned b, unsigned c)
 {
     //printf("face %i %i %i\n", a, b, c);
     assert_true( a!=b && b!=c && a!=c );
-    if ( halfZ_ )
-    {
-        // reject face if 2 corners are outside
-        FLOAT pos[3];
-        int out = 0;
-        interpolate(vertex(a), pos, 0); out += ( pos[2] * halfZ_ > 0 );
-        interpolate(vertex(b), pos, 0); out += ( pos[2] * halfZ_ > 0 );
-        interpolate(vertex(c), pos, 0); out += ( pos[2] * halfZ_ > 0 );
-        if ( out > 1 )
-            return;
-    }
     unsigned f = 3 * num_faces_;
     faces_[f  ] = (INDEX)a;
     faces_[f+1] = (INDEX)b;
@@ -678,49 +666,139 @@ void Tesselator::buildOpensphere(unsigned div, int make)
     if ( make & 4 ) setEdges();
 }
 
+static void copyme(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3])
+{
+    x[0] = a[0];
+    x[1] = a[1];
+    x[2] = a[2];
+}
+
+static void middle(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3], Tesselator::FLOAT b[3])
+{
+    x[0] = 0.5 * ( a[0] + b[0] );
+    x[1] = 0.5 * ( a[1] + b[1] );
+    x[2] = 0.5 * ( a[2] + b[2] );
+}
+
+static void triangle(unsigned i[3], unsigned a, unsigned b, unsigned c)
+{
+    i[0] = a;
+    i[1] = b;
+    i[2] = c;
+}
+
 void Tesselator::buildHemisphere(unsigned div, int make)
 {
-    halfZ_ = 1;
-    setGeometry(HEMISPHERE, 10, 22, 12, div);
+    setGeometry(HEMISPHERE, 26, 75, 40, div);
     
-    const FLOAT G = 0.5+0.5*std::sqrt(5.0);
-    const FLOAT Z = 1 / std::sqrt(G*G+1.0);
-    const FLOAT T = G * Z;
+    const FLOAT Z = std::sqrt(0.2);
+    const FLOAT C = std::cos(M_PI/2.5);
+    const FLOAT S = std::sin(M_PI/2.5);
+    const FLOAT D = C*C - S*S;
+    const FLOAT T = C*S + C*S;
     
     // Twelve vertices of icosahedron on unit sphere
-    FLOAT vex[10][3] = {
-        {-Z,  T,  0},
-        { Z, -T,  0},
-        {-Z, -T,  0},
-        { Z,  T,  0},
-        { 0, -Z, -T}, // 5->4
-        { 0,  Z, -T}, // 6->5
-        {-T,  0,  Z}, // 8->6
-        { T,  0, -Z}, // 9->7
-        { T,  0,  Z}, // 10->8
-        {-T,  0, -Z}  // 11->9
+    FLOAT ico[12][3] = {
+        { 0,  0, -1},
+        { 1,  0, -Z},
+        { C, -S, -Z},
+        { D, -T, -Z},
+        { D,  T, -Z},
+        { C,  S, -Z},
+        {-D, -T,  Z},
+        {-C, -S,  Z},
+        {-1,  0,  Z},
+        {-C,  S,  Z},
+        {-D,  T,  Z},
+        { 0,  0,  1}
     };
     
+    int j = 0, f = 0;
+    FLOAT vex[26][3];
+    unsigned fac[40][3];
+    
+    copyme(vex[j++], ico[0]);
+    for ( int i = 1; i <= 5; ++i )
+    {
+        middle(vex[j++], ico[0], ico[i]);
+        triangle(fac[f++], 0, i, i<5?i+1:1);
+    }
+    for ( int i = 1; i <= 5; ++i )
+    {
+        unsigned n = i<5 ? i+1 : 1;
+        middle(vex[j++], ico[i], ico[n]);
+        triangle(fac[f++], n, i, i+5);
+    }
+    for ( int i = 1; i <= 5; ++i )
+    {
+        unsigned p = i<2 ? 5 : i-1;
+        copyme(vex[j++], ico[i]);
+        triangle(fac[f++], i, p+5, i+10);
+        triangle(fac[f++], i, i+10, i+5);
+    }
+    for ( int i = 1; i <= 5; ++i )
+    {
+        unsigned n = i<5 ? i+1 : 1;
+        middle(vex[j++], ico[n], ico[i+5]);
+        triangle(fac[f++], n+10, i+5, i+15);
+    }
+    for ( int i = 1; i <= 5; ++i )
+    {
+        unsigned p = i<2 ? 5 : i-1;
+        middle(vex[j++], ico[i], ico[i+5]);
+        triangle(fac[f++], i+10, p+15, i+20);
+        triangle(fac[f++], i+5, i+20, i+15);
+        triangle(fac[f++], i+5, i+10, i+20);
+    }
+/*
     // ordered faces: Counter-Clockwise = facing out
-    unsigned fac[12][3] = {
-        {0,  3,  5},
-        {5,  3,  7},
-        {7,  3,  8},
-        {4,  5,  7},
-        {1,  4,  7},
-        {1,  7,  8},
-        {1,  2,  4},
-        {4,  2,  9},
-        {2,  6,  9},
-        {5,  4,  9},
-        {0,  9,  6},
-        {0,  5,  9},
+    unsigned fac[40][3] = {
+        {0,  1,  2},
+        {0,  2,  3},
+        {0,  3,  4},
+        {0,  4,  5},
+        {0,  5,  1}, //
+        {2,  1,  7},
+        {2,  7,  8},
+        {2,  8,  9},
+        {3,  2,  9},
+        {3,  9, 10},
+        {3, 10, 11},
+        {4,  3, 11},
+        {4, 11, 12},
+        {4, 12, 13},
+        {5,  4, 13},
+        {5, 13, 14},
+        {5, 14, 15},
+        {1,  5, 15},
+        {1, 15,  6},
+        {1,  6,  7}, //
+        {7,  6, 16},
+        {7, 16, 17},
+        {8,  7, 17},
+        {8, 17, 18},
+        {9,  8, 18},
+        {9, 18, 19},
+        {10, 9, 19},
+        {10,19, 20},
+        {11,10, 20},
+        {11,20, 21},
+        {12,11, 21},
+        {12,21, 22},
+        {13,12, 22},
+        {13,22, 23},
+        {14,13, 23},
+        {14,23, 24},
+        {15,14, 24},
+        {15,24, 25},
+        {6, 15, 25},
+        {6, 25, 16}
     };
-    
+    */
     // we can skip 5 triangles which are entirely in Z > 0
     allocate();
     setCorners(vex, div);
-    refineTriangles(12, fac, div);
+    refineTriangles(f, fac, div);
     if ( make & 2 ) setVertices();
     if ( make & 4 ) setEdges();
 }
@@ -852,7 +930,7 @@ static void projectDice(REAL* X, const REAL len[4])
 }
 
 
-void Tesselator::interpolate(Vertex const& vex, double ptr[3], int half) const
+void Tesselator::interpolate(Vertex const& vex, double ptr[3]) const
 {
     double X = 0, Y = 0, Z = 0, S = 0;
     for ( int i = 0; i < 3; ++i )
@@ -868,10 +946,6 @@ void Tesselator::interpolate(Vertex const& vex, double ptr[3], int half) const
         }
     }
     assert_true( S > 0 );
-    
-    if ( half * Z > 0 )
-        Z = 0;
-    
     scale_(X, Y, Z, 1.0/S);
     ptr[0] = X;
     ptr[1] = Y;
@@ -879,7 +953,7 @@ void Tesselator::interpolate(Vertex const& vex, double ptr[3], int half) const
 }
 
 
-void Tesselator::interpolate(Vertex const& vex, float ptr[3], int half) const
+void Tesselator::interpolate(Vertex const& vex, float ptr[3]) const
 {
     float X = 0, Y = 0, Z = 0, S = 0;
     for ( int i = 0; i < 3; ++i )
@@ -895,10 +969,6 @@ void Tesselator::interpolate(Vertex const& vex, float ptr[3], int half) const
         }
     }
     assert_true( S > 0 );
-    
-    if ( half * Z > 0 )
-        Z = 0;
-    
     scale_(X, Y, Z, 1.f/S);
     ptr[0] = X;
     ptr[1] = Y;
@@ -908,7 +978,7 @@ void Tesselator::interpolate(Vertex const& vex, float ptr[3], int half) const
 void Tesselator::store_vertices(float * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        interpolate(vertices_[n], vec+3*n, halfZ_);
+        interpolate(vertices_[n], vec+3*n);
     
     if ( kind_ == DICE )
     {
@@ -927,7 +997,7 @@ void Tesselator::store_vertices(float * vec) const
 void Tesselator::store_vertices(double * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        interpolate(vertices_[n], vec+3*n, halfZ_);
+        interpolate(vertices_[n], vec+3*n);
     
     if ( kind_ == DICE )
     {
