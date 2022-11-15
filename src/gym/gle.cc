@@ -1416,15 +1416,15 @@ namespace gle
     {
         Tesselator ico[8];
         size_t f = std::max(1UL, finesse/2);
-        ico[0].buildIcosahedronZ(finesse*4);
-        ico[1].buildIcosahedronZ(finesse*2);
-        ico[2].buildIcosahedronZ(finesse);
-        ico[3].buildIcosahedronZ(f);
+        ico[0].buildIcosahedron(finesse*4);
+        ico[1].buildIcosahedron(finesse*2);
+        ico[2].buildIcosahedron(finesse);
+        ico[3].buildIcosahedron(f);
 
         ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
         ico[6].buildHemisphere(f);
-        ico[7].buildIcosahedronZ(finesse);
+        ico[7].buildIcosahedron(finesse);
         
         f = 32; // for setIcoidBuffer
         size_t s = 12;

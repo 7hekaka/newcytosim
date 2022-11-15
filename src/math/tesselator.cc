@@ -128,8 +128,8 @@ void Tesselator::setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned
 {
     kind_ = K;
     num_corners_ = V;
-    max_vertices_ = V + E * (N-1) + F * ((N-1)*(N-2)/2);
-    max_edges_ = E * N + F * 3 * ((N-1)*N/2);
+    max_vertices_ = V + E * (N-1) + F * ((N-1)*(N-2))/2;
+    max_edges_ = E * N + F * 3 * ((N-1)*N)/2;
     max_faces_ = F * N * N;
 }
 
@@ -437,12 +437,12 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case UNSET: break;
         case TETRAHEDRON: buildTetrahedron(div, make); break;
         case OCTAHEDRON: buildOctahedron(div, make); break;
-        case ICOSAHEDRON: buildIcosahedronZ(div, make); break;
-        case ICOSAHEDRONX: buildIcosahedron(div, make); break;
+        case ICOSAHEDRON: buildIcosahedron(div, make); break;
+        case ICOSAHEDRONX: buildIcosahedronX(div, make); break;
         case HEMISPHERE: buildHemisphere(div, make); break;
         case OPENSPHERE: buildOpensphere(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
-        case DROPLET: buildIcosahedronZ(div, make); dropletify(2); break;
+        case DROPLET: buildIcosahedron(div, make); dropletify(2); break;
     }
 }
 
@@ -513,7 +513,7 @@ void Tesselator::buildOctahedron(unsigned div, int make)
 }
 
 
-void Tesselator::buildIcosahedron(unsigned div, int make)
+void Tesselator::buildIcosahedronX(unsigned div, int make)
 {
     setGeometry(ICOSAHEDRON, 12, 30, 20, div);
     
@@ -569,7 +569,7 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
 }
 
 /** The faces are draw in order of increasing Z */
-void Tesselator::buildIcosahedronZ(unsigned div, int make)
+void Tesselator::buildIcosahedron(unsigned div, int make)
 {
     setGeometry(ICOSAHEDRON, 12, 30, 20, div);
     
@@ -681,7 +681,7 @@ void Tesselator::buildOpensphere(unsigned div, int make)
 void Tesselator::buildHemisphere(unsigned div, int make)
 {
     halfZ_ = 1;
-    setGeometry(HEMISPHERE, 10, 21, 12, div);
+    setGeometry(HEMISPHERE, 10, 22, 12, div);
     
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
     const FLOAT Z = 1 / std::sqrt(G*G+1.0);
@@ -948,12 +948,18 @@ void Tesselator::store_vertices(double * vec) const
 
 void Tesselator::addEdge(unsigned a, unsigned b)
 {
-    size_t e = 2 * num_edges_;
-    edges_[e  ] = (INDEX)a;
-    edges_[e+1] = (INDEX)b;
-    assert_true(edges_[e  ] == a);
-    assert_true(edges_[e+1] == b);
-    ++num_edges_;
+    if ( num_edges_ < max_edges_ )
+    {
+        //printf("edge: %i %i\n", a, b);
+        size_t e = 2 * num_edges_++;
+        edges_[e  ] = (INDEX)a;
+        edges_[e+1] = (INDEX)b;
+        assert_true((INDEX)a == a);
+        assert_true((INDEX)b == b);
+    }
+    else
+        printf("Tesselator::addEdge overflow (%i): %i %i\n", max_edges_, a, b);
+
 }
 
 
@@ -977,7 +983,7 @@ void Tesselator::setEdges()
          */
         if ( a < b ) addEdge(a, b);
         if ( b < c ) addEdge(b, c);
-        if ( a < c ) addEdge(a, c);
+        if ( c < a ) addEdge(c, a);
     }
     //printf("ico: %i vertices, %i edges\n", num_faces_, num_edges_);
     assert_true( num_edges_ <= max_edges_ );
