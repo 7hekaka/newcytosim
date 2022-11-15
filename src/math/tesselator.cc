@@ -271,7 +271,7 @@ unsigned Tesselator::makeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB
 #pragma mark -
 
 /// add intermediate vertices between `a` and `b`
-void Tesselator::refineEdge(unsigned a, unsigned b, unsigned div)
+void Tesselator::cutEdge(unsigned a, unsigned b, unsigned div)
 {
     // check if this edge has been processes already:
     unsigned i = findEdgeVertex(a, div-1, b, 1);
@@ -312,7 +312,7 @@ void Tesselator::addFace(unsigned a, unsigned b, unsigned c)
 }
 
 
-void Tesselator::refineFace(unsigned* line, unsigned a, unsigned b, unsigned c, unsigned div)
+void Tesselator::cutFace(unsigned* line, unsigned a, unsigned b, unsigned c, unsigned div)
 {
     for ( unsigned u = 0; u <= div; ++u )
         line[u] = getEdgeVertex(a, div-u, b, u);
@@ -333,7 +333,7 @@ void Tesselator::refineFace(unsigned* line, unsigned a, unsigned b, unsigned c, 
     }
 }
 
-void Tesselator::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
+void Tesselator::cutQuad(unsigned* line, unsigned quad[4], unsigned div)
 {
     unsigned A = quad[0];
     unsigned B = quad[1];
@@ -372,7 +372,7 @@ void Tesselator::refineQuad(unsigned* line, unsigned quad[4], unsigned div)
 
 /*
  /// unfinished
- void Tesselator::refineStrip(unsigned cnt, unsigned inx[], unsigned div)
+ void Tesselator::cutStrip(unsigned cnt, unsigned inx[], unsigned div)
  {
  unsigned* line = new unsigned[cnt*(div+1)];
  
@@ -413,15 +413,15 @@ void Tesselator::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div
         unsigned a = fac[f][0];
         unsigned b = fac[f][1];
         unsigned c = fac[f][2];
-        refineEdge(a, b, div);
-        refineEdge(b, c, div);
-        refineEdge(c, a, div);
+        cutEdge(a, b, div);
+        cutEdge(b, c, div);
+        cutEdge(c, a, div);
     }
     assert_true(num_vertices_ <= max_vertices_);
     
     unsigned* line = new unsigned[div+1];
     for ( unsigned f = 0; f < n_fac; ++f )
-        refineFace(line, fac[f][0], fac[f][1], fac[f][2], div);
+        cutFace(line, fac[f][0], fac[f][1], fac[f][2], div);
     delete[] line;
 }
 
@@ -781,30 +781,30 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
         unsigned b = quad[q][1];
         unsigned c = quad[q][2];
         unsigned d = quad[q][3];
-        refineEdge(a, b, div);
-        refineEdge(b, c, div);
-        refineEdge(c, a, div);
-        refineEdge(b, d, div);
-        refineEdge(c, d, div);
+        cutEdge(a, b, div);
+        cutEdge(b, c, div);
+        cutEdge(c, a, div);
+        cutEdge(b, d, div);
+        cutEdge(c, d, div);
     }
     refineTriangles(8, fac, div);
     
     unsigned* line = new unsigned[div+1];
     // 4 edges parallel to the Z axis
     for ( int n = 6; n < 10; ++n )
-        refineQuad(line, quad[n], div);
+        cutQuad(line, quad[n], div);
     
     // 4 edges parallel to the Y axis
     for ( int n = 10; n < 14; ++n )
-        refineQuad(line, quad[n], div);
+        cutQuad(line, quad[n], div);
     
     // 4 edges parallel to the X axis
     for ( int n = 14; n < 18; ++n )
-        refineQuad(line, quad[n], div);
+        cutQuad(line, quad[n], div);
     
     // faces
     for ( int n = 0; n < 6; ++n )
-        refineQuad(line, quad[n], vid);
+        cutQuad(line, quad[n], vid);
     
     delete[] line;
     if ( make & 2 ) setVertices();
@@ -969,11 +969,17 @@ void Tesselator::setEdges()
         unsigned a = faces_[3*i  ];
         unsigned b = faces_[3*i+1];
         unsigned c = faces_[3*i+2];
+        //printf("face %i: %i %i %i\n", i, a, b, c);
+        /*
+         Here we rely on the fact that every edge will be covered by two faces,
+         and thus we add this test to keep only half of them.
+         This may fail if the volume is not closed.
+         */
         if ( a < b ) addEdge(a, b);
         if ( b < c ) addEdge(b, c);
-        if ( c < a ) addEdge(c, a);
+        if ( a < c ) addEdge(a, c);
     }
-    
+    //printf("ico: %i vertices, %i edges\n", num_faces_, num_edges_);
     assert_true( num_edges_ <= max_edges_ );
 }
 

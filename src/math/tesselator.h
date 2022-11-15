@@ -134,10 +134,10 @@ private:
     
     void addFace(unsigned, unsigned, unsigned);
     void addEdge(unsigned, unsigned);
-    void refineEdge(unsigned a, unsigned b, unsigned div);
-    void refineFace(unsigned*, unsigned a, unsigned b, unsigned c, unsigned div);
-    void refineQuad(unsigned*, unsigned quad[4], unsigned div);
-    void refineStrip(unsigned cnt, unsigned inx[], unsigned div);
+    void cutEdge(unsigned a, unsigned b, unsigned div);
+    void cutFace(unsigned*, unsigned a, unsigned b, unsigned c, unsigned div);
+    void cutQuad(unsigned*, unsigned quad[4], unsigned div);
+    void cutStrip(unsigned cnt, unsigned inx[], unsigned div);
     
     void allocate();
     void destroy();
