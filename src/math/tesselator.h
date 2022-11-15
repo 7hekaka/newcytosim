@@ -32,7 +32,7 @@ public:
 
     /// starting shapes
     enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3,
-        ICOSAHEDRONX=4, HEMISPHERE=5, OPENSPHERE=6, DICE=7 };
+        ICOSAHEDRONX=4, HEMISPHERE=5, OPENSPHERE=6, DICE=7, DROPLET=8 };
     
     /// One of the vertex of the template model
     struct Corner
@@ -172,7 +172,7 @@ public:
     
     /// scale vertex {X, Y, Z} data
     static void scale(size_t, float*, float X, float Y, float Z);
-    /// scale vertex {X, Y, Z} data to transform into a pin-like surface
+    /// transform sphere into a droplet-like surface of length Z
     static void dropletify(size_t, float *, float Z);
 
     /// reference to derived vertex `ii`
@@ -184,6 +184,9 @@ public:
     /// copy coordinates of points to given array
     void store_vertices(double* vec) const;
     
+    /// transform sphere into a droplet-like surface
+    void dropletify(float Z);
+
     
     /// number of derived vertices
     unsigned max_vertices() const { return max_vertices_; }

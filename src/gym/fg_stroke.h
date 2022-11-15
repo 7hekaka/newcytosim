@@ -55,13 +55,13 @@ typedef struct tagSFG_StrokeFont SFG_StrokeFont;
 
 
 /*
- * Draw a stroke character. With `scale=8` the font is ~120 units high.
+ * Draw a stroke character. With `scale=pixel_size` the font is ~15 pixels high.
  */
 void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char character,
                        float stroke_width, float stroke_size);
 
 /*
-* Draw a stroke string. With `scale=8` the font is ~120 units high.
+* Draw a stroke string. With `scale=pixel_size` the font is ~15 pixels high.
 */
 void fgStrokeString(float x, float y, float scale, int mono, const char *string,
                     float stroke_width, float stroke_size = 0, float vshift = 0.);

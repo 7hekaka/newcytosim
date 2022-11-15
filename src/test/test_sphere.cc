@@ -166,7 +166,7 @@ int display(View& view)
     gym::color(col);
     drawVertices();
     gym::color(0,1,1);
-    nameVertices(0.1*view.pixelSize());
+    nameVertices(view.pixelSize());
     //drawTangents(col, lor);
     view.closeDisplay();
     return 0;

@@ -42,25 +42,21 @@ void flip_cap(GLenum cap)
 //------------------------------------------------------------------------------
 void initVBO();
 
-void reset()
+void reset(int K, int R)
 {
+    kind = abs(K);
+    rank = R;
     if ( ico )
         delete ico;
     ico = new Tesselator();
-    ico->construct((Tesselator::Polyhedra)kind, rank);
-    ico->setVertices();
+    ico->construct((Tesselator::Polyhedra)K, R, 2);
 
     char tmp[128];
     snprintf(tmp, sizeof(tmp), "%i div, %i points, %i faces",
-             rank, ico->num_vertices(), ico->num_faces());
+             R, ico->num_vertices(), ico->num_faces());
     glApp::setMessage(tmp);
     initVBO();
-}
-
-void reset(int K)
-{
-    kind = K;
-    reset();
+    
 }
 
 FILE * openFile(const char name[])
@@ -102,6 +98,7 @@ void exportSTL()
 }
 
 //------------------------------------------------------------------------------
+
 void drawPlane()
 {
     glColor4f(0.5f, 0.5f, 0.5f, 1.0f);
@@ -208,10 +205,31 @@ void namePoints(float scale)
 void drawPoints()
 {
     glColor3f(1, 1, 1);
-    glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-    glVertexPointer(3, GL_FLOAT, 0, nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if ( style == 0 )
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
+        glVertexPointer(3, GL_FLOAT, 0, nullptr);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    else
+    {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
+    }
     gym::drawPoints(10, 0, ico->num_vertices());
+    glDisableClientState(GL_NORMAL_ARRAY);
+}
+
+void drawNeedle()
+{
+    glLineWidth(1);
+    glPointSize(10);
+    //glPolygonMode(GL_FRONT, GL_LINE);
+    glColor4f(0, 1, 1, 0.5f);
+    glEnable(GL_LIGHTING);
+    //gle::sphere1();
+    gle::needle();
+    glDisable(GL_LIGHTING);
 }
 
 int display(View& view)
@@ -222,19 +240,6 @@ int display(View& view)
     GLfloat pink[4] = { 1.0, 0.0, 0.7, 1 };
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
     glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, pink);
-
-    if ( 0 )
-    {
-        glLineWidth(1);
-        glPointSize(10);
-        //glPolygonMode(GL_FRONT, GL_LINE);
-        glColor4f(0, 1, 1, 0.5f);
-        glEnable(GL_LIGHTING);
-        //gle::sphere1();
-        gle::needle();
-        glDisable(GL_LIGHTING);
-        return 0;
-    }
 
     glDepthMask(GL_TRUE);
     if ( showPlane )
@@ -270,7 +275,7 @@ int display(View& view)
     {
         glDisable(GL_LIGHTING);
         gym::color(1, 1, 1);
-        namePoints(0.1*view.pixelSize());
+        namePoints(view.pixelSize());
     }
     view.closeDisplay();
     return 0;
@@ -282,28 +287,31 @@ void processNormalKey(unsigned char c, int x, int y)
 {
     switch (c)
     {
-        case ' ': break; // update the Platonic
-        case 'k': reset( ( kind + 1 ) % 6 ); break;
-        case 'i': reset( Tesselator::ICOSAHEDRON ); break;
-        case 'I': reset( Tesselator::ICOSAHEDRONX ); break;
-        case 'o': reset( Tesselator::OCTAHEDRON ); break;
-        case 'd': reset( Tesselator::DICE ); break;
-        case 'h': reset( Tesselator::HEMISPHERE ); break;
-        case 'a': reset( Tesselator::OPENSPHERE ); break;
-        case ']': rank += 1; reset(); break;
-        case '}': rank += 16; reset(); break;
-        case '[': rank = std::max(rank-1, 1); reset(); break;
-        case '{': rank = std::max(rank-16, 1); reset(); break;
+        case ' ': reset(kind, rank); break;
+        case 'k': reset(( kind + 1 ) % 6, rank); break;
+        case 'i': reset(Tesselator::ICOSAHEDRON, rank); break;
+        case 'I': reset(Tesselator::ICOSAHEDRONX, rank); break;
+        case 'o': reset(Tesselator::OCTAHEDRON, rank); break;
+        case 'd': reset(Tesselator::DICE, rank); break;
+        case 'h': reset(Tesselator::HEMISPHERE, rank); break;
+        case 'a': reset(Tesselator::DROPLET, rank); break;
+        case ']': reset(kind, rank+1); break;
+        case '}': reset(kind, rank+16); break;
+        case '[': reset(kind, std::max(rank-1, 1)); break;
+        case '{': reset(kind, std::max(rank-16, 1)); break;
+        
         case 'y': exportPLY(); return;
         case 'Y': exportSTL(); return;
+            
         case 'e': showEdges = !showEdges; break;
         case 'f': showFaces = !showFaces; break;
         case 'n': showNames = !showNames; break;
         case 'p': showPoints = !showPoints; break;
-        case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
-        case 't': flip_cap(GL_DEPTH_TEST); break;
         case 'v': showPlane = !showPlane; break;
         case 'c': cull_test = !cull_test; break;
+        case 't': flip_cap(GL_DEPTH_TEST); break;
+
+        case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
         default: glApp::processNormalKey(c,x,y); return;
     }
     glApp::postRedisplay();
@@ -320,6 +328,6 @@ int main(int argc, char* argv[])
     glApp::attachMenu();
     glApp::setScale(3);
     gle::initialize();
-    reset();
+    reset(kind, rank);
     glutMainLoop();
 }

@@ -196,6 +196,12 @@ void Tesselator::dropletify(size_t num, float* ptr, float Z)
     }
 }
 
+
+void Tesselator::dropletify(float Z)
+{
+    dropletify(num_vertices(), vex_, Z);
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -436,6 +442,7 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case HEMISPHERE: buildHemisphere(div, make); break;
         case OPENSPHERE: buildOpensphere(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
+        case DROPLET: buildIcosahedronZ(div, make); dropletify(2); break;
     }
 }
 

@@ -1459,7 +1459,7 @@ namespace gle
 
         for ( int i = 0; i < 8; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
-        // transform the last sphere into a needle-like object:
+        // transform the last sphere into a droplet-like object:
         Tesselator::dropletify(ico[7].num_vertices(), ptr0+ico_pts_[7], 2);
 
         icoid_pts_ = ptr - ptr0;
