@@ -32,7 +32,7 @@ public:
 
     /// starting shapes
     enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3,
-        ICOSAHEDRONX=4, HEMISPHERE=5, OPENSPHERE=6, DICE=7, DROPLET=8 };
+        ICOSAHEDRONX=4, HEMISPHERE=5, CYLINDER=6, DICE=7, DROPLET=8 };
     
     /// One of the vertex of the template model
     struct Corner
@@ -158,7 +158,7 @@ public:
     void buildOctahedron(unsigned div, int make = 1);
     void buildIcosahedron(unsigned div, int make = 1);
     void buildIcosahedronX(unsigned div, int make = 1);
-    void buildOpensphere(unsigned div, int make = 1);
+    void buildCylinder(unsigned div, int make = 1);
     void buildHemisphere(unsigned div, int make = 1);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
 
@@ -166,11 +166,6 @@ public:
     void setEdges();
     /// calculate coordinates of vertices used in vertex_data()
     void setVertices();
-    
-    /// scale vertex {X, Y, Z} data
-    static void scale(size_t, float*, float X, float Y, float Z);
-    /// transform sphere into a droplet-like surface of length Z
-    static void dropletify(size_t, float *, float Z);
 
     /// reference to derived vertex `ii`
     Vertex& vertex(int i) const { return vertices_[i]; }
@@ -182,7 +177,8 @@ public:
     void store_vertices(double* vec) const;
     
     /// transform sphere into a droplet-like surface
-    void dropletify(float Z);
+    void dropletify(float*, float Z);
+    void dropletify(double*, double Z);
 
     
     /// number of derived vertices

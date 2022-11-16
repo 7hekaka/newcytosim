@@ -288,13 +288,13 @@ void processNormalKey(unsigned char c, int x, int y)
     switch (c)
     {
         case ' ': reset(kind, rank); break;
-        case 'k': reset(( kind + 1 ) % 6, rank); break;
         case 'i': reset(Tesselator::ICOSAHEDRON, rank); break;
         case 'I': reset(Tesselator::ICOSAHEDRONX, rank); break;
         case 'o': reset(Tesselator::OCTAHEDRON, rank); break;
         case 'd': reset(Tesselator::DICE, rank); break;
         case 'h': reset(Tesselator::HEMISPHERE, rank); break;
         case 'a': reset(Tesselator::DROPLET, rank); break;
+        case 'c': reset(Tesselator::CYLINDER, rank); break;
         case ']': reset(kind, rank+1); break;
         case '}': reset(kind, rank+16); break;
         case '[': reset(kind, std::max(rank-1, 1)); break;
@@ -308,7 +308,7 @@ void processNormalKey(unsigned char c, int x, int y)
         case 'n': showNames = !showNames; break;
         case 'p': showPoints = !showPoints; break;
         case 'v': showPlane = !showPlane; break;
-        case 'c': cull_test = !cull_test; break;
+        case 'k': cull_test = !cull_test; break;
         case 't': flip_cap(GL_DEPTH_TEST); break;
 
         case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;

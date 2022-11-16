@@ -169,7 +169,7 @@ void Tesselator::setVertices()
 }
 
 
-void Tesselator::scale(size_t num, float* ptr, float X, float Y, float Z)
+void scale_(size_t num, float* ptr, float X, float Y, float Z)
 {
     for ( unsigned n = 0; n < num; ++n )
     {
@@ -181,24 +181,23 @@ void Tesselator::scale(size_t num, float* ptr, float X, float Y, float Z)
 
 
 /** This transforms the sphere into a 'pin'-like smooth surface */
-void Tesselator::dropletify(size_t num, float* ptr, float Z)
+template < typename FLOAT >
+static void dropletify_(size_t num, FLOAT* ptr, float Z)
 {
-    const float t = 0.2;
-    const float m = 1.4142f;
+    const FLOAT m = 0.75f;
     for ( unsigned n = 0; n < num; ++n )
     {
-        float H = ptr[3*n+2];
-        float W = 0.5f * ( 1.f + std::tanh(-m*H) );
+        FLOAT H = ptr[3*n+2];
+        FLOAT W = 0.5f * ( 1.f + std::tanh(-m*H) );
         ptr[3*n  ] *= W;
         ptr[3*n+1] *= W;
-        ptr[3*n+2] = t + (( H > 0 ) ? H*Z : H);
     }
 }
 
 
-void Tesselator::dropletify(float Z)
+void Tesselator::dropletify(float* ptr, float Z)
 {
-    dropletify(num_vertices(), vex_, Z);
+    dropletify_(num_vertices_, ptr, Z);
 }
 
 //------------------------------------------------------------------------------
@@ -428,9 +427,9 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case ICOSAHEDRON: buildIcosahedron(div, make); break;
         case ICOSAHEDRONX: buildIcosahedronX(div, make); break;
         case HEMISPHERE: buildHemisphere(div, make); break;
-        case OPENSPHERE: buildOpensphere(div, make); break;
+        case CYLINDER: buildCylinder(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
-        case DROPLET: buildIcosahedron(div, make); dropletify(2); break;
+        case DROPLET: buildIcosahedron(div, make); break;
     }
 }
 
@@ -614,19 +613,29 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
     if ( make & 4 ) setEdges();
 }
 
-/** The faces are draw in order of increasing Z */
-void Tesselator::buildOpensphere(unsigned div, int make)
+static void triangle(unsigned i[3], unsigned a, unsigned b, unsigned c)
 {
-    setGeometry(OPENSPHERE, 11, 25, 15, div);
-    
+    i[0] = a;
+    i[1] = b;
+    i[2] = c;
+}
+
+/** The faces are draw in order of increasing Z */
+void Tesselator::buildCylinder(unsigned div, int make)
+{
+    setGeometry(CYLINDER, 16, 40, 25, div);
+    setGeometry(CYLINDER, 21, 55, 35, div);
+
     const FLOAT Z = std::sqrt(0.2);
     const FLOAT C = std::cos(M_PI/2.5);
     const FLOAT S = std::sin(M_PI/2.5);
     const FLOAT D = C*C - S*S;
     const FLOAT T = C*S + C*S;
-    
+    const FLOAT H = 3 * Z;
+    const FLOAT W = 5 * Z;
+
     // Twelve vertices of icosahedron on unit sphere
-    FLOAT vex[11][3] = {
+    FLOAT vex[21][3] = {
         { 0,  0, -1},
         { 1,  0, -Z},
         { C, -S, -Z},
@@ -638,30 +647,54 @@ void Tesselator::buildOpensphere(unsigned div, int make)
         {-1,  0,  Z},
         {-C,  S,  Z},
         {-D,  T,  Z},
+        { C, -S,  H},
+        { D, -T,  H},
+        { D,  T,  H},
+        { C,  S,  H},
+        { 1,  0,  H},
+        {-C, -S,  W},
+        {-1,  0,  W},
+        {-C,  S,  W},
+        {-D,  T,  W},
+        {-D, -T,  W},
     };
     
     // ordered faces: Counter-Clockwise = facing out
-    unsigned fac[15][3] = {
+    unsigned fac[40][3] = {
         {0,  1,  2},
         {0,  2,  3},
         {0,  3,  4},
         {0,  4,  5},
-        {0,  5,  1} ,
-        {1,  6,  2},
-        {2,  7,  3},
-        {3,  8,  4},
-        {4,  9,  5},
-        {5, 10,  1} ,
-        {6,  7,  2},
-        {7,  8,  3},
-        {8,  9,  4},
-        {9, 10,  5},
-        {10, 6,  1}
+        {0,  5,  1},
     };
-    
+    int f = 5;
+    for ( int i = 1; i <= 5; ++i )
+    {
+        unsigned n = i<5 ? i+1 : 1;
+        unsigned p = i<2 ? 5 : i-1;
+        triangle(fac[f++], n, i, i+5);
+        triangle(fac[f++], i, p+5, i+5);
+    }
+    for ( int i = 1; i <= 5; ++i )
+    {
+        unsigned x = 5;
+        unsigned n = i<5 ? i+1 : 1;
+        unsigned p = i<2 ? 5 : i-1;
+        triangle(fac[f++], n+x, i+x, i+5+x);
+        triangle(fac[f++], i+x, p+5+x, i+5+x);
+    }
+    for ( int i = 1; i <= 5; ++i )
+    {
+        unsigned x = 10;
+        unsigned n = i<5 ? i+1 : 1;
+        unsigned p = i<2 ? 5 : i-1;
+        triangle(fac[f++], n+x, i+x, i+5+x);
+        triangle(fac[f++], i+x, p+5+x, i+5+x);
+    }
+
     allocate();
     setCorners(vex, div);
-    refineTriangles(15, fac, div);
+    refineTriangles(f, fac, div);
     if ( make & 2 ) setVertices();
     if ( make & 4 ) setEdges();
 }
@@ -678,13 +711,6 @@ static void middle(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3], Tesselator::F
     x[0] = 0.5 * ( a[0] + b[0] );
     x[1] = 0.5 * ( a[1] + b[1] );
     x[2] = 0.5 * ( a[2] + b[2] );
-}
-
-static void triangle(unsigned i[3], unsigned a, unsigned b, unsigned c)
-{
-    i[0] = a;
-    i[1] = b;
-    i[2] = c;
 }
 
 void Tesselator::buildHemisphere(unsigned div, int make)
@@ -903,12 +929,31 @@ static void scale_(REAL& X, REAL& Y, REAL& Z, REAL n)
 
 
 template < typename REAL >
-static void project_(REAL* X)
+static void projectSphere(REAL* X)
 {
     REAL n = 1.0 / std::sqrt(X[0]*X[0] + X[1]*X[1] + X[2]*X[2]);
     X[0] *= n;
     X[1] *= n;
     X[2] *= n;
+}
+
+
+template < typename REAL >
+static void projectCylinder(REAL* X)
+{
+    if ( X[2] < 0 )
+    {
+        REAL n = 1.0 / std::sqrt(X[0]*X[0] + X[1]*X[1] + X[2]*X[2]);
+        X[0] *= n;
+        X[1] *= n;
+        X[2] *= n;
+    }
+    else
+    {
+        REAL n = 1.0 / std::sqrt(X[0]*X[0] + X[1]*X[1]);
+        X[0] *= n;
+        X[1] *= n;
+    }
 }
 
 
@@ -986,10 +1031,16 @@ void Tesselator::store_vertices(float * vec) const
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectDice(vec+3*n, len);
     }
+    else if ( kind_ == CYLINDER )
+    {
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            projectCylinder(vec+3*n);
+        dropletify_(num_vertices_, vec, 3);
+    }
     else
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
-            project_(vec+3*n);
+            projectSphere(vec+3*n);
     }
 }
 
@@ -1005,10 +1056,16 @@ void Tesselator::store_vertices(double * vec) const
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectDice(vec+3*n, len);
     }
+    else if ( kind_ == CYLINDER )
+    {
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            projectCylinder(vec+3*n);
+        dropletify_(num_vertices_, vec, 3);
+    }
     else
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
-            project_(vec+3*n);
+            projectSphere(vec+3*n);
     }
 }
 

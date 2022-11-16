@@ -1421,10 +1421,10 @@ namespace gle
         ico[2].buildIcosahedron(finesse);
         ico[3].buildIcosahedron(f);
 
-        ico[4].buildHemisphere(finesse*2);
-        ico[5].buildHemisphere(finesse);
-        ico[6].buildHemisphere(f);
-        ico[7].buildIcosahedron(finesse);
+        ico[4].buildHemisphere(finesse);
+        ico[5].buildHemisphere(f);
+        ico[6].buildHemisphere(std::max(1UL, finesse/4));
+        ico[7].buildCylinder(finesse);
         
         f = 32; // for setIcoidBuffer
         size_t s = 12;
@@ -1459,8 +1459,6 @@ namespace gle
 
         for ( int i = 0; i < 8; ++i )
             setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
-        // transform the last sphere into a droplet-like object:
-        Tesselator::dropletify(ico[7].num_vertices(), ptr0+ico_pts_[7], 2);
 
         icoid_pts_ = ptr - ptr0;
         icoid_idx_ = idx - idx0;
