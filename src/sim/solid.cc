@@ -14,6 +14,7 @@
 #include "space.h"
 #include "singles/wrist.h"
 #include "lapack.h"
+#include "print_color.h"
 
 #if ( DIM >= 3 )
 #   include "quaternion.h"
@@ -261,7 +262,7 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
     opt.set(rad, var, 1);
     
     if ( rad <= 0 )
-        throw InvalidParameter("radius of sphere specified in solid must be > 0");
+        throw InvalidParameter("radius of spherical component of solid must be > 0");
     
     // get position of center:
     Vector cen = Movable::readPosition(opt.value(var, 0));
@@ -325,21 +326,30 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
         inx = 2;
         while ( opt.set(str, var, inx++) )
         {
-            // get a number and the name of a class:
             size_t num = 1;
-            Tokenizer::split_integer(num, str);
-            std::string nam = Tokenizer::split_symbol(str);
+            std::string nam;
+            Tokenizer::strip_block(str);
+            std::stringstream iss(str);
+            // get a number and the name of a class:
+            iss >> num >> nam;
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+var+"'");
             SingleProp * sip = sim.findProperty<SingleProp>("single", nam);
-            
-            Vector vec;
+            getline(iss, str);
             /* add Wrists anchored on the local coordinate system:
              need to use unit vectors here since the Triad is build with 'rad' */
             for ( size_t i = 0; i < num; ++i )
             {
+                Vector vec;
                 if ( str.size() )
-                    vec = Movable::readPosition(str);
+                {
+                    try {
+                        vec = Movable::readPosition(str);
+                    } catch( Exception& e ) {
+                        print_magenta(std::cerr, e.brief());
+                        std::cerr << e.info() << '\n';
+                    }
+                }
                 else
                     vec = Vector::randU();
                 Wrist * w = sip->newWrist(this, 0);
