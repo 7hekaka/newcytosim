@@ -213,9 +213,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "sphere" )
         {
             real R = -1, T = 0;
-            is >> R >> T;
-            if ( R < 0 )
+            is >> R;
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `sphere R`");
+            is >> T;
             if ( T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `sphere R T`");
             return Vector::randU(R) + Vector::randU(T*0.5);
@@ -225,7 +226,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         {
             real R = -1;
             is >> R;
-            if ( R < 0 )
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `sphere R`");
             return Vector::randB(R);
         }
@@ -233,9 +234,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "equator" )
         {
             real R = 0, T = 0;
-            is >> R >> T;
-            if ( R < 0 )
+            is >> R;
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `equator R T`");
+            is >> T;
             if ( T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `equator R T`");
             const Vector2 V = Vector2::randU();
@@ -245,9 +247,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "cylinder" )
         {
             real L = -1, R = -1;
-            is >> L >> R;
-            if ( L < 0 )
+            is >> L;
+            if ( is.fail() || L < 0 )
                 throw InvalidParameter("length L must be >= 0 in `cylinder L R`");
+            is >> R;
             if ( R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
             const Vector2 V = Vector2::randB(R);
@@ -257,9 +260,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "ring" )
         {
             real L = -1, R = -1, T = 0;
-            is >> L >> R >> T;
-            if ( L < 0 )
+            is >> L;
+            if ( is.fail() || L < 0 )
                 throw InvalidParameter("length L must be >= 0 in `cylinder L R`");
+            is >> R >> T;
             if ( R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
             const Vector2 V = Vector2::randU(R) * ( 1.0 + RNG.shalf()*T );
@@ -269,9 +273,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "circle" )
         {
             real R = -1, T = 0;
-            is >> R >> T;
-            if ( R < 0 )
+            is >> R;
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `circle R T`");
+            is >> T;
             if ( T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `circle R T`");
 #if ( DIM >= 3 )
@@ -285,7 +290,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         {
             real R = -1;
             is >> R;
-            if ( R < 0 )
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `ball R`");
             return Vector::randB(R);
         }
@@ -293,9 +298,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "disc" || tok == "discXY" )
         {
             real R = -1, T = 0;
-            is >> R >> T;
-            if ( R < 0 )
+            is >> R;
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `disc R`");
+            is >> T;
 #if ( DIM >= 3 )
             //in 3D, a disc in the XY-plane of thickness T in Z-direction
             if ( T < 0 )
@@ -310,9 +316,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "discXZ"  )
         {
             real R = -1, T = 0;
-            is >> R >> T;
-            if ( R < 0 )
+            is >> R;
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `discXZ R`");
+            is >> T;
             if ( T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `discXZ R T`");
             const Vector2 V = Vector2::randB(R);
@@ -322,9 +329,10 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         if ( tok == "discYZ"  )
         {
             real R = -1, T = 0;
-            is >> R >> T;
-            if ( R < 0 )
+            is >> R;
+            if ( is.fail() || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `discYZ R`");
+            is >> T;
             if ( T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `discYZ R T`");
             const Vector2 V = Vector2::randB(R);
@@ -590,9 +598,9 @@ Vector Movable::readPosition(std::string const& arg, Space const* spc)
 Vector Movable::readPosition(std::string const& arg)
 {
     long max_trials = 1 << 14;
-    std::istringstream iss(arg);
     while ( --max_trials >= 0 )
     {
+        std::istringstream iss(arg);
         Vector vec = Movable::readPosition(iss, nullptr);
         if ( vec.valid() )
             return vec;
