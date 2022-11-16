@@ -1,0 +1,65 @@
+% A Solid made of two beads that can nucleate MTs at their plus-end
+% F. Nedelec, Cambridge 15 Nov. 2022, 
+
+set simul system
+{
+    time_step = 0.001
+    viscosity = 0.1
+}
+
+set space cell
+{
+    shape = sphere
+}
+
+new cell
+{
+    radius = 4
+}
+
+set fiber microtubule
+{
+    rigidity = 20
+    segmentation = 0.75
+    confine = inside, 1
+    display = ( color=white; line_width=3; )
+    activity = dynamic
+    min_length = 0.064
+    growing_speed = 0.21
+    shrinking_speed = -0.42
+    hydrolysis_rate = 1.4
+    growing_force = 5
+}
+
+set hand nucleator
+{
+    binding = 0, 0.050
+    unbinding = 0, 5
+    activity = nucleate
+    nucleate = 1.0, microtubule, ( length=0.064; direction=X; end_state = grow, white; )
+    display = ( color=blue; size=8; width=1; )
+}
+
+set single corona
+{
+    hand = nucleator
+    stiffness = 100
+    diffusion = 10
+}
+
+set solid chromosome
+{
+    display = ( style=5; )
+}
+
+new 5 chromosome
+{
+    sphere1 = +0.2 0 0, 0.100, (8 corona sphere 1 0 if (X > +0.5))
+    sphere2 = -0.2 0 0, 0.100, (8 corona sphere 1 0 if (X < -0.5))
+    position = sphere 2
+}
+
+run 100000 system
+{
+    nb_frames = 100
+}
