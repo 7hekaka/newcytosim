@@ -154,6 +154,11 @@ private:
             ++ptr; // ')'
             return res;
         }
+        if ( c == '+' )
+        {
+            ++ptr;
+            return factor_();
+        }
         if ( c == '-' )
         {
             ++ptr;
