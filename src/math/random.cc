@@ -451,7 +451,7 @@ real * makeExponentials(real dst[], size_t cnt, const uint32_t src[])
 void Random::refill_exponentials()
 {
 #if ( RANDOM_USES_SIMD ) && defined(__ARM_NEON__)
-    real * ptr = makeExponentials_NEON(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
+    real * ptr = makeExponentials_SIMD(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #else
     real * ptr = makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #endif

@@ -247,8 +247,8 @@ int main(int argc, char* argv[])
 #endif
     
     run<makeExponentials_>(sfmt, "Exponential", cnt);
-#if defined(__ARM_NEON__)
-    run<makeExponentials_NEON>(sfmt, "Expon.SIMD", cnt);
+#if USE_SIMD
+    run<makeExponentials_SIMD>(sfmt, "Expon.SIMD", cnt);
 #endif
 }
 

@@ -74,7 +74,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
 #include "simd_print.h"
 
 /// compute approximate exponential derivates
-static real* makeExponentials_NEON(real dst[], size_t cnt, const uint32_t* arg)
+static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
 {
     const uint32_t * src = arg;
     const uint32_t * end = src + cnt;
@@ -82,9 +82,15 @@ static real* makeExponentials_NEON(real dst[], size_t cnt, const uint32_t* arg)
     //vec4f inf = setzero4f();
     while ( src < end )
     {
+#ifdef __ARM_NEON__
         vec4f z = load4uf(src);
         // the multiplication by TWO_POWER_MINUS_32 is handled below:
         vec4f x = minuslog_approx4f32(z);
+#else
+        vec4f z = abs4f(cvt4if(load4i((int32_t*)src)));
+        const vec4f off = set4f(21.487562597358305f); // log(2^31)
+        vec4f x = sub4f(off, logapprox4f(z));
+#endif
         //inf = min4f(inf, x);
         src += 4;
 #if REAL_IS_DOUBLE
