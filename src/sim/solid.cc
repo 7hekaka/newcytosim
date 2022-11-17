@@ -252,6 +252,53 @@ void Solid::makePoint(ObjectList& res, Glossary& opt, std::string const& var, Si
 }
 
 
+/*
+ add Wrists anchored on the local coordinate system of a sphere at index 'ref':
+ using unit vectors here since the Triad is build already with a scale 'rad'
+ */
+void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref)
+{
+    for ( size_t i = 0; i < num; ++i )
+    {
+        Wrist * w = sip->newWrist(this, 0);
+        w->rebase(this, ref, Vector::randU());
+        res.push_back(w);
+    }
+}
+
+
+/*
+ add Wrists anchored on the local coordinate system of a sphere at index 'ref':
+ using unit vectors here since the Triad is build already with a scale 'rad'
+ */
+void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref, Vector const& pos, real dev)
+{
+    for ( size_t i = 0; i < num; ++i )
+    {
+        Vector vec = normalize(pos+pos.randOrthoB(dev));
+        Wrist * w = sip->newWrist(this, 0);
+        w->rebase(this, ref, vec);
+        res.push_back(w);
+    }
+}
+
+
+/*
+ add Wrists anchored on the local coordinate system of a sphere at index 'ref':
+ using unit vectors here since the Triad is build already with a scale 'rad'
+ */
+void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref, std::string const& str)
+{
+    for ( size_t i = 0; i < num; ++i )
+    {
+        Vector vec = Movable::readPosition(str);
+        Wrist * w = sip->newWrist(this, 0);
+        w->rebase(this, ref, vec);
+        res.push_back(w);
+    }
+}
+
+
 void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
@@ -298,7 +345,6 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
         real dev = 0.0;
         if ( opt.set(dev, "deviation") && dev > rad )
             throw InvalidParameter("solid:deviation should be <= radius");
-        
         inx = 2;
         while ( opt.set(str, var, inx++) )
         {
@@ -306,17 +352,7 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
             size_t num = 1;
             Tokenizer::split_integer(num, str);
             SingleProp * sip = sim.findProperty<SingleProp>("single", str);
-            
-            //add Wrists anchored on the local coordinate system:
-            Vector pos = pts[inx-3];
-            for ( size_t i = 0; i < num; ++i )
-            {
-                // we use unit vectors here since the Triad is build with 'rad'
-                Vector vec = normalize(pos+pos.randOrthoB(dev/rad));
-                Wrist * w = sip->newWrist(this, 0);
-                w->rebase(this, ref, vec);
-                res.push_back(w);
-            }
+            addWrists(res, num, sip, ref, pts[inx-3], dev/rad);
         }
     }
     else
@@ -326,42 +362,32 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
         inx = 2;
         while ( opt.set(str, var, inx++) )
         {
-            size_t num = 1;
-            std::string nam;
             Tokenizer::strip_block(str);
             std::stringstream iss(str);
-            // get a number and the name of a class:
-            iss >> num >> nam;
+            size_t num = 1;
+            std::string nam;
+            iss >> num >> nam; // get a number and the name of a class
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+var+"'");
             SingleProp * sip = sim.findProperty<SingleProp>("single", nam);
-            getline(iss, str);
-            /* add Wrists anchored on the local coordinate system:
-             need to use unit vectors here since the Triad is build with 'rad' */
-            for ( size_t i = 0; i < num; ++i )
+            if ( iss.good() )
             {
-                Vector vec;
-                if ( str.size() )
-                {
-                    try {
-                        vec = Movable::readPosition(str);
-                    } catch( Exception& e ) {
-                        print_magenta(std::cerr, e.brief());
-                        std::cerr << e.info() << '\n';
-                    }
+                getline(iss, str);
+                try {
+                    addWrists(res, num, sip, ref, str);
+                } catch( Exception& e ) {
+                    print_magenta(std::cerr, e.brief());
+                    std::cerr << e.info() << '\n';
                 }
-                else
-                    vec = Vector::randU();
-                Wrist * w = sip->newWrist(this, 0);
-                w->rebase(this, ref, vec);
-                res.push_back(w);
             }
+            else
+                addWrists(res, num, sip, ref);
         }
     }
 }
 
 
-void Solid::makeWrist(ObjectList& res, Glossary& opt, std::string const& var, Simul& sim)
+Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
     size_t a = 0, b = 0;
@@ -386,7 +412,7 @@ void Solid::makeWrist(ObjectList& res, Glossary& opt, std::string const& var, Si
     // add a Wrist anchored between 'a' and 'b':
     Wrist * w = sip->newWrist(this, 0);
     w->rebase(this, a, b, c);
-    res.push_back(w);
+    return w;
 }
 
 /**
@@ -516,7 +542,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     var = "anchor1";
     while ( opt.has_key(var) )
     {
-        makeWrist(res, opt, var, sim);
+        res.push_back(makeWrist(opt, var, sim));
         var = "anchor" + std::to_string(++inp);
     }
     

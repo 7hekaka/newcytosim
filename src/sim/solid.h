@@ -84,13 +84,22 @@ private:
     void reset();
     
     /// part of build()
+    Wrist* makeWrist(Glossary&, std::string const&, Simul&);
+
+    /// part of build()
     void makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
     void makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    void makeWrist(ObjectList&, Glossary&, std::string const&, Simul&);
+    void addWrists(ObjectList&, size_t num, SingleProp*, size_t ref);
+    
+    /// part of build()
+    void addWrists(ObjectList&, size_t num, SingleProp*, size_t ref, Vector const&, real);
+
+    /// part of build()
+    void addWrists(ObjectList&, size_t num, SingleProp*, size_t ref, std::string const&);
 
 public:
     
