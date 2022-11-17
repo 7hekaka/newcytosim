@@ -26,7 +26,8 @@ Vector1 Vector1::randB()       { return Vector1(  RNG.sreal()); }
 Vector1 Vector1::randB(real n) { return Vector1(n*RNG.sreal()); }
 Vector1 Vector1::randG(real n) { return Vector1(n*RNG.gauss()); }
 
-Vector1 Vector1::randOrthoU(real len) const { return Vector1(0.0); }
+Vector1 Vector1::randOrthoU(real) const { return Vector1(0.0); }
+Vector1 Vector1::randOrthoB(real) const { return Vector1(0.0); }
 
 
 //------------------------------------------------------------------------------

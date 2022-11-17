@@ -579,8 +579,11 @@ public:
     void addRand(real s);
     
     
-    /// a vector orthogonal to *this, with `norm == n`, chosen randomly and uniformly
-    Vector1 randOrthoU(real n) const;
+    /// return null vector
+    Vector1 randOrthoU(real) const;
+    
+    /// return null vector
+    Vector1 randOrthoB(real) const;
 
     /// Vector with random independent coordinates in [0,+1]
     static Vector1 randP();
