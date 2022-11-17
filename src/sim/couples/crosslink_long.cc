@@ -24,14 +24,14 @@ CrosslinkLong::~CrosslinkLong()
 void CrosslinkLong::stepAA()
 {
     Vector f = CrosslinkLong::force();
-    real fn = f.norm();
+    real mag = f.norm();
     
-    if ( cHand1->checkKramersDetachment(fn) )
+    if ( cHand1->checkKramersDetachment(mag) )
         cHand1->detach();
     else
         cHand1->stepLoaded( f);
     
-    if ( cHand2->checkKramersDetachment(fn) )
+    if ( cHand2->checkKramersDetachment(mag) )
         cHand2->detach();
     else
         cHand2->stepLoaded(-f);
