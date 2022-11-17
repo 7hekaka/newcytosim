@@ -34,8 +34,8 @@ public:
     enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3,
         ICOSAHEDRONX=4, HEMISPHERE=5, CYLINDER=6, DICE=7, DROPLET=8 };
     
-    /// One of the vertex of the template model
-    struct Corner
+    /// One of the vertex of the unrefined template model
+    struct Apex
     {
         /// Coordinates in space
         FLOAT pos_[3];
@@ -43,14 +43,14 @@ public:
         /// an index to identify this vertex
         unsigned inx_;
         
-        Corner()
+        Apex()
         { inx_=0; pos_[0]=0; pos_[1]=0; pos_[2]=0; }
         
         void init(unsigned n, FLOAT x, FLOAT y, FLOAT z)
         { inx_=n; pos_[0]=x; pos_[1]=y; pos_[2]=z; }
     };
     
-    /// A vertex is interpolated from 3 Corners
+    /// A vertex is interpolated from 3 Apex
     class Vertex
     {
     private:
@@ -61,10 +61,10 @@ public:
         
     public:
         
-        /// pointers to the corners being interpolated
+        /// pointers to the apices being interpolated
         unsigned index_[3];
         
-        /// Weights of the interpolation
+        /// Coefficients of the interpolation, before normalization
         unsigned weight_[3];
         
         /// check if weights are equal
@@ -72,14 +72,10 @@ public:
         
         ///
         Vertex() { index_[0]=-1; index_[1]=-1; index_[2]=-1; }
-        
-        //Vertex(Corner *, unsigned, Corner *, unsigned, Corner *, unsigned) { set(); }
-        
+                
         void set(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
         
         unsigned weight(int x) const { return weight_[x]; }
-        
-        unsigned sum_weights() const { return weight_[0]+weight_[1]+weight_[2]; }
         
         void print(unsigned, FILE*) const;
     };
@@ -93,7 +89,7 @@ private:
     float * vex_;
     
     /// Array of primary vertices of the geometry
-    Corner * corners_;
+    Apex * apices_;
     
     /// Array of derived vertices
     Vertex * vertices_;
@@ -105,7 +101,7 @@ private:
     INDEX * faces_;
     
     /// number of primary vertices
-    unsigned num_corners_;
+    unsigned num_apices_;
     
     unsigned num_vertices_, max_vertices_;
     
@@ -126,7 +122,7 @@ private:
     unsigned addVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
     unsigned makeVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
     
-    void setCorners(FLOAT vex[][3], unsigned div);
+    void setApices(FLOAT vex[][3], unsigned div);
     void refineTriangles(unsigned, unsigned fac[][3], unsigned div);
     
     void addFace(unsigned, unsigned, unsigned);
@@ -165,7 +161,9 @@ public:
     /// set array of indices that define the edges
     void setEdges();
     /// calculate coordinates of vertices used in vertex_data()
-    void setVertices();
+    void sortVertices();
+    /// calculate coordinates of vertices used in vertex_data()
+    void setVertexCoordinates();
 
     /// reference to derived vertex `ii`
     Vertex& vertex(int i) const { return vertices_[i]; }

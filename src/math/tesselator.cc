@@ -6,7 +6,6 @@
 #include <cmath>
 
 
-// return 'a < b'
 bool Tesselator::Vertex::smaller(unsigned a, unsigned b)
 {
     if ( weight_[a] < weight_[b] )
@@ -63,7 +62,7 @@ bool Tesselator::Vertex::equivalent(unsigned A, unsigned wA, unsigned B, unsigne
         wA = wB;
         wB = wT;
     }
-    unsigned S = sum_weights();
+    unsigned S = weight_[0] + weight_[1] + weight_[2];
     unsigned T = wA + wB;
     return (   T*weight_[0]==S*wA && ( weight_[0]==0 || index_[0]==A )
             && T*weight_[1]==S*wB && ( weight_[1]==0 || index_[1]==B ));
@@ -97,8 +96,8 @@ void Tesselator::Vertex::print(unsigned inx, FILE* f) const
 
 Tesselator::Tesselator()
 {
-    corners_     = nullptr;
-    num_corners_ = 0;
+    apices_     = nullptr;
+    num_apices_ = 0;
     
     vertices_     = nullptr;
     max_vertices_ = 0;
@@ -126,7 +125,7 @@ Tesselator::Tesselator()
 void Tesselator::setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned N)
 {
     kind_ = K;
-    num_corners_ = V;
+    num_apices_ = V;
     max_vertices_ = V + E * (N-1) + F * ((N-1)*(N-2))/2;
     max_edges_ = E * N + F * 3 * ((N-1)*N)/2;
     max_faces_ = F * N * N;
@@ -135,10 +134,10 @@ void Tesselator::setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned
 
 void Tesselator::allocate()
 {
-    assert_true(corners_ == nullptr);
+    assert_true(apices_ == nullptr);
     assert_true(vertices_ == nullptr);
     assert_true(faces_ == nullptr);
-    corners_ = new Corner[num_corners_];
+    apices_ = new Apex[num_apices_];
     vertices_ = new Vertex[max_vertices_];
     faces_ = new INDEX[3*max_faces_];
 }
@@ -146,20 +145,20 @@ void Tesselator::allocate()
 
 void Tesselator::destroy()
 {
-    delete[] corners_;
+    delete[] apices_;
     delete[] vertices_;
     delete(edges_);
     delete(faces_);
     delete(vex_);
     vertices_ = nullptr;
-    corners_ = nullptr;
+    apices_ = nullptr;
     faces_ = nullptr;
     edges_ = nullptr;
     vex_ = nullptr;
 }
 
 
-void Tesselator::setVertices()
+void Tesselator::setVertexCoordinates()
 {
     assert_true( num_vertices_ <= max_vertices_ );
     assert_true( num_faces_ <= max_faces_ );
@@ -193,6 +192,62 @@ static void dropletify_(size_t num, FLOAT* ptr, float Z)
         ptr[3*n+1] *= W;
     }
 }
+
+struct VertexIZ
+{
+    unsigned vex;
+    float val;
+};
+
+
+/// qsort function comparing the Z component of two points
+static int compareVertexZ(const void * a, const void * b)
+{
+    float az = ((VertexIZ const*)(a))->val;
+    float bz = ((VertexIZ const*)(b))->val;
+    return ( az > bz ) - ( bz > az );
+}
+
+
+/** Sort vertices in Z order and reassign the face indices */
+void Tesselator::sortVertices()
+{
+    VertexIZ * map = new VertexIZ[num_vertices_];
+    unsigned * per = new unsigned[num_vertices_];
+
+    for ( unsigned i = 0; i < num_vertices_; ++i )
+    {
+        Vertex const& vex = vertices_[i];
+        FLOAT S = 1.0 / ( vex.weight_[0] + vex.weight_[1] + vex.weight_[2] );
+        FLOAT a = vex.weight_[0] * S;
+        FLOAT b = vex.weight_[1] * S;
+        FLOAT c = vex.weight_[2] * S;
+        FLOAT* pA = apices_[vex.index_[0]].pos_;
+        FLOAT* pB = apices_[vex.index_[1]].pos_;
+        FLOAT* pC = apices_[vex.index_[2]].pos_;
+        FLOAT Z = a * pA[2] + b * pB[2] + c * pC[2];
+        map[i] = { i, Z };
+    }
+
+    qsort(map, num_vertices_, sizeof(VertexIZ), &compareVertexZ);
+    
+    // copy vertices according to the new order
+    Vertex * ver = new Vertex[max_vertices_];
+    for ( unsigned i = 0; i < num_vertices_; ++i )
+    {
+        ver[i] = vertices_[map[i].vex];
+        per[map[i].vex] = i;
+    }
+    delete[] vertices_;
+    vertices_ = ver;
+    
+    // update vertex indices in faces:
+    for ( unsigned i = 0; i < 3*num_faces_; ++i )
+        faces_[i] = per[faces_[i]];
+    delete[] map;
+    delete[] per;
+}
+
 
 
 void Tesselator::dropletify(float* ptr, float Z)
@@ -258,6 +313,7 @@ unsigned Tesselator::getEdgeVertex(unsigned A, unsigned wA, unsigned B, unsigned
  */
 unsigned Tesselator::makeVertex(unsigned A, unsigned wA, unsigned B, unsigned wB, unsigned C, unsigned wC)
 {
+    //printf("vertex %p %u\n", this, wA+wB+wC);
     assert_true( wA > 0 && wB > 0 && wC >= 0 );
     if ( wC == 0 )
         return getEdgeVertex(A, wA, B, wB);
@@ -380,15 +436,15 @@ void Tesselator::cutQuad(unsigned* line, unsigned quad[4], unsigned div)
  }
  */
 
-void Tesselator::setCorners(FLOAT vex[][3], unsigned div)
+void Tesselator::setApices(FLOAT vex[][3], unsigned div)
 {
-    for ( unsigned c = 0; c < num_corners_; ++c )
+    for ( unsigned c = 0; c < num_apices_; ++c )
     {
-        corners_[c].init(c, vex[c][0], vex[c][1], vex[c][2]);
+        apices_[c].init(c, vex[c][0], vex[c][1], vex[c][2]);
         // also create the corresponding 'derived' vertex:
         addVertex(c, div, 0, 0, 0, 0);
     }
-    num_edge_vertices_ = num_corners_;
+    num_edge_vertices_ = num_apices_;
 }
 
 
@@ -459,9 +515,9 @@ void Tesselator::buildTetrahedron(unsigned div, int make)
     };
     
     allocate();
-    setCorners(vex, div);
+    setApices(vex, div);
     refineTriangles(4, fac, div);
-    if ( make & 2 ) setVertices();
+    if ( make & 2 ) setVertexCoordinates();
     if ( make & 4 ) setEdges();
 }
 
@@ -493,9 +549,9 @@ void Tesselator::buildOctahedron(unsigned div, int make)
     };
     
     allocate();
-    setCorners(vex, div);
+    setApices(vex, div);
     refineTriangles(8, fac, div);
-    if ( make & 2 ) setVertices();
+    if ( make & 2 ) setVertexCoordinates();
     if ( make & 4 ) setEdges();
 }
 
@@ -549,9 +605,9 @@ void Tesselator::buildIcosahedronX(unsigned div, int make)
     };
     
     allocate();
-    setCorners(vex, div);
+    setApices(vex, div);
     refineTriangles(20, fac, div);
-    if ( make & 2 ) setVertices();
+    if ( make & 2 ) setVertexCoordinates();
     if ( make & 4 ) setEdges();
 }
 
@@ -607,9 +663,9 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
     };
     
     allocate();
-    setCorners(vex, div);
+    setApices(vex, div);
     refineTriangles(20, fac, div);
-    if ( make & 2 ) setVertices();
+    if ( make & 2 ) setVertexCoordinates();
     if ( make & 4 ) setEdges();
 }
 
@@ -693,9 +749,10 @@ void Tesselator::buildCylinder(unsigned div, int make)
     }
 
     allocate();
-    setCorners(vex, div);
+    setApices(vex, div);
     refineTriangles(f, fac, div);
-    if ( make & 2 ) setVertices();
+    sortVertices();
+    if ( make & 2 ) setVertexCoordinates();
     if ( make & 4 ) setEdges();
 }
 
@@ -823,9 +880,9 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     */
     // we can skip 5 triangles which are entirely in Z > 0
     allocate();
-    setCorners(vex, div);
+    setApices(vex, div);
     refineTriangles(f, fac, div);
-    if ( make & 2 ) setVertices();
+    if ( make & 2 ) setVertexCoordinates();
     if ( make & 4 ) setEdges();
 }
 
@@ -878,7 +935,7 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
     };
     
     allocate();
-    setCorners(vex, div);
+    setApices(vex, div);
     for ( unsigned q = 0; q < 18; ++q )
     {
         unsigned a = quad[q][0];
@@ -911,7 +968,7 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
         cutQuad(line, quad[n], vid);
     
     delete[] line;
-    if ( make & 2 ) setVertices();
+    if ( make & 2 ) setVertexCoordinates();
     if ( make & 4 ) setEdges();
 }
 
@@ -977,48 +1034,33 @@ static void projectDice(REAL* X, const REAL len[4])
 
 void Tesselator::interpolate(Vertex const& vex, double ptr[3]) const
 {
-    double X = 0, Y = 0, Z = 0, S = 0;
-    for ( int i = 0; i < 3; ++i )
-    {
-        FLOAT W = (FLOAT)vex.weight_[i];
-        if ( W )
-        {
-            Corner const& v = corners_[vex.index_[i]];
-            X += W * v.pos_[0];
-            Y += W * v.pos_[1];
-            Z += W * v.pos_[2];
-            S += W;
-        }
-    }
-    assert_true( S > 0 );
-    scale_(X, Y, Z, 1.0/S);
-    ptr[0] = X;
-    ptr[1] = Y;
-    ptr[2] = Z;
+    double S = 1.0 / ( vex.weight_[0] + vex.weight_[1] + vex.weight_[2] );
+    double a = (double)vex.weight_[0] * S;
+    double b = (double)vex.weight_[1] * S;
+    double c = (double)vex.weight_[2] * S;
+    auto pA = apices_[vex.index_[0]].pos_;
+    auto pB = apices_[vex.index_[1]].pos_;
+    auto pC = apices_[vex.index_[2]].pos_;
+    ptr[0] = a * pA[0] + b * pB[0] + c * pC[0];
+    ptr[1] = a * pA[1] + b * pB[1] + c * pC[1];
+    ptr[2] = a * pA[2] + b * pB[2] + c * pC[2];
 }
 
 
 void Tesselator::interpolate(Vertex const& vex, float ptr[3]) const
 {
-    float X = 0, Y = 0, Z = 0, S = 0;
-    for ( int i = 0; i < 3; ++i )
-    {
-        float W = (float)vex.weight_[i];
-        if ( W )
-        {
-            Corner const& v = corners_[vex.index_[i]];
-            X += W * v.pos_[0];
-            Y += W * v.pos_[1];
-            Z += W * v.pos_[2];
-            S += W;
-        }
-    }
-    assert_true( S > 0 );
-    scale_(X, Y, Z, 1.f/S);
-    ptr[0] = X;
-    ptr[1] = Y;
-    ptr[2] = Z;
+    float S = 1.0 / ( vex.weight_[0] + vex.weight_[1] + vex.weight_[2] );
+    float a = (float)vex.weight_[0] * S;
+    float b = (float)vex.weight_[1] * S;
+    float c = (float)vex.weight_[2] * S;
+    auto pA = apices_[vex.index_[0]].pos_;
+    auto pB = apices_[vex.index_[1]].pos_;
+    auto pC = apices_[vex.index_[2]].pos_;
+    ptr[0] = a * pA[0] + b * pB[0] + c * pC[0];
+    ptr[1] = a * pA[1] + b * pB[1] + c * pC[1];
+    ptr[2] = a * pA[2] + b * pB[2] + c * pC[2];
 }
+
 
 void Tesselator::store_vertices(float * vec) const
 {
