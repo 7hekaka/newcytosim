@@ -35,6 +35,9 @@ set hand nucleator
 {
     binding = 0, 0.050
     unbinding = 0, 5
+    track_end = plus_end
+    hold_shrinking_end = 0
+    adictive = 1
     activity = nucleate
     nucleate = 1.0, microtubule, ( length=0.064; direction=X; end_state = grow, white; )
     display = ( color=blue; size=8; width=1; )
@@ -54,8 +57,9 @@ set solid chromosome
 
 new 5 chromosome
 {
-    sphere1 = +0.2 0 0, 0.100, (8 corona sphere 1 0 if (X > +0.5))
-    sphere2 = -0.2 0 0, 0.100, (8 corona sphere 1 0 if (X < -0.5))
+    sphere1 = +0.2 0 0, 0.100, (8 corona sphere 1 0 if (X > +0.6))
+    sphere2 =  0.0 0 0, 0.200
+    sphere3 = -0.2 0 0, 0.100, (8 corona sphere 1 0 if (X < -0.6))
     position = sphere 2
 }
 
