@@ -535,7 +535,7 @@ void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     opt.set(tif, "fibers", 1);
     opt.set(fos, "fibers", 2);
     opt.set(dis, "radius", 1);
-    opt.set(sep, "seed_diameter");
+    opt.set(sep, "separation", "seed_diameter");
     dis /= asRadius;
     size_t ouf = 0, max_trials = 1024;
     size_t cnt = 0;
