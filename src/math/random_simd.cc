@@ -88,7 +88,8 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
         vec4f x = minuslog_approx4f32(z);
 #else
         vec4f z = abs4f(cvt4if(load4i((int32_t*)src)));
-        const vec4f off = set4f(21.487562597358305f); // log(2^31)
+        // off = log(2^31), increased a bit to ensure x >= 0
+        const vec4f off = set4f(21.48757171630859375f);
         vec4f x = sub4f(off, logapprox4f(z));
 #endif
         //inf = min4f(inf, x);
