@@ -71,23 +71,21 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
     return dst;
 }
 
-
+#include "simd_print.h"
 
 /// compute approximate exponential derivates
-static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
+static real* makeExponentials_NEON(real dst[], size_t cnt, const uint32_t* arg)
 {
-    const int32_t * src = (int32_t*)arg;
-    const int32_t * end = src + cnt;
-
-    const vec4f off = set4f(21.487562597358305f); // log(2^31)
+    const uint32_t * src = arg;
+    const uint32_t * end = src + cnt;
     
+    //vec4f inf = setzero4f();
     while ( src < end )
     {
-        // dst = -log( float(src) * TWO_POWER_MINUS_31 );
-        vec4f z = abs4f(cvt4if(load4i(src)));
-        // there is small chance that 'z==0' and in this case log(z) == -inf
-        // however, the logapprox4f(z) will return 0, so we are safe
-        vec4f x = sub4f(off, logapprox4f(z));
+        vec4f z = load4uf(src);
+        // the multiplication by TWO_POWER_MINUS_32 is handled below:
+        vec4f x = minuslog_approx4f32(z);
+        //inf = min4f(inf, x);
         src += 4;
 #if REAL_IS_DOUBLE
         // convert 4 single-precision values
@@ -99,6 +97,8 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
 #endif
         dst += 4;
     }
+    //if ( inf[0] || inf[1] || inf[2] || inf[3] )
+    //    printf("inf ( %12.4e %12.4e %12.4e %12.4e )\n", inf[3], inf[2], inf[1], inf[0]);
     return dst;
 }
 

@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
     printf("sfmt.refill  %5.2f\n", tock(cnt>>10));
     //print(vec, end);
     
-    //run<makeGaussians_std>(sfmt, "Gauss.STD", cnt);
+    run<makeGaussians_std>(sfmt, "Gauss.STD", cnt);
     run<makeGaussians_>(sfmt, "Gauss", cnt);
 #if USE_SIMD
     run<makeGaussians_SIMD>(sfmt, "Gauss.SIMD", cnt);
@@ -247,15 +247,8 @@ int main(int argc, char* argv[])
 #endif
     
     run<makeExponentials_>(sfmt, "Exponential", cnt);
-#if USE_SIMD
-    run<makeExponentials_SIMD>(sfmt, "Expon.SIMD", cnt);
-#endif
-#if defined(__AVX__) && 0
-    printf("Approximate logarithm:\n");
-    real * vec = new_real(SFMT_N32);
-    check_log(vec, SFMT_N256, (uint32_t*)sfmt.state);
-    print_gaussian(std::min(SFMT_N256, 32), vec);
-    free_real(vec);
+#if defined(__ARM_NEON__)
+    run<makeExponentials_NEON>(sfmt, "Expon.SIMD", cnt);
 #endif
 }
 

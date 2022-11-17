@@ -31,11 +31,13 @@ inline vec4f logapprox4f(vec4f x)
     const vec4f c = set4f(+1.130626167f);
     const vec4f d = set4f(-0.288739945f);
     const vec4f e = set4f(+3.110401639e-2f);
+    /* -89.970756366f = -127 * log(2) + constant term of polynomial approx.
+    deducted cst_term = -1.941064434886946f */
     const vec4f f = set4f(-89.970756366f);
-    const vec4f g = set4f(0.6931471805f);
+    const vec4f g = set4f(0.6931471805f); // log(2)
     // used to clear invalid results:
     //vec4f invalid = notpositive4f(x);
-    vec4f valid = positive4f(x);
+    vec4f valid = positive4f(x); // > 0
     // extract exponent:
     vec4f cst = cvt4if(shiftbitsR4(x, 23));
     cst = fmadd4f(cst, g, f);
@@ -53,6 +55,37 @@ inline vec4f logapprox4f(vec4f x)
     // return blendv4f(tmp, set4f(-INFINITY), invalid);
     //return zero for zero or not-a-number arguments:
     return and4f(tmp, valid);
+}
+
+
+/// calculates `-log( x * 2^(-32) )` for 4 POSITIVE floats
+inline vec4f minuslog_approx4f32(vec4f x)
+{
+    // masks:
+    const vec4f mant = set4fi(0x007FFFFF);
+    const vec4f expo = set4fi(0x3F800000);
+    // polynomial coefficients
+    const vec4f a = set4f(-3.529304993f);
+    const vec4f b = set4f(+2.461222105f);
+    const vec4f c = set4f(-1.130626167f);
+    const vec4f d = set4f(+0.288739945f);
+    const vec4f e = set4f(-3.110401639e-2f);
+    /* 112.15146614391825f = ( 32 + 127 ) * log(2) + 1.941064434886946f */
+    //const vec4f f = set4f(112.15158843994140625f);
+    // we use a slightly larger constant to avoid negative output:
+    const vec4f f = set4f(112.15148162841796875f);
+    const vec4f g = set4f(-0.6931471805f); // log(2)
+    // extract exponent:
+    vec4f cst = cvt4if(shiftbitsR4(x, 23));
+    cst = fmadd4f(cst, g, f);
+    // reset exponents to '127':
+    x = or4f(expo, and4f(mant, x));
+    // evaluate polynom:
+    vec4f tmp = fmadd4f(x, e, d);
+    tmp = fmadd4f(x, tmp, c);
+    tmp = fmadd4f(x, tmp, b);
+    tmp = fmadd4f(x, tmp, a);
+    return fmadd4f(x, tmp, cst);
 }
 
 #endif

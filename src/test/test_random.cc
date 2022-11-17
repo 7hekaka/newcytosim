@@ -125,7 +125,7 @@ void testbits()
 
 
 #define TEST test
-void test_test( const real prob, const size_t MAX )
+void check_test( const real prob, const size_t MAX )
 {
     int cnt = 0, a, b, c;
     for ( size_t jj=0; jj < MAX; ++jj )
@@ -214,7 +214,7 @@ void test_real()
 
 //==============================================================================
 
-void test_uniform(size_t cnt)
+void check_uniform(size_t cnt)
 {
     const double off = 0.5;
     double avg = 0, var = 0;
@@ -239,7 +239,7 @@ void test_uniform(size_t cnt)
 }
 
 
-void test_gauss(size_t CNT)
+void check_gauss(size_t CNT)
 {
     size_t cnt = 0;
     double avg = 0, var = 0;
@@ -267,7 +267,7 @@ void test_gauss(size_t CNT)
 }
 
 
-void test_prob()
+void check_prob()
 {
     size_t avg = 0;
     size_t cnt = 1 << 28;
@@ -278,8 +278,9 @@ void test_prob()
 }
 
 
-void test_exponential(size_t cnt)
+void check_exponential(size_t cnt)
 {
+    double ix = INFINITY, iy = INFINITY, iz = INFINITY, it = INFINITY;
     const double off = 1;
     double avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
@@ -288,9 +289,14 @@ void test_exponential(size_t cnt)
         real y = RNG.exponential() - off;
         real z = RNG.exponential() - off;
         real t = RNG.exponential() - off;
+        ix = std::min(ix, x);
+        iy = std::min(iy, y);
+        iz = std::min(iz, z);
+        it = std::min(it, t);
         avg += x + y + z + t;
         var += x*x + y*y + z*z + t*t;
     }
+    ix = std::min(std::min(ix, iz), std::min(ix, iz));
     cnt *= 4;
     if ( cnt > 0 )
     {
@@ -299,11 +305,11 @@ void test_exponential(size_t cnt)
     }
     if ( cnt > 1 )
         var /= real(cnt-1);
-    printf("EXPONENTIAL  avg = %.12e   var = %.12e\n", avg+off, var);
+    printf("EXPONENTIAL min: %.12e   avg = %.12e   var = %.12e\n", ix+off, avg+off, var);
 }
 
 
-void test_poisson(size_t sup)
+void check_poisson(size_t sup)
 {
     for ( size_t n = 0; n < sup; ++n )
     {
@@ -359,7 +365,7 @@ void speed_test_vector(size_t cnt)
 
 int main(int argc, char* argv[])
 {
-    int mode = 4;
+    int mode = 1;
     RNG.seed();
 
     if ( argc > 1 )
@@ -371,19 +377,19 @@ int main(int argc, char* argv[])
     switch ( mode )
     {
         case 0:
-            test_poisson(1024);
-            test_prob();
+            check_poisson(1024);
+            check_prob();
             break;
             
         case 1:
-            test_exponential(0x1p26);
-            test_uniform(0x1p20);
-            test_gauss(0x1p20);
+            check_exponential(1<<26);
+            //check_uniform(1<<20);
+            //check_gauss(1<<20);
             break;
 
         case 2:
             for ( int kk=0; kk < 11; ++kk )
-                test_test(rate*kk, 5000000);
+                check_test(rate*kk, 5000000);
             break;
             
         case 3:
