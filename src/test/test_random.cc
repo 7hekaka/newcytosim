@@ -305,7 +305,7 @@ void check_exponential(size_t cnt)
     }
     if ( cnt > 1 )
         var /= real(cnt-1);
-    printf("EXPONENTIAL min: %.12e   avg = %.12e   var = %.12e\n", ix+off, avg+off, var);
+    printf("EXPONENTIAL min: %.12e   avg = %10.8f   var = %10.8f\n", ix+off, avg+off, var);
 }
 
 
@@ -383,8 +383,8 @@ int main(int argc, char* argv[])
             
         case 1:
             check_exponential(1<<26);
-            //check_uniform(1<<20);
-            //check_gauss(1<<20);
+            check_uniform(1<<20);
+            check_gauss(1<<20);
             break;
 
         case 2:
