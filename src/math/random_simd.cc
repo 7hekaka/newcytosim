@@ -79,7 +79,6 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
     const uint32_t * src = arg;
     const uint32_t * end = src + cnt;
     
-    //vec4f inf = setzero4f();
     while ( src < end )
     {
 #ifdef __ARM_NEON__
@@ -92,7 +91,6 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
         const vec4f off = set4f(21.48757171630859375f);
         vec4f x = sub4f(off, logapprox4f(z));
 #endif
-        //inf = min4f(inf, x);
         src += 4;
 #if REAL_IS_DOUBLE
         // convert 4 single-precision values
@@ -104,8 +102,6 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
 #endif
         dst += 4;
     }
-    //if ( inf[0] || inf[1] || inf[2] || inf[3] )
-    //    printf("inf ( %12.4e %12.4e %12.4e %12.4e )\n", inf[3], inf[2], inf[1], inf[0]);
     return dst;
 }
 
