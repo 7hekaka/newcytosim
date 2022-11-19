@@ -214,60 +214,7 @@ void test_real()
 
 //==============================================================================
 
-void check_uniform(size_t cnt)
-{
-    const double off = 0.5;
-    double avg = 0, var = 0;
-    for ( size_t i = 0; i < cnt; ++i )
-    {
-        real x = RNG.sreal() - off;
-        real y = RNG.sreal() - off;
-        real z = RNG.sreal() - off;
-        real t = RNG.sreal() - off;
-        avg += x + y + z + t;
-        var += x*x + y*y + z*z + t*t;
-    }
-    cnt *= 4;
-    if ( cnt > 0 )
-    {
-        avg /= cnt;
-        var -= square(avg)*cnt;
-    }
-    if ( cnt > 1 )
-        var /= real(cnt-1);
-    printf("UNIFORM      avg = %.12e   var = %.12e\n", avg+off, var);
-}
-
-
-void check_gauss(size_t CNT)
-{
-    size_t cnt = 0;
-    double avg = 0, var = 0;
-    const size_t n_max = 1<<6;
-    real vec[n_max] = { 0 };
-    for ( size_t i = 0; i < CNT; ++i )
-    {
-        size_t n = RNG.pint32(n_max);
-        RNG.gauss_set(vec, n);
-        cnt += n;
-        for ( size_t u = 0; u < n; ++u )
-        {
-            avg += vec[u];
-            var += vec[u] * vec[u];
-        }
-    }
-    if ( cnt > 0 )
-    {
-        avg /= cnt;
-        var -= square(avg)*cnt;
-    }
-    if ( cnt > 1 )
-        var /= real(cnt-1);
-    printf("GAUSSIAN     avg = %.12e   var = %.12e\n", avg, var);
-}
-
-
-void check_prob()
+void check_flip()
 {
     size_t avg = 0;
     size_t cnt = 1 << 28;
@@ -278,17 +225,17 @@ void check_prob()
 }
 
 
-void check_exponential(size_t cnt)
+template < real (Random::*FUNC)() >
+void check_random(const char str[], size_t cnt, real off)
 {
-    double ix = INFINITY, iy = INFINITY, iz = INFINITY, it = INFINITY;
-    const double off = 1;
-    double avg = 0, var = 0;
+    real ix = INFINITY, iy = INFINITY, iz = INFINITY, it = INFINITY;
+    real avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
-        real x = RNG.exponential() - off;
-        real y = RNG.exponential() - off;
-        real z = RNG.exponential() - off;
-        real t = RNG.exponential() - off;
+        real x = (RNG.*FUNC)() - off;
+        real y = (RNG.*FUNC)() - off;
+        real z = (RNG.*FUNC)() - off;
+        real t = (RNG.*FUNC)() - off;
         ix = std::min(ix, x);
         iy = std::min(iy, y);
         iz = std::min(iz, z);
@@ -305,7 +252,7 @@ void check_exponential(size_t cnt)
     }
     if ( cnt > 1 )
         var /= real(cnt-1);
-    printf("EXPONENTIAL min: %.12e   avg = %10.8f   var = %10.8f\n", ix+off, avg+off, var);
+    printf("%-16s  avg: %12.8f  var: %12.8f  min: %20.12e\n", str, avg+off, var, ix+off);
 }
 
 
@@ -378,13 +325,14 @@ int main(int argc, char* argv[])
     {
         case 0:
             check_poisson(1024);
-            check_prob();
+            check_flip();
             break;
             
         case 1:
-            check_exponential(1<<26);
-            check_uniform(1<<20);
-            check_gauss(1<<20);
+            check_random<&Random::exponential>("EXPONENTIAL", 1<<26, 1.0);
+            check_random<&Random::preal>("UNIFORM [0,1]", 1<<20, 0.5);
+            check_random<&Random::sreal>("UNIFORM [-1,1]", 1<<20, 0.0);
+            check_random<&Random::gauss>("GAUSSIAN", 1<<20, 0.0);
             break;
 
         case 2:
