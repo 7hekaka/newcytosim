@@ -490,9 +490,13 @@ static void changeLatticeStyle(FiberDisp* p, int)
 
 static void changePointSize(FiberDisp* p, int inc)
 {
-    if ( p->speckle_style ) changeSpeckleSize(p, inc);
-    p->point_style = grained(p->point_style, inc);
-    flashText("%s:point_size=%0.2f", p->name_str(), p->point_style);
+    if ( p->speckle_style )
+        changeSpeckleSize(p, inc);
+    else if ( p->point_style )
+    {
+        p->point_size = grained(p->point_size, inc);
+        flashText("%s:point_size=%0.2f", p->name_str(), p->point_size);
+    }
 }
 
 

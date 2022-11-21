@@ -1424,7 +1424,7 @@ namespace gle
         ico[4].buildHemisphere(finesse);
         ico[5].buildHemisphere(f);
         ico[6].buildHemisphere(std::max(1UL, finesse/4));
-        ico[7].buildCylinder(finesse);
+        ico[7].buildCylinder(f);
         
         f = 32; // for setIcoidBuffer
         size_t s = 12;
