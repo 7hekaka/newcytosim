@@ -308,15 +308,13 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
     real rad = 0;
     opt.set(rad, var, 1);
     
-    if ( rad <= 0 )
-        throw InvalidParameter("radius of spherical component of solid must be > 0");
-    
     // get position of center:
     Vector cen = Movable::readPosition(opt.value(var, 0));
     
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, rad);
+    size_t ref = addSphere(cen, abs_real(rad));
     addTriad(rad);
+    rad = abs_real(rad);
     
 #if ( DIM > 1 )
     real sep = 1.0;
@@ -569,8 +567,6 @@ size_t Solid::addSphere(Vector const& vec, real rad)
 
 size_t Solid::addTriad(real arm)
 {
-    assert_true(arm > 0);
-    
     if ( nPoints < 1 )
         throw InvalidParameter("cannot add Triad to a Solid with no point");
     
