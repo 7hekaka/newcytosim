@@ -517,7 +517,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         }
     }
 
-    VLOG("+NEW `" << name << "' made " << set->size()-amount << " objects (total " << sim_->nbObjects() << ")");
+    VLOG("+NEW " << cat << " `" << name << "' made " << set->size()-amount << " objects (total " << sim_->nbObjects() << ")");
     return res;
 }
 
@@ -576,7 +576,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt)
         objs.clear();
     }
     
-    VLOG("-NEW " << cnt << "`" << name << "' objects");
+    VLOG("-NEW " << cnt << " `" << name << "'");
     //hold();
     return res;
 }

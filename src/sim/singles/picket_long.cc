@@ -57,9 +57,6 @@ Vector PicketLong::sidePos() const
 }
 
 
-/**
- This calculates the force as stiffness * ( posFoot() - sidePos() )
- */
 Vector PicketLong::force() const
 {
     assert_true( sHand->attached() );

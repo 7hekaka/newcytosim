@@ -210,6 +210,7 @@ void Hand::locate(Fiber* f, real a)
     reinterpolate(f->interpolate(a));
     hMonitor->afterAttachment(this);
     nextDetach = RNG.exponential();
+    assert_true(nextDetach > 0);
 }
 
 

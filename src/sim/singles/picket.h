@@ -38,7 +38,7 @@ public:
     Vector position() const { return sPos; }
 
     /// Picket accepts translation
-    int mobile()   const { return 1; }
+    int mobile() const { return 1; }
     
     /// translate object's position by the given vector
     void translate(Vector const& w)  { sPos += w; }
@@ -49,7 +49,7 @@ public:
     /// stretch of the link = ( posFoot() - posHand() )
     Vector stretch() const;
 
-    /// tension in the link = stiffness * ( posFoot() - posHand() )
+    /// tension in the link = stiffness * stretch()
     Vector force() const;
 
     /// Monte-Carlo step for a free Single

@@ -2048,7 +2048,7 @@ void Simul::reportSpace(std::ostream& out) const
 {
     out << COM << "class" << SEP << "identity";
     
-    for ( Space const* obj=spaces.first(); obj; obj=obj->next() )
+    for ( Space const* obj=spaces.firstID(); obj; obj=spaces.nextID(obj) )
     {
         out << LIN << obj->prop->name();
         out << SEP << obj->identity();

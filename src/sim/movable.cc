@@ -295,7 +295,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             return Vector::randB(R);
         }
         
-        if ( tok == "disc" || tok == "discXY" )
+        if ( tok == "disc" || tok == "discXY" || tok == "discZ"  )
         {
             real R = -1, T = 0;
             is >> R;
@@ -313,7 +313,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             return Vector::randB(R);
         }
         
-        if ( tok == "discXZ"  )
+        if ( tok == "discXZ" || tok == "discY" )
         {
             real R = -1, T = 0;
             is >> R;
@@ -326,7 +326,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             return Vector(V.XX, T*RNG.shalf(), V.YY);
         }
         
-        if ( tok == "discYZ"  )
+        if ( tok == "discYZ" || tok == "discX" )
         {
             real R = -1, T = 0;
             is >> R;
