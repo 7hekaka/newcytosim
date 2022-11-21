@@ -13,6 +13,10 @@ class Meca;
 class SingleProp;
 class Wrist;
 
+
+#define NEW_SOLID_HAS_TWIN 0
+
+
 /// Undeformable set of points
 /**
  This is a Mecable behaving like a undeformable cloud of points.
@@ -76,7 +80,10 @@ private:
 
     /// second moment of the reference shape
     real soVariance;
-    
+#if NEW_SOLID_HAS_TWIN
+    /// pointer to Solid link to this one
+    Solid * soTwin;
+#endif
     /// a counter used in reshape()
     unsigned int soReshapeTimer;
 

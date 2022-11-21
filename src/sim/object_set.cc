@@ -313,13 +313,16 @@ Object* ObjectSet::pickObject(const std::string& cat, std::string spec) const
     // try to split into a word and a number:
     long num = 0;
     if ( Tokenizer::split_polysymbol(spec, num) )
+    {
+        //std::clog << "pickObject(" << spec << " " << num << ")\n";
         return findObject(cat, spec, num);
+    }
     
     // check category name, eg. 'fiber':
     if ( spec == cat )
     {
         ObjectList all = collect();
-        //std::clog << "findObject -> random pick among " << sel.size() << " " << title << "\n";
+        //std::clog << "pickObject(" << sel.size() << " " << title << ")\n";
         if ( all.size() > 0 )
             return all.pick_one();
     }
@@ -329,7 +332,7 @@ Object* ObjectSet::pickObject(const std::string& cat, std::string spec) const
     if ( p )
     {
         ObjectList sel = collect(match_property, p);
-        //std::clog << "findObject -> random pick among " << sel.size() << " " << spec << "\n";
+        //std::clog << "pickObject(" << sel.size() << " " << spec << ")\n";
         if ( sel.size() > 0 )
             return sel.pick_one();
     }

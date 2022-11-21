@@ -43,7 +43,7 @@ public:
          drag = 6 * M_PI * viscosity * radius;
 
      */
-    real         drag;
+    real drag;
     
     /// effective viscosity (if not specified, simul:viscosity is used)
     /**
@@ -51,13 +51,13 @@ public:
      Example: It possible to put the majority of the drag coefficient of an aster at its center, by reducing the effecitve viscosity of the fibers, and conserving (or increasing) the viscosity of the solid which forms its core.
      If unspecified, the global `simul:viscosity` is used.
      */
-    real         viscosity;
+    real viscosity;
     
     /// flag to include steric interactions
-    int          steric;
+    int steric;
     
     /// distance added to radius to set the steric interaction distance
-    real         steric_range;
+    real steric_range;
     
     /// flag to confine the object
     /**

@@ -51,7 +51,14 @@ void Solid::setInteractions(Meca& meca) const
         meca.addPointClamp(Mecapoint(this,0), prop->clamp_pos, prop->clamp_stiff);
     }
 #endif
-    
+#if NEW_SOLID_HAS_TWIN
+    if ( soTwin )
+    {
+        const real stiff = 100;
+        for ( int i = 1; i < 4; ++i )
+            meca.addLink(Mecapoint(this,i), Mecapoint(soTwin, i), stiff);
+    }
+#endif
     if ( prop->confine != CONFINE_OFF )
     {
         Space const* spc = prop->confine_space_ptr;
@@ -138,6 +145,9 @@ void Solid::reset()
     soMomentum = Matrix33(0, 1);
 #endif
     soReshapeTimer = RNG.pint32(7);
+#if NEW_SOLID_HAS_TWIN
+    soTwin = nullptr;
+#endif
 }
 
 
@@ -550,6 +560,13 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     {
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
+    
+#if NEW_SOLID_HAS_TWIN
+    if ( opt.set(str, "sibling") )
+        soTwin = sim.pickSolid(str);
+    else
+        soTwin = nullptr;
+#endif
 }
 
 
