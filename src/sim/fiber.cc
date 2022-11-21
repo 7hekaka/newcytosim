@@ -303,16 +303,21 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
  */
 void Fiber::flipHandsPolarity()
 {
-    real mid = abscissaM() + abscissaP();
+    real C = abscissaM() + abscissaP();
     Hand * ha = fHands.front();
     while ( ha )
     {
         Hand * nx = ha->next();
-        ha->moveTo(mid-ha->abscissa());
+        ha->moveTo(C-ha->abscissa());
         ha = nx;
     }
 }
 
+void Fiber::flipPolarity()
+{
+    flipChainPolarity();
+    flipHandsPolarity();
+}
 
 /**
  A portion of size `len` that includes the MINUS_END is removed.

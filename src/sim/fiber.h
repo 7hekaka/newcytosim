@@ -197,7 +197,9 @@ public:
 
     /// adjust abscissa of Hands by applying mirror image around fiber midpoint
     void flipHandsPolarity();
-    
+    /// flip Vertices and Hands, exchanging Plus and Minus ends
+    void flipPolarity();
+
     /// remove the portion of size `len` that includes the MINUS_END
     void cutM(real len);
     

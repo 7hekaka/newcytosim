@@ -23,29 +23,15 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string const& fiber_type, Glossary& opt)
 {
     ObjectMark mk = 0;
-    Rotation rot(0, 1);
-    
-    Fiber * fib = sim.fibers.newFiber(objs, fiber_type, opt);
-    Hand const* h = hMonitor->otherHand(this);
+    FiberProp * fip = sim.findProperty<FiberProp>("fiber", fiber_type);
 
+    // determine direction of nucleation:
+    Vector dir;
+    Hand const* h = hMonitor->otherHand(this);
     if ( h && h->attached() )
     {
         // nucleating on the side of a 'mother' fiber:
-        Vector dir = h->dirFiber();
-        // select rotation to align with direction of 'mother' fiber:
-        rot = Rotation::randomRotationToVector(dir);
-        const real A = prop()->nucleation_angle;
-        const real L = hMonitor->linkRestingLength();
-#if ( DIM == 2 )
-        // shift position by the length of the interaction:
-        real F = RNG.sflip();
-        pos += rot * Vector(0, L*F, 0);
-        rot = rot * Rotation::rotation(std::cos(A), std::sin(A)*F);
-#elif ( DIM == 3 )
-        // shift position by the length of the interaction:
-        pos += rot * Vector(0, L, 0);
-        rot = rot * Rotation::rotationAroundZ(A);
-#endif
+        dir = h->dirFiber();
         // equalize marks to highlight amplification:
         mk = h->fiber()->mark();
         if ( mk == 0 )
@@ -58,18 +44,40 @@ void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string 
     }
     else
     {
-        // nucleating in the bulk:
         std::string str;
         if ( opt.set(str, "direction") )
         {
+            // nucleating in the bulk:
             std::istringstream ss(str);
-            Vector dir = Movable::readDirection(ss, pos, fib->prop->confine_space_ptr);
-            rot = Rotation::randomRotationToVector(dir);
+            dir = Movable::readDirection(ss, pos, fip->confine_space_ptr);
         }
         else
-            rot = Rotation::randomRotation();
+        {
+            // nucleating from a Mecable:
+            dir = hMonitor->linkDir(this);
+        }
     }
+    // flip if nucleator is at the PLUS_END
+    if ( prop()->hold_end == PLUS_END )
+        dir = -dir;
     
+    Fiber * fib = sim.fibers.newFiber(objs, fip, opt);
+    // select rotation to align with direction of nucleation:
+    Rotation rot = Rotation::randomRotationToVector(dir);
+    
+    const real A = prop()->nucleation_angle;
+    const real L = hMonitor->linkRestingLength();
+#if ( DIM == 2 )
+    // shift position by the length of the interaction:
+    real F = RNG.sflip();
+    pos += rot * Vector(0, L*F, 0);
+    rot = rot * Rotation::rotation(std::cos(A), std::sin(A)*F);
+#elif ( DIM == 3 )
+    // shift position by the length of the interaction:
+    pos += rot * Vector(0, L, 0);
+    rot = rot * Rotation::rotationAroundZ(A);
+#endif
+
     // mark fiber to highlight mode of nucleation:
     opt.set(mk, "mark");
     Simul::mark(objs, mk);
@@ -102,7 +110,8 @@ void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string 
 
 //------------------------------------------------------------------------------
 /**
- Does not attach nearby Fiber, but can nucleate
+ Does not attach nearby Fiber, but can nucleate.
+ the argument `pos` is the position of the other Hand
  */
 void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
 {

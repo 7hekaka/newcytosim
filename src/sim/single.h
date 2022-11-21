@@ -56,6 +56,8 @@ private:
     /// specialization of HandMonitor
     Vector linkBase(Hand const*) const { return posFoot(); }
     /// specialization of HandMonitor
+    Vector linkDir(Hand const*) const { return dirFoot(); }
+    /// specialization of HandMonitor
     real linkRestingLength() const { return prop->length; }
     /// stiffness of the interaction
     real linkStiffness() const { return 0; }
@@ -139,6 +141,9 @@ public:
     /// the position of the anchoring point
     virtual Vector posFoot() const { return sPos; }
     
+    /// the direction at the anchoring point
+    virtual Vector dirFoot() const { return Vector(0,0,0); }
+
     /// position on the side of fiber used for sideInteractions
     virtual Vector sidePos() const { return sHand->pos(); }
     

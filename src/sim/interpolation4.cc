@@ -30,6 +30,12 @@ void Interpolation4::polish()
         throw InvalidParameter("out-of-range Interpolation4");
 }
 
+/// (position of interpolation) - (position of prime point = center of sphere)
+Vector Interpolation4::dir() const
+{
+    real coef[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
+    return mec_->interpolatePoints(prime_, coef, rank_);
+}
 
 /**
 Set a point of index 'P' on Mecable

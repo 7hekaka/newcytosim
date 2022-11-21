@@ -65,10 +65,13 @@ public:
     /// the position of the anchoring point
     Vector posFoot() const { return base_.pos(); }
     
+    /// the position of the anchoring point
+    Vector dirFoot() const { return base_.dir(); }
+
     /// stretch of the link = ( posFoot() - posHand() )
     Vector stretch() const;
 
-    /// force = stiffness * ( posFoot() - posHand() )
+    /// force = stiffness * stretch()
     Vector force() const;
     
     

@@ -693,11 +693,7 @@ void FiberSet::flipFiberPolarity(FiberProp * sel)
     for ( Fiber* fib=first(); fib; fib=fib->next() )
     {
         if ( fib->prop == sel )
-        {
-            fib->flipChainPolarity();
-            // this will put back the Hands in their original position:
-            fib->flipHandsPolarity();
-        }
+            fib->flipPolarity();
     }
 }
 
