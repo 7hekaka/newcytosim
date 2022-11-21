@@ -439,26 +439,29 @@ public:
     /// old code that has been replaced by interTorque()
     void addTorquePoliti(Interpolation const&, Interpolation const&, Vector2 const& ang, real weight);
     
-    /// Add a torque to constrain two segments to an angle defined by ang = (cosine, sine)
+    /// Add a torque to constrain two segments to be aligned
+    void addTorque(Interpolation const&, Interpolation const&, real weight);
+
+    /// Add a torque to constrain two segments to an angle defined by MatrixBlock
     void addTorque(Interpolation const&, Interpolation const&, MatrixBlock const&, real weight);
 
     /// Add a torque to constrain two segments to an angle defined by ang = (cosine, sine)
     void addTorque(Interpolation const&, Interpolation const&, Vector2 const& ang, real weight);
     
     /// Add a 'bending elasticity' torque on 3 points 
-    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, real scale, real weight);
+    void addTorque3(Mecapoint const&, Mecapoint const&, Mecapoint const&, real scale, real weight);
+
+    /// Add a torque on 3 points with equilibrium angle defined by MatrixBlock
+    void addTorque3(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight);
 
     /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine)
-    void addTorque(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight);
-
-    /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine)
-    void addTorquePlane(Mecapoint const&, Mecapoint const&, Mecapoint const&, Torque const&, Vector2 const& ang, real weight);
+    void addTorque3Plane(Mecapoint const&, Mecapoint const&, Mecapoint const&, Torque const&, Vector2 const& ang, real weight);
 
     /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine), add LongLink on two points
-    void addTorqueLong(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
+    void addTorque3Long(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
     
     /// Add a torque on 4 points to align AB with CD
-    void addTorque(Mecapoint const&, Mecapoint const&, real weight);
+    void addTorque4(Mecapoint const&, Mecapoint const&, real weight);
 
     /// Link of stiffness `weight` from fixed position
     void addPointClamp(Mecapoint const&, Vector, real weight);

@@ -19,6 +19,10 @@ class FiberSegment;
  
      pos = (1-coef) * pt1_ + coef * pt2_
  
+ or equivalently:
+ 
+     pos = pt1_ + coef * ( pt2_ - pt1_ )
+
  This class used to be called 'PointInterpolated' before 12.2017
  */
 class Interpolation final

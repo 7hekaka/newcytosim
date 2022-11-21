@@ -231,8 +231,8 @@ public:
         return Vector::interpolated(pPos+DIM*P, A, pPos+DIM*Q);
     }
     
-    /// interpolate 'rank' points starting from 'ref'
-    Vector interpolatePoints(size_t ref, real const coef[], size_t rank) const;
+    /// interpolate 'rank' points starting from 'ref' with coefficients
+    Vector interpolatePoints(size_t ref, const real coef[], size_t rank) const;
 
     //--------------------------------------------------------------------------
 

@@ -73,12 +73,15 @@ public:
 
     /// interpolation coefficients
     const real* coef() const { return coef_; }
-
-    /// call Meca::addLink to given Interpolation
-    void addLink(Meca&, Interpolation const&, real weight) const;
     
     /// call Meca::addLink to given Mecapoint
     void addLink(Meca&, Mecapoint const&, real weight) const;
+
+    /// call Meca::addLink with given Interpolation and *this
+    void addLink(Meca&, Interpolation const&, real weight) const;
+    
+    /// call Meca::addLink with point offset by `len` from bead surface
+    void addOffsetLink(Meca&, real len, Mecapoint const&, real weight) const;
 
     /// check validity
     int  bad() const;

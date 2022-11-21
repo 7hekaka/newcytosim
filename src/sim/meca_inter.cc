@@ -735,7 +735,7 @@ void Meca::addTorquePoliti(Interpolation const& pt1,
      force_D = - force_C
  
  These force vectors are orthogonal to the segments on which they are applied.
- The equilibrium_angle is the angle specified by the rotation matrix R
+ The equilibrium angle, and the axis of rotation is specified by the rotation matrix R
  The interpolation coefficients of `pt1` and `pt2` are ignored.
 
  3D implicit torque implementation
@@ -959,7 +959,7 @@ MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, Vector2 const& an
 
 
 /**
- Add Torque between 4 points to align AB with CD:
+ Add Torque between 3 points to align AB with BC:
  
  F = k * ( -A + 2*B - C )
  
@@ -969,10 +969,10 @@ MatrixBlock Meca::torqueMatrix(real weight, Torque const& axi, Vector2 const& an
  
  FJN, 11.05.2021
  */
-void Meca::addTorque(Mecapoint const& ptA,
-                     Mecapoint const& ptB,
-                     Mecapoint const& ptC,
-                     const real scale, const real weight)
+void Meca::addTorque3(Mecapoint const& ptA,
+                      Mecapoint const& ptB,
+                      Mecapoint const& ptC,
+                      const real scale, const real weight)
 {
     assert_true( weight >= 0 );
     const MatrixBlock W(0, weight);
@@ -1006,11 +1006,11 @@ void Meca::addTorque(Mecapoint const& ptA,
  This version does not impose any particular distance between the points,
  and just move them to enforce the angle described by ABC
  */
-void Meca::addTorque(Mecapoint const& ptA,
-                     Mecapoint const& ptB,
-                     Mecapoint const& ptC,
-                     const MatrixBlock & R, //already multiplied by -weight
-                     const real weight)
+void Meca::addTorque3(Mecapoint const& ptA,
+                      Mecapoint const& ptB,
+                      Mecapoint const& ptC,
+                      const MatrixBlock & R, //already multiplied by -weight
+                      const real weight)
 {
     assert_true( weight >= 0 );
     const MatrixBlock W(0, -weight);
@@ -1059,10 +1059,10 @@ void Meca::addTorque(Mecapoint const& ptA,
  This version does not impose any particular distance between the points,
  and just move them to enforce the angle described by ABC
  */
-void Meca::addTorquePlane(Mecapoint const& ptA,
-                          Mecapoint const& ptB,
-                          Mecapoint const& ptC,
-                          const Torque & axi, Vector2 const& ang, const real weight)
+void Meca::addTorque3Plane(Mecapoint const& ptA,
+                           Mecapoint const& ptB,
+                           Mecapoint const& ptC,
+                           const Torque & axi, Vector2 const& ang, const real weight)
 {
     assert_true( weight >= 0 );
     assert_small( ang.normSqr() - 1.0 );
@@ -1119,12 +1119,12 @@ void Meca::addTorquePlane(Mecapoint const& ptA,
 /** This is variation 3, 20.08.2019
  It combines addTorque() without length with a LongLink(ptA, ptB);
  */
-void Meca::addTorqueLong(Mecapoint const& ptA,
-                         Mecapoint const& ptB,
-                         Mecapoint const& ptC,
-                         const MatrixBlock & R,
-                         const real weight,
-                         const real len, const real weightL)
+void Meca::addTorque3Long(Mecapoint const& ptA,
+                          Mecapoint const& ptB,
+                          Mecapoint const& ptC,
+                          const MatrixBlock & R,
+                          const real weight,
+                          const real len, const real weightL)
 {
     assert_true( weight >= 0 );
     assert_true( weightL >= 0 );
@@ -1190,9 +1190,7 @@ void Meca::addTorqueLong(Mecapoint const& ptA,
  
  FJN, 11.05.2021
  */
-void Meca::addTorque(Mecapoint const& ptA,
-                     Mecapoint const& ptC,
-                     const real weight)
+void Meca::addTorque4(Mecapoint const& ptA, Mecapoint const& ptC, const real weight)
 {
     assert_true( weight >= 0 );
 
@@ -1600,8 +1598,8 @@ void Meca::addLink1(Interpolation const& pti,
      force_B = weight * ( A - B )
  
  Point A is a Mecapoint (ptA).
- Point B in interpolated over 2 vertices, specified by index in 'pts[]'
- using the coefficients given in `coef[]`.
+ Point B in interpolated over 2 vertices, specified by index 'pts',
+ using the coefficients `cc1`, `cc2`.
  */
 void Meca::addLink2(Mecapoint const& ptA,
                     const size_t pts,
@@ -1663,8 +1661,8 @@ void Meca::addLink2(Mecapoint const& ptA,
      force_B = weight * ( A - B )
  
  Point A is an Interpolation.
- Point B in interpolated over 2 vertices, specified by index in 'pts[]'
- using the coefficients given in `coef[]`.
+ Point B in interpolated over 2 vertices, specified by index 'pts',
+ using the coefficients `cc2`, `cc3`.
  */
 void Meca::addLink2(Interpolation const& pti,
                     const size_t pts, const real cc2, const real cc3,
@@ -1733,8 +1731,8 @@ void Meca::addLink2(Interpolation const& pti,
      force_B = weight * ( A - B )
  
  Point A is a Mecapoint.
- Point B in interpolated over 3 vertices, specified by index in 'pts[]'
- using the coefficients given in `coef[]`.
+ Point B in interpolated over 3 vertices, specified by index in 'pts',
+ using the coefficients `cc1`, `cc2`, `cc3`.
  */
 void Meca::addLink3(Mecapoint const& ptA,
                     const size_t pts,
@@ -1802,8 +1800,8 @@ void Meca::addLink3(Mecapoint const& ptA,
      force_B = weight * ( A - B )
  
  Point A is an Interpolation.
- Point B in interpolated over 4 vertices, specified by index in 'pts[]'
- using the coefficients given in `coef[]`.
+ Point B in interpolated over 4 vertices, specified by index in 'pts',
+ using the coefficients `cc2`, `cc3`, `cc4`.
 */
 void Meca::addLink3(Interpolation const& pti,
                     const size_t pts, const real cc2, const real cc3, const real cc4,
@@ -1882,8 +1880,8 @@ void Meca::addLink3(Interpolation const& pti,
      force_B = weight * ( A - B )
  
  Point A is a Mecapoint.
- Point B in interpolated over 4 vertices, specified by index in 'pts[]'
- using the coefficients given in `coef[]`.
+ Point B in interpolated over 4 vertices, specified by index in 'pts',
+ using the coefficients `cc1`, `cc2`, `cc3`, `cc4`.
  */
 void Meca::addLink4(Mecapoint const& ptA,
                     const size_t pts,
@@ -1960,8 +1958,8 @@ void Meca::addLink4(Mecapoint const& ptA,
      force_B = weight * ( A - B )
  
  Point A is an Interpolation.
- Point B in interpolated over 4 vertices, specified by index in 'pts[]'
- using the coefficients given in `coef[]`.
+ Point B in interpolated over 4 vertices, specified by index in 'pts',
+ using the coefficients `cc1`, `cc2`, `cc3`, `cc4`, `cc5`.
 */
 void Meca::addLink4(Interpolation const& pti,
                     const size_t pts, const real cc2, const real cc3, const real cc4, const real cc5,
@@ -2396,7 +2394,7 @@ void Meca::addLongLink(Interpolation const& ptA,
 
 
 /**
-Link `ptA` (A) and the point described by `coef[]` and `inx[]` (B),
+Link `ptA` (A) and the point described by `inx` and `cc2`, `cc3`, `cc4`, `cc5` (B),
 The force is affine with non-zero resting length:
 
     force_A = weight * ( B - A ) * ( len / |AB| - 1 )

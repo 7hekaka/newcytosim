@@ -71,7 +71,16 @@ void Wrist::stepA()
 
 void Wrist::setInteractions(Meca& meca) const
 {
-    base_.addLink(meca, sHand->interpolation(), prop->stiffness);
+    Interpolation i = sHand->interpolation();
+    base_.addLink(meca, i, prop->stiffness);
+#if 0
+    /*
+     Add a second link to the distal point of the fiber, inducing torque such as
+     to contrain the fiber to be aligned with the direction of the anchor point.
+    */
+    Mecapoint j(i.mecable(), i.point1());
+    base_.addOffsetLink(meca, sHand->fiber()->segmentation(), j, 0.5*prop->stiffness);
+#endif
 }
 
 

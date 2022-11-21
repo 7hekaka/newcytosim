@@ -491,7 +491,6 @@ public:
 
     /// length of polymer made in last timestep, at the MINUS_END (negative for shrinking)
     real freshAssemblyM() const { return cDeltaM; }
-    
     /// length of polymer made in last timestep, at the PLUS_END (negative for shrinking)
     real freshAssemblyP() const { return cDeltaP; }
     

@@ -295,7 +295,7 @@ void Tubule::setInteractions(Meca& meca) const
             // radial spoke:
             meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(bone_,i), beta*cross(dir,leg), stiffR);
             // twist stiffness
-            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffR);
+            meca.addTorque4(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffR);
         }
     }
 
@@ -352,8 +352,8 @@ void Tubule::setInteractionsC(Meca& meca) const
             real alpha = len * fil_[n]->segmentationInv();
             Vector leg = ( 2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(alpha);
             meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(fil_[n+1],i), leg, stiffL);
-            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), Mecapoint(fil_[n+2],i), mat, stiffA);
-            meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffT);
+            meca.addTorque3(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), Mecapoint(fil_[n+2],i), mat, stiffA);
+            meca.addTorque4(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffT);
         }
     }
     
@@ -407,7 +407,7 @@ void Tubule::setInteractionsD(Meca& meca) const
             // orthoradial links with bending stiffness
             //meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), Mecapoint(fil_[n+2],i), 1.0, stiffL);
             // twist stiffness
-            meca.addTorque(Mecapoint(fib,i), Mecapoint(fil_[n+2],i), stiffR);
+            meca.addTorque4(Mecapoint(fib,i), Mecapoint(fil_[n+2],i), stiffR);
         }
 
         // use the same rotation matrix for the last point:

@@ -110,10 +110,10 @@ void Aster::setInteractions(Meca& meca) const
                 FiberEnd end = ( prop->joint == PLUS_END ? MINUS_END : PLUS_END );
                 real c = fib->length() / len;
                 real u = 1.0 - c;
-                real coef[4];
+                real alp[4];
                 for ( int d = 0; d < 4; ++d )
-                    coef[d] = u * link.coef1_[d] + c * link.coef2_[d];
-                meca.ADDLINK(fib->exactEnd(end), off, coef, prop->stiffness[1]);
+                    alp[d] = u * link.coef1_[d] + c * link.coef2_[d];
+                meca.ADDLINK(fib->exactEnd(end), off, alp, prop->stiffness[1]);
             }
         }
     }

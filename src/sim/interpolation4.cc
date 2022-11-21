@@ -18,7 +18,7 @@ void Interpolation4::clear()
 void Interpolation4::polish()
 {
     // ensures that sum of coefficients is 1
-    coef_[0] = 1.0 - coef_[1] - coef_[2] - coef_[3];
+    coef_[0] = ( 1.0 - coef_[1] ) - ( coef_[2] + coef_[3] );
 
     size_t R = 4;
     while ((R > 0) & (abs_real(coef_[R-1]) < REAL_EPSILON))
@@ -33,8 +33,8 @@ void Interpolation4::polish()
 /// (position of interpolation) - (position of prime point = center of sphere)
 Vector Interpolation4::dir() const
 {
-    real coef[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
-    return mec_->interpolatePoints(prime_, coef, rank_);
+    real C[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
+    return mec_->interpolatePoints(prime_, C, rank_);
 }
 
 /**
@@ -94,6 +94,30 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
 }
 
 
+void Interpolation4::addLink(Meca& meca, Mecapoint const& arg, const real weight) const
+{
+    size_t off = mec_->matIndex() + prime_;
+    
+    switch ( rank_ )
+    {
+        case 0:
+            break;
+        case 1:
+            meca.addLink(arg, Mecapoint(mec_, prime_), weight);
+            break;
+        case 2:
+            meca.addLink2(arg, off, coef_[0], coef_[1], weight);
+            break;
+        case 3:
+            meca.addLink3(arg, off, coef_[0], coef_[1], coef_[2], weight);
+            break;
+        case 4:
+            meca.addLink4(arg, off, coef_[0], coef_[1], coef_[2], coef_[3], weight);
+        break;
+    }
+}
+
+
 void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real weight) const
 {
     assert_true(mec_);
@@ -119,25 +143,35 @@ void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real we
 }
 
 
-void Interpolation4::addLink(Meca& meca, Mecapoint const& arg, const real weight) const
+void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& arg, const real weight) const
 {
+    assert_true(mec_);
     size_t off = mec_->matIndex() + prime_;
-    
+    // coefficients to extract ( surface_point - center )
+    real alp[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
+    // extract distance in current configuration:
+    real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
+    // distance for distal point, offset by `len` from the bead surface
+    real alpha = ( rad + len ) / rad;
+    // calculat coefficients to interpolate the offset point:
+    alp[1] *= alpha;
+    alp[2] *= alpha;
+    alp[3] *= alpha;
+    alp[0] = ( 1.0 - alp[1] ) - ( alp[2] + alp[3] );
     switch ( rank_ )
     {
         case 0:
             break;
         case 1:
-            meca.addLink(arg, Mecapoint(mec_, prime_), weight);
             break;
         case 2:
-            meca.addLink2(arg, off, coef_[0], coef_[1], weight);
+            meca.addLink2(arg, off, alp[0], alp[1], weight);
             break;
         case 3:
-            meca.addLink3(arg, off, coef_[0], coef_[1], coef_[2], weight);
+            meca.addLink3(arg, off, alp[0], alp[1], alp[2], weight);
             break;
         case 4:
-            meca.addLink4(arg, off, coef_[0], coef_[1], coef_[2], coef_[3], weight);
+            meca.addLink4(arg, off, alp[0], alp[1], alp[2], alp[3], weight);
         break;
     }
 }
