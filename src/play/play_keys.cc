@@ -638,7 +638,7 @@ static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 }
 
 
-static void shuffleVisible(FiberDisp* p)
+static void shuffleVisible(FiberDisp* p, int)
 {
     if ( p->visible && p->line_style )
     {
@@ -663,12 +663,10 @@ static void shuffleVisible(FiberDisp* p)
 
 static void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
-    if ( plist.empty() )
-        flashText("no relevant fibers");
-    
-    if ( plist.size() == 1 )
+    if ( plist.size() == 1 || val == 0 )
     {
-        shuffleVisible(toFiberDisp(plist.front()));
+        for ( Property * i : plist )
+            shuffleVisible(toFiberDisp(i), 0);
     }
     else
     {
@@ -970,7 +968,7 @@ void processKey(unsigned char key, int modifiers = 0)
         //------------------------------ Fibers --------------------------------
            
         case '`':
-            shuffleFiberDispVisible(player.allFiberDisp(), 1);
+            shuffleFiberDispVisible(player.allFiberDisp(), 0);
             break;
             
         case '~':

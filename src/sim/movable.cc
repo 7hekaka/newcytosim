@@ -544,7 +544,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
         else if ( tok == "if" )
         {
             tok = Tokenizer::get_token(is);
-            Evaluator evaluator{{"X", pos.x()}, {"Y", pos.y()}, {"Z", pos.z()}};
+            Evaluator evaluator{{"X", pos.x()}, {"Y", pos.y()}, {"Z", pos.z()}, {"S", pos.e_sum()}};
             try {
                 if ( 0 == evaluator.eval(tok) )
                     return Vector(nan(""), nan(""), nan(""));
