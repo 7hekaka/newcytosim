@@ -419,7 +419,7 @@ Property* Simul::findProperty(const std::string& cat, const std::string& nom) co
         return &prop;
 
     if ( cat.empty() || nom.empty() )
-        throw InvalidSyntax("unexpected syntax");
+        throw InvalidSyntax("findProperty(void, void)");
 
     return properties.find(cat, nom);
 }
@@ -431,7 +431,7 @@ Property* Simul::findProperty(const std::string& nom) const
         return &prop;
 
     if ( nom.empty() )
-        throw InvalidSyntax("unexpected syntax");
+        throw InvalidSyntax("findProperty(void)");
 
     return properties.find(nom);
 }
@@ -446,7 +446,7 @@ PropertyList Simul::findAllProperties(const std::string& cat) const
         return list;
     }
     if ( cat.empty() )
-        throw InvalidSyntax("unexpected syntax");
+        throw InvalidSyntax("findAllProperty(void)");
 
     return properties.find_all(cat);
 }

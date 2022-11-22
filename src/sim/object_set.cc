@@ -248,6 +248,9 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
         return static_cast<Object*>(inv);
     }
     
+    if ( spec.empty() )
+        return nullptr;
+
     // finally search for a property name:
     Property * pp = simul_.findProperty(cat, spec);
 
