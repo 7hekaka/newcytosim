@@ -509,25 +509,9 @@ Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
 
 ObjectList Solid::build(Glossary& opt, Simul& sim)
 {
-    ObjectList objs;
+    ObjectList objs(this);
     std::string var, str;
     size_t inp, inx, nbp;
-    
-#if NEW_SOLID_HAS_TWIN
-    if ( opt.set(str, "twin") && !soTwin )
-    {
-        Solid * S = sim.pickSolid(str);
-        if ( ! S )
-        {
-            S = new Solid(prop);
-            S->soTwin = this;
-            objs = S->build(opt, sim);
-        }
-        if ( S->nbPoints() <= DIM )
-            throw InvalidParameter("Solid's twin lacks sufficient points");
-    }
-#endif
-    objs.push_back(this);
     
     if ( opt.has_key("point0") || opt.has_key("sphere0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
@@ -580,6 +564,27 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     }
 
     fixShape();
+    
+#if NEW_SOLID_HAS_TWIN
+    if ( opt.set(str, "twin") && !soTwin )
+    {
+        Solid * S = sim.pickSolid(str);
+        if ( ! S )
+        {
+            S = new Solid(prop);
+            S->soTwin = this;
+            ObjectList list = S->build(opt, sim);
+            real R = S->radius(0);
+            objs.append(list);
+            Rotation rot = Rotation::randomRotationToVector(Vector(1,1,1));
+            ObjectSet::rotateObjects(objs, rot.transposed());
+            ObjectSet::translateObjects(list, Vector(R,0,0));
+            ObjectSet::rotateObjects(list, Rotation::rotationAroundX(M_PI));
+        }
+        if ( S->nbPoints() <= DIM )
+            throw InvalidParameter("Solid's twin lacks sufficient points");
+    }
+#endif
     return objs;
 }
 
