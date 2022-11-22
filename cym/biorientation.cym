@@ -72,7 +72,7 @@ set hand plus_nucleator
     unbinding = 0, 5
     track_end = plus_end
     hold_shrinking_end = 0
-    adictive = 1
+    addictive = 1
     activity = nucleate
     nucleate = 1.0, slow_microtubule, ( length=0.064; end_state = grow, white; )
     display = ( color=white; size=3; width=3; )

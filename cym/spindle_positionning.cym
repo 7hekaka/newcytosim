@@ -81,8 +81,8 @@ new star
 
 new spindle
 {
-    aster1 = aster1
-    aster2 = aster2
+    aster1 = star1
+    aster2 = star2
     radius = 0.1
     placement = off
 }
