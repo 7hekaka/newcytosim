@@ -35,7 +35,7 @@ private:
     Nucleator();
     
     /// create a new Fiber
-    void makeFiber(ObjectList&, Simul&, Vector pos, std::string const&, Glossary&);
+    ObjectList makeFiber(Simul&, Vector pos, std::string const&, Glossary&);
 
 public:
     

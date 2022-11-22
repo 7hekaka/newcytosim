@@ -142,7 +142,7 @@ public:
     virtual Vector posFoot() const { return sPos; }
     
     /// the direction at the anchoring point
-    virtual Vector dirFoot() const { return Vector(0,0,0); }
+    virtual Vector dirFoot() const { return Vector::randU(); }
 
     /// position on the side of fiber used for sideInteractions
     virtual Vector sidePos() const { return sHand->pos(); }

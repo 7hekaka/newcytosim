@@ -20,8 +20,9 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 
 //------------------------------------------------------------------------------
 
-void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string const& fiber_type, Glossary& opt)
+ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, std::string const& fiber_type, Glossary& opt)
 {
+    ObjectList objs;
     ObjectMark mk = 0;
     FiberProp * fip = sim.findProperty<FiberProp>("fiber", fiber_type);
 
@@ -100,11 +101,13 @@ void Nucleator::makeFiber(ObjectList& objs, Simul& sim, Vector pos, std::string 
     else
         pos -= fib->position();
     
+    assert_true(pos.valid());
     ObjectSet::translateObjects(objs, pos);
     //std::clog << "nucleated fiber in direction " << fib->dirEndM() << "\n";
 
     opt.print_warnings(std::cerr, 1, "nucleator:spec\n");
     assert_true(fib->valid());
+    return objs;
 }
 
 
@@ -123,9 +126,8 @@ void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
     {
         nextAct = RNG.exponential();
         try {
-            ObjectList objs;
             Glossary opt(prop()->fiber_spec);
-            makeFiber(objs, sim, pos, prop()->fiber_type, opt);
+            ObjectList objs = makeFiber(sim, pos, prop()->fiber_type, opt);
             sim.add(objs);
         }
         catch( Exception & e )

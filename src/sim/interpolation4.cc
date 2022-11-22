@@ -33,6 +33,8 @@ void Interpolation4::polish()
 /// (position of interpolation) - (position of prime point = center of sphere)
 Vector Interpolation4::dir() const
 {
+    if ( rank_ < 2 )
+        return Vector::randU();
     real C[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
     return mec_->interpolatePoints(prime_, C, rank_);
 }
@@ -149,6 +151,7 @@ void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& 
     size_t off = mec_->matIndex() + prime_;
     // coefficients to extract ( surface_point - center )
     real alp[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
+    //printf("offsetLink %9.3f %9.3f %9.3f\n", alp[1], alp[2], alp[3]);
     // extract distance in current configuration:
     real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
     // distance for distal point, offset by `len` from the bead surface
