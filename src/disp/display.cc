@@ -1793,17 +1793,17 @@ void Display::drawSolid(Solid const& obj)
     Solid const* tw = obj.twin();
     if (( disp->style & 2 ) && tw )
     {
-        flute3 * flt = gym::mapBufferV3(8);
+        fluteD * flt = gym::mapBufferVD(8);
         for ( int i = 1; i <= DIM; ++i )
         {
             flt[2*i-2] = obj.posPoint(i);
             flt[2*i-1] = tw->posPoint(i);
         }
-        gym::unmapBufferV3();
+        gym::unmapBufferVD();
         gym::ref_view();
         gym::disableLighting();
         bodyColor(obj);
-        gym::drawLines(disp->widthX, 0, 6);
+        gym::drawLines(disp->widthX, 0, 2*DIM);
         gym::enableLighting();
     }
 #endif
@@ -1841,9 +1841,14 @@ void Display::drawSolid(Solid const& obj)
     if ( disp->style & 8 )
     {
         char tmp[8];
-        snprintf(tmp, sizeof(tmp), "%u", obj.identity());
         gym::color(bodyColorF(obj));
+        snprintf(tmp, sizeof(tmp), "0:%u", obj.identity());
         drawText(obj.posP(0), tmp);
+        for ( size_t i = 1; i < obj.nbPoints(); ++i )
+        {
+            snprintf(tmp, sizeof(tmp), "%lu", i);
+            drawText(obj.posP(i), tmp);
+        }
     }
     
     //draw polygon around vertices of Solid

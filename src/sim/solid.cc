@@ -566,7 +566,8 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     }
 
     fixShape();
-    
+    objs.push_back(this);
+
 #if NEW_SOLID_HAS_TWIN
     if ( opt.set(str, "twin") && !soTwin )
     {
@@ -576,18 +577,19 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             S = new Solid(prop);
             S->soTwin = this;
             ObjectList list = S->build(opt, sim);
-            real R = S->radius(0);
-            objs.append(list);
-            Rotation rot = Rotation::randomRotationToVector(Vector(1,1,1));
+            real R = 0.5 * S->radius(0);
+            Rotation rot = Rotation::randomRotationToVector(Vector(1,-1,-1));
+            ObjectSet::rotateObjects(list, rot.transposed());
+            ObjectSet::translateObjects(list, Vector(+R,0,0));
+            rot = Rotation::randomRotationToVector(Vector(+1,1,1));
             ObjectSet::rotateObjects(objs, rot.transposed());
-            ObjectSet::translateObjects(list, Vector(R,0,0));
-            ObjectSet::rotateObjects(list, Rotation::rotationAroundX(M_PI));
+            ObjectSet::translateObjects(objs, Vector(-R,0,0));
+            objs.append(list);
         }
         if ( S->nbPoints() <= DIM )
             throw InvalidParameter("Solid's twin lacks sufficient points");
     }
 #endif
-    objs.push_back(this);
     return objs;
 }
 
@@ -610,13 +612,14 @@ size_t Solid::addTriad(real arm)
         throw InvalidParameter("cannot add Triad to a Solid with no point");
     
     size_t inx = lastPoint();
-
+    real ARM = abs_real(arm);
+    
     //std::clog << "Solid::addTriad(" << arm << ") at index " << inx << "\n";
     Vector vec = posP(inx);
     
     if ( DIM > 0 ) addPoint(vec+Vector(arm,0,0));
-    if ( DIM > 1 ) addPoint(vec+Vector(0,arm,0));
-    if ( DIM > 2 ) addPoint(vec+Vector(0,0,arm));
+    if ( DIM > 1 ) addPoint(vec+Vector(0,ARM,0));
+    if ( DIM > 2 ) addPoint(vec+Vector(0,0,ARM));
     
     return inx;
 }

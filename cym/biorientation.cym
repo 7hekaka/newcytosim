@@ -93,13 +93,13 @@ set solid chromosome
 }
 new 1 chromosome
 {
-    sphere1 = +0.1 0 0, 0.100, (5 corona sphere 1 0 if (S < -1.73))
+    sphere1 = +0.1 0 0, 0.100, (5 corona sphere 1 0 if (S > 0.96))
     position = 0 0 0
     orientation = 1 0 0
 }
 new 1 chromosome
 {
-    sphere1 = +0.1 0 0, -0.100, (5 corona sphere 1 0 if (S < -1.73))
+    sphere1 = +0.1 0 0, -0.100, (5 corona sphere 1 0 if (S > 0.96))
     position = 0 0 0
     orientation = 1 0 0
     sibling = last
