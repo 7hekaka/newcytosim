@@ -31,7 +31,7 @@ new plate
     diameter = 2
 }
 
-set fiber kinemic
+set fiber slow_microtubule
 {
     rigidity = 20
     segmentation = 0.5
@@ -40,9 +40,9 @@ set fiber kinemic
 
     activity = dynamic
     min_length = 0.032
-    growing_speed = 0.21
-    shrinking_speed = -0.42
-    hydrolysis_rate = 0.4
+    growing_speed = 0.04
+    shrinking_speed = -0.20
+    hydrolysis_rate = 0.2
     growing_force = 5
 
     display = ( line_width=2.5; end_size=2, 2; coloring=0; speckles=3; )
@@ -56,14 +56,14 @@ set hand plus_nucleator
     hold_shrinking_end = 0
     adictive = 1
     activity = nucleate
-    nucleate = 1.0, kinemic, ( length=0.064; end_state = grow, white; )
-    display = ( color=white; size=5; )
+    nucleate = 1.0, slow_microtubule, ( length=0.064; end_state = grow, white; )
+    display = ( color=white; size=3; )
 }
 
 set single corona
 {
     hand = plus_nucleator
-    stiffness = 500
+    stiffness = 333
     diffusion = 10
 }
 
