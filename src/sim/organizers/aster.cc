@@ -333,6 +333,8 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
 void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
 {
     std::string tif, fos;
+    size_t nbf = 0;
+    opt.set(nbf, "fibers");
     opt.set(tif, "fibers", 1);
     opt.set(fos, "fibers", 2);
 

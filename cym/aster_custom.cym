@@ -65,7 +65,7 @@ new star
     position = 0 0 0
     orientation = off
     point1 = center, 0.5
-    fibers = microtubule
+    fibers = 2, microtubule
     fiber1 = 0 0 0, 0 +1 0, ( length = 1 )
     fiber2 = 0 0 0, 0 -1 0, ( length = 3 )
 }
