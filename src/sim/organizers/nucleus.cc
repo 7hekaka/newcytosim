@@ -37,7 +37,7 @@ void Nucleus::setInteractions(Meca& meca) const
 //------------------------------------------------------------------------------
 ObjectList Nucleus::build(Glossary& opt, Simul& sim)
 {
-    ObjectList objs(this);
+    ObjectList objs;
     std::string str, spec;
     assert_true(prop);
     size_t cnt = 0;
@@ -110,6 +110,7 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
             grasp(bun->organized(1));
         }
     }
+    objs.push_back(this);
     return objs;
 }
 

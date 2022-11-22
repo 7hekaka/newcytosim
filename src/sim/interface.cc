@@ -336,6 +336,16 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
     long nb_trials = 1024;
     opt.set(nb_trials, "nb_trials");
     ObjectList objs;
+    Glossary::dict_type<PlacementType> keys{
+        {"off",       PLACE_NOT},
+#if BACKWARD_COMPATIBILITY < 50
+        {"none",       PLACE_NOT},
+#endif
+        {"anywhere",   PLACE_ANYWHERE},
+        {"inside",     PLACE_INSIDE},
+        {"all_inside", PLACE_ALL_INSIDE},
+        {"outside",    PLACE_OUTSIDE},
+        {"surface",    PLACE_EDGE}};
     
     while ( --nb_trials >= 0 )
     {
@@ -355,17 +365,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
             break;
         
         PlacementType placement = PLACE_INSIDE;
-        
-        opt.set(placement, "placement",{{"off",       PLACE_NOT},
-#if BACKWARD_COMPATIBILITY < 50
-                                       {"none",       PLACE_NOT},
-#endif
-                                       {"anywhere",   PLACE_ANYWHERE},
-                                       {"inside",     PLACE_INSIDE},
-                                       {"all_inside", PLACE_ALL_INSIDE},
-                                       {"outside",    PLACE_OUTSIDE},
-                                       {"surface",    PLACE_EDGE}});
-        
+        opt.set(placement, "placement", keys);
         if ( placement == PLACE_NOT )
             break;
         

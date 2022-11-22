@@ -127,7 +127,7 @@ Vector Bundle::position() const
  */
 ObjectList Bundle::build(Glossary& opt, Simul& sim)
 {
-    ObjectList objs(this);
+    ObjectList objs;
     assert_true(prop);
     size_t cnt = 0;
     std::string type, spec;
@@ -160,6 +160,7 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
         
         grasp(fib, inx);
     }
+    objs.push_back(this);
     return objs;
 }
 

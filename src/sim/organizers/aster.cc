@@ -184,7 +184,6 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     assert_true(prop);
     assert_true(asSolid==nullptr);
     assert_true(nbOrganized()==0);
-    ObjectList objs(this);
 
     opt.set(asRadius, "radius");
     if ( asRadius <= 0 )
@@ -199,6 +198,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
         throw InvalidParameter("please specify `fibers = COUNT, CLASS, SPEC`");
     }
 #endif
+    ObjectList objs;
     size_t origin = makeSolid(objs, sim, opt);
     
     unsigned type = 7 * opt.has_key("fiber1");
@@ -215,6 +215,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
         default:
             throw InvalidParameter("unknown aster:type");
     }
+    objs.push_back(this);
     return objs;
 }
 
@@ -290,7 +291,11 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
         if ( p )
         {
             sol = new Solid(p);
-            objs = sol->build(opt, sim);
+            // add a Sphere if no component were specified:
+            if ( !opt.has_key("point1") && !opt.has_key("sphere1") )
+                sol->addSphere(Vector(0,0,0), asRadius);
+            ObjectList list = sol->build(opt, sim);
+            objs.append(list);
             //std::clog << "Aster::makeSolid() created solid " << sol->reference() << "\n";
         }
         else
@@ -311,11 +316,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
     
     // check that there is at least one point:
     if ( sol->sumRadius() < REAL_EPSILON )
-#if BACKWARD_COMPATIBILITY <= 50
-        sol->addSphere(Vector(0,0,0), asRadius);
-#else
         throw InvalidParameter("Aster's drag coefficient is null: please specify 'point1=center, RADIUS'");
-#endif
     
     // add local coordinate system around the last point:
     size_t ref = sol->addTriad(asRadius);

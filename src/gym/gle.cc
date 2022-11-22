@@ -1579,8 +1579,8 @@ namespace gle
             }
             gym::unmapBufferV3N3();
             gym::drawTriangleStrip(0, ptr-flu);
+            gym::cleanup();
         }
-        gym::cleanup();
     }
 
     /// some volume of revolution with axis along Z

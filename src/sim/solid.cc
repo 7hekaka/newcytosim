@@ -321,13 +321,15 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     // get position of center:
     Vector cen = Movable::readPosition(opt.value(var, 0));
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, rad);
+    size_t ref = addSphere(cen, abs_real(rad));
+    
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin )
         addTriad(-rad);
     else
 #endif
     addTriad(rad);
+    rad = abs_real(rad);
     
 #if ( DIM > 1 )
     real sep = 1.0;
@@ -509,7 +511,7 @@ Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
 
 ObjectList Solid::build(Glossary& opt, Simul& sim)
 {
-    ObjectList objs(this);
+    ObjectList objs;
     std::string var, str;
     size_t inp, inx, nbp;
     
@@ -585,6 +587,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             throw InvalidParameter("Solid's twin lacks sufficient points");
     }
 #endif
+    objs.push_back(this);
     return objs;
 }
 
@@ -600,7 +603,7 @@ size_t Solid::addSphere(Vector const& vec, real rad)
     return inx;
 }
 
-
+// the coordinate system can be inverted by specifying negative 'arm'
 size_t Solid::addTriad(real arm)
 {
     if ( nPoints < 1 )
