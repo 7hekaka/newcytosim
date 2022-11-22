@@ -1789,6 +1789,25 @@ void Display::drawSolid(Solid const& obj)
             drawObject(obj.posP(i), pixscale(disp->size), gle::hedron(obj.radius(i)>0));
     }
     
+#if NEW_SOLID_HAS_TWIN
+    Solid const* tw = obj.twin();
+    if (( disp->style & 2 ) && tw )
+    {
+        flute3 * flt = gym::mapBufferV3(8);
+        for ( int i = 1; i <= DIM; ++i )
+        {
+            flt[2*i-2] = obj.posPoint(i);
+            flt[2*i-1] = tw->posPoint(i);
+        }
+        gym::unmapBufferV3();
+        gym::ref_view();
+        gym::disableLighting();
+        bodyColor(obj);
+        gym::drawLines(disp->widthX, 0, 6);
+        gym::enableLighting();
+    }
+#endif
+    
     //display outline of spheres in 2D
     if ( disp->style & 4 )
     {

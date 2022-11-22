@@ -55,7 +55,7 @@ void Solid::setInteractions(Meca& meca) const
     if ( soTwin )
     {
         const real stiff = 100;
-        for ( int i = 1; i < 4; ++i )
+        for ( int i = 1; i <= DIM; ++i )
             meca.addLink(Mecapoint(this,i), Mecapoint(soTwin, i), stiff);
     }
 #endif
@@ -563,7 +563,11 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     
 #if NEW_SOLID_HAS_TWIN
     if ( opt.set(str, "sibling") )
+    {
         soTwin = sim.pickSolid(str);
+        if ( soTwin->nbPoints() <= DIM )
+            throw InvalidParameter("desired Twin Solid lacks sufficient points");
+    }
     else
         soTwin = nullptr;
 #endif

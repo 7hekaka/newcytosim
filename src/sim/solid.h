@@ -81,7 +81,7 @@ private:
     /// second moment of the reference shape
     real soVariance;
 #if NEW_SOLID_HAS_TWIN
-    /// pointer to Solid link to this one
+    /// another Solid mechanically linked to this one
     Solid * soTwin;
 #endif
     /// a counter used in reshape()
@@ -221,7 +221,11 @@ public:
 #if NEW_SOLID_CLAMP
     Vector clampForce() const { return prop->clamp_stiff * ( prop->clamp_pos - posPoint(0) ); }
 #endif
-    
+#if NEW_SOLID_HAS_TWIN
+    /// pointer to Solid linked to this one
+    Solid const* twin() const { return soTwin; }
+#endif
+
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()

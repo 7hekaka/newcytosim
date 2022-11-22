@@ -49,7 +49,7 @@ public:
     
     /// if set > 0, this defines the unit size used for `point_size` and `line_width` 
     /**
-     Set this parameter to specify the fiber radius and point size in real units.
+     Set this parameter to specify the fiber radius and point size in simulation units.
 
      `point_size` and `line_width` are usually set in pixels, but if `point_value` is set,
      these specifications are interpreted as multiples of `point_value`,

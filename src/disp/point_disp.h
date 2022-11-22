@@ -141,7 +141,7 @@ public:
     /// visible and big enough to be seen
     bool perceptible;
     
-    /// this is the size in real unit
+    /// size in simulation units
     float sizeR;
     
     /// rescaled point size
