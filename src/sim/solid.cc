@@ -577,7 +577,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             S = new Solid(prop);
             S->soTwin = this;
             ObjectList list = S->build(opt, sim);
-            real R = 0.5 * S->radius(0);
+            real R = 0.5 * radius(0);
             Rotation rot = Rotation::randomRotationToVector(Vector(1,-1,-1));
             ObjectSet::rotateObjects(list, rot.transposed());
             ObjectSet::translateObjects(list, Vector(+R,0,0));
@@ -586,6 +586,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             ObjectSet::translateObjects(objs, Vector(-R,0,0));
             objs.append(list);
         }
+        S->soTwin = this;
         if ( S->nbPoints() <= DIM )
             throw InvalidParameter("Solid's twin lacks sufficient points");
     }
