@@ -115,12 +115,12 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
 
  @}
  */
-Fiber * FiberSet::newFiber(ObjectList& res, const Property* p, Glossary& opt)
+Fiber * FiberSet::newFiber(ObjectList& objs, const Property* p, Glossary& opt)
 {
     FiberProp const* pp = static_cast<FiberProp const*>(p);
     Fiber * fib = pp->newFiber(opt);
     fib->birthTime(simul_.time());
-    res.push_back(fib);
+    objs.push_back(fib);
     
 #if FIBER_HAS_FAMILY
     std::string str;
@@ -187,7 +187,7 @@ Fiber * FiberSet::newFiber(ObjectList& res, const Property* p, Glossary& opt)
                     cs->setPosition(vec);
                 else
                     cs->setPosition(h->pos());
-                res.push_back(cs);
+                objs.push_back(cs);
             }
             else
             {
@@ -201,10 +201,10 @@ Fiber * FiberSet::newFiber(ObjectList& res, const Property* p, Glossary& opt)
 }
 
 
-Fiber * FiberSet::newFiber(ObjectList& res, const std::string& name, Glossary& opt)
+Fiber * FiberSet::newFiber(ObjectList& objs, const std::string& name, Glossary& opt)
 {
     FiberProp * pp = simul_.findProperty<FiberProp>("fiber", name);
-    return newFiber(res, pp, opt);
+    return newFiber(objs, pp, opt);
 }
 
 /**

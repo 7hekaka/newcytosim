@@ -125,8 +125,9 @@ Vector Bundle::position() const
  }
 
  */
-void Bundle::build(ObjectList& objs, Glossary& opt, Simul& sim)
+ObjectList Bundle::build(Glossary& opt, Simul& sim)
 {
+    ObjectList objs(this);
     assert_true(prop);
     size_t cnt = 0;
     std::string type, spec;
@@ -159,6 +160,7 @@ void Bundle::build(ObjectList& objs, Glossary& opt, Simul& sim)
         
         grasp(fib, inx);
     }
+    return objs;
 }
 
 void Bundle::write(Outputter& out) const

@@ -80,11 +80,10 @@ ObjectList OrganizerSet::newObjects(const Property* p, Glossary& opt)
     else if ( p->category() == "fake" )
         obj = new Fake(static_cast<FakeProp const*>(p));
 
-    ObjectList res(4,4);
+    ObjectList res;
     if ( obj )
     {
-        obj->build(res, opt, simul_);
-        res.push_back(obj);
+        res = obj->build(opt, simul_);
     }
     return res;
 }

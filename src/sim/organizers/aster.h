@@ -231,7 +231,7 @@ public:
     virtual ~Aster();
     
     /// construct all the dependent Objects of the Organizer
-    void build(ObjectList&, Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
     
     /// return the scaffolding Solid
     Solid * solid() const { return asSolid; }

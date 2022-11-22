@@ -179,11 +179,12 @@ Aster::~Aster()
  .
 
  */
-void Aster::build(ObjectList& objs, Glossary& opt, Simul& sim)
+ObjectList Aster::build(Glossary& opt, Simul& sim)
 {
     assert_true(prop);
     assert_true(asSolid==nullptr);
     assert_true(nbOrganized()==0);
+    ObjectList objs(this);
 
     opt.set(asRadius, "radius");
     if ( asRadius <= 0 )
@@ -214,10 +215,11 @@ void Aster::build(ObjectList& objs, Glossary& opt, Simul& sim)
         default:
             throw InvalidParameter("unknown aster:type");
     }
+    return objs;
 }
 
 
-Fiber * Aster::makeFiber(ObjectList& res, Simul& sim, const Vector pos, Vector dir,
+Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector dir,
                          std::string const& fiber_type, std::string const& fos)
 {
     real n = dir.normSqr();
@@ -233,16 +235,16 @@ Fiber * Aster::makeFiber(ObjectList& res, Simul& sim, const Vector pos, Vector d
     if ( fos.empty() )
         throw InvalidParameter("Error: unspecified fiber specs (aster:fibers[2])");
     
-    ObjectList objs;
+    ObjectList list;
     Glossary opt(fos);
-    Fiber * F = sim.fibers.newFiber(objs, fiber_type, opt);
+    Fiber * F = sim.fibers.newFiber(list, fiber_type, opt);
     opt.print_warnings(std::cerr, 1, "aster:build\n");
 
     //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
-    ObjectSet::rotateObjects(objs, Rotation::rotationToVector(dir));
-    ObjectSet::translateObjects(objs, asRadius*pos - F->posEnd(prop->joint));
+    ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
+    ObjectSet::translateObjects(list, asRadius*pos - F->posEnd(prop->joint));
     
-    res.append(objs);
+    objs.append(list);
     return F;
 }
 
@@ -288,8 +290,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
         if ( p )
         {
             sol = new Solid(p);
-            sol->build(objs, opt, sim);
-            objs.push_back(sol);
+            objs = sol->build(opt, sim);
             //std::clog << "Aster::makeSolid() created solid " << sol->reference() << "\n";
         }
         else
@@ -548,7 +549,7 @@ void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     if ( cnt < nbf )
     {
         std::clog << "warning: aster could only fit " << cnt << " seeds ";
-        std::clog << "with aster:seed_diameter = " << sep << '\n';
+        std::clog << "with aster:separation = " << sep << '\n';
     }
     //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
     for ( size_t i = 0; i < cnt; ++i )

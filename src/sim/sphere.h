@@ -134,7 +134,7 @@ public:
     size_t nbSurfacePoints() const { return nPoints - nbRefPoints; }
     
     /// initialize according to options given in Glossary
-    void build(ObjectList&, Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
 
     //------------------- methods for the projection ---------------------------
     

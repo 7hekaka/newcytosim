@@ -54,10 +54,8 @@ ObjectList SphereSet::newObjects(const Property* p, Glossary& opt)
         rad = r;
     }
     
-    ObjectList res;
     Sphere * obj = new Sphere(pp, rad);
-    obj->build(res, opt, simul_);
-    res.push_back(obj);
+    ObjectList res = obj->build(opt, simul_);
     return res;
 }
 

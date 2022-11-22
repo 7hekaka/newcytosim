@@ -139,8 +139,9 @@ size_t Sphere::addSurfacePoint(Vector const& cp)
         attach2 = 10 grafted
      }
  */
-void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
+ObjectList Sphere::build(Glossary & opt, Simul& sim)
 {
+    ObjectList objs(this);
     std::string str;
     size_t inp = 1, inx = 0, nbp = 1;
 
@@ -177,13 +178,13 @@ void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
             
             // attach Single to this set of points:
             while ( opt.set(str, var, ++inx) )
-                sim.singles.makeWrists(res, this, fip, nbp, str);
+                sim.singles.makeWrists(objs, this, fip, nbp, str);
             
             // attach Single to this set of points:
             inx = 0;
             var = "attach" + std::to_string(inp);
             while ( opt.set(str, var, inx++) )
-                sim.singles.makeWrists(res, this, fip, nbp, str);
+                sim.singles.makeWrists(objs, this, fip, nbp, str);
         }
         
         // set next keyword:
@@ -194,7 +195,7 @@ void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
     // attach Singles distributed over the surface points:
     inx = 0;
     while ( opt.set(str, "attach", inx++) )
-        sim.singles.makeWrists(res, this, nbRefPoints, nbSurfacePoints(), str);
+        sim.singles.makeWrists(objs, this, nbRefPoints, nbSurfacePoints(), str);
 
     
     // final verification of the number of points:
@@ -203,6 +204,7 @@ void Sphere::build(ObjectList& res, Glossary & opt, Simul& sim)
     {
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
+    return objs;
 }
 
 

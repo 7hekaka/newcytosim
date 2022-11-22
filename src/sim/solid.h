@@ -129,7 +129,7 @@ public:
     virtual ~Solid();
     
     /// initialize according to options given in Glossary
-    void build(ObjectList&, Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
 
     //------------------------------- Mecable ----------------------------------
     

@@ -479,7 +479,7 @@ size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* ar
  
  This is used to attach Single to Bead, Solid and Sphere
  */
-void SingleSet::makeWrists(ObjectList& res, Mecable const* obj, size_t fip, size_t nbp, std::string& arg)
+void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, size_t fip, size_t nbp, std::string& arg)
 {
     size_t num = 1;
 
@@ -505,14 +505,14 @@ void SingleSet::makeWrists(ObjectList& res, Mecable const* obj, size_t fip, size
         for ( size_t u = 0; u < num; ++u )
         {
             for ( size_t i = 0; i < nbp; ++i )
-                res.push_back(sip->newWrist(obj, fip+i));
+                objs.push_back(sip->newWrist(mec, fip+i));
         }
     }
     else
     {
         for ( size_t u = 0; u < num; ++u )
         {
-            res.push_back(sip->newWrist(obj, fip+RNG.pint32(nbp)));
+            objs.push_back(sip->newWrist(mec, fip+RNG.pint32(nbp)));
         }
     }
 }

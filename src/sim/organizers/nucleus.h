@@ -37,7 +37,7 @@ public:
     virtual ~Nucleus();
 
     /// create a Nucleus and requested associated Objects
-    void build(ObjectList&, Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
     
     //------------------- simulation -------------------------------------------    
 

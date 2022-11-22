@@ -35,8 +35,9 @@ void Nucleus::setInteractions(Meca& meca) const
 
 
 //------------------------------------------------------------------------------
-void Nucleus::build(ObjectList& res, Glossary& opt, Simul& sim)
+ObjectList Nucleus::build(Glossary& opt, Simul& sim)
 {
+    ObjectList objs(this);
     std::string str, spec;
     assert_true(prop);
     size_t cnt = 0;
@@ -50,7 +51,7 @@ void Nucleus::build(ObjectList& res, Glossary& opt, Simul& sim)
 
     SphereProp * sp = sim.findProperty<SphereProp>("sphere", str);
     nuSphere = new Sphere(sp, rad);
-    res.push_back(nuSphere);
+    objs.push_back(nuSphere);
     
     // get the center of the sphere
     Vector c = nuSphere->posP(0);
@@ -65,7 +66,7 @@ void Nucleus::build(ObjectList& res, Glossary& opt, Simul& sim)
         for ( size_t ii = 0; ii < cnt; ++ii )
         {
             Glossary fiber_opt(spec);
-            Fiber * fib = sim.fibers.newFiber(res, str, fiber_opt);
+            Fiber * fib = sim.fibers.newFiber(objs, str, fiber_opt);
             Vector pos = c + Vector::randU(rad);
             Vector dir = Vector::randU();
             fib->setStraight(pos, dir, fib->length());
@@ -84,7 +85,7 @@ void Nucleus::build(ObjectList& res, Glossary& opt, Simul& sim)
 
         Rotation rot;
         // add bundles
-        ObjectList objs;
+        ObjectList list;
         const real len = 0.5 * bp->overlap;
         for ( size_t ii = 0; ii < cnt; ++ii  )
         {
@@ -95,14 +96,12 @@ void Nucleus::build(ObjectList& res, Glossary& opt, Simul& sim)
             //a vector tangent to the sphere:
             Vector dir = rot * Vector(len, 0, 0);
             
-            objs.clear();
             Bundle * bun = new Bundle(bp);
-            bun->build(objs, bundle_opt, sim);
-            res.append(objs);
-            res.push_back(bun);
+            list = bun->build(bundle_opt, sim);
+            objs.append(list);
 
             //position the bundle (initially aligned with X) tangentially:
-            ObjectSet::moveObjects(objs, Isometry(pos, rot));
+            ObjectSet::moveObjects(list, Isometry(pos, rot));
             
             nuSphere->addPoint( c + (pos-dir).normalized(rad) );
             grasp(bun->organized(0));
@@ -111,6 +110,7 @@ void Nucleus::build(ObjectList& res, Glossary& opt, Simul& sim)
             grasp(bun->organized(1));
         }
     }
+    return objs;
 }
 
 

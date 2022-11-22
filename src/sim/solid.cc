@@ -227,7 +227,7 @@ void Solid::release()
 #pragma mark - Build
 
 
-void Solid::makePoint(ObjectList& res, Glossary& opt, std::string const& var, Simul& sim)
+void Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
     size_t inx = 0;
@@ -257,7 +257,7 @@ void Solid::makePoint(ObjectList& res, Glossary& opt, std::string const& var, Si
         // attach Single to this set of points:
         ++inx;
         while ( opt.set(str, var, ++inx) )
-            sim.singles.makeWrists(res, this, fip, nbp, str);
+            sim.singles.makeWrists(objs, this, fip, nbp, str);
     }
 }
 
@@ -266,13 +266,13 @@ void Solid::makePoint(ObjectList& res, Glossary& opt, std::string const& var, Si
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref)
+void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref)
 {
     for ( size_t i = 0; i < num; ++i )
     {
         Wrist * w = sip->newWrist(this, 0);
         w->rebase(this, ref, Vector::randU());
-        res.push_back(w);
+        objs.push_back(w);
     }
 }
 
@@ -281,14 +281,14 @@ void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref)
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref, Vector const& pos, real dev)
+void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref, Vector const& pos, real dev)
 {
     for ( size_t i = 0; i < num; ++i )
     {
         Vector vec = normalize(pos+pos.randOrthoB(dev));
         Wrist * w = sip->newWrist(this, 0);
         w->rebase(this, ref, vec);
-        res.push_back(w);
+        objs.push_back(w);
     }
 }
 
@@ -297,22 +297,22 @@ void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref, 
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& res, size_t num, SingleProp* sip, size_t ref, std::string const& str)
+void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref, std::string const& str)
 {
     for ( size_t i = 0; i < num; ++i )
     {
         Vector vec = Movable::readPosition(str);
         Wrist * w = sip->newWrist(this, 0);
         w->rebase(this, ref, vec);
-        res.push_back(w);
+        objs.push_back(w);
     }
 }
 
 
-void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, Simul& sim)
+void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
-    size_t inx;
+    size_t inx = 2;
 
     // get sphere radius:
     real rad = 0;
@@ -320,11 +320,14 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
     
     // get position of center:
     Vector cen = Movable::readPosition(opt.value(var, 0));
-    
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, abs_real(rad));
+    size_t ref = addSphere(cen, rad);
+#if NEW_SOLID_HAS_TWIN
+    if ( soTwin )
+        addTriad(-rad);
+    else
+#endif
     addTriad(rad);
-    rad = abs_real(rad);
     
 #if ( DIM > 1 )
     real sep = 1.0;
@@ -353,21 +356,19 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
         real dev = 0.0;
         if ( opt.set(dev, "deviation") && dev > rad )
             throw InvalidParameter("solid:deviation should be <= radius");
-        inx = 2;
         while ( opt.set(str, var, inx++) )
         {
             // get a number and the name of a class:
             size_t num = 1;
             Tokenizer::split_integer(num, str);
             SingleProp * sip = sim.findProperty<SingleProp>("single", str);
-            addWrists(res, num, sip, ref, pts[inx-3], dev/rad);
+            addWrists(objs, num, sip, ref, pts[inx-3], dev/rad);
         }
     }
     else
 #endif
     {
         // associate Singles with this sphere
-        inx = 2;
         while ( opt.set(str, var, inx++) )
         {
             Tokenizer::strip_block(str);
@@ -382,14 +383,14 @@ void Solid::makeSphere(ObjectList& res, Glossary& opt, std::string const& var, S
             {
                 getline(iss, str);
                 try {
-                    addWrists(res, num, sip, ref, str);
+                    addWrists(objs, num, sip, ref, str);
                 } catch( Exception& e ) {
                     print_magenta(std::cerr, e.brief());
                     std::cerr << e.info() << '\n';
                 }
             }
             else
-                addWrists(res, num, sip, ref);
+                addWrists(objs, num, sip, ref);
         }
     }
 }
@@ -506,10 +507,27 @@ Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
      }
  */
 
-void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
+ObjectList Solid::build(Glossary& opt, Simul& sim)
 {
+    ObjectList objs;
     std::string var, str;
     size_t inp, inx, nbp;
+    
+#if NEW_SOLID_HAS_TWIN
+    if ( opt.set(str, "twin") && !soTwin )
+    {
+        Solid * S = sim.pickSolid(str);
+        if ( ! S )
+        {
+            S = new Solid(prop);
+            S->soTwin = this;
+            objs = S->build(opt, sim);
+        }
+        if ( S->nbPoints() <= DIM )
+            throw InvalidParameter("Solid's twin lacks sufficient points");
+    }
+#endif
+    objs.push_back(this);
     
     if ( opt.has_key("point0") || opt.has_key("sphere0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
@@ -519,7 +537,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     var = "point1";
     while ( opt.has_key(var) )
     {
-        makePoint(res, opt, var, sim);
+        makePoint(objs, opt, var, sim);
         var = "point" + std::to_string(++inp);
     }
 
@@ -528,7 +546,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     var = "sphere1";
     while ( opt.has_key(var) )
     {
-        makeSphere(res, opt, var, sim);
+        makeSphere(objs, opt, var, sim);
         var = "sphere" + std::to_string(++inp);
     }
     
@@ -540,7 +558,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
      */
     inx = 0;
     while ( opt.set(str, "anchor", inx++) )
-        sim.singles.makeWrists(res, this, 0, nPoints, str);
+        sim.singles.makeWrists(objs, this, 0, nPoints, str);
 #endif
     
     /*
@@ -550,7 +568,7 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     var = "anchor1";
     while ( opt.has_key(var) )
     {
-        res.push_back(makeWrist(opt, var, sim));
+        objs.push_back(makeWrist(opt, var, sim));
         var = "anchor" + std::to_string(++inp);
     }
     
@@ -560,24 +578,16 @@ void Solid::build(ObjectList& res, Glossary& opt, Simul& sim)
     {
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
-    
-#if NEW_SOLID_HAS_TWIN
-    if ( opt.set(str, "sibling") )
-    {
-        soTwin = sim.pickSolid(str);
-        if ( soTwin->nbPoints() <= DIM )
-            throw InvalidParameter("desired Twin Solid lacks sufficient points");
-    }
-    else
-        soTwin = nullptr;
-#endif
+
+    fixShape();
+    return objs;
 }
 
 
 size_t Solid::addSphere(Vector const& vec, real rad)
 {
     if ( rad < 0 )
-        throw InvalidParameter("solid:sphere's radius should be >= 0");
+        throw InvalidParameter("solid:sphere's radius must be >= 0");
 
     size_t inx = addPoint(vec);
     soRadius[inx] = rad;

@@ -42,7 +42,7 @@ public:
     ~Fake();
 
     /// construct all the dependent Objects of the Organizer
-    void build(ObjectList&, Glossary&, Simul&);
+    ObjectList build(Glossary&, Simul&);
 
     /// perform one Monte-Carlo step
     void step();
