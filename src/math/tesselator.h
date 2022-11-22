@@ -157,6 +157,7 @@ public:
     void buildCylinder(unsigned div, int make = 1);
     void buildHemisphere(unsigned div, int make = 1);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
+    void buildDroplet(unsigned div, int make = 1);
 
     /// set array of indices that define the edges
     void setEdges();

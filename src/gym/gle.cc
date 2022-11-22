@@ -200,7 +200,7 @@ namespace gle
         return 14;
     }
 
-    /// Tetrahedron is make of 4 triangles = 12 vertices
+    /// Tetrahedron is made of 4 triangles and 12 vertices
     size_t setTetrahedron(flute6* flt, float R=1.2f)
     {
         const float S = R / M_SQRT3;
@@ -326,7 +326,7 @@ namespace gle
         return 16;
     }
     
-    /// Octahedron is make of 8 triangles = 24 vertices
+    /// Octahedron is made of 8 triangles and 24 vertices
     size_t setOctahedron(flute6* flt, float R=1.46459188756f)
     {
         // the default size is set to match the volume of the unit sphere
@@ -1424,7 +1424,7 @@ namespace gle
         ico[4].buildHemisphere(finesse);
         ico[5].buildHemisphere(f);
         ico[6].buildHemisphere(std::max(1UL, finesse/4));
-        ico[7].buildCylinder(f);
+        ico[7].buildDroplet(f);
         
         f = 32; // for setIcoidBuffer
         size_t s = 12;
