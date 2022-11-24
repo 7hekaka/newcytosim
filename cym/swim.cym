@@ -80,7 +80,6 @@ new cell
 new head
 {
     sphere1 = 0 0 0, 1.0
-    fibers = 2, microtubule
     fiber1 = microtubule, ( length = 11 ), linker, 0 +0.1 0, 1.0 +0.1 0, plus_end
     fiber2 = microtubule, ( length = 11 ), linker, 0 -0.1 0, 1.0 -0.1 0, plus_end
     position = -6 0 0

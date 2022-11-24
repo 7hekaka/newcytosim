@@ -51,10 +51,10 @@ public:
     /// Set dimentionnality of vectors
     void vectorSize(size_t d) { vecsize_ = d; }
     
-    /// returns the type of input
+    /// return file format version identification number
     size_t formatID() const { return format_; }
 
-    /// returns the type of input
+    /// set file format version identification number
     void setFormatID(size_t f) { format_ = f; }
 
     /// Returns 1 for native binary format, 2 for non-native binary format, and 0 if not binary
