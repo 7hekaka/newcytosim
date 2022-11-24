@@ -10,6 +10,7 @@
 #include "solid_prop.h"
 
 class Meca;
+class Fiber;
 class SingleProp;
 class Wrist;
 
@@ -89,9 +90,6 @@ private:
 
     /// reset private variables
     void reset();
-    
-    /// part of build()
-    Wrist* makeWrist(Glossary&, std::string const&, Simul&);
 
     /// part of build()
     void makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
@@ -100,13 +98,19 @@ private:
     void makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    void addWrists(ObjectList&, size_t num, SingleProp*, size_t ref);
+    Wrist* makeWrist(Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    void addWrists(ObjectList&, size_t num, SingleProp*, size_t ref, Vector const&, real);
+    Fiber* makeFiber(ObjectList&, Glossary&, std::string const&, Simul&);
 
     /// part of build()
-    void addWrists(ObjectList&, size_t num, SingleProp*, size_t ref, std::string const&);
+    void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref);
+    
+    /// part of build()
+    void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref, Vector const&, real);
+
+    /// part of build()
+    void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref, std::string const&);
 
 public:
     

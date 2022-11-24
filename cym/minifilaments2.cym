@@ -82,12 +82,12 @@ new 20 minifilament
 {
     point1 = -0.4 0 0, 0.005, motor;
     point2 = +0.4 0 0, 0.005, motor;
-    anchor1 = point1, point2, 0.1, motor;
-    anchor2 = point1, point2, 0.2, motor;
-    anchor3 = point1, point2, 0.3, motor;
-    anchor4 = point1, point2, 0.7, motor;
-    anchor5 = point1, point2, 0.8, motor;
-    anchor6 = point1, point2, 0.9, motor;
+    single1 = motor, point1, point2, 0.05;
+    single2 = motor, point1, point2, 0.10;
+    single3 = motor, point1, point2, 0.15;
+    single4 = motor, point1, point2, 0.85;
+    single5 = motor, point1, point2, 0.90;
+    single6 = motor, point1, point2, 0.95;
 }
 
 run 25000 system

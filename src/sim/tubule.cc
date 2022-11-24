@@ -49,7 +49,8 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
     // get the 'bone'
     if ( prop->bone_type.size() > 0 )
     {
-        bone_ = sim.fibers.newFiber(objs, prop->bone_type, opt);
+        FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop->bone_type);
+        bone_ = sim.fibers.newFiber(objs, fip, opt);
         Buddy::connect(bone_);
         len = bone_->length();
         if ( bone_->prop->segmentation != fp->segmentation )

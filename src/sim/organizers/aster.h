@@ -195,7 +195,7 @@ private:
     size_t makeSolid(ObjectList&, Simul&, Glossary& opt);
 
     /// create a Fiber for position 'inx'
-    Fiber * makeFiber(ObjectList&, Simul&, Vector, Vector, std::string const&, std::string const&);
+    Fiber * makeFiber(ObjectList&, Simul&, Vector, Vector, FiberProp const*, std::string const&);
 
     /// define the attachment position of fiber 'inx'
     size_t placeAnchor(Vector, Vector, size_t origin);

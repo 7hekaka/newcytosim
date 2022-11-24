@@ -21,12 +21,12 @@ void Bundle::step()
         if ( !organized(ii)  &&  RNG.test(prop->fiber_prob) )
         {
             ObjectList objs;
-            Glossary opt(prop->fiber_spec);
-            Fiber * fib = sim.fibers.newFiber(objs, prop->fiber_type, opt);
-            fib->adjustLength(prop->overlap, prop->joint);
+            FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
+            Fiber * F = sim.fibers.newFiber(objs, fip, prop->fiber_spec);
+            F->adjustLength(prop->overlap, prop->joint);
             ///\todo: we should orient the new Fiber in bundle direction
             sim.add(objs);
-            grasp(fib, ii);
+            grasp(F, ii);
         }
     }
 }
@@ -135,6 +135,8 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     opt.set(type, "fibers", 1);
     opt.set(spec, "fibers", 2);
     
+    FiberProp const* fip = sim.findProperty<FiberProp>("fiber", type);
+
     if ( cnt <= 0 )
         throw InvalidParameter(prop->name()+":fibers[0] (number of fibers) must be specified and >= 1");
     
@@ -143,8 +145,7 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     for ( size_t inx = 0; inx < cnt; ++inx )
     {
         ObjectList list;
-        Glossary fiber_opt(spec);
-        Fiber * fib = sim.fibers.newFiber(list, type, fiber_opt);
+        Fiber * fib = sim.fibers.newFiber(list, fip, spec);
         objs.append(list);
         
         // rotate odd fibers by 180 degrees to make an anti-parallel overlap:

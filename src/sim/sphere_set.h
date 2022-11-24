@@ -22,7 +22,7 @@ public:
     /// create a new property of category `cat` for a class `name`
     Property *  newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
-    /// create objects of class `name`, given the options provided in `opt`
+    /// create objects specified by Property, given options provided in `opt`
     ObjectList newObjects(const Property*, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)

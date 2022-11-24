@@ -37,14 +37,14 @@ public:
     /// create a new property of category `cat` for a class `name`
     Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
     
-    /// create objects of class `name`, given the options provided in `opt`
-    Fiber * newFiber(ObjectList&, const Property* p, Glossary& opt);
+    /// create objects specified by Property, given options provided in `opt`
+    Fiber * newFiber(ObjectList&, FiberProp const*, Glossary& opt) const;
     
-    /// create objects of class `name`, given the options provided in `opt`
-    Fiber * newFiber(ObjectList&, const std::string& name, Glossary& opt);
+    /// create objects specified by Property, given the options provided in `spec`
+    Fiber * newFiber(ObjectList&, FiberProp const*, std::string const& spec) const;
 
-    /// create objects of class `name`, given the options provided in `opt`
-    ObjectList newObjects(const Property* p, Glossary& opt) { ObjectList res(4, 4); newFiber(res, p, opt); return res; }
+    /// create objects specified by Property, given options provided in `opt`
+    ObjectList newObjects(Property const* p, Glossary& opt);
 
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);

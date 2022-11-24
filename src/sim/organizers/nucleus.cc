@@ -49,7 +49,7 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
     if ( !opt.set(str, "sphere") )
         throw InvalidParameter("parameter `sphere` should be specified");
 
-    SphereProp * sp = sim.findProperty<SphereProp>("sphere", str);
+    SphereProp const* sp = sim.findProperty<SphereProp>("sphere", str);
     nuSphere = new Sphere(sp, rad);
     objs.push_back(nuSphere);
     
@@ -60,13 +60,13 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
     {
         if ( !opt.set(str, "fibers", 1) )
             throw InvalidParameter("fiber type (fiber[1]) should be specified");
+        FiberProp const* fip = sim.findProperty<FiberProp>("fiber", str);
         opt.set(spec, "fibers", 2);
 
         // create points and clamps and add fiber attached to them
         for ( size_t ii = 0; ii < cnt; ++ii )
         {
-            Glossary fiber_opt(spec);
-            Fiber * fib = sim.fibers.newFiber(objs, str, fiber_opt);
+            Fiber * fib = sim.fibers.newFiber(objs, fip, spec);
             Vector pos = c + Vector::randU(rad);
             Vector dir = Vector::randU();
             fib->setStraight(pos, dir, fib->length());
@@ -81,7 +81,7 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
             throw InvalidParameter("bundle type (bundles[1]) should be specified");
         opt.set(spec, "bundles", 2);
 
-        BundleProp * bp = sim.findProperty<BundleProp>("bundle", str);
+        BundleProp const* bp = sim.findProperty<BundleProp>("bundle", str);
 
         Rotation rot;
         // add bundles

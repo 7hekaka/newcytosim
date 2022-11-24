@@ -29,7 +29,8 @@ void Aster::step()
             Simul & sim = simul();
             Vector A = posSolid1(i);
             Vector B = posSolid2(i);
-            Fiber * F = makeFiber(objs, sim, A, B-A, prop->fiber_type, prop->fiber_spec);
+            FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
+            Fiber * F = makeFiber(objs, sim, A, B-A, fip, prop->fiber_spec);
             grasp(F, i);
             sim.add(objs);
         }
@@ -221,7 +222,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
 
 
 Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector dir,
-                         std::string const& fiber_type, std::string const& fos)
+                         FiberProp const* fip, std::string const& fos)
 {
     real n = dir.normSqr();
     
@@ -234,13 +235,10 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
         dir = -dir;
     
     if ( fos.empty() )
-        throw InvalidParameter("Error: unspecified fiber specs (aster:fibers[2])");
+        throw InvalidParameter("fiber specs must be specified");
     
     ObjectList list;
-    Glossary opt(fos);
-    Fiber * F = sim.fibers.newFiber(list, fiber_type, opt);
-    opt.print_warnings(std::cerr, 1, "aster:build\n");
-
+    Fiber * F = sim.fibers.newFiber(list, fip, fos);
     //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
     ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
     ObjectSet::translateObjects(list, asRadius*pos - F->posEnd(prop->joint));
@@ -272,7 +270,8 @@ void Aster::placeFiber(ObjectList& objs, Simul& sim, const Vector A, const Vecto
                        size_t ref, std::string const& fiber_type, std::string const& fos)
 {
     size_t i = placeAnchor(A, B, ref);
-    Fiber * F = makeFiber(objs, sim, A, B-A, fiber_type, fos);
+    FiberProp const* fip = sim.findProperty<FiberProp>("fiber", fiber_type);
+    Fiber * F = makeFiber(objs, sim, A, B-A, fip, fos);
     assert_true( i == nbOrganized() );
     nbOrganized(i+1);
     grasp(F, i);
@@ -333,8 +332,6 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
 void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
 {
     std::string tif, fos;
-    size_t nbf = 0;
-    opt.set(nbf, "fibers");
     opt.set(tif, "fibers", 1);
     opt.set(fos, "fibers", 2);
 
@@ -349,6 +346,11 @@ void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
         placeFiber(objs, sim, A, B, ref, tif, str);
         var = "fiber" + std::to_string(++cnt);
     }
+    
+    // verify the number of fibers:
+    size_t nbf = 0;
+    if ( opt.set(nbf, "fibers")  &&  nbf != nbFibers() )
+        throw InvalidParameter("could not find the number of fibers specified in aster:fibers[0]");
 }
 
 

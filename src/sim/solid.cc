@@ -262,11 +262,40 @@ void Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, S
 }
 
 
+Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
+{
+    std::string str;
+    size_t a = 0, b = 0;
+    real c = 0.0;
+    
+    opt.set(str, var, 0);
+    SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
+
+    // get index of point A
+    opt.set(str, var, 1);
+    a = point_index(str);
+
+    // get index of point B
+    opt.set(str, var, 2);
+    b = point_index(str);
+
+    // get interpolation coefficient
+    opt.set(c, var, 3);
+    if ( c < 0 || 1 < c )
+        throw InvalidParameter("interpolation coefficient must be in [0, 1]");
+    
+    // add a Wrist anchored between 'a' and 'b':
+    Wrist * w = sip->newWrist(this, 0);
+    w->rebase(this, a, b, c);
+    return w;
+}
+
+
 /*
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref)
+void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref)
 {
     for ( size_t i = 0; i < num; ++i )
     {
@@ -281,7 +310,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref)
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref, Vector const& pos, real dev)
+void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref, Vector const& pos, real dev)
 {
     for ( size_t i = 0; i < num; ++i )
     {
@@ -297,7 +326,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref,
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& objs, size_t num, SingleProp* sip, size_t ref, std::string const& str)
+void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref, std::string const& str)
 {
     for ( size_t i = 0; i < num; ++i )
     {
@@ -363,7 +392,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             // get a number and the name of a class:
             size_t num = 1;
             Tokenizer::split_integer(num, str);
-            SingleProp * sip = sim.findProperty<SingleProp>("single", str);
+            SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
             addWrists(objs, num, sip, ref, pts[inx-3], dev/rad);
         }
     }
@@ -380,7 +409,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             iss >> num >> nam; // get a number and the name of a class
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+var+"'");
-            SingleProp * sip = sim.findProperty<SingleProp>("single", nam);
+            SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
             if ( iss.good() )
             {
                 getline(iss, str);
@@ -398,32 +427,39 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
 }
 
 
-Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
+Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
+    size_t ref = 0;
+    Vector A, B;
     std::string str;
-    size_t a = 0, b = 0;
-    real c = 0.0;
     
-    // get index of point A
     opt.set(str, var, 0);
-    a = point_index(str);
-
-    // get index of point B
-    opt.set(str, var, 1);
-    b = point_index(str);
-
-    // get coefficient
-    opt.set(c, var, 2);
-    if ( c < 0 || 1 < c )
-        throw InvalidParameter("interpolation coefficient must be in [0, 1]");
-
-    opt.set(str, var, 3);
-    SingleProp * sip = sim.findProperty<SingleProp>("single", str);
+    FiberProp const* fip = sim.findProperty<FiberProp>("fiber", str);
     
-    // add a Wrist anchored between 'a' and 'b':
-    Wrist * w = sip->newWrist(this, 0);
-    w->rebase(this, a, b, c);
-    return w;
+    opt.set(str, var, 2);
+    SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
+
+    // get position of anchoring points
+    if ( !opt.set(A, var, 3) && !opt.set(B, var, 4) )
+        throw InvalidParameter("points must be specified as fiber?[1] and fiber?[2]");
+    
+    Wrist * w1 = sip->newWrist(this, 0);
+    w1->rebase(this, ref, A);
+    Wrist * w2 = sip->newWrist(this, 0);
+    w2->rebase(this, ref, B);
+
+    Vector dir = normalize(B-A);
+    
+    if ( !opt.set(str, var, 1) )
+        throw InvalidParameter("fiber specs must be specified as fiber?[1]");
+    
+    ObjectList list;
+    Fiber * F = sim.fibers.newFiber(list, fip, str);
+    objs.append(list);
+    //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
+    ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
+    ObjectSet::translateObjects(list, A - F->posEndM());
+        return F;
 }
 
 /**
@@ -512,15 +548,14 @@ Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
 ObjectList Solid::build(Glossary& opt, Simul& sim)
 {
     ObjectList objs;
-    std::string var, str;
-    size_t inp, inx, nbp;
+    std::string str;
     
     if ( opt.has_key("point0") || opt.has_key("sphere0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
     
     // options named 'point???' will add points:
-    inp = 1;
-    var = "point1";
+    size_t inp = 1;
+    std::string var = "point1";
     while ( opt.has_key(var) )
     {
         makePoint(objs, opt, var, sim);
@@ -537,30 +572,41 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     }
     
 #if BACKWARD_COMPATIBILITY < 100
-    
-    /* attach Singles to be distributed over all the points:
-     this is deprecated, since one can attach Single at any point since 03.2017
-     using the 'sphere' specifications above
-     */
-    inx = 0;
-    while ( opt.set(str, "anchor", inx++) )
+    /* distribute Singles over all points. Deprecated, since since 03.2017 */
+    inp = 0;
+    while ( opt.set(str, "anchor", inp++) )
         sim.singles.makeWrists(objs, this, 0, nPoints, str);
 #endif
-    
-    /*
-     Anchor Single to intermediate positions between two vertices
-     */
+#if BACKWARD_COMPATIBILITY < 100
+    /* Anchor Single to intermediate positions between two vertices */
     inp = 1;
     var = "anchor1";
     while ( opt.has_key(var) )
     {
-        objs.push_back(makeWrist(opt, var, sim));
+        std::cerr << "please use `single1` instead of removed `anchor1`\n";
         var = "anchor" + std::to_string(++inp);
     }
-    
-    // final verification of the number of points:
-    nbp = 0;
-    if ( opt.set(nbp, "nb_points")  &&  nbp != nPoints )
+#endif
+    /* Anchor Single to intermediate positions between two vertices (24.11.2022) */
+    inp = 1;
+    var = "single1";
+    while ( opt.has_key(var) )
+    {
+        objs.push_back(makeWrist(opt, var, sim));
+        var = "single" + std::to_string(++inp);
+    }
+    /* Attach fibers using two interpolated anchors (24.11.2022) */
+    inp = 1;
+    var = "fiber1";
+    while ( opt.has_key(var) )
+    {
+        makeFiber(objs, opt, var, sim);
+        var = "fiber" + std::to_string(++inp);
+    }
+
+    // verify the number of points:
+    inp = 0;
+    if ( opt.set(inp, "nb_points")  &&  inp != nPoints )
     {
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }

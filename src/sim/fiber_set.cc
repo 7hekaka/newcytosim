@@ -115,10 +115,9 @@ Property* FiberSet::newProperty(const std::string& cat, const std::string& nom, 
 
  @}
  */
-Fiber * FiberSet::newFiber(ObjectList& objs, const Property* p, Glossary& opt)
+Fiber * FiberSet::newFiber(ObjectList& objs, FiberProp const* fip, Glossary& opt) const
 {
-    FiberProp const* pp = static_cast<FiberProp const*>(p);
-    Fiber * fib = pp->newFiber(opt);
+    Fiber * fib = fip->newFiber(opt);
     fib->birthTime(simul_.time());
     objs.push_back(fib);
     
@@ -201,11 +200,19 @@ Fiber * FiberSet::newFiber(ObjectList& objs, const Property* p, Glossary& opt)
 }
 
 
-Fiber * FiberSet::newFiber(ObjectList& objs, const std::string& name, Glossary& opt)
+Fiber * FiberSet::newFiber(ObjectList& objs, FiberProp const* fip, std::string const& spec) const
 {
-    FiberProp * pp = simul_.findProperty<FiberProp>("fiber", name);
-    return newFiber(objs, pp, opt);
+    Glossary opt(spec);
+    Fiber * F = newFiber(objs, fip, opt);
+    std::string war;
+    if ( opt.has_warning(war) )
+    {
+        //print_yellow(std::cerr, war);
+        std::cerr << war << " in `" << spec << "'\n";
+    }
+    return F;
 }
+
 
 /**
  The returned object is not initialized, since this is used for file input
@@ -221,6 +228,14 @@ Object * FiberSet::newObject(const ObjectTag tag, PropertyID pid)
     }
     throw InvalidIO("Warning: unknown Fiber tag `"+std::to_string(tag)+"'");
     return nullptr;
+}
+
+
+ObjectList FiberSet::newObjects(Property const* p, Glossary& opt)
+{
+    ObjectList res(4, 4);
+    newFiber(res, static_cast<FiberProp const*>(p), opt);
+    return res;
 }
 
 
