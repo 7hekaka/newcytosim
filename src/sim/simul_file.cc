@@ -8,6 +8,9 @@
 #include "parser.h"
 #include "print_color.h"
 
+// Use second definition to trace execution
+#define VLOG(ARG) ((void) 0)
+//#define VLOG(ARG) std::clog << ARG;
 
 /**
  \var Simul::currentFormatID
@@ -516,7 +519,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             fpos_t pos;
             bool has_pos = !in.get_pos(pos);
             std::string line = in.get_line();
-            //std::clog << "      #|" << line << "|" << '\n';
+            VLOG("      #|" << line << "|" << '\n');
             std::istringstream iss(line);
             std::string tok;
             iss >> tok;
@@ -525,7 +528,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             if ( tok == "section" )
             {
                 iss >> section;
-                //std::clog << "-- section |" << section << "|\n";
+                VLOG("-- section |" << section << "|\n");
                 if ( section == "end" )
                     continue;
                 else if ( section == "single" )
@@ -602,7 +605,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 if ( f != in.formatID() )
                 {
                     in.setFormatID(f);
-                    //Cytosim::warn << "Cytosim is reading format " << f << '\n';
+                    VLOG("Cytosim is reading format " << f << '\n');
                 }
                 if ( tok == "dim" )
                 {
@@ -659,7 +662,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
         }
         else
         {
-            //std::clog << "OBJECT |" << (char)tag << "| " << (fat?"fat\n":"\n");
+            VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
             assert_true( isalpha(tag) );
 #if BACKWARD_COMPATIBILITY < 50
             // this is an 'older' code pathway, before 2017?

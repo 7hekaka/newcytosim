@@ -609,6 +609,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     if ( !obj )
     {
         assert_true(isprint(tag));
+        //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
         // create new object of required class, indentified by property-id
         obj = newObject(tag, pid);
         assert_true(obj);
@@ -616,19 +617,18 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         obj->setIdentity(id);
         obj->objset(this);
         inventory_.assign(obj);
-        //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
     }
     assert_true( obj->identity() == id );
     assert_true( obj->property() );
     
     try {
-        //std::clog << "- read " << Object::reference(tag, pid, id) << '\n';
+        //std::clog << "- read " << obj->reference() << '\n';
         // read object data:
         obj->read(in, simul_, tag);
     }
     catch( Exception & e )
     {
-        e << "while loading " << Object::reference(tag, pid, id);
+        e << "while loading " << obj->reference();
         throw;
     }
     
