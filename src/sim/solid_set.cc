@@ -85,8 +85,7 @@ ObjectList SolidSet::newObjects(const Property* p, Glossary& opt)
 {
     SolidProp const* pp = static_cast<SolidProp const*>(p);
     Solid * obj = new Solid(pp);
-    ObjectList res = obj->build(opt, simul_);
-    return res;
+    return obj->build(opt, simul_);
 }
 
 

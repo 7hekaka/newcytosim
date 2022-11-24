@@ -183,8 +183,8 @@ Object * Simul::pickMovable(const std::string& arg) const
 
 void Simul::add(Object * w)
 {
-    //std::clog << " Simul::add(" << w->reference() << ")" << '\n';
     assert_true(w);
+    //std::clog << " Simul::add(" << w->reference() << ")" << '\n';
     ObjectSet * set = findSetT(w->tag());
     set->add(w);
 }

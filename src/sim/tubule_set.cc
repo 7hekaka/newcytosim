@@ -62,8 +62,7 @@ ObjectList TubuleSet::newObjects(const Property* p, Glossary& opt)
 {
     TubuleProp const* pp = static_cast<TubuleProp const*>(p);
     Tubule * obj = new Tubule(pp);
-    ObjectList res = obj->build(pp->radius, opt, simul_);
-    return res;
+    return obj->build(pp->radius, opt, simul_);
 }
 
 

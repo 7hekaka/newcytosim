@@ -1,11 +1,11 @@
 % A bead propelled by a beating flagella
-% F. Nedelec, 18.04.2013
+% F. Nedelec, Strasbourg, 18.04.2013, 24.11.2022
 
 set simul system
 {
     time_step = 0.001
     viscosity = 0.2
-    steric = 1, 500, 500
+    steric = 1, 500, 100
     binding_grid_step = 1
     precondition = 0
     verbose = 0
@@ -14,7 +14,6 @@ set simul system
 set system display
 {
     delay = 3;
-    style = 2;
     point_size = 8; 
     window_size = 1024, 512; 
 }
@@ -33,22 +32,22 @@ set fiber microtubule
     display = ( color=blue; line_width=3; )
 }
 
-set hand binder 
+set hand holder 
 {
-    binding = 1000, 0.25
+    binding = 1000, 0.100
     unbinding = 0, inf
     display = ( width=6; size=8; color=blue, dark_blue )
 }
 
 set single linker
 {
-    hand = binder
+    hand = holder
     stiffness = 5000
 }
 
 set hand dynein 
 {
-    binding = 0, 0.4
+    binding = 0, 0.300
     unbinding = 0.1, 1.2
     
     activity = move
@@ -60,11 +59,11 @@ set hand dynein
 
 set couple motor 
 {
-    hand1 = binder
+    hand1 = holder
     hand2 = dynein
     diffusion = 0
     stiffness = 1000
-    length = 0.2
+    length = 0.200
 }
 
 set solid head
@@ -80,61 +79,22 @@ new cell
 
 new head
 {
-    point1 = 0    0   0, 0.8
-    point2 = 0.0  0.1 0
-    point3 = 0.8  0.1 0
-    point4 = 0.0 -0.1 0
-    point5 = 0.8 -0.1 0
-    position = -5.0 0 0
+    sphere1 = 0 0 0, 1.0
+    fibers = 2, microtubule
+    fiber1 = microtubule, ( length = 11 ), linker, 0 +0.1 0, 1.0 +0.1 0, plus_end
+    fiber2 = microtubule, ( length = 11 ), linker, 0 -0.1 0, 1.0 -0.1 0, plus_end
+    position = -6 0 0
     direction = 1 0 0
-}
-
-new microtubule
-{
-    position = 0 0.1 0
-    direction = 1 0 0
-    length = 10
-}
-
-new linker
-{
-    base = solid1, point2
-    attach = fiber1, 0
-}
-
-new linker
-{
-    base = solid1, point3
-    attach = fiber1, 0.8
-}
-
-new microtubule
-{
-    position = 0 -0.1 0
-    direction = 1 0 0
-    length = 10
-}
-
-new linker
-{
-    base = solid1, point4
-    attach = fiber2, 0
-}
-
-new linker
-{
-    base = solid1, point5
-    attach = fiber2, 0.8
 }
 
 new 100 motor
 {
-    range = -4.2 0.2 0, 5 0.2 0
+    range = -5.0 0.15 0, 4.9 0.15 0
 }
 
 new 100 motor
 {
-    range = -4.175 -0.2 0, 5 -0.2 0
+    range = -4.95 -0.15 0, 4.95 -0.15 0
 }
 
 run 100 system
@@ -144,7 +104,7 @@ run 100 system
 
 set dynein { binding_rate = 5 }
 
-run 100000 system
+run 10000 system
 {
     nb_frames = 100
 }

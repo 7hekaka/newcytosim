@@ -63,8 +63,6 @@ bool match_property(Object const* obj, void const* prop)
 */
 std::string Object::reference(ObjectTag tag, size_t pip, ObjectID id)
 {
-    assert_true( pip > 0 );
-    assert_true( id > 0 );
     char tmp[32];
     snprintf(tmp, sizeof(tmp), "%c%lu:%04u", tag, pip, id);
     return std::string(tmp);
@@ -227,10 +225,20 @@ void Object::writeHeader(Outputter& out, ObjectTag g) const
 /// print a list of objects
 std::ostream& operator << (std::ostream& os, ObjectList const& arg)
 {
-    os << "ObjectList " << &arg << " of size " << arg.size() << "\n{\n";
-    for ( Object * obj : arg )
-        os << "   " << obj->property()->name() << " " << obj->reference() << '\n';
-    os << "}" << '\n';
+    if ( arg.size() == 0 )
+        os << "ObjectList " << &arg << " is empty\n{\n";
+    else if ( arg.size() == 1 )
+    {
+        Object * obj = arg[0];
+        os << "ObjectList " << &arg << " contains " << obj->property()->name() << " " << obj->reference() << '\n';
+    }
+    else
+    {
+        os << "ObjectList " << &arg << " has " << arg.size() << " objects:\n{\n";
+        for ( Object * obj : arg )
+            os << "   " << obj->property()->name() << " " << obj->reference() << '\n';
+        os << "}" << '\n';
+    }
     return os;
 }
 

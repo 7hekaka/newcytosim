@@ -70,7 +70,7 @@ public:
     FiberSite() : hFiber(nullptr), hAbs(0) {}
 #endif
 
-    /// construct at the given distance from the origin
+    /// construct at the given distance from the origin (i.e. abscissa)
     FiberSite(Fiber*, real a);
 
     /// make destructor non-virtual

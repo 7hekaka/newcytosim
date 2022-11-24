@@ -430,6 +430,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
 Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     size_t ref = 0;
+    const real rad = radius(ref);
     Vector A, B;
     std::string str;
     
@@ -440,15 +441,20 @@ Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var,
     SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
 
     // get position of anchoring points
-    if ( !opt.set(A, var, 3) && !opt.set(B, var, 4) )
+    if ( !opt.set(A, var, 3) || !opt.set(B, var, 4) )
         throw InvalidParameter("points must be specified as fiber?[1] and fiber?[2]");
     
     Wrist * w1 = sip->newWrist(this, 0);
-    w1->rebase(this, ref, A);
+    w1->rebase(this, ref, A/rad);
+    objs.push_back(w1);
+    
     Wrist * w2 = sip->newWrist(this, 0);
-    w2->rebase(this, ref, B);
+    w2->rebase(this, ref, B/rad);
+    objs.push_back(w2);
 
-    Vector dir = normalize(B-A);
+    real len = distance(A, B);
+    if ( len < REAL_EPSILON )
+        throw InvalidParameter("anchor points must be distinct");
     
     if ( !opt.set(str, var, 1) )
         throw InvalidParameter("fiber specs must be specified as fiber?[1]");
@@ -456,10 +462,23 @@ Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var,
     ObjectList list;
     Fiber * F = sim.fibers.newFiber(list, fip, str);
     objs.append(list);
-    //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
-    ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
-    ObjectSet::translateObjects(list, A - F->posEndM());
-        return F;
+
+    Vector dir = ( B - A ) / len;
+    if ( opt.set(str, var, 5) && str=="plus_end" )
+    {
+        ObjectSet::rotateObjects(list, Rotation::rotationToVector(-dir));
+        ObjectSet::translateObjects(list, A - F->posEndP());
+        w1->attach(FiberSite(F, F->abscissaP()));
+        w2->attach(FiberSite(F, F->abscissaP()-len));
+    }
+    else
+    {
+        ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
+        ObjectSet::translateObjects(list, A - F->posEndM());
+        w1->attach(FiberSite(F, F->abscissaM()));
+        w2->attach(FiberSite(F, F->abscissaM()+len));
+    }
+    return F;
 }
 
 /**
@@ -603,7 +622,6 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         makeFiber(objs, opt, var, sim);
         var = "fiber" + std::to_string(++inp);
     }
-
     // verify the number of points:
     inp = 0;
     if ( opt.set(inp, "nb_points")  &&  inp != nPoints )
