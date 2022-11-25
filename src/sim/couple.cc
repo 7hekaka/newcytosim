@@ -534,19 +534,19 @@ Hand const* Couple::otherHand(Hand const* h) const
 }
 
 
-Vector Couple::linkBase(Hand const* h) const
+Vector Couple::linkFoot(Hand const* h) const
 {
     if ( h == cHand1 )
     {
         if ( attached2() )
             return cHand2->pos();
-        throw Exception("linkBase() called for unattached Hand2");
+        throw Exception("linkFoot() called for unattached Hand2");
     }
     else
     {
         if ( attached1() )
             return cHand1->pos();
-        throw Exception("linkBase() called for unattached Hand1");
+        throw Exception("linkFoot() called for unattached Hand1");
     }
 }
 

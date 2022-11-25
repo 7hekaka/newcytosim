@@ -52,7 +52,7 @@ public:
      - plus_end
      - minus_end
      .
-     Note that a nucleator remains innactive as long as it is bound to a fiber.
+     Note that a nucleator remains inactive as long as it is bound to a fiber.
      Thus, setting `hold_end = minus_end` in combination with a detachment rate of zero
      will limit nucleation to one fiber at a time, because in that case the nucleator
      can only be released when the fiber is deleted, for example after a catastrophe.

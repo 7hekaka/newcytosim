@@ -171,8 +171,8 @@ public:
     void attachToEnd(Fiber * f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
     
     
-    /// return position of other Hand, if part of a Couple, or of Single
-    Vector linkBase() const;
+    /// return position of other Hand, if part of a Couple, or position of Single
+    Vector linkFoot() const;
     
     /// return stiffness of associated link
     real linkStiffness() const;

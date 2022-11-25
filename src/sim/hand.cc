@@ -33,9 +33,9 @@ Hand::~Hand()
 }
 
 
-Vector Hand::linkBase() const
+Vector Hand::linkFoot() const
 {
-    return hMonitor->linkBase(this);
+    return hMonitor->linkFoot(this);
 }
 
 

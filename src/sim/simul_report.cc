@@ -1515,7 +1515,7 @@ void Simul::reportFiberLinks(std::ostream& out) const
                     out << SEP << fib->identity();
                     out << SEP << ha->prop->number();
                     out << SEP << ha->abscissa();
-                    out << SEP << ha->linkBase();
+                    out << SEP << ha->linkFoot();
                     out << SEP << ha->linkStiffness();
                 }
             }

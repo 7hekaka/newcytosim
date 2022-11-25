@@ -73,7 +73,7 @@ protected:
     /// stiffness of the interaction, if the Couple is bridging
     real linkStiffness() const { return hasLink() * prop->stiffness; }
     /// specialization of HandMonitor
-    Vector linkBase(Hand const*) const;
+    Vector linkFoot(Hand const*) const;
     /// specialization of HandMonitor
     real linkRestingLength() const { return prop->length; }
 

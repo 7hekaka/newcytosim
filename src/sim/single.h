@@ -54,7 +54,7 @@ private:
     /// specialization of HandMonitor
     void beforeDetachment(Hand const*);
     /// specialization of HandMonitor
-    Vector linkBase(Hand const*) const { return posFoot(); }
+    Vector linkFoot(Hand const*) const { return posFoot(); }
     /// specialization of HandMonitor
     Vector linkDir(Hand const*) const { return dirFoot(); }
     /// specialization of HandMonitor

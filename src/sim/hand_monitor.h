@@ -39,7 +39,7 @@ public:
     
     /// return the distal position of the link attached to this Hand
     /** returns the position of the other Hand, if the Hand is part of a Couple */
-    virtual Vector linkBase(Hand const*) const { return Vector(0,0,0); }
+    virtual Vector linkFoot(Hand const*) const { return Vector(0,0,0); }
     
     /// return the direction associated with the anchoring
     virtual Vector linkDir(Hand const*) const { return Vector::randU(); }
