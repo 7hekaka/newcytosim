@@ -13,6 +13,7 @@ class Wrist;
 class Space;
 
 #define NEW_MOBILE_SINGLE 0
+#define NEW_ANCHOR_STIFFNESS 0
 
 /// Property for Single
 /**
@@ -38,6 +39,11 @@ public:
     
     /// stiffness of link (pN/um)
     real stiffness;
+    
+#if NEW_ANCHOR_STIFFNESS
+    /// A stiffness to anchor fibers on Solids with angular constraints
+    real anchor_stiffness;
+#endif
     
     /// resting length of link (um)
     real length;
