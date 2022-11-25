@@ -862,7 +862,6 @@ void Display::drawFiberBackbone(Fiber const& fib) const
 
 void Display::drawFiberLines(Fiber const& fib, int style) const
 {
-    gym::ref_view();
     size_t cnt = 2 * fib.nbSegments();
     flute4D* flu = gym::mapBufferC4VD(cnt+4);
     flute4D* ptr = flu;
@@ -932,6 +931,8 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             ptr = flu + fib.nbPoints();
             break;
     }
+    gym::ref_view();
+    gym::disableLighting();
     gym::unmapBufferC4VD();
     if ( strip )
         gym::drawLineStrip(fib.prop->disp->line_widthX, 0, ptr-flu);
