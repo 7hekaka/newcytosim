@@ -60,12 +60,18 @@ Coefficient 'c' determines the position between 'P' and 'Q':
 void Interpolation4::set(Mecable const* m, size_t p, size_t q, real c)
 {
     assert_true(m);
-    assert_true(q == p+1);
     assert_true(q < m->nbPoints());
     
     mec_ = m;
     prime_ = p;
-    set_coef(1.0-c, 0.0, 0.0);
+    if ( q == p + 1 )
+        set_coef(c, 0.0, 0.0);
+    else if ( q == p + 2 )
+        set_coef(0.0, c, 0.0);
+    else if ( q == p + 3 )
+        set_coef(0.0, 0.0, c);
+    else
+        throw InvalidSyntax("out-of-range index in Interpolation");
 }
 
 /**

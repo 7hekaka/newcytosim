@@ -98,7 +98,7 @@ private:
     void makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    Wrist* makeWrist(Glossary&, std::string const&, Simul&);
+    void makeWrist(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
     Fiber* makeFiber(ObjectList&, Glossary&, std::string const&, Simul&);

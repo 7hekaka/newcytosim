@@ -262,32 +262,40 @@ void Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, S
 }
 
 
-Wrist* Solid::makeWrist(Glossary& opt, std::string const& var, Simul& sim)
+void Solid::makeWrist(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
+    size_t num = 1;
     std::string str;
     size_t a = 0, b = 0;
     real c = 0.0;
     
     opt.set(str, var, 0);
+    Tokenizer::split_integer(num, str);
     SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
 
     // get index of point A
     opt.set(str, var, 1);
-    a = point_index(str);
+    b = a = point_index(str);
 
     // get index of point B
-    opt.set(str, var, 2);
-    b = point_index(str);
-
-    // get interpolation coefficient
-    opt.set(c, var, 3);
-    if ( c < 0 || 1 < c )
-        throw InvalidParameter("interpolation coefficient must be in [0, 1]");
+    if ( opt.set(str, var, 2) )
+    {
+        b = point_index(str);
+        
+        // get interpolation coefficient
+        opt.set(c, var, 3);
+        if ( c < 0 || 1 < c )
+            throw InvalidParameter("interpolation coefficient must be in [0, 1]");
+    }
     
-    // add a Wrist anchored between 'a' and 'b':
-    Wrist * w = sip->newWrist(this, 0);
-    w->rebase(this, a, b, c);
-    return w;
+    for ( size_t i = 0; i < num; ++i )
+    {
+        // add a Wrist anchored between 'a' and 'b':
+        Wrist * w = sip->newWrist(this, a);
+        if ( b != a )
+            w->rebase(this, a, b, c);
+        objs.push_back(w);
+    }
 }
 
 
@@ -611,7 +619,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     var = "single1";
     while ( opt.has_key(var) )
     {
-        objs.push_back(makeWrist(opt, var, sim));
+        makeWrist(objs, opt, var, sim);
         var = "single" + std::to_string(++inp);
     }
     /* Attach fibers using two interpolated anchors (24.11.2022) */
