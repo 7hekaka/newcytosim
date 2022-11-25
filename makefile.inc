@@ -1,5 +1,5 @@
-# This file contains variable definitions for make. It is included in makefile
-# Copyright 2007-2017 EMBL; 2019-2020 Sainsbury Laboratory, Cambridge University
+# This file defines variables for make and is included by `makefile`
+# Copyright 2007-2017 EMBL; 2019-2022 Sainsbury Laboratory, Cambridge University
 
 
 #---------------- MACHINE = {mac, linux, cluster, cygwin, auto}
@@ -9,7 +9,7 @@ MACHINE := auto
 COMPILER := gcc
 
 #---------------- MODE = {F = Fast; D = Debug; P = Profiling; C = Coverage}
-MODE := D
+MODE := F
 
 #---------------- INTEL Math Kernel Library
 # If the Intel Math Kernel library is a free library providing BLAS+LAPACK,
