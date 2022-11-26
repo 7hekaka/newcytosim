@@ -92,7 +92,7 @@ void Inventory::unassign(const Inventoried * obj)
 {
     ObjectID n = obj->identity();
     assert_true( n <= highest_ );
-    assert_true( record_[n] == obj );
+    assert_true( n == 0 || record_[n] == obj );
     record_[n] = nullptr;
     
     if ( n == lowest_ )

@@ -576,7 +576,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
 
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");
-    //std::clog << "- load " << Object::reference(tag, pid, id) << '\n';
+    //std::clog << "- load " << Object::make_reference(tag, pid, id) << '\n';
 
     if ( update )
     {
@@ -587,20 +587,22 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
          */
         if ( obj && islower(tag) && tag != 'l' )
         {
-            ice_.pop(obj);
 #if ( 1 )
             // check that property index has not changed:
             if ( obj->property()->number() != pid )
             {
                 Property const* P = obj->property();
-                std::clog << "Warning: erasing " << P->category() << P->number() << " `" << P->name();
+                std::clog << "Incident: erasing " << P->category() << P->number() << " `" << P->name();
                 std::clog << "' to load object with property #" << pid << '\n';
+                // the orphan Object remains on the 'ice_' to be deleted during pruning:
                 inventory_.unassign(obj);
                 obj->objset(nullptr);
-                delete(obj);
+                obj->setIdentity(0);
                 obj = nullptr;
             }
+            else
 #endif
+                ice_.pop(obj);
         }
         else
             update = false;
