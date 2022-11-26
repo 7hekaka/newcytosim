@@ -474,6 +474,151 @@ int Simul::loadObjects(char const* filename)
 //------------------------------------------------------------------------------
 
 /**
+ This returns:
+     - 1 if the start marker of a frame is found
+     - 2 if the end marker of a frame is found
+     - 0 otherwise
+*/
+int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, ObjectSet* subset)
+{
+    std::string line = in.get_line();
+    VLOG("      #|" << line << "|" << '\n');
+    std::istringstream iss(line);
+    std::string tok;
+    iss >> tok;
+
+    // section heading
+    if ( tok == "section" )
+    {
+        iss >> section;
+        VLOG("-- section |" << section << "|\n");
+        if ( section == "end" )
+            return 0;
+        else if ( section == "single" )
+        {
+            int mod = 0;
+            iss >> tok >> mod;
+            if ( tok == "F" )
+            {
+                // may skip unattached Singles
+                if ( prop.skip_free_single > 1 )
+                    in.skip_until("#section ");
+                if ( iss.good() && mod == 1 )
+                    singles.reheat();
+            }
+            else if ( tok == "reheat" )
+            {
+                singles.reheat();
+            }
+        }
+        else if ( section == "couple" )
+        {
+            int mod = 0;
+            iss >> tok >> mod;
+            if ( tok == "FF" )
+            {
+                // may skip unattached Couples
+                if ( prop.skip_free_couple > 1 )
+                    in.skip_until("#section ");
+                if ( iss.good() && mod == 1 )
+                    couples.reheat();
+            }
+            else if ( tok == "reheat" )
+            {
+                couples.reheat();
+            }
+        }
+        objset = findSet(section);
+        if ( !objset )
+            throw InvalidIO("unknown section |"+section+"|");
+        if ( subset && objset != subset )
+            in.skip_until("#section ");
+    }
+    // optional indication giving the number of objects in the section
+    else if ( tok == "record" )
+    {
+        if ( objset )
+        {
+            size_t cnt = 0, sup_id = 0;
+            if ( iss >> cnt >> sup_id )
+                objset->reserve(sup_id);
+        }
+    }
+    // frame start
+    else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )
+        return 1;
+    //binary signature
+    else if ( tok == "binary" )
+    {
+        in.setEndianess(line.substr(7).c_str());
+    }
+    // info line "#format 48 dim 2"
+    else if ( tok == "format" )
+    {
+        unsigned f = 0, d = 0;
+        iss >> f >> tok >> d;
+        if ( f != in.formatID() )
+        {
+            in.setFormatID(f);
+            VLOG("Cytosim is reading format " << f << '\n');
+        }
+        if ( tok == "dim" )
+        {
+            if ( in.vectorSize() != d )
+                Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
+            in.vectorSize(d);
+        }
+    }
+    // time data "#time 1.2345"
+    else if ( tok == "time" )
+    {
+        iss >> prop.time;
+#if BACKWARD_COMPATIBILITY < 48
+        // old format info line "#time 14.000000, dim 2, format 47"
+        if ( iss.get() == ',' )
+        {
+            unsigned i = 0;
+            iss >> tok >> i;
+            if ( tok == "dim" )
+            {
+                in.vectorSize(i);
+                if ( i != DIM )
+                    Cytosim::warn << "mismatch between file ("<<i<<"D) and executable ("<<DIM<<"D)\n";
+            }
+            if ( iss.get() == ',' )
+            {
+                iss >> tok >> i;
+                if ( tok == "format" )
+                {
+                    if ( i != in.formatID() )
+                    {
+                        in.setFormatID(i);
+                        if ( i < BACKWARD_COMPATIBILITY )
+                            std::clog << "Cytosim is attempting to read old format " << i << "\n";
+                        if ( in.formatID() < 45 )
+                            properties.decrement_all();
+                    }
+                }
+            }
+        }
+#endif
+    }
+    //detect the mark at the end of the frame
+    else if ( tok == "end" )
+    {
+        iss >> tok;
+        if ( tok == "cytosim" )
+            return 2;
+#if BACKWARD_COMPATIBILITY < 50
+        if ( tok == "frame" )
+            return 2;
+#endif
+    }
+    return 0;
+}
+
+
+/**
  Read file, updating existing objects, and creating new ones for those not 
  already present in the Simul.
  If 'subset!=0' only objects from this class will be imported.
@@ -498,7 +643,24 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
         do {
             c = in.get_char();
             if ( c == '#' )
-                break;
+            {
+                fpos_t pos;
+                bool has_pos = !in.get_pos(pos);
+                int h = readMetadata(in, section, objset, subset);
+                if ( h )
+                {
+                    if ( h == 2 && has_frame )
+                        return 0;
+                    if ( h == 1 && has_frame )
+                    {
+                        // found another frame start without finishing current one?
+                        if ( has_pos )
+                            in.seek(pos);
+                        return 2;
+                    }
+                    has_frame = h;
+                }
+            }
             if ( c == EOF )
                 return 1;
             tag = ( c & LOW_BITS );
@@ -513,187 +675,36 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
 #endif
         } while ( !isalpha(tag) );
         
-        
-        //check for meta-data, contained in lines starting with '#'
-        if ( c == '#' )
-        {
-            fpos_t pos;
-            bool has_pos = !in.get_pos(pos);
-            std::string line = in.get_line();
-            VLOG("      #|" << line << "|" << '\n');
-            std::istringstream iss(line);
-            std::string tok;
-            iss >> tok;
-
-            // section heading
-            if ( tok == "section" )
-            {
-                iss >> section;
-                VLOG("-- section |" << section << "|\n");
-                if ( section == "end" )
-                    continue;
-                else if ( section == "single" )
-                {
-                    int mod = 0;
-                    iss >> tok >> mod;
-                    if ( tok == "F" )
-                    {
-                        // may skip unattached Singles
-                        if ( prop.skip_free_single > 1 )
-                            in.skip_until("#section ");
-                        if ( iss.good() && mod == 1 )
-                            singles.reheat();
-                    }
-                    else if ( tok == "reheat" )
-                    {
-                        singles.reheat();
-                    }
-                }
-                else if ( section == "couple" )
-                {
-                    int mod = 0;
-                    iss >> tok >> mod;
-                    if ( tok == "FF" )
-                    {
-                        // may skip unattached Couples
-                        if ( prop.skip_free_couple > 1 )
-                            in.skip_until("#section ");
-                        if ( iss.good() && mod == 1 )
-                            couples.reheat();
-                    }
-                    else if ( tok == "reheat" )
-                    {
-                        couples.reheat();
-                    }
-                }
-                objset = findSet(section);
-                if ( !objset )
-                    throw InvalidIO("unknown section |"+section+"|");
-                if ( subset && objset != subset )
-                    in.skip_until("#section ");
-            }
-            // optional indication giving the number of objects in the section
-            else if ( tok == "record" )
-            {
-                if ( objset )
-                {
-                    size_t cnt = 0, sup_id = 0;
-                    if ( iss >> cnt >> sup_id )
-                        objset->reserve(sup_id);
-                }
-            }
-            // frame start
-            else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )
-            {
-                if ( has_frame )
-                {
-                    if ( has_pos )
-                        in.seek(pos);
-                    return 2;
-                }
-                has_frame = 1;
-            }
-            //binary signature
-            else if ( tok == "binary" )
-            {
-                in.setEndianess(line.substr(7).c_str());
-            }
-            // info line "#format 48 dim 2"
-            else if ( tok == "format" )
-            {
-                unsigned f = 0, d = 0;
-                iss >> f >> tok >> d;
-                if ( f != in.formatID() )
-                {
-                    in.setFormatID(f);
-                    VLOG("Cytosim is reading format " << f << '\n');
-                }
-                if ( tok == "dim" )
-                {
-                    if ( in.vectorSize() != d )
-                        Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
-                    in.vectorSize(d);
-                }
-            }
-            // time data "#time 1.2345"
-            else if ( tok == "time" )
-            {
-                iss >> prop.time;
-#if BACKWARD_COMPATIBILITY < 48
-                // old format info line "#time 14.000000, dim 2, format 47"
-                if ( iss.get() == ',' )
-                {
-                    unsigned i = 0;
-                    iss >> tok >> i;
-                    if ( tok == "dim" )
-                    {
-                        in.vectorSize(i);
-                        if ( i != DIM )
-                            Cytosim::warn << "mismatch between file ("<<i<<"D) and executable ("<<DIM<<"D)\n";
-                    }
-                    if ( iss.get() == ',' )
-                    {
-                        iss >> tok >> i;
-                        if ( tok == "format" )
-                        {
-                            if ( i != in.formatID() )
-                            {
-                                in.setFormatID(i);
-                                if ( i < BACKWARD_COMPATIBILITY )
-                                    std::clog << "Cytosim is attempting to read old format " << i << "\n";
-                                if ( in.formatID() < 45 )
-                                    properties.decrement_all();
-                            }
-                        }
-                    }
-                }
-#endif
-            }
-            //detect the mark at the end of the frame
-            else if ( tok == "end" )
-            {
-                iss >> tok;
-                if ( tok == "cytosim" )
-                    return 0;
+        VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
+        assert_true( isalpha(tag) );
 #if BACKWARD_COMPATIBILITY < 50
-                if ( tok == "frame" )
-                    return 0;
-#endif
-            }
+        // this is an 'older' code pathway, before 2017?
+        if ( !objset )
+        {
+            ObjectSet * set = findSetT(tag);
+            if ( set )
+                set->loadObject(in, tag, fat, true);
+            continue;
         }
-        else
-        {
-            VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
-            assert_true( isalpha(tag) );
-#if BACKWARD_COMPATIBILITY < 50
-            // this is an 'older' code pathway, before 2017?
-            if ( !objset )
-            {
-                ObjectSet * set = findSetT(tag);
-                if ( set )
-                    set->loadObject(in, tag, fat, true);
-                continue;
-            }
 #endif
-            try
+        try
+        {
+            // check that we are using the correct ObjectSet:
+            assert_true( objset == findSetT(tag) );
+            objset->loadObject(in, tag, fat, true);
+        }
+        catch( Exception & e )
+        {
+            print_blue(std::cerr, e.brief());
+            if ( objset )
             {
-                // check that we are using the correct ObjectSet:
-                assert_true( objset == findSetT(tag) );
-                objset->loadObject(in, tag, fat, true);
+                in.skip_until("#section ");
+                if ( in.eof() )
+                    return 3;
+                std::cerr << e.info() << " (skipping section "+section+")\n";
             }
-            catch( Exception & e )
-            {
-                print_blue(std::cerr, e.brief());
-                if ( objset )
-                {
-                    in.skip_until("#section ");
-                    if ( in.eof() )
-                        return 3;
-                    std::cerr << e.info() << " (skipping section "+section+")\n";
-                }
-                else
-                    std::cerr << e.info() << " (section "+section+")\n";
-            }
+            else
+                std::cerr << e.info() << " (section "+section+")\n";
         }
     }
     return 2;

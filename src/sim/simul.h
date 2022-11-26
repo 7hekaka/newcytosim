@@ -375,6 +375,9 @@ public:
     class InputLock;
     
     /// read objects from file, and add them to the simulation state
+    int readMetadata(Inputter&, std::string& section, ObjectSet*& objset, ObjectSet* subset);
+
+    /// read objects from file, and add them to the simulation state
     int readObjects(Inputter&, ObjectSet* subset);
 
     /// load sim-world from the named file
