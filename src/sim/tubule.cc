@@ -427,7 +427,7 @@ void Tubule::setInteractionsD(Meca& meca) const
 
 void Tubule::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     out.writeUInt16(NFIL+1);
     Object::writeReference(out, bone_);
     for ( size_t i = 0; i < NFIL; ++i )

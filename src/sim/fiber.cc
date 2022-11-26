@@ -1759,11 +1759,11 @@ void Fiber::write(Outputter& out) const
 {
 #if !NEW_COMPACT_STORAGE
     // normal way
-    writeHeader(out, tag());
+    writeMarker(out, tag());
     Chain::write(out);
 #else
     // compact format created on 23/06/2021
-    writeHeader(out, TAG_COMPACT);
+    writeMarker(out, TAG_COMPACT);
     Chain::writeAngles(out);
 #endif
     
@@ -1774,7 +1774,7 @@ void Fiber::write(Outputter& out) const
      */
     if ( prop->save_lattice && fLattice.data() )
     {
-        writeHeader(out, TAG_LATTICE);
+        writeMarker(out, TAG_LATTICE);
         // fLattice.write(out);
         // only write information corresponding to actual Fiber abscissa range:
         fLattice.write(out, fLattice.indexM(), fLattice.indexP()+1);
@@ -1783,7 +1783,7 @@ void Fiber::write(Outputter& out) const
 #if FIBER_HAS_MESH
     if ( fMesh.data() )
     {
-        writeHeader(out, TAG_FIBMESH);
+        writeMarker(out, TAG_FIBMESH);
         // fMesh.write(out);
         // only write information corresponding to actual Fiber abscissa range:
         fMesh.write(out, fMesh.indexM(), fMesh.indexP()+1);

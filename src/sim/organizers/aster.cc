@@ -570,7 +570,7 @@ void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
 
 void Aster::write(Outputter& out) const
 {
-    writeHeader(out, Organizer::TAG_ASTER);
+    writeMarker(out, Organizer::TAG_ASTER);
     Object::writeReference(out, asSolid);
     writeOrganized(out);
     

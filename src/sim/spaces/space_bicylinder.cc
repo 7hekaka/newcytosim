@@ -221,7 +221,7 @@ void SpaceBicylinder::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceBicylinder::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "RR");
     out.writeUInt16(2);
     out.writeFloat(radius_);

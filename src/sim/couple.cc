@@ -556,7 +556,7 @@ Vector Couple::linkFoot(Hand const* h) const
 
 void Couple::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     //std::clog << "- writing " << state() << " at " << out.pos() << '\n';
     cHand1->write(out);
     cHand2->write(out);

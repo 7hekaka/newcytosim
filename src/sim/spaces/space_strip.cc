@@ -224,7 +224,7 @@ void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceStrip::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "LLBT");
     out.writeUInt16(4);
     out.writeFloat(half_[0]);

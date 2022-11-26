@@ -514,8 +514,8 @@ void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list) const
 }
 
 
-/**  read header in binary format. This should match Object::writeHeader() */
-static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+/**  read Object's mark in binary format. This should match Object::writeMarker() */
+static void readMarker(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
 {
     if ( fat )
     {
@@ -531,8 +531,8 @@ static void readObjectHeader(Inputter& in, bool fat, PropertyID& ix, ObjectID& i
 }
 
 
-/**  read header in text format. This should match Object::writeHeader() */
-static void readObjectHeaderASCII(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+/**  read Object's mark in text format. This should match Object::writeMarker() */
+static void readMarkerASCII(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
 {
     FILE * f = in.file();
     if ( 1 != fscanf(f, "%u", &ix) )
@@ -570,9 +570,9 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
     Object * obj = nullptr;
     
     if ( in.binary() )
-        readObjectHeader(in, fat, pid, id, mk);
+        readMarker(in, fat, pid, id, mk);
     else
-        readObjectHeaderASCII(in, fat, pid, id, mk);
+        readMarkerASCII(in, fat, pid, id, mk);
 
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");

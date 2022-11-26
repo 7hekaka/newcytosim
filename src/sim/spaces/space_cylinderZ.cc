@@ -515,7 +515,7 @@ void SpaceCylinderZ::setConfinement(Vector const& pos, Mecapoint const& mp, real
 
 void SpaceCylinderZ::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "RBTE");
     out.writeUInt16(4);
     out.writeFloat(radius_);

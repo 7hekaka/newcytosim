@@ -104,7 +104,7 @@ void GrowingFiber::write(Outputter& out) const
     Fiber::write(out);
 
     // since states are constant, we write growth rates:
-    writeHeader(out, TAG_DYNAMIC);
+    writeMarker(out, TAG_DYNAMIC);
     if ( mStateM == STATE_GREEN )
         out.writeFloat(cDeltaM);
     else

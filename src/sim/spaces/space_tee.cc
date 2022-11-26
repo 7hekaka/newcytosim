@@ -386,7 +386,7 @@ Vector SpaceTee::project(Vector const& W) const
 
 void SpaceTee::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "LRLL");
     out.writeUInt16(4);
     out.writeFloat(tLength);

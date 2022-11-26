@@ -186,9 +186,9 @@ Writes the info that is common to all objects to file
      .
  .
  The ascii based format is invariant.
- This data is read back in `readObjectHeader()`
+ This data is read back in `readMarker()`
  */
-void Object::writeHeader(Outputter& out, ObjectTag g) const
+void Object::writeMarker(Outputter& out, ObjectTag g) const
 {
     if ( !out.binary() )
     {

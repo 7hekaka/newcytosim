@@ -216,7 +216,7 @@ void SpaceSquare::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceSquare::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "LLL");
     out.writeUInt16(4);
     out.writeFloat(half_[0]);

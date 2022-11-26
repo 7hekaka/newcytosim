@@ -167,7 +167,7 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
 
 void Bundle::write(Outputter& out) const
 {
-    writeHeader(out, Organizer::TAG_BUNDLE);
+    writeMarker(out, Organizer::TAG_BUNDLE);
     writeOrganized(out);
 }
 

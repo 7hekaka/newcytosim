@@ -181,7 +181,7 @@ void SpaceDisc::setConfinement(Vector const& pos, Mecapoint const& mp,
 
 void SpaceDisc::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "RBT");
     out.writeUInt16(4);
     out.writeFloat(radius_);

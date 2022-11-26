@@ -278,7 +278,7 @@ void SpaceDice::setConfinement(Vector const& pos, Mecapoint const& mp, real rad,
 
 void SpaceDice::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "LLLE");
     out.writeUInt16(4);
     out.writeFloat(half_[0]);

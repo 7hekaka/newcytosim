@@ -136,7 +136,7 @@ Fake::~Fake()
 
 void Fake::write(Outputter& out) const
 {
-    writeHeader(out, Organizer::TAG_FAKE);
+    writeMarker(out, Organizer::TAG_FAKE);
     Object::writeReference(out, fkSolid);
     writeOrganized(out);
 }

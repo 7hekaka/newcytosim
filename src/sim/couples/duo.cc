@@ -150,7 +150,7 @@ void Duo::stepAA()
 
 void Duo::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     out.writeUInt8(active_);
     cHand1->write(out);
     cHand2->write(out);

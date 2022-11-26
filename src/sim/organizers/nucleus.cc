@@ -126,7 +126,7 @@ Nucleus::~Nucleus()
 
 void Nucleus::write(Outputter& out) const
 {
-    writeHeader(out, Organizer::TAG_NUCLEUS);
+    writeMarker(out, Organizer::TAG_NUCLEUS);
     Object::writeReference(out, nuSphere);
     writeOrganized(out);
 }

@@ -149,7 +149,7 @@ void Bead::projectForces(const real* X, real* Y) const
 
 void Bead::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     out.writeFloats(position(), DIM, '\n');
     out.writeSoftSpace();
     out.writeFloat(paRadius);

@@ -384,7 +384,7 @@ void DynamicFiber::write(Outputter& out) const
     Fiber::write(out);
     
     // write variables describing the dynamic state of the ends:
-    writeHeader(out, TAG_DYNAMIC);
+    writeMarker(out, TAG_DYNAMIC);
     out.writeUInt8(unitM[0]);
     out.writeUInt8(unitM[1]);
     out.writeUInt16(0);

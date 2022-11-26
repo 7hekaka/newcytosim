@@ -126,7 +126,7 @@ Vector SpaceBanana::project(Vector const& pos) const
 
 void SpaceBanana::write(Outputter& out) const
 {
-    writeHeader(out, TAG);
+    writeMarker(out, TAG);
     writeShape(out, "LRC");
     out.writeUInt16(4);
     out.writeFloat(bLength);
