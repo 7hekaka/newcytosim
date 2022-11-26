@@ -16,7 +16,7 @@ class ObjectSet;
 class Display;
 
 /// Type for unique class identifier used to read/write objects from file
-typedef char ObjectTag;
+typedef unsigned char ObjectTag;
 
 /// Type used to mark objects
 typedef unsigned short ObjectMark;
@@ -26,6 +26,13 @@ typedef unsigned short ObjectFlag;
 
 /// Type used for signature
 typedef unsigned ObjectSignature;
+
+
+/// used to address the highest bit which is not used by ASCII codes
+constexpr uint8_t HIGH_BIT = 128;
+/// bit mask for those bits which are used by ASCII codes
+constexpr uint8_t LOW_BITS = 127;
+
 
 /// Parent class for all simulated objects
 /**

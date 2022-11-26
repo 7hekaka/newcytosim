@@ -1763,7 +1763,7 @@ void Fiber::write(Outputter& out) const
     Chain::write(out);
 #else
     // compact format created on 23/06/2021
-    writeHeader(out, TAG_ALT);
+    writeHeader(out, TAG_COMPACT);
     Chain::writeAngles(out);
 #endif
     
@@ -1826,7 +1826,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         fGlue = nullptr;
 #endif
     }
-    else if ( tag == TAG_ALT )
+    else if ( tag == TAG_COMPACT )
     {
         Chain::readAngles(in, sim, tag);
         updateRange();

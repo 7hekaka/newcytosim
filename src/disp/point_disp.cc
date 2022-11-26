@@ -364,7 +364,7 @@ void PointDisp::read(Glossary& glos)
     glos.set(size, "points");
     glos.set(shape, "points", 1);
 
-    glos.set(width, "width");
+    glos.set(width, "width") || glos.set(width, "size", 1);
     glos.set(style, "style");
     glos.set(shape, "shape");
     glos.set(symbol, "symbol");

@@ -8,10 +8,6 @@
 #include "filewrapper.h"
 
 
-/// the highest bit is not used by ASCII codes
-constexpr uint8_t HIGH_BIT = 128;
-constexpr uint8_t LOW_BITS = 127;
-
 
 /// Input in text or binary mode with automatic byte-swapping for endianess compatibility
 class Inputter : public FileWrapper

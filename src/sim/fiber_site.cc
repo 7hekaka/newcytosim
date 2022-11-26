@@ -146,7 +146,7 @@ void FiberSite::write(Outputter& out) const
 #else
             // compact format created on 23/06/2021
             // sacrificing precision to save a bit of space (29/06/2021)
-            Object::writeReference(out, Fiber::TAG_ALT, hFiber->identity());
+            Object::writeReference(out, Fiber::TAG_COMPACT, hFiber->identity());
             // calculate relative position on fiber, which should be in [0, 1]:
             real x = ( hAbs - hFiber->abscissaM() ) / ( hFiber->length() );
             out.writeFixed(x); // 2 bytes
@@ -176,7 +176,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
                 hSite = hLattice->index(hAbs);
 #endif
         }
-        else if ( tag == Fiber::TAG_ALT )
+        else if ( tag == Fiber::TAG_COMPACT )
         {
             real x = in.readFixed();
             hAbs = x * hFiber->length() + hFiber->abscissaM();
