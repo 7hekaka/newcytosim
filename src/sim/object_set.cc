@@ -571,15 +571,13 @@ static void readMarkerASCII(Inputter& in, bool fat, PropertyID& ix, ObjectID& id
 /**
  Load one object from file
  
- If 'fat==true', read the larger header format
- If 'update==true', the corresponding object is changed, or a new object is created.
+ If 'fat==true', read the larger Marker format
  */
-void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool update)
+void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
 {
     PropertyID pid = 0;
     ObjectID id = 0;
     ObjectMark mk = 0;
-    Object * obj = nullptr;
     
     if ( in.binary() )
         readMarker(in, fat, pid, id, mk);
@@ -590,44 +588,42 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat, bool upd
         throw InvalidIO("Invalid ObjectID referenced in file");
     //std::clog << "- load " << Object::make_reference(tag, pid, id) << '\n';
 
-    if ( update )
+    Object * obj = findID(id);
+    
+    /*
+     only 'primary' objects with a lowercase TAG are linked, but we exclude the old
+     TAG_LATTICE = 'l' for backward compatibility with format 56 (before 23/06/2021)
+     */
+    bool update = ( islower(tag) && tag != 'l' );
+
+    if ( obj && update )
     {
-        obj = findID(id);
-        /*
-         only 'primary' objects with a lowercase TAG are linked, but we exclude the old
-         TAG_LATTICE = 'l' for backward compatibility with format 56 (before 23/06/2021)
-         */
-        if ( obj && islower(tag) && tag != 'l' )
-        {
 #if ( 1 )
-            // check that property index has not changed:
-            if ( obj->property()->number() != pid )
-            {
-                Property const* P = obj->property();
-                std::clog << "Incident: erasing " << P->category() << P->number() << " `" << P->name();
-                std::clog << "' to load object with property #" << pid << '\n';
-                // the orphan Object remains on the 'ice_' to be deleted during pruning:
-                inventory_.unassign(obj);
-                obj->objset(nullptr);
-                obj->setIdentity(0);
-                obj = nullptr;
-            }
-            else
-#endif
-                ice_.pop(obj);
+        // check that property index has not changed:
+        if ( obj->property()->number() != pid )
+        {
+            Property const* P = obj->property();
+            std::clog << "Incident: erasing " << P->category() << P->number() << " `" << P->name();
+            std::clog << "' to load object with property #" << pid << '\n';
+            // the orphan Object remains on the 'ice_' to be deleted during pruning:
+            inventory_.unassign(obj);
+            obj->objset(nullptr);
+            obj->setIdentity(0);
+            obj = nullptr;
         }
         else
-            update = false;
+#endif
+            ice_.pop(obj);
     }
     
     if ( !obj )
     {
+        assert_true(update);
         assert_true(isprint(tag));
         //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
         // create new object of required class, indentified by property-id
         obj = newObject(tag, pid);
         assert_true(obj);
-        update = true;
         obj->setIdentity(id);
         obj->objset(this);
         inventory_.assign(obj);

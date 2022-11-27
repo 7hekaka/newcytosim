@@ -679,15 +679,16 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
 #endif
         } while ( !isalpha(tag) );
         
-        VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
         assert_true( isalpha(tag) );
+        VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
+
 #if BACKWARD_COMPATIBILITY < 50
         // this is an 'older' code pathway, before 2017?
         if ( !objset )
         {
             ObjectSet * set = findSetT(tag);
             if ( set )
-                set->loadObject(in, tag, fat, true);
+                set->loadObject(in, tag, fat);
             continue;
         }
 #endif
@@ -695,7 +696,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
         {
             // check that we are using the correct ObjectSet:
             assert_true( objset == findSetT(tag) );
-            objset->loadObject(in, tag, fat, true);
+            objset->loadObject(in, tag, fat);
         }
         catch( Exception & e )
         {

@@ -201,8 +201,8 @@ public:
     /// collect objects that have given Property
     ObjectList collect(Property const*) const;
     
-    /// load one Object from file, or skip it if `skip==true`
-    void loadObject(Inputter&, ObjectTag tag, bool fat, bool update);
+    /// load one Object from file
+    void loadObject(Inputter&, ObjectTag tag, bool fat);
     
     /// write all Objects to file
     virtual void writeSet(Outputter&) const = 0;
