@@ -184,6 +184,10 @@ void Single::write(Outputter& out) const
 }
 
 
+/**
+ To speedup reading, we could implement readF(), and readA()
+ Since Single are stored seperatetly, depending of their state
+ */
 void Single::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     sHand->readHand(in, sim);

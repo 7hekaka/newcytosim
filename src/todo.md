@@ -87,6 +87,8 @@ test write / read systematically on all cym files
 
 # Performance:
 
+- reading Single can be pooled since the Unattached and Attached Singles are stored apart
+- reduce Solid::addTriad() to add 2 points in 2D and 3 in 3D, as this is sufficient
 - SparMatSymStruct Matrices can be structured as blocks corresponding to each Mecable (1.9.2022).
 	+ this would speed up block addressing: 
 	+ Need to create a tuple of indices {mecaindex, pointindex}, to use as argument of add_block()
