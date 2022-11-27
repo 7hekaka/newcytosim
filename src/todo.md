@@ -192,7 +192,7 @@ https://github.com/TNG/boost-python-examples
 
 # Graphics:
 
-- Update OpenGL code: Matrix pipeline, State maintenance, Shaders
+- Update Cytosim to use OpenGL ES 2.0, which can be run on METAL using Google's ANGLE
 - Improve control of whether bound Hands are hidden if fiber->disp->visible==0
 - SimThread could store two simulation states, such as to be able to flip back-and-forth quickly.
 - stereoscopic display for 3D

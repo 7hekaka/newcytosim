@@ -281,24 +281,26 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag, ObjectID& id)
 #endif
         id = readObjectID(in, tag);
     
-    if ((tag != Fiber::TAG) & (tag != Fiber::TAG_COMPACT) & (tag != Fiber::TAG_LATTICE))
+    Fiber* fib = nullptr;
+    switch( tag )
     {
-        if ( tag == Object::NULL_TAG )
-            return nullptr;
+        case Object::NULL_TAG:
+            break;
 #if BACKWARD_COMPATIBILITY < 57
-        if ( tag == 'l' ) // TAG_LATTICE was 'l' before 23/06/2021
+        case 'l': // TAG_LATTICE was 'l' before 23/06/2021
             tag = Fiber::TAG_LATTICE;
-        else
 #endif
+        case Fiber::TAG:
+        case Fiber::TAG_COMPACT:
+        case Fiber::TAG_LATTICE:
+            fib = fibers.findID(id);
+            if ( !fib )
+                std::clog << "unknown fiber ID " << id << "\n";
+             //throw InvalidIO("unknown fiber ID "+std::to_string(id));
+            break;
+        default:
             throw InvalidIO("expected a fiber tag ("+std::string(1, tag)+")");
     }
-
-    Fiber* fib = fibers.findID(id);
-    
-    if ( !fib )
-        std::clog << "unknown fiber ID " << id << "\n";
-    //throw InvalidIO("unknown fiber ID "+std::to_string(id));
-
     return fib;
 }
 
