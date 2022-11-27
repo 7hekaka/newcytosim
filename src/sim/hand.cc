@@ -325,23 +325,23 @@ void Hand::stepLoaded(Vector const& force)
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - I/O
 
 
-void Hand::write(Outputter& out) const
+void Hand::writeHand(Outputter& out) const
 {
     /*
      it is not necessary to write the property number here,
      since it is set when the Hand is created in class Single or Couple.
      */
-    FiberSite::write(out);
+    writeFiberSite(out);
 }
 
 
-void Hand::read(Inputter& in, Simul& sim)
+ObjectID Hand::readHand(Inputter& in, Simul& sim)
 {
     Fiber * fib = hFiber;
-    FiberSite::read(in, sim);
+    ObjectID id = readFiberSite(in, sim);
     resetTimers();
     
     // update fiber's lists:
@@ -352,6 +352,7 @@ void Hand::read(Inputter& in, Simul& sim)
         if ( hFiber )
             hFiber->addHand(this);
     }
+    return id;
 }
 
 

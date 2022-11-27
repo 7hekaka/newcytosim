@@ -99,14 +99,14 @@ void Wrist::setInteractions(Meca& meca) const
 void Wrist::write(Outputter& out) const
 {
     writeMarker(out, TAG_WRIST);
-    sHand->write(out);
+    sHand->writeHand(out);
     base_.write(out);
 }
 
 
 void Wrist::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    sHand->read(in, sim);
+    sHand->readHand(in, sim);
     
 #if BACKWARD_COMPATIBILITY < 47
     if ( in.formatID() < 47 )

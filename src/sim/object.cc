@@ -105,30 +105,38 @@ std::string Object::reference() const
 void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
 {
     assert_true( id > 0 );
+    assert_true(isalpha(g));
 
     if ( out.binary() )
     {
-#if 1
-        // slim/fat format 50 -- 56 using different size
         if ( id > 65535 )
         {
-            // set the highest bit of the byte, which is not used by ASCII codes
-            out.writeChar(g|HIGH_BIT);
-            out.writeUInt32(id);
+            // fat format
+            if ( 1 ) // Simul::currentFormatID < 58 )
+            {
+                /*
+                 format 58 enabled on 26.11.2022:
+                 combining `tag` and 'id', leaving 3 bytes and at most 16 777 216 objects
+                 */
+                assert_true( id < 1<<24 );
+                uint32_t u = id | (uint32_t(g|HIGH_BIT)<<24);
+                std::cerr << "write " << id << " ref\n";
+                if ( 1 != fwrite(&u, 4, 1, out.file()) )
+                    throw InvalidIO("writeReference() failed");
+            }
+            else
+            {
+                // set the highest bit of the byte, which is not used by ASCII codes
+                out.writeChar(g|HIGH_BIT);
+                out.writeUInt32(id);
+            }
         }
         else
         {
+            // slim format
             out.writeChar(g);
             out.writeUInt16(id);
         }
-#else
-        /*
-         format tryout on 11.06.2021:
-         combine `tag` and 'id', leaving 3 bytes and at most 16777216 objects
-         Note that the topmost bit of ASCII is not used
-         */
-        out.writeUInt32(id|(uint32_t(g)<<24));
-#endif
     }
     else
     {
@@ -201,18 +209,26 @@ void Object::writeMarker(Outputter& out, ObjectTag g) const
     }
     else
     {
-        if ( identity() > 16777216 )
+        if ( identity() > 1<<24 )
             throw InvalidIO("binary file data format overflow");
         if ( identity() > 65535 || property()->number() > 255 || mark() )
         {
-            // set the highest bit of the byte, which is not used by ASCII codes
+            // using 8 bytes
+            // set the highest bit, which is not used by ASCII codes
             out.writeChar(g|HIGH_BIT);
+            out.writeUInt8(255&mark());
             out.writeUInt16(property()->number());
             out.writeUInt32(identity());
-            out.writeUInt32(mark());
+            /* Prior to format 58, on 26.11.2022, this was:
+             out.writeChar(g|HIGH_BIT);
+             out.writeUInt16(property()->number());
+             out.writeUInt32(identity());
+             out.writeUInt32(mark());
+             */
         }
         else
         {
+            // using 4 bytes
             out.writeChar(g);
             out.writeUInt8(property()->number());
             out.writeUInt16(identity());

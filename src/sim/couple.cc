@@ -558,8 +558,8 @@ void Couple::write(Outputter& out) const
 {
     writeMarker(out, TAG);
     //std::clog << "- writing " << state() << " at " << out.pos() << '\n';
-    cHand1->write(out);
-    cHand2->write(out);
+    cHand1->writeHand(out);
+    cHand2->writeHand(out);
     if ( !attached1() && !attached2() )
         out.writeFloats(cPos, DIM);
 }
@@ -579,10 +579,10 @@ void Couple::write(Outputter& out) const
  */
 void Couple::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    cHand1->read(in, sim);
-    cHand2->read(in, sim);
+    ObjectID id1 = cHand1->readHand(in, sim);
+    ObjectID id2 = cHand2->readHand(in, sim);
     
-    if ( attached1() || attached2() )
+    if ( id1 || id2 )
     {
 #if 0
         // it can be nice to set the position, but not essential

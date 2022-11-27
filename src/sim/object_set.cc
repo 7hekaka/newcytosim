@@ -519,15 +519,27 @@ static void readMarker(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, Obj
 {
     if ( fat )
     {
-        ix = in.readUInt16();
-        id = in.readUInt32();
-        mk = in.readUInt32();
+#if BACKWARD_COMPATIBILITY < 58
+        if ( in.formatID() < 58 ) // 26.11.2022
+        {
+            ix = in.readUInt16();
+            id = in.readUInt32();
+            mk = in.readUInt32();
+        }
+        else
+#endif
+        {
+            mk = in.readUInt8();
+            ix = in.readUInt16();
+            id = in.readUInt32();
+        }
     }
     else
     {
         ix = in.readUInt8();
         id = in.readUInt16();
     }
+    assert_true( id < 1<<24 );
 }
 
 

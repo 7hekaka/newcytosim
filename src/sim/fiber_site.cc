@@ -124,7 +124,7 @@ real  FiberSite::abscissaFrom(const FiberEnd ref) const
 #pragma mark - I/O
 
 
-void FiberSite::write(Outputter& out) const
+void FiberSite::writeFiberSite(Outputter& out) const
 {
     if ( hFiber )
     {
@@ -160,14 +160,15 @@ void FiberSite::write(Outputter& out) const
 }
 
 
-void FiberSite::read(Inputter& in, Simul& sim)
+ObjectID FiberSite::readFiberSite(Inputter& in, Simul& sim)
 {
+    ObjectID id = 0;
     ObjectTag tag = 0;
-    hFiber = sim.readFiberReference(in, tag);
+    hFiber = sim.readFiberReference(in, tag, id);
     
     if ( hFiber )
     {
-        //std::clog << "FiberSite::read() " << (char)tag << '\n';
+        //std::clog << "FiberSite::readFiberSite() " << (char)tag << '\n';
         if ( tag == Fiber::TAG )
         {
             hAbs = in.readFloat();
@@ -213,6 +214,7 @@ void FiberSite::read(Inputter& in, Simul& sim)
         // reinterpolate() will be called in updateFiber();
         //checkAbscissa();
     }
+    return id;
 }
 
 void FiberSite::print(std::ostream& os) const

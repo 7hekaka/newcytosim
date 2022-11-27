@@ -183,10 +183,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// read from file
-    void read(Inputter&, Simul&);
+    ObjectID readFiberSite(Inputter&, Simul&);
     
     /// write to file
-    void write(Outputter&) const;
+    void writeFiberSite(Outputter&) const;
  
     /// Human friendly ouput
     void print(std::ostream&) const;

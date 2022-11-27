@@ -179,14 +179,14 @@ void Single::setInteractions(Meca& meca) const
 void Single::write(Outputter& out) const
 {
     writeMarker(out, TAG);
-    sHand->write(out);
+    sHand->writeHand(out);
     out.writeFloats(sPos, DIM);
 }
 
 
 void Single::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    sHand->read(in, sim);
+    sHand->readHand(in, sim);
     in.readFloats(sPos, DIM);
 }
 

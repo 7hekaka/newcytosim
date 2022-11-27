@@ -112,7 +112,7 @@ uint16_t Inputter::readUInt16bin()
 {
     uint16_t v;
     if ( 1 != fread(&v, 2, 1, mFile) )
-        throw InvalidIO("readUInt16() failed");
+        throw InvalidIO("readUInt16bin() failed");
     if ( binary_ == 2 )
         v = byteswap16(v);
     return v;
@@ -137,7 +137,7 @@ uint32_t Inputter::readUInt32bin()
 {
     uint32_t v;
     if ( 1 != fread(&v, 4, 1, mFile) )
-        throw InvalidIO("readUInt32() failed");
+        throw InvalidIO("readUInt32bin() failed");
     if ( binary_ == 2 )
         v = byteswap32(v);
     return v;

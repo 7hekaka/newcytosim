@@ -302,7 +302,7 @@ public:
     Object * readReference(Inputter&, ObjectTag& tag);
 
     /// read a Fiber reference and return the corresponding Object (`tag` is set)
-    Fiber * readFiberReference(Inputter&, ObjectTag& tag);
+    Fiber * readFiberReference(Inputter&, ObjectTag& tag, ObjectID&);
     
     
     /// check if `name` corresponds to a property class, but excluding 'simul'
@@ -369,7 +369,7 @@ public:
     static const char TRAJECTORY[];
 
     /// current file format (check history in `simul_file.cc`)
-    static constexpr unsigned currentFormatID = 56;
+    static constexpr unsigned currentFormatID = 58;
     
     /// class for reading trajectory file
     class InputLock;

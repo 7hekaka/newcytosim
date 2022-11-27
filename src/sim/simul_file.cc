@@ -237,20 +237,24 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         {
             char c = in.get_char();
             tag = c & LOW_BITS;
-            if ( tag == Object::NULL_TAG )
-                return 0;
             if ( c & HIGH_BIT )
                 id = in.readUInt32bin();
-            else
+            else if ( c != Object::NULL_TAG )
                 id = in.readUInt16bin();
         }
         else
 #endif
         {
             // binary format 58 (26.11.2022)
-            uint32_t u = in.readUInt32bin();
-            tag = ( u >> 24 ) & LOW_BITS;
-            id = u & 0xFFFFFF;
+            char c = in.get_char();
+            tag = c & LOW_BITS;
+            if ( c & HIGH_BIT )
+            {
+                if ( 1 != fread(&id, 3, 1, in.file()) )
+                    throw InvalidIO("readObjectID(binary) failed");
+            }
+            else if ( c != Object::NULL_TAG )
+                id = in.readUInt16bin();
         }
     }
     else
@@ -268,9 +272,8 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
 /**
  Read a fiber (compatible with format tryout 11.06.2021)
  */
-Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
+Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag, ObjectID& id)
 {
-    ObjectID id;
 #if BACKWARD_COMPATIBILITY < 50
     if ( in.formatID() < 50 )
         id = readObjectID_old(in, tag);
@@ -287,13 +290,14 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag)
             tag = Fiber::TAG_LATTICE;
         else
 #endif
-            throw InvalidIO("expected reference to a fiber ("+std::to_string(tag)+")");
+            throw InvalidIO("expected a fiber tag ("+std::string(1, tag)+")");
     }
 
     Fiber* fib = fibers.findID(id);
     
     if ( !fib )
-        throw InvalidIO("unknown fiber ID "+std::to_string(id)+"");
+        std::clog << "unknown fiber ID " << id << "\n";
+    //throw InvalidIO("unknown fiber ID "+std::to_string(id));
 
     return fib;
 }

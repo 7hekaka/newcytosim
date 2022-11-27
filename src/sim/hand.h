@@ -178,10 +178,10 @@ public:
     real linkStiffness() const;
     
     /// read from file
-    void read(Inputter&, Simul&);
+    ObjectID readHand(Inputter&, Simul&);
     
     /// write to file
-    void write(Outputter&) const;
+    void writeHand(Outputter&) const;
     
     /// reset Gillespie's counters
     void resetTimers();
