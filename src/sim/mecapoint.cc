@@ -24,13 +24,8 @@ void Mecapoint::read(Inputter& in, Simul& sim)
 
 void Mecapoint::write(Outputter& out) const
 {
-    if ( mec_ ) {
-        Object::writeReference(out, mec_);
-        out.writeUInt16(pti_);
-    }
-    else {
-        Object::writeNullReference(out);
-    }
+    Object::writeReference(out, mec_);
+    if ( mec_ ) out.writeUInt16(pti_);
 }
 
 

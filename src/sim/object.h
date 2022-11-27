@@ -84,9 +84,6 @@ public:
     
     /// write a reference, but using the provided Tag
     static void writeReference(Outputter&, ObjectTag, ObjectID);
-    
-    /// write a reference that does not refer to any Object
-    static void writeNullReference(Outputter&);
 
     /// write a reference that identifies the Object uniquely
     static void writeReference(Outputter&, Object const*);

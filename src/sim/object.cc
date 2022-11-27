@@ -104,7 +104,6 @@ std::string Object::reference() const
  */
 void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
 {
-    assert_true( id > 0 );
     assert_true(isalpha(g));
 
     if ( out.binary() )
@@ -135,7 +134,8 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
         {
             // slim format
             out.writeChar(g);
-            out.writeUInt16(id);
+            if ( g != NULL_TAG )
+                out.writeUInt16(id);
         }
     }
     else
@@ -146,35 +146,12 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
 }
 
 
-void Object::writeNullReference(Outputter& out)
-{
-    if ( out.binary() )
-    {
-#if 1
-        out.writeChar(NULL_TAG);
-#else
-        /*
-         format tryout on 11.06.2021:
-         combining `tag` and 'id', leaving 3 bytes and at most 16777216 objects
-         Note that the topmost bit of ASCII is not used
-         */
-        out.writeUInt32(uint32_t(NULL_TAG)<<24);
-#endif
-    }
-    else
-    {
-        out.writeChar(' ');
-        out.writeChar(NULL_TAG);
-    }
-}
-
-
 void Object::writeReference(Outputter& out, Object const* i)
 {
     if ( i )
         writeReference(out, i->tag(), i->identity());
     else
-        writeNullReference(out);
+        writeReference(out, NULL_TAG, 0);
 }
 
 
@@ -188,9 +165,9 @@ Writes the info that is common to all objects to file
      .
  - A fat format:
      - 1 byte for the tag() with the highest bit set
+     - 1 byte for the mark
      - 2 bytes for the index of the property
      - 4 bytes for the identity
-     - 4 bytes for the mark
      .
  .
  The ascii based format is invariant.
@@ -209,7 +186,7 @@ void Object::writeMarker(Outputter& out, ObjectTag g) const
     }
     else
     {
-        if ( identity() > 1<<24 )
+        if ( identity() > 1<<24 ) // ~16 Million objects
             throw InvalidIO("binary file data format overflow");
         if ( identity() > 65535 || property()->number() > 255 || mark() )
         {
@@ -219,7 +196,7 @@ void Object::writeMarker(Outputter& out, ObjectTag g) const
             out.writeUInt8(255&mark());
             out.writeUInt16(property()->number());
             out.writeUInt32(identity());
-            /* Prior to format 58, on 26.11.2022, this was:
+            /* Prior 26.11.2022, in format 56, this was using 11 bytes:
              out.writeChar(g|HIGH_BIT);
              out.writeUInt16(property()->number());
              out.writeUInt32(identity());

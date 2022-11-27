@@ -155,7 +155,7 @@ void FiberSite::writeFiberSite(Outputter& out) const
     }
     else
     {
-        Object::writeNullReference(out);
+        Object::writeReference(out, Object::NULL_TAG, 0);
     }
 }
 
