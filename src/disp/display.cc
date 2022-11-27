@@ -1786,6 +1786,7 @@ void Display::drawSolid(Solid const& obj)
     if (( disp->style & 2 ) && disp->perceptible )
     {
         bodyColor(obj);
+        gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), pixscale(disp->size), gle::hedron(obj.radius(i)>0));
     }
