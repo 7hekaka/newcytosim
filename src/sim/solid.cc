@@ -1323,8 +1323,8 @@ void Solid::makeProjection()
     //to the current shape. We could use it to transform the inertia matrix
     real sum = 0;
     size_t cnt = 0;
-    Vector cen(0,0,0);
-    real mXX=0, mXY=0, mXZ=0, mYY=0, mYZ=0, mZZ=0;
+    real cX = 0, cY = 0, cZ = 0;
+    real XX=0, XY=0, XZ=0, YY=0, YZ=0, ZZ=0;
     
     for ( size_t i = 0; i < nPoints; ++i )
     {
@@ -1335,17 +1335,21 @@ void Solid::makeProjection()
             sum += R;
             const Vector pos = posP(i);
             const Vector vec = R * pos;
-            cen += vec;
-            mXX += vec.XX * pos.XX;
-            mXY += vec.XX * pos.YY;
-            mXZ += vec.XX * pos.ZZ;
-            mYY += vec.YY * pos.YY;
-            mYZ += vec.YY * pos.ZZ;
-            mZZ += vec.ZZ * pos.ZZ;
+            cX += vec.XX;
+            cY += vec.YY;
+            cZ += vec.ZZ;
+            XX += vec.XX * pos.XX;
+            XY += vec.XX * pos.YY;
+            XZ += vec.XX * pos.ZZ;
+            YY += vec.YY * pos.YY;
+            YZ += vec.YY * pos.ZZ;
+            ZZ += vec.ZZ * pos.ZZ;
         }
     }
-    
-    soCenter = cen / sum;
+    cX /= sum;
+    cY /= sum;
+    cZ /= sum;
+    soCenter.set(cX, cY, cZ);
     if ( cnt == 1 )
     {
         // in this case there is a single bead, and the matrix is isotropic
@@ -1356,16 +1360,16 @@ void Solid::makeProjection()
     // scale to get the correct mobility:
     const real A = 6 * M_PI;
     const real B = soDrag;
-    const real D = soDragRot - soDrag*soCenter.normSqr();
+    const real D = soDragRot - soDrag * ( cX*cX + cY*cY + cZ*cZ );
     
     // finally set the matrix in front of R in projectForces()
     // the 3x3 matrix is symmetric, and we only set its lower half:
-    soMomentum(0,0) = D + A * (mYY+mZZ) + B * soCenter.XX * soCenter.XX;
-    soMomentum(1,0) =   - A *  mXY      + B * soCenter.XX * soCenter.YY;
-    soMomentum(2,0) =   - A *  mXZ      + B * soCenter.XX * soCenter.ZZ;
-    soMomentum(1,1) = D + A * (mXX+mZZ) + B * soCenter.YY * soCenter.YY;
-    soMomentum(2,1) =   - A *  mYZ      + B * soCenter.YY * soCenter.ZZ;
-    soMomentum(2,2) = D + A * (mXX+mYY) + B * soCenter.ZZ * soCenter.ZZ;
+    soMomentum(0,0) = D + A * (YY+ZZ) + B * cX * cX;
+    soMomentum(1,0) =   - A *  XY     + B * cX * cY;
+    soMomentum(2,0) =   - A *  XZ     + B * cX * cZ;
+    soMomentum(1,1) = D + A * (XX+ZZ) + B * cY * cY;
+    soMomentum(2,1) =   - A *  YZ     + B * cY * cZ;
+    soMomentum(2,2) = D + A * (XX+YY) + B * cZ * cZ;
     //Matrix33 mat = soMomentum;
     soMomentum.symmetricInverse();
 
@@ -1453,6 +1457,7 @@ void Solid::projectForces(const real* X, real* Y) const
     
     for ( size_t p = 0; p < nPoints; ++p )
     {
+        // Y <- T + cross(R, X)
         (T+cross(R, Vector(pPos+DIM*p))).store(Y+DIM*p);
     }
 }
