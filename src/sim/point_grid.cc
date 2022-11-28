@@ -6,6 +6,7 @@
 #include "messages.h"
 #include "modulo.h"
 #include "space.h"
+#include "solid.h"
 #include "meca.h"
 
 extern Modulo const* modulo;
@@ -373,6 +374,12 @@ void PointGrid::checkLL(FatLocus const& aa, FatLocus const& bb) const
 /// excluding two spheres when they are from the same Solid
 static inline bool not_adjacentPP(FatPoint const* a, FatPoint const* b)
 {
+#if NEW_SOLID_HAS_TWIN
+    Solid const* A = Solid::toSolid(a->pnt_.mecable());
+    Solid const* B = Solid::toSolid(b->pnt_.mecable());
+    if ( A->twin() == B || B->twin() == A )
+        return false;
+#endif
     return a->pnt_.mecable() != b->pnt_.mecable();
 }
 

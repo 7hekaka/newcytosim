@@ -256,6 +256,14 @@ public:
             return static_cast<Solid*>(obj);
         return nullptr;
     }
+    
+    /// convert pointer to Solid* if the conversion seems valid; returns 0 otherwise
+    static Solid const* toSolid(Object const* obj)
+    {
+        if ( obj  &&  obj->tag() == TAG )
+            return static_cast<Solid const*>(obj);
+        return nullptr;
+    }
 
     //--------------------------------------------------------------------------
 
