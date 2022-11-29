@@ -289,7 +289,7 @@ public:
     void add_srand2(real dst[2], const real vec[2], real mag);
     
     /// add random number in ]-mag, mag[ to each component of 3D vec[]
-    void add_srand3(real dst[3], const real vec[2], real mag);
+    void add_srand3(real dst[3], const real vec[3], real mag);
     
     /// refill array `gaussians_[]`, resetting `next_gaussian_`
     void refill_gaussians();

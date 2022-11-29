@@ -154,7 +154,7 @@ void Random::add_srand2(real dst[2], const real ptr[2], real mag)
     dst[1] = ptr[1] + mag * static_cast<real>(finish_[1]);
 }
 
-void Random::add_srand3(real dst[2], const real ptr[2], real mag)
+void Random::add_srand3(real dst[3], const real ptr[3], real mag)
 {
     mag *= TWO_POWER_MINUS_31;
     if ( finish_ <= 2 + start_ )
