@@ -98,7 +98,7 @@ Vector SpaceLid::bounce(Vector const& pos) const
  */
 Vector SpaceLid::placeOnEdge(real) const
 {
-    return Vector(RNG.sfloat()*half_[0], top_, 0);
+    return Vector(RNG.sreal()*half_[0], top_, 0);
 }
 
 

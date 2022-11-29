@@ -113,9 +113,9 @@ Vector SpaceStrip::placeOnEdge(real) const
 {
     real Z = RNG.choice(bot_, top_);
 #if ( DIM >= 3 )
-    return Vector(RNG.sfloat()*half_[0], RNG.sfloat()*half_[0], Z);
+    return Vector(RNG.sreal()*half_[0], RNG.sreal()*half_[0], Z);
 #elif ( DIM > 1 )
-    return Vector(RNG.sfloat()*half_[0], Z, 0);
+    return Vector(RNG.sreal()*half_[0], Z, 0);
 #else
     return Vector(Z, 0, 0);
 #endif
