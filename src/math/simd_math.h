@@ -20,7 +20,7 @@ inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
  SIMD by FJN 12.01.2021 derived from:
  http://gallium.inria.fr/blog/fast-vectorizable-math-approx/
  */
-inline vec4f logapprox4f(vec4f x)
+inline vec4f log_approx4f(vec4f x)
 {
     // masks:
     const vec4f mant = set4fi(0x007FFFFF);
@@ -58,7 +58,7 @@ inline vec4f logapprox4f(vec4f x)
 }
 
 
-/// calculates `-log( x * 2^(-32) )` for 4 POSITIVE floats
+/// calculates `-log( x * 2^(-32) )` for 4 POSITIVE floats. Results are always positive
 inline vec4f minuslog_approx4f32(vec4f x)
 {
     // masks:
@@ -88,6 +88,29 @@ inline vec4f minuslog_approx4f32(vec4f x)
     return fmadd4f(x, tmp, cst);
 }
 
+
+/// Approximate combined cos+sin by Jacques-Henri Jourdan
+/**
+   This is correct only for x in [-pi, pi]
+   Absolute error bounded is by 5e-5
+   Continuous error
+ SIMD by FJN 12.01.2021 derived from:
+ */
+inline void sincos_approx4f(vec4f& S, vec4f& C, const vec4f x)
+{
+    vec4f xx = mul4f(x, x);
+
+    // Horner's rule for 4th order polynoms
+    S = fmadd4f(xx, set4f(2.1478401777e-6f), set4f(-1.9264918228e-4f));
+    C = fmadd4f(xx, set4f(1.8929864824e-5f), set4f(-1.3422947025e-3f));
+    S = fmadd4f(xx, S, set4f(8.3089787513e-3f));
+    C = fmadd4f(xx, C, set4f(4.1518035216e-2f));
+    S = fmadd4f(xx, S, set4f(-0.1666243672f));
+    C = fmadd4f(xx, C, set4f(-0.4998515820f));
+    S = fmadd4f(xx, S, set4f(0.9999793767f));
+    C = fmadd4f(xx, C, set4f(1.f));
+    S = mul4f(x, S);
+}
 #endif
 
 
@@ -133,7 +156,7 @@ inline vec8f rsqrt8fi(vec8f x)
  Continuous error.
  SIMD by FJN 12.01.2021 derived from:
  */
-inline vec8f logapprox8f(vec8f x)
+inline vec8f log_approx8f(vec8f x)
 {
     // masks:
     const vec8f mant = set8fi(0x007FFFFF);
@@ -178,42 +201,21 @@ inline vec8f logapprox8f(vec8f x)
    This is correct only for x in [-pi, pi]
    Absolute error bounded is by 5e-5
    Continuous error
- SIMD by FJN 12.01.2021 derived from:
+ SIMD by FJN 12.01.2021 derived from Jacques-Henri Jourdan's code
  */
-inline void sincosapprox8f(vec8f& S, vec8f& C, const vec8f x)
+inline void sincos_approx8f(vec8f& S, vec8f& C, const vec8f x)
 {
-    const vec8f c4 = set8f(1.8929864824e-5f);
-    const vec8f c3 = set8f(-1.3422947025e-3f);
-    const vec8f c2 = set8f(4.1518035216e-2f);
-    const vec8f c1 = set8f(-0.4998515820f);
-    const vec8f c0 = set8f(1.f);
-    
-    const vec8f s4 = set8f(2.1478401777e-6f);
-    const vec8f s3 = set8f(-1.9264918228e-4f);
-    const vec8f s2 = set8f(8.3089787513e-3f);
-    const vec8f s1 = set8f(-0.1666243672f);
-    const vec8f s0 = set8f(0.9999793767f);
-
     vec8f xx = mul8f(x, x);
 
-    /* Mathematically equivalent polynomial evaluations:
-     a0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4
-     a0 + x*(a1 + x*(a2 + x*(a3 + x*a4)))
-     ([a0 + a1*x] + xx*([a2 + a3*x] + a4*xx)
-
-     a0 + a1*x + a2*x^2 + a3*x^3 + a4*x^4 + a5*x^5 + a6*x^6
-     a0 + x*(a1 + x*(a2 + x*(a3 + x*(a4 + x*(a5 + a6*x)))))
-     ([a0 + a1*x] + xx*[a2 + a3*x]) + [xx*xx]*([a4 + a5*x] + a6*x)
-     */
     // Horner's rule for 4th order polynoms
-    S = add8f(mul8f(xx, s4), s3);
-    C = add8f(mul8f(xx, c4), c3);
-    S = add8f(mul8f(xx, S), s2);
-    C = add8f(mul8f(xx, C), c2);
-    S = add8f(mul8f(xx, S), s1);
-    C = add8f(mul8f(xx, C), c1);
-    S = add8f(mul8f(xx, S), s0);
-    C = add8f(mul8f(xx, C), c0);
+    S = add8f(mul8f(xx, set8f(2.1478401777e-6f)), set8f(-1.9264918228e-4f));
+    C = add8f(mul8f(xx, set8f(1.8929864824e-5f)), set8f(-1.3422947025e-3f));
+    S = add8f(mul8f(xx, S), set8f(8.3089787513e-3f));
+    C = add8f(mul8f(xx, C), set8f(4.1518035216e-2f));
+    S = add8f(mul8f(xx, S), set8f(-0.1666243672f));
+    C = add8f(mul8f(xx, C), set8f(-0.4998515820f));
+    S = add8f(mul8f(xx, S), set8f(0.9999793767f));
+    C = add8f(mul8f(xx, C), set8f(1.f));
     S = mul8f(x, S);
 }
 

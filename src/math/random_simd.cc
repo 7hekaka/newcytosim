@@ -43,7 +43,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         fold_corners4f(x, y); // increases from 490 to 574 expected!
         vec4f n = add4f(mul4f(x,x), mul4f(y,y));
         // the log() will be negative if `n < 1`, returning 0 if n == 0:
-        vec4f l = logapprox4f(n);
+        vec4f l = log_approx4f(n);
         // set valid[i] to 2 whenever `l[i] < 0`, and 0 otherwise:
         vec4i valid = cast4fi(and4f(negative4f(l), two));
         // n = sqrt( log(n) / ( -0.5 * n ) );
@@ -71,7 +71,52 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
     return dst;
 }
 
-#include "simd_print.h"
+
+/** This follows Box-Muller's method with approximate Log and Sin/Cos functions */
+static real * makeGaussiansBM_SIMD(real dst[], size_t cnt, const uint32_t* arg)
+{
+    const uint32_t* src = arg;
+    const uint32_t* end = src + cnt;
+
+    constexpr vec4f PI{M_PI*0x1p-31, M_PI*0x1p-31, M_PI*0x1p-31, M_PI*0x1p-31};
+
+    while ( src < end )
+    {
+        // generate angle in ]-PI, PI[:
+        vec4f t = mul4f(PI, load4if((int32_t*)src));
+        vec4f x, y;
+        sincos_approx4f(x, y, t);
+
+#ifdef __ARM_NEON__
+        constexpr vec4f two{2.f, 2.f, 2.f, 2.f};
+        // the multiplication by TWO_POWER_MINUS_32 is handled below:
+        vec4f n = minuslog_approx4f32(load4uf(src+4));
+#else
+        constexpr vec4f two{-2.f, -2.f, -2.f, -2.f};
+        constexpr vec4f eps{0x1p-31, 0x1p-31, 0x1p-31, 0x1p-31};
+        // generate norm in ]0, 1]: eps * float(uint32)
+        vec4f n = log_approx4f(mul4f(eps, abs4f(load4if((int32_t*)(src+4)))));
+#endif
+        // transform norm: n = sqrt( -2 * log(n) / n )
+        n = sqrt4f(mul4f(n, two));
+        x = mul4f(n, x);
+        y = mul4f(n, y);
+#if REAL_IS_DOUBLE
+        // convert 8 single-precision values
+        store2d(dst  , getlo2f(x));
+        store2d(dst+2, getlo2f(y));
+        store2d(dst+4, gethi2f(x));
+        store2d(dst+6, gethi2f(y));
+#else
+        // store 8 single-precision values
+        store4f(dst, x);
+        store4f(dst+4, y);
+#endif
+        src += 8;
+        dst += 8;
+    }
+    return dst;
+}
 
 /// compute approximate exponential derivates
 static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
@@ -89,7 +134,7 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
         vec4f z = abs4f(cvt4if(load4i((int32_t*)src)));
         // off = log(2^31), increased a bit to ensure x >= 0
         const vec4f off = set4f(21.48757171630859375f);
-        vec4f x = sub4f(off, logapprox4f(z));
+        vec4f x = sub4f(off, log_approx4f(z));
 #endif
         src += 4;
 #if REAL_IS_DOUBLE
@@ -137,7 +182,7 @@ static inline void fold_corners8f(vec8f& x, vec8f& y)
 
 
 /** This follows Box-Muller's method with approximate Log and Sin/Cos functions */
-static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
+static real * makeGaussiansBM_AVX(real dst[], size_t cnt, const uint32_t* arg)
 {
     const vec8i * src = (vec8i*)arg;
     const vec8i * end = src + cnt / 8;
@@ -153,9 +198,9 @@ static real * makeGaussians_AVXBM(real dst[], size_t cnt, const uint32_t* arg)
         // generate angle in ]-PI, PI[:
         vec8f t = mul8f(PI, load8if(src++));
         // transform norm:
-        n = sqrt8f(mul8f(abs8f(logapprox8f(n)), two));
+        n = sqrt8f(mul8f(abs8f(log_approx8f(n)), two));
         vec8f x, y;
-        sincosapprox8f(x, y, t);
+        sincos_approx8f(x, y, t);
         x = mul8f(n, x);
         y = mul8f(n, y);
 #if REAL_IS_DOUBLE
@@ -243,7 +288,7 @@ static real * makeGaussians_AVX(real dst[], size_t cnt, const uint32_t* arg)
         // set valid[i] to 2 whenever 'n[i] < 1.0', and 0 otherwise:
         vec8i valid = _mm256_castps_si256(and8f(lowerthan8f(n, one), two));
         //w = std::sqrt( -2 * std::log(n) / n );
-        n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
+        n = sqrt8f(div8f(log_approx8f(n), mul8f(half, n)));
         y = mul8f(n, y);
         n = mul8f(n, x);
         // place corresponding X and Y values next to each other:
@@ -320,9 +365,9 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const uint32_t* arg)
         // calculate norm:
         vec8f n = add8f(mul8f(x,x), mul8f(y,y));
         // n = sqrt( -2 * log(n) / n )
-        n = sqrt8f(div8f(logapprox8f(n), mul8f(half, n)));
+        n = sqrt8f(div8f(log_approx8f(n), mul8f(half, n)));
         //n = sqrt8f(div8f(log8f(n), mul8f(half, n)));
-        //n = rsqrt8f(div8f(mul8f(half, n), logapprox8f(n)));
+        //n = rsqrt8f(div8f(mul8f(half, n), log_approx8f(n)));
         x = mul8f(n, x);
         y = mul8f(n, y);
         // place corresponding X and Y values next to each other:
@@ -338,7 +383,7 @@ static real * makeGaussians_AVX2(real dst[], size_t cnt, const uint32_t* arg)
         vec8f t = mul8f(eps, load8if(src++));
         fold_corners8f(z, t);
         vec8f p = add8f(mul8f(z,z), mul8f(t,t));
-        p = sqrt8f(div8f(logapprox8f(p), mul8f(half, p)));
+        p = sqrt8f(div8f(log_approx8f(p), mul8f(half, p)));
         z = mul8f(p, z);
         t = mul8f(p, t);
         p = unpacklo8f(z, t);

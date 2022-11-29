@@ -238,10 +238,11 @@ int main(int argc, char* argv[])
     run<makeGaussians_>(sfmt, "Gauss", cnt);
 #if USE_SIMD
     run<makeGaussians_SIMD>(sfmt, "Gauss.SIMD", cnt);
+    run<makeGaussiansBM_SIMD>(sfmt, "GauBM.SIMD", cnt);
 #endif
 
 #if defined(__AVX__)
-    run<makeGaussians_AVXBM>(sfmt, "Gauss.AVXBM", cnt);
+    run<makeGaussiansBM_AVX>(sfmt, "GauBM.AVX", cnt);
     run<makeGaussians_AVX>(sfmt, "Gauss.AVX", cnt);
     run<makeGaussians_AVX2>(sfmt, "Gauss.AVX2", cnt);
 #endif
