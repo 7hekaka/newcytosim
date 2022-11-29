@@ -236,21 +236,18 @@ public:
 
     /// True with probability 1/8
     bool flip_8th()       { return URAND32() < 1<<29; }
-    
-    /// fast (dirty) random float in [0,1[, requires IEEE Standard 754
-    float pfloat23();
-    
+
     /// random float in [0,1[, requires IEEE Standard 754 
-    float pfloat();
+    float pfloat()        { return float(URAND32() >> 8) * 0x1.0p-24; }
     
     /// random float in ]-1,1[, requires IEEE Standard 754
-    float sfloat();
+    float sfloat()        { return float(RAND32() >> 8) * 0x1.0p-23; }
     
     /// slow random double in [0,1[, using two uint32_t to set all the fraction bits, requires IEEE Standard 754
-    double pdouble();
+    double pdouble()       { return double(URAND64() >> 11) * 0x1.0p-53; }
     
     /// slow random double in ]-1,1[, using two uint32_t to set all the fraction bits, requires IEEE Standard 754
-    double sdouble();
+    double sdouble()       { return double(RAND64() >> 11) * 0x1.0p-52; }
     
     /// positive real number in [0,1[, zero included
     real preal()           { return ZERO2ONE(); }

@@ -14,7 +14,7 @@
 #include <random>
 
 template < typename T >
-void print_bits(FILE* f, const T& val, char spc)
+void print_bits(FILE* f, const T& val, char end)
 {
     unsigned char * ptr = (unsigned char*) & val;
     for ( int i = sizeof(T)-1; i >= 0; --i)
@@ -25,9 +25,9 @@ void print_bits(FILE* f, const T& val, char spc)
             putc('0' + (1 & (byte>>(CHAR_BIT-1))), f);
             byte <<= 1;
         }
-        if ( spc ) putc(spc, f);
+        putc(' ', f);
     }
-    putc('\n', f);
+    putc(end, f);
 }
 
 
@@ -89,18 +89,6 @@ void silly_test()
 }
 
 
-/**
- This assumes IEEE Standard 754 Floating point numbers
-32 bits: 1 for sign, 8 for exponents, 23 for fraction
- */
-float convertFix(uint32_t x)
-{
-    constexpr uint32_t FRAC  = 0x7FFFFFU;
-    constexpr uint32_t EXPON = 127 << 23;
-    uint32_t res = EXPON | ( x & FRAC );
-    return *((float*)&res) - 1.0;
-}
-
 
 void testbits()
 {
@@ -113,13 +101,6 @@ void testbits()
         // x = -ii / float(SCALE);
         // printf("%f :", x);
         // print_bits(stdout, x, 0);
-    }
-    
-    for ( int i=0; i < 16; ++i )
-    {
-        float y = convertFix(RNG.pint32());
-        printf(" %f :", y);
-        print_bits(stdout, y, ' ');
     }
 }
 
@@ -267,6 +248,35 @@ void check_poisson(size_t sup)
 
 //==============================================================================
 
+/**
+ Not a good way of doing things: least significant bit always zero!
+ This assumes IEEE Standard 754 Floating point numbers
+32 bits: 1 for sign, 8 for exponents, 23 for fraction
+ */
+float convertFloat(uint32_t x)
+{
+    constexpr uint32_t FRAC  = 0x7FFFFFU;
+    constexpr uint32_t EXPON = 127 << 23;
+    uint32_t res = EXPON | ( x & FRAC );
+    return *((float*)&res) - 1.0;
+}
+
+
+void test_convert(size_t sup)
+{
+    for ( size_t i = 0; i < sup; ++i )
+    {
+        uint64_t u = RNG.pint64();
+        double x = double(u) * 0x1.0p-64;
+        double y = double(u>>11) * 0x1.0p-53; // better!
+        print_bits(stdout, x, ' ');
+        print_bits(stdout, y, ' ');
+        printf("%e\n", x - y);
+    }
+}
+
+//==============================================================================
+
 void speed_test(size_t cnt)
 {
     tick();
@@ -353,6 +363,10 @@ int main(int argc, char* argv[])
             
         case 5:
             silly_test();
+            break;
+            
+        case 6:
+            test_convert(32);
             break;
     }
 }
