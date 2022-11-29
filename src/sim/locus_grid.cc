@@ -977,9 +977,9 @@ BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
     if ( ptr < end )
     {
         BitField t = four_near_bits(xyzr, ptr);
-#if 1
+#if 0
         BitField a = two_near_bits(xyzr, ptr) + (two_near_bits(xyzr, ptr+2)<<2);
-        if ( t != a ) printf("[%llX %llX]", t, a);
+        if ( t != a ) printf("[%lX %lX]", t, a);
 #endif
         res |= t << shift;
         shift += 4;
