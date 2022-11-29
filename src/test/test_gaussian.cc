@@ -183,7 +183,7 @@ static real* check_log(real dst[], size_t cnt, const uint32_t arg[])
         vec8f n = sub8f(set8f(1.0f), mul8f(eps, abs8f(load8if(src++))));
         ++src; //vec8f j = mul8f(eps, load8if(src++));
         vec8f x = n;
-        vec8f y = logapprox8f(n);
+        vec8f y = log_approx8f(n);
 #if REAL_IS_DOUBLE
         // convert 16 single-precision values
         store4d(d   , getlo4f(x));
