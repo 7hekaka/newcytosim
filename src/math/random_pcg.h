@@ -1,4 +1,4 @@
-//Permuted congruential generator
+// Melissa E. O’Neill Permuted Congruential Generator
 // https://en.wikipedia.org/wiki/Permuted_congruential_generator
 
 #include <stdint.h>

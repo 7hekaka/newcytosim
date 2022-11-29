@@ -76,7 +76,7 @@ void mouseMotionCallback(GLFWwindow* win, double mx, double my)
 }
 
 /* respond to mouse clicks */
-void mouseButtoncallback(GLFWwindow* win, int button, int action, int mods)
+void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods)
 {
     double mx, my;
     glfwGetCursorPos(win, &mx, &my);
@@ -92,6 +92,16 @@ void mouseButtoncallback(GLFWwindow* win, int button, int action, int mods)
                 fate[i] = 1;
         }
     }
+}
+
+/* respond to scroll events (mouse wheel) */
+void scrollCallback(GLFWwindow* win, double dx, double dy)
+{
+    double mx, my;
+    glfwGetCursorPos(win, &mx, &my);
+    //printf("scroll @ %8.2f %8.2f (%8.2f %8.2f)\n", mx, my, dx, dy);
+    double Z = std::max(0.5, 1.0 + 0.0625 * dy);
+    view.zoom_in(Z);
 }
 
 /* enter/exit full screen mode */
@@ -212,7 +222,8 @@ GLFWwindow * initWindow(int W, int H)
     glfwSetKeyCallback(win, keysCallback);
     glfwSetFramebufferSizeCallback(win, reshape);
     glfwSetCursorPosCallback(win, mouseMotionCallback);
-    glfwSetMouseButtonCallback(win, mouseButtoncallback);
+    glfwSetMouseButtonCallback(win, mouseButtonCallback);
+    glfwSetScrollCallback(win, scrollCallback);
     //glfwSetCharModsCallback(win, charCallback);
     glfwMakeContextCurrent(win);
     //gladLoadGL(glfwGetProcAddress);
