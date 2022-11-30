@@ -241,7 +241,7 @@ public:
     Confinement confine2;
     
     /// stiffness of confinement (also known as `confine[1]`)
-    real confine2_stiffness;
+    real confine2_stiff[2];
     
     /// name of space used for confinement (also known as `confine[2]`)
     std::string confine2_space;

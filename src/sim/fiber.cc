@@ -1082,7 +1082,7 @@ void Fiber::setInteractions(Meca& meca) const
 #if NEW_FIBER_CONFINE2
     /// add another confinement force
     if ( prop->confine2 != CONFINE_OFF )
-        setFiberConfinement(meca, prop->confine2, prop->confine2_space_ptr, prop->confine2_stiffness, prop->confine2_stiffness);
+        setFiberConfinement(meca, prop->confine2, prop->confine2_space_ptr, prop->confine2_stiff[0], prop->confine2_stiff[1]);
 #endif
 }
 
