@@ -349,7 +349,7 @@ void Random::gauss_set(real vec[], size_t cnt)
  */
 void Random::gauss_boxmuller(real& x, real& y)
 {
-    real ang = real(RAND32()) * ( TWO_POWER_MINUS_31 * M_PI );
+    real ang = real(SRAND32()) * ( TWO_POWER_MINUS_31 * M_PI );
     real nrm = std::sqrt( -2 * std::log( preal_exc() ));
     x = nrm * std::cos(ang);
     y = nrm * std::sin(ang);

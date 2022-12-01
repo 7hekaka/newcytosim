@@ -81,7 +81,7 @@ protected:
     }
 
     /// extract next 32 random bits as signed integer
-    int32_t RAND32()
+    int32_t SRAND32()
     {
         if ( finish_ <= start_ )
             refill();
@@ -101,7 +101,7 @@ protected:
     }
     
     /// extract next 64 random bits as signed integer
-    int64_t RAND64()
+    int64_t SRAND64()
     {
         // consume data from the 'start_' to preserve alignment
         if ( finish_ <= 1 + start_ )
@@ -115,13 +115,13 @@ protected:
     real ZERO2ONE()
     {
         // the cast gives a number with (x <= 2^31-1)
-        return std::fabs(static_cast<real>(RAND32())) * TWO_POWER_MINUS_31;
+        return std::fabs(static_cast<real>(SRAND32())) * TWO_POWER_MINUS_31;
     }
 
     /// a signed 'real' using 31 random bits + sign bit (-2^31+1 < x <= 2^31-1)
     real BIGREAL()
     {
-        return static_cast<real>(RAND32());
+        return static_cast<real>(SRAND32());
     }
 
 public:
@@ -142,13 +142,13 @@ public:
     uint32_t seed();
 
     /// signed integer in [-2^31+1, 2^31-1];
-    int32_t  sint32() { return RAND32(); }
+    int32_t  sint32() { return SRAND32(); }
 
     /// unsigned integer in [0, 2^32-1]
     uint32_t pint32() { return URAND32(); }
     
     /// unsigned integer in [0, 2^64-1]
-    int64_t  sint64() { return RAND64(); }
+    int64_t  sint64() { return SRAND64(); }
 
     /// unsigned integer in [0, 2^64-1]
     uint64_t pint64() { return URAND64(); }
@@ -226,13 +226,13 @@ public:
     bool test_not(real p) { return ( ZERO2ONE() >= p ); }
     
     /// 0  or  1  with equal chance
-    int  flip()           { return URAND32() & 1U; }
+    int flip()            { return URAND32() >> 31; }
     
     /// returns -1  or  1 with equal chance
-    real flipsign()       { return std::copysign(1, RAND32()); }
+    int flipsign()        { return (SRAND32() > 0) ? 1 : -1; }
     
     /// returns 1 with probability P and -1 with probability 1-P
-    real flipsign(real p) { return 2*(int)test(p) - 1; }
+    int flipsign(real p)  { return 2*(int)test(p) - 1; }
 
     /// True with probability 1/8
     bool flip_8th()       { return URAND32() < 1<<29; }
@@ -241,13 +241,13 @@ public:
     float pfloat()        { return float(URAND32() >> 8) * 0x1.0p-24; }
     
     /// random float in ]-1,1[, requires IEEE Standard 754
-    float sfloat()        { return float(RAND32() >> 8) * 0x1.0p-23; }
+    float sfloat()        { return float(SRAND32() >> 8) * 0x1.0p-23; }
     
     /// slow random double in [0,1[, using two uint32_t to set all the fraction bits, requires IEEE Standard 754
     double pdouble()       { return double(URAND64() >> 11) * 0x1.0p-53; }
     
     /// slow random double in ]-1,1[, using two uint32_t to set all the fraction bits, requires IEEE Standard 754
-    double sdouble()       { return double(RAND64() >> 11) * 0x1.0p-52; }
+    double sdouble()       { return double(SRAND64() >> 11) * 0x1.0p-52; }
     
     /// positive real number in [0,1[, zero included
     real preal()           { return ZERO2ONE(); }
@@ -262,10 +262,10 @@ public:
     real shalf()           { return BIGREAL() * TWO_POWER_MINUS_32; }
     
     /// returns -1.0 or 1.0 with equal chance
-    real sflip()           { return sign_real(BIGREAL()); }
+    real sflip()           { return (SRAND32() > 0) ? real(1.0) : real(-1.0); }
     
     /// returns -a or a with equal chance
-    real sflip(real a)     { return std::copysign(a, BIGREAL()); }
+    real sflip(real a)     { return (SRAND32() > 0) ? a : -a; }
 
     /// non-zero real number in ]0,1]
     real preal_exc()       { return 1 - ZERO2ONE(); }
@@ -338,7 +338,7 @@ public:
     template<typename T>
     T choice(const T& x, const T& y)
     {
-        if ( RAND32() > 0 )
+        if ( SRAND32() > 0 )
             return x;
         else
             return y;
