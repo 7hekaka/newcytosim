@@ -74,7 +74,8 @@ void Movable::revolve(Rotation const& T)
  `discYZ R T`         | Disc in the YZ-plane of radius R, thickness T
  `equator R T`        | At distance R from the origin, and T from the XY plane:\n `norm(X,Y) < R` `norm(Z) < T`
  `circle R T`         | Circle of radius R and thickness T \n At distance T from the circle of radius R
- `cylinder L R`       | Cylinder of axis X, L=length in X, R=radius in YZ
+ `cylinder L R`       | Cylinder of axis X, L=length in X, R=radius in YZ plane
+ `cylinderZ L R`      | Cylinder of axis Z, L=length in Z, R=radius in XY plane
  `ring L R T`         | Surface of a cylinder of axis X, L=length in X, R=radius in YZ, T = thickness
  `ellipse A B C`      | Inside the ellipse or ellipsoid of main axes 2A, 2B and 2C
  `arc L Theta`        | A piece of circle of length L and covering an angle Theta
@@ -257,19 +258,45 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
             return Vector(L*RNG.shalf(), V.XX, V.YY);
         }
         
+        if ( tok == "cylinderZ" )
+        {
+            real L = -1, R = -1;
+            is >> L;
+            if ( is.fail() || L < 0 )
+                throw InvalidParameter("length L must be >= 0 in `cylinderZ L R`");
+            is >> R;
+            if ( R < 0 )
+                throw InvalidParameter("radius R must be >= 0 in `cylinderZ L R`");
+            const Vector2 V = Vector2::randB(R);
+            return Vector(V.XX, V.YY, L*RNG.shalf());
+        }
+
         if ( tok == "ring" )
         {
             real L = -1, R = -1, T = 0;
             is >> L;
             if ( is.fail() || L < 0 )
-                throw InvalidParameter("length L must be >= 0 in `cylinder L R`");
+                throw InvalidParameter("length L must be >= 0 in `ring L R`");
             is >> R >> T;
             if ( R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
+                throw InvalidParameter("radius R must be >= 0 in `ring L R`");
             const Vector2 V = Vector2::randU(R) * ( 1.0 + RNG.shalf()*T );
             return Vector(L*RNG.shalf(), V.XX, V.YY);
         }
         
+        if ( tok == "ringZ" )
+        {
+            real L = -1, R = -1, T = 0;
+            is >> L;
+            if ( is.fail() || L < 0 )
+                throw InvalidParameter("length L must be >= 0 in `ringZ L R`");
+            is >> R >> T;
+            if ( R < 0 )
+                throw InvalidParameter("radius R must be >= 0 in `ringZ L R`");
+            const Vector2 V = Vector2::randU(R) * ( 1.0 + RNG.shalf()*T );
+            return Vector(V.XX, V.YY, L*RNG.shalf());
+        }
+
         if ( tok == "circle" )
         {
             real R = -1, T = 0;
@@ -341,16 +368,16 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         
         if ( tok == "ellipse" )
         {
-            real x = 1, y = 1, z = 0;
-            is >> x >> y >> z;
-            return Vector(x,y,z).e_mul(Vector::randB());
+            Vector S(1, 1, 0);
+            is >> S;
+            return S.e_mul(Vector::randB());
         }
         
         if ( tok == "ellipse_surface" )
         {
-            real x = 1, y = 1, z = 0;
-            is >> x >> y >> z;
-            return Vector(x,y,z).e_mul(Vector::randU());
+            Vector S(1, 1, 0);
+            is >> S;
+            return S.e_mul(Vector::randU());
         }
         
         if ( tok == "line" )
@@ -399,9 +426,9 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
         
         if ( tok == "rectangle" )
         {
-            real x = 0, y = 0, z = 0;
-            is >> x >> y >> z;
-            return Vector(x,y,z).e_mul(Vector::randH());
+            Vector S(0, 0, 0);
+            is >> S;
+            return S.e_mul(Vector::randH());
         }
 
 #if ( 1 )
@@ -460,6 +487,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
  `add SHAPE`            | Translate by a vector chosen according to SHAPE
  `align VECTOR`         | Rotate to align parallel with specified vector
  `turn ROTATION`        | Apply specified rotation
+ `extend B T`           | Extend along the Z axis, between Z=B and Z=T
  `blur REAL`            | Add centered Gaussian noise of variance REAL
  `to X Y Z`             | Interpolate with the previously specified position
  `or POSITION`          | flip randomly between two specified positions
@@ -529,6 +557,15 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
             is >> blur;
             pos += Vector::randG(blur);
         }
+#if ( DIM > 2 )
+        // extend long the Z axis
+        else if ( tok == "extendZ" )
+        {
+            real B = 0, T = 0;
+            is >> B >> T;
+            pos.ZZ += B + ( T - B ) * RNG.preal();
+        }
+#endif
         // returns a random position between the two points specified
         else if ( tok == "to" )
         {
@@ -560,7 +597,7 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
             // unget last token:
             is.clear();
             is.seekg(isp);
-#if 1
+#if 0
             /*
              We need to work around a bug in the stream extraction operator,
              which eats extra characters ('a','n','e','E') if a double is read

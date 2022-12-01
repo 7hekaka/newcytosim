@@ -29,16 +29,20 @@ std::istream& operator >> (std::istream& is, Vector4& v)
 {
     if ( is >> v.XX )
     {
+        std::streampos isp = is.tellg();
         if ( is >> v.YY )
         {
+            isp = is.tellg();
             if ( is >> v.ZZ )
             {
+                isp = is.tellg();
                 if ( is >> v.TT )
                     ;
                 else
                 {
                     v.TT = 0;
                     is.clear();
+                    is.seekg(isp);
                 }
             }
             else
@@ -46,6 +50,7 @@ std::istream& operator >> (std::istream& is, Vector4& v)
                 v.ZZ = 0;
                 v.TT = 0;
                 is.clear();
+                is.seekg(isp);
             }
         }
         else
@@ -54,6 +59,7 @@ std::istream& operator >> (std::istream& is, Vector4& v)
             v.ZZ = 0;
             v.TT = 0;
             is.clear();
+            is.seekg(isp);
         }
     }
     return is;
