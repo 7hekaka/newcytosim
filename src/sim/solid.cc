@@ -369,32 +369,16 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     rad = abs_real(rad);
     
 #if ( DIM > 1 )
-    real sep = 1.0;
-    if ( opt.set(sep, "separation") )
+    real sep = 1.0, dev = 0.0;
+    if ( opt.set(sep, "separation") && opt.set(dev, "deviation") )
     {
+        if ( dev > rad )
+            throw InvalidParameter("solid:deviation should be <= radius");
         // attach Single on the surface of this sphere:
         size_t nbs = opt.num_values(var) - 2;
         // 'pts' is a set of unit vectors:
         std::vector<Vector> pts(nbs, Vector(0,0,0));
-        
-        // separation should not be greater than diameter:
-        sep = std::min(sep, 2*rad);
-        // decrease separation gradually, until all points can fit:
-        real dis = sep;
-        size_t ouf = 0;
-        while ( tossPointsSphere(pts, dis/rad, 128) < nbs )
-        {
-            if ( ++ouf > 128 )
-            {
-                ouf = 0;
-                dis /= 1.0905044; // std::sqrt(sqrt(std::sqrt(2)))
-            }
-        }
-        if ( dis < sep )
-            Cytosim::warn << "solid:separation reduced to " << dis << "\n";
-        real dev = 0.0;
-        if ( opt.set(dev, "deviation") && dev > rad )
-            throw InvalidParameter("solid:deviation should be <= radius");
+        distributePointsSphere(pts, sep/rad, 128);
         while ( opt.set(str, var, inx++) )
         {
             // get a number and the name of a class:
@@ -404,6 +388,34 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             addWrists(objs, num, sip, ref, pts[inx-3], dev/rad);
         }
     }
+    else if ( opt.set(sep, "separation") )
+    {
+        // count number of singles to be attached:
+        size_t nbs = 0;
+        size_t i = inx;
+        while ( opt.peek(str, var, i++) )
+        {
+            size_t num = 1;
+            Tokenizer::split_integer(num, str);
+            nbs += num;
+        }
+        // generate a set of unit vectors:
+        std::vector<Vector> pts(nbs, Vector(0,0,0));
+        distributePointsSphere(pts, sep/rad, 128);
+        i = 0;
+        while ( opt.set(str, var, inx++) )
+        {
+            size_t num = 1;
+            Tokenizer::split_integer(num, str);
+            SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
+            for ( size_t u = 0; u < num; ++u )
+            {
+                Wrist * w = sip->newWrist(this, 0);
+                w->rebase(this, ref, pts[i++]);
+                objs.push_back(w);
+            }
+        }
+    }
     else
 #endif
     {
@@ -411,16 +423,15 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
         while ( opt.set(str, var, inx++) )
         {
             Tokenizer::strip_block(str);
-            std::stringstream iss(str);
             size_t num = 1;
-            std::string nam;
-            iss >> num >> nam; // get a number and the name of a class
+            Tokenizer::split_integer(num, str);
+            std::string nam = Tokenizer::split_symbol(str);
+            //std::clog << num << " [" << nam << "]\n";
             if ( nam.empty() )
-                throw InvalidParameter("the name of a single should be specified in `"+var+"'");
+                throw InvalidParameter("the name of a single should be specified in `"+str+"'");
             SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
-            if ( iss.good() )
+            if ( str.size() )
             {
-                getline(iss, str);
                 try {
                     addWrists(objs, num, sip, ref, str);
                 } catch( Exception& e ) {

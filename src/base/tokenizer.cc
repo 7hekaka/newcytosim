@@ -128,20 +128,24 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
     std::string res = get_stuff(is, valid_symbol);
     
     VLOG("Tokenizer: SYMBOL |" << res << "|\n");
-
     return res;
 }
 
 
 std::string Tokenizer::split_symbol(std::string& arg)
 {
-    std::stringstream is(arg);
-    std::string res = get_symbol(is, false);
-    skip_space(is, false);
-    if ( is.good() )
-        arg = arg.substr(is.tellg());
-    else
-        arg.clear();
+    char const* str = arg.c_str();
+    char const* end = str;
+    
+    while ( isspace(*end) )
+        ++end;
+    
+    while ( valid_symbol(*end) )
+        ++end;
+    
+    std::string res = arg.substr(0, end-str);
+    // remove extracted part:
+    arg.erase(0, (size_t)(end-str));
     return res;
 }
 
