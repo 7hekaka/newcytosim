@@ -465,6 +465,9 @@ void ObjectSet::flag(ObjectPool const& list, ObjectFlag f)
 void ObjectSet::freeze()
 {
     assert_true(ice_.empty());
+#ifdef ROBUST_READING
+    flag(pool_, 7);
+#endif
     ice_.append(pool_);
 }
 
@@ -564,7 +567,7 @@ static void readMarkerASCII(Inputter& in, bool fat, PropertyID& ix, ObjectID& id
             throw InvalidIO("overflow ObjectMark");
     }
     else
-        in.unget(c);
+        in.unget_char(c);
 }
 
 
@@ -613,7 +616,15 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
         }
         else
 #endif
-            ice_.pop(obj);
+#ifdef ROBUST_READING
+            if ( obj->flag() )
+            {
+                obj->flag(0);
+                ice_.pop(obj);
+            }
+#else
+        ice_.pop(obj);
+#endif
     }
     
     if ( !obj )

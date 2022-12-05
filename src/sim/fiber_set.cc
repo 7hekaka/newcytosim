@@ -731,28 +731,14 @@ void FiberSet::updateFibers()
 
 void FiberSet::prune()
 {
-    Object * i = ice_.pop_front();
-    while ( i )
-    {
-        Fiber* o = static_cast<Fiber*>(i);
-        i = ice_.pop_front();
-        inventory_.unassign(o);
-        o->objset(nullptr);
-        delete(o);
-    }
+    ObjectSet::prune();
     updateFibers();
 }
 
 
 void FiberSet::thaw()
 {
-    Object * i = ice_.pop_front();
-    while ( i )
-    {
-        Fiber* o = static_cast<Fiber*>(i);
-        i = ice_.pop_front();
-        link(o);
-    }
+    ObjectSet::thaw();
     updateFibers();
 }
 

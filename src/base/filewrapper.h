@@ -122,7 +122,7 @@ public:
     int get_char() { return getc_unlocked(mFile); }
 
     /// unget character from input
-    void unget(int c) { ungetc(c, mFile); }
+    void unget_char(int c) { ungetc(c, mFile); }
 
     /// write a character
     int put_char(int c) { return putc_unlocked(c, mFile); }

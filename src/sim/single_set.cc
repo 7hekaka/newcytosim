@@ -318,6 +318,10 @@ void SingleSet::erase()
 void SingleSet::freeze()
 {
     relax();
+#ifdef ROBUST_READING
+    flag(aList, 7);
+    flag(fList, 7);
+#endif
     assert_true(ice_.empty());
     ice_.append(aList);
     ice_.append(fList);

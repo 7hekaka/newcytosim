@@ -105,7 +105,6 @@ extern "C"
         }
     }
 
-
 }
 
 #endif

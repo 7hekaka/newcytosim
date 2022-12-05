@@ -20,6 +20,7 @@
  
  History of changes in file format:
 
+ - 58: 26/11/2022 References written on 2 or 4 bytes
  - ??: 11/06/2021 References written always on 4 bytes with tag+identity
  - 56: 23/06/2021 Secondary TAG use capital letters, but ID was not changed
  - 56: 19/01/2021 All fiber dynamic states stored on 16 bytes, really
@@ -248,10 +249,13 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
             // binary format 58 (26.11.2022)
             char c = in.get_char();
             tag = c & LOW_BITS;
+            //assert_true(isalpha(tag));
             if ( c & HIGH_BIT )
             {
-                if ( 1 != fread(&id, 3, 1, in.file()) )
+                uint8_t u[4] = { 0, 0, 0, 0 };
+                if ( 1 != fread(u, 3, 1, in.file()) )
                     throw InvalidIO("readObjectID(binary) failed");
+                id = ( ObjectID(u[0]) << 16 ) + ( ObjectID(u[1]) << 8 ) + ObjectID(u[2]);
             }
             else if ( c != Object::NULL_TAG )
                 id = in.readUInt16bin();

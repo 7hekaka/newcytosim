@@ -111,12 +111,12 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
         if ( id > 65535 )
         {
             // fat format
-            if ( 1 ) // Simul::currentFormatID < 58 )
+            if ( 1 ) // Simul::currentFormatID >= 58 )
             {
                 /* format 58 enabled on 26.11.2022: combining `tag` and 'id',
                  leaving 3 bytes and at most 16 777 216 objects */
                 assert_true( id < 1<<24 );
-                uint32_t u = id | (uint32_t(g|HIGH_BIT)<<24);
+                uint8_t u[4] = { g, uint8_t((id>>16)&0xFF), uint8_t((id>>8)&0xFF), uint8_t(id&0xFF) };
                 if ( 1 != fwrite(&u, 4, 1, out.file()) )
                     throw InvalidIO("writeReference() failed");
             }

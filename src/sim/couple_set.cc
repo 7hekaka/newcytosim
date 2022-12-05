@@ -458,6 +458,12 @@ void CoupleSet::erase()
 void CoupleSet::freeze()
 {
     relax();
+#ifdef ROBUST_READING
+    flag(aaList, 7);
+    flag(faList, 7);
+    flag(afList, 7);
+    flag(ffList, 7);
+#endif
     assert_true(ice_.empty());
     ice_.append(aaList);
     ice_.append(faList);
