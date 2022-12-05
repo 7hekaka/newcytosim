@@ -57,7 +57,7 @@ void SingleSet::step_collect(Single * obj)
     {
         nxt = obj->next();
         SingleProp const* p = obj->prop;
-        if ( p->fast_diffusion )
+        if ( p->fast_diffusion && !obj->base() )
         {
             fList.pop(obj);
             uniReserves[p->number()-1].second.push_back(obj);
