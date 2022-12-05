@@ -12,6 +12,10 @@
  */
 
 
+/// Distribute points on the ball ( norm <= 1 ).
+size_t tossPointsBall(std::vector<Vector3>& pts, real sep, size_t max_trials);
+
+
 /// Distribute points on the unit disc, at distance never below `sep`.
 size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials);
 
@@ -19,6 +23,9 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials);
 /// Distribute points on the unit disc, over a spherical cap of thickness `cap`.
 size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t limit_trials);
 
+
+/// Distribute points on the sphere (3D).
+size_t distributePointsSphere(std::vector<Vector3>& pts, real sep, size_t max_trials);
 
 /// Distribute points on the unit sphere, at distance never below `sep`.
 /**
@@ -52,31 +59,6 @@ size_t tossPointsSphere(std::vector<VECTOR>& pts, real sep, size_t max_trials)
         ++n;
     }
     return n;
-}
-
-
-template <typename VECTOR>
-size_t distributePointsSphere(std::vector<VECTOR>& pts, real sep, size_t max_trials)
-{
-    // estimate separation by dividing area:
-    if ( sep <= 0 )
-        sep = std::sqrt(4*M_PI/pts.size());
-
-    real dis = sep;
-    size_t ouf = 0;
-    size_t res = 0;
-    while ( res < pts.size() )
-    {
-        res = tossPointsSphere(pts, dis, max_trials);
-        if ( ++ouf > 64 )
-        {
-            ouf = 0;
-            dis /= 1.0905044;
-        }
-    }
-    if ( dis < sep )
-        std::clog << "distributePointsSphere " << sep << " --> " << dis << "\n";
-    return res;
 }
 
 #endif

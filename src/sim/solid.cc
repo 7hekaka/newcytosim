@@ -401,7 +401,10 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
         }
         // generate a set of unit vectors:
         std::vector<Vector> pts(nbs, Vector(0,0,0));
-        distributePointsSphere(pts, sep/rad, 128);
+        //distributePointsSphere(pts, sep/rad, 128);
+        size_t nbp = tossPointsBall(pts, sep/rad, 128);
+        if ( nbp < nbs )
+            std::clog << "Warning: could not fit all points in Sphere\n";
         i = 0;
         while ( opt.set(str, var, inx++) )
         {
@@ -411,7 +414,8 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             for ( size_t u = 0; u < num; ++u )
             {
                 Wrist * w = sip->newWrist(this, 0);
-                w->rebase(this, ref, pts[i++]);
+                w->rebase(this, ref, pts[i]);
+                i = ( i + 1 ) % nbp;
                 objs.push_back(w);
             }
         }

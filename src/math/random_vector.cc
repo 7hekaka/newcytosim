@@ -311,6 +311,33 @@ void  Vector4::addRand(real n) { XX += n*RNG.sreal(); YY += n*RNG.sreal(); ZZ +=
 #pragma mark - Functions to distribute multiple points
 
 
+/// Distribute points on the ball ( norm <= 1 ).
+size_t tossPointsBall(std::vector<Vector3>& pts, real sep, size_t max_trials)
+{
+    const real ss = sep * sep;
+    size_t ouf = 0;
+    size_t n = 0;
+    
+    for ( Vector3& vec : pts )
+    {
+    toss:
+        if ( ++ouf > max_trials )
+            break;
+        
+        const Vector3 V = Vector3::randB();
+        
+        for ( size_t i = 0; i < n; ++i )
+            if ( distanceSqr(V, pts[i]) < ss )
+                goto toss;
+        
+        vec = V;
+        ouf = 0;
+        ++n;
+    }
+    return n;
+}
+
+
 /**
  Generate a random distribution of points on the unit disc,
  with the distance between two points never below `sep`.
@@ -378,3 +405,25 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
 }
 
 
+size_t distributePointsSphere(std::vector<Vector3>& pts, real sep, size_t max_trials)
+{
+    // estimate separation by dividing area:
+    if ( sep <= 0 )
+        sep = std::sqrt(4*M_PI/pts.size());
+
+    real dis = sep;
+    size_t ouf = 0;
+    size_t res = 0;
+    while ( res < pts.size() )
+    {
+        res = tossPointsSphere(pts, dis, max_trials);
+        if ( ++ouf > 64 )
+        {
+            ouf = 0;
+            dis /= 1.0905044;
+        }
+    }
+    if ( dis < sep )
+        std::clog << "distributePointsSphere " << sep << " --> " << dis << "\n";
+    return res;
+}
