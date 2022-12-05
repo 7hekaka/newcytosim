@@ -37,7 +37,7 @@ void Mighty::handleDisassemblyM()
             //revert the last disassembly step:
             fib->undoGrowM();
             // induce rescue:
-            fib->setEndStateM(STATE_GREEN);
+            //fib->setEndStateM(STATE_GREEN);
         }
         else
             detach();
@@ -71,7 +71,7 @@ void Mighty::handleDisassemblyP()
             //revert the last disassembly step:
             fib->undoGrowP();
             // induce rescue:
-            fib->setEndStateP(STATE_GREEN);
+            //fib->setEndStateP(STATE_GREEN);
             //assert_true(hAbs <= fib->abscissaP())
         }
         else
