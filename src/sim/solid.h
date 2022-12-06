@@ -98,6 +98,9 @@ private:
     void makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
+    void makeBall(ObjectList&, Glossary&, std::string const&, Simul&);
+
+    /// part of build()
     void makeWrist(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()

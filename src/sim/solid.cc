@@ -338,7 +338,13 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
 {
     for ( size_t i = 0; i < num; ++i )
     {
-        Vector vec = Movable::readPosition(str);
+        Vector vec(0,0,0);
+        try {
+            vec = Movable::readPosition(str);
+        } catch( Exception& e ) {
+            print_magenta(std::cerr, e.brief());
+            std::cerr << e.info() << " in `" << str << "'\n";
+        }
         Wrist * w = sip->newWrist(this, 0);
         w->rebase(this, ref, vec);
         objs.push_back(w);
@@ -346,19 +352,19 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
 }
 
 
-void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
-    size_t inx = 2;
-
     // get sphere radius:
     real rad = 0;
     opt.set(rad, var, 1);
-    
+    if ( rad <= 0 )
+        throw InvalidParameter("radius of solid:sphere must be > 0");
+
     // get position of center:
     Vector cen = Movable::readPosition(opt.value(var, 0));
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, abs_real(rad));
+    size_t ref = addSphere(cen, rad);
     
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin )
@@ -366,9 +372,95 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     else
 #endif
     addTriad(rad);
-    rad = abs_real(rad);
     
-#if ( DIM > 1 )
+#if ( DIM > 2 )
+    real sep = 1.0;
+    if ( opt.set(sep, "separation") )
+    {
+        // count number of singles to be attached:
+        size_t nbs = 0;
+        size_t inx = 2;
+        while ( opt.peek(str, var, inx++) )
+        {
+            size_t num = 1;
+            Tokenizer::split_integer(num, str);
+            nbs += num;
+        }
+        std::vector<Vector> pts(nbs, Vector(0,0,0));
+        real sup = 2 * std::pow(M_PI/(3*M_SQRT2*nbs), 1.0/3);
+        size_t nbp = tossPointsBall(pts, std::min(sep/rad, sup), 128);
+        if ( nbp < nbs )
+        {
+            Cytosim::warn << " Could only fit " << nbp << "/" << nbs << " points in Sphere at separation " << sep << "\n";
+            Cytosim::warn << " Target separation for " << nbs << " points is " << sup * rad << "\n";
+        }
+        nbs = 0;
+        inx = 2;
+        while ( opt.set(str, var, inx++) )
+        {
+            size_t num = 1;
+            Tokenizer::split_integer(num, str);
+            SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
+            for ( size_t u = 0; u < num; ++u )
+            {
+                Wrist * w = sip->newWrist(this, 0);
+                w->rebase(this, ref, pts[nbs]);
+                nbs = ( nbs + 1 ) % nbp;
+                objs.push_back(w);
+            }
+        }
+    }
+    else
+#endif
+    {
+        size_t inx = 2;
+        while ( opt.set(str, var, inx++) )
+        {
+            size_t num = 1;
+            Tokenizer::strip_block(str);
+            Tokenizer::split_integer(num, str);
+            std::string nam = Tokenizer::split_symbol(str);
+            if ( nam.empty() )
+                throw InvalidParameter("the name of a single should be specified in `"+str+"'");
+            SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
+            if ( str.size() )
+                addWrists(objs, num, sip, ref, str);
+            else
+            {
+                for ( size_t i = 0; i < num; ++i )
+                {
+                    Wrist * w = sip->newWrist(this, 0);
+                    w->rebase(this, ref, Vector::randB());
+                    objs.push_back(w);
+                }
+            }
+        }
+    }
+}
+
+
+void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+{
+    std::string str;
+    // get sphere radius:
+    real rad = 0;
+    opt.set(rad, var, 1);
+    if ( rad <= 0 )
+        throw InvalidParameter("radius of solid:sphere must be > 0");
+
+    // get position of center:
+    Vector cen = Movable::readPosition(opt.value(var, 0));
+    // add a bead with a local coordinate system
+    size_t ref = addSphere(cen, rad);
+    
+#if NEW_SOLID_HAS_TWIN
+    if ( soTwin )
+        addTriad(-rad);
+    else
+#endif
+    addTriad(rad);
+    
+#if ( DIM > 2 )
     real sep = 1.0, dev = 0.0;
     if ( opt.set(sep, "separation") && opt.set(dev, "deviation") )
     {
@@ -376,9 +468,9 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             throw InvalidParameter("solid:deviation should be <= radius");
         // attach Single on the surface of this sphere:
         size_t nbs = opt.num_values(var) - 2;
-        // 'pts' is a set of unit vectors:
         std::vector<Vector> pts(nbs, Vector(0,0,0));
         distributePointsSphere(pts, sep/rad, 128);
+        size_t inx = 2;
         while ( opt.set(str, var, inx++) )
         {
             // get a number and the name of a class:
@@ -392,8 +484,8 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     {
         // count number of singles to be attached:
         size_t nbs = 0;
-        size_t i = inx;
-        while ( opt.peek(str, var, i++) )
+        size_t inx = 2;
+        while ( opt.peek(str, var, inx++) )
         {
             size_t num = 1;
             Tokenizer::split_integer(num, str);
@@ -401,11 +493,9 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
         }
         // generate a set of unit vectors:
         std::vector<Vector> pts(nbs, Vector(0,0,0));
-        //distributePointsSphere(pts, sep/rad, 128);
-        size_t nbp = tossPointsBall(pts, sep/rad, 128);
-        if ( nbp < nbs )
-            std::clog << "Warning: could not fit all points in Sphere\n";
-        i = 0;
+        distributePointsSphere(pts, sep/rad, 128);
+        nbs = 0;
+        inx = 2;
         while ( opt.set(str, var, inx++) )
         {
             size_t num = 1;
@@ -414,8 +504,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             for ( size_t u = 0; u < num; ++u )
             {
                 Wrist * w = sip->newWrist(this, 0);
-                w->rebase(this, ref, pts[i]);
-                i = ( i + 1 ) % nbp;
+                w->rebase(this, ref, pts[nbs++]);
                 objs.push_back(w);
             }
         }
@@ -423,7 +512,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     else
 #endif
     {
-        // associate Singles with this sphere
+        size_t inx = 2;
         while ( opt.set(str, var, inx++) )
         {
             Tokenizer::strip_block(str);
@@ -435,16 +524,16 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
                 throw InvalidParameter("the name of a single should be specified in `"+str+"'");
             SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
             if ( str.size() )
+                addWrists(objs, num, sip, ref, str);
+            else
             {
-                try {
-                    addWrists(objs, num, sip, ref, str);
-                } catch( Exception& e ) {
-                    print_magenta(std::cerr, e.brief());
-                    std::cerr << e.info() << '\n';
+                for ( size_t i = 0; i < num; ++i )
+                {
+                    Wrist * w = sip->newWrist(this, 0);
+                    w->rebase(this, ref, Vector::randU());
+                    objs.push_back(w);
                 }
             }
-            else
-                addWrists(objs, num, sip, ref);
         }
     }
 }
@@ -604,7 +693,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         var = "point" + std::to_string(++inp);
     }
 
-    // options named 'sphere???' will add spheres:
+    // options named 'sphere???' will add spheres, with Singles on the surface:
     inp = 1;
     var = "sphere1";
     while ( opt.has_key(var) )
@@ -613,6 +702,15 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         var = "sphere" + std::to_string(++inp);
     }
     
+    // options named 'ball???' will add spheres, with Singles in the volume
+    inp = 1;
+    var = "ball1";
+    while ( opt.has_key(var) )
+    {
+        makeBall(objs, opt, var, sim);
+        var = "ball" + std::to_string(++inp);
+    }
+
 #if BACKWARD_COMPATIBILITY < 100
     /* distribute Singles over all points. Deprecated, since since 03.2017 */
     inp = 0;

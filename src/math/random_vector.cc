@@ -407,11 +407,15 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
 
 size_t distributePointsSphere(std::vector<Vector3>& pts, real sep, size_t max_trials)
 {
-    // estimate separation by dividing area:
-    if ( sep <= 0 )
-        sep = std::sqrt(4*M_PI/pts.size());
+    /*
+     Estimate max separation by dividing area, given densest packing possible:
+     Each hexagon covers 3 discs of diameter D has surface area 3/4*PI*D*D,
+     Since sphere surface is 4 * PI, the surface of hexagon = 3*4*PI/nb_points
+     Hence 1/4 * D*D = 4 / nb_points
+     */
+    real sup = std::sqrt(16.0/pts.size());
 
-    real dis = sep;
+    real dis = std::min(sep, sup);
     size_t ouf = 0;
     size_t res = 0;
     while ( res < pts.size() )
