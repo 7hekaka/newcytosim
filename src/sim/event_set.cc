@@ -75,8 +75,8 @@ void EventSet::report(std::ostream& os) const
 {
     if ( size() > 0 )
     {
-        os << "\n" << size() << " events:\n";
+        os << "\n" << size() << " events:";
         for ( Event * e=first(); e; e=e->next() )
-            os << "   : " << e->activity << "\n";
+            os << "\n   : " << e->activity;
     }
 }
