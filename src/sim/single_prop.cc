@@ -62,7 +62,7 @@ Single * SingleProp::newSingle() const
 
 
 /**
- The Wrist requires a anchor point to be created
+ Create Wrist anchored to a Mecable vertex
  */
 Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
 {
@@ -71,6 +71,21 @@ Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
         return new WristLong(this, mec, point);
     else
         return new Wrist(this, mec, point);
+}
+
+/**
+ Create Wrist anchores on point interpolated from the Mecable's vertices
+ */
+Wrist * SingleProp::newWrist(Mecable const* mec, const size_t ref, Vector const& vec) const
+{
+    //std::clog << "SingleProp::newWrist(length=" << length << ")\n";
+    Wrist * w;
+    if ( length > 0 )
+        w = new WristLong(this, mec, ref);
+    else
+        w = new Wrist(this, mec, ref);
+    w->rebase(mec, ref, vec);
+    return w;
 }
 
 //------------------------------------------------------------------------------

@@ -307,8 +307,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
 {
     for ( size_t i = 0; i < num; ++i )
     {
-        Wrist * w = sip->newWrist(this, 0);
-        w->rebase(this, ref, Vector::randU());
+        Wrist * w = sip->newWrist(this, ref, Vector::randU());
         objs.push_back(w);
     }
 }
@@ -323,8 +322,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
     for ( size_t i = 0; i < num; ++i )
     {
         Vector vec = normalize(pos+pos.randOrthoB(dev));
-        Wrist * w = sip->newWrist(this, 0);
-        w->rebase(this, ref, vec);
+        Wrist * w = sip->newWrist(this, ref, vec);
         objs.push_back(w);
     }
 }
@@ -345,8 +343,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
             print_magenta(std::cerr, e.brief());
             std::cerr << e.info() << " in `" << str << "'\n";
         }
-        Wrist * w = sip->newWrist(this, 0);
-        w->rebase(this, ref, vec);
+        Wrist * w = sip->newWrist(this, ref, vec);
         objs.push_back(w);
     }
 }
@@ -410,8 +407,7 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
             SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
             for ( size_t u = 0; u < num; ++u )
             {
-                Wrist * w = sip->newWrist(this, 0);
-                w->rebase(this, ref, pts[nbs]);
+                Wrist * w = sip->newWrist(this, ref, pts[nbs]);
                 nbs = ( nbs + 1 ) % nbp;
                 objs.push_back(w);
             }
@@ -436,8 +432,7 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
             {
                 for ( size_t i = 0; i < num; ++i )
                 {
-                    Wrist * w = sip->newWrist(this, 0);
-                    w->rebase(this, ref, Vector::randB());
+                    Wrist * w = sip->newWrist(this, ref, Vector::randB());
                     objs.push_back(w);
                 }
             }
@@ -516,8 +511,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
             for ( size_t u = 0; u < num; ++u )
             {
-                Wrist * w = sip->newWrist(this, 0);
-                w->rebase(this, ref, pts[nbs++]);
+                Wrist * w = sip->newWrist(this, ref, pts[nbs++]);
                 objs.push_back(w);
             }
         }
@@ -542,8 +536,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             {
                 for ( size_t i = 0; i < num; ++i )
                 {
-                    Wrist * w = sip->newWrist(this, 0);
-                    w->rebase(this, ref, Vector::randU());
+                    Wrist * w = sip->newWrist(this, ref, Vector::randU());
                     objs.push_back(w);
                 }
             }
@@ -569,12 +562,10 @@ Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var,
     if ( !opt.set(A, var, 3) || !opt.set(B, var, 4) )
         throw InvalidParameter("points must be specified as fiber?[1] and fiber?[2]");
     
-    Wrist * w1 = sip->newWrist(this, 0);
-    w1->rebase(this, ref, A/rad);
+    Wrist * w1 = sip->newWrist(this, ref, A/rad);
     objs.push_back(w1);
     
-    Wrist * w2 = sip->newWrist(this, 0);
-    w2->rebase(this, ref, B/rad);
+    Wrist * w2 = sip->newWrist(this, ref, B/rad);
     objs.push_back(w2);
 
     real len = distance(A, B);
