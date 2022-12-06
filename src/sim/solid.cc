@@ -357,9 +357,16 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
     std::string str;
     // get sphere radius:
     real rad = 0;
-    opt.set(rad, var, 1);
+    if ( opt.is_number(var, 1) ) // sphere radius specified directly
+        opt.set(rad, var, 1);
+    else if ( opt.set(str, var, 1) ) // range of radius specified
+    {
+        float a = 0, b = 0;
+        sscanf(str.c_str(), "%f, %f", &a, &b);
+        rad = RNG.real_uniform(a, b);
+    }
     if ( rad <= 0 )
-        throw InvalidParameter("radius of solid:sphere must be > 0");
+        throw InvalidParameter("radius of solid:ball must be > 0");
 
     // get position of center:
     Vector cen = Movable::readPosition(opt.value(var, 0));
@@ -442,9 +449,15 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
 void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
-    // get sphere radius:
     real rad = 0;
-    opt.set(rad, var, 1);
+    if ( opt.is_number(var, 1) ) // sphere radius specified directly
+        opt.set(rad, var, 1);
+    else if ( opt.set(str, var, 1) ) // range of radius specified
+    {
+        float a = 0, b = 0;
+        sscanf(str.c_str(), "%f, %f", &a, &b);
+        rad = RNG.real_uniform(a, b);
+    }
     if ( rad <= 0 )
         throw InvalidParameter("radius of solid:sphere must be > 0");
 
