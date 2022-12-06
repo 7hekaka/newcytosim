@@ -74,7 +74,7 @@ Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
 }
 
 /**
- Create Wrist anchores on point interpolated from the Mecable's vertices
+ Create Wrist anchored on points interpolated from the Mecable's vertices
  */
 Wrist * SingleProp::newWrist(Mecable const* mec, const size_t ref, Vector const& vec) const
 {

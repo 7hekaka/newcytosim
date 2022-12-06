@@ -303,35 +303,6 @@ void Solid::makeWrist(ObjectList& objs, Glossary& opt, std::string const& var, S
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref)
-{
-    for ( size_t i = 0; i < num; ++i )
-    {
-        Wrist * w = sip->newWrist(this, ref, Vector::randU());
-        objs.push_back(w);
-    }
-}
-
-
-/*
- add Wrists anchored on the local coordinate system of a sphere at index 'ref':
- using unit vectors here since the Triad is build already with a scale 'rad'
- */
-void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref, Vector const& pos, real dev)
-{
-    for ( size_t i = 0; i < num; ++i )
-    {
-        Vector vec = normalize(pos+pos.randOrthoB(dev));
-        Wrist * w = sip->newWrist(this, ref, vec);
-        objs.push_back(w);
-    }
-}
-
-
-/*
- add Wrists anchored on the local coordinate system of a sphere at index 'ref':
- using unit vectors here since the Triad is build already with a scale 'rad'
- */
 void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref, std::string const& str)
 {
     for ( size_t i = 0; i < num; ++i )
@@ -485,7 +456,13 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             size_t num = 1;
             Tokenizer::split_integer(num, str);
             SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
-            addWrists(objs, num, sip, ref, pts[inx-3], dev/rad);
+            for ( size_t u = 0; u < num; ++u )
+            {
+                Vector pos = pts[inx-3];
+                Vector vec = normalize(pos+pos.randOrthoB(dev/rad));
+                Wrist * w = sip->newWrist(this, ref, vec);
+                objs.push_back(w);
+            }
         }
     }
     else if ( opt.set(sep, "separation") )

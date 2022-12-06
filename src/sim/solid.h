@@ -107,12 +107,6 @@ private:
     Fiber* makeFiber(ObjectList&, Glossary&, std::string const&, Simul&);
 
     /// part of build()
-    void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref);
-    
-    /// part of build()
-    void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref, Vector const&, real);
-
-    /// part of build()
     void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref, std::string const&);
 
 public:
