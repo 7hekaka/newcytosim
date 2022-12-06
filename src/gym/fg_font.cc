@@ -126,7 +126,7 @@ void fgBitmapCharacter(float x, float y, float S, int fontID, const float color[
 
 void fgBitmapString(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
 {
-    float gray[4] = { 0.6, 0.6, 0.6, 1 };
+    float gray[4] = { 0.5, 0.5, 0.5, 1 };
     const float* col = color;
     char * str = strdup(string);
     char * token = NULL;
