@@ -1837,6 +1837,7 @@ void reportSimulSet(std::ostream& out, SET& set, PropertyList const& properties)
 {
     for ( Property const* i : properties.find_all(set.title()) )
     {
+        ObjectID id = 0;
         size_t points = 0, sup = 0;
         ObjectList objs = set.collect(match_property, i);
         for ( Object * o : objs )
@@ -1846,20 +1847,22 @@ void reportSimulSet(std::ostream& out, SET& set, PropertyList const& properties)
             {
                 points += mec->nbPoints();
                 sup = std::max(sup, mec->nbPoints());
+                id = std::max(id, mec->identity());
             }
         }
         if ( points > 0 )
         {
             out << LIN << ljust(i->name(), 2);
-            out << SEP << objs.size();
-            out << SEP << points << SEP << sup;
+            out << SEP << objs.size() << SEP << points;
+            out << SEP << sup << SEP << id;
         }
     }
 }
 
 void Simul::reportSimul(std::ostream& out) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "objects" << SEP << "vertices" << SEP << "largest";
+    out << COM << ljust("class", 2, 2) << SEP << "objects" << SEP << "vertices";
+    out << SEP << "largest" << SEP << "identity";
     reportSimulSet(out,  fibers, properties);
     reportSimulSet(out,  solids, properties);
     reportSimulSet(out, spheres, properties);
