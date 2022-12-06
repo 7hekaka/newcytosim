@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 /**
  @file
  @brief Cytosim's assertions
@@ -14,10 +14,10 @@
 /**
  Assertions are used extensively to check the validity of the arguments.
  Defining NDEBUG disables:
- - the standard assert() macro and
- - the custom assert_true and assert_false macros defined below,
+    - the standard assert() macro and,
+    - the custom assert_true() and assert_false() macros defined below.
  This makes the executable faster.
- Note that the value of NDEBUG is ignored!
+ Note that the value defined for NDEBUG is ignored: 0 or 1 have the same effects!
  */
 #define NDEBUG 1
 
