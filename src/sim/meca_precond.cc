@@ -80,7 +80,7 @@ static inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 /// apply banded symmetric preconditionner block
 static inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
-    const int bks = mec->blockSize();
+    const int bks = DIM * mec->nbPoints();
     assert_true( (int)BAND_NUD < bks );
 #if CHOUCROUTE
     alsatian_xpbtrsLK<BAND_NUD>(bks, mec->pblock(), BAND_LDD, Y);
@@ -101,7 +101,7 @@ static inline void applyPrecondBand(Mecable const* mec, real* Y)
 /// apply symmetric preconditionner block in full storage
 static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
-    const int bks = mec->blockSize();
+    const int bks = DIM * mec->nbPoints();
 #if CHOUCROUTE
     // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xpotrsL(bks, mec->pblock(), bks, Y);
@@ -118,7 +118,7 @@ static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 /// apply non-symmetric preconditionner block in full storage
 static inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
-    const int bks = mec->blockSize();
+    const int bks = DIM * mec->nbPoints();
 #if CHOUCROUTE && USE_SIMD
     // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xgetrsN_SSE(bks, mec->pblock(), bks, mec->pivot(), Y);
@@ -184,7 +184,7 @@ size_t Meca::preconditionnerSize() const
 {
     size_t res = 0;
     for ( Mecable const* mec : mecables )
-        res += mec->blockAllocated();
+        res += mec->blockLimit();
     return res;
 }
 
@@ -1064,7 +1064,7 @@ void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, rea
     const size_t bks = DIM * mec->nbPoints();
     const int age = mec->blockAge();
 
-    if (( mec->blockType() != 7 ) | ( mec->blockSize() != bks ) | ( age >= span ))
+    if (( mec->blockType() != 7 ) | ( age >= span ))
     {
         // recalculate block!
         getFullBlock(mec, blk);

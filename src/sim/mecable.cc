@@ -23,12 +23,24 @@ Mecable::Mecable()
 #if EXPERIMENTAL_PRECONDITIONNERS
     pBlockAge  = 0;
 #endif
-    pBlockSize = 0;
     pBlockType = 0;
     pPos       = nullptr;
     pForce     = nullptr;
-    pForceMax  = 0;
     pIndex     = 0;
+}
+
+
+void Mecable::setNbPoints(size_t n)
+{
+    if ( n != nPoints )
+    {
+        allocateMecable(n);
+        nPoints = (SIZE_T)n;
+        assert_true(nPoints==n);
+        // invalidate data that depend on number of points:
+        pForce = nullptr;
+        pBlockType = 0;
+    }
 }
 
 
@@ -54,7 +66,6 @@ Set block size to 'bks' and allocate as necessary to hold 'alc' scalars
 void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
 {
     assert_true( bks <= DIM * nPoints );
-    pBlockSize = bks;
     
     if ( alc > pBlockAlc )
     {
@@ -83,7 +94,6 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
  */
 real* Mecable::allocateMemory(const size_t nbp, size_t add, size_t top)
 {
-    pForce = nullptr;
     if ( pAllocated < nbp + (DIM==3) )
     {
         size_t all = chunk_real(nbp+(DIM==3));
@@ -117,7 +127,6 @@ void Mecable::release()
 {
     free_real(pBlock);
     pBlock = nullptr;
-    pBlockSize = 0;
     pBlockAlc = 0;
 
     delete[] pPivot;
@@ -279,9 +288,7 @@ int Mecable::putPoints(float ptr[], size_t cnt) const
 
 Vector Mecable::netForce(const size_t p) const
 {
-    assert_true( !pForce || nPoints==pForceMax );
-    
-    if (( pForce != nullptr ) & ( p < pForceMax ))
+    if ( pForce )
         return Vector(pForce+DIM*p);
     else
         return Vector(0,0,0);

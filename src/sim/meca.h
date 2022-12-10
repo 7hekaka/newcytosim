@@ -334,11 +334,13 @@ private:
     /// DEBUG: test if `blk` is inverse of block returned by extractBlock()
     void checkBlock(const Mecable*, const real* blk);
     
+#if EXPERIMENTAL_PRECONDITIONNERS
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondAlt(Mecable*, real*, real*, size_t);
 
     /// compute all blocks of the preconditionner
     void computePrecondAlt();
+#endif
     
     /// compute the preconditionner block corresponding to given Mecable
     void renewPreconditionner(Mecable*, int, real*, int*, real*, size_t);

@@ -78,9 +78,6 @@ protected:
 
 private:
 
-    /// Number of points in pForce[]
-    SIZE_T pForceMax;
-
     /// Currently allocated size of arrays pPos[]
     SIZE_T pAllocated;
     
@@ -89,9 +86,6 @@ private:
     
     /// Allocated size of pPivot[]
     SIZE_T pPivotAlc;
-    
-    /// Current size of pBlock[]
-    SIZE_T pBlockSize;
 
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Flag that pBlock[] is used for preconditionning
@@ -118,7 +112,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Set the number of points of the object
-    void setNbPoints(const size_t n) { allocateMecable(n); nPoints=(SIZE_T)n; assert_true(nPoints==n); }
+    void setNbPoints(const size_t n);
     
     /// Returns number of points
     size_t nbPoints()  const { return nPoints; }
@@ -284,24 +278,21 @@ public:
      and should be multiplied by DIM to address the general matrix (Meca::mFUL)
      */
     size_t matIndex()   const { return pIndex; }
-
-    /// Returns current size of preconditionner block
-    size_t blockSize()  const { return pBlockSize; }
     
     /// set size of preconditionner block, allocating memory for 'alc' scalars
     void blockSize(size_t, size_t alc, size_t pivot);
     
     /// Returns allocated size of preconditionner block
-    size_t blockAllocated()  const { return pBlockAlc; }
+    size_t blockLimit() const { return pBlockAlc; }
 
     /// True if preconditionner block is 'in use'
-    SIZE_T blockType()       const { return pBlockType; }
+    SIZE_T blockType()  const { return pBlockType; }
 
     /// Returns address of memory allocated for preconditionning
-    real * pblock()          const { return pBlock; }
+    real * pblock()     const { return pBlock; }
     
     /// Returns address of memory allocated for preconditionning (pivot)
-    int * pivot()            const { return pPivot; }
+    int * pivot()       const { return pPivot; }
     
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
@@ -328,7 +319,7 @@ public:
     Vector netForce(const size_t p) const;
     
     /// replace current forces by the ones provided as argument
-    virtual void getForces(const real* ptr) { pForce = ptr; pForceMax = nPoints; }
+    virtual void getForces(const real* ptr) { pForce = ptr; }
     
     //--------------------------------------------------------------------------
     

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec.  Copyright 2021 Cambridge University.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #ifndef BEAD_H
 #define BEAD_H
@@ -13,7 +13,7 @@ class Meca;
 class Single;
 class SingleProp;
 
-/// A single point with a radius
+/// The Bead is constructed from a vertex and a radius
 /**
  The Bead is the simplest Mecable.
  It represents a spherical object using: 
@@ -22,7 +22,7 @@ class SingleProp;
  .
  The orientational degrees of freedom are neglected.
  Translation follows Stokes's law.
- A Single can be attached in the center of the bead.
+ A Single can be attached in the center of the Bead.
  
  For more elaborate models, see Sphere and Solid.
 */
@@ -50,13 +50,13 @@ public:
     //--------------------------------------------------------------------------
     
     /// return the position in space of the object
-    Vector pos()                const { return Vector(pPos); }
+    Vector pos() const { return Vector(pPos); }
 
     /// return the position in space of the object
-    Vector position()           const { return Vector(pPos); }
+    Vector position() const { return Vector(pPos); }
     
     /// move the object position ( position += given vector )
-    void translate(Vector const& x)   { x.add_to(pPos); }
+    void translate(Vector const& x) { x.add_to(pPos); }
     
     /// set the object position ( position = given vector )
     void setPosition(Vector const& x) { x.store(pPos); }
@@ -64,13 +64,13 @@ public:
     //--------------------------------------------------------------------------
         
     /// the radius of the Bead
-    real radius()    const { return paRadius; }
+    real radius() const { return paRadius; }
     
     /// the volume of the bead
     real radiusSqr() const { return paRadius * paRadius; }
     
     /// set the radius of the Bead
-    void resize(real R)    { assert_true(R>0); paRadius = R; }
+    void resize(real R) { assert_true(R>0); paRadius = R; }
     
     /// the volume of the bead
     real volume() const;
