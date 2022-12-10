@@ -1795,18 +1795,10 @@ void Display::drawSolid(Solid const& obj)
     Solid const* tw = obj.twin();
     if (( disp->style & 2 ) && tw )
     {
-        fluteD * flt = gym::mapBufferVD(8);
-        for ( int i = 1; i <= DIM; ++i )
-        {
-            flt[2*i-2] = obj.posPoint(i);
-            flt[2*i-1] = tw->posPoint(i);
-        }
-        gym::unmapBufferVD();
-        gym::ref_view();
-        gym::disableLighting();
-        bodyColor(obj);
-        gym::drawLines(disp->widthX, 0, 2*DIM);
         gym::enableLighting();
+        real rad = 0.5 * pixscale(disp->size);
+        for ( int i = 1; i <= DIM; ++i )
+            gle::stretchTube(obj.posPoint(i), rad, tw->posPoint(i), gle::tube2);
     }
 #endif
     
@@ -1832,9 +1824,7 @@ void Display::drawSolid(Solid const& obj)
             gym::enableLighting();
             bodyColor(obj);
             //drawObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
-            Vector A = obj.posP(0), B = obj.posP(1);
-            gym::transAlignZ(A, obj.radius(0), B-A);
-            gle::cylinder1();
+            gle::stretchTube(obj.posP(0), obj.radius(0), obj.posP(1), gle::cylinder1);
         }
 #endif
     }

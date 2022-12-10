@@ -250,9 +250,9 @@ namespace gle
     #pragma mark -
 
     /// draw 'obj' with its ends at [a,b], of specified radius
-    void stretchTube(Vector1 const& A, Vector1 const& B, float rad, void (*obj)());
-    void stretchTube(Vector2 const& A, Vector2 const& B, float rad, void (*obj)());
-    void stretchTube(Vector3 const& A, Vector3 const& B, float rad, void (*obj)());
+    void stretchTube(Vector1 const& A, float rad, Vector1 const& B, void (*obj)());
+    void stretchTube(Vector2 const& A, float rad, Vector2 const& B, void (*obj)());
+    void stretchTube(Vector3 const& A, float rad, Vector3 const& B, void (*obj)());
 
     void drawTube(Vector1 const& A, float rad, Vector1 const& B, void (*obj)());
     void drawTube(Vector2 const& A, float rad, Vector2 const& B, void (*obj)());
@@ -288,11 +288,11 @@ namespace gle
     /// display arrow-head, dir should be normalized
     void drawCone(Vector3 const& center, Vector3 const& dir, float rad);
     
-    /// display arrow-head, dir should be normalized
+    /// display cylinder, dir should be normalized
     void drawCylinder(Vector1 const& center, Vector1 const& dir, float rad);
-    /// display arrow-head, dir should be normalized
+    /// display cylinder, dir should be normalized
     void drawCylinder(Vector2 const& center, Vector2 const& dir, float rad);
-    /// display arrow-head, dir should be normalized
+    /// display cylinder, dir should be normalized
     void drawCylinder(Vector3 const& center, Vector3 const& dir, float rad);
 
     /// display arrow-head, dir should be normalized

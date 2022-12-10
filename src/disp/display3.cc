@@ -817,7 +817,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
         {
             drawPoint(P, disp);
             if ( modulo ) modulo->fold(Q, P);
-            gle::stretchTube(P, Q, wid, gle::tube1);
+            gle::stretchTube(P, wid, Q, gle::tube1);
         }
     }
     /**
@@ -839,7 +839,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
 #else
             const float wid = pixscale(disp->width);
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
-                gle::stretchTube(sol->posPoint(i), sol->posPoint(i+1), wid, gle::hexTube);
+                gle::stretchTube(sol->posPoint(i), wid, sol->posPoint(i+1), gle::hexTube);
 #endif
         }
     }
@@ -1046,7 +1046,7 @@ void Display3::drawCoupleBplain(Couple const* cx) const
     Vector p2 = cx->posHand2();
 
     gym::color_both(pd1->color);
-    gle::stretchTube(p1, p2, pixscale(pd1->width), gle::hexTube);
+    gle::stretchTube(p1, pixscale(pd1->width), p2, gle::hexTube);
     if ( pd1->visible ) drawHand(p1, pd1);
     if ( pd2->visible ) drawHand(p2, pd2);
 }
@@ -1069,8 +1069,8 @@ void Display3::drawCoupleBside(Couple const* cx) const
         gym::color_both(pd1->color);
         Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
         drawPoint(mid, pixscale(pd1->width));
-        gle::stretchTube(p2, mid, pixscale(pd2->width), gle::hexTube);
-        gle::stretchTube(p1, mid, pixscale(pd1->width), gle::hexTube);
+        gle::stretchTube(p2, pixscale(pd2->width), mid, gle::hexTube);
+        gle::stretchTube(p1, pixscale(pd1->width), mid, gle::hexTube);
         drawPoint(p1, pd1);
         drawPoint(p2, pd2);
         return;
@@ -1198,7 +1198,7 @@ void Display3::drawCoupleBalt(Couple const* cx) const
     {
         gym::color_both(pd1->color, cx->fiber1()->disp->color.transparency());
         gym::closeDepthMask();
-        gle::stretchTube(p1, p2, pixscale(pd2->width), gle::hexTube);
+        gle::stretchTube(p1, pixscale(pd2->width), p2, gle::hexTube);
         gym::openDepthMask();
         return;
     }

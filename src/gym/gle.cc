@@ -1594,19 +1594,19 @@ namespace gle
     //-----------------------------------------------------------------------
 #pragma mark - Tubes
     
-    void stretchTube(Vector1 const& A, Vector1 const& B, float R, void (*obj)())
+    void stretchTube(Vector1 const& A, float R, Vector1 const& B, void (*obj)())
     {
         gym::stretchAlignZ(A, B, R);
         obj();
     }
     
-    void stretchTube(Vector2 const& A, Vector2 const& B, float R, void (*obj)())
+    void stretchTube(Vector2 const& A, float R, Vector2 const& B, void (*obj)())
     {
         gym::stretchAlignZ(A, B, R);
         obj();
     }
     
-    void stretchTube(Vector3 const& A, Vector3 const& B, float R, void (*obj)())
+    void stretchTube(Vector3 const& A, float R, Vector3 const& B, void (*obj)())
     {
         gym::stretchAlignZ(A, B, R);
         obj();
