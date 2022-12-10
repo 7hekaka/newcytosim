@@ -347,7 +347,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
             col = gym::bright_color(fib->signature()).match_a(disp->color);
             break;
         case FiberDisp::COLORING_DIRECTION:
-            col = radial_color(fib->avgDirection());
+            col = radial_color(fib->avgDirection()).match_a(disp->color);
             break;
         case FiberDisp::COLORING_MARK:
             col = gym::nice_color(fib->mark());
