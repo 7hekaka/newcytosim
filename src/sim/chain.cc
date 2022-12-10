@@ -87,10 +87,10 @@ void Chain::setStraight(Vector const& pos, Vector const& dir)
     assert_true( pos.valid() );
     assert_true( dir.norm() > 0.1 );
     // 'dir' is normalized for safety:
-    Vector dpts = dir * ( fnCut / dir.norm() );
+    Vector delta = dir * ( fnCut / dir.norm() );
     //
     for ( size_t p = 0 ; p < nPoints; ++p )
-        setPoint(p, pos + p * dpts);
+        setPoint(p, pos + p * delta);
 }
 
 
@@ -107,6 +107,24 @@ void Chain::setStraight(Vector const& pos, Vector const& dir, real len)
     setSegmentation(len/(np-1));
     fnAbscissaP = fnAbscissaM + len;
     setStraight(pos, dir);
+}
+
+
+void Chain::setCircular(Vector const& cen, Vector const& dir, real rad, real len)
+{
+    assert_true( fnSegmentation > REAL_EPSILON );
+    if ( len <= 0 )
+        throw InvalidParameter("fiber:length must be > 0");
+    size_t np = bestNumberOfPoints(len/fnSegmentation);
+    
+    setNbPoints(np);
+    real S = len / ( np-1 );
+    setSegmentation(S);
+    fnAbscissaP = fnAbscissaM + len;
+    real delta = 2 * std::asin(0.5*S/rad);
+    real angle = -delta * np * 0.5;
+    for ( size_t p = 0 ; p < nPoints; ++p, angle+=delta )
+        setPoint(p, cen + rad * Vector(std::cos(angle), std::sin(angle), 0));
 }
 
 

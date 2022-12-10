@@ -37,8 +37,8 @@ real FiberProp::newFiberLength(Glossary& opt) const
         real var = 0.0;
         if ( opt.value_is("length", 1, "exponential") )
         {
-            // exponential distribution, truncated (Julio M.Belmonte's student):
             real L = len;
+            // exponential distribution, truncated (Julio M.Belmonte's student):
             do
                 len = L * RNG.exponential();
             while (( len < min_length ) | ( len > max_length ));
@@ -178,6 +178,14 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     }
     else
 #endif
+    if ( opt.value_is("shape", 0, "circle") )
+    {
+        real rad = 1;
+        opt.set(rad, "shape", 1);
+        const real len = newFiberLength(opt);
+        fib->setCircular(Vector(0,0,0), Vector(1,0,0), rad, len);
+    }
+    else
     if ( opt.has_key("shape") )
     {
         size_t nbp = opt.num_values("shape");
