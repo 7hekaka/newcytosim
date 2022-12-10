@@ -307,7 +307,7 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
             *INFO = J;
             return;
         }
-        dia = real(1) / std::sqrt(dia);
+        dia = std::sqrt(dia) / dia;
         AB[0] = dia;
         // Compute elements J+1:J+KN of column J
         int KN = std::min(KD, N-1-J);  // N-1-J < KD iff J >= N-KD
@@ -337,14 +337,15 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
 template < int KD >
 void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
 {
-    /*
+#if 0
     lapack::xpbtf2('L', N, KD, AB, LDAB, INFO);
     if ( 0 == *INFO )
     {
         for ( int u = 0; u < N; ++u )
             AB[LDAB*u] = 1.0 / AB[LDAB*u];
     }
-     */
+    return;
+#endif
     assert_true( LDAB > KD );
     const int KLD = std::max(1, LDAB-1);
     const int nkd = std::max(0, N-KD);
@@ -361,7 +362,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
         /* In the Alsatian version of the factorization, we invert
          the diagonal term, such that only multiplications are needed
          for applying the factorization to a vector. */
-        dia = std::sqrt(dia) * (real(1) / dia);
+        dia = std::sqrt(dia) / dia;
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/
@@ -390,7 +391,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
         /* In the Alsatian version of the factorization, we invert
          the diagonal term, such that only multiplications are needed
          for applying the factorization to a vector. */
-        dia = std::sqrt(dia) * (real(1) / dia);
+        dia = std::sqrt(dia) / dia;
         AB[0] = dia;
         /* Compute elements J+1:J+KN of column J and update the
          trailing submatrix within the band.*/
