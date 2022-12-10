@@ -62,9 +62,6 @@ private:
     /// Matrix block used for preconditionning in Meca::solve()
     real * pBlock;
     
-    /// array of pivot indices used by LAPACK to factorize the preconditionner
-    int * pPivot;
-    
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
     unsigned pIndex;
     
@@ -83,9 +80,6 @@ private:
     
     /// type of preconditionner
     SIZE_T pBlockType;
-    
-    /// Allocated size of pPivot[]
-    SIZE_T pPivotAlc;
 
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Flag that pBlock[] is used for preconditionning
@@ -291,8 +285,8 @@ public:
     /// Returns address of memory allocated for preconditionning
     real * pblock()     const { return pBlock; }
     
-    /// Returns address of memory allocated for preconditionning (pivot)
-    int * pivot()       const { return pPivot; }
+    /// Returns address of memory available to store pivoting indices
+    int * pivot() const { return reinterpret_cast<int*>(pBlock+pBlockAlc)-DIM*nPoints; }
     
 #if EXPERIMENTAL_PRECONDITIONNERS
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom

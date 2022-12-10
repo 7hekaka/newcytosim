@@ -17,9 +17,7 @@ Mecable::Mecable()
     pAllocated = 0;
     nPoints    = 0;
     pBlock     = nullptr;
-    pPivot     = nullptr;
     pBlockAlc  = 0;
-    pPivotAlc  = 0;
 #if EXPERIMENTAL_PRECONDITIONNERS
     pBlockAge  = 0;
 #endif
@@ -61,11 +59,13 @@ Mecable& Mecable::operator =(const Mecable& o)
 //------------------------------------------------------------------------------
 
 /**
-Set block size to 'bks' and allocate as necessary to hold 'alc' scalars
+Set block size to 'bks' and allocate as necessary to hold 'alc' reals, and 'pivot' integers
  */
 void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
 {
     assert_true( bks <= DIM * nPoints );
+    // add enough to cover 'pivot' integers:
+    alc += (( 1 + pivot ) * sizeof(int) ) / sizeof(real);
     
     if ( alc > pBlockAlc )
     {
@@ -76,13 +76,6 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
         pBlock = new_real(pBlockAlc+4);
         //zero_real(pBlockAlc+4, pBlock);
         //std::clog << reference() << " allocateBlock " << bks << " " << pBlockAlc << "\n";
-    }
-    
-    if ( pivot > pPivotAlc )
-    {
-        delete[] pPivot;
-        pPivotAlc = chunk_real(pivot);
-        pPivot = new int[pPivotAlc];
     }
 }
 
@@ -128,9 +121,6 @@ void Mecable::release()
     free_real(pBlock);
     pBlock = nullptr;
     pBlockAlc = 0;
-
-    delete[] pPivot;
-    pPivot = nullptr;
     
     free_real(pPos);
     pPos = nullptr;

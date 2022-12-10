@@ -717,7 +717,8 @@ void Meca::computePrecondIsoP(Mecable* mec)
     int info = 0;
 
     const size_t bks = DIM * nbp;
-    mec->blockSize(bks, bks*bks, nbp);
+    // we claim too much memory here, but this preconditionner is not good anyhow:
+    mec->blockSize(bks, bks*bks, bks);
     getFullBlock(mec, mec->pblock());
     project_matrix<DIM>(nbp, mec->pblock(), bks, mec->pblock(), nbp);
 
