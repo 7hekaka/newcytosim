@@ -1795,6 +1795,7 @@ void Display::drawSolid(Solid const& obj)
     Solid const* tw = obj.twin();
     if (( disp->style & 2 ) && tw )
     {
+        bodyColor(obj);
         gym::enableLighting();
         real rad = 0.5 * pixscale(disp->size);
         for ( int i = 1; i <= DIM; ++i )
