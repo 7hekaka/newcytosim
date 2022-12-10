@@ -79,8 +79,15 @@ ObjectList BeadSet::newObjects(const Property* p, Glossary& opt)
     {
         inx = 0;
         var = "attach";
-        opt.set(rad, "radius");
-        
+        std::string str;
+        if ( opt.is_number("radius", 1) ) // sphere radius specified directly
+            opt.set(rad, "radius");
+        else if ( opt.set(str, "radius") ) // range of radius specified
+        {
+            float a = 0, b = 0;
+            sscanf(str.c_str(), "%f, %f", &a, &b);
+            rad = RNG.real_uniform(a, b);
+        }
         // possibly add some variability in the radius:
         real dev = 0, inf = 0;
         if ( opt.set(dev, "radius", 1) && opt.set(inf, "radius", 2) )
