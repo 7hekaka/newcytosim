@@ -52,9 +52,9 @@ Matrix33 Matrix33::rotation180()
     return Matrix33(-1, 0, 0, 0, -1, 0, 0, 0, 1);
 }
 
-Matrix33 Matrix33::rotation180X()
+Matrix33 Matrix33::flipX()
 {
-    return Matrix33(1, 0, 0, 0, -1, 0, 0, 0, -1);
+    return Matrix33(-1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 
 Matrix33 Matrix33::rotationAroundX(const real angle)

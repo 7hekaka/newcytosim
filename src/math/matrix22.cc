@@ -16,6 +16,11 @@ Matrix22 Matrix22::rotation180()
     return Matrix22(-1.0, 0.0, -1.0, 0.0);
 }
 
+Matrix22 Matrix22::flipX()
+{
+    return Matrix22(-1, 0, 0, 1);
+}
+
 
 Matrix22 Matrix22::randomRotation()
 {

@@ -430,6 +430,9 @@ public:
 
     /// return a rotation that transforms (1,0,0) into (-1,0,0)
     static Matrix11 rotation180();
+    
+    /// mirror image: X -> -X
+    static Matrix11 flipX();
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix11 rotationToVector(const Vector1& vec);

@@ -55,6 +55,12 @@ Matrix34 Matrix34::rotation180()
 }
 
 
+Matrix34 Matrix34::flipX()
+{
+    return Matrix34(-1, 0, 0, 0, 1, 0, 0, 0, 1);
+}
+
+
 Matrix34 Matrix34::rotationAroundX(const real angle)
 {
     real c = std::cos(angle);

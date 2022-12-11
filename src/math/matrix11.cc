@@ -18,6 +18,11 @@ Matrix11 Matrix11::rotation180()
     return Matrix11(-1);
 }
 
+Matrix11 Matrix11::flipX()
+{
+    return Matrix11(-1);
+}
+
 
 Matrix11 Matrix11::randomRotation()
 {
