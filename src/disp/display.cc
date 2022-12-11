@@ -1863,6 +1863,25 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
 {
     const PointDisp * disp = obj.prop->disp;
 
+#if NEW_SOLID_HAS_TWIN
+    if (( disp->style & 2 ) && ( obj.radius(inx) > 0 ))
+    {
+        Vector X = obj.posP(inx);
+        gym::enableLighting();
+        gym::color_both(disp->color);
+        if ( obj.nbPoints() > inx + 3 )
+        {
+            Vector A = obj.posP(inx+1);
+            Vector B = obj.posP(inx+2);
+            Vector C = obj.posP(inx+3);
+            gym::transRotate(X, A-X, B-X, obj.twin()?X-C:C-X);
+        }
+        else
+            gym::transScale(X, obj.radius(inx));
+        gle::football();
+    }
+    else
+#endif
     if (( disp->style & 1 ) && ( obj.radius(inx) > 0 ))
     {
         Vector X = obj.posP(inx);
@@ -1887,23 +1906,6 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         drawDiscT(X, obj.radius(inx), bodyColorF(obj));
 #endif
     }
-#if NEW_SOLID_HAS_TWIN
-    else if (( disp->style & 2 ) && ( obj.radius(inx) > 0 ))
-    {
-        Vector X = obj.posP(inx);
-        gym::color_front(bodyColorF(obj));
-        if ( obj.nbPoints() > inx + 3 )
-        {
-            Vector A = obj.posP(inx+1);
-            Vector B = obj.posP(inx+2);
-            Vector C = obj.posP(inx+3);
-            gym::transRotate(X, A-X, B-X, obj.twin()?X-C:C-X);
-        }
-        else
-            gym::transScale(X, obj.radius(inx));
-        gle::football();
-    }
-#endif
 }
 
 

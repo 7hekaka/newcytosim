@@ -340,12 +340,6 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
     Vector cen = Movable::readPosition(opt.value(var, 0));
     // add a bead with a local coordinate system
     size_t ref = addSphere(cen, rad);
-    
-#if NEW_SOLID_HAS_TWIN
-    if ( soTwin )
-        addTriad(-rad);
-    else
-#endif
     addTriad(rad);
     
 #if ( DIM > 2 )
@@ -431,12 +425,6 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     Vector cen = Movable::readPosition(opt.value(var, 0));
     // add a bead with a local coordinate system
     size_t ref = addSphere(cen, rad);
-    
-#if NEW_SOLID_HAS_TWIN
-    if ( soTwin )
-        addTriad(-rad);
-    else
-#endif
     addTriad(rad);
     
 #if ( DIM > 2 )
@@ -744,15 +732,17 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             S->soTwin = this;
             ObjectList list = S->build(opt, sim);
             real R = 0.5 * radius(0);
-            Rotation rot = Rotation::randomRotationToVector(Vector(1,-1,-1));
-            ObjectSet::rotateObjects(list, rot.transposed());
+            // using axis going midway between the three references points:
+            Rotation rot = Rotation::randomRotationToVector(Vector(1,1,1)).transposed();
+            // we flip 'S' with a X -> -X to make it mirror image of its twin:
+            ObjectSet::rotateObjects(list, Rotation::flipX()*rot);
             ObjectSet::translateObjects(list, Vector(+R,0,0));
-            rot = Rotation::randomRotationToVector(Vector(+1,1,1));
-            ObjectSet::rotateObjects(objs, rot.transposed());
+            ObjectSet::rotateObjects(objs, rot);
             ObjectSet::translateObjects(objs, Vector(-R,0,0));
             objs.append(list);
         }
         S->soTwin = this;
+        S->fixShape(); // to keep the mirrored shape
         if ( S->nbPoints() <= DIM )
             throw InvalidParameter("Solid's twin lacks sufficient points");
     }
