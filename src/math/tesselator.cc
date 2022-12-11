@@ -621,10 +621,11 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
     const FLOAT S = std::sin(M_PI/2.5);
     const FLOAT D = C*C - S*S;
     const FLOAT T = C*S + C*S;
-    
-    // Twelve vertices of icosahedron on unit sphere
+    const FLOAT H = std::sqrt(1 + Z*Z);
+
+    // Twelve vertices of icosahedron
     FLOAT vex[12][3] = {
-        { 0,  0, -1},
+        { 0,  0, -H},
         { 1,  0, -Z},
         { C, -S, -Z},
         { D, -T, -Z},
@@ -635,7 +636,7 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
         {-1,  0,  Z},
         {-C,  S,  Z},
         {-D,  T,  Z},
-        { 0,  0,  1}
+        { 0,  0,  H}
     };
     
     // ordered faces: Counter-Clockwise = facing out
@@ -785,10 +786,11 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     const FLOAT S = std::sin(M_PI/2.5);
     const FLOAT D = C*C - S*S;
     const FLOAT T = C*S + C*S;
-    
-    // Twelve vertices of icosahedron on unit sphere
+    const FLOAT H = std::sqrt(1 + Z*Z);
+
+    // Twelve vertices of icosahedron
     FLOAT ico[12][3] = {
-        { 0,  0, -1},
+        { 0,  0, -H},
         { 1,  0, -Z},
         { C, -S, -Z},
         { D, -T, -Z},
@@ -799,7 +801,7 @@ void Tesselator::buildHemisphere(unsigned div, int make)
         {-1,  0,  Z},
         {-C,  S,  Z},
         {-D,  T,  Z},
-        { 0,  0,  1}
+        { 0,  0,  H}
     };
     
     int j = 0, f = 0;
@@ -839,52 +841,6 @@ void Tesselator::buildHemisphere(unsigned div, int make)
         triangle(fac[f++], i+5, i+20, i+15);
         triangle(fac[f++], i+5, i+10, i+20);
     }
-/*
-    // ordered faces: Counter-Clockwise = facing out
-    unsigned fac[40][3] = {
-        {0,  1,  2},
-        {0,  2,  3},
-        {0,  3,  4},
-        {0,  4,  5},
-        {0,  5,  1}, //
-        {2,  1,  7},
-        {2,  7,  8},
-        {2,  8,  9},
-        {3,  2,  9},
-        {3,  9, 10},
-        {3, 10, 11},
-        {4,  3, 11},
-        {4, 11, 12},
-        {4, 12, 13},
-        {5,  4, 13},
-        {5, 13, 14},
-        {5, 14, 15},
-        {1,  5, 15},
-        {1, 15,  6},
-        {1,  6,  7}, //
-        {7,  6, 16},
-        {7, 16, 17},
-        {8,  7, 17},
-        {8, 17, 18},
-        {9,  8, 18},
-        {9, 18, 19},
-        {10, 9, 19},
-        {10,19, 20},
-        {11,10, 20},
-        {11,20, 21},
-        {12,11, 21},
-        {12,21, 22},
-        {13,12, 22},
-        {13,22, 23},
-        {14,13, 23},
-        {14,23, 24},
-        {15,14, 24},
-        {15,24, 25},
-        {6, 15, 25},
-        {6, 25, 16}
-    };
-    */
-    // we can skip 5 triangles which are entirely in Z > 0
     allocate();
     setApices(vex, div);
     refineTriangles(f, fac, div);
