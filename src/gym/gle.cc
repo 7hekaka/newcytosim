@@ -654,7 +654,7 @@ namespace gle
         float H = std::sqrt(1+K*K);
 
         /* Twelve vertices of icosahedron on unit sphere,
-        ordererd to follow a helical patch */
+        ordered to follow a helical path */
         flute3 vex[13] = {
             { 0,  0,  H },
             {-1,  0,  K },

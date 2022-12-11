@@ -220,7 +220,7 @@ void drawPoints()
     glDisableClientState(GL_NORMAL_ARRAY);
 }
 
-void drawNeedle()
+void drawObject()
 {
     glLineWidth(1);
     glPointSize(10);
@@ -228,7 +228,8 @@ void drawNeedle()
     glColor4f(0, 1, 1, 0.5f);
     glEnable(GL_LIGHTING);
     //gle::sphere1();
-    gle::needle();
+    //gle::needle();
+    gle::football();
     glDisable(GL_LIGHTING);
 }
 
@@ -241,6 +242,7 @@ int display(View& view)
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
     glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, pink);
 
+    //drawObject();
     glDepthMask(GL_TRUE);
     if ( showPlane )
     {
