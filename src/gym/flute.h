@@ -17,7 +17,7 @@ struct flute2
     float xy[2];
     flute2() : xy{0, 0} {}
     flute2(float x, float y) : xy{x, y} {}
-    //explicit flute2(double x, double y) : xy{float(x), float(y)} {}
+    //flute2(double x, double y) : xy{float(x), float(y)} {}
 
     flute2(const float v[2]) : xy{v[0], v[1]} {}
     flute2(const double v[2]) : xy{float(v[0]), float(v[1])} {}
@@ -41,7 +41,7 @@ struct flute3
     float xyz[3];
     flute3() : xyz{0, 0, 0} {}
     flute3(float x, float y, float z) : xyz{x, y, z} {}
-    flute3(double x, double y, double z) : xyz{float(x), float(y), float(z)} {}
+    //flute3(double x, double y, double z) : xyz{float(x), float(y), float(z)} {}
 
     //flute3(float* ptr) : xyz{ptr[0], ptr[1], ptr[2]} {}
     void set(float x, float y, float z) { xyz[0] = x; xyz[1] = y; xyz[2] = z; }
@@ -78,7 +78,7 @@ struct flute4
     flute4() : xyz{0, 0, 0, 0} {}
     flute4(float x, float y, float z, float t) : xyz{x, y, z, t} {}
     flute4(const float c[4]) : xyz{c[0], c[1], c[2], c[3]} {}
-    flute4(double x, double y, double z, double t) : xyz{float(x), float(y), float(z), float(t)} {}
+    //flute4(double x, double y, double z, double t) : xyz{float(x), float(y), float(z), float(t)} {}
 };
 
 
@@ -88,7 +88,7 @@ struct flute6
     float xyz[6];
     flute6() : xyz{0, 0, 0, 0, 0, 0} {}
     flute6(float x, float y, float z, float a, float b, float c) : xyz{x, y, z, a, b, c} {}
-    flute6(double x, double y, double z, double a, double b, double c) : xyz{float(x), float(y), float(z), float(a), float(b), float(c)} {}
+    //flute6(double x, double y, double z, double a, double b, double c) : xyz{float(x), float(y), float(z), float(a), float(b), float(c)} {}
 
     flute6(float const c[4], float x, float y) : xyz{c[0], c[1], c[2], c[3], x, y} {}
     flute6(float const c[4], const float d[2]) : xyz{c[0], c[1], c[2], c[3], d[0], d[1]} {}

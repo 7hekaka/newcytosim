@@ -119,7 +119,7 @@ size_t gym::zoo_init(flute2* flt, flute2* const ori)
         zoo_[j++] = flt - ori;
         const float A(M_PI * 0.1);
         const float B(M_PI * 0.3);
-        const float R  = 1.3512958724134987f; //std::sqrt( 4 * M_PI / std::sqrt( 25 + 10 * std::sqrt(5)) );
+        const float R = 1.3512958724134987f; //std::sqrt(4*M_PI/std::sqrt(25+10*std::sqrt(5)));
         const float C1 = R * cosf(A), S1 = R * sinf(A);
         const float C3 = R * cosf(B), S3 = R * sinf(B);
         *flt++ = {  0,  0};

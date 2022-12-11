@@ -237,6 +237,8 @@ namespace gle
     inline void sphere() { sphere1(); }
     /// draw nicest hemisphere available
     inline void hemisphere() { hemisphere1(); }
+    /// draw a sphere decorated with 12 pentagons
+    void football();
 
     /// primitive used to draw the central segments of fibers
     inline void centralTube() { longTube4(); }
