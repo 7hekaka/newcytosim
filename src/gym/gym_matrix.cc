@@ -102,14 +102,14 @@ void gym::mat_mulvec(float out[4], const float M[16], const float in[4])
         out[i] = in[0] * M[i] + in[1] * M[4+i] + in[2] * M[8+i] + in[3] * M[12+i];
 }
 
-/** Attention: out = A x B */
+/** Attention: M = A x B */
 void gym::mat_mul(float M[16], const float A[16], const float B[16])
 {
     for ( int i = 0; i < 4; ++i )
         mat_mulvec(M+4*i, A, B+4*i);
 }
 
-/** Attention: out = out x B */
+/** Attention: M = out x B */
 void gym::mat_mul(float M[16], const float B[16])
 {
     float tmp[16];

@@ -109,16 +109,16 @@ void gym::rotateInverse(Vector3 const& A, Vector3 const& B, Vector3 const& C)
 }
 
 
-// translate to center O and rotate
-void gym::transRotate(Vector3 const& O, Vector3 const& A,
-                 Vector3 const& B, Vector3 const& C)
+// translate to center T and rotate
+void gym::transRotate(Vector3 const& T, Vector3 const& A,
+                      Vector3 const& B, Vector3 const& C)
 {
     //warning! this matrix is displayed here transposed
     float mat[16] = {
         (float)A.XX, (float)A.YY, (float)A.ZZ, 0,
         (float)B.XX, (float)B.YY, (float)B.ZZ, 0,
         (float)C.XX, (float)C.YY, (float)C.ZZ, 0,
-        (float)O.XX, (float)O.YY, (float)O.ZZ, 1 };
+        (float)T.XX, (float)T.YY, (float)T.ZZ, 1 };
     apply(mat);
 }
 

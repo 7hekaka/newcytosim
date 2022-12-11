@@ -1783,7 +1783,7 @@ void Display::drawSolid(Solid const& obj)
     const PointDisp * disp = obj.prop->disp;
     
     //display points:
-    if (( disp->style & 2 ) && disp->perceptible )
+    if (( disp->style & 4 ) && disp->perceptible )
     {
         bodyColor(obj);
         gym::enableLighting();
@@ -1793,7 +1793,7 @@ void Display::drawSolid(Solid const& obj)
     
 #if NEW_SOLID_HAS_TWIN
     Solid const* tw = obj.twin();
-    if (( disp->style & 2 ) && tw )
+    if (( disp->style & 4 ) && tw )
     {
         bodyColor(obj);
         gym::enableLighting();
@@ -1804,7 +1804,7 @@ void Display::drawSolid(Solid const& obj)
 #endif
     
     //display outline of spheres in 2D
-    if ( disp->style & 4 )
+    if ( disp->style & 8 )
     {
 #if ( DIM == 2 )
         gym::disableLighting();
@@ -1831,7 +1831,7 @@ void Display::drawSolid(Solid const& obj)
     }
     
     //print the number for each Solid
-    if ( disp->style & 8 )
+    if ( disp->style & 16 )
     {
         char tmp[8];
         gym::color(bodyColorF(obj));
@@ -1845,7 +1845,7 @@ void Display::drawSolid(Solid const& obj)
     }
     
     //draw polygon around vertices of Solid
-    if ( disp->style & 16 )
+    if ( disp->style & 32 )
     {
         gym::disableLighting();
         gym::color(bodyColorF(obj));
@@ -1887,6 +1887,23 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         drawDiscT(X, obj.radius(inx), bodyColorF(obj));
 #endif
     }
+#if NEW_SOLID_HAS_TWIN
+    else if (( disp->style & 2 ) && ( obj.radius(inx) > 0 ))
+    {
+        Vector X = obj.posP(inx);
+        gym::color_front(bodyColorF(obj));
+        if ( obj.nbPoints() > inx + 3 )
+        {
+            Vector A = obj.posP(inx+1);
+            Vector B = obj.posP(inx+2);
+            Vector C = obj.posP(inx+3);
+            gym::transRotate(X, A-X, B-X, obj.twin()?X-C:C-X);
+        }
+        else
+            gym::transScale(X, obj.radius(inx));
+        gle::football();
+    }
+#endif
 }
 
 
