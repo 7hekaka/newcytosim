@@ -1863,7 +1863,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
 {
     const PointDisp * disp = obj.prop->disp;
 
-#if NEW_SOLID_HAS_TWIN
+#if NEW_SOLID_HAS_TWIN && ( DIM > 2 )
     if (( disp->style & 2 ) && ( obj.radius(inx) > 0 ))
     {
         Vector X = obj.posP(inx);
