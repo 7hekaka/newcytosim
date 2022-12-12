@@ -1861,72 +1861,73 @@ void Display::drawSolid(Solid const& obj)
  */
 void Display::drawSolidT(Solid const& obj, size_t inx) const
 {
-    const PointDisp * disp = obj.prop->disp;
-
-#if NEW_SOLID_HAS_TWIN && ( DIM > 2 )
-    if (( inx == 0 ) && ( obj.radius(inx) > 0 ))
-    {
-        Vector X = obj.posP(inx);
-        gym::enableLighting();
-        gym::color_both(disp->color);
-        if ( obj.nbPoints() > inx + 3 )
-        {
-            Vector A = obj.posP(inx+1);
-            Vector B = obj.posP(inx+2);
-            Vector C = obj.posP(inx+3);
-            gym::transRotate(X, A-X, B-X, obj.twin()?X-C:C-X);
-        }
-        else
-            gym::transScale(X, obj.radius(inx));
-        gle::football();
-    }
-    else
-#endif
-    if (( disp->style & 1 ) && ( obj.radius(inx) > 0 ))
-    {
-        Vector X = obj.posP(inx);
+    Vector X = obj.posP(inx);
 #if ( DIM > 2 )
-        // using clipping planes to cleanup overlapping Spheres
-        size_t near[3];
-        size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
-        //printf("nearest Spheres to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
-        // set clipping planes with nearest Spheres
-        for ( size_t i = 0; i < num; ++i )
-        {
-            size_t J = near[i];
-            Vector P = obj.posP(J);
-            real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
-            gym::enableClipPlane(5-i);
-            gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
-        }
-        drawBallT(X, obj.radius(inx), bodyColorF(obj));
-        for ( size_t i = 0; i < num; ++i )
-            gym::disableClipPlane(5-i);
-#else
-        drawDiscT(X, obj.radius(inx), bodyColorF(obj));
-#endif
+    // using clipping planes to cleanup overlapping Spheres
+    size_t near[3];
+    size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
+    //printf("nearest Spheres to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
+    // set clipping planes with nearest Spheres
+    for ( size_t i = 0; i < num; ++i )
+    {
+        size_t J = near[i];
+        Vector P = obj.posP(J);
+        real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
+        gym::enableClipPlane(5-i);
+        gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
     }
+    drawBallT(X, obj.radius(inx), bodyColorF(obj));
+    for ( size_t i = 0; i < num; ++i )
+        gym::disableClipPlane(5-i);
+#else
+    drawDiscT(X, obj.radius(inx), bodyColorF(obj));
+#endif
 }
 
+
+void Display::drawFootball(Solid const& obj, size_t inx)
+{
+    const PointDisp * disp = obj.prop->disp;
+    Vector X = obj.posP(inx);
+    gym::enableLighting();
+    gym::color_front(disp->color, 1.0);
+    Vector A = obj.posP(inx+1);
+    Vector B = obj.posP(inx+2);
+    Vector C = obj.posP(inx+3);
+    gym::transRotate(X, A-X, B-X, obj.twin()?X-C:C-X);
+    gle::football();
+}
+            
 
 void Display::drawSolids(SolidSet const& set)
 {
     for ( Solid * obj = set.first(); obj; obj=obj->next() )
     {
-        if ( obj->prop->disp->visible )
+        const PointDisp * disp = obj->prop->disp;
+        if ( disp->visible && ( disp->style & 1 ))
         {
             drawSolid(*obj);
 #if ( DIM >= 3 )
+            size_t inx = 0;
+#if NEW_SOLID_HAS_TWIN
+            if ( obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
+            {
+                drawFootball(*obj, inx);
+                ++inx;
+            }
+#endif
             if ( obj->prop->disp->color.transparent() )
             {
-                for ( size_t i = 0; i < obj->nbPoints(); ++i )
-                    zObjects.push_back(zObject(obj, i));
+                for ( size_t i = inx; i < obj->nbPoints(); ++i )
+                    if ( obj->radius(i) > 0 )
+                        zObjects.push_back(zObject(obj, i));
             }
             else
 #endif
             {
                 for ( size_t i = 0; i < obj->nbPoints(); ++i )
-                    drawSolidT(*obj, i);
+                    if ( obj->radius(i) > 0 )
+                        drawSolidT(*obj, i);
             }
         }
     }

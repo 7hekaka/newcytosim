@@ -270,6 +270,9 @@ public:
     /// draw translucent elements of a Solid
     void drawSolidT(Solid const&, size_t) const;
     
+    /// draw football for one sphere of a Solid
+    void drawFootball(Solid const&, size_t);
+
     /// draw the Solids
     void drawSolids(SolidSet const&);
     
