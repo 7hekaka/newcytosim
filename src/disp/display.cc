@@ -1885,7 +1885,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
 }
 
 
-void Display::drawFootball(Solid const& obj, size_t inx)
+void Display::drawFootball(Solid const& obj, size_t inx, bool flip)
 {
     const PointDisp * disp = obj.prop->disp;
     Vector X = obj.posP(inx);
@@ -1894,7 +1894,7 @@ void Display::drawFootball(Solid const& obj, size_t inx)
     Vector A = obj.posP(inx+1);
     Vector B = obj.posP(inx+2);
     Vector C = obj.posP(inx+3);
-    gym::transRotate(X, A-X, B-X, obj.twin()?X-C:C-X);
+    gym::transRotate(X, A-X, B-X, flip?X-C:C-X);
     gle::football();
 }
             
@@ -1912,7 +1912,7 @@ void Display::drawSolids(SolidSet const& set)
 #if NEW_SOLID_HAS_TWIN
             if ( obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
             {
-                drawFootball(*obj, inx);
+                drawFootball(*obj, inx, obj->twin());
                 ++inx;
             }
 #endif

@@ -271,7 +271,7 @@ public:
     void drawSolidT(Solid const&, size_t) const;
     
     /// draw football for one sphere of a Solid
-    void drawFootball(Solid const&, size_t);
+    void drawFootball(Solid const&, size_t, bool flip);
 
     /// draw the Solids
     void drawSolids(SolidSet const&);
