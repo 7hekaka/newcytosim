@@ -644,7 +644,7 @@ namespace gle
     }
     
     /// set 12 pentagon as on a football constructed as a truncated icosahedron
-    size_t setTwelvePentagons(flute6* flu, float R)
+    size_t setFootballPentagons(flute6* flu, float R)
     {
         const float K = std::sqrt(0.2);
         float C = std::cos(M_PI * 0.4); // 0.31
@@ -871,7 +871,7 @@ namespace gle
         idx[6] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
         idx[7] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
         idx[8] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
-        idx[9] = i+s; i += setTwelvePentagons((flute6*)(ptr+i), 0.333);
+        idx[9] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
         idx[10] = i+s; i += setWireCube((flute3*)(ptr+i), 0.5773502692f);
         assert_true( i <= sizeCubeBuffers() );
         return i;
@@ -949,9 +949,9 @@ namespace gle
     void cuboid() { doTriangleStrip(blobs_[2], 14); }
     //void icoidS() { doTriangleStrip(blobs_[3], 32); }
     
-    void paintTwelvePentagons() { doVNTriangleStrip(cubes_[9], 8*12); }
+    void footballPentagons() { doVNTriangleStrip(cubes_[9], 8*12); }
     
-    void football() { sphere1(); gym::color_front(0, 0, 0); paintTwelvePentagons(); }
+    void football() { sphere1(); gym::color_front(0, 0, 0); footballPentagons(); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D Circle

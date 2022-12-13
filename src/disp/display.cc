@@ -1887,15 +1887,14 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
 
 void Display::drawFootball(Solid const& obj, size_t inx, bool flip)
 {
-    const PointDisp * disp = obj.prop->disp;
     Vector X = obj.posP(inx);
     gym::enableLighting();
-    gym::color_front(disp->color, 1.0);
+    gym::color_front(0, 0, 0);
     Vector A = obj.posP(inx+1);
     Vector B = obj.posP(inx+2);
     Vector C = obj.posP(inx+3);
-    gym::transRotate(X, A-X, B-X, flip?X-C:C-X);
-    gle::football();
+    gym::transRotate(X, A-X, B-X, flip ? X-C : C-X);
+    gle::footballPentagons();
 }
             
 
@@ -1909,16 +1908,19 @@ void Display::drawSolids(SolidSet const& set)
             drawSolid(*obj);
 #if ( DIM >= 3 )
             size_t inx = 0;
-#if NEW_SOLID_HAS_TWIN
+#if 0 && NEW_SOLID_HAS_TWIN
             if ( obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
             {
-                drawFootball(*obj, inx, obj->twin());
-                ++inx;
+                if ( obj->twin() )
+                {
+                    drawFootball(*obj, inx, true);
+                    drawFootball(*obj->twin(), inx, 0);
+                }
             }
 #endif
             if ( obj->prop->disp->color.transparent() )
             {
-                for ( size_t i = inx; i < obj->nbPoints(); ++i )
+                for ( size_t i = 0; i < obj->nbPoints(); ++i )
                     if ( obj->radius(i) > 0 )
                         zObjects.push_back(zObject(obj, i));
             }
