@@ -95,8 +95,8 @@ std::string Object::reference() const
      - 2 bytes for the identity
      .
  - A fat format:
-     - 1 byte containing tag() + 128
-     - 4 bytes for the identity
+     - 1 byte containing tag() + HIGH_BIT
+     - 3 bytes for the identity
      .
  .
  The ascii-based format is always the same.
@@ -110,19 +110,19 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
     {
         if ( id > 65535 )
         {
-            // fat format
-            if ( 1 ) // Simul::currentFormatID >= 58 )
+            /* The fat format is signaled by the highest bit of the byte,
+             which is not used by ASCII codes. */
+            if ( 1 )
             {
                 /* format 58 enabled on 26.11.2022: combining `tag` and 'id',
                  leaving 3 bytes and at most 16 777 216 objects */
                 assert_true( id < 1<<24 );
-                uint8_t u[4] = { g, uint8_t((id>>16)&0xFF), uint8_t((id>>8)&0xFF), uint8_t(id&0xFF) };
+                uint8_t u[4] = { uint8_t(g|HIGH_BIT), uint8_t((id>>16)&0xFF), uint8_t((id>>8)&0xFF), uint8_t(id&0xFF) };
                 if ( 1 != fwrite(&u, 4, 1, out.file()) )
                     throw InvalidIO("writeReference() failed");
             }
             else
             {
-                // set the highest bit of the byte, which is not used by ASCII codes
                 out.writeChar(g|HIGH_BIT);
                 out.writeUInt32(id);
             }

@@ -18,7 +18,7 @@ void* operator new(std::size_t size)
     constexpr std::size_t sup = 1 << 30;
     if ( size > sup )
     {
-        std::printf("Error: excessive memory requested %5zu\n", size);
+        std::printf("Error: excessive memory requested (%5zu)\n", size);
         throw std::bad_alloc();
     }
 #endif

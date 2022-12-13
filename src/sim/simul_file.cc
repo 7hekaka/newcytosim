@@ -247,7 +247,7 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
 #endif
         {
             // binary format 58 (26.11.2022)
-            char c = in.get_char();
+            int c = in.get_char();
             tag = c & LOW_BITS;
             //assert_true(isalpha(tag));
             if ( c & HIGH_BIT )
@@ -299,7 +299,7 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag, ObjectID& id)
         case Fiber::TAG_LATTICE:
             fib = fibers.findID(id);
             if ( !fib )
-                std::clog << "unknown fiber ID " << id << "\n";
+                std::clog << "unknown fiber ID " << id << " (" << tag << ")\n";
              //throw InvalidIO("unknown fiber ID "+std::to_string(id));
             break;
         default:
