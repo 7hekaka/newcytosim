@@ -27,8 +27,8 @@ FILE * openFile(const char * filename, const char* code)
 
 int main()
 {
-    int g = 'x';
-    int id = 0x70001;
+    uint8_t g = 'x';
+    int id = 0x70101;
     char filename[] = "test_file";
     FILE * F = openFile(filename, "wb");
     if ( F ) {

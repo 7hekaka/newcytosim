@@ -35,6 +35,10 @@ test_bits: test_bits.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
+test_file: test_file.cc $(TEST_OBJ) | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+
 test_ortho: test_ortho.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
