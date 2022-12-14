@@ -1314,7 +1314,7 @@ namespace gle
         idx[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);
         idx[20] = i+s; i += setDisc(ptr+i, 2, 1, 1);
         idx[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
-        idx[22] = i+s; i += setDisc(ptr+i, 2, 0, -1);
+        idx[22] = i+s; i += setDisc(ptr+i, 4, 0, -1);
         assert_true( i <= sizeTubeBuffers() );
         return i;
     }
@@ -1360,7 +1360,7 @@ namespace gle
     void discTop1()      { doTubeStrip(tubes_[19], pi_twice); }
     void discTop2()      { doTubeStrip(tubes_[20], pi_twice/2); }
     void discBottom1()   { doTubeStrip(tubes_[21], pi_twice); }
-    void discBottom2()   { doTubeStrip(tubes_[22], pi_twice/2); }
+    void discBottom2()   { doTubeStrip(tubes_[22], pi_twice/4); }
     
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
     void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }

@@ -23,13 +23,13 @@ namespace gle
     constexpr size_t finesse = 4;
     
     /// number of circle points stored in buffer
-    constexpr size_t pi_5half = finesse * 15;
-    constexpr size_t pi_twice = finesse * 12;
-    constexpr size_t pi_3half = finesse * 9;
-    constexpr size_t pi_once = finesse * 6;
-    constexpr size_t pi_half = finesse * 3;
+    constexpr size_t pi_5half = finesse * 20;
+    constexpr size_t pi_twice = finesse * 16;
+    constexpr size_t pi_3half = finesse * 12;
+    constexpr size_t pi_once = finesse * 8;
+    constexpr size_t pi_half = finesse * 4;
 
-    /// values of cosine, sine over a full circle
+    /// values of cosine, sine over two full circle
     extern float circle_[4*pi_twice+8];
 
     /// access to precomputed cosine
