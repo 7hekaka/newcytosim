@@ -39,10 +39,11 @@ void DuoProp::clear()
 {
     CoupleProp::clear();
     
-    deactivation_rate    = 0;
-    activation_space     = "off";
-    activation_space_ptr = nullptr;
-    vulnerable           = true;
+    deactivation_rate = 0;
+    activation = "off";
+    vulnerable = true;
+    activation_space = nullptr;
+    activation_beads = nullptr;
 }
 
 
@@ -51,7 +52,7 @@ void DuoProp::read(Glossary& glos)
     CoupleProp::read(glos);
     
     glos.set(deactivation_rate, "deactivation_rate");
-    glos.set(activation_space,  "activation_space");
+    glos.set(activation, "activation", "activation_space");
     glos.set(vulnerable, "vulnerable");
 }
 
@@ -60,10 +61,14 @@ void DuoProp::complete(Simul const& sim)
 {
     CoupleProp::complete(sim);
     
-    activation_space_ptr = sim.findSpace(activation_space);
+    activation_space = sim.findSpace(activation);
+    if ( !activation_space )
+    {
+        activation_beads = sim.findSolidProp(activation);
+    }
     
-    if ( primed(sim)  &&  !activation_space_ptr )
-        throw InvalidParameter("duo:activation_space not found!");
+    if ( primed(sim) && !activation_space && !activation_beads )
+        throw InvalidParameter("duo:activation not found!");
 
     if ( deactivation_rate < 0 )
         throw InvalidParameter("deactivation_rate should be >= 0");

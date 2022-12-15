@@ -5,6 +5,7 @@
 
 #include "couple_prop.h"
 class Space;
+class SolidProp;
 
 
 /// Additional Property for Duo and DuoLong
@@ -29,7 +30,7 @@ public:
     real         deactivation_rate;
     
     /// name of the Space inside which the Duo is activated
-    std::string  activation_space;
+    std::string  activation;
     
     /// if true, the deactivation clock runs at all time
     bool         vulnerable;
@@ -40,7 +41,10 @@ public:
     real         deactivation_rate_dt;
     
     // Space inside which the Duo is activated
-    Space const* activation_space_ptr;
+    Space const* activation_space;
+    
+    // Space inside which the Duo is activated
+    SolidProp const* activation_beads;
 
 public:
     

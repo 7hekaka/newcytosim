@@ -267,6 +267,9 @@ public:
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
     Object * pickMovable(const std::string&) const;
 
+    /// find a Solid Prop
+    SolidProp* findSolidProp(std::string s) const { return static_cast<SolidProp*>(findProperty("solid", s)); }
+
     /// find a Solid by name
     Solid * pickSolid(std::string s) { return Solid::toSolid(solids.pickObject("solid", s)); }
     
