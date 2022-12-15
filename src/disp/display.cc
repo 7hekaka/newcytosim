@@ -1891,10 +1891,14 @@ void Display::drawFootball(Solid const& obj, size_t inx, bool flip)
     Vector X = obj.posP(inx);
     gym::enableLighting();
     gym::color_both(disp->color, 1.0);
+#if ( DIM >= 3 )
     Vector A = obj.posP(inx+1);
     Vector B = obj.posP(inx+2);
     Vector C = obj.posP(inx+3);
     gym::transRotate(X, A-X, B-X, flip ? X-C : C-X);
+#else
+    gym::transScale(X, obj.radius(inx));
+#endif
     gle::football();
 }
 
