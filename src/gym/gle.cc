@@ -856,7 +856,7 @@ namespace gle
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 + 16 + 12 );
+        return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 + 16 + 12*8 );
     }
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori, size_t idx[])
