@@ -59,12 +59,17 @@ void Duo::stepFF()
             if ( RNG.test(-countdown_/prop()->deactivation_rate_dt) )
                 return;
         }
-    
+        
         // hands may bind:
         if ( RNG.flip() )
             cHand1->stepUnattached(simul(), cPos);
         else if ( !prop()->trans_activated )
             cHand2->stepUnattached(simul(), cPos);
+    }
+    else if ( prop()->deactivation_type )
+    {
+        delete(this);
+        return;
     }
 }
 

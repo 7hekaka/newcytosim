@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #ifndef DUO_PROP_H
 #define DUO_PROP_H
@@ -26,19 +26,22 @@ public:
      @{
      */
     
-    /// rate of deactivation
-    real         deactivation_rate;
-    
     /// name of the Space inside which the Duo is activated
     std::string  activation;
+
+    /// rate of deactivation
+    real deactivation_rate;
+    
+    /// type of deactivation: can lead to object deletion
+    int deactivation_type;
     
     /// if true, the deactivation clock runs at all time
-    bool         vulnerable;
+    bool vulnerable;
     
     /// @}
 
     /// deactivation_rate * time_step
-    real         deactivation_rate_dt;
+    real deactivation_rate_dt;
     
     // Space inside which the Duo is activated
     Space const* activation_space;

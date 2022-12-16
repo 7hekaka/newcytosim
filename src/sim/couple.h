@@ -129,6 +129,9 @@ public:
     
     /// activity flag
     virtual int active() const { return 1; }
+    
+    /// turn activity on
+    virtual void activate() {}
 
     /// the state of the Couple in { 0 ... 3 } representing { FF, AF, FA, AA }
     int state() const { return cHand1->attached() + 2 * cHand2->attached(); }

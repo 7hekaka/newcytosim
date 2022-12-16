@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 #include "dim.h"
 #include "messages.h"
@@ -40,6 +40,7 @@ void DuoProp::clear()
     CoupleProp::clear();
     
     deactivation_rate = 0;
+    deactivation_type = 0;
     activation = "off";
     vulnerable = true;
     activation_space = nullptr;
@@ -51,7 +52,8 @@ void DuoProp::read(Glossary& glos)
 {
     CoupleProp::read(glos);
     
-    glos.set(deactivation_rate, "deactivation_rate");
+    glos.set(deactivation_rate, "deactivation", "deactivation_rate");
+    glos.set(deactivation_type, "deactivation", 1, {{"normal", 0}, {"delete", 1}});
     glos.set(activation, "activation", "activation_space");
     glos.set(vulnerable, "vulnerable");
 }
@@ -62,6 +64,7 @@ void DuoProp::complete(Simul const& sim)
     CoupleProp::complete(sim);
     
     activation_space = sim.findSpace(activation);
+#if ( 0 )
     if ( !activation_space )
     {
         activation_beads = sim.findSolidProp(activation);
@@ -69,7 +72,7 @@ void DuoProp::complete(Simul const& sim)
     
     if ( primed(sim) && !activation_space && !activation_beads )
         throw InvalidParameter("duo:activation not found!");
-
+#endif
     if ( deactivation_rate < 0 )
         throw InvalidParameter("deactivation_rate should be >= 0");
     
@@ -88,8 +91,8 @@ void DuoProp::complete(Simul const& sim)
 void DuoProp::write_values(std::ostream& os) const
 {
     CoupleProp::write_values(os);
-    write_value(os, "activation_space",  activation_space);
-    write_value(os, "deactivation_rate", deactivation_rate);
+    write_value(os, "activation",  activation_space);
+    write_value(os, "deactivation", deactivation_rate, deactivation_type);
     write_value(os, "vulnerable", vulnerable);
 }
 

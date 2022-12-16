@@ -24,9 +24,6 @@ class Duo : public Couple
     /// Gillespie countdown timer for deactivation event
     real countdown_;
     
-    /// switch activity 'on'
-    void activate();
-    
     /// switch activity 'off'
     void deactivate();
     
@@ -49,6 +46,9 @@ public:
     /// destructor
     virtual ~Duo();
     
+    /// switch activity 'on'
+    void activate();
+
     /// activity flag
     int  active() const { return active_; }
     
