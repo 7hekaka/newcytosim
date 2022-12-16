@@ -111,7 +111,7 @@ private:
     bool uniPrepare(PropertyList const& properties);
     
     /// gather all Couple with `fast_diffusion` in reserve lists
-    template <void (Couple::*FUNC)()> void step_collect(Couple*);
+    void uniStepCollect(Couple*);
 
     /// ensures that `can` holds `cnt` Couple, creating them of specified CoupleProp
     void uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const*);
@@ -156,7 +156,7 @@ public:
     /// save free Couples
     void writeFF(Outputter&) const;
     
-    /// save free Couples
+    /// save free Couples for which `fast_diffusion == 0`
     void writeFF_skip(Outputter&) const;
 
     /// save attached Couples

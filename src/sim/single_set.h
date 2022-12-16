@@ -92,7 +92,7 @@ private:
     bool uniPrepare(PropertyList const& properties);
     
     /// gather all Single with `fast_diffusion` in reserve lists
-    template <void (Single::*FUNC)()> void step_collect(Single*);
+    void uniStepCollect(Single*);
 
     /// ensures that `can` holds `cnt` Singles, creating them of specified SingleProp
     void uniRefill(SingleReserve& can, size_t cnt, SingleProp const*);
@@ -106,7 +106,7 @@ private:
     /// release Single from reserve lists
     void uniRelax();
 
-    /// save free Single
+    /// save free Single for which `fast_diffusion == 0`
     void writeF_skip(Outputter&) const;
     
 public:

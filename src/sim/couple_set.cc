@@ -53,8 +53,7 @@ static inline void step_couples(Couple * obj, bool odd)
  Transfer free Couple with `fast_diffusion` to the reserves, starting from `obj`,
  and execute FUNC for all other Couples
 */
-template < void (Couple::*FUNC)() >
-void CoupleSet::step_collect(Couple * obj)
+void CoupleSet::uniStepCollect(Couple * obj)
 {
     Couple * nxt;
     while ( obj )
@@ -67,7 +66,7 @@ void CoupleSet::step_collect(Couple * obj)
             uniReserves[p->number()].push(obj);
         }
         else
-            (obj->*FUNC)();
+            obj->stepFF();
         obj = nxt;
     }
 }
@@ -114,7 +113,7 @@ void CoupleSet::step()
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        step_collect<&Couple::stepFF>(ffHead);
+        uniStepCollect(ffHead);
         uniAttach(simul_.fibers);
     }
     else
@@ -143,7 +142,7 @@ void CoupleSet::stepSkipUnattached()
                  ffList.size(), afList.size(), faList.size(), aaList.size());
     */
     
-    Couple *const ffHead = firstFF();
+    //Couple *const ffHead = firstFF();
     Couple *const afHead = firstAF();
     Couple *const faHead = firstFA();
     
@@ -161,13 +160,6 @@ void CoupleSet::stepSkipUnattached()
     {
         step_couples<&Couple::stepHand1>(afHead, afOdd);
         step_couples<&Couple::stepHand2>(faHead, faOdd);
-    }
-
-    // use alternative attachment strategy:
-    if ( uniEnabled )
-    {
-        step_collect<&Couple::stepBlank>(ffHead);
-        uniAttach(simul_.fibers);
     }
 }
 

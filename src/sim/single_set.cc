@@ -49,8 +49,7 @@ static inline void step_singles(Single * obj, bool odd)
  Transfer free Single with `fast_diffusion` to the reserves, starting from `obj`.
  Return first Single that was not transferred
 */
-template <void (Single::*FUNC)()>
-void SingleSet::step_collect(Single * obj)
+void SingleSet::uniStepCollect(Single * obj)
 {
     Single * nxt;
     while ( obj )
@@ -63,7 +62,7 @@ void SingleSet::step_collect(Single * obj)
             uniReserves[p->number()].push(obj);
         }
         else
-            (obj->*FUNC)();
+            obj->stepF();
         obj = nxt;
     }
 }
@@ -91,7 +90,7 @@ void SingleSet::step()
     // use alternative attachment strategy:
     if ( uniEnabled )
     {
-        step_collect<&Single::stepF>(fHead);
+        uniStepCollect(fHead);
         uniAttach(simul_.fibers);
     }
     else
@@ -111,16 +110,7 @@ void SingleSet::stepSkipUnattached()
 {
     //Cytosim::log("SingleSet::stepSkipUnattached : F %5i A %5i\n", fList.size(), aList.size());
     
-    Single *const fHead = firstF();
-    
     step_singles<&Single::stepA>(firstA(), sizeA() & 1);
-    
-    // use alternative attachment strategy:
-    if ( uniEnabled )
-    {
-        step_collect<&Single::stepBlank>(fHead);
-        uniAttach(simul_.fibers);
-    }
 }
 
 

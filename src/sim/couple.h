@@ -176,9 +176,6 @@ public:
     
     /// simulate movement of Hand2, skipping attachment
     void stepHand2();
-    
-    /// this does nothing
-    void stepBlank() { }
 
     //--------------------------------------------------------------------------
 
