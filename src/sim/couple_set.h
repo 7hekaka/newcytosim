@@ -18,14 +18,16 @@ class CoupleReserve
     CoupleProp const* property_;
     Couple * head_;
     size_t count_;
+    
 public:
+    
     /// constructor
     CoupleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
     
     /// number of objects stored
     size_t size() { return count_; }
     
-    /// the property
+    /// return property
     CoupleProp const* property() { return property_; }
     
     /// set Property
@@ -39,6 +41,19 @@ public:
     
     /// remove head
     void pop() { head_ = head_->next(); --count_; }
+    
+    /// delete all objects
+    void erase()
+    {
+        Couple * obj = head_;
+        while ( obj )
+        {
+            pop();
+            obj->objset(nullptr);
+            delete(obj);
+            obj = head();
+        }
+    }
 };
 
 
@@ -86,7 +101,7 @@ private:
     /// an array of Reserve Couple
     typedef std::vector<CoupleReserve> CoupleReserveList;
     
-    /// uniReserves[p] holds Couples with ( property()->number() == p+1 )
+    /// uniReserves[p] holds Couples with ( property()->number() == p )
     CoupleReserveList uniReserves;
     
     /// flag to enable `fast_diffusion` attachment algorithm

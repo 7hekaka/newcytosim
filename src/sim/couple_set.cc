@@ -439,16 +439,7 @@ void CoupleSet::shuffle()
 void CoupleSet::erase()
 {
     for ( CoupleReserve & can : uniReserves )
-    {
-        Couple * obj = can.head();
-        while ( obj )
-        {
-            can.pop();
-            obj->objset(nullptr);
-            delete(obj);
-            obj = can.head();
-        }
-    }
+        can.erase();
     ObjectSet::erasePool(aaList);
     ObjectSet::erasePool(faList);
     ObjectSet::erasePool(afList);
@@ -924,8 +915,8 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
     if ( res )
     {
         uniReserves.resize(last+1);
-        for ( CoupleReserve & reserve : uniReserves )
-            reserve.property(nullptr);
+        for ( CoupleReserve & can : uniReserves )
+            can.property(nullptr);
         for ( Property const* i : allprop )
         {
             CoupleProp const* P = static_cast<CoupleProp const*>(i);
