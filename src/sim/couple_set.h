@@ -11,8 +11,35 @@
 
 class PropertyList;
 
-/// a list of pointers to Single
-typedef Array<Couple *> CoupleList;
+
+/// holds a list of Couple of the same type
+class CoupleReserve
+{
+    CoupleProp const* property_;
+    Couple * head_;
+    size_t count_;
+public:
+    /// constructor
+    CoupleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
+    
+    /// number of objects stored
+    size_t size() { return count_; }
+    
+    /// the property
+    CoupleProp const* property() { return property_; }
+    
+    /// set Property
+    void property(CoupleProp const* p) { property_ = p; }
+    
+    /// first object
+    Couple * head() { return head_; }
+    
+    /// add object
+    void push(Couple* arg) { arg->Object::next(head_); head_ = arg; ++count_; }
+    
+    /// remove head
+    void pop() { head_ = head_->next(); --count_; }
+};
 
 
 /// Set for Couple
@@ -56,10 +83,7 @@ private:
         }
     }
 
-    /// holds the property and the list of singles
-    typedef std::pair<CoupleProp const*, CoupleList> CoupleReserve;
-
-    /// an array of SingleReserveList
+    /// an array of Reserve Couple
     typedef std::vector<CoupleReserve> CoupleReserveList;
     
     /// uniReserves[p] holds Couples with ( property()->number() == p+1 )
@@ -75,18 +99,18 @@ private:
     template <void (Couple::*FUNC)()> void step_collect(Couple*);
 
     /// ensures that `can` holds `cnt` Couple, creating them of specified CoupleProp
-    void uniRefill(CoupleList& can, size_t cnt, CoupleProp const*);
+    void uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const*);
 
     /// attach Hand1 of Couple from `can` on locations specified in `loc`
-    void uniAttach1(Array<FiberSite>& loc, CoupleList& can);
+    void uniAttach1(Array<FiberSite>& loc, CoupleReserve& can);
     
     /// attach Hand2 of Couple from `can` on locations specified in `loc`
-    void uniAttach2(Array<FiberSite>& loc, CoupleList& can);
+    void uniAttach2(Array<FiberSite>& loc, CoupleReserve& can);
     
     /// attach both Hands of `nb` Couple at crossing points specified by first argument
-    void uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleList&, size_t nb);
+    void uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleReserve&, size_t nb);
 
-    /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
+    /// `fast_diffusion` attachment assuming that free Couples are uniformly distributed
     void uniAttach(FiberSet const&);
     
     /// release Couples from reserve lists
@@ -229,10 +253,10 @@ public:
     //--------------------------
 
     /// distribute the Couple on the fibers to approximate an equilibrated state
-    void equilibrateSym(FiberSet const&, CoupleList&, CoupleProp const*);
+    void equilibrateSym(FiberSet const&, CoupleReserve&);
 
     /// distribute Couples of given class on the fibers to approximate an equilibrated state
-    void equilibrate(FiberSet const&, CoupleList&, CoupleProp const*);
+    void equilibrate(FiberSet const&, CoupleReserve&);
     
     /// distribute all Couple on the fibers to approximate an equilibrated state
     void equilibrate(FiberSet const&, PropertyList const&);
@@ -241,7 +265,7 @@ public:
     void equilibrate();
 
     /// distribute Couples on filament intersections
-    void bindToIntersections(FiberSet const&, CoupleList&, PropertyList const&);
+    void bindToIntersections(FiberSet const&, CoupleReserve&, PropertyList const&);
     
     /// distribute Couples on filament intersections
     void bindToIntersections(CoupleProp const*);

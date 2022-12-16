@@ -138,52 +138,48 @@ void Simul::step()
     doAttachCounter = ( doAttachCounter + 1 ) % POOL_UNATTACHED;
 #endif
 
-    // if no Hands are present, we can skip attachment
-    if ( singles.size() + couples.size() )
-    {
 #if POOL_UNATTACHED > 1
-        if ( doAttachCounter )
-        {
-            couples.stepSkipUnattached();
-            singles.stepSkipUnattached();
-            //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
-        }
-        else
+    if ( doAttachCounter )
+    {
+        couples.stepSkipUnattached();
+        singles.stepSkipUnattached();
+        //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
+    }
+    else
 #endif
-        {
-            // calculate grid range from Hand's binding range:
-            real range = 0.0;
-            for ( Property const* i : properties.find_all("hand") )
-                range = std::max(range, static_cast<HandProp const*>(i)->binding_range);
-            
-            // distribute Fibers over a grid for binding of Hands:
-            fiberGrid.paintGrid(fibers.first(), nullptr, range);
-            
-            //printf("     ::paint    %16llu\n", (timer()-rdt)>>5); rdt = timer();
-            
+    {
+        // calculate grid range from Hand's binding range:
+        real range = 0.0;
+        for ( Property const* i : properties.find_all("hand") )
+            range = std::max(range, static_cast<HandProp const*>(i)->binding_range);
+        
+        // distribute Fibers over a grid for binding of Hands:
+        fiberGrid.paintGrid(fibers.first(), nullptr, range);
+        
+        //printf("     ::paint    %16llu\n", (timer()-rdt)>>5); rdt = timer();
+        
 #if ( 0 )
-            // This code continuously tests the binding algorithm.
-            if ( fiberGrid.hasGrid() )
+        // This code continuously tests the binding algorithm.
+        if ( fiberGrid.hasGrid() )
+        {
+            HandProp hp("test_binding");
+            hp.binding_rate  = INFINITY;
+            hp.binding_range = RNG.preal() * range;
+            hp.bind_also_end = BOTH_ENDS;
+            hp.complete(*this);
+            
+            Space const* spc = spaces.master();
+            for ( size_t i = 0; i < 16; ++i )
             {
-                HandProp hp("test_binding");
-                hp.binding_rate  = INFINITY;
-                hp.binding_range = RNG.preal() * range;
-                hp.bind_also_end = BOTH_ENDS;
-                hp.complete(*this);
-                
-                Space const* spc = spaces.master();
-                for ( size_t i = 0; i < 16; ++i )
-                {
-                    Vector pos = spc->place();
-                    fiberGrid.testAttach(stdout, pos, fibers, &hp);
-                }
+                Vector pos = spc->place();
+                fiberGrid.testAttach(stdout, pos, fibers, &hp);
             }
-#endif
-            // step Hand-containing objects, giving them a possibility to attach Fibers:
-            couples.step();
-            singles.step();
-            //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
         }
+#endif
+        // step Hand-containing objects, giving them a possibility to attach Fibers:
+        couples.step();
+        singles.step();
+        //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
     }
     
     // This will also update all the attached Hands
