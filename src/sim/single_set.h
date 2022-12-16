@@ -11,6 +11,50 @@ class PropertyList;
 /// a list of pointers to Single
 typedef Array<Single *> SingleList;
 
+/// holds a list of Single of the same type
+class SingleReserve
+{
+    SingleProp const* property_;
+    Single * head_;
+    size_t count_;
+    
+public:
+    
+    /// constructor
+    SingleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
+    
+    /// number of objects stored
+    size_t size() { return count_; }
+    
+    /// return property
+    SingleProp const* property() { return property_; }
+    
+    /// set Property
+    void property(SingleProp const* p) { property_ = p; }
+    
+    /// first object
+    Single * head() { return head_; }
+    
+    /// add object
+    void push(Single* arg) { arg->Object::next(head_); head_ = arg; ++count_; }
+    
+    /// remove head
+    void pop() { head_ = head_->next(); --count_; }
+    
+    /// delete all objects
+    void erase()
+    {
+        Single * obj = head_;
+        while ( obj )
+        {
+            pop();
+            obj->objset(nullptr);
+            delete(obj);
+            obj = head();
+        }
+    }
+};
+
 
 /// Set for Single
 /**
@@ -34,14 +78,11 @@ private:
     
     /// List for attached Singles (a=attached)
     ObjectPool aList;
-    
-    /// holds the property and the list of singles
-    typedef std::pair<SingleProp const*, SingleList> SingleReserve;
 
     /// an array of SingleReserveList
     typedef std::vector<SingleReserve> SingleReserveList;
     
-    /// uniReserves[p] holds Singles with ( property()->number() == p+1 )
+    /// uniReserves[p] holds Singles with ( property()->number() == p )
     SingleReserveList uniReserves;
     
     /// flag to enable `fast_diffusion` attachment algorithm
@@ -50,14 +91,14 @@ private:
     /// initialize `fast_diffusion` attachment algorithm
     bool uniPrepare(PropertyList const& properties);
     
-    /// gather all Couple with `fast_diffusion` in reserve lists
+    /// gather all Single with `fast_diffusion` in reserve lists
     template <void (Single::*FUNC)()> void step_collect(Single*);
 
     /// ensures that `can` holds `cnt` Singles, creating them of specified SingleProp
-    void uniRefill(SingleList& can, size_t cnt, SingleProp const*);
+    void uniRefill(SingleReserve& can, size_t cnt, SingleProp const*);
 
     /// attach Singles from `can` on locations specified in `loc`
-    void uniAttach(Array<FiberSite>& can, SingleList& loc);
+    void uniAttach(Array<FiberSite>& can, SingleReserve& loc);
     
     /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
     void uniAttach(FiberSet const&);

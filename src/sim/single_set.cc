@@ -60,7 +60,7 @@ void SingleSet::step_collect(Single * obj)
         if ( p->fast_diffusion && !obj->base() )
         {
             fList.pop(obj);
-            uniReserves[p->number()-1].second.push_back(obj);
+            uniReserves[p->number()].push(obj);
         }
         else
             (obj->*FUNC)();
@@ -300,15 +300,8 @@ void SingleSet::shuffle()
 
 void SingleSet::erase()
 {
-    for ( SingleReserve & reserve : uniReserves )
-    {
-        for ( Single * s : reserve.second )
-        {
-            s->objset(nullptr);
-            delete(s);
-        }
-        reserve.second.clear();
-    }
+    for ( SingleReserve & can : uniReserves )
+        can.erase();
     ObjectSet::erasePool(fList);
     ObjectSet::erasePool(aList);
     inventory_.clear();
@@ -566,14 +559,14 @@ void SingleSet::deleteWrists(Object const* arg)
 #pragma mark - Fast Diffusion
 
 
-void SingleSet::uniRefill(SingleList& can, size_t cnt, SingleProp const* p)
+void SingleSet::uniRefill(SingleReserve& can, size_t cnt, SingleProp const* p)
 {
     for ( size_t i = can.size(); i < cnt; ++i )
     {
         Single* s = p->newSingle();
         inventory_.assign(s);
         s->objset(this);
-        can.push_back(s);
+        can.push(s);
     }
 }
 
@@ -582,7 +575,7 @@ void SingleSet::uniRefill(SingleList& can, size_t cnt, SingleProp const* p)
  Attach exactly one Single from `can` to each site in `loc`.
  If `can` is not large enough, a subset of `loc` is selected.
  */
-void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
+void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserve& can)
 {
     // crop list to match available number of candidates:
     if ( can.size() < loc.size() )
@@ -593,7 +586,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
     
     for ( FiberSite & i : loc )
     {
-        Single * s = can.back();
+        Single * s = can.head();
         Hand const* h = s->hand();
         
         if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
@@ -625,7 +618,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleList& can)
 #endif
             }
 
-            can.pop_back();
+            can.pop();
             linkF(s);
             s->setPosition(pos);
             s->attach(i);
@@ -661,34 +654,33 @@ void SingleSet::uniAttach(FiberSet const& fibers)
     Array<FiberSite> loc(128, 128);
     
     // uniform attachment for the reserves:
-    for ( SingleReserve & reserve : uniReserves )
+    for ( SingleReserve & can : uniReserves )
     {
-        SingleProp const* p = reserve.first;
-        if ( !p )
+        SingleProp const* P = can.property();
+        if ( !P )
             continue;
         
-        const real vol = p->spaceVolume();
-        SingleList& can = reserve.second;
+        const real vol = P->spaceVolume();
         
         // assuming (or not) a fixed number of diffusing molecules
-        bool fixed = ( p->fast_reservoir > 0 );
-        size_t cnt = ( fixed ? p->fast_reservoir : can.size());
+        bool fixed = ( P->fast_reservoir > 0 );
+        size_t cnt = ( fixed ? P->fast_reservoir : can.size());
 
         if ( cnt > 0 )
         {
-            if ( p->fast_diffusion & 2 )
+            if ( P->fast_diffusion & 2 )
             {
-                real dis = vol / ( cnt * p->hand_prop->bindingSectionRate() );
+                real dis = vol / ( cnt * P->hand_prop->bindingSectionRate() );
                 fibers.newFiberSitesP(loc, dis);
             }
             else
             {
-                real dis = vol / ( cnt * p->hand_prop->bindingSectionProb() );
+                real dis = vol / ( cnt * P->hand_prop->bindingSectionProb() );
                 fibers.uniFiberSites(loc, dis);
             }
             
             if ( fixed ) // create enough candidates for all sites
-                uniRefill(can, loc.size(), p);
+                uniRefill(can, loc.size(), P);
 
             uniAttach(loc, can);
         }
@@ -712,22 +704,22 @@ bool SingleSet::uniPrepare(PropertyList const& properties)
     
     for ( Property const* i : allprop )
     {
-        SingleProp const* p = static_cast<SingleProp const*>(i);
-        last = std::max(last, p->number());
-        assert_true(p->number() > 0);
-        res |= p->fast_diffusion;
+        SingleProp const* P = static_cast<SingleProp const*>(i);
+        last = std::max(last, P->number());
+        assert_true(P->number() > 0);
+        res |= P->fast_diffusion;
     }
     
     if ( res )
     {
-        uniReserves.resize(last);
-        for ( SingleReserve & reserve : uniReserves )
-            reserve.first = nullptr;
+        uniReserves.resize(last+1);
+        for ( SingleReserve & can : uniReserves )
+            can.property(nullptr);
         for ( Property const* i : allprop )
         {
-            SingleProp const* p = static_cast<SingleProp const*>(i);
-            if ( p->fast_diffusion )
-                uniReserves[p->number()-1].first = p;
+            SingleProp const* P = static_cast<SingleProp const*>(i);
+            if ( P->fast_diffusion )
+                uniReserves[P->number()].property(P);
         }
     }
     
@@ -740,15 +732,17 @@ Release all Singles from the reserves
 */
 void SingleSet::uniRelax()
 {
-    for ( SingleReserve & reserve : uniReserves )
+    for ( SingleReserve & can : uniReserves )
     {
-        for ( Single * s : reserve.second )
+        Single * obj = can.head();
+        while ( obj )
         {
-            assert_true(!s->attached());
-            s->randomizePosition();
-            linkF(s);
+            assert_true(!obj->attached());
+            can.pop();
+            obj->randomizePosition();
+            linkF(obj);
+            obj = can.head();
         }
-        reserve.second.clear();
     }
 }
 
