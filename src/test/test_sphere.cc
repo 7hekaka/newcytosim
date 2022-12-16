@@ -112,7 +112,7 @@ void drawVertices()
     for ( size_t i = 0; i < cnt; ++i )
     {
         real const* ptr = front->addr(i);
-        flu[i] = { ptr[0], ptr[1], ptr[2] };
+        flu[i] = { (float)ptr[0], (float)ptr[1], (float)ptr[2] };
     }
     gym::unmapBufferV3();
     gym::drawPoints(5, 0, cnt);
