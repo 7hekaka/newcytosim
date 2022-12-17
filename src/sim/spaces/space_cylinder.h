@@ -44,10 +44,13 @@ public:
     
     /// radius
     real thickness() const { return 2*radius_; }
-
-    /// the volume inside
-    real volume() const;
     
+    /// the volume inside
+    real volume() const { return 2 * M_PI * half_ * square(radius_); }
+
+    /// surface area of the boundary
+    real surface() const { return 2 * M_PI * ( 2 * half_ + radius_ ) * radius_; }
+
     /// true if the point is inside the Space
     bool inside(Vector const&) const;
     

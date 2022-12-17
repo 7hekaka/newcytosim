@@ -63,6 +63,9 @@ public:
     /// the volume inside
     real volume() const;
     
+    /// the surface area of the edge
+    real surface() const;
+
     /// near the top edge
     Vector placeOnEdge(real) const;
 

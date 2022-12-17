@@ -43,10 +43,10 @@ public:
     real thickness() const { return 2*radius_; }
 
     /// the volume inside
-    real volume() const;
-    
+    real volume() const { return 16 / 3.0 * cube(radius_); }
+
     /// the area of the edge surface
-    real surface() const;
+    real surface() const { return 16 * square(radius_); }
 
     /// true if the point is inside the Space
     bool inside(Vector const&) const;

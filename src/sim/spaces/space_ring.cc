@@ -44,12 +44,6 @@ void SpaceRing::boundaries(Vector& inf, Vector& sup) const
 }
 
 
-real  SpaceRing::volume() const
-{
-    return 2 * M_PI * half_ * square(radius_);
-}
-
-
 Vector SpaceRing::place() const
 {
 #if ( DIM >= 3 )

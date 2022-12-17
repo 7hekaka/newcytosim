@@ -36,6 +36,9 @@ public:
     /// the volume inside
     real volume() const;
     
+    /// the surface area of the boundary
+    real surface() const;
+ 
     /// true if the point is inside the Space
     bool inside(Vector const&) const;
 

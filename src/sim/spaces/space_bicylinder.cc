@@ -38,18 +38,6 @@ void SpaceBicylinder::boundaries(Vector& inf, Vector& sup) const
 }
 
 
-real SpaceBicylinder::volume() const
-{
-    return 16 / 3.0 * cube(radius_);
-}
-
-
-real SpaceBicylinder::surface() const
-{
-    return 16 * square(radius_);
-}
-
-
 bool SpaceBicylinder::inside(Vector const& W) const
 {
 #if ( DIM > 2 )

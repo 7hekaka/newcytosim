@@ -43,8 +43,11 @@ public:
     void boundaries(Vector& inf, Vector& sup) const;
     
     /// the volume inside
-    real volume() const;
-    
+    real volume() const { return 2 * M_PI * half_ * square(radius_); }
+
+    /// surface area of the boundary
+    real surface() const { return 4 * M_PI * half_ * radius_; }
+
     /// true if the point is inside the Space
     bool inside(Vector const&) const;
     

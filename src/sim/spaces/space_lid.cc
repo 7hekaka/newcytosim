@@ -118,6 +118,18 @@ real SpaceLid::volume() const
 }
 
 
+real SpaceLid::surface() const
+{
+#if ( DIM == 1 )
+    return -1;
+#elif ( DIM == 2 )
+    return 2 * half_[0];
+#else
+    return 4 * half_[0] * half_[1];
+#endif
+}
+
+
 bool SpaceLid::inside(Vector const& pos) const
 {
 #if ( DIM == 1 )

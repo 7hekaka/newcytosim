@@ -54,12 +54,6 @@ void SpaceCylinderP::boundaries(Vector& inf, Vector& sup) const
 }
 
 
-real SpaceCylinderP::volume() const
-{
-    return 2 * M_PI * half_ * square(radius_);
-}
-
-
 bool SpaceCylinderP::inside(Vector const& W) const
 {
 #if ( DIM > 2 )

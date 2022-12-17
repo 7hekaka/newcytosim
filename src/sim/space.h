@@ -81,7 +81,10 @@ public:
     //------------------------------ OBJECT ------------------------------------
     
     /// the volume inside in 3D, or the surface area in 2D
-    virtual real volume() const { return 1; }
+    virtual real volume() const { return -1; }
+    
+    /// the surface area of the boundary in 3D
+    virtual real surface() const { return -1; }
 
     /// return the bounds for the coordinates of the points inside the Space
     /**

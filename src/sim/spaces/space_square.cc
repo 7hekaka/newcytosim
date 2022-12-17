@@ -60,6 +60,17 @@ real SpaceSquare::volume() const
 #endif
 }
 
+real SpaceSquare::surface() const
+{
+#if ( DIM == 1 )
+    return 2 * half_[0];
+#elif ( DIM == 2 )
+    return 4 * ( half_[0] + half_[1] );
+#else
+    return 8 * ( half_[0] * ( half_[1] + half_[2] ) + half_[1] * half_[2] );
+#endif
+}
+
 bool SpaceSquare::inside(Vector const& W) const
 {
 #if ( DIM == 1 )
