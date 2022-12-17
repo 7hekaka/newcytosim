@@ -188,8 +188,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
     if ( isCategory(who) )
     {
         int split = false;
-        opt.set(split, "split");
-        if ( split )
+        if ( opt.set(split, "split") && split )
         {
             int com = 1;
             opt.peek(com, "verbose");
@@ -657,7 +656,7 @@ void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const*
     std::string name;
     if ( sel )
         name = sel->name() + ":";
-    name.append(end==PLUS_END ?"plus_end":"minus_end");
+    name.append(end==PLUS_END ?"plus":"minus");
     
     out << COM << ljust("class", 2, 2) << SEP << "total" << SEP << "static";
     out << SEP << "green" << SEP << "yellow" << SEP << "orange" << SEP << "red";
