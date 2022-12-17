@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #ifndef SOLID_PROP_H
 #define SOLID_PROP_H
@@ -8,6 +8,7 @@
 #include "property.h"
 #include "vector.h"
 
+class CoupleProp;
 class PointDisp;
 class Space;
 
@@ -17,6 +18,8 @@ class Space;
 /// new option to immobilize Solid by attaching one point
 #define NEW_SOLID_CLAMP 0
 
+/// new option to create Couple from Solid's spheres
+#define NEW_SOLID_SOURCE 0
 
 /// Property for Bead and Solid
 /*
@@ -93,6 +96,14 @@ public:
     real         clamp_stiff;
 #endif
     
+#if NEW_SOLID_SOURCE
+    /// rate
+    real         source_rate;
+    
+    /// type
+    std::string  source_type;
+#endif
+    
     /// display string (see @ref PointDispPar)
     std::string  display;
     
@@ -105,6 +116,14 @@ public:
     /// parameters derived from string `display`
     PointDisp *  disp;
     
+#if NEW_SOLID_SOURCE
+    /// rate
+    real source_rate_dt;
+    
+    /// type
+    CoupleProp * source_prop;
+#endif
+
 private:
     
     /// pointer to actual confinement Space, derived from `confine_space`

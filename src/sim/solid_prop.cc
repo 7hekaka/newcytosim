@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #include "solid_prop.h"
 #include "glossary.h"
@@ -28,6 +28,12 @@ void SolidProp::clear()
 #if NEW_SOLID_CLAMP
     clamp_stiff  = 0;
     clamp_pos.reset();
+#endif
+#if NEW_SOLID_SOURCE
+    source_rate = 0;
+    source_type = "none";
+    source_prop = nullptr;
+    source_rate_dt = 0;
 #endif
 
     display           = "";
@@ -83,7 +89,11 @@ void SolidProp::read(Glossary& glos)
     if ( clamp_stiff < 0 )
         throw InvalidParameter("clamp[0] (stiffness) should be >= 0");
 #endif
-
+#if NEW_SOLID_SOURCE
+    glos.set(source_rate, "source");
+    glos.set(source_type, "source", 1);
+#endif
+    
     if ( glos.set(display, "display") )
         display_fresh = true;
 }
@@ -118,6 +128,14 @@ void SolidProp::complete(Simul const& sim)
     
     if ( primed(sim) && steric && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
+    
+#if NEW_SOLID_SOURCE
+    if ( source_type == "none" )
+        source_prop = nullptr;
+    else
+        source_prop = sim.findProperty<CoupleProp>("couple", source_type);
+    source_rate_dt = 4 * M_PI * source_rate * time_step(sim);
+#endif
 }
 
 
@@ -133,6 +151,9 @@ void SolidProp::write_values(std::ostream& os) const
 #endif
 #if NEW_SOLID_CLAMP
     write_value(os, "clamp", clamp_pos, clamp_stiff);
+#endif
+#if NEW_SOLID_SOURCE
+    write_value(os, "source", source_rate, source_type);
 #endif
     write_value(os, "display",   "("+display+")");
 }

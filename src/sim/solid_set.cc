@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 #include "solid_set.h"
 #include "solid_prop.h"
 #include "iowrapper.h"
@@ -6,13 +6,34 @@
 #include "simul.h"
 
 
-#if ( 0 )
 void SolidSet::step()
 {
-    for ( Solid * o = first(); o; o=o->next() )
-        o->step();
-}
+#if ( 0 )
+    for ( Solid * S = first(); S; S=S->next() )
+        S->step();
 #endif
+#if NEW_SOLID_SOURCE
+    static real nextCreation = RNG.exponential();
+    for ( Solid * S = first(); S; S=S->next() )
+    {
+        real rate = S->prop->source_rate_dt;
+        for ( size_t p = 0; p < S->nbPoints(); ++p )
+        {
+            // creation rate is proportional to surface
+            nextCreation -= rate * square(S->radius(p));
+            while ( nextCreation <= 0 )
+            {
+                nextCreation += RNG.exponential();
+                Couple * C = S->prop->source_prop->newCouple();
+                C->setPosition(S->posPoint(p));
+                C->activate();
+                simul_.couples.add(C);
+            }
+        }
+    }
+#endif
+}
+
 
 
 /**

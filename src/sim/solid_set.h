@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 #ifndef SOLID_SET_H
 #define SOLID_SET_H
 
@@ -62,7 +62,7 @@ public:
     Solid * insideSphere(Vector const&, real range, size_t& inx, SolidProp const*) const;
                              
     /// Monte-Carlo simulation step for every Object
-    void step() {}
+    void step();
 };
 
 
