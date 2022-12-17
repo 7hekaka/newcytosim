@@ -59,11 +59,11 @@ void CoupleSet::uniStepCollect(Couple * obj)
     while ( obj )
     {
         nxt = obj->next();
-        CoupleProp const* p = static_cast<CoupleProp const*>(obj->property());
-        if ( p->fast_diffusion )
+        CoupleProp const* P = static_cast<CoupleProp const*>(obj->property());
+        if ( P->fast_diffusion )
         {
             ffList.pop(obj);
-            uniReserves[p->number()].push(obj);
+            uniReserves[P->number()].push(obj);
         }
         else
             obj->stepFF();
@@ -237,8 +237,8 @@ Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Couple::TAG )
     {
-        CoupleProp * p = simul_.findProperty<CoupleProp>("couple", pid);
-        return p->newCouple();
+        CoupleProp * P = simul_.findProperty<CoupleProp>("couple", pid);
+        return P->newCouple();
     }
     throw InvalidIO("Warning: unknown Couple tag `"+std::to_string(tag)+"'");
     return nullptr;
@@ -687,11 +687,11 @@ int CoupleSet::bad() const
 #pragma mark - Fast Diffusion
 
 
-void CoupleSet::uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const* p)
+void CoupleSet::uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const* cop)
 {
     for ( size_t i = can.size(); i < cnt; ++i )
     {
-        Couple* c = p->newCouple();
+        Couple* c = cop->newCouple();
         inventory_.assign(c);
         c->objset(this);
         can.push(c);
@@ -834,7 +834,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
         CoupleProp const * P = can.property();
         if ( !P ) continue;
         
-        // assuming (or not) a fixed number of diffusing molecules
+        // assuming (or not) a given number of diffusing molecules
         bool fixed = ( P->fast_reservoir > 0 );
         size_t cnt = ( fixed ? P->fast_reservoir : can.size());
 
@@ -898,10 +898,10 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
 
     for ( Property const* i : allprop )
     {
-        CoupleProp const * p = static_cast<CoupleProp const*>(i);
-        last = std::max(last, p->number());
-        assert_true(p->number() > 0);
-        res |= p->fast_diffusion;
+        CoupleProp const * P = static_cast<CoupleProp const*>(i);
+        last = std::max(last, P->number());
+        assert_true(P->number() > 0);
+        res |= P->fast_diffusion;
     }
     
     if ( res )

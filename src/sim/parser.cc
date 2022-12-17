@@ -381,14 +381,28 @@ void Parser::parse_change(std::istream& is)
  
      new [COUNT] NAME
  
+ To specify a concentration:
+ 
+     new (REAL * volume) NAME
+
+ `volume` appearing verbatim is replaced by the Space's volume in cubic micro-meters.
 */
 
 void Parser::parse_new(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    Glossary opt;
     size_t cnt = 1;
-    Tokenizer::get_integer(is, cnt);
+    std::string blok = Tokenizer::get_block(is, '(');
+    if ( blok.empty() )
+        Tokenizer::get_integer(is, cnt);
+    else if ( do_new && sim_->spaces.master() )
+    {
+        // Syntax sugar: (x * volume) specifies concentration of objects
+        Evaluator evaluator{{"volume", sim_->spaces.master()->volume()}};
+        cnt = (int)std::round(evaluator.eval(blok));
+        //std::clog << blok << " <--- " << cnt << "\n";
+    }
+    
     std::string name, cat = Tokenizer::get_symbol(is);
     
     // Read 'category + name' or just 'name'
@@ -400,8 +414,9 @@ void Parser::parse_new(std::istream& is)
         cat = "";
     }
     
+    Glossary opt;
     // Syntax sugar: () specify only position
-    std::string blok = Tokenizer::get_block(is, '(');
+    blok = Tokenizer::get_block(is, '(');
     
     if ( blok.empty() )
     {

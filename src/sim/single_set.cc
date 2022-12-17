@@ -55,11 +55,11 @@ void SingleSet::uniStepCollect(Single * obj)
     while ( obj )
     {
         nxt = obj->next();
-        SingleProp const* p = obj->prop;
-        if ( p->fast_diffusion && !obj->base() )
+        SingleProp const* P = obj->prop;
+        if ( P->fast_diffusion && !obj->base() )
         {
             fList.pop(obj);
-            uniReserves[p->number()].push(obj);
+            uniReserves[P->number()].push(obj);
         }
         else
             obj->stepF();
@@ -133,13 +133,13 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Single::TAG )
     {
-        SingleProp * p = simul_.findProperty<SingleProp>("single", pid);
-        return p->newSingle();
+        SingleProp * P = simul_.findProperty<SingleProp>("single", pid);
+        return P->newSingle();
     }
     else if ( tag == Single::TAG_WRIST )
     {
-        SingleProp * p = simul_.findProperty<SingleProp>("single", pid);
-        return p->newWrist(nullptr, 0);
+        SingleProp * P = simul_.findProperty<SingleProp>("single", pid);
+        return P->newWrist(nullptr, 0);
     }
     throw InvalidIO("unknown Single tag `"+std::to_string(tag)+"'");
     return nullptr;
@@ -414,10 +414,10 @@ void SingleSet::report(std::ostream& os) const
         PropertyList plist = simul_.properties.find_all(title());
         for ( Property const* i : plist )
         {
-            SingleProp const* p = static_cast<SingleProp const*>(i);
-            size_t cnt = count(match_property, p);
-            os << '\n' << std::setw(10) << cnt << ' ' << p->name();
-            os << " ( " << p->hand << " )";
+            SingleProp const* P = static_cast<SingleProp const*>(i);
+            size_t cnt = count(match_property, P);
+            os << '\n' << std::setw(10) << cnt << ' ' << P->name();
+            os << " ( " << P->hand << " )";
         }
         if ( plist.size() > 1 )
             os << '\n' << std::setw(10) << size() << " total";
@@ -549,14 +549,14 @@ void SingleSet::deleteWrists(Object const* arg)
 #pragma mark - Fast Diffusion
 
 
-void SingleSet::uniRefill(SingleReserve& can, size_t cnt, SingleProp const* p)
+void SingleSet::uniRefill(SingleReserve& can, size_t cnt, SingleProp const* sip)
 {
     for ( size_t i = can.size(); i < cnt; ++i )
     {
-        Single* s = p->newSingle();
-        inventory_.assign(s);
-        s->objset(this);
-        can.push(s);
+        Single* S = sip->newSingle();
+        inventory_.assign(S);
+        S->objset(this);
+        can.push(S);
     }
 }
 
