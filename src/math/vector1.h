@@ -176,7 +176,7 @@ public:
     }
     
     /// change signs of all coordinates
-    void oppose()
+    void negate()
     {
         XX = -XX;
     }

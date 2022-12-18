@@ -270,7 +270,7 @@ public:
     }
     
     /// change signs of all coordinates
-    void oppose()
+    void negate()
     {
 #if VECTOR2_USES_SSE
         vec = flipsign2(vec);

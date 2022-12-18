@@ -311,7 +311,7 @@ public:
     }
     
     /// change signs of all coordinates
-    void oppose()
+    void negate()
     {
 #if VECTOR3_USES_AVX
         vec = flipsign4(vec);

@@ -232,7 +232,7 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
         dir = Vector::randU();
     
     if ( prop->joint == PLUS_END )
-        dir = -dir;
+        dir.negate();
     
     if ( fos.empty() )
         throw InvalidParameter("fiber specs must be specified");

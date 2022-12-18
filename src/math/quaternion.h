@@ -300,7 +300,7 @@ public:
     }
     
     /// oppose in place
-    void oppose()
+    void negate()
     {
         q[0] = -q[0];
         q[1] = -q[1];

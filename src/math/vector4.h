@@ -294,7 +294,7 @@ public:
     }
     
     /// change signs of all coordinates
-    void oppose()
+    void negate()
     {
 #if VECTOR4_USES_AVX
         vec = flipsign4(vec);
