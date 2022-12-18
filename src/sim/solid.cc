@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 #include "assert_macro.h"
 #include "random_vector.h"
 #include "solid.h"
@@ -725,9 +725,10 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 #if NEW_SOLID_HAS_TWIN
     if ( opt.set(str, "twin") && !soTwin )
     {
-        Solid * S = sim.pickSolid(str);
-        if ( ! S )
+        Solid * S = nullptr;
+        if ( str == "mirror" )
         {
+            // create a twin Solid that is the mirror image of *this:
             S = new Solid(prop);
             S->soTwin = this;
             ObjectList list = S->build(opt, sim);
@@ -741,10 +742,17 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             ObjectSet::translateObjects(objs, Vector(-R,0,0));
             objs.append(list);
         }
-        S->soTwin = this;
-        S->fixShape(); // to keep the mirrored shape
-        if ( S->nbPoints() <= DIM )
-            throw InvalidParameter("Solid's twin lacks sufficient points");
+        else
+            S = sim.pickSolid(str);
+        if ( S )
+        {
+            S->soTwin = this;
+            S->fixShape(); // to keep the mirrored shape
+            if ( S->nbPoints() <= DIM )
+                throw InvalidParameter("Solid's twin lacks sufficient points");
+        }
+        else
+            std::cerr << "Warning: could not find twin Solid `" << str << "'\n";
     }
 #endif
     return objs;
