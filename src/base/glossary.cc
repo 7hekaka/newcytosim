@@ -342,7 +342,8 @@ void Glossary::add_value(Glossary::pair_type& res, std::string& str, bool def)
 */
 bool valid_value(const int c)
 {
-   return isalnum(c) || c==' ' || c=='/' || c == '#' || c==':' || c=='\t' || c=='_' || c=='.' || c=='+' || c=='-';
+   return isalnum(c) || c==' ' || c=='/' || c == '#' || c==':' || c=='\t'
+    || c=='_' || c=='.' || c=='+' || c=='-' || c=='~';
 }
 
 

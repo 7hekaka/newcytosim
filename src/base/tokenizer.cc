@@ -188,12 +188,19 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
     std::istringstream is(arg);
     std::string res = get_symbol(is, false);
     std::streampos isp = is.tellg();
-    if ( is.get() == ':' )
+    int c = is.peek();
+    if ( c == ':' )
     {
+        is.get();
         // spliting as symbol:number
-        arg.resize(isp);
         is >> num;
-        return !is.fail();
+    }
+    else if ( c == '~' )
+    {
+        is.get();
+        // spliting as symbol:number
+        is >> num;
+        num = -num;
     }
     else
     {
@@ -202,13 +209,12 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
         is.seekg(0);
         get_stuff(is, isalpha);
         isp = is.tellg();
-        if ( is >> num )
-        {
-            arg.resize(isp);
-            return true;
-        }
+        is >> num;
     }
-    return false;
+    if ( is.fail() )
+        return false;
+    arg.resize(isp);
+    return true;
 }
 
 

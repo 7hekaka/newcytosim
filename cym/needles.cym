@@ -21,7 +21,7 @@ new cell
     radius = 5
 }
 
-set fiber rod
+set fiber stem
 {
     rigidity = 20
     segmentation = 0.25
@@ -57,10 +57,10 @@ new event
 {
     rate = 10;
     code = (
-        new rod  { length=0.25; plus_end=grow; }
+        new stem { length=0.25; plus_end=grow; }
         new ball { point1=center, 0.25; point2=0.24 0 0; point3=0.49 0 0 }
-        new link { base=solid0, point2; attach=fiber0, 0 }
-        new link { base=solid0, point3; attach=fiber0, 0.25 }
+        new link { base=solid~1, point2; attach=fiber~1, 0 }
+        new link { base=solid~1, point3; attach=fiber~1, 0.25 }
     )
 }
 

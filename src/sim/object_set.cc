@@ -224,7 +224,7 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
         {
             // start from the end of the list:
             inv = inventory_.last();
-            while ( inv  &&  ++num <= 0 )
+            while ( inv  &&  ++num < 0 )
                 inv = inventory_.previous(inv);
         }
         return static_cast<Object*>(inv);
@@ -243,7 +243,7 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
     if ( spec == "last" )
     {
         Inventoried* inv = inventory_.last();
-        while ( inv  &&  ++num <= 0 )
+        while ( inv  &&  ++num < 0 )
             inv = inventory_.previous(inv);
         return static_cast<Object*>(inv);
     }
@@ -278,7 +278,7 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
             while ( inv )
             {
                 num += ( static_cast<Object*>(inv)->property() == pp );
-                if ( num > 0 )
+                if ( num >= 0 )
                     break;
                 inv = inventory_.previous(inv);
             }
