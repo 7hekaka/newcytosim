@@ -124,6 +124,7 @@ Tesselator::Tesselator()
 
 void Tesselator::setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned N)
 {
+    assert_true(N > 0);
     kind_ = K;
     num_apices_ = V;
     max_vertices_ = V + E * (N-1) + F * ((N-1)*(N-2))/2;
@@ -492,6 +493,7 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
 
 void Tesselator::buildTetrahedron(unsigned div, int make)
 {
+    div = std::max(div, 1U);
     setGeometry(TETRAHEDRON, 4, 6, 4, div);
     
     constexpr FLOAT a = 1.0/3.0;
@@ -524,6 +526,7 @@ void Tesselator::buildTetrahedron(unsigned div, int make)
 
 void Tesselator::buildOctahedron(unsigned div, int make)
 {
+    div = std::max(div, 1U);
     setGeometry(OCTAHEDRON, 6, 12, 8, div);
     
     // Eight vertices on unit sphere
@@ -558,6 +561,7 @@ void Tesselator::buildOctahedron(unsigned div, int make)
 
 void Tesselator::buildIcosahedronX(unsigned div, int make)
 {
+    div = std::max(div, 1U);
     setGeometry(ICOSAHEDRON, 12, 30, 20, div);
     
     const FLOAT G = 0.5+0.5*std::sqrt(5.0);
@@ -614,6 +618,7 @@ void Tesselator::buildIcosahedronX(unsigned div, int make)
 /** The faces are draw in order of increasing Z */
 void Tesselator::buildIcosahedron(unsigned div, int make)
 {
+    div = std::max(div, 1U);
     setGeometry(ICOSAHEDRON, 12, 30, 20, div);
     
     const FLOAT Z = std::sqrt(0.2);
@@ -680,6 +685,7 @@ static void triangle(unsigned i[3], unsigned a, unsigned b, unsigned c)
 /** The faces are draw in order of increasing Z */
 void Tesselator::buildCylinder(unsigned div, int make)
 {
+    div = std::max(div, 1U);
     //setGeometry(CYLINDER, 16, 40, 25, div);
     setGeometry(CYLINDER, 21, 55, 35, div);
 
@@ -759,6 +765,7 @@ void Tesselator::buildCylinder(unsigned div, int make)
 
 void Tesselator::buildDroplet(unsigned div, int make)
 {
+    div = std::max(div, 1U);
     buildCylinder(div, make);
     kind_ = DROPLET;
 }
@@ -779,28 +786,29 @@ static void middle(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3], Tesselator::F
 
 void Tesselator::buildHemisphere(unsigned div, int make)
 {
+    div = std::max(div, 1U);
     setGeometry(HEMISPHERE, 26, 75, 40, div);
     
+    const FLOAT P = M_PI/10.;
+    const FLOAT D = M_PI/2.5;
+    const FLOAT A[5] = {P, P+D, P+D*2, P+D*3, P+D*4};
+
     const FLOAT Z = std::sqrt(0.2);
-    const FLOAT C = std::cos(M_PI/2.5);
-    const FLOAT S = std::sin(M_PI/2.5);
-    const FLOAT D = C*C - S*S;
-    const FLOAT T = C*S + C*S;
     const FLOAT H = std::sqrt(1 + Z*Z);
 
     // Twelve vertices of icosahedron
     FLOAT ico[12][3] = {
         { 0,  0, -H},
-        { 1,  0, -Z},
-        { C, -S, -Z},
-        { D, -T, -Z},
-        { D,  T, -Z},
-        { C,  S, -Z},
-        {-D, -T,  Z},
-        {-C, -S,  Z},
-        {-1,  0,  Z},
-        {-C,  S,  Z},
-        {-D,  T,  Z},
+        {std::cos(A[0]),-std::sin(A[0]), -Z},
+        {std::cos(A[1]),-std::sin(A[1]), -Z},
+        {std::cos(A[2]),-std::sin(A[2]), -Z},
+        {std::cos(A[3]),-std::sin(A[3]), -Z},
+        {std::cos(A[4]),-std::sin(A[4]), -Z},
+        {-std::cos(A[3]), std::sin(A[3]), Z},
+        {-std::cos(A[4]), std::sin(A[4]), Z},
+        {-std::cos(A[0]), std::sin(A[0]), Z},
+        {-std::cos(A[1]), std::sin(A[1]), Z},
+        {-std::cos(A[2]), std::sin(A[2]), Z},
         { 0,  0,  H}
     };
     

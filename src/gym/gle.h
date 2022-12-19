@@ -17,17 +17,16 @@ class Vector3;
  */
 namespace gle
 {
-    /// this defines the number of triangles used to draw shapes
-    /** Higher finesse improves the rendering:
-     4 is okay, 8 is nice and 16 is very nice */
-    constexpr size_t finesse = 4;
+    /// `finesse` affects the number of triangles used to draw shapes such as cylinders
+    /** Higher values are better: 2 is okay, 4 is good, 8 is nice and 16 is very nice */
+    constexpr size_t finesse = 2;
     
     /// number of circle points stored in buffer
-    constexpr size_t pi_5half = finesse * 20;
-    constexpr size_t pi_twice = finesse * 16;
-    constexpr size_t pi_3half = finesse * 12;
-    constexpr size_t pi_once = finesse * 8;
-    constexpr size_t pi_half = finesse * 4;
+    constexpr size_t pi_5half = finesse * 25;
+    constexpr size_t pi_twice = finesse * 20;
+    constexpr size_t pi_3half = finesse * 15;
+    constexpr size_t pi_once = finesse * 10;
+    constexpr size_t pi_half = finesse * 5;
 
     /// values of cosine, sine over two full circle
     extern float circle_[4*pi_twice+8];
@@ -230,7 +229,7 @@ namespace gle
     void hemisphere2();
     /// draw half a sphere of radius 1 in Z < 0
     void hemisphere4();
-    
+
     /// draw a blob with a pointy ends up in Z
     void droplet();
     /// draw nicest sphere available
@@ -239,7 +238,7 @@ namespace gle
     inline void hemisphere() { hemisphere1(); }
     /// draw a sphere decorated with 12 pentagons
     void football();
-    /// draw a sphere decorated with 12 pentagons
+    /// draw 12 pentagons distributed on a sphere
     void footballPentagons();
 
     /// primitive used to draw the central segments of fibers

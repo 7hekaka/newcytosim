@@ -859,20 +859,20 @@ namespace gle
         return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 + 16 + 12*8 );
     }
     
-    size_t setCubeBuffers(flute6* ptr, flute6* const ori, size_t idx[])
+    size_t setCubeBuffers(flute6* ptr, flute6* const ori)
     {
         size_t i = 0, s = ptr - ori;
-        idx[0] = i+s; i += setTetrahedron(ptr);
-        idx[1] = i+s; i += invTetrahedron(ptr+i);
-        idx[2] = i+s; i += setOctahedron(ptr+i);
-        idx[3] = i+s; i += setIcosahedron(ptr+i);
-        idx[4] = i+s; i += setArrowTail(ptr+i);
-        idx[5] = i+s; i += setCube(ptr+i, 0.5773502692f);
-        idx[6] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
-        idx[7] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
-        idx[8] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
-        idx[9] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
-        idx[10] = i+s; i += setWireCube((flute3*)(ptr+i), 0.5773502692f);
+        cubes_[0] = i+s; i += setTetrahedron(ptr);
+        cubes_[1] = i+s; i += invTetrahedron(ptr+i);
+        cubes_[2] = i+s; i += setOctahedron(ptr+i);
+        cubes_[3] = i+s; i += setIcosahedron(ptr+i);
+        cubes_[4] = i+s; i += setArrowTail(ptr+i);
+        cubes_[5] = i+s; i += setCube(ptr+i, 0.5773502692f);
+        cubes_[6] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
+        cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
+        cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
+        cubes_[9] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
+        cubes_[10] = i+s; i += setWireCube((flute3*)(ptr+i), 0.5773502692f);
         assert_true( i <= sizeCubeBuffers() );
         return i;
     }
@@ -882,12 +882,12 @@ namespace gle
         return ( 54 + 54 + 16 );
     }
 
-    size_t setBlobBuffers(flute3* ptr, flute3* const ori, size_t idx[])
+    size_t setBlobBuffers(flute3* ptr, flute3* const ori)
     {
         size_t i = 0, s = ptr - ori;
-        idx[0] = i+s; i += setBlob(ptr+i);
-        idx[1] = i+s; i += setPin(ptr+i);
-        idx[2] = i+s; i += setCuboid(ptr+i, 1.0);
+        blobs_[0] = i+s; i += setBlob(ptr+i);
+        blobs_[1] = i+s; i += setPin(ptr+i);
+        blobs_[2] = i+s; i += setCuboid(ptr+i, 1.0);
         assert_true( i <= sizeBlobBuffers() );
         return i;
     }
@@ -1069,15 +1069,15 @@ namespace gle
         return 56 + 4 * pi_twice;
     }
     
-    size_t setCircBuffers(flute2* ptr, flute2* const ori, size_t idx[])
+    size_t setCircBuffers(flute2* ptr, flute2* const ori)
     {
         size_t i = 0, s = ptr - ori;
-        idx[0] = i+s; i += setCircle(ptr+i, 1, 1);
-        idx[1] = i+s; i += setCircle(ptr+i, 2, 1);
-        idx[2] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
-        idx[3] = i+s; i += setCapsulePaint(ptr+i, 0.75);
-        idx[4] = i+s; i += setCrossStroke(ptr+i);
-        idx[5] = i+s; i += setCrossPaint(ptr+i);
+        discs_[0] = i+s; i += setCircle(ptr+i, 1, 1);
+        discs_[1] = i+s; i += setCircle(ptr+i, 2, 1);
+        discs_[2] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
+        discs_[3] = i+s; i += setCapsulePaint(ptr+i, 0.75);
+        discs_[4] = i+s; i += setCrossStroke(ptr+i);
+        discs_[5] = i+s; i += setCrossPaint(ptr+i);
         assert_true( i <= sizeCircBuffers() );
         return i;
     }
@@ -1284,37 +1284,37 @@ namespace gle
         return 25 * pi_twice;  // this is empirical!
     }
     
-    size_t setTubeBuffers(flute6* ptr, flute6* const ori, size_t idx[])
+    size_t setTubeBuffers(flute6* ptr, flute6* const ori)
     {
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const float B = -32.f, T = 256.f, E = 0.03125;
         size_t i = 0, s = ptr - ori;
-        idx[0] = i+s; i += setTube(ptr+i, 1, 0, 1);
-        idx[1] = i+s; i += setTube(ptr+i, 2, 0, 1);
-        idx[2] = i+s; i += setTube(ptr+i, 4, 0, 1);
-        idx[3] = i+s; i += setTube(ptr+i, 8, 0, 1);
+        tubes_[0] = i+s; i += setTube(ptr+i, 1, 0, 1);
+        tubes_[1] = i+s; i += setTube(ptr+i, 2, 0, 1);
+        tubes_[2] = i+s; i += setTube(ptr+i, 4, 0, 1);
+        tubes_[3] = i+s; i += setTube(ptr+i, 8, 0, 1);
 
-        idx[4] = i+s; i += setTube(ptr+i, 4, 0, 1+E); // tubeS
-        idx[5] = i+s; i += setTube(ptr+i, 4,-E, 1+E); // tubeM
-        idx[6] = i+s; i += setTube(ptr+i, 4,-E, 1);   // tubeE
+        tubes_[4] = i+s; i += setTube(ptr+i, 4, 0, 1+E); // tubeS
+        tubes_[5] = i+s; i += setTube(ptr+i, 4,-E, 1+E); // tubeM
+        tubes_[6] = i+s; i += setTube(ptr+i, 4,-E, 1);   // tubeE
         
-        idx[7] = i+s; i += setTube(ptr+i, 1, B, T);
-        idx[8] = i+s; i += setTube(ptr+i, 2, B, T);
-        idx[9] = i+s; i += setTube(ptr+i, 4, B, T);
+        tubes_[7] = i+s; i += setTube(ptr+i, 1, B, T);
+        tubes_[8] = i+s; i += setTube(ptr+i, 2, B, T);
+        tubes_[9] = i+s; i += setTube(ptr+i, 4, B, T);
         
-        idx[10] = i+s; i += setTube(ptr+i, 1, 0, T);
-        idx[11] = i+s; i += setTube(ptr+i, 2, 0, T);
-        idx[12] = i+s; i += setTube(ptr+i, 4, 0, T);
-        idx[13] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone1
-        idx[14] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0); // cone2
-        idx[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
-        idx[16] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone3
-        idx[17] = i+s; i += setDisc(ptr+i, 1, 0, 1);
-        idx[18] = i+s; i += setDisc(ptr+i, 2, 0, 1);
-        idx[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);
-        idx[20] = i+s; i += setDisc(ptr+i, 2, 1, 1);
-        idx[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
-        idx[22] = i+s; i += setDisc(ptr+i, 4, 0, -1);
+        tubes_[10] = i+s; i += setTube(ptr+i, 1, 0, T);
+        tubes_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
+        tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
+        tubes_[13] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone1
+        tubes_[14] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0); // cone2
+        tubes_[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
+        tubes_[16] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone3
+        tubes_[17] = i+s; i += setDisc(ptr+i, 1, 0, 1);
+        tubes_[18] = i+s; i += setDisc(ptr+i, 2, 0, 1);
+        tubes_[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);
+        tubes_[20] = i+s; i += setDisc(ptr+i, 2, 1, 1);
+        tubes_[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
+        tubes_[22] = i+s; i += setDisc(ptr+i, 4, 0, -1);
         assert_true( i <= sizeTubeBuffers() );
         return i;
     }
@@ -1399,7 +1399,7 @@ namespace gle
         ico.store_vertices(ptr);
         ptr += 3 * ico.num_vertices();
         
-        assert_true(ico.num_vertices() <= 65535 );
+        assert_true(ico.num_vertices() <= 65535);
         size_t cnt = 3 * ico.num_faces();
         memcpy(idx, ico.face_data(), cnt*sizeof(Tesselator::INDEX));
         idx += cnt;
@@ -1442,7 +1442,7 @@ namespace gle
     
     void hemisphere1() { drawIcoBuffer(ico_pts_[4], ico_idx_[4], ico_cnt_[4]); }
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
-    void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
+    void hemisphere4() { gym::scale(1,1,0.75); drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
 
     void droplet() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
     
@@ -1472,18 +1472,17 @@ namespace gle
     void setBuffers()
     {
         Tesselator ico[8];
-        size_t f = std::max(1UL, finesse/2);
         ico[0].buildIcosahedron(finesse*4);
         ico[1].buildIcosahedron(finesse*2);
         ico[2].buildIcosahedron(finesse);
-        ico[3].buildIcosahedron(f);
+        ico[3].buildIcosahedron(finesse/2);
 
-        ico[4].buildHemisphere(finesse);
-        ico[5].buildHemisphere(f);
-        ico[6].buildHemisphere(std::max(1UL, finesse/4));
-        ico[7].buildDroplet(f);
+        ico[4].buildHemisphere(finesse*2);
+        ico[5].buildHemisphere(finesse);
+        ico[6].buildHemisphere(finesse/2);
+        ico[7].buildDroplet(finesse/2);
         
-        f = 32; // for setIcoidBuffer
+        size_t f = 32; // for setIcoidBuffer
         size_t s = 12;
         for ( int i = 0; i < 8; ++i )
         {
@@ -1506,11 +1505,11 @@ namespace gle
         float*const ptr0 = ptr;
         Tesselator::INDEX*const idx0 = idx;
         
-        ptr += 6 * setTubeBuffers((flute6*)ptr, (flute6*)ptr0, tubes_);
+        ptr += 6 * setTubeBuffers((flute6*)ptr, (flute6*)ptr0);
         //fprintf(stderr, "setTubeBuffers : %li %li\n", ptr-ptr0, t); float* sub=ptr;
         assert_true( ptr < ptr0 + t );
 
-        ptr += 6 * setCubeBuffers((flute6*)ptr, (flute6*)ptr0, cubes_);
+        ptr += 6 * setCubeBuffers((flute6*)ptr, (flute6*)ptr0);
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
         assert_true( ptr < ptr0 + c + t );
 
@@ -1527,14 +1526,14 @@ namespace gle
         assert_true( ptr < ptr0 + s + c + t );
         assert_true( idx < idx0 + f );
 
-        ptr += 3 * setBlobBuffers((flute3*)ptr, (flute3*)ptr0, blobs_);
+        ptr += 3 * setBlobBuffers((flute3*)ptr, (flute3*)ptr0);
         //fprintf(stderr, "setBlobBuffers : %li %li\n", ptr-sub, b); sub=ptr;
         assert_true( ptr < ptr0 + s + t + c + b );
 
         // align pointer:
         ptr += (ptr-ptr0) & 1;
         
-        ptr += 2 * setCircBuffers((flute2*)ptr, (flute2*)ptr0, discs_);
+        ptr += 2 * setCircBuffers((flute2*)ptr, (flute2*)ptr0);
         //fprintf(stderr, "setCircBuffers : %li %li\n", ptr-sub, o);
 
         assert_true( ptr < ptr0 + (s+t+c+b+o) );
