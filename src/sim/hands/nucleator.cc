@@ -22,9 +22,7 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 
 ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Glossary& opt)
 {
-    ObjectList objs;
     ObjectMark mk = 0;
-
     // determine direction of nucleation:
     Vector dir;
     Hand const* h = hMonitor->otherHand(this);
@@ -59,12 +57,19 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     }
     // flip if nucleator is at the PLUS_END
     if ( prop()->hold_end == PLUS_END )
-        dir = -dir;
+        dir.negate();
     
+    if ( prop()->specificity == NucleatorProp::NUCLEATE_MOSTLY_PARALLEL )
+    {
+        if ( RNG.flip_8th() )
+            dir.negate();
+    }
+
+    ObjectList objs;
     Fiber * fib = sim.fibers.newFiber(objs, fip, opt);
     // select rotation to align with direction of nucleation:
     Rotation rot = Rotation::randomRotationToVector(dir);
-    
+
     const real A = prop()->nucleation_angle;
     const real L = hMonitor->linkRestingLength();
 #if ( DIM == 2 )

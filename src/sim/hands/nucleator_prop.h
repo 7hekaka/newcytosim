@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #ifndef NUCLEATOR_PROP_H
 #define NUCLEATOR_PROP_H
@@ -19,6 +19,13 @@ public:
     
     friend class Nucleator;
     
+    /// indicates a specificity
+    enum Specificity
+    {
+        NUCLEATE_UNSPECIFIC = 0,
+        NUCLEATE_MOSTLY_PARALLEL
+    };
+
 public:
     
     /**
@@ -44,6 +51,9 @@ public:
     /// angle of newly made fiber, relative to mother filament for Nucleator in Couple
     real nucleation_angle;
     
+    /// specificity of nucleation
+    int specificity;
+
     /// specifies if the nucleator attaches to fibers that it creates [none, minus_end, plus_end]
     /**
      This option controls if the nucleator will be attached (or not) to a fiber that it created.
@@ -79,11 +89,6 @@ public:
     state_t detached_end_state;
     
     /// @}
-
-#if BACKWARD_COMPATIBILITY < 57
-    /// deprecated value, used here just for reading old files
-    int specificity;
-#endif
     
 private:
     

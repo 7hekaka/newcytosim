@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #include "dim.h"
 #include "cymdef.h"
@@ -19,17 +19,15 @@ void NucleatorProp::clear()
 {
     HandProp::clear();
 
-    rate         = 0;
-    fiber_type   = "";
-    fiber_spec   = "";
-    track_end    = NO_END;
-    hold_end     = MINUS_END;
-    addictive    = false;
+    rate       = 0;
+    fiber_type = "";
+    fiber_spec = "";
+    track_end  = NO_END;
+    hold_end   = MINUS_END;
+    addictive  = false;
     detached_end_state = STATE_BLACK;
     nucleation_angle = 0;
-#if BACKWARD_COMPATIBILITY < 57
-    specificity = 0;
-#endif
+    specificity = NUCLEATE_UNSPECIFIC;
 }
 
 
@@ -62,10 +60,8 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(hold_end, "hold_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}});
     
-#if BACKWARD_COMPATIBILITY < 57
-    /// deprecated value, used here just for reading old files
-    glos.set(specificity, "specificity");
-#endif
+    glos.set(specificity, "specificity", {{"off", NUCLEATE_UNSPECIFIC},
+        {"mostly_parallel", NUCLEATE_MOSTLY_PARALLEL}});
 }
 
 
@@ -85,11 +81,6 @@ void NucleatorProp::complete(Simul const& sim)
         throw InvalidParameter("if set, hand:track_end should be equal to hold_end");
     
     rate_dt = rate * time_step(sim) * POOL_UNATTACHED;
-    
-#if BACKWARD_COMPATIBILITY < 57
-    if ( specificity && primed(sim) )
-        throw InvalidParameter("`nucleator:specificity' is deprecated: set `nucleation_angle' instead");
-#endif
 }
 
 
@@ -102,5 +93,6 @@ void NucleatorProp::write_values(std::ostream& os) const
     write_value(os, "hold_end",  hold_end);
     write_value(os, "track_end", track_end);
     write_value(os, "addictive", addictive);
+    write_value(os, "specificity", specificity);
 }
 
