@@ -4,8 +4,6 @@
 #define BUDDY_H
 
 
-#define MAKE_NO_FRIENDS 0
-
 /// Establishes `circles of friends' within objects.
 /**
  Buddy implements mutual relationship between objects.
@@ -32,10 +30,10 @@ private:
 public:
     
     /// search for 'guy' in circle of buddies, returning Buddy anterior to `guy` if found
-    Buddy* findBuddy(Buddy const* guy)
+    Buddy const* findBuddy(Buddy const* guy) const
     {
-        Buddy * a = this;
-        Buddy * b = buddy_;
+        Buddy const* a = this;
+        Buddy const* b = buddy_;
         while ( b != this )
         {
             if ( b == guy )
@@ -46,13 +44,13 @@ public:
         return nullptr;
     }
     
-    /// true if 'guy' belongs to the circle of buddies
+    /// true if 'guy' is not within the circle of buddies
     bool notBuddy(Buddy const* guy) const
     {
-        return ! const_cast<Buddy*>(this)->findBuddy(guy);
+        return ! this->findBuddy(guy);
     }
     
-    /// return number of buddies, in circle of friends
+    /// return number of buddies in circle of friends
     size_t nbBuddies()
     {
         size_t cnt = 0;
@@ -65,7 +63,7 @@ public:
         return cnt;
     }
 
-    /// add `b` into the list of buddies, joining circles if needed
+    /// add `guy` into the list of buddies, joining circles if needed
     void enlist(Buddy * guy)
     {
         assert_true( guy != this );
@@ -82,10 +80,10 @@ public:
         }
     }
     
-    /// remove `b` from the list of known buddy, do not call goodbye()
+    /// remove `guy` from the list of known buddy, do not call goodbye()
     void unlist(Buddy * guy)
     {
-        Buddy * b = findBuddy(guy);
+        Buddy * b = const_cast<Buddy*>(findBuddy(guy));
         if ( b )
         {
             assert_true( b->buddy_ == guy );
@@ -124,7 +122,7 @@ public:
     }
     
     /// this is called everytime a known buddy is destroyed
-    virtual void goodbye(Buddy const* b)
+    virtual void goodbye(Buddy const*)
     {
         //std::clog << "Buddy " << this << "::goodbye(" << b << ")\n";
     }

@@ -28,9 +28,9 @@ set fiber stem
     steric = 1, 0.25
     confine = inside, 100
 
-    activity      = grow
+    activity = grow
     growing_speed = 10
-    max_length    = 2
+    max_length = 2
     display = ( line=20; )
 }
 
@@ -58,9 +58,9 @@ new event
     rate = 10;
     code = (
         new stem { length=0.25; plus_end=grow; }
-        new ball { point1=center, 0.25; point2=0.24 0 0; point3=0.49 0 0 }
-        new link { base=solid~1, point2; attach=fiber~1, 0 }
-        new link { base=solid~1, point3; attach=fiber~1, 0.25 }
+        new ball { point1=center, 0.25; point2=0.25 0 0; buddy=stem~1 }
+        new link { base=solid~1, point1; attach=fiber~1, 0 }
+        new link { base=solid~1, point2; attach=fiber~1, 0.25 }
     )
 }
 

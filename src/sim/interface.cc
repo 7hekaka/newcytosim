@@ -410,10 +410,19 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
             i->mark(mk);
     }
     
-    // translation after placement
-    Vector vec;
-    if ( opt.set(vec, "translation") )
-        ObjectSet::translateObjects(objs, vec);
+    // optionally link buddies:
+    std::string str;
+    if ( opt.set(str, "buddy") )
+    {
+        Mecable * bud = sim_->pickMecable(str);
+        if ( !bud )
+            throw InvalidParameter("could not find buddy `"+str+"'");
+        for ( Object * i : objs )
+        {
+            Mecable * mec = Simul::toMecable(i);
+            if ( mec ) mec->enlist(bud);
+        }
+    }
     
     // set identity if specified
     ObjectID id = 0;
@@ -423,6 +432,11 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
             throw InvalidParameter("identity "+std::to_string(id)+" is already assigned");
         objs.front()->setIdentity(id);
     }
+
+    // translation after placement
+    Vector vec;
+    if ( opt.set(vec, "translation") )
+        ObjectSet::translateObjects(objs, vec);
     
     /* 
      Because the objects in ObjectList are not necessarily all of the same class,
