@@ -276,7 +276,7 @@ public:
     void addHand(Hand* h) const { fHands.add(h); }
     
     /// unregister bound Hands (which has detached)
-    void removeHand(Hand* h) const  { fHands.remove(h); }
+    void removeHand(Hand* h) const { fHands.remove(h); }
     
     /// update all Hands bound to this
     void updateHands();

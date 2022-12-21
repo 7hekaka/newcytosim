@@ -90,10 +90,10 @@ public:
 
 
     /// return next Hand in Fiber's list
-    Hand * next()  const  { return hNext; }
+    Hand * next() const { return hNext; }
     
     /// return previous Hand in Fiber's list
-    Hand * prev()  const  { return hPrev; }
+    Hand * prev() const { return hPrev; }
 
     /// set next Hand in Fiber's list
     void next(Hand * h) { hNext = h; }
