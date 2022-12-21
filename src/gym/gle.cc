@@ -21,7 +21,7 @@
 
 namespace gle
 {
-    /// values of cosine, sine over two full revolution
+    /// values of cosine and sine over two full revolutions
     float circle_[4*pi_twice+8] = { 0 };
         
     /// vertex buffer objects for static draw
@@ -76,7 +76,7 @@ namespace gle
             exit(1);
         }
 #endif
-        // circle covers 2 revolutions
+        // circle_[] covers 2 revolutions = 4 * PI
         set_arc(2*pi_twice, circle_, 1, 0, 2*M_PI/pi_twice, 0, 0);
 
         if ( !glIsBuffer(buf_[0]) )
