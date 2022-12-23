@@ -18,7 +18,7 @@ Mecable::Mecable()
     nPoints    = 0;
     pBlock     = nullptr;
     pBlockAlc  = 0;
-#if EXPERIMENTAL_PRECONDITIONNERS
+#if RECYCLED_PRECONDITIONNER
     pBlockAge  = 0;
 #endif
     pBlockType = 0;

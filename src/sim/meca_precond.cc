@@ -168,7 +168,7 @@ void Meca::precondition(const real* X, real* Y) const
     for ( Mecable const* mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
-#if EXPERIMENTAL_PRECONDITIONNERS
+#if RECYCLED_PRECONDITIONNER
         if ( mec->blockType() == 7 )
             mec->blockMultiply(X+inx, Y+inx);
         else
@@ -916,7 +916,7 @@ void Meca::computePreconditionner()
             for ( Mecable * mec : mecables )
                 computePrecondFull(mec);
             break;
-#if EXPERIMENTAL_PRECONDITIONNERS
+#if RECYCLED_PRECONDITIONNER
         case 7:
             renewPreconditionner(span);
             break;
@@ -934,7 +934,7 @@ void Meca::computePreconditionner()
 //------------------------------------------------------------------------------
 #pragma mark - Experimental Methods
 
-#if EXPERIMENTAL_PRECONDITIONNERS
+#if RECYCLED_PRECONDITIONNER
 
 /**
  Arrays 'tmp' and 'wrk' should be of size (nb_points*DIM)^2 or more

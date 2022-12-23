@@ -12,7 +12,7 @@
 class Meca;
 
 /// include some experimental preconditionner methods
-#define EXPERIMENTAL_PRECONDITIONNERS 0
+#define RECYCLED_PRECONDITIONNER 0
 
 
 /**
@@ -81,7 +81,7 @@ private:
     /// type of preconditionner
     SIZE_T pBlockType;
 
-#if EXPERIMENTAL_PRECONDITIONNERS
+#if RECYCLED_PRECONDITIONNER
     /// Flag that pBlock[] is used for preconditionning
     SIZE_T pBlockAge;
     
@@ -288,7 +288,7 @@ public:
     /// Returns address of memory available to store pivoting indices
     int * pivot() const { return reinterpret_cast<int*>(pBlock+pBlockAlc)-DIM*nPoints; }
     
-#if EXPERIMENTAL_PRECONDITIONNERS
+#if RECYCLED_PRECONDITIONNER
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
     void blockType(SIZE_T t) { pBlockType = t; pBlockAge = 0; }
 
