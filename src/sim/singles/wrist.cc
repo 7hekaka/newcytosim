@@ -73,7 +73,7 @@ void Wrist::setInteractions(Meca& meca) const
 {
     Interpolation i = sHand->interpolation();
     base_.addLink(meca, i, prop->stiffness);
-#if NEW_ANCHOR_STIFFNESS
+#if NEW_ANCHOR_NORMAL
     if ( prop->anchor_stiffness > 0 )
     {
         real seg = sHand->fiber()->segmentation();

@@ -89,14 +89,16 @@ test write / read systematically on all cym files
 
 - reading Single can be pooled since the Unattached and Attached Singles are stored apart
 - reduce Solid::addTriad() to add 2 points in 2D and 3 in 3D, as this is sufficient
+- Solid degree of freedom in linear system reduced to 5 in 3D, as this is sufficient
 - SparMatSymStruct Matrices can be structured as blocks corresponding to each Mecable (1.9.2022).
 	+ this would speed up block addressing: 
 	+ Need to create a tuple of indices {mecaindex, pointindex}, to use as argument of add_block()
 	+ Updating the matrix can be done in parallel if Mecablocks are independent
 	+ column reordering by increasing index would only be needed within each Mecablock,
 	+ this will also permit vecMul parallelization per diagonal, using two output vectors:
-        each diagonal of blocks can be treated in parallel using multiple threads
+        each sub-diagonal of blocks can be treated in parallel using multiple threads
 	+ todo: vecMul() takes two output vectors; SparmatSymBlock becomes rectangular
+- parallel matrix-vector with two output vector
 - new Matrix33x2 two implement two consecutive blocks:
     consecutive 3x3 blocks can be handled simultaneously with SIMD vec2 operations
 - Store Mecable vertices as XXXXXXYYYYYYZZZZZZ to improve vectorization
@@ -126,7 +128,7 @@ This reduces the loading from 36 scalars down to 6 scalars, and the caculation
         We only need to calculate this once for A = a . PT[i] + (1-a) . PT[i+1]
         And redistribute to the two vectors: PT[j] += b.wT.A and PT[j+1] += (1-b).wT.A
 This can be done on the fly in mFUL.vecMul(), if we add a list of BlockOuterProduct elements to the matrix.
-This can speed up multiplication by a great deal. 
+This can speed up multiplication, to be tested. 
 The approach can be extended to others elements used extensively: SideSlidingLinks, SideLinks, etc.
 
 
