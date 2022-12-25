@@ -2051,8 +2051,8 @@ namespace gle
     {
         gym::stretchAlignZ(A, B, R);
         tube1();
-        gym::translate(0, 0, 1-3*R);
-        gym::scale(3.0, 3.0, 6*R);
+        gym::transAlignZ(B, 2*R, B-A);
+        gym::scale(1.0, 1.0, 1.5);
         cone2();
         discBottom2();
     }
