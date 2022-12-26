@@ -581,7 +581,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 #pragma mark - Display Lattice
 
 
-void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, real width,
+void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, real rad,
                                 gym_color (*select_color)(Fiber const&, long, real)) const
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -600,8 +600,6 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
 
     const real fac = 1 / disp->lattice_scale;
     const real uni = lat.unit();
-    const real rad = pixscale(width);
-    
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
 
@@ -623,24 +621,24 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
 }
 
 
-void Display3::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real width) const
+void Display3::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    drawFiberLattice(fib, lat, width, color_by_lattice);
+    drawFiberLattice(fib, lat, rad, color_by_lattice);
 }
 
-void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real width) const
+void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    drawFiberLattice(fib, lat, width, color_by_lattice_jet);
+    drawFiberLattice(fib, lat, rad, color_by_lattice_jet);
 }
 
-void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
+void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    drawFiberLattice(fib, lat, width, color_by_lattice_white);
+    drawFiberLattice(fib, lat, rad, color_by_lattice_white);
 }
 
-void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real width) const
+void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    drawFiberLattice(fib, lat, width, color_alternate);
+    drawFiberLattice(fib, lat, rad, color_alternate);
 }
 
 //------------------------------------------------------------------------------

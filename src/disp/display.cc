@@ -1131,9 +1131,8 @@ void Display::drawFiberPoints(Fiber const& fib) const
  This style uses one vertex for each site, positionned at the center of the range
  OpenGL will interpolate the colors, and each site will be covered by a gradient.
  */
-void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real width) const
+void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    const real rad = std::max(width * unitValue, real(0.25));
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1198,9 +1197,8 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
  This style, uses two vertices for each site, positionned at the extremity of the range,
  and each site is entirely covered by the color corresponding to the value.
  */
-void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real width) const
+void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    const real rad = std::max(width * unitValue, real(0.25));
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1262,9 +1260,8 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
 }
 
 
-void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real width) const
+void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    real rad = std::max(width * unitValue, real(0.25));
     drawFiberLattice2(fib, lat, rad);
     drawFiberLatticeEdges(fib, lat, rad*0.5);
 }
@@ -1273,9 +1270,8 @@ void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, rea
 /**
  Indicate the edges between sites with small dots
  */
-void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real size) const
+void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real rad) const
 {
-    real rad = std::max(size * unitValue, real(0.25));
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1639,23 +1635,26 @@ void Display::drawFiber(Fiber const& fib)
     VisibleLattice const* lat = fib.visibleLattice();
     if ( lat )
     {
+        real rad = std::max(disp->line_width * unitValue, real(0.25));
+        if ( style == 3 )
+            rad = pixscale(disp->line_width);
         // if the Lattice is displayed, do not draw backbone:
         switch ( disp->lattice_style )
         {
             case 1:
-                drawFiberLattice1(fib, *lat, disp->line_width);
+                drawFiberLattice1(fib, *lat, rad;
                 style = 0;
                 break;
             case 2:
-                drawFiberLattice2(fib, *lat, disp->line_width);
+                drawFiberLattice2(fib, *lat, rad);
                 style = 0;
                 break;
             case 3:
-                drawFiberLattice3(fib, *lat, disp->line_width);
+                drawFiberLattice3(fib, *lat, rad);
                 style = 0;
                 break;
             case 4:
-                drawFiberLatticeEdges(fib, *lat, disp->line_width);
+                drawFiberLatticeEdges(fib, *lat, rad);
                 style = 0;
                 break;
         }
