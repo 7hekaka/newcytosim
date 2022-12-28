@@ -77,6 +77,9 @@ namespace gym
     /// translate matrix and then scale, like glTranslate() followed by glScale()
     void mat_transscale(float[16], float X, float Y, float Z, float S);
 
+    /// translate matrix and then scale, like glTranslate() followed by glScale()
+    void mat_transscale(float[16], const float[16], float X, float Y, float Z, float S);
+
     /// keep translation and scale but not rotation component
     void mat_unrotate(float[16], const float[16]);
 

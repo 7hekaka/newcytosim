@@ -178,6 +178,19 @@ void gym::mat_transscale(float M[16], float X, float Y, float Z, float S)
     }
 }
 
+void gym::mat_transscale(float M[16], const float R[16], float X, float Y, float Z, float S)
+{
+    for ( int i = 0; i < 12; i += 4 )
+    {
+        M[i  ] = R[i  ] * S;
+        M[i+1] = R[i+1] * S;
+        M[i+2] = R[i+2] * S;
+        M[i+3] = R[i+3] * S;
+    }
+    for ( int i = 0; i < 4; ++i )
+        M[12+i] = R[12+i] + X * R[i] + Y * R[i+4] + Z * R[i+8];
+}
+
 /** This works if the scaling is isotropic */
 void gym::mat_unrotate(float T[16], const float M[16])
 {
@@ -213,7 +226,7 @@ int gym::mat4x4_inverse(float T[16], const float M[16])
     c[4] = M[2+4*1]*M[3+4*3] - M[3+4*1]*M[2+4*3];
     c[5] = M[2+4*2]*M[3+4*3] - M[3+4*2]*M[2+4*3];
     
-    float det = s[0]*c[5]-s[1]*c[4]+s[2]*c[3]+s[3]*c[2]-s[4]*c[1]+s[5]*c[0];
+    float det = s[0]*c[5] - s[1]*c[4] + s[2]*c[3] + s[3]*c[2] - s[4]*c[1] + s[5]*c[0];
     
     if ( det == 0 )
         return 1;
@@ -250,8 +263,9 @@ int gym::mat4x4_inverse(float T[16], const float M[16])
 /// Invert 3x3 matrix.
 int gym::mat3x3_inverse(float inv[9], const float m[9])
 {
-    float det = m[0]*m[4]*m[8] + m[2]*m[3]*m[7] + m[1]*m[5]*m[6]
-              - m[2]*m[4]*m[6] - m[1]*m[3]*m[8] - m[0]*m[5]*m[7];
+    float det = m[0] * ( m[4]*m[8] - m[5]*m[7] ) +
+                m[1] * ( m[5]*m[6] - m[3]*m[8] ) +
+                m[2] * ( m[3]*m[7] - m[4]*m[6] ) ;
     
     if ( det != 0 )
     {

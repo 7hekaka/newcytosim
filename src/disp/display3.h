@@ -91,7 +91,7 @@ public:
     /// draw Fiber point-like features
     void drawFiberPoints(Fiber const&) const;
     
-    /// draw Fiber speckles
+    /// draw points distributed randomly along fibers, at fixed positions
     void drawFiberSpeckles(Fiber const&) const;
     
     /// draw the free Single

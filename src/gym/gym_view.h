@@ -85,7 +85,7 @@ namespace gym
 #pragma mark -
     
     /// translate by (X, Y, Z) and then scale by S
-    inline void transScale(float X, float Y, float Z, float S) { gym::mat_copy(mvp_, ref_); gym::mat_transscale(mvp_, X, Y, Z, S); load(); }
+    inline void transScale(float X, float Y, float Z, float S) { gym::mat_transscale(mvp_, ref_, X, Y, Z, S); load(); }
 
     /// translate by pos; rotate to align X to Z, scale by rad in Z and trans in the other directions
     void transAlignZX(float pos, float rad, float trans);

@@ -703,8 +703,11 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const float rad = pixscale(disp->speckle_size);
+    if ( rad < pixelSize )
+        return;
     gym::color_front(fib.disp->color);
     gym::color_back(disp->back_color);
+    assert_enabled(GL_LIGHTING);
 
     // display random speckles:
     if ( disp->speckle_style == 1 )
@@ -726,7 +729,8 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
                 a += gap * std::log(pcg32(Z)*TINY);
             while ( a >= fib.abscissaM() )
             {
-                drawPoint(fib.pos(a), rad);
+                gym::transScale(fib.pos(a), rad);
+                gle::icosahedron();
                 a += gap * std::log(pcg32(Z)*TINY);
             }
         }
@@ -739,7 +743,8 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
                 a -= gap * std::log(pcg32(Z)*TINY);
             while ( a <= fib.abscissaP() )
             {
-                drawPoint(fib.pos(a), rad);
+                gym::transScale(fib.pos(a), rad);
+                gle::icosahedron();
                 a -= gap * std::log(pcg32(Z)*TINY);
             }
         }
@@ -751,7 +756,8 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
         real a = gap * std::ceil( fib.abscissaM() / gap );
         while ( a <= fib.abscissaP() )
         {
-            drawPoint(fib.pos(a), rad);
+            gym::transScale(fib.pos(a), rad);
+            gle::icosahedron();
             a += gap;
         }
     }
