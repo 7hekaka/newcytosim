@@ -119,7 +119,7 @@ void SingleProp::read(Glossary& glos)
     glos.set(hand,           "hand");
     glos.set(stiffness,      "stiffness");
 #if NEW_ANCHOR_NORMAL
-    glos.set(anchor_stiffness, "anchor_stiffness");
+    glos.set(anchor_stiffness, "anchor_stiffness") || glos.set(anchor_stiffness, "stiffness", 1);
 #endif
     glos.set(length,         "length");
     if ( glos.value_is("diffusion", 0, "fast") )

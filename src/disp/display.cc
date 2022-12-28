@@ -1891,14 +1891,18 @@ void Display::drawFootball(Solid const& obj, size_t inx, bool flip)
     gym::enableLighting();
     gym::color_both(disp->color, 1.0);
 #if ( DIM >= 3 )
-    Vector A = obj.posP(inx+1+flip);
-    Vector B = obj.posP(inx+2-flip);
+    Vector A = obj.posP(inx+1);
+    Vector B = obj.posP(inx+2);
     Vector C = obj.posP(inx+3);
     gym::transRotate(X, A-X, B-X, C-X);
 #else
     gym::transScale(X, obj.radius(inx));
 #endif
+    if ( flip )
+        glFrontFace(GL_CW);
     gle::football();
+    if ( flip )
+        glFrontFace(GL_CCW);
 }
 
 
