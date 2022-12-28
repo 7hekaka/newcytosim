@@ -59,8 +59,9 @@ void PointGrid::createCells()
     if ( pGrid.createCells() )
         pGrid.printSummary(Cytosim::log, "   PointGrid");
 
-    //Create side regions suitable for pairwise interactions:
-    pGrid.createSideRegions(1);
+    // create side regions suitable for pairwise interactions:
+    if ( !pGrid.hasRegions() )
+        pGrid.createSideRegions(1);
 }
 
 
@@ -552,8 +553,6 @@ void PointGrid::setStericsT(FatPointList & pots1, FatLocusList & locs1,
  */
 void PointGrid::setSterics0() const
 {
-    //std::clog << "----" << '\n';
-    
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -577,7 +576,7 @@ void PointGrid::setSterics0() const
 
 void PointGrid::setStericsT() const
 {
-    //std::clog << "----" << '\n';
+    assert_false( pGrid.isPeriodic() );
     
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
@@ -641,6 +640,7 @@ void PointGrid::setSterics0(const size_t pan) const
 
 void PointGrid::setStericsT(const size_t pan) const
 {
+    assert_false( pGrid.isPeriodic() );
     // scan all cells to examine each pair of particles:
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
@@ -702,6 +702,7 @@ void PointGrid::setSterics0(const size_t pan1, const size_t pan2) const
 
 void PointGrid::setStericsT(const size_t pan1, const size_t pan2) const
 {
+    assert_false( pGrid.isPeriodic() );
     assert_true(pan1 != pan2);
     
     // scan all cells to examine each pair of particles:

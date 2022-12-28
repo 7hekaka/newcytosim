@@ -261,7 +261,8 @@ public:
     {
         cVolume = 1;
         size_t cnt = 1;
-
+        bool reshaped = false;
+        
         for ( int d = 0; d < ORD; ++d )
         {
             if ( cells[d] <= 0 )
@@ -269,6 +270,7 @@ public:
             
             if ( infs[d] >= sups[d] )
                 throw InvalidParameter("Cannot build grid as sup[] <= inf[]");
+            reshaped |= ( mDim[d] != cells[d] );
             
             mStride[d] = cnt;
             cnt      *= cells[d];
@@ -282,6 +284,8 @@ public:
             cVolume  *= cWidth[d];
         }
         mNbCells = cnt;
+        if ( reshaped )
+            deleteRegions();
     }
     
     ///true if setDimensions() was called
@@ -611,8 +615,8 @@ private:
         return e;
     }
     
-    
-    int * newRectangularGrid(size_t& cmx, const size_t range[ORD])
+    /// return array of dimensionality ORD, containing indices with reference to the center cell
+    static int * newRectangularGrid(size_t& cmx, const size_t range[ORD])
     {
         cmx = 1;
         for ( int d = 0; d < ORD; ++d )

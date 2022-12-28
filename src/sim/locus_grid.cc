@@ -64,7 +64,8 @@ void LocusGrid::createCells()
         pGrid.printSummary(Cytosim::log, "   LocusGrid");
 
     //Create side regions suitable for pairwise interactions:
-    pGrid.createSideRegions(1);
+    if ( !pGrid.hasRegions() )
+        pGrid.createSideRegions(1);
 }
 
 
@@ -1133,6 +1134,7 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
 void LocusGrid::setStericsX(BigLocusList const& list1,
                             BigLocusList const& list2) const
 {
+    assert_false( pGrid.isPeriodic() );
     assert_true( &list1 != &list2 );
 #if 0
     {
@@ -1269,6 +1271,7 @@ void LocusGrid::setSterics0() const
 /** This calls setStericsT() */
 void LocusGrid::setSterics() const
 {
+    assert_false( pGrid.isPeriodic() );
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
@@ -1339,6 +1342,7 @@ void LocusGrid::setSterics0(size_t pan) const
 
 void LocusGrid::setStericsT(size_t pan) const
 {
+    assert_false( pGrid.isPeriodic() );
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
          int const* region;
@@ -1383,6 +1387,7 @@ void LocusGrid::setSterics0(size_t pan, size_t bim) const
 
 void LocusGrid::setStericsT(size_t pan, size_t bim) const
 {
+    assert_false( pGrid.isPeriodic() );
     assert_true(pan != bim);
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
