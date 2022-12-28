@@ -39,7 +39,7 @@ class Simul;
  @todo Include FiberSite site as member variable, instead of derivation
  */
 class Hand : public FiberSite
-{    
+{
     /// a monitor that does nothing
     static HandMonitor dummyMonitor;
 

@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 /**
- This provides an incomplete declaration of Simul,
- and global functions to access values used often across Cytosim's code
+ This provides an incomplete declaration of Simul, and some global functions
+ to access values that are used frequently across Cytosim's code
  */
 
 #include "real.h"

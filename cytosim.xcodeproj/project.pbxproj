@@ -287,6 +287,7 @@
 		BB584FDB28F9F520006D6349 /* test_random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591005B98DA3006956D5 /* test_random.cc */; };
 		BB584FDC28F9F52C006D6349 /* random.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73589C05B98DA3006956D5 /* random.cc */; };
 		BB584FDD28F9F53C006D6349 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
+		BB585419295C716600F103AB /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BB5A0CB021C38BF7000DBC0E /* interpolation4.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD89B2F214FEABB00DB4ECA /* interpolation4.cc */; };
 		BB5CD2D028D8C91D004F34D5 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BB5CD2DD28D8C94E004F34D5 /* (null) in Headers */ = {isa = PBXBuildFile; };
@@ -5721,6 +5722,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB585419295C716600F103AB /* glapp.cc in Sources */,
 				BB51BC0D05FA4F8200D4869F /* test_grid.cc in Sources */,
 				BB51BC1005FA4F9A00D4869F /* random.cc in Sources */,
 				BB51BC1605FA4FD100D4869F /* messages.cc in Sources */,
