@@ -449,7 +449,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
     
     // set parameters for exploded display
     if ( disp->explode_style )
-        self->explode_shift = ( lcrng3(fib->signature()) * 0x1p-32 - 0.5 ) * disp->explode_range;
+        self->explode_shift = ( fib->signature() * 0x1p-32 - 0.5 ) * disp->explode_range;
     else
         self->explode_shift = 0;
 }

@@ -372,24 +372,5 @@ public:
 /// The Random Number Generator is thread local to avoid data corruption
 extern thread_local Random RNG;
 
-/**
- Linear congruential random number generator
- The coefficients are found in Numerical Recipes 3rd Ed. Chapter 7
- See also http://en.wikipedia.org/wiki/Linear_congruential_generator
- 
- The low-order bits should never be relied on for any degree of randomness whatsoever. 
- To use the topmost bit:
-
-     if ( z & 0x80000000U )
- 
- */
-
-static inline uint32_t lcrng1(uint32_t z) { return z * 2024337845U + 797082193U; }
-
-static inline uint32_t lcrng2(uint32_t z) { return z * 279470273U + 4294967291U; }
-
-static inline uint32_t lcrng3(uint32_t z) { return z * 1372383749U + 1289706101U; }
-
-static inline uint32_t lcrng4(uint32_t z) { return z * 1103515245U + 12345U; }
 
 #endif  //RANDOM_H

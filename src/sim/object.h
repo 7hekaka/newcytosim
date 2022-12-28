@@ -167,7 +167,7 @@ public:
     /// set flag (this value is not stored in trajectory files)
     void flag(ObjectFlag f) { flag_ = f; }
     
-    /// a random number that makes objects unique
+    /// a random number that is likely to be unique
     ObjectSignature signature() const { return signature_; }
     
     /// set signature
