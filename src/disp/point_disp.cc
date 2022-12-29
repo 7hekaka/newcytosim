@@ -51,6 +51,7 @@ PointDisp::PointDisp(PointDisp const& o) : Property(o)
     coloring = o.coloring;
     size     = o.size;
     width    = o.width;
+    scale    = o.scale;
     shape    = o.shape;
     style    = o.style;
     symbol   = o.symbol;
@@ -69,6 +70,7 @@ PointDisp& PointDisp::operator = (PointDisp const& o)
     coloring = o.coloring;
     size     = o.size;
     width    = o.width;
+    scale    = o.scale;
     shape    = o.shape;
     style    = o.style;
     symbol   = o.symbol;
@@ -95,6 +97,7 @@ void PointDisp::clear()
     coloring = 0;
     size   = 5;
     width  = 2;
+    scale  = 1;
     shape  = 'o';
     style  = 7;
     symbol = 0;
@@ -365,6 +368,7 @@ void PointDisp::read(Glossary& glos)
     glos.set(shape, "points", 1);
 
     glos.set(width, "width") || glos.set(width, "size", 1);
+    glos.set(scale, "scale");
     glos.set(style, "style");
     glos.set(shape, "shape");
     glos.set(symbol, "symbol");
@@ -390,6 +394,7 @@ void PointDisp::write_values(std::ostream& os) const
     write_value(os, "coloring", coloring);
     write_value(os, "size", size);
     write_value(os, "width", width);
+    write_value(os, "scale", scale);
     write_value(os, "shape", shape);
     write_value(os, "style", style);
     if ( isprint(symbol) )

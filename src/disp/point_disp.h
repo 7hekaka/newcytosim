@@ -124,6 +124,9 @@ public:
     /// display width of lines
     float width;
     
+    /// miscellaneous display parameter
+    float scale;
+
     /// 'c' for circle, 'h' for hexagon, 's' for star, etc.
     char shape;
     

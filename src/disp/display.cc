@@ -1790,18 +1790,6 @@ void Display::drawSolid(Solid const& obj)
             drawObject(obj.posP(i), pixscale(disp->size), gle::hedron(obj.radius(i)>0));
     }
     
-#if NEW_SOLID_HAS_TWIN
-    Solid const* tw = obj.twin();
-    if (( disp->style & 4 ) && tw )
-    {
-        bodyColor(obj);
-        gym::enableLighting();
-        real rad = 0.5 * pixscale(disp->size);
-        for ( int i = 1; i <= DIM; ++i )
-            gle::stretchTube(obj.posPoint(i), rad, tw->posPoint(i), gle::tube2);
-    }
-#endif
-    
     //display outline of spheres in 2D
     if ( disp->style & 8 )
     {
@@ -1843,7 +1831,7 @@ void Display::drawSolid(Solid const& obj)
         }
     }
     
-    //draw polygon around vertices of Solid
+    //draw polygon line joining vertices of Solid
     if ( disp->style & 32 )
     {
         gym::disableLighting();
@@ -1884,25 +1872,28 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
 }
 
 
-void Display::drawFootball(Solid const& obj, size_t inx, bool flip)
+void Display::drawFootball(Solid const& obj, size_t inx, gym_color col, bool flip)
 {
-    const PointDisp * disp = obj.prop->disp;
     Vector X = obj.posP(inx);
-    gym::enableLighting();
-    gym::color_both(disp->color, 1.0);
 #if ( DIM >= 3 )
-    Vector A = obj.posP(inx+1);
-    Vector B = obj.posP(inx+2);
-    Vector C = obj.posP(inx+3);
-    gym::transRotate(X, A-X, B-X, C-X);
+    gym::transRotate(X, obj.posP(inx+1)-X, obj.posP(inx+2)-X, obj.posP(inx+3)-X);
 #else
     gym::transScale(X, obj.radius(inx));
 #endif
     if ( flip )
+    {
         glFrontFace(GL_CW);
-    gle::football();
-    if ( flip )
+        gle::sphere1();
+        gym::color_front(col);
+        gle::footballPentagons();
         glFrontFace(GL_CCW);
+    }
+    else
+    {
+        gle::sphere1();
+        gym::color_front(col);
+        gle::footballPentagons();
+    }
 }
 
 
@@ -1913,19 +1904,33 @@ void Display::drawSolids(SolidSet const& set)
         const PointDisp * disp = obj->prop->disp;
         if ( disp->visible && ( disp->style & 1 ))
         {
-            drawSolid(*obj);
 #if ( DIM >= 3 )
-            size_t inx = 0;
 #if NEW_SOLID_HAS_TWIN
-            if ( obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
+            size_t inx = 0;
+            Solid const* tw = obj->twin();
+            if ( tw && obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
             {
-                if ( obj->twin() )
+                real len = 0;
+                for ( size_t i = inx+1; i <= inx+DIM; ++i )
+                    len += distanceSqr(obj->posPoint(i), tw->posPoint(i));
+                gym::enableLighting();
+                gym_color col = gym_color::jet_color_dark(disp->scale * len);
+                bodyColor(*obj);
+                drawFootball(*obj, inx, col, true);
+                bodyColor(*obj);
+                drawFootball(*obj->twin(), inx, col, 0);
+                if ( disp->style & 4 )
                 {
-                    drawFootball(*obj, inx, true);
-                    drawFootball(*obj->twin(), inx, 0);
+                    //draw links between 'obj' and Twin
+                    bodyColor(*obj);
+                    real rad = 0.5 * pixscale(disp->size);
+                    for ( size_t i = inx+1; i <= inx+DIM; ++i )
+                        gle::stretchTube(obj->posPoint(i), rad, tw->posPoint(i), gle::tube2);
                 }
+                continue;
             }
 #endif
+            drawSolid(*obj);
             if ( obj->prop->disp->color.transparent() )
             {
                 for ( size_t i = 0; i < obj->nbPoints(); ++i )
