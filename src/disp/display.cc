@@ -1914,10 +1914,11 @@ void Display::drawSolids(SolidSet const& set)
                 for ( size_t i = inx+1; i <= inx+DIM; ++i )
                     len += distanceSqr(obj->posPoint(i), tw->posPoint(i));
                 gym::enableLighting();
-                gym_color col = gym_color::jet_color_dark(disp->scale * len);
-                bodyColor(*obj);
+                gym_color col = gym_color::dark_jet_color(disp->scale * len);
+                gym::color_back(disp->color2);
+                gym::color_front(disp->color, 1.0);
                 drawFootball(*obj, inx, col, true);
-                bodyColor(*obj);
+                gym::color_front(disp->color, 1.0);
                 drawFootball(*obj->twin(), inx, col, 0);
                 if ( disp->style & 4 )
                 {

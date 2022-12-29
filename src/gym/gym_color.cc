@@ -320,7 +320,7 @@ The result vary from black, blue, cyan, yellow, orange to red:
 - 4 : yellow
 - 5 : white
 */
-gym_color gym_color::jet_color_dark(const COLOF h, const COLOF a)
+gym_color gym_color::dark_jet_color(const COLOF h, const COLOF a)
 {
     COLOF r, g, b;
     if ( h <= 0.1 )

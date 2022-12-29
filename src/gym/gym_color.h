@@ -298,7 +298,7 @@ public:
     static gym_color jet_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new jet color extended
-    static gym_color jet_color_dark(COLOF h, COLOF alpha = 1.0f);
+    static gym_color dark_jet_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new jet color extended
     static gym_color jet_color_alpha(COLOF h);

@@ -575,7 +575,7 @@ static gym_color field_color(FieldDisplayParameters fdp, FieldScalar const& cell
         return gym_color(0, 0, 0);
     gym_color::COLOF x(fdp.amp * cell.val);
     if ( x > 0 )
-        return gym_color::jet_color_dark(x, 1.0);
+        return gym_color::dark_jet_color(x, 1.0);
     return gym_color(-x, 0, -x);
 }
 
