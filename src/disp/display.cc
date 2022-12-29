@@ -1904,6 +1904,7 @@ void Display::drawSolids(SolidSet const& set)
         const PointDisp * disp = obj->prop->disp;
         if ( disp->visible && ( disp->style & 1 ))
         {
+            drawSolid(*obj);
 #if ( DIM >= 3 )
 #if NEW_SOLID_HAS_TWIN
             size_t inx = 0;
@@ -1927,8 +1928,8 @@ void Display::drawSolids(SolidSet const& set)
                         gle::stretchTube(obj->posPoint(i), rad, tw->posPoint(i), gle::tube2);
                 }
             }
+            else
 #endif
-            drawSolid(*obj);
             if ( obj->prop->disp->color.transparent() )
             {
                 for ( size_t i = 0; i < obj->nbPoints(); ++i )
