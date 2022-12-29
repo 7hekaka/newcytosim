@@ -225,6 +225,15 @@ public:
 #if NEW_SOLID_HAS_TWIN
     /// pointer to Solid linked to this one
     Solid const* twin() const { return soTwin; }
+    
+    /// sum distance squared of links between twins
+    real twinTensionSqr() const
+    {
+        real res = 0;
+        for ( size_t i = 1; i <= DIM; ++i )
+            res += distanceSqr(posPoint(i), soTwin->posPoint(i));
+        return res;
+    }
 #endif
 
     //--------------------------------------------------------------------------

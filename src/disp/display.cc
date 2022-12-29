@@ -1910,9 +1910,7 @@ void Display::drawSolids(SolidSet const& set)
             Solid const* tw = obj->twin();
             if ( tw && obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
             {
-                real len = 0;
-                for ( size_t i = inx+1; i <= inx+DIM; ++i )
-                    len += distanceSqr(obj->posPoint(i), tw->posPoint(i));
+                real len = std::sqrt(obj->twinTensionSqr());
                 gym::enableLighting();
                 gym_color col = gym_color::dark_jet_color(disp->scale * len);
                 gym::color_back(disp->color2);
@@ -1928,7 +1926,6 @@ void Display::drawSolids(SolidSet const& set)
                     for ( size_t i = inx+1; i <= inx+DIM; ++i )
                         gle::stretchTube(obj->posPoint(i), rad, tw->posPoint(i), gle::tube2);
                 }
-                continue;
             }
 #endif
             drawSolid(*obj);
