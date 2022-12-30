@@ -8,6 +8,7 @@
 
 
 /// leading dimension of the banded matrix used for iso symmetric blocks
+constexpr size_t ISOB_KD = 2;
 constexpr size_t ISOB_LDD = 3;
 
 /*
@@ -28,6 +29,7 @@ static inline void applyPrecondIsoB(Mecable const* mec, real* Y)
     int nbp = mec->nbPoints();
 
 #if CHOUCROUTE
+    assert_true( ISOB_KD == 2 );
     alsatian_xpbtrsL<DIM>(nbp, mec->pblock(), ISOB_LDD, Y);
 #else
     /*
@@ -37,8 +39,8 @@ static inline void applyPrecondIsoB(Mecable const* mec, real* Y)
      */
     for ( int d = 0; d < DIM; ++d )
     {
-        blas::xtbsv('L', 'N', 'N', nbp, 2, mec->pblock(), ISOB_LDD, Y+d, DIM);
-        blas::xtbsv('L', 'T', 'N', nbp, 2, mec->pblock(), ISOB_LDD, Y+d, DIM);
+        blas::xtbsv('L', 'N', 'N', nbp, ISOB_KD, mec->pblock(), ISOB_LDD, Y+d, DIM);
+        blas::xtbsv('L', 'T', 'N', nbp, ISOB_KD, mec->pblock(), ISOB_LDD, Y+d, DIM);
     }
 #endif
 }
@@ -342,7 +344,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
  
  This block is square, symmetric, definite positive and well-behaved
  */
-void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t ldd) const
+void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t ldd) const
 {
     const size_t nbp = mec->nbPoints();
 
@@ -367,10 +369,10 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t ldd) const
      */
 
 #if USE_ISO_MATRIX
-    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 1, 2);
+    mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 1, kd);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTrace(beta/DIM, res, ldd-1, mec->matIndex(), nbp, DIM, 2, false);
+        mFUL.addDiagonalTrace(beta/DIM, res, kd, mec->matIndex(), nbp, DIM, kd, false);
 
     // add Identity matrix to band storage:
     for ( size_t i = 0; i < nbp; ++i )
@@ -605,7 +607,6 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
  */
 void Meca::computePrecondIsoB(Mecable* mec)
 {
-    assert_true(ISOB_LDD>2);
     const size_t nbp = mec->nbPoints();
     mec->blockSize(DIM*nbp, ISOB_LDD*nbp, 0);
     
@@ -623,14 +624,14 @@ void Meca::computePrecondIsoB(Mecable* mec)
         getIsoBlock(mec, mec->pblock());
         VecPrint::full("iso symmetric", nbp, nbp, mec->pblock(), nbp, 2);
 #endif
-        getIsoBandedBlock(mec, mec->pblock(), ISOB_LDD);
+        getIsoBandedBlock(mec, mec->pblock(), ISOB_KD, ISOB_LDD);
         //VecPrint::full("banded", ISOB_LDD, nbp, mec->pblock(), ISOB_LDD, 2);
 
         // calculate Banded Cholesky factorization:
 #if CHOUCROUTE
-        alsatian_xpbtf2L<2>(nbp, mec->pblock(), ISOB_LDD, &info);
+        alsatian_xpbtf2L<ISOB_KD>(nbp, mec->pblock(), ISOB_LDD, &info);
 #else
-        lapack::xpbtf2('L', nbp, 2, mec->pblock(), ISOB_LDD, &info);
+        lapack::xpbtf2('L', nbp, ISOB_KD, mec->pblock(), ISOB_LDD, &info);
 #endif
         bt = 1;
     }
@@ -927,8 +928,6 @@ void Meca::computePreconditionner()
             throw InvalidParameter("unknown `precondition' value");
             break;
     }
-    if ( bump_ > 0 )
-        Cytosim::log << "failed to compute " << bump_ << " / " << mecables.size() << " preconditionner blocks\n";
 }
 
 

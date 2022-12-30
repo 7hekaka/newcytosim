@@ -320,7 +320,7 @@ private:
     void getFullBlock(const Mecable*, real* mat) const;
 
     /// extract the 5-bands symmetric on-diagonal block corresponding to a Mecable
-    void getIsoBandedBlock(const Mecable*, real* mat, size_t ldd) const;
+    void getIsoBandedBlock(const Mecable*, real* mat, size_t kd, size_t ldd) const;
 
     /// extract the istropic projection of the on-diagonal block corresponding to a Mecable
     void getIsoBlock(const Mecable*, real* mat) const;
