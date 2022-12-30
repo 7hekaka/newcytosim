@@ -97,10 +97,25 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
     // distribute Fiber-points on the grid
     for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
     {
+#if NEW_SHAPED_FIBER
+        if ( F->prop->steric == 2 )
+        {
+            // include segments, in the cell associated with their center
+            for ( size_t i = 0; i < F->nbSegments(); ++i )
+            {
+                real amp = 2. + std::tanh(std::abs(i-0.5*F->nbSegments())-3);
+                real rad = amp * F->prop->steric_radius;
+                real rge = rad + F->prop->steric_range;
+                real sup = rge + 0.5 * F->segmentation();
+                grid.add(F, i, rad, rge, sup);
+            }
+        }
+        else
+#endif
         if ( has_steric(F, grid.nbPanes()) )
         {
-            const real rad = F->prop->steric_radius;        // equilibrium radius
-            const real rge = rad + F->prop->steric_range;   // extended range of interaction
+            const real rad = F->prop->steric_radius; // equilibrium radius
+            const real rge = rad + F->prop->steric_range; // extended range of interaction
             const real sup = rge + 0.5 * F->segmentation();
 
             // include segments, in the cell associated with their center
